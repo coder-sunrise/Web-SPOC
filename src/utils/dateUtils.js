@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { serverDateFormat } from '@/components'
+import { serverDateFormat } from '@/utils/format'
 
 export const formatDateToText = (value = undefined, parseFormat) => {
   if (moment.isMoment(value)) return value.format(serverDateFormat)

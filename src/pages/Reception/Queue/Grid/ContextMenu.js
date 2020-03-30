@@ -50,7 +50,9 @@ const styles = (theme) => ({
   },
 })
 
-const ContextMenu = ({ show, row, handleClick, classes }) => {
+const { Secured } = Authorized
+
+const ContextMenu = ({ row, handleClick, classes, rights }) => {
   const isStatusWaiting = row.visitStatus === VISIT_STATUS.WAITING
   const isStatusInProgress = filterMap[StatusIndicator.IN_PROGRESS].includes(
     row.visitStatus,
@@ -109,10 +111,12 @@ const ContextMenu = ({ show, row, handleClick, classes }) => {
 
   const contextMenuOptions = useMemo(() =>
     ContextMenuOptions.map((opt) => {
+      const isDisabled = rights === 'disable'
+
       switch (opt.id) {
-        case 0: // view visit
-          return { ...opt, hidden: !isStatusWaiting }
-        case 0.1: // edit visit
+        case 0: // edit visit
+          return { ...opt, hidden: !isStatusWaiting, disabled: isDisabled }
+        case 0.1: // view visit
           return { ...opt, hidden: isStatusWaiting }
         case 1: // dispense
           return {
@@ -120,25 +124,28 @@ const ContextMenu = ({ show, row, handleClick, classes }) => {
             disabled: !enableDispense(),
           }
         case 1.1: // billing
-          return { ...opt, disabled: !enableBilling }
+          return {
+            ...opt,
+            disabled: !enableBilling || isDisabled,
+          }
         case 2: // delete visit
-          return { ...opt, disabled: !isStatusWaiting }
+          return { ...opt, disabled: !isStatusWaiting || isDisabled }
         case 5: // start consultation
           return {
             ...opt,
-            disabled: isStatusInProgress,
+            disabled: isStatusInProgress || isDisabled,
             hidden: !isStatusWaiting || isRetailVisit || isBillFirstVisit,
           }
         case 6: // resume consultation
           return {
             ...opt,
-            disabled: !isStatusInProgress,
+            disabled: !isStatusInProgress || isDisabled,
             hidden: hideResumeButton || isRetailVisit || isBillFirstVisit,
           }
         case 7: // edit consultation
           return {
             ...opt,
-            disabled: !isStatusCompleted,
+            disabled: !isStatusCompleted || isDisabled,
             hidden: hideEditConsultation,
           }
         default:
@@ -182,6 +189,8 @@ const ContextMenu = ({ show, row, handleClick, classes }) => {
   return MenuItemsOverlay
 }
 
+const SecuredContextMenu = Secured('reception/queue')(ContextMenu)
+
 export default withStyles(styles, { name: 'QueueListingContextMenu' })(
-  ContextMenu,
+  SecuredContextMenu,
 )

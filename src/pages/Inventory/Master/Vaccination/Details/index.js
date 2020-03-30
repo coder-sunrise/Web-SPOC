@@ -8,9 +8,12 @@ import {
   roundTo,
 } from '@/utils/utils'
 import { ProgressButton, Button, withFormikExtend, Tabs } from '@/components'
-import { VaccinationDetailOption } from './variables'
 import Yup from '@/utils/yup'
 import { getBizSession } from '@/services/queue'
+import Authorized from '@/utils/Authorized'
+import { VaccinationDetailOption } from './variables'
+
+const { Secured } = Authorized
 
 const styles = () => ({
   actionDiv: {
@@ -51,6 +54,7 @@ const Detail = ({
     dispatch,
     errors: props.errors,
     hasActiveSession,
+    authority: 'inventorymaster.vaccination',
   }
 
   const checkHasActiveSession = async () => {
@@ -134,6 +138,7 @@ const Detail = ({
       <div className={classes.actionDiv}>
         <Button
           color='danger'
+          authority='none'
           onClick={navigateDirtyCheck({
             redirectUrl: '/inventory/master?t=2',
           })}
@@ -257,4 +262,4 @@ export default compose(
     },
     displayName: 'InventoryVaccinationDetail',
   }),
-)(Detail)
+)(Secured('inventorymaster.vaccination')(Detail))

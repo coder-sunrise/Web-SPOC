@@ -10,11 +10,7 @@ import { withFormikExtend, notification, CommonModal } from '@/components'
 import DispenseDetails from './DispenseDetails/WebSocketWrapper'
 import AddOrder from './DispenseDetails/AddOrder'
 // utils
-import {
-  calculateAmount,
-  getAppendUrl,
-  navigateDirtyCheck,
-} from '@/utils/utils'
+import { calculateAmount, navigateDirtyCheck } from '@/utils/utils'
 import Yup from '@/utils/yup'
 import { VISIT_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
@@ -70,10 +66,9 @@ const reloadDispense = (props, effect = 'query') => {
   })
 }
 
-const constructPayload = (values) => {
-  const _values = {
-    ...values,
-    prescription: values.prescription.map((o) => {
+const ConvertBatchNoArrayToText = (array) => {
+  if (array) {
+    return array.map((o) => {
       const item = { ...o }
       if (item.batchNo instanceof Array) {
         if (item.batchNo && item.batchNo.length > 0) {
@@ -84,9 +79,18 @@ const constructPayload = (values) => {
         }
       }
       return item
-    }),
+    })
   }
-  // values.prescription.forEach()
+
+  return array
+}
+
+const constructPayload = (values) => {
+  const _values = {
+    ...values,
+    prescription: ConvertBatchNoArrayToText(values.prescription),
+    vaccination: ConvertBatchNoArrayToText(values.vaccination),
+  }
   return _values
 }
 
@@ -131,9 +135,10 @@ const constructPayload = (values) => {
   },
   displayName: 'DispensePage',
 })
-@connect(({ orders, formik }) => ({
+@connect(({ orders, formik, dispense }) => ({
   orders,
   formik,
+  dispense,
 }))
 class Main extends Component {
   state = {
@@ -152,18 +157,6 @@ class Main extends Component {
     const accessRights = Authorized.check('queue.dispense.editorder')
 
     if (visitPurposeFK === VISIT_TYPE.RETAIL && isEmptyDispense) {
-      await dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'ctservice',
-        },
-      })
-      await dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'inventoryconsumable',
-        },
-      })
       this.setState(
         (prevState) => {
           return {
@@ -201,15 +194,9 @@ class Main extends Component {
     })
 
     if (finalizeResponse === 204) {
-      await dispatch({
-        type: 'dispense/query',
-        payload: {
-          id: dispense.visitID,
-          version: Date.now(),
-        },
-      })
-      router.push(getAppendUrl({}, '/reception/queue/billing'))
+      return true
     }
+    return false
   }
 
   _editOrder = () => {
@@ -362,7 +349,7 @@ class Main extends Component {
   }
 
   render () {
-    const { classes, handleSubmit, values } = this.props
+    const { classes, handleSubmit, values, dispense } = this.props
 
     return (
       <div className={classes.root}>
@@ -375,7 +362,7 @@ class Main extends Component {
         />
         <CommonModal
           title='Orders'
-          open={this.state.showOrderModal}
+          open={this.state.showOrderModal && dispense.queryCodeTablesDone}
           onClose={this.handleCloseAddOrder}
           onConfirm={this.handleOrderModal}
           maxWidth='md'

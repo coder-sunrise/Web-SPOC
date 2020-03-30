@@ -1,4 +1,5 @@
 import React from 'react'
+import router from 'umi/router'
 import DispenseDetails from './index'
 // common component
 import { notification } from '@/components'
@@ -12,6 +13,7 @@ import {
 } from '@/services/dispense'
 import CONSTANTS from './constants'
 import { REPORT_ID } from '@/utils/constants'
+import { getAppendUrl } from '@/utils/utils'
 
 const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
   const withoutPrintPreview = [
@@ -186,9 +188,30 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
     }
   }
 
+  const handleFinalize = async () => {
+    const { onFinalizeClick } = restProps
+    const finalized = await onFinalizeClick()
+    if (finalized) {
+      let settings = JSON.parse(localStorage.getItem('clinicSettings'))
+      const { autoPrintDrugLabel = false } = settings
+      if (autoPrintDrugLabel === true)
+        await handleOnPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
+
+      await restProps.dispatch({
+        type: 'dispense/query',
+        payload: {
+          id: restProps.dispense.visitID,
+          version: Date.now(),
+        },
+      })
+      router.push(getAppendUrl({}, '/reception/queue/billing'))
+    }
+  }
+
   return (
     <DispenseDetails
       {...restProps}
+      onFinalizeClick={handleFinalize}
       onPrint={handleOnPrint}
       sendingJob={sendingJob}
     />

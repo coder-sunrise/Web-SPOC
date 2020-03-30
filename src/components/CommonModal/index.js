@@ -182,6 +182,22 @@ class CommonModal extends React.PureComponent {
   }
 
   onClose = (force) => {
+    if (this.props.global.disableSave) {
+      if (force === true) {
+        this.props.dispatch({
+          type: 'global/updateState',
+          payload: {
+            disableSave: false,
+          },
+        })
+      }
+      if (force !== true) {
+        this.setState({
+          openConfirm: true,
+        })
+        return false
+      }
+    }
     const obs = Array.isArray(this.props.observe)
       ? this.props.observe
       : [

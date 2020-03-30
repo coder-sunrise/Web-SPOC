@@ -84,7 +84,10 @@ const mapEntityToValues = (entity) => {
   global,
 }))
 @withFormikExtend({
-  authority: 'patientdatabase.patientprofiledetails',
+  authority: [
+    'patientdatabase.newpatient',
+    'patientdatabase.patientprofiledetails',
+  ],
   enableReinitialize: false,
   mapPropsToValues: ({ patient }) => {
     // const mappedValues = {
@@ -192,7 +195,12 @@ const mapEntityToValues = (entity) => {
   displayName: 'PatientDetail',
 })
 class PatientDetail extends PureComponent {
-  state = {}
+  state = {
+    moduleAccessRight: {
+      name: 'patientdatabase',
+      rights: 'enable',
+    },
+  }
 
   constructor (props) {
     super(props)
@@ -200,7 +208,10 @@ class PatientDetail extends PureComponent {
       {
         id: '1',
         name: 'Demographic',
-        access: 'patientdatabase.patientprofiledetails',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
         schema: schema.demographic,
         component: Loadable({
           loader: () => import('./Demographics'),
@@ -214,7 +225,10 @@ class PatientDetail extends PureComponent {
       {
         id: '2',
         name: 'Emergency Contact',
-        access: 'patientdatabase.patientprofiledetails',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
         schema: schema.emergencyContact,
         component: Loadable({
           loader: () => import('./EmergencyContact'),
@@ -235,7 +249,10 @@ class PatientDetail extends PureComponent {
       {
         id: '3',
         name: 'Allergies',
-        access: 'patientdatabase.patientprofiledetails',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
         schema: schema.allergies,
         component: Loadable({
           loader: () => import('./Allergies'),
@@ -249,7 +266,10 @@ class PatientDetail extends PureComponent {
       {
         id: '4',
         name: 'Schemes',
-        access: 'patientdatabase.patientprofiledetails',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
         schema: schema.schemes,
         component: Loadable({
           loader: () => import('./Schemes'),
@@ -262,21 +282,11 @@ class PatientDetail extends PureComponent {
       },
       {
         id: '5',
-        name: 'Appointment History',
-        access: 'patientdatabase.patientprofiledetails',
-        component: Loadable({
-          loader: () => import('./AppointmentHistory'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '6',
         name: 'Patient History',
-        access: 'patientdatabase.patientprofiledetails',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
         component: Loadable({
           loader: () => import('./PatientHistory'),
           render: (loaded, p) => {
@@ -287,9 +297,12 @@ class PatientDetail extends PureComponent {
         }),
       },
       {
-        id: '7',
+        id: '6',
         name: 'Patient Document',
-        access: 'patientdatabase.patientprofiledetails',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
         component: Loadable({
           loader: () => import('./PatientDocument'),
           render: (loaded, p) => {
@@ -300,7 +313,7 @@ class PatientDetail extends PureComponent {
         }),
       },
       {
-        id: '8',
+        id: '7',
         name: 'Admission',
         access: 'demorights', // 'wardmanagement',
         component: Loadable({
@@ -315,17 +328,10 @@ class PatientDetail extends PureComponent {
     ]
   }
 
-  // componentDidMount () {
-  //   console.log('PatientDetail componentDidMount')
-  // }
-
-  // componentDidMount () {
-  //   setTimeout(() => {
-  //     if (this.props.patient.entity) {
-  //       this.props.resetForm(this.props.patient.entity)
-  //     }
-  //   }, 2000)
-  // }
+  componentWillMount () {
+    const moduleAccessRight = Authorized.check('patientdatabase')
+    this.setState({ moduleAccessRight })
+  }
 
   componentWillUnmount () {
     const { dispatch } = this.props
@@ -457,134 +463,143 @@ class PatientDetail extends PureComponent {
     const CurrentComponent = currentMenu.component
 
     return (
-      <GridContainer>
-        <GridItem xs={12} sm={12} md={2}>
-          <Card profile>
-            <CardBody profile>
-              <PatientInfoSideBanner entity={entity} {...this.props} />
-              <MenuList>
-                {this.widgets
-                  .filter(
-                    (o) =>
-                      (!!patient.entity && !!patient.entity.id) ||
-                      Number(o.id) <= 4,
-                  )
-                  .map((o) => (
-                    <Authorized authority={o.access}>
-                      <MenuItem
-                        key={o.name}
-                        className={classes.menuItem}
-                        selected={currentMenu.name === o.name}
-                        disabled={
-                          global.disableSave && currentMenu.name !== o.name
-                        }
-                        onClick={(e) => {
-                          onMenuClick(e, o)
-                          // console.log('here', entity, values)
-                          dispatch({
-                            type: 'patient/updateState',
-                            payload: {
-                              entity: entity || undefined,
-                            },
-                          })
-                          this.setState({
-                            selectedMenu: o.id,
-                          })
-                          // this.props.history.push(
-                          //   getAppendUrl({
-                          //     md: 'pt',
-                          //     cmt: o.id,
-                          //   }),
-                          // )
-                        }}
-                      >
-                        <ListItemIcon style={{ minWidth: 25 }}>
-                          <KeyboardArrowRight />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={
-                            <span
-                              style={{
-                                color: menuErrors[o.id] ? 'red' : 'inherit',
-                              }}
-                            >
-                              {o.name}
-                              {menuErrors[o.id] ? (
-                                <Error
-                                  style={{
-                                    position: 'absolute',
-                                    top: 13,
-                                    right: 8,
-                                  }}
-                                />
-                              ) : null}
-                            </span>
+      <Authorized
+        authority={[
+          'patientdatabase.patientprofiledetails',
+          'patientdatabase.newpatient',
+        ]}
+      >
+        <GridContainer>
+          <GridItem xs={12} sm={12} md={2}>
+            <Card profile>
+              <CardBody profile>
+                <PatientInfoSideBanner entity={entity} {...this.props} />
+                <MenuList>
+                  {this.widgets
+                    .filter(
+                      (o) =>
+                        (!!patient.entity && !!patient.entity.id) ||
+                        Number(o.id) <= 4,
+                    )
+                    .map((o) => (
+                      <Authorized authority={o.access}>
+                        <MenuItem
+                          key={o.name}
+                          className={classes.menuItem}
+                          selected={currentMenu.name === o.name}
+                          disabled={
+                            global.disableSave && currentMenu.name !== o.name
                           }
-                        />
-                      </MenuItem>
-                    </Authorized>
-                  ))}
-              </MenuList>
-              {isCreatingPatient && <Divider light />}
-              {isCreatingPatient && (
-                <Button
-                  color='primary'
-                  style={{ marginTop: theme.spacing(1) }}
-                  onClick={this.registerVisit}
-                >
-                  Register Visit
-                </Button>
-              )}
-            </CardBody>
-          </Card>
-        </GridItem>
-        <GridItem xs={12} sm={12} md={10}>
-          <CardContainer hideHeader title={currentMenu.name}>
-            <div
-              style={
-                height > 0 ? (
-                  {
-                    height: height - 95 - 20,
-                    overflow: 'auto',
-                    padding: 4,
-                    paddingTop: 20,
-                  }
-                ) : (
-                  { padding: 4, paddingTop: 20 }
-                )
-              }
-            >
-              <CurrentComponent {...resetProps} />
-            </div>
-          </CardContainer>
+                          onClick={(e) => {
+                            onMenuClick(e, o)
+                            // console.log('here', entity, values)
+                            dispatch({
+                              type: 'patient/updateState',
+                              payload: {
+                                entity: entity || undefined,
+                              },
+                            })
+                            this.setState({
+                              selectedMenu: o.id,
+                            })
+                            // this.props.history.push(
+                            //   getAppendUrl({
+                            //     md: 'pt',
+                            //     cmt: o.id,
+                            //   }),
+                            // )
+                          }}
+                        >
+                          <ListItemIcon style={{ minWidth: 25 }}>
+                            <KeyboardArrowRight />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <span
+                                style={{
+                                  color: menuErrors[o.id] ? 'red' : 'inherit',
+                                }}
+                              >
+                                {o.name}
+                                {menuErrors[o.id] ? (
+                                  <Error
+                                    style={{
+                                      position: 'absolute',
+                                      top: 13,
+                                      right: 8,
+                                    }}
+                                  />
+                                ) : null}
+                              </span>
+                            }
+                          />
+                        </MenuItem>
+                      </Authorized>
+                    ))}
+                </MenuList>
+                {isCreatingPatient && <Divider light />}
+                {isCreatingPatient && (
+                  <Authorized authority='queue.registervisit'>
+                    <Button
+                      color='primary'
+                      style={{ marginTop: theme.spacing(1) }}
+                      onClick={this.registerVisit}
+                    >
+                      Register Visit
+                    </Button>
+                  </Authorized>
+                )}
+              </CardBody>
+            </Card>
+          </GridItem>
+          <GridItem xs={12} sm={12} md={10}>
+            <CardContainer hideHeader title={currentMenu.name}>
+              <div
+                style={
+                  height > 0 ? (
+                    {
+                      height: height - 95 - 20,
+                      overflow: 'auto',
+                      padding: 4,
+                      paddingTop: 20,
+                    }
+                  ) : (
+                    { padding: 4, paddingTop: 20 }
+                  )
+                }
+              >
+                <CurrentComponent {...resetProps} />
+              </div>
+            </CardContainer>
 
-          <div
-            style={{
-              position: 'relative',
-            }}
-          >
-            {footer({
-              align: 'center',
-              // onReset:
-              //   values && values.id
-              //     ? () => {
-              //         resetForm(patient.entity)
-              //       }
-              //     : undefined,
-              onCancel: () => {
-                dispatch({
-                  type: 'patient/closePatientModal',
-                  payload: {
-                    history: this.props.history,
-                  },
-                })
-              },
-              onConfirm: this.validatePatient,
-              confirmBtnText: 'Save',
-            })}
-          </div>
-        </GridItem>
-      </GridContainer>
+            <div
+              style={{
+                position: 'relative',
+              }}
+            >
+              {footer({
+                align: 'center',
+                // onReset:
+                //   values && values.id
+                //     ? () => {
+                //         resetForm(patient.entity)
+                //       }
+                //     : undefined,
+                onCancel: () => {
+                  dispatch({
+                    type: 'patient/closePatientModal',
+                    payload: {
+                      history: this.props.history,
+                    },
+                  })
+                },
+                onConfirm: this.validatePatient,
+                confirmBtnText: 'Save',
+              })}
+            </div>
+          </GridItem>
+        </GridContainer>
+      </Authorized>
     )
   }
 }

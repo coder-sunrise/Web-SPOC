@@ -9,7 +9,6 @@ import { CLINIC_TYPE } from '@/utils/constants'
 
 const clinicInfo = JSON.parse(localStorage.getItem('clinicInfo') || {})
 const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
-
 const widgets = [
   {
     id: '1',
@@ -90,7 +89,7 @@ const widgets = [
       minW: 12,
       minH: 10,
       style: {
-        padding: '0 5px',
+        padding: 5,
       },
     },
     // toolbarAddon: (
@@ -291,6 +290,10 @@ const widgets = [
     accessRight: 'queue.consultation.widgets.attachment',
     component: Loadable({
       loader: () => import('@/pages/Widgets/Attachment'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...p} mainType='ClinicalNotes' />
+      },
       loading: Loading,
     }),
     model: 'attachment',
@@ -302,6 +305,52 @@ const widgets = [
       minH: 10,
       style: {
         padding: '0 5px',
+      },
+    },
+  },
+  {
+    id: '9',
+    name: 'Visual Acuity Test',
+    accessRight: 'queue.consultation.widgets.eyevisualacuity',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/EyeVisualAcuity'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return (
+          <Cmpnet
+            {...p}
+            prefix='corEyeVisualAcuityTest.eyeVisualAcuityTestForms'
+            attachmentsFieldName='corAttachment'
+            handleUpdateAttachments={({
+              updated,
+              form,
+              dispatch,
+              consultation,
+            }) => {
+              // console.log(updated, form, dispatch, consultation)
+              form.setFieldValue('corAttachment', updated)
+              const { entity } = consultation
+              entity.corAttachment = updated
+              dispatch({
+                type: 'consultation/updateState',
+                payload: {
+                  entity,
+                },
+              })
+            }}
+          />
+        )
+      },
+      loading: Loading,
+    }),
+    associatedProps: [
+      'corEyeVisualAcuityTest',
+    ],
+    layoutConfig: {
+      minW: 12,
+      minH: 10,
+      style: {
+        padding: 5,
       },
     },
   },

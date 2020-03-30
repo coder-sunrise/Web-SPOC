@@ -6,6 +6,7 @@ import { withStyles } from '@material-ui/core'
 // variables
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { VISIT_TYPE, VISIT_TYPE_NAME } from '@/utils/constants'
+import Authorized from '@/utils/Authorized'
 
 const styles = () => ({
   container: {
@@ -22,6 +23,11 @@ const styles = () => ({
     verticalAlign: 'baseline',
     '&:hover': {
       cursor: 'pointer',
+    },
+  },
+  readonly: {
+    '&:hover': {
+      cursor: 'default',
     },
   },
   red: {
@@ -56,7 +62,8 @@ const styles = () => ({
   },
 })
 
-const VisitStatusTag = ({ classes, row, onClick, statusTagClicked }) => {
+const VisitStatusTag = (props) => {
+  const { classes, row, onClick, statusTagClicked } = props
   const { visitStatus: value, visitPurposeFK } = row
 
   let colorTag = 'lightGrey'
@@ -111,7 +118,9 @@ const VisitStatusTag = ({ classes, row, onClick, statusTagClicked }) => {
 
   return (
     <div
-      className={classnames(cssClass)}
+      className={classnames({
+        ...cssClass,
+      })}
       onClick={statusTagClicked ? undefined : handleClick}
       onDoubleClick={handleDoubleClick}
     >

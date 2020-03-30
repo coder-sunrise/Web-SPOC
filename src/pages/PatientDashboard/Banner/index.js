@@ -28,6 +28,7 @@ import {
   Info,
 } from '@/components'
 import { getAppendUrl } from '@/utils/utils'
+import Authorized from '@/utils/Authorized'
 import Block from './Block'
 import HistoryDiagnosis from './HistoryDiagnosis'
 import { control } from '@/components/Decorator'
@@ -375,6 +376,10 @@ class Banner extends PureComponent {
       }
     }
     const year = Math.floor(moment.duration(moment().diff(info.dob)).asYears())
+
+    const viewPatientProfileAccess = Authorized.check(
+      'patientdatabase.patientprofiledetails',
+    )
     return (
       // <Affix target={() => window.mainPanel} offset={headerHeight + 1}>
       <Paper style={style}>
@@ -395,6 +400,11 @@ class Banner extends PureComponent {
                       cmt: 1,
                       pid: info.id,
                     })}
+                    disabled={
+                      !viewPatientProfileAccess ||
+                      (viewPatientProfileAccess &&
+                        viewPatientProfileAccess.rights !== 'enable')
+                    }
                     tabIndex='-1'
                   >
                     <Tooltip title={name} placement='bottom-start'>

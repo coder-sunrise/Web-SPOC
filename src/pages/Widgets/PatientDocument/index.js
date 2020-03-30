@@ -52,10 +52,14 @@ class PatientDocument extends Component {
     if (added)
       updated = [
         ...updated,
-        ...added.map((o) => ({
-          ...o,
-          fileIndexFK: o.id,
-        })),
+        ...added.map((file) => {
+          const { 0: fileDetails, attachmentType } = file
+          return {
+            ...fileDetails,
+            fileIndexFK: fileDetails.id,
+            attachmentType,
+          }
+        }),
       ]
 
     if (deleted)

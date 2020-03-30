@@ -17,6 +17,7 @@ import { convertToBase64 } from '@/utils/utils'
 import { FILE_STATUS, FILE_CATEGORY } from '@/utils/constants'
 import { getThumbnail } from './utils'
 import styles from './styles'
+import { corAttchementTypes } from '@/utils/codes'
 
 const allowedFiles = '.png, .jpg, .jpeg, .xls, .xlsx, .doc, .docx, .pdf'
 
@@ -39,6 +40,7 @@ const AttachmentWithThumbnail = ({
   simple = false,
   local = false,
   attachmentType = '',
+  fieldName,
   thumbnailSize = {
     height: 64,
     width: 64,
@@ -48,6 +50,8 @@ const AttachmentWithThumbnail = ({
   restrictFileTypes = [],
   fileCategory,
 }) => {
+  const type = corAttchementTypes.find((o) => o.type === attachmentType) || {}
+
   const fileAttachments = attachments.filter(
     (attachment) =>
       (!attachmentType ||
@@ -72,50 +76,6 @@ const AttachmentWithThumbnail = ({
     downloading,
     setDownlaoding,
   ] = useState(false)
-
-  const mapFileToUploadObject = async (file) => {
-    // file type and file size validation
-    const base64 = await convertToBase64(file)
-    const fileStatusFK = FILE_STATUS.UPLOADED
-    const fileExtension = getFileExtension(file.name)
-
-    let thumbnailData
-    if (
-      [
-        'jpg',
-        'jpeg',
-        'png',
-      ].includes(fileExtension)
-    ) {
-      const imgEle = document.createElement('img')
-      imgEle.src = `data:image/${fileExtension};base64,${base64}`
-      await setTimeout(() => {
-        // wait for 1 milli second for img to set src successfully
-      }, 100)
-      const thumbnail = getThumbnail(imgEle, thumbnailSize)
-      thumbnailData = thumbnail.toDataURL(`image/png`)
-    }
-
-    const uploadObject = {
-      fileName: file.name,
-      fileSize: file.size,
-      fileCategoryFK: FILE_CATEGORY.VISITREG,
-      content: base64,
-      fileExtension,
-      thumbnailData,
-      fileStatusFK,
-      attachmentType,
-    }
-    const uploaded = local ? {} : await uploadFile(uploadObject)
-
-    return {
-      ...uploaded,
-      attachmentType,
-      content: base64,
-      thumbnailData,
-      isbase64: true,
-    }
-  }
 
   const stopUploading = (reason) => {
     setErrorText(reason)
@@ -169,6 +129,7 @@ const AttachmentWithThumbnail = ({
       fileExtension,
       fileStatusFK,
       attachmentType,
+      attachmentTypeFK: type.id,
     }
 
     return originalFile
@@ -302,7 +263,7 @@ const AttachmentWithThumbnail = ({
       size='sm'
       onClick={onUploadClick}
       disabled={isReadOnly || uploading || global.disableSave || disableUpload}
-      className={classes.uploadBtn}
+      className={fileAttachments.length >= 1 ? classes.uploadBtn : ''}
     >
       <AttachFile /> Upload
     </Button>
@@ -318,6 +279,7 @@ const AttachmentWithThumbnail = ({
     onConfirmDelete: onDelete,
     onClickAttachment: onClick,
     noBorder: simple && !allowedMultiple,
+    fieldName,
   }
 
   let Body =

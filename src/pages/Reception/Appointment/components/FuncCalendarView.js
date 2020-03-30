@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { connect } from 'dva'
 // moment
 import moment from 'moment'
@@ -277,16 +277,26 @@ const CalendarView = ({
     // }
   }
 
+  const _jumpToSelectedValue = (value, type) => {
+    const desiredDate = moment().add(value, type)
+
+    dispatch({
+      type: 'calendar/navigateCalendar',
+      payload: { date: desiredDate },
+    })
+  }
+
   const Toolbar = (toolbarProps) => {
     return (
       <CalendarToolbar
         {...toolbarProps}
-        displayDate={displayDate}
         handleViewChange={_onViewChange}
         handleDateChange={_jumpToDate}
+        handleSelectedValue={_jumpToSelectedValue}
       />
     )
   }
+
   const EventComponent = (eventProps) => {
     return (
       <Event

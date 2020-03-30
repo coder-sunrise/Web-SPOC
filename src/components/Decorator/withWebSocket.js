@@ -60,6 +60,9 @@ const withWebSocket = () => (Component) => {
         pendingJob.length === 1
       ) {
         this.wsConnection.send(pendingJob[0])
+        notification.success({
+          message: `Job sent to the printer.`,
+        })
       }
       this.setState({
         pendingJob: [],

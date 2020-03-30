@@ -39,15 +39,32 @@ import { calculateAdjustAmount } from '@/utils/utils'
     if (type === '5') {
       v.drugCode = 'MISC'
     }
-    if (
-      !v.corPrescriptionItemPrecaution ||
-      !v.corPrescriptionItemPrecaution[0]
-    ) {
-      v.corPrescriptionItemPrecaution = [
-        {},
-      ]
+    // v.corPrescriptionItemPrecaution =
+    //   v.corPrescriptionItemPrecaution && v.corPrescriptionItemPrecaution[0]
+    //     ? v.corPrescriptionItemPrecaution
+    //     : [
+    //         {},
+    //       ]
+    let sequence = 0
+    const newCorPrescriptionItemPrecaution = (v.corPrescriptionItemPrecaution ||
+      [])
+      .map((precaution) => {
+        sequence += 1
+        return {
+          ...precaution,
+          sequence,
+        }
+      })
+
+    return {
+      ...v,
+      corPrescriptionItemPrecaution:
+        newCorPrescriptionItemPrecaution.length > 0
+          ? newCorPrescriptionItemPrecaution
+          : [
+              {},
+            ],
     }
-    return v
   },
   enableReinitialize: true,
 
@@ -74,7 +91,6 @@ import { calculateAdjustAmount } from '@/utils/utils'
     // ),
     corPrescriptionItemInstruction: Yup.array().of(
       Yup.object().shape({
-        prescribeUOMFK: Yup.number().required(),
         sequence: Yup.number().required(),
         stepdose: Yup.string().required(),
       }),
@@ -122,8 +138,12 @@ import { calculateAdjustAmount } from '@/utils/utils'
     }
 
     const instruction = getInstruction(values.corPrescriptionItemInstruction)
+    // const corPrescriptionItemPrecaution = values.corPrescriptionItemPrecaution.filter(
+    //   (i) => i.medicationPrecautionFK !== undefined,
+    // )
+
     const corPrescriptionItemPrecaution = values.corPrescriptionItemPrecaution.filter(
-      (i) => i.medicationPrecautionFK !== undefined || !i.isDeleted,
+      (i) => i.medicationPrecautionFK !== undefined,
     )
 
     const activeInstruction = values.corPrescriptionItemInstruction.filter(
@@ -132,14 +152,14 @@ import { calculateAdjustAmount } from '@/utils/utils'
 
     // reorder and overwrite sequence
     corPrescriptionItemPrecaution.forEach((item, index) => {
-      item.sequence = index + 1
+      if (!item.isDeleted) item.sequence = index + 1
     })
 
     // reorder and overwrite sequence
     activeInstruction.forEach((item, index) => {
       item.sequence = index + 1
     })
-    var batchNo = values.batchNo
+    let { batchNo } = values
     if (batchNo instanceof Array) {
       if (batchNo && batchNo.length > 0) {
         batchNo = batchNo[0]
@@ -173,21 +193,6 @@ class Medication extends PureComponent {
     expiryDate: '',
   }
 
-  componentDidMount () {
-    // this.props
-    //   .dispatch({
-    //     type: 'orders/getStockDetails',
-    //     payload: {
-    //       id: 1,
-    //     },
-    //   })
-    //   .then((v) => {
-    //     if (v) {
-    //       this.setState({ stockList: v.data })
-    //     }
-    //   })
-  }
-
   getActionItem = (i, arrayHelpers, prop, tooltip, defaultValue) => {
     const { theme, values, setFieldValue } = this.props
     const activeRows = values[prop].filter((item) => !item.isDeleted) || []
@@ -196,7 +201,6 @@ class Medication extends PureComponent {
         xs={2}
         gutter={theme.spacing(1)}
         style={{
-          // lineHeight: theme.props.rowHeight,
           textAlign: 'center',
         }}
       >
@@ -205,13 +209,12 @@ class Medication extends PureComponent {
             title='Are you sure delete this item?'
             onConfirm={() => {
               setFieldValue(`${prop}[${i}].isDeleted`, true)
-              // arrayHelpers.remove(i)
-              setTimeout(() => {
-                this.calculateQuantity()
-              }, 1)
+              if (prop === 'corPrescriptionItemInstruction') {
+                setTimeout(() => {
+                  this.calculateQuantity()
+                }, 1)
+              }
             }}
-            // okText='Yes'
-            // cancelText='No'
           >
             <Button justIcon color='danger'>
               <Delete />
@@ -236,21 +239,20 @@ class Medication extends PureComponent {
   }
 
   calculateQuantity = (medication) => {
-    const { codetable, setFieldValue, disableEdit, dirty } = this.props
-    let currentMedicaiton = medication
-    if (!currentMedicaiton) currentMedicaiton = this.state.selectedMedication
+    const { codetable, setFieldValue, disableEdit } = this.props
+    let currentMedication = medication || this.state.selectedMedication
+
     const { form } = this.descriptionArrayHelpers
     let newTotalQuantity = 0
 
-    if (currentMedicaiton && currentMedicaiton.dispensingQuantity) {
-      newTotalQuantity = currentMedicaiton.dispensingQuantity
+    if (currentMedication && currentMedication.dispensingQuantity) {
+      newTotalQuantity = currentMedication.dispensingQuantity
     } else {
       const prescriptionItem = form.values.corPrescriptionItemInstruction.filter(
         (item) => !item.isDeleted,
       )
       const dosageUsageList = codetable.ctmedicationdosage
       const medicationFrequencyList = codetable.ctmedicationfrequency
-
       for (let i = 0; i < prescriptionItem.length; i++) {
         if (
           prescriptionItem[i].dosageFK &&
@@ -273,7 +275,7 @@ class Medication extends PureComponent {
       }
 
       newTotalQuantity = Math.ceil(newTotalQuantity * 10) / 10 || 0
-      const { prescriptionToDispenseConversion } = currentMedicaiton
+      const { prescriptionToDispenseConversion } = currentMedication
       if (prescriptionToDispenseConversion)
         newTotalQuantity = Math.ceil(
           newTotalQuantity / prescriptionToDispenseConversion,
@@ -282,27 +284,21 @@ class Medication extends PureComponent {
     setFieldValue(`quantity`, newTotalQuantity)
 
     if (disableEdit === false) {
-      if (currentMedicaiton.sellingPrice) {
-        setFieldValue('unitPrice', currentMedicaiton.sellingPrice)
-        setFieldValue(
-          'totalPrice',
-          currentMedicaiton.sellingPrice * newTotalQuantity,
-        )
-        this.updateTotalPrice(currentMedicaiton.sellingPrice * newTotalQuantity)
+      if (currentMedication.sellingPrice) {
+        setFieldValue('unitPrice', currentMedication.sellingPrice)
+        this.updateTotalPrice(currentMedication.sellingPrice * newTotalQuantity)
       } else {
         setFieldValue('unitPrice', undefined)
-        setFieldValue('totalPrice', undefined)
         this.updateTotalPrice(undefined)
       }
     }
   }
 
   setTotalPrice = () => {
-    const { setFieldValue, values, disableEdit } = this.props
+    const { values, disableEdit } = this.props
     if (disableEdit === false) {
       if (values.unitPrice) {
         const total = (values.quantity || 0) * values.unitPrice
-        setFieldValue('totalPrice', total)
         this.updateTotalPrice(total)
       }
     }
@@ -517,9 +513,11 @@ class Medication extends PureComponent {
         v,
         adjValue,
       )
+      this.props.setFieldValue('totalPrice', v)
       this.props.setFieldValue('totalAfterItemAdjustment', adjustment.amount)
       this.props.setFieldValue('adjAmount', adjustment.adjAmount)
     } else {
+      this.props.setFieldValue('totalPrice', v)
       this.props.setFieldValue('totalAfterItemAdjustment', undefined)
       this.props.setFieldValue('adjAmount', undefined)
     }
@@ -910,15 +908,31 @@ class Medication extends PureComponent {
                   const activeRows = values.corPrescriptionItemPrecaution.filter(
                     (val) => !val.isDeleted,
                   )
+
+                  const maxSeq = _.maxBy(
+                    values.corPrescriptionItemPrecaution,
+                    'sequence',
+                  )
+
+                  let newMaxSeq = maxSeq
+                    ? maxSeq.sequence + 1
+                    : values.corPrescriptionItemPrecaution.length + 1
+
                   return activeRows.map((val, activeIndex) => {
                     if (val && val.isDeleted) return null
-
                     const i = values.corPrescriptionItemPrecaution.findIndex(
-                      (item) =>
-                        !val.id
-                          ? _.isEqual(item, val)
-                          : item.sequence === val.sequence,
+                      (cor) =>
+                        val.id
+                          ? cor.id === val.id
+                          : val.sequence === cor.sequence,
                     )
+
+                    // const i = values.corPrescriptionItemPrecaution.findIndex(
+                    //   (item) =>
+                    //     !val.id
+                    //       ? _.isEqual(item, val)
+                    //       : item.sequence === val.sequence,
+                    // )
 
                     return (
                       <div key={i}>
@@ -959,10 +973,10 @@ class Medication extends PureComponent {
                                           `corPrescriptionItemPrecaution[${i}].precautionCode`,
                                           option.code,
                                         )
-                                        setFieldValue(
-                                          `corPrescriptionItemPrecaution[${i}].sequence`,
-                                          i,
-                                        )
+                                        // setFieldValue(
+                                        //   `corPrescriptionItemPrecaution[${i}].sequence`,
+                                        //   i,
+                                        // )
                                       }}
                                       {...args}
                                     />
@@ -983,7 +997,7 @@ class Medication extends PureComponent {
                               drugFrequencyFK: '1',
                               day: 1,
                               precaution: '1',
-                              sequence: activeRows.length + 1,
+                              sequence: newMaxSeq,
                             },
                           )}
                         </GridContainer>
@@ -1012,13 +1026,6 @@ class Medication extends PureComponent {
                       setTimeout(() => {
                         this.setTotalPrice()
                       }, 1)
-                      // if (disableEdit === false) {
-                      //   if (values.unitPrice) {
-                      //     const total = e.target.value * values.unitPrice
-                      //     setFieldValue('totalPrice', total)
-                      //     this.updateTotalPrice(total)
-                      //   }
-                      // }
                     }}
                     {...args}
                   />
@@ -1057,18 +1064,7 @@ class Medication extends PureComponent {
                   <NumberInput
                     label='Total'
                     onChange={(e) => {
-                      // this.props.setFieldValue(
-                      //   'totalAfterItemAdjustment',
-                      //   e.target.value,
-                      // )
                       this.updateTotalPrice(e.target.value)
-                      // this.props.dispatch({
-                      //   type: 'orders/updateState',
-                      //   payload: {
-                      //     totalPrice: e.target.value,
-                      //     totalAfterItemAdjustment: undefined,
-                      //   },
-                      // })
                     }}
                     disabled={disableEdit}
                     currency

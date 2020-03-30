@@ -33,3 +33,4 @@ export {
 export {
   default as CallingQueueButton,
 } from './QueueDisplay/CallingQueueButton'
+export { default as AuthorizationWrapper } from './AuthorizationWrapper'

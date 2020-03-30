@@ -18,7 +18,7 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  authority: 'finance/scheme',
+  // authority: 'finance/scheme',
   mapPropsToValues: ({ settingCompany }) => settingCompany.filter || {},
   handleSubmit: () => {},
   displayName: 'CompanyFilter',
@@ -116,7 +116,7 @@ class Filter extends PureComponent {
                 >
                   <FormattedMessage id='form.search' />
                 </ProgressButton>
-                <Authorized authority='scheme.newscheme'>
+                <Authorized authority='copayer.newcopayer'>
                   <Button
                     color='primary'
                     onClick={() => {

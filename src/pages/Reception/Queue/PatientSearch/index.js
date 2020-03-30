@@ -11,6 +11,8 @@ import { LoadingWrapper } from '@/components/_medisys'
 import Loading from '@/components/PageLoading/index'
 import RegisterVisitBtn from './RegisterVisitBtn'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
+import Authorized from '@/utils/Authorized'
+import { primaryColor } from '@/assets/jss'
 
 const styles = () => ({
   patientNameBtn: {
@@ -38,20 +40,33 @@ class PatientSearch extends PureComponent {
         align: 'left',
         columnName: 'name',
         // width: 240,
-        render: (row) => (
-          <Tooltip title='View patient profile'>
-            <Button
-              className={this.props.classes.patientNameBtn}
-              color='primary'
-              size='sm'
-              link
-              id={row.id}
-              onClick={this.viewPatientProfile}
-            >
-              {row.name}
-            </Button>
-          </Tooltip>
-        ),
+        render: (row) => {
+          const accessRight = Authorized.check(
+            'patientdatabase.patientprofiledetails',
+          )
+          const isDisabled =
+            accessRight &&
+            (accessRight.rights === 'hidden' ||
+              accessRight.rights === 'disable')
+          return (
+            <Tooltip title='View patient profile'>
+              {isDisabled ? (
+                <span style={{ color: primaryColor }}>{row.name}</span>
+              ) : (
+                <Button
+                  className={this.props.classes.patientNameBtn}
+                  color='primary'
+                  size='sm'
+                  link
+                  id={row.id}
+                  onClick={this.viewPatientProfile}
+                >
+                  {row.name}
+                </Button>
+              )}
+            </Tooltip>
+          )
+        },
       },
       { columnName: 'patientAccountNo', width: 140 },
       { columnName: 'mobileNo', width: 140, sortingEnabled: false },

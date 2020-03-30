@@ -11,7 +11,7 @@ import {
   commonDataWriterTransform,
   commonDataReaderTransform,
 } from './utils'
-import { checkIsCodetableAPI, refreshCodetable } from '@/utils/codes'
+import { checkIsCodetableAPI, refreshCodetable } from '@/utils/codetable'
 import { sendNotification } from '@/utils/realtime'
 import { NOTIFICATION_STATUS, NOTIFICATION_TYPE } from '@/utils/constants'
 
@@ -106,7 +106,7 @@ export const axiosRequest = async (
         ...headers,
       },
     }
-    const apiUrl = baseUrl + url
+    const apiUrl = dynamicURL + url
 
     result = await axios({
       url: apiUrl,

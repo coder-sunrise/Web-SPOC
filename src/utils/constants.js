@@ -243,7 +243,7 @@ export const ORDER_TYPE_TAB = {
   VACCINATION: '2',
   SERVICE: '3',
   CONSUMABLE: '4',
-  OPENPRECRIPTION: '5',
+  OPENPRESCRIPTION: '5',
   ORDERSET: '6',
 }
 
@@ -256,12 +256,8 @@ export const FILE_STATUS = {
 export const SCRIBBLE_NOTE_TYPE = {
   CLINICALNOTES: 1,
   CHIEFCOMPLAINTS: 2,
-  PLAN: 3,
-  DENTALCLINICALNOTES: 4,
-  DENTALCOMPLAINTS: 5,
-  DENTALASSOCIATEHISTORY: 6,
-  DENTALINTRAORAL: 7,
-  DENTALEXTRAORAL: 8,
+  PLAN: 6,
+  HISTORY: 3,
 }
 
 export const SMS_STATUS = {
@@ -294,21 +290,10 @@ export const SMS_STATUS_TEXT = {
 }
 
 export const CANNED_TEXT_TYPE = {
-  CLINICALNOTES: 1,
+  NOTE: 1,
   CHIEFCOMPLAINTS: 2,
-  ASSOCIATEDHISTORY: 3,
-  INTRAORAL: 4,
-  EXTRAORAL: 5,
+  HISTORY: 3,
   PLAN: 6,
-}
-
-export const CANNED_TEXT_TYPE_FIELD = {
-  1: 'clinicianNote',
-  2: 'chiefComplaints',
-  3: 'associatedHistory',
-  4: 'intraOral',
-  5: 'extraOral',
-  6: 'plan',
 }
 
 export const DENTAL_CANNED_TEXT_TYPE_FIELD = {
@@ -329,7 +314,6 @@ export const FILE_CATEGORY = {
   VISITREG: 1,
   CONSULTATION: 2,
   PATIENT: 3,
-  QUEUEDISPLAY: 4,
 }
 
 export const PURCHASE_ORDER_STATUS = {
@@ -352,14 +336,12 @@ export const NOTIFICATION_TYPE = {
   QUEUE: 1,
   CODETABLE: 2,
   ERROR: 3,
-  QUEUECALL: 4,
 }
 
 export const NOTIFICATION_STATUS = {
   OK: 1,
   ERROR: 2,
 }
-
 export const KEYS = {
   QUEUEDISPLAYSETUP: 'queueDisplay',
   QUEUECALLING: 'queueCalling',

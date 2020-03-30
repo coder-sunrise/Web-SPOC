@@ -56,7 +56,6 @@ const styles = () => ({
 
 const filterByAccessRight = (m) => {
   const accessRight = Authorized.check(m.authority)
-
   if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
     return false
   return true
@@ -78,17 +77,18 @@ class SystemSetting extends PureComponent {
 
     const { filterValues } = systemSetting
     const { searchText } = filterValues
-
     return Object.keys(this.group).map((o) => {
+      const filteredByAccessRight = this.group[o].filter(filterByAccessRight)
+
       return {
         authority: Authority[o],
         title: o,
         items: this.group[o],
         key: o,
+        itemCount: filteredByAccessRight.length,
         content: (
           <GridContainer style={{ marginTop: theme.spacing(1) }} key={o}>
-            {this.group[o]
-              .filter(filterByAccessRight)
+            {filteredByAccessRight
               .filter((m) => {
                 return (
                   m.text.toLocaleLowerCase().indexOf(searchText) >= 0 ||
@@ -206,6 +206,7 @@ class SystemSetting extends PureComponent {
           activedKeys: actives,
         }
       : { active: actives[0] }
+    const menus = this.menus().filter((item) => item.itemCount > 0)
 
     return (
       <CardContainer hideHeader>
@@ -221,21 +222,18 @@ class SystemSetting extends PureComponent {
           mode={isMultiple ? 'multiple' : 'default'}
           {...activeConfig}
           onChange={this.onAccordionChange}
-          collapses={this.menus().filter((item) => {
+          collapses={menus.filter((item) => {
             const accessRight = accessRights.find(
               (menuItem) => menuItem.name === item.authority,
             )
-
-            const canAccess =
-              accessRight === undefined
-                ? true
-                : accessRight.rights === 'readwrite'
+            const hide =
+              !accessRight || (accessRights && accessRights === 'hidden')
+            if (hide) return false
             return (
-              canAccess &&
-              (!searchText ||
-                item.items.find(
-                  (m) => m.text.toLocaleLowerCase().indexOf(searchText) >= 0,
-                ))
+              !searchText ||
+              item.items.find(
+                (m) => m.text.toLocaleLowerCase().indexOf(searchText) >= 0,
+              )
             )
           })}
         />

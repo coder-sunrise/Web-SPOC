@@ -14,6 +14,8 @@ import {
 } from '@/components'
 import { podoOrderType, getInventoryItemV2 } from '@/utils/codes'
 import { INVENTORY_TYPE } from '@/utils/constants'
+import AuthorizedContext from '@/components/Context/Authorized'
+
 // let commitCount = 2201 // uniqueNumber
 
 const receivingDetailsSchema = Yup.object().shape({
@@ -414,7 +416,15 @@ class DODetails extends PureComponent {
 
   render () {
     const { props } = this
-    const { footer, values, theme, errors, classes } = props
+    const {
+      footer,
+      values,
+      theme,
+      errors,
+      classes,
+      isEditable,
+      allowAccess,
+    } = props
     const { rows } = values
 
     const tableParas = {
@@ -571,8 +581,14 @@ class DODetails extends PureComponent {
       ],
       onRowDoubleClick: undefined,
     }
+
     return (
-      <React.Fragment>
+      // <AuthorizedContext.Provider
+      //   value={{
+      //     rights:
+      //       isEditable === true && allowAccess === true ? 'enable' : 'disable',
+      //   }}
+      // >
         <div style={{ margin: theme.spacing(2) }}>
           <GridContainer>
             <GridItem xs={12} md={5}>
@@ -672,7 +688,7 @@ class DODetails extends PureComponent {
               confirmBtnText: 'Save',
             })}
         </div>
-      </React.Fragment>
+      // </AuthorizedContext.Provider>
     )
   }
 }

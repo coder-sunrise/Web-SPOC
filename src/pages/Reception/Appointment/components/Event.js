@@ -75,7 +75,7 @@ class Event extends React.PureComponent {
     !patientAccountNo ? '' : `(${patientAccountNo})`
 
   render () {
-    const { event, classes, calendarView, handleMouseOver } = this.props
+    const { event, classes, calendarView } = this.props
     const { doctor, hasConflict, isEnableRecurrence, patientProfile } = event
     let { patientName, patientAccountNo, patientContactNo } = event
     if (patientProfile) {
@@ -112,6 +112,11 @@ class Event extends React.PureComponent {
       [classes.otherViewEvent]: true,
     })
 
+    let OverlayComponent = <ApptPopover popoverEvent={event} />
+
+    if (event.isDoctorBlock)
+      OverlayComponent = <DoctorBlockPopover popoverEvent={event} />
+
     return (
       <Popper
         stopOnClickPropagation
@@ -119,13 +124,7 @@ class Event extends React.PureComponent {
           [classes.pooperResponsive]: true,
           [classes.pooperNav]: true,
         })}
-        overlay={
-          event.isDoctorBlock ? (
-            <DoctorBlockPopover popoverEvent={event} />
-          ) : (
-            <ApptPopover popoverEvent={event} />
-          )
-        }
+        overlay={OverlayComponent}
       >
         {calendarView === BigCalendar.Views.MONTH ? (
           <div className={monthViewClass}>

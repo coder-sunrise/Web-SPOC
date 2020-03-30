@@ -40,17 +40,26 @@ const styles = (theme) => ({
       clinicSettings.entity &&
       clinicSettings.entity.showConsultationVersioning
     ) {
-      const { showConsultationVersioning, autoRefresh, defaultVisitType } = clinicSettings.entity
+      const {
+        showConsultationVersioning,
+        autoRefresh,
+        defaultVisitType,
+        autoPrintDrugLabel,
+      } = clinicSettings.entity
 
       return {
         ...clinicSettings.entity,
-        defaultVisitType:{
+        defaultVisitType: {
           ...defaultVisitType,
           settingValue: Number(defaultVisitType.settingValue),
         },
-        autoRefresh:{
+        autoRefresh: {
           ...autoRefresh,
           settingValue: autoRefresh.settingValue === 'true',
+        },
+        autoPrintDrugLabel: {
+          ...autoPrintDrugLabel,
+          settingValue: autoPrintDrugLabel.settingValue === 'true',
         },
         showConsultationVersioning: {
           ...showConsultationVersioning,
@@ -69,6 +78,7 @@ const styles = (theme) => ({
       showConsultationVersioning,
       autoRefresh,
       defaultVisitType,
+      autoPrintDrugLabel,
     } = values
 
     const payload = [
@@ -86,6 +96,9 @@ const styles = (theme) => ({
       },
       {
         ...autoRefresh,
+      },
+      {
+        ...autoPrintDrugLabel,
       },
       {
         ...defaultVisitType,
@@ -232,6 +245,20 @@ class GeneralSetting extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
+                name='autoPrintDrugLabel.settingValue'
+                render={(args) => (
+                  <Switch
+                    label='Auto Print Drug Label'
+                    {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
                 name='defaultVisitType.settingValue'
                 render={(args) => (
                   <CodeSelect
@@ -239,6 +266,7 @@ class GeneralSetting extends PureComponent {
                     {...args}
                     code='ctvisitpurpose'
                     disabled={!!hasActiveSession}
+                    allowClear={false}
                   />
                 )}
               />

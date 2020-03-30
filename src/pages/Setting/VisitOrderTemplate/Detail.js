@@ -45,6 +45,7 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
           inventoryItemTypeFK: type.id,
           inventoryItemCode: row.code,
           inventoryItemName: row.name,
+          total: row.quantity * row.unitPrice,
           [type.dtoName]: {
             ...row[type.dtoName],
             [type.itemFKName]: row.itemFK,

@@ -13,7 +13,6 @@ import {
   withFormikExtend,
   Tabs,
 } from '@/components'
-import { ConsumableDetailOption } from './variables'
 import {
   getAppendUrl,
   errMsgForOutOfRange as errMsg,
@@ -21,6 +20,10 @@ import {
   roundTo,
 } from '@/utils/utils'
 import { getBizSession } from '@/services/queue'
+import Authorized from '@/utils/Authorized'
+import { ConsumableDetailOption } from './variables'
+
+const { Secured } = Authorized
 
 const styles = () => ({
   actionDiv: {
@@ -64,6 +67,7 @@ const Detail = ({
     dispatch,
     errors,
     hasActiveSession,
+    authority: 'inventorymaster.consumable',
   }
 
   const checkHasActiveSession = async () => {
@@ -128,6 +132,7 @@ const Detail = ({
       <div className={classes.actionDiv}>
         <Button
           color='danger'
+          authority='none'
           onClick={navigateDirtyCheck({
             redirectUrl: '/inventory/master?t=1',
           })}
@@ -249,4 +254,4 @@ export default compose(
     },
     displayName: 'InventoryConsumableDetail',
   }),
-)(Detail)
+)(Secured('inventorymaster.consumable')(Detail))

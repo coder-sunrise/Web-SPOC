@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Yup from '@/utils/yup'
 import { CardContainer, GridContainer, GridItem } from '@/components'
-import { podoOrderType, getInventoryItemList, getServices } from '@/utils/codes'
-import InventoryType from './InventoryType'
+import { podoOrderType, inventoryItemListing } from '@/utils/codes'
+import { getServices } from '@/utils/codetable'
 import Authorized from '@/utils/Authorized'
+
+import InventoryType from './InventoryType'
+import { AuthorizationWrapper } from '@/components/_medisys'
 
 const styles = () => ({
   displayDiv: {
@@ -160,7 +163,7 @@ const InventoryTypeListing = ({
           code: x.ctName,
         },
       }).then((list) => {
-        const { inventoryItemList } = getInventoryItemList(list)
+        const { inventoryItemList } = inventoryItemListing(list)
         switch (x.stateName) {
           case 'ConsumableItemList': {
             return setConsumableList(inventoryItemList)
@@ -606,7 +609,12 @@ const InventoryTypeListing = ({
         }))
       }
     }
-    return addedRows
+    return addedRows.map((row) => {
+      return {
+        ...row,
+        subTotal: 0,
+      }
+    })
   }
 
   const handleItemOnChange = (e) => {
@@ -615,7 +623,7 @@ const InventoryTypeListing = ({
     setSelectedItem(option)
     row.quantity = undefined
     row.unitPrice = sellingPrice
-    row.subTotal = undefined
+    row.subTotal = 0
 
     // dispatch({
     //   // force current edit row components to update
@@ -944,7 +952,6 @@ const InventoryTypeListing = ({
               style={{ marginTop: 15 }}
             />
           </Authorized>
-
           <Authorized authority='inventorymaster.orderset.service'>
             <InventoryType
               title='Service'

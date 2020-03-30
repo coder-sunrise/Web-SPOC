@@ -29,6 +29,8 @@ const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
     setActiveTab,
   }
 
+  const itemTabs = InventoryMasterOption(componentProps)
+
   const didMount = async () => {
     await Promise.all([
       dispatch({
@@ -53,7 +55,7 @@ const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
     setMounted(true)
     let tabIndex = inventoryMaster.currentTab
     if (!tabIndex) {
-      tabIndex = '0'
+      if (itemTabs.length > 0) tabIndex = itemTabs[0].id
     }
     setActiveTab(tabIndex)
   }
@@ -68,7 +70,7 @@ const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
       activeKey={mounted ? activeTab : '-1'}
       // defaultActivekey='0'
       onChange={(e) => setActiveTab(e)}
-      options={InventoryMasterOption(componentProps)}
+      options={itemTabs}
     />
   )
 }

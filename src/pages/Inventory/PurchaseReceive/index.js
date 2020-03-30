@@ -16,8 +16,7 @@ import FilterBar from './components/FilterBar'
 import PurchaseReceiveDataGrid from './components/PurchaseReceiveDataGrid'
 import WriteOff from './components/Modal/WriteOff'
 import DuplicatePO from './components/Modal/DuplicatePO'
-import { getPurchaseOrderStatusFK } from './variables'
-import Authorized from '@/utils/Authorized'
+import { getPurchaseOrderStatusFK, getAccessRight } from './variables'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -154,6 +153,7 @@ class PurchaseReceive extends Component {
   onNavigate = (type, rowId) => {
     const { history } = this.props
     const { location } = history
+
     switch (type) {
       case 'new':
         history.push(`${location.pathname}/pdodetails?type=${type}`)
@@ -162,6 +162,12 @@ class PurchaseReceive extends Component {
         history.push(`${location.pathname}/pdodetails?id=${rowId}&type=${type}`)
         break
       case 'edit':
+        if (!getAccessRight()) {
+          notification.error({
+            message: 'Current user is not authorized to access',
+          })
+          return
+        }
         history.push(`${location.pathname}/pdodetails?id=${rowId}&type=${type}`)
         break
       default:

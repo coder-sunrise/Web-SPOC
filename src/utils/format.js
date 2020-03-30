@@ -1,11 +1,8 @@
 import moment from 'moment'
 import React from 'react'
-import nzh from 'nzh/cn'
-import { parse, stringify } from 'qs'
 import numeral from 'numeral'
-import { DataTypeProvider } from '@devexpress/dx-react-grid'
 
-import config from '@/utils/config'
+import config from './config'
 
 const { currencyFormat, qtyFormat, currencySymbol } = config
 
@@ -35,69 +32,6 @@ function NumberFormatter (p) {
   if (text) return numeral(value).format(qtyFormat)
   return <b style={{ color }}>{numeral(value).format(qtyFormat)}</b>
 }
-export function NumberInputEditor (props) {
-  const { paras, value, classes, column, ...resetProps } = props
-  const { inputProps = {} } = column
-  const { name, value: v, ...otherInputProps } = inputProps
-  // console.log(inputProps)
-  if (name) {
-    return (
-      <FastField
-        name={name}
-        render={(args) => {
-          return (
-            <NumberInput
-              showErrorIcon
-              simple
-              {...resetProps}
-              {...otherInputProps}
-              {...args}
-              onChange={(e) => {
-                args.field.onChange({
-                  target: {
-                    value: e.target.value,
-                    name: args.field.name,
-                  },
-                })
-                if (otherInputProps.onChange) otherInputProps.onChange(e)
-              }}
-            />
-          )
-        }}
-      />
-    )
-  }
-  return (
-    <NumberInput
-      value={v || value}
-      simple
-      {...resetProps}
-      {...otherInputProps}
-    />
-  )
-}
-export function NumberEditor (props) {
-  return NumberInputEditor({
-    currency: true,
-    ...props,
-  })
-}
-
-export function QtyEditor (props) {
-  return NumberInputEditor({
-    qty: true,
-    ...props,
-  })
-}
-
-export function QtyFormatter ({ value }) {
-  return numeral(value).format(qtyFormat)
-}
-
-// const DateFormatter = ({ value }) => {
-//   console.log(value)
-//   return '123213' // moment.isMoment(value) ? value.format('LLL') : value
-// }
 const dateFormatLong = 'DD MMM YYYY'
 const dateFormat = 'DD-MM-YYYY'
 const reversedDateFormat = 'YYYY-MM-DD'
@@ -136,20 +70,6 @@ const additionalShortcutFormats = [
   'YYYYMMDD',
 ]
 
-const TimeFormatter = ({ value, ...rest }) => {
-  if (!value) return ''
-
-  if (moment.isMoment(value)) {
-    return value.format(timeFormat)
-  }
-
-  if (moment(value, timeFormat).isValid()) {
-    return moment(value, timeFormat).format(timeFormat)
-  }
-
-  return value
-}
-
 const DateFormatter = ({ value, full = false, format }) => {
   const _format = format || (full ? fullDateTime : dateFormatLong)
   if (!value) return null
@@ -162,39 +82,7 @@ const DateFormatter = ({ value, full = false, format }) => {
   //   : moment(value).isValid() ? moment(value).format(format) : value
 }
 
-const TimeTypeProvider = (props) => {
-  return <DataTypeProvider formatterComponent={TimeFormatter} {...props} />
-}
-
-const DateTypeProvider = (props) => {
-  return <DataTypeProvider formatterComponent={DateFormatter} {...props} />
-}
-
-const NumberTypeProvider = (props) => {
-  return (
-    <DataTypeProvider
-      formatterComponent={NumberFormatter}
-      editorComponent={NumberEditor}
-      {...props}
-    />
-  )
-}
-
-const QtyTypeProvider = (props) => {
-  return (
-    <DataTypeProvider
-      formatterComponent={QtyFormatter}
-      editorComponent={QtyEditor}
-      {...props}
-    />
-  )
-}
-
 module.exports = {
-  DateTypeProvider,
-  TimeTypeProvider,
-  NumberTypeProvider,
-  QtyTypeProvider,
   NumberFormatter,
   DateFormatter,
   currencyFormat,

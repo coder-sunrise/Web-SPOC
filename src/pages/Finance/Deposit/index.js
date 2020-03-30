@@ -5,6 +5,7 @@ import moment from 'moment'
 import { compare } from '@/layouts'
 
 import { CardContainer } from '@/components'
+import Authorized from '@/utils/Authorized'
 import FilterBar from './FilterBar'
 import Grid from './Grid'
 

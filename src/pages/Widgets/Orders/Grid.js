@@ -17,7 +17,7 @@ import {
   Select,
   Checkbox,
 } from '@/components'
-import { orderTypes } from '@/utils/codes'
+import { orderTypes } from '@/pages/Consultation/utils'
 
 // console.log(orderTypes)
 export default ({ orders, dispatch, classes, from, codetable }) => {

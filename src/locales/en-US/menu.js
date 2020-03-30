@@ -92,6 +92,7 @@ export default {
   'menu.report.creditNoteListingReport': 'Credit Note Listing Report',
   'menu.report.inventorytrendingreport': 'Inventory Trending Report',
   'menu.report.inventorylistingreport': 'Inventory Listing Report',
+  'menu.report.inventorystockcountreport': 'Inventory Stock Count Report',
   'menu.communication': 'Communication',
   'menu.communication.sms': 'SMS',
   'menu.queue': 'Queue',

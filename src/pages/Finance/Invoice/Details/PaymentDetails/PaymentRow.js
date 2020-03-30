@@ -8,6 +8,7 @@ import Info from '@material-ui/icons/Info'
 import Cross from '@material-ui/icons/HighlightOff'
 // common components
 import {
+  Button,
   GridContainer,
   GridItem,
   Tooltip,
@@ -19,13 +20,6 @@ import { currencyFormatter } from '@/utils/utils'
 import PaymentDetails from './PaymentDetails'
 
 const PaymentRow = ({
-  // id,
-  // type,
-  // itemID,
-  // date,
-  // amount,
-  // reason,
-  // isCancelled,
   classes,
   handleVoidClick,
   handlePrinterClick,
@@ -61,15 +55,18 @@ const PaymentRow = ({
     if (type === 'Payment' || type === 'Credit Note') {
       return (
         <Tooltip title={tooltipMsg}>
-          <IconButton
-            // payerID='N/A'
+          <Button
+            justIcon
+            simple
+            size='sm'
+            color='primary'
             id={itemID}
             className={classes.printButton}
             disabled={isCancelled}
             onClick={() => handlePrinterClick(type, id)}
           >
             <Printer />
-          </IconButton>
+          </Button>
         </Tooltip>
       )
     }
@@ -89,7 +86,6 @@ const PaymentRow = ({
     textDecoration: hoveredRowId ? 'underline' : null,
     padding: '5px 20px 5px 0px',
     cursor: 'default',
-    // padding: 5,
   }
 
   return (
@@ -141,7 +137,6 @@ const PaymentRow = ({
         </GridItem>
         <GridItem md={2}>
           <span>{moment(date).format(dateFormatLong)}</span>
-          {/* <DatePicker text format={dateFormatLong} value={date} /> */}
         </GridItem>
         <GridItem md={6} container justify='flex-end' alignItems='center'>
           <GridItem>
@@ -156,13 +151,17 @@ const PaymentRow = ({
                 visibility: isCancelled === undefined ? 'hidden' : 'visible',
               }}
             >
-              <IconButton
+              <Button
+                justIcon
+                simple
+                size='sm'
+                color='danger'
                 id={itemID}
                 onClick={() => handleVoidClick(payment)}
                 disabled={isCancelled || readOnly}
               >
                 <Cross />
-              </IconButton>
+              </Button>
             </Tooltip>
           </GridItem>
         </GridItem>

@@ -21,7 +21,6 @@ import {
 } from '@/components'
 import { getUniqueNumericId } from '@/utils/utils'
 import { queryList } from '@/services/patient'
-import { fetchAndSaveCodeTable } from '@/utils/codes'
 import Address from './Address'
 import { MobileNumberInput } from '@/components/_medisys'
 

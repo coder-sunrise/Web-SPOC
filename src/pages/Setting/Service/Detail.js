@@ -426,7 +426,7 @@ class Detail extends PureComponent {
                     }}
                   />
                 </GridItem>
-                <GridItem xs={6}>
+                <GridItem xs={3}>
                   <Field
                     name='isAutoOrder'
                     render={(args) => {
@@ -435,6 +435,19 @@ class Detail extends PureComponent {
                           label='Consultation Auto Order'
                           onChange={(e) => this.handleAutoOrder(e)}
                           // disabled={this.handleDisableAutoOrder()}
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+                <GridItem xs={3}>
+                  <Field
+                    name='isTrackResults'
+                    render={(args) => {
+                      return (
+                        <Switch
+                          label='Track Results'
                           {...args}
                         />
                       )

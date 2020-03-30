@@ -8,9 +8,13 @@ import {
   roundTo,
 } from '@/utils/utils'
 import { ProgressButton, Button, withFormikExtend, Tabs } from '@/components'
-import { MedicationDetailOption } from './variables'
 import Yup from '@/utils/yup'
 import { getBizSession } from '@/services/queue'
+import { AuthorizationWrapper } from '@/components/_medisys'
+import Authorized from '@/utils/Authorized'
+import { MedicationDetailOption } from './variables'
+
+const { Secured } = Authorized
 
 const styles = () => ({
   actionDiv: {
@@ -58,6 +62,7 @@ const Detail = ({
     dispatch,
     errors: props.errors,
     hasActiveSession,
+    authority: 'inventorymaster.medication',
   }
 
   const checkHasActiveSession = async () => {
@@ -159,6 +164,7 @@ const Detail = ({
       {/* </CardContainer> */}
       <div className={classes.actionDiv}>
         <Button
+          authority='none'
           color='danger'
           onClick={navigateDirtyCheck({
             redirectUrl: '/inventory/master?t=0',
@@ -310,4 +316,4 @@ export default compose(
 
     displayName: 'InventoryMedicationDetail',
   }),
-)(Detail)
+)(Secured('inventorymaster.medication')(Detail))

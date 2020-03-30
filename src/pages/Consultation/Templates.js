@@ -23,14 +23,7 @@ import {
   Popconfirm,
   notification,
 } from '@/components'
-// services
-import {
-  uploadFile,
-  downloadAttachment,
-  deleteFileByFileID,
-} from '@/services/file'
 // utils
-import { getCodes } from '@/utils/codes'
 
 const styles = () => ({})
 const Templates = ({

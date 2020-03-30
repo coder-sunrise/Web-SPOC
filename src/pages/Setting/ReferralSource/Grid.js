@@ -68,6 +68,22 @@ class Grid extends PureComponent {
         ]}
         columnExtensions={[
           {
+            columnName: 'mobileNo',
+            sortingEnabled: false,
+          },
+          {
+            columnName: 'officeNo',
+            sortingEnabled: false,
+          },
+          {
+            columnName: 'address',
+            sortingEnabled: false,
+          },
+          {
+            columnName: 'email',
+            sortingEnabled: false,
+          },
+          {
             columnName: 'isActive',
             sortingEnabled: false,
             type: 'select',

@@ -33,10 +33,7 @@ export default ({
         ? (event) => {
             setAnchorEl(event.currentTarget)
           }
-        : (event) => {
-            // stop bubbling
-            if (stopOnClickPropagation) event.stopPropagation()
-          },
+        : null,
     onMouseEnter:
       trigger === 'hover'
         ? (event) => {
@@ -50,17 +47,19 @@ export default ({
           }
         : null,
   }
-  // const { className, style, ...resetBtnProps } = children.props
+
+  const onOverlayClick = (event) => {
+    if (stopOnClickPropagation) event.stopPropagation()
+  }
 
   const popperContainer = (
     <Paper elevation={2}>
       <ClickAwayListener
         onClickAway={() => {
-          // console.log('onClickAway')
           trigger !== 'hover' ? setAnchorEl(null) : undefined
         }}
       >
-        {overlay}
+        <div onClick={onOverlayClick}>{overlay}</div>
       </ClickAwayListener>
     </Paper>
   )

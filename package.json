@@ -1,12 +1,12 @@
 {
-  "name": "Medicloud",
+  "name": "medicloud",
   "version": "2.1.1",
   "description": "Medicloud System",
-  "private": true,
+  "private": false,
   "scripts": {
     "presite": "node ./scripts/generateMock.js && cd functions && npm install",
     "start": "cross-env APP_TYPE=site umi dev",
-    "start:no-mock": "cross-env MOCK=none PORT=8000 umi dev",
+    "start:no-mock": "cross-env MOCK=none HTTPS=true PORT=44385 umi dev",
     "build": "cross-env umi build",
     "build:prod": "cross-env UMI_ENV=prod umi build",
     "build:uat": "cross-env UMI_ENV=prod umi build",

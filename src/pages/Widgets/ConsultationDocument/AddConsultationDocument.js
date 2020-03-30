@@ -391,14 +391,7 @@ class AddConsultationDocument extends PureComponent {
   }
 
   getLoader = (editor, setFieldValue, currentType) => {
-    const {
-      classes,
-      parentProps,
-      consultation,
-      codetable,
-      patient,
-      values,
-    } = this.props
+    const { classes, consultation, codetable, patient, values } = this.props
     const { documenttemplate = [] } = codetable
     // console.log({ documenttemplate })
     const documentType = parseInt(currentType.value, 10) || -1
@@ -465,7 +458,6 @@ class AddConsultationDocument extends PureComponent {
       theme,
       classes,
       consultationDocument,
-      parentProps,
       rowHeight,
       footer,
       dispatch,

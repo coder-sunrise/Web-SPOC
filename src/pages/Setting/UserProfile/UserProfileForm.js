@@ -27,13 +27,15 @@ import {
   LoadingWrapper,
   MobileNumberInput,
 } from '@/components/_medisys'
-import PrimaryClinicianChanges from './PrimaryClinicianChanges'
 // utils
-import { constructUserProfile } from './utils'
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
 import * as queueServices from '@/services/queue'
 import * as clinicServices from '@/services/clinicInfo'
+import request from '@/utils/request'
+import { convertToQuery } from '@/utils/utils'
+import { constructUserProfile } from './utils'
+import PrimaryClinicianChanges from './PrimaryClinicianChanges'
 
 const styles = (theme) => ({
   container: {

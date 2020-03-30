@@ -18,7 +18,6 @@ const PaymentActions = ({
   invoicePayerFK,
   companyFK,
   readOnly,
-  hasActiveSession,
 }) => {
   const ButtonProps = {
     icon: true,
@@ -27,7 +26,15 @@ const PaymentActions = ({
     size: 'sm',
   }
   return (
-    <React.Fragment>
+    <div>
+      <Button
+        onClick={() => handleAddPayment(invoicePayerFK)}
+        // disabled={!handleAddPayment || readOnly}
+        {...ButtonProps}
+      >
+        <Add />
+        Add Payment
+      </Button>
       <Button
         onClick={() => handleAddPayment(invoicePayerFK)}
         disabled={!handleAddPayment || readOnly}
@@ -75,7 +82,7 @@ const PaymentActions = ({
         <Printer />
         Print Invoice
       </Button>
-    </React.Fragment>
+    </div>
   )
 }
 
