@@ -297,7 +297,10 @@ const QueueDisplayDasboard = ({
             )}
           </Ticker> */}
 
-        <div className={classes.footerCenterContainer}>
+        <div
+          className={classes.footerCenterContainer}
+          style={{ width: showDateTime ? '60%' : '80%' }}
+        >
           <marquee
             style={{
               fontSize: '1.5vw',
@@ -332,9 +335,11 @@ const QueueDisplayDasboard = ({
             asdds
           </button> */}
         </div>
-        <div className={classes.footerRightContainer}>
-          {showDateTime && <Clock />}
-        </div>
+        {showDateTime && (
+          <div className={classes.footerRightContainer}>
+            <Clock />
+          </div>
+        )}
       </div>
     </Fragment>
   )
