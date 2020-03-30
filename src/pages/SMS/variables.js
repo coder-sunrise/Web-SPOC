@@ -2,6 +2,7 @@ import moment from 'moment'
 import {
   DateFormatter,
   dateFormatLong,
+  dateFormatLongWithTimeNoSec12h,
   timeFormat24HourWithSecond,
   timeFormatSmallCase,
   Tooltip,
@@ -136,7 +137,7 @@ const appointmentColumnsExtensions = [
       DateFormatter({
         value: row.lastSMSSendDate,
         full: true,
-        format: 'DD MMM YYYY hh:mm A',
+        format: dateFormatLongWithTimeNoSec12h,
       }),
   },
   {
@@ -187,7 +188,7 @@ const patientColumnsExtensions = [
       DateFormatter({
         value: row.lastSMSSendDate,
         full: true,
-        format: 'DD MMM YYYY hh:mm A',
+        format: dateFormatLongWithTimeNoSec12h,
       }),
   },
   {

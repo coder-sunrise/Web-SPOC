@@ -2,7 +2,14 @@ import React from 'react'
 import moment from 'moment'
 // components
 import { DoctorLabel, VisitStatusTag } from '@/components/_medisys'
-import { dateFormat, CodeSelect, DateFormatter, Tooltip } from '@/components'
+import {
+  dateFormat,
+  CodeSelect,
+  DateFormatter,
+  Tooltip,
+  dateFormatLong,
+  dateFormatLongWithTimeNoSec12h,
+} from '@/components'
 // utils
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 // variables
@@ -220,11 +227,11 @@ export const QueueColumnExtensions = [
       if (row.appointmentTime) {
         // const appointmentDate = moment(row.appointmentTime).format('MM DD YYYY')
         const appointmentDate = moment(row.appointmentTime).format(
-          'DD MMM YYYY',
+          dateFormatLong,
         )
         return DateFormatter({
           value: `${appointmentDate} ${row.appointmentResourceStartTime}`,
-          format: 'DD MMM YYYY hh:mm A',
+          format: dateFormatLongWithTimeNoSec12h,
         })
       }
       return '-'
