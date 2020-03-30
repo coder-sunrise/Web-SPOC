@@ -9,7 +9,7 @@ import {
   currenciesList,
   currencyRoundingList,
   currencyRoundingToTheClosestList,
-  LABEL_PRINTER_OPTIONS,
+  labelPrinterList,
 } from '@/utils/codes'
 
 import {
@@ -249,7 +249,7 @@ class GeneralSetting extends PureComponent {
                 render={(args) => (
                   <Select
                     label='Label Printer Size'
-                    options={LABEL_PRINTER_OPTIONS}
+                    options={labelPrinterList}
                     {...args}
                     disabled={!!hasActiveSession}
                     allowClear={false}

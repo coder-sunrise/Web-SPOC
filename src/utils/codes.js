@@ -991,7 +991,7 @@ export const visitOrderTemplateItemTypes = [
   },
 ]
 
-export const LABEL_PRINTER_OPTIONS = [
+export const labelPrinterList = [
   { value: '8.9cmx3.6cm', name: '8.9cmx3.6cm' },
   { value: '8.0cmx4.5cm', name: '8.0cmx4.5cm' },
 ]
