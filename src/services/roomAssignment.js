@@ -7,8 +7,8 @@ module.exports = {
   // remove: (params) => service.remove(url, params),
   query: (params) => service.query(url, params),
   queryList: (params) => service.queryList(url, params),
-  upsert: async (params) => {
-    const r = await request(`${url}`, {
+  upsert: (params) => {
+    const r = request(`${url}`, {
       method: 'POST',
       body: [
         ...params,

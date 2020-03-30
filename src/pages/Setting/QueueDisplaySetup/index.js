@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 import { getBizSession } from '@/services/queue'
-import { FILE_CATEGORY, KEYS } from '@/utils/constants'
+import { FILE_CATEGORY, VALUE_KEYS } from '@/utils/constants'
 
 import {
   withFormikExtend,
@@ -78,7 +78,7 @@ const styles = (theme) => ({
     const payload = {
       ...restValues,
       value: stringifyValue,
-      key: KEYS.QUEUEDISPLAYSETUP,
+      key: VALUE_KEYS.QUEUEDISPLAYSETUP,
       isUserMaintainable: true,
     }
 
@@ -101,7 +101,7 @@ class QueueDisplaySetup extends PureComponent {
     this.props.dispatch({
       type: 'queueDisplaySetup/query',
       payload: {
-        keys: KEYS.QUEUEDISPLAYSETUP,
+        keys: VALUE_KEYS.QUEUEDISPLAYSETUP,
       },
     })
   }

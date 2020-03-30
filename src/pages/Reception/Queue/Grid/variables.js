@@ -175,13 +175,11 @@ export const QueueColumnExtensions = [
           >
             {row.queueNo}
             {row.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
-              <span>
-                <CallingQueueButton
-                  qId={row.queueNo}
-                  roomNo={row.roomNo}
-                  doctor={row.doctor}
-                />
-              </span>
+              <CallingQueueButton
+                qId={row.queueNo}
+                roomNo={row.roomNo}
+                doctor={row.doctor}
+              />
             )}
           </span>
         </Fragment>

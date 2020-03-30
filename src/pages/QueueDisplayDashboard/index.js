@@ -10,7 +10,7 @@ import QueueCallingList from './QueueCallingList'
 import Carousel from './Carousel'
 import CurrentCallingQueue from './CurrentCallingQueue'
 import { withFormikExtend } from '@/components'
-import { KEYS } from '@/utils/constants'
+import { VALUE_KEYS } from '@/utils/constants'
 import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
 import { getFileByFileID } from '@/services/file'
 
@@ -103,7 +103,7 @@ const QueueDisplayDasboard = ({
     await dispatch({
       type: 'queueCalling/getExistingQueueCallList',
       payload: {
-        keys: KEYS.QUEUECALLING,
+        keys: VALUE_KEYS.QUEUECALLING,
       },
     })
   }
@@ -141,7 +141,7 @@ const QueueDisplayDasboard = ({
     dispatch({
       type: 'queueDisplaySetup/query',
       payload: {
-        keys: KEYS.QUEUEDISPLAYSETUP,
+        keys: VALUE_KEYS.QUEUEDISPLAYSETUP,
       },
     })
   }
@@ -172,7 +172,7 @@ const QueueDisplayDasboard = ({
     dispatch({
       type: 'queueCalling/getStatus',
       payload: {
-        keys: KEYS.QUEUECALLING,
+        keys: VALUE_KEYS.QUEUECALLING,
       },
     }).then((response) => {
       const { lastUpdateDate: serverLastUpdateDate } = response
@@ -180,7 +180,7 @@ const QueueDisplayDasboard = ({
         dispatch({
           type: 'queueCalling/syncUp',
           payload: {
-            keys: KEYS.QUEUECALLING,
+            keys: VALUE_KEYS.QUEUECALLING,
             isSync: setIsSyncValue,
           },
         })

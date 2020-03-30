@@ -35,7 +35,7 @@ import { getAppendUrl, getRemovedUrl } from '@/utils/utils'
 import { SendNotification } from '@/utils/notification'
 import Authorized from '@/utils/Authorized'
 import { QueueDashboardButton } from '@/components/_medisys'
-import { KEYS } from '@/utils/constants'
+import { VALUE_KEYS } from '@/utils/constants'
 
 const drawerWidth = 400
 
@@ -320,7 +320,7 @@ class Queue extends React.Component {
         dispatch({
           type: 'queueCalling/getExistingQueueCallList',
           payload: {
-            keys: KEYS.QUEUECALLING,
+            keys: VALUE_KEYS.QUEUECALLING,
           },
         }).then((res) => {
           const { value, ...restRespValues } = res
@@ -328,7 +328,7 @@ class Queue extends React.Component {
             type: 'queueCalling/upsertQueueCallList',
             payload: {
               ...restRespValues,
-              keys: KEYS.QUEUECALLING,
+              keys: VALUE_KEYS.QUEUECALLING,
               value: '[]',
             },
           })
@@ -447,7 +447,7 @@ class Queue extends React.Component {
                     dispatch({
                       type: 'queueCalling/getExistingQueueCallList',
                       payload: {
-                        keys: KEYS.QUEUECALLING,
+                        keys: VALUE_KEYS.QUEUECALLING,
                       },
                     }).then((res) => {
                       const { value, ...restRespValues } = res
@@ -455,7 +455,7 @@ class Queue extends React.Component {
                         type: 'queueCalling/upsertQueueCallList',
                         payload: {
                           ...restRespValues,
-                          keys: KEYS.QUEUECALLING,
+                          keys: VALUE_KEYS.QUEUECALLING,
                           value: '[]',
                         },
                       }).then((response) => {

@@ -157,7 +157,6 @@ const debouncedSendNotification = _.debounce(sendNotification, 500, {
 
 const subscribeNotification = (type, payload) => {
   const { callback } = payload
-  console.log({ type, payload })
   connectionObserver[type] = callback
 }
 

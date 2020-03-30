@@ -342,7 +342,7 @@ export const NOTIFICATION_STATUS = {
   OK: 1,
   ERROR: 2,
 }
-export const KEYS = {
+export const VALUE_KEYS = {
   QUEUEDISPLAYSETUP: 'queueDisplay',
   QUEUECALLING: 'queueCalling',
 }

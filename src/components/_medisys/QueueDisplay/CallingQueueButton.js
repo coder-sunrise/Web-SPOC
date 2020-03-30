@@ -4,7 +4,11 @@ import { connect } from 'dva'
 import { compose } from 'redux'
 import { isNumber } from 'util'
 import { sendNotification } from '@/utils/realtime'
-import { NOTIFICATION_TYPE, NOTIFICATION_STATUS, KEYS } from '@/utils/constants'
+import {
+  NOTIFICATION_TYPE,
+  NOTIFICATION_STATUS,
+  VALUE_KEYS,
+} from '@/utils/constants'
 import { notification } from '@/components'
 
 const btnStyle = {
@@ -163,7 +167,7 @@ const CallingQueueButton = ({
     const payload = {
       ...restValues,
       ...newRestValues,
-      key: KEYS.QUEUECALLING,
+      key: VALUE_KEYS.QUEUECALLING,
       value: stringifyValue,
       isUserMaintainable: true,
       lastUpdateDate: null,
@@ -194,7 +198,7 @@ const CallingQueueButton = ({
         dispatch({
           type: 'queueCalling/getExistingQueueCallList',
           payload: {
-            keys: KEYS.QUEUECALLING,
+            keys: VALUE_KEYS.QUEUECALLING,
           },
         }).then((res) => {
           const { value, ...restRespValues } = res
@@ -216,7 +220,7 @@ const CallingQueueButton = ({
     const { lastUpdateDate: dataLastUpdateDate } = await dispatch({
       type: 'queueCalling/getStatus',
       payload: {
-        keys: KEYS.QUEUECALLING,
+        keys: VALUE_KEYS.QUEUECALLING,
       },
     })
 
@@ -224,7 +228,7 @@ const CallingQueueButton = ({
       dispatch({
         type: 'queueCalling/getExistingQueueCallList',
         payload: {
-          keys: KEYS.QUEUECALLING,
+          keys: VALUE_KEYS.QUEUECALLING,
         },
       }).then((response) => {
         const { value, ...newRestValues } = response

@@ -26,7 +26,7 @@ import {
   ApptColumnExtensions,
 } from './variables'
 import Authorized from '@/utils/Authorized'
-import { VISIT_TYPE, KEYS } from '@/utils/constants'
+import { VISIT_TYPE, VALUE_KEYS } from '@/utils/constants'
 
 const Grid = ({
   dispatch,
@@ -108,7 +108,7 @@ const Grid = ({
     dispatch({
       type: 'queueCalling/getExistingQueueCallList',
       payload: {
-        keys: KEYS.QUEUECALLING,
+        keys: VALUE_KEYS.QUEUECALLING,
       },
     })
   }, [])
