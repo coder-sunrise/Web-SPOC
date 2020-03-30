@@ -155,7 +155,11 @@ class SchemesGrid extends PureComponent {
             const patCoPaymentScheme = copaymentscheme.find(
               (item) => item.id === row.coPaymentSchemeFK,
             )
-            if (row.schemeTypeFK === SCHEME_TYPE.CORPORATE) {
+
+            if (
+              row.schemeTypeFK === SCHEME_TYPE.CORPORATE &&
+              patCoPaymentScheme
+            ) {
               const isActiveLabel = !patCoPaymentScheme.isActive
                 ? ' (Inactive)'
                 : ''

@@ -148,6 +148,17 @@ export default createFormViewModel({
             },
           },
         })
+
+        yield put({
+          type: 'codetable/fetchCodes',
+          payload: {
+            code: 'copaymentscheme',
+            force: true,
+            filter: {
+              isActive: undefined,
+            },
+          },
+        })
       },
       *waitLoadComplete (_, { take }) {
         yield take('patient/query/@@end')
@@ -266,7 +277,6 @@ export default createFormViewModel({
       *queryDone ({ payload }, { select, put }) {
         const codetable = yield select((state) => state.codetable)
         const { copaymentscheme = [] } = codetable
-        console.log({ copaymentscheme, codetable })
 
         const { data } = payload
         // console.log(payload)
