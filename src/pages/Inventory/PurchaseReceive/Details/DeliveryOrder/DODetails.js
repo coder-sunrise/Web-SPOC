@@ -89,7 +89,9 @@ const receivingDetailsSchema = Yup.object().shape({
       }
       return undefined
     }
-    let deliveryOrderItem = rows.map((x, index) => {
+    console.log({rows});
+    
+    let deliveryOrderItem = rows.filter(row => (row.isNew && !row.isDeleted) || (!row.isNew && row.isDeleted)).map((x, index) => {
       // const itemType = podoOrderType.find((y) => y.value === x.type)
       const {
         purchaseOrderMedicationItem,
