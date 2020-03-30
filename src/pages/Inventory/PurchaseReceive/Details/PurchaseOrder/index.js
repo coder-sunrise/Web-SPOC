@@ -45,6 +45,10 @@ const styles = (theme) => ({
 })
 
 @withFormikExtend({
+  authority: [
+    'purchasingandreceiving.newpurchasingandreceiving',
+    'purchasingandreceiving.purchasingandreceivingdetails',
+  ],
   displayName: 'purchaseOrderDetails',
   enableReinitialize: true,
   mapPropsToValues: ({ purchaseOrderDetails }) => {
@@ -545,7 +549,7 @@ class Index extends Component {
     return (
       <AuthorizedContext.Provider
         value={{
-          rights: this.getRights() ? 'enable' : 'disable',
+          rights: this.isEditable(poStatus, isWriteOff) ? 'enable' : 'disable',
         }}
       >
         <POForm
