@@ -27,4 +27,10 @@ export { default as Notification } from './Notification'
 export { default as FilterBarDate } from './FilterBarDate'
 export { default as InventoryItemList } from './InventoryItemList'
 export { default as ImageViewer } from './ImageViewer'
+export {
+  default as QueueDashboardButton,
+} from './QueueDisplay/QueueDashboardButton'
+export {
+  default as CallingQueueButton,
+} from './QueueDisplay/CallingQueueButton'
 export { default as AuthorizationWrapper } from './AuthorizationWrapper'

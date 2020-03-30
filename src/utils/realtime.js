@@ -144,10 +144,11 @@ const sendNotification = (type, data) => {
   data.senderId = user.data.id
   data.timestamp = Date.now()
 
-  if (connection)
+  if (connection) {
     connection.invoke('SendNotification', type, data).catch((err) => {
       return console.error(err)
     })
+  }
 }
 
 const debouncedSendNotification = _.debounce(sendNotification, 500, {

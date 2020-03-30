@@ -21,6 +21,7 @@ import {
   PageHeaderWrapper,
   Button,
   ProgressButton,
+  notification,
 } from '@/components'
 // current page sub components
 import EmptySession from './EmptySession'
@@ -33,6 +34,8 @@ import { modelKey } from './variables'
 import { getAppendUrl, getRemovedUrl } from '@/utils/utils'
 import { SendNotification } from '@/utils/notification'
 import Authorized from '@/utils/Authorized'
+import { QueueDashboardButton } from '@/components/_medisys'
+import { VALUE_KEYS } from '@/utils/constants'
 
 const drawerWidth = 400
 
@@ -73,14 +76,17 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ queueLog, patientSearch, loading, user, patient }) => ({
-  patientSearchResult: patientSearch.list,
-  queueLog,
-  loading,
-  user: user.data,
-  patient: patient.entity,
-  DefaultPatientProfile: patient.default,
-}))
+@connect(
+  ({ queueLog, patientSearch, loading, user, patient, queueCalling }) => ({
+    patientSearchResult: patientSearch.list,
+    queueLog,
+    loading,
+    user: user.data,
+    patient: patient.entity,
+    DefaultPatientProfile: patient.default,
+    queueCalling,
+  }),
+)
 class Queue extends React.Component {
   constructor (props) {
     super(props)
@@ -302,15 +308,32 @@ class Queue extends React.Component {
   }
 
   onConfirmEndSession = () => {
-    const { queueLog, dispatch } = this.props
+    const { queueLog, dispatch, queueCalling } = this.props
     const _sessionInfoID = queueLog.sessionInfo.id
     this.setState({ _sessionInfoID })
     dispatch({
       type: `queueLog/endSession`,
       sessionID: queueLog.sessionInfo.id,
-    }).then((response) => {
+    }).then(async (response) => {
       const { status } = response
       if (response) {
+        dispatch({
+          type: 'queueCalling/getExistingQueueCallList',
+          payload: {
+            keys: VALUE_KEYS.QUEUECALLING,
+          },
+        }).then((res) => {
+          const { value, ...restRespValues } = res
+          dispatch({
+            type: 'queueCalling/upsertQueueCallList',
+            payload: {
+              ...restRespValues,
+              keys: VALUE_KEYS.QUEUECALLING,
+              value: '[]',
+            },
+          })
+        })
+
         this.setState(
           {
             showEndSessionSummary: true,
@@ -394,7 +417,7 @@ class Queue extends React.Component {
   }
 
   render () {
-    const { classes, queueLog, loading, history } = this.props
+    const { classes, queueLog, loading, history, dispatch } = this.props
     const {
       showEndSessionSummary,
       showPatientSearch,
@@ -417,6 +440,36 @@ class Queue extends React.Component {
 
             {!isClinicSessionClosed && (
               <div className={classNames(classes.toolBtns)}>
+                {/* for testing calling queue */}
+                <Button
+                  size='sm'
+                  onClick={() => {
+                    dispatch({
+                      type: 'queueCalling/getExistingQueueCallList',
+                      payload: {
+                        keys: VALUE_KEYS.QUEUECALLING,
+                      },
+                    }).then((res) => {
+                      const { value, ...restRespValues } = res
+                      dispatch({
+                        type: 'queueCalling/upsertQueueCallList',
+                        payload: {
+                          ...restRespValues,
+                          keys: VALUE_KEYS.QUEUECALLING,
+                          value: '[]',
+                        },
+                      }).then((response) => {
+                        if (response)
+                          notification.success({ message: 'Cleared' })
+                      })
+                    })
+                  }}
+                >
+                  clear
+                </Button>
+                {/* for testing calling queue */}
+
+                <QueueDashboardButton size='sm' />
                 <ProgressButton
                   color='info'
                   size='sm'

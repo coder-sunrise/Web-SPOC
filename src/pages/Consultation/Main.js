@@ -68,7 +68,7 @@ import Layout from './Layout'
 
 import schema from './schema'
 import styles from './style'
-
+import { CallingQueueButton } from '@/components/_medisys'
 // window.g_app.replaceModel(model)
 
 const discardMessage = 'Discard consultation?'
@@ -463,13 +463,14 @@ class Main extends React.Component {
     } = this.props
     const { entity: vistEntity = {} } = visitRegistration
     // if (!vistEntity) return null
-    const { visit = {} } = vistEntity
+    const { visit = {}, queueNo } = vistEntity
     const { summary } = orders
     // const { adjustments, total, gst, totalWithGst } = summary
     // console.log('values', values, this.props)
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)
+
     return (
       <SizeContainer size='sm'>
         <div
@@ -592,7 +593,14 @@ class Main extends React.Component {
                 )}
               </h4>
             </GridItem>
-            <GridItem>
+            <GridItem style={{ display: 'flex' }}>
+              <div style={{ marginRight: 10 }}>
+                <CallingQueueButton
+                  qId={queueNo}
+                  roomNo={visit.roomFK}
+                  doctor={visit.doctorProfileFK}
+                />
+              </div>
               {values.status !== 'PAUSED' && (
                 <ProgressButton
                   color='danger'

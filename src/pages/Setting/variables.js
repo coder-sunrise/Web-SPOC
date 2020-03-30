@@ -28,6 +28,12 @@ export const menuData = [
     url: '/setting/generalsetting',
   },
   {
+    authority: 'settings.mastersetting.queuedisplaysetup',
+    title: 'Master Setting',
+    text: 'Queue Display Setup',
+    url: '/setting/queuedisplaysetup',
+  },
+  {
     authority: 'settings.clinicsetting.service',
     title: 'Clinic Setting',
     text: 'Service',
@@ -66,6 +72,12 @@ export const menuData = [
     title: 'Clinic Setting',
     text: 'Room',
     url: '/setting/room',
+  },
+  {
+    // authority: 'settings.clinicsetting.roomAssignment',
+    title: 'Clinic Setting',
+    text: 'Room Assignment',
+    url: '/setting/roomassignment',
   },
   {
     authority: 'settings.clinicsetting.clinicoperationhour',
