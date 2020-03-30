@@ -54,11 +54,18 @@ const styles = () => ({
   },
 })
 
-const filterByAccessRight = (m) => {
+const filterByAccessRight = (_result, m) => {
   const accessRight = Authorized.check(m.authority)
+
   if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
-    return false
-  return true
+    return [
+      ..._result,
+    ]
+
+  return [
+    ..._result,
+    { ...m, rights: accessRight.rights },
+  ]
 }
 
 @connect(({ systemSetting, global, user }) => ({
@@ -79,7 +86,7 @@ class SystemSetting extends PureComponent {
     const { searchText } = filterValues
     return Object.keys(this.group).map((o) => {
       const filteredByAccessRight = this.group[o]
-        .filter(filterByAccessRight)
+        .reduce(filterByAccessRight, [])
         .filter((m) => {
           return (
             m.text.toLocaleLowerCase().indexOf(searchText) >= 0 || !searchText
@@ -95,6 +102,7 @@ class SystemSetting extends PureComponent {
         content: (
           <GridContainer style={{ marginTop: theme.spacing(1) }} key={o}>
             {filteredByAccessRight.map((item, i) => {
+              const disabled = item.rights === 'disable'
               return (
                 <GridItem
                   key={i}
@@ -109,6 +117,7 @@ class SystemSetting extends PureComponent {
                       [classes.baseBtn]: true,
                     })}
                     variant='outlined'
+                    disabled={disabled}
                     onClick={() => {
                       this.props.history.push(item.url)
                     }}
