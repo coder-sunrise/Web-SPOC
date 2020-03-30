@@ -11,6 +11,16 @@ export const APPOINTMENT_STATUS = {
   NOSHOW: 6,
 }
 
+export const PATIENT_LAB ={
+  PATIENT_PROFILE:1,
+  CONSULTATION:2,
+  LAB_TRACKING:3,
+}
+
+
+
+
+
 export const CANCELLATION_REASON_TYPE = {
   NOSHOW: 1,
   OTHERS: 2,
@@ -245,6 +255,13 @@ export const ORDER_TYPE_TAB = {
   CONSUMABLE: '4',
   OPENPRESCRIPTION: '5',
   ORDERSET: '6',
+}
+
+export const PATIENT_HISTORY_TABS = {
+  VISIT:1,
+  DISPENSE:2,
+  APPOINTMENT:3,
+  INVOICE:4,
 }
 
 export const FILE_STATUS = {

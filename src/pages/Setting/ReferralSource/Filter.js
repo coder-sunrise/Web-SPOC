@@ -12,27 +12,7 @@ import {
   ProgressButton,
 } from '@/components'
 
-@withFormikExtend({
-  mapPropsToValues: ({ settingReferralSource }) =>
-    settingReferralSource.filter || {},
-  handleSubmit: (values, { props}) => {
 
-    const {  isActive, name, institution, department } = values
-
-    const payload = {
-      isActive,
-      name,
-      institution,
-      department,
-    }
-
-    props.dispatch({
-      type: 'settingReferralSource/query',
-      payload,
-    })
-  },
-  displayName: 'ReferralSourceFilter',
-})
 class Filter extends PureComponent {
   render () {
     const { classes,handleSubmit } = this.props

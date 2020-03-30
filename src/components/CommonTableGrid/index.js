@@ -1260,8 +1260,8 @@ class CommonTableGrid extends PureComponent {
               <DateTypeProvider {...cellComponentConfig} />
               <RangeDateTypeProvider {...cellComponentConfig} />
               <TimeTypeProvider {...cellComponentConfig} />
-              {/* 
-              
+              {/*
+
 
               <RowErrorTypeProvider {...cellComponentConfig} /> */}
               {grouping && <DragDropProvider />}
