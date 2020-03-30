@@ -9,6 +9,7 @@ import {
   currenciesList,
   currencyRoundingList,
   currencyRoundingToTheClosestList,
+  LABEL_PRINTER_OPTIONS,
 } from '@/utils/codes'
 
 import {
@@ -24,7 +25,6 @@ import {
   CodeSelect,
 } from '@/components'
 import { navigateDirtyCheck } from '@/utils/utils'
-import { LABEL_PRINTER_OPTIONS } from '@/utils/constants'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -249,12 +249,7 @@ class GeneralSetting extends PureComponent {
                 render={(args) => (
                   <Select
                     label='Label Printer Size'
-                    options={
-                      LABEL_PRINTER_OPTIONS &&
-                      LABEL_PRINTER_OPTIONS.map((o) => {
-                        return { name: o, value: o }
-                      })
-                    }
+                    options={LABEL_PRINTER_OPTIONS}
                     {...args}
                     disabled={!!hasActiveSession}
                     allowClear={false}

@@ -342,8 +342,3 @@ export const NOTIFICATION_STATUS = {
   OK: 1,
   ERROR: 2,
 }
-
-export const LABEL_PRINTER_OPTIONS = [
-  '8.9cmx3.6cm',
-  '8.0cmx4.5cm',
-]

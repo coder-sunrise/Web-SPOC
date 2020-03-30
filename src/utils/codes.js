@@ -991,6 +991,11 @@ export const visitOrderTemplateItemTypes = [
   },
 ]
 
+export const LABEL_PRINTER_OPTIONS = [
+  { value: '8.9cmx3.6cm', name: '8.9cmx3.6cm' },
+  { value: '8.0cmx4.5cm', name: '8.0cmx4.5cm' },
+]
+
 const corAttchementTypes = [
   {
     id: 1,
