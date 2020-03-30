@@ -5,7 +5,6 @@ import { compose } from 'redux'
 import { isNumber } from 'util'
 import { sendNotification } from '@/utils/realtime'
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS, KEYS } from '@/utils/constants'
-import { withFormikExtend } from '@/components'
 
 const btnStyle = {
   borderRadius: '50%',
@@ -52,11 +51,60 @@ const CallingQueueButton = ({
   roomAssignmentList,
   ctroom,
   user,
-  queueCalling: { qCallList = [], lastUpdateDate, ...restValues },
+  queueCalling: { qCallList = [], lastUpdateDate, tracker, ...restValues },
 }) => {
-  console.log({ qId })
+  const [
+    roomAssignList,
+    setRoomAssignList,
+  ] = useState()
+  // console.log({ qId })
 
   const qNo = qId.includes('.0') ? qId.replace('.0', '') : qId
+
+  const [
+    disable,
+    setDisable,
+  ] = useState(false)
+
+  useEffect(
+    () => {
+      if (tracker && qNo === tracker.qNo) {
+        setDisable(() => !disable)
+        setTimeout(() => {
+          setDisable(() => false)
+        }, 3000)
+      }
+    },
+    [
+      tracker,
+    ],
+  )
+
+  useEffect(
+    () => {
+      if (!roomAssignList) {
+        dispatch({
+          type: 'settingRoomAssignment/query',
+          payload: {
+            pagesize: 9999,
+          },
+        }).then((response) => {
+          const { data } = response
+          setRoomAssignList(data)
+        })
+
+        // dispatch({
+        //   type: 'codetable/fetchCodes',
+        //   payload: {
+        //     code: 'clinicianprofile',
+        //   },
+        // })
+      }
+    },
+    [
+      roomAssignList,
+    ],
+  )
 
   const getRoomAssigned = () => {
     if (roomNo) {
@@ -80,9 +128,8 @@ const CallingQueueButton = ({
 
       // console.log({ clinicianProfileFK })
 
-      const roomAssignment = roomAssignmentList.find(
-        (room) => room.clinicianProfileFK === clinicianProfileFK,
-      )
+      const roomAssignment = (roomAssignList || [])
+        .find((room) => room.clinicianProfileFK === clinicianProfileFK)
       // console.log({ roomAssignment })
       if (roomAssignment) {
         const roomAssigned = ctroom.find(
@@ -103,11 +150,6 @@ const CallingQueueButton = ({
   ]
 
   const isCalled = newQList.find((q) => q.qNo === qNo)
-
-  const [
-    disable,
-    setDisable,
-  ] = useState(false)
 
   const updateData = (existingQArray, newRestValues = {}) => {
     const valueArray = [

@@ -2,7 +2,7 @@ import React from 'react'
 import Slider from 'react-slick'
 import { withStyles } from '@material-ui/core'
 
-const styles = (theme) => ({
+const styles = () => ({
   slider: {
     height: '90vh',
   },

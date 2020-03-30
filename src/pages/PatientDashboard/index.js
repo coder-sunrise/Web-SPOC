@@ -175,7 +175,6 @@ class PatientDashboard extends PureComponent {
     if (!entity) return null
     const { visit = {} } = entity
     const { visitPurposeFK = VISIT_TYPE.CONS, roomFK, doctorProfileFK } = visit
-    console.log({ entity, roomFK })
 
     return (
       <div className={classes.root}>

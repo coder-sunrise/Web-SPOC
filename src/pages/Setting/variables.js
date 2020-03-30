@@ -28,7 +28,7 @@ export const menuData = [
     url: '/setting/generalsetting',
   },
   {
-    // authority: 'settings.mastersetting.queuedisplaysetup',
+    authority: 'settings.mastersetting.queuedisplaysetup',
     title: 'Master Setting',
     text: 'Queue Display Setup',
     url: '/setting/queuedisplaysetup',

@@ -43,20 +43,13 @@ const styles = (theme) => ({
 
   mapPropsToValues: ({ queueDisplaySetup }) => {
     if (!queueDisplaySetup.entity) return queueDisplaySetup.default
-    const { value } = queueDisplaySetup.entity
 
-    // const parsedValue = JSON.parse(value)
-    // console.log({ parsedValue })
     return {
       ...queueDisplaySetup.entity,
-      // value: {
-      //   ...parsedValue,
-      // },
     }
   },
 
   handleSubmit: (values, { props }) => {
-    console.log({ values })
     const { value, lastUpdateDate, ...restValues } = values
     const { dispatch, history } = props
 
@@ -88,8 +81,6 @@ const styles = (theme) => ({
       key: KEYS.QUEUEDISPLAYSETUP,
       isUserMaintainable: true,
     }
-
-    console.log({ payload })
 
     dispatch({
       type: 'queueDisplaySetup/upsert',
@@ -162,7 +153,6 @@ class QueueDisplaySetup extends PureComponent {
 
   render () {
     const { classes, handleSubmit, values: { value = {} } } = this.props
-    console.log(this.props.values)
     const activeImages = (value.images || [])
       .filter((image) => !image.isDeleted)
 

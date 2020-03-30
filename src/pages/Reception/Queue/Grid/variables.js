@@ -164,8 +164,6 @@ export const QueueColumnExtensions = [
     width: 80,
     compare: compareQueueNo,
     render: (row) => {
-      console.log({ row })
-
       return (
         <Fragment>
           <span

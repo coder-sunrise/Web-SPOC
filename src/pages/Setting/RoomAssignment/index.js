@@ -17,11 +17,12 @@ const styles = (theme) => ({
 }))
 @withSettingBase({ modelName: 'settingRoomAssignment' })
 class RoomAssignment extends PureComponent {
-  state = {}
-
   componentDidMount () {
     this.props.dispatch({
       type: 'settingRoomAssignment/query',
+      payload: {
+        pagesize: 9999,
+      },
     })
   }
 

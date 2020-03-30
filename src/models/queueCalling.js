@@ -50,7 +50,6 @@ export default createFormViewModel({
       },
       *getStatus ({ payload }, { call, put }) {
         const r = yield call(service.getStatus, payload)
-        console.log({ r })
         const { status, data } = r
         if (status === '200') {
           if (data.length > 0) {
@@ -98,7 +97,6 @@ export default createFormViewModel({
         const { value, ...restValues } = payload.data
         const existingQCall = JSON.parse(value)
         const uniqueQCall = _.uniqBy(existingQCall, 'qNo')
-        console.log({ uniqueQCall })
         return {
           ...st,
           qCallList: uniqueQCall,
@@ -121,11 +119,13 @@ export default createFormViewModel({
           return {
             ...st,
             pendingQCall: pendingCalls,
+            tracker: callingQueue,
           }
         }
 
         return {
           ...st,
+          tracker: callingQueue,
         }
       },
       displayCallQueue (st, { payload }) {

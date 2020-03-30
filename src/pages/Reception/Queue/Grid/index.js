@@ -111,12 +111,6 @@ const Grid = ({
         keys: KEYS.QUEUECALLING,
       },
     })
-    dispatch({
-      type: 'settingRoomAssignment/query',
-      payload: {
-        pagesize: 9999,
-      },
-    })
   }, [])
 
   // const calendarData = useMemo(

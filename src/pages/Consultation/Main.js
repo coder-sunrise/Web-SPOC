@@ -472,7 +472,6 @@ class Main extends React.Component {
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)
-    console.log({ visitRegistration, queueNo })
 
     return (
       <SizeContainer size='sm'>

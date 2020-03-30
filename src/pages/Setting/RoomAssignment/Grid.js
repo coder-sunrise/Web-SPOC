@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { compose } from 'redux'
+import { connect } from 'dva'
 import moment from 'moment'
 import {
   withFormikExtend,
@@ -16,24 +17,100 @@ const roomAssignSchema = Yup.object().shape({
   roomFK: Yup.number().required(),
 })
 
+let commitCount = 1000
 const Grid = ({
   handleSubmit,
   setFieldValue,
   values,
   values: { roomAssignRows = [] },
+  dispatch,
+  doctorProfile,
 }) => {
-  const handleDoctorChange = (v, test) => {
+  const [
+    doctorOptions,
+    setDoctorOptions,
+  ] = useState([])
+
+  const [
+    filteredDoctorOptions,
+    setFilteredDoctorOptions,
+  ] = useState([])
+
+  useEffect(() => {
+    const formattedDoctorProfiles = doctorProfile.map((doctor) => {
+      const { doctorMCRNo, clinicianProfile } = doctor
+      const { id, title, name } = clinicianProfile
+      return {
+        value: id,
+        name: `${title || ''}${title ? ' ' : ''}${name} (${doctorMCRNo})`,
+      }
+    })
+    setDoctorOptions(formattedDoctorProfiles)
+    setFilteredDoctorOptions(formattedDoctorProfiles)
+  }, [])
+
+  // const handleDoctorChange = (v, test) => {
+  //   const { row } = v
+  //   const { clinicianProfileFK } = row
+
+  //   const isDoctorAlrdyAssigned = roomAssignRows.find(
+  //     (roomAssign) => roomAssign.clinicianProfileFK === clinicianProfileFK,
+  //   )
+  //   // console.log({
+  //   //   isDoctorAlrdyAssigned,
+  //   //   roomAssignRows,
+  //   //   clinicianProfileFK,
+  //   //   test,
+  //   // })
+  //   dispatch({
+  //     // force current edit row components to update
+  //     type: 'global/updateState',
+  //     payload: {
+  //       commitCount: (commitCount += 1),
+  //     },
+  //   })
+  //   if (isDoctorAlrdyAssigned) row.clinicianProfileFK = undefined
+  // }
+
+  useEffect(
+    () => {
+      let tempDoctorOptions = [
+        ...doctorOptions,
+      ]
+      roomAssignRows.map((roomAssign) => {
+        tempDoctorOptions = tempDoctorOptions.filter(
+          (doctor) => doctor.value !== roomAssign.clinicianProfileFK,
+        )
+        return roomAssign
+      })
+      setFilteredDoctorOptions(tempDoctorOptions)
+    },
+    [
+      roomAssignRows,
+    ],
+  )
+
+  useEffect(
+    () => {
+      dispatch({
+        // force current edit row components to update
+        type: 'global/updateState',
+        payload: {
+          commitCount: (commitCount += 1),
+        },
+      })
+    },
+    [
+      filteredDoctorOptions,
+    ],
+  )
+
+  const handleDoctorChange = (v) => {
     const { row } = v
-    const { clinicianProfileFK } = row
-
-    const isDoctorAlrdyAssigned = roomAssignRows.find(
-      (roomAssign) => roomAssign.clinicianProfileFK === clinicianProfileFK,
+    const newDoctorOptions = doctorOptions.filter(
+      (doctor) => doctor.value !== row.clinicianProfileFK,
     )
-    console.log({ isDoctorAlrdyAssigned, roomAssignRows, clinicianProfileFK })
-
-    if (isDoctorAlrdyAssigned) row.clinicianProfileFK = undefined
-    console.log({ v, test })
-    console.log(values.roomAssignRows)
+    setFilteredDoctorOptions(newDoctorOptions)
   }
 
   const tableParas = {
@@ -45,16 +122,27 @@ const Grid = ({
       {
         columnName: 'clinicianProfileFK',
         width: 500,
-        type: 'codeSelect',
-        code: 'doctorprofile',
-        labelField: 'clinicianProfile.name',
-        valueField: 'clinicianProfile.id',
-        remoteFilter: {
-          'clinicianProfile.isActive': false,
+        // type: 'codeSelect',
+        // code: 'doctorprofile',
+        // labelField: 'clinicianProfile.name',
+        // valueField: 'clinicianProfile.id',
+        // remoteFilter: {
+        //   'clinicianProfile.isActive': false,
+        // },
+        // onChange: (v) => handleDoctorChange(v, roomAssignRows),
+        // renderDropdown: (option) => <DoctorLabel doctor={option} />,
+        type: 'select',
+        options: (row) => {
+          const currentRowDoctor = doctorOptions.find(
+            (doctor) => doctor.value === row.clinicianProfileFK,
+          )
+
+          return [
+            ...filteredDoctorOptions,
+            currentRowDoctor,
+          ]
         },
-        localFilter: (opt) => console.log({ values }),
-        onChange: (v) => handleDoctorChange(v, roomAssignRows),
-        renderDropdown: (option) => <DoctorLabel doctor={option} />,
+        onChange: handleDoctorChange,
       },
       {
         columnName: 'roomFK',
@@ -116,6 +204,11 @@ const Grid = ({
 }
 
 export default compose(
+  connect(({ codetable }) => {
+    return {
+      doctorProfile: codetable.doctorprofile,
+    }
+  }),
   withFormikExtend({
     enableReinitialize: true,
     mapPropsToValues: ({ settingRoomAssignment }) => {
@@ -137,7 +230,7 @@ export default compose(
       const payload = [
         ...newRowAssignRows,
       ]
-      console.log({ payload })
+      // console.log({ payload })
       dispatch({
         type: 'settingRoomAssignment/upsert',
         payload,
@@ -146,6 +239,9 @@ export default compose(
           resetForm()
           dispatch({
             type: 'settingRoomAssignment/query',
+            payload: {
+              pagesize: 9999,
+            },
           })
           history.push('/setting')
         }

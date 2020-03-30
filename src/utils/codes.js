@@ -1073,6 +1073,13 @@ const tenantCodesMap = new Map([
     },
   ],
   [
+    'roomassignment',
+    {
+      ...defaultParams,
+      sorting: [],
+    },
+  ],
+  [
     'ctappointmenttype',
     {
       ...defaultParams,
@@ -1212,12 +1219,14 @@ const tenantCodesMap = new Map([
 const skipCache = [
   'doctorprofile',
   'clinicianprofile',
+  'roomassignment',
 ]
 
 const noSortOrderProp = [
   'doctorprofile',
   'clinicianprofile',
   'role',
+  'roomassignment',
 ]
 
 const convertExcludeFields = [

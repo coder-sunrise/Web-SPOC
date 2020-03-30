@@ -6,7 +6,6 @@ import Ticker from 'react-ticker'
 import { compose } from 'redux'
 import { connect } from 'dva'
 import Clock from './Clock'
-import Marquee from './Marquee'
 import QueueCallingList from './QueueCallingList'
 import Carousel from './Carousel'
 import CurrentCallingQueue from './CurrentCallingQueue'
@@ -201,8 +200,6 @@ const QueueDisplayDasboard = ({
       let getLastestQCallTimer = null
 
       if (signalRConnected && !isSync) {
-        console.log('hihi')
-
         getLastQueueCallList(true)
       }
 
