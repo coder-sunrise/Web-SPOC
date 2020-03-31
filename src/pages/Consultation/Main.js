@@ -594,13 +594,15 @@ class Main extends React.Component {
               </h4>
             </GridItem>
             <GridItem style={{ display: 'flex' }}>
-              <div style={{ marginRight: 10 }}>
-                <CallingQueueButton
-                  qId={queueNo}
-                  roomNo={visit.roomFK}
-                  doctor={visit.doctorProfileFK}
-                />
-              </div>
+              <Authorized authority='openqueuedisplay'>
+                <div style={{ marginRight: 10 }}>
+                  <CallingQueueButton
+                    qId={queueNo}
+                    roomNo={visit.roomFK}
+                    doctor={visit.doctorProfileFK}
+                  />
+                </div>
+              </Authorized>
               {values.status !== 'PAUSED' && (
                 <ProgressButton
                   color='danger'

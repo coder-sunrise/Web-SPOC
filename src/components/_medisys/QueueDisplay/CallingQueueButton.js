@@ -61,7 +61,7 @@ const CallingQueueButton = ({
   const [
     roomAssignList,
     setRoomAssignList,
-  ] = useState()
+  ] = useState(roomAssignmentList)
   // console.log({ qId })
 
   const qNo = qId.includes('.0') ? qId.replace('.0', '') : qId
@@ -94,8 +94,10 @@ const CallingQueueButton = ({
             pagesize: 9999,
           },
         }).then((response) => {
-          const { data } = response
-          setRoomAssignList(data)
+          if (response) {
+            const { data } = response
+            setRoomAssignList(data)
+          }
         })
 
         // dispatch({

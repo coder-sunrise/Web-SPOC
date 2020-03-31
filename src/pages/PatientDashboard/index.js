@@ -180,35 +180,40 @@ class PatientDashboard extends PureComponent {
       <div className={classes.root}>
         <Banner
           extraCmt={
-            visit.visitStatus === 'WAITING' && (
+            visit.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-evenly',
+                  height: '100%',
                 }}
               >
-                {visit.visitStatus === VISIT_STATUS.WAITING && (
-                  <CallingQueueButton
-                    qId={queueNo}
-                    roomNo={roomFK}
-                    doctor={doctorProfileFK}
-                  />
+                {visit.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
+                  <Authorized authority='openqueuedisplay'>
+                    <CallingQueueButton
+                      qId={queueNo}
+                      roomNo={roomFK}
+                      doctor={doctorProfileFK}
+                    />
+                  </Authorized>
                 )}
-                <Authorized authority='patientdashboard.startresumeconsultation'>
-                  <div style={{ padding: '30px 0' }}>
-                    <ProgressButton
-                      color='primary'
-                      onClick={this.startConsultation}
-                      disabled={
-                        visitPurposeFK === VISIT_TYPE.RETAIL ||
-                        visitPurposeFK === VISIT_TYPE.BILL_FIRST
-                      }
-                    >
-                      Start Consultation
-                    </ProgressButton>
-                  </div>
-                </Authorized>
+                {visit.visitStatus === VISIT_STATUS.WAITING && (
+                  <Authorized authority='patientdashboard.startresumeconsultation'>
+                    <div style={{ padding: '30px 0' }}>
+                      <ProgressButton
+                        color='primary'
+                        onClick={this.startConsultation}
+                        disabled={
+                          visitPurposeFK === VISIT_TYPE.RETAIL ||
+                          visitPurposeFK === VISIT_TYPE.BILL_FIRST
+                        }
+                      >
+                        Start Consultation
+                      </ProgressButton>
+                    </div>
+                  </Authorized>
+                )}
               </div>
             )
           }

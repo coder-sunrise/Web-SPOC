@@ -10,7 +10,7 @@ const styles = () => ({
 const Carousel = ({ images = [], currentImageIndex, setCurrentImageIndex }) => {
   const settings = {
     infinite: true,
-    speed: 500,
+    speed: 5000,
     slidesToShow: 1,
     slidesToScroll: 1,
     arrows: false,

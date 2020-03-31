@@ -11,6 +11,7 @@ import { dateFormat, CodeSelect, DateFormatter, Tooltip } from '@/components'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 // variables
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
+import Authorized from '@/utils/Authorized'
 
 const compareString = (a, b) => a.localeCompare(b)
 const compareDoctor = (a, b) => {
@@ -175,11 +176,13 @@ export const QueueColumnExtensions = [
           >
             {row.queueNo}
             {row.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
-              <CallingQueueButton
-                qId={row.queueNo}
-                roomNo={row.roomNo}
-                doctor={row.doctor}
-              />
+              <Authorized authority='openqueuedisplay'>
+                <CallingQueueButton
+                  qId={row.queueNo}
+                  roomNo={row.roomNo}
+                  doctor={row.doctor}
+                />
+              </Authorized>
             )}
           </span>
         </Fragment>
