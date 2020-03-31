@@ -3,6 +3,17 @@ import { withStyles } from '@material-ui/core'
 import Beep from './state-change_confirm-up.wav'
 
 const styles = () => ({
+  '@keyframes mui-ripple-pulsate': {
+    '0%': {
+      transform: 'scale(1)',
+    },
+    '50%': {
+      transform: 'scale(0.92)',
+    },
+    '100%': {
+      transform: 'scale(1)',
+    },
+  },
   callingQueueSection: {
     height: '90vh',
     display: 'flex',
@@ -11,6 +22,7 @@ const styles = () => ({
     flexDirection: 'column',
     lineHeight: '10vw',
     fontSize: '8vw',
+    animation: `mui-ripple-pulsate 2500ms 200ms infinite`,
   },
 })
 

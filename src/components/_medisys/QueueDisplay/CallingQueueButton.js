@@ -10,6 +10,7 @@ import {
   VALUE_KEYS,
 } from '@/utils/constants'
 import { notification } from '@/components'
+import Authorized from '@/utils/Authorized'
 
 const btnStyle = {
   borderRadius: '50%',
@@ -61,7 +62,7 @@ const CallingQueueButton = ({
   const [
     roomAssignList,
     setRoomAssignList,
-  ] = useState()
+  ] = useState(roomAssignmentList)
   // console.log({ qId })
 
   const qNo = qId.includes('.0') ? qId.replace('.0', '') : qId
@@ -249,13 +250,15 @@ const CallingQueueButton = ({
     : classes.uncalledQueueStyle
 
   return (
-    <button
-      type='submit'
-      className={currentStyle}
-      onClick={handleCallingQueue}
-      disabled={disable}
-      style={btnStyle}
-    />
+    <Authorized authority='openqueuedisplay'>
+      <button
+        type='submit'
+        className={currentStyle}
+        onClick={handleCallingQueue}
+        disabled={disable}
+        style={btnStyle}
+      />
+    </Authorized>
   )
 }
 
