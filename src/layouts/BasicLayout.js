@@ -134,6 +134,7 @@ class BasicLayout extends React.PureComponent {
     const { dispatch } = this.props
 
     this.initUserData()
+    this.initRoomAssignment()
     initStream()
 
     let sessionTimeOutInterval = null
@@ -303,6 +304,22 @@ class BasicLayout extends React.PureComponent {
     }
 
     return this.props.history.push('/not-found')
+  }
+
+  initRoomAssignment = async () => {
+    const { dispatch } = this.props
+    const accessRight = Authorized.check(
+      'settings.clinicsetting.roomassignment',
+    )
+
+    if (accessRight && accessRight.rights === 'enable') {
+      await dispatch({
+        type: 'settingRoomAssignment/query',
+        payload: {
+          pagesize: 9999,
+        },
+      })
+    }
   }
 
   initUserData = async () => {
