@@ -4,9 +4,6 @@ import { subscribeNotification } from '@/utils/realtime'
 
 export default createListViewModel({
   namespace: 'settingRoomAssignment',
-  config: {
-    refreshModel: true,
-  },
   param: {
     service,
     state: {
@@ -18,9 +15,9 @@ export default createListViewModel({
     },
     subscriptions: ({ dispatch, history }) => {
       subscribeNotification('ModelUpdated', {
-        callback: ({ modelName }) => {
+        callback: () => {
           dispatch({
-            type: `${modelName}/query`,
+            type: 'settingRoomAssignment/query',
             payload: { pagesize: 9999 },
           })
         },

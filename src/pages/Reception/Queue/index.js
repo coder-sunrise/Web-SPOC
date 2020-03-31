@@ -36,6 +36,7 @@ import { SendNotification } from '@/utils/notification'
 import Authorized from '@/utils/Authorized'
 import { QueueDashboardButton } from '@/components/_medisys'
 import { VALUE_KEYS } from '@/utils/constants'
+import { initRoomAssignment } from '@/utils/codes'
 
 const drawerWidth = 400
 
@@ -109,6 +110,7 @@ class Queue extends React.Component {
     dispatch({
       type: `${modelKey}refresh`,
     })
+    initRoomAssignment()
 
     // dispatch({
     //   type: 'calendar/updateState',

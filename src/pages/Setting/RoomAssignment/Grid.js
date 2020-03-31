@@ -11,6 +11,7 @@ import {
 import { navigateDirtyCheck } from '@/utils/utils'
 import { DoctorLabel } from '@/components/_medisys'
 import Yup from '@/utils/yup'
+import { sendNotification } from '@/utils/realtime'
 
 const roomAssignSchema = Yup.object().shape({
   clinicianProfileFK: Yup.number().required(),
@@ -237,6 +238,11 @@ export default compose(
       }).then((r) => {
         if (r) {
           resetForm()
+
+          sendNotification('ModelUpdated', {
+            modelName: 'settingRoomAssignment',
+          })
+
           dispatch({
             type: 'settingRoomAssignment/query',
             payload: {

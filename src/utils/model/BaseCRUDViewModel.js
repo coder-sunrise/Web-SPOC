@@ -258,7 +258,7 @@ export default class BaseCRUDViewModel {
           })
         }
 
-        const { codetable, refreshModel } = config
+        const { codetable } = config
         // console.log(codetable)
         if (codetable) {
           if (typeof codetable === 'function') {
@@ -270,13 +270,6 @@ export default class BaseCRUDViewModel {
               status: NOTIFICATION_STATUS.OK,
             })
           }
-        }
-
-        if (refreshModel) {
-          sendNotification('ModelUpdated', {
-            modelName: namespace,
-            status: NOTIFICATION_STATUS.OK,
-          })
         }
 
         return r

@@ -70,6 +70,7 @@ import schema from './schema'
 import styles from './style'
 import { CallingQueueButton } from '@/components/_medisys'
 // window.g_app.replaceModel(model)
+import { initRoomAssignment } from '@/utils/codes'
 
 const discardMessage = 'Discard consultation?'
 const formName = 'ConsultationPage'
@@ -244,6 +245,7 @@ class Main extends React.Component {
 
   componentDidMount () {
     // console.log('Main')
+    initRoomAssignment()
     setTimeout(() => {
       this.props.setFieldValue('fakeField', 'setdirty')
     }, 500)
