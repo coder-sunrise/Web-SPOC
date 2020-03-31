@@ -10,7 +10,6 @@ import {
   VALUE_KEYS,
 } from '@/utils/constants'
 import { notification } from '@/components'
-import Authorized from '@/utils/Authorized'
 
 const btnStyle = {
   borderRadius: '50%',
@@ -252,15 +251,13 @@ const CallingQueueButton = ({
     : classes.uncalledQueueStyle
 
   return (
-    <Authorized authority='openqueuedisplay'>
-      <button
-        type='submit'
-        className={currentStyle}
-        onClick={handleCallingQueue}
-        disabled={disable}
-        style={btnStyle}
-      />
-    </Authorized>
+    <button
+      type='submit'
+      className={currentStyle}
+      onClick={handleCallingQueue}
+      disabled={disable}
+      style={btnStyle}
+    />
   )
 }
 
