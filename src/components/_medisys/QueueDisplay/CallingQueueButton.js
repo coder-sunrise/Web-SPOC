@@ -58,10 +58,6 @@ const CallingQueueButton = ({
   user,
   queueCalling: { qCallList = [], lastUpdateDate, tracker, ...restValues },
 }) => {
-  const [
-    roomAssignList,
-    setRoomAssignList,
-  ] = useState(roomAssignmentList)
   // console.log({ qId })
 
   const qNo = qId.includes('.0') ? qId.replace('.0', '') : qId
@@ -82,34 +78,6 @@ const CallingQueueButton = ({
     },
     [
       tracker,
-    ],
-  )
-
-  useEffect(
-    () => {
-      if (!roomAssignList) {
-        dispatch({
-          type: 'settingRoomAssignment/query',
-          payload: {
-            pagesize: 9999,
-          },
-        }).then((response) => {
-          if (response) {
-            const { data } = response
-            setRoomAssignList(data)
-          }
-        })
-
-        // dispatch({
-        //   type: 'codetable/fetchCodes',
-        //   payload: {
-        //     code: 'clinicianprofile',
-        //   },
-        // })
-      }
-    },
-    [
-      roomAssignList,
     ],
   )
 
@@ -135,8 +103,9 @@ const CallingQueueButton = ({
 
       // console.log({ clinicianProfileFK })
 
-      const roomAssignment = (roomAssignList || [])
-        .find((room) => room.clinicianProfileFK === clinicianProfileFK)
+      const roomAssignment = roomAssignmentList.find(
+        (room) => room.clinicianProfileFK === clinicianProfileFK,
+      )
       // console.log({ roomAssignment })
       if (roomAssignment) {
         const roomAssigned = ctroom.find(
