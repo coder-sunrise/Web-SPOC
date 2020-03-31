@@ -89,31 +89,33 @@ const receivingDetailsSchema = Yup.object().shape({
       }
       return undefined
     }
-    
-    let deliveryOrderItem = rows.filter(row => (row.isNew && !row.isDeleted) || (!row.isNew && row.isDeleted)).map((x, index) => {
-      // const itemType = podoOrderType.find((y) => y.value === x.type)
-      const {
-        purchaseOrderMedicationItem,
-        purchaseOrderVaccinationItem,
-        purchaseOrderConsumableItem,
-        ...restX
-      } = x
 
-      let batchNo = Array.isArray(x.batchNo) ? x.batchNo[0] : x.batchNo
-      if (!batchNo) batchNo = null
-      return {
-        ...restX,
-        // inventoryTransactionItemFK: 39, // Temporary hard code, will remove once Soe fix the API
-        purchaseOrderItemFK: getPurchaseOrderItemFK(x),
-        recevingQuantity: x.currentReceivingQty,
-        bonusQuantity: x.currentReceivingBonusQty,
-        isDeleted: x.isDeleted,
-        batchNo,
-        expiryDate: x.expiryDate,
-        sortOrder: index + 1,
-        id: values.id ? x.id : undefined,
-      }
-    })
+    let deliveryOrderItem = rows
+      .filter((row) => !(row.isNew && row.isDeleted))
+      .map((x, index) => {
+        // const itemType = podoOrderType.find((y) => y.value === x.type)
+        const {
+          purchaseOrderMedicationItem,
+          purchaseOrderVaccinationItem,
+          purchaseOrderConsumableItem,
+          ...restX
+        } = x
+
+        let batchNo = Array.isArray(x.batchNo) ? x.batchNo[0] : x.batchNo
+        if (!batchNo) batchNo = null
+        return {
+          ...restX,
+          // inventoryTransactionItemFK: 39, // Temporary hard code, will remove once Soe fix the API
+          purchaseOrderItemFK: getPurchaseOrderItemFK(x),
+          recevingQuantity: x.currentReceivingQty,
+          bonusQuantity: x.currentReceivingBonusQty,
+          isDeleted: x.isDeleted,
+          batchNo,
+          expiryDate: x.expiryDate,
+          sortOrder: index + 1,
+          id: values.id ? x.id : undefined,
+        }
+      })
     dispatch({
       type: 'deliveryOrderDetails/upsert',
       payload: {
@@ -590,105 +592,105 @@ class DODetails extends PureComponent {
       //       isEditable === true && allowAccess === true ? 'enable' : 'disable',
       //   }}
       // >
-        <div style={{ margin: theme.spacing(2) }}>
-          <GridContainer>
-            <GridItem xs={12} md={5}>
-              <GridContainer>
-                <GridItem xs={12}>
-                  <FastField
-                    name='deliveryOrderNo'
-                    render={(args) => {
-                      return (
-                        <TextField
-                          autoFocus
-                          label={formatMessage({
-                            id: 'inventory.pr.detail.dod.deliveryOrderNo',
-                          })}
-                          disabled
-                          {...args}
-                        />
-                      )
-                    }}
-                  />
-                </GridItem>
-                <GridItem xs={12}>
-                  <Field
-                    name='deliveryOrderDate'
-                    render={(args) => {
-                      return (
-                        <DatePicker
-                          disabled={values.id}
-                          label={formatMessage({
-                            id: 'inventory.pr.detail.dod.deliveryOrderDate',
-                          })}
-                          {...args}
-                        />
-                      )
-                    }}
-                  />
-                </GridItem>
-              </GridContainer>
-            </GridItem>
-
-            <GridItem xs={12} md={1} />
-
-            <GridItem xs={12} md={5}>
-              <GridContainer>
-                <GridItem xs={12}>
-                  <FastField
-                    name='remark'
-                    render={(args) => {
-                      return (
-                        <OutlinedTextField
-                          label={formatMessage({
-                            id: 'inventory.pr.detail.dod.remarks',
-                          })}
-                          multiline
-                          rowsMax={2}
-                          rows={2}
-                          {...args}
-                        />
-                      )
-                    }}
-                  />
-                </GridItem>
-              </GridContainer>
-            </GridItem>
-          </GridContainer>
-
-          <GridItem xs={12} md={11}>
-            <h4 style={{ marginTop: 20, fontWeight: 'bold' }}>
-              {formatMessage({
-                id: 'inventory.pr.detail.dod.receivingDetails',
-              })}
-            </h4>
+      <div style={{ margin: theme.spacing(2) }}>
+        <GridContainer>
+          <GridItem xs={12} md={5}>
+            <GridContainer>
+              <GridItem xs={12}>
+                <FastField
+                  name='deliveryOrderNo'
+                  render={(args) => {
+                    return (
+                      <TextField
+                        autoFocus
+                        label={formatMessage({
+                          id: 'inventory.pr.detail.dod.deliveryOrderNo',
+                        })}
+                        disabled
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+              <GridItem xs={12}>
+                <Field
+                  name='deliveryOrderDate'
+                  render={(args) => {
+                    return (
+                      <DatePicker
+                        disabled={values.id}
+                        label={formatMessage({
+                          id: 'inventory.pr.detail.dod.deliveryOrderDate',
+                        })}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+            </GridContainer>
           </GridItem>
-          <div style={{ margin: theme.spacing(2) }}>
-            {errors.rows && (
-              <p className={classes.errorMsgStyle}>{errors.rows}</p>
-            )}
-            <EditableTableGrid
-              getRowId={(r) => r.uid}
-              rows={rows}
-              schema={receivingDetailsSchema}
-              FuncProps={{
-                // edit: isEditable,
-                pager: false,
-              }}
-              EditingProps={{
-                showAddCommand: true,
-                onCommitChanges: this.onCommitChanges,
-              }}
-              {...tableParas}
-            />
-          </div>
-          {footer &&
-            footer({
-              align: 'center',
-              onConfirm: props.handleSubmit,
-              confirmBtnText: 'Save',
+
+          <GridItem xs={12} md={1} />
+
+          <GridItem xs={12} md={5}>
+            <GridContainer>
+              <GridItem xs={12}>
+                <FastField
+                  name='remark'
+                  render={(args) => {
+                    return (
+                      <OutlinedTextField
+                        label={formatMessage({
+                          id: 'inventory.pr.detail.dod.remarks',
+                        })}
+                        multiline
+                        rowsMax={2}
+                        rows={2}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+            </GridContainer>
+          </GridItem>
+        </GridContainer>
+
+        <GridItem xs={12} md={11}>
+          <h4 style={{ marginTop: 20, fontWeight: 'bold' }}>
+            {formatMessage({
+              id: 'inventory.pr.detail.dod.receivingDetails',
             })}
+          </h4>
+        </GridItem>
+        <div style={{ margin: theme.spacing(2) }}>
+          {errors.rows && (
+            <p className={classes.errorMsgStyle}>{errors.rows}</p>
+          )}
+          <EditableTableGrid
+            getRowId={(r) => r.uid}
+            rows={rows}
+            schema={receivingDetailsSchema}
+            FuncProps={{
+              // edit: isEditable,
+              pager: false,
+            }}
+            EditingProps={{
+              showAddCommand: true,
+              onCommitChanges: this.onCommitChanges,
+            }}
+            {...tableParas}
+          />
         </div>
+        {footer &&
+          footer({
+            align: 'center',
+            onConfirm: props.handleSubmit,
+            confirmBtnText: 'Save',
+          })}
+      </div>
       // </AuthorizedContext.Provider>
     )
   }
