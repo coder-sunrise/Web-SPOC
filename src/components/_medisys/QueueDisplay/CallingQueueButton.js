@@ -95,8 +95,10 @@ const CallingQueueButton = ({
             pagesize: 9999,
           },
         }).then((response) => {
-          const { data } = response
-          setRoomAssignList(data)
+          if (response) {
+            const { data } = response
+            setRoomAssignList(data)
+          }
         })
 
         // dispatch({
