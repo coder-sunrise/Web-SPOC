@@ -103,9 +103,8 @@ const CallingQueueButton = ({
 
       // console.log({ clinicianProfileFK })
 
-      const roomAssignment = roomAssignmentList.find(
-        (room) => room.clinicianProfileFK === clinicianProfileFK,
-      )
+      const roomAssignment = (roomAssignmentList || [])
+        .find((room) => room.clinicianProfileFK === clinicianProfileFK)
       // console.log({ roomAssignment })
       if (roomAssignment) {
         const roomAssigned = ctroom.find(

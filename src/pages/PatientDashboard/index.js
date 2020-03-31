@@ -44,6 +44,7 @@ import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE } from '@/utils/constants'
 import { CallingQueueButton } from '@/components/_medisys'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
+import { initRoomAssignment } from '@/utils/codes'
 
 const styles = (theme) => ({
   ...inputStyle(theme),
@@ -97,6 +98,7 @@ class PatientDashboard extends PureComponent {
         },
       })
     }
+    initRoomAssignment()
   }
 
   componentWillUnmount () {}

@@ -3,6 +3,7 @@ import _ from 'lodash'
 import { dateFormatLong, dateFormatLongWithTime } from './format'
 import { UNFIT_TYPE } from './constants'
 import { calculateAgeFromDOB } from './dateUtils'
+import Authorized from '@/utils/Authorized'
 
 const status = [
   {
@@ -1015,6 +1016,18 @@ const corAttchementTypes = [
   },
 ]
 
+const initRoomAssignment = async () => {
+  const accessRight = Authorized.check('settings.clinicsetting.roomassignment')
+  if (accessRight && accessRight.rights === 'enable') {
+    await window.g_app._store.dispatch({
+      type: 'settingRoomAssignment/query',
+      payload: {
+        pagesize: 9999,
+      },
+    })
+  }
+}
+
 module.exports = {
   appointmentStatus,
   recurrenceTypes,
@@ -1044,5 +1057,6 @@ module.exports = {
   gstEnabled,
   groupByFKFunc,
   corAttchementTypes,
+  initRoomAssignment,
   ...module.exports,
 }
