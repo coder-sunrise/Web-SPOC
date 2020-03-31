@@ -39,7 +39,8 @@ class CollectPaymentConfirm extends PureComponent {
       { name: 'invoiceNo', title: 'Invoice No' },
       { name: 'invoiceDate', title: 'Invoice Date' },
       { name: 'patientName', title: 'Patient Name' },
-      { name: 'adminCharge', title: 'Admin Charge' },
+      { name: 'adminCharge', title: 'Corporate Charge' },
+      { name: 'statementAdjustment', title: 'Statement Adjustment' },
       { name: 'payableAmount', title: 'Payable Amount' },
       { name: 'outstandingAmount', title: 'Outstanding' },
       { name: 'payment', title: 'Payment' },
@@ -56,6 +57,13 @@ class CollectPaymentConfirm extends PureComponent {
       },
       {
         columnName: 'adminCharge',
+        type: 'number',
+        currency: true,
+        sortingEnabled: false,
+        width: 150,
+      },
+      {
+        columnName: 'statementAdjustment',
         type: 'number',
         currency: true,
         sortingEnabled: false,

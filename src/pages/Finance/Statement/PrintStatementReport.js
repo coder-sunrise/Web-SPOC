@@ -50,6 +50,9 @@ const PrintStatementReport = (props) => {
               By Doctor
             </MenuItem>
             <MenuItem onClick={() => toggleReport('Item')}>By Item</MenuItem>
+            <MenuItem onClick={() => toggleReport('AsInvoice')}>
+              As Invoice
+            </MenuItem>
           </MenuList>
         }
       >
