@@ -308,7 +308,9 @@ class BasicLayout extends React.PureComponent {
 
   initRoomAssignment = async () => {
     const { dispatch } = this.props
-    const accessRight = Authorized.check('openqueuedisplay')
+    const accessRight = Authorized.check(
+      'settings.clinicsetting.roomassignment',
+    )
 
     if (accessRight && accessRight.rights === 'enable') {
       await dispatch({
