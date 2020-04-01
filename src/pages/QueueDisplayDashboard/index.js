@@ -42,7 +42,7 @@ const styles = (theme) => ({
   footerLeftContainer: {
     width: '20%',
     height: '10vh',
-    padding: 15,
+    padding: '1vh',
     float: 'left',
   },
   footerCenterContainer: {
