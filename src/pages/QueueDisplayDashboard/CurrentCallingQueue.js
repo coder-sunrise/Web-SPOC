@@ -20,8 +20,8 @@ const styles = () => ({
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'column',
-    lineHeight: '10vw',
-    fontSize: '8vw',
+    lineHeight: '15vw',
+    fontSize: '12vw',
     animation: `mui-ripple-pulsate 2500ms 200ms infinite`,
     background: 'black',
     color: 'white',
@@ -49,7 +49,17 @@ const CurrentCallingQueue = ({ classes, callingQueue }) => {
   return (
     <div className={classes.callingQueueSection}>
       <Fragment>
-        <p>{callingQueue.roomNo}</p>
+        <p
+          style={{
+            maxWidth: '100%',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            padding: '1vw',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {callingQueue.roomNo}
+        </p>
         <p style={{ fontWeight: 'bold' }}>{callingQueue.qNo}</p>
       </Fragment>
     </div>
