@@ -16,6 +16,7 @@ import DatePicker from '@/components/DatePicker'
 import { DoctorLabel } from '@/components/_medisys'
 import * as WidgetConfig from './config'
 import { deleteFileByFileID } from '@/services/file'
+import { LAB_TRACKING_STATUS } from '@/utils/constants'
 
 const styles = (theme) => ({
   root: {},
@@ -139,7 +140,9 @@ class Detail extends PureComponent {
     this.myRef = React.createRef()
     this.widgets = WidgetConfig.widgets(props)
   }
+
   componentDidMount () {
+
     const { values } = this.props
     if (values && values.labTrackingResults) {
       const { labTrackingResults } = values
@@ -150,6 +153,9 @@ class Detail extends PureComponent {
       notConfirmedFiles.forEach((item) => {
         !item.isDeleted && deleteFileByFileID(item.id)
       })
+    }
+    if(values.labTrackingStatusFK) {
+      this.toggleAccordion(values.labTrackingStatusFK)
     }
   }
 
@@ -203,6 +209,41 @@ class Detail extends PureComponent {
 
     setFieldValue('labTrackingResults', updated)
   }
+
+
+  changeToggle = (event, p, expanded) => {
+    if (expanded) {
+      setTimeout(() => {
+        $(this.myRef.current)
+          .find('div[aria-expanded=true]')
+          .next()
+          .find('div[role="button"]:eq(0)')
+          .trigger('click')
+      }, 1)
+    }
+  }
+
+  toggleAccordion = (e) => {
+    const {activedKeys} = this.myRef.current.state
+    let newActivedKeys = activedKeys||[]
+    switch (e) {
+      case LAB_TRACKING_STATUS.ORDERED:
+        if(newActivedKeys.indexOf(0) ===-1){
+          newActivedKeys.push(0)
+        }
+        break
+      case LAB_TRACKING_STATUS.RECEIVED:
+        if(newActivedKeys.indexOf(1) ===-1){
+          newActivedKeys.push(1)
+        }
+        break
+      default:
+        break
+    }
+
+    this.setState({activedKeys: []})
+  }
+
 
 
   getContent =(data,)=>{
@@ -297,16 +338,7 @@ class Detail extends PureComponent {
                     label='Status'
                     {...args}
                     code='ltlabtrackingstatus'
-                    // onChange={(value) => {
-                    //   console.log('this.myRef',this.myRef)
-                    //   setTimeout(() => {
-                    //     $(this.myRef.current)
-                    //       .find('div[aria-expanded=true]')
-                    //       .next()
-                    //       .find('div[role="button"]:eq(0)')
-                    //       .trigger('click')
-                    //   }, 1)
-                    // }}
+                    onChange={this.toggleAccordion}
                   />
                     )}
               />
@@ -314,32 +346,23 @@ class Detail extends PureComponent {
           </GridContainer>
         </div>
         <div>
-          {this.widgets.map((o)=>{
-              return (
-                <div ref={this.myRef}>
-                  <Accordion
-                    defaultActive={1}
-                    onChange={(event, p, expanded) => {
-                      if (expanded) {
-                        setTimeout(() => {
-                          $(this.myRef.current)
-                            .find('div[aria-expanded=true]')
-                            .next()
-                            .find('div[role="button"]:eq(0)')
-                            .trigger('click')
-                        }, 1)
-                      }
-                    }}
-                    collapses={[{
-                      title:this.getTitle(o),
-                      hideExpendIcon:false,
-                      content: this.getContent(o),
-                    }]
-                    }
-                  />
-                </div>
-              )
-            })}
+          <div>
+            <Accordion
+              ref={this.myRef}
+              onChange={this.changeToggle}
+              mode='multiple'
+              collapses={
+                this.widgets.map((o)=>{
+                  return {
+                    title: this.getTitle(o),
+                    hideExpendIcon:false,
+                    content: this.getContent(o),
+                  }
+                })
+              }
+            />
+          </div>
+
         </div>
         {footer &&
           footer({

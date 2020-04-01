@@ -38,11 +38,8 @@ const styles = (theme) => ({
 
 
 class FilterBar extends PureComponent {
-
   render() {
-
     const {handleSubmit, IsOverallGrid} = this.props
-
     return(
     <div>
           <GridContainer>
@@ -132,12 +129,11 @@ class FilterBar extends PureComponent {
 }
 
 export default memo(
-
   withFormikExtend({
-    handleSubmit: (values, { props }) => {
-      const { dispatch, IsOverallGrid, patientId } = props
+    handleSubmit: (values, { props, resetForm }) => {
+      const { dispatch, IsOverallGrid, patientId, setState } = props
       let patientID = patientId ? patientId : Number(findGetParameter('pid'))
-      const {visitDate, isAllDateChecked, labTrackingStatusFK,serviceName, searchValue} = values
+      const {visitDate, isAllDateChecked, labTrackingStatusFK, serviceName, searchValue} = values
 
 
       const visitStartDate = visitDate && visitDate.length > 0 ? visitDate[0] : undefined
@@ -146,24 +142,21 @@ export default memo(
 
       const payload = IsOverallGrid ?
       {
-        lgteql_visitDate: isAllDateChecked ? undefined : visitStartDate,
-        lsteql_visitDate: isAllDateChecked ? undefined : visitEndDate,
-        labTrackingStatusFK,
-        apiCriteria: {
-          searchValue,
-        },
+        lgteql_visitDate: isAllDateChecked ? undefined : visitStartDate || undefined,
+        lsteql_visitDate: isAllDateChecked ? undefined : visitEndDate || undefined,
+        labTrackingStatusFK: labTrackingStatusFK || undefined,
+        apiCriteria: searchValue ? {searchValue } : undefined,
+        serviceName: serviceName || undefined
       }:{
-        visitFKNavigation: {
+        visitFKNavigation: patientID ? {
           patientProfileFK : patientID,
-        },
-        lgteql_visitDate: isAllDateChecked ? undefined : visitStartDate,
-        lsteql_visitDate: isAllDateChecked ? undefined : visitEndDate,
-        labTrackingStatusFK,
-        serviceName
+        } : undefined,
+        lgteql_visitDate: isAllDateChecked ? undefined : visitStartDate || undefined,
+        lsteql_visitDate: isAllDateChecked ? undefined : visitEndDate || undefined,
+        labTrackingStatusFK:labTrackingStatusFK || undefined,
+        serviceName: serviceName || undefined,
+         apiCriteria: searchValue ? {searchValue } : undefined,
       }
-
-      console.log('tsting? payload??',payload)
-      console.log('tsting? IsOverallGrid??',IsOverallGrid)
 
       dispatch({
         type: 'labTrackingDetails/query',

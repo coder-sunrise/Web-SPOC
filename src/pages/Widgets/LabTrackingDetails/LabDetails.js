@@ -67,6 +67,7 @@ export default ({ classes, current, fieldName = '' }) => {
             render={(args) => (
               <CodeSelect
                 label='Case Type'
+                valueField='DisplayValue'
                 {...args}
                 code='CTCaseType'
               />

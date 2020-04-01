@@ -37,15 +37,22 @@ class LabTrackingDetails extends PureComponent{
   componentDidMount () {
     this.resize()
     window.addEventListener('resize', this.resize.bind(this))
-    const {dispatch, patientId,resultType} = this.props
-    const IsOverallGrid = resultType === PATIENT_LAB.LAB_TRACKING
-    let patientID = patientId || Number(findGetParameter('pid'))
 
+    const {dispatch, patientId,resultType} = this.props
+
+    const IsOverallGrid = resultType === PATIENT_LAB.LAB_TRACKING
+    let patientID = patientId || Number(findGetParameter('pid')) || undefined
     const payload = IsOverallGrid ? undefined : {
-      visitFKNavigation: {
+      visitFKNavigation: patientID ? {
         patientProfileFK : patientID,
-      },
+      }:undefined,
+      lgteql_visitDate:undefined,
+      lsteql_visitDate:undefined,
+      labTrackingStatusFK:undefined,
+      apiCriteria:undefined,
+      serviceName:undefined,
     }
+
     dispatch({
       type: 'labTrackingDetails/query',
       payload,
@@ -54,7 +61,6 @@ class LabTrackingDetails extends PureComponent{
   }
 
   componentWillUnmount () {
-
     window.removeEventListener('resize', this.resize.bind(this))
   }
 
@@ -77,8 +83,6 @@ class LabTrackingDetails extends PureComponent{
     }
   }
 
-
-
   render () {
     const { resultType, dispatch, labTrackingDetails, patientId } = this.props
     const IsOverallGrid = resultType === PATIENT_LAB.LAB_TRACKING
@@ -89,7 +93,7 @@ class LabTrackingDetails extends PureComponent{
 
     return(
       <div>
-        <FilterBar dispatch={dispatch} IsOverallGrid patientId={patientId} />
+        <FilterBar dispatch={dispatch} IsOverallGrid={IsOverallGrid} patientId={patientId} />
         <div style={{margin:10}}>
           {IsOverallGrid?
             (<OverallGrid

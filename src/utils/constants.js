@@ -34,6 +34,14 @@ export const USER_ROLE = {
   CLINIC_ASSISTANT: 4,
 }
 
+export const LAB_TRACKING_STATUS={
+  NEW:1,
+  ORDERED:2,
+  RECEIVED:3,
+  COMPLETED:4,
+}
+
+
 export const COPAYER_TYPE = {
   CORPORATE: 1,
   GOVERNMENT: 2,
@@ -354,4 +362,8 @@ export const NOTIFICATION_TYPE = {
 export const NOTIFICATION_STATUS = {
   OK: 1,
   ERROR: 2,
+}
+export const VALUE_KEYS = {
+  QUEUEDISPLAYSETUP: 'queueDisplay',
+  QUEUECALLING: 'queueCalling',
 }
