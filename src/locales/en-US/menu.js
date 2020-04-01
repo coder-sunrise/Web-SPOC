@@ -148,6 +148,8 @@ export default {
   'menu.setting.appointmenttype': 'Appointment Type',
   'menu.setting.referralsource': 'Referral Source',
   'menu.setting.visitordertemplate': 'Visit Order Template',
+  'menu.setting.casetype': 'Case Type',
+  'menu.setting.casedescription': 'Case Description',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',
