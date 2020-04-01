@@ -178,13 +178,13 @@ export const menuData = [
     url: '/setting/treatmentcategory',
   },
   {
-     // authority: 'menu.setting.casetype',
+      authority: 'menu.setting.casetype',
       title: 'Clinic Setting',
       text: 'CASE Type',
       url: '/setting/casetype',
   },
   {
-     // authority: 'menu.setting.casedescription',
+      authority: 'menu.setting.casedescription',
       title: 'Clinic Setting',
       text: 'CASE DESCRIPTION',
       url: '/setting/casedescription',
