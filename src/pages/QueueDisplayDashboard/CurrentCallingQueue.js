@@ -23,6 +23,8 @@ const styles = () => ({
     lineHeight: '10vw',
     fontSize: '8vw',
     animation: `mui-ripple-pulsate 2500ms 200ms infinite`,
+    background: 'black',
+    color: 'white',
   },
 })
 

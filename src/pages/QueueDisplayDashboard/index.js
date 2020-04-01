@@ -27,6 +27,7 @@ const styles = (theme) => ({
     width: '70%',
     float: 'right',
     border: '1px solid black',
+    height: '90vh',
   },
   footerContainer: {
     position: 'absolute',
