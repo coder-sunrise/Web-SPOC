@@ -88,6 +88,7 @@ export const formikMapPropsToValues = ({
       }),
       {},
     )
+    let roomAssignmentFK
 
     const { location } = history
     if (location.query.pdid) {
@@ -95,6 +96,13 @@ export const formikMapPropsToValues = ({
         (item) =>
           item.clinicianProfile.id === parseInt(location.query.pdid, 10),
       )
+      if (doctorProfile && !visitEntries.id) {
+        if (doctorProfile.clinicianProfile.roomAssignment) {
+          roomAssignmentFK =
+            doctorProfile.clinicianProfile.roomAssignment.roomFK
+          roomAssignmentFK = 11
+        }
+      }
       doctorProfileFK = doctorProfile ? doctorProfile.id : doctorProfileFK
     }
 
@@ -108,10 +116,27 @@ export const formikMapPropsToValues = ({
       .map((option) => option.id)
       .includes(visitEntries.visitOrderTemplateFK)
 
+    if (!visitEntries.id) {
+      if (doctorProfile) {
+        if (doctorProfile.clinicianProfile.roomAssignment) {
+          roomAssignmentFK =
+            doctorProfile.clinicianProfile.roomAssignment.roomFK
+        }
+      } else if (doctorProfileFK) {
+        const defaultDoctor = doctorProfiles.find(
+          (doctor) => doctor.id === doctorProfileFK,
+        )
+        if (defaultDoctor.clinicianProfile.roomAssignment) {
+          roomAssignmentFK =
+            doctorProfile.clinicianProfile.roomAssignment.roomFK
+        }
+      }
+    }
+
     return {
       queueNo: qNo,
       visitPurposeFK,
-      roomFK,
+      roomFK: roomAssignmentFK || roomFK,
       visitStatus: VISIT_STATUS.WAITING,
       // doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
       doctorProfileFK,
