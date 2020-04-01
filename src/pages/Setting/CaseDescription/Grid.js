@@ -72,8 +72,9 @@ class Grid extends PureComponent {
                     },
                     {
                         columnName: 'caseTypeFK',
-                        sortingEnabled: false,
-                        render: (row) => row.CaseTypeFKNavigation.code,
+                        type: 'codeSelect',
+                        code: 'ctcasetype',
+                        label: 'name',
                     },
                 ]}
             />

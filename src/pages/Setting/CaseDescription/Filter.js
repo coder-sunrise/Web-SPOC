@@ -56,13 +56,11 @@ class Filter extends PureComponent {
                                     const {
                                         codeDisplayValue,
                                         isActive,
-                                        caseTypeK,
                                     } = this.props.values
                                     this.props.dispatch({
-                                        type: 'settingCaseType/query',
+                                        type: 'settingCaseDescription/query',
                                         payload: {
                                             isActive,
-                                            caseTypeK,
                                             group: [
                                                 {
                                                     code: codeDisplayValue,
