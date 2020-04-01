@@ -13,6 +13,11 @@ export default createListViewModel({
         description: '',
       },
     },
+    subscriptions: ({ dispatch, history }) => {
+      history.listen(async (loct, method) => {
+        const { pathname, search, query = {} } = loct
+      })
+    },
     effects: {},
     reducers: {
       queryDone (st, { payload }) {

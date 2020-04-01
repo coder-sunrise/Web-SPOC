@@ -1,4 +1,6 @@
 import React, { PureComponent } from 'react'
+import $ from 'jquery'
+import { withStyles } from '@material-ui/core'
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -6,20 +8,111 @@ import {
   GridContainer,
   GridItem,
   TextField,
-  DateRangePicker,
-  NumberInput,
   CodeSelect,
+   Accordion,
+   CardContainer,
 } from '@/components'
 import DatePicker from '@/components/DatePicker'
+import { DoctorLabel } from '@/components/_medisys'
+import * as WidgetConfig from './config'
+import { deleteFileByFileID } from '@/services/file'
 
-const styles = (theme) => ({})
+const styles = (theme) => ({
+  root: {},
+  hide: {
+    display: 'none',
+  },
+  title: {
+    fontSize: '1em',
+  },
+  note: {
+    fontSize: '0.85em',
+    fontWeight: 400,
+    lineHeight: '10px',
+  },
+  listRoot: {
+    width: '100%',
+  },
+  listItemRoot: {
+    paddingTop: 4,
+    paddingBottom: 4,
+    fontSize: '0.85em',
+  },
+  listItemDate: {
+    position: 'absolute',
+    right: '21%',
+  },
+  paragraph: {
+    marginLeft: theme.spacing(1),
+  },
+  leftPanel: {
+    position: 'sticky',
+    width: 400,
+    top: 0,
+    float: 'left',
+    marginRight: theme.spacing(1),
+    marginTop: 0,
+  },
+  rightPanel: {
+    marginTop: 0,
+
+    '& h5': {
+      textDecoration: 'underline',
+      marginTop: theme.spacing(2),
+      fontSize: '1em',
+    },
+  },
+  integratedLeftPanel: {
+    width: '100%',
+  },
+})
 
 @withFormikExtend({
-  mapPropsToValues: ({ labTrackingDetails }) =>
-    labTrackingDetails.entity,
+  mapPropsToValues: ({ labTrackingDetails }) =>{
+
+    // Construct Attachment
+    let labTrackingResults=[]
+    labTrackingDetails.entity.labTrackingResults.map((labTrackingResult) => {
+      labTrackingResults.push({
+        ...labTrackingResult,
+        thumbnailIndexFK: undefined,
+        attachmentType:'labTrackingResults',
+        fileExtension:'pdf',
+      })
+      return labTrackingResult
+    })
+
+    return {
+    ...labTrackingDetails.entity,
+      labTrackingResults,
+    }
+  },
   handleSubmit: (values, { props, resetForm }) => {
-    const { ...restValues } = values
+    let { ...restValues } = values
     const { dispatch, onConfirm } = props
+
+    if(values){
+      let sortOrder = 0 && values.labTrackingResults.length ? values.labTrackingResults.length : 0
+
+      let item = values.labTrackingResults.map(x => {
+
+        sortOrder += 1
+        if(x.fileIndexFK)
+        {
+          return {
+            ...x,
+            sortOrder,
+          }
+        }
+          return {
+            fileIndexFK:x.id,
+            sortOrder,
+            fileName: x.fileName,
+          }
+      })
+      restValues.labTrackingResults = item
+    }
+
     dispatch({
       type: 'labTrackingDetails/upsert',
       payload: {
@@ -37,18 +130,101 @@ const styles = (theme) => ({})
   },
   displayName: 'labTrackingDetails',
 })
+
 class Detail extends PureComponent {
   state = {}
 
-  render () {
-    const { props } = this
-    const { theme, footer, labTrackingDetails } = props
+  constructor (props) {
+    super(props)
+    this.myRef = React.createRef()
+    this.widgets = WidgetConfig.widgets(props)
+  }
+  componentDidMount () {
+    const { values } = this.props
+    if (values && values.labTrackingResults) {
+      const { labTrackingResults } = values
 
-    // TODO: Accordion for lab tracking details and Lab Results
+      const notConfirmedFiles = labTrackingResults.filter(
+        (att) => att.fileIndexFK === undefined,
+      )
+      notConfirmedFiles.forEach((item) => {
+        !item.isDeleted && deleteFileByFileID(item.id)
+      })
+    }
+  }
+
+  renderDropdown = (option) => <DoctorLabel doctor={option} />
+
+  getTitle = (row) => {
+    const { name = '' } = row
 
     return (
-      <React.Fragment>
-        <div style={{ margin: theme.spacing(1) }}>
+      <div className={this.props.classes.title}>
+        <GridContainer>
+          <GridItem sm={12}>
+            <p>
+              <span>{name}</span>
+            </p>
+          </GridItem>
+        </GridContainer>
+      </div>
+    )
+  }
+
+  updateAttachments = ({ added, deleted }) => {
+    const { values: { labTrackingResults = [] }, setFieldValue } = this.props
+
+    let updated = [
+      ...labTrackingResults,
+    ]
+
+    if (added)
+      updated = [
+        ...updated,
+        ...added,
+      ]
+
+    if (deleted)
+      updated = updated.reduce((attachments, item) => {
+        if (
+          (item.fileIndexFK !== undefined && item.fileIndexFK === deleted) ||
+          (item.fileIndexFK === undefined && item.id === deleted)
+        )
+          return [
+            ...attachments,
+            { ...item, isDeleted: true },
+          ]
+
+        return [
+          ...attachments,
+          { ...item },
+        ]
+      }, [])
+
+    setFieldValue('labTrackingResults', updated)
+  }
+
+
+  getContent =(data,)=>{
+    const Widget = data.component
+    const{values} = this.props
+
+    return <Widget
+      current={values|| {}}
+      attachment={values.labTrackingResults}
+      updateAttachments={this.updateAttachments}
+    />
+  }
+
+  render () {
+    const { props } = this
+    const { theme, footer } = props
+    return (
+      <CardContainer
+        hideHeader
+        size='sm'
+      >
+        <div>
           <GridContainer>
             <GridItem md={4}>
               <FastField
@@ -62,24 +238,34 @@ class Detail extends PureComponent {
                 )}
               />
             </GridItem>
-
             <GridItem md={4}>
               <FastField
                 name='patientName'
                 render={(args) => <TextField label='Patient Name' {...args} disabled />}
               />
             </GridItem>
-
             <GridItem md={4}>
               <FastField
-                name='DoctorProfileFK'
-                render={(args) => {
-                  // TODO: Change to code table
-                  return <TextField label='Doctor' {...args} />
-                }}
+                name='doctorProfileFK'
+                render={(args) => (
+                  <CodeSelect
+                    {...args}
+                    disableAll
+                    allowClear={false}
+                    label='Doctor'
+                    remoteFilter={{
+                      'clinicianProfile.isActive': true,
+                    }}
+                    disabled
+                    localFilter={(option) => option.clinicianProfile.isActive}
+                    code='doctorprofile'
+                    labelField='clinicianProfile.name'
+                    valueField='clinicianProfile.id'
+                    renderDropdown={this.renderDropdown}
+                  />
+                )}
               />
             </GridItem>
-
             <GridItem md={4}>
               <FastField
                 name='visitDate'
@@ -89,6 +275,7 @@ class Detail extends PureComponent {
                       label='Visit Date'
                       {...args}
                       disabled
+                      timeFormat={false}
                     />
                   )
                 }}
@@ -106,23 +293,65 @@ class Detail extends PureComponent {
               <FastField
                 name='labTrackingStatusFK'
                 render={(args) => (
-                  <TextField label='Status' {...args} disabled />
-                )}
+                  <CodeSelect
+                    label='Status'
+                    {...args}
+                    code='ltlabtrackingstatus'
+                    // onChange={(value) => {
+                    //   console.log('this.myRef',this.myRef)
+                    //   setTimeout(() => {
+                    //     $(this.myRef.current)
+                    //       .find('div[aria-expanded=true]')
+                    //       .next()
+                    //       .find('div[role="button"]:eq(0)')
+                    //       .trigger('click')
+                    //   }, 1)
+                    // }}
+                  />
+                    )}
               />
             </GridItem>
           </GridContainer>
         </div>
+        <div>
+          {this.widgets.map((o)=>{
+              return (
+                <div ref={this.myRef}>
+                  <Accordion
+                    defaultActive={1}
+                    onChange={(event, p, expanded) => {
+                      if (expanded) {
+                        setTimeout(() => {
+                          $(this.myRef.current)
+                            .find('div[aria-expanded=true]')
+                            .next()
+                            .find('div[role="button"]:eq(0)')
+                            .trigger('click')
+                        }, 1)
+                      }
+                    }}
+                    collapses={[{
+                      title:this.getTitle(o),
+                      hideExpendIcon:false,
+                      content: this.getContent(o),
+                    }]
+                    }
+                  />
+                </div>
+              )
+            })}
+        </div>
         {footer &&
-        footer({
-          onConfirm: props.handleSubmit,
-          confirmBtnText: 'Save',
-          confirmProps: {
-            disabled: false,
-          },
-        })}
-      </React.Fragment>
+          footer({
+            onConfirm: props.handleSubmit,
+            confirmBtnText: 'Save',
+            confirmProps: {
+              disabled: false,
+            },
+          })}
+      </CardContainer>
     )
   }
 }
 
-export default Detail
+export default withStyles (styles,{withTheme:true})(Detail)

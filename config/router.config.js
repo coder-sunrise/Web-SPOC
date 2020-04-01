@@ -113,6 +113,16 @@ const _routes = [
               'patientdashboard',
             ],
           },
+          {
+            path: '/reception/labtracking',
+            name: 'labTracking',
+            component: './Reception/LabTracking',
+            mini: 'LT',
+            exact: true,
+            authority: [
+              'reception/queue',
+            ],
+          },
           // {
           //   path: '/reception/queue/patientdashboard/consultation/:id?',
           //   name: 'consultation',

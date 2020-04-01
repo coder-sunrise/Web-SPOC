@@ -52,8 +52,8 @@ const tableColumnExtensions = [
 class OverallGrid extends PureComponent {
 
   editRow = (row, e) =>{
-    const {dispatch, LabTrackingDetails}= this.props
-    const {list} = LabTrackingDetails
+    const {dispatch, labTrackingDetails}= this.props
+    const {list} = labTrackingDetails
 
     dispatch({
       type:'labTrackingDetails/updatestate',

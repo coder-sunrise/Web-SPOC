@@ -32,6 +32,7 @@ import {
 } from '@/components'
 // sub components
 import PatientHistoryDrawer from './PatientHistoryDrawer'
+import LabTrackingDrawer from './LabTrackingDrawer'
 import { control } from '@/components/Decorator'
 import Templates from './Templates'
 // utils
@@ -56,7 +57,6 @@ const { Link } = Anchor
 class Layout extends PureComponent {
   constructor (props) {
     super(props)
-
     this.container = React.createRef()
     this.layoutContainer = React.createRef()
     // console.log(this.container)
@@ -175,6 +175,7 @@ class Layout extends PureComponent {
       collapsed: global.collapsed,
       currentLayout: defaultLayout,
       openPatientHistoryDrawer: false,
+      openLabTrackingDrawer: false,
     }
     localStorage.setItem('consultationLayout', JSON.stringify(defaultLayout))
   }
@@ -383,6 +384,12 @@ class Layout extends PureComponent {
   togglePatientHistoryDrawer = () => {
     this.setState((prevState) => ({
       openPatientHistoryDrawer: !prevState.openPatientHistoryDrawer,
+    }))
+  }
+
+  toggleLabTrackingDrawer = () => {
+    this.setState((prevState) => ({
+      openLabTrackingDrawer: !prevState.openLabTrackingDrawer,
     }))
   }
 
@@ -602,7 +609,7 @@ class Layout extends PureComponent {
             }}
           >
             <GridContainer justify='space-between'>
-              <GridItem md={10}>
+              <GridItem md={9}>
                 {state.currentLayout.widgets.map((id) => {
                   const w = widgets.find((o) => o.id === id)
                   if (!w) return null
@@ -614,7 +621,15 @@ class Layout extends PureComponent {
                   )
                 })}
               </GridItem>
-              <GridItem md={2} style={{ textAlign: 'right' }}>
+              <GridItem md={3} style={{ textAlign: 'right' }}>
+                <Button
+                  size='sm'
+                  color='info'
+                  onClick={this.toggleLabTrackingDrawer}
+                >
+                  <Accessibility />
+                  Results
+                </Button>
                 <Button size='sm' color='info' onClick={this.toggleDrawer}>
                   <Settings />
                   Widgets
@@ -960,6 +975,17 @@ class Layout extends PureComponent {
                   </div>
                 </SizeContainer>
               </div>
+            </Drawer>
+            <Drawer
+              anchor='right'
+              open={this.state.openLabTrackingDrawer}
+              onClose={this.toggleLabTrackingDrawer}
+            >
+              <LabTrackingDrawer
+                {...widgetProps}
+                patientId={this.props.visitRegistration.entity.visit.patientProfileFK}
+                onClose={this.toggleLabTrackingDrawer}
+              />
             </Drawer>
           </React.Fragment>
         )}

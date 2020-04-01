@@ -146,6 +146,10 @@ class NumberInput extends React.PureComponent {
       options.numeral = true
     }
 
+    if(number) {
+      formatVal.value = value || field.value
+    }
+
     if ((currency || qty || percent) && `${value}`) {
       if ((currency && !currency.allowNegtive) || qty || percent) {
         options.numeralPositiveOnly = true

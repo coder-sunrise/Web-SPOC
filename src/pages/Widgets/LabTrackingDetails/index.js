@@ -6,9 +6,9 @@ import { PATIENT_LAB } from '@/utils/constants'
 import FilterBar from './FilterBar'
 import OverallGrid from './OverallGrid'
 import PatientGrid from './PatientGrid'
-import CommonModal from '@/components/CommonModal'
 import model from './models'
-
+import { CommonModal } from '@/components'
+import {findGetParameter} from "@/utils/utils"
 
 window.g_app.replaceModel(model)
 
@@ -24,10 +24,10 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({labTrackingDetails})=>{
-  labTrackingDetails
-})
 
+@connect(({ labTrackingDetails }) => ({
+  labTrackingDetails,
+}))
 class LabTrackingDetails extends PureComponent{
 
   state = {
@@ -37,12 +37,36 @@ class LabTrackingDetails extends PureComponent{
   componentDidMount () {
     this.resize()
     window.addEventListener('resize', this.resize.bind(this))
+    const {dispatch, patientId,resultType} = this.props
+    const IsOverallGrid = resultType === PATIENT_LAB.LAB_TRACKING
+    let patientID = patientId || Number(findGetParameter('pid'))
+
+    const payload = IsOverallGrid ? undefined : {
+      visitFKNavigation: {
+        patientProfileFK : patientID,
+      },
+    }
+    dispatch({
+      type: 'labTrackingDetails/query',
+      payload,
+    })
+
   }
 
   componentWillUnmount () {
+
     window.removeEventListener('resize', this.resize.bind(this))
   }
 
+  toggleModal = () => {
+    const {labTrackingDetails} = this.props
+    this.props.dispatch({
+      type: 'labTrackingDetails/updateState',
+      payload: {
+        showModal: !labTrackingDetails.showModal,
+      },
+    })
+  }
 
   resize () {
     if (this.divElement) {
@@ -53,18 +77,10 @@ class LabTrackingDetails extends PureComponent{
     }
   }
 
-  toggleModal = () => {
-    this.props.dispatch({
-      type: 'labTrackingDetails/updateState',
-      payload: {
-        showModal: !this.props.LabTrackingDetails.showModal,
-      },
-    })
-  }
+
 
   render () {
-    const { resultType, dispatch,labTrackingDetails} = this.props
-
+    const { resultType, dispatch, labTrackingDetails, patientId } = this.props
     const IsOverallGrid = resultType === PATIENT_LAB.LAB_TRACKING
 
     const cfg = {
@@ -73,25 +89,31 @@ class LabTrackingDetails extends PureComponent{
 
     return(
       <div>
-        <FilterBar dispatch={dispatch} />
-        {IsOverallGrid?
-          (<OverallGrid
-            {...cfg}
-            {...this.props}
-          />):(
-            <PatientGrid
+        <FilterBar dispatch={dispatch} IsOverallGrid patientId={patientId} />
+        <div style={{margin:10}}>
+          {IsOverallGrid?
+            (<OverallGrid
+              dispatch={dispatch}
               {...cfg}
               {...this.props}
-            />)}
-        {/* <CommonModal */}
-        {/*  open={labTrackingDetails.showModal} */}
-        {/*  title='Edit Lab Tracking / Results' */}
-        {/*  observe='LabResultsDetail' */}
-        {/*  maxWidth='md' */}
-        {/*  bodyNoPadding */}
-        {/*  onClose={this.toggleModal} */}
-        {/*  onConfirm={this.toggleModal} */}
-        {/* /> */}
+            />):(
+              <PatientGrid
+                dispatch={dispatch}
+                {...cfg}
+                {...this.props}
+              />)}
+        </div>
+        <CommonModal
+          open={labTrackingDetails.showModal}
+          title='Edit Lab Tracking / Results'
+          observe='LabResultsDetail'
+          maxWidth='md'
+          bodyNoPadding
+          onClose={this.toggleModal}
+          onConfirm={this.toggleModal}
+        >
+          <Detail {...cfg} {...this.props} mode='integrated' />
+        </CommonModal>
       </div>
     )
   }
