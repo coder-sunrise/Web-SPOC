@@ -27,6 +27,7 @@ const styles = (theme) => ({
     width: '70%',
     float: 'right',
     border: '1px solid black',
+    height: '90vh',
   },
   footerContainer: {
     position: 'absolute',
@@ -42,7 +43,7 @@ const styles = (theme) => ({
   footerLeftContainer: {
     width: '20%',
     height: '10vh',
-    padding: 15,
+    padding: '1vh',
     float: 'left',
   },
   footerCenterContainer: {

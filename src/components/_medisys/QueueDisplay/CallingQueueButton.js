@@ -56,7 +56,7 @@ const CallingQueueButton = ({
   roomAssignmentList,
   ctroom,
   user,
-  queueCalling: { qCallList = [], lastUpdateDate, tracker, ...restValues },
+  queueCalling: { oriQCallList = [], lastUpdateDate, tracker, ...restValues },
 }) => {
   // console.log({ qId })
 
@@ -70,6 +70,18 @@ const CallingQueueButton = ({
   useEffect(
     () => {
       if (tracker && qNo === tracker.qNo) {
+        const isExistCalledQ = oriQCallList.find((q) => q.qNo === tracker.qNo)
+        if (!isExistCalledQ) {
+          dispatch({
+            type: 'queueCalling/updateState',
+            payload: {
+              oriQCallList: [
+                tracker,
+                ...oriQCallList,
+              ],
+            },
+          })
+        }
         setDisable(() => !disable)
         setTimeout(() => {
           setDisable(() => false)
@@ -121,7 +133,7 @@ const CallingQueueButton = ({
   const callingQueue = { qNo, roomNo: getRoomAssigned() }
 
   const newQList = [
-    ...qCallList,
+    ...oriQCallList,
   ]
 
   const isCalled = newQList.find((q) => q.qNo === qNo)
@@ -154,7 +166,7 @@ const CallingQueueButton = ({
           type: 'queueCalling/updateState',
           payload: {
             lastUpdateDate: lastUpdateTime,
-            qCallList: valueArray,
+            oriQCallList: valueArray,
             concurrencyToken,
           },
         })
@@ -211,7 +223,7 @@ const CallingQueueButton = ({
       return
     }
 
-    updateData(qCallList)
+    updateData(oriQCallList)
   }
 
   const currentStyle = isCalled
