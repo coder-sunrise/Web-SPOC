@@ -69,6 +69,28 @@ export const widgets = (props) => [
     }),
   },
   {
+    id: '13',
+    name: 'Visual Acuity',
+    authority: 'queue.consultation.widgets.eyevisualacuity',
+    component: Loadable({
+      loader: () => import('../EyeVisualAcuity/VisualAcuityWithoutAuthority'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return (
+          <Cmpnet
+            {...props}
+            {...p}
+            prefix='eyeVisualAcuityTestForms'
+            attachmentsFieldName='eyeVisualAcuityTestAttachments'
+            fromPatientHistory
+            values={p.patientHistory.entity}
+          />
+        )
+      },
+      loading: Loading,
+    }),
+  },
+  {
     id: '3',
     name: 'Associated History',
     authority: 'queue.consultation.clinicalnotes.associatedhistory',
