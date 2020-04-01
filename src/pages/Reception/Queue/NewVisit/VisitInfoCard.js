@@ -52,6 +52,7 @@ const VisitInfoCard = ({
   existingQNo,
   visitType,
   visitOrderTemplateOptions,
+  setFieldValue,
   ...restProps
 }) => {
   const validateQNo = (value) => {
@@ -91,6 +92,11 @@ const VisitInfoCard = ({
     return ''
   }
 
+  const handleDoctorChange = (v, op) => {
+    const { roomAssignment = {} } = op.clinicianProfile
+    setFieldValue(FormField['visit.roomFK'], roomAssignment.roomFK)
+  }
+
   return (
     <CommonCard title='Visit Information'>
       <GridContainer alignItems='center'>
@@ -116,6 +122,7 @@ const VisitInfoCard = ({
             render={(args) => (
               <DoctorProfileSelect
                 // disabled={isReadOnly}
+                onChange={(v, op = {}) => handleDoctorChange(v, op)}
                 label={
                   visitType === VISIT_TYPE.RETAIL ? (
                     formatMessage({
