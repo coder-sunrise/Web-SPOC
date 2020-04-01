@@ -57,6 +57,7 @@ export const formikMapPropsToValues = ({
     let doctorProfile
     let doctorProfileFK
     let visitPurposeFK
+    let roomAssignmentFK
     if (clinicInfo) {
       // doctorProfile = doctorProfiles.find(
       //   (item) => item.doctorMCRNo === clinicInfo.primaryMCRNO,
@@ -88,7 +89,6 @@ export const formikMapPropsToValues = ({
       }),
       {},
     )
-    let roomAssignmentFK
 
     const { location } = history
     if (location.query.pdid) {
