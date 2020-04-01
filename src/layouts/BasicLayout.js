@@ -331,6 +331,12 @@ class BasicLayout extends React.PureComponent {
           code: 'clinicianprofile',
         },
       }),
+      // dispatch({
+      //   type: 'codetable/fetchCodes',
+      //   payload: {
+      //     code: 'roomassignment',
+      //   },
+      // }),
     ])
 
     const user = await dispatch({

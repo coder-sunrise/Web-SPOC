@@ -17,10 +17,6 @@ export const PATIENT_LAB ={
   LAB_TRACKING:3,
 }
 
-
-
-
-
 export const CANCELLATION_REASON_TYPE = {
   NOSHOW: 1,
   OTHERS: 2,

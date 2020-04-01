@@ -3,6 +3,7 @@ import _ from 'lodash'
 import { dateFormatLong, dateFormatLongWithTime } from './format'
 import { UNFIT_TYPE } from './constants'
 import { calculateAgeFromDOB } from './dateUtils'
+import Authorized from '@/utils/Authorized'
 
 const status = [
   {
@@ -991,6 +992,11 @@ export const visitOrderTemplateItemTypes = [
   },
 ]
 
+export const labelPrinterList = [
+  { value: '8.9cmx3.6cm', name: '8.9cmx3.6cm' },
+  { value: '8.0cmx4.5cm', name: '8.0cmx4.5cm' },
+]
+
 const corAttchementTypes = [
   {
     id: 1,
@@ -1014,6 +1020,18 @@ const corAttchementTypes = [
     accessRight: 'queue.consultation.widgets.eyevisualacuity',
   },
 ]
+
+const initRoomAssignment = async () => {
+  const accessRight = Authorized.check('settings.clinicsetting.roomassignment')
+  if (accessRight && accessRight.rights === 'enable') {
+    await window.g_app._store.dispatch({
+      type: 'settingRoomAssignment/query',
+      payload: {
+        pagesize: 9999,
+      },
+    })
+  }
+}
 
 module.exports = {
   appointmentStatus,
@@ -1044,5 +1062,6 @@ module.exports = {
   gstEnabled,
   groupByFKFunc,
   corAttchementTypes,
+  initRoomAssignment,
   ...module.exports,
 }

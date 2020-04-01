@@ -18,6 +18,18 @@ const _routes = [
       },
     ],
   },
+  // Queue Display Dashboard
+  {
+    path: '/queuedisplay',
+    component: '../layouts/BlankLayout',
+    routes: [
+      {
+        path: '/queuedisplay/dashboard',
+        component: './QueueDisplayDashboard',
+        hideInMenu: true,
+      },
+    ],
+  },
   // login
   //
   // Main routes
@@ -818,6 +830,11 @@ const _routes = [
             ],
           },
           {
+            path: '/setting/queuedisplaysetup',
+            name: 'queuedisplaysetup',
+            component: './Setting/QueueDisplaySetup',
+          },
+          {
             path: '/setting/service',
             name: 'service',
             component: './Setting/Service',
@@ -848,6 +865,11 @@ const _routes = [
             authority: [
               'settings.clinicsetting.room',
             ],
+          },
+          {
+            path: '/setting/roomassignment',
+            name: 'roomassignment',
+            component: './Setting/RoomAssignment',
           },
           {
             path: '/setting/clinicbreakhour',

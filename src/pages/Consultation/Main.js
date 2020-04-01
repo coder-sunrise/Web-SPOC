@@ -68,8 +68,9 @@ import Layout from './Layout'
 
 import schema from './schema'
 import styles from './style'
-
+import { CallingQueueButton } from '@/components/_medisys'
 // window.g_app.replaceModel(model)
+import { initRoomAssignment } from '@/utils/codes'
 
 const discardMessage = 'Discard consultation?'
 const formName = 'ConsultationPage'
@@ -244,6 +245,7 @@ class Main extends React.Component {
 
   componentDidMount () {
     // console.log('Main')
+    initRoomAssignment()
     setTimeout(() => {
       this.props.setFieldValue('fakeField', 'setdirty')
     }, 500)
@@ -463,13 +465,14 @@ class Main extends React.Component {
     } = this.props
     const { entity: vistEntity = {} } = visitRegistration
     // if (!vistEntity) return null
-    const { visit = {} } = vistEntity
+    const { visit = {}, queueNo } = vistEntity
     const { summary } = orders
     // const { adjustments, total, gst, totalWithGst } = summary
     // console.log('values', values, this.props)
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)
+
     return (
       <SizeContainer size='sm'>
         <div
@@ -592,7 +595,16 @@ class Main extends React.Component {
                 )}
               </h4>
             </GridItem>
-            <GridItem>
+            <GridItem style={{ display: 'flex' }}>
+              <Authorized authority='openqueuedisplay'>
+                <div style={{ marginRight: 10 }}>
+                  <CallingQueueButton
+                    qId={queueNo}
+                    roomNo={visit.roomFK}
+                    doctor={visit.doctorProfileFK}
+                  />
+                </div>
+              </Authorized>
               {values.status !== 'PAUSED' && (
                 <ProgressButton
                   color='danger'

@@ -1,12 +1,17 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import moment from 'moment'
 // components
-import { DoctorLabel, VisitStatusTag } from '@/components/_medisys'
+import {
+  DoctorLabel,
+  VisitStatusTag,
+  CallingQueueButton,
+} from '@/components/_medisys'
 import { dateFormat, CodeSelect, DateFormatter, Tooltip } from '@/components'
 // utils
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 // variables
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
+import Authorized from '@/utils/Authorized'
 
 const compareString = (a, b) => a.localeCompare(b)
 const compareDoctor = (a, b) => {
@@ -155,7 +160,35 @@ export const QueueColumnExtensions = [
   //   width: 180,
   //   render: (row) => <VisitStatusTag row={row} />,
   // },
-  { columnName: 'queueNo', width: 80, compare: compareQueueNo },
+  {
+    columnName: 'queueNo',
+    width: 80,
+    compare: compareQueueNo,
+    render: (row) => {
+      return (
+        <Fragment>
+          <span
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            {row.queueNo}
+            {row.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
+              <Authorized authority='openqueuedisplay'>
+                <CallingQueueButton
+                  qId={row.queueNo}
+                  roomNo={row.roomNo}
+                  doctor={row.doctor}
+                />
+              </Authorized>
+            )}
+          </span>
+        </Fragment>
+      )
+    },
+  },
   { columnName: 'patientAccountNo', compare: compareString },
 
   { columnName: 'invoiceNo' },

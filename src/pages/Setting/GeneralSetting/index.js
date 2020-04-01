@@ -9,6 +9,7 @@ import {
   currenciesList,
   currencyRoundingList,
   currencyRoundingToTheClosestList,
+  labelPrinterList,
 } from '@/utils/codes'
 
 import {
@@ -44,6 +45,7 @@ const styles = (theme) => ({
         showConsultationVersioning,
         autoRefresh,
         defaultVisitType,
+        autoPrintDrugLabel,
       } = clinicSettings.entity
 
       return {
@@ -56,6 +58,11 @@ const styles = (theme) => ({
           ...autoRefresh,
           settingValue: autoRefresh.settingValue === 'true',
         },
+        autoPrintDrugLabel: {
+          ...autoPrintDrugLabel,
+          settingValue:
+            autoPrintDrugLabel && autoPrintDrugLabel.settingValue === 'true',
+        },
         showConsultationVersioning: {
           ...showConsultationVersioning,
           settingValue: showConsultationVersioning.settingValue === 'true',
@@ -66,36 +73,8 @@ const styles = (theme) => ({
   },
 
   handleSubmit: (values, { props }) => {
-    const {
-      systemCurrency,
-      currencyRounding,
-      currencyRoundingToTheClosest,
-      showConsultationVersioning,
-      autoRefresh,
-      defaultVisitType,
-    } = values
-
-    const payload = [
-      {
-        ...systemCurrency,
-      },
-      {
-        ...currencyRounding,
-      },
-      {
-        ...currencyRoundingToTheClosest,
-      },
-      {
-        ...showConsultationVersioning,
-      },
-      {
-        ...autoRefresh,
-      },
-      {
-        ...defaultVisitType,
-      },
-    ]
     const { dispatch, history } = props
+    const payload = Object.keys(values).map((o) => values[o])
 
     dispatch({
       type: 'clinicSettings/upsert',
@@ -236,12 +215,42 @@ class GeneralSetting extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
+                name='autoPrintDrugLabel.settingValue'
+                render={(args) => (
+                  <Switch
+                    label='Auto Print Drug Label'
+                    {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
                 name='defaultVisitType.settingValue'
                 render={(args) => (
                   <CodeSelect
                     label='Default Visit Type'
                     {...args}
                     code='ctvisitpurpose'
+                    disabled={!!hasActiveSession}
+                    allowClear={false}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='labelPrinterSize.settingValue'
+                render={(args) => (
+                  <Select
+                    label='Label Printer Size'
+                    options={labelPrinterList}
+                    {...args}
                     disabled={!!hasActiveSession}
                     allowClear={false}
                   />

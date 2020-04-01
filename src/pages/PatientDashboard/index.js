@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Fragment } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
 import PerfectScrollbar from 'perfect-scrollbar'
@@ -42,6 +42,9 @@ import Banner from './Banner'
 import PatientHistory from '@/pages/Widgets/PatientHistory'
 import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE } from '@/utils/constants'
+import { CallingQueueButton } from '@/components/_medisys'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
+import { initRoomAssignment } from '@/utils/codes'
 
 const styles = (theme) => ({
   ...inputStyle(theme),
@@ -95,6 +98,7 @@ class PatientDashboard extends PureComponent {
         },
       })
     }
+    initRoomAssignment()
   }
 
   componentWillUnmount () {}
@@ -169,30 +173,50 @@ class PatientDashboard extends PureComponent {
       ...resetProps
     } = this.props
     const { patientDashboard, global, history, visitRegistration } = resetProps
-    const { entity } = visitRegistration
+    const { entity, queueNo } = visitRegistration
     if (!entity) return null
     const { visit = {} } = entity
-    const { visitPurposeFK = VISIT_TYPE.CONS } = visit
+    const { visitPurposeFK = VISIT_TYPE.CONS, roomFK, doctorProfileFK } = visit
 
     return (
       <div className={classes.root}>
         <Banner
           extraCmt={
-            visit.visitStatus === 'WAITING' && (
-              <Authorized authority='patientdashboard.startresumeconsultation'>
-                <div style={{ padding: '30px 0' }}>
-                  <ProgressButton
-                    color='primary'
-                    onClick={this.startConsultation}
-                    disabled={
-                      visitPurposeFK === VISIT_TYPE.RETAIL ||
-                      visitPurposeFK === VISIT_TYPE.BILL_FIRST
-                    }
-                  >
-                    Start Consultation
-                  </ProgressButton>
-                </div>
-              </Authorized>
+            visit.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-evenly',
+                  height: '100%',
+                }}
+              >
+                {visit.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
+                  <Authorized authority='openqueuedisplay'>
+                    <CallingQueueButton
+                      qId={queueNo}
+                      roomNo={roomFK}
+                      doctor={doctorProfileFK}
+                    />
+                  </Authorized>
+                )}
+                {visit.visitStatus === VISIT_STATUS.WAITING && (
+                  <Authorized authority='patientdashboard.startresumeconsultation'>
+                    <div style={{ padding: '30px 0' }}>
+                      <ProgressButton
+                        color='primary'
+                        onClick={this.startConsultation}
+                        disabled={
+                          visitPurposeFK === VISIT_TYPE.RETAIL ||
+                          visitPurposeFK === VISIT_TYPE.BILL_FIRST
+                        }
+                      >
+                        Start Consultation
+                      </ProgressButton>
+                    </div>
+                  </Authorized>
+                )}
+              </div>
             )
           }
           {...this.props}
