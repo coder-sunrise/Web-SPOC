@@ -31,6 +31,7 @@ import {
   withSettingBase,
   CodeSelect,
   Popper,
+  notification,
 } from '@/components'
 // sub component
 import Authorized from '@/utils/Authorized'
@@ -64,16 +65,18 @@ class UserRole extends React.Component {
           align: 'center',
           render: (row) => {
             return (
-              <Tooltip title='Edit Role & Access Right' placement='bottom'>
-                <Button
-                  justIcon
-                  color='primary'
-                  onClick={() => this.editRow(row)}
-                  id={row.id}
-                >
-                  <Edit />
-                </Button>
-              </Tooltip>
+              <Authorized authority='settings.role.editrole'>
+                <Tooltip title='Edit Role & Access Right' placement='bottom'>
+                  <Button
+                    justIcon
+                    color='primary'
+                    onClick={() => this.editRow(row)}
+                    id={row.id}
+                  >
+                    <Edit />
+                  </Button>
+                </Tooltip>
+              </Authorized>
             )
           },
         },
@@ -100,6 +103,13 @@ class UserRole extends React.Component {
   }
 
   editRow = (row) => {
+    const accessRight = Authorized.check('settings.role.editrole')
+    if (accessRight.rights && accessRight.rights !== 'enable') {
+      notification.error({
+        message: 'Current user is not authorized to access',
+      })
+      return
+    }
     this.props.history.push(`/setting/userrole/${row.id}`)
   }
 
