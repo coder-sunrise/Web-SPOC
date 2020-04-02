@@ -9,10 +9,13 @@ import { CLINIC_TYPE } from '@/utils/constants'
 
 const clinicInfo = JSON.parse(localStorage.getItem('clinicInfo') || {})
 const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
+console.log({ clinicTypeFK })
+console.log({ CLINIC_TYPE })
 const widgets = [
   {
     id: '1',
-    name: clinicTypeFK === CLINIC_TYPE.GP ? 'Clinical Notes' : 'Dental Notes',
+    name:
+      clinicTypeFK !== CLINIC_TYPE.DENTAL ? 'Clinical Notes' : 'Dental Notes',
     accessRight: 'queue.consultation.widgets.clinicalnotes',
     component: Loadable({
       loader: () => import('@/pages/Widgets/ClinicalNotes'),
