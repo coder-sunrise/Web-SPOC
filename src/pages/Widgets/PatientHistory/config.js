@@ -19,7 +19,6 @@ export const widgets = (props) => [
   {
     id: '1',
     name: 'Clinical Notes',
-    authority: 'queue.consultation.clinicalnotes.clinicalnotes',
     component: Loadable({
       loader: () => import('./Notes'),
       render: (loaded, p) => {
@@ -32,7 +31,6 @@ export const widgets = (props) => [
   {
     id: '2',
     name: 'Chief Complaints',
-    authority: 'queue.consultation.clinicalnotes.chiefcomplaints',
     component: Loadable({
       loader: () => import('./Notes'),
       render: (loaded, p) => {
@@ -45,7 +43,6 @@ export const widgets = (props) => [
   {
     id: '11',
     name: 'Plan',
-    authority: 'queue.consultation.clinicalnotes.plan',
     component: Loadable({
       loader: () => import('./Notes'),
       render: (loaded, p) => {
@@ -58,7 +55,6 @@ export const widgets = (props) => [
   {
     id: '12',
     name: 'Diagnosis',
-    authority: 'queue.consultation.widgets.diagnosis',
     component: Loadable({
       loader: () => import('./Diagnosis'),
       render: (loaded, p) => {
@@ -71,7 +67,6 @@ export const widgets = (props) => [
   {
     id: '13',
     name: 'Visual Acuity',
-    authority: 'queue.consultation.widgets.eyevisualacuity',
     component: Loadable({
       loader: () => import('../EyeVisualAcuity/VisualAcuityWithoutAuthority'),
       render: (loaded, p) => {
@@ -93,7 +88,6 @@ export const widgets = (props) => [
   {
     id: '3',
     name: 'Associated History',
-    authority: 'queue.consultation.clinicalnotes.associatedhistory',
     component: Loadable({
       loader: () => import('./Notes'),
       render: (loaded, p) => {
@@ -106,7 +100,6 @@ export const widgets = (props) => [
   {
     id: '4',
     name: 'Intra Oral',
-    authority: 'queue.consultation.clinicalnotes.intraoral',
     component: Loadable({
       loader: () => import('./Notes'),
       render: (loaded, p) => {
@@ -119,7 +112,6 @@ export const widgets = (props) => [
   {
     id: '5',
     name: 'Extra Oral',
-    authority: 'queue.consultation.clinicalnotes.extraoral',
     component: Loadable({
       loader: () => import('./Notes'),
       render: (loaded, p) => {
@@ -132,7 +124,6 @@ export const widgets = (props) => [
   {
     id: '6',
     name: 'Attachment',
-    authority: 'queue.consultation.widgets.attachment',
     component: Loadable({
       loader: () => import('./Attachment'),
       render: (loaded, p) => {
@@ -145,7 +136,6 @@ export const widgets = (props) => [
   {
     id: '7',
     name: 'Orders',
-    authority: 'queue.consultation.widgets.order',
     component: Loadable({
       loader: () => import('./Orders'),
       render: (loaded, p) => {
@@ -158,7 +148,6 @@ export const widgets = (props) => [
   {
     id: '9',
     name: 'Dental Chart',
-    authority: 'queue.consultation.widgets.dentalchart',
     component: Loadable({
       loader: () => import('./DentalChart/index'),
       render: (loaded, p) => {
@@ -171,7 +160,6 @@ export const widgets = (props) => [
   {
     id: '10',
     name: 'Treatment',
-    authority: 'queue.consultation.widgets.dentalchart',
     component: Loadable({
       loader: () => import('./Treatment/index'),
       render: (loaded, p) => {
@@ -184,7 +172,6 @@ export const widgets = (props) => [
   {
     id: '8',
     name: 'Invoice',
-    authority: 'queue.consultation.widgets.order',
     component: Loadable({
       loader: () => import('./Invoice'),
       render: (loaded, p) => {

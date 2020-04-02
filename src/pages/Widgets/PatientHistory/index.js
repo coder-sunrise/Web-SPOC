@@ -139,8 +139,29 @@ class PatientHistory extends Component {
     this.myRef = React.createRef()
 
     this.widgets = WidgetConfig.widgets(props).filter((o) => {
-      const accessRight = Authorized.check(o.authority)
-      return accessRight && accessRight.rights !== 'hidden'
+      const { clinicTypeFK = CLINIC_TYPE.GP } = this.clinicInfo
+      const dentalWidgets = [
+        '4',
+        '5',
+        '9',
+        '10',
+      ]
+      const eyeWidgets = [
+        '13',
+      ]
+      switch (clinicTypeFK) {
+        case CLINIC_TYPE.DENTAL:
+          if (dentalWidgets.includes(o.id)) return true
+          return false
+        case CLINIC_TYPE.EYE:
+          if (eyeWidgets.includes(o.id)) return true
+          return false
+        default:
+          return true
+      }
+      // if (o.authority === 'byPass') return true
+      // const accessRight = Authorized.check(o.authority)
+      // return accessRight && accessRight.rights !== 'hidden'
     })
     this.state = {
       selectedItems: localStorage.getItem('patientHistoryWidgets')
