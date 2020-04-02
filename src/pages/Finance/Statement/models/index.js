@@ -18,6 +18,7 @@ export default createListViewModel({
         statementInvoice: [],
         statementDate: moment(),
         adminChargeValue: 0.0,
+        adjustmentValueType: 'Percentage',
       },
       invoiceList: [],
     },
