@@ -677,7 +677,7 @@ class EditableTableGrid extends PureComponent {
                   [
                     'readonly',
                     'disable',
-                  ].includes(matches?matches.rights:'') ? (
+                  ].includes(matches ? matches.rights : '') ? (
                     0
                   ) : (
                     'auto'
