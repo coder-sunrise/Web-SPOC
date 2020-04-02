@@ -117,6 +117,9 @@ export default ({ classes, current, fieldName = '' }) => {
             render={(args) => (
               <NumberInput
                 {...args}
+                max={9999}
+                min={0}
+                maxLength={4}
                 label='No. of Units'
               />
             )}

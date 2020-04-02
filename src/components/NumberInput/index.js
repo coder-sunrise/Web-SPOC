@@ -147,7 +147,7 @@ class NumberInput extends React.PureComponent {
     }
 
     if(number) {
-      formatVal.value = value || field.value
+      formatVal.value = Number.isInteger(field.value) ? field.value:0
     }
 
     if ((currency || qty || percent) && `${value}`) {
