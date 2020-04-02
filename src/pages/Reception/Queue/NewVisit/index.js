@@ -340,7 +340,7 @@ class NewVisit extends PureComponent {
                             setFieldValue={setFieldValue}
                           />
                         </GridItem>
-                        <Authorized authority='queue.consultation.widgets.eyevisualacuity'>
+                        <Authorized authority='queue.visitregistrationdetails.eyevisualacuity'>
                           <GridItem xs={12} className={classes.row}>
                             <EyeVisualAcuityCard
                               // isReadOnly={isRetail || isReadOnly}
