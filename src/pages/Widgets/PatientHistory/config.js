@@ -73,7 +73,7 @@ export const widgets = (props) => [
     name: 'Visual Acuity',
     authority: 'queue.consultation.widgets.eyevisualacuity',
     component: Loadable({
-      loader: () => import('../EyeVisualAcuity/VisualAcuityWithoutAuthority'),
+      loader: () => import('../EyeVisualAcuity'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return (
