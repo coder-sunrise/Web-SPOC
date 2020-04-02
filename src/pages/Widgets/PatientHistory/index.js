@@ -139,7 +139,6 @@ class PatientHistory extends Component {
     this.myRef = React.createRef()
 
     this.widgets = WidgetConfig.widgets(props).filter((o) => {
-      if (o.authority === 'byPass') return true
       const accessRight = Authorized.check(o.authority)
       return accessRight && accessRight.rights !== 'hidden'
     })
