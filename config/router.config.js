@@ -132,7 +132,7 @@ const _routes = [
             mini: 'LT',
             exact: true,
             authority: [
-              'reception/queue',
+              'reception/labtracking',
             ],
           },
           // {

@@ -4,62 +4,66 @@ import Edit from '@material-ui/icons/Edit'
 import CommonTableGrid from '@/components/CommonTableGrid'
 import { Button, Tooltip } from '@/components'
 
-const tableColumns = [
-  {name:'visitDate',title:'Visit Date'},
-  {name:'patientAccountNo',title:'Acc. No'},
-  {name:'patientName',title:'Patient name'},
-  {name:'doctorName',title:'Doctor'},
-  {name:'serviceName',title:'Service Name'},
-  {name:'supplierFK',title:'Supplier'},
-  {name:'orderedDate',title:'Ordered Date'},
-  {name:'estimateReceiveDate',title:'Est. Receive Date'},
-  {name:'receivedDate',title:'Received Date'},
-  {name:'labTrackingStatusDisplayValue',title:'Status'},
-  {name:'remarks',title:'Remarks'},
-  { name: 'action', title: 'Action'},
-]
-
-const tableColumnExtensions = [
-  {columnName:'visitDate',type:'date'},
-  {columnName:'estimateReceiveDate',type:'date'},
-  {columnName:'orderedDate',type:'date'},
-  {columnName:'receivedDate',type:'date'},
-  {
-    columnName: 'action',
-    sortingEnabled: false,
-    align: 'center',
-    width: 100,
-    render: (row) => {
-      return (
-        <Tooltip title='Edit Patient Lab Result' placement='bottom'>
-          <Button
-            size='sm'
-            onClick={() => {
-              this.editRow(row)
-            }}
-            justIcon
-            color='primary'
-            style={{ marginRight: 0 }}
-          >
-            <Edit />
-          </Button>
-        </Tooltip>
-      )
-    },
-  },
-]
 
 class OverallGrid extends PureComponent {
+
+  configs = {
+    columns : [
+      {name:'visitDate',title:'Visit Date'},
+      {name:'patientAccountNo',title:'Acc. No'},
+      {name:'patientName',title:'Patient name'},
+      {name:'doctorName',title:'Doctor'},
+      {name:'serviceName',title:'Service Name'},
+      {name:'supplierFK',title:'Supplier'},
+      {name:'orderedDate',title:'Ordered Date'},
+      {name:'estimateReceiveDate',title:'Est. Receive Date'},
+      {name:'receivedDate',title:'Received Date'},
+      {name:'labTrackingStatusDisplayValue',title:'Status'},
+      {name:'remarks',title:'Remarks'},
+      { name: 'action', title: 'Action'},
+    ],
+    columnExtensions : [
+      {columnName:'visitDate',type:'date'},
+      {columnName:'estimateReceiveDate',type:'date'},
+      {columnName:'orderedDate',type:'date'},
+      {columnName:'receivedDate',type:'date'},
+      {
+        columnName: 'action',
+        sortingEnabled: false,
+        align: 'center',
+        width: 100,
+        render: (row) => {
+          return (
+            <Tooltip title='Edit Patient Lab Result' placement='bottom'>
+              <Button
+                size='sm'
+                onClick={() => {
+                  this.editRow(row)
+                }}
+                justIcon
+                color='primary'
+                style={{ marginRight: 0 }}
+              >
+                <Edit />
+              </Button>
+            </Tooltip>
+          )
+        },
+      },
+    ],
+  }
+
+
 
   editRow = (row, e) =>{
     const {dispatch, labTrackingDetails}= this.props
     const {list} = labTrackingDetails
 
     dispatch({
-      type:'labTrackingDetails/updatestate',
+      type:'labTrackingDetails/updateState',
       payload:{
         showModal:true,
-        entity: list.find((o)=> o.id===row.id),
+        entity: list.find((o)=> o.id === row.id),
       },
     })
 
@@ -71,8 +75,7 @@ class OverallGrid extends PureComponent {
       <CommonTableGrid
         type='labTrackingDetails'
         onRowDoubleClick={this.editRow}
-        columns={tableColumns}
-        columnExtensions={tableColumnExtensions}
+        {...this.configs}
       />
     )
 
