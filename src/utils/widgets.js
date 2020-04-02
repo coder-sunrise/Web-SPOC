@@ -9,8 +9,6 @@ import { CLINIC_TYPE } from '@/utils/constants'
 
 const clinicInfo = JSON.parse(localStorage.getItem('clinicInfo') || {})
 const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
-console.log({ clinicTypeFK })
-console.log({ CLINIC_TYPE })
 const widgets = [
   {
     id: '1',
