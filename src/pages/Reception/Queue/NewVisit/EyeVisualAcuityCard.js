@@ -9,7 +9,7 @@ class EyeVisualAcuityCard extends PureComponent {
     const { attachments, handleUpdateAttachments } = this.props
 
     return (
-      <CommonCard title='Eye Visual Acuity Test'>
+      <CommonCard title='Visual Acuity Test'>
         <EyeVisualAcuity
           prefix='visitEyeVisualAcuityTest.visitEyeVisualAcuityTestForm'
           attachments={attachments}
