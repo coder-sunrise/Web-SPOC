@@ -139,7 +139,7 @@ class PatientHistory extends Component {
     this.myRef = React.createRef()
 
     this.widgets = WidgetConfig.widgets(props).filter((o) => {
-      const { clinicTypeFK = CLINIC_TYPE.GP } = this.clinicInfo
+      const { clinicTypeFK = CLINIC_TYPE.GP } = this.props.clinicInfo
       const dentalWidgets = [
         '4',
         '5',
