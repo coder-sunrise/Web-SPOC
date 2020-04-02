@@ -309,7 +309,10 @@ class InventoryItemList extends React.Component {
     }
   }
 
-  addContent = (type) => {
+  addContent = (type, accessRight) => {
+    const authority = Authorized.check(accessRight)
+    const isDisabled =
+      this.props.includeOrderSet && authority && authority.rights === 'disable'
     return (
       <GridContainer>
         <GridItem xs={8}>
@@ -338,6 +341,7 @@ class InventoryItemList extends React.Component {
                       </span>
                     )
                   }}
+                  disabled={isDisabled}
                   {...args}
                 />
               )
@@ -348,6 +352,7 @@ class InventoryItemList extends React.Component {
           <Button
             color='primary'
             // disabled={this.props.values.tempSelectedItemFK === undefined}
+            disabled={isDisabled}
             onClick={() => this.onClickAdd(type)}
           >
             Add
@@ -392,30 +397,41 @@ class InventoryItemList extends React.Component {
   }
 
   getOptions = () => {
+    const medicationAccessRight =
+      'settings.templates.visitordertemplate.medication'
+    const consumableAccessRight =
+      'settings.templates.visitordertemplate.consumable'
+    const vaccinationAccessRight =
+      'settings.templates.visitordertemplate.vaccination'
+    const serviceAccessRight = 'settings.templates.visitordertemplate.service'
+    const ordersetAccessRight = 'settings.templates.visitordertemplate.orderset'
     const commonOptions = [
       {
         id: ITEM_TYPE.MEDICATION,
         name: 'Medication',
-        content: this.addContent('inventorymedication'),
-        accessRight: 'settings.templates.visitordertemplate.medication',
+        content: this.addContent('inventorymedication', medicationAccessRight),
+        accessRight: medicationAccessRight,
       },
       {
         id: ITEM_TYPE.CONSUMABLE,
         name: 'Consumable',
-        content: this.addContent('inventoryconsumable'),
-        accessRight: 'settings.templates.visitordertemplate.consumable',
+        content: this.addContent('inventoryconsumable', consumableAccessRight),
+        accessRight: consumableAccessRight,
       },
       {
         id: ITEM_TYPE.VACCINATION,
         name: 'Vaccination',
-        content: this.addContent('inventoryvaccination'),
-        accessRight: 'settings.templates.visitordertemplate.vaccination',
+        content: this.addContent(
+          'inventoryvaccination',
+          vaccinationAccessRight,
+        ),
+        accessRight: vaccinationAccessRight,
       },
       {
         id: ITEM_TYPE.SERVICE,
         name: 'Service',
-        content: this.addContent('ctservice'),
-        accessRight: 'settings.templates.visitordertemplate.service',
+        content: this.addContent('ctservice', serviceAccessRight),
+        accessRight: serviceAccessRight,
       },
     ]
 
@@ -425,8 +441,8 @@ class InventoryItemList extends React.Component {
         {
           id: ITEM_TYPE.ORDERSET,
           name: 'Order Set',
-          content: this.addContent('inventoryorderset'),
-          accessRight: 'settings.templates.visitordertemplate.orderset',
+          content: this.addContent('inventoryorderset', ordersetAccessRight),
+          accessRight: ordersetAccessRight,
         },
       ])
     }
