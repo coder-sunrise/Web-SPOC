@@ -119,7 +119,8 @@ const FilterBar = (props) => {
             )}
           />
         </GridItem>
-        <GridItem md={1}>
+
+        <GridItem md={5}>
           <ProgressButton
             icon={<Search />}
             color='primary'
@@ -127,9 +128,6 @@ const FilterBar = (props) => {
           >
             Filter
           </ProgressButton>
-        </GridItem>
-
-        <GridItem md={3}>
           <ProgressButton
             icon={<Search />}
             color='primary'
