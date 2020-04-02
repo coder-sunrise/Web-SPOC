@@ -82,29 +82,29 @@ export const widgets = (props) => [
       loading: Loading,
     }),
   },
-  {
-    id: '13',
-    name: 'Visual Acuity',
-    authority: 'queue.consultation.widgets.eyevisualacuity',
-    component: Loadable({
-      loader: () => import('../EyeVisualAcuity'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return (
-          <Cmpnet
-            {...props}
-            {...p}
-            prefix='eyeVisualAcuityTestForms'
-            attachmentsFieldName='eyeVisualAcuityTestAttachments'
-            fromPatientHistory
-            values={p.patientHistory.entity}
-          />
-        )
-      },
-      loading: Loading,
-    }),
-  },
-
+  // TODO: hide the eye visual acuity first
+  // {
+  //   id: '13',
+  //   name: 'Visual Acuity',
+  //   authority: 'queue.consultation.widgets.eyevisualacuity',
+  //   component: Loadable({
+  //     loader: () => import('../EyeVisualAcuity'),
+  //     render: (loaded, p) => {
+  //       let Cmpnet = loaded.default
+  //       return (
+  //         <Cmpnet
+  //           {...props}
+  //           {...p}
+  //           prefix='eyeVisualAcuityTestForms'
+  //           attachmentsFieldName='eyeVisualAcuityTestAttachments'
+  //           fromPatientHistory
+  //           values={p.patientHistory.entity}
+  //         />
+  //       )
+  //     },
+  //     loading: Loading,
+  //   }),
+  // },
   {
     id: '4',
     name: 'Intra Oral',
