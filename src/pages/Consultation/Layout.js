@@ -331,8 +331,11 @@ class Layout extends PureComponent {
           const w = widgets.find((m) => m.id === o.id)
           if (!w) return false
           const widgetAccessRight = Authorized.check(w.accessRight)
-          // console.log(widgetAccessRight, w)
-          return !!widgetAccessRight
+          if (widgetAccessRight.rights && widgetAccessRight.rights === 'enable')
+            return true
+
+          return false
+          // console.log(widgetAccessRight, w, !!widgetAccessRight)
         })
         .map((o) => o.id),
     }
