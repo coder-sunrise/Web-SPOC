@@ -33,6 +33,7 @@ import {
   Popper,
 } from '@/components'
 // sub component
+import Authorized from '@/utils/Authorized'
 import UserRoleForm from './UserRoleForm'
 import { dummyData, UserRoleTableConfig } from './const'
 
@@ -203,32 +204,33 @@ class UserRole extends React.Component {
             >
               <FormattedMessage id='form.search' />
             </ProgressButton>
-
-            <Popper
-              open={openPopper}
-              transition
-              className={classNames({
-                [classes.pooperResponsive]: true,
-                [classes.pooperNav]: true,
-              })}
-              overlay={
-                <ClickAwayListener onClickAway={this.closePopper}>
-                  <MenuList role='menu'>
-                    <MenuItem onClick={() => this.handleClickPopper(1)}>
-                      Add New
-                    </MenuItem>
-                    <MenuItem onClick={() => this.handleClickPopper(2)}>
-                      Add From Existing
-                    </MenuItem>
-                  </MenuList>
-                </ClickAwayListener>
-              }
-            >
-              <Button color='primary' onClick={this.handleAddNew}>
-                <Add />
-                Add New
-              </Button>
-            </Popper>
+            <Authorized authority='settings.role.addrole'>
+              <Popper
+                open={openPopper}
+                transition
+                className={classNames({
+                  [classes.pooperResponsive]: true,
+                  [classes.pooperNav]: true,
+                })}
+                overlay={
+                  <ClickAwayListener onClickAway={this.closePopper}>
+                    <MenuList role='menu'>
+                      <MenuItem onClick={() => this.handleClickPopper(1)}>
+                        Add New
+                      </MenuItem>
+                      <MenuItem onClick={() => this.handleClickPopper(2)}>
+                        Add From Existing
+                      </MenuItem>
+                    </MenuList>
+                  </ClickAwayListener>
+                }
+              >
+                <Button color='primary' onClick={this.handleAddNew}>
+                  <Add />
+                  Add New
+                </Button>
+              </Popper>
+            </Authorized>
           </GridItem>
           <GridItem md={12}>
             <CommonTableGrid
