@@ -331,7 +331,7 @@ class Layout extends PureComponent {
           const w = widgets.find((m) => m.id === o.id)
           if (!w) return false
           const widgetAccessRight = Authorized.check(w.accessRight)
-          if (widgetAccessRight.rights && widgetAccessRight.rights === 'enable')
+          if (widgetAccessRight && widgetAccessRight.rights === 'enable')
             return true
 
           return false

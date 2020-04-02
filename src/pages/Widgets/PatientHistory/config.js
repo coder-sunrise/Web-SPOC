@@ -17,18 +17,19 @@ export const WIDGETS_ID = {
 
 export const widgets = (props) => [
   {
-    id: '1',
-    name: 'Clinical Notes',
-    authority: 'queue.consultation.clinicalnotes.clinicalnotes',
+    id: '3',
+    name: 'History',
+    authority: 'queue.consultation.clinicalnotes.history',
     component: Loadable({
       loader: () => import('./Notes'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='clinicalNote' />
+        return <Cmpnet {...props} {...p} fieldName='history' />
       },
       loading: Loading,
     }),
   },
+
   {
     id: '2',
     name: 'Chief Complaints',
@@ -38,6 +39,19 @@ export const widgets = (props) => [
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return <Cmpnet {...props} {...p} fieldName='chiefComplaints' />
+      },
+      loading: Loading,
+    }),
+  },
+  {
+    id: '1',
+    name: 'Clinical Notes',
+    authority: 'queue.consultation.clinicalnotes.clinicalnotes',
+    component: Loadable({
+      loader: () => import('./Notes'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} fieldName='note' />
       },
       loading: Loading,
     }),
@@ -90,19 +104,7 @@ export const widgets = (props) => [
       loading: Loading,
     }),
   },
-  {
-    id: '3',
-    name: 'Associated History',
-    authority: 'queue.consultation.clinicalnotes.associatedhistory',
-    component: Loadable({
-      loader: () => import('./Notes'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='associatedHistory' />
-      },
-      loading: Loading,
-    }),
-  },
+
   {
     id: '4',
     name: 'Intra Oral',

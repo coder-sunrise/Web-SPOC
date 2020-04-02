@@ -452,7 +452,6 @@ class ClinicalNotes extends Component {
 
     const { config, contents, showCannedText } = this.state
     const { entity = {} } = consultation
-
     const { fields } = config
     const panels = contents.filter((item) => {
       const accessRight = Authorized.check(item.authority)
