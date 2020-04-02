@@ -19,6 +19,7 @@ import { getRawData } from '@/services/report'
 const labelTypes = [
   'PATIENT_LABEL',
   'PATIENT_LAB_LABEL',
+  'PATIENT_ADDRESS_LABEL',
 ]
 
 const useStyles = makeStyles(() => ({
@@ -117,8 +118,8 @@ const PatientLabelButton = ({
                         onClick={() => handleClick(o)}
                         disabled={!Number.isInteger(copyNo[o]) || sendingJob}
                       >
-                        {o.includes('_LAB_') ? (
-                          'LAB LABEL'
+                        {o !== 'PATIENT_LABEL' ? (
+                          o.replace('PATIENT_', '').replace('_', ' ')
                         ) : (
                           o.replace('_', ' ')
                         )}

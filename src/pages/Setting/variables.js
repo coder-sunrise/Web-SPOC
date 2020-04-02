@@ -189,7 +189,18 @@ export const menuData = [
     // icon: <FolderOpen />,
     url: '/setting/treatmentcategory',
   },
-
+  {
+      authority: 'menu.setting.casetype',
+      title: 'Clinic Setting',
+      text: 'CASE Type',
+      url: '/setting/casetype',
+  },
+  {
+      authority: 'menu.setting.casedescription',
+      title: 'Clinic Setting',
+      text: 'CASE DESCRIPTION',
+      url: '/setting/casedescription',
+  },
   {
     authority: 'settings.systemuser.systemuser',
     title: 'System User',

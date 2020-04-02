@@ -1133,6 +1133,22 @@ const _routes = [
             ],
           },
           {
+              path: '/setting/casetype',
+              name: 'casetype',
+              component: './Setting/CaseType',
+              authority: [
+                  'settings.clinicsetting.casetype',
+              ],
+          },
+          {
+              path: '/setting/casedescription',
+              name: 'casedescription',
+              component: './Setting/CaseDescription',
+              authority: [
+                  'settings.clinicsetting.casedescription',
+              ],
+          },
+          {
             path: '/setting/referralsource',
             name: 'referralsource',
             component: './Setting/ReferralSource',
