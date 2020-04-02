@@ -384,6 +384,7 @@ class AddNewStatement extends PureComponent {
                           currency
                           label='Statement Adjustment'
                           precision={2}
+                          min={0}
                           {...args}
                         />
                       )
@@ -392,6 +393,7 @@ class AddNewStatement extends PureComponent {
                       <NumberInput
                         percentage
                         label='Statement Adjustment'
+                        min={0}
                         max={100}
                         precision={2}
                         {...args}
