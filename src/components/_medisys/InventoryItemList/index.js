@@ -386,10 +386,13 @@ class InventoryItemList extends React.Component {
   }
 
   filterTabOnAccessRight = (tabs) => {
-    return tabs.filter((o) => {
-      if (!o.accessRight || o.accessRight === 'hidden') return false
-      return true
-    })
+    if (this.props.includeOrderSet) {
+      return tabs.filter((o) => {
+        if (!o.accessRight || o.accessRight === 'hidden') return false
+        return true
+      })
+    }
+    return tabs
   }
 
   getAccessRight = (accessRightName) => {
@@ -445,7 +448,7 @@ class InventoryItemList extends React.Component {
     ]
 
     if (this.props.includeOrderSet) {
-      return this.filterTabOnAccessRight([
+      return [
         ...commonOptions,
         {
           id: ITEM_TYPE.ORDERSET,
@@ -453,7 +456,7 @@ class InventoryItemList extends React.Component {
           content: this.addContent('inventoryorderset', ordersetAccessRight),
           accessRight: ordersetAccessRight,
         },
-      ])
+      ]
     }
 
     const removedAccessRightOptions = commonOptions.map((option) => {
@@ -529,6 +532,8 @@ class InventoryItemList extends React.Component {
         align: 'center',
         render: (row) => {
           const onConfirm = () => this.onDeleteClick(row)
+          const btnAccessRight = this.getCurrentTypeAccessRight(row.type)
+          if (btnAccessRight === 'hidden') return null
           return (
             <Popconfirm onConfirm={onConfirm}>
               <Tooltip title='Delete'>
@@ -536,7 +541,7 @@ class InventoryItemList extends React.Component {
                   size='sm'
                   color='danger'
                   justIcon
-                  disabled={this.getCurrentTypeAccessRight(row.type)}
+                  disabled={btnAccessRight}
                 >
                   <Delete />
                 </Button>
@@ -669,11 +674,12 @@ class InventoryItemList extends React.Component {
       (tab) => tab.id === rowType,
     )
 
+    if (currentTabAccessRight && currentTabAccessRight.accessRight === 'hidden')
+      return 'hidden'
+
     if (
       !currentTabAccessRight ||
-      (currentTabAccessRight &&
-        (currentTabAccessRight.accessRight === 'disable' ||
-          currentTabAccessRight.accessRight === 'hidden'))
+      (currentTabAccessRight && currentTabAccessRight.accessRight === 'disable')
     )
       return true
 
@@ -688,7 +694,7 @@ class InventoryItemList extends React.Component {
           <Tabs
             defaultActiveKey='1'
             onChange={this.onTabChange}
-            options={this.getOptions()}
+            options={this.filterTabOnAccessRight(this.getOptions())}
           />
           <CommonTableGrid
             rows={values.rows}
