@@ -536,9 +536,7 @@ class InventoryItemList extends React.Component {
                   size='sm'
                   color='danger'
                   justIcon
-                  disabled={
-                    row.id ? this.getCurrentTypeAccessRight(row.type) : false
-                  }
+                  disabled={this.getCurrentTypeAccessRight(row.type)}
                 >
                   <Delete />
                 </Button>
@@ -569,9 +567,7 @@ class InventoryItemList extends React.Component {
                     min={1}
                     precision={0}
                     positiveOnly
-                    disabled={
-                      row.id ? this.getCurrentTypeAccessRight(row.type) : false
-                    }
+                    disabled={this.getCurrentTypeAccessRight(row.type)}
                   />
                 )}
               />
@@ -594,9 +590,7 @@ class InventoryItemList extends React.Component {
                     currency
                     positiveOnly
                     min={0}
-                    disabled={
-                      row.id ? this.getCurrentTypeAccessRight(row.type) : false
-                    }
+                    disabled={this.getCurrentTypeAccessRight(row.type)}
                   />
                 )}
               />
