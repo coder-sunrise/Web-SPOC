@@ -1,4 +1,5 @@
 import React, { memo } from 'react'
+import moment from 'moment'
 import classnames from 'classnames'
 // formik
 import { withFormik, Field, FastField } from 'formik'
@@ -32,6 +33,7 @@ const styles = () => ({
 
 const FilterBar = (props) => {
   const {
+    dispatch,
     loading,
     classes,
     onDoctorEventClick,
@@ -84,6 +86,12 @@ const FilterBar = (props) => {
                 maxSelected={5}
                 maxTagPlaceholder='doctors'
                 renderDropdown={renderDropdown}
+                onChange={(v) => {
+                  sessionStorage.setItem(
+                    'appointmentDoctors',
+                    JSON.stringify(v),
+                  )
+                }}
               />
             )}
           />
