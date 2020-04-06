@@ -131,19 +131,19 @@ export const widgets = (props) => [
       loading: Loading,
     }),
   },
-  {
-    id: '6',
-    name: 'Attachment',
-    authority: 'queue.consultation.widgets.attachment',
-    component: Loadable({
-      loader: () => import('./Attachment'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
-      },
-      loading: Loading,
-    }),
-  },
+  // {
+  //   id: '6',
+  //   name: 'Attachment',
+  //   authority: 'queue.consultation.widgets.attachment',
+  //   component: Loadable({
+  //     loader: () => import('./Attachment'),
+  //     render: (loaded, p) => {
+  //       let Cmpnet = loaded.default
+  //       return <Cmpnet {...props} {...p} />
+  //     },
+  //     loading: Loading,
+  //   }),
+  // },
   {
     id: '7',
     name: 'Orders',
