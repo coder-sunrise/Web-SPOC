@@ -324,12 +324,14 @@ class NewVisit extends PureComponent {
                       }}
                     >
                       <React.Fragment>
-                        <GridItem xs={12} className={classes.row}>
-                          <VitalSignCard
-                            // isReadOnly={isReadOnly}
-                            handleCalculateBMI={this.calculateBMI}
-                          />
-                        </GridItem>
+                        <Authorized authority='queue.visitregistrationdetails.vitalsign'>
+                          <GridItem xs={12} className={classes.row}>
+                            <VitalSignCard
+                              // isReadOnly={isReadOnly}
+                              handleCalculateBMI={this.calculateBMI}
+                            />
+                          </GridItem>
+                        </Authorized>
                         <GridItem xs={12} className={classes.row}>
                           <ReferralCard
                             // isReadOnly={isRetail || isReadOnly}
