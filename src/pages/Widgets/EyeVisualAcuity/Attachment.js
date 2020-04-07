@@ -156,6 +156,7 @@ class Attachment extends Component {
           attachments={_attachment || []}
           buttonOnly
           attachmentType='EyeVisualAcuity'
+          isReadOnly
           handleUpdateAttachments={this.handleUpdateAttachments}
           renderBody={(list) => {
             // console.log(list)
