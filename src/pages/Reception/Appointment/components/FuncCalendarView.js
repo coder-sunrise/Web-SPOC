@@ -278,7 +278,7 @@ const CalendarView = ({
   }
 
   const _jumpToSelectedValue = (value, type) => {
-    const desiredDate = moment().add(value, type)
+    const desiredDate = moment().add(value, type).toDate()
 
     dispatch({
       type: 'calendar/navigateCalendar',
