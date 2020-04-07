@@ -97,10 +97,16 @@ const styles = (theme) => ({
 @withFormikExtend({
   enableReinitialize: true,
   mapPropsToValues: ({ patientHistory }) => {
-    // console.log(patientHistory)
-    return patientHistory.entity
+    const returnValue = patientHistory.entity
       ? patientHistory.entity
       : patientHistory.default
+
+    return {
+      ...returnValue,
+      eyeVisualAcuityTestAttachments: (returnValue.eyeVisualAcuityTestAttachments ||
+        [])
+        .map((eyeAttachment) => eyeAttachment.attachment),
+    }
   },
   // validationSchema: Yup.object().shape({
   //   name: Yup.string().required(),
