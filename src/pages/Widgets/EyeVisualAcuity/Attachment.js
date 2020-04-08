@@ -155,6 +155,7 @@ class Attachment extends Component {
         <AttachmentWithThumbnail
           attachments={_attachment || []}
           buttonOnly
+          label='Auto-ref Result'
           attachmentType='EyeVisualAcuity'
           isReadOnly={fromPatientHistory}
           handleUpdateAttachments={this.handleUpdateAttachments}
