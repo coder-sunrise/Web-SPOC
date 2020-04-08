@@ -310,9 +310,7 @@ class InventoryItemList extends React.Component {
   }
 
   addContent = (type, accessRight) => {
-    const authority = Authorized.check(accessRight)
-    const isDisabled =
-      this.props.includeOrderSet && authority && authority.rights === 'disable'
+    const isDisabled = this.props.includeOrderSet && accessRight === 'disable'
     return (
       <GridContainer>
         <GridItem xs={8}>
@@ -388,23 +386,37 @@ class InventoryItemList extends React.Component {
   }
 
   filterTabOnAccessRight = (tabs) => {
-    return tabs.filter((o) => {
-      const accessRight = Authorized.check(o.accessRight)
-      if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
-        return false
-      return true
-    })
+    if (this.props.includeOrderSet) {
+      return tabs.filter((o) => {
+        if (!o.accessRight || o.accessRight === 'hidden') return false
+        return true
+      })
+    }
+    return tabs
+  }
+
+  getAccessRight = (accessRightName) => {
+    const accessRight = Authorized.check(accessRightName)
+    if (!accessRight) return false
+    return accessRight.rights
   }
 
   getOptions = () => {
-    const medicationAccessRight =
-      'settings.templates.visitordertemplate.medication'
-    const consumableAccessRight =
-      'settings.templates.visitordertemplate.consumable'
-    const vaccinationAccessRight =
-      'settings.templates.visitordertemplate.vaccination'
-    const serviceAccessRight = 'settings.templates.visitordertemplate.service'
-    const ordersetAccessRight = 'settings.templates.visitordertemplate.orderset'
+    const medicationAccessRight = this.getAccessRight(
+      'settings.templates.visitordertemplate.medication',
+    )
+    const consumableAccessRight = this.getAccessRight(
+      'settings.templates.visitordertemplate.consumable',
+    )
+    const vaccinationAccessRight = this.getAccessRight(
+      'settings.templates.visitordertemplate.vaccination',
+    )
+    const serviceAccessRight = this.getAccessRight(
+      'settings.templates.visitordertemplate.service',
+    )
+    const ordersetAccessRight = this.getAccessRight(
+      'settings.templates.visitordertemplate.orderset',
+    )
     const commonOptions = [
       {
         id: ITEM_TYPE.MEDICATION,
@@ -436,7 +448,7 @@ class InventoryItemList extends React.Component {
     ]
 
     if (this.props.includeOrderSet) {
-      return this.filterTabOnAccessRight([
+      return [
         ...commonOptions,
         {
           id: ITEM_TYPE.ORDERSET,
@@ -444,7 +456,7 @@ class InventoryItemList extends React.Component {
           content: this.addContent('inventoryorderset', ordersetAccessRight),
           accessRight: ordersetAccessRight,
         },
-      ])
+      ]
     }
 
     const removedAccessRightOptions = commonOptions.map((option) => {
@@ -515,16 +527,22 @@ class InventoryItemList extends React.Component {
           return row.name ? row.name : ''
         },
       },
-
       {
         columnName: 'action',
         align: 'center',
         render: (row) => {
           const onConfirm = () => this.onDeleteClick(row)
+          const btnAccessRight = this.getCurrentTypeAccessRight(row.type)
+          if (btnAccessRight === 'hidden') return null
           return (
             <Popconfirm onConfirm={onConfirm}>
               <Tooltip title='Delete'>
-                <Button size='sm' color='danger' justIcon>
+                <Button
+                  size='sm'
+                  color='danger'
+                  justIcon
+                  disabled={btnAccessRight}
+                >
                   <Delete />
                 </Button>
               </Tooltip>
@@ -549,7 +567,13 @@ class InventoryItemList extends React.Component {
               <Field
                 name={`rows[${index}].quantity`}
                 render={(args) => (
-                  <NumberInput {...args} min={1} precision={0} positiveOnly />
+                  <NumberInput
+                    {...args}
+                    min={1}
+                    precision={0}
+                    positiveOnly
+                    disabled={this.getCurrentTypeAccessRight(row.type)}
+                  />
                 )}
               />
             )
@@ -566,7 +590,13 @@ class InventoryItemList extends React.Component {
               <Field
                 name={`rows[${index}].unitPrice`}
                 render={(args) => (
-                  <NumberInput {...args} currency positiveOnly min={0} />
+                  <NumberInput
+                    {...args}
+                    currency
+                    positiveOnly
+                    min={0}
+                    disabled={this.getCurrentTypeAccessRight(row.type)}
+                  />
                 )}
               />
             )
@@ -639,6 +669,23 @@ class InventoryItemList extends React.Component {
     return commonExtensions
   }
 
+  getCurrentTypeAccessRight = (rowType) => {
+    const currentTabAccessRight = this.getOptions().find(
+      (tab) => tab.id === rowType,
+    )
+
+    if (currentTabAccessRight && currentTabAccessRight.accessRight === 'hidden')
+      return 'hidden'
+
+    if (
+      !currentTabAccessRight ||
+      (currentTabAccessRight && currentTabAccessRight.accessRight === 'disable')
+    )
+      return true
+
+    return false
+  }
+
   render () {
     const { theme, values } = this.props
     return (
@@ -647,7 +694,7 @@ class InventoryItemList extends React.Component {
           <Tabs
             defaultActiveKey='1'
             onChange={this.onTabChange}
-            options={this.getOptions()}
+            options={this.filterTabOnAccessRight(this.getOptions())}
           />
           <CommonTableGrid
             rows={values.rows}
