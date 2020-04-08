@@ -56,6 +56,7 @@ export default {
   'menu.reception.queue': 'Queue',
   'menu.reception.appointment': 'Appointment',
   'menu.reception.dispense': 'Dispense',
+  'menu.reception.labTracking':'Lab Tracking',
   'menu.patient': 'Patient Database',
   'menu.patient.search': 'Search Patient',
   'menu.patient.new': 'New Patient',

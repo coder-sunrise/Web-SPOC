@@ -282,6 +282,22 @@ class PatientDetail extends PureComponent {
       },
       {
         id: '5',
+        name: 'Patient Results',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
+        component: Loadable({
+          loader: () => import('./Results'),
+          render: (loaded, p) => {
+            let Cmpnet = loaded.default
+            return <Cmpnet {...p} widget mode='integrated' />
+          },
+          loading: Loading,
+        }),
+      },
+      {
+        id: '6',
         name: 'Patient History',
         access: [
           'patientdatabase.newpatient',
@@ -297,7 +313,7 @@ class PatientDetail extends PureComponent {
         }),
       },
       {
-        id: '6',
+        id: '7',
         name: 'Patient Document',
         access: [
           'patientdatabase.newpatient',
@@ -313,7 +329,7 @@ class PatientDetail extends PureComponent {
         }),
       },
       {
-        id: '7',
+        id: '8',
         name: 'Admission',
         access: 'demorights', // 'wardmanagement',
         component: Loadable({

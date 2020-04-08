@@ -1,7 +1,9 @@
-import React, { PureComponent, useEffect } from 'react'
+import React, { PureComponent,Fragment } from 'react'
+import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
-import { Tabs } from '@/components'
-import { PatientHistoryTabOption } from '@/pages/PatientDatabase/Detail/PatientHistory/variables'
+import { CardContainer } from '@/components'
+import LabTrackingDetails from '@/pages/Widgets/LabTrackingDetails'
+import { PATIENT_LAB } from '@/utils/constants'
 
 const styles = () => ({
   container: {
@@ -12,15 +14,7 @@ const styles = () => ({
   },
 })
 
-class History extends PureComponent {
-
-  constructor () {
-    super()
-    this.state ={
-      activeTab:'1',
-      mounted:'1',
-    }
-  }
+class Results extends PureComponent {
 
   componentDidMount () {
     this.resize()
@@ -40,17 +34,19 @@ class History extends PureComponent {
     }
   }
 
-  setActiveTab =(e)=>{
-    this.setState({ activeTab: e })
-  }
-
   render () {
-    return (<Tabs
-      activeKey={this.state.activeTab}
-      onChange={(e) => this.setActiveTab(e)}
-      options={PatientHistoryTabOption(this.props)}
-    />)
+
+    return (
+      <div>
+        <CardContainer
+          hideHeader
+          size='sm'
+        >
+          <LabTrackingDetails resultType={PATIENT_LAB.PATIENT_PROFILE} />
+        </CardContainer>
+      </div>
+        )
   }
 }
 
-export default withStyles(styles, { withTheme: true })(History)
+export default withStyles(styles, { withTheme: true })(Results)

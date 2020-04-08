@@ -107,7 +107,7 @@ class Accordion extends React.Component {
       [classes.expansionPanelSummaryExpandIcon]: true,
       [classes.expandIconAtLeft]: leftIcon,
     })
-    // console.log(this.state)
+
     return (
       <div className={classes.root}>
         {collapses.map((prop, i) => {
