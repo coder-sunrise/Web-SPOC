@@ -5,6 +5,7 @@ import Service from '@/pages/Widgets/Orders/Detail/Service'
 import Consumable from '@/pages/Widgets/Orders/Detail/Consumable'
 import OrderSet from '@/pages/Widgets/Orders/Detail/OrderSet'
 import Treatment from '@/pages/Widgets/Orders/Detail/Treatment'
+import { CLINIC_TYPE } from '@/utils/constants'
 
 const orderTypes = [
   {
@@ -65,7 +66,14 @@ const orderTypes = [
     getSubject: (r) => r.itemName,
     component: (props) => <Treatment {...props} />,
   },
-]
+].filter((o) => {
+  if (o.value === '2') {
+    const clinicInfo = JSON.parse(localStorage.getItem('clinicInfo') || {})
+    const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
+    if (clinicTypeFK === CLINIC_TYPE.EYE) return false
+  }
+  return true
+})
 
 const convertToConsultation = (values, { consultationDocument, orders }) => {
   const { rows = [] } = consultationDocument
