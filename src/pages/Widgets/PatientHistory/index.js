@@ -86,10 +86,27 @@ const styles = (theme) => ({
     width: '100%',
   },
 })
+
+@connect(({ patientHistory, clinicInfo, clinicSettings, codetable, user }) => ({
+  patientHistory,
+  clinicSettings,
+  codetable,
+  user,
+  clinicInfo,
+}))
 @withFormikExtend({
+  enableReinitialize: true,
   mapPropsToValues: ({ patientHistory }) => {
-    // console.log(patientHistory)
-    // return patientHistory.entity ? patientHistory.entity : patientHistory.default
+    const returnValue = patientHistory.entity
+      ? patientHistory.entity
+      : patientHistory.default
+
+    return {
+      ...returnValue,
+      eyeVisualAcuityTestAttachments: (returnValue.eyeVisualAcuityTestAttachments ||
+        [])
+        .map((eyeAttachment) => eyeAttachment.attachment),
+    }
   },
   // validationSchema: Yup.object().shape({
   //   name: Yup.string().required(),
@@ -111,13 +128,6 @@ const styles = (theme) => ({
   // handleSubmit: () => {},
   // displayName: 'PatientHistory',
 })
-@connect(({ patientHistory, clinicInfo, clinicSettings, codetable, user }) => ({
-  patientHistory,
-  clinicSettings,
-  codetable,
-  user,
-  clinicInfo,
-}))
 class PatientHistory extends Component {
   static defaultProps = {
     mode: 'split',
