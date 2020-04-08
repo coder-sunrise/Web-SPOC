@@ -41,6 +41,7 @@ import Authorized from '@/utils/Authorized'
 
 import schema from './schema'
 import { queryList } from '@/services/patient'
+import { getBizSession } from '@/services/queue'
 
 // moment.updateLocale('en', {
 //   relativeTime: {
@@ -200,6 +201,7 @@ class PatientDetail extends PureComponent {
       name: 'patientdatabase',
       rights: 'enable',
     },
+    hasActiveSession: false,
   }
 
   constructor (props) {
@@ -344,6 +346,10 @@ class PatientDetail extends PureComponent {
     ]
   }
 
+  componentDidMount () {
+    this.checkHasActiveSession()
+  }
+
   componentWillUnmount () {
     const { dispatch } = this.props
     const menuErrors = {}
@@ -425,6 +431,20 @@ class PatientDetail extends PureComponent {
     return handleSubmit()
   }
 
+  checkHasActiveSession = async () => {
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+    }
+    const result = await getBizSession(bizSessionPayload)
+    const { data } = result.data
+
+    this.setState(() => {
+      return {
+        hasActiveSession: data.length > 0,
+      }
+    })
+  }
+
   UNSAFE_componentWillReceiveProps (nextProps) {
     const { errors, dispatch, patient, values, validateForm } = nextProps
     // validateForm(values).then((o) => {
@@ -458,6 +478,8 @@ class PatientDetail extends PureComponent {
       footer,
       ...resetProps
     } = this.props
+
+    const { hasActiveSession } = this.state
 
     const { patient, global, resetForm, values, dispatch } = resetProps
     if (!patient) return null
@@ -549,7 +571,8 @@ class PatientDetail extends PureComponent {
                     ))}
                 </MenuList>
                 {isCreatingPatient && <Divider light />}
-                {isCreatingPatient && (
+                {hasActiveSession &&
+                isCreatingPatient && (
                   <Authorized authority='queue.registervisit'>
                     <Button
                       color='primary'
