@@ -318,18 +318,34 @@ class NewVisit extends PureComponent {
                     <Authorized.Context.Provider
                       value={{
                         rights:
-                          rights === 'readwrite' && (isReadOnly || isRetail)
+                          (rights === 'readwrite' || rights === 'enable') &&
+                          (isReadOnly || isRetail)
                             ? 'disable'
                             : rights,
                       }}
                     >
                       <React.Fragment>
-                        <GridItem xs={12} className={classes.row}>
-                          <VitalSignCard
-                            // isReadOnly={isReadOnly}
-                            handleCalculateBMI={this.calculateBMI}
-                          />
-                        </GridItem>
+                        <Authorized authority='queue.visitregistrationdetails.vitalsign'>
+                          {({ rights: vitalAccessRight }) => (
+                            <Authorized.Context.Provider
+                              value={{
+                                rights:
+                                  (vitalAccessRight === 'readwrite' ||
+                                    vitalAccessRight === 'enable') &&
+                                  isReadOnly
+                                    ? 'disable'
+                                    : vitalAccessRight,
+                              }}
+                            >
+                              <GridItem xs={12} className={classes.row}>
+                                <VitalSignCard
+                                  // isReadOnly={isReadOnly}
+                                  handleCalculateBMI={this.calculateBMI}
+                                />
+                              </GridItem>
+                            </Authorized.Context.Provider>
+                          )}
+                        </Authorized>
                         <GridItem xs={12} className={classes.row}>
                           <ReferralCard
                             // isReadOnly={isRetail || isReadOnly}
@@ -341,13 +357,28 @@ class NewVisit extends PureComponent {
                           />
                         </GridItem>
                         <Authorized authority='queue.visitregistrationdetails.eyevisualacuity'>
-                          <GridItem xs={12} className={classes.row}>
-                            <EyeVisualAcuityCard
-                              // isReadOnly={isRetail || isReadOnly}
-                              handleUpdateAttachments={this.updateAttachments}
-                              attachments={values.visitAttachment}
-                            />
-                          </GridItem>
+                          {({ rights: eyeAccessRight }) => (
+                            <Authorized.Context.Provider
+                              value={{
+                                rights:
+                                  (eyeAccessRight === 'readwrite' ||
+                                    eyeAccessRight === 'enable') &&
+                                  (isReadOnly || isRetail)
+                                    ? 'disable'
+                                    : eyeAccessRight,
+                              }}
+                            >
+                              <GridItem xs={12} className={classes.row}>
+                                <EyeVisualAcuityCard
+                                  // isReadOnly={isRetail || isReadOnly}
+                                  handleUpdateAttachments={
+                                    this.updateAttachments
+                                  }
+                                  attachments={values.visitAttachment}
+                                />
+                              </GridItem>
+                            </Authorized.Context.Provider>
+                          )}
                         </Authorized>
                       </React.Fragment>
                     </Authorized.Context.Provider>
