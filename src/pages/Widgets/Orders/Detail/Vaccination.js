@@ -1,5 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import _ from 'lodash'
+import Add from '@material-ui/icons/Add'
 import {
   GridContainer,
   GridItem,
@@ -10,18 +12,30 @@ import {
   FastField,
   Field,
   withFormikExtend,
+  CommonModal,
+  ProgressButton,
+  Tooltip,
 } from '@/components'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 import LowStockInfo from './LowStockInfo'
+import AddFromPast from './AddFromPast'
 
 let i = 0
-@connect(({ global, codetable }) => ({ global, codetable }))
+@connect(({ global, codetable, visitRegistration }) => ({
+  global,
+  codetable,
+  visitRegistration,
+}))
 @withFormikExtend({
   mapPropsToValues: ({ orders = {} }) => {
     const newOrders = orders.entity || orders.defaultVaccination
 
-    return { minQuantity: 1, ...newOrders }
+    return {
+      minQuantity: 1,
+      ...newOrders,
+      isEditVaccination: !_.isEmpty(orders.entity),
+    }
   },
 
   enableReinitialize: true,
@@ -86,6 +100,7 @@ class Vaccination extends PureComponent {
       selectedVaccination,
       batchNo: '',
       expiryDate: '',
+      showAddFromPastModal: false,
     }
   }
 
@@ -276,6 +291,33 @@ class Vaccination extends PureComponent {
         })
     }
   }
+  onSearchVaccinationHistory = async () => {
+    const { dispatch, values, visitRegistration } = this.props
+    const { patientProfileFK } = visitRegistration.entity.visit
+    await dispatch({
+      type: 'medicationHistory/queryMedicationHistory',
+      payload: { patientProfileId: patientProfileFK },
+    })
+    this.toggleAddFromPastModal()
+  }
+
+  toggleAddFromPastModal = () => {
+    const { showAddFromPastModal } = this.state
+    this.setState({ showAddFromPastModal: !showAddFromPastModal })
+    if (showAddFromPastModal) {
+      this.resetVaccinationHistoryResult()
+    }
+  }
+
+  resetVaccinationHistoryResult = () => {
+    this.props.dispatch({
+      type: 'medicationHistory/updateState',
+      payload: {
+        filter: {},
+        list: [],
+      },
+    })
+  }
 
   render () {
     const {
@@ -286,8 +328,11 @@ class Vaccination extends PureComponent {
       setFieldValue,
       classes,
       disableEdit,
+      getNextSequence,
       ...reset
     } = this.props
+    const { isEditVaccination } = values
+    const { showAddFromPastModal } = this.state
     return (
       <div>
         <GridContainer>
@@ -311,6 +356,20 @@ class Vaccination extends PureComponent {
                 )
               }}
             />
+          </GridItem>
+          <GridItem xs={6}>
+            {!isEditVaccination && (
+              <Tooltip title='Add From Past'>
+                <ProgressButton
+                  color='primary'
+                  icon={<Add />}
+                  style={{ marginTop: theme.spacing(2) }}
+                  onClick={this.onSearchVaccinationHistory}
+                >
+                  Add New
+                </ProgressButton>
+              </Tooltip>
+            )}
           </GridItem>
         </GridContainer>
         <GridContainer>
@@ -505,6 +564,18 @@ class Vaccination extends PureComponent {
           onSave: handleSubmit,
           onReset: this.handleReset,
         })}
+        <CommonModal
+          open={showAddFromPastModal}
+          title='Add Vaccination From Past'
+          onClose={this.toggleAddFromPastModal}
+          onConfirm={this.toggleAddFromPastModal}
+          maxWidth='md'
+          showFooter={false}
+          overrideLoading
+          cancelText='Cancel'
+        >
+          <AddFromPast {...this.props} />
+        </CommonModal>
       </div>
     )
   }

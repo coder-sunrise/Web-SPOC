@@ -24,17 +24,25 @@ import {
   FieldArray,
   Tooltip,
   Field,
+  CommonModal,
+  ProgressButton,
 } from '@/components'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
+import AddFromPast from './AddFromPast'
 
-@connect(({ global, codetable }) => ({ global, codetable }))
+@connect(({ global, codetable, visitRegistration }) => ({
+  global,
+  codetable,
+  visitRegistration,
+}))
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type }) => {
     const v = {
       ...(orders.entity || orders.defaultMedication),
       type,
       visitPurposeFK: orders.visitPurposeFK,
+      isEditMedication: !_.isEmpty(orders.entity),
     }
     if (type === '5') {
       v.drugCode = 'MISC'
@@ -191,6 +199,7 @@ class Medication extends PureComponent {
     },
     batchNo: '',
     expiryDate: '',
+    showAddFromPastModal: false,
   }
 
   getActionItem = (i, arrayHelpers, prop, tooltip, defaultValue) => {
@@ -594,6 +603,34 @@ class Medication extends PureComponent {
     }
   }
 
+  onSearchMedicationHistory = async () => {
+    const { dispatch, visitRegistration } = this.props
+    const { patientProfileFK } = visitRegistration.entity.visit
+    await dispatch({
+      type: 'medicationHistory/queryMedicationHistory',
+      payload: { patientProfileId: patientProfileFK },
+    })
+    this.toggleAddFromPastModal()
+  }
+
+  toggleAddFromPastModal = () => {
+    const { showAddFromPastModal } = this.state
+    this.setState({ showAddFromPastModal: !showAddFromPastModal })
+    if (showAddFromPastModal) {
+      this.resetMedicationHistoryResult()
+    }
+  }
+
+  resetMedicationHistoryResult = () => {
+    this.props.dispatch({
+      type: 'medicationHistory/updateState',
+      payload: {
+        filter: {},
+        list: [],
+      },
+    })
+  }
+
   render () {
     const {
       theme,
@@ -606,6 +643,9 @@ class Medication extends PureComponent {
       disableEdit,
       setDisable,
     } = this.props
+
+    const { isEditMedication } = values
+    const { showAddFromPastModal } = this.state
 
     const commonSelectProps = {
       handleFilter: this.filterOptions,
@@ -654,6 +694,21 @@ class Medication extends PureComponent {
                 />
               )}
             </React.Fragment>
+          </GridItem>
+          <GridItem xs={6}>
+            {!openPrescription &&
+            !isEditMedication && (
+              <Tooltip title='Add From Past'>
+                <ProgressButton
+                  color='primary'
+                  icon={<Add />}
+                  style={{ marginTop: theme.spacing(2) }}
+                  onClick={this.onSearchMedicationHistory}
+                >
+                  Add New
+                </ProgressButton>
+              </Tooltip>
+            )}
           </GridItem>
         </GridContainer>
         <GridContainer gutter={0}>
@@ -1208,6 +1263,21 @@ class Medication extends PureComponent {
           onSave: handleSubmit,
           onReset: this.handleReset,
         })}
+        <CommonModal
+          open={showAddFromPastModal}
+          title='Add Medication From Past'
+          onClose={this.toggleAddFromPastModal}
+          onConfirm={this.toggleAddFromPastModal}
+          maxWidth='md'
+          showFooter={false}
+          overrideLoading
+          cancelText='Cancel'
+        >
+          <AddFromPast
+            isRetail={values.visitPurposeFK === VISIT_TYPE.RETAIL}
+            {...this.props}
+          />
+        </CommonModal>
       </div>
     )
   }
