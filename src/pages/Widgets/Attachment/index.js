@@ -169,6 +169,7 @@ class Attachment extends Component {
                   attachment={attachment}
                   onConfirmDelete={onDeleteClick}
                   indexInAllAttachments={indexInAllAttachments}
+                  isReadOnly={this.isAttachmentReadOnly()}
                   {...commonProps}
                 />
               )
@@ -182,6 +183,15 @@ class Attachment extends Component {
     this.setState({
       activedKeys: keys,
     })
+  }
+
+  isAttachmentReadOnly = () => {
+    const widgetAccessRight = Authorized.check(
+      'queue.consultation.widgets.attachment',
+    )
+    if (widgetAccessRight && widgetAccessRight.rights === 'disable') return true
+
+    return false
   }
 
   render () {
@@ -213,6 +223,7 @@ class Attachment extends Component {
           <AttachmentWithThumbnail
             attachments={corAttachment}
             buttonOnly
+            isReadOnly={this.isAttachmentReadOnly()}
             attachmentType='ClinicalNotes'
             handleUpdateAttachments={this.handleUpdateAttachments}
             renderBody={(attachments) => {

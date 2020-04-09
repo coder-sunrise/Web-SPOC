@@ -6,6 +6,7 @@ import Loading from '@/components/PageLoading/index'
 import { Tooltip, AuthorizedContext, IconButton } from '@/components'
 // utils
 import { CLINIC_TYPE } from '@/utils/constants'
+import Authorized from '@/utils/Authorized'
 
 const clinicInfo = JSON.parse(localStorage.getItem('clinicInfo') || {})
 const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
@@ -251,22 +252,24 @@ const widgets = [
       },
     },
     toolbarAddon: (
-      <Tooltip title='Add Vital Sign'>
-        <IconButton
-          style={{ float: 'left' }}
-          className='non-dragable'
-          onClick={() => {
-            window.g_app._store.dispatch({
-              type: 'patientVitalSign/updateState',
-              payload: {
-                shouldAddNew: true,
-              },
-            })
-          }}
-        >
-          <Add />
-        </IconButton>
-      </Tooltip>
+      <Authorized authority='queue.consultation.widgets.vitalsign'>
+        <Tooltip title='Add Vital Sign'>
+          <IconButton
+            style={{ float: 'left' }}
+            className='non-dragable'
+            onClick={() => {
+              window.g_app._store.dispatch({
+                type: 'patientVitalSign/updateState',
+                payload: {
+                  shouldAddNew: true,
+                },
+              })
+            }}
+          >
+            <Add />
+          </IconButton>
+        </Tooltip>
+      </Authorized>
     ),
   },
 

@@ -87,6 +87,10 @@ class Layout extends PureComponent {
 
     if (userDefaultLayout && userDefaultLayout.consultationTemplate) {
       defaultLayout = JSON.parse(userDefaultLayout.consultationTemplate)
+      defaultLayout = {
+        ...defaultLayout,
+        widgets: defaultLayout.widgets.filter(this.fitlerItemWithAccessRight),
+      }
     } else {
       // disable local setting(!localStorage.getItem('consultationLayout')) {
       defaultLayout = this.getDefaultLayout()
@@ -322,21 +326,22 @@ class Layout extends PureComponent {
     )
   }
 
+  fitlerItemWithAccessRight = (itemId) => {
+    const w = widgets.find((m) => m.id === itemId)
+    if (!w) return false
+    const widgetAccessRight = Authorized.check(w.accessRight)
+
+    if (widgetAccessRight && widgetAccessRight.rights !== 'hidden') return true
+
+    return false
+  }
+
   getDefaultLayout = () => {
     const defaultWidgets = _.cloneDeep(this.pageDefaultWidgets)
 
     const r = {
       widgets: defaultWidgets
-        .filter((o) => {
-          const w = widgets.find((m) => m.id === o.id)
-          if (!w) return false
-          const widgetAccessRight = Authorized.check(w.accessRight)
-          if (widgetAccessRight && widgetAccessRight.rights === 'enable')
-            return true
-
-          return false
-          // console.log(widgetAccessRight, w, !!widgetAccessRight)
-        })
+        .filter((w) => this.fitlerItemWithAccessRight(w.id))
         .map((o) => o.id),
     }
     sizes.forEach((s) => {
@@ -624,14 +629,16 @@ class Layout extends PureComponent {
                   <Settings />
                   Widgets
                 </Button>
-                <Button
-                  size='sm'
-                  color='info'
-                  onClick={this.togglePatientHistoryDrawer}
-                >
-                  <Accessibility />
-                  History
-                </Button>
+                <Authorized authority='queue.consultation.widgets.patienthistory'>
+                  <Button
+                    size='sm'
+                    color='info'
+                    onClick={this.togglePatientHistoryDrawer}
+                  >
+                    <Accessibility />
+                    History
+                  </Button>
+                </Authorized>
               </GridItem>
             </GridContainer>
           </CardContainer>
