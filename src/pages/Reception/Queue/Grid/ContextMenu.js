@@ -52,7 +52,7 @@ const styles = (theme) => ({
 
 const { Secured } = Authorized
 
-const ContextMenu = ({ row, handleClick, classes, rights }) => {
+const ContextMenu = ({ row, handleClick, classes }) => {
   const isStatusWaiting = row.visitStatus === VISIT_STATUS.WAITING
   const isStatusInProgress = filterMap[StatusIndicator.IN_PROGRESS].includes(
     row.visitStatus,
@@ -111,11 +111,9 @@ const ContextMenu = ({ row, handleClick, classes, rights }) => {
 
   const contextMenuOptions = useMemo(() =>
     ContextMenuOptions.map((opt) => {
-      const isDisabled = rights === 'disable'
-
       switch (opt.id) {
         case 0: // edit visit
-          return { ...opt, hidden: !isStatusWaiting, disabled: isDisabled }
+          return { ...opt, hidden: !isStatusWaiting }
         case 0.1: // view visit
           return { ...opt, hidden: isStatusWaiting }
         case 1: // dispense
@@ -126,26 +124,26 @@ const ContextMenu = ({ row, handleClick, classes, rights }) => {
         case 1.1: // billing
           return {
             ...opt,
-            disabled: !enableBilling || isDisabled,
+            disabled: !enableBilling,
           }
         case 2: // delete visit
-          return { ...opt, disabled: !isStatusWaiting || isDisabled }
+          return { ...opt, disabled: !isStatusWaiting }
         case 5: // start consultation
           return {
             ...opt,
-            disabled: isStatusInProgress || isDisabled,
+            disabled: isStatusInProgress,
             hidden: !isStatusWaiting || isRetailVisit || isBillFirstVisit,
           }
         case 6: // resume consultation
           return {
             ...opt,
-            disabled: !isStatusInProgress || isDisabled,
+            disabled: !isStatusInProgress,
             hidden: hideResumeButton || isRetailVisit || isBillFirstVisit,
           }
         case 7: // edit consultation
           return {
             ...opt,
-            disabled: !isStatusCompleted || isDisabled,
+            disabled: !isStatusCompleted,
             hidden: hideEditConsultation,
           }
         default:

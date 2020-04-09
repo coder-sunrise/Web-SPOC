@@ -1,4 +1,5 @@
 import React, { memo } from 'react'
+import moment from 'moment'
 import classnames from 'classnames'
 // formik
 import { withFormik, Field, FastField } from 'formik'
@@ -32,6 +33,7 @@ const styles = () => ({
 
 const FilterBar = (props) => {
   const {
+    dispatch,
     loading,
     classes,
     onDoctorEventClick,
@@ -84,6 +86,12 @@ const FilterBar = (props) => {
                 maxSelected={5}
                 maxTagPlaceholder='doctors'
                 renderDropdown={renderDropdown}
+                onChange={(v) => {
+                  sessionStorage.setItem(
+                    'appointmentDoctors',
+                    JSON.stringify(v),
+                  )
+                }}
               />
             )}
           />
@@ -119,7 +127,8 @@ const FilterBar = (props) => {
             )}
           />
         </GridItem>
-        <GridItem md={1}>
+
+        <GridItem md={5}>
           <ProgressButton
             icon={<Search />}
             color='primary'
@@ -127,9 +136,6 @@ const FilterBar = (props) => {
           >
             Filter
           </ProgressButton>
-        </GridItem>
-
-        <GridItem md={3}>
           <ProgressButton
             icon={<Search />}
             color='primary'
