@@ -124,7 +124,14 @@ class Form extends React.PureComponent {
 
   render () {
     const { state, props } = this
-    const { theme, classes, rights, prefix, ...restProps } = props
+    const {
+      theme,
+      classes,
+      rights,
+      prefix,
+      fromPatientHistory,
+      ...restProps
+    } = props
     const cfg = {
       extraClasses: {
         root: classes.inputRoot,
@@ -214,7 +221,11 @@ class Form extends React.PureComponent {
                                     )
                                   }}
                                 />
-                                <div style={{ position: 'relative' }}>
+                                <div
+                                  style={{
+                                    position: 'relative',
+                                  }}
+                                >
                                   <FastField
                                     name={`${_prefix}isRefractionOn`}
                                     render={(args) => {
@@ -248,7 +259,9 @@ class Form extends React.PureComponent {
                                           style={{
                                             position: 'absolute',
                                             bottom: 8,
-                                            left: 115,
+                                            left: fromPatientHistory
+                                              ? 130
+                                              : 115,
                                           }}
                                           simple
                                           {...args}

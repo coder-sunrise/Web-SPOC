@@ -84,7 +84,7 @@ export const widgets = (props) => [
   },
   {
     id: '13',
-    name: 'Visual Acuity',
+    name: 'Visual Acuity Test',
     authority: 'queue.consultation.widgets.eyevisualacuity',
     component: Loadable({
       loader: () => import('../EyeVisualAcuity'),
