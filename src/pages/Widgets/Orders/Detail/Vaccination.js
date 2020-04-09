@@ -19,7 +19,7 @@ import {
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 import LowStockInfo from './LowStockInfo'
-import AddFromPast from './AddFromPast'
+import AddFromPast from './AddMedicationFromPast'
 
 let i = 0
 @connect(({ global, codetable, visitRegistration }) => ({

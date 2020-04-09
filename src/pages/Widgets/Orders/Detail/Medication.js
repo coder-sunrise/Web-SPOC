@@ -29,7 +29,7 @@ import {
 } from '@/components'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
-import AddFromPast from './AddFromPast'
+import AddFromPast from './AddMedicationFromPast'
 
 @connect(({ global, codetable, visitRegistration }) => ({
   global,
