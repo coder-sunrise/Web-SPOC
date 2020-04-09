@@ -36,6 +36,9 @@ const styles = (theme) => ({
   uploadBtn: {
     marginBottom: theme.spacing(1),
   },
+  dropDownItem: {
+    fontSize: '1em',
+  },
 })
 
 export default styles

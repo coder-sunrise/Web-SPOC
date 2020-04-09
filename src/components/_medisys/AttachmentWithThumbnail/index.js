@@ -1,8 +1,16 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, Fragment } from 'react'
 import { connect } from 'dva'
 // material ui
 import AttachFile from '@material-ui/icons/AttachFile'
-import { withStyles } from '@material-ui/core'
+import {
+  withStyles,
+  MenuList,
+  Popper,
+  Paper,
+  Grow,
+  ClickAwayListener,
+  MenuItem,
+} from '@material-ui/core'
 // common components
 import { Button, CardContainer, Danger, GridContainer } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
@@ -14,7 +22,7 @@ import {
   deleteFileByFileID,
 } from '@/services/file'
 import { convertToBase64 } from '@/utils/utils'
-import { FILE_STATUS, FILE_CATEGORY } from '@/utils/constants'
+import { FILE_STATUS, FILE_CATEGORY, ATTACHMENT_TYPE } from '@/utils/constants'
 import { getThumbnail } from './utils'
 import styles from './styles'
 import { corAttchementTypes } from '@/utils/codes'
@@ -45,7 +53,15 @@ const AttachmentWithThumbnail = ({
     width: 64,
   },
   renderBody = undefined,
+  withDropDown,
+  handleSelectedAttachmentType,
 }) => {
+  const [
+    showPopper,
+    setShowPopper,
+  ] = useState(false)
+  let popperRef = useRef(null)
+
   const type = corAttchementTypes.find((o) => o.type === attachmentType) || {}
 
   const fileAttachments = attachments.filter(
@@ -229,16 +245,84 @@ const AttachmentWithThumbnail = ({
     setDownlaoding(false)
   }
 
+  const handlePopper = () => {
+    setShowPopper(!showPopper)
+  }
+
+  const onDropDownClick = (selectedAttachmentType) => {
+    handleSelectedAttachmentType(selectedAttachmentType)
+    onUploadClick()
+  }
+
   let UploadButton = (
-    <Button
-      color='rose'
-      size='sm'
-      onClick={onUploadClick}
-      disabled={isReadOnly || uploading || global.disableSave}
-      className={fileAttachments.length >= 1 ? classes.uploadBtn : ''}
-    >
-      <AttachFile /> Upload
-    </Button>
+    <Fragment>
+      {withDropDown ? (
+        <Fragment>
+          <Button
+            color='rose'
+            size='sm'
+            onClick={handlePopper}
+            disabled={isReadOnly || uploading || global.disableSave}
+            className={fileAttachments.length >= 1 ? classes.uploadBtn : ''}
+            buttonRef={(node) => {
+              popperRef = node
+            }}
+          >
+            <AttachFile /> Upload
+          </Button>
+          <Popper
+            open={showPopper}
+            anchorEl={popperRef}
+            transition
+            disablePortal
+            placement='bottom-end'
+            style={{
+              zIndex: 999,
+              marginTop: 65,
+              marginLeft: 8,
+              fontSize: '1em',
+            }}
+          >
+            {({ TransitionProps, placement }) => (
+              <Grow
+                {...TransitionProps}
+                id='menu-list'
+                style={{ transformOrigin: '0 0 -30' }}
+              >
+                <Paper className={classes.dropdown}>
+                  <ClickAwayListener onClickAway={handlePopper}>
+                    <MenuList role='menu'>
+                      <MenuItem
+                        onClick={() =>
+                          onDropDownClick(ATTACHMENT_TYPE.CLINICALNOTES)}
+                      >
+                        Consultation Attachment
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() =>
+                          onDropDownClick(ATTACHMENT_TYPE.EYEVISUALACUITY)}
+                      >
+                        Visual Acuity Test
+                      </MenuItem>
+                    </MenuList>
+                  </ClickAwayListener>
+                </Paper>
+              </Grow>
+            )}
+          </Popper>
+        </Fragment>
+      ) : (
+        <Button
+          color='rose'
+          size='sm'
+          onClick={onUploadClick}
+          disabled={isReadOnly || uploading || global.disableSave}
+          className={fileAttachments.length >= 1 ? classes.uploadBtn : ''}
+        >
+          <AttachFile /> Upload
+        </Button>
+      )}
+    </Fragment>
   )
 
   if (!allowedMultiple && fileAttachments.length >= 1) UploadButton = null

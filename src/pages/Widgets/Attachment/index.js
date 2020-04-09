@@ -26,6 +26,7 @@ class Attachment extends Component {
     runOnce: false,
     showScribbleModal: false,
     activedKeys: undefined,
+    selectedAttachmentType: 'ClinicalNotes',
     types: corAttchementTypes.filter(
       (o) => !o.accessRight || Authorized.check(o.accessRight),
     ),
@@ -36,8 +37,10 @@ class Attachment extends Component {
   }
 
   handleUpdateAttachments = ({ added, deleted }) => {
+    const { consultation } = this.props
+    const { entity } = consultation
     const { form, field } = this
-    const { types, activedKeys } = this.state
+    const { types, activedKeys, selectedAttachmentType } = this.state
     let updated = [
       ...(field.value || []),
     ]
@@ -54,14 +57,14 @@ class Attachment extends Component {
         }),
       ]
 
-      if (this.props.mainType) {
+      if (selectedAttachmentType) {
         // default open panel if it was closed
         const targetIndex = types.indexOf(
-          types.find((o) => o.type === this.props.mainType),
+          types.find((o) => o.type === selectedAttachmentType),
         )
         if (
           targetIndex >= 0 &&
-          added.find((o) => o.attachmentType === this.props.mainType) &&
+          added.find((o) => o.attachmentType === selectedAttachmentType) &&
           !(activedKeys || []).includes(targetIndex)
         ) {
           this.setState((preState) => ({
@@ -95,8 +98,6 @@ class Attachment extends Component {
       updated.map((item, index) => ({ ...item, sortOrder: index + 1 })),
     )
 
-    const { consultation } = this.props
-    const { entity } = consultation
     entity.corAttachment = updated
     this.props.dispatch({
       type: 'consultation/updateState',
@@ -184,8 +185,16 @@ class Attachment extends Component {
     })
   }
 
+  handleSelectedAttachmentType = (selectedType) => {
+    this.setState(() => {
+      return {
+        selectedAttachmentType: selectedType,
+      }
+    })
+  }
+
   render () {
-    const { types } = this.state
+    const { types, selectedAttachmentType } = this.state
     const { consultation } = this.props
     const { entity } = consultation
     const { corAttachment } = entity
@@ -213,8 +222,10 @@ class Attachment extends Component {
           <AttachmentWithThumbnail
             attachments={corAttachment}
             buttonOnly
-            attachmentType='ClinicalNotes'
+            attachmentType={selectedAttachmentType}
+            withDropDown
             handleUpdateAttachments={this.handleUpdateAttachments}
+            handleSelectedAttachmentType={this.handleSelectedAttachmentType}
             renderBody={(attachments) => {
               return (
                 <Accordion
