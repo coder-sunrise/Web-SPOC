@@ -325,7 +325,7 @@ class NewVisit extends PureComponent {
                       }}
                     >
                       <React.Fragment>
-                        <Authorized authority='queue.visitregistrationdetails.vitalsign'>
+                        <Authorized authority='queue.registervisit.vitalsign'>
                           {({ rights: vitalAccessRight }) => (
                             <Authorized.Context.Provider
                               value={{
