@@ -222,7 +222,7 @@ const loadFromCodesConfig = {
   },
   loadFromCodes: [
     {
-      value: 'corDoctorNote[0].clinicianNote',
+      value: 'corDoctorNote[0].note',
       name: 'Clinical Notes',
     },
     {
@@ -431,7 +431,7 @@ class AddConsultationDocument extends PureComponent {
               ? option.getter(entity, codetable, patient.entity)
               : Object.byString(entity, option.value) || '-'
             const blocksFromHTML = convertFromHTML(htmlDecodeByRegExp(v))
-            console.log(editor)
+            // console.log(editor)
             if (editor && editor.props) {
               const { editorState } = editor.props
               editor.update(
