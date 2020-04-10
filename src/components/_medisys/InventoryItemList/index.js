@@ -18,7 +18,7 @@ import {
 } from '@/components'
 import { getUniqueId, currencyFormatter } from '@/utils/utils'
 import { InventoryTypes, visitOrderTemplateItemTypes } from '@/utils/codes'
-import { ITEM_TYPE } from '@/utils/constants'
+import { ITEM_TYPE, CLINIC_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
 
 const CPSwitch = (label) => (args) => {
@@ -389,6 +389,13 @@ class InventoryItemList extends React.Component {
     if (this.props.includeOrderSet) {
       return tabs.filter((o) => {
         if (!o.accessRight || o.accessRight === 'hidden') return false
+        if (o.id === 3) {
+          const clinicInfo = JSON.parse(
+            localStorage.getItem('clinicInfo') || {},
+          )
+          const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
+          if (clinicTypeFK === CLINIC_TYPE.EYE) return false
+        }
         return true
       })
     }
