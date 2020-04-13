@@ -38,10 +38,11 @@ import Form from './Form'
 
 class EyeVisualAcuity extends React.PureComponent {
   render () {
+    const { fromConsultation } = this.props
     return (
       <div style={{ minWidth: 700 }}>
         <Form {...this.props} />
-        <Attachment {...this.props} />
+        {!fromConsultation && <Attachment {...this.props} />}
       </div>
     )
   }

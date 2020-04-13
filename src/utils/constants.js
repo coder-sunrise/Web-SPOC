@@ -347,3 +347,10 @@ export const NOTIFICATION_STATUS = {
   OK: 1,
   ERROR: 2,
 }
+
+export const ATTACHMENT_TYPE = {
+  CLINICALNOTES: 'ClinicalNotes',
+  VISITREFERRAL: 'VisitReferral',
+  VISIT: 'Visit',
+  EYEVISUALACUITY: 'EyeVisualAcuity',
+}

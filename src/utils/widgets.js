@@ -325,6 +325,7 @@ const widgets = [
             {...p}
             prefix='corEyeVisualAcuityTest.eyeVisualAcuityTestForms'
             attachmentsFieldName='corAttachment'
+            fromConsultation
             handleUpdateAttachments={({
               updated,
               form,
