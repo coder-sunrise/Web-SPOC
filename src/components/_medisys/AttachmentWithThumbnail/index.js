@@ -391,7 +391,7 @@ const AttachmentWithThumbnail = ({
         onChange={onFileChange}
         onClick={clearValue}
       />
-      {UploadButton}
+      {!isReadOnly && UploadButton}
       {errorText && (
         <Danger style={{ display: 'inline-block' }}>
           <span style={{ fontWeight: 500 }}>{errorText}</span>

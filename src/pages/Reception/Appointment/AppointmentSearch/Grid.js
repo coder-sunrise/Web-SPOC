@@ -103,7 +103,8 @@ class Grid extends PureComponent {
         columnExtensions={[
           {
             columnName: 'patientName',
-            sortBy: 'name',
+            // sortBy: 'name',
+            sortingEnabled: false,
           },
           {
             columnName: 'patientAccountNo',

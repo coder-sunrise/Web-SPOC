@@ -170,6 +170,7 @@ class Attachment extends Component {
                   attachment={attachment}
                   onConfirmDelete={onDeleteClick}
                   indexInAllAttachments={indexInAllAttachments}
+                  isReadOnly={this.isAttachmentReadOnly()}
                   {...commonProps}
                 />
               )
@@ -191,6 +192,15 @@ class Attachment extends Component {
         selectedAttachmentType: selectedType,
       }
     })
+  }
+
+  isAttachmentReadOnly = () => {
+    const widgetAccessRight = Authorized.check(
+      'queue.consultation.widgets.attachment',
+    )
+    if (widgetAccessRight && widgetAccessRight.rights === 'disable') return true
+
+    return false
   }
 
   render () {
@@ -224,6 +234,7 @@ class Attachment extends Component {
             buttonOnly
             attachmentType={selectedAttachmentType}
             withDropDown
+            isReadOnly={this.isAttachmentReadOnly()}
             handleUpdateAttachments={this.handleUpdateAttachments}
             handleSelectedAttachmentType={this.handleSelectedAttachmentType}
             renderBody={(attachments) => {

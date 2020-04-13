@@ -1,8 +1,9 @@
+import Authorized from '@/utils/Authorized'
+import { CLINIC_TYPE } from '@/utils/constants'
 import Consumable from './Consumable'
 import Medication from './Medication'
 import Vaccination from './Vaccination'
 import OrderSet from './OrderSet'
-import Authorized from '@/utils/Authorized'
 
 const addContent = (type, props) => {
   switch (type) {
@@ -48,6 +49,11 @@ export const InventoryMasterOption = (props) => {
     const accessRight = Authorized.check(tab.authority)
     if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
       return false
+    if (tab.id === '2') {
+      const clinicInfo = JSON.parse(localStorage.getItem('clinicInfo') || {})
+      const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
+      if (clinicTypeFK === CLINIC_TYPE.EYE) return false
+    }
     return true
   })
 }

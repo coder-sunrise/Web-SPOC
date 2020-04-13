@@ -120,9 +120,6 @@ class CheckboxGroup extends React.Component {
       >
         {options.map((o) => {
           const v = `${o[valueField]}`
-          const hasAccessRight = !!o.accessRight
-          let _accessRight = ''
-          if (hasAccessRight) _accessRight = o.accessRight
 
           return (
             <div
@@ -131,20 +128,18 @@ class CheckboxGroup extends React.Component {
                 : classes.checkboxAndRadioHorizontal}`}
               key={v}
             >
-              <Authorized authority={_accessRight}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={state[v]}
-                      onChange={this.handleChange(v)}
-                      value={v}
-                      color='primary'
-                      disabled={o.disabled || disabled}
-                    />
-                  }
-                  label={o[textField]}
-                />
-              </Authorized>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={state[v]}
+                    onChange={this.handleChange(v)}
+                    value={v}
+                    color='primary'
+                    disabled={o.disabled || disabled}
+                  />
+                }
+                label={o[textField]}
+              />
             </div>
           )
         })}
