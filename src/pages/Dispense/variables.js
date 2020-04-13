@@ -12,6 +12,8 @@ import {
   Select,
 } from '@/components'
 import CONSTANTS from './DispenseDetails/constants'
+import LowStockInfo from '@/pages/Widgets/Orders/Detail/LowStockInfo'
+import { InventoryTypes } from '@/utils/codes'
 
 export const tableConfig = {
   FuncProps: { pager: false },
@@ -19,6 +21,27 @@ export const tableConfig = {
 
 const columnwidth = '10%'
 const columnWidth = '10%'
+
+const lowStockIndicator = (row) => {
+  const currentType = InventoryTypes.find((type) => type.name === row.type)
+  if (!currentType) return null
+
+  const values = {
+    [currentType.itemFKName]:
+      currentType.name === 'Consumable'
+        ? row.itemFK
+        : row[currentType.itemFKName],
+  }
+
+  return (
+    <div style={{ position: 'relative', top: 2 }}>
+      <LowStockInfo
+        sourceType={currentType.name.toLowerCase()}
+        values={values}
+      />
+    </div>
+  )
+}
 
 export const PrescriptionColumns = [
   // { name: 'id', title: 'id' },
@@ -76,13 +99,16 @@ export const PrescriptionColumnExtensions = (
     width: columnWidth,
     render: (row) => {
       return (
-        <div
-          style={{
-            wordWrap: 'break-word',
-            whiteSpace: 'pre-wrap',
-          }}
-        >
-          {row.name}
+        <div style={{ position: 'relative' }}>
+          <div
+            style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+            }}
+          >
+            {row.name}
+            {lowStockIndicator(row)}
+          </div>
         </div>
       )
     },
@@ -266,13 +292,16 @@ export const VaccinationColumnExtensions = (
     columnName: 'name',
     render: (row) => {
       return (
-        <div
-          style={{
-            wordWrap: 'break-word',
-            whiteSpace: 'pre-wrap',
-          }}
-        >
-          {row.name}
+        <div style={{ position: 'relative' }}>
+          <div
+            style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+            }}
+          >
+            {row.name}
+            {lowStockIndicator(row)}
+          </div>
         </div>
       )
     },
@@ -428,13 +457,16 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     render: (row) => {
       return (
         <Tooltip title={row.description}>
-          <div
-            style={{
-              wordWrap: 'break-word',
-              whiteSpace: 'pre-wrap',
-            }}
-          >
-            {row.description}
+          <div style={{ position: 'relative' }}>
+            <div
+              style={{
+                wordWrap: 'break-word',
+                whiteSpace: 'pre-wrap',
+              }}
+            >
+              {row.description}
+              {lowStockIndicator(row)}
+            </div>
           </div>
         </Tooltip>
       )
