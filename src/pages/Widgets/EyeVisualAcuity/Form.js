@@ -156,14 +156,14 @@ class Form extends React.PureComponent {
 
             // console.log(values)
             if (!ary || ary.length === 0) {
-              const accessRight = Authorized.check(
-                'queue.consultation.widgets.eyevisualacuity',
-              )
-              if (rights === 'enable' || accessRight.rights === 'enable') {
-                this.addForm()
-                return null
-              }
+              // const accessRight = Authorized.check(
+              //   'queue.consultation.widgets.eyevisualacuity',
+              // )
+              // if (rights === 'enable' || accessRight.rights === 'enable') {
+              this.addForm()
               return null
+              // }
+              // return null
             }
 
             return (

@@ -357,28 +357,31 @@ class NewVisit extends PureComponent {
                           />
                         </GridItem>
                         <Authorized authority='queue.visitregistrationdetails.eyevisualacuity'>
-                          {({ rights: eyeAccessRight }) => (
-                            <Authorized.Context.Provider
-                              value={{
-                                rights:
-                                  (eyeAccessRight === 'readwrite' ||
-                                    eyeAccessRight === 'enable') &&
-                                  (isReadOnly || isRetail)
-                                    ? 'disable'
-                                    : eyeAccessRight,
-                              }}
-                            >
-                              <GridItem xs={12} className={classes.row}>
-                                <EyeVisualAcuityCard
-                                  // isReadOnly={isRetail || isReadOnly}
-                                  handleUpdateAttachments={
-                                    this.updateAttachments
-                                  }
-                                  attachments={values.visitAttachment}
-                                />
-                              </GridItem>
-                            </Authorized.Context.Provider>
-                          )}
+                          {({ rights: eyeAccessRight }) => {
+                            if (eyeAccessRight === 'hidden') return null
+                            return (
+                              <Authorized.Context.Provider
+                                value={{
+                                  rights:
+                                    (eyeAccessRight === 'readwrite' ||
+                                      eyeAccessRight === 'enable') &&
+                                    (isReadOnly || isRetail)
+                                      ? 'disable'
+                                      : eyeAccessRight,
+                                }}
+                              >
+                                <GridItem xs={12} className={classes.row}>
+                                  <EyeVisualAcuityCard
+                                    // isReadOnly={isRetail || isReadOnly}
+                                    handleUpdateAttachments={
+                                      this.updateAttachments
+                                    }
+                                    attachments={values.visitAttachment}
+                                  />
+                                </GridItem>
+                              </Authorized.Context.Provider>
+                            )
+                          }}
                         </Authorized>
                       </React.Fragment>
                     </Authorized.Context.Provider>

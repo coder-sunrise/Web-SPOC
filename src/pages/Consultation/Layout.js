@@ -630,14 +630,19 @@ class Layout extends PureComponent {
                   Widgets
                 </Button>
                 <Authorized authority='queue.consultation.widgets.patienthistory'>
-                  <Button
-                    size='sm'
-                    color='info'
-                    onClick={this.togglePatientHistoryDrawer}
-                  >
-                    <Accessibility />
-                    History
-                  </Button>
+                  {({ rights: patientHistoryAccessRight }) => {
+                    if (patientHistoryAccessRight === 'hidden') return null
+                    return (
+                      <Button
+                        size='sm'
+                        color='info'
+                        onClick={this.togglePatientHistoryDrawer}
+                      >
+                        <Accessibility />
+                        History
+                      </Button>
+                    )
+                  }}
                 </Authorized>
               </GridItem>
             </GridContainer>
