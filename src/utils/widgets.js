@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import Loadable from 'react-loadable'
 // material ui
 import Add from '@material-ui/icons/Add'
@@ -321,29 +322,33 @@ const widgets = [
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return (
-          <Cmpnet
-            {...p}
-            prefix='corEyeVisualAcuityTest.eyeVisualAcuityTestForms'
-            attachmentsFieldName='corAttachment'
-            fromConsultation
-            handleUpdateAttachments={({
-              updated,
-              form,
-              dispatch,
-              consultation,
-            }) => {
-              // console.log(updated, form, dispatch, consultation)
-              form.setFieldValue('corAttachment', updated)
-              const { entity } = consultation
-              entity.corAttachment = updated
-              dispatch({
-                type: 'consultation/updateState',
-                payload: {
-                  entity,
-                },
-              })
-            }}
-          />
+          <Fragment>
+            <Authorized authority='queue.consultation.widgets.eyevisualacuity'>
+              <Cmpnet
+                {...p}
+                prefix='corEyeVisualAcuityTest.eyeVisualAcuityTestForms'
+                attachmentsFieldName='corAttachment'
+                fromConsultation
+                handleUpdateAttachments={({
+                  updated,
+                  form,
+                  dispatch,
+                  consultation,
+                }) => {
+                  // console.log(updated, form, dispatch, consultation)
+                  form.setFieldValue('corAttachment', updated)
+                  const { entity } = consultation
+                  entity.corAttachment = updated
+                  dispatch({
+                    type: 'consultation/updateState',
+                    payload: {
+                      entity,
+                    },
+                  })
+                }}
+              />
+            </Authorized>
+          </Fragment>
         )
       },
       loading: Loading,

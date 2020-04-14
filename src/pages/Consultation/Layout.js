@@ -630,14 +630,19 @@ class Layout extends PureComponent {
                   Widgets
                 </Button>
                 <Authorized authority='queue.consultation.widgets.patienthistory'>
-                  <Button
-                    size='sm'
-                    color='info'
-                    onClick={this.togglePatientHistoryDrawer}
-                  >
-                    <Accessibility />
-                    History
-                  </Button>
+                  {({ rights: patientHistoryAccessRight }) => {
+                    if (patientHistoryAccessRight === 'hidden') return null
+                    return (
+                      <Button
+                        size='sm'
+                        color='info'
+                        onClick={this.togglePatientHistoryDrawer}
+                      >
+                        <Accessibility />
+                        History
+                      </Button>
+                    )
+                  }}
                 </Authorized>
               </GridItem>
             </GridContainer>
@@ -777,19 +782,17 @@ class Layout extends PureComponent {
                           <Divider light />
                         </div>
                       )}
-                      <Authorized authority={w.accessRight}>
-                        <div
-                          className='non-dragable'
-                          style={w.layoutConfig ? w.layoutConfig.style : {}}
-                        >
-                          <SizeContainer size='sm'>
-                            <LoadableComponent
-                              {...widgetProps}
-                              {...w.restProps}
-                            />
-                          </SizeContainer>
-                        </div>
-                      </Authorized>
+                      <div
+                        className='non-dragable'
+                        style={w.layoutConfig ? w.layoutConfig.style : {}}
+                      >
+                        <SizeContainer size='sm'>
+                          <LoadableComponent
+                            {...widgetProps}
+                            {...w.restProps}
+                          />
+                        </SizeContainer>
+                      </div>
                     </Paper>
                   </div>
                 )
