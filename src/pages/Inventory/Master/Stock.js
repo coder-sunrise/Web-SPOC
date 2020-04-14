@@ -145,7 +145,7 @@ const Stock = ({
 
   const checkIsReadOnly = () => {
     const accessRight = Authorized.check(authority)
-    if (!accessRight || (accessRight && accessRight.rights !== 'readwrite'))
+    if (!accessRight || (accessRight && accessRight.rights !== 'enable'))
       return true
     return false
   }
