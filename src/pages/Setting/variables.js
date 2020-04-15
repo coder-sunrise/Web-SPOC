@@ -208,6 +208,7 @@ export const menuData = [
     url: '/setting/userprofile',
   },
   {
+    authority: 'settings.role',
     title: 'System User',
     text: 'Role & Access Right',
     url: '/setting/userrole',

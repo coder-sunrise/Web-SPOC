@@ -87,6 +87,10 @@ class Layout extends PureComponent {
 
     if (userDefaultLayout && userDefaultLayout.consultationTemplate) {
       defaultLayout = JSON.parse(userDefaultLayout.consultationTemplate)
+      defaultLayout = {
+        ...defaultLayout,
+        widgets: defaultLayout.widgets.filter(this.fitlerItemWithAccessRight),
+      }
     } else {
       // disable local setting(!localStorage.getItem('consultationLayout')) {
       defaultLayout = this.getDefaultLayout()
@@ -102,17 +106,18 @@ class Layout extends PureComponent {
     this.widgetMenu = (
       <Menu>
         {widgets
-          .filter((widget) => {
+          .map((widget) => {
             const widgetAccessRight = Authorized.check(widget.accessRight)
-            if (!widgetAccessRight) return false
-            const shouldShow =
-              widgetAccessRight && widgetAccessRight.rights !== 'hidden'
-
-            return shouldShow
+            const { rights } = widgetAccessRight || { rights: undefined }
+            return { ...widget, rights }
+          })
+          .filter((widget) => {
+            if (!widget.rights) return false
+            return widget.rights !== 'hidden'
           })
           .map((o) => {
             const cfg = defaultLayout.lg.find((m) => m.i === o.id) || {}
-
+            // const disableByAccessRight = o.rights === 'disable'
             return (
               <Menu.Item
                 key={o.id}
@@ -322,18 +327,22 @@ class Layout extends PureComponent {
     )
   }
 
+  fitlerItemWithAccessRight = (itemId) => {
+    const w = widgets.find((m) => m.id === itemId)
+    if (!w) return false
+    const widgetAccessRight = Authorized.check(w.accessRight)
+
+    if (widgetAccessRight && widgetAccessRight.rights !== 'hidden') return true
+
+    return false
+  }
+
   getDefaultLayout = () => {
     const defaultWidgets = _.cloneDeep(this.pageDefaultWidgets)
 
     const r = {
       widgets: defaultWidgets
-        .filter((o) => {
-          const w = widgets.find((m) => m.id === o.id)
-          if (!w) return false
-          const widgetAccessRight = Authorized.check(w.accessRight)
-          // console.log(widgetAccessRight, w)
-          return !!widgetAccessRight
-        })
+        .filter((w) => this.fitlerItemWithAccessRight(w.id))
         .map((o) => o.id),
     }
     sizes.forEach((s) => {
@@ -613,6 +622,7 @@ class Layout extends PureComponent {
                 {state.currentLayout.widgets.map((id) => {
                   const w = widgets.find((o) => o.id === id)
                   if (!w) return null
+
                   const onClick = () => this.onAnchorClick(w.id)
                   return (
                     <Button size='sm' color='primary' onClick={onClick}>
@@ -634,14 +644,21 @@ class Layout extends PureComponent {
                   <Settings />
                   Widgets
                 </Button>
-                <Button
-                  size='sm'
-                  color='info'
-                  onClick={this.togglePatientHistoryDrawer}
-                >
-                  <Accessibility />
-                  History
-                </Button>
+                <Authorized authority='queue.consultation.widgets.patienthistory'>
+                  {({ rights: patientHistoryAccessRight }) => {
+                    if (patientHistoryAccessRight === 'hidden') return null
+                    return (
+                      <Button
+                        size='sm'
+                        color='info'
+                        onClick={this.togglePatientHistoryDrawer}
+                      >
+                        <Accessibility />
+                        History
+                      </Button>
+                    )
+                  }}
+                </Authorized>
               </GridItem>
             </GridContainer>
           </CardContainer>
@@ -895,14 +912,6 @@ class Layout extends PureComponent {
                       return shouldShow
                     })}
                     onChange={(e, s) => {
-                      // console.log(e)
-                      // dispatch({
-                      //   type: 'consultation/updateState',
-                      //   payload: {
-                      //     selectedWidgets: e.target.value,
-                      //   },
-                      // })
-                      // console.log(e.target.value, s)
                       this.updateWidget(e.target.value, s)
                     }}
                   />

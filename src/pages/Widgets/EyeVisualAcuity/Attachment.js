@@ -115,13 +115,25 @@ class Attachment extends Component {
   }
 
   render () {
-    const { consultation = {}, attachments, attachmentsFieldName } = this.props
+    const {
+      consultation = {},
+      attachments,
+      attachmentsFieldName,
+      fromPatientHistory,
+      values,
+    } = this.props
     // console.log(attachments)
     const { entity } = consultation
     let _attachment = attachments
     if (!_attachment && entity) {
       _attachment = entity.corAttachment
     }
+
+    if (fromPatientHistory) {
+      _attachment = (values.eyeVisualAcuityTestAttachments || [])
+        .map((o) => o.attachment)
+    }
+
     return (
       <div>
         <FastField
@@ -143,7 +155,9 @@ class Attachment extends Component {
         <AttachmentWithThumbnail
           attachments={_attachment || []}
           buttonOnly
+          label='Auto-ref Result'
           attachmentType='EyeVisualAcuity'
+          isReadOnly={fromPatientHistory}
           handleUpdateAttachments={this.handleUpdateAttachments}
           renderBody={(list) => {
             // console.log(list)

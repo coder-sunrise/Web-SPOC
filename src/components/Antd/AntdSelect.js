@@ -516,6 +516,7 @@ class AntdSelect extends React.PureComponent {
 
   getSelectOptions = (source, renderDropdown) => {
     const { valueField, labelField, optionLabelLength = 0, mode } = this.props
+
     return source
       .map((s) => {
         // console.log({ label: Object.byString(s, labelField) })
@@ -528,29 +529,33 @@ class AntdSelect extends React.PureComponent {
           // label: s[labelField],
         }
       })
-      .map((option, index) => (
-        <Select.Option
-          data={option}
-          title={option.label}
-          label={
-            optionLabelLength ? (
-              option.label.substring(0, optionLabelLength)
+      .map((option, index) => {
+        const hasIsActive = option.isActive !== undefined
+        const isActive = hasIsActive ? option.isActive : true
+        return (
+          <Select.Option
+            data={option}
+            title={option.label}
+            label={
+              optionLabelLength ? (
+                option.label.substring(0, optionLabelLength)
+              ) : (
+                option.label
+              )
+            }
+            key={`select-${option.value}`}
+            value={mode === 'tags' ? `${option.value}` : option.value}
+            // key={option.id ? `${option.id}` : option.value}
+            disabled={!!option.disabled || !isActive}
+          >
+            {typeof renderDropdown === 'function' ? (
+              renderDropdown(option)
             ) : (
               option.label
-            )
-          }
-          key={`select-${option.value}`}
-          value={mode === 'tags' ? `${option.value}` : option.value}
-          // key={option.id ? `${option.id}` : option.value}
-          disabled={!!option.disabled}
-        >
-          {typeof renderDropdown === 'function' ? (
-            renderDropdown(option)
-          ) : (
-            option.label
-          )}
-        </Select.Option>
-      ))
+            )}
+          </Select.Option>
+        )
+      })
   }
 
   getComponent = ({ inputRef, ...props }) => {

@@ -17,18 +17,19 @@ export const WIDGETS_ID = {
 
 export const widgets = (props) => [
   {
-    id: '1',
-    name: 'Clinical Notes',
-    authority: 'queue.consultation.clinicalnotes.clinicalnotes',
+    id: '3',
+    name: 'History',
+    authority: 'queue.consultation.clinicalnotes.history',
     component: Loadable({
       loader: () => import('./Notes'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='clinicalNote' />
+        return <Cmpnet {...props} {...p} fieldName='history' />
       },
       loading: Loading,
     }),
   },
+
   {
     id: '2',
     name: 'Chief Complaints',
@@ -38,6 +39,19 @@ export const widgets = (props) => [
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return <Cmpnet {...props} {...p} fieldName='chiefComplaints' />
+      },
+      loading: Loading,
+    }),
+  },
+  {
+    id: '1',
+    name: 'Clinical Notes',
+    authority: 'queue.consultation.clinicalnotes.clinicalnotes',
+    component: Loadable({
+      loader: () => import('./Notes'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} fieldName='note' />
       },
       loading: Loading,
     }),
@@ -69,14 +83,23 @@ export const widgets = (props) => [
     }),
   },
   {
-    id: '3',
-    name: 'Associated History',
-    authority: 'queue.consultation.clinicalnotes.associatedhistory',
+    id: '13',
+    name: 'Visual Acuity Test',
+    authority: 'queue.consultation.widgets.eyevisualacuity',
     component: Loadable({
-      loader: () => import('./Notes'),
+      loader: () => import('../EyeVisualAcuity'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='associatedHistory' />
+        return (
+          <Cmpnet
+            {...props}
+            {...p}
+            prefix='eyeVisualAcuityTestForms'
+            attachmentsFieldName='eyeVisualAcuityTestAttachments'
+            fromPatientHistory
+            values={p.patientHistory.entity}
+          />
+        )
       },
       loading: Loading,
     }),
@@ -107,19 +130,19 @@ export const widgets = (props) => [
       loading: Loading,
     }),
   },
-  {
-    id: '6',
-    name: 'Attachment',
-    authority: 'queue.consultation.widgets.attachment',
-    component: Loadable({
-      loader: () => import('./Attachment'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
-      },
-      loading: Loading,
-    }),
-  },
+  // {
+  //   id: '6',
+  //   name: 'Attachment',
+  //   authority: 'queue.consultation.widgets.attachment',
+  //   component: Loadable({
+  //     loader: () => import('./Attachment'),
+  //     render: (loaded, p) => {
+  //       let Cmpnet = loaded.default
+  //       return <Cmpnet {...props} {...p} />
+  //     },
+  //     loading: Loading,
+  //   }),
+  // },
   {
     id: '7',
     name: 'Orders',

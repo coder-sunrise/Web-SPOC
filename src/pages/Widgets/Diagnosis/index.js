@@ -7,6 +7,7 @@ import { withStyles } from '@material-ui/core'
 import Add from '@material-ui/icons/Add'
 import { AuthorizedContext, Button } from '@/components'
 import Item from './Item'
+import Authorized from '@/utils/Authorized'
 // import model from './models'
 
 // window.g_app.replaceModel(model)
@@ -37,6 +38,8 @@ const styles = (theme) => ({
 //   handleSubmit: () => {},
 //   displayName: 'Diagnosis',
 // })
+const { Secured } = Authorized
+@Secured('queue.consultation.widgets.diagnosis')
 @connect(({ diagnosis, components, codetable, consultation }) => ({
   diagnosis,
   codetable,

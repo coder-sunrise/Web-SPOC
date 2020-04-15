@@ -81,8 +81,8 @@ export default createFormViewModel({
       default: defaultPatientEntity,
     },
     subscriptions: ({ dispatch, history }) => {
-      history.listen(async (loct, method) => {
-        const { pathname, search, query = {} } = loct
+      history.listen(async (loct) => {
+        const { query = {} } = loct
 
         setTimeout(() => {
           if (query.md === 'pt' && query.cmt) {
@@ -106,8 +106,9 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *initState ({ payload }, { call, put, select, take }) {
-        let { currentId, version, currentComponent, md, newPatient } = payload
+      *initState ({ payload }, { put, select, take }) {
+        yield put({ type: 'initSchemeCodetable' })
+        let { currentId, version, md, newPatient } = payload
         if (newPatient) {
           yield put({ type: 'updateState', payload: { entity: null } })
         }
@@ -137,34 +138,32 @@ export default createFormViewModel({
             },
           })
       },
-      *waitLoadComplete ({ payload }, { call, put, select, take }) {
-        // let { currentId, version, currentComponent } = payload
+      *initSchemeCodetable (_, { put }) {
+        yield put({
+          type: 'codetable/fetchCodes',
+          payload: {
+            code: 'ctschemetype',
+            filter: {
+              isActive: true,
+            },
+          },
+        })
 
+        yield put({
+          type: 'codetable/fetchCodes',
+          payload: {
+            code: 'copaymentscheme',
+            force: true,
+            filter: {
+              isActive: undefined,
+            },
+          },
+        })
+      },
+      *waitLoadComplete (_, { take }) {
         yield take('patient/query/@@end')
         return ''
-        // const patient = yield select((state) => state.patient)
-        // if (
-        //   patient.version !== version ||
-        //   (patient.entity && patient.entity.id !== currentId)
-        // )
-        //   yield put({
-        //     type: 'query',
-        //     payload: {
-        //       id: currentId,
-        //       version,
-        //     },
-        //   })
       },
-      // *fetchList ({ payload }, { call, put }) {
-      //   const response = yield call(service.queryList)
-      //   console.log(response)
-      //   yield put({
-      //     type: 'updateState',
-      //     payload: {
-      //       list: Array.isArray(response) ? response : [],
-      //     },
-      //   })
-      // },
       *closePatientModal ({ payload }, { all, put, select }) {
         const patientState = yield select((st) => st.patient)
         const { history } = payload || { history: undefined }
@@ -211,12 +210,7 @@ export default createFormViewModel({
           ]
         }
         router.push(getRemovedUrl(shouldRemoveQueries))
-        // yield put({
-        //   type: 'updateState',
-        //   payload: {
-        //     entity: undefined,
-        //   },
-        // })
+
         return yield all([
           yield put({
             type: 'global/updateAppState',
@@ -238,7 +232,7 @@ export default createFormViewModel({
           }),
         ])
       },
-      *openPatientModal ({ payload = { callback: undefined } }, { call, put }) {
+      *openPatientModal ({ payload = { callback: undefined } }, { put }) {
         if (payload.callback) {
           yield put({
             type: 'updateState',
@@ -253,20 +247,6 @@ export default createFormViewModel({
           }),
         )
       },
-      // *queryOne ({ payload }, { call, put }) {
-      //   const response = yield call(service.query, payload)
-      //   yield put({
-      //     type: 'updateState',
-      //     payload: {
-      //       entity: response.data,
-      //     },
-      //   })
-      //   return response.data
-      // },
-      // *submit ({ payload }, { call }) {
-      //   // console.log(payload)
-      //   return yield call(service.upsert, payload)
-      // },
       *refreshChasBalance ({ payload }, { call }) {
         const {
           patientAccountNo,
@@ -294,6 +274,31 @@ export default createFormViewModel({
 
         return result
       },
+      *queryDone ({ payload }, { select, put }) {
+        const codetable = yield select((state) => state.codetable)
+        const { copaymentscheme = [] } = codetable
+
+        const { data } = payload
+        // console.log(payload)
+        data.patientScheme.forEach((ps) => {
+          if (ps.validFrom && ps.validTo)
+            ps.validRange = [
+              ps.validFrom,
+              ps.validTo,
+            ]
+          if (ps.coPaymentSchemeFK === null) {
+            ps.coPaymentSchemeFK = undefined
+          }
+
+          ps.preSchemeTypeFK = ps.schemeTypeFK
+        })
+        yield put({
+          type: 'updateState',
+          payload: {
+            entity: data,
+          },
+        })
+      },
     },
     reducers: {
       updateDefaultEntity (state, { payload }) {
@@ -308,25 +313,25 @@ export default createFormViewModel({
           },
         }
       },
-      queryDone (st, { payload }) {
-        const { data } = payload
-        // console.log(payload)
-        data.patientScheme.forEach((ps) => {
-          if (ps.validFrom && ps.validTo)
-            ps.validRange = [
-              ps.validFrom,
-              ps.validTo,
-            ]
-          if (ps.coPaymentSchemeFK === null) {
-            ps.coPaymentSchemeFK = undefined
-          }
-          ps.preSchemeTypeFK = ps.schemeTypeFK
-        })
-        return {
-          ...st,
-          entity: data,
-        }
-      },
+      // queryDone (st, { payload }) {
+      //   const { data } = payload
+      //   // console.log(payload)
+      //   data.patientScheme.forEach((ps) => {
+      //     if (ps.validFrom && ps.validTo)
+      //       ps.validRange = [
+      //         ps.validFrom,
+      //         ps.validTo,
+      //       ]
+      //     if (ps.coPaymentSchemeFK === null) {
+      //       ps.coPaymentSchemeFK = undefined
+      //     }
+      //     ps.preSchemeTypeFK = ps.schemeTypeFK
+      //   })
+      //   return {
+      //     ...st,
+      //     entity: data,
+      //   }
+      // },
     },
   },
 })

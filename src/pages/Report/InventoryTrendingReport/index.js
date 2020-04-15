@@ -23,8 +23,14 @@ class InventoryTrendingReport extends ReportBase {
     }
   }
 
-  renderFilterBar = (handleSubmit, isSubmitting) => {
-    return <FilterBar handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
+  renderFilterBar = (handleSubmit, isSubmitting, formikProps) => {
+    return (
+      <FilterBar
+        handleSubmit={handleSubmit}
+        isSubmitting={isSubmitting}
+        formikProps={formikProps}
+      />
+    )
   }
 
   renderContent = (reportDatas) => {

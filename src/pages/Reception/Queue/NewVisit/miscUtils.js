@@ -186,6 +186,15 @@ export const formikHandleSubmit = (
       .map(mapAttachmentToUploadInput)
   }
 
+  let _referralBy = null
+
+  if (typeof referralBy === 'string') {
+    _referralBy = referralBy
+  } else if (Array.isArray(referralBy) && referralBy.length > 0) {
+    // eslint-disable-next-line prefer-destructuring
+    _referralBy = referralBy[0]
+  }
+
   const payload = {
     cfg: {
       message: id ? 'Visit updated' : 'Visit created',
@@ -202,26 +211,11 @@ export const formikHandleSubmit = (
       appointmentFK,
       roomFK,
       visitStatus: VISIT_STATUS.WAITING,
-      visitRemarks: null,
-      temperatureC: null,
-      bpSysMMHG: null,
-      bpDiaMMHG: null,
-      heightCM: null,
-      weightKG: null,
-      bmi: null,
-      pulseRateBPM: null,
-      priorityTime: null,
-      priorityType: null,
-      referralPersonFK: null,
-      referralCompanyFK: null,
-      referralPerson: null,
-      referralDate: null,
       ...restValues, // override using formik values
-      referralBy: referralBy.length > 0 ? referralBy[0] : null,
+      referralBy: _referralBy,
     },
   }
 
-  // console.log({ payload })
   dispatch({
     type: 'visitRegistration/upsert',
     payload,
