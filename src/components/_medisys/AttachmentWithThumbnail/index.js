@@ -26,6 +26,7 @@ import { FILE_STATUS, FILE_CATEGORY, ATTACHMENT_TYPE } from '@/utils/constants'
 import { getThumbnail } from './utils'
 import styles from './styles'
 import { corAttchementTypes } from '@/utils/codes'
+import Authorized from '@/utils/Authorized'
 
 const allowedFiles = '.png, .jpg, .jpeg, .xls, .xlsx, .doc, .docx, .pdf'
 
@@ -298,12 +299,14 @@ const AttachmentWithThumbnail = ({
                       >
                         Consultation Attachment
                       </MenuItem>
-                      <MenuItem
-                        onClick={() =>
-                          onDropDownClick(ATTACHMENT_TYPE.EYEVISUALACUITY)}
-                      >
-                        Visual Acuity Test
-                      </MenuItem>
+                      <Authorized authority='queue.consultation.widgets.eyevisualacuity'>
+                        <MenuItem
+                          onClick={() =>
+                            onDropDownClick(ATTACHMENT_TYPE.EYEVISUALACUITY)}
+                        >
+                          Visual Acuity Test
+                        </MenuItem>
+                      </Authorized>
                     </MenuList>
                   </ClickAwayListener>
                 </Paper>
