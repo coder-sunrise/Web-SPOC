@@ -15,7 +15,7 @@ export const WIDGETS_ID = {
   TREATMENT: '10',
 }
 
-export const widgets = (props) => [
+export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
   {
     id: '1',
     name: 'Clinical Notes',
@@ -24,7 +24,14 @@ export const widgets = (props) => [
       loader: () => import('./Notes'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='clinicalNote' />
+        return (
+          <Cmpnet
+            {...props}
+            {...p}
+            scribbleNoteUpdateState={scribbleNoteUpdateState}
+            fieldName='note'
+          />
+        )
       },
       loading: Loading,
     }),
@@ -37,7 +44,14 @@ export const widgets = (props) => [
       loader: () => import('./Notes'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='chiefComplaints' />
+        return (
+          <Cmpnet
+            {...props}
+            {...p}
+            scribbleNoteUpdateState={scribbleNoteUpdateState}
+            fieldName='chiefComplaints'
+          />
+        )
       },
       loading: Loading,
     }),
@@ -50,7 +64,14 @@ export const widgets = (props) => [
       loader: () => import('./Notes'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='plan' />
+        return (
+          <Cmpnet
+            {...props}
+            scribbleNoteUpdateState={scribbleNoteUpdateState}
+            {...p}
+            fieldName='plan'
+          />
+        )
       },
       loading: Loading,
     }),

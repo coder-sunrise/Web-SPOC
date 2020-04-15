@@ -33,6 +33,7 @@ import {
 } from '@/components'
 import AmountSummary from '@/pages/Shared/AmountSummary'
 import { VISIT_TYPE } from '@/utils/constants'
+import AuthorizedContext from '@/components/Context/Authorized'
 
 const baseColumns = [
   { name: 'itemType', title: 'Type' },
@@ -115,7 +116,12 @@ export default ({ classes, current, theme, setFieldValue }) => {
           { columnName: 'description', width: 'auto' },
           { columnName: 'quantity', width: 90, type: 'number' },
           { columnName: 'dispenseUOMDisplayValue', width: 100 },
-          { columnName: 'adjAmt', type: 'number', currency: true, width: 120 },
+          {
+            columnName: 'adjAmt',
+            type: 'number',
+            currency: true,
+            width: 120,
+          },
           {
             columnName: 'totalAfterItemAdjustment',
             type: 'number',
@@ -132,32 +138,40 @@ export default ({ classes, current, theme, setFieldValue }) => {
       >
         <GridItem xs={2} md={9} />
         <GridItem xs={10} md={3}>
-          <AmountSummary
-            showAdjustment
-            rows={invoiceItemData}
-            adjustments={invoiceAdjustmentData}
-            config={{
-              isGSTInclusive: current.invoice
-                ? current.invoice.isGSTInclusive
-                : '',
-              totalField: 'totalAfterItemAdjustment',
-              adjustedField: 'totalAfterOverallAdjustment',
-              gstValue: current.invoice ? current.invoice.gstValue : undefined,
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
             }}
-            onValueChanged={(v) => {
-              // console.log('onValueChanged', v)
-              if (setFieldValue) {
-                setFieldValue(
-                  'current.invoice.invoiceTotalAftGST',
-                  v.summary.totalWithGST,
-                )
-                setFieldValue(
-                  'current.invoice.invoiceAdjustment',
-                  v.adjustments,
-                )
-              }
-            }}
-          />
+          >
+            <AmountSummary
+              showAdjustment
+              rows={invoiceItemData}
+              adjustments={invoiceAdjustmentData}
+              config={{
+                isGSTInclusive: current.invoice
+                  ? current.invoice.isGSTInclusive
+                  : '',
+                totalField: 'totalAfterItemAdjustment',
+                adjustedField: 'totalAfterOverallAdjustment',
+                gstValue: current.invoice
+                  ? current.invoice.gstValue
+                  : undefined,
+              }}
+              onValueChanged={(v) => {
+                // console.log('onValueChanged', v)
+                if (setFieldValue) {
+                  setFieldValue(
+                    'current.invoice.invoiceTotalAftGST',
+                    v.summary.totalWithGST,
+                  )
+                  setFieldValue(
+                    'current.invoice.invoiceAdjustment',
+                    v.adjustments,
+                  )
+                }
+              }}
+            />
+          </AuthorizedContext.Provider>
         </GridItem>
       </GridContainer>
     </div>

@@ -12,6 +12,7 @@ import Circle from './circle'
 import Pan from './pan'
 import Eraser from './eraser'
 import Tool from './tools'
+import None from './none'
 
 const { fabric } = require('fabric')
 
@@ -90,6 +91,7 @@ class SketchField extends PureComponent {
     this._tools[Tool.Circle] = new Circle(fabricCanvas)
     this._tools[Tool.Pan] = new Pan(fabricCanvas)
     this._tools[Tool.Eraser] = new Eraser(fabricCanvas)
+    this._tools[Tool.None] = new None(fabricCanvas)
   }
 
   /**
