@@ -1,6 +1,6 @@
 import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
-import * as service from '../services/invoicePayment'
+import * as service from '@/services/invoicePayment'
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
 const InitialCreditNote = {

@@ -11,6 +11,9 @@ export default createListViewModel({
     service,
     state: {
       default: {},
+      invoiceHistory: {
+        list: [],
+      },
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -106,13 +109,13 @@ export default createListViewModel({
           },
         })
       },
-      *queryDispenseHistory ({payload},{call,put}){
+      *queryDispenseHistory ({ payload }, { call, put }) {
         const response = yield call(service.queryDispenseHistory, payload)
         if (response.status === '200') {
           yield put({
             type: 'updateState',
             payload: {
-              dispenseHistory : response.data,
+              dispenseHistory: response.data,
             },
           })
           return response.data
@@ -125,6 +128,19 @@ export default createListViewModel({
         if (response.status === '200') {
           yield put({
             type: 'getRetailHistory',
+            payload: response,
+          })
+          return response
+        }
+        return false
+      },
+
+      *queryInvoiceHistory ({ payload }, { call, put }) {
+        const response = yield call(service.queryInvoiceHistory, payload)
+
+        if (response.status === '200') {
+          yield put({
+            type: 'getInvoiceHistory',
             payload: response,
           })
           return response
@@ -158,6 +174,16 @@ export default createListViewModel({
           entity: data,
           selected: defaultItem,
           selectedSubRow: defaultItem,
+        }
+      },
+      getInvoiceHistory (st, { payload }) {
+        const { data } = payload
+        return {
+          ...st,
+          invoiceHistory: {
+            entity: data,
+            list: data.data,
+          },
         }
       },
     },

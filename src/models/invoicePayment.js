@@ -297,11 +297,13 @@ export default createFormViewModel({
 
             return { ...payment, paymentTxnList }
           })
+
           return {
             ...state,
             entity: [
               ...paymentResult,
             ],
+            currentId: paymentResult[0].invoiceFK,
           }
         }
 
