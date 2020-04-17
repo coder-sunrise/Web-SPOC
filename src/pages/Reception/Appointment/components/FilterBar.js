@@ -69,30 +69,32 @@ const FilterBar = (props) => {
           <Field
             name='filterByDoctor'
             render={(args) => (
-              <CodeSelect
-                {...args}
-                disableAll
-                allowClear={false}
-                label='Filter by Doctor'
-                mode='multiple'
-                remoteFilter={{
-                  'clinicianProfile.isActive': true,
-                }}
-                localFilter={(option) => option.clinicianProfile.isActive}
-                code='doctorprofile'
-                labelField='clinicianProfile.name'
-                valueField='clinicianProfile.id'
-                maxTagCount={maxDoctorTagCount}
-                maxSelected={5}
-                maxTagPlaceholder='doctors'
-                renderDropdown={renderDropdown}
-                onChange={(v) => {
-                  sessionStorage.setItem(
-                    'appointmentDoctors',
-                    JSON.stringify(v),
-                  )
-                }}
-              />
+              <Authorized authority='appointment.viewotherappointment'>
+                <CodeSelect
+                  {...args}
+                  disableAll
+                  allowClear={false}
+                  label='Filter by Doctor'
+                  mode='multiple'
+                  remoteFilter={{
+                    'clinicianProfile.isActive': true,
+                  }}
+                  localFilter={(option) => option.clinicianProfile.isActive}
+                  code='doctorprofile'
+                  labelField='clinicianProfile.name'
+                  valueField='clinicianProfile.id'
+                  maxTagCount={maxDoctorTagCount}
+                  maxSelected={5}
+                  maxTagPlaceholder='doctors'
+                  renderDropdown={renderDropdown}
+                  onChange={(v) => {
+                    sessionStorage.setItem(
+                      'appointmentDoctors',
+                      JSON.stringify(v),
+                    )
+                  }}
+                />
+              </Authorized>
             )}
           />
         </GridItem>

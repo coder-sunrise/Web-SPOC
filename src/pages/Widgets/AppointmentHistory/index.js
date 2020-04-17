@@ -5,7 +5,8 @@ import { withStyles } from '@material-ui/core'
 import { CardContainer, CommonTableGrid } from '@/components'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
 import { queryList as queryAppointments } from '@/services/calendar'
-import { futureApptTableParams,previousApptTableParams} from './variables'
+import { futureApptTableParams, previousApptTableParams } from './variables'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   gridRow: {
@@ -19,9 +20,9 @@ const styles = (theme) => ({
   },
 })
 
-
-@connect(({ patient }) => ({
+@connect(({ patient, user }) => ({
   patient: patient.entity || {},
+  user,
 }))
 class AppointmentHistory extends PureComponent {
   state = {
@@ -44,32 +45,50 @@ class AppointmentHistory extends PureComponent {
   }
 
   async getAppts (patientId) {
+    const { user } = this.props
     const commonParams = {
       combineCondition: 'and',
       sorting: [
         { columnName: 'appointmentDate', direction: 'asc' },
       ],
     }
+
+    const viewOtherApptAccessRight = Authorized.check(
+      'appointment.viewotherappointment',
+    )
+
+    let doctor
+    if (
+      !viewOtherApptAccessRight ||
+      viewOtherApptAccessRight.rights !== 'enable'
+    ) {
+      doctor = user.data.clinicianProfile.id
+    }
+
     const [
       previous,
       future,
     ] = await Promise.all([
       queryAppointments({
-        apiCriteria:{
-          appStatus:[
+        apiCriteria: {
+          appStatus: [
             APPOINTMENT_STATUS.CANCELLED,
             APPOINTMENT_STATUS.TURNEDUP,
-            APPOINTMENT_STATUS.NOSHOW].join(),
+            APPOINTMENT_STATUS.NOSHOW,
+          ].join(),
           patientProfileId: patientId,
+          doctor,
         },
         ...commonParams,
       }),
       queryAppointments({
-        apiCriteria:{
+        apiCriteria: {
           appStatus: [
-          APPOINTMENT_STATUS.SCHEDULED,
-          APPOINTMENT_STATUS.RESCHEDULED].join(),
+            APPOINTMENT_STATUS.SCHEDULED,
+            APPOINTMENT_STATUS.RESCHEDULED,
+          ].join(),
           patientProfileId: patientId,
+          doctor,
         },
         ...commonParams,
       }),
@@ -145,10 +164,7 @@ class AppointmentHistory extends PureComponent {
     const { previousAppt, futureAppt } = this.state
     return (
       <div>
-        <CardContainer
-          hideHeader
-          size='sm'
-        >
+        <CardContainer hideHeader size='sm'>
           <h4 style={{ marginTop: 20 }}>Previous Appointment</h4>
 
           <CommonTableGrid

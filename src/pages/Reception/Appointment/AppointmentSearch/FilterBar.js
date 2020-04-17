@@ -30,7 +30,7 @@ import {
 import { appointmentStatusReception } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
 
-const createPayload = (values) => {
+const createPayload = (values, viewOtherApptAccessRight, isActiveDoctor) => {
   const {
     filterByDoctor = [],
     filterByRoomBlockGroup = [],
@@ -55,11 +55,22 @@ const createPayload = (values) => {
         : undefined,
   }
 
+  let selectedDoctor = filterByDoctor
+
+  if (
+    (!viewOtherApptAccessRight ||
+      viewOtherApptAccessRight.rights !== 'enable') &&
+    !isActiveDoctor
+  ) {
+    selectedDoctor = [
+      -1,
+    ]
+  }
   if (isPrint) {
     return {
       ...commonPayload,
       bookBy: bookBy.length > 0 ? bookBy : undefined,
-      doctor: filterByDoctor.length > 0 ? filterByDoctor : undefined,
+      doctor: selectedDoctor.length > 0 ? selectedDoctor : undefined,
       room: filterByRoomBlockGroup > 0 ? filterByRoomBlockGroup : undefined,
       SearchText: searchValue || undefined,
       ApptType: filterByApptType.length > 0 ? filterByApptType : undefined,
@@ -73,7 +84,7 @@ const createPayload = (values) => {
   return {
     ...commonPayload,
     bookBy: bookBy.join() || undefined,
-    doctor: filterByDoctor.join() || undefined,
+    doctor: selectedDoctor.join() || undefined,
     room: filterByRoomBlockGroup.join() || undefined,
     searchValue: searchValue || undefined,
     appType: filterByApptType.join() || undefined,
@@ -94,6 +105,8 @@ const FilterBar = ({
     filterByRoomBlockGroup = [],
     filterByAppointmentStatus = [],
   } = values
+
+  const { viewOtherApptAccessRight, isActiveDoctor } = restValues
 
   const [
     showReport,
@@ -133,33 +146,35 @@ const FilterBar = ({
           <Field
             name='filterByDoctor'
             render={(args) => (
-              <CodeSelect
-                {...args}
-                // allLabel='All Doctors'
-                // disableAll
-                // allValue={-99}
-                allValueOption={{
-                  clinicianProfile: {
-                    name: 'All',
-                    id: -99,
-                  },
-                }}
-                allowClear={false}
-                label='Filter by Doctor'
-                mode='multiple'
-                // code='clinicianprofile'
-                // labelField='name'
-                // valueField='id'
-                remoteFilter={{
-                  'clinicianProfile.isActive': true,
-                }}
-                code='doctorprofile'
-                labelField='clinicianProfile.name'
-                valueField='clinicianProfile.id'
-                maxTagCount={maxDoctorTagCount}
-                maxTagPlaceholder='doctors'
-                renderDropdown={renderDropdown}
-              />
+              <Authorized authority='appointment.viewotherappointment'>
+                <CodeSelect
+                  {...args}
+                  // allLabel='All Doctors'
+                  // disableAll
+                  // allValue={-99}
+                  allValueOption={{
+                    clinicianProfile: {
+                      name: 'All',
+                      id: -99,
+                    },
+                  }}
+                  allowClear={false}
+                  label='Filter by Doctor'
+                  mode='multiple'
+                  // code='clinicianprofile'
+                  // labelField='name'
+                  // valueField='id'
+                  remoteFilter={{
+                    'clinicianProfile.isActive': true,
+                  }}
+                  code='doctorprofile'
+                  labelField='clinicianProfile.name'
+                  valueField='clinicianProfile.id'
+                  maxTagCount={maxDoctorTagCount}
+                  maxTagPlaceholder='doctors'
+                  renderDropdown={renderDropdown}
+                />
+              </Authorized>
             )}
           />
         </GridItem>
@@ -308,7 +323,7 @@ const FilterBar = ({
           showTopDivider={false}
           reportID={38}
           reportParameters={{
-            ...createPayload(values),
+            ...createPayload(values, viewOtherApptAccessRight, isActiveDoctor),
           }}
           defaultScale={1.5}
         />
@@ -326,13 +341,13 @@ export default memo(
       }),
     }),
     handleSubmit: (values, { props }) => {
-      const { dispatch } = props
+      const { dispatch, viewOtherApptAccessRight, isActiveDoctor } = props
 
       dispatch({
         type: `appointment/query`,
         payload: {
           apiCriteria: {
-            ...createPayload(values),
+            ...createPayload(values, viewOtherApptAccessRight, isActiveDoctor),
           },
         },
       })

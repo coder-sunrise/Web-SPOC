@@ -74,12 +74,13 @@ export const flattenAppointmentDateToCalendarEvents = (massaged, event) =>
         // }),
       ]
 
-@connect(({ calendar, codetable, clinicInfo, loading }) => ({
+@connect(({ calendar, codetable, clinicInfo, loading, user }) => ({
   calendar,
   calendarLoading: loading.models.calendar,
   // doctorProfiles: codetable.doctorprofile || [],
   clinicInfo,
   doctorprofile: codetable.doctorprofile || [],
+  user,
 }))
 class Appointment extends React.PureComponent {
   state = {
@@ -147,6 +148,9 @@ class Appointment extends React.PureComponent {
           sessionStorage.getItem('appointmentDoctors') || '[]',
         )
 
+        const viewOtherApptAccessRight = Authorized.check(
+          'appointment.viewotherappointment',
+        )
         resources = response
           .filter((clinician) => clinician.clinicianProfile.isActive)
           .filter(
@@ -155,6 +159,15 @@ class Appointment extends React.PureComponent {
                 ? lastSelected.includes(_.clinicianProfile.id)
                 : index < 5,
           )
+          .filter((activeclinician) => {
+            const { user } = this.props
+            return (
+              (viewOtherApptAccessRight &&
+                viewOtherApptAccessRight.rights === 'enable') ||
+              activeclinician.clinicianProfile.id ===
+                user.data.clinicianProfile.id
+            )
+          })
           .map((clinician) => ({
             clinicianFK: clinician.clinicianProfile.id,
             doctorName: clinician.clinicianProfile.name,
@@ -509,6 +522,8 @@ class Appointment extends React.PureComponent {
       classes,
       calendarLoading,
       dispatch,
+      user,
+      doctorprofile,
     } = this.props
     const {
       showPopup,
@@ -615,6 +630,8 @@ class Appointment extends React.PureComponent {
           <AppointmentSearch
             handleSelectEvent={this.onSelectEvent}
             handleAddAppointmentClick={this.handleAddAppointmentClick}
+            currentUser={user.data.clinicianProfile.id}
+            doctorprofile={doctorprofile}
           />
         </CommonModal>
       </CardContainer>

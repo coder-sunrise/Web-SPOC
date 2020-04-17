@@ -40,6 +40,8 @@ const Grid = ({
   columnsExtensions,
   setSelectedRows,
   selectedRows,
+  user,
+  doctorprofile = [],
 }) => {
   const [
     showMessageModal,
@@ -140,7 +142,11 @@ const Grid = ({
 
   return (
     <React.Fragment>
-      <FilterBar {...filterBarProps} />
+      <FilterBar
+        {...filterBarProps}
+        currentUser={user.data.clinicianProfile.id}
+        doctorprofile={doctorprofile}
+      />
       <CommonTableGrid
         type={type === 'Appointment' ? 'smsAppointment' : 'smsPatient'}
         onSelectionChange={handleSelectionChange}
