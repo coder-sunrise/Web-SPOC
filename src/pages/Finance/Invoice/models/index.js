@@ -1,6 +1,6 @@
 import moment from 'moment'
 import { createListViewModel } from 'medisys-model'
-import * as service from '../services'
+import * as service from '@/services/invoice'
 
 const defaultFilterValues = {
   invoiceStartDate: moment().add(-1, 'month').formatUTC(),
