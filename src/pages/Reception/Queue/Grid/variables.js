@@ -66,6 +66,7 @@ export const AppointmentTableConfig = {
     { name: 'doctorName', title: 'Doctor' },
     { name: 'appointmentTime', title: 'Appt. Time' },
     { name: 'roomNo', title: 'Room No.' },
+    { name: 'remarks', title: 'Remarks' },
     { name: 'patientContactNo', title: 'Phone' },
     { name: 'action', title: 'Action' },
   ],
@@ -120,6 +121,11 @@ export const ApptColumnExtensions = [
     render: (row) => row.roomNo || '-',
   },
   {
+    columnName: 'remarks',
+    width: 180,
+    render: (row) => row.remarks || '-',
+  },
+  {
     columnName: 'appointmentTime',
     width: 180,
     type: 'date',
@@ -137,6 +143,7 @@ export const QueueTableConfig = {
     { name: 'doctor', title: 'Doctor' },
     { name: 'appointmentTime', title: 'Appt. Time' },
     { name: 'roomNo', title: 'Room No.' },
+    { name: 'remarks', title: 'Remarks' },
     { name: 'timeIn', title: 'Time In' },
     { name: 'timeOut', title: 'Time Out' },
     { name: 'invoiceNo', title: 'Invoice No' },
@@ -196,6 +203,10 @@ export const QueueColumnExtensions = [
   { columnName: 'invoiceNo' },
   {
     columnName: 'roomNo',
+  },
+  {
+    columnName: 'remarks',
+    width: 180,
   },
   // {
   //   columnName: 'patientScheme',
