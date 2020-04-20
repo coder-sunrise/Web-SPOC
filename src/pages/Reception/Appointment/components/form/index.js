@@ -275,7 +275,13 @@ class Form extends React.PureComponent {
   }
 
   onSelectPatientClick = async (patientProfile, autoPopulate = false) => {
-    const { id, patientAccountNo, name, mobileNo } = patientProfile
+    const {
+      id,
+      patientAccountNo,
+      name,
+      mobileNo,
+      countryCodeFK,
+    } = patientProfile
     const { values, setValues } = this.props
     await setValues({
       ...values,
@@ -283,6 +289,7 @@ class Form extends React.PureComponent {
       patientProfileFK: id,
       patientName: name,
       patientContactNo: mobileNo,
+      countryCodeFK,
     })
     this.refreshPatient(id)
     if (!autoPopulate) this.toggleSearchPatientModal()
