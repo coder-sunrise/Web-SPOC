@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import Loadable from 'react-loadable'
 // material ui
 import Add from '@material-ui/icons/Add'
@@ -6,13 +7,15 @@ import Loading from '@/components/PageLoading/index'
 import { Tooltip, AuthorizedContext, IconButton } from '@/components'
 // utils
 import { CLINIC_TYPE } from '@/utils/constants'
+import Authorized from '@/utils/Authorized'
 
 const clinicInfo = JSON.parse(localStorage.getItem('clinicInfo') || {})
 const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
 const widgets = [
   {
     id: '1',
-    name: clinicTypeFK === CLINIC_TYPE.GP ? 'Clinical Notes' : 'Dental Notes',
+    name:
+      clinicTypeFK !== CLINIC_TYPE.DENTAL ? 'Clinical Notes' : 'Dental Notes',
     accessRight: 'queue.consultation.widgets.clinicalnotes',
     component: Loadable({
       loader: () => import('@/pages/Widgets/ClinicalNotes'),
@@ -251,22 +254,24 @@ const widgets = [
       },
     },
     toolbarAddon: (
-      <Tooltip title='Add Vital Sign'>
-        <IconButton
-          style={{ float: 'left' }}
-          className='non-dragable'
-          onClick={() => {
-            window.g_app._store.dispatch({
-              type: 'patientVitalSign/updateState',
-              payload: {
-                shouldAddNew: true,
-              },
-            })
-          }}
-        >
-          <Add />
-        </IconButton>
-      </Tooltip>
+      <Authorized authority='queue.consultation.widgets.vitalsign'>
+        <Tooltip title='Add Vital Sign'>
+          <IconButton
+            style={{ float: 'left' }}
+            className='non-dragable'
+            onClick={() => {
+              window.g_app._store.dispatch({
+                type: 'patientVitalSign/updateState',
+                payload: {
+                  shouldAddNew: true,
+                },
+              })
+            }}
+          >
+            <Add />
+          </IconButton>
+        </Tooltip>
+      </Authorized>
     ),
   },
 
@@ -317,28 +322,33 @@ const widgets = [
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return (
-          <Cmpnet
-            {...p}
-            prefix='corEyeVisualAcuityTest.eyeVisualAcuityTestForms'
-            attachmentsFieldName='corAttachment'
-            handleUpdateAttachments={({
-              updated,
-              form,
-              dispatch,
-              consultation,
-            }) => {
-              // console.log(updated, form, dispatch, consultation)
-              form.setFieldValue('corAttachment', updated)
-              const { entity } = consultation
-              entity.corAttachment = updated
-              dispatch({
-                type: 'consultation/updateState',
-                payload: {
-                  entity,
-                },
-              })
-            }}
-          />
+          <Fragment>
+            <Authorized authority='queue.consultation.widgets.eyevisualacuity'>
+              <Cmpnet
+                {...p}
+                prefix='corEyeVisualAcuityTest.eyeVisualAcuityTestForms'
+                attachmentsFieldName='corAttachment'
+                fromConsultation
+                handleUpdateAttachments={({
+                  updated,
+                  form,
+                  dispatch,
+                  consultation,
+                }) => {
+                  // console.log(updated, form, dispatch, consultation)
+                  form.setFieldValue('corAttachment', updated)
+                  const { entity } = consultation
+                  entity.corAttachment = updated
+                  dispatch({
+                    type: 'consultation/updateState',
+                    payload: {
+                      entity,
+                    },
+                  })
+                }}
+              />
+            </Authorized>
+          </Fragment>
         )
       },
       loading: Loading,

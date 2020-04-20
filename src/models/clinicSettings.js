@@ -1,6 +1,7 @@
 import { createFormViewModel } from 'medisys-model'
 import humps from 'humps'
 import * as service from '../services/clinicSettings'
+import { initClinicSettings } from '@/utils/config'
 
 export default createFormViewModel({
   namespace: 'clinicSettings',
@@ -54,7 +55,7 @@ export default createFormViewModel({
 
         const clinicSettingsSessionData = JSON.stringify(settings)
         localStorage.setItem('clinicSettings', clinicSettingsSessionData)
-
+        initClinicSettings()
         return {
           settings,
           entity,

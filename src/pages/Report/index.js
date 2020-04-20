@@ -66,47 +66,45 @@ class Report extends React.Component {
     const { classes, theme } = this.props
 
     return Object.keys(this.group).map((o) => {
+      const filtered = this.group[o].filter(filterByAccessRight).filter((m) => {
+        return (
+          m.text.toLocaleLowerCase().indexOf(this.state.searchText) >= 0 ||
+          !this.state.searchText
+        )
+      })
       return {
         title: o,
         items: this.group[o],
+        itemCount: filtered.length,
         content: (
           <GridContainer style={{ marginTop: theme.spacing(1) }} key={o}>
-            {this.group[o]
-              .filter(filterByAccessRight)
-              .filter((m) => {
-                return (
-                  m.text.toLocaleLowerCase().indexOf(this.state.searchText) >=
-                    0 || !this.state.searchText
-                )
-              })
-              .map((item) => {
-                const accessRight = Authorized.check(item.authority)
-                const isDisabled =
-                  accessRight && accessRight.rights === 'disable'
-                return (
-                  <GridItem
-                    key={item.name}
-                    xs={4}
-                    md={2}
-                    style={{ marginBottom: theme.spacing(2) }}
+            {filtered.map((item) => {
+              const accessRight = Authorized.check(item.authority)
+              const isDisabled = accessRight && accessRight.rights === 'disable'
+              return (
+                <GridItem
+                  key={item.name}
+                  xs={4}
+                  md={2}
+                  style={{ marginBottom: theme.spacing(2) }}
+                >
+                  <Button
+                    fullWidth
+                    color='primary'
+                    className={classnames({
+                      [classes.bigviewBtn]: true,
+                      // [classes.longTextBtn]: item.longText,
+                    })}
+                    variant='outlined'
+                    id={item.url}
+                    onClick={this.onButtonClick}
+                    disabled={isDisabled}
                   >
-                    <Button
-                      fullWidth
-                      color='primary'
-                      className={classnames({
-                        [classes.bigviewBtn]: true,
-                        // [classes.longTextBtn]: item.longText,
-                      })}
-                      variant='outlined'
-                      id={item.url}
-                      onClick={this.onButtonClick}
-                      disabled={isDisabled}
-                    >
-                      {item.text}
-                    </Button>
-                  </GridItem>
-                )
-              })}
+                    {item.text}
+                  </Button>
+                </GridItem>
+              )
+            })}
           </GridContainer>
         ),
       }
@@ -114,13 +112,15 @@ class Report extends React.Component {
   }
 
   render () {
+    const menus = this.menus().filter((item) => item.itemCount > 0)
+
     return (
       <CardContainer hideHeader>
         <TextField prefix={<Search />} onChange={this.onFilterChange} />
         <Accordion
           defaultActive={0}
           mode={this.state.searchText.length > 0 ? 'multiple' : 'default'}
-          collapses={this.menus().filter((item) => {
+          collapses={menus.filter((item) => {
             return (
               !this.state.searchText ||
               // item.title.toLocaleLowerCase().indexOf(this.state.searchText) >=

@@ -28,6 +28,9 @@ let i = 0
   visitRegistration,
 }))
 @withFormikExtend({
+  authority: [
+    'queue.consultation.order.vaccination',
+  ],
   mapPropsToValues: ({ orders = {} }) => {
     const newOrders = orders.entity || orders.defaultVaccination
 

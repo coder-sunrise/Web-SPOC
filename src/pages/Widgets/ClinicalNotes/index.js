@@ -16,19 +16,12 @@ import {
 } from '@/components'
 import CannedText from './CannedText'
 import CannedTextButton from './CannedText/CannedTextButton'
-import UploadAttachment from './UploadAttachment'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 import model from './models'
 import cannedTextModel from './models/cannedText'
 import { navigateDirtyCheck } from '@/utils/utils'
 import { getDefaultActivePanel, getConfig, getContent } from './utils'
 import Authorized from '@/utils/Authorized'
-import { CLINIC_TYPE } from '@/utils/constants'
-
-const PREFIX = {
-  GP: 'corDoctorNote',
-  DENTAL: 'corDentalNotes',
-}
 
 const styles = (theme) => ({
   editor: {
@@ -396,6 +389,10 @@ class ClinicalNotes extends Component {
 
   handleAddCannedText = (cannedText) => {
     const { cannedTextRow } = this.state
+    const { authority } = cannedTextRow
+    const accessRight = Authorized.check(authority)
+
+    if (accessRight && accessRight.rights !== 'enable') return
 
     const { consultation, prefix } = this.props
 
@@ -455,7 +452,6 @@ class ClinicalNotes extends Component {
 
     const { config, contents, showCannedText } = this.state
     const { entity = {} } = consultation
-
     const { fields } = config
     const panels = contents.filter((item) => {
       const accessRight = Authorized.check(item.authority)
@@ -524,7 +520,6 @@ class ClinicalNotes extends Component {
             const onCannedTextClick = () =>
               this.handleCannedTextButtonClick(item)
             const onSettingClick = () => this.openCannedText(item)
-
             return {
               title: item.fieldTitle,
               content: (
@@ -533,47 +528,55 @@ class ClinicalNotes extends Component {
                     name={`${prefix}[0]${item.fieldName}`}
                     render={(args) => {
                       return (
-                        <div>
-                          <div
-                            style={{
-                              position: 'absolute',
-                              zIndex: 1,
-                              left: 305,
-                              right: 0,
-                              top: 10,
-                            }}
-                          >
-                            <ScribbleNoteItem
-                              scribbleNoteUpdateState={
-                                this.scribbleNoteUpdateState
-                              }
-                              category={item.category}
-                              arrayName={item.scribbleField}
-                              categoryIndex={item.scribbleNoteTypeFK}
-                              scribbleNoteArray={
-                                scriblenotes[item.category][item.scribbleField]
-                              }
-                              gridItemWidth={this.state.width}
-                            />
+                        <Authorized authority={item.authority}>
+                          <div>
+                            <div
+                              style={{
+                                position: 'absolute',
+                                zIndex: 1,
+                                left: 305,
+                                right: 0,
+                                top: 10,
+                              }}
+                            >
+                              <ScribbleNoteItem
+                                scribbleNoteUpdateState={
+                                  this.scribbleNoteUpdateState
+                                }
+                                category={item.category}
+                                arrayName={item.scribbleField}
+                                categoryIndex={item.scribbleNoteTypeFK}
+                                scribbleNoteArray={
+                                  scriblenotes[item.category][
+                                    item.scribbleField
+                                  ]
+                                }
+                                gridItemWidth={this.state.width}
+                              />
 
-                            <CannedTextButton
-                              onSettingClick={onSettingClick}
-                              onCannedTextClick={onCannedTextClick}
-                              cannedTextTypeFK={item.cannedTextTypeFK}
-                              handleSelectCannedText={this.handleAddCannedText}
+                              <Authorized authority='settings.cannedtext'>
+                                <CannedTextButton
+                                  onSettingClick={onSettingClick}
+                                  onCannedTextClick={onCannedTextClick}
+                                  cannedTextTypeFK={item.cannedTextTypeFK}
+                                  handleSelectCannedText={
+                                    this.handleAddCannedText
+                                  }
+                                />
+                              </Authorized>
+                            </div>
+
+                            <RichEditor
+                              autoFocus={index === 0}
+                              style={{ marginBottom: 0 }}
+                              strongLabel
+                              onBlur={this.onEditorChange(item.fieldName)}
+                              // label='Chief Complaints'
+                              height={item.height}
+                              {...args}
                             />
                           </div>
-
-                          <RichEditor
-                            autoFocus={index === 0}
-                            style={{ marginBottom: 0 }}
-                            strongLabel
-                            onBlur={this.onEditorChange(item.fieldName)}
-                            // label='Chief Complaints'
-                            height={item.height}
-                            {...args}
-                          />
-                        </div>
+                        </Authorized>
                       )
                     }}
                   />

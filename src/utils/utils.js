@@ -1162,7 +1162,7 @@ const commonDataReaderTransform = (data, fieldName, keepNull = false) => {
 
 const commonDataWriterTransform = (data) => {
   const { getClinic } = config
-  const { systemTimeZoneInt = 0 } = getClinic() || {}
+  const { systemTimeZoneInt = 8 } = getClinic() || {}
   if (typeof data === 'object') {
     if (Array.isArray(data)) {
       data.forEach((element) => {

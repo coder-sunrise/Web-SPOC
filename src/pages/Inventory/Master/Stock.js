@@ -17,7 +17,7 @@ import {
   Tooltip,
   Button,
   notification,
-  serverDateFormat,
+  dateFormatLong,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 
@@ -145,7 +145,7 @@ const Stock = ({
 
   const checkIsReadOnly = () => {
     const accessRight = Authorized.check(authority)
-    if (!accessRight || (accessRight && accessRight.rights !== 'readwrite'))
+    if (!accessRight || (accessRight && accessRight.rights !== 'enable'))
       return true
     return false
   }
@@ -189,7 +189,7 @@ const Stock = ({
         render: (row) => (
           <p className={row.isDeleted && classes.isDeleted}>
             {row.expiryDate ? (
-              moment(row.expiryDate).format(serverDateFormat)
+              moment(row.expiryDate).format(dateFormatLong)
             ) : (
               '-'
             )}

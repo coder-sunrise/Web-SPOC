@@ -33,6 +33,7 @@ import {
   constructPayload,
   validateApplySchemesWithPatientSchemes,
 } from './utils'
+import Authorized from '@/utils/Authorized'
 
 // window.g_app.replaceModel(model)
 
@@ -59,6 +60,7 @@ const styles = (theme) => ({
   },
 })
 
+// @Authorized.Secured('queue.dispense.makepayment')
 @connect(
   ({
     global,
@@ -83,6 +85,9 @@ const styles = (theme) => ({
   }),
 )
 @withFormikExtend({
+  // authority: [
+  //   'queue.dispense.makepayment',
+  // ],
   notDirtyDuration: 3,
   displayName: 'BillingForm',
   enableReinitialize: true,
@@ -123,6 +128,7 @@ const styles = (theme) => ({
     return { ...billing.default, visitId: billing.visitID }
   },
 })
+@Authorized.Secured('queue.dispense.makepayment')
 class Billing extends Component {
   state = {
     showReport: false,

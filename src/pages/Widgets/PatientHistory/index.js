@@ -23,7 +23,7 @@ import Authorized from '@/utils/Authorized'
 import AuthorizedContext from '@/components/Context/Authorized'
 // utils
 import { findGetParameter } from '@/utils/utils'
-import {  VISIT_TYPE} from '@/utils/constants'
+import { VISIT_TYPE } from '@/utils/constants'
 import * as WidgetConfig from './config'
 
 const styles = (theme) => ({
@@ -76,10 +76,6 @@ const styles = (theme) => ({
     width: '100%',
   },
 })
-@withFormikExtend({
-  mapPropsToValues: ({ patientHistory }) => {
-  },
-})
 
 @connect(({ patientHistory, clinicInfo, clinicSettings, codetable, user }) => ({
   patientHistory,
@@ -88,7 +84,28 @@ const styles = (theme) => ({
   user,
   clinicInfo,
 }))
+@withFormikExtend({
+  enableReinitialize: true,
+  mapPropsToValues: ({ patientHistory }) => {
+    const returnValue = patientHistory.entity
+      ? patientHistory.entity
+      : patientHistory.default
 
+    return {
+      ...returnValue,
+      eyeVisualAcuityTestAttachments: (returnValue.eyeVisualAcuityTestAttachments ||
+        [])
+        .map((eyeAttachment) => eyeAttachment.attachment),
+    }
+  },
+})
+@connect(({ patientHistory, clinicInfo, clinicSettings, codetable, user }) => ({
+  patientHistory,
+  clinicSettings,
+  codetable,
+  user,
+  clinicInfo,
+}))
 class PatientHistory extends Component {
   static defaultProps = {
     mode: 'split',

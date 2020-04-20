@@ -30,7 +30,6 @@ import { podoOrderType } from '@/utils/codes'
 import { INVOICE_STATUS, PURCHASE_ORDER_STATUS } from '@/utils/constants'
 import AuthorizedContext from '@/components/Context/Authorized'
 import AmountSummary from '@/pages/Shared/AmountSummary'
-import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   errorMsgStyle: {
@@ -45,9 +44,11 @@ const styles = (theme) => ({
   },
 })
 
-const { Secured } = Authorized
-@Secured('purchasingandreceiving.purchasingandreceivingdetails')
 @withFormikExtend({
+  authority: [
+    'purchasingandreceiving.newpurchasingandreceiving',
+    'purchasingandreceiving.purchasingandreceivingdetails',
+  ],
   displayName: 'purchaseOrderDetails',
   enableReinitialize: true,
   mapPropsToValues: ({ purchaseOrderDetails }) => {
@@ -526,7 +527,6 @@ class Index extends Component {
       setFieldValue,
       errors,
       classes,
-      rights,
     } = this.props
     const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
@@ -549,7 +549,7 @@ class Index extends Component {
     return (
       <AuthorizedContext.Provider
         value={{
-          rights: type === 'new' ? 'enable' : rights,
+          rights: this.isEditable(poStatus, isWriteOff) ? 'enable' : 'disable',
         }}
       >
         <POForm

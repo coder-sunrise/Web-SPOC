@@ -29,8 +29,15 @@ import {
 } from '@/components'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
+import Authorized from '@/utils/Authorized'
 import AddFromPast from './AddMedicationFromPast'
 
+const authorityCfg = {
+  '1': 'queue.consultation.order.medication',
+  '5': 'queue.consultation.order.openprescription',
+}
+
+@connect(({ global, codetable }) => ({ global, codetable }))
 @connect(({ global, codetable, visitRegistration }) => ({
   global,
   codetable,
@@ -397,10 +404,11 @@ class Medication extends PureComponent {
       `corPrescriptionItemInstruction[${index}].drugFrequencyDisplayValue`,
       op.medicationFrequency ? op.medicationFrequency.name : undefined,
     )
-    setFieldValue(
-      `corPrescriptionItemInstruction[${index}].duration`,
-      op.duration || 1,
-    )
+    if (op.duration)
+      setFieldValue(
+        `corPrescriptionItemInstruction[${index}].duration`,
+        op.duration,
+      )
   }
 
   changeMedication = (v, op = {}) => {
@@ -654,385 +662,157 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
+    const accessRight = authorityCfg[values.type]
     return (
-      <div>
-        <GridContainer>
-          <GridItem xs={6}>
-            <React.Fragment>
-              {openPrescription ? (
-                <FastField
-                  name='drugName'
-                  render={(args) => {
-                    return (
-                      <TextField
-                        label='Open Prescription Name'
-                        {...args}
-                        autocomplete='nope'
-                      />
-                    )
-                  }}
-                />
-              ) : (
-                <FastField
-                  name='inventoryMedicationFK'
-                  render={(args) => {
-                    return (
-                      <div style={{ position: 'relative' }}>
-                        <CodeSelect
-                          temp
-                          label='Medication Name'
-                          code='inventorymedication'
-                          labelField='displayValue'
-                          onChange={this.changeMedication}
+      <Authorized authority={accessRight}>
+        <div>
+          <GridContainer>
+            <GridItem xs={6}>
+              <React.Fragment>
+                {openPrescription ? (
+                  <FastField
+                    name='drugName'
+                    render={(args) => {
+                      return (
+                        <TextField
+                          label='Open Prescription Name'
                           {...args}
-                          style={{ paddingRight: 20 }}
+                          autocomplete='nope'
                         />
-                        <LowStockInfo sourceType='medication' {...this.props} />
-                      </div>
-                    )
-                  }}
-                />
+                      )
+                    }}
+                  />
+                ) : (
+                  <FastField
+                    name='inventoryMedicationFK'
+                    render={(args) => {
+                      return (
+                        <div style={{ position: 'relative' }}>
+                          <CodeSelect
+                            temp
+                            label='Medication Name'
+                            code='inventorymedication'
+                            labelField='displayValue'
+                            onChange={this.changeMedication}
+                            {...args}
+                            style={{ paddingRight: 20 }}
+                          />
+                          <LowStockInfo
+                            sourceType='medication'
+                            {...this.props}
+                          />
+                        </div>
+                      )
+                    }}
+                  />
+                )}
+              </React.Fragment>
+            </GridItem>
+            <GridItem xs={6}>
+              {!openPrescription &&
+              !isEditMedication && (
+                <Tooltip title='Add From Past'>
+                  <ProgressButton
+                    color='primary'
+                    icon={<Add />}
+                    style={{ marginTop: theme.spacing(2) }}
+                    onClick={this.onSearchMedicationHistory}
+                  >
+                    Add New
+                  </ProgressButton>
+                </Tooltip>
               )}
-            </React.Fragment>
-          </GridItem>
-          <GridItem xs={6}>
-            {!openPrescription &&
-            !isEditMedication && (
-              <Tooltip title='Add From Past'>
-                <ProgressButton
-                  color='primary'
-                  icon={<Add />}
-                  style={{ marginTop: theme.spacing(2) }}
-                  onClick={this.onSearchMedicationHistory}
-                >
-                  Add New
-                </ProgressButton>
-              </Tooltip>
-            )}
-          </GridItem>
-        </GridContainer>
-        <GridContainer gutter={0}>
-          <GridItem xs={12}>
-            <CustomInputWrapper
-              label='Description'
-              style={{ paddingTop: 14 }}
-              labelProps={{
-                shrink: true,
-                style: { marginLeft: theme.spacing(1) },
-              }}
-            />
+            </GridItem>
+          </GridContainer>
+          <GridContainer gutter={0}>
+            <GridItem xs={12}>
+              <CustomInputWrapper
+                label='Description'
+                style={{ paddingTop: 14 }}
+                labelProps={{
+                  shrink: true,
+                  style: { marginLeft: theme.spacing(1) },
+                }}
+              />
 
-            <FieldArray
-              name='corPrescriptionItemInstruction'
-              render={(arrayHelpers) => {
-                this.descriptionArrayHelpers = arrayHelpers
-                if (!values || !values.corPrescriptionItemInstruction)
-                  return null
-                const activeRows = values.corPrescriptionItemInstruction.filter(
-                  (val) => !val.isDeleted,
-                )
-                return activeRows.map((val, activeIndex) => {
-                  if (val && val.isDeleted) return null
-                  const i = values.corPrescriptionItemInstruction.findIndex(
-                    (item) => _.isEqual(item, val),
-                  )
-
-                  return (
-                    <div key={i}>
-                      <GridContainer>
-                        {activeIndex > 0 && (
-                          <GridItem xs={2}>
-                            <FastField
-                              name={`corPrescriptionItemInstruction[${i}].stepdose`}
-                              render={(args) => {
-                                return (
-                                  <Select
-                                    style={{
-                                      paddingLeft: 15,
-                                      marginBottom: theme.spacing(1),
-                                    }}
-                                    allowClear={false}
-                                    simple
-                                    options={[
-                                      { value: 'AND', name: 'And' },
-                                      { value: 'THEN', name: 'Then' },
-                                    ]}
-                                    {...args}
-                                  />
-                                )
-                              }}
-                            />
-                          </GridItem>
-                        )}
-                        {activeIndex > 0 && <GridItem xs={10} />}
-                        <GridItem xs={2}>
-                          <Field
-                            name={`corPrescriptionItemInstruction[${i}].usageMethodFK`}
-                            render={(args) => {
-                              return (
-                                <div style={{ position: 'relative' }}>
-                                  <span
-                                    style={{
-                                      position: 'absolute',
-                                      bottom: 4,
-                                    }}
-                                  >
-                                    {activeIndex + 1}.
-                                  </span>
-                                  <CodeSelect
-                                    label={formatMessage({
-                                      id: 'inventory.master.setting.usage',
-                                    })}
-                                    allowClear={false}
-                                    style={{
-                                      marginLeft: 15,
-                                      paddingRight: 15,
-                                    }}
-                                    code='ctMedicationUsage'
-                                    onChange={(v, op = {}) => {
-                                      setFieldValue(
-                                        `corPrescriptionItemInstruction[${i}].usageMethodCode`,
-                                        op ? op.code : undefined,
-                                      )
-                                      setFieldValue(
-                                        `corPrescriptionItemInstruction[${i}].usageMethodDisplayValue`,
-                                        op ? op.name : undefined,
-                                      )
-                                    }}
-                                    {...commonSelectProps}
-                                    {...args}
-                                  />
-                                </div>
-                              )
-                            }}
-                          />
-                        </GridItem>
-                        <GridItem xs={2}>
-                          <FastField
-                            name={`corPrescriptionItemInstruction[${i}].dosageFK`}
-                            render={(args) => {
-                              return (
-                                <CodeSelect
-                                  label={formatMessage({
-                                    id: 'inventory.master.setting.dosage',
-                                  })}
-                                  allowClear={false}
-                                  code='ctMedicationDosage'
-                                  labelField='displayValue'
-                                  {...commonSelectProps}
-                                  {...args}
-                                  onChange={(v, op = {}) => {
-                                    setFieldValue(
-                                      `corPrescriptionItemInstruction[${i}].dosageCode`,
-                                      op ? op.code : undefined,
-                                    )
-                                    setFieldValue(
-                                      `corPrescriptionItemInstruction[${i}].dosageDisplayValue`,
-                                      op ? op.displayValue : undefined,
-                                    )
-                                    setTimeout(() => {
-                                      this.calculateQuantity()
-                                    }, 1)
-                                  }}
-                                />
-                              )
-                            }}
-                          />
-                        </GridItem>
-                        <GridItem xs={2}>
-                          <FastField
-                            name={`corPrescriptionItemInstruction[${i}].prescribeUOMFK`}
-                            render={(args) => {
-                              return (
-                                <CodeSelect
-                                  label={formatMessage({
-                                    id: 'inventory.master.setting.uom',
-                                  })}
-                                  allowClear={false}
-                                  code='ctMedicationUnitOfMeasurement'
-                                  onChange={(v, op = {}) => {
-                                    setFieldValue(
-                                      `corPrescriptionItemInstruction[${i}].prescribeUOMCode`,
-                                      op ? op.code : undefined,
-                                    )
-                                    setFieldValue(
-                                      `corPrescriptionItemInstruction[${i}].prescribeUOMDisplayValue`,
-                                      op ? op.name : undefined,
-                                    )
-                                  }}
-                                  {...commonSelectProps}
-                                  {...args}
-                                />
-                              )
-                            }}
-                          />
-                        </GridItem>
-                        <GridItem xs={2}>
-                          <FastField
-                            name={`corPrescriptionItemInstruction[${i}].drugFrequencyFK`}
-                            render={(args) => {
-                              return (
-                                <CodeSelect
-                                  label={formatMessage({
-                                    id: 'inventory.master.setting.frequency',
-                                  })}
-                                  labelField='displayValue'
-                                  allowClear={false}
-                                  code='ctMedicationFrequency'
-                                  {...commonSelectProps}
-                                  {...args}
-                                  onChange={(v, op = {}) => {
-                                    setFieldValue(
-                                      `corPrescriptionItemInstruction[${i}].drugFrequencyCode`,
-                                      op ? op.code : undefined,
-                                    )
-                                    setFieldValue(
-                                      `corPrescriptionItemInstruction[${i}].drugFrequencyDisplayValue`,
-                                      op ? op.displayValue : undefined,
-                                    )
-                                    setTimeout(() => {
-                                      this.calculateQuantity()
-                                    }, 1)
-                                  }}
-                                />
-                              )
-                            }}
-                          />
-                        </GridItem>
-                        <GridItem xs={2}>
-                          <FastField
-                            name={`corPrescriptionItemInstruction[${i}].duration`}
-                            render={(args) => {
-                              return (
-                                <NumberInput
-                                  precision={0}
-                                  label={formatMessage({
-                                    id: 'inventory.master.setting.duration',
-                                  })}
-                                  formatter={(v) =>
-                                    `${v} Day${v > 1 ? 's' : ''}`}
-                                  step={1}
-                                  min={0}
-                                  {...args}
-                                  onChange={() => {
-                                    setTimeout(() => {
-                                      this.calculateQuantity()
-                                    }, 1)
-                                  }}
-                                />
-                              )
-                            }}
-                          />
-                        </GridItem>
-                        {this.getActionItem(
-                          i,
-                          arrayHelpers,
-                          'corPrescriptionItemInstruction',
-                          'Add step dose',
-                          {
-                            // drugFrequencyFK: 1,
-                            // duration: 1,
-                            stepdose: 'AND',
-                            sequence: activeRows.length + 1,
-                          },
-                        )}
-                      </GridContainer>
-                    </div>
-                  )
-                })
-              }}
-            />
-          </GridItem>
-        </GridContainer>
-
-        <GridContainer gutter={0}>
-          <GridItem xs={12}>
-            <CustomInputWrapper
-              label='Precaution'
-              style={{ paddingTop: 14 }}
-              labelProps={{
-                shrink: true,
-                style: { marginLeft: theme.spacing(1) },
-              }}
-            >
               <FieldArray
-                name='corPrescriptionItemPrecaution'
+                name='corPrescriptionItemInstruction'
                 render={(arrayHelpers) => {
-                  if (!values || !values.corPrescriptionItemPrecaution)
+                  this.descriptionArrayHelpers = arrayHelpers
+                  if (!values || !values.corPrescriptionItemInstruction)
                     return null
-                  const activeRows = values.corPrescriptionItemPrecaution.filter(
+                  const activeRows = values.corPrescriptionItemInstruction.filter(
                     (val) => !val.isDeleted,
                   )
-
-                  const maxSeq = _.maxBy(
-                    values.corPrescriptionItemPrecaution,
-                    'sequence',
-                  )
-
-                  let newMaxSeq = maxSeq
-                    ? maxSeq.sequence + 1
-                    : values.corPrescriptionItemPrecaution.length + 1
-
                   return activeRows.map((val, activeIndex) => {
                     if (val && val.isDeleted) return null
-                    const i = values.corPrescriptionItemPrecaution.findIndex(
-                      (cor) =>
-                        val.id
-                          ? cor.id === val.id
-                          : val.sequence === cor.sequence,
+                    const i = values.corPrescriptionItemInstruction.findIndex(
+                      (item) => _.isEqual(item, val),
                     )
-
-                    // const i = values.corPrescriptionItemPrecaution.findIndex(
-                    //   (item) =>
-                    //     !val.id
-                    //       ? _.isEqual(item, val)
-                    //       : item.sequence === val.sequence,
-                    // )
 
                     return (
                       <div key={i}>
                         <GridContainer>
-                          <GridItem xs={10}>
+                          {activeIndex > 0 && (
+                            <GridItem xs={2}>
+                              <FastField
+                                name={`corPrescriptionItemInstruction[${i}].stepdose`}
+                                render={(args) => {
+                                  return (
+                                    <Select
+                                      style={{
+                                        paddingLeft: 15,
+                                        marginBottom: theme.spacing(1),
+                                      }}
+                                      allowClear={false}
+                                      simple
+                                      options={[
+                                        { value: 'AND', name: 'And' },
+                                        { value: 'THEN', name: 'Then' },
+                                      ]}
+                                      {...args}
+                                    />
+                                  )
+                                }}
+                              />
+                            </GridItem>
+                          )}
+                          {activeIndex > 0 && <GridItem xs={10} />}
+                          <GridItem xs={2}>
                             <Field
-                              name={`corPrescriptionItemPrecaution[${i}].medicationPrecautionFK`}
+                              name={`corPrescriptionItemInstruction[${i}].usageMethodFK`}
                               render={(args) => {
                                 return (
-                                  <div
-                                    style={{
-                                      position: 'relative',
-                                      marginBottom: theme.spacing(1),
-                                    }}
-                                  >
+                                  <div style={{ position: 'relative' }}>
                                     <span
                                       style={{
                                         position: 'absolute',
-                                        top: 3,
+                                        bottom: 4,
                                       }}
                                     >
                                       {activeIndex + 1}.
                                     </span>
                                     <CodeSelect
+                                      label={formatMessage({
+                                        id: 'inventory.master.setting.usage',
+                                      })}
+                                      allowClear={false}
                                       style={{
-                                        paddingLeft: 15,
+                                        marginLeft: 15,
+                                        paddingRight: 15,
                                       }}
-                                      // label='Precaution'
-                                      // simple
-                                      code='ctmedicationprecaution'
-                                      labelField='displayValue'
-                                      onChange={(v, option = {}) => {
+                                      code='ctMedicationUsage'
+                                      onChange={(v, op = {}) => {
                                         setFieldValue(
-                                          `corPrescriptionItemPrecaution[${i}].precaution`,
-                                          option.displayValue,
+                                          `corPrescriptionItemInstruction[${i}].usageMethodCode`,
+                                          op ? op.code : undefined,
                                         )
                                         setFieldValue(
-                                          `corPrescriptionItemPrecaution[${i}].precautionCode`,
-                                          option.code,
+                                          `corPrescriptionItemInstruction[${i}].usageMethodDisplayValue`,
+                                          op ? op.name : undefined,
                                         )
-                                        // setFieldValue(
-                                        //   `corPrescriptionItemPrecaution[${i}].sequence`,
-                                        //   i,
-                                        // )
                                       }}
+                                      {...commonSelectProps}
                                       {...args}
                                     />
                                   </div>
@@ -1040,19 +820,133 @@ class Medication extends PureComponent {
                               }}
                             />
                           </GridItem>
+                          <GridItem xs={2}>
+                            <FastField
+                              name={`corPrescriptionItemInstruction[${i}].dosageFK`}
+                              render={(args) => {
+                                return (
+                                  <CodeSelect
+                                    label={formatMessage({
+                                      id: 'inventory.master.setting.dosage',
+                                    })}
+                                    allowClear={false}
+                                    code='ctMedicationDosage'
+                                    labelField='displayValue'
+                                    {...commonSelectProps}
+                                    {...args}
+                                    onChange={(v, op = {}) => {
+                                      setFieldValue(
+                                        `corPrescriptionItemInstruction[${i}].dosageCode`,
+                                        op ? op.code : undefined,
+                                      )
+                                      setFieldValue(
+                                        `corPrescriptionItemInstruction[${i}].dosageDisplayValue`,
+                                        op ? op.displayValue : undefined,
+                                      )
+                                      setTimeout(() => {
+                                        this.calculateQuantity()
+                                      }, 1)
+                                    }}
+                                  />
+                                )
+                              }}
+                            />
+                          </GridItem>
+                          <GridItem xs={2}>
+                            <FastField
+                              name={`corPrescriptionItemInstruction[${i}].prescribeUOMFK`}
+                              render={(args) => {
+                                return (
+                                  <CodeSelect
+                                    label={formatMessage({
+                                      id: 'inventory.master.setting.uom',
+                                    })}
+                                    allowClear={false}
+                                    code='ctMedicationUnitOfMeasurement'
+                                    onChange={(v, op = {}) => {
+                                      setFieldValue(
+                                        `corPrescriptionItemInstruction[${i}].prescribeUOMCode`,
+                                        op ? op.code : undefined,
+                                      )
+                                      setFieldValue(
+                                        `corPrescriptionItemInstruction[${i}].prescribeUOMDisplayValue`,
+                                        op ? op.name : undefined,
+                                      )
+                                    }}
+                                    {...commonSelectProps}
+                                    {...args}
+                                  />
+                                )
+                              }}
+                            />
+                          </GridItem>
+                          <GridItem xs={2}>
+                            <FastField
+                              name={`corPrescriptionItemInstruction[${i}].drugFrequencyFK`}
+                              render={(args) => {
+                                return (
+                                  <CodeSelect
+                                    label={formatMessage({
+                                      id: 'inventory.master.setting.frequency',
+                                    })}
+                                    labelField='displayValue'
+                                    allowClear={false}
+                                    code='ctMedicationFrequency'
+                                    {...commonSelectProps}
+                                    {...args}
+                                    onChange={(v, op = {}) => {
+                                      setFieldValue(
+                                        `corPrescriptionItemInstruction[${i}].drugFrequencyCode`,
+                                        op ? op.code : undefined,
+                                      )
+                                      setFieldValue(
+                                        `corPrescriptionItemInstruction[${i}].drugFrequencyDisplayValue`,
+                                        op ? op.displayValue : undefined,
+                                      )
+                                      setTimeout(() => {
+                                        this.calculateQuantity()
+                                      }, 1)
+                                    }}
+                                  />
+                                )
+                              }}
+                            />
+                          </GridItem>
+                          <GridItem xs={2}>
+                            <FastField
+                              name={`corPrescriptionItemInstruction[${i}].duration`}
+                              render={(args) => {
+                                return (
+                                  <NumberInput
+                                    precision={0}
+                                    label={formatMessage({
+                                      id: 'inventory.master.setting.duration',
+                                    })}
+                                    formatter={(v) =>
+                                      `${v} Day${v > 1 ? 's' : ''}`}
+                                    step={1}
+                                    min={0}
+                                    {...args}
+                                    onChange={() => {
+                                      setTimeout(() => {
+                                        this.calculateQuantity()
+                                      }, 1)
+                                    }}
+                                  />
+                                )
+                              }}
+                            />
+                          </GridItem>
                           {this.getActionItem(
                             i,
                             arrayHelpers,
-                            'corPrescriptionItemPrecaution',
-                            'Add precaution',
+                            'corPrescriptionItemInstruction',
+                            'Add step dose',
                             {
-                              action: '1',
-                              count: 1,
-                              unit: '1',
-                              drugFrequencyFK: '1',
-                              day: 1,
-                              precaution: '1',
-                              sequence: newMaxSeq,
+                              // drugFrequencyFK: 1,
+                              // duration: 1,
+                              stepdose: 'AND',
+                              sequence: activeRows.length + 1,
                             },
                           )}
                         </GridContainer>
@@ -1061,224 +955,352 @@ class Medication extends PureComponent {
                   })
                 }}
               />
-            </CustomInputWrapper>
-          </GridItem>
-        </GridContainer>
+            </GridItem>
+          </GridContainer>
 
-        <GridContainer>
-          <GridItem xs={2}>
-            <Field
-              name='quantity'
-              render={(args) => {
-                return (
-                  <NumberInput
-                    label='Quantity'
-                    // formatter={(v) => `${v} Bottle${v > 1 ? 's' : ''}`}
-                    step={1}
-                    min={0}
-                    // currency
-                    onChange={() => {
-                      setTimeout(() => {
-                        this.setTotalPrice()
-                      }, 1)
-                    }}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs={2}>
-            <FastField
-              name='dispenseUOMFK'
-              render={(args) => {
-                return (
-                  <CodeSelect
-                    disabled={!openPrescription}
-                    label='UOM'
-                    allowClear={false}
-                    code='ctMedicationUnitOfMeasurement'
-                    onChange={(v, op = {}) => {
-                      setFieldValue('dispenseUOMCode', op ? op.code : undefined)
-                      setFieldValue(
-                        'dispenseUOMDisplayValue',
-                        op ? op.name : undefined,
+          <GridContainer gutter={0}>
+            <GridItem xs={12}>
+              <CustomInputWrapper
+                label='Precaution'
+                style={{ paddingTop: 14 }}
+                labelProps={{
+                  shrink: true,
+                  style: { marginLeft: theme.spacing(1) },
+                }}
+              >
+                <FieldArray
+                  name='corPrescriptionItemPrecaution'
+                  render={(arrayHelpers) => {
+                    if (!values || !values.corPrescriptionItemPrecaution)
+                      return null
+                    const activeRows = values.corPrescriptionItemPrecaution.filter(
+                      (val) => !val.isDeleted,
+                    )
+
+                    const maxSeq = _.maxBy(
+                      values.corPrescriptionItemPrecaution,
+                      'sequence',
+                    )
+
+                    let newMaxSeq = maxSeq
+                      ? maxSeq.sequence + 1
+                      : values.corPrescriptionItemPrecaution.length + 1
+
+                    return activeRows.map((val, activeIndex) => {
+                      if (val && val.isDeleted) return null
+                      const i = values.corPrescriptionItemPrecaution.findIndex(
+                        (cor) =>
+                          val.id
+                            ? cor.id === val.id
+                            : val.sequence === cor.sequence,
                       )
-                    }}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs={3}>
-            <Field
-              name='totalPrice'
-              render={(args) => {
-                return (
-                  <NumberInput
-                    label='Total'
-                    onChange={(e) => {
-                      this.updateTotalPrice(e.target.value)
-                    }}
-                    disabled={disableEdit}
-                    currency
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs={3}>
-            <Field
-              name='totalAfterItemAdjustment'
-              render={(args) => {
-                // if (
-                //   orders.totalAfterItemAdjustment &&
-                //   args.field.value !== orders.totalAfterItemAdjustment
-                // ) {
-                //   args.form.setFieldValue('totalAfterItemAdjustment', orders.totalAfterItemAdjustment)
-                // }
-                return (
-                  <NumberInput
-                    label='Total After Adj'
-                    disabled
-                    currency
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-        </GridContainer>
-        <GridContainer>
-          <GridItem xs={2} className={classes.editor}>
-            <Field
-              name='batchNo'
-              render={(args) => {
-                return (
-                  <CodeSelect
-                    mode='tags'
-                    maxSelected={1}
-                    disableAll
-                    label='Batch No.'
-                    labelField='batchNo'
-                    valueField='batchNo'
-                    options={this.state.selectedMedication.medicationStock}
-                    onChange={(e, op = {}) => {
-                      if (op && op.length > 0) {
-                        const { expiryDate } = op[0]
-                        setFieldValue(`expiryDate`, expiryDate)
-                      } else {
-                        setFieldValue(`expiryDate`, undefined)
-                      }
-                    }}
-                    disabled={disableEdit}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs={2} className={classes.editor}>
-            <Field
-              name='expiryDate'
-              render={(args) => {
-                return (
-                  <DatePicker
-                    label='Expiry Date'
-                    disabled={disableEdit}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs={6} className={classes.editor}>
-            {/* <Button link className={classes.editorBtn}>
-              Add Diagnosis
-            </Button> */}
 
-            <FastField
-              name='remarks'
-              render={(args) => {
-                // return <RichEditor placeholder='Remarks' {...args} />
-                return (
-                  <TextField multiline rowsMax='5' label='Remarks' {...args} />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs={12}>
-            {values.visitPurposeFK !== VISIT_TYPE.RETAIL ? (
-              <FastField
-                name='isExternalPrescription'
+                      // const i = values.corPrescriptionItemPrecaution.findIndex(
+                      //   (item) =>
+                      //     !val.id
+                      //       ? _.isEqual(item, val)
+                      //       : item.sequence === val.sequence,
+                      // )
+
+                      return (
+                        <div key={i}>
+                          <GridContainer>
+                            <GridItem xs={10}>
+                              <Field
+                                name={`corPrescriptionItemPrecaution[${i}].medicationPrecautionFK`}
+                                render={(args) => {
+                                  return (
+                                    <div
+                                      style={{
+                                        position: 'relative',
+                                        marginBottom: theme.spacing(1),
+                                      }}
+                                    >
+                                      <span
+                                        style={{
+                                          position: 'absolute',
+                                          top: 3,
+                                        }}
+                                      >
+                                        {activeIndex + 1}.
+                                      </span>
+                                      <CodeSelect
+                                        style={{
+                                          paddingLeft: 15,
+                                        }}
+                                        // label='Precaution'
+                                        // simple
+                                        code='ctmedicationprecaution'
+                                        labelField='displayValue'
+                                        onChange={(v, option = {}) => {
+                                          setFieldValue(
+                                            `corPrescriptionItemPrecaution[${i}].precaution`,
+                                            option.displayValue,
+                                          )
+                                          setFieldValue(
+                                            `corPrescriptionItemPrecaution[${i}].precautionCode`,
+                                            option.code,
+                                          )
+                                          // setFieldValue(
+                                          //   `corPrescriptionItemPrecaution[${i}].sequence`,
+                                          //   i,
+                                          // )
+                                        }}
+                                        {...args}
+                                      />
+                                    </div>
+                                  )
+                                }}
+                              />
+                            </GridItem>
+                            {this.getActionItem(
+                              i,
+                              arrayHelpers,
+                              'corPrescriptionItemPrecaution',
+                              'Add precaution',
+                              {
+                                action: '1',
+                                count: 1,
+                                unit: '1',
+                                drugFrequencyFK: '1',
+                                day: 1,
+                                precaution: '1',
+                                sequence: newMaxSeq,
+                              },
+                            )}
+                          </GridContainer>
+                        </div>
+                      )
+                    })
+                  }}
+                />
+              </CustomInputWrapper>
+            </GridItem>
+          </GridContainer>
+
+          <GridContainer>
+            <GridItem xs={2}>
+              <Field
+                name='quantity'
                 render={(args) => {
-                  if (args.field.value) {
-                    setDisable(true)
-                  } else {
-                    setDisable(false)
-                  }
                   return (
-                    <Checkbox
-                      label='External Prescription'
-                      labelPlacement='start'
-                      // fullWidth={false}
-                      {...args}
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          this.props.setFieldValue('adjAmount', 0)
-                          this.props.setFieldValue(
-                            'totalAfterItemAdjustment',
-                            0,
-                          )
-                          this.props.setFieldValue('totalPrice', 0)
-                          this.props.setFieldValue('expiryDate', undefined)
-                          this.props.setFieldValue('batchNo', undefined)
-                        } else {
-                          this.props.setFieldValue(
-                            'expiryDate',
-                            this.state.expiryDate,
-                          )
-                          this.props.setFieldValue(
-                            'batchNo',
-                            this.state.batchNo,
-                          )
-                          setTimeout(() => {
-                            this.calculateQuantity()
-                          }, 1)
-                        }
-                        setDisable(e.target.value)
+                    <NumberInput
+                      label='Quantity'
+                      // formatter={(v) => `${v} Bottle${v > 1 ? 's' : ''}`}
+                      step={1}
+                      min={0}
+                      // currency
+                      onChange={() => {
+                        setTimeout(() => {
+                          this.setTotalPrice()
+                        }, 1)
                       }}
+                      {...args}
                     />
                   )
                 }}
               />
-            ) : (
-              ''
-            )}
-          </GridItem>
-        </GridContainer>
-        {footer({
-          onSave: handleSubmit,
-          onReset: this.handleReset,
-        })}
-        <CommonModal
-          open={showAddFromPastModal}
-          title='Add Medication From Past'
-          onClose={this.toggleAddFromPastModal}
-          onConfirm={this.toggleAddFromPastModal}
-          maxWidth='md'
-          showFooter={false}
-          overrideLoading
-          cancelText='Cancel'
-        >
-          <AddFromPast
-            isRetail={values.visitPurposeFK === VISIT_TYPE.RETAIL}
-            {...this.props}
-          />
-        </CommonModal>
-      </div>
+            </GridItem>
+            <GridItem xs={2}>
+              <FastField
+                name='dispenseUOMFK'
+                render={(args) => {
+                  return (
+                    <CodeSelect
+                      disabled={!openPrescription}
+                      label='UOM'
+                      allowClear={false}
+                      code='ctMedicationUnitOfMeasurement'
+                      onChange={(v, op = {}) => {
+                        setFieldValue(
+                          'dispenseUOMCode',
+                          op ? op.code : undefined,
+                        )
+                        setFieldValue(
+                          'dispenseUOMDisplayValue',
+                          op ? op.name : undefined,
+                        )
+                      }}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={3}>
+              <Field
+                name='totalPrice'
+                render={(args) => {
+                  return (
+                    <NumberInput
+                      label='Total'
+                      onChange={(e) => {
+                        this.updateTotalPrice(e.target.value)
+                      }}
+                      disabled={disableEdit}
+                      currency
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={3}>
+              <Field
+                name='totalAfterItemAdjustment'
+                render={(args) => {
+                  // if (
+                  //   orders.totalAfterItemAdjustment &&
+                  //   args.field.value !== orders.totalAfterItemAdjustment
+                  // ) {
+                  //   args.form.setFieldValue('totalAfterItemAdjustment', orders.totalAfterItemAdjustment)
+                  // }
+                  return (
+                    <NumberInput
+                      label='Total After Adj'
+                      disabled
+                      currency
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem xs={2} className={classes.editor}>
+              <Field
+                name='batchNo'
+                render={(args) => {
+                  return (
+                    <CodeSelect
+                      mode='tags'
+                      maxSelected={1}
+                      disableAll
+                      label='Batch No.'
+                      labelField='batchNo'
+                      valueField='batchNo'
+                      options={this.state.selectedMedication.medicationStock}
+                      onChange={(e, op = {}) => {
+                        if (op && op.length > 0) {
+                          const { expiryDate } = op[0]
+                          setFieldValue(`expiryDate`, expiryDate)
+                        } else {
+                          setFieldValue(`expiryDate`, undefined)
+                        }
+                      }}
+                      disabled={disableEdit}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={2} className={classes.editor}>
+              <Field
+                name='expiryDate'
+                render={(args) => {
+                  return (
+                    <DatePicker
+                      label='Expiry Date'
+                      disabled={disableEdit}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={6} className={classes.editor}>
+              {/* <Button link className={classes.editorBtn}>
+              Add Diagnosis
+            </Button> */}
+
+              <FastField
+                name='remarks'
+                render={(args) => {
+                  // return <RichEditor placeholder='Remarks' {...args} />
+                  return (
+                    <TextField
+                      multiline
+                      rowsMax='5'
+                      label='Remarks'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={12}>
+              {values.visitPurposeFK !== VISIT_TYPE.RETAIL ? (
+                <FastField
+                  name='isExternalPrescription'
+                  render={(args) => {
+                    if (args.field.value) {
+                      setDisable(true)
+                    } else {
+                      setDisable(false)
+                    }
+                    return (
+                      <Checkbox
+                        label='External Prescription'
+                        labelPlacement='start'
+                        // fullWidth={false}
+                        {...args}
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            this.props.setFieldValue('adjAmount', 0)
+                            this.props.setFieldValue(
+                              'totalAfterItemAdjustment',
+                              0,
+                            )
+                            this.props.setFieldValue('totalPrice', 0)
+                            this.props.setFieldValue('expiryDate', undefined)
+                            this.props.setFieldValue('batchNo', undefined)
+                          } else {
+                            this.props.setFieldValue(
+                              'expiryDate',
+                              this.state.expiryDate,
+                            )
+                            this.props.setFieldValue(
+                              'batchNo',
+                              this.state.batchNo,
+                            )
+                            setTimeout(() => {
+                              this.calculateQuantity()
+                            }, 1)
+                          }
+                          setDisable(e.target.value)
+                        }}
+                      />
+                    )
+                  }}
+                />
+              ) : (
+                ''
+              )}
+            </GridItem>
+          </GridContainer>
+          {footer({
+            onSave: handleSubmit,
+            onReset: this.handleReset,
+          })}
+          <CommonModal
+            open={showAddFromPastModal}
+            title='Add Medication From Past'
+            onClose={this.toggleAddFromPastModal}
+            onConfirm={this.toggleAddFromPastModal}
+            maxWidth='md'
+            showFooter={false}
+            overrideLoading
+            cancelText='Cancel'
+          >
+            <AddFromPast
+              isRetail={values.visitPurposeFK === VISIT_TYPE.RETAIL}
+              {...this.props}
+            />
+          </CommonModal>
+        </div>
+      </Authorized>
     )
   }
 }

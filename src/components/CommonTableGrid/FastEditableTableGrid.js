@@ -470,10 +470,11 @@ class EditableTableGrid extends PureComponent {
     // console.log(this.state.errorCells)
     return (
       <Authorized.Context.Consumer>
-        {(matches = {}) => {
+        {(matches = { rights: 'enable' }) => {
           return (
             <React.Fragment>
               {showAddCommand &&
+              matches &&
               matches.rights !== 'disable' && (
                 <Button
                   // hideIfNoEditRights
@@ -483,19 +484,6 @@ class EditableTableGrid extends PureComponent {
                         {},
                       ]),
                     })
-                    // setTimeout(() => {
-                    //   window.g_app._store.dispatch({
-                    //     type: 'global/updateState',
-                    //     payload: {
-                    //       disableSave: true,
-                    //     },
-                    //   })
-                    // }, 1)
-
-                    // $(e.target)
-                    //   .parents(selector)
-                    //   .find('.medisys-table-add')
-                    //   .trigger('click')
                   }}
                   color='primary'
                   link
@@ -647,7 +635,7 @@ class EditableTableGrid extends PureComponent {
     // console.log(sharedCfg)
     const element = (
       <Authorized.Context.Consumer>
-        {(matches = {}) => {
+        {(matches = { rights: 'enable' }) => {
           const sharedCfg = {
             editableGrid: true,
             gridId: this.gridId,
@@ -659,8 +647,6 @@ class EditableTableGrid extends PureComponent {
             },
             extraState: [
               <EditingState
-                // key={`editingState-${uniqueGid}`}
-                // editingRowIds={editingRowIds}
                 columnEditingEnabled
                 deletedRowIds={deletedRowIds}
                 rowChanges={rowChanges}
@@ -692,7 +678,7 @@ class EditableTableGrid extends PureComponent {
                   [
                     'readonly',
                     'disable',
-                  ].includes(matches.rights) ? (
+                  ].includes(matches ? matches.rights : '') ? (
                     0
                   ) : (
                     'auto'

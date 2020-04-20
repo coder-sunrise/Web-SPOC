@@ -116,17 +116,13 @@ const QueueDisplayDasboard = ({
     images.map(async (image, idx) => {
       try {
         let src
-        const thumbnailId = image.thumbnailIndexFK
-
-        if (thumbnailId) {
-          const response = await getFileByFileID(thumbnailId)
-          if (response && response.status === 200) {
-            const { data: imageData } = response
-            const thumbnailDataInBase64 = arrayBufferToBase64(imageData)
-            const base64Prefix = 'data:image/png;base64,'
-            src = `${base64Prefix}${thumbnailDataInBase64}`
-            imageArray[idx] = src
-          }
+        const response = await getFileByFileID(image.id)
+        if (response && response.status === 200) {
+          const { data: imageData } = response
+          const thumbnailDataInBase64 = arrayBufferToBase64(imageData)
+          const base64Prefix = 'data:image/png;base64,'
+          src = `${base64Prefix}${thumbnailDataInBase64}`
+          imageArray[idx] = src
         }
       } catch (error) {
         console.error(error)

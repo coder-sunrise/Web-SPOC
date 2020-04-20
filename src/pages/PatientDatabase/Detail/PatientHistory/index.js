@@ -1,8 +1,5 @@
 import React, { PureComponent, useEffect } from 'react'
-
 import { withStyles } from '@material-ui/core'
-
-
 import { Tabs } from '@/components'
 import { PatientHistoryTabOption } from '@/pages/PatientDatabase/Detail/PatientHistory/variables'
 

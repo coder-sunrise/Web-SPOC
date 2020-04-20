@@ -1,10 +1,11 @@
 import numeral from 'numeral'
+import { compose } from 'redux'
 import Info from '@material-ui/icons/Info'
-
+import { connect } from 'dva'
 import { qtyFormat, currencyFormat, currencySymbol } from '@/utils/config'
 import { IconButton, Popover, Tooltip } from '@/components'
 
-const LowStockInfo = ({ sourceType, values, codetable }) => {
+const LowStockInfo = ({ sourceType, values = {}, codetable }) => {
   const {
     inventorymedication = [],
     inventoryconsumable = [],
@@ -85,4 +86,8 @@ const LowStockInfo = ({ sourceType, values, codetable }) => {
   )
 }
 
-export default LowStockInfo
+export default compose(
+  connect(({ codetable }) => ({
+    codetable,
+  })),
+)(LowStockInfo)

@@ -190,16 +190,16 @@ export const menuData = [
     url: '/setting/treatmentcategory',
   },
   {
-      authority: 'menu.setting.casetype',
-      title: 'Clinic Setting',
-      text: 'CASE Type',
-      url: '/setting/casetype',
+    authority: 'settings.clinicsetting.casetype',
+    title: 'Clinic Setting',
+    text: 'CASE Type',
+    url: '/setting/casetype',
   },
   {
-      authority: 'menu.setting.casedescription',
-      title: 'Clinic Setting',
-      text: 'CASE DESCRIPTION',
-      url: '/setting/casedescription',
+    authority: 'settings.clinicsetting.casedescription',
+    title: 'Clinic Setting',
+    text: 'CASE DESCRIPTION',
+    url: '/setting/casedescription',
   },
   {
     authority: 'settings.systemuser.systemuser',
@@ -208,9 +208,15 @@ export const menuData = [
     url: '/setting/userprofile',
   },
   {
+    authority: 'settings.role',
     title: 'System User',
     text: 'Role & Access Right',
     url: '/setting/userrole',
+  },
+  {
+    title: 'Print Setup',
+    text: 'Master Printout Setting',
+    url: '/setting/masterprintoutsetting',
   },
   {
     authority: 'settings.printsetup.printoutsetting',

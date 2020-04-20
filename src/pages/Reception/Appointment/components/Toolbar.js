@@ -176,14 +176,12 @@ class CalendarToolbar extends React.PureComponent {
     return (
       <Fragment>
         <GridContainer className={classnames(classes.container)}>
-          <GridItem xs md={1}>
+          <GridItem xs md={3}>
             <Tooltip title='Jump to today' placement='bottom'>
               <Button color='info' onClick={this.returnToday} authority='none'>
                 Today
               </Button>
             </Tooltip>
-          </GridItem>
-          <GridItem xs md={1}>
             <Tooltip title='Jump to selected day/month/year' placement='bottom'>
               <Button
                 color='info'
@@ -198,7 +196,7 @@ class CalendarToolbar extends React.PureComponent {
               </Button>
             </Tooltip>
           </GridItem>
-          <GridItem xs md={8} container justify='center'>
+          <GridItem xs md={6} container justify='center'>
             <Tooltip title={`Previous ${view}`}>
               <Button
                 justIcon
@@ -252,7 +250,7 @@ class CalendarToolbar extends React.PureComponent {
               </div>
             </Popover>
           </GridItem>
-          <GridItem xs md={2} container justify='flex-end'>
+          <GridItem xs md={3} container justify='flex-end'>
             <div className={classnames(classes.btnContainer)}>
               {CalendarViews.map((cv) => (
                 <Button

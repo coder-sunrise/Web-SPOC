@@ -1,5 +1,6 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Fragment } from 'react'
 import Edit from '@material-ui/icons/Edit'
+import Print from '@material-ui/icons/Print'
 import { CommonTableGrid, Button, Tooltip, notification } from '@/components'
 import { status, gstEnabled } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
@@ -48,6 +49,7 @@ class Grid extends PureComponent {
         type='settingCompany'
         onRowDoubleClick={this.editRow}
         FuncProps={this.FuncConfig}
+        forceRender
         columns={
           name === 'copayer' ? (
             [
@@ -215,24 +217,30 @@ class Grid extends PureComponent {
             render: (row) => {
               return (
                 <Authorized authority='copayer.copayerdetails'>
-                  <Tooltip
-                    title={
-                      companyType.id === 1 ? 'Edit Co-Payer' : 'Edit Supplier'
-                    }
-                    placement='bottom'
-                  >
-                    <Button
-                      size='sm'
-                      onClick={() => {
-                        this.editRow(row)
-                      }}
-                      justIcon
-                      color='primary'
-                      style={{ marginRight: 0 }}
+                  <Fragment>
+                    <Tooltip
+                      title={
+                        companyType.id === 1 ? 'Edit Co-Payer' : 'Edit Supplier'
+                      }
+                      placement='bottom'
                     >
-                      <Edit />
-                    </Button>
-                  </Tooltip>
+                      <Button
+                        size='sm'
+                        onClick={() => {
+                          this.editRow(row)
+                        }}
+                        justIcon
+                        color='primary'
+                      >
+                        <Edit />
+                      </Button>
+                    </Tooltip>
+                    <Tooltip title='Print Copayer Label' placement='bottom'>
+                      <Button size='sm' justIcon color='primary'>
+                        <Print />
+                      </Button>
+                    </Tooltip>
+                  </Fragment>
                 </Authorized>
               )
             },
