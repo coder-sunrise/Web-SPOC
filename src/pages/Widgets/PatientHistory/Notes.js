@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { GridContainer } from '@/components'
-import { SCRIBBLE_NOTE_TYPE } from '@/utils/constants'
+import { scribbleTypes } from '@/utils/codes'
 
 export default ({
   classes,
@@ -13,12 +13,6 @@ export default ({
   let htmlData = e.childNodes.length === 0 ? '' : e.childNodes[0].nodeValue
 
   const base64Prefix = 'data:image/jpeg;base64,'
-  const scribbleTypes = [
-    { type: 'history', typeFK: SCRIBBLE_NOTE_TYPE.HISTORY },
-    { type: 'chiefComplaints', typeFK: SCRIBBLE_NOTE_TYPE.CHIEFCOMPLAINTS },
-    { type: 'note', typeFK: SCRIBBLE_NOTE_TYPE.CLINICALNOTES },
-    { type: 'plan', typeFK: SCRIBBLE_NOTE_TYPE.PLAN },
-  ]
 
   const { scribbleNotes = [] } = current
 
@@ -41,7 +35,7 @@ export default ({
     window.g_app._store.dispatch({
       type: 'scriblenotes/updateState',
       payload: {
-        showScribbleModal: true,
+        showViewScribbleModal: true,
         isReadonly: true,
         entity: scribbleNote,
       },

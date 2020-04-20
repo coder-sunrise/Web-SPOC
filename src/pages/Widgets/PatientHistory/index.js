@@ -521,7 +521,7 @@ class PatientHistory extends Component {
     this.props.dispatch({
       type: 'scriblenotes/updateState',
       payload: {
-        showScribbleModal: !scriblenotes.showScribbleModal,
+        showViewScribbleModal: !scriblenotes.showViewScribbleModal,
         isReadonly: false,
       },
     })
@@ -632,7 +632,7 @@ class PatientHistory extends Component {
 
         {selected && mode === 'split' && this.getDetailPanel()}
         <CommonModal
-          open={scriblenotes.showScribbleModal}
+          open={scriblenotes.showViewScribbleModal}
           title='Scribble'
           fullScreen
           bodyNoPadding
