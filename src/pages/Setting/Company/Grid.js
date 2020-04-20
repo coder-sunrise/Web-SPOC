@@ -49,6 +49,7 @@ class Grid extends PureComponent {
         type='settingCompany'
         onRowDoubleClick={this.editRow}
         FuncProps={this.FuncConfig}
+        forceRender
         columns={
           name === 'copayer' ? (
             [

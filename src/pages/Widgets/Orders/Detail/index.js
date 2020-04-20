@@ -206,6 +206,15 @@ class Details extends PureComponent {
         ...cfg,
         type: '7',
       })
+    const tabOptions = orderTypeArray
+      .filter((o) => o.value !== '7' || (o.value === '7' && from === 'ca'))
+      .filter((o) => {
+        const accessRight = Authorized.check(o.accessRight)
+
+        if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
+          return false
+        return true
+      })
     return (
       <div>
         <div className={classes.detail}>
@@ -213,31 +222,16 @@ class Details extends PureComponent {
             <GridItem xs={12}>
               <Tabs
                 activeKey={type}
-                options={orderTypeArray
-                  .filter(
-                    (o) =>
-                      o.value !== '7' || (o.value === '7' && from === 'ca'),
-                  )
-                  .filter((o) => {
-                    const accessRight = Authorized.check(o.accessRight)
-
-                    if (
-                      !accessRight ||
-                      (accessRight && accessRight.rights === 'hidden')
-                    )
-                      return false
-                    return true
-                  })
-                  .map((o) => {
-                    return {
-                      id: o.value,
-                      name: o.name,
-                      content: o.component({
-                        ...cfg,
-                        type: o.value,
-                      }),
-                    }
-                  })}
+                options={tabOptions.map((o) => {
+                  return {
+                    id: o.value,
+                    name: o.name,
+                    content: o.component({
+                      ...cfg,
+                      type: o.value,
+                    }),
+                  }
+                })}
                 tabStyle={{}}
                 onChange={(key) => {
                   dispatch({

@@ -18,6 +18,7 @@ import {
   Checkbox,
 } from '@/components'
 import { orderTypes } from '@/pages/Consultation/utils'
+import Authorized from '@/utils/Authorized'
 
 // console.log(orderTypes)
 export default ({ orders, dispatch, classes, from, codetable }) => {
@@ -371,60 +372,66 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
           sortingEnabled: false,
           render: (row) => {
             if (row.type === '7' && from !== 'ca') return null
+            const orderType = orderTypes.find(
+              (item) => item.value === row.type,
+            ) || { accessRight: '' }
+            const { accessRight } = orderType
             return (
-              <div>
-                <Tooltip title='Edit'>
-                  <Button
-                    size='sm'
-                    onClick={() => {
-                      editRow(row)
-                    }}
-                    justIcon
-                    color='primary'
-                    style={{ marginRight: 5 }}
-                    disabled={
-                      isEditingEntity || (!row.isActive && row.type !== '5')
-                    }
-                  >
-                    <Edit />
-                  </Button>
-                </Tooltip>
-                <Popconfirm
-                  onConfirm={() => {
-                    dispatch({
-                      type: 'orders/deleteRow',
-                      payload: {
-                        uid: row.uid,
-                      },
-                    })
-                    dispatch({
-                      type: 'orders/updateState',
-                      payload: {
-                        entity: undefined,
-                      },
-                    })
-                    // let commitCount = 1000 // uniqueNumber
-                    // dispatch({
-                    //   // force current edit row components to update
-                    //   type: 'global/updateState',
-                    //   payload: {
-                    //     commitCount: (commitCount += 1),
-                    //   },
-                    // })
-                  }}
-                >
-                  <Tooltip title='Delete'>
+              <Authorized authority={accessRight}>
+                <div>
+                  <Tooltip title='Edit'>
                     <Button
                       size='sm'
-                      color='danger'
+                      onClick={() => {
+                        editRow(row)
+                      }}
                       justIcon
-                      disabled={isEditingEntity}
+                      color='primary'
+                      style={{ marginRight: 5 }}
+                      disabled={
+                        isEditingEntity || (!row.isActive && row.type !== '5')
+                      }
                     >
-                      <Delete />
+                      <Edit />
                     </Button>
                   </Tooltip>
-                </Popconfirm>
-              </div>
+                  <Popconfirm
+                    onConfirm={() => {
+                      dispatch({
+                        type: 'orders/deleteRow',
+                        payload: {
+                          uid: row.uid,
+                        },
+                      })
+                      dispatch({
+                        type: 'orders/updateState',
+                        payload: {
+                          entity: undefined,
+                        },
+                      })
+                      // let commitCount = 1000 // uniqueNumber
+                      // dispatch({
+                      //   // force current edit row components to update
+                      //   type: 'global/updateState',
+                      //   payload: {
+                      //     commitCount: (commitCount += 1),
+                      //   },
+                      // })
+                    }}
+                  >
+                    <Tooltip title='Delete'>
+                      <Button
+                        size='sm'
+                        color='danger'
+                        justIcon
+                        disabled={isEditingEntity}
+                      >
+                        <Delete />
+                      </Button>
+                    </Tooltip>
+                  </Popconfirm>
+                </div>
+              </Authorized>
             )
           },
         },

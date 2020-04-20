@@ -16,6 +16,7 @@ import { filterData } from '../utils'
 import {
   VISIT_STATUS,
   ContextMenuOptions,
+  AppointmentContextMenu,
 } from '@/pages/Reception/Queue/variables'
 import { StatusIndicator } from '../variables'
 import {
@@ -163,10 +164,24 @@ const Grid = ({
   }
 
   const canAccess = (id) => {
-    const menuOpt = ContextMenuOptions.find(
-      (item) => item.id === parseFloat(id, 10),
-    )
+    const apptsActionID = [
+      '8',
+      '9',
+    ]
+    const findMatch = (item) => item.id === parseFloat(id, 10)
+
+    let menuOpt = ContextMenuOptions.find(findMatch)
+
+    if (apptsActionID.includes(id)) {
+      menuOpt = AppointmentContextMenu.find(findMatch)
+    }
+
     const accessRight = Authorized.check(menuOpt.authority)
+
+    // skip for patient dashboard button
+    // user can access patient dashboard regardless of access right
+    // patient dashboard page will have the access right checking explicitly
+    if (id === '4') return true
 
     return (
       accessRight &&

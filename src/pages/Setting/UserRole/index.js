@@ -31,8 +31,10 @@ import {
   withSettingBase,
   CodeSelect,
   Popper,
+  notification,
 } from '@/components'
 // sub component
+import Authorized from '@/utils/Authorized'
 import UserRoleForm from './UserRoleForm'
 import { dummyData, UserRoleTableConfig } from './const'
 
@@ -63,16 +65,18 @@ class UserRole extends React.Component {
           align: 'center',
           render: (row) => {
             return (
-              <Tooltip title='Edit Role & Access Right' placement='bottom'>
-                <Button
-                  justIcon
-                  color='primary'
-                  onClick={() => this.editRow(row)}
-                  id={row.id}
-                >
-                  <Edit />
-                </Button>
-              </Tooltip>
+              <Authorized authority='settings.role.editrole'>
+                <Tooltip title='Edit Role & Access Right' placement='bottom'>
+                  <Button
+                    justIcon
+                    color='primary'
+                    onClick={() => this.editRow(row)}
+                    id={row.id}
+                  >
+                    <Edit />
+                  </Button>
+                </Tooltip>
+              </Authorized>
             )
           },
         },
@@ -99,6 +103,13 @@ class UserRole extends React.Component {
   }
 
   editRow = (row) => {
+    const accessRight = Authorized.check('settings.role.editrole')
+    if (accessRight.rights && accessRight.rights !== 'enable') {
+      notification.error({
+        message: 'Current user is not authorized to access',
+      })
+      return
+    }
     this.props.history.push(`/setting/userrole/${row.id}`)
   }
 
@@ -203,32 +214,33 @@ class UserRole extends React.Component {
             >
               <FormattedMessage id='form.search' />
             </ProgressButton>
-
-            <Popper
-              open={openPopper}
-              transition
-              className={classNames({
-                [classes.pooperResponsive]: true,
-                [classes.pooperNav]: true,
-              })}
-              overlay={
-                <ClickAwayListener onClickAway={this.closePopper}>
-                  <MenuList role='menu'>
-                    <MenuItem onClick={() => this.handleClickPopper(1)}>
-                      Add New
-                    </MenuItem>
-                    <MenuItem onClick={() => this.handleClickPopper(2)}>
-                      Add From Existing
-                    </MenuItem>
-                  </MenuList>
-                </ClickAwayListener>
-              }
-            >
-              <Button color='primary' onClick={this.handleAddNew}>
-                <Add />
-                Add New
-              </Button>
-            </Popper>
+            <Authorized authority='settings.role.addrole'>
+              <Popper
+                open={openPopper}
+                transition
+                className={classNames({
+                  [classes.pooperResponsive]: true,
+                  [classes.pooperNav]: true,
+                })}
+                overlay={
+                  <ClickAwayListener onClickAway={this.closePopper}>
+                    <MenuList role='menu'>
+                      <MenuItem onClick={() => this.handleClickPopper(1)}>
+                        Add New
+                      </MenuItem>
+                      <MenuItem onClick={() => this.handleClickPopper(2)}>
+                        Add From Existing
+                      </MenuItem>
+                    </MenuList>
+                  </ClickAwayListener>
+                }
+              >
+                <Button color='primary' onClick={this.handleAddNew}>
+                  <Add />
+                  Add New
+                </Button>
+              </Popper>
+            </Authorized>
           </GridItem>
           <GridItem md={12}>
             <CommonTableGrid

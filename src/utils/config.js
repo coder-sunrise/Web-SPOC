@@ -179,5 +179,10 @@ module.exports = {
   numberFormat: '0,0',
   conuntry: countrySetting,
   initClinicSettings,
-  getClinic: () => clinicSettings,
+  getClinic: () => {
+    if (!clinicSettings) {
+      initClinicSettings()
+    }
+    return clinicSettings
+  },
 }

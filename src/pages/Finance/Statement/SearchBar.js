@@ -15,6 +15,7 @@ import {
   ProgressButton,
 } from '@/components'
 import { FilterBarDate } from '@/components/_medisys'
+import Authorized from '@/utils/Authorized'
 
 const styles = () => ({
   container: {
@@ -255,22 +256,24 @@ class SearchBar extends PureComponent {
               <Search />
               <FormattedMessage id='form.search' />
             </ProgressButton>
-            <Button
-              variant='contained'
-              color='primary'
-              onClick={() => {
-                dispatch({
-                  type: 'statement/updateState',
-                  payload: {
-                    entity: undefined,
-                  },
-                })
-                history.push('/finance/statement/newstatement')
-              }}
-            >
-              <Add />
-              New Statement
-            </Button>
+            <Authorized authority='finance/statement'>
+              <Button
+                variant='contained'
+                color='primary'
+                onClick={() => {
+                  dispatch({
+                    type: 'statement/updateState',
+                    payload: {
+                      entity: undefined,
+                    },
+                  })
+                  history.push('/finance/statement/newstatement')
+                }}
+              >
+                <Add />
+                New Statement
+              </Button>
+            </Authorized>
           </GridItem>
         </GridItem>
       </GridContainer>

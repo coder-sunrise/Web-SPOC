@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
+import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import _ from 'lodash'
 import AttachMoney from '@material-ui/icons/AttachMoney'
@@ -32,6 +33,7 @@ const filterOptions = [
 ]
 
 const DiagnosisSelect = ({
+  dispatch,
   theme,
   classes,
   style,
@@ -103,8 +105,16 @@ const DiagnosisSelect = ({
 
     // console.log(diagnosisFilter)
     const response = await queryList('/api/codetable/ctsnomeddiagnosis', search)
-    if (response && response.data) setCtDiagnosis(response.data.data)
+    if (response && response.data) {
+      setCtDiagnosis(response.data.data)
 
+      dispatch({
+        type: 'codetable/updateState',
+        payload: {
+          'codetable/ctsnomeddiagnosis': response.data.data,
+        },
+      })
+    }
     return response
   }
   const selected = ctDiagnosis.find(
@@ -189,4 +199,6 @@ const DiagnosisSelect = ({
   )
 }
 
-export default withStyles(styles, { withTheme: true })(DiagnosisSelect)
+const Connected = connect()(DiagnosisSelect)
+
+export default withStyles(styles, { withTheme: true })(Connected)

@@ -253,10 +253,12 @@ const Thumbnail = ({
             </Tooltip>
           </GridItem>
           <GridItem md={3}>
-            <DeleteWithPopover
-              disabled={isReadOnly}
-              onConfirmDelete={handleConfirmDelete}
-            />
+            {!isReadOnly && (
+              <DeleteWithPopover
+                disabled={isReadOnly}
+                onConfirmDelete={handleConfirmDelete}
+              />
+            )}
           </GridItem>
           <GridItem md={12} style={{ cursor: 'pointer' }}>
             <div

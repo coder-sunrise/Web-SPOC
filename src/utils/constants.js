@@ -11,10 +11,10 @@ export const APPOINTMENT_STATUS = {
   NOSHOW: 6,
 }
 
-export const PATIENT_LAB ={
-  PATIENT_PROFILE:1,
-  CONSULTATION:2,
-  LAB_TRACKING:3,
+export const PATIENT_LAB = {
+  PATIENT_PROFILE: 1,
+  CONSULTATION: 2,
+  LAB_TRACKING: 3,
 }
 
 export const CANCELLATION_REASON_TYPE = {
@@ -34,13 +34,12 @@ export const USER_ROLE = {
   CLINIC_ASSISTANT: 4,
 }
 
-export const LAB_TRACKING_STATUS={
-  NEW:1,
-  ORDERED:2,
-  RECEIVED:3,
-  COMPLETED:4,
+export const LAB_TRACKING_STATUS = {
+  NEW: 1,
+  ORDERED: 2,
+  RECEIVED: 3,
+  COMPLETED: 4,
 }
-
 
 export const COPAYER_TYPE = {
   CORPORATE: 1,
@@ -262,10 +261,10 @@ export const ORDER_TYPE_TAB = {
 }
 
 export const PATIENT_HISTORY_TABS = {
-  VISIT:1,
-  DISPENSE:2,
-  APPOINTMENT:3,
-  INVOICE:4,
+  VISIT: 1,
+  DISPENSE: 2,
+  APPOINTMENT: 3,
+  INVOICE: 4,
 }
 
 export const FILE_STATUS = {
@@ -366,4 +365,11 @@ export const NOTIFICATION_STATUS = {
 export const VALUE_KEYS = {
   QUEUEDISPLAYSETUP: 'queueDisplay',
   QUEUECALLING: 'queueCalling',
+}
+/**
+ * ENUM constants that maps with SEMR Gen2 codeset
+ */
+
+export const SCHEME_TYPE = {
+  CORPORATE: 15,
 }

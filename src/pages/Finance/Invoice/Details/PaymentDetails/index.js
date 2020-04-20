@@ -124,17 +124,18 @@ class PaymentDetails extends Component {
   }
 
   refresh = () => {
-    const { dispatch, invoiceDetail } = this.props
+    const { dispatch, invoiceDetail, invoicePayment } = this.props
+
     dispatch({
       type: 'invoiceDetail/query',
       payload: {
-        id: invoiceDetail.currentId,
+        id: invoiceDetail.currentId || invoicePayment.currentId,
       },
     })
     dispatch({
       type: 'invoicePayment/query',
       payload: {
-        id: invoiceDetail.currentId,
+        id: invoiceDetail.currentId || invoicePayment.currentId,
       },
     })
   }
@@ -427,7 +428,7 @@ class PaymentDetails extends Component {
     return (
       <div
         className={classes.container}
-        style={{ height: '60vh', overflow: 'auto' }}
+        style={{ overflow: 'auto', width: '100%' }}
       >
         {readOnly ? (
           <div style={{ paddingTop: 5 }}>

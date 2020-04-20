@@ -78,9 +78,6 @@ const styles = (theme) => ({
     width: '100%',
   },
 })
-@withFormikExtend({
-  mapPropsToValues: ({ patientHistory }) => {},
-})
 @connect(
   ({
     patientHistory,
@@ -98,6 +95,21 @@ const styles = (theme) => ({
     scriblenotes,
   }),
 )
+@withFormikExtend({
+  enableReinitialize: true,
+  mapPropsToValues: ({ patientHistory }) => {
+    const returnValue = patientHistory.entity
+      ? patientHistory.entity
+      : patientHistory.default
+
+    return {
+      ...returnValue,
+      eyeVisualAcuityTestAttachments: (returnValue.eyeVisualAcuityTestAttachments ||
+        [])
+        .map((eyeAttachment) => eyeAttachment.attachment),
+    }
+  },
+})
 class PatientHistory extends Component {
   static defaultProps = {
     mode: 'split',

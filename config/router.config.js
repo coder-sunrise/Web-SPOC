@@ -1039,6 +1039,11 @@ const _routes = [
               'settings.printsetup.printoutsetting',
             ],
           },
+          {
+            path: '/setting/masterprintoutsetting',
+            name: 'masterprintoutsetting',
+            component: './Setting/MasterPrintoutSetting',
+          },
           // {
           //   path: '/finance/company/1',
           //   name: 'copayer',
@@ -1133,20 +1138,20 @@ const _routes = [
             ],
           },
           {
-              path: '/setting/casetype',
-              name: 'casetype',
-              component: './Setting/CaseType',
-              authority: [
-                  'settings.clinicsetting.casetype',
-              ],
+            path: '/setting/casetype',
+            name: 'casetype',
+            component: './Setting/CaseType',
+            authority: [
+              'settings.clinicsetting.casetype',
+            ],
           },
           {
-              path: '/setting/casedescription',
-              name: 'casedescription',
-              component: './Setting/CaseDescription',
-              authority: [
-                  'settings.clinicsetting.casedescription',
-              ],
+            path: '/setting/casedescription',
+            name: 'casedescription',
+            component: './Setting/CaseDescription',
+            authority: [
+              'settings.clinicsetting.casedescription',
+            ],
           },
           {
             path: '/setting/referralsource',

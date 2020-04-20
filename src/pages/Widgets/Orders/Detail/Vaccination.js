@@ -18,6 +18,9 @@ import LowStockInfo from './LowStockInfo'
 let i = 0
 @connect(({ global, codetable }) => ({ global, codetable }))
 @withFormikExtend({
+  authority: [
+    'queue.consultation.order.vaccination',
+  ],
   mapPropsToValues: ({ orders = {} }) => {
     const newOrders = orders.entity || orders.defaultVaccination
 

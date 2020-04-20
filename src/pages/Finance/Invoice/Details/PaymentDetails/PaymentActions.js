@@ -29,14 +29,6 @@ const PaymentActions = ({
     <div>
       <Button
         onClick={() => handleAddPayment(invoicePayerFK)}
-        // disabled={!handleAddPayment || readOnly}
-        {...ButtonProps}
-      >
-        <Add />
-        Add Payment
-      </Button>
-      <Button
-        onClick={() => handleAddPayment(invoicePayerFK)}
         disabled={!handleAddPayment || readOnly}
         {...ButtonProps}
       >

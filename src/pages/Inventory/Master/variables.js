@@ -1,8 +1,8 @@
+import Authorized from '@/utils/Authorized'
 import Consumable from './Consumable'
 import Medication from './Medication'
 import Vaccination from './Vaccination'
 import OrderSet from './OrderSet'
-import Authorized from '@/utils/Authorized'
 
 const addContent = (type, props) => {
   switch (type) {

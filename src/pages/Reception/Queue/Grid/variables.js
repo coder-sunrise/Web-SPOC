@@ -1,12 +1,14 @@
 import React, { Fragment } from 'react'
 import moment from 'moment'
 // components
+import { DoctorLabel, CallingQueueButton } from '@/components/_medisys'
 import {
-  DoctorLabel,
-  VisitStatusTag,
-  CallingQueueButton,
-} from '@/components/_medisys'
-import { dateFormat, CodeSelect, DateFormatter, Tooltip } from '@/components'
+  CodeSelect,
+  DateFormatter,
+  Tooltip,
+  dateFormatLong,
+  dateFormatLongWithTimeNoSec12h,
+} from '@/components'
 // utils
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 // variables
@@ -64,6 +66,7 @@ export const AppointmentTableConfig = {
     { name: 'doctorName', title: 'Doctor' },
     { name: 'appointmentTime', title: 'Appt. Time' },
     { name: 'roomNo', title: 'Room No.' },
+    { name: 'remarks', title: 'Remarks' },
     { name: 'patientContactNo', title: 'Phone' },
     { name: 'action', title: 'Action' },
   ],
@@ -118,6 +121,11 @@ export const ApptColumnExtensions = [
     render: (row) => row.roomNo || '-',
   },
   {
+    columnName: 'remarks',
+    width: 180,
+    render: (row) => row.remarks || '-',
+  },
+  {
     columnName: 'appointmentTime',
     width: 180,
     type: 'date',
@@ -135,6 +143,7 @@ export const QueueTableConfig = {
     { name: 'doctor', title: 'Doctor' },
     { name: 'appointmentTime', title: 'Appt. Time' },
     { name: 'roomNo', title: 'Room No.' },
+    { name: 'remarks', title: 'Remarks' },
     { name: 'timeIn', title: 'Time In' },
     { name: 'timeOut', title: 'Time Out' },
     { name: 'invoiceNo', title: 'Invoice No' },
@@ -195,6 +204,10 @@ export const QueueColumnExtensions = [
   {
     columnName: 'roomNo',
   },
+  {
+    columnName: 'remarks',
+    width: 180,
+  },
   // {
   //   columnName: 'patientScheme',
   //   render: (row) => row.patientScheme || '-',
@@ -253,11 +266,11 @@ export const QueueColumnExtensions = [
       if (row.appointmentTime) {
         // const appointmentDate = moment(row.appointmentTime).format('MM DD YYYY')
         const appointmentDate = moment(row.appointmentTime).format(
-          'DD MMM YYYY',
+          dateFormatLong,
         )
         return DateFormatter({
           value: `${appointmentDate} ${row.appointmentResourceStartTime}`,
-          format: 'DD MMM YYYY hh:mm A',
+          format: dateFormatLongWithTimeNoSec12h,
         })
       }
       return '-'

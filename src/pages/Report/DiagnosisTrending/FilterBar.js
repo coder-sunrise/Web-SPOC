@@ -1,7 +1,8 @@
 import React from 'react'
+import { connect } from 'dva'
 // formik
 import { FastField } from 'formik'
-import { withStyles } from '@material-ui/core'
+import { Chip, withStyles } from '@material-ui/core'
 // common components
 import {
   Button,
@@ -21,7 +22,28 @@ const styles = (theme) => ({
   },
 })
 
-const FilterBar = ({ classes, handleSubmit, isSubmitting }) => {
+const FilterBar = ({
+  classes,
+  handleSubmit,
+  isSubmitting,
+  formikProps,
+  ctdiagnosis = [],
+}) => {
+  const { values, setFieldValue } = formikProps
+
+  const { diagnosisIds = [] } = values
+
+  const selectedDiagnosis = ctdiagnosis.filter((diagnosis) =>
+    diagnosisIds.includes(diagnosis.id),
+  )
+
+  const handleDelete = (diagnosisID) => {
+    setFieldValue(
+      'diagnosisIds',
+      diagnosisIds.filter((item) => item !== diagnosisID),
+    )
+  }
+
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
@@ -74,10 +96,27 @@ const FilterBar = ({ classes, handleSubmit, isSubmitting }) => {
               render={(args) => <Checkbox {...args} label='Show Details' />}
             />
           </GridItem>
+          <GridItem md={12}>
+            {selectedDiagnosis.map((item) => (
+              <Chip
+                style={{ margin: 8 }}
+                key={item.code}
+                size='small'
+                variant='outlined'
+                label={item.displayvalue}
+                color='primary'
+                onDelete={() => handleDelete(item.id)}
+              />
+            ))}
+          </GridItem>
         </GridContainer>
       </React.Fragment>
     </SizeContainer>
   )
 }
 
-export default withStyles(styles, { name: 'SalesSummaryFilterBar' })(FilterBar)
+const Connected = connect(({ codetable }) => ({
+  ctdiagnosis: codetable['codetable/ctsnomeddiagnosis'],
+}))(FilterBar)
+
+export default withStyles(styles, { name: 'SalesSummaryFilterBar' })(Connected)

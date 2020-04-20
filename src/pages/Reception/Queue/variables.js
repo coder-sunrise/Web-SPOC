@@ -118,6 +118,7 @@ export const ContextMenuOptions = [
     label: 'Patient Dashboard',
     Icon: Book,
     disabled: false,
+    authority: 'patientdashboard',
   },
   { isDivider: true },
   {

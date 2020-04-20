@@ -142,11 +142,19 @@ class Appointment extends React.PureComponent {
       let filterByDoctor = []
       let resources = []
       let primaryClinicianFK
-
       if (response) {
+        const lastSelected = JSON.parse(
+          sessionStorage.getItem('appointmentDoctors') || '[]',
+        )
+
         resources = response
           .filter((clinician) => clinician.clinicianProfile.isActive)
-          .filter((_, index) => index < 5)
+          .filter(
+            (_, index) =>
+              lastSelected.length > 0
+                ? lastSelected.includes(_.clinicianProfile.id)
+                : index < 5,
+          )
           .map((clinician) => ({
             clinicianFK: clinician.clinicianProfile.id,
             doctorName: clinician.clinicianProfile.name,
@@ -496,7 +504,12 @@ class Appointment extends React.PureComponent {
   }
 
   render () {
-    const { calendar: CalendarModel, classes, calendarLoading } = this.props
+    const {
+      calendar: CalendarModel,
+      classes,
+      calendarLoading,
+      dispatch,
+    } = this.props
     const {
       showPopup,
       popupAnchor,
@@ -527,6 +540,7 @@ class Appointment extends React.PureComponent {
     return (
       <CardContainer hideHeader size='sm'>
         <FilterBar
+          dispatch={dispatch}
           loading={calendarLoading}
           filterByDoctor={filter.filterByDoctor}
           filterByApptType={filter.filterByApptType}
