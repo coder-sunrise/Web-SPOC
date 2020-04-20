@@ -300,7 +300,7 @@ const QueueDisplayDasboard = ({
         >
           <marquee
             style={{
-              fontSize: '1.5vw',
+              fontSize: '2.2vw',
               fontStyle: 'italic',
               boxShadow: '-5px 0 5px -5px white, 5px 0 5px -5px white',
             }}
