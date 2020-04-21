@@ -1,15 +1,19 @@
 import React from 'react'
-import { CardContainer, CodeSelect, CommonTableGrid, FastField, GridContainer, GridItem, TextField, DatePicker } from '@/components'
+import {
+  CardContainer,
+  CodeSelect,
+  CommonTableGrid,
+  FastField,
+  GridContainer,
+  GridItem,
+  TextField,
+  DatePicker,
+} from '@/components'
 import NumberInput from '@/components/NumberInput'
 
-export default ({ classes, current, fieldName = '' }) => {
-
+export default ({ setFieldValue, classes, current, fieldName = '' }) => {
   return (
-    <CardContainer
-      hideHeader
-      size='sm'
-      style={{margin:0}}
-    >
+    <CardContainer hideHeader size='sm' style={{ margin: 0 }}>
       <GridContainer>
         <GridItem md={4}>
           <FastField
@@ -20,6 +24,16 @@ export default ({ classes, current, fieldName = '' }) => {
                 labelField='displayValue'
                 {...args}
                 code='CTSupplier'
+                onChange={(value, option) => {
+                  setFieldValue(
+                    'supplierCode',
+                    option ? option.code : undefined,
+                  )
+                  setFieldValue(
+                    'SupplierName',
+                    option ? option.displayValue : undefined,
+                  )
+                }}
               />
             )}
           />
@@ -29,11 +43,7 @@ export default ({ classes, current, fieldName = '' }) => {
           <FastField
             name='orderedDate'
             render={(args) => (
-              <DatePicker
-                label='Ordered Date'
-                {...args}
-                timeFormat={false}
-              />
+              <DatePicker label='Ordered Date' {...args} timeFormat={false} />
             )}
           />
         </GridItem>
@@ -41,9 +51,7 @@ export default ({ classes, current, fieldName = '' }) => {
         <GridItem md={4}>
           <FastField
             name='labSheetNo'
-            render={(args) => (
-              <TextField label='Lab Sheet No' {...args}  />
-            )}
+            render={(args) => <TextField label='Lab Sheet No' {...args} />}
           />
         </GridItem>
         <GridItem md={2} />
@@ -105,9 +113,7 @@ export default ({ classes, current, fieldName = '' }) => {
         <GridItem md={4}>
           <FastField
             name='sentBy'
-            render={(args) => (
-              <TextField label='Sent By' {...args}  />
-            )}
+            render={(args) => <TextField label='Sent By' {...args} />}
           />
         </GridItem>
         <GridItem md={2} />
@@ -130,7 +136,7 @@ export default ({ classes, current, fieldName = '' }) => {
           <FastField
             name='receivedBy'
             render={(args) => (
-              <TextField label='Received By (in Lab)' {...args}  />
+              <TextField label='Received By (in Lab)' {...args} />
             )}
           />
         </GridItem>
