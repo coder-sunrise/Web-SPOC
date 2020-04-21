@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
+import { connect } from 'dva'
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -69,6 +70,9 @@ const styles = (theme) => ({
   },
 })
 
+@connect(({ codetable }) => ({
+  codetable,
+}))
 @withFormikExtend({
   mapPropsToValues: ({ labTrackingDetails }) => {
     // Construct Attachment
@@ -257,9 +261,16 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { theme, footer, values } = props
-    const { visitDate } = values
-    console.log('visitDate', visitDate)
+    const { theme, footer, values, codetable } = props
+    const { doctorprofile } = codetable
+    const { doctorProfileFK } = values
+
+    let doctorNameLabel = ''
+    let selectDoctor = doctorprofile.find((d) => d.id === doctorProfileFK)
+    if (selectDoctor) {
+      const { doctorMCRNo, clinicianProfile: { name } } = selectDoctor
+      doctorNameLabel = `${name} (${doctorMCRNo})`
+    }
     return (
       <CardContainer hideHeader size='sm'>
         <div>
@@ -281,26 +292,7 @@ class Detail extends PureComponent {
               />
             </GridItem>
             <GridItem md={4}>
-              <FastField
-                name='doctorProfileFK'
-                render={(args) => (
-                  <CodeSelect
-                    {...args}
-                    disableAll
-                    allowClear={false}
-                    label='Doctor'
-                    remoteFilter={{
-                      'clinicianProfile.isActive': true,
-                    }}
-                    disabled
-                    localFilter={(option) => option.clinicianProfile.isActive}
-                    code='doctorprofile'
-                    labelField='clinicianProfile.name'
-                    valueField='id'
-                    renderDropdown={this.renderDropdown}
-                  />
-                )}
-              />
+              <TextField disabled label='Doctor' value={doctorNameLabel} />
             </GridItem>
             <GridItem md={4}>
               <FastField
