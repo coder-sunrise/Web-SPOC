@@ -1,97 +1,42 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 // formik
-import { FastField } from 'formik'
+import { FastField, Field, withFormik } from 'formik'
 import { FormattedMessage } from 'umi/locale'
 import Search from '@material-ui/icons/Search'
-import moment from 'moment'
 // common components
 import {
+  Button,
   ProgressButton,
-  DateRangePicker,
   GridContainer,
   GridItem,
   SizeContainer,
   TextField,
   Select,
 } from '@/components'
+import { FilterBarDate } from '@/components/_medisys'
 import { getBizSession } from '@/services/queue'
 import { osBalanceStatus, sessionOptions } from '@/utils/codes'
 
-const FilterBar = ({ classes, dispatch, values }) => {
-  const unmount = () =>
-    dispatch({
-      type: 'invoiceList/updateState',
-      payload: {
-        filter: {},
-      },
-    })
-
-  useEffect(() => {
-    return unmount
-  }, [])
-
-  const getBizSessionId = async () => {
-    const bizSessionPayload = {
-      IsClinicSessionClosed: false,
-    }
-    const result = await getBizSession(bizSessionPayload)
-    const { data } = result.data
-    if (data.length > 0) {
-      return data[0].id
-    }
-    return null
+const getBizSessionId = async () => {
+  const bizSessionPayload = {
+    IsClinicSessionClosed: false,
   }
+  const result = await getBizSession(bizSessionPayload)
+  const { data } = result.data
+  if (data.length > 0) {
+    return data[0].id
+  }
+  return null
+}
 
-  const onSearchClick = async () => {
-    const {
-      invoiceNo,
-      patientName,
-      patientAccountNo,
-      invoiceDates,
-      outstandingBalanceStatus,
-      session,
-    } = values
-    let SessionID
-    let SessionType
-    if (session === 'current') {
-      SessionID = await getBizSessionId()
-      SessionType = 'CurrentSession'
-    } else if (session === 'past') {
-      SessionID = await getBizSessionId()
-      SessionType = 'PastSession'
-    }
+const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
+  const { invoiceStartDate, invoiceEndDate } = values
 
-    dispatch({
-      type: 'invoiceList/query',
-      payload: {
-        // keepFilter: false,
-        // combineCondition: 'and',
-        lgteql_invoiceDate: invoiceDates ? invoiceDates[0] : undefined,
-        lsteql_invoiceDate: invoiceDates ? invoiceDates[1] : undefined,
-        lgt_OutstandingBalance:
-          outstandingBalanceStatus === 'yes' &&
-          outstandingBalanceStatus !== 'all'
-            ? '0'
-            : undefined,
-        lsteql_OutstandingBalance:
-          outstandingBalanceStatus === 'no' &&
-          outstandingBalanceStatus !== 'all'
-            ? '0'
-            : undefined,
-        apiCriteria: {
-          SessionID,
-          SessionType,
-        },
-        group: [
-          {
-            invoiceNo,
-            'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.Name': patientName,
-            'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.PatientAccountNo': patientAccountNo,
-            combineCondition: 'and',
-          },
-        ],
-      },
+  const handleReset = async () => {
+    await dispatch({
+      type: 'invoiceList/resetFilter',
     })
+    handleSubmit()
   }
 
   return (
@@ -104,20 +49,35 @@ const FilterBar = ({ classes, dispatch, values }) => {
               render={(args) => <TextField label='Invoice No' {...args} />}
             />
           </GridItem>
-          <GridItem xs={6} md={6}>
-            <FastField
-              name='invoiceDates'
-              render={(args) => {
-                return (
-                  <DateRangePicker
-                    label='Invoice Date From'
-                    label2='Invoice Date To'
-                    allowClear={false}
-                    disabledDate={(d) => !d || d.isAfter(moment().endOf('day'))}
-                    {...args}
-                  />
-                )
-              }}
+          <GridItem md={3}>
+            <Field
+              name='invoiceStartDate'
+              render={(args) => (
+                <FilterBarDate
+                  args={args}
+                  label='Invoice Date From'
+                  formValues={{
+                    startDate: invoiceStartDate,
+                    endDate: invoiceEndDate,
+                  }}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem md={3}>
+            <Field
+              name='invoiceEndDate'
+              render={(args) => (
+                <FilterBarDate
+                  args={args}
+                  label='Invoice Date To'
+                  isEndDate
+                  formValues={{
+                    startDate: invoiceStartDate,
+                    endDate: invoiceEndDate,
+                  }}
+                />
+              )}
             />
           </GridItem>
         </GridContainer>
@@ -166,10 +126,11 @@ const FilterBar = ({ classes, dispatch, values }) => {
           <ProgressButton
             color='primary'
             icon={<Search />}
-            onClick={onSearchClick}
+            onClick={handleSubmit}
           >
             <FormattedMessage id='form.search' />
           </ProgressButton>
+          <Button onClick={handleReset}>Reset</Button>
           {/* <i>Double click on record to view invoice</i> */}
         </div>
       </React.Fragment>
@@ -177,4 +138,66 @@ const FilterBar = ({ classes, dispatch, values }) => {
   )
 }
 
-export default FilterBar
+export default withFormik({
+  enableReinitialize: true,
+  mapPropsToValues: ({ invoiceList }) => ({ ...invoiceList.filterValues }),
+  handleSubmit: async (values, { props }) => {
+    const { dispatch } = props
+    const {
+      invoiceNo,
+      patientName,
+      patientAccountNo,
+      invoiceStartDate,
+      invoiceEndDate,
+      outstandingBalanceStatus,
+      session,
+    } = values
+    let SessionID
+    let SessionType
+    if (session === 'current') {
+      SessionID = await getBizSessionId()
+      SessionType = 'CurrentSession'
+    } else if (session === 'past') {
+      SessionID = await getBizSessionId()
+      SessionType = 'PastSession'
+    }
+
+    const payload = {
+      lgteql_invoiceDate: invoiceStartDate || undefined,
+      lsteql_invoiceDate: invoiceEndDate || undefined,
+      lgt_OutstandingBalance:
+        outstandingBalanceStatus === 'yes' && outstandingBalanceStatus !== 'all'
+          ? '0'
+          : undefined,
+      lsteql_OutstandingBalance:
+        outstandingBalanceStatus === 'no' && outstandingBalanceStatus !== 'all'
+          ? '0'
+          : undefined,
+      apiCriteria: {
+        SessionID,
+        SessionType,
+      },
+      group: [
+        {
+          invoiceNo,
+          'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.Name': patientName,
+          'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.PatientAccountNo': patientAccountNo,
+          combineCondition: 'and',
+        },
+      ],
+    }
+
+    dispatch({
+      type: 'invoiceList/query',
+      payload,
+    })
+    dispatch({
+      type: 'invoiceList/updateState',
+      payload: {
+        filterValues: {
+          ...values,
+        },
+      },
+    })
+  },
+})(FilterBar)

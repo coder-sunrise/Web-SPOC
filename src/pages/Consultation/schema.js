@@ -53,6 +53,14 @@ const schema = Yup.object().shape({
   //     onsetDate: Yup.string().required(),
   //   }),
   // ),
+
+  // corEyeVisualAcuityTest: Yup.object().shape({
+  //   eyeVisualAcuityTestForms: Yup.array().of(
+  //     Yup.object().shape({
+  //       nearVADsOD: Yup.string().required(),
+  //     }),
+  //   ),
+  // }),
 })
 
 export default schema

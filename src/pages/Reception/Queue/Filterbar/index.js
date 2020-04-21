@@ -20,28 +20,23 @@ import {
 // sub component
 import StatusFilterButton from './StatusFilterButton'
 import Authorized from '@/utils/Authorized'
-import { USER_ROLE } from '@/utils/constants'
 
 const styles = () => ({
   actionBar: { marginBottom: '10px' },
   switch: { display: 'inline-block', minWidth: '200px' },
 })
 
-const shouldShowSelfOnlyCheckbox = [
-  USER_ROLE.DOCTOR,
-  USER_ROLE.DOCTOR_OWNER,
-]
-
-const Filterbar = ({
-  classes,
-  dispatch,
-  toggleNewPatient,
-  handleSubmit,
-  selfOnly,
-  user,
-  setSearch,
-  loading,
-}) => {
+const Filterbar = (props) => {
+  const {
+    classes,
+    dispatch,
+    toggleNewPatient,
+    handleSubmit,
+    selfOnly,
+    user,
+    setSearch,
+    loading,
+  } = props
   const onSwitchClick = () => dispatch({ type: 'queueLog/toggleSelfOnly' })
 
   return (
@@ -56,9 +51,10 @@ const Filterbar = ({
           render={(args) => (
             <TextField
               {...args}
-              inputProps={{
-                autocomplete: 'queue-listing-filterbar-search',
-              }}
+              autocomplete='off'
+              // inputProps={{
+              //   autocomplete: 'queue-listing-filterbar-search',
+              // }}
               label={formatMessage({
                 id: 'reception.queue.patientSearchPlaceholder',
               })}
@@ -87,22 +83,21 @@ const Filterbar = ({
             Create Visit
           </ProgressButton>
         </Authorized>
-        <Button
-          icon={null}
-          color='primary'
-          size='sm'
-          onClick={toggleNewPatient}
-          disabled={loading.global}
-        >
-          <Hidden mdDown>
-            <PersonAdd />
-          </Hidden>
-          <FormattedMessage id='reception.queue.createPatient' />
-        </Button>
-
-        {shouldShowSelfOnlyCheckbox.includes(
-          user.clinicianProfile.userProfile.role.id,
-        ) && (
+        <Authorized authority='patientdatabase.newpatient'>
+          <Button
+            icon={null}
+            color='primary'
+            size='sm'
+            onClick={toggleNewPatient}
+            disabled={loading.global}
+          >
+            <Hidden mdDown>
+              <PersonAdd />
+            </Hidden>
+            <FormattedMessage id='reception.queue.createPatient' />
+          </Button>
+        </Authorized>
+        {user.clinicianProfile.userProfile.role.clinicRoleFK === 1 && (
           <div className={classes.switch}>
             <Checkbox
               label='Visit assign to me only'

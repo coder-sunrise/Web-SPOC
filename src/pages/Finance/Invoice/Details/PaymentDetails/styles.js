@@ -6,6 +6,11 @@ export default (theme) => ({
   container: {
     margin: theme.spacing(1),
   },
+  popupContainer: {
+    maxHeight: '30vh',
+    overflow: 'scroll',
+  },
+
   printButton: {
     position: 'absolute',
     left: theme.spacing(2),

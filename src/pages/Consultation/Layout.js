@@ -1,154 +1,55 @@
-import React, { PureComponent, Suspense } from 'react'
-import { connect } from 'dva'
-import GridLayout, { Responsive, WidthProvider } from 'react-grid-layout'
-
+import React, { PureComponent } from 'react'
+import classnames from 'classnames'
 import _ from 'lodash'
 import $ from 'jquery'
-import classnames from 'classnames'
-
-import { Menu, Dropdown } from 'antd'
-import {
-  FormControl,
-  InputLabel,
-  Input,
-  Paper,
-  withStyles,
-  Fade,
-  ClickAwayListener,
-  Divider,
-  Slide,
-  Tooltip,
-  Drawer,
-} from '@material-ui/core'
-import MoreVert from '@material-ui/icons/MoreVert'
-import Delete from '@material-ui/icons/Delete'
-import MoreHoriz from '@material-ui/icons/MoreHoriz'
+// react-grid-layout
+import { Responsive, WidthProvider } from 'react-grid-layout'
+// antd
+import { Anchor, Menu, Dropdown } from 'antd'
+// material ui
+import { Paper, Divider, Slide, Tooltip, Drawer } from '@material-ui/core'
 import Clear from '@material-ui/icons/Clear'
 import Settings from '@material-ui/icons/Settings'
-import GetApp from '@material-ui/icons/GetApp'
-import Edit from '@material-ui/icons/Edit'
 import Fullscreen from '@material-ui/icons/Fullscreen'
 import FullscreenExit from '@material-ui/icons/FullscreenExit'
 import CompareArrows from '@material-ui/icons/CompareArrows'
+import Accessibility from '@material-ui/icons/Accessibility'
 
-import { standardRowHeight, headerHeight } from 'mui-pro-jss'
+import { headerHeight } from 'mui-pro-jss'
+// common components
 import {
   CardContainer,
-  TextField,
   Button,
-  CommonHeader,
-  CommonModal,
-  PictureUpload,
-  GridContainer,
-  GridItem,
-  Card,
-  CardAvatar,
-  CardBody,
-  notification,
-  Select,
-  DatePicker,
   CheckboxGroup,
   ProgressButton,
-  Checkbox,
-  NumberFormatter,
-  confirm,
   SizeContainer,
   Popconfirm,
-  withFormikExtend,
-  FastField,
-  NumberInput,
-  Skeleton,
   IconButton,
   CustomInputWrapper,
-  Fab,
+  notification,
+  GridContainer,
+  GridItem,
 } from '@/components'
-import { sendNotification } from '@/utils/realtime'
+// sub components
+import PatientHistoryDrawer from './PatientHistoryDrawer'
+import LabTrackingDrawer from './LabTrackingDrawer'
 import { control } from '@/components/Decorator'
-
-import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
-import Authorized from '@/utils/Authorized'
-import { getAppendUrl } from '@/utils/utils'
-import { widgets } from '@/utils/widgets'
-import styles from './style'
 import Templates from './Templates'
+// utils
+import Authorized from '@/utils/Authorized'
+import { widgets } from '@/utils/widgets'
+import gpLayoutCfg, { dentalLayoutCfg } from './layoutConfigs'
+import { CLINIC_TYPE } from '@/utils/constants'
 
-const _defaultLayout = [
-  {
-    id: '1',
-    config: {
-      lg: { x: 0, y: 0, w: 6, h: 6, minH: 3, minW: 4 },
-      md: { x: 0, y: 0, w: 5, h: 6, minH: 3, minW: 3 },
-      sm: { x: 0, y: 0, w: 6, h: 6, minH: 3, minW: 6 },
-      xs: { x: 0, y: 0, w: 4, h: 6, minH: 3, minW: 4 },
-      xxs: { x: 0, y: 0, w: 2, h: 6, minH: 3, minW: 2 },
-    },
-  },
-  {
-    id: '4',
-    config: {
-      lg: { x: 6, y: 0, w: 6, h: 6, minH: 3, minW: 4 },
-      md: { x: 5, y: 0, w: 5, h: 6, minH: 3, minW: 3 },
-      sm: { x: 0, y: 6, w: 6, h: 6, minH: 3, minW: 6 },
-      xs: { x: 0, y: 6, w: 4, h: 6, minH: 3, minW: 4 },
-      xxs: { x: 0, y: 6, w: 2, h: 6, minH: 3, minW: 2 },
-    },
-  },
-  {
-    id: '2',
-    config: {
-      lg: { x: 0, y: 12, w: 6, h: 3, minH: 2, minW: 4 },
-      md: { x: 0, y: 12, w: 5, h: 3, minH: 2, minW: 3 },
-      sm: { x: 0, y: 12, w: 6, h: 2, minH: 2, minW: 6 },
-      xs: { x: 0, y: 12, w: 4, h: 2, minH: 2, minW: 4 },
-      xxs: { x: 0, y: 12, w: 2, h: 2, minH: 2, minW: 2 },
-    },
-  },
-  {
-    id: '7',
-    config: {
-      lg: { x: 0, y: 15, w: 6, h: 3, minH: 2, minW: 4 },
-      md: { x: 0, y: 15, w: 5, h: 36, minH: 2, minW: 3 },
-      sm: { x: 0, y: 14, w: 6, h: 2, minH: 2, minW: 6 },
-      xs: { x: 0, y: 14, w: 4, h: 2, minH: 2, minW: 4 },
-      xxs: { x: 0, y: 14, w: 2, h: 2, minH: 2, minW: 2 },
-    },
-  },
-  {
-    id: '3',
-    config: {
-      lg: { x: 0, y: 18, w: 12, h: 3, minH: 3, minW: 6 },
-      md: { x: 0, y: 18, w: 10, h: 3, minH: 3, minW: 5 },
-      sm: { x: 0, y: 18, w: 6, h: 3, minH: 3, minW: 6 },
-      xs: { x: 0, y: 18, w: 4, h: 3, minH: 3, minW: 4 },
-      xxs: { x: 0, y: 18, w: 2, h: 3, minH: 3, minW: 2 },
-    },
-  },
-
-  {
-    id: '5',
-    config: {
-      lg: { x: 6, y: 12, w: 6, h: 6, minH: 3, minW: 4 },
-      md: { x: 5, y: 12, w: 5, h: 6, minH: 3, minW: 3 },
-      sm: { x: 0, y: 26, w: 6, h: 6, minH: 3, minW: 6 },
-      xs: { x: 0, y: 26, w: 4, h: 6, minH: 3, minW: 4 },
-      xxs: { x: 0, y: 26, w: 2, h: 6, minH: 3, minW: 2 },
-    },
-  },
-
-  // {
-  //   id: '1002',
-  //   config: {
-  //     lg: { x: 0, y: 12, w: 12, h: 6, minH: 3, minW: 6 },
-  //     md: { x: 0, y: 12, w: 10, h: 6, minH: 3, minW: 5 },
-  //   },
-  // },
-]
+// console.log(JSON.stringify(dentalLayoutCfg))
 const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
 const sizes = Object.keys(breakpoints)
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
-let lasActivedWidget = null
+let lastActivedWidget = null
+
+const { Link } = Anchor
 // @connect(({ cestemplate }) => ({
 //   cestemplate,
 // }))
@@ -156,7 +57,6 @@ let lasActivedWidget = null
 class Layout extends PureComponent {
   constructor (props) {
     super(props)
-
     this.container = React.createRef()
     this.layoutContainer = React.createRef()
     // console.log(this.container)
@@ -164,81 +64,111 @@ class Layout extends PureComponent {
     this.delayedResize = _.debounce(this.resize, 300)
     window.addEventListener('resize', this.delayedResize)
     this.delayedChangeLayout = _.debounce(this.changeLayout, 300)
+    this.ordersRef = React.createRef()
+    this.myRefs = []
 
     // console.log(localStorage.getItem('consultationLayout'))
     // console.log(JSON.parse(localStorage.getItem('consultationLayout') || '{}'))
 
-    const { userDefaultLayout } = props
-    this.pageDefaultWidgets = _defaultLayout
+    const { userDefaultLayout, clinicInfo } = props
+
+    let { defaultConsultationTemplate = '[]' } = clinicInfo
+    // console.log(defaultConsultationTemplate)
+    if (!defaultConsultationTemplate || defaultConsultationTemplate === '[]') {
+      notification.warn({
+        message: 'Clinic do not have default template configuration',
+      })
+      this.pageDefaultWidgets = []
+    } else {
+      this.pageDefaultWidgets = JSON.parse(defaultConsultationTemplate)
+    }
+
     let defaultLayout
-    // console.log('userDefaultLayout', userDefaultLayout)
+
     if (userDefaultLayout && userDefaultLayout.consultationTemplate) {
       defaultLayout = JSON.parse(userDefaultLayout.consultationTemplate)
-    } else if (true) {
+      defaultLayout = {
+        ...defaultLayout,
+        widgets: defaultLayout.widgets.filter(this.fitlerItemWithAccessRight),
+      }
+    } else {
       // disable local setting(!localStorage.getItem('consultationLayout')) {
       defaultLayout = this.getDefaultLayout()
-    } else {
-      defaultLayout = JSON.parse(localStorage.getItem('consultationLayout'))
     }
+    //  else {
+    //   defaultLayout = JSON.parse(localStorage.getItem('consultationLayout'))
+    // }
     // console.log(defaultLayout)
     if (!defaultLayout.widgets) {
       defaultLayout = this.getDefaultLayout()
     }
-    console.log(defaultLayout)
+    // console.log(defaultLayout)
     this.widgetMenu = (
       <Menu>
-        {widgets.map((o) => {
-          const cfg = defaultLayout.lg.find((m) => m.i === o.id) || {}
-
-          return (
-            <Menu.Item
-              key={o.id}
-              disabled={cfg.static}
-              onClick={(e) => {
-                // console.log(this.state.currentLayout)
-                // console.log(e.domEvent.target)
-                // console.log(this.state.replaceWidget)
-                if (e.key === this.state.replaceWidget) return false
-                const layout = _.cloneDeep(this.state.currentLayout)
-                for (let index = 0; index < sizes.length; index++) {
-                  const breakpoint = sizes[index]
-                  if (layout[breakpoint]) {
-                    const target = layout[breakpoint].find((m) => m.i === e.key)
-                    let starter = layout[breakpoint].find(
-                      (m) => m.i === this.state.replaceWidget,
-                    )
-                    if (target) {
-                      target.i = this.state.replaceWidget
-                      starter.i = e.key
-                    } else {
-                      starter.i = e.key
-                      if (
-                        layout.widgets.find(
-                          (m) => m === this.state.replaceWidget,
-                        )
+        {widgets
+          .map((widget) => {
+            const widgetAccessRight = Authorized.check(widget.accessRight)
+            const { rights } = widgetAccessRight || { rights: undefined }
+            return { ...widget, rights }
+          })
+          .filter((widget) => {
+            if (!widget.rights) return false
+            return widget.rights !== 'hidden'
+          })
+          .map((o) => {
+            const cfg = defaultLayout.lg.find((m) => m.i === o.id) || {}
+            // const disableByAccessRight = o.rights === 'disable'
+            return (
+              <Menu.Item
+                key={o.id}
+                disabled={cfg.static}
+                onClick={(e) => {
+                  // console.log(this.state.currentLayout)
+                  // console.log(e.domEvent.target)
+                  // console.log(this.state.replaceWidget)
+                  if (e.key === this.state.replaceWidget) return false
+                  const layout = _.cloneDeep(this.state.currentLayout)
+                  for (let index = 0; index < sizes.length; index++) {
+                    const breakpoint = sizes[index]
+                    if (layout[breakpoint]) {
+                      const target = layout[breakpoint].find(
+                        (m) => m.i === e.key,
                       )
-                        layout.widgets = _.reject(
-                          layout.widgets,
-                          (m) => m === this.state.replaceWidget,
+                      let starter = layout[breakpoint].find(
+                        (m) => m.i === this.state.replaceWidget,
+                      )
+                      if (target) {
+                        target.i = this.state.replaceWidget
+                        starter.i = e.key
+                      } else {
+                        starter.i = e.key
+                        if (
+                          layout.widgets.find(
+                            (m) => m === this.state.replaceWidget,
+                          )
                         )
+                          layout.widgets = _.reject(
+                            layout.widgets,
+                            (m) => m === this.state.replaceWidget,
+                          )
 
-                      if (!layout.widgets.find((m) => m === e.key)) {
-                        layout.widgets.push(e.key)
+                        if (!layout.widgets.find((m) => m === e.key)) {
+                          layout.widgets.push(e.key)
+                        }
+                        // layout[breakpoint]=_.reject(layout[breakpoint])
                       }
-                      // layout[breakpoint]=_.reject(layout[breakpoint])
-                    }
 
-                    // console.log(target, starter)
+                      // console.log(target, starter)
+                    }
                   }
-                }
-                // console.log(layout)
-                this.changeLayout(layout)
-              }}
-            >
-              {o.name}
-            </Menu.Item>
-          )
-        })}
+                  // console.log(layout)
+                  this.changeLayout(layout)
+                }}
+              >
+                {o.name}
+              </Menu.Item>
+            )
+          })}
       </Menu>
     )
 
@@ -249,7 +179,10 @@ class Layout extends PureComponent {
       showInvoiceAdjustment: false,
       collapsed: global.collapsed,
       currentLayout: defaultLayout,
+      openPatientHistoryDrawer: false,
+      openLabTrackingDrawer: false,
     }
+    localStorage.setItem('consultationLayout', JSON.stringify(defaultLayout))
   }
 
   // componentDidMount () {}
@@ -257,6 +190,11 @@ class Layout extends PureComponent {
   componentWillUnmount () {
     window.removeEventListener('resize', this.delayedResize)
     $(window.mainPanel).css('overflow', 'auto')
+
+    this.state.currentLayout.widgets.map((id) => {
+      const w = widgets.find((o) => o.id === id)
+      if (w && w.onUnmount) w.onUnmount()
+    })
   }
 
   resize = (e) => {
@@ -354,35 +292,28 @@ class Layout extends PureComponent {
     this.changeLayout(layout)
   }
 
+  promptRemoveWidgetConfirmation = (key) => {
+    this.props.dispatch({
+      type: 'global/updateState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: 'Confirm to remove widgets?',
+        openConfirmText: 'Confirm',
+        onConfirmSave: () => this.removeWidget(key),
+      },
+    })
+  }
+
   updateWidget = (ids, changes) => {
-    // console.log(ids, changes)
     const keys = Object.keys(changes)
     for (let index = 0; index < keys.length; index++) {
       const key = keys[index]
-      // console.log(key)
       if (changes[key]) {
         this.addWidget(key)
       } else {
-        this.removeWidget(key)
+        this.promptRemoveWidgetConfirmation(key)
       }
     }
-    // const { currentLayout } = this.state
-    // const widgets = this.getDefaultLayout().widgets.filter(
-    //   (o) => ids.indexOf(o.id) >= 0,
-    // )
-    // console.log(widgets)
-    // const sizes = [
-    //   'lg',
-    //   'md',
-    //   'sm',
-    // ]
-    // const layout = {
-    //   widgets,
-    // }
-    // sizes.forEach((s) => {
-    //   layout[s] = currentLayout[s]
-    // })
-    // this.changeLayout(layout)
   }
 
   changeLayout = (layout) => {
@@ -396,11 +327,23 @@ class Layout extends PureComponent {
     )
   }
 
+  fitlerItemWithAccessRight = (itemId) => {
+    const w = widgets.find((m) => m.id === itemId)
+    if (!w) return false
+    const widgetAccessRight = Authorized.check(w.accessRight)
+
+    if (widgetAccessRight && widgetAccessRight.rights !== 'hidden') return true
+
+    return false
+  }
+
   getDefaultLayout = () => {
-    console.log('getDefaultLayout')
     const defaultWidgets = _.cloneDeep(this.pageDefaultWidgets)
+
     const r = {
-      widgets: defaultWidgets.map((o) => o.id),
+      widgets: defaultWidgets
+        .filter((w) => this.fitlerItemWithAccessRight(w.id))
+        .map((o) => o.id),
     }
     sizes.forEach((s) => {
       r[s] = defaultWidgets.map((o) => ({
@@ -447,6 +390,18 @@ class Layout extends PureComponent {
     }
   }
 
+  togglePatientHistoryDrawer = () => {
+    this.setState((prevState) => ({
+      openPatientHistoryDrawer: !prevState.openPatientHistoryDrawer,
+    }))
+  }
+
+  toggleLabTrackingDrawer = () => {
+    this.setState((prevState) => ({
+      openLabTrackingDrawer: !prevState.openLabTrackingDrawer,
+    }))
+  }
+
   compareNodeLayoutChange = (a, b) => {
     for (let index = 0; index < a.length; index++) {
       const a1 = a[index]
@@ -465,15 +420,18 @@ class Layout extends PureComponent {
     // console.log($(e.target).parent('.widget-container')[0])
     // elevation[cfg.id] = 3
     // this.setState({ elevation })
-    // if (lasActivedWidgetId === id) return
-    if (lasActivedWidget) {
-      lasActivedWidget.css('overflowY', 'hidden')
-      lasActivedWidget.css('overflowX', 'hidden')
+    // if (lastActivedWidgetId === id) return
+    if (lastActivedWidget) {
+      lastActivedWidget.css('overflowY', 'hidden')
+      lastActivedWidget.css('overflowX', 'hidden')
     }
-    lasActivedWidget = $($(e.target).parents('.widget-container')[0])
-    if (lasActivedWidget.length > 0) {
-      lasActivedWidget.css('overflowY', 'auto')
-      lasActivedWidget.css('overflowX', 'hidden')
+    const t = $(e.target)
+    lastActivedWidget = t.hasClass('widget-container')
+      ? t
+      : $(t.parents('.widget-container')[0])
+    if (lastActivedWidget.length > 0) {
+      lastActivedWidget.css('overflowY', 'auto')
+      lastActivedWidget.css('overflowX', 'hidden')
     }
   }
 
@@ -514,7 +472,7 @@ class Layout extends PureComponent {
   // }
 
   getLayoutRowHeight = () => {
-    const topHeight = (this.props.height ? 0 : headerHeight) + 114
+    const topHeight = (this.props.height ? 0 : headerHeight) + 158 // 168 = nav header height + patient banner height + anchor height
     // console.log(
     //   this.props,
     //   (this.props.height || window.innerHeight - topHeight) / 6,
@@ -524,21 +482,41 @@ class Layout extends PureComponent {
     return ((this.props.height || window.innerHeight) - topHeight) / 6
   }
 
+  onAnchorClick = (id) => {
+    const parentElement = document.getElementById('mainPanel-root')
+    const element = document.getElementById(id)
+    try {
+      if (parentElement && element) {
+        const screenPosition = element.getBoundingClientRect()
+        const { scrollTop } = parentElement
+        const { top, left } = screenPosition
+
+        parentElement.scrollTo({
+          // scrolled top position + element top position - Nav header height and Patient Banner height
+          top: scrollTop + top - 208,
+          left,
+          behavior: 'smooth',
+        })
+      }
+    } catch (error) {
+      console.error({ error })
+    }
+  }
+
   render () {
     const { state, props } = this
     const { currentLayout } = state
+    const { classes, ...restProps } = props
     const {
-      classes,
       theme,
       height,
-      values,
-      cestemplate,
       rights,
+      clinicInfo,
       onSaveLayout = (f) => f,
-    } = props
+    } = restProps
     const widgetProps = {
       status: 'consultation',
-      parentProps: props,
+      // parentProps: props,
       rights,
     }
     // console.log(state.currentLayout)
@@ -621,9 +599,70 @@ class Layout extends PureComponent {
       },
     }
 
-    // console.log(this.props)
+    // console.log({ currentLayout: state.currentLayout.widgets, widgets })
+    const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
     return (
       <div>
+        {!this.state.fullScreenWidget && (
+          <CardContainer
+            hideHeader
+            style={{
+              marginTop: 0,
+              position: 'sticky',
+              overflowY: 'auto',
+              top: headerHeight + 100,
+              zIndex: 1000,
+              borderRadius: 0,
+              marginBottom: 0,
+              // backgroundColor: '#f0f8ff',
+            }}
+          >
+            <GridContainer justify='space-between'>
+              <GridItem md={9}>
+                {state.currentLayout.widgets.map((id) => {
+                  const w = widgets.find((o) => o.id === id)
+                  if (!w) return null
+
+                  const onClick = () => this.onAnchorClick(w.id)
+                  return (
+                    <Button size='sm' color='primary' onClick={onClick}>
+                      {w.name}
+                    </Button>
+                  )
+                })}
+              </GridItem>
+              <GridItem md={3} style={{ textAlign: 'right' }}>
+                <Button
+                  size='sm'
+                  color='info'
+                  onClick={this.toggleLabTrackingDrawer}
+                >
+                  <Accessibility />
+                  Results
+                </Button>
+                <Button size='sm' color='info' onClick={this.toggleDrawer}>
+                  <Settings />
+                  Widgets
+                </Button>
+                <Authorized authority='queue.consultation.widgets.patienthistory'>
+                  {({ rights: patientHistoryAccessRight }) => {
+                    if (patientHistoryAccessRight === 'hidden') return null
+                    return (
+                      <Button
+                        size='sm'
+                        color='info'
+                        onClick={this.togglePatientHistoryDrawer}
+                      >
+                        <Accessibility />
+                        History
+                      </Button>
+                    )
+                  }}
+                </Authorized>
+              </GridItem>
+            </GridContainer>
+          </CardContainer>
+        )}
         {true && (
           <div
             ref={this.layoutContainer}
@@ -632,7 +671,9 @@ class Layout extends PureComponent {
               overflowY: 'auto',
               overflowX: 'hidden',
               marginTop: 1,
+              position: 'relative',
             }}
+
             // onScroll={this.delayedMainDivScroll}
           >
             <ResponsiveGridLayout {...layoutCfg}>
@@ -641,9 +682,10 @@ class Layout extends PureComponent {
                 if (!w) return <div />
                 const cfgs = state.currentLayout[state.breakpoint]
                 const cfg = cfgs.find((o) => o.i === id)
-                // console.log(cfg, w)
+
                 if (!cfg) return <div key={id} />
                 const LoadableComponent = w.component
+
                 return (
                   <div
                     className={classnames({
@@ -655,6 +697,7 @@ class Layout extends PureComponent {
                         state.fullScreenWidget === id,
                     })}
                     key={id}
+                    id={w.id}
                   >
                     <Paper
                       {...this.generateConfig(id)}
@@ -756,10 +799,13 @@ class Layout extends PureComponent {
                       )}
                       <div
                         className='non-dragable'
-                        style={w.layoutConfig.style}
+                        style={w.layoutConfig ? w.layoutConfig.style : {}}
                       >
                         <SizeContainer size='sm'>
-                          <LoadableComponent {...widgetProps} />
+                          <LoadableComponent
+                            {...widgetProps}
+                            {...w.restProps}
+                          />
                         </SizeContainer>
                       </div>
                     </Paper>
@@ -771,13 +817,13 @@ class Layout extends PureComponent {
         )}
         {!state.fullScreenWidget && (
           <React.Fragment>
-            <div className={classes.fabContainer}>
+            {/* <div className={classes.fabContainer}>
               <Slide
                 direction='up'
                 in={this.state.mode === 'edit'}
                 mountOnEnter
               >
-                <div>
+                <div style={{ display: 'inline-block' }}>
                   <Fab
                     color='secondary'
                     className={classes.fab}
@@ -790,32 +836,82 @@ class Layout extends PureComponent {
                   </Fab>
                 </div>
               </Slide>
-            </div>
+              {clinicTypeFK === CLINIC_TYPE.DENTAL && (
+                <Slide
+                  direction='up'
+                  in={this.state.mode === 'edit'}
+                  mountOnEnter
+                >
+                  <div style={{ display: 'inline-block' }}>
+                    <Fab
+                      color='secondary'
+                      className={classes.fab}
+                      style={{ marginRight: 8 }}
+                      variant='extended'
+                      size='small'
+                      onClick={this.togglePatientHistoryDrawer}
+                    >
+                      <Accessibility />&nbsp;Patient History
+                    </Fab>
+                  </div>
+                </Slide>
+              )}
+            </div> */}
+            <Drawer
+              anchor='right'
+              open={this.state.openPatientHistoryDrawer}
+              onClose={this.togglePatientHistoryDrawer}
+            >
+              <PatientHistoryDrawer
+                {...widgetProps}
+                onClose={this.togglePatientHistoryDrawer}
+              />
+              {/* <div style={{ width: '67vw', padding: theme.spacing(2) }}>
+                <h4>Patient History</h4>
+                <Button />
+                <SizeContainer size='sm'>
+                  <PatientHistory {...widgetProps} mode='integrated' />
+                </SizeContainer>
+              </div> */}
+            </Drawer>
             <Drawer
               anchor='right'
               open={this.state.openDraw}
               onClose={this.toggleDrawer}
             >
-              <div style={{ width: 260 }}>
+              <div style={{ width: 360, position: 'relative' }}>
+                <h5
+                  style={{
+                    fontWeight: 500,
+                    lineHeight: 1.3,
+                    position: 'absolute',
+                    top: 8,
+                    left: 16,
+                  }}
+                >
+                  Manage Widgets
+                </h5>
                 <SizeContainer size='sm'>
                   <CheckboxGroup
                     className={classes.fabDiv}
-                    label='Manage Widgets'
+                    label=''
                     vertical
                     strongLabel
                     value={currentLayout.widgets}
                     valueField='id'
                     textField='name'
-                    options={widgets}
+                    options={widgets.filter((widget) => {
+                      const widgetAccessRight = Authorized.check(
+                        widget.accessRight,
+                      )
+                      if (!widgetAccessRight) return false
+                      const shouldShow =
+                        widgetAccessRight &&
+                        widgetAccessRight.rights !== 'hidden'
+
+                      return shouldShow
+                    })}
                     onChange={(e, s) => {
-                      // console.log(e)
-                      // dispatch({
-                      //   type: 'consultation/updateState',
-                      //   payload: {
-                      //     selectedWidgets: e.target.value,
-                      //   },
-                      // })
-                      // console.log(e.target.value, s)
                       this.updateWidget(e.target.value, s)
                     }}
                   />
@@ -836,12 +932,21 @@ class Layout extends PureComponent {
                   </div>
                   <Divider light />
                   <div className={classes.fabDiv}>
-                    <Templates {...this.props} />
+                    <Templates {...restProps} />
                   </div>
                   <Divider light />
                   <div className={classes.fabDiv}>
+                    <h5
+                      style={{
+                        fontWeight: 500,
+                        lineHeight: 1.3,
+                        position: 'absolute',
+                      }}
+                    >
+                      Manage Layout
+                    </h5>
                     <CustomInputWrapper
-                      label='My Layout'
+                      label=''
                       style={{ paddingTop: 25 }}
                       strongLabel
                       labelProps={{
@@ -849,16 +954,47 @@ class Layout extends PureComponent {
                       }}
                     >
                       <ProgressButton
+                        style={{ margin: theme.spacing(1, 0) }}
                         onClick={() => {
                           onSaveLayout(this.state.currentLayout)
                         }}
                       >
                         Save as My Favourite
                       </ProgressButton>
+                      <ul
+                        style={{
+                          listStyle: 'square',
+                          paddingLeft: 16,
+                          fontSize: 'smaller',
+                        }}
+                      >
+                        <li>
+                          <p>
+                            Save current consultation layout as my favourite.
+                          </p>
+                        </li>
+                        <li>
+                          <p>
+                            System will use favourite layout for new
+                            consultation.
+                          </p>
+                        </li>
+                      </ul>
                     </CustomInputWrapper>
                   </div>
                 </SizeContainer>
               </div>
+            </Drawer>
+            <Drawer
+              anchor='right'
+              open={this.state.openLabTrackingDrawer}
+              onClose={this.toggleLabTrackingDrawer}
+            >
+              <LabTrackingDrawer
+                {...widgetProps}
+                patientId={this.props.visitRegistration.entity.visit.patientProfileFK}
+                onClose={this.toggleLabTrackingDrawer}
+              />
             </Drawer>
           </React.Fragment>
         )}

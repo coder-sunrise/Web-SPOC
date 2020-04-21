@@ -27,6 +27,7 @@ export default createFormViewModel({
     service,
     state: {
       entity: {
+        queueNo: '',
         visit: {
           visitRemarks: undefined,
         },
@@ -161,6 +162,36 @@ export default createFormViewModel({
               patientInfo: 'Failed to retrieve patient info',
             },
           })
+        }
+      },
+      *getVisitOrderTemplateList ({ payload }, { call, put }) {
+        try {
+          const response = yield call(service.queryVisitOrderTemplate, payload)
+          const { data } = response
+          return data
+        } catch (error) {
+          yield put({
+            type: 'updateErrorState',
+            payload: {
+              patientInfo: 'Failed to retrieve visit order templates',
+            },
+          })
+          return false
+        }
+      },
+      *getReferralList ({ payload }, { call, put }) {
+        try {
+          const response = yield call(service.queryReferralList)
+          const { data } = response
+          return data
+        } catch (error) {
+          yield put({
+            type: 'updateErrorState',
+            payload: {
+              patientInfo: 'Failed to retrieve referral list',
+            },
+          })
+          return false
         }
       },
     },

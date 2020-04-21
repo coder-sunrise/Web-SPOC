@@ -45,33 +45,7 @@ const initialState = {
   defaultOrderSet: {
     orderSetItems: [],
   },
-  // default: {
-  //   corPrescriptionItemPrecaution: [
-  //     {
-  //       action: '1',
-  //       count: 1,
-  //       unit: '1',
-  //       frequency: '1',
-  //       day: 1,
-  //       // precaution: '1',
-  //       operator: '1',
-  //     },
-  //   ],
-  //   descriptions: [
-  //     {
-  //       action: '1',
-  //       count: 1,
-  //       unit: '1',
-  //       frequency: '1',
-  //       day: 1,
-  //       precaution: '1',
-  //       operator: '1',
-  //     },
-  //   ],
-  //   quantity: 1,
-  //   total: 20,
-  //   totalAfterAdj: 18,
-  // },
+  defaultTreatment: {},
 }
 export default createListViewModel({
   namespace: 'orders',
@@ -103,9 +77,9 @@ export default createListViewModel({
               entity: undefined,
             },
           })
-          yield put({
-            type: 'global/incrementCommitCount',
-          })
+          // yield put({
+          //   type: 'global/incrementCommitCount',
+          // })
         }
       },
       *upsertRows ({ payload }, { select, call, put, delay }) {
@@ -156,12 +130,15 @@ export default createListViewModel({
 
     reducers: {
       reset () {
-        console.log('order reset')
+        // console.log('order reset')
         return { ...initialState }
       },
       upsertRowState (state, { payload }) {
         let newRow
         let { rows, type } = state
+        if (payload.type) {
+          type = payload.type
+        }
         if (payload.uid) {
           rows = rows.map((row) => {
             const n =
@@ -206,7 +183,7 @@ export default createListViewModel({
       },
 
       deleteRow (state, { payload }) {
-        let { finalAdjustments, rows } = state
+        let { finalAdjustments, rows, isGSTInclusive, gstValue } = state
         let tempRows = [
           ...rows,
         ]
@@ -228,7 +205,10 @@ export default createListViewModel({
           }))
         }
 
-        const amount = calculateAmount(tempRows, finalAdjustments)
+        const amount = calculateAmount(tempRows, finalAdjustments, {
+          isGSTInclusive,
+          gstValue,
+        })
         // console.log(tempRows, finalAdjustments, amount)
         return {
           ...state,

@@ -20,8 +20,11 @@ import {
 import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
 // sub component
 import PatientBanner from '@/pages/PatientDashboard/Banner'
-import DispenseDetails from '@/pages/Dispense/DispenseDetails/PrintDrugLabelWrapper'
+// import DispenseDetails from '@/pages/Dispense/DispenseDetails/PrintDrugLabelWrapper'
+import DispenseDetails from '@/pages/Dispense/DispenseDetails/WebSocketWrapper'
 // import ApplyClaims from './components/ApplyClaims'
+import { roundTo } from '@/utils/utils'
+import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 import ApplyClaims from './refactored/newApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 import SchemeValidationPrompt from './components/SchemeValidationPrompt'
@@ -30,8 +33,7 @@ import {
   constructPayload,
   validateApplySchemesWithPatientSchemes,
 } from './utils'
-import { roundTo } from '@/utils/utils'
-import { INVOICE_PAYER_TYPE } from '@/utils/constants'
+import Authorized from '@/utils/Authorized'
 
 // window.g_app.replaceModel(model)
 
@@ -58,6 +60,7 @@ const styles = (theme) => ({
   },
 })
 
+// @Authorized.Secured('queue.dispense.makepayment')
 @connect(
   ({
     global,
@@ -82,6 +85,9 @@ const styles = (theme) => ({
   }),
 )
 @withFormikExtend({
+  // authority: [
+  //   'queue.dispense.makepayment',
+  // ],
   notDirtyDuration: 3,
   displayName: 'BillingForm',
   enableReinitialize: true,
@@ -122,6 +128,7 @@ const styles = (theme) => ({
     return { ...billing.default, visitId: billing.visitID }
   },
 })
+@Authorized.Secured('queue.dispense.makepayment')
 class Billing extends Component {
   state = {
     showReport: false,
@@ -139,13 +146,6 @@ class Billing extends Component {
     const { billing, history, dispatch } = this.props
     const { patientID } = billing
     const { query } = history.location
-    dispatch({
-      type: 'patient/query',
-      payload: {
-        id: patientID,
-        version: Date.now(),
-      },
-    })
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {
@@ -170,6 +170,12 @@ class Billing extends Component {
   componentWillUnmount () {
     this.props.dispatch({
       type: 'billing/updateState',
+      payload: {
+        entity: null,
+      },
+    })
+    this.props.dispatch({
+      type: 'dispense/updateState',
       payload: {
         entity: null,
       },
@@ -295,10 +301,27 @@ class Billing extends Component {
   }
 
   onCompletePaymentClick = async () => {
-    const { setFieldValue } = this.props
+    const { dispatch, values, setFieldValue } = this.props
     await setFieldValue('mode', 'save')
     await setFieldValue('visitStatus', 'COMPLETED')
-    this.upsertBilling()
+
+    // check if invoice is OVERPAID and prompt user for confirmation
+    const { invoice } = values
+    const { outstandingBalance = 0 } = invoice
+    if (outstandingBalance < 0) {
+      return dispatch({
+        type: 'global/updateState',
+        payload: {
+          openConfirm: true,
+          openConfirmTitle: '',
+          openConfirmText: 'Confirm',
+          openConfirmContent:
+            'Invoice is overpaid. Confirm to complete billing?',
+          onConfirmSave: this.upsertBilling,
+        },
+      })
+    }
+    return this.upsertBilling()
   }
 
   onPrintReceiptClick = (invoicePaymentID) => {
@@ -528,7 +551,7 @@ class Billing extends Component {
               }}
             />
           </GridItem>
-          <GridItem md={4}>
+          <GridItem md={4} style={{ paddingRight: 0 }}>
             <React.Fragment>
               <div className={classes.paymentButton}>
                 <Button

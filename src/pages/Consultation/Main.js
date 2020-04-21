@@ -44,7 +44,6 @@ import {
   CheckboxGroup,
   ProgressButton,
   Checkbox,
-  NumberFormatter,
   confirm,
   SizeContainer,
   Popconfirm,
@@ -56,7 +55,6 @@ import {
 import Authorized from '@/utils/Authorized'
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 
-import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
 import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 // import model from '@/pages/Widgets/Orders/models'
 import { convertToConsultation } from './utils'
@@ -70,8 +68,9 @@ import Layout from './Layout'
 
 import schema from './schema'
 import styles from './style'
-
+import { CallingQueueButton } from '@/components/_medisys'
 // window.g_app.replaceModel(model)
+import { initRoomAssignment } from '@/utils/codes'
 
 const discardMessage = 'Discard consultation?'
 const formName = 'ConsultationPage'
@@ -192,6 +191,7 @@ const discardConsultation = ({
 // @skeleton()
 @connect(
   ({
+    clinicInfo,
     consultation,
     global,
     consultationDocument,
@@ -200,6 +200,7 @@ const discardConsultation = ({
     formik,
     cestemplate,
   }) => ({
+    clinicInfo,
     consultation,
     global,
     consultationDocument,
@@ -244,9 +245,19 @@ class Main extends React.Component {
 
   componentDidMount () {
     // console.log('Main')
+    initRoomAssignment()
     setTimeout(() => {
       this.props.setFieldValue('fakeField', 'setdirty')
     }, 500)
+  }
+
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'consultation/updateState',
+      payload: {
+        entity: undefined,
+      },
+    })
   }
 
   shouldComponentUpdate = (nextProps) => {
@@ -454,13 +465,14 @@ class Main extends React.Component {
     } = this.props
     const { entity: vistEntity = {} } = visitRegistration
     // if (!vistEntity) return null
-    const { visit = {} } = vistEntity
+    const { visit = {}, queueNo } = vistEntity
     const { summary } = orders
     // const { adjustments, total, gst, totalWithGst } = summary
     // console.log('values', values, this.props)
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)
+
     return (
       <SizeContainer size='sm'>
         <div
@@ -583,7 +595,16 @@ class Main extends React.Component {
                 )}
               </h4>
             </GridItem>
-            <GridItem>
+            <GridItem style={{ display: 'flex' }}>
+              <Authorized authority='openqueuedisplay'>
+                <div style={{ marginRight: 10 }}>
+                  <CallingQueueButton
+                    qId={queueNo}
+                    roomNo={visit.roomFK}
+                    doctor={visit.doctorProfileFK}
+                  />
+                </div>
+              </Authorized>
               {values.status !== 'PAUSED' && (
                 <ProgressButton
                   color='danger'
@@ -675,14 +696,31 @@ class Main extends React.Component {
         ...v[p],
       ]
     })
-    if (v.corDoctorNote && v.corDoctorNote.length) {
-      if (exist.corDoctorNote && exist.corDoctorNote.length) {
-        exist.corDoctorNote[0].chiefComplaints = `${exist.corDoctorNote[0]
-          .chiefComplaints}<br/>${v.corDoctorNote[0].chiefComplaints}`
-        exist.corDoctorNote[0].clinicianNote = `${exist.corDoctorNote[0]
-          .clinicianNote}<br/>${v.corDoctorNote[0].clinicianNote}`
-        exist.corDoctorNote[0].plan = `${exist.corDoctorNote[0].plan}<br/>${v
-          .corDoctorNote[0].plan}`
+    if (v.corDoctorNote && v.corDoctorNote.length > 0) {
+      if (exist.corDoctorNote && exist.corDoctorNote.length > 0) {
+        const {
+          chiefComplaints = '',
+          clinicianNote = '',
+          plan = '',
+        } = exist.corDoctorNote[0]
+
+        if (chiefComplaints)
+          exist.corDoctorNote[0].chiefComplaints = `${chiefComplaints}<br/>${v
+            .corDoctorNote[0].chiefComplaints}`
+        else
+          exist.corDoctorNote[0].chiefComplaints =
+            v.corDoctorNote[0].chiefComplaints
+
+        if (clinicianNote)
+          exist.corDoctorNote[0].clinicianNote = `${clinicianNote}<br/>${v
+            .corDoctorNote[0].clinicianNote}`
+        else
+          exist.corDoctorNote[0].clinicianNote =
+            v.corDoctorNote[0].clinicianNote
+
+        if (plan)
+          exist.corDoctorNote[0].plan = `${plan}<br/>${v.corDoctorNote[0].plan}`
+        else exist.corDoctorNote[0].plan = v.corDoctorNote[0].plan
       } else {
         exist.corDoctorNote = [
           ...v.corDoctorNote,
@@ -748,6 +786,14 @@ class Main extends React.Component {
   //     },
   //   })
   // }
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'consultation/updateState',
+      payload: {
+        entity: undefined,
+      },
+    })
+  }
 
   render () {
     const { props, state } = this
@@ -761,6 +807,7 @@ class Main extends React.Component {
       orders = {},
       formik,
       rights,
+      disabled,
       ...resetProps
     } = this.props
     const { entity } = consultation
@@ -771,7 +818,7 @@ class Main extends React.Component {
     // const { adjustments, total, gst, totalWithGst } = summary
     // console.log('values', values, this.props)
     // console.log(currentLayout)
-
+    // console.log(values)
     const matches = {
       rights:
         rights === 'enable' && visit.visitStatus === 'PAUSED'
@@ -779,7 +826,7 @@ class Main extends React.Component {
           : rights,
     }
     // console.log(matches)
-
+    // console.log('main', { values })
     return (
       <div className={classes.root}>
         <PatientBanner extraCmt={this.getExtraComponent()} {...this.props} />

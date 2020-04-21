@@ -29,7 +29,6 @@ import {
   Tooltip,
   NumberInput,
 } from '@/components'
-import { getServices } from '@/utils/codes'
 import { sumReducer, calculateAdjustAmount } from '@/utils/utils'
 
 import Grid from './Grid'
@@ -45,9 +44,10 @@ const styles = (theme) => ({
   },
 })
 // @skeleton()
-@connect(({ orders, codetable }) => ({
+@connect(({ orders, codetable, clinicInfo }) => ({
   orders,
   codetable,
+  clinicInfo,
 }))
 class Orders extends PureComponent {
   state = {
@@ -61,6 +61,8 @@ class Orders extends PureComponent {
     const { dispatch, status } = this.props
 
     const codeTableNameArray = [
+      'inventorymedication',
+      'inventoryvaccination',
       'ctMedicationUsage',
       'ctMedicationDosage',
       'ctMedicationUnitOfMeasurement',
@@ -104,8 +106,7 @@ class Orders extends PureComponent {
 
   render () {
     const { props } = this
-    const { className } = props
-    const { footer, ...restProps } = props // for dispense add order popup modal
+    const { className, footer, ...restProps } = props
     return (
       <div className={className}>
         <Detail {...restProps} />

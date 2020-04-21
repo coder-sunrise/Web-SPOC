@@ -69,11 +69,11 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
           </GridItem>
           <GridItem md={3} />
           <GridItem md={5}>
-            <h5 className={classes.boldText}>Total Payments: </h5>
+            <h5 className={classes.boldText}>Write Off Amount: </h5>
           </GridItem>
           <GridItem md={4}>
             <FastField
-              name='totalPayment'
+              name='writeOffAmount'
               render={(args) => <NumberInput {...amountProps} {...args} />}
             />
           </GridItem>
@@ -89,11 +89,11 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
 
         <GridContainer item md={3} alignItems='flex-start'>
           <GridItem md={5}>
-            <h5 className={classes.boldText}>Write Off Amount: </h5>
+            <h5 className={classes.boldText}>Total Paid: </h5>
           </GridItem>
           <GridItem md={3}>
             <FastField
-              name='writeOffAmount'
+              name='totalPayment'
               render={(args) => <NumberInput {...amountProps} {...args} />}
             />
           </GridItem>

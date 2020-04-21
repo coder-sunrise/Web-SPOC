@@ -37,11 +37,11 @@ import {
   CommonModal,
   withFormik,
 } from '@/components'
-import avatar from '@/assets/img/faces/marc.jpg'
 import Authorized from '@/utils/Authorized'
 
 import schema from './schema'
 import { queryList } from '@/services/patient'
+import { getBizSession } from '@/services/queue'
 
 // moment.updateLocale('en', {
 //   relativeTime: {
@@ -85,7 +85,10 @@ const mapEntityToValues = (entity) => {
   global,
 }))
 @withFormikExtend({
-  authority: 'patientdatabase.patientprofiledetails',
+  authority: [
+    'patientdatabase.newpatient',
+    'patientdatabase.patientprofiledetails',
+  ],
   enableReinitialize: false,
   mapPropsToValues: ({ patient }) => {
     // const mappedValues = {
@@ -193,7 +196,13 @@ const mapEntityToValues = (entity) => {
   displayName: 'PatientDetail',
 })
 class PatientDetail extends PureComponent {
-  state = {}
+  state = {
+    moduleAccessRight: {
+      name: 'patientdatabase',
+      rights: 'enable',
+    },
+    hasActiveSession: false,
+  }
 
   constructor (props) {
     super(props)
@@ -201,7 +210,10 @@ class PatientDetail extends PureComponent {
       {
         id: '1',
         name: 'Demographic',
-        access: 'patient.view',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
         schema: schema.demographic,
         component: Loadable({
           loader: () => import('./Demographics'),
@@ -215,7 +227,10 @@ class PatientDetail extends PureComponent {
       {
         id: '2',
         name: 'Emergency Contact',
-        access: 'patient.view',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
         schema: schema.emergencyContact,
         component: Loadable({
           loader: () => import('./EmergencyContact'),
@@ -236,7 +251,10 @@ class PatientDetail extends PureComponent {
       {
         id: '3',
         name: 'Allergies',
-        access: 'patient.view',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
         schema: schema.allergies,
         component: Loadable({
           loader: () => import('./Allergies'),
@@ -250,7 +268,10 @@ class PatientDetail extends PureComponent {
       {
         id: '4',
         name: 'Schemes',
-        access: 'patient.view',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
         schema: schema.schemes,
         component: Loadable({
           loader: () => import('./Schemes'),
@@ -263,13 +284,16 @@ class PatientDetail extends PureComponent {
       },
       {
         id: '5',
-        name: 'Appointment History',
-        access: 'patient.view',
+        name: 'Patient Results',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
         component: Loadable({
-          loader: () => import('./AppointmentHistory'),
+          loader: () => import('./Results'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet {...p} />
+            return <Cmpnet {...p} widget mode='integrated' />
           },
           loading: Loading,
         }),
@@ -277,7 +301,10 @@ class PatientDetail extends PureComponent {
       {
         id: '6',
         name: 'Patient History',
-        access: 'patient.view',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
         component: Loadable({
           loader: () => import('./PatientHistory'),
           render: (loaded, p) => {
@@ -290,9 +317,25 @@ class PatientDetail extends PureComponent {
       {
         id: '7',
         name: 'Patient Document',
-        access: 'patient.view',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
         component: Loadable({
           loader: () => import('./PatientDocument'),
+          render: (loaded, p) => {
+            let Cmpnet = loaded.default
+            return <Cmpnet {...p} />
+          },
+          loading: Loading,
+        }),
+      },
+      {
+        id: '8',
+        name: 'Admission',
+        access: 'demorights', // 'wardmanagement',
+        component: Loadable({
+          loader: () => import('./Admission'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
             return <Cmpnet {...p} />
@@ -303,41 +346,20 @@ class PatientDetail extends PureComponent {
     ]
   }
 
-  // componentDidMount () {
-  //   console.log('PatientDetail componentDidMount')
-  // }
-
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    const { errors, dispatch, patient, values, validateForm } = nextProps
-    // validateForm(values).then((o) => {
-    //   console.log(o)
-    // })
-    const menuErrors = {}
-    Object.keys(errors).forEach((k) => {
-      this.widgets.forEach((w) => {
-        menuErrors[w.id] = !!(w.schema && w.schema[k])
-      })
-    })
-    if (!_.isEqual(patient.menuErrors, menuErrors)) {
-      const { currentComponent, currentId, entity } = patient
-      const currentMenu =
-        this.widgets.find((o) => o.id === currentComponent) || {}
-      dispatch({
-        type: 'patient/updateState',
-        payload: {
-          menuErrors,
-        },
-      })
-    }
+  componentDidMount () {
+    this.checkHasActiveSession()
   }
 
-  // componentDidMount () {
-  //   setTimeout(() => {
-  //     if (this.props.patient.entity) {
-  //       this.props.resetForm(this.props.patient.entity)
-  //     }
-  //   }, 2000)
-  // }
+  componentWillUnmount () {
+    const { dispatch } = this.props
+    const menuErrors = {}
+    dispatch({
+      type: 'patient/updateState',
+      payload: {
+        menuErrors,
+      },
+    })
+  }
 
   registerVisit = (e) => {
     navigateDirtyCheck({
@@ -381,15 +403,16 @@ class PatientDetail extends PureComponent {
     })
 
     const { data } = response
+
     let shouldPromptSaveConfirmation = false
     if (data) {
-      if (data.length === 1)
-        shouldPromptSaveConfirmation = data[0].id !== values.id
-      else if (data.length > 1) {
-        shouldPromptSaveConfirmation = true
+      const { totalRecords, data: patientList } = data
+      shouldPromptSaveConfirmation = totalRecords > 1
+
+      if (totalRecords === 1) {
+        shouldPromptSaveConfirmation = patientList[0].id !== values.id
       }
     }
-
     if (shouldPromptSaveConfirmation) {
       return dispatch({
         type: 'global/updateAppState',
@@ -397,27 +420,53 @@ class PatientDetail extends PureComponent {
           openConfirm: true,
           openConfirmTitle: '',
           openConfirmText: 'OK',
-          openConfirmContent:
-            'Duplicate Account No. found. OK to continue or Cancel to make changes',
+          openConfirmContent: 'Duplicated Account No. found.',
+          additionalInfo: (
+            <h3 style={{ marginTop: 0 }}>Do you wish to proceed?</h3>
+          ),
           onConfirmSave: handleSubmit,
         },
       })
     }
-
-    // if (data && data.totalRecords > 0) {
-    //   return dispatch({
-    //     type: 'global/updateAppState',
-    //     payload: {
-    //       openConfirm: true,
-    //       openConfirmTitle: '',
-    //       openConfirmText: 'OK',
-    //       openConfirmContent:
-    //         'Duplicate Account No. found. OK to continue or Cancel to make changes',
-    //       onConfirmSave: handleSubmit,
-    //     },
-    //   })
-    // }
     return handleSubmit()
+  }
+
+  checkHasActiveSession = async () => {
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+    }
+    const result = await getBizSession(bizSessionPayload)
+    const { data } = result.data
+
+    this.setState(() => {
+      return {
+        hasActiveSession: data.length > 0,
+      }
+    })
+  }
+
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    const { errors, dispatch, patient, values, validateForm } = nextProps
+    // validateForm(values).then((o) => {
+    //   console.log(o)
+    // })
+    const menuErrors = {}
+    Object.keys(errors).forEach((k) => {
+      this.widgets.forEach((w) => {
+        menuErrors[w.id] = !!(w.schema && w.schema[k])
+      })
+    })
+    if (!_.isEqual(patient.menuErrors, menuErrors)) {
+      const { currentComponent, currentId, entity } = patient
+      const currentMenu =
+        this.widgets.find((o) => o.id === currentComponent) || {}
+      dispatch({
+        type: 'patient/updateState',
+        payload: {
+          menuErrors,
+        },
+      })
+    }
   }
 
   render () {
@@ -429,6 +478,8 @@ class PatientDetail extends PureComponent {
       footer,
       ...resetProps
     } = this.props
+
+    const { hasActiveSession } = this.state
 
     const { patient, global, resetForm, values, dispatch } = resetProps
     if (!patient) return null
@@ -445,134 +496,144 @@ class PatientDetail extends PureComponent {
     const CurrentComponent = currentMenu.component
 
     return (
-      <GridContainer>
-        <GridItem xs={12} sm={12} md={2}>
-          <Card profile>
-            <CardBody profile>
-              <PatientInfoSideBanner entity={entity} {...this.props} />
-              <MenuList>
-                {this.widgets
-                  .filter(
-                    (o) =>
-                      (!!patient.entity && !!patient.entity.id) ||
-                      Number(o.id) <= 4,
-                  )
-                  .map((o) => (
-                    // <Authorized authority={o.access}>
-                    <MenuItem
-                      key={o.name}
-                      className={classes.menuItem}
-                      selected={currentMenu.name === o.name}
-                      disabled={
-                        global.disableSave && currentMenu.name !== o.name
-                      }
-                      onClick={(e) => {
-                        onMenuClick(e, o)
-                        // console.log('here', entity, values)
-                        dispatch({
-                          type: 'patient/updateState',
-                          payload: {
-                            entity: entity || undefined,
-                          },
-                        })
-                        this.setState({
-                          selectedMenu: o.id,
-                        })
-                        // this.props.history.push(
-                        //   getAppendUrl({
-                        //     md: 'pt',
-                        //     cmt: o.id,
-                        //   }),
-                        // )
-                      }}
-                    >
-                      <ListItemIcon style={{ minWidth: 25 }}>
-                        <KeyboardArrowRight />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={
-                          <span
-                            style={{
-                              color: menuErrors[o.id] ? 'red' : 'inherit',
-                            }}
-                          >
-                            {o.name}
-                            {menuErrors[o.id] ? (
-                              <Error
+      <Authorized
+        authority={[
+          'patientdatabase.patientprofiledetails',
+          'patientdatabase.newpatient',
+        ]}
+      >
+        <GridContainer>
+          <GridItem xs={12} sm={12} md={2}>
+            <Card profile>
+              <CardBody profile>
+                <PatientInfoSideBanner entity={entity} {...this.props} />
+                <MenuList>
+                  {this.widgets
+                    .filter(
+                      (o) =>
+                        (!!patient.entity && !!patient.entity.id) ||
+                        Number(o.id) <= 4,
+                    )
+                    .map((o) => (
+                      <Authorized authority={o.access}>
+                        <MenuItem
+                          key={o.name}
+                          className={classes.menuItem}
+                          selected={currentMenu.name === o.name}
+                          disabled={
+                            global.disableSave && currentMenu.name !== o.name
+                          }
+                          onClick={(e) => {
+                            onMenuClick(e, o)
+                            // console.log('here', entity, values)
+                            dispatch({
+                              type: 'patient/updateState',
+                              payload: {
+                                entity: entity || undefined,
+                              },
+                            })
+                            this.setState({
+                              selectedMenu: o.id,
+                            })
+                            // this.props.history.push(
+                            //   getAppendUrl({
+                            //     md: 'pt',
+                            //     cmt: o.id,
+                            //   }),
+                            // )
+                          }}
+                        >
+                          <ListItemIcon style={{ minWidth: 25 }}>
+                            <KeyboardArrowRight />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <span
                                 style={{
-                                  position: 'absolute',
-                                  top: 13,
-                                  right: 8,
+                                  color: menuErrors[o.id] ? 'red' : 'inherit',
                                 }}
-                              />
-                            ) : null}
-                          </span>
-                        }
-                      />
-                    </MenuItem>
-                    // </Authorized>
-                  ))}
-              </MenuList>
-              {isCreatingPatient && <Divider light />}
-              {isCreatingPatient && (
-                <Button
-                  color='primary'
-                  style={{ marginTop: theme.spacing(1) }}
-                  onClick={this.registerVisit}
-                >
-                  Register Visit
-                </Button>
-              )}
-            </CardBody>
-          </Card>
-        </GridItem>
-        <GridItem xs={12} sm={12} md={10}>
-          <CardContainer hideHeader title={currentMenu.name}>
-            <div
-              style={
-                height > 0 ? (
-                  {
-                    height: height - 95 - 20,
-                    overflow: 'auto',
-                    padding: 4,
-                    paddingTop: 20,
-                  }
-                ) : (
-                  { padding: 4, paddingTop: 20 }
-                )
-              }
-            >
-              <CurrentComponent {...resetProps} />
-            </div>
-          </CardContainer>
+                              >
+                                {o.name}
+                                {menuErrors[o.id] ? (
+                                  <Error
+                                    style={{
+                                      position: 'absolute',
+                                      top: 13,
+                                      right: 8,
+                                    }}
+                                  />
+                                ) : null}
+                              </span>
+                            }
+                          />
+                        </MenuItem>
+                      </Authorized>
+                    ))}
+                </MenuList>
+                {isCreatingPatient && <Divider light />}
+                {hasActiveSession &&
+                isCreatingPatient && (
+                  <Authorized authority='queue.registervisit'>
+                    <Button
+                      color='primary'
+                      style={{ marginTop: theme.spacing(1) }}
+                      onClick={this.registerVisit}
+                    >
+                      Register Visit
+                    </Button>
+                  </Authorized>
+                )}
+              </CardBody>
+            </Card>
+          </GridItem>
+          <GridItem xs={12} sm={12} md={10}>
+            <CardContainer hideHeader title={currentMenu.name}>
+              <div
+                style={
+                  height > 0 ? (
+                    {
+                      height: height - 95 - 20,
+                      overflow: 'auto',
+                      padding: 4,
+                      paddingTop: 20,
+                    }
+                  ) : (
+                    { padding: 4, paddingTop: 20 }
+                  )
+                }
+              >
+                <CurrentComponent {...resetProps} />
+              </div>
+            </CardContainer>
 
-          <div
-            style={{
-              position: 'relative',
-            }}
-          >
-            {footer({
-              align: 'center',
-              // onReset:
-              //   values && values.id
-              //     ? () => {
-              //         resetForm(patient.entity)
-              //       }
-              //     : undefined,
-              onCancel: () => {
-                dispatch({
-                  type: 'patient/closePatientModal',
-                  payload: {
-                    history: this.props.history,
-                  },
-                })
-              },
-              onConfirm: this.validatePatient,
-              confirmBtnText: 'Save',
-            })}
-          </div>
-        </GridItem>
-      </GridContainer>
+            <div
+              style={{
+                position: 'relative',
+              }}
+            >
+              {footer({
+                align: 'center',
+                // onReset:
+                //   values && values.id
+                //     ? () => {
+                //         resetForm(patient.entity)
+                //       }
+                //     : undefined,
+                onCancel: () => {
+                  dispatch({
+                    type: 'patient/closePatientModal',
+                    payload: {
+                      history: this.props.history,
+                    },
+                  })
+                },
+                onConfirm: this.validatePatient,
+                confirmBtnText: 'Save',
+              })}
+            </div>
+          </GridItem>
+        </GridContainer>
+      </Authorized>
     )
   }
 }

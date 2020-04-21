@@ -11,6 +11,9 @@ import {
   Checkbox,
   Select,
 } from '@/components'
+import CONSTANTS from './DispenseDetails/constants'
+import LowStockInfo from '@/pages/Widgets/Orders/Detail/LowStockInfo'
+import { InventoryTypes } from '@/utils/codes'
 
 export const tableConfig = {
   FuncProps: { pager: false },
@@ -18,6 +21,27 @@ export const tableConfig = {
 
 const columnwidth = '10%'
 const columnWidth = '10%'
+
+const lowStockIndicator = (row) => {
+  const currentType = InventoryTypes.find((type) => type.name === row.type)
+  if (!currentType) return null
+
+  const values = {
+    [currentType.itemFKName]:
+      currentType.name === 'Consumable'
+        ? row.itemFK
+        : row[currentType.itemFKName],
+  }
+
+  return (
+    <div style={{ position: 'relative', top: 2 }}>
+      <LowStockInfo
+        sourceType={currentType.name.toLowerCase()}
+        values={values}
+      />
+    </div>
+  )
+}
 
 export const PrescriptionColumns = [
   // { name: 'id', title: 'id' },
@@ -75,13 +99,16 @@ export const PrescriptionColumnExtensions = (
     width: columnWidth,
     render: (row) => {
       return (
-        <div
-          style={{
-            wordWrap: 'break-word',
-            whiteSpace: 'pre-wrap',
-          }}
-        >
-          {row.name}
+        <div style={{ position: 'relative' }}>
+          <div
+            style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+            }}
+          >
+            {row.name}
+            {lowStockIndicator(row)}
+          </div>
         </div>
       )
     },
@@ -209,7 +236,7 @@ export const PrescriptionColumnExtensions = (
           <Button
             color='primary'
             onClick={() => {
-              onPrint('Medication', row)
+              onPrint({ type: CONSTANTS.DRUG_LABEL, row })
             }}
             justIcon
           >
@@ -256,18 +283,25 @@ export const VaccinationColumn = [
   },
 ]
 
-export const VaccinationColumnExtensions = (viewOnly = false) => [
+export const VaccinationColumnExtensions = (
+  viewOnly = false,
+  inventoryvaccination = [],
+  handleSelectedBatch = () => {},
+) => [
   {
     columnName: 'name',
     render: (row) => {
       return (
-        <div
-          style={{
-            wordWrap: 'break-word',
-            whiteSpace: 'pre-wrap',
-          }}
-        >
-          {row.name}
+        <div style={{ position: 'relative' }}>
+          <div
+            style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+            }}
+          >
+            {row.name}
+            {lowStockIndicator(row)}
+          </div>
         </div>
       )
     },
@@ -299,19 +333,42 @@ export const VaccinationColumnExtensions = (viewOnly = false) => [
     columnName: 'batchNo',
     width: 150,
     render: (row) => {
+      const currentItem = inventoryvaccination.find(
+        (o) => o.id === row.inventoryVaccinationFK,
+      )
+      let batchNoOptions = []
+      if (currentItem) {
+        batchNoOptions = currentItem.vaccinationStock
+      }
+
       return (
         <FastField
           name={`vaccination[${row.rowIndex}]batchNo`}
           render={(args) => {
             const restProps = viewOnly ? { value: row.batchNo } : { ...args }
             return (
-              <TextField
+              <Select
                 simple
-                text={viewOnly}
+                options={batchNoOptions}
+                mode='tags'
+                // valueField='id'
+                valueField='batchNo'
+                labelField='batchNo'
+                maxSelected={1}
+                disableAll
                 disabled={viewOnly}
+                onChange={(e, op = {}) => handleSelectedBatch(e, op, row)}
                 {...restProps}
               />
             )
+            // return (
+            //   <TextField
+            //     simple
+            //     text={viewOnly}
+            //     disabled={viewOnly}
+            //     {...restProps}
+            //   />
+            // )
           }}
         />
       )
@@ -400,13 +457,16 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     render: (row) => {
       return (
         <Tooltip title={row.description}>
-          <div
-            style={{
-              wordWrap: 'break-word',
-              whiteSpace: 'pre-wrap',
-            }}
-          >
-            {row.description}
+          <div style={{ position: 'relative' }}>
+            <div
+              style={{
+                wordWrap: 'break-word',
+                whiteSpace: 'pre-wrap',
+              }}
+            >
+              {row.description}
+              {lowStockIndicator(row)}
+            </div>
           </div>
         </Tooltip>
       )
@@ -419,8 +479,9 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     width: columnWidth,
     render: (row) => {
       const { type } = row
-      if (type !== 'Service' && type !== 'Consumable') return 'N/A'
-      return <NumberInput text currency value={row.unitPrice} />
+      if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
+        return 'N/A'
+      return <NumberInput text currency showZero value={row.unitPrice} />
     },
   },
   {
@@ -430,8 +491,9 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     width: columnWidth,
     render: (row) => {
       const { type } = row
-      if (type !== 'Service' && type !== 'Consumable') return 'N/A'
-      return <NumberInput text currency value={row.adjAmt} />
+      if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
+        return 'N/A'
+      return <NumberInput text currency showZero value={row.adjAmt} />
     },
   },
   {
@@ -441,8 +503,16 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     width: columnWidth,
     render: (row) => {
       const { type } = row
-      if (type !== 'Service' && type !== 'Consumable') return 'N/A'
-      return <NumberInput text currency value={row.totalAfterItemAdjustment} />
+      if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
+        return 'N/A'
+      return (
+        <NumberInput
+          text
+          currency
+          showZero
+          value={row.totalAfterItemAdjustment}
+        />
+      )
     },
   },
   {
@@ -451,14 +521,16 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     width: 80,
     render: (r) => {
       const { type } = r
-      if (type === 'Service' || type === 'Consumable') return null
+
+      if (type === 'Service' || type === 'Consumable' || type === 'Treatment')
+        return null
       return (
         <Tooltip title='Print'>
           <Button
             color='primary'
             justIcon
             onClick={() => {
-              onPrint(type, r)
+              onPrint({ type: CONSTANTS.DOCUMENTS, row: r })
             }}
           >
             <Print />

@@ -1,87 +1,87 @@
 import React from 'react'
-import * as Yup from 'yup'
 // formik
-import { FastField, withFormik } from 'formik'
+import { withFormik } from 'formik'
 // material ui
-import { Divider, withStyles } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
+import { withRouter } from 'react-router'
 // common component
 import {
-  CodeSelect,
-  DatePicker,
   GridContainer,
   GridItem,
+  FastField,
   Select,
-  TextField,
+  CodeSelect,
 } from '@/components'
 // sub components
-import AccessRight from './AccessRight'
+import request from '@/utils/request'
+import { convertToQuery } from '@/utils/utils'
 
 const styles = (theme) => ({
   verticalSpacing: {
-    marginTop: theme.spacing(2),
+    // marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
     '& > h4': {
       fontWeight: 500,
     },
   },
 })
+class UserRoleForm extends React.PureComponent {
+  state = {
+    selectedValue: undefined,
+  }
 
-const UserRoleForm = ({ classes, footer, handleSubmit, ...props }) => {
-  return (
-    <React.Fragment>
-      <GridContainer>
-        <GridItem md={12} className={classes.verticalSpacing}>
-          <h4>User Role</h4>
-          <Divider />
-        </GridItem>
-        <GridItem md={4}>
-          <FastField
-            name='name'
-            render={(args) => <TextField autoFocus {...args} label='Name' />}
-          />
-        </GridItem>
-        <GridItem md={4}>
-          <FastField
-            name='effectiveStartDate'
-            render={(args) => (
-              <DatePicker {...args} label='Effective Start Date' />
-            )}
-          />
-        </GridItem>
-        <GridItem md={4} />
-        <GridItem md={4}>
-          <FastField
-            name='description'
-            render={(args) => <TextField {...args} label='Description' />}
-          />
-        </GridItem>
-        <GridItem md={4}>
-          <FastField
-            name='effectiveEndDate'
-            render={(args) => (
-              <DatePicker {...args} label='Effective End Date' />
-            )}
-          />
-        </GridItem>
-        <GridItem md={4} />
+  onSelect = (value) => {
+    this.setState({ selectedValue: value })
+  }
 
-        <GridItem md={12} className={classes.verticalSpacing}>
-          <h4>Access Right</h4>
-          <Divider />
-        </GridItem>
-        <GridItem md={12}>
-          <AccessRight />
-        </GridItem>
-      </GridContainer>
-      {footer &&
-        footer({
-          confirmBtnText: 'Save',
-          onConfirm: handleSubmit,
-        })}
-    </React.Fragment>
-  )
+  handleClickAddNew = () => {
+    const { selectedValue } = this.state
+    if (selectedValue) {
+      this.props.history.push(`/setting/userrole/new`, { id: selectedValue })
+    }
+  }
+
+  render () {
+    const { classes, footer } = this.props
+    const { selectedValue } = this.state
+    return (
+      <div>
+        <React.Fragment>
+          <div className={classes.verticalSpacing}>
+            <GridContainer>
+              <GridItem md={4} />
+              <GridItem md={4} className={classes.verticalSpacing}>
+                <FastField
+                  name='role'
+                  render={(args) => (
+                    <CodeSelect
+                      {...args}
+                      label='Existing Role'
+                      code='role'
+                      onChange={this.onSelect}
+                    />
+                  )}
+                />
+              </GridItem>
+            </GridContainer>
+          </div>
+
+          <GridItem md={4} />
+          {footer &&
+            footer({
+              confirmBtnText: 'Add New',
+              onConfirm: this.handleClickAddNew,
+              confirmProps: {
+                disabled: !selectedValue,
+              },
+            })}
+        </React.Fragment>
+      </div>
+    )
+  }
 }
 
 export default withFormik({
   mapPropsToValues: () => ({}),
   handleSubmit: () => {},
-})(withStyles(styles, { name: 'UserProfileForm' })(UserRoleForm))
+})(withStyles(styles, { name: 'UserRoleForm' })(withRouter(UserRoleForm)))

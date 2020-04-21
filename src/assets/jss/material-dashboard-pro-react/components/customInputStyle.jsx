@@ -149,10 +149,14 @@ const customInputStyle = {
   formControl: {
     position: 'relative',
     verticalAlign: 'unset',
+    // overflow: 'hidden',
     // margin: '5px 0 5px 0',
     // "& svg,& .fab,& .far,& .fal,& .fas,& .material-icons": {
     //   color: "#495057",
     // },
+  },
+  hiddenOverflow: {
+    overflow: 'hidden',
   },
   simple: {
     margin: 0,

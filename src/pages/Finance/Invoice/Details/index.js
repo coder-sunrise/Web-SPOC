@@ -7,6 +7,7 @@ import { CardContainer } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
 import InvoiceBanner from './InvoiceBanner'
 import InvoiceContent from './Content'
+import Authorized from '@/utils/Authorized'
 
 @connect(({ invoiceDetail, invoicePayment, loading }) => ({
   invoiceDetail,
@@ -17,7 +18,12 @@ import InvoiceContent from './Content'
   name: 'invoiceDetail',
   enableReinitialize: true,
   mapPropsToValues: ({ invoiceDetail }) => {
-    return invoiceDetail.entity || invoiceDetail.default
+    const values = invoiceDetail.entity || invoiceDetail.default
+
+    return {
+      ...values,
+      totalPayment: values.invoiceTotalAftGST - values.outstandingBalance,
+    }
   },
 })
 class InvoiceDetails extends Component {
@@ -63,12 +69,15 @@ class InvoiceDetails extends Component {
     const bannerProps = {
       values,
     }
+
     return (
       <LoadingWrapper loading={loading} text='Getting invoice details...'>
-        <CardContainer hideHeader>
-          <InvoiceBanner {...bannerProps} />
-          <InvoiceContent {...invoiceContentProps} />
-        </CardContainer>
+        <Authorized authority='finance/invoicepayment'>
+          <CardContainer hideHeader>
+            <InvoiceBanner {...bannerProps} />
+            <InvoiceContent {...invoiceContentProps} />
+          </CardContainer>
+        </Authorized>
       </LoadingWrapper>
     )
   }

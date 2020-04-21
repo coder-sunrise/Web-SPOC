@@ -1,15 +1,16 @@
 import router from 'umi/router'
 import _ from 'lodash'
-import moment from 'moment'
 import { createFormViewModel } from 'medisys-model'
 import * as service from '../services/consultation'
-import { getRemovedUrl, getAppendUrl, getUniqueId } from '@/utils/utils'
-import {
-  consultationDocumentTypes,
-  orderTypes,
-  getServices,
-} from '@/utils/codes'
-import { sendNotification } from '@/utils/realtime'
+import { getUniqueId } from '@/utils/utils'
+import { consultationDocumentTypes } from '@/utils/codes'
+import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
+import { orderTypes } from '@/pages/Consultation/utils'
+
+const getSequence = (sequence, maxSeq) => {
+  if (sequence === 0) return sequence
+  return sequence || maxSeq
+}
 
 export default createFormViewModel({
   namespace: 'consultation',
@@ -119,17 +120,26 @@ export default createFormViewModel({
             },
           })
 
-          sendNotification('QueueListing', {
-            message: `Consultation started`,
+          // at this point visitRegistration state does not have any entity yet
+          // so get queueNo from payload instead of visitRegistration model
+          sendQueueNotification({
+            message: 'Consultation started.',
+            queueNo: payload.queueNo,
           })
         }
         return response
       },
-      *pause ({ payload }, { call, put }) {
+      *pause ({ payload }, { call, put, select }) {
+        const visitRegistration = yield select(
+          (state) => state.visitRegistration,
+        )
+        const { entity } = visitRegistration
+
         const response = yield call(service.pause, payload)
         if (response) {
-          sendNotification('QueueListing', {
-            message: `Consultation paused`,
+          sendQueueNotification({
+            message: 'Consultation paused.',
+            queueNo: entity.queueNo,
           })
 
           yield put({ type: 'closeModal' })
@@ -138,12 +148,17 @@ export default createFormViewModel({
       },
 
       *resume ({ payload }, { call, put, select }) {
+        const visitRegistration = yield select(
+          (state) => state.visitRegistration,
+        )
+        const { entity } = visitRegistration
         yield put({
           type: 'updateState',
           payload: {
             entity: undefined,
           },
         })
+
         const response = yield call(service.resume, payload.id)
         if (response) {
           yield put({
@@ -160,8 +175,9 @@ export default createFormViewModel({
               data: response,
             },
           })
-          sendNotification('QueueListing', {
-            message: `Consultation resumed`,
+          sendQueueNotification({
+            message: 'Consultation resumed.',
+            queueNo: entity.queueNo,
           })
         }
         return response
@@ -205,27 +221,39 @@ export default createFormViewModel({
         }
         return response
       },
-      *sign ({ payload }, { call, put }) {
+      *sign ({ payload }, { call, put, select }) {
+        const visitRegistration = yield select(
+          (state) => state.visitRegistration,
+        )
+        const { entity } = visitRegistration
+
         const response = yield call(service.sign, payload)
         if (response) {
-          sendNotification('QueueListing', {
-            message: `Consultation signed`,
+          sendQueueNotification({
+            message: 'Consultation signed-off.',
+            queueNo: entity.queueNo,
           })
           yield put({ type: 'closeModal' })
           // console.log('payload ', payload)
         }
         return response
       },
-      *discard ({ payload }, { call, put }) {
+      *discard ({ payload }, { call, put, select }) {
         // if (!payload) {
         //   yield put({ type: 'closeModal' })
         //   return null
         // }
+        const visitRegistration = yield select(
+          (state) => state.visitRegistration,
+        )
+        const { entity } = visitRegistration
+
         const response = yield call(service.remove, payload)
 
         if (response) {
-          sendNotification('QueueListing', {
-            message: `Consultation discarded`,
+          sendQueueNotification({
+            message: 'Consultation discarded.',
+            queueNo: entity.queueNo,
           })
           // yield put({ type: 'closeModal', payload })
         }
@@ -341,9 +369,30 @@ export default createFormViewModel({
                   type: p.value,
                   subject: p.getSubject ? p.getSubject(o) : '',
                   ...o,
-                  sequence: o.sequence || maxSeq,
+                  sequence: getSequence(o.sequence, maxSeq),
+                  instruction: o.instruction || o.itemNotes,
                 }
-                return p.convert ? p.convert(d) : d
+
+                let newObj = {
+                  ...d,
+                }
+                let instructionArray = []
+                if (d.corPrescriptionItemInstruction) {
+                  instructionArray = d.corPrescriptionItemInstruction.map(
+                    (instruction) => {
+                      return {
+                        ...instruction,
+                        stepdose: instruction.stepdose || 'AND',
+                      }
+                    },
+                  )
+                  newObj = {
+                    ...newObj,
+                    corPrescriptionItemInstruction: instructionArray,
+                  }
+                }
+
+                return p.convert ? p.convert(newObj) : newObj
               }),
             )
           })
@@ -386,6 +435,14 @@ export default createFormViewModel({
             defaultIsPersist: diagnosis.isPersist,
           }
         })
+
+        // if (data.corEyeVisualAcuityTest)
+        //   yield put({
+        //     type: 'visualAcuity/updateState',
+        //     payload: {
+        //       entity: data.corEyeVisualAcuityTest,
+        //     },
+        //   })
 
         // if (data.corDiagnosis && data.corDiagnosis.length > 0) {
         //   data.corDiagnosis.forEach((cd) => {

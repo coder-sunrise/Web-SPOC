@@ -1,4 +1,5 @@
 import React, { memo } from 'react'
+import moment from 'moment'
 import classnames from 'classnames'
 // formik
 import { withFormik, Field, FastField } from 'formik'
@@ -30,21 +31,23 @@ const styles = () => ({
   },
 })
 
-const FilterBar = ({
-  loading,
-  classes,
-  onDoctorEventClick,
-  onAddAppointmentClick,
-  handleUpdateFilter,
-  values,
-}) => {
+const FilterBar = (props) => {
+  const {
+    dispatch,
+    loading,
+    classes,
+    onDoctorEventClick,
+    onAddAppointmentClick,
+    handleUpdateFilter,
+    toggleSearchAppointmentModal,
+    values,
+  } = props
   const onFilterClick = () => handleUpdateFilter(values)
 
   const renderDropdown = (option) => <DoctorLabel doctor={option} />
 
-  const { filterByDoctor = [], filterByApptType = [] } = values
+  const { filterByDoctor = [] } = values
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
-  const maxAppointmentTagCount = filterByApptType.length <= 1 ? 1 : 0
 
   return (
     <React.Fragment>
@@ -68,21 +71,10 @@ const FilterBar = ({
             render={(args) => (
               <CodeSelect
                 {...args}
-                // allLabel='All Doctors'
                 disableAll
-                // allValue={-99}
-                // allValueOption={{
-                //   clinicianProfile: {
-                //     name: 'All',
-                //     id: -99,
-                //   },
-                // }}
                 allowClear={false}
                 label='Filter by Doctor'
                 mode='multiple'
-                // code='clinicianprofile'
-                // labelField='name'
-                // valueField='id'
                 remoteFilter={{
                   'clinicianProfile.isActive': true,
                 }}
@@ -94,6 +86,12 @@ const FilterBar = ({
                 maxSelected={5}
                 maxTagPlaceholder='doctors'
                 renderDropdown={renderDropdown}
+                onChange={(v) => {
+                  sessionStorage.setItem(
+                    'appointmentDoctors',
+                    JSON.stringify(v),
+                  )
+                }}
               />
             )}
           />
@@ -124,18 +122,26 @@ const FilterBar = ({
                   },
                 ]}
                 maxTagCount={0}
-                maxTagPlaceholder='appointment types'
+                maxTagPlaceholder='appt. types'
               />
             )}
           />
         </GridItem>
-        <GridItem md={2}>
+
+        <GridItem md={5}>
           <ProgressButton
             icon={<Search />}
             color='primary'
             onClick={onFilterClick}
           >
             Filter
+          </ProgressButton>
+          <ProgressButton
+            icon={<Search />}
+            color='primary'
+            onClick={toggleSearchAppointmentModal}
+          >
+            Search Appointment
           </ProgressButton>
         </GridItem>
 
@@ -152,15 +158,17 @@ const FilterBar = ({
             </Button>
           </Authorized>
 
-          <Button
-            color='primary'
-            size='sm'
-            onClick={onDoctorEventClick}
-            disabled={loading}
-          >
-            <AddIcon />
-            Add Doctor Block
-          </Button>
+          <Authorized authority='settings.clinicsetting.doctorblock'>
+            <Button
+              color='primary'
+              size='sm'
+              onClick={onDoctorEventClick}
+              disabled={loading}
+            >
+              <AddIcon />
+              Add Doctor Block
+            </Button>
+          </Authorized>
         </GridItem>
       </GridContainer>
     </React.Fragment>

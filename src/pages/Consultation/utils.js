@@ -1,4 +1,71 @@
-import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
+import { consultationDocumentTypes } from '@/utils/codes'
+import Medication from '@/pages/Widgets/Orders/Detail/Medication'
+import Vaccination from '@/pages/Widgets/Orders/Detail/Vaccination'
+import Service from '@/pages/Widgets/Orders/Detail/Service'
+import Consumable from '@/pages/Widgets/Orders/Detail/Consumable'
+import OrderSet from '@/pages/Widgets/Orders/Detail/OrderSet'
+import Treatment from '@/pages/Widgets/Orders/Detail/Treatment'
+
+const orderTypes = [
+  {
+    name: 'Medication',
+    value: '1',
+    prop: 'corPrescriptionItem',
+    accessRight: 'queue.consultation.order.medication',
+    filter: (r) => !!r.inventoryMedicationFK,
+    getSubject: (r) => {
+      return r.drugName
+    },
+    component: (props) => <Medication {...props} />,
+  },
+  {
+    name: 'Vaccination',
+    value: '2',
+    prop: 'corVaccinationItem',
+    accessRight: 'queue.consultation.order.vaccination',
+    getSubject: (r) => r.vaccinationName,
+    component: (props) => <Vaccination {...props} />,
+  },
+  {
+    name: 'Service',
+    value: '3',
+    prop: 'corService',
+    accessRight: 'queue.consultation.order.service',
+    getSubject: (r) => r.serviceName,
+    component: (props) => <Service {...props} />,
+  },
+  {
+    name: 'Consumable',
+    value: '4',
+    prop: 'corConsumable',
+    accessRight: 'queue.consultation.order.consumable',
+    getSubject: (r) => r.consumableName,
+    component: (props) => <Consumable {...props} />,
+  },
+  {
+    name: 'Open Prescription',
+    value: '5',
+    prop: 'corPrescriptionItem',
+    accessRight: 'queue.consultation.order.openprescription',
+    filter: (r) => !r.inventoryMedicationFK,
+    getSubject: (r) => r.drugName,
+    component: (props) => <Medication openPrescription {...props} />,
+  },
+  {
+    name: 'Order Set',
+    value: '6',
+    accessRight: 'queue.consultation.order.orderset',
+    component: (props) => <OrderSet {...props} />,
+  },
+  {
+    name: 'Treatment',
+    value: '7',
+    prop: 'corDentalTreatments',
+    accessRight: 'queue.consultation.order.treatment',
+    getSubject: (r) => r.itemName,
+    component: (props) => <Treatment {...props} />,
+  },
+]
 
 const convertToConsultation = (values, { consultationDocument, orders }) => {
   const { rows = [] } = consultationDocument
@@ -17,6 +84,19 @@ const convertToConsultation = (values, { consultationDocument, orders }) => {
       }
     }
   })
+  const { dentalChartComponent } = window.g_app._store.getState()
+  if (dentalChartComponent) {
+    const { isPedoChart, isSurfaceLabel, data } = dentalChartComponent
+    values.corDentalCharts = [
+      {
+        ...(values.corDentalCharts || [])[0],
+        isPedoChart,
+        isSurfaceLabel,
+        dentalChart: JSON.stringify(data),
+      },
+    ]
+    // values.corDentalCharts = data.map(o=>)
+  }
   return {
     ...values,
     isGSTInclusive,
@@ -25,5 +105,6 @@ const convertToConsultation = (values, { consultationDocument, orders }) => {
 
 module.exports = {
   ...module.exports,
+  orderTypes,
   convertToConsultation,
 }

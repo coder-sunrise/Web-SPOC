@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
@@ -8,8 +8,13 @@ import {
   roundTo,
 } from '@/utils/utils'
 import { ProgressButton, Button, withFormikExtend, Tabs } from '@/components'
-import { MedicationDetailOption } from './variables'
 import Yup from '@/utils/yup'
+import { getBizSession } from '@/services/queue'
+import { AuthorizationWrapper } from '@/components/_medisys'
+import Authorized from '@/utils/Authorized'
+import { MedicationDetailOption } from './variables'
+
+const { Secured } = Authorized
 
 const styles = () => ({
   actionDiv: {
@@ -35,12 +40,18 @@ const Detail = ({
 }) => {
   const { currentTab } = medication
 
+  const [
+    hasActiveSession,
+    setHasActiveSession,
+  ] = useState(true)
+
   const detailProps = {
     medicationDetail,
     dispatch,
     setFieldValue,
     showTransfer: true,
     values,
+    hasActiveSession,
     ...props,
   }
 
@@ -50,10 +61,23 @@ const Detail = ({
     setFieldValue,
     dispatch,
     errors: props.errors,
+    hasActiveSession,
+    authority: 'inventorymaster.medication',
+  }
+
+  const checkHasActiveSession = async () => {
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+    }
+    const result = await getBizSession(bizSessionPayload)
+    const { data } = result.data
+
+    setHasActiveSession(data.length > 0)
   }
 
   useEffect(() => {
     if (medicationDetail.currentId) {
+      checkHasActiveSession()
       let tempCode
       let tempName
       dispatch({
@@ -140,6 +164,7 @@ const Detail = ({
       {/* </CardContainer> */}
       <div className={classes.actionDiv}>
         <Button
+          authority='none'
           color='danger'
           onClick={navigateDirtyCheck({
             redirectUrl: '/inventory/master?t=0',
@@ -291,4 +316,4 @@ export default compose(
 
     displayName: 'InventoryMedicationDetail',
   }),
-)(Detail)
+)(Secured('inventorymaster.medication')(Detail))

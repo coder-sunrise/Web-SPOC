@@ -1,8 +1,8 @@
 /* eslint-disable no-nested-ternary */
 import React, { Component } from 'react'
+import $ from 'jquery'
 import { connect } from 'dva'
 import router from 'umi/router'
-import Loadable from 'react-loadable'
 import classnames from 'classnames'
 // material ui
 import { withStyles, List, ListItem, ListItemText } from '@material-ui/core'
@@ -19,16 +19,12 @@ import {
   withFormikExtend,
   Skeleton,
 } from '@/components'
-import Loading from '@/components/PageLoading/index'
+import Authorized from '@/utils/Authorized'
 import AuthorizedContext from '@/components/Context/Authorized'
 // utils
 import { findGetParameter } from '@/utils/utils'
-import Authorized from '@/utils/Authorized'
-import { VISIT_TYPE_NAME, VISIT_TYPE } from '@/utils/constants'
-
-import model from './models'
-
-window.g_app.replaceModel(model)
+import { VISIT_TYPE } from '@/utils/constants'
+import * as WidgetConfig from './config'
 
 const styles = (theme) => ({
   root: {},
@@ -75,182 +71,64 @@ const styles = (theme) => ({
       marginTop: theme.spacing(2),
       fontSize: '1em',
     },
-    // '& h5:not(:first-of-type)': {
-    //   marginTop: theme.spacing(2),
-    // },
   },
   integratedLeftPanel: {
     width: '100%',
   },
 })
-@withFormikExtend({
-  mapPropsToValues: ({ patientHistory }) => {
-    // console.log(patientHistory)
-    // return patientHistory.entity ? patientHistory.entity : patientHistory.default
-  },
-  // validationSchema: Yup.object().shape({
-  //   name: Yup.string().required(),
-  //   dob: Yup.date().required(),
-  //   patientAccountNo: Yup.string().required(),
-  //   genderFK: Yup.string().required(),
-  //   dialect: Yup.string().required(),
-  //   contact: Yup.object().shape({
-  //     contactAddress: Yup.array().of(
-  //       Yup.object().shape({
-  //         line1: Yup.string().required(),
-  //         postcode: Yup.number().required(),
-  //         countryFK: Yup.string().required(),
-  //       }),
-  //     ),
-  //   }),
-  // }),
 
-  // handleSubmit: () => {},
-  // displayName: 'PatientHistory',
-})
-@connect(({ patientHistory, clinicSettings, codetable, user }) => ({
+@connect(({ patientHistory, clinicInfo, clinicSettings, codetable, user }) => ({
   patientHistory,
   clinicSettings,
   codetable,
   user,
+  clinicInfo,
+}))
+@withFormikExtend({
+  enableReinitialize: true,
+  mapPropsToValues: ({ patientHistory }) => {
+    const returnValue = patientHistory.entity
+      ? patientHistory.entity
+      : patientHistory.default
+
+    return {
+      ...returnValue,
+      eyeVisualAcuityTestAttachments: (returnValue.eyeVisualAcuityTestAttachments ||
+        [])
+        .map((eyeAttachment) => eyeAttachment.attachment),
+    }
+  },
+})
+@connect(({ patientHistory, clinicInfo, clinicSettings, codetable, user }) => ({
+  patientHistory,
+  clinicSettings,
+  codetable,
+  user,
+  clinicInfo,
 }))
 class PatientHistory extends Component {
-  state = {
-    selectedItems: [
-      '0',
-      '1',
-      '2',
-      '3',
-      '4',
-      '5',
-      '6',
-      '7',
-    ],
-  }
-
   static defaultProps = {
     mode: 'split',
   }
 
   constructor (props) {
     super(props)
-    this.widgets = [
-      {
-        id: '1',
-        name: 'Clinical Notes',
-        component: Loadable({
-          loader: () => import('./ClinicalNotes'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '2',
-        name: 'Chief Complaints',
-        component: Loadable({
-          loader: () => import('./ChiefComplaints'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '3',
-        name: 'Plan',
-        component: Loadable({
-          loader: () => import('./Plan'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '4',
-        name: 'Diagnosis',
-        component: Loadable({
-          loader: () => import('./Diagnosis'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '5',
-        name: 'Orders',
-        component: Loadable({
-          loader: () => import('./Orders'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '6',
-        name: 'Consultation Document',
-        component: Loadable({
-          loader: () => import('./ConsultationDocument'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      // {
-      //   id: '6',
-      //   name: 'Result History',
-      //   component: Loadable({
-      //     loader: () => import('./ResultHistory'),
-      //     render: (loaded, p) => {
-      //       let Cmpnet = loaded.default
-      //       return <Cmpnet {...props} {...p} />
-      //     },
-      //     loading: Loading,
-      //   }),
-      // },
-      {
-        id: '7',
-        name: 'Invoice',
-        component: Loadable({
-          loader: () => import('./Invoice'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-    ]
+
+    this.myRef = React.createRef()
+
+    this.widgets = WidgetConfig.widgets(props).filter((o) => {
+      const accessRight = Authorized.check(o.authority)
+      return accessRight && accessRight.rights !== 'hidden'
+    })
+    this.state = {
+      selectedItems: localStorage.getItem('patientHistoryWidgets')
+        ? JSON.parse(localStorage.getItem('patientHistoryWidgets'))
+        : this.widgets.map((widget) => widget.id),
+    }
   }
 
   componentWillMount () {
     const { dispatch, mode } = this.props
-    const codeTableNameArray = [
-      'ctComplication',
-      'ctMedicationUsage',
-      'ctMedicationDosage',
-      'ctMedicationUnitOfMeasurement',
-      'ctMedicationFrequency',
-      'ctVaccinationUsage',
-      'ctVaccinationUnitOfMeasurement',
-    ]
-    dispatch({
-      type: 'codetable/batchFetch',
-      payload: {
-        codes: codeTableNameArray,
-      },
-    })
 
     dispatch({
       type: 'patientHistory/initState',
@@ -276,6 +154,7 @@ class PatientHistory extends Component {
     this.setState({
       selectedItems: val,
     })
+    localStorage.setItem('patientHistoryWidgets', JSON.stringify(val))
   }
 
   getContent = (row) => {
@@ -297,7 +176,6 @@ class PatientHistory extends Component {
     } else {
       newArray = row.coHistory
     }
-
     return (
       <List
         component='nav'
@@ -305,6 +183,7 @@ class PatientHistory extends Component {
           root: this.props.classes.listRoot,
         }}
         disablePadding
+        onClick={() => {}}
       >
         {newArray.map((o) => {
           const _title = o.userTitle ? `${o.userTitle} ` : ''
@@ -322,6 +201,19 @@ class PatientHistory extends Component {
                 disableGutters
                 button
                 onClick={() => {
+                  if (
+                    mode === 'integrated' &&
+                    selectedSubRow &&
+                    selectedSubRow.id === o.id
+                  ) {
+                    this.props.dispatch({
+                      type: 'patientHistory/updateState',
+                      payload: {
+                        selectedSubRow: undefined,
+                      },
+                    })
+                    return
+                  }
                   if (isRetailVisit) {
                     this.handleRetailVisitHistory(row)
                   } else
@@ -431,48 +323,6 @@ class PatientHistory extends Component {
     )
   }
 
-  // <GridItem sm={5} style={{ textAlign: 'right' }}>
-  //           <span style={{ whiteSpace: 'nowrap', position: 'relative' }}>
-  //             ( <DatePicker text value={row.visitDate} /> )
-  //           </span>
-  //           <div className={this.props.classes.note}>&nbsp;</div>
-  //         </GridItem>
-
-  // eslint-disable-next-line camelcase
-  // UNSAFE_componentWillReceiveProps (nextProps) {
-  //   // console.log(this.props, nextProps, nextProps.patientHistory.version)
-  //   if (
-  //     nextProps.patientHistory.version &&
-  //     this.props.patientHistory.version !== nextProps.patientHistory.version
-  //   ) {
-  //     nextProps
-  //       .dispatch({
-  //         type: 'patientHistory/query',
-  //         payload: {
-  //           patientProfileFK: nextProps.patientHistory.patientID,
-  //           sorting: [
-  //             {
-  //               columnName: 'VisitDate',
-  //               direction: 'desc',
-  //             },
-  //           ],
-  //           version:
-  //         },
-  //       })
-  //       .then((o) => {
-  //         // this.props.resetForm(o)
-  //         nextProps.dispatch({
-  //           type: 'patientHistory/updateState',
-  //           payload: {
-  //             selected: undefined,
-  //             selectedSubRow: undefined,
-  //             entity: undefined,
-  //           },
-  //         })
-  //       })
-  //   }
-  // }
-
   getDetailPanel = () => {
     const {
       theme,
@@ -485,6 +335,7 @@ class PatientHistory extends Component {
       codetable,
       user,
     } = this.props
+
     const { entity, selected, patientID } = patientHistory
     const { id: visitId } = selected
     const { visitPurposeFK } = selected
@@ -509,7 +360,7 @@ class PatientHistory extends Component {
       >
         {!isRetailVisit && (
           <GridContainer gutter={0} alignItems='center'>
-            <GridItem md={2}>
+            <GridItem md={4}>
               <Select
                 // simple
                 value={this.state.selectedItems}
@@ -517,16 +368,10 @@ class PatientHistory extends Component {
                 // prefix='Filter By'
                 mode='multiple'
                 // maxTagCount={4}
-                options={[
-                  { name: 'Clinical Notes', value: '1' },
-                  { name: 'Chief Complaints', value: '2' },
-                  { name: 'Plan', value: '3' },
-                  { name: 'Diagnosis', value: '4' },
-                  { name: 'Orders', value: '5' },
-                  { name: 'Consultation Document', value: '6' },
-                  // { name: 'Result History', value: '6' },
-                  { name: 'Invoice', value: '7' },
-                ]}
+                options={this.widgets.map((item) => ({
+                  name: item.name,
+                  value: item.id,
+                }))}
                 style={{ marginBottom: theme.spacing(1) }}
                 onChange={this.onSelectChange}
                 maxTagCount={maxItemTagCount}
@@ -596,7 +441,7 @@ class PatientHistory extends Component {
                 )}
               </GridItem>
             </Authorized>
-            <GridItem md={7} style={{ textAlign: 'right' }}>
+            <GridItem md={5} style={{ textAlign: 'right' }}>
               Updated Date:&nbsp;
               {patientHistory.selectedSubRow.signOffDate && (
                 <DatePicker
@@ -613,8 +458,17 @@ class PatientHistory extends Component {
             rights: 'disable',
           }}
         >
-          {visitPurposeFK === VISIT_TYPE.RETAIL ? (
-            this.widgets.filter((o) => o.id === '7').map((o) => {
+          {this.widgets
+            .filter((_widget) => {
+              if (visitPurposeFK === VISIT_TYPE.RETAIL) {
+                return _widget.id === WidgetConfig.WIDGETS_ID.INVOICE
+              }
+              return (
+                this.state.selectedItems.indexOf('0') >= 0 ||
+                this.state.selectedItems.indexOf(_widget.id) >= 0
+              )
+            })
+            .map((o) => {
               const Widget = o.component
               return (
                 <div>
@@ -626,48 +480,7 @@ class PatientHistory extends Component {
                   />
                 </div>
               )
-            })
-          ) : (
-            this.widgets
-              .filter(
-                (o) =>
-                  this.state.selectedItems.indexOf('0') >= 0 ||
-                  this.state.selectedItems.indexOf(o.id) >= 0,
-              )
-              .map((o) => {
-                const Widget = o.component
-                return (
-                  <div>
-                    <h5 style={{ fontWeight: 500 }}>{o.name}</h5>
-                    <Widget
-                      current={entity || {}}
-                      {...this.props}
-                      setFieldValue={this.props.setFieldValue}
-                    />
-                  </div>
-                )
-              })
-          )}
-          {/* {entity &&
-            this.widgets
-              .filter(
-                (o) =>
-                  this.state.selectedItems.indexOf('0') >= 0 ||
-                  this.state.selectedItems.indexOf(o.id) >= 0,
-              )
-              .map((o) => {
-                const Widget = o.component
-                return (
-                  <div>
-                    <h5 style={{ fontWeight: 500 }}>{o.name}</h5>
-                    <Widget
-                      current={entity || {}}
-                      {...this.props}
-                      setFieldValue={this.props.setFieldValue}
-                    />
-                  </div>
-                )
-              })} */}
+            })}
         </AuthorizedContext.Provider>
       </CardContainer>
     )
@@ -727,10 +540,6 @@ class PatientHistory extends Component {
         )
       : ''
 
-    // console.log({
-    //   sortedPatientHistory,
-    //   settings: settings.showConsultationVersioning,
-    // })
     return (
       <div {...cfg}>
         <CardContainer
@@ -747,26 +556,39 @@ class PatientHistory extends Component {
           settings.showConsultationVersioning === undefined ? (
             sortedPatientHistory.map((o) => this.getContent(o))
           ) : (
-            <Accordion
-              defaultActive={0}
-              collapses={sortedPatientHistory.map((o) => {
-                const isRetailVisit = o.visitPurposeFK === VISIT_TYPE.RETAIL
-                const returnValue = {
-                  title: this.getTitle(o),
-                  content: this.getContent(o),
-                  hideExpendIcon: isRetailVisit,
-                }
-                if (isRetailVisit) {
+            <div ref={this.myRef}>
+              <Accordion
+                defaultActive={0}
+                onChange={(event, p, expanded) => {
+                  if (expanded) {
+                    setTimeout(() => {
+                      $(this.myRef.current)
+                        .find('div[aria-expanded=true]')
+                        .next()
+                        .find('div[role="button"]:eq(0)')
+                        .trigger('click')
+                    }, 1)
+                  }
+                }}
+                collapses={sortedPatientHistory.map((o) => {
+                  const isRetailVisit = o.visitPurposeFK === VISIT_TYPE.RETAIL
+                  const returnValue = {
+                    title: this.getTitle(o),
+                    content: this.getContent(o),
+                    hideExpendIcon: isRetailVisit,
+                  }
+                  if (isRetailVisit) {
+                    return {
+                      ...returnValue,
+                      onClickSummary: () => this.handleRetailVisitHistory(o),
+                    }
+                  }
                   return {
                     ...returnValue,
-                    onClickSummary: () => this.handleRetailVisitHistory(o),
                   }
-                }
-                return {
-                  ...returnValue,
-                }
-              })}
-            />
+                })}
+              />
+            </div>
           ) : (
             <p>No Visit Record Found</p>
           ) : (

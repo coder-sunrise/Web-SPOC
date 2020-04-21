@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Fragment } from 'react'
 import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
 
@@ -7,8 +7,12 @@ import {
   Button,
   dateFormatLong,
   Popconfirm,
+  notification,
 } from '@/components'
+import Authorized from '@/utils/Authorized'
 
+const viewAdjustmentDetailAuthority =
+  'inventoryadjustment.inventoryadjustmentdetails'
 class Grid extends PureComponent {
   configs = {
     columns: [
@@ -24,35 +28,37 @@ class Grid extends PureComponent {
         align: 'center',
         render: (row) => {
           return (
-            <React.Fragment>
-              <Button
-                size='sm'
-                onClick={() => {
-                  this.editRow(row)
-                }}
-                justIcon
-                color='primary'
-              >
-                <Edit />
-              </Button>
-              <Popconfirm
-                title='Are you sure?'
-                onConfirm={() => {
-                  setTimeout(() => {
-                    this.cancelRow(row)
-                  }, 1)
-                }}
-              >
+            <Authorized authority={viewAdjustmentDetailAuthority}>
+              <Fragment>
                 <Button
                   size='sm'
+                  onClick={() => {
+                    this.editRow(row)
+                  }}
                   justIcon
-                  color='danger'
-                  disabled={row.status !== 'Draft'}
+                  color='primary'
                 >
-                  <Delete />
+                  <Edit />
                 </Button>
-              </Popconfirm>
-            </React.Fragment>
+                <Popconfirm
+                  title='Are you sure?'
+                  onConfirm={() => {
+                    setTimeout(() => {
+                      this.cancelRow(row)
+                    }, 1)
+                  }}
+                >
+                  <Button
+                    size='sm'
+                    justIcon
+                    color='danger'
+                    disabled={row.status !== 'Draft'}
+                  >
+                    <Delete />
+                  </Button>
+                </Popconfirm>
+              </Fragment>
+            </Authorized>
           )
         },
       },
@@ -79,6 +85,13 @@ class Grid extends PureComponent {
 
   editRow = async (row) => {
     const { dispatch, inventoryAdjustment, toggleModal } = this.props
+    const accessRight = Authorized.check(viewAdjustmentDetailAuthority)
+    if (!accessRight || accessRight.rights !== 'enable') {
+      notification.error({
+        message: 'Current user is not authorized to access',
+      })
+      return
+    }
 
     await this.props
       .dispatch({

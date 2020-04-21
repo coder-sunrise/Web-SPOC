@@ -4,28 +4,16 @@ import moment from 'moment'
 // formik
 import { withFormik } from 'formik'
 // sub components
+import { GridContainer, GridItem } from '@/components'
 import FilterBar from './FilterBar'
-import { ReportDataGrid } from '@/components/_medisys'
 import ReportBase from '../ReportBase'
+import DiagnosisGroupDetails from './DiagnosisGroupDetails'
+import DiagnosisDetails from './DiagnosisDetails'
 
-const DiagnosisDetailsColumns = [
-  { name: 'groupName', title: 'Date' },
-  { name: 'diagnosisCode', title: 'Diagnosis Code' },
-  { name: 'diagnosisName', title: 'Diagnosis Name' },
-  { name: 'patientCount', title: 'Patients' },
-  { name: 'visitCount', title: 'Visits' },
-]
-const DiagnosisDetailsExtensions = [
-  { columnName: 'groupName', sortingEnabled: false },
-  { columnName: 'diagnosisCode', sortingEnabled: false },
-  { columnName: 'diagnosisName', sortingEnabled: false },
-  { columnName: 'patientCount', sortingEnabled: false },
-  { columnName: 'visitCount', sortingEnabled: false },
-]
 const reportId = 6
 const fileName = 'Diagnosis Trending'
 class DiagnosisTrending extends ReportBase {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       ...this.state,
@@ -34,36 +22,26 @@ class DiagnosisTrending extends ReportBase {
     }
   }
 
-  renderFilterBar = (handleSubmit, isSubmitting) => {
-    return <FilterBar handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
+  renderFilterBar = (handleSubmit, isSubmitting, formikProps) => {
+    return (
+      <FilterBar
+        handleSubmit={handleSubmit}
+        isSubmitting={isSubmitting}
+        formikProps={formikProps}
+      />
+    )
   }
 
   renderContent = (reportDatas) => {
-    let listData = []
-    if (!reportDatas) return null
-    if (reportDatas.DiagnosisDetails) {
-      listData = reportDatas.DiagnosisDetails.map((item, index) => ({
-        ...item,
-        id: `DiagnosisDetails-${index}-${item.diagnosisCode}`,
-      }))
-    }
-    const FuncProps = {
-      grouping: true,
-      groupingConfig: {
-        state: {
-          grouping: [
-            { columnName: 'groupName' },
-          ],
-        },
-      },
-    }
     return (
-      <ReportDataGrid
-        data={listData}
-        columns={DiagnosisDetailsColumns}
-        columnExtensions={DiagnosisDetailsExtensions}
-        FuncProps={FuncProps}
-      />
+      <GridContainer>
+        <GridItem md={12}>
+          <DiagnosisGroupDetails reportDatas={reportDatas} />
+        </GridItem>
+        <GridItem md={12} style={{ padding: 6 }}>
+          <DiagnosisDetails reportDatas={reportDatas} />
+        </GridItem>
+      </GridContainer>
     )
   }
 }

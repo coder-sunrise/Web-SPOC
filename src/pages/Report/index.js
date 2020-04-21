@@ -13,6 +13,8 @@ import {
   GridItem,
   TextField,
 } from '@/components'
+import Authorized from '@/utils/Authorized'
+import { menuData } from './variables'
 
 const styles = (theme) => ({
   bigviewBtn: {
@@ -31,93 +33,12 @@ const styles = (theme) => ({
   },
 })
 
-const menuData = [
-  {
-    title: 'Admin',
-    text: 'Session Summary Report',
-    url: '/report/sessionsummary',
-  },
-  {
-    title: 'Finance',
-    text: 'Payment Collection Report',
-    url: '/report/paymentcollection',
-  },
-  {
-    title: 'Finance',
-    text: 'GST Report',
-    url: '/report/gstreport',
-  },
-  {
-    title: 'Finance',
-    text: 'Queue Listing Report',
-    url: '/report/queuelisting',
-  },
-  {
-    title: 'Finance',
-    text: 'Sales Listing Report',
-    url: '/report/saleslistingreport',
-  },
-  {
-    title: 'Finance',
-    text: 'Patient Listing Report',
-    url: '/report/patientlisting',
-  },
-  {
-    title: 'Finance',
-    text: 'Sale Summary Report',
-    url: '/report/salesummary',
-  },
-  {
-    title: 'Finance',
-    text: 'Credit Note Listing Report',
-    url: '/report/creditnotelistingreport',
-  },
-  {
-    title: 'Finance',
-    text: 'Void Credit Note & Payment Report',
-    url: '/report/voidcreditnotereport',
-  },
-  {
-    title: 'Finance',
-    text: 'Deposit Transaction Report',
-    url: '/report/deposittransactionreport',
-  },
-  {
-    title: 'Finance',
-    text: 'Outstanding Payment Report',
-    url: '/report/outstandingpaymentreport',
-  },
-  {
-    title: 'Finance',
-    text: 'CHAS Claim Report',
-    url: '/report/chasclaimreport',
-  },
-  {
-    title: 'Inventory',
-    text: 'Medication Movement Report',
-    url: '/report/medicationmovementreport',
-  },
-  {
-    title: 'Inventory',
-    text: 'Consumable Movement Report',
-    url: '/report/consumablemovementreport',
-  },
-  {
-    title: 'Inventory',
-    text: 'Low Stock Medication Report',
-    url: '/report/lowstockmedicationreport',
-  },
-  {
-    title: 'Inventory',
-    text: 'Low Stock Consumables Report',
-    url: '/report/lowstockconsumablesreport',
-  },
-  {
-    title: 'Other',
-    text: 'Diagnosis Trending Report',
-    url: '/report/diagnosistrending',
-  },
-]
+const filterByAccessRight = (m) => {
+  const accessRight = Authorized.check(m.authority)
+  if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
+    return false
+  return true
+}
 
 class Report extends React.Component {
   constructor (props) {
@@ -145,42 +66,45 @@ class Report extends React.Component {
     const { classes, theme } = this.props
 
     return Object.keys(this.group).map((o) => {
+      const filtered = this.group[o].filter(filterByAccessRight).filter((m) => {
+        return (
+          m.text.toLocaleLowerCase().indexOf(this.state.searchText) >= 0 ||
+          !this.state.searchText
+        )
+      })
       return {
         title: o,
         items: this.group[o],
+        itemCount: filtered.length,
         content: (
           <GridContainer style={{ marginTop: theme.spacing(1) }} key={o}>
-            {this.group[o]
-              .filter((m) => {
-                return (
-                  m.text.toLocaleLowerCase().indexOf(this.state.searchText) >=
-                  0 || !this.state.searchText
-                )
-              })
-              .map((item) => {
-                return (
-                  <GridItem
-                    key={item.name}
-                    xs={4}
-                    md={2}
-                    style={{ marginBottom: theme.spacing(2) }}
+            {filtered.map((item) => {
+              const accessRight = Authorized.check(item.authority)
+              const isDisabled = accessRight && accessRight.rights === 'disable'
+              return (
+                <GridItem
+                  key={item.name}
+                  xs={4}
+                  md={2}
+                  style={{ marginBottom: theme.spacing(2) }}
+                >
+                  <Button
+                    fullWidth
+                    color='primary'
+                    className={classnames({
+                      [classes.bigviewBtn]: true,
+                      // [classes.longTextBtn]: item.longText,
+                    })}
+                    variant='outlined'
+                    id={item.url}
+                    onClick={this.onButtonClick}
+                    disabled={isDisabled}
                   >
-                    <Button
-                      fullWidth
-                      color='primary'
-                      className={classnames({
-                        [classes.bigviewBtn]: true,
-                        // [classes.longTextBtn]: item.longText,
-                      })}
-                      variant='outlined'
-                      id={item.url}
-                      onClick={this.onButtonClick}
-                    >
-                      {item.text}
-                    </Button>
-                  </GridItem>
-                )
-              })}
+                    {item.text}
+                  </Button>
+                </GridItem>
+              )
+            })}
           </GridContainer>
         ),
       }
@@ -188,13 +112,15 @@ class Report extends React.Component {
   }
 
   render () {
+    const menus = this.menus().filter((item) => item.itemCount > 0)
+
     return (
       <CardContainer hideHeader>
         <TextField prefix={<Search />} onChange={this.onFilterChange} />
         <Accordion
           defaultActive={0}
           mode={this.state.searchText.length > 0 ? 'multiple' : 'default'}
-          collapses={this.menus().filter((item) => {
+          collapses={menus.filter((item) => {
             return (
               !this.state.searchText ||
               // item.title.toLocaleLowerCase().indexOf(this.state.searchText) >=

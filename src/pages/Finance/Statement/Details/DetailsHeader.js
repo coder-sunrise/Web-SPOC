@@ -114,7 +114,7 @@ class DetailsHeader extends PureComponent {
               render={(args) => {
                 return (
                   <NumberInput
-                    prefix='Admin Charge:'
+                    prefix='Corporate Charge:'
                     {...cfg}
                     {...amountProps}
                     {...args}
@@ -158,6 +158,7 @@ class DetailsHeader extends PureComponent {
                   {...cfg}
                   {...amountProps}
                   {...args}
+                  defaultCurrencyFontColor
                 />
               )}
             />

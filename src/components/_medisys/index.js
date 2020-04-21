@@ -21,3 +21,16 @@ export { default as DiagnosisSelect } from './DiagnosisSelect'
 export { default as MobileNumberInput } from './MobileNumberInput'
 export { default as MoreButton } from './MoreButton'
 export { default as CustomConfirm } from './CustomConfirm'
+export { default as DeleteWithPopover } from './DeleteWithPopover'
+export { default as AttachmentWithThumbnail } from './AttachmentWithThumbnail'
+export { default as Notification } from './Notification'
+export { default as FilterBarDate } from './FilterBarDate'
+export { default as InventoryItemList } from './InventoryItemList'
+export { default as ImageViewer } from './ImageViewer'
+export {
+  default as QueueDashboardButton,
+} from './QueueDisplay/QueueDashboardButton'
+export {
+  default as CallingQueueButton,
+} from './QueueDisplay/CallingQueueButton'
+export { default as AuthorizationWrapper } from './AuthorizationWrapper'

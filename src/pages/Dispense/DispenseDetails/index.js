@@ -11,6 +11,7 @@ import AttachMoney from '@material-ui/icons/AttachMoney'
 import AddAlert from '@material-ui/icons/AddAlert'
 // sub components
 import TableData from './TableData'
+import VaccinationGrid from './VaccinationGrid'
 // common component
 import {
   Button,
@@ -31,7 +32,10 @@ import {
 import AmountSummary from '@/pages/Shared/AmountSummary'
 import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE } from '@/utils/constants'
+import CONSTANTS from './constants'
+
 import { dangerColor } from '@/assets/jss'
+
 // const styles = (theme) => ({
 //   gridRow: {
 //     margin: `${theme.spacing.unit}px 0px`,
@@ -78,6 +82,7 @@ const DispenseDetails = ({
   dispatch,
   viewOnly = false,
   onPrint,
+  sendingJob,
   onReloadClick,
   onSaveClick,
   onEditOrderClick,
@@ -86,42 +91,6 @@ const DispenseDetails = ({
   dispense,
   history,
 }) => {
-  const [
-    loading,
-    setLoading,
-  ] = useState(false)
-  useEffect(() => {
-    const getCodeTables = async () => {
-      await dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'inventorymedication',
-          force: true,
-          temp: true,
-        },
-      })
-      await dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'inventoryconsumable',
-          force: true,
-          temp: true,
-        },
-      })
-      await dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'ctservice',
-          force: true,
-          temp: true,
-        },
-      })
-      setLoading(false)
-    }
-    setLoading(true)
-    getCodeTables()
-  }, [])
-
   const {
     prescription,
     vaccination,
@@ -133,28 +102,24 @@ const DispenseDetails = ({
   }
   const { invoiceItem = [], invoiceAdjustment = [], totalPayment } = invoice
 
-  const { inventorymedication } = codetable
+  const { inventorymedication, inventoryvaccination } = codetable
 
   const handleSelectedBatch = (e, op = {}, row) => {
     // console.log({ e, op, row })
     if (op && op.length > 0) {
-      // const currentItem = inventorymedication.find(
-      //   (o) => o.id === row.inventoryMedicationFK,
-      // )
-      // let batchNoOptions = []
-      // if (currentItem) {
-      //   batchNoOptions = currentItem.medicationStock
-      // }
-      // const batchNo = batchNoOptions.find(
-      //   (item) => parseInt(item.id, 10) === parseInt(e[0], 10),
-      // )
-
       const { expiryDate } = op[0]
-
-      // setFieldValue(`prescription[${row.rowIndex}]batchNo`, batchNo.batchNo)
       setFieldValue(`prescription[${row.rowIndex}]expiryDate`, expiryDate)
     } else {
       setFieldValue(`prescription[${row.rowIndex}]expiryDate`, undefined)
+    }
+  }
+
+  const handleSelectVaccinationBatch = (e, op = {}, row) => {
+    if (op && op.length > 0) {
+      const { expiryDate } = op[0]
+      setFieldValue(`vaccination[${row.rowIndex}]expiryDate`, expiryDate)
+    } else {
+      setFieldValue(`vaccination[${row.rowIndex}]expiryDate`, undefined)
     }
   }
 
@@ -249,20 +214,22 @@ const DispenseDetails = ({
             color='primary'
             size='sm'
             onClick={() => {
-              onPrint('Medications')
+              onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
             }}
+            disabled={sendingJob}
           >
-            <Print />
+            {sendingJob ? <Refresh className='spin-custom' /> : <Print />}
             Drug Label
           </Button>
           <Button
             color='primary'
             size='sm'
             onClick={() => {
-              onPrint('Patient')
+              onPrint({ type: CONSTANTS.PATIENT_LABEL })
             }}
+            disabled={sendingJob}
           >
-            <Print />
+            {sendingJob ? <Refresh className='spin-custom' /> : <Print />}
             Patient Label
           </Button>
         </GridItem>
@@ -306,7 +273,7 @@ const DispenseDetails = ({
                 size='sm'
                 icon={<Edit />}
                 onClick={onEditOrderClick}
-                disabled={loading}
+                disabled={!dispense.queryCodeTablesDone}
               >
                 Add Order
               </ProgressButton>
@@ -349,15 +316,18 @@ const DispenseDetails = ({
               )}
               data={prescription}
             />
-            {!isRetailVisit && (
-              <TableData
-                title='Vaccination'
-                idPrefix='vaccination'
-                columns={VaccinationColumn}
-                colExtensions={VaccinationColumnExtensions(viewOnly)}
-                data={vaccination}
-              />
-            )}
+            <VaccinationGrid
+              title='Vaccination'
+              idPrefix='vaccination'
+              columns={VaccinationColumn}
+              colExtensions={VaccinationColumnExtensions(
+                viewOnly,
+                inventoryvaccination,
+                handleSelectVaccinationBatch,
+              )}
+              data={vaccination}
+              visitPurposeFK={visitPurposeFK}
+            />
 
             <TableData
               title='Other Orders'

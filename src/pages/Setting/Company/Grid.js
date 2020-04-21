@@ -1,6 +1,7 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Fragment } from 'react'
 import Edit from '@material-ui/icons/Edit'
-import { CommonTableGrid, Button, Tooltip } from '@/components'
+import Print from '@material-ui/icons/Print'
+import { CommonTableGrid, Button, Tooltip, notification } from '@/components'
 import { status, gstEnabled } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
 
@@ -16,6 +17,14 @@ class Grid extends PureComponent {
   }
 
   editRow = (row, e) => {
+    const accessRight = Authorized.check('copayer.copayerdetails')
+
+    if (accessRight && accessRight.rights !== 'enable') {
+      notification.error({
+        message: 'Current user is not authorized to access',
+      })
+      return
+    }
     const { dispatch, settingCompany } = this.props
 
     const { list } = settingCompany
@@ -40,6 +49,7 @@ class Grid extends PureComponent {
         type='settingCompany'
         onRowDoubleClick={this.editRow}
         FuncProps={this.FuncConfig}
+        forceRender
         columns={
           name === 'copayer' ? (
             [
@@ -206,25 +216,31 @@ class Grid extends PureComponent {
             width: 100,
             render: (row) => {
               return (
-                <Authorized authority='scheme.schemedetails'>
-                  <Tooltip
-                    title={
-                      companyType.id === 1 ? 'Edit Co-Payer' : 'Edit Supplier'
-                    }
-                    placement='bottom'
-                  >
-                    <Button
-                      size='sm'
-                      onClick={() => {
-                        this.editRow(row)
-                      }}
-                      justIcon
-                      color='primary'
-                      style={{ marginRight: 0 }}
+                <Authorized authority='copayer.copayerdetails'>
+                  <Fragment>
+                    <Tooltip
+                      title={
+                        companyType.id === 1 ? 'Edit Co-Payer' : 'Edit Supplier'
+                      }
+                      placement='bottom'
                     >
-                      <Edit />
-                    </Button>
-                  </Tooltip>
+                      <Button
+                        size='sm'
+                        onClick={() => {
+                          this.editRow(row)
+                        }}
+                        justIcon
+                        color='primary'
+                      >
+                        <Edit />
+                      </Button>
+                    </Tooltip>
+                    <Tooltip title='Print Copayer Label' placement='bottom'>
+                      <Button size='sm' justIcon color='primary'>
+                        <Print />
+                      </Button>
+                    </Tooltip>
+                  </Fragment>
                 </Authorized>
               )
             },

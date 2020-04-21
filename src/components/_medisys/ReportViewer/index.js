@@ -44,6 +44,7 @@ const ReportViewer = ({
   unsavedReport = false,
   classes,
   showTopDivider = true,
+  defaultScale = 1.75,
 }) => {
   const [
     exporting,
@@ -52,7 +53,7 @@ const ReportViewer = ({
   const [
     scale,
     setScale,
-  ] = useState(1.75)
+  ] = useState(defaultScale)
   const [
     screenSize,
     setScreenSize,

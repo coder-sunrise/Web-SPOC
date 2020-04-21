@@ -17,10 +17,11 @@ import {
   Select,
   Checkbox,
 } from '@/components'
-import { orderTypes } from '@/utils/codes'
+import { orderTypes } from '@/pages/Consultation/utils'
+import Authorized from '@/utils/Authorized'
 
 // console.log(orderTypes)
-export default ({ orders, dispatch, classes }) => {
+export default ({ orders, dispatch, classes, from, codetable }) => {
   const { rows, summary, finalAdjustments, isGSTInclusive, gstValue } = orders
   const { total, gst, totalWithGST } = summary
   const [
@@ -53,10 +54,25 @@ export default ({ orders, dispatch, classes }) => {
         // },
       },
     })
-    dispatch({
-      // force current edit row components to update
-      type: 'global/incrementCommitCount',
-    })
+    if (row.type === '7') {
+      const treatment =
+        (codetable.cttreatment || [])
+          .find((o) => o.isActive && o.id === row.treatmentFK) || {}
+      const action = (codetable.ctchartmethod || [])
+        .find((o) => o.id === treatment.chartMethodFK)
+      dispatch({
+        type: 'dentalChartComponent/updateState',
+        payload: {
+          mode: 'treatment',
+          action,
+        },
+      })
+    }
+
+    // dispatch({
+    //   // force current edit row components to update
+    //   type: 'global/incrementCommitCount',
+    // })
   }
   // console.log(total, summary)
   const addAdjustment = () => {
@@ -311,6 +327,11 @@ export default ({ orders, dispatch, classes }) => {
         {
           columnName: 'description',
           width: 260,
+          observeFields: [
+            'instruction',
+            'remark',
+            'remarks',
+          ],
           render: (row) => {
             return (
               <Tooltip title={row.instruction}>
@@ -320,7 +341,7 @@ export default ({ orders, dispatch, classes }) => {
                     whiteSpace: 'pre-wrap',
                   }}
                 >
-                  {row.instruction}
+                  {row.instruction || row.remark || row.remarks || ''}
                 </div>
               </Tooltip>
             )
@@ -343,66 +364,74 @@ export default ({ orders, dispatch, classes }) => {
           //   )
           // },
         },
-        {
-          columnName: 'remark',
-          render: (r) => {
-            return r.remark || r.remarks || ''
-          },
-        },
+
         {
           columnName: 'actions',
           width: 70,
           align: 'center',
           sortingEnabled: false,
           render: (row) => {
+            if (row.type === '7' && from !== 'ca') return null
+            const orderType = orderTypes.find(
+              (item) => item.value === row.type,
+            ) || { accessRight: '' }
+            const { accessRight } = orderType
             return (
-              <div>
-                <Tooltip title='Edit'>
-                  <Button
-                    size='sm'
-                    onClick={() => {
-                      editRow(row)
-                    }}
-                    justIcon
-                    color='primary'
-                    style={{ marginRight: 5 }}
-                    disabled={
-                      isEditingEntity || (!row.isActive && row.type !== '5')
-                    }
-                  >
-                    <Edit />
-                  </Button>
-                </Tooltip>
-                <Popconfirm
-                  onConfirm={() => {
-                    dispatch({
-                      type: 'orders/deleteRow',
-                      payload: {
-                        uid: row.uid,
-                      },
-                    })
-                    // let commitCount = 1000 // uniqueNumber
-                    // dispatch({
-                    //   // force current edit row components to update
-                    //   type: 'global/updateState',
-                    //   payload: {
-                    //     commitCount: (commitCount += 1),
-                    //   },
-                    // })
-                  }}
-                >
-                  <Tooltip title='Delete'>
+              <Authorized authority={accessRight}>
+                <div>
+                  <Tooltip title='Edit'>
                     <Button
                       size='sm'
-                      color='danger'
+                      onClick={() => {
+                        editRow(row)
+                      }}
                       justIcon
-                      disabled={isEditingEntity}
+                      color='primary'
+                      style={{ marginRight: 5 }}
+                      disabled={
+                        isEditingEntity || (!row.isActive && row.type !== '5')
+                      }
                     >
-                      <Delete />
+                      <Edit />
                     </Button>
                   </Tooltip>
-                </Popconfirm>
-              </div>
+                  <Popconfirm
+                    onConfirm={() => {
+                      dispatch({
+                        type: 'orders/deleteRow',
+                        payload: {
+                          uid: row.uid,
+                        },
+                      })
+                      dispatch({
+                        type: 'orders/updateState',
+                        payload: {
+                          entity: undefined,
+                        },
+                      })
+                      // let commitCount = 1000 // uniqueNumber
+                      // dispatch({
+                      //   // force current edit row components to update
+                      //   type: 'global/updateState',
+                      //   payload: {
+                      //     commitCount: (commitCount += 1),
+                      //   },
+                      // })
+                    }}
+                  >
+                    <Tooltip title='Delete'>
+                      <Button
+                        size='sm'
+                        color='danger'
+                        justIcon
+                        disabled={isEditingEntity}
+                      >
+                        <Delete />
+                      </Button>
+                    </Tooltip>
+                  </Popconfirm>
+                </div>
+              </Authorized>
             )
           },
         },

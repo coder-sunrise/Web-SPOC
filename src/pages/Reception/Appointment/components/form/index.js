@@ -21,7 +21,7 @@ import {
 import { LoadingWrapper, Recurrence } from '@/components/_medisys'
 // custom components
 import PatientProfile from '@/pages/PatientDatabase/Detail'
-import AppointmentHistory from '@/pages/PatientDatabase/Detail/AppointmentHistory'
+import AppointmentHistory from '@/pages/Widgets/AppointmentHistory'
 import PatientSearchModal from '../../PatientSearch'
 import DeleteConfirmation from './DeleteConfirmation'
 import AppointmentDataGrid from './AppointmentDataGrid'
@@ -801,9 +801,9 @@ class Form extends React.PureComponent {
     const { appointmentStatusFk } = values
     if (!values.id) return false
     const disablingList = [
+      APPOINTMENT_STATUS.CANCELLED,
+      APPOINTMENT_STATUS.NOSHOW,
       APPOINTMENT_STATUS.TURNEDUP,
-      APPOINTMENT_STATUS.SCHEDULED,
-      APPOINTMENT_STATUS.RESCHEDULED,
     ]
     return (
       values.isEnableRecurrence || disablingList.includes(appointmentStatusFk)

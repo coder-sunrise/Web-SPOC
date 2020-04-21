@@ -3,9 +3,7 @@ import { connect } from 'dva'
 import { compose } from 'redux'
 import { withStyles } from '@material-ui/core/styles'
 import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
-import DetailPanel from './Detail'
-import InventoryTypeListing from './InventoryTypeListing'
-import { OrderSetDetailOption } from './variables'
+import Authorized from '@/utils/Authorized'
 
 import {
   NavPills,
@@ -15,6 +13,11 @@ import {
   Tabs,
 } from '@/components'
 import Yup from '@/utils/yup'
+import { OrderSetDetailOption } from './variables'
+import InventoryTypeListing from './InventoryTypeListing'
+import DetailPanel from './Detail'
+
+const { Secured } = Authorized
 
 const styles = () => ({
   actionDiv: {
@@ -65,7 +68,7 @@ const Detail = ({
   //           code: x.ctName,
   //         },
   //       }).then((list) => {
-  //         const { inventoryItemList } = getInventoryItemList(list)
+  //         const { inventoryItemList } = inventoryItemList(list)
   //         console.log(x.stateName)
   //         switch (x.stateName) {
   //           case 'ConsumableItemList': {
@@ -219,6 +222,7 @@ const Detail = ({
       <div className={classes.actionDiv}>
         <Button
           color='danger'
+          authority='none'
           onClick={navigateDirtyCheck({
             redirectUrl: '/inventory/master?t=3',
           })}
@@ -303,4 +307,4 @@ export default compose(
 
     displayName: 'InventoryOrderSetDetail',
   }),
-)(Detail)
+)(Secured('inventorymaster.orderset')(Detail))

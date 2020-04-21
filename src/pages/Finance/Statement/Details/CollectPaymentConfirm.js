@@ -39,7 +39,8 @@ class CollectPaymentConfirm extends PureComponent {
       { name: 'invoiceNo', title: 'Invoice No' },
       { name: 'invoiceDate', title: 'Invoice Date' },
       { name: 'patientName', title: 'Patient Name' },
-      { name: 'adminCharge', title: 'Admin Charge' },
+      { name: 'adminCharge', title: 'Corporate Charge' },
+      { name: 'statementAdjustment', title: 'Statement Adjustment' },
       { name: 'payableAmount', title: 'Payable Amount' },
       { name: 'outstandingAmount', title: 'Outstanding' },
       { name: 'payment', title: 'Payment' },
@@ -56,6 +57,13 @@ class CollectPaymentConfirm extends PureComponent {
       },
       {
         columnName: 'adminCharge',
+        type: 'number',
+        currency: true,
+        sortingEnabled: false,
+        width: 150,
+      },
+      {
+        columnName: 'statementAdjustment',
         type: 'number',
         currency: true,
         sortingEnabled: false,
@@ -106,9 +114,11 @@ class CollectPaymentConfirm extends PureComponent {
         width: 150,
       },
     ],
+    hasActiveSession: false,
   }
 
   componentDidMount () {
+    this.checkHasActiveSession()
     this.resize()
     window.addEventListener('resize', this.resize.bind(this))
   }
@@ -220,6 +230,20 @@ class CollectPaymentConfirm extends PureComponent {
     setFieldValue('displayValue', displayValue)
   }
 
+  checkHasActiveSession = async () => {
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+    }
+    const result = await getBizSession(bizSessionPayload)
+    const { data } = result.data
+
+    this.setState(() => {
+      return {
+        hasActiveSession: data.length > 0,
+      }
+    })
+  }
+
   resize () {
     if (this._container) {
       const containerHeight = window.document.body.clientHeight - 300
@@ -228,7 +252,13 @@ class CollectPaymentConfirm extends PureComponent {
   }
 
   render () {
-    const { rows, columns, columnExtensions, isCardPayment } = this.state
+    const {
+      rows,
+      columns,
+      columnExtensions,
+      isCardPayment,
+      hasActiveSession,
+    } = this.state
     const { values, statement, handleSubmit } = this.props
     const { bizSessionList } = statement
     return (
@@ -357,7 +387,7 @@ class CollectPaymentConfirm extends PureComponent {
                 <ProgressButton
                   color='primary'
                   onClick={handleSubmit}
-                  disabled={values.amount <= 0}
+                  disabled={values.amount <= 0 || !hasActiveSession}
                 >
                   Confirm Payment
                 </ProgressButton>

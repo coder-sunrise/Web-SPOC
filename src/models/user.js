@@ -1,6 +1,8 @@
+import _ from 'lodash'
 import { query as queryUsers, queryCurrent } from '@/services/user'
 import { fetchUserProfileByID } from '@/pages/Setting/UserProfile/services'
 import * as serviceQueue from '../services/queue'
+import { CLINIC_TYPE } from '@/utils/constants'
 
 const convertServerRights = ({ accessRight, type, permission }) => {
   // const orgName = accessRight
@@ -67,7 +69,44 @@ const convertServerRights = ({ accessRight, type, permission }) => {
     ]
   }
 
-  return []
+  if (type === 'Field') {
+    return [
+      {
+        name,
+        rights,
+        // orgName,
+      },
+    ]
+  }
+  return [
+    {
+      name,
+      rights,
+      // orgName,
+    },
+  ]
+}
+
+const parseUserRights = (user) => {
+  const disableList = [
+    'reception/appointment',
+    'patientdatabase',
+    'communication',
+    'inventory',
+    'finance',
+    'report',
+    'settings',
+    'support',
+    'claimsubmission',
+  ]
+  const result = {
+    ...user,
+    accessRights: user.accessRights.map((access) => ({
+      ...access,
+      rights: disableList.includes(access.name) ? 'disable' : access.rights,
+    })),
+  }
+  return result
 }
 
 const defaultState = {
@@ -88,15 +127,16 @@ export default {
   },
 
   effects: {
-    *fetch (_, { call, put }) {
+    *fetch (state, { call, put }) {
       const response = yield call(queryUsers)
       yield put({
         type: 'save',
         payload: response,
       })
     },
-    *fetchCurrent (_, { call, put }) {
+    *fetchCurrent (state, { select, call, put }) {
       let user = JSON.parse(sessionStorage.getItem('user'))
+      // const clinicInfo = yield select((state) => state.clinicInfo)
       if (!user) {
         const response = yield call(queryCurrent)
         if (!response) {
@@ -108,13 +148,33 @@ export default {
             return a.concat(convertServerRights(b))
           }, [])
 
+          if (
+            data.userProfileDetailDto &&
+            data.userProfileDetailDto.clinicianProfile &&
+            data.userProfileDetailDto.clinicianProfile.userProfile &&
+            data.userProfileDetailDto.clinicianProfile.userProfile.userName ===
+              'demouser'
+          ) {
+            // for demo only, TODO: should have a better way to handle it
+            accessRights.push({
+              name: 'demorights',
+              rights: 'enable',
+            })
+          }
+
           user = {
             data: data.userProfileDetailDto,
-            accessRights,
+            accessRights: _.orderBy(accessRights, (o) => o.name),
           }
+          // for AiOT user only
+          // if (user && user.data && user.data.id === 46) {
+          //   user = parseUserRights(user)
+          //   console.log({ user })
+          // }
         }
         sessionStorage.setItem('user', JSON.stringify(user))
       }
+      // console.log({ accessRight: JSON.stringify(user.accessRights) })
       yield put({
         type: 'saveCurrentUser',
         payload: user,
@@ -152,7 +212,7 @@ export default {
   },
 
   reducers: {
-    reset (_) {
+    reset (state) {
       return { ...defaultState }
     },
     save (state, action) {

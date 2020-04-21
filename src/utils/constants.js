@@ -11,6 +11,12 @@ export const APPOINTMENT_STATUS = {
   NOSHOW: 6,
 }
 
+export const PATIENT_LAB = {
+  PATIENT_PROFILE: 1,
+  CONSULTATION: 2,
+  LAB_TRACKING: 3,
+}
+
 export const CANCELLATION_REASON_TYPE = {
   NOSHOW: 1,
   OTHERS: 2,
@@ -26,6 +32,13 @@ export const USER_ROLE = {
   DOCTOR_OWNER: 2,
   DOCTOR: 3,
   CLINIC_ASSISTANT: 4,
+}
+
+export const LAB_TRACKING_STATUS = {
+  NEW: 1,
+  ORDERED: 2,
+  RECEIVED: 3,
+  COMPLETED: 4,
 }
 
 export const COPAYER_TYPE = {
@@ -83,6 +96,8 @@ export const INVOICE_ITEM_TYPE = {
   3: 'Vaccination',
   4: 'Service',
   5: 'OrderSet',
+  6: 'Misc',
+  7: 'Treatment',
 }
 
 export const INVOICE_ITEM_TYPE_BY_TEXT = {
@@ -105,6 +120,14 @@ export const INVENTORY_TYPE = {
   MEDICATION: 1,
   CONSUMABLE: 2,
   VACCINATION: 3,
+}
+
+export const ITEM_TYPE = {
+  MEDICATION: 1,
+  CONSUMABLE: 2,
+  VACCINATION: 3,
+  SERVICE: 4,
+  ORDERSET: 5,
 }
 
 export const INVENTORY_ADJUSTMENT_STATUS = {
@@ -142,12 +165,18 @@ export const REPORT_TYPE = {
   26: 'Purchase Order',
   27: 'Patient Label',
   29: 'Payment Receipt',
+  37: 'Inventory Trending Report',
 }
 
-export const REPORT_TYPE_ID = {
-  PATIENT_LABEL: 27,
-  LAB_LABEL: 33,
-  LAB_LABEL_89MM: 34,
+export const REPORT_ID = {
+  DRUG_LABEL_80MM_45MM: 24,
+  DRUG_LABEL_89MM_36MM: 31,
+  PATIENT_LABEL_80MM_45MM: 27,
+  PATIENT_LABEL_89MM_36MM: 32,
+  PATIENT_LAB_LABEL_80MM_45MM: 33,
+  PATIENT_LAB_LABEL_89MM_36MM: 34,
+  POST_CARD_LABEL_80MM_45MM: 35,
+  POST_CARD_LABEL_89MM_36MM: 36,
 }
 
 export const INVOICE_STATUS = {
@@ -180,6 +209,15 @@ export const COUNTRY_CODE = {
   4: '+63 Philippines',
   5: '+66 Thailand',
   6: '+81 Japan',
+}
+
+export const COUNTRY_CODE_NUMBER = {
+  1: '+65',
+  2: '+60',
+  3: '+62',
+  4: '+63',
+  5: '+66',
+  6: '+81',
 }
 
 export const ADD_ON_FEATURE = {
@@ -218,8 +256,28 @@ export const ORDER_TYPE_TAB = {
   VACCINATION: '2',
   SERVICE: '3',
   CONSUMABLE: '4',
-  OPENPRECRIPTION: '5',
+  OPENPRESCRIPTION: '5',
   ORDERSET: '6',
+}
+
+export const PATIENT_HISTORY_TABS = {
+  VISIT: 1,
+  DISPENSE: 2,
+  APPOINTMENT: 3,
+  INVOICE: 4,
+}
+
+export const FILE_STATUS = {
+  UPLOADED: 1,
+  CONFIRMED: 2,
+  ARCHIEVED: 3,
+}
+
+export const SCRIBBLE_NOTE_TYPE = {
+  CLINICALNOTES: 1,
+  CHIEFCOMPLAINTS: 2,
+  PLAN: 6,
+  HISTORY: 3,
 }
 
 export const SMS_STATUS = {
@@ -248,16 +306,70 @@ export const SMS_STATUS_TEXT = {
   READ: 'Read',
   QUEUED: 'Queued',
   SENDING: 'Sending',
+  UNREAD: 'Unread',
 }
 
-export const FILE_STATUS = {
-  UPLOADED: 1,
-  CONFIRMED: 2,
-  ARCHIEVED: 3,
+export const CANNED_TEXT_TYPE = {
+  NOTE: 1,
+  CHIEFCOMPLAINTS: 2,
+  HISTORY: 3,
+  PLAN: 6,
+}
+
+export const DENTAL_CANNED_TEXT_TYPE_FIELD = {
+  1: 'clinicalNotes',
+  2: 'complaints',
+  3: 'associatedHistory',
+  4: 'intraOral',
+  5: 'extraOral',
+  6: 'plan',
+}
+
+export const CLINIC_TYPE = {
+  GP: 1,
+  DENTAL: 2,
 }
 
 export const FILE_CATEGORY = {
   VISITREG: 1,
   CONSULTATION: 2,
   PATIENT: 3,
+}
+
+export const PURCHASE_ORDER_STATUS = {
+  DRAFT: 1,
+  FINALIZED: 2,
+  PARTIALREVD: 3,
+  CANCELLED: 4,
+  FULFILLED: 5,
+  COMPLETED: 6,
+}
+
+export const NUMBER_TYPE = {
+  MOBILE: 1,
+  HOME: 2,
+  WORK: 3,
+  FAX: 4,
+}
+
+export const NOTIFICATION_TYPE = {
+  QUEUE: 1,
+  CODETABLE: 2,
+  ERROR: 3,
+}
+
+export const NOTIFICATION_STATUS = {
+  OK: 1,
+  ERROR: 2,
+}
+export const VALUE_KEYS = {
+  QUEUEDISPLAYSETUP: 'queueDisplay',
+  QUEUECALLING: 'queueCalling',
+}
+/**
+ * ENUM constants that maps with SEMR Gen2 codeset
+ */
+
+export const SCHEME_TYPE = {
+  CORPORATE: 15,
 }

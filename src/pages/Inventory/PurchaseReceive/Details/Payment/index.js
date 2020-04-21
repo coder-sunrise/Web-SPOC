@@ -7,14 +7,16 @@ import { GridContainer, withFormikExtend, ProgressButton } from '@/components'
 import Header from './Header'
 import Grid from './Grid'
 import { INVOICE_STATUS } from '@/utils/constants'
-import { isPOStatusFinalized } from '../../variables'
 import { navigateDirtyCheck, roundTo } from '@/utils/utils'
 import AuthorizedContext from '@/components/Context/Authorized'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
+const { Secured } = Authorized
+@Secured('purchasingandreceiving.purchasingandreceivingdetails')
 @connect(({ podoPayment, purchaseOrderDetails }) => ({
   podoPayment,
   purchaseOrderDetails,
@@ -160,35 +162,20 @@ class index extends PureComponent {
   }
 
   render () {
-    const { purchaseOrderDetails, values } = this.props
-    const { invoiceAmount } = values
+    const { purchaseOrderDetails, rights } = this.props
     const { purchaseOrder: po } = purchaseOrderDetails
-    const poStatus = po ? po.purchaseOrderStatusFK : 1
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
-    const isEditable = isPOStatusFinalized(poStatus)
-    const allowEdit = () => {
-      if (
-        (poStatus === 6 && invoiceAmount === this.getTotalPaid()) ||
-        isWriteOff
-      )
-        return false
-      return true
-    }
     return (
       <AuthorizedContext.Provider
         value={{
-          rights: allowEdit() ? 'enable' : 'disable',
+          rights: isWriteOff === true ? 'disable' : rights,
         }}
       >
         <GridContainer>
           <Header {...this.props} />
-          <Grid
-            {...this.props}
-            isEditable={isEditable}
-            getTotalPaid={this.getTotalPaid}
-          />
+          <Grid {...this.props} getTotalPaid={this.getTotalPaid} />
         </GridContainer>
 
         <div style={{ textAlign: 'center' }}>

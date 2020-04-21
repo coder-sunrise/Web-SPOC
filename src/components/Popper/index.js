@@ -5,7 +5,17 @@ import Paper from '@material-ui/core/Paper'
 import Popper from '@material-ui/core/Popper'
 import ClickAwayListener from '@material-ui/core/ClickAwayListener'
 
-export default ({ children, overlay, trigger = 'hover', ...props }) => {
+export default ({
+  children,
+  overlay,
+  trigger = 'hover',
+  disabled,
+  disabledTransition,
+  placement,
+  stopOnClickPropagation = false,
+  ...props
+}) => {
+  if (disabled) return children
   const [
     anchorEl,
     setAnchorEl,
@@ -37,7 +47,22 @@ export default ({ children, overlay, trigger = 'hover', ...props }) => {
           }
         : null,
   }
-  // const { className, style, ...resetBtnProps } = children.props
+
+  const onOverlayClick = (event) => {
+    if (stopOnClickPropagation) event.stopPropagation()
+  }
+
+  const popperContainer = (
+    <Paper elevation={2}>
+      <ClickAwayListener
+        onClickAway={() => {
+          trigger !== 'hover' ? setAnchorEl(null) : undefined
+        }}
+      >
+        <div onClick={onOverlayClick}>{overlay}</div>
+      </ClickAwayListener>
+    </Paper>
+  )
 
   return (
     <span {...triggerProps}>
@@ -46,6 +71,7 @@ export default ({ children, overlay, trigger = 'hover', ...props }) => {
         open={Boolean(anchorEl)}
         anchorEl={anchorEl}
         transition
+        placement={placement}
         // disablePortal
         onClose={() => {
           setAnchorEl(null)
@@ -58,22 +84,14 @@ export default ({ children, overlay, trigger = 'hover', ...props }) => {
           vertical: 'center',
           horizontal: 'center',
         }}
+        style={{ zIndex: 1500 }}
         {...props}
       >
-        {({ TransitionProps, placement }) => (
-          <Grow {...TransitionProps}>
-            <Paper>
-              <ClickAwayListener
-                onClickAway={() => {
-                  console.log('onClickAway')
-                  trigger !== 'hover' ? setAnchorEl(null) : undefined
-                }}
-              >
-                {overlay}
-              </ClickAwayListener>
-            </Paper>
-          </Grow>
-        )}
+        {({ TransitionProps, p }) => {
+          if (disabledTransition) return popperContainer
+
+          return <Grow {...TransitionProps}>{popperContainer}</Grow>
+        }}
       </Popper>
     </span>
   )

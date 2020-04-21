@@ -5,9 +5,10 @@ import { compose } from 'redux'
 import moment from 'moment'
 import { connect } from 'dva'
 import { CardContainer, Danger, Tabs } from '@/components'
+import { ADD_ON_FEATURE, APPOINTMENT_STATUS } from '@/utils/constants'
+import Authorized from '@/utils/Authorized'
 import New from './New'
 import { SmsOption } from './variables'
-import { ADD_ON_FEATURE, APPOINTMENT_STATUS } from '@/utils/constants'
 
 const styles = {
   sendBar: {
@@ -89,9 +90,9 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
 
     return {
       apiCriteria: {
-        PDPAPhone: true,
-        PDPAMessage: true,
-        PDPAEmail: true,
+        pdpaphone: true,
+        pdpamessage: true,
+        pdpaemail: true,
       },
     }
   }

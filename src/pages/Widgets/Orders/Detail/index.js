@@ -1,24 +1,22 @@
 import React, { PureComponent } from 'react'
 import classnames from 'classnames'
+import { connect } from 'dva'
+
 import { Divider, withStyles } from '@material-ui/core'
 import _ from 'lodash'
-import { orderTypes } from '@/utils/codes'
-import { VISIT_TYPE } from '@/utils/constants'
 import {
   Button,
+  ProgressButton,
   GridContainer,
   GridItem,
   notification,
   Tabs,
 } from '@/components'
 import { currencySymbol } from '@/utils/config'
-
-import Medication from './Medication'
-import Vaccination from './Vaccination'
-import Service from './Service'
-import Consumable from './Consumable'
-import OrderSet from './OrderSet'
 // import Others from './Others'
+// utils
+import { orderTypes } from '@/pages/Consultation/utils'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   editor: {
@@ -43,6 +41,9 @@ const styles = (theme) => ({
   },
 })
 
+@connect(({ orders }) => ({
+  orders,
+}))
 class Details extends PureComponent {
   state = {
     disableEdit: false,
@@ -94,20 +95,21 @@ class Details extends PureComponent {
                     entity: undefined,
                   },
                 })
-                this.props.dispatch({
-                  // force current edit row components to update
-                  type: 'global/incrementCommitCount',
-                })
-              } else {
+                // this.props.dispatch({
+                //   // force current edit row components to update
+                //   type: 'global/incrementCommitCount',
+                // })
+              }
+              if (onReset) {
                 onReset()
               }
             }}
           >
             Discard
           </Button>
-          <Button color='primary' onClick={onSave}>
+          <ProgressButton color='primary' onClick={onSave} icon={null}>
             {!entity ? 'Add' : 'Save'}
-          </Button>
+          </ProgressButton>
         </div>
       </React.Fragment>
     )
@@ -175,9 +177,9 @@ class Details extends PureComponent {
 
   render () {
     const { props } = this
-    const { classes, orders, dispatch, fromDispense } = props
+    const { classes, orders, dispatch, fromDispense, singleMode, from } = props
     const { type } = orders
-
+    // console.log({ props })
     const cfg = {
       disableEdit: this.state.disableEdit,
       setDisable: this.setDisable,
@@ -187,13 +189,32 @@ class Details extends PureComponent {
       getNextSequence: this.getNextSequence,
       ...props,
     }
-
     let orderTypeArray = orderTypes
     if (fromDispense) {
       orderTypeArray = orderTypes.filter(
         (o) => o.value !== '2' && o.value !== '6',
       )
     }
+
+    // if (clinicTypeFK === CLINIC_TYPE.DENTAL) {
+    //   orderTypeArray = orderTypes.filter(
+    //     (o) => o.value === '1' || o.value === '4',
+    //   )
+    // }
+    if (singleMode)
+      return orderTypeArray.find((o) => o.value === '7').component({
+        ...cfg,
+        type: '7',
+      })
+    const tabOptions = orderTypeArray
+      .filter((o) => o.value !== '7' || (o.value === '7' && from === 'ca'))
+      .filter((o) => {
+        const accessRight = Authorized.check(o.accessRight)
+
+        if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
+          return false
+        return true
+      })
     return (
       <div>
         <div className={classes.detail}>
@@ -201,7 +222,7 @@ class Details extends PureComponent {
             <GridItem xs={12}>
               <Tabs
                 activeKey={type}
-                options={orderTypeArray.map((o) => {
+                options={tabOptions.map((o) => {
                   return {
                     id: o.value,
                     name: o.name,
@@ -220,9 +241,9 @@ class Details extends PureComponent {
                       type: key,
                     },
                   })
-                  dispatch({
-                    type: 'global/incrementCommitCount',
-                  })
+                  // dispatch({
+                  //   type: 'global/incrementCommitCount',
+                  // })
                 }}
               />
             </GridItem>

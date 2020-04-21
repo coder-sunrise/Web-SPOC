@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Fragment } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
 // material ui
@@ -15,6 +15,7 @@ import {
   Tooltip,
   dateFormatLong,
   CardContainer,
+  notification,
 } from '@/components'
 // sub components
 import SearchBar from './SearchBar'
@@ -90,18 +91,29 @@ class Statement extends PureComponent {
     })
   }
 
+  editRow = (row, e) => {
+    const { history, dispatch } = this.props
+    const accessRight = Authorized.check('statement.statementdetails')
+
+    if (accessRight && accessRight.rights !== 'enable') {
+      notification.error({
+        message: 'Current user is not authorized to access',
+      })
+      return
+    }
+    dispatch({
+      type: 'statement/updateState',
+      payload: {
+        currentId: row.id,
+      },
+    })
+    history.push(`/finance/statement/details/${row.id}`)
+  }
+
   render () {
     const { history, dispatch } = this.props
-    const editRow = (row, e) => {
-      dispatch({
-        type: 'statement/updateState',
-        payload: {
-          currentId: row.id,
-        },
-      })
-      history.push(`/finance/statement/details/${row.id}`)
-    }
     const { rows, columns } = this.state
+
     return (
       <CardContainer hideHeader>
         <SearchBar
@@ -116,7 +128,7 @@ class Statement extends PureComponent {
           type='statement'
           // selection={this.state.selectedRows}
           // onSelectionChange={this.handleSelectionChange}
-          onRowDoubleClick={editRow}
+          onRowDoubleClick={this.editRow}
           rows={rows}
           columns={columns}
           // FuncProps={{ selectable: true }}
@@ -170,13 +182,13 @@ class Statement extends PureComponent {
               width: 130,
               render: (row) => {
                 return (
-                  <React.Fragment>
-                    <Authorized authority='statement.statementdetails'>
+                  <Authorized authority='statement.statementdetails'>
+                    <Fragment>
                       <Tooltip title='Edit Statement'>
                         <Button
                           size='sm'
                           onClick={() => {
-                            editRow(row)
+                            this.editRow(row)
                           }}
                           justIcon
                           color='primary'
@@ -203,8 +215,8 @@ class Statement extends PureComponent {
                           </Button>
                         </Tooltip>
                       </PrintStatementReport>
-                    </Authorized>
-                  </React.Fragment>
+                    </Fragment>
+                  </Authorized>
                 )
               },
             },

@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Fragment } from 'react'
 import { FormattedMessage } from 'umi/locale'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
@@ -24,6 +24,7 @@ import {
   Button,
 } from '@/components'
 import { inventoryAdjustmentStatus } from '@/utils/codes'
+import Authorized from '@/utils/Authorized'
 
 @withFormikExtend({
   mapPropsToValues: ({ inventoryAdjustment }) =>
@@ -157,37 +158,42 @@ class Filter extends PureComponent {
                 <FormattedMessage id='form.search' />
               </ProgressButton>
 
-              <Button
-                color='primary'
-                icon={null}
-                onClick={() => {
-                  const { inventoryAdjustment } = this.props
-                  this.props.dispatch({
-                    type: 'inventoryAdjustment/updateState',
-                    payload: {
-                      entity: undefined,
-                      default: {
-                        ...inventoryAdjustment.default,
-                        stockList: undefined,
-                      },
-                    },
-                  })
-                  this.props.toggleModal()
-                }}
-              >
-                <Add />
-                Add New
-              </Button>
-              <Button
-                color='primary'
-                icon={null}
-                onClick={this.handleToggle}
-                buttonRef={(node) => {
-                  this.anchorElAccount = node
-                }}
-              >
-                Mass Adjustment
-              </Button>
+              <Authorized authority='inventoryadjustment.newinventoryadjustment'>
+                <Fragment>
+                  <Button
+                    color='primary'
+                    icon={null}
+                    onClick={() => {
+                      const { inventoryAdjustment } = this.props
+                      this.props.dispatch({
+                        type: 'inventoryAdjustment/updateState',
+                        payload: {
+                          entity: undefined,
+                          default: {
+                            ...inventoryAdjustment.default,
+                            stockList: undefined,
+                          },
+                        },
+                      })
+                      this.props.toggleModal()
+                    }}
+                  >
+                    <Add />
+                    Add New
+                  </Button>
+                  <Button
+                    color='primary'
+                    icon={null}
+                    onClick={this.handleToggle}
+                    buttonRef={(node) => {
+                      this.anchorElAccount = node
+                    }}
+                  >
+                    Mass Adjustment
+                  </Button>
+                </Fragment>
+              </Authorized>
+
               <Popper
                 open={open}
                 anchorEl={this.anchorElAccount}

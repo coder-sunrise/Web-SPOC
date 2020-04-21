@@ -47,15 +47,21 @@ const styles = () => ({
     const returnValue = statement.entity || statement.default
     const adminChargeValueType =
       returnValue.adminChargeValueType || 'Percentage'
+    const adjustmentValueType = returnValue.adjustmentValueType || 'Percentage'
     return {
       ...returnValue,
       adminChargeValueType,
+      adjustmentValueType,
     }
   },
   validationSchema: Yup.object().shape({
     copayerFK: Yup.number().required(),
     statementDate: Yup.date().required(),
     paymentTerm: Yup.number().required(),
+    adjustmentRemarks: Yup.string().when('adjustmentValue', {
+      is: (adjValue) => (adjValue || 0) !== 0,
+      then: Yup.string().trim().required(),
+    }),
   }),
 
   handleSubmit: (values, { props, resetForm }) => {
@@ -348,7 +354,7 @@ class AddNewStatement extends PureComponent {
                 )}
               />
             </GridItem>
-
+            <GridItem md={1} />
             <GridItem md={3}>
               <FastField
                 name='paymentTerm'
@@ -370,18 +376,86 @@ class AddNewStatement extends PureComponent {
             <GridContainer>
               <GridItem md={3}>
                 <Field
-                  name='adminChargeValue'
+                  name='adjustmentValue'
                   render={(args) => {
-                    if (values.adminChargeValueType === 'ExactAmount') {
+                    if (values.adjustmentValueType === 'ExactAmount') {
                       return (
-                        <NumberInput currency label='Admin Charge' {...args} />
+                        <NumberInput
+                          currency
+                          label='Statement Adjustment'
+                          precision={2}
+                          min={0}
+                          {...args}
+                        />
                       )
                     }
                     return (
                       <NumberInput
                         percentage
-                        label='Admin Charge'
+                        label='Statement Adjustment'
+                        min={0}
                         max={100}
+                        precision={2}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+              <GridItem md={1}>
+                <Field
+                  name='adjustmentValueType'
+                  render={(args) => (
+                    <Switch
+                      checkedChildren='$'
+                      unCheckedChildren='%'
+                      checkedValue='ExactAmount'
+                      unCheckedValue='Percentage'
+                      label=''
+                      {...args}
+                    />
+                  )}
+                />
+              </GridItem>
+              <GridItem md={3}>
+                <FastField
+                  name='adjustmentRemarks'
+                  render={(args) => {
+                    return (
+                      <TextField
+                        label='Adjustment Remarks'
+                        max={50}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+            </GridContainer>
+
+            <GridContainer>
+              <GridItem md={3}>
+                <Field
+                  name='adminChargeValue'
+                  render={(args) => {
+                    if (values.adminChargeValueType === 'ExactAmount') {
+                      return (
+                        <NumberInput
+                          currency
+                          label='Corporate Charge'
+                          precision={2}
+                          min={0}
+                          {...args}
+                        />
+                      )
+                    }
+                    return (
+                      <NumberInput
+                        percentage
+                        label='Corporate Charge'
+                        max={100}
+                        precision={2}
+                        min={0}
                         {...args}
                       />
                     )
@@ -405,7 +479,7 @@ class AddNewStatement extends PureComponent {
               </GridItem>
             </GridContainer>
 
-            <GridItem md={6}>
+            <GridItem md={7}>
               <FastField
                 name='remark'
                 render={(args) => {

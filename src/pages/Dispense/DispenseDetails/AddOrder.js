@@ -3,15 +3,17 @@ import { withStyles } from '@material-ui/core/styles'
 import _ from 'lodash'
 import { connect } from 'dva'
 import { compose } from 'redux'
-import Order from '../../Widgets/Orders'
+import { withRouter } from 'react-router-dom'
 import { SizeContainer, withFormikExtend } from '@/components'
 import { convertToConsultation } from '@/pages/Consultation/utils'
 import {
   VISIT_TYPE,
   INVOICE_ITEM_TYPE_BY_NAME,
   ORDER_TYPE_TAB,
+  CLINIC_TYPE,
 } from '@/utils/constants'
-import { roundTo } from '@/utils/utils'
+import { roundTo, getUniqueId } from '@/utils/utils'
+import Order from '../../Widgets/Orders'
 
 const styles = () => ({})
 
@@ -20,14 +22,18 @@ const AddOrder = ({
   handleSubmit,
   dispatch,
   dispense,
+  height,
   codetable: { ctservice, inventoryconsumable, inventorymedication },
   visitType,
+  location,
+  clinicInfo,
 }) => {
   const displayExistingOrders = async (id, servicesList) => {
     const r = await dispatch({
       type: 'dispense/queryAddOrderDetails',
       payload: {
         invoiceId: id,
+        isInitialLoading: location.query.isInitialLoading,
       },
     })
 
@@ -44,22 +50,36 @@ const AddOrder = ({
               ...restValues
             } = o.retailVisitInvoiceDrug.retailPrescriptionItem
 
-            const medicationItem = inventorymedication.find(
-              (medication) =>
-                medication.id ===
-                  o.retailVisitInvoiceDrug.inventoryMedicationFK &&
-                medication.isActive,
-            )
+            let medicationItem
+            if (o.retailVisitInvoiceDrug.inventoryMedicationFK) {
+              medicationItem = inventorymedication.find(
+                (medication) =>
+                  medication.id ===
+                    o.retailVisitInvoiceDrug.inventoryMedicationFK &&
+                  medication.isActive,
+              )
+            } else {
+              // for open prescription item
+              medicationItem = true
+            }
+
             obj = {
-              type: o.invoiceItemTypeFK.toString(),
+              type: o.retailVisitInvoiceDrug.inventoryMedicationFK
+                ? o.invoiceItemTypeFK.toString()
+                : ORDER_TYPE_TAB.OPENPRESCRIPTION,
               ...o.retailVisitInvoiceDrug,
               innerLayerId: o.retailVisitInvoiceDrug.id,
               innerLayerConcurrencyToken:
                 o.retailVisitInvoiceDrug.concurrencyToken,
               ...restValues,
-              corPrescriptionItemInstruction:
-                o.retailVisitInvoiceDrug.retailPrescriptionItem
-                  .retailPrescriptionItemInstruction,
+              corPrescriptionItemInstruction: o.retailVisitInvoiceDrug.retailPrescriptionItem.retailPrescriptionItemInstruction.map(
+                (instruction) => {
+                  return {
+                    ...instruction,
+                    stepdose: instruction.stepdose || 'AND',
+                  }
+                },
+              ),
               corPrescriptionItemPrecaution:
                 o.retailVisitInvoiceDrug.retailPrescriptionItem
                   .retailPrescriptionItemPrecaution,
@@ -122,6 +142,7 @@ const AddOrder = ({
           outerLayerConcurrencyToken: o.concurrencyToken,
           subject: o.itemName,
           uid: o.id,
+          revenueCategoryFK: o.revenueCategoryFK,
           ...obj,
         }
       }
@@ -140,10 +161,49 @@ const AddOrder = ({
       const newRetailInvoiceAdjustment = retailInvoiceAdjustment.map(
         assignRetailAdjustmentIdToOrderAdjustmentUid,
       )
+
+      const isVaccinationExist = newRows.filter((row) => !row.type)
+      const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
+      if (clinicTypeFK === CLINIC_TYPE.GP && isVaccinationExist.length > 0) {
+        dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            openConfirm: true,
+            openConfirmContent: (
+              <p style={{ fontWeight: 400 }}>
+                Vaccination item(s) will not be added.
+              </p>
+            ),
+            alignContent: 'left',
+            isInformType: true,
+            additionalInfo: (
+              <div style={{ fontSize: '1.3em' }}>
+                <ul style={{ listStylePosition: 'inside' }}>
+                  {isVaccinationExist.map((item) => (
+                    <li>
+                      <b>{item.subject}</b>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ),
+            onConfirmSave: () => {},
+          },
+        })
+      }
+
+      const rowsWithoutVaccination = newRows
+        .filter((row) => row.type)
+        .map((row) => {
+          return {
+            ...row,
+            uid: getUniqueId(),
+          }
+        })
       dispatch({
         type: 'orders/updateState',
         payload: {
-          rows: newRows,
+          rows: rowsWithoutVaccination,
           finalAdjustments: newRetailInvoiceAdjustment,
           isGSTInclusive: r.isGSTInclusive,
           gstValue: r.gstValue,
@@ -167,11 +227,12 @@ const AddOrder = ({
     if (visitType === VISIT_TYPE.RETAIL)
       displayExistingOrders(invoice.id, ctservice)
   }, [])
-
   return (
     <React.Fragment>
       <SizeContainer size='sm'>
-        <Order fromDispense={visitType === VISIT_TYPE.RETAIL} />
+        <div style={{ maxHeight: height - 128, overflow: 'auto' }}>
+          <Order fromDispense={visitType === VISIT_TYPE.RETAIL} />
+        </div>
       </SizeContainer>
       {footer &&
         footer({
@@ -185,12 +246,14 @@ const AddOrder = ({
   )
 }
 export default compose(
+  withRouter,
   withStyles(styles, { withTheme: true }),
-  connect(({ dispense, orders, codetable, consultation }) => ({
+  connect(({ dispense, orders, codetable, consultation, clinicInfo }) => ({
     dispense,
     orders,
     consultation,
     codetable,
+    clinicInfo,
   })),
   withFormikExtend({
     handleSubmit: (values, { props }) => {
@@ -201,17 +264,24 @@ export default compose(
         onConfirm,
         dispense,
         onReloadClick,
-        codetable: { inventoryconsumable },
+        codetable: { inventoryconsumable, inventorymedication, ctservice },
         visitType,
+        history,
       } = props
       const { rows, summary, finalAdjustments } = orders
       const { addOrderDetails } = dispense
       if (visitType === VISIT_TYPE.RETAIL) {
         const removeIdAndConcurrencyTokenForNewPrecautionsOrInstructions = (
-          o,
-        ) => {
+          existingIDArray,
+        ) => (instructionOrPrecaution) => {
+          if (existingIDArray.includes(instructionOrPrecaution.id)) {
+            return {
+              ...instructionOrPrecaution,
+            }
+          }
+
           return {
-            ...o,
+            ...instructionOrPrecaution,
             id: undefined,
             concurrencyToken: undefined,
           }
@@ -238,105 +308,66 @@ export default compose(
           retailPrescriptionItemPrecaution,
           itemIsDeleted,
         ) => {
-          const combinedOldNewPrecautions = _.intersectionBy(
+          const combinedOldNewPrecautions = _.intersectionWith(
             corPrescriptionItemPrecaution,
             retailPrescriptionItemPrecaution,
-            'medicationPrecautionFK',
+            _.isEqual,
           )
 
-          const newAddedPrecautions = _.differenceBy(
+          const newAddedPrecautions = _.differenceWith(
             corPrescriptionItemPrecaution,
             combinedOldNewPrecautions,
-            'medicationPrecautionFK',
+            _.isEqual,
           )
 
-          // const unwantedItem = _.differenceBy(
-          //   retailPrescriptionItemPrecaution,
-          //   combinedOldNewPrecautions,
-          //   'medicationPrecautionFK',
-          // )
-
-          const unwantedItem = _.xor(
-            retailPrescriptionItemPrecaution,
-            combinedOldNewPrecautions,
+          const precautionsIDArray = retailPrescriptionItemPrecaution.map(
+            (precaution) => precaution.id,
           )
 
           const formatNewAddedPrecautions = newAddedPrecautions.map(
-            removeIdAndConcurrencyTokenForNewPrecautionsOrInstructions,
+            removeIdAndConcurrencyTokenForNewPrecautionsOrInstructions(
+              precautionsIDArray,
+            ),
           )
-
-          let deleteUnwantedItem = []
-          if (combinedOldNewPrecautions.length <= 0) {
-            deleteUnwantedItem = retailPrescriptionItemPrecaution.map(
-              setIsDeletedToUnwantedPrecautionsOrInstructions,
-            )
-          } else {
-            deleteUnwantedItem = unwantedItem.map(
-              setIsDeletedToUnwantedPrecautionsOrInstructions,
-            )
-          }
 
           const returnedPrecautionsArray = [
             ...combinedOldNewPrecautions,
             ...formatNewAddedPrecautions,
-            ...deleteUnwantedItem,
           ].map((o) => setIsDeletedIfWholeItemIsDeleted(o, itemIsDeleted))
 
           return returnedPrecautionsArray
         }
 
-        const medicationIntructionsArray = (
+        const medicationInstructionsArray = (
           corPrescriptionItemInstruction,
           retailPrescriptionItemInstruction,
           itemIsDeleted,
         ) => {
-          // const compareCriteria = [
-          //   'dosageFK',
-          //   'drugFrequencyFK',
-          //   'duration',
-          //   'prescribeUOMFK',
-          //   'stepdose',
-          //   'usageMethodFK',
-          // ]
-          const compareCriteria =
-            'dosageFK drugFrequencyFK duration prescribeUOMFK stepdose usageMethodFK'
-
-          const combinedOldNewInstructions = _.intersectionBy(
+          const combinedOldNewInstructions = _.intersectionWith(
             corPrescriptionItemInstruction,
             retailPrescriptionItemInstruction,
-            compareCriteria,
+            _.isEqual,
           )
 
-          const newAddedIntructions = _.differenceBy(
+          const newAddedInstructions = _.differenceWith(
             corPrescriptionItemInstruction,
-            combinedOldNewInstructions,
-            compareCriteria,
-          )
-
-          const unwantedItem = _.xor(
             retailPrescriptionItemInstruction,
-            combinedOldNewInstructions,
+            _.isEqual,
           )
 
-          const formatNewAddedInstructions = newAddedIntructions.map(
-            removeIdAndConcurrencyTokenForNewPrecautionsOrInstructions,
+          const instructionIDArray = retailPrescriptionItemInstruction.map(
+            (instruction) => instruction.id,
           )
 
-          let deleteUnwantedItem = []
-          if (combinedOldNewInstructions.length <= 0) {
-            deleteUnwantedItem = retailPrescriptionItemInstruction.map(
-              setIsDeletedToUnwantedPrecautionsOrInstructions,
-            )
-          } else {
-            deleteUnwantedItem = unwantedItem.map(
-              setIsDeletedToUnwantedPrecautionsOrInstructions,
-            )
-          }
+          const formatNewAddedInstructions = newAddedInstructions.map(
+            removeIdAndConcurrencyTokenForNewPrecautionsOrInstructions(
+              instructionIDArray,
+            ),
+          )
 
           const returnedInstructionsArray = [
             ...combinedOldNewInstructions,
             ...formatNewAddedInstructions,
-            ...deleteUnwantedItem,
           ].map((o) => setIsDeletedIfWholeItemIsDeleted(o, itemIsDeleted))
 
           return returnedInstructionsArray
@@ -346,7 +377,12 @@ export default compose(
           let obj
           switch (o.type) {
             case ORDER_TYPE_TAB.MEDICATION:
-            case ORDER_TYPE_TAB.OPENPRECRIPTION: {
+            case ORDER_TYPE_TAB.OPENPRESCRIPTION: {
+              let revenueCategory
+              const medication = inventorymedication.find(
+                (c) => c.id === o.inventoryMedicationFK,
+              )
+              revenueCategory = medication ? medication.revenueCategory : {}
               const {
                 corPrescriptionItemInstruction,
                 corPrescriptionItemPrecaution,
@@ -364,6 +400,7 @@ export default compose(
                 unitPrice: o.unitPrice,
                 quantity: o.quantity,
                 subTotal: roundTo(o.totalPrice),
+                itemRevenueCategoryFK: revenueCategory.id,
                 // "adjType": "string",
                 // "adjValue": 0,
                 retailVisitInvoiceDrug: {
@@ -378,7 +415,7 @@ export default compose(
                     ...restO,
                     isDeleted: o.isDeleted,
                     unitPrice: roundTo(o.totalPrice / o.quantity),
-                    retailPrescriptionItemInstruction: medicationIntructionsArray(
+                    retailPrescriptionItemInstruction: medicationInstructionsArray(
                       corPrescriptionItemInstruction,
                       retailPrescriptionItemInstruction,
                       o.isDeleted,
@@ -395,43 +432,56 @@ export default compose(
               break
             }
             case ORDER_TYPE_TAB.SERVICE: {
+              const { retailService, ...restValues } = o
+              const { revenueCategoryFK } = ctservice.find(
+                (c) => c.serviceCenter_ServiceId === o.serviceCenterServiceFK,
+              )
               obj = {
                 itemCode: o.serviceCode,
                 itemName: o.serviceName,
                 subTotal: roundTo(o.total),
                 invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.SERVICE,
+                unitPrice: o.unitPrice,
+                quantity: o.quantity,
+                itemRevenueCategoryFK: revenueCategoryFK,
                 retailVisitInvoiceService: {
                   id: o.innerLayerId,
                   concurrencyToken: o.innerLayerConcurrencyToken,
                   serviceCenterServiceFK: o.serviceCenterServiceFK,
+                  isDeleted: restValues.isDeleted,
                   retailService: {
                     unitPrice: o.total,
-                    ...o,
+                    ...restValues,
                   },
                 },
               }
               break
             }
             case ORDER_TYPE_TAB.CONSUMABLE: {
-              const { uom } = inventoryconsumable.find(
+              const { uom, revenueCategory } = inventoryconsumable.find(
                 (c) => c.id === o.inventoryConsumableFK,
               )
+              const { retailConsumable, ...restValues } = o
               obj = {
                 invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.CONSUMABLE,
                 itemCode: o.consumableCode,
                 itemName: o.consumableName,
                 subTotal: roundTo(o.totalPrice),
+                unitPrice: o.unitPrice,
+                quantity: o.quantity,
+                itemRevenueCategoryFK: revenueCategory.id,
                 retailVisitInvoiceConsumable: {
                   id: o.innerLayerId,
                   concurrencyToken: o.innerLayerConcurrencyToken,
                   inventoryConsumableFK: o.inventoryConsumableFK,
                   expiryDate: o.expiryDate,
                   batchNo: o.batchNo,
+                  isDeleted: restValues.isDeleted,
                   retailConsumable: {
                     unitOfMeasurement: uom.name,
                     unitofMeasurementFK: uom.id,
                     unitPrice: roundTo(o.totalPrice / o.quantity),
-                    ...o,
+                    ...restValues,
                   },
                 },
               }
@@ -452,6 +502,7 @@ export default compose(
             gstAmount: o.gstAmount,
             isDeleted: o.isDeleted,
             ...obj,
+            revenueCategoryFK: o.revenueCategoryFK || obj.itemRevenueCategoryFK,
           }
         }
 
@@ -463,12 +514,20 @@ export default compose(
           retailInvoiceItem,
           retailInvoiceAdjustment: finalAdjustments,
         }
+
         dispatch({
           type: 'dispense/saveAddOrderDetails',
           payload,
         }).then((r) => {
           if (r) {
             if (onConfirm) onConfirm()
+            history.push({
+              pathname: history.location.pathname,
+              query: {
+                ...history.location.query,
+                isInitialLoading: false,
+              },
+            })
             onReloadClick()
           }
         })

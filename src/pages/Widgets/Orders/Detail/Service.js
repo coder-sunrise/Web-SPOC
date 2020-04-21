@@ -12,11 +12,14 @@ import {
   withFormikExtend,
 } from '@/components'
 import Yup from '@/utils/yup'
-import { getServices } from '@/utils/codes'
+import { getServices } from '@/utils/codetable'
 import { calculateAdjustAmount } from '@/utils/utils'
 
 @connect(({ codetable, global }) => ({ codetable, global }))
 @withFormikExtend({
+  authority: [
+    'queue.consultation.order.service',
+  ],
   mapPropsToValues: ({ orders = {}, type }) =>
     orders.entity || orders.defaultService,
   enableReinitialize: true,

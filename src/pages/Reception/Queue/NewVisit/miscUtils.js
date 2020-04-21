@@ -1,5 +1,5 @@
 import { VISIT_STATUS } from '../variables'
-import { sendNotification } from '@/utils/realtime'
+import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 
 const filterDeletedFiles = (item) => {
   // filter out not yet confirmed files
@@ -9,24 +9,37 @@ const filterDeletedFiles = (item) => {
 }
 
 const mapAttachmentToUploadInput = (
-  { fileIndexFK, fileName, attachmentType, isDeleted, ...rest },
+  {
+    fileIndexFK,
+    fileName,
+    attachmentType,
+    attachmentTypeFK,
+    isDeleted,
+    thumbnail,
+    ...rest
+  },
   index,
 ) =>
   !fileIndexFK
     ? {
         // file status === uploaded, only 4 info needed for API
         fileIndexFK: rest.id,
+        thumbnailIndexFK: thumbnail ? thumbnail.id : undefined,
         sortOrder: index,
         fileName,
         attachmentType,
+        attachmentTypeFK,
         isDeleted,
+        remarks: rest.remarks,
       }
     : {
         // file status === confirmed, need to provide full object for API
         ...rest,
         fileIndexFK,
+        thumbnailIndexFK: thumbnail ? thumbnail.id : undefined,
         fileName,
         attachmentType,
+        attachmentTypeFK,
         isDeleted,
         sortOrder: index,
       }
@@ -37,11 +50,14 @@ export const formikMapPropsToValues = ({
   visitRegistration,
   doctorProfiles,
   history,
+  clinicSettings,
 }) => {
   try {
     let qNo = 0.0
     let doctorProfile
     let doctorProfileFK
+    let visitPurposeFK
+    let roomAssignmentFK
     if (clinicInfo) {
       // doctorProfile = doctorProfiles.find(
       //   (item) => item.doctorMCRNo === clinicInfo.primaryMCRNO,
@@ -83,14 +99,44 @@ export const formikMapPropsToValues = ({
       doctorProfileFK = doctorProfile ? doctorProfile.id : doctorProfileFK
     }
 
+    if (clinicSettings) {
+      visitPurposeFK = Number(clinicSettings.settings.defaultVisitType)
+    }
+
+    const { visitOrderTemplateFK } = visitEntries
+    const isVisitOrderTemplateActive = (visitRegistration.visitOrderTemplateOptions ||
+      [])
+      .map((option) => option.id)
+      .includes(visitEntries.visitOrderTemplateFK)
+
+    if (!visitEntries.id) {
+      if (doctorProfile) {
+        if (doctorProfile.clinicianProfile.roomAssignment) {
+          roomAssignmentFK =
+            doctorProfile.clinicianProfile.roomAssignment.roomFK
+        }
+      } else if (doctorProfileFK) {
+        const defaultDoctor = doctorProfiles.find(
+          (doctor) => doctor.id === doctorProfileFK,
+        )
+        if (defaultDoctor.clinicianProfile.roomAssignment) {
+          roomAssignmentFK =
+            doctorProfile.clinicianProfile.roomAssignment.roomFK
+        }
+      }
+    }
+
     return {
       queueNo: qNo,
-      visitPurposeFK: 1,
-      roomFK,
+      visitPurposeFK,
+      roomFK: roomAssignmentFK || roomFK,
       visitStatus: VISIT_STATUS.WAITING,
       // doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
       doctorProfileFK,
       ...visitEntries,
+      visitOrderTemplateFK: isVisitOrderTemplateActive
+        ? visitOrderTemplateFK
+        : undefined,
     }
   } catch (error) {
     console.log({ error })
@@ -102,7 +148,13 @@ export const formikHandleSubmit = (
   values,
   { props, resetForm, setSubmitting },
 ) => {
-  const { queueNo, visitAttachment, ...restValues } = values
+  const {
+    queueNo,
+    visitAttachment,
+    referralBy = [],
+    visitOrderTemplate,
+    ...restValues
+  } = values
   const {
     history,
     dispatch,
@@ -134,6 +186,15 @@ export const formikHandleSubmit = (
       .map(mapAttachmentToUploadInput)
   }
 
+  let _referralBy = null
+
+  if (typeof referralBy === 'string') {
+    _referralBy = referralBy
+  } else if (Array.isArray(referralBy) && referralBy.length > 0) {
+    // eslint-disable-next-line prefer-destructuring
+    _referralBy = referralBy[0]
+  }
+
   const payload = {
     cfg: {
       message: id ? 'Visit updated' : 'Visit created',
@@ -150,21 +211,8 @@ export const formikHandleSubmit = (
       appointmentFK,
       roomFK,
       visitStatus: VISIT_STATUS.WAITING,
-      visitRemarks: null,
-      temperatureC: null,
-      bpSysMMHG: null,
-      bpDiaMMHG: null,
-      heightCM: null,
-      weightKG: null,
-      bmi: null,
-      pulseRateBPM: null,
-      priorityTime: null,
-      priorityType: null,
-      referralPersonFK: null,
-      referralCompanyFK: null,
-      referralPerson: null,
-      referralDate: null,
       ...restValues, // override using formik values
+      referralBy: _referralBy,
     },
   }
 
@@ -184,10 +232,11 @@ export const formikHandleSubmit = (
           type: 'queueLog/refresh',
         })
 
-      sendNotification('QueueListing', {
-        message: 'Visit Created',
-      })
       onConfirm()
+      sendQueueNotification({
+        message: 'New visit created.',
+        queueNo: payload && payload.queueNo,
+      })
     } else {
       setSubmitting(false)
     }

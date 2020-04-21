@@ -4,6 +4,8 @@ export default {
   'visit.doctorProfileFk': 'doctorProfileFK',
   'visit.visitRemarks': 'visitRemarks',
   'visit.roomFK': 'roomFK',
+  'visit.visitOrderTemplateFK': 'visitOrderTemplateFK',
+  'visit.VisitOrderTemplateTotal': 'visitOrderTemplateTotal',
 
   'vitalsign.temperatureC': 'temperatureC',
   'vitalsign.bpSysMMHG': 'bpSysMMHG',

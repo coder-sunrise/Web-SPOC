@@ -8,10 +8,12 @@ import { CardContainer, CommonModal } from '@/components'
 // sub component
 import FilterBar from './components/FilterBar'
 import FuncCalendarView from './components/FuncCalendarView'
-import PopoverContent from './components/PopoverContent'
+import ApptPopover from './components/ApptPopover'
+import DoctorBlockPopover from './components/DoctorBlockPopover'
 import Form from './components/form'
 import DoctorBlockForm from './components/form/DoctorBlock'
 import SeriesConfirmation from './SeriesConfirmation'
+import AppointmentSearch from './AppointmentSearch'
 // settings
 import {
   defaultColorOpts,
@@ -85,6 +87,7 @@ class Appointment extends React.PureComponent {
     showPopup: false,
     showAppointmentForm: false,
     showDoctorEventModal: false,
+    showSearchAppointmentModal: false,
     popupAnchor: null,
     popoverEvent: { ...InitialPopoverEvent },
     resources: null,
@@ -108,10 +111,11 @@ class Appointment extends React.PureComponent {
       type: 'calendar/query',
       payload: {
         pagesize: 9999,
-        combineCondition: 'and',
-        isCancelled: false,
-        lgteql_appointmentDate: startOfMonth,
-        lsteql_appointmentDate: endOfMonth,
+        apiCriteria: {
+          isCancelled: false,
+          apptDateFrom: startOfMonth,
+          apptDateTo: endOfMonth,
+        },
       },
     })
     dispatch({
@@ -138,11 +142,19 @@ class Appointment extends React.PureComponent {
       let filterByDoctor = []
       let resources = []
       let primaryClinicianFK
-
       if (response) {
+        const lastSelected = JSON.parse(
+          sessionStorage.getItem('appointmentDoctors') || '[]',
+        )
+
         resources = response
           .filter((clinician) => clinician.clinicianProfile.isActive)
-          .filter((_, index) => index < 5)
+          .filter(
+            (_, index) =>
+              lastSelected.length > 0
+                ? lastSelected.includes(_.clinicianProfile.id)
+                : index < 5,
+          )
           .map((clinician) => ({
             clinicianFK: clinician.clinicianProfile.id,
             doctorName: clinician.clinicianProfile.name,
@@ -242,6 +254,10 @@ class Appointment extends React.PureComponent {
 
   onSelectSlot = (props) => {
     const { start, end, resourceId } = props
+    const createApptAccessRight = Authorized.check('appointment.newappointment')
+
+    if (createApptAccessRight && createApptAccessRight.rights !== 'enable')
+      return
 
     const selectedSlot = {
       allDay: start - end === 0,
@@ -265,6 +281,23 @@ class Appointment extends React.PureComponent {
       isEditedAsSingleAppointment,
       isEnableRecurrence,
     } = selectedEvent
+
+    const viewApptAccessRight = Authorized.check(
+      'appointment.appointmentdetails',
+    )
+    const viewDoctorBlockAccessRight = Authorized.check(
+      'settings.clinicsetting.doctorblock',
+    )
+
+    if (
+      (viewApptAccessRight &&
+        viewApptAccessRight.rights !== 'enable' &&
+        !doctor) ||
+      (doctor &&
+        viewDoctorBlockAccessRight &&
+        viewDoctorBlockAccessRight.rights !== 'enable')
+    )
+      return
 
     if (doctor) {
       this.props
@@ -442,8 +475,41 @@ class Appointment extends React.PureComponent {
     })
   }
 
+  queryCodetables = async () => {
+    const { dispatch } = this.props
+    await Promise.all([
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctroom',
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ltappointmentstatus',
+        },
+      }),
+    ])
+  }
+
+  toggleSearchAppointmentModal = async () => {
+    await this.queryCodetables()
+
+    this.setState((prevState) => {
+      return {
+        showSearchAppointmentModal: !prevState.showSearchAppointmentModal,
+      }
+    })
+  }
+
   render () {
-    const { calendar: CalendarModel, classes, calendarLoading } = this.props
+    const {
+      calendar: CalendarModel,
+      classes,
+      calendarLoading,
+      dispatch,
+    } = this.props
     const {
       showPopup,
       popupAnchor,
@@ -457,6 +523,7 @@ class Appointment extends React.PureComponent {
       filter,
       selectedAppointmentFK,
       primaryClinicianFK,
+      showSearchAppointmentModal,
     } = this.state
 
     const { currentViewAppointment, mode, calendarView } = CalendarModel
@@ -472,36 +539,15 @@ class Appointment extends React.PureComponent {
 
     return (
       <CardContainer hideHeader size='sm'>
-        <Popover
-          id='event-popup'
-          className={classes.popover}
-          open={showPopup}
-          anchorEl={popupAnchor}
-          onClose={this.handleClosePopover}
-          placement='top-start'
-          anchorOrigin={{
-            vertical: 'center',
-            horizontal: 'right',
-          }}
-          transformOrigin={{
-            vertical: 'center',
-            horizontal: 'left',
-          }}
-          disableRestoreFocus
-        >
-          <PopoverContent
-            popoverEvent={popoverEvent}
-            calendarView={calendarView}
-          />
-        </Popover>
-
         <FilterBar
+          dispatch={dispatch}
           loading={calendarLoading}
           filterByDoctor={filter.filterByDoctor}
           filterByApptType={filter.filterByApptType}
           handleUpdateFilter={this.onFilterUpdate}
           onDoctorEventClick={this.handleDoctorEventClick}
           onAddAppointmentClick={this.handleAddAppointmentClick}
+          toggleSearchAppointmentModal={this.toggleSearchAppointmentModal}
         />
         <Authorized authority='appointment.appointmentdetails'>
           <div style={{ marginTop: 16, minHeight: '80vh', height: '100%' }}>
@@ -528,13 +574,15 @@ class Appointment extends React.PureComponent {
           overrideLoading
           observe='AppointmentForm'
         >
-          <Form
-            history={this.props.history}
-            resources={resources}
-            selectedAppointmentID={selectedAppointmentFK}
-            selectedSlot={selectedSlot}
-            // calendarEvents={calendarEvents}
-          />
+          {showAppointmentForm && (
+            <Form
+              history={this.props.history}
+              resources={resources}
+              selectedAppointmentID={selectedAppointmentFK}
+              selectedSlot={selectedSlot}
+              // calendarEvents={calendarEvents}
+            />
+          )}
         </CommonModal>
         <CommonModal
           open={showDoctorEventModal}
@@ -556,6 +604,18 @@ class Appointment extends React.PureComponent {
           maxWidth='sm'
         >
           <SeriesConfirmation onConfirmClick={this.editSeriesConfirmation} />
+        </CommonModal>
+
+        <CommonModal
+          open={showSearchAppointmentModal}
+          title='Appointment Search'
+          onClose={this.toggleSearchAppointmentModal}
+          maxWidth='xl'
+        >
+          <AppointmentSearch
+            handleSelectEvent={this.onSelectEvent}
+            handleAddAppointmentClick={this.handleAddAppointmentClick}
+          />
         </CommonModal>
       </CardContainer>
     )

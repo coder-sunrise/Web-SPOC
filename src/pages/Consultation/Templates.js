@@ -4,11 +4,17 @@ import { connect } from 'dva'
 import { compose } from 'redux'
 import Delete from '@material-ui/icons/Delete'
 import GetApp from '@material-ui/icons/GetApp'
-import { CircularProgress, Chip, withStyles } from '@material-ui/core'
+import {
+  CircularProgress,
+  Chip,
+  FormControlLabel,
+  withStyles,
+} from '@material-ui/core'
 // custom components
 import {
   Button,
   Danger,
+  CheckboxGroup,
   GridContainer,
   GridItem,
   Select,
@@ -17,14 +23,7 @@ import {
   Popconfirm,
   notification,
 } from '@/components'
-// services
-import {
-  uploadFile,
-  downloadAttachment,
-  deleteFileByFileID,
-} from '@/services/file'
 // utils
-import { getCodes } from '@/utils/codes'
 
 const styles = () => ({})
 const Templates = ({
@@ -113,7 +112,10 @@ const Templates = ({
   return (
     <div>
       <GridContainer gutter={0} style={{ marginBottom: theme.spacing(1) }}>
-        <GridItem xs={6}>
+        <GridItem xs={12}>
+          <h5 style={{ fontWeight: 500, lineHeight: 1.3 }}>Manage Template</h5>
+        </GridItem>
+        <GridItem xs={8}>
           <Select
             label='My Template'
             strongLabel
@@ -127,7 +129,7 @@ const Templates = ({
             }}
           />
         </GridItem>
-        <GridItem xs={6} alignItems='flex-end' justify='flex-end' container>
+        <GridItem xs={4} alignItems='flex-end' justify='flex-end' container>
           <ProgressButton
             icon={<GetApp />}
             disabled={!currentId}
@@ -140,30 +142,46 @@ const Templates = ({
 
       {currentId && (
         <GridContainer gutter={0}>
-          <GridItem xs={6}>
+          <GridItem xs={12}>
             <ProgressButton onClick={updateTemplate}>Replace</ProgressButton>
-          </GridItem>
-          <GridItem xs={6} justify='flex-end' container>
             <Popconfirm onConfirm={deleteTemplate}>
               <ProgressButton color='danger' icon={<Delete />}>
                 Delete
               </ProgressButton>
             </Popconfirm>
           </GridItem>
+          {/* <GridItem xs={6} justify='flex-end' container>
+            
+          </GridItem> */}
         </GridContainer>
       )}
       {!currentId && (
-        <React.Fragment>
-          <TextField
-            label='Template Name'
-            onChange={(e) => {
-              setTemplateName(e.target.value.trim())
-            }}
-          />
-          <ProgressButton disabled={!templateName} onClick={saveTemplate}>
-            Save
-          </ProgressButton>
-        </React.Fragment>
+        <GridContainer
+          gutter={0}
+          style={{
+            marginTop: theme.spacing(2),
+            marginBottom: theme.spacing(1),
+          }}
+        >
+          <GridItem xs={12}>
+            <h5 style={{ fontWeight: 500, lineHeight: 1.3 }}>
+              Add New Template
+            </h5>
+          </GridItem>
+          <GridItem xs={8}>
+            <TextField
+              label='Template Name'
+              onChange={(e) => {
+                setTemplateName(e.target.value.trim())
+              }}
+            />
+          </GridItem>
+          <GridItem xs={4} alignItems='flex-end' justify='flex-end' container>
+            <ProgressButton disabled={!templateName} onClick={saveTemplate}>
+              Save
+            </ProgressButton>
+          </GridItem>
+        </GridContainer>
       )}
     </div>
   )

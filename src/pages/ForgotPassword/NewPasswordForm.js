@@ -98,7 +98,9 @@ const NewPasswordForm = ({
           <GridItem md={6}>
             <FastField
               name='validationCode'
-              render={(args) => <TextField {...args} autoFocus label='OTP' />}
+              render={(args) => (
+                <TextField {...args} autoFocus label='OTP' autocomplete='off' />
+              )}
             />
           </GridItem>
           <GridItem md={4}>
@@ -119,7 +121,7 @@ const NewPasswordForm = ({
                 <TextField
                   {...args}
                   inputProps={{ autoComplete: 'new-password' }}
-                  autoComplete='new-password'
+                  autocomplete='off'
                   label='New Password'
                   type='password'
                 />
@@ -133,7 +135,7 @@ const NewPasswordForm = ({
                 <TextField
                   {...args}
                   inputProps={{ autoComplete: 'new-password' }}
-                  autoComplete='new-password'
+                  autocomplete='off'
                   label='Re-enter New Password'
                   type='password'
                 />

@@ -15,6 +15,8 @@ import {
   ProgressButton,
 } from '@/components'
 import { MobileNumberInput } from '@/components/_medisys'
+import { APPOINTMENT_STATUS } from '@/utils/constants'
+import Authorized from '@/utils/Authorized'
 import style from './style'
 
 const PatientInfoInput = ({
@@ -31,9 +33,10 @@ const PatientInfoInput = ({
 }) => {
   const isRegisteredPatient =
     patientProfileFK !== undefined && patientProfileFK !== null
+
   const allowedToActualize = [
-    1,
-    5,
+    APPOINTMENT_STATUS.SCHEDULED,
+    APPOINTMENT_STATUS.RESCHEDULED,
   ].includes(appointmentStatusFK)
 
   return (
@@ -45,12 +48,11 @@ const PatientInfoInput = ({
             return (
               <TextField
                 {...args}
-                // autoFocus
+                autoFocus={!isEdit}
                 defaultValue={undefined}
                 label={formatMessage({
                   id: 'reception.queue.patientSearchPlaceholder',
                 })}
-                loseFocusOnEnterPressed
               />
             )
           }}
@@ -73,35 +75,41 @@ const PatientInfoInput = ({
                 Search
               </ProgressButton>
               {!isEdit && (
-                <Button
-                  // tabIndex={-2}
-                  size='sm'
-                  color='primary'
-                  disabled={disabled}
-                  onClick={onCreatePatientClick}
-                >
-                  Create Patient
-                </Button>
+                <Authorized authority='patientdatabase.newpatient'>
+                  <Button
+                    // tabIndex={-2}
+                    size='sm'
+                    color='primary'
+                    disabled={disabled}
+                    onClick={onCreatePatientClick}
+                  >
+                    Create Patient
+                  </Button>
+                </Authorized>
               )}
             </React.Fragment>
           ) : (
             <React.Fragment>
-              <Button
-                color='primary'
-                size='sm'
-                // className={classes.patientNameButton}
-                onClick={onViewPatientProfileClick}
-              >
-                Patient Profile
-              </Button>
-              <Button
-                size='sm'
-                color='primary'
-                disabled={!isEdit || !allowedToActualize}
-                onClick={onRegisterToVisitClick}
-              >
-                Register To Visit
-              </Button>
+              <Authorized authority='patientdatabase.patientprofiledetails'>
+                <Button
+                  color='primary'
+                  size='sm'
+                  // className={classes.patientNameButton}
+                  onClick={onViewPatientProfileClick}
+                >
+                  Patient Profile
+                </Button>
+              </Authorized>
+              <Authorized authority='queue.registervisit'>
+                <Button
+                  size='sm'
+                  color='primary'
+                  disabled={!isEdit || !allowedToActualize}
+                  onClick={onRegisterToVisitClick}
+                >
+                  Register To Visit
+                </Button>
+              </Authorized>
             </React.Fragment>
           )}
         </div>

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import _ from 'lodash'
 import axios from 'axios'
 import { connect } from 'dva'
@@ -31,8 +31,9 @@ import { getUniqueId } from '@/utils/utils'
 //   handleSubmit: () => {},
 //   displayName: 'streetAddressFilter',
 // })
-@connect(({ streetAddress }) => ({
+@connect(({ streetAddress, codetable }) => ({
   streetAddress,
+  codetable,
 }))
 class Address extends Component {
   state = {
@@ -48,7 +49,13 @@ class Address extends Component {
   handleAddressType = (e) => {}
 
   handleGetAddress = () => {
-    const { values, addressIndex, setFieldValue, setValues } = this.props
+    const {
+      values,
+      addressIndex,
+      setFieldValue,
+      setValues,
+      codetable,
+    } = this.props
     let prefix = this.getPrefix()
 
     const postcode = Object.byString(values, `${prefix}postcode`)
@@ -56,7 +63,8 @@ class Address extends Component {
       ? (setFieldValue(`${prefix}postcode`, ''),
         setFieldValue(`${prefix}blockNo`, ''),
         setFieldValue(`${prefix}buildingName`, ''),
-        setFieldValue(`${prefix}street`, ''))
+        setFieldValue(`${prefix}street`, ''),
+        setFieldValue(`${prefix}countryFK`, undefined))
       : this.props
           .dispatch({
             type: 'streetAddress/fetchAddress',
@@ -67,6 +75,8 @@ class Address extends Component {
           .then((o) => {
             const { data } = o
             if (data.length > 0) {
+              const { ctcountry } = codetable
+              const country = ctcountry.find((c) => c.code === 'SG')
               const { postalCode, blkHseNo, building, street } = data[0]
               const { contactAddress } = values.contact
               const newContactAddress = {
@@ -75,6 +85,7 @@ class Address extends Component {
                 blockNo: blkHseNo,
                 buildingName: building,
                 street,
+                countryFK: country.id,
               }
 
               let contactAddressArray = values.contact.contactAddress.map(
@@ -95,6 +106,7 @@ class Address extends Component {
               setFieldValue(`${prefix}blockNo`, blkHseNo)
               setFieldValue(`${prefix}buildingName`, building)
               setFieldValue(`${prefix}street`, street)
+              setFieldValue(`${prefix}countryFK`, country.id)
             }
           })
   }
@@ -123,8 +135,15 @@ class Address extends Component {
 
   render () {
     const searchBtnUid = getUniqueId()
-    const { addressIndex, classes, theme, values, style, propName } = this.props
-    // console.log(values, propName)
+    const {
+      addressIndex,
+      classes,
+      theme,
+      values,
+      style,
+      propName,
+      hideCheckBox,
+    } = this.props
     const v = Object.byString(values, propName)
     // console.log(v)
     let addresses = v
@@ -151,38 +170,47 @@ class Address extends Component {
       <div style={style}>
         {isArray && (
           <GridContainer>
-            <GridItem xs={6} md={2}>
-              <Field
-                name={`${prefix}isMailing`}
-                render={(args) => (
-                  <Checkbox
-                    label='Mailing Address'
-                    inputLabel=' '
-                    disabled={
-                      !!addresses.find((o) => o.isMailing && !o.isDeleted) &&
-                      !addresses[addressIndex].isMailing
-                    }
-                    {...args}
+            {hideCheckBox ? (
+              <GridItem xs={6} md={5} />
+            ) : (
+              <Fragment>
+                <GridItem xs={6} md={2}>
+                  <Field
+                    name={`${prefix}isMailing`}
+                    render={(args) => (
+                      <Checkbox
+                        label='Mailing Address'
+                        inputLabel=' '
+                        disabled={
+                          !!addresses.find(
+                            (o) => o.isMailing && !o.isDeleted,
+                          ) && !addresses[addressIndex].isMailing
+                        }
+                        {...args}
+                      />
+                    )}
                   />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={6} md={3}>
-              <Field
-                name={`${prefix}isPrimary`}
-                render={(args) => (
-                  <Checkbox
-                    label='Primary Address'
-                    inputLabel=' '
-                    disabled={
-                      !!addresses.find((o) => o.isPrimary && !o.isDeleted) &&
-                      !addresses[addressIndex].isPrimary
-                    }
-                    {...args}
+                </GridItem>
+                <GridItem xs={6} md={3}>
+                  <Field
+                    name={`${prefix}isPrimary`}
+                    render={(args) => (
+                      <Checkbox
+                        label='Primary Address'
+                        inputLabel=' '
+                        disabled={
+                          !!addresses.find(
+                            (o) => o.isPrimary && !o.isDeleted,
+                          ) && !addresses[addressIndex].isPrimary
+                        }
+                        {...args}
+                      />
+                    )}
                   />
-                )}
-              />
-            </GridItem>
+                </GridItem>
+              </Fragment>
+            )}
+
             <GridItem xs={6} md={5}>
               <FastField
                 name={`${prefix}postcode`}

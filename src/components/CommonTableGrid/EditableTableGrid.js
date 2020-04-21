@@ -14,7 +14,11 @@ import {
 import { Getter } from '@devexpress/dx-react-core'
 import Add from '@material-ui/icons/Add'
 import CommandComponent from './CommandComponent'
-import { getGlobalVariable, getUniqueNumericId } from '@/utils/utils'
+import {
+  getGlobalVariable,
+  getUniqueNumericId,
+  difference,
+} from '@/utils/utils'
 import CustomTableEditRow from './CustomTableEditRow'
 import CommonTableGrid from './index'
 import EditPlugin from './EditPlugin'
@@ -24,8 +28,9 @@ import Authorized from '@/utils/Authorized'
 let uniqueGid = 0
 
 const styles = (theme) => ({})
+window.$tempGridRow = {}
 
-class EditableTableGrid extends React.Component {
+class EditableTableGrid extends PureComponent {
   static defaultProps = {
     EditingProps: {},
     getRowId: (r) => r.id,
@@ -45,6 +50,7 @@ class EditableTableGrid extends React.Component {
     }
     this.gridId = `edit-${uniqueGid++}`
     // console.log(this.gridId)
+    // console.log('edit created', window.$tempGridRow[this.gridId])
   }
 
   // static getDerivedStateFromProps (nextProps, preState) {
@@ -61,12 +67,96 @@ class EditableTableGrid extends React.Component {
   //   return null
   // }
 
-  // componentWillReceiveProps (nextProps) {
-  //   const { EditingProps = {}, rows, errors = [] } = nextProps
-  //   if (!_.isEqual(rows, this.props.rows)) {
-  //     const cells = this.getErrorCells(nextProps)
-  //     console.log(cells)
+  componentWillReceiveProps (nextProps) {
+    // dectect if datasource changed outside grid, reset grid data cache
+    if (Array.isArray(nextProps.rows) && Array.isArray(this.props.rows)) {
+      if (
+        !_.isEqual(
+          nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
+          this.props.rows.map(({ _errors, rowIndex, ...o }, i) => o),
+        )
+      ) {
+        if (
+          !_.isEqual(
+            Object.values(window.$tempGridRow[this.gridId] || {}).map(
+              ({ _errors, rowIndex, ...o }, i) => o,
+            ),
+            nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
+          )
+        ) {
+          window.$tempGridRow[
+            this.gridId
+          ] = nextProps.rows.reduce((ary, item) => {
+            return {
+              ...ary,
+              [item[nextProps.getRowId(item)]]: item,
+            }
+          }, {})
+        }
+      }
+    }
+  }
+
+  // shouldComponentUpdate (nextProps, nextState) {
+  //   if (!_.isEqual(this.state, nextState)) {
+  //     return true
   //   }
+  //   if (Array.isArray(nextProps.rows) && Array.isArray(this.props.rows)) {
+  //     // console.log(nextProps.rows, this.props.rows)
+  //     const propEqual = _.isEqual(
+  //       nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
+  //       this.props.rows.map(({ _errors, rowIndex, ...o }, i) => o),
+  //     )
+  //     if (!propEqual) return true
+  //     const cacheEqual = !window.$tempGridRow[this.gridId]
+  //       ? false
+  //       : _.isEqual(
+  //           Object.values(window.$tempGridRow[this.gridId]).map(
+  //             ({ _errors, rowIndex, ...o }, i) => o,
+  //           ),
+  //           nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
+  //         )
+
+  //     if (!cacheEqual) {
+  //       // dectect if datasource changed outside grid, reset grid data cache
+  //       window.$tempGridRow[
+  //         this.gridId
+  //       ] = nextProps.rows.reduce((ary, item) => {
+
+  //         return {
+  //           ...ary,
+
+  //           [item[nextProps.getRowId(item)]]: item
+  //         }
+  //       }, {})
+  //       return true
+  //       // console.log(
+  //       //   window.$tempGridRow[this.gridId],
+  //       //   Object.values(window.$tempGridRow[this.gridId] || []).map(
+  //       //     ({ _errors, rowIndex, ...o }, i) => o,
+  //       //   ),
+  //       //   nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
+  //       //   difference(
+  //       //     Object.values(window.$tempGridRow[this.gridId] || []).map(
+  //       //       ({ _errors, rowIndex, ...o }, i) => o,
+  //       //     ),
+  //       //     nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
+  //       //   ),
+  //       // )
+  //     }
+  //     if (
+  //       cacheEqual &&
+  //       Object.values(window.$tempGridRow[this.gridId]).find(
+  //         (o) => !o._errors || o._errors.length > 0,
+  //       )
+  //     ) {
+  //       // console.log(window.$tempGridRow[this.gridId])
+  //       console.log('1', this.props, nextProps)
+  //       return true
+  //     }
+  //     return !cacheEqual
+  //   }
+  //   return true
   // }
 
   getErrorCells = (props) => {
@@ -75,28 +165,24 @@ class EditableTableGrid extends React.Component {
     const errorRows = Object.values(window.$tempGridRow[this.gridId]).filter(
       (o) => o._errors && o._errors.length && !o.isDeleted,
     )
-    // console.log(
-    //   errorRows,
-    //   this.state.editingCells,
-    //   window.$tempGridRow[this.gridId],
-    // )
     const errorCells = []
     errorRows.forEach((r) => {
       const { _errors } = r
       const rowId = getRowId(r)
-      _errors.forEach((e) => {
-        const { path } = e
-        errorCells.push({
-          rowId,
-          columnName: path,
+      if (rowId)
+        _errors.forEach((e) => {
+          const { path } = e
+          errorCells.push({
+            rowId,
+            columnName: path,
+          })
         })
-      })
     })
+    // console.log(errorCells)
     return errorCells
   }
 
   _onEditingCellsChange = (editingCells) => {
-    // console.log(errorCells)
     setTimeout(() => {
       const errorCells = this.getErrorCells()
       const { global } = window.g_app._store.getState()
@@ -120,10 +206,6 @@ class EditableTableGrid extends React.Component {
         errorCells,
       })
     }, 1)
-    // this.setState({
-    //   editingCells: _.unionWith(editingCells, errorCells, _.isEqual),
-    //   errorCells,
-    // })
     this.setState({
       editingCells,
     })
@@ -226,8 +308,8 @@ class EditableTableGrid extends React.Component {
   }
 
   _onCommitChanges = ({ added, changed, deleted }) => {
+    // console.log('_onCommitChanges')
     const { EditingProps, rows = [], schema, getRowId } = this.props
-    // console.log(changed)
     const { onCommitChanges = (f) => f } = EditingProps
     let shouldUpdate = false
     if (added && Object.values(added)[0]) shouldUpdate = true
@@ -249,27 +331,27 @@ class EditableTableGrid extends React.Component {
         window.$tempGridRow[this.gridId] = {}
       const tempNewData = window.$tempGridRow[this.gridId][undefined] || {}
       // console.log(tempNewData)
-
       newRows = added
         .map((o) => {
           const id = getUniqueNumericId()
-          window.$tempGridRow[this.gridId][id] = {
+          window.$tempGridRow[this.gridId][getRowId(o)] = {
             id,
             isNew: true,
             ...tempNewData,
             ...o,
           }
-          return window.$tempGridRow[this.gridId][id]
+          return window.$tempGridRow[this.gridId][getRowId(o)]
         })
         .concat(newRows)
       // this.setState({
       //   addedRows: [],
       // })
+
       delete window.$tempGridRow[this.gridId][undefined]
     }
 
     if (changed) {
-      newRows = newRows.map((row) => {
+      newRows = newRows.filter((o) => !!o).map((row) => {
         const n = changed[getRowId(row)]
           ? {
               ...row,
@@ -337,8 +419,12 @@ class EditableTableGrid extends React.Component {
     })
     // window.$tempGridRow[this.gridId]={}
     if (updatedRows && Array.isArray(updatedRows)) {
-      // console.log(updatedRows, window.$tempGridRow[this.gridId])
-      window.$tempGridRow[this.gridId] = {}
+      // Fix schema validation which will gone when delete,
+      // thus skip when deleted to avoid the
+      // existing error validation being cleared (PO grid)
+      if (added || changed) {
+        window.$tempGridRow[this.gridId] = {}
+      }
       updatedRows.forEach((r) => {
         if (!window.$tempGridRow[this.gridId][r.id])
           window.$tempGridRow[this.gridId][r.id] = {}
@@ -361,6 +447,7 @@ class EditableTableGrid extends React.Component {
     } = this.props
     const { pagerConfig = {}, pager = true, addNewLabelName } = FuncProps
     const { containerExtraComponent } = pagerConfig
+    // console.log(this.state.errorCells)
     return (
       <React.Fragment>
         {showAddCommand && (
@@ -454,6 +541,7 @@ class EditableTableGrid extends React.Component {
   // }
 
   render () {
+    // console.log('redner',this.gridId)
     const {
       theme,
       columnExtensions = [],
@@ -462,6 +550,8 @@ class EditableTableGrid extends React.Component {
         showAddCommand = false,
         showEditCommand = true,
         showDeleteCommand = true,
+        onRowDelete,
+        isDeletable = (f) => true,
         messages = {
           commitCommand: 'Save',
           editCommand: 'Edit',
@@ -495,12 +585,14 @@ class EditableTableGrid extends React.Component {
       cfg.containerComponent = this.containerComponent
     }
     const sharedCfg = {
+      editableGrid: true,
       gridId: this.gridId,
       columnExtensions,
       editingRowIds,
       getRowId,
       extraCellConfig: {
         commitChanges: this._onCommitChanges,
+        editingCells,
       },
       extraState: [
         <EditingState
@@ -532,6 +624,28 @@ class EditableTableGrid extends React.Component {
           // showEditCommand={showEditCommand}
           showDeleteCommand={showDeleteCommand}
           commandComponent={CommandComponent}
+          cellComponent={(cellProps) => {
+            const { children, ...p } = cellProps
+            return (
+              <Table.Cell {...p}>
+                {children.map((o) => {
+                  if (o) {
+                    return React.cloneElement(o, {
+                      row: p.row,
+                      // editingRowIds,
+                      // key: o.props.id,
+                      // schema: this.props.schema,
+                      // gridId: this.gridId,
+                      onRowDelete,
+                      isDeletable,
+                      // ...o.props,
+                    })
+                  }
+                  return null
+                })}
+              </Table.Cell>
+            )
+          }}
           messages={messages}
         />,
         <TableInlineCellEditing

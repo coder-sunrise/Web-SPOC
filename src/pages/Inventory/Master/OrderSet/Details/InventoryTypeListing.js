@@ -2,8 +2,12 @@ import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Yup from '@/utils/yup'
 import { CardContainer, GridContainer, GridItem } from '@/components'
-import { podoOrderType, getInventoryItemList, getServices } from '@/utils/codes'
+import { podoOrderType, inventoryItemListing } from '@/utils/codes'
+import { getServices } from '@/utils/codetable'
+import Authorized from '@/utils/Authorized'
+
 import InventoryType from './InventoryType'
+import { AuthorizationWrapper } from '@/components/_medisys'
 
 const styles = () => ({
   displayDiv: {
@@ -159,7 +163,7 @@ const InventoryTypeListing = ({
           code: x.ctName,
         },
       }).then((list) => {
-        const { inventoryItemList } = getInventoryItemList(list)
+        const { inventoryItemList } = inventoryItemListing(list)
         switch (x.stateName) {
           case 'ConsumableItemList': {
             return setConsumableList(inventoryItemList)
@@ -605,7 +609,12 @@ const InventoryTypeListing = ({
         }))
       }
     }
-    return addedRows
+    return addedRows.map((row) => {
+      return {
+        ...row,
+        subTotal: 0,
+      }
+    })
   }
 
   const handleItemOnChange = (e) => {
@@ -614,7 +623,7 @@ const InventoryTypeListing = ({
     setSelectedItem(option)
     row.quantity = undefined
     row.unitPrice = sellingPrice
-    row.subTotal = undefined
+    row.subTotal = 0
 
     // dispatch({
     //   // force current edit row components to update
@@ -912,40 +921,47 @@ const InventoryTypeListing = ({
             padding: 10,
           }}
         >
-          <InventoryType
-            title='Medication'
-            inventoryTypeProps={medicationProps}
-            schema={medicationSchema}
-            rows={medicationRows}
-            editingProps={medicationEditingProps}
-          />
+          <Authorized authority='inventorymaster.orderset.medication'>
+            <InventoryType
+              title='Medication'
+              inventoryTypeProps={medicationProps}
+              schema={medicationSchema}
+              rows={medicationRows}
+              editingProps={medicationEditingProps}
+            />
+          </Authorized>
 
-          <InventoryType
-            title='Consumable'
-            inventoryTypeProps={consumableProps}
-            schema={consumableSchema}
-            rows={consumableRows}
-            editingProps={consumableEditingProps}
-            style={{ marginTop: 15 }}
-          />
+          <Authorized authority='inventorymaster.orderset.consumable'>
+            <InventoryType
+              title='Consumable'
+              inventoryTypeProps={consumableProps}
+              schema={consumableSchema}
+              rows={consumableRows}
+              editingProps={consumableEditingProps}
+              style={{ marginTop: 15 }}
+            />
+          </Authorized>
 
-          <InventoryType
-            title='Vaccination'
-            inventoryTypeProps={vaccinationProps}
-            schema={vaccinationSchema}
-            rows={vaccinationRows}
-            editingProps={vaccinationEditingProps}
-            style={{ marginTop: 15 }}
-          />
-
-          <InventoryType
-            title='Service'
-            inventoryTypeProps={serviceProps}
-            schema={serviceSchema}
-            rows={serviceRows}
-            editingProps={serviceEditingProps}
-            style={{ marginTop: 15 }}
-          />
+          <Authorized authority='inventorymaster.orderset.vaccination'>
+            <InventoryType
+              title='Vaccination'
+              inventoryTypeProps={vaccinationProps}
+              schema={vaccinationSchema}
+              rows={vaccinationRows}
+              editingProps={vaccinationEditingProps}
+              style={{ marginTop: 15 }}
+            />
+          </Authorized>
+          <Authorized authority='inventorymaster.orderset.service'>
+            <InventoryType
+              title='Service'
+              inventoryTypeProps={serviceProps}
+              schema={serviceSchema}
+              rows={serviceRows}
+              editingProps={serviceEditingProps}
+              style={{ marginTop: 15 }}
+            />
+          </Authorized>
         </GridContainer>
       </CardContainer>
     </div>

@@ -251,6 +251,7 @@ class ClinicInfo extends PureComponent {
                       handleSubmit={handleSubmit}
                       setFieldValue={setFieldValue}
                       {...restProps}
+                      hideCheckBox
                     />
                     {/* ) */}
                     {/* })} */}

@@ -74,7 +74,6 @@ class Memo extends PureComponent {
       rowHeight,
       setFieldValue,
       loadFromCodes,
-      parentProps,
       templateLoader,
       currentType,
       height,

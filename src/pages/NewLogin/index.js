@@ -23,6 +23,8 @@ import {
   Transition,
   ProgressButton,
 } from '@/components'
+import { VALUE_KEYS } from '@/utils/constants'
+import Authorized, { reloadAuthorized } from '@/utils/Authorized'
 
 // styles
 // import loginPageStyle from '@/assets/jss/material-dashboard-pro-react/views/loginPageStyle'
@@ -152,6 +154,13 @@ const submitKey = 'login/getToken'
             type: 'clinicInfo/query',
             payload: { clinicCode },
           })
+
+          await dispatch({
+            type: 'user/fetchCurrent',
+          })
+
+          reloadAuthorized()
+
           router.push(loginDestination)
         }
       })

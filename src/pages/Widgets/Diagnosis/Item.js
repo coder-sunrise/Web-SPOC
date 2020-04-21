@@ -19,7 +19,6 @@ import {
   Select,
   ButtonSelect,
 } from '@/components'
-import { fetchAndSaveCodeTable } from '@/utils/codes'
 import { queryList } from '@/services/common'
 import { DiagnosisSelect } from '@/components/_medisys'
 
@@ -109,7 +108,7 @@ const DiagnosisItem = ({
     }
   }
   return (
-    <Paper elevation={4} className={classes.diagnosisRow}>
+    <Paper className={classes.diagnosisRow}>
       <GridContainer style={{ marginTop: theme.spacing(1) }}>
         <GridItem xs={6} style={{ paddingRight: 35 }}>
           <Field
@@ -118,6 +117,7 @@ const DiagnosisItem = ({
               <DiagnosisSelect
                 onChange={onDiagnosisChange}
                 onDataSouceChange={onDataSouceChange}
+                filterStyle={{ position: 'absolute', bottom: 2, right: -35 }}
                 {...args}
               />
             )}
@@ -279,7 +279,7 @@ const DiagnosisItem = ({
             render={(args) => {
               return (
                 <DatePicker
-                  label='Order Date'
+                  label='Onset Date'
                   allowClear={false}
                   {...args}
                   onChange={(value) => {

@@ -40,7 +40,7 @@ const DepositTransactionReportWithFormik = withFormik({
       dateFrom: moment(new Date()).startOf('month').toDate(),
       dateTo: moment(new Date()).endOf('month').toDate(),
     }
-    console.log({ values })
+    // console.log({ values })
     return values
   },
 })(DepositTransactionReport)

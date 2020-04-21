@@ -1,5 +1,5 @@
 import { createListViewModel } from 'medisys-model'
-import { getCodes, getAllCodes } from '@/utils/codes'
+import { getCodes, getAllCodes } from '@/utils/codetable'
 import { subscribeNotification } from '@/utils/realtime'
 
 export default createListViewModel({
@@ -16,7 +16,7 @@ export default createListViewModel({
     subscriptions: ({ dispatch }) => {
       subscribeNotification('CodetableUpdated', {
         callback: ({ code }) => {
-          console.log(code, 'rete')
+          // console.log(code, 'rete')
           if (code === 'clinicianprofile') {
             window.g_app._store.dispatch({
               type: 'codetable/refreshCodes',
@@ -43,6 +43,7 @@ export default createListViewModel({
         })
       },
       *refreshCodes ({ payload }, { call, put }) {
+        // console.log('refreshCodes')
         const { code } = payload
         const response = yield call(getCodes, { ...payload, refresh: true })
         yield put({
@@ -67,7 +68,7 @@ export default createListViewModel({
         if (ctcode !== undefined) {
           if (codetableState[ctcode] === undefined || payload.force) {
             const response = yield call(getCodes, payload)
-            if (response.length > 0) {
+            if (Array.isArray(response)) {
               yield put({
                 type: 'saveCodetable',
                 payload: {
@@ -86,11 +87,11 @@ export default createListViewModel({
       },
       *batchFetch ({ payload }, { all, call, put }) {
         const { codes } = payload
-        console.time('batch fetch')
+        // console.time('batch fetch')
         const responses = yield all(
           codes.map((code) => put({ type: 'fetchCodes', payload: { code } })),
         )
-        console.timeEnd('batch fetch')
+        // console.timeEnd('batch fetch')
         return responses
       },
     },

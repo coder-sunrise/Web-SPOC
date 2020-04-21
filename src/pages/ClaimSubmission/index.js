@@ -1,10 +1,12 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Fragment } from 'react'
 import { connect } from 'dva'
 // material ui
 import { Badge, withStyles } from '@material-ui/core'
 import Note from '@material-ui/icons/EventNote'
 // common components
 import { Button, GridContainer, GridItem } from '@/components'
+import { authorityConfig } from './config'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   container: {
@@ -46,62 +48,40 @@ class ClaimSubmission extends PureComponent {
     return (
       <GridContainer className={classes.container}>
         <GridItem md={12} container>
-          {invoiceClaimCount.map((scheme) => {
-            return (
-              <GridItem md={2}>
-                <Badge
-                  badgeContent={scheme.count}
-                  color='error'
-                  className={classes.badge}
-                >
-                  <Button
-                    fullWidth
-                    bigview
-                    color='primary'
-                    variant='outlined'
-                    onClick={this.navigate}
-                    id={scheme.schemeType}
-                  >
-                    <Note />
-                    {scheme.schemeType}
-                  </Button>
-                </Badge>
-              </GridItem>
-            )
-          })}
+          <Authorized authority='claimsubmission'>
+            <Fragment>
+              {invoiceClaimCount.map((scheme) => {
+                const authority = authorityConfig.find(
+                  (item) => item.type === scheme.schemeType,
+                )
+
+                return (
+                  <GridItem md={2}>
+                    <Badge
+                      badgeContent={scheme.count}
+                      color='error'
+                      className={classes.badge}
+                    >
+                      <Authorized authority={authority.accessRight}>
+                        <Button
+                          fullWidth
+                          bigview
+                          color='primary'
+                          variant='outlined'
+                          onClick={this.navigate}
+                          id={scheme.schemeType}
+                        >
+                          <Note />
+                          {scheme.schemeType}
+                        </Button>
+                      </Authorized>
+                    </Badge>
+                  </GridItem>
+                )
+              })}
+            </Fragment>
+          </Authorized>
         </GridItem>
-
-        {/* <GridItem md={2}>
-          <Badge badgeContent={5} color='error' className={classes.badge}>
-            <Button
-              fullWidth
-              bigview
-              color='primary'
-              variant='outlined'
-              onClick={this.navigate}
-              id='chas'
-            >
-              <Note />
-              CHAS
-            </Button>
-          </Badge>
-        </GridItem> */}
-
-        {/* <GridItem md={2}>
-          <Badge badgeContent={5} color='error' className={classes.badge}>
-            <Button
-              fullWidth
-              bigview
-              color='primary'
-              variant='outlined'
-              id='medisave'
-              onClick={this.navigate}
-            >
-              <Note />
-              MEDISAVE
-            </Button>
-          </Badge>
-        </GridItem> */}
       </GridContainer>
     )
   }
