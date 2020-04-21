@@ -96,6 +96,7 @@ class Queue extends React.Component {
       showPatientSearch: false,
       showEndSessionSummary: false,
       search: '',
+      showForms: false,
     }
     this._timer = null
   }
@@ -418,6 +419,38 @@ class Queue extends React.Component {
     })
   }
 
+  toggleForms = () => {
+    const { showForms } = this.state
+    const target = !showForms
+    this.setState({
+      showForms: target,
+    })
+    // closing Forms
+    if (!target) {
+      this.resetFormsResult()
+    }
+  }
+
+  resetFormsResult = () => {
+    this.props.dispatch({
+      type: 'forms/updateState',
+      payload: {
+        list: [],
+        dataType: undefined,
+      },
+    })
+  }
+
+  showVisitForms = ({ visitID = undefined }) => {
+    this.props.dispatch({
+      type: 'forms/updateState',
+      payload: {
+        visitID,
+      },
+    })
+    this.toggleForms()
+  }
+
   render () {
     const { classes, queueLog, loading, history, dispatch } = this.props
     const {
@@ -425,6 +458,7 @@ class Queue extends React.Component {
       showPatientSearch,
       _sessionInfoID,
       search,
+      showForms,
     } = this.state
     const { sessionInfo, error } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
@@ -520,6 +554,7 @@ class Queue extends React.Component {
                   onRegisterPatientClick={this.toggleRegisterNewPatient}
                   handleEditVisitClick={this.showVisitRegistration}
                   handleActualizeAppointment={this.handleActualizeAppointment}
+                  handleFormsClick={this.showVisitForms}
                   history={history}
                   searchQuery={search}
                 />
@@ -547,6 +582,16 @@ class Queue extends React.Component {
               disableBackdropClick
             >
               <EndSessionSummary sessionID={_sessionInfoID} />
+            </CommonModal>
+            <CommonModal
+              open={showForms}
+              title={formatMessage({ id: 'reception.queue.forms' })}
+              onClose={this.toggleForms}
+              onConfirm={this.toggleForms}
+              maxWidth='md'
+              overrideLoading
+            >
+              <span>forms</span>
             </CommonModal>
           </CardBody>
         </Card>

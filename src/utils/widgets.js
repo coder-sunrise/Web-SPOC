@@ -364,6 +364,23 @@ const widgets = [
       },
     },
   },
+  {
+    id: '10',
+    name: 'Forms',
+    accessRight: 'queue.consultation.widgets.consultationdocument',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/Forms'),
+      loading: Loading,
+    }),
+    model: 'forms',
+    layoutConfig: {},
+
+    onRemove: () => {
+      window.g_app._store.dispatch({
+        type: 'forms/deleteRow',
+      })
+    },
+  },
 ]
 
 module.exports = {

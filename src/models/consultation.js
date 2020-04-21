@@ -3,7 +3,7 @@ import _ from 'lodash'
 import { createFormViewModel } from 'medisys-model'
 import * as service from '../services/consultation'
 import { getUniqueId } from '@/utils/utils'
-import { consultationDocumentTypes } from '@/utils/codes'
+import { consultationDocumentTypes, formTypes } from '@/utils/codes'
 import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import { orderTypes } from '@/pages/Consultation/utils'
 
@@ -348,6 +348,27 @@ export default createFormViewModel({
           type: 'consultationDocument/updateState',
           payload: {
             rows: _.sortBy(cdRows, 'sequence'),
+          },
+        })
+
+        let formRows = []
+        formTypes.forEach((p) => {
+          formRows = formRows.concat(
+            (data[p.prop] || []).map((o) => {
+              const d = {
+                uid: getUniqueId(),
+                type: p.value,
+                typeName: p.name,
+                ...o,
+              }
+              return d
+            }),
+          )
+        })
+        yield put({
+          type: 'forms/updateState',
+          payload: {
+            rows: _.sortBy(formRows, 'sequence'),
           },
         })
 

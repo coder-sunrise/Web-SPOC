@@ -7,6 +7,7 @@ import Book from '@material-ui/icons/LibraryBooks'
 import Play from '@material-ui/icons/PlayArrow'
 import PlayCircle from '@material-ui/icons/PlayCircleOutlineOutlined'
 import Assignment from '@material-ui/icons/Assignment'
+import Description from '@material-ui/icons/Description'
 
 export const StatusIndicator = {
   ALL: 'all',
@@ -141,6 +142,14 @@ export const ContextMenuOptions = [
     label: 'Edit Consultation',
     Icon: Edit,
     disabled: true,
+    hidden: false,
+    authority: 'patientdashboard.editconsultation',
+  },
+  {
+    id: 10,
+    label: 'Forms',
+    Icon: Description,
+    disabled: false,
     hidden: false,
     authority: 'patientdashboard.editconsultation',
   },

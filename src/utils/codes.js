@@ -1033,6 +1033,48 @@ const initRoomAssignment = async () => {
   }
 }
 
+const formTypes = [
+  {
+    value: '1',
+    name: 'Letter of Certification',
+    prop: 'corLetterofCertification',
+    downloadConfig: {
+      id: 9,
+      key: 'LetterofCertificationId',
+      subject: 'Letter of Certification',
+      draft: (row) => {
+        return {
+          LetterofCertificationDetails: [
+            {
+              ...row,
+              referralDate: moment(row.referralDate).format(dateFormatLong),
+            },
+          ],
+        }
+      },
+    },
+  },
+]
+
+const formStatus = [
+  {
+    value: 1,
+    name: 'Draft',
+  },
+  {
+    value: 2,
+    name: 'Finalized',
+  },
+  {
+    value: 3,
+    name: 'Submitted',
+  },
+  {
+    value: 4,
+    name: 'Voided',
+  },
+]
+
 module.exports = {
   appointmentStatus,
   recurrenceTypes,
@@ -1063,5 +1105,7 @@ module.exports = {
   groupByFKFunc,
   corAttchementTypes,
   initRoomAssignment,
+  formTypes,
+  formStatus,
   ...module.exports,
 }

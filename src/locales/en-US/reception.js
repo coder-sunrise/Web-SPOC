@@ -155,6 +155,8 @@ export default {
   'reception.queue.newVisit.addNew': 'Add New',
   'reception.queue.newVisit.doctor': 'Doctor',
 
+  'reception.queue.forms': 'Forms',
+
   // appointment
   'reception.appt.title': 'Appointment',
   'reception.appt.conflictWarning':
