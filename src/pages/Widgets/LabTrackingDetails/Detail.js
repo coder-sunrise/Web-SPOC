@@ -18,7 +18,7 @@ import {
 import { DoctorLabel } from '@/components/_medisys'
 import * as WidgetConfig from './config'
 import { deleteFileByFileID } from '@/services/file'
-import { LAB_TRACKING_STATUS } from '@/utils/constants'
+import { LAB_TRACKING_STATUS, PATIENT_LAB } from '@/utils/constants'
 
 const styles = (theme) => ({
   root: {},
@@ -90,49 +90,95 @@ const styles = (theme) => ({
     return {
       ...labTrackingDetails.entity,
       labTrackingResults,
+      oldRemarks: labTrackingDetails.entity.remarks,
     }
   },
   handleSubmit: (values, { props, resetForm }) => {
-    let { ...restValues } = values
-    const { dispatch, onConfirm } = props
+    let { oldRemarks, remarks, ...restValues } = values
+    const { dispatch, onConfirm, codetable } = props
 
-    if (values) {
-      let sortOrder =
-        0 && values.labTrackingResults.length
-          ? values.labTrackingResults.length
-          : 0
+    const saveData = (labTrackingStatusFK) => {
+      if (values) {
+        let sortOrder =
+          0 && values.labTrackingResults.length
+            ? values.labTrackingResults.length
+            : 0
 
-      let item = values.labTrackingResults.map((x) => {
-        sortOrder += 1
-        if (x.fileIndexFK) {
+        let item = values.labTrackingResults.map((x) => {
+          sortOrder += 1
+          if (x.fileIndexFK) {
+            return {
+              ...x,
+              sortOrder,
+            }
+          }
           return {
-            ...x,
+            fileIndexFK: x.id,
             sortOrder,
+            fileName: x.fileName,
+          }
+        })
+        restValues.labTrackingResults = item
+        if (labTrackingStatusFK) {
+          let status = codetable.ltlabtrackingstatus.find(
+            (o) => o.id === labTrackingStatusFK,
+          )
+          if (status) {
+            restValues.labTrackingStatusFK = status.id
+            restValues.labTrackingStatusCode = status.code
+            restValues.labTrackingStatusDisplayValue = status.name
           }
         }
-        return {
-          fileIndexFK: x.id,
-          sortOrder,
-          fileName: x.fileName,
+      }
+      dispatch({
+        type: 'labTrackingDetails/upsert',
+        payload: {
+          ...restValues,
+        },
+      }).then((r) => {
+        if (r) {
+          resetForm()
+          if (onConfirm) onConfirm()
+          dispatch({
+            type: 'labTrackingDetails/query',
+          })
         }
       })
-      restValues.labTrackingResults = item
     }
 
-    dispatch({
-      type: 'labTrackingDetails/upsert',
-      payload: {
-        ...restValues,
-      },
-    }).then((r) => {
-      if (r) {
-        resetForm()
-        if (onConfirm) onConfirm()
-        dispatch({
-          type: 'labTrackingDetails/query',
-        })
-      }
-    })
+    const onConfirmChangeRemarks = () => {
+      saveData(LAB_TRACKING_STATUS.RECEIVED)
+    }
+
+    const exeSubmit = () => {
+      saveData()
+    }
+
+    if (
+      oldRemarks !== remarks &&
+      values.labTrackingStatusFK === LAB_TRACKING_STATUS.NEW
+    ) {
+      dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          openConfirmTitle: '',
+          alignContent: 'left',
+          openConfirmContent: (
+            <div style={{ marginLeft: 10 }}>
+              <div>Remarks has been changed.</div>
+              <div>Do you want to update the status to 'Received'?</div>
+            </div>
+          ),
+          onConfirmSave: onConfirmChangeRemarks,
+          onConfirmClose: exeSubmit,
+          openConfirmText: 'YES',
+          cancelText: 'NO',
+        },
+      })
+    } else {
+      exeSubmit()
+    }
   },
   displayName: 'labTrackingDetails',
 })
@@ -146,7 +192,7 @@ class Detail extends PureComponent {
   }
 
   componentDidMount () {
-    const { values } = this.props
+    const { values, resultType } = this.props
     if (values && values.labTrackingResults) {
       const { labTrackingResults } = values
 
@@ -160,6 +206,8 @@ class Detail extends PureComponent {
     if (values.labTrackingStatusFK) {
       this.toggleAccordion(values.labTrackingStatusFK)
     }
+
+    this.toggleAccordionByResultType(resultType)
   }
 
   renderDropdown = (option) => <DoctorLabel doctor={option} />
@@ -246,6 +294,19 @@ class Detail extends PureComponent {
     this.setState({ activedKeys: [] })
   }
 
+  toggleAccordionByResultType = (resultType) => {
+    const { activedKeys } = this.myRef.current.state
+    let newActivedKeys = activedKeys || []
+
+    if (resultType === PATIENT_LAB.LAB_TRACKING) {
+      if (newActivedKeys.indexOf(0) === -1) {
+        newActivedKeys.push(0)
+      }
+    } else if (newActivedKeys.indexOf(1) === -1) {
+      newActivedKeys.push(1)
+    }
+  }
+
   getContent = (data) => {
     const Widget = data.component
     const { values } = this.props
@@ -261,7 +322,7 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { theme, footer, values, codetable } = props
+    const { theme, footer, values, codetable, setFieldValue } = props
     const { doctorprofile } = codetable
     const { doctorProfileFK } = values
 
@@ -326,7 +387,17 @@ class Detail extends PureComponent {
                     label='Status'
                     {...args}
                     code='ltlabtrackingstatus'
-                    onChange={this.toggleAccordion}
+                    onChange={(v, option) => {
+                      this.toggleAccordion(v)
+                      setFieldValue(
+                        'labTrackingStatusCode',
+                        option ? option.code : undefined,
+                      )
+                      setFieldValue(
+                        'labTrackingStatusDisplayValue',
+                        option ? option.name : undefined,
+                      )
+                    }}
                   />
                 )}
               />
