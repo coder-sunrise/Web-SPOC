@@ -114,6 +114,7 @@ const styles = (theme) => ({
           fileIndexFK: x.id,
           sortOrder,
           fileName: x.fileName,
+          isDeleted: x.isDeleted,
         }
       })
       restValues.labTrackingResults = item
