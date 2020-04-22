@@ -129,6 +129,12 @@ class CalendarToolbar extends React.PureComponent {
     })
   }
 
+  handleModalValueClick = (index, renderType) => {
+    const { handleSelectedValue, displayDate } = this.props
+    handleSelectedValue(index, renderType, displayDate)
+    this.handleNextModal()
+  }
+
   renderColumn = (header, renderType) => {
     return (
       <div style={{ margin: 0 }}>
@@ -156,7 +162,9 @@ class CalendarToolbar extends React.PureComponent {
         <li
           id={getUniqueId()}
           className={classes.listItem}
-          onClick={() => this.props.handleSelectedValue(index, renderType)}
+          onClick={() => {
+            this.handleModalValueClick(index, renderType)
+          }}
         >
           {index}
         </li>
@@ -182,7 +190,7 @@ class CalendarToolbar extends React.PureComponent {
                 Today
               </Button>
             </Tooltip>
-            <Tooltip title='Jump to selected day/month/year' placement='bottom'>
+            <Tooltip title='Jump to next Day/Month/Year' placement='bottom'>
               <Button
                 color='info'
                 onClick={this.handleNextModal}
