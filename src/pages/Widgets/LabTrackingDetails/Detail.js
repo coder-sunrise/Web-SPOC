@@ -94,7 +94,8 @@ const styles = (theme) => ({
     }
   },
   handleSubmit: (values, { props, resetForm }) => {
-    let { oldRemarks, remarks, ...restValues } = values
+    let { ...restValues } = values
+    let { oldRemarks, remarks } = values
     const { dispatch, onConfirm, codetable } = props
 
     const saveData = (labTrackingStatusFK) => {
