@@ -80,9 +80,8 @@ const styles = (theme) => ({
     labTrackingDetails.entity.labTrackingResults.map((labTrackingResult) => {
       labTrackingResults.push({
         ...labTrackingResult,
-        thumbnailIndexFK: undefined,
-        attachmentType: 'labTrackingResults',
-        fileExtension: 'pdf',
+        attachmentType:'labTrackingResults',
+        fileExtension:'pdf',
       })
       return labTrackingResult
     })

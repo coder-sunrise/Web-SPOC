@@ -16,7 +16,6 @@ import Authorized from '@/utils/Authorized'
 import * as WidgetConfig from './config'
 import { findGetParameter } from '@/utils/utils'
 
-
 const styles = (theme) => ({
   root: {},
   hide: {
@@ -67,8 +66,7 @@ const styles = (theme) => ({
   },
 })
 @withFormikExtend({
-  mapPropsToValues: ({ patientHistory }) => {
-  },
+  mapPropsToValues: ({ patientHistory }) => {},
 })
 @connect(({ patientHistory, clinicSettings, codetable, user }) => ({
   patientHistory,
@@ -76,15 +74,14 @@ const styles = (theme) => ({
   codetable,
   user,
 }))
-
 class DispenseHistory extends Component {
-
   constructor (props) {
     super(props)
 
     this.myRef = React.createRef()
 
     this.widgets = WidgetConfig.widgets(props).filter((o) => {
+      if (o.authority === undefined) return true
       const accessRight = Authorized.check(o.authority)
       return accessRight && accessRight.rights !== 'hidden'
     })
@@ -102,10 +99,9 @@ class DispenseHistory extends Component {
     dispatch({
       type: 'patientHistory/queryDispenseHistory',
       payload: {
-          id:Number(findGetParameter('pid')) || 0,
+        id: Number(findGetParameter('pid')) || 0,
       },
     })
-
   }
 
   getTitle = (row) => {
@@ -124,22 +120,14 @@ class DispenseHistory extends Component {
     )
   }
 
-  getContent =(data,)=>{
+  getContent = (data) => {
     const Widget = data.component
-    const {dispenseHistory} = this.props.patientHistory
-    return <Widget
-      current={dispenseHistory|| {}}
-    />
+    const { dispenseHistory } = this.props.patientHistory
+    return <Widget current={dispenseHistory || {}} />
   }
 
   render () {
-    const {
-      style,
-      classes,
-      override = {},
-      widget,
-      mode,
-    } = this.props
+    const { style, classes, override = {}, widget, mode } = this.props
     const cfg = {}
 
     if (mode === 'split') {
@@ -157,33 +145,34 @@ class DispenseHistory extends Component {
             [classes.integratedLeftPanel]: mode === 'integrated',
             [override.leftPanel]: !widget,
           })}
-        >{this.widgets.map((o)=> {
-          return (
-            <div ref={this.myRef}>
-              <Accordion
-                defaultActive={0}
-                onChange={(event, p, expanded) => {
-                  if (expanded) {
-                    setTimeout(() => {
-                      $(this.myRef.current)
-                        .find('div[aria-expanded=true]')
-                        .next()
-                        .find('div[role="button"]:eq(0)')
-                        .trigger('click')
-                    }, 1)
-                  }
-                }}
-                collapses={[{
-                  title:this.getTitle(o),
-                  hideExpendIcon:false,
-                  content: this.getContent(o),
-                }]
-                }
-              />
-            </div>
-          )
-
-        })}
+        >
+          {this.widgets.map((o) => {
+            return (
+              <div ref={this.myRef}>
+                <Accordion
+                  defaultActive={0}
+                  onChange={(event, p, expanded) => {
+                    if (expanded) {
+                      setTimeout(() => {
+                        $(this.myRef.current)
+                          .find('div[aria-expanded=true]')
+                          .next()
+                          .find('div[role="button"]:eq(0)')
+                          .trigger('click')
+                      }, 1)
+                    }
+                  }}
+                  collapses={[
+                    {
+                      title: this.getTitle(o),
+                      hideExpendIcon: false,
+                      content: this.getContent(o),
+                    },
+                  ]}
+                />
+              </div>
+            )
+          })}
         </CardContainer>
       </div>
     )
