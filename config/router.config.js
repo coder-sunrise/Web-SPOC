@@ -515,15 +515,6 @@ const _routes = [
           },
         ],
       },
-      // Forms
-      {
-        path: '/forms',
-        icon: 'assignment',
-        name: 'forms',
-        hideInMenu: true,
-        // component: './Forms',
-      },
-      // Forms
       //
       // Lab Report
       // {
@@ -797,6 +788,15 @@ const _routes = [
         ],
       },
       // Claim Submission
+      //
+      // Forms
+      {
+        path: '/forms',
+        icon: 'description',
+        name: 'forms',
+        component: './FormListing',
+      },
+      // Forms
       //
       // Settings
       {

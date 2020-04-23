@@ -1,15 +1,16 @@
-import React, { Component, PureComponent, useCallback } from 'react'
+import React, { Component, PureComponent, useCallback, useState } from 'react'
 import { connect } from 'dva'
-
+import { primaryColor } from 'mui-pro-jss'
+import color from 'color'
 import { FastField } from 'formik'
 import withStyles from '@material-ui/core/styles/withStyles'
 import { Tooltip } from '@material-ui/core'
-import { Delete, Edit, Print, Add, Undo } from '@material-ui/icons'
+import { Delete, Edit, Print, Add } from '@material-ui/icons'
 import { formTypes, formStatus } from '@/utils/codes'
 import { download } from '@/utils/request'
 import { commonDataReaderTransform } from '@/utils/utils'
 import Yup from '@/utils/yup'
-import { DeleteWithPopover } from '@/components/_medisys'
+import VoidWithPopover from './VoidWithPopover'
 
 import {
   CommonTableGrid,
@@ -22,10 +23,39 @@ import {
   AuthorizedContext,
   TextField,
   Danger,
+  Popover,
 } from '@/components'
 import AddForm from './AddForm'
 
-const styles = (theme) => ({})
+const styles = (theme) => ({
+  item: {
+    display: 'flex',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    cursor: 'pointer',
+
+    '&:hover': {
+      background: color(primaryColor).lighten(0.9).hex(),
+    },
+    '& > svg': {
+      marginRight: theme.spacing(1),
+    },
+    '& > span': {
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+    },
+  },
+
+  popoverContainer: {
+    width: 200,
+    textAlign: 'left',
+  },
+  listContainer: {
+    maxHeight: 300,
+    overflowY: 'auto',
+  },
+})
 export const printRow = async (row, props) => {
   const type = formTypes.find(
     (o) => o.value === row.type || o.name === row.type || o.code === row.type,
@@ -164,6 +194,10 @@ class Forms extends PureComponent {
     super(props)
     const { dispatch } = props
 
+    this.state = {
+      openFormType: false,
+    }
+
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {
@@ -184,6 +218,7 @@ class Forms extends PureComponent {
   }
 
   editRow = (row) => {
+    if (row.statusFK === 3 || row.statusFK === 4) return
     this.props.dispatch({
       type: 'forms/updateState',
       payload: {
@@ -198,6 +233,77 @@ class Forms extends PureComponent {
     const { forms } = this.props
     const { rows } = forms
     viewReport(rows.find((item) => item.uid === uid), this.props)
+  }
+
+  toggleVisibleChange = () =>
+    this.setState((ps) => {
+      return {
+        openFormType: !ps.openFormType,
+      }
+    })
+
+  ListItem = ({ classes, title, onClick }) => {
+    return (
+      <Tooltip title={title} style={{ pidding: 0 }}>
+        <div className={classes.item} onClick={onClick}>
+          <span>{title}</span>
+        </div>
+      </Tooltip>
+    )
+  }
+
+  VoidForm = ({ setFieldValue, classes, index, dispatch, row }) => {
+    const [
+      reason,
+      setReason,
+    ] = useState(undefined)
+
+    const handleConfirmDelete = useCallback((i, voidVisibleChange) => {
+      if (reason) {
+        voidVisibleChange()
+        dispatch({
+          type: 'forms/voidRow',
+          payload: {
+            id: row.uid,
+            voidReason: reason,
+            statusFK: 4,
+          },
+        })
+      }
+    })
+    return (
+      <VoidWithPopover
+        title='Void Form'
+        contentText='Confirm to void this form?'
+        tooltipText='Void Form'
+        extraCmd={
+          <div className={classes.errorContainer}>
+            <FastField
+              name={`rows[${index}].voidReason`}
+              render={(args) => (
+                <TextField
+                  label='Void Reason'
+                  autoFocus
+                  {...args}
+                  onChange={(e) => {
+                    setReason(e.target.value)
+                  }}
+                />
+              )}
+            />
+            {!reason && (
+              <Danger>
+                <span>Void reason is required</span>
+              </Danger>
+            )}
+          </div>
+        }
+        onCancelClick={() => {
+          setFieldValue(`rows[${index}].voidReason`, undefined)
+        }}
+        onConfirmDelete={handleConfirmDelete}
+      />
+    )
   }
 
   render () {
@@ -240,27 +346,7 @@ class Forms extends PureComponent {
               columnName: 'action',
               width: 110,
               render: (row) => {
-                const handleConfirmDelete = useCallback(
-                  (id, toggleVisibleCallback) => {
-                    const form = rows.find(
-                      (item) => parseInt(item.id, 10) === parseInt(id, 10),
-                    )
-
-                    if (
-                      form.voidReason !== '' &&
-                      form.voidReason !== undefined
-                    ) {
-                      toggleVisibleCallback()
-                      const index = rows.findIndex(
-                        (item) => item.uid === row.uid,
-                      )
-                      setFieldValue(`rows[${index}].statusFK`, 4)
-                    }
-                  },
-                  [
-                    rows,
-                  ],
-                )
+                const index = rows.findIndex((item) => item.uid === row.uid)
                 return (
                   <React.Fragment>
                     <Tooltip title='Print'>
@@ -309,36 +395,12 @@ class Forms extends PureComponent {
                       </Popconfirm>
                     )}
                     {row.statusFK === 3 && (
-                      <DeleteWithPopover
-                        title='Void Form'
-                        contentText='Confirm to void this form?'
-                        extraCmd={
-                          <div className={classes.errorContainer}>
-                            <FastField
-                              name='voidReason'
-                              render={(args) => (
-                                <TextField
-                                  label='Void Reason'
-                                  autoFocus
-                                  {...args}
-                                />
-                              )}
-                            />
-                            {row.voidReason === '' &&
-                            row.voidReason === undefined && (
-                              <Danger>
-                                <span>Void reason is required</span>
-                              </Danger>
-                            )}
-                          </div>
-                        }
-                        onCancelClick={() => {
-                          const index = rows.findIndex(
-                            (item) => item.uid === row.uid,
-                          )
-                          setFieldValue(`rows[${index}].voidReason`, undefined)
-                        }}
-                        onConfirmDelete={handleConfirmDelete}
+                      <this.VoidForm
+                        setFieldValue={setFieldValue}
+                        classes={setFieldValue}
+                        index={index}
+                        dispatch={dispatch}
+                        row={row}
                       />
                     )}
                   </React.Fragment>
@@ -352,25 +414,52 @@ class Forms extends PureComponent {
             if (r && r.rights !== 'enable') return null
 
             return (
-              <Tooltip title='Add Form'>
-                <ProgressButton
-                  color='primary'
-                  icon={<Add />}
-                  style={{ margin: theme.spacing(1) }}
-                  onClick={() => {
-                    window.g_app._store.dispatch({
-                      type: 'forms/updateState',
-                      payload: {
-                        showModal: true,
-                        type: '1',
-                        entity: undefined,
-                      },
-                    })
-                  }}
-                >
-                  Add New
-                </ProgressButton>
-              </Tooltip>
+              <Popover
+                icon={null}
+                trigger='click'
+                placement='bottom'
+                visible={this.state.openFormType}
+                onVisibleChange={this.toggleVisibleChange}
+                content={
+                  <div className={classes.popoverContainer}>
+                    <div className={classes.listContainer}>
+                      {formTypes.map((item) => {
+                        return (
+                          <this.ListItem
+                            key={item.value}
+                            title={item.name}
+                            classes={classes}
+                            onClick={() => {
+                              window.g_app._store.dispatch({
+                                type: 'forms/updateState',
+                                payload: {
+                                  showModal: true,
+                                  type: item.value,
+                                  entity: undefined,
+                                },
+                              })
+                              this.toggleVisibleChange()
+                            }}
+                            {...item}
+                          />
+                        )
+                      })}
+                    </div>
+                  </div>
+                }
+              >
+                <Tooltip title='Add Form'>
+                  <Tooltip title='Add Form'>
+                    <ProgressButton
+                      color='primary'
+                      icon={<Add />}
+                      style={{ margin: theme.spacing(1) }}
+                    >
+                      Add New
+                    </ProgressButton>
+                  </Tooltip>
+                </Tooltip>
+              </Popover>
             )
           }}
         </AuthorizedContext>

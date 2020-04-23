@@ -49,10 +49,13 @@ class AddForm extends PureComponent {
     }
 
     return (
-      <div>
-        <div style={{ margin: theme.spacing(1) }}>
-          {type === '1' && <LCForm {...cfg} />}
-        </div>
+      <div
+        style={{
+          marginLeft: theme.spacing(1),
+          marginRight: theme.spacing(1),
+        }}
+      >
+        {type === '1' && <LCForm {...cfg} />}
       </div>
     )
   }

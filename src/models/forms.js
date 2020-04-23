@@ -10,11 +10,10 @@ export default createFormViewModel({
   param: {
     service: {},
     state: {
-      type: '1',
       defaultLCForm: {
         type: '1',
         typeName: 'Letter of Certification',
-        statusFK: 1,
+        statusFK: 3,
         visitDate: moment(),
       },
       default: {},
@@ -62,6 +61,20 @@ export default createFormViewModel({
           ...state,
           rows: rows.map((o) => {
             if (!payload || o.uid === payload.id) o.isDeleted = true
+            return o
+          }),
+        }
+      },
+
+      voidRow (state, { payload }) {
+        const { rows } = state
+        return {
+          ...state,
+          rows: rows.map((o) => {
+            if (payload && o.uid === payload.id) {
+              o.voidReason = payload.voidReason
+              o.statusFK = payload.statusFK
+            }
             return o
           }),
         }
