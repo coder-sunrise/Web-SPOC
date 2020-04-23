@@ -330,7 +330,7 @@ class Queue extends React.Component {
             type: 'queueCalling/upsertQueueCallList',
             payload: {
               ...restRespValues,
-              keys: VALUE_KEYS.QUEUECALLING,
+              key: VALUE_KEYS.QUEUECALLING,
               value: '[]',
             },
           })
@@ -457,7 +457,7 @@ class Queue extends React.Component {
                         type: 'queueCalling/upsertQueueCallList',
                         payload: {
                           ...restRespValues,
-                          keys: VALUE_KEYS.QUEUECALLING,
+                          key: VALUE_KEYS.QUEUECALLING,
                           value: '[]',
                         },
                       }).then((response) => {

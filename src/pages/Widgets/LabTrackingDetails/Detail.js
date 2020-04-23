@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
+import { connect } from 'dva'
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -9,10 +10,11 @@ import {
   GridItem,
   TextField,
   CodeSelect,
-   Accordion,
-   CardContainer,
+  Accordion,
+  CardContainer,
+  dateFormatLongWithTimeNoSec12h,
+  DatePicker,
 } from '@/components'
-import DatePicker from '@/components/DatePicker'
 import { DoctorLabel } from '@/components/_medisys'
 import * as WidgetConfig from './config'
 import { deleteFileByFileID } from '@/services/file'
@@ -68,11 +70,13 @@ const styles = (theme) => ({
   },
 })
 
+@connect(({ codetable }) => ({
+  codetable,
+}))
 @withFormikExtend({
-  mapPropsToValues: ({ labTrackingDetails }) =>{
-
+  mapPropsToValues: ({ labTrackingDetails }) => {
     // Construct Attachment
-    let labTrackingResults=[]
+    let labTrackingResults = []
     labTrackingDetails.entity.labTrackingResults.map((labTrackingResult) => {
       labTrackingResults.push({
         ...labTrackingResult,
@@ -83,7 +87,7 @@ const styles = (theme) => ({
     })
 
     return {
-    ...labTrackingDetails.entity,
+      ...labTrackingDetails.entity,
       labTrackingResults,
     }
   },
@@ -91,24 +95,25 @@ const styles = (theme) => ({
     let { ...restValues } = values
     const { dispatch, onConfirm } = props
 
-    if(values){
-      let sortOrder = 0 && values.labTrackingResults.length ? values.labTrackingResults.length : 0
+    if (values) {
+      let sortOrder =
+        0 && values.labTrackingResults.length
+          ? values.labTrackingResults.length
+          : 0
 
-      let item = values.labTrackingResults.map(x => {
-
+      let item = values.labTrackingResults.map((x) => {
         sortOrder += 1
-        if(x.fileIndexFK)
-        {
+        if (x.fileIndexFK) {
           return {
             ...x,
             sortOrder,
           }
         }
-          return {
-            fileIndexFK:x.id,
-            sortOrder,
-            fileName: x.fileName,
-          }
+        return {
+          fileIndexFK: x.id,
+          sortOrder,
+          fileName: x.fileName,
+        }
       })
       restValues.labTrackingResults = item
     }
@@ -130,7 +135,6 @@ const styles = (theme) => ({
   },
   displayName: 'labTrackingDetails',
 })
-
 class Detail extends PureComponent {
   state = {}
 
@@ -141,7 +145,6 @@ class Detail extends PureComponent {
   }
 
   componentDidMount () {
-
     const { values } = this.props
     if (values && values.labTrackingResults) {
       const { labTrackingResults } = values
@@ -153,7 +156,7 @@ class Detail extends PureComponent {
         !item.isDeleted && deleteFileByFileID(item.id)
       })
     }
-    if(values.labTrackingStatusFK) {
+    if (values.labTrackingStatusFK) {
       this.toggleAccordion(values.labTrackingStatusFK)
     }
   }
@@ -209,7 +212,6 @@ class Detail extends PureComponent {
     setFieldValue('labTrackingResults', updated)
   }
 
-
   changeToggle = (event, p, expanded) => {
     if (expanded) {
       setTimeout(() => {
@@ -223,16 +225,16 @@ class Detail extends PureComponent {
   }
 
   toggleAccordion = (e) => {
-    const {activedKeys} = this.myRef.current.state
-    let newActivedKeys = activedKeys||[]
+    const { activedKeys } = this.myRef.current.state
+    let newActivedKeys = activedKeys || []
     switch (e) {
       case LAB_TRACKING_STATUS.ORDERED:
-        if(newActivedKeys.indexOf(0) ===-1){
+        if (newActivedKeys.indexOf(0) === -1) {
           newActivedKeys.push(0)
         }
         break
       case LAB_TRACKING_STATUS.RECEIVED:
-        if(newActivedKeys.indexOf(1) ===-1){
+        if (newActivedKeys.indexOf(1) === -1) {
           newActivedKeys.push(1)
         }
         break
@@ -240,71 +242,56 @@ class Detail extends PureComponent {
         break
     }
 
-    this.setState({activedKeys: []})
+    this.setState({ activedKeys: [] })
   }
 
-
-
-  getContent =(data,)=>{
+  getContent = (data) => {
     const Widget = data.component
-    const{values} = this.props
+    const { values } = this.props
 
-    return <Widget
-      current={values|| {}}
-      attachment={values.labTrackingResults}
-      updateAttachments={this.updateAttachments}
-    />
+    return (
+      <Widget
+        current={values || {}}
+        attachment={values.labTrackingResults}
+        updateAttachments={this.updateAttachments}
+      />
+    )
   }
 
   render () {
     const { props } = this
-    const { theme, footer } = props
+    const { theme, footer, values, codetable } = props
+    const { doctorprofile } = codetable
+    const { doctorProfileFK } = values
+
+    let doctorNameLabel = ''
+    let selectDoctor = doctorprofile.find((d) => d.id === doctorProfileFK)
+    if (selectDoctor) {
+      const { doctorMCRNo, clinicianProfile: { name } } = selectDoctor
+      doctorNameLabel = `${name} (${doctorMCRNo})`
+    }
     return (
-      <CardContainer
-        hideHeader
-        size='sm'
-      >
+      <CardContainer hideHeader size='sm'>
         <div>
           <GridContainer>
             <GridItem md={4}>
               <FastField
                 name='patientAccountNo'
                 render={(args) => (
-                  <TextField
-                    label='Patient Acc No.'
-                    {...args}
-                    disabled
-                  />
+                  <TextField label='Patient Acc No.' {...args} disabled />
                 )}
               />
             </GridItem>
             <GridItem md={4}>
               <FastField
                 name='patientName'
-                render={(args) => <TextField label='Patient Name' {...args} disabled />}
+                render={(args) => (
+                  <TextField label='Patient Name' {...args} disabled />
+                )}
               />
             </GridItem>
             <GridItem md={4}>
-              <FastField
-                name='doctorProfileFK'
-                render={(args) => (
-                  <CodeSelect
-                    {...args}
-                    disableAll
-                    allowClear={false}
-                    label='Doctor'
-                    remoteFilter={{
-                      'clinicianProfile.isActive': true,
-                    }}
-                    disabled
-                    localFilter={(option) => option.clinicianProfile.isActive}
-                    code='doctorprofile'
-                    labelField='clinicianProfile.name'
-                    valueField='clinicianProfile.id'
-                    renderDropdown={this.renderDropdown}
-                  />
-                )}
-              />
+              <TextField disabled label='Doctor' value={doctorNameLabel} />
             </GridItem>
             <GridItem md={4}>
               <FastField
@@ -315,7 +302,8 @@ class Detail extends PureComponent {
                       label='Visit Date'
                       {...args}
                       disabled
-                      timeFormat={false}
+                      format={dateFormatLongWithTimeNoSec12h}
+                      showTime
                     />
                   )
                 }}
@@ -339,7 +327,7 @@ class Detail extends PureComponent {
                     code='ltlabtrackingstatus'
                     onChange={this.toggleAccordion}
                   />
-                    )}
+                )}
               />
             </GridItem>
           </GridContainer>
@@ -350,18 +338,15 @@ class Detail extends PureComponent {
               ref={this.myRef}
               onChange={this.changeToggle}
               mode='multiple'
-              collapses={
-                this.widgets.map((o)=>{
-                  return {
-                    title: this.getTitle(o),
-                    hideExpendIcon:false,
-                    content: this.getContent(o),
-                  }
-                })
-              }
+              collapses={this.widgets.map((o) => {
+                return {
+                  title: this.getTitle(o),
+                  hideExpendIcon: false,
+                  content: this.getContent(o),
+                }
+              })}
             />
           </div>
-
         </div>
         {footer &&
           footer({
@@ -376,4 +361,4 @@ class Detail extends PureComponent {
   }
 }
 
-export default withStyles (styles,{withTheme:true})(Detail)
+export default withStyles(styles, { withTheme: true })(Detail)

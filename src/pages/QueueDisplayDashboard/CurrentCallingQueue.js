@@ -56,11 +56,14 @@ const CurrentCallingQueue = ({ classes, callingQueue }) => {
             textOverflow: 'ellipsis',
             padding: '1vw',
             whiteSpace: 'nowrap',
+            height: '50%',
           }}
         >
           {callingQueue.roomNo}
         </p>
-        <p style={{ fontWeight: 'bold' }}>{callingQueue.qNo}</p>
+        <p style={{ fontWeight: 'bold', height: '50%', fontSize: '30vw' }}>
+          {callingQueue.qNo}
+        </p>
       </Fragment>
     </div>
   )
