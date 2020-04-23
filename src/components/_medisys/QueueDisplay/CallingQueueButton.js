@@ -249,7 +249,7 @@ export default React.memo(
         qlist: queueLog.list,
         queueCalling,
         roomAssignmentList: settingRoomAssignment.list,
-        ctroom: codetable.ctroom,
+        ctroom: codetable.ctroom || [],
         user: user.data,
       }),
     ),

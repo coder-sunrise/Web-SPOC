@@ -80,7 +80,6 @@ const styles = (theme) => ({
     labTrackingDetails.entity.labTrackingResults.map((labTrackingResult) => {
       labTrackingResults.push({
         ...labTrackingResult,
-        thumbnailIndexFK: undefined,
         attachmentType: 'labTrackingResults',
         fileExtension: 'pdf',
       })
@@ -117,6 +116,7 @@ const styles = (theme) => ({
             fileIndexFK: x.id,
             sortOrder,
             fileName: x.fileName,
+            isDeleted: x.isDeleted,
           }
         })
         restValues.labTrackingResults = item

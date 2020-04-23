@@ -67,7 +67,7 @@ const styles = (theme) => ({
   displayName: 'UserProfile',
   enableReinitialize: true,
   validationSchema: (props) => {
-    const { settingUserProfile, currentUser } = props
+    const { settingUserProfile, currentUser, ctRole } = props
     const { currentSelectedUser } = settingUserProfile
     const isEdit =
       (currentSelectedUser &&
@@ -80,7 +80,7 @@ const styles = (theme) => ({
         userName: Yup.string().required('Login ID is a required field'),
       }),
       name: Yup.string().required('Name is a required field'),
-      phoneNumber: Yup.string().required('Contact No. is a required field'),
+      // phoneNumber: Yup.string().required('Contact No. is a required field'),
       userAccountNo: Yup.string().required(
         'User Account No. is a required field',
       ),
@@ -90,7 +90,10 @@ const styles = (theme) => ({
       doctorProfile: Yup.object()
         .transform((value) => (value === null ? {} : value))
         .when('role', {
-          is: (val) => val === '2' || val === '3',
+          is (val) { 
+            if(val===undefined) return false
+            return ctRole.find((item) => item.id === parseInt(val,10)).clinicalRoleName === 'Doctor' || ctRole.find((item) => item.id === parseInt(val,10)).clinicalRoleName === 'Doctor Owner'
+          },
           then: Yup.object().shape({
             doctorMCRNo: Yup.string().required(),
           }),
@@ -236,8 +239,7 @@ class UserProfileForm extends React.PureComponent {
 
   onRoleChange = (value) => {
     const { ctRole, setFieldValue } = this.props
-    const role = ctRole.find((item) => item.id === value)
-
+    const role = ctRole.find((item) => item.id === value) 
     this.setState({
       canEditDoctorMCR: role.name === 'Doctor' || role.name === 'Doctor Owner',
     })

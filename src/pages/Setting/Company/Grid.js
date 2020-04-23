@@ -1,11 +1,23 @@
 import React, { PureComponent, Fragment } from 'react'
 import Edit from '@material-ui/icons/Edit'
 import Print from '@material-ui/icons/Print'
-import { CommonTableGrid, Button, Tooltip, notification } from '@/components'
+import {
+  CommonTableGrid,
+  Button,
+  Tooltip,
+  notification,
+  CommonModal,
+} from '@/components'
 import { status, gstEnabled } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
+import { ReportViewer } from '@/components/_medisys'
 
 class Grid extends PureComponent {
+  state = {
+    showReport: false,
+    selectedPrintCopayerId: null,
+  }
+
   FuncConfig = {
     sort: true,
     sortConfig: {
@@ -38,215 +50,249 @@ class Grid extends PureComponent {
     })
   }
 
+  toggleReport = (copayerId) => {
+    this.setState((prevState) => {
+      return {
+        showReport: !prevState.showReport,
+        selectedPrintCopayerId: copayerId,
+      }
+    })
+  }
+
   render () {
     const { settingCompany, route } = this.props
     const { name } = route
     const { companyType } = settingCompany
+    const { showReport, selectedPrintCopayerId } = this.state
 
     return (
-      <CommonTableGrid
-        style={{ margin: 0 }}
-        type='settingCompany'
-        onRowDoubleClick={this.editRow}
-        FuncProps={this.FuncConfig}
-        forceRender
-        columns={
-          name === 'copayer' ? (
-            [
-              {
-                name: 'code',
-                title: 'Co-payer Code',
-              },
+      <Fragment>
+        <CommonTableGrid
+          style={{ margin: 0 }}
+          type='settingCompany'
+          onRowDoubleClick={this.editRow}
+          FuncProps={this.FuncConfig}
+          forceRender
+          columns={
+            name === 'copayer' ? (
+              [
+                {
+                  name: 'code',
+                  title: 'Co-payer Code',
+                },
 
-              {
-                name: 'displayValue',
-                title: 'Co-payer Name',
-              },
+                {
+                  name: 'displayValue',
+                  title: 'Co-payer Name',
+                },
 
-              { name: 'coPayerTypeName', title: 'Co-payer Type' },
+                { name: 'coPayerTypeName', title: 'Co-payer Type' },
 
-              {
-                name: 'contactNo',
-                title: 'Contact No.',
-              },
+                {
+                  name: 'contactNo',
+                  title: 'Contact No.',
+                },
 
-              { name: 'url', title: 'URL' },
+                { name: 'url', title: 'URL' },
 
-              { name: 'isActive', title: 'Status' },
-              { name: 'action', title: 'Action' },
-            ]
-          ) : (
-            [
-              {
-                name: 'code',
-                title: 'Company Code',
-              },
+                { name: 'isActive', title: 'Status' },
+                { name: 'action', title: 'Action' },
+              ]
+            ) : (
+              [
+                {
+                  name: 'code',
+                  title: 'Company Code',
+                },
 
-              {
-                name: 'displayValue',
-                title: 'Company Name',
-              },
+                {
+                  name: 'displayValue',
+                  title: 'Company Name',
+                },
 
-              { name: 'contactPerson', title: 'Contact Person' },
-              { name: 'contactNo', title: 'Contact No.' },
+                { name: 'contactPerson', title: 'Contact Person' },
+                { name: 'contactNo', title: 'Contact No.' },
 
-              { name: 'officeNum', title: 'Office Number' },
+                { name: 'officeNum', title: 'Office Number' },
 
-              { name: 'faxNo', title: 'Fax Number' },
-              { name: 'isGSTEnabled', title: 'GST Enable' },
-              { name: 'isActive', title: 'Status' },
-              { name: 'action', title: 'Action' },
-            ]
-          )
-        }
-        // FuncProps={{ pager: false }}
-        columnExtensions={[
-          {
-            columnName: 'url',
-            sortingEnabled: false,
-            width: 400,
-            render: (row) => {
-              return (
-                <a
-                  rel='noopener noreferrer'
-                  target='_blank'
-                  href={
-                    row.contact &&
+                { name: 'faxNo', title: 'Fax Number' },
+                { name: 'isGSTEnabled', title: 'GST Enable' },
+                { name: 'isActive', title: 'Status' },
+                { name: 'action', title: 'Action' },
+              ]
+            )
+          }
+          // FuncProps={{ pager: false }}
+          columnExtensions={[
+            {
+              columnName: 'url',
+              sortingEnabled: false,
+              width: 400,
+              render: (row) => {
+                return (
+                  <a
+                    rel='noopener noreferrer'
+                    target='_blank'
+                    href={
+                      row.contact &&
+                      row.contact.contactWebsite &&
+                      row.contact.contactWebsite.website !== '' ? (
+                        row.contact.contactWebsite.website
+                      ) : (
+                        '-'
+                      )
+                    }
+                  >
+                    {row.contact &&
                     row.contact.contactWebsite &&
                     row.contact.contactWebsite.website !== '' ? (
                       row.contact.contactWebsite.website
                     ) : (
                       '-'
-                    )
-                  }
-                >
+                    )}
+                  </a>
+                )
+              },
+            },
+            {
+              columnName: 'coPayerTypeName',
+              sortBy: 'coPayerTypeFK',
+              width: 200,
+            },
+            {
+              columnName: 'officeNum',
+              sortingEnabled: false,
+              width: 120,
+              render: (row) => (
+                <span>
                   {row.contact &&
-                  row.contact.contactWebsite &&
-                  row.contact.contactWebsite.website !== '' ? (
-                    row.contact.contactWebsite.website
+                  row.contact.officeContactNumber &&
+                  row.contact.officeContactNumber.number !== '' ? (
+                    row.contact.officeContactNumber.number
                   ) : (
                     '-'
                   )}
-                </a>
-              )
+                </span>
+              ),
             },
-          },
-          {
-            columnName: 'coPayerTypeName',
-            sortBy: 'coPayerTypeFK',
-            width: 200,
-          },
-          {
-            columnName: 'officeNum',
-            sortingEnabled: false,
-            width: 120,
-            render: (row) => (
-              <span>
-                {row.contact &&
-                row.contact.officeContactNumber &&
-                row.contact.officeContactNumber.number !== '' ? (
-                  row.contact.officeContactNumber.number
-                ) : (
-                  '-'
-                )}
-              </span>
-            ),
-          },
-          {
-            columnName: 'contactPerson',
-            render: (row) => (
-              <span>{row.contactPerson ? row.contactPerson : '-'}</span>
-            ),
-          },
-          {
-            columnName: 'faxNo',
-            sortingEnabled: false,
-            width: 120,
-            render: (row) => (
-              <span>
-                {row.contact &&
-                row.contact.faxContactNumber &&
-                row.contact.faxContactNumber.number !== '' ? (
-                  row.contact.faxContactNumber.number
-                ) : (
-                  '-'
-                )}
-              </span>
-            ),
-          },
-          {
-            columnName: 'displayValue',
-            width: 500,
-          },
+            {
+              columnName: 'contactPerson',
+              render: (row) => (
+                <span>{row.contactPerson ? row.contactPerson : '-'}</span>
+              ),
+            },
+            {
+              columnName: 'faxNo',
+              sortingEnabled: false,
+              width: 120,
+              render: (row) => (
+                <span>
+                  {row.contact &&
+                  row.contact.faxContactNumber &&
+                  row.contact.faxContactNumber.number !== '' ? (
+                    row.contact.faxContactNumber.number
+                  ) : (
+                    '-'
+                  )}
+                </span>
+              ),
+            },
+            {
+              columnName: 'displayValue',
+              width: 500,
+            },
 
-          {
-            columnName: 'contactNo',
-            sortingEnabled: false,
-            width: 120,
-            render: (row) => (
-              <span>
-                {row.contact &&
-                row.contact.mobileContactNumber &&
-                row.contact.mobileContactNumber.number !== '' ? (
-                  row.contact.mobileContactNumber.number
-                ) : (
-                  '-'
-                )}
-              </span>
-            ),
-          },
-          {
-            columnName: 'isActive',
-            sortingEnabled: false,
-            type: 'select',
-            options: status,
-            align: 'center',
-            width: 120,
-          },
-          {
-            columnName: 'isGSTEnabled',
-            type: 'select',
-            options: gstEnabled,
-            width: 120,
-            sortBy: 'isGSTEnabled',
-          },
-          {
-            columnName: 'action',
-            align: 'center',
-            width: 100,
-            render: (row) => {
-              return (
-                <Authorized authority='copayer.copayerdetails'>
-                  <Fragment>
-                    <Tooltip
-                      title={
-                        companyType.id === 1 ? 'Edit Co-Payer' : 'Edit Supplier'
-                      }
-                      placement='bottom'
-                    >
-                      <Button
-                        size='sm'
-                        onClick={() => {
-                          this.editRow(row)
-                        }}
-                        justIcon
-                        color='primary'
-                      >
-                        <Edit />
-                      </Button>
-                    </Tooltip>
-                    <Tooltip title='Print Copayer Label' placement='bottom'>
-                      <Button size='sm' justIcon color='primary'>
-                        <Print />
-                      </Button>
-                    </Tooltip>
-                  </Fragment>
-                </Authorized>
-              )
+            {
+              columnName: 'contactNo',
+              sortingEnabled: false,
+              width: 120,
+              render: (row) => (
+                <span>
+                  {row.contact &&
+                  row.contact.mobileContactNumber &&
+                  row.contact.mobileContactNumber.number !== '' ? (
+                    row.contact.mobileContactNumber.number
+                  ) : (
+                    '-'
+                  )}
+                </span>
+              ),
             },
-          },
-        ]}
-      />
+            {
+              columnName: 'isActive',
+              sortingEnabled: false,
+              type: 'select',
+              options: status,
+              align: 'center',
+              width: 120,
+            },
+            {
+              columnName: 'isGSTEnabled',
+              type: 'select',
+              options: gstEnabled,
+              width: 120,
+              sortBy: 'isGSTEnabled',
+            },
+            {
+              columnName: 'action',
+              align: 'center',
+              width: 100,
+              render: (row) => {
+                return (
+                  <Authorized authority='copayer.copayerdetails'>
+                    <Fragment>
+                      <Tooltip
+                        title={
+                          companyType.id === 1 ? (
+                            'Edit Co-Payer'
+                          ) : (
+                            'Edit Supplier'
+                          )
+                        }
+                        placement='bottom'
+                      >
+                        <Button
+                          size='sm'
+                          onClick={() => {
+                            this.editRow(row)
+                          }}
+                          justIcon
+                          color='primary'
+                        >
+                          <Edit />
+                        </Button>
+                      </Tooltip>
+                      <Tooltip title='Print Copayer Label' placement='bottom'>
+                        <Button
+                          size='sm'
+                          justIcon
+                          color='primary'
+                          onClick={() => this.toggleReport(row.id)}
+                        >
+                          <Print />
+                        </Button>
+                      </Tooltip>
+                    </Fragment>
+                  </Authorized>
+                )
+              },
+            },
+          ]}
+        />
+        <CommonModal
+          open={showReport}
+          onClose={this.toggleReport}
+          title='Statement'
+          maxWidth='lg'
+        >
+          <ReportViewer
+            reportID={43}
+            reportParameters={{
+              copayerId: selectedPrintCopayerId,
+            }}
+          />
+        </CommonModal>
+      </Fragment>
     )
   }
 }
