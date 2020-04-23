@@ -40,7 +40,6 @@ class Filter extends PureComponent {
     const { companyType } = settingCompany
     this.checkIsCopayer(name)
     const { isCopayer } = this.state
-    console.log({ companyType })
     return (
       <div className={classes.filterBar}>
         <GridContainer>
