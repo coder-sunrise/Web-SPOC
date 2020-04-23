@@ -110,6 +110,13 @@ class Queue extends React.Component {
     dispatch({
       type: `${modelKey}refresh`,
     })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctroom',
+      },
+    })
+
     initRoomAssignment()
 
     // dispatch({
