@@ -299,12 +299,13 @@ class CalendarToolbar extends React.PureComponent {
                     <div
                       style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(3, 1fr)',
+                        gridTemplateColumns: 'repeat(4, 1fr)',
                         gridGap: 20,
                         textAlign: 'center',
                       }}
                     >
                       {this.renderColumn('Day', 'days')}
+                      {this.renderColumn('Week', 'weeks')}
                       {this.renderColumn('Month', 'months')}
                       {this.renderColumn('Year', 'years')}
                     </div>
