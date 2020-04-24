@@ -376,7 +376,7 @@ const Grid = ({
           onRegisterPatientClick(false, row)
           break
         case '10':
-          handleFormsClick({ visitID: row.id })
+          handleFormsClick({ visitID: row.id, visitStatus: row.visitStatus })
           break
         default:
           break

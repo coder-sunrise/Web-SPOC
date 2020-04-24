@@ -154,3 +154,8 @@ export const ContextMenuOptions = [
     authority: 'patientdashboard.editconsultation',
   },
 ]
+
+export const FORM_CATEGORY = {
+  VISITFORM: 'VISITFORM',
+  CORFORM: 'CORFORM',
+}

@@ -10,7 +10,8 @@ import { formTypes, formStatus } from '@/utils/codes'
 import { download } from '@/utils/request'
 import { commonDataReaderTransform } from '@/utils/utils'
 import Yup from '@/utils/yup'
-import VoidWithPopover from './VoidWithPopover'
+import VoidWithPopover from '../FormDetail/VoidWithPopover'
+import AddForm from '../FormDetail/AddForm'
 
 import {
   CommonTableGrid,
@@ -18,14 +19,12 @@ import {
   CommonModal,
   Popconfirm,
   notification,
-  withFormikExtend,
   ProgressButton,
   AuthorizedContext,
   TextField,
   Danger,
   Popover,
 } from '@/components'
-import AddForm from './AddForm'
 
 const styles = (theme) => ({
   item: {
@@ -167,32 +166,16 @@ export const viewReport = (row, props, useID = false) => {
   return true
 }
 
-@connect(({ forms, codetable, patient, consultation }) => ({
-  forms,
+@connect(({ formListing, codetable, patient, consultation }) => ({
+  formListing,
   codetable,
   patient,
   consultation,
 }))
-@withFormikExtend({
-  authority: [
-    'queue.consultation.widgets.consultationdocument',
-  ],
-  mapPropsToValues: ({ consultation }) => {
-    const _values = consultation.entity || consultation.default
-    return _values
-  },
-  validationSchema: Yup.object().shape({}),
-
-  handleSubmit: (values, { props }) => {
-    const { dispatch, onSave } = props
-    if (onSave) onSave(values)
-  },
-  displayName: 'Forms',
-})
-class Forms extends PureComponent {
+class VisitFormGrid extends PureComponent {
   constructor (props) {
     super(props)
-    const { dispatch } = props
+    const { dispatch, formListing } = props
 
     this.state = {
       openFormType: false,
@@ -204,13 +187,23 @@ class Forms extends PureComponent {
         code: 'clinicianprofile',
       },
     })
+
+    dispatch({
+      type: 'formListing/query',
+      payload: {
+        apiCriteria: {
+          visitID: formListing.visitID,
+          formCategory: props.formCategory,
+        },
+      },
+    })
   }
 
   toggleModal = () => {
-    const { forms } = this.props
-    const { showModal } = forms
+    const { formListing } = this.props
+    const { showModal } = formListing
     this.props.dispatch({
-      type: 'forms/updateState',
+      type: 'formListing/updateState',
       payload: {
         showModal: !showModal,
       },
@@ -220,7 +213,7 @@ class Forms extends PureComponent {
   editRow = (row) => {
     if (row.statusFK === 3 || row.statusFK === 4) return
     this.props.dispatch({
-      type: 'forms/updateState',
+      type: 'formListing/updateState',
       payload: {
         entity: row,
         type: row.type,
@@ -230,9 +223,9 @@ class Forms extends PureComponent {
   }
 
   handleViewReport = (uid) => {
-    const { forms } = this.props
-    const { rows } = forms
-    viewReport(rows.find((item) => item.uid === uid), this.props)
+    const { formListing } = this.props
+    const { list } = formListing
+    viewReport(list.find((item) => item.uid === uid), this.props)
   }
 
   toggleVisibleChange = () =>
@@ -262,9 +255,9 @@ class Forms extends PureComponent {
       if (reason) {
         voidVisibleChange()
         dispatch({
-          type: 'forms/voidRow',
+          type: 'formListing/update',
           payload: {
-            id: row.uid,
+            ...row,
             voidReason: reason,
             statusFK: 4,
           },
@@ -302,16 +295,16 @@ class Forms extends PureComponent {
   }
 
   render () {
-    const { forms, dispatch, theme, classes, setFieldValue } = this.props
-    const { showModal } = forms
-    const { rows } = forms
+    const { formListing, dispatch, theme, classes, setFieldValue } = this.props
+    const { showModal } = formListing
+    const { list } = formListing
     return (
       <div>
         <CommonTableGrid
           getRowId={(r) => r.uid}
           size='sm'
           style={{ margin: 0 }}
-          rows={rows}
+          rows={list}
           onRowDoubleClick={this.editRow}
           columns={[
             { name: 'typeName', title: 'Type' },
@@ -375,9 +368,10 @@ class Forms extends PureComponent {
                       <Popconfirm
                         onConfirm={() =>
                           dispatch({
-                            type: 'forms/deleteRow',
+                            type: 'formListing/update',
                             payload: {
-                              id: row.uid,
+                              ...row,
+                              isDeleted: true,
                             },
                           })}
                       >
@@ -423,7 +417,7 @@ class Forms extends PureComponent {
                             classes={classes}
                             onClick={() => {
                               window.g_app._store.dispatch({
-                                type: 'forms/updateState',
+                                type: 'formListing/updateState',
                                 payload: {
                                   showModal: true,
                                   type: item.value,
@@ -470,4 +464,4 @@ class Forms extends PureComponent {
     )
   }
 }
-export default withStyles(styles, { withTheme: true })(Forms)
+export default withStyles(styles, { withTheme: true })(VisitFormGrid)

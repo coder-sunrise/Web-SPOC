@@ -373,3 +373,8 @@ export const VALUE_KEYS = {
 export const SCHEME_TYPE = {
   CORPORATE: 15,
 }
+
+export const FORM_FROM = {
+  FORMMODULE: 1,
+  QUEUELOG: 2,
+}

@@ -14,7 +14,8 @@ export default createListViewModel({
       list: [
         {
           typeName: 'sdfsdfdsfs',
-          statusFK: 3,
+          type: '1',
+          statusFK: 2,
         },
       ],
     },
@@ -26,7 +27,7 @@ export default createListViewModel({
     },
     effects: {
       *update ({ payload }, { call, put }) {
-        const response = yield call(service.update, payload)
+        const response = yield call(service.upsert, payload)
         return response
       },
     },

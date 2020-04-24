@@ -37,6 +37,8 @@ import Authorized from '@/utils/Authorized'
 import { QueueDashboardButton } from '@/components/_medisys'
 import { VALUE_KEYS } from '@/utils/constants'
 import { initRoomAssignment } from '@/utils/codes'
+import { VISIT_STATUS, FORM_CATEGORY } from '@/pages/Reception/Queue/variables'
+import VisitForms from './VisitForms'
 
 const drawerWidth = 400
 
@@ -97,6 +99,7 @@ class Queue extends React.Component {
       showEndSessionSummary: false,
       search: '',
       showForms: false,
+      formCategory: undefined,
     }
     this._timer = null
   }
@@ -441,13 +444,18 @@ class Queue extends React.Component {
     })
   }
 
-  showVisitForms = ({ visitID = undefined }) => {
+  showVisitForms = ({ visitID, visitStatus }) => {
     this.props.dispatch({
-      type: 'forms/updateState',
+      type: 'formListing/updateState',
       payload: {
         visitID,
       },
     })
+    if (visitStatus === VISIT_STATUS.WAITING) {
+      this.setState({ formCategory: FORM_CATEGORY.VISITFORM })
+    } else {
+      this.setState({ formCategory: FORM_CATEGORY.CORFORM })
+    }
     this.toggleForms()
   }
 
@@ -591,7 +599,7 @@ class Queue extends React.Component {
               maxWidth='md'
               overrideLoading
             >
-              <span>forms</span>
+              <VisitForms formCategory={this.state.formCategory} />
             </CommonModal>
           </CardBody>
         </Card>

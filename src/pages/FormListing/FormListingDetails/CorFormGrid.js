@@ -1,7 +1,6 @@
 import React, { PureComponent, useState, useCallback } from 'react'
 import { Tooltip } from '@material-ui/core'
 import { Delete, Edit, Print } from '@material-ui/icons'
-import { FastField } from 'formik'
 import { formTypes, formStatus } from '@/utils/codes'
 import { download } from '@/utils/request'
 import { commonDataReaderTransform } from '@/utils/utils'
@@ -14,8 +13,8 @@ import {
   TextField,
   Danger,
 } from '@/components'
-import VoidWithPopover from '@/pages/Widgets/Forms/VoidWithPopover'
-import AddForm from '@/pages/Widgets/Forms/AddForm'
+import VoidWithPopover from '../FormDetail/VoidWithPopover'
+import AddForm from '../FormDetail/AddForm'
 
 export const printRow = async (row, props) => {
   const type = formTypes.find(
@@ -71,7 +70,7 @@ export const printRow = async (row, props) => {
   }
 }
 
-class Grid extends PureComponent {
+class CorFormGrid extends PureComponent {
   constructor (props) {
     super(props)
 
@@ -80,8 +79,6 @@ class Grid extends PureComponent {
         reason,
         setReason,
       ] = useState(undefined)
-
-      // let myRef = React.createRef()
 
       const handleConfirmDelete = useCallback((i, voidVisibleChange) => {
         if (reason) {
@@ -103,20 +100,15 @@ class Grid extends PureComponent {
           tooltipText='Void Form'
           extraCmd={
             <div className={classes.errorContainer}>
-              <FastField
-                name='sdfsdf'
-                render={(args) => (
-                  <TextField
-                    label='Void Reason'
-                    autoFocus
-                    // ref={myRef}
-                    {...args}
-                    onChange={(e) => {
-                      setReason(e.target.value)
-                    }}
-                  />
-                )}
+              <TextField
+                label='Void Reason'
+                autoFocus
+                value={reason}
+                onChange={(e) => {
+                  setReason(e.target.value)
+                }}
               />
+
               {!reason && (
                 <Danger>
                   <span>Void reason is required</span>
@@ -125,17 +117,39 @@ class Grid extends PureComponent {
             </div>
           }
           onCancelClick={() => {
-            // setFieldValue(`formListing[${index}].voidReason`, undefined)
-            // myRef.current.value = undefined
             setReason(undefined)
           }}
           onConfirmDelete={handleConfirmDelete}
         />
       )
     }
+
+    this.toggleModal = () => {
+      const { formListing } = this.props
+      const { showModal } = formListing
+      this.props.dispatch({
+        type: 'formListing/updateState',
+        payload: {
+          showModal: !showModal,
+        },
+      })
+    }
+
+    this.editRow = (row) => {
+      if (row.statusFK === 3 || row.statusFK === 4) return
+      this.props.dispatch({
+        type: 'formListing/updateState',
+        payload: {
+          entity: row,
+          type: row.type,
+        },
+      })
+      this.toggleModal()
+    }
+
     this.tableParas = {
       columns: [
-        { name: 'typeName', title: 'Type' },
+        { name: 'type', title: 'Type' },
         { name: 'visitDate', title: 'Visit Date' },
         { name: 'patientID', title: 'Patient ID' },
         { name: 'patientName', title: 'Patient Name' },
@@ -147,6 +161,12 @@ class Grid extends PureComponent {
         { name: 'action', title: 'Action' },
       ],
       columnExtensions: [
+        {
+          columnName: 'type',
+          type: 'select',
+          options: formTypes,
+          sortingEnabled: false,
+        },
         {
           columnName: 'visitDate',
           type: 'date',
@@ -254,6 +274,7 @@ class Grid extends PureComponent {
         <CommonTableGrid
           // type='formListing'
           rows={formListing.list}
+          onRowDoubleClick={this.editRow}
           {...this.tableParas}
           {...overrideTableParas}
         />
@@ -273,4 +294,4 @@ class Grid extends PureComponent {
   }
 }
 
-export default Grid
+export default CorFormGrid

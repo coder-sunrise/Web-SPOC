@@ -3,19 +3,19 @@ import React from 'react'
 import { withStyles } from '@material-ui/core'
 // common components
 import { CardContainer } from '@/components'
-import FormListingDetails from './FormListingDetails'
+import FormListingDetails from '@/pages/FormListing/FormListingDetails'
 import { FORM_FROM } from '@/utils/constants'
 
 const styles = (theme) => ({})
 
-class FormListing extends React.Component {
+class VisitForms extends React.Component {
   render () {
     return (
       <CardContainer hideHeader>
-        <FormListingDetails formFrom={FORM_FROM.FORMMODULE} />
+        <FormListingDetails formFrom={FORM_FROM.QUEUELOG} />
       </CardContainer>
     )
   }
 }
 
-export default withStyles(styles, { withTheme: true })(FormListing)
+export default withStyles(styles, { withTheme: true })(VisitForms)
