@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   CardContainer,
   CodeSelect,
@@ -8,10 +8,86 @@ import {
   GridItem,
   TextField,
   DatePicker,
+  Select,
+  Field,
 } from '@/components'
 import NumberInput from '@/components/NumberInput'
 
-export default ({ setFieldValue, classes, current, fieldName = '' }) => {
+export default ({ setFieldValue, values, codetable, setShowMessage }) => {
+  console.log('values', values)
+  const { ctcasedescription = [], ctcasetype = [] } = codetable
+  const [
+    selectCaseTypeFK,
+    setSelectCaseTypeFK,
+  ] = useState(() => undefined)
+
+  useEffect(() => {
+    const {
+      caseTypeFK,
+      caseTypeDisplayValue,
+      caseDescriptionFK,
+      caseDescriptionDisplayValue,
+    } = values
+    if (caseDescriptionFK) {
+      let caseDescription = ctcasedescription.find(
+        (o) => o.id === caseDescriptionFK,
+      )
+      if (caseDescription.displayValue !== caseDescriptionDisplayValue) {
+        setShowMessage(true)
+        setFieldValue('caseDescriptionDisplayValue', caseDescription.name)
+      }
+      let caseType = ctcasetype.find((o) => o.id === caseDescription.caseTypeFK)
+      if (!caseTypeFK || caseTypeFK !== caseDescription.caseTypeFK) {
+        setShowMessage(true)
+        setSelectCaseTypeFK(caseType.id)
+        setFieldValue('caseTypeFK', caseType.id)
+        setFieldValue('caseTypeCode', caseType.code)
+        setFieldValue('caseTypeDisplayValue', caseType.name)
+      } else if (caseTypeFK && caseTypeFK === caseDescription.caseTypeFK) {
+        if (caseType.name !== caseTypeDisplayValue) {
+          setShowMessage(true)
+          setFieldValue('caseTypeDisplayValue', caseType.name)
+        }
+        setSelectCaseTypeFK(caseTypeFK)
+      }
+    } else if (caseTypeFK) {
+      let caseType = ctcasetype.find((o) => o.id === caseTypeFK)
+      if (caseType.name !== caseTypeDisplayValue) {
+        setShowMessage(true)
+        setFieldValue('caseTypeDisplayValue', caseType.name)
+      }
+      setSelectCaseTypeFK(caseTypeFK)
+    }
+  }, [])
+
+  const caseTypeChange = (v, option) => {
+    setSelectCaseTypeFK(option ? option.id : undefined)
+    setFieldValue('caseTypeCode', option ? option.code : undefined)
+    setFieldValue('caseTypeDisplayValue', option ? option.name : undefined)
+    if (v) {
+      setFieldValue('caseDescriptionFK', undefined)
+      setFieldValue('caseDescriptionCode', undefined)
+      setFieldValue('caseDescriptionDisplayValue', undefined)
+    }
+  }
+
+  const caseDescriptionChange = (v, option) => {
+    setFieldValue('caseDescriptionCode', option ? option.code : undefined)
+    setFieldValue(
+      'caseDescriptionDisplayValue',
+      option ? option.displayValue : undefined,
+    )
+    if (option && !selectCaseTypeFK) {
+      let caseType = ctcasetype.find((o) => o.id === option.caseTypeFK)
+      if (caseType) {
+        setSelectCaseTypeFK(caseType.id)
+        setFieldValue('caseTypeFK', caseType.id)
+        setFieldValue('caseTypeCode', caseType.code)
+        setFieldValue('caseTypeDisplayValue', caseType.name)
+      }
+    }
+  }
+
   return (
     <CardContainer hideHeader size='sm' style={{ margin: 0 }}>
       <GridContainer>
@@ -71,13 +147,14 @@ export default ({ setFieldValue, classes, current, fieldName = '' }) => {
         <GridItem md={2} />
         <GridItem md={4}>
           <FastField
-            name='caseTypeDisplayValue'
+            name='caseTypeFK'
             render={(args) => (
               <CodeSelect
                 label='Case Type'
-                valueField='DisplayValue'
+                valueField='id'
                 {...args}
                 code='CTCaseType'
+                onChange={caseTypeChange}
               />
             )}
           />
@@ -98,13 +175,18 @@ export default ({ setFieldValue, classes, current, fieldName = '' }) => {
         </GridItem>
         <GridItem md={2} />
         <GridItem md={4}>
-          <FastField
+          <Field
             name='caseDescriptionFK'
             render={(args) => (
-              <CodeSelect
+              <Select
                 label='Case Description'
+                labelField='displayValue'
+                valueField='id'
+                options={ctcasedescription.filter(
+                  (o) => !selectCaseTypeFK || o.caseTypeFK === selectCaseTypeFK,
+                )}
+                onChange={caseDescriptionChange}
                 {...args}
-                code='CTCaseDescription'
               />
             )}
           />

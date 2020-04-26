@@ -6,8 +6,7 @@ export const WIDGETS_ID = {
   LAB_RESULTS: 2,
 }
 
-
-export const widgets = (props) => [
+export const widgets = (props, setShowMessage) => [
   {
     id: WIDGETS_ID.LAB_TRACKING_DETAILS,
     name: 'Lab Tracking Details',
@@ -15,7 +14,14 @@ export const widgets = (props) => [
       loader: () => import('./LabDetails'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='LabDetails' />
+        return (
+          <Cmpnet
+            {...props}
+            {...p}
+            setShowMessage={setShowMessage}
+            fieldName='LabDetails'
+          />
+        )
       },
       loading: Loading,
     }),
