@@ -1,29 +1,22 @@
-import React, { Component, PureComponent, useCallback, useState } from 'react'
-import { connect } from 'dva'
+import React, { PureComponent, useCallback, useState } from 'react'
 import { primaryColor } from 'mui-pro-jss'
 import color from 'color'
-import { FastField } from 'formik'
 import withStyles from '@material-ui/core/styles/withStyles'
 import { Tooltip } from '@material-ui/core'
 import { Delete, Edit, Print, Add } from '@material-ui/icons'
 import { formTypes, formStatus } from '@/utils/codes'
-import { download } from '@/utils/request'
-import { commonDataReaderTransform } from '@/utils/utils'
-import Yup from '@/utils/yup'
-import VoidWithPopover from '../FormDetail/VoidWithPopover'
-import AddForm from '../FormDetail/AddForm'
+import VoidWithPopover from './FormDetail/VoidWithPopover'
 
 import {
   CommonTableGrid,
   Button,
-  CommonModal,
   Popconfirm,
-  notification,
   ProgressButton,
   AuthorizedContext,
   TextField,
   Danger,
   Popover,
+  Checkbox,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -55,130 +48,14 @@ const styles = (theme) => ({
     overflowY: 'auto',
   },
 })
-export const printRow = async (row, props) => {
-  const type = formTypes.find(
-    (o) => o.value === row.type || o.name === row.type || o.code === row.type,
-  )
-  const { downloadConfig } = type
-  if (!downloadConfig) {
-    notification.error({ message: 'No configuration found' })
-    return
-  }
-  // return
-  if (row.id) {
-    download(
-      `/api/Reports/${downloadConfig.id}?ReportFormat=pdf&ReportParameters={${downloadConfig.key}:${row.id}}`,
-      {
-        subject: row.subject,
-        type: 'pdf',
-      },
-    )
-  } else {
-    const { codetable, patient } = props
-    const { clinicianprofile = [] } = codetable
-    const { entity } = patient
-    const obj =
-      clinicianprofile.find(
-        (o) =>
-          o.userProfileFK ===
-          (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
-      ) || {}
 
-    row.doctorName = (obj.title ? `${obj.title} ` : '') + obj.name
-    row.doctorMCRNo = obj.doctorProfile.doctorMCRNo
-
-    row.patientName = entity.name
-    row.patientAccountNo = entity.patientAccountNo
-
-    download(
-      `/api/Reports/${downloadConfig.id}?ReportFormat=pdf`,
-      {
-        subject: row.subject,
-        type: 'pdf',
-      },
-      {
-        method: 'POST',
-        contentType: 'application/x-www-form-urlencoded',
-        data: {
-          reportContent: JSON.stringify(
-            commonDataReaderTransform(downloadConfig.draft(row)),
-          ),
-        },
-      },
-    )
-  }
-}
-
-export const viewReport = (row, props, useID = false) => {
-  const type = formTypes.find(
-    (o) => o.value === row.type || o.name === row.type || o.code === row.type,
-  )
-  const { downloadConfig } = type
-  if (!downloadConfig) {
-    notification.error({ message: 'No configuration found' })
-    return false
-  }
-  if (row.id && useID) {
-    window.g_app._store.dispatch({
-      type: 'report/updateState',
-      payload: {
-        reportTypeID: downloadConfig.id,
-        reportParameters: {
-          [downloadConfig.key]: row.id,
-          isSaved: true,
-        },
-      },
-    })
-  } else {
-    const { codetable, patient } = props
-    const { clinicianprofile = [] } = codetable
-    const { entity } = patient
-    const obj =
-      clinicianprofile.find(
-        (o) =>
-          o.userProfileFK ===
-          (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
-      ) || {}
-
-    const reportParameters = { ...row }
-    const { subject } = row
-    reportParameters.doctorName = (obj.title ? `${obj.title} ` : '') + obj.name
-    reportParameters.doctorMCRNo = obj.doctorProfile
-      ? obj.doctorProfile.doctorMCRNo
-      : ''
-
-    reportParameters.patientName = entity.name
-    reportParameters.patientAccountNo = entity.patientAccountNo
-    window.g_app._store.dispatch({
-      type: 'report/updateState',
-      payload: {
-        reportTypeID: downloadConfig.id,
-        reportParameters: {
-          isSaved: false,
-          reportContent: JSON.stringify(
-            commonDataReaderTransform(downloadConfig.draft(reportParameters)),
-          ),
-        },
-      },
-    })
-  }
-
-  return true
-}
-
-@connect(({ formListing, codetable, patient, consultation }) => ({
-  formListing,
-  codetable,
-  patient,
-  consultation,
-}))
 class VisitFormGrid extends PureComponent {
   constructor (props) {
     super(props)
-    const { dispatch, formListing } = props
-
+    const { dispatch } = props
     this.state = {
       openFormType: false,
+      includeVoidForms: false,
     }
 
     dispatch({
@@ -187,45 +64,6 @@ class VisitFormGrid extends PureComponent {
         code: 'clinicianprofile',
       },
     })
-
-    dispatch({
-      type: 'formListing/query',
-      payload: {
-        apiCriteria: {
-          visitID: formListing.visitID,
-          formCategory: props.formCategory,
-        },
-      },
-    })
-  }
-
-  toggleModal = () => {
-    const { formListing } = this.props
-    const { showModal } = formListing
-    this.props.dispatch({
-      type: 'formListing/updateState',
-      payload: {
-        showModal: !showModal,
-      },
-    })
-  }
-
-  editRow = (row) => {
-    if (row.statusFK === 3 || row.statusFK === 4) return
-    this.props.dispatch({
-      type: 'formListing/updateState',
-      payload: {
-        entity: row,
-        type: row.type,
-      },
-    })
-    this.toggleModal()
-  }
-
-  handleViewReport = (uid) => {
-    const { formListing } = this.props
-    const { list } = formListing
-    viewReport(list.find((item) => item.uid === uid), this.props)
   }
 
   toggleVisibleChange = () =>
@@ -261,6 +99,10 @@ class VisitFormGrid extends PureComponent {
             voidReason: reason,
             statusFK: 4,
           },
+        }).then(() => {
+          dispatch({
+            type: 'formListing/query',
+          })
         })
       }
     })
@@ -296,16 +138,33 @@ class VisitFormGrid extends PureComponent {
 
   render () {
     const { formListing, dispatch, theme, classes, setFieldValue } = this.props
-    const { showModal } = formListing
     const { list } = formListing
     return (
       <div>
+        <Checkbox
+          label='Include void forms'
+          value={this.state.includeVoidForms}
+          onChange={() => {
+            this.setState((ps) => {
+              return {
+                ...ps,
+                includeVoidForms: !ps.includeVoidForms,
+              }
+            })
+          }}
+        />
         <CommonTableGrid
           getRowId={(r) => r.uid}
           size='sm'
           style={{ margin: 0 }}
-          rows={list}
-          onRowDoubleClick={this.editRow}
+          rows={
+            this.state.includeVoidForms ? (
+              list
+            ) : (
+              list.filter((o) => o.statusFK !== 4)
+            )
+          }
+          onRowDoubleClick={this.props.editRow}
           columns={[
             { name: 'typeName', title: 'Type' },
             { name: 'updateByUser', title: 'Last Update By' },
@@ -319,7 +178,7 @@ class VisitFormGrid extends PureComponent {
               type: 'link',
               linkField: 'href',
               onClick: (row) => {
-                this.handleViewReport(row.uid)
+                this.viewReport(row)
               },
             },
             {
@@ -340,7 +199,7 @@ class VisitFormGrid extends PureComponent {
                       <Button
                         size='sm'
                         onClick={() => {
-                          printRow(row, this.props)
+                          this.props.printRow(row)
                         }}
                         justIcon
                         color='primary'
@@ -354,7 +213,7 @@ class VisitFormGrid extends PureComponent {
                         <Button
                           size='sm'
                           onClick={() => {
-                            this.editRow(row)
+                            this.props.editRow(row)
                           }}
                           justIcon
                           color='primary'
@@ -373,6 +232,10 @@ class VisitFormGrid extends PureComponent {
                               ...row,
                               isDeleted: true,
                             },
+                          }).then(() => {
+                            dispatch({
+                              type: 'formListing/query',
+                            })
                           })}
                       >
                         <Tooltip title='Delete'>
@@ -422,6 +285,7 @@ class VisitFormGrid extends PureComponent {
                                   showModal: true,
                                   type: item.value,
                                   entity: undefined,
+                                  formCategory: this.props.formCategory,
                                 },
                               })
                               this.toggleVisibleChange()
@@ -449,17 +313,6 @@ class VisitFormGrid extends PureComponent {
             )
           }}
         </AuthorizedContext>
-        <CommonModal
-          open={showModal}
-          title='Add Form'
-          onClose={this.toggleModal}
-          onConfirm={this.toggleModal}
-          observe='AddForm'
-          maxWidth='md'
-          bodyNoPadding
-        >
-          <AddForm {...this.props} types={formTypes} />
-        </CommonModal>
       </div>
     )
   }

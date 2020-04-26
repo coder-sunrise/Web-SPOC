@@ -13,7 +13,7 @@ export default createFormViewModel({
       defaultLCForm: {
         type: '1',
         typeName: 'Letter of Certification',
-        statusFK: 3,
+        statusFK: 1,
         visitDate: moment(),
       },
       default: {},

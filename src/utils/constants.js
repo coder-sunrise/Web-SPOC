@@ -378,3 +378,8 @@ export const FORM_FROM = {
   FORMMODULE: 1,
   QUEUELOG: 2,
 }
+
+export const FORM_CATEGORY = {
+  VISITFORM: 1,
+  CORFORM: 2,
+}

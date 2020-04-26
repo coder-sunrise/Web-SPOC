@@ -35,9 +35,9 @@ import { getAppendUrl, getRemovedUrl } from '@/utils/utils'
 import { SendNotification } from '@/utils/notification'
 import Authorized from '@/utils/Authorized'
 import { QueueDashboardButton } from '@/components/_medisys'
-import { VALUE_KEYS } from '@/utils/constants'
+import { VALUE_KEYS, FORM_CATEGORY } from '@/utils/constants'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { initRoomAssignment } from '@/utils/codes'
-import { VISIT_STATUS, FORM_CATEGORY } from '@/pages/Reception/Queue/variables'
 import VisitForms from './VisitForms'
 
 const drawerWidth = 400
@@ -436,10 +436,9 @@ class Queue extends React.Component {
 
   resetFormsResult = () => {
     this.props.dispatch({
-      type: 'forms/updateState',
+      type: 'formListing/updateState',
       payload: {
         list: [],
-        dataType: undefined,
       },
     })
   }
@@ -593,7 +592,13 @@ class Queue extends React.Component {
             </CommonModal>
             <CommonModal
               open={showForms}
-              title={formatMessage({ id: 'reception.queue.forms' })}
+              title={
+                this.state.formCategory === FORM_CATEGORY.VisitForms ? (
+                  'Visit Forms'
+                ) : (
+                  'Forms'
+                )
+              }
               onClose={this.toggleForms}
               onConfirm={this.toggleForms}
               maxWidth='md'

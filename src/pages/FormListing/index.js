@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core'
 // common components
 import { CardContainer } from '@/components'
 import FormListingDetails from './FormListingDetails'
-import { FORM_FROM } from '@/utils/constants'
+import { FORM_FROM, FORM_CATEGORY } from '@/utils/constants'
 
 const styles = (theme) => ({})
 
@@ -12,7 +12,10 @@ class FormListing extends React.Component {
   render () {
     return (
       <CardContainer hideHeader>
-        <FormListingDetails formFrom={FORM_FROM.FORMMODULE} />
+        <FormListingDetails
+          formFrom={FORM_FROM.FORMMODULE}
+          formCategory={FORM_CATEGORY.CORFORM}
+        />
       </CardContainer>
     )
   }

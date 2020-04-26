@@ -1,8 +1,7 @@
-import React, { Component, PureComponent, useCallback, useState } from 'react'
+import React, { PureComponent, useCallback, useState } from 'react'
 import { connect } from 'dva'
 import { primaryColor } from 'mui-pro-jss'
 import color from 'color'
-import { FastField } from 'formik'
 import withStyles from '@material-ui/core/styles/withStyles'
 import { Tooltip } from '@material-ui/core'
 import { Delete, Edit, Print, Add } from '@material-ui/icons'
@@ -24,6 +23,7 @@ import {
   TextField,
   Danger,
   Popover,
+  Checkbox,
 } from '@/components'
 import AddForm from './AddForm'
 
@@ -184,7 +184,7 @@ export const viewReport = (row, props, useID = false) => {
   validationSchema: Yup.object().shape({}),
 
   handleSubmit: (values, { props }) => {
-    const { dispatch, onSave } = props
+    const { onSave } = props
     if (onSave) onSave(values)
   },
   displayName: 'Forms',
@@ -196,6 +196,7 @@ class Forms extends PureComponent {
 
     this.state = {
       openFormType: false,
+      includeVoidForms: false,
     }
 
     dispatch({
@@ -238,6 +239,7 @@ class Forms extends PureComponent {
   toggleVisibleChange = () =>
     this.setState((ps) => {
       return {
+        ...ps,
         openFormType: !ps.openFormType,
       }
     })
@@ -304,14 +306,33 @@ class Forms extends PureComponent {
   render () {
     const { forms, dispatch, theme, classes, setFieldValue } = this.props
     const { showModal } = forms
-    const { rows } = forms
+    const { rows = [] } = forms
     return (
       <div>
+        <Checkbox
+          style={{ marginLeft: 10 }}
+          label='Include void forms'
+          value={this.state.includeVoidForms}
+          onChange={() => {
+            this.setState((ps) => {
+              return {
+                ...ps,
+                includeVoidForms: !ps.includeVoidForms,
+              }
+            })
+          }}
+        />
         <CommonTableGrid
           getRowId={(r) => r.uid}
           size='sm'
           style={{ margin: 0 }}
-          rows={rows}
+          rows={
+            this.state.includeVoidForms ? (
+              rows
+            ) : (
+              rows.filter((o) => o.statusFK !== 4)
+            )
+          }
           onRowDoubleClick={this.editRow}
           columns={[
             { name: 'typeName', title: 'Type' },

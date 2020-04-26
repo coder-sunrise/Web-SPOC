@@ -1,4 +1,5 @@
 import { createListViewModel } from 'medisys-model'
+import moment from 'moment'
 import * as service from '../services'
 
 export default createListViewModel({
@@ -9,6 +10,12 @@ export default createListViewModel({
   param: {
     service,
     state: {
+      defaultLCForm: {
+        type: '1',
+        typeName: 'Letter of Certification',
+        statusFK: 1,
+        visitDate: moment(),
+      },
       default: {},
       showModal: false,
       list: [
@@ -34,7 +41,6 @@ export default createListViewModel({
     reducers: {
       queryDone (st, { payload }) {
         const { data } = payload
-
         return {
           ...st,
           list: data.data.map((o) => {

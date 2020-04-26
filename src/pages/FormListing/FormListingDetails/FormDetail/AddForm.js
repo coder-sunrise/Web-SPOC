@@ -4,7 +4,7 @@ import withStyles from '@material-ui/core/styles/withStyles'
 import _ from 'lodash'
 
 import { SizeContainer } from '@/components'
-import LCForm from './LCForm'
+import LCForm from './LCForm/index'
 
 const styles = (theme) => ({
   editor: {

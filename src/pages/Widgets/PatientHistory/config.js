@@ -195,4 +195,17 @@ export const widgets = (props) => [
       loading: Loading,
     }),
   },
+  {
+    id: '14',
+    name: 'Forms',
+    authority: 'queue.consultation.widgets.order',
+    component: Loadable({
+      loader: () => import('./Forms'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} />
+      },
+      loading: Loading,
+    }),
+  },
 ]

@@ -12,7 +12,10 @@ class VisitForms extends React.Component {
   render () {
     return (
       <CardContainer hideHeader>
-        <FormListingDetails formFrom={FORM_FROM.QUEUELOG} />
+        <FormListingDetails
+          formFrom={FORM_FROM.QUEUELOG}
+          formCategory={this.props.formCategory}
+        />
       </CardContainer>
     )
   }

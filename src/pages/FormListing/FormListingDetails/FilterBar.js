@@ -6,11 +6,13 @@ import Search from '@material-ui/icons/Search'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 import Authorized from '@/utils/Authorized'
+import { formTypes, formStatus } from '@/utils/codes'
 import {
   GridContainer,
   GridItem,
   TextField,
   ProgressButton,
+  Select,
 } from '@/components'
 import { FilterBarDate } from '@/components/_medisys'
 
@@ -59,13 +61,32 @@ class FilterBar extends PureComponent {
               />
             </GridItem>
           </Authorized>
+          <GridItem xs={6} md={2}>
+            <FastField
+              name='statusFK'
+              render={(args) => {
+                return <Select label='Status' options={formStatus} {...args} />
+              }}
+            />
+          </GridItem>
+          <GridItem xs={6} md={2}>
+            <FastField
+              name='formTypeFK'
+              render={(args) => {
+                return (
+                  <Select label='Form Type' options={formTypes} {...args} />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem md={12} />
           <GridItem md={2}>
             <Field
               name='formSearchStartDate'
               render={(args) => (
                 <FilterBarDate
                   args={args}
-                  label='Transaction Date From'
+                  label='From'
                   formValues={{
                     startDate: formSearchStartDate,
                     endDate: formSearchEndDate,
@@ -81,7 +102,7 @@ class FilterBar extends PureComponent {
                 <FilterBarDate
                   isEndDate
                   args={args}
-                  label='Transaction Date To'
+                  label='To'
                   formValues={{
                     startDate: formSearchStartDate,
                     endDate: formSearchEndDate,
@@ -99,7 +120,11 @@ class FilterBar extends PureComponent {
                   color='primary'
                   icon={<Search />}
                   onClick={() => {
-                    const { patientSearchValue } = this.props.values
+                    const {
+                      patientSearchValue,
+                      statusFK,
+                      formTypeFK,
+                    } = this.props.values
                     this.props.dispatch({
                       type: 'formListing/query',
                       payload: {
@@ -107,6 +132,8 @@ class FilterBar extends PureComponent {
                           searchValue: patientSearchValue,
                           startDate: formSearchStartDate,
                           endDate: formSearchEndDate,
+                          formTypeFK,
+                          statusFK,
                         },
                       },
                     })

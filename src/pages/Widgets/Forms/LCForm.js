@@ -11,6 +11,7 @@ import {
   withFormikExtend,
   FastField,
   ClinicianSelect,
+  Button,
 } from '@/components'
 
 @withFormikExtend({
@@ -27,9 +28,11 @@ import {
     to: Yup.string().required(),
     subject: Yup.string().required(),
   }),
-
-  handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, getNextSequence, user } = props
+  displayName: 'AddForm',
+})
+class LCForm extends PureComponent {
+  saveLCForm = () => {
+    const { dispatch, onConfirm, getNextSequence, user, values } = this.props
     const nextSequence = getNextSequence()
     dispatch({
       type: 'forms/upsertRow',
@@ -37,15 +40,38 @@ import {
         sequence: nextSequence,
         ...values,
         updateByUser: user.data.clinicianProfile.name,
+        statusFK: 2,
       },
+    }).then(() => {
+      if (onConfirm) onConfirm()
     })
-    if (onConfirm) onConfirm()
-  },
-  displayName: 'AddForm',
-})
-class LCForm extends PureComponent {
+  }
+
+  confirmLCForm = () => {
+    const { dispatch, onConfirm, getNextSequence, user, values } = this.props
+    const nextSequence = getNextSequence()
+    dispatch({
+      type: 'forms/upsertRow',
+      payload: {
+        sequence: nextSequence,
+        ...values,
+        updateByUser: user.data.clinicianProfile.name,
+        statusFK: 3,
+      },
+    }).then(() => {
+      if (onConfirm) onConfirm()
+    })
+  }
+
+  cancelLCForm = () => {
+    if (this.props.onClose) {
+      this.props.onClose()
+    }
+  }
+
   render () {
-    const { footer, handleSubmit } = this.props
+    const { values } = this.props
+    const { statusFK } = values
     return (
       <div>
         <GridContainer>
@@ -94,11 +120,29 @@ class LCForm extends PureComponent {
             />
           </GridItem>
         </GridContainer>
-        {footer &&
-          footer({
-            onConfirm: handleSubmit,
-            confirmBtnText: 'Save',
-          })}
+        <GridContainer
+          style={{
+            marginTop: 20,
+            marginBottom: 20,
+            display: 'flex',
+            justifyContent: 'flex-end',
+          }}
+        >
+          <Button color='danger' icon={null} onClick={this.cancelLCForm}>
+            cancel
+          </Button>
+          {statusFK === 1 && (
+            <Button color='primary' icon={null} onClick={this.saveLCForm}>
+              finalize
+            </Button>
+          )}
+
+          {(statusFK === 1 || statusFK === 2) && (
+            <Button color='success' icon={null} onClick={this.confirmLCForm}>
+              submit
+            </Button>
+          )}
+        </GridContainer>
       </div>
     )
   }
