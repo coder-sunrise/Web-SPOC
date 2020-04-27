@@ -48,6 +48,18 @@ class LabTrackingDetails extends PureComponent {
             }
           : undefined,
     }
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctcasedescription',
+      },
+    })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctcasetype',
+      },
+    })
 
     dispatch({
       type: 'labTrackingDetails/query',
