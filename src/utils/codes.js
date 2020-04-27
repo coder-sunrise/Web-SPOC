@@ -1019,6 +1019,11 @@ const corAttchementTypes = [
     name: 'Visual Acuity Test',
     accessRight: 'queue.consultation.widgets.eyevisualacuity',
   },
+  {
+    id: 5,
+    type: 'QueueDisplay',
+    name: 'Queue Display',
+  },
 ]
 
 const initRoomAssignment = async () => {
