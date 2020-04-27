@@ -40,6 +40,10 @@ const PatientLabLabelButton = ({
     if (labelPrinterSize === '8.9cmx3.6cm') {
       reportID = REPORT_ID.PATIENT_LAB_LABEL_89MM_36MM
     }
+    else if (labelPrinterSize === '7.6cmx3.8cm') {
+        reportID = REPORT_ID.PATIENT_LAB_LABEL_76MM_38MM
+    }
+
     const data = await getRawData(reportID, { patientId })
     const payload = [
       {
@@ -61,6 +65,9 @@ const PatientLabLabelButton = ({
 
     if (labelPrinterSize === '8.9cmx3.6cm') {
       reportID = REPORT_ID.PATIENT_LABEL_89MM_36MM
+    }
+    else if (labelPrinterSize === '7.6cmx3.8cm') {
+        reportID = REPORT_ID.PATIENT_LAB_LABEL_76MM_38MM
     }
 
     if (!Number.isInteger(ptnLabelCopyNo)) return
