@@ -672,6 +672,7 @@ class Index extends Component {
                 <ProgressButton
                   color='success'
                   icon={null}
+                  authority='none'
                   onClick={() =>
                     this.onSubmitButtonClicked(poSubmitAction.COMPLETE)}
                   disabled={!isPOStatusFulfilled(poStatus)}
