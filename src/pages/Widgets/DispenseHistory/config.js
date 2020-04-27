@@ -13,7 +13,7 @@ export const widgets = (props) => [
   {
     id: WIDGETS_ID.MEDICATION,
     name: 'Medication',
-    authority: 'patientdatabase.patientprofiledetails.patienthistory.dispensehistory.medication',
+    authority: undefined,
     component: Loadable({
       loader: () => import('./Medication'),
       render: (loaded, p) => {
@@ -26,7 +26,7 @@ export const widgets = (props) => [
   {
     id: WIDGETS_ID.CONSUMABLE,
     name: 'Consumable',
-    authority: 'patientdatabase.patientprofiledetails.patienthistory.dispensehistory.consumable',
+    authority: undefined,
     component: Loadable({
       loader: () => import('./Consumable'),
       render: (loaded, p) => {
@@ -39,7 +39,8 @@ export const widgets = (props) => [
   {
     id: WIDGETS_ID.VACCINATION,
     name: 'Vaccination',
-    authority: 'patientdatabase.patientprofiledetails.patienthistory.dispensehistory.vaccination',
+    authority:
+      'patientdatabase.patientprofiledetails.patienthistory.dispensehistory.vaccination',
     component: Loadable({
       loader: () => import('./Vaccination'),
       render: (loaded, p) => {
@@ -52,8 +53,9 @@ export const widgets = (props) => [
   {
     id: WIDGETS_ID.SERVICE,
     name: 'Service',
-    authority: 'patientdatabase.patientprofiledetails.patienthistory.dispensehistory.service',
-      component: Loadable({
+    authority:
+      'patientdatabase.patientprofiledetails.patienthistory.dispensehistory.service',
+    component: Loadable({
       loader: () => import('./Service'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
@@ -65,7 +67,8 @@ export const widgets = (props) => [
   {
     id: WIDGETS_ID.TREATMENT,
     name: 'Treatment',
-    authority: 'patientdatabase.patientprofiledetails.patienthistory.dispensehistory.treatment',
+    authority:
+      'patientdatabase.patientprofiledetails.patienthistory.dispensehistory.treatment',
     component: Loadable({
       loader: () => import('./Treatment'),
       render: (loaded, p) => {

@@ -121,7 +121,7 @@ export const formikMapPropsToValues = ({
         )
         if (defaultDoctor.clinicianProfile.roomAssignment) {
           roomAssignmentFK =
-            doctorProfile.clinicianProfile.roomAssignment.roomFK
+            defaultDoctor.clinicianProfile.roomAssignment.roomFK
         }
       }
     }
