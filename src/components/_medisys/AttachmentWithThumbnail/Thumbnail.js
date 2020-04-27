@@ -111,6 +111,7 @@ const Thumbnail = ({
   noBorder = true,
   fieldName,
   size = { width: 64, height: 64 },
+  hideRemarks,
 }) => {
   const {
     fileIndexFK,
@@ -273,21 +274,23 @@ const Thumbnail = ({
               />
             </div>
           </GridItem>
-          <GridItem md={12}>
-            <SizeContainer size='sm'>
-              <FastField
-                name={`${fieldName}[${indexInAllAttachments}].remarks`}
-                render={(args) => (
-                  <TextField
-                    {...args}
-                    size='sm'
-                    label='Remarks'
-                    disabled={isReadOnly}
-                  />
-                )}
-              />
-            </SizeContainer>
-          </GridItem>
+          {!hideRemarks && (
+            <GridItem md={12}>
+              <SizeContainer size='sm'>
+                <FastField
+                  name={`${fieldName}[${indexInAllAttachments}].remarks`}
+                  render={(args) => (
+                    <TextField
+                      {...args}
+                      size='sm'
+                      label='Remarks'
+                      disabled={isReadOnly}
+                    />
+                  )}
+                />
+              </SizeContainer>
+            </GridItem>
+          )}
         </GridContainer>
       </LoadingWrapper>
     </div>

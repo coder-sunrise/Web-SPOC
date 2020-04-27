@@ -60,6 +60,7 @@ const AttachmentWithThumbnail = ({
   fileCategory,
   withDropDown,
   handleSelectedAttachmentType,
+  hideRemarks = false,
 }) => {
   const [
     showPopper,
@@ -367,6 +368,7 @@ const AttachmentWithThumbnail = ({
     onClickAttachment: onClick,
     noBorder: simple && !allowedMultiple,
     fieldName,
+    hideRemarks,
   }
 
   let Body =

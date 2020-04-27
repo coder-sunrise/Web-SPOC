@@ -64,6 +64,7 @@ const styles = (theme) => ({
         } = image
         return {
           ...restImageValues,
+          fileIndexFK: restImageValues.id,
           thumbnailIndexFK: thumbnailIndexFK || thumbnail.id,
         }
       })
@@ -164,7 +165,8 @@ class QueueDisplaySetup extends PureComponent {
             <GridItem md={10}>
               <AttachmentWithThumbnail
                 label='Image: (maximum 5)'
-                attachmentType='Visit'
+                attachmentType='QueueDisplay'
+                hideRemarks
                 handleUpdateAttachments={this.handleUpdateAttachments}
                 attachments={activeImages}
                 disableUpload={activeImages.length >= 5}
