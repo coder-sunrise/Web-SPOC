@@ -14,7 +14,7 @@ class PatientParticulars extends PureComponent {
     const { values, setFieldValue } = this.props
     const { admittingSpecialtyFK } = values
     return (
-      <GridContainer hideHeader>
+      <GridContainer>
         <GridItem xs={4}>
           <FastField
             name='patientName'

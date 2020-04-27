@@ -97,45 +97,55 @@ class LCForm extends PureComponent {
   }
 
   render () {
-    const { values, formCategory } = this.props
+    const { values, formCategory, height } = this.props
     const { statusFK } = values
     return (
       <div>
-        <div>
-          <h5>A - PATIENT PARTICULARS</h5>
-          <CardContainer hideHeader>
-            <PatientParticulars {...this.props} />
-          </CardContainer>
-        </div>
-        <div>
-          <h5>B - DIAGNOSIS (In Order of Priority)</h5>
-          <CardContainer hideHeader>
-            <Diagnosis {...this.props} />
-          </CardContainer>
-        </div>
-        <div>
-          <h5>
-            C - PROCEDURE - SPECIFIC CHARGES TO BE REIMBURSED TO THE SURGEON(S)
-          </h5>
-          <CardContainer hideHeader>
-            <Procedures {...this.props} />
-          </CardContainer>
-        </div>
-        <div>
-          <h5>D – CERTIFICATION</h5>
-          <CardContainer hideHeader>
-            <Certification {...this.props} />
-          </CardContainer>
-        </div>
-        <div>
-          <h5>
-            E - DOCTORS' NON-SURGICAL AND TREATMENT-RELATED CHARGES TO BE
-            REIMBURSED
-          </h5>
-          <CardContainer hideHeader>
-            {' '}
-            <NonSurgical {...this.props} />{' '}
-          </CardContainer>
+        <div
+          style={{
+            overflow: 'auto',
+            height: height - 200,
+            paddingLeft: 5,
+            paddingRight: 5,
+          }}
+        >
+          <div>
+            <h5>A - PATIENT PARTICULARS</h5>
+            <CardContainer hideHeader>
+              <PatientParticulars {...this.props} />
+            </CardContainer>
+          </div>
+          <div>
+            <h5>B - DIAGNOSIS (In Order of Priority)</h5>
+            <CardContainer hideHeader>
+              <Diagnosis {...this.props} />
+            </CardContainer>
+          </div>
+          <div>
+            <h5>
+              C - PROCEDURE - SPECIFIC CHARGES TO BE REIMBURSED TO THE
+              SURGEON(S)
+            </h5>
+            <CardContainer hideHeader>
+              <Procedures {...this.props} />
+            </CardContainer>
+          </div>
+          <div>
+            <h5>D – CERTIFICATION</h5>
+            <CardContainer hideHeader>
+              <Certification {...this.props} />
+            </CardContainer>
+          </div>
+          <div>
+            <h5>
+              E - DOCTORS' NON-SURGICAL AND TREATMENT-RELATED CHARGES TO BE
+              REIMBURSED
+            </h5>
+            <CardContainer hideHeader>
+              {' '}
+              <NonSurgical {...this.props} />{' '}
+            </CardContainer>
+          </div>
         </div>
         <GridContainer
           style={{
