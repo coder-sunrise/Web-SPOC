@@ -53,8 +53,7 @@ export const widgets = (props) => [
   {
     id: WIDGETS_ID.SERVICE,
     name: 'Service',
-    authority:
-      'patientdatabase.patientprofiledetails.patienthistory.dispensehistory.service',
+    authority: undefined,
     component: Loadable({
       loader: () => import('./Service'),
       render: (loaded, p) => {
