@@ -17,6 +17,13 @@ export const endSession = async (sessionID) => {
   return response
 }
 
+export const reopenLastSession = async () => {
+  const response = await request('/api/bizsession/reopenlastsession', {
+    method: 'POST',
+  })
+  return response
+}
+
 export const getBizSession = (params) =>
   commonServices.queryList(bizSessionAPIURL, params)
 

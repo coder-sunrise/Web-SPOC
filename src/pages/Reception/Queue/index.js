@@ -294,6 +294,13 @@ class Queue extends React.Component {
     })
   }
 
+  onReopenLastSession = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: `${modelKey}reopenLastSession`,
+    })
+  }
+
   onEndSessionClick = () => {
     const { dispatch, queueLog } = this.props
     const { sessionInfo } = queueLog
@@ -501,6 +508,7 @@ class Queue extends React.Component {
             {isClinicSessionClosed ? (
               <EmptySession
                 handleStartSession={this.onStartSession}
+                handleReopenLastSession={this.onReopenLastSession}
                 sessionInfo={sessionInfo}
                 loading={loading}
                 errorState={error}
