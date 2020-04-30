@@ -29,7 +29,9 @@ class Grid extends PureComponent {
   }
 
   editRow = (row, e) => {
-    const accessRight = Authorized.check('copayer.copayerdetails')
+    const { dispatch, settingCompany, route } = this.props
+    const { name } = route
+    const accessRight = name === 'copayer' ? Authorized.check('copayer.copayerdetails') : Authorized.check('settings.supplier.supplierdetails')
 
     if (accessRight && accessRight.rights !== 'enable') {
       notification.error({
@@ -37,7 +39,6 @@ class Grid extends PureComponent {
       })
       return
     }
-    const { dispatch, settingCompany } = this.props
 
     const { list } = settingCompany
 
@@ -59,7 +60,7 @@ class Grid extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingCompany, route } = this.props
     const { name } = route
     const { companyType } = settingCompany
@@ -99,28 +100,28 @@ class Grid extends PureComponent {
                 { name: 'action', title: 'Action' },
               ]
             ) : (
-              [
-                {
-                  name: 'code',
-                  title: 'Company Code',
-                },
+                [
+                  {
+                    name: 'code',
+                    title: 'Company Code',
+                  },
 
-                {
-                  name: 'displayValue',
-                  title: 'Company Name',
-                },
+                  {
+                    name: 'displayValue',
+                    title: 'Company Name',
+                  },
 
-                { name: 'contactPerson', title: 'Contact Person' },
-                { name: 'contactNo', title: 'Contact No.' },
+                  { name: 'contactPerson', title: 'Contact Person' },
+                  { name: 'contactNo', title: 'Contact No.' },
 
-                { name: 'officeNum', title: 'Office Number' },
+                  { name: 'officeNum', title: 'Office Number' },
 
-                { name: 'faxNo', title: 'Fax Number' },
-                { name: 'isGSTEnabled', title: 'GST Enable' },
-                { name: 'isActive', title: 'Status' },
-                { name: 'action', title: 'Action' },
-              ]
-            )
+                  { name: 'faxNo', title: 'Fax Number' },
+                  { name: 'isGSTEnabled', title: 'GST Enable' },
+                  { name: 'isActive', title: 'Status' },
+                  { name: 'action', title: 'Action' },
+                ]
+              )
           }
           // FuncProps={{ pager: false }}
           columnExtensions={[
@@ -135,21 +136,21 @@ class Grid extends PureComponent {
                     target='_blank'
                     href={
                       row.contact &&
+                        row.contact.contactWebsite &&
+                        row.contact.contactWebsite.website !== '' ? (
+                          row.contact.contactWebsite.website
+                        ) : (
+                          '-'
+                        )
+                    }
+                  >
+                    {row.contact &&
                       row.contact.contactWebsite &&
                       row.contact.contactWebsite.website !== '' ? (
                         row.contact.contactWebsite.website
                       ) : (
                         '-'
-                      )
-                    }
-                  >
-                    {row.contact &&
-                    row.contact.contactWebsite &&
-                    row.contact.contactWebsite.website !== '' ? (
-                      row.contact.contactWebsite.website
-                    ) : (
-                      '-'
-                    )}
+                      )}
                   </a>
                 )
               },
@@ -166,12 +167,12 @@ class Grid extends PureComponent {
               render: (row) => (
                 <span>
                   {row.contact &&
-                  row.contact.officeContactNumber &&
-                  row.contact.officeContactNumber.number !== '' ? (
-                    row.contact.officeContactNumber.number
-                  ) : (
-                    '-'
-                  )}
+                    row.contact.officeContactNumber &&
+                    row.contact.officeContactNumber.number !== '' ? (
+                      row.contact.officeContactNumber.number
+                    ) : (
+                      '-'
+                    )}
                 </span>
               ),
             },
@@ -188,12 +189,12 @@ class Grid extends PureComponent {
               render: (row) => (
                 <span>
                   {row.contact &&
-                  row.contact.faxContactNumber &&
-                  row.contact.faxContactNumber.number !== '' ? (
-                    row.contact.faxContactNumber.number
-                  ) : (
-                    '-'
-                  )}
+                    row.contact.faxContactNumber &&
+                    row.contact.faxContactNumber.number !== '' ? (
+                      row.contact.faxContactNumber.number
+                    ) : (
+                      '-'
+                    )}
                 </span>
               ),
             },
@@ -209,12 +210,12 @@ class Grid extends PureComponent {
               render: (row) => (
                 <span>
                   {row.contact &&
-                  row.contact.mobileContactNumber &&
-                  row.contact.mobileContactNumber.number !== '' ? (
-                    row.contact.mobileContactNumber.number
-                  ) : (
-                    '-'
-                  )}
+                    row.contact.mobileContactNumber &&
+                    row.contact.mobileContactNumber.number !== '' ? (
+                      row.contact.mobileContactNumber.number
+                    ) : (
+                      '-'
+                    )}
                 </span>
               ),
             },
@@ -239,41 +240,66 @@ class Grid extends PureComponent {
               width: 100,
               render: (row) => {
                 return (
-                  <Authorized authority='copayer.copayerdetails'>
-                    <Fragment>
-                      <Tooltip
-                        title={
-                          companyType.id === 1 ? (
-                            'Edit Co-Payer'
-                          ) : (
-                            'Edit Supplier'
-                          )
-                        }
-                        placement='bottom'
-                      >
-                        <Button
-                          size='sm'
-                          onClick={() => {
-                            this.editRow(row)
-                          }}
-                          justIcon
-                          color='primary'
+                  name === 'copayer' ?
+                    <Authorized authority='copayer.copayerdetails'>
+                      <Fragment>
+                        <Tooltip
+                          title='Edit Co-Payer'
+                          placement='bottom'
                         >
-                          <Edit />
-                        </Button>
-                      </Tooltip>
-                      <Tooltip title='Print Copayer Label' placement='bottom'>
-                        <Button
-                          size='sm'
-                          justIcon
-                          color='primary'
-                          onClick={() => this.toggleReport(row.id)}
+                          <Button
+                            size='sm'
+                            onClick={() => {
+                              this.editRow(row)
+                            }}
+                            justIcon
+                            color='primary'
+                          >
+                            <Edit />
+                          </Button>
+                        </Tooltip>
+                        <Tooltip title='Print Copayer Label' placement='bottom'>
+                          <Button
+                            size='sm'
+                            justIcon
+                            color='primary'
+                            onClick={() => this.toggleReport(row.id)}
+                          >
+                            <Print />
+                          </Button>
+                        </Tooltip>
+                      </Fragment>
+                    </Authorized>
+                    :
+                    <Authorized authority='settings.supplier.supplierdetails'>
+                      <Fragment>
+                        <Tooltip
+                          title="Edit Supplier"
+                          placement='bottom'
                         >
-                          <Print />
-                        </Button>
-                      </Tooltip>
-                    </Fragment>
-                  </Authorized>
+                          <Button
+                            size='sm'
+                            onClick={() => {
+                              this.editRow(row)
+                            }}
+                            justIcon
+                            color='primary'
+                          >
+                            <Edit />
+                          </Button>
+                        </Tooltip>
+                        <Tooltip title='Print Supplier Label' placement='bottom'>
+                          <Button
+                            size='sm'
+                            justIcon
+                            color='primary'
+                            onClick={() => this.toggleReport(row.id)}
+                          >
+                            <Print />
+                          </Button>
+                        </Tooltip>
+                      </Fragment>
+                    </Authorized>
                 )
               },
             },
