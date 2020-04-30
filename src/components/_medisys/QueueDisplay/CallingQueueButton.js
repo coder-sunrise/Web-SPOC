@@ -3,49 +3,16 @@ import { withStyles } from '@material-ui/core'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import { isNumber } from 'util'
+import IconButton from '@material-ui/core/IconButton'
+import VolumeUp from '@material-ui/icons/VolumeUp'
 import { sendNotification } from '@/utils/realtime'
+
 import {
   NOTIFICATION_TYPE,
   NOTIFICATION_STATUS,
   VALUE_KEYS,
 } from '@/utils/constants'
-import { notification } from '@/components'
-
-const btnStyle = {
-  borderRadius: '50%',
-  width: 20,
-  padding: 10,
-  boxShadow: '0 3px 6px rgba(0, 0, 0, 0.6)',
-}
-
-const styles = () => ({
-  uncalledQueueStyle: {
-    background: '#4255bd',
-    cursor: 'pointer',
-
-    '&:hover': {
-      background: '#354497',
-    },
-    '&:disabled': {
-      cursor: 'not-allowed',
-      background: '#354497',
-      opacity: 0.5,
-    },
-  },
-  calledQueueStyle: {
-    background: '#cf1322',
-    cursor: 'pointer',
-
-    '&:hover': {
-      background: '#A60F1B',
-    },
-    '&:disabled': {
-      cursor: 'not-allowed',
-      background: '#A60F1B',
-      opacity: 0.5,
-    },
-  },
-})
+import { notification, Button } from '@/components'
 
 const CallingQueueButton = ({
   classes,
@@ -232,24 +199,22 @@ const CallingQueueButton = ({
     updateData(oriQCallList)
   }
 
-  const currentStyle = isCalled
-    ? classes.calledQueueStyle
-    : classes.uncalledQueueStyle
-
   return (
-    <button
+    <Button
       type='submit'
-      className={currentStyle}
+      round
+      color={isCalled ? 'danger' : 'primary'}
+      size='sm'
+      justIcon
       onClick={handleCallingQueue}
-      disabled={disable}
-      style={btnStyle}
-    />
+    >
+      <VolumeUp />
+    </Button>
   )
 }
 
 export default React.memo(
   compose(
-    withStyles(styles, { withTheme: true }),
     connect(
       ({ queueLog, queueCalling, settingRoomAssignment, codetable, user }) => ({
         qlist: queueLog.list,

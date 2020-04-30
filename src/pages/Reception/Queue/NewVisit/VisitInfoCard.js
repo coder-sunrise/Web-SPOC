@@ -62,9 +62,11 @@ const VisitInfoCard = ({
     return ''
   }
 
-  const getVisitOrderTemplateTotal = (template) => {
+  const getVisitOrderTemplateTotal = (vType, template) => {
     let activeItemTotal = 0
     visitOrderTemplateItemTypes.forEach((type) => {
+      // type.id === 3 means vaccination
+      if (vType === VISIT_TYPE.RETAIL && type.id === 3) return
       const currentTypeItems = template.visitOrderTemplateItemDtos.filter(
         (itemType) => itemType.inventoryItemTypeFK === type.id,
       )
@@ -84,7 +86,7 @@ const VisitInfoCard = ({
       const template = visitOrderTemplateOptions.find(
         (i) => i.id === values.visitOrderTemplateFK,
       )
-      totalTempCharge = getVisitOrderTemplateTotal(template)
+      totalTempCharge = getVisitOrderTemplateTotal(visitType, template)
     }
     if ((value || 0) > totalTempCharge) {
       return `Total Charges can not more than visit template total amount(${totalTempCharge}).`
@@ -95,6 +97,29 @@ const VisitInfoCard = ({
   const handleDoctorChange = (v, op) => {
     const { roomAssignment = {} } = op.clinicianProfile
     setFieldValue(FormField['visit.roomFK'], roomAssignment.roomFK)
+  }
+
+  const handleVisitOrderTemplateChange = (vType, opts) => {
+    if (opts) {
+      let activeItemTotal = getVisitOrderTemplateTotal(vType, opts)
+
+      setFieldValue(FormField['visit.VisitOrderTemplateTotal'], activeItemTotal)
+    } else {
+      setTimeout(() => {
+        setFieldValue(FormField['visit.VisitOrderTemplateTotal'], undefined)
+      }, 1)
+    }
+  }
+
+  const handleVisitTypeChange = (v, op) => {
+    const { values } = restProps
+    const template = visitOrderTemplateOptions.find(
+      (i) => i.id === values.visitOrderTemplateFK,
+    )
+    setFieldValue(FormField['visit.visitType'], v)
+    if (template) {
+      handleVisitOrderTemplateChange(v, template)
+    }
   }
 
   return (
@@ -109,6 +134,7 @@ const VisitInfoCard = ({
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.visitType',
                 })}
+                onChange={(v, op = {}) => handleVisitTypeChange(v, op)}
                 code='ctvisitpurpose'
                 allowClear={false}
                 {...args}
@@ -188,23 +214,8 @@ const VisitInfoCard = ({
                     id: 'reception.queue.visitRegistration.visitOrderTemplate',
                   })}
                   {...args}
-                  onChange={(e, opts) => {
-                    if (opts) {
-                      let activeItemTotal = getVisitOrderTemplateTotal(opts)
-
-                      form.setFieldValue(
-                        FormField['visit.VisitOrderTemplateTotal'],
-                        activeItemTotal,
-                      )
-                    } else {
-                      setTimeout(() => {
-                        form.setFieldValue(
-                          FormField['visit.VisitOrderTemplateTotal'],
-                          undefined,
-                        )
-                      }, 1)
-                    }
-                  }}
+                  onChange={(e, opts) =>
+                    handleVisitOrderTemplateChange(visitType, opts)}
                 />
               )
             }}
