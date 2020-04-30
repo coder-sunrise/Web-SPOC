@@ -33,11 +33,6 @@ const Grid = ({
     setDoctorOptions,
   ] = useState([])
 
-  const [
-    filteredDoctorOptions,
-    setFilteredDoctorOptions,
-  ] = useState([])
-
   useEffect(() => {
     const formattedDoctorProfiles = doctorProfile.map((doctor) => {
       const { doctorMCRNo, clinicianProfile } = doctor
@@ -48,31 +43,7 @@ const Grid = ({
       }
     })
     setDoctorOptions(formattedDoctorProfiles)
-    setFilteredDoctorOptions(formattedDoctorProfiles)
   }, [])
-
-  // const handleDoctorChange = (v, test) => {
-  //   const { row } = v
-  //   const { clinicianProfileFK } = row
-
-  //   const isDoctorAlrdyAssigned = roomAssignRows.find(
-  //     (roomAssign) => roomAssign.clinicianProfileFK === clinicianProfileFK,
-  //   )
-  //   // console.log({
-  //   //   isDoctorAlrdyAssigned,
-  //   //   roomAssignRows,
-  //   //   clinicianProfileFK,
-  //   //   test,
-  //   // })
-  //   dispatch({
-  //     // force current edit row components to update
-  //     type: 'global/updateState',
-  //     payload: {
-  //       commitCount: (commitCount += 1),
-  //     },
-  //   })
-  //   if (isDoctorAlrdyAssigned) row.clinicianProfileFK = undefined
-  // }
 
   useEffect(
     () => {
@@ -85,35 +56,21 @@ const Grid = ({
         )
         return roomAssign
       })
-      setFilteredDoctorOptions(tempDoctorOptions)
     },
     [
       roomAssignRows,
     ],
   )
 
-  useEffect(
-    () => {
-      dispatch({
-        // force current edit row components to update
-        type: 'global/updateState',
-        payload: {
-          commitCount: (commitCount += 1),
-        },
-      })
-    },
-    [
-      filteredDoctorOptions,
-    ],
-  )
-
-  const handleDoctorChange = (v) => {
-    const { row } = v
-    const newDoctorOptions = doctorOptions.filter(
-      (doctor) => doctor.value !== row.clinicianProfileFK,
-    )
-    setFilteredDoctorOptions(newDoctorOptions)
-  }
+  useEffect(() => {
+    dispatch({
+      // force current edit row components to update
+      type: 'global/updateState',
+      payload: {
+        commitCount: (commitCount += 1),
+      },
+    })
+  }, [])
 
   const tableParas = {
     columns: [
@@ -124,27 +81,21 @@ const Grid = ({
       {
         columnName: 'clinicianProfileFK',
         width: 500,
-        // type: 'codeSelect',
-        // code: 'doctorprofile',
-        // labelField: 'clinicianProfile.name',
-        // valueField: 'clinicianProfile.id',
-        // remoteFilter: {
-        //   'clinicianProfile.isActive': false,
-        // },
-        // onChange: (v) => handleDoctorChange(v, roomAssignRows),
-        // renderDropdown: (option) => <DoctorLabel doctor={option} />,
         type: 'select',
         options: (row) => {
           const currentRowDoctor = doctorOptions.find(
             (doctor) => doctor.value === row.clinicianProfileFK,
           )
 
+          const newDoctorOptions = doctorOptions.filter(
+            (doctor) => doctor.value !== row.clinicianProfileFK,
+          )
+
           return [
-            ...filteredDoctorOptions,
+            ...newDoctorOptions,
             currentRowDoctor,
           ]
         },
-        onChange: handleDoctorChange,
       },
       {
         columnName: 'roomFK',
