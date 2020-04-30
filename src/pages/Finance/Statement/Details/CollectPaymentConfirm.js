@@ -20,6 +20,9 @@ import {
 } from '@/components'
 import { DEFAULT_PAYMENT_MODE_GIRO } from '@/utils/constants'
 import { getBizSession } from '@/services/queue'
+import { 
+  CreditCardNumberInput,
+} from '@/components/_medisys'
 
 const styles = () => ({
   grid: {
@@ -362,12 +365,7 @@ class CollectPaymentConfirm extends PureComponent {
                     <Field
                       name='cardNumber'
                       render={(args) => (
-                        <NumberInput
-                          label='Card Number'
-                          inputProps={{ maxLength: 4 }}
-                          maxLength={4}
-                          {...args}
-                        />
+                        <CreditCardNumberInput {...args} /> 
                       )}
                     />
                   </GridItem>
