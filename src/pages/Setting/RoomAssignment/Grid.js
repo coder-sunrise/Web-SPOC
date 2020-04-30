@@ -25,7 +25,8 @@ const Grid = ({
   values,
   values: { roomAssignRows = [] },
   dispatch,
-  doctorProfile,
+  doctorProfile = [],
+  global,
 }) => {
   const [
     doctorOptions,
@@ -196,7 +197,11 @@ const Grid = ({
           Cancel
         </Button>
 
-        <Button color='primary' onClick={handleSubmit}>
+        <Button
+          color='primary'
+          onClick={handleSubmit}
+          disabled={global.disableSave}
+        >
           Save
         </Button>
       </div>
@@ -205,9 +210,10 @@ const Grid = ({
 }
 
 export default compose(
-  connect(({ codetable }) => {
+  connect(({ codetable, global }) => {
     return {
       doctorProfile: codetable.doctorprofile,
+      global,
     }
   }),
   withFormikExtend({
