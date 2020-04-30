@@ -4,6 +4,7 @@ export default {
   'reception.queue.emptyState':
     'There is no session now. Would you like to start one?',
   'reception.queue.startSession': 'Start Session',
+  'reception.queue.reopenLastSession': 'Reopen Last Session',
   'reception.queue.startingASession': 'Starting a session',
   'reception.queue.gettingSessionInfo': 'Getting Session Info...',
   'reception.queue.doctor': 'Doctor',
