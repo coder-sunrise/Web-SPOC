@@ -11,13 +11,14 @@ import {
 
 class Diagnosis extends PureComponent {
   render () {
+    const { setFieldValue } = this.props
     return (
       <div>
         <span>Principal Diagnosis</span>
         <GridContainer>
           <GridItem md={6}>
             <FastField
-              name='principalDiagnosisFK'
+              name='dataContent.principalDiagnosisFK'
               render={(args) => (
                 <CodeSelect
                   label='ICD10-AM Code'
@@ -30,7 +31,7 @@ class Diagnosis extends PureComponent {
           </GridItem>
           <GridItem md={6}>
             <FastField
-              name='principalDiagnosisFK'
+              name='dataContent.principalDiagnosisFK'
               render={(args) => (
                 <CodeSelect
                   label='Description'
@@ -46,7 +47,7 @@ class Diagnosis extends PureComponent {
         <GridContainer>
           <GridItem md={6}>
             <FastField
-              name='secondDiagnosisAFK'
+              name='dataContent.secondDiagnosisAFK'
               render={(args) => (
                 <div style={{ position: 'relative' }}>
                   <span
@@ -73,7 +74,7 @@ class Diagnosis extends PureComponent {
           </GridItem>
           <GridItem md={6}>
             <FastField
-              name='secondDiagnosisAFK'
+              name='dataContent.secondDiagnosisAFK'
               render={(args) => (
                 <CodeSelect
                   label='Description'
@@ -86,7 +87,7 @@ class Diagnosis extends PureComponent {
           </GridItem>
           <GridItem md={6}>
             <FastField
-              name='secondDiagnosisBFK'
+              name='dataContent.secondDiagnosisBFK'
               render={(args) => (
                 <div style={{ position: 'relative' }}>
                   <span
@@ -113,7 +114,7 @@ class Diagnosis extends PureComponent {
           </GridItem>
           <GridItem md={6}>
             <FastField
-              name='secondDiagnosisBFK'
+              name='dataContent.secondDiagnosisBFK'
               render={(args) => (
                 <CodeSelect
                   label='Description'

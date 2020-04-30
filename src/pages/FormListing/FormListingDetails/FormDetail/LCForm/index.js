@@ -1,4 +1,6 @@
 import React, { PureComponent } from 'react'
+import { connect } from 'dva'
+import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 import Yup from '@/utils/yup'
 import { FORM_CATEGORY } from '@/utils/constants'
 import {
@@ -6,6 +8,7 @@ import {
   withFormikExtend,
   Button,
   CardContainer,
+  Accordion,
 } from '@/components'
 import PatientParticulars from './PatientParticulars'
 import Diagnosis from './Diagnosis'
@@ -13,6 +16,7 @@ import Procedures from './Procedures'
 import Certification from './Certification'
 import NonSurgical from './NonSurgical'
 
+@connect(({ global }) => ({ global }))
 @withFormikExtend({
   mapPropsToValues: ({ formListing, codetable }) => {
     const values = {
@@ -22,10 +26,14 @@ import NonSurgical from './NonSurgical'
     return values
   },
   validationSchema: Yup.object().shape({
-    referralDate: Yup.date().required(),
-    referredByUserFK: Yup.number().required(),
-    to: Yup.string().required(),
-    subject: Yup.string().required(),
+    dataContent: Yup.object().shape({
+      principalDiagnosisFK: Yup.number().required(),
+      admittingSpecialtyFK: Yup.number().required(),
+      others: Yup.number().when('admittingSpecialtyFK', {
+        is: (val) => val === 99,
+        then: Yup.string().required(),
+      }),
+    }),
   }),
   displayName: 'LCForm',
 })
@@ -97,7 +105,8 @@ class LCForm extends PureComponent {
   }
 
   render () {
-    const { values, formCategory, height } = this.props
+    const { values, formCategory, height, global } = this.props
+
     const { statusFK } = values
     return (
       <div>
@@ -137,14 +146,21 @@ class LCForm extends PureComponent {
             </CardContainer>
           </div>
           <div>
-            <h5>
-              E - DOCTORS' NON-SURGICAL AND TREATMENT-RELATED CHARGES TO BE
-              REIMBURSED
-            </h5>
-            <CardContainer hideHeader>
-              {' '}
-              <NonSurgical {...this.props} />{' '}
-            </CardContainer>
+            <Accordion
+              leftIcon
+              expandIcon={<SolidExpandMore fontSize='large' />}
+              defaultActive={[
+                0,
+              ]}
+              mode='multiple'
+              collapses={[
+                {
+                  title:
+                    "E - DOCTORS' NON-SURGICAL AND TREATMENT-RELATED CHARGES TO BE REIMBURSED",
+                  content: <NonSurgical {...this.props} />,
+                },
+              ]}
+            />
           </div>
         </div>
         <GridContainer
@@ -159,14 +175,24 @@ class LCForm extends PureComponent {
             cancel
           </Button>
           {(formCategory === FORM_CATEGORY.VISITFORM || statusFK === 1) && (
-            <Button color='primary' icon={null} onClick={this.saveLCForm}>
+            <Button
+              disabled={global.disableSave}
+              color='primary'
+              icon={null}
+              onClick={this.saveLCForm}
+            >
               finalize
             </Button>
           )}
 
           {formCategory === FORM_CATEGORY.CORFORM &&
           (statusFK === 1 || statusFK === 2) && (
-            <Button color='success' icon={null} onClick={this.confirmLCForm}>
+            <Button
+              disabled={global.disableSave}
+              color='success'
+              icon={null}
+              onClick={this.confirmLCForm}
+            >
               submit
             </Button>
           )}

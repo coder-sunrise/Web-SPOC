@@ -14,7 +14,7 @@ export default createListViewModel({
         type: '1',
         typeName: 'Letter of Certification',
         statusFK: 1,
-        visitDate: moment(),
+        dataContent: {},
       },
       default: {},
       showModal: false,

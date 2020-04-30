@@ -17,7 +17,7 @@ class PatientParticulars extends PureComponent {
       <GridContainer>
         <GridItem xs={4}>
           <FastField
-            name='patientName'
+            name='dataContent.patientName'
             render={(args) => {
               return <TextField disabled label='Name' {...args} />
             }}
@@ -25,7 +25,7 @@ class PatientParticulars extends PureComponent {
         </GridItem>
         <GridItem xs={4}>
           <FastField
-            name='patientNRICNo'
+            name='dataContent.patientNRICNo'
             render={(args) => {
               return <TextField disabled label='NRIC/Passport No.' {...args} />
             }}
@@ -33,7 +33,7 @@ class PatientParticulars extends PureComponent {
         </GridItem>
         <GridItem xs={4}>
           <FastField
-            name='patientAccountNo'
+            name='dataContent.patientAccountNo'
             render={(args) => {
               return <TextField label='Patient Account No.' {...args} />
             }}
@@ -41,7 +41,7 @@ class PatientParticulars extends PureComponent {
         </GridItem>
         <GridItem xs={4}>
           <FastField
-            name='admissionDate'
+            name='dataContent.admissionDate'
             render={(args) => {
               return (
                 <DatePicker label='Date of Admission' autoFocus {...args} />
@@ -84,7 +84,7 @@ class PatientParticulars extends PureComponent {
         </GridItem>
         <GridItem md={4}>
           <FastField
-            name='admittingSpecialtyFK'
+            name='dataContent.admittingSpecialtyFK'
             render={(args) => (
               <CodeSelect
                 label='Admitting Specialty'
@@ -102,7 +102,7 @@ class PatientParticulars extends PureComponent {
         <GridItem xs={8}>
           {admittingSpecialtyFK === 99 && (
             <FastField
-              name='others'
+              name='dataContent.others'
               render={(args) => {
                 return <TextField label='Others (please specify)' {...args} />
               }}

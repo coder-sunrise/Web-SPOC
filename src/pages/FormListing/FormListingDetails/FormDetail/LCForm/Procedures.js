@@ -44,7 +44,7 @@ class Procedures extends PureComponent {
         <GridContainer>
           <GridItem md={6}>
             <FastField
-              name='principalSurgeonFK'
+              name='dataContent.principalSurgeonFK'
               render={(args) => {
                 return (
                   <CodeSelect
