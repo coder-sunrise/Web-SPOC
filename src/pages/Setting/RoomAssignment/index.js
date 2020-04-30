@@ -12,8 +12,9 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingRoomAssignment }) => ({
+@connect(({ settingRoomAssignment,codetable }) => ({
   settingRoomAssignment,
+  codetable,
 }))
 @withSettingBase({ modelName: 'settingRoomAssignment' })
 class RoomAssignment extends PureComponent {
