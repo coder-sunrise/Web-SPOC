@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react'
+import React, { memo } from 'react'
 import moment from 'moment'
 import classnames from 'classnames'
 // formik
@@ -6,18 +6,9 @@ import { withFormik, Field, FastField } from 'formik'
 // umi/locale
 import { formatMessage } from 'umi/locale'
 // material ui
-import {
-  withStyles,
-  Fab,
-  Popper,
-  Paper,
-  ClickAwayListener,
-} from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add'
 import Search from '@material-ui/icons/Search'
-import BookmarkIcon from '@material-ui/icons/Bookmark'
-import { connect } from 'dva'
-import { compose } from 'redux'
 // custom component
 import {
   Button,
@@ -30,7 +21,6 @@ import {
 // sub components
 import { AppointmentTypeLabel, DoctorLabel } from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
-import FilterTemplateTooltip from './FilterTemplateTooltip'
 
 const styles = () => ({
   selectorContainer: {
@@ -38,14 +28,6 @@ const styles = () => ({
   },
   antdSelect: {
     width: '100%',
-  },
-  fabButtonStyle: {
-    color: 'white',
-  },
-  container: {
-    maxWidth: 450,
-    minWidth: 450,
-    padding: 15,
   },
 })
 
@@ -67,20 +49,6 @@ const FilterBar = (props) => {
   const { filterByDoctor = [] } = values
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
 
-  const [
-    showFilterTemplate,
-    setShowFilterTemplate,
-  ] = useState(false)
-
-  const [
-    anchorEl,
-    setAnchorEl,
-  ] = useState(null)
-
-  const handleFilterTemplate = (event) => {
-    setAnchorEl(anchorEl ? null : event.currentTarget)
-    setShowFilterTemplate(() => !showFilterTemplate)
-  }
   return (
     <React.Fragment>
       <GridContainer alignItems='center'>
@@ -160,18 +128,7 @@ const FilterBar = (props) => {
           />
         </GridItem>
 
-        <GridItem md={1}>
-          <Fab
-            size='small'
-            color='secondary'
-            className={classes.fabButtonStyle}
-            onClick={handleFilterTemplate}
-          >
-            <BookmarkIcon />
-          </Fab>
-        </GridItem>
-
-        <GridItem md={4}>
+        <GridItem md={5}>
           <ProgressButton
             icon={<Search />}
             color='primary'
@@ -214,17 +171,6 @@ const FilterBar = (props) => {
           </Authorized>
         </GridItem>
       </GridContainer>
-      <Popper open={showFilterTemplate} anchorEl={anchorEl}>
-        <Paper className={classes.container}>
-          {/* <ClickAwayListener onClickAway={handleFilterTemplate}> */}
-          <FilterTemplateTooltip
-            filterByDoctor={values.filterByDoctor}
-            filterByApptType={values.filterByApptType}
-            handleFilterTemplate={handleFilterTemplate}
-          />
-          {/* </ClickAwayListener> */}
-        </Paper>
-      </Popper>
     </React.Fragment>
   )
 }
@@ -233,36 +179,16 @@ const StyledFilterBar = withStyles(styles, { name: 'CalendarFilterBar' })(
   FilterBar,
 )
 
-export default compose(
-  connect(({ appointment }) => ({
-    appointment,
-  })),
+export default memo(
   withFormik({
     enableReinitialize: true,
-    mapPropsToValues: ({ filterByDoctor, appointment }) => {
-      if (appointment.currentFilterTemplate) {
-        const {
-          filterByDoctor: doctorFilterTemplate,
-          filterByApptType: apptTypeFiltertemplate,
-        } = appointment.currentFilterTemplate
-        return {
-          filterByDoctor: [
-            ...doctorFilterTemplate,
-          ],
-          filterByApptType: [
-            ...apptTypeFiltertemplate,
-          ],
-        }
-      }
-
-      return {
-        filterByDoctor: [
-          ...filterByDoctor,
-        ],
-        filterByApptType: [
-          -99,
-        ],
-      }
-    },
-  }),
-)(memo(StyledFilterBar))
+    mapPropsToValues: ({ filterByDoctor }) => ({
+      filterByDoctor: [
+        ...filterByDoctor,
+      ],
+      filterByApptType: [
+        -99,
+      ],
+    }),
+  })(StyledFilterBar),
+)

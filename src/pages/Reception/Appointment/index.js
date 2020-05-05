@@ -188,9 +188,6 @@ class Appointment extends React.PureComponent {
       payload: moment().toDate(),
     })
 
-    dispatch({
-      type: 'appointment/getFilterTemplate',
-    })
   }
 
   componentWillUnmount () {
