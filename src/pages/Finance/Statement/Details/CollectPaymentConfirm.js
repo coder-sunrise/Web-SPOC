@@ -20,7 +20,7 @@ import {
 } from '@/components'
 import { DEFAULT_PAYMENT_MODE_GIRO } from '@/utils/constants'
 import { getBizSession } from '@/services/queue'
-import { 
+import {
   CreditCardNumberInput,
 } from '@/components/_medisys'
 
@@ -34,6 +34,9 @@ const styles = () => ({
 class CollectPaymentConfirm extends PureComponent {
   state = {
     isCardPayment: false,
+    isGIROPayment: true,
+    isChequePayment: false,
+    isNetsPayment: false,
     totalAmount: '',
     rows: [
       this.props.values.statementInvoice,
@@ -120,13 +123,13 @@ class CollectPaymentConfirm extends PureComponent {
     hasActiveSession: false,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.checkHasActiveSession()
     this.resize()
     window.addEventListener('resize', this.resize.bind(this))
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.removeEventListener('resize', this.resize.bind(this))
   }
 
@@ -224,10 +227,42 @@ class CollectPaymentConfirm extends PureComponent {
     const selectedValue = event || ''
     if (selectedValue === 1) {
       this.setState({ isCardPayment: true })
+      this.setState({ isGIROPayment: false })
+      this.setState({ isChequePayment: false })
+      this.setState({ isNetsPayment: false })
       setFieldValue('creditCardTypeFK', 1)
-    } else {
+    }
+    else if (selectedValue === 5) {
+      this.setState({ isChequePayment: false })
+      this.setState({ isNetsPayment: false })
       this.setState({ isCardPayment: false })
+      this.setState({ isGIROPayment: true })
       setFieldValue('cardNumber', '')
+      setFieldValue('creditCardTypeFK', undefined)
+    }
+    else if (selectedValue === 2) {
+      this.setState({ isChequePayment: true })
+      this.setState({ isNetsPayment: false })
+      this.setState({ isCardPayment: false })
+      this.setState({ isGIROPayment: false })
+      setFieldValue('cardNumber', '')
+      setFieldValue('creditCardTypeFK', undefined)
+    }
+    else if (selectedValue === 4) {
+      this.setState({ isChequePayment: false })
+      this.setState({ isNetsPayment: true })
+      this.setState({ isCardPayment: false })
+      this.setState({ isGIROPayment: false })
+      setFieldValue('cardNumber', '')
+      setFieldValue('creditCardTypeFK', undefined)
+    }
+    else {
+      this.setState({ isCardPayment: false })
+      this.setState({ isChequePayment: false })
+      this.setState({ isGIROPayment: false })
+      setFieldValue('cardNumber', '')
+      setFieldValue('refNo', '')
+      setFieldValue('chequeNo', '')
       setFieldValue('creditCardTypeFK', undefined)
     }
     setFieldValue('displayValue', displayValue)
@@ -247,19 +282,22 @@ class CollectPaymentConfirm extends PureComponent {
     })
   }
 
-  resize () {
+  resize() {
     if (this._container) {
       const containerHeight = window.document.body.clientHeight - 300
       this.setState({ containerHeight })
     }
   }
 
-  render () {
+  render() {
     const {
       rows,
       columns,
       columnExtensions,
       isCardPayment,
+      isGIROPayment,
+      isNetsPayment,
+      isChequePayment,
       hasActiveSession,
     } = this.state
     const { values, statement, handleSubmit } = this.props
@@ -365,7 +403,43 @@ class CollectPaymentConfirm extends PureComponent {
                     <Field
                       name='cardNumber'
                       render={(args) => (
-                        <CreditCardNumberInput {...args} /> 
+                        <CreditCardNumberInput {...args} />
+                      )}
+                    />
+                  </GridItem>
+                </React.Fragment>
+              )}
+              {(isGIROPayment) && (
+                <React.Fragment>
+                  <GridItem>
+                    <FastField
+                      name='refNo'
+                      render={(args) => (
+                        <TextField {...args} label='Ref. No' />
+                      )}
+                    />
+                  </GridItem>
+                </React.Fragment>
+              )}
+              {(isNetsPayment) && (
+                <React.Fragment>
+                  <GridItem>
+                    <FastField
+                      name='refNo'
+                      render={(args) => (
+                        <TextField {...args} label='Ref. No' />
+                      )}
+                    />
+                  </GridItem>
+                </React.Fragment>
+              )}
+              {isChequePayment && (
+                <React.Fragment>
+                  <GridItem>
+                    <FastField
+                      name='chequeNo'
+                      render={(args) => (
+                        <TextField {...args} label='Cheque No' />
                       )}
                     />
                   </GridItem>

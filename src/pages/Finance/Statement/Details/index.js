@@ -11,9 +11,10 @@ import { roundToPrecision } from '@/utils/codes'
 import { getBizSession } from '@/services/queue'
 
 const styles = () => ({})
-@connect(({ statement, user }) => ({
+@connect(({ statement, user, codetable }) => ({
   statement,
   user,
+  codetable,
 }))
 @withFormikExtend({
   enableReinitialize: true,
@@ -63,13 +64,19 @@ const styles = () => ({})
     }),
   }),
   handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, history, user } = props
+    const { dispatch, onConfirm, history, user, codetable } = props
     const {
       paymentCreatedBizSessionFK,
       paymentModeFK,
       displayValue,
       paymentDate,
+      remarks,
+      cardNumber,
+      creditCardTypeFK,
+      refNo,
+      chequeNo,
     } = values
+
     const paymentReceivedByUserFK = user.data.id
     let newPaymentStatementInvoice = values.statementInvoice.filter(
       (o) =>
@@ -87,6 +94,23 @@ const styles = () => ({})
         Math.abs(paymentAmt - roundToPrecision(paymentAmt, 0.05)).toFixed(2),
       )
       const { invoicePayment, statementInvoiceFK } = newInvoicePayment
+      let cardPayment = null
+      let chequePayment = null
+      let giroPayment = null
+      let netsPayment = null
+      if (paymentModeFK === 1) {
+        let creditCardType = codetable.ctcreditcardtype.find((item) => item.id === creditCardTypeFK).name
+        cardPayment = { creditCardNo: cardNumber, creditCardTypeFK, creditCardType }
+      }
+      else if (paymentModeFK === 2) {
+        chequePayment = { chequeNo }
+      }
+      else if (paymentModeFK === 5) {
+        giroPayment = { refNo }
+      }
+      else if (paymentModeFK === 4) {
+        netsPayment = { refNo }
+      }
       newInvoicePayment = {
         ...invoicePayment,
         paymentCreatedBizSessionFK,
@@ -101,6 +125,11 @@ const styles = () => ({})
             amt: invoicePayment.totalAmtPaid,
             paymentMode: displayValue,
             cashRouding: isCashPayment ? roundingAmt : 0,
+            remark: remarks,
+            giroPayment,
+            chequePayment,
+            creditCardPayment: cardPayment,
+            netsPayment,
           },
         ],
       }
@@ -241,7 +270,7 @@ class StatementDetails extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     return (
       <React.Fragment>
         <Paper>
