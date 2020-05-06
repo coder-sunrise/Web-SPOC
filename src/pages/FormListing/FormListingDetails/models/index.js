@@ -14,7 +14,12 @@ export default createListViewModel({
         type: '1',
         typeName: 'Letter of Certification',
         statusFK: 1,
-        dataContent: {},
+        dataContent: {
+          procuderes: [
+            { name: '111', index: 1 },
+            { name: '222', index: 2 },
+          ],
+        },
       },
       default: {},
       showModal: false,

@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import _ from 'lodash'
 import { Add, Delete } from '@material-ui/icons'
 import {
   GridContainer,
@@ -18,11 +19,29 @@ import {
 import { DoctorLabel } from '@/components/_medisys'
 
 class Procedures extends PureComponent {
+  addProcedure = () => {
+    const { setFieldValue, values } = this.props
+    const maxIndev = _.maxBy(values.dataContent.procuderes, 'index').index
+    let newProcedure = values.dataContent.procuderes.map((o) => o)
+    newProcedure.push({ name: '333', index: maxIndev + 1 })
+    setFieldValue('dataContent.procuderes', newProcedure)
+  }
+
+  deleteProcedure = (row) => {
+    const { setFieldValue, values } = this.props
+    let newProcedure = values.dataContent.procuderes.map((o) => o)
+    newProcedure = newProcedure.filter((o) => o.index !== row.index)
+
+    newProcedure.forEach((s) => {
+      if (s.index > row.index) {
+        s.index -= 1
+      }
+    })
+    setFieldValue('dataContent.procuderes', newProcedure)
+  }
+
   render () {
-    const procuderes = [
-      { name: '111', index: 1 },
-      { name: '222', index: 2 },
-    ]
+    const { values } = this.props
 
     const _timeFormat = 'hh:mm a'
     return (
@@ -62,18 +81,19 @@ class Procedures extends PureComponent {
         </GridContainer>
         <div>
           <div>
-            {procuderes.map((o) => {
+            {values.dataContent.procuderes.map((o) => {
+              const i = o.index
               return (
                 <GridContainer>
                   <GridItem md={6}>
                     <div>Procedure {o.index}</div>
                   </GridItem>
                   <GridItem md={6} container justify='flex-end'>
-                    {o.index !== 1 && (
+                    {i !== 1 && (
                       <Popconfirm
                         title='Are you sure delete this item?'
                         onConfirm={() => {
-                          // setFieldValue(`${prop}[${i}].isDeleted`, true)
+                          this.deleteProcedure(o)
                         }}
                       >
                         <Button justIcon color='danger'>
@@ -87,7 +107,7 @@ class Procedures extends PureComponent {
                       <GridContainer>
                         <GridItem xs={4}>
                           <FastField
-                            name='procedureDate'
+                            name={`dataContent.procuderes[${i}].procedureDate`}
                             render={(args) => {
                               return (
                                 <DatePicker
@@ -101,12 +121,12 @@ class Procedures extends PureComponent {
                         </GridItem>
                         <GridItem xs={4}>
                           <FastField
-                            name='procedureDate'
+                            name={`dataContent.procuderes[${i}].procedureStartTime`}
                             render={(args) => {
                               return (
                                 <TimePicker
                                   {...args}
-                                  label='Time'
+                                  label='Start Time in OT'
                                   format={_timeFormat}
                                   use12Hours
                                 />
@@ -116,12 +136,12 @@ class Procedures extends PureComponent {
                         </GridItem>
                         <GridItem xs={4}>
                           <FastField
-                            name='procedureDate'
+                            name={`dataContent.procuderes[${i}].procedureEndTime`}
                             render={(args) => {
                               return (
                                 <TimePicker
                                   {...args}
-                                  label='Time'
+                                  label='End Time in OT'
                                   format={_timeFormat}
                                   use12Hours
                                 />
@@ -131,7 +151,7 @@ class Procedures extends PureComponent {
                         </GridItem>
                         <GridItem xs={12}>
                           <FastField
-                            name='natureOfOpertation'
+                            name={`dataContent.procuderes[${i}].natureOfOpertation`}
                             render={(args) => (
                               <RadioButtonGroup
                                 label='Nature of Opertation'
@@ -187,6 +207,7 @@ class Procedures extends PureComponent {
                   color='primary'
                   icon={<Add />}
                   style={{ marginTop: 10 }}
+                  onClick={this.addProcedure}
                 >
                   New Procedure
                 </ProgressButton>
