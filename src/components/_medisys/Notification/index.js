@@ -8,6 +8,7 @@ import Refresh from '@material-ui/icons/Refresh'
 import { Badge, Popper, Button, Tabs, IconButton } from '@/components'
 // sub components
 import NotificationList from './NotificationList'
+import { SystemMessageList } from '@/components/_medisys'
 // assets
 import customDropdownStyle from '@/assets/jss/material-dashboard-pro-react/components/customDropdownStyle'
 import { TYPES } from './constants'
@@ -48,13 +49,20 @@ const NotificationComponent = ({
             name: `${o.name} ${list.filter((m) => !m.read).length > 0
               ? `(${list.filter((m) => !m.read).length})`
               : ''}`,
-            content: (
-              <NotificationList
-                notifications={list}
-                dispatch={dispatch}
-                type={o.id}
-              />
-            ),
+            content:
+              o.id === 4 ? (
+                <SystemMessageList
+                  dispatch={dispatch}
+                  type={o.id}
+                  systemMessages={list}
+                />
+              ) : (
+                <NotificationList
+                  notifications={list}
+                  dispatch={dispatch}
+                  type={o.id}
+                />
+              ),
           }
         })}
       />

@@ -15,12 +15,18 @@ import WifiOff from '@material-ui/icons/WifiOff'
 // assets
 import headerLinksStyle from 'mui-pro-jss/material-dashboard-pro-react/components/headerLinksStyle'
 // common components
+import moment from 'moment'
 import { Badge, SizeContainer, Popper, Button, Tooltip } from '@/components'
 // subcomponents
 import { Notification } from '@/components/_medisys'
 // utils
 import { updateAPIType } from '@/utils/request'
 import { navigateDirtyCheck } from '@/utils/utils'
+import {
+  VALUE_KEYS,
+  NOTIFICATION_STATUS,
+  NOTIFICATION_TYPE,
+} from '@/utils/constants'
 
 @connect(({ user, clinicInfo, header }) => ({
   user,
@@ -33,6 +39,58 @@ class HeaderLinks extends React.Component {
     openAccount: false,
     openDomain: false,
     title: 'PROD',
+  }
+
+  componentDidMount = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'systemMessage/query',
+      payload: {
+        lgt_EffectiveEndDate: moment().formatUTC(false),
+        lst_EffectiveStartDate: moment().formatUTC(false),
+        pagesize: 3,
+        sorting: [
+          { columnName: 'createDate', direction: 'desc' },
+        ],
+      },
+    }).then((msgResponse) => {
+      const { data = [] } = msgResponse
+      if (data.length > 0) {
+        const { isAlertAfterLogin = false, isRead = false } = data[0]
+        if (isAlertAfterLogin && !isRead) {
+          dispatch({
+            type: 'systemMessage/updateState',
+            payload: {
+              entity: data[0],
+            },
+          })
+
+          dispatch({
+            type: 'global/updateState',
+            payload: {
+              showSystemMessage: true,
+            },
+          })
+        }
+
+        data.map((o) => {
+          const notificationPayload = {
+            type: NOTIFICATION_TYPE.SYSINFO,
+            status: NOTIFICATION_STATUS.OK,
+            message: o,
+            requestId: undefined,
+            sender: undefined,
+            senderId: undefined,
+            timestamp: o.createDate,
+            read: o.isRead,
+          }
+          dispatch({
+            type: 'header/appendNotification',
+            payload: notificationPayload,
+          })
+        })
+      }
+    })
   }
 
   handleClick = (key) => () => {
