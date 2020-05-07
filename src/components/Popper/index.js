@@ -12,6 +12,7 @@ export default ({
   disabled,
   disabledTransition,
   placement,
+  useTimer,
   stopOnClickPropagation = false,
   ...props
 }) => {
@@ -20,6 +21,12 @@ export default ({
     anchorEl,
     setAnchorEl,
   ] = React.useState(null)
+
+  const [
+    timer,
+    setTimer,
+  ] = React.useState(null)
+
   const triggerProps = {
     onContextMenu:
       trigger === 'contextmenu'
@@ -37,12 +44,27 @@ export default ({
     onMouseEnter:
       trigger === 'hover'
         ? (event) => {
-            setAnchorEl(event.currentTarget)
+            if (useTimer) {
+              let selectAnchorEl = event.currentTarget
+              setTimer(
+                setTimeout(() => {
+                  setAnchorEl(selectAnchorEl)
+                }, 1000),
+              )
+            } else {
+              setAnchorEl(event.currentTarget)
+            }
           }
         : null,
     onMouseLeave:
       trigger === 'hover'
         ? () => {
+            if (useTimer) {
+              if (timer) {
+                clearTimeout(timer)
+                setTimer(null)
+              }
+            }
             setAnchorEl(null)
           }
         : null,
@@ -84,7 +106,9 @@ export default ({
           vertical: 'center',
           horizontal: 'center',
         }}
-        style={{ zIndex: 1500 }}
+        style={{
+          zIndex: 1500,
+        }}
         {...props}
       >
         {({ TransitionProps, p }) => {

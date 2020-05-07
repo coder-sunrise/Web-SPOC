@@ -2,6 +2,7 @@ import React from 'react'
 import { withStyles } from '@material-ui/core'
 import Dashboard from '@material-ui/icons/Dashboard'
 import { ProgressButton } from '@/components'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   queueDashboardButton: {
@@ -13,15 +14,17 @@ const styles = (theme) => ({
 
 const QueueDashboardButton = ({ classes, size = 'md' }) => {
   return (
-    <ProgressButton
-      icon={<Dashboard />}
-      size={size}
-      color='info'
-      className={classes.queueDashboardButton}
-      onClick={() => window.open('/queuedisplay/dashboard')}
-    >
-      Open Queue Display
-    </ProgressButton>
+    <Authorized authority='openqueuedisplay'>
+      <ProgressButton
+        icon={<Dashboard />}
+        size={size}
+        color='info'
+        className={classes.queueDashboardButton}
+        onClick={() => window.open('/queuedisplay/dashboard')}
+      >
+        Open Queue Display
+      </ProgressButton>
+    </Authorized>
   )
 }
 

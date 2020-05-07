@@ -13,6 +13,8 @@ class OverallGrid extends PureComponent {
       { name: 'doctorName', title: 'Doctor' },
       { name: 'serviceName', title: 'Service Name' },
       { name: 'supplierName', title: 'Supplier' },
+      { name: 'caseTypeDisplayValue', title: 'Case Type' },
+      { name: 'caseDescriptionDisplayValue', title: 'Case Description' },
       { name: 'orderedDate', title: 'Ordered Date' },
       { name: 'estimateReceiveDate', title: 'Est. Receive Date' },
       { name: 'receivedDate', title: 'Received Date' },

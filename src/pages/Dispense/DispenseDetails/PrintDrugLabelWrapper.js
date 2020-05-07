@@ -43,7 +43,12 @@ class PrintDrugLabelWrapper extends React.Component {
     if (settings.labelPrinterSize === '8.9cmx3.6cm') {
       drugLabelReportID = 31
       patientLabelReportID = 32
-    } else {
+    }
+    else if (settings.labelPrinterSize === '7.6cmx3.8cm') {
+        drugLabelReportID = 48
+        patientLabelReportID = 45
+    }
+    else {
       drugLabelReportID = 24
       patientLabelReportID = 27
     }

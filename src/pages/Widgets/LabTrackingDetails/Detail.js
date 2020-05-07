@@ -184,12 +184,11 @@ const styles = (theme) => ({
   displayName: 'labTrackingDetails',
 })
 class Detail extends PureComponent {
-  state = {}
-
   constructor (props) {
     super(props)
     this.myRef = React.createRef()
-    this.widgets = WidgetConfig.widgets(props)
+    this.widgets = WidgetConfig.widgets(props, this.setShowMessage)
+    this.state = { showMessage: false }
   }
 
   componentDidMount () {
@@ -209,6 +208,15 @@ class Detail extends PureComponent {
     }
 
     this.toggleAccordionByResultType(resultType)
+  }
+
+  setShowMessage = (v) => {
+    this.setState((preState) => {
+      return {
+        ...preState,
+        showMessage: v,
+      }
+    })
   }
 
   renderDropdown = (option) => <DoctorLabel doctor={option} />
@@ -421,6 +429,13 @@ class Detail extends PureComponent {
             />
           </div>
         </div>
+        {this.state.showMessage && (
+          <div>
+            <span style={{ color: 'red' }}>
+              Note: Case type or case descprition already get changed.
+            </span>
+          </div>
+        )}
         {footer &&
           footer({
             onConfirm: props.handleSubmit,

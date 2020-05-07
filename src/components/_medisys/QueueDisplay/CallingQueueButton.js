@@ -52,6 +52,12 @@ const CallingQueueButton = ({
         setDisable(() => !disable)
         setTimeout(() => {
           setDisable(() => false)
+          dispatch({
+            type: 'queueCalling/updateState',
+            payload: {
+              tracker: undefined,
+            },
+          })
         }, 3000)
       }
     },

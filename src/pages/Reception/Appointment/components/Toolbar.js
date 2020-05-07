@@ -190,7 +190,7 @@ class CalendarToolbar extends React.PureComponent {
                 Today
               </Button>
             </Tooltip>
-            <Tooltip title='Jump to next Day/Month/Year' placement='bottom'>
+            <Tooltip title='Jump to next Day/Week/Month/Year' placement='bottom'>
               <Button
                 color='info'
                 onClick={this.handleNextModal}

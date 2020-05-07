@@ -870,6 +870,9 @@ const _routes = [
             path: '/setting/roomassignment',
             name: 'roomassignment',
             component: './Setting/RoomAssignment',
+            authority: [
+              'settings.clinicsetting.roomassignment',
+            ],
           },
           {
             path: '/setting/clinicbreakhour',

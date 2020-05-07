@@ -27,6 +27,7 @@ const Grid = ({
   dispatch,
   doctorProfile = [],
   global,
+  codetable,
 }) => {
   const [
     doctorOptions,
@@ -72,6 +73,16 @@ const Grid = ({
     })
   }, [])
 
+  const compareDoctor = function (a, b) {
+    let doctorA = doctorOptions.find((doctor) => doctor.value === a)
+    let doctorB = doctorOptions.find((doctor) => doctor.value === b)
+    return doctorA.name.localeCompare(doctorB.name)
+  }
+  const compareRoom = function (a, b) {
+    let roomA = codetable.ctroom.find((room) => room.id === a)
+    let roomB = codetable.ctroom.find((room) => room.id === b)
+    return roomA.name.localeCompare(roomB.name)
+  }
   const tableParas = {
     columns: [
       { name: 'clinicianProfileFK', title: 'Doctor' },
@@ -101,6 +112,7 @@ const Grid = ({
         columnName: 'roomFK',
         type: 'codeSelect',
         code: 'ctroom',
+        compare: compareRoom,
       },
     ],
   }

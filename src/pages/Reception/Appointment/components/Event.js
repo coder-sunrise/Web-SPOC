@@ -124,6 +124,7 @@ class Event extends React.PureComponent {
           [classes.pooperResponsive]: true,
           [classes.pooperNav]: true,
         })}
+        useTimer
         overlay={OverlayComponent}
       >
         {calendarView === BigCalendar.Views.MONTH ? (

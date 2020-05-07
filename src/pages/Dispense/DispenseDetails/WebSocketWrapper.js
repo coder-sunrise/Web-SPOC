@@ -93,6 +93,10 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
         drugLabelReportID = REPORT_ID.DRUG_LABEL_89MM_36MM
         patientLabelReportID = REPORT_ID.PATIENT_LABEL_89MM_36MM
       }
+      else if (settings && settings.labelPrinterSize === '7.6cmx3.8cm') {
+          drugLabelReportID = REPORT_ID.DRUG_LABEL_76MM_38MM
+          patientLabelReportID = REPORT_ID.PATIENT_LABEL_76MM_38MM
+      }
 
       if (type === CONSTANTS.ALL_DRUG_LABEL) {
         const { dispense, values } = restProps

@@ -1081,6 +1081,7 @@ class Medication extends PureComponent {
                       onChange={(e) => {
                         this.updateTotalPrice(e.target.value)
                       }}
+                      min={0}
                       disabled={disableEdit}
                       currency
                       {...args}

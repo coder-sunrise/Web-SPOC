@@ -62,6 +62,7 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
     clinicianFK,
     startTime,
     endTime,
+    clinicianName,
   } = popoverEvent
 
   const date = moment(appointmentDate)
@@ -106,6 +107,9 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
         <GridItem md={12}>
           <h4 className={classes.titleLabel}>{title}</h4>
         </GridItem>
+        <GridItem md={12}>
+          <span>Doctor: {clinicianName}</span>
+        </GridItem>
         <GridItem className={classes.iconRow}>{AppointmentDateLabel}</GridItem>
         <GridItem>
           <Divider
@@ -122,17 +126,7 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
             style={{ marginTop: 8, marginBottom: 8 }}
           />
         </GridItem>
-        <GridItem md={12}>
-          <CodeSelect
-            disabled
-            code='doctorprofile'
-            label='Doctor'
-            labelField='clinicianProfile.name'
-            valueField='clinicianProfile.id'
-            value={clinicianFK}
-          />
-        </GridItem>
-        <GridItem md={12}>
+        <GridItem md={6}>
           <CodeSelect
             disabled
             code='ctappointmenttype'
@@ -142,7 +136,7 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
             value={appointmentTypeFK}
           />
         </GridItem>
-        <GridItem md={12}>
+        <GridItem md={6}>
           <CodeSelect
             disabled
             code='ltappointmentstatus'
@@ -150,17 +144,17 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
             value={appointmentStatusFk && Number(appointmentStatusFk)}
           />
         </GridItem>
-        <GridItem md={12}>
+        <GridItem md={6}>
           <TextField disabled label='Book By' value={bookedByUser} />
         </GridItem>
-        <GridItem md={12}>
+        <GridItem md={6}>
           <DatePicker disabled label='Book On' value={createDate} />
         </GridItem>
         <GridItem md={12}>
           <TextField
             disabled
             multiline
-            rowsMax={3}
+            rowsMax={10}
             label='Remarks'
             value={appointmentRemarks}
           />

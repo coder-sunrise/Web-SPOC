@@ -74,7 +74,7 @@ export const menuData = [
     url: '/setting/room',
   },
   {
-    // authority: 'settings.clinicsetting.roomAssignment',
+    authority: 'settings.clinicsetting.roomassignment',
     title: 'Clinic Setting',
     text: 'Room Assignment',
     url: '/setting/roomassignment',
