@@ -217,6 +217,7 @@ export const menuData = [
     title: 'Print Setup',
     text: 'Master Printout Setting',
     url: '/setting/masterprintoutsetting',
+    authority: 'settings.printsetup.masterprintoutsetting',
   },
   {
     authority: 'settings.printsetup.printoutsetting',
