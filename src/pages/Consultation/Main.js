@@ -87,6 +87,7 @@ const saveConsultation = ({
     values,
     consultation,
     consultationDocument = {},
+    corEyeRefractionForm,
     orders = {},
   } = props
   const onConfirmSave = () => {
@@ -102,6 +103,7 @@ const saveConsultation = ({
       {
         orders,
         consultationDocument,
+        corEyeRefractionForm,
       },
     )
     newValues.duration = Math.floor(

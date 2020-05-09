@@ -17,6 +17,7 @@ import VisitInfoCard from './VisitInfoCard'
 import VitalSignCard from './VitalSignCard'
 import ReferralCard from './ReferralCard'
 import EyeVisualAcuityCard from './EyeVisualAcuityCard'
+import RefractionFormCard from './RefractionFormCard'
 
 // import ParticipantCard from './ParticipantCard'
 import VisitValidationSchema from './validationScheme'
@@ -379,6 +380,27 @@ class NewVisit extends PureComponent {
                                     }
                                     attachments={values.visitAttachment}
                                   />
+                                </GridItem>
+                              </Authorized.Context.Provider>
+                            )
+                          }}
+                        </Authorized>
+                        <Authorized authority='queue.visitregistrationdetails.eyevisualacuity'>
+                          {({ rights: eyeAccessRight }) => {
+                            if (eyeAccessRight === 'hidden') return null
+                            return (
+                              <Authorized.Context.Provider
+                                value={{
+                                  rights:
+                                    (eyeAccessRight === 'readwrite' ||
+                                      eyeAccessRight === 'enable') &&
+                                    (isReadOnly || isRetail)
+                                      ? 'disable'
+                                      : eyeAccessRight,
+                                }}
+                              >
+                                <GridItem xs={12} className={classes.row}>
+                                  <RefractionFormCard {...this.props} />
                                 </GridItem>
                               </Authorized.Context.Provider>
                             )

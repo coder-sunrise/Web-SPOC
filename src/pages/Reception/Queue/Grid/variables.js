@@ -175,24 +175,26 @@ export const QueueColumnExtensions = [
     render: (row) => {
       return (
         <Fragment>
-          <span
+          <div
             style={{
               display: 'flex',
-              alignItems: 'center',
               justifyContent: 'space-between',
+              alignItems: 'center',
             }}
           >
-            {row.queueNo}
-            {row.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
-              <Authorized authority='openqueuedisplay'>
-                <CallingQueueButton
-                  qId={row.queueNo}
-                  roomNo={row.roomNo}
-                  doctor={row.doctor}
-                />
-              </Authorized>
-            )}
-          </span>
+            <span>{row.queueNo}</span>
+            <div>
+              {row.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
+                <Authorized authority='openqueuedisplay'>
+                  <CallingQueueButton
+                    qId={row.queueNo}
+                    roomNo={row.roomNo}
+                    doctor={row.doctor}
+                  />
+                </Authorized>
+              )}
+            </div>
+          </div>
         </Fragment>
       )
     },

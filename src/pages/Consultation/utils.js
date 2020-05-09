@@ -85,6 +85,7 @@ const convertToConsultation = (values, { consultationDocument, orders }) => {
     }
   })
   const { dentalChartComponent } = window.g_app._store.getState()
+
   if (dentalChartComponent) {
     const { isPedoChart, isSurfaceLabel, data } = dentalChartComponent
     values.corDentalCharts = [
@@ -97,6 +98,14 @@ const convertToConsultation = (values, { consultationDocument, orders }) => {
     ]
     // values.corDentalCharts = data.map(o=>)
   }
+
+  const { corEyeRefractionForm } = values
+  if (corEyeRefractionForm && corEyeRefractionForm.formData) {
+    values.corEyeRefractionForm.formData = JSON.stringify(
+      corEyeRefractionForm.formData,
+    )
+  }
+
   return {
     ...values,
     isGSTInclusive,

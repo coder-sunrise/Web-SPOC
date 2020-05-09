@@ -38,7 +38,7 @@ Object.byString = function (o, s) {
   let a = s.split('.')
   for (let i = 0, n = a.length; i < n; ++i) {
     let k = a[i]
-    if (o === undefined || o === null) continue
+    if (o === undefined || o === null || typeof o !== 'object') continue
     try {
       if (k in o) {
         o = o[k]

@@ -132,6 +132,7 @@ class Form extends React.PureComponent {
       fromPatientHistory,
       ...restProps
     } = props
+
     const cfg = {
       extraClasses: {
         root: classes.inputRoot,

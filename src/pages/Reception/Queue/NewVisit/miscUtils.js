@@ -103,7 +103,7 @@ export const formikMapPropsToValues = ({
       visitPurposeFK = Number(clinicSettings.settings.defaultVisitType)
     }
 
-    const { visitOrderTemplateFK } = visitEntries
+    const { visitOrderTemplateFK, visitEyeRefractionForm } = visitEntries
     const isVisitOrderTemplateActive = (visitRegistration.visitOrderTemplateOptions ||
       [])
       .map((option) => option.id)
@@ -126,6 +126,15 @@ export const formikMapPropsToValues = ({
       }
     }
 
+    let newFormData
+    if (
+      visitEyeRefractionForm &&
+      visitEyeRefractionForm.formData &&
+      typeof visitEyeRefractionForm.formData === 'string'
+    ) {
+      newFormData = JSON.parse(visitEyeRefractionForm.formData)
+    }
+
     return {
       queueNo: qNo,
       visitPurposeFK,
@@ -137,6 +146,10 @@ export const formikMapPropsToValues = ({
       visitOrderTemplateFK: isVisitOrderTemplateActive
         ? visitOrderTemplateFK
         : undefined,
+      visitEyeRefractionForm: {
+        ...visitEyeRefractionForm,
+        formData: newFormData,
+      },
     }
   } catch (error) {
     console.log({ error })
@@ -195,6 +208,15 @@ export const formikHandleSubmit = (
     _referralBy = referralBy[0]
   }
 
+  let { visitEyeRefractionForm = undefined } = restValues
+  if (visitEyeRefractionForm && visitEyeRefractionForm.formData) {
+    visitEyeRefractionForm.formData = JSON.stringify(
+      visitEyeRefractionForm.formData,
+    )
+  } else {
+    visitEyeRefractionForm = undefined
+  }
+
   const payload = {
     cfg: {
       message: id ? 'Visit updated' : 'Visit created',
@@ -213,6 +235,7 @@ export const formikHandleSubmit = (
       visitStatus: VISIT_STATUS.WAITING,
       ...restValues, // override using formik values
       referralBy: _referralBy,
+      visitEyeRefractionForm,
     },
   }
 
@@ -221,8 +244,12 @@ export const formikHandleSubmit = (
     payload,
   }).then((response) => {
     if (response) {
-      resetForm({})
       const { location } = history
+      onConfirm()
+      sendQueueNotification({
+        message: 'New visit created.',
+        queueNo: payload && payload.queueNo,
+      })
       if (location.pathname === '/reception/appointment')
         dispatch({
           type: 'calendar/refresh',
@@ -232,11 +259,7 @@ export const formikHandleSubmit = (
           type: 'queueLog/refresh',
         })
 
-      onConfirm()
-      sendQueueNotification({
-        message: 'New visit created.',
-        queueNo: payload && payload.queueNo,
-      })
+      resetForm({})
     } else {
       setSubmitting(false)
     }
