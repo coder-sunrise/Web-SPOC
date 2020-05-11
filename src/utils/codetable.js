@@ -185,6 +185,12 @@ const tenantCodesMap = new Map([
       ...defaultParams,
     },
   ],
+  // [
+  //   'ctEyeRefractiontestType',
+  //   {
+  //     ...defaultParams,
+  //   },
+  // ],
 ])
 
 // always get latest codetable

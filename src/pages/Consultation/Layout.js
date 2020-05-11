@@ -516,7 +516,7 @@ class Layout extends PureComponent {
     } = restProps
     const widgetProps = {
       status: 'consultation',
-      // parentProps: props,
+      parentProps: props,
       rights,
     }
     // console.log(state.currentLayout)
@@ -992,7 +992,9 @@ class Layout extends PureComponent {
             >
               <LabTrackingDrawer
                 {...widgetProps}
-                patientId={this.props.visitRegistration.entity.visit.patientProfileFK}
+                patientId={
+                  this.props.visitRegistration.entity.visit.patientProfileFK
+                }
                 onClose={this.toggleLabTrackingDrawer}
               />
             </Drawer>
