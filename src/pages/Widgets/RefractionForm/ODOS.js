@@ -15,7 +15,14 @@ const styles = () => ({
 })
 
 const ODOS = ({ row, columnConfig, cellProps, classes }) => {
-  const { value, control, validSchema, columnName, ...restProps } = columnConfig
+  const {
+    value,
+    control,
+    validSchema,
+    columnName,
+    editingEnabled,
+    ...restProps
+  } = columnConfig
   const { onBlur, onFocus, autoFocus } = cellProps
   const [
     blur,
@@ -67,6 +74,7 @@ const ODOS = ({ row, columnConfig, cellProps, classes }) => {
           onFocus={() => {
             debounceBlur(false)
           }}
+          disabled={!editingEnabled}
         />
       </GridItem>
       <GridItem xs={1} className={classes.alignBottom}>
@@ -89,6 +97,7 @@ const ODOS = ({ row, columnConfig, cellProps, classes }) => {
           onFocus={() => {
             debounceBlur(false)
           }}
+          disabled={!editingEnabled}
         />
       </GridItem>
       <GridItem xs={1} className={classes.alignBottom}>
@@ -111,6 +120,7 @@ const ODOS = ({ row, columnConfig, cellProps, classes }) => {
           onFocus={() => {
             debounceBlur(false)
           }}
+          disabled={!editingEnabled}
         />
       </GridItem>
       <GridItem xs={4}>
@@ -134,6 +144,7 @@ const ODOS = ({ row, columnConfig, cellProps, classes }) => {
               onFocus={() => {
                 debounceBlur(false)
               }}
+              disabled={!editingEnabled}
             />
             <span className={classes.alignBottom}>)</span>
           </div>

@@ -16,7 +16,14 @@ const styles = () => ({
 })
 
 const NearAddODOS = ({ row, columnConfig, cellProps, classes }) => {
-  const { value, control, validSchema, columnName, ...restProps } = columnConfig
+  const {
+    value,
+    control,
+    validSchema,
+    columnName,
+    editingEnabled,
+    ...restProps
+  } = columnConfig
   const { onBlur, onFocus, autoFocus, ...props } = cellProps
   const [
     blur,
@@ -74,6 +81,7 @@ const NearAddODOS = ({ row, columnConfig, cellProps, classes }) => {
               onFocus={() => {
                 debounceBlur(false)
               }}
+              disabled={!editingEnabled}
             />
           </React.Fragment>
         </GridItem>
@@ -98,6 +106,7 @@ const NearAddODOS = ({ row, columnConfig, cellProps, classes }) => {
               onFocus={() => {
                 debounceBlur(false)
               }}
+              disabled={!editingEnabled}
             />
           </React.Fragment>
         </GridItem>
@@ -123,6 +132,7 @@ const NearAddODOS = ({ row, columnConfig, cellProps, classes }) => {
               onFocus={() => {
                 debounceBlur(false)
               }}
+              disabled={!editingEnabled}
             />
           </React.Fragment>
         </GridItem>
@@ -153,6 +163,7 @@ const NearAddODOS = ({ row, columnConfig, cellProps, classes }) => {
               onFocus={() => {
                 debounceBlur(false)
               }}
+              disabled={!editingEnabled}
             />
             <span className={classes.alignBottom}> cm )</span>
           </React.Fragment>

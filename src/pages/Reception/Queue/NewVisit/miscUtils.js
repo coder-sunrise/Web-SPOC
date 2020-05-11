@@ -1,5 +1,5 @@
-import { VISIT_STATUS } from '../variables'
 import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
+import { VISIT_STATUS } from '../variables'
 
 const filterDeletedFiles = (item) => {
   // filter out not yet confirmed files
@@ -127,12 +127,10 @@ export const formikMapPropsToValues = ({
     }
 
     let newFormData
-    if (
-      visitEyeRefractionForm &&
-      visitEyeRefractionForm.formData &&
-      typeof visitEyeRefractionForm.formData === 'string'
-    ) {
-      newFormData = JSON.parse(visitEyeRefractionForm.formData)
+    if (visitEyeRefractionForm && visitEyeRefractionForm.formData) {
+      if (typeof visitEyeRefractionForm.formData === 'string')
+        newFormData = JSON.parse(visitEyeRefractionForm.formData)
+      else newFormData = visitEyeRefractionForm.formData
     }
 
     return {

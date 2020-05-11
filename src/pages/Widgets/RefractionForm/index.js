@@ -1,10 +1,6 @@
 import React, { PureComponent } from 'react'
 import { withStyles } from '@material-ui/core'
 import * as Yup from 'yup'
-import model from './models'
-import Grid from './Grid'
-import NearAddGrid from './NearAddGrid'
-
 import {
   TextField,
   NumberInput,
@@ -16,6 +12,9 @@ import {
   Checkbox,
   OutlinedTextField,
 } from '@/components'
+import model from './models'
+import Grid from './Grid'
+import NearAddGrid from './NearAddGrid'
 
 window.g_app.replaceModel(model)
 
@@ -25,20 +24,29 @@ const gridValidationSchema = Yup.object().shape({
 })
 
 class RefractionForm extends PureComponent {
-  constructor (props) {
-    super(props)
-    const { prefix, setFieldValue, values } = props
+  state = {
+    formData: undefined,
+  }
 
-    let formData = this.convertEyeRefractionForm(
-      Object.byString(values, prefix),
-    )
-    this.state = {
-      formData,
+  componentWillReceiveProps (nextProps) {
+    const { prefix, values, setFieldValue } = this.props
+    let thisFormData = Object.byString(values, prefix)
+    let nextFormData = Object.byString(nextProps.values, prefix)
+
+    if (
+      nextFormData &&
+      !this.state.formData &&
+      (!thisFormData || typeof thisFormData === 'string')
+    ) {
+      nextFormData = this.convertEyeRefractionForm(nextFormData)
+
+      this.state = {
+        formData: nextFormData,
+      }
+      setTimeout(() => {
+        setFieldValue(prefix, nextFormData)
+      }, 10)
     }
-    // console.log('constructor RefractionForm', formData)
-    setTimeout(() => {
-      setFieldValue(prefix, formData)
-    }, 10)
   }
 
   onCommitChanges = (p) => {
@@ -98,12 +106,14 @@ class RefractionForm extends PureComponent {
   }
 
   getRows = () => {
-    return this.state.formData.Tests || []
+    const { formData } = this.state
+    if (formData && formData.Tests) return formData.Tests
+    return []
   }
 
   getNearAddRows = () => {
-    const { formData } = this.state
-    console.log(formData)
+    const { formData = undefined } = this.state
+
     if (formData && formData.NearAdd) {
       return [
         { id: -99, ...formData.NearAdd },
@@ -171,6 +181,8 @@ class RefractionForm extends PureComponent {
       const rows = this.getRows()
       return !rows || rows.filter((r) => r.IsSelected === true).length !== 1
     }
+
+    // console.log(this.state.formData)
 
     const _prefix = `${prefix}.`
     return (
