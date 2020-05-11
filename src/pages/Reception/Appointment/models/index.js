@@ -33,9 +33,34 @@ export default createListViewModel({
   param: {
     service,
     state: {
-      default: {},
+        filterTemplates: [],
     },
-    effects: {},
+    effects: {
+        *saveFilterTemplate({ payload }, { call, put, select }) {
+            const user = yield select((st) => st.user)
+            const r = yield call(service.saveFilterTemplate, user.data.id, {
+                userPreferenceDetails: JSON.stringify(payload),
+            })
+
+            if (r === 204) return true
+
+            return false
+        },
+        *getFilterTemplate({ payload }, { call, put }) {
+            const r = yield call(service.getFilterTemplate, payload)
+            const { status, data } = r
+
+            if (status === '200') {
+                yield put({
+                    type: 'setFilterTemplate',
+                    payload: {
+                        data,
+                    },
+                })
+            }
+            return false
+        },
+    },
     reducers: {
       queryOneDone (st, { payload }) {
         const { data } = payload
@@ -101,6 +126,49 @@ export default createListViewModel({
           ...st,
           list: formattedList,
         }
+      },
+      setFilterTemplate(st, { payload }) {
+          const { data } = payload
+
+          if (data.userPreferenceDetails) {
+              const parsedFilterTemplate = JSON.parse(data.userPreferenceDetails)
+              const favFilterTemplate = parsedFilterTemplate.find(
+                  (template) => template.isFavorite,
+              )
+              return {
+                  ...st,
+                  filterTemplates: parsedFilterTemplate,
+                  currentFilterTemplate: favFilterTemplate
+                      ? {
+                          ...favFilterTemplate,
+                      }
+                      : null,
+              }
+          }
+          return {
+              ...st,
+          }
+      },
+      setCurrentFilterTemplate(st, { payload }) {
+          const { id } = payload
+          const { filterTemplates } = st
+
+          if (id) {
+              const { filterByDoctor, filterByApptType } = filterTemplates.find(
+                  (template) => template.id === id,
+              )
+              return {
+                  ...st,
+                  currentFilterTemplate: {
+                      filterByDoctor,
+                      filterByApptType,
+                  },
+              }
+          }
+          return {
+              ...st,
+              currentFilterTemplate: null,
+          }
       },
     },
   },
