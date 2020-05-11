@@ -153,6 +153,7 @@ export default {
   'menu.setting.visitordertemplate': 'Visit Order Template',
   'menu.setting.casetype': 'Case Type',
   'menu.setting.casedescription': 'Case Description',
+  'menu.setting.refractiontesttype': 'Refraction Test Type',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',
