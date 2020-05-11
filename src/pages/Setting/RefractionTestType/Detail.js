@@ -46,10 +46,9 @@ const styles = (theme) => ({})
 class Detail extends PureComponent {
     state = {}
 
-    render () {
+    render() {
         const { props } = this
         const { theme, footer, settingRefractionTestType } = props
-        // console.log('detail', props)
         return (
             <React.Fragment>
                 <div style={{ margin: theme.spacing(1) }}>
