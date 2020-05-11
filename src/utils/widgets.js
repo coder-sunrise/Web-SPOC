@@ -389,6 +389,31 @@ const widgets = [
     // model: 'refractionForm',
     layoutConfig: {},
   },
+  {
+    id: '11',
+    name: 'Examination Form',
+    accessRight: undefined, // 'queue.consultation.widgets.refractionform',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/ExaminationForm'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        const { parentProps, ...restProps } = p
+        return (
+          <Cmpnet
+            {...parentProps}
+            {...restProps}
+            prefix='corEyeExaminationForm.formData'
+          />
+        )
+      },
+      loading: Loading,
+    }),
+    associatedProps: [
+      'corEyeExaminationForm',
+    ],
+    // model: 'refractionForm',
+    layoutConfig: {},
+  },
 ]
 
 module.exports = {

@@ -92,6 +92,7 @@ export default createFormViewModel({
             roomFK: undefined,
             appointmentFK: undefined,
             expandRefractionForm: undefined,
+            expandExaminationForm: undefined,
           },
         })
         yield put({
@@ -111,7 +112,13 @@ export default createFormViewModel({
         try {
           const response = yield call(service.query, payload)
           const { data = {} } = response
-          const { visit: { patientProfileFK, visitEyeRefractionForm } } = data
+          const {
+            visit: {
+              patientProfileFK,
+              visitEyeRefractionForm,
+              visitEyeExaminationForm,
+            },
+          } = data
 
           if (patientProfileFK) {
             // const { patientProfileFK } = visit
@@ -125,18 +132,33 @@ export default createFormViewModel({
               })
             }
             // yield take('fetchPatientInfoByPatientID/@@end')
-            let formData
+            let refractionFormData
+            let examinationFormData
             if (visitEyeRefractionForm) {
               if (
                 visitEyeRefractionForm.formData &&
                 typeof visitEyeRefractionForm.formData === 'string'
               ) {
-                formData = JSON.parse(visitEyeRefractionForm.formData)
+                refractionFormData = JSON.parse(visitEyeRefractionForm.formData)
               } else {
                 // eslint-disable-next-line prefer-destructuring
-                formData = visitEyeRefractionForm.formData
+                refractionFormData = visitEyeRefractionForm.formData
               }
             }
+            if (visitEyeExaminationForm) {
+              if (
+                visitEyeExaminationForm.formData &&
+                typeof visitEyeExaminationForm.formData === 'string'
+              ) {
+                examinationFormData = JSON.parse(
+                  visitEyeExaminationForm.formData,
+                )
+              } else {
+                // eslint-disable-next-line prefer-destructuring
+                examinationFormData = visitEyeExaminationForm.formData
+              }
+            }
+
             yield put({
               type: 'updateState',
               payload: {
@@ -144,13 +166,18 @@ export default createFormViewModel({
                   ...data,
                   visitEyeRefractionForm: {
                     ...visitEyeRefractionForm,
-                    formData,
+                    formData: refractionFormData,
+                  },
+                  visitEyeExaminationForm: {
+                    ...visitEyeExaminationForm,
+                    formData: examinationFormData,
                   },
                 },
                 attachmentOriList: [
                   ...data.visit.visitAttachment,
                 ],
                 expandRefractionForm: !!visitEyeRefractionForm,
+                expandExaminationForm: !!visitEyeExaminationForm,
               },
             })
           }

@@ -10,7 +10,6 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import numeral from 'numeral'
 import {
   CommonTableGrid,
-  FastEditableTableGrid,
   EditableTableGrid,
   Button,
   Popconfirm,

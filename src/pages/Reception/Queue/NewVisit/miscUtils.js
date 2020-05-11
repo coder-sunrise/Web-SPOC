@@ -206,7 +206,10 @@ export const formikHandleSubmit = (
     _referralBy = referralBy[0]
   }
 
-  let { visitEyeRefractionForm = undefined } = restValues
+  let {
+    visitEyeRefractionForm = undefined,
+    visitEyeExaminationForm,
+  } = restValues
   if (visitEyeRefractionForm && visitEyeRefractionForm.formData) {
     visitEyeRefractionForm.formData = JSON.stringify(
       visitEyeRefractionForm.formData,
@@ -214,7 +217,13 @@ export const formikHandleSubmit = (
   } else {
     visitEyeRefractionForm = undefined
   }
-
+  if (visitEyeExaminationForm && visitEyeExaminationForm.formData) {
+    visitEyeExaminationForm.formData = JSON.stringify(
+      visitEyeExaminationForm.formData,
+    )
+  } else {
+    visitEyeExaminationForm = undefined
+  }
   const payload = {
     cfg: {
       message: id ? 'Visit updated' : 'Visit created',
@@ -234,6 +243,7 @@ export const formikHandleSubmit = (
       ...restValues, // override using formik values
       referralBy: _referralBy,
       visitEyeRefractionForm,
+      visitEyeExaminationForm,
     },
   }
 

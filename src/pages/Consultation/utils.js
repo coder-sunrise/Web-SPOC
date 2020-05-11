@@ -99,10 +99,15 @@ const convertToConsultation = (values, { consultationDocument, orders }) => {
     // values.corDentalCharts = data.map(o=>)
   }
 
-  const { corEyeRefractionForm } = values
+  const { corEyeRefractionForm, corEyeExaminationForm } = values
   if (corEyeRefractionForm && corEyeRefractionForm.formData) {
     values.corEyeRefractionForm.formData = JSON.stringify(
       corEyeRefractionForm.formData,
+    )
+  }
+  if (corEyeExaminationForm && corEyeExaminationForm.formData) {
+    values.corEyeExaminationForm.formData = JSON.stringify(
+      corEyeExaminationForm.formData,
     )
   }
 

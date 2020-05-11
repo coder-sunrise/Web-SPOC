@@ -24,6 +24,7 @@ import VitalSignCard from './VitalSignCard'
 import ReferralCard from './ReferralCard'
 import EyeVisualAcuityCard from './EyeVisualAcuityCard'
 import RefractionFormCard from './RefractionFormCard'
+import ExaminationFormCard from './ExaminationFormCard'
 
 // import ParticipantCard from './ParticipantCard'
 import VisitValidationSchema from './validationScheme'
@@ -245,6 +246,7 @@ class NewVisit extends PureComponent {
         errorState,
         visitOrderTemplateOptions,
         expandRefractionForm,
+        expandExaminationForm,
       },
       values,
       isSubmitting,
@@ -255,6 +257,10 @@ class NewVisit extends PureComponent {
 
     if (expandRefractionForm) {
       let div = $(this.myRef.current).find('div[aria-expanded]:eq(1)')
+      if (div.attr('aria-expanded') === 'false') div.click()
+    }
+    if (expandExaminationForm) {
+      let div = $(this.myRef.current).find('div[aria-expanded]:eq(2)')
       if (div.attr('aria-expanded') === 'false') div.click()
     }
 
@@ -384,14 +390,18 @@ class NewVisit extends PureComponent {
                             <Accordion
                               mode='multiple'
                               onChange={(event, p, expanded) => {
+                                let payload = {}
                                 if (p.key === 1 && expanded) {
-                                  dispatch({
-                                    type: 'visitRegistration/updateState',
-                                    payload: {
-                                      expandRefractionForm: false,
-                                    },
-                                  })
+                                  payload.expandRefractionForm = false
                                 }
+                                if (p.key === 2 && expanded) {
+                                  payload.expandExaminationForm = false
+                                }
+
+                                dispatch({
+                                  type: 'visitRegistration/updateState',
+                                  payload,
+                                })
                               }}
                               collapses={[
                                 {
@@ -458,7 +468,41 @@ class NewVisit extends PureComponent {
                                               xs={12}
                                               className={classes.row}
                                             >
-                                              <RefractionFormCard
+                                              <ExaminationFormCard
+                                                {...this.props}
+                                              />
+                                            </GridItem>
+                                          </Authorized.Context.Provider>
+                                        )
+                                      }}
+                                    </Authorized>
+                                  ),
+                                },
+                                {
+                                  title: 'Examination Form',
+                                  content: (
+                                    <Authorized authority='queue.visitregistrationdetails.eyevisualacuity'>
+                                      {({ rights: eyeAccessRight }) => {
+                                        if (eyeAccessRight === 'hidden')
+                                          return null
+                                        return (
+                                          <Authorized.Context.Provider
+                                            value={{
+                                              rights:
+                                                (eyeAccessRight ===
+                                                  'readwrite' ||
+                                                  eyeAccessRight ===
+                                                    'enable') &&
+                                                (isReadOnly || isRetail)
+                                                  ? 'disable'
+                                                  : eyeAccessRight,
+                                            }}
+                                          >
+                                            <GridItem
+                                              xs={12}
+                                              className={classes.row}
+                                            >
+                                              <ExaminationFormCard
                                                 {...this.props}
                                               />
                                             </GridItem>
