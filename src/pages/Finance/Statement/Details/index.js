@@ -23,12 +23,18 @@ const styles = () => ({})
     let newStatementInvoice = []
     let total = 0
     let adminChargeValueField = 0
+    let adjustmentValueField = 0
     if (returnValue.statementInvoice) {
       newStatementInvoice = returnValue.statementInvoice.map((o) => {
-        const { statementInvoicePayment, adminCharge, outstandingAmount } = o
+        const {
+          statementInvoicePayment,
+          adminCharge,
+          outstandingAmount,
+          statementAdjustment,
+        } = o
         total += outstandingAmount
         adminChargeValueField += adminCharge
-
+        adjustmentValueField += statementAdjustment
         return {
           ...o,
           tempOutstandingAmount: o.outstandingAmount,
@@ -42,7 +48,8 @@ const styles = () => ({})
     const outstandingBalance =
       returnValue.totalAmount -
       returnValue.collectedAmount -
-      adminChargeValueField
+      adminChargeValueField -
+      adjustmentValueField
 
     return {
       ...returnValue,
