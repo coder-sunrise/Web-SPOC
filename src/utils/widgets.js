@@ -367,7 +367,7 @@ const widgets = [
   {
     id: '10',
     name: 'Forms',
-    accessRight: 'queue.consultation.widgets.consultationdocument',
+    accessRight: 'queue.consultation.widgets.forms',
     component: Loadable({
       loader: () => import('@/pages/Widgets/Forms'),
       loading: Loading,

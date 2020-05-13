@@ -6,7 +6,6 @@ import { gstChargedTypes, surgicalRoles } from '@/utils/codes'
 import {
   GridContainer,
   GridItem,
-  TextField,
   FastField,
   DatePicker,
   RadioButtonGroup,
@@ -17,6 +16,7 @@ import {
   Button,
   TimePicker,
   EditableTableGrid,
+  TextField,
 } from '@/components'
 import { DoctorLabel } from '@/components/_medisys'
 
@@ -181,7 +181,6 @@ class Procedures extends PureComponent {
               } else {
                 canAddSurgicalCharges = o.surgicalCharges.length < 5
               }
-
               let isContainsPrincipalSurgeon =
                 o.surgicalCharges.filter((sc) => sc.surgicalRoleFK === 1)
                   .length >= 1

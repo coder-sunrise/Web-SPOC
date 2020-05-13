@@ -130,10 +130,10 @@ class FilterBar extends PureComponent {
                       payload: {
                         apiCriteria: {
                           searchValue: patientSearchValue,
-                          startDate: formSearchStartDate,
-                          endDate: formSearchEndDate,
-                          formTypeFK,
-                          statusFK,
+                          visitDateFrom: formSearchStartDate,
+                          visitDateTo: formSearchEndDate,
+                          formType: formTypeFK,
+                          formStatus: statusFK,
                         },
                       },
                     })

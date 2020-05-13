@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import { ltAdmittingSpecialty } from '@/utils/codes'
 import {
   GridContainer,
   GridItem,
@@ -89,7 +90,7 @@ class PatientParticulars extends PureComponent {
               <CodeSelect
                 label='Admitting Specialty'
                 {...args}
-                code='CTCaseDescription'
+                options={ltAdmittingSpecialty}
                 onChage={(v) => {
                   if (!v || v !== 99) {
                     setFieldValue('others', undefined)

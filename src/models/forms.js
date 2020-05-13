@@ -1,5 +1,4 @@
 import { createFormViewModel } from 'medisys-model'
-import moment from 'moment'
 import { getUniqueId } from '@/utils/utils'
 
 export default createFormViewModel({
@@ -14,7 +13,13 @@ export default createFormViewModel({
         type: '1',
         typeName: 'Letter of Certification',
         statusFK: 1,
-        visitDate: moment(),
+        formData: {
+          caseType: '2',
+          procuderes: [],
+          otherDiagnosis: [],
+          surgicalCharges: [],
+          nonSurgicalCharges: [],
+        },
       },
       default: {},
       rows: [],

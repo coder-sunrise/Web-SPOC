@@ -1037,7 +1037,7 @@ const formTypes = [
   {
     value: '1',
     name: 'Letter of Certification',
-    prop: 'corLetterofCertification',
+    prop: 'corLetterOfCertification',
     downloadConfig: {
       id: 9,
       key: 'LetterofCertificationId',
@@ -1075,6 +1075,57 @@ const formStatus = [
   },
 ]
 
+const gstChargedTypes = [
+  {
+    id: 1,
+    name: 'Charged',
+  },
+  {
+    id: 2,
+    name: 'Waived',
+  },
+  {
+    id: 3,
+    name: 'Not Registered',
+  },
+]
+
+const surgicalRoles = [
+  {
+    id: 1,
+    code: 'PrincipalSurgeon',
+    name: 'Principal Surgeon',
+  },
+  {
+    id: 2,
+    code: 'Dentist',
+    name: 'Dentist',
+  },
+  {
+    id: 3,
+    code: 'Doctor',
+    name: 'Doctor',
+  },
+  {
+    id: 4,
+    code: 'Anaesthetist',
+    name: 'Anaesthetist',
+  },
+  {
+    id: 5,
+    code: 'Assistant',
+    name: 'Assistant',
+  },
+]
+
+const ltAdmittingSpecialty = [
+  {
+    id: 1,
+    code: '01',
+    name: 'Burns',
+  },
+]
+
 module.exports = {
   appointmentStatus,
   recurrenceTypes,
@@ -1107,5 +1158,8 @@ module.exports = {
   initRoomAssignment,
   formTypes,
   formStatus,
+  gstChargedTypes,
+  surgicalRoles,
+  ltAdmittingSpecialty,
   ...module.exports,
 }

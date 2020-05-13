@@ -11,7 +11,6 @@ import {
   CommonTableGrid,
   Button,
   Popconfirm,
-  ProgressButton,
   AuthorizedContext,
   TextField,
   Danger,
@@ -279,15 +278,24 @@ class VisitFormGrid extends PureComponent {
                             title={item.name}
                             classes={classes}
                             onClick={() => {
-                              window.g_app._store.dispatch({
-                                type: 'formListing/updateState',
-                                payload: {
-                                  showModal: true,
-                                  type: item.value,
-                                  entity: undefined,
-                                  formCategory: this.props.formCategory,
-                                },
-                              })
+                              this.props
+                                .dispatch({
+                                  type: 'formListing/initState',
+                                  payload: {
+                                    visitID: formListing.visitID,
+                                  },
+                                })
+                                .then((response) => {
+                                  this.props.dispatch({
+                                    type: 'formListing/updateState',
+                                    payload: {
+                                      showModal: true,
+                                      type: item.value,
+                                      entity: undefined,
+                                      formCategory: this.props.formCategory,
+                                    },
+                                  })
+                                })
                               this.toggleVisibleChange()
                             }}
                             {...item}
@@ -300,13 +308,13 @@ class VisitFormGrid extends PureComponent {
               >
                 <Tooltip title='Add Form'>
                   <Tooltip title='Add Form'>
-                    <ProgressButton
+                    <Button
                       color='primary'
                       icon={<Add />}
                       style={{ margin: theme.spacing(1) }}
                     >
                       Add New
-                    </ProgressButton>
+                    </Button>
                   </Tooltip>
                 </Tooltip>
               </Popover>

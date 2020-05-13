@@ -4,7 +4,6 @@ import _ from 'lodash'
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 import moment from 'moment'
 import Yup from '@/utils/yup'
-import { FORM_CATEGORY } from '@/utils/constants'
 import {
   GridContainer,
   withFormikExtend,
@@ -57,11 +56,11 @@ const procuderesSchema = Yup.object().shape({
   visit: visitRegistration.entity.visit,
 }))
 @withFormikExtend({
-  mapPropsToValues: ({ formListing, codetable, patient, visit }) => {
+  mapPropsToValues: ({ forms, codetable, patient, visit }) => {
     let values = {}
-    if (formListing.entity) {
+    if (forms.entity) {
       values = {
-        ...formListing.entity,
+        ...forms.entity,
       }
     } else {
       const { visitDate, doctorProfileFK } = visit
@@ -69,9 +68,9 @@ const procuderesSchema = Yup.object().shape({
       const { doctorprofile } = codetable
       const doctor = doctorprofile.find((o) => o.id === doctorProfileFK)
       values = {
-        ...formListing.defaultLCForm,
+        ...forms.defaultLCForm,
         formData: {
-          ...formListing.defaultLCForm.formData,
+          ...forms.defaultLCForm.formData,
           patientName: name,
           patientNRICNo: patientReferenceNo,
           patientAccountNo,
@@ -137,8 +136,6 @@ class LCForm extends PureComponent {
       getNextSequence,
       user,
       values,
-      resetForm,
-      formCategory,
       validateForm,
     } = this.props
     const isFormValid = await validateForm()
@@ -146,34 +143,16 @@ class LCForm extends PureComponent {
       this.props.handleSubmit()
     } else {
       const nextSequence = getNextSequence()
-      let statusFK
-      if (action === 'submit') {
-        statusFK = 3
-      } else {
-        statusFK =
-          formCategory === FORM_CATEGORY.VISITFORM ? values.statusFK : 2
-      }
       dispatch({
-        type: 'formListing/update',
+        type: 'forms/upsertRow',
         payload: {
-          formCategory,
-          type: values.type,
-          formData: {
-            sequence: nextSequence,
-            ...values,
-            formData: JSON.stringify(values.formData),
-            updateByUser: user.data.clinicianProfile.name,
-            statusFK,
-          },
+          sequence: nextSequence,
+          ...values,
+          updateByUser: user.data.clinicianProfile.name,
+          statusFK: action === 'submit' ? 3 : 2,
         },
-      }).then((r) => {
-        if (r) {
-          resetForm()
-          if (onConfirm) onConfirm()
-          dispatch({
-            type: 'formListing/query',
-          })
-        }
+      }).then(() => {
+        if (onConfirm) onConfirm()
       })
     }
   }
@@ -185,7 +164,7 @@ class LCForm extends PureComponent {
   }
 
   render () {
-    const { values, formCategory, height, global } = this.props
+    const { values, height, global } = this.props
 
     const { statusFK } = values
     return (
@@ -259,7 +238,7 @@ class LCForm extends PureComponent {
           <Button color='danger' icon={null} onClick={this.cancelLCForm}>
             cancel
           </Button>
-          {(formCategory === FORM_CATEGORY.VISITFORM || statusFK === 1) && (
+          {statusFK === 1 && (
             <Button
               disabled={global.disableSave}
               color='primary'
@@ -272,8 +251,7 @@ class LCForm extends PureComponent {
             </Button>
           )}
 
-          {formCategory === FORM_CATEGORY.CORFORM &&
-          (statusFK === 1 || statusFK === 2) && (
+          {(statusFK === 1 || statusFK === 2) && (
             <Button
               disabled={global.disableSave}
               color='success'

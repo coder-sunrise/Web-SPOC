@@ -198,7 +198,7 @@ export const widgets = (props) => [
   {
     id: '14',
     name: 'Forms',
-    authority: 'queue.consultation.widgets.order',
+    authority: 'queue.consultation.widgets.froms',
     component: Loadable({
       loader: () => import('./Forms'),
       render: (loaded, p) => {

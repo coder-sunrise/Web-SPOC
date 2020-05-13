@@ -795,6 +795,9 @@ const _routes = [
         icon: 'description',
         name: 'forms',
         component: './FormListing',
+        authority: [
+          'forms',
+        ],
       },
       // Forms
       //

@@ -18,7 +18,6 @@ import {
   Popconfirm,
   notification,
   withFormikExtend,
-  ProgressButton,
   AuthorizedContext,
   TextField,
   Danger,
@@ -463,13 +462,13 @@ class Forms extends PureComponent {
               >
                 <Tooltip title='Add Form'>
                   <Tooltip title='Add Form'>
-                    <ProgressButton
+                    <Button
                       color='primary'
                       icon={<Add />}
                       style={{ margin: theme.spacing(1) }}
                     >
                       Add New
-                    </ProgressButton>
+                    </Button>
                   </Tooltip>
                 </Tooltip>
               </Popover>

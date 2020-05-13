@@ -122,10 +122,17 @@ class EditOrder extends Component {
   }
 
   signOrder = async (values) => {
-    const { consultationDocument, orders, dispatch, dispense } = this.props
+    const {
+      consultationDocument,
+      orders,
+      dispatch,
+      dispense,
+      forms,
+    } = this.props
     const payload = convertToConsultation(values, {
       consultationDocument,
       orders,
+      forms,
     })
 
     const signResult = await dispatch({

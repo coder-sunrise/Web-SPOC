@@ -360,6 +360,7 @@ export default createFormViewModel({
                 type: p.value,
                 typeName: p.name,
                 ...o,
+                formData: JSON.parse(o.formData),
               }
               return d
             }),

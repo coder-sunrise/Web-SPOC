@@ -14,22 +14,17 @@ export default createListViewModel({
         type: '1',
         typeName: 'Letter of Certification',
         statusFK: 1,
-        dataContent: {
-          procuderes: [
-            { name: '111', index: 1 },
-            { name: '222', index: 2 },
-          ],
+        formData: {
+          caseType: '2',
+          procuderes: [],
+          otherDiagnosis: [],
+          surgicalCharges: [],
+          nonSurgicalCharges: [],
         },
       },
       default: {},
       showModal: false,
-      list: [
-        {
-          typeName: 'sdfsdfdsfs',
-          type: '1',
-          statusFK: 2,
-        },
-      ],
+      list: [],
     },
 
     subscriptions: ({ dispatch, history }) => {
@@ -38,6 +33,33 @@ export default createListViewModel({
       })
     },
     effects: {
+      *initState ({ payload }, { call, put, select, take }) {
+        const { visitID } = payload
+
+        let visit
+        if (visitID) {
+          yield put({
+            type: 'visitRegistration/query',
+            payload: { id: visitID },
+          })
+          yield take('visitRegistration/query/@@end')
+          const visitRegistration = yield select((st) => st.visitRegistration)
+          visit = visitRegistration.entity.visit
+          if (!visit) return
+        } else {
+          yield put({
+            type: 'visitRegistration/reset',
+          })
+        }
+
+        yield put({
+          type: 'patient/query',
+          payload: { id: visit.patientProfileFK },
+        })
+
+        yield take('patient/query/@@end')
+      },
+
       *update ({ payload }, { call, put }) {
         const response = yield call(service.upsert, payload)
         return response

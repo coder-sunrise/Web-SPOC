@@ -88,6 +88,7 @@ const saveConsultation = ({
     consultation,
     consultationDocument = {},
     orders = {},
+    forms = {},
   } = props
   const onConfirmSave = () => {
     const newValues = convertToConsultation(
@@ -102,6 +103,7 @@ const saveConsultation = ({
       {
         orders,
         consultationDocument,
+        forms,
       },
     )
     newValues.duration = Math.floor(
@@ -199,6 +201,7 @@ const discardConsultation = ({
     visitRegistration,
     formik,
     cestemplate,
+    forms,
   }) => ({
     clinicInfo,
     consultation,
@@ -208,6 +211,7 @@ const discardConsultation = ({
     visitRegistration,
     formik,
     cestemplate,
+    forms,
   }),
 )
 @withFormikExtend({
@@ -745,13 +749,14 @@ class Main extends React.Component {
   }
 
   saveTemplate = () => {
-    const { dispatch, orders, consultationDocument, values } = this.props
+    const { dispatch, orders, consultationDocument, values, forms } = this.props
     dispatch({
       type: 'consultation/updateState',
       payload: {
         entity: convertToConsultation(values, {
           orders,
           consultationDocument,
+          forms,
         }),
       },
     })
