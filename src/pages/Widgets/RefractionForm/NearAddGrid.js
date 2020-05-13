@@ -24,7 +24,6 @@ import { orderTypes } from '@/pages/Consultation/utils'
 import Authorized from '@/utils/Authorized'
 import NearAddODOS from './NearAddODOS'
 
-// console.log(orderTypes)
 export default ({
   dispatch,
   classes,

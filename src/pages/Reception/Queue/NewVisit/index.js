@@ -24,7 +24,6 @@ import VitalSignCard from './VitalSignCard'
 import ReferralCard from './ReferralCard'
 import EyeVisualAcuityCard from './EyeVisualAcuityCard'
 import RefractionFormCard from './RefractionFormCard'
-import ExaminationFormCard from './ExaminationFormCard'
 
 // import ParticipantCard from './ParticipantCard'
 import VisitValidationSchema from './validationScheme'
@@ -236,6 +235,57 @@ class NewVisit extends PureComponent {
     return handleSubmit()
   }
 
+  getEyeWidgets = (isReadOnly, isRetail) => {
+    const { values, classes } = this.props
+
+    const checkAccessright = (authority) => {
+      const accessRight = Authorized.check(authority)
+      if (accessRight) {
+        const { rights } = accessRight
+        return (rights === 'readwrite' || rights === 'enable') &&
+        (isReadOnly || isRetail)
+          ? 'disable'
+          : rights
+      }
+
+      return undefined
+    }
+
+    return [
+      {
+        title: 'Visual Acuity Test',
+        authority: 'queue.visitregistrationdetails.eyevisualacuity',
+        content: (
+          <GridItem xs={12} className={classes.row}>
+            <EyeVisualAcuityCard
+              handleUpdateAttachments={this.updateAttachments}
+              attachments={values.visitAttachment}
+            />
+          </GridItem>
+        ),
+      },
+      {
+        title: 'Refraction Form',
+        authority: 'queue.visitregistrationdetails.eyerefractionform',
+        content: (
+          <GridItem xs={12} className={classes.row}>
+            <RefractionFormCard {...this.props} />
+          </GridItem>
+        ),
+      },
+    ].reduce((result, item) => {
+      let right = checkAccessright(item.authority)
+      if (right === 'readwrite' || right === 'enable') {
+        return [
+          ...result,
+          item,
+        ]
+      }
+
+      return result
+    }, [])
+  }
+
   render () {
     const {
       classes,
@@ -246,7 +296,6 @@ class NewVisit extends PureComponent {
         errorState,
         visitOrderTemplateOptions,
         expandRefractionForm,
-        expandExaminationForm,
       },
       values,
       isSubmitting,
@@ -257,10 +306,6 @@ class NewVisit extends PureComponent {
 
     if (expandRefractionForm) {
       let div = $(this.myRef.current).find('div[aria-expanded]:eq(1)')
-      if (div.attr('aria-expanded') === 'false') div.click()
-    }
-    if (expandExaminationForm) {
-      let div = $(this.myRef.current).find('div[aria-expanded]:eq(2)')
       if (div.attr('aria-expanded') === 'false') div.click()
     }
 
@@ -390,129 +435,17 @@ class NewVisit extends PureComponent {
                             <Accordion
                               mode='multiple'
                               onChange={(event, p, expanded) => {
-                                let payload = {}
                                 if (p.key === 1 && expanded) {
-                                  payload.expandRefractionForm = false
+                                  dispatch({
+                                    type: 'visitRegistration/updateState',
+                                    payload: { expandRefractionForm: false },
+                                  })
                                 }
-                                if (p.key === 2 && expanded) {
-                                  payload.expandExaminationForm = false
-                                }
-
-                                dispatch({
-                                  type: 'visitRegistration/updateState',
-                                  payload,
-                                })
                               }}
-                              collapses={[
-                                {
-                                  title: 'Visual Acuity Test',
-                                  content: (
-                                    <Authorized authority='queue.visitregistrationdetails.eyevisualacuity'>
-                                      {({ rights: eyeAccessRight }) => {
-                                        if (eyeAccessRight === 'hidden')
-                                          return null
-                                        return (
-                                          <Authorized.Context.Provider
-                                            value={{
-                                              rights:
-                                                (eyeAccessRight ===
-                                                  'readwrite' ||
-                                                  eyeAccessRight ===
-                                                    'enable') &&
-                                                (isReadOnly || isRetail)
-                                                  ? 'disable'
-                                                  : eyeAccessRight,
-                                            }}
-                                          >
-                                            <GridItem
-                                              xs={12}
-                                              className={classes.row}
-                                            >
-                                              <EyeVisualAcuityCard
-                                                // isReadOnly={isRetail || isReadOnly}
-                                                handleUpdateAttachments={
-                                                  this.updateAttachments
-                                                }
-                                                attachments={
-                                                  values.visitAttachment
-                                                }
-                                              />
-                                            </GridItem>
-                                          </Authorized.Context.Provider>
-                                        )
-                                      }}
-                                    </Authorized>
-                                  ),
-                                },
-                                {
-                                  title: 'Refraction Form',
-                                  content: (
-                                    <Authorized authority='queue.visitregistrationdetails.eyevisualacuity'>
-                                      {({ rights: eyeAccessRight }) => {
-                                        if (eyeAccessRight === 'hidden')
-                                          return null
-                                        return (
-                                          <Authorized.Context.Provider
-                                            value={{
-                                              rights:
-                                                (eyeAccessRight ===
-                                                  'readwrite' ||
-                                                  eyeAccessRight ===
-                                                    'enable') &&
-                                                (isReadOnly || isRetail)
-                                                  ? 'disable'
-                                                  : eyeAccessRight,
-                                            }}
-                                          >
-                                            <GridItem
-                                              xs={12}
-                                              className={classes.row}
-                                            >
-                                              <ExaminationFormCard
-                                                {...this.props}
-                                              />
-                                            </GridItem>
-                                          </Authorized.Context.Provider>
-                                        )
-                                      }}
-                                    </Authorized>
-                                  ),
-                                },
-                                {
-                                  title: 'Examination Form',
-                                  content: (
-                                    <Authorized authority='queue.visitregistrationdetails.eyevisualacuity'>
-                                      {({ rights: eyeAccessRight }) => {
-                                        if (eyeAccessRight === 'hidden')
-                                          return null
-                                        return (
-                                          <Authorized.Context.Provider
-                                            value={{
-                                              rights:
-                                                (eyeAccessRight ===
-                                                  'readwrite' ||
-                                                  eyeAccessRight ===
-                                                    'enable') &&
-                                                (isReadOnly || isRetail)
-                                                  ? 'disable'
-                                                  : eyeAccessRight,
-                                            }}
-                                          >
-                                            <GridItem
-                                              xs={12}
-                                              className={classes.row}
-                                            >
-                                              <ExaminationFormCard
-                                                {...this.props}
-                                              />
-                                            </GridItem>
-                                          </Authorized.Context.Provider>
-                                        )
-                                      }}
-                                    </Authorized>
-                                  ),
-                                },
-                              ]}
+                              collapses={this.getEyeWidgets(
+                                isReadOnly,
+                                isRetail,
+                              )}
                             />
                           </div>
                         </GridItem>

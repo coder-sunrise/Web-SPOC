@@ -24,8 +24,8 @@ const styles = (theme) => ({
   },
 })
 
+const inputProps = { style: { textAlign: 'center' } }
 const Grid = ({
-  classes,
   theme,
   EyeExaminations,
   isEditable = true,
@@ -43,6 +43,7 @@ const Grid = ({
         columnName: 'RightEye',
         align: 'center',
         sortingEnabled: false,
+        // inputProps,
       },
       {
         columnName: 'EyeExaminationType',
@@ -54,6 +55,7 @@ const Grid = ({
         columnName: 'LeftEye',
         align: 'center',
         sortingEnabled: false,
+        // inputProps,
       },
     ],
   }
@@ -62,6 +64,7 @@ const Grid = ({
     <GridContainer style={{ marginTop: theme.spacing(1) }}>
       <GridItem md={12}>
         <EditableTableGrid
+          key='gridkey-examinationform'
           size='sm'
           rows={EyeExaminations}
           FuncProps={{

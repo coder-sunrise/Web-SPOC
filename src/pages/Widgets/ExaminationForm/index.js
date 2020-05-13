@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { Component, PureComponent } from 'react'
 import { withStyles } from '@material-ui/core'
 import * as Yup from 'yup'
 import {
@@ -17,79 +17,38 @@ import {
 
 import Grid from './Grid'
 
-const styles = (theme) => ({
-  // table: {
-  //   '& th': {
-  //     textAlign: 'center',
-  //   },
-  //   '& td,th': {
-  //     border: '1px solid rgba(0, 0, 0, 0.42)',
-  //     // verticalAlign: 'top',
-  //   },
-  // },
-})
+const styles = (theme) => ({})
 class ExaminationForm extends PureComponent {
-  state = {
-    formData: undefined,
-    examinationTypes: undefined,
-  }
-
-  componentWillReceiveProps (nextProps) {
-    const { prefix } = this.props
-    const { examinationTypes, formData } = this.state
-    let nextFormData = Object.byString(nextProps.values, prefix)
-
-    if (
-      examinationTypes &&
-      nextFormData &&
-      (!formData || formData.isDefault !== nextFormData.isDefault)
-    ) {
-      this.setExaminations(false, nextFormData)
-    }
-  }
-
   componentDidMount = () => {
-    const { dispatch, prefix } = this.props
+    const { prefix } = this.props
 
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: { code: 'cteyeexaminationtype' },
-    }).then((response) => {
-      this.setState({
-        examinationTypes: response,
+    window.g_app._store
+      .dispatch({
+        type: 'codetable/fetchCodes',
+        payload: { code: 'cteyeexaminationtype' },
       })
-      let currentFormData = Object.byString(this.props.values, prefix)
-
-      this.setExaminations(true, currentFormData)
-    })
+      .then((response) => {
+        let currentFormData = Object.byString(this._form.values, prefix)
+        this.setExaminations(true, currentFormData, response)
+      })
   }
 
-  setExaminations = (isDefault, nextFormData) => {
-    const { prefix, values, setFieldValue } = this.props
-    const { examinationTypes } = this.state
+  setExaminations = (isDefault, currentFormData, examinationTypes) => {
+    const { prefix } = this.props
 
-    if (nextFormData)
-      nextFormData = this.convertEyeExaminationForm(nextFormData) || {}
-
-    const examinationsFroms = this.buildExaminationsFromTypes(
+    const examinations = this.buildExaminationsFromTypes(
       examinationTypes,
-      nextFormData && nextFormData.EyeExaminations
-        ? nextFormData.EyeExaminations
+      currentFormData && currentFormData.EyeExaminations
+        ? currentFormData.EyeExaminations
         : undefined,
     )
     const newFormData = {
-      isDefault,
-      EyeExaminations: examinationsFroms,
+      EyeExaminations: examinations,
     }
 
     setTimeout(() => {
-      setFieldValue(prefix, newFormData)
+      this._form.setFieldValue(prefix, newFormData)
     }, 1)
-    this.setState({
-      formData: newFormData,
-    })
-
-    console.log('setExaminations', newFormData)
   }
 
   buildExaminationsFromTypes = (examinationTypes, originalData) => {
@@ -118,41 +77,45 @@ class ExaminationForm extends PureComponent {
   }
 
   handleCommitChanges = (p) => {
-    const { rows = [], deleted } = p
-    const { prefix, setFieldValue } = this.props
-    let { formData } = this.state
+    const { rows = [] } = p
+    const { prefix } = this.props
     if (rows) {
-      setFieldValue(`${prefix}.EyeExaminations`, rows)
-      this.setState({
-        formData: {
-          ...formData,
-          EyeExaminations: rows,
-        },
-      })
-      return rows
+      setTimeout(() => {
+        this._form.setFieldValue(`${prefix}.EyeExaminations`, rows)
+      }, 10)
     }
+    return rows
   }
 
-  convertEyeExaminationForm = (formData) => {
-    if (formData && typeof formData === 'string') {
-      let parseJson = JSON.parse(formData)
+  getRows = (args) => {
+    const { prefix } = this.props
+    let rows = []
+    const { form } = args
 
-      return parseJson
+    let currentFormData = Object.byString(form.values, prefix)
+
+    if (currentFormData && currentFormData.EyeExaminations) {
+      rows = currentFormData.EyeExaminations
     }
-    return formData
+
+    return rows
   }
 
   render () {
-    const { formData } = this.state
-
-    let rows
-    if (formData && formData.EyeExaminations) rows = formData.EyeExaminations
-
+    // const { formData } = this.state
     return (
-      <Grid
-        {...this.props}
-        EyeExaminations={rows}
-        handleCommitChanges={this.handleCommitChanges}
+      <Field
+        render={(args) => {
+          if (!this.form) this._form = args.form
+
+          return (
+            <Grid
+              {...this.props}
+              EyeExaminations={this.getRows(args)}
+              handleCommitChanges={this.handleCommitChanges}
+            />
+          )
+        }}
       />
     )
   }

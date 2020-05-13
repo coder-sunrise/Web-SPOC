@@ -31,15 +31,15 @@ import {
   GridItem,
 } from '@/components'
 // sub components
-import PatientHistoryDrawer from './PatientHistoryDrawer'
-import LabTrackingDrawer from './LabTrackingDrawer'
 import { control } from '@/components/Decorator'
-import Templates from './Templates'
-// utils
 import Authorized from '@/utils/Authorized'
 import { widgets } from '@/utils/widgets'
-import gpLayoutCfg, { dentalLayoutCfg } from './layoutConfigs'
 import { CLINIC_TYPE } from '@/utils/constants'
+import PatientHistoryDrawer from './PatientHistoryDrawer'
+import LabTrackingDrawer from './LabTrackingDrawer'
+import Templates from './Templates'
+// utils
+import gpLayoutCfg, { dentalLayoutCfg } from './layoutConfigs'
 
 // console.log(JSON.stringify(dentalLayoutCfg))
 const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
@@ -516,7 +516,7 @@ class Layout extends PureComponent {
     } = restProps
     const widgetProps = {
       status: 'consultation',
-      parentProps: props,
+      // parentProps: props,
       rights,
     }
     // console.log(state.currentLayout)

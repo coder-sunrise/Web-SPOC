@@ -198,7 +198,7 @@ export const widgets = (props) => [
   {
     id: '11',
     name: 'Refraction Form',
-    accessRight: undefined, // 'queue.consultation.widgets.refractionform',
+    accessRight: 'queue.consultation.widgets.eyerefractionform',
     component: Loadable({
       loader: () => import('@/pages/Widgets/RefractionForm'),
       render: (loaded, p) => {
@@ -224,7 +224,7 @@ export const widgets = (props) => [
   {
     id: '12',
     name: 'Examination Form',
-    accessRight: undefined, // 'queue.consultation.widgets.refractionform',
+    accessRight: 'queue.consultation.widgets.eyeexaminationform',
     component: Loadable({
       loader: () => import('@/pages/Widgets/ExaminationForm'),
       render: (loaded, p) => {

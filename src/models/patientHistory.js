@@ -1,6 +1,32 @@
 import { createListViewModel } from 'medisys-model'
-import * as service from '../services/patientHistory'
 import { VISIT_TYPE } from '@/utils/constants'
+import * as service from '../services/patientHistory'
+
+const ParseEyeFormData = (response) => {
+  const { corEyeRefractionForm = {}, corEyeExaminationForm = {} } = response
+  let refractionFormData = {}
+  let examinationFormData = {}
+  if (corEyeRefractionForm.formData) {
+    refractionFormData = JSON.parse(corEyeRefractionForm.formData)
+  }
+
+  if (corEyeExaminationForm.formData) {
+    examinationFormData = JSON.parse(corEyeExaminationForm.formData)
+  }
+
+  const newResponse = {
+    ...response,
+    corEyeRefractionForm: {
+      ...corEyeRefractionForm,
+      formData: refractionFormData,
+    },
+    corEyeExaminationForm: {
+      ...corEyeExaminationForm,
+      formData: examinationFormData,
+    },
+  }
+  return newResponse
+}
 
 export default createListViewModel({
   namespace: 'patientHistory',
@@ -106,13 +132,13 @@ export default createListViewModel({
           },
         })
       },
-      *queryDispenseHistory ({payload},{call,put}){
+      *queryDispenseHistory ({ payload }, { call, put }) {
         const response = yield call(service.queryDispenseHistory, payload)
         if (response.status === '200') {
           yield put({
             type: 'updateState',
             payload: {
-              dispenseHistory : response.data,
+              dispenseHistory: response.data,
             },
           })
           return response.data
@@ -135,6 +161,9 @@ export default createListViewModel({
     reducers: {
       queryOneDone (st, { payload }) {
         // const { data } = payload
+
+        const { entity } = st
+        st.entity = ParseEyeFormData(entity)
 
         let sortedPatientHistory = st.list
           ? st.list.filter((o) => o.coHistory.length >= 1)

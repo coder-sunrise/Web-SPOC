@@ -100,12 +100,20 @@ const convertToConsultation = (values, { consultationDocument, orders }) => {
   }
 
   const { corEyeRefractionForm, corEyeExaminationForm } = values
-  if (corEyeRefractionForm && corEyeRefractionForm.formData) {
+  if (
+    corEyeRefractionForm &&
+    corEyeRefractionForm.formData &&
+    typeof corEyeRefractionForm.formData === 'object'
+  ) {
     values.corEyeRefractionForm.formData = JSON.stringify(
       corEyeRefractionForm.formData,
     )
   }
-  if (corEyeExaminationForm && corEyeExaminationForm.formData) {
+  if (
+    corEyeExaminationForm &&
+    corEyeExaminationForm.formData &&
+    typeof corEyeExaminationForm.formData === 'object'
+  ) {
     values.corEyeExaminationForm.formData = JSON.stringify(
       corEyeExaminationForm.formData,
     )
