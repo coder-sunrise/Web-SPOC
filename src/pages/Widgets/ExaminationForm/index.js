@@ -77,12 +77,10 @@ class ExaminationForm extends PureComponent {
   }
 
   handleCommitChanges = (p) => {
-    const { rows = [] } = p
+    const { rows = [], form: { setFieldValue } } = p
     const { prefix } = this.props
     if (rows) {
-      setTimeout(() => {
-        this._form.setFieldValue(`${prefix}.EyeExaminations`, rows)
-      }, 10)
+      setFieldValue(`${prefix}.EyeExaminations`, rows)
     }
     return rows
   }
@@ -112,7 +110,9 @@ class ExaminationForm extends PureComponent {
             <Grid
               {...this.props}
               EyeExaminations={this.getRows(args)}
-              handleCommitChanges={this.handleCommitChanges}
+              handleCommitChanges={(p) => {
+                this.handleCommitChanges({ ...args, ...p })
+              }}
             />
           )
         }}

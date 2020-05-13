@@ -28,6 +28,12 @@ const ODOS = ({ row, columnConfig, cellProps, classes }) => {
     blur,
     setBlur,
   ] = useState(false)
+
+  const [
+    changed,
+    setChanged,
+  ] = useState({})
+
   const debounceBlur = _.debounce(setBlur, 100, {
     leading: false,
     trailing: true,
@@ -35,6 +41,16 @@ const ODOS = ({ row, columnConfig, cellProps, classes }) => {
   useEffect(
     () => {
       if (blur) {
+        const { commitChanges } = control
+        validSchema(row)
+        commitChanges({
+          changed: {
+            [row.id]: {
+              ...changed,
+            },
+          },
+        })
+
         if (onBlur) onBlur()
       }
     },
@@ -45,16 +61,16 @@ const ODOS = ({ row, columnConfig, cellProps, classes }) => {
 
   const onValuesChange = (field, val) => {
     const fieldName = field + columnName
-    const { commitChanges } = control
     row[fieldName] = val
-    validSchema(row)
-    commitChanges({
-      changed: {
-        [row.id]: {
-          [fieldName]: row[fieldName],
-        },
-      },
-    })
+    // validSchema(row)
+    const currentChanges = { [fieldName]: row[fieldName] }
+
+    let changes = {
+      ...changed,
+      ...currentChanges,
+    }
+
+    setChanged(changes)
   }
 
   return (

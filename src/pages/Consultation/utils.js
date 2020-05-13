@@ -67,6 +67,72 @@ const orderTypes = [
   },
 ]
 
+const convertEyeForms = (values) => {
+  const { corEyeRefractionForm, corEyeExaminationForm } = values
+
+  const removeFields = (obj, fields = []) => {
+    if (Array.isArray(obj)) {
+      for (let n = 0; n < obj.length; n++) {
+        const isEmpty = removeFields(obj[n], fields)
+        if (isEmpty) {
+          obj.splice(n, 1)
+          n--
+        }
+      }
+    } else if (typeof obj === 'object') {
+      for (let value in obj) {
+        if (Array.isArray(obj[value])) {
+          removeFields(obj[value], fields)
+        }
+      }
+      fields.forEach((o) => {
+        delete obj[o]
+      })
+
+      // check all of fields is empty
+      let allFieldIsEmtpy = true
+      for (let i in obj) {
+        if (i !== 'id' && obj[i] !== undefined && obj[i] !== '') {
+          allFieldIsEmtpy = false
+          break
+        }
+      }
+
+      return allFieldIsEmtpy
+    }
+  }
+
+  const durtyFields = [
+    'isDeleted',
+    'isNew',
+    'IsSelected',
+    'rowIndex',
+    '_errors',
+    'OD',
+    'OS',
+  ]
+  if (
+    corEyeRefractionForm &&
+    corEyeRefractionForm.formData &&
+    typeof corEyeRefractionForm.formData === 'object'
+  ) {
+    let { formData } = values.corEyeRefractionForm
+    removeFields(formData, durtyFields)
+
+    values.corEyeRefractionForm.formData = JSON.stringify(formData)
+  }
+  if (
+    corEyeExaminationForm &&
+    corEyeExaminationForm.formData &&
+    typeof corEyeExaminationForm.formData === 'object'
+  ) {
+    let { formData } = corEyeExaminationForm
+    removeFields(formData, durtyFields)
+    values.corEyeExaminationForm.formData = JSON.stringify(formData)
+  }
+  return values
+}
+
 const convertToConsultation = (values, { consultationDocument, orders }) => {
   const { rows = [] } = consultationDocument
   consultationDocumentTypes.forEach((p) => {
@@ -99,25 +165,7 @@ const convertToConsultation = (values, { consultationDocument, orders }) => {
     // values.corDentalCharts = data.map(o=>)
   }
 
-  const { corEyeRefractionForm, corEyeExaminationForm } = values
-  if (
-    corEyeRefractionForm &&
-    corEyeRefractionForm.formData &&
-    typeof corEyeRefractionForm.formData === 'object'
-  ) {
-    values.corEyeRefractionForm.formData = JSON.stringify(
-      corEyeRefractionForm.formData,
-    )
-  }
-  if (
-    corEyeExaminationForm &&
-    corEyeExaminationForm.formData &&
-    typeof corEyeExaminationForm.formData === 'object'
-  ) {
-    values.corEyeExaminationForm.formData = JSON.stringify(
-      corEyeExaminationForm.formData,
-    )
-  }
+  values = convertEyeForms(values)
 
   return {
     ...values,

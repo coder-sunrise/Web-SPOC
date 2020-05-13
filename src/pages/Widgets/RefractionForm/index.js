@@ -58,15 +58,6 @@ class RefractionForm extends PureComponent {
     setFieldValue(`${prefix}.NearAdd`, nearAdd)
   }
 
-  convertEyeRefractionForm = (formData) => {
-    if (formData && typeof formData === 'string') {
-      let parseJson = JSON.parse(formData)
-
-      return parseJson
-    }
-    return formData
-  }
-
   getRows = (args) => {
     const { form: { values } } = args
     let thisFormData = Object.byString(values, this.props.prefix)

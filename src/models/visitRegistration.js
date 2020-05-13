@@ -112,13 +112,7 @@ export default createFormViewModel({
         try {
           const response = yield call(service.query, payload)
           const { data = {} } = response
-          const {
-            visit: {
-              patientProfileFK,
-              visitEyeRefractionForm,
-              visitEyeExaminationForm,
-            },
-          } = data
+          const { visit: { patientProfileFK, visitEyeRefractionForm } } = data
 
           if (patientProfileFK) {
             // const { patientProfileFK } = visit
@@ -133,7 +127,6 @@ export default createFormViewModel({
             }
             // yield take('fetchPatientInfoByPatientID/@@end')
             let refractionFormData
-            let examinationFormData
             if (visitEyeRefractionForm) {
               if (
                 visitEyeRefractionForm.formData &&
@@ -143,19 +136,6 @@ export default createFormViewModel({
               } else {
                 // eslint-disable-next-line prefer-destructuring
                 refractionFormData = visitEyeRefractionForm.formData
-              }
-            }
-            if (visitEyeExaminationForm) {
-              if (
-                visitEyeExaminationForm.formData &&
-                typeof visitEyeExaminationForm.formData === 'string'
-              ) {
-                examinationFormData = JSON.parse(
-                  visitEyeExaminationForm.formData,
-                )
-              } else {
-                // eslint-disable-next-line prefer-destructuring
-                examinationFormData = visitEyeExaminationForm.formData
               }
             }
 
@@ -168,16 +148,11 @@ export default createFormViewModel({
                     ...visitEyeRefractionForm,
                     formData: refractionFormData,
                   },
-                  visitEyeExaminationForm: {
-                    ...visitEyeExaminationForm,
-                    formData: examinationFormData,
-                  },
                 },
                 attachmentOriList: [
                   ...data.visit.visitAttachment,
                 ],
                 expandRefractionForm: !!visitEyeRefractionForm,
-                expandExaminationForm: !!visitEyeExaminationForm,
               },
             })
           }
