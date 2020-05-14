@@ -9,6 +9,7 @@ import { withFormikExtend, notification, CommonModal } from '@/components'
 // import DispenseDetails from './DispenseDetails/PrintDrugLabelWrapper'
 import DispenseDetails from './DispenseDetails/WebSocketWrapper'
 import AddOrder from './DispenseDetails/AddOrder'
+import DrugLabelSelection from './DispenseDetails/DrugLabelSelection'
 // utils
 import { calculateAmount, navigateDirtyCheck } from '@/utils/utils'
 import Yup from '@/utils/yup'
@@ -143,6 +144,7 @@ const constructPayload = (values) => {
 class Main extends Component {
   state = {
     showOrderModal: false,
+    showDrugLabelSelection: false,
   }
 
   componentDidMount = async () => {
@@ -347,10 +349,17 @@ class Main extends Component {
       this.handleOrderModal()
     }
   }
-
-  render () {
-    const { classes, handleSubmit, values, dispense } = this.props
-
+  handleDrugLabelClick = () => {
+    this.setState(
+      (prevState) => {
+        return {
+          showDrugLabelSelection: !prevState.showDrugLabelSelection,
+        }
+      },
+    )
+  }
+  render() {
+    const { classes, handleSubmit, values, dispense, codetable } = this.props 
     return (
       <div className={classes.root}>
         <DispenseDetails
@@ -359,6 +368,7 @@ class Main extends Component {
           onEditOrderClick={this.editOrder}
           onFinalizeClick={this.makePayment}
           onReloadClick={this.handleReloadClick}
+          onDrugLabelClick={this.handleDrugLabelClick}
         />
         <CommonModal
           title='Orders'
@@ -374,6 +384,36 @@ class Main extends Component {
               reloadDispense(this.props)
             }}
           />
+        </CommonModal>
+        <CommonModal
+          title='Print Drug Labels'
+          open={this.state.showDrugLabelSelection}
+          observe='DispenseDetails'
+          onClose={() => {
+            this.setState(
+              (prevState) => {
+                return {
+                  showDrugLabelSelection: !prevState.showDrugLabelSelection,
+                }
+              },
+            )
+          }}
+          onConfirm={() => {
+            this.setState(
+              (prevState) => {
+                return {
+                  showDrugLabelSelection: !prevState.showDrugLabelSelection,
+                }
+              },
+            )
+          }}
+        >
+          <DrugLabelSelection
+            prescription={values.prescription} 
+            codetable={codetable} 
+            handleSubmit={() => {
+              onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
+            }} />
         </CommonModal>
       </div>
     )
