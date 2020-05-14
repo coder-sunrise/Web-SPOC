@@ -9,6 +9,33 @@ import {
   difference,
 } from '@/utils/utils'
 
+const updateGlobalState = ({ gridId, latestRow }) => {
+  const { global } = window.g_app._store.getState()
+  if (
+    window.$tempGridRow[gridId] &&
+    latestRow._errors &&
+    latestRow._errors.length
+  ) {
+    if (!global.disableSave)
+      window.g_app._store.dispatch({
+        type: 'global/updateState',
+        payload: {
+          disableSave: true,
+        },
+      })
+  } else if (
+    (!latestRow._errors || !latestRow._errors.length) &&
+    global.disableSave
+  ) {
+    window.g_app._store.dispatch({
+      type: 'global/updateState',
+      payload: {
+        disableSave: false,
+      },
+    })
+  }
+}
+
 function onComponentDidMount () {
   const {
     columnExtensions,
@@ -33,6 +60,10 @@ function onComponentDidMount () {
   }
   const errors = updateCellValue(this.props, null, latestRow[columnName])
   latestRow._errors = errors
+  updateGlobalState({
+    gridId,
+    latestRow,
+  })
   return {
     row,
     gridId,
@@ -92,6 +123,11 @@ function onComponentChange (args, config) {
       latestRow._errors = errors
     }
   }
+
+  updateGlobalState({
+    gridId,
+    latestRow,
+  })
 }
 
 function getCommonConfig () {

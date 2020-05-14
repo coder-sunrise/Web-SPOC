@@ -70,7 +70,7 @@ const CallingQueueButton = ({
     if (roomNo) {
       if (isNumber(roomNo)) {
         const roomAssigned = ctroom.find((room) => room.id === roomNo)
-        return roomAssigned.name
+        return roomAssigned ? roomAssigned.name || '' : ''
       }
       return roomNo
     }
@@ -206,6 +206,7 @@ const CallingQueueButton = ({
       color={isCalled ? 'danger' : 'primary'}
       size='sm'
       justIcon
+      style={{ marginRight: '0px' }}
       onClick={handleCallingQueue}
     >
       <VolumeUp />

@@ -70,7 +70,7 @@ const PaymentRow = ({
         </Tooltip>
       )
     }
-    if (type === 'Admin Charge') {
+    if (type === 'Corporate Charges' || type === 'Statement Adjustment') {
       return ''
     }
     return (

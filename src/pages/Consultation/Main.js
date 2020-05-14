@@ -57,9 +57,11 @@ import PatientBanner from '@/pages/PatientDashboard/Banner'
 
 import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 // import model from '@/pages/Widgets/Orders/models'
-import { convertToConsultation } from './utils'
 import { VISIT_TYPE } from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
+import { CallingQueueButton } from '@/components/_medisys'
+import { initRoomAssignment } from '@/utils/codes'
+import { convertToConsultation } from './utils'
 
 // import PatientSearch from '@/pages/PatientDatabase/Search'
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
@@ -68,9 +70,7 @@ import Layout from './Layout'
 
 import schema from './schema'
 import styles from './style'
-import { CallingQueueButton } from '@/components/_medisys'
 // window.g_app.replaceModel(model)
-import { initRoomAssignment } from '@/utils/codes'
 
 const discardMessage = 'Discard consultation?'
 const formName = 'ConsultationPage'
@@ -87,6 +87,7 @@ const saveConsultation = ({
     values,
     consultation,
     consultationDocument = {},
+    corEyeRefractionForm,
     orders = {},
   } = props
   const onConfirmSave = () => {
@@ -102,6 +103,7 @@ const saveConsultation = ({
       {
         orders,
         consultationDocument,
+        corEyeRefractionForm,
       },
     )
     newValues.duration = Math.floor(

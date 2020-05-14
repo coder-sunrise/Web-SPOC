@@ -424,7 +424,7 @@ class AddNewStatement extends PureComponent {
                     return (
                       <TextField
                         label='Adjustment Remarks'
-                        max={50}
+                        maxLength={50}
                         {...args}
                       />
                     )

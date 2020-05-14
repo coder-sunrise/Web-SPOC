@@ -55,7 +55,7 @@ class FilterBar extends PureComponent {
             <FastField
               name='search1'
               render={(args) => {
-                return <Select label='Service Centre' {...args} />
+                return <Select label='Service Center' {...args} />
               }}
             />
           </GridItem>

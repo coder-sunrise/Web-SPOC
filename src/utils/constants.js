@@ -61,9 +61,10 @@ export const UNFIT_TYPE = {
   5: 'Unfit for Duty',
   6: 'Unfit to Attend Court',
   7: 'for Light Duty',
-  8: 'Unfit for PE',
+  8: 'Unfit for Physical Exercise',
   9: 'Unfit for wearing shoes',
   10: 'Excuse Chit',
+  11: 'on Maternity Leave',
 }
 
 export const PAYMENT_MODE = {
@@ -183,6 +184,12 @@ export const REPORT_ID = {
   PATIENT_ADDRESS_LABEL_80MM_45MM: 41,
   PATIENT_ADDRESS_LABEL_89MM_36MM: 42,
   PATIENT_ADDRESS_LABEL_76MM_38MM: 47,
+  COPAYER_ADDRESS_LABEL_80MM_45MM: 43,
+  COPAYER_ADDRESS_LABEL_89MM_36MM: 44,
+  COPAYER_ADDRESS_LABEL_76MM_38MM: 49,
+  SUPPLIER_ADDRESS_LABEL_80MM_45MM: 50,
+  SUPPLIER_ADDRESS_LABEL_89MM_36MM: 51,
+  SUPPLIER_ADDRESS_LABEL_76MM_38MM: 52,
 }
 
 export const INVOICE_STATUS = {
@@ -425,4 +432,11 @@ export const SCHEME_TYPE = {
 export const INVOICE_VIEW_MODE = {
   DEFAULT: 'default',
   APPLIED_SCHEME: 'applied_scheme',
+}
+
+export const ATTACHMENT_TYPE = {
+  CLINICALNOTES: 'ClinicalNotes',
+  VISITREFERRAL: 'VisitReferral',
+  VISIT: 'Visit',
+  EYEVISUALACUITY: 'EyeVisualAcuity',
 }
