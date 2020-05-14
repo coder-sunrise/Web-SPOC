@@ -19,6 +19,7 @@ export default createFormViewModel({
           otherDiagnosis: [],
           surgicalCharges: [],
           nonSurgicalCharges: [],
+          others: '',
         },
       },
       default: {},

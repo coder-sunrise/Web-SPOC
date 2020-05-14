@@ -1,6 +1,23 @@
 import { createListViewModel } from 'medisys-model'
-import moment from 'moment'
+import _ from 'lodash'
+import { getUniqueId } from '@/utils/utils'
 import * as service from '../services'
+
+const formTypes = [
+  {
+    value: '1',
+    name: 'Letter of Certification',
+    prop: 'corLetterOfCertification',
+  },
+]
+
+const visitFormTypes = [
+  {
+    value: '1',
+    name: 'Letter of Certification',
+    prop: 'visitLetterOfCertification',
+  },
+]
 
 export default createListViewModel({
   namespace: 'formListing',
@@ -20,6 +37,7 @@ export default createListViewModel({
           otherDiagnosis: [],
           surgicalCharges: [],
           nonSurgicalCharges: [],
+          others: '',
         },
       },
       default: {},
@@ -33,56 +51,109 @@ export default createListViewModel({
       })
     },
     effects: {
-      *initState ({ payload }, { call, put, select, take }) {
+      *saveForm ({ payload }, { call, put, select }) {
         const { visitID } = payload
-
-        let visit
-        if (visitID) {
-          yield put({
-            type: 'visitRegistration/query',
-            payload: { id: visitID },
-          })
-          yield take('visitRegistration/query/@@end')
-          const visitRegistration = yield select((st) => st.visitRegistration)
-          visit = visitRegistration.entity.visit
-          if (!visit) return
-        } else {
-          yield put({
-            type: 'visitRegistration/reset',
-          })
-        }
-
-        yield put({
-          type: 'patient/query',
-          payload: { id: visit.patientProfileFK },
-        })
-
-        yield take('patient/query/@@end')
+        const response = yield call(service.saveForm, visitID, payload)
+        return response
       },
 
-      *update ({ payload }, { call, put }) {
-        const response = yield call(service.upsert, payload)
-        return response
+      *getVisitForm ({ payload }, { call, put, select }) {
+        const response = yield call(service.getVisitForm, payload)
+        const { data, status } = response
+        if (status === '200') {
+          yield put({
+            type: 'queryFormDone',
+            payload: data,
+          })
+          return data
+        }
+        return false
+      },
+
+      *getCORForm ({ payload }, { call, put, select }) {
+        const response = yield call(service.getCORForm, payload)
+        const { data, status } = response
+        if (status === '200') {
+          yield put({
+            type: 'queryFormDone',
+            payload: data,
+          })
+          return data
+        }
+        return false
       },
     },
     reducers: {
       queryDone (st, { payload }) {
         const { data } = payload
+
         return {
           ...st,
-          list: data.data.map((o) => {
+          list: data.map((o) => {
             return {
               ...o,
+              formData: JSON.parse(o.formData),
+              typeName: formTypes.find((t) => t.value === o.type).name,
             }
           }),
         }
       },
 
-      queryOneDone (st, { payload }) {
+      queryFormDone (st, { payload }) {
         const { data } = payload
+        let formRows = []
+        if (data.FormType === 'VisitForm') {
+          visitFormTypes.forEach((p) => {
+            formRows = formRows.concat(
+              (data[p.prop] || []).map((o) => {
+                const d = {
+                  uid: getUniqueId(),
+                  type: p.value,
+                  typeName: p.name,
+                  ...o,
+                  formData: JSON.parse(o.formData),
+                }
+                return d
+              }),
+            )
+          })
+        } else {
+          formTypes.forEach((p) => {
+            formRows = formRows.concat(
+              (data[p.prop] || []).map((o) => {
+                const d = {
+                  uid: getUniqueId(),
+                  type: p.value,
+                  typeName: p.name,
+                  ...o,
+                  formData: JSON.parse(o.formData),
+                }
+                return d
+              }),
+            )
+          })
+        }
+        const {
+          id,
+          currentCORId,
+          visitDate,
+          doctorProfileFK,
+          patientName,
+          patientNRICNo,
+          patientAccountNo,
+        } = data
         return {
           ...st,
-          entity: data,
+          visitDetail: {
+            visitID: id,
+            currentCORId,
+            visitDate,
+            doctorProfileFK,
+            patientName,
+            patientNRICNo,
+            patientAccountNo,
+          },
+          list: _.sortBy(formRows, 'sequence'),
         }
       },
     },

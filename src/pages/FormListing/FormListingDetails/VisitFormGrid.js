@@ -278,24 +278,15 @@ class VisitFormGrid extends PureComponent {
                             title={item.name}
                             classes={classes}
                             onClick={() => {
-                              this.props
-                                .dispatch({
-                                  type: 'formListing/initState',
-                                  payload: {
-                                    visitID: formListing.visitID,
-                                  },
-                                })
-                                .then((response) => {
-                                  this.props.dispatch({
-                                    type: 'formListing/updateState',
-                                    payload: {
-                                      showModal: true,
-                                      type: item.value,
-                                      entity: undefined,
-                                      formCategory: this.props.formCategory,
-                                    },
-                                  })
-                                })
+                              this.props.dispatch({
+                                type: 'formListing/updateState',
+                                payload: {
+                                  showModal: true,
+                                  type: item.value,
+                                  entity: undefined,
+                                  formCategory: this.props.formCategory,
+                                },
+                              })
                               this.toggleVisibleChange()
                             }}
                             {...item}

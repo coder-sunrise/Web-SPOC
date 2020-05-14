@@ -1,16 +1,30 @@
 import * as service from '@/services/common'
 import request from '@/utils/request'
 
-const url = '/api/deposit'
+const url = '/api/forms'
 
 module.exports = {
   queryList: (params) => service.queryList(url, params),
-  upsert: async (params) => {
-    const r = await request(`${url}`, {
-      method: 'POST',
-      body: {
-        ...params,
-      },
+  saveForm: async (userId, params) => {
+    const r = await request(`${url}/saveform/${userId}`, {
+      method: 'PUT',
+      body: params,
+    })
+    return r
+  },
+
+  getVisitForm: async (params) => {
+    const r = await request(`${url}/VisitForm/${params.id}`, {
+      method: 'GET',
+      body: params,
+    })
+    return r
+  },
+
+  getCORForm: async (params) => {
+    const r = await request(`${url}/CORForm/${params.id}`, {
+      method: 'GET',
+      body: params,
     })
     return r
   },

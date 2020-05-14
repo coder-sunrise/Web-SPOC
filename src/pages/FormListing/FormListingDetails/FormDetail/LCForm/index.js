@@ -51,29 +51,33 @@ const procuderesSchema = Yup.object().shape({
   surgicalCharges: Yup.array().of(surgicalChargesSchema),
 })
 
-@connect(({ global, patient, visitRegistration }) => ({
+@connect(({ global, formListing }) => ({
   global,
-  patient: patient.entity,
-  visit: visitRegistration.entity.visit,
+  formListing,
 }))
 @withFormikExtend({
-  mapPropsToValues: ({ formListing, codetable, patient, visit }) => {
+  mapPropsToValues: ({ formListing, codetable }) => {
     let values = {}
     if (formListing.entity) {
       values = {
         ...formListing.entity,
       }
     } else {
-      const { visitDate, doctorProfileFK } = visit
-      const { name, patientReferenceNo, patientAccountNo } = patient
+      const {
+        visitDate,
+        doctorProfileFK,
+        patientName,
+        patientNRICNo,
+        patientAccountNo,
+      } = formListing.visitDetail
       const { doctorprofile } = codetable
       const doctor = doctorprofile.find((o) => o.id === doctorProfileFK)
       values = {
         ...formListing.defaultLCForm,
         formData: {
           ...formListing.defaultLCForm.formData,
-          patientName: name,
-          patientNRICNo: patientReferenceNo,
+          patientName,
+          patientNRICNo,
           patientAccountNo,
           admissionDate: visitDate,
           dischargeDate: visitDate,
@@ -140,6 +144,7 @@ class LCForm extends PureComponent {
       resetForm,
       formCategory,
       validateForm,
+      visitDetail,
     } = this.props
     const isFormValid = await validateForm()
     if (!_.isEmpty(isFormValid)) {
@@ -153,18 +158,35 @@ class LCForm extends PureComponent {
         statusFK =
           formCategory === FORM_CATEGORY.VISITFORM ? values.statusFK : 2
       }
+      const { currentCORId, visitID } = visitDetail
       dispatch({
-        type: 'formListing/update',
+        type: 'formListing/saveForm',
         payload: {
-          formCategory,
-          type: values.type,
-          formData: {
-            sequence: nextSequence,
-            ...values,
-            formData: JSON.stringify(values.formData),
-            updateByUser: user.data.clinicianProfile.name,
-            statusFK,
-          },
+          visitID,
+          currentCORId,
+          formType:
+            formCategory === FORM_CATEGORY.VISITFORM ? 'VisitForm' : 'CORForm',
+          UpdateType: values.type,
+          visitLetterOfCertification:
+            formCategory === FORM_CATEGORY.VISITFORM
+              ? {
+                  sequence: nextSequence,
+                  ...values,
+                  formData: JSON.stringify(values.formData),
+                  updateByUser: user.data.clinicianProfile.name,
+                  statusFK,
+                }
+              : undefined,
+          CORLetterOfCertification:
+            formCategory === FORM_CATEGORY.CORFORM
+              ? {
+                  sequence: nextSequence,
+                  ...values,
+                  formData: JSON.stringify(values.formData),
+                  updateByUser: user.data.clinicianProfile.name,
+                  statusFK,
+                }
+              : undefined,
         },
       }).then((r) => {
         if (r) {

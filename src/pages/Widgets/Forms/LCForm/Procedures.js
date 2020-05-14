@@ -22,12 +22,13 @@ import { DoctorLabel } from '@/components/_medisys'
 
 class Procedures extends PureComponent {
   addProcedure = () => {
-    const { setFieldValue, values } = this.props
+    const { setFieldValue, values, visit } = this.props
+    const { visitDate } = visit
     const maxIndev = _.maxBy(values.formData.procuderes, 'index').index
     let newProcedure = values.formData.procuderes.map((o) => o)
     newProcedure.push({
       index: maxIndev + 1,
-      procedureDate: moment(),
+      procedureDate: visitDate,
       procedureStartTime: moment(),
       procedureEndTime: moment(),
       natureOfOpertation: '1',
