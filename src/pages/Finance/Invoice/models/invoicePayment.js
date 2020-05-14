@@ -277,7 +277,7 @@ export default createFormViewModel({
               }),
             )
 
-            // Statement Invoice
+            // Statement Corporate Charges
             paymentTxnList = (paymentTxnList || []).concat(
               (statementInvoice || [])
                 .filter((x) => x.adminCharge > 0)
@@ -285,10 +285,30 @@ export default createFormViewModel({
                   return {
                     ...z,
                     // id: z.id,
-                    type: 'Admin Charge',
+                    type: 'Corporate Charges',
                     itemID: z.statementNo,
                     date: z.statementDate,
                     amount: z.adminCharge,
+                    reason: '',
+                    isCancelled: undefined,
+                  }
+                }),
+            )
+
+            // Statement Adjustment
+            paymentTxnList = (paymentTxnList || []).concat(
+              (statementInvoice || [])
+                .filter(
+                  (x) => x.statementAdjustment && x.statementAdjustment > 0,
+                )
+                .map((z) => {
+                  return {
+                    ...z,
+                    // id: z.id,
+                    type: 'Statement Adjustment',
+                    itemID: z.statementNo,
+                    date: z.statementDate,
+                    amount: z.statementAdjustment,
                     reason: '',
                     isCancelled: undefined,
                   }
