@@ -60,8 +60,15 @@ class InvoiceDetails extends Component {
   }
 
   render () {
-    const { values, invoiceDetail, invoicePayment, loading } = this.props
+    const {
+      values,
+      dispatch,
+      invoiceDetail,
+      invoicePayment,
+      loading,
+    } = this.props
     const invoiceContentProps = {
+      dispatch,
       values,
       invoiceDetail,
       invoicePayment,
@@ -73,10 +80,8 @@ class InvoiceDetails extends Component {
     return (
       <LoadingWrapper loading={loading} text='Getting invoice details...'>
         <Authorized authority='finance/invoicepayment'>
-          <CardContainer hideHeader>
-            <InvoiceBanner {...bannerProps} />
-            <InvoiceContent {...invoiceContentProps} />
-          </CardContainer>
+          <InvoiceBanner {...bannerProps} />
+          <InvoiceContent {...invoiceContentProps} />
         </Authorized>
       </LoadingWrapper>
     )
