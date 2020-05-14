@@ -93,6 +93,11 @@ const DispenseDetails = ({
   dispense,
   history,
   onDrugLabelClick,
+  showDrugLabelSelection,
+  onDrugLabelSelectionClose,
+  onDrugLabelSelected,
+  onDrugLabelNoChanged,
+  selectedDrugs,
 }) => {
   const {
     prescription,
@@ -359,6 +364,28 @@ const DispenseDetails = ({
           </GridItem>
         )}
       </GridContainer>
+      <CommonModal
+        title='Print Drug Labels'
+        open={showDrugLabelSelection}
+        observe='DispenseDetails'
+        onClose={() => {
+          onDrugLabelSelectionClose()
+        }}
+      // onConfirm={() => { 
+      //    onDrugLabelSelectionClose()
+      //    onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
+      // }}
+      >
+        <DrugLabelSelection
+          prescription={selectedDrugs}
+          codetable={codetable}
+          handleDrugLabelSelected={onDrugLabelSelected}
+          handleDrugLabelNoChanged={onDrugLabelNoChanged}
+          handleSubmit={() => {
+            onDrugLabelSelectionClose()
+            onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
+          }} />
+      </CommonModal>
     </React.Fragment>
   )
 }

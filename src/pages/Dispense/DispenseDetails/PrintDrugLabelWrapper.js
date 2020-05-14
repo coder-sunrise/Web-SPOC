@@ -284,7 +284,7 @@ class PrintDrugLabelWrapper extends React.Component {
     return (
       <DispenseDetails
         {...restProps}
-        onPrint={this.handleOnPrint}
+        onPrint={this.handleOnPrint}        
         sendingJob={pendingJob.length > 0}
       /> 
     )

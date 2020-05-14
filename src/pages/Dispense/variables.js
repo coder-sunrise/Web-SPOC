@@ -543,7 +543,6 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
 
 
 export const DrugLabelSelectionColumns = [
-  // { name: 'id', title: 'id' },
   {
     name: 'code',
     title: 'Code',
@@ -556,34 +555,10 @@ export const DrugLabelSelectionColumns = [
     name: 'instruction',
     title: 'Instructions',
   },
-  // {
-  //   name: 'batchNo',
-  //   title: 'Batch #',
-  // },
-  // {
-  //   name: 'expiryDate',
-  //   title: 'Expiry Date',
-  // },
-  // {
-  //   name: 'orderedQuantity',
-  //   title: 'Qty Ordered',
-  // },
   {
     name: 'dispensedQuanity',
     title: 'Qty Dispensed',
   },
-  // {
-  //   name: 'unitPrice',
-  //   title: 'Unit Price ($)',
-  // },
-  // {
-  //   name: 'adjAmt',
-  //   title: 'Item Adj ($)',
-  // },
-  // {
-  //   name: 'totalAfterItemAdjustment',
-  //   title: 'Total ($)',
-  // },
   {
     name: 'NumberOfLabel',
     title: 'No. Of Label',
@@ -591,16 +566,15 @@ export const DrugLabelSelectionColumns = [
   {
     name: 'print',
     title: 'Print',
-  }, 
+  },
 ]
 
 export const DrugLabelSelectionColumnExtensions = (
-  viewOnly = false,   
+  handleDrugLabelSelected, handleDrugLabelNoChanged
 ) => [
-    { columnName: 'unitPrice', width: columnWidth, type: 'currency' },
     {
       columnName: 'name',
-      width: columnWidth,
+      width: 150,
       render: (row) => {
         return (
           <div style={{ position: 'relative' }}>
@@ -634,7 +608,7 @@ export const DrugLabelSelectionColumnExtensions = (
     {
       columnName: 'dispensedQuanity',
       type: 'number',
-      width: columnWidth,
+      width: 100,
       render: (row) => {
         return (
           <p>
@@ -646,18 +620,19 @@ export const DrugLabelSelectionColumnExtensions = (
     {
       columnName: 'NumberOfLabel',
       type: 'number',
-      width: columnWidth,
+      width: 140,
       render: (row) => {
         return (
           <p>
-             <NumberInput
-                max={99}
-                inputProps={{ maxLength: 2 }}
-                maxLength={2}
-                precision={0}
-                min={0}
-                value={1}
-              />
+            <NumberInput
+              max={99} 
+              precision={0}
+              min={1}
+              defaultValue={1} 
+              onChange={(obj) => {
+                handleDrugLabelNoChanged(row.id, obj.target.value)
+              }}
+            />
           </p>
         )
       },
@@ -673,18 +648,11 @@ export const DrugLabelSelectionColumnExtensions = (
               <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
             }
           >
-            <Checkbox
+            <Checkbox onChange={(obj) => {
+              handleDrugLabelSelected(row.id, obj.target.value)
+            }}
               simple
             />
-            {/* <Button
-            color='primary'
-            onClick={() => {
-              onPrint({ type: CONSTANTS.DRUG_LABEL, row })
-            }}
-            justIcon
-          >
-            <Print />
-          </Button> */}
           </Tooltip>
         )
       },

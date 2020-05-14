@@ -15,7 +15,7 @@ import CONSTANTS from './constants'
 import { REPORT_ID } from '@/utils/constants'
 import { getAppendUrl } from '@/utils/utils'
 
-const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
+const WebSocketWrapper = ({ handlePrint, selectedDrugs, sendingJob, ...restProps }) => {
   const withoutPrintPreview = [
     CONSTANTS.ALL_DRUG_LABEL,
     CONSTANTS.DRUG_LABEL,
@@ -70,10 +70,14 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
     const { data } = drugLabelsDetails1
     if (data && data.length > 0) {
       let drugLabelDetail = []
+      const newdata = data.filter(x => selectedDrugs.findIndex(function (value, index, arr) { return value.id === x.id && value.selected }) > -1)
       drugLabelDetail = drugLabelDetail.concat(
-        data.map((o) => {
-          const prescriptionItem = prescriptions.find((p) => p.id === o.id)
-          return getDrugLabelDetails(o, prescriptionItem)
+        newdata.map((o) => {
+          let copy = selectedDrugs.find((x) => x.id === o.id).no;
+          for (let no = 0; no < copy; no++) {
+            const prescriptionItem = prescriptions.find((p) => p.id === o.id)
+            return getDrugLabelDetails(o, prescriptionItem)
+          }
         }),
       )
       return drugLabelDetail
@@ -94,8 +98,8 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
         patientLabelReportID = REPORT_ID.PATIENT_LABEL_89MM_36MM
       }
       else if (settings && settings.labelPrinterSize === '7.6cmx3.8cm') {
-          drugLabelReportID = REPORT_ID.DRUG_LABEL_76MM_38MM
-          patientLabelReportID = REPORT_ID.PATIENT_LABEL_76MM_38MM
+        drugLabelReportID = REPORT_ID.DRUG_LABEL_76MM_38MM
+        patientLabelReportID = REPORT_ID.PATIENT_LABEL_76MM_38MM
       }
 
       if (type === CONSTANTS.ALL_DRUG_LABEL) {
@@ -218,6 +222,7 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
       onFinalizeClick={handleFinalize}
       onPrint={handleOnPrint}
       sendingJob={sendingJob}
+      selectedDrugs={selectedDrugs}
     />
   )
 }

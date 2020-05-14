@@ -15,38 +15,17 @@ import {
   DrugLabelSelectionColumnExtensions,
 } from '../variables'
 import TableData from './TableData'
-@withFormik({
-  displayName: 'DrugLabelSelection',
-  validationSchema: Yup.object().shape({
-    // currentPassword: Yup.string().required(
-    //   'Current Password is a required field',
-    // ),
-    // newPassword: Yup.string().required('New Password is a required field'),
-    // confirmPassword: Yup.string()
-    //   .oneOf(
-    //     [
-    //       Yup.ref('newPassword'),
-    //       null,
-    //     ],
-    //     "Passwords don't match",
-    //   )
-    //   .required('Confirm Password is a required field'),
-  }),
-  handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, userID, currentUser, handleSubmit } = props
-    console.log(handleSubmit)
-  },
-})
-class DrugLabelSelection extends React.PureComponent { 
+
+class DrugLabelSelection extends React.PureComponent {
   render() {
     const {
       footer,
       handleSubmit,
-      prescription, 
-      codetable      
+      prescription,
+      codetable,
+      handleDrugLabelSelected,
+      handleDrugLabelNoChanged,
     } = this.props
-    console.log("DrugLabelSelection props:")
-    console.log(this.props)
     return (
       <div>
         <GridContainer>
@@ -54,7 +33,7 @@ class DrugLabelSelection extends React.PureComponent {
             <TableData
               idPrefix='prescription'
               columns={DrugLabelSelectionColumns}
-              colExtensions={DrugLabelSelectionColumnExtensions()}
+              colExtensions={DrugLabelSelectionColumnExtensions(handleDrugLabelSelected,handleDrugLabelNoChanged)}
               data={prescription}
             />
           </GridItem>

@@ -145,6 +145,7 @@ class Main extends Component {
   state = {
     showOrderModal: false,
     showDrugLabelSelection: false,
+    selectedDrugs: []
   }
 
   componentDidMount = async () => {
@@ -182,6 +183,13 @@ class Main extends Component {
     ) {
       this.editOrder()
     }
+    this.setState(
+      (prevState) => {
+        return {
+          selectedDrugs: prescription.map((x) => { return { ...x, no: 1, selected: false } })
+        }
+      })
+    console.log(this.state.selectedDrugs)
   }
 
   makePayment = async () => {
@@ -350,6 +358,19 @@ class Main extends Component {
     }
   }
   handleDrugLabelClick = () => {
+    const { values } = this.props
+    const { otherOrder = [], prescription = [], visitPurposeFK } = values
+    this.setState(
+      (prevState) => {
+        return {
+          showDrugLabelSelection: !prevState.showDrugLabelSelection,
+          selectedDrugs: prescription.map((x) => { return { ...x, no: 1, selected: false } })
+        }
+      })
+
+    console.log(this.state.selectedDrugs)
+  }
+  handleDrugLabelSelectionClose = () => {
     this.setState(
       (prevState) => {
         return {
@@ -358,8 +379,22 @@ class Main extends Component {
       },
     )
   }
+  handleDrugLabelSelected = (itemId, selected) => {
+    this.setState((prevState) => ({
+      selectedDrugs: prevState.selectedDrugs.map(
+        (drug) => (drug.id === itemId ? { ...drug, selected } : { ...drug }),
+      ),
+    }))
+  }
+  handleDrugLabelNoChanged = (itemId, no) => { 
+    this.setState((prevState) => ({
+      selectedDrugs: prevState.selectedDrugs.map(
+        (drug) => (drug.id === itemId ? { ...drug, no } : { ...drug }),
+      ),
+    }))
+  }
   render() {
-    const { classes, handleSubmit, values, dispense, codetable } = this.props 
+    const { classes, handleSubmit, values, dispense, codetable } = this.props
     return (
       <div className={classes.root}>
         <DispenseDetails
@@ -369,6 +404,11 @@ class Main extends Component {
           onFinalizeClick={this.makePayment}
           onReloadClick={this.handleReloadClick}
           onDrugLabelClick={this.handleDrugLabelClick}
+          showDrugLabelSelection={this.state.showDrugLabelSelection}
+          onDrugLabelSelectionClose={this.handleDrugLabelSelectionClose}
+          onDrugLabelSelected={this.handleDrugLabelSelected}
+          onDrugLabelNoChanged={this.handleDrugLabelNoChanged}
+          selectedDrugs={this.state.selectedDrugs}
         />
         <CommonModal
           title='Orders'
@@ -385,36 +425,7 @@ class Main extends Component {
             }}
           />
         </CommonModal>
-        <CommonModal
-          title='Print Drug Labels'
-          open={this.state.showDrugLabelSelection}
-          observe='DispenseDetails'
-          onClose={() => {
-            this.setState(
-              (prevState) => {
-                return {
-                  showDrugLabelSelection: !prevState.showDrugLabelSelection,
-                }
-              },
-            )
-          }}
-          onConfirm={() => {
-            this.setState(
-              (prevState) => {
-                return {
-                  showDrugLabelSelection: !prevState.showDrugLabelSelection,
-                }
-              },
-            )
-          }}
-        >
-          <DrugLabelSelection
-            prescription={values.prescription} 
-            codetable={codetable} 
-            handleSubmit={() => {
-              onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
-            }} />
-        </CommonModal>
+
       </div>
     )
   }
