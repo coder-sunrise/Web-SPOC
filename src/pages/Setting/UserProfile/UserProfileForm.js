@@ -90,9 +90,9 @@ const styles = (theme) => ({
       doctorProfile: Yup.object()
         .transform((value) => (value === null ? {} : value))
         .when('role', {
-          is (val) { 
-            if(val===undefined) return false
-            return ctRole.find((item) => item.id === parseInt(val,10)).clinicalRoleName === 'Doctor' || ctRole.find((item) => item.id === parseInt(val,10)).clinicalRoleName === 'Doctor Owner'
+          is(val) {
+            if (val === undefined) return false
+            return ctRole.find((item) => item.id === parseInt(val, 10)).clinicalRoleName === 'Doctor' || ctRole.find((item) => item.id === parseInt(val, 10)).clinicalRoleName === 'Doctor Owner'
           },
           then: Yup.object().shape({
             doctorMCRNo: Yup.string().required(),
@@ -102,17 +102,17 @@ const styles = (theme) => ({
     return isEdit
       ? Yup.object().shape(baseValidationRule)
       : Yup.object().shape({
-          ...baseValidationRule,
-          userProfile: Yup.object().shape({
-            userName: Yup.string()
-              .matches(
-                /(^[a-zA-Z][a-zA-Z0-9]+$)/,
-                'Must have at least 2 letter, start with alphabet and do not contains whitespace and special characters.',
-              )
-              .required('Login ID is a required field'),
-            password: Yup.string().required('Password is a required field'),
-          }),
-        })
+        ...baseValidationRule,
+        userProfile: Yup.object().shape({
+          userName: Yup.string()
+            .matches(
+              /(^[a-zA-Z][a-zA-Z0-9]+$)/,
+              'Must have at least 2 letter, start with alphabet and do not contains whitespace and special characters.',
+            )
+            .required('Login ID is a required field'),
+          password: Yup.string().required('Password is a required field'),
+        }),
+      })
   },
   mapPropsToValues: (props) => {
     const { settingUserProfile, currentUser } = props
@@ -145,13 +145,13 @@ const styles = (theme) => ({
         effectiveDates:
           Object.entries(currentSelectedUser).length <= 0
             ? [
-                moment().formatUTC(),
-                moment('2099-12-31T23:59:59').formatUTC(false),
-              ]
+              moment().formatUTC(),
+              moment('2099-12-31T23:59:59').formatUTC(false),
+            ]
             : [
-                currentSelectedUser.effectiveStartDate,
-                currentSelectedUser.effectiveEndDate,
-              ],
+              currentSelectedUser.effectiveStartDate,
+              currentSelectedUser.effectiveEndDate,
+            ],
         role: currentSelectedUser.userProfile
           ? currentSelectedUser.userProfile.role.id
           : undefined,
@@ -174,9 +174,9 @@ const styles = (theme) => ({
     const doctorProfile = _.isEmpty(restValues.doctorProfile)
       ? undefined
       : {
-          ...restValues.doctorProfile,
-          isDeleted: !isDoctor,
-        }
+        ...restValues.doctorProfile,
+        isDeleted: !isDoctor,
+      }
 
     const userProfile = constructUserProfile(values, role)
 
@@ -239,9 +239,10 @@ class UserProfileForm extends React.PureComponent {
 
   onRoleChange = (value) => {
     const { ctRole, setFieldValue } = this.props
-    const role = ctRole.find((item) => item.id === value) 
+    const role = ctRole.find((item) => item.id === value)
+
     this.setState({
-      canEditDoctorMCR: role.name === 'Doctor' || role.name === 'Doctor Owner',
+      canEditDoctorMCR: role !== undefined && (role.clinicalRoleName === 'Doctor' || role.clinicalRoleName === 'Doctor Owner'),
     })
   }
 
@@ -329,7 +330,7 @@ class UserProfileForm extends React.PureComponent {
         const isPrimaryClinician =
           currentSelectedRole.clinicalRoleName === 'Doctor'
             ? parseInt(doctorProfile.id, 10) ===
-              parseInt(primaryRegisteredDoctorFK, 10)
+            parseInt(primaryRegisteredDoctorFK, 10)
             : false
 
         if (deactivating && isPrimaryClinician) {
@@ -349,7 +350,7 @@ class UserProfileForm extends React.PureComponent {
     return true
   }
 
-  render () {
+  render() {
     const {
       classes,
       footer,
@@ -408,18 +409,18 @@ class UserProfileForm extends React.PureComponent {
                       disabled
                     />
                   ) : (
-                    <FastField
-                      name='userProfile.userName'
-                      render={(args) => (
-                        <TextField
-                          {...args}
-                          label='Username'
-                          autocomplete='off'
-                          autoFocus
-                        />
-                      )}
-                    />
-                  )}
+                      <FastField
+                        name='userProfile.userName'
+                        render={(args) => (
+                          <TextField
+                            {...args}
+                            label='Username'
+                            autocomplete='off'
+                            autoFocus
+                          />
+                        )}
+                      />
+                    )}
                 </GridItem>
                 {!isEdit ? (
                   <React.Fragment>
@@ -454,15 +455,15 @@ class UserProfileForm extends React.PureComponent {
                     </GridItem>
                   </React.Fragment>
                 ) : (
-                  <GridItem md={6}>
-                    <Button
-                      color='primary'
-                      onClick={this.toggleChangePasswordModal}
-                    >
-                      <Key />Change Password
+                    <GridItem md={6}>
+                      <Button
+                        color='primary'
+                        onClick={this.toggleChangePasswordModal}
+                      >
+                        <Key />Change Password
                     </Button>
-                  </GridItem>
-                )}
+                    </GridItem>
+                  )}
               </GridContainer>
 
               <GridItem md={12} className={classes.verticalSpacing}>

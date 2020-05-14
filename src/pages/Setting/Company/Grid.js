@@ -1,6 +1,7 @@
 import React, { PureComponent, Fragment } from 'react'
 import Edit from '@material-ui/icons/Edit'
 import Print from '@material-ui/icons/Print'
+import { connect } from 'dva'
 import {
   CommonTableGrid,
   Button,
@@ -11,7 +12,13 @@ import {
 import { status, gstEnabled } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
 import { ReportViewer } from '@/components/_medisys'
+import withWebSocket from '@/components/Decorator/withWebSocket'
+import { getRawData } from '@/services/report'
+import { REPORT_ID } from '@/utils/constants'
 
+@connect(({ clinicSettings }) => ({
+  clinicSettings,
+}))
 class Grid extends PureComponent {
   state = {
     showReport: false,
@@ -51,13 +58,34 @@ class Grid extends PureComponent {
     })
   }
 
-  toggleReport = (copayerId) => {
-    this.setState((prevState) => {
-      return {
-        showReport: !prevState.showReport,
-        selectedPrintCopayerId: copayerId,
-      }
-    })
+  handleClick = async (copayerId) => {
+    if (!Number.isInteger(copayerId)) return
+
+    const { handlePrint, clinicSettings } = this.props
+    const { labelPrinterSize } = clinicSettings.settings
+
+    const sizeConverter = (sizeCM) => {
+      return sizeCM
+        .split('x')
+        .map((o) =>
+          (10 * parseFloat(o.replace('cm', ''))).toString().concat('MM'),
+        )
+        .join('_')
+    }
+    const { route } = this.props
+    const reportID = 
+      REPORT_ID[(route.name === 'copayer' ? 'COPAYER_ADDRESS_LABEL_' : 'SUPPLIER_ADDRESS_LABEL_').concat(sizeConverter(labelPrinterSize))]
+
+    const data = await getRawData(reportID, route.name === 'copayer' ? { copayerId } : { supplierId: copayerId })
+    const payload = [
+      {
+        ReportId: reportID,
+        ReportData: JSON.stringify({
+          ...data,
+        }),
+      },
+    ]
+    handlePrint(JSON.stringify(payload))
   }
 
   render() {
@@ -263,7 +291,7 @@ class Grid extends PureComponent {
                             size='sm'
                             justIcon
                             color='primary'
-                            onClick={() => this.toggleReport(row.id)}
+                            onClick={() => this.handleClick(row.id)}
                           >
                             <Print />
                           </Button>
@@ -293,7 +321,7 @@ class Grid extends PureComponent {
                             size='sm'
                             justIcon
                             color='primary'
-                            onClick={() => this.toggleReport(row.id)}
+                            onClick={() => this.handleClick(row.id)}
                           >
                             <Print />
                           </Button>
@@ -305,22 +333,9 @@ class Grid extends PureComponent {
             },
           ]}
         />
-        <CommonModal
-          open={showReport}
-          onClose={this.toggleReport}
-          title='Statement'
-          maxWidth='lg'
-        >
-          <ReportViewer
-            reportID={43}
-            reportParameters={{
-              copayerId: selectedPrintCopayerId,
-            }}
-          />
-        </CommonModal>
       </Fragment>
     )
   }
 }
 
-export default Grid
+export default withWebSocket()(Grid)

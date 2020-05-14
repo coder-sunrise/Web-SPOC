@@ -276,34 +276,45 @@ class Form extends React.PureComponent {
                           <td>
                             <GridContainer gutter={0}>
                               <GridItem xs={3}>
-                                <FastField
-                                  name={`${_prefix}nearVADsOD`}
-                                  render={(args) => {
-                                    return (
-                                      <TextField
-                                        suffix='/N'
-                                        suffixProps={{ style: { right: -5 } }}
-                                        {...cfg}
-                                        {...args}
-                                      />
-                                    )
-                                  }}
-                                />
+                                <div style={{ display: 'flex' }}>
+                                  <span style={{ marginTop: 5 }}>D</span>
+                                  <FastField
+                                    name={`${_prefix}nearVADOD`}
+                                    render={(args) => {
+                                      return <TextField {...cfg} {...args} />
+                                    }}
+                                  />
+                                </div>
                               </GridItem>
                               <GridItem xs={3}>
-                                <FastField
-                                  name={`${_prefix}nearVANOD`}
-                                  render={(args) => {
-                                    return (
-                                      <TextField
-                                        suffix='@'
-                                        suffixProps={{ style: { right: -5 } }}
-                                        {...cfg}
-                                        {...args}
-                                      />
-                                    )
-                                  }}
-                                />
+                                <div style={{ display: 'flex' }}>
+                                  <span style={{ marginTop: 5 }}>PH</span>
+                                  <FastField
+                                    name={`${_prefix}nearVAPHOD`}
+                                    render={(args) => {
+                                      return <TextField {...cfg} {...args} />
+                                    }}
+                                  />
+                                </div>
+                              </GridItem>
+                              <GridItem xs={6} />
+                              <GridItem xs={3}>
+                                <div style={{ display: 'flex' }}>
+                                  <span style={{ marginTop: 5 }}>N</span>
+                                  <FastField
+                                    name={`${_prefix}nearVANOD`}
+                                    render={(args) => {
+                                      return (
+                                        <TextField
+                                          suffix='@'
+                                          suffixProps={{ style: { right: -5 } }}
+                                          {...cfg}
+                                          {...args}
+                                        />
+                                      )
+                                    }}
+                                  />
+                                </div>
                               </GridItem>
                               <GridItem xs={3}>
                                 <FastField
@@ -320,40 +331,51 @@ class Form extends React.PureComponent {
                                   }}
                                 />
                               </GridItem>
-                              <GridItem xs={3} />
+                              <GridItem xs={6} />
                             </GridContainer>
                           </td>
                           <td>
                             <GridContainer gutter={0}>
                               <GridItem xs={3}>
-                                <FastField
-                                  name={`${_prefix}nearVADsOS`}
-                                  render={(args) => {
-                                    return (
-                                      <TextField
-                                        suffix='/N'
-                                        suffixProps={{ style: { right: -5 } }}
-                                        {...cfg}
-                                        {...args}
-                                      />
-                                    )
-                                  }}
-                                />
+                                <div style={{ display: 'flex' }}>
+                                  <span style={{ marginTop: 5 }}>D</span>
+                                  <FastField
+                                    name={`${_prefix}nearVADOS`}
+                                    render={(args) => {
+                                      return <TextField {...cfg} {...args} />
+                                    }}
+                                  />
+                                </div>
                               </GridItem>
                               <GridItem xs={3}>
-                                <FastField
-                                  name={`${_prefix}nearVANOS`}
-                                  render={(args) => {
-                                    return (
-                                      <TextField
-                                        suffix='@'
-                                        suffixProps={{ style: { right: -5 } }}
-                                        {...cfg}
-                                        {...args}
-                                      />
-                                    )
-                                  }}
-                                />
+                                <div style={{ display: 'flex' }}>
+                                  <span style={{ marginTop: 5 }}>PH</span>
+                                  <FastField
+                                    name={`${_prefix}nearVAPHOS`}
+                                    render={(args) => {
+                                      return <TextField {...cfg} {...args} />
+                                    }}
+                                  />
+                                </div>
+                              </GridItem>
+                              <GridItem xs={6} />
+                              <GridItem xs={3}>
+                                <div style={{ display: 'flex' }}>
+                                  <span style={{ marginTop: 5 }}>N</span>
+                                  <FastField
+                                    name={`${_prefix}nearVANOS`}
+                                    render={(args) => {
+                                      return (
+                                        <TextField
+                                          suffix='@'
+                                          suffixProps={{ style: { right: -5 } }}
+                                          {...cfg}
+                                          {...args}
+                                        />
+                                      )
+                                    }}
+                                  />
+                                </div>
                               </GridItem>
                               <GridItem xs={3}>
                                 <FastField
@@ -370,7 +392,7 @@ class Form extends React.PureComponent {
                                   }}
                                 />
                               </GridItem>
-                              <GridItem xs={3} />
+                              <GridItem xs={6} />
                             </GridContainer>
                           </td>
                         </tr>
@@ -590,21 +612,6 @@ class Form extends React.PureComponent {
                         gutter={0}
                         style={{ marginTop: theme.spacing(1) }}
                       >
-                        <GridItem xs={12}>
-                          <FastField
-                            name={`${_prefix}chiefComplain`}
-                            render={(args) => {
-                              return (
-                                <OutlinedTextField
-                                  label='Chief Complaints'
-                                  rows={3}
-                                  multiline
-                                  {...args}
-                                />
-                              )
-                            }}
-                          />
-                        </GridItem>
                         <GridItem xs={12}>
                           <FastField
                             name={`${_prefix}remark`}

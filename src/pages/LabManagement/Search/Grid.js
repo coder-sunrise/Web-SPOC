@@ -102,7 +102,7 @@ class Grid extends PureComponent {
       columns: [
         { name: 'orderId', title: 'Order ID' },
         { name: 'orderDate', title: 'Order Date' },
-        { name: 'serviceCentre', title: 'Service Centre' },
+        { name: 'serviceCentre', title: 'Service Center' },
         { name: 'serviceCategory', title: 'Service Category' },
         { name: 'serviceName', title: 'Service Name' },
         { name: 'patientId', title: 'Patient ID' },

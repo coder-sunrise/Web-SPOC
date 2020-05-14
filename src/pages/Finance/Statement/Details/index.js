@@ -23,12 +23,18 @@ const styles = () => ({})
     let newStatementInvoice = []
     let total = 0
     let adminChargeValueField = 0
+    let adjustmentValueField = 0
     if (returnValue.statementInvoice) {
       newStatementInvoice = returnValue.statementInvoice.map((o) => {
-        const { statementInvoicePayment, adminCharge, outstandingAmount } = o
+        const {
+          statementInvoicePayment,
+          adminCharge,
+          outstandingAmount,
+          statementAdjustment,
+        } = o
         total += outstandingAmount
         adminChargeValueField += adminCharge
-
+        adjustmentValueField += statementAdjustment
         return {
           ...o,
           tempOutstandingAmount: o.outstandingAmount,
@@ -42,12 +48,14 @@ const styles = () => ({})
     const outstandingBalance =
       returnValue.totalAmount -
       returnValue.collectedAmount -
-      adminChargeValueField
+      adminChargeValueField -
+      adjustmentValueField
 
     return {
       ...returnValue,
       outstandingBalance,
       adminChargeValueField,
+      adjustmentValueField,
       amount: Number(total).toFixed(2),
       maxAmount: Number(total).toFixed(2),
       paymentModeFK: DEFAULT_PAYMENT_MODE_GIRO.PAYMENT_FK, // GIRO
@@ -99,16 +107,19 @@ const styles = () => ({})
       let giroPayment = null
       let netsPayment = null
       if (paymentModeFK === 1) {
-        let creditCardType = codetable.ctcreditcardtype.find((item) => item.id === creditCardTypeFK).name
-        cardPayment = { creditCardNo: cardNumber, creditCardTypeFK, creditCardType }
-      }
-      else if (paymentModeFK === 2) {
+        let creditCardType = codetable.ctcreditcardtype.find(
+          (item) => item.id === creditCardTypeFK,
+        ).name
+        cardPayment = {
+          creditCardNo: cardNumber,
+          creditCardTypeFK,
+          creditCardType,
+        }
+      } else if (paymentModeFK === 2) {
         chequePayment = { chequeNo }
-      }
-      else if (paymentModeFK === 5) {
+      } else if (paymentModeFK === 5) {
         giroPayment = { refNo }
-      }
-      else if (paymentModeFK === 4) {
+      } else if (paymentModeFK === 4) {
         netsPayment = { refNo }
       }
       newInvoicePayment = {
@@ -270,7 +281,7 @@ class StatementDetails extends PureComponent {
     })
   }
 
-  render() {
+  render () {
     return (
       <React.Fragment>
         <Paper>
