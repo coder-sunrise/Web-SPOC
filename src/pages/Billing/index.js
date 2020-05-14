@@ -18,23 +18,21 @@ import {
   OutlinedTextField,
 } from '@/components'
 import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
-// sub component
-import PatientBanner from '@/pages/PatientDashboard/Banner'
-// import DispenseDetails from '@/pages/Dispense/DispenseDetails/PrintDrugLabelWrapper'
-import DispenseDetails from '@/pages/Dispense/DispenseDetails/WebSocketWrapper'
-// import ApplyClaims from './components/ApplyClaims'
+// common utils
 import { roundTo } from '@/utils/utils'
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
+import Authorized from '@/utils/Authorized'
+// sub component
+import PatientBanner from '@/pages/PatientDashboard/Banner'
+import DispenseDetails from '@/pages/Dispense/DispenseDetails/WebSocketWrapper'
 import ApplyClaims from './refactored/newApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 import SchemeValidationPrompt from './components/SchemeValidationPrompt'
-// utils
+// page utils
 import {
   constructPayload,
   validateApplySchemesWithPatientSchemes,
 } from './utils'
-import Authorized from '@/utils/Authorized'
-
 // window.g_app.replaceModel(model)
 
 const styles = (theme) => ({

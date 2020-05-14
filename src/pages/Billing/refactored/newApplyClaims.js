@@ -672,31 +672,6 @@ const ApplyClaims = ({
       <GridItem md={12} style={{ maxHeight: '60vh', overflowY: 'auto' }}>
         {tempInvoicePayer.map((invoicePayer, index) => {
           if (invoicePayer.isCancelled) return null
-          // if (
-          //   invoicePayer.schemeConfig &&
-          //   [
-          //     12,
-          //     13,
-          //     14,
-          //   ].includes(invoicePayer.schemeConfig.id)
-          // )
-          //   return (
-          //     <MedisaveSchemes
-          //       key={`invoicePayer-${index}`}
-          //       _key={`invoicePayer-${index}`}
-          //       invoicePayer={invoicePayer}
-          //       index={index}
-          //       onSchemeChange={handleSchemeChange}
-          //       onCommitChanges={handleCommitChanges}
-          //       onCancelClick={handleCancelClick}
-          //       onEditClick={handleEditClick}
-          //       onApplyClick={handleApplyClick}
-          //       onDeleteClick={handleDeleteClick}
-          //       hasOtherEditing={hasOtherEditing}
-          //       onClaimTypeChange={handleClaimTypeChange}
-          //     />
-          //   )
-
           return (
             <Scheme
               key={`invoicePayer-${index}`}

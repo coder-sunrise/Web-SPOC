@@ -421,3 +421,8 @@ export const VALUE_KEYS = {
 export const SCHEME_TYPE = {
   CORPORATE: 15,
 }
+
+export const INVOICE_VIEW_MODE = {
+  DEFAULT: 'default',
+  APPLIED_SCHEME: 'applied_scheme',
+}

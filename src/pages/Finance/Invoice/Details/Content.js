@@ -6,14 +6,17 @@ import Printer from '@material-ui/icons/Print'
 // common components
 import { Button, CommonModal, Tabs } from '@/components'
 import { ReportViewer } from '@/components/_medisys'
+// utils
+import { INVOICE_VIEW_MODE } from '@/utils/constants'
 // sub components
 import InvoiceDetails from './InvoiceDetails'
 import PaymentDetails from './PaymentDetails'
+import AppliedSchemes from './AppliedSchemes'
 // styling
 import styles from './styles'
 
 const Content = ({ classes, clinicSettings, values, ...restProps }) => {
-  const { invoiceDetail, invoicePayment } = restProps
+  const { invoiceDetail, invoicePayment, dispatch } = restProps
   const { currentBizSessionInfo } = invoicePayment
   const { entity } = invoiceDetail
   const invoiceBizSessionFK = entity ? entity.bizSessionFK : undefined
@@ -44,7 +47,7 @@ const Content = ({ classes, clinicSettings, values, ...restProps }) => {
     {
       id: 1,
       name: 'Invoice',
-      content: <InvoiceDetails values={values} />,
+      content: <InvoiceDetails values={values} dispatch={dispatch} />,
     },
     {
       id: 2,
@@ -61,13 +64,18 @@ const Content = ({ classes, clinicSettings, values, ...restProps }) => {
 
   return (
     <React.Fragment>
-      <Tabs
-        style={{ marginTop: 20 }}
-        activeKey={active}
-        defaultActivekey='1'
-        onChange={(e) => setActive(e)}
-        options={InvoicePaymentTabOption}
-      />
+      {invoiceDetail.mode === INVOICE_VIEW_MODE.DEFAULT && (
+        <Tabs
+          style={{ marginTop: 20 }}
+          activeKey={active}
+          defaultActivekey='1'
+          onChange={(e) => setActive(e)}
+          options={InvoicePaymentTabOption}
+        />
+      )}
+      {invoiceDetail.mode === INVOICE_VIEW_MODE.APPLIED_SCHEME && (
+        <AppliedSchemes />
+      )}
     </React.Fragment>
   )
 }
