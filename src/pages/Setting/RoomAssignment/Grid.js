@@ -130,7 +130,7 @@ const Grid = ({
   const onCommitChanges = ({ rows }) => {
     setFieldValue('roomAssignRows', rows)
   }
-  console.log(window.$tempGridRow)
+  // console.log(window.$tempGridRow)
   // console.log(
   //   values,
   //   roomAssignRows,

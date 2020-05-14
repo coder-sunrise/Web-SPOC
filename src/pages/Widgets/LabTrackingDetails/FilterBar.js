@@ -90,7 +90,7 @@ const searchResult = (values, props) => {
         serviceName: serviceName || undefined,
         apiCriteria: searchValue ? { searchValue } : undefined,
       }
-  console.log('searchResult', payload)
+
   dispatch({
     type: 'labTrackingDetails/query',
     payload,
