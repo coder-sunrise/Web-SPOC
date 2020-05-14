@@ -1,10 +1,6 @@
 import React, { PureComponent } from 'react'
 import { withStyles } from '@material-ui/core'
 import * as Yup from 'yup'
-import model from './models'
-import Grid from './Grid'
-import NearAddGrid from './NearAddGrid'
-
 import {
   TextField,
   NumberInput,
@@ -17,7 +13,8 @@ import {
   OutlinedTextField,
 } from '@/components'
 
-window.g_app.replaceModel(model)
+import Grid from './Grid'
+import NearAddGrid from './NearAddGrid'
 
 const styles = (theme) => ({})
 const gridValidationSchema = Yup.object().shape({
@@ -25,26 +22,10 @@ const gridValidationSchema = Yup.object().shape({
 })
 
 class RefractionForm extends PureComponent {
-  constructor (props) {
-    super(props)
-    const { prefix, setFieldValue, values } = props
-
-    let formData = this.convertEyeRefractionForm(
-      Object.byString(values, prefix),
-    )
-    this.state = {
-      formData,
-    }
-    // console.log('constructor RefractionForm', formData)
-    setTimeout(() => {
-      setFieldValue(prefix, formData)
-    }, 10)
-  }
-
   onCommitChanges = (p) => {
     const { rows = [], deleted, form: { setFieldValue } } = p
     const { prefix } = this.props
-    let { formData } = this.state
+    // let { formData } = this.state
     if (deleted) {
       const newrow =
         rows.reduce((result, r) => {
@@ -59,24 +40,11 @@ class RefractionForm extends PureComponent {
           ]
         }, []) || []
       setFieldValue(`${prefix}.Tests`, newrow)
-
-      this.setState({
-        formData: {
-          ...formData,
-          Tests: newrow,
-        },
-      })
       return newrow
     }
     if (rows) {
       const updatedRows = this.validateWithSchema(rows)
       setFieldValue(`${prefix}.Tests`, updatedRows)
-      this.setState({
-        formData: {
-          ...formData,
-          Tests: updatedRows,
-        },
-      })
       return updatedRows
     }
   }
@@ -85,25 +53,21 @@ class RefractionForm extends PureComponent {
     const { rows = [], form: { setFieldValue } } = p
     const { prefix } = this.props
 
-    setFieldValue(`${prefix}.NearAdd`, rows ? rows[0] : undefined)
+    let nearAdd = rows ? rows[0] : undefined
+
+    setFieldValue(`${prefix}.NearAdd`, nearAdd)
   }
 
-  convertEyeRefractionForm = (formData) => {
-    if (formData && typeof formData === 'string') {
-      let parseJson = JSON.parse(formData)
-
-      return parseJson
-    }
-    return formData
+  getRows = (args) => {
+    const { form: { values } } = args
+    let thisFormData = Object.byString(values, this.props.prefix)
+    return thisFormData ? thisFormData.Tests || [] : []
   }
 
-  getRows = () => {
-    return this.state.formData.Tests || []
-  }
-
-  getNearAddRows = () => {
-    const { formData } = this.state
-    console.log(formData)
+  getNearAddRows = (args) => {
+    const { form: { values } } = args
+    const { prefix } = this.props
+    let formData = Object.byString(values, prefix)
     if (formData && formData.NearAdd) {
       return [
         { id: -99, ...formData.NearAdd },
@@ -165,12 +129,22 @@ class RefractionForm extends PureComponent {
     return endResult
   }
 
+  handleEyeDominanceChange = (v, mutual, { form }) => {
+    const { setFieldValue } = form
+    if (v === true) {
+      setFieldValue(mutual, false)
+    }
+  }
+
   render () {
     const { theme, prefix } = this.props
-    const isDisabledPrint = () => {
-      const rows = this.getRows()
-      return !rows || rows.filter((r) => r.IsSelected === true).length !== 1
-    }
+    // const isDisabledPrint = () => {
+    //   const rows = this.getRows()
+    //   return !rows || rows.filter((r) => r.IsSelected === true).length !== 1
+    // }
+
+    // console.log(values)
+    // console.log('render ', Object.byString(values, prefix))
 
     const _prefix = `${prefix}.`
     return (
@@ -217,13 +191,37 @@ class RefractionForm extends PureComponent {
           <GridItem xs sm={2} md={1}>
             <FastField
               name={`${_prefix}EyeDominance.Left`}
-              render={(args) => <Checkbox {...args} label='Left' />}
+              render={(args) => (
+                <Checkbox
+                  {...args}
+                  label='Left'
+                  onChange={(e) => {
+                    this.handleEyeDominanceChange(
+                      e.target.value,
+                      `${_prefix}EyeDominance.Right`,
+                      args,
+                    )
+                  }}
+                />
+              )}
             />
           </GridItem>
           <GridItem xs sm={2} md={1}>
             <FastField
               name={`${_prefix}EyeDominance.Right`}
-              render={(args) => <Checkbox {...args} label='Right' />}
+              render={(args) => (
+                <Checkbox
+                  {...args}
+                  label='Right'
+                  onChange={(e) => {
+                    this.handleEyeDominanceChange(
+                      e.target.value,
+                      `${_prefix}EyeDominance.Left`,
+                      args,
+                    )
+                  }}
+                />
+              )}
             />
           </GridItem>
         </GridContainer>
@@ -231,7 +229,7 @@ class RefractionForm extends PureComponent {
           <GridItem xs sm={2} md={2}>
             <TextField value='Van Herick' text />
           </GridItem>
-          <GridItem xs sm={6} md={6}>
+          <GridItem xs sm={10} md={10}>
             <FastField
               name={`${_prefix}VanHerick`}
               render={(args) => {
@@ -274,7 +272,7 @@ class RefractionForm extends PureComponent {
           <GridItem xs sm={2} md={2}>
             <TextField value='Remarks' text />
           </GridItem>
-          <GridItem xs sm={6} md={6}>
+          <GridItem xs sm={10} md={10}>
             <FastField
               name={`${_prefix}Remarks`}
               render={(args) => {
@@ -291,7 +289,7 @@ class RefractionForm extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs sm={4} md={4} style={{ alignSelf: 'flex-end' }}>
+          {/* <GridItem xs sm={4} md={4} style={{ alignSelf: 'flex-end' }}>
             <FastField
               render={(args) => {
                 return (
@@ -306,7 +304,7 @@ class RefractionForm extends PureComponent {
                 )
               }}
             />
-          </GridItem>
+          </GridItem> */}
         </GridContainer>
 
         <GridContainer style={{ marginTop: theme.spacing(1) }}>
@@ -334,7 +332,7 @@ class RefractionForm extends PureComponent {
               render={(args) => {
                 return (
                   <NearAddGrid
-                    rows={this.getNearAddRows()}
+                    rows={this.getNearAddRows(args)}
                     setArrayValue={(p) => {
                       this.updateNearAddValue({ ...args, ...p })
                     }}
