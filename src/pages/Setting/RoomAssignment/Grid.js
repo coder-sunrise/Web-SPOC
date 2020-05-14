@@ -72,15 +72,19 @@ const Grid = ({
       },
     })
   }, [])
-
+ 
   const compareDoctor = function (a, b) {
     let doctorA = doctorOptions.find((doctor) => doctor.value === a)
-    let doctorB = doctorOptions.find((doctor) => doctor.value === b)
+    let doctorB = doctorOptions.find((doctor) => doctor.value === b) 
+    if (doctorA === undefined || doctorB === undefined)
+      return false
     return doctorA.name.localeCompare(doctorB.name)
   }
   const compareRoom = function (a, b) {
     let roomA = codetable.ctroom.find((room) => room.id === a)
     let roomB = codetable.ctroom.find((room) => room.id === b)
+    if (roomA === undefined || roomB === undefined)
+      return false
     return roomA.name.localeCompare(roomB.name)
   }
   const tableParas = {
@@ -107,6 +111,7 @@ const Grid = ({
             currentRowDoctor,
           ]
         },
+        compare: compareDoctor,
       },
       {
         columnName: 'roomFK',
