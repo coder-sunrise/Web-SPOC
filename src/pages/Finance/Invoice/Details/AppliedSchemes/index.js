@@ -13,10 +13,18 @@ import { INVOICE_VIEW_MODE } from '@/utils/constants'
 import { roundTo } from '@/utils/utils'
 import ApplyClaims from '@/pages/Billing/refactored/newApplyClaims'
 import { constructPayload } from '@/pages/Billing/utils'
+// services
+import { validateInvoicePayer } from '../../services/appliedScheme'
 
 const styles = (theme) => ({
   cardContainer: {
     margin: theme.spacing(1),
+  },
+  errorPromptContainer: {
+    textAlign: 'center',
+    '& p': {
+      fontSize: '1rem',
+    },
   },
 })
 
@@ -126,15 +134,44 @@ class AppliedScheme extends Component {
     // })
   }
 
-  handleSaveClick = () => {
-    const { dispatch, values, invoiceDetail } = this.props
+  handleSaveClick = async () => {
+    const { dispatch, classes, values, invoiceDetail } = this.props
     const payload = {
       ...constructPayload(values),
+      invoiceId: invoiceDetail.entity.id,
     }
-    dispatch({
-      type: 'appliedSchemes/saveAppliedScheme',
-      payload,
+    const result = await validateInvoicePayer({
+      invoiceFK: invoiceDetail.entity.id,
+      invoicePayerFKs: payload.invoicePayer.map((ip) => ip.id),
     })
+
+    const onConfirm = () => {
+      dispatch({
+        type: 'appliedSchemes/saveAppliedScheme',
+        payload,
+      })
+    }
+
+    const { data, status } = result
+    if (status === '200' && data.content && data.content.length > 0) {
+      dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          openConfirmContent:
+            'One or more invoice payer is part of the statements.',
+          onConfirmSave: onConfirm,
+          confirmText: 'Confirm to proceed?',
+          additionalInfo: (
+            <div className={classes.errorPromptContainer}>
+              {data.content.map((message) => <p>{message}</p>)}
+            </div>
+          ),
+        },
+      })
+    } else {
+      onConfirm()
+    }
   }
 
   render () {

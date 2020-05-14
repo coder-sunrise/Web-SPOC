@@ -22,3 +22,7 @@ export const saveAppliedScheme = (payload) => {
     body: payload,
   })
 }
+
+export const validateInvoicePayer = (payload) => {
+  return request(`${apiUrl}/validate`, { method: 'POST', body: payload })
+}

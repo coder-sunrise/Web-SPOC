@@ -52,10 +52,25 @@ export default createFormViewModel({
             payload: data,
           })
       },
-      *saveAppliedScheme ({ payload }, { call, put }) {
-        const response = yield call(saveAppliedScheme, payload)
-        if (response) {
-          console.log({ response })
+      *saveAppliedScheme ({ payload }, { call, put, take }) {
+        const { invoiceId, ...restPayload } = payload
+        const response = yield call(saveAppliedScheme, restPayload)
+        if (response === 204) {
+          yield put({
+            type: 'invoiceDetail/query',
+            payload: {
+              id: invoiceId,
+            },
+          })
+          yield put({
+            type: 'invoicePayment/query',
+            payload: {
+              id: invoiceId,
+            },
+          })
+
+          yield take('invoiceDetail/query/@@end')
+          yield take('invoicePayment/query/@@end')
           yield put({
             type: 'invoiceDetail/updateState',
             payload: {
