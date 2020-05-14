@@ -15,12 +15,25 @@ const styles = () => ({
 })
 
 const ODOS = ({ row, columnConfig, cellProps, classes }) => {
-  const { value, control, validSchema, columnName, ...restProps } = columnConfig
+  const {
+    value,
+    control,
+    validSchema,
+    columnName,
+    editingEnabled,
+    ...restProps
+  } = columnConfig
   const { onBlur, onFocus, autoFocus } = cellProps
   const [
     blur,
     setBlur,
   ] = useState(false)
+
+  const [
+    changed,
+    setChanged,
+  ] = useState({})
+
   const debounceBlur = _.debounce(setBlur, 100, {
     leading: false,
     trailing: true,
@@ -28,6 +41,16 @@ const ODOS = ({ row, columnConfig, cellProps, classes }) => {
   useEffect(
     () => {
       if (blur) {
+        const { commitChanges } = control
+        validSchema(row)
+        commitChanges({
+          changed: {
+            [row.id]: {
+              ...changed,
+            },
+          },
+        })
+
         if (onBlur) onBlur()
       }
     },
@@ -38,16 +61,16 @@ const ODOS = ({ row, columnConfig, cellProps, classes }) => {
 
   const onValuesChange = (field, val) => {
     const fieldName = field + columnName
-    const { commitChanges } = control
     row[fieldName] = val
-    validSchema(row)
-    commitChanges({
-      changed: {
-        [row.id]: {
-          [fieldName]: row[fieldName],
-        },
-      },
-    })
+    // validSchema(row)
+    const currentChanges = { [fieldName]: row[fieldName] }
+
+    let changes = {
+      ...changed,
+      ...currentChanges,
+    }
+
+    setChanged(changes)
   }
 
   return (
@@ -67,6 +90,7 @@ const ODOS = ({ row, columnConfig, cellProps, classes }) => {
           onFocus={() => {
             debounceBlur(false)
           }}
+          disabled={!editingEnabled}
         />
       </GridItem>
       <GridItem xs={1} className={classes.alignBottom}>
@@ -89,6 +113,7 @@ const ODOS = ({ row, columnConfig, cellProps, classes }) => {
           onFocus={() => {
             debounceBlur(false)
           }}
+          disabled={!editingEnabled}
         />
       </GridItem>
       <GridItem xs={1} className={classes.alignBottom}>
@@ -111,6 +136,7 @@ const ODOS = ({ row, columnConfig, cellProps, classes }) => {
           onFocus={() => {
             debounceBlur(false)
           }}
+          disabled={!editingEnabled}
         />
       </GridItem>
       <GridItem xs={4}>
@@ -134,6 +160,7 @@ const ODOS = ({ row, columnConfig, cellProps, classes }) => {
               onFocus={() => {
                 debounceBlur(false)
               }}
+              disabled={!editingEnabled}
             />
             <span className={classes.alignBottom}>)</span>
           </div>

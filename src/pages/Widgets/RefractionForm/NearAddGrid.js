@@ -24,7 +24,6 @@ import { orderTypes } from '@/pages/Consultation/utils'
 import Authorized from '@/utils/Authorized'
 import NearAddODOS from './NearAddODOS'
 
-// console.log(orderTypes)
 export default ({
   dispatch,
   classes,
@@ -60,7 +59,7 @@ export default ({
         columnName: 'OD',
         isReactComponent: true,
         render: NearAddODOS,
-        editingEnabled: true,
+        editingEnabled: isEditable,
         sortingEnabled: false,
         align: 'center',
       },
@@ -68,7 +67,7 @@ export default ({
         columnName: 'OS',
         isReactComponent: true,
         render: NearAddODOS,
-        editingEnabled: true,
+        editingEnabled: isEditable,
         sortingEnabled: false,
         align: 'center',
       },

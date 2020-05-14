@@ -427,3 +427,10 @@ export const VALUE_KEYS = {
 export const SCHEME_TYPE = {
   CORPORATE: 15,
 }
+
+export const ATTACHMENT_TYPE = {
+  CLINICALNOTES: 'ClinicalNotes',
+  VISITREFERRAL: 'VisitReferral',
+  VISIT: 'Visit',
+  EYEVISUALACUITY: 'EyeVisualAcuity',
+}

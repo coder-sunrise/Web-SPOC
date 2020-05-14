@@ -10,7 +10,6 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import numeral from 'numeral'
 import {
   CommonTableGrid,
-  FastEditableTableGrid,
   EditableTableGrid,
   Button,
   Popconfirm,
@@ -69,7 +68,7 @@ export default ({
         columnName: 'OD',
         isReactComponent: true,
         render: ODOS,
-        editingEnabled: true,
+        editingEnabled: isEditable,
         sortingEnabled: false,
         align: 'center',
       },
@@ -77,7 +76,7 @@ export default ({
         columnName: 'OS',
         isReactComponent: true,
         render: ODOS,
-        editingEnabled: true,
+        editingEnabled: isEditable,
         sortingEnabled: false,
         align: 'center',
       },

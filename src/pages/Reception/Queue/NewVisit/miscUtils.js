@@ -1,5 +1,6 @@
-import { VISIT_STATUS } from '../variables'
 import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
+import { bool } from 'prop-types'
+import { VISIT_STATUS } from '../variables'
 
 const filterDeletedFiles = (item) => {
   // filter out not yet confirmed files
@@ -43,6 +44,65 @@ const mapAttachmentToUploadInput = (
         isDeleted,
         sortOrder: index,
       }
+
+const convertEyeForms = (values) => {
+  let { visitEyeRefractionForm = undefined } = values
+
+  const removeFields = (obj, fields = []) => {
+    if (Array.isArray(obj)) {
+      for (let n = 0; n < obj.length; n++) {
+        const isEmpty = removeFields(obj[n], fields)
+        if (isEmpty) {
+          obj.splice(n, 1)
+          n--
+        }
+      }
+    } else if (typeof obj === 'object') {
+      for (let value in obj) {
+        if (Array.isArray(obj[value])) {
+          removeFields(obj[value], fields)
+        }
+      }
+      fields.forEach((o) => {
+        delete obj[o]
+      })
+
+      // check all of fields is empty
+      let allFieldIsEmtpy = true
+      for (let i in obj) {
+        if (i !== 'id' && obj[i] !== undefined && obj[i] !== '') {
+          allFieldIsEmtpy = false
+          break
+        }
+      }
+
+      return allFieldIsEmtpy
+    }
+  }
+
+  const durtyFields = [
+    'isDeleted',
+    'isNew',
+    'IsSelected',
+    'rowIndex',
+    '_errors',
+    'OD',
+    'OS',
+  ]
+  if (
+    visitEyeRefractionForm &&
+    visitEyeRefractionForm.formData &&
+    typeof visitEyeRefractionForm.formData === 'object'
+  ) {
+    let { formData } = visitEyeRefractionForm
+    removeFields(formData, durtyFields)
+
+    console.log('clear datas ==>', formData)
+    values.visitEyeRefractionForm.formData = JSON.stringify(formData)
+  }
+
+  return values
+}
 
 export const formikMapPropsToValues = ({
   clinicInfo,
@@ -127,12 +187,10 @@ export const formikMapPropsToValues = ({
     }
 
     let newFormData
-    if (
-      visitEyeRefractionForm &&
-      visitEyeRefractionForm.formData &&
-      typeof visitEyeRefractionForm.formData === 'string'
-    ) {
-      newFormData = JSON.parse(visitEyeRefractionForm.formData)
+    if (visitEyeRefractionForm && visitEyeRefractionForm.formData) {
+      if (typeof visitEyeRefractionForm.formData === 'string')
+        newFormData = JSON.parse(visitEyeRefractionForm.formData)
+      else newFormData = visitEyeRefractionForm.formData
     }
 
     return {
@@ -208,13 +266,16 @@ export const formikHandleSubmit = (
     _referralBy = referralBy[0]
   }
 
-  let { visitEyeRefractionForm = undefined } = restValues
-  if (visitEyeRefractionForm && visitEyeRefractionForm.formData) {
+  let { visitEyeRefractionForm = undefined } = convertEyeForms(restValues)
+
+  if (
+    visitEyeRefractionForm &&
+    visitEyeRefractionForm.formData &&
+    typeof visitEyeRefractionForm.formData === 'object'
+  ) {
     visitEyeRefractionForm.formData = JSON.stringify(
       visitEyeRefractionForm.formData,
     )
-  } else {
-    visitEyeRefractionForm = undefined
   }
 
   const payload = {
