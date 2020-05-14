@@ -73,10 +73,10 @@ class Grid extends PureComponent {
         .join('_')
     }
     const { route } = this.props
-    const reportID =
-      REPORT_ID[(route === 'copayer' ? 'COPAYER_ADDRESS_LABEL_' : 'SUPPLIER_ADDRESS_LABEL_').concat(sizeConverter(labelPrinterSize))]
+    const reportID = 
+      REPORT_ID[(route.name === 'copayer' ? 'COPAYER_ADDRESS_LABEL_' : 'SUPPLIER_ADDRESS_LABEL_').concat(sizeConverter(labelPrinterSize))]
 
-    const data = await getRawData(reportID, route === 'copayer' ? { copayerId } : { supplierId: copayerId })
+    const data = await getRawData(reportID, route.name === 'copayer' ? { copayerId } : { supplierId: copayerId })
     const payload = [
       {
         ReportId: reportID,
