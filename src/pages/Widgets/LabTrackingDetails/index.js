@@ -1,14 +1,14 @@
 import React, { Fragment, PureComponent } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
-import Detail from './Detail'
 import { PATIENT_LAB } from '@/utils/constants'
+import { CommonModal } from '@/components'
+import { findGetParameter } from '@/utils/utils'
+import Detail from './Detail'
 import FilterBar from './FilterBar'
 import OverallGrid from './OverallGrid'
 import PatientGrid from './PatientGrid'
 import model from './models'
-import { CommonModal } from '@/components'
-import { findGetParameter } from '@/utils/utils'
 
 window.g_app.replaceModel(model)
 
@@ -40,14 +40,7 @@ class LabTrackingDetails extends PureComponent {
 
     const IsOverallGrid = resultType === PATIENT_LAB.LAB_TRACKING
     let patientID = patientId || Number(findGetParameter('pid')) || undefined
-    const payload = {
-      visitFKNavigation:
-        !IsOverallGrid && patientID
-          ? {
-              patientProfileFK: patientID,
-            }
-          : undefined,
-    }
+
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {
@@ -59,11 +52,6 @@ class LabTrackingDetails extends PureComponent {
       payload: {
         code: 'ctcasetype',
       },
-    })
-
-    dispatch({
-      type: 'labTrackingDetails/query',
-      payload,
     })
   }
 
@@ -94,6 +82,8 @@ class LabTrackingDetails extends PureComponent {
     const { resultType, dispatch, labTrackingDetails, patientId } = this.props
     const IsOverallGrid = resultType === PATIENT_LAB.LAB_TRACKING
 
+    let patientID = patientId || Number(findGetParameter('pid')) || undefined
+
     const cfg = {
       toggleModal: this.toggleModal,
     }
@@ -103,7 +93,7 @@ class LabTrackingDetails extends PureComponent {
         <FilterBar
           dispatch={dispatch}
           IsOverallGrid={IsOverallGrid}
-          patientId={patientId}
+          patientId={patientID}
         />
         <div style={{ margin: 10 }}>
           {IsOverallGrid ? (
