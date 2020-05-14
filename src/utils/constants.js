@@ -61,9 +61,10 @@ export const UNFIT_TYPE = {
   5: 'Unfit for Duty',
   6: 'Unfit to Attend Court',
   7: 'for Light Duty',
-  8: 'Unfit for PE',
+  8: 'Unfit for Physical Exercise',
   9: 'Unfit for wearing shoes',
   10: 'Excuse Chit',
+  11: 'on Maternity Leave',
 }
 
 export const PAYMENT_MODE = {
