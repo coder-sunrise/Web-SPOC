@@ -107,7 +107,6 @@ const Grid = ({
             currentRowDoctor,
           ]
         },
-        compare: compareDoctor,
       },
       {
         columnName: 'roomFK',
