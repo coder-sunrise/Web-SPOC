@@ -38,7 +38,7 @@ class EditableTableGrid extends PureComponent {
 
   constructor (props) {
     super(props)
-    const { EditingProps = {} } = props
+    const { EditingProps = {}, id } = props
     this.state = {
       editingRowIds: [],
       deletedRowIds: [],
@@ -48,7 +48,7 @@ class EditableTableGrid extends PureComponent {
       // hasError: false,
       // errorRows: [],
     }
-    this.gridId = `edit-${uniqueGid++}`
+    this.gridId = id || `edit-${uniqueGid++}`
     // console.log(this.gridId)
     // console.log('edit created', window.$tempGridRow[this.gridId])
   }

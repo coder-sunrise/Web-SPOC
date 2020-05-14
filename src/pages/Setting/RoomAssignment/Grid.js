@@ -28,6 +28,8 @@ const Grid = ({
   doctorProfile = [],
   global,
   codetable,
+  theme,
+  ...restProps
 }) => {
   const [
     doctorOptions,
@@ -128,14 +130,23 @@ const Grid = ({
   const onCommitChanges = ({ rows }) => {
     setFieldValue('roomAssignRows', rows)
   }
-
+  console.log(window.$tempGridRow)
+  // console.log(
+  //   values,
+  //   roomAssignRows,
+  //   (doctorProfile = []),
+  //   global,
+  //   codetable,
+  //   restProps,
+  // )
   return (
     <div>
       <GridItem md={3}>
         <p>* Only doctor users can be assigned to a room</p>
       </GridItem>
       <EditableTableGrid
-        style={{ margin: 20 }}
+        style={{ margin: theme.spacing(1) }}
+        id='roomAssingmentGrid'
         schema={roomAssignSchema}
         rows={roomAssignRows}
         FuncProps={{

@@ -13,7 +13,7 @@ export default () => (
       <Button
         color='primary'
         onClick={() => {
-          window.location.reload()
+          window.location.reload(true)
         }}
       >
         Refresh page
