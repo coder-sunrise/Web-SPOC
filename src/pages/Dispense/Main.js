@@ -145,7 +145,7 @@ class Main extends Component {
   state = {
     showOrderModal: false,
     showDrugLabelSelection: false,
-    selectedDrugs: [], 
+    selectedDrugs: [],
   }
 
   componentDidMount = async () => {
@@ -184,9 +184,9 @@ class Main extends Component {
       this.editOrder()
     }
     this.setState(
-      (prevState) => {
+      () => {
         return {
-          selectedDrugs: prescription.map((x) => { return { ...x, no: 1, selected: false } })
+          selectedDrugs: prescription.map((x) => { return { ...x, no: 1, selected: true } }),
         }
       })
   }
@@ -359,12 +359,12 @@ class Main extends Component {
 
   handleDrugLabelClick = () => {
     const { values } = this.props
-    const { otherOrder = [], prescription = [], visitPurposeFK } = values
+    const { prescription = [] } = values
     this.setState(
       (prevState) => {
         return {
           showDrugLabelSelection: !prevState.showDrugLabelSelection,
-          selectedDrugs: prescription.map((x) => { return { ...x, no: 1, selected: false } }), 
+          selectedDrugs: prescription.map((x) => { return { ...x, no: 1, selected: true } }),
         }
       })
   }
@@ -383,8 +383,11 @@ class Main extends Component {
     this.setState((prevState) => ({
       selectedDrugs: prevState.selectedDrugs.map(
         (drug) => (drug.id === itemId ? { ...drug, selected } : { ...drug }),
-      )
-    })) 
+      ),
+    }))
+    this.props.dispatch(
+      { type: 'global/incrementCommitCount', }
+    )
   }
 
   handleDrugLabelNoChanged = (itemId, no) => {
@@ -393,9 +396,12 @@ class Main extends Component {
         (drug) => (drug.id === itemId ? { ...drug, no } : { ...drug }),
       ),
     }))
+    this.props.dispatch(
+      { type: 'global/incrementCommitCount', }
+    )
   }
 
-  render () {
+  render() {
     const { classes, handleSubmit, values, dispense, codetable } = this.props
     return (
       <div className={classes.root}>
@@ -410,7 +416,7 @@ class Main extends Component {
           onDrugLabelSelectionClose={this.handleDrugLabelSelectionClose}
           onDrugLabelSelected={this.handleDrugLabelSelected}
           onDrugLabelNoChanged={this.handleDrugLabelNoChanged}
-          selectedDrugs={this.state.selectedDrugs} 
+          selectedDrugs={this.state.selectedDrugs}
         />
         <CommonModal
           title='Orders'

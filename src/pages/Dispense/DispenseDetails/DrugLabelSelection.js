@@ -16,7 +16,7 @@ class DrugLabelSelection extends React.PureComponent {
       prescription, 
       handleDrugLabelSelected,
       handleDrugLabelNoChanged,
-    } = this.props
+    } = this.props  
     const printLabelDisabled = !prescription.some((x) => x.selected === true)
     return (
       <div>

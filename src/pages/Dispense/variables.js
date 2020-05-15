@@ -625,11 +625,11 @@ export const DrugLabelSelectionColumnExtensions = (
         return (
           <p>
             <NumberInput
-              max={99} 
+              max={99}
               precision={0}
               min={1}
               value={row.no}
-              defaultValue={1} 
+              defaultValue={1}
               onChange={(obj) => {
                 handleDrugLabelNoChanged(row.id, obj.target.value)
               }}
@@ -644,17 +644,12 @@ export const DrugLabelSelectionColumnExtensions = (
       width: 80,
       render: (row) => {
         return (
-          <Tooltip
-            title={
-              <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
-            }
-          >
-            <Checkbox onChange={(obj) => {
-              handleDrugLabelSelected(row.id, obj.target.value)
-            }}
-              simple
-            />
-          </Tooltip>
+          <Checkbox onChange={(obj) => {
+            handleDrugLabelSelected(row.id, obj.target.value)
+          }}
+            checked={row.selected}
+            simple
+          />
         )
       },
     },

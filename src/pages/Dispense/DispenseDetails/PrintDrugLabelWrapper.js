@@ -18,7 +18,7 @@ const defaultSocketPortsState = [
   { portNumber: 7184, attempted: false },
 ]
 class PrintDrugLabelWrapper extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       socketPorts: [
@@ -31,7 +31,7 @@ class PrintDrugLabelWrapper extends React.Component {
     this.initializeWebSocket(true)
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     if (this.wsConnection) this.wsConnection.close()
   }
 
@@ -116,13 +116,10 @@ class PrintDrugLabelWrapper extends React.Component {
       CONSTANTS.DRUG_LABEL,
       CONSTANTS.PATIENT_LABEL,
     ]
-    console.log({ type, row })
     if (withoutPrintPreview.includes(type)) {
       let printResult = await this.getPrintResult(type, row)
-      console.log(printResult)
       if (printResult) {
         const base64Result = arrayBufferToBase64(printResult)
-        console.log(base64Result)
         this.prepareJobForWebSocket(base64Result)
       }
     } else {
@@ -284,9 +281,9 @@ class PrintDrugLabelWrapper extends React.Component {
     return (
       <DispenseDetails
         {...restProps}
-        onPrint={this.handleOnPrint}        
+        onPrint={this.handleOnPrint}
         sendingJob={pendingJob.length > 0}
-      /> 
+      />
     )
   }
 }
