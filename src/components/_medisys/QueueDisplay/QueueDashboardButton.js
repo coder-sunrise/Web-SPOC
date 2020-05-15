@@ -1,8 +1,9 @@
 import React from 'react'
 import { withStyles } from '@material-ui/core'
-import Dashboard from '@material-ui/icons/Dashboard'
-import { ProgressButton } from '@/components'
+import { Dashboard, ClearAll } from '@material-ui/icons'
+import { ProgressButton, notification } from '@/components'
 import Authorized from '@/utils/Authorized'
+import { VALUE_KEYS } from '@/utils/constants'
 
 const styles = (theme) => ({
   queueDashboardButton: {
@@ -12,7 +13,12 @@ const styles = (theme) => ({
   },
 })
 
-const QueueDashboardButton = ({ classes, size = 'md' }) => {
+const QueueDashboardButton = ({
+  classes,
+  size = 'md',
+  dispatch,
+  showClear = false,
+}) => {
   return (
     <Authorized authority='openqueuedisplay'>
       <ProgressButton
@@ -24,6 +30,37 @@ const QueueDashboardButton = ({ classes, size = 'md' }) => {
       >
         Open Queue Display
       </ProgressButton>
+      {showClear ? (
+        <ProgressButton
+          size={size}
+          icon={<ClearAll />}
+          className={classes.queueDashboardButton}
+          onClick={() => {
+            dispatch({
+              type: 'queueCalling/getExistingQueueCallList',
+              payload: {
+                keys: VALUE_KEYS.QUEUECALLING,
+              },
+            }).then((res) => {
+              // const { value, ...restRespValues } = res
+              dispatch({
+                type: 'queueCalling/upsertQueueCallList',
+                payload: {
+                  ...res,
+                  key: VALUE_KEYS.QUEUECALLING,
+                  value: '[]',
+                },
+              }).then((response) => {
+                if (response) notification.success({ message: 'Cleared' })
+              })
+            })
+          }}
+        >
+          clear
+        </ProgressButton>
+      ) : (
+        ''
+      )}
     </Authorized>
   )
 }

@@ -153,13 +153,18 @@ class QueueDisplaySetup extends PureComponent {
   }
 
   render () {
-    const { classes, handleSubmit, values: { value = {} } } = this.props
+    const {
+      classes,
+      handleSubmit,
+      dispatch,
+      values: { value = {} },
+    } = this.props
     const activeImages = (value.images || [])
       .filter((image) => !image.isDeleted)
 
     return (
       <React.Fragment>
-        <QueueDashboardButton />
+        <QueueDashboardButton showClear dispatch={dispatch} />
         <CardContainer hideHeader className={classes.container}>
           <GridContainer>
             <GridItem md={10}>

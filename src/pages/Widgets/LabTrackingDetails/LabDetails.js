@@ -14,7 +14,6 @@ import {
 import NumberInput from '@/components/NumberInput'
 
 export default ({ setFieldValue, values, codetable, setShowMessage }) => {
-  console.log('values', values)
   const { ctcasedescription = [], ctcasetype = [] } = codetable
   const [
     selectCaseTypeFK,
