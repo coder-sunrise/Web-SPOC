@@ -1,9 +1,9 @@
 import moment from 'moment'
 import _ from 'lodash'
+import Authorized from '@/utils/Authorized'
 import { dateFormatLong, dateFormatLongWithTime } from './format'
 import { UNFIT_TYPE } from './constants'
 import { calculateAgeFromDOB } from './dateUtils'
-import Authorized from '@/utils/Authorized'
 
 const status = [
   {
@@ -651,15 +651,16 @@ const tagList = [
               (patientAllergy ? `${patientAllergy}, ` : '') +
               patient.entity.patientAllergy[index].allergyName
         }
-        result = `Patient Name: ${patient.entity.name}`
-        result += `<br/>Patient Ref. No.: ${patient.entity.patientReferenceNo}`
-        result += `<br/>Patient Acc. No.: ${patient.entity.patientAccountNo}`
-        result += `<br/>Gender/Age: ${patientGender.name.substring(
+        result = `<p>Patient Name: ${patient.entity.name}</p>`
+        result += `<p>Patient Ref. No.: ${patient.entity
+          .patientReferenceNo}</p>`
+        result += `<p>Patient Acc. No.: ${patient.entity.patientAccountNo}</p>`
+        result += `<p>Gender/Age: ${patientGender.name.substring(
           0,
           1,
-        )}/${calculateAgeFromDOB(patient.entity.dob)}`
+        )}/${calculateAgeFromDOB(patient.entity.dob)}</p>`
 
-        result += `<br/>Drug Allergy: ${patientAllergy || 'NA'}`
+        result += `<p>Drug Allergy: ${patientAllergy || 'NA'}</p>`
       }
       return result || 'N.A.'
     },

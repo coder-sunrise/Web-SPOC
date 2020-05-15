@@ -5,14 +5,14 @@ import 'slick-carousel/slick/slick-theme.css'
 import Ticker from 'react-ticker'
 import { compose } from 'redux'
 import { connect } from 'dva'
-import Clock from './Clock'
-import QueueCallingList from './QueueCallingList'
-import Carousel from './Carousel'
-import CurrentCallingQueue from './CurrentCallingQueue'
 import { withFormikExtend } from '@/components'
 import { VALUE_KEYS } from '@/utils/constants'
 import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
 import { getFileByFileID } from '@/services/file'
+import Clock from './Clock'
+import QueueCallingList from './QueueCallingList'
+import Carousel from './Carousel'
+import CurrentCallingQueue from './CurrentCallingQueue'
 
 const styles = (theme) => ({
   mainContainer: {
@@ -217,7 +217,7 @@ const QueueDisplayDasboard = ({
               dispatch({
                 type: 'queueCalling/clearCurrentQCall',
               })
-            }, 3000)
+            }, 5000)
           }
         }
       }, 500)
