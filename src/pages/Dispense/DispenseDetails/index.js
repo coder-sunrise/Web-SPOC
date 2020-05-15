@@ -97,7 +97,7 @@ const DispenseDetails = ({
   onDrugLabelSelectionClose,
   onDrugLabelSelected,
   onDrugLabelNoChanged,
-  selectedDrugs,
+  selectedDrugs, 
 }) => {
   const {
     prescription,
@@ -377,7 +377,7 @@ const DispenseDetails = ({
       // }}
       >
         <DrugLabelSelection
-          prescription={selectedDrugs}
+          prescription={selectedDrugs} 
           codetable={codetable}
           handleDrugLabelSelected={onDrugLabelSelected}
           handleDrugLabelNoChanged={onDrugLabelNoChanged}

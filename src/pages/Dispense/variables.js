@@ -560,7 +560,7 @@ export const DrugLabelSelectionColumns = [
     title: 'Qty Dispensed',
   },
   {
-    name: 'NumberOfLabel',
+    name: 'no',
     title: 'No. Of Label',
   },
   {
@@ -618,7 +618,7 @@ export const DrugLabelSelectionColumnExtensions = (
       },
     },
     {
-      columnName: 'NumberOfLabel',
+      columnName: 'no',
       type: 'number',
       width: 140,
       render: (row) => {
@@ -628,6 +628,7 @@ export const DrugLabelSelectionColumnExtensions = (
               max={99} 
               precision={0}
               min={1}
+              value={row.no}
               defaultValue={1} 
               onChange={(obj) => {
                 handleDrugLabelNoChanged(row.id, obj.target.value)

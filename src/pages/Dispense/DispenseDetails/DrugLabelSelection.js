@@ -26,6 +26,7 @@ class DrugLabelSelection extends React.PureComponent {
       handleDrugLabelSelected,
       handleDrugLabelNoChanged,
     } = this.props
+    const printLabelDisabled = prescription.find((x) => x.selected === true) === undefined 
     return (
       <div>
         <GridContainer>
@@ -33,7 +34,7 @@ class DrugLabelSelection extends React.PureComponent {
             <TableData
               idPrefix='prescription'
               columns={DrugLabelSelectionColumns}
-              colExtensions={DrugLabelSelectionColumnExtensions(handleDrugLabelSelected,handleDrugLabelNoChanged)}
+              colExtensions={DrugLabelSelectionColumnExtensions(handleDrugLabelSelected, handleDrugLabelNoChanged)}
               data={prescription}
             />
           </GridItem>
@@ -41,6 +42,9 @@ class DrugLabelSelection extends React.PureComponent {
         {footer &&
           footer({
             cancelProps: {
+            },
+            confirmProps: {
+              disabled: printLabelDisabled,
             },
             onConfirm: handleSubmit,
             confirmBtnText: 'Print',

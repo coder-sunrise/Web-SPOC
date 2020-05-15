@@ -145,7 +145,7 @@ class Main extends Component {
   state = {
     showOrderModal: false,
     showDrugLabelSelection: false,
-    selectedDrugs: []
+    selectedDrugs: [], 
   }
 
   componentDidMount = async () => {
@@ -189,7 +189,6 @@ class Main extends Component {
           selectedDrugs: prescription.map((x) => { return { ...x, no: 1, selected: false } })
         }
       })
-    console.log(this.state.selectedDrugs)
   }
 
   makePayment = async () => {
@@ -364,11 +363,9 @@ class Main extends Component {
       (prevState) => {
         return {
           showDrugLabelSelection: !prevState.showDrugLabelSelection,
-          selectedDrugs: prescription.map((x) => { return { ...x, no: 1, selected: false } })
+          selectedDrugs: prescription.map((x) => { return { ...x, no: 1, selected: false } }), 
         }
       })
-
-    console.log(this.state.selectedDrugs)
   }
   handleDrugLabelSelectionClose = () => {
     this.setState(
@@ -383,10 +380,10 @@ class Main extends Component {
     this.setState((prevState) => ({
       selectedDrugs: prevState.selectedDrugs.map(
         (drug) => (drug.id === itemId ? { ...drug, selected } : { ...drug }),
-      ),
-    }))
+      )
+    })) 
   }
-  handleDrugLabelNoChanged = (itemId, no) => { 
+  handleDrugLabelNoChanged = (itemId, no) => {
     this.setState((prevState) => ({
       selectedDrugs: prevState.selectedDrugs.map(
         (drug) => (drug.id === itemId ? { ...drug, no } : { ...drug }),
@@ -408,7 +405,7 @@ class Main extends Component {
           onDrugLabelSelectionClose={this.handleDrugLabelSelectionClose}
           onDrugLabelSelected={this.handleDrugLabelSelected}
           onDrugLabelNoChanged={this.handleDrugLabelNoChanged}
-          selectedDrugs={this.state.selectedDrugs}
+          selectedDrugs={this.state.selectedDrugs} 
         />
         <CommonModal
           title='Orders'
