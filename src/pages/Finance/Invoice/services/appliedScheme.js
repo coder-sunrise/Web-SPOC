@@ -2,7 +2,7 @@ import * as service from '@/services/common'
 import request from '@/utils/request'
 
 // /api/Invoice/InvoicePayer/{id}/{invoiceVersionNo}
-const apiUrl = '/api/Invoice/InvoicePayer'
+const apiUrl = '/api/Invoice'
 const invoiceApiUrl = '/api/Invoice'
 
 export const queryInvoicePayerByIdAndInvoiceVersionNo = async ({
