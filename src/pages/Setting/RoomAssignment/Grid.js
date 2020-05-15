@@ -82,7 +82,7 @@ const Grid = ({
       return false
     return doctorA.name.localeCompare(doctorB.name)
   }
-  const compareRoom = function (a, b) {
+  const compareRoom = function (a, b) { 
     let roomA = codetable.ctroom.find((room) => room.id === a)
     let roomB = codetable.ctroom.find((room) => room.id === b)
     if (roomA === undefined || roomB === undefined)

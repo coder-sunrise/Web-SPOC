@@ -9,6 +9,7 @@ import { withFormikExtend, notification, CommonModal } from '@/components'
 // import DispenseDetails from './DispenseDetails/PrintDrugLabelWrapper'
 import DispenseDetails from './DispenseDetails/WebSocketWrapper'
 import AddOrder from './DispenseDetails/AddOrder'
+import DrugLabelSelection from './DispenseDetails/DrugLabelSelection'
 // utils
 import { calculateAmount, navigateDirtyCheck } from '@/utils/utils'
 import Yup from '@/utils/yup'
@@ -143,6 +144,8 @@ const constructPayload = (values) => {
 class Main extends Component {
   state = {
     showOrderModal: false,
+    showDrugLabelSelection: false,
+    selectedDrugs: [],
   }
 
   componentDidMount = async () => {
@@ -180,6 +183,12 @@ class Main extends Component {
     ) {
       this.editOrder()
     }
+    this.setState(
+      () => {
+        return {
+          selectedDrugs: prescription.map((x) => { return { ...x, no: 1, selected: true } }),
+        }
+      })
   }
 
   makePayment = async () => {
@@ -348,9 +357,52 @@ class Main extends Component {
     }
   }
 
-  render () {
-    const { classes, handleSubmit, values, dispense } = this.props
+  handleDrugLabelClick = () => {
+    const { values } = this.props
+    const { prescription = [] } = values
+    this.setState(
+      (prevState) => {
+        return {
+          showDrugLabelSelection: !prevState.showDrugLabelSelection,
+          selectedDrugs: prescription.map((x) => { return { ...x, no: 1, selected: true } }),
+        }
+      })
+  }
 
+  handleDrugLabelSelectionClose = () => {
+    this.setState(
+      (prevState) => {
+        return {
+          showDrugLabelSelection: !prevState.showDrugLabelSelection,
+        }
+      },
+    )
+  }
+
+  handleDrugLabelSelected = (itemId, selected) => {
+    this.setState((prevState) => ({
+      selectedDrugs: prevState.selectedDrugs.map(
+        (drug) => (drug.id === itemId ? { ...drug, selected } : { ...drug }),
+      ),
+    }))
+    this.props.dispatch(
+      { type: 'global/incrementCommitCount', }
+    )
+  }
+
+  handleDrugLabelNoChanged = (itemId, no) => {
+    this.setState((prevState) => ({
+      selectedDrugs: prevState.selectedDrugs.map(
+        (drug) => (drug.id === itemId ? { ...drug, no } : { ...drug }),
+      ),
+    }))
+    this.props.dispatch(
+      { type: 'global/incrementCommitCount', }
+    )
+  }
+
+  render() {
+    const { classes, handleSubmit, values, dispense, codetable } = this.props
     return (
       <div className={classes.root}>
         <DispenseDetails
@@ -359,6 +411,12 @@ class Main extends Component {
           onEditOrderClick={this.editOrder}
           onFinalizeClick={this.makePayment}
           onReloadClick={this.handleReloadClick}
+          onDrugLabelClick={this.handleDrugLabelClick}
+          showDrugLabelSelection={this.state.showDrugLabelSelection}
+          onDrugLabelSelectionClose={this.handleDrugLabelSelectionClose}
+          onDrugLabelSelected={this.handleDrugLabelSelected}
+          onDrugLabelNoChanged={this.handleDrugLabelNoChanged}
+          selectedDrugs={this.state.selectedDrugs}
         />
         <CommonModal
           title='Orders'
@@ -375,6 +433,7 @@ class Main extends Component {
             }}
           />
         </CommonModal>
+
       </div>
     )
   }
