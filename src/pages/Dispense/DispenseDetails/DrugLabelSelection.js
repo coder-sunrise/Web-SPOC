@@ -1,14 +1,6 @@
 import React from 'react'
-import * as Yup from 'yup'
-// dva
-import { connect } from 'dva'
-// formik
-import { withFormik, FastField } from 'formik'
-import { Paper, withStyles } from '@material-ui/core'
 // common components
-import { TextField, GridContainer, GridItem, notification } from '@/components'
-// services
-import { changeCurrentUserPassword, changeUserPassword } from '@/services/user'
+import { GridContainer, GridItem } from '@/components'
 
 import {
   DrugLabelSelectionColumns,
@@ -17,16 +9,15 @@ import {
 import TableData from './TableData'
 
 class DrugLabelSelection extends React.PureComponent {
-  render() {
+  render () {
     const {
       footer,
       handleSubmit,
-      prescription,
-      codetable,
+      prescription, 
       handleDrugLabelSelected,
       handleDrugLabelNoChanged,
     } = this.props
-    const printLabelDisabled = prescription.find((x) => x.selected === true) === undefined 
+    const printLabelDisabled = !prescription.some((x) => x.selected === true)
     return (
       <div>
         <GridContainer>

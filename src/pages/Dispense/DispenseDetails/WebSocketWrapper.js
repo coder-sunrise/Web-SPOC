@@ -68,12 +68,11 @@ const WebSocketWrapper = ({ handlePrint, selectedDrugs, sendingJob, ...restProps
   const generateDrugLablesPrintSource = async (visitID, prescriptions = []) => {
     const drugLabelsDetails1 = await queryDrugLabelsDetails(visitID)
     const { data } = drugLabelsDetails1
-    console.log(selectedDrugs)
     if (data && data.length > 0) {
       let drugLabelDetail = []
-      const newdata = data.filter(x => selectedDrugs.findIndex(function (value, index, arr) { return value.id === x.id && value.selected }) > -1)
+      const newdata = data.filter(x => selectedDrugs.findIndex((value, index, arr) => value.id === x.id && value.selected) > -1)
       newdata.map((o) => {
-        let copy = selectedDrugs.find((x) => x.id === o.id).no;
+        let copy = selectedDrugs.find((x) => x.id === o.id).no
         for (let no = 0; no < copy; no++) {
           const prescriptionItem = prescriptions.find((p) => p.id === o.id)
           drugLabelDetail.push(getDrugLabelDetails(o, prescriptionItem))

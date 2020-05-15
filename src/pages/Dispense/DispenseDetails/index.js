@@ -384,7 +384,8 @@ const DispenseDetails = ({
           handleSubmit={() => {
             onDrugLabelSelectionClose()
             onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
-          }} />
+          }}
+        />
       </CommonModal>
     </React.Fragment>
   )

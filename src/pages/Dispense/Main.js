@@ -356,6 +356,7 @@ class Main extends Component {
       this.handleOrderModal()
     }
   }
+
   handleDrugLabelClick = () => {
     const { values } = this.props
     const { otherOrder = [], prescription = [], visitPurposeFK } = values
@@ -367,6 +368,7 @@ class Main extends Component {
         }
       })
   }
+
   handleDrugLabelSelectionClose = () => {
     this.setState(
       (prevState) => {
@@ -376,6 +378,7 @@ class Main extends Component {
       },
     )
   }
+
   handleDrugLabelSelected = (itemId, selected) => {
     this.setState((prevState) => ({
       selectedDrugs: prevState.selectedDrugs.map(
@@ -383,6 +386,7 @@ class Main extends Component {
       )
     })) 
   }
+
   handleDrugLabelNoChanged = (itemId, no) => {
     this.setState((prevState) => ({
       selectedDrugs: prevState.selectedDrugs.map(
@@ -390,7 +394,8 @@ class Main extends Component {
       ),
     }))
   }
-  render() {
+
+  render () {
     const { classes, handleSubmit, values, dispense, codetable } = this.props
     return (
       <div className={classes.root}>
