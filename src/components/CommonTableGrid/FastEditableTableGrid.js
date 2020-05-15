@@ -41,7 +41,7 @@ class EditableTableGrid extends PureComponent {
 
   constructor (props) {
     super(props)
-    const { EditingProps = {} } = props
+    const { EditingProps = {}, id } = props
     this.state = {
       editingRowIds: [],
       deletedRowIds: [],
@@ -51,7 +51,8 @@ class EditableTableGrid extends PureComponent {
       // hasError: false,
       // errorRows: [],
     }
-    this.gridId = `edit-${uniqueGid++}`
+    this.gridId = id || `edit-${uniqueGid++}`
+
     // console.log(this.gridId)
     // console.log('edit created', window.$tempGridRow[this.gridId])
   }
@@ -205,23 +206,23 @@ class EditableTableGrid extends PureComponent {
   _onEditingCellsChange = (editingCells) => {
     setTimeout(() => {
       const errorCells = this.getErrorCells()
-      const { global } = window.g_app._store.getState()
-      if (window.$tempGridRow[this.gridId] && errorCells.length) {
-        if (!global.disableSave)
-          window.g_app._store.dispatch({
-            type: 'global/updateState',
-            payload: {
-              disableSave: true,
-            },
-          })
-      } else if (!errorCells.length && global.disableSave) {
-        window.g_app._store.dispatch({
-          type: 'global/updateState',
-          payload: {
-            disableSave: false,
-          },
-        })
-      }
+      // const { global } = window.g_app._store.getState()
+      // if (window.$tempGridRow[this.gridId] && errorCells.length) {
+      //   if (!global.disableSave)
+      //     window.g_app._store.dispatch({
+      //       type: 'global/updateState',
+      //       payload: {
+      //         disableSave: true,
+      //       },
+      //     })
+      // } else if (!errorCells.length && global.disableSave) {
+      //   window.g_app._store.dispatch({
+      //     type: 'global/updateState',
+      //     payload: {
+      //       disableSave: false,
+      //     },
+      //   })
+      // }
       this.setState({
         errorCells,
       })

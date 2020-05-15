@@ -25,6 +25,13 @@ class RoomAssignment extends PureComponent {
         pagesize: 9999,
       },
     })
+
+    this.props.dispatch({
+      type: 'global/updateState',
+      payload: {
+        disableSave: false,
+      },
+    })
   }
 
   render () {

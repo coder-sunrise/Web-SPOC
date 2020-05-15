@@ -3,6 +3,8 @@ import * as Yup from 'yup'
 import _ from 'lodash'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
+// common utils
+import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 // common components
 import {
   Button,
@@ -21,10 +23,7 @@ import {
   SchemeInvoicePayerColumn,
   CompanyInvoicePayerColumn,
   ApplyClaimsColumnExtension,
-  // ApplyClaimsCopayerColumnExtension,
 } from '../variables'
-
-import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
 const styles = (theme) => ({
   gridRow: {
@@ -103,6 +102,8 @@ const Scheme = ({
     invoicePayerItem,
     id,
     _hasError = false,
+    hasPayments = false,
+    chasClaimStatuses = [],
   } = invoicePayer
 
   const handleSchemeChange = (value) => onSchemeChange(value, index)
@@ -110,6 +111,17 @@ const Scheme = ({
   const handleEditClick = () => onEditClick(index)
   const handleApplyClick = () => onApplyClick(index)
   const handleDeleteClick = () => onDeleteClick(index)
+
+  const shouldDisableDelete = () => {
+    const statuses = chasClaimStatuses.map((status) => status.toLowerCase())
+    if (
+      hasPayments ||
+      statuses.includes('draft') ||
+      statuses.includes('approved')
+    )
+      return true
+    return _isEditing ? false : hasOtherEditing
+  }
 
   const columnExtensions = [
     ...ApplyClaimsColumnExtension,
@@ -192,7 +204,7 @@ const Scheme = ({
         >
           <DeleteWithPopover
             index={index}
-            disabled={_isEditing ? false : hasOtherEditing}
+            disabled={shouldDisableDelete()}
             onConfirmDelete={handleDeleteClick}
           />
         </GridItem>

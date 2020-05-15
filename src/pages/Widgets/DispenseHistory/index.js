@@ -13,8 +13,8 @@ import {
 import Authorized from '@/utils/Authorized'
 
 // utils
-import * as WidgetConfig from './config'
 import { findGetParameter } from '@/utils/utils'
+import * as WidgetConfig from './config'
 
 const styles = (theme) => ({
   root: {},

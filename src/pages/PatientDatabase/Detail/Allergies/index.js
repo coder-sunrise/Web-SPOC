@@ -25,6 +25,7 @@ class Allergies extends PureComponent {
   }
 
   updateValue = (type) => ({ rows, added, changed, deleted }) => {
+    console.log('updateValue', rows)
     let _newRows = rows
     if (type === 'NonAllergy') {
       _newRows = this.isDuplicate({ rows, changed })

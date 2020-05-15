@@ -13,6 +13,8 @@ import {
   Button,
 } from '@/components'
 import { ReportViewer } from '@/components/_medisys'
+// utils
+import { INVOICE_VIEW_MODE } from '@/utils/constants'
 // sub component
 import Summary from './Summary'
 // styling
@@ -33,6 +35,15 @@ class InvoiceDetails extends Component {
     this.setState((preState) => ({ showReport: !preState.showReport }))
   }
 
+  switchMode = () => {
+    this.props.dispatch({
+      type: 'invoiceDetail/updateState',
+      payload: {
+        mode: INVOICE_VIEW_MODE.APPLIED_SCHEME,
+      },
+    })
+  }
+
   render () {
     const { classes, values, clinicSettings } = this.props
     return (
@@ -44,6 +55,9 @@ class InvoiceDetails extends Component {
             marginBottom: 10,
           }}
         >
+          <Button size='sm' color='primary' onClick={this.switchMode}>
+            Applied Scheme
+          </Button>
           <Button size='sm' color='primary' icon onClick={this.toggleReport}>
             <Printer />Print Invoice
           </Button>
