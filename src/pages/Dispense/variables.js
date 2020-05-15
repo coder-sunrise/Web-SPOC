@@ -646,7 +646,7 @@ export const DrugLabelSelectionColumnExtensions = (
         return (
           <Checkbox onChange={(obj) => {
             handleDrugLabelSelected(row.id, obj.target.value)
-          }}
+          }}          
             checked={row.selected}
             simple
           />

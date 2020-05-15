@@ -23,6 +23,7 @@ class DrugLabelSelection extends React.PureComponent {
         <GridContainer>
           <GridItem md={12}>
             <TableData
+              forceRender
               idPrefix='prescription'
               columns={DrugLabelSelectionColumns}
               colExtensions={DrugLabelSelectionColumnExtensions(handleDrugLabelSelected, handleDrugLabelNoChanged)}
