@@ -200,8 +200,7 @@ class Main extends Component {
         id: dispense.visitID,
         values: _values,
       },
-    })
-
+    })  
     if (finalizeResponse === 204) {
       return true
     }
@@ -386,7 +385,7 @@ class Main extends Component {
       ),
     }))
     this.props.dispatch(
-      { type: 'global/incrementCommitCount', }
+      { type: 'global/incrementCommitCount' }
     )
   }
 
@@ -397,7 +396,7 @@ class Main extends Component {
       ),
     }))
     this.props.dispatch(
-      { type: 'global/incrementCommitCount', }
+      { type: 'global/incrementCommitCount' }
     )
   }
 
