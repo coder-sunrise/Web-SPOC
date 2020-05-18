@@ -711,11 +711,9 @@ const _routes = [
             path: '/report/inventorystockcountreport',
             name: 'inventorystockcountreport',
             component: './Report/InventoryStockCountReport',
-          },
-          {
-            path: '/report/inventorystockcountreport',
-            name: 'inventorystockcountreport',
-            component: './Report/InventoryStockCountReport',
+            authority: [
+              'report.inventory.inventorystockcountreport',
+            ],
           },
           {
             path: '/report/inventorylistingreport',
