@@ -1172,6 +1172,14 @@ const _routes = [
               'settings.templates.visitordertemplate',
             ],
           },
+          {
+              path: '/setting/refractiontesttype',
+              name: 'refractiontesttype',
+              component: './Setting/RefractionTestType',
+              authority: [
+                  'settings.clinicsetting.refractiontesttype',
+              ],
+          },
         ],
       },
       // Settings

@@ -202,6 +202,12 @@ export const menuData = [
     url: '/setting/casedescription',
   },
   {
+      authority: 'settings.clinicsetting.refractiontesttype',
+      title: 'Clinic Setting',
+      text: 'REFRACTION TEST TYPE',
+      url: '/setting/refractiontesttype',
+  },
+  {
     authority: 'settings.systemuser.systemuser',
     title: 'System User',
     text: 'System User',
