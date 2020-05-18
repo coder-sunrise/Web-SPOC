@@ -15,7 +15,6 @@ import {
 import { Button, CardContainer, Danger, GridContainer } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
 // sub components
-import Thumbnail from './Thumbnail'
 import {
   downloadAttachment,
   uploadFile,
@@ -23,10 +22,11 @@ import {
 } from '@/services/file'
 import { convertToBase64 } from '@/utils/utils'
 import { FILE_STATUS, FILE_CATEGORY, ATTACHMENT_TYPE } from '@/utils/constants'
-import { getThumbnail } from './utils'
-import styles from './styles'
 import { corAttchementTypes } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
+import { getThumbnail } from './utils'
+import styles from './styles'
+import Thumbnail from './Thumbnail'
 
 const allowedFiles = '.png, .jpg, .jpeg, .xls, .xlsx, .doc, .docx, .pdf'
 
@@ -110,7 +110,7 @@ const AttachmentWithThumbnail = ({
     // file type and file size validation
     const base64 = await convertToBase64(file)
     const fileStatusFK = FILE_STATUS.UPLOADED
-    const fileExtension = getFileExtension(file.name)
+    const fileExtension = getFileExtension(file.name).toLowerCase()
     let _thumbnailDto
     if (
       [
