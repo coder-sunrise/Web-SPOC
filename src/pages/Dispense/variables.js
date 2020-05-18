@@ -572,9 +572,27 @@ export const DrugLabelSelectionColumns = [
 export const DrugLabelSelectionColumnExtensions = (
   handleDrugLabelSelected, handleDrugLabelNoChanged
 ) => [
+  {
+    columnName: 'code',
+    width: 150,
+    render: (row) => {
+      return (
+        <div style={{ position: 'relative' }}>
+          <div
+            style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+            }}
+          >
+            {row.name}
+          </div>
+        </div>
+      )
+    },
+  },
     {
       columnName: 'name',
-      width: 150,
+      width: 210,
       render: (row) => {
         return (
           <div style={{ position: 'relative' }}>
@@ -592,6 +610,7 @@ export const DrugLabelSelectionColumnExtensions = (
     },
     {
       columnName: 'instruction',
+      width: 260,
       render: (row) => {
         return (
           <div
@@ -620,7 +639,7 @@ export const DrugLabelSelectionColumnExtensions = (
     {
       columnName: 'no',
       type: 'number',
-      width: 140,
+      width: 100,
       render: (row) => {
         return (
           <p>
