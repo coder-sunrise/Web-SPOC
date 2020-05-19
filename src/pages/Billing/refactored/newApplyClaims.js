@@ -6,6 +6,9 @@ import Add from '@material-ui/icons/AddCircle'
 import Reset from '@material-ui/icons/Cached'
 // common components
 import { CommonModal, Button, GridItem } from '@/components'
+// common utils
+import { roundTo } from '@/utils/utils'
+import { INVOICE_PAYER_TYPE, VISIT_TYPE } from '@/utils/constants'
 // import MedisaveSchemes from './MedisaveSchemes'
 import Scheme from './newScheme'
 import ResetButton from './ResetButton'
@@ -25,8 +28,6 @@ import {
   updateInvoicePayerPayableBalance,
   sortItemByID,
 } from './applyClaimUtils'
-import { roundTo } from '@/utils/utils'
-import { INVOICE_PAYER_TYPE, VISIT_TYPE } from '@/utils/constants'
 
 const defaultInvoicePayer = {
   _indexInClaimableSchemes: 0,
@@ -57,6 +58,7 @@ const ApplyClaims = ({
   patient,
   ctschemetype,
   ctcopaymentscheme,
+  noExtraOptions = false,
 }) => {
   const {
     invoice,
@@ -663,11 +665,13 @@ const ApplyClaims = ({
           <Reset />
           Reset
         </Button> */}
-        <ResetButton
-          disabled={visitPurposeFK === VISIT_TYPE.RETAIL}
-          handleResetClick={handleResetClick}
-          handleRestoreClick={handleRestoreClick}
-        />
+        {!noExtraOptions && (
+          <ResetButton
+            disabled={visitPurposeFK === VISIT_TYPE.RETAIL}
+            handleResetClick={handleResetClick}
+            handleRestoreClick={handleRestoreClick}
+          />
+        )}
       </GridItem>
       <GridItem md={12} style={{ maxHeight: '60vh', overflowY: 'auto' }}>
         {tempInvoicePayer.map((invoicePayer, index) => {

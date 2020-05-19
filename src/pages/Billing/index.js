@@ -450,23 +450,22 @@ class Billing extends Component {
     console.log('dispense')
     console.log(dispense)
     const { prescription = [] } = dispense.entity
-    this.setState(
-      (prevState) => {
-        return {
-          showDrugLabelSelection: !prevState.showDrugLabelSelection,
-          selectedDrugs: prescription.map((x) => { return { ...x, no: 1, selected: true } }),
-        }
-      })
+    this.setState((prevState) => {
+      return {
+        showDrugLabelSelection: !prevState.showDrugLabelSelection,
+        selectedDrugs: prescription.map((x) => {
+          return { ...x, no: 1, selected: true }
+        }),
+      }
+    })
   }
 
   handleDrugLabelSelectionClose = () => {
-    this.setState(
-      (prevState) => {
-        return {
-          showDrugLabelSelection: !prevState.showDrugLabelSelection,
-        }
-      },
-    )
+    this.setState((prevState) => {
+      return {
+        showDrugLabelSelection: !prevState.showDrugLabelSelection,
+      }
+    })
   }
 
   handleDrugLabelSelected = (itemId, selected) => {
@@ -475,9 +474,7 @@ class Billing extends Component {
         (drug) => (drug.id === itemId ? { ...drug, selected } : { ...drug }),
       ),
     }))
-    this.props.dispatch(
-      { type: 'global/incrementCommitCount', }
-    )
+    this.props.dispatch({ type: 'global/incrementCommitCount' })
   }
 
   handleDrugLabelNoChanged = (itemId, no) => {
@@ -486,9 +483,7 @@ class Billing extends Component {
         (drug) => (drug.id === itemId ? { ...drug, no } : { ...drug }),
       ),
     }))
-    this.props.dispatch(
-      { type: 'global/incrementCommitCount', }
-    )
+    this.props.dispatch({ type: 'global/incrementCommitCount' })
   }
 
   render () {
@@ -544,8 +539,12 @@ class Billing extends Component {
                         values={dispense.entity}
                         dispatch={this.props.dispatch}
                         onDrugLabelClick={this.handleDrugLabelClick}
-                        showDrugLabelSelection={this.state.showDrugLabelSelection}
-                        onDrugLabelSelectionClose={this.handleDrugLabelSelectionClose}
+                        showDrugLabelSelection={
+                          this.state.showDrugLabelSelection
+                        }
+                        onDrugLabelSelectionClose={
+                          this.handleDrugLabelSelectionClose
+                        }
                         onDrugLabelSelected={this.handleDrugLabelSelected}
                         onDrugLabelNoChanged={this.handleDrugLabelNoChanged}
                         selectedDrugs={this.state.selectedDrugs}

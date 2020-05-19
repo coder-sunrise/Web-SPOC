@@ -100,13 +100,7 @@ class AppliedScheme extends Component {
     })
   }
 
-  switchMode = () => {
-    this.props.dispatch({
-      type: 'invoiceDetail/updateState',
-      payload: {
-        mode: INVOICE_VIEW_MODE.DEFAULT,
-      },
-    })
+  componentWillUnmount () {
     this.props.dispatch({
       type: 'appliedSchemes/updateState',
       payload: {
@@ -115,23 +109,34 @@ class AppliedScheme extends Component {
     })
   }
 
+  switchMode = () => {
+    this.props.dispatch({
+      type: 'invoiceDetail/updateState',
+      payload: {
+        mode: INVOICE_VIEW_MODE.DEFAULT,
+      },
+    })
+  }
+
   handleIsEditing = (editing) => {
     this.setState({ isEditing: editing })
   }
 
-  handleResetClick = () => {
-    const { dispatch, values } = this.props
+  handleResetClick = async () => {
+    const { dispatch, invoiceDetail } = this.props
+    const { entity } = invoiceDetail
 
-    // dispatch({
-    //   type: 'billing/query',
-    //   payload: { id: values.visitId },
-    // }).then((response) => {
-    //   if (response) {
-    //     this.setState((preState) => ({
-    //       submitCount: preState.submitCount + 1,
-    //     }))
-    //   }
-    // })
+    const result = await dispatch({
+      type: 'appliedSchemes/fetchInvoicePayers',
+      payload: {
+        id: entity.id,
+        invoiceVersionNo: entity.invoiceVersionNo,
+      },
+    })
+    setTimeout(() => {
+      this.setState((preState) => ({ submitCount: preState.submitCount + 1 }))
+    }, 500)
+    return result
   }
 
   handleSaveClick = async () => {
@@ -140,10 +145,6 @@ class AppliedScheme extends Component {
       ...constructPayload(values),
       invoiceId: invoiceDetail.entity.id,
     }
-    const result = await validateInvoicePayer({
-      invoiceFK: invoiceDetail.entity.id,
-      invoicePayerFKs: payload.invoicePayer.map((ip) => ip.id),
-    })
 
     const onConfirm = () => {
       dispatch({
@@ -152,7 +153,20 @@ class AppliedScheme extends Component {
       })
     }
 
+    const editedInvoicePayer =
+      payload.invoicePayer.filter((ip) => !!ip.id) || []
+    const shouldValidate = editedInvoicePayer.length > 0
+
+    let result = {}
+
+    if (shouldValidate)
+      result = await validateInvoicePayer({
+        invoiceFK: invoiceDetail.entity.id,
+        invoicePayerFKs: editedInvoicePayer.map((ip) => ip.id),
+      })
+
     const { data, status } = result
+
     if (status === '200' && data.content && data.content.length > 0) {
       dispatch({
         type: 'global/updateAppState',
@@ -229,6 +243,7 @@ class AppliedScheme extends Component {
               commitCount={commitCount}
               {...formikBag}
               {...commonProps}
+              noExtraOptions
             />
           </GridContainer>
         </LoadingWrapper>

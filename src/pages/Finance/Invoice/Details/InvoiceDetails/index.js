@@ -56,7 +56,7 @@ class InvoiceDetails extends Component {
           }}
         >
           <Button size='sm' color='primary' onClick={this.switchMode}>
-            Applied Scheme
+            Apply Scheme
           </Button>
           <Button size='sm' color='primary' icon onClick={this.toggleReport}>
             <Printer />Print Invoice

@@ -46,11 +46,14 @@ export default createFormViewModel({
           payload,
         )
         const { status, data } = result
-        if (status === '200')
+        if (status === '200') {
           yield put({
             type: 'mapPaymentsToPayers',
             payload: data,
           })
+          return data
+        }
+        return null
       },
       *saveAppliedScheme ({ payload }, { call, put, take }) {
         const { invoiceId, ...restPayload } = payload
