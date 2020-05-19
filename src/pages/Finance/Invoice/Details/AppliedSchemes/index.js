@@ -143,10 +143,6 @@ class AppliedScheme extends Component {
       ...constructPayload(values),
       invoiceId: invoiceDetail.entity.id,
     }
-    const result = await validateInvoicePayer({
-      invoiceFK: invoiceDetail.entity.id,
-      invoicePayerFKs: payload.invoicePayer.map((ip) => ip.id),
-    })
 
     const onConfirm = () => {
       dispatch({
@@ -154,6 +150,18 @@ class AppliedScheme extends Component {
         payload,
       })
     }
+
+    const editedInvoicePayer =
+      payload.invoicePayer.filter((ip) => !!ip.id) || []
+    const shouldValidate = editedInvoicePayer.length > 0
+
+    let result = {}
+
+    if (shouldValidate)
+      await validateInvoicePayer({
+        invoiceFK: invoiceDetail.entity.id,
+        invoicePayerFKs: editedInvoicePayer.map((ip) => ip.id),
+      })
 
     const { data, status } = result
     if (status === '200' && data.content && data.content.length > 0) {
