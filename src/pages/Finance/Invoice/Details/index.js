@@ -3,11 +3,13 @@ import { connect } from 'dva'
 // formik
 import { withFormik } from 'formik'
 // common components
-import { CardContainer } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
+// utils
+import Authorized from '@/utils/Authorized'
+import { INVOICE_VIEW_MODE } from '@/utils/constants'
+// sub components
 import InvoiceBanner from './InvoiceBanner'
 import InvoiceContent from './Content'
-import Authorized from '@/utils/Authorized'
 
 @connect(({ invoiceDetail, invoicePayment, loading }) => ({
   invoiceDetail,
@@ -32,13 +34,12 @@ class InvoiceDetails extends Component {
   }
 
   componentWillUnmount () {
-    // const { dispatch } = this.props
-    // dispatch({
-    //   type: 'invoiceDetail/reset',
-    // })
-    // dispatch({
-    //   type: 'invoicePayment/reset',
-    // })
+    this.props.dispatch({
+      type: 'invoiceDetail/updateState',
+      payload: {
+        mode: INVOICE_VIEW_MODE.DEFAULT,
+      },
+    })
   }
 
   refresh = () => {

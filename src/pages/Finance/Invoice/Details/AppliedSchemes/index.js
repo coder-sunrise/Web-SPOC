@@ -100,17 +100,20 @@ class AppliedScheme extends Component {
     })
   }
 
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'appliedSchemes/updateState',
+      payload: {
+        entity: null,
+      },
+    })
+  }
+
   switchMode = () => {
     this.props.dispatch({
       type: 'invoiceDetail/updateState',
       payload: {
         mode: INVOICE_VIEW_MODE.DEFAULT,
-      },
-    })
-    this.props.dispatch({
-      type: 'appliedSchemes/updateState',
-      payload: {
-        entity: null,
       },
     })
   }
