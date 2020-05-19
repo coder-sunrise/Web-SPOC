@@ -128,7 +128,8 @@ const Grid = ({
   }
 
   const onCommitChanges = ({ rows }) => {
-    setFieldValue('roomAssignRows', rows)
+    const returnRows = rows.filter((r) => !(r.isNew && r.isDeleted))
+    setFieldValue('roomAssignRows', returnRows)
   }
   // console.log(window.$tempGridRow)
   // console.log(
