@@ -16,11 +16,11 @@ import {
   ProgressButton,
   serverDateFormat,
 } from '@/components'
+import { getBizSession } from '@/services/queue'
+import { roundTo } from '@/utils/utils'
 import CollectPaymentConfirm from './CollectPaymentConfirm'
 import ExtractAsSingle from './ExtractAsSingle'
 import PrintStatementReport from '../PrintStatementReport'
-import { getBizSession } from '@/services/queue'
-import { roundTo } from '@/utils/utils'
 
 const styles = () => ({
   gridContainer: {
@@ -48,7 +48,7 @@ class Details extends PureComponent {
       { name: 'patientName', title: 'Patient Name' },
       { name: 'adminCharge', title: 'Corporate Charge' },
       { name: 'statementAdjustment', title: 'Statement Adjustment' },
-      { name: 'payableAmount', title: 'Payable Amount' },
+      { name: 'payableAmount', title: 'Total Payable Amt' },
       { name: 'outstandingAmount', title: 'Outstanding' },
       { name: 'remark', title: 'Remarks' },
     ],

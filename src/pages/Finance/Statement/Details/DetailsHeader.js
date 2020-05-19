@@ -141,7 +141,7 @@ class DetailsHeader extends PureComponent {
               name='totalAmount'
               render={(args) => (
                 <NumberInput
-                  prefix='Payable Amount:'
+                  prefix='Total Payable Amount:'
                   {...cfg}
                   {...amountProps}
                   {...args}
