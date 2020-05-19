@@ -122,19 +122,21 @@ class AppliedScheme extends Component {
     this.setState({ isEditing: editing })
   }
 
-  handleResetClick = () => {
-    const { dispatch, values } = this.props
+  handleResetClick = async () => {
+    const { dispatch, invoiceDetail } = this.props
+    const { entity } = invoiceDetail
 
-    // dispatch({
-    //   type: 'billing/query',
-    //   payload: { id: values.visitId },
-    // }).then((response) => {
-    //   if (response) {
-    //     this.setState((preState) => ({
-    //       submitCount: preState.submitCount + 1,
-    //     }))
-    //   }
-    // })
+    const result = await dispatch({
+      type: 'appliedSchemes/fetchInvoicePayers',
+      payload: {
+        id: entity.id,
+        invoiceVersionNo: entity.invoiceVersionNo,
+      },
+    })
+    setTimeout(() => {
+      this.setState((preState) => ({ submitCount: preState.submitCount + 1 }))
+    }, 500)
+    return result
   }
 
   handleSaveClick = async () => {
@@ -158,12 +160,13 @@ class AppliedScheme extends Component {
     let result = {}
 
     if (shouldValidate)
-      await validateInvoicePayer({
+      result = await validateInvoicePayer({
         invoiceFK: invoiceDetail.entity.id,
         invoicePayerFKs: editedInvoicePayer.map((ip) => ip.id),
       })
 
     const { data, status } = result
+
     if (status === '200' && data.content && data.content.length > 0) {
       dispatch({
         type: 'global/updateAppState',
@@ -240,6 +243,7 @@ class AppliedScheme extends Component {
               commitCount={commitCount}
               {...formikBag}
               {...commonProps}
+              noExtraOptions
             />
           </GridContainer>
         </LoadingWrapper>
