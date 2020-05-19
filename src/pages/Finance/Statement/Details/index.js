@@ -3,12 +3,12 @@ import { withStyles, Paper } from '@material-ui/core'
 import { connect } from 'dva'
 import moment from 'moment'
 import { withFormikExtend, Tabs, serverDateFormat } from '@/components'
-import { StatementDetailOption } from './variables'
-import DetailsHeader from './DetailsHeader'
 import Yup from '@/utils/yup'
 import { PAYMENT_MODE, DEFAULT_PAYMENT_MODE_GIRO } from '@/utils/constants'
 import { roundToPrecision } from '@/utils/codes'
 import { getBizSession } from '@/services/queue'
+import DetailsHeader from './DetailsHeader'
+import { StatementDetailOption } from './variables'
 
 const styles = () => ({})
 @connect(({ statement, user, codetable }) => ({
@@ -21,7 +21,7 @@ const styles = () => ({})
   mapPropsToValues: ({ statement }) => {
     const returnValue = statement.entity || statement
     let newStatementInvoice = []
-    let total = 0
+    let totalOS = 0
     let adminChargeValueField = 0
     let adjustmentValueField = 0
     if (returnValue.statementInvoice) {
@@ -32,7 +32,7 @@ const styles = () => ({})
           outstandingAmount,
           statementAdjustment,
         } = o
-        total += outstandingAmount
+        totalOS += outstandingAmount
         adminChargeValueField += adminCharge
         adjustmentValueField += statementAdjustment
         return {
@@ -45,19 +45,18 @@ const styles = () => ({})
       })
     }
 
-    const outstandingBalance =
-      returnValue.totalAmount -
-      returnValue.collectedAmount -
-      adminChargeValueField -
-      adjustmentValueField
+    const outstandingBalance = totalOS
+    // returnValue.totalAmount - returnValue.collectedAmount
+    // - adminChargeValueField
+    // - adjustmentValueField
 
     return {
       ...returnValue,
       outstandingBalance,
       adminChargeValueField,
       adjustmentValueField,
-      amount: Number(total).toFixed(2),
-      maxAmount: Number(total).toFixed(2),
+      amount: Number(totalOS).toFixed(2),
+      maxAmount: Number(totalOS).toFixed(2),
       paymentModeFK: DEFAULT_PAYMENT_MODE_GIRO.PAYMENT_FK, // GIRO
       displayValue: DEFAULT_PAYMENT_MODE_GIRO.DISPLAY_VALUE,
       statementInvoice: newStatementInvoice,
