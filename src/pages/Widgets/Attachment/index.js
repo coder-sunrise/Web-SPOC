@@ -28,7 +28,7 @@ class Attachment extends Component {
     activedKeys: undefined,
     selectedAttachmentType: 'ClinicalNotes',
     types: corAttchementTypes.filter(
-      (o) => !o.accessRight || Authorized.check(o.accessRight),
+      (o) => o.id !== 5 && (!o.accessRight || Authorized.check(o.accessRight)),
     ),
   }
 
