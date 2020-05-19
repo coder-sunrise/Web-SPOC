@@ -72,7 +72,7 @@ const DiagnosisItem = ({
     if (op) {
       vals.corDiagnosis[index].diagnosisDescription = op.displayvalue
       vals.corDiagnosis[index].diagnosisCode = op.code
-
+      vals.corDiagnosis[index].diagnosisICD10AMFK = op.iCD10AMFK
       if (op.complication && op.complication.length) {
         setCtComplicationPairedWithDiag(op.complication)
       } else {

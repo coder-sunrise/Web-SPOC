@@ -1122,7 +1122,187 @@ const ltAdmittingSpecialty = [
   {
     id: 1,
     code: '01',
-    name: 'Burns',
+    name: '01 Burns',
+  },
+  {
+    id: 2,
+    code: '02',
+    name: '02 Cardio Thoracic Surgery',
+  },
+  {
+    id: 3,
+    code: '03',
+    name: '03 Cardiology',
+  },
+  {
+    id: 4,
+    code: '04',
+    name: '04 Chronic Medicine',
+  },
+  {
+    id: 5,
+    code: '05',
+    name: '05 Dental',
+  },
+  {
+    id: 6,
+    code: '06',
+    name: '06 Dermatology',
+  },
+  {
+    id: 7,
+    code: '07',
+    name: '07 General Medicine',
+  },
+  {
+    id: 8,
+    code: '08',
+    name: '08 General Surgery',
+  },
+  {
+    id: 9,
+    code: '09',
+    name: '09 Geriatric Medicine',
+  },
+  {
+    id: 10,
+    code: '10',
+    name: '10 Gynaecology',
+  },
+  {
+    id: 11,
+    code: '11',
+    name: '11 Haematology',
+  },
+  {
+    id: 12,
+    code: '12',
+    name: '12 Hand Surgery',
+  },
+  {
+    id: 13,
+    code: '13',
+    name: '13 Infectious Disease',
+  },
+  {
+    id: 14,
+    code: '14',
+    name: '14 Neonatology',
+  },
+  {
+    id: 15,
+    code: '15',
+    name: '15 Neurology',
+  },
+  {
+    id: 16,
+    code: '16',
+    name: '16 Neurosurgery',
+  },
+  {
+    id: 17,
+    code: '17',
+    name: '17 Nuclear Medicine',
+  },
+  {
+    id: 18,
+    code: '18',
+    name: '18 Obstetrics',
+  },
+  {
+    id: 19,
+    code: '19',
+    name: '19 Medical Oncology',
+  },
+  {
+    id: 20,
+    code: '20',
+    name: '20 Ophthalmology',
+  },
+  {
+    id: 21,
+    code: '21',
+    name: '21 Orthopaedic Surgery',
+  },
+  {
+    id: 22,
+    code: '22',
+    name: '22 Otorhinolaryngology',
+  },
+  {
+    id: 23,
+    code: '23',
+    name: '23 Paediatric Medicine',
+  },
+  {
+    id: 24,
+    code: '24',
+    name: '24 Paediatric Surgery',
+  },
+  {
+    id: 25,
+    code: '25',
+    name: '25 Plastic & Reconstructive Surgery',
+  },
+  {
+    id: 26,
+    code: '26',
+    name: '26 Psychiatry',
+  },
+  {
+    id: 27,
+    code: '27',
+    name: '27 Rehabilitation Medicine',
+  },
+  {
+    id: 28,
+    code: '28',
+    name: '28 Renal Medicine',
+  },
+  {
+    id: 29,
+    code: '29',
+    name: '29 Therapeutic Radiology',
+  },
+  {
+    id: 30,
+    code: '30',
+    name: '30 Trauma',
+  },
+  {
+    id: 31,
+    code: '31',
+    name: '31 Tuberculosis',
+  },
+  {
+    id: 32,
+    code: '32',
+    name: '32 Urology',
+  },
+  {
+    id: 33,
+    code: '33',
+    name: '33 Colorectal Surgery',
+  },
+  {
+    id: 34,
+    code: '34',
+    name: '34 Observational Medicine',
+  },
+  {
+    id: 35,
+    code: '35',
+    name: '35 Family Medicine and Continuing Care',
+  },
+  {
+    id: 36,
+    code: '36',
+    name: '36 Surgical Oncology',
+  },
+  {
+    id: 99,
+    code: '99',
+    name: '99 Others (please specify)',
   },
 ]
 

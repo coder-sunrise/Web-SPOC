@@ -63,20 +63,7 @@ export default createListViewModel({
         if (status === '200') {
           yield put({
             type: 'queryFormDone',
-            payload: data,
-          })
-          return data
-        }
-        return false
-      },
-
-      *getCORForm ({ payload }, { call, put, select }) {
-        const response = yield call(service.getCORForm, payload)
-        const { data, status } = response
-        if (status === '200') {
-          yield put({
-            type: 'queryFormDone',
-            payload: data,
+            payload: response,
           })
           return data
         }
@@ -102,7 +89,7 @@ export default createListViewModel({
       queryFormDone (st, { payload }) {
         const { data } = payload
         let formRows = []
-        if (data.FormType === 'VisitForm') {
+        if (data.formType === 'VisitForm') {
           visitFormTypes.forEach((p) => {
             formRows = formRows.concat(
               (data[p.prop] || []).map((o) => {
@@ -112,6 +99,7 @@ export default createListViewModel({
                   typeName: p.name,
                   ...o,
                   formData: JSON.parse(o.formData),
+                  statusFK: 1,
                 }
                 return d
               }),
@@ -133,6 +121,7 @@ export default createListViewModel({
             )
           })
         }
+
         const {
           id,
           currentCORId,
@@ -141,6 +130,8 @@ export default createListViewModel({
           patientName,
           patientNRICNo,
           patientAccountNo,
+          isCanEditForms,
+          cORDiagnosis,
         } = data
         return {
           ...st,
@@ -152,6 +143,8 @@ export default createListViewModel({
             patientName,
             patientNRICNo,
             patientAccountNo,
+            isCanEditForms,
+            cORDiagnosis,
           },
           list: _.sortBy(formRows, 'sequence'),
         }

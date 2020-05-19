@@ -1,22 +1,11 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
-import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 import moment from 'moment'
 import Yup from '@/utils/yup'
-import { FORM_CATEGORY } from '@/utils/constants'
-import {
-  GridContainer,
-  withFormikExtend,
-  Button,
-  CardContainer,
-  Accordion,
-} from '@/components'
-import PatientParticulars from './PatientParticulars'
-import Diagnosis from './Diagnosis'
-import Procedures from './Procedures'
-import Certification from './Certification'
-import NonSurgical from './NonSurgical'
+import { FORM_CATEGORY, FORM_FROM } from '@/utils/constants'
+import { GridContainer, withFormikExtend, Button } from '@/components'
+import CommonLCForm from '@/components/_medisys/Forms/CommonLCForm/index'
 
 const diagnosisSchema = Yup.object().shape({
   diagnosisCode: Yup.string().required(),
@@ -69,9 +58,43 @@ const procuderesSchema = Yup.object().shape({
         patientName,
         patientNRICNo,
         patientAccountNo,
+        cORDiagnosis = [],
       } = formListing.visitDetail
       const { doctorprofile } = codetable
       const doctor = doctorprofile.find((o) => o.id === doctorProfileFK)
+
+      const activeICD10AM = cORDiagnosis.filter((o) => o.diagnosisICD10AMFK)
+      // create principalDiagnosis
+      let principalDiagnosisFK
+      if (activeICD10AM.length > 0) {
+        principalDiagnosisFK = activeICD10AM[0].diagnosisICD10AMFK
+      }
+
+      // create secondDiagnosisA
+      let secondDiagnosisAFK
+      if (activeICD10AM.length > 1) {
+        secondDiagnosisAFK = activeICD10AM[1].diagnosisICD10AMFK
+      }
+
+      // create secondDiagnosisB
+      let secondDiagnosisBFK
+      if (activeICD10AM.length > 2) {
+        secondDiagnosisBFK = activeICD10AM[2].diagnosisICD10AMFK
+      }
+
+      // create otherDiagnosis
+      let otherDiagnosis = []
+      if (activeICD10AM.length > 3) {
+        let uid = -1
+        for (let index = 2; index < activeICD10AM.length; index++) {
+          otherDiagnosis.push({
+            uid,
+            diagnosisFK: activeICD10AM[index].diagnosisICD10AMFK,
+          })
+          uid -= 1
+        }
+      }
+
       values = {
         ...formListing.defaultLCForm,
         formData: {
@@ -81,6 +104,10 @@ const procuderesSchema = Yup.object().shape({
           patientAccountNo,
           admissionDate: visitDate,
           dischargeDate: visitDate,
+          principalDiagnosisFK,
+          secondDiagnosisAFK,
+          secondDiagnosisBFK,
+          otherDiagnosis,
           principalSurgeonFK: doctorProfileFK,
           principalSurgeonMCRNo: doctor ? doctor.doctorMCRNo : undefined,
           principalSurgeonName: doctor
@@ -121,10 +148,10 @@ const procuderesSchema = Yup.object().shape({
   validationSchema: Yup.object().shape({
     formData: Yup.object().shape({
       principalDiagnosisFK: Yup.number().required(),
-      admittingSpecialtyFK: Yup.number().required(),
+      admittingSpecialtys: Yup.array().required(),
       principalSurgeonFK: Yup.number().required(),
-      others: Yup.number().when('admittingSpecialtyFK', {
-        is: (val) => val === 99,
+      others: Yup.number().when('admittingSpecialtys', {
+        is: (val) => val && val.find((o) => o === 99),
         then: Yup.string().required(),
       }),
       otherDiagnosis: Yup.array().of(diagnosisSchema),
@@ -144,8 +171,10 @@ class LCForm extends PureComponent {
       resetForm,
       formCategory,
       validateForm,
-      visitDetail,
+      formListing,
+      formFrom,
     } = this.props
+    const { visitDetail } = formListing
     const isFormValid = await validateForm()
     if (!_.isEmpty(isFormValid)) {
       this.props.handleSubmit()
@@ -169,32 +198,55 @@ class LCForm extends PureComponent {
           UpdateType: values.type,
           visitLetterOfCertification:
             formCategory === FORM_CATEGORY.VISITFORM
-              ? {
-                  sequence: nextSequence,
-                  ...values,
-                  formData: JSON.stringify(values.formData),
-                  updateByUser: user.data.clinicianProfile.name,
-                  statusFK,
-                }
-              : undefined,
+              ? [
+                  {
+                    sequence: nextSequence,
+                    ...values,
+                    formData: JSON.stringify(values.formData),
+                    updateByUser: user.data.clinicianProfile.name,
+                    statusFK,
+                  },
+                ]
+              : [],
           CORLetterOfCertification:
             formCategory === FORM_CATEGORY.CORFORM
-              ? {
-                  sequence: nextSequence,
-                  ...values,
-                  formData: JSON.stringify(values.formData),
-                  updateByUser: user.data.clinicianProfile.name,
-                  statusFK,
-                }
-              : undefined,
+              ? [
+                  {
+                    sequence: nextSequence,
+                    ...values,
+                    formData: JSON.stringify(values.formData),
+                    updateByUser: user.data.clinicianProfile.name,
+                    statusFK,
+                  },
+                ]
+              : [],
         },
       }).then((r) => {
         if (r) {
           resetForm()
           if (onConfirm) onConfirm()
-          dispatch({
-            type: 'formListing/query',
-          })
+          if (formFrom === FORM_FROM.FORMMODULE) {
+            this.props.dispatch({
+              type: 'formListing/query',
+              payload: {
+                apiCriteria: {
+                  startDate: moment().add(-1, 'month').formatUTC(),
+                  endDate: moment().formatUTC(false),
+                },
+              },
+            })
+          } else if (formFrom === FORM_FROM.QUEUELOG) {
+            this.props.dispatch({
+              type: 'formListing/getVisitForm',
+              payload: {
+                id: formListing.visitID,
+                formType:
+                  formCategory === FORM_FROM.FORMMODULE
+                    ? 'VisitForm'
+                    : 'CORForm',
+              },
+            })
+          }
         }
       })
     }
@@ -207,69 +259,16 @@ class LCForm extends PureComponent {
   }
 
   render () {
-    const { values, formCategory, height, global } = this.props
-
+    const { values, formCategory } = this.props
     const { statusFK } = values
     return (
       <div>
-        <div
-          style={{
-            overflow: 'auto',
-            height: height - 200,
-            paddingLeft: 5,
-            paddingRight: 5,
-          }}
-        >
-          <div>
-            <h5>A - PATIENT PARTICULARS</h5>
-            <CardContainer hideHeader>
-              <PatientParticulars {...this.props} />
-            </CardContainer>
-          </div>
-          <div>
-            <h5>B - DIAGNOSIS (In Order of Priority)</h5>
-            <CardContainer hideHeader>
-              <Diagnosis {...this.props} diagnosisSchema={diagnosisSchema} />
-            </CardContainer>
-          </div>
-          <div>
-            <h5>
-              C - PROCEDURE - SPECIFIC CHARGES TO BE REIMBURSED TO THE
-              SURGEON(S)
-            </h5>
-            <CardContainer hideHeader>
-              <Procedures
-                {...this.props}
-                surgicalChargesSchema={surgicalChargesSchema}
-              />
-            </CardContainer>
-          </div>
-          <div>
-            <h5>D – CERTIFICATION</h5>
-            <CardContainer hideHeader>
-              <Certification {...this.props} />
-            </CardContainer>
-          </div>
-          <div>
-            <Accordion
-              leftIcon
-              expandIcon={<SolidExpandMore fontSize='large' />}
-              mode='multiple'
-              collapses={[
-                {
-                  title:
-                    "E - DOCTORS' NON-SURGICAL AND TREATMENT-RELATED CHARGES TO BE REIMBURSED",
-                  content: (
-                    <NonSurgical
-                      {...this.props}
-                      nonSurgicalChargesSchema={nonSurgicalChargesSchema}
-                    />
-                  ),
-                },
-              ]}
-            />
-          </div>
-        </div>
+        <CommonLCForm
+          {...this.props}
+          diagnosisSchema={diagnosisSchema}
+          surgicalChargesSchema={surgicalChargesSchema}
+          nonSurgicalChargesSchema={nonSurgicalChargesSchema}
+        />
         <GridContainer
           style={{
             marginTop: 20,
@@ -290,7 +289,9 @@ class LCForm extends PureComponent {
                 this.onSubmitButtonClicked('save')
               }}
             >
-              finalize
+              <sapn>
+                {formCategory === FORM_CATEGORY.VISITFORM ? 'save' : 'finalize'}
+              </sapn>
             </Button>
           )}
 

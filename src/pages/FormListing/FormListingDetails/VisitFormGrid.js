@@ -4,6 +4,7 @@ import color from 'color'
 import withStyles from '@material-ui/core/styles/withStyles'
 import { Tooltip } from '@material-ui/core'
 import { Delete, Edit, Print, Add } from '@material-ui/icons'
+import { FORM_CATEGORY } from '@/utils/constants'
 import { formTypes, formStatus } from '@/utils/codes'
 import VoidWithPopover from './FormDetail/VoidWithPopover'
 
@@ -82,6 +83,23 @@ class VisitFormGrid extends PureComponent {
     )
   }
 
+  editRow = (row) => {
+    const { formListing } = this.props
+    const { visitDetail = {} } = formListing
+    let { isCanEditForms = false } = visitDetail
+    if (row.statusFK === 3 || row.statusFK === 4 || !isCanEditForms) return
+    this.props.dispatch({
+      type: 'formListing/updateState',
+      payload: {
+        showModal: true,
+        entity: row,
+        type: row.type,
+        formCategory: this.props.formCategory,
+        formFrom: this.props.formFrom,
+      },
+    })
+  }
+
   VoidForm = ({ classes, dispatch, row }) => {
     const [
       reason,
@@ -90,18 +108,32 @@ class VisitFormGrid extends PureComponent {
 
     const handleConfirmDelete = useCallback((i, voidVisibleChange) => {
       if (reason) {
-        voidVisibleChange()
-        dispatch({
-          type: 'formListing/update',
-          payload: {
+        const { formCategory, formListing } = this.props
+        let voidData = [
+          {
             ...row,
+            formData: JSON.stringify(row.formData),
             voidReason: reason,
             statusFK: 4,
           },
+        ]
+        let formType =
+          formCategory === FORM_CATEGORY.VISITFORM ? 'VisitForm' : 'CORForm'
+        voidVisibleChange()
+        dispatch({
+          type: 'formListing/saveForm',
+          payload: {
+            visitID: formListing.visitID,
+            currentCORId: row.clinicalObjectRecordFK,
+            formType,
+            UpdateType: row.type,
+            visitLetterOfCertification:
+              formCategory === FORM_CATEGORY.VISITFORM ? voidData : [],
+            CORLetterOfCertification:
+              formCategory === FORM_CATEGORY.CORFORM ? voidData : [],
+          },
         }).then(() => {
-          dispatch({
-            type: 'formListing/query',
-          })
+          this.props.queryFormListing()
         })
       }
     })
@@ -137,7 +169,8 @@ class VisitFormGrid extends PureComponent {
 
   render () {
     const { formListing, dispatch, theme, classes, setFieldValue } = this.props
-    const { list } = formListing
+    const { list, visitDetail = {} } = formListing
+    let { isCanEditForms = false } = visitDetail
     return (
       <div>
         <Checkbox
@@ -163,7 +196,7 @@ class VisitFormGrid extends PureComponent {
               list.filter((o) => o.statusFK !== 4)
             )
           }
-          onRowDoubleClick={this.props.editRow}
+          onRowDoubleClick={this.editRow}
           columns={[
             { name: 'typeName', title: 'Type' },
             { name: 'updateByUser', title: 'Last Update By' },
@@ -196,6 +229,7 @@ class VisitFormGrid extends PureComponent {
                   <React.Fragment>
                     <Tooltip title='Print'>
                       <Button
+                        disabled={!isCanEditForms}
                         size='sm'
                         onClick={() => {
                           this.props.printRow(row)
@@ -210,9 +244,10 @@ class VisitFormGrid extends PureComponent {
                     {(row.statusFK === 1 || row.statusFK === 2) && (
                       <Tooltip title='Edit'>
                         <Button
+                          disabled={!isCanEditForms}
                           size='sm'
                           onClick={() => {
-                            this.props.editRow(row)
+                            this.editRow(row)
                           }}
                           justIcon
                           color='primary'
@@ -224,21 +259,47 @@ class VisitFormGrid extends PureComponent {
                     )}
                     {(row.statusFK === 1 || row.statusFK === 2) && (
                       <Popconfirm
-                        onConfirm={() =>
-                          dispatch({
-                            type: 'formListing/update',
-                            payload: {
+                        onConfirm={() => {
+                          const { formCategory } = this.props
+                          let deleteData = [
+                            {
                               ...row,
+                              formData: JSON.stringify(row.formData),
                               isDeleted: true,
                             },
+                          ]
+                          let formType =
+                            formCategory === FORM_CATEGORY.VISITFORM
+                              ? 'VisitForm'
+                              : 'CORForm'
+                          dispatch({
+                            type: 'formListing/saveForm',
+                            payload: {
+                              visitID: formListing.visitID,
+                              currentCORId: row.clinicalObjectRecordFK,
+                              formType,
+                              UpdateType: row.type,
+                              visitLetterOfCertification:
+                                formCategory === FORM_CATEGORY.VISITFORM
+                                  ? deleteData
+                                  : [],
+                              CORLetterOfCertification:
+                                formCategory === FORM_CATEGORY.CORFORM
+                                  ? deleteData
+                                  : [],
+                            },
                           }).then(() => {
-                            dispatch({
-                              type: 'formListing/query',
-                            })
-                          })}
+                            this.props.queryFormListing()
+                          })
+                        }}
                       >
                         <Tooltip title='Delete'>
-                          <Button size='sm' color='danger' justIcon>
+                          <Button
+                            disabled={!isCanEditForms}
+                            size='sm'
+                            color='danger'
+                            justIcon
+                          >
                             <Delete />
                           </Button>
                         </Tooltip>
@@ -259,7 +320,7 @@ class VisitFormGrid extends PureComponent {
         />
         <AuthorizedContext>
           {(r) => {
-            if (r && r.rights !== 'enable') return null
+            if ((r && r.rights !== 'enable') || !isCanEditForms) return null
 
             return (
               <Popover
@@ -301,9 +362,9 @@ class VisitFormGrid extends PureComponent {
                   <Tooltip title='Add Form'>
                     <Button
                       color='primary'
-                      icon={<Add />}
                       style={{ margin: theme.spacing(1) }}
                     >
+                      <Add />
                       Add New
                     </Button>
                   </Tooltip>

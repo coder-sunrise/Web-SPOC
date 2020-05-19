@@ -12,7 +12,7 @@ import {
   GridItem,
   TextField,
   ProgressButton,
-  Select,
+  CodeSelect,
 } from '@/components'
 import { FilterBarDate } from '@/components/_medisys'
 
@@ -38,8 +38,14 @@ const styles = (theme) => ({
 class FilterBar extends PureComponent {
   render () {
     const { classes, dispatch, simple, values } = this.props
-    const { formSearchStartDate, formSearchEndDate } = values
-
+    const {
+      formSearchStartDate,
+      formSearchEndDate,
+      status = [],
+      formType = [],
+    } = values
+    const maxformstatusCount = status.length <= 1 ? 1 : 0
+    const maxformtypesCount = formType.length <= 1 ? 1 : 0
     return (
       <div className={classes.filterBar}>
         <GridContainer>
@@ -63,18 +69,52 @@ class FilterBar extends PureComponent {
           </Authorized>
           <GridItem xs={6} md={2}>
             <FastField
-              name='statusFK'
+              name='status'
               render={(args) => {
-                return <Select label='Status' options={formStatus} {...args} />
+                return (
+                  <CodeSelect
+                    label='Status'
+                    options={formStatus}
+                    {...args}
+                    mode='multiple'
+                    valueField='value'
+                    all={-99}
+                    defaultOptions={[
+                      {
+                        isExtra: true,
+                        id: -99,
+                        displayValue: 'All form status',
+                      },
+                    ]}
+                    maxTagCount={maxformstatusCount}
+                    maxTagPlaceholder='form status'
+                  />
+                )
               }}
             />
           </GridItem>
           <GridItem xs={6} md={2}>
             <FastField
-              name='formTypeFK'
+              name='formType'
               render={(args) => {
                 return (
-                  <Select label='Form Type' options={formTypes} {...args} />
+                  <CodeSelect
+                    label='Form Type'
+                    options={formTypes}
+                    {...args}
+                    mode='multiple'
+                    valueField='value'
+                    all={-99}
+                    defaultOptions={[
+                      {
+                        isExtra: true,
+                        id: -99,
+                        displayValue: 'All form types',
+                      },
+                    ]}
+                    maxTagCount={maxformtypesCount}
+                    maxTagPlaceholder='form types'
+                  />
                 )
               }}
             />
@@ -120,11 +160,7 @@ class FilterBar extends PureComponent {
                   color='primary'
                   icon={<Search />}
                   onClick={() => {
-                    const {
-                      patientSearchValue,
-                      statusFK,
-                      formTypeFK,
-                    } = this.props.values
+                    const { patientSearchValue } = this.props.values
                     this.props.dispatch({
                       type: 'formListing/query',
                       payload: {
@@ -132,8 +168,10 @@ class FilterBar extends PureComponent {
                           searchValue: patientSearchValue,
                           visitDateFrom: formSearchStartDate,
                           visitDateTo: formSearchEndDate,
-                          formType: formTypeFK,
-                          formStatus: statusFK,
+                          formType:
+                            formType.length > 0 ? formType.join() : undefined,
+                          formStatus:
+                            status.length > 0 ? status.join() : undefined,
                         },
                       },
                     })

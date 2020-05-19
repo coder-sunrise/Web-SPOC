@@ -15,26 +15,53 @@ class FormModuleGrid extends PureComponent {
   constructor (props) {
     super(props)
 
+    this.editRow = (row) => {
+      if (row.statusFK === 3 || row.statusFK === 4) return
+      this.props.dispatch({
+        type: 'formListing/updateState',
+        payload: {
+          showModal: true,
+          entity: row,
+          type: row.type,
+          formCategory: this.props.formCategory,
+          formFrom: this.props.formFrom,
+          visitDetail: {
+            visitID: row.visitID,
+            currentCORId: row.clinicalObjectRecordFK,
+            visitDate: row.visitDate,
+          },
+        },
+      })
+    }
+
     this.VoidForm = ({ classes, dispatch, row }) => {
       const [
         reason,
         setReason,
       ] = useState(undefined)
 
-      const handleConfirmDelete = useCallback((i, voidVisibleChange) => {
+      const handleConfirmVoid = useCallback((i, voidVisibleChange) => {
         if (reason) {
           voidVisibleChange()
           dispatch({
-            type: 'formListing/update',
+            type: 'formListing/saveForm',
             payload: {
-              ...row,
-              voidReason: reason,
-              statusFK: 4,
+              visitID: row.visitID,
+              currentCORId: row.clinicalObjectRecordFK,
+              formType: 'CORForm',
+              UpdateType: row.type,
+              visitLetterOfCertification: [],
+              CORLetterOfCertification: [
+                {
+                  ...row,
+                  formData: JSON.stringify(row.formData),
+                  voidReason: reason,
+                  statusFK: 4,
+                },
+              ],
             },
           }).then(() => {
-            dispatch({
-              type: 'formListing/query',
-            })
+            this.props.queryFormListing()
           })
         }
       })
@@ -64,7 +91,7 @@ class FormModuleGrid extends PureComponent {
           onCancelClick={() => {
             setReason(undefined)
           }}
-          onConfirmDelete={handleConfirmDelete}
+          onConfirmDelete={handleConfirmVoid}
         />
       )
     }
@@ -75,7 +102,7 @@ class FormModuleGrid extends PureComponent {
         { name: 'visitDate', title: 'Visit Date' },
         { name: 'patientID', title: 'Patient ID' },
         { name: 'patientName', title: 'Patient Name' },
-        { name: 'updateUserName', title: 'From' },
+        { name: 'doctor', title: 'From' },
         { name: 'createDate', title: 'Create Time' },
         { name: 'lastUpdateDate', title: 'Last Update Time' },
         { name: 'submissionDate', title: 'Submission Time' },
@@ -87,12 +114,10 @@ class FormModuleGrid extends PureComponent {
           columnName: 'type',
           type: 'select',
           options: formTypes,
-          sortingEnabled: false,
         },
         {
           columnName: 'visitDate',
           type: 'date',
-          sortingEnabled: false,
         },
         {
           columnName: 'createDate',
@@ -113,7 +138,6 @@ class FormModuleGrid extends PureComponent {
           columnName: 'statusFK',
           type: 'select',
           options: formStatus,
-          sortingEnabled: false,
         },
         {
           columnName: 'action',
@@ -141,7 +165,7 @@ class FormModuleGrid extends PureComponent {
                     <Button
                       size='sm'
                       onClick={() => {
-                        this.props.editRow(row)
+                        this.editRow(row)
                       }}
                       justIcon
                       color='primary'
@@ -156,16 +180,24 @@ class FormModuleGrid extends PureComponent {
                     onConfirm={() =>
                       this.props
                         .dispatch({
-                          type: 'formListing/update',
+                          type: 'formListing/saveForm',
                           payload: {
-                            ...row,
-                            isDeleted: true,
+                            visitID: row.visitID,
+                            currentCORId: row.clinicalObjectRecordFK,
+                            formType: 'CORForm',
+                            UpdateType: row.type,
+                            visitLetterOfCertification: [],
+                            CORLetterOfCertification: [
+                              {
+                                ...row,
+                                formData: JSON.stringify(row.formData),
+                                isDeleted: true,
+                              },
+                            ],
                           },
                         })
                         .then(() => {
-                          dispatch({
-                            type: 'formListing/query',
-                          })
+                          this.props.queryFormListing()
                         })}
                   >
                     <Tooltip title='Delete'>
@@ -195,13 +227,13 @@ class FormModuleGrid extends PureComponent {
   }
 
   render () {
-    const { overrideTableParas = {} } = this.props
+    const { overrideTableParas = {}, formListing } = this.props
     return (
       <React.Fragment>
         <CommonTableGrid
           type='formListing'
-          // rows={formListing.list}
-          onRowDoubleClick={this.props.editRow}
+          rows={formListing.list}
+          onRowDoubleClick={this.editRow}
           {...this.tableParas}
           {...overrideTableParas}
         />

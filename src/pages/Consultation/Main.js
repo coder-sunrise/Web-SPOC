@@ -404,6 +404,7 @@ class Main extends React.Component {
       dispatch,
       handleSubmit,
       values,
+      forms,
     } = this.props
     const { rows, _originalRows } = orders
     const { entity: vistEntity = {} } = visitRegistration
@@ -417,6 +418,12 @@ class Main extends React.Component {
       rows.filter((i) => !(i.id === undefined && i.isDeleted)),
       _originalRows,
     )
+    if (forms.rows.filter((o) => o.statusFK === 1)) {
+      notification.warning({
+        message: `Please finalize all forms.`,
+      })
+      return
+    }
 
     if (
       visitPurposeFK === VISIT_TYPE.BILL_FIRST &&

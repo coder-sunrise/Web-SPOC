@@ -14,18 +14,13 @@ module.exports = {
   },
 
   getVisitForm: async (params) => {
-    const r = await request(`${url}/VisitForm/${params.id}`, {
-      method: 'GET',
-      body: params,
-    })
-    return r
-  },
-
-  getCORForm: async (params) => {
-    const r = await request(`${url}/CORForm/${params.id}`, {
-      method: 'GET',
-      body: params,
-    })
+    const r = await request(
+      `${url}/VisitForm/${params.id}/${params.formType}`,
+      {
+        method: 'GET',
+        // body: params,
+      },
+    )
     return r
   },
 

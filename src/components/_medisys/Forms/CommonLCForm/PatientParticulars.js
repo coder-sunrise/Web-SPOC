@@ -13,7 +13,9 @@ import {
 class PatientParticulars extends PureComponent {
   render () {
     const { values, setFieldValue } = this.props
-    const { admittingSpecialtyFK } = values
+    const { formData } = values
+    const { admittingSpecialtys = [] } = formData
+    const maxadmittingspecialtyCount = admittingSpecialtys.length <= 1 ? 1 : 0
     return (
       <GridContainer>
         <GridItem xs={4}>
@@ -85,23 +87,28 @@ class PatientParticulars extends PureComponent {
         </GridItem>
         <GridItem md={4}>
           <FastField
-            name='formData.admittingSpecialtyFK'
+            name='formData.admittingSpecialtys'
             render={(args) => (
               <CodeSelect
                 label='Admitting Specialty'
                 {...args}
                 options={ltAdmittingSpecialty}
-                onChage={(v) => {
-                  if (!v || v !== 99) {
-                    setFieldValue('others', undefined)
+                valueField='id'
+                disableAll
+                mode='multiple'
+                onChange={() => {
+                  if (!admittingSpecialtys.find((o) => o === 99)) {
+                    setFieldValue('formData.others', undefined)
                   }
                 }}
+                maxTagCount={maxadmittingspecialtyCount}
+                maxTagPlaceholder='admitting specialty'
               />
             )}
           />
         </GridItem>
         <GridItem xs={8}>
-          {admittingSpecialtyFK === 99 && (
+          {admittingSpecialtys.find((o) => o === 99) && (
             <FastField
               name='formData.others'
               render={(args) => {

@@ -6,6 +6,7 @@ import { gstChargedTypes, surgicalRoles } from '@/utils/codes'
 import {
   GridContainer,
   GridItem,
+  TextField,
   FastField,
   DatePicker,
   RadioButtonGroup,
@@ -16,14 +17,13 @@ import {
   Button,
   TimePicker,
   EditableTableGrid,
-  TextField,
 } from '@/components'
 import { DoctorLabel } from '@/components/_medisys'
 
 class Procedures extends PureComponent {
   addProcedure = () => {
-    const { setFieldValue, values, visit } = this.props
-    const { visitDate } = visit
+    const { setFieldValue, values, formListing } = this.props
+    const { visitDate } = formListing.visitDetail
     const maxIndev = _.maxBy(values.formData.procuderes, 'index').index
     let newProcedure = values.formData.procuderes.map((o) => o)
     newProcedure.push({
@@ -111,26 +111,6 @@ class Procedures extends PureComponent {
     setFieldValue('formData.nonSurgicalCharges', newNonSurgicalCharges)
   }
 
-  commitChanges = (i, { rows, deleted }) => {
-    const { setFieldValue } = this.props
-    if (deleted) {
-      rows = rows.filter((o) => o.id !== deleted[0])
-    }
-    setFieldValue(`formData.procuderes[${i}].surgicalCharges`, rows)
-  }
-
-  onAddedRowsChange = (addedRows) => {
-    if (addedRows.length > 0) {
-      const newRow = addedRows[0]
-      newRow.surgeonFees = 0
-      newRow.implantFees = 0
-      newRow.otherFees = 0
-      newRow.totalSurgicalFees = 0
-      newRow.gSTChargedFK = 1
-    }
-    return addedRows
-  }
-
   render () {
     const { values, surgicalChargesSchema } = this.props
 
@@ -182,9 +162,30 @@ class Procedures extends PureComponent {
               } else {
                 canAddSurgicalCharges = o.surgicalCharges.length < 5
               }
+
               let isContainsPrincipalSurgeon =
                 o.surgicalCharges.filter((sc) => sc.surgicalRoleFK === 1)
                   .length >= 1
+
+              const onAddedSurgicalChargesRowsChange = (addedRows) => {
+                if (addedRows.length > 0) {
+                  const newRow = addedRows[0]
+                  newRow.surgeonFees = 0
+                  newRow.implantFees = 0
+                  newRow.otherFees = 0
+                  newRow.totalSurgicalFees = 0
+                  newRow.gSTChargedFK = 1
+                }
+                return addedRows
+              }
+
+              const onCommitSurgicalChargesChanges = ({ rows, deleted }) => {
+                const { setFieldValue } = this.props
+                if (deleted) {
+                  rows = rows.filter((r) => r.id !== deleted[0])
+                }
+                setFieldValue(`formData.procuderes[${i}].surgicalCharges`, rows)
+              }
 
               let tableParas = {
                 columns: [
@@ -489,10 +490,8 @@ class Procedures extends PureComponent {
                             rows={o.surgicalCharges}
                             EditingProps={{
                               showAddCommand: canAddSurgicalCharges,
-                              onCommitChanges: (val) => {
-                                this.commitChanges(i, val)
-                              },
-                              onAddedRowsChange: this.onAddedRowsChange,
+                              onCommitChanges: onCommitSurgicalChargesChanges,
+                              onAddedRowsChange: onAddedSurgicalChargesRowsChange,
                             }}
                             FuncProps={{
                               pager: false,

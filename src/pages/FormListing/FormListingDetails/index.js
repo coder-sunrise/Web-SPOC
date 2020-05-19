@@ -83,12 +83,11 @@ class FormListingDetails extends PureComponent {
       })
     } else if (formFrom === FORM_FROM.QUEUELOG) {
       this.props.dispatch({
-        type: 'formListing/query',
+        type: 'formListing/getVisitForm',
         payload: {
-          apiCriteria: {
-            visitID: formListing.visitID,
-            formCategory,
-          },
+          id: formListing.visitID,
+          formType:
+            formCategory === FORM_FROM.FORMMODULE ? 'VisitForm' : 'CORForm',
         },
       })
     }
@@ -101,19 +100,6 @@ class FormListingDetails extends PureComponent {
       type: 'formListing/updateState',
       payload: {
         showModal: !showModal,
-      },
-    })
-  }
-
-  editRow = (row) => {
-    if (row.statusFK === 3 || row.statusFK === 4) return
-    this.props.dispatch({
-      type: 'formListing/updateState',
-      payload: {
-        showModal: true,
-        entity: row,
-        type: row.type,
-        formCategory: this.props.formCategory,
       },
     })
   }
@@ -132,6 +118,7 @@ class FormListingDetails extends PureComponent {
                 {...this.props}
                 printRow={printRow}
                 editRow={this.editRow}
+                queryFormListing={this.queryFormListing}
               />
             </React.Fragment>
           </CardContainer>
@@ -142,6 +129,7 @@ class FormListingDetails extends PureComponent {
             printRow={printRow}
             viewReport={viewReport}
             editRow={this.editRow}
+            queryFormListing={this.queryFormListing}
           />
         )}
         <CommonModal
