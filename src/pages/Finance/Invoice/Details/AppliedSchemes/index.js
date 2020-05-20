@@ -173,7 +173,7 @@ class AppliedScheme extends Component {
         payload: {
           openConfirm: true,
           openConfirmContent:
-            'This invoice has been included in on or more company/co-payer statement(s)',
+            'This invoice has been included in one or more company/co-payer statement(s)',
           onConfirmSave: onConfirm,
           confirmText: 'Confirm to proceed?',
           additionalInfo: (
