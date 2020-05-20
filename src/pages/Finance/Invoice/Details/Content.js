@@ -47,7 +47,13 @@ const Content = ({ classes, clinicSettings, values, ...restProps }) => {
     {
       id: 1,
       name: 'Invoice',
-      content: <InvoiceDetails values={values} dispatch={dispatch} />,
+      content: (
+        <InvoiceDetails
+          values={values}
+          dispatch={dispatch}
+          disableApplyScheme={isInvoiceCurrentBizSession()}
+        />
+      ),
     },
     {
       id: 2,
