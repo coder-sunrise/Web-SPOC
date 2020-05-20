@@ -244,7 +244,7 @@ const QueueDisplayDasboard = ({
             gridGap: 3,
             textAlign: 'center',
             color: 'black',
-            fontSize: '5vw',
+            fontSize: '4vw',
             lineHeight: '6vw',
           }}
         >
