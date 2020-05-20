@@ -45,9 +45,21 @@ class InvoiceDetails extends Component {
   }
 
   render () {
-    const { classes, values, clinicSettings } = this.props
+    const { classes, values, clinicSettings, disableApplyScheme } = this.props
     return (
       <div className={classes.cardContainer}>
+        <Button
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+          }}
+          color='primary'
+          onClick={this.switchMode}
+          disabled={disableApplyScheme}
+        >
+          Apply Scheme
+        </Button>
         <div
           style={{
             display: 'flex',
@@ -55,9 +67,6 @@ class InvoiceDetails extends Component {
             marginBottom: 10,
           }}
         >
-          <Button size='sm' color='primary' onClick={this.switchMode}>
-            Apply Scheme
-          </Button>
           <Button size='sm' color='primary' icon onClick={this.toggleReport}>
             <Printer />Print Invoice
           </Button>
