@@ -109,7 +109,7 @@ export const menuData = [
   },
   {
     title: 'Inventory',
-    text: 'Inventory Stockcount Report',
+    text: 'Inventory Stock Count Report',
     url: '/report/inventorystockcountreport',
     authority: 'report.inventory.inventorystockcountreport',
   },
