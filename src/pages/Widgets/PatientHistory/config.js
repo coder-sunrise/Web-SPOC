@@ -10,6 +10,7 @@ export const WIDGETS_ID = {
   EXTRA_ORAL: '5',
   ATTACHMENT: '6',
   ORDERS: '7',
+  CONSULTATION_DOCUMENT: '20',
   INVOICE: '8',
   DENTAL_CHART: '9',
   TREATMENT: '10',
@@ -149,6 +150,19 @@ export const widgets = (props) => [
     authority: 'queue.consultation.widgets.order',
     component: Loadable({
       loader: () => import('./Orders'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} />
+      },
+      loading: Loading,
+    }),
+  },
+  {
+    id: WIDGETS_ID.CONSULTATION_DOCUMENT,
+    name: 'Consultation Document',
+    authority: 'queue.consultation.widgets.consultationdocument',
+    component: Loadable({
+      loader: () => import('./ConsultationDocument'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return <Cmpnet {...props} {...p} />

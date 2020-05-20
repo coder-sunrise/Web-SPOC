@@ -9,12 +9,17 @@ import {
   difference,
 } from '@/utils/utils'
 
-const updateGlobalState = ({ gridId, latestRow }) => {
+const updateGlobalState = ({ gridId }) => {
   const { global } = window.g_app._store.getState()
+  // console.log(Object.values(window.$tempGridRow[gridId]))
+  const errorRows = Object.values(window.$tempGridRow[gridId]).filter(
+    (o) => !o.isDeleted && (o._errors && o._errors.length),
+  )
   if (
     window.$tempGridRow[gridId] &&
-    latestRow._errors &&
-    latestRow._errors.length
+    errorRows.length > 0
+    // latestRow._errors &&
+    // latestRow._errors.length
   ) {
     if (!global.disableSave)
       window.g_app._store.dispatch({
@@ -24,7 +29,7 @@ const updateGlobalState = ({ gridId, latestRow }) => {
         },
       })
   } else if (
-    (!latestRow._errors || !latestRow._errors.length) &&
+    // (!latestRow._errors || !latestRow._errors.length) &&
     global.disableSave
   ) {
     window.g_app._store.dispatch({
@@ -53,17 +58,19 @@ function onComponentDidMount () {
     ? window.$tempGridRow[gridId][getRowId(row)] || row
     : row
   // console.log(latestRow[columnName], value)
-  if (latestRow[columnName] !== value) {
-    setTimeout(() => {
-      this.forceUpdate()
-    }, 500)
+  // if (latestRow[columnName] !== value) {
+  //   setTimeout(() => {
+  //     this.forceUpdate()
+  //   }, 500)
+  // }
+  if (getRowId(latestRow)) {
+    const errors = updateCellValue(this.props, null, latestRow[columnName])
+    latestRow._errors = errors
+    updateGlobalState({
+      gridId,
+    })
   }
-  const errors = updateCellValue(this.props, null, latestRow[columnName])
-  latestRow._errors = errors
-  updateGlobalState({
-    gridId,
-    latestRow,
-  })
+
   return {
     row,
     gridId,
@@ -124,10 +131,9 @@ function onComponentChange (args, config) {
     }
   }
 
-  updateGlobalState({
-    gridId,
-    latestRow,
-  })
+  // updateGlobalState({
+  //   gridId,
+  // })
 }
 
 function getCommonConfig () {
@@ -175,7 +181,7 @@ function getCommonConfig () {
     row: latestRow,
     text: text || !editMode,
     validSchema: (_row) => {
-      if (validationSchema) {
+      if (validationSchema && getRowId(_row)) {
         try {
           validationSchema.validateSync(_row, {
             abortEarly: false,
@@ -220,4 +226,5 @@ module.exports = {
   onComponentChange,
   getCommonConfig,
   getCommonRender,
+  updateGlobalState,
 }
