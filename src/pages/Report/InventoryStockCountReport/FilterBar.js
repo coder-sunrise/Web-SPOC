@@ -12,7 +12,9 @@ import {
   Select,
 } from '@/components'
 
-const FilterBar = ({ handleSubmit, isSubmitting }) => {
+const FilterBar = ({ handleSubmit, isSubmitting, values }) => {
+  const { inventoryType = [] } = values
+  const maxinventorytypeCount = inventoryType.length <= 1 ? 1 : 0
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
@@ -34,12 +36,14 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                     {...args}
                     label='Inventory Type'
                     mode='multiple'
-                    maxTagCount={1}
                     options={[
                       { name: 'Medication', value: 'MEDICATION' },
                       { name: 'Consumable', value: 'CONSUMABLE' },
                       { name: 'Vaccination', value: 'VACCINATION' },
                     ]}
+                    all={-99}
+                    maxTagCount={maxinventorytypeCount}
+                    maxTagPlaceholder='inventory types'
                   />
                 )
               }}
