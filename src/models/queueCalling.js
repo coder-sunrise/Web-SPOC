@@ -94,10 +94,21 @@ export default createFormViewModel({
       setExistingQueueCallList (st, { payload }) {
         const { value, ...restValues } = payload.data
         const existingQCall = JSON.parse(value)
+        // filter same queueNo and roomNo
         const uniqueQCall = _.uniqBy(existingQCall, 'qNo')
+        let uniqueRoomCall = []
+        uniqueQCall.forEach((element) => {
+          if (
+            element.roomNo === '' ||
+            !uniqueRoomCall.find((o) => o.roomNo === element.roomNo)
+          ) {
+            uniqueRoomCall.push({ ...element })
+          }
+        })
+
         return {
           ...st,
-          qCallList: uniqueQCall,
+          qCallList: uniqueRoomCall,
           oriQCallList: existingQCall,
           ...restValues,
         }
@@ -128,25 +139,19 @@ export default createFormViewModel({
       },
       displayCallQueue (st, { payload }) {
         const { qCallList, pendingQCall } = st
-        const currentCalledQueue = qCallList.find(
-          (q) => q.qNo === pendingQCall[0].qNo,
-        )
 
         let qArray = []
-        if (currentCalledQueue) {
-          const otherQCalls = qCallList.filter(
-            (q) => q.qNo !== currentCalledQueue.qNo,
-          )
-          qArray = [
-            currentCalledQueue,
-            ...otherQCalls,
-          ]
-        } else {
-          qArray = [
-            pendingQCall[0],
-            ...qCallList,
-          ]
-        }
+        // filter same queueNo and roomNo
+        let otherQCalls = qCallList.filter((q) => q.qNo !== pendingQCall[0].qNo)
+
+        otherQCalls = otherQCalls.filter(
+          (q) => q.roomNo === '' || q.roomNo !== pendingQCall[0].roomNo,
+        )
+
+        qArray = [
+          pendingQCall[0],
+          ...otherQCalls,
+        ]
 
         const remainingPendingQCall = pendingQCall.filter((q, idx) => idx !== 0)
         return {
