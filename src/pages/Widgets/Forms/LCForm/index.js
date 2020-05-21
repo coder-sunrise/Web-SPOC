@@ -133,6 +133,7 @@ const procuderesSchema = Yup.object().shape({
                 {
                   id: -1,
                   surgicalRoleFK: 1,
+                  surgicalRoleName: 'Principal Surgeon',
                   surgicalSurgeonFK: doctorProfileFK,
                   surgicalSurgeonMCRNo: doctor ? doctor.doctorMCRNo : undefined,
                   surgicalSurgeonName: doctor
@@ -143,6 +144,7 @@ const procuderesSchema = Yup.object().shape({
                   otherFees: 0,
                   totalSurgicalFees: 0,
                   gSTChargedFK: 1,
+                  gSTChargedName: 'Charged',
                 },
               ],
             },

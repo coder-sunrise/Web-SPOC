@@ -1045,37 +1045,118 @@ const formTypes = [
       draft: (row) => {
         const { formData } = row
 
+        let LCFormSurgicalCharges = []
+        formData.procuderes.filter((p) => p.index <= 3).forEach((element) => {
+          for (let index = 0; index < 3; index++) {
+            LCFormSurgicalCharges.push({
+              index: element.index,
+              ProcedureDate: element.procedureDate,
+              StartTime: element.procedureStartTime,
+              EndTime: element.procedureEndTime,
+              NatureOperation: element.natureOfOpertation,
+              SurgicalCode: element.surgicalProcedureCode,
+              SurgicalDescription: element.surgicalProcedureName,
+              SurgicalTable: element.surgicalProcedureTable,
+              DoctorMCRNo: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].surgicalSurgeonMCRNo
+                : '',
+              DoctorName: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].surgicalSurgeonName
+                : '',
+              SurgeonRoleDisplayValue: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].surgicalRoleName
+                : '',
+              SurgeonFees: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].surgeonFees
+                : 0,
+              ImplantFees: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].implantFees
+                : 0,
+              OtherFees: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].otherFees
+                : 0,
+              TotalSurgicalFees: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].totalSurgicalFees
+                : 0,
+              GSTChargedDisplayValue: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].gSTChargedName
+                : 'Charged',
+            })
+          }
+        })
+
         let LCFormSurgicalChargesAnnex = []
         formData.procuderes.filter((p) => p.index > 3).forEach((element) => {
-          LCFormSurgicalChargesAnnex = LCFormSurgicalChargesAnnex.concat(
-            element.map((o) => {
-              return {
-                index: element.index,
-                ProcedureDate: element.procedureDate,
-                StartTime: element.procedureStartTime,
-                EndTime: element.procedureEndTime,
-                NatureOperation: element.natureOfOpertation,
-                SurgicalCode: element.surgicalProcedureCode,
-                SurgicalDescription: element.surgicalProcedureName,
-                SurgicalTable: element.surgicalProcedureTable,
-                PatientName: formData.patientName,
-                PatientAccountNo: formData.patientAccountNo,
-                DateOfAdmission: formData.admissionDate,
-                PrincipalSurgeonName: formData.principalSurgeonName,
-                SignatureDoctorMCRNo: formData.principalSurgeonMCRNo,
-                SignatureDate: formData.principalSurgeonSignatureDate,
-                DoctorMCRNo: o.surgicalSurgeonMCRNo,
-                DoctorName: o.surgicalSurgeonName,
-                SurgeonRoleDisplayValue: o.surgicalRoleName,
-                SurgeonFees: o.surgeonFees,
-                ImplantFees: o.implantFees,
-                OtherFees: o.otherFees,
-                TotalSurgicalFees: o.totalSurgicalFees,
-                GSTChargedDisplayValue: o.gSTChargedName,
-              }
-            }),
-          )
+          for (let index = 0; index < 5; index++) {
+            LCFormSurgicalChargesAnnex.push({
+              index: element.index,
+              ProcedureDate: element.procedureDate,
+              StartTime: element.procedureStartTime,
+              EndTime: element.procedureEndTime,
+              NatureOperation: element.natureOfOpertation,
+              SurgicalCode: element.surgicalProcedureCode,
+              SurgicalDescription: element.surgicalProcedureName,
+              SurgicalTable: element.surgicalProcedureTable,
+              PatientName: formData.patientName,
+              PatientAccountNo: formData.patientAccountNo,
+              DateOfAdmission: formData.admissionDate,
+              PrincipalSurgeonName: formData.principalSurgeonName,
+              SignatureDoctorMCRNo: formData.principalSurgeonMCRNo,
+              SignatureDate: formData.principalSurgeonSignatureDate,
+              DoctorMCRNo: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].surgicalSurgeonMCRNo
+                : '',
+              DoctorName: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].surgicalSurgeonName
+                : '',
+              SurgeonRoleDisplayValue: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].surgicalRoleName
+                : '',
+              SurgeonFees: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].surgeonFees
+                : 0,
+              ImplantFees: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].implantFees
+                : 0,
+              OtherFees: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].otherFees
+                : 0,
+              TotalSurgicalFees: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].totalSurgicalFees
+                : 0,
+              GSTChargedDisplayValue: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].gSTChargedName
+                : 'Charged',
+            })
+          }
         })
+
+        let LCFormNonSurgicalCharges = []
+        for (let index = 0; index < 7; index++) {
+          LCFormSurgicalChargesAnnex.push({
+            DoctorMCRNo: formData.nonSurgicalCharges[index]
+              ? formData.nonSurgicalCharges[index].surgicalSurgeonMCRNo
+              : '',
+            DoctorName: formData.nonSurgicalCharges[index]
+              ? formData.nonSurgicalCharges[index].surgicalSurgeonName
+              : '',
+            SurgeonRoleDisplayValue: formData.nonSurgicalCharges[index]
+              ? formData.nonSurgicalCharges[index].surgicalRoleName
+              : '',
+            AttendanceFee: formData.nonSurgicalCharges[index]
+              ? formData.nonSurgicalCharges[index].inpatientAttendanceFees
+              : 0,
+            OtherFees: formData.nonSurgicalCharges[index]
+              ? formData.nonSurgicalCharges[index].otherFees
+              : 0,
+            TotalSurgicalFees: formData.nonSurgicalCharges[index]
+              ? formData.nonSurgicalCharges[index].totalSurgicalFees
+              : 0,
+            GSTChargedDisplayValue: formData.nonSurgicalCharges[index]
+              ? formData.nonSurgicalCharges[index].gSTChargedName
+              : 'Charged',
+          })
+        }
 
         return {
           LCFormDetails: [
@@ -1084,7 +1165,7 @@ const formTypes = [
               referralDate: moment(row.referralDate).format(dateFormatLong),
             },
           ],
-          LCFormSurgicalCharges: [],
+          LCFormSurgicalCharges,
           LCFormSignature: [
             {
               PrincipalSurgeonName: formData.principalSurgeonName,
@@ -1092,8 +1173,8 @@ const formTypes = [
               SignatureDate: formData.principalSurgeonSignatureDate,
             },
           ],
-          LCFormNonSurgicalCharges: [],
-          LCFormSurgicalChargesAnnex: [],
+          LCFormNonSurgicalCharges,
+          LCFormSurgicalChargesAnnex,
         }
       },
     },

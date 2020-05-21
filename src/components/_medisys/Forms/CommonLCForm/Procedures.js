@@ -36,6 +36,7 @@ class Procedures extends PureComponent {
         {
           id: -1,
           surgicalRoleFK: 1,
+          surgicalRoleName: 'Principal Surgeon',
           surgicalSurgeonFK: values.formData.principalSurgeonFK,
           surgicalSurgeonMCRNo: values.formData.principalSurgeonMCRNo,
           surgicalSurgeonName: values.formData.principalSurgeonName,
@@ -44,6 +45,7 @@ class Procedures extends PureComponent {
           otherFees: 0,
           totalSurgicalFees: 0,
           gSTChargedFK: 1,
+          gSTChargedName: 'Charged',
         },
       ],
     })
@@ -175,6 +177,7 @@ class Procedures extends PureComponent {
                   newRow.otherFees = 0
                   newRow.totalSurgicalFees = 0
                   newRow.gSTChargedFK = 1
+                  newRow.gSTChargedName = 'Charged'
                 }
                 return addedRows
               }
@@ -261,6 +264,9 @@ class Procedures extends PureComponent {
                     labelField: 'name',
                     sortingEnabled: false,
                     isDisabled: (row) => row.surgicalRoleFK === 1,
+                    onChange: ({ option, row }) => {
+                      row.surgicalRoleName = option ? option.name : undefined
+                    },
                   },
                   {
                     columnName: 'surgeonFees',
@@ -307,6 +313,9 @@ class Procedures extends PureComponent {
                     options: gstChargedTypes,
                     labelField: 'name',
                     sortingEnabled: false,
+                    onChange: ({ option, row }) => {
+                      row.gSTChargedName = option ? option.name : undefined
+                    },
                   },
                 ],
               }

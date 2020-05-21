@@ -20,6 +20,7 @@ class NonSurgical extends PureComponent {
       newRow.otherFees = 0
       newRow.totalSurgicalFees = 0
       newRow.gSTChargedFK = 1
+      newRow.gSTChargedName = 'Charged'
     }
     return addedRows
   }
@@ -99,12 +100,13 @@ class NonSurgical extends PureComponent {
           labelField: 'name',
           sortingEnabled: false,
           isDisabled: (row) => row.surgicalRoleFK === 1,
-          onChange: ({ val, row }) => {
-            if (val === 1) {
+          onChange: ({ val, option, row }) => {
+            if (val && val === 1) {
               row.surgicalSurgeonFK = values.formData.principalSurgeonFK
               row.surgicalSurgeonMCRNo = values.formData.principalSurgeonMCRNo
               row.surgicalSurgeonName = values.formData.principalSurgeonName
             }
+            row.surgicalRoleName = option ? option.name : undefined
           },
         },
         {
@@ -138,6 +140,9 @@ class NonSurgical extends PureComponent {
           options: gstChargedTypes,
           labelField: 'name',
           sortingEnabled: false,
+          onChange: ({ option, row }) => {
+            row.gSTChargedName = option ? option.name : undefined
+          },
         },
       ],
     }
