@@ -67,7 +67,7 @@ export const printRow = async (row, props) => {
   // return
   if (row.id) {
     download(
-      `/api/Reports/${downloadConfig.id}?ReportFormat=pdf&ReportParameters={${downloadConfig.key}:${row.id}}`,
+      `/api/Reports/${downloadConfig.id}?ReportFormat=pdf&ReportParameters={${downloadConfig.key}:${row.id},"FormCategory":"CORForm"}`,
       {
         subject: row.subject,
         type: 'pdf',
@@ -109,7 +109,7 @@ export const printRow = async (row, props) => {
   }
 }
 
-export const viewReport = (row, props, useID = false) => {
+export const viewReport = (row, props) => {
   const type = formTypes.find(
     (o) => o.value === row.type || o.name === row.type || o.code === row.type,
   )
@@ -118,50 +118,37 @@ export const viewReport = (row, props, useID = false) => {
     notification.error({ message: 'No configuration found' })
     return false
   }
-  if (row.id && useID) {
-    window.g_app._store.dispatch({
-      type: 'report/updateState',
-      payload: {
-        reportTypeID: downloadConfig.id,
-        reportParameters: {
-          [downloadConfig.key]: row.id,
-          isSaved: true,
-        },
-      },
-    })
-  } else {
-    const { codetable, patient } = props
-    const { clinicianprofile = [] } = codetable
-    const { entity } = patient
-    const obj =
-      clinicianprofile.find(
-        (o) =>
-          o.userProfileFK ===
-          (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
-      ) || {}
 
-    const reportParameters = { ...row }
-    const { subject } = row
-    reportParameters.doctorName = (obj.title ? `${obj.title} ` : '') + obj.name
-    reportParameters.doctorMCRNo = obj.doctorProfile
-      ? obj.doctorProfile.doctorMCRNo
-      : ''
+  const { codetable, patient } = props
+  const { clinicianprofile = [] } = codetable
+  const { entity } = patient
+  const obj =
+    clinicianprofile.find(
+      (o) =>
+        o.userProfileFK ===
+        (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
+    ) || {}
 
-    reportParameters.patientName = entity.name
-    reportParameters.patientAccountNo = entity.patientAccountNo
-    window.g_app._store.dispatch({
-      type: 'report/updateState',
-      payload: {
-        reportTypeID: downloadConfig.id,
-        reportParameters: {
-          isSaved: false,
-          reportContent: JSON.stringify(
-            commonDataReaderTransform(downloadConfig.draft(reportParameters)),
-          ),
-        },
+  const reportParameters = { ...row }
+  reportParameters.doctorName = (obj.title ? `${obj.title} ` : '') + obj.name
+  reportParameters.doctorMCRNo = obj.doctorProfile
+    ? obj.doctorProfile.doctorMCRNo
+    : ''
+
+  reportParameters.patientName = entity.name
+  reportParameters.patientAccountNo = entity.patientAccountNo
+  window.g_app._store.dispatch({
+    type: 'report/updateState',
+    payload: {
+      reportTypeID: downloadConfig.id,
+      reportParameters: {
+        isSaved: false,
+        reportContent: JSON.stringify(
+          commonDataReaderTransform(downloadConfig.draft(reportParameters)),
+        ),
       },
-    })
-  }
+    },
+  })
 
   return true
 }

@@ -9,12 +9,13 @@ import { CardContainer, CommonModal, notification } from '@/components'
 import { FORM_FROM } from '@/utils/constants'
 import model from './models'
 import AddForm from './FormDetail/AddForm'
+import { commonDataReaderTransform } from '@/utils/utils'
 import { formTypes } from '@/utils/codes'
 import { download } from '@/utils/request'
 
 window.g_app.replaceModel(model)
 
-export const printRow = async (row) => {
+export const printRow = async (row, formCategory = 'CORForm') => {
   const type = formTypes.find(
     (o) => o.value === row.type || o.name === row.type || o.code === row.type,
   )
@@ -25,7 +26,7 @@ export const printRow = async (row) => {
   }
   // return
   download(
-    `/api/Reports/${downloadConfig.id}?ReportFormat=pdf&ReportParameters={${downloadConfig.key}:${row.id}}`,
+    `/api/Reports/${downloadConfig.id}?ReportFormat=pdf&ReportParameters={${downloadConfig.key}:${row.id},"FormCategory":${formCategory}}`,
     {
       subject: row.subject,
       type: 'pdf',
@@ -33,7 +34,7 @@ export const printRow = async (row) => {
   )
 }
 
-export const viewReport = (row) => {
+export const viewReport = (row, props) => {
   const type = formTypes.find(
     (o) => o.value === row.type || o.name === row.type || o.code === row.type,
   )
@@ -42,13 +43,34 @@ export const viewReport = (row) => {
     notification.error({ message: 'No configuration found' })
     return false
   }
+
+  const { codetable, patient } = props
+  const { clinicianprofile = [] } = codetable
+  const { entity } = patient
+  const obj =
+    clinicianprofile.find(
+      (o) =>
+        o.userProfileFK ===
+        (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
+    ) || {}
+
+  const reportParameters = { ...row }
+  reportParameters.doctorName = (obj.title ? `${obj.title} ` : '') + obj.name
+  reportParameters.doctorMCRNo = obj.doctorProfile
+    ? obj.doctorProfile.doctorMCRNo
+    : ''
+
+  reportParameters.patientName = entity.name
+  reportParameters.patientAccountNo = entity.patientAccountNo
   window.g_app._store.dispatch({
     type: 'report/updateState',
     payload: {
       reportTypeID: downloadConfig.id,
       reportParameters: {
-        [downloadConfig.key]: row.id,
-        isSaved: true,
+        isSaved: false,
+        reportContent: JSON.stringify(
+          commonDataReaderTransform(downloadConfig.draft(reportParameters)),
+        ),
       },
     },
   })

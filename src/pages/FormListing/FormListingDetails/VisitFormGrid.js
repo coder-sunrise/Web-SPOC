@@ -232,7 +232,8 @@ class VisitFormGrid extends PureComponent {
                         disabled={!isCanEditForms}
                         size='sm'
                         onClick={() => {
-                          this.props.printRow(row)
+                          const { formCategory, printRow } = this.props
+                          printRow(row, formCategory)
                         }}
                         justIcon
                         color='primary'

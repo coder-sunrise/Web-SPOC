@@ -1039,17 +1039,61 @@ const formTypes = [
     name: 'Letter of Certification',
     prop: 'corLetterOfCertification',
     downloadConfig: {
-      id: 9,
+      id: 45,
       key: 'LetterofCertificationId',
       subject: 'Letter of Certification',
       draft: (row) => {
+        const { formData } = row
+
+        let LCFormSurgicalChargesAnnex = []
+        formData.procuderes.filter((p) => p.index > 3).forEach((element) => {
+          LCFormSurgicalChargesAnnex = LCFormSurgicalChargesAnnex.concat(
+            element.map((o) => {
+              return {
+                index: element.index,
+                ProcedureDate: element.procedureDate,
+                StartTime: element.procedureStartTime,
+                EndTime: element.procedureEndTime,
+                NatureOperation: element.natureOfOpertation,
+                SurgicalCode: element.surgicalProcedureCode,
+                SurgicalDescription: element.surgicalProcedureName,
+                SurgicalTable: element.surgicalProcedureTable,
+                PatientName: formData.patientName,
+                PatientAccountNo: formData.patientAccountNo,
+                DateOfAdmission: formData.admissionDate,
+                PrincipalSurgeonName: formData.principalSurgeonName,
+                SignatureDoctorMCRNo: formData.principalSurgeonMCRNo,
+                SignatureDate: formData.principalSurgeonSignatureDate,
+                DoctorMCRNo: o.surgicalSurgeonMCRNo,
+                DoctorName: o.surgicalSurgeonName,
+                SurgeonRoleDisplayValue: o.surgicalRoleName,
+                SurgeonFees: o.surgeonFees,
+                ImplantFees: o.implantFees,
+                OtherFees: o.otherFees,
+                TotalSurgicalFees: o.totalSurgicalFees,
+                GSTChargedDisplayValue: o.gSTChargedName,
+              }
+            }),
+          )
+        })
+
         return {
-          LetterofCertificationDetails: [
+          LCFormDetails: [
             {
               ...row,
               referralDate: moment(row.referralDate).format(dateFormatLong),
             },
           ],
+          LCFormSurgicalCharges: [],
+          LCFormSignature: [
+            {
+              PrincipalSurgeonName: formData.principalSurgeonName,
+              DoctorMCRNo: formData.principalSurgeonMCRNo,
+              SignatureDate: formData.principalSurgeonSignatureDate,
+            },
+          ],
+          LCFormNonSurgicalCharges: [],
+          LCFormSurgicalChargesAnnex: [],
         }
       },
     },
