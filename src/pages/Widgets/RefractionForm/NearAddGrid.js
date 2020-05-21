@@ -46,6 +46,9 @@ export default ({
         columnName: 'NearAdd',
         type: 'text',
         width: 130,
+        editingEnabled: false,
+        sortingEnabled: false,
+        disabled: true,
         render: () => {
           return (
             <GridItem>
@@ -75,6 +78,7 @@ export default ({
   }
   return (
     <EditableTableGrid
+      id='enarAddGrid'
       size='sm'
       style={{ margin: 0 }}
       rows={rows}
