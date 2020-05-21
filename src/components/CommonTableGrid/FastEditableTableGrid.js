@@ -53,7 +53,9 @@ class EditableTableGrid extends PureComponent {
       // errorRows: [],
     }
     this.gridId = id || `edit-${uniqueGid++}`
-
+    if (!window.$tempGridRow[this.gridId]) {
+      window.$tempGridRow[this.gridId] = {}
+    }
     // console.log(this.gridId)
     // console.log('edit created', window.$tempGridRow[this.gridId])
   }
