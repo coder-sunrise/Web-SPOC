@@ -47,13 +47,7 @@ const Content = ({ classes, clinicSettings, values, ...restProps }) => {
     {
       id: 1,
       name: 'Invoice',
-      content: (
-        <InvoiceDetails
-          values={values}
-          dispatch={dispatch}
-          disableApplyScheme={isInvoiceCurrentBizSession()}
-        />
-      ),
+      content: <InvoiceDetails values={values} dispatch={dispatch} />,
     },
     {
       id: 2,
@@ -68,16 +62,35 @@ const Content = ({ classes, clinicSettings, values, ...restProps }) => {
     },
   ]
 
+  const switchMode = () => {
+    dispatch({
+      type: 'invoiceDetail/updateState',
+      payload: {
+        mode: INVOICE_VIEW_MODE.APPLIED_SCHEME,
+      },
+    })
+  }
+
   return (
     <React.Fragment>
       {invoiceDetail.mode === INVOICE_VIEW_MODE.DEFAULT && (
-        <Tabs
-          style={{ marginTop: 20 }}
-          activeKey={active}
-          defaultActivekey='1'
-          onChange={(e) => setActive(e)}
-          options={InvoicePaymentTabOption}
-        />
+        <div className={classes.container}>
+          <Tabs
+            style={{ marginTop: 20 }}
+            activeKey={active}
+            defaultActivekey='1'
+            onChange={(e) => setActive(e)}
+            options={InvoicePaymentTabOption}
+          />
+          <Button
+            className={classes.applySchemeButton}
+            color='primary'
+            onClick={switchMode}
+            disabled={isInvoiceCurrentBizSession()}
+          >
+            Apply Scheme
+          </Button>
+        </div>
       )}
       {invoiceDetail.mode === INVOICE_VIEW_MODE.APPLIED_SCHEME && (
         <AppliedSchemes />

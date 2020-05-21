@@ -10,7 +10,7 @@ import { Button, GridContainer, withFormikExtend } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
 // utils
 import { INVOICE_VIEW_MODE } from '@/utils/constants'
-import { roundTo } from '@/utils/utils'
+import { roundTo, navigateDirtyCheck } from '@/utils/utils'
 import ApplyClaims from '@/pages/Billing/refactored/newApplyClaims'
 import { constructPayload } from '@/pages/Billing/utils'
 // services
@@ -118,6 +118,9 @@ class AppliedScheme extends Component {
     })
   }
 
+  handleBackToDetailsClick = () =>
+    navigateDirtyCheck({ onProceed: this.switchMode })
+
   handleIsEditing = (editing) => {
     this.setState({ isEditing: editing })
   }
@@ -222,7 +225,11 @@ class AppliedScheme extends Component {
             marginBottom: 24,
           }}
         >
-          <Button size='sm' color='primary' onClick={this.switchMode}>
+          <Button
+            size='sm'
+            color='primary'
+            onClick={navigateDirtyCheck({ onProceed: this.switchMode })}
+          >
             <ArrowLeft />Back To Invoice Details
           </Button>
           <Button size='sm' color='primary' onClick={this.handleSaveClick}>

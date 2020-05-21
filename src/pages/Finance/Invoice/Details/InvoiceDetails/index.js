@@ -35,31 +35,10 @@ class InvoiceDetails extends Component {
     this.setState((preState) => ({ showReport: !preState.showReport }))
   }
 
-  switchMode = () => {
-    this.props.dispatch({
-      type: 'invoiceDetail/updateState',
-      payload: {
-        mode: INVOICE_VIEW_MODE.APPLIED_SCHEME,
-      },
-    })
-  }
-
   render () {
-    const { classes, values, clinicSettings, disableApplyScheme } = this.props
+    const { classes, values } = this.props
     return (
       <div className={classes.cardContainer}>
-        <Button
-          style={{
-            position: 'absolute',
-            top: 0,
-            right: 0,
-          }}
-          color='primary'
-          onClick={this.switchMode}
-          disabled={disableApplyScheme}
-        >
-          Apply Scheme
-        </Button>
         <div
           style={{
             display: 'flex',
