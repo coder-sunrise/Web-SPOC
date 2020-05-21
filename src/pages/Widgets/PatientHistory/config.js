@@ -83,28 +83,6 @@ export const widgets = (props) => [
     }),
   },
   {
-    id: '13',
-    name: 'Visual Acuity Test',
-    authority: 'queue.consultation.widgets.eyevisualacuity',
-    component: Loadable({
-      loader: () => import('../EyeVisualAcuity'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return (
-          <Cmpnet
-            {...props}
-            {...p}
-            prefix='eyeVisualAcuityTestForms'
-            attachmentsFieldName='eyeVisualAcuityTestAttachments'
-            fromPatientHistory
-            values={p.patientHistory.entity}
-          />
-        )
-      },
-      loading: Loading,
-    }),
-  },
-  {
     id: '4',
     name: 'Intra Oral',
     authority: 'queue.consultation.clinicalnotes.intraoral',
@@ -191,6 +169,28 @@ export const widgets = (props) => [
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return <Cmpnet {...props} {...p} />
+      },
+      loading: Loading,
+    }),
+  },
+  {
+    id: '13',
+    name: 'Visual Acuity Test',
+    authority: 'queue.consultation.widgets.eyevisualacuity',
+    component: Loadable({
+      loader: () => import('../EyeVisualAcuity'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return (
+          <Cmpnet
+            {...props}
+            {...p}
+            prefix='eyeVisualAcuityTestForms'
+            attachmentsFieldName='eyeVisualAcuityTestAttachments'
+            fromPatientHistory
+            values={p.patientHistory.entity}
+          />
+        )
       },
       loading: Loading,
     }),
