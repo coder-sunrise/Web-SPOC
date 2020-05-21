@@ -24,6 +24,7 @@ const styles = () => ({})
     let totalOS = 0
     let adminChargeValueField = 0
     let adjustmentValueField = 0
+    let sumTotalPayableAmount = 0
     if (returnValue.statementInvoice) {
       newStatementInvoice = returnValue.statementInvoice.map((o) => {
         const {
@@ -31,13 +32,19 @@ const styles = () => ({})
           adminCharge,
           outstandingAmount,
           statementAdjustment,
+          creditNoteAmount = 0,
+          payableAmount = 0,
         } = o
+        const totalPayableAmount =
+          payableAmount - creditNoteAmount - adminCharge - statementAdjustment
+        sumTotalPayableAmount += totalPayableAmount
         totalOS += outstandingAmount
         adminChargeValueField += adminCharge
         adjustmentValueField += statementAdjustment
         return {
           ...o,
           tempOutstandingAmount: o.outstandingAmount,
+          totalPayableAmount,
           statementInvoicePayment: [
             ...statementInvoicePayment,
           ],
@@ -52,6 +59,7 @@ const styles = () => ({})
 
     return {
       ...returnValue,
+      totalPayableAmount: sumTotalPayableAmount,
       outstandingBalance,
       adminChargeValueField,
       adjustmentValueField,

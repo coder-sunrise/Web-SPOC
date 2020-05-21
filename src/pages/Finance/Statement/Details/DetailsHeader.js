@@ -138,7 +138,7 @@ class DetailsHeader extends PureComponent {
           </GridItem>
           <GridItem md={3} xs={12} className={classes.gridItem}>
             <FastField
-              name='totalAmount'
+              name='totalPayableAmount'
               render={(args) => (
                 <NumberInput
                   prefix='Total Payable Amount:'
