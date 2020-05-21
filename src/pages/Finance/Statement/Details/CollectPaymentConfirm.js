@@ -45,7 +45,7 @@ class CollectPaymentConfirm extends PureComponent {
       { name: 'patientName', title: 'Patient Name' },
       { name: 'adminCharge', title: 'Corporate Charge' },
       { name: 'statementAdjustment', title: 'Statement Adjustment' },
-      { name: 'payableAmount', title: 'Total Payable Amt' },
+      { name: 'totalPayableAmount', title: 'Total Payable Amt' },
       { name: 'outstandingAmount', title: 'Outstanding' },
       { name: 'payment', title: 'Payment' },
     ],
@@ -74,7 +74,7 @@ class CollectPaymentConfirm extends PureComponent {
         width: 150,
       },
       {
-        columnName: 'payableAmount',
+        columnName: 'totalPayableAmount',
         type: 'number',
         currency: true,
         sortingEnabled: false,
