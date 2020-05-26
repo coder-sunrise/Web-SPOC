@@ -29,6 +29,7 @@ const styles = () => ({
   itemRoot: {
     paddingTop: 0,
     paddingBottom: 0,
+    paddingRight: 30,
     cursor: 'pointer',
     '&:not(:last-child)': {
       borderBottom: `1px solid rgba(0, 0, 0, 0.12)`,
@@ -42,8 +43,10 @@ const styles = () => ({
     minWidth: 38,
   },
   titleLinkBtn: {
+    paddingLeft: '0px',
     paddingTop: '0px !important',
     textTransform: 'none',
+    textAlign: 'left',
   },
   copyBtn: {
     paddingTop: '0px !important',
@@ -51,20 +54,35 @@ const styles = () => ({
 })
 
 const Content = ({ systemMessage, classes, dispatch }) => {
-  const { message } = systemMessage
-
-  let messageTitle = message.title || ''
+  let messageTitle = systemMessage.title || ''
 
   // const icon = ICONS[NOTIFICATION_TYPE.SYSINFO]
 
-  const handelDismiss = () => {
+  const handleDismiss = () => {
     dispatch({
       type: 'systemMessage/dismiss',
       payload: {
-        id: message.id,
+        id: systemMessage.id,
       },
     })
   }
+
+  const handleOpenDetail = () => {
+    dispatch({
+      type: 'systemMessage/updateState',
+      payload: {
+        entity: systemMessage,
+      },
+    })
+
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        showSystemMessage: true,
+      },
+    })
+  }
+
   return (
     <ListItem button alignItems='flex-start' className={classes.itemRoot}>
       <ListItemIcon className={classes.icon}>
@@ -79,6 +97,7 @@ const Content = ({ systemMessage, classes, dispatch }) => {
                 link
                 color='primary'
                 className={classes.titleLinkBtn}
+                onClick={handleOpenDetail}
               >
                 {messageTitle}&nbsp;
               </Button>
@@ -101,17 +120,21 @@ const Content = ({ systemMessage, classes, dispatch }) => {
                 </p>
               </React.Fragment>
             </GridItem>
-            <GridItem md={2}>
-              <Button
-                size='sm'
-                link
-                color='primary'
-                onClick={handelDismiss}
-                className={classes.copyBtn}
-              >
-                Dismiss
-              </Button>
-            </GridItem>
+            {!systemMessage.isRead && !systemMessage.isDismissed ? (
+              <GridItem md={2}>
+                <Button
+                  size='sm'
+                  link
+                  color='primary'
+                  onClick={handleDismiss}
+                  className={classes.copyBtn}
+                >
+                  Dismiss
+                </Button>
+              </GridItem>
+            ) : (
+              ''
+            )}
           </GridContainer>
         }
       />

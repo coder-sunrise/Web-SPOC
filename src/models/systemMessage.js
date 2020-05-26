@@ -18,24 +18,51 @@ export default createListViewModel({
       })
     },
     effects: {
-      // *queryList ({ payload }, { call, put }) {
-      //   const response = yield call(service.queryList, payload)
-      //   yield put({
-      //     type: 'querySuccess',
-      //     payload: {
-      //       filter: payload,
-      //       ...response,
-      //     },
-      //   })
-      //   return response
-      // },
+      *queryList ({ payload }, { call, put, select }) {
+        const { typeId, sorting = [], pagesize = 10, current = 1 } = payload
+        const stMessage = yield select((st) => st.systemMessage)
+        let filter = {}
+        // let pagination = {}
+        delete payload.typeId
+
+        filter = stMessage[`filter${typeId}`]
+
+        filter = {
+          sorting,
+          pagesize,
+          ...payload,
+          current,
+        }
+
+        const response = yield call(service.queryList, filter)
+        const { data, status } = response
+
+        if (status === '200' || data) {
+          yield put({
+            type: 'querySuccess',
+            payload: {
+              data,
+              typeId,
+              [`filter${typeId}`]: filter,
+            },
+          })
+          yield put({
+            type: 'queryDone',
+            payload: {
+              data,
+            },
+          })
+        }
+
+        return data
+      },
 
       *read ({ payload }, { call, put }) {
         const response = yield call(service.upsertRead, payload)
         if (response) {
           yield put({
             type: 'queryOneDone',
-            payload: response,
+            payload: { data: response },
           })
           return true
         }
@@ -44,11 +71,11 @@ export default createListViewModel({
 
       *dismiss ({ payload }, { call, put }) {
         const response = yield call(service.upsertDismiss, payload)
-        if (response) {
+        if (response === 200) {
           // const res = yield call(service.query, payload)
           yield put({
-            type: 'queryOneDone',
-            payload: response,
+            type: 'dismissDone',
+            payload,
           })
           return true
         }
@@ -56,16 +83,19 @@ export default createListViewModel({
       },
     },
     reducers: {
-      querySystemMessageListDone (st, { payload }) {
-        const { data } = payload
-        console.log(st)
+      dismissDone (st, { payload }) {
+        const { id } = payload
+        const { list } = st
+
+        for (let i in list) {
+          if (list[i].id === id) {
+            list[i].isDismissed = true
+            break
+          }
+        }
         return {
           ...st,
-          systemMessageList: data.data.map((o) => {
-            return {
-              ...o,
-            }
-          }),
+          list,
         }
       },
       queryDone (st, { payload }) {
@@ -86,22 +116,38 @@ export default createListViewModel({
         const { data } = payload
         return {
           ...st,
-          entity: payload,
+          entity: data,
         }
       },
 
-      // updateBizSessionList (state, { payload }) {
-      //   const { data } = payload
-      //   return {
-      //     ...state,
-      //     bizSessionList: data.map((x) => {
-      //       return {
-      //         value: x.id,
-      //         name: x.sessionNo,
-      //       }
-      //     }),
-      //   }
-      // },
+      querySuccess (st, { payload = {} }) {
+        const { data, typeId, version, keepFilter = true } = payload
+        const datas = data.entities ? data.entities : data.data
+        const list = [
+          ...(st.list || []),
+          ...datas,
+        ]
+        const filter = payload[`filter${typeId}`]
+        const { sorting } = filter
+
+        const cfg = {}
+        if (version) {
+          cfg.version = Number(version)
+        }
+        return {
+          ...st,
+          list,
+          [`filter${typeId}`]: keepFilter ? filter : {},
+          [`pagination${typeId}`]: {
+            ...st[`pagination${typeId}`],
+            current: data.currentPage || 1,
+            pageSize: data.pageSize || 10,
+            totalRecords: data.totalRecords,
+            sorting,
+          },
+          ...cfg,
+        }
+      },
     },
   },
 })

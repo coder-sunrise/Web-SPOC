@@ -55,18 +55,23 @@ class SystemMessageDetail extends React.Component {
 
   componentDidMount = () => {
     const { dispatch, systemMessage: { entity } } = this.props
-    if (entity && !entity.isRead) {
-      dispatch({
-        type: 'systemMessage/read',
-        payload: {
-          id: entity.id,
-        },
-      })
+    if (entity) {
+      if (!entity.isRead) {
+        dispatch({
+          type: 'systemMessage/read',
+          payload: {
+            id: entity.id,
+          },
+        })
+      } else {
+        dispatch({
+          type: 'systemMessage/queryOne',
+          payload: {
+            id: entity.id,
+          },
+        })
+      }
     }
-  }
-
-  handleDoubleClick = (row) => {
-    this.handleActionButtonClick({ currentTarget: { id: row.id } })
   }
 
   render () {

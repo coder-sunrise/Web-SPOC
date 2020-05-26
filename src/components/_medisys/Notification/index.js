@@ -7,10 +7,10 @@ import Refresh from '@material-ui/icons/Refresh'
 // common components
 import { Badge, Popper, Button, Tabs, IconButton } from '@/components'
 // sub components
-import NotificationList from './NotificationList'
 import { SystemMessageList } from '@/components/_medisys'
 // assets
 import customDropdownStyle from '@/assets/jss/material-dashboard-pro-react/components/customDropdownStyle'
+import NotificationList from './NotificationList'
 import { TYPES } from './constants'
 
 const styles = (theme) => ({
@@ -51,11 +51,7 @@ const NotificationComponent = ({
               : ''}`,
             content:
               o.id === 4 ? (
-                <SystemMessageList
-                  dispatch={dispatch}
-                  type={o.id}
-                  systemMessages={list}
-                />
+                <SystemMessageList dispatch={dispatch} type={o.id} />
               ) : (
                 <NotificationList
                   notifications={list}

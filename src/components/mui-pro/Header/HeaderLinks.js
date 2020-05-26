@@ -6,6 +6,8 @@ import PropTypes from 'prop-types'
 import { connect } from 'dva'
 // antd
 import { Divider } from 'antd'
+import _ from 'lodash'
+
 // @material-ui
 import withStyles from '@material-ui/core/styles/withStyles'
 import MenuItem from '@material-ui/core/MenuItem'
@@ -41,56 +43,78 @@ class HeaderLinks extends React.Component {
     title: 'PROD',
   }
 
-  componentDidMount = () => {
+  async componentDidMount () {
     const { dispatch } = this.props
-    dispatch({
-      type: 'systemMessage/query',
-      payload: {
-        lgt_EffectiveEndDate: moment().formatUTC(false),
-        lst_EffectiveStartDate: moment().formatUTC(false),
-        pagesize: 3,
-        sorting: [
-          { columnName: 'createDate', direction: 'desc' },
-        ],
-      },
-    }).then((msgResponse) => {
-      const { data = [] } = msgResponse
-      if (data.length > 0) {
-        const { isAlertAfterLogin = false, isRead = false } = data[0]
-        if (isAlertAfterLogin && !isRead) {
-          dispatch({
-            type: 'systemMessage/updateState',
-            payload: {
-              entity: data[0],
-            },
-          })
+    const allResult = await this.featchSysMessages()
 
-          dispatch({
-            type: 'global/updateState',
-            payload: {
-              showSystemMessage: true,
-            },
-          })
-        }
+    const latestData = allResult.reduce((p, i) => {
+      const { data = [] } = i
+      const [
+        current,
+      ] = data
 
-        data.map((o) => {
-          const notificationPayload = {
-            type: NOTIFICATION_TYPE.SYSINFO,
-            status: NOTIFICATION_STATUS.OK,
-            message: o,
-            requestId: undefined,
-            sender: undefined,
-            senderId: undefined,
-            timestamp: o.createDate,
-            read: o.isRead,
-          }
-          dispatch({
-            type: 'header/appendNotification',
-            payload: notificationPayload,
-          })
+      const { createDate: currentDate } = current
+      const { createDate: preDate } = p
+
+      if (preDate && currentDate) {
+        const d1 = moment(preDate)
+        const d2 = moment(currentDate)
+        return d1.isBefore(d2) ? current : p
+      }
+      if (currentDate) {
+        return current
+      }
+      return p
+    }, {})
+
+    if (latestData) {
+      const { isAlertAfterLogin = false, isRead = false } = latestData
+      if (isAlertAfterLogin && !isRead) {
+        dispatch({
+          type: 'systemMessage/updateState',
+          payload: {
+            entity: latestData,
+          },
+        })
+
+        dispatch({
+          type: 'global/updateState',
+          payload: {
+            showSystemMessage: true,
+          },
         })
       }
-    })
+    }
+  }
+
+  // eslint-disable-next-line react/sort-comp
+  async featchSysMessages () {
+    const { dispatch } = this.props
+    let payload = {
+      lgt_EffectiveEndDate: moment().formatUTC(false),
+      lst_EffectiveStartDate: moment().formatUTC(false),
+      pagesize: 3,
+      typeId: 1,
+      systemMessageTypeFK: 1,
+      sorting: [
+        { columnName: 'createDate', direction: 'desc' },
+      ],
+    }
+    const result = await Promise.all([
+      dispatch({
+        type: 'systemMessage/queryList',
+        payload,
+      }),
+      dispatch({
+        type: 'systemMessage/queryList',
+        payload: {
+          ...payload,
+          typeId: 2,
+          systemMessageTypeFK: 2,
+        },
+      }),
+    ])
+    return result
   }
 
   handleClick = (key) => () => {
