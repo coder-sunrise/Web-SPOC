@@ -9,8 +9,8 @@ export default createFormViewModel({
   param: {
     service,
     state: {
-      default: {
-        reportFK: undefined,
+      default: { 
+
       },
     },
     subscriptions: ({ dispatch, history, searchField }) => {

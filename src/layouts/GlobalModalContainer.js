@@ -208,7 +208,7 @@ class GlobalModalContainer extends PureComponent {
           autoFocus
           open={global.openConfirm}
           title={global.openConfirmTitle}
-          cancelText='Cancel'
+          cancelText={global.cancelText || 'Cancel'}
           maxWidth='sm'
           confirmText={global.openConfirmText || 'Confirm'}
           isInformType={global.isInformType}

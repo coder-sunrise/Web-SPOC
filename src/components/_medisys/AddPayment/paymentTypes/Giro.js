@@ -31,7 +31,7 @@ const Giro = ({ payment, index, handleDeletePayment, handleAmountChange }) => {
             name={`paymentList[${index}].giroPayment.refNo`}
             render={(args) => (
               <TextField
-                label='Referrence No.'
+                label='Reference No.'
                 {...args}
                 maxLength={25}
                 inputProps={{ maxLength: 25 }}

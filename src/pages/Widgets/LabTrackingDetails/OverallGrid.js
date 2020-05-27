@@ -1,32 +1,32 @@
-import React, {PureComponent } from 'react'
+import React, { PureComponent } from 'react'
 import { withStyles } from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
 import CommonTableGrid from '@/components/CommonTableGrid'
 import { Button, Tooltip } from '@/components'
 
-
 class OverallGrid extends PureComponent {
-
   configs = {
-    columns : [
-      {name:'visitDate',title:'Visit Date'},
-      {name:'patientAccountNo',title:'Acc. No'},
-      {name:'patientName',title:'Patient name'},
-      {name:'doctorName',title:'Doctor'},
-      {name:'serviceName',title:'Service Name'},
-      {name:'supplierFK',title:'Supplier'},
-      {name:'orderedDate',title:'Ordered Date'},
-      {name:'estimateReceiveDate',title:'Est. Receive Date'},
-      {name:'receivedDate',title:'Received Date'},
-      {name:'labTrackingStatusDisplayValue',title:'Status'},
-      {name:'remarks',title:'Remarks'},
-      { name: 'action', title: 'Action'},
+    columns: [
+      { name: 'visitDate', title: 'Visit Date' },
+      { name: 'patientAccountNo', title: 'Acc. No' },
+      { name: 'patientName', title: 'Patient name' },
+      { name: 'doctorName', title: 'Doctor' },
+      { name: 'serviceName', title: 'Service Name' },
+      { name: 'supplierName', title: 'Supplier' },
+      { name: 'caseTypeDisplayValue', title: 'Case Type' },
+      { name: 'caseDescriptionDisplayValue', title: 'Case Description' },
+      { name: 'orderedDate', title: 'Ordered Date' },
+      { name: 'estimateReceiveDate', title: 'Est. Receive Date' },
+      { name: 'receivedDate', title: 'Received Date' },
+      { name: 'labTrackingStatusDisplayValue', title: 'Status' },
+      { name: 'remarks', title: 'Remarks' },
+      { name: 'action', title: 'Action' },
     ],
-    columnExtensions : [
-      {columnName:'visitDate',type:'date'},
-      {columnName:'estimateReceiveDate',type:'date'},
-      {columnName:'orderedDate',type:'date'},
-      {columnName:'receivedDate',type:'date'},
+    columnExtensions: [
+      { columnName: 'visitDate', type: 'date' },
+      { columnName: 'estimateReceiveDate', type: 'date' },
+      { columnName: 'orderedDate', type: 'date' },
+      { columnName: 'receivedDate', type: 'date' },
       {
         columnName: 'action',
         sortingEnabled: false,
@@ -53,22 +53,18 @@ class OverallGrid extends PureComponent {
     ],
   }
 
-
-
-  editRow = (row, e) =>{
-    const {dispatch, labTrackingDetails}= this.props
-    const {list} = labTrackingDetails
+  editRow = (row, e) => {
+    const { dispatch, labTrackingDetails } = this.props
+    const { list } = labTrackingDetails
 
     dispatch({
-      type:'labTrackingDetails/updateState',
-      payload:{
-        showModal:true,
-        entity: list.find((o)=> o.id === row.id),
+      type: 'labTrackingDetails/updateState',
+      payload: {
+        showModal: true,
+        entity: list.find((o) => o.id === row.id),
       },
     })
-
   }
-
 
   render () {
     return (
@@ -78,7 +74,6 @@ class OverallGrid extends PureComponent {
         {...this.configs}
       />
     )
-
   }
 }
 

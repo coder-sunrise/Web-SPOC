@@ -266,6 +266,7 @@ class Consumable extends PureComponent {
                     onChange={(e) => {
                       this.updateTotalPrice(e.target.value)
                     }}
+                    min={0}
                     {...args}
                   />
                 )

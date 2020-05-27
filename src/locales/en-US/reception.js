@@ -91,7 +91,7 @@ export default {
   'reception.queue.dispense.drugItem.remarks': 'Remarks',
 
   'reception.queue.dispense.serviceItem.service': 'Service',
-  'reception.queue.dispense.serviceItem.serviceCentre': 'Service Centre',
+  'reception.queue.dispense.serviceItem.serviceCentre': 'Service Center',
   'reception.queue.dispense.serviceItem.instructions': 'Instructions',
   'reception.queue.dispense.serviceItem.remarks': 'Remarks',
 

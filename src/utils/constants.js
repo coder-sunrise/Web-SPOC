@@ -61,9 +61,10 @@ export const UNFIT_TYPE = {
   5: 'Unfit for Duty',
   6: 'Unfit to Attend Court',
   7: 'for Light Duty',
-  8: 'Unfit for PE',
+  8: 'Unfit for Physical Exercise',
   9: 'Unfit for wearing shoes',
   10: 'Excuse Chit',
+  11: 'on Maternity Leave',
 }
 
 export const PAYMENT_MODE = {
@@ -171,12 +172,24 @@ export const REPORT_TYPE = {
 export const REPORT_ID = {
   DRUG_LABEL_80MM_45MM: 24,
   DRUG_LABEL_89MM_36MM: 31,
+  DRUG_LABEL_76MM_38MM: 48,
   PATIENT_LABEL_80MM_45MM: 27,
   PATIENT_LABEL_89MM_36MM: 32,
+  PATIENT_LABEL_76MM_38MM: 45,
   PATIENT_LAB_LABEL_80MM_45MM: 33,
   PATIENT_LAB_LABEL_89MM_36MM: 34,
+  PATIENT_LAB_LABEL_76MM_38MM: 46,
   POST_CARD_LABEL_80MM_45MM: 35,
   POST_CARD_LABEL_89MM_36MM: 36,
+  PATIENT_ADDRESS_LABEL_80MM_45MM: 41,
+  PATIENT_ADDRESS_LABEL_89MM_36MM: 42,
+  PATIENT_ADDRESS_LABEL_76MM_38MM: 47,
+  COPAYER_ADDRESS_LABEL_80MM_45MM: 43,
+  COPAYER_ADDRESS_LABEL_89MM_36MM: 44,
+  COPAYER_ADDRESS_LABEL_76MM_38MM: 49,
+  SUPPLIER_ADDRESS_LABEL_80MM_45MM: 50,
+  SUPPLIER_ADDRESS_LABEL_89MM_36MM: 51,
+  SUPPLIER_ADDRESS_LABEL_76MM_38MM: 52,
 }
 
 export const INVOICE_STATUS = {
@@ -209,6 +222,27 @@ export const COUNTRY_CODE = {
   4: '+63 Philippines',
   5: '+66 Thailand',
   6: '+81 Japan',
+  7: '+886 Taiwan',
+  8: '+61 Australia',
+  9: '+55 Brazil',
+  10: '+86 China',
+  11: '+1 Canada',
+  12: '+1 United States of America',
+  13: '+45 Denmark',
+  14: '+33 France',
+  15: '+49 Germany',
+  16: '+39 Italy',
+  17: '+82 South Korea',
+  18: '+852 Hong Kong',
+  19: '+853 Macao',
+  20: '+52 Mexico',
+  21: '+95 Myanmar',
+  22: '+64 New Zealand',
+  23: '+47 Norway',
+  24: '+34 Spain',
+  25: '+41 Switzerland',
+  26: '+84 Vietnam',
+  27: '+44 United Kingdom',
 }
 
 export const COUNTRY_CODE_NUMBER = {
@@ -218,6 +252,27 @@ export const COUNTRY_CODE_NUMBER = {
   4: '+63',
   5: '+66',
   6: '+81',
+  7: '+886',
+  8: '+61',
+  9: '+55',
+  10: '+86',
+  11: '+1',
+  12: '+1',
+  13: '+45',
+  14: '+33',
+  15: '+49',
+  16: '+39',
+  17: '+82',
+  18: '+852',
+  19: '+853',
+  20: '+52',
+  21: '+95',
+  22: '+64',
+  23: '+47',
+  24: '+34',
+  25: '+41',
+  26: '+84',
+  27: '+44',
 }
 
 export const ADD_ON_FEATURE = {
@@ -372,4 +427,16 @@ export const VALUE_KEYS = {
 
 export const SCHEME_TYPE = {
   CORPORATE: 15,
+}
+
+export const INVOICE_VIEW_MODE = {
+  DEFAULT: 'default',
+  APPLIED_SCHEME: 'applied_scheme',
+}
+
+export const ATTACHMENT_TYPE = {
+  CLINICALNOTES: 'ClinicalNotes',
+  VISITREFERRAL: 'VisitReferral',
+  VISIT: 'Visit',
+  EYEVISUALACUITY: 'EyeVisualAcuity',
 }

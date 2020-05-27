@@ -275,7 +275,13 @@ class Form extends React.PureComponent {
   }
 
   onSelectPatientClick = async (patientProfile, autoPopulate = false) => {
-    const { id, patientAccountNo, name, mobileNo } = patientProfile
+    const {
+      id,
+      patientAccountNo,
+      name,
+      mobileNo,
+      countryCodeFK,
+    } = patientProfile
     const { values, setValues } = this.props
     await setValues({
       ...values,
@@ -283,6 +289,7 @@ class Form extends React.PureComponent {
       patientProfileFK: id,
       patientName: name,
       patientContactNo: mobileNo,
+      countryCodeFK,
     })
     this.refreshPatient(id)
     if (!autoPopulate) this.toggleSearchPatientModal()
@@ -768,7 +775,12 @@ class Form extends React.PureComponent {
   shouldDisableButtonAction = () => {
     const { values } = this.props
     const { isDataGridValid } = this.state
-    if (!isDataGridValid || !values.patientName || !values.patientContactNo)
+    if (
+      !isDataGridValid ||
+      !values.patientName ||
+      values.patientContactNo === undefined ||
+      values.patientContactNo === null
+    )
       return true
 
     return false
@@ -861,67 +873,69 @@ class Form extends React.PureComponent {
               className={classnames(classes.formContent)}
               alignItems='flex-start'
             >
-              <GridItem
-                container
-                xs={12}
-                md={7}
-                style={{
-                  height: '100%',
-                  maxHeight: this.props.height - 200,
-                  overflow: 'auto',
-                }}
-              >
-                <PatientInfoInput
-                  disabled={disablePatientInfo}
-                  isEdit={values.id}
-                  onViewPatientProfileClick={this.onViewPatientProfile}
-                  onSearchPatientClick={this.onSearchPatient}
-                  onCreatePatientClick={this.togglePatientProfileModal}
-                  onRegisterToVisitClick={this.actualizeAppointment}
-                  patientContactNo={values.patientContactNo}
-                  patientName={values.patientName}
-                  patientProfileFK={values.patientProfileFK}
-                  appointmentStatusFK={currentAppointment.appointmentStatusFk}
-                  values={values}
-                />
-                <AppointmentDateInput disabled={_disableAppointmentDate} />
-                <GridItem xs md={12} className={classes.verticalSpacing}>
-                  <AppointmentDataGrid
-                    validationSchema={gridValidationSchema}
-                    disabled={disableDataGrid}
-                    appointmentDate={currentAppointment.appointmentDate}
-                    data={_datagrid}
-                    handleCommitChanges={this.onCommitChanges}
-                    handleEditingRowsChange={this.onEditingRowsChange}
-                    editingRows={editingRows}
-                    selectedSlot={selectedSlot}
+              <GridItem container xs={12} md={7}>
+                <GridItem
+                  container
+                  xs
+                  md={12}
+                  style={{
+                    height: this.props.height - 270,
+                    overflow: 'auto',
+                  }}
+                  justify='flex-start'
+                >
+                  <PatientInfoInput
+                    disabled={disablePatientInfo}
+                    isEdit={values.id}
+                    onViewPatientProfileClick={this.onViewPatientProfile}
+                    onSearchPatientClick={this.onSearchPatient}
+                    onCreatePatientClick={this.togglePatientProfileModal}
+                    onRegisterToVisitClick={this.actualizeAppointment}
+                    patientContactNo={values.patientContactNo}
+                    patientName={values.patientName}
+                    patientProfileFK={values.patientProfileFK}
+                    appointmentStatusFK={currentAppointment.appointmentStatusFk}
+                    values={values}
                   />
-                </GridItem>
-                <GridItem xs md={12}>
-                  <Field
-                    name='currentAppointment.appointmentRemarks'
-                    render={(args) => (
-                      <OutlinedTextField
-                        {...args}
-                        disabled={disableDataGrid}
-                        rows='4'
-                        rowsMax='10'
-                        multiline
-                        label='Appointment Remarks'
-                      />
-                    )}
-                  />
-                </GridItem>
-                <GridItem xs md={12}>
-                  <Recurrence
-                    size='lg'
-                    disabled={values.id !== undefined}
-                    formValues={values}
-                    recurrenceDto={values.recurrenceDto}
-                    handleRecurrencePatternChange={
-                      this.onRecurrencePatternChange
-                    }
-                  />
+                  <AppointmentDateInput disabled={_disableAppointmentDate} />
+                  <GridItem xs md={12} className={classes.verticalSpacing}>
+                    <AppointmentDataGrid
+                      validationSchema={gridValidationSchema}
+                      disabled={disableDataGrid}
+                      appointmentDate={currentAppointment.appointmentDate}
+                      data={_datagrid}
+                      handleCommitChanges={this.onCommitChanges}
+                      handleEditingRowsChange={this.onEditingRowsChange}
+                      editingRows={editingRows}
+                      selectedSlot={selectedSlot}
+                    />
+                  </GridItem>
+                  <GridItem xs md={12}>
+                    <Field
+                      name='currentAppointment.appointmentRemarks'
+                      render={(args) => (
+                        <OutlinedTextField
+                          {...args}
+                          disabled={disableDataGrid}
+                          rows='10'
+                          rowsMax='10'
+                          multiline
+                          label='Appointment Remarks'
+                        />
+                      )}
+                    />
+                  </GridItem>
+                  <GridItem xs md={12}>
+                    <Recurrence
+                      size='lg'
+                      disabled={values.id !== undefined}
+                      formValues={values}
+                      recurrenceDto={values.recurrenceDto}
+                      handleRecurrencePatternChange={
+                        this.onRecurrencePatternChange
+                      }
+                    />
+                  </GridItem>
                 </GridItem>
                 <GridItem xs md={12} className={classes.footerGrid}>
                   <FormFooter

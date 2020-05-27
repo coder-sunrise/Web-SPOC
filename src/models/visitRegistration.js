@@ -1,8 +1,8 @@
 import router from 'umi/router'
 import { createFormViewModel } from 'medisys-model'
-import * as service from '../services/visit'
 import { query as queryPatient } from '@/services/patient'
 import { getRemovedUrl } from '@/utils/utils'
+import * as service from '../services/visit'
 
 const openModal = {
   type: 'global/updateAppState',
@@ -91,6 +91,8 @@ export default createFormViewModel({
             errorState: {},
             roomFK: undefined,
             appointmentFK: undefined,
+            expandRefractionForm: undefined,
+            expandExaminationForm: undefined,
           },
         })
         yield put({
@@ -110,7 +112,7 @@ export default createFormViewModel({
         try {
           const response = yield call(service.query, payload)
           const { data = {} } = response
-          const { visit: { patientProfileFK } } = data
+          const { visit: { patientProfileFK, visitEyeRefractionForm } } = data
 
           if (patientProfileFK) {
             // const { patientProfileFK } = visit
@@ -124,13 +126,33 @@ export default createFormViewModel({
               })
             }
             // yield take('fetchPatientInfoByPatientID/@@end')
+            let refractionFormData
+            if (visitEyeRefractionForm) {
+              if (
+                visitEyeRefractionForm.formData &&
+                typeof visitEyeRefractionForm.formData === 'string'
+              ) {
+                refractionFormData = JSON.parse(visitEyeRefractionForm.formData)
+              } else {
+                // eslint-disable-next-line prefer-destructuring
+                refractionFormData = visitEyeRefractionForm.formData
+              }
+            }
+
             yield put({
               type: 'updateState',
               payload: {
-                visitInfo: data,
+                visitInfo: {
+                  ...data,
+                  visitEyeRefractionForm: {
+                    ...visitEyeRefractionForm,
+                    formData: refractionFormData,
+                  },
+                },
                 attachmentOriList: [
                   ...data.visit.visitAttachment,
                 ],
+                expandRefractionForm: !!visitEyeRefractionForm,
               },
             })
           }

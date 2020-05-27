@@ -61,11 +61,11 @@ const errorMessage = (v) => {
 @withFormikExtend({
   enableReinitialize: true,
   notDirtyDuration: 0.3,
-  mapPropsToValues: ({ masterPrintoutSetting, reportFK }) => {
+  mapPropsToValues: ({ masterPrintoutSetting, id }) => {
     const returnValue =
       masterPrintoutSetting.entity || masterPrintoutSetting.default
     return {
-      reportFK,
+      id,
       ...returnValue,
     }
   },
@@ -111,7 +111,7 @@ const errorMessage = (v) => {
   }),
   handleSubmit: (values, { props }) => {
     const { dispatch } = props
-    const { customLetterHeadImage, footerDisclaimerImage } = values
+    const { customLetterHeadImage, footerDisclaimerImage,id } = values
     console.log(customLetterHeadImage)
     const noHeaderBase64 = (v) => {
       if (v === '') return v
@@ -131,7 +131,7 @@ const errorMessage = (v) => {
         dispatch({
           type: 'masterPrintoutSetting/query',
           payload: {
-            id: 1,
+            id,
           },
         })
       }
@@ -140,7 +140,7 @@ const errorMessage = (v) => {
   displayName: 'masterPrintoutSettingInfo',
 })
 class MasterPrintoutSetting extends PureComponent {
-  state = { selected: !!this.props.values.reportFK, prevSelectedIndex: 0 }
+  state = { selected: !!this.props.values.id, prevSelectedId: 0 }
 
   componentDidMount = () => {
     this.props.dispatch({
@@ -164,7 +164,7 @@ class MasterPrintoutSetting extends PureComponent {
 
   checkFormIsDirty = (e) => {
     const { formik, dispatch, setFieldValue } = this.props
-    if (this.setState.prevSelectedIndex === 0) {
+    if (this.setState.prevSelectedId === 0) {
       return
     }
 
@@ -178,10 +178,12 @@ class MasterPrintoutSetting extends PureComponent {
           openConfirm: true,
           openConfirmContent: 'Are you sure want to discard the changes?',
           onConfirmSave: () => {
+            this.setState({ prevSelectedId: e })  
             this.getSelectedReportSetting(e)
           },
           onConfirmClose: () => {
-            setFieldValue('reportFK', this.state.prevSelectedIndex)
+            console.log(this.state.prevSelectedId)
+            setFieldValue('id', this.state.prevSelectedId)
           },
 
           // openConfirmText: 'Discard Changes',
@@ -193,8 +195,8 @@ class MasterPrintoutSetting extends PureComponent {
   }
 
   getSelectedReportSetting = (e) => {
-    const { dispatch } = this.props
-
+    const { dispatch,setFieldValue, resetForm } = this.props
+    resetForm()
     if (e) {
       dispatch({
         type: 'masterPrintoutSetting/query',
@@ -202,20 +204,23 @@ class MasterPrintoutSetting extends PureComponent {
           id: e,
         },
       }).then((v) => {
-        if (v) {
+        if (v) { 
           this.setState(() => {
             return {
               selected: true,
             }
           })
-        } else {
+        } else { 
           notification.warn({
             message: 'No default setting for the selected report in database',
-          })
+          })  
+          this.setState({ prevSelectedId: e }) 
+          setFieldValue('id', e)
         }
       })
 
-      this.setState({ prevSelectedIndex: e })
+      this.setState({ prevSelectedId: e }) 
+      setFieldValue('id', e)
     } else {
       this.setState(() => {
         return {
@@ -223,16 +228,6 @@ class MasterPrintoutSetting extends PureComponent {
         }
       })
     }
-
-    // dispatch({
-    //   type: 'formik/updateState',
-    //   payload: {
-    //     printoutSettingInfo: {
-    //       ...formik.printoutSettingInfo,
-    //       dirty: false,
-    //     },
-    //   },
-    // })
   }
 
   render () {
@@ -255,7 +250,7 @@ class MasterPrintoutSetting extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <FastField
-                name='reportFK'
+                name='id'                
                 render={(args) => (
                   <CodeSelect
                     label='Select Printout'

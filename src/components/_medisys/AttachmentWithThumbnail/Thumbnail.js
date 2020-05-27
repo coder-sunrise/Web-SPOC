@@ -16,12 +16,6 @@ import {
 } from '@/components'
 import { DeleteWithPopover, LoadingWrapper } from '@/components/_medisys'
 // utils
-import {
-  imageFileExtensions,
-  pdfFileExtensions,
-  excelFileExtensions,
-  wordFileExtensions,
-} from './utils'
 import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
 // services
 import { getFileByFileID } from '@/services/file'
@@ -30,6 +24,12 @@ import dummyThumbnail from '@/assets/thumbnail-icons/dummy-thumbnail-icon.png'
 import pdfIcon from '@/assets/thumbnail-icons/pdf-icon.png'
 import wordIcon from '@/assets/thumbnail-icons/word-icon.png'
 import excelIcon from '@/assets/thumbnail-icons/excel-icon.png'
+import {
+  imageFileExtensions,
+  pdfFileExtensions,
+  excelFileExtensions,
+  wordFileExtensions,
+} from './utils'
 
 const styles = (theme) => ({
   simpleRoot: {
@@ -111,6 +111,7 @@ const Thumbnail = ({
   noBorder = true,
   fieldName,
   size = { width: 64, height: 64 },
+  hideRemarks,
 }) => {
   const {
     fileIndexFK,
@@ -176,9 +177,12 @@ const Thumbnail = ({
 
   const handleAttachmentClicked = () => {
     if (!attachment) return
+
+    console.log(attachment)
+
     if (
       useImageViewer &&
-      imageFileExtensions.includes(attachment.fileExtension)
+      imageFileExtensions.includes(attachment.fileExtension.toLowerCase())
     ) {
       // show image preview
       dispatch({
@@ -273,21 +277,23 @@ const Thumbnail = ({
               />
             </div>
           </GridItem>
-          <GridItem md={12}>
-            <SizeContainer size='sm'>
-              <FastField
-                name={`${fieldName}[${indexInAllAttachments}].remarks`}
-                render={(args) => (
-                  <TextField
-                    {...args}
-                    size='sm'
-                    label='Remarks'
-                    disabled={isReadOnly}
-                  />
-                )}
-              />
-            </SizeContainer>
-          </GridItem>
+          {!hideRemarks && (
+            <GridItem md={12}>
+              <SizeContainer size='sm'>
+                <FastField
+                  name={`${fieldName}[${indexInAllAttachments}].remarks`}
+                  render={(args) => (
+                    <TextField
+                      {...args}
+                      size='sm'
+                      label='Remarks'
+                      disabled={isReadOnly}
+                    />
+                  )}
+                />
+              </SizeContainer>
+            </GridItem>
+          )}
         </GridContainer>
       </LoadingWrapper>
     </div>

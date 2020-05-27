@@ -189,7 +189,7 @@ class Appointment extends React.PureComponent {
     })
 
     dispatch({
-        type: 'appointment/getFilterTemplate',
+      type: 'appointment/getFilterTemplate',
     })
   }
 
