@@ -14,19 +14,19 @@ export default createFormViewModel({
         typeName: 'Letter of Certification',
         statusFK: 1,
         formData: {
-          caseType: '2',
+          caseType: 'DaySurgery',
           procuderes: [],
           otherDiagnosis: [],
           surgicalCharges: [],
           nonSurgicalCharges: [],
-          others: '',
+          others: null,
         },
       },
       default: {},
       rows: [],
     },
     effects: {
-      *upsertRow ({ payload }, { call, put }) {
+      *upsertRow ({ payload }, { put }) {
         yield put({
           type: 'upsertRowState',
           payload,

@@ -1,16 +1,13 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
-import $ from 'jquery'
-import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 import moment from 'moment'
 import Yup from '@/utils/yup'
 import {
   GridContainer,
   withFormikExtend,
   Button,
-  CardContainer,
-  Accordion,
+  ProgressButton,
 } from '@/components'
 import CommonLCForm from '@/components/_medisys/Forms/CommonLCForm/index'
 
@@ -47,8 +44,7 @@ const procuderesSchema = Yup.object().shape({
   surgicalCharges: Yup.array().of(surgicalChargesSchema),
 })
 
-@connect(({ global, patient, visitRegistration, diagnosis }) => ({
-  global,
+@connect(({ patient, visitRegistration, diagnosis }) => ({
   patient: patient.entity,
   visit: visitRegistration.entity.visit,
   cORDiagnosis: diagnosis.rows,
@@ -67,6 +63,7 @@ const procuderesSchema = Yup.object().shape({
         ...forms.entity,
       }
     } else {
+      console.log('cORDiagnosis', cORDiagnosis)
       const { visitDate, doctorProfileFK } = visit
       const { name, patientReferenceNo, patientAccountNo } = patient
       const { doctorprofile } = codetable
@@ -113,7 +110,11 @@ const procuderesSchema = Yup.object().shape({
           dischargeDate: visitDate,
           principalDiagnosisFK,
           secondDiagnosisAFK,
+          secondDiagnosisACode: null,
+          secondDiagnosisAName: null,
           secondDiagnosisBFK,
+          secondDiagnosisBCode: null,
+          secondDiagnosisBName: null,
           otherDiagnosis,
           principalSurgeonFK: doctorProfileFK,
           principalSurgeonMCRNo: doctor ? doctor.doctorMCRNo : undefined,
@@ -128,7 +129,7 @@ const procuderesSchema = Yup.object().shape({
               procedureDate: visitDate,
               procedureStartTime: moment(),
               procedureEndTime: moment(),
-              natureOfOpertation: '1',
+              natureOfOpertation: 'Medical',
               surgicalCharges: [
                 {
                   id: -1,
@@ -145,6 +146,7 @@ const procuderesSchema = Yup.object().shape({
                   totalSurgicalFees: 0,
                   gSTChargedFK: 1,
                   gSTChargedName: 'Charged',
+                  sortOrder: 0,
                 },
               ],
             },
@@ -160,7 +162,7 @@ const procuderesSchema = Yup.object().shape({
       admittingSpecialtys: Yup.array().required(),
       principalSurgeonFK: Yup.number().required(),
       others: Yup.number().when('admittingSpecialtys', {
-        is: (val) => val && val.find((o) => o === 99),
+        is: (val) => val && val.find((o) => o === '99'),
         then: Yup.string().required(),
       }),
       otherDiagnosis: Yup.array().of(diagnosisSchema),
@@ -227,8 +229,7 @@ class LCForm extends PureComponent {
             cancel
           </Button>
           {statusFK === 1 && (
-            <Button
-              disabled={global.disableSave}
+            <ProgressButton
               color='primary'
               icon={null}
               onClick={() => {
@@ -236,12 +237,11 @@ class LCForm extends PureComponent {
               }}
             >
               finalize
-            </Button>
+            </ProgressButton>
           )}
 
           {(statusFK === 1 || statusFK === 2) && (
-            <Button
-              disabled={global.disableSave}
+            <ProgressButton
               color='success'
               icon={null}
               onClick={() => {
@@ -249,7 +249,7 @@ class LCForm extends PureComponent {
               }}
             >
               submit
-            </Button>
+            </ProgressButton>
           )}
         </GridContainer>
       </div>

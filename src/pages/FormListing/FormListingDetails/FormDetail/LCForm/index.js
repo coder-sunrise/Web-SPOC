@@ -4,7 +4,12 @@ import _ from 'lodash'
 import moment from 'moment'
 import Yup from '@/utils/yup'
 import { FORM_CATEGORY, FORM_FROM } from '@/utils/constants'
-import { GridContainer, withFormikExtend, Button } from '@/components'
+import {
+  GridContainer,
+  withFormikExtend,
+  Button,
+  ProgressButton,
+} from '@/components'
 import CommonLCForm from '@/components/_medisys/Forms/CommonLCForm/index'
 
 const diagnosisSchema = Yup.object().shape({
@@ -40,8 +45,7 @@ const procuderesSchema = Yup.object().shape({
   surgicalCharges: Yup.array().of(surgicalChargesSchema),
 })
 
-@connect(({ global, formListing }) => ({
-  global,
+@connect(({ formListing }) => ({
   formListing,
 }))
 @withFormikExtend({
@@ -52,6 +56,7 @@ const procuderesSchema = Yup.object().shape({
         ...formListing.entity,
       }
     } else {
+      const { visitDetail = {} } = formListing
       const {
         visitDate,
         doctorProfileFK,
@@ -59,7 +64,7 @@ const procuderesSchema = Yup.object().shape({
         patientNRICNo,
         patientAccountNo,
         cORDiagnosis = [],
-      } = formListing.visitDetail
+      } = visitDetail
       const { doctorprofile } = codetable
       const doctor = doctorprofile.find((o) => o.id === doctorProfileFK)
 
@@ -106,7 +111,11 @@ const procuderesSchema = Yup.object().shape({
           dischargeDate: visitDate,
           principalDiagnosisFK,
           secondDiagnosisAFK,
+          secondDiagnosisACode: null,
+          secondDiagnosisAName: null,
           secondDiagnosisBFK,
+          secondDiagnosisBCode: null,
+          secondDiagnosisBName: null,
           otherDiagnosis,
           principalSurgeonFK: doctorProfileFK,
           principalSurgeonMCRNo: doctor ? doctor.doctorMCRNo : undefined,
@@ -121,7 +130,7 @@ const procuderesSchema = Yup.object().shape({
               procedureDate: visitDate,
               procedureStartTime: moment(),
               procedureEndTime: moment(),
-              natureOfOpertation: '1',
+              natureOfOpertation: 'Medical',
               surgicalCharges: [
                 {
                   id: -1,
@@ -138,6 +147,7 @@ const procuderesSchema = Yup.object().shape({
                   totalSurgicalFees: 0,
                   gSTChargedFK: 1,
                   gSTChargedName: 'Charged',
+                  sortOrder: 0,
                 },
               ],
             },
@@ -153,7 +163,7 @@ const procuderesSchema = Yup.object().shape({
       admittingSpecialtys: Yup.array().required(),
       principalSurgeonFK: Yup.number().required(),
       others: Yup.number().when('admittingSpecialtys', {
-        is: (val) => val && val.find((o) => o === 99),
+        is: (val) => val && val.find((o) => o === '99'),
         then: Yup.string().required(),
       }),
       otherDiagnosis: Yup.array().of(diagnosisSchema),
@@ -283,8 +293,7 @@ class LCForm extends PureComponent {
             cancel
           </Button>
           {(formCategory === FORM_CATEGORY.VISITFORM || statusFK === 1) && (
-            <Button
-              disabled={global.disableSave}
+            <ProgressButton
               color='primary'
               icon={null}
               onClick={() => {
@@ -294,13 +303,12 @@ class LCForm extends PureComponent {
               <sapn>
                 {formCategory === FORM_CATEGORY.VISITFORM ? 'save' : 'finalize'}
               </sapn>
-            </Button>
+            </ProgressButton>
           )}
 
           {formCategory === FORM_CATEGORY.CORFORM &&
           (statusFK === 1 || statusFK === 2) && (
-            <Button
-              disabled={global.disableSave}
+            <ProgressButton
               color='success'
               icon={null}
               onClick={() => {
@@ -308,7 +316,7 @@ class LCForm extends PureComponent {
               }}
             >
               submit
-            </Button>
+            </ProgressButton>
           )}
         </GridContainer>
       </div>

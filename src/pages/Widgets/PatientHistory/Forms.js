@@ -19,6 +19,7 @@ export const viewReport = (row) => {
         reportTypeID: downloadConfig.id,
         reportParameters: {
           [downloadConfig.key]: row.id,
+          FormCategory: 'CORForm',
           isSaved: true,
         },
       },

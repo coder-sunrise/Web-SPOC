@@ -168,9 +168,9 @@ class VisitFormGrid extends PureComponent {
   }
 
   render () {
-    const { formListing, dispatch, theme, classes, setFieldValue } = this.props
-    const { list, visitDetail = {} } = formListing
-    let { isCanEditForms = false } = visitDetail
+    let { formListing, dispatch, theme, classes, setFieldValue } = this.props
+    let { list, visitDetail = {} } = formListing
+    let { isCanEditForms = true } = visitDetail
     return (
       <div>
         <Checkbox
@@ -210,7 +210,7 @@ class VisitFormGrid extends PureComponent {
               type: 'link',
               linkField: 'href',
               onClick: (row) => {
-                this.viewReport(row)
+                this.props.viewReport(row, this.props)
               },
             },
             {
@@ -229,7 +229,6 @@ class VisitFormGrid extends PureComponent {
                   <React.Fragment>
                     <Tooltip title='Print'>
                       <Button
-                        disabled={!isCanEditForms}
                         size='sm'
                         onClick={() => {
                           const { formCategory, printRow } = this.props
@@ -245,7 +244,7 @@ class VisitFormGrid extends PureComponent {
                     {(row.statusFK === 1 || row.statusFK === 2) && (
                       <Tooltip title='Edit'>
                         <Button
-                          disabled={!isCanEditForms}
+                          disabled={!row.isCanEditForms}
                           size='sm'
                           onClick={() => {
                             this.editRow(row)
@@ -296,7 +295,7 @@ class VisitFormGrid extends PureComponent {
                       >
                         <Tooltip title='Delete'>
                           <Button
-                            disabled={!isCanEditForms}
+                            disabled={!row.isCanEditForms}
                             size='sm'
                             color='danger'
                             justIcon
@@ -360,15 +359,10 @@ class VisitFormGrid extends PureComponent {
                 }
               >
                 <Tooltip title='Add Form'>
-                  <Tooltip title='Add Form'>
-                    <Button
-                      color='primary'
-                      style={{ margin: theme.spacing(1) }}
-                    >
-                      <Add />
-                      Add New
-                    </Button>
-                  </Tooltip>
+                  <Button color='primary' style={{ margin: theme.spacing(1) }}>
+                    <Add />
+                    Add New
+                  </Button>
                 </Tooltip>
               </Popover>
             )

@@ -167,6 +167,7 @@ const DiagnosisSelect = ({
           if (onDataSouceChange) onDataSouceChange(data)
         }}
         onChange={(values, opts) => {
+          console.log('sdfsdfsdfsd')
           if (
             props.maxTagCount === undefined &&
             props.mode &&

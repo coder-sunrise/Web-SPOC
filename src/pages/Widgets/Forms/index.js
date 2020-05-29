@@ -448,15 +448,10 @@ class Forms extends PureComponent {
                 }
               >
                 <Tooltip title='Add Form'>
-                  <Tooltip title='Add Form'>
-                    <Button
-                      color='primary'
-                      style={{ margin: theme.spacing(1) }}
-                    >
-                      <Add />
-                      Add New
-                    </Button>
-                  </Tooltip>
+                  <Button color='primary' style={{ margin: theme.spacing(1) }}>
+                    <Add />
+                    Add New
+                  </Button>
                 </Tooltip>
               </Popover>
             )

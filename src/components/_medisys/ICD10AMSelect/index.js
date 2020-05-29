@@ -1,28 +1,9 @@
-import React, { useState } from 'react'
-import { withStyles } from '@material-ui/core'
-import _ from 'lodash'
-import { Select } from '@/components'
+import React, { PureComponent } from 'react'
+import { CodeSelect } from '@/components'
 import { queryList } from '@/services/common'
 
-const styles = (theme) => ({})
-
-const ICD10AMSelect = ({
-  dispatch,
-  theme,
-  classes,
-  label,
-  onDataSouceChange,
-  labelField,
-  valueField,
-  mode,
-  ...props
-}) => {
-  const [
-    ctICD10AM,
-    setCtICD10AM,
-  ] = useState([])
-
-  const onICD10AMSearch = async (v) => {
+class ICD10AMSelect extends PureComponent {
+  onICD10AMSearch = async (v) => {
     const search = {
       props: 'id,displayvalue,code',
       sorting: [
@@ -31,50 +12,49 @@ const ICD10AMSelect = ({
       pagesize: 30,
     }
     if (typeof v === 'string') {
-      search.group = [
-        {
-          displayvalue: v,
-          code: v,
-          combineCondition: 'or',
-        },
-      ]
+      const { labelField } = this.props
+      if (!labelField || labelField === 'code') {
+        search.code = v
+      } else {
+        search.displayvalue = v
+      }
     } else {
       search.id = Number(v)
     }
 
-    const response = await queryList('/api/codetable/cticd10am', search)
+    const response = await queryList('/api/codetable/ctsnomeddiagnosis', search)
     if (response && response.data) {
-      setCtICD10AM(response.data.data)
-
-      dispatch({
-        type: 'codetable/updateState',
-        payload: {
-          'codetable/cticd10am': response.data.data,
-        },
-      })
+      if (this.props.onDataSouceChange)
+        this.props.onDataSouceChange(response.data.data)
     }
     return response
   }
 
-  return (
-    <Select
-      label={mode === 'tags' ? undefined : label || 'ICD10-AM'}
-      mode
-      options={ctICD10AM}
-      valueField={valueField || 'id'}
-      labelField={labelField || 'displayvalue'}
-      query={onICD10AMSearch}
-      onDataSouceChange={(data) => {
-        setCtICD10AM(data)
-        if (onDataSouceChange) onDataSouceChange(data)
-      }}
-      onChange={(values, opts) => {
-        if (props.onChange) {
-          props.onChange(values, opts)
-        }
-      }}
-      {...props}
-    />
-  )
+  render () {
+    const {
+      valueField,
+      labelField,
+      label,
+      mode,
+      options,
+      ...otherprops
+    } = this.props
+    return (
+      <CodeSelect
+        label={label}
+        mode={mode}
+        options={options}
+        valueField={valueField || 'id'}
+        labelField={labelField || 'code'}
+        query={this.onICD10AMSearch}
+        onChange={(values, opts) => {
+          if (this.props.onChange) {
+            this.props.onChange(values, opts)
+          }
+        }}
+        {...otherprops}
+      />
+    )
+  }
 }
-export default withStyles(styles, { withTheme: true })(ICD10AMSelect)
+export default ICD10AMSelect

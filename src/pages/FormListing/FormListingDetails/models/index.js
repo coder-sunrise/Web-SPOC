@@ -32,7 +32,7 @@ export default createListViewModel({
         typeName: 'Letter of Certification',
         statusFK: 1,
         formData: {
-          caseType: '2',
+          caseType: 'DaySurgery',
           procuderes: [],
           otherDiagnosis: [],
           surgicalCharges: [],
@@ -88,6 +88,17 @@ export default createListViewModel({
 
       queryFormDone (st, { payload }) {
         const { data } = payload
+        const {
+          id,
+          currentCORId,
+          visitDate,
+          doctorProfileFK,
+          patientName,
+          patientNRICNo,
+          patientAccountNo,
+          isCanEditForms,
+          cORDiagnosis,
+        } = data
         let formRows = []
         if (data.formType === 'VisitForm') {
           visitFormTypes.forEach((p) => {
@@ -100,6 +111,7 @@ export default createListViewModel({
                   ...o,
                   formData: JSON.parse(o.formData),
                   statusFK: 1,
+                  isCanEditForms,
                 }
                 return d
               }),
@@ -115,6 +127,7 @@ export default createListViewModel({
                   typeName: p.name,
                   ...o,
                   formData: JSON.parse(o.formData),
+                  isCanEditForms,
                 }
                 return d
               }),
@@ -122,17 +135,6 @@ export default createListViewModel({
           })
         }
 
-        const {
-          id,
-          currentCORId,
-          visitDate,
-          doctorProfileFK,
-          patientName,
-          patientNRICNo,
-          patientAccountNo,
-          isCanEditForms,
-          cORDiagnosis,
-        } = data
         return {
           ...st,
           visitDetail: {

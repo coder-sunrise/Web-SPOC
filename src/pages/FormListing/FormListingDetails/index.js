@@ -6,7 +6,7 @@ import FilterBar from './FilterBar'
 import FormModuleGrid from './FormModuleGrid'
 import VisitFormGrid from './VisitFormGrid'
 import { CardContainer, CommonModal, notification } from '@/components'
-import { FORM_FROM } from '@/utils/constants'
+import { FORM_CATEGORY, FORM_FROM } from '@/utils/constants'
 import model from './models'
 import AddForm from './FormDetail/AddForm'
 import { commonDataReaderTransform } from '@/utils/utils'
@@ -15,7 +15,7 @@ import { download } from '@/utils/request'
 
 window.g_app.replaceModel(model)
 
-export const printRow = async (row, formCategory = 'CORForm') => {
+export const printRow = async (row, formCategory = '2') => {
   const type = formTypes.find(
     (o) => o.value === row.type || o.name === row.type || o.code === row.type,
   )
@@ -26,7 +26,10 @@ export const printRow = async (row, formCategory = 'CORForm') => {
   }
   // return
   download(
-    `/api/Reports/${downloadConfig.id}?ReportFormat=pdf&ReportParameters={${downloadConfig.key}:${row.id},"FormCategory":${formCategory}}`,
+    `/api/Reports/${downloadConfig.id}?ReportFormat=pdf&ReportParameters={${downloadConfig.key}:${row.id},FormCategory:"${formCategory ===
+    FORM_CATEGORY.VISITFORM
+      ? 'VisitForm'
+      : 'CORForm'}"}`,
     {
       subject: row.subject,
       type: 'pdf',
@@ -44,9 +47,8 @@ export const viewReport = (row, props) => {
     return false
   }
 
-  const { codetable, patient } = props
+  const { codetable } = props
   const { clinicianprofile = [] } = codetable
-  const { entity } = patient
   const obj =
     clinicianprofile.find(
       (o) =>
@@ -60,8 +62,8 @@ export const viewReport = (row, props) => {
     ? obj.doctorProfile.doctorMCRNo
     : ''
 
-  reportParameters.patientName = entity.name
-  reportParameters.patientAccountNo = entity.patientAccountNo
+  reportParameters.patientName = row.formData.patientName
+  reportParameters.patientAccountNo = row.formData.patientAccountNo
   window.g_app._store.dispatch({
     type: 'report/updateState',
     payload: {
@@ -80,14 +82,13 @@ export const viewReport = (row, props) => {
 
 const styles = () => ({})
 
-@connect(({ formListing, codetable, patient }) => ({
+@connect(({ formListing, codetable }) => ({
   formListing,
   codetable,
-  patient,
 }))
 class FormListingDetails extends PureComponent {
   componentDidMount () {
-    this.queryFormListing()
+    //this.queryFormListing()
   }
 
   queryFormListing = () => {

@@ -166,6 +166,7 @@ export const REPORT_TYPE = {
   27: 'Patient Label',
   29: 'Payment Receipt',
   37: 'Inventory Trending Report',
+  45: 'Letter of Certification',
 }
 
 export const REPORT_ID = {

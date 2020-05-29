@@ -1043,7 +1043,7 @@ const formTypes = [
       key: 'LetterofCertificationId',
       subject: 'Letter of Certification',
       draft: (row) => {
-        const { formData } = row
+        const { formData, statusFK } = row
 
         let LCFormSurgicalCharges = []
         formData.procuderes.filter((p) => p.index <= 3).forEach((element) => {
@@ -1133,7 +1133,7 @@ const formTypes = [
 
         let LCFormNonSurgicalCharges = []
         for (let index = 0; index < 7; index++) {
-          LCFormSurgicalChargesAnnex.push({
+          LCFormNonSurgicalCharges.push({
             DoctorMCRNo: formData.nonSurgicalCharges[index]
               ? formData.nonSurgicalCharges[index].surgicalSurgeonMCRNo
               : '',
@@ -1161,8 +1161,24 @@ const formTypes = [
         return {
           LCFormDetails: [
             {
-              ...row,
-              referralDate: moment(row.referralDate).format(dateFormatLong),
+              StatusFK: statusFK,
+              PatientName: formData.patientName,
+              PatientNRIC: formData.patientNRICNo,
+              PatientAccountNo: formData.patientAccountNo,
+              DateOfAdmission: formData.admissionDate,
+              DateOfDischarge: formData.dischargeDate,
+              AdmittingSpecialtyCode: formData.admittingSpecialtys.join(','),
+              OtherSpecialty: formData.others,
+              CaseType: formData.caseType,
+              PrincipalDiagnosisCode: formData.principalDiagnosisCode,
+              PrincipalDiagnosisDescription: formData.principalDiagnosisName,
+              SecondaryDiagnosisCode1: formData.secondDiagnosisACode,
+              SecondaryDiagnosisDescription1: formData.secondDiagnosisAName,
+              SecondaryDiagnosisCode2: formData.secondDiagnosisBCode,
+              SecondaryDiagnosisDescription2: formData.secondDiagnosisBName,
+              OtherDiagnosis: formData.otherDiagnosis
+                .map((o) => o.diagnosisName)
+                .join('|'),
             },
           ],
           LCFormSurgicalCharges,
