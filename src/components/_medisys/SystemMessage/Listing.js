@@ -49,7 +49,7 @@ const styles = (theme) => ({
 class SystemMessageList extends React.Component {
   render () {
     const { dispatch, systemMessage, classes } = this.props
-    const { list } = systemMessage
+    const { list = [] } = systemMessage
     const rootClass = classnames({
       [classes.root]: true,
       [classes.listRoot]: list.length > 0,

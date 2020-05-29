@@ -53,16 +53,18 @@ class HeaderLinks extends React.Component {
         current,
       ] = data
 
-      const { createDate: currentDate } = current
-      const { createDate: preDate } = p
+      if (current) {
+        const { createDate: currentDate } = current
+        const { createDate: preDate } = p
 
-      if (preDate && currentDate) {
-        const d1 = moment(preDate)
-        const d2 = moment(currentDate)
-        return d1.isBefore(d2) ? current : p
-      }
-      if (currentDate) {
-        return current
+        if (preDate && currentDate) {
+          const d1 = moment(preDate)
+          const d2 = moment(currentDate)
+          return d1.isBefore(d2) ? current : p
+        }
+        if (currentDate) {
+          return current
+        }
       }
       return p
     }, {})
