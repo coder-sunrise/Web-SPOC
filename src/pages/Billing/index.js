@@ -182,6 +182,10 @@ class Billing extends Component {
     })
   }
 
+  onPrintRef = (ref) => {
+    this.childOnPrintRef = ref
+  }
+
   validateSchemesWithPatientProfile = (invoicePayers = []) => {
     const { doesNotMatch, schemes } = validateApplySchemesWithPatientSchemes({
       ...this.props,
@@ -199,20 +203,43 @@ class Billing extends Component {
     this.toggleSchemeValidationPrompt()
   }
 
+  printAfterComplete = async () => {
+    let settings = JSON.parse(localStorage.getItem('clinicSettings'))
+    if (settings && settings.autoPrintDrugLabelOnCompleteBilling) {
+      await this.onExpandDispenseDetails()
+
+      const { dispense } = this.props
+      const { prescription = [] } = dispense.entity
+      this.setState({
+        selectedDrugs: prescription.map((x) => {
+          return { ...x, no: 1, selected: true }
+        }),
+      })
+      await this.childOnPrintRef({
+        type: 1,
+        row: {},
+        printAllDrugLabel: true,
+      })
+    }
+  }
+
   upsertBilling = async (callback = null, noValidation = false) => {
     const { dispatch, values, resetForm, patient } = this.props
     const { visitStatus, invoicePayer = [] } = values
+
     try {
       const isSchemesValid = noValidation
         ? true
         : this.validateSchemesWithPatientProfile(invoicePayer)
       if (isSchemesValid) {
         const payload = constructPayload(values)
-        const defaultCallback = () => {
+        const defaultCallback = async () => {
           if (visitStatus === 'COMPLETED') {
             notification.success({
               message: 'Billing Completed',
             })
+            await this.printAfterComplete()
+
             router.push('/reception/queue')
           } else {
             notification.success({
@@ -239,7 +266,7 @@ class Billing extends Component {
             callback()
             return
           }
-          defaultCallback()
+          await defaultCallback()
         }
       }
     } catch (error) {
@@ -277,11 +304,11 @@ class Billing extends Component {
     })
   }
 
-  onExpandDispenseDetails = () => {
+  onExpandDispenseDetails = async () => {
     const { dispense } = this.props
 
     if (!dispense.entity) {
-      this.props.dispatch({
+      await this.props.dispatch({
         type: 'billing/showDispenseDetails',
       })
     }
@@ -447,8 +474,6 @@ class Billing extends Component {
 
   handleDrugLabelClick = () => {
     const { dispense } = this.props
-    console.log('dispense')
-    console.log(dispense)
     const { prescription = [] } = dispense.entity
     this.setState((prevState) => {
       return {
@@ -548,6 +573,7 @@ class Billing extends Component {
                         onDrugLabelSelected={this.handleDrugLabelSelected}
                         onDrugLabelNoChanged={this.handleDrugLabelNoChanged}
                         selectedDrugs={this.state.selectedDrugs}
+                        onPrintRef={this.onPrintRef}
                       />
                     </div>
                   ),
