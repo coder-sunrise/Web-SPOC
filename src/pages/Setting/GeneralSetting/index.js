@@ -21,6 +21,7 @@ import {
   Select,
   Button,
   Switch,
+  Checkbox,
   WarningSnackbar,
   CodeSelect,
 } from '@/components'
@@ -45,9 +46,10 @@ const styles = (theme) => ({
         showConsultationVersioning,
         autoRefresh,
         defaultVisitType,
-        autoPrintDrugLabel,
+        autoPrintDrugLabelOnFinalize,
+        autoPrintDrugLabelOnSignOff,
+        autoPrintDrugLabelOnCompleteBilling,
       } = clinicSettings.entity
-
       return {
         ...clinicSettings.entity,
         defaultVisitType: {
@@ -58,10 +60,20 @@ const styles = (theme) => ({
           ...autoRefresh,
           settingValue: autoRefresh.settingValue === 'true',
         },
-        autoPrintDrugLabel: {
-          ...autoPrintDrugLabel,
+        autoPrintDrugLabelOnFinalize: {
+          ...autoPrintDrugLabelOnFinalize,
           settingValue:
-            autoPrintDrugLabel && autoPrintDrugLabel.settingValue === 'true',
+            autoPrintDrugLabelOnFinalize && autoPrintDrugLabelOnFinalize.settingValue === 'true',
+        },
+        autoPrintDrugLabelOnCompleteBilling: {
+          ...autoPrintDrugLabelOnCompleteBilling,
+          settingValue:
+            autoPrintDrugLabelOnCompleteBilling && autoPrintDrugLabelOnCompleteBilling.settingValue === 'true',
+        },
+        autoPrintDrugLabelOnSignOff: {
+          ...autoPrintDrugLabelOnSignOff,
+          settingValue:
+            autoPrintDrugLabelOnSignOff && autoPrintDrugLabelOnSignOff.settingValue === 'true',
         },
         showConsultationVersioning: {
           ...showConsultationVersioning,
@@ -116,7 +128,7 @@ class GeneralSetting extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const {
       classes,
       clinicSettings,
@@ -183,7 +195,6 @@ class GeneralSetting extends PureComponent {
               />
             </GridItem>
           </GridContainer>
-
           <GridContainer>
             <GridItem md={3}>
               <Field
@@ -213,12 +224,40 @@ class GeneralSetting extends PureComponent {
             </GridItem>
           </GridContainer>
           <GridContainer>
-            <GridItem md={3}>
+            <GridItem md={12}>
+              <span>Auto Print Drug Label</span>
+            </GridItem>
+            <GridItem md={2}>
               <Field
-                name='autoPrintDrugLabel.settingValue'
+                name='autoPrintDrugLabelOnFinalize.settingValue'
                 render={(args) => (
-                  <Switch
-                    label='Auto Print Drug Label'
+                  <Checkbox
+                    label='Finalize'
+                    {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={2}>
+              <Field
+                name='autoPrintDrugLabelOnSignOff.settingValue'
+                render={(args) => (
+                  <Checkbox
+                    label='Sign Off'
+                    {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+
+            <GridItem md={2}>
+              <Field
+                name='autoPrintDrugLabelOnCompleteBilling.settingValue'
+                render={(args) => (
+                  <Checkbox
+                    label='Complete Billing'
                     {...args}
                     disabled={!!hasActiveSession}
                   />
