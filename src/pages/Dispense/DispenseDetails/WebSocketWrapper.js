@@ -96,7 +96,6 @@ const WebSocketWrapper = ({
         }
       })
 
-      console.log(drugLabelDetail)
       return drugLabelDetail
     }
     notification.warn({
