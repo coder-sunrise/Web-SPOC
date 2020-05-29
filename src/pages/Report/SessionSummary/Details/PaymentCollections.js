@@ -108,28 +108,35 @@ const PaymentCollections = ({
     let newchildren = []
     const payerNameColIndex = TotalDetails[0].isDisplayGST ? 3 : 2
     if (row.countNumber === 1) {
-      newchildren.push(children.filter((value, index) => index < payerNameColIndex).map(
-        (item) => ({
-          ...item,
-          props: {
-            ...item.props,
-            rowSpan: row.rowspan,
-          },
-        })),
+      newchildren.push(
+        children
+          .filter((value, index) => index < payerNameColIndex)
+          .map((item) => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.rowspan,
+            },
+          })),
       )
     }
     if (row.payerCountNumber === 1) {
       newchildren.push(
-        children.filter((value, index) => index === payerNameColIndex).map((item) => ({
-          ...item,
-          props: {
-            ...item.props,
-            rowSpan: row.payerRowspan,
-          },
-        })),
+        children
+          .filter((value, index) => index === payerNameColIndex)
+          .map((item) => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.payerRowspan,
+            },
+          })),
       )
     }
-    newchildren.push([children[children.length - 2], children[children.length - 1]])
+    newchildren.push([
+      children[children.length - 2],
+      children[children.length - 1],
+    ])
     if (row.countNumber === 1) {
       return <Table.Row {...p}>{newchildren}</Table.Row>
     }
@@ -149,13 +156,13 @@ const PaymentCollections = ({
       integrated: {
         calculator: (type, rows, getValue) => {
           if (type === 'totalAftAdj') {
-            return TotalDetails[0].grandTotalAftAdj
+            return TotalDetails[0].grandTotalAftAdj || 0
           }
           if (type === 'gstAmt') {
-            return TotalDetails[0].grandGSTAmt
+            return TotalDetails[0].grandGSTAmt || 0
           }
           if (type === 'totalAmtPaid') {
-            return TotalDetails[0].grandTotalAmtPaid
+            return TotalDetails[0].grandTotalAmtPaid || 0
           }
           return IntegratedSummary.defaultCalculator(type, rows, getValue)
         },

@@ -19,6 +19,10 @@ import {
   serverDateFormat,
 } from '@/components'
 
+import { 
+  CreditCardNumberInput,
+} from '@/components/_medisys'
+
 const style = () => ({
   totalPayment: {
     textAlign: 'right',
@@ -403,13 +407,7 @@ class Modal extends PureComponent {
                 <Field
                   name='patientDepositTransaction.cardNumber'
                   render={(args) => (
-                    <NumberInput
-                      label='Card Number'
-                      precision={0}
-                      inputProps={{ maxLength: 4 }}
-                      maxLength={4}
-                      {...args}
-                    />
+                    <CreditCardNumberInput {...args} /> 
                   )}
                 />
               </GridItem>

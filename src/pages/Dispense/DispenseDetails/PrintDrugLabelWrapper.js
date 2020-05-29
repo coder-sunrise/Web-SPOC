@@ -43,7 +43,12 @@ class PrintDrugLabelWrapper extends React.Component {
     if (settings.labelPrinterSize === '8.9cmx3.6cm') {
       drugLabelReportID = 31
       patientLabelReportID = 32
-    } else {
+    }
+    else if (settings.labelPrinterSize === '7.6cmx3.8cm') {
+      drugLabelReportID = 48
+      patientLabelReportID = 45
+    }
+    else {
       drugLabelReportID = 24
       patientLabelReportID = 27
     }
@@ -111,10 +116,8 @@ class PrintDrugLabelWrapper extends React.Component {
       CONSTANTS.DRUG_LABEL,
       CONSTANTS.PATIENT_LABEL,
     ]
-    console.log({ type, row })
     if (withoutPrintPreview.includes(type)) {
       let printResult = await this.getPrintResult(type, row)
-
       if (printResult) {
         const base64Result = arrayBufferToBase64(printResult)
         this.prepareJobForWebSocket(base64Result)
@@ -271,7 +274,7 @@ class PrintDrugLabelWrapper extends React.Component {
     }
   }
 
-  render () {
+  render() {
     const { onPrint, ...restProps } = this.props
     const { pendingJob = [] } = this.state
 

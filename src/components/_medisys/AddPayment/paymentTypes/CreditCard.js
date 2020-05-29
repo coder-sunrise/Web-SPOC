@@ -14,6 +14,9 @@ import {
 import PaymentBase from './PaymentBase'
 import styles from '../styles'
 import { CREDIT_CARD_TYPE } from '@/utils/constants'
+import { 
+  CreditCardNumberInput,
+} from '@/components/_medisys'
 
 const CreditCard = ({
   payment,
@@ -47,14 +50,7 @@ const CreditCard = ({
           <FastField
             name={`paymentList[${index}].creditCardPayment.creditCardNo`}
             render={(args) => (
-              <NumberInput
-                max={9999}
-                inputProps={{ maxLength: 4 }}
-                maxLength={4}
-                precision={0}
-                label='Card No.'
-                {...args}
-              />
+              <CreditCardNumberInput {...args} />
             )}
           />
         </GridItem>

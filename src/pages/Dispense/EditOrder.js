@@ -1,12 +1,22 @@
 import React, { Component } from 'react'
+import _ from 'lodash'
 import router from 'umi/router'
+import { connect } from 'dva'
+import withStyles from '@material-ui/core/styles/withStyles'
 // common component
 import {
   GridContainer,
   GridItem,
   notification,
   withFormikExtend,
+  FastField,
+  CodeSelect,
+  TextField,
+  Checkbox,
+  Button,
+  ProgressButton,
 } from '@/components'
+import Yup from '@/utils/yup'
 import { convertToConsultation } from '@/pages/Consultation/utils'
 // utils
 import { getAppendUrl } from '@/utils/utils'
@@ -38,20 +48,44 @@ const discardConsultation = async ({ dispatch, dispense }) => {
     console.error({ error })
   }
 }
-
+const styles = () => ({})
 // @Authorized.Secured('queue.dispense.editorder')
+@connect(({ consultation }) => ({
+  consultation,
+}))
 @withFormikExtend({
   authority: [
     'queue.dispense.editorder',
   ],
   notDirtyDuration: 0, // this page should alwasy show warning message when leave
-  mapPropsToValues: () => ({ dummyField: '' }),
+  mapPropsToValues: ({ consultation }) => {
+    return {
+      ...(consultation.entity || consultation.default),
+      dummyField: '',
+      dispenseAcknowledgement: {
+        editDispenseReasonFK: 1,
+      },
+    }
+  },
+  validationSchema: Yup.object().shape({
+    dispenseAcknowledgement: Yup.object().shape({
+      editDispenseReasonFK: Yup.number().required(),
+      remarks: Yup.string().when('editDispenseReasonFK', {
+        is: (val) => val === 2,
+        then: Yup.string().required(),
+      }),
+    }),
+  }),
   dirtyCheckMessage: 'Discard edit order?',
   onDirtyDiscard: discardConsultation,
   enableReinitialize: false,
   displayName: 'EditOrder',
 })
 class EditOrder extends Component {
+  state = {
+    acknowledged: false,
+  }
+
   componentDidMount () {
     const { setFieldValue } = this.props
     setTimeout(() => {
@@ -82,7 +116,7 @@ class EditOrder extends Component {
   }
 
   editOrder = () => {
-    const { dispatch, dispense, visitRegistration, history } = this.props
+    const { dispatch, dispense, history } = this.props
     const { location } = history
     const { query } = location
     dispatch({
@@ -121,7 +155,12 @@ class EditOrder extends Component {
     discardConsultation(this.props)
   }
 
-  signOrder = async (values) => {
+    signOrder = async (values) => {
+        const { values, validateForm, handleSubmit } = this.props
+        const isFormValid = await validateForm()
+        if (!_.isEmpty(isFormValid)) {
+            handleSubmit()
+        } else {
     const {
       consultationDocument,
       orders,
@@ -135,30 +174,31 @@ class EditOrder extends Component {
       forms,
     })
 
-    const signResult = await dispatch({
-      type: `consultation/signOrder`,
-      payload,
-    })
-    if (signResult) {
-      notification.success({
-        message: 'Order signed',
+      const signResult = await dispatch({
+        type: `consultation/signOrder`,
+        payload,
       })
+      if (signResult) {
+        notification.success({
+          message: 'Order signed',
+        })
 
-      await dispatch({
-        type: `dispense/refresh`,
-        payload: dispense.visitID,
-      })
-      dispatch({
-        type: `dispense/updateState`,
-        payload: {
-          editingOrder: false,
-        },
-      })
+        await dispatch({
+          type: `dispense/refresh`,
+          payload: dispense.visitID,
+        })
+        dispatch({
+          type: `dispense/updateState`,
+          payload: {
+            editingOrder: false,
+          },
+        })
+      }
     }
   }
 
   render () {
-    const { classes, dispense, consultation, dispatch } = this.props
+    const { classes, theme } = this.props
     const orderWidget = widgets.find((o) => o.id === '5')
     const cdWidget = widgets.find((o) => o.id === '3')
     const formsWidget = widgets.find((o) => o.id === '10')
@@ -186,22 +226,79 @@ class EditOrder extends Component {
             </GridItem>
           )}
           <GridItem xs={12} md={6}>
-            <h5>
-              <span style={{ display: 'inline-block' }}>
-                Consultation Document
-              </span>
-              <span className={classes.cdAddButton}>
-                {cdWidget.toolbarAddon}
-              </span>
-            </h5>
-            <ConsultationDocument
-              forDispense
-              // parentProps={{
-              //   values: consultation.entity,
-              // }}
-              onCancel={this.cancelOrder}
-              onSave={this.signOrder}
-            />
+            <Authorized authority={cdWidget.accessRight}>
+              <h5>
+                <span style={{ display: 'inline-block' }}>
+                  Consultation Document
+                </span>
+                <span className={classes.cdAddButton}>
+                  {cdWidget.toolbarAddon}
+                </span>
+              </h5>
+              <ConsultationDocument forDispense />
+            </Authorized>
+            <GridItem xs={12} md={6}>
+              <FastField
+                name='dispenseAcknowledgement.editDispenseReasonFK'
+                render={(args) => {
+                  return (
+                    <CodeSelect
+                      label='Reason'
+                      code='cteditdispensereasons'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={12}>
+              <FastField
+                name='dispenseAcknowledgement.remarks'
+                render={(args) => {
+                  return (
+                    <TextField
+                      multiline
+                      rowsMax='5'
+                      label='Remarks'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={12}>
+              <FastField
+                name='acknowledged'
+                render={(args) => {
+                  return (
+                    <Checkbox
+                      onChange={(e) => {
+                        this.setState({
+                          acknowledged: e.target.value,
+                        })
+                      }}
+                      label='I hereby confirm the above orders are instructed by the attending physician'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem
+              xs={12}
+              style={{ textAlign: 'center', paddingTop: theme.spacing(2) }}
+            >
+              <Button color='danger' onClick={this.cancelOrder}>
+                Cancel
+              </Button>
+              <ProgressButton
+                color='primary'
+                disabled={!this.state.acknowledged}
+                onClick={this.signOrder}
+              >
+                Save
+              </ProgressButton>
+            </GridItem>
           </GridItem>
         </GridContainer>
       </div>
@@ -209,4 +306,4 @@ class EditOrder extends Component {
   }
 }
 
-export default EditOrder
+export default withStyles(styles, { withTheme: true })(EditOrder)

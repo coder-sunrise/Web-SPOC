@@ -366,6 +366,42 @@ const widgets = [
   },
   {
     id: '10',
+    name: 'Refraction Form',
+    accessRight: 'queue.consultation.widgets.eyerefractionform',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/RefractionForm'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...p} prefix='corEyeRefractionForm.formData' />
+      },
+      loading: Loading,
+    }),
+    associatedProps: [
+      'corEyeRefractionForm',
+    ],
+    // model: 'refractionForm',
+    layoutConfig: {},
+  },
+  {
+    id: '11',
+    name: 'Examination Form',
+    accessRight: 'queue.consultation.widgets.eyeexaminationform',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/ExaminationForm'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...p} prefix='corEyeExaminationForm.formData' />
+      },
+      loading: Loading,
+    }),
+    associatedProps: [
+      'corEyeExaminationForm',
+    ],
+    // model: 'refractionForm',
+    layoutConfig: {},
+  },
+  {
+    id: '12',
     name: 'Forms',
     accessRight: 'queue.consultation.widgets.forms',
     component: Loadable({

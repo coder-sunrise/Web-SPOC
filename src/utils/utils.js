@@ -38,7 +38,7 @@ Object.byString = function (o, s) {
   let a = s.split('.')
   for (let i = 0, n = a.length; i < n; ++i) {
     let k = a[i]
-    if (o === undefined || o === null) continue
+    if (o === undefined || o === null || typeof o !== 'object') continue
     try {
       if (k in o) {
         o = o[k]
@@ -630,16 +630,17 @@ export const updateCellValue = (
       if (editMode && value !== val && typeof onValueChange === 'function') {
         onValueChange(val)
       }
-      const r = validationSchema.validateSync(
-        window.$tempGridRow[gridId][getRowId(row)],
-        {
-          abortEarly: false,
-        },
-      )
+      if (getRowId(row)) {
+        const r = validationSchema.validateSync(
+          window.$tempGridRow[gridId][getRowId(row)],
+          {
+            abortEarly: false,
+          },
+        )
 
-      // if (element)
-      //   $(element).parents('tr').find('.grid-commit').removeAttr('disabled')
-
+        // if (element)
+        //   $(element).parents('tr').find('.grid-commit').removeAttr('disabled')
+      }
       return []
       // row._$error = false
     } catch (er) {
@@ -742,12 +743,22 @@ const navigateDirtyCheck = ({
         openConfirm: true,
         openConfirmContent:
           openConfirmContent ||
-          f.dirtyCheckMessage ||
+          (typeof f.dirtyCheckMessage === 'function'
+            ? f.dirtyCheckMessage()
+            : f.dirtyCheckMessage) ||
           formatMessage({
             id: 'app.general.leave-without-save',
           }),
         onConfirmSave: onConfirm,
         openConfirmText: onConfirm ? 'Save Changes' : 'Confirm',
+        onConfirmClose: () => {
+          window.g_app._store.dispatch({
+            type: 'global/updateAppState',
+            payload: {
+              openConfirm: false,
+            },
+          })
+        },
         onConfirmDiscard: () => {
           if (displayName) {
             window.g_app._store.dispatch({

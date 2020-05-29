@@ -1,15 +1,40 @@
 import router from 'umi/router'
 import _ from 'lodash'
 import { createFormViewModel } from 'medisys-model'
-import * as service from '../services/consultation'
 import { getUniqueId } from '@/utils/utils'
 import { consultationDocumentTypes, formTypes } from '@/utils/codes'
 import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import { orderTypes } from '@/pages/Consultation/utils'
+import * as service from '../services/consultation'
 
 const getSequence = (sequence, maxSeq) => {
   if (sequence === 0) return sequence
   return sequence || maxSeq
+}
+
+const ParseEyeFormData = (response) => {
+  const { corEyeRefractionForm = {}, corEyeExaminationForm = {} } = response
+  let refractionFormData = {}
+  let examinationFormData = {}
+  if (corEyeRefractionForm.formData) {
+    refractionFormData = JSON.parse(corEyeRefractionForm.formData)
+  }
+  if (corEyeExaminationForm.formData) {
+    examinationFormData = JSON.parse(corEyeExaminationForm.formData)
+  }
+
+  const newResponse = {
+    ...response,
+    corEyeRefractionForm: {
+      ...corEyeRefractionForm,
+      formData: refractionFormData,
+    },
+    corEyeExaminationForm: {
+      ...corEyeExaminationForm,
+      formData: examinationFormData,
+    },
+  }
+  return newResponse
 }
 
 export default createFormViewModel({
@@ -103,6 +128,7 @@ export default createFormViewModel({
           },
         })
         const response = yield call(service.create, payload.id)
+
         const { id } = response
         if (id) {
           yield put({
@@ -458,6 +484,10 @@ export default createFormViewModel({
           }
         })
 
+        let newResponse = ParseEyeFormData(data)
+        const { corEyeRefractionForm, corEyeExaminationForm } = newResponse
+        data.corEyeRefractionForm = corEyeRefractionForm
+        data.corEyeExaminationForm = corEyeExaminationForm
         // if (data.corEyeVisualAcuityTest)
         //   yield put({
         //     type: 'visualAcuity/updateState',

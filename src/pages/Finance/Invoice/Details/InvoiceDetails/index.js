@@ -13,6 +13,8 @@ import {
   Button,
 } from '@/components'
 import { ReportViewer } from '@/components/_medisys'
+// utils
+import { INVOICE_VIEW_MODE } from '@/utils/constants'
 // sub component
 import Summary from './Summary'
 // styling
@@ -34,7 +36,7 @@ class InvoiceDetails extends Component {
   }
 
   render () {
-    const { classes, values, clinicSettings } = this.props
+    const { classes, values } = this.props
     return (
       <div className={classes.cardContainer}>
         <div

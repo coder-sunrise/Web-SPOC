@@ -702,11 +702,9 @@ const _routes = [
             path: '/report/inventorystockcountreport',
             name: 'inventorystockcountreport',
             component: './Report/InventoryStockCountReport',
-          },
-          {
-            path: '/report/inventorystockcountreport',
-            name: 'inventorystockcountreport',
-            component: './Report/InventoryStockCountReport',
+            authority: [
+              'report.inventory.inventorystockcountreport',
+            ],
           },
           {
             path: '/report/inventorylistingreport',
@@ -873,6 +871,9 @@ const _routes = [
             path: '/setting/roomassignment',
             name: 'roomassignment',
             component: './Setting/RoomAssignment',
+            authority: [
+              'settings.clinicsetting.roomassignment',
+            ],
           },
           {
             path: '/setting/clinicbreakhour',
@@ -1171,6 +1172,14 @@ const _routes = [
             authority: [
               'settings.templates.visitordertemplate',
             ],
+          },
+          {
+              path: '/setting/refractiontesttype',
+              name: 'refractiontesttype',
+              component: './Setting/RefractionTestType',
+              authority: [
+                  'settings.clinicsetting.refractiontesttype',
+              ],
           },
         ],
       },

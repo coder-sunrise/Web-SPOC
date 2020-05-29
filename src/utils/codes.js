@@ -1,9 +1,9 @@
 import moment from 'moment'
 import _ from 'lodash'
+import Authorized from '@/utils/Authorized'
 import { dateFormatLong, dateFormatLongWithTime } from './format'
 import { UNFIT_TYPE } from './constants'
 import { calculateAgeFromDOB } from './dateUtils'
-import Authorized from '@/utils/Authorized'
 
 const status = [
   {
@@ -651,15 +651,16 @@ const tagList = [
               (patientAllergy ? `${patientAllergy}, ` : '') +
               patient.entity.patientAllergy[index].allergyName
         }
-        result = `Patient Name: ${patient.entity.name}`
-        result += `<br/>Patient Ref. No.: ${patient.entity.patientReferenceNo}`
-        result += `<br/>Patient Acc. No.: ${patient.entity.patientAccountNo}`
-        result += `<br/>Gender/Age: ${patientGender.name.substring(
+        result = `<p>Patient Name: ${patient.entity.name}</p>`
+        result += `<p>Patient Ref. No.: ${patient.entity
+          .patientReferenceNo}</p>`
+        result += `<p>Patient Acc. No.: ${patient.entity.patientAccountNo}</p>`
+        result += `<p>Gender/Age: ${patientGender.name.substring(
           0,
           1,
-        )}/${calculateAgeFromDOB(patient.entity.dob)}`
+        )}/${calculateAgeFromDOB(patient.entity.dob)}</p>`
 
-        result += `<br/>Drug Allergy: ${patientAllergy || 'NA'}`
+        result += `<p>Drug Allergy: ${patientAllergy || 'NA'}</p>`
       }
       return result || 'N.A.'
     },
@@ -995,6 +996,7 @@ export const visitOrderTemplateItemTypes = [
 export const labelPrinterList = [
   { value: '8.9cmx3.6cm', name: '8.9cmx3.6cm' },
   { value: '8.0cmx4.5cm', name: '8.0cmx4.5cm' },
+  { value: '7.6cmx3.8cm', name: '7.6cmx3.8cm' },
 ]
 
 const corAttchementTypes = [
@@ -1018,6 +1020,11 @@ const corAttchementTypes = [
     type: 'EyeVisualAcuity',
     name: 'Visual Acuity Test',
     accessRight: 'queue.consultation.widgets.eyevisualacuity',
+  },
+  {
+    id: 5,
+    type: 'QueueDisplay',
+    name: 'Queue Display',
   },
 ]
 

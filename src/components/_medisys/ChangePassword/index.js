@@ -132,7 +132,7 @@ class ChangePassword extends React.PureComponent {
               Password must be
               <li style={{ marginLeft: 30 }}>8 to 18 characters long</li>
               <li style={{ marginLeft: 30 }}>
-                contain a mix of letters, numebrs, and/or special characters
+                contain a mix of letters, numbers, and/or special characters
               </li>
             </p>
           </GridItem>

@@ -25,16 +25,15 @@ const Grid = ({
   values,
   values: { roomAssignRows = [] },
   dispatch,
-  doctorProfile,
+  doctorProfile = [],
+  global,
+  codetable,
+  theme,
+  ...restProps
 }) => {
   const [
     doctorOptions,
     setDoctorOptions,
-  ] = useState([])
-
-  const [
-    filteredDoctorOptions,
-    setFilteredDoctorOptions,
   ] = useState([])
 
   useEffect(() => {
@@ -47,31 +46,7 @@ const Grid = ({
       }
     })
     setDoctorOptions(formattedDoctorProfiles)
-    setFilteredDoctorOptions(formattedDoctorProfiles)
   }, [])
-
-  // const handleDoctorChange = (v, test) => {
-  //   const { row } = v
-  //   const { clinicianProfileFK } = row
-
-  //   const isDoctorAlrdyAssigned = roomAssignRows.find(
-  //     (roomAssign) => roomAssign.clinicianProfileFK === clinicianProfileFK,
-  //   )
-  //   // console.log({
-  //   //   isDoctorAlrdyAssigned,
-  //   //   roomAssignRows,
-  //   //   clinicianProfileFK,
-  //   //   test,
-  //   // })
-  //   dispatch({
-  //     // force current edit row components to update
-  //     type: 'global/updateState',
-  //     payload: {
-  //       commitCount: (commitCount += 1),
-  //     },
-  //   })
-  //   if (isDoctorAlrdyAssigned) row.clinicianProfileFK = undefined
-  // }
 
   useEffect(
     () => {
@@ -84,36 +59,36 @@ const Grid = ({
         )
         return roomAssign
       })
-      setFilteredDoctorOptions(tempDoctorOptions)
     },
     [
       roomAssignRows,
     ],
   )
 
-  useEffect(
-    () => {
-      dispatch({
-        // force current edit row components to update
-        type: 'global/updateState',
-        payload: {
-          commitCount: (commitCount += 1),
-        },
-      })
-    },
-    [
-      filteredDoctorOptions,
-    ],
-  )
-
-  const handleDoctorChange = (v) => {
-    const { row } = v
-    const newDoctorOptions = doctorOptions.filter(
-      (doctor) => doctor.value !== row.clinicianProfileFK,
-    )
-    setFilteredDoctorOptions(newDoctorOptions)
+  useEffect(() => {
+    dispatch({
+      // force current edit row components to update
+      type: 'global/updateState',
+      payload: {
+        commitCount: (commitCount += 1),
+      },
+    })
+  }, [])
+ 
+  const compareDoctor = function (a, b) {
+    let doctorA = doctorOptions.find((doctor) => doctor.value === a)
+    let doctorB = doctorOptions.find((doctor) => doctor.value === b) 
+    if (doctorA === undefined || doctorB === undefined)
+      return false
+    return doctorA.name.localeCompare(doctorB.name)
   }
-
+  const compareRoom = function (a, b) { 
+    let roomA = codetable.ctroom.find((room) => room.id === a)
+    let roomB = codetable.ctroom.find((room) => room.id === b)
+    if (roomA === undefined || roomB === undefined)
+      return false
+    return roomA.name.localeCompare(roomB.name)
+  }
   const tableParas = {
     columns: [
       { name: 'clinicianProfileFK', title: 'Doctor' },
@@ -123,32 +98,28 @@ const Grid = ({
       {
         columnName: 'clinicianProfileFK',
         width: 500,
-        // type: 'codeSelect',
-        // code: 'doctorprofile',
-        // labelField: 'clinicianProfile.name',
-        // valueField: 'clinicianProfile.id',
-        // remoteFilter: {
-        //   'clinicianProfile.isActive': false,
-        // },
-        // onChange: (v) => handleDoctorChange(v, roomAssignRows),
-        // renderDropdown: (option) => <DoctorLabel doctor={option} />,
         type: 'select',
         options: (row) => {
           const currentRowDoctor = doctorOptions.find(
             (doctor) => doctor.value === row.clinicianProfileFK,
           )
 
+          const newDoctorOptions = doctorOptions.filter(
+            (doctor) => doctor.value !== row.clinicianProfileFK,
+          )
+
           return [
-            ...filteredDoctorOptions,
+            ...newDoctorOptions,
             currentRowDoctor,
           ]
         },
-        onChange: handleDoctorChange,
+        compare: compareDoctor,
       },
       {
         columnName: 'roomFK',
         type: 'codeSelect',
         code: 'ctroom',
+        compare: compareRoom,
       },
     ],
   }
@@ -162,16 +133,26 @@ const Grid = ({
   }
 
   const onCommitChanges = ({ rows }) => {
-    setFieldValue('roomAssignRows', rows)
+    const returnRows = rows.filter((r) => !(r.isNew && r.isDeleted))
+    setFieldValue('roomAssignRows', returnRows)
   }
-
+  // console.log(window.$tempGridRow)
+  // console.log(
+  //   values,
+  //   roomAssignRows,
+  //   (doctorProfile = []),
+  //   global,
+  //   codetable,
+  //   restProps,
+  // )
   return (
     <div>
       <GridItem md={3}>
         <p>* Only doctor users can be assigned to a room</p>
       </GridItem>
       <EditableTableGrid
-        style={{ margin: 20 }}
+        style={{ margin: theme.spacing(1) }}
+        id='roomAssingmentGrid'
         schema={roomAssignSchema}
         rows={roomAssignRows}
         FuncProps={{
@@ -196,7 +177,11 @@ const Grid = ({
           Cancel
         </Button>
 
-        <Button color='primary' onClick={handleSubmit}>
+        <Button
+          color='primary'
+          onClick={handleSubmit}
+          disabled={global.disableSave}
+        >
           Save
         </Button>
       </div>
@@ -205,9 +190,10 @@ const Grid = ({
 }
 
 export default compose(
-  connect(({ codetable }) => {
+  connect(({ codetable, global }) => {
     return {
       doctorProfile: codetable.doctorprofile,
+      global,
     }
   }),
   withFormikExtend({

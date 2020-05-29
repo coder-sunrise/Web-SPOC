@@ -180,6 +180,18 @@ const tenantCodesMap = new Map([
     },
   ],
   [
+    'ctcasedescription',
+    {
+      ...defaultParams,
+    },
+  ],
+  // [
+  //   'ctEyeRefractiontestType',
+  //   {
+  //     ...defaultParams,
+  //   },
+  // ],
+  [
     'ctprocedure',
     {
       ...defaultParams,

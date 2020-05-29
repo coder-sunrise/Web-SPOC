@@ -23,7 +23,14 @@ const Clock = () => {
   }, [])
 
   return (
-    <div style={{ fontSize: '1.5vw', lineHeight: '10vh', textAlign: 'right' }}>
+    <div
+      style={{
+        fontSize: '1.5vw',
+        lineHeight: '10vh',
+        textAlign: 'center',
+        fontWeight: 'bold',
+      }}
+    >
       {time}
     </div>
   )
