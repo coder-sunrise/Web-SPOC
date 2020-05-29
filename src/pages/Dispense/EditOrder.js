@@ -155,24 +155,24 @@ class EditOrder extends Component {
     discardConsultation(this.props)
   }
 
-    signOrder = async (values) => {
-        const { values, validateForm, handleSubmit } = this.props
-        const isFormValid = await validateForm()
-        if (!_.isEmpty(isFormValid)) {
-            handleSubmit()
-        } else {
-    const {
-      consultationDocument,
-      orders,
-      dispatch,
-      dispense,
-      forms,
-    } = this.props
-    const payload = convertToConsultation(values, {
-      consultationDocument,
-      orders,
-      forms,
-    })
+  signOrder = async () => {
+    const { values, validateForm, handleSubmit } = this.props
+    const isFormValid = await validateForm()
+    if (!_.isEmpty(isFormValid)) {
+      handleSubmit()
+    } else {
+      const {
+        consultationDocument,
+        orders,
+        dispatch,
+        dispense,
+        forms,
+      } = this.props
+      const payload = convertToConsultation(values, {
+        consultationDocument,
+        orders,
+        forms,
+      })
 
       const signResult = await dispatch({
         type: `consultation/signOrder`,
