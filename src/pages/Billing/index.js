@@ -205,7 +205,7 @@ class Billing extends Component {
 
   printAfterComplete = async () => {
     let settings = JSON.parse(localStorage.getItem('clinicSettings'))
-    if (settings && settings.autoPrintDrugLabelOnCompleteBilling) {
+    if (settings && settings.autoPrintDrugLabelOnCompletePayment) {
       await this.onExpandDispenseDetails()
 
       const { dispense } = this.props
