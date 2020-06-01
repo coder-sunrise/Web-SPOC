@@ -4,6 +4,7 @@ import * as service from '@/services/common'
 const patientApiUrl = '/api/patient'
 const queueApiUrl = '/api/queue'
 const visitOrderTemplateUrl = '/api/visitOrderTemplate'
+const bizSessionAPIURL = '/api/bizsession'
 
 // export async function fetchPatientInfoByPatientID (patientID) {
 //   // const entities = await request(`/api/fake_patientInfo?patientID=${patientID}`)
@@ -48,3 +49,6 @@ export const queryReferralList = async () => {
 }
 
 export const upsert = (payload) => service.upsert(queueApiUrl, payload)
+
+export const getBizSession = (params) =>
+  service.queryList(bizSessionAPIURL, params)
