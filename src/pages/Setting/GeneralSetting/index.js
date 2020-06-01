@@ -48,7 +48,7 @@ const styles = (theme) => ({
         defaultVisitType,
         autoPrintDrugLabelOnFinalize,
         autoPrintDrugLabelOnSignOff,
-        autoPrintDrugLabelOnCompleteBilling,
+        autoPrintDrugLabelOnCompletePayment,
       } = clinicSettings.entity
       return {
         ...clinicSettings.entity,
@@ -65,10 +65,10 @@ const styles = (theme) => ({
           settingValue:
             autoPrintDrugLabelOnFinalize && autoPrintDrugLabelOnFinalize.settingValue === 'true',
         },
-        autoPrintDrugLabelOnCompleteBilling: {
-          ...autoPrintDrugLabelOnCompleteBilling,
+        autoPrintDrugLabelOnCompletePayment: {
+          ...autoPrintDrugLabelOnCompletePayment,
           settingValue:
-            autoPrintDrugLabelOnCompleteBilling && autoPrintDrugLabelOnCompleteBilling.settingValue === 'true',
+            autoPrintDrugLabelOnCompletePayment && autoPrintDrugLabelOnCompletePayment.settingValue === 'true',
         },
         autoPrintDrugLabelOnSignOff: {
           ...autoPrintDrugLabelOnSignOff,
@@ -254,10 +254,10 @@ class GeneralSetting extends PureComponent {
 
             <GridItem md={2}>
               <Field
-                name='autoPrintDrugLabelOnCompleteBilling.settingValue'
+                name='autoPrintDrugLabelOnCompletePayment.settingValue'
                 render={(args) => (
                   <Checkbox
-                    label='Complete Billing'
+                    label='Complete Payment'
                     {...args}
                     disabled={!!hasActiveSession}
                   />
