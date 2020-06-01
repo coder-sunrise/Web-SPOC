@@ -62,7 +62,7 @@ class SystemMessageList extends React.Component {
       dispatch({
         type: 'systemMessage/queryList',
         payload: {
-          lgt_EffectiveEndDate: moment().formatUTC(false),
+          // lgt_EffectiveEndDate: moment().formatUTC(false),
           lst_EffectiveStartDate: moment().formatUTC(false),
           pagesize: 3,
           typeId: msgTypeId,

@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'dva'
 import router from 'umi/router'
+import $ from 'jquery'
 import { FormattedMessage } from 'umi/locale'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
@@ -30,27 +31,13 @@ const styles = (theme) => ({
   },
 })
 
-// @withSettingBase({ modelName: 'settingUserProfile' })
-// @withFormik({
-//   mapPropsToValues: () => ({
-//     status: true,
-//   }),
-// })
 @connect(({ systemMessage }) => ({ systemMessage }))
 class SystemMessageDetail extends React.Component {
-  state = {
-    // gridConfig: {
-    //   ...UserProfileTableConfig,
-    //   columnExtensions: [
-    //     ...UserProfileTableConfig.columnExtensions,
-    //     {
-    //       columnName: 'action',
-    //       width: 90,
-    //       align: 'center',
-    //       render: (row) => this.Cell(row),
-    //     },
-    //   ],
-    // },
+  state = {}
+
+  constructor (props) {
+    super(props)
+    this.container = React.createRef()
   }
 
   componentDidMount = () => {
@@ -72,6 +59,8 @@ class SystemMessageDetail extends React.Component {
         })
       }
     }
+    // simulation click to close system info popup
+    $(this.container.current).click()
   }
 
   render () {
@@ -81,7 +70,10 @@ class SystemMessageDetail extends React.Component {
       <GridContainer>
         <GridItem>
           <React.Fragment>
-            <div dangerouslySetInnerHTML={{ __html: contents }} />
+            <div
+              ref={this.container}
+              dangerouslySetInnerHTML={{ __html: contents }}
+            />
           </React.Fragment>
         </GridItem>
         <GridContainer className={classes.verticalSpacing}>

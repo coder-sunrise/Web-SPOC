@@ -48,30 +48,32 @@ class HeaderLinks extends React.Component {
     const allResult = await this.featchSysMessages()
 
     const latestData = allResult.reduce((p, i) => {
-      const { data = [] } = i
-      const [
-        current,
-      ] = data
+      if (i) {
+        const { data = [] } = i
+        const [
+          current,
+        ] = data
 
-      if (current) {
-        const { createDate: currentDate } = current
-        const { createDate: preDate } = p
+        if (current) {
+          const { createDate: currentDate } = current
+          const { createDate: preDate } = p
 
-        if (preDate && currentDate) {
-          const d1 = moment(preDate)
-          const d2 = moment(currentDate)
-          return d1.isBefore(d2) ? current : p
-        }
-        if (currentDate) {
-          return current
+          if (preDate && currentDate) {
+            const d1 = moment(preDate)
+            const d2 = moment(currentDate)
+            return d1.isBefore(d2) ? current : p
+          }
+          if (currentDate) {
+            return current
+          }
         }
       }
       return p
     }, {})
 
     if (latestData) {
-      const { isAlertAfterLogin = false, isRead = false } = latestData
-      if (isAlertAfterLogin && !isRead) {
+      const { isAlertAfterLogin = false, isRead = false, isActive } = latestData
+      if (isAlertAfterLogin && !isRead && isActive) {
         dispatch({
           type: 'systemMessage/updateState',
           payload: {
@@ -93,7 +95,7 @@ class HeaderLinks extends React.Component {
   async featchSysMessages () {
     const { dispatch } = this.props
     let payload = {
-      lgt_EffectiveEndDate: moment().formatUTC(false),
+      // lgt_EffectiveEndDate: moment().formatUTC(false),
       lst_EffectiveStartDate: moment().formatUTC(false),
       pagesize: 3,
       typeId: 1,
