@@ -217,12 +217,9 @@ const WebSocketWrapper = ({
     const finalized = await onFinalizeClick()
     if (finalized) {
       let settings = JSON.parse(localStorage.getItem('clinicSettings'))
-      const { autoPrintDrugLabel = false } = settings
-      if (autoPrintDrugLabel === true)
-        await handleOnPrint({
-          type: CONSTANTS.ALL_DRUG_LABEL,
-          printAllDrugLabel: true,
-        })
+      const { autoPrintDrugLabelOnFinalize = false } = settings
+      if (autoPrintDrugLabelOnFinalize === true)
+        await handleOnPrint({ type: CONSTANTS.ALL_DRUG_LABEL, printAllDrugLabel: true })
 
       await restProps.dispatch({
         type: 'dispense/query',
