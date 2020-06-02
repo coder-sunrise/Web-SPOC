@@ -6,7 +6,7 @@ import { FormattedMessage } from 'umi/locale'
 import { LinearProgress, withStyles } from '@material-ui/core'
 import PlayCircleOutline from '@material-ui/icons/PlayCircleOutline'
 // custom components
-import Stop from '@material-ui/icons/Stop'
+import Replay from '@material-ui/icons/Replay'
 import { Button, Danger } from '@/components'
 import Authorized from '@/utils/Authorized'
 import { getBizSession } from '@/services/queue'
@@ -97,7 +97,7 @@ class EmptySession extends PureComponent {
               {isLastSessionClosed && (
                 <Authorized authority='queue.reopenlastsession'>
                   <Button color='primary' onClick={this.onReopenClick}>
-                    <Stop />
+                    <Replay />
                     <FormattedMessage id='reception.queue.reopenLastSession' />
                   </Button>
                 </Authorized>
