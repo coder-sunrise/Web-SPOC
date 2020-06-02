@@ -151,27 +151,37 @@ class Appointment extends React.PureComponent {
         const viewOtherApptAccessRight = Authorized.check(
           'appointment.viewotherappointment',
         )
-        resources = response
-          .filter((clinician) => clinician.clinicianProfile.isActive)
-          .filter(
-            (_, index) =>
-              lastSelected.length > 0
-                ? lastSelected.includes(_.clinicianProfile.id)
-                : index < 5,
-          )
-          .filter((activeclinician) => {
-            const { user } = this.props
-            return (
-              (viewOtherApptAccessRight &&
-                viewOtherApptAccessRight.rights === 'enable') ||
-              activeclinician.clinicianProfile.id ===
-                user.data.clinicianProfile.id
+        if (
+          viewOtherApptAccessRight &&
+          viewOtherApptAccessRight.rights === 'enable'
+        ) {
+          resources = response
+            .filter((clinician) => clinician.clinicianProfile.isActive)
+            .filter(
+              (_, index) =>
+                lastSelected.length > 0
+                  ? lastSelected.includes(_.clinicianProfile.id)
+                  : index < 5,
             )
-          })
-          .map((clinician) => ({
-            clinicianFK: clinician.clinicianProfile.id,
-            doctorName: clinician.clinicianProfile.name,
-          }))
+            .map((clinician) => ({
+              clinicianFK: clinician.clinicianProfile.id,
+              doctorName: clinician.clinicianProfile.name,
+            }))
+        } else {
+          resources = response
+            .filter((clinician) => clinician.clinicianProfile.isActive)
+            .filter((activeclinician) => {
+              const { user } = this.props
+              return (
+                activeclinician.clinicianProfile.id ===
+                user.data.clinicianProfile.id
+              )
+            })
+            .map((clinician) => ({
+              clinicianFK: clinician.clinicianProfile.id,
+              doctorName: clinician.clinicianProfile.name,
+            }))
+        }
         filterByDoctor = resources.map((res) => res.clinicianFK)
       }
 
