@@ -53,14 +53,7 @@ export default ({
           margin: 10,
         }}
       >
-        <a
-          style={{ textDecoration: 'underline' }}
-          onClick={() => {
-            viewScribbleNote(o)
-          }}
-        >
-          {o.subject}
-        </a>
+        <span>{o.subject}</span>
         <div
           style={{
             display: 'flex',
