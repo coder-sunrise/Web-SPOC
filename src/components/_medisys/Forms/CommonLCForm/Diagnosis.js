@@ -4,10 +4,12 @@ import {
   GridItem,
   EditableTableGrid,
   FastField,
+  Select,
 } from '@/components'
-import { ICD10AMSelect, DiagnosisSelect } from '@/components/_medisys'
+import { ICD10AMSelect } from '@/components/_medisys'
+import { queryList } from '@/services/common'
 
-const Diagnosis = ({ setFieldValue, values, diagnosisSchema }) => {
+const Diagnosis = ({ setFieldValue, values, diagnosisSchema, dispatch }) => {
   const [
     principalDiagnosiss,
     setPrincipalDiagnosiss,
@@ -16,9 +18,7 @@ const Diagnosis = ({ setFieldValue, values, diagnosisSchema }) => {
   const [
     secondDiagnosisAs,
     setSecondDiagnosisAs,
-  ] = useState([
-    { id: 1, code: '444', displayvalue: '444444' },
-  ])
+  ] = useState([])
 
   const [
     secondDiagnosisBs,
@@ -33,74 +33,76 @@ const Diagnosis = ({ setFieldValue, values, diagnosisSchema }) => {
     columnExtensions: [
       {
         columnName: 'diagnosisCode',
+        type: 'select',
+        labelField: 'code',
+        valueField: 'code',
+        options: (row) => {
+          return row.diagnosiss
+        },
+        query: async (v) => {
+          const search = {
+            props: 'id,displayvalue,code',
+            sorting: [
+              { columnName: 'displayvalue', direction: 'asc' },
+            ],
+            pagesize: 30,
+          }
+          if (typeof v === 'string') {
+            search.code = v
+          } else {
+            search.id = Number(v)
+          }
+
+          const response = await queryList('/api/codetable/cticd10am', search)
+          return response
+        },
+        onChange: ({ row, option }) => {
+          row.diagnosiss = [
+            option,
+          ]
+          row.diagnosisFK = option ? option.id : undefined
+          row.diagnosisCode = option ? option.code : undefined
+          row.diagnosisName = option ? option.displayvalue : undefined
+        },
         render: (row) => {
-          let { otherDiagnosis } = values.formData
-          let index = otherDiagnosis.findIndex((o) => o.uid === row.uid)
-          return (
-            <FastField
-              name={`formData.otherDiagnosis[${index}].diagnosisCode`}
-              render={(args) => (
-                <ICD10AMSelect
-                  labelField='code'
-                  valueField='code'
-                  mode='tags'
-                  maxSelected={1}
-                  disableAll
-                  options={row.diagnosiss}
-                  {...args}
-                  onChange={(v, option) => {
-                    setFieldValue(
-                      `formData.otherDiagnosis[${index}].diagnosisFK`,
-                      option ? option.id : undefined,
-                    )
-                    setFieldValue(
-                      `formData.otherDiagnosis[${index}].diagnosisName`,
-                      option ? option.displayvalue : undefined,
-                    )
-                  }}
-                  onDataSouceChange={(data) => {
-                    row.diagnosiss = data
-                  }}
-                />
-              )}
-            />
-          )
+          return <div>{row.diagnosisCode}</div>
         },
       },
       {
         columnName: 'diagnosisName',
+        type: 'select',
+        labelField: 'displayvalue',
+        valueField: 'displayvalue',
+        options: (row) => {
+          return row.diagnosiss
+        },
+        query: async (v) => {
+          const search = {
+            props: 'id,displayvalue,code',
+            sorting: [
+              { columnName: 'displayvalue', direction: 'asc' },
+            ],
+            pagesize: 30,
+          }
+          if (typeof v === 'string') {
+            search.displayvalue = v
+          } else {
+            search.id = Number(v)
+          }
+
+          const response = await queryList('/api/codetable/cticd10am', search)
+          return response
+        },
+        onChange: ({ row, option }) => {
+          row.diagnosiss = [
+            option,
+          ]
+          row.diagnosisFK = option ? option.id : undefined
+          row.diagnosisCode = option ? option.code : undefined
+          row.diagnosisName = option ? option.displayvalue : undefined
+        },
         render: (row) => {
-          let { otherDiagnosis } = values.formData
-          let index = otherDiagnosis.findIndex((o) => o.uid === row.uid)
-          return (
-            <FastField
-              name={`formData.otherDiagnosis[${index}].diagnosisName`}
-              render={(args) => (
-                <ICD10AMSelect
-                  mode='tags'
-                  valueField='displayvalue'
-                  labelField='displayvalue'
-                  maxSelected={1}
-                  disableAll
-                  {...args}
-                  options={row.diagnosiss}
-                  onChange={(v, option) => {
-                    setFieldValue(
-                      `formData.otherDiagnosis[${index}].diagnosisFK`,
-                      option ? option.id : undefined,
-                    )
-                    setFieldValue(
-                      `formData.otherDiagnosis[${index}].diagnosisCode`,
-                      option ? option.code : undefined,
-                    )
-                  }}
-                  onDataSouceChange={(data) => {
-                    row.diagnosiss = data
-                  }}
-                />
-              )}
-            />
-          )
+          return <div>{row.diagnosisName}</div>
         },
       },
     ],
@@ -151,7 +153,6 @@ const Diagnosis = ({ setFieldValue, values, diagnosisSchema }) => {
   }
 
   const onSecondDiagnosisADataSouceChange = (data) => {
-    console.log('AAAAA', data)
     setSecondDiagnosisAs(data)
   }
 

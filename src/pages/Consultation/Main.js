@@ -420,7 +420,7 @@ class Main extends React.Component {
       rows.filter((i) => !(i.id === undefined && i.isDeleted)),
       _originalRows,
     )
-    if (forms.rows.filter((o) => o.statusFK === 1)) {
+    if (forms.rows.filter((o) => o.statusFK === 1).length > 0) {
       notification.warning({
         message: `Please finalize all forms.`,
       })

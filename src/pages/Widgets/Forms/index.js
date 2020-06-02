@@ -46,6 +46,15 @@ const styles = (theme) => ({
     },
   },
 
+  errorContainer: {
+    textAlign: 'left',
+    lineHeight: '1em',
+    paddingBottom: theme.spacing(1),
+    '& span': {
+      fontSize: '.8rem',
+    },
+  },
+
   popoverContainer: {
     width: 200,
     textAlign: 'left',

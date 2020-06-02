@@ -1184,7 +1184,7 @@ const formTypes = [
               SecondaryDiagnosisCode2: formData.secondDiagnosisBCode,
               SecondaryDiagnosisDescription2: formData.secondDiagnosisBName,
               OtherDiagnosis: formData.otherDiagnosis
-                .map((o) => o.diagnosisName)
+                .map((o) => `${o.diagnosisCode} - ${o.diagnosisName}`)
                 .join('|'),
             },
           ],

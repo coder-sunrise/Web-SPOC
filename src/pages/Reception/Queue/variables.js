@@ -151,7 +151,6 @@ export const ContextMenuOptions = [
     Icon: Description,
     disabled: false,
     hidden: false,
-    authority: 'queue.visitregistrationdetails',
-    //authority: 'patientdashboard.forms',
+    authority: 'patientdashboard.forms',
   },
 ]

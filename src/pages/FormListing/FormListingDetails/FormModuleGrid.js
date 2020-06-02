@@ -1,5 +1,5 @@
 import React, { PureComponent, useState, useCallback } from 'react'
-import { Tooltip } from '@material-ui/core'
+import { Tooltip, withStyles } from '@material-ui/core'
 import { Delete, Edit, Print } from '@material-ui/icons'
 import { formTypes, formStatus } from '@/utils/codes'
 import {
@@ -11,6 +11,16 @@ import {
 } from '@/components'
 import VoidWithPopover from './FormDetail/VoidWithPopover'
 
+const styles = (theme) => ({
+  errorContainer: {
+    textAlign: 'left',
+    lineHeight: '1em',
+    paddingBottom: theme.spacing(1),
+    '& span': {
+      fontSize: '.8rem',
+    },
+  },
+})
 class FormModuleGrid extends PureComponent {
   constructor (props) {
     super(props)
@@ -51,7 +61,7 @@ class FormModuleGrid extends PureComponent {
               formType: 'CORForm',
               UpdateType: row.type,
               visitLetterOfCertification: [],
-              CORLetterOfCertification: [
+              corLetterOfCertification: [
                 {
                   ...row,
                   formData: JSON.stringify(row.formData),
@@ -187,7 +197,7 @@ class FormModuleGrid extends PureComponent {
                             formType: 'CORForm',
                             UpdateType: row.type,
                             visitLetterOfCertification: [],
-                            CORLetterOfCertification: [
+                            corLetterOfCertification: [
                               {
                                 ...row,
                                 formData: JSON.stringify(row.formData),
@@ -242,4 +252,4 @@ class FormModuleGrid extends PureComponent {
   }
 }
 
-export default FormModuleGrid
+export default withStyles(styles, { name: 'FormModuleGrid' })(FormModuleGrid)

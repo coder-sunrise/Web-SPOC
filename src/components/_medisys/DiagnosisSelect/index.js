@@ -72,7 +72,7 @@ const DiagnosisSelect = ({
   const onDiagnosisSearch = async (v) => {
     const search = {
       props:
-        'id,displayvalue,code,complication,isChasAcuteClaimable,isChasChronicClaimable,isHazeClaimable,iCD10AMFK',
+        'id,displayvalue,code,complication,isChasAcuteClaimable,isChasChronicClaimable,isHazeClaimable,iCD10AMFK,iCD10AMDiagnosisCode,iCD10AMDiagnosisName',
       sorting: [
         { columnName: 'displayvalue', direction: 'asc' },
       ],

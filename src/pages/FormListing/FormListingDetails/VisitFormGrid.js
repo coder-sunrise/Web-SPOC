@@ -39,6 +39,14 @@ const styles = (theme) => ({
     },
   },
 
+  errorContainer: {
+    textAlign: 'left',
+    lineHeight: '1em',
+    paddingBottom: theme.spacing(1),
+    '& span': {
+      fontSize: '.8rem',
+    },
+  },
   popoverContainer: {
     width: 200,
     textAlign: 'left',
@@ -129,7 +137,7 @@ class VisitFormGrid extends PureComponent {
             UpdateType: row.type,
             visitLetterOfCertification:
               formCategory === FORM_CATEGORY.VISITFORM ? voidData : [],
-            CORLetterOfCertification:
+            corLetterOfCertification:
               formCategory === FORM_CATEGORY.CORFORM ? voidData : [],
           },
         }).then(() => {
@@ -283,7 +291,7 @@ class VisitFormGrid extends PureComponent {
                                 formCategory === FORM_CATEGORY.VISITFORM
                                   ? deleteData
                                   : [],
-                              CORLetterOfCertification:
+                              corLetterOfCertification:
                                 formCategory === FORM_CATEGORY.CORFORM
                                   ? deleteData
                                   : [],
@@ -307,7 +315,7 @@ class VisitFormGrid extends PureComponent {
                     )}
                     {row.statusFK === 3 && (
                       <this.VoidForm
-                        classes={setFieldValue}
+                        classes={classes}
                         dispatch={dispatch}
                         row={row}
                       />

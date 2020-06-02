@@ -1,9 +1,10 @@
 import React, { PureComponent } from 'react'
-import { CodeSelect } from '@/components'
+import { Select } from '@/components'
 import { queryList } from '@/services/common'
 
 class ICD10AMSelect extends PureComponent {
   onICD10AMSearch = async (v) => {
+    const { labelField = 'code' } = this.props
     const search = {
       props: 'id,displayvalue,code',
       sorting: [
@@ -12,7 +13,6 @@ class ICD10AMSelect extends PureComponent {
       pagesize: 30,
     }
     if (typeof v === 'string') {
-      const { labelField } = this.props
       if (!labelField || labelField === 'code') {
         search.code = v
       } else {
@@ -22,11 +22,7 @@ class ICD10AMSelect extends PureComponent {
       search.id = Number(v)
     }
 
-    const response = await queryList('/api/codetable/ctsnomeddiagnosis', search)
-    if (response && response.data) {
-      if (this.props.onDataSouceChange)
-        this.props.onDataSouceChange(response.data.data)
-    }
+    const response = await queryList('/api/codetable/cticd10am', search)
     return response
   }
 
@@ -39,19 +35,16 @@ class ICD10AMSelect extends PureComponent {
       options,
       ...otherprops
     } = this.props
+
     return (
-      <CodeSelect
+      <Select
+        autoComplete
         label={label}
         mode={mode}
         options={options}
         valueField={valueField || 'id'}
         labelField={labelField || 'code'}
         query={this.onICD10AMSearch}
-        onChange={(values, opts) => {
-          if (this.props.onChange) {
-            this.props.onChange(values, opts)
-          }
-        }}
         {...otherprops}
       />
     )

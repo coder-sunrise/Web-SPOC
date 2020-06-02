@@ -35,7 +35,6 @@ export default createListViewModel({
           caseType: 'DaySurgery',
           procuderes: [],
           otherDiagnosis: [],
-          surgicalCharges: [],
           nonSurgicalCharges: [],
           others: '',
         },
@@ -76,7 +75,7 @@ export default createListViewModel({
 
         return {
           ...st,
-          list: data.map((o) => {
+          list: data.data.map((o) => {
             return {
               ...o,
               formData: JSON.parse(o.formData),
@@ -97,7 +96,7 @@ export default createListViewModel({
           patientNRICNo,
           patientAccountNo,
           isCanEditForms,
-          cORDiagnosis,
+          corDiagnosis,
         } = data
         let formRows = []
         if (data.formType === 'VisitForm') {
@@ -146,7 +145,7 @@ export default createListViewModel({
             patientNRICNo,
             patientAccountNo,
             isCanEditForms,
-            cORDiagnosis,
+            cORDiagnosis: corDiagnosis,
           },
           list: _.sortBy(formRows, 'sequence'),
         }

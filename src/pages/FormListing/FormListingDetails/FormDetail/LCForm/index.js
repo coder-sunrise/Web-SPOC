@@ -67,24 +67,35 @@ const procuderesSchema = Yup.object().shape({
       } = visitDetail
       const { doctorprofile } = codetable
       const doctor = doctorprofile.find((o) => o.id === doctorProfileFK)
-
       const activeICD10AM = cORDiagnosis.filter((o) => o.diagnosisICD10AMFK)
       // create principalDiagnosis
       let principalDiagnosisFK
+      let principalDiagnosisCode
+      let principalDiagnosisName
       if (activeICD10AM.length > 0) {
         principalDiagnosisFK = activeICD10AM[0].diagnosisICD10AMFK
+        principalDiagnosisCode = activeICD10AM[0].diagnosisICD10AMCode
+        principalDiagnosisName = activeICD10AM[0].diagnosisICD10AMName
       }
 
       // create secondDiagnosisA
       let secondDiagnosisAFK
+      let secondDiagnosisACode
+      let secondDiagnosisAName
       if (activeICD10AM.length > 1) {
         secondDiagnosisAFK = activeICD10AM[1].diagnosisICD10AMFK
+        secondDiagnosisACode = activeICD10AM[1].diagnosisICD10AMCode
+        secondDiagnosisAName = activeICD10AM[1].diagnosisICD10AMName
       }
 
       // create secondDiagnosisB
       let secondDiagnosisBFK
+      let secondDiagnosisBCode
+      let secondDiagnosisBName
       if (activeICD10AM.length > 2) {
         secondDiagnosisBFK = activeICD10AM[2].diagnosisICD10AMFK
+        secondDiagnosisBCode = activeICD10AM[2].diagnosisICD10AMCode
+        secondDiagnosisBName = activeICD10AM[2].diagnosisICD10AMName
       }
 
       // create otherDiagnosis
@@ -95,6 +106,8 @@ const procuderesSchema = Yup.object().shape({
           otherDiagnosis.push({
             uid,
             diagnosisFK: activeICD10AM[index].diagnosisICD10AMFK,
+            diagnosisCode: activeICD10AM[index].diagnosisICD10AMCode,
+            diagnosisName: activeICD10AM[index].diagnosisICD10AMName,
           })
           uid -= 1
         }
@@ -110,12 +123,14 @@ const procuderesSchema = Yup.object().shape({
           admissionDate: visitDate,
           dischargeDate: visitDate,
           principalDiagnosisFK,
+          principalDiagnosisCode,
+          principalDiagnosisName,
           secondDiagnosisAFK,
-          secondDiagnosisACode: null,
-          secondDiagnosisAName: null,
+          secondDiagnosisACode,
+          secondDiagnosisAName,
           secondDiagnosisBFK,
-          secondDiagnosisBCode: null,
-          secondDiagnosisBName: null,
+          secondDiagnosisBCode,
+          secondDiagnosisBName,
           otherDiagnosis,
           principalSurgeonFK: doctorProfileFK,
           principalSurgeonMCRNo: doctor ? doctor.doctorMCRNo : undefined,
@@ -214,19 +229,39 @@ class LCForm extends PureComponent {
                   {
                     sequence: nextSequence,
                     ...values,
-                    formData: JSON.stringify(values.formData),
+                    formData: JSON.stringify({
+                      ...values.formData,
+                      otherDiagnosis: values.formData.otherDiagnosis.map(
+                        (d) => {
+                          const { diagnosiss, ...retainData } = d
+                          return {
+                            ...retainData,
+                          }
+                        },
+                      ),
+                    }),
                     updateByUser: user.data.clinicianProfile.name,
                     statusFK,
                   },
                 ]
               : [],
-          CORLetterOfCertification:
+          corLetterOfCertification:
             formCategory === FORM_CATEGORY.CORFORM
               ? [
                   {
                     sequence: nextSequence,
                     ...values,
-                    formData: JSON.stringify(values.formData),
+                    formData: JSON.stringify({
+                      ...values.formData,
+                      otherDiagnosis: values.formData.otherDiagnosis.map(
+                        (d) => {
+                          const { diagnosiss, ...retainData } = d
+                          return {
+                            ...retainData,
+                          }
+                        },
+                      ),
+                    }),
                     updateByUser: user.data.clinicianProfile.name,
                     statusFK,
                   },

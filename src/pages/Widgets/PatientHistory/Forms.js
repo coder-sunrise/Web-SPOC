@@ -4,9 +4,7 @@ import { CommonTableGrid, notification, Checkbox } from '@/components'
 import { formTypes, formStatus } from '@/utils/codes'
 
 export const viewReport = (row) => {
-  const type = formTypes.find(
-    (o) => o.value === row.type || o.name === row.type || o.code === row.type,
-  )
+  const type = formTypes.find((o) => parseInt(o.value, 10) === row.type)
   const { downloadConfig } = type
   if (!downloadConfig) {
     notification.error({ message: 'No configuration found' })
@@ -49,7 +47,7 @@ export default ({ current }) => {
         rows={includeVoidForms ? forms : forms.filter((o) => o.statusFK !== 4)}
         columns={[
           { name: 'typeName', title: 'Type' },
-          { name: 'updateUserName', title: 'Last Update By' },
+          { name: 'updateByUser', title: 'Last Update By' },
           { name: 'lastUpdateDate', title: 'Last Update Time' },
           { name: 'statusFK', title: 'Status' },
         ]}

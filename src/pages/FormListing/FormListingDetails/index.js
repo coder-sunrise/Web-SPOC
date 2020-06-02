@@ -88,7 +88,7 @@ const styles = () => ({})
 }))
 class FormListingDetails extends PureComponent {
   componentDidMount () {
-    //this.queryFormListing()
+    this.queryFormListing()
   }
 
   queryFormListing = () => {
