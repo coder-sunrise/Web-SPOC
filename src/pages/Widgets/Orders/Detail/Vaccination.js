@@ -369,7 +369,7 @@ class Vaccination extends PureComponent {
                   style={{ marginTop: theme.spacing(2) }}
                   onClick={this.onSearchVaccinationHistory}
                 >
-                  Add New
+                  Add From Past
                 </ProgressButton>
               </Tooltip>
             )}
