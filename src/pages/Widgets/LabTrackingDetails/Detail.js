@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
+import { connect } from 'dva'
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -9,14 +10,15 @@ import {
   GridItem,
   TextField,
   CodeSelect,
-   Accordion,
-   CardContainer,
+  Accordion,
+  CardContainer,
+  dateFormatLongWithTimeNoSec12h,
+  DatePicker,
 } from '@/components'
-import DatePicker from '@/components/DatePicker'
 import { DoctorLabel } from '@/components/_medisys'
 import * as WidgetConfig from './config'
 import { deleteFileByFileID } from '@/services/file'
-import { LAB_TRACKING_STATUS } from '@/utils/constants'
+import { LAB_TRACKING_STATUS, PATIENT_LAB } from '@/utils/constants'
 
 const styles = (theme) => ({
   root: {},
@@ -68,82 +70,129 @@ const styles = (theme) => ({
   },
 })
 
+@connect(({ codetable }) => ({
+  codetable,
+}))
 @withFormikExtend({
-  mapPropsToValues: ({ labTrackingDetails }) =>{
-
+  mapPropsToValues: ({ labTrackingDetails }) => {
     // Construct Attachment
-    let labTrackingResults=[]
+    let labTrackingResults = []
     labTrackingDetails.entity.labTrackingResults.map((labTrackingResult) => {
       labTrackingResults.push({
         ...labTrackingResult,
-        thumbnailIndexFK: undefined,
-        attachmentType:'labTrackingResults',
-        fileExtension:'pdf',
+        attachmentType: 'labTrackingResults',
+        fileExtension: 'pdf',
       })
       return labTrackingResult
     })
 
     return {
-    ...labTrackingDetails.entity,
+      ...labTrackingDetails.entity,
       labTrackingResults,
+      oldRemarks: labTrackingDetails.entity.remarks,
     }
   },
   handleSubmit: (values, { props, resetForm }) => {
     let { ...restValues } = values
-    const { dispatch, onConfirm } = props
+    let { oldRemarks, remarks } = values
+    const { dispatch, onConfirm, codetable } = props
 
-    if(values){
-      let sortOrder = 0 && values.labTrackingResults.length ? values.labTrackingResults.length : 0
+    const saveData = (labTrackingStatusFK) => {
+      if (values) {
+        let sortOrder =
+          0 && values.labTrackingResults.length
+            ? values.labTrackingResults.length
+            : 0
 
-      let item = values.labTrackingResults.map(x => {
-
-        sortOrder += 1
-        if(x.fileIndexFK)
-        {
-          return {
-            ...x,
-            sortOrder,
+        let item = values.labTrackingResults.map((x) => {
+          sortOrder += 1
+          if (x.fileIndexFK) {
+            return {
+              ...x,
+              sortOrder,
+            }
           }
-        }
           return {
-            fileIndexFK:x.id,
+            fileIndexFK: x.id,
             sortOrder,
             fileName: x.fileName,
+            isDeleted: x.isDeleted,
           }
+        })
+        restValues.labTrackingResults = item
+        if (labTrackingStatusFK) {
+          let status = codetable.ltlabtrackingstatus.find(
+            (o) => o.id === labTrackingStatusFK,
+          )
+          if (status) {
+            restValues.labTrackingStatusFK = status.id
+            restValues.labTrackingStatusCode = status.code
+            restValues.labTrackingStatusDisplayValue = status.name
+          }
+        }
+      }
+      dispatch({
+        type: 'labTrackingDetails/upsert',
+        payload: {
+          ...restValues,
+        },
+      }).then((r) => {
+        if (r) {
+          resetForm()
+          if (onConfirm) onConfirm()
+          dispatch({
+            type: 'labTrackingDetails/query',
+          })
+        }
       })
-      restValues.labTrackingResults = item
     }
 
-    dispatch({
-      type: 'labTrackingDetails/upsert',
-      payload: {
-        ...restValues,
-      },
-    }).then((r) => {
-      if (r) {
-        resetForm()
-        if (onConfirm) onConfirm()
-        dispatch({
-          type: 'labTrackingDetails/query',
-        })
-      }
-    })
+    const onConfirmChangeRemarks = () => {
+      saveData(LAB_TRACKING_STATUS.RECEIVED)
+    }
+
+    const exeSubmit = () => {
+      saveData()
+    }
+
+    if (
+      oldRemarks !== remarks &&
+      values.labTrackingStatusFK === LAB_TRACKING_STATUS.NEW
+    ) {
+      dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          openConfirmTitle: '',
+          alignContent: 'left',
+          openConfirmContent: (
+            <div style={{ marginLeft: 10 }}>
+              <div>Remarks has been changed.</div>
+              <div>Do you want to update the status to 'Received'?</div>
+            </div>
+          ),
+          onConfirmSave: onConfirmChangeRemarks,
+          onConfirmClose: exeSubmit,
+          openConfirmText: 'YES',
+          cancelText: 'NO',
+        },
+      })
+    } else {
+      exeSubmit()
+    }
   },
   displayName: 'labTrackingDetails',
 })
-
 class Detail extends PureComponent {
-  state = {}
-
   constructor (props) {
     super(props)
     this.myRef = React.createRef()
-    this.widgets = WidgetConfig.widgets(props)
+    this.widgets = WidgetConfig.widgets(props, this.setShowMessage)
+    this.state = { showMessage: false }
   }
 
   componentDidMount () {
-
-    const { values } = this.props
+    const { values, resultType } = this.props
     if (values && values.labTrackingResults) {
       const { labTrackingResults } = values
 
@@ -154,9 +203,20 @@ class Detail extends PureComponent {
         !item.isDeleted && deleteFileByFileID(item.id)
       })
     }
-    if(values.labTrackingStatusFK) {
+    if (values.labTrackingStatusFK) {
       this.toggleAccordion(values.labTrackingStatusFK)
     }
+
+    this.toggleAccordionByResultType(resultType)
+  }
+
+  setShowMessage = (v) => {
+    this.setState((preState) => {
+      return {
+        ...preState,
+        showMessage: v,
+      }
+    })
   }
 
   renderDropdown = (option) => <DoctorLabel doctor={option} />
@@ -210,7 +270,6 @@ class Detail extends PureComponent {
     setFieldValue('labTrackingResults', updated)
   }
 
-
   changeToggle = (event, p, expanded) => {
     if (expanded) {
       setTimeout(() => {
@@ -224,16 +283,16 @@ class Detail extends PureComponent {
   }
 
   toggleAccordion = (e) => {
-    const {activedKeys} = this.myRef.current.state
-    let newActivedKeys = activedKeys||[]
+    const { activedKeys } = this.myRef.current.state
+    let newActivedKeys = activedKeys || []
     switch (e) {
       case LAB_TRACKING_STATUS.ORDERED:
-        if(newActivedKeys.indexOf(0) ===-1){
+        if (newActivedKeys.indexOf(0) === -1) {
           newActivedKeys.push(0)
         }
         break
       case LAB_TRACKING_STATUS.RECEIVED:
-        if(newActivedKeys.indexOf(1) ===-1){
+        if (newActivedKeys.indexOf(1) === -1) {
           newActivedKeys.push(1)
         }
         break
@@ -241,71 +300,69 @@ class Detail extends PureComponent {
         break
     }
 
-    this.setState({activedKeys: []})
+    this.setState({ activedKeys: [] })
   }
 
+  toggleAccordionByResultType = (resultType) => {
+    const { activedKeys } = this.myRef.current.state
+    let newActivedKeys = activedKeys || []
 
+    if (resultType === PATIENT_LAB.LAB_TRACKING) {
+      if (newActivedKeys.indexOf(0) === -1) {
+        newActivedKeys.push(0)
+      }
+    } else if (newActivedKeys.indexOf(1) === -1) {
+      newActivedKeys.push(1)
+    }
+  }
 
-  getContent =(data,)=>{
+  getContent = (data) => {
     const Widget = data.component
-    const{values} = this.props
+    const { values } = this.props
 
-    return <Widget
-      current={values|| {}}
-      attachment={values.labTrackingResults}
-      updateAttachments={this.updateAttachments}
-    />
+    return (
+      <Widget
+        current={values || {}}
+        attachment={values.labTrackingResults}
+        updateAttachments={this.updateAttachments}
+      />
+    )
   }
 
   render () {
     const { props } = this
-    const { theme, footer } = props
+    const { theme, footer, values, codetable, setFieldValue } = props
+    const { doctorprofile } = codetable
+    const { doctorProfileFK } = values
+
+    let doctorNameLabel = ''
+    let selectDoctor = doctorprofile.find((d) => d.id === doctorProfileFK)
+    if (selectDoctor) {
+      const { doctorMCRNo, clinicianProfile: { name } } = selectDoctor
+      doctorNameLabel = `${name} (${doctorMCRNo})`
+    }
     return (
-      <CardContainer
-        hideHeader
-        size='sm'
-      >
+      <CardContainer hideHeader size='sm'>
         <div>
           <GridContainer>
             <GridItem md={4}>
               <FastField
                 name='patientAccountNo'
                 render={(args) => (
-                  <TextField
-                    label='Patient Acc No.'
-                    {...args}
-                    disabled
-                  />
+                  <TextField label='Patient Acc No.' {...args} disabled />
                 )}
               />
             </GridItem>
             <GridItem md={4}>
               <FastField
                 name='patientName'
-                render={(args) => <TextField label='Patient Name' {...args} disabled />}
+                render={(args) => (
+                  <TextField label='Patient Name' {...args} disabled />
+                )}
               />
             </GridItem>
             <GridItem md={4}>
-              <FastField
-                name='doctorProfileFK'
-                render={(args) => (
-                  <CodeSelect
-                    {...args}
-                    disableAll
-                    allowClear={false}
-                    label='Doctor'
-                    remoteFilter={{
-                      'clinicianProfile.isActive': true,
-                    }}
-                    disabled
-                    localFilter={(option) => option.clinicianProfile.isActive}
-                    code='doctorprofile'
-                    labelField='clinicianProfile.name'
-                    valueField='clinicianProfile.id'
-                    renderDropdown={this.renderDropdown}
-                  />
-                )}
-              />
+              <TextField disabled label='Doctor' value={doctorNameLabel} />
             </GridItem>
             <GridItem md={4}>
               <FastField
@@ -316,7 +373,8 @@ class Detail extends PureComponent {
                       label='Visit Date'
                       {...args}
                       disabled
-                      timeFormat={false}
+                      format={dateFormatLongWithTimeNoSec12h}
+                      showTime
                     />
                   )
                 }}
@@ -338,9 +396,19 @@ class Detail extends PureComponent {
                     label='Status'
                     {...args}
                     code='ltlabtrackingstatus'
-                    onChange={this.toggleAccordion}
+                    onChange={(v, option) => {
+                      this.toggleAccordion(v)
+                      setFieldValue(
+                        'labTrackingStatusCode',
+                        option ? option.code : undefined,
+                      )
+                      setFieldValue(
+                        'labTrackingStatusDisplayValue',
+                        option ? option.name : undefined,
+                      )
+                    }}
                   />
-                    )}
+                )}
               />
             </GridItem>
           </GridContainer>
@@ -351,19 +419,23 @@ class Detail extends PureComponent {
               ref={this.myRef}
               onChange={this.changeToggle}
               mode='multiple'
-              collapses={
-                this.widgets.map((o)=>{
-                  return {
-                    title: this.getTitle(o),
-                    hideExpendIcon:false,
-                    content: this.getContent(o),
-                  }
-                })
-              }
+              collapses={this.widgets.map((o) => {
+                return {
+                  title: this.getTitle(o),
+                  hideExpendIcon: false,
+                  content: this.getContent(o),
+                }
+              })}
             />
           </div>
-
         </div>
+        {this.state.showMessage && (
+          <div>
+            <span style={{ color: 'red' }}>
+              Note: Case type or case descprition already get changed.
+            </span>
+          </div>
+        )}
         {footer &&
           footer({
             onConfirm: props.handleSubmit,
@@ -377,4 +449,4 @@ class Detail extends PureComponent {
   }
 }
 
-export default withStyles (styles,{withTheme:true})(Detail)
+export default withStyles(styles, { withTheme: true })(Detail)

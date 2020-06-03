@@ -39,7 +39,14 @@ const QueueCallingList = ({ data, rerender, setRerender }) => {
           >
             {currentPartition[index].roomNo}
           </p>
-          <p style={{ fontWeight: 'bold' }}>{currentPartition[index].qNo}</p>
+          <p style={{ fontWeight: 'bold', fontSize: '8vw' }}>
+            {currentPartition[index].qNo ===
+            parseInt(currentPartition[index].qNo, 10) ? (
+              currentPartition[index].qNo
+            ) : (
+              currentPartition[index].qNo.padStart(3, '0')
+            )}
+          </p>
         </div>
       )
       elements.push(element)

@@ -74,7 +74,7 @@ export const menuData = [
     url: '/setting/room',
   },
   {
-    // authority: 'settings.clinicsetting.roomAssignment',
+    authority: 'settings.clinicsetting.roomassignment',
     title: 'Clinic Setting',
     text: 'Room Assignment',
     url: '/setting/roomassignment',
@@ -190,16 +190,22 @@ export const menuData = [
     url: '/setting/treatmentcategory',
   },
   {
-      authority: 'settings.clinicsetting.casetype',
-      title: 'Clinic Setting',
-      text: 'CASE Type',
-      url: '/setting/casetype',
+    authority: 'settings.clinicsetting.casetype',
+    title: 'Clinic Setting',
+    text: 'CASE Type',
+    url: '/setting/casetype',
   },
   {
-      authority: 'settings.clinicsetting.casedescription',
+    authority: 'settings.clinicsetting.casedescription',
+    title: 'Clinic Setting',
+    text: 'CASE DESCRIPTION',
+    url: '/setting/casedescription',
+  },
+  {
+      authority: 'settings.clinicsetting.refractiontesttype',
       title: 'Clinic Setting',
-      text: 'CASE DESCRIPTION',
-      url: '/setting/casedescription',
+      text: 'REFRACTION TEST TYPE',
+      url: '/setting/refractiontesttype',
   },
   {
     authority: 'settings.systemuser.systemuser',
@@ -212,6 +218,12 @@ export const menuData = [
     title: 'System User',
     text: 'Role & Access Right',
     url: '/setting/userrole',
+  },
+  {
+    title: 'Print Setup',
+    text: 'Master Printout Setting',
+    url: '/setting/masterprintoutsetting',
+    authority: 'settings.printsetup.masterprintoutsetting',
   },
   {
     authority: 'settings.printsetup.printoutsetting',

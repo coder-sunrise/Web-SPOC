@@ -1,14 +1,14 @@
 import React, { Fragment, PureComponent } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
-import Detail from './Detail'
 import { PATIENT_LAB } from '@/utils/constants'
+import { CommonModal } from '@/components'
+import { findGetParameter } from '@/utils/utils'
+import Detail from './Detail'
 import FilterBar from './FilterBar'
 import OverallGrid from './OverallGrid'
 import PatientGrid from './PatientGrid'
 import model from './models'
-import { CommonModal } from '@/components'
-import {findGetParameter} from "@/utils/utils"
 
 window.g_app.replaceModel(model)
 
@@ -24,12 +24,10 @@ const styles = (theme) => ({
   },
 })
 
-
 @connect(({ labTrackingDetails }) => ({
   labTrackingDetails,
 }))
-class LabTrackingDetails extends PureComponent{
-
+class LabTrackingDetails extends PureComponent {
   state = {
     height: 100,
   }
@@ -38,26 +36,23 @@ class LabTrackingDetails extends PureComponent{
     this.resize()
     window.addEventListener('resize', this.resize.bind(this))
 
-    const {dispatch, patientId,resultType} = this.props
+    const { dispatch, patientId, resultType } = this.props
 
     const IsOverallGrid = resultType === PATIENT_LAB.LAB_TRACKING
     let patientID = patientId || Number(findGetParameter('pid')) || undefined
-    const payload = IsOverallGrid ? undefined : {
-      visitFKNavigation: patientID ? {
-        patientProfileFK : patientID,
-      }:undefined,
-      lgteql_visitDate:undefined,
-      lsteql_visitDate:undefined,
-      labTrackingStatusFK:undefined,
-      apiCriteria:undefined,
-      serviceName:undefined,
-    }
 
     dispatch({
-      type: 'labTrackingDetails/query',
-      payload,
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctcasedescription',
+      },
     })
-
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctcasetype',
+      },
+    })
   }
 
   componentWillUnmount () {
@@ -65,7 +60,7 @@ class LabTrackingDetails extends PureComponent{
   }
 
   toggleModal = () => {
-    const {labTrackingDetails} = this.props
+    const { labTrackingDetails } = this.props
     this.props.dispatch({
       type: 'labTrackingDetails/updateState',
       payload: {
@@ -87,25 +82,25 @@ class LabTrackingDetails extends PureComponent{
     const { resultType, dispatch, labTrackingDetails, patientId } = this.props
     const IsOverallGrid = resultType === PATIENT_LAB.LAB_TRACKING
 
+    let patientID = patientId || Number(findGetParameter('pid')) || undefined
+
     const cfg = {
       toggleModal: this.toggleModal,
     }
 
-    return(
+    return (
       <div>
-        <FilterBar dispatch={dispatch} IsOverallGrid={IsOverallGrid} patientId={patientId} />
-        <div style={{margin:10}}>
-          {IsOverallGrid?
-            (<OverallGrid
-              dispatch={dispatch}
-              {...cfg}
-              {...this.props}
-            />):(
-              <PatientGrid
-                dispatch={dispatch}
-                {...cfg}
-                {...this.props}
-              />)}
+        <FilterBar
+          dispatch={dispatch}
+          IsOverallGrid={IsOverallGrid}
+          patientId={patientID}
+        />
+        <div style={{ margin: 10 }}>
+          {IsOverallGrid ? (
+            <OverallGrid dispatch={dispatch} {...cfg} {...this.props} />
+          ) : (
+            <PatientGrid dispatch={dispatch} {...cfg} {...this.props} />
+          )}
         </div>
         <CommonModal
           open={labTrackingDetails.showModal}
@@ -123,4 +118,4 @@ class LabTrackingDetails extends PureComponent{
   }
 }
 
-export default withStyles(styles,{withTheme:true})(LabTrackingDetails)
+export default withStyles(styles, { withTheme: true })(LabTrackingDetails)

@@ -12,8 +12,9 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingRoomAssignment }) => ({
+@connect(({ settingRoomAssignment,codetable }) => ({
   settingRoomAssignment,
+  codetable,
 }))
 @withSettingBase({ modelName: 'settingRoomAssignment' })
 class RoomAssignment extends PureComponent {
@@ -22,6 +23,13 @@ class RoomAssignment extends PureComponent {
       type: 'settingRoomAssignment/query',
       payload: {
         pagesize: 9999,
+      },
+    })
+
+    this.props.dispatch({
+      type: 'global/updateState',
+      payload: {
+        disableSave: false,
       },
     })
   }

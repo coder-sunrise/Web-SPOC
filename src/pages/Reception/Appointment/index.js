@@ -210,6 +210,10 @@ class Appointment extends React.PureComponent {
       type: 'calendar/setCurrentViewDate',
       payload: moment().toDate(),
     })
+
+    dispatch({
+      type: 'appointment/getFilterTemplate',
+    })
   }
 
   componentWillUnmount () {

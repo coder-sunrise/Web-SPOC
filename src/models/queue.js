@@ -134,6 +134,30 @@ export default createListViewModel({
         }
         return response
       },
+      *reopenLastSession (_, { call, put }) {
+        const response = yield call(service.reopenLastSession)
+
+        if (response) {
+          // reopen session successfully
+          yield put({
+            type: 'updateSessionInfo',
+            payload: { ...response },
+          })
+          yield put({
+            type: 'query',
+            payload: {
+              'VisitFKNavigation.BizSessionFK': response.id,
+            },
+          })
+        }
+        return yield put({
+          type: 'toggleError',
+          error: {
+            hasError: true,
+            message: 'Failed to reopen session.',
+          },
+        })
+      },
       *getCurrentActiveSessionInfo (_, { call, put }) {
         const bizSessionPayload = {
           IsClinicSessionClosed: false,

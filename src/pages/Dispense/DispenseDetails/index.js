@@ -12,6 +12,7 @@ import AddAlert from '@material-ui/icons/AddAlert'
 // sub components
 import TableData from './TableData'
 import VaccinationGrid from './VaccinationGrid'
+import DrugLabelSelection from './DrugLabelSelection'
 // common component
 import {
   Button,
@@ -36,6 +37,7 @@ import CONSTANTS from './constants'
 
 import { dangerColor } from '@/assets/jss'
 
+import { CommonModal } from '@/components'
 // const styles = (theme) => ({
 //   gridRow: {
 //     margin: `${theme.spacing.unit}px 0px`,
@@ -90,6 +92,12 @@ const DispenseDetails = ({
   codetable,
   dispense,
   history,
+  onDrugLabelClick,
+  showDrugLabelSelection,
+  onDrugLabelSelectionClose,
+  onDrugLabelSelected,
+  onDrugLabelNoChanged,
+  selectedDrugs, 
 }) => {
   const {
     prescription,
@@ -199,23 +207,21 @@ const DispenseDetails = ({
       <GridContainer>
         <GridItem justify='flex-start' md={6} className={classes.actionButtons}>
           {!viewOnly &&
-          !isRetailVisit && (
-            <Button
-              color='info'
-              size='sm'
-              onClick={onReloadClick}
-              disabled={disableRefreshOrder}
-            >
-              <Refresh />
+            !isRetailVisit && (
+              <Button
+                color='info'
+                size='sm'
+                onClick={onReloadClick}
+                disabled={disableRefreshOrder}
+              >
+                <Refresh />
               Refresh Order
-            </Button>
-          )}
+              </Button>
+            )}
           <Button
             color='primary'
             size='sm'
-            onClick={() => {
-              onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
-            }}
+            onClick={onDrugLabelClick}
             disabled={sendingJob}
           >
             {sendingJob ? <Refresh className='spin-custom' /> : <Print />}
@@ -358,6 +364,29 @@ const DispenseDetails = ({
           </GridItem>
         )}
       </GridContainer>
+      <CommonModal
+        title='Print Drug Labels'
+        open={showDrugLabelSelection}
+        observe='DispenseDetails'
+        onClose={() => {
+          onDrugLabelSelectionClose()
+        }}
+      // onConfirm={() => { 
+      //    onDrugLabelSelectionClose()
+      //    onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
+      // }}
+      >
+        <DrugLabelSelection
+          prescription={selectedDrugs} 
+          codetable={codetable}
+          handleDrugLabelSelected={onDrugLabelSelected}
+          handleDrugLabelNoChanged={onDrugLabelNoChanged}
+          handleSubmit={() => {
+            onDrugLabelSelectionClose()
+            onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
+          }}
+        />
+      </CommonModal>
     </React.Fragment>
   )
 }

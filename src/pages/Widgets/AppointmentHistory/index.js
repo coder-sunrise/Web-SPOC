@@ -165,24 +165,25 @@ class AppointmentHistory extends PureComponent {
     return (
       <div>
         <CardContainer hideHeader size='sm'>
-          <h4 style={{ marginTop: 20 }}>Previous Appointment</h4>
+          <h4 style={{ marginTop: 20 }}>Current & Future Appointment</h4>
 
           <CommonTableGrid
             size='sm'
-            rows={previousAppt}
-            {...previousApptTableParams}
+            rows={futureAppt}
+            {...futureApptTableParams}
           />
+
           <h4
             style={{
               marginTop: theme.spacing(2),
             }}
           >
-            Current & Future Appointment
+            Previous Appointment
           </h4>
           <CommonTableGrid
             size='sm'
-            rows={futureAppt}
-            {...futureApptTableParams}
+            rows={previousAppt}
+            {...previousApptTableParams}
           />
         </CardContainer>
       </div>

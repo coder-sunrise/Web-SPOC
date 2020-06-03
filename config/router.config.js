@@ -711,11 +711,9 @@ const _routes = [
             path: '/report/inventorystockcountreport',
             name: 'inventorystockcountreport',
             component: './Report/InventoryStockCountReport',
-          },
-          {
-            path: '/report/inventorystockcountreport',
-            name: 'inventorystockcountreport',
-            component: './Report/InventoryStockCountReport',
+            authority: [
+              'report.inventory.inventorystockcountreport',
+            ],
           },
           {
             path: '/report/inventorylistingreport',
@@ -870,6 +868,9 @@ const _routes = [
             path: '/setting/roomassignment',
             name: 'roomassignment',
             component: './Setting/RoomAssignment',
+            authority: [
+              'settings.clinicsetting.roomassignment',
+            ],
           },
           {
             path: '/setting/clinicbreakhour',
@@ -1039,6 +1040,11 @@ const _routes = [
               'settings.printsetup.printoutsetting',
             ],
           },
+          {
+            path: '/setting/masterprintoutsetting',
+            name: 'masterprintoutsetting',
+            component: './Setting/MasterPrintoutSetting',
+          },
           // {
           //   path: '/finance/company/1',
           //   name: 'copayer',
@@ -1133,20 +1139,20 @@ const _routes = [
             ],
           },
           {
-              path: '/setting/casetype',
-              name: 'casetype',
-              component: './Setting/CaseType',
-              authority: [
-                  'settings.clinicsetting.casetype',
-              ],
+            path: '/setting/casetype',
+            name: 'casetype',
+            component: './Setting/CaseType',
+            authority: [
+              'settings.clinicsetting.casetype',
+            ],
           },
           {
-              path: '/setting/casedescription',
-              name: 'casedescription',
-              component: './Setting/CaseDescription',
-              authority: [
-                  'settings.clinicsetting.casedescription',
-              ],
+            path: '/setting/casedescription',
+            name: 'casedescription',
+            component: './Setting/CaseDescription',
+            authority: [
+              'settings.clinicsetting.casedescription',
+            ],
           },
           {
             path: '/setting/referralsource',
@@ -1163,6 +1169,14 @@ const _routes = [
             authority: [
               'settings.templates.visitordertemplate',
             ],
+          },
+          {
+              path: '/setting/refractiontesttype',
+              name: 'refractiontesttype',
+              component: './Setting/RefractionTestType',
+              authority: [
+                  'settings.clinicsetting.refractiontesttype',
+              ],
           },
         ],
       },

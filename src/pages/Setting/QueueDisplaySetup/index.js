@@ -64,6 +64,7 @@ const styles = (theme) => ({
         } = image
         return {
           ...restImageValues,
+          fileIndexFK: restImageValues.id,
           thumbnailIndexFK: thumbnailIndexFK || thumbnail.id,
         }
       })
@@ -152,19 +153,25 @@ class QueueDisplaySetup extends PureComponent {
   }
 
   render () {
-    const { classes, handleSubmit, values: { value = {} } } = this.props
+    const {
+      classes,
+      handleSubmit,
+      dispatch,
+      values: { value = {} },
+    } = this.props
     const activeImages = (value.images || [])
       .filter((image) => !image.isDeleted)
 
     return (
       <React.Fragment>
-        <QueueDashboardButton />
+        <QueueDashboardButton showClear dispatch={dispatch} />
         <CardContainer hideHeader className={classes.container}>
           <GridContainer>
             <GridItem md={10}>
               <AttachmentWithThumbnail
                 label='Image: (maximum 5)'
-                attachmentType='Visit'
+                attachmentType='QueueDisplay'
+                hideRemarks
                 handleUpdateAttachments={this.handleUpdateAttachments}
                 attachments={activeImages}
                 disableUpload={activeImages.length >= 5}

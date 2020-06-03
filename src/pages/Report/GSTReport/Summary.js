@@ -35,7 +35,7 @@ const Summary = ({ reportDatas }) => {
     {
       id: '3',
       name: 'Total Input Tax:',
-      value: SumExpenditureGstDetail.sumExpenditureAmount,
+      value: SumExpenditureGstDetail.sumExpenditureGst,
     },
     {
       id: '4',
