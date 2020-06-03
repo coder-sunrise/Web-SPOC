@@ -718,7 +718,7 @@ class Medication extends PureComponent {
                     style={{ marginTop: theme.spacing(2) }}
                     onClick={this.onSearchMedicationHistory}
                   >
-                    Add New
+                    Add From Past
                   </ProgressButton>
                 </Tooltip>
               )}

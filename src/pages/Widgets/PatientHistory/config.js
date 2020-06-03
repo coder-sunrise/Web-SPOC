@@ -17,7 +17,7 @@ export const WIDGETS_ID = {
   TREATMENT: '10',
 }
 
-export const widgets = (props) => [
+export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
   {
     id: '3',
     name: 'History',
@@ -27,13 +27,12 @@ export const widgets = (props) => [
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return (
-          <AuthorizedContext.Provider
-            value={{
-              rights: 'disable',
-            }}
-          >
-            <Cmpnet {...props} {...p} fieldName='history' />
-          </AuthorizedContext.Provider>
+          <Cmpnet
+            {...props}
+            {...p}
+            scribbleNoteUpdateState={scribbleNoteUpdateState}
+            fieldName='history'
+          />
         )
       },
       loading: Loading,
@@ -49,13 +48,12 @@ export const widgets = (props) => [
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return (
-          <AuthorizedContext.Provider
-            value={{
-              rights: 'disable',
-            }}
-          >
-            <Cmpnet {...props} {...p} fieldName='chiefComplaints' />
-          </AuthorizedContext.Provider>
+          <Cmpnet
+            {...props}
+            {...p}
+            scribbleNoteUpdateState={scribbleNoteUpdateState}
+            fieldName='chiefComplaints'
+          />
         )
       },
       loading: Loading,
@@ -70,13 +68,12 @@ export const widgets = (props) => [
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return (
-          <AuthorizedContext.Provider
-            value={{
-              rights: 'disable',
-            }}
-          >
-            <Cmpnet {...props} {...p} fieldName='note' />
-          </AuthorizedContext.Provider>
+          <Cmpnet
+            {...props}
+            {...p}
+            scribbleNoteUpdateState={scribbleNoteUpdateState}
+            fieldName='note'
+          />
         )
       },
       loading: Loading,
@@ -91,13 +88,12 @@ export const widgets = (props) => [
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return (
-          <AuthorizedContext.Provider
-            value={{
-              rights: 'disable',
-            }}
-          >
-            <Cmpnet {...props} {...p} fieldName='plan' />
-          </AuthorizedContext.Provider>
+          <Cmpnet
+            {...props}
+            scribbleNoteUpdateState={scribbleNoteUpdateState}
+            {...p}
+            fieldName='plan'
+          />
         )
       },
       loading: Loading,

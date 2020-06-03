@@ -2,7 +2,7 @@ import moment from 'moment'
 import _ from 'lodash'
 import Authorized from '@/utils/Authorized'
 import { dateFormatLong, dateFormatLongWithTime } from './format'
-import { UNFIT_TYPE } from './constants'
+import { UNFIT_TYPE, SCRIBBLE_NOTE_TYPE } from './constants'
 import { calculateAgeFromDOB } from './dateUtils'
 
 const status = [
@@ -1040,6 +1040,13 @@ const initRoomAssignment = async () => {
   }
 }
 
+const scribbleTypes = [
+  { type: 'history', typeFK: SCRIBBLE_NOTE_TYPE.HISTORY },
+  { type: 'chiefComplaints', typeFK: SCRIBBLE_NOTE_TYPE.CHIEFCOMPLAINTS },
+  { type: 'note', typeFK: SCRIBBLE_NOTE_TYPE.CLINICALNOTES },
+  { type: 'plan', typeFK: SCRIBBLE_NOTE_TYPE.PLAN },
+]
+
 const formTypes = [
   {
     value: '1',
@@ -1484,6 +1491,7 @@ module.exports = {
   groupByFKFunc,
   corAttchementTypes,
   initRoomAssignment,
+  scribbleTypes,
   formTypes,
   formStatus,
   gstChargedTypes,
