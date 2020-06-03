@@ -30,10 +30,11 @@ import {
   NOTIFICATION_TYPE,
 } from '@/utils/constants'
 
-@connect(({ user, clinicInfo, header }) => ({
+@connect(({ user, clinicInfo, header, systemMessage }) => ({
   user,
   clinicInfo,
   header,
+  systemMessage,
 }))
 class HeaderLinks extends React.Component {
   state = {
@@ -96,10 +97,16 @@ class HeaderLinks extends React.Component {
     const { dispatch } = this.props
     let payload = {
       // lgt_EffectiveEndDate: moment().formatUTC(false),
-      lst_EffectiveStartDate: moment().formatUTC(false),
       pagesize: 3,
       typeId: 1,
       systemMessageTypeFK: 1,
+      group: [
+        {
+          lst_EffectiveStartDate: moment().formatUTC(false),
+          isAlertAfterLogin: false,
+          combineCondition: 'or',
+        },
+      ],
       sorting: [
         { columnName: 'createDate', direction: 'desc' },
       ],
@@ -173,7 +180,14 @@ class HeaderLinks extends React.Component {
   }
 
   render () {
-    const { classes, rtlActive, user, clinicInfo, header } = this.props
+    const {
+      classes,
+      rtlActive,
+      user,
+      clinicInfo,
+      header,
+      systemMessage,
+    } = this.props
     const { openAccount } = this.state
     const { signalRConnected, notifications } = header
 
@@ -207,6 +221,7 @@ class HeaderLinks extends React.Component {
               <Notification
                 dispatch={this.props.dispatch}
                 notifications={notifications}
+                systemMessage={systemMessage}
               />
               {!signalRConnected && (
                 <Tooltip title='Real-time update signal is down. Please refresh manually.'>

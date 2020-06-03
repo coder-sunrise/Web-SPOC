@@ -64,8 +64,8 @@ class SystemMessageDetail extends React.Component {
   }
 
   render () {
-    const { footer, classes, systemMessage: { entity } } = this.props
-    const { contents } = entity
+    const { footer, classes, systemMessage: { entity = {} } } = this.props
+    const { contents = 'System message has not found.' } = entity
     return (
       <GridContainer>
         <GridItem>

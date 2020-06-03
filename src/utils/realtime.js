@@ -53,7 +53,7 @@ const updateSignalRState = () => {
 }
 
 const initStream = () => {
-  const signalREndPoint = process.env.signalrUrl
+  const signalREndPoint = 'https://localhost:44372/notificationHub/'
 
   connection = new signalR.HubConnectionBuilder()
     .withUrl(signalREndPoint, {
@@ -68,17 +68,11 @@ const initStream = () => {
     const { dispatch, getState } = window.g_app._store
 
     if (type === 'Announcement') {
+      console.log(response)
       dispatch({
-        type: 'systemMessage/updateState',
+        type: 'systemMessage/received',
         payload: {
-          entity: response,
-        },
-      })
-
-      dispatch({
-        type: 'global/updateState',
-        payload: {
-          showSystemMessage: true,
+          ...response,
         },
       })
     } else {

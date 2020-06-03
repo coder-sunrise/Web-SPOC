@@ -11,3 +11,6 @@ export const upsertRead = (params) => {
 export const upsertDismiss = (params) => {
   return service.upsert(`${url}/dismiss`, params)
 }
+export const upsertDismissAll = (params) => {
+  return service.upsert(`${url}/dismissall`, params)
+}

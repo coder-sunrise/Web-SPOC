@@ -85,9 +85,9 @@ const Content = ({ systemMessage, classes, dispatch }) => {
 
   return (
     <ListItem button alignItems='flex-start' className={classes.itemRoot}>
-      <ListItemIcon className={classes.icon}>
+      {/* <ListItemIcon className={classes.icon}>
         <Info style={{ color: infoColor }} />
-      </ListItemIcon>
+      </ListItemIcon> */}
       <ListItemText
         primary={
           <div>
@@ -98,8 +98,9 @@ const Content = ({ systemMessage, classes, dispatch }) => {
                 color='primary'
                 className={classes.titleLinkBtn}
                 onClick={handleOpenDetail}
+                style={{ display: 'block' }}
               >
-                {messageTitle}&nbsp;
+                {messageTitle}
               </Button>
             </div>
           </div>
@@ -114,7 +115,7 @@ const Content = ({ systemMessage, classes, dispatch }) => {
             >
               <React.Fragment>
                 <p className={classes.timestampText}>
-                  {moment(systemMessage.timestamp).format(
+                  {moment(systemMessage.createDate).format(
                     dateFormatLongWithTimeNoSec,
                   )}
                 </p>

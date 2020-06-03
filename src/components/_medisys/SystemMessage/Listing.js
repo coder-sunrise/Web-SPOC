@@ -7,7 +7,7 @@ import { withStyles, Divider } from '@material-ui/core'
 import AddAlertIcon from '@material-ui/icons/AddAlert'
 // common components
 import { hoverColor } from 'mui-pro-jss'
-import { Button, Tabs } from '@/components'
+import { Button, Tabs, Badge, GridItem, GridContainer } from '@/components'
 import moment from 'moment'
 
 // sub components
@@ -63,14 +63,28 @@ class SystemMessageList extends React.Component {
         type: 'systemMessage/queryList',
         payload: {
           // lgt_EffectiveEndDate: moment().formatUTC(false),
-          lst_EffectiveStartDate: moment().formatUTC(false),
           pagesize: 3,
           typeId: msgTypeId,
           systemMessageTypeFK: msgTypeId,
+          group: [
+            {
+              lst_EffectiveStartDate: moment().formatUTC(false),
+              isAlertAfterLogin: false,
+              combineCondition: 'or',
+            },
+          ],
           current: current + 1,
           sorting: [
             { columnName: 'createDate', direction: 'desc' },
           ],
+        },
+      })
+    }
+    const handelDimissAll = (msgTypeId) => {
+      dispatch({
+        type: 'systemMessage/dismissAll',
+        payload: {
+          id: msgTypeId,
         },
       })
     }
@@ -139,8 +153,13 @@ class SystemMessageList extends React.Component {
                         />
                       ))}
                     </div>
-                    {isEnableLoadMore ? (
-                      <div style={{ textAlign: 'center' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      {isEnableLoadMore ? (
                         <Button
                           size='sm'
                           link
@@ -151,10 +170,21 @@ class SystemMessageList extends React.Component {
                         >
                           load more
                         </Button>
-                      </div>
-                    ) : (
-                      ''
-                    )}
+                      ) : (
+                        <div />
+                      )}
+
+                      <Button
+                        size='sm'
+                        link
+                        color='primary'
+                        onClick={() => {
+                          handelDimissAll(o.id)
+                        }}
+                      >
+                        dismiss all
+                      </Button>
+                    </div>
                   </div>
                 ),
               }

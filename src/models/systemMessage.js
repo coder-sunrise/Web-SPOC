@@ -1,4 +1,5 @@
 import { createListViewModel } from 'medisys-model'
+import moment from 'moment'
 
 import * as service from '../services/systemMessage.js'
 
@@ -56,10 +57,49 @@ export default createListViewModel({
 
         return data
       },
+      *received ({ payload }, { call, put }) {
+        const { id, isDeleted = false } = payload
+        const filter = {
+          id,
+          pagesize: 1,
+          group: [
+            {
+              lst_EffectiveStartDate: moment().formatUTC(false),
+              isAlertAfterLogin: false,
+              combineCondition: 'or',
+            },
+          ],
+        }
+        if (isDeleted) {
+          yield put({
+            type: 'receivedDone',
+            payload: {
+              id,
+              isDeleted,
+            },
+          })
+          return null
+        }
+
+        const response = yield call(service.queryList, filter)
+        const { data, status } = response
+        if (status === '200' || data) {
+          yield put({
+            type: 'receivedDone',
+            payload: {
+              id,
+              isDeleted,
+              data,
+            },
+          })
+        }
+        return data
+      },
 
       *read ({ payload }, { call, put }) {
         const response = yield call(service.upsertRead, payload)
         if (response) {
+          yield put({ type: 'received', payload })
           yield put({
             type: 'queryOneDone',
             payload: { data: response },
@@ -72,10 +112,31 @@ export default createListViewModel({
       *dismiss ({ payload }, { call, put }) {
         const response = yield call(service.upsertDismiss, payload)
         if (response === 200) {
-          // const res = yield call(service.query, payload)
+          yield put({ type: 'received', payload })
           yield put({
             type: 'dismissDone',
-            payload,
+            payload: {
+              ids: [
+                payload.id,
+              ],
+            },
+          })
+          return true
+        }
+        return false
+      },
+      *dismissAll ({ payload }, { call, put }) {
+        const response = yield call(service.upsertDismissAll, payload)
+        const { data = [], status } = response
+        if (status === '200' && data.length > 0) {
+          yield put({ type: 'received', payload: { id: data[0] } })
+          yield put({
+            type: 'dismissDone',
+            payload: {
+              ids: [
+                ...data,
+              ],
+            },
           })
           return true
         }
@@ -84,13 +145,11 @@ export default createListViewModel({
     },
     reducers: {
       dismissDone (st, { payload }) {
-        const { id } = payload
+        const { ids } = payload
         const { list } = st
-
         for (let i in list) {
-          if (list[i].id === id) {
+          if (ids.includes(list[i].id)) {
             list[i].isDismissed = true
-            break
           }
         }
         return {
@@ -119,7 +178,82 @@ export default createListViewModel({
           entity: data,
         }
       },
+      receivedDone (st, { payload = {} }) {
+        const { list, totalUnReadCount } = st
+        const { isDeleted = false, id, data } = payload
+        let newST = st
+        if (isDeleted) {
+          let deletedIsUnRead = false
+          let systemMessageTypeFK
+          const newList = list.reduce((pre, cur) => {
+            if (cur.id === id) {
+              deletedIsUnRead = cur.isRead && cur.isDismissed
+              systemMessageTypeFK = cur.systemMessageTypeFK
+              return pre
+            }
+            return [
+              ...pre,
+              cur,
+            ]
+          }, [])
 
+          const pagination = st[`pagination${systemMessageTypeFK}`]
+          newST = {
+            ...st,
+            list: newList,
+            [`pagination${systemMessageTypeFK}`]: {
+              ...pagination,
+              totalRecords: pagination.totalRecords - 1,
+            },
+            totalUnReadCount: deletedIsUnRead
+              ? totalUnReadCount - 1
+              : totalUnReadCount,
+          }
+        } else {
+          const datas = data.data
+          if (datas && datas.length === 1) {
+            const [
+              entity,
+            ] = datas
+            const { systemMessageTypeFK } = entity
+            const pagination = st[`pagination${systemMessageTypeFK}`]
+            if (!list.some((f) => f.id === entity.id)) {
+              newST = {
+                ...st,
+                list: [
+                  entity,
+                  ...list,
+                ],
+                [`pagination${systemMessageTypeFK}`]: {
+                  ...pagination,
+                  totalRecords: pagination.totalRecords + 1,
+                },
+                totalUnReadCount: entity.totalUnReadCount,
+              }
+            } else {
+              const newList = list.reduce((pre, cur) => {
+                if (cur.id === entity.id) {
+                  return [
+                    ...pre,
+                    entity,
+                  ]
+                }
+                return [
+                  ...pre,
+                  cur,
+                ]
+              }, [])
+
+              newST = {
+                ...st,
+                list: newList,
+                totalUnReadCount: entity.totalUnReadCount,
+              }
+            }
+          }
+        }
+        return newST
+      },
       querySuccess (st, { payload = {} }) {
         const { data, typeId, version, keepFilter = true } = payload
         const datas = data.entities ? data.entities : data.data
@@ -137,6 +271,8 @@ export default createListViewModel({
         return {
           ...st,
           list,
+          totalUnReadCount:
+            datas.length > 0 ? datas[0].totalUnReadCount : st.totalUnReadCount,
           [`filter${typeId}`]: keepFilter ? filter : {},
           [`pagination${typeId}`]: {
             ...st[`pagination${typeId}`],

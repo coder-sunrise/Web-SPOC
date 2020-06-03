@@ -24,6 +24,7 @@ const styles = (theme) => ({
 
 const NotificationComponent = ({
   notifications = [],
+  systemMessage,
   dispatch,
   classes,
   theme,
@@ -33,6 +34,7 @@ const NotificationComponent = ({
       type: 'queueLog/refresh',
     })
   }
+  const { totalUnReadCount = 0 } = systemMessage
 
   const overlay = (
     <div style={{ position: 'relative', width: 600 }}>
@@ -44,11 +46,12 @@ const NotificationComponent = ({
         // onChange={(e) => setActive(e)}
         options={TYPES.map((o) => {
           const list = notifications.filter((m) => !o.id || m.type === o.id)
+          let unReadCounts =
+            o.id === 4 ? totalUnReadCount : list.filter((m) => !m.read).length
+
           return {
             ...o,
-            name: `${o.name} ${list.filter((m) => !m.read).length > 0
-              ? `(${list.filter((m) => !m.read).length})`
-              : ''}`,
+            name: `${o.name} ${unReadCounts > 0 ? `(${unReadCounts})` : ''}`,
             content:
               o.id === 4 ? (
                 <SystemMessageList dispatch={dispatch} type={o.id} />
@@ -81,7 +84,9 @@ const NotificationComponent = ({
       overlay={overlay}
     >
       <Badge
-        badgeContent={notifications.filter((o) => !o.read).length}
+        badgeContent={
+          notifications.filter((o) => !o.read).length + totalUnReadCount
+        }
         color='primary'
         anchorOrigin={{
           vertical: 'top',
