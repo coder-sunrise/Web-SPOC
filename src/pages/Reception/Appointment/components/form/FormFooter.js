@@ -15,7 +15,7 @@ const ButtonText = {
   CHECK: 'Check Availability',
   DRAFT: 'Save Draft',
   ADD: 'Save Appointment',
-  EDIT: 'Reschedule Appointment',
+  EDIT: 'Save',
 }
 
 const FormFooter = ({
