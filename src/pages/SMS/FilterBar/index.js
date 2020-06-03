@@ -4,6 +4,7 @@ import { compose } from 'redux'
 import { FormattedMessage } from 'umi/locale'
 // formik
 import { withFormik } from 'formik'
+import { connect } from 'dva'
 // material ui
 import Search from '@material-ui/icons/Search'
 import Print from '@material-ui/icons/Print'
@@ -18,6 +19,7 @@ import FilterByPatient from './FilterByPatient'
 import PostCardLabelBtn from './PostCardLabelBtn'
 import { APPOINTMENT_STATUS, SMS_STATUS } from '@/utils/constants'
 import { formatDatesToUTC } from '@/utils/dateUtils'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   filterBar: {
@@ -82,19 +84,40 @@ const FilterBar = ({
 export default compose(
   withStyles(styles, { withTheme: true }),
   withFormik({
-    mapPropsToValues: () => ({
-      upcomingAppointmentDate: [
-        moment(),
-        moment().add(1, 'months'),
-      ],
-      appointmentType: [],
+    mapPropsToValues: ({ currentUser, doctorprofile }) => {
+      const viewOtherApptAccessRight = Authorized.check(
+        'appointment.viewotherappointment',
+      )
 
-      pdpaConsent: [
-        '1',
-        '2',
-        '3',
-      ],
-    }),
+      const isActiveDoctor = doctorprofile.find(
+        (doctor) =>
+          doctor.clinicianProfile.isActive &&
+          doctor.clinicianProfile.id === currentUser,
+      )
+      let doctor
+      if (
+        (!viewOtherApptAccessRight ||
+          viewOtherApptAccessRight.rights !== 'enable') &&
+        isActiveDoctor
+      ) {
+        doctor = [
+          currentUser,
+        ]
+      }
+      return {
+        upcomingAppointmentDate: [
+          moment(),
+          moment().add(1, 'months'),
+        ],
+        appointmentType: [],
+        doctor,
+        pdpaConsent: [
+          '1',
+          '2',
+          '3',
+        ],
+      }
+    },
 
     handleSubmit: (values, { props }) => {
       const {
@@ -115,7 +138,13 @@ export default compose(
         ageFrom,
         ageTo,
       } = values
-      const { dispatch, type, setSelectedRows } = props
+      const {
+        dispatch,
+        type,
+        setSelectedRows,
+        currentUser,
+        doctorprofile,
+      } = props
 
       let payload = {}
       let dispatchType = ''
@@ -142,6 +171,25 @@ export default compose(
         if (doctor.length > 1) {
           doctorProperty = 'in_Appointment_Resources.ClinicianFK'
           stringDoctors = doctor.join('|')
+        } else if (doctor.length <= 0) {
+          const viewOtherApptAccessRight = Authorized.check(
+            'appointment.viewotherappointment',
+          )
+
+          const isActiveDoctor = doctorprofile.find(
+            (clinician) =>
+              clinician.clinicianProfile.isActive &&
+              clinician.clinicianProfile.id === currentUser,
+          )
+
+          if (
+            (!viewOtherApptAccessRight ||
+              viewOtherApptAccessRight.rights !== 'enable') &&
+            !isActiveDoctor
+          ) {
+            doctorProperty = 'Appointment_Resources.ClinicianFK'
+            stringDoctors = -1
+          }
         }
         let stringAppType = Number(appointmentType)
         let apptTypeProperty = 'Appointment_Resources.AppointmentTypeFK'

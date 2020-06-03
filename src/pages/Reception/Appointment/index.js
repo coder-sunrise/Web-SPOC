@@ -74,12 +74,13 @@ export const flattenAppointmentDateToCalendarEvents = (massaged, event) =>
         // }),
       ]
 
-@connect(({ calendar, codetable, clinicInfo, loading }) => ({
+@connect(({ calendar, codetable, clinicInfo, loading, user }) => ({
   calendar,
   calendarLoading: loading.models.calendar,
   // doctorProfiles: codetable.doctorprofile || [],
   clinicInfo,
   doctorprofile: codetable.doctorprofile || [],
+  user,
 }))
 class Appointment extends React.PureComponent {
   state = {
@@ -147,18 +148,40 @@ class Appointment extends React.PureComponent {
           sessionStorage.getItem('appointmentDoctors') || '[]',
         )
 
-        resources = response
-          .filter((clinician) => clinician.clinicianProfile.isActive)
-          .filter(
-            (_, index) =>
-              lastSelected.length > 0
-                ? lastSelected.includes(_.clinicianProfile.id)
-                : index < 5,
-          )
-          .map((clinician) => ({
-            clinicianFK: clinician.clinicianProfile.id,
-            doctorName: clinician.clinicianProfile.name,
-          }))
+        const viewOtherApptAccessRight = Authorized.check(
+          'appointment.viewotherappointment',
+        )
+        if (
+          viewOtherApptAccessRight &&
+          viewOtherApptAccessRight.rights === 'enable'
+        ) {
+          resources = response
+            .filter((clinician) => clinician.clinicianProfile.isActive)
+            .filter(
+              (_, index) =>
+                lastSelected.length > 0
+                  ? lastSelected.includes(_.clinicianProfile.id)
+                  : index < 5,
+            )
+            .map((clinician) => ({
+              clinicianFK: clinician.clinicianProfile.id,
+              doctorName: clinician.clinicianProfile.name,
+            }))
+        } else {
+          resources = response
+            .filter((clinician) => clinician.clinicianProfile.isActive)
+            .filter((activeclinician) => {
+              const { user } = this.props
+              return (
+                activeclinician.clinicianProfile.id ===
+                user.data.clinicianProfile.id
+              )
+            })
+            .map((clinician) => ({
+              clinicianFK: clinician.clinicianProfile.id,
+              doctorName: clinician.clinicianProfile.name,
+            }))
+        }
         filterByDoctor = resources.map((res) => res.clinicianFK)
       }
 
@@ -513,6 +536,8 @@ class Appointment extends React.PureComponent {
       classes,
       calendarLoading,
       dispatch,
+      user,
+      doctorprofile,
     } = this.props
     const {
       showPopup,
@@ -619,6 +644,8 @@ class Appointment extends React.PureComponent {
           <AppointmentSearch
             handleSelectEvent={this.onSelectEvent}
             handleAddAppointmentClick={this.handleAddAppointmentClick}
+            currentUser={user.data.clinicianProfile.id}
+            doctorprofile={doctorprofile}
           />
         </CommonModal>
       </CardContainer>

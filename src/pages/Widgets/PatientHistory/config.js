@@ -1,4 +1,5 @@
 import Loadable from 'react-loadable'
+import AuthorizedContext from '@/components/Context/Authorized'
 import Loading from '@/components/PageLoading/index'
 
 export const WIDGETS_ID = {
@@ -16,7 +17,7 @@ export const WIDGETS_ID = {
   TREATMENT: '10',
 }
 
-export const widgets = (props) => [
+export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
   {
     id: '3',
     name: 'History',
@@ -25,7 +26,14 @@ export const widgets = (props) => [
       loader: () => import('./Notes'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='history' />
+        return (
+          <Cmpnet
+            {...props}
+            {...p}
+            scribbleNoteUpdateState={scribbleNoteUpdateState}
+            fieldName='history'
+          />
+        )
       },
       loading: Loading,
     }),
@@ -39,7 +47,14 @@ export const widgets = (props) => [
       loader: () => import('./Notes'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='chiefComplaints' />
+        return (
+          <Cmpnet
+            {...props}
+            {...p}
+            scribbleNoteUpdateState={scribbleNoteUpdateState}
+            fieldName='chiefComplaints'
+          />
+        )
       },
       loading: Loading,
     }),
@@ -52,7 +67,14 @@ export const widgets = (props) => [
       loader: () => import('./Notes'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='note' />
+        return (
+          <Cmpnet
+            {...props}
+            {...p}
+            scribbleNoteUpdateState={scribbleNoteUpdateState}
+            fieldName='note'
+          />
+        )
       },
       loading: Loading,
     }),
@@ -65,7 +87,14 @@ export const widgets = (props) => [
       loader: () => import('./Notes'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='plan' />
+        return (
+          <Cmpnet
+            {...props}
+            scribbleNoteUpdateState={scribbleNoteUpdateState}
+            {...p}
+            fieldName='plan'
+          />
+        )
       },
       loading: Loading,
     }),
@@ -78,7 +107,15 @@ export const widgets = (props) => [
       loader: () => import('./Diagnosis'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
+        return (
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
+            }}
+          >
+            <Cmpnet {...props} {...p} />
+          </AuthorizedContext.Provider>
+        )
       },
       loading: Loading,
     }),
@@ -104,7 +141,15 @@ export const widgets = (props) => [
       loader: () => import('./Notes'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='extraOral' />
+        return (
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
+            }}
+          >
+            <Cmpnet {...props} {...p} fieldName='extraOral' />
+          </AuthorizedContext.Provider>
+        )
       },
       loading: Loading,
     }),
@@ -130,7 +175,15 @@ export const widgets = (props) => [
       loader: () => import('./Orders'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
+        return (
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
+            }}
+          >
+            <Cmpnet {...props} {...p} />
+          </AuthorizedContext.Provider>
+        )
       },
       loading: Loading,
     }),
@@ -143,7 +196,15 @@ export const widgets = (props) => [
       loader: () => import('./ConsultationDocument'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
+        return (
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
+            }}
+          >
+            <Cmpnet {...props} {...p} />
+          </AuthorizedContext.Provider>
+        )
       },
       loading: Loading,
     }),
@@ -156,7 +217,15 @@ export const widgets = (props) => [
       loader: () => import('./DentalChart/index'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
+        return (
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
+            }}
+          >
+            <Cmpnet {...props} {...p} />
+          </AuthorizedContext.Provider>
+        )
       },
       loading: Loading,
     }),
@@ -169,7 +238,15 @@ export const widgets = (props) => [
       loader: () => import('./Treatment/index'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
+        return (
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
+            }}
+          >
+            <Cmpnet {...props} {...p} />
+          </AuthorizedContext.Provider>
+        )
       },
       loading: Loading,
     }),
@@ -182,7 +259,15 @@ export const widgets = (props) => [
       loader: () => import('./Invoice'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
+        return (
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
+            }}
+          >
+            <Cmpnet {...props} {...p} />
+          </AuthorizedContext.Provider>
+        )
       },
       loading: Loading,
     }),
@@ -196,14 +281,20 @@ export const widgets = (props) => [
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return (
-          <Cmpnet
-            {...props}
-            {...p}
-            prefix='eyeVisualAcuityTestForms'
-            attachmentsFieldName='eyeVisualAcuityTestAttachments'
-            fromPatientHistory
-            values={p.patientHistory.entity}
-          />
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
+            }}
+          >
+            <Cmpnet
+              {...props}
+              {...p}
+              prefix='eyeVisualAcuityTestForms'
+              attachmentsFieldName='eyeVisualAcuityTestAttachments'
+              fromPatientHistory
+              values={p.patientHistory.entity}
+            />
+          </AuthorizedContext.Provider>
         )
       },
       loading: Loading,
@@ -218,13 +309,19 @@ export const widgets = (props) => [
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return (
-          <Cmpnet
-            {...props}
-            {...p}
-            isEditable={false}
-            prefix='corEyeRefractionForm.formData'
-            values={p.patientHistory.entity}
-          />
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
+            }}
+          >
+            <Cmpnet
+              {...props}
+              {...p}
+              isEditable={false}
+              prefix='corEyeRefractionForm.formData'
+              values={p.patientHistory.entity}
+            />
+          </AuthorizedContext.Provider>
         )
       },
       loading: Loading,
@@ -244,13 +341,19 @@ export const widgets = (props) => [
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return (
-          <Cmpnet
-            {...props}
-            {...p}
-            isEditable={false}
-            prefix='corEyeExaminationForm.formData'
-            values={p.patientHistory.entity}
-          />
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
+            }}
+          >
+            <Cmpnet
+              {...props}
+              {...p}
+              isEditable={false}
+              prefix='corEyeExaminationForm.formData'
+              values={p.patientHistory.entity}
+            />
+          </AuthorizedContext.Provider>
         )
       },
       loading: Loading,

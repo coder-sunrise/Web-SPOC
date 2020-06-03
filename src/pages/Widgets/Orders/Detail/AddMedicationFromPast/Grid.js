@@ -29,10 +29,7 @@ const styles = () => ({
     marginTop: 6,
   },
   instructionColumn: {
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
     display: 'inline-block',
-    textOverflow: 'ellipsis',
     width: 340,
     paddingLeft: 8,
     float: 'left',
@@ -136,7 +133,7 @@ class Grid extends PureComponent {
             <GridContainer>
               <GridItem xs={4} md={3} style={{ padding: 0 }}>
                 <span>
-                  VisitDate:&nbsp;{moment(o.visitDate).format('DD MMM YYYY')}
+                  Visit Date:&nbsp;{moment(o.visitDate).format('DD MMM YYYY')}
                 </span>
               </GridItem>
               <GridItem xs={4} md={4}>
