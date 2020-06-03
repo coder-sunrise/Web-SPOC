@@ -18,23 +18,21 @@ import {
   OutlinedTextField,
 } from '@/components'
 import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
-// sub component
-import PatientBanner from '@/pages/PatientDashboard/Banner'
-// import DispenseDetails from '@/pages/Dispense/DispenseDetails/PrintDrugLabelWrapper'
-import DispenseDetails from '@/pages/Dispense/DispenseDetails/WebSocketWrapper'
-// import ApplyClaims from './components/ApplyClaims'
+// common utils
 import { roundTo } from '@/utils/utils'
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
+import Authorized from '@/utils/Authorized'
+// sub component
+import PatientBanner from '@/pages/PatientDashboard/Banner'
+import DispenseDetails from '@/pages/Dispense/DispenseDetails/WebSocketWrapper'
 import ApplyClaims from './refactored/newApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 import SchemeValidationPrompt from './components/SchemeValidationPrompt'
-// utils
+// page utils
 import {
   constructPayload,
   validateApplySchemesWithPatientSchemes,
 } from './utils'
-import Authorized from '@/utils/Authorized'
-
 // window.g_app.replaceModel(model)
 
 const styles = (theme) => ({
@@ -140,6 +138,8 @@ class Billing extends Component {
       patient: [],
       billing: [],
     },
+    showDrugLabelSelection: false,
+    selectedDrugs: [],
   }
 
   componentWillMount () {
@@ -445,6 +445,47 @@ class Billing extends Component {
     }))
   }
 
+  handleDrugLabelClick = () => {
+    const { dispense } = this.props
+    console.log('dispense')
+    console.log(dispense)
+    const { prescription = [] } = dispense.entity
+    this.setState((prevState) => {
+      return {
+        showDrugLabelSelection: !prevState.showDrugLabelSelection,
+        selectedDrugs: prescription.map((x) => {
+          return { ...x, no: 1, selected: true }
+        }),
+      }
+    })
+  }
+
+  handleDrugLabelSelectionClose = () => {
+    this.setState((prevState) => {
+      return {
+        showDrugLabelSelection: !prevState.showDrugLabelSelection,
+      }
+    })
+  }
+
+  handleDrugLabelSelected = (itemId, selected) => {
+    this.setState((prevState) => ({
+      selectedDrugs: prevState.selectedDrugs.map(
+        (drug) => (drug.id === itemId ? { ...drug, selected } : { ...drug }),
+      ),
+    }))
+    this.props.dispatch({ type: 'global/incrementCommitCount' })
+  }
+
+  handleDrugLabelNoChanged = (itemId, no) => {
+    this.setState((prevState) => ({
+      selectedDrugs: prevState.selectedDrugs.map(
+        (drug) => (drug.id === itemId ? { ...drug, no } : { ...drug }),
+      ),
+    }))
+    this.props.dispatch({ type: 'global/incrementCommitCount' })
+  }
+
   render () {
     const {
       showReport,
@@ -497,6 +538,16 @@ class Billing extends Component {
                         viewOnly
                         values={dispense.entity}
                         dispatch={this.props.dispatch}
+                        onDrugLabelClick={this.handleDrugLabelClick}
+                        showDrugLabelSelection={
+                          this.state.showDrugLabelSelection
+                        }
+                        onDrugLabelSelectionClose={
+                          this.handleDrugLabelSelectionClose
+                        }
+                        onDrugLabelSelected={this.handleDrugLabelSelected}
+                        onDrugLabelNoChanged={this.handleDrugLabelNoChanged}
+                        selectedDrugs={this.state.selectedDrugs}
                       />
                     </div>
                   ),

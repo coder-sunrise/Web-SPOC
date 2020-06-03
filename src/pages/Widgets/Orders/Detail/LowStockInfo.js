@@ -70,7 +70,7 @@ const LowStockInfo = ({ sourceType, values = {}, codetable }) => {
         </div>
       }
     >
-      <Tooltip title='Low Stock'>
+      <Tooltip title={isLowStock ? 'Low Stock' : ''}>
         <IconButton
           style={{
             position: 'absolute',

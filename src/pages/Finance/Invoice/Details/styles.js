@@ -14,4 +14,12 @@ export default (theme) => ({
   hidden: {
     display: 'none',
   },
+  container: {
+    position: 'relative',
+  },
+  applySchemeButton: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+  },
 })

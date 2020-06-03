@@ -23,7 +23,13 @@ class InventoryStockCountReport extends ReportBase {
   }
 
   renderFilterBar = (handleSubmit, isSubmitting) => {
-    return <FilterBar handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
+    return (
+      <FilterBar
+        handleSubmit={handleSubmit}
+        isSubmitting={isSubmitting}
+        values={this.props.values}
+      />
+    )
   }
 
   renderContent = (reportDatas) => {

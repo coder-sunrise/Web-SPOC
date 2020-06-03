@@ -26,6 +26,7 @@ import CommonTableGrid from './index.optimized'
 import EditPlugin from './EditPlugin'
 import { Button } from '@/components'
 import Authorized from '@/utils/Authorized'
+import { updateGlobalState } from './EditCellComponents/utils'
 
 let uniqueGid = 0
 
@@ -41,7 +42,7 @@ class EditableTableGrid extends PureComponent {
 
   constructor (props) {
     super(props)
-    const { EditingProps = {} } = props
+    const { EditingProps = {}, id } = props
     this.state = {
       editingRowIds: [],
       deletedRowIds: [],
@@ -51,7 +52,10 @@ class EditableTableGrid extends PureComponent {
       // hasError: false,
       // errorRows: [],
     }
-    this.gridId = `edit-${uniqueGid++}`
+    this.gridId = id || `edit-${uniqueGid++}`
+    if (!window.$tempGridRow[this.gridId]) {
+      window.$tempGridRow[this.gridId] = {}
+    }
     // console.log(this.gridId)
     // console.log('edit created', window.$tempGridRow[this.gridId])
   }
@@ -92,13 +96,14 @@ class EditableTableGrid extends PureComponent {
           let { rows } = nextProps
           if (schema)
             rows = rows.map((o) => {
-              try {
-                schema.validateSync(o, {
-                  abortEarly: false,
-                })
-              } catch (error) {
-                o._errors = error.inner
-              }
+              if (getRowId(o))
+                try {
+                  schema.validateSync(o, {
+                    abortEarly: false,
+                  })
+                } catch (error) {
+                  o._errors = error.inner
+                }
               return o
             })
           window.$tempGridRow[this.gridId] = rows.reduce((ary, item) => {
@@ -205,27 +210,31 @@ class EditableTableGrid extends PureComponent {
   _onEditingCellsChange = (editingCells) => {
     setTimeout(() => {
       const errorCells = this.getErrorCells()
-      const { global } = window.g_app._store.getState()
-      if (window.$tempGridRow[this.gridId] && errorCells.length) {
-        if (!global.disableSave)
-          window.g_app._store.dispatch({
-            type: 'global/updateState',
-            payload: {
-              disableSave: true,
-            },
-          })
-      } else if (!errorCells.length && global.disableSave) {
-        window.g_app._store.dispatch({
-          type: 'global/updateState',
-          payload: {
-            disableSave: false,
-          },
-        })
-      }
+      // const { global } = window.g_app._store.getState()
+      // if (window.$tempGridRow[this.gridId] && errorCells.length) {
+      //   if (!global.disableSave)
+      //     window.g_app._store.dispatch({
+      //       type: 'global/updateState',
+      //       payload: {
+      //         disableSave: true,
+      //       },
+      //     })
+      // } else if (!errorCells.length && global.disableSave) {
+      //   window.g_app._store.dispatch({
+      //     type: 'global/updateState',
+      //     payload: {
+      //       disableSave: false,
+      //     },
+      //   })
+      // }
+
       this.setState({
         errorCells,
       })
     }, 1)
+    const { gridId } = this
+    const { getRowId } = this.props
+    updateGlobalState({ gridId, getRowId })
     this.setState({
       editingCells,
     })
@@ -696,6 +705,7 @@ class EditableTableGrid extends PureComponent {
                             // key: o.props.id,
                             // schema: this.props.schema,
                             // gridId: this.gridId,
+                            // getRowId: this.props.getRowId,
                             onRowDelete,
                             isDeletable,
                             // ...o.props,

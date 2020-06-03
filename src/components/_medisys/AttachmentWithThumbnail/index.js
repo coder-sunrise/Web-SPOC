@@ -15,7 +15,6 @@ import {
 import { Button, CardContainer, Danger, GridContainer } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
 // sub components
-import Thumbnail from './Thumbnail'
 import {
   downloadAttachment,
   uploadFile,
@@ -23,9 +22,11 @@ import {
 } from '@/services/file'
 import { convertToBase64 } from '@/utils/utils'
 import { FILE_STATUS, FILE_CATEGORY, ATTACHMENT_TYPE } from '@/utils/constants'
+import { corAttchementTypes } from '@/utils/codes'
+import Authorized from '@/utils/Authorized'
 import { getThumbnail } from './utils'
 import styles from './styles'
-import { corAttchementTypes } from '@/utils/codes'
+import Thumbnail from './Thumbnail'
 
 const allowedFiles = '.png, .jpg, .jpeg, .xls, .xlsx, .doc, .docx, .pdf'
 
@@ -59,6 +60,7 @@ const AttachmentWithThumbnail = ({
   fileCategory,
   withDropDown,
   handleSelectedAttachmentType,
+  hideRemarks = false,
 }) => {
   const [
     showPopper,
@@ -108,7 +110,7 @@ const AttachmentWithThumbnail = ({
     // file type and file size validation
     const base64 = await convertToBase64(file)
     const fileStatusFK = FILE_STATUS.UPLOADED
-    const fileExtension = getFileExtension(file.name)
+    const fileExtension = getFileExtension(file.name).toLowerCase()
     let _thumbnailDto
     if (
       [
@@ -326,12 +328,14 @@ const AttachmentWithThumbnail = ({
                       >
                         Consultation Attachment
                       </MenuItem>
-                      <MenuItem
-                        onClick={() =>
-                          onDropDownClick(ATTACHMENT_TYPE.EYEVISUALACUITY)}
-                      >
-                        Visual Acuity Test
-                      </MenuItem>
+                      <Authorized authority='queue.consultation.widgets.eyevisualacuity'>
+                        <MenuItem
+                          onClick={() =>
+                            onDropDownClick(ATTACHMENT_TYPE.EYEVISUALACUITY)}
+                        >
+                          Visual Acuity Test
+                        </MenuItem>
+                      </Authorized>
                     </MenuList>
                   </ClickAwayListener>
                 </Paper>
@@ -364,6 +368,7 @@ const AttachmentWithThumbnail = ({
     onClickAttachment: onClick,
     noBorder: simple && !allowedMultiple,
     fieldName,
+    hideRemarks,
   }
 
   let Body =

@@ -346,7 +346,6 @@ class PatientHistory extends Component {
     } = this.props
 
     const { entity, selected, patientID } = patientHistory
-    const { id: visitId } = selected
     const { visitPurposeFK } = selected
     const maxItemTagCount = this.state.selectedItems.length <= 1 ? 1 : 0
     // console.log({ maxItemTagCount, selected: this.state.selectedItems })
@@ -427,7 +426,7 @@ class PatientHistory extends Component {
                                       type: 'patient/closePatientModal',
                                     })
                                     router.push(
-                                      `/reception/queue/consultation?qid=${visitId}&pid=${patientID}&cid=${c.id}&v=${version}`,
+                                      `/reception/queue/consultation?qid=${entity.queueFK}&pid=${patientID}&cid=${c.id}&v=${version}`,
                                     )
                                   })
                                 },
@@ -438,7 +437,7 @@ class PatientHistory extends Component {
                               type: 'patient/closePatientModal',
                             })
                             router.push(
-                              `/reception/queue/consultation?qid=${visitId}&pid=${patientID}&cid=${o.id}&v=${patientHistory.version}`,
+                              `/reception/queue/consultation?qid=${entity.queueFK}&pid=${patientID}&cid=${o.id}&v=${patientHistory.version}`,
                             )
                           }
                         }

@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core'
 import { CardContainer, CommonTableGrid } from '@/components'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
 import { queryList as queryAppointments } from '@/services/calendar'
-import { futureApptTableParams,previousApptTableParams} from './variables'
+import { futureApptTableParams, previousApptTableParams } from './variables'
 
 const styles = (theme) => ({
   gridRow: {
@@ -18,7 +18,6 @@ const styles = (theme) => ({
     height: 'calc(100vh - 80px)',
   },
 })
-
 
 @connect(({ patient }) => ({
   patient: patient.entity || {},
@@ -55,20 +54,22 @@ class AppointmentHistory extends PureComponent {
       future,
     ] = await Promise.all([
       queryAppointments({
-        apiCriteria:{
-          appStatus:[
+        apiCriteria: {
+          appStatus: [
             APPOINTMENT_STATUS.CANCELLED,
             APPOINTMENT_STATUS.TURNEDUP,
-            APPOINTMENT_STATUS.NOSHOW].join(),
+            APPOINTMENT_STATUS.NOSHOW,
+          ].join(),
           patientProfileId: patientId,
         },
         ...commonParams,
       }),
       queryAppointments({
-        apiCriteria:{
+        apiCriteria: {
           appStatus: [
-          APPOINTMENT_STATUS.SCHEDULED,
-          APPOINTMENT_STATUS.RESCHEDULED].join(),
+            APPOINTMENT_STATUS.SCHEDULED,
+            APPOINTMENT_STATUS.RESCHEDULED,
+          ].join(),
           patientProfileId: patientId,
         },
         ...commonParams,
@@ -145,28 +146,26 @@ class AppointmentHistory extends PureComponent {
     const { previousAppt, futureAppt } = this.state
     return (
       <div>
-        <CardContainer
-          hideHeader
-          size='sm'
-        >
-          <h4 style={{ marginTop: 20 }}>Previous Appointment</h4>
+        <CardContainer hideHeader size='sm'>
+          <h4 style={{ marginTop: 20 }}>Current & Future Appointment</h4>
 
           <CommonTableGrid
             size='sm'
-            rows={previousAppt}
-            {...previousApptTableParams}
+            rows={futureAppt}
+            {...futureApptTableParams}
           />
+
           <h4
             style={{
               marginTop: theme.spacing(2),
             }}
           >
-            Current & Future Appointment
+            Previous Appointment
           </h4>
           <CommonTableGrid
             size='sm'
-            rows={futureAppt}
-            {...futureApptTableParams}
+            rows={previousAppt}
+            {...previousApptTableParams}
           />
         </CardContainer>
       </div>

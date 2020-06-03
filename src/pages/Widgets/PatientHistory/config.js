@@ -10,6 +10,7 @@ export const WIDGETS_ID = {
   EXTRA_ORAL: '5',
   ATTACHMENT: '6',
   ORDERS: '7',
+  CONSULTATION_DOCUMENT: '20',
   INVOICE: '8',
   DENTAL_CHART: '9',
   TREATMENT: '10',
@@ -111,28 +112,6 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     }),
   },
   {
-    id: '13',
-    name: 'Visual Acuity Test',
-    authority: 'queue.consultation.widgets.eyevisualacuity',
-    component: Loadable({
-      loader: () => import('../EyeVisualAcuity'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return (
-          <Cmpnet
-            {...props}
-            {...p}
-            prefix='eyeVisualAcuityTestForms'
-            attachmentsFieldName='eyeVisualAcuityTestAttachments'
-            fromPatientHistory
-            values={p.patientHistory.entity}
-          />
-        )
-      },
-      loading: Loading,
-    }),
-  },
-  {
     id: '4',
     name: 'Intra Oral',
     authority: 'queue.consultation.clinicalnotes.intraoral',
@@ -185,6 +164,19 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     }),
   },
   {
+    id: WIDGETS_ID.CONSULTATION_DOCUMENT,
+    name: 'Consultation Document',
+    authority: 'queue.consultation.widgets.consultationdocument',
+    component: Loadable({
+      loader: () => import('./ConsultationDocument'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} />
+      },
+      loading: Loading,
+    }),
+  },
+  {
     id: '9',
     name: 'Dental Chart',
     authority: 'queue.consultation.widgets.dentalchart',
@@ -222,5 +214,79 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       },
       loading: Loading,
     }),
+  },
+  {
+    id: '13',
+    name: 'Visual Acuity Test',
+    authority: 'queue.consultation.widgets.eyevisualacuity',
+    component: Loadable({
+      loader: () => import('../EyeVisualAcuity'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return (
+          <Cmpnet
+            {...props}
+            {...p}
+            prefix='eyeVisualAcuityTestForms'
+            attachmentsFieldName='eyeVisualAcuityTestAttachments'
+            fromPatientHistory
+            values={p.patientHistory.entity}
+          />
+        )
+      },
+      loading: Loading,
+    }),
+  },
+  {
+    id: '11',
+    name: 'Refraction Form',
+    authority: 'queue.consultation.widgets.eyerefractionform',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/RefractionForm'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return (
+          <Cmpnet
+            {...props}
+            {...p}
+            isEditable={false}
+            prefix='corEyeRefractionForm.formData'
+            values={p.patientHistory.entity}
+          />
+        )
+      },
+      loading: Loading,
+    }),
+    associatedProps: [
+      'corEyeRefractionForm',
+    ],
+    // model: 'refractionForm',
+    layoutConfig: {},
+  },
+  {
+    id: '12',
+    name: 'Examination Form',
+    authority: 'queue.consultation.widgets.eyeexaminationform',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/ExaminationForm'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return (
+          <Cmpnet
+            {...props}
+            {...p}
+            isEditable={false}
+            prefix='corEyeExaminationForm.formData'
+            values={p.patientHistory.entity}
+          />
+        )
+      },
+      loading: Loading,
+    }),
+    associatedProps: [
+      'corEyeExaminationForm',
+    ],
+    // model: 'refractionForm',
+    layoutConfig: {},
   },
 ]

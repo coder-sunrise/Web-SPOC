@@ -1,11 +1,13 @@
 import React from 'react'
 import { CardContainer, CommonTableGrid } from '@/components'
+import * as config from './config'
 
 export const tableColumns = [
   {name:'visitDate', title:'Date'},
   {name:'code', title:'Code'},
   {name:'name', title:'Name'},
   {name:'instruction', title:'Instructions'},
+  {name:'remarks', title:'Remarks'},
   {name:'dispensedQuanity', title:'Qty'},
   {name:'dispenseUOM', title:'UOM'},
   {name:'totalPrice', title:'Subtotal'},
@@ -15,6 +17,10 @@ export const tableColumns = [
 
 export const TableColumnExtensions =
 [
+  { columnName: 'code', compare: config.compareString },
+  { columnName: 'name', compare: config.compareString },
+  { columnName: 'instruction', compare: config.compareString }, 
+  { columnName: 'remarks', compare: config.compareString }, 
   { columnName: 'visitDate', type: 'date' },
   { columnName: 'totalPrice', type: 'currency'},
   { columnName: 'adjAmt', type: 'currency'},

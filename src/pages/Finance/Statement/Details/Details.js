@@ -16,11 +16,11 @@ import {
   ProgressButton,
   serverDateFormat,
 } from '@/components'
+import { getBizSession } from '@/services/queue'
+import { roundTo } from '@/utils/utils'
 import CollectPaymentConfirm from './CollectPaymentConfirm'
 import ExtractAsSingle from './ExtractAsSingle'
 import PrintStatementReport from '../PrintStatementReport'
-import { getBizSession } from '@/services/queue'
-import { roundTo } from '@/utils/utils'
 
 const styles = () => ({
   gridContainer: {
@@ -48,7 +48,7 @@ class Details extends PureComponent {
       { name: 'patientName', title: 'Patient Name' },
       { name: 'adminCharge', title: 'Corporate Charge' },
       { name: 'statementAdjustment', title: 'Statement Adjustment' },
-      { name: 'payableAmount', title: 'Payable Amount' },
+      { name: 'totalPayableAmount', title: 'Total Payable Amt' },
       { name: 'outstandingAmount', title: 'Outstanding' },
       { name: 'remark', title: 'Remarks' },
     ],
@@ -115,6 +115,7 @@ class Details extends PureComponent {
       selectedRows,
     } = this.state
     const { classes, statement, values, theme, history } = this.props
+    const { statementInvoice = [] } = values
     return (
       <div>
         <GridContainer classes={{ grid: classes.gridContainer }}>
@@ -139,7 +140,7 @@ class Details extends PureComponent {
         </GridContainer>
 
         <CommonTableGrid
-          rows={statement.entity ? statement.entity.statementInvoice : []}
+          rows={statementInvoice}
           columns={columns}
           columnExtensions={[
             {
@@ -170,7 +171,7 @@ class Details extends PureComponent {
               width: 180,
             },
             {
-              columnName: 'payableAmount',
+              columnName: 'totalPayableAmount',
               type: 'number',
               currency: true,
               sortingEnabled: false,

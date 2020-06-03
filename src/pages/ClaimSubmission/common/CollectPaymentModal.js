@@ -25,6 +25,9 @@ import {
 import { CollectPaymentColumns, amountProps } from './variables'
 import { PAYMENT_MODE } from '@/utils/constants'
 import { getBizSession } from '@/services/queue'
+import { 
+  CreditCardNumberInput,
+} from '@/components/_medisys'
 
 const paymentListSchema = Yup.object().shape({
   amountReceived: Yup.number().required(),
@@ -452,12 +455,7 @@ class CollectPaymentModal extends PureComponent {
                   <Field
                     name='cardNumber'
                     render={(args) => (
-                      <NumberInput
-                        label='Card Number'
-                        inputProps={{ maxLength: 4 }}
-                        maxLength={4}
-                        {...args}
-                      />
+                      <CreditCardNumberInput {...args} /> 
                     )}
                   />
                 </GridItem>
