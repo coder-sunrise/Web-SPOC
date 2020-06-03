@@ -79,6 +79,9 @@ module.exports = {
     return r
   },
   queryMedicationHistory: (params) => {
-    return service.query(`${url}/medicationhistory`, params)
+    return service.query(
+      `${url}/medicationhistory/${params.patientProfileId}`,
+      {},
+    )
   },
 }
