@@ -1,4 +1,5 @@
 import Loadable from 'react-loadable'
+import AuthorizedContext from '@/components/Context/Authorized'
 import Loading from '@/components/PageLoading/index'
 
 export const WIDGETS_ID = {
@@ -106,7 +107,15 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       loader: () => import('./Diagnosis'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
+        return (
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
+            }}
+          >
+            <Cmpnet {...props} {...p} />
+          </AuthorizedContext.Provider>
+        )
       },
       loading: Loading,
     }),
@@ -132,7 +141,15 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       loader: () => import('./Notes'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='extraOral' />
+        return (
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
+            }}
+          >
+            <Cmpnet {...props} {...p} fieldName='extraOral' />
+          </AuthorizedContext.Provider>
+        )
       },
       loading: Loading,
     }),
@@ -158,7 +175,15 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       loader: () => import('./Orders'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
+        return (
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
+            }}
+          >
+            <Cmpnet {...props} {...p} />
+          </AuthorizedContext.Provider>
+        )
       },
       loading: Loading,
     }),
@@ -171,7 +196,15 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       loader: () => import('./ConsultationDocument'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
+        return (
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
+            }}
+          >
+            <Cmpnet {...props} {...p} />
+          </AuthorizedContext.Provider>
+        )
       },
       loading: Loading,
     }),
@@ -184,7 +217,15 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       loader: () => import('./DentalChart/index'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
+        return (
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
+            }}
+          >
+            <Cmpnet {...props} {...p} />
+          </AuthorizedContext.Provider>
+        )
       },
       loading: Loading,
     }),
@@ -197,7 +238,15 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       loader: () => import('./Treatment/index'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
+        return (
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
+            }}
+          >
+            <Cmpnet {...props} {...p} />
+          </AuthorizedContext.Provider>
+        )
       },
       loading: Loading,
     }),
@@ -210,7 +259,15 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       loader: () => import('./Invoice'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
+        return (
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
+            }}
+          >
+            <Cmpnet {...props} {...p} />
+          </AuthorizedContext.Provider>
+        )
       },
       loading: Loading,
     }),
@@ -224,14 +281,20 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return (
-          <Cmpnet
-            {...props}
-            {...p}
-            prefix='eyeVisualAcuityTestForms'
-            attachmentsFieldName='eyeVisualAcuityTestAttachments'
-            fromPatientHistory
-            values={p.patientHistory.entity}
-          />
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
+            }}
+          >
+            <Cmpnet
+              {...props}
+              {...p}
+              prefix='eyeVisualAcuityTestForms'
+              attachmentsFieldName='eyeVisualAcuityTestAttachments'
+              fromPatientHistory
+              values={p.patientHistory.entity}
+            />
+          </AuthorizedContext.Provider>
         )
       },
       loading: Loading,
@@ -246,13 +309,19 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return (
-          <Cmpnet
-            {...props}
-            {...p}
-            isEditable={false}
-            prefix='corEyeRefractionForm.formData'
-            values={p.patientHistory.entity}
-          />
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
+            }}
+          >
+            <Cmpnet
+              {...props}
+              {...p}
+              isEditable={false}
+              prefix='corEyeRefractionForm.formData'
+              values={p.patientHistory.entity}
+            />
+          </AuthorizedContext.Provider>
         )
       },
       loading: Loading,
@@ -272,13 +341,19 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return (
-          <Cmpnet
-            {...props}
-            {...p}
-            isEditable={false}
-            prefix='corEyeExaminationForm.formData'
-            values={p.patientHistory.entity}
-          />
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
+            }}
+          >
+            <Cmpnet
+              {...props}
+              {...p}
+              isEditable={false}
+              prefix='corEyeExaminationForm.formData'
+              values={p.patientHistory.entity}
+            />
+          </AuthorizedContext.Provider>
         )
       },
       loading: Loading,

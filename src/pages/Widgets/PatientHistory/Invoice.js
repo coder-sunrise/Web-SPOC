@@ -33,7 +33,6 @@ import {
 } from '@/components'
 import AmountSummary from '@/pages/Shared/AmountSummary'
 import { VISIT_TYPE } from '@/utils/constants'
-import AuthorizedContext from '@/components/Context/Authorized'
 
 const baseColumns = [
   { name: 'itemType', title: 'Type' },
@@ -138,40 +137,32 @@ export default ({ classes, current, theme, setFieldValue }) => {
       >
         <GridItem xs={2} md={9} />
         <GridItem xs={10} md={3}>
-          <AuthorizedContext.Provider
-            value={{
-              rights: 'disable',
+          <AmountSummary
+            showAdjustment
+            rows={invoiceItemData}
+            adjustments={invoiceAdjustmentData}
+            config={{
+              isGSTInclusive: current.invoice
+                ? current.invoice.isGSTInclusive
+                : '',
+              totalField: 'totalAfterItemAdjustment',
+              adjustedField: 'totalAfterOverallAdjustment',
+              gstValue: current.invoice ? current.invoice.gstValue : undefined,
             }}
-          >
-            <AmountSummary
-              showAdjustment
-              rows={invoiceItemData}
-              adjustments={invoiceAdjustmentData}
-              config={{
-                isGSTInclusive: current.invoice
-                  ? current.invoice.isGSTInclusive
-                  : '',
-                totalField: 'totalAfterItemAdjustment',
-                adjustedField: 'totalAfterOverallAdjustment',
-                gstValue: current.invoice
-                  ? current.invoice.gstValue
-                  : undefined,
-              }}
-              onValueChanged={(v) => {
-                // console.log('onValueChanged', v)
-                if (setFieldValue) {
-                  setFieldValue(
-                    'current.invoice.invoiceTotalAftGST',
-                    v.summary.totalWithGST,
-                  )
-                  setFieldValue(
-                    'current.invoice.invoiceAdjustment',
-                    v.adjustments,
-                  )
-                }
-              }}
-            />
-          </AuthorizedContext.Provider>
+            onValueChanged={(v) => {
+              // console.log('onValueChanged', v)
+              if (setFieldValue) {
+                setFieldValue(
+                  'current.invoice.invoiceTotalAftGST',
+                  v.summary.totalWithGST,
+                )
+                setFieldValue(
+                  'current.invoice.invoiceAdjustment',
+                  v.adjustments,
+                )
+              }
+            }}
+          />
         </GridItem>
       </GridContainer>
     </div>
