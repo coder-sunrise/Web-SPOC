@@ -1,5 +1,6 @@
 import React, { PureComponent, useCallback, useState } from 'react'
 import { primaryColor } from 'mui-pro-jss'
+import moment from 'moment'
 import color from 'color'
 import withStyles from '@material-ui/core/styles/withStyles'
 import { Tooltip } from '@material-ui/core'
@@ -108,7 +109,7 @@ class VisitFormGrid extends PureComponent {
     })
   }
 
-  VoidForm = ({ classes, dispatch, row }) => {
+  VoidForm = ({ classes, dispatch, row, user }) => {
     const [
       reason,
       setReason,
@@ -123,6 +124,8 @@ class VisitFormGrid extends PureComponent {
             formData: JSON.stringify(row.formData),
             voidReason: reason,
             statusFK: 4,
+            voidDate: moment(),
+            voidByUserFK: user.data.clinicianProfile.id,
           },
         ]
         let formType =
@@ -176,13 +179,13 @@ class VisitFormGrid extends PureComponent {
   }
 
   render () {
-    let { formListing, dispatch, theme, classes, setFieldValue } = this.props
+    let { formListing, dispatch, theme, classes, user } = this.props
     let { list, visitDetail = {} } = formListing
     let { isCanEditForms = true } = visitDetail
     return (
       <div>
         <Checkbox
-          label='Include void forms'
+          label='Include voided forms'
           value={this.state.includeVoidForms}
           onChange={() => {
             this.setState((ps) => {
@@ -318,6 +321,7 @@ class VisitFormGrid extends PureComponent {
                         classes={classes}
                         dispatch={dispatch}
                         row={row}
+                        user={user}
                       />
                     )}
                   </React.Fragment>

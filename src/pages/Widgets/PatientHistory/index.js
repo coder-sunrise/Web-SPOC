@@ -20,7 +20,6 @@ import {
   Skeleton,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
-import AuthorizedContext from '@/components/Context/Authorized'
 // utils
 import { findGetParameter } from '@/utils/utils'
 import { VISIT_TYPE } from '@/utils/constants'
@@ -452,35 +451,29 @@ class PatientHistory extends Component {
           </GridContainer>
         )}
 
-        <AuthorizedContext.Provider
-          value={{
-            rights: 'disable',
-          }}
-        >
-          {this.widgets
-            .filter((_widget) => {
-              if (visitPurposeFK === VISIT_TYPE.RETAIL) {
-                return _widget.id === WidgetConfig.WIDGETS_ID.INVOICE
-              }
-              return (
-                this.state.selectedItems.indexOf('0') >= 0 ||
-                this.state.selectedItems.indexOf(_widget.id) >= 0
-              )
-            })
-            .map((o) => {
-              const Widget = o.component
-              return (
-                <div>
-                  <h5 style={{ fontWeight: 500 }}>{o.name}</h5>
-                  <Widget
-                    current={entity || {}}
-                    {...this.props}
-                    setFieldValue={this.props.setFieldValue}
-                  />
-                </div>
-              )
-            })}
-        </AuthorizedContext.Provider>
+        {this.widgets
+          .filter((_widget) => {
+            if (visitPurposeFK === VISIT_TYPE.RETAIL) {
+              return _widget.id === WidgetConfig.WIDGETS_ID.INVOICE
+            }
+            return (
+              this.state.selectedItems.indexOf('0') >= 0 ||
+              this.state.selectedItems.indexOf(_widget.id) >= 0
+            )
+          })
+          .map((o) => {
+            const Widget = o.component
+            return (
+              <div>
+                <h5 style={{ fontWeight: 500 }}>{o.name}</h5>
+                <Widget
+                  current={entity || {}}
+                  {...this.props}
+                  setFieldValue={this.props.setFieldValue}
+                />
+              </div>
+            )
+          })}
       </CardContainer>
     )
   }

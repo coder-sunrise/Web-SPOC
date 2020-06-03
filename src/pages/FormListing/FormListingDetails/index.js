@@ -82,9 +82,10 @@ export const viewReport = (row, props) => {
 
 const styles = () => ({})
 
-@connect(({ formListing, codetable }) => ({
+@connect(({ formListing, codetable, user }) => ({
   formListing,
   codetable,
+  user,
 }))
 class FormListingDetails extends PureComponent {
   componentDidMount () {
@@ -128,7 +129,7 @@ class FormListingDetails extends PureComponent {
   }
 
   render () {
-    const { formFrom, formListing } = this.props
+    const { formFrom, formListing, user } = this.props
 
     const { showModal } = formListing
     return (

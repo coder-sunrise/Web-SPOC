@@ -74,7 +74,7 @@ class FilterBar extends PureComponent {
                 return (
                   <CodeSelect
                     label='Status'
-                    options={formStatus}
+                    options={formStatus.filter((o) => o.value !== 1)}
                     {...args}
                     mode='multiple'
                     valueField='value'

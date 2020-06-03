@@ -1,4 +1,5 @@
 import React, { PureComponent, useState, useCallback } from 'react'
+import moment from 'moment'
 import { Tooltip, withStyles } from '@material-ui/core'
 import { Delete, Edit, Print } from '@material-ui/icons'
 import { formTypes, formStatus } from '@/utils/codes'
@@ -44,7 +45,7 @@ class FormModuleGrid extends PureComponent {
       })
     }
 
-    this.VoidForm = ({ classes, dispatch, row }) => {
+    this.VoidForm = ({ classes, dispatch, row, user }) => {
       const [
         reason,
         setReason,
@@ -67,6 +68,8 @@ class FormModuleGrid extends PureComponent {
                   formData: JSON.stringify(row.formData),
                   voidReason: reason,
                   statusFK: 4,
+                  voidDate: moment(),
+                  voidByUserFK: user.data.clinicianProfile.id,
                 },
               ],
             },
@@ -121,40 +124,53 @@ class FormModuleGrid extends PureComponent {
       ],
       columnExtensions: [
         {
+          columnName: 'patientID',
+          width: 100,
+        },
+        {
           columnName: 'type',
           type: 'select',
           options: formTypes,
+          width: 180,
         },
         {
           columnName: 'visitDate',
           type: 'date',
+          width: 100,
         },
         {
           columnName: 'createDate',
-          type: 'date',
           sortingEnabled: false,
+          type: 'date',
+          showTime: true,
+          width: 180,
         },
         {
           columnName: 'lastUpdateDate',
           type: 'date',
+          showTime: true,
           sortingEnabled: false,
+          width: 180,
         },
         {
           columnName: 'submissionDate',
           type: 'date',
+          showTime: true,
           sortingEnabled: false,
+          width: 180,
         },
         {
           columnName: 'statusFK',
           type: 'select',
           options: formStatus,
+          width: 80,
         },
         {
           columnName: 'action',
           align: 'center',
           sortingEnabled: false,
           render: (row) => {
-            const { classes, dispatch } = props
+            const { classes, dispatch, user } = props
             return (
               <React.Fragment>
                 <Tooltip title='Print'>
@@ -222,6 +238,7 @@ class FormModuleGrid extends PureComponent {
                     classes={classes}
                     dispatch={dispatch}
                     row={row}
+                    user={user}
                   />
                 )}
               </React.Fragment>

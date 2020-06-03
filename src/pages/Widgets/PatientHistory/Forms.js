@@ -36,7 +36,7 @@ export default ({ current }) => {
   return (
     <div>
       <Checkbox
-        label='Include void forms'
+        label='Include voided forms'
         value={includeVoidForms}
         onChange={() => {
           setIncludeVoidForms(!includeVoidForms)
@@ -67,6 +67,7 @@ export default ({ current }) => {
           {
             columnName: 'lastUpdateDate',
             type: 'date',
+            showTime: true,
           },
         ]}
       />

@@ -206,13 +206,48 @@ class LCForm extends PureComponent {
     if (!_.isEmpty(isFormValid)) {
       this.props.handleSubmit()
     } else {
-      const nextSequence = getNextSequence()
-      let statusFK
+      let nextSequence
+      if (formFrom === FORM_FROM.QUEUELOG) {
+        nextSequence = getNextSequence()
+      }
+      let saveData
       if (action === 'submit') {
-        statusFK = 3
+        saveData = {
+          sequence: nextSequence,
+          ...values,
+          formData: JSON.stringify({
+            ...values.formData,
+            otherDiagnosis: values.formData.otherDiagnosis.map((d) => {
+              const { diagnosiss, ...retainData } = d
+              return {
+                ...retainData,
+              }
+            }),
+          }),
+          updateByUser: user.data.clinicianProfile.name,
+          statusFK: 3,
+          submissionDate: moment(),
+          submissionByUserFK: user.data.clinicianProfile.id,
+        }
       } else {
-        statusFK =
-          formCategory === FORM_CATEGORY.VISITFORM ? values.statusFK : 2
+        saveData = {
+          sequence: nextSequence,
+          ...values,
+          formData: JSON.stringify({
+            ...values.formData,
+            otherDiagnosis: values.formData.otherDiagnosis.map((d) => {
+              const { diagnosiss, ...retainData } = d
+              return {
+                ...retainData,
+              }
+            }),
+          }),
+          updateByUser: user.data.clinicianProfile.name,
+          statusFK:
+            formCategory === FORM_CATEGORY.VISITFORM ? values.statusFK : 2,
+          finalizeDate: moment(),
+          finalizeByUserFK: user.data.clinicianProfile.id,
+        }
       }
       const { currentCORId, visitID } = visitDetail
       dispatch({
@@ -227,21 +262,7 @@ class LCForm extends PureComponent {
             formCategory === FORM_CATEGORY.VISITFORM
               ? [
                   {
-                    sequence: nextSequence,
-                    ...values,
-                    formData: JSON.stringify({
-                      ...values.formData,
-                      otherDiagnosis: values.formData.otherDiagnosis.map(
-                        (d) => {
-                          const { diagnosiss, ...retainData } = d
-                          return {
-                            ...retainData,
-                          }
-                        },
-                      ),
-                    }),
-                    updateByUser: user.data.clinicianProfile.name,
-                    statusFK,
+                    ...saveData,
                   },
                 ]
               : [],
@@ -249,21 +270,7 @@ class LCForm extends PureComponent {
             formCategory === FORM_CATEGORY.CORFORM
               ? [
                   {
-                    sequence: nextSequence,
-                    ...values,
-                    formData: JSON.stringify({
-                      ...values.formData,
-                      otherDiagnosis: values.formData.otherDiagnosis.map(
-                        (d) => {
-                          const { diagnosiss, ...retainData } = d
-                          return {
-                            ...retainData,
-                          }
-                        },
-                      ),
-                    }),
-                    updateByUser: user.data.clinicianProfile.name,
-                    statusFK,
+                    ...saveData,
                   },
                 ]
               : [],
@@ -275,12 +282,6 @@ class LCForm extends PureComponent {
           if (formFrom === FORM_FROM.FORMMODULE) {
             this.props.dispatch({
               type: 'formListing/query',
-              payload: {
-                apiCriteria: {
-                  startDate: moment().add(-1, 'month').formatUTC(),
-                  endDate: moment().formatUTC(false),
-                },
-              },
             })
           } else if (formFrom === FORM_FROM.QUEUELOG) {
             this.props.dispatch({

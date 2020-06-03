@@ -197,14 +197,29 @@ class LCForm extends PureComponent {
       this.props.handleSubmit()
     } else {
       const nextSequence = getNextSequence()
-      dispatch({
-        type: 'forms/upsertRow',
-        payload: {
+      let payload
+      if (action === 'submit') {
+        payload = {
           sequence: nextSequence,
           ...values,
           updateByUser: user.data.clinicianProfile.name,
-          statusFK: action === 'submit' ? 3 : 2,
-        },
+          statusFK: 3,
+          submissionDate: moment(),
+          submissionByUserFK: user.data.clinicianProfile.id,
+        }
+      } else {
+        payload = {
+          sequence: nextSequence,
+          ...values,
+          updateByUser: user.data.clinicianProfile.name,
+          statusFK: 2,
+          finalizeDate: moment(),
+          finalizeByUserFK: user.data.clinicianProfile.id,
+        }
+      }
+      dispatch({
+        type: 'forms/upsertRow',
+        payload,
       }).then(() => {
         if (onConfirm) onConfirm()
       })

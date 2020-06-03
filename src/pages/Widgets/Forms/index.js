@@ -1,5 +1,6 @@
 import React, { PureComponent, useCallback, useState } from 'react'
 import { connect } from 'dva'
+import moment from 'moment'
 import { primaryColor } from 'mui-pro-jss'
 import color from 'color'
 import withStyles from '@material-ui/core/styles/withStyles'
@@ -162,11 +163,12 @@ export const viewReport = (row, props) => {
   return true
 }
 
-@connect(({ forms, codetable, patient, consultation }) => ({
+@connect(({ forms, codetable, patient, consultation, user }) => ({
   forms,
   codetable,
   patient,
   consultation,
+  user,
 }))
 @withFormikExtend({
   authority: [
@@ -249,7 +251,7 @@ class Forms extends PureComponent {
     )
   }
 
-  VoidForm = ({ classes, dispatch, row }) => {
+  VoidForm = ({ classes, dispatch, row, user }) => {
     const [
       reason,
       setReason,
@@ -264,6 +266,8 @@ class Forms extends PureComponent {
             id: row.uid,
             voidReason: reason,
             statusFK: 4,
+            voidDate: moment(),
+            voidByUserFK: user.data.clinicianProfile.id,
           },
         })
       }
@@ -299,14 +303,14 @@ class Forms extends PureComponent {
   }
 
   render () {
-    const { forms, dispatch, theme, classes, setFieldValue } = this.props
+    const { forms, dispatch, theme, classes, setFieldValue, user } = this.props
     const { showModal } = forms
     const { rows = [] } = forms
     return (
       <div>
         <Checkbox
           style={{ marginLeft: 10 }}
-          label='Include void forms'
+          label='Include voided forms'
           value={this.state.includeVoidForms}
           onChange={() => {
             this.setState((ps) => {
@@ -409,6 +413,7 @@ class Forms extends PureComponent {
                         classes={setFieldValue}
                         dispatch={dispatch}
                         row={row}
+                        user={user}
                       />
                     )}
                   </React.Fragment>
