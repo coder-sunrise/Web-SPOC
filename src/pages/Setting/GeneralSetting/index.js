@@ -225,26 +225,26 @@ class GeneralSetting extends PureComponent {
           </GridContainer>
           <GridContainer>
             <GridItem md={12}>
-              <span>Auto Print Drug Label</span>
+              <span style={{ position: 'relative', color:'rgba(0, 0, 0, 0.5)', display: 'inline-block', marginTop: 8 }}>Auto Print Drug Label</span>
             </GridItem>
-            <GridItem md={2}>
+            <GridItem md={2} style={{ margin:0, marginTop: -10 }}>
               <Field
                 name='autoPrintDrugLabelOnFinalize.settingValue'
                 render={(args) => (
                   <Checkbox
-                    label='Finalize'
+                    label='Finalize Order'
                     {...args}
                     disabled={!!hasActiveSession}
                   />
                 )}
               />
             </GridItem>
-            <GridItem md={2}>
+            <GridItem md={2} style={{ margin:0, marginTop: -10 }}>
               <Field
                 name='autoPrintDrugLabelOnSignOff.settingValue'
                 render={(args) => (
                   <Checkbox
-                    label='Sign Off'
+                    label='Consultation Sign Off'
                     {...args}
                     disabled={!!hasActiveSession}
                   />
@@ -252,7 +252,7 @@ class GeneralSetting extends PureComponent {
               />
             </GridItem>
 
-            <GridItem md={2}>
+            <GridItem md={2} style={{ margin:0, marginTop: -10 }}>
               <Field
                 name='autoPrintDrugLabelOnCompletePayment.settingValue'
                 render={(args) => (
