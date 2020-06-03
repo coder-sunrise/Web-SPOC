@@ -21,6 +21,7 @@ import {
   Select,
   Button,
   Switch,
+  Checkbox,
   WarningSnackbar,
   CodeSelect,
 } from '@/components'
@@ -46,8 +47,8 @@ const styles = (theme) => ({
         autoRefresh,
         defaultVisitType,
         autoPrintDrugLabel,
+        showTotalInvoiceAmtInConsultation,
       } = clinicSettings.entity
-
       return {
         ...clinicSettings.entity,
         defaultVisitType: {
@@ -66,6 +67,10 @@ const styles = (theme) => ({
         showConsultationVersioning: {
           ...showConsultationVersioning,
           settingValue: showConsultationVersioning.settingValue === 'true',
+        },
+        showTotalInvoiceAmtInConsultation: {
+          ...showTotalInvoiceAmtInConsultation,
+          settingValue: showTotalInvoiceAmtInConsultation.settingValue === 'true',
         },
       }
     }
@@ -116,7 +121,7 @@ class GeneralSetting extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const {
       classes,
       clinicSettings,
@@ -183,7 +188,6 @@ class GeneralSetting extends PureComponent {
               />
             </GridItem>
           </GridContainer>
-
           <GridContainer>
             <GridItem md={3}>
               <Field
@@ -253,6 +257,20 @@ class GeneralSetting extends PureComponent {
                     {...args}
                     disabled={!!hasActiveSession}
                     allowClear={false}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='showTotalInvoiceAmtInConsultation.settingValue'
+                render={(args) => (
+                  <Switch
+                    label='Show Total Invoice Amount In Consultation'
+                    {...args}
+                    disabled={!!hasActiveSession}
                   />
                 )}
               />
