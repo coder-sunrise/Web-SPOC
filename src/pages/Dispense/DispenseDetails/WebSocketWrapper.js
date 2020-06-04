@@ -184,7 +184,7 @@ const WebSocketWrapper = ({
     if (withoutPrintPreview.includes(type)) {
       const printResult = await getPrintResult(type, row, printAllDrugLabel)
       if (!printResult) return
-      handlePrint(JSON.stringify(printResult))
+      await handlePrint(JSON.stringify(printResult))
     } else {
       const documentType = consultationDocumentTypes.find(
         (o) =>
@@ -219,7 +219,10 @@ const WebSocketWrapper = ({
       let settings = JSON.parse(localStorage.getItem('clinicSettings'))
       const { autoPrintDrugLabelOnFinalize = false } = settings
       if (autoPrintDrugLabelOnFinalize === true)
-        await handleOnPrint({ type: CONSTANTS.ALL_DRUG_LABEL, printAllDrugLabel: true })
+        await handleOnPrint({
+          type: CONSTANTS.ALL_DRUG_LABEL,
+          printAllDrugLabel: true,
+        })
 
       await restProps.dispatch({
         type: 'dispense/query',
