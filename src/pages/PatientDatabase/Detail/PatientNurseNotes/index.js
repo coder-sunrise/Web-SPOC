@@ -1,9 +1,7 @@
-import React, { PureComponent, Component } from 'react'
-import connect from 'dva'
+import React, { PureComponent } from 'react'
+import { connect } from 'dva'
 import $ from 'jquery'
-
-// models
-// utils
+import Yup from '@/utils/yup'
 
 import {
   GridContainer,
@@ -15,6 +13,7 @@ import {
   FastField,
   Field,
   OutlinedTextField,
+  withFormikExtend,
 } from '@/components'
 import { withStyles, TextField } from '@material-ui/core'
 import model from './models'
@@ -31,10 +30,57 @@ const styles = () => ({
 
 window.g_app.replaceModel(model)
 
-@connect(({ patient }) => ({
+@connect(({ patient, user, patientNurseNotes }) => ({
   patient,
+  patientNurseNotes,
+  user,
 }))
-class PatientNurseNotes extends Component {
+@withFormikExtend({
+  authority: [
+    'patientdatabase.newpatient',
+    'patientdatabase.patientprofiledetails',
+  ],
+  enableReinitialize: true,
+  mapPropsToValues: ({ patient, patientNurseNotes }) => {
+    // console.log('mapPropsToValues', patientNurseNotes)
+    const { entity = {} } = patientNurseNotes
+    return {
+      patientProfileFK: patient.entity.id,
+      ...entity,
+    }
+  },
+  validationSchema: Yup.object().shape({}),
+
+  handleSubmit: async (values, component) => {
+    const { props, resetForm } = component
+    const { dispatch, history, patient, onConfirm } = props
+
+    const { id } = values
+
+    const response = await dispatch({
+      type: 'patientNurseNotes/upsert',
+      payload: { ...values },
+    })
+
+    const refreshResult = await dispatch({
+      type: 'patientNurseNotes/query',
+      payload: {
+        PatientProfileFK: patient.entity.id,
+      },
+    })
+
+    if (refreshResult && refreshResult.data && !response.id) {
+      const { data = [] } = refreshResult
+      const editEntity = data.find((f) => f.id === id)
+      dispatch({
+        type: 'patientNurseNotes/updateState',
+        payload: { entity: editEntity },
+      })
+    }
+  },
+  displayName: 'PatientNurseNotes',
+})
+class PatientNurseNotes extends PureComponent {
   constructor (props) {
     super(props)
     this.divElement = React.createRef()
@@ -42,19 +88,30 @@ class PatientNurseNotes extends Component {
   }
 
   componentDidMount () {
-    console.log('componentDidMount')
+    const { patient: { entity } } = this.props
     this.props.dispatch({
       type: 'patientNurseNotes/query',
       payload: {
-        PatientProfileFK: 1,
+        PatientProfileFK: entity.id,
       },
     })
-    this.resize()
     window.addEventListener('resize', this.resize.bind(this))
+    // this.resize()
+
+    setTimeout(() => {
+      this.resize()
+    }, 10)
   }
 
   componentWillUnmount () {
     window.removeEventListener('resize', this.resize.bind(this))
+    const { dispatch } = this.props
+    dispatch({
+      type: 'patientNurseNotes/updateState',
+      payload: {
+        entity: {},
+      },
+    })
   }
 
   resize () {
@@ -66,27 +123,21 @@ class PatientNurseNotes extends Component {
     ) {
       const hisotoryHeight = $(this.hisoryElement.current).find('div')[0]
         .clientHeight
-      // console.log($(this.divElement.current).find('textarea[name=Notes]'))
       let currentTextArea = $(this.divElement.current).find(
-        'textarea[name=Notes]',
+        'textarea[name=notes]',
       )[0]
 
-      currentTextArea.style.cssText = `height:${hisotoryHeight - 45}px`
+      currentTextArea.style.cssText = `height:${hisotoryHeight - 90}px`
     }
   }
 
   render () {
-    setTimeout(() => {
-      this.resize()
-    }, 100)
-
+    const { dispatch, patientNurseNotes: { list = [] }, user } = this.props
+    const { clinicianProfile } = user.data
     return (
       <div ref={this.divElement}>
         <GridContainer>
           <GridItem md={8}>
-            {/* <GridItem md={12}>
-            <h4>History</h4>
-          </GridItem> */}
             <div ref={this.hisoryElement}>
               <CardContainer
                 md={12}
@@ -96,26 +147,39 @@ class PatientNurseNotes extends Component {
                   height: 'calc(100vh - 220px)',
                 }}
               >
-                <PatientNurseNotesContent />
+                {list.map((i) => (
+                  <PatientNurseNotesContent
+                    entity={i}
+                    dispatch={dispatch}
+                    clinicianProfile={clinicianProfile}
+                  />
+                ))}
               </CardContainer>
             </div>
           </GridItem>
-          <GridItem md={4}>
-            <Field
-              name='Notes'
-              render={(args) => {
-                return (
-                  <OutlinedTextField
-                    label='Current'
-                    multiline
-                    rowsMax={2}
-                    rows={2}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
+          <GridContainer md={4}>
+            <GridItem md={12}>
+              <Field
+                name='notes'
+                render={(args) => {
+                  return (
+                    <OutlinedTextField
+                      label='Current'
+                      multiline
+                      rowsMax={2}
+                      rows={2}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={12} style={{ textAlign: 'end' }}>
+              <Button color='primary' onClick={this.props.handleSubmit}>
+                Save
+              </Button>
+            </GridItem>
+          </GridContainer>
         </GridContainer>
       </div>
     )

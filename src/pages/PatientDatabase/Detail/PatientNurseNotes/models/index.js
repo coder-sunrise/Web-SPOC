@@ -16,12 +16,12 @@ export default createListViewModel({
       })
     },
     effects: {
-      *removeRow ({ payload }, { call, put }) {
-        const result = yield call(service.remove, payload)
-        if (result === 204) {
-          notification.success({ message: 'Deleted' })
-        }
-      },
+      // *removeRow ({ payload }, { call, put }) {
+      //   const result = yield call(service.remove, payload)
+      //   if (result === 204) {
+      //     notification.success({ message: 'Deleted' })
+      //   }
+      // },
     },
     reducers: {
       queryDone (st, { payload }) {
@@ -31,10 +31,6 @@ export default createListViewModel({
           list: data.data.map((o) => {
             return {
               ...o,
-              effectiveDates: [
-                o.effectiveStartDate,
-                o.effectiveEndDate,
-              ],
             }
           }),
         }
