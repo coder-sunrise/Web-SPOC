@@ -53,15 +53,15 @@ const withWebSocket = () => (Component) => {
         this.sendJobToWebSocket()
       } else {
         let haveOneOpend = false
+        const settings = JSON.parse(localStorage.getItem('clinicSettings'))
+        const { printToolSocketURL = '' } = settings
+        const [
+          prefix = '',
+          ip = '',
+        ] = printToolSocketURL.split(':')
+
         for (let index = 0; index < defaultSocketPortsState.length; index++) {
           const socket = defaultSocketPortsState[index]
-          let settings = JSON.parse(localStorage.getItem('clinicSettings'))
-          const { printToolSocketURL = '' } = settings
-          const [
-            prefix = '',
-            ip = '',
-          ] = printToolSocketURL.split(':')
-
           const wsUrl = `${prefix}:${ip}:${socket.portNumber}`
           if (wsUrl) {
             console.log(`try to connect ${wsUrl}`)
