@@ -4,12 +4,11 @@ import {
   GridItem,
   EditableTableGrid,
   FastField,
-  Select,
 } from '@/components'
 import { ICD10AMSelect } from '@/components/_medisys'
 import { queryList } from '@/services/common'
 
-const Diagnosis = ({ setFieldValue, values, diagnosisSchema, dispatch }) => {
+const Diagnosis = ({ setFieldValue, values, diagnosisSchema }) => {
   const [
     principalDiagnosiss,
     setPrincipalDiagnosiss,

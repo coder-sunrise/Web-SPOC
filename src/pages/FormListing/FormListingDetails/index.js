@@ -24,14 +24,12 @@ export const printRow = async (row, formCategory = '2') => {
     notification.error({ message: 'No configuration found' })
     return
   }
-  // return
   download(
     `/api/Reports/${downloadConfig.id}?ReportFormat=pdf&ReportParameters={${downloadConfig.key}:${row.id},FormCategory:"${formCategory ===
     FORM_CATEGORY.VISITFORM
       ? 'VisitForm'
       : 'CORForm'}"}`,
     {
-      subject: row.subject,
       type: 'pdf',
     },
   )
@@ -162,7 +160,7 @@ class FormListingDetails extends PureComponent {
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
           observe='AddForm'
-          maxWidth='md'
+          maxWidth='lg'
           bodyNoPadding
         >
           <AddForm {...this.props} types={formTypes} />

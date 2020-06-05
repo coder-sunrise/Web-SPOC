@@ -172,19 +172,31 @@ const procuderesSchema = Yup.object().shape({
     }
     return values
   },
-  validationSchema: Yup.object().shape({
-    formData: Yup.object().shape({
-      principalDiagnosisFK: Yup.number().required(),
-      admittingSpecialtys: Yup.array().required(),
-      principalSurgeonFK: Yup.number().required(),
-      others: Yup.number().when('admittingSpecialtys', {
-        is: (val) => val && val.find((o) => o === '99'),
-        then: Yup.string().required(),
+  validationSchema: ({ formCategory }) => {
+    return Yup.object().shape({
+      formData: Yup.object().shape({
+        principalDiagnosisFK: Yup.number().required(),
+        admittingSpecialtys: Yup.array().required(),
+        principalSurgeonFK: Yup.number().required(),
+        others: Yup.string().when('admittingSpecialtys', {
+          is: (val) => val && val.find((o) => o === '99'),
+          then: Yup.string().required(),
+        }),
+        otherDiagnosis: Yup.array().of(diagnosisSchema),
+        procuderes: Yup.array().of(procuderesSchema),
+        signatureThumbnail:
+          formCategory === FORM_CATEGORY.CORFORM
+            ? Yup.string().required()
+            : undefined,
+        principalSurgeonSignatureDate:
+          formCategory === FORM_CATEGORY.CORFORM
+            ? Yup.date().required()
+            : undefined,
+        admissionDate: Yup.date().required(),
+        dischargeDate: Yup.date().required(),
       }),
-      otherDiagnosis: Yup.array().of(diagnosisSchema),
-      procuderes: Yup.array().of(procuderesSchema),
-    }),
-  }),
+    })
+  },
   displayName: 'LCForm',
 })
 class LCForm extends PureComponent {

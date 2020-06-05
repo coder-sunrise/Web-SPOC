@@ -1114,9 +1114,6 @@ const formTypes = [
               PatientName: formData.patientName,
               PatientAccountNo: formData.patientAccountNo,
               DateOfAdmission: formData.admissionDate,
-              PrincipalSurgeonName: formData.principalSurgeonName,
-              SignatureDoctorMCRNo: formData.principalSurgeonMCRNo,
-              SignatureDate: formData.principalSurgeonSignatureDate,
               DoctorMCRNo: element.surgicalCharges[index]
                 ? element.surgicalCharges[index].surgicalSurgeonMCRNo
                 : '',
@@ -1198,6 +1195,7 @@ const formTypes = [
           LCFormSurgicalCharges,
           LCFormSignature: [
             {
+              Signature: formData.signatureThumbnail,
               PrincipalSurgeonName: formData.principalSurgeonName,
               DoctorMCRNo: formData.principalSurgeonMCRNo,
               SignatureDate: formData.principalSurgeonSignatureDate,
@@ -1248,27 +1246,32 @@ const gstChargedTypes = [
 const surgicalRoles = [
   {
     id: 1,
-    code: 'PrincipalSurgeon',
+    code: 'PRINCIPALSURGEON',
     name: 'Principal Surgeon',
   },
   {
     id: 2,
-    code: 'Dentist',
-    name: 'Dentist',
+    code: 'OTHERSURGEON',
+    name: 'Other Surgeon',
   },
   {
     id: 3,
-    code: 'Doctor',
-    name: 'Doctor',
+    code: 'DENTIST',
+    name: 'Dentist',
   },
   {
     id: 4,
-    code: 'Anaesthetist',
-    name: 'Anaesthetist',
+    code: 'DOCTOR',
+    name: 'Doctor',
   },
   {
     id: 5,
-    code: 'Assistant',
+    code: 'ANESTHETIST',
+    name: 'Anesthetist',
+  },
+  {
+    id: 6,
+    code: 'ASSISTANT',
     name: 'Assistant',
   },
 ]

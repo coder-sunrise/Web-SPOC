@@ -20,6 +20,7 @@ export default createFormViewModel({
           surgicalCharges: [],
           nonSurgicalCharges: [],
           others: null,
+          signatureThumbnail: null,
         },
       },
       default: {},

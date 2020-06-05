@@ -172,12 +172,16 @@ const procuderesSchema = Yup.object().shape({
       principalDiagnosisFK: Yup.number().required(),
       admittingSpecialtys: Yup.array().required(),
       principalSurgeonFK: Yup.number().required(),
-      others: Yup.number().when('admittingSpecialtys', {
+      others: Yup.string().when('admittingSpecialtys', {
         is: (val) => val && val.find((o) => o === '99'),
         then: Yup.string().required(),
       }),
       otherDiagnosis: Yup.array().of(diagnosisSchema),
       procuderes: Yup.array().of(procuderesSchema),
+      signatureThumbnail: Yup.string().required(),
+      principalSurgeonSignatureDate: Yup.date().required(),
+      admissionDate: Yup.date().required(),
+      dischargeDate: Yup.date().required(),
     }),
   }),
   displayName: 'LCForm',

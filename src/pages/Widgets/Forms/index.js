@@ -79,31 +79,13 @@ export const printRow = async (row, props) => {
     download(
       `/api/Reports/${downloadConfig.id}?ReportFormat=pdf&ReportParameters={${downloadConfig.key}:${row.id},"FormCategory":"CORForm"}`,
       {
-        subject: row.subject,
         type: 'pdf',
       },
     )
   } else {
-    const { codetable, patient } = props
-    const { clinicianprofile = [] } = codetable
-    const { entity } = patient
-    const obj =
-      clinicianprofile.find(
-        (o) =>
-          o.userProfileFK ===
-          (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
-      ) || {}
-
-    row.doctorName = (obj.title ? `${obj.title} ` : '') + obj.name
-    row.doctorMCRNo = obj.doctorProfile.doctorMCRNo
-
-    row.patientName = entity.name
-    row.patientAccountNo = entity.patientAccountNo
-
     download(
       `/api/Reports/${downloadConfig.id}?ReportFormat=pdf`,
       {
-        subject: row.subject,
         type: 'pdf',
       },
       {
@@ -477,7 +459,7 @@ class Forms extends PureComponent {
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
           observe='AddForm'
-          maxWidth='md'
+          maxWidth='lg'
           bodyNoPadding
         >
           <AddForm {...this.props} types={formTypes} />
