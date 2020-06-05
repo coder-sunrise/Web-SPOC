@@ -21,6 +21,9 @@ module.exports = {
   queryInvoiceHistory: (params) => {
     return service.queryList(invoiceHistoryUrl, params)
   },
+  queryPrevDoctorNotes: (params) => {
+    return service.query(`${url}/PreviousDoctorNote/${params.visitId}`, params)
+  },
   // upsert: (params) => {
   //   return service.upsert(url, params)
   // },
