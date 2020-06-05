@@ -1,4 +1,5 @@
 import * as service from '@/services/common'
+import request from '@/utils/request'
 
 const url = '/api/InventoryMedication'
 // const medicPrecautionUrl = '/api/CodeTable/Search?ctname=ctmedicationprecaution'
@@ -15,4 +16,23 @@ module.exports = {
   },
   queryMedicPrecaution: (params) =>
     service.queryList(medicPrecautionUrl, params),
+
+  export: () => {
+    return request(`${url}/export`, {
+      method: 'GET',
+      xhrFields: {
+        responseType: 'arraybuffer',
+      },
+    })
+  },
+
+  import: (params) => {
+    return request(`${url}/import`, {
+      method: 'POST',
+      body: params,
+      xhrFields: {
+        responseType: 'arraybuffer',
+      },
+    })
+  },
 }
