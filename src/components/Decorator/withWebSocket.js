@@ -117,31 +117,31 @@ const withWebSocket = () => (Component) => {
       // console.log({ content })
       // const pdfResult = await getPDF(reportID, payload)
       if (content) {
-        const timer = setTimeout(() => {
-          notification.open({
-            type: 'info',
-            message: `waiting for printing...`,
-            key: 'waitingprint',
-            duration: 30,
-          })
-        }, 1000)
+        // const timer = setTimeout(() => {
+        //   notification.open({
+        //     type: 'info',
+        //     message: `waiting for printing...`,
+        //     key: 'waitingprint',
+        //     duration: 30,
+        //   })
+        // }, 1000)
 
         // const base64Result = arrayBufferToBase64(pdfResult)
         await this.prepareJobForWebSocket(content)
 
-        clearTimeout(timer)
-        notification.close('waitingprint')
+        // clearTimeout(timer)
+        // notification.close('waitingprint')
       }
     }
 
-    connectionAsync = async (socket, timeout = 10000) => {
+    connectionAsync = async (socket, timeout = 1000) => {
       const isOpened = () => socket.readyState === WebSocket.OPEN
 
       if (socket.readyState !== WebSocket.CONNECTING) {
         return isOpened()
       }
 
-      const intrasleep = 100
+      const intrasleep = 10
       const ttl = timeout / intrasleep // time to loop
       let loop = 0
       while (socket.readyState === WebSocket.CONNECTING && loop < ttl) {
