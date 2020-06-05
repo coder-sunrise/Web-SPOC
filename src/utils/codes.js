@@ -1153,7 +1153,7 @@ const formTypes = [
               : '',
             SurgeonRoleDisplayValue: formData.nonSurgicalCharges[index]
               ? formData.nonSurgicalCharges[index].surgicalRoleName
-              : '',
+              : index === 0 ? 'Principal Surgeon' : '',
             AttendanceFee: formData.nonSurgicalCharges[index]
               ? formData.nonSurgicalCharges[index].inpatientAttendanceFees
               : 0,
