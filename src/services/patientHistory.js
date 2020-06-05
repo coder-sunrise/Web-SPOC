@@ -24,4 +24,11 @@ module.exports = {
   // upsert: (params) => {
   //   return service.upsert(url, params)
   // },
+
+  queryMedicationHistory: (params) => {
+    return service.query(
+      `${url}/MedicationHistory/${params.patientProfileId}`,
+      {},
+    )
+  },
 }
