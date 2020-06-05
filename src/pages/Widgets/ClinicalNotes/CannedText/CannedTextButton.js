@@ -6,6 +6,7 @@ import { Divider, withStyles } from '@material-ui/core'
 import History from '@material-ui/icons/History'
 import Settings from '@material-ui/icons/Settings'
 import ListAlt from '@material-ui/icons/ListAlt'
+import NavigateNext from '@material-ui/icons/NavigateNext'
 // common components
 import { primaryColor } from 'mui-pro-jss'
 import { Button, Popover, Tooltip } from '@/components'
@@ -44,6 +45,9 @@ const styles = (theme) => ({
   divider: {
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
+  },
+  arrowRight: {
+    float: 'right',
   },
 })
 
@@ -167,6 +171,7 @@ const CannedTextButton = ({
               <div className={classes.item} onMouseEnter={showCannedTextPopover}>
                 <ListAlt />
                 <span>Canned Text</span>
+                <NavigateNext className={classes.arrowRight} />
               </div>
             </Popover>
           </div>
