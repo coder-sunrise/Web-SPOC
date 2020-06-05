@@ -114,23 +114,8 @@ const withWebSocket = () => (Component) => {
     }
 
     handlePrint = async (content) => {
-      // console.log({ content })
-      // const pdfResult = await getPDF(reportID, payload)
       if (content) {
-        // const timer = setTimeout(() => {
-        //   notification.open({
-        //     type: 'info',
-        //     message: `waiting for printing...`,
-        //     key: 'waitingprint',
-        //     duration: 30,
-        //   })
-        // }, 1000)
-
-        // const base64Result = arrayBufferToBase64(pdfResult)
         await this.prepareJobForWebSocket(content)
-
-        // clearTimeout(timer)
-        // notification.close('waitingprint')
       }
     }
 
