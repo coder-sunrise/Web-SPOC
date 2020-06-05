@@ -11,7 +11,7 @@ import {
 import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 
 const InitialSessionInfo = {
-  isClinicSessionClosed: true,
+  isClinicSessionClosed: undefined,
   id: '',
   // sessionNo: `${moment().format('YYMMDD')}-01`,
   sessionNo: 'N/A',
