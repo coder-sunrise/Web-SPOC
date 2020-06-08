@@ -1,7 +1,7 @@
 import update from 'immutability-helper'
+import { createListViewModel } from 'medisys-model'
 import { getUniqueId } from '@/utils/utils'
 import { fakeSubmitForm } from '@/services/api'
-import { createListViewModel } from 'medisys-model'
 import * as service from '../Vaccination/services'
 
 const namespace = 'vaccination'
@@ -34,7 +34,18 @@ export default createListViewModel({
         // }
       })
     },
-    effects: {},
+    effects: {
+      *export (_, { call }) {
+        const result = yield call(service.export)
+        return result
+      },
+
+      *import ({ payload }, { call }) {
+        const result = yield call(service.import, { content: payload.content })
+        if (result === false) return false
+        return result
+      },
+    },
     reducers: {
       queryDone (st, { payload }) {
         const { data } = payload
