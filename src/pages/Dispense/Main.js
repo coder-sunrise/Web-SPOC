@@ -7,14 +7,14 @@ import { withFormikExtend, notification, CommonModal } from '@/components'
 // sub component
 // import DispenseDetails from './DispenseDetails'
 // import DispenseDetails from './DispenseDetails/PrintDrugLabelWrapper'
-import DispenseDetails from './DispenseDetails/WebSocketWrapper'
-import AddOrder from './DispenseDetails/AddOrder'
-import DrugLabelSelection from './DispenseDetails/DrugLabelSelection'
 // utils
 import { calculateAmount, navigateDirtyCheck } from '@/utils/utils'
 import Yup from '@/utils/yup'
 import { VISIT_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
+import DrugLabelSelection from './DispenseDetails/DrugLabelSelection'
+import AddOrder from './DispenseDetails/AddOrder'
+import DispenseDetails from './DispenseDetails/WebSocketWrapper'
 
 const calculateInvoiceAmounts = (entity) => {
   const obj = { ...entity }
@@ -99,7 +99,8 @@ const constructPayload = (values) => {
   authority: 'queue.dispense',
   enableReinitialize: true,
   notDirtyDuration: 3,
-  mapPropsToValues: ({ dispense = {} }) => {
+  mapPropsToValues: (pops) => {
+    const { dispense = {} } = pops
     const obj = dispense.entity || dispense.default
     const result = calculateInvoiceAmounts(obj)
     return result
@@ -148,6 +149,17 @@ class Main extends Component {
     selectedDrugs: [],
   }
 
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    const { prescription = [] } = nextProps.values
+    this.setState(() => {
+      return {
+        selectedDrugs: prescription.map((x) => {
+          return { ...x, no: 1, selected: true }
+        }),
+      }
+    })
+  }
+
   componentDidMount = async () => {
     const { dispatch, values, dispense } = this.props
     const { otherOrder = [], prescription = [], visitPurposeFK } = values
@@ -183,12 +195,14 @@ class Main extends Component {
     ) {
       this.editOrder()
     }
-    this.setState(
-      () => {
-        return {
-          selectedDrugs: prescription.map((x) => { return { ...x, no: 1, selected: true } }),
-        }
-      })
+
+    this.setState(() => {
+      return {
+        selectedDrugs: prescription.map((x) => {
+          return { ...x, no: 1, selected: true }
+        }),
+      }
+    })
   }
 
   makePayment = async () => {
@@ -200,7 +214,7 @@ class Main extends Component {
         id: dispense.visitID,
         values: _values,
       },
-    })  
+    })
     if (finalizeResponse === 204) {
       return true
     }
@@ -359,23 +373,22 @@ class Main extends Component {
   handleDrugLabelClick = () => {
     const { values } = this.props
     const { prescription = [] } = values
-    this.setState(
-      (prevState) => {
-        return {
-          showDrugLabelSelection: !prevState.showDrugLabelSelection,
-          selectedDrugs: prescription.map((x) => { return { ...x, no: 1, selected: true } }),
-        }
-      })
+    this.setState((prevState) => {
+      return {
+        showDrugLabelSelection: !prevState.showDrugLabelSelection,
+        selectedDrugs: prescription.map((x) => {
+          return { ...x, no: 1, selected: true }
+        }),
+      }
+    })
   }
 
   handleDrugLabelSelectionClose = () => {
-    this.setState(
-      (prevState) => {
-        return {
-          showDrugLabelSelection: !prevState.showDrugLabelSelection,
-        }
-      },
-    )
+    this.setState((prevState) => {
+      return {
+        showDrugLabelSelection: !prevState.showDrugLabelSelection,
+      }
+    })
   }
 
   handleDrugLabelSelected = (itemId, selected) => {
@@ -384,9 +397,7 @@ class Main extends Component {
         (drug) => (drug.id === itemId ? { ...drug, selected } : { ...drug }),
       ),
     }))
-    this.props.dispatch(
-      { type: 'global/incrementCommitCount' }
-    )
+    this.props.dispatch({ type: 'global/incrementCommitCount' })
   }
 
   handleDrugLabelNoChanged = (itemId, no) => {
@@ -395,12 +406,10 @@ class Main extends Component {
         (drug) => (drug.id === itemId ? { ...drug, no } : { ...drug }),
       ),
     }))
-    this.props.dispatch(
-      { type: 'global/incrementCommitCount' }
-    )
+    this.props.dispatch({ type: 'global/incrementCommitCount' })
   }
 
-  render() {
+  render () {
     const { classes, handleSubmit, values, dispense, codetable } = this.props
     return (
       <div className={classes.root}>
@@ -432,7 +441,6 @@ class Main extends Component {
             }}
           />
         </CommonModal>
-
       </div>
     )
   }
