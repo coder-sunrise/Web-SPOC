@@ -53,8 +53,18 @@ const PatientNurseNotesContent = ({ clinicianProfile, entity, dispatch }) => {
           </Button>
         )}
       </div>
-      <div>
-        <span style={{ marginLeft: 20 }}>{notes}</span>
+      <div style={{ paddingLeft: 20 }}>
+        <textarea
+          disabled='on'
+          rows={notes.split('\n').length}
+          value={notes}
+          style={{
+            width: '100%',
+            border: 0,
+            resize: 'none',
+            background: 'transparent',
+          }}
+        />
       </div>
     </React.Fragment>
   )
