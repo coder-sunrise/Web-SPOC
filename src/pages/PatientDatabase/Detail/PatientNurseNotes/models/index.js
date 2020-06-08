@@ -1,5 +1,6 @@
 import { createListViewModel } from 'medisys-model'
 import { notification } from '@/components'
+import moment from 'moment'
 import * as service from '../services'
 
 export default createListViewModel({
@@ -28,6 +29,7 @@ export default createListViewModel({
         const { data } = payload
         return {
           ...st,
+          refreshTime: moment().format('HH:mm'),
           list: data.data.map((o) => {
             return {
               ...o,

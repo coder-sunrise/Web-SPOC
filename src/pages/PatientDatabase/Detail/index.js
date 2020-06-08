@@ -347,7 +347,6 @@ class PatientDetail extends PureComponent {
         id: '9',
         name: 'Nurse Notes',
         access: [
-          'patientdatabase.newpatient',
           'patientdatabase.patientprofiledetails',
         ],
         component: Loadable({

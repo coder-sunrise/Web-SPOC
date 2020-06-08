@@ -16,7 +16,12 @@ import {
 import Edit from '@material-ui/icons/Edit'
 
 const PatientNurseNotesContent = ({ clinicianProfile, entity, dispatch }) => {
-  const { createDate, createByUserFK, createByUserFullName, notes } = entity
+  const {
+    createDate,
+    createByUserFK,
+    createByUserFullName = '',
+    notes,
+  } = entity
   const formateDate = moment(createDate).format(dateFormatLongWithTimeNoSec)
 
   const canEdit =

@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import $ from 'jquery'
 import Yup from '@/utils/yup'
+import Refresh from '@material-ui/icons/Refresh'
 
 import {
   GridContainer,
@@ -14,6 +15,7 @@ import {
   Field,
   OutlinedTextField,
   withFormikExtend,
+  Tooltip,
 } from '@/components'
 import { withStyles, TextField } from '@material-ui/core'
 import model from './models'
@@ -37,7 +39,6 @@ window.g_app.replaceModel(model)
 }))
 @withFormikExtend({
   authority: [
-    'patientdatabase.newpatient',
     'patientdatabase.patientprofiledetails',
   ],
   enableReinitialize: true,
@@ -56,7 +57,7 @@ window.g_app.replaceModel(model)
     const { dispatch, history, patient, onConfirm } = props
 
     const { id } = values
-
+    const isEdit = id !== undefined && id > 0
     const response = await dispatch({
       type: 'patientNurseNotes/upsert',
       payload: { ...values },
@@ -66,12 +67,17 @@ window.g_app.replaceModel(model)
       type: 'patientNurseNotes/query',
       payload: {
         PatientProfileFK: patient.entity.id,
+        pagesize: 999,
+        sorting: [
+          { columnName: 'createDate', direction: 'desc' },
+        ],
       },
     })
 
-    if (refreshResult && refreshResult.data && !response.id) {
+    if (refreshResult && refreshResult.data) {
       const { data = [] } = refreshResult
-      const editEntity = data.find((f) => f.id === id)
+      const editingId = isEdit ? id : response.id
+      const editEntity = data.find((f) => f.id === editingId)
       dispatch({
         type: 'patientNurseNotes/updateState',
         payload: { entity: editEntity },
@@ -88,13 +94,7 @@ class PatientNurseNotes extends PureComponent {
   }
 
   componentDidMount () {
-    const { patient: { entity } } = this.props
-    this.props.dispatch({
-      type: 'patientNurseNotes/query',
-      payload: {
-        PatientProfileFK: entity.id,
-      },
-    })
+    this.refreshNurseNotes()
     window.addEventListener('resize', this.resize.bind(this))
     // this.resize()
 
@@ -114,6 +114,21 @@ class PatientNurseNotes extends PureComponent {
     })
   }
 
+  refreshNurseNotes = async () => {
+    const { dispatch, patient } = this.props
+    const refreshResult = await dispatch({
+      type: 'patientNurseNotes/query',
+      payload: {
+        PatientProfileFK: patient.entity.id,
+        pagesize: 999,
+        sorting: [
+          { columnName: 'createDate', direction: 'desc' },
+        ],
+      },
+    })
+    return refreshResult
+  }
+
   resize () {
     if (
       this.divElement &&
@@ -127,35 +142,70 @@ class PatientNurseNotes extends PureComponent {
         'textarea[name=notes]',
       )[0]
 
-      currentTextArea.style.cssText = `height:${hisotoryHeight - 90}px`
+      currentTextArea.style.cssText = `height:${hisotoryHeight - 40}px`
     }
   }
 
   render () {
-    const { dispatch, patientNurseNotes: { list = [] }, user } = this.props
+    const {
+      dispatch,
+      patientNurseNotes: { refreshTime, list = [] },
+      user,
+    } = this.props
     const { clinicianProfile } = user.data
+
     return (
       <div ref={this.divElement}>
         <GridContainer>
           <GridItem md={8}>
-            <div ref={this.hisoryElement}>
-              <CardContainer
-                md={12}
-                hideHeader
-                title='History'
-                style={{
-                  height: 'calc(100vh - 220px)',
-                }}
+            <GridContainer>
+              <GridItem md={12}>
+                <div ref={this.hisoryElement}>
+                  <CardContainer
+                    md={12}
+                    hideHeader
+                    title='History'
+                    style={{
+                      height: 'calc(100vh - 255px)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        height: 'calc(100vh - 280px)',
+                        marginTop: '15px',
+                        overflow: 'scroll',
+                      }}
+                    >
+                      {list.map((i) => (
+                        <PatientNurseNotesContent
+                          entity={i}
+                          dispatch={dispatch}
+                          clinicianProfile={clinicianProfile}
+                        />
+                      ))}
+                    </div>
+                  </CardContainer>
+                </div>
+              </GridItem>
+              <GridItem
+                md={6}
+                style={{ textAlign: 'left', fontWeight: 'bold' }}
               >
-                {list.map((i) => (
-                  <PatientNurseNotesContent
-                    entity={i}
-                    dispatch={dispatch}
-                    clinicianProfile={clinicianProfile}
-                  />
-                ))}
-              </CardContainer>
-            </div>
+                <span>Total: {list.length} Records</span>
+              </GridItem>
+              <GridItem md={6} style={{ textAlign: 'right' }}>
+                <Button
+                  justIcon
+                  color='primary'
+                  onClick={this.refreshNurseNotes}
+                >
+                  <Tooltip title='Refresh'>
+                    <Refresh />
+                  </Tooltip>
+                </Button>
+                <span>{refreshTime}</span>
+              </GridItem>
+            </GridContainer>
           </GridItem>
           <GridContainer md={4}>
             <GridItem md={12}>
