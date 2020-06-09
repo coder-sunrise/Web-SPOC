@@ -433,7 +433,14 @@ class Queue extends React.Component {
   }
 
   render () {
-    const { classes, queueLog, loading, history, dispatch } = this.props
+    const {
+      classes,
+      queueLog,
+      loading,
+      history,
+      dispatch,
+      queueCalling,
+    } = this.props
     const {
       showEndSessionSummary,
       showPatientSearch,
@@ -442,6 +449,10 @@ class Queue extends React.Component {
     } = this.state
     const { sessionInfo, error } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
+    const { oriQCallList = [] } = queueCalling
+    const [
+      lastCall,
+    ] = oriQCallList
 
     return (
       <PageHeaderWrapper
@@ -452,6 +463,21 @@ class Queue extends React.Component {
           <CardHeader icon>
             <h3 className={classNames(classes.sessionNo)}>
               {`Session No.: ${sessionNo}`}
+              {lastCall ? (
+                <font color='red'>
+                  <br />
+                  <b>
+                    NOW SERVING:{' '}
+                    {lastCall.qNo.includes('.') ? (
+                      lastCall.qNo
+                    ) : (
+                      `${lastCall.qNo}.0`
+                    )}
+                  </b>
+                </font>
+              ) : (
+                ''
+              )}
             </h3>
 
             {!isClinicSessionClosed && (
