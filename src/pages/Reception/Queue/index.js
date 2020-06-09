@@ -463,21 +463,23 @@ class Queue extends React.Component {
           <CardHeader icon>
             <h3 className={classNames(classes.sessionNo)}>
               {`Session No.: ${sessionNo}`}
-              {lastCall ? (
-                <font color='red'>
-                  <br />
-                  <b>
-                    NOW SERVING:{' '}
-                    {lastCall.qNo.includes('.') ? (
-                      lastCall.qNo
-                    ) : (
-                      `${lastCall.qNo}.0`
-                    )}
-                  </b>
-                </font>
-              ) : (
-                ''
-              )}
+              <Authorized authority='openqueuedisplay'>
+                {lastCall ? (
+                  <font color='red'>
+                    <br />
+                    <b>
+                      NOW SERVING:{' '}
+                      {lastCall.qNo.includes('.') ? (
+                        lastCall.qNo
+                      ) : (
+                        `${lastCall.qNo}.0`
+                      )}
+                    </b>
+                  </font>
+                ) : (
+                  ''
+                )}
+              </Authorized>
             </h3>
 
             {!isClinicSessionClosed && (
