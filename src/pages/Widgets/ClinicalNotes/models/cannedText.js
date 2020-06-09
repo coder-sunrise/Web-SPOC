@@ -1,5 +1,6 @@
 import { createFormViewModel } from 'medisys-model'
 import * as service from '../services/cannedText'
+import * as patientHistoryService from '../../../../services/patientHistory'
 import { CANNED_TEXT_TYPE_FIELD_NAME } from '../CannedText/utils'
 
 const defaultState = {
@@ -10,6 +11,7 @@ const defaultState = {
   selectedNote: undefined,
   fields: [],
   cannedTextTypes: [],
+  prevDoctorNotes: undefined,
 }
 
 export default createFormViewModel({
@@ -43,6 +45,19 @@ export default createFormViewModel({
             }),
           )
         yield all(queryDone)
+      },
+      *queryPrevDoctorNotes ({ payload }, { call, put }) {
+        const response = yield call(patientHistoryService.queryPrevDoctorNotes, payload)
+        if (response.status === '200') {
+          yield put({
+            type: 'updateState',
+            payload: {
+              prevDoctorNotes: response.data,
+            },
+          })
+          return response.data
+        }
+        return false
       },
     },
     reducers: {
