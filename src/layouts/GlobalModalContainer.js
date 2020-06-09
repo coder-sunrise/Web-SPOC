@@ -6,6 +6,7 @@ import {
   SessionTimeout,
   CustomConfirm,
   ImageViewer,
+  SystemMessageDetail,
 } from '@/components/_medisys'
 import { CommonModal, Button } from '@/components'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
@@ -68,6 +69,16 @@ class GlobalModalContainer extends PureComponent {
     dispatch({
       type: 'settingUserProfile/updateCurrentSelected',
       userProfile: {},
+    })
+  }
+
+  closeSystemMessage = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        showSystemMessage: false,
+      },
     })
   }
 
@@ -167,6 +178,16 @@ class GlobalModalContainer extends PureComponent {
           observe='UserProfile'
         >
           <UserProfileForm />
+        </CommonModal>
+
+        <CommonModal
+          title='Maintenance Announcement '
+          open={global.showSystemMessage}
+          onClose={this.closeSystemMessage}
+          onConfirm={this.closeSystemMessage}
+          observe='SystemMessage'
+        >
+          <SystemMessageDetail {...this.props} />
         </CommonModal>
 
         <CommonModal
