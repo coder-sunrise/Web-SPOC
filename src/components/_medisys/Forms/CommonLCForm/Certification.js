@@ -103,7 +103,9 @@ const Certification = ({ values, setFieldValue, formCategory }) => {
         <GridItem md={12}>
           <GridContainer>
             <GridItem xs={12}>
-              <span>Signature of Principal Surgeon:</span>
+              <div style={{ marginTop: 10 }}>
+                <span>Signature of Principal Surgeon:</span>
+              </div>
             </GridItem>
             <div style={{ display: 'flex' }}>
               <div>

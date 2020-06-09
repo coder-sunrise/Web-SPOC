@@ -70,13 +70,21 @@ const Procedures = ({
   }
 
   const principalSurgeonChanged = (v, option) => {
+    let title
+    if (option) {
+      title =
+        option.clinicianProfile.title &&
+        option.clinicianProfile.title !== 'Other'
+          ? `${option.clinicianProfile.title} `
+          : ''
+    }
     setFieldValue(
       'formData.principalSurgeonMCRNo',
       option ? option.doctorMCRNo : undefined,
     )
     setFieldValue(
       'formData.principalSurgeonName',
-      option ? option.clinicianProfile.name : undefined,
+      option ? `${title}${option.clinicianProfile.name}` : undefined,
     )
 
     let newProcuderes = values.formData.procuderes.map((o) => {
@@ -89,7 +97,7 @@ const Procedures = ({
               surgicalSurgeonFK: option ? option.id : undefined,
               surgicalSurgeonMCRNo: option ? option.doctorMCRNo : undefined,
               surgicalSurgeonName: option
-                ? option.clinicianProfile.name
+                ? `${title}${option.clinicianProfile.name}`
                 : undefined,
             }
           }
@@ -106,7 +114,7 @@ const Procedures = ({
           surgicalSurgeonFK: option ? option.id : undefined,
           surgicalSurgeonMCRNo: option ? option.doctorMCRNo : undefined,
           surgicalSurgeonName: option
-            ? option.clinicianProfile.name
+            ? `${title}${option.clinicianProfile.name}`
             : undefined,
         }
       }
@@ -153,7 +161,7 @@ const Procedures = ({
           />
         </GridItem>
       </GridContainer>
-      <div>
+      <div style={{ marginTop: 10 }}>
         <div>
           {values.formData.procuderes.map((o) => {
             const i = o.index - 1
@@ -229,12 +237,7 @@ const Procedures = ({
                 },
                 {
                   name: 'totalSurgicalFees',
-                  title: (
-                    <div>
-                      <div>Total</div>
-                      <div>Surgical Fees</div>
-                    </div>
-                  ),
+                  title: 'Total Surgical Fees',
                 },
                 { name: 'gSTChargedFK', title: 'GST Charged' },
               ],
@@ -246,9 +249,18 @@ const Procedures = ({
                   valueField: 'doctorMCRNo',
                   labelField: 'doctorMCRNo',
                   onChange: ({ option, row }) => {
+                    let title
+                    if (option) {
+                      title =
+                        option.clinicianProfile.title &&
+                        option.clinicianProfile.title !== 'Other'
+                          ? `${option.clinicianProfile.title} `
+                          : ''
+                    }
                     row.surgicalSurgeonName = option
-                      ? option.clinicianProfile.name
+                      ? `${title}${option.clinicianProfile.name}`
                       : undefined
+
                     row.surgicalSurgeonFK = option ? option.id : undefined
                   },
                   sortingEnabled: false,
@@ -263,12 +275,24 @@ const Procedures = ({
                     row.surgicalSurgeonMCRNo = option
                       ? option.doctorMCRNo
                       : undefined
+                    let title
+                    if (option) {
+                      title =
+                        option.clinicianProfile.title &&
+                        option.clinicianProfile.title !== 'Other'
+                          ? `${option.clinicianProfile.title} `
+                          : ''
+                    }
                     row.surgicalSurgeonName = option
-                      ? option.clinicianProfile.name
+                      ? `${title}${option.clinicianProfile.name}`
                       : undefined
                   },
                   sortingEnabled: false,
                   isDisabled: (row) => row.surgicalRoleFK === 1,
+                  renderDropdown: (option) => (
+                    <DoctorLabel doctor={option} hideMCR />
+                  ),
+                  render: (row) => <div>{row.surgicalSurgeonName}</div>,
                 },
                 {
                   columnName: 'surgicalRoleFK',
@@ -492,17 +516,19 @@ const Procedures = ({
                         />
                       </GridItem>
                       <GridItem xs={12}>
-                        Only{' '}
-                        <span
-                          style={{
-                            fontStyle: 'italic',
-                            textDecoration: 'underline',
-                          }}
-                        >
-                          surgical-related
-                        </span>{' '}
-                        charges to be reimbursed to the doctor need to be filled
-                        in below.
+                        <div style={{ marginTop: 10, marginBottom: 5 }}>
+                          Only{' '}
+                          <span
+                            style={{
+                              fontStyle: 'italic',
+                              textDecoration: 'underline',
+                            }}
+                          >
+                            surgical-related
+                          </span>{' '}
+                          charges to be reimbursed to the doctor need to be
+                          filled in below.
+                        </div>
                       </GridItem>
                       <GridItem md={12}>
                         <EditableTableGrid

@@ -194,7 +194,7 @@ const Diagnosis = ({ setFieldValue, values, diagnosisSchema }) => {
           />
         </GridItem>
       </GridContainer>
-      <span>Second Diagnosis</span>
+      <div style={{ marginTop: 10 }}>Second Diagnosis</div>
       <GridContainer>
         <GridItem md={6}>
           <FastField
@@ -286,7 +286,7 @@ const Diagnosis = ({ setFieldValue, values, diagnosisSchema }) => {
         </GridItem>
       </GridContainer>
       <GridContainer />
-      <span>Other Diagnosis</span>
+      <div style={{ marginTop: 10 }}>Other Diagnosis</div>
       <EditableTableGrid
         rows={otherDiagnosis}
         EditingProps={{

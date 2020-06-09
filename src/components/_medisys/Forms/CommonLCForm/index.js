@@ -9,12 +9,6 @@ import Certification from './Certification'
 import NonSurgical from './NonSurgical'
 
 class CommonLCForm extends PureComponent {
-  constructor (props) {
-    super(props)
-
-    this.myRef = React.createRef()
-  }
-
   render () {
     const {
       values,

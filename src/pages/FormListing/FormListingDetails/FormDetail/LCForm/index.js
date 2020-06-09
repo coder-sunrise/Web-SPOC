@@ -113,6 +113,15 @@ const procuderesSchema = Yup.object().shape({
         }
       }
 
+      let title
+      if (doctor) {
+        title =
+          doctor.clinicianProfile.title &&
+          doctor.clinicianProfile.title !== 'Other'
+            ? `${doctor.clinicianProfile.title} `
+            : ''
+      }
+
       values = {
         ...formListing.defaultLCForm,
         formData: {
@@ -135,7 +144,7 @@ const procuderesSchema = Yup.object().shape({
           principalSurgeonFK: doctorProfileFK,
           principalSurgeonMCRNo: doctor ? doctor.doctorMCRNo : undefined,
           principalSurgeonName: doctor
-            ? doctor.clinicianProfile.name
+            ? `${title}${doctor.clinicianProfile.name}`
             : undefined,
           principalSurgeonSignatureDate: moment(),
 
@@ -154,7 +163,7 @@ const procuderesSchema = Yup.object().shape({
                   surgicalSurgeonFK: doctorProfileFK,
                   surgicalSurgeonMCRNo: doctor ? doctor.doctorMCRNo : undefined,
                   surgicalSurgeonName: doctor
-                    ? doctor.clinicianProfile.name
+                    ? `${title}${doctor.clinicianProfile.name}`
                     : undefined,
                   surgeonFees: 0,
                   implantFees: 0,
@@ -200,6 +209,12 @@ const procuderesSchema = Yup.object().shape({
   displayName: 'LCForm',
 })
 class LCForm extends PureComponent {
+  constructor (props) {
+    super(props)
+
+    this.myRef = React.createRef()
+  }
+
   onSubmitButtonClicked = async (action) => {
     const {
       dispatch,

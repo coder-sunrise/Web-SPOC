@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import _ from 'lodash'
 import { gstChargedTypes, surgicalRoles } from '@/utils/codes'
 import { GridContainer, GridItem, EditableTableGrid } from '@/components'
+import { DoctorLabel } from '@/components/_medisys'
 
 const NonSurgical = ({ setFieldValue, values, nonSurgicalChargesSchema }) => {
   let isContainsNonPrincipalSurgeon = false
@@ -82,9 +83,18 @@ const NonSurgical = ({ setFieldValue, values, nonSurgicalChargesSchema }) => {
         valueField: 'doctorMCRNo',
         labelField: 'doctorMCRNo',
         onChange: ({ option, row }) => {
+          let title
+          if (option) {
+            title =
+              option.clinicianProfile.title &&
+              option.clinicianProfile.title !== 'Other'
+                ? `${option.clinicianProfile.title} `
+                : ''
+          }
           row.surgicalSurgeonName = option
-            ? option.clinicianProfile.name
+            ? `${title}${option.clinicianProfile.name}`
             : undefined
+
           row.surgicalSurgeonFK = option ? option.id : undefined
         },
         sortingEnabled: false,
@@ -97,12 +107,23 @@ const NonSurgical = ({ setFieldValue, values, nonSurgicalChargesSchema }) => {
         labelField: 'clinicianProfile.name',
         onChange: ({ option, row }) => {
           row.surgicalSurgeonMCRNo = option ? option.doctorMCRNo : undefined
+
+          let title
+          if (option) {
+            title =
+              option.clinicianProfile.title &&
+              option.clinicianProfile.title !== 'Other'
+                ? `${option.clinicianProfile.title} `
+                : ''
+          }
           row.surgicalSurgeonName = option
-            ? option.clinicianProfile.name
+            ? `${title}${option.clinicianProfile.name}`
             : undefined
         },
         sortingEnabled: false,
         isDisabled: (row) => row.surgicalRoleFK === 1,
+        renderDropdown: (option) => <DoctorLabel doctor={option} hideMCR />,
+        render: (row) => <div>{row.surgicalSurgeonName}</div>,
       },
       {
         columnName: 'surgicalRoleFK',
@@ -147,7 +168,7 @@ const NonSurgical = ({ setFieldValue, values, nonSurgicalChargesSchema }) => {
         type: 'currency',
         sortingEnabled: false,
         disabled: true,
-        width: 180,
+        width: 200,
       },
       {
         columnName: 'gSTChargedFK',
@@ -183,6 +204,7 @@ const NonSurgical = ({ setFieldValue, values, nonSurgicalChargesSchema }) => {
       </GridItem>
       <GridItem md={12}>
         <EditableTableGrid
+          style={{ marginTop: 10 }}
           getRowId={(r) => r.id}
           rows={nonSurgicalCharges}
           EditingProps={{
