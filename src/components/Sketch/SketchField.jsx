@@ -863,6 +863,36 @@ class SketchField extends PureComponent {
     // img.src = dataUrl
   }
 
+  setBackgroundFromData = (imageData) => {
+    let canvas = this._fc
+    let { indexCount } = this.state
+    let history = this._history
+    let oldIndexCount = indexCount
+    let newIndexCount = indexCount + 1
+
+    history.updateCount(oldIndexCount)
+
+    this.setState({
+      indexCount: newIndexCount,
+    })
+
+    const image = new Image()
+    image.src = imageData
+    image.onload = () => {
+      let imgbase64 = new fabric.Image(image, {})
+      imgbase64.width = canvas.width
+      imgbase64.height = canvas.height
+      imgbase64.set({
+        zindex: oldIndexCount,
+      })
+      canvas.add(imgbase64)
+      imgbase64.selectable = false
+      imgbase64.evented = false
+
+      canvas.sendToBack(imgbase64)
+    }
+  }
+
   setTemplate = (dataUrl, id) => {
     let { templateSet } = this.state
     let history = this._history

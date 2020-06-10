@@ -320,7 +320,11 @@ class AntdSelect extends React.PureComponent {
         shrink: false,
       })
     }
-    if (autoComplete && options && this.state.data.length === 0) {
+    if (
+      autoComplete &&
+      options
+      //&& this.state.data.length === 0
+    ) {
       this.setState({
         data: _.filter(options, (o) => o[valueField] === v),
       })

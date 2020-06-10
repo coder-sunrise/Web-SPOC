@@ -401,6 +401,23 @@ const widgets = [
     // model: 'refractionForm',
     layoutConfig: {},
   },
+  {
+    id: '12',
+    name: 'Forms',
+    accessRight: 'queue.consultation.widgets.forms',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/Forms'),
+      loading: Loading,
+    }),
+    model: 'forms',
+    layoutConfig: {},
+
+    onRemove: () => {
+      window.g_app._store.dispatch({
+        type: 'forms/deleteRow',
+      })
+    },
+  },
 ]
 
 module.exports = {

@@ -167,6 +167,7 @@ export const REPORT_TYPE = {
   27: 'Patient Label',
   29: 'Payment Receipt',
   37: 'Inventory Trending Report',
+  45: 'Letter of Certification',
 }
 
 export const REPORT_ID = {
@@ -441,4 +442,14 @@ export const ATTACHMENT_TYPE = {
   VISITREFERRAL: 'VisitReferral',
   VISIT: 'Visit',
   EYEVISUALACUITY: 'EyeVisualAcuity',
+}
+
+export const FORM_FROM = {
+  FORMMODULE: 1,
+  QUEUELOG: 2,
+}
+
+export const FORM_CATEGORY = {
+  VISITFORM: 1,
+  CORFORM: 2,
 }

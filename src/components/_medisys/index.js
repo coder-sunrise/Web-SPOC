@@ -37,3 +37,4 @@ export {
 export { default as AuthorizationWrapper } from './AuthorizationWrapper'
 export { default as SystemMessageList } from './SystemMessage/Listing'
 export { default as SystemMessageDetail } from './SystemMessage/Details'
+export { default as ICD10AMSelect } from './ICD10AMSelect'

@@ -161,10 +161,17 @@ class EditOrder extends Component {
     if (!_.isEmpty(isFormValid)) {
       handleSubmit()
     } else {
-      const { consultationDocument, orders, dispatch, dispense } = this.props
+      const {
+        consultationDocument,
+        orders,
+        dispatch,
+        dispense,
+        forms,
+      } = this.props
       const payload = convertToConsultation(values, {
         consultationDocument,
         orders,
+        forms,
       })
 
       const signResult = await dispatch({
@@ -194,8 +201,10 @@ class EditOrder extends Component {
     const { classes, theme } = this.props
     const orderWidget = widgets.find((o) => o.id === '5')
     const cdWidget = widgets.find((o) => o.id === '3')
+    const formsWidget = widgets.find((o) => o.id === '12')
     const Order = orderWidget.component
     const ConsultationDocument = cdWidget.component
+    const Forms = formsWidget.component
     return (
       <div className={classes.content}>
         <GridContainer>
@@ -204,6 +213,15 @@ class EditOrder extends Component {
             <Order className={classes.orderPanel} status='' from='ca' />
           </GridItem>
           <GridItem xs={12} md={6}>
+            <Authorized authority={formsWidget.accessRight}>
+              <h5>
+                <span style={{ display: 'inline-block' }}>Forms</span>
+                <span className={classes.cdAddButton}>
+                  {cdWidget.toolbarAddon}
+                </span>
+              </h5>
+              <Forms />
+            </Authorized>
             <Authorized authority={cdWidget.accessRight}>
               <h5>
                 <span style={{ display: 'inline-block' }}>

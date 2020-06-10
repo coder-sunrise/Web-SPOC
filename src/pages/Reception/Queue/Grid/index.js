@@ -46,6 +46,7 @@ const Grid = ({
   onViewPatientProfileClick,
   handleActualizeAppointment,
   statusTagClicked,
+  handleFormsClick,
   mainDivHeight = 700,
 }) => {
   const [
@@ -373,6 +374,9 @@ const Grid = ({
         }
         case '9':
           onRegisterPatientClick(false, row)
+          break
+        case '10':
+          handleFormsClick({ visitID: row.id, visitStatus: row.visitStatus })
           break
         default:
           break

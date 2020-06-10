@@ -72,7 +72,7 @@ const DiagnosisSelect = ({
   const onDiagnosisSearch = async (v) => {
     const search = {
       props:
-        'id,displayvalue,code,complication,isChasAcuteClaimable,isChasChronicClaimable,isHazeClaimable',
+        'id,displayvalue,code,complication,isChasAcuteClaimable,isChasChronicClaimable,isHazeClaimable,iCD10AMFK,iCD10AMDiagnosisCode,iCD10AMDiagnosisName',
       sorting: [
         { columnName: 'displayvalue', direction: 'asc' },
       ],
@@ -167,6 +167,7 @@ const DiagnosisSelect = ({
           if (onDataSouceChange) onDataSouceChange(data)
         }}
         onChange={(values, opts) => {
+          console.log('sdfsdfsdfsd')
           if (
             props.maxTagCount === undefined &&
             props.mode &&
