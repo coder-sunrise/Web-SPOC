@@ -6,6 +6,8 @@ import PropTypes from 'prop-types'
 import { connect } from 'dva'
 // antd
 import { Divider } from 'antd'
+import _ from 'lodash'
+
 // @material-ui
 import withStyles from '@material-ui/core/styles/withStyles'
 import MenuItem from '@material-ui/core/MenuItem'
@@ -15,17 +17,24 @@ import WifiOff from '@material-ui/icons/WifiOff'
 // assets
 import headerLinksStyle from 'mui-pro-jss/material-dashboard-pro-react/components/headerLinksStyle'
 // common components
+import moment from 'moment'
 import { Badge, SizeContainer, Popper, Button, Tooltip } from '@/components'
 // subcomponents
 import { Notification } from '@/components/_medisys'
 // utils
 import { updateAPIType } from '@/utils/request'
 import { navigateDirtyCheck } from '@/utils/utils'
+import {
+  VALUE_KEYS,
+  NOTIFICATION_STATUS,
+  NOTIFICATION_TYPE,
+} from '@/utils/constants'
 
-@connect(({ user, clinicInfo, header }) => ({
+@connect(({ user, clinicInfo, header, systemMessage }) => ({
   user,
   clinicInfo,
   header,
+  systemMessage,
 }))
 class HeaderLinks extends React.Component {
   state = {
@@ -33,6 +42,90 @@ class HeaderLinks extends React.Component {
     openAccount: false,
     openDomain: false,
     title: 'PROD',
+  }
+
+  async componentDidMount () {
+    const { dispatch } = this.props
+    const allResult = await this.featchSysMessages()
+
+    const latestData = allResult.reduce((p, i) => {
+      if (i) {
+        const { data = [] } = i
+        const [
+          current,
+        ] = data
+
+        if (current) {
+          const { createDate: currentDate } = current
+          const { createDate: preDate } = p
+
+          if (preDate && currentDate) {
+            const d1 = moment(preDate)
+            const d2 = moment(currentDate)
+            return d1.isBefore(d2) ? current : p
+          }
+          if (currentDate) {
+            return current
+          }
+        }
+      }
+      return p
+    }, {})
+
+    if (latestData) {
+      const { isAlertAfterLogin = false, isRead = false, isActive } = latestData
+      if (isAlertAfterLogin && !isRead && isActive) {
+        dispatch({
+          type: 'systemMessage/updateState',
+          payload: {
+            entity: latestData,
+          },
+        })
+
+        dispatch({
+          type: 'global/updateState',
+          payload: {
+            showSystemMessage: true,
+          },
+        })
+      }
+    }
+  }
+
+  // eslint-disable-next-line react/sort-comp
+  async featchSysMessages () {
+    const { dispatch } = this.props
+    let payload = {
+      // lgt_EffectiveEndDate: moment().formatUTC(false),
+      pagesize: 3,
+      typeId: 1,
+      systemMessageTypeFK: 1,
+      group: [
+        {
+          lst_EffectiveStartDate: moment().formatUTC(false),
+          isAlertAfterLogin: false,
+          combineCondition: 'or',
+        },
+      ],
+      sorting: [
+        { columnName: 'createDate', direction: 'desc' },
+      ],
+    }
+    const result = await Promise.all([
+      dispatch({
+        type: 'systemMessage/queryList',
+        payload,
+      }),
+      dispatch({
+        type: 'systemMessage/queryList',
+        payload: {
+          ...payload,
+          typeId: 2,
+          systemMessageTypeFK: 2,
+        },
+      }),
+    ])
+    return result
   }
 
   handleClick = (key) => () => {
@@ -87,7 +180,14 @@ class HeaderLinks extends React.Component {
   }
 
   render () {
-    const { classes, rtlActive, user, clinicInfo, header } = this.props
+    const {
+      classes,
+      rtlActive,
+      user,
+      clinicInfo,
+      header,
+      systemMessage,
+    } = this.props
     const { openAccount } = this.state
     const { signalRConnected, notifications } = header
 
@@ -121,6 +221,7 @@ class HeaderLinks extends React.Component {
               <Notification
                 dispatch={this.props.dispatch}
                 notifications={notifications}
+                systemMessage={systemMessage}
               />
               {!signalRConnected && (
                 <Tooltip title='Real-time update signal is down. Please refresh manually.'>
