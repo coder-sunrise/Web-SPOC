@@ -183,7 +183,8 @@ const WebSocketWrapper = ({
   const handleOnPrint = async ({ type, row, printAllDrugLabel }) => {
     if (withoutPrintPreview.includes(type)) {
       const printResult = await getPrintResult(type, row, printAllDrugLabel)
-      if (!printResult) return
+
+      if (!printResult || printResult.length <= 0) return
       await handlePrint(JSON.stringify(printResult))
     } else {
       const documentType = consultationDocumentTypes.find(
