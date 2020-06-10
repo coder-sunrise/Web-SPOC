@@ -3,7 +3,10 @@ import { connect } from 'dva'
 import color from 'color'
 // material ui
 import { Divider, withStyles } from '@material-ui/core'
+import History from '@material-ui/icons/History'
 import Settings from '@material-ui/icons/Settings'
+import ListAlt from '@material-ui/icons/ListAlt'
+import NavigateNext from '@material-ui/icons/NavigateNext'
 // common components
 import { primaryColor } from 'mui-pro-jss'
 import { Button, Popover, Tooltip } from '@/components'
@@ -43,6 +46,9 @@ const styles = (theme) => ({
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
   },
+  arrowRight: {
+    float: 'right',
+  },
 })
 
 const ListItem = ({ classes, title, onClick }) => {
@@ -63,18 +69,32 @@ const CannedTextButton = ({
   onSettingClick,
   handleSelectCannedText,
   onCannedTextClick,
+  onPrevDoctorNoteClick,
   loading,
 }) => {
   const [
     show,
     setShow,
   ] = useState(false)
+  const [
+    showCannedText,
+    setShowCannedText,
+  ] = useState(false)
 
   const fieldName = CANNED_TEXT_TYPE_FIELD_NAME[cannedTextTypeFK]
 
   const list = cannedText[fieldName] || []
 
-  const toggleVisibleChange = () => setShow(!show)
+  const toggleVisibleChange = () => {
+    setShow(!show)
+    if (show) {
+      setShowCannedText(false)
+    }
+  }
+
+  const toggleCannedTextVisibleChange = () => {
+    setShowCannedText(!showCannedText)
+  }
 
   const handleMainButtonClick = () => {
     if (cannedTextTypeFK && !show) {
@@ -90,11 +110,20 @@ const CannedTextButton = ({
   const onListItemClick = (selectedCannedText) => {
     handleSelectCannedText(selectedCannedText)
     toggleVisibleChange()
+    toggleCannedTextVisibleChange()
   }
 
   const handleSettingClick = () => {
     toggleVisibleChange()
+    toggleCannedTextVisibleChange()
     onSettingClick()
+  }
+  const showCannedTextPopover = () => {
+    setShowCannedText(true)
+  }
+  const handlePreviousVisitNoteClick = () => {
+    toggleVisibleChange()
+    onPrevDoctorNoteClick(cannedTextTypeFK)
   }
 
   return (
@@ -107,30 +136,50 @@ const CannedTextButton = ({
       content={
         <LoadingWrapper loading={loading}>
           <div className={classes.popoverContainer}>
-            <div className={classes.item} onClick={handleSettingClick}>
-              <Settings />
-              <span>Settings</span>
+            <div className={classes.item} onClick={handlePreviousVisitNoteClick}>
+              <History />
+              <span>Previous Notes</span>
             </div>
-            <Divider className={classes.divider} />
-            <div className={classes.listContainer}>
-              {list.map((item) => {
-                const handleClick = () => onListItemClick(item)
-                return (
-                  <ListItem
-                    key={`cannedText-${item.id}`}
-                    classes={classes}
-                    onClick={handleClick}
-                    {...item}
-                  />
-                )
-              })}
-            </div>
+            <Popover
+              icon={null}
+              placement="right"
+              trigger="hover"
+              visible={showCannedText}
+              content={
+                <div className={classes.popoverContainer}>
+                  <div className={classes.listContainer}>
+                    {list.map((item) => {
+                      const handleClick = () => onListItemClick(item)
+                      return (
+                        <ListItem
+                          key={`cannedText-${item.id}`}
+                          classes={classes}
+                          onClick={handleClick}
+                          {...item}
+                        />
+                      )
+                    })}
+                  </div>
+                  <Divider className={classes.divider} />
+                  <div className={classes.item} onClick={handleSettingClick}>
+                    <Settings />
+                    <span>Settings</span>
+                  </div>
+                </div>
+              }
+            >
+              <div className={classes.item} onMouseEnter={showCannedTextPopover}>
+                <ListAlt />
+                <span>Canned Text</span>
+                <NavigateNext className={classes.arrowRight} />
+              </div>
+            </Popover>
           </div>
         </LoadingWrapper>
       }
     >
       <Button color='info' onClick={handleMainButtonClick}>
-        Canned Text
+        Load From
       </Button>
     </Popover>
   )

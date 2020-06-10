@@ -7,9 +7,10 @@ import Refresh from '@material-ui/icons/Refresh'
 // common components
 import { Badge, Popper, Button, Tabs, IconButton } from '@/components'
 // sub components
-import NotificationList from './NotificationList'
+import { SystemMessageList } from '@/components/_medisys'
 // assets
 import customDropdownStyle from '@/assets/jss/material-dashboard-pro-react/components/customDropdownStyle'
+import NotificationList from './NotificationList'
 import { TYPES } from './constants'
 
 const styles = (theme) => ({
@@ -23,6 +24,7 @@ const styles = (theme) => ({
 
 const NotificationComponent = ({
   notifications = [],
+  systemMessage,
   dispatch,
   classes,
   theme,
@@ -32,6 +34,7 @@ const NotificationComponent = ({
       type: 'queueLog/refresh',
     })
   }
+  const { totalUnReadCount = 0 } = systemMessage
 
   const overlay = (
     <div style={{ position: 'relative', width: 600 }}>
@@ -43,18 +46,22 @@ const NotificationComponent = ({
         // onChange={(e) => setActive(e)}
         options={TYPES.map((o) => {
           const list = notifications.filter((m) => !o.id || m.type === o.id)
+          let unReadCounts =
+            o.id === 4 ? totalUnReadCount : list.filter((m) => !m.read).length
+
           return {
             ...o,
-            name: `${o.name} ${list.filter((m) => !m.read).length > 0
-              ? `(${list.filter((m) => !m.read).length})`
-              : ''}`,
-            content: (
-              <NotificationList
-                notifications={list}
-                dispatch={dispatch}
-                type={o.id}
-              />
-            ),
+            name: `${o.name} ${unReadCounts > 0 ? `(${unReadCounts})` : ''}`,
+            content:
+              o.id === 4 ? (
+                <SystemMessageList dispatch={dispatch} type={o.id} />
+              ) : (
+                <NotificationList
+                  notifications={list}
+                  dispatch={dispatch}
+                  type={o.id}
+                />
+              ),
           }
         })}
       />
@@ -77,7 +84,9 @@ const NotificationComponent = ({
       overlay={overlay}
     >
       <Badge
-        badgeContent={notifications.filter((o) => !o.read).length}
+        badgeContent={
+          notifications.filter((o) => !o.read).length + totalUnReadCount
+        }
         color='primary'
         anchorOrigin={{
           vertical: 'top',
