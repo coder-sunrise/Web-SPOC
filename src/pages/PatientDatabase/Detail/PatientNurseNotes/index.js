@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import $ from 'jquery'
 import Yup from '@/utils/yup'
 import Refresh from '@material-ui/icons/Refresh'
-
+import moment from 'moment'
 import {
   GridContainer,
   GridItem,
@@ -176,13 +176,20 @@ class PatientNurseNotes extends PureComponent {
                         overflow: 'scroll',
                       }}
                     >
-                      {list.map((i) => (
-                        <PatientNurseNotesContent
-                          entity={i}
-                          dispatch={dispatch}
-                          clinicianProfile={clinicianProfile}
-                        />
-                      ))}
+                      {list.map((i) => {
+                        const { createDate, createByUserFK } = i
+                        const canEdit =
+                          clinicianProfile.userProfileFK === createByUserFK &&
+                          moment(createDate).utc().formatUTC(true) ===
+                            moment().formatUTC(true)
+                        return (
+                          <PatientNurseNotesContent
+                            entity={i}
+                            dispatch={dispatch}
+                            canEdit={canEdit}
+                          />
+                        )
+                      })}
                     </div>
                   </CardContainer>
                 </div>

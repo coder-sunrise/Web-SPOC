@@ -15,18 +15,9 @@ import {
 } from '@/components'
 import Edit from '@material-ui/icons/Edit'
 
-const PatientNurseNotesContent = ({ clinicianProfile, entity, dispatch }) => {
-  const {
-    createDate,
-    createByUserFK,
-    createByUserFullName = '',
-    notes,
-  } = entity
+const PatientNurseNotesContent = ({ canEdit, entity, dispatch }) => {
+  const { createDate, createByUserFullName = '', notes } = entity
   const formateDate = moment(createDate).format(dateFormatLongWithTimeNoSec)
-
-  const canEdit =
-    clinicianProfile.userProfileFK === createByUserFK &&
-    moment(createDate).utc().formatUTC(true) === moment().formatUTC(true)
 
   return (
     <React.Fragment>

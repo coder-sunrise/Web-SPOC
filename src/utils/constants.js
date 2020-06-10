@@ -320,6 +320,7 @@ export const PATIENT_HISTORY_TABS = {
   DISPENSE: 2,
   APPOINTMENT: 3,
   INVOICE: 4,
+  NURSENOTES: 5,
 }
 
 export const FILE_STATUS = {
