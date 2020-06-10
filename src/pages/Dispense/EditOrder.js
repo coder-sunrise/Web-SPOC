@@ -201,11 +201,10 @@ class EditOrder extends Component {
     const { classes, theme } = this.props
     const orderWidget = widgets.find((o) => o.id === '5')
     const cdWidget = widgets.find((o) => o.id === '3')
-    const formsWidget = widgets.find((o) => o.id === '10')
+    const formsWidget = widgets.find((o) => o.id === '12')
     const Order = orderWidget.component
     const ConsultationDocument = cdWidget.component
     const Forms = formsWidget.component
-    const formAccessRight = Authorized.check(formsWidget.authority)
     return (
       <div className={classes.content}>
         <GridContainer>
@@ -213,9 +212,8 @@ class EditOrder extends Component {
             <h5>Orders</h5>
             <Order className={classes.orderPanel} status='' from='ca' />
           </GridItem>
-          {formAccessRight &&
-          formAccessRight.rights !== 'hidden' && (
-            <GridItem xs={12} md={6}>
+          <GridItem xs={12} md={6}>
+            <Authorized authority={formsWidget.accessRight}>
               <h5>
                 <span style={{ display: 'inline-block' }}>Forms</span>
                 <span className={classes.cdAddButton}>
@@ -223,9 +221,7 @@ class EditOrder extends Component {
                 </span>
               </h5>
               <Forms />
-            </GridItem>
-          )}
-          <GridItem xs={12} md={6}>
+            </Authorized>
             <Authorized authority={cdWidget.accessRight}>
               <h5>
                 <span style={{ display: 'inline-block' }}>
