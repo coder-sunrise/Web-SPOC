@@ -15,12 +15,12 @@ const styles = (theme) => ({
   },
 })
 
-const DeleteWithPopover = ({
+const VoidWithPopover = ({
   classes,
   disabled,
   index,
-  title = 'Remove this scheme',
-  contentText = 'Confirm to remove this scheme?',
+  title = 'Void this Form',
+  contentText = 'Confirm to void this form?',
   extraCmd,
   onConfirmDelete,
   onCancelClick,
@@ -80,6 +80,4 @@ const DeleteWithPopover = ({
   )
 }
 
-export default withStyles(styles, { name: 'DeleteWithPopover' })(
-  DeleteWithPopover,
-)
+export default withStyles(styles, { name: 'VoidWithPopover' })(VoidWithPopover)
