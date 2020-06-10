@@ -22,11 +22,19 @@ import {
   Button,
   Switch,
   WarningSnackbar,
+  Checkbox,
 } from '@/components'
 import { navigateDirtyCheck } from '@/utils/utils'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
+  boldText: {
+    fontWeight: '700',
+    marginTop: theme.spacing(1),
+  },
+  marginTop: {
+    marginTop: theme.spacing(3),
+  },
 })
 
 @connect(({ clinicSettings }) => ({
@@ -40,12 +48,78 @@ const styles = (theme) => ({
       clinicSettings.entity &&
       clinicSettings.entity.showConsultationVersioning
     ) {
-      const { showConsultationVersioning } = clinicSettings.entity
+      const {
+        showConsultationVersioning,
+        autoPrintDrugLabel,
+        autoPrintOnSignOff,
+        autoPrintDrugLabelOnSignOff,
+        autoPrintMedicalCertificateOnSignOff,
+        autoPrintCertificateOfAttendanceOnSignOff,
+        autoPrintReferralLetterOnSignOff,
+        autoPrintMemoOnSignOff,
+        autoPrintVaccinationCertificateOnSignOff,
+        autoPrintOtherDocumentsOnSignOff,
+        autoPrintOnCompletePayment,
+        autoPrintDrugLabelOnCompletePayment,
+        autoPrintInvoiceOnCompletePayment,
+        autoPrintReceiptOnCompletePayment } = clinicSettings.entity
       return {
         ...clinicSettings.entity,
         showConsultationVersioning: {
           ...showConsultationVersioning,
           settingValue: showConsultationVersioning.settingValue === 'true',
+        },
+        autoPrintDrugLabel: {
+          ...autoPrintDrugLabel,
+          settingValue: autoPrintDrugLabel.settingValue === 'true',
+        },
+        autoPrintOnSignOff: {
+          ...autoPrintOnSignOff,
+          settingValue: autoPrintOnSignOff.settingValue === 'true',
+        },
+        autoPrintDrugLabelOnSignOff: {
+          ...autoPrintDrugLabelOnSignOff,
+          settingValue: autoPrintDrugLabelOnSignOff.settingValue === 'true',
+        },
+        autoPrintMedicalCertificateOnSignOff: {
+          ...autoPrintMedicalCertificateOnSignOff,
+          settingValue: autoPrintMedicalCertificateOnSignOff.settingValue === 'true',
+        },
+        autoPrintCertificateOfAttendanceOnSignOff: {
+          ...autoPrintCertificateOfAttendanceOnSignOff,
+          settingValue: autoPrintCertificateOfAttendanceOnSignOff.settingValue === 'true',
+        },
+        autoPrintReferralLetterOnSignOff: {
+          ...autoPrintReferralLetterOnSignOff,
+          settingValue: autoPrintReferralLetterOnSignOff.settingValue === 'true',
+        },
+        autoPrintMemoOnSignOff: {
+          ...autoPrintMemoOnSignOff,
+          settingValue: autoPrintMemoOnSignOff.settingValue === 'true',
+        },
+        autoPrintVaccinationCertificateOnSignOff: {
+          ...autoPrintVaccinationCertificateOnSignOff,
+          settingValue: autoPrintVaccinationCertificateOnSignOff.settingValue === 'true',
+        },
+        autoPrintOtherDocumentsOnSignOff: {
+          ...autoPrintOtherDocumentsOnSignOff,
+          settingValue: autoPrintOtherDocumentsOnSignOff.settingValue === 'true',
+        },
+        autoPrintOnCompletePayment: {
+          ...autoPrintOnCompletePayment,
+          settingValue: autoPrintOnCompletePayment.settingValue === 'true',
+        },
+        autoPrintDrugLabelOnCompletePayment: {
+          ...autoPrintDrugLabelOnCompletePayment,
+          settingValue: autoPrintDrugLabelOnCompletePayment.settingValue === 'true',
+        },
+        autoPrintInvoiceOnCompletePayment: {
+          ...autoPrintInvoiceOnCompletePayment,
+          settingValue: autoPrintInvoiceOnCompletePayment.settingValue === 'true',
+        },
+        autoPrintReceiptOnCompletePayment: {
+          ...autoPrintReceiptOnCompletePayment,
+          settingValue: autoPrintReceiptOnCompletePayment.settingValue === 'true',
         },
       }
     }
@@ -58,6 +132,19 @@ const styles = (theme) => ({
       currencyRounding,
       currencyRoundingToTheClosest,
       showConsultationVersioning,
+      autoPrintDrugLabel,
+      autoPrintOnSignOff,
+      autoPrintDrugLabelOnSignOff,
+      autoPrintMedicalCertificateOnSignOff,
+      autoPrintCertificateOfAttendanceOnSignOff,
+      autoPrintReferralLetterOnSignOff,
+      autoPrintMemoOnSignOff,
+      autoPrintVaccinationCertificateOnSignOff,
+      autoPrintOtherDocumentsOnSignOff,
+      autoPrintOnCompletePayment,
+      autoPrintDrugLabelOnCompletePayment,
+      autoPrintInvoiceOnCompletePayment,
+      autoPrintReceiptOnCompletePayment,
     } = values
 
     const payload = [
@@ -72,6 +159,45 @@ const styles = (theme) => ({
       },
       {
         ...showConsultationVersioning,
+      },
+      {
+        ...autoPrintDrugLabel,
+      },
+      {
+        ...autoPrintOnSignOff,
+      },
+      {
+        ...autoPrintDrugLabelOnSignOff,
+      },
+      {
+        ...autoPrintMedicalCertificateOnSignOff,
+      },
+      {
+        ...autoPrintCertificateOfAttendanceOnSignOff,
+      },
+      {
+        ...autoPrintReferralLetterOnSignOff,
+      },
+      {
+        ...autoPrintMemoOnSignOff,
+      },
+      {
+        ...autoPrintVaccinationCertificateOnSignOff,
+      },
+      {
+        ...autoPrintOtherDocumentsOnSignOff,
+      },
+      {
+        ...autoPrintOnCompletePayment,
+      },
+      {
+        ...autoPrintDrugLabelOnCompletePayment,
+      },
+      {
+        ...autoPrintInvoiceOnCompletePayment,
+      },
+      {
+        ...autoPrintReceiptOnCompletePayment,
       },
     ]
     const { dispatch, onConfirm, history } = props
@@ -126,7 +252,8 @@ class GeneralSetting extends PureComponent {
       values,
       ...restProps
     } = this.props
-    const { hasActiveSession } = this.state
+    // const { hasActiveSession } = this.state
+    let hasActiveSession = false
     return (
       <React.Fragment>
         {hasActiveSession && (
@@ -211,7 +338,232 @@ class GeneralSetting extends PureComponent {
               />
             </GridItem>
           </GridContainer>
-
+          <GridContainer>
+            <GridItem md={3}>
+              <h5 className={classes.boldText}>Auto Print</h5>
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3} className={classes.marginTop}>
+              <h5> Finalize Order </h5>
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='autoPrintDrugLabel.settingValue'
+                render={(args) => {
+                  return (
+                    <Checkbox
+                      label='Drug Label'
+                      labelPlacement='end'
+                      mode='default'
+                      disabled={!!hasActiveSession}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer className={classes.marginTop}>
+            <GridItem md={3}>
+              <h5> Consultation Sign Off</h5>
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='autoPrintOnSignOff.settingValue'
+                render={(args) => (
+                  <Switch
+                    {...args}
+                    style={{ marginTop: 0 }}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='autoPrintDrugLabelOnSignOff.settingValue'
+                render={(args) => {
+                  return (
+                    <Checkbox
+                      label='Drug Label'
+                      labelPlacement='end'
+                      mode='default'
+                      disabled={!!hasActiveSession}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='autoPrintMedicalCertificateOnSignOff.settingValue'
+                render={(args) => {
+                  return (
+                    <Checkbox
+                      label='Medical Certificate'
+                      labelPlacement='end'
+                      mode='default'
+                      disabled={!!hasActiveSession}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='autoPrintCertificateOfAttendanceOnSignOff.settingValue'
+                render={(args) => {
+                  return (
+                    <Checkbox
+                      label='Certificate of Attendance'
+                      labelPlacement='end'
+                      mode='default'
+                      disabled={!!hasActiveSession}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='autoPrintReferralLetterOnSignOff.settingValue'
+                render={(args) => {
+                  return (
+                    <Checkbox
+                      label='Referral Letter'
+                      labelPlacement='end'
+                      mode='default'
+                      disabled={!!hasActiveSession}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='autoPrintMemoOnSignOff.settingValue'
+                render={(args) => {
+                  return (
+                    <Checkbox
+                      label='Memo'
+                      labelPlacement='end'
+                      mode='default'
+                      disabled={!!hasActiveSession}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='autoPrintVaccinationCertificateOnSignOff.settingValue'
+                render={(args) => {
+                  return (
+                    <Checkbox
+                      label='Vaccination Certificate'
+                      labelPlacement='end'
+                      mode='default'
+                      disabled={!!hasActiveSession}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='autoPrintOtherDocumentsOnSignOff.settingValue'
+                render={(args) => {
+                  return (
+                    <Checkbox
+                      label='Other Documents'
+                      labelPlacement='end'
+                      mode='default'
+                      disabled={!!hasActiveSession}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <h5>Complete Payment</h5>
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='autoPrintOnCompletePayment.settingValue'
+                render={(args) => (
+                  <Switch
+                    {...args}
+                    style={{ marginTop: 0 }}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='autoPrintDrugLabelOnCompletePayment.settingValue'
+                render={(args) => {
+                  return (
+                    <Checkbox
+                      label='Drug Label'
+                      labelPlacement='end'
+                      mode='default'
+                      disabled={!!hasActiveSession}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='autoPrintInvoiceOnCompletePayment.settingValue'
+                render={(args) => {
+                  return (
+                    <Checkbox
+                      label='Invoice'
+                      labelPlacement='end'
+                      mode='default'
+                      disabled={!!hasActiveSession}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='autoPrintReceiptOnCompletePayment.settingValue'
+                render={(args) => {
+                  return (
+                    <Checkbox
+                      label='Receipt'
+                      labelPlacement='end'
+                      mode='default'
+                      disabled={!!hasActiveSession}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+          </GridContainer>
           <div
             className={classes.actionBtn}
             style={{ display: 'flex', justifyContent: 'center' }}
