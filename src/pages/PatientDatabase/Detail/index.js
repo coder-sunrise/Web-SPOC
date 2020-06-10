@@ -39,9 +39,9 @@ import {
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 
-import schema from './schema'
 import { queryList } from '@/services/patient'
 import { getBizSession } from '@/services/queue'
+import schema from './schema'
 
 // moment.updateLocale('en', {
 //   relativeTime: {
@@ -336,6 +336,21 @@ class PatientDetail extends PureComponent {
         access: 'demorights', // 'wardmanagement',
         component: Loadable({
           loader: () => import('./Admission'),
+          render: (loaded, p) => {
+            let Cmpnet = loaded.default
+            return <Cmpnet {...p} />
+          },
+          loading: Loading,
+        }),
+      },
+      {
+        id: '9',
+        name: 'Nurse Notes',
+        access: [
+          'patientdatabase.patientprofiledetails',
+        ],
+        component: Loadable({
+          loader: () => import('./PatientNurseNotes'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
             return <Cmpnet {...p} />
