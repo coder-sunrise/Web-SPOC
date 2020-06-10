@@ -1,13 +1,23 @@
-import React, { memo } from 'react'
+import React, { memo, useState } from 'react'
+import moment from 'moment'
 import classnames from 'classnames'
 // formik
 import { withFormik, Field, FastField } from 'formik'
 // umi/locale
 import { formatMessage } from 'umi/locale'
 // material ui
-import { withStyles } from '@material-ui/core'
+import {
+    withStyles,
+    Fab,
+    Popper,
+    Paper,
+    ClickAwayListener,
+} from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add'
 import Search from '@material-ui/icons/Search'
+import BookmarkIcon from '@material-ui/icons/Bookmark'
+import { connect } from 'dva'
+import { compose } from 'redux'
 // custom component
 import {
   Button,
@@ -20,6 +30,7 @@ import {
 // sub components
 import { AppointmentTypeLabel, DoctorLabel } from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
+import FilterTemplateTooltip from './FilterTemplateTooltip'
 
 const styles = () => ({
   selectorContainer: {
@@ -28,24 +39,47 @@ const styles = () => ({
   antdSelect: {
     width: '100%',
   },
+  fabButtonStyle: {
+      color: 'white',
+  },
+  container: {
+      maxWidth: 450,
+      minWidth: 450,
+      padding: 15,
+  },
 })
 
-const FilterBar = ({
-  loading,
-  classes,
-  onDoctorEventClick,
-  onAddAppointmentClick,
-  handleUpdateFilter,
-  values,
-}) => {
+const FilterBar = (props) => {
+  const {
+    dispatch,
+    loading,
+    classes,
+    onDoctorEventClick,
+    onAddAppointmentClick,
+    handleUpdateFilter,
+    toggleSearchAppointmentModal,
+    values,
+  } = props
   const onFilterClick = () => handleUpdateFilter(values)
 
   const renderDropdown = (option) => <DoctorLabel doctor={option} />
 
-  const { filterByDoctor = [], filterByApptType = [] } = values
+  const { filterByDoctor = [] } = values
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
-  const maxAppointmentTagCount = filterByApptType.length <= 1 ? 1 : 0
+  const [
+      showFilterTemplate,
+      setShowFilterTemplate,
+  ] = useState(false)
 
+  const [
+      anchorEl,
+      setAnchorEl,
+  ] = useState(null)
+
+  const handleFilterTemplate = (event) => {
+      setAnchorEl(anchorEl ? null : event.currentTarget)
+      setShowFilterTemplate(() => !showFilterTemplate)
+  }
   return (
     <React.Fragment>
       <GridContainer alignItems='center'>
@@ -66,34 +100,32 @@ const FilterBar = ({
           <Field
             name='filterByDoctor'
             render={(args) => (
-              <CodeSelect
-                {...args}
-                // allLabel='All Doctors'
-                disableAll
-                // allValue={-99}
-                // allValueOption={{
-                //   clinicianProfile: {
-                //     name: 'All',
-                //     id: -99,
-                //   },
-                // }}
-                allowClear={false}
-                label='Filter by Doctor'
-                mode='multiple'
-                // code='clinicianprofile'
-                // labelField='name'
-                // valueField='id'
-                remoteFilter={{
-                  'clinicianProfile.isActive': true,
-                }}
-                code='doctorprofile'
-                labelField='clinicianProfile.name'
-                valueField='clinicianProfile.id'
-                maxTagCount={maxDoctorTagCount}
-                maxSelected={5}
-                maxTagPlaceholder='doctors'
-                renderDropdown={renderDropdown}
-              />
+              <Authorized authority='appointment.viewotherappointment'>
+                <CodeSelect
+                  {...args}
+                  disableAll
+                  allowClear={false}
+                  label='Filter by Doctor'
+                  mode='multiple'
+                  remoteFilter={{
+                    'clinicianProfile.isActive': true,
+                  }}
+                  localFilter={(option) => option.clinicianProfile.isActive}
+                  code='doctorprofile'
+                  labelField='clinicianProfile.name'
+                  valueField='clinicianProfile.id'
+                  maxTagCount={maxDoctorTagCount}
+                  maxSelected={5}
+                  maxTagPlaceholder='doctors'
+                  renderDropdown={renderDropdown}
+                  onChange={(v) => {
+                    sessionStorage.setItem(
+                      'appointmentDoctors',
+                      JSON.stringify(v),
+                    )
+                  }}
+                />
+              </Authorized>
             )}
           />
         </GridItem>
@@ -123,18 +155,37 @@ const FilterBar = ({
                   },
                 ]}
                 maxTagCount={0}
-                maxTagPlaceholder='appointment types'
+                maxTagPlaceholder='appt. types'
               />
             )}
           />
         </GridItem>
-        <GridItem md={2}>
+
+        <GridItem md={1}>
+            <Fab
+                size='small'
+                color='secondary'
+                className={classes.fabButtonStyle}
+                onClick={handleFilterTemplate}
+            >
+                <BookmarkIcon />
+            </Fab>
+        </GridItem>
+
+        <GridItem md={4}>
           <ProgressButton
             icon={<Search />}
             color='primary'
             onClick={onFilterClick}
           >
             Filter
+          </ProgressButton>
+          <ProgressButton
+            icon={<Search />}
+            color='primary'
+            onClick={toggleSearchAppointmentModal}
+          >
+            Search Appointment
           </ProgressButton>
         </GridItem>
 
@@ -151,17 +202,30 @@ const FilterBar = ({
             </Button>
           </Authorized>
 
-          <Button
-            color='primary'
-            size='sm'
-            onClick={onDoctorEventClick}
-            disabled={loading}
-          >
-            <AddIcon />
-            Add Doctor Block
-          </Button>
+          <Authorized authority='settings.clinicsetting.doctorblock'>
+            <Button
+              color='primary'
+              size='sm'
+              onClick={onDoctorEventClick}
+              disabled={loading}
+            >
+              <AddIcon />
+              Add Doctor Block
+            </Button>
+          </Authorized>
         </GridItem>
-      </GridContainer>
+        </GridContainer>
+        <Popper open={showFilterTemplate} anchorEl={anchorEl}>
+            <Paper className={classes.container}>
+                {/* <ClickAwayListener onClickAway={handleFilterTemplate}> */}
+                <FilterTemplateTooltip
+                    filterByDoctor={values.filterByDoctor}
+                    filterByApptType={values.filterByApptType}
+                    handleFilterTemplate={handleFilterTemplate}
+                />
+                {/* </ClickAwayListener> */}
+            </Paper>
+        </Popper>
     </React.Fragment>
   )
 }
@@ -170,16 +234,37 @@ const StyledFilterBar = withStyles(styles, { name: 'CalendarFilterBar' })(
   FilterBar,
 )
 
-export default memo(
+export default compose(
+  connect(({ appointment }) => ({
+      appointment,
+  })),
   withFormik({
     enableReinitialize: true,
-    mapPropsToValues: ({ filterByDoctor }) => ({
-      filterByDoctor: [
-        ...filterByDoctor,
-      ],
-      filterByApptType: [
-        -99,
-      ],
-    }),
-  })(StyledFilterBar),
-)
+      mapPropsToValues: ({ filterByDoctor, appointment }) => {
+          if (appointment.currentFilterTemplate) {
+              const {
+                  filterByDoctor: doctorFilterTemplate,
+                  filterByApptType: apptTypeFiltertemplate,
+              } = appointment.currentFilterTemplate
+              return {
+                  filterByDoctor: [
+                      ...doctorFilterTemplate,
+                  ],
+                  filterByApptType: [
+                      ...apptTypeFiltertemplate,
+                  ],
+              }
+          }
+
+          return {
+              filterByDoctor: [
+                  ...filterByDoctor,
+              ],
+              filterByApptType: [
+                  -99,
+              ],
+          }
+      },
+  }),
+)(memo(StyledFilterBar))
+

@@ -1,3 +1,4 @@
+import Authorized from '@/utils/Authorized'
 import Consumable from './Consumable'
 import Medication from './Medication'
 import Vaccination from './Vaccination'
@@ -16,25 +17,37 @@ const addContent = (type, props) => {
   }
 }
 
-export const InventoryMasterOption = (props) => [
-  {
-    id: 0,
-    name: 'Medication',
-    content: addContent(1, props),
-  },
-  {
-    id: 1,
-    name: 'Consumable',
-    content: addContent(2, props),
-  },
-  {
-    id: 2,
-    name: 'Vaccination',
-    content: addContent(3, props),
-  },
-  {
-    id: 3,
-    name: 'Order Set',
-    content: addContent(4, props),
-  },
-]
+export const InventoryMasterOption = (props) => {
+  const Tabs = [
+    {
+      id: '0',
+      name: 'Medication',
+      authority: 'inventorymaster.medication',
+      content: addContent(1, props),
+    },
+    {
+      id: '1',
+      name: 'Consumable',
+      authority: 'inventorymaster.consumable',
+      content: addContent(2, props),
+    },
+    {
+      id: '2',
+      name: 'Vaccination',
+      authority: 'inventorymaster.vaccination',
+      content: addContent(3, props),
+    },
+    {
+      id: '3',
+      name: 'Order Set',
+      authority: 'inventorymaster.orderset',
+      content: addContent(4, props),
+    },
+  ]
+  return Tabs.filter((tab) => {
+    const accessRight = Authorized.check(tab.authority)
+    if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
+      return false
+    return true
+  })
+}

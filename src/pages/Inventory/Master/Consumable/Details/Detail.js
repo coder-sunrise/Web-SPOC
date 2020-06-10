@@ -18,32 +18,7 @@ import {
 
 const styles = () => ({})
 
-const Detail = ({ consumableDetail, dispatch, values, theme }) => {
-  const [
-    hasActiveSession,
-    setHasActiveSession,
-  ] = useState(true)
-  const checkHasActiveSession = async () => {
-    const bizSessionPayload = {
-      IsClinicSessionClosed: false,
-    }
-    const result = await getBizSession(bizSessionPayload)
-    const { data } = result.data
-    setHasActiveSession(data.length > 0)
-  }
-
-  useEffect(() => {
-    if (consumableDetail.currentId) {
-      dispatch({
-        type: 'consumableDetail/query',
-        payload: {
-          id: consumableDetail.currentId,
-        },
-      })
-      checkHasActiveSession()
-    }
-  }, [])
-
+const Detail = ({ consumableDetail, hasActiveSession, values, theme }) => {
   return (
     <CardContainer
       hideHeader
@@ -65,7 +40,6 @@ const Detail = ({ consumableDetail, dispatch, values, theme }) => {
                       label={formatMessage({
                         id: 'inventory.master.consumable.code',
                       })}
-                      disabled={!values.isActive}
                       {...args}
                     />
                   )

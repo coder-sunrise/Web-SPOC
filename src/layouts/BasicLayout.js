@@ -35,6 +35,7 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import image from 'assets/img/sidebar-2.jpg'
 // import logo from 'assets/img/logo-white.svg'
 import logo from 'assets/img/logo/logo_blue.png'
+// import logo from 'assets/img/logo/nscmh-logo-2.png'
 import withStyles from '@material-ui/core/styles/withStyles'
 import appStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/dashboardStyle.jsx'
 import Header from 'mui-pro-components/Header'
@@ -48,11 +49,13 @@ import defaultSettings from '@/defaultSettings'
 
 // import Footer from './Footer'
 // import Header from './Header'
+import { notification } from '@/components'
+import SiderMenu from '@/components/SiderMenu'
+import { getAuthority } from '@/utils/authority'
 import Context from './MenuContext'
 import ErrorBoundary from './ErrorBoundary'
 import Exception403 from '../pages/Exception/403'
-import { notification } from '@/components'
-import SiderMenu from '@/components/SiderMenu'
+import Exception from '../components/Exception'
 import GlobalModalContainer from './GlobalModalContainer'
 
 initClinicSettings()
@@ -112,7 +115,7 @@ const query = {
 }
 
 const refreshTokenTimer = 10 * 60 * 1000
-const sessionTimeoutTimer = 15 * 60 * 1000
+const sessionTimeoutTimer = 30 * 60 * 1000
 // const sessionTimeoutTimer = 2500
 
 class BasicLayout extends React.PureComponent {
@@ -121,6 +124,8 @@ class BasicLayout extends React.PureComponent {
     this.state = {
       mobileOpen: false,
       authorized: false,
+      accessable: false,
+      routesData: undefined,
     }
     // this.resize = this.resize.bind(this)
     this.resize = _.debounce(this.resize, 500, {
@@ -131,22 +136,37 @@ class BasicLayout extends React.PureComponent {
     this.initUserData()
     initStream()
 
-    let sessionTimeOutTimer = null
+    let sessionTimeOutInterval = null
     this.refreshTokenInterval = null
 
     const resetSessionTimeOut = (e) => {
       // console.log(e)
-      clearTimeout(sessionTimeOutTimer)
-      sessionTimeOutTimer = setTimeout(() => {
-        dispatch({
-          type: 'global/updateAppState',
-          payload: {
-            showSessionTimeout: true,
-          },
-        })
+      clearTimeout(sessionTimeOutInterval)
+      const now = Date.now()
+      localStorage.setItem('lastActiveTime', now)
+      sessionTimeOutInterval = setInterval(() => {
+        if (
+          Number(localStorage.getItem('lastActiveTime')) <=
+          Date.now() - sessionTimeoutTimer
+        ) {
+          if (localStorage.getItem('token')) {
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                showSessionTimeout: true,
+              },
+            })
+            clearInterval(sessionTimeOutInterval)
+          } else {
+            window.location.reload()
+          }
+        }
       }, sessionTimeoutTimer)
     }
-    const debouncedRST = _.debounce(resetSessionTimeOut, 10000)
+    const debouncedRST = _.debounce(resetSessionTimeOut, 10000, {
+      leading: true,
+      trailing: false,
+    })
     $(document).on('click', debouncedRST)
     $(document).on('keydown', debouncedRST)
 
@@ -154,50 +174,9 @@ class BasicLayout extends React.PureComponent {
     this.refreshToken()
   }
 
-  // componentDidMount () {
-  //   const {
-  //     dispatch,
-  //     route: { routes, authority },
-  //   } = this.props
-
-  //   dispatch({
-  //     type: 'user/fetchCurrent',
-  //   })
-  //   dispatch({
-  //     type: 'setting/getSetting',
-  //   })
-  //   dispatch({
-  //     type: 'menu/getMenuData',
-  //     payload: { routes, authority },
-  //   })
-  // }
-
-  // componentDidUpdate (preProps) {
-  //   // After changing to phone mode,
-  //   // if collapsed is true, you need to click twice to display
-  //   this.breadcrumbNameMap = this.getBreadcrumbNameMap()
-  //   const { collapsed, isMobile } = this.props
-  //   if (isMobile && !preProps.isMobile && !collapsed) {
-  //     this.handleMenuCollapse(false)
-  //   }
-  // }
-
   componentDidMount () {
-    // if (navigator.platform.indexOf("Win") > -1) {
-    //   ps = new PerfectScrollbar(this.refs.mainPanel, {
-    //     suppressScrollX: true,
-    //     suppressScrollY: false,
-    //   })
-    //   document.body.style.overflow = "hidden"
-    // }
-
-    // check token, logout if token not exist
-    // const accessToken = localStorage.getItem('token')
-    // !accessToken && router.push('/login')
-
     window.addEventListener('resize', this.resize)
     this.resize()
-    // const { dispatch, route: { routes, authority } } = this.props
   }
 
   componentDidUpdate (e) {
@@ -207,20 +186,9 @@ class BasicLayout extends React.PureComponent {
         this.setState({ mobileOpen: false })
       }
     }
-
-    // After changing to phone mode,
-    // if collapsed is true, you need to click twice to display
-    // this.breadcrumbNameMap = this.getBreadcrumbNameMap()
-    // const { collapsed, isMobile } = this.props
-    // if (isMobile && !preProps.isMobile && !collapsed) {
-    //   this.handleMenuCollapse(false)
-    // }
   }
 
   componentWillUnmount () {
-    // if (navigator.platform.indexOf("Win") > -1) {
-    //   ps.destroy()
-    // }
     window.removeEventListener('resize', this.resize)
     clearInterval(this.refreshTokenInterval)
   }
@@ -297,8 +265,78 @@ class BasicLayout extends React.PureComponent {
     }
   }
 
+  redirectToAccessable = () => {
+    const { location } = this.props.history
+    const { pathname } = location
+    const _cloned = _.cloneDeep(this.menus)
+
+    const isAccessible = _cloned.reduce((canAccess, _menu) => {
+      const { children, path } = _menu
+      if (Array.isArray(children)) {
+        const valid = children.find(
+          (child) => child.path.toLowerCase() === pathname.toLowerCase(),
+        )
+        return canAccess || !!valid
+      }
+      return canAccess || path.toLowerCase() === pathname.toLowerCase()
+    }, false)
+
+    if (isAccessible) return true
+
+    const [
+      firstMenu,
+    ] = _cloned
+
+    // check if menu has any sub menu
+    // redirect to first accessible sub menu
+    if (firstMenu.children && Array.isArray(firstMenu.children)) {
+      const [
+        firstChildren,
+      ] = firstMenu.children
+      if (firstChildren && typeof firstChildren.path === 'string') {
+        return this.props.history.push(firstChildren.path)
+      }
+    }
+
+    if (firstMenu && typeof firstMenu.path === 'string') {
+      return this.props.history.push(firstMenu.path)
+    }
+
+    return this.props.history.push('/not-found')
+  }
+
+  initNecessaryCodetable = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'doctorprofile',
+        filter: {
+          'clinicianProfile.isActive': true,
+        },
+      },
+    })
+
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'clinicianprofile',
+      },
+    })
+
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'copaymentscheme',
+        filter: {
+          isActive: undefined,
+        },
+      },
+    })
+  }
+
   initUserData = async () => {
-    const { dispatch, route: { routes, authority } } = this.props
+    const { dispatch, route: { routes, authority }, location } = this.props
     const shouldProceed = await this.checkShouldProceedRender()
     if (!shouldProceed) {
       // system version is lower than db, should do a refresh
@@ -306,24 +344,7 @@ class BasicLayout extends React.PureComponent {
       window.location.reload(true)
       return
     }
-
-    await Promise.all([
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'doctorprofile',
-          filter: {
-            'clinicianProfile.isActive': true,
-          },
-        },
-      }),
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'clinicianprofile',
-        },
-      }),
-    ])
+    this.initNecessaryCodetable()
 
     const user = await dispatch({
       type: 'user/fetchCurrent',
@@ -335,7 +356,6 @@ class BasicLayout extends React.PureComponent {
       type: 'codetable/fetchAllCachedCodetable',
     })
 
-    // console.log(routes, authority)
     const menus = await dispatch({
       type: 'menu/getMenuData',
       payload: { routes, authority },
@@ -347,6 +367,7 @@ class BasicLayout extends React.PureComponent {
     this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual)
     this.getPageTitle = memoizeOne(this.getPageTitle)
     this.menus = menus
+    this.redirectToAccessable()
 
     this.setState({
       authorized: true,
@@ -364,7 +385,6 @@ class BasicLayout extends React.PureComponent {
 
   getPageTitle = (pathname) => {
     const currRouterData = this.matchParamsPath(pathname)
-
     if (!currRouterData) {
       return defaultSettings.appTitle
     }
@@ -453,6 +473,14 @@ class BasicLayout extends React.PureComponent {
   //   }
   //   return <SettingDrawer />
   // };
+
+  renderChild = () => {
+    const { children } = this.props
+    const { authorized } = this.state
+    if (!authorized) return <Loading />
+
+    return children
+  }
 
   render () {
     const { classes, loading, theme, ...props } = this.props
@@ -551,11 +579,7 @@ class BasicLayout extends React.PureComponent {
                             <ErrorBoundary>
                               <div className={classes.content}>
                                 <div className={classes.container}>
-                                  {this.state.authorized ? (
-                                    children
-                                  ) : (
-                                    <Loading />
-                                  )}
+                                  {this.renderChild()}
                                 </div>
                               </div>
                             </ErrorBoundary>

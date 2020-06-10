@@ -7,4 +7,5 @@ export default {
   Select: 'select',
   Pan: 'pan',
   Eraser: 'eraser',
+  None: 'none',
 }

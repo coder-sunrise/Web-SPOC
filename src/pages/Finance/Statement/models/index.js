@@ -18,6 +18,7 @@ export default createListViewModel({
         statementInvoice: [],
         statementDate: moment(),
         adminChargeValue: 0.0,
+        adjustmentValueType: 'Percentage',
       },
       invoiceList: [],
     },
@@ -44,7 +45,9 @@ export default createListViewModel({
             type: 'queryOneDone',
             payload: res,
           })
+          return true
         }
+        return false
       },
 
       *extractAsSingle ({ payload }, { call, put }) {

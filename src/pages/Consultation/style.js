@@ -33,16 +33,17 @@ const styles = (theme) => ({
   show: {
     display: 'inherit',
   },
+  block: {
+    padding: '4px 2px 0px 2px',
+  },
   fullscreen: {
     position: 'initial !important',
     width: '100% !important',
     height: 'auto !important',
-
+    padding: '3px 3px 0px 3px',
     // height: `calc(100vh - ${topHeight}px) !important`,
   },
-  block: {
-    padding: '4px 2px 0px 2px',
-  },
+
   blockHeader: {
     position: 'sticky',
     textAlign: 'right',
@@ -109,6 +110,7 @@ const styles = (theme) => ({
   },
   fabDiv: {
     margin: theme.spacing(2),
+    position: 'relative',
   },
 })
 

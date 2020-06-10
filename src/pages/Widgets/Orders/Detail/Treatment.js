@@ -31,16 +31,17 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     orders,
     ...rest
   }) => {
-    if (
-      orders.entity &&
-      orders.entity.treatmentFK &&
-      _.isEmpty(dentalChartComponent)
-    ) {
-      const treatment = (codetable.cttreatment || [])
-        .find((o) => o.id === orders.entity.treatmentFK)
-      return {
-        ...orders.entity,
-        treatmentCategoryFK: treatment ? treatment.treatmentCategoryFK : null,
+    if (orders.entity) {
+      if (orders.entity.treatmentFK && _.isEmpty(dentalChartComponent)) {
+        const treatment = (codetable.cttreatment || [])
+          .find((o) => o.id === orders.entity.treatmentFK)
+        return {
+          ...orders.entity,
+          treatmentCategoryFK: treatment ? treatment.treatmentCategoryFK : null,
+        }
+      }
+      if (orders.type !== '7') {
+        return {}
       }
     }
     // console.log(dentalChartComponent, dentalChartTreatment)
@@ -48,16 +49,29 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     const { entity = {} } = orders
     const { rows } = orders
     // console.log(action, data, rows)
-    // console.log(rest, this)
 
-    const treatment =
-      (codetable.cttreatment || [])
-        .find((o) => o.id === action.dentalTreatmentFK) || {}
+    let treatment
+
+    if (orders.entity) {
+      treatment = (codetable.cttreatment || [])
+        .find((o) => o.id === orders.entity.treatmentFK)
+    }
+
+    if (!treatment) {
+      treatment =
+        (codetable.cttreatment || [])
+          .find((o) => o.id === action.dentalTreatmentFK) || {}
+    }
+    // console.log(rest, this, treatment)
+
     const existedTooths = []
     const otherTreatmentTooths = []
     rows
       .filter(
-        (o) => o.type === '7' && o.treatmentFK === action.dentalTreatmentFK,
+        (o) =>
+          !o.isDeleted &&
+          o.type === '7' &&
+          o.treatmentFK === action.dentalTreatmentFK,
       )
       .forEach((r) => {
         let matches = (r.itemNotes || '').matchAll(rangeReg)
@@ -104,8 +118,8 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     // console.log(dataFiltered)
 
     let groupsAry = []
-    let quantity
-    if (treatment.id) {
+    let quantity = orders.entity ? orders.entity.quantity : undefined
+    if (treatment.id && treatment.chartMethod) {
       let groups = _.groupBy(dataFiltered, 'toothNo')
       groupsAry = Object.keys(groups).map((k) => {
         return {
@@ -135,7 +149,7 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     }
     // console.log(entity)
     let { adjType, adjValue = 0, unitPrice } = entity
-    if (!unitPrice || action.id !== entity.treatmentFK) {
+    if (!unitPrice || action.dentalTreatmentFK !== entity.treatmentFK) {
       unitPrice = treatment.sellingPrice
     }
     const totalPrice = unitPrice * quantity || undefined
@@ -169,13 +183,7 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     unitPrice: Yup.number().required(),
     treatmentFK: Yup.number().required(),
   }),
-  handleReset: () => {
-    const { setValues, orders } = this.props
-    setValues({
-      ...orders.defaultTreatment,
-      type: orders.type,
-    })
-  },
+
   handleSubmit: async (values, { props, onConfirm }) => {
     const { dispatch, orders, currentType, getNextSequence } = props
 
@@ -240,6 +248,26 @@ class Treatment extends PureComponent {
       }
   }
 
+  handleReset = () => {
+    const { setValues, orders, dispatch, values } = this.props
+    // console.log(values)
+    // if (!values.uid)
+    dispatch({
+      type: 'dentalChartComponent/deleteTreatment',
+      payload: values,
+    })
+    dispatch({
+      type: 'dentalChartComponent/updateState',
+      payload: {
+        action: undefined,
+      },
+    })
+    setValues({
+      ...orders.defaultTreatment,
+      type: orders.type,
+    })
+  }
+
   setTotalPrice = () => {
     const { setFieldValue, values, disableEdit } = this.props
     if (disableEdit === false) {
@@ -269,10 +297,10 @@ class Treatment extends PureComponent {
 
   changeTreatment = (option = {}) => {
     const { setFieldValue } = this.props
-
     const { sellingPrice } = option
 
     setFieldValue('unitPrice', sellingPrice)
+    setFieldValue('itemName', option.displayValue)
   }
 
   updateValueToStore = (vals) => {
@@ -317,6 +345,7 @@ class Treatment extends PureComponent {
       codetable = {},
       footer,
       handleSubmit,
+      handleReset,
       from,
     } = this.props
     // const {
@@ -391,7 +420,7 @@ class Treatment extends PureComponent {
                 )}
               />
             )}
-            <FastField
+            <Field
               name='treatmentFK'
               render={(args) => (
                 <Select
@@ -409,9 +438,9 @@ class Treatment extends PureComponent {
                   labelField='displayValue'
                   label='Treatment'
                   disabled={isDoctor}
-                  // onChange={(v, op) => {
-                  //   this.changeTreatment(op)
-                  // }}
+                  onChange={(v, op) => {
+                    this.changeTreatment(op)
+                  }}
                   {...args}
                 />
               )}

@@ -10,11 +10,11 @@ import DraftsIcon from '@material-ui/icons/Drafts'
 import MarkunreadIcon from '@material-ui/icons/Markunread'
 // common components
 import { GridContextMenuButton as GridButton } from 'medisys-components'
-import MessageListing from './Reminder/MessageListing'
 
 import { CommonTableGrid, Tooltip, CommonModal } from '@/components'
 // medisys components
 import Authorized from '@/utils/Authorized'
+import MessageListing from './Reminder/MessageListing'
 import FilterBar from './FilterBar'
 
 const styles = (theme) => ({
@@ -40,6 +40,8 @@ const Grid = ({
   columnsExtensions,
   setSelectedRows,
   selectedRows,
+  user,
+  doctorprofile = [],
 }) => {
   const [
     showMessageModal,
@@ -56,11 +58,6 @@ const Grid = ({
     colExtensions,
     setColExtensions,
   ] = useState(columnsExtensions)
-
-  const [
-    selectedRow,
-    setSelectedRow,
-  ] = useState([])
 
   const [
     recipient,
@@ -139,11 +136,17 @@ const Grid = ({
     type,
     dispatch,
     setSelectedRows,
+    selectedRows,
+    smsPatient,
   }
 
   return (
     <React.Fragment>
-      <FilterBar {...filterBarProps} />
+      <FilterBar
+        {...filterBarProps}
+        currentUser={user.data.clinicianProfile.id}
+        doctorprofile={doctorprofile}
+      />
       <CommonTableGrid
         type={type === 'Appointment' ? 'smsAppointment' : 'smsPatient'}
         onSelectionChange={handleSelectionChange}

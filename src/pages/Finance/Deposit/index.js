@@ -1,11 +1,11 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import { formatMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core/styles'
-
+import moment from 'moment'
 import { compare } from '@/layouts'
 
 import { CardContainer } from '@/components'
+import Authorized from '@/utils/Authorized'
 import FilterBar from './FilterBar'
 import Grid from './Grid'
 
@@ -30,6 +30,8 @@ class Deposit extends PureComponent {
       payload: {
         apiCriteria: {
           OnlyWithDeposit: false,
+          startDate: moment().add(-1, 'month').formatUTC(),
+          endDate: moment().formatUTC(false),
         },
       },
     })

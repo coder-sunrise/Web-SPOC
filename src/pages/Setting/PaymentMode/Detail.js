@@ -120,7 +120,6 @@ class Detail extends PureComponent {
                     <TextField
                       label='Description'
                       multiline
-                      disabled={!!values.id}
                       rowsMax={4}
                       {...args}
                     />

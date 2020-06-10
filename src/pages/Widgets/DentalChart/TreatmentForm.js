@@ -6,7 +6,7 @@ import { isNumber } from 'util'
 import * as Yup from 'yup'
 
 import _ from 'lodash'
-import { orderTypes } from '@/utils/codes'
+import { orderTypes } from '@/pages/Consultation/utils'
 import Form from '@/pages/Widgets/Orders/Detail'
 import { currencySymbol } from '@/utils/config'
 

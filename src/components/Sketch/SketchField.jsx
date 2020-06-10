@@ -12,6 +12,7 @@ import Circle from './circle'
 import Pan from './pan'
 import Eraser from './eraser'
 import Tool from './tools'
+import None from './none'
 
 const { fabric } = require('fabric')
 
@@ -90,6 +91,7 @@ class SketchField extends PureComponent {
     this._tools[Tool.Circle] = new Circle(fabricCanvas)
     this._tools[Tool.Pan] = new Pan(fabricCanvas)
     this._tools[Tool.Eraser] = new Eraser(fabricCanvas)
+    this._tools[Tool.None] = new None(fabricCanvas)
   }
 
   /**
@@ -169,26 +171,17 @@ class SketchField extends PureComponent {
 
   getAllLayerData = () => {
     let canvas = this._fc
-    let filterList = this._history.getSaveLayerList()
-    let objects = canvas.getObjects()
-    let exist = false
+    const DefaultFilterList = this._history.getSaveLayerList()
+    const objects = canvas.getObjects()
+    let FilteredObjectList = []
 
-    for (let i = 0; i < filterList.length; i++) {
-      for (let a = 0; a < objects.length; a++) {
-        if (
-          filterList[i].layerContent ===
-          JSON.stringify(objects[a].__originalState)
-        ) {
-          exist = true
-        }
-      }
-      if (exist === false) {
-        filterList.splice(i, 1)
-      }
-      exist = false
-    }
+    FilteredObjectList = DefaultFilterList.filter(({ layerContent }) =>
+      objects.find(
+        (item) => JSON.stringify(item.__originalState) === layerContent,
+      ),
+    )
 
-    return filterList
+    return FilteredObjectList
   }
 
   initializeData = (data) => {
@@ -284,13 +277,27 @@ class SketchField extends PureComponent {
     const canvas = this._fc
     let result = false
     let obj = canvas.getActiveObject()
+
     if (obj) {
-      obj.set({
-        id: 'delete',
-        removeObject: true,
-      })
-      canvas.remove(obj)
-      result = true
+      if (canvas.getActiveObject().type === 'activeSelection') {
+        obj._objects.forEach(function (object, key) {
+          object.set({
+            id: 'delete',
+            removeObject: true,
+          })
+          canvas.remove(object)
+        })
+
+        result = true
+      } else {
+        obj.set({
+          id: 'delete',
+          removeObject: true,
+        })
+        canvas.remove(obj)
+        result = true
+      }
+      canvas.discardActiveObject()
     }
     return result
   }

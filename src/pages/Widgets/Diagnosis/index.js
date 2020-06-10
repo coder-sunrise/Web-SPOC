@@ -7,17 +7,15 @@ import { withStyles } from '@material-ui/core'
 import Add from '@material-ui/icons/Add'
 import { AuthorizedContext, Button } from '@/components'
 import Item from './Item'
+import Authorized from '@/utils/Authorized'
 // import model from './models'
 
 // window.g_app.replaceModel(model)
 
 const styles = (theme) => ({
   diagnosisRow: {
-    margin: theme.spacing(1),
-    paddingTop: theme.spacing(0.5),
-    paddingBottom: theme.spacing(2),
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2),
+    marginBottom: theme.spacing(1),
+    padding: theme.spacing(0.5),
   },
 })
 
@@ -40,6 +38,8 @@ const styles = (theme) => ({
 //   handleSubmit: () => {},
 //   displayName: 'Diagnosis',
 // })
+const { Secured } = Authorized
+@Secured('queue.consultation.widgets.diagnosis')
 @connect(({ diagnosis, components, codetable, consultation }) => ({
   diagnosis,
   codetable,
@@ -150,7 +150,7 @@ class Diagnosis extends PureComponent {
           {(r) => {
             if (r.rights !== 'enable') return null
             return (
-              <div style={{ padding: theme.spacing(1) }}>
+              <div>
                 <Button
                   size='sm'
                   color='primary'

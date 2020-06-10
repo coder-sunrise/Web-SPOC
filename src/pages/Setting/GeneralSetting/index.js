@@ -1,15 +1,15 @@
-import React, { PureComponent, useEffect } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
 import { getBizSession } from '@/services/queue'
 
-import Yup from '@/utils/yup'
 import {
   currenciesList,
   currencyRoundingList,
   currencyRoundingToTheClosestList,
+  labelPrinterList,
 } from '@/utils/codes'
 
 import {
@@ -21,8 +21,9 @@ import {
   Select,
   Button,
   Switch,
-  WarningSnackbar,
   Checkbox,
+  WarningSnackbar,
+  CodeSelect,
 } from '@/components'
 import { navigateDirtyCheck } from '@/utils/utils'
 
@@ -33,7 +34,7 @@ const styles = (theme) => ({
     marginTop: theme.spacing(1),
   },
   marginTop: {
-    marginTop: theme.spacing(3),
+    marginTop: theme.spacing(1),
   },
 })
 
@@ -62,64 +63,81 @@ const styles = (theme) => ({
         autoPrintOnCompletePayment,
         autoPrintDrugLabelOnCompletePayment,
         autoPrintInvoiceOnCompletePayment,
-        autoPrintReceiptOnCompletePayment } = clinicSettings.entity
+        autoPrintReceiptOnCompletePayment,
+        autoRefresh,
+        defaultVisitType,
+        showTotalInvoiceAmtInConsultation,
+      } = clinicSettings.entity
       return {
         ...clinicSettings.entity,
+        defaultVisitType: {
+          ...defaultVisitType,
+          settingValue: Number(defaultVisitType.settingValue),
+        },
+        autoRefresh: {
+          ...autoRefresh,
+          settingValue: autoRefresh.settingValue === 'true',
+        },
+        autoPrintDrugLabel: {
+          ...autoPrintDrugLabel,
+          settingValue:
+            autoPrintDrugLabel && autoPrintDrugLabel.settingValue === 'true',
+        },
         showConsultationVersioning: {
           ...showConsultationVersioning,
           settingValue: showConsultationVersioning.settingValue === 'true',
         },
-        autoPrintDrugLabel: {
-          ...autoPrintDrugLabel,
-          settingValue: autoPrintDrugLabel.settingValue === 'true',
-        },
         autoPrintOnSignOff: {
           ...autoPrintOnSignOff,
-          settingValue: autoPrintOnSignOff.settingValue === 'true',
+          settingValue: autoPrintOnSignOff && autoPrintOnSignOff.settingValue === 'true',
         },
         autoPrintDrugLabelOnSignOff: {
           ...autoPrintDrugLabelOnSignOff,
-          settingValue: autoPrintDrugLabelOnSignOff.settingValue === 'true',
+          settingValue: autoPrintDrugLabelOnSignOff && autoPrintDrugLabelOnSignOff.settingValue === 'true',
         },
         autoPrintMedicalCertificateOnSignOff: {
           ...autoPrintMedicalCertificateOnSignOff,
-          settingValue: autoPrintMedicalCertificateOnSignOff.settingValue === 'true',
+          settingValue: autoPrintMedicalCertificateOnSignOff && autoPrintMedicalCertificateOnSignOff.settingValue === 'true',
         },
         autoPrintCertificateOfAttendanceOnSignOff: {
           ...autoPrintCertificateOfAttendanceOnSignOff,
-          settingValue: autoPrintCertificateOfAttendanceOnSignOff.settingValue === 'true',
+          settingValue: autoPrintCertificateOfAttendanceOnSignOff && autoPrintCertificateOfAttendanceOnSignOff.settingValue === 'true',
         },
         autoPrintReferralLetterOnSignOff: {
           ...autoPrintReferralLetterOnSignOff,
-          settingValue: autoPrintReferralLetterOnSignOff.settingValue === 'true',
+          settingValue: autoPrintReferralLetterOnSignOff && autoPrintReferralLetterOnSignOff.settingValue === 'true',
         },
         autoPrintMemoOnSignOff: {
           ...autoPrintMemoOnSignOff,
-          settingValue: autoPrintMemoOnSignOff.settingValue === 'true',
+          settingValue: autoPrintMemoOnSignOff && autoPrintMemoOnSignOff.settingValue === 'true',
         },
         autoPrintVaccinationCertificateOnSignOff: {
           ...autoPrintVaccinationCertificateOnSignOff,
-          settingValue: autoPrintVaccinationCertificateOnSignOff.settingValue === 'true',
+          settingValue: autoPrintVaccinationCertificateOnSignOff && autoPrintVaccinationCertificateOnSignOff.settingValue === 'true',
         },
         autoPrintOtherDocumentsOnSignOff: {
           ...autoPrintOtherDocumentsOnSignOff,
-          settingValue: autoPrintOtherDocumentsOnSignOff.settingValue === 'true',
+          settingValue: autoPrintOtherDocumentsOnSignOff && autoPrintOtherDocumentsOnSignOff.settingValue === 'true',
         },
         autoPrintOnCompletePayment: {
           ...autoPrintOnCompletePayment,
-          settingValue: autoPrintOnCompletePayment.settingValue === 'true',
+          settingValue: autoPrintOnCompletePayment && autoPrintOnCompletePayment.settingValue === 'true',
         },
         autoPrintDrugLabelOnCompletePayment: {
           ...autoPrintDrugLabelOnCompletePayment,
-          settingValue: autoPrintDrugLabelOnCompletePayment.settingValue === 'true',
+          settingValue: autoPrintDrugLabelOnCompletePayment && autoPrintDrugLabelOnCompletePayment.settingValue === 'true',
         },
         autoPrintInvoiceOnCompletePayment: {
           ...autoPrintInvoiceOnCompletePayment,
-          settingValue: autoPrintInvoiceOnCompletePayment.settingValue === 'true',
+          settingValue: autoPrintInvoiceOnCompletePayment && autoPrintInvoiceOnCompletePayment.settingValue === 'true',
         },
         autoPrintReceiptOnCompletePayment: {
           ...autoPrintReceiptOnCompletePayment,
-          settingValue: autoPrintReceiptOnCompletePayment.settingValue === 'true',
+          settingValue: autoPrintReceiptOnCompletePayment && autoPrintReceiptOnCompletePayment.settingValue === 'true',
+        },
+        showTotalInvoiceAmtInConsultation: {
+          ...showTotalInvoiceAmtInConsultation,
+          settingValue: showTotalInvoiceAmtInConsultation.settingValue === 'true',
         },
       }
     }
@@ -127,80 +145,8 @@ const styles = (theme) => ({
   },
 
   handleSubmit: (values, { props }) => {
-    const {
-      systemCurrency,
-      currencyRounding,
-      currencyRoundingToTheClosest,
-      showConsultationVersioning,
-      autoPrintDrugLabel,
-      autoPrintOnSignOff,
-      autoPrintDrugLabelOnSignOff,
-      autoPrintMedicalCertificateOnSignOff,
-      autoPrintCertificateOfAttendanceOnSignOff,
-      autoPrintReferralLetterOnSignOff,
-      autoPrintMemoOnSignOff,
-      autoPrintVaccinationCertificateOnSignOff,
-      autoPrintOtherDocumentsOnSignOff,
-      autoPrintOnCompletePayment,
-      autoPrintDrugLabelOnCompletePayment,
-      autoPrintInvoiceOnCompletePayment,
-      autoPrintReceiptOnCompletePayment,
-    } = values
-
-    const payload = [
-      {
-        ...systemCurrency,
-      },
-      {
-        ...currencyRounding,
-      },
-      {
-        ...currencyRoundingToTheClosest,
-      },
-      {
-        ...showConsultationVersioning,
-      },
-      {
-        ...autoPrintDrugLabel,
-      },
-      {
-        ...autoPrintOnSignOff,
-      },
-      {
-        ...autoPrintDrugLabelOnSignOff,
-      },
-      {
-        ...autoPrintMedicalCertificateOnSignOff,
-      },
-      {
-        ...autoPrintCertificateOfAttendanceOnSignOff,
-      },
-      {
-        ...autoPrintReferralLetterOnSignOff,
-      },
-      {
-        ...autoPrintMemoOnSignOff,
-      },
-      {
-        ...autoPrintVaccinationCertificateOnSignOff,
-      },
-      {
-        ...autoPrintOtherDocumentsOnSignOff,
-      },
-      {
-        ...autoPrintOnCompletePayment,
-      },
-      {
-        ...autoPrintDrugLabelOnCompletePayment,
-      },
-      {
-        ...autoPrintInvoiceOnCompletePayment,
-      },
-      {
-        ...autoPrintReceiptOnCompletePayment,
-      },
-    ]
-    const { dispatch, onConfirm, history } = props
+    const { dispatch, history } = props
+    const payload = Object.keys(values).map((o) => values[o])
 
     dispatch({
       type: 'clinicSettings/upsert',
@@ -252,8 +198,7 @@ class GeneralSetting extends PureComponent {
       values,
       ...restProps
     } = this.props
-    // const { hasActiveSession } = this.state
-    let hasActiveSession = false
+    const { hasActiveSession } = this.state
     return (
       <React.Fragment>
         {hasActiveSession && (
@@ -310,21 +255,7 @@ class GeneralSetting extends PureComponent {
               />
             </GridItem>
           </GridContainer>
-
           <GridContainer>
-            {/* <GridItem md={3}>
-              <Field
-                name='.settingValue'
-                render={(args) => (
-                  <Select
-                    label='To The Closest'
-                    options={currencyRoundingToTheClosest}
-                    {...args}
-                    disabled={!!hasActiveSession}
-                  />
-                )}
-              />
-            </GridItem> */}
             <GridItem md={3}>
               <Field
                 name='showConsultationVersioning.settingValue'
@@ -340,11 +271,71 @@ class GeneralSetting extends PureComponent {
           </GridContainer>
           <GridContainer>
             <GridItem md={3}>
+              <Field
+                name='autoRefresh.settingValue'
+                render={(args) => (
+                  <Switch
+                    label='Queue Listing Auto Refresh'
+                    {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='defaultVisitType.settingValue'
+                render={(args) => (
+                  <CodeSelect
+                    label='Default Visit Type'
+                    {...args}
+                    code='ctvisitpurpose'
+                    disabled={!!hasActiveSession}
+                    allowClear={false}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='labelPrinterSize.settingValue'
+                render={(args) => (
+                  <Select
+                    label='Label Printer Size'
+                    options={labelPrinterList}
+                    {...args}
+                    disabled={!!hasActiveSession}
+                    allowClear={false}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='showTotalInvoiceAmtInConsultation.settingValue'
+                render={(args) => (
+                  <Switch
+                    label='Show Total Invoice Amount In Consultation'
+                    {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer className={classes.marginTop}>
+            <GridItem md={3}>
               <h5 className={classes.boldText}>Auto Print</h5>
             </GridItem>
           </GridContainer>
           <GridContainer>
-            <GridItem md={3} className={classes.marginTop}>
+            <GridItem md={3}>
               <h5> Finalize Order </h5>
             </GridItem>
           </GridContainer>
@@ -366,7 +357,7 @@ class GeneralSetting extends PureComponent {
               />
             </GridItem>
           </GridContainer>
-          <GridContainer className={classes.marginTop}>
+          <GridContainer>
             <GridItem md={3}>
               <h5> Consultation Sign Off</h5>
             </GridItem>

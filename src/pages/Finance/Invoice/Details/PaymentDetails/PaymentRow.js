@@ -1,23 +1,25 @@
-import React from 'react'
+import React, { useState } from 'react'
 import moment from 'moment'
+import classNames from 'classnames'
 // material ui
 import { IconButton, withStyles } from '@material-ui/core'
 import Printer from '@material-ui/icons/Print'
 import Info from '@material-ui/icons/Info'
 import Cross from '@material-ui/icons/HighlightOff'
 // common components
-import { GridContainer, GridItem, Tooltip, dateFormatLong } from '@/components'
+import {
+  Button,
+  GridContainer,
+  GridItem,
+  Tooltip,
+  dateFormatLong,
+  Popper,
+} from '@/components'
 import styles from './styles'
 import { currencyFormatter } from '@/utils/utils'
+import PaymentDetails from './PaymentDetails'
 
 const PaymentRow = ({
-  // id,
-  // type,
-  // itemID,
-  // date,
-  // amount,
-  // reason,
-  // isCancelled,
   classes,
   handleVoidClick,
   handlePrinterClick,
@@ -33,7 +35,17 @@ const PaymentRow = ({
     reason,
     isCancelled,
     patientDepositTransaction,
+    invoicePaymentMode = [],
   } = payment
+
+  const sortedInvoicePaymentModes = [
+    ...invoicePaymentMode,
+  ].sort((a, b) => (a.id > b.id ? 1 : -1))
+
+  const [
+    hoveredRowId,
+    setHoveredRowId,
+  ] = useState(null)
 
   let tooltipMsg = ''
   if (type === 'Payment') tooltipMsg = 'Print Receipt'
@@ -43,19 +55,22 @@ const PaymentRow = ({
     if (type === 'Payment' || type === 'Credit Note') {
       return (
         <Tooltip title={tooltipMsg}>
-          <IconButton
-            // payerID='N/A'
+          <Button
+            justIcon
+            simple
+            size='sm'
+            color='primary'
             id={itemID}
             className={classes.printButton}
             disabled={isCancelled}
             onClick={() => handlePrinterClick(type, id)}
           >
             <Printer />
-          </IconButton>
+          </Button>
         </Tooltip>
       )
     }
-    if (type === 'Admin Charge') {
+    if (type === 'Corporate Charges' || type === 'Statement Adjustment') {
       return ''
     }
     return (
@@ -65,6 +80,12 @@ const PaymentRow = ({
         </IconButton>
       </Tooltip>
     )
+  }
+
+  const paymentTextStyle = {
+    textDecoration: hoveredRowId ? 'underline' : null,
+    padding: '5px 20px 5px 0px',
+    cursor: 'default',
   }
 
   return (
@@ -77,14 +98,45 @@ const PaymentRow = ({
       >
         <GridItem md={2}>
           {getIconByType()}
-          <span>{type}</span>
+          {type === 'Payment' ? (
+            <Popper
+              className={classNames({
+                [classes.pooperResponsive]: true,
+                [classes.pooperNav]: true,
+              })}
+              style={{
+                width: 450,
+                border: '1px solid',
+              }}
+              disabledTransition
+              placement='right'
+              overlay={
+                <PaymentDetails
+                  paymentModeDetails={sortedInvoicePaymentModes}
+                  setHoveredRowId={setHoveredRowId}
+                  id={id}
+                />
+              }
+            >
+              <span
+                style={paymentTextStyle}
+                onMouseOver={() => setHoveredRowId(id)}
+                onMouseOut={() => setHoveredRowId(null)}
+                onFocus={() => 0}
+                onBlur={() => 0}
+              >
+                {type}
+              </span>
+            </Popper>
+          ) : (
+            <span>{type}</span>
+          )}
         </GridItem>
         <GridItem md={2}>
           <span>{itemID}</span>
         </GridItem>
         <GridItem md={2}>
           <span>{moment(date).format(dateFormatLong)}</span>
-          {/* <DatePicker text format={dateFormatLong} value={date} /> */}
         </GridItem>
         <GridItem md={6} container justify='flex-end' alignItems='center'>
           <GridItem>
@@ -99,13 +151,17 @@ const PaymentRow = ({
                 visibility: isCancelled === undefined ? 'hidden' : 'visible',
               }}
             >
-              <IconButton
+              <Button
+                justIcon
+                simple
+                size='sm'
+                color='danger'
                 id={itemID}
                 onClick={() => handleVoidClick(payment)}
                 disabled={isCancelled || readOnly}
               >
                 <Cross />
-              </IconButton>
+              </Button>
             </Tooltip>
           </GridItem>
         </GridItem>

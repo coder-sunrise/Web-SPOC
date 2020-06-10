@@ -29,8 +29,9 @@ class TextField extends React.PureComponent {
 
   static defaultProps = {
     autocomplete: 'off',
-    debounceDuration: 1000,
-    useLeading: true,
+    debounceDuration: 500,
+    useLeading: false,
+    useTrailing: true,
   }
 
   constructor (props) {
@@ -44,6 +45,7 @@ class TextField extends React.PureComponent {
       value,
       debounceDuration,
       useLeading,
+      useTrailing,
     } = props
     // console.log(this.state, props, defaultValue, value)
     this.state = {
@@ -59,13 +61,12 @@ class TextField extends React.PureComponent {
     // } else {
     //   this.debouncedOnChange = this._onChange
     // }
-    this.debouncedOnChange = _.debounce(
-      this._onChange.bind(this),
-      debounceDuration,
-      {
-        leading: useLeading,
-      },
-    )
+    this.debouncedOnChange = debounceDuration
+      ? _.debounce(this._onChange.bind(this), debounceDuration, {
+          leading: useLeading,
+          trailing: useTrailing,
+        })
+      : this._onChange.bind(this)
   }
 
   // static getDerivedStateFromProps (nextProps, preState) {
@@ -140,7 +141,7 @@ class TextField extends React.PureComponent {
       this.debouncedOnChange(event.target.value)
     } else {
       this._onChange(event.target.value)
-      this.debouncedOnChange.cancel()
+      if (this.debouncedOnChange.cancel) this.debouncedOnChange.cancel()
     }
   }
 
@@ -155,7 +156,7 @@ class TextField extends React.PureComponent {
       ].includes(e.which)
     ) {
       this._onChange(e.target.value)
-      this.debouncedOnChange.cancel()
+      if (this.debouncedOnChange.cancel) this.debouncedOnChange.cancel()
     }
   }
 
@@ -183,7 +184,7 @@ class TextField extends React.PureComponent {
       focused: false,
     })
     this._onChange(e.target.value)
-    this.debouncedOnChange.cancel()
+    if (this.debouncedOnChange.cancel) this.debouncedOnChange.cancel()
   }
 
   render () {
@@ -227,6 +228,7 @@ class TextField extends React.PureComponent {
       value,
       uppercase,
       lowercase,
+      text,
       maxLength,
     } = props
     const { field, form, ...resetProps } = props
@@ -234,7 +236,9 @@ class TextField extends React.PureComponent {
     // if (this.state && this.state.value !== undefined) {
     //   inputProps.value = this.state.value
     // }
-    const cfg = {}
+    const cfg = {
+      hiddenOverflow: !text,
+    }
     if (field && form) {
       cfg.value = state.value
       cfg.name = field.name
@@ -328,6 +332,7 @@ TextField.propTypes = {
   onBlur: PropTypes.func,
   debounceDuration: PropTypes.number,
   useLeading: PropTypes.bool,
+  useTrailing: PropTypes.bool,
 }
 
 export default TextField

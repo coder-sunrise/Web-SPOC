@@ -16,12 +16,12 @@ import {
 } from '@/components'
 import CannedText from './CannedText'
 import CannedTextButton from './CannedText/CannedTextButton'
-import UploadAttachment from './UploadAttachment'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 import model from './models'
 import cannedTextModel from './models/cannedText'
 import { navigateDirtyCheck } from '@/utils/utils'
 import { getDefaultActivePanel, getConfig, getContent } from './utils'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   editor: {
@@ -107,9 +107,13 @@ window.g_app.replaceModel(cannedTextModel)
   }),
 )
 class ClinicalNotes extends Component {
+  static defaultProps = {
+    prefix: 'corDoctorNote',
+  }
+
   constructor (props) {
     super(props)
-    const config = getConfig(this.props.clinicInfo)
+    const config = getConfig()
     const contents = getContent(config)
     this.state = {
       showCannedText: false,
@@ -234,7 +238,7 @@ class ClinicalNotes extends Component {
     const currentScribbleNoteData = fields.reduce(
       (result, field) => ({
         ...result,
-        [field.fieldName]: scriblenotes[field.fieldName][field.scribbleField],
+        [field.category]: scriblenotes[field.category][field.scribbleField],
       }),
       {},
     )
@@ -346,13 +350,13 @@ class ClinicalNotes extends Component {
   }
 
   onEditorChange = (type) => (v) => {
-    const { entity } = this.props.consultation
-    entity.corDoctorNote = [
-      {
-        ...entity.corDoctorNote[0],
-        [type]: v,
-      },
+    const { consultation, prefix } = this.props
+    const { entity } = consultation
+
+    entity[prefix] = [
+      { ...entity[prefix][0], [type]: v },
     ]
+
     this.props.dispatch({
       type: 'consultation/updateState',
       payload: {
@@ -383,45 +387,89 @@ class ClinicalNotes extends Component {
     })
   }
 
-  handleAddCannedText = (cannedText) => {
+  insertPrevDoctorNotes = async (cannedTextTypeFK) => {
+    const { visitRegistration } = this.props
+    let previousDoctorNote = await this.props.dispatch({
+      type: 'cannedText/queryPrevDoctorNotes',
+      payload: { visitId: visitRegistration.entity.id },
+    })
     const { cannedTextRow } = this.state
 
-    const { consultation, prefix = 'corDoctorNote[0].' } = this.props
+    const { consultation, prefix } = this.props
+    const { entity } = consultation
+    let text = ""
+    if (previousDoctorNote) {
+      if (cannedTextTypeFK === 0) {
+        text = previousDoctorNote.note || ''
+      }
+      else if (cannedTextTypeFK === 1) {
+        text = previousDoctorNote.chiefComplaints || ''
+      }
+      else if (cannedTextTypeFK === 2) {
+        text = previousDoctorNote.plan || ''
+      }
+      else if (cannedTextTypeFK === 3) {
+        text = previousDoctorNote.history || ''
+      }
+    } 
+    const note = entity[prefix] || []
+    const prevData = note.length > 0 ? note[0][cannedTextRow.fieldName] : ''
+    const value = `${prevData || ''}${text}`
+
+    this.onEditorChange(cannedTextRow.fieldName)(value)
+    const name = `${prefix}[0][${cannedTextRow.fieldName}]`
+    this.form.setFieldValue(name, value)
+
+    this.setState({
+      showCannedText: false,
+      cannedTextRow: undefined,
+    })
+  }
+
+  handleAddCannedText = (cannedText) => {
+    const { cannedTextRow } = this.state
+    const { authority } = cannedTextRow
+    const accessRight = Authorized.check(authority)
+
+    if (accessRight && accessRight.rights !== 'enable') return
+
+    const { consultation, prefix } = this.props
+
     const { entity } = consultation
     const { text } = cannedText
 
-    const { corDoctorNote = [] } = entity
-    const prevData =
-      corDoctorNote.length > 0 ? corDoctorNote[0][cannedTextRow.fieldName] : ''
+    // const { corDoctorNote = [] } = entity
+    const note = entity[prefix] || []
+    const prevData = note.length > 0 ? note[0][cannedTextRow.fieldName] : ''
 
     const value = `${prevData || ''}${text}`
 
     this.onEditorChange(cannedTextRow.fieldName)(value)
-    this.form.setFieldValue(`${prefix}${cannedTextRow.fieldName}`, value)
+    const name = `${prefix}[0][${cannedTextRow.fieldName}]`
+    this.form.setFieldValue(name, value)
   }
 
   insertIntoClinicalNote = (dataUrl) => {
     const { selectedData, config } = this.state
     const { fields = [] } = config
-    const { consultation, prefix = 'corDoctorNote[0].' } = this.props
+    const { consultation, prefix } = this.props
+
     const { entity } = consultation
     const contents = `<img src=${dataUrl} alt='scribbleNote' />`
 
-    const { corDoctorNote = [] } = entity
+    // const { corDoctorNote = [] } = entity
+    const note = entity[prefix] || []
     const scribbleNoteField = fields.find(
       (field) => field.scribbleNoteTypeFK === selectedData.scribbleNoteTypeFK,
     )
 
-    const prevData =
-      corDoctorNote.length > 0
-        ? corDoctorNote[0][scribbleNoteField.fieldName]
-        : ''
+    const prevData = note.length > 0 ? note[0][scribbleNoteField.fieldName] : ''
 
     const value = `${prevData} ${contents}`
 
     this.onEditorChange(scribbleNoteField.fieldName)(value)
 
-    this.form.setFieldValue(`${prefix}${scribbleNoteField.fieldName}`, value)
+    this.form.setFieldValue(`${prefix}[0]${scribbleNoteField.fieldName}`, value)
   }
 
   handleCannedTextButtonClick = (note) => {
@@ -432,18 +480,32 @@ class ClinicalNotes extends Component {
 
   render () {
     const {
-      prefix = 'corDoctorNote[0].',
+      prefix,
       classes,
       scriblenotes,
       theme,
       dispatch,
       consultation,
+      clinicInfo,
     } = this.props
+
     const { config, contents, showCannedText } = this.state
     const { entity = {} } = consultation
-
     const { fields } = config
-    const defaultActive = getDefaultActivePanel(entity, config)
+    const panels = contents.filter((item) => {
+      const accessRight = Authorized.check(item.authority)
+      if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
+        return false
+      return true
+    })
+
+    const defaultActive = getDefaultActivePanel(
+      entity,
+      config,
+      prefix,
+      clinicInfo,
+      panels,
+    )
 
     return (
       <div>
@@ -459,17 +521,18 @@ class ClinicalNotes extends Component {
             const payload = {
               entity: '',
               selectedIndex: '',
-              ...fields.reduce(
-                (_result, field) => ({
+              ...fields.reduce((_result, field) => {
+                const scribbles = values.corScribbleNotes.filter(
+                  (o) => o.scribbleNoteTypeFK === field.scribbleNoteTypeFK,
+                )
+
+                return {
                   ..._result,
                   [field.category]: {
-                    [field.scribbleField]: values.corScribbleNotes.filter(
-                      (o) => o.scribbleNoteTypeFK === field.scribbleNoteTypeFK,
-                    ),
+                    [field.scribbleField]: scribbles,
                   },
-                }),
-                {},
-              ),
+                }
+              }, {}),
             }
 
             if (this.state.runOnce === false) {
@@ -492,53 +555,69 @@ class ClinicalNotes extends Component {
           expandIcon={<SolidExpandMore fontSize='large' />}
           defaultActive={defaultActive}
           mode='multiple'
-          collapses={contents.map((item) => {
+          collapses={panels.map((item, index) => {
             const onCannedTextClick = () =>
               this.handleCannedTextButtonClick(item)
             const onSettingClick = () => this.openCannedText(item)
+            const onPrevDoctorNoteClick = (cannedTextTypeFK) => this.insertPrevDoctorNotes(cannedTextTypeFK)
             return {
               title: item.fieldTitle,
               content: (
                 <div className={classes.editor}>
                   <Field
-                    name={`${prefix}${item.fieldName}`}
+                    name={`${prefix}[0]${item.fieldName}`}
                     render={(args) => {
                       return (
-                        <div>
-                          <ScribbleNoteItem
-                            editorButtonStyle={{
-                              position: 'absolute',
-                              zIndex: 1,
-                              left: 305,
-                              right: 0,
-                              top: 10,
-                            }}
-                            scribbleNoteUpdateState={
-                              this.scribbleNoteUpdateState
-                            }
-                            category={item.category}
-                            arrayName={item.scribbleField}
-                            categoryIndex={item.scribbleNoteTypeFK}
-                            scribbleNoteArray={
-                              scriblenotes[item.category][item.scribbleField]
-                            }
-                            gridItemWidth={this.state.width}
-                          />
+                        <Authorized authority={item.authority}>
+                          <div>
+                            <div
+                              style={{
+                                position: 'absolute',
+                                zIndex: 1,
+                                left: 305,
+                                right: 0,
+                                top: 10,
+                              }}
+                            >
+                              <ScribbleNoteItem
+                                scribbleNoteUpdateState={
+                                  this.scribbleNoteUpdateState
+                                }
+                                category={item.category}
+                                arrayName={item.scribbleField}
+                                categoryIndex={item.scribbleNoteTypeFK}
+                                scribbleNoteArray={
+                                  scriblenotes[item.category][
+                                  item.scribbleField
+                                  ]
+                                }
+                                gridItemWidth={this.state.width}
+                              />
 
-                          <CannedTextButton
-                            onSettingClick={onSettingClick}
-                            onCannedTextClick={onCannedTextClick}
-                            cannedTextTypeFK={item.cannedTextTypeFK}
-                            handleSelectCannedText={this.handleAddCannedText}
-                          />
+                              <Authorized authority='settings.cannedtext'>
+                                <CannedTextButton
+                                  onSettingClick={onSettingClick}
+                                  onPrevDoctorNoteClick={onPrevDoctorNoteClick}
+                                  onCannedTextClick={onCannedTextClick}
+                                  cannedTextTypeFK={item.cannedTextTypeFK}
+                                  handleSelectCannedText={
+                                    this.handleAddCannedText
+                                  }
+                                />
+                              </Authorized>
+                            </div>
 
-                          <RichEditor
-                            strongLabel
-                            onBlur={this.onEditorChange(item.fieldName)}
-                            // label='Chief Complaints'
-                            {...args}
-                          />
-                        </div>
+                            <RichEditor
+                              autoFocus={index === 0}
+                              style={{ marginBottom: 0 }}
+                              strongLabel
+                              onBlur={this.onEditorChange(item.fieldName)}
+                              // label='Chief Complaints'
+                              height={item.height}
+                              {...args}
+                            />
+                          </div>
+                        </Authorized>
                       )
                     }}
                   />
@@ -548,11 +627,6 @@ class ClinicalNotes extends Component {
           })}
         />
 
-        {config.hasAttachment && (
-          <div style={{ marginTop: theme.spacing(1) }}>
-            <UploadAttachment updateAttachments={this.updateAttachments} />
-          </div>
-        )}
         <div
           style={{
             marginTop: theme.spacing(1),

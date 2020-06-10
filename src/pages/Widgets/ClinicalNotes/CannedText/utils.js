@@ -2,6 +2,14 @@ import { EditorState, ContentState } from 'draft-js'
 import htmlToDraft from 'html-to-draftjs'
 import { Checkbox } from '@/components'
 import { htmlDecodeByRegExp } from '@/utils/utils'
+import { CANNED_TEXT_TYPE } from '@/utils/constants'
+
+export const CANNED_TEXT_TYPE_FIELD_NAME = {
+  [CANNED_TEXT_TYPE.NOTE]: 'note',
+  [CANNED_TEXT_TYPE.CHIEFCOMPLAINTS]: 'chiefComplaints',
+  [CANNED_TEXT_TYPE.PLAN]: 'plan',
+  [CANNED_TEXT_TYPE.HISTORY]: 'history',
+}
 
 export const columns = [
   { name: 'drag', title: ' ' },
@@ -24,10 +32,6 @@ export const columnExtensions = [
     columnName: 'text',
     render: (row) => {
       const { text } = row
-      // const encodede = htmlEncodeByRegExp(
-      //   draftToHtml(convertToRaw(this.state.value.getCurrentContent())),
-      // )
-      // console.log({ decodedHtml })
       const contentBlock = htmlToDraft(htmlDecodeByRegExp(text))
       const newEditorState = EditorState.createWithContent(
         ContentState.createFromBlockArray(contentBlock.contentBlocks),

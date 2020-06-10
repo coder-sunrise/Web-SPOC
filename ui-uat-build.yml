@@ -18,8 +18,10 @@ pool:
 steps:
 - script: npm install
   displayName: 'npm install'
+
 - script: copy "config\config.uat.js" "config\config.js" /Y
   displayName: 'update config to uat settings'
+
 - script: 
     #export NODE_OPTIONS="--no-warnings --max-old-space-size=2048" && npm run build
     set NODE_OPTIONS=--max_old_space_size=8192 & npm run build
@@ -33,4 +35,24 @@ steps:
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
+    publishLocation: 'Container'
+
+- script: copy "config\config.my-uat.js" "config\config.js" /Y
+  displayName: 'update config to malaysia uat settings'
+
+- script: 
+  #export NODE_OPTIONS="--no-warnings --max-old-space-size=2048" && npm run build
+    set NODE_OPTIONS=--max_old_space_size=8192 & npm run build
+  displayName: 'npm build(malaysia)'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '.\dist'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\malaysia'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)\malaysia'
+    ArtifactName: 'drop-malaysia'
     publishLocation: 'Container'

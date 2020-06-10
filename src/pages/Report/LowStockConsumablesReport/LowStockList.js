@@ -16,7 +16,7 @@ class LowStockList extends PureComponent {
     const LowStockConsumablesDetailsCols = [
       { name: 'code', title: 'Code' },
       { name: 'name', title: 'Name' },
-      { name: 'stock', title: 'Stock' },
+      { name: 'stock', title: 'Current Stock' },
       { name: 'threshold', title: 'Threshold' },
       { name: 'uom', title: 'Uom' },
       { name: 'supplier', title: 'Supplier' },

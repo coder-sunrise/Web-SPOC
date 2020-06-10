@@ -50,7 +50,9 @@ const styles = (theme) => ({
   },
 })
 
-const ContextMenu = ({ show, row, handleClick, classes }) => {
+const { Secured } = Authorized
+
+const ContextMenu = ({ row, handleClick, classes }) => {
   const isStatusWaiting = row.visitStatus === VISIT_STATUS.WAITING
   const isStatusInProgress = filterMap[StatusIndicator.IN_PROGRESS].includes(
     row.visitStatus,
@@ -110,9 +112,9 @@ const ContextMenu = ({ show, row, handleClick, classes }) => {
   const contextMenuOptions = useMemo(() =>
     ContextMenuOptions.map((opt) => {
       switch (opt.id) {
-        case 0: // view visit
+        case 0: // edit visit
           return { ...opt, hidden: !isStatusWaiting }
-        case 0.1: // edit visit
+        case 0.1: // view visit
           return { ...opt, hidden: isStatusWaiting }
         case 1: // dispense
           return {
@@ -120,7 +122,10 @@ const ContextMenu = ({ show, row, handleClick, classes }) => {
             disabled: !enableDispense(),
           }
         case 1.1: // billing
-          return { ...opt, disabled: !enableBilling }
+          return {
+            ...opt,
+            disabled: !enableBilling,
+          }
         case 2: // delete visit
           return { ...opt, disabled: !isStatusWaiting }
         case 5: // start consultation
@@ -155,19 +160,26 @@ const ContextMenu = ({ show, row, handleClick, classes }) => {
           index,
         ) => {
           if (isDivider) return <Menu.Divider key={`divider-${index}`} />
-          const { rights } = Authorized.check(authority)
+
+          const accessRight = Authorized.check(authority)
+          if (!accessRight) return null
+
+          const hideByAccessRight = accessRight.rights === 'hidden'
+          const disabledByAccessRight =
+            accessRight.rights === 'disable' && id !== 4 // skip patient dashboard access right checking
+
           const menu = (
             <Menu.Item
               key={id}
               id={id}
-              disabled={disabled || rights === 'disable'}
+              disabled={disabled || disabledByAccessRight}
             >
               <Icon className={classes.icon} />
               <span>{label}</span>
             </Menu.Item>
           )
           // eslint-disable-next-line no-nested-ternary
-          return hidden || rights === 'hidden' ? null : menu
+          return hidden || hideByAccessRight ? null : menu
         },
       )}
     </Menu>
@@ -176,6 +188,8 @@ const ContextMenu = ({ show, row, handleClick, classes }) => {
   return MenuItemsOverlay
 }
 
+const SecuredContextMenu = Secured('reception/queue')(ContextMenu)
+
 export default withStyles(styles, { name: 'QueueListingContextMenu' })(
-  ContextMenu,
+  SecuredContextMenu,
 )

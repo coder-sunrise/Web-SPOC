@@ -1,17 +1,17 @@
 import React, { Component } from 'react'
 import router from 'umi/router'
 // common component
+import { connect } from 'dva'
+import { formatMessage } from 'umi/locale'
 import { withFormikExtend, notification, CommonModal } from '@/components'
 // sub component
 // import DispenseDetails from './DispenseDetails'
-import DispenseDetails from './DispenseDetails/PrintDrugLabelWrapper'
+// import DispenseDetails from './DispenseDetails/PrintDrugLabelWrapper'
+import DispenseDetails from './DispenseDetails/WebSocketWrapper'
 import AddOrder from './DispenseDetails/AddOrder'
+import DrugLabelSelection from './DispenseDetails/DrugLabelSelection'
 // utils
-import {
-  calculateAmount,
-  getAppendUrl,
-  navigateDirtyCheck,
-} from '@/utils/utils'
+import { calculateAmount, navigateDirtyCheck } from '@/utils/utils'
 import Yup from '@/utils/yup'
 import { VISIT_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
@@ -67,10 +67,9 @@ const reloadDispense = (props, effect = 'query') => {
   })
 }
 
-const constructPayload = (values) => {
-  const _values = {
-    ...values,
-    prescription: values.prescription.map((o) => {
+const ConvertBatchNoArrayToText = (array) => {
+  if (array) {
+    return array.map((o) => {
       const item = { ...o }
       if (item.batchNo instanceof Array) {
         if (item.batchNo && item.batchNo.length > 0) {
@@ -81,9 +80,18 @@ const constructPayload = (values) => {
         }
       }
       return item
-    }),
+    })
   }
-  // values.prescription.forEach()
+
+  return array
+}
+
+const constructPayload = (values) => {
+  const _values = {
+    ...values,
+    prescription: ConvertBatchNoArrayToText(values.prescription),
+    vaccination: ConvertBatchNoArrayToText(values.vaccination),
+  }
   return _values
 }
 
@@ -128,12 +136,19 @@ const constructPayload = (values) => {
   },
   displayName: 'DispensePage',
 })
+@connect(({ orders, formik, dispense }) => ({
+  orders,
+  formik,
+  dispense,
+}))
 class Main extends Component {
   state = {
     showOrderModal: false,
+    showDrugLabelSelection: false,
+    selectedDrugs: [],
   }
 
-  componentDidMount () {
+  componentDidMount = async () => {
     const { dispatch, values, dispense } = this.props
     const { otherOrder = [], prescription = [], visitPurposeFK } = values
     dispatch({
@@ -141,9 +156,8 @@ class Main extends Component {
     })
     const isEmptyDispense = otherOrder.length === 0 && prescription.length === 0
     const noClinicalObjectRecord = !values.clinicalObjectRecordFK
-    const { rights: editOrderRights } = Authorized.check(
-      'queue.dispense.editorder',
-    )
+
+    const accessRights = Authorized.check('queue.dispense.editorder')
 
     if (visitPurposeFK === VISIT_TYPE.RETAIL && isEmptyDispense) {
       this.setState(
@@ -160,7 +174,8 @@ class Main extends Component {
     }
 
     if (
-      editOrderRights !== 'hidden' &&
+      accessRights &&
+      accessRights.rights !== 'hidden' &&
       visitPurposeFK === VISIT_TYPE.BILL_FIRST &&
       isEmptyDispense &&
       noClinicalObjectRecord &&
@@ -168,6 +183,12 @@ class Main extends Component {
     ) {
       this.editOrder()
     }
+    this.setState(
+      () => {
+        return {
+          selectedDrugs: prescription.map((x) => { return { ...x, no: 1, selected: true } }),
+        }
+      })
   }
 
   makePayment = async () => {
@@ -179,18 +200,11 @@ class Main extends Component {
         id: dispense.visitID,
         values: _values,
       },
-    })
-
+    })  
     if (finalizeResponse === 204) {
-      await dispatch({
-        type: 'dispense/query',
-        payload: {
-          id: dispense.visitID,
-          version: Date.now(),
-        },
-      })
-      router.push(getAppendUrl({}, '/reception/queue/billing'))
+      return true
     }
+    return false
   }
 
   _editOrder = () => {
@@ -286,11 +300,42 @@ class Main extends Component {
     reloadDispense(this.props, 'refresh')
   }
 
-  handleCloseAddOrder = () => {
-    const { dispatch, consultation, values } = this.props
-    const { visitPurposeFK } = values
+  showConfirmationBox = () => {
+    const { dispatch, history } = this.props
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: formatMessage({
+          id: 'app.general.leave-without-save',
+        }),
+        onConfirmSave: () => {
+          history.push({
+            pathname: history.location.pathname,
+            query: {
+              ...history.location.query,
+              isInitialLoading: false,
+            },
+          })
+          this.handleOrderModal()
+        },
+      },
+    })
+  }
 
-    if (visitPurposeFK === VISIT_TYPE.BILL_FIRST) {
+  handleCloseAddOrder = () => {
+    const {
+      dispatch,
+      consultation,
+      values,
+      orders: { rows },
+      formik,
+    } = this.props
+    const { visitPurposeFK } = values
+    const newOrderRows = rows.filter((row) => !row.id && !row.isDeleted)
+    if (formik.OrderPage && !formik.OrderPage.dirty && newOrderRows.length > 0)
+      this.showConfirmationBox()
+    else if (visitPurposeFK === VISIT_TYPE.BILL_FIRST) {
       dispatch({
         type: 'consultation/discard',
         payload: {
@@ -311,9 +356,52 @@ class Main extends Component {
     }
   }
 
-  render () {
-    const { classes, handleSubmit, values } = this.props
+  handleDrugLabelClick = () => {
+    const { values } = this.props
+    const { prescription = [] } = values
+    this.setState(
+      (prevState) => {
+        return {
+          showDrugLabelSelection: !prevState.showDrugLabelSelection,
+          selectedDrugs: prescription.map((x) => { return { ...x, no: 1, selected: true } }),
+        }
+      })
+  }
 
+  handleDrugLabelSelectionClose = () => {
+    this.setState(
+      (prevState) => {
+        return {
+          showDrugLabelSelection: !prevState.showDrugLabelSelection,
+        }
+      },
+    )
+  }
+
+  handleDrugLabelSelected = (itemId, selected) => {
+    this.setState((prevState) => ({
+      selectedDrugs: prevState.selectedDrugs.map(
+        (drug) => (drug.id === itemId ? { ...drug, selected } : { ...drug }),
+      ),
+    }))
+    this.props.dispatch(
+      { type: 'global/incrementCommitCount' }
+    )
+  }
+
+  handleDrugLabelNoChanged = (itemId, no) => {
+    this.setState((prevState) => ({
+      selectedDrugs: prevState.selectedDrugs.map(
+        (drug) => (drug.id === itemId ? { ...drug, no } : { ...drug }),
+      ),
+    }))
+    this.props.dispatch(
+      { type: 'global/incrementCommitCount' }
+    )
+  }
+
+  render() {
+    const { classes, handleSubmit, values, dispense, codetable } = this.props
     return (
       <div className={classes.root}>
         <DispenseDetails
@@ -322,10 +410,16 @@ class Main extends Component {
           onEditOrderClick={this.editOrder}
           onFinalizeClick={this.makePayment}
           onReloadClick={this.handleReloadClick}
+          onDrugLabelClick={this.handleDrugLabelClick}
+          showDrugLabelSelection={this.state.showDrugLabelSelection}
+          onDrugLabelSelectionClose={this.handleDrugLabelSelectionClose}
+          onDrugLabelSelected={this.handleDrugLabelSelected}
+          onDrugLabelNoChanged={this.handleDrugLabelNoChanged}
+          selectedDrugs={this.state.selectedDrugs}
         />
         <CommonModal
           title='Orders'
-          open={this.state.showOrderModal}
+          open={this.state.showOrderModal && dispense.queryCodeTablesDone}
           onClose={this.handleCloseAddOrder}
           onConfirm={this.handleOrderModal}
           maxWidth='md'
@@ -338,6 +432,7 @@ class Main extends Component {
             }}
           />
         </CommonModal>
+
       </div>
     )
   }

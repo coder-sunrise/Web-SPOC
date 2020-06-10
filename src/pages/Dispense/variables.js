@@ -11,6 +11,9 @@ import {
   Checkbox,
   Select,
 } from '@/components'
+import CONSTANTS from './DispenseDetails/constants'
+import LowStockInfo from '@/pages/Widgets/Orders/Detail/LowStockInfo'
+import { InventoryTypes } from '@/utils/codes'
 
 export const tableConfig = {
   FuncProps: { pager: false },
@@ -18,6 +21,27 @@ export const tableConfig = {
 
 const columnwidth = '10%'
 const columnWidth = '10%'
+
+const lowStockIndicator = (row) => {
+  const currentType = InventoryTypes.find((type) => type.name === row.type)
+  if (!currentType) return null
+
+  const values = {
+    [currentType.itemFKName]:
+      currentType.name === 'Consumable'
+        ? row.itemFK
+        : row[currentType.itemFKName],
+  }
+
+  return (
+    <div style={{ position: 'relative', top: 2 }}>
+      <LowStockInfo
+        sourceType={currentType.name.toLowerCase()}
+        values={values}
+      />
+    </div>
+  )
+}
 
 export const PrescriptionColumns = [
   // { name: 'id', title: 'id' },
@@ -69,157 +93,160 @@ export const PrescriptionColumnExtensions = (
   inventorymedication = [],
   handleSelectedBatch,
 ) => [
-  { columnName: 'unitPrice', width: columnWidth, type: 'currency' },
-  {
-    columnName: 'name',
-    width: columnWidth,
-    render: (row) => {
-      return (
-        <div
-          style={{
-            wordWrap: 'break-word',
-            whiteSpace: 'pre-wrap',
-          }}
-        >
-          {row.name}
-        </div>
-      )
+    { columnName: 'unitPrice', width: columnWidth, type: 'currency' },
+    {
+      columnName: 'name',
+      width: columnWidth,
+      render: (row) => {
+        return (
+          <div style={{ position: 'relative' }}>
+            <div
+              style={{
+                wordWrap: 'break-word',
+                whiteSpace: 'pre-wrap',
+              }}
+            >
+              {row.name}
+              {lowStockIndicator(row)}
+            </div>
+          </div>
+        )
+      },
     },
-  },
-  {
-    columnName: 'instruction',
-    render: (row) => {
-      return (
-        <div
-          style={{
-            wordWrap: 'break-word',
-            whiteSpace: 'pre-wrap',
-          }}
-        >
-          {row.instruction}
-        </div>
-      )
-    },
-  },
-  {
-    columnName: 'totalAfterItemAdjustment',
-    width: columnWidth,
-    type: 'currency',
-  },
-  {
-    columnName: 'adjAmt',
-    width: columnWidth,
-    type: 'currency',
-  },
-  {
-    columnName: 'dispensedQuanity',
-    type: 'number',
-    width: columnWidth,
-    render: (row) => {
-      return (
-        <p>
-          {row.dispensedQuanity} {row.dispenseUOM}
-        </p>
-      )
-    },
-  },
-  {
-    columnName: 'orderedQuantity',
-    type: 'number',
-    width: columnWidth,
-    render: (row) => {
-      return (
-        <p>
-          {row.orderedQuantity} {row.orderUOM}
-        </p>
-      )
-    },
-  },
-  {
-    columnName: 'batchNo',
-    width: 150,
-    render: (row) => {
-      const currentItem = inventorymedication.find(
-        (o) => o.id === row.inventoryMedicationFK,
-      )
-      let batchNoOptions = []
-      if (currentItem) {
-        batchNoOptions = currentItem.medicationStock
-      }
-      return (
-        <FastField
-          name={`prescription[${row.rowIndex}]batchNo`}
-          render={(args) => {
-            const restProps = viewOnly ? { value: row.batchNo } : { ...args }
-            return (
-              <Select
-                simple
-                options={batchNoOptions}
-                mode='tags'
-                // valueField='id'
-                valueField='batchNo'
-                labelField='batchNo'
-                maxSelected={1}
-                disableAll
-                disabled={viewOnly}
-                onChange={(e, op = {}) => handleSelectedBatch(e, op, row)}
-                {...restProps}
-              />
-            )
-          }}
-        />
-      )
-    },
-  },
-  {
-    columnName: 'expiryDate',
-    width: 130,
-    render: (row) => {
-      return (
-        <FastField
-          name={`prescription[${row.rowIndex}]expiryDate`}
-          render={(args) => {
-            const restProps = viewOnly ? { value: row.expiryDate } : { ...args }
-
-            return (
-              <DatePicker
-                text={viewOnly}
-                disabled={viewOnly}
-                disabledDate={(d) => !d || d.isBefore(moment().add('days', -1))}
-                simple
-                {...restProps}
-              />
-            )
-          }}
-        />
-      )
-    },
-  },
-  {
-    columnName: 'action',
-    align: 'center',
-    width: 80,
-    render: (row) => {
-      return (
-        <Tooltip
-          title={
-            <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
-          }
-        >
-          <Button
-            color='primary'
-            onClick={() => {
-              onPrint('Medication', row)
+    {
+      columnName: 'instruction',
+      render: (row) => {
+        return (
+          <div
+            style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
             }}
-            justIcon
           >
-            <Print />
-          </Button>
-        </Tooltip>
-      )
+            {row.instruction}
+          </div>
+        )
+      },
     },
-  },
-]
+    {
+      columnName: 'totalAfterItemAdjustment',
+      width: columnWidth,
+      type: 'currency',
+    },
+    {
+      columnName: 'adjAmt',
+      width: columnWidth,
+      type: 'currency',
+    },
+    {
+      columnName: 'dispensedQuanity',
+      type: 'number',
+      width: columnWidth,
+      render: (row) => {
+        return (
+          <p>
+            {row.dispensedQuanity} {row.dispenseUOM}
+          </p>
+        )
+      },
+    },
+    {
+      columnName: 'orderedQuantity',
+      type: 'number',
+      width: columnWidth,
+      render: (row) => {
+        return (
+          <p>
+            {row.orderedQuantity} {row.orderUOM}
+          </p>
+        )
+      },
+    },
+    {
+      columnName: 'batchNo',
+      width: 150,
+      render: (row) => {
+        const currentItem = inventorymedication.find(
+          (o) => o.id === row.inventoryMedicationFK,
+        )
+        let batchNoOptions = []
+        if (currentItem) {
+          batchNoOptions = currentItem.medicationStock
+        }
+        return (
+          <FastField
+            name={`prescription[${row.rowIndex}]batchNo`}
+            render={(args) => {
+              const restProps = viewOnly ? { value: row.batchNo } : { ...args }
+              return (
+                <Select
+                  simple
+                  options={batchNoOptions}
+                  mode='tags'
+                  // valueField='id'
+                  valueField='batchNo'
+                  labelField='batchNo'
+                  maxSelected={1}
+                  disableAll
+                  disabled={viewOnly}
+                  onChange={(e, op = {}) => handleSelectedBatch(e, op, row)}
+                  {...restProps}
+                />
+              )
+            }}
+          />
+        )
+      },
+    },
+    {
+      columnName: 'expiryDate',
+      width: 130,
+      render: (row) => {
+        return (
+          <FastField
+            name={`prescription[${row.rowIndex}]expiryDate`}
+            render={(args) => {
+              const restProps = viewOnly ? { value: row.expiryDate } : { ...args }
+
+              return (
+                <DatePicker
+                  text={viewOnly}
+                  disabled={viewOnly}
+                  disabledDate={(d) => !d || d.isBefore(moment().add('days', -1))}
+                  simple
+                  {...restProps}
+                />
+              )
+            }}
+          />
+        )
+      },
+    },
+    {
+      columnName: 'action',
+      align: 'center',
+      width: 80,
+      render: (row) => {
+        return (
+          <Tooltip
+            title={
+              <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
+            }
+          >
+            <Button
+              color='primary'
+              onClick={() => {
+                onPrint({ type: CONSTANTS.DRUG_LABEL, row })
+              }}
+              justIcon
+            >
+              <Print />
+            </Button>
+          </Tooltip>
+        )
+      },
+    },
+  ]
 
 export const VaccinationColumn = [
   {
@@ -256,96 +283,126 @@ export const VaccinationColumn = [
   },
 ]
 
-export const VaccinationColumnExtensions = (viewOnly = false) => [
-  {
-    columnName: 'name',
-    render: (row) => {
-      return (
-        <div
-          style={{
-            wordWrap: 'break-word',
-            whiteSpace: 'pre-wrap',
-          }}
-        >
-          {row.name}
-        </div>
-      )
+export const VaccinationColumnExtensions = (
+  viewOnly = false,
+  inventoryvaccination = [],
+  handleSelectedBatch = () => { },
+) => [
+    {
+      columnName: 'name',
+      render: (row) => {
+        return (
+          <div style={{ position: 'relative' }}>
+            <div
+              style={{
+                wordWrap: 'break-word',
+                whiteSpace: 'pre-wrap',
+              }}
+            >
+              {row.name}
+              {lowStockIndicator(row)}
+            </div>
+          </div>
+        )
+      },
     },
-  },
-  {
-    columnName: 'dispensedQuanity',
-    type: 'number',
-    width: columnWidth,
-    render: (row) => {
-      return (
-        <p>
-          {row.dispensedQuanity} {row.dispenseUOM}
-        </p>
-      )
+    {
+      columnName: 'dispensedQuanity',
+      type: 'number',
+      width: columnWidth,
+      render: (row) => {
+        return (
+          <p>
+            {row.dispensedQuanity} {row.dispenseUOM}
+          </p>
+        )
+      },
     },
-  },
-  { columnName: 'unitPrice', width: columnWidth, type: 'currency' },
-  {
-    columnName: 'totalAfterItemAdjustment',
-    width: columnWidth,
-    type: 'currency',
-  },
-  {
-    columnName: 'adjAmt',
-    width: columnWidth,
-    type: 'currency',
-  },
-  {
-    columnName: 'batchNo',
-    width: 150,
-    render: (row) => {
-      return (
-        <FastField
-          name={`vaccination[${row.rowIndex}]batchNo`}
-          render={(args) => {
-            const restProps = viewOnly ? { value: row.batchNo } : { ...args }
-            return (
-              <TextField
-                simple
-                text={viewOnly}
-                disabled={viewOnly}
-                {...restProps}
-              />
-            )
-          }}
-        />
-      )
+    { columnName: 'unitPrice', width: columnWidth, type: 'currency' },
+    {
+      columnName: 'totalAfterItemAdjustment',
+      width: columnWidth,
+      type: 'currency',
     },
-  },
-  {
-    columnName: 'expiryDate',
-    width: 130,
-    render: (row) => {
-      return (
-        <FastField
-          name={`vaccination[${row.rowIndex}]expiryDate`}
-          render={(args) => {
-            const restProps = viewOnly ? { value: row.expiryDate } : { ...args }
-            return (
-              <DatePicker
-                disabledDate={(d) => !d || d.isBefore(moment().add('days', -1))}
-                text={viewOnly}
-                disabled={viewOnly}
-                simple
-                {...restProps}
-              />
-            )
-          }}
-        />
-      )
+    {
+      columnName: 'adjAmt',
+      width: columnWidth,
+      type: 'currency',
     },
-  },
-  {
-    columnName: 'action',
-    width: 80,
-    render: () => <div />,
-  },
-]
+    {
+      columnName: 'batchNo',
+      width: 150,
+      render: (row) => {
+        const currentItem = inventoryvaccination.find(
+          (o) => o.id === row.inventoryVaccinationFK,
+        )
+        let batchNoOptions = []
+        if (currentItem) {
+          batchNoOptions = currentItem.vaccinationStock
+        }
+
+        return (
+          <FastField
+            name={`vaccination[${row.rowIndex}]batchNo`}
+            render={(args) => {
+              const restProps = viewOnly ? { value: row.batchNo } : { ...args }
+              return (
+                <Select
+                  simple
+                  options={batchNoOptions}
+                  mode='tags'
+                  // valueField='id'
+                  valueField='batchNo'
+                  labelField='batchNo'
+                  maxSelected={1}
+                  disableAll
+                  disabled={viewOnly}
+                  onChange={(e, op = {}) => handleSelectedBatch(e, op, row)}
+                  {...restProps}
+                />
+              )
+              // return (
+              //   <TextField
+              //     simple
+              //     text={viewOnly}
+              //     disabled={viewOnly}
+              //     {...restProps}
+              //   />
+              // )
+            }}
+          />
+        )
+      },
+    },
+    {
+      columnName: 'expiryDate',
+      width: 130,
+      render: (row) => {
+        return (
+          <FastField
+            name={`vaccination[${row.rowIndex}]expiryDate`}
+            render={(args) => {
+              const restProps = viewOnly ? { value: row.expiryDate } : { ...args }
+              return (
+                <DatePicker
+                  disabledDate={(d) => !d || d.isBefore(moment().add('days', -1))}
+                  text={viewOnly}
+                  disabled={viewOnly}
+                  simple
+                  {...restProps}
+                />
+              )
+            }}
+          />
+        )
+      },
+    },
+    {
+      columnName: 'action',
+      width: 80,
+      render: () => <div />,
+    },
+  ]
 
 export const OtherOrdersColumns = [
   {
@@ -400,13 +457,16 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     render: (row) => {
       return (
         <Tooltip title={row.description}>
-          <div
-            style={{
-              wordWrap: 'break-word',
-              whiteSpace: 'pre-wrap',
-            }}
-          >
-            {row.description}
+          <div style={{ position: 'relative' }}>
+            <div
+              style={{
+                wordWrap: 'break-word',
+                whiteSpace: 'pre-wrap',
+              }}
+            >
+              {row.description}
+              {lowStockIndicator(row)}
+            </div>
           </div>
         </Tooltip>
       )
@@ -421,7 +481,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
         return 'N/A'
-      return <NumberInput text currency value={row.unitPrice} />
+      return <NumberInput text currency showZero value={row.unitPrice} />
     },
   },
   {
@@ -433,7 +493,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
         return 'N/A'
-      return <NumberInput text currency value={row.adjAmt} />
+      return <NumberInput text currency showZero value={row.adjAmt} />
     },
   },
   {
@@ -445,7 +505,14 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
         return 'N/A'
-      return <NumberInput text currency value={row.totalAfterItemAdjustment} />
+      return (
+        <NumberInput
+          text
+          currency
+          showZero
+          value={row.totalAfterItemAdjustment}
+        />
+      )
     },
   },
   {
@@ -454,6 +521,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     width: 80,
     render: (r) => {
       const { type } = r
+
       if (type === 'Service' || type === 'Consumable' || type === 'Treatment')
         return null
       return (
@@ -462,7 +530,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
             color='primary'
             justIcon
             onClick={() => {
-              onPrint(type, r)
+              onPrint({ type: CONSTANTS.DOCUMENTS, row: r })
             }}
           >
             <Print />
@@ -472,3 +540,136 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     },
   },
 ]
+
+
+export const DrugLabelSelectionColumns = [
+  {
+    name: 'code',
+    title: 'Code',
+  },
+  {
+    name: 'name',
+    title: 'Description',
+  },
+  {
+    name: 'instruction',
+    title: 'Instructions',
+  },
+  {
+    name: 'dispensedQuanity',
+    title: 'Qty Dispensed',
+  },
+  {
+    name: 'no',
+    title: 'No. Of Label',
+  },
+  {
+    name: 'print',
+    title: 'Print',
+  },
+]
+
+export const DrugLabelSelectionColumnExtensions = (
+  handleDrugLabelSelected, handleDrugLabelNoChanged
+) => [
+  {
+    columnName: 'code',
+    width: 150,
+    render: (row) => {
+      return (
+        <div style={{ position: 'relative' }}>
+          <div
+            style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+            }}
+          >
+            {row.name}
+          </div>
+        </div>
+      )
+    },
+  },
+    {
+      columnName: 'name',
+      width: 210,
+      render: (row) => {
+        return (
+          <div style={{ position: 'relative' }}>
+            <div
+              style={{
+                wordWrap: 'break-word',
+                whiteSpace: 'pre-wrap',
+              }}
+            >
+              {row.name}
+            </div>
+          </div>
+        )
+      },
+    },
+    {
+      columnName: 'instruction',
+      width: 260,
+      render: (row) => {
+        return (
+          <div
+            style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+            }}
+          >
+            {row.instruction}
+          </div>
+        )
+      },
+    },
+    {
+      columnName: 'dispensedQuanity',
+      type: 'number',
+      width: 100,
+      render: (row) => {
+        return (
+          <p>
+            {row.dispensedQuanity} {row.dispenseUOM}
+          </p>
+        )
+      },
+    },
+    {
+      columnName: 'no',
+      type: 'number',
+      width: 100,
+      render: (row) => {
+        return (
+          <p>
+            <NumberInput
+              max={99}
+              precision={0}
+              min={1}
+              value={row.no}
+              defaultValue={1}
+              onChange={(obj) => {
+                handleDrugLabelNoChanged(row.id, obj.target.value)
+              }}
+            />
+          </p>
+        )
+      },
+    },
+    {
+      columnName: 'print',
+      align: 'center',
+      width: 80,
+      render: (row) => {
+        return (
+          <Checkbox onChange={(obj) => {
+            handleDrugLabelSelected(row.id, obj.target.value)
+          }}          
+            checked={row.selected}
+            simple
+          />
+        )
+      },
+    },
+  ]

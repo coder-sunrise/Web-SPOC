@@ -1,22 +1,32 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, Fragment } from 'react'
 import { connect } from 'dva'
 // material ui
 import AttachFile from '@material-ui/icons/AttachFile'
-import { withStyles } from '@material-ui/core'
+import {
+  withStyles,
+  MenuList,
+  Popper,
+  Paper,
+  Grow,
+  ClickAwayListener,
+  MenuItem,
+} from '@material-ui/core'
 // common components
 import { Button, CardContainer, Danger, GridContainer } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
 // sub components
-import Thumbnail from './Thumbnail'
 import {
   downloadAttachment,
   uploadFile,
   deleteFileByFileID,
 } from '@/services/file'
 import { convertToBase64 } from '@/utils/utils'
-import { FILE_STATUS, FILE_CATEGORY } from '@/utils/constants'
+import { FILE_STATUS, FILE_CATEGORY, ATTACHMENT_TYPE } from '@/utils/constants'
+import { corAttchementTypes } from '@/utils/codes'
+import Authorized from '@/utils/Authorized'
 import { getThumbnail } from './utils'
 import styles from './styles'
+import Thumbnail from './Thumbnail'
 
 const allowedFiles = '.png, .jpg, .jpeg, .xls, .xlsx, .doc, .docx, .pdf'
 
@@ -31,6 +41,7 @@ const AttachmentWithThumbnail = ({
   label,
   handleUpdateAttachments,
   isReadOnly,
+  disableUpload,
   buttonOnly = false,
   attachments = [],
   filterTypes = [],
@@ -38,12 +49,27 @@ const AttachmentWithThumbnail = ({
   simple = false,
   local = false,
   attachmentType = '',
+  fieldName,
   thumbnailSize = {
     height: 64,
     width: 64,
   },
   renderBody = undefined,
+  maxFilesAllowUpload,
+  restrictFileTypes = [],
+  fileCategory,
+  withDropDown,
+  handleSelectedAttachmentType,
+  hideRemarks = false,
 }) => {
+  const [
+    showPopper,
+    setShowPopper,
+  ] = useState(false)
+  let popperRef = useRef(null)
+
+  const type = corAttchementTypes.find((o) => o.type === attachmentType) || {}
+
   const fileAttachments = attachments.filter(
     (attachment) =>
       (!attachmentType ||
@@ -69,55 +95,22 @@ const AttachmentWithThumbnail = ({
     setDownlaoding,
   ] = useState(false)
 
-  const mapFileToUploadObject = async (file) => {
-    // file type and file size validation
-    const base64 = await convertToBase64(file)
-    const fileStatusFK = FILE_STATUS.UPLOADED
-    const fileExtension = getFileExtension(file.name)
-
-    let thumbnailData
-    if (
-      [
-        'jpg',
-        'jpeg',
-        'png',
-      ].includes(fileExtension)
-    ) {
-      const imgEle = document.createElement('img')
-      imgEle.src = `data:image/${fileExtension};base64,${base64}`
-      await setTimeout(() => {
-        // wait for 1 milli second for img to set src successfully
-      }, 100)
-      const thumbnail = getThumbnail(imgEle, thumbnailSize)
-      thumbnailData = thumbnail.toDataURL(`image/png`)
-    }
-
-    const uploadObject = {
-      fileName: file.name,
-      fileSize: file.size,
-      fileCategoryFK: FILE_CATEGORY.VISITREG,
-      content: base64,
-      fileExtension,
-      thumbnailData,
-      fileStatusFK,
-      attachmentType,
-    }
-    const uploaded = local ? {} : await uploadFile(uploadObject)
-
-    return {
-      ...uploaded,
-      attachmentType,
-      content: base64,
-      thumbnailData,
-      isbase64: true,
-    }
+  const stopUploading = (reason) => {
+    setErrorText(reason)
+    setUploading(false)
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        disableSave: false,
+      },
+    })
   }
 
   const mapToFileDto = async (file) => {
     // file type and file size validation
     const base64 = await convertToBase64(file)
     const fileStatusFK = FILE_STATUS.UPLOADED
-    const fileExtension = getFileExtension(file.name)
+    const fileExtension = getFileExtension(file.name).toLowerCase()
     let _thumbnailDto
     if (
       [
@@ -148,12 +141,13 @@ const AttachmentWithThumbnail = ({
     const originalFile = {
       fileName: file.name,
       fileSize: file.size,
-      fileCategoryFK: FILE_CATEGORY.VISITREG,
+      fileCategoryFK: fileCategory || FILE_CATEGORY.VISITREG,
       content: base64,
       thumbnail: _thumbnailDto,
       fileExtension,
       fileStatusFK,
       attachmentType,
+      attachmentTypeFK: type.id,
     }
 
     return originalFile
@@ -194,6 +188,26 @@ const AttachmentWithThumbnail = ({
         ...files,
       ]
 
+      const currentFilesLength = filesArray.length + attachments.length
+
+      if (maxFilesAllowUpload && currentFilesLength > maxFilesAllowUpload) {
+        stopUploading(`Cannot upload more than ${maxFilesAllowUpload} files`)
+        return
+      }
+
+      if (restrictFileTypes.length > 0) {
+        const invalidFileExist = filesArray.some(
+          (file) => !restrictFileTypes.includes(file.type),
+        )
+
+        if (invalidFileExist) {
+          stopUploading(
+            `Only the file types (${restrictFileTypes.toString()}) are allowed`,
+          )
+          return
+        }
+      }
+
       filesArray &&
         filesArray.forEach((o) => {
           totalFilesSize += o.size
@@ -205,14 +219,7 @@ const AttachmentWithThumbnail = ({
       })
 
       if (totalFilesSize > maxUploadSize) {
-        setErrorText('Cannot upload more than 30MB')
-        setUploading(false)
-        dispatch({
-          type: 'global/updateState',
-          payload: {
-            disableSave: false,
-          },
-        })
+        stopUploading('Cannot upload more than 30MB')
         return
       }
 
@@ -268,27 +275,100 @@ const AttachmentWithThumbnail = ({
     setDownlaoding(false)
   }
 
+  const handlePopper = () => {
+    setShowPopper(!showPopper)
+  }
+
+  const onDropDownClick = (selectedAttachmentType) => {
+    handleSelectedAttachmentType(selectedAttachmentType)
+    onUploadClick()
+  }
+
   let UploadButton = (
-    <Button
-      color='rose'
-      size='sm'
-      onClick={onUploadClick}
-      disabled={uploading || global.disableSave}
-      className={classes.uploadBtn}
-    >
-      <AttachFile /> Upload
-    </Button>
+    <Fragment>
+      {withDropDown ? (
+        <Fragment>
+          <Button
+            color='rose'
+            size='sm'
+            onClick={handlePopper}
+            disabled={isReadOnly || uploading || global.disableSave}
+            className={fileAttachments.length >= 1 ? classes.uploadBtn : ''}
+            buttonRef={(node) => {
+              popperRef = node
+            }}
+          >
+            <AttachFile /> Upload
+          </Button>
+          <Popper
+            open={showPopper}
+            anchorEl={popperRef}
+            transition
+            disablePortal
+            placement='bottom-end'
+            style={{
+              zIndex: 999,
+              marginTop: 65,
+              marginLeft: 8,
+              fontSize: '1em',
+            }}
+          >
+            {({ TransitionProps, placement }) => (
+              <Grow
+                {...TransitionProps}
+                id='menu-list'
+                style={{ transformOrigin: '0 0 -30' }}
+              >
+                <Paper className={classes.dropdown}>
+                  <ClickAwayListener onClickAway={handlePopper}>
+                    <MenuList role='menu'>
+                      <MenuItem
+                        onClick={() =>
+                          onDropDownClick(ATTACHMENT_TYPE.CLINICALNOTES)}
+                      >
+                        Consultation Attachment
+                      </MenuItem>
+                      <Authorized authority='queue.consultation.widgets.eyevisualacuity'>
+                        <MenuItem
+                          onClick={() =>
+                            onDropDownClick(ATTACHMENT_TYPE.EYEVISUALACUITY)}
+                        >
+                          Visual Acuity Test
+                        </MenuItem>
+                      </Authorized>
+                    </MenuList>
+                  </ClickAwayListener>
+                </Paper>
+              </Grow>
+            )}
+          </Popper>
+        </Fragment>
+      ) : (
+        <Button
+          color='rose'
+          size='sm'
+          onClick={onUploadClick}
+          disabled={isReadOnly || uploading || global.disableSave}
+          className={fileAttachments.length >= 1 ? classes.uploadBtn : ''}
+        >
+          <AttachFile /> Upload
+        </Button>
+      )}
+    </Fragment>
   )
 
   if (!allowedMultiple && fileAttachments.length >= 1) UploadButton = null
 
   const commonProps = {
+    dispatch,
     isReadOnly,
     simple,
     size: thumbnailSize,
     onConfirmDelete: onDelete,
     onClickAttachment: onClick,
     noBorder: simple && !allowedMultiple,
+    fieldName,
+    hideRemarks,
   }
 
   let Body =
@@ -296,9 +376,17 @@ const AttachmentWithThumbnail = ({
       <CardContainer hideHeader styles={cardStyles}>
         <GridContainer>
           {fileAttachments.map((attachment, index) => {
+            let indexInAllAttachments = attachments.findIndex(
+              (item) => item.id === attachment.id,
+            )
+            if (attachment.fileIndexFK)
+              indexInAllAttachments = attachments.findIndex(
+                (item) => item.fileIndexFK === attachment.fileIndexFK,
+              )
             return (
               <Thumbnail
                 index={index}
+                indexInAllAttachments={indexInAllAttachments}
                 attachment={attachment}
                 {...commonProps}
               />
@@ -336,7 +424,7 @@ const AttachmentWithThumbnail = ({
         onChange={onFileChange}
         onClick={clearValue}
       />
-      {UploadButton}
+      {!isReadOnly && UploadButton}
       {errorText && (
         <Danger style={{ display: 'inline-block' }}>
           <span style={{ fontWeight: 500 }}>{errorText}</span>

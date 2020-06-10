@@ -3,34 +3,48 @@ import { withStyles, Paper } from '@material-ui/core'
 import { connect } from 'dva'
 import moment from 'moment'
 import { withFormikExtend, Tabs, serverDateFormat } from '@/components'
-import { StatementDetailOption } from './variables'
-import DetailsHeader from './DetailsHeader'
 import Yup from '@/utils/yup'
 import { PAYMENT_MODE, DEFAULT_PAYMENT_MODE_GIRO } from '@/utils/constants'
 import { roundToPrecision } from '@/utils/codes'
 import { getBizSession } from '@/services/queue'
+import DetailsHeader from './DetailsHeader'
+import { StatementDetailOption } from './variables'
 
 const styles = () => ({})
-@connect(({ statement, user }) => ({
+@connect(({ statement, user, codetable }) => ({
   statement,
   user,
+  codetable,
 }))
 @withFormikExtend({
   enableReinitialize: true,
   mapPropsToValues: ({ statement }) => {
     const returnValue = statement.entity || statement
     let newStatementInvoice = []
-    let total = 0
-    let adminChargeValue = 0
+    let totalOS = 0
+    let adminChargeValueField = 0
+    let adjustmentValueField = 0
+    let sumTotalPayableAmount = 0
     if (returnValue.statementInvoice) {
       newStatementInvoice = returnValue.statementInvoice.map((o) => {
-        const { statementInvoicePayment, adminCharge, outstandingAmount } = o
-        total += outstandingAmount
-        adminChargeValue += adminCharge
-
+        const {
+          statementInvoicePayment,
+          adminCharge,
+          outstandingAmount,
+          statementAdjustment,
+          creditNoteAmount = 0,
+          payableAmount = 0,
+        } = o
+        const totalPayableAmount =
+          payableAmount - creditNoteAmount - adminCharge - statementAdjustment
+        sumTotalPayableAmount += totalPayableAmount
+        totalOS += outstandingAmount
+        adminChargeValueField += adminCharge
+        adjustmentValueField += statementAdjustment
         return {
           ...o,
           tempOutstandingAmount: o.outstandingAmount,
+          totalPayableAmount,
           statementInvoicePayment: [
             ...statementInvoicePayment,
           ],
@@ -38,15 +52,19 @@ const styles = () => ({})
       })
     }
 
-    const outstandingBalance =
-      returnValue.totalAmount - returnValue.collectedAmount - adminChargeValue
+    const outstandingBalance = totalOS
+    // returnValue.totalAmount - returnValue.collectedAmount
+    // - adminChargeValueField
+    // - adjustmentValueField
 
     return {
       ...returnValue,
+      totalPayableAmount: sumTotalPayableAmount,
       outstandingBalance,
-      adminChargeValue,
-      amount: Number(total).toFixed(2),
-      maxAmount: Number(total).toFixed(2),
+      adminChargeValueField,
+      adjustmentValueField,
+      amount: Number(totalOS).toFixed(2),
+      maxAmount: Number(totalOS).toFixed(2),
       paymentModeFK: DEFAULT_PAYMENT_MODE_GIRO.PAYMENT_FK, // GIRO
       displayValue: DEFAULT_PAYMENT_MODE_GIRO.DISPLAY_VALUE,
       statementInvoice: newStatementInvoice,
@@ -61,13 +79,19 @@ const styles = () => ({})
     }),
   }),
   handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, history, user } = props
+    const { dispatch, onConfirm, history, user, codetable } = props
     const {
       paymentCreatedBizSessionFK,
       paymentModeFK,
       displayValue,
       paymentDate,
+      remarks,
+      cardNumber,
+      creditCardTypeFK,
+      refNo,
+      chequeNo,
     } = values
+
     const paymentReceivedByUserFK = user.data.id
     let newPaymentStatementInvoice = values.statementInvoice.filter(
       (o) =>
@@ -85,6 +109,26 @@ const styles = () => ({})
         Math.abs(paymentAmt - roundToPrecision(paymentAmt, 0.05)).toFixed(2),
       )
       const { invoicePayment, statementInvoiceFK } = newInvoicePayment
+      let cardPayment = null
+      let chequePayment = null
+      let giroPayment = null
+      let netsPayment = null
+      if (paymentModeFK === 1) {
+        let creditCardType = codetable.ctcreditcardtype.find(
+          (item) => item.id === creditCardTypeFK,
+        ).name
+        cardPayment = {
+          creditCardNo: cardNumber,
+          creditCardTypeFK,
+          creditCardType,
+        }
+      } else if (paymentModeFK === 2) {
+        chequePayment = { chequeNo }
+      } else if (paymentModeFK === 5) {
+        giroPayment = { refNo }
+      } else if (paymentModeFK === 4) {
+        netsPayment = { refNo }
+      }
       newInvoicePayment = {
         ...invoicePayment,
         paymentCreatedBizSessionFK,
@@ -99,6 +143,11 @@ const styles = () => ({})
             amt: invoicePayment.totalAmtPaid,
             paymentMode: displayValue,
             cashRouding: isCashPayment ? roundingAmt : 0,
+            remark: remarks,
+            giroPayment,
+            chequePayment,
+            creditCardPayment: cardPayment,
+            netsPayment,
           },
         ],
       }
@@ -159,14 +208,12 @@ class StatementDetails extends PureComponent {
     const { statement, dispatch, history } = this.props
     if (statement.currentId) {
       dispatch({
-        type: 'statement/queryOne',
+        type: 'statement/refreshStatement',
         payload: {
           id: statement.currentId,
         },
-      }).then((v) => {
-        if (v) {
-          this.fetchLatestBizSessions()
-        }
+      }).then((response) => {
+        if (response) this.fetchLatestBizSessions()
       })
     } else {
       history.push('/finance/statement/')

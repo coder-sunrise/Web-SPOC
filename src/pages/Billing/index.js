@@ -18,21 +18,21 @@ import {
   OutlinedTextField,
 } from '@/components'
 import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
+// common utils
+import { roundTo } from '@/utils/utils'
+import { INVOICE_PAYER_TYPE } from '@/utils/constants'
+import Authorized from '@/utils/Authorized'
 // sub component
 import PatientBanner from '@/pages/PatientDashboard/Banner'
-import DispenseDetails from '@/pages/Dispense/DispenseDetails/PrintDrugLabelWrapper'
-// import ApplyClaims from './components/ApplyClaims'
+import DispenseDetails from '@/pages/Dispense/DispenseDetails/WebSocketWrapper'
 import ApplyClaims from './refactored/newApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 import SchemeValidationPrompt from './components/SchemeValidationPrompt'
-// utils
+// page utils
 import {
   constructPayload,
   validateApplySchemesWithPatientSchemes,
 } from './utils'
-import { roundTo } from '@/utils/utils'
-import { INVOICE_PAYER_TYPE } from '@/utils/constants'
-
 // window.g_app.replaceModel(model)
 
 const styles = (theme) => ({
@@ -58,6 +58,7 @@ const styles = (theme) => ({
   },
 })
 
+// @Authorized.Secured('queue.dispense.makepayment')
 @connect(
   ({
     global,
@@ -82,6 +83,9 @@ const styles = (theme) => ({
   }),
 )
 @withFormikExtend({
+  // authority: [
+  //   'queue.dispense.makepayment',
+  // ],
   notDirtyDuration: 3,
   displayName: 'BillingForm',
   enableReinitialize: true,
@@ -122,6 +126,7 @@ const styles = (theme) => ({
     return { ...billing.default, visitId: billing.visitID }
   },
 })
+@Authorized.Secured('queue.dispense.makepayment')
 class Billing extends Component {
   state = {
     showReport: false,
@@ -133,10 +138,13 @@ class Billing extends Component {
       patient: [],
       billing: [],
     },
+    showDrugLabelSelection: false,
+    selectedDrugs: [],
   }
 
-  componentDidMount () {
-    const { history, dispatch } = this.props
+  componentWillMount () {
+    const { billing, history, dispatch } = this.props
+    const { patientID } = billing
     const { query } = history.location
     dispatch({
       type: 'codetable/fetchCodes',
@@ -162,6 +170,12 @@ class Billing extends Component {
   componentWillUnmount () {
     this.props.dispatch({
       type: 'billing/updateState',
+      payload: {
+        entity: null,
+      },
+    })
+    this.props.dispatch({
+      type: 'dispense/updateState',
       payload: {
         entity: null,
       },
@@ -287,10 +301,27 @@ class Billing extends Component {
   }
 
   onCompletePaymentClick = async () => {
-    const { setFieldValue } = this.props
+    const { dispatch, values, setFieldValue } = this.props
     await setFieldValue('mode', 'save')
     await setFieldValue('visitStatus', 'COMPLETED')
-    this.upsertBilling()
+
+    // check if invoice is OVERPAID and prompt user for confirmation
+    const { invoice } = values
+    const { outstandingBalance = 0 } = invoice
+    if (outstandingBalance < 0) {
+      return dispatch({
+        type: 'global/updateState',
+        payload: {
+          openConfirm: true,
+          openConfirmTitle: '',
+          openConfirmText: 'Confirm',
+          openConfirmContent:
+            'Invoice is overpaid. Confirm to complete billing?',
+          onConfirmSave: this.upsertBilling,
+        },
+      })
+    }
+    return this.upsertBilling()
   }
 
   onPrintReceiptClick = (invoicePaymentID) => {
@@ -414,6 +445,47 @@ class Billing extends Component {
     }))
   }
 
+  handleDrugLabelClick = () => {
+    const { dispense } = this.props
+    console.log('dispense')
+    console.log(dispense)
+    const { prescription = [] } = dispense.entity
+    this.setState((prevState) => {
+      return {
+        showDrugLabelSelection: !prevState.showDrugLabelSelection,
+        selectedDrugs: prescription.map((x) => {
+          return { ...x, no: 1, selected: true }
+        }),
+      }
+    })
+  }
+
+  handleDrugLabelSelectionClose = () => {
+    this.setState((prevState) => {
+      return {
+        showDrugLabelSelection: !prevState.showDrugLabelSelection,
+      }
+    })
+  }
+
+  handleDrugLabelSelected = (itemId, selected) => {
+    this.setState((prevState) => ({
+      selectedDrugs: prevState.selectedDrugs.map(
+        (drug) => (drug.id === itemId ? { ...drug, selected } : { ...drug }),
+      ),
+    }))
+    this.props.dispatch({ type: 'global/incrementCommitCount' })
+  }
+
+  handleDrugLabelNoChanged = (itemId, no) => {
+    this.setState((prevState) => ({
+      selectedDrugs: prevState.selectedDrugs.map(
+        (drug) => (drug.id === itemId ? { ...drug, no } : { ...drug }),
+      ),
+    }))
+    this.props.dispatch({ type: 'global/incrementCommitCount' })
+  }
+
   render () {
     const {
       showReport,
@@ -466,6 +538,16 @@ class Billing extends Component {
                         viewOnly
                         values={dispense.entity}
                         dispatch={this.props.dispatch}
+                        onDrugLabelClick={this.handleDrugLabelClick}
+                        showDrugLabelSelection={
+                          this.state.showDrugLabelSelection
+                        }
+                        onDrugLabelSelectionClose={
+                          this.handleDrugLabelSelectionClose
+                        }
+                        onDrugLabelSelected={this.handleDrugLabelSelected}
+                        onDrugLabelNoChanged={this.handleDrugLabelNoChanged}
+                        selectedDrugs={this.state.selectedDrugs}
                       />
                     </div>
                   ),
@@ -520,7 +602,7 @@ class Billing extends Component {
               }}
             />
           </GridItem>
-          <GridItem md={4}>
+          <GridItem md={4} style={{ paddingRight: 0 }}>
             <React.Fragment>
               <div className={classes.paymentButton}>
                 <Button

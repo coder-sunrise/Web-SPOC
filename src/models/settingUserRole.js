@@ -1,0 +1,116 @@
+import { createListViewModel } from 'medisys-model'
+import moment from 'moment'
+import * as service from '@/pages/Setting/UserRole/services'
+
+const defaultDates = {
+  effectiveStartDate: moment().formatUTC(),
+  effectiveEndDate: moment('2099-12-31T23:59:59').formatUTC(false),
+}
+
+const compare = (a, b) => {
+  const f = a.module.localeCompare(b.module)
+  if (f !== 0) return f
+  return a.sortOrder - b.sortOrder
+}
+
+export default createListViewModel({
+  namespace: 'settingUserRole',
+  config: {
+    queryOnLoad: false,
+  },
+  param: {
+    service,
+    state: {
+      list: [],
+      currentSelectedUserRole: {
+        filteredAccessRight: [],
+        ...defaultDates,
+      },
+    },
+    effects: {
+      *fetchUserRoleByID ({ payload }, { call, put }) {
+        const response = yield call(service.getUserRoleById, payload)
+        const { isEdit } = payload
+        let { data = {}, status } = response
+        const { id, ...result } = data
+
+        if (isEdit) {
+          return yield put({
+            type: 'updateUserRole',
+            data: { ...data },
+          })
+        }
+
+        data = result
+        return yield put({
+          type: 'loadAccessRight',
+          data: [
+            ...data.roleClientAccessRight,
+          ],
+        })
+      },
+      *fetchDefaultAccessRight ({ payload }, { call, put }) {
+        const response = yield call(service.getAccessRight)
+        const { data = [], status } = response
+
+        const resultData = data.map((d) => {
+          const permission =
+            (d.type === 'Module' && 'ReadWrite') ||
+            (d.type === 'Action' && 'Enable') ||
+            (d.type === 'Field' && 'ReadWrite') ||
+            'ReadWrite'
+          return {
+            permission: d.permission || permission,
+            ...d,
+          }
+        })
+
+        return yield put({
+          type: 'loadAccessRight',
+          data: [
+            ...resultData,
+          ],
+        })
+      },
+      *fetchActiveUsers ({ payload }, { call, put }) {
+        try {
+          const response = yield call(service.getActiveUsers)
+          const { data } = response
+          return data
+        } catch (error) {
+          console.log(error)
+          return false
+        }
+      },
+    },
+
+    reducers: {
+      updateUserRole (state, { data }) {
+        return {
+          ...state,
+          currentSelectedUserRole: {
+            ...data,
+            filteredAccessRight: data.roleClientAccessRight
+              .filter(
+                (m) =>
+                  !data.clinicRoleFK ||
+                  m.clinicRoleBitValue >= 2 ** (data.clinicRoleFK - 1),
+              )
+              .sort(compare),
+          },
+        }
+      },
+      loadAccessRight (state, { data }) {
+        return {
+          ...state,
+          currentSelectedUserRole: {
+            isUserMaintainable: true,
+            filteredAccessRight: data.sort(compare),
+            roleClientAccessRight: data.sort(compare),
+            ...defaultDates,
+          },
+        }
+      },
+    },
+  },
+})

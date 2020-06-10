@@ -28,6 +28,7 @@ import {
   Info,
 } from '@/components'
 import { getAppendUrl } from '@/utils/utils'
+import Authorized from '@/utils/Authorized'
 import Block from './Block'
 import HistoryDiagnosis from './HistoryDiagnosis'
 import { control } from '@/components/Decorator'
@@ -164,10 +165,15 @@ class Banner extends PureComponent {
     const { currPatientCoPaymentSchemeFK, currentSchemeType } = this.state
     let patientCoPaymentSchemeFK = currPatientCoPaymentSchemeFK
     let oldSchemeTypeFK = currentSchemeType
-
+    let isSaveToDb = true
     dispatch({
       type: 'patient/refreshChasBalance',
-      payload: { ...entity, patientCoPaymentSchemeFK },
+      payload: {
+        ...entity,
+        patientCoPaymentSchemeFK,
+        isSaveToDb,
+        patientProfileId: entity.id,
+      },
     }).then((result) => {
       // console.log('result ==========', result)
       if (result) {
@@ -370,6 +376,10 @@ class Banner extends PureComponent {
       }
     }
     const year = Math.floor(moment.duration(moment().diff(info.dob)).asYears())
+
+    const viewPatientProfileAccess = Authorized.check(
+      'patientdatabase.patientprofiledetails',
+    )
     return (
       // <Affix target={() => window.mainPanel} offset={headerHeight + 1}>
       <Paper style={style}>
@@ -390,6 +400,11 @@ class Banner extends PureComponent {
                       cmt: 1,
                       pid: info.id,
                     })}
+                    disabled={
+                      !viewPatientProfileAccess ||
+                      (viewPatientProfileAccess &&
+                        viewPatientProfileAccess.rights !== 'enable')
+                    }
                     tabIndex='-1'
                   >
                     <Tooltip title={name} placement='bottom-start'>
@@ -491,7 +506,8 @@ class Banner extends PureComponent {
                 }
                 body={
                   <div>
-                    {entity.patientScheme.length &&
+                    {entity.patientScheme &&
+                    entity.patientScheme.length > 0 &&
                     entity.patientScheme.filter((o) => o.schemeTypeFK <= 6)
                       .length > 0 ? (
                       entity.patientScheme

@@ -18,7 +18,7 @@ import {
   TextField,
 } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
-import PrintLabLabelButton from './PatientLabLabelBtn'
+import PrintLabLabelButton from './PatientLabelBtn'
 // assets
 import styles from './styles.js'
 
@@ -43,11 +43,15 @@ class PatientInfoSideBanner extends PureComponent {
 
   refreshChasBalance = (patientCoPaymentSchemeFK, oldSchemeTypeFK) => {
     const { dispatch, entity, setValues } = this.props
+    const isSaveToDb = true
+
     dispatch({
       type: 'patient/refreshChasBalance',
       payload: {
         ...entity,
         patientCoPaymentSchemeFK,
+        isSaveToDb,
+        patientProfileId: entity.id,
       },
     }).then((result) => {
       if (result) {
@@ -115,26 +119,34 @@ class PatientInfoSideBanner extends PureComponent {
     ) {
       return { ...this.state.refreshedSchemeData }
     }
-    // Scheme Balance
-    const balance =
-      schemeData.patientSchemeBalance.length <= 0
-        ? undefined
-        : schemeData.patientSchemeBalance[0].balance
-    // Patient Acute Visit Patient Balance
-    const acuteVPBal =
-      schemeData.patientSchemeBalance.length <= 0
-        ? undefined
-        : schemeData.patientSchemeBalance[0].acuteVisitPatientBalance
-    // Patient Acute Visit Clinic Balance
-    const acuteVCBal =
-      schemeData.patientSchemeBalance.length <= 0
-        ? undefined
-        : schemeData.patientSchemeBalance[0].acuteVisitClinicBalance
 
-    const chronicStatus =
-      schemeData.patientSchemeBalance.length <= 0
-        ? undefined
-        : schemeData.patientSchemeBalance[0].chronicBalanceStatusCode
+    let balance = ''
+    let acuteVPBal = ''
+    let acuteVCBal = ''
+    let chronicStatus = ''
+
+    if (!schemeData.isNew) {
+      // Scheme Balance
+      balance =
+        schemeData.patientSchemeBalance.length <= 0
+          ? undefined
+          : schemeData.patientSchemeBalance[0].balance
+      // Patient Acute Visit Patient Balance
+      acuteVPBal =
+        schemeData.patientSchemeBalance.length <= 0
+          ? undefined
+          : schemeData.patientSchemeBalance[0].acuteVisitPatientBalance
+      // Patient Acute Visit Clinic Balance
+      acuteVCBal =
+        schemeData.patientSchemeBalance.length <= 0
+          ? undefined
+          : schemeData.patientSchemeBalance[0].acuteVisitClinicBalance
+
+      chronicStatus =
+        schemeData.patientSchemeBalance.length <= 0
+          ? undefined
+          : schemeData.patientSchemeBalance[0].chronicBalanceStatusCode
+    }
 
     return {
       balance,
@@ -215,82 +227,86 @@ class PatientInfoSideBanner extends PureComponent {
           className={classes.schemeContainer}
           style={{ maxHeight: height - 455 - 20 }}
         >
-          {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6).map((o) => {
-            const schemeData = this.getSchemeDetails(o)
+          {entity.patientScheme
+            .filter((o) => o.schemeTypeFK <= 6 && !o.isDeleted)
+            .map((o) => {
+              const schemeData = this.getSchemeDetails(o)
 
-            return (
-              <LoadingWrapper loading={loading} text='Retrieving balance...'>
-                <div style={{ marginBottom: theme.spacing(1) }}>
-                  <p style={{ fontWeight: 500 }}>
-                    {/* <CodeSelect text code='ctSchemeType' value={o.schemeTypeFK} /> */}
-                    <CodeSelect
-                      text
-                      code='ctSchemeType'
-                      value={schemeData.schemeTypeFK}
-                    />
-                    <IconButton>
-                      <Refresh
-                        onClick={() =>
+              return (
+                <LoadingWrapper loading={loading} text='Retrieving balance...'>
+                  <div style={{ marginBottom: theme.spacing(1) }}>
+                    <p style={{ fontWeight: 500 }}>
+                      {/* <CodeSelect text code='ctSchemeType' value={o.schemeTypeFK} /> */}
+                      <CodeSelect
+                        text
+                        code='ctSchemeType'
+                        value={schemeData.schemeTypeFK}
+                      />
+                      <IconButton>
+                        <Refresh
+                          onClick={() =>
+                            this.refreshChasBalance(
+                              schemeData.patientCoPaymentSchemeFK,
+                              schemeData.schemeTypeFK,
+                            )}
+                        />
+                      </IconButton>
+
+                      <SchemePopover
+                        isShowReplacementModal={
+                          schemeData.isShowReplacementModal
+                        }
+                        handleRefreshChasBalance={() =>
                           this.refreshChasBalance(
                             schemeData.patientCoPaymentSchemeFK,
                             schemeData.schemeTypeFK,
                           )}
+                        entity={entity}
+                        schemeData={schemeData}
                       />
-                    </IconButton>
-
-                    <SchemePopover
-                      isShowReplacementModal={schemeData.isShowReplacementModal}
-                      handleRefreshChasBalance={() =>
-                        this.refreshChasBalance(
-                          schemeData.patientCoPaymentSchemeFK,
-                          schemeData.schemeTypeFK,
-                        )}
-                      entity={entity}
-                      schemeData={schemeData}
-                    />
-                  </p>
-                  {schemeData.validFrom && (
-                    <div>
-                      <p>
-                        {schemeData.chronicBalanceStatusCode !== 'SC105' ? (
-                          <NumberInput
-                            prefix='Balance:'
+                    </p>
+                    {schemeData.validFrom && (
+                      <div>
+                        <p>
+                          {schemeData.chronicBalanceStatusCode !== 'SC105' ? (
+                            <NumberInput
+                              prefix='Balance:'
+                              text
+                              currency
+                              value={schemeData.balance}
+                            />
+                          ) : (
+                            <TextField
+                              text
+                              prefix='Balance:'
+                              value='Full Balance'
+                            />
+                          )}
+                        </p>
+                        <p>
+                          <DatePicker
+                            prefix='Validity:'
                             text
-                            currency
-                            value={schemeData.balance}
-                          />
-                        ) : (
-                          <TextField
+                            format={dateFormatLong}
+                            // value={o.validFrom}
+                            value={schemeData.validFrom}
+                          />&nbsp; -&nbsp;
+                          <DatePicker
                             text
-                            prefix='Balance:'
-                            value='Full Balance'
+                            format={dateFormatLong}
+                            // value={o.validTo}
+                            value={schemeData.validTo}
                           />
-                        )}
-                      </p>
-                      <p>
-                        <DatePicker
-                          prefix='Validity:'
-                          text
-                          format={dateFormatLong}
-                          // value={o.validFrom}
-                          value={schemeData.validFrom}
-                        />&nbsp; -&nbsp;
-                        <DatePicker
-                          text
-                          format={dateFormatLong}
-                          // value={o.validTo}
-                          value={schemeData.validTo}
-                        />
-                      </p>
-                      <p style={{ color: 'red' }}>
-                        {schemeData.statusDescription}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </LoadingWrapper>
-            )
-          })}
+                        </p>
+                        <p style={{ color: 'red' }}>
+                          {schemeData.statusDescription}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </LoadingWrapper>
+              )
+            })}
         </div>
         {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).length > 0 && (
           <Divider light />

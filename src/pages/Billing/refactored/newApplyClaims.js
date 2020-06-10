@@ -6,6 +6,9 @@ import Add from '@material-ui/icons/AddCircle'
 import Reset from '@material-ui/icons/Cached'
 // common components
 import { CommonModal, Button, GridItem } from '@/components'
+// common utils
+import { roundTo } from '@/utils/utils'
+import { INVOICE_PAYER_TYPE, VISIT_TYPE } from '@/utils/constants'
 // import MedisaveSchemes from './MedisaveSchemes'
 import Scheme from './newScheme'
 import ResetButton from './ResetButton'
@@ -25,8 +28,6 @@ import {
   updateInvoicePayerPayableBalance,
   sortItemByID,
 } from './applyClaimUtils'
-import { roundTo } from '@/utils/utils'
-import { INVOICE_PAYER_TYPE, VISIT_TYPE } from '@/utils/constants'
 
 const defaultInvoicePayer = {
   _indexInClaimableSchemes: 0,
@@ -57,6 +58,7 @@ const ApplyClaims = ({
   patient,
   ctschemetype,
   ctcopaymentscheme,
+  noExtraOptions = false,
 }) => {
   const {
     invoice,
@@ -144,8 +146,14 @@ const ApplyClaims = ({
     incrementCommitCount()
   }
 
-  const handleSchemeChange = (value, index, invoicePayerList, invoiceItems) => {
-    const flattenSchemes = claimableSchemes.reduce(
+  const handleSchemeChange = (
+    value,
+    index,
+    invoicePayerList,
+    invoiceItems,
+    allSchemes,
+  ) => {
+    const flattenSchemes = allSchemes.reduce(
       (schemes, cs) => [
         ...schemes,
         ...cs.map((item) => ({ ...item })),
@@ -259,6 +267,7 @@ const ApplyClaims = ({
           _invoicePayer,
         ],
         invoice.invoiceItems,
+        claimableSchemes,
       )
     } else {
       setInitialState([])
@@ -300,7 +309,15 @@ const ApplyClaims = ({
   }
 
   const resetClaims = useCallback(
-    () => {
+    async () => {
+      const response = await dispatch({
+        type: 'billing/query',
+        payload: { id: values.visitId },
+      })
+
+      // abort early if failed to reset bill
+      if (!response) return
+
       const _newTempInvoicePayer = tempInvoicePayer.map((i) => ({
         ...i,
         _isDeleted: true,
@@ -309,11 +326,11 @@ const ApplyClaims = ({
         _isConfirmed: true,
         _isEditing: false,
       }))
-
-      if (claimableSchemes.length > 0) {
+      const { claimableSchemes: refreshedClaimableSchemes } = response
+      if (refreshedClaimableSchemes.length > 0) {
         const _invoicePayer = {
           ...defaultInvoicePayer,
-          claimableSchemes: claimableSchemes[0],
+          claimableSchemes: refreshedClaimableSchemes[0],
           payerTypeFK: INVOICE_PAYER_TYPE.SCHEME,
         }
         const newTempInvoicePayer = [
@@ -327,6 +344,7 @@ const ApplyClaims = ({
           newTempInvoicePayer.length - 1,
           newTempInvoicePayer,
           invoice.invoiceItems,
+          refreshedClaimableSchemes,
         )
       } else {
         setCurEditInvoicePayerBackup(undefined)
@@ -580,6 +598,8 @@ const ApplyClaims = ({
         invoicePayer.claimableSchemes[nestedIndex].id,
         newTempInvoicePayer.length - 1,
         newTempInvoicePayer,
+        undefined,
+        claimableSchemes,
       )
     }
     return setTempInvoicePayer(newTempInvoicePayer)
@@ -645,40 +665,17 @@ const ApplyClaims = ({
           <Reset />
           Reset
         </Button> */}
-        <ResetButton
-          disabled={visitPurposeFK === VISIT_TYPE.RETAIL}
-          handleResetClick={handleResetClick}
-          handleRestoreClick={handleRestoreClick}
-        />
+        {!noExtraOptions && (
+          <ResetButton
+            disabled={visitPurposeFK === VISIT_TYPE.RETAIL}
+            handleResetClick={handleResetClick}
+            handleRestoreClick={handleRestoreClick}
+          />
+        )}
       </GridItem>
       <GridItem md={12} style={{ maxHeight: '60vh', overflowY: 'auto' }}>
         {tempInvoicePayer.map((invoicePayer, index) => {
           if (invoicePayer.isCancelled) return null
-          // if (
-          //   invoicePayer.schemeConfig &&
-          //   [
-          //     12,
-          //     13,
-          //     14,
-          //   ].includes(invoicePayer.schemeConfig.id)
-          // )
-          //   return (
-          //     <MedisaveSchemes
-          //       key={`invoicePayer-${index}`}
-          //       _key={`invoicePayer-${index}`}
-          //       invoicePayer={invoicePayer}
-          //       index={index}
-          //       onSchemeChange={handleSchemeChange}
-          //       onCommitChanges={handleCommitChanges}
-          //       onCancelClick={handleCancelClick}
-          //       onEditClick={handleEditClick}
-          //       onApplyClick={handleApplyClick}
-          //       onDeleteClick={handleDeleteClick}
-          //       hasOtherEditing={hasOtherEditing}
-          //       onClaimTypeChange={handleClaimTypeChange}
-          //     />
-          //   )
-
           return (
             <Scheme
               key={`invoicePayer-${index}`}

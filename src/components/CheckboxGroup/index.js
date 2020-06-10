@@ -2,10 +2,10 @@ import React from 'react'
 import classnames from 'classnames'
 import withStyles from '@material-ui/core/styles/withStyles'
 import CustomInput from 'mui-pro-components/CustomInput'
-import { FormLabel, Checkbox, FormControlLabel } from '@material-ui/core'
-import FiberManualRecord from '@material-ui/icons/FiberManualRecord'
+import { Checkbox, FormControlLabel } from '@material-ui/core'
 import regularFormsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/regularFormsStyle'
 import { control } from '@/components/Decorator'
+import Authorized from '@/utils/Authorized'
 
 @control()
 class CheckboxGroup extends React.Component {
@@ -60,27 +60,21 @@ class CheckboxGroup extends React.Component {
       })
       return v
     }
-    // console.log(value)
-    // if (value) {
-    //   return {
-    //     selectedValue: value || [],
-    //   }
-    // }
     return null
   }
 
   handleChange = (name) => (event) => {
-    // console.log(event.target.value)
     const newVal = {
       [name]: event.target.checked,
     }
     this.setState(newVal)
+
     const newSt = {
       ...this.state,
       ...newVal,
     }
-    // console.log(newSt)
-    const { form, field, onChange, onSelectedChange } = this.props
+
+    const { form, field, onChange } = this.props
     const v = {
       target: {
         value: Object.keys(newSt)
@@ -99,14 +93,6 @@ class CheckboxGroup extends React.Component {
     if (onChange) {
       onChange(v, newVal)
     }
-    // let { selectedValue = [] } = this.state
-    // let newSv = selectedValue.slice()
-    // if (selectedValue.find((o) => o === event.target.value)) {
-    //   newSv = selectedValue.filter((o) => o !== event.target.value)
-    // } else {
-    //   newSv.push(event.target.value)
-    // }
-    // this.setState({ selectedValue: newSv })
   }
 
   getComponent = ({ inputRef, onChange, className, ...props }) => {
@@ -134,8 +120,7 @@ class CheckboxGroup extends React.Component {
       >
         {options.map((o) => {
           const v = `${o[valueField]}`
-          // console.log(v)
-          // const checked = .selectedValue.find((m) => m === v)
+
           return (
             <div
               className={`${classes.checkboxAndRadio} ${vertical
@@ -151,21 +136,8 @@ class CheckboxGroup extends React.Component {
                     value={v}
                     color='primary'
                     disabled={o.disabled || disabled}
-                    // icon={
-                    //   <FiberManualRecord className={classes.uncheckedIcon} />
-                    // }
-                    // checkedIcon={
-                    //   <FiberManualRecord className={classes.checkedIcon} />
-                    // }
-                    // classes={{
-                    //   checked: classes.checked,
-                    //   root: classes.checkRoot,
-                    // }}
                   />
                 }
-                // classes={{
-                //   root: true,
-                // }}
                 label={o[textField]}
               />
             </div>
@@ -177,7 +149,6 @@ class CheckboxGroup extends React.Component {
 
   render () {
     const { classes, form, field, onChange, ...restProps } = this.props
-    // console.log('check', restProps)
     return (
       <CustomInput
         inputComponent={this.getComponent}
@@ -188,7 +159,6 @@ class CheckboxGroup extends React.Component {
         preventDefaultChangeEvent
         preventDefaultKeyDownEvent
         {...restProps}
-        // value={this.state.selectedValue}
       />
     )
   }

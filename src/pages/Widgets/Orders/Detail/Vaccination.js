@@ -1,5 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import _ from 'lodash'
+import Add from '@material-ui/icons/Add'
 import {
   GridContainer,
   GridItem,
@@ -10,18 +12,33 @@ import {
   FastField,
   Field,
   withFormikExtend,
+  CommonModal,
+  ProgressButton,
+  Tooltip,
 } from '@/components'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 import LowStockInfo from './LowStockInfo'
+import AddFromPast from './AddMedicationFromPast'
 
 let i = 0
-@connect(({ global, codetable }) => ({ global, codetable }))
+@connect(({ global, codetable, visitRegistration }) => ({
+  global,
+  codetable,
+  visitRegistration,
+}))
 @withFormikExtend({
+  authority: [
+    'queue.consultation.order.vaccination',
+  ],
   mapPropsToValues: ({ orders = {} }) => {
     const newOrders = orders.entity || orders.defaultVaccination
 
-    return { minQuantity: 1, ...newOrders }
+    return {
+      minQuantity: 1,
+      ...newOrders,
+      isEditVaccination: !_.isEmpty(orders.entity),
+    }
   },
 
   enableReinitialize: true,
@@ -32,19 +49,23 @@ let i = 0
     totalPrice: Yup.number().required(),
     vaccinationGivenDate: Yup.date().required(),
     quantity: Yup.number().required(),
-    usageMethodFK: Yup.number().required(),
-    dosageFK: Yup.number().required(),
-    uomfk: Yup.number().required(),
   }),
 
   handleSubmit: (values, { props, onConfirm, resetForm }) => {
     const { dispatch, orders, currentType, getNextSequence } = props
     const { rows } = orders
+    var batchNo = values.batchNo
+    if (batchNo instanceof Array) {
+      if (batchNo && batchNo.length > 0) {
+        batchNo = batchNo[0]
+      }
+    }
     const data = {
       sequence: getNextSequence(),
       ...values,
       subject: currentType.getSubject(values),
       isDeleted: false,
+      batchNo,
     }
     dispatch({
       type: 'orders/upsertRow',
@@ -58,29 +79,32 @@ let i = 0
   displayName: 'OrderPage',
 })
 class Vaccination extends PureComponent {
-  state = {
-    selectedVaccination: {
-      vaccinationStock: [],
-    },
-    batchNo: '',
-    expiryDate: '',
-  }
+  // state = {
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    if (nextProps.orders.type === this.props.type)
-      if (
-        (!this.props.global.openAdjustment &&
-          nextProps.global.openAdjustment) ||
-        nextProps.orders.shouldPushToState
-      ) {
-        nextProps.dispatch({
-          type: 'orders/updateState',
-          payload: {
-            entity: nextProps.values,
-            shouldPushToState: false,
-          },
-        })
-      }
+  // }
+
+  constructor (props) {
+    super(props)
+
+    const { codetable, values } = this.props
+    const { inventoryvaccination = [] } = codetable
+    const { inventoryVaccinationFK } = values
+
+    let selectedVaccination = {
+      vaccinationStock: [],
+    }
+    const vaccination = inventoryVaccinationFK
+      ? inventoryvaccination.find((item) => item.id === inventoryVaccinationFK)
+      : undefined
+
+    if (vaccination) selectedVaccination = vaccination
+
+    this.state = {
+      selectedVaccination,
+      batchNo: '',
+      expiryDate: '',
+      showAddFromPastModal: false,
+    }
   }
 
   changeVaccination = (v, op = {}) => {
@@ -227,6 +251,77 @@ class Vaccination extends PureComponent {
     })
   }
 
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    if (nextProps.orders.type === this.props.type)
+      if (
+        (!this.props.global.openAdjustment &&
+          nextProps.global.openAdjustment) ||
+        nextProps.orders.shouldPushToState
+      ) {
+        nextProps.dispatch({
+          type: 'orders/updateState',
+          payload: {
+            entity: nextProps.values,
+            shouldPushToState: false,
+          },
+        })
+      }
+
+    const { values: nextValues } = nextProps
+    const { values: currentValues } = this.props
+
+    if (
+      !!nextValues.id &&
+      nextValues.id !== currentValues.id &&
+      nextValues.type === '2' // type === 'Medication'
+    ) {
+      const { codetable } = this.props
+      const { inventoryvaccination = [] } = codetable
+      const { inventoryVaccinationFK } = nextValues
+      const vaccination = inventoryvaccination.find(
+        (item) => item.id === inventoryVaccinationFK,
+      )
+
+      if (vaccination)
+        this.setState({
+          selectedVaccination: vaccination,
+        })
+      else
+        this.setState({
+          selectedVaccination: {
+            vaccinationStock: [],
+          },
+        })
+    }
+  }
+  onSearchVaccinationHistory = async () => {
+    const { dispatch, values, visitRegistration } = this.props
+    const { patientProfileFK } = visitRegistration.entity.visit
+    await dispatch({
+      type: 'medicationHistory/queryMedicationHistory',
+      payload: { patientProfileId: patientProfileFK },
+    })
+    this.toggleAddFromPastModal()
+  }
+
+  toggleAddFromPastModal = () => {
+    const { showAddFromPastModal } = this.state
+    this.setState({ showAddFromPastModal: !showAddFromPastModal })
+    if (showAddFromPastModal) {
+      this.resetVaccinationHistoryResult()
+    }
+  }
+
+  resetVaccinationHistoryResult = () => {
+    this.props.dispatch({
+      type: 'medicationHistory/updateState',
+      payload: {
+        filter: {},
+        list: [],
+      },
+    })
+  }
+
   render () {
     const {
       theme,
@@ -236,8 +331,11 @@ class Vaccination extends PureComponent {
       setFieldValue,
       classes,
       disableEdit,
+      getNextSequence,
       ...reset
     } = this.props
+    const { isEditVaccination } = values
+    const { showAddFromPastModal } = this.state
     return (
       <div>
         <GridContainer>
@@ -261,6 +359,20 @@ class Vaccination extends PureComponent {
                 )
               }}
             />
+          </GridItem>
+          <GridItem xs={6}>
+            {!isEditVaccination && (
+              <Tooltip title='Add From Past'>
+                <ProgressButton
+                  color='primary'
+                  icon={<Add />}
+                  style={{ marginTop: theme.spacing(2) }}
+                  onClick={this.onSearchVaccinationHistory}
+                >
+                  Add From Past
+                </ProgressButton>
+              </Tooltip>
+            )}
           </GridItem>
         </GridContainer>
         <GridContainer>
@@ -374,6 +486,7 @@ class Vaccination extends PureComponent {
                     onChange={(e) => {
                       this.updateTotalPrice(e.target.value)
                     }}
+                    min={0}
                     {...args}
                   />
                 )
@@ -403,12 +516,20 @@ class Vaccination extends PureComponent {
               render={(args) => {
                 return (
                   <CodeSelect
+                    mode='tags'
+                    maxSelected={1}
+                    disableAll
                     label='Batch No.'
                     labelField='batchNo'
                     valueField='batchNo'
                     options={this.state.selectedVaccination.vaccinationStock}
                     onChange={(e, op = {}) => {
-                      setFieldValue('expiryDate', op.expiryDate)
+                      if (op && op.length > 0) {
+                        const { expiryDate } = op[0]
+                        setFieldValue(`expiryDate`, expiryDate)
+                      } else {
+                        setFieldValue(`expiryDate`, undefined)
+                      }
                     }}
                     disabled={disableEdit}
                     {...args}
@@ -447,6 +568,18 @@ class Vaccination extends PureComponent {
           onSave: handleSubmit,
           onReset: this.handleReset,
         })}
+        <CommonModal
+          open={showAddFromPastModal}
+          title='Add Vaccination From Past'
+          onClose={this.toggleAddFromPastModal}
+          onConfirm={this.toggleAddFromPastModal}
+          maxWidth='md'
+          showFooter={false}
+          overrideLoading
+          cancelText='Cancel'
+        >
+          <AddFromPast {...this.props} />
+        </CommonModal>
       </div>
     )
   }

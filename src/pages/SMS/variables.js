@@ -1,33 +1,38 @@
 import moment from 'moment'
-import Grid from './Grid'
 import {
   DateFormatter,
   dateFormatLong,
+  dateFormatLongWithTimeNoSec12h,
   timeFormat24HourWithSecond,
   timeFormatSmallCase,
   Tooltip,
 } from '@/components'
 import { SMS_STATUS_TEXT } from '@/utils/constants'
+import Grid from './Grid'
 
 const renderSMSStatus = (status) => {
   if (
     status === SMS_STATUS_TEXT.SENT ||
     status === SMS_STATUS_TEXT.DELIVERED ||
-    status === SMS_STATUS_TEXT.RECEIVING ||
-    status === SMS_STATUS_TEXT.RECEIVED ||
-    status === SMS_STATUS_TEXT.ACCEPTED ||
-    status === SMS_STATUS_TEXT.SCHEDULED ||
-    status === SMS_STATUS_TEXT.READ ||
-    status === SMS_STATUS_TEXT.QUEUED ||
     status === SMS_STATUS_TEXT.SENDING
-  ) {
+  )
     return SMS_STATUS_TEXT.SENT
-  }
+
   if (
     status === SMS_STATUS_TEXT.FAILED ||
     status === SMS_STATUS_TEXT.UNDELIVERED
   )
     return SMS_STATUS_TEXT.FAILED
+
+  if (
+    status === SMS_STATUS_TEXT.RECEIVING ||
+    status === SMS_STATUS_TEXT.RECEIVED ||
+    status === SMS_STATUS_TEXT.ACCEPTED ||
+    status === SMS_STATUS_TEXT.SCHEDULED ||
+    status === SMS_STATUS_TEXT.READ ||
+    status === SMS_STATUS_TEXT.QUEUED
+  )
+    return SMS_STATUS_TEXT.UNREAD
 
   return null
 }
@@ -132,6 +137,7 @@ const appointmentColumnsExtensions = [
       DateFormatter({
         value: row.lastSMSSendDate,
         full: true,
+        format: dateFormatLongWithTimeNoSec12h,
       }),
   },
   {
@@ -182,6 +188,7 @@ const patientColumnsExtensions = [
       DateFormatter({
         value: row.lastSMSSendDate,
         full: true,
+        format: dateFormatLongWithTimeNoSec12h,
       }),
   },
   {

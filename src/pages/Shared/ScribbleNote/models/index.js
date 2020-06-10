@@ -11,7 +11,7 @@ export default createFormViewModel({
     state: {
       entity: '',
       selectedIndex: '',
-      ClinicianNote: {
+      Note: {
         notesScribbleArray: [],
       },
       ChiefComplaints: {
@@ -19,6 +19,9 @@ export default createFormViewModel({
       },
       Plan: {
         planScribbleArray: [],
+      },
+      History: {
+        historyScribbleArray: [],
       },
       default: {
         scribleNotes: 'Test notes',
@@ -28,28 +31,8 @@ export default createFormViewModel({
       *queryTemplateList ({ payload }, { call, put }) {
         const response = yield call(service.queryTemplateList, payload)
         return response
-        // yield put({
-        //   type: 'queryInvoiceDone',
-        //   payload: response,
-        // })
       },
     },
-    reducers: {
-      // queryDone (st, { payload }) {
-      //   const { data } = payload
-      //   return {
-      //     ...st,
-      //     list: data.data.map((o) => {
-      //       return {
-      //         ...o,
-      //         effectiveDates: [
-      //           o.effectiveStartDate,
-      //           o.effectiveEndDate,
-      //         ],
-      //       }
-      //     }),
-      //   }
-      // },
-    },
+    reducers: {},
   },
 })

@@ -1,20 +1,24 @@
 import React, { PureComponent } from 'react'
-import { FastField, withFormik } from 'formik'
+import moment from 'moment'
+import { FastField, Field, withFormik } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
+// matetrial ui
 import PersonAdd from '@material-ui/icons/PersonAdd'
 import Search from '@material-ui/icons/Search'
-
 import { withStyles, Tooltip } from '@material-ui/core'
+// assets
 import { standardRowHeight } from 'mui-pro-jss'
+// common components
 import {
   GridContainer,
   GridItem,
   Button,
   TextField,
   Checkbox,
-  DateRangePicker,
   ProgressButton,
 } from '@/components'
+import { FilterBarDate } from '@/components/_medisys'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   filterBar: {
@@ -37,7 +41,10 @@ const styles = (theme) => ({
 })
 
 @withFormik({
-  mapPropsToValues: () => {},
+  mapPropsToValues: () => ({
+    transactionStartDate: moment().add(-1, 'month'),
+    transactionEndDate: moment(),
+  }),
 })
 class FilterBar extends PureComponent {
   componentWillUnmount () {
@@ -53,13 +60,14 @@ class FilterBar extends PureComponent {
     })
 
   render () {
-    const { classes, dispatch, theme, queryDepositListing } = this.props
+    const { classes, queryDepositListing, values } = this.props
+    const { transactionStartDate, transactionEndDate } = values
     return (
       <div className={classes.filterBar}>
         <GridContainer>
           <GridItem xs sm={12} md={4}>
             <FastField
-              name='ExpenseType'
+              name='patientSearchValue'
               render={(args) => {
                 return (
                   <TextField
@@ -72,22 +80,38 @@ class FilterBar extends PureComponent {
               }}
             />
           </GridItem>
-
-          <GridItem xs={6} md={4}>
-            <FastField
-              name='transactionDates'
-              render={(args) => {
-                return (
-                  <DateRangePicker
-                    style={{ maxWidth: 380 }}
-                    label='Transaction Date From'
-                    label2='To'
-                    {...args}
-                  />
-                )
-              }}
+          <GridItem md={2}>
+            <Field
+              name='transactionStartDate'
+              render={(args) => (
+                <FilterBarDate
+                  args={args}
+                  label='Transaction Date From'
+                  formValues={{
+                    startDate: transactionStartDate,
+                    endDate: transactionEndDate,
+                  }}
+                />
+              )}
             />
           </GridItem>
+          <GridItem md={2}>
+            <Field
+              name='transactionEndDate'
+              render={(args) => (
+                <FilterBarDate
+                  isEndDate
+                  args={args}
+                  label='Transaction Date To'
+                  formValues={{
+                    startDate: transactionStartDate,
+                    endDate: transactionEndDate,
+                  }}
+                />
+              )}
+            />
+          </GridItem>
+
           <GridItem md={4} />
 
           <GridItem xs sm={6} md={4}>
@@ -122,41 +146,21 @@ class FilterBar extends PureComponent {
                 color='primary'
                 onClick={() => {
                   const {
-                    transactionDates,
-                    ExpenseType,
+                    patientSearchValue,
                     transactionOnly,
                   } = this.props.values
 
                   const showTransactionOnly = transactionOnly === true
-                  // console.log('showTransactionOnly', showTransactionOnly)
+
                   this.props.dispatch({
                     type: 'deposit/query',
                     payload: {
-                      'lgteql_PatientDeposit.PatientDepositTransaction.TransactionDate': transactionDates
-                        ? transactionDates[0]
-                        : undefined,
-                      'lsteql_PatientDeposit.PatientDepositTransaction.TransactionDate': transactionDates
-                        ? transactionDates[1]
-                        : undefined,
                       apiCriteria: {
-                        // searchValue: ExpenseType,
-                        OnlyWithDeposit: showTransactionOnly,
-                        // startDate: transactionDates
-                        //   ? transactionDates[0]
-                        //   : undefined,
-                        // endDate: transactionDates
-                        //   ? transactionDates[1]
-                        //   : undefined,
+                        searchValue: patientSearchValue || undefined,
+                        onlyWithDeposit: showTransactionOnly,
+                        startDate: transactionStartDate || undefined,
+                        endDate: transactionEndDate || undefined,
                       },
-                      group: [
-                        {
-                          'contactFkNavigation.contactNumber.number': ExpenseType,
-                          patientReferenceNo: ExpenseType,
-                          patientAccountNo: ExpenseType,
-                          name: ExpenseType,
-                          combineCondition: 'or',
-                        },
-                      ],
                     },
                   })
                 }}
@@ -164,27 +168,28 @@ class FilterBar extends PureComponent {
                 <Search />
                 <FormattedMessage id='form.search' />
               </ProgressButton>
-
-              <Button
-                variant='contained'
-                color='primary'
-                onClick={() => {
-                  this.props.dispatch({
-                    type: 'patient/openPatientModal',
-                    payload: {
-                      callback: () => {
-                        this.props.dispatch({
-                          type: 'patient/closePatientModal',
-                        })
-                        queryDepositListing()
+              <Authorized authority='patientdatabase.newpatient'>
+                <Button
+                  variant='contained'
+                  color='primary'
+                  onClick={() => {
+                    this.props.dispatch({
+                      type: 'patient/openPatientModal',
+                      payload: {
+                        callback: () => {
+                          this.props.dispatch({
+                            type: 'patient/closePatientModal',
+                          })
+                          queryDepositListing()
+                        },
                       },
-                    },
-                  })
-                }}
-              >
-                <PersonAdd />
-                <FormattedMessage id='reception.queue.patientSearch.registerNewPatient' />
-              </Button>
+                    })
+                  }}
+                >
+                  <PersonAdd />
+                  <FormattedMessage id='reception.queue.patientSearch.registerNewPatient' />
+                </Button>
+              </Authorized>
             </div>
           </GridItem>
         </GridContainer>

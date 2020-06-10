@@ -21,7 +21,7 @@ import {
 import { LoadingWrapper, Recurrence } from '@/components/_medisys'
 // custom components
 import PatientProfile from '@/pages/PatientDatabase/Detail'
-import AppointmentHistory from '@/pages/PatientDatabase/Detail/AppointmentHistory'
+import AppointmentHistory from '@/pages/Widgets/AppointmentHistory'
 import PatientSearchModal from '../../PatientSearch'
 import DeleteConfirmation from './DeleteConfirmation'
 import AppointmentDataGrid from './AppointmentDataGrid'
@@ -102,20 +102,14 @@ class Form extends React.PureComponent {
     editingRows: [],
   }
 
-  componentDidMount () {
-    const { values } = this.props
+  componentDidMount() {
+    const { values, dispatch } = this.props
     Promise.all([
-      // this.props.dispatch({
-      //   type: 'codetable/fetchCodes',
-      //   payload: {
-      //     code: 'clinicianprofile',
-      //   },
-      // }),
-      this.props.dispatch({
+      dispatch({
         type: 'codetable/fetchCodes',
         payload: { code: 'ltappointmentstatus' },
       }),
-      this.props.dispatch({
+      dispatch({
         type: 'codetable/fetchCodes',
         payload: { code: 'ltcancelreasontype' },
       }),
@@ -281,7 +275,13 @@ class Form extends React.PureComponent {
   }
 
   onSelectPatientClick = async (patientProfile, autoPopulate = false) => {
-    const { id, patientAccountNo, name, mobileNo } = patientProfile
+    const {
+      id,
+      patientAccountNo,
+      name,
+      mobileNo,
+      countryCodeFK,
+    } = patientProfile
     const { values, setValues } = this.props
     await setValues({
       ...values,
@@ -289,6 +289,7 @@ class Form extends React.PureComponent {
       patientProfileFK: id,
       patientName: name,
       patientContactNo: mobileNo,
+      countryCodeFK,
     })
     this.refreshPatient(id)
     if (!autoPopulate) this.toggleSearchPatientModal()
@@ -510,7 +511,6 @@ class Form extends React.PureComponent {
         appointmentResources: [],
         newAppointmentStatusFK: appointmentStatusFK,
       }
-
       setSubmitting(false)
 
       dispatch({
@@ -558,7 +558,7 @@ class Form extends React.PureComponent {
     }
   }
 
-  onDeleteClick = () => {}
+  onDeleteClick = () => { }
 
   onValidateClick = () => {
     const appointmentStatus = this.props.appointmentStatuses.find(
@@ -625,19 +625,88 @@ class Form extends React.PureComponent {
 
   onConfirmClick = () => {
     const { values, mode, viewingAppointment } = this.props
-
     try {
+      const { datagrid } = this.state
       let newAppointmentStatusFK = APPOINTMENT_STATUS.SCHEDULED
       const rescheduleFK = APPOINTMENT_STATUS.RESCHEDULED
-
+      let originalAppointment = viewingAppointment.appointments.find((t) => t.id === values.currentAppointment.id)
+      let newResource = Array.from(datagrid, (resource) => {
+        let startTime = `${resource.startTime}:00`
+        let endTime = `${resource.endTime}:00`
+        const { appointmentFK,
+          clinicianFK,
+          clinicianName,
+          clinicianTitle,
+          sortOrder,
+          isPrimaryClinician,
+          id,
+          isDeleted,
+          concurrencyToken,
+          apptDurationHour,
+          apptDurationMinute,
+          preClinicianFK } = resource
+        return {
+          appointmentFK,
+          clinicianFK,
+          clinicianName,
+          clinicianTitle,
+          startTime,
+          endTime,
+          sortOrder,
+          isPrimaryClinician,
+          id,
+          isDeleted,
+          concurrencyToken,
+          apptDurationHour,
+          apptDurationMinute,
+          preClinicianFK,
+        }
+      })
+      let originalResource = Array.from(originalAppointment.appointments_Resources, (resource) => {
+        const { appointmentFK,
+          clinicianFK,
+          clinicianName,
+          clinicianTitle,
+          startTime,
+          endTime,
+          sortOrder,
+          isPrimaryClinician,
+          id,
+          isDeleted,
+          concurrencyToken,
+          apptDurationHour,
+          apptDurationMinute,
+          preClinicianFK } = resource
+        return {
+          appointmentFK,
+          clinicianFK,
+          clinicianName,
+          clinicianTitle,
+          startTime,
+          endTime,
+          sortOrder,
+          isPrimaryClinician,
+          id,
+          isDeleted,
+          concurrencyToken,
+          apptDurationHour,
+          apptDurationMinute,
+          preClinicianFK,
+        }
+      }) 
+      let resourceChanged = JSON.stringify(originalResource) !== JSON.stringify(newResource)
+      let dateChanged = originalAppointment.appointmentDate.indexOf(values.currentAppointment.appointmentDate) === -1
       if (
         values.currentAppointment &&
         (values.currentAppointment.appointmentStatusFk ===
           APPOINTMENT_STATUS.SCHEDULED ||
           values.currentAppointment.appointmentStatusFk ===
-            APPOINTMENT_STATUS.RESCHEDULED)
-      )
-        newAppointmentStatusFK = rescheduleFK
+          APPOINTMENT_STATUS.RESCHEDULED)
+      ) {
+        if (resourceChanged || dateChanged) {
+          newAppointmentStatusFK = rescheduleFK
+        }
+      }
 
       const hasModifiedAsSingle = viewingAppointment.appointments.reduce(
         (editedAsSingle, appointment) =>
@@ -659,7 +728,6 @@ class Form extends React.PureComponent {
             this.openSeriesUpdateConfirmation(this.openRescheduleForm)
             return true
           }
-
           if (newAppointmentStatusFK === APPOINTMENT_STATUS.RESCHEDULED) {
             this.openRescheduleForm()
           } else {
@@ -808,16 +876,16 @@ class Form extends React.PureComponent {
     const { appointmentStatusFk } = values
     if (!values.id) return false
     const disablingList = [
+      APPOINTMENT_STATUS.CANCELLED,
+      APPOINTMENT_STATUS.NOSHOW,
       APPOINTMENT_STATUS.TURNEDUP,
-      APPOINTMENT_STATUS.SCHEDULED,
-      APPOINTMENT_STATUS.RESCHEDULED,
     ]
     return (
       values.isEnableRecurrence || disablingList.includes(appointmentStatusFk)
     )
   }
 
-  render () {
+  render() {
     const {
       classes,
       theme,
@@ -849,12 +917,12 @@ class Form extends React.PureComponent {
     const _datagrid =
       conflicts.length > 0
         ? datagrid
-            .filter((item) => !item.isDeleted)
-            .sort(sortDataGrid)
-            .map((item, index) => ({ ...item, sortOrder: index }))
+          .filter((item) => !item.isDeleted)
+          .sort(sortDataGrid)
+          .map((item, index) => ({ ...item, sortOrder: index }))
         : [
-            ...datagrid,
-          ]
+          ...datagrid,
+        ]
 
     const show =
       loading.effects['patientSearch/query'] || loading.models.calendar
@@ -868,67 +936,69 @@ class Form extends React.PureComponent {
               className={classnames(classes.formContent)}
               alignItems='flex-start'
             >
-              <GridItem
-                container
-                xs={12}
-                md={7}
-                style={{
-                  height: '100%',
-                  maxHeight: this.props.height - 200,
-                  overflow: 'auto',
-                }}
-              >
-                <PatientInfoInput
-                  disabled={disablePatientInfo}
-                  isEdit={values.id}
-                  onViewPatientProfileClick={this.onViewPatientProfile}
-                  onSearchPatientClick={this.onSearchPatient}
-                  onCreatePatientClick={this.togglePatientProfileModal}
-                  onRegisterToVisitClick={this.actualizeAppointment}
-                  patientContactNo={values.patientContactNo}
-                  patientName={values.patientName}
-                  patientProfileFK={values.patientProfileFK}
-                  appointmentStatusFK={currentAppointment.appointmentStatusFk}
-                  values={values}
-                />
-                <AppointmentDateInput disabled={_disableAppointmentDate} />
-                <GridItem xs md={12} className={classes.verticalSpacing}>
-                  <AppointmentDataGrid
-                    validationSchema={gridValidationSchema}
-                    disabled={disableDataGrid}
-                    appointmentDate={currentAppointment.appointmentDate}
-                    data={_datagrid}
-                    handleCommitChanges={this.onCommitChanges}
-                    handleEditingRowsChange={this.onEditingRowsChange}
-                    editingRows={editingRows}
-                    selectedSlot={selectedSlot}
+              <GridItem container xs={12} md={7}>
+                <GridItem
+                  container
+                  xs
+                  md={12}
+                  style={{
+                    height: this.props.height - 270,
+                    overflow: 'auto',
+                  }}
+                  justify='flex-start'
+                >
+                  <PatientInfoInput
+                    disabled={disablePatientInfo}
+                    isEdit={values.id}
+                    onViewPatientProfileClick={this.onViewPatientProfile}
+                    onSearchPatientClick={this.onSearchPatient}
+                    onCreatePatientClick={this.togglePatientProfileModal}
+                    onRegisterToVisitClick={this.actualizeAppointment}
+                    patientContactNo={values.patientContactNo}
+                    patientName={values.patientName}
+                    patientProfileFK={values.patientProfileFK}
+                    appointmentStatusFK={currentAppointment.appointmentStatusFk}
+                    values={values}
                   />
-                </GridItem>
-                <GridItem xs md={12}>
-                  <Field
-                    name='currentAppointment.appointmentRemarks'
-                    render={(args) => (
-                      <OutlinedTextField
-                        {...args}
-                        disabled={disableDataGrid}
-                        rows='4'
-                        rowsMax='10'
-                        multiline
-                        label='Appointment Remarks'
-                      />
-                    )}
-                  />
-                </GridItem>
-                <GridItem xs md={12}>
-                  <Recurrence
-                    size='lg'
-                    disabled={values.id !== undefined}
-                    formValues={values}
-                    recurrenceDto={values.recurrenceDto}
-                    handleRecurrencePatternChange={
-                      this.onRecurrencePatternChange
-                    }
-                  />
+                  <AppointmentDateInput disabled={_disableAppointmentDate} />
+                  <GridItem xs md={12} className={classes.verticalSpacing}>
+                    <AppointmentDataGrid
+                      validationSchema={gridValidationSchema}
+                      disabled={disableDataGrid}
+                      appointmentDate={currentAppointment.appointmentDate}
+                      data={_datagrid}
+                      handleCommitChanges={this.onCommitChanges}
+                      handleEditingRowsChange={this.onEditingRowsChange}
+                      editingRows={editingRows}
+                      selectedSlot={selectedSlot}
+                    />
+                  </GridItem>
+                  <GridItem xs md={12}>
+                    <Field
+                      name='currentAppointment.appointmentRemarks'
+                      render={(args) => (
+                        <OutlinedTextField
+                          {...args}
+                          disabled={disableDataGrid}
+                          rows='10'
+                          rowsMax='10'
+                          multiline
+                          label='Appointment Remarks'
+                        />
+                      )}
+                    />
+                  </GridItem>
+                  <GridItem xs md={12}>
+                    <Recurrence
+                      size='lg'
+                      disabled={values.id !== undefined}
+                      formValues={values}
+                      recurrenceDto={values.recurrenceDto}
+                      handleRecurrencePatternChange={
+                        this.onRecurrencePatternChange
+                      }
+                    />
+                  </GridItem>
                 </GridItem>
                 <GridItem xs md={12} className={classes.footerGrid}>
                   <FormFooter

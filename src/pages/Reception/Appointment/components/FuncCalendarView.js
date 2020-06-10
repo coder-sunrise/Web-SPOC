@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { connect } from 'dva'
 // moment
 import moment from 'moment'
@@ -58,8 +58,8 @@ const maxTime = new Date(
   today.getFullYear(),
   today.getMonth(),
   today.getDate(),
-  19,
-  0,
+  21,
+  30,
   0,
 )
 
@@ -277,22 +277,32 @@ const CalendarView = ({
     // }
   }
 
+  const _jumpToSelectedValue = (value, type, currentDate) => {
+    const desiredDate = moment(currentDate).add(value, type).toDate()
+
+    dispatch({
+      type: 'calendar/navigateCalendar',
+      payload: { date: desiredDate },
+    })
+  }
+
   const Toolbar = (toolbarProps) => {
     return (
       <CalendarToolbar
         {...toolbarProps}
-        displayDate={displayDate}
         handleViewChange={_onViewChange}
         handleDateChange={_jumpToDate}
+        handleSelectedValue={_jumpToSelectedValue}
       />
     )
   }
+
   const EventComponent = (eventProps) => {
     return (
       <Event
         {...eventProps}
         // calendarView={calendarView}
-        handleMouseOver={handleEventMouseOver}
+        // handleMouseOver={handleEventMouseOver}
       />
     )
   }
@@ -303,9 +313,9 @@ const CalendarView = ({
         return calendarEvents.reduce((events, appointment) => {
           const { appointment_Resources: apptResources = [] } = appointment
 
-          const firstApptRes = apptResources.find(
-            (item) => item.sortOrder === 0,
-          )
+          // TODO: need to fix sortOrder calculation, should exclude deleted appointments when calculating sortOrder
+          const firstApptRes =
+            apptResources.length >= 1 ? apptResources[0] : undefined
 
           const firstClinicianFK =
             firstApptRes !== undefined ? firstApptRes.clinicianFK : undefined
@@ -335,6 +345,9 @@ const CalendarView = ({
           isEnableRecurrence,
           appointment_Resources: apptResources,
           appointmentRemarks,
+          appointmentStatusFk,
+          bookedByUser,
+          createDate,
         } = appointment
 
         const apptEvents = apptResources.map((item) => ({
@@ -346,6 +359,9 @@ const CalendarView = ({
           patientContactNo,
           isEnableRecurrence,
           appointmentRemarks,
+          appointmentStatusFk,
+          bookedByUser,
+          createDate,
           start: moment(
             `${appointmentDate} ${item.startTime}`,
             `${serverDateFormat} HH:mm`,

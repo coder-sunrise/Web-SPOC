@@ -4,7 +4,6 @@ import _ from 'lodash'
 import * as service from '../services/deliveryOrder'
 import { podoOrderType, groupByFKFunc } from '@/utils/codes'
 import { getUniqueId } from '@/utils/utils'
-import { fakeDOQueryDoneData, isPOStatusFinalized } from '../variables'
 
 const InitialPurchaseOrder = {
   purchaseOrder: {
@@ -131,12 +130,16 @@ export default createFormViewModel({
                 f.stock &&
                 f.stock.length > 0,
             )
-            const defaultStock = m.stock.find((s) => s.isDefault === true)
-            const batchNo = defaultStock.batchNo || o.batchNo
+            const { id, batchNo, expiryDate } = m.stock.find(
+              (s) => s.isDefault === true,
+            )
+
             return {
               ...o,
               id: undefined,
               batchNo,
+              batchNoId: id,
+              expiryDate,
             }
           }
           if (ConsumableItemList.length > 0 && o.type === 2) {
@@ -146,12 +149,17 @@ export default createFormViewModel({
                 f.stock &&
                 f.stock.length > 0,
             )
-            const defaultStock = m.stock.find((s) => s.isDefault === true)
-            const batchNo = defaultStock.batchNo || o.batchNo
+
+            const { id, batchNo, expiryDate } = m.stock.find(
+              (s) => s.isDefault === true,
+            )
+
             return {
               ...o,
               id: undefined,
               batchNo,
+              batchNoId: id,
+              expiryDate,
             }
           }
           if (VaccinationItemList.length > 0 && o.type === 3) {
@@ -161,18 +169,20 @@ export default createFormViewModel({
                 f.stock &&
                 f.stock.length > 0,
             )
-            const defaultStock = m.stock.find((s) => s.isDefault === true)
-            const batchNo = defaultStock.batchNo || o.batchNo
+            const { id, batchNo, expiryDate } = m.stock.find(
+              (s) => s.isDefault === true,
+            )
+
             return {
               ...o,
               id: undefined,
               batchNo,
+              batchNoId: id,
+              expiryDate,
             }
           }
-
           return o
         })
-
         return {
           ...state,
           entity: {
@@ -180,7 +190,11 @@ export default createFormViewModel({
             // deliveryOrderNo,
             deliveryOrderDate: moment(),
             remark: '',
-            rows: newOSItem,
+            rows: newOSItem.map((o) => ({
+              currentReceivingBonusQty: 0,
+              expiryDate: undefined,
+              ...o,
+            })),
           },
         }
       },
@@ -275,8 +289,9 @@ export default createFormViewModel({
       },
 
       upsertRow (state, { payload }) {
-        let { rows } = state.entity
+        let rows = _.cloneDeep(state.entity.rows)
         const { gridRows, gridRow, remark } = payload
+
         if (payload.uid) {
           rows = gridRows.map((o) => {
             let itemFK
@@ -287,24 +302,10 @@ export default createFormViewModel({
             }
             return {
               ...o,
-              // [itemFK]: o.inventoryItemFK,
               [itemFK]: o.itemFK,
             }
           })
-          // rows = rows.map((row) => {
-          //   const n =
-          //     row.uid === payload.uid
-          //       ? {
-          //           ...row,
-          //           ...payload,
-          //         }
-          //       : row
-          //   return n
-          // })
         } else if (gridRow) {
-          // const itemFK = podoOrderType.filter(
-          //   (x) => x.value === payload.type,
-          // )[0].itemFKName
           let itemFK
           const item = podoOrderType.filter((x) => x.value === gridRow.type)
           if (item.length > 0) {
@@ -339,6 +340,16 @@ export default createFormViewModel({
         // let newRows = rows.filter((v) => v.uid !== payload)
 
         return { ...state, entity: { ...state.entity, rows } }
+      },
+
+      reset (state, { payload }) {
+        return {
+          ...state,
+          entity: {
+            ...state.entity,
+            rows: [],
+          },
+        }
       },
     },
   },

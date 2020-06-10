@@ -12,23 +12,23 @@ import InvoiceDataGrid from './components/InvoiceDataGrid'
 import styles from './styles'
 import Authorized from '@/utils/Authorized'
 
+// @withFormikExtend({
+//   mapPropsToValues: () => {
+//     return {
+//       invoiceDates: [
+//         moment().add(-1, 'month'),
+//         moment(),
+//       ],
+//       isIncludePatientOS: true,
+//       isIncludeGovtOS: true,
+//       isIncludeCorporateOS: true,
+//     }
+//   },
+// })
 @connect(({ invoiceList, global }) => ({
   invoiceList,
   global,
 }))
-@withFormikExtend({
-  mapPropsToValues: () => {
-    return {
-      invoiceDates: [
-        moment().add(-1, 'month'),
-        moment(),
-      ],
-      isIncludePatientOS: true,
-      isIncludeGovtOS: true,
-      isIncludeCorporateOS: true,
-    }
-  },
-})
 class Invoice extends React.Component {
   componentDidMount () {
     this.props.dispatch({

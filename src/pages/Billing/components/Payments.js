@@ -8,6 +8,7 @@ import Print from '@material-ui/icons/Print'
 // common components
 import { Button, GridItem, NumberInput, TextField, Danger } from '@/components'
 import DeleteWithPopover from './DeleteWithPopover'
+import PaymentDetailsPopover from './PaymentDetailsPopover'
 
 const styles = (theme) => ({
   inline: {
@@ -59,6 +60,7 @@ const Payments = ({
             size='sm'
             className={classes.printerButton}
             onClick={onPrintClick}
+            disabled={item.isCancelled}
           >
             <Print />
           </Button>
@@ -95,19 +97,12 @@ const Payments = ({
             }
             onCancelClick={handleCancelClick}
             onConfirmDelete={handleConfirmDelete}
+            disabled={item.isCancelled}
           />
         </GridItem>
 
         {item.invoicePaymentMode.map((payment) => (
-          <React.Fragment>
-            <GridItem md={1} />
-            <GridItem md={5}>
-              <p>{payment.paymentMode}</p>
-            </GridItem>
-            <GridItem md={6} className={classes.rightAlign}>
-              <NumberInput currency text value={payment.amt} />
-            </GridItem>
-          </React.Fragment>
+          <PaymentDetailsPopover payment={payment} />
         ))}
       </React.Fragment>
     )

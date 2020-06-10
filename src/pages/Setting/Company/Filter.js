@@ -18,9 +18,9 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  authority: 'finance/scheme',
+  // authority: 'finance/scheme',
   mapPropsToValues: ({ settingCompany }) => settingCompany.filter || {},
-  handleSubmit: () => {},
+  handleSubmit: () => { },
   displayName: 'CompanyFilter',
 })
 class Filter extends PureComponent {
@@ -28,19 +28,18 @@ class Filter extends PureComponent {
     isCopayer: undefined,
   }
 
-  checkIsCopayer (name) {
+  checkIsCopayer(name) {
     this.setState({
       isCopayer: name === 'copayer',
     })
   }
 
-  render () {
+  render() {
     const { classes, route, settingCompany } = this.props
     const { name } = route
     const { companyType } = settingCompany
     this.checkIsCopayer(name)
     const { isCopayer } = this.state
-    console.log({ companyType })
     return (
       <div className={classes.filterBar}>
         <GridContainer>
@@ -74,8 +73,8 @@ class Filter extends PureComponent {
                 }}
               />
             ) : (
-              []
-            )}
+                []
+              )}
           </GridItem>
           <GridItem xs={6} md={3}>
             <FastField
@@ -116,23 +115,43 @@ class Filter extends PureComponent {
                 >
                   <FormattedMessage id='form.search' />
                 </ProgressButton>
-                <Authorized authority='scheme.newscheme'>
-                  <Button
-                    color='primary'
-                    onClick={() => {
-                      this.props.dispatch({
-                        type: 'settingCompany/updateState',
-                        payload: {
-                          entity: undefined,
-                        },
-                      })
-                      this.props.toggleModal()
-                    }}
-                  >
-                    <Add />
-                    Add New
-                  </Button>
-                </Authorized>
+                {isCopayer ?
+                  <Authorized authority='copayer.newcopayer'>
+                    <Button
+                      color='primary'
+                      onClick={() => {
+                        this.props.dispatch({
+                          type: 'settingCompany/updateState',
+                          payload: {
+                            entity: undefined,
+                          },
+                        })
+                        this.props.toggleModal()
+                      }}
+                    >
+                      <Add />
+                      Add New
+                    </Button>
+                  </Authorized> :
+                  <Authorized authority='settings.supplier.newsupplier'>
+                    <Button
+                      color='primary'
+                      onClick={() => {
+                        this.props.dispatch({
+                          type: 'settingCompany/updateState',
+                          payload: {
+                            entity: undefined,
+                          },
+                        })
+                        this.props.toggleModal()
+                      }}
+                    >
+                      <Add />
+                      Add New
+                    </Button>
+                  </Authorized>
+                  }
+
               </div>
             </GridItem>
           </GridContainer>

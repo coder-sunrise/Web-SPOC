@@ -73,6 +73,7 @@ const Summary = ({ classes, values }) => {
                         textOverflow: 'ellipsis',
                         wordBreak: 'keep-all',
                         whiteSpace: 'nowrap',
+                        marginLeft: 20,
                       }}
                     >
                       <Tooltip title={v.adjRemark}>

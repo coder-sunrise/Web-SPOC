@@ -7,20 +7,37 @@ import { compare } from '@/layouts'
 import { CardContainer, Button, Tooltip } from '@/components'
 import FilterBar from './FilterBar'
 import Grid from './Grid'
+import Authorized from '@/utils/Authorized'
 
 const styles = () => ({})
 
+const { Secured } = Authorized
 @connect(({ patientSearch }) => ({
   patientSearch,
 }))
 @compare('patientSearch')
+@Secured('patientdatabase/searchpatient')
 class PatientSearch extends PureComponent {
   constructor (props) {
     super(props)
     // console.log(this)
 
+    // double click to view patient profile
     const showPatient = (row) => {
-      if (!this.props.history) return
+      const viewPatProfileAccessRight = Authorized.check(
+        'patientdatabase.patientprofiledetails',
+      )
+      const disableRights = [
+        'disable',
+        'hidden',
+      ]
+      if (
+        !this.props.history ||
+        (viewPatProfileAccessRight &&
+          disableRights.includes(viewPatProfileAccessRight.rights))
+      )
+        return
+
       this.props.history.push(
         getAppendUrl({
           md: 'pt',
@@ -33,17 +50,19 @@ class PatientSearch extends PureComponent {
     this.defaultAction = (row) => (
       <Tooltip title='View Patient Profile' placement='bottom'>
         <span>
-          <Button
-            size='sm'
-            onClick={() => showPatient(row)}
-            justIcon
-            authority='none'
-            round
-            color='primary'
-            style={{ marginRight: 5 }}
-          >
-            <AccountCircle />
-          </Button>
+          <Authorized authority='patientdatabase.patientprofiledetails'>
+            <Button
+              size='sm'
+              onClick={() => showPatient(row)}
+              justIcon
+              authority='none'
+              round
+              color='primary'
+              style={{ marginRight: 5 }}
+            >
+              <AccountCircle />
+            </Button>
+          </Authorized>
         </span>
       </Tooltip>
     )

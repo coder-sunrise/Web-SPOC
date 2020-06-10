@@ -37,7 +37,10 @@ export const getThumbnail = (original, { scale, width, height }) => {
     canvas.height = original.height * scale
   }
 
-  canvas.getContext('2d').drawImage(original, 0, 0, canvas.width, canvas.height)
+  let content = canvas.getContext('2d')
+  content.fillStyle = '#FFFFFF'
+  content.fillRect(0, 0, canvas.width, canvas.height)
+  content.drawImage(original, 0, 0, canvas.width, canvas.height)
 
   return canvas
 }

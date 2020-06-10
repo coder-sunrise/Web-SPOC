@@ -33,7 +33,6 @@ const RightPanel = (props) => {
     style,
     onChange,
     value,
-    mode,
     onDataSouceChange,
     dentalChartComponent,
     height,
@@ -46,7 +45,7 @@ const RightPanel = (props) => {
   ] = React.useState(false)
   return (
     <Paper className={classes.paper}>
-      <div style={{ width: '100%' }}>
+      <div style={{ width: '100%' }} className='journalContainer'>
         <GridContainer style={{ height: 'auto' }}>
           <GridItem xs={5}>
             <Checkbox
@@ -82,7 +81,7 @@ const RightPanel = (props) => {
             gutter={0}
             style={{ lineHeight: theme.props.singleRowHeight }}
           >
-            <Tooltip title='History' placement='left'>
+            <Tooltip title='Chart History' placement='left'>
               <Button
                 size='sm'
                 onClick={() => {
@@ -98,13 +97,14 @@ const RightPanel = (props) => {
           <GridItem xs={12}>
             <Tabs
               // style={{ marginTop: 20 }}
-              defaultActiveKey='0'
+              activeKey={dentalChartComponent.mode === 'diagnosis' ? '1' : '2'}
               onChange={(tabId) => {
                 if (tabId === '1') {
                   dispatch({
                     type: 'dentalChartComponent/updateState',
                     payload: {
                       mode: 'diagnosis',
+                      action: undefined,
                     },
                   })
                 } else {
@@ -112,6 +112,7 @@ const RightPanel = (props) => {
                     type: 'dentalChartComponent/updateState',
                     payload: {
                       mode: 'treatment',
+                      action: undefined,
                     },
                   })
                 }

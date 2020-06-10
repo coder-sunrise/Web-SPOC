@@ -1,20 +1,12 @@
 import { CLINIC_TYPE } from '@/utils/constants'
-import defaultConfigs, { dentalConfigs } from './config'
+// import defaultConfigs, { dentalConfigs } from './config'
+import { defaultConfigs } from './config'
 
-export const getConfig = (clinicInfo) => {
-  const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
-  switch (clinicTypeFK) {
-    case CLINIC_TYPE.GP:
-      return defaultConfigs
-    case CLINIC_TYPE.DENTAL:
-      return defaultConfigs
-    default:
-      return defaultConfigs
-  }
-}
+export const getConfig = () => defaultConfigs
 
 export const getContent = (config) => {
   const { fields } = config
+
   return fields.map((field) => ({
     title: field.fieldTitle,
     name: field.fieldName,
@@ -23,23 +15,36 @@ export const getContent = (config) => {
   }))
 }
 
-export const getDefaultActivePanel = (entity, config) => {
+export const getDefaultActivePanel = (
+  entity,
+  config,
+  prefix,
+  clinicInfo,
+  panels,
+) => {
   try {
     const { fields } = config
+    const { corScribbleNotes = [] } = entity
+    const notes = entity[prefix] || []
 
-    const { corDoctorNote = [], corScribbleNotes = [] } = entity
-    let defaultActive = fields.map((field) => field.index)
+    let defaultActive = [
+      0,
+    ]
 
-    if (corDoctorNote.length === 0 && corScribbleNotes.length === 0) return []
+    if (notes.length === 0 && corScribbleNotes.length === 0)
+      return defaultActive
 
     // check if panel contains doctor notes
-    if (corDoctorNote.length > 0) {
-      const doctorNote = { ...corDoctorNote[0] }
+    if (notes.length > 0) {
+      const doctorNote = { ...notes[0] }
       const panelWithData = fields.filter((field) => {
         if (doctorNote[field.fieldName]) return true
         return false
       })
-      defaultActive = panelWithData.map((i) => i.index)
+
+      defaultActive = panelWithData.map((i) =>
+        panels.findIndex((field) => field.index === i.index),
+      )
     }
 
     // check if panel contains scribble notes
@@ -60,7 +65,7 @@ export const getDefaultActivePanel = (entity, config) => {
     const result = [
       ...new Set(defaultActive),
     ]
-
+    // console.log({ result })
     return result
   } catch (error) {
     console.error(error)

@@ -17,7 +17,7 @@ const Cheque = ({
 }) => {
   return (
     <PaymentBase payment={payment} handleDeletePayment={handleDeletePayment}>
-      <GridContainer justify='flex-end'>
+      <GridContainer>
         <GridItem md={6}>
           <FastField
             name={`paymentList[${index}].amt`}
@@ -35,7 +35,14 @@ const Cheque = ({
         <GridItem md={6}>
           <FastField
             name={`paymentList[${index}].chequePayment.chequeNo`}
-            render={(args) => <TextField label='Cheque No.' {...args} />}
+            render={(args) => (
+              <TextField
+                label='Cheque No.'
+                {...args}
+                maxLength={25}
+                inputProps={{ maxLength: 25 }}
+              />
+            )}
           />
         </GridItem>
         <GridItem md={6}>

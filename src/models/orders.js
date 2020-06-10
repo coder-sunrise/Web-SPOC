@@ -46,33 +46,6 @@ const initialState = {
     orderSetItems: [],
   },
   defaultTreatment: {},
-  // default: {
-  //   corPrescriptionItemPrecaution: [
-  //     {
-  //       action: '1',
-  //       count: 1,
-  //       unit: '1',
-  //       frequency: '1',
-  //       day: 1,
-  //       // precaution: '1',
-  //       operator: '1',
-  //     },
-  //   ],
-  //   descriptions: [
-  //     {
-  //       action: '1',
-  //       count: 1,
-  //       unit: '1',
-  //       frequency: '1',
-  //       day: 1,
-  //       precaution: '1',
-  //       operator: '1',
-  //     },
-  //   ],
-  //   quantity: 1,
-  //   total: 20,
-  //   totalAfterAdj: 18,
-  // },
 }
 export default createListViewModel({
   namespace: 'orders',
@@ -157,7 +130,7 @@ export default createListViewModel({
 
     reducers: {
       reset () {
-        console.log('order reset')
+        // console.log('order reset')
         return { ...initialState }
       },
       upsertRowState (state, { payload }) {
@@ -210,7 +183,7 @@ export default createListViewModel({
       },
 
       deleteRow (state, { payload }) {
-        let { finalAdjustments, rows } = state
+        let { finalAdjustments, rows, isGSTInclusive, gstValue } = state
         let tempRows = [
           ...rows,
         ]
@@ -232,7 +205,10 @@ export default createListViewModel({
           }))
         }
 
-        const amount = calculateAmount(tempRows, finalAdjustments)
+        const amount = calculateAmount(tempRows, finalAdjustments, {
+          isGSTInclusive,
+          gstValue,
+        })
         // console.log(tempRows, finalAdjustments, amount)
         return {
           ...state,

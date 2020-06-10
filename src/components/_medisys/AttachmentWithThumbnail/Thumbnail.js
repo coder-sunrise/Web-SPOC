@@ -4,25 +4,18 @@ import classnames from 'classnames'
 import { FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
-import Edit from '@material-ui/icons/Edit'
-import Delete from '@material-ui/icons/Delete'
+import { compose } from 'redux'
+import { connect } from 'dva'
 // common components
 import {
-  Button,
   GridContainer,
   GridItem,
-  OutlinedTextField,
   SizeContainer,
   TextField,
   Tooltip,
 } from '@/components'
 import { DeleteWithPopover, LoadingWrapper } from '@/components/_medisys'
 // utils
-import {
-  pdfFileExtensions,
-  excelFileExtensions,
-  wordFileExtensions,
-} from './utils'
 import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
 // services
 import { getFileByFileID } from '@/services/file'
@@ -31,6 +24,12 @@ import dummyThumbnail from '@/assets/thumbnail-icons/dummy-thumbnail-icon.png'
 import pdfIcon from '@/assets/thumbnail-icons/pdf-icon.png'
 import wordIcon from '@/assets/thumbnail-icons/word-icon.png'
 import excelIcon from '@/assets/thumbnail-icons/excel-icon.png'
+import {
+  imageFileExtensions,
+  pdfFileExtensions,
+  excelFileExtensions,
+  wordFileExtensions,
+} from './utils'
 
 const styles = (theme) => ({
   simpleRoot: {
@@ -102,15 +101,17 @@ const styles = (theme) => ({
 
 const Thumbnail = ({
   classes,
-  index,
+  dispatch,
+  indexInAllAttachments,
   isReadOnly = false,
   simple,
   attachment,
   onConfirmDelete,
   onClickAttachment,
-  noBorder,
-  fieldName = 'visitAttachment',
+  noBorder = true,
+  fieldName,
   size = { width: 64, height: 64 },
+  hideRemarks,
 }) => {
   const {
     fileIndexFK,
@@ -119,6 +120,7 @@ const Thumbnail = ({
     id,
     thumbnailIndexFK,
     thumbnail = { id: undefined },
+    useImageViewer = true,
   } = attachment
 
   const [
@@ -166,14 +168,34 @@ const Thumbnail = ({
   }
 
   useEffect(getThumbnail, [
-    attachment,
+    attachment.id,
   ])
 
   const handleConfirmDelete = () => {
     onConfirmDelete(fileIndexFK, id)
   }
 
-  const handleAttachmentClicked = () => onClickAttachment(attachment)
+  const handleAttachmentClicked = () => {
+    if (!attachment) return
+
+    console.log(attachment)
+
+    if (
+      useImageViewer &&
+      imageFileExtensions.includes(attachment.fileExtension.toLowerCase())
+    ) {
+      // show image preview
+      dispatch({
+        type: 'imageViewer/updateState',
+        payload: {
+          attachment,
+        },
+      })
+      return
+    }
+
+    onClickAttachment(attachment)
+  }
 
   const simpleThumbnailClass = classnames({
     [classes.simpleRoot]: true,
@@ -224,7 +246,7 @@ const Thumbnail = ({
       </div>
     )
   }
-
+  // console.log(`${fieldName}[${indexInAllAttachments}].remarks`)
   return (
     <div className={thumbnailClass}>
       <LoadingWrapper loading={loadingThumbnail}>
@@ -235,10 +257,12 @@ const Thumbnail = ({
             </Tooltip>
           </GridItem>
           <GridItem md={3}>
-            <DeleteWithPopover
-              disabled={isReadOnly}
-              onConfirmDelete={handleConfirmDelete}
-            />
+            {!isReadOnly && (
+              <DeleteWithPopover
+                disabled={isReadOnly}
+                onConfirmDelete={handleConfirmDelete}
+              />
+            )}
           </GridItem>
           <GridItem md={12} style={{ cursor: 'pointer' }}>
             <div
@@ -253,25 +277,32 @@ const Thumbnail = ({
               />
             </div>
           </GridItem>
-          <GridItem md={12}>
-            <SizeContainer size='sm'>
-              <FastField
-                name={`${fieldName}[${index}].remark`}
-                render={(args) => (
-                  <TextField
-                    {...args}
-                    size='sm'
-                    label='Remarks'
-                    disabled={isReadOnly}
-                  />
-                )}
-              />
-            </SizeContainer>
-          </GridItem>
+          {!hideRemarks && (
+            <GridItem md={12}>
+              <SizeContainer size='sm'>
+                <FastField
+                  name={`${fieldName}[${indexInAllAttachments}].remarks`}
+                  render={(args) => (
+                    <TextField
+                      {...args}
+                      size='sm'
+                      label='Remarks'
+                      disabled={isReadOnly}
+                    />
+                  )}
+                />
+              </SizeContainer>
+            </GridItem>
+          )}
         </GridContainer>
       </LoadingWrapper>
     </div>
   )
 }
 
-export default withStyles(styles, { name: 'Thumbnail' })(Thumbnail)
+export default compose(
+  withStyles(styles, { name: 'Thumbnail' }),
+  connect(({ imageViewer }) => ({
+    imageViewer,
+  })),
+)(Thumbnail)

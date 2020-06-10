@@ -45,7 +45,7 @@ const compareOperationHour = (value, operationHour = []) => {
     ] = getHourAndMinute(end)
     const beforeStart =
       valueHour < startHour ||
-      (valueHour === startHour && valueMinute <= startMinute)
+      (valueHour === startHour && valueMinute < startMinute)
 
     const afterEnd =
       valueHour > endHour || (valueHour === endHour && valueMinute >= endMinute)

@@ -2,7 +2,7 @@ import moment from 'moment'
 import Yup from '@/utils/yup'
 import { notification } from '@/components'
 
-import { getCodes } from '@/utils/codes'
+import { getCodes } from '@/utils/codetable'
 
 let schemeTypes = []
 getCodes('ctSchemeType').then((codetableData) => {
@@ -160,11 +160,8 @@ const schemaDemographic = {
 }
 
 const pecValidationSchema = Yup.object().shape({
-  accountNoTypeFK: Yup.string().required(),
-  accountNo: Yup.string().NRIC().required(),
   // remark: Yup.string().required(),
   name: Yup.string().required(),
-  relationshipFK: Yup.number().required(),
 })
 const schemaEmergencyContact = {
   patientEmergencyContact: Yup.array()
@@ -222,13 +219,15 @@ const schemaSchemes = {
           is: (val) => {
             const st = schemeTypes.find((o) => o.id === val)
             if (!st) return false
-            return (
+            const notMedisaveOrPhpc =
               [
                 'MEDI500VISUT',
                 'FLEXIMEDI',
                 'OPSCAN',
               ].indexOf(st.code) < 0 && !st.code.startsWith('PHPC')
-            )
+
+            const isCorporate = st.id === 15
+            return notMedisaveOrPhpc && !isCorporate
           }, // val === undefined,
           then: Yup.array().of(Yup.date()).required().min(2),
           // otherwise: null,

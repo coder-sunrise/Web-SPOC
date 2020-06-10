@@ -57,12 +57,14 @@ export const AppointmentContextMenu = [
     label: 'Register Visit',
     Icon: Edit,
     disabled: true,
+    authority: 'queue.registervisit',
   },
   {
     id: 9,
     label: 'Register Patient',
     Icon: Person,
     disabled: true,
+    authority: 'patientdatabase.newpatient',
   },
 ]
 
@@ -109,12 +111,14 @@ export const ContextMenuOptions = [
     label: 'Patient Profile',
     Icon: Person,
     disabled: false,
+    authority: 'patientdatabase.patientprofiledetails',
   },
   {
     id: 4,
     label: 'Patient Dashboard',
     Icon: Book,
     disabled: false,
+    authority: 'patientdashboard',
   },
   { isDivider: true },
   {

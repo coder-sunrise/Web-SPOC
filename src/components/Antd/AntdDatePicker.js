@@ -100,6 +100,7 @@ class AntdDatePicker extends PureComponent {
       parser,
       local,
       showTime,
+      endDay,
       dateOnly,
     } = props
     const v =
@@ -117,8 +118,12 @@ class AntdDatePicker extends PureComponent {
           showTime
             ? moment(this.state.value).formatUTC(false)
             : moment(this.state.value)
-                .set({ hour: 0, minute: 0, second: 0 })
-                .formatUTC(),
+                .set(
+                  endDay
+                    ? { hour: 23, minute: 59, second: 59 }
+                    : { hour: 0, minute: 0, second: 0 },
+                )
+                .formatUTC(false),
         )
       }, 1)
     }
@@ -131,11 +136,13 @@ class AntdDatePicker extends PureComponent {
     if (field) {
       this.setState({
         value: field.value === undefined ? '' : field.value,
+        shrink: !!field.value,
       })
     } else if (value) {
       if (typeof value === 'string' || moment.isMoment(value)) {
         this.setState({
           value,
+          shrink: !!value,
         })
       }
     } else {
@@ -169,13 +176,18 @@ class AntdDatePicker extends PureComponent {
     // if (date) {
     //   date.utcOffset()
     // }
-    const { form, field, onChange, showTime } = this.props
+    const { form, field, onChange, showTime, endDay } = this.props
     // eslint-disable-next-line no-nested-ternary
-    const v = date
+    let v = date
       ? showTime
         ? moment(date).formatUTC(false)
         : moment(date.set({ hour: 0, minute: 0, second: 0 })).formatUTC()
       : ''
+    if (endDay) {
+      v = moment(date.set({ hour: 23, minute: 59, second: 59 })).formatUTC(
+        false,
+      )
+    }
     if (form && field) {
       form.setFieldValue(field.name, v)
     }
@@ -230,7 +242,7 @@ class AntdDatePicker extends PureComponent {
   // }
 
   buildInRestrict = (current) => {
-    const { dobRestrict, recurrenceRestrict } = this.props
+    const { dobRestrict, recurrenceRestrict, restrictFromTo } = this.props
     if (dobRestrict) {
       return (
         current &&
@@ -246,6 +258,25 @@ class AntdDatePicker extends PureComponent {
           current > moment().add(3, 'months').startOf('day'))
       )
     }
+
+    if (restrictFromTo) {
+      let restrictFromDate = moment(restrictFromTo[0]).startOf('day')
+      if (!restrictFromDate.isValid())
+        restrictFromDate = moment().startOf('day')
+
+      let restrictToDate = moment(restrictFromTo[1]).endOf('day')
+      if (!restrictToDate.isValid()) restrictToDate = null
+
+      if (!restrictToDate && restrictFromDate) {
+        return restrictFromDate.isAfter(current)
+      }
+
+      return !(
+        restrictFromDate.isSameOrBefore(current) &&
+        restrictToDate.isAfter(current)
+      )
+    }
+
     return false
   }
 

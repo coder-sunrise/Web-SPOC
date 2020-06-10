@@ -45,7 +45,6 @@ const History = (props) => {
     onDataSouceChange,
     dentalChartComponent,
     height,
-    dentalChartSetup,
     patientHistory,
     values,
     setFieldValue,
@@ -105,7 +104,6 @@ const History = (props) => {
               <Chart
                 // style={{ padding: theme.spacing(0, 3), margin: '0 auto' }}
                 dentalChartComponent={current}
-                // dentalChartSetup={dentalChartSetup}
                 readOnly
               />
             </GridItem>
@@ -118,20 +116,22 @@ const History = (props) => {
                     label='Previous Visit Date'
                     dropdownMatchSelectWidth={false}
                     // value={selected}
-                    options={list.map(
-                      ({
-                        id,
-                        visitPurposeName,
-                        visitDate,
-                        userName = '',
-                        userTitle = '',
-                      }) => ({
-                        value: id,
-                        name: `${visitPurposeName} (${moment(visitDate).format(
-                          dateFormatLong,
-                        )}) ${userTitle} ${userName}`,
-                      }),
-                    )}
+                    options={list
+                      .filter((o) => o.coHistory && o.coHistory.length)
+                      .map(
+                        ({
+                          id,
+                          visitPurposeName,
+                          visitDate,
+                          userName = '',
+                          userTitle = '',
+                        }) => ({
+                          value: id,
+                          name: `${visitPurposeName} (${moment(
+                            visitDate,
+                          ).format(dateFormatLong)}) ${userTitle} ${userName}`,
+                        }),
+                      )}
                     onChange={(v, op) => {
                       const item = list.find((o) => o.id === v)
                       if (item && item.coHistory[0]) {
@@ -182,6 +182,7 @@ const History = (props) => {
                   // style={{ width: '70%', margin: '0 auto' }}
                   dentalChartComponent={selected}
                   readOnly
+                  classes={classes}
                 />
               )}
             </GridItem>
@@ -206,30 +207,6 @@ const History = (props) => {
   )
 }
 export default compose(
-  // withFormikExtend({
-  //   mapPropsToValues: ({ dentalChartSetup }) => {
-  //     return {}
-  //   },
-
-  //   validationSchema: Yup.object().shape({
-  //     rows: Yup.array().of(rowSchema),
-  //   }),
-
-  //   handleSubmit: (values, { props, resetForm }) => {
-  //     // console.log(values)
-  //     const { dispatch, history, codetable, onConfirm } = props
-  //     dispatch({
-  //       type: 'dentalChartSetup/updateState',
-  //       payload: {
-  //         rows: values.rows,
-  //       },
-  //     })
-  //     // localStorage.setItem('dentalChartSetup', JSON.stringify(values.rows))
-  //     if (onConfirm) onConfirm()
-  //   },
-
-  //   displayName: 'DentalChartHistory',
-  // }),
   connect(({ patientHistory }) => ({
     patientHistory,
   })),

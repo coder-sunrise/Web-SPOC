@@ -14,7 +14,6 @@ import {
   deleteFileByFileID,
 } from '@/services/file'
 // utils
-import { getCodes } from '@/utils/codes'
 import AttachmentChipWithPopover from './AttachmentChipWithPopover'
 import { FILE_CATEGORY, FILE_STATUS } from '@/utils/constants'
 
@@ -121,13 +120,16 @@ const Attachment = ({
       fileName: file.name,
       fileSize: file.size,
       fileExtension: getFileExtension(file.name),
-      fileCategoryFK: fileCategoryFK,
+      fileCategoryFK,
       content: base64,
       // isConfirmed: false,
-      fileStatusFK: fileStatusFK,
+      fileStatusFK,
       attachmentType,
     }
-    const uploaded = await uploadFile(uploadObject)
+    console.log(uploadObject)
+    const uploaded = await uploadFile([
+      uploadObject,
+    ])
 
     return { ...uploaded, attachmentType }
   }

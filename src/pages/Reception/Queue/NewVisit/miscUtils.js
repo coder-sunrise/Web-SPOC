@@ -1,5 +1,6 @@
+import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
+import { bool } from 'prop-types'
 import { VISIT_STATUS } from '../variables'
-import { sendNotification } from '@/utils/realtime'
 
 const filterDeletedFiles = (item) => {
   // filter out not yet confirmed files
@@ -9,7 +10,15 @@ const filterDeletedFiles = (item) => {
 }
 
 const mapAttachmentToUploadInput = (
-  { fileIndexFK, fileName, attachmentType, isDeleted, thumbnail, ...rest },
+  {
+    fileIndexFK,
+    fileName,
+    attachmentType,
+    attachmentTypeFK,
+    isDeleted,
+    thumbnail,
+    ...rest
+  },
   index,
 ) =>
   !fileIndexFK
@@ -20,7 +29,9 @@ const mapAttachmentToUploadInput = (
         sortOrder: index,
         fileName,
         attachmentType,
+        attachmentTypeFK,
         isDeleted,
+        remarks: rest.remarks,
       }
     : {
         // file status === confirmed, need to provide full object for API
@@ -29,9 +40,69 @@ const mapAttachmentToUploadInput = (
         thumbnailIndexFK: thumbnail ? thumbnail.id : undefined,
         fileName,
         attachmentType,
+        attachmentTypeFK,
         isDeleted,
         sortOrder: index,
       }
+
+const convertEyeForms = (values) => {
+  let { visitEyeRefractionForm = undefined } = values
+
+  const removeFields = (obj, fields = []) => {
+    if (Array.isArray(obj)) {
+      for (let n = 0; n < obj.length; n++) {
+        const isEmpty = removeFields(obj[n], fields)
+        if (isEmpty) {
+          obj.splice(n, 1)
+          n--
+        }
+      }
+    } else if (typeof obj === 'object') {
+      for (let value in obj) {
+        if (Array.isArray(obj[value])) {
+          removeFields(obj[value], fields)
+        }
+      }
+      fields.forEach((o) => {
+        delete obj[o]
+      })
+
+      // check all of fields is empty
+      let allFieldIsEmtpy = true
+      for (let i in obj) {
+        if (i !== 'id' && obj[i] !== undefined && obj[i] !== '') {
+          allFieldIsEmtpy = false
+          break
+        }
+      }
+
+      return allFieldIsEmtpy
+    }
+  }
+
+  const durtyFields = [
+    'isDeleted',
+    'isNew',
+    'IsSelected',
+    'rowIndex',
+    '_errors',
+    'OD',
+    'OS',
+  ]
+  if (
+    visitEyeRefractionForm &&
+    visitEyeRefractionForm.formData &&
+    typeof visitEyeRefractionForm.formData === 'object'
+  ) {
+    let { formData } = visitEyeRefractionForm
+    removeFields(formData, durtyFields)
+
+    console.log('clear datas ==>', formData)
+    values.visitEyeRefractionForm.formData = JSON.stringify(formData)
+  }
+
+  return values
+}
 
 export const formikMapPropsToValues = ({
   clinicInfo,
@@ -39,11 +110,14 @@ export const formikMapPropsToValues = ({
   visitRegistration,
   doctorProfiles,
   history,
+  clinicSettings,
 }) => {
   try {
     let qNo = 0.0
     let doctorProfile
     let doctorProfileFK
+    let visitPurposeFK
+    let roomAssignmentFK
     if (clinicInfo) {
       // doctorProfile = doctorProfiles.find(
       //   (item) => item.doctorMCRNo === clinicInfo.primaryMCRNO,
@@ -85,14 +159,55 @@ export const formikMapPropsToValues = ({
       doctorProfileFK = doctorProfile ? doctorProfile.id : doctorProfileFK
     }
 
+    if (clinicSettings) {
+      visitPurposeFK = Number(clinicSettings.settings.defaultVisitType)
+    }
+
+    const { visitOrderTemplateFK, visitEyeRefractionForm } = visitEntries
+    const isVisitOrderTemplateActive = (visitRegistration.visitOrderTemplateOptions ||
+      [])
+      .map((option) => option.id)
+      .includes(visitEntries.visitOrderTemplateFK)
+
+    if (!visitEntries.id) {
+      if (doctorProfile) {
+        if (doctorProfile.clinicianProfile.roomAssignment) {
+          roomAssignmentFK =
+            doctorProfile.clinicianProfile.roomAssignment.roomFK
+        }
+      } else if (doctorProfileFK) {
+        const defaultDoctor = doctorProfiles.find(
+          (doctor) => doctor.id === doctorProfileFK,
+        )
+        if (defaultDoctor.clinicianProfile.roomAssignment) {
+          roomAssignmentFK =
+            defaultDoctor.clinicianProfile.roomAssignment.roomFK
+        }
+      }
+    }
+
+    let newFormData
+    if (visitEyeRefractionForm && visitEyeRefractionForm.formData) {
+      if (typeof visitEyeRefractionForm.formData === 'string')
+        newFormData = JSON.parse(visitEyeRefractionForm.formData)
+      else newFormData = visitEyeRefractionForm.formData
+    }
+
     return {
       queueNo: qNo,
-      visitPurposeFK: 1,
-      roomFK,
+      visitPurposeFK,
+      roomFK: roomAssignmentFK || roomFK,
       visitStatus: VISIT_STATUS.WAITING,
       // doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
       doctorProfileFK,
       ...visitEntries,
+      visitOrderTemplateFK: isVisitOrderTemplateActive
+        ? visitOrderTemplateFK
+        : undefined,
+      visitEyeRefractionForm: {
+        ...visitEyeRefractionForm,
+        formData: newFormData,
+      },
     }
   } catch (error) {
     console.log({ error })
@@ -104,7 +219,13 @@ export const formikHandleSubmit = (
   values,
   { props, resetForm, setSubmitting },
 ) => {
-  const { queueNo, visitAttachment, ...restValues } = values
+  const {
+    queueNo,
+    visitAttachment,
+    referralBy = [],
+    visitOrderTemplate,
+    ...restValues
+  } = values
   const {
     history,
     dispatch,
@@ -136,6 +257,27 @@ export const formikHandleSubmit = (
       .map(mapAttachmentToUploadInput)
   }
 
+  let _referralBy = null
+
+  if (typeof referralBy === 'string') {
+    _referralBy = referralBy
+  } else if (Array.isArray(referralBy) && referralBy.length > 0) {
+    // eslint-disable-next-line prefer-destructuring
+    _referralBy = referralBy[0]
+  }
+
+  let { visitEyeRefractionForm = undefined } = convertEyeForms(restValues)
+
+  if (
+    visitEyeRefractionForm &&
+    visitEyeRefractionForm.formData &&
+    typeof visitEyeRefractionForm.formData === 'object'
+  ) {
+    visitEyeRefractionForm.formData = JSON.stringify(
+      visitEyeRefractionForm.formData,
+    )
+  }
+
   const payload = {
     cfg: {
       message: id ? 'Visit updated' : 'Visit created',
@@ -152,32 +294,23 @@ export const formikHandleSubmit = (
       appointmentFK,
       roomFK,
       visitStatus: VISIT_STATUS.WAITING,
-      visitRemarks: null,
-      temperatureC: null,
-      bpSysMMHG: null,
-      bpDiaMMHG: null,
-      heightCM: null,
-      weightKG: null,
-      bmi: null,
-      pulseRateBPM: null,
-      priorityTime: null,
-      priorityType: null,
-      referralPersonFK: null,
-      referralCompanyFK: null,
-      referralPerson: null,
-      referralDate: null,
       ...restValues, // override using formik values
+      referralBy: _referralBy,
+      visitEyeRefractionForm,
     },
   }
 
-  console.log({ payload })
   dispatch({
     type: 'visitRegistration/upsert',
     payload,
   }).then((response) => {
     if (response) {
-      resetForm({})
       const { location } = history
+      onConfirm()
+      sendQueueNotification({
+        message: 'New visit created.',
+        queueNo: payload && payload.queueNo,
+      })
       if (location.pathname === '/reception/appointment')
         dispatch({
           type: 'calendar/refresh',
@@ -187,10 +320,7 @@ export const formikHandleSubmit = (
           type: 'queueLog/refresh',
         })
 
-      sendNotification('QueueListing', {
-        message: 'Visit Created',
-      })
-      onConfirm()
+      resetForm({})
     } else {
       setSubmitting(false)
     }

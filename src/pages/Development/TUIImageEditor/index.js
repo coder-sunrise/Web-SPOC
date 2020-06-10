@@ -1,11 +1,7 @@
 import React, { PureComponent, Suspense } from 'react'
 import GridLayout, { Responsive, WidthProvider } from 'react-grid-layout'
 import Loadable from 'react-loadable'
-import Loading from '@/components/PageLoading'
-import { deepDiffMapper } from '@/utils/cdrss'
-import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
-import Yup from '@/utils/yup'
 import numeral from 'numeral'
 import Search from '@material-ui/icons/Search'
 
@@ -45,6 +41,8 @@ import WarningIcon from '@material-ui/icons/Warning'
 import ErrorIcon from '@material-ui/icons/Error'
 import InfoIcon from '@material-ui/icons/Info'
 import CloseIcon from '@material-ui/icons/Close'
+import image from 'assets/img/sidebar-2.jpg'
+import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 import {
   CardContainer,
   TextField,
@@ -73,9 +71,11 @@ import {
   NumberInput,
   Switch,
 } from '@/components'
-import image from 'assets/img/sidebar-2.jpg'
 import { widgets } from '@/utils/widgets'
-import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
+import Yup from '@/utils/yup'
+import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
+import { deepDiffMapper } from '@/utils/cdrss'
+import Loading from '@/components/PageLoading'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -239,7 +239,7 @@ class ControlTest extends PureComponent {
       // )
       .loadImageFromURL(imgTest, 'test')
       .then((result) => {
-        console.log({ result })
+        // console.log({ result })
         console.log(this.editorInstance.getCanvasSize())
 
         this.editorInstance.clearUndoStack()

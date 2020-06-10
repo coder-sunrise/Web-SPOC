@@ -10,6 +10,10 @@ export default ({
   overlay,
   trigger = 'hover',
   disabled,
+  disabledTransition,
+  placement,
+  useTimer,
+  stopOnClickPropagation = false,
   ...props
 }) => {
   if (disabled) return children
@@ -17,6 +21,12 @@ export default ({
     anchorEl,
     setAnchorEl,
   ] = React.useState(null)
+
+  const [
+    timer,
+    setTimer,
+  ] = React.useState(null)
+
   const triggerProps = {
     onContextMenu:
       trigger === 'contextmenu'
@@ -34,17 +44,47 @@ export default ({
     onMouseEnter:
       trigger === 'hover'
         ? (event) => {
-            setAnchorEl(event.currentTarget)
+            if (useTimer) {
+              let selectAnchorEl = event.currentTarget
+              setTimer(
+                setTimeout(() => {
+                  setAnchorEl(selectAnchorEl)
+                }, 1000),
+              )
+            } else {
+              setAnchorEl(event.currentTarget)
+            }
           }
         : null,
     onMouseLeave:
       trigger === 'hover'
         ? () => {
+            if (useTimer) {
+              if (timer) {
+                clearTimeout(timer)
+                setTimer(null)
+              }
+            }
             setAnchorEl(null)
           }
         : null,
   }
-  // const { className, style, ...resetBtnProps } = children.props
+
+  const onOverlayClick = (event) => {
+    if (stopOnClickPropagation) event.stopPropagation()
+  }
+
+  const popperContainer = (
+    <Paper elevation={2}>
+      <ClickAwayListener
+        onClickAway={() => {
+          trigger !== 'hover' ? setAnchorEl(null) : undefined
+        }}
+      >
+        <div onClick={onOverlayClick}>{overlay}</div>
+      </ClickAwayListener>
+    </Paper>
+  )
 
   return (
     <span {...triggerProps}>
@@ -53,6 +93,7 @@ export default ({
         open={Boolean(anchorEl)}
         anchorEl={anchorEl}
         transition
+        placement={placement}
         // disablePortal
         onClose={() => {
           setAnchorEl(null)
@@ -65,23 +106,16 @@ export default ({
           vertical: 'center',
           horizontal: 'center',
         }}
-        style={{ zIndex: 1500 }}
+        style={{
+          zIndex: 1500,
+        }}
         {...props}
       >
-        {({ TransitionProps, placement }) => (
-          <Grow {...TransitionProps}>
-            <Paper>
-              <ClickAwayListener
-                onClickAway={() => {
-                  // console.log('onClickAway')
-                  trigger !== 'hover' ? setAnchorEl(null) : undefined
-                }}
-              >
-                {overlay}
-              </ClickAwayListener>
-            </Paper>
-          </Grow>
-        )}
+        {({ TransitionProps, p }) => {
+          if (disabledTransition) return popperContainer
+
+          return <Grow {...TransitionProps}>{popperContainer}</Grow>
+        }}
       </Popper>
     </span>
   )

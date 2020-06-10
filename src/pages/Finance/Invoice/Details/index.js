@@ -3,8 +3,11 @@ import { connect } from 'dva'
 // formik
 import { withFormik } from 'formik'
 // common components
-import { CardContainer } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
+// utils
+import Authorized from '@/utils/Authorized'
+import { INVOICE_VIEW_MODE } from '@/utils/constants'
+// sub components
 import InvoiceBanner from './InvoiceBanner'
 import InvoiceContent from './Content'
 
@@ -17,7 +20,12 @@ import InvoiceContent from './Content'
   name: 'invoiceDetail',
   enableReinitialize: true,
   mapPropsToValues: ({ invoiceDetail }) => {
-    return invoiceDetail.entity || invoiceDetail.default
+    const values = invoiceDetail.entity || invoiceDetail.default
+
+    return {
+      ...values,
+      totalPayment: values.invoiceTotalAftGST - values.outstandingBalance,
+    }
   },
 })
 class InvoiceDetails extends Component {
@@ -26,13 +34,12 @@ class InvoiceDetails extends Component {
   }
 
   componentWillUnmount () {
-    // const { dispatch } = this.props
-    // dispatch({
-    //   type: 'invoiceDetail/reset',
-    // })
-    // dispatch({
-    //   type: 'invoicePayment/reset',
-    // })
+    this.props.dispatch({
+      type: 'invoiceDetail/updateState',
+      payload: {
+        mode: INVOICE_VIEW_MODE.DEFAULT,
+      },
+    })
   }
 
   refresh = () => {
@@ -54,8 +61,15 @@ class InvoiceDetails extends Component {
   }
 
   render () {
-    const { values, invoiceDetail, invoicePayment, loading } = this.props
+    const {
+      values,
+      dispatch,
+      invoiceDetail,
+      invoicePayment,
+      loading,
+    } = this.props
     const invoiceContentProps = {
+      dispatch,
       values,
       invoiceDetail,
       invoicePayment,
@@ -63,12 +77,13 @@ class InvoiceDetails extends Component {
     const bannerProps = {
       values,
     }
+
     return (
       <LoadingWrapper loading={loading} text='Getting invoice details...'>
-        <CardContainer hideHeader>
+        <Authorized authority='finance/invoicepayment'>
           <InvoiceBanner {...bannerProps} />
           <InvoiceContent {...invoiceContentProps} />
-        </CardContainer>
+        </Authorized>
       </LoadingWrapper>
     )
   }

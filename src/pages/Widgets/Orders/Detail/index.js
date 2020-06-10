@@ -6,6 +6,7 @@ import { Divider, withStyles } from '@material-ui/core'
 import _ from 'lodash'
 import {
   Button,
+  ProgressButton,
   GridContainer,
   GridItem,
   notification,
@@ -14,7 +15,7 @@ import {
 import { currencySymbol } from '@/utils/config'
 // import Others from './Others'
 // utils
-import { orderTypes } from '@/utils/codes'
+import { orderTypes } from '@/pages/Consultation/utils'
 import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
@@ -98,16 +99,17 @@ class Details extends PureComponent {
                 //   // force current edit row components to update
                 //   type: 'global/incrementCommitCount',
                 // })
-              } else if (onReset) {
+              }
+              if (onReset) {
                 onReset()
               }
             }}
           >
             Discard
           </Button>
-          <Button color='primary' onClick={onSave}>
+          <ProgressButton color='primary' onClick={onSave} icon={null}>
             {!entity ? 'Add' : 'Save'}
-          </Button>
+          </ProgressButton>
         </div>
       </React.Fragment>
     )
@@ -204,6 +206,15 @@ class Details extends PureComponent {
         ...cfg,
         type: '7',
       })
+    const tabOptions = orderTypeArray
+      .filter((o) => o.value !== '7' || (o.value === '7' && from === 'ca'))
+      .filter((o) => {
+        const accessRight = Authorized.check(o.accessRight)
+
+        if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
+          return false
+        return true
+      })
     return (
       <div>
         <div className={classes.detail}>
@@ -211,28 +222,16 @@ class Details extends PureComponent {
             <GridItem xs={12}>
               <Tabs
                 activeKey={type}
-                options={orderTypeArray
-                  .filter(
-                    (o) =>
-                      o.value !== '7' || (o.value === '7' && from === 'ca'),
-                  )
-                  .filter((o) => {
-                    const accessRight = Authorized.check(o.accessRight)
-
-                    if (accessRight && accessRight.rights === 'hidden')
-                      return false
-                    return true
-                  })
-                  .map((o) => {
-                    return {
-                      id: o.value,
-                      name: o.name,
-                      content: o.component({
-                        ...cfg,
-                        type: o.value,
-                      }),
-                    }
-                  })}
+                options={tabOptions.map((o) => {
+                  return {
+                    id: o.value,
+                    name: o.name,
+                    content: o.component({
+                      ...cfg,
+                      type: o.value,
+                    }),
+                  }
+                })}
                 tabStyle={{}}
                 onChange={(key) => {
                   dispatch({

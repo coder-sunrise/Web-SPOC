@@ -5,7 +5,10 @@ import { FormattedMessage } from 'umi/locale'
 import Add from '@material-ui/icons/Add'
 // custom component
 import { Button } from '@/components'
+import Authorized from '@/utils/Authorized'
 
+const { Secured } = Authorized
+@Secured('queue.registervisit')
 class ViewDetailsBtn extends PureComponent {
   handleClick = () => {
     const { onClick, row } = this.props

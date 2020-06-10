@@ -4,17 +4,22 @@ import { compose } from 'redux'
 import { FormattedMessage } from 'umi/locale'
 // formik
 import { withFormik } from 'formik'
+import { connect } from 'dva'
 // material ui
 import Search from '@material-ui/icons/Search'
+import Print from '@material-ui/icons/Print'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 // common components
 import moment from 'moment'
-import { GridContainer, GridItem, ProgressButton } from '@/components'
+import { GridContainer, GridItem, ProgressButton, Button } from '@/components'
 // sub components
 import FilterByAppointment from './FilterByAppointment'
 import FilterByPatient from './FilterByPatient'
+import PostCardLabelBtn from './PostCardLabelBtn'
 import { APPOINTMENT_STATUS, SMS_STATUS } from '@/utils/constants'
+import { formatDatesToUTC } from '@/utils/dateUtils'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   filterBar: {
@@ -37,12 +42,15 @@ const FilterBar = ({
   dispatch,
   handleSubmit,
   setFieldValue,
+  selectedRows,
+  smsPatient,
 }) => {
   const props = {
     values,
     type,
     dispatch,
     setFieldValue,
+    selectedRows,
   }
 
   return (
@@ -64,6 +72,9 @@ const FilterBar = ({
           >
             <FormattedMessage id='sms.search' />
           </ProgressButton>
+          {type !== 'Appointment' && (
+            <PostCardLabelBtn {...props} smsPatient={smsPatient} />
+          )}
         </div>
       </GridItem>
     </div>
@@ -73,23 +84,40 @@ const FilterBar = ({
 export default compose(
   withStyles(styles, { withTheme: true }),
   withFormik({
-    mapPropsToValues: () => ({
-      upcomingAppointmentDate: [
-        moment(),
-        moment().add(1, 'months'),
-      ],
-      appointmentType: [],
+    mapPropsToValues: ({ currentUser, doctorprofile }) => {
+      const viewOtherApptAccessRight = Authorized.check(
+        'appointment.viewotherappointment',
+      )
 
-      lastVisitDate: [
-        moment().subtract(1, 'months'),
-        moment(),
-      ],
-      pdpaConsent: [
-        '1',
-        '2',
-        '3',
-      ],
-    }),
+      const isActiveDoctor = doctorprofile.find(
+        (doctor) =>
+          doctor.clinicianProfile.isActive &&
+          doctor.clinicianProfile.id === currentUser,
+      )
+      let doctor
+      if (
+        (!viewOtherApptAccessRight ||
+          viewOtherApptAccessRight.rights !== 'enable') &&
+        isActiveDoctor
+      ) {
+        doctor = [
+          currentUser,
+        ]
+      }
+      return {
+        upcomingAppointmentDate: [
+          moment(),
+          moment().add(1, 'months'),
+        ],
+        appointmentType: [],
+        doctor,
+        pdpaConsent: [
+          '1',
+          '2',
+          '3',
+        ],
+      }
+    },
 
     handleSubmit: (values, { props }) => {
       const {
@@ -100,18 +128,39 @@ export default compose(
         isExcludeReminderSent,
         doctor = [],
         appointmentType = [],
+
+        // patient
         pdpaConsent = [],
+        visitDate,
+        nationality,
+        noVisitDate,
+        dob,
+        ageFrom,
+        ageTo,
       } = values
-      const { dispatch, type, setSelectedRows } = props
+      const {
+        dispatch,
+        type,
+        setSelectedRows,
+        currentUser,
+        doctorprofile,
+      } = props
 
       let payload = {}
       let dispatchType = ''
 
-      let smsStatusPayload
+      let smsStatusPayload = []
       if (lastSMSSendStatus === SMS_STATUS.SENT) {
-        smsStatusPayload = '1 | 3 | 5 | 6 | 7 | 8 | 9 | 10 | 11'
+        smsStatusPayload = [
+          SMS_STATUS.SENT,
+          SMS_STATUS.DELIVERED,
+          SMS_STATUS.SENDING,
+        ]
       } else if (lastSMSSendStatus === SMS_STATUS.FAILED) {
-        smsStatusPayload = '2 | 4'
+        smsStatusPayload = [
+          SMS_STATUS.FAILED,
+          SMS_STATUS.UNDELIVERED,
+        ]
       }
 
       if (type === 'Appointment') {
@@ -122,6 +171,25 @@ export default compose(
         if (doctor.length > 1) {
           doctorProperty = 'in_Appointment_Resources.ClinicianFK'
           stringDoctors = doctor.join('|')
+        } else if (doctor.length <= 0) {
+          const viewOtherApptAccessRight = Authorized.check(
+            'appointment.viewotherappointment',
+          )
+
+          const isActiveDoctor = doctorprofile.find(
+            (clinician) =>
+              clinician.clinicianProfile.isActive &&
+              clinician.clinicianProfile.id === currentUser,
+          )
+
+          if (
+            (!viewOtherApptAccessRight ||
+              viewOtherApptAccessRight.rights !== 'enable') &&
+            !isActiveDoctor
+          ) {
+            doctorProperty = 'Appointment_Resources.ClinicianFK'
+            stringDoctors = -1
+          }
         }
         let stringAppType = Number(appointmentType)
         let apptTypeProperty = 'Appointment_Resources.AppointmentTypeFK'
@@ -156,33 +224,37 @@ export default compose(
           [apptStatusProperty]:
             appointmentStatus ||
             `${APPOINTMENT_STATUS.DRAFT}|${APPOINTMENT_STATUS.RESCHEDULED}|${APPOINTMENT_STATUS.SCHEDULED}`,
-          'in_AppointmentReminders.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.StatusFK': smsStatusPayload,
+          'in_AppointmentReminders.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.StatusFK': smsStatusPayload.join(
+            '|',
+          ),
           isReminderSent: isExcludeReminderSent ? false : undefined,
           [doctorProperty]: stringDoctors === 0 ? undefined : stringDoctors,
           [apptTypeProperty]: stringAppType === 0 ? undefined : stringAppType,
         }
       } else {
         dispatchType = 'smsPatient'
-        let PDPAPhone = pdpaConsent.includes('1') // phone
-        let PDPAMessage = pdpaConsent.includes('2') // sms
-        let PDPAEmail = pdpaConsent.includes('3') // email
+        const pdpaphone = pdpaConsent.includes('1') // phone
+        const pdpamessage = pdpaConsent.includes('2') // sms
+        const pdpaemail = pdpaConsent.includes('3') // email
+        const formattedVisitDate = formatDatesToUTC(visitDate)
+        const formattedNoVisitDate = formatDatesToUTC(noVisitDate)
+        const formattedDOB = formatDatesToUTC(dob)
         payload = {
-          group: [
-            {
-              name: patientName,
-              patientAccountNo: patientName,
-              patientReferenceNo: patientName,
-              'ContactFkNavigation.contactNumber.number': patientName,
-              combineCondition: 'or',
-            },
-          ],
-          'in_PatientOutgoingSMS.OutgoingSMSFKNavigation.StatusFK': smsStatusPayload,
-
           apiCriteria: {
-            // searchValue: patientName,
-            PDPAPhone,
-            PDPAMessage,
-            PDPAEmail,
+            searchValue: patientName,
+            visitdatefrom: formattedVisitDate[0],
+            visitdateto: formattedVisitDate[1],
+            nationality,
+            novisitdatefrom: formattedNoVisitDate[0],
+            novisitdateto: formattedNoVisitDate[1],
+            dobfrom: formattedDOB[0],
+            dobto: formattedDOB[1],
+            agefrom: ageFrom,
+            ageto: ageTo,
+            smsstatus: smsStatusPayload.join() || undefined,
+            pdpaphone,
+            pdpamessage,
+            pdpaemail,
           },
         }
       }

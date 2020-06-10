@@ -7,14 +7,16 @@ import { GridContainer, withFormikExtend, ProgressButton } from '@/components'
 import Header from './Header'
 import Grid from './Grid'
 import { INVOICE_STATUS } from '@/utils/constants'
-import { isPOStatusFinalized } from '../../variables'
 import { navigateDirtyCheck, roundTo } from '@/utils/utils'
 import AuthorizedContext from '@/components/Context/Authorized'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
+const { Secured } = Authorized
+@Secured('purchasingandreceiving.purchasingandreceivingdetails')
 @connect(({ podoPayment, purchaseOrderDetails }) => ({
   podoPayment,
   purchaseOrderDetails,
@@ -25,12 +27,10 @@ const styles = (theme) => ({
   mapPropsToValues: ({ podoPayment }) => {
     let outstandingAmount = {}
     let newPurchaseOrderPayment = []
-    if (
-      podoPayment &&
-      podoPayment.purchaseOrderDetails &&
-      podoPayment.purchaseOrderDetails.outstandingAmount
-    ) {
-      const osAmt = roundTo(podoPayment.purchaseOrderDetails.outstandingAmount)
+    if (podoPayment && podoPayment.purchaseOrderDetails) {
+      const osAmt = roundTo(
+        podoPayment.purchaseOrderDetails.outstandingAmount || 0,
+      )
       outstandingAmount = {
         outstandingAmt: osAmt,
         currentOutstandingAmt: osAmt,
@@ -76,6 +76,8 @@ const styles = (theme) => ({
             clinicPaymentTypeFK: 1,
             transactionOnBizSessionFK: currentBizSessionInfo.id,
             isCancelled: x.isCancelled,
+            paymentMode: x.paymentModeTypeName,
+            creditCardType: x.creditCardTypeName,
           },
         }
       }
@@ -152,79 +154,30 @@ class index extends PureComponent {
     })
   }
 
-  // onClickAddPayment = () => this.setState({ showPODOPaymentModal: true })
-
-  // onCloseAddPayment = () => this.setState({ showPODOPaymentModal: false })
-
-  recalculateOutstandingAmount = (type, value = 0) => {
-    const { values, setValues } = this.props
-    if (type === 'add') {
-      const currentOutstandingAmt = values.outstandingAmt - value
-      setValues({
-        ...values,
-        currentOutstandingAmt,
-      })
-    } else {
-      const currentOutstandingAmt = values.outstandingAmt + value
-      setValues({
-        ...values,
-        currentOutstandingAmt,
-        outstandingAmt: currentOutstandingAmt,
-      })
-    }
+  getTotalPaid = () => {
+    const activeRows = this.props.values.purchaseOrderPayment.filter(
+      (payment) => !payment.isDeleted,
+    )
+    return _.sumBy(activeRows, 'paymentAmount') || 0
   }
 
   render () {
-    const { purchaseOrderDetails } = this.props
+    const { purchaseOrderDetails, rights } = this.props
     const { purchaseOrder: po } = purchaseOrderDetails
-    const poStatus = po ? po.purchaseOrderStatusFK : 1
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
-    const isEditable = isPOStatusFinalized(poStatus)
-    const allowEdit = () => {
-      if (poStatus === 6) return false
-      if (isWriteOff) return false
-      return true
-    }
     return (
       <AuthorizedContext.Provider
         value={{
-          rights: allowEdit() ? 'enable' : 'disable',
-          // rights: 'disable',
+          rights: isWriteOff === true ? 'disable' : rights,
         }}
       >
         <GridContainer>
           <Header {...this.props} />
-          <Grid
-            {...this.props}
-            isEditable={isEditable}
-            recalculateOutstandingAmount={this.recalculateOutstandingAmount}
-          />
+          <Grid {...this.props} getTotalPaid={this.getTotalPaid} />
         </GridContainer>
-        {/* <CommonModal
-          open={showPODOPaymentModal}
-          title='Add Payment'
-          maxWidth='md'
-          bodyNoPadding
-          onConfirm={this.onCloseAddPayment}
-          onClose={this.onCloseAddPayment}
-        >
-          <PaymentDetails
-            refreshPodoPayment={this.refreshPodoPayment}
-            {...this.props}
-          />
-        </CommonModal> */}
-        {/* <Button
-          disabled={isEditable}
-          onClick={this.onClickAddPayment}
-          // hideIfNoEditRights
-          color='info'
-          link
-        >
-          <Add />
-          Add Payment
-        </Button> */}
+
         <div style={{ textAlign: 'center' }}>
           <ProgressButton
             color='danger'

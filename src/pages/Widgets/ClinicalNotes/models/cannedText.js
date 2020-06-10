@@ -1,18 +1,17 @@
 import { createFormViewModel } from 'medisys-model'
-// import * as service from '../services'
 import * as service from '../services/cannedText'
-import { CANNED_TEXT_TYPE_FIELD } from '@/utils/constants'
+import * as patientHistoryService from '../../../../services/patientHistory'
+import { CANNED_TEXT_TYPE_FIELD_NAME } from '../CannedText/utils'
 
 const defaultState = {
-  clinicianNote: [],
   chiefComplaints: [],
+  note: [],
   plan: [],
-  associatedHistory: [],
-  intraOral: [],
-  extraOral: [],
+  history: [],
   selectedNote: undefined,
   fields: [],
   cannedTextTypes: [],
+  prevDoctorNotes: undefined,
 }
 
 export default createFormViewModel({
@@ -25,14 +24,11 @@ export default createFormViewModel({
     state: {
       ...defaultState,
     },
-    subscriptions: ({ dispatch, history }) => {
-      history.listen(async (loct, method) => {
-        const { pathname, search, query = {} } = loct
-      })
-    },
+    subscriptions: {},
     effects: {
       *queryAll (_, { select, call, put, all }) {
         const cannedTextState = yield select((st) => st.cannedText)
+        const clinicInfo = yield select((state) => state.clinicInfo)
         const queries = cannedTextState.cannedTextTypes
           .filter((types) => !!types)
           .map((types) => call(service.query, types))
@@ -44,50 +40,50 @@ export default createFormViewModel({
               type: 'queryDone',
               payload: {
                 data: response.data,
+                clinicTypeFK: clinicInfo.clinicTypeFK,
               },
             }),
           )
         yield all(queryDone)
       },
+      *queryPrevDoctorNotes ({ payload }, { call, put }) {
+        const response = yield call(patientHistoryService.queryPrevDoctorNotes, payload)
+        if (response.status === '200') {
+          yield put({
+            type: 'updateState',
+            payload: {
+              prevDoctorNotes: response.data,
+            },
+          })
+          return response.data
+        }
+        return false
+      },
     },
     reducers: {
       filterDeleted (state, { payload }) {
-        const { id } = payload
-        const { fields, ...rest } = state
-        const filterDeletedFromAllFields = (_result, field) => ({
-          ..._result,
-          [field]: (state[field] || []).filter((item) => item.id !== id),
-        })
-        const updatedFields = fields.reduce(filterDeletedFromAllFields, {
-          ...rest,
-        })
+        const { id, cannedTextTypeFK } = payload
 
-        return { ...state, ...updatedFields }
+        const fieldName = CANNED_TEXT_TYPE_FIELD_NAME[cannedTextTypeFK]
+        return {
+          ...state,
+          [fieldName]: (state[fieldName] || [])
+            .filter((item) => item.id !== id),
+        }
       },
       queryDone (state, { payload }) {
         const { data } = payload
+
         const { fields, selectedNote, ...restState } = state
         const splitByCannedTextType = (_result, cannedText) => {
-          const field = CANNED_TEXT_TYPE_FIELD[cannedText.cannedTextTypeFK]
-          const currentField = _result[field] || []
+          const fieldName =
+            CANNED_TEXT_TYPE_FIELD_NAME[cannedText.cannedTextTypeFK]
+          const currentField = _result[fieldName] || []
           let rest = {}
-          // if (cannedText.isShared) {
-          //   const insertIntoOtherFields = (merged, eachField) => ({
-          //     ...merged,
-          //     [eachField]: [
-          //       ...(_result[eachField] || [])
-          //         .filter((item) => item.id !== cannedText.id),
-          //       cannedText,
-          //     ],
-          //   })
-          //   rest = fields.reduce(insertIntoOtherFields, {
-          //     ...restState,
-          //   })
-          // }
 
           return {
             ..._result,
-            [field]: [
+            [fieldName]: [
               ...currentField.filter((item) => item.id !== cannedText.id),
               cannedText,
             ],
@@ -96,7 +92,6 @@ export default createFormViewModel({
         }
 
         const result = data.reduce(splitByCannedTextType, { ...restState })
-        console.log({ result })
         return { ...state, ...result }
       },
       setList (state, { payload }) {

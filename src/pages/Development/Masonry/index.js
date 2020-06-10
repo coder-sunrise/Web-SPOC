@@ -14,10 +14,11 @@ import {
   Fade,
   ClickAwayListener,
 } from '@material-ui/core'
+import MoreVert from '@material-ui/icons/MoreVert'
+import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 import Loading from '@/components/PageLoading/index'
 import { getUniqueId } from '@/utils/utils'
-
-import MoreVert from '@material-ui/icons/MoreVert'
+import EyeVisualAcuity from '@/pages/Widgets/EyeVisualAcuity'
 
 import {
   CardContainer,
@@ -40,7 +41,6 @@ import {
 } from '@/components'
 
 import { widgets } from '@/utils/widgets'
-import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
 // import PatientSearch from '@/pages/PatientDatabase/Search'
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
@@ -208,68 +208,7 @@ class Masonry extends PureComponent {
 
   render () {
     const { props, state } = this
-    const { classes, ...resetProps } = this.props
-
-    const paperCfg = (cfg) => {
-      return {
-        elevation: 0,
-        className: classes.paper,
-        onMouseOver: (e) => {
-          console.log(e.target.key)
-        },
-        onMouseOut: (e) => {
-          console.log(e.target)
-        },
-      }
-    }
-    const layoutCfg = {
-      className: 'layout',
-      rowHeight: 30,
-      layouts: {
-        lg: pageDefaultWidgets.map((o) => o.config.lg),
-      },
-      breakpoints: { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 },
-      cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 },
-      useCSSTransforms: false,
-      margin: [
-        1,
-        1,
-      ],
-    }
-    return (
-      <CardContainer
-        // hideHeader
-        style={{
-          marginLeft: 5,
-          marginRight: 5,
-        }}
-        title={this.title}
-      >
-        <ResponsiveGridLayout {...layoutCfg}>
-          {pageDefaultWidgets.map((o) => {
-            const w = widgets.find((wg) => wg.id === o.widgetFK)
-            const LoadableComponent = w.component
-            return (
-              <Paper {...this.generateConfig(o)} {...o}>
-                <LoadableComponent />
-              </Paper>
-            )
-          })}
-          {/* <Paper key='a' {...paperCfg}>
-            <LoadableComponent />
-          </Paper>
-          <Paper key='b' {...paperCfg}>
-            b
-          </Paper>
-          <Paper key='c' {...paperCfg}>
-            c
-          </Paper> */}
-        </ResponsiveGridLayout>
-        <div className={classes.actionBtn}>
-          <ProgressButton onClick={props.handleSubmit} />
-        </div>
-      </CardContainer>
-    )
+    return <EyeVisualAcuity />
   }
 }
 

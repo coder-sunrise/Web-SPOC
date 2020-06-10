@@ -10,6 +10,7 @@ import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
 import Tooth from '../Tooth'
+import { isToothDoubleCenterCell } from '../variables'
 import {
   Button,
   GridContainer,
@@ -48,16 +49,17 @@ const SortItem = ({
 }) => {
   const ary = item
   // console.log(item)
-  const valueGroups = _.groupBy(ary, 'id')
+  const valueGroups = _.groupBy(ary, 'key')
   const SortList = SortableContainer(List)
   const items = Object.values(
     _.orderBy(valueGroups, (o) => o[0].timestamp),
-  ).map((o) => o[0].id) // Object.keys(valueGroups).map((o) => Number(o))
-
+  ).map((o, i) => o[0].key) // Object.keys(valueGroups).map((o) => Number(o))
+  // console.log(valueGroups, items)
   const onSortEnd = ({ newIndex, oldIndex }) => {
+    // console.log(newIndex, oldIndex)
     if (newIndex === oldIndex) return
-    let currentItems = ary.filter((o) => o.id === items[oldIndex])
-    const existItems = ary.filter((o) => o.id === items[newIndex])
+    let currentItems = ary.filter((o) => o.key === items[oldIndex])
+    const existItems = ary.filter((o) => o.key === items[newIndex])
     currentItems = currentItems.map((o) => ({
       ...o,
       timestamp:
@@ -73,7 +75,7 @@ const SortItem = ({
     ary
       .filter(
         (o) =>
-          o.id !== currentItems[0].id &&
+          o.key !== currentItems[0].key &&
           o.timestamp < currentItems[0].timestamp,
       )
       .map((o) => {
@@ -82,24 +84,34 @@ const SortItem = ({
     ary
       .filter(
         (o) =>
-          o.id !== currentItems[0].id &&
+          o.key !== currentItems[0].key &&
           o.timestamp > currentItems[0].timestamp,
       )
       .map((o) => {
         o.timestamp += 1
       })
 
+    // dispatch({
+    //   type: 'dentalChartComponent/updateState',
+    //   payload: {
+    //     data: [
+    //       ...data.filter(
+    //         (o) =>
+    //           (o.toothNo === Number(index) && o.key !== items[oldIndex]) ||
+    //           o.toothNo !== Number(index),
+    //       ),
+    //       ...currentItems,
+    //     ],
+    //   },
+    // })
+
     dispatch({
-      type: 'dentalChartComponent/updateState',
+      type: 'dentalChartComponent/sortItems',
       payload: {
-        data: [
-          ...data.filter(
-            (o) =>
-              (o.toothNo === Number(index) && o.id !== items[oldIndex]) ||
-              o.toothNo !== Number(index),
-          ),
-          ...currentItems,
-        ],
+        currentItems,
+        index,
+        oldIndex,
+        items,
       },
     })
   }
@@ -120,21 +132,39 @@ const SortItem = ({
         const v = subAry[0]
         if (v.action.method !== 3) v.info = subAry.map((o) => o.name).join(',')
         if (!subAry.find((o) => o.subTarget.indexOf('center') >= 0)) {
-          subAry.push({
-            subTarget: 'centerfull',
-            action: {
-              fill: 'white',
-              symbol: '',
-            },
-          })
+          if (isToothDoubleCenterCell(v.toothNo)) {
+            subAry.push({
+              subTarget: 'cell_centerleft',
+              action: {
+                chartMethodColorBlock: 'transparent',
+                chartMethodText: '',
+              },
+            })
+            subAry.push({
+              subTarget: 'cell_centerright',
+              action: {
+                chartMethodColorBlock: 'transparent',
+                chartMethodText: '',
+              },
+            })
+          } else {
+            subAry.push({
+              subTarget: 'cell_centerfull',
+              action: {
+                chartMethodColorBlock: 'transparent',
+                chartMethodText: '',
+              },
+            })
+          }
         }
-        const { action = {}, subTarget, id } = v
+        const { action = {}, subTarget, key } = v
         const SortableListItem = SortableElement(ListItem)
-        const idx = items.indexOf(id)
-        // console.log(v, selected)
+        const idx = items.indexOf(key)
+        // console.log(idx)
         return (
           <SortableListItem
-            key={id}
+            key={key}
+            uid={key}
             classes={{
               root: classes.toothJournalItem,
               secondaryAction: classes.toothJournalItemSecondaryAction,
@@ -147,15 +177,22 @@ const SortItem = ({
                   selected:
                     selected &&
                     v.toothNo === selected.toothNo &&
-                    v.id === selected.id
+                    v.key === selected.key
                       ? undefined
                       : v,
                 },
               })
+
+              window._tempDisableEvent = true
+              setTimeout(() => {
+                window._tempDisableEvent = false
+              }, 2000)
             }}
             index={idx}
             selected={
-              selected && v.toothNo === selected.toothNo && v.id === selected.id
+              selected &&
+              v.toothNo === selected.toothNo &&
+              v.key === selected.key
             }
           >
             <ListItemIcon
@@ -183,6 +220,7 @@ const SortItem = ({
                       .chartMethodText,
                   })),
                 )}
+                target={v}
                 // name={row.text}
               />
             </ListItemIcon>
@@ -222,6 +260,12 @@ const SortItem = ({
                                 deleted: true,
                               })),
                             })
+                            dispatch({
+                              type: 'dentalChartComponent/updateState',
+                              payload: {
+                                selected: undefined,
+                              },
+                            })
                           }}
                         >
                           <Delete />
@@ -239,6 +283,7 @@ const SortItem = ({
   )
 }
 
+// export default SortItem
 export default React.memo(
   SortItem,
   ({ item, selected }, { item: itemNext, selected: selectedNext }) => {

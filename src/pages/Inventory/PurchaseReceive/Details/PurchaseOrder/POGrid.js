@@ -1,26 +1,23 @@
 import React, { PureComponent } from 'react'
 import _ from 'lodash'
 import Yup from '@/utils/yup'
-import { EditableTableGrid, GridContainer, GridItem } from '@/components'
+import { FastEditableTableGrid, GridContainer, GridItem } from '@/components'
 import {
   podoOrderType,
   getInventoryItem,
-  getInventoryItemList,
-  fetchAndSaveCodeTable,
+  inventoryItemListing,
 } from '@/utils/codes'
+import { fetchAndSaveCodeTable } from '@/utils/codetable'
 
 // let commitCount = 2200 // uniqueNumber
 
-const receivingDetailsSchema = Yup.object().shape({
+const purchaseOrderDetailsSchema = Yup.object().shape({
   type: Yup.number().required(),
   code: Yup.number().required(),
-  // name: Yup.string().required(),
+  name: Yup.number().required(),
   orderQuantity: Yup.number()
-    .min(1, 'Order Quantity nust be greater than or equal to 1')
+    .min(1, 'Order Quantity must be greater than or equal to 1')
     .required(),
-  // bonusReceived: Yup.number()
-  //   .min(0, 'Bonus Quantity nust be greater than or equal to 0')
-  //   .required(),
 })
 
 class Grid extends PureComponent {
@@ -61,7 +58,7 @@ class Grid extends PureComponent {
         // excludeInactiveCodes: false,
         isActive: excludeInactiveCodes(),
       }).then((list) => {
-        const { inventoryItemList } = getInventoryItemList(
+        const { inventoryItemList } = inventoryItemListing(
           list,
           x.itemFKName,
           x.stateName,
@@ -131,7 +128,7 @@ class Grid extends PureComponent {
     row.codeString = option.code
     row.nameString = option.name
     row.unitOfMeasurement = option.uom
-    row.unitPrice = option.sellingPrice
+    row.unitPrice = option.lastCostPriceBefBonus
     row.uom = option.value
     row.orderQuantity = 0
     row.bonusReceived = 0
@@ -182,8 +179,8 @@ class Grid extends PureComponent {
         if (onClickColumn === 'type') {
           // type logic here
         } else if (onClickColumn === 'item') {
-          tempUnitPrice = selectedItem.sellingPrice
-          tempTotalPrice = selectedItem.sellingPrice
+          tempUnitPrice = selectedItem.lastCostPriceBefBonus
+          tempTotalPrice = selectedItem.lastCostPriceBefBonus
         } else {
           tempTotalQty = calcTotalQty() || 0
           tempTotalPrice = calcTotalPrice() || tempUnitPrice
@@ -435,18 +432,18 @@ class Grid extends PureComponent {
     return (
       <GridContainer style={{ paddingRight: 20 }}>
         <GridItem xs={4} md={12}>
-          <EditableTableGrid
+          <FastEditableTableGrid
             getRowId={(r) => r.uid}
             rows={rows}
-            schema={receivingDetailsSchema}
+            schema={purchaseOrderDetailsSchema}
+            forceRenderDuration={5000}
             FuncProps={{
-              edit: isEditable,
               pager: false,
             }}
             EditingProps={{
               showAddCommand: isEditable,
-              showEditCommand: isEditable,
-              showDeleteCommand: isEditable,
+              // showEditCommand: isEditable,
+              // showDeleteCommand: isEditable,
               onCommitChanges: this.onCommitChanges(values),
               onAddedRowsChange: this.onAddedRowsChange,
             }}

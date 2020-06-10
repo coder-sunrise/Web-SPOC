@@ -1,35 +1,22 @@
+import { Fragment } from 'react'
 import Loadable from 'react-loadable'
-import { Menu, Dropdown } from 'antd'
-
-import {
-  FormControl,
-  InputLabel,
-  Input,
-  Paper,
-  withStyles,
-  MenuItem,
-  Popper,
-  Fade,
-  ClickAwayListener,
-  Divider,
-  Fab,
-  Slide,
-} from '@material-ui/core'
-import MoreHoriz from '@material-ui/icons/MoreHoriz'
-import MoreVert from '@material-ui/icons/MoreVert'
-import Clear from '@material-ui/icons/Clear'
+// material ui
 import Add from '@material-ui/icons/Add'
-import Edit from '@material-ui/icons/Edit'
-import Fullscreen from '@material-ui/icons/Fullscreen'
-import FullscreenExit from '@material-ui/icons/FullscreenExit'
-import CompareArrows from '@material-ui/icons/CompareArrows'
+// common components
 import Loading from '@/components/PageLoading/index'
-import { Tooltip, AuthorizedContext, IconButton, Button } from '@/components'
+import { Tooltip, AuthorizedContext, IconButton } from '@/components'
+// utils
+import { CLINIC_TYPE } from '@/utils/constants'
+import Authorized from '@/utils/Authorized'
 
+const clinicInfo = JSON.parse(localStorage.getItem('clinicInfo') || {})
+const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
 const widgets = [
   {
     id: '1',
-    name: 'Clinical Notes',
+    name:
+      clinicTypeFK !== CLINIC_TYPE.DENTAL ? 'Clinical Notes' : 'Dental Notes',
+    accessRight: 'queue.consultation.widgets.clinicalnotes',
     component: Loadable({
       loader: () => import('@/pages/Widgets/ClinicalNotes'),
       loading: Loading,
@@ -92,6 +79,7 @@ const widgets = [
   {
     id: '2',
     name: 'Diagnosis',
+    accessRight: 'queue.consultation.widgets.diagnosis',
     component: Loadable({
       loader: () => import('@/pages/Widgets/Diagnosis'),
       loading: Loading,
@@ -104,7 +92,7 @@ const widgets = [
       minW: 12,
       minH: 10,
       style: {
-        padding: '0 5px',
+        padding: 5,
       },
     },
     // toolbarAddon: (
@@ -136,6 +124,7 @@ const widgets = [
   {
     id: '3',
     name: 'Consultation Document',
+    accessRight: 'queue.consultation.widgets.consultationdocument',
     component: Loadable({
       loader: () => import('@/pages/Widgets/ConsultationDocument'),
       loading: Loading,
@@ -181,6 +170,7 @@ const widgets = [
   {
     id: '4',
     name: 'Patient History',
+    accessRight: 'queue.consultation.widgets.patienthistory',
     component: Loadable({
       loader: () => import('@/pages/Widgets/PatientHistory'),
       render: (loaded, p) => {
@@ -200,6 +190,7 @@ const widgets = [
   {
     id: '5',
     name: 'Orders',
+    accessRight: 'queue.consultation.widgets.order',
     component: Loadable({
       loader: () => import('@/pages/Widgets/Orders'),
       loading: Loading,
@@ -246,6 +237,7 @@ const widgets = [
   {
     id: '7',
     name: 'Vital Sign',
+    accessRight: 'queue.consultation.widgets.vitalsign',
     component: Loadable({
       loader: () => import('@/pages/Widgets/VitalSign'),
       loading: Loading,
@@ -262,29 +254,51 @@ const widgets = [
       },
     },
     toolbarAddon: (
-      <Tooltip title='Add Vital Sign'>
-        <IconButton
-          style={{ float: 'left' }}
-          className='non-dragable'
-          onClick={() => {
-            window.g_app._store.dispatch({
-              type: 'patientVitalSign/updateState',
-              payload: {
-                shouldAddNew: true,
-              },
-            })
-          }}
-        >
-          <Add />
-        </IconButton>
-      </Tooltip>
+      <Authorized authority='queue.consultation.widgets.vitalsign'>
+        <Tooltip title='Add Vital Sign'>
+          <IconButton
+            style={{ float: 'left' }}
+            className='non-dragable'
+            onClick={() => {
+              window.g_app._store.dispatch({
+                type: 'patientVitalSign/updateState',
+                payload: {
+                  shouldAddNew: true,
+                },
+              })
+            }}
+          >
+            <Add />
+          </IconButton>
+        </Tooltip>
+      </Authorized>
     ),
+  },
+
+  {
+    id: '21',
+    name: 'Dental Chart',
+    accessRight: 'queue.consultation.widgets.dentalchart',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/DentalChart'),
+      loading: Loading,
+    }),
+    onUnmount: () => {
+      window.g_app._store.dispatch({
+        type: 'dentalChartComponent/reset',
+      })
+    },
   },
   {
     id: '8',
     name: 'Attachment',
+    accessRight: 'queue.consultation.widgets.attachment',
     component: Loadable({
       loader: () => import('@/pages/Widgets/Attachment'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...p} mainType='ClinicalNotes' />
+      },
       loading: Loading,
     }),
     model: 'attachment',
@@ -299,34 +313,92 @@ const widgets = [
       },
     },
   },
-  // {
-  //   id: '1001',
-  //   name: 'Test Widget',
-  //   component: Loadable({
-  //     loader: () => import('@/pages/Widgets/TestWidget'),
-  //     loading: Loading,
-  //   }),
-  //   layoutConfig: {
-  //     style: {},
-  //   },
-  // },
   {
-    id: '21',
-    name: 'Dental Chart',
+    id: '9',
+    name: 'Visual Acuity Test',
+    accessRight: 'queue.consultation.widgets.eyevisualacuity',
     component: Loadable({
-      loader: () => import('@/pages/Widgets/DentalChart'),
+      loader: () => import('@/pages/Widgets/EyeVisualAcuity'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return (
+          <Fragment>
+            <Authorized authority='queue.consultation.widgets.eyevisualacuity'>
+              <Cmpnet
+                {...p}
+                prefix='corEyeVisualAcuityTest.eyeVisualAcuityTestForms'
+                attachmentsFieldName='corAttachment'
+                fromConsultation
+                handleUpdateAttachments={({
+                  updated,
+                  form,
+                  dispatch,
+                  consultation,
+                }) => {
+                  // console.log(updated, form, dispatch, consultation)
+                  form.setFieldValue('corAttachment', updated)
+                  const { entity } = consultation
+                  entity.corAttachment = updated
+                  dispatch({
+                    type: 'consultation/updateState',
+                    payload: {
+                      entity,
+                    },
+                  })
+                }}
+              />
+            </Authorized>
+          </Fragment>
+        )
+      },
       loading: Loading,
     }),
-    onUnmount: () => {
-      window.g_app._store.dispatch({
-        type: 'dentalChartComponent/reset',
-      })
+    associatedProps: [
+      'corEyeVisualAcuityTest',
+    ],
+    layoutConfig: {
+      minW: 12,
+      minH: 10,
+      style: {
+        padding: 5,
+      },
     },
-    // layoutConfig: {
-    //   style: {
-    //     height: 'calc(100% - 36px)',
-    //   },
-    // },
+  },
+  {
+    id: '10',
+    name: 'Refraction Form',
+    accessRight: 'queue.consultation.widgets.eyerefractionform',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/RefractionForm'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...p} prefix='corEyeRefractionForm.formData' />
+      },
+      loading: Loading,
+    }),
+    associatedProps: [
+      'corEyeRefractionForm',
+    ],
+    // model: 'refractionForm',
+    layoutConfig: {},
+  },
+  {
+    id: '11',
+    name: 'Examination Form',
+    accessRight: 'queue.consultation.widgets.eyeexaminationform',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/ExaminationForm'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...p} prefix='corEyeExaminationForm.formData' />
+      },
+      loading: Loading,
+    }),
+    associatedProps: [
+      'corEyeExaminationForm',
+    ],
+    // model: 'refractionForm',
+    layoutConfig: {},
   },
 ]
 

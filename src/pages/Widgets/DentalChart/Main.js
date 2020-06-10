@@ -28,15 +28,7 @@ const styles = (theme) => ({
     padding: 0,
     width: 0,
   },
-  groupBtnRoot: {
-    display: 'block',
-    marginBottom: theme.spacing(1),
-  },
-  groupBtnGrouped: {
-    '&:not(:first-child)': {
-      marginLeft: theme.spacing(0.5),
-    },
-  },
+
   toothJournal: {
     paddingTop: 0,
     paddingBottom: 0,
@@ -67,23 +59,18 @@ const styles = (theme) => ({
     margin: 0,
     width: 'auto',
   },
-  buttonIcon: {
-    position: 'absolute',
-    left: -1,
+  treatmentListItem: {
+    padding: 0,
+  },
+
+  groupBtns: {
+    display: 'block',
   },
 })
 
 @connect(
-  ({
+  ({ dentalChartComponent, orders, codetable, consultation, global }) => ({
     dentalChartComponent,
-    dentalChartSetup,
-    orders,
-    codetable,
-    consultation,
-    global,
-  }) => ({
-    dentalChartComponent,
-    dentalChartSetup,
     orders,
     codetable,
     consultation,
@@ -134,7 +121,6 @@ class DentalChart extends React.Component {
       index,
       arrayHelpers,
       diagnosises,
-      classes,
       form,
       field,
       style,
@@ -145,6 +131,7 @@ class DentalChart extends React.Component {
       dispatch,
       ...props
     } = this.props
+    const { classes, ...restProps } = this.props
     const { mode } = dentalChartComponent
     return (
       <div className={className} style={{ padding: `${theme.spacing(1)}px 0` }}>
@@ -153,7 +140,9 @@ class DentalChart extends React.Component {
             <div style={{ marginBottom: theme.spacing(1) }}>
               <Chart {...this.props} />
             </div>
-            {mode === 'diagnosis' && <DiagnosisPanel {...this.props} />}
+            {mode === 'diagnosis' && (
+              <DiagnosisPanel searchable {...restProps} />
+            )}
             {mode === 'treatment' && <TreatmentForm {...this.props} />}
           </GridItem>
           <GridItem md={4}>

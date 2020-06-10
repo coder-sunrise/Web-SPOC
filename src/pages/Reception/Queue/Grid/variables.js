@@ -1,12 +1,19 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import moment from 'moment'
 // components
-import { DoctorLabel, VisitStatusTag } from '@/components/_medisys'
-import { dateFormat, CodeSelect, DateFormatter, Tooltip } from '@/components'
+import { DoctorLabel, CallingQueueButton } from '@/components/_medisys'
+import {
+  CodeSelect,
+  DateFormatter,
+  Tooltip,
+  dateFormatLong,
+  dateFormatLongWithTimeNoSec12h,
+} from '@/components'
 // utils
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 // variables
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
+import Authorized from '@/utils/Authorized'
 
 const compareString = (a, b) => a.localeCompare(b)
 const compareDoctor = (a, b) => {
@@ -59,6 +66,7 @@ export const AppointmentTableConfig = {
     { name: 'doctorName', title: 'Doctor' },
     { name: 'appointmentTime', title: 'Appt. Time' },
     { name: 'roomNo', title: 'Room No.' },
+    { name: 'remarks', title: 'Remarks' },
     { name: 'patientContactNo', title: 'Phone' },
     { name: 'action', title: 'Action' },
   ],
@@ -113,16 +121,15 @@ export const ApptColumnExtensions = [
     render: (row) => row.roomNo || '-',
   },
   {
+    columnName: 'remarks',
+    width: 180,
+    render: (row) => row.remarks || '-',
+  },
+  {
     columnName: 'appointmentTime',
     width: 180,
-    render: (row) => {
-      // const appointmentDate = moment(row.appointmentDate).format('MM DD YYYY')
-      const appointmentDate = moment(row.appointmentDate).format('DD MMM YYYY')
-      return DateFormatter({
-        value: `${appointmentDate} ${row.startTime}`,
-        format: 'DD MMM YYYY hh:mm A',
-      })
-    },
+    type: 'date',
+    showTime: true,
   },
 ]
 
@@ -136,6 +143,7 @@ export const QueueTableConfig = {
     { name: 'doctor', title: 'Doctor' },
     { name: 'appointmentTime', title: 'Appt. Time' },
     { name: 'roomNo', title: 'Room No.' },
+    { name: 'remarks', title: 'Remarks' },
     { name: 'timeIn', title: 'Time In' },
     { name: 'timeOut', title: 'Time Out' },
     { name: 'invoiceNo', title: 'Invoice No' },
@@ -161,12 +169,46 @@ export const QueueColumnExtensions = [
   //   width: 180,
   //   render: (row) => <VisitStatusTag row={row} />,
   // },
-  { columnName: 'queueNo', width: 80, compare: compareQueueNo },
+  {
+    columnName: 'queueNo',
+    width: 80,
+    compare: compareQueueNo,
+    render: (row) => {
+      return (
+        <Fragment>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <span>{row.queueNo}</span>
+            <div>
+              {row.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
+                <Authorized authority='openqueuedisplay'>
+                  <CallingQueueButton
+                    qId={row.queueNo}
+                    roomNo={row.roomNo}
+                    doctor={row.doctor}
+                  />
+                </Authorized>
+              )}
+            </div>
+          </div>
+        </Fragment>
+      )
+    },
+  },
   { columnName: 'patientAccountNo', compare: compareString },
 
   { columnName: 'invoiceNo' },
   {
     columnName: 'roomNo',
+  },
+  {
+    columnName: 'remarks',
+    width: 180,
   },
   // {
   //   columnName: 'patientScheme',
@@ -226,11 +268,11 @@ export const QueueColumnExtensions = [
       if (row.appointmentTime) {
         // const appointmentDate = moment(row.appointmentTime).format('MM DD YYYY')
         const appointmentDate = moment(row.appointmentTime).format(
-          'DD MMM YYYY',
+          dateFormatLong,
         )
         return DateFormatter({
           value: `${appointmentDate} ${row.appointmentResourceStartTime}`,
-          format: 'DD MMM YYYY hh:mm A',
+          format: dateFormatLongWithTimeNoSec12h,
         })
       }
       return '-'

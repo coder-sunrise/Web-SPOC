@@ -44,7 +44,6 @@ import {
   CheckboxGroup,
   ProgressButton,
   Checkbox,
-  NumberFormatter,
   confirm,
   SizeContainer,
   Popconfirm,
@@ -56,12 +55,13 @@ import {
 import Authorized from '@/utils/Authorized'
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 
-import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
 import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 // import model from '@/pages/Widgets/Orders/models'
-import { convertToConsultation } from './utils'
 import { VISIT_TYPE } from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
+import { CallingQueueButton } from '@/components/_medisys'
+import { initRoomAssignment } from '@/utils/codes'
+import { convertToConsultation } from './utils'
 
 // import PatientSearch from '@/pages/PatientDatabase/Search'
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
@@ -70,7 +70,6 @@ import Layout from './Layout'
 
 import schema from './schema'
 import styles from './style'
-
 // window.g_app.replaceModel(model)
 
 const discardMessage = 'Discard consultation?'
@@ -88,6 +87,7 @@ const saveConsultation = ({
     values,
     consultation,
     consultationDocument = {},
+    corEyeRefractionForm,
     orders = {},
   } = props
   const onConfirmSave = () => {
@@ -103,6 +103,7 @@ const saveConsultation = ({
       {
         orders,
         consultationDocument,
+        corEyeRefractionForm,
       },
     )
     newValues.duration = Math.floor(
@@ -200,6 +201,7 @@ const discardConsultation = ({
     visitRegistration,
     formik,
     cestemplate,
+    clinicSettings,
   }) => ({
     clinicInfo,
     consultation,
@@ -209,6 +211,7 @@ const discardConsultation = ({
     visitRegistration,
     formik,
     cestemplate,
+    clinicSettings: clinicSettings.settings || clinicSettings.default,
   }),
 )
 @withFormikExtend({
@@ -244,11 +247,21 @@ class Main extends React.Component {
     recording: true,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     // console.log('Main')
+    initRoomAssignment()
     setTimeout(() => {
       this.props.setFieldValue('fakeField', 'setdirty')
     }, 500)
+  }
+
+  componentWillUnmount() {
+    this.props.dispatch({
+      type: 'consultation/updateState',
+      payload: {
+        entity: undefined,
+      },
+    })
   }
 
   shouldComponentUpdate = (nextProps) => {
@@ -453,16 +466,18 @@ class Main extends React.Component {
       values,
       orders = {},
       visitRegistration,
+      clinicSettings,
     } = this.props
     const { entity: vistEntity = {} } = visitRegistration
     // if (!vistEntity) return null
-    const { visit = {} } = vistEntity
+    const { visit = {}, queueNo } = vistEntity
     const { summary } = orders
     // const { adjustments, total, gst, totalWithGst } = summary
     // console.log('values', values, this.props)
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)
+ 
     return (
       <SizeContainer size='sm'>
         <div
@@ -483,63 +498,63 @@ class Main extends React.Component {
               {({ rights }) => {
                 //
                 return rights === 'enable' &&
-                [
-                  'IN CONS',
-                  'WAITING',
-                ].includes(visit.visitStatus) &&
-                values.id ? (
-                  <GridItem>
-                    <h5 style={{ marginTop: -3, fontWeight: 'bold' }}>
-                      <Timer
-                        initialTime={
-                          Number(
-                            sessionStorage.getItem(
+                  [
+                    'IN CONS',
+                    'WAITING',
+                  ].includes(visit.visitStatus) &&
+                  values.id ? (
+                    <GridItem>
+                      <h5 style={{ marginTop: -3, fontWeight: 'bold' }}>
+                        <Timer
+                          initialTime={
+                            Number(
+                              sessionStorage.getItem(
+                                `${values.id}_consultationTimer`,
+                              ),
+                            ) ||
+                            values.duration ||
+                            0
+                          }
+                          direction='forward'
+                          startImmediately={this.state.recording}
+                        >
+                          {({
+                            start,
+                            resume,
+                            pause,
+                            stop,
+                            reset,
+                            getTimerState,
+                            getTime,
+                          }) => {
+                            sessionStorage.setItem(
                               `${values.id}_consultationTimer`,
-                            ),
-                          ) ||
-                          values.duration ||
-                          0
-                        }
-                        direction='forward'
-                        startImmediately={this.state.recording}
-                      >
-                        {({
-                          start,
-                          resume,
-                          pause,
-                          stop,
-                          reset,
-                          getTimerState,
-                          getTime,
-                        }) => {
-                          sessionStorage.setItem(
-                            `${values.id}_consultationTimer`,
-                            getTime(),
-                          )
-                          return (
-                            <React.Fragment>
-                              <TimerIcon
-                                style={{
-                                  height: 17,
-                                  top: 2,
-                                  left: -5,
-                                  position: 'relative',
-                                }}
-                              />
-                              <Timer.Hours
-                                formatValue={(value) =>
-                                  `${numeral(value).format('00')} : `}
-                              />
-                              <Timer.Minutes
-                                formatValue={(value) =>
-                                  `${numeral(value).format('00')} : `}
-                              />
-                              <Timer.Seconds
-                                formatValue={(value) =>
-                                  `${numeral(value).format('00')}`}
-                              />
+                              getTime(),
+                            )
+                            return (
+                              <React.Fragment>
+                                <TimerIcon
+                                  style={{
+                                    height: 17,
+                                    top: 2,
+                                    left: -5,
+                                    position: 'relative',
+                                  }}
+                                />
+                                <Timer.Hours
+                                  formatValue={(value) =>
+                                    `${numeral(value).format('00')} : `}
+                                />
+                                <Timer.Minutes
+                                  formatValue={(value) =>
+                                    `${numeral(value).format('00')} : `}
+                                />
+                                <Timer.Seconds
+                                  formatValue={(value) =>
+                                    `${numeral(value).format('00')}`}
+                                />
 
-                              {/* {!this.state.recording && (
+                                {/* {!this.state.recording && (
                       <IconButton
                         style={{ padding: 0, top: -1, right: -6 }}
                         onClick={() => {
@@ -565,27 +580,38 @@ class Main extends React.Component {
                         <Pause />
                       </IconButton>
                     )} */}
-                            </React.Fragment>
-                          )
-                        }}
-                      </Timer>
-                    </h5>
-                  </GridItem>
-                ) : null
+                              </React.Fragment>
+                            )
+                          }}
+                        </Timer>
+                      </h5>
+                    </GridItem>
+                  ) : null
               }}
             </Authorized>
-            <GridItem>
-              <h4 style={{ position: 'relative', marginTop: 0 }}>
-                Total Invoice
-                {summary && (
-                  <span>
-                    &nbsp;:&nbsp;
-                    <NumberInput text currency value={summary.totalWithGST} />
-                  </span>
-                )}
-              </h4>
-            </GridItem>
-            <GridItem>
+            {clinicSettings.showTotalInvoiceAmtInConsultation ?
+              <GridItem>
+                <h4 style={{ position: 'relative', marginTop: 0 }}>
+                  Total Invoice
+                  {summary && (
+                    <span>
+                      &nbsp;:&nbsp;
+                      <NumberInput text currency value={summary.totalWithGST} />
+                    </span>
+                    )}
+                </h4>
+              </GridItem>
+              : null}
+            <GridItem style={{ display: 'flex' }}>
+              <Authorized authority='openqueuedisplay'>
+                <div style={{ marginRight: 10 }}>
+                  <CallingQueueButton
+                    qId={queueNo}
+                    roomNo={visit.roomFK}
+                    doctor={visit.doctorProfileFK}
+                  />
+                </div>
+              </Authorized>
               {values.status !== 'PAUSED' && (
                 <ProgressButton
                   color='danger'
@@ -604,14 +630,14 @@ class Main extends React.Component {
                     'IN CONS',
                     'WAITING',
                   ].includes(visit.visitStatus) && (
-                    <ProgressButton
-                      onClick={this.pauseConsultation}
-                      color='info'
-                      icon={null}
-                    >
-                      Pause
-                    </ProgressButton>
-                  )}
+                      <ProgressButton
+                        onClick={this.pauseConsultation}
+                        color='info'
+                        icon={null}
+                      >
+                        Pause
+                      </ProgressButton>
+                    )}
                   {visit.visitStatus === 'PAUSED' && (
                     <ProgressButton
                       onClick={this.resumeConsultation}
@@ -677,14 +703,31 @@ class Main extends React.Component {
         ...v[p],
       ]
     })
-    if (v.corDoctorNote && v.corDoctorNote.length) {
-      if (exist.corDoctorNote && exist.corDoctorNote.length) {
-        exist.corDoctorNote[0].chiefComplaints = `${exist.corDoctorNote[0]
-          .chiefComplaints}<br/>${v.corDoctorNote[0].chiefComplaints}`
-        exist.corDoctorNote[0].clinicianNote = `${exist.corDoctorNote[0]
-          .clinicianNote}<br/>${v.corDoctorNote[0].clinicianNote}`
-        exist.corDoctorNote[0].plan = `${exist.corDoctorNote[0].plan}<br/>${v
-          .corDoctorNote[0].plan}`
+    if (v.corDoctorNote && v.corDoctorNote.length > 0) {
+      if (exist.corDoctorNote && exist.corDoctorNote.length > 0) {
+        const {
+          chiefComplaints = '',
+          clinicianNote = '',
+          plan = '',
+        } = exist.corDoctorNote[0]
+
+        if (chiefComplaints)
+          exist.corDoctorNote[0].chiefComplaints = `${chiefComplaints}<br/>${v
+            .corDoctorNote[0].chiefComplaints}`
+        else
+          exist.corDoctorNote[0].chiefComplaints =
+            v.corDoctorNote[0].chiefComplaints
+
+        if (clinicianNote)
+          exist.corDoctorNote[0].clinicianNote = `${clinicianNote}<br/>${v
+            .corDoctorNote[0].clinicianNote}`
+        else
+          exist.corDoctorNote[0].clinicianNote =
+            v.corDoctorNote[0].clinicianNote
+
+        if (plan)
+          exist.corDoctorNote[0].plan = `${plan}<br/>${v.corDoctorNote[0].plan}`
+        else exist.corDoctorNote[0].plan = v.corDoctorNote[0].plan
       } else {
         exist.corDoctorNote = [
           ...v.corDoctorNote,
@@ -750,8 +793,16 @@ class Main extends React.Component {
   //     },
   //   })
   // }
+  componentWillUnmount() {
+    this.props.dispatch({
+      type: 'consultation/updateState',
+      payload: {
+        entity: undefined,
+      },
+    })
+  }
 
-  render () {
+  render() {
     const { props, state } = this
     const {
       classes,
@@ -763,6 +814,7 @@ class Main extends React.Component {
       orders = {},
       formik,
       rights,
+      disabled,
       ...resetProps
     } = this.props
     const { entity } = consultation
@@ -773,7 +825,7 @@ class Main extends React.Component {
     // const { adjustments, total, gst, totalWithGst } = summary
     // console.log('values', values, this.props)
     // console.log(currentLayout)
-
+    // console.log(values)
     const matches = {
       rights:
         rights === 'enable' && visit.visitStatus === 'PAUSED'

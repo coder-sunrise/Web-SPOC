@@ -4,6 +4,7 @@ export default {
   'reception.queue.emptyState':
     'There is no session now. Would you like to start one?',
   'reception.queue.startSession': 'Start Session',
+  'reception.queue.reopenLastSession': 'Reopen Last Session',
   'reception.queue.startingASession': 'Starting a session',
   'reception.queue.gettingSessionInfo': 'Getting Session Info...',
   'reception.queue.doctor': 'Doctor',
@@ -90,7 +91,7 @@ export default {
   'reception.queue.dispense.drugItem.remarks': 'Remarks',
 
   'reception.queue.dispense.serviceItem.service': 'Service',
-  'reception.queue.dispense.serviceItem.serviceCentre': 'Service Centre',
+  'reception.queue.dispense.serviceItem.serviceCentre': 'Service Center',
   'reception.queue.dispense.serviceItem.instructions': 'Instructions',
   'reception.queue.dispense.serviceItem.remarks': 'Remarks',
 
@@ -127,6 +128,9 @@ export default {
   'reception.queue.visitRegistration.visitRemarks': 'Visit Remarks',
   'reception.queue.visitRegistration.attachment': 'Attachment',
   'reception.queue.visitRegistration.room': 'Room',
+  'reception.queue.visitRegistration.visitOrderTemplate':
+    'Visit Order Template',
+  'reception.queue.visitRegistration.visitOrderTotalCharge': 'Total Charges',
 
   'reception.queue.visitRegistration.vitalSign': 'Vital Sign',
   'reception.queue.visitRegistration.temperature': 'Temperature',

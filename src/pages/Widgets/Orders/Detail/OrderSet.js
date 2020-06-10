@@ -21,6 +21,9 @@ const { qtyFormat } = config
 
 @connect(({ global, codetable }) => ({ global, codetable }))
 @withFormikExtend({
+  authority: [
+    'queue.consultation.order.orderset',
+  ],
   mapPropsToValues: ({ orders = {}, type }) => {
     const v = {
       ...(orders.entity || orders.defaultOrderSet),

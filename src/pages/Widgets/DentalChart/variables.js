@@ -134,13 +134,16 @@ export const createToothShape = ({
   image,
   canvas,
   action,
+  target = {
+    subTarget: 'tooth',
+  },
 }) => {
   const cfg = {
     ...sharedCfg,
     top: baseHeight * 2,
     // strokeUniform: true,
   }
-
+  // console.log(groupCfg, left)
   const cCfg = {
     ...groupCfg,
     ...lockConfig,
@@ -155,6 +158,7 @@ export const createToothShape = ({
     // originY: 'center',
     subTargetCheck: true,
     selectable: false,
+
     selectionBackgroundColor: '#cccccc',
     line,
     // opacity: 0,
@@ -172,17 +176,39 @@ export const createToothShape = ({
   const _width = width || groupWidth
   const _height = height || groupHeight
 
-  if (action && action.chartMethodTypeFK === 2 && !image) {
+  if (
+    action &&
+    (action.chartMethodTypeFK === 2 ||
+      (action.chartMethodTypeFK === 1 &&
+        target.subTarget.indexOf('outside') >= 0)) &&
+    !image
+  ) {
+    let offset = _height / 3
+    if (target.subTarget === 'cell_outsidebottom') {
+      offset *= 1.2
+    } else if (target.subTarget === 'cell_outsidetop') {
+      offset *= 0.8
+    }
+
+    // console.log(target.subTarget === 'tooth')
     return new fabric.Group(
       [
-        createRectangle({
-          fill: action.chartMethodColorBlock,
-        }),
+        // createRectangle({
+        //   fill: action.chartMethodColorBlock,
+        // }),
+
+        target.subTarget === 'tooth'
+          ? createRectangle({
+              fill: action.chartMethodColorBlock,
+            })
+          : createTriangle({
+              fill: action.chartMethodColorBlock,
+            }).rotate(target.subTarget.indexOf('top') >= 0 ? 0 : 180),
         createFont({
           text: action.chartMethodText,
-          left: _width / 2 - _width / 8,
-          top: _height / 2 - _height / 4,
-          fontSize: _width / 2,
+          left: _width / 2 - _width / 5,
+          top: _height / 2 - offset,
+          fontSize: _width / 1.5,
         }),
       ],
       {
@@ -214,6 +240,7 @@ export const createToothShape = ({
     })
     return
   }
+  // console.log(fill, symbol, text)
   const polygon = new fabric.Polygon( // left
     [
       { x: 0, y: 0 },
@@ -368,7 +395,8 @@ export const createToothShape = ({
   let g5
   let g6
   let g7
-  if (!fill.centerfull && !text.centerfull) {
+
+  if (!fill.centerfull && !text.centerfull && !symbol.centerfull) {
     const polygon5 = new fabric.Polygon( // center left
       [
         { x: baseWidth, y: baseHeight },
@@ -518,4 +546,42 @@ export const createToothShape = ({
     )
   }
   return new fabric.Group(fixedItems.filter((o) => !width && !!o), cCfg)
+}
+
+export const isToothCrossed = (target, start, end) => {
+  const startChar1 = start.substring(0, 1)
+  const endChar1 = end.substring(0, 1)
+  if (!target || !Number(target)) return false
+  if (startChar1 === endChar1) {
+    return (
+      (Number(target) >= Number(start) && Number(target) <= Number(end)) ||
+      (Number(target) >= Number(end) && Number(target) <= Number(start))
+    )
+  }
+  if (target.substring(0, 1) === startChar1) {
+    return (
+      Number(target) > Number(`${startChar1}0`) &&
+      Number(target) <= Number(start)
+    )
+  }
+  if (target.substring(0, 1) === endChar1) {
+    return (
+      Number(target) > Number(`${endChar1}0`) && Number(target) <= Number(end)
+    )
+  }
+
+  return false
+}
+
+export const isToothDoubleCenterCell = (target) => {
+  if (target <= 18 && target >= 14) return true
+  if (target <= 28 && target >= 24) return true
+  if (target <= 38 && target >= 34) return true
+  if (target <= 48 && target >= 44) return true
+  if (target <= 55 && target >= 54) return true
+  if (target <= 65 && target >= 64) return true
+  if (target <= 75 && target >= 74) return true
+  if (target <= 85 && target >= 84) return true
+
+  return false
 }

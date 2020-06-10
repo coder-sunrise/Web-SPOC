@@ -100,6 +100,19 @@ const sharedOverrides = {
   //     zIndex: 1,
   //   },
   // },
+  MuiExpansionPanel: {
+    root: {
+      '&.Mui-expanded': {
+        margin: 0,
+        marginTop: '8px !important',
+
+        // marginTop: 'inherit',
+        // '&:first-child': {
+        //   marginTop: '8px !important',
+        // },
+      },
+    },
+  },
   NavPills: {
     contentWrapper: {
       marginLeft: 1,
@@ -276,7 +289,7 @@ export const defaultTheme = createMuiTheme({
     PrivateSwitchBase: {
       root: {
         margin: '0px 6px',
-        padding: 1,
+        padding: '0px 0px 1px 3px',
       },
     },
     MuiFormControl: {
@@ -505,6 +518,7 @@ export const smallTheme = createMuiTheme({
       root: {
         margin: '0px 4px',
         padding: 0,
+        paddingLeft: 2,
       },
     },
     MuiFormControl: {
@@ -577,7 +591,12 @@ export const smallTheme = createMuiTheme({
         //   marginRight: 27,
         // },
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
-          top: -4,
+          // top: -4,
+          height: 18,
+          // margin-top: 3px;
+          lineHeight: '18px',
+          fontSize: 'smaller',
+          padding: '0 18px 0 5px',
         },
       },
       input: {
@@ -611,6 +630,7 @@ export const smallTheme = createMuiTheme({
         transform: 'translate(0, 3px) scale(0.8)',
         fontWeight: 'inherit',
         width: '126%',
+        lineHeight: '20px',
       },
     },
     MuiInputAdornment: {
@@ -705,7 +725,7 @@ export const largeTheme = createMuiTheme({
     PrivateSwitchBase: {
       root: {
         margin: '0px 8px',
-        padding: 1,
+        padding: '0px 3px',
       },
     },
     MuiFormControl: {

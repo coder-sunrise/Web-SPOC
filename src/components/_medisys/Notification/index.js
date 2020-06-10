@@ -1,0 +1,107 @@
+import React from 'react'
+import classnames from 'classnames'
+// material ui
+import { withStyles, Divider } from '@material-ui/core'
+import Notifications from '@material-ui/icons/Notifications'
+import Refresh from '@material-ui/icons/Refresh'
+// common components
+import { Badge, Popper, Button, Tabs, IconButton } from '@/components'
+// sub components
+import { SystemMessageList } from '@/components/_medisys'
+// assets
+import customDropdownStyle from '@/assets/jss/material-dashboard-pro-react/components/customDropdownStyle'
+import NotificationList from './NotificationList'
+import { TYPES } from './constants'
+
+const styles = (theme) => ({
+  ...customDropdownStyle(theme),
+  overlayRoot: {
+    display: 'flex',
+    height: 50,
+    borderBottom: 'solid 1px #DCDCDC',
+  },
+})
+
+const NotificationComponent = ({
+  notifications = [],
+  systemMessage,
+  dispatch,
+  classes,
+  theme,
+}) => {
+  const refreshQueueListing = () => {
+    dispatch({
+      type: 'queueLog/refresh',
+    })
+  }
+  const { totalUnReadCount = 0 } = systemMessage
+
+  const overlay = (
+    <div style={{ position: 'relative', width: 600 }}>
+      <Tabs
+        type='line'
+        // style={{ marginTop: 20 }}
+        // activeKey={active}
+        // defaultActivekey='1'
+        // onChange={(e) => setActive(e)}
+        options={TYPES.map((o) => {
+          const list = notifications.filter((m) => !o.id || m.type === o.id)
+          let unReadCounts =
+            o.id === 4 ? totalUnReadCount : list.filter((m) => !m.read).length
+
+          return {
+            ...o,
+            name: `${o.name} ${unReadCounts > 0 ? `(${unReadCounts})` : ''}`,
+            content:
+              o.id === 4 ? (
+                <SystemMessageList dispatch={dispatch} type={o.id} />
+              ) : (
+                <NotificationList
+                  notifications={list}
+                  dispatch={dispatch}
+                  type={o.id}
+                />
+              ),
+          }
+        })}
+      />
+      <IconButton
+        style={{ top: 12, right: 12, position: 'absolute' }}
+        onClick={refreshQueueListing}
+      >
+        <Refresh />
+      </IconButton>
+    </div>
+  )
+
+  return (
+    <Popper
+      trigger='click'
+      className={classnames({
+        [classes.pooperResponsive]: true,
+        [classes.pooperNav]: true,
+      })}
+      overlay={overlay}
+    >
+      <Badge
+        badgeContent={
+          notifications.filter((o) => !o.read).length + totalUnReadCount
+        }
+        color='primary'
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+      >
+        <Button justIcon color='transparent'>
+          <Notifications fontSize='large' />
+        </Button>
+      </Badge>
+    </Popper>
+  )
+}
+
+export default withStyles(styles, {
+  withTheme: true,
+  name: 'NotificationComponent',
+})(NotificationComponent)

@@ -7,6 +7,11 @@ const connectionObserver = {}
 const tenMinutesInMillisecond = 600000
 const retryIntervalInMillisecond = 5000
 
+const CONNECTION_STATE = {
+  CONNECTED: 'Connected',
+  DISCONNECTED: 'Disconnected',
+}
+
 const setSignalRConnectedState = (state = false) => {
   window.g_app._store.dispatch({
     type: 'header/updateState',
@@ -35,8 +40,20 @@ const automaticReconnectConfig = {
   },
 }
 
+const updateSignalRState = () => {
+  if (connection) {
+    let isConnected = false
+    if (connection.connectionState === CONNECTION_STATE.CONNECTED) {
+      isConnected = true
+    }
+
+    setSignalRConnectedState(isConnected)
+    console.log(`Connection State: ${connection.connectionState}`)
+  }
+}
+
 const initStream = () => {
-  const signalREndPoint = process.env.signalrUrl
+  const signalREndPoint = 'https://localhost:44372/notificationHub/'
 
   connection = new signalR.HubConnectionBuilder()
     .withUrl(signalREndPoint, {
@@ -49,100 +66,75 @@ const initStream = () => {
     const { sender, message } = response
 
     const { dispatch, getState } = window.g_app._store
-    const {
-      user = {
-        data: {
-          clinicianProfile: {
-            name: '',
+
+    if (type === 'Announcement') {
+      console.log(response)
+      dispatch({
+        type: 'systemMessage/received',
+        payload: {
+          ...response,
+        },
+      })
+    } else {
+      const {
+        user = {
+          data: {
+            clinicianProfile: {
+              name: '',
+            },
           },
         },
-      },
-      header,
-    } = getState()
-    if (sender !== user.data.clinicianProfile.name) {
-      const { notifications = [] } = header
+        header,
+      } = getState()
+      if (sender !== user.data.clinicianProfile.name) {
+        const { notifications = [] } = header
 
-      notifications.push(response)
-      dispatch({
-        type: 'header/updateState',
-        payload: notifications,
-      })
-      sessionStorage.setItem('notifications', JSON.stringify(notifications))
+        notifications.push(response)
+        dispatch({
+          type: 'header/updateState',
+          payload: notifications,
+        })
+        sessionStorage.setItem('notifications', JSON.stringify(notifications))
+      }
+      if (connectionObserver[type]) {
+        connectionObserver[type](response)
+      }
     }
-
-    if (connectionObserver[type]) {
-      connectionObserver[type](response)
-    }
-    // var message = data.sender + ' says ' + data.message
-    // var li = document.createElement('li')
-    // li.textContent = message
-    // document.getElementById('messagesList').appendChild(li)
-    // console.log('***************')
-    // console.log('NotificationReceived: ' + eventName + ' from ' + data.sender)
-    // console.log('Message:' + data.message)
-    // console.log('***************')
-    // var notification = new Notification('New Messsage Received', {
-    //   body: data.sender + ': ' + data.message,
-    //   icon:
-    //     'https://5.imimg.com/data5/XQ/KP/MY-40305254/kids-toy-500x500.jpg',
-    // })
   })
+
+  connection.onclose(updateSignalRState)
+  connection.onreconnected(updateSignalRState)
 
   let retryAttempt = 0
-
   const startConnection = () => {
-    connection
-      .start()
-      .then(() => {
-        setSignalRConnectedState(true)
-        console.log('Connection started')
-      })
-      .catch((err) => {
-        setSignalRConnectedState(false)
-        if (connection.connectionState === 'Disconnected') {
-          retryAttempt += 1
-          const interval = retryAttempt * retryIntervalInMillisecond
+    if (connection) {
+      if (connection.connectionState === CONNECTION_STATE.DISCONNECTED)
+        // starting the connection
+        connection.start().then(updateSignalRState).catch((err) => {
+          updateSignalRState()
+          if (connection.connectionState === CONNECTION_STATE.DISCONNECTED) {
+            retryAttempt += 1
+            const interval = retryAttempt * retryIntervalInMillisecond
 
-          if (retryAttempt > 4) {
-            return console.log(err)
+            if (retryAttempt > 4) {
+              return console.log(err)
+            }
+
+            setTimeout(() => {
+              console.log(
+                `Retry attempt: ${retryAttempt}, next retry in: ${interval}ms`,
+              )
+              startConnection()
+            }, interval)
           }
-
-          setTimeout(() => {
-            console.log(
-              `Retry attempt: ${retryAttempt}, next retry in: ${interval}ms`,
-            )
-            startConnection()
-          }, interval)
-        }
-        return console.log(err)
-      })
+          return console.log(err)
+        })
+      else if (connection.connectionState === CONNECTION_STATE.CONNECTED)
+        updateSignalRState()
+    }
   }
 
-  connection.onclose(() => {
-    console.log('Disconnected')
-    setSignalRConnectedState(false)
-  })
-
-  connection.onreconnected(() => {
-    console.log('Reconnected')
-    setSignalRConnectedState(true)
-  })
-
   startConnection()
-
-  // JSON-string from `response.json()` call
-  // .catch((error) => console.log(error))
-
-  // setInterval(() => {
-  //   connection
-  //     .invoke('SendNotification', 'NewMessage', {
-  //       message: 'reception update',
-  //       sender: 'Mr Test',
-  //     })
-  //     .catch((err) => {
-  //       return console.error(err.toString())
-  //     })
-  // }, 5000)
 }
 
 const sendNotification = (type, data) => {
@@ -162,9 +154,11 @@ const sendNotification = (type, data) => {
   data.senderId = user.data.id
   data.timestamp = Date.now()
 
-  connection.invoke('SendNotification', type, data).catch((err) => {
-    return console.error(err)
-  })
+  if (connection) {
+    connection.invoke('SendNotification', type, data).catch((err) => {
+      return console.error(err)
+    })
+  }
 }
 
 const debouncedSendNotification = _.debounce(sendNotification, 500, {

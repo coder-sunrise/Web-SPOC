@@ -5,9 +5,10 @@ import { compose } from 'redux'
 import moment from 'moment'
 import { connect } from 'dva'
 import { CardContainer, Danger, Tabs } from '@/components'
+import { ADD_ON_FEATURE, APPOINTMENT_STATUS } from '@/utils/constants'
+import Authorized from '@/utils/Authorized'
 import New from './New'
 import { SmsOption } from './variables'
-import { ADD_ON_FEATURE, APPOINTMENT_STATUS } from '@/utils/constants'
 
 const styles = {
   sendBar: {
@@ -41,7 +42,15 @@ const styles = {
   },
 }
 
-const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
+const SMS = ({
+  classes,
+  smsAppointment,
+  smsPatient,
+  dispatch,
+  clinicInfo,
+  doctorprofile,
+  user,
+}) => {
   const [
     selectedRows,
     setSelectedRows,
@@ -72,6 +81,8 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
     dispatch,
     setSelectedRows,
     selectedRows,
+    user,
+    doctorprofile,
   }
 
   const contentClass = classnames({
@@ -80,18 +91,36 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
 
   const defaultSearchQuery = (type) => {
     if (type === 'Appointment') {
+      const viewOtherApptAccessRight = Authorized.check(
+        'appointment.viewotherappointment',
+      )
+
+      const isActiveDoctor = doctorprofile.find(
+        (clinician) =>
+          clinician.clinicianProfile.isActive &&
+          clinician.clinicianProfile.id === user.data.clinicianProfile.id,
+      )
+      let doctorProperty = 'Appointment_Resources.ClinicianFK'
+      let doctor
+      if (
+        !viewOtherApptAccessRight ||
+        viewOtherApptAccessRight.rights !== 'enable'
+      ) {
+        doctor = isActiveDoctor ? user.data.clinicianProfile.id : -1
+      }
       return {
         lgteql_AppointmentDate: moment().formatUTC(),
         lsteql_AppointmentDate: moment().add(1, 'months').formatUTC(false),
         in_AppointmentStatusFk: `${APPOINTMENT_STATUS.DRAFT}|${APPOINTMENT_STATUS.RESCHEDULED}|${APPOINTMENT_STATUS.SCHEDULED}`,
+        [doctorProperty]: doctor,
       }
     }
 
     return {
       apiCriteria: {
-        PDPAPhone: true,
-        PDPAMessage: true,
-        PDPAEmail: true,
+        pdpaphone: true,
+        pdpamessage: true,
+        pdpaemail: true,
       },
     }
   }
@@ -189,9 +218,11 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
 export default compose(
   withStyles(styles, { withTheme: true }),
   React.memo,
-  connect(({ smsAppointment, smsPatient, clinicInfo }) => ({
+  connect(({ smsAppointment, smsPatient, clinicInfo, codetable, user }) => ({
     smsAppointment,
     smsPatient,
     clinicInfo,
+    doctorprofile: codetable.doctorprofile || [],
+    user,
   })),
 )(SMS)

@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 // material ui
 import { withStyles } from '@material-ui/core'
 // custom component
@@ -8,24 +9,29 @@ import {
   GridItem,
   SizeContainer,
   withFormikExtend,
+  Accordion,
 } from '@/components'
 // medisys-components
 import { ErrorWrapper, LoadingWrapper } from '@/components/_medisys'
 // Sub-components
+import { deleteFileByFileID } from '@/services/file'
+import { VISIT_TYPE } from '@/utils/constants'
+import { locationQueryParameters } from '@/utils/utils'
+import Authorized from '@/utils/Authorized'
 import PatientInfoCard from './PatientInfoCard'
 import VisitInfoCard from './VisitInfoCard'
 import VitalSignCard from './VitalSignCard'
 import ReferralCard from './ReferralCard'
+import EyeVisualAcuityCard from './EyeVisualAcuityCard'
+import RefractionFormCard from './RefractionFormCard'
+
 // import ParticipantCard from './ParticipantCard'
 import VisitValidationSchema from './validationScheme'
 import FormFieldName from './formField'
 // services
-import { deleteFileByFileID } from '@/services/file'
 // misc utils
 import { formikMapPropsToValues, formikHandleSubmit } from './miscUtils'
 import { VISIT_STATUS } from '../variables'
-import { VISIT_TYPE } from '@/utils/constants'
-import { locationQueryParameters } from '@/utils/utils'
 
 const styles = (theme) => ({
   gridContainer: {
@@ -70,6 +76,7 @@ const getHeight = (propsHeight) => {
 
 @connect(
   ({
+    clinicSettings,
     clinicInfo,
     queueLog,
     loading,
@@ -77,6 +84,7 @@ const getHeight = (propsHeight) => {
     patient,
     codetable,
   }) => ({
+    clinicSettings,
     clinicInfo,
     queueLog,
     loading,
@@ -94,6 +102,54 @@ const getHeight = (propsHeight) => {
   handleSubmit: formikHandleSubmit,
 })
 class NewVisit extends PureComponent {
+  state = {
+    hasActiveSession: false,
+  }
+
+  constructor (props) {
+    super(props)
+
+    this.myRef = React.createRef()
+  }
+
+  componentDidMount = async () => {
+    const { dispatch } = this.props
+    const response = await dispatch({
+      type: 'visitRegistration/getVisitOrderTemplateList',
+      payload: {
+        pagesize: 9999,
+      },
+    })
+    if (response) {
+      const { data } = response
+      const templateOptions = data
+        .filter((template) => template.isActive)
+        .map((template) => {
+          return {
+            ...template,
+            value: template.id,
+            name: template.displayValue,
+          }
+        })
+
+      dispatch({
+        type: 'visitRegistration/updateState',
+        payload: {
+          visitOrderTemplateOptions: templateOptions,
+        },
+      })
+    }
+
+    const bizSession = await dispatch({
+      type: 'visitRegistration/getBizSession',
+      payload: {
+        IsClinicSessionClosed: false,
+      },
+    })
+    const { data = [] } = bizSession
+    this.setState({ hasActiveSession: data.length > 0 })
+  }
+
   componentWillUnmount () {
     // call file index API METHOD='DELETE'
     // for Attachments where fileStatus === 'Uploaded' but not 'Confirmed'
@@ -116,7 +172,7 @@ class NewVisit extends PureComponent {
 
   calculateBMI = () => {
     const { heightCM, weightKG } = this.props.values
-    console.log(heightCM, weightKG)
+
     const { setFieldValue, setFieldTouched } = this.props
     if (heightCM && weightKG) {
       const heightM = heightCM / 100
@@ -192,17 +248,84 @@ class NewVisit extends PureComponent {
     return handleSubmit()
   }
 
+  getEyeWidgets = (isReadOnly, isRetail) => {
+    const { values, classes } = this.props
+
+    const checkAccessright = (authority) => {
+      const accessRight = Authorized.check(authority)
+      if (accessRight) {
+        const { rights } = accessRight
+        return (rights === 'readwrite' || rights === 'enable') &&
+        (isReadOnly || isRetail)
+          ? 'disable'
+          : rights
+      }
+
+      return undefined
+    }
+
+    return [
+      {
+        title: 'Visual Acuity Test',
+        authority: 'queue.visitregistrationdetails.eyevisualacuity',
+        content: (
+          <GridItem xs={12} className={classes.row}>
+            <EyeVisualAcuityCard
+              handleUpdateAttachments={this.updateAttachments}
+              attachments={values.visitAttachment}
+            />
+          </GridItem>
+        ),
+      },
+      {
+        title: 'Refraction Form',
+        authority: 'queue.visitregistrationdetails.eyerefractionform',
+        content: (
+          <GridItem xs={12} className={classes.row}>
+            <RefractionFormCard {...this.props} />
+          </GridItem>
+        ),
+      },
+    ].reduce((result, item) => {
+      let right = checkAccessright(item.authority)
+      if (right === 'readwrite' || right === 'enable') {
+        return [
+          ...result,
+          item,
+        ]
+      }
+
+      return result
+    }, [])
+  }
+
   render () {
     const {
       classes,
       footer,
       queueLog: { list = [] } = { list: [] },
       loading,
-      visitRegistration: { errorState },
+      visitRegistration: {
+        errorState,
+        visitOrderTemplateOptions,
+        expandRefractionForm,
+      },
       values,
       isSubmitting,
+      dispatch,
+      rights,
+      setFieldValue,
     } = this.props
 
+    if (expandRefractionForm) {
+      let div = $(this.myRef.current).find('div[aria-expanded]:eq(1)')
+      if (div.attr('aria-expanded') === 'false') div.click()
+    }
+
+    const defaultActive = []
+    if (expandRefractionForm) {
+      defaultActive.push(1)
+    }
     const height = getHeight(this.props.height)
 
     const existingQNo = list.reduce(
@@ -231,7 +354,6 @@ class NewVisit extends PureComponent {
     const params = locationQueryParameters()
     const vis = parseInt(params.vis, 10)
     const autoRefreshChas = !(params.md === 'visreg' && vis > 0)
-
     return (
       <React.Fragment>
         <LoadingWrapper
@@ -258,34 +380,96 @@ class NewVisit extends PureComponent {
               <ErrorWrapper errorState={errorState} errorKey='visitInfo'>
                 <SizeContainer size='sm'>
                   <React.Fragment>
-                    <GridItem xs md={12} className={classes.row}>
-                      <VisitInfoCard
-                        isReadOnly={isReadOnly}
-                        existingQNo={existingQNo}
-                        handleUpdateAttachments={this.updateAttachments}
-                        attachments={values.visitAttachment}
-                        visitType={values.visitPurposeFK}
-                      />
-                    </GridItem>
-                    <GridItem xs md={12} className={classes.row}>
-                      <VitalSignCard
-                        isReadOnly={isReadOnly}
-                        handleCalculateBMI={this.calculateBMI}
-                      />
-                    </GridItem>
-                    <GridItem xs md={12} className={classes.row}>
-                      <ReferralCard
-                        isReadOnly={isRetail || isReadOnly}
-                        handleUpdateAttachments={this.updateAttachments}
-                        attachments={values.visitAttachment}
-                      />
-                    </GridItem>
+                    <Authorized.Context.Provider
+                      value={{
+                        rights:
+                          (rights === 'readwrite' || rights === 'enable') &&
+                          isReadOnly
+                            ? 'disable'
+                            : rights,
+                      }}
+                    >
+                      <GridItem xs={12} className={classes.row}>
+                        <VisitInfoCard
+                          // isReadOnly={isReadOnly}
+                          existingQNo={existingQNo}
+                          handleUpdateAttachments={this.updateAttachments}
+                          attachments={values.visitAttachment}
+                          visitType={values.visitPurposeFK}
+                          dispatch={dispatch}
+                          visitOrderTemplateOptions={visitOrderTemplateOptions}
+                          {...this.props}
+                        />
+                      </GridItem>
+                    </Authorized.Context.Provider>
+                    <Authorized.Context.Provider
+                      value={{
+                        rights:
+                          (rights === 'readwrite' || rights === 'enable') &&
+                          (isReadOnly || isRetail)
+                            ? 'disable'
+                            : rights,
+                      }}
+                    >
+                      <React.Fragment>
+                        <Authorized authority='queue.registervisit.vitalsign'>
+                          {({ rights: vitalAccessRight }) => (
+                            <Authorized.Context.Provider
+                              value={{
+                                rights:
+                                  (vitalAccessRight === 'readwrite' ||
+                                    vitalAccessRight === 'enable') &&
+                                  isReadOnly
+                                    ? 'disable'
+                                    : vitalAccessRight,
+                              }}
+                            >
+                              <GridItem xs={12} className={classes.row}>
+                                <VitalSignCard
+                                  // isReadOnly={isReadOnly}
+                                  handleCalculateBMI={this.calculateBMI}
+                                />
+                              </GridItem>
+                            </Authorized.Context.Provider>
+                          )}
+                        </Authorized>
+                        <GridItem xs={12} className={classes.row}>
+                          <ReferralCard
+                            // isReadOnly={isRetail || isReadOnly}
+                            handleUpdateAttachments={this.updateAttachments}
+                            attachments={values.visitAttachment}
+                            dispatch={dispatch}
+                            values={values}
+                            setFieldValue={setFieldValue}
+                          />
+                        </GridItem>
+                        <GridItem xs={12} className={classes.row}>
+                          <div ref={this.myRef}>
+                            <Accordion
+                              mode='multiple'
+                              onChange={(event, p, expanded) => {
+                                if (p.key === 1 && expanded) {
+                                  dispatch({
+                                    type: 'visitRegistration/updateState',
+                                    payload: { expandRefractionForm: false },
+                                  })
+                                }
+                              }}
+                              collapses={this.getEyeWidgets(
+                                isReadOnly,
+                                isRetail,
+                              )}
+                            />
+                          </div>
+                        </GridItem>
+                      </React.Fragment>
+                    </Authorized.Context.Provider>
                   </React.Fragment>
                 </SizeContainer>
               </ErrorWrapper>
               {/*
-                <GridItem xs md={12} container>
-                  <GridItem xs md={12} className={classes.cardContent}>
+                <GridItem xs={12} container>
+                  <GridItem xs={12} className={classes.cardContent}>
                     <ParticipantCard />
                   </GridItem>
                 </GridItem>
@@ -299,7 +483,7 @@ class NewVisit extends PureComponent {
               confirmBtnText: isEdit ? 'Save' : 'Register visit',
               onConfirm: this.validatePatient,
               confirmProps: {
-                disabled: isReadOnly,
+                disabled: isReadOnly || !this.state.hasActiveSession,
               },
             })}
         </div>

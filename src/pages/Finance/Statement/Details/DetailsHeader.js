@@ -110,11 +110,11 @@ class DetailsHeader extends PureComponent {
           </GridItem>
           <GridItem md={3} xs={12} className={classes.gridItem}>
             <Field
-              name='adminChargeValue'
+              name='adminChargeValueField'
               render={(args) => {
                 return (
                   <NumberInput
-                    prefix='Admin Charge:'
+                    prefix='Corporate Charge:'
                     {...cfg}
                     {...amountProps}
                     {...args}
@@ -125,10 +125,10 @@ class DetailsHeader extends PureComponent {
           </GridItem>
           <GridItem md={3} xs={12} className={classes.gridItem}>
             <FastField
-              name='totalAmount'
+              name='adjustmentValueField'
               render={(args) => (
                 <NumberInput
-                  prefix='Payable Amount:'
+                  prefix='Statement Adjustment: '
                   {...cfg}
                   {...amountProps}
                   {...args}
@@ -138,10 +138,10 @@ class DetailsHeader extends PureComponent {
           </GridItem>
           <GridItem md={3} xs={12} className={classes.gridItem}>
             <FastField
-              name='collectedAmount'
+              name='totalPayableAmount'
               render={(args) => (
                 <NumberInput
-                  prefix='Paid: '
+                  prefix='Total Payable Amount:'
                   {...cfg}
                   {...amountProps}
                   {...args}
@@ -158,6 +158,7 @@ class DetailsHeader extends PureComponent {
                   {...cfg}
                   {...amountProps}
                   {...args}
+                  defaultCurrencyFontColor
                 />
               )}
             />

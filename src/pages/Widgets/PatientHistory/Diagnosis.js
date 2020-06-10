@@ -25,8 +25,7 @@ export default ({ current, classes, theme, codetable }) => {
             paddingLeft: theme.spacing(2),
           }}
         >
-          {' '}
-          {current.diagnosis.map((o, i) => (
+          {(current.diagnosis || []).map((o, i) => (
             <li key={i} style={{ paddingBottom: 10 }}>
               {o.diagnosisDescription} (<DatePicker text value={o.onsetDate} />)
               {o.corComplication.length > 0 ? <br /> : ''}

@@ -9,6 +9,38 @@ import {
   difference,
 } from '@/utils/utils'
 
+const updateGlobalState = ({ gridId }) => {
+  const { global } = window.g_app._store.getState()
+  // console.log(Object.values(window.$tempGridRow[gridId]))
+  const errorRows = Object.values(window.$tempGridRow[gridId]).filter(
+    (o) => !o.isDeleted && (o._errors && o._errors.length),
+  )
+  if (
+    window.$tempGridRow[gridId] &&
+    errorRows.length > 0
+    // latestRow._errors &&
+    // latestRow._errors.length
+  ) {
+    if (!global.disableSave)
+      window.g_app._store.dispatch({
+        type: 'global/updateState',
+        payload: {
+          disableSave: true,
+        },
+      })
+  } else if (
+    // (!latestRow._errors || !latestRow._errors.length) &&
+    global.disableSave
+  ) {
+    window.g_app._store.dispatch({
+      type: 'global/updateState',
+      payload: {
+        disableSave: false,
+      },
+    })
+  }
+}
+
 function onComponentDidMount () {
   const {
     columnExtensions,
@@ -26,13 +58,19 @@ function onComponentDidMount () {
     ? window.$tempGridRow[gridId][getRowId(row)] || row
     : row
   // console.log(latestRow[columnName], value)
-  if (latestRow[columnName] !== value) {
-    setTimeout(() => {
-      this.forceUpdate()
-    }, 500)
+  // if (latestRow[columnName] !== value) {
+  //   setTimeout(() => {
+  //     this.forceUpdate()
+  //   }, 500)
+  // }
+  if (getRowId(latestRow)) {
+    const errors = updateCellValue(this.props, null, latestRow[columnName])
+    latestRow._errors = errors
+    updateGlobalState({
+      gridId,
+    })
   }
-  const errors = updateCellValue(this.props, null, latestRow[columnName])
-  latestRow._errors = errors
+
   return {
     row,
     gridId,
@@ -45,8 +83,8 @@ function onComponentChange (args, config) {
   const {
     columnExtensions,
     column: { name: columnName },
-    value,
     onValueChange,
+    value,
     row,
   } = this.props
   const cfg =
@@ -63,6 +101,7 @@ function onComponentChange (args, config) {
     getRowId,
     ...restProps
   } = cfg
+  if (value === Object.values(args)[0]) return
   let errors = updateCellValue(this.props, null, Object.values(args)[0])
 
   const latestRow = window.$tempGridRow[gridId]
@@ -91,6 +130,10 @@ function onComponentChange (args, config) {
       latestRow._errors = errors
     }
   }
+
+  // updateGlobalState({
+  //   gridId,
+  // })
 }
 
 function getCommonConfig () {
@@ -138,7 +181,7 @@ function getCommonConfig () {
     row: latestRow,
     text: text || !editMode,
     validSchema: (_row) => {
-      if (validationSchema) {
+      if (validationSchema && getRowId(_row)) {
         try {
           validationSchema.validateSync(_row, {
             abortEarly: false,
@@ -161,13 +204,15 @@ function getCommonRender (cb) {
   const cfg = getCommonConfig.call(this)
   const { render, error, row, isReactComponent } = cfg
   // console.log(row, this.props.row)
-
+  // console.log('getCommonRender', row, this.props.row)
   if (render) {
     if (isReactComponent) {
       const Cmpt = render
       return <Cmpt row={row} columnConfig={cfg} cellProps={this.props} />
     }
-    if (!editMode && !error) return render(row, { ...cfg }, this.props)
+    if (!editMode && !error) {
+      return <span>{render(row, { ...cfg }, this.props)}</span>
+    }
   }
   if (typeof value === 'object' && React.isValidElement(value)) {
     return <span>{value}</span>
@@ -181,4 +226,5 @@ module.exports = {
   onComponentChange,
   getCommonConfig,
   getCommonRender,
+  updateGlobalState,
 }

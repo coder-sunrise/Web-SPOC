@@ -27,12 +27,15 @@ import {
   LoadingWrapper,
   MobileNumberInput,
 } from '@/components/_medisys'
-import PrimaryClinicianChanges from './PrimaryClinicianChanges'
 // utils
-import { constructUserProfile } from './utils'
+import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
 import * as queueServices from '@/services/queue'
 import * as clinicServices from '@/services/clinicInfo'
+import request from '@/utils/request'
+import { convertToQuery } from '@/utils/utils'
+import { constructUserProfile } from './utils'
+import PrimaryClinicianChanges from './PrimaryClinicianChanges'
 
 const styles = (theme) => ({
   container: {
@@ -64,7 +67,7 @@ const styles = (theme) => ({
   displayName: 'UserProfile',
   enableReinitialize: true,
   validationSchema: (props) => {
-    const { settingUserProfile, currentUser } = props
+    const { settingUserProfile, currentUser, ctRole } = props
     const { currentSelectedUser } = settingUserProfile
     const isEdit =
       (currentSelectedUser &&
@@ -77,7 +80,7 @@ const styles = (theme) => ({
         userName: Yup.string().required('Login ID is a required field'),
       }),
       name: Yup.string().required('Name is a required field'),
-      phoneNumber: Yup.string().required('Contact No. is a required field'),
+      // phoneNumber: Yup.string().required('Contact No. is a required field'),
       userAccountNo: Yup.string().required(
         'User Account No. is a required field',
       ),
@@ -87,7 +90,10 @@ const styles = (theme) => ({
       doctorProfile: Yup.object()
         .transform((value) => (value === null ? {} : value))
         .when('role', {
-          is: (val) => val === '2' || val === '3',
+          is(val) {
+            if (val === undefined) return false
+            return ctRole.find((item) => item.id === parseInt(val, 10)).clinicalRoleName === 'Doctor' || ctRole.find((item) => item.id === parseInt(val, 10)).clinicalRoleName === 'Doctor Owner'
+          },
           then: Yup.object().shape({
             doctorMCRNo: Yup.string().required(),
           }),
@@ -96,17 +102,17 @@ const styles = (theme) => ({
     return isEdit
       ? Yup.object().shape(baseValidationRule)
       : Yup.object().shape({
-          ...baseValidationRule,
-          userProfile: Yup.object().shape({
-            userName: Yup.string()
-              .matches(
-                /(^[a-zA-Z][a-zA-Z0-9]+$)/,
-                'Must have at least 2 letter, start with alphabet and do not contains whitespace and special characters.',
-              )
-              .required('Login ID is a required field'),
-            password: Yup.string().required('Password is a required field'),
-          }),
-        })
+        ...baseValidationRule,
+        userProfile: Yup.object().shape({
+          userName: Yup.string()
+            .matches(
+              /(^[a-zA-Z][a-zA-Z0-9]+$)/,
+              'Must have at least 2 letter, start with alphabet and do not contains whitespace and special characters.',
+            )
+            .required('Login ID is a required field'),
+          password: Yup.string().required('Password is a required field'),
+        }),
+      })
   },
   mapPropsToValues: (props) => {
     const { settingUserProfile, currentUser } = props
@@ -139,13 +145,13 @@ const styles = (theme) => ({
         effectiveDates:
           Object.entries(currentSelectedUser).length <= 0
             ? [
-                moment().formatUTC(),
-                moment('2099-12-31T23:59:59').formatUTC(false),
-              ]
+              moment().formatUTC(),
+              moment('2099-12-31T23:59:59').formatUTC(false),
+            ]
             : [
-                currentSelectedUser.effectiveStartDate,
-                currentSelectedUser.effectiveEndDate,
-              ],
+              currentSelectedUser.effectiveStartDate,
+              currentSelectedUser.effectiveEndDate,
+            ],
         role: currentSelectedUser.userProfile
           ? currentSelectedUser.userProfile.role.id
           : undefined,
@@ -168,9 +174,9 @@ const styles = (theme) => ({
     const doctorProfile = _.isEmpty(restValues.doctorProfile)
       ? undefined
       : {
-          ...restValues.doctorProfile,
-          isDeleted: !isDoctor,
-        }
+        ...restValues.doctorProfile,
+        isDeleted: !isDoctor,
+      }
 
     const userProfile = constructUserProfile(values, role)
 
@@ -190,6 +196,8 @@ const styles = (theme) => ({
         sendNotification('CodetableUpdated', {
           message: 'User profiles updated',
           code: 'clinicianprofile',
+          type: NOTIFICATION_TYPE.CODETABLE,
+          status: NOTIFICATION_STATUS.OK,
         })
         sessionStorage.removeItem('user')
         if (currentUser) {
@@ -234,7 +242,7 @@ class UserProfileForm extends React.PureComponent {
     const role = ctRole.find((item) => item.id === value)
 
     this.setState({
-      canEditDoctorMCR: role.name === 'Doctor' || role.name === 'Doctor Owner',
+      canEditDoctorMCR: role !== undefined && (role.clinicalRoleName === 'Doctor' || role.clinicalRoleName === 'Doctor Owner'),
     })
   }
 
@@ -322,7 +330,7 @@ class UserProfileForm extends React.PureComponent {
         const isPrimaryClinician =
           currentSelectedRole.clinicalRoleName === 'Doctor'
             ? parseInt(doctorProfile.id, 10) ===
-              parseInt(primaryRegisteredDoctorFK, 10)
+            parseInt(primaryRegisteredDoctorFK, 10)
             : false
 
         if (deactivating && isPrimaryClinician) {
@@ -342,13 +350,14 @@ class UserProfileForm extends React.PureComponent {
     return true
   }
 
-  render () {
+  render() {
     const {
       classes,
       footer,
       values,
       settingUserProfile,
       hasActiveSession,
+      height,
     } = this.props
     const {
       currentPrimaryRegisteredDoctorFK,
@@ -366,232 +375,245 @@ class UserProfileForm extends React.PureComponent {
     return (
       <LoadingWrapper loading={isValidating}>
         <React.Fragment>
-          {showActiveSessionWarning && (
-            <div style={{ paddingTop: 5 }}>
-              <WarningSnackbar
-                variant='warning'
-                className={classes.margin}
-                message='There is an active business session and this user is a primary clinician. Please end the current session to change primary clinician'
-              />
-            </div>
-          )}
-          <GridContainer
-            alignItems='center'
-            justify='space-between'
-            className={classes.container}
+          <div
+            style={{
+              maxHeight: height - 128,
+              overflowY: 'auto',
+              overflowX: 'hidden',
+            }}
           >
-            <GridItem md={12} className={classes.verticalSpacing}>
-              <h4>Login Info</h4>
-            </GridItem>
-            <GridContainer className={classes.indent} alignItems='center'>
-              <GridItem md={6}>
-                {isEdit ? (
-                  <TextField
-                    value={values.userProfile.userName}
-                    label='Username'
-                    disabled
-                  />
+            {showActiveSessionWarning && (
+              <div style={{ paddingTop: 5 }}>
+                <WarningSnackbar
+                  variant='warning'
+                  className={classes.margin}
+                  message='There is an active business session and this user is a primary clinician. Please end the current session to change primary clinician'
+                />
+              </div>
+            )}
+            <GridContainer
+              alignItems='center'
+              justify='space-between'
+              className={classes.container}
+            >
+              <GridItem md={12} className={classes.verticalSpacing}>
+                <h4>Login Info</h4>
+              </GridItem>
+              <GridContainer className={classes.indent} alignItems='center'>
+                <GridItem md={6}>
+                  {isEdit ? (
+                    <TextField
+                      value={values.userProfile.userName}
+                      label='Username'
+                      autocomplete='off'
+                      disabled
+                    />
+                  ) : (
+                      <FastField
+                        name='userProfile.userName'
+                        render={(args) => (
+                          <TextField
+                            {...args}
+                            label='Username'
+                            autocomplete='off'
+                            autoFocus
+                          />
+                        )}
+                      />
+                    )}
+                </GridItem>
+                {!isEdit ? (
+                  <React.Fragment>
+                    <GridItem md={6}>
+                      <FastField
+                        name='userProfile.password'
+                        render={(args) => (
+                          <TextField
+                            {...args}
+                            label='Password'
+                            type='password'
+                            autocomplete='off'
+                            maxLength={18}
+                          />
+                        )}
+                      />
+                    </GridItem>
+                    <GridItem md={6} />
+                    <GridItem md={6}>
+                      <i>User must create a new password at next sign in.</i>
+                    </GridItem>
+                    <GridItem md={6} />
+                    <GridItem md={6}>
+                      <span>Password must be</span>
+                      <ul>
+                        <li>8 to 18 characters long</li>
+                        <li>
+                          contain a mix of letters, numbers, and/or special
+                          characters
+                        </li>
+                      </ul>
+                    </GridItem>
+                  </React.Fragment>
                 ) : (
+                    <GridItem md={6}>
+                      <Button
+                        color='primary'
+                        onClick={this.toggleChangePasswordModal}
+                      >
+                        <Key />Change Password
+                    </Button>
+                    </GridItem>
+                  )}
+              </GridContainer>
+
+              <GridItem md={12} className={classes.verticalSpacing}>
+                <h4>Profile</h4>
+              </GridItem>
+              <GridContainer className={classes.indent}>
+                <GridItem md={6}>
                   <FastField
-                    name='userProfile.userName'
+                    name='name'
                     render={(args) => (
-                      <TextField {...args} label='Username' autoFocus />
+                      <TextField {...args} label='Name' disabled={isEdit} />
                     )}
                   />
-                )}
-              </GridItem>
-              {!isEdit ? (
-                <React.Fragment>
-                  <GridItem md={6}>
-                    <FastField
-                      name='userProfile.password'
-                      render={(args) => (
-                        <TextField
-                          {...args}
-                          label='Password'
-                          type='password'
-                          autocomplete='off'
-                          maxLength={18}
-                        />
-                      )}
-                    />
-                  </GridItem>
-                  <GridItem md={6} />
-                  <GridItem md={6}>
-                    <i>User must create a new password at next sign in.</i>
-                  </GridItem>
-                  <GridItem md={6} />
-                  <GridItem md={6}>
-                    <span>Password must be</span>
-                    <ul>
-                      <li>8 to 18 characters long</li>
-                      <li>
-                        contain a mix of letters, numbers, and/or special
-                        characters
-                      </li>
-                    </ul>
-                  </GridItem>
-                </React.Fragment>
-              ) : (
-                <GridItem md={6}>
-                  <Button
-                    color='primary'
-                    onClick={this.toggleChangePasswordModal}
-                  >
-                    <Key />Change Password
-                  </Button>
                 </GridItem>
-              )}
+                <GridItem md={6}>
+                  <FastField
+                    name='title'
+                    render={(args) => (
+                      <CodeSelect
+                        {...args}
+                        code='ctsalutation'
+                        valueField='code'
+                        label='Title'
+                        flexible
+                      />
+                    )}
+                  />
+                </GridItem>
+                <GridItem md={6}>
+                  <FastField
+                    name='userAccountNo'
+                    render={(args) => (
+                      <TextField
+                        {...args}
+                        label='User Account No.'
+                        disabled={isEdit}
+                      />
+                    )}
+                  />
+                </GridItem>
+                <GridItem md={6}>
+                  <Field
+                    name='doctorProfile.doctorMCRNo'
+                    render={(args) => (
+                      <TextField
+                        {...args}
+                        label='Doctor MCR No.'
+                        disabled={!canEditDoctorMCR}
+                      />
+                    )}
+                  />
+                </GridItem>
+                <GridItem md={2}>
+                  <FastField
+                    name='userProfile.countryCodeFK'
+                    render={(args) => (
+                      <CodeSelect
+                        allowClear={false}
+                        label='Country Code'
+                        code='ctcountrycode'
+                        {...args}
+                      />
+                    )}
+                  />
+                </GridItem>
+                <GridItem md={4}>
+                  <FastField
+                    name='phoneNumber'
+                    render={(args) => (
+                      // <NumberInput
+                      //   {...args}
+                      //   label='Contact No.'
+                      //   max={1000000000000000}
+                      //   // maxLength={15}
+                      // />
+                      <MobileNumberInput {...args} />
+                    )}
+                  />
+                </GridItem>
+                <GridItem md={6}>
+                  <FastField
+                    name='genderFK'
+                    render={(args) => (
+                      <CodeSelect {...args} label='Gender' code='ctgender' />
+                    )}
+                  />
+                </GridItem>
+
+                <GridItem md={6}>
+                  <FastField
+                    name='email'
+                    render={(args) => <TextField {...args} label='Email' />}
+                  />
+                </GridItem>
+
+                <GridItem md={6}>
+                  <FastField
+                    name='designation'
+                    render={(args) => (
+                      <TextField {...args} label='Designation' />
+                    )}
+                  />
+                </GridItem>
+
+                <GridItem md={6}>
+                  <FastField
+                    name='dob'
+                    render={(args) => (
+                      <DatePicker {...args} dobRestrict label='Date Of Birth' />
+                    )}
+                  />
+                </GridItem>
+
+                <GridItem md={6} />
+
+                <GridItem md={12}>
+                  <FastField
+                    name='effectiveDates'
+                    render={(args) => (
+                      <DateRangePicker
+                        {...args}
+                        label='Effective Start Date'
+                        label2='Effective End Date'
+                        disabled={isEdit ? hasActiveSession : false}
+                      />
+                    )}
+                  />
+                </GridItem>
+              </GridContainer>
+              <GridItem md={12} className={classes.verticalSpacing}>
+                <h4>User Role</h4>
+              </GridItem>
+              <GridContainer className={classes.indent}>
+                <GridItem md={6}>
+                  <Field
+                    name='role'
+                    render={(args) => (
+                      <CodeSelect
+                        {...args}
+                        label='Role'
+                        code='role'
+                        disabled={isMyAccount}
+                        onChange={this.onRoleChange}
+                      />
+                    )}
+                  />
+                </GridItem>
+              </GridContainer>
             </GridContainer>
-
-            <GridItem md={12} className={classes.verticalSpacing}>
-              <h4>Profile</h4>
-            </GridItem>
-            <GridContainer className={classes.indent}>
-              <GridItem md={6}>
-                <FastField
-                  name='name'
-                  render={(args) => (
-                    <TextField {...args} label='Name' disabled={isEdit} />
-                  )}
-                />
-              </GridItem>
-              <GridItem md={6}>
-                <FastField
-                  name='title'
-                  render={(args) => (
-                    <CodeSelect
-                      {...args}
-                      code='ctsalutation'
-                      valueField='code'
-                      label='Title'
-                      flexible
-                      // onChange={(value) => {
-                      //   console.log({ value })
-                      // }}
-                    />
-                  )}
-                />
-              </GridItem>
-              <GridItem md={6}>
-                <FastField
-                  name='userAccountNo'
-                  render={(args) => (
-                    <TextField
-                      {...args}
-                      label='User Account No.'
-                      disabled={isEdit}
-                    />
-                  )}
-                />
-              </GridItem>
-              <GridItem md={6}>
-                <Field
-                  name='doctorProfile.doctorMCRNo'
-                  render={(args) => (
-                    <TextField
-                      {...args}
-                      label='Doctor MCR No.'
-                      disabled={!canEditDoctorMCR}
-                    />
-                  )}
-                />
-              </GridItem>
-              <GridItem md={2}>
-                <FastField
-                  name='userProfile.countryCodeFK'
-                  render={(args) => (
-                    <CodeSelect
-                      allowClear={false}
-                      label='Country Code'
-                      code='ctcountrycode'
-                      {...args}
-                    />
-                  )}
-                />
-              </GridItem>
-              <GridItem md={4}>
-                <FastField
-                  name='phoneNumber'
-                  render={(args) => (
-                    // <NumberInput
-                    //   {...args}
-                    //   label='Contact No.'
-                    //   max={1000000000000000}
-                    //   // maxLength={15}
-                    // />
-                    <MobileNumberInput {...args} />
-                  )}
-                />
-              </GridItem>
-              <GridItem md={6}>
-                <FastField
-                  name='genderFK'
-                  render={(args) => (
-                    <CodeSelect {...args} label='Gender' code='ctgender' />
-                  )}
-                />
-              </GridItem>
-
-              <GridItem md={6}>
-                <FastField
-                  name='email'
-                  render={(args) => <TextField {...args} label='Email' />}
-                />
-              </GridItem>
-
-              <GridItem md={6}>
-                <FastField
-                  name='designation'
-                  render={(args) => <TextField {...args} label='Designation' />}
-                />
-              </GridItem>
-
-              <GridItem md={6}>
-                <FastField
-                  name='dob'
-                  render={(args) => (
-                    <DatePicker {...args} dobRestrict label='Date Of Birth' />
-                  )}
-                />
-              </GridItem>
-
-              <GridItem md={6} />
-
-              <GridItem md={12}>
-                <FastField
-                  name='effectiveDates'
-                  render={(args) => (
-                    <DateRangePicker
-                      {...args}
-                      label='Effective Start Date'
-                      label2='Effective End Date'
-                      disabled={isEdit ? hasActiveSession : false}
-                    />
-                  )}
-                />
-              </GridItem>
-            </GridContainer>
-            <GridItem md={12} className={classes.verticalSpacing}>
-              <h4>User Role</h4>
-            </GridItem>
-            <GridContainer className={classes.indent}>
-              <GridItem md={6}>
-                <Field
-                  name='role'
-                  render={(args) => (
-                    <CodeSelect
-                      {...args}
-                      label='Role'
-                      code='role'
-                      disabled={isMyAccount}
-                      onChange={this.onRoleChange}
-                    />
-                  )}
-                />
-              </GridItem>
-            </GridContainer>
-          </GridContainer>
+          </div>
           <CommonModal
             title='Primary Clinician'
             open={showPrimaryClinicianChanges}
