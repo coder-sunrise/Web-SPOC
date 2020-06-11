@@ -57,6 +57,7 @@ const saveConsultation = ({
     consultationDocument = {},
     corEyeRefractionForm,
     orders = {},
+    forms = {},
   } = props
   const onConfirmSave = (printData) => {
     console.log(`printData: ${printData}`)
@@ -73,6 +74,7 @@ const saveConsultation = ({
         orders,
         consultationDocument,
         corEyeRefractionForm,
+        forms,
       },
     )
     newValues.duration = Math.floor(
@@ -227,6 +229,7 @@ const discardConsultation = ({
     clinicSettings,
     user,
     patient,
+    forms,
   }) => ({
     clinicInfo,
     consultation,
@@ -239,6 +242,7 @@ const discardConsultation = ({
     clinicSettings: clinicSettings.settings || clinicSettings.default,
     user,
     patient,
+    forms,
   }),
 )
 @withFormikExtend({
@@ -437,6 +441,7 @@ class Main extends React.Component {
       dispatch,
       handleSubmit,
       values,
+      forms,
     } = this.props
     const { rows, _originalRows } = orders
     const { entity: vistEntity = {} } = visitRegistration
@@ -450,6 +455,12 @@ class Main extends React.Component {
       rows.filter((i) => !(i.id === undefined && i.isDeleted)),
       _originalRows,
     )
+    if (forms.rows.filter((o) => o.statusFK === 1).length > 0) {
+      notification.warning({
+        message: `Please finalize all forms.`,
+      })
+      return
+    }
 
     if (
       visitPurposeFK === VISIT_TYPE.BILL_FIRST &&
@@ -785,13 +796,14 @@ class Main extends React.Component {
   }
 
   saveTemplate = () => {
-    const { dispatch, orders, consultationDocument, values } = this.props
+    const { dispatch, orders, consultationDocument, values, forms } = this.props
     dispatch({
       type: 'consultation/updateState',
       payload: {
         entity: convertToConsultation(values, {
           orders,
           consultationDocument,
+          forms,
         }),
       },
     })

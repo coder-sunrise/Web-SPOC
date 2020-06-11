@@ -146,6 +146,11 @@ const ContextMenu = ({ row, handleClick, classes }) => {
             disabled: !isStatusCompleted,
             hidden: hideEditConsultation,
           }
+        case 10: // forms
+          return {
+            ...opt,
+            hidden: isRetailVisit,
+          }
         default:
           return { ...opt }
       }
