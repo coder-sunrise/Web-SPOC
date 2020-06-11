@@ -1,4 +1,5 @@
 import router from 'umi/router'
+import moment from 'moment'
 import _ from 'lodash'
 import { createFormViewModel } from 'medisys-model'
 import { getUniqueId } from '@/utils/utils'
@@ -50,6 +51,9 @@ export default createFormViewModel({
       selectedWidgets: [
         '1',
       ],
+      showSignOffModal: false,
+      printData: [{ item: '1', description: '1', no: 1, print: true }],
+
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -466,30 +470,16 @@ export default createFormViewModel({
         const { corEyeRefractionForm, corEyeExaminationForm } = newResponse
         data.corEyeRefractionForm = corEyeRefractionForm
         data.corEyeExaminationForm = corEyeExaminationForm
-        // if (data.corEyeVisualAcuityTest)
-        //   yield put({
-        //     type: 'visualAcuity/updateState',
-        //     payload: {
-        //       entity: data.corEyeVisualAcuityTest,
-        //     },
-        //   })
-
-        // if (data.corDiagnosis && data.corDiagnosis.length > 0) {
-        //   data.corDiagnosis.forEach((cd) => {
-        //     cd.complication = cd.corComplication.map((o) => o.complicationFK)
-        //   })
-        // }
-        // if (data.corDiagnosis && data.corDiagnosis.length === 0) {
-        //   data.corDiagnosis.push({
-        //     onsetDate: moment(),
-        //     isPersist: false,
-        //     remarks: '',
-        //   })
-        // }
-        // console.log(payload)
         return payload
       },
     },
-    reducers: {},
+    reducers: {
+      showSignOffModal (state, { payload }) {
+        return { ...state, ...payload }
+      },
+      closeSignOffModal (state) {
+        return { ...state, showSignOffModal: false, printData: [] }
+      },
+    },
   },
 })

@@ -690,7 +690,7 @@ export const getInventoryItem = (
       if (
         item &&
         item.orderQuantity - item.quantityReceived ===
-          o.totalCurrentReceivingQty
+        o.totalCurrentReceivingQty
       ) {
         return {
           ...o,
@@ -1046,6 +1046,45 @@ const scribbleTypes = [
   { type: 'note', typeFK: SCRIBBLE_NOTE_TYPE.CLINICALNOTES },
   { type: 'plan', typeFK: SCRIBBLE_NOTE_TYPE.PLAN },
 ]
+
+export const getDrugLabelPrintData
+  = async (drugLabel, prescripationItem) => {
+    let printResult = []
+    let drugLabelReportID
+    let settings = JSON.parse(localStorage.getItem('clinicSettings'))
+    if (settings.labelPrinterSize === '8.9cmx3.6cm') {
+      drugLabelReportID = 31
+    }
+    else if (settings.labelPrinterSize === '7.6cmx3.8cm') {
+      drugLabelReportID = 48
+    }
+    else {
+      drugLabelReportID = 24
+    }
+    const expiryDate = prescripationItem
+      ? prescripationItem.expiryDate
+      : undefined
+    const batchNo =
+      prescripationItem && Array.isArray(prescripationItem.batchNo)
+        ? prescripationItem.batchNo[0]
+        : prescripationItem.batchNo
+    return {
+      PatientName: drugLabel.patientName,
+      PatientReferenceNo: drugLabel.patientReferenceNo,
+      PatientAccountNo: drugLabel.patientAccountNo,
+      DrugName: drugLabel.name,
+      ConsumptionMethod: drugLabel.instruction,
+      Precaution: drugLabel.precaution,
+      IssuedDate: drugLabel.issueDate,
+      ExpiryDate: expiryDate,
+      UOM: drugLabel.dispenseUOM,
+      Quantity: drugLabel.dispensedQuanity,
+      BatchNo: batchNo,
+      CurrentPage: drugLabel.currentPage.toString(),
+      TotalPage: drugLabel.totalPage.toString(),
+    }
+    return printResult
+  }
 
 module.exports = {
   appointmentStatus,
