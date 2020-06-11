@@ -67,6 +67,7 @@ const styles = (theme) => ({
         autoRefresh,
         defaultVisitType,
         showTotalInvoiceAmtInConsultation,
+        autoPrintDrugLabelOnFinalize,
       } = clinicSettings.entity
       return {
         ...clinicSettings.entity,
@@ -78,10 +79,20 @@ const styles = (theme) => ({
           ...autoRefresh,
           settingValue: autoRefresh.settingValue === 'true',
         },
-        autoPrintDrugLabel: {
-          ...autoPrintDrugLabel,
+        autoPrintDrugLabelOnFinalize: {
+          ...autoPrintDrugLabelOnFinalize,
           settingValue:
-            autoPrintDrugLabel && autoPrintDrugLabel.settingValue === 'true',
+            autoPrintDrugLabelOnFinalize && autoPrintDrugLabelOnFinalize.settingValue === 'true',
+        },
+        autoPrintDrugLabelOnCompletePayment: {
+          ...autoPrintDrugLabelOnCompletePayment,
+          settingValue:
+            autoPrintDrugLabelOnCompletePayment && autoPrintDrugLabelOnCompletePayment.settingValue === 'true',
+        },
+        autoPrintDrugLabelOnSignOff: {
+          ...autoPrintDrugLabelOnSignOff,
+          settingValue:
+            autoPrintDrugLabelOnSignOff && autoPrintDrugLabelOnSignOff.settingValue === 'true',
         },
         showConsultationVersioning: {
           ...showConsultationVersioning,
@@ -284,7 +295,10 @@ class GeneralSetting extends PureComponent {
             </GridItem>
           </GridContainer>
           <GridContainer>
-            <GridItem md={3}>
+            <GridItem md={12}>
+              <span style={{ position: 'relative', color: 'rgba(0, 0, 0, 0.5)', display: 'inline-block', marginTop: 8 }}>Auto Print Drug Label</span>
+            </GridItem>
+            <GridItem md={2} style={{ margin: 0, marginTop: -10 }}>
               <Field
                 name='defaultVisitType.settingValue'
                 render={(args) => (

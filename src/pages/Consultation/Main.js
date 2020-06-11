@@ -261,7 +261,34 @@ const discardConsultation = ({
   notDirtyDuration: 0, // this page should alwasy show warning message when leave
   onDirtyDiscard: discardConsultation,
   handleSubmit: (values, { props }) => {
-    console.log('sign off')
+    const successCallback = async () => {
+      const {
+        onPrintDrugLabel,
+        visitRegistration: { entity: visitEntity },
+        orders = {},
+        patient,
+        dispatch,
+      } = props
+
+      const { versionNumber } = values
+
+      if (versionNumber === 1 && orders && orders.rows) {
+        if (onPrintDrugLabel) {
+          const { rows = [] } = orders
+          // prescriptionItems
+          const prescriptionItems = rows.filter(
+            (f) => f.type === '1' && !f.isDeleted,
+          )
+          await onPrintDrugLabel({
+            patient: patient.entity,
+            visitId: visitEntity.id,
+            prescriptionItems,
+          })
+        }
+      }
+      dispatch({ type: 'consultation/closeModal' })
+    }
+
     saveConsultation({
       props: {
         values,
@@ -270,6 +297,7 @@ const discardConsultation = ({
       confirmMessage: 'Confirm sign off current consultation?',
       successMessage: 'Consultation signed',
       action: 'sign',
+      successCallback,
     })
   },
   displayName: formName,
@@ -402,6 +430,7 @@ class Main extends React.Component {
     const { visit = {} } = vistEntity
     const { id: visitId } = visit
     const successCallback = () => {
+      dispatch({ type: 'consultation/closeModal' })
       dispatch({
         type: 'consultation/completeBillFirstOrder',
         payload: {
@@ -422,7 +451,8 @@ class Main extends React.Component {
   }
 
   signOffOnly = () => {
-    const { values } = this.props
+    const { values, dispatch } = this.props
+
     saveConsultation({
       props: {
         values,
@@ -431,6 +461,9 @@ class Main extends React.Component {
       successMessage: 'Consultation signed',
       shouldPromptConfirm: false,
       action: 'sign',
+      successCallback: () => {
+        dispatch({ type: 'consultation/closeModal' })
+      },
     })
   }
 
