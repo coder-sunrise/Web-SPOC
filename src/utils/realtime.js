@@ -68,7 +68,7 @@ const initStream = () => {
     const { dispatch, getState } = window.g_app._store
 
     if (type === 'Announcement') {
-      console.log(response)
+      // console.log(response)
       dispatch({
         type: 'systemMessage/received',
         payload: {
