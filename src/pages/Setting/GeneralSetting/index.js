@@ -10,6 +10,8 @@ import {
   currencyRoundingList,
   currencyRoundingToTheClosestList,
   labelPrinterList,
+  ReportsOnSignOff,
+  ReportsOnCompletePayment,
 } from '@/utils/codes'
 
 import {
@@ -22,6 +24,7 @@ import {
   Button,
   Switch,
   Checkbox,
+  CheckboxGroup,
   WarningSnackbar,
   CodeSelect,
 } from '@/components'
@@ -51,23 +54,14 @@ const styles = (theme) => ({
     ) {
       const {
         showConsultationVersioning,
-        autoPrintDrugLabel,
+        autoPrintDrugLabelOnFinalize,
         autoPrintOnSignOff,
-        autoPrintDrugLabelOnSignOff,
-        autoPrintMedicalCertificateOnSignOff,
-        autoPrintCertificateOfAttendanceOnSignOff,
-        autoPrintReferralLetterOnSignOff,
-        autoPrintMemoOnSignOff,
-        autoPrintVaccinationCertificateOnSignOff,
-        autoPrintOtherDocumentsOnSignOff,
         autoPrintOnCompletePayment,
-        autoPrintDrugLabelOnCompletePayment,
-        autoPrintInvoiceOnCompletePayment,
-        autoPrintReceiptOnCompletePayment,
         autoRefresh,
         defaultVisitType,
         showTotalInvoiceAmtInConsultation,
-        autoPrintDrugLabelOnFinalize,
+        autoPrintReportsOnCompletePayment,
+        autoPrintReportsOnSignOff,
       } = clinicSettings.entity
       return {
         ...clinicSettings.entity,
@@ -84,16 +78,6 @@ const styles = (theme) => ({
           settingValue:
             autoPrintDrugLabelOnFinalize && autoPrintDrugLabelOnFinalize.settingValue === 'true',
         },
-        autoPrintDrugLabelOnCompletePayment: {
-          ...autoPrintDrugLabelOnCompletePayment,
-          settingValue:
-            autoPrintDrugLabelOnCompletePayment && autoPrintDrugLabelOnCompletePayment.settingValue === 'true',
-        },
-        autoPrintDrugLabelOnSignOff: {
-          ...autoPrintDrugLabelOnSignOff,
-          settingValue:
-            autoPrintDrugLabelOnSignOff && autoPrintDrugLabelOnSignOff.settingValue === 'true',
-        },
         showConsultationVersioning: {
           ...showConsultationVersioning,
           settingValue: showConsultationVersioning.settingValue === 'true',
@@ -102,53 +86,21 @@ const styles = (theme) => ({
           ...autoPrintOnSignOff,
           settingValue: autoPrintOnSignOff && autoPrintOnSignOff.settingValue === 'true',
         },
-        autoPrintDrugLabelOnSignOff: {
-          ...autoPrintDrugLabelOnSignOff,
-          settingValue: autoPrintDrugLabelOnSignOff && autoPrintDrugLabelOnSignOff.settingValue === 'true',
-        },
-        autoPrintMedicalCertificateOnSignOff: {
-          ...autoPrintMedicalCertificateOnSignOff,
-          settingValue: autoPrintMedicalCertificateOnSignOff && autoPrintMedicalCertificateOnSignOff.settingValue === 'true',
-        },
-        autoPrintCertificateOfAttendanceOnSignOff: {
-          ...autoPrintCertificateOfAttendanceOnSignOff,
-          settingValue: autoPrintCertificateOfAttendanceOnSignOff && autoPrintCertificateOfAttendanceOnSignOff.settingValue === 'true',
-        },
-        autoPrintReferralLetterOnSignOff: {
-          ...autoPrintReferralLetterOnSignOff,
-          settingValue: autoPrintReferralLetterOnSignOff && autoPrintReferralLetterOnSignOff.settingValue === 'true',
-        },
-        autoPrintMemoOnSignOff: {
-          ...autoPrintMemoOnSignOff,
-          settingValue: autoPrintMemoOnSignOff && autoPrintMemoOnSignOff.settingValue === 'true',
-        },
-        autoPrintVaccinationCertificateOnSignOff: {
-          ...autoPrintVaccinationCertificateOnSignOff,
-          settingValue: autoPrintVaccinationCertificateOnSignOff && autoPrintVaccinationCertificateOnSignOff.settingValue === 'true',
-        },
-        autoPrintOtherDocumentsOnSignOff: {
-          ...autoPrintOtherDocumentsOnSignOff,
-          settingValue: autoPrintOtherDocumentsOnSignOff && autoPrintOtherDocumentsOnSignOff.settingValue === 'true',
-        },
         autoPrintOnCompletePayment: {
           ...autoPrintOnCompletePayment,
           settingValue: autoPrintOnCompletePayment && autoPrintOnCompletePayment.settingValue === 'true',
         },
-        autoPrintDrugLabelOnCompletePayment: {
-          ...autoPrintDrugLabelOnCompletePayment,
-          settingValue: autoPrintDrugLabelOnCompletePayment && autoPrintDrugLabelOnCompletePayment.settingValue === 'true',
-        },
-        autoPrintInvoiceOnCompletePayment: {
-          ...autoPrintInvoiceOnCompletePayment,
-          settingValue: autoPrintInvoiceOnCompletePayment && autoPrintInvoiceOnCompletePayment.settingValue === 'true',
-        },
-        autoPrintReceiptOnCompletePayment: {
-          ...autoPrintReceiptOnCompletePayment,
-          settingValue: autoPrintReceiptOnCompletePayment && autoPrintReceiptOnCompletePayment.settingValue === 'true',
-        },
         showTotalInvoiceAmtInConsultation: {
           ...showTotalInvoiceAmtInConsultation,
           settingValue: showTotalInvoiceAmtInConsultation.settingValue === 'true',
+        },
+        autoPrintReportsOnCompletePayment: {
+          ...autoPrintReportsOnCompletePayment,
+          settingValue: autoPrintReportsOnCompletePayment.settingValue.split(','),
+        },
+        autoPrintReportsOnSignOff: {
+          ...autoPrintReportsOnSignOff,
+          settingValue: autoPrintReportsOnSignOff.settingValue.split(','),
         },
       }
     }
@@ -157,7 +109,15 @@ const styles = (theme) => ({
 
   handleSubmit: (values, { props }) => {
     const { dispatch, history } = props
-    const payload = Object.keys(values).map((o) => values[o])
+    const payload = Object.keys(values).map((o) => {
+      if (o === 'autoPrintReportsOnCompletePayment' || o === 'autoPrintReportsOnSignOff') {
+        return {
+          ...values[o],
+          settingValue: values[o].settingValue.join(','),
+        }
+      }
+      return values[o]
+    })
 
     dispatch({
       type: 'clinicSettings/upsert',
@@ -209,7 +169,8 @@ class GeneralSetting extends PureComponent {
       values,
       ...restProps
     } = this.props
-    const { hasActiveSession } = this.state
+    // const { hasActiveSession } = this.state
+    let hasActiveSession = false
     return (
       <React.Fragment>
         {hasActiveSession && (
@@ -389,112 +350,16 @@ class GeneralSetting extends PureComponent {
             </GridItem>
           </GridContainer>
           <GridContainer>
-            <GridItem md={3}>
+            <GridItem md={12}>
               <Field
-                name='autoPrintDrugLabelOnSignOff.settingValue'
+                name='autoPrintReportsOnSignOff.settingValue'
                 render={(args) => {
                   return (
-                    <Checkbox
-                      label='Drug Label'
-                      labelPlacement='end'
-                      mode='default'
-                      disabled={!!hasActiveSession}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem md={3}>
-              <Field
-                name='autoPrintMedicalCertificateOnSignOff.settingValue'
-                render={(args) => {
-                  return (
-                    <Checkbox
-                      label='Medical Certificate'
-                      labelPlacement='end'
-                      mode='default'
-                      disabled={!!hasActiveSession}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem md={3}>
-              <Field
-                name='autoPrintCertificateOfAttendanceOnSignOff.settingValue'
-                render={(args) => {
-                  return (
-                    <Checkbox
-                      label='Certificate of Attendance'
-                      labelPlacement='end'
-                      mode='default'
-                      disabled={!!hasActiveSession}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem md={3}>
-              <Field
-                name='autoPrintReferralLetterOnSignOff.settingValue'
-                render={(args) => {
-                  return (
-                    <Checkbox
-                      label='Referral Letter'
-                      labelPlacement='end'
-                      mode='default'
-                      disabled={!!hasActiveSession}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem md={3}>
-              <Field
-                name='autoPrintMemoOnSignOff.settingValue'
-                render={(args) => {
-                  return (
-                    <Checkbox
-                      label='Memo'
-                      labelPlacement='end'
-                      mode='default'
-                      disabled={!!hasActiveSession}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem md={3}>
-              <Field
-                name='autoPrintVaccinationCertificateOnSignOff.settingValue'
-                render={(args) => {
-                  return (
-                    <Checkbox
-                      label='Vaccination Certificate'
-                      labelPlacement='end'
-                      mode='default'
-                      disabled={!!hasActiveSession}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem md={3}>
-              <Field
-                name='autoPrintOtherDocumentsOnSignOff.settingValue'
-                render={(args) => {
-                  return (
-                    <Checkbox
-                      label='Other Documents'
-                      labelPlacement='end'
-                      mode='default'
-                      disabled={!!hasActiveSession}
+                    <CheckboxGroup
+                      valueField='code'
+                      textField='description'
+                      options={ReportsOnSignOff}
+                      noUnderline
                       {...args}
                     />
                   )
@@ -520,48 +385,16 @@ class GeneralSetting extends PureComponent {
             </GridItem>
           </GridContainer>
           <GridContainer>
-            <GridItem md={3}>
+            <GridItem md={12}>
               <Field
-                name='autoPrintDrugLabelOnCompletePayment.settingValue'
+                name='autoPrintReportsOnCompletePayment.settingValue'
                 render={(args) => {
                   return (
-                    <Checkbox
-                      label='Drug Label'
-                      labelPlacement='end'
-                      mode='default'
-                      disabled={!!hasActiveSession}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem md={3}>
-              <Field
-                name='autoPrintInvoiceOnCompletePayment.settingValue'
-                render={(args) => {
-                  return (
-                    <Checkbox
-                      label='Invoice'
-                      labelPlacement='end'
-                      mode='default'
-                      disabled={!!hasActiveSession}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem md={3}>
-              <Field
-                name='autoPrintReceiptOnCompletePayment.settingValue'
-                render={(args) => {
-                  return (
-                    <Checkbox
-                      label='Receipt'
-                      labelPlacement='end'
-                      mode='default'
-                      disabled={!!hasActiveSession}
+                    <CheckboxGroup
+                      valueField='code'
+                      textField='description'
+                      options={ReportsOnCompletePayment}
+                      noUnderline
                       {...args}
                     />
                   )

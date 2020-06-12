@@ -1,35 +1,35 @@
-import CryptoJS from 'crypto-js'
+import cryptoJS from 'crypto-js'
 
-export const AESEncryptor = (encryptKey = 'eed*62H*%l$4ksfHyOJGLJG)JH6%$~fd', encryptIV = 'ieu(4f5%fj9kG14K') => {
-  this._KEY = encryptKey
-  this._IV = encryptIV
-  this.encrypt = (str) => {
-    let key = CryptoJS.enc.Utf8.parse(this._KEY)
-    let iv = CryptoJS.enc.Utf8.parse(this._IV)
+const defaultEncryptKey = 'eed*62H*%l$4ksfHyOJGLJG)JH6%$~fd'
+const defaultEncryptIV = 'ieu(4f5%fj9kG14K'
+export const AESEncryptor = {
+  encrypt: (str, encryptKey) => {
+    let key = cryptoJS.enc.Utf8.parse(encryptKey || defaultEncryptKey)
+    let iv = cryptoJS.enc.Utf8.parse(defaultEncryptIV)
 
     let encrypted = ''
 
-    let srcs = CryptoJS.enc.Utf8.parse(str)
-    encrypted = CryptoJS.AES.encrypt(srcs, key, {
+    let srcs = cryptoJS.enc.Utf8.parse(str)
+    encrypted = cryptoJS.AES.encrypt(srcs, key, {
       iv,
-      mode: CryptoJS.mode.CBC,
-      padding: CryptoJS.pad.Pkcs7,
+      mode: cryptoJS.mode.CBC,
+      padding: cryptoJS.pad.Pkcs7,
     })
 
     return encrypted.ciphertext.toString()
-  }
+  },
 
-  this.decrypt = (str) => {
-    let key = CryptoJS.enc.Utf8.parse(this._KEY)
-    let iv = CryptoJS.enc.Utf8.parse(this._IV)
-    let encryptedHexStr = CryptoJS.enc.Hex.parse(str)
-    let srcs = CryptoJS.enc.Base64.stringify(encryptedHexStr)
-    let decrypt = CryptoJS.AES.decrypt(srcs, key, {
+  decrypt: (str, encryptKey) => {
+    let key = cryptoJS.enc.Utf8.parse(encryptKey || defaultEncryptKey)
+    let iv = cryptoJS.enc.Utf8.parse(defaultEncryptIV)
+    let encryptedHexStr = cryptoJS.enc.Hex.parse(str)
+    let srcs = cryptoJS.enc.Base64.stringify(encryptedHexStr)
+    let decrypt = cryptoJS.AES.decrypt(srcs, key, {
       iv,
-      mode: CryptoJS.mode.CBC,
-      padding: CryptoJS.pad.Pkcs7,
+      mode: cryptoJS.mode.CBC,
+      padding: cryptoJS.pad.Pkcs7,
     })
-    let decryptedStr = decrypt.toString(CryptoJS.enc.Utf8)
+    let decryptedStr = decrypt.toString(cryptoJS.enc.Utf8)
     return decryptedStr.toString()
-  }
+  },
 }

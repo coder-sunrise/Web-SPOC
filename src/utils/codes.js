@@ -1,7 +1,6 @@
 import moment from 'moment'
 import _ from 'lodash'
 import Authorized from '@/utils/Authorized'
-import { getReportContext } from '@/services/report'
 import { dateFormatLong, dateFormatLongWithTime } from './format'
 import { UNFIT_TYPE, SCRIBBLE_NOTE_TYPE, REPORT_ID } from './constants'
 import { calculateAgeFromDOB } from './dateUtils'
@@ -1000,7 +999,7 @@ export const labelPrinterList = [
   { value: '7.6cmx3.8cm', name: '7.6cmx3.8cm' },
 ]
 
-const corAttchementTypes = [
+export const corAttchementTypes = [
   {
     id: 1,
     type: 'ClinicalNotes',
@@ -1028,7 +1027,20 @@ const corAttchementTypes = [
     name: 'Queue Display',
   },
 ]
-
+export const ReportsOnSignOff = [
+  { code: 'Drug Label', description: 'Drug Label' },
+  { code: 'Medical Certificate', description: 'Medical Certificate' },
+  { code: 'Certificate of Attendance', description: 'Certificate of Attendance' },
+  { code: 'Referral Letter', description: 'Referral Letter' },
+  { code: 'Memo', description: 'Memo' },
+  { code: 'Vaccination Certificate', description: 'Vaccination Certificate' },
+  { code: 'Other Documents', description: 'Other Documents' },
+]
+export const ReportsOnCompletePayment = [
+  { code: 'Drug Label', description: 'Drug Label' },
+  { code: 'Invoice', description: 'Invoice' },
+  { code: 'Receipt', description: 'Receipt' },
+]
 const initRoomAssignment = async () => {
   const accessRight = Authorized.check('settings.clinicsetting.roomassignment')
   if (accessRight && accessRight.rights === 'enable') {
@@ -1493,7 +1505,6 @@ module.exports = {
   roundToPrecision,
   gstEnabled,
   groupByFKFunc,
-  corAttchementTypes,
   initRoomAssignment,
   scribbleTypes,
   formTypes,

@@ -78,7 +78,7 @@ const generatePrintData = async (settings, consultationDocument, user, patient, 
         )
         return list.filter((item) => !item.isDeleted).map((item) => ({
           item: type,
-          description: item.subject ?? (documentType.getSubject(item) ?? ''),
+          description: `  ${item.subject ?? ''}`,
           Copies: 1,
           print: true,
           ReportId: documentType.downloadConfig.id,
