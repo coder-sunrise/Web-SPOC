@@ -25,11 +25,13 @@ import Authorized from '@/utils/Authorized'
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 
 import { getAppendUrl, navigateDirtyCheck, commonDataReaderTransform } from '@/utils/utils'
+import { convertToConsultation, convertConsultationDocument } from '@/pages/Consultation/utils'
 // import model from '@/pages/Widgets/Orders/models'
 import { VISIT_TYPE } from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { CallingQueueButton } from '@/components/_medisys'
 import { initRoomAssignment, consultationDocumentTypes } from '@/utils/codes'
+
 
 // import PatientSearch from '@/pages/PatientDatabase/Search'
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
@@ -38,11 +40,92 @@ import Layout from './Layout'
 
 import schema from './schema'
 import styles from './style'
+import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
 // window.g_app.replaceModel(model)
 
 const discardMessage = 'Discard consultation?'
 const formName = 'ConsultationPage'
-const saveConsultation = ({
+
+const generatePrintData = async (settings, consultationDocument, user, patient, orders, visitEntity) => {
+  let documents = convertConsultationDocument(consultationDocument)
+  const [
+    autoPrintOnSignOff,
+    autoPrintMemoOnSignOff,
+    autoPrintMedicalCertificateOnSignOff,
+    autoPrintCertificateOfAttendanceOnSignOff,
+    autoPrintReferralLetterOnSignOff,
+    autoPrintVaccinationCertificateOnSignOff,
+    autoPrintOtherDocumentsOnSignOff,
+    autoPrintDrugLabelOnSignOff,
+  ] = [true, true, true, true, true, true, true, true]
+  if (autoPrintOnSignOff === true) {
+    const { corMemo, corCertificateOfAttendance, corMedicalCertificate, corOtherDocuments, corReferralLetter, corVaccinationCert } = documents
+    let printData = []
+
+    let doctor = user.data.clinicianProfile
+    const doctorName = (doctor.title ? `${doctor.title} ` : '') + doctor.name
+    const doctorMCRNo = doctor.doctorProfile
+      ? doctor.doctorProfile.doctorMCRNo
+      : ''
+    const patientName = patient.entity.name
+    const { patientAccountNo } = patient.entity
+
+    let getPrintData = (type, list) => {
+      if (list && list.length > 0) {
+        const documentType = consultationDocumentTypes.find(
+          (o) =>
+            o.name === type ,
+        )
+        return list.filter((item) => !item.isDeleted).map((item) => ({
+          item: type,
+          description: item.subject ?? (documentType.getSubject(item) ?? ''),
+          Copies: 1,
+          print: true,
+          ReportId: documentType.downloadConfig.id,
+          ReportData: `${JSON.stringify(commonDataReaderTransform(
+            documentType.downloadConfig.draft(
+              {
+                ...item,
+                doctorName,
+                doctorMCRNo,
+                patientName,
+                patientAccountNo,
+              })))}`,
+        }))
+      }
+      return []
+    }
+    if (autoPrintDrugLabelOnSignOff === true) {
+      // const { versionNumber } = values
+      // versionNumber === 1 && 
+      if (orders && orders.rows) {
+        const { rows = [] } = orders
+        // prescriptionItems
+        const prescriptionItems = rows.filter(
+          (f) => f.type === '1' && !f.isDeleted,
+        )
+        let drugLabelData = await getDrugLabelPrintData(settings, patient.entity, visitEntity.id, prescriptionItems)
+        if (drugLabelData && drugLabelData.length > 0)
+          printData = printData.concat(drugLabelData)
+      }
+    }
+    if (autoPrintMemoOnSignOff === true)
+      printData = printData.concat(getPrintData('Memo', corMemo))
+    if (autoPrintMedicalCertificateOnSignOff === true)
+      printData = printData.concat(getPrintData('Medical Certificate', corMedicalCertificate))
+    if (autoPrintCertificateOfAttendanceOnSignOff === true)
+      printData = printData.concat(getPrintData('Certificate of Attendance', corCertificateOfAttendance))
+    if (autoPrintOtherDocumentsOnSignOff === true)
+      printData = printData.concat(getPrintData('Others', corOtherDocuments))
+    if (autoPrintReferralLetterOnSignOff === true)
+      printData = printData.concat(getPrintData('Referral Letter', corReferralLetter))
+    if (autoPrintVaccinationCertificateOnSignOff === true)
+      printData = printData.concat(getPrintData('Vaccination Certificate', corVaccinationCert))
+    return printData
+  }
+  return []
+}
+const saveConsultation = async ({
   props,
   action,
   confirmMessage,
@@ -58,9 +141,11 @@ const saveConsultation = ({
     corEyeRefractionForm,
     orders = {},
     forms = {},
+    visitRegistration: { entity: visitEntity },
+    patient,
+    handlePrint,
   } = props
-  const onConfirmSave = (printData) => {
-    console.log(`printData: ${printData}`)
+  const onConfirmSave = (callback) => {
     const newValues = convertToConsultation(
       {
         ...values,
@@ -96,91 +181,65 @@ const saveConsultation = ({
           })
         }
         sessionStorage.removeItem(`${values.id}_consultationTimer`)
-        if (successCallback) {
-          successCallback()
+        if (callback) {
+          callback(newValues)
         }
       }
     })
   }
 
   if (shouldPromptConfirm) {
-    const { clinicSettings: {
+    let settings = JSON.parse(localStorage.getItem('clinicSettings'))
+    const [
       autoPrintOnSignOff,
-      autoPrintMemoOnSignOff,
-      autoPrintMedicalCertificateOnSignOff,
-      autoPrintCertificateOfAttendanceOnSignOff,
-      autoPrintReferralLetterOnSignOff,
-      autoPrintVaccinationCertificateOnSignOff,
-      autoPrintOtherDocumentsOnSignOff,
-    } } = props
+    ] = [true]
     if (autoPrintOnSignOff === true) {
-      const { entity } = consultation
-      const { corPrescriptionItem, corMemo, corCertificateOfAttendance, corMedicalCertificate, corOtherDocuments, corReferralLetter, corVaccinationCert } = entity
-      let printData = []
-      let doctor = props.user.data.clinicianProfile
-      const doctorName = (doctor.title ? `${doctor.title} ` : '') + doctor.name
-      const doctorMCRNo = doctor.doctorProfile
-        ? doctor.doctorProfile.doctorMCRNo
-        : ''
-      const patientName = props.patient.entity.name
-      const { patientAccountNo } = props.patient.entity
-
-      let getPrintData = (type, list) => {
-        if (list && list.length > 0) {
-          const documentType = consultationDocumentTypes.find(
-            (o) =>
-              o.name === type ,
-          )
-          printData.push(list.map((item) => ({
-            reportId: documentType.downloadConfig.id,
-            documentName: `${type}(${item.subject ?? ''})`,
-            reportData: `${JSON.stringify(commonDataReaderTransform(
-              documentType.downloadConfig.draft(
-                {
-                  ...item,
-                  doctorName,
-                  doctorMCRNo,
-                  patientName,
-                  patientAccountNo,
-                })))}`,
-          })))
-        }
-        return []
+      let printData = await generatePrintData(settings, consultationDocument, props.user, patient, orders, visitEntity)
+      if (printData && printData.length > 0) {
+        dispatch({
+          type: 'consultation/showSignOffModal',
+          payload: {
+            showSignOffModal: true,
+            onSignOffConfirm: (result) => {
+              onConfirmSave(() => {
+                if (result && result.length > 0) {
+                  dispatch({ type: `consultation/closeSignOffModal` })
+                  let printedData = result.filter((item) => item.print === true)
+                  if (printedData && printedData.length > 0) {
+                    const token = localStorage.getItem('token')
+                    printedData = printedData.map((item) => ({
+                      ReportId: item.ReportId,
+                      DocumentName: `${item.item}(${item.description})`,
+                      ReportData: item.ReportData,
+                      Copies: item.Copies,
+                      Token: token,
+                      BaseUrl: process.env.url,
+                    }))
+                    handlePrint(JSON.stringify(printedData))
+                  }
+                  if (successCallback)
+                    successCallback()
+                }
+              })
+            },
+            printData,
+          },
+        })
+        return
       }
-      if (autoPrintMemoOnSignOff === true)
-        printData.push(getPrintData('Memo', corMemo))
-      if (autoPrintMedicalCertificateOnSignOff === true)
-        printData.push(getPrintData('Medical Certificate', corMedicalCertificate))
-      if (autoPrintCertificateOfAttendanceOnSignOff === true)
-        printData.push(getPrintData('Certificate of Attendance', corCertificateOfAttendance))
-      if (autoPrintOtherDocumentsOnSignOff === true)
-        printData.push(getPrintData('Others', corOtherDocuments))
-      if (autoPrintReferralLetterOnSignOff === true)
-        printData.push(getPrintData('Referral Letter', corReferralLetter))
-      if (autoPrintVaccinationCertificateOnSignOff === true)
-        printData.push(getPrintData('Vaccination Certificate', corVaccinationCert))
-      dispatch({
-        type: 'consultation/showSignOffModal',
-        payload: {
-          showSignOffModal: true,
-          onSignOffConfirm: onConfirmSave,
-          printData,
-        },
-      })
-    } else {
-      dispatch({
-        type: 'global/updateAppState',
-        payload: {
-          openConfirm: true,
-          openConfirmContent: confirmMessage,
-          openConfirmText: 'Confirm',
-          onConfirmSave,
-        },
-      })
     }
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: confirmMessage,
+        openConfirmText: 'Confirm',
+        onConfirmSave: () => { onConfirmSave(successCallback) },
+      },
+    })
   }
   else {
-    onConfirmSave()
+    onConfirmSave(successCallback)
   }
 }
 
@@ -261,34 +320,6 @@ const discardConsultation = ({
   notDirtyDuration: 0, // this page should alwasy show warning message when leave
   onDirtyDiscard: discardConsultation,
   handleSubmit: (values, { props }) => {
-    const successCallback = async () => {
-      const {
-        onPrintDrugLabel,
-        visitRegistration: { entity: visitEntity },
-        orders = {},
-        patient,
-        dispatch,
-      } = props
-
-      const { versionNumber } = values
-
-      if (versionNumber === 1 && orders && orders.rows) {
-        if (onPrintDrugLabel) {
-          const { rows = [] } = orders
-          // prescriptionItems
-          const prescriptionItems = rows.filter(
-            (f) => f.type === '1' && !f.isDeleted,
-          )
-          await onPrintDrugLabel({
-            patient: patient.entity,
-            visitId: visitEntity.id,
-            prescriptionItems,
-          })
-        }
-      }
-      dispatch({ type: 'consultation/closeModal' })
-    }
-
     saveConsultation({
       props: {
         values,
@@ -297,7 +328,6 @@ const discardConsultation = ({
       confirmMessage: 'Confirm sign off current consultation?',
       successMessage: 'Consultation signed',
       action: 'sign',
-      successCallback,
     })
   },
   displayName: formName,
@@ -843,9 +873,7 @@ class Main extends React.Component {
   }
 
   onCloseSignOffModal = () => {
-    this.props.dispatch({
-      type: `consultation/closeSignOffModal`,
-    })
+    this.props.dispatch({ type: `consultation/closeSignOffModal` })
   }
 
   componentWillUnmount () {
@@ -881,7 +909,7 @@ class Main extends React.Component {
     // const { adjustments, total, gst, totalWithGst } = summary
     // console.log('values', values, this.props)
     // console.log(currentLayout)
-    // console.log(values)
+    console.log(printData)
     const matches = {
       rights:
         rights === 'enable' && visit.visitStatus === 'PAUSED'

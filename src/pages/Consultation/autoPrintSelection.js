@@ -17,7 +17,7 @@ class AutoPrintSelection extends React.PureComponent {
       title: 'Description',
     },
     {
-      name: 'copies',
+      name: 'Copies',
       title: 'No. Of Label',
     },
     {
@@ -63,7 +63,7 @@ class AutoPrintSelection extends React.PureComponent {
       },
     },
     {
-      columnName: 'copies',
+      columnName: 'Copies',
       type: 'number',
       width: 100,
       render: (row) => {
@@ -73,14 +73,14 @@ class AutoPrintSelection extends React.PureComponent {
               max={99}
               precision={0}
               min={1}
-              value={row.no}
+              value={row.Copies}
               defaultValue={1}
-              onChange={(value) => {
+              onChange={(event, value) => {
                 this.setState((prevState) => ({
                   data: prevState.data.map((item) => row.id === item.id ? (
                     {
                       ...item,
-                      copies: value,
+                      Copies: value,
                     }) : item),
                 }))
               }}
@@ -95,7 +95,8 @@ class AutoPrintSelection extends React.PureComponent {
       width: 80,
       render: (row) => {
         return (
-          <Checkbox onChange={(value) => {
+          <Checkbox onChange={(event, value) => {
+            console.log(value)
             this.setState((prevState) => ({
               data: prevState.data.map((item) => row.id === item.id ? (
                 {
@@ -104,7 +105,7 @@ class AutoPrintSelection extends React.PureComponent {
                 }) : item),
             }))
           }}
-            checked={row.selected}
+            checked={row.print}
             simple
           />
         )
