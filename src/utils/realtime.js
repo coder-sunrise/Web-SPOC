@@ -53,7 +53,7 @@ const updateSignalRState = () => {
 }
 
 const initStream = () => {
-  const signalREndPoint = 'https://localhost:44372/notificationHub/'
+  const signalREndPoint = process.env.signalrUrl
 
   connection = new signalR.HubConnectionBuilder()
     .withUrl(signalREndPoint, {
