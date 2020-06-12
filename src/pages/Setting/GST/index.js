@@ -33,16 +33,16 @@ const styles = (theme) => ({
   enableReinitialize: true,
   mapPropsToValues: ({ clinicSettings }) => {
     if (clinicSettings.entity && clinicSettings.entity.isEnableGST) {
-      const { isEnableGST, isInclusiveGST } = clinicSettings.entity
+      const { isEnableGST, isDefaultInclusiveGST } = clinicSettings.entity
       return {
         ...clinicSettings.entity,
         isEnableGST: {
           ...isEnableGST,
           settingValue: isEnableGST.settingValue === 'true',
         },
-        isInclusiveGST: {
-          ...isInclusiveGST,
-          settingValue: isInclusiveGST.settingValue === 'true',
+        isDefaultInclusiveGST: {
+          ...isDefaultInclusiveGST,
+          settingValue: isDefaultInclusiveGST.settingValue === 'true',
         },
       }
     }
@@ -53,7 +53,7 @@ const styles = (theme) => ({
       isEnableGST,
       gSTRegistrationNumber,
       gSTPercentage,
-      isInclusiveGST,
+      isDefaultInclusiveGST,
     } = values
 
     const payload = [
@@ -68,8 +68,8 @@ const styles = (theme) => ({
         ...gSTPercentage,
       },
       {
-        ...isInclusiveGST,
-        settingValue: isInclusiveGST.settingValue.toString(),
+        ...isDefaultInclusiveGST,
+        settingValue: isDefaultInclusiveGST.settingValue.toString(),
       },
     ]
     const { dispatch, onConfirm, history } = props
@@ -147,7 +147,7 @@ class clinicSettings extends PureComponent {
     // )
     this.setState({ enableGst: event.target.value })
     if (!event.target.value) {
-      this.props.setFieldValue('isInclusiveGST.settingValue', false)
+      this.props.setFieldValue('isDefaultInclusiveGST.settingValue', false)
     }
     // this.props.setFieldValue('isEnableGST.settingvalue', event.target.value)
     // this.props.setValues({
@@ -164,7 +164,7 @@ class clinicSettings extends PureComponent {
       isEnableGST,
       gSTRegistrationNumber,
       gSTPercentage,
-      isInclusiveGST,
+      isDefaultInclusiveGST,
     } = this.props.values
 
     const payload = [
@@ -179,8 +179,8 @@ class clinicSettings extends PureComponent {
         ...gSTPercentage,
       },
       {
-        ...isInclusiveGST,
-        settingValue: isInclusiveGST.settingValue.toString(),
+        ...isDefaultInclusiveGST,
+        settingValue: isDefaultInclusiveGST.settingValue.toString(),
       },
     ]
     const { dispatch, onConfirm, history } = this.props
@@ -270,7 +270,7 @@ class clinicSettings extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='isInclusiveGST.settingValue'
+                name='isDefaultInclusiveGST.settingValue'
                 render={(args) => (
                   <Checkbox
                     label='Inclusive GST'
