@@ -28,6 +28,8 @@ import DispenseDetails from '@/pages/Dispense/DispenseDetails/WebSocketWrapper'
 import ApplyClaims from './refactored/newApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 import SchemeValidationPrompt from './components/SchemeValidationPrompt'
+import { ReportsOnCompletePaymentOption } from '@/utils/codes'
+import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
 // page utils
 import {
   constructPayload,
@@ -205,21 +207,57 @@ class Billing extends Component {
 
   printAfterComplete = async () => {
     let settings = JSON.parse(localStorage.getItem('clinicSettings'))
-    if (settings && settings.autoPrintDrugLabelOnCompletePayment) {
+    const { autoPrintOnCompletePayment, autoPrintReportsOnCompletePayment } = settings
+    if (autoPrintOnCompletePayment) {
       await this.onExpandDispenseDetails()
 
-      const { dispense } = this.props
+      const { values, dispense } = this.props
       const { prescription = [] } = dispense.entity
+      const { invoice, invoicePayment } = values
       this.setState({
         selectedDrugs: prescription.map((x) => {
           return { ...x, no: 1, selected: true }
         }),
       })
-      await this.childOnPrintRef({
-        type: 1,
-        row: {},
-        printAllDrugLabel: true,
-      })
+      let reportsOnCompletePayment = autoPrintReportsOnCompletePayment.split(',')
+      let printData = []
+
+      if (reportsOnCompletePayment.indexOf(ReportsOnCompletePaymentOption.Invoice) > -1) {
+        if (invoice) {
+          printData.push({
+            ReportId: 15,
+            Copies: 1,
+            DocumentName: 'Invoice',
+            ReportParam: `${JSON.stringify({ InvoiceID: invoice.id })}`,
+          })
+        }
+      }
+      if (reportsOnCompletePayment.indexOf(ReportsOnCompletePaymentOption.Receipt) > -1) {
+        if (invoicePayment && invoicePayment.length > 0) {
+          let payments = invoicePayment.filter((payment) => !payment.isCancelled && !payment.isDeleted)
+          if (payments && payments.length > 0) {
+            printData = printData.concat(payments.map((payment) => ({
+              ReportId: 29,
+              DocumentName: 'Receipt',
+              Copies: 1,
+              ReportParam: `${JSON.stringify({ InvoicePaymentId: payment.id })}`,
+            })))
+          }
+        }
+      }
+      if (printData && printData.length > 0) {
+        const token = localStorage.getItem('token')
+        printData = printData.map((item) => ({
+          ...item,
+          Token: token,
+          BaseUrl: process.env.url,
+        }))
+        await this.childOnPrintRef({
+          type: 1,
+          printData,
+          printAllDrugLabel: reportsOnCompletePayment.indexOf(ReportsOnCompletePaymentOption.DrugLabel) > -1,
+        })
+      }
     }
   }
 
@@ -427,11 +465,11 @@ class Billing extends Component {
         (payment) =>
           payment.id === id
             ? {
-                ...payment,
-                isCancelled: true,
-                cancelDate: new Date(),
-                cancelByUserFK: user.id,
-              }
+              ...payment,
+              isCancelled: true,
+              cancelDate: new Date(),
+              cancelByUserFK: user.id,
+            }
             : { ...payment },
       )
     }

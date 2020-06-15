@@ -10,6 +10,8 @@ import {
   currencyRoundingList,
   currencyRoundingToTheClosestList,
   labelPrinterList,
+  ReportsOnSignOff,
+  ReportsOnCompletePayment,
 } from '@/utils/codes'
 
 import {
@@ -22,6 +24,7 @@ import {
   Button,
   Switch,
   Checkbox,
+  CheckboxGroup,
   WarningSnackbar,
   CodeSelect,
 } from '@/components'
@@ -29,6 +32,13 @@ import { navigateDirtyCheck } from '@/utils/utils'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
+  boldText: {
+    fontWeight: '700',
+    marginTop: theme.spacing(1),
+  },
+  marginTop: {
+    marginTop: theme.spacing(1),
+  },
 })
 
 @connect(({ clinicSettings }) => ({
@@ -44,13 +54,14 @@ const styles = (theme) => ({
     ) {
       const {
         showConsultationVersioning,
+        autoPrintDrugLabelOnFinalize,
+        autoPrintOnSignOff,
+        autoPrintOnCompletePayment,
         autoRefresh,
         defaultVisitType,
-        autoPrintDrugLabel,
         showTotalInvoiceAmtInConsultation,
-        autoPrintDrugLabelOnFinalize,
-        autoPrintDrugLabelOnSignOff,
-        autoPrintDrugLabelOnCompletePayment,
+        autoPrintReportsOnCompletePayment,
+        autoPrintReportsOnSignOff,
       } = clinicSettings.entity
       return {
         ...clinicSettings.entity,
@@ -68,26 +79,30 @@ const styles = (theme) => ({
             autoPrintDrugLabelOnFinalize &&
             autoPrintDrugLabelOnFinalize.settingValue === 'true',
         },
-        autoPrintDrugLabelOnCompletePayment: {
-          ...autoPrintDrugLabelOnCompletePayment,
-          settingValue:
-            autoPrintDrugLabelOnCompletePayment &&
-            autoPrintDrugLabelOnCompletePayment.settingValue === 'true',
-        },
-        autoPrintDrugLabelOnSignOff: {
-          ...autoPrintDrugLabelOnSignOff,
-          settingValue:
-            autoPrintDrugLabelOnSignOff &&
-            autoPrintDrugLabelOnSignOff.settingValue === 'true',
-        },
         showConsultationVersioning: {
           ...showConsultationVersioning,
           settingValue: showConsultationVersioning.settingValue === 'true',
+        },
+        autoPrintOnSignOff: {
+          ...autoPrintOnSignOff,
+          settingValue: autoPrintOnSignOff && autoPrintOnSignOff.settingValue === 'true',
+        },
+        autoPrintOnCompletePayment: {
+          ...autoPrintOnCompletePayment,
+          settingValue: autoPrintOnCompletePayment && autoPrintOnCompletePayment.settingValue === 'true',
         },
         showTotalInvoiceAmtInConsultation: {
           ...showTotalInvoiceAmtInConsultation,
           settingValue:
             showTotalInvoiceAmtInConsultation.settingValue === 'true',
+        },
+        autoPrintReportsOnCompletePayment: {
+          ...autoPrintReportsOnCompletePayment,
+          settingValue: autoPrintReportsOnCompletePayment.settingValue.split(','),
+        },
+        autoPrintReportsOnSignOff: {
+          ...autoPrintReportsOnSignOff,
+          settingValue: autoPrintReportsOnSignOff.settingValue.split(','),
         },
       }
     }
@@ -96,7 +111,15 @@ const styles = (theme) => ({
 
   handleSubmit: (values, { props }) => {
     const { dispatch, history } = props
-    const payload = Object.keys(values).map((o) => values[o])
+    const payload = Object.keys(values).map((o) => {
+      if (o === 'autoPrintReportsOnCompletePayment' || o === 'autoPrintReportsOnSignOff') {
+        return {
+          ...values[o],
+          settingValue: values[o].settingValue.join(','),
+        }
+      }
+      return values[o]
+    })
 
     dispatch({
       type: 'clinicSettings/upsert',
@@ -234,58 +257,7 @@ class GeneralSetting extends PureComponent {
             </GridItem>
           </GridContainer>
           <GridContainer>
-            <GridItem md={12}>
-              <span
-                style={{
-                  position: 'relative',
-                  color: 'rgba(0, 0, 0, 0.5)',
-                  display: 'inline-block',
-                  marginTop: 8,
-                }}
-              >
-                Auto Print Drug Label
-              </span>
-            </GridItem>
             <GridItem md={2} style={{ margin: 0, marginTop: -10 }}>
-              <Field
-                name='autoPrintDrugLabelOnFinalize.settingValue'
-                render={(args) => (
-                  <Checkbox
-                    label='Finalize Order'
-                    {...args}
-                    disabled={!!hasActiveSession}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem md={2} style={{ margin: 0, marginTop: -10 }}>
-              <Field
-                name='autoPrintDrugLabelOnSignOff.settingValue'
-                render={(args) => (
-                  <Checkbox
-                    label='Consultation Sign Off'
-                    {...args}
-                    disabled={!!hasActiveSession}
-                  />
-                )}
-              />
-            </GridItem>
-
-            <GridItem md={2} style={{ margin: 0, marginTop: -10 }}>
-              <Field
-                name='autoPrintDrugLabelOnCompletePayment.settingValue'
-                render={(args) => (
-                  <Checkbox
-                    label='Complete Payment'
-                    {...args}
-                    disabled={!!hasActiveSession}
-                  />
-                )}
-              />
-            </GridItem>
-          </GridContainer>
-          <GridContainer>
-            <GridItem md={3}>
               <Field
                 name='defaultVisitType.settingValue'
                 render={(args) => (
@@ -299,9 +271,7 @@ class GeneralSetting extends PureComponent {
                 )}
               />
             </GridItem>
-          </GridContainer>
-          <GridContainer>
-            <GridItem md={3}>
+            <GridItem md={2} style={{ margin: 0, marginTop: -10 }}>
               <Field
                 name='labelPrinterSize.settingValue'
                 render={(args) => (
@@ -315,9 +285,7 @@ class GeneralSetting extends PureComponent {
                 )}
               />
             </GridItem>
-          </GridContainer>
-          <GridContainer>
-            <GridItem md={3}>
+            <GridItem md={2} style={{ margin: 0, marginTop: -10 }}>
               <Field
                 name='showTotalInvoiceAmtInConsultation.settingValue'
                 render={(args) => (
@@ -330,7 +298,106 @@ class GeneralSetting extends PureComponent {
               />
             </GridItem>
           </GridContainer>
-
+          <GridContainer className={classes.marginTop}>
+            <GridItem md={3}>
+              <h5 className={classes.boldText}>Auto Print</h5>
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <h5> Finalize Order </h5>
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='autoPrintDrugLabel.settingValue'
+                render={(args) => {
+                  return (
+                    <Checkbox
+                      label='Drug Label'
+                      labelPlacement='end'
+                      mode='default'
+                      disabled={!!hasActiveSession}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <h5> Consultation Sign Off</h5>
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='autoPrintOnSignOff.settingValue'
+                render={(args) => (
+                  <Switch
+                    {...args}
+                    style={{ marginTop: 0 }}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={12}>
+              <Field
+                name='autoPrintReportsOnSignOff.settingValue'
+                render={(args) => {
+                  return (
+                    <CheckboxGroup
+                      valueField='code'
+                      textField='description'
+                      disabled={!!hasActiveSession}
+                      options={ReportsOnSignOff}
+                      noUnderline
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <h5>Complete Payment</h5>
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='autoPrintOnCompletePayment.settingValue'
+                render={(args) => (
+                  <Switch
+                    {...args}
+                    style={{ marginTop: 0 }}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={12}>
+              <Field
+                name='autoPrintReportsOnCompletePayment.settingValue'
+                render={(args) => {
+                  return (
+                    <CheckboxGroup
+                      disabled={!!hasActiveSession}
+                      valueField='code'
+                      textField='description'
+                      options={ReportsOnCompletePayment}
+                      noUnderline
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+          </GridContainer>
           <div
             className={classes.actionBtn}
             style={{ display: 'flex', justifyContent: 'center' }}

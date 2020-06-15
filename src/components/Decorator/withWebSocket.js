@@ -5,6 +5,7 @@ import { notification } from '@/components'
 import { getPDF } from '@/services/report'
 // utils
 import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
+import { AESEncryptor } from '@/utils/aesEncryptor'
 
 const defaultSocketPortsState = [
   { portNumber: 7182, attempted: false },
@@ -14,7 +15,7 @@ const defaultSocketPortsState = [
 
 const withWebSocket = () => (Component) => {
   class WebSocketBase extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props)
       this.state = {
         socketPorts: [
@@ -114,8 +115,9 @@ const withWebSocket = () => (Component) => {
     }
 
     handlePrint = async (content) => {
+      console.log(`handlePrint: ${content}`)
       if (content) {
-        await this.prepareJobForWebSocket(content)
+        await this.prepareJobForWebSocket(AESEncryptor.encrypt(content))
       }
     }
 

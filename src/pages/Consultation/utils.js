@@ -132,6 +132,14 @@ const convertEyeForms = (values) => {
   }
   return values
 }
+const convertConsultationDocument = (consultationDocument) => {
+  let result = {}
+  const { rows = [] } = consultationDocument
+  consultationDocumentTypes.forEach((p) => {
+    result[p.prop] = rows.filter((o) => o.type === p.value)
+  })
+  return result
+}
 
 const convertToConsultation = (
   values,
@@ -174,19 +182,19 @@ const convertToConsultation = (
   formTypes.forEach((p) => {
     values[p.prop] = formRows
       ? formRows.filter((o) => o.type === p.value).map((val) => {
-          return {
-            ...val,
-            formData: JSON.stringify({
-              ...val.formData,
-              otherDiagnosis: val.formData.otherDiagnosis.map((d) => {
-                const { diagnosiss, ...retainData } = d
-                return {
-                  ...retainData,
-                }
-              }),
+        return {
+          ...val,
+          formData: JSON.stringify({
+            ...val.formData,
+            otherDiagnosis: val.formData.otherDiagnosis.map((d) => {
+              const { diagnosiss, ...retainData } = d
+              return {
+                ...retainData,
+              }
             }),
-          }
-        })
+          }),
+        }
+      })
       : []
   })
   return {
@@ -199,4 +207,5 @@ module.exports = {
   ...module.exports,
   orderTypes,
   convertToConsultation,
+  convertConsultationDocument,
 }
