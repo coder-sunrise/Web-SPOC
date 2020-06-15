@@ -162,7 +162,7 @@ class PatientNurseNotes extends PureComponent {
   render () {
     const {
       dispatch,
-      patientNurseNotes: { entity, refreshTime, list = [] },
+      patientNurseNotes: { entity, list = [] },
       user,
     } = this.props
     const { clinicianProfile } = user.data
@@ -213,18 +213,6 @@ class PatientNurseNotes extends PureComponent {
                 style={{ textAlign: 'left', fontWeight: 'bold' }}
               >
                 <span>Total: {list.length} Records</span>
-              </GridItem>
-              <GridItem md={6} style={{ textAlign: 'right' }}>
-                <Button
-                  justIcon
-                  color='primary'
-                  onClick={this.refreshNurseNotes}
-                >
-                  <Tooltip title='Refresh'>
-                    <Refresh />
-                  </Tooltip>
-                </Button>
-                <span>{refreshTime}</span>
               </GridItem>
             </GridContainer>
           </GridItem>
