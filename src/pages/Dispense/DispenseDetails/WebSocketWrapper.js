@@ -180,10 +180,11 @@ const WebSocketWrapper = ({
     return null
   }
 
-  const handleOnPrint = async ({ type, row, printAllDrugLabel }) => {
+  const handleOnPrint = async ({ type, row, printAllDrugLabel, printData }) => {
     if (withoutPrintPreview.includes(type)) {
-      const printResult = await getPrintResult(type, row, printAllDrugLabel)
-
+      let printResult = await getPrintResult(type, row, printAllDrugLabel)
+      if (printData && printData.length > 0)
+        printResult = printResult && printResult.concat(printData)
       if (!printResult || printResult.length <= 0) return
       await handlePrint(JSON.stringify(printResult))
     } else {
