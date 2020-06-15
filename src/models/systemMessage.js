@@ -187,7 +187,7 @@ export default createListViewModel({
           let systemMessageTypeFK
           const newList = list.reduce((pre, cur) => {
             if (cur.id === id) {
-              deletedIsUnRead = cur.isRead && cur.isDismissed
+              deletedIsUnRead = !cur.isRead && !cur.isDismissed
               systemMessageTypeFK = cur.systemMessageTypeFK
               return pre
             }

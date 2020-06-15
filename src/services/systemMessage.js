@@ -1,7 +1,6 @@
 import * as service from '@/services/common'
 
-// const url = '/api/userprofileABC123'
-const url = '/api/systemmessage'
+const url = '/api/systemnotification'
 
 export const query = (params) => service.query(url, params)
 export const queryList = (params) => service.queryList(`${url}/user`, params)
