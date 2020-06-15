@@ -15,7 +15,7 @@ import {
 } from '@/components'
 import Edit from '@material-ui/icons/Edit'
 
-const PatientNurseNotesContent = ({ canEdit, entity, dispatch }) => {
+const PatientNurseNotesContent = ({ canEdit, entity, handleEdit }) => {
   const { createDate, createByUserFullName = '', notes } = entity
   const formateDate = moment(createDate).format(dateFormatLongWithTimeNoSec)
 
@@ -32,12 +32,7 @@ const PatientNurseNotesContent = ({ canEdit, entity, dispatch }) => {
             color='primary'
             size='sm'
             onClick={() => {
-              dispatch({
-                type: 'patientNurseNotes/updateState',
-                payload: {
-                  entity,
-                },
-              })
+              handleEdit(entity)
             }}
           >
             <Edit />

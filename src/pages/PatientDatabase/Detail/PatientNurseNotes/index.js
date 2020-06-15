@@ -146,10 +146,23 @@ class PatientNurseNotes extends PureComponent {
     }
   }
 
+  handleEdit = (entity) => {
+    const { dispatch, setFieldValue } = this.props
+
+    dispatch({
+      type: 'patientNurseNotes/updateState',
+      payload: {
+        entity,
+      },
+    })
+
+    setFieldValue('notes', entity.notes || '')
+  }
+
   render () {
     const {
       dispatch,
-      patientNurseNotes: { refreshTime, list = [] },
+      patientNurseNotes: { entity, refreshTime, list = [] },
       user,
     } = this.props
     const { clinicianProfile } = user.data
@@ -187,6 +200,7 @@ class PatientNurseNotes extends PureComponent {
                             entity={i}
                             dispatch={dispatch}
                             canEdit={canEdit}
+                            handleEdit={this.handleEdit}
                           />
                         )
                       })}
