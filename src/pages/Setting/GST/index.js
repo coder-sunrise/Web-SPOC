@@ -33,19 +33,28 @@ const styles = (theme) => ({
   enableReinitialize: true,
   mapPropsToValues: ({ clinicSettings }) => {
     if (clinicSettings.entity && clinicSettings.entity.isEnableGST) {
-      const { isEnableGST } = clinicSettings.entity
+      const { isEnableGST, isDefaultInclusiveGST } = clinicSettings.entity
       return {
         ...clinicSettings.entity,
         isEnableGST: {
           ...isEnableGST,
           settingValue: isEnableGST.settingValue === 'true',
         },
+        isDefaultInclusiveGST: {
+          ...isDefaultInclusiveGST,
+          settingValue: isDefaultInclusiveGST.settingValue === 'true',
+        },
       }
     }
     return clinicSettings.entity
   },
   handleSubmit: (values, { props }) => {
-    const { isEnableGST, gSTRegistrationNumber, gSTPercentage } = values
+    const {
+      isEnableGST,
+      gSTRegistrationNumber,
+      gSTPercentage,
+      isDefaultInclusiveGST,
+    } = values
 
     const payload = [
       {
@@ -57,6 +66,10 @@ const styles = (theme) => ({
       },
       {
         ...gSTPercentage,
+      },
+      {
+        ...isDefaultInclusiveGST,
+        settingValue: isDefaultInclusiveGST.settingValue.toString(),
       },
     ]
     const { dispatch, onConfirm, history } = props
@@ -78,7 +91,6 @@ const styles = (theme) => ({
 class clinicSettings extends PureComponent {
   state = {
     enableGst: true,
-    inclusiveGst: false,
     hasActiveSession: false,
   }
 
@@ -134,6 +146,9 @@ class clinicSettings extends PureComponent {
     // },
     // )
     this.setState({ enableGst: event.target.value })
+    if (!event.target.value) {
+      this.props.setFieldValue('isDefaultInclusiveGST.settingValue', false)
+    }
     // this.props.setFieldValue('isEnableGST.settingvalue', event.target.value)
     // this.props.setValues({
     //   ...this.props.values,
@@ -149,6 +164,7 @@ class clinicSettings extends PureComponent {
       isEnableGST,
       gSTRegistrationNumber,
       gSTPercentage,
+      isDefaultInclusiveGST,
     } = this.props.values
 
     const payload = [
@@ -161,6 +177,10 @@ class clinicSettings extends PureComponent {
       },
       {
         ...gSTPercentage,
+      },
+      {
+        ...isDefaultInclusiveGST,
+        settingValue: isDefaultInclusiveGST.settingValue.toString(),
       },
     ]
     const { dispatch, onConfirm, history } = this.props
@@ -247,10 +267,10 @@ class clinicSettings extends PureComponent {
               />
             </GridItem>
           </GridContainer>
-          {/* <GridContainer>
+          <GridContainer>
             <GridItem md={3}>
               <Field
-                name='inclusiveGst'
+                name='isDefaultInclusiveGST.settingValue'
                 render={(args) => (
                   <Checkbox
                     label='Inclusive GST'
@@ -260,7 +280,7 @@ class clinicSettings extends PureComponent {
                 )}
               />
             </GridItem>
-          </GridContainer> */}
+          </GridContainer>
           <div
             className={classes.actionBtn}
             style={{ display: 'flex', justifyContent: 'center' }}
