@@ -259,7 +259,7 @@ export default createFormViewModel({
             message: 'Consultation signed-off.',
             queueNo: entity.queueNo,
           })
-          yield put({ type: 'closeModal' })
+          // yield put({ type: 'closeModal' })
           // console.log('payload ', payload)
         }
         return response

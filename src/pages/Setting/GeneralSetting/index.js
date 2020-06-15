@@ -48,6 +48,9 @@ const styles = (theme) => ({
         defaultVisitType,
         autoPrintDrugLabel,
         showTotalInvoiceAmtInConsultation,
+        autoPrintDrugLabelOnFinalize,
+        autoPrintDrugLabelOnSignOff,
+        autoPrintDrugLabelOnCompletePayment,
       } = clinicSettings.entity
       return {
         ...clinicSettings.entity,
@@ -59,10 +62,23 @@ const styles = (theme) => ({
           ...autoRefresh,
           settingValue: autoRefresh.settingValue === 'true',
         },
-        autoPrintDrugLabel: {
-          ...autoPrintDrugLabel,
+        autoPrintDrugLabelOnFinalize: {
+          ...autoPrintDrugLabelOnFinalize,
           settingValue:
-            autoPrintDrugLabel && autoPrintDrugLabel.settingValue === 'true',
+            autoPrintDrugLabelOnFinalize &&
+            autoPrintDrugLabelOnFinalize.settingValue === 'true',
+        },
+        autoPrintDrugLabelOnCompletePayment: {
+          ...autoPrintDrugLabelOnCompletePayment,
+          settingValue:
+            autoPrintDrugLabelOnCompletePayment &&
+            autoPrintDrugLabelOnCompletePayment.settingValue === 'true',
+        },
+        autoPrintDrugLabelOnSignOff: {
+          ...autoPrintDrugLabelOnSignOff,
+          settingValue:
+            autoPrintDrugLabelOnSignOff &&
+            autoPrintDrugLabelOnSignOff.settingValue === 'true',
         },
         showConsultationVersioning: {
           ...showConsultationVersioning,
@@ -70,7 +86,8 @@ const styles = (theme) => ({
         },
         showTotalInvoiceAmtInConsultation: {
           ...showTotalInvoiceAmtInConsultation,
-          settingValue: showTotalInvoiceAmtInConsultation.settingValue === 'true',
+          settingValue:
+            showTotalInvoiceAmtInConsultation.settingValue === 'true',
         },
       }
     }
@@ -121,7 +138,7 @@ class GeneralSetting extends PureComponent {
     })
   }
 
-  render() {
+  render () {
     const {
       classes,
       clinicSettings,
@@ -217,12 +234,49 @@ class GeneralSetting extends PureComponent {
             </GridItem>
           </GridContainer>
           <GridContainer>
-            <GridItem md={3}>
+            <GridItem md={12}>
+              <span
+                style={{
+                  position: 'relative',
+                  color: 'rgba(0, 0, 0, 0.5)',
+                  display: 'inline-block',
+                  marginTop: 8,
+                }}
+              >
+                Auto Print Drug Label
+              </span>
+            </GridItem>
+            <GridItem md={2} style={{ margin: 0, marginTop: -10 }}>
               <Field
-                name='autoPrintDrugLabel.settingValue'
+                name='autoPrintDrugLabelOnFinalize.settingValue'
                 render={(args) => (
-                  <Switch
-                    label='Auto Print Drug Label'
+                  <Checkbox
+                    label='Finalize Order'
+                    {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={2} style={{ margin: 0, marginTop: -10 }}>
+              <Field
+                name='autoPrintDrugLabelOnSignOff.settingValue'
+                render={(args) => (
+                  <Checkbox
+                    label='Consultation Sign Off'
+                    {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+
+            <GridItem md={2} style={{ margin: 0, marginTop: -10 }}>
+              <Field
+                name='autoPrintDrugLabelOnCompletePayment.settingValue'
+                render={(args) => (
+                  <Checkbox
+                    label='Complete Payment'
                     {...args}
                     disabled={!!hasActiveSession}
                   />
