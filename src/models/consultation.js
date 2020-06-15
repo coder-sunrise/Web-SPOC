@@ -52,7 +52,7 @@ export default createFormViewModel({
         '1',
       ],
       showSignOffModal: false,
-      printData: [{ item: '1', description: '1', no: 1, print: true }],
+      printData: [],
 
     },
     subscriptions: ({ dispatch, history }) => {
