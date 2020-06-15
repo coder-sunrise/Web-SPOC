@@ -696,7 +696,7 @@ class Main extends React.Component {
                   ) : null
               }}
             </Authorized>
-            {clinicSettings.showTotalInvoiceAmtInConsultation ?
+            {clinicSettings.showTotalInvoiceAmtInConsultation ? (
               <GridItem>
                 <h4 style={{ position: 'relative', marginTop: 0 }}>
                   Total Invoice
@@ -708,7 +708,7 @@ class Main extends React.Component {
                   )}
                 </h4>
               </GridItem>
-              : null}
+            ) : null}
             <GridItem style={{ display: 'flex' }}>
               <Authorized authority='openqueuedisplay'>
                 <div style={{ marginRight: 10 }}>
@@ -876,6 +876,16 @@ class Main extends React.Component {
     this.props.dispatch({ type: `consultation/closeSignOffModal` })
   }
 
+  // componentWillUnmount () {
+  //   this.props.dispatch({
+  //     type: 'formik/updateState',
+  //     payload: {
+  //       ConsultationPage: undefined,
+  //       ConsultationDocumentList: undefined,
+  //       OrderPage: undefined,
+  //     },
+  //   })
+  // }
   componentWillUnmount () {
     this.props.dispatch({
       type: 'consultation/updateState',

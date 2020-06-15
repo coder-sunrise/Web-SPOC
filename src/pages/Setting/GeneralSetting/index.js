@@ -76,7 +76,8 @@ const styles = (theme) => ({
         autoPrintDrugLabelOnFinalize: {
           ...autoPrintDrugLabelOnFinalize,
           settingValue:
-            autoPrintDrugLabelOnFinalize && autoPrintDrugLabelOnFinalize.settingValue === 'true',
+            autoPrintDrugLabelOnFinalize &&
+            autoPrintDrugLabelOnFinalize.settingValue === 'true',
         },
         showConsultationVersioning: {
           ...showConsultationVersioning,
@@ -92,7 +93,8 @@ const styles = (theme) => ({
         },
         showTotalInvoiceAmtInConsultation: {
           ...showTotalInvoiceAmtInConsultation,
-          settingValue: showTotalInvoiceAmtInConsultation.settingValue === 'true',
+          settingValue:
+            showTotalInvoiceAmtInConsultation.settingValue === 'true',
         },
         autoPrintReportsOnCompletePayment: {
           ...autoPrintReportsOnCompletePayment,
@@ -255,9 +257,6 @@ class GeneralSetting extends PureComponent {
             </GridItem>
           </GridContainer>
           <GridContainer>
-            <GridItem md={12}>
-              <span style={{ position: 'relative', color: 'rgba(0, 0, 0, 0.5)', display: 'inline-block', marginTop: 8 }}>Auto Print Drug Label</span>
-            </GridItem>
             <GridItem md={2} style={{ margin: 0, marginTop: -10 }}>
               <Field
                 name='defaultVisitType.settingValue'
@@ -272,9 +271,7 @@ class GeneralSetting extends PureComponent {
                 )}
               />
             </GridItem>
-          </GridContainer>
-          <GridContainer>
-            <GridItem md={3}>
+            <GridItem md={2} style={{ margin: 0, marginTop: -10 }}>
               <Field
                 name='labelPrinterSize.settingValue'
                 render={(args) => (
@@ -288,9 +285,7 @@ class GeneralSetting extends PureComponent {
                 )}
               />
             </GridItem>
-          </GridContainer>
-          <GridContainer>
-            <GridItem md={3}>
+            <GridItem md={2} style={{ margin: 0, marginTop: -10 }}>
               <Field
                 name='showTotalInvoiceAmtInConsultation.settingValue'
                 render={(args) => (

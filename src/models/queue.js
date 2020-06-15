@@ -212,6 +212,8 @@ export default createListViewModel({
 
           return true
         }
+        InitialSessionInfo.isClinicSessionClosed = true
+
         yield put({
           type: 'updateSessionInfo',
           payload: { ...InitialSessionInfo },
