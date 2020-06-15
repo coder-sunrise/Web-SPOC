@@ -1027,19 +1027,34 @@ export const corAttchementTypes = [
     name: 'Queue Display',
   },
 ]
+
+export const ReportsOnSignOffOption = {
+  DrugLabel: 'Drug Label',
+  MedicalCertificate: 'Medical Certificate',
+  CertificateofAttendance: 'Certificate of Attendance',
+  ReferralLetter: 'Referral Letter',
+  Memo: 'Memo',
+  VaccinationCertificate: 'Vaccination Certificate',
+  OtherDocuments: 'Other Documents',
+}
 export const ReportsOnSignOff = [
-  { code: 'Drug Label', description: 'Drug Label' },
-  { code: 'Medical Certificate', description: 'Medical Certificate' },
-  { code: 'Certificate of Attendance', description: 'Certificate of Attendance' },
-  { code: 'Referral Letter', description: 'Referral Letter' },
-  { code: 'Memo', description: 'Memo' },
-  { code: 'Vaccination Certificate', description: 'Vaccination Certificate' },
-  { code: 'Other Documents', description: 'Other Documents' },
+  { code: ReportsOnSignOffOption.DrugLabel, description: 'Drug Label' },
+  { code: ReportsOnSignOffOption.MedicalCertificate, description: 'Medical Certificate' },
+  { code: ReportsOnSignOffOption.CertificateofAttendance, description: 'Certificate of Attendance' },
+  { code: ReportsOnSignOffOption.ReferralLetter, description: 'Referral Letter' },
+  { code: ReportsOnSignOffOption.Memo, description: 'Memo' },
+  { code: ReportsOnSignOffOption.VaccinationCertificate, description: 'Vaccination Certificate' },
+  { code: ReportsOnSignOffOption.OtherDocuments, description: 'Other Documents' },
 ]
+export const ReportsOnCompletePaymentOption = {
+  DrugLabel: 'Drug Label',
+  Invoice: 'Invoice',
+  Receipt: 'Receipt',
+}
 export const ReportsOnCompletePayment = [
-  { code: 'Drug Label', description: 'Drug Label' },
-  { code: 'Invoice', description: 'Invoice' },
-  { code: 'Receipt', description: 'Receipt' },
+  { code: ReportsOnCompletePaymentOption.DrugLabel, description: 'Drug Label' },
+  { code: ReportsOnCompletePaymentOption.Invoice, description: 'Invoice' },
+  { code: ReportsOnCompletePaymentOption.Receipt, description: 'Receipt' },
 ]
 const initRoomAssignment = async () => {
   const accessRight = Authorized.check('settings.clinicsetting.roomassignment')

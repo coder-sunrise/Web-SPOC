@@ -30,7 +30,7 @@ import { convertToConsultation, convertConsultationDocument } from '@/pages/Cons
 import { VISIT_TYPE } from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { CallingQueueButton } from '@/components/_medisys'
-import { initRoomAssignment, consultationDocumentTypes } from '@/utils/codes'
+import { initRoomAssignment, consultationDocumentTypes, ReportsOnSignOffOption } from '@/utils/codes'
 
 
 // import PatientSearch from '@/pages/PatientDatabase/Search'
@@ -48,17 +48,13 @@ const formName = 'ConsultationPage'
 
 const generatePrintData = async (settings, consultationDocument, user, patient, orders, visitEntity) => {
   let documents = convertConsultationDocument(consultationDocument)
-  const [
+  const {
     autoPrintOnSignOff,
-    autoPrintMemoOnSignOff,
-    autoPrintMedicalCertificateOnSignOff,
-    autoPrintCertificateOfAttendanceOnSignOff,
-    autoPrintReferralLetterOnSignOff,
-    autoPrintVaccinationCertificateOnSignOff,
-    autoPrintOtherDocumentsOnSignOff,
-    autoPrintDrugLabelOnSignOff,
-  ] = [true, true, true, true, true, true, true, true]
+    autoPrintReportsOnSignOff,
+  } = settings
+
   if (autoPrintOnSignOff === true) {
+    let reportsOnSignOff = autoPrintReportsOnSignOff.split(',')
     const { corMemo, corCertificateOfAttendance, corMedicalCertificate, corOtherDocuments, corReferralLetter, corVaccinationCert } = documents
     let printData = []
 
@@ -95,7 +91,7 @@ const generatePrintData = async (settings, consultationDocument, user, patient, 
       }
       return []
     }
-    if (autoPrintDrugLabelOnSignOff === true) {
+    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.DrugLabel) > -1) {
       // const { versionNumber } = values
       // versionNumber === 1 && 
       if (orders && orders.rows) {
@@ -109,17 +105,17 @@ const generatePrintData = async (settings, consultationDocument, user, patient, 
           printData = printData.concat(drugLabelData)
       }
     }
-    if (autoPrintMemoOnSignOff === true)
+    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.Memo) > -1)
       printData = printData.concat(getPrintData('Memo', corMemo))
-    if (autoPrintMedicalCertificateOnSignOff === true)
+    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.MedicalCertificate) > -1)
       printData = printData.concat(getPrintData('Medical Certificate', corMedicalCertificate))
-    if (autoPrintCertificateOfAttendanceOnSignOff === true)
+    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.CertificateofAttendance) > -1)
       printData = printData.concat(getPrintData('Certificate of Attendance', corCertificateOfAttendance))
-    if (autoPrintOtherDocumentsOnSignOff === true)
+    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.OtherDocuments) > -1)
       printData = printData.concat(getPrintData('Others', corOtherDocuments))
-    if (autoPrintReferralLetterOnSignOff === true)
+    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.ReferralLetter) > -1)
       printData = printData.concat(getPrintData('Referral Letter', corReferralLetter))
-    if (autoPrintVaccinationCertificateOnSignOff === true)
+    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.VaccinationCertificate) > -1)
       printData = printData.concat(getPrintData('Vaccination Certificate', corVaccinationCert))
     return printData
   }
@@ -190,9 +186,10 @@ const saveConsultation = async ({
 
   if (shouldPromptConfirm) {
     let settings = JSON.parse(localStorage.getItem('clinicSettings'))
-    const [
+    const {
       autoPrintOnSignOff,
-    ] = [true]
+    } = settings
+
     if (autoPrintOnSignOff === true) {
       let printData = await generatePrintData(settings, consultationDocument, props.user, patient, orders, visitEntity)
       if (printData && printData.length > 0) {
@@ -328,6 +325,9 @@ const discardConsultation = ({
       confirmMessage: 'Confirm sign off current consultation?',
       successMessage: 'Consultation signed',
       action: 'sign',
+      successCallback: () => {
+        props.dispatch({ type: 'consultation/closeModal' })
+      },
     })
   },
   displayName: formName,

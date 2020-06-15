@@ -169,8 +169,7 @@ class GeneralSetting extends PureComponent {
       values,
       ...restProps
     } = this.props
-    // const { hasActiveSession } = this.state
-    let hasActiveSession = false
+    const { hasActiveSession } = this.state
     return (
       <React.Fragment>
         {hasActiveSession && (
@@ -358,6 +357,7 @@ class GeneralSetting extends PureComponent {
                     <CheckboxGroup
                       valueField='code'
                       textField='description'
+                      disabled={!!hasActiveSession}
                       options={ReportsOnSignOff}
                       noUnderline
                       {...args}
@@ -391,6 +391,7 @@ class GeneralSetting extends PureComponent {
                 render={(args) => {
                   return (
                     <CheckboxGroup
+                      disabled={!!hasActiveSession}
                       valueField='code'
                       textField='description'
                       options={ReportsOnCompletePayment}
