@@ -34,10 +34,19 @@ export default createListViewModel({
         formData: {
           caseType: 'DaySurgery',
           procuderes: [],
-          otherDiagnosis: [],
           nonSurgicalCharges: [],
           others: null,
           signatureThumbnail: null,
+          principalDiagnosisFK: null,
+          principalDiagnosisCode: null,
+          principalDiagnosisName: null,
+          secondDiagnosisAFK: null,
+          secondDiagnosisACode: null,
+          secondDiagnosisAName: null,
+          secondDiagnosisBFK: null,
+          secondDiagnosisBCode: null,
+          secondDiagnosisBName: null,
+          otherDiagnosis: [],
         },
       },
       default: {},
@@ -97,7 +106,6 @@ export default createListViewModel({
           patientNRICNo,
           patientAccountNo,
           isCanEditForms,
-          corDiagnosis,
         } = data
         let formRows = []
         if (data.formType === 'VisitForm') {
@@ -146,7 +154,6 @@ export default createListViewModel({
             patientNRICNo,
             patientAccountNo,
             isCanEditForms,
-            cORDiagnosis: corDiagnosis,
           },
           list: _.sortBy(formRows, 'sequence'),
         }
