@@ -39,24 +39,20 @@ const PatientLabLabelButton = ({
 
     if (labelPrinterSize === '8.9cmx3.6cm') {
       reportID = REPORT_ID.PATIENT_LAB_LABEL_89MM_36MM
-    }
-    else if (labelPrinterSize === '7.6cmx3.8cm') {
-        reportID = REPORT_ID.PATIENT_LAB_LABEL_76MM_38MM
+    } else if (labelPrinterSize === '7.6cmx3.8cm') {
+      reportID = REPORT_ID.PATIENT_LAB_LABEL_76MM_38MM
     }
 
     const data = await getRawData(reportID, { patientId })
     const payload = [
       {
         ReportId: reportID,
-        ReportData: JSON.stringify({
-          ...data,
-        }),
+        Copies: labLabelCopyNo,
+        ReportData: JSON.stringify(data),
       },
     ]
 
-    for (let i = 0; i < labLabelCopyNo; i++) {
-      handlePrint(JSON.stringify(payload))
-    }
+    handlePrint(JSON.stringify(payload))
   }
 
   const handlePatientLabelClick = async () => {
@@ -65,9 +61,8 @@ const PatientLabLabelButton = ({
 
     if (labelPrinterSize === '8.9cmx3.6cm') {
       reportID = REPORT_ID.PATIENT_LABEL_89MM_36MM
-    }
-    else if (labelPrinterSize === '7.6cmx3.8cm') {
-        reportID = REPORT_ID.PATIENT_LAB_LABEL_76MM_38MM
+    } else if (labelPrinterSize === '7.6cmx3.8cm') {
+      reportID = REPORT_ID.PATIENT_LAB_LABEL_76MM_38MM
     }
 
     if (!Number.isInteger(ptnLabelCopyNo)) return
@@ -76,15 +71,13 @@ const PatientLabLabelButton = ({
     const payload = [
       {
         ReportId: reportID,
+        Copies: ptnLabelCopyNo,
         ReportData: JSON.stringify({
           ...data,
         }),
       },
     ]
-
-    for (let i = 0; i < ptnLabelCopyNo; i++) {
-      handlePrint(JSON.stringify(payload))
-    }
+    handlePrint(JSON.stringify(payload))
   }
 
   return (
