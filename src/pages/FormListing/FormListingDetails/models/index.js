@@ -133,16 +133,7 @@ export default createListViewModel({
 
       queryCORFormsDone (st, { payload }) {
         const { data } = payload
-        const {
-          id,
-          currentCORId,
-          visitDate,
-          doctorProfileFK,
-          patientName,
-          patientNRICNo,
-          patientAccountNo,
-          isCanEditForms,
-        } = data
+        const { id, currentCORId, visitDate, isCanEditForms } = data
         let formRows = []
         formTypes.forEach((p) => {
           formRows = formRows.concat(
@@ -163,13 +154,10 @@ export default createListViewModel({
         return {
           ...st,
           visitDetail: {
+            ...st.visitDetail,
             visitID: id,
             currentCORId,
             visitDate,
-            doctorProfileFK,
-            patientName,
-            patientNRICNo,
-            patientAccountNo,
             isCanEditForms,
           },
           list: _.sortBy(formRows, 'sequence'),
@@ -178,16 +166,7 @@ export default createListViewModel({
 
       queryVisitFormsDone (st, { payload }) {
         const { data } = payload
-        const {
-          id,
-          currentCORId,
-          visitDate,
-          doctorProfileFK,
-          patientName,
-          patientNRICNo,
-          patientAccountNo,
-          isCanEditForms,
-        } = data
+        const { id, currentCORId, visitDate, isCanEditForms } = data
         let formRows = []
         visitFormTypes.forEach((p) => {
           formRows = formRows.concat(
@@ -209,13 +188,10 @@ export default createListViewModel({
         return {
           ...st,
           visitDetail: {
+            ...st.visitDetail,
             visitID: id,
             currentCORId,
             visitDate,
-            doctorProfileFK,
-            patientName,
-            patientNRICNo,
-            patientAccountNo,
             isCanEditForms,
           },
           list: _.sortBy(formRows, 'sequence'),
