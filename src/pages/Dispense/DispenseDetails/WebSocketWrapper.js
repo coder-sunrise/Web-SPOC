@@ -1,6 +1,5 @@
 import React from 'react'
 import router from 'umi/router'
-import DispenseDetails from './index'
 // common component
 import { notification } from '@/components'
 import withWebSocket from '@/components/Decorator/withWebSocket'
@@ -11,11 +10,18 @@ import {
   queryDrugLabelDetails,
   queryDrugLabelsDetails,
 } from '@/services/dispense'
-import CONSTANTS from './constants'
 import { REPORT_ID } from '@/utils/constants'
 import { getAppendUrl } from '@/utils/utils'
+import CONSTANTS from './constants'
+import DispenseDetails from './index'
 
-const WebSocketWrapper = ({ handlePrint, selectedDrugs, sendingJob, ...restProps }) => {
+const WebSocketWrapper = ({
+  handlePrint,
+  selectedDrugs,
+  sendingJob,
+  onPrintRef,
+  ...restProps
+}) => {
   const withoutPrintPreview = [
     CONSTANTS.ALL_DRUG_LABEL,
     CONSTANTS.DRUG_LABEL,
@@ -65,12 +71,23 @@ const WebSocketWrapper = ({ handlePrint, selectedDrugs, sendingJob, ...restProps
     return null
   }
 
-  const generateDrugLablesPrintSource = async (visitID, prescriptions = [], printAllDrugLabel = false) => {
+  const generateDrugLablesPrintSource = async (
+    visitID,
+    prescriptions = [],
+    printAllDrugLabel = false,
+  ) => {
     const drugLabelsDetails1 = await queryDrugLabelsDetails(visitID)
     const { data } = drugLabelsDetails1
+
     if (data && data.length > 0) {
       let drugLabelDetail = []
-      const newdata = data.filter(x => selectedDrugs.findIndex((value) => value.id === x.id && (printAllDrugLabel || value.selected)) > -1)
+      const newdata = data.filter(
+        (x) =>
+          selectedDrugs.findIndex(
+            (value) =>
+              value.id === x.id && (printAllDrugLabel || value.selected),
+          ) > -1,
+      )
       newdata.map((o) => {
         let copy = selectedDrugs.find((x) => x.id === o.id).no
         for (let no = 0; no < copy; no++) {
@@ -78,6 +95,7 @@ const WebSocketWrapper = ({ handlePrint, selectedDrugs, sendingJob, ...restProps
           drugLabelDetail.push(getDrugLabelDetails(o, prescriptionItem))
         }
       })
+
       return drugLabelDetail
     }
     notification.warn({
@@ -94,8 +112,7 @@ const WebSocketWrapper = ({ handlePrint, selectedDrugs, sendingJob, ...restProps
       if (settings && settings.labelPrinterSize === '8.9cmx3.6cm') {
         drugLabelReportID = REPORT_ID.DRUG_LABEL_89MM_36MM
         patientLabelReportID = REPORT_ID.PATIENT_LABEL_89MM_36MM
-      }
-      else if (settings && settings.labelPrinterSize === '7.6cmx3.8cm') {
+      } else if (settings && settings.labelPrinterSize === '7.6cmx3.8cm') {
         drugLabelReportID = REPORT_ID.DRUG_LABEL_76MM_38MM
         patientLabelReportID = REPORT_ID.PATIENT_LABEL_76MM_38MM
       }
@@ -107,7 +124,7 @@ const WebSocketWrapper = ({ handlePrint, selectedDrugs, sendingJob, ...restProps
         const drugLabelList = await generateDrugLablesPrintSource(
           dispense ? dispense.visitID : values.id,
           prescription,
-          printAllDrugLabel
+          printAllDrugLabel,
         )
         if (drugLabelList) {
           const payload = drugLabelList.map((drugLabel) => ({
@@ -163,11 +180,13 @@ const WebSocketWrapper = ({ handlePrint, selectedDrugs, sendingJob, ...restProps
     return null
   }
 
-  const handleOnPrint = async ({ type, row, printAllDrugLabel }) => {
+  const handleOnPrint = async ({ type, row, printAllDrugLabel, printData }) => {
     if (withoutPrintPreview.includes(type)) {
-      const printResult = await getPrintResult(type, row, printAllDrugLabel)
-      if (!printResult) return
-      handlePrint(JSON.stringify(printResult))
+      let printResult = await getPrintResult(type, row, printAllDrugLabel)
+      if (printData && printData.length > 0)
+        printResult = printResult && printResult.concat(printData)
+      if (!printResult || printResult.length <= 0) return
+      await handlePrint(JSON.stringify(printResult))
     } else {
       const documentType = consultationDocumentTypes.find(
         (o) =>
@@ -200,9 +219,12 @@ const WebSocketWrapper = ({ handlePrint, selectedDrugs, sendingJob, ...restProps
     const finalized = await onFinalizeClick()
     if (finalized) {
       let settings = JSON.parse(localStorage.getItem('clinicSettings'))
-      const { autoPrintDrugLabel = false } = settings
-      if (autoPrintDrugLabel === true)
-        await handleOnPrint({ type: CONSTANTS.ALL_DRUG_LABEL, printAllDrugLabel: true })
+      const { autoPrintDrugLabelOnFinalize = false } = settings
+      if (autoPrintDrugLabelOnFinalize === true)
+        await handleOnPrint({
+          type: CONSTANTS.ALL_DRUG_LABEL,
+          printAllDrugLabel: true,
+        })
 
       await restProps.dispatch({
         type: 'dispense/query',
@@ -214,6 +236,8 @@ const WebSocketWrapper = ({ handlePrint, selectedDrugs, sendingJob, ...restProps
       router.push(getAppendUrl({}, '/reception/queue/billing'))
     }
   }
+
+  if (onPrintRef) onPrintRef(handleOnPrint)
 
   return (
     <DispenseDetails

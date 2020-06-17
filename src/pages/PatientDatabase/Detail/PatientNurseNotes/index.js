@@ -146,10 +146,23 @@ class PatientNurseNotes extends PureComponent {
     }
   }
 
+  handleEdit = (entity) => {
+    const { dispatch, setFieldValue } = this.props
+
+    dispatch({
+      type: 'patientNurseNotes/updateState',
+      payload: {
+        entity,
+      },
+    })
+
+    setFieldValue('notes', entity.notes || '')
+  }
+
   render () {
     const {
       dispatch,
-      patientNurseNotes: { refreshTime, list = [] },
+      patientNurseNotes: { entity, list = [] },
       user,
     } = this.props
     const { clinicianProfile } = user.data
@@ -187,6 +200,7 @@ class PatientNurseNotes extends PureComponent {
                             entity={i}
                             dispatch={dispatch}
                             canEdit={canEdit}
+                            handleEdit={this.handleEdit}
                           />
                         )
                       })}
@@ -199,18 +213,6 @@ class PatientNurseNotes extends PureComponent {
                 style={{ textAlign: 'left', fontWeight: 'bold' }}
               >
                 <span>Total: {list.length} Records</span>
-              </GridItem>
-              <GridItem md={6} style={{ textAlign: 'right' }}>
-                <Button
-                  justIcon
-                  color='primary'
-                  onClick={this.refreshNurseNotes}
-                >
-                  <Tooltip title='Refresh'>
-                    <Refresh />
-                  </Tooltip>
-                </Button>
-                <span>{refreshTime}</span>
               </GridItem>
             </GridContainer>
           </GridItem>

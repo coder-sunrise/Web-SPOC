@@ -2,7 +2,7 @@ import moment from 'moment'
 import _ from 'lodash'
 import Authorized from '@/utils/Authorized'
 import { dateFormatLong, dateFormatLongWithTime } from './format'
-import { UNFIT_TYPE, SCRIBBLE_NOTE_TYPE } from './constants'
+import { UNFIT_TYPE, SCRIBBLE_NOTE_TYPE, REPORT_ID } from './constants'
 import { calculateAgeFromDOB } from './dateUtils'
 
 const status = [
@@ -690,7 +690,7 @@ export const getInventoryItem = (
       if (
         item &&
         item.orderQuantity - item.quantityReceived ===
-          o.totalCurrentReceivingQty
+        o.totalCurrentReceivingQty
       ) {
         return {
           ...o,
@@ -999,7 +999,7 @@ export const labelPrinterList = [
   { value: '7.6cmx3.8cm', name: '7.6cmx3.8cm' },
 ]
 
-const corAttchementTypes = [
+export const corAttchementTypes = [
   {
     id: 1,
     type: 'ClinicalNotes',
@@ -1028,6 +1028,34 @@ const corAttchementTypes = [
   },
 ]
 
+export const ReportsOnSignOffOption = {
+  DrugLabel: 'Drug Label',
+  MedicalCertificate: 'Medical Certificate',
+  CertificateofAttendance: 'Certificate of Attendance',
+  ReferralLetter: 'Referral Letter',
+  Memo: 'Memo',
+  VaccinationCertificate: 'Vaccination Certificate',
+  OtherDocuments: 'Other Documents',
+}
+export const ReportsOnSignOff = [
+  { code: ReportsOnSignOffOption.DrugLabel, description: 'Drug Label' },
+  { code: ReportsOnSignOffOption.MedicalCertificate, description: 'Medical Certificate' },
+  { code: ReportsOnSignOffOption.CertificateofAttendance, description: 'Certificate of Attendance' },
+  { code: ReportsOnSignOffOption.ReferralLetter, description: 'Referral Letter' },
+  { code: ReportsOnSignOffOption.Memo, description: 'Memo' },
+  { code: ReportsOnSignOffOption.VaccinationCertificate, description: 'Vaccination Certificate' },
+  { code: ReportsOnSignOffOption.OtherDocuments, description: 'Other Documents' },
+]
+export const ReportsOnCompletePaymentOption = {
+  DrugLabel: 'Drug Label',
+  Invoice: 'Invoice',
+  Receipt: 'Receipt',
+}
+export const ReportsOnCompletePayment = [
+  { code: ReportsOnCompletePaymentOption.DrugLabel, description: 'Drug Label' },
+  { code: ReportsOnCompletePaymentOption.Invoice, description: 'Invoice' },
+  { code: ReportsOnCompletePaymentOption.Receipt, description: 'Receipt' },
+]
 const initRoomAssignment = async () => {
   const accessRight = Authorized.check('settings.clinicsetting.roomassignment')
   if (accessRight && accessRight.rights === 'enable') {
@@ -1492,7 +1520,6 @@ module.exports = {
   roundToPrecision,
   gstEnabled,
   groupByFKFunc,
-  corAttchementTypes,
   initRoomAssignment,
   scribbleTypes,
   formTypes,

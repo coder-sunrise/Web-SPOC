@@ -5,6 +5,7 @@ import { notification } from '@/components'
 import { getPDF } from '@/services/report'
 // utils
 import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
+import { AESEncryptor } from '@/utils/aesEncryptor'
 
 const defaultSocketPortsState = [
   { portNumber: 7182, attempted: false },
@@ -14,7 +15,7 @@ const defaultSocketPortsState = [
 
 const withWebSocket = () => (Component) => {
   class WebSocketBase extends React.Component {
-    constructor (props) {
+    constructor(props) {
       super(props)
       this.state = {
         socketPorts: [
@@ -30,28 +31,61 @@ const withWebSocket = () => (Component) => {
     }
 
     componentWillUnmount () {
-      if (this.wsConnection) this.wsConnection.close()
+      const { isWsConnected } = this.state
+
+      if (this.wsConnection && isWsConnected === true) this.wsConnection.close()
     }
 
-    prepareJobForWebSocket = (content) => {
+    prepareJobForWebSocket = async (content) => {
       // reset port number state to retry all attempt and set job content
       // then initialize web socket connection
-      this.setState(
-        {
-          socketPorts: [
-            ...defaultSocketPortsState,
-          ],
-          pendingJob: [
-            content,
-          ],
-        },
-        () => {
-          this.initializeWebSocket(false)
-        },
-      )
+      this.setState({
+        // socketPorts: [
+        //   ...defaultSocketPortsState,
+        // ],
+        pendingJob: [
+          content,
+        ],
+      })
+
+      const { isWsConnected } = this.state
+
+      if (isWsConnected === true) {
+        this.sendJobToWebSocket()
+      } else {
+        let haveOneOpend = false
+        const settings = JSON.parse(localStorage.getItem('clinicSettings'))
+        const { printToolSocketURL = '' } = settings
+        const [
+          prefix = '',
+          ip = '',
+        ] = printToolSocketURL.split(':')
+
+        for (let index = 0; index < defaultSocketPortsState.length; index++) {
+          const socket = defaultSocketPortsState[index]
+          const wsUrl = `${prefix}:${ip}:${socket.portNumber}`
+          if (wsUrl) {
+            console.log(`try to connect ${wsUrl}`)
+            this.wsConnection = new window.WebSocket(wsUrl)
+            haveOneOpend = await this.connectionAsync(this.wsConnection)
+            if (haveOneOpend) {
+              this.sendJobToWebSocket()
+              break
+            }
+          }
+        }
+        if (!haveOneOpend) {
+          notification.error({
+            message: `Medicloud printing tool is not running, please start it.`,
+          })
+          this.setState({
+            pendingJob: [],
+          })
+        }
+      }
     }
 
-    sendJobToWebSocket = () => {
+    sendJobToWebSocket = async () => {
       const { pendingJob } = this.state
 
       if (
@@ -69,30 +103,46 @@ const withWebSocket = () => (Component) => {
       })
     }
 
-    setSocketPortsState = (socket) => {
+    setSocketPortsState = (socket, attempted = true) => {
       this.setState((preState) => ({
         socketPorts: preState.socketPorts.map(
           (port) =>
             port.portNumber === socket.portNumber
-              ? { ...port, attempted: true }
+              ? { ...port, attempted }
               : { ...port },
         ),
       }))
     }
 
     handlePrint = async (content) => {
-      // console.log({ content })
-      // const pdfResult = await getPDF(reportID, payload)
+      console.log(`handlePrint: ${content}`)
       if (content) {
-        // const base64Result = arrayBufferToBase64(pdfResult)
-        this.prepareJobForWebSocket(content)
+        await this.prepareJobForWebSocket(AESEncryptor.encrypt(content))
       }
+    }
+
+    connectionAsync = async (socket, timeout = 1000) => {
+      const isOpened = () => socket.readyState === WebSocket.OPEN
+
+      if (socket.readyState !== WebSocket.CONNECTING) {
+        return isOpened()
+      }
+
+      const intrasleep = 10
+      const ttl = timeout / intrasleep // time to loop
+      let loop = 0
+      while (socket.readyState === WebSocket.CONNECTING && loop < ttl) {
+        await new Promise((resolve) => setTimeout(resolve, intrasleep))
+        loop += 1
+      }
+      return isOpened()
     }
 
     // will initialize web socket connection
     // send job if there is any successful connection or already connected
-    initializeWebSocket = (isFirstLoad = false) => {
+    initializeWebSocket = () => {
       const { socketPorts, isWsConnected } = this.state
+
       if (isWsConnected === false) {
         let settings = JSON.parse(localStorage.getItem('clinicSettings'))
         const { printToolSocketURL = '' } = settings
@@ -106,14 +156,6 @@ const withWebSocket = () => (Component) => {
         const socket = socketPorts.find((port) => !port.attempted)
 
         if (!socket) {
-          this.setState({
-            pendingJob: [],
-          })
-
-          if (!isFirstLoad)
-            notification.error({
-              message: `Medicloud printing tool is not running, please start it.`,
-            })
           return
         }
 
@@ -123,29 +165,24 @@ const withWebSocket = () => (Component) => {
           this.wsConnection = new window.WebSocket(wsUrl)
           this.wsConnection.onopen = () => {
             // this.isWsConnected = true
-            console.log(`connected: ${socket.portNumber}`)
+            console.log(`connected: ${wsUrl}`)
             this.setState({
               isWsConnected: true,
             })
             this.setSocketPortsState(socket)
-            this.sendJobToWebSocket()
           }
 
           this.wsConnection.onclose = () => {
             // this.isWsConnected = false
-            this.setState({
-              isWsConnected: false,
-            })
-            this.setSocketPortsState(socket)
-            this.initializeWebSocket(isFirstLoad)
+            // console.log(`closed: ${wsUrl}`)
+            this.setSocketPortsState(socket, true)
+            this.initializeWebSocket()
           }
 
           // this.wsConnection.onerror = (event) => {
           //   console.log('WebSocket error: ', event)
           // }
         }
-      } else {
-        this.sendJobToWebSocket()
       }
     }
 
