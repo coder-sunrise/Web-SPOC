@@ -221,53 +221,55 @@ class LCForm extends PureComponent {
         }
       }
       const { currentCORId, visitID } = visitDetail
-      dispatch({
-        type: 'formListing/saveForm',
-        payload: {
-          visitID,
-          currentCORId,
-          formType:
-            formCategory === FORM_CATEGORY.VISITFORM ? 'VisitForm' : 'CORForm',
-          UpdateType: values.type,
-          visitLetterOfCertification:
-            formCategory === FORM_CATEGORY.VISITFORM
-              ? [
-                  {
-                    ...saveData,
-                  },
-                ]
-              : [],
-          corLetterOfCertification:
-            formCategory === FORM_CATEGORY.CORFORM
-              ? [
-                  {
-                    ...saveData,
-                  },
-                ]
-              : [],
-        },
-      }).then((r) => {
-        if (r) {
-          resetForm()
-          if (onConfirm) onConfirm()
-          if (formFrom === FORM_FROM.FORMMODULE) {
+      if (formCategory === FORM_CATEGORY.VISITFORM) {
+        dispatch({
+          type: 'formListing/saveVisitForm',
+          payload: {
+            ...saveData,
+            visitID,
+          },
+        }).then((r) => {
+          if (r) {
+            resetForm()
+            if (onConfirm) onConfirm()
             this.props.dispatch({
-              type: 'formListing/query',
-            })
-          } else if (formFrom === FORM_FROM.QUEUELOG) {
-            this.props.dispatch({
-              type: 'formListing/getVisitForm',
+              type: 'formListing/getVisitForms',
               payload: {
                 id: formListing.visitID,
-                formType:
-                  formCategory === FORM_FROM.FORMMODULE
-                    ? 'VisitForm'
-                    : 'CORForm',
               },
             })
           }
-        }
-      })
+        })
+      } else {
+        dispatch({
+          type: 'formListing/saveCORForm',
+          payload: {
+            ...saveData,
+            visitID,
+            ClinicalObjectRecordFK:
+              saveData.id && saveData.id > 0
+                ? saveData.ClinicalObjectRecordFK
+                : currentCORId,
+          },
+        }).then((r) => {
+          if (r) {
+            resetForm()
+            if (onConfirm) onConfirm()
+            if (formFrom === FORM_FROM.FORMMODULE) {
+              this.props.dispatch({
+                type: 'formListing/query',
+              })
+            } else if (formFrom === FORM_FROM.QUEUELOG) {
+              this.props.dispatch({
+                type: 'formListing/getCORForms',
+                payload: {
+                  id: formListing.visitID,
+                },
+              })
+            }
+          }
+        })
+      }
     }
   }
 

@@ -92,21 +92,42 @@ class VisitFormGrid extends PureComponent {
     )
   }
 
-  editRow = (row) => {
-    const { formListing } = this.props
+  editRow = async (row) => {
+    const { formListing, formCategory, formFrom, dispatch } = this.props
     const { visitDetail = {} } = formListing
     let { isCanEditForms = false } = visitDetail
     if (row.statusFK === 3 || row.statusFK === 4 || !isCanEditForms) return
-    this.props.dispatch({
-      type: 'formListing/updateState',
-      payload: {
-        showModal: true,
-        entity: row,
-        type: row.type,
-        formCategory: this.props.formCategory,
-        formFrom: this.props.formFrom,
-      },
-    })
+    let response
+    if (formCategory === FORM_CATEGORY.VISITFORM) {
+      response = await this.props.dispatch({
+        type: 'formListing/getVisitForm',
+        payload: {
+          id: row.id,
+        },
+      })
+    } else {
+      response = await dispatch({
+        type: 'formListing/getCORForm',
+        payload: {
+          id: row.id,
+        },
+      })
+    }
+    if (response) {
+      dispatch({
+        type: 'formListing/updateState',
+        payload: {
+          showModal: true,
+          entity: {
+            ...response,
+            formData: JSON.parse(response.formData),
+          },
+          type: row.type,
+          formCategory,
+          formFrom,
+        },
+      })
+    }
   }
 
   VoidForm = ({ classes, dispatch, row, user }) => {
@@ -118,34 +139,35 @@ class VisitFormGrid extends PureComponent {
     const handleConfirmDelete = useCallback((i, voidVisibleChange) => {
       if (reason) {
         const { formCategory, formListing } = this.props
-        let voidData = [
-          {
-            ...row,
-            formData: JSON.stringify(row.formData),
-            voidReason: reason,
-            statusFK: 4,
-            voidDate: moment(),
-            voidByUserFK: user.data.clinicianProfile.id,
-          },
-        ]
-        let formType =
-          formCategory === FORM_CATEGORY.VISITFORM ? 'VisitForm' : 'CORForm'
+        let voidData = {
+          ...row,
+          formData: JSON.stringify(row.formData),
+          voidReason: reason,
+          statusFK: 4,
+          voidDate: moment(),
+          voidByUserFK: user.data.clinicianProfile.id,
+          visitID: formListing.visitID,
+        }
         voidVisibleChange()
-        dispatch({
-          type: 'formListing/saveForm',
-          payload: {
-            visitID: formListing.visitID,
-            currentCORId: row.clinicalObjectRecordFK,
-            formType,
-            UpdateType: row.type,
-            visitLetterOfCertification:
-              formCategory === FORM_CATEGORY.VISITFORM ? voidData : [],
-            corLetterOfCertification:
-              formCategory === FORM_CATEGORY.CORFORM ? voidData : [],
-          },
-        }).then(() => {
-          this.props.queryFormListing()
-        })
+        if (formCategory === FORM_CATEGORY.VISITFORM) {
+          dispatch({
+            type: 'formListing/saveVisitForm',
+            payload: {
+              ...voidData,
+            },
+          }).then(() => {
+            this.props.queryFormListing()
+          })
+        } else {
+          dispatch({
+            type: 'formListing/saveCORForm',
+            payload: {
+              ...voidData,
+            },
+          }).then(() => {
+            this.props.queryFormListing()
+          })
+        }
       }
     })
     return (
@@ -272,36 +294,32 @@ class VisitFormGrid extends PureComponent {
                       <Popconfirm
                         onConfirm={() => {
                           const { formCategory } = this.props
-                          let deleteData = [
-                            {
-                              ...row,
-                              formData: JSON.stringify(row.formData),
-                              isDeleted: true,
-                            },
-                          ]
-                          let formType =
-                            formCategory === FORM_CATEGORY.VISITFORM
-                              ? 'VisitForm'
-                              : 'CORForm'
-                          dispatch({
-                            type: 'formListing/saveForm',
-                            payload: {
-                              visitID: formListing.visitID,
-                              currentCORId: row.clinicalObjectRecordFK,
-                              formType,
-                              UpdateType: row.type,
-                              visitLetterOfCertification:
-                                formCategory === FORM_CATEGORY.VISITFORM
-                                  ? deleteData
-                                  : [],
-                              corLetterOfCertification:
-                                formCategory === FORM_CATEGORY.CORFORM
-                                  ? deleteData
-                                  : [],
-                            },
-                          }).then(() => {
-                            this.props.queryFormListing()
-                          })
+                          let deleteData = {
+                            ...row,
+                            formData: JSON.stringify(row.formData),
+                            isDeleted: true,
+                            visitID: formListing.visitID,
+                          }
+
+                          if (formCategory === FORM_CATEGORY.VISITFORM) {
+                            dispatch({
+                              type: 'formListing/saveVisitForm',
+                              payload: {
+                                ...deleteData,
+                              },
+                            }).then(() => {
+                              this.props.queryFormListing()
+                            })
+                          } else {
+                            dispatch({
+                              type: 'formListing/saveCORForm',
+                              payload: {
+                                ...deleteData,
+                              },
+                            }).then(() => {
+                              this.props.queryFormListing()
+                            })
+                          }
                         }}
                       >
                         <Tooltip title='Delete'>
