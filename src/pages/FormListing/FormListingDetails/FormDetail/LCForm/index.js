@@ -153,12 +153,6 @@ const procuderesSchema = Yup.object().shape({
   displayName: 'LCForm',
 })
 class LCForm extends PureComponent {
-  constructor (props) {
-    super(props)
-
-    this.myRef = React.createRef()
-  }
-
   onSubmitButtonClicked = async (action) => {
     const {
       dispatch,
