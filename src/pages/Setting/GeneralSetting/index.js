@@ -49,8 +49,6 @@ const styles = (theme) => ({
         autoPrintDrugLabelOnFinalize,
         autoPrintDrugLabelOnSignOff,
         autoPrintDrugLabelOnCompletePayment,
-        showG6PDInPatientAndLabLabel,
-        showAllergyInPatientAndLabLabel,
       } = clinicSettings.entity
       return {
         ...clinicSettings.entity,
@@ -61,19 +59,6 @@ const styles = (theme) => ({
         autoRefresh: {
           ...autoRefresh,
           settingValue: autoRefresh.settingValue === 'true',
-        },
-        showG6PDInPatientAndLabLabel: {
-          ...showG6PDInPatientAndLabLabel,
-          settingValue:
-            showG6PDInPatientAndLabLabel.settingValue &&
-            showG6PDInPatientAndLabLabel.settingValue.toUpperCase() === 'TRUE',
-        },
-        showAllergyInPatientAndLabLabel: {
-          ...showAllergyInPatientAndLabLabel,
-          settingValue:
-            showAllergyInPatientAndLabLabel.settingValue &&
-            showAllergyInPatientAndLabLabel.settingValue.toUpperCase() ===
-              'TRUE',
         },
         autoPrintDrugLabelOnFinalize: {
           ...autoPrintDrugLabelOnFinalize,
@@ -136,14 +121,14 @@ class GeneralSetting extends PureComponent {
     const bizSessionPayload = {
       IsClinicSessionClosed: false,
     }
-    // const result = await getBizSession(bizSessionPayload)
-    // const { data } = result.data
+    const result = await getBizSession(bizSessionPayload)
+    const { data } = result.data
 
-    // this.setState(() => {
-    //   return {
-    //     hasActiveSession: data.length > 0,
-    //   }
-    // })
+    this.setState(() => {
+      return {
+        hasActiveSession: data.length > 0,
+      }
+    })
   }
 
   render () {
@@ -234,34 +219,6 @@ class GeneralSetting extends PureComponent {
                 render={(args) => (
                   <Switch
                     label='Queue Listing Auto Refresh'
-                    {...args}
-                    disabled={!!hasActiveSession}
-                  />
-                )}
-              />
-            </GridItem>
-          </GridContainer>
-          <GridContainer>
-            <GridItem md={3}>
-              <Field
-                name='showG6PDInPatientAndLabLabel.settingValue'
-                render={(args) => (
-                  <Switch
-                    label='Show G6PD in patient and lab label'
-                    {...args}
-                    disabled={!!hasActiveSession}
-                  />
-                )}
-              />
-            </GridItem>
-          </GridContainer>
-          <GridContainer>
-            <GridItem md={3}>
-              <Field
-                name='showAllergyInPatientAndLabLabel.settingValue'
-                render={(args) => (
-                  <Switch
-                    label='Show Allergy in patient and lab label'
                     {...args}
                     disabled={!!hasActiveSession}
                   />
