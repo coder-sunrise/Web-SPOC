@@ -6,6 +6,7 @@ import { withFormik, Field } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 import Warning from '@material-ui/icons/Warning'
+import { APPOINTMENT_CANCELLEDBY } from '@/utils/constants'
 // common component
 import {
   Danger,
@@ -126,6 +127,27 @@ const DeleteConfirmation = ({
       </GridItem>
       <GridItem md={8}>
         <Field
+          name='cancelBy'
+          render={(args) => (
+            <RadioGroup
+              {...args}
+              label='Cancel By'
+              options={[
+                {
+                  value: APPOINTMENT_CANCELLEDBY.CLINIC,
+                  label: 'Clinic',
+                },
+                {
+                  value: APPOINTMENT_CANCELLEDBY.PATIENT,
+                  label: 'Patient',
+                },
+              ]}
+            />
+          )}
+        />
+      </GridItem>
+      {/* <GridItem md={8}>
+        <Field
           name='reasonType'
           render={(args) => (
             <RadioGroup
@@ -137,17 +159,11 @@ const DeleteConfirmation = ({
             />
           )}
         />
-      </GridItem>
+      </GridItem> */}
       <GridItem xs md={8}>
         <Field
           name='reason'
-          render={(args) => (
-            <TextField
-              {...args}
-              label='Reason'
-              disabled={values.reasonType !== '2'}
-            />
-          )}
+          render={(args) => <TextField {...args} label='Reason' />}
         />
       </GridItem>
       <GridItem container justify='flex-end'>
@@ -167,9 +183,15 @@ const DeleteConfirmationForm = withFormik({
     type: '',
     reason: '',
     reasonType: '1',
+    cancelBy: APPOINTMENT_CANCELLEDBY.CLINIC.toString(),
   }),
   handleSubmit: (values, { props }) => {
-    props.handleConfirmClick(values)
+    let { cancelBy } = values
+    if (parseInt(cancelBy, 10) === APPOINTMENT_CANCELLEDBY.PATIENT)
+      cancelBy = APPOINTMENT_CANCELLEDBY.PATIENT
+    else cancelBy = APPOINTMENT_CANCELLEDBY.CLINIC
+
+    props.handleConfirmClick({ ...values, cancelBy })
   },
 })(DeleteConfirmation)
 

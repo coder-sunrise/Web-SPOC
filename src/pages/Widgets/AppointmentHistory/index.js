@@ -5,8 +5,8 @@ import { withStyles } from '@material-ui/core'
 import { CardContainer, CommonTableGrid } from '@/components'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
 import { queryList as queryAppointments } from '@/services/calendar'
-import { futureApptTableParams, previousApptTableParams } from './variables'
 import Authorized from '@/utils/Authorized'
+import { futureApptTableParams, previousApptTableParams } from './variables'
 
 const styles = (theme) => ({
   gridRow: {
@@ -71,11 +71,13 @@ class AppointmentHistory extends PureComponent {
     ] = await Promise.all([
       queryAppointments({
         apiCriteria: {
-          appStatus: [
-            APPOINTMENT_STATUS.CANCELLED,
-            APPOINTMENT_STATUS.TURNEDUP,
-            APPOINTMENT_STATUS.NOSHOW,
-          ].join(),
+          // appStatus: [
+          //   APPOINTMENT_STATUS.CANCELLED,
+          //   APPOINTMENT_STATUS.TURNEDUP,
+          //   APPOINTMENT_STATUS.TURNEDUPLATE,
+          //   // APPOINTMENT_STATUS.NOSHOW,
+          // ].join(),
+          apptDateTo: moment().add(-1, 'd').formatUTC(),
           patientProfileId: patientId,
           doctor,
         },
@@ -83,10 +85,12 @@ class AppointmentHistory extends PureComponent {
       }),
       queryAppointments({
         apiCriteria: {
-          appStatus: [
-            APPOINTMENT_STATUS.SCHEDULED,
-            APPOINTMENT_STATUS.RESCHEDULED,
-          ].join(),
+          apptDateFrom: moment().formatUTC(),
+          // appStatus: [
+          //   APPOINTMENT_STATUS.CONFIRMED,
+          //   APPOINTMENT_STATUS.RESCHEDULED,
+          //   APPOINTMENT_STATUS.PFA_RESCHEDULED,
+          // ].join(),
           patientProfileId: patientId,
           doctor,
         },

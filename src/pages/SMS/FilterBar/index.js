@@ -14,12 +14,12 @@ import { standardRowHeight } from 'mui-pro-jss'
 import moment from 'moment'
 import { GridContainer, GridItem, ProgressButton, Button } from '@/components'
 // sub components
-import FilterByAppointment from './FilterByAppointment'
-import FilterByPatient from './FilterByPatient'
-import PostCardLabelBtn from './PostCardLabelBtn'
 import { APPOINTMENT_STATUS, SMS_STATUS } from '@/utils/constants'
 import { formatDatesToUTC } from '@/utils/dateUtils'
 import Authorized from '@/utils/Authorized'
+import FilterByAppointment from './FilterByAppointment'
+import FilterByPatient from './FilterByPatient'
+import PostCardLabelBtn from './PostCardLabelBtn'
 
 const styles = (theme) => ({
   filterBar: {
@@ -223,7 +223,7 @@ export default compose(
             : undefined,
           [apptStatusProperty]:
             appointmentStatus ||
-            `${APPOINTMENT_STATUS.DRAFT}|${APPOINTMENT_STATUS.RESCHEDULED}|${APPOINTMENT_STATUS.SCHEDULED}`,
+            `${APPOINTMENT_STATUS.DRAFT}|${APPOINTMENT_STATUS.RESCHEDULED}|${APPOINTMENT_STATUS.PFA_RESCHEDULED}|${APPOINTMENT_STATUS.CONFIRMED}`,
           'in_AppointmentReminders.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.StatusFK': smsStatusPayload.join(
             '|',
           ),

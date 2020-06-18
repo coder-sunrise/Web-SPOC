@@ -111,7 +111,7 @@ const SMS = ({
       return {
         lgteql_AppointmentDate: moment().formatUTC(),
         lsteql_AppointmentDate: moment().add(1, 'months').formatUTC(false),
-        in_AppointmentStatusFk: `${APPOINTMENT_STATUS.DRAFT}|${APPOINTMENT_STATUS.RESCHEDULED}|${APPOINTMENT_STATUS.SCHEDULED}`,
+        in_AppointmentStatusFk: `${APPOINTMENT_STATUS.DRAFT}|${APPOINTMENT_STATUS.RESCHEDULED}|${APPOINTMENT_STATUS.PFA_RESCHEDULED}|${APPOINTMENT_STATUS.CONFIRMED}`,
         [doctorProperty]: doctor,
       }
     }
