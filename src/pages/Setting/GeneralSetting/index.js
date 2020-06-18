@@ -49,6 +49,8 @@ const styles = (theme) => ({
         autoPrintDrugLabelOnFinalize,
         autoPrintDrugLabelOnSignOff,
         autoPrintDrugLabelOnCompletePayment,
+        showG6PDInPatientAndLabLabel,
+        showAllergyInPatientAndLabLabel,
       } = clinicSettings.entity
       return {
         ...clinicSettings.entity,
@@ -60,20 +62,36 @@ const styles = (theme) => ({
           ...autoRefresh,
           settingValue: autoRefresh.settingValue === 'true',
         },
+        showG6PDInPatientAndLabLabel: {
+          ...showG6PDInPatientAndLabLabel,
+          settingValue:
+            showG6PDInPatientAndLabLabel.settingValue &&
+            showG6PDInPatientAndLabLabel.settingValue.toUpperCase() === 'TRUE',
+        },
+        showAllergyInPatientAndLabLabel: {
+          ...showAllergyInPatientAndLabLabel,
+          settingValue:
+            showAllergyInPatientAndLabLabel.settingValue &&
+            showAllergyInPatientAndLabLabel.settingValue.toUpperCase() ===
+              'TRUE',
+        },
         autoPrintDrugLabelOnFinalize: {
           ...autoPrintDrugLabelOnFinalize,
           settingValue:
-            autoPrintDrugLabelOnFinalize && autoPrintDrugLabelOnFinalize.settingValue === 'true',
+            autoPrintDrugLabelOnFinalize &&
+            autoPrintDrugLabelOnFinalize.settingValue === 'true',
         },
         autoPrintDrugLabelOnCompletePayment: {
           ...autoPrintDrugLabelOnCompletePayment,
           settingValue:
-            autoPrintDrugLabelOnCompletePayment && autoPrintDrugLabelOnCompletePayment.settingValue === 'true',
+            autoPrintDrugLabelOnCompletePayment &&
+            autoPrintDrugLabelOnCompletePayment.settingValue === 'true',
         },
         autoPrintDrugLabelOnSignOff: {
           ...autoPrintDrugLabelOnSignOff,
           settingValue:
-            autoPrintDrugLabelOnSignOff && autoPrintDrugLabelOnSignOff.settingValue === 'true',
+            autoPrintDrugLabelOnSignOff &&
+            autoPrintDrugLabelOnSignOff.settingValue === 'true',
         },
         showConsultationVersioning: {
           ...showConsultationVersioning,
@@ -118,17 +136,17 @@ class GeneralSetting extends PureComponent {
     const bizSessionPayload = {
       IsClinicSessionClosed: false,
     }
-    const result = await getBizSession(bizSessionPayload)
-    const { data } = result.data
+    // const result = await getBizSession(bizSessionPayload)
+    // const { data } = result.data
 
-    this.setState(() => {
-      return {
-        hasActiveSession: data.length > 0,
-      }
-    })
+    // this.setState(() => {
+    //   return {
+    //     hasActiveSession: data.length > 0,
+    //   }
+    // })
   }
 
-  render() {
+  render () {
     const {
       classes,
       clinicSettings,
@@ -224,10 +242,47 @@ class GeneralSetting extends PureComponent {
             </GridItem>
           </GridContainer>
           <GridContainer>
-            <GridItem md={12}>
-              <span style={{ position: 'relative', color:'rgba(0, 0, 0, 0.5)', display: 'inline-block', marginTop: 8 }}>Auto Print Drug Label</span>
+            <GridItem md={3}>
+              <Field
+                name='showG6PDInPatientAndLabLabel.settingValue'
+                render={(args) => (
+                  <Switch
+                    label='Show G6PD in patient and lab label'
+                    {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
             </GridItem>
-            <GridItem md={2} style={{ margin:0, marginTop: -10 }}>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='showAllergyInPatientAndLabLabel.settingValue'
+                render={(args) => (
+                  <Switch
+                    label='Show Allergy in patient and lab label'
+                    {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={12}>
+              <span
+                style={{
+                  position: 'relative',
+                  color: 'rgba(0, 0, 0, 0.5)',
+                  display: 'inline-block',
+                  marginTop: 8,
+                }}
+              >
+                Auto Print Drug Label
+              </span>
+            </GridItem>
+            <GridItem md={2} style={{ margin: 0, marginTop: -10 }}>
               <Field
                 name='autoPrintDrugLabelOnFinalize.settingValue'
                 render={(args) => (
@@ -239,7 +294,7 @@ class GeneralSetting extends PureComponent {
                 )}
               />
             </GridItem>
-            <GridItem md={2} style={{ margin:0, marginTop: -10 }}>
+            <GridItem md={2} style={{ margin: 0, marginTop: -10 }}>
               <Field
                 name='autoPrintDrugLabelOnSignOff.settingValue'
                 render={(args) => (
@@ -252,7 +307,7 @@ class GeneralSetting extends PureComponent {
               />
             </GridItem>
 
-            <GridItem md={2} style={{ margin:0, marginTop: -10 }}>
+            <GridItem md={2} style={{ margin: 0, marginTop: -10 }}>
               <Field
                 name='autoPrintDrugLabelOnCompletePayment.settingValue'
                 render={(args) => (
