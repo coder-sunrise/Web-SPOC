@@ -1,6 +1,8 @@
 import React from 'react'
 import * as Yup from 'yup'
+import moment from 'moment'
 import _ from 'lodash'
+import { Add, Print } from '@material-ui/icons'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
 // common utils
@@ -13,6 +15,7 @@ import {
   Select,
   CommonTableGrid,
   EditableTableGrid,
+  CardContainer,
 } from '@/components'
 // sub components
 import MaxCap from './MaxCap'
@@ -24,6 +27,8 @@ import {
   CompanyInvoicePayerColumn,
   ApplyClaimsColumnExtension,
 } from '../variables'
+import PaymentSummary from '@/pages/Finance/Invoice/Details/PaymentDetails/PaymentSummary'
+import PaymentRow from '@/pages/Finance/Invoice/Details/PaymentDetails/PaymentRow'
 
 const styles = (theme) => ({
   gridRow: {
@@ -88,6 +93,9 @@ const Scheme = ({
   onDeleteClick,
   onSchemeChange,
   onCommitChanges,
+  onPaymentVoidClick,
+  onPrinterClick,
+  onAddPaymentClick,
 }) => {
   const {
     name,
@@ -104,7 +112,12 @@ const Scheme = ({
     _hasError = false,
     hasPayments = false,
     chasClaimStatuses = [],
+    payerDistributedAmt,
+    payerOutstanding,
+    invoicePayment = [],
   } = invoicePayer
+
+  console.log('invoicePayer', invoicePayer)
 
   const handleSchemeChange = (value) => onSchemeChange(value, index)
   const handleCancelClick = () => onCancelClick(index)
@@ -141,6 +154,17 @@ const Scheme = ({
     id !== undefined &&
     _.isEmpty(schemeConfig)
   const titleColor = disableEdit ? 'grey' : 'darkblue'
+
+  const ButtonProps = {
+    icon: true,
+    simple: true,
+    color: 'primary',
+    size: 'sm',
+  }
+
+  const shoulddisable = () => {
+    return _isEditing || hasOtherEditing
+  }
   return (
     <Paper key={_key} elevation={4} className={classes.gridRow}>
       <GridContainer style={{ marginBottom: 16 }} alignItems='flex-start'>
@@ -300,6 +324,56 @@ const Scheme = ({
               Edit
             </Button>
           )}
+        </GridItem>
+        <GridItem md={12}>
+          <CardContainer hideHeader size='sm'>
+            {invoicePayment ? (
+              invoicePayment
+                .sort((a, b) => moment(a.date) - moment(b.date))
+                .map((payment) => (
+                  <PaymentRow
+                    {...payment}
+                    handleVoidClick={onPaymentVoidClick}
+                    handlePrinterClick={onPrinterClick}
+                    readOnly={shoulddisable()}
+                  />
+                ))
+            ) : (
+              ''
+            )}
+          </CardContainer>
+        </GridItem>
+        <GridItem md={7}>
+          <div>
+            <Button
+              {...ButtonProps}
+              disabled={shoulddisable()}
+              onClick={() => onAddPaymentClick(index)}
+            >
+              <Add />
+              Add Payment
+            </Button>
+            <Button
+              {...ButtonProps}
+              disabled={shoulddisable()}
+              onClick={() => onPrinterClick('TaxInvoice', undefined, companyFK)}
+            >
+              <Print />
+              Print Invoice
+            </Button>
+          </div>
+        </GridItem>
+        <GridItem
+          md={5}
+          container
+          direction='column'
+          justify='center'
+          alignItems='flex-end'
+        >
+          <PaymentSummary
+            payerDistributedAmt={payerDistributedAmt}
+            outstanding={payerOutstanding}
+          />
         </GridItem>
       </GridContainer>
     </Paper>

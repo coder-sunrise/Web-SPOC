@@ -58,6 +58,7 @@ const ApplyClaims = ({
   patient,
   ctschemetype,
   ctcopaymentscheme,
+  onPrinterClick,
   noExtraOptions = false,
 }) => {
   const {
@@ -637,6 +638,8 @@ const ApplyClaims = ({
     tempInvoicePayer,
   ])
 
+  const onPaymentVoidClick = () => {}
+  const onAddPaymentClick = () => {}
   return (
     <Fragment>
       <GridItem md={2}>
@@ -692,6 +695,9 @@ const ApplyClaims = ({
               patient={patient}
               ctschemetype={ctschemetype}
               ctcopaymentscheme={ctcopaymentscheme}
+              onPaymentVoidClick={onPaymentVoidClick}
+              onPrinterClick={onPrinterClick}
+              onAddPaymentClick={onAddPaymentClick}
             />
           )
         })}

@@ -207,7 +207,10 @@ class Billing extends Component {
 
   printAfterComplete = async () => {
     let settings = JSON.parse(localStorage.getItem('clinicSettings'))
-    const { autoPrintOnCompletePayment, autoPrintReportsOnCompletePayment } = settings
+    const {
+      autoPrintOnCompletePayment,
+      autoPrintReportsOnCompletePayment,
+    } = settings
     if (autoPrintOnCompletePayment) {
       await this.onExpandDispenseDetails()
 
@@ -219,10 +222,16 @@ class Billing extends Component {
           return { ...x, no: 1, selected: true }
         }),
       })
-      let reportsOnCompletePayment = autoPrintReportsOnCompletePayment.split(',')
+      let reportsOnCompletePayment = autoPrintReportsOnCompletePayment.split(
+        ',',
+      )
       let printData = []
 
-      if (reportsOnCompletePayment.indexOf(ReportsOnCompletePaymentOption.Invoice) > -1) {
+      if (
+        reportsOnCompletePayment.indexOf(
+          ReportsOnCompletePaymentOption.Invoice,
+        ) > -1
+      ) {
         if (invoice) {
           printData.push({
             ReportId: 15,
@@ -232,16 +241,26 @@ class Billing extends Component {
           })
         }
       }
-      if (reportsOnCompletePayment.indexOf(ReportsOnCompletePaymentOption.Receipt) > -1) {
+      if (
+        reportsOnCompletePayment.indexOf(
+          ReportsOnCompletePaymentOption.Receipt,
+        ) > -1
+      ) {
         if (invoicePayment && invoicePayment.length > 0) {
-          let payments = invoicePayment.filter((payment) => !payment.isCancelled && !payment.isDeleted)
+          let payments = invoicePayment.filter(
+            (payment) => !payment.isCancelled && !payment.isDeleted,
+          )
           if (payments && payments.length > 0) {
-            printData = printData.concat(payments.map((payment) => ({
-              ReportId: 29,
-              DocumentName: 'Receipt',
-              Copies: 1,
-              ReportParam: `${JSON.stringify({ InvoicePaymentId: payment.id })}`,
-            })))
+            printData = printData.concat(
+              payments.map((payment) => ({
+                ReportId: 29,
+                DocumentName: 'Receipt',
+                Copies: 1,
+                ReportParam: `${JSON.stringify({
+                  InvoicePaymentId: payment.id,
+                })}`,
+              })),
+            )
           }
         }
       }
@@ -255,7 +274,10 @@ class Billing extends Component {
         await this.childOnPrintRef({
           type: 1,
           printData,
-          printAllDrugLabel: reportsOnCompletePayment.indexOf(ReportsOnCompletePaymentOption.DrugLabel) > -1,
+          printAllDrugLabel:
+            reportsOnCompletePayment.indexOf(
+              ReportsOnCompletePaymentOption.DrugLabel,
+            ) > -1,
         })
       }
     }
@@ -400,6 +422,27 @@ class Billing extends Component {
     })
   }
 
+  onPrinterClick = (type, itemID, copayerID) => {
+    const { invoicePayment } = this.props
+
+    switch (type) {
+      case 'Payment':
+        this.onShowReport(29, { InvoicePaymentId: itemID })
+        break
+      case 'Credit Note':
+        this.onShowReport(18, { CreditNoteId: itemID })
+        break
+      case 'TaxInvoice':
+        this.onShowReport(15, {
+          InvoiceId: invoicePayment ? invoicePayment.currentId : '',
+          CopayerId: copayerID,
+        })
+        break
+      default:
+        break
+    }
+  }
+
   onPrintInvoiceClick = () => {
     const { values, dispatch } = this.props
     const { invoicePayer } = values
@@ -465,11 +508,11 @@ class Billing extends Component {
         (payment) =>
           payment.id === id
             ? {
-              ...payment,
-              isCancelled: true,
-              cancelDate: new Date(),
-              cancelByUserFK: user.id,
-            }
+                ...payment,
+                isCancelled: true,
+                cancelDate: new Date(),
+                cancelByUserFK: user.id,
+              }
             : { ...payment },
       )
     }
@@ -633,6 +676,8 @@ class Billing extends Component {
                   commitCount={commitCount}
                   {...formikBag}
                   {...commonProps}
+                  onInvoicePrinterClick={this.onPrintInvoiceClick}
+                  onPaymentPrinterClick={this.onPrintCopayerPaymentClick}
                 />
               )}
             </GridContainer>
@@ -641,8 +686,7 @@ class Billing extends Component {
                 disabled={this.state.isEditing || values.id === undefined}
                 handleAddPaymentClick={this.toggleAddPaymentModal}
                 handleDeletePaymentClick={this.handleDeletePayment}
-                handlePrintInvoiceClick={this.onPrintInvoiceClick}
-                handlePrintReceiptClick={this.onPrintReceiptClick}
+                onPrinterClick={this.onPrinterClick}
                 {...formikBag}
               />
             </GridContainer>
