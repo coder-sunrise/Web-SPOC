@@ -166,8 +166,12 @@ class FilterBar extends PureComponent {
                       payload: {
                         apiCriteria: {
                           searchValue: patientSearchValue,
-                          visitDateFrom: formSearchStartDate,
-                          visitDateTo: formSearchEndDate,
+                          visitDateFrom: moment(
+                            formSearchStartDate,
+                          ).formatUTC(),
+                          visitDateTo: moment(formSearchEndDate).formatUTC(
+                            false,
+                          ),
                           formType:
                             formType.length > 0 ? formType.join() : undefined,
                           formStatus:
