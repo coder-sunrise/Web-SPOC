@@ -13,23 +13,14 @@ class AutoPrintSelection extends React.PureComponent {
       title: 'Item',
     },
     {
-      name: 'description',
-      title: 'Description',
-    },
-    {
       name: 'Copies',
-      title: 'No. Of Label',
-    },
-    {
-      name: 'print',
-      title: 'Print',
+      title: 'Copies',
     },
   ]
 
   colExtensions = [
     {
       columnName: 'item',
-      width: 200,
       render: (row) => {
         return (
           <div style={{ position: 'relative' }}>
@@ -46,25 +37,9 @@ class AutoPrintSelection extends React.PureComponent {
       },
     },
     {
-      columnName: 'description',
-      render: (row) => {
-        return (
-          <div style={{ position: 'relative' }}>
-            <div
-              style={{
-                wordWrap: 'break-word',
-                whiteSpace: 'pre-wrap',
-              }}
-            >
-              {row.description}
-            </div>
-          </div>
-        )
-      },
-    },
-    {
       columnName: 'Copies',
       type: 'number',
+      align: 'left',
       width: 100,
       render: (row) => {
         return (
@@ -75,12 +50,12 @@ class AutoPrintSelection extends React.PureComponent {
               min={1}
               value={row.Copies}
               defaultValue={1}
-              onChange={(event, value) => {
+              onChange={(event) => {
                 this.setState((prevState) => ({
                   data: prevState.data.map((item) => row.id === item.id ? (
                     {
                       ...item,
-                      Copies: value,
+                      Copies: event.target.value,
                     }) : item),
                 }))
               }}
@@ -89,47 +64,43 @@ class AutoPrintSelection extends React.PureComponent {
         )
       },
     },
-    {
-      columnName: 'print',
-      align: 'center',
-      width: 80,
-      render: (row) => {
-        return (
-          <Checkbox onChange={(event, value) => {
-            console.log(value)
-            this.setState((prevState) => ({
-              data: prevState.data.map((item) => row.id === item.id ? (
-                {
-                  ...item,
-                  print: value,
-                }) : item),
-            }))
-          }}
-            checked={row.print}
-            simple
-          />
-        )
-      },
-    },
   ]
 
   tableConfig = {
-    FuncProps: { pager: false },
+    FuncProps: {
+      pager: false,
+      selectable: true,
+      selectConfig: {
+        showSelectAll: true,
+        selectByRowClick: false,
+        rowSelectionEnabled: () => true,
+      },
+    },
   }
 
   constructor(props) {
     super(props)
+    let data = props.data.reduce((pre, cur) => {
+      let filterData = pre.filter((x) => x.item === cur.item)
+      if (filterData && filterData.length > 0) {
+        return pre
+      }
+      return [...pre, { item: cur.item, Copies: cur.Copies, id: cur.item }]
+    }, [])
+    console.log({ data })
     this.state = {
-      data: props.data.map((item, index) => ({
-        ...item,
-        id: `${index}`,
-      })),
+      selectedRows: data.map((item) => item.id),
+      data,
     }
-    // this.onSubmitClick = this.onSubmitClick.bind(this)
+    console.log(this.state)
   }
 
 
-
+  handleSelectionChange = (rows) => {
+    this.setState(() => ({
+      selectedRows: rows,
+    }))
+  }
 
   render () {
     const {
@@ -150,12 +121,21 @@ class AutoPrintSelection extends React.PureComponent {
                   columnExtensions={this.colExtensions}
                   rows={this.state.data}
                   {...this.tableConfig}
+                  selection={this.state.selectedRows}
+                  onSelectionChange={this.handleSelectionChange}
                 />
               </div>}
           </GridItem>
         </GridContainer>
         {footer({
-          onConfirm: () => handleSubmit(this.state.data),
+          onConfirm: () => {
+            const selectedData = this.state.data.filter((item) => this.state.selectedRows.includes(item.id) > -1)
+            let printData = selectedData.reduce((pre, cur) => {
+              let itemData = this.props.data.filter((x) => x.item === cur.item)
+              return [...pre, ...(itemData.map((i) => ({ ...i, Copies: cur.Copies })))]
+            }, [])
+            handleSubmit(printData)
+          },
           confirmBtnText: 'Confirm',
         })}
       </div>
