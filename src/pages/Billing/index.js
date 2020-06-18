@@ -625,6 +625,8 @@ class Billing extends Component {
       patient,
       ctschemetype,
       ctcopaymentscheme,
+      sessionInfo,
+      user,
     }
     return (
       <LoadingWrapper loading={loading} text='Getting billing info...'>

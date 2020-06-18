@@ -28,6 +28,7 @@ import {
   updateInvoicePayerPayableBalance,
   sortItemByID,
 } from './applyClaimUtils'
+import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
 
 const defaultInvoicePayer = {
   _indexInClaimableSchemes: 0,
@@ -59,6 +60,8 @@ const ApplyClaims = ({
   ctschemetype,
   ctcopaymentscheme,
   onPrinterClick,
+  sessionInfo,
+  user,
   noExtraOptions = false,
 }) => {
   const {
@@ -450,6 +453,13 @@ const ApplyClaims = ({
             0,
           ),
         ),
+        payerOutstanding:
+          roundTo(
+            invoiceItems.reduce(
+              (subtotal, item) => subtotal + item.claimAmount,
+              0,
+            ),
+          ) - _.sum(tempInvoicePayer[index].invoicePayment, 'TotalAmtPaid'),
         isModified: true,
         invoicePayerItem: invoiceItems,
         _isConfirmed: !hasInvalidRow,
@@ -637,9 +647,46 @@ const ApplyClaims = ({
   useEffect(updateValues, [
     tempInvoicePayer,
   ])
+  const [
+    showAddPaymentModal,
+    setShowAddPaymentModal,
+  ] = useState(false)
 
+  const [
+    selectInvoicePayer,
+    setSelectInvoicePayer,
+  ] = useState({})
+
+  const toggleAddPaymentModal = () => {
+    setShowAddPaymentModal(!showAddPaymentModal)
+  }
+
+  const onSubmitAddPayment = (invoicePaymentList) => {
+    toggleAddPaymentModal()
+    selectInvoicePayer.invoicepa
+  }
+
+  const onAddPaymentClick = (index) => {
+    let invoicePayer = tempInvoicePayer[index]
+    const invoicePayerPayment = {
+      ...invoice,
+      payerTypeFK: invoicePayer.payerTypeFK,
+      totalAftGst: invoicePayer.payerDistributedAmt,
+      outstandingBalance: invoicePayer.outStanding,
+      finalPayable: invoicePayer.outStanding,
+      totalClaims: undefined,
+    }
+
+    let selectPayerName = ''
+    if (invoicePayer.payerTypeFK === 1)
+      selectPayerName = invoicePayer.patientName
+    if (invoicePayer.payerTypeFK === 2) selectPayerName = 'Scheme'
+    if (invoicePayer.payerTypeFK === 4) selectPayerName = invoicePayer.name
+
+    setSelectInvoicePayer({ selectPayerName, invoicePayerPayment })
+    toggleAddPaymentModal()
+  }
   const onPaymentVoidClick = () => {}
-  const onAddPaymentClick = () => {}
   return (
     <Fragment>
       <GridItem md={2}>
@@ -754,6 +801,24 @@ const ApplyClaims = ({
             .map((i) => i.schemeConfig.id)}
           claimableSchemes={claimableSchemes}
           handleSelectClick={handleSelectClaimClick}
+        />
+      </CommonModal>
+      <CommonModal
+        open={showAddPaymentModal}
+        title='Add Payment'
+        onClose={toggleAddPaymentModal}
+        observe='AddPaymentForm'
+        maxWidth='lg'
+      >
+        <AddPayment
+          handleSubmit={onSubmitAddPayment}
+          onClose={toggleAddPaymentModal}
+          invoicePayerName={selectInvoicePayer.invoicePayerName}
+          invoicePayment={[]}
+          showPaymentDate
+          invoice={{
+            ...selectInvoicePayer.invoicePayerPayment,
+          }}
         />
       </CommonModal>
     </Fragment>
