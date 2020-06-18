@@ -165,7 +165,7 @@ class FormModuleGrid extends PureComponent {
         },
         {
           columnName: 'action',
-          align: 'center',
+          align: 'left',
           sortingEnabled: false,
           render: (row) => {
             const { classes, dispatch, user } = props

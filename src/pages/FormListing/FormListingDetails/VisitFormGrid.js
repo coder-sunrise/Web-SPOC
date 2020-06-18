@@ -257,6 +257,7 @@ class VisitFormGrid extends PureComponent {
             {
               columnName: 'action',
               width: 110,
+              align: 'left',
               render: (row) => {
                 return (
                   <React.Fragment>
