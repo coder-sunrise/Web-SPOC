@@ -67,38 +67,28 @@ const initStream = () => {
 
     const { dispatch, getState } = window.g_app._store
 
-    if (type === 'Announcement') {
-      // console.log(response)
-      dispatch({
-        type: 'systemMessage/received',
-        payload: {
-          ...response,
-        },
-      })
-    } else {
-      const {
-        user = {
-          data: {
-            clinicianProfile: {
-              name: '',
-            },
+    const {
+      user = {
+        data: {
+          clinicianProfile: {
+            name: '',
           },
         },
-        header,
-      } = getState()
-      if (sender !== user.data.clinicianProfile.name) {
-        const { notifications = [] } = header
+      },
+      header,
+    } = getState()
+    if (sender !== user.data.clinicianProfile.name) {
+      const { notifications = [] } = header
 
-        notifications.push(response)
-        dispatch({
-          type: 'header/updateState',
-          payload: notifications,
-        })
-        sessionStorage.setItem('notifications', JSON.stringify(notifications))
-      }
-      if (connectionObserver[type]) {
-        connectionObserver[type](response)
-      }
+      notifications.push(response)
+      dispatch({
+        type: 'header/updateState',
+        payload: notifications,
+      })
+      sessionStorage.setItem('notifications', JSON.stringify(notifications))
+    }
+    if (connectionObserver[type]) {
+      connectionObserver[type](response)
     }
   })
 
