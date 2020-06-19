@@ -35,10 +35,6 @@ export const TYPES = [
     id: 3,
     name: 'Error',
   },
-  {
-    id: 4,
-    name: 'System Info',
-  },
 ]
 
 export const ICONS = {
