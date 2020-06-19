@@ -1,3 +1,4 @@
+import Authorized from '@/utils/Authorized'
 import PatientHistory from '@/pages/Widgets/PatientHistory'
 import AppointmentHistory from '@/pages/Widgets/AppointmentHistory'
 import DispenseHistory from '@/pages/Widgets/DispenseHistory'
@@ -20,6 +21,16 @@ const addContent = (type, props) => {
     default:
       return <PatientHistory {...props} />
   }
+}
+
+const checkAccessRight = (accessRightNames) => {
+  if (!accessRightNames || accessRightNames.length === 0) return true
+
+  for (let i = 0; i < accessRightNames.length; i++) {
+    const accessRight = Authorized.check(accessRightNames[i])
+    if (accessRight.rights === 'enable') return true
+  }
+  return false
 }
 
 export const PatientHistoryTabOption = (props) => {
@@ -48,8 +59,10 @@ export const PatientHistoryTabOption = (props) => {
       id: PATIENT_HISTORY_TABS.NURSENOTES,
       name: 'Nurse Notes',
       content: addContent(PATIENT_HISTORY_TABS.NURSENOTES, props),
+      authority: [
+        'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
+      ],
     },
   ]
-
-  return Tabs
+  return Tabs.filter((f) => checkAccessRight(f.authority))
 }
