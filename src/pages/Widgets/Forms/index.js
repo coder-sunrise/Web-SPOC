@@ -340,6 +340,7 @@ class Forms extends PureComponent {
               options: formStatus,
             },
             {
+              align: 'left',
               columnName: 'action',
               width: 110,
               render: (row) => {

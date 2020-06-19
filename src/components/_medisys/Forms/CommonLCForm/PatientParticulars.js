@@ -90,8 +90,8 @@ const PatientParticulars = ({ setFieldValue, values }) => {
               valueField='code'
               disableAll
               mode='multiple'
-              onChange={() => {
-                if (!admittingSpecialtys.find((o) => o === '99')) {
+              onChange={(v) => {
+                if (!v.find((o) => o === '99')) {
                   setFieldValue('formData.others', undefined)
                 }
               }}

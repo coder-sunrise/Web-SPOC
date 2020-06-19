@@ -1200,7 +1200,7 @@ const formTypes = [
         return {
           LCFormDetails: [
             {
-              StatusFK: statusFK,
+              Watermark: statusFK === 4 ? 'THIS FORM IS VOIDED' : '',
               PatientName: formData.patientName,
               PatientNRIC: formData.patientNRICNo,
               PatientAccountNo: formData.patientAccountNo,

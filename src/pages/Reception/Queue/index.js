@@ -457,11 +457,26 @@ class Queue extends React.Component {
     })
   }
 
-  showVisitForms = ({ visitID, visitStatus }) => {
-    this.props.dispatch({
+  showVisitForms = async (row) => {
+    const {
+      id,
+      visitStatus,
+      doctor,
+      patientAccountNo,
+      patientName,
+      patientReferenceNo,
+    } = row
+    await this.props.dispatch({
       type: 'formListing/updateState',
       payload: {
-        visitID,
+        visitID: id,
+        visitDetail: {
+          visitID: id,
+          doctorProfileFK: doctor ? doctor.id : 0,
+          patientName,
+          patientNRICNo: patientReferenceNo,
+          patientAccountNo,
+        },
       },
     })
     if (visitStatus === VISIT_STATUS.WAITING) {
