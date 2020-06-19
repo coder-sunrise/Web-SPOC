@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { withStyles } from '@material-ui/core'
-import Edit from '@material-ui/icons/Edit'
+import { Edit, Print } from '@material-ui/icons'
 import CommonTableGrid from '@/components/CommonTableGrid'
 import { Button, Tooltip } from '@/components'
 
@@ -25,19 +25,33 @@ class PatientGrid extends PureComponent {
         width: 100,
         render: (row) => {
           return (
-            <Tooltip title='Edit Patient Lab Result' placement='bottom'>
-              <Button
-                size='sm'
-                onClick={() => {
-                  this.editRow(row)
-                }}
-                justIcon
-                color='primary'
-                style={{ marginRight: 0 }}
-              >
-                <Edit />
-              </Button>
-            </Tooltip>
+            <React.Fragment>
+              <Tooltip title='Print Patient Lab Result' placement='bottom'>
+                <Button
+                  size='sm'
+                  color='primary'
+                  justIcon
+                  onClick={() => {
+                    this.props.handlePrintClick(row)
+                  }}
+                >
+                  <Print />
+                </Button>
+              </Tooltip>
+              <Tooltip title='Edit Patient Lab Result' placement='bottom'>
+                <Button
+                  size='sm'
+                  onClick={() => {
+                    this.editRow(row)
+                  }}
+                  justIcon
+                  color='primary'
+                  style={{ marginRight: 0 }}
+                >
+                  <Edit />
+                </Button>
+              </Tooltip>
+            </React.Fragment>
           )
         },
       },
