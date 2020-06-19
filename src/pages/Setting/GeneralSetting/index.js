@@ -63,17 +63,20 @@ const styles = (theme) => ({
         autoPrintDrugLabelOnFinalize: {
           ...autoPrintDrugLabelOnFinalize,
           settingValue:
-            autoPrintDrugLabelOnFinalize && autoPrintDrugLabelOnFinalize.settingValue === 'true',
+            autoPrintDrugLabelOnFinalize &&
+            autoPrintDrugLabelOnFinalize.settingValue === 'true',
         },
         autoPrintDrugLabelOnCompletePayment: {
           ...autoPrintDrugLabelOnCompletePayment,
           settingValue:
-            autoPrintDrugLabelOnCompletePayment && autoPrintDrugLabelOnCompletePayment.settingValue === 'true',
+            autoPrintDrugLabelOnCompletePayment &&
+            autoPrintDrugLabelOnCompletePayment.settingValue === 'true',
         },
         autoPrintDrugLabelOnSignOff: {
           ...autoPrintDrugLabelOnSignOff,
           settingValue:
-            autoPrintDrugLabelOnSignOff && autoPrintDrugLabelOnSignOff.settingValue === 'true',
+            autoPrintDrugLabelOnSignOff &&
+            autoPrintDrugLabelOnSignOff.settingValue === 'true',
         },
         showConsultationVersioning: {
           ...showConsultationVersioning,
@@ -128,7 +131,7 @@ class GeneralSetting extends PureComponent {
     })
   }
 
-  render() {
+  render () {
     const {
       classes,
       clinicSettings,
@@ -225,9 +228,18 @@ class GeneralSetting extends PureComponent {
           </GridContainer>
           <GridContainer>
             <GridItem md={12}>
-              <span style={{ position: 'relative', color:'rgba(0, 0, 0, 0.5)', display: 'inline-block', marginTop: 8 }}>Auto Print Drug Label</span>
+              <span
+                style={{
+                  position: 'relative',
+                  color: 'rgba(0, 0, 0, 0.5)',
+                  display: 'inline-block',
+                  marginTop: 8,
+                }}
+              >
+                Auto Print Drug Label
+              </span>
             </GridItem>
-            <GridItem md={2} style={{ margin:0, marginTop: -10 }}>
+            <GridItem md={2} style={{ margin: 0, marginTop: -10 }}>
               <Field
                 name='autoPrintDrugLabelOnFinalize.settingValue'
                 render={(args) => (
@@ -239,7 +251,7 @@ class GeneralSetting extends PureComponent {
                 )}
               />
             </GridItem>
-            <GridItem md={2} style={{ margin:0, marginTop: -10 }}>
+            <GridItem md={2} style={{ margin: 0, marginTop: -10 }}>
               <Field
                 name='autoPrintDrugLabelOnSignOff.settingValue'
                 render={(args) => (
@@ -252,7 +264,7 @@ class GeneralSetting extends PureComponent {
               />
             </GridItem>
 
-            <GridItem md={2} style={{ margin:0, marginTop: -10 }}>
+            <GridItem md={2} style={{ margin: 0, marginTop: -10 }}>
               <Field
                 name='autoPrintDrugLabelOnCompletePayment.settingValue'
                 render={(args) => (
