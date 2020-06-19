@@ -60,8 +60,7 @@ const ApplyClaims = ({
   ctschemetype,
   ctcopaymentscheme,
   onPrinterClick,
-  sessionInfo,
-  user,
+  saveBilling,
   noExtraOptions = false,
 }) => {
   const {
@@ -663,17 +662,25 @@ const ApplyClaims = ({
 
   const onSubmitAddPayment = (invoicePaymentList) => {
     toggleAddPaymentModal()
-    selectInvoicePayer.invoicepa
+    let invoicePayer = tempInvoicePayer[selectInvoicePayer.index]
+    if (invoicePayer.id && invoicePayer.id > 0) {
+      invoicePayer.isModified = true
+    }
+    invoicePayer.invoicePayment = [
+      ...invoicePayer.invoicePayment,
+      invoicePaymentList,
+    ]
+    saveBilling()
   }
 
-  const onAddPaymentClick = (index) => {
+  const onAddPaymentClick = async (index) => {
     let invoicePayer = tempInvoicePayer[index]
     const invoicePayerPayment = {
       ...invoice,
       payerTypeFK: invoicePayer.payerTypeFK,
       totalAftGst: invoicePayer.payerDistributedAmt,
-      outstandingBalance: invoicePayer.outStanding,
-      finalPayable: invoicePayer.outStanding,
+      outstandingBalance: invoicePayer.payerOutstanding,
+      finalPayable: invoicePayer.payerOutstanding,
       totalClaims: undefined,
     }
 
@@ -682,11 +689,20 @@ const ApplyClaims = ({
       selectPayerName = invoicePayer.patientName
     if (invoicePayer.payerTypeFK === 2) selectPayerName = 'Scheme'
     if (invoicePayer.payerTypeFK === 4) selectPayerName = invoicePayer.name
-
-    setSelectInvoicePayer({ selectPayerName, invoicePayerPayment })
+    await setSelectInvoicePayer({
+      invoicePayerName: selectPayerName,
+      index,
+      invoicePayerPayment,
+    })
     toggleAddPaymentModal()
   }
-  const onPaymentVoidClick = () => {}
+  const onPaymentVoidClick = (index, paymentId) => {
+    let invoicePayer = tempInvoicePayer[index]
+    invoicePayer.isModified = true
+    let payment = invoicePayer.invoicePayment.find((o) => o.id === paymentId)
+    payment.isDeleted = true
+    saveBilling()
+  }
   return (
     <Fragment>
       <GridItem md={2}>

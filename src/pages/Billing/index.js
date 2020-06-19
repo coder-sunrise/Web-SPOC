@@ -680,6 +680,7 @@ class Billing extends Component {
                   {...commonProps}
                   onInvoicePrinterClick={this.onPrintInvoiceClick}
                   onPaymentPrinterClick={this.onPrintCopayerPaymentClick}
+                  saveBilling={this.handleSaveBillingClick}
                 />
               )}
             </GridContainer>

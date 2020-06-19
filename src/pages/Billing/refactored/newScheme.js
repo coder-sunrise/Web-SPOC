@@ -117,8 +117,6 @@ const Scheme = ({
     invoicePayment = [],
   } = invoicePayer
 
-  console.log('invoicePayer', invoicePayer)
-
   const handleSchemeChange = (value) => onSchemeChange(value, index)
   const handleCancelClick = () => onCancelClick(index)
   const handleEditClick = () => onEditClick(index)
@@ -164,6 +162,13 @@ const Scheme = ({
 
   const shoulddisable = () => {
     return _isEditing || hasOtherEditing
+  }
+
+  const payments = invoicePayment.map((o) => {
+    return { ...o, type: 'Payment' }
+  })
+  const onPaymentDeleteClick = (payment) => {
+    onPaymentVoidClick(index, payment.id)
   }
   return (
     <Paper key={_key} elevation={4} className={classes.gridRow}>
@@ -327,20 +332,16 @@ const Scheme = ({
         </GridItem>
         <GridItem md={12}>
           <CardContainer hideHeader size='sm'>
-            {invoicePayment ? (
-              invoicePayment
-                .sort((a, b) => moment(a.date) - moment(b.date))
-                .map((payment) => (
-                  <PaymentRow
-                    {...payment}
-                    handleVoidClick={onPaymentVoidClick}
-                    handlePrinterClick={onPrinterClick}
-                    readOnly={shoulddisable()}
-                  />
-                ))
-            ) : (
-              ''
-            )}
+            {payments
+              .sort((a, b) => moment(a.date) - moment(b.date))
+              .map((payment) => (
+                <PaymentRow
+                  {...payment}
+                  handleVoidClick={onPaymentDeleteClick}
+                  handlePrinterClick={onPrinterClick}
+                  readOnly={shoulddisable()}
+                />
+              ))}
           </CardContainer>
         </GridItem>
         <GridItem md={7}>
