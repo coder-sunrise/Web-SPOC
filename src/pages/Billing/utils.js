@@ -69,7 +69,7 @@ export const constructPayload = (values) => {
             return _invoicePayerItem
           }),
         invoicePayment: payer.invoicePayment.filter(
-          (item) => !item.id || item.isDeleted,
+          (item) => !item.id || item.isCancelled,
         ),
       }
       return _payer

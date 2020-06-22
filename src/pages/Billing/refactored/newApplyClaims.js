@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core'
 import Add from '@material-ui/icons/AddCircle'
 import Reset from '@material-ui/icons/Cached'
 // common components
-import { CommonModal, Button, GridItem } from '@/components'
+import { CommonModal, Button, GridItem, notification } from '@/components'
 // common utils
 import { roundTo } from '@/utils/utils'
 import { INVOICE_PAYER_TYPE, VISIT_TYPE } from '@/utils/constants'
@@ -28,7 +28,8 @@ import {
   updateInvoicePayerPayableBalance,
   sortItemByID,
 } from './applyClaimUtils'
-import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
+import { AddPayment } from '@/components/_medisys'
+import DeleteConfirmation from '@/pages/Finance/Invoice/components/modal/DeleteConfirmation'
 
 const defaultInvoicePayer = {
   _indexInClaimableSchemes: 0,
@@ -45,6 +46,7 @@ const defaultInvoicePayer = {
   // claimableSchemes: claimableSchemes[0],
   invoicePayerItem: [],
   sequence: 0,
+  invoicePayment: [],
   // payerTypeFK: INVOICE_PAYER_TYPE.SCHEME,
 }
 
@@ -62,6 +64,7 @@ const ApplyClaims = ({
   onPrinterClick,
   saveBilling,
   noExtraOptions = false,
+  fromBilling = false,
 }) => {
   const {
     invoice,
@@ -320,6 +323,17 @@ const ApplyClaims = ({
 
       // abort early if failed to reset bill
       if (!response) return
+
+      if (
+        tempInvoicePayer.find((o) =>
+          o.invoicePayment.find((payment) => !payment.isCancelled),
+        )
+      ) {
+        notification.warn({
+          message: 'please remove payments before reset claims',
+        })
+        return
+      }
 
       const _newTempInvoicePayer = tempInvoicePayer.map((i) => ({
         ...i,
@@ -656,20 +670,37 @@ const ApplyClaims = ({
     setSelectInvoicePayer,
   ] = useState({})
 
+  const [
+    onVoid,
+    setOnVoid,
+  ] = useState({})
+
+  const [
+    showDeleteConfirmation,
+    setShowDeleteConfirmation,
+  ] = useState(false)
+
   const toggleAddPaymentModal = () => {
     setShowAddPaymentModal(!showAddPaymentModal)
   }
 
-  const onSubmitAddPayment = (invoicePaymentList) => {
+  const toggleDeleteConfirmation = () => {
+    setShowDeleteConfirmation(!showDeleteConfirmation)
+  }
+
+  const onSubmitAddPayment = async (invoicePaymentList) => {
     toggleAddPaymentModal()
     let invoicePayer = tempInvoicePayer[selectInvoicePayer.index]
     if (invoicePayer.id && invoicePayer.id > 0) {
       invoicePayer.isModified = true
     }
     invoicePayer.invoicePayment = [
-      ...invoicePayer.invoicePayment,
+      ...(invoicePayer.invoicePayment || []),
       invoicePaymentList,
     ]
+    await setTempInvoicePayer([
+      ...tempInvoicePayer,
+    ])
     saveBilling()
   }
 
@@ -696,12 +727,24 @@ const ApplyClaims = ({
     })
     toggleAddPaymentModal()
   }
-  const onPaymentVoidClick = (index, paymentId) => {
-    let invoicePayer = tempInvoicePayer[index]
+
+  const onSubmitVoid = async (cancelReason) => {
+    toggleDeleteConfirmation()
+    let invoicePayer = tempInvoicePayer[onVoid.payerIndex]
     invoicePayer.isModified = true
-    let payment = invoicePayer.invoicePayment.find((o) => o.id === paymentId)
-    payment.isDeleted = true
+    if (onVoid.type === 'Payment') {
+      let payment = invoicePayer.invoicePayment.find((o) => o.id === onVoid.id)
+      payment.isCancelled = true
+      payment.cancelReason = cancelReason
+    }
+    await setTempInvoicePayer([
+      ...tempInvoicePayer,
+    ])
     saveBilling()
+  }
+  const onPaymentVoidClick = (index, payment) => {
+    setOnVoid({ payerIndex: index, ...payment })
+    toggleDeleteConfirmation()
   }
   return (
     <Fragment>
@@ -761,6 +804,7 @@ const ApplyClaims = ({
               onPaymentVoidClick={onPaymentVoidClick}
               onPrinterClick={onPrinterClick}
               onAddPaymentClick={onAddPaymentClick}
+              fromBilling={fromBilling}
             />
           )
         })}
@@ -836,6 +880,15 @@ const ApplyClaims = ({
             ...selectInvoicePayer.invoicePayerPayment,
           }}
         />
+      </CommonModal>
+      <CommonModal
+        open={showDeleteConfirmation}
+        title={`Void ${onVoid.type}`}
+        onConfirm={toggleDeleteConfirmation}
+        onClose={toggleDeleteConfirmation}
+        maxWidth='sm'
+      >
+        <DeleteConfirmation handleSubmit={onSubmitVoid} {...onVoid} />
       </CommonModal>
     </Fragment>
   )

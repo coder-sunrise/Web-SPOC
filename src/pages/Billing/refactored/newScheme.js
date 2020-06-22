@@ -96,6 +96,7 @@ const Scheme = ({
   onPaymentVoidClick,
   onPrinterClick,
   onAddPaymentClick,
+  fromBilling,
 }) => {
   const {
     name,
@@ -124,6 +125,10 @@ const Scheme = ({
   const handleDeleteClick = () => onDeleteClick(index)
 
   const shouldDisableDelete = () => {
+    if (invoicePayment.find((o) => o.isCancelled === false)) {
+      return true
+    }
+
     const statuses = chasClaimStatuses.map((status) => status.toLowerCase())
     if (
       hasPayments ||
@@ -164,11 +169,20 @@ const Scheme = ({
     return _isEditing || hasOtherEditing
   }
 
-  const payments = invoicePayment.map((o) => {
-    return { ...o, type: 'Payment' }
-  })
+  let payments = []
+  payments = payments.concat(
+    invoicePayment.map((o) => {
+      return {
+        ...o,
+        type: 'Payment',
+        itemID: o.receiptNo,
+        date: o.paymentReceivedDate,
+        amount: o.totalAmtPaid,
+      }
+    }),
+  )
   const onPaymentDeleteClick = (payment) => {
-    onPaymentVoidClick(index, payment.id)
+    onPaymentVoidClick(index, payment)
   }
   return (
     <Paper key={_key} elevation={4} className={classes.gridRow}>
@@ -330,52 +344,57 @@ const Scheme = ({
             </Button>
           )}
         </GridItem>
-        <GridItem md={12}>
-          <CardContainer hideHeader size='sm'>
-            {payments
-              .sort((a, b) => moment(a.date) - moment(b.date))
-              .map((payment) => (
-                <PaymentRow
-                  {...payment}
-                  handleVoidClick={onPaymentDeleteClick}
-                  handlePrinterClick={onPrinterClick}
-                  readOnly={shoulddisable()}
-                />
-              ))}
-          </CardContainer>
-        </GridItem>
-        <GridItem md={7}>
-          <div>
-            <Button
-              {...ButtonProps}
-              disabled={shoulddisable()}
-              onClick={() => onAddPaymentClick(index)}
+        {fromBilling && (
+          <GridContainer>
+            <GridItem md={12}>
+              <CardContainer hideHeader size='sm'>
+                {payments
+                  .sort((a, b) => moment(a.date) - moment(b.date))
+                  .map((payment) => (
+                    <PaymentRow
+                      {...payment}
+                      handleVoidClick={onPaymentDeleteClick}
+                      handlePrinterClick={onPrinterClick}
+                      readOnly={shoulddisable()}
+                    />
+                  ))}
+              </CardContainer>
+            </GridItem>
+            <GridItem md={7}>
+              <div>
+                <Button
+                  {...ButtonProps}
+                  disabled={shoulddisable()}
+                  onClick={() => onAddPaymentClick(index)}
+                >
+                  <Add />
+                  Add Payment
+                </Button>
+                <Button
+                  {...ButtonProps}
+                  disabled={shoulddisable()}
+                  onClick={() =>
+                    onPrinterClick('TaxInvoice', undefined, companyFK)}
+                >
+                  <Print />
+                  Print Invoice
+                </Button>
+              </div>
+            </GridItem>
+            <GridItem
+              md={5}
+              container
+              direction='column'
+              justify='center'
+              alignItems='flex-end'
             >
-              <Add />
-              Add Payment
-            </Button>
-            <Button
-              {...ButtonProps}
-              disabled={shoulddisable()}
-              onClick={() => onPrinterClick('TaxInvoice', undefined, companyFK)}
-            >
-              <Print />
-              Print Invoice
-            </Button>
-          </div>
-        </GridItem>
-        <GridItem
-          md={5}
-          container
-          direction='column'
-          justify='center'
-          alignItems='flex-end'
-        >
-          <PaymentSummary
-            payerDistributedAmt={payerDistributedAmt}
-            outstanding={payerOutstanding}
-          />
-        </GridItem>
+              <PaymentSummary
+                payerDistributedAmt={payerDistributedAmt}
+                outstanding={payerOutstanding}
+              />
+            </GridItem>
+          </GridContainer>
+        )}
       </GridContainer>
     </Paper>
   )
