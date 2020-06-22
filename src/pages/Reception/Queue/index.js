@@ -519,24 +519,32 @@ class Queue extends React.Component {
           <CardHeader icon>
             <h3 className={classNames(classes.sessionNo)}>
               {`Session No.: ${sessionNo}`}
-              <Authorized authority='openqueuedisplay'>
-                {lastCall ? (
-                  <font color='red'>
-                    <br />
-                    <b>
-                      NOW SERVING:{' '}
-                      {lastCall.qNo.includes('.') ? (
-                        lastCall.qNo
-                      ) : (
-                        `${lastCall.qNo}.0`
-                      )}
-                    </b>
-                  </font>
-                ) : (
-                  ''
-                )}
-              </Authorized>
             </h3>
+
+            <Authorized authority='openqueuedisplay'>
+              {lastCall ? (
+                <h4
+                  className={classNames(classes.sessionNo)}
+                  style={{
+                    fontSize: 16,
+                    marginTop: 10,
+                    marginLeft: 10,
+                    fontWeight: 'Bold',
+                  }}
+                >
+                  <font color='red'>
+                    NOW SERVING:{' '}
+                    {lastCall.qNo.includes('.') ? (
+                      lastCall.qNo
+                    ) : (
+                      `${lastCall.qNo}.0`
+                    )}
+                  </font>
+                </h4>
+              ) : (
+                ''
+              )}
+            </Authorized>
 
             {!isClinicSessionClosed && (
               <div className={classNames(classes.toolBtns)}>

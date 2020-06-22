@@ -3,7 +3,12 @@ import { withStyles } from '@material-ui/core'
 import { Dashboard, ClearAll } from '@material-ui/icons'
 import { ProgressButton, notification } from '@/components'
 import Authorized from '@/utils/Authorized'
-import { VALUE_KEYS } from '@/utils/constants'
+import {
+  VALUE_KEYS,
+  NOTIFICATION_TYPE,
+  NOTIFICATION_STATUS,
+} from '@/utils/constants'
+import { sendNotification } from '@/utils/realtime'
 
 const styles = (theme) => ({
   queueDashboardButton: {
@@ -37,22 +42,19 @@ const QueueDashboardButton = ({
           className={classes.queueDashboardButton}
           onClick={() => {
             dispatch({
-              type: 'queueCalling/getExistingQueueCallList',
+              type: 'queueCalling/claearAll',
               payload: {
-                keys: VALUE_KEYS.QUEUECALLING,
+                key: VALUE_KEYS.QUEUECALLING,
               },
             }).then((res) => {
-              // const { value, ...restRespValues } = res
-              dispatch({
-                type: 'queueCalling/upsertQueueCallList',
-                payload: {
-                  ...res,
-                  key: VALUE_KEYS.QUEUECALLING,
-                  value: '[]',
-                },
-              }).then((response) => {
-                if (response) notification.success({ message: 'Cleared' })
-              })
+              if (res) {
+                notification.success({ message: 'Cleared' })
+                sendNotification('QueueCalled', {
+                  type: NOTIFICATION_TYPE.QUEUECALL,
+                  status: NOTIFICATION_STATUS.OK,
+                  message: 'Queue Called',
+                })
+              }
             })
           }}
         >
