@@ -40,87 +40,89 @@ const Filterbar = (props) => {
   const onSwitchClick = () => dispatch({ type: 'queueLog/toggleSelfOnly' })
 
   return (
-    <GridContainer
-      className={classes.actionBar}
-      justify='flex-start'
-      alignItems='center'
-    >
-      <GridItem xs={3} sm={3} md={3} lg={3}>
-        <FastField
-          name='search'
-          render={(args) => (
-            <TextField
-              {...args}
-              autocomplete='off'
-              // inputProps={{
-              //   autocomplete: 'queue-listing-filterbar-search',
-              // }}
-              label={formatMessage({
-                id: 'reception.queue.patientSearchPlaceholder',
-              })}
-              onChange={(e) => setSearch(e.target.value)}
-              bind='patientSearch/query'
-              useLeading={false}
-              debounceDuration={500}
-            />
-          )}
-        />
-      </GridItem>
-      <GridItem xs={7} sm={7} md={7} lg={4}>
-        <Authorized authority='queue.registervisit'>
-          <ProgressButton
-            variant='contained'
-            color='primary'
-            icon={
-              <Hidden mdDown>
-                <Search />
-              </Hidden>
-            }
-            onClick={handleSubmit}
-            size='sm'
-            submitKey='patientSearch/query'
-          >
-            Create Visit
-          </ProgressButton>
-        </Authorized>
-        <Authorized authority='patientdatabase.newpatient'>
-          <Button
-            icon={null}
-            color='primary'
-            size='sm'
-            onClick={toggleNewPatient}
-            disabled={loading.global}
-          >
-            <Hidden mdDown>
-              <PersonAdd />
-            </Hidden>
-            <FormattedMessage id='reception.queue.createPatient' />
-          </Button>
-        </Authorized>
-        {user.clinicianProfile.userProfile.role.clinicRoleFK === 1 && (
-          <div className={classes.switch}>
-            <Checkbox
-              label='Visit assign to me only'
-              onChange={onSwitchClick}
-              checked={selfOnly}
-            />
-          </div>
-        )}
-      </GridItem>
-
-      <GridItem
-        xs={12}
-        sm={12}
-        md={12}
-        lg={5}
-        container
-        justify='flex-end'
+    <div className='div-reception-header'>
+      <GridContainer
+        className={classes.actionBar}
+        justify='flex-start'
         alignItems='center'
-        style={{ paddingRight: 0 }}
       >
-        <StatusFilterButton />
-      </GridItem>
-    </GridContainer>
+        <GridItem xs={3} sm={3} md={3} lg={3}>
+          <FastField
+            name='search'
+            render={(args) => (
+              <TextField
+                {...args}
+                autocomplete='off'
+                // inputProps={{
+                //   autocomplete: 'queue-listing-filterbar-search',
+                // }}
+                label={formatMessage({
+                  id: 'reception.queue.patientSearchPlaceholder',
+                })}
+                onChange={(e) => setSearch(e.target.value)}
+                bind='patientSearch/query'
+                useLeading={false}
+                debounceDuration={500}
+              />
+            )}
+          />
+        </GridItem>
+        <GridItem xs={7} sm={7} md={7} lg={4}>
+          <Authorized authority='queue.registervisit'>
+            <ProgressButton
+              variant='contained'
+              color='primary'
+              icon={
+                <Hidden mdDown>
+                  <Search />
+                </Hidden>
+              }
+              onClick={handleSubmit}
+              size='sm'
+              submitKey='patientSearch/query'
+            >
+              Create Visit
+            </ProgressButton>
+          </Authorized>
+          <Authorized authority='patientdatabase.newpatient'>
+            <Button
+              icon={null}
+              color='primary'
+              size='sm'
+              onClick={toggleNewPatient}
+              disabled={loading.global}
+            >
+              <Hidden mdDown>
+                <PersonAdd />
+              </Hidden>
+              <FormattedMessage id='reception.queue.createPatient' />
+            </Button>
+          </Authorized>
+          {user.clinicianProfile.userProfile.role.clinicRoleFK === 1 && (
+            <div className={classes.switch}>
+              <Checkbox
+                label='Visit assign to me only'
+                onChange={onSwitchClick}
+                checked={selfOnly}
+              />
+            </div>
+          )}
+        </GridItem>
+
+        <GridItem
+          xs={12}
+          sm={12}
+          md={12}
+          lg={5}
+          container
+          justify='flex-end'
+          alignItems='center'
+          style={{ paddingRight: 0 }}
+        >
+          <StatusFilterButton />
+        </GridItem>
+      </GridContainer>
+    </div>
   )
 }
 

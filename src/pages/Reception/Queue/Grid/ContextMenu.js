@@ -1,15 +1,13 @@
-import React, { useState, useMemo } from 'react'
+import React, { useMemo } from 'react'
 // ant design
-import { Dropdown, Menu } from 'antd'
+import { Menu } from 'antd'
 // material ui core
 import withStyles from '@material-ui/core/styles/withStyles'
 import { primaryColor } from 'mui-pro-jss'
-// common components
-import { SizeContainer } from '@/components'
+
 // variables
 import {
   StatusIndicator,
-  AppointmentContextMenu,
   ContextMenuOptions,
   filterMap,
   VISIT_STATUS,
@@ -52,7 +50,14 @@ const styles = (theme) => ({
 
 const { Secured } = Authorized
 
-const ContextMenu = ({ row, handleClick, classes }) => {
+const ContextMenu = ({
+  row,
+  classes,
+  rights,
+  onMenuItemClick,
+  onMenuClick,
+}) => {
+  console.log({ rights })
   const isStatusWaiting = row.visitStatus === VISIT_STATUS.WAITING
   const isStatusInProgress = filterMap[StatusIndicator.IN_PROGRESS].includes(
     row.visitStatus,
@@ -111,6 +116,7 @@ const ContextMenu = ({ row, handleClick, classes }) => {
 
   const contextMenuOptions = useMemo(() =>
     ContextMenuOptions.map((opt) => {
+      const isDisabled = rights === 'disable'
       switch (opt.id) {
         case 0: // edit visit
           return { ...opt, hidden: !isStatusWaiting }
@@ -124,26 +130,26 @@ const ContextMenu = ({ row, handleClick, classes }) => {
         case 1.1: // billing
           return {
             ...opt,
-            disabled: !enableBilling,
+            disabled: !enableBilling || isDisabled,
           }
         case 2: // delete visit
           return { ...opt, disabled: !isStatusWaiting }
         case 5: // start consultation
           return {
             ...opt,
-            disabled: isStatusInProgress,
+            disabled: isStatusInProgress || isDisabled,
             hidden: !isStatusWaiting || isRetailVisit || isBillFirstVisit,
           }
         case 6: // resume consultation
           return {
             ...opt,
-            disabled: !isStatusInProgress,
+            disabled: !isStatusInProgress || isDisabled,
             hidden: hideResumeButton || isRetailVisit || isBillFirstVisit,
           }
         case 7: // edit consultation
           return {
             ...opt,
-            disabled: !isStatusCompleted,
+            disabled: !isStatusCompleted || isDisabled,
             hidden: hideEditConsultation,
           }
         default:
@@ -153,7 +159,13 @@ const ContextMenu = ({ row, handleClick, classes }) => {
   )
 
   const MenuItemsOverlay = (
-    <Menu onClick={handleClick} className={classes.menu}>
+    <Menu
+      onClick={(menu) => {
+        onMenuItemClick(row, menu.key)
+        if (onMenuClick) onMenuClick()
+      }}
+      className={classes.menu}
+    >
       {contextMenuOptions.map(
         (
           { disabled, label, Icon, id, isDivider, hidden, authority },
