@@ -126,7 +126,7 @@ class FilterBar extends PureComponent {
               render={(args) => (
                 <FilterBarDate
                   args={args}
-                  label='From'
+                  label='Visit Date From'
                   formValues={{
                     startDate: formSearchStartDate,
                     endDate: formSearchEndDate,
@@ -142,7 +142,7 @@ class FilterBar extends PureComponent {
                 <FilterBarDate
                   isEndDate
                   args={args}
-                  label='To'
+                  label='Visit Date To'
                   formValues={{
                     startDate: formSearchStartDate,
                     endDate: formSearchEndDate,
@@ -166,8 +166,12 @@ class FilterBar extends PureComponent {
                       payload: {
                         apiCriteria: {
                           searchValue: patientSearchValue,
-                          visitDateFrom: formSearchStartDate,
-                          visitDateTo: formSearchEndDate,
+                          visitDateFrom: moment(
+                            formSearchStartDate,
+                          ).formatUTC(),
+                          visitDateTo: moment(formSearchEndDate).formatUTC(
+                            false,
+                          ),
                           formType:
                             formType.length > 0 ? formType.join() : undefined,
                           formStatus:

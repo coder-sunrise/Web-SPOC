@@ -1,9 +1,10 @@
 import React from 'react'
+import * as Yup from 'yup'
 // common components
 import {
   withStyles,
 } from '@material-ui/core'
-import { GridContainer, GridItem, NumberInput, Checkbox, CommonTableGrid } from '@/components'
+import { GridContainer, GridItem, NumberInput, Checkbox, EditableTableGrid } from '@/components'
 import styles from './style'
 
 class AutoPrintSelection extends React.PureComponent {
@@ -13,23 +14,15 @@ class AutoPrintSelection extends React.PureComponent {
       title: 'Item',
     },
     {
-      name: 'description',
-      title: 'Description',
-    },
-    {
       name: 'Copies',
-      title: 'No. Of Label',
-    },
-    {
-      name: 'print',
-      title: 'Print',
+      title: 'Copies',
     },
   ]
 
   colExtensions = [
     {
       columnName: 'item',
-      width: 200,
+      disabled: true,
       render: (row) => {
         return (
           <div style={{ position: 'relative' }}>
@@ -46,90 +39,80 @@ class AutoPrintSelection extends React.PureComponent {
       },
     },
     {
-      columnName: 'description',
-      render: (row) => {
-        return (
-          <div style={{ position: 'relative' }}>
-            <div
-              style={{
-                wordWrap: 'break-word',
-                whiteSpace: 'pre-wrap',
-              }}
-            >
-              {row.description}
-            </div>
-          </div>
-        )
-      },
-    },
-    {
       columnName: 'Copies',
       type: 'number',
-      width: 100,
-      render: (row) => {
-        return (
-          <p>
-            <NumberInput
-              max={99}
-              precision={0}
-              min={1}
-              value={row.Copies}
-              defaultValue={1}
-              onChange={(event, value) => {
-                this.setState((prevState) => ({
-                  data: prevState.data.map((item) => row.id === item.id ? (
-                    {
-                      ...item,
-                      Copies: value,
-                    }) : item),
-                }))
-              }}
-            />
-          </p>
-        )
-      },
-    },
-    {
-      columnName: 'print',
-      align: 'center',
       width: 80,
-      render: (row) => {
-        return (
-          <Checkbox onChange={(event, value) => {
-            console.log(value)
-            this.setState((prevState) => ({
-              data: prevState.data.map((item) => row.id === item.id ? (
-                {
-                  ...item,
-                  print: value,
-                }) : item),
-            }))
-          }}
-            checked={row.print}
-            simple
-          />
-        )
-      },
+      precision: 0,
+      min: 1,
+      // render: (row) => {
+      //   return (
+      //     <p>
+      //       <NumberInput
+      //         max={99}
+      //         precision={0}
+      //         min={1}
+      //         value={row.Copies}
+      //         defaultValue={1}
+      //         onChange={(event) => {
+      //           this.setState((prevState) => ({
+      //             data: prevState.data.map((item) => row.id === item.id ? (
+      //               {
+      //                 ...item,
+      //                 Copies: event.target.value,
+      //               }) : item),
+      //           }))
+      //         }}
+      //       />
+      //     </p>
+      //   )
+      // },
     },
   ]
 
   tableConfig = {
-    FuncProps: { pager: false },
+    FuncProps: {
+      pager: false,
+      selectable: true,
+      selectConfig: {
+        showSelectAll: true,
+        selectByRowClick: false,
+        rowSelectionEnabled: () => true,
+      },
+    },
   }
 
   constructor(props) {
     super(props)
+    let id = 0
+    let data = props.data.reduce((pre, cur) => {
+      let filterData = pre.filter((x) => x.item === cur.item)
+      if (filterData && filterData.length > 0) {
+        return pre
+      }
+      id += 1
+      return [...pre, { item: cur.item, Copies: cur.Copies, id: cur.item }]
+    }, [])
+    console.log({ data })
     this.state = {
-      data: props.data.map((item, index) => ({
-        ...item,
-        id: `${index}`,
-      })),
+      selectedRows: data.map((item) => item.id),
+      data,
     }
-    // this.onSubmitClick = this.onSubmitClick.bind(this)
   }
 
 
+  handleSelectionChange = (rows) => {
+    this.setState(() => ({
+      selectedRows: rows,
+    }))
+  }
 
+  handleCommitChanges = ({ rows }) => {
+    this.setState({
+      data: [
+        ...rows,
+      ],
+    })
+  }
 
   render () {
     const {
@@ -137,6 +120,11 @@ class AutoPrintSelection extends React.PureComponent {
       footer,
       classes,
     } = this.props
+    console.log(this.state)
+    const validationSchema = Yup.object().shape({
+      Copies: Yup.number()
+        .min(1),
+    })
     return (
       <div>
         <GridContainer>
@@ -144,18 +132,34 @@ class AutoPrintSelection extends React.PureComponent {
             {this.state.data &&
               <div className={classes.tableContainer}>
                 <h5>Print the following document after sign off</h5>
-                <CommonTableGrid
+                <EditableTableGrid
                   size='sm'
+                  forceRender
                   columns={this.columns}
                   columnExtensions={this.colExtensions}
                   rows={this.state.data}
                   {...this.tableConfig}
+                  selection={this.state.selectedRows}
+                  onSelectionChange={this.handleSelectionChange}
+                  EditingProps={{
+                    showAddCommand: false,
+                    showDeleteCommand: false,
+                    onCommitChanges: this.handleCommitChanges,
+                  }}
+                  schema={validationSchema}
                 />
               </div>}
           </GridItem>
         </GridContainer>
         {footer({
-          onConfirm: () => handleSubmit(this.state.data),
+          onConfirm: () => {
+            const selectedData = this.state.data.filter((item) => this.state.selectedRows.includes(item.id) > -1)
+            let printData = selectedData.reduce((pre, cur) => {
+              let itemData = this.props.data.filter((x) => x.item === cur.item)
+              return [...pre, ...(itemData.map((i) => ({ ...i, Copies: cur.Copies })))]
+            }, [])
+            handleSubmit(printData)
+          },
           confirmBtnText: 'Confirm',
         })}
       </div>
