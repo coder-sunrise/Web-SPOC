@@ -274,7 +274,7 @@ class clinicSettings extends PureComponent {
                 render={(args) => (
                   <Checkbox
                     label='Inclusive GST'
-                    disabled={!enableGst}
+                    disabled={!enableGst || !!hasActiveSession}
                     {...args}
                   />
                 )}
