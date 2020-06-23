@@ -132,6 +132,10 @@ const styles = (theme) => ({
 class Billing extends Component {
   state = {
     showReport: false,
+    reportPayload: {
+      reportID: undefined,
+      reportParameters: undefined,
+    },
     showAddPaymentModal: false,
     showSchemeValidationPrompt: false,
     isEditing: false,
@@ -207,7 +211,10 @@ class Billing extends Component {
 
   printAfterComplete = async () => {
     let settings = JSON.parse(localStorage.getItem('clinicSettings'))
-    const { autoPrintOnCompletePayment, autoPrintReportsOnCompletePayment } = settings
+    const {
+      autoPrintOnCompletePayment,
+      autoPrintReportsOnCompletePayment,
+    } = settings
     if (autoPrintOnCompletePayment) {
       await this.onExpandDispenseDetails()
 
@@ -219,10 +226,16 @@ class Billing extends Component {
           return { ...x, no: 1, selected: true }
         }),
       })
-      let reportsOnCompletePayment = autoPrintReportsOnCompletePayment.split(',')
+      let reportsOnCompletePayment = autoPrintReportsOnCompletePayment.split(
+        ',',
+      )
       let printData = []
 
-      if (reportsOnCompletePayment.indexOf(ReportsOnCompletePaymentOption.Invoice) > -1) {
+      if (
+        reportsOnCompletePayment.indexOf(
+          ReportsOnCompletePaymentOption.Invoice,
+        ) > -1
+      ) {
         if (invoice) {
           printData.push({
             ReportId: 15,
@@ -232,16 +245,26 @@ class Billing extends Component {
           })
         }
       }
-      if (reportsOnCompletePayment.indexOf(ReportsOnCompletePaymentOption.Receipt) > -1) {
+      if (
+        reportsOnCompletePayment.indexOf(
+          ReportsOnCompletePaymentOption.Receipt,
+        ) > -1
+      ) {
         if (invoicePayment && invoicePayment.length > 0) {
-          let payments = invoicePayment.filter((payment) => !payment.isCancelled && !payment.isDeleted)
+          let payments = invoicePayment.filter(
+            (payment) => !payment.isCancelled && !payment.isDeleted,
+          )
           if (payments && payments.length > 0) {
-            printData = printData.concat(payments.map((payment) => ({
-              ReportId: 29,
-              DocumentName: 'Receipt',
-              Copies: 1,
-              ReportParam: `${JSON.stringify({ InvoicePaymentId: payment.id })}`,
-            })))
+            printData = printData.concat(
+              payments.map((payment) => ({
+                ReportId: 29,
+                DocumentName: 'Receipt',
+                Copies: 1,
+                ReportParam: `${JSON.stringify({
+                  InvoicePaymentId: payment.id,
+                })}`,
+              })),
+            )
           }
         }
       }
@@ -255,7 +278,10 @@ class Billing extends Component {
         await this.childOnPrintRef({
           type: 1,
           printData,
-          printAllDrugLabel: reportsOnCompletePayment.indexOf(ReportsOnCompletePaymentOption.DrugLabel) > -1,
+          printAllDrugLabel:
+            reportsOnCompletePayment.indexOf(
+              ReportsOnCompletePaymentOption.DrugLabel,
+            ) > -1,
         })
       }
     }
@@ -312,8 +338,14 @@ class Billing extends Component {
     }
   }
 
-  toggleReport = () => {
-    this.setState((preState) => ({ showReport: !preState.showReport }))
+  onCloseReport = () => {
+    this.setState({
+      showReport: false,
+      reportPayload: {
+        reportID: undefined,
+        reportParameters: undefined,
+      },
+    })
   }
 
   backToDispense = () => {
@@ -400,7 +432,20 @@ class Billing extends Component {
     })
   }
 
-  onPrintInvoiceClick = () => {
+  onPrinterClick = (type, itemID, copayerID) => {
+    switch (type) {
+      case 'Payment':
+        this.onShowReport(29, { InvoicePaymentId: itemID })
+        break
+      case 'TaxInvoice':
+        this.onPrintInvoice(copayerID)
+        break
+      default:
+        break
+    }
+  }
+
+  onPrintInvoice = (copayerID) => {
     const { values, dispatch } = this.props
     const { invoicePayer } = values
     const modifiedOrNewAddedPayer = invoicePayer.filter((payer) => {
@@ -408,6 +453,18 @@ class Billing extends Component {
       if (payer.id) return payer.isModified
       return true
     })
+    let parametrPaload
+    if (copayerID) {
+      parametrPaload = {
+        InvoiceId: values.invoice ? values.invoice.id : '',
+        CopayerId: copayerID,
+      }
+    } else {
+      parametrPaload = {
+        InvoiceId: values.invoice ? values.invoice.id : '',
+      }
+    }
+    console.log('parametrPaload', parametrPaload)
     if (modifiedOrNewAddedPayer.length > 0) {
       dispatch({
         type: 'global/updateState',
@@ -421,13 +478,20 @@ class Billing extends Component {
               this.setState((preState) => ({
                 submitCount: preState.submitCount + 1,
               }))
-              this.toggleReport()
+
+              this.onShowReport(15, parametrPaload)
             }
             this.upsertBilling(callback)
           },
         },
       })
-    } else this.toggleReport()
+    } else {
+      this.onShowReport(15, parametrPaload)
+    }
+  }
+
+  onPrintInvoiceClick = () => {
+    this.onPrintInvoice(undefined)
   }
 
   handleAddPayment = async (payment) => {
@@ -465,11 +529,11 @@ class Billing extends Component {
         (payment) =>
           payment.id === id
             ? {
-              ...payment,
-              isCancelled: true,
-              cancelDate: new Date(),
-              cancelByUserFK: user.id,
-            }
+                ...payment,
+                isCancelled: true,
+                cancelDate: new Date(),
+                cancelByUserFK: user.id,
+              }
             : { ...payment },
       )
     }
@@ -549,9 +613,20 @@ class Billing extends Component {
     this.props.dispatch({ type: 'global/incrementCommitCount' })
   }
 
+  onShowReport = (reportID, reportParameters) => {
+    this.setState({
+      showReport: true,
+      reportPayload: {
+        reportID,
+        reportParameters,
+      },
+    })
+  }
+
   render () {
     const {
       showReport,
+      reportPayload,
       showAddPaymentModal,
       showSchemeValidationPrompt,
       schemeValidations,
@@ -582,6 +657,8 @@ class Billing extends Component {
       patient,
       ctschemetype,
       ctcopaymentscheme,
+      sessionInfo,
+      user,
     }
     return (
       <LoadingWrapper loading={loading} text='Getting billing info...'>
@@ -633,6 +710,9 @@ class Billing extends Component {
                   commitCount={commitCount}
                   {...formikBag}
                   {...commonProps}
+                  onPrinterClick={this.onPrinterClick}
+                  saveBilling={this.handleSaveBillingClick}
+                  fromBilling
                 />
               )}
             </GridContainer>
@@ -672,7 +752,15 @@ class Billing extends Component {
                 <Button
                   color='info'
                   onClick={this.backToDispense}
-                  disabled={this.state.isEditing || values.id === undefined}
+                  disabled={
+                    this.state.isEditing ||
+                    values.id === undefined ||
+                    values.invoicePayer.find((payer) =>
+                      payer.invoicePayment.find(
+                        (payment) => !payment.isCancelled,
+                      ),
+                    )
+                  }
                 >
                   <ArrowBack />Dispense
                 </Button>
@@ -729,16 +817,14 @@ class Billing extends Component {
         </CommonModal>
         <CommonModal
           open={showReport}
-          onClose={this.toggleReport}
+          onClose={this.onCloseReport}
           title='Invoice'
           maxWidth='lg'
         >
           <ReportViewer
             showTopDivider={false}
-            reportID={15}
-            reportParameters={{
-              InvoiceID: values.invoice ? values.invoice.id : '',
-            }}
+            reportID={reportPayload.reportID}
+            reportParameters={reportPayload.reportParameters}
           />
         </CommonModal>
       </LoadingWrapper>

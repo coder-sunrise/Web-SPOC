@@ -83,7 +83,12 @@ class CoPayer extends Component {
 
     const returnValue = {
       invoicePayerItem,
+      invoicePayment: [],
       payerDistributedAmt: invoicePayerItem.reduce(
+        (total, item) => total + item.claimAmount,
+        0,
+      ),
+      payerOutstanding: invoicePayerItem.reduce(
         (total, item) => total + item.claimAmount,
         0,
       ),
