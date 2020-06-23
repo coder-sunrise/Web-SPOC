@@ -23,6 +23,7 @@ import { LoadingWrapper } from '@/components/_medisys'
     patient,
     clinicSettings,
     loading,
+    forms,
   }) => ({
     loading,
     dispense,
@@ -32,6 +33,7 @@ import { LoadingWrapper } from '@/components/_medisys'
     orders,
     patient: patient.entity,
     clinicSettings,
+    forms,
   }),
 )
 class Dispense extends PureComponent {

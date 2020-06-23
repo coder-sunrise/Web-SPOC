@@ -1,10 +1,12 @@
 import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
 import { FormattedMessage } from 'umi/locale'
-import Search from '@material-ui/icons/Search'
-import Add from '@material-ui/icons/Add'
+import { Search, Add, ImportExport, AttachFile } from '@material-ui/icons'
 import { standardRowHeight } from 'mui-pro-jss'
 import { status } from '@/utils/codes'
+import { downloadFile } from '@/services/file'
+import { convertToBase64 } from '@/utils/utils'
+import { LoadingWrapper } from '@/components/_medisys'
 
 import {
   GridContainer,
@@ -14,7 +16,10 @@ import {
   CodeSelect,
   Select,
   ProgressButton,
+  notification,
 } from '@/components'
+
+const allowedFiles = '.xlsx'
 
 const styles = (theme) => ({
   filterBar: {
@@ -35,11 +40,123 @@ const styles = (theme) => ({
   },
 })
 
+const clearValue = (e) => {
+  e.target.value = null
+}
+
+const mapToFileDto = async (file) => {
+  const base64 = await convertToBase64(file)
+  const originalFile = {
+    content: base64,
+  }
+
+  return originalFile
+}
+
 @withFormik({
   handleSubmit: () => {},
   displayName: 'ServiceFilter',
 })
 class Filter extends PureComponent {
+  constructor (props) {
+    super(props)
+    this.uploadInput = React.createRef()
+  }
+
+  state = {
+    loading: false,
+    loadingText: 'Exporting...',
+  }
+
+  showLoading = (isShow, text = '') => {
+    this.setState({
+      loading: isShow,
+      loadingText: text,
+    })
+  }
+
+  onSearchClick = () => {
+    const { codeDisplayValue, isActive, serviceCenterFK } = this.props.values
+    this.props.dispatch({
+      type: 'settingClinicService/query',
+      payload: {
+        'ServiceFKNavigation.isActive': isActive,
+        serviceCenterFK,
+        group: [
+          {
+            'ServiceFKNavigation.Code': codeDisplayValue,
+            'ServiceFKNavigation.DisplayValue': codeDisplayValue,
+            combineCondition: 'or',
+          },
+        ],
+      },
+    })
+  }
+
+  onExportClick = async () => {
+    this.showLoading(true, 'Exporting...')
+
+    this.props
+      .dispatch({
+        type: 'settingClinicService/export',
+      })
+      .then((result) => {
+        if (result) {
+          downloadFile(result, 'Service.xlsx')
+        }
+
+        this.showLoading(false)
+      })
+  }
+
+  onImportClick = () => {
+    this.uploadInput.current.click()
+  }
+
+  onFileChange = async (event) => {
+    try {
+      const { files } = event.target
+
+      const selectedFiles = await Promise.all(
+        Object.keys(files).map((key) => mapToFileDto(files[key])),
+      )
+
+      if (selectedFiles.length > 0) {
+        this.showLoading(true, 'Importing...')
+        this.props
+          .dispatch({
+            type: 'settingClinicService/import',
+            payload: {
+              ...selectedFiles[0],
+            },
+          })
+          .then((result) => {
+            if (result && result.byteLength === 0) {
+              notification.success({
+                message: 'Import success',
+              })
+
+              this.onSearchClick()
+            } else if (result && result.byteLength > 0) {
+              notification.warning({
+                message:
+                  'File is not valid, please download the validation file and check the issues',
+              })
+              downloadFile(result, 'Validation.xlsx')
+            } else {
+              notification.error({
+                message: 'Import failed',
+              })
+            }
+
+            this.showLoading(false)
+          })
+      }
+    } catch (error) {
+      console.log({ error })
+    }
+  }
+
   render () {
     const { classes } = this.props
 
@@ -77,51 +194,58 @@ class Filter extends PureComponent {
             />
           </GridItem>
           <GridItem xs={12} md={12}>
-            <div className={classes.filterBtn}>
-              <ProgressButton
-                color='primary'
-                icon={<Search />}
-                onClick={() => {
-                  const {
-                    codeDisplayValue,
-                    isActive,
-                    serviceCenterFK,
-                  } = this.props.values
-                  this.props.dispatch({
-                    type: 'settingClinicService/query',
-                    payload: {
-                      'ServiceFKNavigation.isActive': isActive,
-                      serviceCenterFK,
-                      group: [
-                        {
-                          'ServiceFKNavigation.Code': codeDisplayValue,
-                          'ServiceFKNavigation.DisplayValue': codeDisplayValue,
-                          combineCondition: 'or',
-                        },
-                      ],
-                    },
-                  })
-                }}
-              >
-                <FormattedMessage id='form.search' />
-              </ProgressButton>
+            <LoadingWrapper
+              linear
+              loading={this.state.loading}
+              text={this.state.loadingText}
+            >
+              <div className={classes.filterBtn}>
+                <ProgressButton
+                  color='primary'
+                  icon={<Search />}
+                  onClick={this.onSearchClick}
+                >
+                  <FormattedMessage id='form.search' />
+                </ProgressButton>
 
-              <Button
-                color='primary'
-                onClick={() => {
-                  this.props.dispatch({
-                    type: 'settingClinicService/updateState',
-                    payload: {
-                      entity: undefined,
-                    },
-                  })
-                  this.props.toggleModal()
-                }}
-              >
-                <Add />
-                Add New
-              </Button>
-            </div>
+                <Button
+                  color='primary'
+                  onClick={() => {
+                    this.props.dispatch({
+                      type: 'settingClinicService/updateState',
+                      payload: {
+                        entity: undefined,
+                      },
+                    })
+                    this.props.toggleModal()
+                  }}
+                >
+                  <Add />
+                  Add New
+                </Button>
+
+                <Button color='primary' onClick={this.onExportClick}>
+                  <ImportExport />
+                  Export
+                </Button>
+
+                <input
+                  style={{ display: 'none' }}
+                  type='file'
+                  accept={allowedFiles}
+                  id='importServiceFile'
+                  ref={this.uploadInput}
+                  multiple={false}
+                  onChange={this.onFileChange}
+                  onClick={clearValue}
+                />
+
+                <Button color='primary' onClick={this.onImportClick}>
+                  <AttachFile />
+                  Import
+                </Button>
+              </div>
+            </LoadingWrapper>
           </GridItem>
         </GridContainer>
       </div>

@@ -128,7 +128,15 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       loader: () => import('./Notes'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='intraOral' />
+        return (
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
+            }}
+          >
+            <Cmpnet {...props} {...p} fieldName='intraOral' />
+          </AuthorizedContext.Provider>
+        )
       },
       loading: Loading,
     }),
@@ -363,5 +371,18 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     ],
     // model: 'refractionForm',
     layoutConfig: {},
+  },
+  {
+    id: '14',
+    name: 'Forms',
+    authority: 'queue.consultation.widgets.forms',
+    component: Loadable({
+      loader: () => import('./Forms'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} />
+      },
+      loading: Loading,
+    }),
   },
 ]

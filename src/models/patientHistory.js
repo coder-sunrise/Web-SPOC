@@ -1,6 +1,7 @@
 import { createListViewModel } from 'medisys-model'
 import { VISIT_TYPE } from '@/utils/constants'
 import * as service from '../services/patientHistory'
+import { formTypes } from '@/utils/codes'
 
 const ParseEyeFormData = (response) => {
   const { corEyeRefractionForm = {}, corEyeExaminationForm = {} } = response
@@ -177,10 +178,20 @@ export default createListViewModel({
     reducers: {
       queryOneDone (st, { payload }) {
         // const { data } = payload
-
         const { entity } = st
         st.entity = ParseEyeFormData(entity)
 
+        st.entity = {
+          ...st.entity,
+          forms: st.entity.forms.map((o) => {
+            return {
+              ...o,
+              typeName: formTypes.find(
+                (type) => parseInt(type.value, 10) === o.type,
+              ).name,
+            }
+          }),
+        }
         let sortedPatientHistory = st.list
           ? st.list.filter((o) => o.coHistory.length >= 1)
           : []

@@ -112,6 +112,12 @@ const styles = (theme) => ({
     margin: theme.spacing(2),
     position: 'relative',
   },
+  tableContainer: {
+    margin: theme.spacing(1),
+    '& > div:last-child': {
+      marginBottom: theme.spacing(1.5),
+    },
+  },
 })
 
 export default styles

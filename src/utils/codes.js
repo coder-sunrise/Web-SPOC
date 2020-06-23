@@ -2,7 +2,7 @@ import moment from 'moment'
 import _ from 'lodash'
 import Authorized from '@/utils/Authorized'
 import { dateFormatLong, dateFormatLongWithTime } from './format'
-import { UNFIT_TYPE, SCRIBBLE_NOTE_TYPE } from './constants'
+import { UNFIT_TYPE, SCRIBBLE_NOTE_TYPE, REPORT_ID } from './constants'
 import { calculateAgeFromDOB } from './dateUtils'
 
 const status = [
@@ -690,7 +690,7 @@ export const getInventoryItem = (
       if (
         item &&
         item.orderQuantity - item.quantityReceived ===
-          o.totalCurrentReceivingQty
+        o.totalCurrentReceivingQty
       ) {
         return {
           ...o,
@@ -999,7 +999,7 @@ export const labelPrinterList = [
   { value: '7.6cmx3.8cm', name: '7.6cmx3.8cm' },
 ]
 
-const corAttchementTypes = [
+export const corAttchementTypes = [
   {
     id: 1,
     type: 'ClinicalNotes',
@@ -1028,6 +1028,34 @@ const corAttchementTypes = [
   },
 ]
 
+export const ReportsOnSignOffOption = {
+  DrugLabel: 'Drug Label',
+  MedicalCertificate: 'Medical Certificate',
+  CertificateofAttendance: 'Certificate of Attendance',
+  ReferralLetter: 'Referral Letter',
+  Memo: 'Memo',
+  VaccinationCertificate: 'Vaccination Certificate',
+  OtherDocuments: 'Other Documents',
+}
+export const ReportsOnSignOff = [
+  { code: ReportsOnSignOffOption.DrugLabel, description: 'Drug Label' },
+  { code: ReportsOnSignOffOption.MedicalCertificate, description: 'Medical Certificate' },
+  { code: ReportsOnSignOffOption.CertificateofAttendance, description: 'Certificate of Attendance' },
+  { code: ReportsOnSignOffOption.ReferralLetter, description: 'Referral Letter' },
+  { code: ReportsOnSignOffOption.Memo, description: 'Memo' },
+  { code: ReportsOnSignOffOption.VaccinationCertificate, description: 'Vaccination Certificate' },
+  { code: ReportsOnSignOffOption.OtherDocuments, description: 'Other Documents' },
+]
+export const ReportsOnCompletePaymentOption = {
+  DrugLabel: 'Drug Label',
+  Invoice: 'Invoice',
+  Receipt: 'Receipt',
+}
+export const ReportsOnCompletePayment = [
+  { code: ReportsOnCompletePaymentOption.DrugLabel, description: 'Drug Label' },
+  { code: ReportsOnCompletePaymentOption.Invoice, description: 'Invoice' },
+  { code: ReportsOnCompletePaymentOption.Receipt, description: 'Receipt' },
+]
 const initRoomAssignment = async () => {
   const accessRight = Authorized.check('settings.clinicsetting.roomassignment')
   if (accessRight && accessRight.rights === 'enable') {
@@ -1045,6 +1073,423 @@ const scribbleTypes = [
   { type: 'chiefComplaints', typeFK: SCRIBBLE_NOTE_TYPE.CHIEFCOMPLAINTS },
   { type: 'note', typeFK: SCRIBBLE_NOTE_TYPE.CLINICALNOTES },
   { type: 'plan', typeFK: SCRIBBLE_NOTE_TYPE.PLAN },
+]
+
+const formTypes = [
+  {
+    value: '1',
+    name: 'Letter of Certification',
+    prop: 'corLetterOfCertification',
+    downloadConfig: {
+      id: 45,
+      key: 'LetterofCertificationId',
+      subject: 'Letter of Certification',
+      draft: (row) => {
+        const { formData, statusFK } = row
+
+        let LCFormSurgicalCharges = []
+        formData.procuderes.filter((p) => p.index <= 3).forEach((element) => {
+          for (let index = 0; index < 3; index++) {
+            LCFormSurgicalCharges.push({
+              index: element.index,
+              ProcedureDate: element.procedureDate,
+              StartTime: element.procedureStartTime,
+              EndTime: element.procedureEndTime,
+              NatureOperation: element.natureOfOpertation,
+              SurgicalCode: element.surgicalProcedureCode,
+              SurgicalDescription: element.surgicalProcedureName,
+              SurgicalTable: element.surgicalProcedureTable,
+              DoctorMCRNo: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].surgicalSurgeonMCRNo
+                : '',
+              DoctorName: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].surgicalSurgeonName
+                : '',
+              SurgeonRoleDisplayValue: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].surgicalRoleName
+                : '',
+              SurgeonFees: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].surgeonFees
+                : 0,
+              ImplantFees: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].implantFees
+                : 0,
+              OtherFees: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].otherFees
+                : 0,
+              TotalSurgicalFees: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].totalSurgicalFees
+                : 0,
+              GSTChargedDisplayValue: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].gSTChargedName
+                : 'Charged',
+            })
+          }
+        })
+
+        let LCFormSurgicalChargesAnnex = []
+        formData.procuderes.filter((p) => p.index > 3).forEach((element) => {
+          for (let index = 0; index < 5; index++) {
+            LCFormSurgicalChargesAnnex.push({
+              index: element.index,
+              ProcedureDate: element.procedureDate,
+              StartTime: element.procedureStartTime,
+              EndTime: element.procedureEndTime,
+              NatureOperation: element.natureOfOpertation,
+              SurgicalCode: element.surgicalProcedureCode,
+              SurgicalDescription: element.surgicalProcedureName,
+              SurgicalTable: element.surgicalProcedureTable,
+              PatientName: formData.patientName,
+              PatientAccountNo: formData.patientAccountNo,
+              DateOfAdmission: formData.admissionDate,
+              DoctorMCRNo: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].surgicalSurgeonMCRNo
+                : '',
+              DoctorName: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].surgicalSurgeonName
+                : '',
+              SurgeonRoleDisplayValue: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].surgicalRoleName
+                : '',
+              SurgeonFees: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].surgeonFees
+                : 0,
+              ImplantFees: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].implantFees
+                : 0,
+              OtherFees: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].otherFees
+                : 0,
+              TotalSurgicalFees: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].totalSurgicalFees
+                : 0,
+              GSTChargedDisplayValue: element.surgicalCharges[index]
+                ? element.surgicalCharges[index].gSTChargedName
+                : 'Charged',
+            })
+          }
+        })
+
+        let LCFormNonSurgicalCharges = []
+        for (let index = 0; index < 7; index++) {
+          LCFormNonSurgicalCharges.push({
+            DoctorMCRNo: formData.nonSurgicalCharges[index]
+              ? formData.nonSurgicalCharges[index].surgicalSurgeonMCRNo
+              : '',
+            DoctorName: formData.nonSurgicalCharges[index]
+              ? formData.nonSurgicalCharges[index].surgicalSurgeonName
+              : '',
+            SurgeonRoleDisplayValue: formData.nonSurgicalCharges[index]
+              ? formData.nonSurgicalCharges[index].surgicalRoleName
+              : index === 0 ? 'Principal Surgeon' : '',
+            AttendanceFee: formData.nonSurgicalCharges[index]
+              ? formData.nonSurgicalCharges[index].inpatientAttendanceFees
+              : 0,
+            OtherFees: formData.nonSurgicalCharges[index]
+              ? formData.nonSurgicalCharges[index].otherFees
+              : 0,
+            TotalSurgicalFees: formData.nonSurgicalCharges[index]
+              ? formData.nonSurgicalCharges[index].totalSurgicalFees
+              : 0,
+            GSTChargedDisplayValue: formData.nonSurgicalCharges[index]
+              ? formData.nonSurgicalCharges[index].gSTChargedName
+              : 'Charged',
+          })
+        }
+
+        return {
+          LCFormDetails: [
+            {
+              Watermark: statusFK === 4 ? 'THIS FORM IS VOIDED' : '',
+              PatientName: formData.patientName,
+              PatientNRIC: formData.patientNRICNo,
+              PatientAccountNo: formData.patientAccountNo,
+              DateOfAdmission: formData.admissionDate,
+              DateOfDischarge: formData.dischargeDate,
+              AdmittingSpecialtyCode: formData.admittingSpecialtys.join(','),
+              OtherSpecialty: formData.others,
+              CaseType: formData.caseType,
+              PrincipalDiagnosisCode: formData.principalDiagnosisCode,
+              PrincipalDiagnosisDescription: formData.principalDiagnosisName,
+              SecondaryDiagnosisCode1: formData.secondDiagnosisACode,
+              SecondaryDiagnosisDescription1: formData.secondDiagnosisAName,
+              SecondaryDiagnosisCode2: formData.secondDiagnosisBCode,
+              SecondaryDiagnosisDescription2: formData.secondDiagnosisBName,
+              OtherDiagnosis: formData.otherDiagnosis
+                .map((o) => `${o.diagnosisCode} - ${o.diagnosisName}`)
+                .join('|'),
+            },
+          ],
+          LCFormSurgicalCharges,
+          LCFormSignature: [
+            {
+              Signature: formData.signatureThumbnail,
+              PrincipalSurgeonName: formData.principalSurgeonName,
+              DoctorMCRNo: formData.principalSurgeonMCRNo,
+              SignatureDate: formData.principalSurgeonSignatureDate,
+            },
+          ],
+          LCFormNonSurgicalCharges,
+          LCFormSurgicalChargesAnnex,
+        }
+      },
+    },
+  },
+]
+
+const formStatus = [
+  {
+    value: 1,
+    name: 'Draft',
+  },
+  {
+    value: 2,
+    name: 'Finalized',
+  },
+  {
+    value: 3,
+    name: 'Submitted',
+  },
+  {
+    value: 4,
+    name: 'Voided',
+  },
+]
+
+const gstChargedTypes = [
+  {
+    id: 1,
+    name: 'Charged',
+  },
+  {
+    id: 2,
+    name: 'Waived',
+  },
+  {
+    id: 3,
+    name: 'Not Registered',
+  },
+]
+
+const surgicalRoles = [
+  {
+    id: 1,
+    code: 'PRINCIPALSURGEON',
+    name: 'Principal Surgeon',
+  },
+  {
+    id: 2,
+    code: 'OTHERSURGEON',
+    name: 'Other Surgeon',
+  },
+  {
+    id: 3,
+    code: 'DENTIST',
+    name: 'Dentist',
+  },
+  {
+    id: 4,
+    code: 'DOCTOR',
+    name: 'Doctor',
+  },
+  {
+    id: 5,
+    code: 'ANESTHETIST',
+    name: 'Anesthetist',
+  },
+  {
+    id: 6,
+    code: 'ASSISTANT',
+    name: 'Assistant',
+  },
+]
+
+const ltAdmittingSpecialty = [
+  {
+    id: 1,
+    code: '01',
+    name: '01 Burns',
+  },
+  {
+    id: 2,
+    code: '02',
+    name: '02 Cardio Thoracic Surgery',
+  },
+  {
+    id: 3,
+    code: '03',
+    name: '03 Cardiology',
+  },
+  {
+    id: 4,
+    code: '04',
+    name: '04 Chronic Medicine',
+  },
+  {
+    id: 5,
+    code: '05',
+    name: '05 Dental',
+  },
+  {
+    id: 6,
+    code: '06',
+    name: '06 Dermatology',
+  },
+  {
+    id: 7,
+    code: '07',
+    name: '07 General Medicine',
+  },
+  {
+    id: 8,
+    code: '08',
+    name: '08 General Surgery',
+  },
+  {
+    id: 9,
+    code: '09',
+    name: '09 Geriatric Medicine',
+  },
+  {
+    id: 10,
+    code: '10',
+    name: '10 Gynaecology',
+  },
+  {
+    id: 11,
+    code: '11',
+    name: '11 Haematology',
+  },
+  {
+    id: 12,
+    code: '12',
+    name: '12 Hand Surgery',
+  },
+  {
+    id: 13,
+    code: '13',
+    name: '13 Infectious Disease',
+  },
+  {
+    id: 14,
+    code: '14',
+    name: '14 Neonatology',
+  },
+  {
+    id: 15,
+    code: '15',
+    name: '15 Neurology',
+  },
+  {
+    id: 16,
+    code: '16',
+    name: '16 Neurosurgery',
+  },
+  {
+    id: 17,
+    code: '17',
+    name: '17 Nuclear Medicine',
+  },
+  {
+    id: 18,
+    code: '18',
+    name: '18 Obstetrics',
+  },
+  {
+    id: 19,
+    code: '19',
+    name: '19 Medical Oncology',
+  },
+  {
+    id: 20,
+    code: '20',
+    name: '20 Ophthalmology',
+  },
+  {
+    id: 21,
+    code: '21',
+    name: '21 Orthopaedic Surgery',
+  },
+  {
+    id: 22,
+    code: '22',
+    name: '22 Otorhinolaryngology',
+  },
+  {
+    id: 23,
+    code: '23',
+    name: '23 Paediatric Medicine',
+  },
+  {
+    id: 24,
+    code: '24',
+    name: '24 Paediatric Surgery',
+  },
+  {
+    id: 25,
+    code: '25',
+    name: '25 Plastic & Reconstructive Surgery',
+  },
+  {
+    id: 26,
+    code: '26',
+    name: '26 Psychiatry',
+  },
+  {
+    id: 27,
+    code: '27',
+    name: '27 Rehabilitation Medicine',
+  },
+  {
+    id: 28,
+    code: '28',
+    name: '28 Renal Medicine',
+  },
+  {
+    id: 29,
+    code: '29',
+    name: '29 Therapeutic Radiology',
+  },
+  {
+    id: 30,
+    code: '30',
+    name: '30 Trauma',
+  },
+  {
+    id: 31,
+    code: '31',
+    name: '31 Tuberculosis',
+  },
+  {
+    id: 32,
+    code: '32',
+    name: '32 Urology',
+  },
+  {
+    id: 33,
+    code: '33',
+    name: '33 Colorectal Surgery',
+  },
+  {
+    id: 34,
+    code: '34',
+    name: '34 Observational Medicine',
+  },
+  {
+    id: 35,
+    code: '35',
+    name: '35 Family Medicine and Continuing Care',
+  },
+  {
+    id: 36,
+    code: '36',
+    name: '36 Surgical Oncology',
+  },
+  {
+    id: 99,
+    code: '99',
+    name: '99 Others (please specify)',
+  },
 ]
 
 module.exports = {
@@ -1075,8 +1520,12 @@ module.exports = {
   roundToPrecision,
   gstEnabled,
   groupByFKFunc,
-  corAttchementTypes,
   initRoomAssignment,
   scribbleTypes,
+  formTypes,
+  formStatus,
+  gstChargedTypes,
+  surgicalRoles,
+  ltAdmittingSpecialty,
   ...module.exports,
 }

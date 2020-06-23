@@ -15,7 +15,7 @@ class PatchedIntegratedSelection extends React.PureComponent {
               const filtered = rows.filter(rowSelectionEnabled)
               return filtered
             }
-            return rows
+            return rows.filter(() => true)
           }}
         />
         <IntegratedSelection />

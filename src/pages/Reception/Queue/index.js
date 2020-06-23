@@ -30,13 +30,15 @@ import { getAppendUrl, getRemovedUrl } from '@/utils/utils'
 import { SendNotification } from '@/utils/notification'
 import Authorized from '@/utils/Authorized'
 import { QueueDashboardButton } from '@/components/_medisys'
-import { VALUE_KEYS } from '@/utils/constants'
+import { VALUE_KEYS, FORM_CATEGORY } from '@/utils/constants'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { initRoomAssignment } from '@/utils/codes'
 import { modelKey } from './variables'
 import PatientSearchModal from './PatientSearch'
 import DetailsGrid from './Grid'
 import DetailsActionBar from './FilterBar'
 import EmptySession from './EmptySession'
+import VisitForms from './VisitForms'
 
 const drawerWidth = 400
 
@@ -96,6 +98,8 @@ class Queue extends React.Component {
       showPatientSearch: false,
       showEndSessionSummary: false,
       search: '',
+      showForms: false,
+      formCategory: undefined,
     }
     this._timer = null
   }
@@ -432,16 +436,79 @@ class Queue extends React.Component {
     })
   }
 
+  toggleForms = () => {
+    const { showForms } = this.state
+    const target = !showForms
+    this.setState({
+      showForms: target,
+    })
+    // closing Forms
+    if (!target) {
+      this.resetFormsResult()
+    }
+  }
+
+  resetFormsResult = () => {
+    this.props.dispatch({
+      type: 'formListing/updateState',
+      payload: {
+        list: [],
+      },
+    })
+  }
+
+  showVisitForms = async (row) => {
+    const {
+      id,
+      visitStatus,
+      doctor,
+      patientAccountNo,
+      patientName,
+      patientReferenceNo,
+    } = row
+    await this.props.dispatch({
+      type: 'formListing/updateState',
+      payload: {
+        visitID: id,
+        visitDetail: {
+          visitID: id,
+          doctorProfileFK: doctor ? doctor.id : 0,
+          patientName,
+          patientNRICNo: patientReferenceNo,
+          patientAccountNo,
+        },
+      },
+    })
+    if (visitStatus === VISIT_STATUS.WAITING) {
+      this.setState({ formCategory: FORM_CATEGORY.VISITFORM })
+    } else {
+      this.setState({ formCategory: FORM_CATEGORY.CORFORM })
+    }
+    this.toggleForms()
+  }
+
   render () {
-    const { classes, queueLog, loading, history, dispatch } = this.props
+    const {
+      classes,
+      queueLog,
+      loading,
+      history,
+      dispatch,
+      queueCalling,
+    } = this.props
     const {
       showEndSessionSummary,
       showPatientSearch,
       _sessionInfoID,
       search,
+      showForms,
     } = this.state
     const { sessionInfo, error } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
+    const { oriQCallList = [] } = queueCalling
+    const [
+      lastCall,
+    ] = oriQCallList
 
     return (
       <PageHeaderWrapper
@@ -453,6 +520,31 @@ class Queue extends React.Component {
             <h3 className={classNames(classes.sessionNo)}>
               {`Session No.: ${sessionNo}`}
             </h3>
+
+            <Authorized authority='openqueuedisplay'>
+              {lastCall ? (
+                <h4
+                  className={classNames(classes.sessionNo)}
+                  style={{
+                    fontSize: 16,
+                    marginTop: 10,
+                    marginLeft: 10,
+                    fontWeight: 'Bold',
+                  }}
+                >
+                  <font color='red'>
+                    NOW SERVING:{' '}
+                    {lastCall.qNo.includes('.') ? (
+                      lastCall.qNo
+                    ) : (
+                      `${lastCall.qNo}.0`
+                    )}
+                  </font>
+                </h4>
+              ) : (
+                ''
+              )}
+            </Authorized>
 
             {!isClinicSessionClosed && (
               <div className={classNames(classes.toolBtns)}>
@@ -506,6 +598,7 @@ class Queue extends React.Component {
                   onRegisterPatientClick={this.toggleRegisterNewPatient}
                   handleEditVisitClick={this.showVisitRegistration}
                   handleActualizeAppointment={this.handleActualizeAppointment}
+                  handleFormsClick={this.showVisitForms}
                   history={history}
                   searchQuery={search}
                 />
@@ -533,6 +626,22 @@ class Queue extends React.Component {
               disableBackdropClick
             >
               <EndSessionSummary sessionID={_sessionInfoID} />
+            </CommonModal>
+            <CommonModal
+              open={showForms}
+              title={
+                this.state.formCategory === FORM_CATEGORY.VisitForms ? (
+                  'Visit Forms'
+                ) : (
+                  'Forms'
+                )
+              }
+              onClose={this.toggleForms}
+              onConfirm={this.toggleForms}
+              maxWidth='md'
+              overrideLoading
+            >
+              <VisitForms formCategory={this.state.formCategory} />
             </CommonModal>
           </CardBody>
         </Card>
