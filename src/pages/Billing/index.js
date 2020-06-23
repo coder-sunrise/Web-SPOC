@@ -752,7 +752,15 @@ class Billing extends Component {
                 <Button
                   color='info'
                   onClick={this.backToDispense}
-                  disabled={this.state.isEditing || values.id === undefined}
+                  disabled={
+                    this.state.isEditing ||
+                    values.id === undefined ||
+                    values.invoicePayer.find((payer) =>
+                      payer.invoicePayment.find(
+                        (payment) => !payment.isCancelled,
+                      ),
+                    )
+                  }
                 >
                   <ArrowBack />Dispense
                 </Button>
