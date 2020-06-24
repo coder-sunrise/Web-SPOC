@@ -34,10 +34,19 @@ export default createListViewModel({
         formData: {
           caseType: 'DaySurgery',
           procuderes: [],
-          otherDiagnosis: [],
           nonSurgicalCharges: [],
           others: null,
           signatureThumbnail: null,
+          principalDiagnosisFK: null,
+          principalDiagnosisCode: null,
+          principalDiagnosisName: null,
+          secondDiagnosisAFK: null,
+          secondDiagnosisACode: null,
+          secondDiagnosisAName: null,
+          secondDiagnosisBFK: null,
+          secondDiagnosisBCode: null,
+          secondDiagnosisBName: null,
+          otherDiagnosis: [],
         },
       },
       default: {},
@@ -51,20 +60,57 @@ export default createListViewModel({
       })
     },
     effects: {
-      *saveForm ({ payload }, { call, put, select }) {
-        const { visitID } = payload
-        const response = yield call(service.saveForm, visitID, payload)
-        return response
-      },
-
-      *getVisitForm ({ payload }, { call, put, select }) {
-        const response = yield call(service.getVisitForm, payload)
+      *getCORForms ({ payload }, { call, put, select }) {
+        const response = yield call(service.getCORForms, payload)
         const { data, status } = response
         if (status === '200') {
           yield put({
-            type: 'queryFormDone',
+            type: 'queryCORFormsDone',
             payload: response,
           })
+          return data
+        }
+        return false
+      },
+
+      *getVisitForms ({ payload }, { call, put, select }) {
+        const response = yield call(service.getVisitForms, payload)
+        const { data, status } = response
+        if (status === '200') {
+          yield put({
+            type: 'queryVisitFormsDone',
+            payload: response,
+          })
+          return data
+        }
+        return false
+      },
+
+      *saveVisitForm ({ payload }, { call, put, select }) {
+        const { visitID } = payload
+        const response = yield call(service.saveVisitForm, visitID, payload)
+        return response
+      },
+
+      *saveCORForm ({ payload }, { call, put, select }) {
+        const { visitID } = payload
+        const response = yield call(service.saveCORForm, visitID, payload)
+        return response
+      },
+
+      *getCORForm ({ payload }, { call, put, select }) {
+        const response = yield call(service.queryCORForm, payload)
+        const { data, status } = response
+        if (status === '200') {
+          return data
+        }
+        return false
+      },
+
+      *getVisitForm ({ payload }, { call, put, select }) {
+        const response = yield call(service.queryVisitForm, payload)
+        const { data, status } = response
+        if (status === '200') {
           return data
         }
         return false
@@ -79,74 +125,74 @@ export default createListViewModel({
           list: data.data.map((o) => {
             return {
               ...o,
-              formData: JSON.parse(o.formData),
               typeName: formTypes.find((t) => t.value === o.type).name,
             }
           }),
         }
       },
 
-      queryFormDone (st, { payload }) {
+      queryCORFormsDone (st, { payload }) {
         const { data } = payload
-        const {
-          id,
-          currentCORId,
-          visitDate,
-          doctorProfileFK,
-          patientName,
-          patientNRICNo,
-          patientAccountNo,
-          isCanEditForms,
-          corDiagnosis,
-        } = data
+        const { id, currentCORId, visitDate, isCanEditForms } = data
         let formRows = []
-        if (data.formType === 'VisitForm') {
-          visitFormTypes.forEach((p) => {
-            formRows = formRows.concat(
-              (data[p.prop] || []).map((o) => {
-                const d = {
-                  uid: getUniqueId(),
-                  type: p.value,
-                  typeName: p.name,
-                  ...o,
-                  formData: JSON.parse(o.formData),
-                  statusFK: 1,
-                  isCanEditForms,
-                }
-                return d
-              }),
-            )
-          })
-        } else {
-          formTypes.forEach((p) => {
-            formRows = formRows.concat(
-              (data[p.prop] || []).map((o) => {
-                const d = {
-                  uid: getUniqueId(),
-                  type: p.value,
-                  typeName: p.name,
-                  ...o,
-                  formData: JSON.parse(o.formData),
-                  isCanEditForms,
-                }
-                return d
-              }),
-            )
-          })
-        }
+        formTypes.forEach((p) => {
+          formRows = formRows.concat(
+            (data[p.prop] || []).map((o) => {
+              const d = {
+                uid: getUniqueId(),
+                type: p.value,
+                typeName: p.name,
+                ...o,
+                formData: JSON.parse(o.formData),
+                isCanEditForms,
+              }
+              return d
+            }),
+          )
+        })
 
         return {
           ...st,
           visitDetail: {
+            ...st.visitDetail,
             visitID: id,
             currentCORId,
             visitDate,
-            doctorProfileFK,
-            patientName,
-            patientNRICNo,
-            patientAccountNo,
             isCanEditForms,
-            cORDiagnosis: corDiagnosis,
+          },
+          list: _.sortBy(formRows, 'sequence'),
+        }
+      },
+
+      queryVisitFormsDone (st, { payload }) {
+        const { data } = payload
+        const { id, currentCORId, visitDate, isCanEditForms } = data
+        let formRows = []
+        visitFormTypes.forEach((p) => {
+          formRows = formRows.concat(
+            (data[p.prop] || []).map((o) => {
+              const d = {
+                uid: getUniqueId(),
+                type: p.value,
+                typeName: p.name,
+                ...o,
+                formData: JSON.parse(o.formData),
+                statusFK: 1,
+                isCanEditForms,
+              }
+              return d
+            }),
+          )
+        })
+
+        return {
+          ...st,
+          visitDetail: {
+            ...st.visitDetail,
+            visitID: id,
+            currentCORId,
+            visitDate,
+            isCanEditForms,
           },
           list: _.sortBy(formRows, 'sequence'),
         }

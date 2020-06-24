@@ -12,7 +12,7 @@ import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import Authorized from '@/utils/Authorized'
 
 const InitialSessionInfo = {
-  isClinicSessionClosed: true,
+  isClinicSessionClosed: undefined,
   id: '',
   // sessionNo: `${moment().format('YYMMDD')}-01`,
   sessionNo: 'N/A',
@@ -212,6 +212,8 @@ export default createListViewModel({
 
           return true
         }
+        InitialSessionInfo.isClinicSessionClosed = true
+
         yield put({
           type: 'updateSessionInfo',
           payload: { ...InitialSessionInfo },

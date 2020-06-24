@@ -63,55 +63,9 @@ const procuderesSchema = Yup.object().shape({
         patientName,
         patientNRICNo,
         patientAccountNo,
-        cORDiagnosis = [],
       } = visitDetail
       const { doctorprofile } = codetable
       const doctor = doctorprofile.find((o) => o.id === doctorProfileFK)
-      const activeICD10AM = cORDiagnosis.filter((o) => o.diagnosisICD10AMFK)
-      // create principalDiagnosis
-      let principalDiagnosisFK
-      let principalDiagnosisCode
-      let principalDiagnosisName
-      if (activeICD10AM.length > 0) {
-        principalDiagnosisFK = activeICD10AM[0].diagnosisICD10AMFK
-        principalDiagnosisCode = activeICD10AM[0].diagnosisICD10AMCode
-        principalDiagnosisName = activeICD10AM[0].diagnosisICD10AMName
-      }
-
-      // create secondDiagnosisA
-      let secondDiagnosisAFK
-      let secondDiagnosisACode
-      let secondDiagnosisAName
-      if (activeICD10AM.length > 1) {
-        secondDiagnosisAFK = activeICD10AM[1].diagnosisICD10AMFK
-        secondDiagnosisACode = activeICD10AM[1].diagnosisICD10AMCode
-        secondDiagnosisAName = activeICD10AM[1].diagnosisICD10AMName
-      }
-
-      // create secondDiagnosisB
-      let secondDiagnosisBFK
-      let secondDiagnosisBCode
-      let secondDiagnosisBName
-      if (activeICD10AM.length > 2) {
-        secondDiagnosisBFK = activeICD10AM[2].diagnosisICD10AMFK
-        secondDiagnosisBCode = activeICD10AM[2].diagnosisICD10AMCode
-        secondDiagnosisBName = activeICD10AM[2].diagnosisICD10AMName
-      }
-
-      // create otherDiagnosis
-      let otherDiagnosis = []
-      if (activeICD10AM.length > 3) {
-        let uid = -1
-        for (let index = 2; index < activeICD10AM.length; index++) {
-          otherDiagnosis.push({
-            uid,
-            diagnosisFK: activeICD10AM[index].diagnosisICD10AMFK,
-            diagnosisCode: activeICD10AM[index].diagnosisICD10AMCode,
-            diagnosisName: activeICD10AM[index].diagnosisICD10AMName,
-          })
-          uid -= 1
-        }
-      }
 
       let title
       if (doctor) {
@@ -131,16 +85,6 @@ const procuderesSchema = Yup.object().shape({
           patientAccountNo,
           admissionDate: visitDate,
           dischargeDate: visitDate,
-          principalDiagnosisFK,
-          principalDiagnosisCode,
-          principalDiagnosisName,
-          secondDiagnosisAFK,
-          secondDiagnosisACode,
-          secondDiagnosisAName,
-          secondDiagnosisBFK,
-          secondDiagnosisBCode,
-          secondDiagnosisBName,
-          otherDiagnosis,
           principalSurgeonFK: doctorProfileFK,
           principalSurgeonMCRNo: doctor ? doctor.doctorMCRNo : undefined,
           principalSurgeonName: doctor
@@ -209,12 +153,6 @@ const procuderesSchema = Yup.object().shape({
   displayName: 'LCForm',
 })
 class LCForm extends PureComponent {
-  constructor (props) {
-    super(props)
-
-    this.myRef = React.createRef()
-  }
-
   onSubmitButtonClicked = async (action) => {
     const {
       dispatch,
@@ -277,53 +215,55 @@ class LCForm extends PureComponent {
         }
       }
       const { currentCORId, visitID } = visitDetail
-      dispatch({
-        type: 'formListing/saveForm',
-        payload: {
-          visitID,
-          currentCORId,
-          formType:
-            formCategory === FORM_CATEGORY.VISITFORM ? 'VisitForm' : 'CORForm',
-          UpdateType: values.type,
-          visitLetterOfCertification:
-            formCategory === FORM_CATEGORY.VISITFORM
-              ? [
-                  {
-                    ...saveData,
-                  },
-                ]
-              : [],
-          corLetterOfCertification:
-            formCategory === FORM_CATEGORY.CORFORM
-              ? [
-                  {
-                    ...saveData,
-                  },
-                ]
-              : [],
-        },
-      }).then((r) => {
-        if (r) {
-          resetForm()
-          if (onConfirm) onConfirm()
-          if (formFrom === FORM_FROM.FORMMODULE) {
+      if (formCategory === FORM_CATEGORY.VISITFORM) {
+        dispatch({
+          type: 'formListing/saveVisitForm',
+          payload: {
+            ...saveData,
+            visitID,
+          },
+        }).then((r) => {
+          if (r) {
+            resetForm()
+            if (onConfirm) onConfirm()
             this.props.dispatch({
-              type: 'formListing/query',
-            })
-          } else if (formFrom === FORM_FROM.QUEUELOG) {
-            this.props.dispatch({
-              type: 'formListing/getVisitForm',
+              type: 'formListing/getVisitForms',
               payload: {
                 id: formListing.visitID,
-                formType:
-                  formCategory === FORM_FROM.FORMMODULE
-                    ? 'VisitForm'
-                    : 'CORForm',
               },
             })
           }
-        }
-      })
+        })
+      } else {
+        dispatch({
+          type: 'formListing/saveCORForm',
+          payload: {
+            ...saveData,
+            visitID,
+            ClinicalObjectRecordFK:
+              saveData.id && saveData.id > 0
+                ? saveData.ClinicalObjectRecordFK
+                : currentCORId,
+          },
+        }).then((r) => {
+          if (r) {
+            resetForm()
+            if (onConfirm) onConfirm()
+            if (formFrom === FORM_FROM.FORMMODULE) {
+              this.props.dispatch({
+                type: 'formListing/query',
+              })
+            } else if (formFrom === FORM_FROM.QUEUELOG) {
+              this.props.dispatch({
+                type: 'formListing/getCORForms',
+                payload: {
+                  id: formListing.visitID,
+                },
+              })
+            }
+          }
+        })
+      }
     }
   }
 

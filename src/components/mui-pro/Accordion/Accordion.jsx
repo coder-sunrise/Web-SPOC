@@ -23,7 +23,7 @@ const styles = (theme) => ({
     borderColor: '#AAAAAA',
     borderStyle: 'solid',
     borderWidth: 'thin',
-    marginTop: theme.spacing(1),
+    // marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
   },
   expansionPanelExpanded: {
@@ -37,10 +37,8 @@ class Accordion extends React.Component {
     super(props)
     this.state = {
       active: Array.isArray(props.defaultActive)
-        ? props.defaultActive
-        : [
-            props.defaultActive,
-          ],
+        ? props.defaultActive[0]
+        : props.defaultActive,
       activedKeys: Array.isArray(props.defaultActive)
         ? props.defaultActive
         : [

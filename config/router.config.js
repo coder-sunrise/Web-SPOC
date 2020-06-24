@@ -462,7 +462,7 @@ const _routes = [
             ],
           },
           {
-            path: '/finance/statement/editstatement',
+            path: '/finance/statement/editstatement/:id',
             name: 'statement/editstatement',
             hideInMenu: true,
             component: './Finance/Statement/NewStatement/AddNewStatement',
@@ -1174,12 +1174,12 @@ const _routes = [
             ],
           },
           {
-              path: '/setting/refractiontesttype',
-              name: 'refractiontesttype',
-              component: './Setting/RefractionTestType',
-              authority: [
-                  'settings.clinicsetting.refractiontesttype',
-              ],
+            path: '/setting/refractiontesttype',
+            name: 'refractiontesttype',
+            component: './Setting/RefractionTestType',
+            authority: [
+              'settings.clinicsetting.refractiontesttype',
+            ],
           },
         ],
       },

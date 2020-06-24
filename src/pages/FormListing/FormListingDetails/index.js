@@ -104,14 +104,21 @@ class FormListingDetails extends PureComponent {
         },
       })
     } else if (formFrom === FORM_FROM.QUEUELOG) {
-      this.props.dispatch({
-        type: 'formListing/getVisitForm',
-        payload: {
-          id: formListing.visitID,
-          formType:
-            formCategory === FORM_FROM.FORMMODULE ? 'VisitForm' : 'CORForm',
-        },
-      })
+      if (formCategory === FORM_CATEGORY.VISITFORM) {
+        this.props.dispatch({
+          type: 'formListing/getVisitForms',
+          payload: {
+            id: formListing.visitID,
+          },
+        })
+      } else {
+        this.props.dispatch({
+          type: 'formListing/getCORForms',
+          payload: {
+            id: formListing.visitID,
+          },
+        })
+      }
     }
   }
 

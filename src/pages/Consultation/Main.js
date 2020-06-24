@@ -1,67 +1,37 @@
-import React, { PureComponent, Suspense } from 'react'
+import React from 'react'
 import { connect } from 'dva'
 import router from 'umi/router'
 import _ from 'lodash'
-import $ from 'jquery'
-import classnames from 'classnames'
 import numeral from 'numeral'
 import Timer from 'react-compound-timer'
 
-import { Menu, Dropdown } from 'antd'
-import {
-  FormControl,
-  InputLabel,
-  Input,
-  Paper,
-  withStyles,
-  IconButton,
-  Fade,
-  ClickAwayListener,
-  Divider,
-  Fab,
-  Slide,
-  Drawer,
-} from '@material-ui/core'
-import PlayArrow from '@material-ui/icons/PlayArrow'
-import Pause from '@material-ui/icons/Pause'
-import TimerIcon from '@material-ui/icons/Timer'
 
 import {
-  CardContainer,
-  TextField,
-  Button,
-  CommonHeader,
+  withStyles,
+} from '@material-ui/core'
+import TimerIcon from '@material-ui/icons/Timer'
+import AutoPrintSelection from './autoPrintSelection'
+import {
   CommonModal,
-  PictureUpload,
   GridContainer,
   GridItem,
-  Card,
-  CardAvatar,
-  CardBody,
   notification,
-  Select,
-  DatePicker,
-  CheckboxGroup,
   ProgressButton,
-  Checkbox,
-  confirm,
   SizeContainer,
-  Popconfirm,
   withFormikExtend,
-  FastField,
   NumberInput,
-  Skeleton,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 
-import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
+import { getAppendUrl, navigateDirtyCheck, commonDataReaderTransform } from '@/utils/utils'
+import { convertToConsultation, convertConsultationDocument } from '@/pages/Consultation/utils'
 // import model from '@/pages/Widgets/Orders/models'
 import { VISIT_TYPE } from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { CallingQueueButton } from '@/components/_medisys'
-import { initRoomAssignment } from '@/utils/codes'
-import { convertToConsultation } from './utils'
+import { initRoomAssignment, consultationDocumentTypes, ReportsOnSignOffOption } from '@/utils/codes'
+
 
 // import PatientSearch from '@/pages/PatientDatabase/Search'
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
@@ -70,10 +40,87 @@ import Layout from './Layout'
 
 import schema from './schema'
 import styles from './style'
+import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
 // window.g_app.replaceModel(model)
 
 const discardMessage = 'Discard consultation?'
 const formName = 'ConsultationPage'
+
+const generatePrintData = async (settings, consultationDocument, user, patient, orders, visitEntity) => {
+  let documents = convertConsultationDocument(consultationDocument)
+  const {
+    autoPrintOnSignOff,
+    autoPrintReportsOnSignOff,
+  } = settings
+
+  if (autoPrintOnSignOff === true) {
+    let reportsOnSignOff = autoPrintReportsOnSignOff.split(',')
+    const { corMemo, corCertificateOfAttendance, corMedicalCertificate, corOtherDocuments, corReferralLetter, corVaccinationCert } = documents
+    let printData = []
+
+    let doctor = user.data.clinicianProfile
+    const doctorName = (doctor.title ? `${doctor.title} ` : '') + doctor.name
+    const doctorMCRNo = doctor.doctorProfile
+      ? doctor.doctorProfile.doctorMCRNo
+      : ''
+    const patientName = patient.entity.name
+    const { patientAccountNo } = patient.entity
+
+    let getPrintData = (type, list) => {
+      if (list && list.length > 0) {
+        const documentType = consultationDocumentTypes.find(
+          (o) =>
+            o.name === type ,
+        )
+        return list.filter((item) => !item.isDeleted).map((item) => ({
+          item: type,
+          description: `  ${item.subject ?? ''}`,
+          Copies: 1,
+          print: true,
+          ReportId: documentType.downloadConfig.id,
+          ReportData: `${JSON.stringify(commonDataReaderTransform(
+            documentType.downloadConfig.draft(
+              {
+                ...item,
+                doctorName,
+                doctorMCRNo,
+                patientName,
+                patientAccountNo,
+              })))}`,
+        }))
+      }
+      return []
+    }
+    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.DrugLabel) > -1) {
+      // const { versionNumber } = values
+      // versionNumber === 1 && 
+      if (orders && orders.rows) {
+        const { rows = [] } = orders
+        // prescriptionItems
+        const prescriptionItems = rows.filter(
+          (f) => f.type === '1' && !f.isDeleted,
+        )
+        let drugLabelData = await getDrugLabelPrintData(settings, patient.entity, visitEntity.id, prescriptionItems)
+        if (drugLabelData && drugLabelData.length > 0)
+          printData = printData.concat(drugLabelData)
+      }
+    }
+    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.Memo) > -1)
+      printData = printData.concat(getPrintData('Memo', corMemo))
+    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.MedicalCertificate) > -1)
+      printData = printData.concat(getPrintData('Medical Certificate', corMedicalCertificate))
+    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.CertificateofAttendance) > -1)
+      printData = printData.concat(getPrintData('Certificate of Attendance', corCertificateOfAttendance))
+    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.OtherDocuments) > -1)
+      printData = printData.concat(getPrintData('Others', corOtherDocuments))
+    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.ReferralLetter) > -1)
+      printData = printData.concat(getPrintData('Referral Letter', corReferralLetter))
+    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.VaccinationCertificate) > -1)
+      printData = printData.concat(getPrintData('Vaccination Certificate', corVaccinationCert))
+    return printData
+  }
+  return []
+}
 const saveConsultation = ({
   props,
   action,
@@ -85,7 +132,6 @@ const saveConsultation = ({
   const {
     dispatch,
     values,
-    consultation,
     consultationDocument = {},
     corEyeRefractionForm,
     orders = {},
@@ -148,6 +194,7 @@ const saveConsultation = ({
   }
 }
 
+
 const discardConsultation = ({
   dispatch,
   values,
@@ -179,19 +226,6 @@ const discardConsultation = ({
   }
 }
 
-// const getRights = (values) => {
-//   return {
-//     view: {
-//       name: 'consultation.view',
-//       rights: values.status === 'PAUSED' ? 'disable' : 'enable',
-//     },
-//     edit: {
-//       name: 'consultation.edit',
-//       rights: values.status === 'PAUSED' ? 'disable' : 'enable',
-//     },
-//   }
-// }
-
 // @skeleton()
 @connect(
   ({
@@ -204,6 +238,8 @@ const discardConsultation = ({
     formik,
     cestemplate,
     clinicSettings,
+    user,
+    patient,
     forms,
   }) => ({
     clinicInfo,
@@ -215,6 +251,8 @@ const discardConsultation = ({
     formik,
     cestemplate,
     clinicSettings: clinicSettings.settings || clinicSettings.default,
+    user,
+    patient,
     forms,
   }),
 )
@@ -233,16 +271,80 @@ const discardConsultation = ({
   dirtyCheckMessage: discardMessage,
   notDirtyDuration: 0, // this page should alwasy show warning message when leave
   onDirtyDiscard: discardConsultation,
-  handleSubmit: (values, { props }) => {
-    saveConsultation({
-      props: {
-        values,
-        ...props,
-      },
-      confirmMessage: 'Confirm sign off current consultation?',
-      successMessage: 'Consultation signed',
-      action: 'sign',
-    })
+  handleSubmit: async (values, { props }) => {
+    const { versionNumber } = values
+    const {
+      dispatch,
+      handlePrint,
+    } = props
+    let printData = []
+    if (versionNumber === 1) {
+      let settings = JSON.parse(localStorage.getItem('clinicSettings'))
+      const {
+        autoPrintOnSignOff,
+      } = settings
+
+      if (autoPrintOnSignOff === true) {
+        const {
+          consultationDocument = {},
+          orders = {},
+          visitRegistration: { entity: visitEntity },
+          patient,
+        } = props
+        printData = await generatePrintData(settings, consultationDocument, props.user, patient, orders, visitEntity)
+      }
+    }
+    if (printData && printData.length > 0) {
+      dispatch({
+        type: 'consultation/showSignOffModal',
+        payload: {
+          showSignOffModal: true,
+          printData,
+          onSignOffConfirm: (result) => {
+            saveConsultation({
+              props: {
+                values,
+                ...props,
+              },
+              shouldPromptConfirm: false,
+              action: 'sign',
+              successCallback: () => {
+                if (result && result.length > 0) {
+                  dispatch({ type: `consultation/closeSignOffModal` })
+                  let printedData = result
+                  if (printedData && printedData.length > 0) {
+                    const token = localStorage.getItem('token')
+                    printedData = printedData.map((item) => ({
+                      ReportId: item.ReportId,
+                      DocumentName: `${item.item}(${item.description})`,
+                      ReportData: item.ReportData,
+                      Copies: item.Copies,
+                      Token: token,
+                      BaseUrl: process.env.url,
+                    }))
+                    handlePrint(JSON.stringify(printedData))
+                  }
+                }
+                props.dispatch({ type: 'consultation/closeModal' })
+              },
+            })
+          },
+        },
+      })
+    } else {
+      saveConsultation({
+        props: {
+          values,
+          ...props,
+        },
+        confirmMessage: 'Confirm sign off current consultation?',
+        successMessage: 'Consultation signed',
+        action: 'sign',
+        successCallback: () => {
+          props.dispatch({ type: 'consultation/closeModal' })
+        },
+      })
+    }
   },
   displayName: formName,
 })
@@ -251,7 +353,7 @@ class Main extends React.Component {
     recording: true,
   }
 
-  componentDidMount() {
+  componentDidMount () {
     // console.log('Main')
     initRoomAssignment()
     setTimeout(() => {
@@ -259,7 +361,7 @@ class Main extends React.Component {
     }, 500)
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     this.props.dispatch({
       type: 'consultation/updateState',
       payload: {
@@ -271,6 +373,11 @@ class Main extends React.Component {
   shouldComponentUpdate = (nextProps) => {
     if (nextProps.values.id !== this.props.values.id) return true
     if (nextProps.consultation.version !== this.props.consultation.version)
+      return true
+    if (
+      nextProps.consultation.showSignOffModal !==
+      this.props.consultation.showSignOffModal
+    )
       return true
     if (
       nextProps.visitRegistration.version !==
@@ -369,6 +476,7 @@ class Main extends React.Component {
     const { visit = {} } = vistEntity
     const { id: visitId } = visit
     const successCallback = () => {
+      dispatch({ type: 'consultation/closeModal' })
       dispatch({
         type: 'consultation/completeBillFirstOrder',
         payload: {
@@ -389,7 +497,8 @@ class Main extends React.Component {
   }
 
   signOffOnly = () => {
-    const { values } = this.props
+    const { values, dispatch } = this.props
+
     saveConsultation({
       props: {
         values,
@@ -398,6 +507,9 @@ class Main extends React.Component {
       successMessage: 'Consultation signed',
       shouldPromptConfirm: false,
       action: 'sign',
+      successCallback: () => {
+        dispatch({ type: 'consultation/closeModal' })
+      },
     })
   }
 
@@ -488,7 +600,7 @@ class Main extends React.Component {
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)
- 
+
     return (
       <SizeContainer size='sm'>
         <div
@@ -600,7 +712,7 @@ class Main extends React.Component {
                   ) : null
               }}
             </Authorized>
-            {clinicSettings.showTotalInvoiceAmtInConsultation ?
+            {clinicSettings.showTotalInvoiceAmtInConsultation ? (
               <GridItem>
                 <h4 style={{ position: 'relative', marginTop: 0 }}>
                   Total Invoice
@@ -609,10 +721,10 @@ class Main extends React.Component {
                       &nbsp;:&nbsp;
                       <NumberInput text currency value={summary.totalWithGST} />
                     </span>
-                    )}
+                  )}
                 </h4>
               </GridItem>
-              : null}
+            ) : null}
             <GridItem style={{ display: 'flex' }}>
               <Authorized authority='openqueuedisplay'>
                 <div style={{ marginRight: 10 }}>
@@ -776,24 +888,9 @@ class Main extends React.Component {
     })
   }
 
-  // // eslint-disable-next-line camelcase
-  // UNSAFE_componentWillReceiveProps (nextProps) {
-  //   // console.log('UNSAFE_componentWillReceiveProps', this.props, nextProps)
-  //   // console.log(
-  //   //   nextProps.consultation,
-  //   //   nextProps.consultation.consultationID,
-  //   //   this.props.consultation.consultationID !==
-  //   //     nextProps.consultation.consultationID,
-  //   // )
-  //   if (
-  //     nextProps.consultation &&
-  //     nextProps.consultation.entity &&
-  //     nextProps.consultation.entity.concurrencyToken !==
-  //       nextProps.values.concurrencyToken
-  //   ) {
-  //     nextProps.resetForm(nextProps.consultation.entity)
-  //   }
-  // }
+  onCloseSignOffModal = () => {
+    this.props.dispatch({ type: `consultation/closeSignOffModal` })
+  }
 
   // componentWillUnmount () {
   //   this.props.dispatch({
@@ -805,7 +902,7 @@ class Main extends React.Component {
   //     },
   //   })
   // }
-  componentWillUnmount() {
+  componentWillUnmount () {
     this.props.dispatch({
       type: 'consultation/updateState',
       payload: {
@@ -814,7 +911,7 @@ class Main extends React.Component {
     })
   }
 
-  render() {
+  render () {
     const { props, state } = this
     const {
       classes,
@@ -829,7 +926,8 @@ class Main extends React.Component {
       disabled,
       ...resetProps
     } = this.props
-    const { entity } = consultation
+    console.log(consultation)
+    const { entity, showSignOffModal, printData, onSignOffConfirm } = consultation
     const { entity: vistEntity = {} } = visitRegistration
     // if (!vistEntity) return null
     const { visit = {} } = vistEntity
@@ -837,7 +935,7 @@ class Main extends React.Component {
     // const { adjustments, total, gst, totalWithGst } = summary
     // console.log('values', values, this.props)
     // console.log(currentLayout)
-    // console.log(values)
+    console.log(printData)
     const matches = {
       rights:
         rights === 'enable' && visit.visitStatus === 'PAUSED'
@@ -859,6 +957,18 @@ class Main extends React.Component {
             userDefaultLayout={values.visitConsultationTemplate}
           />
         </Authorized.Context.Provider>
+        <CommonModal
+          cancelText='Cancel'
+          maxWidth='xs'
+          title='Confirm sign off current consultation?'
+          onClose={this.onCloseSignOffModal}
+          open={showSignOffModal}
+        >
+          <AutoPrintSelection
+            data={printData}
+            handleSubmit={onSignOffConfirm}
+          />
+        </CommonModal>
       </div>
     )
   }

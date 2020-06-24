@@ -16,6 +16,7 @@ import {
   OutlinedTextField,
   withFormikExtend,
   Tooltip,
+  RichEditor,
 } from '@/components'
 import { withStyles, TextField } from '@material-ui/core'
 import model from './models'
@@ -129,6 +130,7 @@ class PatientNurseNotes extends PureComponent {
     return refreshResult
   }
 
+  // eslint-disable-next-line react/sort-comp
   resize () {
     if (
       this.divElement &&
@@ -138,107 +140,123 @@ class PatientNurseNotes extends PureComponent {
     ) {
       const hisotoryHeight = $(this.hisoryElement.current).find('div')[0]
         .clientHeight
-      let currentTextArea = $(this.divElement.current).find(
-        'textarea[name=notes]',
-      )[0]
-
-      currentTextArea.style.cssText = `height:${hisotoryHeight - 40}px`
+      let currentBox = $(this.divElement.current).find('.rdw-editor-main')[0]
+      if (currentBox)
+        currentBox.style.cssText = `height:${hisotoryHeight - 75}px`
     }
+  }
+
+  handleEdit = (entity) => {
+    const { dispatch, setFieldValue } = this.props
+
+    dispatch({
+      type: 'patientNurseNotes/updateState',
+      payload: {
+        entity,
+      },
+    })
+
+    setFieldValue('notes', entity.notes || '')
+    let currentBox = $(this.divElement.current).find('.rdw-editor-main')[0]
+    if (currentBox) currentBox.click()
+  }
+
+  onEditorChange = (v) => {
+    const { dispatch, setFieldValue } = this.props
+    setFieldValue('notes', v || '')
   }
 
   render () {
     const {
       dispatch,
-      patientNurseNotes: { refreshTime, list = [] },
+      patientNurseNotes: { entity, list = [] },
       user,
     } = this.props
     const { clinicianProfile } = user.data
 
     return (
-      <div ref={this.divElement}>
-        <GridContainer>
-          <GridItem md={8}>
-            <GridContainer>
-              <GridItem md={12}>
-                <div ref={this.hisoryElement}>
-                  <CardContainer
-                    md={12}
-                    hideHeader
-                    title='History'
+      <GridContainer>
+        <GridItem md={8}>
+          <GridContainer>
+            <GridItem md={12}>
+              <div ref={this.hisoryElement}>
+                <CardContainer
+                  md={12}
+                  hideHeader
+                  title='History'
+                  style={{
+                    height: 'calc(100vh - 255px)',
+                  }}
+                >
+                  <div
                     style={{
-                      height: 'calc(100vh - 255px)',
+                      height: 'calc(100vh - 280px)',
+                      marginTop: '15px',
+                      overflow: 'scroll',
                     }}
                   >
-                    <div
-                      style={{
-                        height: 'calc(100vh - 280px)',
-                        marginTop: '15px',
-                        overflow: 'scroll',
-                      }}
-                    >
-                      {list.map((i) => {
-                        const { createDate, createByUserFK } = i
-                        const canEdit =
-                          clinicianProfile.userProfileFK === createByUserFK &&
-                          moment(createDate).utc().formatUTC(true) ===
-                            moment().formatUTC(true)
-                        return (
-                          <PatientNurseNotesContent
-                            entity={i}
-                            dispatch={dispatch}
-                            canEdit={canEdit}
-                          />
-                        )
-                      })}
-                    </div>
-                  </CardContainer>
-                </div>
-              </GridItem>
-              <GridItem
-                md={6}
-                style={{ textAlign: 'left', fontWeight: 'bold' }}
-              >
-                <span>Total: {list.length} Records</span>
-              </GridItem>
-              <GridItem md={6} style={{ textAlign: 'right' }}>
-                <Button
-                  justIcon
-                  color='primary'
-                  onClick={this.refreshNurseNotes}
-                >
-                  <Tooltip title='Refresh'>
-                    <Refresh />
-                  </Tooltip>
-                </Button>
-                <span>{refreshTime}</span>
-              </GridItem>
-            </GridContainer>
-          </GridItem>
-          <GridContainer md={4}>
-            <GridItem md={12}>
-              <Field
-                name='notes'
-                render={(args) => {
-                  return (
-                    <OutlinedTextField
-                      label='Current'
-                      multiline
-                      rowsMax={2}
-                      rows={2}
-                      {...args}
-                    />
-                  )
-                }}
-              />
+                    {list.map((i) => {
+                      const { createDate, createByUserFK } = i
+                      const canEdit =
+                        clinicianProfile.userProfileFK === createByUserFK &&
+                        moment(createDate).utc().formatUTC(true) ===
+                          moment().formatUTC(true)
+                      return (
+                        <PatientNurseNotesContent
+                          entity={i}
+                          dispatch={dispatch}
+                          canEdit={canEdit}
+                          handleEdit={this.handleEdit}
+                        />
+                      )
+                    })}
+                  </div>
+                </CardContainer>
+              </div>
             </GridItem>
+            <GridItem md={6} style={{ textAlign: 'left', fontWeight: 'bold' }}>
+              <span>Total: {list.length} Records</span>
+            </GridItem>
+          </GridContainer>
+        </GridItem>
+        <GridItem md={4}>
+          <GridContainer>
+            <GridItem md={12}>
+              <CardContainer
+                hideHeader
+                title='Current'
+                style={{
+                  height: 'calc(100vh - 255px)',
+                }}
+              >
+                <GridItem md={12}>
+                  <Field
+                    name='notes'
+                    render={(args) => {
+                      return (
+                        <div ref={this.divElement}>
+                          <RichEditor
+                            strongLabel
+                            autoFocus
+                            onBlur={this.onEditorChange}
+                            {...args}
+                          />
+                        </div>
+                      )
+                    }}
+                  />
+                </GridItem>
+              </CardContainer>
+            </GridItem>
+
             <GridItem md={12} style={{ textAlign: 'end' }}>
               <Button color='primary' onClick={this.props.handleSubmit}>
                 Save
               </Button>
             </GridItem>
           </GridContainer>
-        </GridContainer>
-      </div>
+        </GridItem>
+      </GridContainer>
     )
   }
 }

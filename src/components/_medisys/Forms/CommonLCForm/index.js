@@ -9,20 +9,29 @@ import Certification from './Certification'
 import NonSurgical from './NonSurgical'
 
 class CommonLCForm extends PureComponent {
+  constructor (props) {
+    super(props)
+
+    this.myRef = React.createRef()
+  }
+
+  componentDidMount = () => {
+    const { values } = this.props
+    const { formData } = values
+    if (formData && formData.nonSurgicalCharges.length > 0) {
+      let div = $(this.myRef.current).find('div[aria-expanded]:eq(0)')
+      if (div.attr('aria-expanded') === 'false') div.click()
+    }
+  }
+
   render () {
     const {
-      values,
       height,
       diagnosisSchema,
       surgicalChargesSchema,
       nonSurgicalChargesSchema,
     } = this.props
 
-    const { formData } = values
-    if (formData && formData.nonSurgicalCharges.length > 0) {
-      let div = $(this.myRef.current).find('div[aria-expanded]:eq(0)')
-      if (div.attr('aria-expanded') === 'false') div.click()
-    }
     return (
       <div
         style={{

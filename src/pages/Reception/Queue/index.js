@@ -457,11 +457,26 @@ class Queue extends React.Component {
     })
   }
 
-  showVisitForms = ({ visitID, visitStatus }) => {
-    this.props.dispatch({
+  showVisitForms = async (row) => {
+    const {
+      id,
+      visitStatus,
+      doctor,
+      patientAccountNo,
+      patientName,
+      patientReferenceNo,
+    } = row
+    await this.props.dispatch({
       type: 'formListing/updateState',
       payload: {
-        visitID,
+        visitID: id,
+        visitDetail: {
+          visitID: id,
+          doctorProfileFK: doctor ? doctor.id : 0,
+          patientName,
+          patientNRICNo: patientReferenceNo,
+          patientAccountNo,
+        },
       },
     })
     if (visitStatus === VISIT_STATUS.WAITING) {
@@ -504,24 +519,32 @@ class Queue extends React.Component {
           <CardHeader icon>
             <h3 className={classNames(classes.sessionNo)}>
               {`Session No.: ${sessionNo}`}
-              <Authorized authority='openqueuedisplay'>
-                {lastCall ? (
-                  <font color='red'>
-                    <br />
-                    <b>
-                      NOW SERVING:{' '}
-                      {lastCall.qNo.includes('.') ? (
-                        lastCall.qNo
-                      ) : (
-                        `${lastCall.qNo}.0`
-                      )}
-                    </b>
-                  </font>
-                ) : (
-                  ''
-                )}
-              </Authorized>
             </h3>
+
+            <Authorized authority='openqueuedisplay'>
+              {lastCall ? (
+                <h4
+                  className={classNames(classes.sessionNo)}
+                  style={{
+                    fontSize: 16,
+                    marginTop: 10,
+                    marginLeft: 10,
+                    fontWeight: 'Bold',
+                  }}
+                >
+                  <font color='red'>
+                    NOW SERVING:{' '}
+                    {lastCall.qNo.includes('.') ? (
+                      lastCall.qNo
+                    ) : (
+                      `${lastCall.qNo}.0`
+                    )}
+                  </font>
+                </h4>
+              ) : (
+                ''
+              )}
+            </Authorized>
 
             {!isClinicSessionClosed && (
               <div className={classNames(classes.toolBtns)}>

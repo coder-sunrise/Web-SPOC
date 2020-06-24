@@ -44,13 +44,12 @@ const procuderesSchema = Yup.object().shape({
   surgicalCharges: Yup.array().of(surgicalChargesSchema),
 })
 
-@connect(({ patient, visitRegistration, consultation }) => ({
+@connect(({ patient, visitRegistration }) => ({
   patient: patient.entity,
   visit: visitRegistration.entity.visit,
-  cORDiagnosis: consultation.entity.corDiagnosis,
 }))
 @withFormikExtend({
-  mapPropsToValues: ({ forms, codetable, patient, visit, cORDiagnosis }) => {
+  mapPropsToValues: ({ forms, codetable, patient, visit }) => {
     let values = {}
     if (forms.entity) {
       values = {
@@ -61,53 +60,6 @@ const procuderesSchema = Yup.object().shape({
       const { name, patientReferenceNo, patientAccountNo } = patient
       const { doctorprofile } = codetable
       const doctor = doctorprofile.find((o) => o.id === doctorProfileFK)
-      const activeICD10AM = cORDiagnosis.filter(
-        (o) => !o.isDeleted && o.diagnosisICD10AMFK,
-      )
-      // create principalDiagnosis
-      let principalDiagnosisFK
-      let principalDiagnosisCode
-      let principalDiagnosisName
-      if (activeICD10AM.length > 0) {
-        principalDiagnosisFK = activeICD10AM[0].diagnosisICD10AMFK
-        principalDiagnosisCode = activeICD10AM[0].diagnosisICD10AMCode
-        principalDiagnosisName = activeICD10AM[0].diagnosisICD10AMName
-      }
-
-      // create secondDiagnosisA
-      let secondDiagnosisAFK
-      let secondDiagnosisACode
-      let secondDiagnosisAName
-      if (activeICD10AM.length > 1) {
-        secondDiagnosisAFK = activeICD10AM[1].diagnosisICD10AMFK
-        secondDiagnosisACode = activeICD10AM[1].diagnosisICD10AMCode
-        secondDiagnosisAName = activeICD10AM[1].diagnosisICD10AMName
-      }
-
-      // create secondDiagnosisB
-      let secondDiagnosisBFK
-      let secondDiagnosisBCode
-      let secondDiagnosisBName
-      if (activeICD10AM.length > 2) {
-        secondDiagnosisBFK = activeICD10AM[2].diagnosisICD10AMFK
-        secondDiagnosisBCode = activeICD10AM[2].diagnosisICD10AMCode
-        secondDiagnosisBName = activeICD10AM[2].diagnosisICD10AMName
-      }
-
-      // create otherDiagnosis
-      let otherDiagnosis = []
-      if (activeICD10AM.length > 3) {
-        let uid = -1
-        for (let index = 2; index < activeICD10AM.length; index++) {
-          otherDiagnosis.push({
-            uid,
-            diagnosisFK: activeICD10AM[index].diagnosisICD10AMFK,
-            diagnosisCode: activeICD10AM[index].diagnosisICD10AMCode,
-            diagnosisName: activeICD10AM[index].diagnosisICD10AMName,
-          })
-          uid -= 1
-        }
-      }
 
       let title
       if (doctor) {
@@ -127,16 +79,6 @@ const procuderesSchema = Yup.object().shape({
           patientAccountNo,
           admissionDate: visitDate,
           dischargeDate: visitDate,
-          principalDiagnosisFK,
-          principalDiagnosisCode,
-          principalDiagnosisName,
-          secondDiagnosisAFK,
-          secondDiagnosisACode,
-          secondDiagnosisAName,
-          secondDiagnosisBFK,
-          secondDiagnosisBCode,
-          secondDiagnosisBName,
-          otherDiagnosis,
           principalSurgeonFK: doctorProfileFK,
           principalSurgeonMCRNo: doctor ? doctor.doctorMCRNo : undefined,
           principalSurgeonName: doctor
