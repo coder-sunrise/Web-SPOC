@@ -31,7 +31,7 @@ import { getAppendUrl, getRemovedUrl } from '@/utils/utils'
 import { SendNotification } from '@/utils/notification'
 import Authorized from '@/utils/Authorized'
 import { QueueDashboardButton } from '@/components/_medisys'
-import { VALUE_KEYS } from '@/utils/constants'
+import { VALUE_KEYS, VISIT_TYPE } from '@/utils/constants'
 import { initRoomAssignment } from '@/utils/codes'
 import {
   modelKey,
@@ -442,7 +442,7 @@ class Queue extends React.Component {
   isAssignedDoctor = (row) => {
     if (!row.doctor) return false
     const { doctor: { id }, visitStatus } = row
-    const { clinicianProfile: { doctorProfile } } = this.props.user.data
+    const { clinicianProfile: { doctorProfile } } = this.props.user
 
     if (!doctorProfile) {
       notification.error({
