@@ -485,7 +485,7 @@ class Banner extends PureComponent {
               body={this.displayMedicalProblemData(entity)}
             />
           </GridItem>
-          <GridItem xs={6} md={3}>
+          <GridItem xs={6} md={2}>
             <LoadingWrapper
               loading={refreshingChasBalance}
               text='Retrieving balance...'
@@ -578,6 +578,16 @@ class Banner extends PureComponent {
                 }
               />
             </LoadingWrapper>
+          </GridItem>
+          <GridItem xs={6} md={1}>
+            <Block
+              header={<div style={headerStyles}>Outstanding</div>}
+              body={
+                <div>
+                  <NumberInput text currency value={info.outstandingBalance} />
+                </div>
+              }
+            />
           </GridItem>
           <GridItem xs={12} md={3}>
             {extraCmt}
