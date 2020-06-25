@@ -988,7 +988,7 @@ const calculateAmount = (
         initalRowToal += r[`adjustmen${idx}`]
       }
       if (fa.adjType === 'ExactAmount') {
-        adj = r.weightage * fa.adjValue
+        adj = roundTo(r.weightage * fa.adjValue)
       } else if (fa.adjType === 'Percentage') {
         adj = roundTo(fa.adjValue / 100 * initalRowToal)
       }
