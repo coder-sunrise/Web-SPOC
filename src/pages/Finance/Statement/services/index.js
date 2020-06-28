@@ -6,6 +6,7 @@ const invoiceUrl = '/api/Invoice/InvoicesNotInsideStatment'
 const refreshUrl = '/api/Statement/Refresh'
 const extractUrl = '/api/Statement/ExtractAsSingle'
 const bizSessionUrl = '/api/bizSession'
+const statementPaymentUrl = '/api/StatementPayment'
 
 // const runningNoUrl = '/api/InventoryAdjustment/GenerateRunningNo'
 // const stockUrl = '/api/InventoryAdjustment/StockDetails'
@@ -20,6 +21,16 @@ module.exports = {
   queryInvoiceList: (params) => service.queryList(invoiceUrl, params),
   // queryStockDetails: (params) => service.query(stockUrl, params),
 
+  queryPaymentList: async (params) => service.queryList(statementPaymentUrl, params),
+  queryStatementPaymentById: (statmentPaymentId) => {
+    return service.query(statementPaymentUrl, { id: statmentPaymentId })
+  },
+  cancelPayment: async (id, params) => {
+    await request(`${statementPaymentUrl}/${id}`, {
+      method: 'PUT',
+      body: params,
+    })
+  },
   refresh: async (params) => {
     let r
     if (params.id) {

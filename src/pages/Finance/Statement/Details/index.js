@@ -79,7 +79,7 @@ const styles = () => ({})
     }),
   }),
   handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, history, user, codetable } = props
+    const { dispatch, onConfirm, history, user, codetable, statement } = props
     const {
       paymentCreatedBizSessionFK,
       paymentModeFK,
@@ -160,37 +160,19 @@ const styles = () => ({})
       }
     })
 
-    // values.statementInvoice.forEach((o) => {
-    //   o.statementInvoicePayment.forEach((i) => {
-    //     if (!i.id) {
-    //       const isCashPayment = paymentModeFK === PAYMENT_MODE.CASH
-    //       const paymentAmt = i.invoicePayment.totalAmtPaid
-    //       const roundingAmt = parseFloat(
-    //         Math.abs(paymentAmt - roundToPrecision(paymentAmt, 0.05)).toFixed(
-    //           2,
-    //         ),
-    //       )
-    //       i.invoicePayment = {
-    //         ...i.invoicePayment,
-    //         paymentCreatedBizSessionFK,
-    //         paymentReceivedBizSessionFK: paymentCreatedBizSessionFK,
-    //         paymentReceivedByUserFK,
-    //         invoicePaymentMode: [
-    //           {
-    //             paymentModeFK,
-    //             amt: i.invoicePayment.totalAmtPaid,
-    //             paymentMode: displayValue,
-    //             cashRouding: isCashPayment ? roundingAmt : 0,
-    //           },
-    //         ],
-    //       }
-    //     }
-    //   })
-    // })
-
     const payload = {
       ...values,
       statementInvoice: newPaymentStatementInvoice,
+      newStatementPayment: (newPaymentStatementInvoice && newPaymentStatementInvoice.length > 0) ? {
+        statementFK: values.id,
+        paymentCreatedBizSessionFK,
+        paymentReceivedBizSessionFK: paymentCreatedBizSessionFK,
+        paymentReceivedByUserFK,
+        paymentReceivedDate: moment(paymentDate, serverDateFormat).formatUTC(
+          false,
+        ),
+        Remark: remarks,
+      } : null,
     }
     dispatch({
       type: 'statement/upsert',

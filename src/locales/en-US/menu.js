@@ -49,6 +49,7 @@ export default {
   'menu.finance.statement/newstatement': 'New Statement',
   'menu.finance.statement/editstatement': 'Edit Statement',
   'menu.finance.statement/detail': 'Statement Details',
+  'menu.finance.statement/statementpayment': 'Statement Payment',
   'menu.finance.scheme': 'Scheme',
   'menu.finance.scheme/detail': 'Scheme Detail',
 
