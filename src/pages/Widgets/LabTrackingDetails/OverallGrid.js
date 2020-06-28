@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core'
 import { Edit, Print } from '@material-ui/icons'
 import CommonTableGrid from '@/components/CommonTableGrid'
 import { Button, Tooltip } from '@/components'
+import PatientResultButton from './PatientResultPrintBtn'
 
 class OverallGrid extends PureComponent {
   configs = {
@@ -33,20 +34,10 @@ class OverallGrid extends PureComponent {
         align: 'center',
         width: 100,
         render: (row) => {
+          const { clinicSettings } = this.props
           return (
             <React.Fragment>
-              <Tooltip title='Print Patient Lab Result' placement='bottom'>
-                <Button
-                  size='sm'
-                  color='primary'
-                  justIcon
-                  onClick={() => {
-                    this.props.handlePrintClick(row)
-                  }}
-                >
-                  <Print />
-                </Button>
-              </Tooltip>
+              <PatientResultButton row={row} clinicSettings={clinicSettings} />
               <Tooltip title='Edit Patient Lab Result' placement='bottom'>
                 <Button
                   size='sm'
