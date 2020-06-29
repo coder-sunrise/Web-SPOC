@@ -25,10 +25,14 @@ class PatientGrid extends PureComponent {
         align: 'center',
         width: 100,
         render: (row) => {
-          const { clinicSettings } = this.props
+          const { clinicSettings, handlePrintClick } = this.props
           return (
             <React.Fragment>
-              <PatientResultButton row={row} clinicSettings={clinicSettings} />
+              <PatientResultButton
+                row={row}
+                clinicSettings={clinicSettings}
+                handlePrint={handlePrintClick}
+              />
               <Tooltip title='Edit Patient Lab Result' placement='bottom'>
                 <Button
                   size='sm'

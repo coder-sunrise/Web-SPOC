@@ -37,29 +37,6 @@ const PatientResultButton = ({ handlePrint, clinicSettings, row }) => {
   }
   const closeReportViewer = () => setReportViewerOpen(false)
 
-  const handlePrintLabClick = async () => {
-    const { labelPrinterSize } = clinicSettings
-
-    let reportID = REPORT_ID.PATIENT_LAB_LABEL_80MM_45MM
-
-    if (labelPrinterSize === '8.9cmx3.6cm') {
-      reportID = REPORT_ID.PATIENT_LAB_LABEL_89MM_36MM
-    } else if (labelPrinterSize === '7.6cmx3.8cm') {
-      reportID = REPORT_ID.PATIENT_LAB_LABEL_76MM_38MM
-    }
-
-    const data = await getRawData(reportID, { visitId: row.visitFK })
-    const payload = [
-      {
-        ReportId: reportID,
-        Copies: 1,
-        ReportData: JSON.stringify(data),
-      },
-    ]
-
-    handlePrint(JSON.stringify(payload))
-  }
-
   return (
     <React.Fragment>
       <Popper
@@ -69,7 +46,13 @@ const PatientResultButton = ({ handlePrint, clinicSettings, row }) => {
           <ClickAwayListener onClickAway={closePopper}>
             <MenuList role='menu'>
               <MenuItem>
-                <Button color='primary' onClick={handlePrintLabClick}>
+                <Button
+                  color='primary'
+                  onClick={() => {
+                    closePopper()
+                    handlePrint(row)
+                  }}
+                >
                   Patient Lab Label
                 </Button>
               </MenuItem>
@@ -102,4 +85,4 @@ const PatientResultButton = ({ handlePrint, clinicSettings, row }) => {
   )
 }
 
-export default withWebSocket()(PatientResultButton)
+export default PatientResultButton
