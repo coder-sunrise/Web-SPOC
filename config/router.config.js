@@ -719,7 +719,7 @@ const _routes = [
             name: 'statementsummaryreport',
             component: './Report/StatementSummaryReport',
             authority: [
-              'report.finance.inventorylistingreport',
+              'report.finance.statementsummaryreport',
             ],
           },
         ],
