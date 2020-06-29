@@ -4,13 +4,13 @@ import { withStyles } from '@material-ui/core'
 import { PATIENT_LAB, REPORT_ID } from '@/utils/constants'
 import { CommonModal } from '@/components'
 import { findGetParameter } from '@/utils/utils'
+import withWebSocket from '@/components/Decorator/withWebSocket'
+import { getRawData } from '@/services/report'
 import Detail from './Detail'
 import FilterBar from './FilterBar'
 import OverallGrid from './OverallGrid'
 import PatientGrid from './PatientGrid'
 import model from './models'
-import withWebSocket from '@/components/Decorator/withWebSocket'
-import { getRawData } from '@/services/report'
 
 window.g_app.replaceModel(model)
 
