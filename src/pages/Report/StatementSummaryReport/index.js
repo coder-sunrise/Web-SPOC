@@ -14,7 +14,7 @@ import StatementList from './StatementList'
 import AgeingList from './AgeingList'
 import ReportBase from '../ReportBase'
 
-const reportId = 53
+const reportId = 54
 const fileName = 'Statement Summary Report'
 
 class StatementSummaryReport extends ReportBase {
