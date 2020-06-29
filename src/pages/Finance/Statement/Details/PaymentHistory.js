@@ -255,7 +255,7 @@ class PaymentHistory extends PureComponent {
           maxWidth='lg'
         >
           <ReportViewer
-            reportID={53}
+            reportID={56}
             reportParameters={{
               isSaved: true, StatementPaymentId: this.state.statementPaymentId,
             }}
