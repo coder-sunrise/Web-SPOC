@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import { connect } from 'dva'
 import Print from '@material-ui/icons/Print'
 import Info from '@material-ui/icons/Info'
 import { withStyles } from '@material-ui/core'
@@ -28,11 +29,12 @@ const styles = (theme) => ({
   },
 })
 
-
+@connect(({ statement }) => ({
+  statement,
+}))
 class PaymentHistory extends PureComponent {
   state = {
     open: false,
-    statementPaymentList: [],
     statementPaymentId: 0,
     showError: false,
     errorMessage: '',
@@ -40,7 +42,12 @@ class PaymentHistory extends PureComponent {
   }
 
   componentDidMount () {
-    this.queryPaymentList()
+    this.props.dispatch({
+      type: 'statement/queryPaymentList',
+      payload: {
+        id: this.props.values.id,
+      },
+    })
   }
 
   onCancelReasonChange = (event) => {
@@ -52,7 +59,6 @@ class PaymentHistory extends PureComponent {
   }
 
   handleConfirmDelete = async (id, toggleVisibleCallback) => {
-    console.log({ id })
     if (this.state.cancelReason === '' || this.state.cancelReason === undefined) {
       this.setState({
         showError: true,
@@ -68,7 +74,12 @@ class PaymentHistory extends PureComponent {
         errorMessage: '',
         cancelReason: '',
       })
-      this.queryPaymentList()
+      this.props.dispatch({
+        type: 'statement/refreshAll',
+        payload: {
+          id: this.props.values.id,
+        },
+      })
     }
   }
 
@@ -77,20 +88,6 @@ class PaymentHistory extends PureComponent {
       showError: false,
       errorMessage: '',
       cancelReason: '',
-    })
-  }
-
-  queryPaymentList = async () => {
-    const response = await service.queryPaymentList({
-      pagesize: 999,
-      statementFK: this.props.values.id,
-      sorting: [
-        { columnName: 'paymentReceivedDate', direction: 'desc' },
-        { columnName: 'receiptNo', direction: 'desc' },
-      ],
-    })
-    this.setState({
-      statementPaymentList: response.data.data || [],
     })
   }
 
@@ -121,11 +118,11 @@ class PaymentHistory extends PureComponent {
   }
 
   render () {
-    const { classes } = this.props
+    const { classes, statement: { statementPaymentList } } = this.props
     return (
       <div>
         <CommonTableGrid
-          rows={this.state.statementPaymentList}
+          rows={statementPaymentList}
           onRowDoubleClick={this.showDetails}
           columns={[
             { name: 'receiptNo', title: 'Receipt No.' },

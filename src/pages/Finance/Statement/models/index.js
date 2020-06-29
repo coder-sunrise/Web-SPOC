@@ -21,6 +21,8 @@ export default createListViewModel({
         adjustmentValueType: 'Percentage',
       },
       invoiceList: [],
+      statementPaymentList: [],
+      activeTab: '0',
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -35,6 +37,16 @@ export default createListViewModel({
         //   type: 'queryInvoiceDone',
         //   payload: response,
         // })
+      },
+      *refreshAll ({ payload }, { call, put }) {
+        yield put({
+          type: 'refreshStatement',
+          payload,
+        })
+        yield put({
+          type: 'queryPaymentList',
+          payload,
+        })
       },
 
       *refreshStatement ({ payload }, { call, put }) {
@@ -76,8 +88,27 @@ export default createListViewModel({
           notification.success({ message: 'Deleted' })
         }
       },
+      *queryPaymentList ({ payload }, { call, put }) {
+        const response = yield call(service.queryPaymentList, {
+          pagesize: 999,
+          statementFK: payload.id,
+          sorting: [
+            { columnName: 'paymentReceivedDate', direction: 'desc' },
+            { columnName: 'receiptNo', direction: 'desc' },
+          ],
+        })
+        yield put({
+          type: 'queryPaymentListDone',
+          payload: {
+            statementPaymentList: response.data.data || [],
+          },
+        })
+      },
     },
     reducers: {
+      setActiveTab (st, { payload }) {
+        return { ...st, activeTab: payload.activeTab }
+      },
       queryDone (st, { payload }) {
         const { data } = payload
         return {
@@ -109,6 +140,12 @@ export default createListViewModel({
               ...o,
             }
           }),
+        }
+      },
+      queryPaymentListDone (st, { payload }) {
+        return {
+          ...st,
+          ...payload,
         }
       },
       refreshDone (st, { payload }) {

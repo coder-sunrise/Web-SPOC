@@ -140,6 +140,7 @@ class Details extends PureComponent {
         </GridContainer>
 
         <CommonTableGrid
+          forceRender
           rows={statementInvoice}
           columns={columns}
           columnExtensions={[
@@ -212,8 +213,8 @@ class Details extends PureComponent {
         <p style={{ margin: theme.spacing(1) }}>
           {`Last Refreshed On ${values.lastRefreshTime
             ? moment(values.lastRefreshTime).format(
-                dateFormatLongWithTimeNoSec12h,
-              )
+              dateFormatLongWithTimeNoSec12h,
+            )
             : '-'}`}
         </p>
 

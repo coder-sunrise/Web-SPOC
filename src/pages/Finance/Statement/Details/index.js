@@ -180,7 +180,19 @@ const styles = () => ({})
     }).then((r) => {
       if (r) {
         if (onConfirm) onConfirm()
-        history.push('/finance/statement')
+        dispatch({
+          type: 'statement/refreshAll',
+          payload: {
+            id: statement.currentId,
+          },
+        })
+        dispatch({
+          type: 'statement/setActiveTab',
+          payload: {
+            activeTab: '2',
+          },
+        })
+        // history.push('/finance/statement')
       }
     })
   },
@@ -200,6 +212,15 @@ class StatementDetails extends PureComponent {
     } else {
       history.push('/finance/statement/')
     }
+  }
+
+  componentWillUnmount = () => {
+    this.props.dispatch({
+      type: 'statement/setActiveTab',
+      payload: {
+        activeTab: '0',
+      },
+    })
   }
 
   fetchLatestBizSessions = () => {
@@ -270,7 +291,17 @@ class StatementDetails extends PureComponent {
     })
   }
 
+  onTabChange = (tab) => {
+    this.props.dispatch({
+      type: 'statement/setActiveTab',
+      payload: {
+        activeTab: tab,
+      },
+    })
+  }
+
   render () {
+    const { statement: { activeTab } } = this.props
     return (
       <React.Fragment>
         <Paper>
@@ -280,6 +311,8 @@ class StatementDetails extends PureComponent {
           <Tabs
             style={{ marginTop: 20 }}
             defaultActiveKey='0'
+            onChange={this.onTabChange}
+            activeKey={activeTab}
             options={StatementDetailOption(
               this.props,
               this.fetchLatestBizSessions,
