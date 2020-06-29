@@ -714,6 +714,14 @@ const _routes = [
               'report.inventory.inventorylistingreport',
             ],
           },
+          {
+            path: '/report/statementsummaryreport',
+            name: 'statementsummaryreport',
+            component: './Report/StatementSummaryReport',
+            authority: [
+              'report.finance.inventorylistingreport',
+            ],
+          },
         ],
       },
       // Report
