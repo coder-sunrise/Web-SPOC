@@ -947,9 +947,9 @@ const calculateGSTAdj = ({
   gstValue,
   gstAmtField = 'gstAmount',
 }) => {
-  const gst = roundTo(totalAfterAdj * gstValue / 100)
+  let gst = roundTo(totalAfterAdj * gstValue / 100)
   if (isGSTInclusive) {
-    return { gst, gstAdjustment: 0 }
+    gst = roundTo(totalAfterAdj - totalAfterAdj / (1 + gstValue / 100))
   }
 
   const totalItemizedGST = roundTo(
@@ -1062,7 +1062,7 @@ const calculateAmount = (
       if (isGSTInclusive) {
         r[gstField] = r[adjustedField]
         r[gstAmtField] = roundTo(
-          r[adjustedField] - r[adjustedField] * 1 / (1 + gstValue / 100),
+          r[adjustedField] - r[adjustedField] / (1 + gstValue / 100),
         )
       } else {
         r[gstAmtField] = roundTo(r[adjustedField] * gstValue / 100)
