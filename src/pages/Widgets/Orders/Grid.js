@@ -21,14 +21,7 @@ import { orderTypes } from '@/pages/Consultation/utils'
 import Authorized from '@/utils/Authorized'
 
 // console.log(orderTypes)
-export default ({
-  orders,
-  dispatch,
-  classes,
-  from,
-  codetable,
-  isEditOrder,
-}) => {
+export default ({ orders, dispatch, classes, from, codetable }) => {
   const { rows, summary, finalAdjustments, isGSTInclusive, gstValue } = orders
   const { total, gst, totalWithGST } = summary
   const [
@@ -48,24 +41,6 @@ export default ({
   const adjustments = finalAdjustments.filter((o) => !o.isDeleted)
   const editRow = (row) => {
     if (!row.isActive && row.type !== '5') return
-
-    if (row.type === '7' && from !== 'ca') return
-    let editAccessRight
-    if (from !== 'ca') {
-      const orderType = orderTypes.find((item) => item.value === row.type) || {
-        accessRight: '',
-      }
-      editAccessRight = orderType.accessRight
-    } else {
-      if (row.isOrderedByDoctor) {
-        editAccessRight = 'queue.dispense.editorder.modifydoctororder'
-      } else {
-        editAccessRight = ''
-      }
-    }
-
-    const accessRight = Authorized.check(editAccessRight)
-    if (!accessRight || accessRight.rights !== 'enable') return
 
     dispatch({
       type: 'orders/updateState',
@@ -397,21 +372,12 @@ export default ({
           sortingEnabled: false,
           render: (row) => {
             if (row.type === '7' && from !== 'ca') return null
-            let editAccessRight
-            if (from !== 'ca') {
-              const orderType = orderTypes.find(
-                (item) => item.value === row.type,
-              ) || { accessRight: '' }
-              editAccessRight = orderType.accessRight
-            } else {
-              if (row.isOrderedByDoctor) {
-                editAccessRight = 'queue.dispense.editorder.modifydoctororder'
-              } else {
-                editAccessRight = ''
-              }
-            }
+            const orderType = orderTypes.find(
+              (item) => item.value === row.type,
+            ) || { accessRight: '' }
+            const { accessRight } = orderType
             return (
-              <Authorized authority={editAccessRight}>
+              <Authorized authority={accessRight}>
                 <div>
                   <Tooltip title='Edit'>
                     <Button
