@@ -80,16 +80,19 @@ class Grid extends React.Component {
       queueList = [],
     } = this.props
 
-    const { clinicianProfile: { doctorProfile } } = user.data
+    const { clinicianProfile } = user.data
     if (filter === StatusIndicator.APPOINTMENT) {
       if (selfOnly) {
         return calendarEvents.filter(
           (item) =>
-            doctorProfile ? item.doctorProfileFK === doctorProfile.id : true,
+            clinicianProfile
+              ? item.clinicianProfileFk === clinicianProfile.id
+              : true,
         )
       }
       return calendarEvents
     }
+
     if (filter === StatusIndicator.E_QUEUE) return eQueueEvents
     let data = [
       ...queueList,
