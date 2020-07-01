@@ -17,7 +17,7 @@ import {
 
 // export const baseUrl = 'http://localhost:9300'
 // export const baseUrl = 'http://localhost/SEMR_V2'
-export const baseUrl = 'http://localhost:55314'
+export const baseUrl = process.env.url
 
 const uatUrl = 'https://semr2uat2010.emr.com.sg'
 const localApiUrl = 'http://localhost:55314'
