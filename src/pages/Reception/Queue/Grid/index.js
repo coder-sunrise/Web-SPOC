@@ -115,7 +115,6 @@ class Grid extends React.Component {
       color='primary'
       size='sm'
       onClick={(e) => {
-        console.log({ props: this.props })
         this.props.onContextMenu(row, e)
         e.preventDefault()
         return false
@@ -267,20 +266,6 @@ class Grid extends React.Component {
                       statusTagClicked={statusTagClicked}
                     />
                   ),
-                },
-                {
-                  columnName: 'isTeleConsult',
-                  width: 60,
-                  align: 'left',
-                  render: (row) => {
-                    return row.isTeleConsult ? (
-                      <Tooltip title='TEL-CONS'>
-                        <CallIcon style={{ color: 'green' }} />
-                      </Tooltip>
-                    ) : (
-                      ''
-                    )
-                  },
                 },
                 {
                   columnName: 'action',
