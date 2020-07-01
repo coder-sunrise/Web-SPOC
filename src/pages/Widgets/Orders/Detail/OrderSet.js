@@ -19,7 +19,7 @@ import config from '@/utils/config'
 
 const { qtyFormat } = config
 
-@connect(({ global, codetable, user }) => ({ global, codetable, user }))
+@connect(({ global, codetable }) => ({ global, codetable }))
 @withFormikExtend({
   authority: [
     'queue.consultation.order.orderset',
@@ -36,7 +36,7 @@ const { qtyFormat } = config
     inventoryOrderSetFK: Yup.number().required(),
   }),
   handleSubmit: (values, { props, onConfirm }) => {
-    const { dispatch, orders, codetable, getNextSequence, user } = props
+    const { dispatch, orders, codetable, getNextSequence } = props
     const { rows } = orders
     const {
       ctmedicationusage,
@@ -321,8 +321,6 @@ const { qtyFormat } = config
       const newOrder = getOrderFromOrderSet(orderSetCode, orderSetItems[index])
       if (newOrder) {
         const data = {
-          isOrderedByDoctor:
-            user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
           sequence: nextSequence,
           ...newOrder,
           subject: orderSetItems[index].name,

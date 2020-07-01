@@ -15,7 +15,7 @@ import Yup from '@/utils/yup'
 import { getServices } from '@/utils/codetable'
 import { calculateAdjustAmount } from '@/utils/utils'
 
-@connect(({ codetable, global, user }) => ({ codetable, global, user }))
+@connect(({ codetable, global }) => ({ codetable, global }))
 @withFormikExtend({
   authority: [
     'queue.consultation.order.service',
@@ -30,11 +30,9 @@ import { calculateAdjustAmount } from '@/utils/utils'
   }),
 
   handleSubmit: (values, { props, onConfirm }) => {
-    const { dispatch, orders, currentType, getNextSequence, user } = props
+    const { dispatch, orders, currentType, getNextSequence } = props
     const { rows } = orders
     const data = {
-      isOrderedByDoctor:
-        user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
       sequence: getNextSequence(),
       ...values,
       subject: currentType.getSubject(values),

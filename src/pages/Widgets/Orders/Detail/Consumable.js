@@ -16,7 +16,7 @@ import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 import LowStockInfo from './LowStockInfo'
 
-@connect(({ global, codetable, user }) => ({ global, codetable, user }))
+@connect(({ global, codetable }) => ({ global, codetable }))
 @withFormikExtend({
   authority: [
     'queue.consultation.order.consumable',
@@ -32,17 +32,14 @@ import LowStockInfo from './LowStockInfo'
   }),
 
   handleSubmit: (values, { props, onConfirm }) => {
-    const { dispatch, currentType, getNextSequence, user } = props
+    const { dispatch, currentType, getNextSequence } = props
     let { batchNo } = values
     if (batchNo instanceof Array) {
       if (batchNo && batchNo.length > 0) {
         batchNo = batchNo[0]
       }
     }
-
     const data = {
-      isOrderedByDoctor:
-        user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
       sequence: getNextSequence(),
       ...values,
       subject: currentType.getSubject(values),
