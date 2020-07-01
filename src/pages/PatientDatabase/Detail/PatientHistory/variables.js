@@ -5,6 +5,7 @@ import DispenseHistory from '@/pages/Widgets/DispenseHistory'
 import { PATIENT_HISTORY_TABS } from '@/utils/constants'
 import InvoiceHistory from '@/pages/Widgets/InvoiceHistory'
 import PatientNurseNotes from '@/pages/Widgets/PatientNurseNotes'
+import PatientDeposit from '@/pages/patientdatabase/Detail/patientdeposit'
 
 const addContent = (type, props) => {
   switch (type) {
@@ -18,6 +19,8 @@ const addContent = (type, props) => {
       return <InvoiceHistory mode='integrated' {...props} />
     case PATIENT_HISTORY_TABS.NURSENOTES:
       return <PatientNurseNotes {...props} />
+    case PATIENT_HISTORY_TABS.DEPOSIT:
+      return <PatientDeposit {...props} />
     default:
       return <PatientHistory {...props} />
   }
@@ -41,6 +44,14 @@ export const PatientHistoryTabOption = (props) => {
       content: addContent(PATIENT_HISTORY_TABS.VISIT, props),
     },
     {
+      id: PATIENT_HISTORY_TABS.NURSENOTES,
+      name: 'Nurse Notes',
+      content: addContent(PATIENT_HISTORY_TABS.NURSENOTES, props),
+      authority: [
+        'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
+      ],
+    },
+    {
       id: PATIENT_HISTORY_TABS.DISPENSE,
       name: 'Dispense',
       content: addContent(PATIENT_HISTORY_TABS.DISPENSE, props),
@@ -56,12 +67,12 @@ export const PatientHistoryTabOption = (props) => {
       content: addContent(PATIENT_HISTORY_TABS.INVOICE, props),
     },
     {
-      id: PATIENT_HISTORY_TABS.NURSENOTES,
-      name: 'Nurse Notes',
-      content: addContent(PATIENT_HISTORY_TABS.NURSENOTES, props),
+      id: PATIENT_HISTORY_TABS.DEPOSIT,
+      name: 'Deposit',
       authority: [
-        'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
+        // 'patientdatabase.patientprofiledetails.patienthistory.deposit',
       ],
+      content: addContent(PATIENT_HISTORY_TABS.DEPOSIT, props),
     },
   ]
   return Tabs.filter((f) => checkAccessRight(f.authority))
