@@ -9,6 +9,7 @@ import { primaryColor } from 'mui-pro-jss'
 import {
   StatusIndicator,
   ContextMenuOptions,
+  AppointmentContextMenu,
   filterMap,
   VISIT_STATUS,
 } from '../variables'
@@ -114,8 +115,30 @@ const ContextMenu = ({
     isRetailVisit ||
     (isBillFirstVisit && !row.hasSignedCOR)
 
-  const contextMenuOptions = useMemo(() =>
-    ContextMenuOptions.map((opt) => {
+  const contextMenuOptions = useMemo(() => {
+    if (row.visitStatus === VISIT_STATUS.UPCOMING_APPT) {
+      return AppointmentContextMenu.map((opt) => {
+        let mobileAppointment = row.dataSourceFK === 2
+        switch (opt.id) {
+          case 8: // register visit
+            return {
+              ...opt,
+              disabled: !row.patientProfileFk || mobileAppointment,
+              hidden: !row.patientProfileFk || mobileAppointment,
+            }
+          case 9: // register patient
+            return {
+              ...opt,
+              disabled: !!row.patientProfileFk || mobileAppointment,
+              hidden: !!row.patientProfileFk || mobileAppointment,
+            }
+          default:
+            return { ...opt }
+        }
+      })
+    }
+
+    return ContextMenuOptions.map((opt) => {
       const isDisabled = rights === 'disable'
       switch (opt.id) {
         case 0: // edit visit
@@ -155,8 +178,8 @@ const ContextMenu = ({
         default:
           return { ...opt }
       }
-    }),
-  )
+    })
+  })
 
   const MenuItemsOverlay = (
     <Menu

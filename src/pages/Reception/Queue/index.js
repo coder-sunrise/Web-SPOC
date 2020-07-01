@@ -84,7 +84,15 @@ const styles = (theme) => ({
 })
 
 @connect(
-  ({ queueLog, patientSearch, loading, user, patient, queueCalling }) => ({
+  ({
+    queueLog,
+    patientSearch,
+    loading,
+    user,
+    patient,
+    queueCalling,
+    codetable,
+  }) => ({
     patientSearchResult: patientSearch.list,
     queueLog,
     loading,
@@ -92,6 +100,7 @@ const styles = (theme) => ({
     patient: patient.entity,
     DefaultPatientProfile: patient.default,
     queueCalling,
+    codetable,
   }),
 )
 class Queue extends React.Component {
