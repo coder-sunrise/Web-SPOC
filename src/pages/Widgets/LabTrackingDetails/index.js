@@ -28,7 +28,7 @@ const styles = (theme) => ({
 
 @connect(({ labTrackingDetails, clinicSettings }) => ({
   labTrackingDetails,
-  clinicSettings,
+  clinicSettings: clinicSettings.settings,
 }))
 class LabTrackingDetails extends PureComponent {
   state = {
