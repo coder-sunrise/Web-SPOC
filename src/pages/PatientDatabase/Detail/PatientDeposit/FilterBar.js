@@ -22,9 +22,7 @@ import {
   CommonModal,
 } from '@/components'
 import Modal from '@/pages/Finance/Deposit/Modal'
-import depositModel from '@/pages/Finance/Deposit/models/deposit'
 
-window.g_app.replaceModel(depositModel)
 class FilterBar extends PureComponent {
   constructor (props) {
     super(props)
@@ -36,11 +34,11 @@ class FilterBar extends PureComponent {
     // const { setFieldValue } = props
   }
 
-  componentDidMount = () => {
-    setTimeout(() => {
-      this.searchResult()
-    }, 100)
-  }
+  // componentDidMount = () => {
+  //   setTimeout(() => {
+  //     this.searchResult()
+  //   }, 100)
+  // }
 
   openReportViewer = () => {
     this.setState({ reportViewerOpen: true })
@@ -50,21 +48,8 @@ class FilterBar extends PureComponent {
     this.setState({ reportViewerOpen: false })
   }
 
-  searchResult = () => {
-    const { dispatch } = this.props
-    const patientId = Number(findGetParameter('pid'))
-
-    dispatch({
-      type: 'patient/queryDeposit',
-      payload: {
-        id: patientId,
-      },
-    })
-  }
-
   addDepositRefund = async (isDeposit) => {
     const { dispatch, patient: { deposit } } = this.props
-    console.log(deposit)
     if (deposit && deposit.id > 0) {
       await dispatch({
         type: 'deposit/queryOne',
@@ -92,7 +77,7 @@ class FilterBar extends PureComponent {
     this.setState((prevState) => ({
       showDepositRefundModal: !prevState.showDepositRefundModal,
     }))
-    this.searchResult()
+    this.props.refresh()
   }
 
   render () {

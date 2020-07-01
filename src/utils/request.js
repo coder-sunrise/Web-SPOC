@@ -5,19 +5,19 @@ import hash from 'hash.js'
 import queryString from 'query-string'
 import $ from 'jquery'
 import { notification } from '@/components'
+import { checkIsCodetableAPI, refreshCodetable } from '@/utils/codetable'
+import { sendNotification } from '@/utils/realtime'
+import { NOTIFICATION_STATUS, NOTIFICATION_TYPE } from '@/utils/constants'
 import {
   isAntdPro,
   updateLoadingState,
   commonDataWriterTransform,
   commonDataReaderTransform,
 } from './utils'
-import { checkIsCodetableAPI, refreshCodetable } from '@/utils/codetable'
-import { sendNotification } from '@/utils/realtime'
-import { NOTIFICATION_STATUS, NOTIFICATION_TYPE } from '@/utils/constants'
 
 // export const baseUrl = 'http://localhost:9300'
 // export const baseUrl = 'http://localhost/SEMR_V2'
-export const baseUrl = process.env.url
+export const baseUrl = 'http://localhost:55314'
 
 const uatUrl = 'https://semr2uat2010.emr.com.sg'
 const localApiUrl = 'http://localhost:55314'

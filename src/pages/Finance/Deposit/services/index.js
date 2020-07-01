@@ -16,7 +16,7 @@ module.exports = {
     })
     return r
   },
-
+  deleteTransaction: (params) => service.remove(`${url}/Transaction`, params),
   query: (params) => service.query(url, params),
   queryBizSession: (params) => service.queryList(bizSessionUrl, params),
 }

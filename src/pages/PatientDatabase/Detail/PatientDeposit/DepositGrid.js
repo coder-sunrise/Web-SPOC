@@ -3,16 +3,20 @@ import { withStyles } from '@material-ui/core'
 import { Print, Delete } from '@material-ui/icons'
 import CommonTableGrid from '@/components/CommonTableGrid'
 import { Button, Tooltip, Popconfirm } from '@/components'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
+import { IntegratedSummary } from '@devexpress/dx-react-grid'
 
-const DepositGrid = ({ transactionList = [], handlePrint }) => {
+const DepositGrid = ({
+  transactionList = [],
+  handlePrint,
+  handleDeleteRow,
+}) => {
   const configs = {
     rows: transactionList,
     columns: [
       { name: 'transactionDate', title: 'Date' },
       { name: 'transactionTypeFK', title: 'Type' },
       { name: 'amount', title: 'Amount' },
-      { name: 'transactionModeFK', title: 'Payment Mode' },
+      { name: 'transactionMode', title: 'Payment Mode' },
       { name: 'remarks', title: 'Remarks' },
       { name: 'action', title: 'Action' },
     ],
@@ -25,16 +29,14 @@ const DepositGrid = ({ transactionList = [], handlePrint }) => {
       },
       { columnName: 'amount', type: 'currency' },
       {
-        columnName: 'transactionModeFK',
-        type: 'codeSelect',
-        code: 'CTPaymentMode',
-      },
-      {
         columnName: 'action',
         sortingEnabled: false,
         align: 'center',
         width: 100,
         render: (row) => {
+          const { transactionTypeFK, amount = 0, refundableBalance } = row
+          const isDeposit = transactionTypeFK === 1 //
+          const isEnableDelete = isDeposit && refundableBalance >= amount
           return (
             <React.Fragment>
               <Tooltip title='Print Receipt' placement='bottom'>
@@ -45,39 +47,55 @@ const DepositGrid = ({ transactionList = [], handlePrint }) => {
                   }}
                   justIcon
                   color='primary'
-                  style={{ marginRight: 10 }}
+                  style={{ marginRight: 10, width: 25 }}
                 >
                   <Print />
                 </Button>
               </Tooltip>
-              <Tooltip title='Delete' placement='bottom'>
-                <Popconfirm
-                  title='Are you sure you want to delete the selected item?'
-                  onConfirm={() => {
-                    // this.handleDeleteRow(row)
-                  }}
-                >
-                  <Button
-                    size='sm'
-                    onClick={() => {
-                      handlePrint(row)
+              {isEnableDelete ? (
+                <Tooltip title='Delete' placement='bottom'>
+                  <Popconfirm
+                    title='Are you sure you want to delete the selected item?'
+                    onConfirm={() => {
+                      handleDeleteRow(row)
                     }}
-                    justIcon
-                    color='danger'
-                    style={{ marginRight: 0 }}
                   >
-                    <Delete />
-                  </Button>
-                </Popconfirm>
-              </Tooltip>
+                    <Button
+                      size='sm'
+                      justIcon
+                      color='danger'
+                      style={{ marginRight: 0, width: 25 }}
+                    >
+                      <Delete />
+                    </Button>
+                  </Popconfirm>
+                </Tooltip>
+              ) : (
+                <div
+                  style={{
+                    marginRight: 0,
+                    width: 25,
+                    display: 'inline-block',
+                  }}
+                />
+              )}
             </React.Fragment>
           )
         },
       },
     ],
+    FuncProps: {
+      pager: false,
+      sort: true,
+      sortConfig: {
+        defaultSorting: [
+          { columnName: 'transactionDate', direction: 'desc' },
+        ],
+      },
+    },
   }
 
-  return <CommonTableGrid type='PatientDepositDetails' {...configs} />
+  return <CommonTableGrid {...configs} />
 }
 
 export default DepositGrid
