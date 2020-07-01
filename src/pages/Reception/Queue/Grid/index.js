@@ -102,7 +102,9 @@ class Grid extends React.Component {
       data = data.filter((item) => {
         if (!item.doctor) return false
         const { doctor: { id } } = item
-        return doctorProfile ? id === doctorProfile.id : false
+        return clinicianProfile.doctorProfile
+          ? id === clinicianProfile.doctorProfile.id
+          : false
       })
 
     return filterData(filter, data, searchQuery)
