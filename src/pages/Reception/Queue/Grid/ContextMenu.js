@@ -118,19 +118,18 @@ const ContextMenu = ({
   const contextMenuOptions = useMemo(() => {
     if (row.visitStatus === VISIT_STATUS.UPCOMING_APPT) {
       return AppointmentContextMenu.map((opt) => {
-        let mobileAppointment = row.dataSourceFK === 2
         switch (opt.id) {
           case 8: // register visit
             return {
               ...opt,
-              disabled: !row.patientProfileFk || mobileAppointment,
-              hidden: !row.patientProfileFk || mobileAppointment,
+              disabled: !row.patientProfileFk,
+              hidden: !row.patientProfileFk,
             }
           case 9: // register patient
             return {
               ...opt,
-              disabled: !!row.patientProfileFk || mobileAppointment,
-              hidden: !!row.patientProfileFk || mobileAppointment,
+              disabled: !!row.patientProfileFk,
+              hidden: !!row.patientProfileFk,
             }
           default:
             return { ...opt }
