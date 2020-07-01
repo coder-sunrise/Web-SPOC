@@ -1,6 +1,4 @@
 import React, { PureComponent } from 'react'
-import color from 'color'
-
 import { isNumber } from 'util'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
@@ -10,13 +8,10 @@ import {
   withStyles,
 } from '@material-ui/core/styles'
 // import Paper from '@material-ui/core/Paper'
-import { Paper, Tooltip, IconButton } from '@material-ui/core'
-import ReOrder from '@material-ui/icons/Reorder'
-
+import { Paper, Tooltip } from '@material-ui/core'
 import { hoverColor, tableEvenRowColor } from 'mui-pro-jss'
 import {
   SortableContainer,
-  SortableHandle,
   SortableElement,
   arrayMove,
 } from 'react-sortable-hoc'
@@ -27,7 +22,6 @@ import {
   GroupingState,
   IntegratedGrouping,
   IntegratedPaging,
-  IntegratedSelection,
   IntegratedSorting,
   IntegratedSummary,
   PagingState,
@@ -48,7 +42,6 @@ import {
   TableGroupRow,
   TableHeaderRow,
   TableSummaryRow,
-  TableSelection,
   Toolbar,
   TableFixedColumns,
   VirtualTable,
@@ -164,8 +157,11 @@ const getIndexedRows = (rows = [], pagerConfig = {}) => {
   })
 }
 let uniqueGid = 0
-@connect(({ loading, global }) => {
-  return { loading, global }
+@connect(({ loading, global }, { type }) => {
+  return {
+    loading: type ? loading.effects[`${type}/query`] : false,
+    commitCount: global.commitCount,
+  }
 })
 @control()
 class CommonTableGrid extends PureComponent {
@@ -430,7 +426,12 @@ class CommonTableGrid extends PureComponent {
             ...cellStyle.cell,
           },
         },
-        TableHeaderCell: cellStyle,
+        TableHeaderCell: {
+          cell: {
+            ...cellStyle.cell,
+            borderTop: '1px solid rgba(0, 0, 0, 0.12)',
+          },
+        },
         Table: {
           table: {
             // tableLayout: 'auto',
@@ -753,7 +754,8 @@ class CommonTableGrid extends PureComponent {
       containerComponent,
       schema,
       editingRowIds,
-      global,
+      // global,
+      commitCount,
       loading,
       gridId,
       extraCellConfig,
@@ -891,8 +893,8 @@ class CommonTableGrid extends PureComponent {
     const cellComponentConfig = {
       columnExtensions,
       editingRowIds,
-      commitCount: global.commitCount,
-      errorCount: global.errorCount,
+      commitCount,
+      // errorCount: global.errorCount,
     }
 
     // const allowSelectRowByClick =
@@ -927,7 +929,7 @@ class CommonTableGrid extends PureComponent {
     }
     // console.log(window.$tempGridRow)
     // console.log(this.state.entity.list)
-    const _loading = type ? loading.effects[`${type}/query`] : false
+    // const _loading = type ? loading.effects[`${type}/query`] : false
     const rowData = this.getData()
     // console.log(rowData, this.state)
     return (
@@ -949,7 +951,7 @@ class CommonTableGrid extends PureComponent {
               <span>{loadingMessage}</span>
             </div>
           ) */}
-          <LoadingWrapper loading={_loading} linear text='Loading...'>
+          <LoadingWrapper loading={loading} linear text='Loading...'>
             <DevGrid
               rows={rowData} // this.state.data ||
               columns={newColumns}
