@@ -23,10 +23,19 @@ export default createListViewModel({
       invoiceList: [],
       statementPaymentList: [],
       activeTab: '0',
+      invoicePaymentList: [],
     },
     subscriptions: ({ dispatch, history }) => {
-      history.listen(async (loct, method) => {
+      history.listen((loct, method) => {
         const { pathname, search, query = {} } = loct
+        if (pathname.startsWith('/finance/statement/details')) {
+          dispatch({
+            type: 'statement/setActiveTab',
+            payload: {
+              activeTab: query.t,
+            },
+          })
+        }
       })
     },
     effects: {
@@ -44,7 +53,7 @@ export default createListViewModel({
           payload,
         })
         yield put({
-          type: 'queryPaymentList',
+          type: 'queryPaymentHistory',
           payload,
         })
       },
@@ -88,19 +97,13 @@ export default createListViewModel({
           notification.success({ message: 'Deleted' })
         }
       },
-      *queryPaymentList ({ payload }, { call, put }) {
-        const response = yield call(service.queryPaymentList, {
-          pagesize: 999,
-          statementFK: payload.id,
-          sorting: [
-            { columnName: 'paymentReceivedDate', direction: 'desc' },
-            { columnName: 'receiptNo', direction: 'desc' },
-          ],
-        })
+      *queryPaymentHistory ({ payload }, { call, put }) {
+        const response = yield call(service.queryPaymentHistory, payload)
         yield put({
-          type: 'queryPaymentListDone',
+          type: 'queryPaymentHistoryDone',
           payload: {
-            statementPaymentList: response.data.data || [],
+            statementPaymentList: response.data.statementPaymentList || [],
+            invoicePaymentList: response.data.invoicePaymentList || [],
           },
         })
       },
@@ -142,7 +145,7 @@ export default createListViewModel({
           }),
         }
       },
-      queryPaymentListDone (st, { payload }) {
+      queryPaymentHistoryDone (st, { payload }) {
         return {
           ...st,
           ...payload,

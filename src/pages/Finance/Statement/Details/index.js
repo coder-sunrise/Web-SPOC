@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import { withStyles, Paper } from '@material-ui/core'
 import { connect } from 'dva'
 import moment from 'moment'
-import { withFormikExtend, Tabs, serverDateFormat } from '@/components'
+import { withFormikExtend, Tabs, serverDateFormat, notification } from '@/components'
 import Yup from '@/utils/yup'
 import { PAYMENT_MODE, DEFAULT_PAYMENT_MODE_GIRO } from '@/utils/constants'
 import { roundToPrecision } from '@/utils/codes'
@@ -186,12 +186,7 @@ const styles = () => ({})
             id: statement.currentId,
           },
         })
-        dispatch({
-          type: 'statement/setActiveTab',
-          payload: {
-            activeTab: '2',
-          },
-        })
+        history.replace(`/finance/statement/details/${statement.currentId}?t=${2}`)
         // history.push('/finance/statement')
       }
     })
@@ -214,14 +209,6 @@ class StatementDetails extends PureComponent {
     }
   }
 
-  componentWillUnmount = () => {
-    this.props.dispatch({
-      type: 'statement/setActiveTab',
-      payload: {
-        activeTab: '0',
-      },
-    })
-  }
 
   fetchLatestBizSessions = () => {
     const { setFieldValue } = this.props
@@ -292,12 +279,14 @@ class StatementDetails extends PureComponent {
   }
 
   onTabChange = (tab) => {
-    this.props.dispatch({
-      type: 'statement/setActiveTab',
-      payload: {
-        activeTab: tab,
-      },
-    })
+    const { statement, dispatch, history } = this.props
+    // dispatch({
+    //   type: 'statement/setActiveTab',
+    //   payload: {
+    //     activeTab: tab,
+    //   },
+    // })
+    this.props.history.replace(`/finance/statement/details/${statement.currentId}?t=${tab}`)
   }
 
   render () {

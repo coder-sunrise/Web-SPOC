@@ -107,7 +107,7 @@ class Statement extends PureComponent {
         currentId: row.id,
       },
     })
-    history.push(`/finance/statement/details/${row.id}`)
+    history.push(`/finance/statement/details/${row.id}?t=0`)
   }
 
   render () {
