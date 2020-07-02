@@ -198,7 +198,7 @@ class AddCrNote extends Component {
     const { creditNoteItem } = values
 
     creditNoteItem.map((x) => {
-      x.totalAfterItemAdjustment = x.quantity * x.unitPrice
+      x.totalAfterGST = x.quantity * x.unitPrice
       return x
     })
 
