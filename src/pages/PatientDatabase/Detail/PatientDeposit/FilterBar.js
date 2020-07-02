@@ -146,7 +146,7 @@ class FilterBar extends PureComponent {
           title='Patient Deposit Transaction Details'
           maxWidth='lg'
         >
-          <ReportViewer reportID={53} reportParameters={{ patientId }} />
+          <ReportViewer reportID={57} reportParameters={{ patientId }} />
         </CommonModal>
       </React.Fragment>
     )

@@ -95,10 +95,9 @@ class PatientDeposit extends PureComponent {
   }
 
   handlePrintReceipt = (row) => {
-    console.log('handlePrintReceipt', row)
-    const { transactionTypeFK } = row
-    const isDeposit = transactionTypeFK === 1 //
-    const reportID = isDeposit ? 54 : 55
+    // const { transactionTypeFK } = row
+    // const isDeposit = transactionTypeFK === 1 //
+    const reportID = 58
     this.toggleReportViewer(reportID, { transactionId: row.id })
   }
 
