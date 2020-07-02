@@ -106,6 +106,7 @@ class Form extends React.PureComponent {
 
   componentDidMount () {
     const { values, dispatch } = this.props
+    this.checkHasActiveSession()
     Promise.all([
       dispatch({
         type: 'codetable/fetchCodes',
@@ -122,7 +123,6 @@ class Form extends React.PureComponent {
     }
 
     this.validateDataGrid()
-    this.checkHasActiveSession()
   }
 
   checkHasActiveSession = async () => {
