@@ -30,6 +30,7 @@ const PatientInfoInput = ({
   disabled,
   appointmentStatusFK,
   values,
+  hasActiveSession,
 }) => {
   const isRegisteredPatient =
     patientProfileFK !== undefined && patientProfileFK !== null
@@ -100,16 +101,18 @@ const PatientInfoInput = ({
                   Patient Profile
                 </Button>
               </Authorized>
-              <Authorized authority='queue.registervisit'>
-                <Button
-                  size='sm'
-                  color='primary'
-                  disabled={!isEdit || !allowedToActualize}
-                  onClick={onRegisterToVisitClick}
-                >
-                  Register To Visit
-                </Button>
-              </Authorized>
+              {hasActiveSession && (
+                <Authorized authority='queue.registervisit'>
+                  <Button
+                    size='sm'
+                    color='primary'
+                    disabled={!isEdit || !allowedToActualize}
+                    onClick={onRegisterToVisitClick}
+                  >
+                    Register To Visit
+                  </Button>
+                </Authorized>
+              )}
             </React.Fragment>
           )}
         </div>
