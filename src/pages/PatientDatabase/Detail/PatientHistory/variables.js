@@ -31,7 +31,7 @@ const checkAccessRight = (accessRightNames) => {
 
   for (let i = 0; i < accessRightNames.length; i++) {
     const accessRight = Authorized.check(accessRightNames[i])
-    if (accessRight.rights === 'enable') return true
+    if (accessRight && accessRight.rights === 'enable') return true
   }
   return false
 }
@@ -70,7 +70,7 @@ export const PatientHistoryTabOption = (props) => {
       id: PATIENT_HISTORY_TABS.DEPOSIT,
       name: 'Deposit',
       authority: [
-        // 'patientdatabase.patientprofiledetails.patienthistory.deposit',
+        'patientdatabase.patientprofiledetails.patienthistory.deposit',
       ],
       content: addContent(PATIENT_HISTORY_TABS.DEPOSIT, props),
     },

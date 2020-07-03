@@ -36,22 +36,26 @@ const DepositGrid = ({
         render: (row) => {
           const { transactionTypeFK, amount = 0, refundableBalance } = row
           const isDeposit = transactionTypeFK === 1 //
+          const isRefund = transactionTypeFK === 2
           const isEnableDelete = isDeposit && refundableBalance >= amount
+          const isEnablePrint = isDeposit || isRefund
           return (
             <React.Fragment>
-              <Tooltip title='Print Receipt' placement='bottom'>
-                <Button
-                  size='sm'
-                  onClick={() => {
-                    handlePrint(row)
-                  }}
-                  justIcon
-                  color='primary'
-                  style={{ marginRight: 10, width: 25 }}
-                >
-                  <Print />
-                </Button>
-              </Tooltip>
+              {isEnablePrint && (
+                <Tooltip title='Print Receipt' placement='bottom'>
+                  <Button
+                    size='sm'
+                    onClick={() => {
+                      handlePrint(row)
+                    }}
+                    justIcon
+                    color='primary'
+                    style={{ marginRight: 10, width: 25 }}
+                  >
+                    <Print />
+                  </Button>
+                </Tooltip>
+              )}
               {isEnableDelete ? (
                 <Tooltip title='Delete' placement='bottom'>
                   <Popconfirm
