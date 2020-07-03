@@ -198,7 +198,11 @@ class AddCrNote extends Component {
     const { creditNoteItem } = values
 
     creditNoteItem.map((x) => {
-      x.totalAfterGST = x.quantity * x.unitPrice
+      if (x.quantity === x.originRemainingQty) {
+        x.totalAfterGST = x._totalAfterGST
+      } else {
+        x.totalAfterGST = roundTo(x.quantity * x._unitPriceAftGst)
+      }
       return x
     })
 
