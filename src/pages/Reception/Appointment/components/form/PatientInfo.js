@@ -43,21 +43,23 @@ const PatientInfoInput = ({
   return (
     <React.Fragment>
       <GridItem xs md={3}>
-        <FastField
-          name='search'
-          render={(args) => {
-            return (
-              <TextField
-                {...args}
-                autoFocus={!isEdit}
-                defaultValue={undefined}
-                label={formatMessage({
-                  id: 'reception.queue.patientSearchPlaceholder',
-                })}
-              />
-            )
-          }}
-        />
+        <div className={classnames(classes.buttonGroup)}>
+          <FastField
+            name='search'
+            render={(args) => {
+              return (
+                <TextField
+                  {...args}
+                  autoFocus={!isEdit}
+                  defaultValue={undefined}
+                  label={formatMessage({
+                    id: 'reception.queue.patientSearchPlaceholder',
+                  })}
+                />
+              )
+            }}
+          />
+        </div>
       </GridItem>
       <GridItem xs md={5}>
         <div className={classnames(classes.buttonGroup)}>
