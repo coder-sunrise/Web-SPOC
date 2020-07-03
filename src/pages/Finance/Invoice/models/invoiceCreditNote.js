@@ -111,6 +111,10 @@ export default createFormViewModel({
             originRemainingQty: item.quantity,
             totalAfterItemAdjustment: item.quantity * item.unitPrice,
             _totalAfterGST: item.totalAfterGST,
+            _unitPriceAftGst:
+              item.quantity && item.quantity > 0
+                ? item.totalAfterGST / item.quantity
+                : item.unitPrice,
           }
         })
 
