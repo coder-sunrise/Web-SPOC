@@ -62,6 +62,8 @@ const styles = (theme) => ({
         showTotalInvoiceAmtInConsultation,
         autoPrintReportsOnCompletePayment,
         autoPrintReportsOnSignOff,
+        autoPrintDrugLabelOnCompletePayment,
+        autoPrintDrugLabelOnSignOff,
       } = clinicSettings.entity
       return {
         ...clinicSettings.entity,
