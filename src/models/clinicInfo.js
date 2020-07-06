@@ -1,5 +1,6 @@
 import { createFormViewModel } from 'medisys-model'
 import * as service from '../services/clinicInfo'
+import { subscribeNotification } from '@/utils/realtime'
 import { notification } from '@/components'
 
 export default createFormViewModel({
@@ -13,6 +14,15 @@ export default createFormViewModel({
       ...JSON.parse(localStorage.getItem('clinicInfo') || '{}'),
     },
     subscriptions: ({ dispatch, history, searchField }) => {
+      subscribeNotification('ClinicInfoUpdated', {
+        callback: () => {
+          dispatch({
+            type: 'query',
+            payload: { clinicCode: localStorage.getItem('clinicCode') },
+          })
+        },
+      })
+
       history.listen((loct) => {
         const { pathname } = loct
       })

@@ -41,6 +41,7 @@ import {
 import { getAppendUrl } from '@/utils/utils'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
 import styles from './style'
+import { getBizSession } from '@/services/queue'
 
 const gridValidationSchema = Yup.object().shape({
   startTime: Yup.string().required(),
@@ -100,10 +101,12 @@ class Form extends React.PureComponent {
     tempNewAppointmentStatusFK: -1,
     isDataGridValid: this.props.values.id !== undefined,
     editingRows: [],
+    hasActiveSession: false,
   }
 
   componentDidMount() {
     const { values, dispatch } = this.props
+    this.checkHasActiveSession()
     Promise.all([
       dispatch({
         type: 'codetable/fetchCodes',
@@ -120,6 +123,24 @@ class Form extends React.PureComponent {
     }
 
     this.validateDataGrid()
+  }
+
+  checkHasActiveSession = async () => {
+    try {
+      const bizSessionPayload = {
+        IsClinicSessionClosed: false,
+      }
+      const result = await getBizSession(bizSessionPayload)
+      const { data } = result.data
+
+      this.setState(() => {
+        return {
+          hasActiveSession: data.length > 0,
+        }
+      })
+    } catch (error) {
+      console.log({ error })
+    }
   }
 
   refreshPatient = (id) => {
@@ -959,6 +980,7 @@ class Form extends React.PureComponent {
                     patientProfileFK={values.patientProfileFK}
                     appointmentStatusFK={currentAppointment.appointmentStatusFk}
                     values={values}
+                    hasActiveSession={this.state.hasActiveSession}
                   />
                   <AppointmentDateInput disabled={_disableAppointmentDate} />
                   <GridItem xs md={12} className={classes.verticalSpacing}>

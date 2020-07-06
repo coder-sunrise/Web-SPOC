@@ -84,15 +84,11 @@ const PatientLabelButton = ({
     const payload = [
       {
         ReportId: reportID,
-        ReportData: JSON.stringify({
-          ...data,
-        }),
+        Copies: copyNo[labelType],
+        ReportData: JSON.stringify(data),
       },
     ]
-
-    for (let i = 0; i < copyNo[labelType]; i++) {
-      handlePrint(JSON.stringify(payload))
-    }
+    handlePrint(JSON.stringify(payload))
   }
 
   const handleCopyNoChange = (value, labelType) =>
