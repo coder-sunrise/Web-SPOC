@@ -756,9 +756,8 @@ class Billing extends Component {
                     this.state.isEditing ||
                     values.id === undefined ||
                     values.invoicePayer.find((payer) =>
-                      payer.invoicePayment.find(
-                        (payment) => !payment.isCancelled,
-                      ),
+                      (payer.invoicePayment || [])
+                        .find((payment) => !payment.isCancelled),
                     )
                   }
                 >

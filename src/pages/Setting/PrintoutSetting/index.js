@@ -18,8 +18,9 @@ import {
   ProgressButton,
 } from '@/components'
 import { navigateDirtyCheck } from '@/utils/utils'
-import BrowseImage from './BrowseImage'
 import AuthorizedContext from '@/components/Context/Authorized'
+import BrowseImage from './BrowseImage'
+import SettingParameter from './SettingParameter'
 
 const styles = (theme) => ({
   container: {
@@ -115,7 +116,6 @@ const errorMessage = (v) => {
       if (v) return v.split(',')[1] || v
       return undefined
     }
-
     dispatch({
       type: 'printoutSetting/upsert',
       payload: {
@@ -241,8 +241,11 @@ class printoutSetting extends PureComponent {
       setFieldValue,
       ...restProps
     } = this.props
+
     const letterHeadImgRequired = this.props.errors.customLetterHeadImage
     const footerDisclaimerImgRequired = this.props.errors.footerDisclaimerImage
+    const { reportSettingParameter = [] } = values
+
     return (
       <React.Fragment>
         <CardContainer hideHeader>
@@ -471,7 +474,7 @@ class printoutSetting extends PureComponent {
                 ''
               )}
             </GridContainer>
-
+            <SettingParameter {...this.props} />
             <div
               className={classes.actionBtn}
               style={{ display: 'flex', justifyContent: 'center' }}
@@ -486,9 +489,9 @@ class printoutSetting extends PureComponent {
                 Cancel
               </Button>
 
-              <ProgressButton color='primary' onClick={handleSubmit}>
+              <Button color='primary' onClick={handleSubmit}>
                 Save
-              </ProgressButton>
+              </Button>
             </div>
           </AuthorizedContext.Provider>
         </CardContainer>

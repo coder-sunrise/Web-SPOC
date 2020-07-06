@@ -153,7 +153,7 @@ export const getApplicableClaimAmount = (
   if (returnClaimAmount > totalClaimableAmount)
     returnClaimAmount = totalClaimableAmount
 
-  return returnClaimAmount
+  return roundTo(returnClaimAmount, 4)
 }
 
 export const getInvoiceItemsWithClaimAmount = (
@@ -301,7 +301,7 @@ export const validateInvoicePayerItems = (invoicePayerItem) => {
     let maxAmount
     let type = 'Total Payable'
     if (item.schemeCoverageType.toLowerCase() === 'percentage') {
-      maxAmount = item.payableBalance * item.schemeCoverage / 100
+      maxAmount = roundTo(item.payableBalance * item.schemeCoverage / 100, 4)
       type = 'Coverage Amount'
     } else maxAmount = item.payableBalance
 
@@ -324,7 +324,7 @@ const getItemTypeSubtotal = (list, type) =>
 const calculateTotalPaybable = (total, item) => {
   let coverageAmount = item.schemeCoverage
   if (item.schemeCoverageType === 'Percentage')
-    coverageAmount = item.payableBalance * item.schemeCoverage / 100
+    coverageAmount = roundTo(item.payableBalance * item.schemeCoverage / 100, 4)
   else {
     coverageAmount = Math.min(item.schemeCoverage, item.payableBalance)
   }

@@ -8,9 +8,9 @@ import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
 import { AESEncryptor } from '@/utils/aesEncryptor'
 
 const defaultSocketPortsState = [
-  { portNumber: 7182, attempted: false },
-  { portNumber: 7183, attempted: false },
-  { portNumber: 7184, attempted: false },
+  7182,
+  7183,
+  7184,
 ]
 
 const withWebSocket = () => (Component) => {
@@ -18,16 +18,12 @@ const withWebSocket = () => (Component) => {
     constructor(props) {
       super(props)
       this.state = {
-        socketPorts: [
-          ...defaultSocketPortsState,
-        ],
         pendingJob: [],
         isWsConnected: false,
       }
       // this.isWsConnected = false
       this.wsConnection = null
-
-      this.initializeWebSocket(true)
+      this.tryConnectSocket()
     }
 
     componentWillUnmount () {
@@ -40,41 +36,19 @@ const withWebSocket = () => (Component) => {
       // reset port number state to retry all attempt and set job content
       // then initialize web socket connection
       this.setState({
-        // socketPorts: [
-        //   ...defaultSocketPortsState,
-        // ],
         pendingJob: [
           content,
         ],
       })
-
       const { isWsConnected } = this.state
 
       if (isWsConnected === true) {
         this.sendJobToWebSocket()
       } else {
-        let haveOneOpend = false
-        const settings = JSON.parse(localStorage.getItem('clinicSettings'))
-        const { printToolSocketURL = '' } = settings
-        const [
-          prefix = '',
-          ip = '',
-        ] = printToolSocketURL.split(':')
-
-        for (let index = 0; index < defaultSocketPortsState.length; index++) {
-          const socket = defaultSocketPortsState[index]
-          const wsUrl = `${prefix}:${ip}:${socket.portNumber}`
-          if (wsUrl) {
-            console.log(`try to connect ${wsUrl}`)
-            this.wsConnection = new window.WebSocket(wsUrl)
-            haveOneOpend = await this.connectionAsync(this.wsConnection)
-            if (haveOneOpend) {
-              this.sendJobToWebSocket()
-              break
-            }
-          }
-        }
-        if (!haveOneOpend) {
+        const connected = await this.tryConnectSocket()
+        if (connected === true) {
+          await this.sendJobToWebSocket()
+        } else {
           notification.error({
             message: `Medicloud printing tool is not running, please start it.`,
           })
@@ -83,6 +57,36 @@ const withWebSocket = () => (Component) => {
           })
         }
       }
+    }
+
+    tryConnectSocket = async () => {
+      let connected = false
+      const settings = JSON.parse(localStorage.getItem('clinicSettings'))
+      const { printToolSocketURL = '' } = settings
+      const [
+        prefix = '',
+        ip = '',
+      ] = printToolSocketURL.split(':')
+
+      for (let index = 0; index < defaultSocketPortsState.length; index++) {
+        const port = defaultSocketPortsState[index]
+        const wsUrl = `${prefix}:${ip}:${port}`
+        if (wsUrl) {
+          console.log(`try to connect ${wsUrl}`)
+          this.wsConnection = new window.WebSocket(wsUrl)
+          this.wsConnection.onopen = () => {
+            console.log(`connected: ${wsUrl}`)
+            this.setState({
+              isWsConnected: true,
+            })
+          }
+          connected = await this.connectionAsync(this.wsConnection)
+          if (connected) {
+            break
+          }
+        }
+      }
+      return connected
     }
 
     sendJobToWebSocket = async () => {
@@ -101,17 +105,6 @@ const withWebSocket = () => (Component) => {
       this.setState({
         pendingJob: [],
       })
-    }
-
-    setSocketPortsState = (socket, attempted = true) => {
-      this.setState((preState) => ({
-        socketPorts: preState.socketPorts.map(
-          (port) =>
-            port.portNumber === socket.portNumber
-              ? { ...port, attempted }
-              : { ...port },
-        ),
-      }))
     }
 
     handlePrint = async (content) => {
@@ -136,54 +129,6 @@ const withWebSocket = () => (Component) => {
         loop += 1
       }
       return isOpened()
-    }
-
-    // will initialize web socket connection
-    // send job if there is any successful connection or already connected
-    initializeWebSocket = () => {
-      const { socketPorts, isWsConnected } = this.state
-
-      if (isWsConnected === false) {
-        let settings = JSON.parse(localStorage.getItem('clinicSettings'))
-        const { printToolSocketURL = '' } = settings
-        const [
-          prefix = '',
-          ip = '',
-        ] = printToolSocketURL.split(':')
-
-        // attempt to connect to different port number
-        // abort early and clear job if no available port number left
-        const socket = socketPorts.find((port) => !port.attempted)
-
-        if (!socket) {
-          return
-        }
-
-        const wsUrl = `${prefix}:${ip}:${socket.portNumber}`
-
-        if (wsUrl && !isWsConnected) {
-          this.wsConnection = new window.WebSocket(wsUrl)
-          this.wsConnection.onopen = () => {
-            // this.isWsConnected = true
-            console.log(`connected: ${wsUrl}`)
-            this.setState({
-              isWsConnected: true,
-            })
-            this.setSocketPortsState(socket)
-          }
-
-          this.wsConnection.onclose = () => {
-            // this.isWsConnected = false
-            // console.log(`closed: ${wsUrl}`)
-            this.setSocketPortsState(socket, true)
-            this.initializeWebSocket()
-          }
-
-          // this.wsConnection.onerror = (event) => {
-          //   console.log('WebSocket error: ', event)
-          // }
-        }
-      }
     }
 
     render () {

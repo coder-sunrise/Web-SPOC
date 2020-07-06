@@ -1,9 +1,11 @@
 import React, { Fragment, PureComponent } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
-import { PATIENT_LAB } from '@/utils/constants'
+import { PATIENT_LAB, REPORT_ID } from '@/utils/constants'
 import { CommonModal } from '@/components'
 import { findGetParameter } from '@/utils/utils'
+import withWebSocket from '@/components/Decorator/withWebSocket'
+import { getRawData } from '@/services/report'
 import Detail from './Detail'
 import FilterBar from './FilterBar'
 import OverallGrid from './OverallGrid'
@@ -24,8 +26,9 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ labTrackingDetails }) => ({
+@connect(({ labTrackingDetails, clinicSettings }) => ({
   labTrackingDetails,
+  clinicSettings: clinicSettings.settings,
 }))
 class LabTrackingDetails extends PureComponent {
   state = {
@@ -69,6 +72,30 @@ class LabTrackingDetails extends PureComponent {
     })
   }
 
+  handlePrintClick = async (row) => {
+    const { clinicSettings, handlePrint } = this.props
+    const { labelPrinterSize } = clinicSettings
+
+    let reportID = REPORT_ID.PATIENT_LAB_LABEL_80MM_45MM
+
+    if (labelPrinterSize === '8.9cmx3.6cm') {
+      reportID = REPORT_ID.PATIENT_LAB_LABEL_89MM_36MM
+    } else if (labelPrinterSize === '7.6cmx3.8cm') {
+      reportID = REPORT_ID.PATIENT_LAB_LABEL_76MM_38MM
+    }
+
+    const data = await getRawData(reportID, { visitId: row.visitFK })
+    const payload = [
+      {
+        ReportId: reportID,
+        Copies: 1,
+        ReportData: JSON.stringify(data),
+      },
+    ]
+
+    handlePrint(JSON.stringify(payload))
+  }
+
   resize () {
     if (this.divElement) {
       const height = this.divElement.clientHeight
@@ -86,6 +113,7 @@ class LabTrackingDetails extends PureComponent {
 
     const cfg = {
       toggleModal: this.toggleModal,
+      handlePrintClick: this.handlePrintClick,
     }
 
     return (
@@ -118,4 +146,6 @@ class LabTrackingDetails extends PureComponent {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(LabTrackingDetails)
+export default withWebSocket()(
+  withStyles(styles, { withTheme: true })(LabTrackingDetails),
+)

@@ -79,17 +79,32 @@ const styles = (theme) => ({
             autoPrintDrugLabelOnFinalize &&
             autoPrintDrugLabelOnFinalize.settingValue === 'true',
         },
+        autoPrintDrugLabelOnCompletePayment: {
+          ...autoPrintDrugLabelOnCompletePayment,
+          settingValue:
+            autoPrintDrugLabelOnCompletePayment &&
+            autoPrintDrugLabelOnCompletePayment.settingValue === 'true',
+        },
+        autoPrintDrugLabelOnSignOff: {
+          ...autoPrintDrugLabelOnSignOff,
+          settingValue:
+            autoPrintDrugLabelOnSignOff &&
+            autoPrintDrugLabelOnSignOff.settingValue === 'true',
+        },
         showConsultationVersioning: {
           ...showConsultationVersioning,
           settingValue: showConsultationVersioning.settingValue === 'true',
         },
         autoPrintOnSignOff: {
           ...autoPrintOnSignOff,
-          settingValue: autoPrintOnSignOff && autoPrintOnSignOff.settingValue === 'true',
+          settingValue:
+            autoPrintOnSignOff && autoPrintOnSignOff.settingValue === 'true',
         },
         autoPrintOnCompletePayment: {
           ...autoPrintOnCompletePayment,
-          settingValue: autoPrintOnCompletePayment && autoPrintOnCompletePayment.settingValue === 'true',
+          settingValue:
+            autoPrintOnCompletePayment &&
+            autoPrintOnCompletePayment.settingValue === 'true',
         },
         showTotalInvoiceAmtInConsultation: {
           ...showTotalInvoiceAmtInConsultation,
@@ -98,7 +113,9 @@ const styles = (theme) => ({
         },
         autoPrintReportsOnCompletePayment: {
           ...autoPrintReportsOnCompletePayment,
-          settingValue: autoPrintReportsOnCompletePayment.settingValue.split(','),
+          settingValue: autoPrintReportsOnCompletePayment.settingValue.split(
+            ',',
+          ),
         },
         autoPrintReportsOnSignOff: {
           ...autoPrintReportsOnSignOff,
@@ -112,7 +129,10 @@ const styles = (theme) => ({
   handleSubmit: (values, { props }) => {
     const { dispatch, history } = props
     const payload = Object.keys(values).map((o) => {
-      if (o === 'autoPrintReportsOnCompletePayment' || o === 'autoPrintReportsOnSignOff') {
+      if (
+        o === 'autoPrintReportsOnCompletePayment' ||
+        o === 'autoPrintReportsOnSignOff'
+      ) {
         return {
           ...values[o],
           settingValue: values[o].settingValue.join(','),
@@ -257,6 +277,18 @@ class GeneralSetting extends PureComponent {
             </GridItem>
           </GridContainer>
           <GridContainer>
+            <GridItem md={12}>
+              <span
+                style={{
+                  position: 'relative',
+                  color: 'rgba(0, 0, 0, 0.5)',
+                  display: 'inline-block',
+                  marginTop: 8,
+                }}
+              >
+                Auto Print Drug Label
+              </span>
+            </GridItem>
             <GridItem md={2} style={{ margin: 0, marginTop: -10 }}>
               <Field
                 name='defaultVisitType.settingValue'
