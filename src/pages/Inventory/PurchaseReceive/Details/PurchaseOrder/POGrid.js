@@ -8,7 +8,7 @@ import {
   inventoryItemListing,
 } from '@/utils/codes'
 import { fetchAndSaveCodeTable } from '@/utils/codetable'
-
+import { roundTo } from '@/utils/utils'
 // let commitCount = 2200 // uniqueNumber
 
 const purchaseOrderDetailsSchema = Yup.object().shape({
@@ -302,6 +302,18 @@ class Grid extends PureComponent {
     }
   }
 
+  calculateUnitPrice = (e) => {
+    const { row } = e
+    if (row) {
+      const { orderQuantity, totalPrice } = row
+      if (orderQuantity && orderQuantity > 0) {
+        row.unitPrice = roundTo(totalPrice / orderQuantity, 3)
+      } else {
+        row.unitPrice = 0
+      }
+    }
+  }
+
   render () {
     // const { purchaseOrderItems } = this.props
     const { values, isEditable, dispatch } = this.props
@@ -418,13 +430,14 @@ class Grid extends PureComponent {
           columnName: 'unitPrice',
           type: 'number',
           currency: true,
+          precision: 3,
           onChange: this.calculateTotalPriceAndTotalQuantity,
         },
         {
           columnName: 'totalPrice',
           type: 'number',
           currency: true,
-          disabled: true,
+          onChange: this.calculateUnitPrice,
         },
       ],
       onRowDoubleClick: undefined,

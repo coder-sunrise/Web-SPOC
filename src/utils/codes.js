@@ -690,7 +690,7 @@ export const getInventoryItem = (
       if (
         item &&
         item.orderQuantity - item.quantityReceived ===
-        o.totalCurrentReceivingQty
+          o.totalCurrentReceivingQty
       ) {
         return {
           ...o,
@@ -1039,12 +1039,27 @@ export const ReportsOnSignOffOption = {
 }
 export const ReportsOnSignOff = [
   { code: ReportsOnSignOffOption.DrugLabel, description: 'Drug Label' },
-  { code: ReportsOnSignOffOption.MedicalCertificate, description: 'Medical Certificate' },
-  { code: ReportsOnSignOffOption.CertificateofAttendance, description: 'Certificate of Attendance' },
-  { code: ReportsOnSignOffOption.ReferralLetter, description: 'Referral Letter' },
+  {
+    code: ReportsOnSignOffOption.MedicalCertificate,
+    description: 'Medical Certificate',
+  },
+  {
+    code: ReportsOnSignOffOption.CertificateofAttendance,
+    description: 'Certificate of Attendance',
+  },
+  {
+    code: ReportsOnSignOffOption.ReferralLetter,
+    description: 'Referral Letter',
+  },
   { code: ReportsOnSignOffOption.Memo, description: 'Memo' },
-  { code: ReportsOnSignOffOption.VaccinationCertificate, description: 'Vaccination Certificate' },
-  { code: ReportsOnSignOffOption.OtherDocuments, description: 'Other Documents' },
+  {
+    code: ReportsOnSignOffOption.VaccinationCertificate,
+    description: 'Vaccination Certificate',
+  },
+  {
+    code: ReportsOnSignOffOption.OtherDocuments,
+    description: 'Other Documents',
+  },
 ]
 export const ReportsOnCompletePaymentOption = {
   DrugLabel: 'Drug Label',
@@ -1081,7 +1096,7 @@ const formTypes = [
     name: 'Letter of Certification',
     prop: 'corLetterOfCertification',
     downloadConfig: {
-      id: 45,
+      id: 55,
       key: 'LetterofCertificationId',
       subject: 'Letter of Certification',
       draft: (row) => {
