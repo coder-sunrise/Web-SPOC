@@ -210,6 +210,16 @@ class AddNewStatement extends PureComponent {
 
   componentDidMount () {
     const { values, setValues } = this.props
+    const { dispatch, match: { params } } = this.props
+    if (params.id) {
+      dispatch({
+        type: 'statement/refreshStatement',
+        payload: {
+          id: Number(params.id),
+        },
+      })
+    }
+
     this.setState({
       invoiceRows: values.statementInvoice,
     })

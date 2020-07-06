@@ -14,7 +14,7 @@ import {
 // data table variable
 import { CoPayerColumns, CoPayerColExtensions } from '../variables'
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
-import { getUniqueId } from '@/utils/utils'
+import { roundTo, getUniqueId } from '@/utils/utils'
 
 const styles = (theme) => ({
   container: {
@@ -83,7 +83,11 @@ class CoPayer extends Component {
 
     const returnValue = {
       invoicePayerItem,
-      payerDistributedAmt: invoicePayerItem.reduce(
+      invoicePayment: [],
+      payerDistributedAmt: roundTo(
+        invoicePayerItem.reduce((total, item) => total + item.claimAmount, 0),
+      ),
+      payerOutstanding: invoicePayerItem.reduce(
         (total, item) => total + item.claimAmount,
         0,
       ),

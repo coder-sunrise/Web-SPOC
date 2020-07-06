@@ -1,8 +1,9 @@
 import React, { PureComponent } from 'react'
 import { withStyles } from '@material-ui/core'
-import Edit from '@material-ui/icons/Edit'
+import { Edit, Print } from '@material-ui/icons'
 import CommonTableGrid from '@/components/CommonTableGrid'
 import { Button, Tooltip } from '@/components'
+import PatientResultButton from './PatientResultPrintBtn'
 
 class OverallGrid extends PureComponent {
   configs = {
@@ -33,20 +34,28 @@ class OverallGrid extends PureComponent {
         align: 'center',
         width: 100,
         render: (row) => {
+          const { clinicSettings, handlePrintClick } = this.props
           return (
-            <Tooltip title='Edit Patient Lab Result' placement='bottom'>
-              <Button
-                size='sm'
-                onClick={() => {
-                  this.editRow(row)
-                }}
-                justIcon
-                color='primary'
-                style={{ marginRight: 0 }}
-              >
-                <Edit />
-              </Button>
-            </Tooltip>
+            <React.Fragment>
+              <PatientResultButton
+                row={row}
+                clinicSettings={clinicSettings}
+                handlePrint={handlePrintClick}
+              />
+              <Tooltip title='Edit Patient Lab Result' placement='bottom'>
+                <Button
+                  size='sm'
+                  onClick={() => {
+                    this.editRow(row)
+                  }}
+                  justIcon
+                  color='primary'
+                  style={{ marginRight: 0 }}
+                >
+                  <Edit />
+                </Button>
+              </Tooltip>
+            </React.Fragment>
           )
         },
       },

@@ -1,24 +1,19 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react'
+import React from 'react'
 import { connect } from 'dva'
-import router from 'umi/router'
+import MoreVert from '@material-ui/icons/MoreVert'
+import $ from 'jquery'
 // material ui
-import { Popover } from '@material-ui/core'
+import CallIcon from '@material-ui/icons/Call'
 // medisys component
+import Tooltip from '@material-ui/core/Tooltip'
 import { VisitStatusTag, LoadingWrapper } from '@/components/_medisys'
-import { CommonTableGrid, notification } from '@/components'
+import { CommonTableGrid, Button, Skeleton } from '@/components'
 // medisys component
 // sub component
-import ActionButton from './ActionButton'
-import ContextMenu from './ContextMenu'
 // utils
-import { getAppendUrl } from '@/utils/utils'
-import { filterData } from '../utils'
-import {
-  VISIT_STATUS,
-  ContextMenuOptions,
-  AppointmentContextMenu,
-} from '@/pages/Reception/Queue/variables'
-import { StatusIndicator } from '../variables'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
+import { APPOINTMENT_STATUS, VISIT_TYPE } from '@/utils/constants'
+import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import {
   FuncConfig,
   QueueTableConfig,
@@ -26,427 +21,123 @@ import {
   AppointmentTableConfig,
   ApptColumnExtensions,
 } from './variables'
-import Authorized from '@/utils/Authorized'
-import { VISIT_TYPE, VALUE_KEYS } from '@/utils/constants'
+import { filterData } from '../utils'
+// import ContextMenu from './ContextMenu'
+// import ActionButton from './ActionButton'
+// import { formikHandleSubmit } from '../NewVisit/miscUtils'
+// import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
+import { StatusIndicator } from '../variables'
 
-const Grid = ({
-  dispatch,
-  codetable,
-  user,
-  calendarEvents = [],
-  filter = StatusIndicator.ALL,
-  searchQuery,
-  selfOnly = false,
-  queueList = [],
-  queryingList = false,
-  queryingFormData = false,
-  showingVisitRegistration = false,
-  handleEditVisitClick,
-  onRegisterPatientClick,
-  onViewPatientProfileClick,
-  handleActualizeAppointment,
-  statusTagClicked,
-  handleFormsClick,
-  mainDivHeight = 700,
-}) => {
-  const [
-    anchorEl,
-    setAnchorEl,
-  ] = useState(null)
-
-  const [
-    rightClickedRow,
-    setRightClickedRow,
-  ] = useState(undefined)
-
-  const handlePopoverOpen = (event) => setAnchorEl(event.target)
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null)
-    setRightClickedRow(undefined)
+class Grid extends React.Component {
+  constructor (props) {
+    super(props)
+    props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: 'ctgender',
+    })
   }
 
-  const openContextMenu = Boolean(anchorEl)
+  shouldComponentUpdate (nextProps) {
+    // console.log(nextProps, this.props)
+    if (this.props.loading !== nextProps.loading) return true
+    if (this.props.selfOnly !== nextProps.selfOnly) return true
+    if (this.props.filter !== nextProps.filter) return true
+    if (this.props.mainDivHeight !== nextProps.mainDivHeight) return true
+    if (this.props.searchQuery !== nextProps.searchQuery) return true
 
-  const isAssignedDoctor = useCallback(
-    (row) => {
-      if (!row.doctor) return false
-      const { doctor: { id }, visitStatus } = row
-      const { clinicianProfile: { doctorProfile } } = user.data
-
-      if (!doctorProfile) {
-        notification.error({
-          message: 'Current user is not authorized to access',
-        })
-        return false
-      }
-
-      if (visitStatus === 'IN CONS') {
-        if (id !== doctorProfile.id) {
-          notification.error({
-            message: `You cannot resume other doctor's consultation.`,
-          })
-          return false
-        }
-      }
+    if (
+      nextProps.filter === 'appointment' &&
+      this.props.calendarEvents !== nextProps.calendarEvents
+    )
       return true
-    },
-    [
-      user,
-    ],
-  )
-
-  const deleteQueue = (id, queueNo) => {
-    dispatch({
-      type: 'queueLog/deleteQueueByQueueID',
-      payload: {
-        id,
-        queueNo,
-      },
-    })
+    return false
   }
 
-  useEffect(() => {
-    dispatch({
-      type: 'queueCalling/getExistingQueueCallList',
-      payload: {
-        keys: VALUE_KEYS.QUEUECALLING,
-      },
-    })
-  }, [])
+  onRowDoubleClick = (row) => {
+    const { visitStatus, visitPurposeFK = VISIT_TYPE.CONS } = row
+    const isWaiting = visitStatus === VISIT_STATUS.WAITING
+    const { clinicianProfile: { doctorProfile } } = this.props.user.data
+    const retailVisits = [
+      VISIT_TYPE.RETAIL,
+      VISIT_TYPE.BILL_FIRST,
+      VISIT_TYPE.TELE_CONS,
+    ]
+    if (!doctorProfile || retailVisits.includes(visitPurposeFK)) return false
 
-  // const calendarData = useMemo(
-  //   () => calendarEvents.reduce(flattenAppointmentDateToCalendarEvents, []),
-  //   [
-  //     calendarEvents,
-  //   ],
-  // )
+    if (isWaiting) this.props.onMenuItemClick(row, '5') // start consultation context menu id = 5
 
-  const computeQueueListingData = () => {
-    if (filter === StatusIndicator.APPOINTMENT) return calendarEvents
+    return true
+  }
+
+  computeQueueListingData = () => {
+    const {
+      user,
+      calendarEvents = [],
+      eQueueEvents = [],
+      filter = StatusIndicator.ALL,
+      searchQuery,
+      selfOnly = false,
+      queueList = [],
+    } = this.props
+
+    const { clinicianProfile } = user.data
+    if (filter === StatusIndicator.APPOINTMENT) {
+      if (selfOnly) {
+        return calendarEvents.filter(
+          (item) =>
+            clinicianProfile
+              ? item.clinicianProfileFk === clinicianProfile.id
+              : true,
+        )
+      }
+      return calendarEvents
+    }
+
+    if (filter === StatusIndicator.E_QUEUE) return eQueueEvents
     let data = [
       ...queueList,
     ]
-
-    const { clinicianProfile: { doctorProfile } } = user.data
 
     if (selfOnly)
       data = data.filter((item) => {
         if (!item.doctor) return false
         const { doctor: { id } } = item
-        return doctorProfile ? id === doctorProfile.id : false
+        return clinicianProfile.doctorProfile
+          ? id === clinicianProfile.doctorProfile.id
+          : false
       })
 
     return filterData(filter, data, searchQuery)
   }
 
-  const queueListingData = useMemo(computeQueueListingData, [
-    filter,
-    selfOnly,
-    calendarEvents,
-    queueList,
-    user,
-    searchQuery,
-  ])
-
-  const deleteQueueConfirmation = (row) => {
-    const { queueNo, id } = row
-
-    dispatch({
-      type: 'global/updateAppState',
-      payload: {
-        openConfirm: true,
-        openConfirmTitle: '',
-        openConfirmText: 'Confirm',
-        openConfirmContent: `Are you sure want to delete this visit (Q No.: ${queueNo})?`,
-        onConfirmSave: () => deleteQueue(id, queueNo),
-      },
-    })
-  }
-
-  const canAccess = (id) => {
-    const apptsActionID = [
-      '8',
-      '9',
-    ]
-    const findMatch = (item) => item.id === parseFloat(id, 10)
-
-    let menuOpt = ContextMenuOptions.find(findMatch)
-
-    if (apptsActionID.includes(id)) {
-      menuOpt = AppointmentContextMenu.find(findMatch)
-    }
-
-    const accessRight = Authorized.check(menuOpt.authority)
-
-    // skip for patient dashboard button
-    // user can access patient dashboard regardless of access right
-    // patient dashboard page will have the access right checking explicitly
-    if (id === '4') return true
-
-    return (
-      accessRight &&
-      (accessRight.rights === 'enable' || accessRight.rights === 'readwrite')
-    )
-  }
-
-  const onClick = useCallback(
-    (row, id) => {
-      const hasAccess = canAccess(id)
-      if (!hasAccess) {
-        notification.error({
-          message: 'Current user is not authorized to access',
-        })
-        return
-      }
-      dispatch({
-        type: 'queueLog/updateState',
-        payload: {
-          statusTagClicked: true,
-        },
-      })
-      switch (id) {
-        case '0': // edit visit
-        case '0.1': // view visit
-          handleEditVisitClick({
-            visitID: row.id,
-          })
-          break
-        case '1': {
-          // dispense
-          const isInitialLoading =
-            row.visitPurposeFK === VISIT_TYPE.RETAIL &&
-            row.visitStatus === 'WAITING'
-          const version = Date.now()
-          dispatch({
-            type: `dispense/start`,
-            payload: {
-              id: row.visitFK,
-              version,
-              qid: row.id,
-              queueNo: row.queueNo,
-            },
-          }).then((o) => {
-            if (o)
-              router.push(
-                `/reception/queue/dispense?isInitialLoading=${isInitialLoading}&qid=${row.id}&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
-              )
-          })
-
-          break
-        }
-        case '1.1': {
-          // billing
-          const version = Date.now()
-          const parameters = {
-            vid: row.visitFK,
-            pid: row.patientProfileFK,
-            qid: row.id,
-            v: version,
-          }
-          router.push(getAppendUrl(parameters, '/reception/queue/billing'))
-          break
-        }
-        case '2': // delete visit
-          deleteQueueConfirmation(row)
-          break
-        case '3': // view patient profile
-          onViewPatientProfileClick(row.patientProfileFK, row.id)
-          break
-        case '4': // patient dashboard
-          router.push(
-            `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}`,
-          )
-          break
-        case '5': {
-          // start consultation
-          const valid = isAssignedDoctor(row)
-          if (valid) {
-            const version = Date.now()
-
-            dispatch({
-              type: `consultation/start`,
-              payload: {
-                id: row.visitFK,
-                version,
-                qid: row.id,
-                queueNo: row.queueNo,
-              },
-            }).then((o) => {
-              if (o)
-                router.push(
-                  `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
-                )
-            })
-          }
-          break
-        }
-        case '6': {
-          // resume consultation
-          const valid = isAssignedDoctor(row)
-          if (valid) {
-            const version = Date.now()
-
-            if (row.visitStatus === 'PAUSED') {
-              dispatch({
-                type: `consultation/resume`,
-                payload: {
-                  id: row.visitFK,
-                  version,
-                },
-              }).then((o) => {
-                if (o)
-                  router.push(
-                    `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
-                  )
-              })
-            } else {
-              router.push(
-                `/reception/queue/consultation?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}`,
-              )
-            }
-          }
-
-          break
-        }
-        case '7': {
-          // edit consultation
-          const valid = isAssignedDoctor(row)
-          if (valid) {
-            const version = Date.now()
-
-            dispatch({
-              type: `consultation/edit`,
-              payload: {
-                id: row.visitFK,
-                version,
-              },
-            }).then((o) => {
-              if (o)
-                if (o.updateByUserFK !== user.data.id) {
-                  const { clinicianprofile = [] } = codetable
-                  const editingUser = clinicianprofile.find(
-                    (m) => m.userProfileFK === o.updateByUserFK,
-                  ) || {
-                    name: 'Someone',
-                  }
-                  dispatch({
-                    type: 'global/updateAppState',
-                    payload: {
-                      openConfirm: true,
-                      openConfirmContent: `${editingUser.name} is currently editing the patient note, do you want to overwrite?`,
-                      onConfirmSave: () => {
-                        dispatch({
-                          type: `consultation/overwrite`,
-                          payload: {
-                            id: row.visitFK,
-                            version,
-                          },
-                        }).then((c) => {
-                          router.push(
-                            `/reception/queue/consultation?qid=${row.id}&cid=${c.id}&v=${version}`,
-                          )
-                        })
-                      },
-                    },
-                  })
-                } else {
-                  router.push(
-                    `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
-                  )
-                }
-            })
-          }
-          break
-        }
-        case '8': {
-          const { clinicianprofile = [] } = codetable
-          const doctorProfile = clinicianprofile.find(
-            (item) => item.id === row.clinicianProfileFk,
-          )
-          handleActualizeAppointment({
-            patientID: row.patientProfileFk,
-            appointmentID: row.id,
-            primaryClinicianFK: doctorProfile ? doctorProfile.id : undefined,
-            primaryClinicianRoomFK: row.roomFk,
-          })
-          break
-        }
-        case '9':
-          onRegisterPatientClick(false, row)
-          break
-        case '10':
-          handleFormsClick({ visitID: row.id, visitStatus: row.visitStatus })
-          break
-        default:
-          break
-      }
-      setTimeout(() => {
-        dispatch({
-          type: 'queueLog/updateState',
-          payload: {
-            statusTagClicked: false,
-          },
-        })
-      }, 3000)
-    },
-    [
-      codetable.clinicianprofile,
-    ],
+  getActionButton = (row) => (
+    <Button
+      justIcon
+      round
+      color='primary'
+      size='sm'
+      onClick={(e) => {
+        this.props.onContextMenu(row, e)
+        e.preventDefault()
+        return false
+      }}
+    >
+      <MoreVert />
+    </Button>
   )
 
-  const onRowDoubleClick = useCallback(
-    (row) => {
-      const { visitStatus, visitPurposeFK = VISIT_TYPE.CONS } = row
-      const isWaiting = visitStatus === VISIT_STATUS.WAITING
-      const { clinicianProfile: { doctorProfile } } = user.data
-      const retailVisits = [
-        VISIT_TYPE.RETAIL,
-        VISIT_TYPE.BILL_FIRST,
-      ]
-      if (!doctorProfile || retailVisits.includes(visitPurposeFK)) return false
-
-      if (isWaiting) onClick(row, '5') // start consultation context menu id = 5
-
-      return true
-    },
-    [
-      user,
-    ],
-  )
-
-  const renderActionButton = useCallback(
-    (row) => {
-      return <ActionButton row={row} onClick={onClick} />
-    },
-    [
-      codetable,
-      onClick,
-    ],
-  )
-
-  const handleContextMenuClick = useCallback(
-    (menuItem) => {
-      handlePopoverClose()
-      onClick(rightClickedRow, menuItem.key)
-    },
-    [
-      rightClickedRow,
-    ],
-  )
-
-  const onOutsidePopoverRightClick = (event) => {
-    event.preventDefault()
-    handlePopoverClose()
-  }
-
-  const handleStatusTagClick = (row) => {
+  handleStatusTagClick = (row) => {
     let id = '5' // default as Start Consultation
-    const { visitStatus, visitPurposeFK, patientProfileFk } = row
+    const {
+      visitStatus,
+      visitPurposeFK,
+      patientProfileFk,
+      appointmentStatusFk,
+    } = row
     if (visitStatus === VISIT_STATUS.UPCOMING_APPT) {
       id = patientProfileFk ? '8' : '9'
 
-      onClick(row, id)
+      this.props.onMenuItemClick(row, id)
       return
     }
 
@@ -469,117 +160,146 @@ const Grid = ({
         break
       case VISIT_STATUS.BILLING:
       case VISIT_STATUS.COMPLETED:
+      case VISIT_STATUS.PAYMENT_REQUESTED:
+      case VISIT_STATUS.PAYMENT_FAILED:
         id = '1.1'
+        break
+      case VISIT_STATUS.EQ_PENDING:
+        id = '12'
+        break
+      case VISIT_STATUS.PENDING:
+        id = '11'
         break
       default:
         id = undefined
         break
     }
 
-    onClick(row, id)
+    this.props.onMenuItemClick(row, id)
   }
 
-  const isLoading = showingVisitRegistration ? false : queryingList
-  let loadingText = 'Refreshing queue...'
-  if (!queryingList && queryingFormData) loadingText = ''
-  const height = mainDivHeight - 190
-  const TableProps = { height }
-  return (
-    // <div style={{ minHeight: '76vh' }}>
-    <div>
-      <LoadingWrapper
-        linear
-        loading={isLoading || queryingFormData}
-        text={loadingText}
-      >
-        {filter !== StatusIndicator.APPOINTMENT && (
-          <CommonTableGrid
-            size='sm'
-            TableProps={TableProps}
-            rows={queueListingData}
-            firstColumnCustomPadding={10}
-            forceRender
-            columnExtensions={[
-              ...QueueColumnExtensions,
-              {
-                columnName: 'visitStatus',
-                width: 200,
-                render: (row) => (
-                  <VisitStatusTag row={row} onClick={handleStatusTagClick} />
-                ),
-              },
-              {
-                columnName: 'action',
-                align: 'center',
-                render: renderActionButton,
-              },
-            ]}
-            FuncProps={FuncConfig}
-            onRowDoubleClick={onRowDoubleClick}
-            onContextMenu={(row, event) => {
-              // console.log({ target: event.target.parentElement })
-              event.preventDefault()
-              handlePopoverOpen(event)
-              setRightClickedRow(row)
-            }}
-            {...QueueTableConfig}
-          />
-        )}
-        {filter === StatusIndicator.APPOINTMENT && (
-          <CommonTableGrid
-            size='sm'
-            TableProps={TableProps}
-            rows={queueListingData}
-            firstColumnCustomPadding={10}
-            columnExtensions={[
-              ...ApptColumnExtensions,
-              {
-                columnName: 'visitStatus',
-                width: 200,
-                render: (row) => (
-                  <VisitStatusTag
-                    row={row}
-                    onClick={handleStatusTagClick}
-                    statusTagClicked={statusTagClicked}
-                  />
-                ),
-              },
-              {
-                columnName: 'action',
-                align: 'center',
-                render: renderActionButton,
-              },
-            ]}
-            FuncProps={FuncConfig}
-            onRowDoubleClick={onRowDoubleClick}
-            {...AppointmentTableConfig}
-          />
-        )}
-      </LoadingWrapper>
-      {rightClickedRow && (
-        <Popover
-          open={openContextMenu}
-          onContextMenu={onOutsidePopoverRightClick}
-          anchorEl={anchorEl}
-          anchorOrigin={{
-            vertical: 'center',
-            horizontal: 'center',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'left',
-          }}
-          onClose={handlePopoverClose}
+  render () {
+    const {
+      codetable,
+      filter = StatusIndicator.ALL,
+      loading = false,
+      queryingFormData = false,
+      showingVisitRegistration = false,
+      statusTagClicked,
+      mainDivHeight = 700,
+    } = this.props
+
+    const queueListingData = this.computeQueueListingData()
+    // console.log(mainDivHeight)
+
+    const isLoading = showingVisitRegistration ? false : loading
+    let loadingText = 'Refreshing queue...'
+    if (!loading && queryingFormData) loadingText = ''
+    let height = mainDivHeight - 150 - $('.div-reception-header').height() || 0
+    if (height < 500) height = 500
+    const TableProps = { height }
+    if (!height) return <Skeleton variant='rect' height={500} />
+    return (
+      <div>
+        <LoadingWrapper
+          linear
+          loading={isLoading || queryingFormData}
+          text={loadingText}
         >
-          <ContextMenu
-            show={openContextMenu}
-            handleClick={handleContextMenuClick}
-            row={rightClickedRow}
-          />
-        </Popover>
-      )}
-    </div>
-  )
+          {filter !== StatusIndicator.APPOINTMENT &&
+          filter !== StatusIndicator.E_QUEUE && (
+            <CommonTableGrid
+              size='sm'
+              TableProps={TableProps}
+              rows={queueListingData}
+              forceRender
+              columnExtensions={[
+                ...QueueColumnExtensions,
+                {
+                  columnName: 'visitStatus',
+                  width: 200,
+                  render: (row) => (
+                    <VisitStatusTag
+                      row={row}
+                      onClick={this.handleStatusTagClick}
+                    />
+                  ),
+                },
+                {
+                  columnName: 'action',
+                  align: 'center',
+                  render: this.getActionButton,
+                },
+                {
+                  columnName: 'visitPurposeFK',
+                  width: 60,
+                  align: 'left',
+                  render: (row) => {
+                    return row.visitPurposeFK === VISIT_TYPE.TELE_CONS ? (
+                      <Tooltip title='TEL-CONS'>
+                        <CallIcon style={{ color: 'green' }} />
+                      </Tooltip>
+                    ) : (
+                      ''
+                    )
+                  },
+                },
+              ]}
+              FuncProps={FuncConfig}
+              onRowDoubleClick={this.onRowDoubleClick}
+              onContextMenu={this.props.onContextMenu}
+              {...QueueTableConfig}
+            />
+          )}
+          {filter === StatusIndicator.APPOINTMENT && (
+            <CommonTableGrid
+              size='sm'
+              TableProps={TableProps}
+              rows={queueListingData}
+              columnExtensions={[
+                ...ApptColumnExtensions,
+                {
+                  columnName: 'visitStatus',
+                  width: 200,
+                  render: (row) => (
+                    <VisitStatusTag
+                      row={row}
+                      onClick={this.handleStatusTagClick}
+                      statusTagClicked={statusTagClicked}
+                    />
+                  ),
+                },
+                {
+                  columnName: 'action',
+                  align: 'center',
+                  render: this.getActionButton,
+                },
+                {
+                  columnName: 'gender/age',
+                  render: (row) => {
+                    const { dob, genderFK = 3, patientProfileFk } = row
+                    if (!patientProfileFk) return null
+                    const { ctgender = [] } = codetable
+                    const age = calculateAgeFromDOB(dob)
+                    const gender = ctgender.find((g) => g.id === genderFK)
+                    return (
+                      <Tooltip title={`${gender.code}/${age}`}>
+                        <span>{`${gender.code}/${age}`}</span>
+                      </Tooltip>
+                    )
+                  },
+                  sortingEnabled: false,
+                },
+              ]}
+              FuncProps={FuncConfig}
+              onRowDoubleClick={this.onRowDoubleClick}
+              {...AppointmentTableConfig}
+            />
+          )}
+        </LoadingWrapper>
+      </div>
+    )
+  }
 }
 
 export default connect(({ queueLog, global, loading, user, codetable }) => ({
@@ -591,8 +311,10 @@ export default connect(({ queueLog, global, loading, user, codetable }) => ({
   queueList: queueLog.list || [],
   statusTagClicked: queueLog.statusTagClicked,
   calendarEvents: queueLog.appointmentList || [],
+  eQueueEvents: queueLog.equeueList || [],
   showingVisitRegistration: global.showVisitRegistration,
-  queryingList:
+  queueLog,
+  loading:
     loading.effects['queueLog/refresh'] ||
     loading.effects['queueLog/getSessionInfo'] ||
     loading.effects['queueLog/query'] ||

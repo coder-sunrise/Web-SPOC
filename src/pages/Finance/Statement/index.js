@@ -101,12 +101,12 @@ class Statement extends PureComponent {
       })
       return
     }
-    dispatch({
-      type: 'statement/updateState',
-      payload: {
-        currentId: row.id,
-      },
-    })
+    // dispatch({
+    //   type: 'statement/updateState',
+    //   payload: {
+    //     currentId: row.id,
+    //   },
+    // })
     history.push(`/finance/statement/details/${row.id}`)
   }
 

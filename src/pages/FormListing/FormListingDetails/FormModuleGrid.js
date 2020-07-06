@@ -26,23 +26,34 @@ class FormModuleGrid extends PureComponent {
   constructor (props) {
     super(props)
 
-    this.editRow = (row) => {
+    this.editRow = async (row) => {
       if (row.statusFK === 3 || row.statusFK === 4) return
-      this.props.dispatch({
-        type: 'formListing/updateState',
+      const response = await this.props.dispatch({
+        type: 'formListing/getCORForm',
         payload: {
-          showModal: true,
-          entity: row,
-          type: row.type,
-          formCategory: this.props.formCategory,
-          formFrom: this.props.formFrom,
-          visitDetail: {
-            visitID: row.visitID,
-            currentCORId: row.clinicalObjectRecordFK,
-            visitDate: row.visitDate,
-          },
+          id: row.id,
         },
       })
+      if (response) {
+        this.props.dispatch({
+          type: 'formListing/updateState',
+          payload: {
+            showModal: true,
+            entity: {
+              ...response,
+              formData: JSON.parse(response.formData),
+            },
+            type: row.type,
+            formCategory: this.props.formCategory,
+            formFrom: this.props.formFrom,
+            visitDetail: {
+              visitID: row.visitID,
+              currentCORId: row.clinicalObjectRecordFK,
+              visitDate: row.visitDate,
+            },
+          },
+        })
+      }
     }
 
     this.VoidForm = ({ classes, dispatch, row, user }) => {
@@ -55,23 +66,13 @@ class FormModuleGrid extends PureComponent {
         if (reason) {
           voidVisibleChange()
           dispatch({
-            type: 'formListing/saveForm',
+            type: 'formListing/saveCORForm',
             payload: {
-              visitID: row.visitID,
-              currentCORId: row.clinicalObjectRecordFK,
-              formType: 'CORForm',
-              UpdateType: row.type,
-              visitLetterOfCertification: [],
-              corLetterOfCertification: [
-                {
-                  ...row,
-                  formData: JSON.stringify(row.formData),
-                  voidReason: reason,
-                  statusFK: 4,
-                  voidDate: moment(),
-                  voidByUserFK: user.data.clinicianProfile.id,
-                },
-              ],
+              ...row,
+              voidReason: reason,
+              statusFK: 4,
+              voidDate: moment(),
+              voidByUserFK: user.data.clinicianProfile.id,
             },
           }).then(() => {
             this.props.queryFormListing()
@@ -116,9 +117,9 @@ class FormModuleGrid extends PureComponent {
         { name: 'patientID', title: 'Patient ID' },
         { name: 'patientName', title: 'Patient Name' },
         { name: 'doctor', title: 'From' },
-        { name: 'createDate', title: 'Create Time' },
-        { name: 'lastUpdateDate', title: 'Last Update Time' },
-        { name: 'submissionDate', title: 'Submission Time' },
+        { name: 'createDate', title: 'Create Date' },
+        { name: 'lastUpdateDate', title: 'Last Update Date' },
+        { name: 'submissionDate', title: 'Submission Date' },
         { name: 'statusFK', title: 'Status' },
         { name: 'action', title: 'Action' },
       ],
@@ -140,7 +141,6 @@ class FormModuleGrid extends PureComponent {
         },
         {
           columnName: 'createDate',
-          sortingEnabled: false,
           type: 'date',
           showTime: true,
           width: 180,
@@ -149,14 +149,12 @@ class FormModuleGrid extends PureComponent {
           columnName: 'lastUpdateDate',
           type: 'date',
           showTime: true,
-          sortingEnabled: false,
           width: 180,
         },
         {
           columnName: 'submissionDate',
           type: 'date',
           showTime: true,
-          sortingEnabled: false,
           width: 180,
         },
         {
@@ -167,7 +165,7 @@ class FormModuleGrid extends PureComponent {
         },
         {
           columnName: 'action',
-          align: 'center',
+          align: 'left',
           sortingEnabled: false,
           render: (row) => {
             const { classes, dispatch, user } = props
@@ -206,20 +204,10 @@ class FormModuleGrid extends PureComponent {
                     onConfirm={() =>
                       this.props
                         .dispatch({
-                          type: 'formListing/saveForm',
+                          type: 'formListing/saveCORForm',
                           payload: {
-                            visitID: row.visitID,
-                            currentCORId: row.clinicalObjectRecordFK,
-                            formType: 'CORForm',
-                            UpdateType: row.type,
-                            visitLetterOfCertification: [],
-                            corLetterOfCertification: [
-                              {
-                                ...row,
-                                formData: JSON.stringify(row.formData),
-                                isDeleted: true,
-                              },
-                            ],
+                            ...row,
+                            isDeleted: true,
                           },
                         })
                         .then(() => {

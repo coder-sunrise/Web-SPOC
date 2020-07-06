@@ -1,7 +1,8 @@
 import * as Yup from 'yup'
 import Info from '@material-ui/icons/Info'
-import { SizeContainer, Tooltip } from '@/components'
+import { Tooltip } from '@/components'
 import { INVOICE_ITEM_TYPE } from '@/utils/constants'
+import { roundTo } from '@/utils/utils'
 
 export const SchemeInvoicePayerColumn = [
   { name: 'invoiceItemTypeFK', title: 'Category' },
@@ -116,7 +117,9 @@ export const validationSchema = Yup.object().shape({
       let _absoluteValue = 0
       if (isPercentage) {
         const percentage = parseFloat(coverage.slice(0, -1))
-        _absoluteValue = payableBalance * percentage / 100
+        if (percentage === 100) {
+          _absoluteValue = payableBalance
+        } else _absoluteValue = roundTo(payableBalance * percentage / 100, 4)
       } else _absoluteValue = coverage.slice(1)
       const message =
         _absoluteValue === payableBalance

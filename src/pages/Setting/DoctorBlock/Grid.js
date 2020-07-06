@@ -94,21 +94,33 @@ export default ({ dataSource, onEditClick, onDeleteClick }) => {
     {
       columnName: 'startDate',
       sortingEnabled: false,
+      observeFields: [
+        'startDateTime',
+      ],
       render: (row) => moment(row.startDateTime).format(dateFormatLong),
     },
     {
       columnName: 'endDate',
       sortingEnabled: false,
+      observeFields: [
+        'endDateTime',
+      ],
       render: (row) => moment(row.endDateTime).format(dateFormatLong),
     },
     {
       columnName: 'startTime',
       sortingEnabled: false,
+      observeFields: [
+        'startDateTime',
+      ],
       render: (row) => moment(row.startDateTime).format(timeFormat),
     },
     {
       columnName: 'endTime',
       sortingEnabled: false,
+      observeFields: [
+        'endDateTime',
+      ],
       render: (row) => moment(row.endDateTime).format(timeFormat),
     },
     {
