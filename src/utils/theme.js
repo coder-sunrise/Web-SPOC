@@ -107,9 +107,9 @@ const sharedOverrides = {
         marginTop: '8px !important',
 
         // marginTop: 'inherit',
-        // '&:first-child': {
-        //   marginTop: '8px !important',
-        // },
+        '&:first-child': {
+          marginTop: '0px !important',
+        },
       },
     },
   },
@@ -266,6 +266,16 @@ export const defaultTheme = createMuiTheme({
   },
   overrides: {
     ...sharedOverrides,
+    MuiCheckbox: {
+      root: {
+        alignSelf: 'flex-start',
+      },
+    },
+    MuiExpansionPanelDetails: {
+      root: {
+        display: 'inherit',
+      },
+    },
     MuiToggleButtonGroup: {
       ...sharedToggleButtonGroup,
       groupedSizeSmall: {

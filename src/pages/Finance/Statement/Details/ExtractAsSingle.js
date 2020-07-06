@@ -5,18 +5,14 @@ import Yup from '@/utils/yup'
 
 import {
   withFormikExtend,
-  FastField,
-  GridItem,
-  CommonTableGrid,
-  CodeSelect,
+  EditableTableGrid,
   dateFormatLong,
-  Field,
   notification,
 } from '@/components'
 
 const styles = (theme) => ({})
 const medicationSchema = Yup.object().shape({
-  coPayer: Yup.number().required(),
+  copayerFK: Yup.number().required(),
 })
 @connect(({ statement }) => ({
   statement,
@@ -72,60 +68,63 @@ class ExtractAsSingle extends PureComponent {
       { name: 'invoiceNo', title: 'Invoice No.' },
       { name: 'invoiceDate', title: 'Invoice Date' },
       { name: 'invoiceAmt', title: 'Invoice Amount' },
-      { name: 'coPayer', title: 'Co-Payer' },
+      { name: 'copayerFK', title: 'Co-Payer' },
     ],
     columnExtensions: [
       {
+        columnName: 'patientName',
+        disabled: true,
+      },
+      {
         columnName: 'invoiceNo',
         width: 120,
+        disabled: true,
       },
       {
         columnName: 'invoiceDate',
         type: 'date',
         format: dateFormatLong,
         width: 120,
+        disabled: true,
       },
       {
         columnName: 'invoiceAmt',
         type: 'number',
         currency: true,
         width: 120,
+        disabled: true,
       },
       {
-        columnName: 'coPayer',
-
-        render: (row) => {
-          return (
-            <FastField
-              name={`rows[${row.rowIndex}].copayerFK`}
-              render={(args) => (
-                <CodeSelect
-                  code='ctCopayer'
-                  labelField='displayValue'
-                  localFilter={(item) => item.coPayerTypeFK === 1}
-                  {...args}
-                />
-              )}
-            />
-          )
-        },
+        columnName: 'copayerFK',
+        type: 'codeSelect',
+        code: 'ctcopayer',
+        valueField: 'id',
+        labelField: 'displayValue',
+        remoteFilter: { coPayerTypeFK: 1 },
       },
     ],
+  }
+
+  handleCommitChanges = ({ rows }) => {
+    const { setFieldValue } = this.props
+    setFieldValue('rows', rows)
   }
 
   render () {
     const { props } = this
     const { columns, columnExtensions } = this.state
-    const { theme, footer, selectedRows, handleSubmit, values } = props
+    const { theme, footer, handleSubmit, values } = props
+    const { rows } = values
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(2) }}>
-          <CommonTableGrid
-            rows={selectedRows || []}
+          <EditableTableGrid
+            rows={rows || []}
             columns={columns}
             columnExtensions={columnExtensions}
             schema={medicationSchema}
             FuncProps={{ pager: false }}
+            EditingProps={{ onCommitChanges: this.handleCommitChanges }}
           />
           <p style={{ margin: theme.spacing(1) }}>
             <i>
@@ -134,7 +133,7 @@ class ExtractAsSingle extends PureComponent {
           </p>
         </div>
         {footer &&
-          selectedRows.length > 0 &&
+          rows.length > 0 &&
           footer({
             onConfirm: handleSubmit,
             confirmBtnText: 'Save',

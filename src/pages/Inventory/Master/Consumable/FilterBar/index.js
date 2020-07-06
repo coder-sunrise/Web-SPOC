@@ -1,13 +1,15 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { FastField, withFormik } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import Search from '@material-ui/icons/Search'
-import Add from '@material-ui/icons/Add'
+import { Search, Add, ImportExport, AttachFile } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 import { compose } from 'redux'
 import { status } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
+import { LoadingWrapper } from '@/components/_medisys'
+import { downloadFile } from '@/services/file'
+import { convertToBase64 } from '@/utils/utils'
 
 import {
   GridContainer,
@@ -17,6 +19,7 @@ import {
   TextField,
   CodeSelect,
   ProgressButton,
+  notification,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -32,6 +35,9 @@ const styles = (theme) => ({
     },
   },
 })
+
+const allowedFiles = '.xlsx'
+
 const FilterBar = ({ classes, dispatch, history, values }) => {
   const unmount = () =>
     dispatch({
@@ -44,6 +50,109 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
   useEffect(() => {
     return unmount
   }, [])
+
+  const [
+    exporting,
+    setExporting,
+  ] = useState(false)
+
+  const [
+    loadingText,
+    setLoadingText,
+  ] = useState('')
+
+  const inputEl = useRef(null)
+
+  const onExportClick = async () => {
+    setExporting(true)
+    setLoadingText('Exporting...')
+
+    dispatch({
+      type: 'consumable/export',
+    }).then((result) => {
+      if (result) {
+        downloadFile(result, 'Consumable.xlsx')
+      }
+
+      setExporting(false)
+    })
+  }
+
+  const onSearchClick = () => {
+    const { code, displayValue, supplier, isActive } = values
+    dispatch({
+      type: 'consumable/query',
+      payload: {
+        code,
+        displayValue,
+        FavouriteSupplierFkNavigation: {
+          id: supplier,
+        },
+        isActive,
+      },
+    })
+  }
+
+  const clearValue = (e) => {
+    e.target.value = null
+  }
+
+  const mapToFileDto = async (file) => {
+    const base64 = await convertToBase64(file)
+    const originalFile = {
+      content: base64,
+    }
+
+    return originalFile
+  }
+
+  const onImportClick = () => {
+    inputEl.current.click()
+  }
+
+  const onFileChange = async (event) => {
+    try {
+      const { files } = event.target
+
+      const selectedFiles = await Promise.all(
+        Object.keys(files).map((key) => mapToFileDto(files[key])),
+      )
+
+      if (selectedFiles.length > 0) {
+        setExporting(true)
+        setLoadingText('Importing...')
+
+        dispatch({
+          type: 'consumable/import',
+          payload: {
+            ...selectedFiles[0],
+          },
+        }).then((result) => {
+          if (result && result.byteLength === 0) {
+            notification.success({
+              message: 'Import success',
+            })
+
+            onSearchClick()
+          } else if (result && result.byteLength > 0) {
+            notification.warning({
+              message:
+                'File is not valid, please download the validation file and check the issues',
+            })
+            downloadFile(result, 'Validation.xlsx')
+          } else {
+            notification.error({
+              message: 'Import failed',
+            })
+          }
+
+          setExporting(false)
+        })
+      }
+    } catch (error) {
+      console.log({ error })
+    }
+  }
 
   return (
     <div className={classes.filterBar}>
@@ -112,48 +221,60 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
           />
         </GridItem>
         <GridItem xs={12}>
-          <div className={classes.filterBtn}>
-            <ProgressButton
-              icon={<Search />}
-              variant='contained'
-              color='primary'
-              onClick={() => {
-                const { code, displayValue, supplier, isActive } = values
-                dispatch({
-                  type: 'consumable/query',
-                  payload: {
-                    code,
-                    displayValue,
-                    FavouriteSupplierFkNavigation: {
-                      id: supplier,
-                    },
-                    isActive,
-                  },
-                })
-              }}
-            >
-              <FormattedMessage id='form.search' />
-            </ProgressButton>
-            <Authorized authority='inventorymaster.newinventoryitem'>
-              <Button
+          <LoadingWrapper linear loading={exporting} text={loadingText}>
+            <div className={classes.filterBtn}>
+              <ProgressButton
+                icon={<Search />}
                 variant='contained'
                 color='primary'
-                onClick={() => {
-                  dispatch({
-                    type: 'consumableDetail/updateState',
-                    payload: {
-                      entity: undefined,
-                      currentId: undefined,
-                    },
-                  })
-                  history.push('/inventory/master/consumable')
-                }}
+                onClick={onSearchClick}
               >
-                <Add />
-                Add New
+                <FormattedMessage id='form.search' />
+              </ProgressButton>
+
+              <Authorized authority='inventorymaster.newinventoryitem'>
+                <Button
+                  variant='contained'
+                  color='primary'
+                  onClick={() => {
+                    dispatch({
+                      type: 'consumableDetail/updateState',
+                      payload: {
+                        entity: undefined,
+                        currentId: undefined,
+                      },
+                    })
+                    history.push('/inventory/master/consumable')
+                  }}
+                >
+                  <Add />
+                  Add New
+                </Button>
+              </Authorized>
+
+              <Button color='primary' onClick={onExportClick}>
+                <ImportExport />
+                Export
               </Button>
-            </Authorized>
-            {/* <Button
+
+              <Authorized authority='inventorymaster.newinventoryitem'>
+                <input
+                  style={{ display: 'none' }}
+                  type='file'
+                  accept={allowedFiles}
+                  id='importConsumableFile'
+                  ref={inputEl}
+                  multiple={false}
+                  onChange={onFileChange}
+                  onClick={clearValue}
+                />
+
+                <Button color='primary' onClick={onImportClick}>
+                  <AttachFile />
+                  Import
+                </Button>
+              </Authorized>
+              {/* <Button
                 variant='contained'
                 color='primary'
                 onClick={() => {
@@ -168,7 +289,8 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                 <GridOn />
                 Batch Edit
               </Button> */}
-          </div>
+            </div>
+          </LoadingWrapper>
         </GridItem>
       </GridContainer>
       {/* <CommonModal

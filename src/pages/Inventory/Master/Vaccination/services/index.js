@@ -1,4 +1,5 @@
 import * as service from '@/services/common'
+import request from '@/utils/request'
 
 const url = '/api/InventoryVaccination'
 
@@ -10,5 +11,24 @@ module.exports = {
   },
   upsert: (params) => {
     return service.upsert(url, params)
+  },
+
+  export: () => {
+    return request(`${url}/export`, {
+      method: 'GET',
+      xhrFields: {
+        responseType: 'arraybuffer',
+      },
+    })
+  },
+
+  import: (params) => {
+    return request(`${url}/import`, {
+      method: 'POST',
+      body: params,
+      xhrFields: {
+        responseType: 'arraybuffer',
+      },
+    })
   },
 }

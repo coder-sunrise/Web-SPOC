@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import { Tabs, Skeleton } from 'antd'
 import classNames from 'classnames'
 import styles from './index.less'
-import BreadcrumbView from './breadcrumb'
+import BreadcrumbView from './BreadcrumbView'
 
 const { TabPane } = Tabs
 export default class PageHeader extends PureComponent {

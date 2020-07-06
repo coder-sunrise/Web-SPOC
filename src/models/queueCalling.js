@@ -1,7 +1,8 @@
 import { createFormViewModel } from 'medisys-model'
 import _ from 'lodash'
-import * as service from '../services/queueDisplaySetup'
 import { subscribeNotification } from '@/utils/realtime'
+import { VALUE_KEYS } from '@/utils/constants'
+import * as service from '../services/queueDisplaySetup'
 
 export default createFormViewModel({
   namespace: 'queueCalling',
@@ -20,10 +21,11 @@ export default createFormViewModel({
         callback: (response) => {
           const { qNo, roomNo } = response
           const newCalledQueue = { qNo, roomNo }
+
           return dispatch({
-            type: 'refreshQueueCallList',
+            type: 'getExistingQueueCallList',
             payload: {
-              callingQueue: newCalledQueue,
+              keys: VALUE_KEYS.QUEUECALLING,
             },
           })
         },
@@ -85,6 +87,26 @@ export default createFormViewModel({
               },
             })
             return data[0]
+          }
+        }
+        return false
+      },
+      *claearAll ({ payload }, { call, put }) {
+        const { key } = payload
+        const r = yield call(service.query, { keys: key })
+        const { status, data } = r
+
+        if (status === '200') {
+          if (data.length > 0) {
+            const response = yield call(service.upsert, {
+              ...data[0],
+              key,
+              value: '[]',
+            })
+            if (response) {
+              yield put({ type: 'claearAllDone' })
+              return true
+            }
           }
         }
         return false
@@ -169,6 +191,9 @@ export default createFormViewModel({
           ...st,
           currentQCall: null,
         }
+      },
+      claearAllDone (st, { payload }) {
+        return {}
       },
       getLatestQCall (st, { payload }) {
         const { oriQCallList, pendingQCall } = st

@@ -172,7 +172,8 @@ const widgets = [
     name: 'Patient History',
     accessRight: 'queue.consultation.widgets.patienthistory',
     component: Loadable({
-      loader: () => import('@/pages/Widgets/PatientHistory'),
+      loader: () =>
+        import('@/pages/Widgets/PatientHistory/consultationDisplay'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return <Cmpnet {...p} widget mode='integrated' />
@@ -399,6 +400,23 @@ const widgets = [
     ],
     // model: 'refractionForm',
     layoutConfig: {},
+  },
+  {
+    id: '12',
+    name: 'Forms',
+    accessRight: 'queue.consultation.widgets.forms',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/Forms'),
+      loading: Loading,
+    }),
+    model: 'forms',
+    layoutConfig: {},
+
+    onRemove: () => {
+      window.g_app._store.dispatch({
+        type: 'forms/deleteRow',
+      })
+    },
   },
 ]
 

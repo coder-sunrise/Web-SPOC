@@ -253,7 +253,7 @@ class Details extends PureComponent {
           style={{ marginTop: 10 }}
           color='primary'
           onClick={() => {
-            history.push(`/finance/statement/editstatement`)
+            history.push(`/finance/statement/editstatement/${values.id}`)
           }}
         >
           Edit Statement

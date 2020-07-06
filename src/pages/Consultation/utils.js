@@ -1,4 +1,4 @@
-import { consultationDocumentTypes } from '@/utils/codes'
+import { consultationDocumentTypes, formTypes } from '@/utils/codes'
 import Medication from '@/pages/Widgets/Orders/Detail/Medication'
 import Vaccination from '@/pages/Widgets/Orders/Detail/Vaccination'
 import Service from '@/pages/Widgets/Orders/Detail/Service'
@@ -132,8 +132,19 @@ const convertEyeForms = (values) => {
   }
   return values
 }
+const convertConsultationDocument = (consultationDocument) => {
+  let result = {}
+  const { rows = [] } = consultationDocument
+  consultationDocumentTypes.forEach((p) => {
+    result[p.prop] = rows.filter((o) => o.type === p.value)
+  })
+  return result
+}
 
-const convertToConsultation = (values, { consultationDocument, orders }) => {
+const convertToConsultation = (
+  values,
+  { consultationDocument, orders, forms },
+) => {
   const { rows = [] } = consultationDocument
   consultationDocumentTypes.forEach((p) => {
     values[p.prop] = rows.filter((o) => o.type === p.value)
@@ -167,6 +178,25 @@ const convertToConsultation = (values, { consultationDocument, orders }) => {
 
   values = convertEyeForms(values)
 
+  const formRows = forms.rows
+  formTypes.forEach((p) => {
+    values[p.prop] = formRows
+      ? formRows.filter((o) => o.type === p.value).map((val) => {
+        return {
+          ...val,
+          formData: JSON.stringify({
+            ...val.formData,
+            otherDiagnosis: val.formData.otherDiagnosis.map((d) => {
+              const { diagnosiss, ...retainData } = d
+              return {
+                ...retainData,
+              }
+            }),
+          }),
+        }
+      })
+      : []
+  })
   return {
     ...values,
     isGSTInclusive,
@@ -177,4 +207,5 @@ module.exports = {
   ...module.exports,
   orderTypes,
   convertToConsultation,
+  convertConsultationDocument,
 }

@@ -122,7 +122,8 @@ export const ApptColumnExtensions = [
   },
   {
     columnName: 'remarks',
-    width: 250,
+    width: 180,
+    render: (row) => row.remarks || '-',
   },
   {
     columnName: 'appointmentTime',
@@ -207,7 +208,7 @@ export const QueueColumnExtensions = [
   },
   {
     columnName: 'remarks',
-    width: 250,
+    width: 180,
   },
   // {
   //   columnName: 'patientScheme',
