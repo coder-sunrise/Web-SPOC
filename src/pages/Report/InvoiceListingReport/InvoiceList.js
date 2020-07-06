@@ -56,7 +56,6 @@ class InvoiceList extends PureComponent {
     }
     let InvoiceListCols = InvoiceListingCols
     let InvoiceListColsExtension = InvoiceListingExtensions
-
     if (groupBy === 'Doctor') {
       FuncProps = {
         ...FuncProps,
@@ -114,6 +113,16 @@ class InvoiceList extends PureComponent {
             grouping: [
               { columnName: 'company' },
             ],
+          },
+          row: {
+            contentComponent: ({ column, row }) => (
+              <span>
+                <strong>
+                  {row.value ? column.title : ''}
+                </strong>
+                {row.value ? (`: ${row.value}`) : 'Private Patient Invoices'}
+              </span>
+            ),
           },
         },
       }
