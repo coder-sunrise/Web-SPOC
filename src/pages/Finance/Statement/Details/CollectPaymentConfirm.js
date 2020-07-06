@@ -373,6 +373,7 @@ class CollectPaymentConfirm extends PureComponent {
                       label='Payment Mode'
                       code='ctPaymentMode'
                       labelField='displayValue'
+                      localFilter={(item) => item.code !== 'DEPOSIT'}
                       onChange={(e, op = {}) => this.onChangePaymentMode(e, op)}
                     />
                   )}
