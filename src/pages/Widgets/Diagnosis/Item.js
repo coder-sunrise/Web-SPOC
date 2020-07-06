@@ -72,7 +72,9 @@ const DiagnosisItem = ({
     if (op) {
       vals.corDiagnosis[index].diagnosisDescription = op.displayvalue
       vals.corDiagnosis[index].diagnosisCode = op.code
-
+      vals.corDiagnosis[index].diagnosisICD10AMFK = op.iCD10AMFK
+      vals.corDiagnosis[index].diagnosisICD10AMCode = op.iCD10AMDiagnosisCode
+      vals.corDiagnosis[index].diagnosisICD10AMName = op.iCD10AMDiagnosisName
       if (op.complication && op.complication.length) {
         setCtComplicationPairedWithDiag(op.complication)
       } else {
@@ -171,8 +173,17 @@ const DiagnosisItem = ({
                 </Button>
                 <Button
                   color='primary'
-                  onClick={() => {
-                    form.setFieldValue(`corDiagnosis[${index}].isDeleted`, true)
+                  onClick={async () => {
+                    const { values: vals } = form
+                    const { entity } = consultation
+                    vals.corDiagnosis[index].isDeleted = true
+                    entity.corDiagnosis = vals.corDiagnosis
+                    dispatch({
+                      type: 'consultation/updateState',
+                      payload: {
+                        entity,
+                      },
+                    })
                     // arrayHelpers.remove(index)
                   }}
                 >

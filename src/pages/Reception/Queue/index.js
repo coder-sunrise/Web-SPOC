@@ -31,7 +31,8 @@ import { getAppendUrl, getRemovedUrl } from '@/utils/utils'
 import { SendNotification } from '@/utils/notification'
 import Authorized from '@/utils/Authorized'
 import { QueueDashboardButton } from '@/components/_medisys'
-import { VALUE_KEYS, VISIT_TYPE } from '@/utils/constants'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
+import { FORM_CATEGORY, VALUE_KEYS, VISIT_TYPE } from '@/utils/constants'
 import { initRoomAssignment } from '@/utils/codes'
 import {
   modelKey,
@@ -42,6 +43,7 @@ import PatientSearchModal from './PatientSearch'
 import DetailsGrid from './Grid'
 import DetailsActionBar from './FilterBar'
 import EmptySession from './EmptySession'
+import VisitForms from './VisitForms'
 import RightClickContextMenu from './Grid/RightClickContextMenu'
 
 const drawerWidth = 400
@@ -84,7 +86,15 @@ const styles = (theme) => ({
 })
 
 @connect(
-  ({ queueLog, patientSearch, loading, user, patient, queueCalling }) => ({
+  ({
+    queueLog,
+    patientSearch,
+    loading,
+    user,
+    patient,
+    queueCalling,
+    codetable,
+  }) => ({
     patientSearchResult: patientSearch.list,
     queueLog,
     loading,
@@ -92,6 +102,7 @@ const styles = (theme) => ({
     patient: patient.entity,
     DefaultPatientProfile: patient.default,
     queueCalling,
+    codetable,
   }),
 )
 class Queue extends React.Component {
@@ -102,6 +113,8 @@ class Queue extends React.Component {
       showPatientSearch: false,
       showEndSessionSummary: false,
       search: '',
+      showForms: false,
+      formCategory: undefined,
     }
     this._timer = null
   }
@@ -304,6 +317,13 @@ class Queue extends React.Component {
     })
     dispatch({
       type: `${modelKey}startSession`,
+    })
+  }
+
+  onReopenLastSession = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: `${modelKey}reopenLastSession`,
     })
   }
 
@@ -675,7 +695,7 @@ class Queue extends React.Component {
         this.toggleRegisterNewPatient(false, row)
         break
       case '10':
-        this.showVisitForms({ visitID: row.id, visitStatus: row.visitStatus })
+        this.showVisitForms(row)
         break
       default:
         break
@@ -729,16 +749,79 @@ class Queue extends React.Component {
     })
   }
 
+  toggleForms = () => {
+    const { showForms } = this.state
+    const target = !showForms
+    this.setState({
+      showForms: target,
+    })
+    // closing Forms
+    if (!target) {
+      this.resetFormsResult()
+    }
+  }
+
+  resetFormsResult = () => {
+    this.props.dispatch({
+      type: 'formListing/updateState',
+      payload: {
+        list: [],
+      },
+    })
+  }
+
+  showVisitForms = async (row) => {
+    const {
+      id,
+      visitStatus,
+      doctor,
+      patientAccountNo,
+      patientName,
+      patientReferenceNo,
+    } = row
+    await this.props.dispatch({
+      type: 'formListing/updateState',
+      payload: {
+        visitID: id,
+        visitDetail: {
+          visitID: id,
+          doctorProfileFK: doctor ? doctor.id : 0,
+          patientName,
+          patientNRICNo: patientReferenceNo,
+          patientAccountNo,
+        },
+      },
+    })
+    if (visitStatus === VISIT_STATUS.WAITING) {
+      this.setState({ formCategory: FORM_CATEGORY.VISITFORM })
+    } else {
+      this.setState({ formCategory: FORM_CATEGORY.CORFORM })
+    }
+    this.toggleForms()
+  }
+
   render () {
-    const { classes, queueLog, loading, history, dispatch } = this.props
+    const {
+      classes,
+      queueLog,
+      loading,
+      history,
+      dispatch,
+      queueCalling,
+    } = this.props
     const {
       showEndSessionSummary,
       showPatientSearch,
       _sessionInfoID,
       search,
+      showForms,
     } = this.state
     const { sessionInfo, error } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
+    const { oriQCallList = [] } = queueCalling
+    const [
+      lastCall,
+    ] = oriQCallList
 
     return (
       <PageHeaderWrapper
@@ -750,6 +833,31 @@ class Queue extends React.Component {
             <h3 className={classNames(classes.sessionNo)}>
               {`Session No.: ${sessionNo}`}
             </h3>
+
+            <Authorized authority='openqueuedisplay'>
+              {lastCall ? (
+                <h4
+                  className={classNames(classes.sessionNo)}
+                  style={{
+                    fontSize: 16,
+                    marginTop: 10,
+                    marginLeft: 10,
+                    fontWeight: 'Bold',
+                  }}
+                >
+                  <font color='red'>
+                    NOW SERVING:{' '}
+                    {lastCall.qNo.includes('.') ? (
+                      lastCall.qNo
+                    ) : (
+                      `${lastCall.qNo}.0`
+                    )}
+                  </font>
+                </h4>
+              ) : (
+                ''
+              )}
+            </Authorized>
 
             {!isClinicSessionClosed && (
               <div className={classNames(classes.toolBtns)}>
@@ -783,6 +891,7 @@ class Queue extends React.Component {
             {isClinicSessionClosed ? (
               <EmptySession
                 handleStartSession={this.onStartSession}
+                handleReopenLastSession={this.onReopenLastSession}
                 sessionInfo={sessionInfo}
                 loading={loading}
                 errorState={error}
@@ -804,6 +913,7 @@ class Queue extends React.Component {
                   // handleActualizeAppointment={this.handleActualizeAppointment}
                   onMenuItemClick={this.onMenuItemClick}
                   onContextMenu={this.onContextMenu}
+                  // handleFormsClick={this.showVisitForms}
                   history={history}
                   searchQuery={search}
                 />
@@ -838,6 +948,22 @@ class Queue extends React.Component {
               disableBackdropClick
             >
               <EndSessionSummary sessionID={_sessionInfoID} />
+            </CommonModal>
+            <CommonModal
+              open={showForms}
+              title={
+                this.state.formCategory === FORM_CATEGORY.VisitForms ? (
+                  'Visit Forms'
+                ) : (
+                  'Forms'
+                )
+              }
+              onClose={this.toggleForms}
+              onConfirm={this.toggleForms}
+              maxWidth='md'
+              overrideLoading
+            >
+              <VisitForms formCategory={this.state.formCategory} />
             </CommonModal>
           </CardBody>
         </Card>

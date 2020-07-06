@@ -1,8 +1,9 @@
 import router from 'umi/router'
+import moment from 'moment'
 import _ from 'lodash'
 import { createFormViewModel } from 'medisys-model'
 import { getUniqueId } from '@/utils/utils'
-import { consultationDocumentTypes } from '@/utils/codes'
+import { consultationDocumentTypes, formTypes } from '@/utils/codes'
 import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import { orderTypes } from '@/pages/Consultation/utils'
 import * as service from '../services/consultation'
@@ -50,6 +51,9 @@ export default createFormViewModel({
       selectedWidgets: [
         '1',
       ],
+      showSignOffModal: false,
+      printData: [],
+
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -377,6 +381,28 @@ export default createFormViewModel({
           },
         })
 
+        let formRows = []
+        formTypes.forEach((p) => {
+          formRows = formRows.concat(
+            (data[p.prop] || []).map((o) => {
+              const d = {
+                uid: getUniqueId(),
+                type: p.value,
+                typeName: p.name,
+                ...o,
+                formData: JSON.parse(o.formData),
+              }
+              return d
+            }),
+          )
+        })
+        yield put({
+          type: 'forms/updateState',
+          payload: {
+            rows: _.sortBy(formRows, 'sequence'),
+          },
+        })
+
         let oRows = []
         if (page !== 'edit order') {
           orderTypes.forEach((p) => {
@@ -466,30 +492,16 @@ export default createFormViewModel({
         const { corEyeRefractionForm, corEyeExaminationForm } = newResponse
         data.corEyeRefractionForm = corEyeRefractionForm
         data.corEyeExaminationForm = corEyeExaminationForm
-        // if (data.corEyeVisualAcuityTest)
-        //   yield put({
-        //     type: 'visualAcuity/updateState',
-        //     payload: {
-        //       entity: data.corEyeVisualAcuityTest,
-        //     },
-        //   })
-
-        // if (data.corDiagnosis && data.corDiagnosis.length > 0) {
-        //   data.corDiagnosis.forEach((cd) => {
-        //     cd.complication = cd.corComplication.map((o) => o.complicationFK)
-        //   })
-        // }
-        // if (data.corDiagnosis && data.corDiagnosis.length === 0) {
-        //   data.corDiagnosis.push({
-        //     onsetDate: moment(),
-        //     isPersist: false,
-        //     remarks: '',
-        //   })
-        // }
-        // console.log(payload)
         return payload
       },
     },
-    reducers: {},
+    reducers: {
+      showSignOffModal (state, { payload }) {
+        return { ...state, ...payload }
+      },
+      closeSignOffModal (state) {
+        return { ...state, showSignOffModal: false, printData: [] }
+      },
+    },
   },
 })

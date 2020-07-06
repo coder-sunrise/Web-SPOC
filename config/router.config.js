@@ -462,7 +462,7 @@ const _routes = [
             ],
           },
           {
-            path: '/finance/statement/editstatement',
+            path: '/finance/statement/editstatement/:id',
             name: 'statement/editstatement',
             hideInMenu: true,
             component: './Finance/Statement/NewStatement/AddNewStatement',
@@ -515,15 +515,6 @@ const _routes = [
           },
         ],
       },
-      // Forms
-      {
-        path: '/forms',
-        icon: 'assignment',
-        name: 'forms',
-        hideInMenu: true,
-        // component: './Forms',
-      },
-      // Forms
       //
       // Lab Report
       // {
@@ -609,6 +600,14 @@ const _routes = [
             component: './Report/SalesListingReport',
             authority: [
               'report.finance.saleslisting',
+            ],
+          },
+          {
+            path: '/report/invoicelistingreport',
+            name: 'invoiceListingReport',
+            component: './Report/InvoiceListingReport',
+            authority: [
+              'report.finance.invoicelisting',
             ],
           },
           {
@@ -795,6 +794,18 @@ const _routes = [
         ],
       },
       // Claim Submission
+      //
+      // Forms
+      {
+        path: '/forms',
+        icon: 'description',
+        name: 'forms',
+        component: './FormListing',
+        authority: [
+          'forms',
+        ],
+      },
+      // Forms
       //
       // Settings
       {
@@ -1171,12 +1182,12 @@ const _routes = [
             ],
           },
           {
-              path: '/setting/refractiontesttype',
-              name: 'refractiontesttype',
-              component: './Setting/RefractionTestType',
-              authority: [
-                  'settings.clinicsetting.refractiontesttype',
-              ],
+            path: '/setting/refractiontesttype',
+            name: 'refractiontesttype',
+            component: './Setting/RefractionTestType',
+            authority: [
+              'settings.clinicsetting.refractiontesttype',
+            ],
           },
         ],
       },
@@ -1246,16 +1257,16 @@ const routes =
   process.env.NODE_ENV === 'production'
     ? _routes
     : _routes.map((r, index) => {
-        if (index === 1) {
-          return {
-            ...r,
-            routes: [
-              devRoutes,
-              ...r.routes,
-            ],
-          }
+      if (index === 1) {
+        return {
+          ...r,
+          routes: [
+            devRoutes,
+            ...r.routes,
+          ],
         }
-        return r
-      })
+      }
+      return r
+    })
 
 export default _routes

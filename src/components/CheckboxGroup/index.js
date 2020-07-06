@@ -109,6 +109,8 @@ class CheckboxGroup extends React.Component {
       labelClass,
       ...resetProps
     } = this.props
+
+    // console.log(options, valueField, textField)
     return (
       <div
         className={classnames({
@@ -138,7 +140,9 @@ class CheckboxGroup extends React.Component {
                     disabled={o.disabled || disabled}
                   />
                 }
-                label={o[textField]}
+                label={
+                  <span dangerouslySetInnerHTML={{ __html: o[textField] }} />
+                }
               />
             </div>
           )

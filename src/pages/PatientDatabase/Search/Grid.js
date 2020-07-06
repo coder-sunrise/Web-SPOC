@@ -28,6 +28,7 @@ class Grid extends PureComponent {
         { name: 'mobileNo', title: 'Mobile No.' },
         { name: 'homeNo', title: 'Home No.' },
         { name: 'officeNo', title: 'Office No.' },
+        { name: 'outstandingBalance', title: 'Total O/S Balance' },
         { name: 'action', title: 'Action' },
       ],
       columnExtensions: [
@@ -82,6 +83,12 @@ class Grid extends PureComponent {
         { columnName: 'mobileNo', sortingEnabled: false },
         { columnName: 'homeNo', sortingEnabled: false },
         { columnName: 'officeNo', sortingEnabled: false },
+        {
+          columnName: 'outstandingBalance',
+          type: 'number',
+          currency: true,
+          sortingEnabled: false,
+        },
       ],
       FuncProps: {
         pager: true,

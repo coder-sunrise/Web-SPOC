@@ -83,8 +83,13 @@ class CoPayer extends Component {
 
     const returnValue = {
       invoicePayerItem,
+      invoicePayment: [],
       payerDistributedAmt: roundTo(
         invoicePayerItem.reduce((total, item) => total + item.claimAmount, 0),
+      ),
+      payerOutstanding: invoicePayerItem.reduce(
+        (total, item) => total + item.claimAmount,
+        0,
       ),
       payerTypeFK: INVOICE_PAYER_TYPE.COMPANY,
       name: copayer.displayValue,

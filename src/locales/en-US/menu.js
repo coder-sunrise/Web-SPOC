@@ -87,6 +87,7 @@ export default {
   'menu.report.chasClaimReport': 'CHAS Claim Report',
   'menu.report.voidCreditNoteReport': 'Void Credit Note & Payment Report',
   'menu.report.salesListingReport': 'Sales Listing Report',
+  'menu.report.invoiceListingReport': 'Invoice Listing Report',
   'menu.report.lowStockConsumablesReport': 'Low Stock Consumables Report',
   'menu.report.lowStockMedicationReport': 'Low Stock Medication Report',
   'menu.report.depositTransactionReport': 'Deposit Transaction Report',

@@ -12,6 +12,7 @@ import Circle from './circle'
 import Pan from './pan'
 import Eraser from './eraser'
 import Tool from './tools'
+import None from './none'
 
 const { fabric } = require('fabric')
 
@@ -90,6 +91,7 @@ class SketchField extends PureComponent {
     this._tools[Tool.Circle] = new Circle(fabricCanvas)
     this._tools[Tool.Pan] = new Pan(fabricCanvas)
     this._tools[Tool.Eraser] = new Eraser(fabricCanvas)
+    this._tools[Tool.None] = new None(fabricCanvas)
   }
 
   /**
@@ -859,6 +861,36 @@ class SketchField extends PureComponent {
     // img.onload = () =>
     //   canvas.setBackgroundImage(new fabric.Image(img), () => canvas.renderAll())
     // img.src = dataUrl
+  }
+
+  setBackgroundFromData = (imageData) => {
+    let canvas = this._fc
+    let { indexCount } = this.state
+    let history = this._history
+    let oldIndexCount = indexCount
+    let newIndexCount = indexCount + 1
+
+    history.updateCount(oldIndexCount)
+
+    this.setState({
+      indexCount: newIndexCount,
+    })
+
+    const image = new Image()
+    image.src = imageData
+    image.onload = () => {
+      let imgbase64 = new fabric.Image(image, {})
+      imgbase64.width = canvas.width
+      imgbase64.height = canvas.height
+      imgbase64.set({
+        zindex: oldIndexCount,
+      })
+      canvas.add(imgbase64)
+      imgbase64.selectable = false
+      imgbase64.evented = false
+
+      canvas.sendToBack(imgbase64)
+    }
   }
 
   setTemplate = (dataUrl, id) => {

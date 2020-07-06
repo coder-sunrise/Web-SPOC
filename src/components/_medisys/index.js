@@ -35,3 +35,4 @@ export {
   default as CallingQueueButton,
 } from './QueueDisplay/CallingQueueButton'
 export { default as AuthorizationWrapper } from './AuthorizationWrapper'
+export { default as ICD10AMSelect } from './ICD10AMSelect'

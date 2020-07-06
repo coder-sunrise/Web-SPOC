@@ -9,6 +9,7 @@ import { primaryColor } from 'mui-pro-jss'
 import {
   StatusIndicator,
   ContextMenuOptions,
+  AppointmentContextMenu,
   filterMap,
   VISIT_STATUS,
 } from '../variables'
@@ -57,7 +58,6 @@ const ContextMenu = ({
   onMenuItemClick,
   onMenuClick,
 }) => {
-  console.log({ rights })
   const isStatusWaiting = row.visitStatus === VISIT_STATUS.WAITING
   const isStatusInProgress = filterMap[StatusIndicator.IN_PROGRESS].includes(
     row.visitStatus,
@@ -114,8 +114,29 @@ const ContextMenu = ({
     isRetailVisit ||
     (isBillFirstVisit && !row.hasSignedCOR)
 
-  const contextMenuOptions = useMemo(() =>
-    ContextMenuOptions.map((opt) => {
+  const contextMenuOptions = useMemo(() => {
+    if (row.visitStatus === VISIT_STATUS.UPCOMING_APPT) {
+      return AppointmentContextMenu.map((opt) => {
+        switch (opt.id) {
+          case 8: // register visit
+            return {
+              ...opt,
+              disabled: !row.patientProfileFk,
+              hidden: !row.patientProfileFk,
+            }
+          case 9: // register patient
+            return {
+              ...opt,
+              disabled: !!row.patientProfileFk,
+              hidden: !!row.patientProfileFk,
+            }
+          default:
+            return { ...opt }
+        }
+      })
+    }
+
+    return ContextMenuOptions.map((opt) => {
       const isDisabled = rights === 'disable'
       switch (opt.id) {
         case 0: // edit visit
@@ -152,11 +173,16 @@ const ContextMenu = ({
             disabled: !isStatusCompleted || isDisabled,
             hidden: hideEditConsultation,
           }
+        case 10: // forms
+          return {
+            ...opt,
+            hidden: isRetailVisit,
+          }
         default:
           return { ...opt }
       }
-    }),
-  )
+    })
+  })
 
   const MenuItemsOverlay = (
     <Menu

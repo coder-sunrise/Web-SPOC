@@ -15,6 +15,7 @@ import {
 // medisys component
 import { AppointmentTypeLabel, DoctorLabel } from '@/components/_medisys'
 import { smsStatus, messageStatus, appointmentStatus } from '@/utils/codes'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   checkbox: {
@@ -84,26 +85,28 @@ const FilterByAppointment = ({ classes, values, setFieldValue }) => {
           name='doctor'
           render={(args) => {
             return (
-              <CodeSelect
-                label={formatMessage({
-                  id: 'sms.doctor',
-                })}
-                allValue={-99}
-                allValueOption={{
-                  clinicianProfile: {
-                    name: 'All',
-                    id: -99,
-                  },
-                }}
-                code='doctorProfile'
-                mode='multiple'
-                labelField='clinicianProfile.name'
-                valueField='clinicianProfile.id'
-                maxTagCount={maxDoctorTagCount}
-                maxTagPlaceholder='doctors'
-                renderDropdown={(option) => <DoctorLabel doctor={option} />}
-                {...args}
-              />
+              <Authorized authority='appointment.viewotherappointment'>
+                <CodeSelect
+                  label={formatMessage({
+                    id: 'sms.doctor',
+                  })}
+                  allValue={-99}
+                  allValueOption={{
+                    clinicianProfile: {
+                      name: 'All',
+                      id: -99,
+                    },
+                  }}
+                  code='doctorProfile'
+                  mode='multiple'
+                  labelField='clinicianProfile.name'
+                  valueField='clinicianProfile.id'
+                  maxTagCount={maxDoctorTagCount}
+                  maxTagPlaceholder='doctors'
+                  renderDropdown={(option) => <DoctorLabel doctor={option} />}
+                  {...args}
+                />
+              </Authorized>
             )
           }}
         />

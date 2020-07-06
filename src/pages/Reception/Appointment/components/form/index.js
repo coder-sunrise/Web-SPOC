@@ -41,6 +41,7 @@ import {
 import { getAppendUrl } from '@/utils/utils'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
 import styles from './style'
+import { getBizSession } from '@/services/queue'
 
 const gridValidationSchema = Yup.object().shape({
   startTime: Yup.string().required(),
@@ -100,10 +101,12 @@ class Form extends React.PureComponent {
     tempNewAppointmentStatusFK: -1,
     isDataGridValid: this.props.values.id !== undefined,
     editingRows: [],
+    hasActiveSession: false,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { values, dispatch } = this.props
+    this.checkHasActiveSession()
     Promise.all([
       dispatch({
         type: 'codetable/fetchCodes',
@@ -120,6 +123,24 @@ class Form extends React.PureComponent {
     }
 
     this.validateDataGrid()
+  }
+
+  checkHasActiveSession = async () => {
+    try {
+      const bizSessionPayload = {
+        IsClinicSessionClosed: false,
+      }
+      const result = await getBizSession(bizSessionPayload)
+      const { data } = result.data
+
+      this.setState(() => {
+        return {
+          hasActiveSession: data.length > 0,
+        }
+      })
+    } catch (error) {
+      console.log({ error })
+    }
   }
 
   refreshPatient = (id) => {
@@ -558,7 +579,7 @@ class Form extends React.PureComponent {
     }
   }
 
-  onDeleteClick = () => {}
+  onDeleteClick = () => { }
 
   onValidateClick = () => {
     const appointmentStatus = this.props.appointmentStatuses.find(
@@ -625,19 +646,88 @@ class Form extends React.PureComponent {
 
   onConfirmClick = () => {
     const { values, mode, viewingAppointment } = this.props
-
     try {
+      const { datagrid } = this.state
       let newAppointmentStatusFK = APPOINTMENT_STATUS.SCHEDULED
       const rescheduleFK = APPOINTMENT_STATUS.RESCHEDULED
-
+      let originalAppointment = viewingAppointment.appointments.find((t) => t.id === values.currentAppointment.id)
+      let newResource = Array.from(datagrid, (resource) => {
+        let startTime = `${resource.startTime}:00`
+        let endTime = `${resource.endTime}:00`
+        const { appointmentFK,
+          clinicianFK,
+          clinicianName,
+          clinicianTitle,
+          sortOrder,
+          isPrimaryClinician,
+          id,
+          isDeleted,
+          concurrencyToken,
+          apptDurationHour,
+          apptDurationMinute,
+          preClinicianFK } = resource
+        return {
+          appointmentFK,
+          clinicianFK,
+          clinicianName,
+          clinicianTitle,
+          startTime,
+          endTime,
+          sortOrder,
+          isPrimaryClinician,
+          id,
+          isDeleted,
+          concurrencyToken,
+          apptDurationHour,
+          apptDurationMinute,
+          preClinicianFK,
+        }
+      })
+      let originalResource = Array.from(originalAppointment.appointments_Resources, (resource) => {
+        const { appointmentFK,
+          clinicianFK,
+          clinicianName,
+          clinicianTitle,
+          startTime,
+          endTime,
+          sortOrder,
+          isPrimaryClinician,
+          id,
+          isDeleted,
+          concurrencyToken,
+          apptDurationHour,
+          apptDurationMinute,
+          preClinicianFK } = resource
+        return {
+          appointmentFK,
+          clinicianFK,
+          clinicianName,
+          clinicianTitle,
+          startTime,
+          endTime,
+          sortOrder,
+          isPrimaryClinician,
+          id,
+          isDeleted,
+          concurrencyToken,
+          apptDurationHour,
+          apptDurationMinute,
+          preClinicianFK,
+        }
+      }) 
+      let resourceChanged = JSON.stringify(originalResource) !== JSON.stringify(newResource)
+      let dateChanged = originalAppointment.appointmentDate.indexOf(values.currentAppointment.appointmentDate) === -1
       if (
         values.currentAppointment &&
         (values.currentAppointment.appointmentStatusFk ===
           APPOINTMENT_STATUS.SCHEDULED ||
           values.currentAppointment.appointmentStatusFk ===
-            APPOINTMENT_STATUS.RESCHEDULED)
-      )
-        newAppointmentStatusFK = rescheduleFK
+          APPOINTMENT_STATUS.RESCHEDULED)
+      ) {
+        if (resourceChanged || dateChanged) {
+          newAppointmentStatusFK = rescheduleFK
+        }
+      }
 
       const hasModifiedAsSingle = viewingAppointment.appointments.reduce(
         (editedAsSingle, appointment) =>
@@ -659,7 +749,6 @@ class Form extends React.PureComponent {
             this.openSeriesUpdateConfirmation(this.openRescheduleForm)
             return true
           }
-
           if (newAppointmentStatusFK === APPOINTMENT_STATUS.RESCHEDULED) {
             this.openRescheduleForm()
           } else {
@@ -775,12 +864,7 @@ class Form extends React.PureComponent {
   shouldDisableButtonAction = () => {
     const { values } = this.props
     const { isDataGridValid } = this.state
-    if (
-      !isDataGridValid ||
-      !values.patientName ||
-      values.patientContactNo === undefined ||
-      values.patientContactNo === null
-    )
+    if (!isDataGridValid || !values.patientName || !values.patientContactNo)
       return true
 
     return false
@@ -822,7 +906,7 @@ class Form extends React.PureComponent {
     )
   }
 
-  render () {
+  render() {
     const {
       classes,
       theme,
@@ -854,12 +938,12 @@ class Form extends React.PureComponent {
     const _datagrid =
       conflicts.length > 0
         ? datagrid
-            .filter((item) => !item.isDeleted)
-            .sort(sortDataGrid)
-            .map((item, index) => ({ ...item, sortOrder: index }))
+          .filter((item) => !item.isDeleted)
+          .sort(sortDataGrid)
+          .map((item, index) => ({ ...item, sortOrder: index }))
         : [
-            ...datagrid,
-          ]
+          ...datagrid,
+        ]
 
     const show =
       loading.effects['patientSearch/query'] || loading.models.calendar
@@ -896,6 +980,7 @@ class Form extends React.PureComponent {
                     patientProfileFK={values.patientProfileFK}
                     appointmentStatusFK={currentAppointment.appointmentStatusFk}
                     values={values}
+                    hasActiveSession={this.state.hasActiveSession}
                   />
                   <AppointmentDateInput disabled={_disableAppointmentDate} />
                   <GridItem xs md={12} className={classes.verticalSpacing}>

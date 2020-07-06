@@ -140,6 +140,7 @@ class Details extends PureComponent {
         </GridContainer>
 
         <CommonTableGrid
+          forceRender
           rows={statementInvoice}
           columns={columns}
           columnExtensions={[
@@ -212,8 +213,8 @@ class Details extends PureComponent {
         <p style={{ margin: theme.spacing(1) }}>
           {`Last Refreshed On ${values.lastRefreshTime
             ? moment(values.lastRefreshTime).format(
-                dateFormatLongWithTimeNoSec12h,
-              )
+              dateFormatLongWithTimeNoSec12h,
+            )
             : '-'}`}
         </p>
 
@@ -252,7 +253,7 @@ class Details extends PureComponent {
           style={{ marginTop: 10 }}
           color='primary'
           onClick={() => {
-            history.push(`/finance/statement/editstatement`)
+            history.push(`/finance/statement/editstatement/${values.id}`)
           }}
         >
           Edit Statement

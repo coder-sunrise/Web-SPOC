@@ -80,16 +80,19 @@ class Grid extends React.Component {
       queueList = [],
     } = this.props
 
-    const { clinicianProfile: { doctorProfile } } = user.data
+    const { clinicianProfile } = user.data
     if (filter === StatusIndicator.APPOINTMENT) {
       if (selfOnly) {
         return calendarEvents.filter(
           (item) =>
-            doctorProfile ? item.doctorProfileFK === doctorProfile.id : true,
+            clinicianProfile
+              ? item.clinicianProfileFk === clinicianProfile.id
+              : true,
         )
       }
       return calendarEvents
     }
+
     if (filter === StatusIndicator.E_QUEUE) return eQueueEvents
     let data = [
       ...queueList,
@@ -99,7 +102,9 @@ class Grid extends React.Component {
       data = data.filter((item) => {
         if (!item.doctor) return false
         const { doctor: { id } } = item
-        return doctorProfile ? id === doctorProfile.id : false
+        return clinicianProfile.doctorProfile
+          ? id === clinicianProfile.doctorProfile.id
+          : false
       })
 
     return filterData(filter, data, searchQuery)
@@ -112,7 +117,6 @@ class Grid extends React.Component {
       color='primary'
       size='sm'
       onClick={(e) => {
-        console.log({ props: this.props })
         this.props.onContextMenu(row, e)
         e.preventDefault()
         return false
@@ -264,20 +268,6 @@ class Grid extends React.Component {
                       statusTagClicked={statusTagClicked}
                     />
                   ),
-                },
-                {
-                  columnName: 'isTeleConsult',
-                  width: 60,
-                  align: 'left',
-                  render: (row) => {
-                    return row.isTeleConsult ? (
-                      <Tooltip title='TEL-CONS'>
-                        <CallIcon style={{ color: 'green' }} />
-                      </Tooltip>
-                    ) : (
-                      ''
-                    )
-                  },
                 },
                 {
                   columnName: 'action',

@@ -6,6 +6,8 @@ import PropTypes from 'prop-types'
 import { connect } from 'dva'
 // antd
 import { Divider } from 'antd'
+import _ from 'lodash'
+
 // @material-ui
 import withStyles from '@material-ui/core/styles/withStyles'
 import MenuItem from '@material-ui/core/MenuItem'
@@ -15,12 +17,18 @@ import WifiOff from '@material-ui/icons/WifiOff'
 // assets
 import headerLinksStyle from 'mui-pro-jss/material-dashboard-pro-react/components/headerLinksStyle'
 // common components
+import moment from 'moment'
 import { Badge, SizeContainer, Popper, Button, Tooltip } from '@/components'
 // subcomponents
 import { Notification } from '@/components/_medisys'
 // utils
 import { updateAPIType } from '@/utils/request'
 import { navigateDirtyCheck } from '@/utils/utils'
+import {
+  VALUE_KEYS,
+  NOTIFICATION_STATUS,
+  NOTIFICATION_TYPE,
+} from '@/utils/constants'
 
 @connect(({ user, clinicInfo, header }) => ({
   user,
