@@ -248,13 +248,16 @@ const AddOrder = ({
 export default compose(
   withRouter,
   withStyles(styles, { withTheme: true }),
-  connect(({ dispense, orders, codetable, consultation, clinicInfo }) => ({
-    dispense,
-    orders,
-    consultation,
-    codetable,
-    clinicInfo,
-  })),
+  connect(
+    ({ dispense, orders, codetable, consultation, clinicInfo, forms }) => ({
+      dispense,
+      orders,
+      consultation,
+      codetable,
+      clinicInfo,
+      forms,
+    }),
+  ),
   withFormikExtend({
     handleSubmit: (values, { props }) => {
       const {
@@ -267,6 +270,7 @@ export default compose(
         codetable: { inventoryconsumable, inventorymedication, ctservice },
         visitType,
         history,
+        forms,
       } = props
       const { rows, summary, finalAdjustments } = orders
       const { addOrderDetails } = dispense
@@ -536,6 +540,7 @@ export default compose(
         const billFirstPayload = convertToConsultation(consultation.entity, {
           consultationDocument: { rows: [] },
           orders,
+          forms,
         })
         console.log({ billFirstPayload })
         dispatch({

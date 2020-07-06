@@ -7,9 +7,9 @@ import Refresh from '@material-ui/icons/Refresh'
 // common components
 import { Badge, Popper, Button, Tabs, IconButton } from '@/components'
 // sub components
+import customDropdownStyle from '@/assets/jss/material-dashboard-pro-react/components/customDropdownStyle'
 import NotificationList from './NotificationList'
 // assets
-import customDropdownStyle from '@/assets/jss/material-dashboard-pro-react/components/customDropdownStyle'
 import { TYPES } from './constants'
 
 const styles = (theme) => ({

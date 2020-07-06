@@ -1,7 +1,7 @@
 import moment from 'moment'
 import { createFormViewModel } from 'medisys-model'
 import { INVOICE_VIEW_MODE } from '@/utils/constants'
-import * as service from '../services'
+import * as service from '../services/appliedScheme'
 import {
   queryInvoicePayerByIdAndInvoiceVersionNo,
   saveAppliedScheme,

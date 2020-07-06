@@ -66,6 +66,7 @@ const initStream = () => {
     const { sender, message } = response
 
     const { dispatch, getState } = window.g_app._store
+
     const {
       user = {
         data: {
@@ -86,7 +87,6 @@ const initStream = () => {
       })
       sessionStorage.setItem('notifications', JSON.stringify(notifications))
     }
-
     if (connectionObserver[type]) {
       connectionObserver[type](response)
     }

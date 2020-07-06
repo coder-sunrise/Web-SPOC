@@ -9,6 +9,7 @@ import {
   VISIT_STATUS,
 } from '@/pages/Reception/Queue/variables'
 import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
+import Authorized from '@/utils/Authorized'
 
 const InitialSessionInfo = {
   isClinicSessionClosed: undefined,
@@ -133,6 +134,30 @@ export default createListViewModel({
         }
         return response
       },
+      *reopenLastSession (_, { call, put }) {
+        const response = yield call(service.reopenLastSession)
+
+        if (response) {
+          // reopen session successfully
+          yield put({
+            type: 'updateSessionInfo',
+            payload: { ...response },
+          })
+          yield put({
+            type: 'query',
+            payload: {
+              'VisitFKNavigation.BizSessionFK': response.id,
+            },
+          })
+        }
+        return yield put({
+          type: 'toggleError',
+          error: {
+            hasError: true,
+            message: 'Failed to reopen session.',
+          },
+        })
+      },
       *getCurrentActiveSessionInfo (_, { call, put }) {
         const bizSessionPayload = {
           IsClinicSessionClosed: false,
@@ -195,15 +220,29 @@ export default createListViewModel({
         })
         return false
       },
-      *getTodayAppointments ({ payload }, { call, put }) {
+      *getTodayAppointments ({ payload }, { call, put, select }) {
         const { shouldGetTodayAppointments = true } = payload
         // TODO: integrate with new appointment listing api
+
+        const doctorProperty = 'Appointment_Resources.ClinicianFK'
+        const viewOtherApptAccessRight = Authorized.check(
+          'appointment.viewotherappointment',
+        )
+        const user = yield select((state) => state.user)
+        let doctor
+        if (
+          !viewOtherApptAccessRight ||
+          viewOtherApptAccessRight.rights !== 'enable'
+        ) {
+          doctor = user.data.clinicianProfile.id
+        }
         if (shouldGetTodayAppointments) {
           const today = moment().formatUTC()
           const queryPayload = {
             combineCondition: 'and',
             eql_appointmentDate: today,
             in_appointmentStatusFk: '1|5',
+            [doctorProperty]: doctor,
           }
           const response = yield call(
             service.queryAppointmentListing,

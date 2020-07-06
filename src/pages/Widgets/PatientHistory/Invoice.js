@@ -115,7 +115,12 @@ export default ({ classes, current, theme, setFieldValue }) => {
           { columnName: 'description', width: 'auto' },
           { columnName: 'quantity', width: 90, type: 'number' },
           { columnName: 'dispenseUOMDisplayValue', width: 100 },
-          { columnName: 'adjAmt', type: 'number', currency: true, width: 120 },
+          {
+            columnName: 'adjAmt',
+            type: 'number',
+            currency: true,
+            width: 120,
+          },
           {
             columnName: 'totalAfterItemAdjustment',
             type: 'number',

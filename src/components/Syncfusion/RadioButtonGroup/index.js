@@ -7,11 +7,17 @@ import FormHelperText from '@material-ui/core/FormHelperText'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import FormControl from '@material-ui/core/FormControl'
 import FormLabel from '@material-ui/core/FormLabel'
-import FiberManualRecord from "@material-ui/icons/FiberManualRecord"
+import FiberManualRecord from '@material-ui/icons/FiberManualRecord'
 
-import { withFormik ,Formik, Form, Field,FastField, ErrorMessage } from 'formik'
+import {
+  withFormik,
+  Formik,
+  Form,
+  Field,
+  FastField,
+  ErrorMessage,
+} from 'formik'
 import { extendFunc } from '@/utils/utils'
-
 
 // const styles = theme => ({
 //   root: {
@@ -24,27 +30,39 @@ import { extendFunc } from '@/utils/utils'
 //     margin: `${theme.spacing.unit}px 0`,
 //   },
 // })
-import customCheckboxRadioSwitch from "mui-pro-jss/material-dashboard-pro-react/customCheckboxRadioSwitch.jsx"
+import customCheckboxRadioSwitch from 'mui-pro-jss/material-dashboard-pro-react/customCheckboxRadioSwitch.jsx'
 
 class RadioButtonsGroup extends React.Component {
- 
-
   render () {
-    let { onChange, onBlur, classes, className, label, options=[] ,tipText, help, row,error , field={},form} = this.props
-    const {name, value}=field
+    let {
+      onChange,
+      onBlur,
+      classes,
+      className,
+      label,
+      options = [],
+      tipText,
+      help,
+      row,
+      error,
+      field = {},
+      form,
+      itemHorizontal,
+    } = this.props
+    const { name, value } = field
 
-    if(form){
-      const shouldShow=(form.touched[field.name] || form.submitCount)
-      if(!error){
-        error= shouldShow && !!form.errors[field.name]
+    if (form) {
+      const shouldShow = form.touched[field.name] || form.submitCount
+      if (!error) {
+        error = shouldShow && !!form.errors[field.name]
       }
-      if(error){
-        help=shouldShow ? form.errors[field.name]:help
+      if (error) {
+        help = shouldShow ? form.errors[field.name] : help
       }
     }
 
     // console.log(onChange)
-// console.log(this.props)
+    // console.log(this.props)
     return (
       // <FormControl error={error} component="fieldset" className={className}>
       //   <FormLabel component="legend">{label}</FormLabel>
@@ -65,8 +83,14 @@ class RadioButtonsGroup extends React.Component {
       //     {helperText || tipText}
       //   </FormHelperText>
       // </FormControl>
-      <FormControl error={error} component="fieldset" className={className}>
-        <FormLabel className={classes.labelHorizontal} component="legend">{label}</FormLabel>
+      <FormControl error={error} component='fieldset' className={className}>
+        <FormLabel
+          className={classes.labelHorizontal}
+          style={{ padding: 0, margin: 0 }}
+          component='legend'
+        >
+          {label}
+        </FormLabel>
         <RadioGroup
           aria-label={label}
           name={name}
@@ -74,43 +98,46 @@ class RadioButtonsGroup extends React.Component {
           onBlur={extendFunc(onBlur, field.onBlur)}
           row={row}
         >
-          {
-          options.map(o=>{
-              return <FormControlLabel key={o.value}
-                control={<Radio 
-                  checked={o.value===value} 
-                  icon={
-                    <FiberManualRecord
-                      className={classes.radioUnchecked}
-                    />
-                            }
-                  checkedIcon={
-                    <FiberManualRecord
-                      className={classes.radioChecked}
-                    />
-                            }
-                  classes={{
+          <div style={{ display: itemHorizontal ? 'flex' : undefined }}>
+            {options.map((o) => {
+              return (
+                <FormControlLabel
+                  key={o.value}
+                  control={
+                    <Radio
+                      checked={o.value === value}
+                      icon={
+                        <FiberManualRecord
+                          style={{ marginLeft: -8, marginTop: -5 }}
+                          className={classes.radioUnchecked}
+                        />
+                      }
+                      checkedIcon={
+                        <FiberManualRecord
+                          style={{ marginLeft: -8, marginTop: -5 }}
+                          className={classes.radioChecked}
+                        />
+                      }
+                      classes={{
                         checked: classes.radio,
                         root: classes.radioRoot,
                       }}
-                />}
-                {...o}
-              />})
-              
-          }
+                    />
+                  }
+                  {...o}
+                />
+              )
+            })}
+          </div>
         </RadioGroup>
-        {help !== undefined ? (
-          <FormHelperText>
-            {help}
-          </FormHelperText>
-      ) : null}
+        {help !== undefined ? <FormHelperText>{help}</FormHelperText> : null}
       </FormControl>
     )
   }
 }
 
 RadioButtonsGroup.propTypes = {
-    className: PropTypes.string,
+  className: PropTypes.string,
 }
 
 export default withStyles(customCheckboxRadioSwitch)(RadioButtonsGroup)

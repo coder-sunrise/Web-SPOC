@@ -24,7 +24,18 @@ export default createListViewModel({
         const { pathname, search, query = {} } = loct
       })
     },
-    effects: {},
+    effects: {
+      *export (_, { call }) {
+        const result = yield call(service.export)
+        return result
+      },
+
+      *import ({ payload }, { call }) {
+        const result = yield call(service.import, { content: payload.content })
+        if (result === false) return false
+        return result
+      },
+    },
     reducers: {
       queryDone (st, { payload }) {
         const { data } = payload

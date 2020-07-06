@@ -58,7 +58,6 @@ const ContextMenu = ({
   onMenuItemClick,
   onMenuClick,
 }) => {
-  console.log({ rights })
   const isStatusWaiting = row.visitStatus === VISIT_STATUS.WAITING
   const isStatusInProgress = filterMap[StatusIndicator.IN_PROGRESS].includes(
     row.visitStatus,
@@ -173,6 +172,11 @@ const ContextMenu = ({
             ...opt,
             disabled: !isStatusCompleted || isDisabled,
             hidden: hideEditConsultation,
+          }
+        case 10: // forms
+          return {
+            ...opt,
+            hidden: isRetailVisit,
           }
         default:
           return { ...opt }

@@ -102,6 +102,10 @@ const getHeight = (propsHeight) => {
   handleSubmit: formikHandleSubmit,
 })
 class NewVisit extends PureComponent {
+  state = {
+    hasActiveSession: false,
+  }
+
   constructor (props) {
     super(props)
 
@@ -135,6 +139,15 @@ class NewVisit extends PureComponent {
         },
       })
     }
+
+    const bizSession = await dispatch({
+      type: 'visitRegistration/getBizSession',
+      payload: {
+        IsClinicSessionClosed: false,
+      },
+    })
+    const { data = [] } = bizSession
+    this.setState({ hasActiveSession: data.length > 0 })
   }
 
   componentWillUnmount () {
@@ -470,7 +483,7 @@ class NewVisit extends PureComponent {
               confirmBtnText: isEdit ? 'Save' : 'Register visit',
               onConfirm: this.validatePatient,
               confirmProps: {
-                disabled: isReadOnly,
+                disabled: isReadOnly || !this.state.hasActiveSession,
               },
             })}
         </div>

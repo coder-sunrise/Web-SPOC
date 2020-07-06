@@ -18,13 +18,14 @@ import {
   Accordion,
   withFormikExtend,
   Skeleton,
+  CommonModal,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
-import AuthorizedContext from '@/components/Context/Authorized'
 // utils
 import { findGetParameter } from '@/utils/utils'
 import { VISIT_TYPE } from '@/utils/constants'
 import * as WidgetConfig from './config'
+import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 
 const styles = (theme) => ({
   root: {},
@@ -76,14 +77,23 @@ const styles = (theme) => ({
     width: '100%',
   },
 })
-
-@connect(({ patientHistory, clinicInfo, clinicSettings, codetable, user }) => ({
-  patientHistory,
-  clinicSettings,
-  codetable,
-  user,
-  clinicInfo,
-}))
+@connect(
+  ({
+    patientHistory,
+    clinicInfo,
+    clinicSettings,
+    codetable,
+    user,
+    scriblenotes,
+  }) => ({
+    patientHistory,
+    clinicSettings,
+    codetable,
+    user,
+    clinicInfo,
+    scriblenotes,
+  }),
+)
 @withFormikExtend({
   enableReinitialize: true,
   mapPropsToValues: ({ patientHistory }) => {
@@ -99,13 +109,6 @@ const styles = (theme) => ({
     }
   },
 })
-@connect(({ patientHistory, clinicInfo, clinicSettings, codetable, user }) => ({
-  patientHistory,
-  clinicSettings,
-  codetable,
-  user,
-  clinicInfo,
-}))
 class PatientHistory extends Component {
   static defaultProps = {
     mode: 'split',
@@ -116,14 +119,19 @@ class PatientHistory extends Component {
 
     this.myRef = React.createRef()
 
-    this.widgets = WidgetConfig.widgets(props).filter((o) => {
+    this.widgets = WidgetConfig.widgets(
+      props,
+      this.scribbleNoteUpdateState,
+    ).filter((o) => {
       const accessRight = Authorized.check(o.authority)
       return accessRight && accessRight.rights !== 'hidden'
     })
+
     this.state = {
       selectedItems: localStorage.getItem('patientHistoryWidgets')
         ? JSON.parse(localStorage.getItem('patientHistoryWidgets'))
         : this.widgets.map((widget) => widget.id),
+      selectedData: '',
     }
   }
 
@@ -452,35 +460,29 @@ class PatientHistory extends Component {
           </GridContainer>
         )}
 
-        <AuthorizedContext.Provider
-          value={{
-            rights: 'disable',
-          }}
-        >
-          {this.widgets
-            .filter((_widget) => {
-              if (visitPurposeFK === VISIT_TYPE.RETAIL) {
-                return _widget.id === WidgetConfig.WIDGETS_ID.INVOICE
-              }
-              return (
-                this.state.selectedItems.indexOf('0') >= 0 ||
-                this.state.selectedItems.indexOf(_widget.id) >= 0
-              )
-            })
-            .map((o) => {
-              const Widget = o.component
-              return (
-                <div>
-                  <h5 style={{ fontWeight: 500 }}>{o.name}</h5>
-                  <Widget
-                    current={entity || {}}
-                    {...this.props}
-                    setFieldValue={this.props.setFieldValue}
-                  />
-                </div>
-              )
-            })}
-        </AuthorizedContext.Provider>
+        {this.widgets
+          .filter((_widget) => {
+            if (visitPurposeFK === VISIT_TYPE.RETAIL) {
+              return _widget.id === WidgetConfig.WIDGETS_ID.INVOICE
+            }
+            return (
+              this.state.selectedItems.indexOf('0') >= 0 ||
+              this.state.selectedItems.indexOf(_widget.id) >= 0
+            )
+          })
+          .map((o) => {
+            const Widget = o.component
+            return (
+              <div>
+                <h5 style={{ fontWeight: 500 }}>{o.name}</h5>
+                <Widget
+                  current={entity || {}}
+                  {...this.props}
+                  setFieldValue={this.props.setFieldValue}
+                />
+              </div>
+            )
+          })}
       </CardContainer>
     )
   }
@@ -506,6 +508,23 @@ class PatientHistory extends Component {
       })
   }
 
+  toggleScribbleModal = () => {
+    const { scriblenotes } = this.props
+    this.props.dispatch({
+      type: 'scriblenotes/updateState',
+      payload: {
+        showViewScribbleModal: !scriblenotes.showViewScribbleModal,
+        isReadonly: false,
+      },
+    })
+  }
+
+  scribbleNoteUpdateState = (selectedDataValue) => {
+    this.setState({
+      selectedData: selectedDataValue,
+    })
+  }
+
   render () {
     const {
       theme,
@@ -517,6 +536,7 @@ class PatientHistory extends Component {
       widget,
       clinicSettings,
       mode,
+      scriblenotes,
     } = this.props
     const { settings = [] } = clinicSettings
     const { entity, visitInfo, selected } = patientHistory
@@ -603,6 +623,20 @@ class PatientHistory extends Component {
         </CardContainer>
 
         {selected && mode === 'split' && this.getDetailPanel()}
+        <CommonModal
+          open={scriblenotes.showViewScribbleModal}
+          title='Scribble'
+          fullScreen
+          bodyNoPadding
+          observe='ScribbleNotePage'
+          onClose={this.toggleScribbleModal}
+        >
+          <ScribbleNote
+            {...this.props}
+            toggleScribbleModal={this.toggleScribbleModal}
+            scribbleData={this.state.selectedData}
+          />
+        </CommonModal>
       </div>
     )
   }

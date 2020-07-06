@@ -216,6 +216,11 @@ export default createFormViewModel({
           return false
         }
       },
+      *getBizSession ({ payload }, { call, put }) {
+        const response = yield call(service.getBizSession, payload)
+        const { data } = response
+        return data
+      },
     },
     reducers: {
       // resetState (state, { payload }) {

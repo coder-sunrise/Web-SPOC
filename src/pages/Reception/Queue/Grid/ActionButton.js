@@ -140,6 +140,11 @@ const ActionButton = ({ row, onClick }) => {
               disabled: !isStatusCompleted,
               hidden: hideEditConsultation,
             }
+          case 10: // forms
+            return {
+              ...opt,
+              hidden: isRetailVisit,
+            }
           default:
             return { ...opt }
         }

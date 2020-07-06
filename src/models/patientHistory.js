@@ -1,6 +1,7 @@
 import { createListViewModel } from 'medisys-model'
 import { VISIT_TYPE } from '@/utils/constants'
 import * as service from '../services/patientHistory'
+import { formTypes } from '@/utils/codes'
 
 const ParseEyeFormData = (response) => {
   const { corEyeRefractionForm = {}, corEyeExaminationForm = {} } = response
@@ -37,6 +38,9 @@ export default createListViewModel({
     service,
     state: {
       default: {},
+      invoiceHistory: {
+        list: [],
+      },
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -157,14 +161,37 @@ export default createListViewModel({
         }
         return false
       },
+
+      *queryInvoiceHistory ({ payload }, { call, put }) {
+        const response = yield call(service.queryInvoiceHistory, payload)
+
+        if (response.status === '200') {
+          yield put({
+            type: 'getInvoiceHistory',
+            payload: response,
+          })
+          return response
+        }
+        return false
+      },
     },
     reducers: {
       queryOneDone (st, { payload }) {
         // const { data } = payload
-
         const { entity } = st
         st.entity = ParseEyeFormData(entity)
 
+        st.entity = {
+          ...st.entity,
+          forms: st.entity.forms.map((o) => {
+            return {
+              ...o,
+              typeName: formTypes.find(
+                (type) => parseInt(type.value, 10) === o.type,
+              ).name,
+            }
+          }),
+        }
         let sortedPatientHistory = st.list
           ? st.list.filter((o) => o.coHistory.length >= 1)
           : []
@@ -187,6 +214,16 @@ export default createListViewModel({
           entity: data,
           selected: defaultItem,
           selectedSubRow: defaultItem,
+        }
+      },
+      getInvoiceHistory (st, { payload }) {
+        const { data } = payload
+        return {
+          ...st,
+          invoiceHistory: {
+            entity: data,
+            list: data.data,
+          },
         }
       },
     },

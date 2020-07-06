@@ -147,7 +147,7 @@ class Scribble extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      tool: Tools.Pencil,
+      tool: props.scriblenotes.isReadonly ? Tools.None : Tools.Pencil,
       lineWidth: 10,
       lineColor: 'black',
       backgroundColor: 'transparent',
@@ -324,9 +324,9 @@ class Scribble extends React.Component {
       await setTimeout(() => {
         // wait for 1 milli second for img to set src successfully
       }, 100)
-      const thumbnailSize = { width: 64, height: 64 }
+      const thumbnailSize = { width: 275, height: 150 }
       const thumbnail = getThumbnail(imgEle, thumbnailSize)
-      const thumbnailData = thumbnail.toDataURL(`image/png`)
+      const thumbnailData = thumbnail.toDataURL(`image/jpeg`)
 
       return thumbnailData
     } catch (error) {
@@ -336,6 +336,8 @@ class Scribble extends React.Component {
   }
 
   _onSketchChange = (action) => {
+    const { scriblenotes } = this.props
+    if (scriblenotes.isReadonly) return
     const prev = this.state.canUndo
     const now = this._sketch.canUndo()
     if (prev !== now || action === 'deleteAction') {
@@ -480,7 +482,7 @@ class Scribble extends React.Component {
   onSaveClick = async () => {
     temp = this._sketch.getAllLayerData()
     const thumbnail = await this._generateThumbnail()
-    await this.props.setFieldValue('thumbnail', thumbnail)
+    await this.props.setFieldValue('thumbnail', thumbnail.split(',')[1])
     this.props.handleSubmit()
   }
 
@@ -510,6 +512,7 @@ class Scribble extends React.Component {
       deleteScribbleNote,
       setFieldValue,
       dispatch,
+      scriblenotes,
     } = this.props
     return (
       <div className={classes.layout}>
@@ -523,6 +526,7 @@ class Scribble extends React.Component {
                     {...args}
                     label='Scribble Subject'
                     inputProps={{ maxLength: 20 }}
+                    disabled={scriblenotes.isReadonly}
                     maxLength={20}
                     // onChange={(e) => {
                     //   const subject = e.target.value
@@ -534,265 +538,270 @@ class Scribble extends React.Component {
                 )}
               />
             </div>
-            <ToggleButtonGroup
-              // size='small'
-              // value={alignment}
-              exclusive
-              onChange={(e) => {
-                if (e.target.value === 'select') {
-                  this.setState({
-                    tool: e.target.value,
-                  })
-                } else if (e.target.value === 'eraser') {
-                  this.setState({
-                    tool: e.target.value,
-                  })
-                  this._removeSelected()
-                }
-              }}
-              value={this.state.tool}
-              outline='none'
-            >
-              <Tooltip title='Select'>
-                <ToggleButton
-                  key={1}
-                  value={Tools.Select}
-                  onClick={() => {
+            {!scriblenotes.isReadonly && (
+              <ToggleButtonGroup
+                // size='small'
+                // value={alignment}
+                exclusive
+                onChange={(e) => {
+                  if (e.target.value === 'select') {
                     this.setState({
-                      tool: 'select',
-                      eraserColor: false,
-                      selectColor: true,
-                      toolsDrawingColor: false,
+                      tool: e.target.value,
+                    })
+                  } else if (e.target.value === 'eraser') {
+                    this.setState({
+                      tool: e.target.value,
+                    })
+                    this._removeSelected()
+                  }
+                }}
+                value={this.state.tool}
+                outline='none'
+              >
+                <Tooltip title='Select'>
+                  <ToggleButton
+                    key={1}
+                    value={Tools.Select}
+                    onClick={() => {
+                      this.setState({
+                        tool: 'select',
+                        eraserColor: false,
+                        selectColor: true,
+                        toolsDrawingColor: false,
+                        toolsShapeColor: false,
+                        selectColorColor: false,
+                        imageColor: false,
+                        textColor: false,
+                      })
+                    }}
+                  >
+                    <Select
+                      color={this.state.selectColor ? 'primary' : ''}
+                      style={{
+                        color: this.state.selectColor ? '' : '#191919',
+                      }}
+                    />
+                  </ToggleButton>
+                </Tooltip>
+
+                <Popover
+                  icon={null}
+                  content={
+                    <ClickAwayListener
+                      onClickAway={this.toolDrawingHandleClickAway}
+                    >
+                      <div style={{ paddingTop: 10, width: 200 }}>
+                        <GridContainer>
+                          <GridItem xs={12} md={12}>
+                            <Radio.Group
+                              // defaultValue={Tools.Pencil}
+                              value={this.state.tool}
+                              buttonStyle='solid'
+                              onChange={(e) => {
+                                this.setState({
+                                  tool: e.target.value,
+                                  eraserColor: false,
+                                  selectColor: false,
+                                  toolsDrawingColor: true,
+                                })
+                              }}
+                            >
+                              <Tooltip title='Pencil'>
+                                <Radio.Button
+                                  value={Tools.Pencil}
+                                  className={classes.radioButtonPadding}
+                                >
+                                  <Pen />
+                                </Radio.Button>
+                              </Tooltip>
+
+                              <Radio.Button
+                                value={Tools.Line}
+                                className={classes.radioButtonPadding}
+                              >
+                                <Remove />
+                              </Radio.Button>
+                              <Radio.Button
+                                value={Tools.Arrow}
+                                className={classes.radioButtonPadding}
+                              >
+                                <Backspace />
+                              </Radio.Button>
+                            </Radio.Group>
+                          </GridItem>
+                        </GridContainer>
+
+                        <GridContainer style={{ paddingTop: 10 }}>
+                          <GridItem xs={12} md={12}>
+                            <Typography>Line Weight</Typography>
+                            <Slider
+                              // ValueLabelComponent={ValueLabelComponent}
+                              step={1}
+                              min={1}
+                              max={50}
+                              aria-labelledby='slider'
+                              value={this.state.lineWidth}
+                              onChange={(e, v) =>
+                                this.setState({ lineWidth: v })}
+                            />
+                          </GridItem>
+                        </GridContainer>
+                      </div>
+                    </ClickAwayListener>
+                  }
+                  // title='Select Tools'
+                  trigger='click'
+                  placement='bottomLeft'
+                  visible={this.state.toolsDrawVisible}
+                  onVisibleChange={this.handleToolsDrawVisibleChange}
+                  onClick={() => {
+                    const { toolsDrawingColor } = this.state
+                    this.setState(() => ({
+                      toolsDrawingColor: true,
                       toolsShapeColor: false,
                       selectColorColor: false,
                       imageColor: false,
                       textColor: false,
-                    })
+                      eraserColor: false,
+                    }))
                   }}
                 >
-                  <Select
-                    color={this.state.selectColor ? 'primary' : ''}
-                    style={{ color: this.state.selectColor ? '' : '#191919' }}
-                  />
-                </ToggleButton>
-              </Tooltip>
+                  <Tooltip title='Drawing type'>
+                    <ToggleButton key={2} type='primary'>
+                      <Pen
+                        color={this.state.toolsDrawingColor ? 'primary' : ''}
+                        style={{
+                          color: this.state.toolsDrawingColor ? '' : '#191919',
+                        }}
+                      />
+                    </ToggleButton>
+                  </Tooltip>
+                </Popover>
 
-              <Popover
-                icon={null}
-                content={
-                  <ClickAwayListener
-                    onClickAway={this.toolDrawingHandleClickAway}
-                  >
-                    <div style={{ paddingTop: 10, width: 200 }}>
-                      <GridContainer>
-                        <GridItem xs={12} md={12}>
-                          <Radio.Group
-                            // defaultValue={Tools.Pencil}
-                            value={this.state.tool}
-                            buttonStyle='solid'
-                            onChange={(e) => {
-                              this.setState({
-                                tool: e.target.value,
-                                eraserColor: false,
-                                selectColor: false,
-                                toolsDrawingColor: true,
-                              })
-                            }}
-                          >
-                            <Tooltip title='Pencil'>
+                <Popover
+                  icon={null}
+                  content={
+                    <ClickAwayListener
+                      onClickAway={this.toolShapeHandleClickAway}
+                    >
+                      <div style={{ paddingTop: 10, width: 200 }}>
+                        <GridContainer>
+                          <GridItem xs={10} md={10}>
+                            <Radio.Group
+                              // defaultValue={Tools.Pencil}
+                              value={this.state.tool}
+                              buttonStyle='solid'
+                              onChange={(e) => {
+                                this.setState({
+                                  tool: e.target.value,
+                                  eraserColor: false,
+                                  selectColor: false,
+                                })
+                              }}
+                            >
                               <Radio.Button
-                                value={Tools.Pencil}
+                                value={Tools.Rectangle}
                                 className={classes.radioButtonPadding}
                               >
-                                <Pen />
+                                <Rectangle />
                               </Radio.Button>
-                            </Tooltip>
+                              <Radio.Button
+                                value={Tools.Circle}
+                                className={classes.radioButtonPadding}
+                              >
+                                <Circle />
+                              </Radio.Button>
+                            </Radio.Group>
+                          </GridItem>
+                        </GridContainer>
 
-                            <Radio.Button
-                              value={Tools.Line}
-                              className={classes.radioButtonPadding}
-                            >
-                              <Remove />
-                            </Radio.Button>
-                            <Radio.Button
-                              value={Tools.Arrow}
-                              className={classes.radioButtonPadding}
-                            >
-                              <Backspace />
-                            </Radio.Button>
-                          </Radio.Group>
-                        </GridItem>
-                      </GridContainer>
+                        <GridContainer style={{ paddingTop: 20 }}>
+                          <GridItem xs={10} md={10}>
+                            <Typography>Fill Enable</Typography>
+                            <Switch
+                              value={this.state.fillWithColor}
+                              onChange={() =>
+                                this.setState((preState) => ({
+                                  fillWithColor: !preState.fillWithColor,
+                                }))}
+                            />
+                          </GridItem>
+                        </GridContainer>
 
-                      <GridContainer style={{ paddingTop: 10 }}>
-                        <GridItem xs={12} md={12}>
-                          <Typography>Line Weight</Typography>
-                          <Slider
-                            // ValueLabelComponent={ValueLabelComponent}
-                            step={1}
-                            min={1}
-                            max={50}
-                            aria-labelledby='slider'
-                            value={this.state.lineWidth}
-                            onChange={(e, v) => this.setState({ lineWidth: v })}
-                          />
-                        </GridItem>
-                      </GridContainer>
-                    </div>
-                  </ClickAwayListener>
-                }
-                // title='Select Tools'
-                trigger='click'
-                placement='bottomLeft'
-                visible={this.state.toolsDrawVisible}
-                onVisibleChange={this.handleToolsDrawVisibleChange}
-                onClick={() => {
-                  const { toolsDrawingColor } = this.state
-                  this.setState(() => ({
-                    toolsDrawingColor: true,
-                    toolsShapeColor: false,
-                    selectColorColor: false,
-                    imageColor: false,
-                    textColor: false,
-                    eraserColor: false,
-                  }))
-                }}
-              >
-                <Tooltip title='Drawing type'>
-                  <ToggleButton key={2} type='primary'>
-                    <Pen
-                      color={this.state.toolsDrawingColor ? 'primary' : ''}
-                      style={{
-                        color: this.state.toolsDrawingColor ? '' : '#191919',
-                      }}
-                    />
-                  </ToggleButton>
-                </Tooltip>
-              </Popover>
+                        <GridContainer>
+                          <GridItem xs={12} md={12}>
+                            <Typography>Line Weight</Typography>
+                            <Slider
+                              // ValueLabelComponent={ValueLabelComponent}
+                              step={1}
+                              min={1}
+                              max={50}
+                              aria-labelledby='slider'
+                              value={this.state.lineWidth}
+                              onChange={(e, v) =>
+                                this.setState({ lineWidth: v })}
+                            />
+                          </GridItem>
+                        </GridContainer>
+                      </div>
+                    </ClickAwayListener>
+                  }
+                  // title='Select Tools'
+                  trigger='click'
+                  placement='bottomLeft'
+                  visible={this.state.toolsShapeVisible}
+                  onVisibleChange={this.handleToolsShapeVisibleChange}
+                  onClick={() => {
+                    this.setState(() => ({
+                      toolsDrawingColor: false,
+                      toolsShapeColor: true,
+                      selectColorColor: false,
+                      imageColor: false,
+                      textColor: false,
+                      eraserColor: false,
+                    }))
+                  }}
+                >
+                  <Tooltip title='Shape'>
+                    <ToggleButton key={3} type='primary'>
+                      <Rectangle
+                        color={this.state.toolsShapeColor ? 'primary' : ''}
+                        style={{
+                          color: this.state.toolsShapeColor ? '' : '#191919',
+                        }}
+                      />
+                    </ToggleButton>
+                  </Tooltip>
+                </Popover>
 
-              <Popover
-                icon={null}
-                content={
-                  <ClickAwayListener
-                    onClickAway={this.toolShapeHandleClickAway}
-                  >
-                    <div style={{ paddingTop: 10, width: 200 }}>
-                      <GridContainer>
-                        <GridItem xs={10} md={10}>
-                          <Radio.Group
-                            // defaultValue={Tools.Pencil}
-                            value={this.state.tool}
-                            buttonStyle='solid'
-                            onChange={(e) => {
-                              this.setState({
-                                tool: e.target.value,
-                                eraserColor: false,
-                                selectColor: false,
-                              })
-                            }}
-                          >
-                            <Radio.Button
-                              value={Tools.Rectangle}
-                              className={classes.radioButtonPadding}
-                            >
-                              <Rectangle />
-                            </Radio.Button>
-                            <Radio.Button
-                              value={Tools.Circle}
-                              className={classes.radioButtonPadding}
-                            >
-                              <Circle />
-                            </Radio.Button>
-                          </Radio.Group>
-                        </GridItem>
-                      </GridContainer>
+                <Popover
+                  icon={null}
+                  content={
+                    <ClickAwayListener onClickAway={this.colorHandleClickAway}>
+                      <div>
+                        <GridContainer>
+                          <GridItem xs={12} md={12}>
+                            <div style={{ paddingBottom: 10 }} />
+                            <Typography>Line Color</Typography>
+                            <CompactPicker
+                              id='lineColor'
+                              color={this.state.lineColor}
+                              onChange={(color) =>
+                                this.setState({ lineColor: color.hex })}
+                            />
+                          </GridItem>
+                        </GridContainer>
 
-                      <GridContainer style={{ paddingTop: 20 }}>
-                        <GridItem xs={10} md={10}>
-                          <Typography>Fill Enable</Typography>
-                          <Switch
-                            value={this.state.fillWithColor}
-                            onChange={() =>
-                              this.setState((preState) => ({
-                                fillWithColor: !preState.fillWithColor,
-                              }))}
-                          />
-                        </GridItem>
-                      </GridContainer>
+                        <GridContainer>
+                          <GridItem xs={12} md={12}>
+                            <Typography>Fill Color</Typography>
+                            <CompactPicker
+                              color={this.state.fillColor}
+                              onChange={(color) =>
+                                this.setState({ fillColor: color.hex })}
+                            />
 
-                      <GridContainer>
-                        <GridItem xs={12} md={12}>
-                          <Typography>Line Weight</Typography>
-                          <Slider
-                            // ValueLabelComponent={ValueLabelComponent}
-                            step={1}
-                            min={1}
-                            max={50}
-                            aria-labelledby='slider'
-                            value={this.state.lineWidth}
-                            onChange={(e, v) => this.setState({ lineWidth: v })}
-                          />
-                        </GridItem>
-                      </GridContainer>
-                    </div>
-                  </ClickAwayListener>
-                }
-                // title='Select Tools'
-                trigger='click'
-                placement='bottomLeft'
-                visible={this.state.toolsShapeVisible}
-                onVisibleChange={this.handleToolsShapeVisibleChange}
-                onClick={() => {
-                  this.setState(() => ({
-                    toolsDrawingColor: false,
-                    toolsShapeColor: true,
-                    selectColorColor: false,
-                    imageColor: false,
-                    textColor: false,
-                    eraserColor: false,
-                  }))
-                }}
-              >
-                <Tooltip title='Shape'>
-                  <ToggleButton key={3} type='primary'>
-                    <Rectangle
-                      color={this.state.toolsShapeColor ? 'primary' : ''}
-                      style={{
-                        color: this.state.toolsShapeColor ? '' : '#191919',
-                      }}
-                    />
-                  </ToggleButton>
-                </Tooltip>
-              </Popover>
-
-              <Popover
-                icon={null}
-                content={
-                  <ClickAwayListener onClickAway={this.colorHandleClickAway}>
-                    <div>
-                      <GridContainer>
-                        <GridItem xs={12} md={12}>
-                          <div style={{ paddingBottom: 10 }} />
-                          <Typography>Line Color</Typography>
-                          <CompactPicker
-                            id='lineColor'
-                            color={this.state.lineColor}
-                            onChange={(color) =>
-                              this.setState({ lineColor: color.hex })}
-                          />
-                        </GridItem>
-                      </GridContainer>
-
-                      <GridContainer>
-                        <GridItem xs={12} md={12}>
-                          <Typography>Fill Color</Typography>
-                          <CompactPicker
-                            color={this.state.fillColor}
-                            onChange={(color) =>
-                              this.setState({ fillColor: color.hex })}
-                          />
-
-                          {/* <Typography>Fill Enable</Typography>
+                            {/* <Typography>Fill Enable</Typography>
                       <Switch
                         value={this.state.fillWithColor}
                         onChange={() =>
@@ -800,355 +809,374 @@ class Scribble extends React.Component {
                             fillWithColor: !preState.fillWithColor,
                           }))}
                       /> */}
-                        </GridItem>
-                      </GridContainer>
-                    </div>
-                  </ClickAwayListener>
-                }
-                // title='Colors'
-                trigger='click'
-                placement='bottomLeft'
-                visible={this.state.colorVisible}
-                onVisibleChange={this.handleColorVisibleChange}
-                onClick={() => {
-                  this.setState(() => ({
-                    toolsDrawingColor: false,
-                    toolsShapeColor: false,
-                    selectColorColor: true,
-                    imageColor: false,
-                    textColor: false,
-                    eraserColor: false,
-                  }))
-                }}
-              >
-                <Tooltip title='Colors'>
-                  <ToggleButton key={4}>
-                    <ColorLens
-                      color={this.state.selectColorColor ? 'primary' : ''}
+                          </GridItem>
+                        </GridContainer>
+                      </div>
+                    </ClickAwayListener>
+                  }
+                  // title='Colors'
+                  trigger='click'
+                  placement='bottomLeft'
+                  visible={this.state.colorVisible}
+                  onVisibleChange={this.handleColorVisibleChange}
+                  onClick={() => {
+                    this.setState(() => ({
+                      toolsDrawingColor: false,
+                      toolsShapeColor: false,
+                      selectColorColor: true,
+                      imageColor: false,
+                      textColor: false,
+                      eraserColor: false,
+                    }))
+                  }}
+                >
+                  <Tooltip title='Colors'>
+                    <ToggleButton key={4}>
+                      <ColorLens
+                        color={this.state.selectColorColor ? 'primary' : ''}
+                        style={{
+                          color: this.state.selectColorColor ? '' : '#191919',
+                        }}
+                      />
+                    </ToggleButton>
+                  </Tooltip>
+                </Popover>
+
+                <Popover
+                  icon={null}
+                  content={
+                    <ClickAwayListener onClickAway={this.imageHandleClickAway}>
+                      <div>
+                        <GridContainer>
+                          <GridItem xs={12} md={12}>
+                            <div style={{ paddingBottom: 10 }}>
+                              <Typography>Select Image</Typography>
+                              <Divider />
+                            </div>
+                            <Paper className={classes.templateImage}>
+                              <List>
+                                <div className={classes.imageOption}>
+                                  {this.state.templateList.map((item) => {
+                                    return (
+                                      <Button
+                                        color='primary'
+                                        onClick={() => {
+                                          this._setTemplate(
+                                            item.layerContent,
+                                            item.id,
+                                          )
+                                        }}
+                                        style={{
+                                          margin: 10,
+                                        }}
+                                      >
+                                        {item.description}
+                                      </Button>
+                                    )
+                                  })}
+                                </div>
+                              </List>
+                            </Paper>
+                          </GridItem>
+                        </GridContainer>
+                        <GridContainer style={{ paddingTop: 10 }}>
+                          <GridItem xs={12} md={12}>
+                            <Dropzone
+                              onDrop={this._onBackgroundImageDrop}
+                              accept='image/*'
+                              multiple={false}
+                            >
+                              {({ getRootProps, getInputProps }) => (
+                                <section>
+                                  <div
+                                    {...getRootProps()}
+                                    style={styles.dropArea}
+                                  >
+                                    <input {...getInputProps()} />
+                                    <p className={classes.dropArea}>
+                                      Drag and drop some files here, or click to
+                                      select files
+                                    </p>
+                                  </div>
+                                </section>
+                              )}
+                            </Dropzone>
+                          </GridItem>
+                        </GridContainer>
+                      </div>
+                    </ClickAwayListener>
+                  }
+                  // title='Select Image'
+                  trigger='click'
+                  placement='bottomLeft'
+                  visible={this.state.imageVisible}
+                  onVisibleChange={this.handleInsertImageVisibleChange}
+                  onClick={() => {
+                    const { imageColor } = this.state
+                    this.setState(() => ({
+                      toolsDrawingColor: false,
+                      toolsShapeColor: false,
+                      selectColorColor: false,
+                      imageColor: true,
+                      textColor: false,
+                      eraserColor: false,
+                    }))
+                  }}
+                >
+                  <Tooltip title='Insert Image'>
+                    <ToggleButton key={5}>
+                      <InsertPhoto
+                        color={this.state.imageColor ? 'primary' : ''}
+                        style={{
+                          color: this.state.imageColor ? '' : '#191919',
+                        }}
+                      />
+                    </ToggleButton>
+                  </Tooltip>
+                </Popover>
+
+                <Popover
+                  icon={null}
+                  content={
+                    <ClickAwayListener onClickAway={this.textHandleClickAway}>
+                      <div style={{ width: 300 }}>
+                        <GridContainer>
+                          <GridItem xs={12} md={12}>
+                            <TextField
+                              label='Text'
+                              onChange={(e) =>
+                                this.setState({ text: e.target.value })}
+                              // value={this.state.text}
+                            />
+                          </GridItem>
+                        </GridContainer>
+                        <GridContainer style={{ paddingTop: 10 }}>
+                          <GridItem xs={12} md={12}>
+                            <Button
+                              color='primary'
+                              onClick={this._addText}
+                              style={{ paddingTop: 20 }}
+                            >
+                              Add Text
+                            </Button>
+                          </GridItem>
+                        </GridContainer>
+                      </div>
+                    </ClickAwayListener>
+                  }
+                  // title='Text'
+                  trigger='click'
+                  placement='bottomLeft'
+                  visible={this.state.textVisible}
+                  onVisibleChange={this.handleTextVisibleChange}
+                  onClick={() => {
+                    this.setState(() => ({
+                      toolsDrawingColor: false,
+                      toolsShapeColor: false,
+                      selectColorColor: false,
+                      imageColor: false,
+                      eraserColor: false,
+                      textColor: true,
+                    }))
+                  }}
+                >
+                  <Tooltip title='Add Text'>
+                    <ToggleButton key={6}>
+                      <Title
+                        color={this.state.textColor ? 'primary' : ''}
+                        style={{
+                          color: this.state.textColor ? '' : '#191919',
+                        }}
+                      />
+                    </ToggleButton>
+                  </Tooltip>
+                </Popover>
+
+                <Tooltip title='Erase'>
+                  <ToggleButton
+                    key={7}
+                    value={Tools.Eraser}
+                    onClick={() => {
+                      this._sketch._deleteSelectedObject()
+                      this.setState({
+                        tool: 'eraser',
+                        eraserColor: true,
+                        selectColor: false,
+                        toolsDrawingColor: false,
+                        toolsShapeColor: false,
+                        selectColorColor: false,
+                        imageColor: false,
+                        textColor: false,
+                      })
+                    }}
+                  >
+                    <Erase
+                      color={this.state.eraserColor ? 'primary' : ''}
                       style={{
-                        color: this.state.selectColorColor ? '' : '#191919',
+                        color: this.state.eraserColor ? '' : '#191919',
                       }}
                     />
                   </ToggleButton>
                 </Tooltip>
-              </Popover>
-
-              <Popover
-                icon={null}
-                content={
-                  <ClickAwayListener onClickAway={this.imageHandleClickAway}>
-                    <div>
-                      <GridContainer>
-                        <GridItem xs={12} md={12}>
-                          <div style={{ paddingBottom: 10 }}>
-                            <Typography>Select Image</Typography>
-                            <Divider />
-                          </div>
-                          <Paper className={classes.templateImage}>
-                            <List>
-                              <div className={classes.imageOption}>
-                                {this.state.templateList.map((item) => {
-                                  return (
-                                    <Button
-                                      color='primary'
-                                      onClick={() => {
-                                        this._setTemplate(
-                                          item.layerContent,
-                                          item.id,
-                                        )
-                                      }}
-                                      style={{
-                                        margin: 10,
-                                      }}
-                                    >
-                                      {item.description}
-                                    </Button>
-                                  )
-                                })}
-                              </div>
-                            </List>
-                          </Paper>
-                        </GridItem>
-                      </GridContainer>
-                      <GridContainer style={{ paddingTop: 10 }}>
-                        <GridItem xs={12} md={12}>
-                          <Dropzone
-                            onDrop={this._onBackgroundImageDrop}
-                            accept='image/*'
-                            multiple={false}
-                          >
-                            {({ getRootProps, getInputProps }) => (
-                              <section>
-                                <div
-                                  {...getRootProps()}
-                                  style={styles.dropArea}
-                                >
-                                  <input {...getInputProps()} />
-                                  <p className={classes.dropArea}>
-                                    Drag and drop some files here, or click to
-                                    select files
-                                  </p>
-                                </div>
-                              </section>
-                            )}
-                          </Dropzone>
-                        </GridItem>
-                      </GridContainer>
-                    </div>
-                  </ClickAwayListener>
-                }
-                // title='Select Image'
-                trigger='click'
-                placement='bottomLeft'
-                visible={this.state.imageVisible}
-                onVisibleChange={this.handleInsertImageVisibleChange}
-                onClick={() => {
-                  const { imageColor } = this.state
-                  this.setState(() => ({
-                    toolsDrawingColor: false,
-                    toolsShapeColor: false,
-                    selectColorColor: false,
-                    imageColor: true,
-                    textColor: false,
-                    eraserColor: false,
-                  }))
-                }}
-              >
-                <Tooltip title='Insert Image'>
-                  <ToggleButton key={5}>
-                    <InsertPhoto
-                      color={this.state.imageColor ? 'primary' : ''}
-                      style={{ color: this.state.imageColor ? '' : '#191919' }}
-                    />
-                  </ToggleButton>
-                </Tooltip>
-              </Popover>
-
-              <Popover
-                icon={null}
-                content={
-                  <ClickAwayListener onClickAway={this.textHandleClickAway}>
-                    <div style={{ width: 300 }}>
-                      <GridContainer>
-                        <GridItem xs={12} md={12}>
-                          <TextField
-                            label='Text'
-                            onChange={(e) =>
-                              this.setState({ text: e.target.value })}
-                            // value={this.state.text}
-                          />
-                        </GridItem>
-                      </GridContainer>
-                      <GridContainer style={{ paddingTop: 10 }}>
-                        <GridItem xs={12} md={12}>
-                          <Button
-                            color='primary'
-                            onClick={this._addText}
-                            style={{ paddingTop: 20 }}
-                          >
-                            Add Text
-                          </Button>
-                        </GridItem>
-                      </GridContainer>
-                    </div>
-                  </ClickAwayListener>
-                }
-                // title='Text'
-                trigger='click'
-                placement='bottomLeft'
-                visible={this.state.textVisible}
-                onVisibleChange={this.handleTextVisibleChange}
-                onClick={() => {
-                  this.setState(() => ({
-                    toolsDrawingColor: false,
-                    toolsShapeColor: false,
-                    selectColorColor: false,
-                    imageColor: false,
-                    eraserColor: false,
-                    textColor: true,
-                  }))
-                }}
-              >
-                <Tooltip title='Add Text'>
-                  <ToggleButton key={6}>
-                    <Title
-                      color={this.state.textColor ? 'primary' : ''}
-                      style={{ color: this.state.textColor ? '' : '#191919' }}
-                    />
-                  </ToggleButton>
-                </Tooltip>
-              </Popover>
-
-              <Tooltip title='Erase'>
-                <ToggleButton
-                  key={7}
-                  value={Tools.Eraser}
-                  onClick={() => {
-                    this._sketch._deleteSelectedObject()
-                    this.setState({
-                      tool: 'eraser',
-                      eraserColor: true,
-                      selectColor: false,
-                      toolsDrawingColor: false,
-                      toolsShapeColor: false,
-                      selectColorColor: false,
-                      imageColor: false,
-                      textColor: false,
-                    })
-                  }}
-                >
-                  <Erase
-                    color={this.state.eraserColor ? 'primary' : ''}
-                    style={{ color: this.state.eraserColor ? '' : '#191919' }}
-                  />
-                </ToggleButton>
-              </Tooltip>
-              <Tooltip title='Save'>
-                <ToggleButton
-                  key={6}
-                  onClick={() => {
-                    this._download()
-
-                    this.setState({
-                      toolsDrawingColor: false,
-                      selectColorColor: false,
-                      imageColor: false,
-                      textColor: false,
-                    })
-                  }}
-                >
-                  <Save style={{ color: '#191919' }} />
-                </ToggleButton>
-              </Tooltip>
-              <Tooltip title='Undo'>
-                <ToggleButton
-                  key={7}
-                  color='primary'
-                  disabled={!this.state.canUndo}
-                  onClick={() => {
-                    this._undo()
-
-                    this.setState({
-                      toolsDrawingColor: false,
-                      toolsShapeColor: false,
-                      selectColorColor: false,
-                      imageColor: false,
-                      textColor: false,
-                    })
-                  }}
-                >
-                  <UndoIcon
-                    color={this.state.canUndo ? 'primary' : 'disabled'}
-                  />
-                </ToggleButton>
-              </Tooltip>
-              <Tooltip title='Redo'>
-                <ToggleButton
-                  key={8}
-                  color='primary'
-                  disabled={!this.state.canRedo}
-                  onClick={() => {
-                    this._redo()
-
-                    this.setState({
-                      toolsDrawingColor: false,
-                      toolsShapeColor: false,
-                      selectColorColor: false,
-                      imageColor: false,
-                      textColor: false,
-                    })
-                  }}
-                >
-                  <RedoIcon
-                    color={this.state.canRedo ? 'primary' : 'disabled'}
-                  />
-                </ToggleButton>
-              </Tooltip>
-              <Tooltip title='Remove All'>
-                <ToggleButton
-                  key={9}
-                  color='primary'
-                  disabled={!this.state.canClear}
-                  onClick={() => {
-                    this._clear()
-
-                    this.setState({
-                      toolsDrawingColor: false,
-                      toolsShapeColor: false,
-                      selectColorColor: false,
-                      imageColor: false,
-                      textColor: false,
-                    })
-                  }}
-                >
-                  <DeleteIcon
-                    color={this.state.canClear ? 'primary' : 'disabled'}
-                  />
-                </ToggleButton>
-              </Tooltip>
-              <Tooltip title='Hide'>
-                <ToggleButton
-                  key={10}
-                  checked={this.state.hideEnable}
-                  onClick={() => {
-                    this._hideDrawing()
-
-                    this.setState({
-                      toolsDrawingColor: false,
-                      toolsShapeColor: false,
-                      selectColorColor: false,
-                      imageColor: false,
-                      textColor: false,
-                    })
-                  }}
-                >
-                  {this.state.hideEnable ? (
-                    <InVisibility color='disabled' />
-                  ) : (
-                    <Visibility color='primary' />
-                  )}
-                </ToggleButton>
-              </Tooltip>
-            </ToggleButtonGroup>
-
-            <div className={classes.rightButton}>
-              <div className={classes.actionDiv}>
-                {this.state.deleteEnable ? (
-                  <Button
-                    color='danger'
+                <Tooltip title='Save'>
+                  <ToggleButton
+                    key={6}
                     onClick={() => {
-                      dispatch({
-                        type: 'global/updateAppState',
-                        payload: {
-                          openConfirm: true,
-                          openConfirmContent:
-                            'Are you sure want to delete this scribble note ?',
-                          onConfirmSave: () => deleteScribbleNote(),
-                        },
+                      this._download()
+
+                      this.setState({
+                        toolsDrawingColor: false,
+                        selectColorColor: false,
+                        imageColor: false,
+                        textColor: false,
                       })
                     }}
                   >
-                    Delete
-                  </Button>
-                ) : (
-                  ''
-                )}
+                    <Save style={{ color: '#191919' }} />
+                  </ToggleButton>
+                </Tooltip>
+                <Tooltip title='Undo'>
+                  <ToggleButton
+                    key={7}
+                    color='primary'
+                    disabled={!this.state.canUndo}
+                    onClick={() => {
+                      this._undo()
 
-                {/* <Button color='danger' onClick={this.onInsertClick}>
+                      this.setState({
+                        toolsDrawingColor: false,
+                        toolsShapeColor: false,
+                        selectColorColor: false,
+                        imageColor: false,
+                        textColor: false,
+                      })
+                    }}
+                  >
+                    <UndoIcon
+                      color={this.state.canUndo ? 'primary' : 'disabled'}
+                    />
+                  </ToggleButton>
+                </Tooltip>
+                <Tooltip title='Redo'>
+                  <ToggleButton
+                    key={8}
+                    color='primary'
+                    disabled={!this.state.canRedo}
+                    onClick={() => {
+                      this._redo()
+
+                      this.setState({
+                        toolsDrawingColor: false,
+                        toolsShapeColor: false,
+                        selectColorColor: false,
+                        imageColor: false,
+                        textColor: false,
+                      })
+                    }}
+                  >
+                    <RedoIcon
+                      color={this.state.canRedo ? 'primary' : 'disabled'}
+                    />
+                  </ToggleButton>
+                </Tooltip>
+                <Tooltip title='Remove All'>
+                  <ToggleButton
+                    key={9}
+                    color='primary'
+                    disabled={!this.state.canClear}
+                    onClick={() => {
+                      this._clear()
+
+                      this.setState({
+                        toolsDrawingColor: false,
+                        toolsShapeColor: false,
+                        selectColorColor: false,
+                        imageColor: false,
+                        textColor: false,
+                      })
+                    }}
+                  >
+                    <DeleteIcon
+                      color={this.state.canClear ? 'primary' : 'disabled'}
+                    />
+                  </ToggleButton>
+                </Tooltip>
+                <Tooltip title='Hide'>
+                  <ToggleButton
+                    key={10}
+                    checked={this.state.hideEnable}
+                    onClick={() => {
+                      this._hideDrawing()
+
+                      this.setState({
+                        toolsDrawingColor: false,
+                        toolsShapeColor: false,
+                        selectColorColor: false,
+                        imageColor: false,
+                        textColor: false,
+                      })
+                    }}
+                  >
+                    {this.state.hideEnable ? (
+                      <InVisibility color='disabled' />
+                    ) : (
+                      <Visibility color='primary' />
+                    )}
+                  </ToggleButton>
+                </Tooltip>
+              </ToggleButtonGroup>
+            )}
+            <div className={classes.rightButton}>
+              {!scriblenotes.isReadonly ? (
+                <div className={classes.actionDiv}>
+                  {this.state.deleteEnable ? (
+                    <Button
+                      color='danger'
+                      onClick={() => {
+                        dispatch({
+                          type: 'global/updateAppState',
+                          payload: {
+                            openConfirm: true,
+                            openConfirmContent:
+                              'Are you sure want to delete this scribble note ?',
+                            onConfirmSave: () => deleteScribbleNote(),
+                          },
+                        })
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  ) : (
+                    ''
+                  )}
+
+                  {/* <Button color='danger' onClick={this.onInsertClick}>
                   Insert Into
                 </Button> */}
+                  <Button
+                    color='danger'
+                    onClick={navigateDirtyCheck({
+                      displayName: 'ScribbleNotePage',
+                      onProceed: toggleScribbleModal,
+                    })}
+                  >
+                    Cancel
+                  </Button>
+                  <ProgressButton onClick={this.onSaveClick} />
+                </div>
+              ) : (
                 <Button
                   color='danger'
-                  onClick={navigateDirtyCheck({
-                    displayName: 'ScribbleNotePage',
-                    onProceed: toggleScribbleModal,
-                  })}
+                  onClick={() => {
+                    toggleScribbleModal()
+                  }}
                 >
-                  Cancel
+                  Close
                 </Button>
-                <ProgressButton onClick={this.onSaveClick} />
-              </div>
+              )}
             </div>
+          </GridItem>
+          <GridItem xs={12} md={12}>
             <div className={classes.sketchArea}>
               <FastField name='drawing' render={(args) => ''} />
               <SketchField

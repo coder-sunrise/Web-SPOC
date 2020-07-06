@@ -19,4 +19,23 @@ module.exports = {
   },
   queryList: (params) => service.queryList(url, params),
   upsert: (params) => service.upsert(url, params),
+
+  export: () => {
+    return request(`${url}/export`, {
+      method: 'GET',
+      xhrFields: {
+        responseType: 'arraybuffer',
+      },
+    })
+  },
+
+  import: (params) => {
+    return request(`${url}/import`, {
+      method: 'POST',
+      body: params,
+      xhrFields: {
+        responseType: 'arraybuffer',
+      },
+    })
+  },
 }

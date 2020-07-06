@@ -1,8 +1,7 @@
 import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
+import * as service from '@/services/invoice'
 import { INVOICE_VIEW_MODE } from '@/utils/constants'
-import * as service from '../services'
-import { fakeInvoiceDetailData } from '../sampleData'
 
 const initialState = {
   currentId: undefined,
