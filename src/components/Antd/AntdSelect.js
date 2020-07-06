@@ -270,7 +270,7 @@ class AntdSelect extends React.PureComponent {
       if (!_.isEqual(v, this.state.value)) {
         this.setState({
           value: v,
-          shrink: v !== undefined && v.length > 0,
+          shrink: v !== undefined && v !== null && v.length > 0,
         })
       }
     } else if (value !== undefined) {
@@ -323,7 +323,7 @@ class AntdSelect extends React.PureComponent {
     if (
       autoComplete &&
       options
-      //&& this.state.data.length === 0
+      // && this.state.data.length === 0
     ) {
       this.setState({
         data: _.filter(options, (o) => o[valueField] === v),
@@ -590,7 +590,7 @@ class AntdSelect extends React.PureComponent {
       isLoading,
       ...restProps
     } = this.props
-    // console.log(options)
+    // console.log(options, valueField, labelField)
     const source =
       autoComplete || query
         ? this.state.data

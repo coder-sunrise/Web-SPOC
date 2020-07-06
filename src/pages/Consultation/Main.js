@@ -121,7 +121,7 @@ const generatePrintData = async (settings, consultationDocument, user, patient, 
   }
   return []
 }
-const saveConsultation = async ({
+const saveConsultation = ({
   props,
   action,
   confirmMessage,
@@ -132,16 +132,12 @@ const saveConsultation = async ({
   const {
     dispatch,
     values,
-    consultation,
     consultationDocument = {},
     corEyeRefractionForm,
     orders = {},
     forms = {},
-    visitRegistration: { entity: visitEntity },
-    patient,
-    handlePrint,
   } = props
-  const onConfirmSave = (callback) => {
+  const onConfirmSave = () => {
     const newValues = convertToConsultation(
       {
         ...values,
@@ -177,68 +173,27 @@ const saveConsultation = async ({
           })
         }
         sessionStorage.removeItem(`${values.id}_consultationTimer`)
-        if (callback) {
-          callback(newValues)
+        if (successCallback) {
+          successCallback()
         }
       }
     })
   }
-
-  if (shouldPromptConfirm) {
-    let settings = JSON.parse(localStorage.getItem('clinicSettings'))
-    const {
-      autoPrintOnSignOff,
-    } = settings
-
-    if (autoPrintOnSignOff === true) {
-      let printData = await generatePrintData(settings, consultationDocument, props.user, patient, orders, visitEntity)
-      if (printData && printData.length > 0) {
-        dispatch({
-          type: 'consultation/showSignOffModal',
-          payload: {
-            showSignOffModal: true,
-            onSignOffConfirm: (result) => {
-              onConfirmSave(() => {
-                if (result && result.length > 0) {
-                  dispatch({ type: `consultation/closeSignOffModal` })
-                  let printedData = result.filter((item) => item.print === true)
-                  if (printedData && printedData.length > 0) {
-                    const token = localStorage.getItem('token')
-                    printedData = printedData.map((item) => ({
-                      ReportId: item.ReportId,
-                      DocumentName: `${item.item}(${item.description})`,
-                      ReportData: item.ReportData,
-                      Copies: item.Copies,
-                      Token: token,
-                      BaseUrl: process.env.url,
-                    }))
-                    handlePrint(JSON.stringify(printedData))
-                  }
-                  if (successCallback)
-                    successCallback()
-                }
-              })
-            },
-            printData,
-          },
-        })
-        return
-      }
-    }
+  if (shouldPromptConfirm)
     dispatch({
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
         openConfirmContent: confirmMessage,
         openConfirmText: 'Confirm',
-        onConfirmSave: () => { onConfirmSave(successCallback) },
+        onConfirmSave,
       },
     })
-  }
   else {
-    onConfirmSave(successCallback)
+    onConfirmSave()
   }
 }
+
 
 const discardConsultation = ({
   dispatch,
@@ -316,19 +271,80 @@ const discardConsultation = ({
   dirtyCheckMessage: discardMessage,
   notDirtyDuration: 0, // this page should alwasy show warning message when leave
   onDirtyDiscard: discardConsultation,
-  handleSubmit: (values, { props }) => {
-    saveConsultation({
-      props: {
-        values,
-        ...props,
-      },
-      confirmMessage: 'Confirm sign off current consultation?',
-      successMessage: 'Consultation signed',
-      action: 'sign',
-      successCallback: () => {
-        props.dispatch({ type: 'consultation/closeModal' })
-      },
-    })
+  handleSubmit: async (values, { props }) => {
+    const { versionNumber } = values
+    const {
+      dispatch,
+      handlePrint,
+    } = props
+    let printData = []
+    if (versionNumber === 1) {
+      let settings = JSON.parse(localStorage.getItem('clinicSettings'))
+      const {
+        autoPrintOnSignOff,
+      } = settings
+
+      if (autoPrintOnSignOff === true) {
+        const {
+          consultationDocument = {},
+          orders = {},
+          visitRegistration: { entity: visitEntity },
+          patient,
+        } = props
+        printData = await generatePrintData(settings, consultationDocument, props.user, patient, orders, visitEntity)
+      }
+    }
+    if (printData && printData.length > 0) {
+      dispatch({
+        type: 'consultation/showSignOffModal',
+        payload: {
+          showSignOffModal: true,
+          printData,
+          onSignOffConfirm: (result) => {
+            saveConsultation({
+              props: {
+                values,
+                ...props,
+              },
+              shouldPromptConfirm: false,
+              action: 'sign',
+              successCallback: () => {
+                if (result && result.length > 0) {
+                  dispatch({ type: `consultation/closeSignOffModal` })
+                  let printedData = result
+                  if (printedData && printedData.length > 0) {
+                    const token = localStorage.getItem('token')
+                    printedData = printedData.map((item) => ({
+                      ReportId: item.ReportId,
+                      DocumentName: `${item.item}(${item.description})`,
+                      ReportData: item.ReportData,
+                      Copies: item.Copies,
+                      Token: token,
+                      BaseUrl: process.env.url,
+                    }))
+                    handlePrint(JSON.stringify(printedData))
+                  }
+                }
+                props.dispatch({ type: 'consultation/closeModal' })
+              },
+            })
+          },
+        },
+      })
+    } else {
+      saveConsultation({
+        props: {
+          values,
+          ...props,
+        },
+        confirmMessage: 'Confirm sign off current consultation?',
+        successMessage: 'Consultation signed',
+        action: 'sign',
+        successCallback: () => {
+          props.dispatch({ type: 'consultation/closeModal' })
+        },
+      })
+    }
   },
   displayName: formName,
 })
@@ -943,6 +959,7 @@ class Main extends React.Component {
         </Authorized.Context.Provider>
         <CommonModal
           cancelText='Cancel'
+          maxWidth='xs'
           title='Confirm sign off current consultation?'
           onClose={this.onCloseSignOffModal}
           open={showSignOffModal}

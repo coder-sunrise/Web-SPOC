@@ -16,8 +16,17 @@ import {
 import Edit from '@material-ui/icons/Edit'
 
 const PatientNurseNotesContent = ({ canEdit, entity, handleEdit }) => {
-  const { createDate, createByUserFullName = '', notes } = entity
+  const {
+    createDate,
+    createByUserName = '',
+    createByUserTitle = '',
+    notes,
+  } = entity
   const formateDate = moment(createDate).format(dateFormatLongWithTimeNoSec)
+  const createByUserFullName = `${createByUserTitle} ${createByUserName}`
+  let e = document.createElement('div')
+  e.innerHTML = notes
+  let htmlData = e.childNodes.length === 0 ? '' : e.childNodes[0].nodeValue
 
   return (
     <React.Fragment>
@@ -39,19 +48,10 @@ const PatientNurseNotesContent = ({ canEdit, entity, handleEdit }) => {
           </Button>
         )}
       </div>
-      <div style={{ paddingLeft: 20 }}>
-        <textarea
-          disabled='on'
-          rows={notes.split('\n').length}
-          value={notes}
-          style={{
-            width: '100%',
-            border: 0,
-            resize: 'none',
-            background: 'transparent',
-          }}
-        />
-      </div>
+      <div
+        dangerouslySetInnerHTML={{ __html: htmlData }}
+        style={{ paddingLeft: 20 }}
+      />
     </React.Fragment>
   )
 }

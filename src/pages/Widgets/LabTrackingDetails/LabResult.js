@@ -24,7 +24,13 @@ export default ({
       <Field
         name='remarks'
         render={(args) => (
-          <TextField {...args} multiline rowsMax={3} label='Remarks' />
+          <TextField
+            {...args}
+            multiline
+            rowsMax={3}
+            maxLength={1000}
+            label='Remarks'
+          />
         )}
       />
       <AttachmentWithThumbnail
