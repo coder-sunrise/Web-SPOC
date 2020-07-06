@@ -18,6 +18,7 @@ import {
 import Address from '@/pages/PatientDatabase/Detail/Demographics/Address'
 import { navigateDirtyCheck } from '@/utils/utils'
 import { MobileNumberInput } from '@/components/_medisys'
+import { sendNotification } from '@/utils/realtime'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -59,6 +60,10 @@ const styles = (theme) => ({
       },
     }).then((r) => {
       if (r) {
+        sendNotification('ClinicInfoUpdated', {
+          message: 'ClinicInfo updated',
+        })
+
         history.push('/setting')
         dispatch({
           type: 'clinicInfo/query',
