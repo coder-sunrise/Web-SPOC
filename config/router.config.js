@@ -603,6 +603,14 @@ const _routes = [
             ],
           },
           {
+            path: '/report/invoicelistingreport',
+            name: 'invoiceListingReport',
+            component: './Report/InvoiceListingReport',
+            authority: [
+              'report.finance.invoicelisting',
+            ],
+          },
+          {
             path: '/report/lowstockconsumablesreport',
             name: 'lowStockConsumablesReport',
             component: './Report/LowStockConsumablesReport',
@@ -1249,16 +1257,16 @@ const routes =
   process.env.NODE_ENV === 'production'
     ? _routes
     : _routes.map((r, index) => {
-        if (index === 1) {
-          return {
-            ...r,
-            routes: [
-              devRoutes,
-              ...r.routes,
-            ],
-          }
+      if (index === 1) {
+        return {
+          ...r,
+          routes: [
+            devRoutes,
+            ...r.routes,
+          ],
         }
-        return r
-      })
+      }
+      return r
+    })
 
 export default _routes
