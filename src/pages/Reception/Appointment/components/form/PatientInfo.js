@@ -30,6 +30,7 @@ const PatientInfoInput = ({
   disabled,
   appointmentStatusFK,
   values,
+  hasActiveSession,
 }) => {
   const isRegisteredPatient =
     patientProfileFK !== undefined && patientProfileFK !== null
@@ -42,21 +43,23 @@ const PatientInfoInput = ({
   return (
     <React.Fragment>
       <GridItem xs md={3}>
-        <FastField
-          name='search'
-          render={(args) => {
-            return (
-              <TextField
-                {...args}
-                autoFocus={!isEdit}
-                defaultValue={undefined}
-                label={formatMessage({
-                  id: 'reception.queue.patientSearchPlaceholder',
-                })}
-              />
-            )
-          }}
-        />
+        <div className={classnames(classes.buttonGroup)}>
+          <FastField
+            name='search'
+            render={(args) => {
+              return (
+                <TextField
+                  {...args}
+                  autoFocus={!isEdit}
+                  defaultValue={undefined}
+                  label={formatMessage({
+                    id: 'reception.queue.patientSearchPlaceholder',
+                  })}
+                />
+              )
+            }}
+          />
+        </div>
       </GridItem>
       <GridItem xs md={5}>
         <div className={classnames(classes.buttonGroup)}>
@@ -100,16 +103,18 @@ const PatientInfoInput = ({
                   Patient Profile
                 </Button>
               </Authorized>
-              <Authorized authority='queue.registervisit'>
-                <Button
-                  size='sm'
-                  color='primary'
-                  disabled={!isEdit || !allowedToActualize}
-                  onClick={onRegisterToVisitClick}
-                >
-                  Register To Visit
-                </Button>
-              </Authorized>
+              {hasActiveSession && (
+                <Authorized authority='queue.registervisit'>
+                  <Button
+                    size='sm'
+                    color='primary'
+                    disabled={!isEdit || !allowedToActualize}
+                    onClick={onRegisterToVisitClick}
+                  >
+                    Register To Visit
+                  </Button>
+                </Authorized>
+              )}
             </React.Fragment>
           )}
         </div>

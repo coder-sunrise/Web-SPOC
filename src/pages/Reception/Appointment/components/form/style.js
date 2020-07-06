@@ -43,7 +43,6 @@ const styles = (theme) => ({
     paddingTop: theme.spacing.unit,
   },
   buttonGroup: {
-    paddingTop: theme.spacing(2),
     height: '100%',
     display: 'flex',
     justifyContent: 'start',
