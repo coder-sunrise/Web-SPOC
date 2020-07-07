@@ -66,14 +66,25 @@ const Templates = ({
 
   const updateTemplate = () => {
     if (onSaveTemplate) onSaveTemplate()
-
+    let tempName = list.find(x => x.cesId === currentId).name
     dispatch({
       type: 'cestemplate/update',
       payload: currentId,
     }).then((o) => {
       if (o) {
         notification.success({
-          message: `Template ${templateName} saved`,
+          message: `Template ${tempName} saved`,
+        })
+        // refresh template list after Replace
+        dispatch({
+          type: 'cestemplate/query',
+        }).then((x) => {
+          if (x) {
+            let newCES = x.find(t => t.name === tempName)
+            if (newCES) {
+              setCurrentId(newCES.cesId)
+            }
+          }
         })
       }
     })
@@ -143,7 +154,7 @@ const Templates = ({
       {currentId && (
         <GridContainer gutter={0}>
           <GridItem xs={12}>
-            <ProgressButton onClick={updateTemplate}>Replace</ProgressButton>
+            <ProgressButton onClick={updateTemplate}>Replace1</ProgressButton>
             <Popconfirm onConfirm={deleteTemplate}>
               <ProgressButton color='danger' icon={<Delete />}>
                 Delete
