@@ -154,7 +154,7 @@ const Templates = ({
       {currentId && (
         <GridContainer gutter={0}>
           <GridItem xs={12}>
-            <ProgressButton onClick={updateTemplate}>Replace1</ProgressButton>
+            <ProgressButton onClick={updateTemplate}>Replace</ProgressButton>
             <Popconfirm onConfirm={deleteTemplate}>
               <ProgressButton color='danger' icon={<Delete />}>
                 Delete
