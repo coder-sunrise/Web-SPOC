@@ -393,8 +393,7 @@ class ClinicalNotes extends Component {
       type: 'cannedText/queryPrevDoctorNotes',
       payload: { visitId: visitRegistration.entity.visit.id },
     })
-    const { cannedTextRow } = this.state
-    console.log(cannedTextTypeFK)
+    const { cannedTextRow } = this.state 
     const { consultation, prefix } = this.props
     const { entity } = consultation
     let text = ''
