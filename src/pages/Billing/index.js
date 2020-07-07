@@ -132,10 +132,6 @@ const styles = (theme) => ({
 class Billing extends Component {
   state = {
     showReport: false,
-    reportPayload: {
-      reportID: undefined,
-      reportParameters: undefined,
-    },
     showAddPaymentModal: false,
     showSchemeValidationPrompt: false,
     isEditing: false,
@@ -338,14 +334,8 @@ class Billing extends Component {
     }
   }
 
-  onCloseReport = () => {
-    this.setState({
-      showReport: false,
-      reportPayload: {
-        reportID: undefined,
-        reportParameters: undefined,
-      },
-    })
+  toggleReport = () => {
+    this.setState((preState) => ({ showReport: !preState.showReport }))
   }
 
   backToDispense = () => {
@@ -432,20 +422,7 @@ class Billing extends Component {
     })
   }
 
-  onPrinterClick = (type, itemID, copayerID) => {
-    switch (type) {
-      case 'Payment':
-        this.onShowReport(29, { InvoicePaymentId: itemID })
-        break
-      case 'TaxInvoice':
-        this.onPrintInvoice(copayerID)
-        break
-      default:
-        break
-    }
-  }
-
-  onPrintInvoice = (copayerID) => {
+  onPrintInvoiceClick = () => {
     const { values, dispatch } = this.props
     const { invoicePayer } = values
     const modifiedOrNewAddedPayer = invoicePayer.filter((payer) => {
@@ -453,18 +430,6 @@ class Billing extends Component {
       if (payer.id) return payer.isModified
       return true
     })
-    let parametrPaload
-    if (copayerID) {
-      parametrPaload = {
-        InvoiceId: values.invoice ? values.invoice.id : '',
-        CopayerId: copayerID,
-      }
-    } else {
-      parametrPaload = {
-        InvoiceId: values.invoice ? values.invoice.id : '',
-      }
-    }
-    console.log('parametrPaload', parametrPaload)
     if (modifiedOrNewAddedPayer.length > 0) {
       dispatch({
         type: 'global/updateState',
@@ -478,20 +443,13 @@ class Billing extends Component {
               this.setState((preState) => ({
                 submitCount: preState.submitCount + 1,
               }))
-
-              this.onShowReport(15, parametrPaload)
+              this.toggleReport()
             }
             this.upsertBilling(callback)
           },
         },
       })
-    } else {
-      this.onShowReport(15, parametrPaload)
-    }
-  }
-
-  onPrintInvoiceClick = () => {
-    this.onPrintInvoice(undefined)
+    } else this.toggleReport()
   }
 
   handleAddPayment = async (payment) => {
@@ -613,20 +571,9 @@ class Billing extends Component {
     this.props.dispatch({ type: 'global/incrementCommitCount' })
   }
 
-  onShowReport = (reportID, reportParameters) => {
-    this.setState({
-      showReport: true,
-      reportPayload: {
-        reportID,
-        reportParameters,
-      },
-    })
-  }
-
   render () {
     const {
       showReport,
-      reportPayload,
       showAddPaymentModal,
       showSchemeValidationPrompt,
       schemeValidations,
@@ -657,8 +604,6 @@ class Billing extends Component {
       patient,
       ctschemetype,
       ctcopaymentscheme,
-      sessionInfo,
-      user,
     }
     return (
       <LoadingWrapper loading={loading} text='Getting billing info...'>
@@ -710,9 +655,6 @@ class Billing extends Component {
                   commitCount={commitCount}
                   {...formikBag}
                   {...commonProps}
-                  onPrinterClick={this.onPrinterClick}
-                  saveBilling={this.handleSaveBillingClick}
-                  fromBilling
                 />
               )}
             </GridContainer>
@@ -752,14 +694,7 @@ class Billing extends Component {
                 <Button
                   color='info'
                   onClick={this.backToDispense}
-                  disabled={
-                    this.state.isEditing ||
-                    values.id === undefined ||
-                    values.invoicePayer.find((payer) =>
-                      (payer.invoicePayment || [])
-                        .find((payment) => !payment.isCancelled),
-                    )
-                  }
+                  disabled={this.state.isEditing || values.id === undefined}
                 >
                   <ArrowBack />Dispense
                 </Button>
@@ -816,14 +751,16 @@ class Billing extends Component {
         </CommonModal>
         <CommonModal
           open={showReport}
-          onClose={this.onCloseReport}
+          onClose={this.toggleReport}
           title='Invoice'
           maxWidth='lg'
         >
           <ReportViewer
             showTopDivider={false}
-            reportID={reportPayload.reportID}
-            reportParameters={reportPayload.reportParameters}
+            reportID={15}
+            reportParameters={{
+              InvoiceID: values.invoice ? values.invoice.id : '',
+            }}
           />
         </CommonModal>
       </LoadingWrapper>
