@@ -80,12 +80,14 @@ class AppointmentHistory extends PureComponent {
           apptDateTo: moment().add(-1, 'd').formatUTC(),
           patientProfileId: patientId,
           doctor,
+          isIncludeHistory: true,
         },
         ...commonParams,
       }),
       queryAppointments({
         apiCriteria: {
           apptDateFrom: moment().formatUTC(),
+          isIncludeHistory: true,
           // appStatus: [
           //   APPOINTMENT_STATUS.CONFIRMED,
           //   APPOINTMENT_STATUS.RESCHEDULED,
