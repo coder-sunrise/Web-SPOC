@@ -141,7 +141,7 @@ class FilterBar extends PureComponent {
           <GridItem xs={12} md={12}>
             <div className={classes.filterBtn}>
               <ProgressButton
-                icon={null}
+                icon={<Search />}
                 variant='contained'
                 color='primary'
                 onClick={() => {
@@ -165,7 +165,6 @@ class FilterBar extends PureComponent {
                   })
                 }}
               >
-                <Search />
                 <FormattedMessage id='form.search' />
               </ProgressButton>
               <Authorized authority='patientdatabase.newpatient'>
