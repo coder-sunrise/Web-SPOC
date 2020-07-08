@@ -73,6 +73,12 @@ export const menuData = [
   },
   {
     title: 'Finance',
+    text: 'Invoice Listing Report',
+    url: '/report/invoicelistingreport',
+    authority: 'report.finance.invoicelisting',
+  },
+  {
+    title: 'Finance',
     text: 'Statement Summary Report',
     url: '/report/statementsummaryreport',
     authority: 'report.finance.statementsummaryreport',
