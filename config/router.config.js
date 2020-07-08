@@ -479,6 +479,15 @@ const _routes = [
               'finance/statement',
             ],
           },
+          {
+            path: '/finance/statement/statementpayment/:id',
+            name: 'statement/statementpayment',
+            hideInMenu: true,
+            component: './Finance/Statement/StatementPayment',
+            authority: [
+              'finance/statement',
+            ],
+          },
           // {
           //   path: '/finance/expense',
           //   name: 'doctor-expense',
