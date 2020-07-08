@@ -32,8 +32,15 @@ import { SendNotification } from '@/utils/notification'
 import Authorized from '@/utils/Authorized'
 import { QueueDashboardButton } from '@/components/_medisys'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
-import { FORM_CATEGORY, VALUE_KEYS, VISIT_TYPE } from '@/utils/constants'
+import {
+  FORM_CATEGORY,
+  VALUE_KEYS,
+  VISIT_TYPE,
+  NOTIFICATION_TYPE,
+  NOTIFICATION_STATUS,
+} from '@/utils/constants'
 import { initRoomAssignment } from '@/utils/codes'
+import { sendNotification } from '@/utils/realtime'
 import {
   modelKey,
   AppointmentContextMenu,
@@ -350,38 +357,33 @@ class Queue extends React.Component {
       type: `queueLog/endSession`,
       sessionID: queueLog.sessionInfo.id,
     }).then(async (response) => {
-      const { status } = response
       if (response) {
-        dispatch({
-          type: 'queueCalling/getExistingQueueCallList',
-          payload: {
-            keys: VALUE_KEYS.QUEUECALLING,
-          },
-        }).then((res) => {
-          const { value, ...restRespValues } = res
-          dispatch({
-            type: 'queueCalling/upsertQueueCallList',
-            payload: {
-              ...restRespValues,
-              key: VALUE_KEYS.QUEUECALLING,
-              value: '[]',
-            },
-          })
+        this.clearQueueCall()
+        this.setState({
+          showEndSessionSummary: true,
         })
-
-        this.setState(
-          {
-            showEndSessionSummary: true,
-          },
-          () => {
-            // dispatch({
-            //   type: 'queueLog/updateState',
-            //   payload: ,
-            // })
-          },
-        )
       }
     })
+  }
+
+  clearQueueCall = () => {
+    this.props
+      .dispatch({
+        type: 'queueCalling/claearAll',
+        payload: {
+          key: VALUE_KEYS.QUEUECALLING,
+        },
+      })
+      .then((res) => {
+        if (res) {
+          notification.success({ message: 'Cleared' })
+          sendNotification('QueueCalled', {
+            type: NOTIFICATION_TYPE.QUEUECALL,
+            status: NOTIFICATION_STATUS.OK,
+            message: 'Queue Called',
+          })
+        }
+      })
   }
 
   onEndSessionSummaryClose = () => {
