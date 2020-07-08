@@ -97,7 +97,7 @@ const DispenseDetails = ({
   onDrugLabelSelectionClose,
   onDrugLabelSelected,
   onDrugLabelNoChanged,
-  selectedDrugs, 
+  selectedDrugs,
 }) => {
   const {
     prescription,
@@ -177,6 +177,7 @@ const DispenseDetails = ({
       invoiceTotalAftGST: v.summary.totalWithGST,
       outstandingBalance: v.summary.totalWithGST - values.invoice.totalPayment,
       invoiceGSTAmt: Math.round(v.summary.gst * 100) / 100,
+      invoiceGSTAdjustment: v.summary.gstAdj,
       invoiceAdjustment: v.adjustments,
       isGSTInclusive: !!v.summary.isGSTInclusive,
     }
@@ -207,17 +208,17 @@ const DispenseDetails = ({
       <GridContainer>
         <GridItem justify='flex-start' md={6} className={classes.actionButtons}>
           {!viewOnly &&
-            !isRetailVisit && (
-              <Button
-                color='info'
-                size='sm'
-                onClick={onReloadClick}
-                disabled={disableRefreshOrder}
-              >
-                <Refresh />
+          !isRetailVisit && (
+            <Button
+              color='info'
+              size='sm'
+              onClick={onReloadClick}
+              disabled={disableRefreshOrder}
+            >
+              <Refresh />
               Refresh Order
-              </Button>
-            )}
+            </Button>
+          )}
           <Button
             color='primary'
             size='sm'
@@ -371,13 +372,13 @@ const DispenseDetails = ({
         onClose={() => {
           onDrugLabelSelectionClose()
         }}
-      // onConfirm={() => { 
-      //    onDrugLabelSelectionClose()
-      //    onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
-      // }}
+        // onConfirm={() => {
+        //    onDrugLabelSelectionClose()
+        //    onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
+        // }}
       >
         <DrugLabelSelection
-          prescription={selectedDrugs} 
+          prescription={selectedDrugs}
           codetable={codetable}
           handleDrugLabelSelected={onDrugLabelSelected}
           handleDrugLabelNoChanged={onDrugLabelNoChanged}

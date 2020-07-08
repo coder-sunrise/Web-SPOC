@@ -665,7 +665,9 @@ class Form extends React.PureComponent {
           concurrencyToken,
           apptDurationHour,
           apptDurationMinute,
-          preClinicianFK } = resource
+          preClinicianFK,
+          roomFk,
+          appointmentTypeFK } = resource
         return {
           appointmentFK,
           clinicianFK,
@@ -681,42 +683,52 @@ class Form extends React.PureComponent {
           apptDurationHour,
           apptDurationMinute,
           preClinicianFK,
+          roomFk,
+          appointmentTypeFK,
         }
       })
-      let originalResource = Array.from(originalAppointment.appointments_Resources, (resource) => {
-        const { appointmentFK,
-          clinicianFK,
-          clinicianName,
-          clinicianTitle,
-          startTime,
-          endTime,
-          sortOrder,
-          isPrimaryClinician,
-          id,
-          isDeleted,
-          concurrencyToken,
-          apptDurationHour,
-          apptDurationMinute,
-          preClinicianFK } = resource
-        return {
-          appointmentFK,
-          clinicianFK,
-          clinicianName,
-          clinicianTitle,
-          startTime,
-          endTime,
-          sortOrder,
-          isPrimaryClinician,
-          id,
-          isDeleted,
-          concurrencyToken,
-          apptDurationHour,
-          apptDurationMinute,
-          preClinicianFK,
-        }
-      }) 
-      let resourceChanged = JSON.stringify(originalResource) !== JSON.stringify(newResource)
-      let dateChanged = originalAppointment.appointmentDate.indexOf(values.currentAppointment.appointmentDate) === -1
+      let originalResource = {}
+      if (originalAppointment) {
+        originalResource = Array.from(originalAppointment.appointments_Resources, (resource) => {
+          console.log(resource)
+          const { appointmentFK,
+            clinicianFK,
+            clinicianName,
+            clinicianTitle,
+            startTime,
+            endTime,
+            sortOrder,
+            isPrimaryClinician,
+            id,
+            isDeleted,
+            concurrencyToken,
+            apptDurationHour,
+            apptDurationMinute,
+            preClinicianFK,
+            roomFk,
+            appointmentTypeFK } = resource
+          return {
+            appointmentFK,
+            clinicianFK,
+            clinicianName,
+            clinicianTitle,
+            startTime,
+            endTime,
+            sortOrder,
+            isPrimaryClinician,
+            id,
+            isDeleted,
+            concurrencyToken,
+            apptDurationHour,
+            apptDurationMinute,
+            preClinicianFK,
+            roomFk,
+            appointmentTypeFK,
+          }
+        })
+      }
+      let resourceChanged = originalAppointment && JSON.stringify(originalResource) !== JSON.stringify(newResource)
+      let dateChanged = originalAppointment && originalAppointment.appointmentDate.indexOf(values.currentAppointment.appointmentDate) === -1
       if (
         values.currentAppointment &&
         (values.currentAppointment.appointmentStatusFk ===

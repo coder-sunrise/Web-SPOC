@@ -940,6 +940,37 @@ const sortAdjustment = (a, b) => {
   return 0
 }
 
+const calculateGSTAdj = ({
+  isGSTInclusive = false,
+  activeRows,
+  totalAfterAdj,
+  gstValue,
+  gstAmtField = 'gstAmount',
+}) => {
+  let gst = roundTo(totalAfterAdj * gstValue / 100)
+  if (isGSTInclusive) {
+    gst = roundTo(totalAfterAdj - totalAfterAdj / (1 + gstValue / 100))
+  }
+
+  const totalItemizedGST = roundTo(
+    activeRows.map((i) => i[gstAmtField]).reduce(sumReducer, 0),
+  )
+  const diff = roundTo(gst - totalItemizedGST)
+
+  // include the diff of GST value only to the last items
+  activeRows.forEach((r, index) => {
+    if (index === activeRows.length - 1) {
+      r[gstAmtField] += diff
+      r.totalAfterGST += diff
+    }
+  })
+
+  return {
+    gst,
+    gstAdjustment: diff,
+  }
+}
+
 const calculateAmount = (
   rows,
   adjustments,
@@ -997,7 +1028,7 @@ const calculateAmount = (
       // r[adjustedField] = roundTo(r[adjustedField] + adj)
       // r.subAdjustment += adj
       r[`adjustmen${i}`] = adj
-      r[adjustedField] = initalRowToal + adj
+      r[adjustedField] = roundTo(initalRowToal + adj)
     })
     fa.adjAmount = roundTo(adjAmount)
   })
@@ -1031,7 +1062,7 @@ const calculateAmount = (
       if (isGSTInclusive) {
         r[gstField] = r[adjustedField]
         r[gstAmtField] = roundTo(
-          r[adjustedField] - r[adjustedField] * 1 / (1 + gstValue / 100),
+          r[adjustedField] - r[adjustedField] / (1 + gstValue / 100),
         )
       } else {
         r[gstAmtField] = roundTo(r[adjustedField] * gstValue / 100)
@@ -1062,6 +1093,13 @@ const calculateAmount = (
     }
   }
 
+  const { gst: absoluteGST, gstAdjustment } = calculateGSTAdj({
+    activeRows,
+    totalAfterAdj,
+    gstValue,
+    isGSTInclusive,
+  })
+
   const r = {
     rows,
     adjustments: adjustments
@@ -1078,17 +1116,18 @@ const calculateAmount = (
       subTotal: roundTo(
         activeRows.map((row) => row[totalField]).reduce(sumReducer, 0),
       ),
-      gst,
+      gst: absoluteGST,
+      gstAdj: gstAdjustment,
       total,
       totalAfterAdj,
       totalWithGST: isGSTInclusive
         ? totalAfterAdj
-        : roundTo(gst + totalAfterAdj),
+        : roundTo(absoluteGST + totalAfterAdj),
       gstValue,
       isGSTInclusive,
     },
   }
-  // console.log({ r })
+
   // eslint-disable-next-line consistent-return
   return r
 }

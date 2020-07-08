@@ -3,9 +3,7 @@ import { FastField } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core'
 import Search from '@material-ui/icons/Search'
-import {
-  IntegratedSummary,
-} from '@devexpress/dx-react-grid'
+import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { connect } from 'dva'
 import Yup from '@/utils/yup'
 import { navigateDirtyCheck } from '@/utils/utils'
@@ -315,9 +313,11 @@ class AddNewStatement extends PureComponent {
 
   clearInvoiceList = (e, op) => {
     const { setFieldValue } = this.props
-    const { adminCharge, adminChargeType } = op
+    const { adminCharge, adminChargeType, copayerAdjustment, copayerAdjustmentType } = op
     setFieldValue('adminChargeValue', adminCharge || 0)
     setFieldValue('adminChargeValueType', adminChargeType || 'Percentage')
+    setFieldValue('adjustmentValue', copayerAdjustment || 0)
+    setFieldValue('adjustmentValueType', copayerAdjustmentType || 'Percentage')
     this.setState(() => {
       return {
         invoiceRows: [],
@@ -540,9 +540,8 @@ class AddNewStatement extends PureComponent {
                   color='primary'
                   disabled={!values.copayerFK}
                   onClick={() => this.getInvoiceList()}
-                  icon={<p />}
+                  icon={<Search />}
                 >
-                  <Search />
                   <FormattedMessage id='form.search' />
                 </ProgressButton>
               </GridItem>
@@ -575,7 +574,10 @@ class AddNewStatement extends PureComponent {
                 summaryConfig: {
                   state: {
                     totalItems: [
-                      { columnName: columnExtensions[3].columnName, type: 'payableAmount' },
+                      {
+                        columnName: columnExtensions[3].columnName,
+                        type: 'payableAmount',
+                      },
                     ],
                   },
                   integrated: {
@@ -584,16 +586,22 @@ class AddNewStatement extends PureComponent {
                         if (rows && rows.length > 0) {
                           return rows.reduce((pre, cur) => {
                             console.log({ cur })
-                            if (values.selectedRows && values.selectedRows.includes(cur.id)) {
+                            if (
+                              values.selectedRows &&
+                              values.selectedRows.includes(cur.id)
+                            ) {
                               return pre + getValue(cur) || 0
                             }
                             return pre
                           }, 0)
                         }
                         return 0
-
                       }
-                      return IntegratedSummary.defaultCalculator(type, rows, getValue)
+                      return IntegratedSummary.defaultCalculator(
+                        type,
+                        rows,
+                        getValue,
+                      )
                     },
                   },
                   row: {

@@ -393,18 +393,17 @@ class ClinicalNotes extends Component {
       type: 'cannedText/queryPrevDoctorNotes',
       payload: { visitId: visitRegistration.entity.visit.id },
     })
-    const { cannedTextRow } = this.state
-
+    const { cannedTextRow } = this.state 
     const { consultation, prefix } = this.props
     const { entity } = consultation
     let text = ''
     if (previousDoctorNote) {
-      if (cannedTextTypeFK === 0) {
+      if (cannedTextTypeFK === 1) {
         text = previousDoctorNote.note || ''
-      } else if (cannedTextTypeFK === 1) {
-        text = previousDoctorNote.chiefComplaints || ''
-      } else if (cannedTextTypeFK === 2) {
+      } else if (cannedTextTypeFK === 6) {
         text = previousDoctorNote.plan || ''
+      } else if (cannedTextTypeFK === 2) {
+        text = previousDoctorNote.chiefComplaints || ''
       } else if (cannedTextTypeFK === 3) {
         text = previousDoctorNote.history || ''
       }

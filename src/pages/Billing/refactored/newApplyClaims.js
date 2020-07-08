@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core'
 import Add from '@material-ui/icons/AddCircle'
 import Reset from '@material-ui/icons/Cached'
 // common components
-import { CommonModal, Button, GridItem, notification } from '@/components'
+import { CommonModal, Button, GridItem } from '@/components'
 // common utils
 import { roundTo } from '@/utils/utils'
 import { INVOICE_PAYER_TYPE, VISIT_TYPE } from '@/utils/constants'
@@ -28,8 +28,6 @@ import {
   updateInvoicePayerPayableBalance,
   sortItemByID,
 } from './applyClaimUtils'
-import { AddPayment } from '@/components/_medisys'
-import DeleteConfirmation from '@/pages/Finance/Invoice/components/modal/DeleteConfirmation'
 
 const defaultInvoicePayer = {
   _indexInClaimableSchemes: 0,
@@ -46,7 +44,6 @@ const defaultInvoicePayer = {
   // claimableSchemes: claimableSchemes[0],
   invoicePayerItem: [],
   sequence: 0,
-  invoicePayment: [],
   // payerTypeFK: INVOICE_PAYER_TYPE.SCHEME,
 }
 
@@ -61,10 +58,7 @@ const ApplyClaims = ({
   patient,
   ctschemetype,
   ctcopaymentscheme,
-  onPrinterClick,
-  saveBilling,
   noExtraOptions = false,
-  fromBilling = false,
 }) => {
   const {
     invoice,
@@ -324,17 +318,6 @@ const ApplyClaims = ({
       // abort early if failed to reset bill
       if (!response) return
 
-      if (
-        tempInvoicePayer.find((o) =>
-          o.invoicePayment.find((payment) => !payment.isCancelled),
-        )
-      ) {
-        notification.warn({
-          message: 'please remove payments before reset claims',
-        })
-        return
-      }
-
       const _newTempInvoicePayer = tempInvoicePayer.map((i) => ({
         ...i,
         _isDeleted: true,
@@ -466,13 +449,6 @@ const ApplyClaims = ({
             0,
           ),
         ),
-        payerOutstanding:
-          roundTo(
-            invoiceItems.reduce(
-              (subtotal, item) => subtotal + item.claimAmount,
-              0,
-            ),
-          ) - _.sum(tempInvoicePayer[index].invoicePayment, 'TotalAmtPaid'),
         isModified: true,
         invoicePayerItem: invoiceItems,
         _isConfirmed: !hasInvalidRow,
@@ -660,92 +636,7 @@ const ApplyClaims = ({
   useEffect(updateValues, [
     tempInvoicePayer,
   ])
-  const [
-    showAddPaymentModal,
-    setShowAddPaymentModal,
-  ] = useState(false)
 
-  const [
-    selectInvoicePayer,
-    setSelectInvoicePayer,
-  ] = useState({})
-
-  const [
-    onVoid,
-    setOnVoid,
-  ] = useState({})
-
-  const [
-    showDeleteConfirmation,
-    setShowDeleteConfirmation,
-  ] = useState(false)
-
-  const toggleAddPaymentModal = () => {
-    setShowAddPaymentModal(!showAddPaymentModal)
-  }
-
-  const toggleDeleteConfirmation = () => {
-    setShowDeleteConfirmation(!showDeleteConfirmation)
-  }
-
-  const onSubmitAddPayment = async (invoicePaymentList) => {
-    toggleAddPaymentModal()
-    let invoicePayer = tempInvoicePayer[selectInvoicePayer.index]
-    if (invoicePayer.id && invoicePayer.id > 0) {
-      invoicePayer.isModified = true
-    }
-    invoicePayer.invoicePayment = [
-      ...(invoicePayer.invoicePayment || []),
-      invoicePaymentList,
-    ]
-    await setTempInvoicePayer([
-      ...tempInvoicePayer,
-    ])
-    saveBilling()
-  }
-
-  const onAddPaymentClick = async (index) => {
-    let invoicePayer = tempInvoicePayer[index]
-    const invoicePayerPayment = {
-      ...invoice,
-      payerTypeFK: invoicePayer.payerTypeFK,
-      totalAftGst: invoicePayer.payerDistributedAmt,
-      outstandingBalance: invoicePayer.payerOutstanding,
-      finalPayable: invoicePayer.payerOutstanding,
-      totalClaims: undefined,
-    }
-
-    let selectPayerName = ''
-    if (invoicePayer.payerTypeFK === 1)
-      selectPayerName = invoicePayer.patientName
-    if (invoicePayer.payerTypeFK === 2) selectPayerName = 'Scheme'
-    if (invoicePayer.payerTypeFK === 4) selectPayerName = invoicePayer.name
-    await setSelectInvoicePayer({
-      invoicePayerName: selectPayerName,
-      index,
-      invoicePayerPayment,
-    })
-    toggleAddPaymentModal()
-  }
-
-  const onSubmitVoid = async (cancelReason) => {
-    toggleDeleteConfirmation()
-    let invoicePayer = tempInvoicePayer[onVoid.payerIndex]
-    invoicePayer.isModified = true
-    if (onVoid.type === 'Payment') {
-      let payment = invoicePayer.invoicePayment.find((o) => o.id === onVoid.id)
-      payment.isCancelled = true
-      payment.cancelReason = cancelReason
-    }
-    await setTempInvoicePayer([
-      ...tempInvoicePayer,
-    ])
-    saveBilling()
-  }
-  const onPaymentVoidClick = (index, payment) => {
-    setOnVoid({ payerIndex: index, ...payment })
-    toggleDeleteConfirmation()
-  }
   return (
     <Fragment>
       <GridItem md={2}>
@@ -801,10 +692,6 @@ const ApplyClaims = ({
               patient={patient}
               ctschemetype={ctschemetype}
               ctcopaymentscheme={ctcopaymentscheme}
-              onPaymentVoidClick={onPaymentVoidClick}
-              onPrinterClick={onPrinterClick}
-              onAddPaymentClick={onAddPaymentClick}
-              fromBilling={fromBilling}
             />
           )
         })}
@@ -862,33 +749,6 @@ const ApplyClaims = ({
           claimableSchemes={claimableSchemes}
           handleSelectClick={handleSelectClaimClick}
         />
-      </CommonModal>
-      <CommonModal
-        open={showAddPaymentModal}
-        title='Add Payment'
-        onClose={toggleAddPaymentModal}
-        observe='AddPaymentForm'
-        maxWidth='lg'
-      >
-        <AddPayment
-          handleSubmit={onSubmitAddPayment}
-          onClose={toggleAddPaymentModal}
-          invoicePayerName={selectInvoicePayer.invoicePayerName}
-          invoicePayment={[]}
-          showPaymentDate
-          invoice={{
-            ...selectInvoicePayer.invoicePayerPayment,
-          }}
-        />
-      </CommonModal>
-      <CommonModal
-        open={showDeleteConfirmation}
-        title={`Void ${onVoid.type}`}
-        onConfirm={toggleDeleteConfirmation}
-        onClose={toggleDeleteConfirmation}
-        maxWidth='sm'
-      >
-        <DeleteConfirmation handleSubmit={onSubmitVoid} {...onVoid} />
       </CommonModal>
     </Fragment>
   )

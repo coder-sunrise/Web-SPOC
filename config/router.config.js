@@ -479,6 +479,15 @@ const _routes = [
               'finance/statement',
             ],
           },
+          {
+            path: '/finance/statement/statementpayment/:id',
+            name: 'statement/statementpayment',
+            hideInMenu: true,
+            component: './Finance/Statement/StatementPayment',
+            authority: [
+              'finance/statement',
+            ],
+          },
           // {
           //   path: '/finance/expense',
           //   name: 'doctor-expense',
@@ -720,6 +729,14 @@ const _routes = [
             component: './Report/InventoryListingReport',
             authority: [
               'report.inventory.inventorylistingreport',
+            ],
+          },
+          {
+            path: '/report/statementsummaryreport',
+            name: 'statementsummaryreport',
+            component: './Report/StatementSummaryReport',
+            authority: [
+              'report.finance.statementsummaryreport',
             ],
           },
         ],
