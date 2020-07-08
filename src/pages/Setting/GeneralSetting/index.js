@@ -79,18 +79,6 @@ const styles = (theme) => ({
             autoPrintDrugLabelOnFinalize &&
             autoPrintDrugLabelOnFinalize.settingValue === 'true',
         },
-        autoPrintDrugLabelOnCompletePayment: {
-          ...autoPrintDrugLabelOnCompletePayment,
-          settingValue:
-            autoPrintDrugLabelOnCompletePayment &&
-            autoPrintDrugLabelOnCompletePayment.settingValue === 'true',
-        },
-        autoPrintDrugLabelOnSignOff: {
-          ...autoPrintDrugLabelOnSignOff,
-          settingValue:
-            autoPrintDrugLabelOnSignOff &&
-            autoPrintDrugLabelOnSignOff.settingValue === 'true',
-        },
         showConsultationVersioning: {
           ...showConsultationVersioning,
           settingValue: showConsultationVersioning.settingValue === 'true',
@@ -343,7 +331,7 @@ class GeneralSetting extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='autoPrintDrugLabel.settingValue'
+                name='autoPrintDrugLabelOnFinalize.settingValue'
                 render={(args) => {
                   return (
                     <Checkbox
