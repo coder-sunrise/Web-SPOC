@@ -220,13 +220,13 @@ const FilterBar = (props) => {
       </GridContainer>
       <Popper open={showFilterTemplate} anchorEl={anchorEl}>
         <Paper className={classes.container}>
-          {/* <ClickAwayListener onClickAway={handleFilterTemplate}> */}
-          <FilterTemplateTooltip
-            filterByDoctor={values.filterByDoctor}
-            filterByApptType={values.filterByApptType}
-            handleFilterTemplate={handleFilterTemplate}
-          />
-          {/* </ClickAwayListener> */}
+          <ClickAwayListener onClickAway={handleFilterTemplate}>
+            <FilterTemplateTooltip
+              filterByDoctor={values.filterByDoctor}
+              filterByApptType={values.filterByApptType}
+              handleFilterTemplate={handleFilterTemplate}
+            />
+          </ClickAwayListener>
         </Paper>
       </Popper>
     </React.Fragment>
