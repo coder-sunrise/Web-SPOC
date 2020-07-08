@@ -3,7 +3,9 @@ import { connect } from 'dva'
 import { compose } from 'redux'
 import Delete from '@material-ui/icons/Delete'
 import { withStyles, Divider } from '@material-ui/core'
+import GetApp from '@material-ui/icons/GetApp'
 import _ from 'lodash'
+import Authorized from '@/utils/Authorized'
 // custom components
 import {
   GridContainer,
@@ -123,11 +125,15 @@ const Templates = ({
     })
   }
 
-  const loadTemplate = (selectedId) => {
-    dispatch({
+  const loadTemplate = async () => {
+    await dispatch({
+      type: 'appointment/setCurrentFilterTemplate',
+      payload: {},
+    })
+    await dispatch({
       type: 'appointment/setCurrentFilterTemplate',
       payload: {
-        id: selectedId,
+        id: selectedTemplateId,
       },
     })
   }
@@ -153,12 +159,19 @@ const Templates = ({
               onChange={(v) => {
                 setSelectedTemplateId(v)
                 setTemplateName('')
-
-                if (v) {
-                  loadTemplate(v)
-                }
               }}
             />
+          </GridItem>
+          <GridItem xs={4} alignItems='flex-end' justify='flex-end' container>
+            <Authorized authority='appointment.viewotherappointment'>
+              <ProgressButton
+                icon={<GetApp />}
+                disabled={!selectedTemplateId}
+                onClick={loadTemplate}
+              >
+                Load
+              </ProgressButton>
+            </Authorized>
           </GridItem>
         </GridContainer>
 
