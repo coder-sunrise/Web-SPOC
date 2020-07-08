@@ -1,8 +1,8 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
-import * as service from '../services'
 import { notification } from '@/components'
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
+import * as service from '../services'
 
 let companyTypes = [
   { id: 1, name: 'copayer' },
@@ -38,6 +38,8 @@ export default createListViewModel({
         ],
         adminCharge: 0,
         adminChargeType: 'Percentage',
+        invoiceAdjustmentType: 'Percentage',
+        invoiceAdjustment: 0,
         coPayerTypeFK: 1,
         isGSTEnabled: false,
         contact: {

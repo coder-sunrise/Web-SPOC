@@ -236,6 +236,49 @@ class Detail extends PureComponent {
                 />
               </GridItem>
 
+              <GridItem md={4}>
+                <Field
+                  name='invoiceAdjustment'
+                  render={(args) => {
+                    if (values.adminChargeType === 'ExactAmount') {
+                      return (
+                        <NumberInput
+                          currency
+                          label='Invoice Adjustment'
+                          defaultValue='0.00'
+                          precision={2}
+                          {...args}
+                        />
+                      )
+                    }
+                    return (
+                      <NumberInput
+                        percentage
+                        label='Invoice Adjustment'
+                        defaultValue='0.00'
+                        precision={2}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+              <GridItem md={2}>
+                <Field
+                  name='invoiceAdjustmentType'
+                  render={(args) => (
+                    <Switch
+                      checkedChildren='$'
+                      checkedValue='ExactAmount'
+                      unCheckedChildren='%'
+                      unCheckedValue='Percentage'
+                      label=' '
+                      {...args}
+                    />
+                  )}
+                />
+              </GridItem>
+
               <GridItem md={2}>
                 {name !== type ? (
                   <div style={{ position: 'relative' }}>
