@@ -25,6 +25,7 @@ export default createListViewModel({
             },
           })
         }
+        return response.data
       },
 
       *queryOne ({ payload }, { call, put, select, take }) {
