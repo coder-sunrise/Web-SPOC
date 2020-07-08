@@ -128,10 +128,6 @@ const Templates = ({
   const loadTemplate = async () => {
     await dispatch({
       type: 'appointment/setCurrentFilterTemplate',
-      payload: {},
-    })
-    await dispatch({
-      type: 'appointment/setCurrentFilterTemplate',
       payload: {
         id: selectedTemplateId,
       },
