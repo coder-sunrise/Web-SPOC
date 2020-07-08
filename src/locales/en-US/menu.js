@@ -167,6 +167,7 @@ export default {
   'menu.report.salessummary': 'Sales Summary Report',
   'menu.report.diagnosistrending': 'Diagnosis Trending Report',
   'menu.report.sessionsummary': 'Session Summary Report',
+  'menu.report.statementsummaryreport': 'Statement Summary Report',
   'menu.report.viewreport': 'View Report',
 
   'menu.support': 'Support',
