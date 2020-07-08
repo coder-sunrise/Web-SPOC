@@ -37,7 +37,6 @@ const authorityCfg = {
   '5': 'queue.consultation.order.openprescription',
 }
 
-@connect(({ global, codetable }) => ({ global, codetable }))
 @connect(({ global, codetable, visitRegistration }) => ({
   global,
   codetable,
@@ -113,7 +112,7 @@ const authorityCfg = {
   }),
 
   handleSubmit: (values, { props, onConfirm }) => {
-    const { dispatch, currentType, getNextSequence } = props
+    const { dispatch, currentType, getNextSequence, user } = props
 
     const getInstruction = (instructions) => {
       let instruction = ''
@@ -181,6 +180,8 @@ const authorityCfg = {
       }
     }
     const data = {
+      isOrderedByDoctor:
+        user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
       sequence: getNextSequence(),
       ...values,
       corPrescriptionItemPrecaution,

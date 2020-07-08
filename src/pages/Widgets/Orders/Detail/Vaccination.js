@@ -52,7 +52,7 @@ let i = 0
   }),
 
   handleSubmit: (values, { props, onConfirm, resetForm }) => {
-    const { dispatch, orders, currentType, getNextSequence } = props
+    const { dispatch, orders, currentType, getNextSequence, user } = props
     const { rows } = orders
     var batchNo = values.batchNo
     if (batchNo instanceof Array) {
@@ -61,6 +61,8 @@ let i = 0
       }
     }
     const data = {
+      isOrderedByDoctor:
+        user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
       sequence: getNextSequence(),
       ...values,
       subject: currentType.getSubject(values),

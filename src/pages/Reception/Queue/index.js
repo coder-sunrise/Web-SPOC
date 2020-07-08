@@ -3,6 +3,7 @@ import React from 'react'
 import { connect } from 'dva'
 // umi locale
 import { FormattedMessage, formatMessage } from 'umi/locale'
+import router from 'umi/router'
 // formik
 import { withFormik } from 'formik'
 // class names
@@ -30,15 +31,20 @@ import { getAppendUrl, getRemovedUrl } from '@/utils/utils'
 import { SendNotification } from '@/utils/notification'
 import Authorized from '@/utils/Authorized'
 import { QueueDashboardButton } from '@/components/_medisys'
-import { VALUE_KEYS, FORM_CATEGORY } from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
+import { FORM_CATEGORY, VALUE_KEYS, VISIT_TYPE } from '@/utils/constants'
 import { initRoomAssignment } from '@/utils/codes'
-import { modelKey } from './variables'
+import {
+  modelKey,
+  AppointmentContextMenu,
+  ContextMenuOptions,
+} from './variables'
 import PatientSearchModal from './PatientSearch'
 import DetailsGrid from './Grid'
 import DetailsActionBar from './FilterBar'
 import EmptySession from './EmptySession'
 import VisitForms from './VisitForms'
+import RightClickContextMenu from './Grid/RightClickContextMenu'
 
 const drawerWidth = 400
 
@@ -80,7 +86,15 @@ const styles = (theme) => ({
 })
 
 @connect(
-  ({ queueLog, patientSearch, loading, user, patient, queueCalling }) => ({
+  ({
+    queueLog,
+    patientSearch,
+    loading,
+    user,
+    patient,
+    queueCalling,
+    codetable,
+  }) => ({
     patientSearchResult: patientSearch.list,
     queueLog,
     loading,
@@ -88,6 +102,7 @@ const styles = (theme) => ({
     patient: patient.entity,
     DefaultPatientProfile: patient.default,
     queueCalling,
+    codetable,
   }),
 )
 class Queue extends React.Component {
@@ -397,6 +412,304 @@ class Queue extends React.Component {
     this.showSearchResult(hasSearchQuery)
   }
 
+  onContextMenu = (row, event) => {
+    event.preventDefault()
+    this.setState({
+      rightClickedRow: row,
+      anchorEl: {
+        x: event.pageX,
+        y: event.pageY,
+      },
+    })
+  }
+
+  onHideContextMenu = (e) => {
+    if (
+      e &&
+      e.target &&
+      (e.target.nodeName === 'svg' || e.target.nodeName === 'BUTTON')
+    )
+      return
+    this.setState({
+      rightClickedRow: undefined,
+      anchorEl: undefined,
+    })
+  }
+
+  deleteQueueConfirmation = (row) => {
+    const { queueNo, id } = row
+    const { dispatch } = this.props
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmTitle: '',
+        openConfirmText: 'Confirm',
+        openConfirmContent: `Are you sure want to delete this visit (Q No.: ${queueNo})?`,
+        onConfirmSave: () => {
+          dispatch({
+            type: 'queueLog/deleteQueueByQueueID',
+            payload: {
+              id,
+              queueNo,
+            },
+          })
+        },
+      },
+    })
+  }
+
+  isAssignedDoctor = (row) => {
+    if (!row.doctor) return false
+    const { doctor: { id }, visitStatus } = row
+    const { clinicianProfile: { doctorProfile } } = this.props.user
+
+    if (!doctorProfile) {
+      notification.error({
+        message: 'Current user is not authorized to access',
+      })
+      return false
+    }
+
+    if (visitStatus === 'IN CONS') {
+      if (id !== doctorProfile.id) {
+        notification.error({
+          message: `You cannot resume other doctor's consultation.`,
+        })
+        return false
+      }
+    }
+    return true
+  }
+
+  canAccess = (id) => {
+    const apptsActionID = [
+      '8',
+      '9',
+    ]
+    const findMatch = (item) => item.id === parseFloat(id, 10)
+
+    let menuOpt = ContextMenuOptions.find(findMatch)
+
+    if (apptsActionID.includes(id)) {
+      menuOpt = AppointmentContextMenu.find(findMatch)
+    }
+
+    const accessRight = Authorized.check(menuOpt.authority)
+
+    // skip for patient dashboard button
+    // user can access patient dashboard regardless of access right
+    // patient dashboard page will have the access right checking explicitly
+    if (id === '4') return true
+
+    return (
+      accessRight &&
+      (accessRight.rights === 'enable' || accessRight.rights === 'readwrite')
+    )
+  }
+
+  onMenuItemClick = (row, id) => {
+    const { dispatch } = this.props
+    const hasAccess = this.canAccess(id)
+
+    if (!hasAccess) {
+      notification.error({
+        message: 'Current user is not authorized to access',
+      })
+      return
+    }
+    dispatch({
+      type: 'queueLog/updateState',
+      payload: {
+        statusTagClicked: true,
+      },
+    })
+    switch (id) {
+      case '0': // edit visit
+      case '0.1': // view visit
+        this.showVisitRegistration({
+          visitID: row.id,
+        })
+        break
+      case '1': {
+        // dispense
+        const isInitialLoading =
+          row.visitPurposeFK === VISIT_TYPE.RETAIL &&
+          row.visitStatus === 'WAITING'
+        const version = Date.now()
+        dispatch({
+          type: `dispense/start`,
+          payload: {
+            id: row.visitFK,
+            version,
+            qid: row.id,
+            queueNo: row.queueNo,
+          },
+        }).then((o) => {
+          if (o)
+            router.push(
+              `/reception/queue/dispense?isInitialLoading=${isInitialLoading}&qid=${row.id}&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
+            )
+        })
+
+        break
+      }
+      case '1.1': {
+        // billing
+        const version = Date.now()
+        const parameters = {
+          vid: row.visitFK,
+          pid: row.patientProfileFK,
+          qid: row.id,
+          v: version,
+        }
+        router.push(getAppendUrl(parameters, '/reception/queue/billing'))
+        break
+      }
+      case '2': // delete visit
+        this.deleteQueueConfirmation(row)
+        break
+      case '3': // view patient profile
+        this.onViewPatientProfileClick(row.patientProfileFK, row.id)
+        break
+      case '4': // patient dashboard
+        router.push(
+          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}`,
+        )
+        break
+      case '5': {
+        // start consultation
+        const valid = this.isAssignedDoctor(row)
+        if (valid) {
+          const version = Date.now()
+
+          dispatch({
+            type: `consultation/start`,
+            payload: {
+              id: row.visitFK,
+              version,
+              qid: row.id,
+              queueNo: row.queueNo,
+            },
+          }).then((o) => {
+            if (o)
+              router.push(
+                `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
+              )
+          })
+        }
+        break
+      }
+      case '6': {
+        // resume consultation
+        const valid = this.isAssignedDoctor(row)
+        if (valid) {
+          const version = Date.now()
+
+          if (row.visitStatus === 'PAUSED') {
+            dispatch({
+              type: `consultation/resume`,
+              payload: {
+                id: row.visitFK,
+                version,
+              },
+            }).then((o) => {
+              if (o)
+                router.push(
+                  `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
+                )
+            })
+          } else {
+            router.push(
+              `/reception/queue/consultation?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}`,
+            )
+          }
+        }
+
+        break
+      }
+      case '7': {
+        // edit consultation
+        const valid = this.isAssignedDoctor(row)
+        if (valid) {
+          const version = Date.now()
+
+          dispatch({
+            type: `consultation/edit`,
+            payload: {
+              id: row.visitFK,
+              version,
+            },
+          }).then((o) => {
+            if (o)
+              if (o.updateByUserFK !== this.props.user.id) {
+                const { clinicianprofile = [] } = this.props.codetable
+                const editingUser = clinicianprofile.find(
+                  (m) => m.userProfileFK === o.updateByUserFK,
+                ) || {
+                  name: 'Someone',
+                }
+                dispatch({
+                  type: 'global/updateAppState',
+                  payload: {
+                    openConfirm: true,
+                    openConfirmContent: `${editingUser.name} is currently editing the patient note, do you want to overwrite?`,
+                    onConfirmSave: () => {
+                      dispatch({
+                        type: `consultation/overwrite`,
+                        payload: {
+                          id: row.visitFK,
+                          version,
+                        },
+                      }).then((c) => {
+                        router.push(
+                          `/reception/queue/consultation?qid=${row.id}&cid=${c.id}&v=${version}`,
+                        )
+                      })
+                    },
+                  },
+                })
+              } else {
+                router.push(
+                  `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
+                )
+              }
+          })
+        }
+        break
+      }
+      case '8': {
+        const { clinicianprofile = [] } = this.props.codetable
+        const doctorProfile = clinicianprofile.find(
+          (item) => item.id === row.clinicianProfileFk,
+        )
+        this.handleActualizeAppointment({
+          patientID: row.patientProfileFk,
+          appointmentID: row.id,
+          primaryClinicianFK: doctorProfile ? doctorProfile.id : undefined,
+          primaryClinicianRoomFK: row.roomFk,
+        })
+        break
+      }
+      case '9':
+        this.toggleRegisterNewPatient(false, row)
+        break
+      case '10':
+        this.showVisitForms(row)
+        break
+      default:
+        break
+    }
+    setTimeout(() => {
+      dispatch({
+        type: 'queueLog/updateState',
+        payload: {
+          statusTagClicked: false,
+        },
+      })
+    }, 3000)
+  }
+
   showSearchResult = (hasSearchQuery = false) => {
     const { patientSearchResult = [] } = this.props
     const totalRecords = patientSearchResult.length
@@ -593,14 +906,23 @@ class Queue extends React.Component {
                   setSearch={this.setSearch}
                 />
                 <DetailsGrid
-                  onViewPatientProfileClick={this.onViewPatientProfileClick}
-                  onViewDispenseClick={this.toggleDispense}
-                  onRegisterPatientClick={this.toggleRegisterNewPatient}
-                  handleEditVisitClick={this.showVisitRegistration}
-                  handleActualizeAppointment={this.handleActualizeAppointment}
-                  handleFormsClick={this.showVisitForms}
+                  // onViewPatientProfileClick={this.onViewPatientProfileClick}
+                  // onViewDispenseClick={this.toggleDispense}
+                  // onRegisterPatientClick={this.toggleRegisterNewPatient}
+                  // handleEditVisitClick={this.showVisitRegistration}
+                  // handleActualizeAppointment={this.handleActualizeAppointment}
+                  onMenuItemClick={this.onMenuItemClick}
+                  onContextMenu={this.onContextMenu}
+                  // handleFormsClick={this.showVisitForms}
                   history={history}
                   searchQuery={search}
+                />
+                <RightClickContextMenu
+                  onMenuItemClick={this.onMenuItemClick}
+                  onOutsidePopoverRightClick={this.onHideContextMenu}
+                  anchorEl={this.state.anchorEl}
+                  rightClickedRow={this.state.rightClickedRow}
+                  dispatch={dispatch}
                 />
               </div>
             )}

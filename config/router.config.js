@@ -479,6 +479,15 @@ const _routes = [
               'finance/statement',
             ],
           },
+          {
+            path: '/finance/statement/statementpayment/:id',
+            name: 'statement/statementpayment',
+            hideInMenu: true,
+            component: './Finance/Statement/StatementPayment',
+            authority: [
+              'finance/statement',
+            ],
+          },
           // {
           //   path: '/finance/expense',
           //   name: 'doctor-expense',
@@ -600,6 +609,14 @@ const _routes = [
             component: './Report/SalesListingReport',
             authority: [
               'report.finance.saleslisting',
+            ],
+          },
+          {
+            path: '/report/invoicelistingreport',
+            name: 'invoiceListingReport',
+            component: './Report/InvoiceListingReport',
+            authority: [
+              'report.finance.invoicelisting',
             ],
           },
           {
@@ -1257,16 +1274,16 @@ const routes =
   process.env.NODE_ENV === 'production'
     ? _routes
     : _routes.map((r, index) => {
-        if (index === 1) {
-          return {
-            ...r,
-            routes: [
-              devRoutes,
-              ...r.routes,
-            ],
-          }
+      if (index === 1) {
+        return {
+          ...r,
+          routes: [
+            devRoutes,
+            ...r.routes,
+          ],
         }
-        return r
-      })
+      }
+      return r
+    })
 
 export default _routes

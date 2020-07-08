@@ -3,9 +3,10 @@ import { FastField } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core'
 import Search from '@material-ui/icons/Search'
+import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { connect } from 'dva'
 import Yup from '@/utils/yup'
-import { navigateDirtyCheck, roundTo } from '@/utils/utils'
+import { navigateDirtyCheck } from '@/utils/utils'
 import {
   Button,
   DatePicker,
@@ -164,7 +165,7 @@ class AddNewStatement extends PureComponent {
         type: 'number',
         currency: true,
         sortingEnabled: false,
-        width: 150,
+        width: 200,
       },
       {
         columnName: this.props.statement.entity
@@ -312,9 +313,11 @@ class AddNewStatement extends PureComponent {
 
   clearInvoiceList = (e, op) => {
     const { setFieldValue } = this.props
-    const { adminCharge, adminChargeType } = op
+    const { adminCharge, adminChargeType, copayerAdjustment, copayerAdjustmentType } = op
     setFieldValue('adminChargeValue', adminCharge || 0)
     setFieldValue('adminChargeValueType', adminChargeType || 'Percentage')
+    setFieldValue('adjustmentValue', copayerAdjustment || 0)
+    setFieldValue('adjustmentValueType', copayerAdjustmentType || 'Percentage')
     this.setState(() => {
       return {
         invoiceRows: [],
@@ -328,7 +331,6 @@ class AddNewStatement extends PureComponent {
     const { invoiceRows, columns, columnExtensions } = this.state
     const { entity } = statement
     const mode = entity && entity.id > 0 ? 'Edit' : 'Add'
-
     // console.log('values', values)
     // console.log('props', this.props)
     return (
@@ -347,7 +349,7 @@ class AddNewStatement extends PureComponent {
                         labelField='displayValue'
                         localFilter={(item) => item.coPayerTypeFK === 1}
                         disabled={statement.entity}
-                        onChange={(e, op = {}) => this.clearInvoiceList(e, op)}
+                        onChange={this.clearInvoiceList}
                         {...args}
                       />
                     )
@@ -538,9 +540,8 @@ class AddNewStatement extends PureComponent {
                   color='primary'
                   disabled={!values.copayerFK}
                   onClick={() => this.getInvoiceList()}
-                  icon={<p />}
+                  icon={<Search />}
                 >
-                  <Search />
                   <FormattedMessage id='form.search' />
                 </ProgressButton>
               </GridItem>
@@ -567,6 +568,46 @@ class AddNewStatement extends PureComponent {
                     return !statementInvoicePayment.find(
                       (o) => o.invoicePayment.isCancelled === false,
                     )
+                  },
+                },
+                summary: true,
+                summaryConfig: {
+                  state: {
+                    totalItems: [
+                      {
+                        columnName: columnExtensions[3].columnName,
+                        type: 'payableAmount',
+                      },
+                    ],
+                  },
+                  integrated: {
+                    calculator: (type, rows, getValue) => {
+                      if (type === 'payableAmount') {
+                        if (rows && rows.length > 0) {
+                          return rows.reduce((pre, cur) => {
+                            console.log({ cur })
+                            if (
+                              values.selectedRows &&
+                              values.selectedRows.includes(cur.id)
+                            ) {
+                              return pre + getValue(cur) || 0
+                            }
+                            return pre
+                          }, 0)
+                        }
+                        return 0
+                      }
+                      return IntegratedSummary.defaultCalculator(
+                        type,
+                        rows,
+                        getValue,
+                      )
+                    },
+                  },
+                  row: {
+                    messages: {
+                      payableAmount: 'Total',
+                    },
                   },
                 },
               }}

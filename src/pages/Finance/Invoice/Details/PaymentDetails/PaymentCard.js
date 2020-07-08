@@ -98,8 +98,8 @@ const PaymentCard = ({
               />
             ))
         ) : (
-          ''
-        )}
+            ''
+          )}
       </CardContainer>
       <GridContainer alignItems='center'>
         <GridItem md={7}>

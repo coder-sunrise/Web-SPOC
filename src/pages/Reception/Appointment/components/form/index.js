@@ -41,6 +41,7 @@ import {
 import { getAppendUrl } from '@/utils/utils'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
 import styles from './style'
+import { getBizSession } from '@/services/queue'
 
 const gridValidationSchema = Yup.object().shape({
   startTime: Yup.string().required(),
@@ -100,10 +101,12 @@ class Form extends React.PureComponent {
     tempNewAppointmentStatusFK: -1,
     isDataGridValid: this.props.values.id !== undefined,
     editingRows: [],
+    hasActiveSession: false,
   }
 
   componentDidMount() {
     const { values, dispatch } = this.props
+    this.checkHasActiveSession()
     Promise.all([
       dispatch({
         type: 'codetable/fetchCodes',
@@ -120,6 +123,24 @@ class Form extends React.PureComponent {
     }
 
     this.validateDataGrid()
+  }
+
+  checkHasActiveSession = async () => {
+    try {
+      const bizSessionPayload = {
+        IsClinicSessionClosed: false,
+      }
+      const result = await getBizSession(bizSessionPayload)
+      const { data } = result.data
+
+      this.setState(() => {
+        return {
+          hasActiveSession: data.length > 0,
+        }
+      })
+    } catch (error) {
+      console.log({ error })
+    }
   }
 
   refreshPatient = (id) => {
@@ -644,7 +665,9 @@ class Form extends React.PureComponent {
           concurrencyToken,
           apptDurationHour,
           apptDurationMinute,
-          preClinicianFK } = resource
+          preClinicianFK,
+          roomFk,
+          appointmentTypeFK } = resource
         return {
           appointmentFK,
           clinicianFK,
@@ -660,42 +683,52 @@ class Form extends React.PureComponent {
           apptDurationHour,
           apptDurationMinute,
           preClinicianFK,
+          roomFk,
+          appointmentTypeFK,
         }
       })
-      let originalResource = Array.from(originalAppointment.appointments_Resources, (resource) => {
-        const { appointmentFK,
-          clinicianFK,
-          clinicianName,
-          clinicianTitle,
-          startTime,
-          endTime,
-          sortOrder,
-          isPrimaryClinician,
-          id,
-          isDeleted,
-          concurrencyToken,
-          apptDurationHour,
-          apptDurationMinute,
-          preClinicianFK } = resource
-        return {
-          appointmentFK,
-          clinicianFK,
-          clinicianName,
-          clinicianTitle,
-          startTime,
-          endTime,
-          sortOrder,
-          isPrimaryClinician,
-          id,
-          isDeleted,
-          concurrencyToken,
-          apptDurationHour,
-          apptDurationMinute,
-          preClinicianFK,
-        }
-      }) 
-      let resourceChanged = JSON.stringify(originalResource) !== JSON.stringify(newResource)
-      let dateChanged = originalAppointment.appointmentDate.indexOf(values.currentAppointment.appointmentDate) === -1
+      let originalResource = {}
+      if (originalAppointment) {
+        originalResource = Array.from(originalAppointment.appointments_Resources, (resource) => {
+          console.log(resource)
+          const { appointmentFK,
+            clinicianFK,
+            clinicianName,
+            clinicianTitle,
+            startTime,
+            endTime,
+            sortOrder,
+            isPrimaryClinician,
+            id,
+            isDeleted,
+            concurrencyToken,
+            apptDurationHour,
+            apptDurationMinute,
+            preClinicianFK,
+            roomFk,
+            appointmentTypeFK } = resource
+          return {
+            appointmentFK,
+            clinicianFK,
+            clinicianName,
+            clinicianTitle,
+            startTime,
+            endTime,
+            sortOrder,
+            isPrimaryClinician,
+            id,
+            isDeleted,
+            concurrencyToken,
+            apptDurationHour,
+            apptDurationMinute,
+            preClinicianFK,
+            roomFk,
+            appointmentTypeFK,
+          }
+        })
+      }
+      let resourceChanged = originalAppointment && JSON.stringify(originalResource) !== JSON.stringify(newResource)
+      let dateChanged = originalAppointment && originalAppointment.appointmentDate.indexOf(values.currentAppointment.appointmentDate) === -1
       if (
         values.currentAppointment &&
         (values.currentAppointment.appointmentStatusFk ===
@@ -959,6 +992,7 @@ class Form extends React.PureComponent {
                     patientProfileFK={values.patientProfileFK}
                     appointmentStatusFK={currentAppointment.appointmentStatusFk}
                     values={values}
+                    hasActiveSession={this.state.hasActiveSession}
                   />
                   <AppointmentDateInput disabled={_disableAppointmentDate} />
                   <GridItem xs md={12} className={classes.verticalSpacing}>
