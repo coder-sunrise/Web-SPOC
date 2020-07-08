@@ -190,7 +190,7 @@ class Detail extends PureComponent {
                       )}
                     />
                   </GridItem>
-                  <GridItem md={6}>
+                  {/* <GridItem md={6}>
                     <FastField
                       name='generateInvoice'
                       render={(args) => (
@@ -204,7 +204,7 @@ class Detail extends PureComponent {
                         />
                       )}
                     />
-                  </GridItem>
+                  </GridItem> */}
                 </React.Fragment>
               )}
 
