@@ -345,7 +345,7 @@ class GeneralSetting extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='autoPrintDrugLabel.settingValue'
+                name='autoPrintDrugLabelOnFinalize.settingValue'
                 render={(args) => {
                   return (
                     <Checkbox
