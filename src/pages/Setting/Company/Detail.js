@@ -238,7 +238,7 @@ class Detail extends PureComponent {
 
               <GridItem md={4}>
                 <Field
-                  name='invoiceAdjustment'
+                  name='autoInvoiceAdjustment'
                   render={(args) => {
                     if (values.adminChargeType === 'ExactAmount') {
                       return (
@@ -265,7 +265,7 @@ class Detail extends PureComponent {
               </GridItem>
               <GridItem md={2}>
                 <Field
-                  name='invoiceAdjustmentType'
+                  name='autoInvoiceAdjustmentType'
                   render={(args) => (
                     <Switch
                       checkedChildren='$'

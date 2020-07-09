@@ -38,8 +38,8 @@ export default createListViewModel({
         ],
         adminCharge: 0,
         adminChargeType: 'Percentage',
-        invoiceAdjustmentType: 'Percentage',
-        invoiceAdjustment: 0,
+        autoInvoiceAdjustmentType: 'Percentage',
+        autoInvoiceAdjustment: 0,
         coPayerTypeFK: 1,
         isGSTEnabled: false,
         contact: {
