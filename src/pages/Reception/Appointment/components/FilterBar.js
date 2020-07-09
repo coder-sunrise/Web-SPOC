@@ -6,13 +6,7 @@ import { withFormik, Field, FastField } from 'formik'
 // umi/locale
 import { formatMessage } from 'umi/locale'
 // material ui
-import {
-  withStyles,
-  Fab,
-  Popper,
-  Paper,
-  ClickAwayListener,
-} from '@material-ui/core'
+import { withStyles, Fab, Paper } from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add'
 import Search from '@material-ui/icons/Search'
 import BookmarkIcon from '@material-ui/icons/Bookmark'
@@ -27,6 +21,7 @@ import {
   CodeSelect,
   ProgressButton,
   Tooltip,
+  Popover,
 } from '@/components'
 // sub components
 import { AppointmentTypeLabel, DoctorLabel } from '@/components/_medisys'
@@ -47,6 +42,10 @@ const styles = () => ({
     maxWidth: 450,
     minWidth: 450,
     padding: 15,
+    marginLeft: -16,
+    marginRight: -16,
+    marginTop: -12,
+    marginBottom: -12,
   },
 })
 let count = 0
@@ -71,15 +70,11 @@ const FilterBar = (props) => {
     showFilterTemplate,
     setShowFilterTemplate,
   ] = useState(false)
-  const [
-    anchorEl,
-    setAnchorEl,
-  ] = useState(null)
 
-  const handleFilterTemplate = (event) => {
-    setAnchorEl(anchorEl ? null : event.currentTarget)
-    setShowFilterTemplate(() => !showFilterTemplate)
+  const handleFilterTemplate = () => {
+    setShowFilterTemplate(!showFilterTemplate)
   }
+
   return (
     <React.Fragment>
       <GridContainer alignItems='center'>
@@ -162,16 +157,33 @@ const FilterBar = (props) => {
         </GridItem>
 
         <GridItem md={1}>
-          <Tooltip title='Manage Filter Template'>
-            <Fab
-              size='small'
-              color='secondary'
-              className={classes.fabButtonStyle}
-              onClick={handleFilterTemplate}
-            >
-              <BookmarkIcon />
-            </Fab>
-          </Tooltip>
+          <Popover
+            icon={null}
+            trigger='click'
+            placement='bottom'
+            visible={showFilterTemplate}
+            onVisibleChange={handleFilterTemplate}
+            content={
+              <Paper className={classes.container}>
+                <FilterTemplateTooltip
+                  filterByDoctor={values.filterByDoctor}
+                  filterByApptType={values.filterByApptType}
+                  handleFilterTemplate={handleFilterTemplate}
+                />
+              </Paper>
+            }
+          >
+            <Tooltip title='Manage Filter Template'>
+              <Fab
+                size='small'
+                color='secondary'
+                className={classes.fabButtonStyle}
+                onClick={handleFilterTemplate}
+              >
+                <BookmarkIcon />
+              </Fab>
+            </Tooltip>
+          </Popover>
         </GridItem>
 
         <GridItem md={4}>
@@ -217,17 +229,6 @@ const FilterBar = (props) => {
           </Authorized>
         </GridItem>
       </GridContainer>
-      <Popper open={showFilterTemplate} anchorEl={anchorEl}>
-        <Paper className={classes.container}>
-          {/* <ClickAwayListener onClickAway={handleFilterTemplate}> */}
-          <FilterTemplateTooltip
-            filterByDoctor={values.filterByDoctor}
-            filterByApptType={values.filterByApptType}
-            handleFilterTemplate={handleFilterTemplate}
-          />
-          {/* </ClickAwayListener> */}
-        </Paper>
-      </Popper>
     </React.Fragment>
   )
 }
