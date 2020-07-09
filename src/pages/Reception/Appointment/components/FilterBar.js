@@ -48,7 +48,7 @@ const styles = () => ({
     marginBottom: -12,
   },
 })
-
+let count = 0
 const FilterBar = (props) => {
   const {
     dispatch,
@@ -244,6 +244,7 @@ export default compose(
   withFormik({
     enableReinitialize: true,
     mapPropsToValues: ({ filterByDoctor, appointment }) => {
+      count += 1
       if (appointment.currentFilterTemplate) {
         const {
           filterByDoctor: doctorFilterTemplate,
@@ -256,6 +257,7 @@ export default compose(
           filterByApptType: [
             ...apptTypeFiltertemplate,
           ],
+          count,
         }
       }
 
@@ -266,6 +268,7 @@ export default compose(
         filterByApptType: [
           -99,
         ],
+        count,
       }
     },
   }),
