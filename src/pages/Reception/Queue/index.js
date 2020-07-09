@@ -376,7 +376,6 @@ class Queue extends React.Component {
       })
       .then((res) => {
         if (res) {
-          notification.success({ message: 'Cleared' })
           sendNotification('QueueCalled', {
             type: NOTIFICATION_TYPE.QUEUECALL,
             status: NOTIFICATION_STATUS.OK,
