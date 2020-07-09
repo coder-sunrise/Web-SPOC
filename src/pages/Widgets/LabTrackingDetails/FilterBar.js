@@ -198,12 +198,11 @@ class FilterBar extends PureComponent {
           </GridItem>
           <GridItem xs sm={8} md={4}>
             <ProgressButton
-              icon={null}
+              icon={<Search />}
               color='primary'
               size='sm'
               onClick={handleSubmit}
             >
-              <Search />
               Search
             </ProgressButton>
           </GridItem>

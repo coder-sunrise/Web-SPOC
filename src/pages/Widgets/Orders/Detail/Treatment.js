@@ -19,7 +19,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
 
 const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
 // @Authorized.Secured('queue.dispense.editorder')
-@connect(({ codetable, global }) => ({ codetable, global }))
+@connect(({ codetable, global, user }) => ({ codetable, global, user }))
 @withFormikExtend({
   // authority: [
   //   'queue.dispense.editorder',
@@ -185,9 +185,11 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
   }),
 
   handleSubmit: async (values, { props, onConfirm }) => {
-    const { dispatch, orders, currentType, getNextSequence } = props
+    const { dispatch, orders, currentType, getNextSequence, user } = props
 
     const data = {
+      isOrderedByDoctor:
+        user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
       sequence: getNextSequence(),
       ...values,
       subject: currentType.getSubject(values),

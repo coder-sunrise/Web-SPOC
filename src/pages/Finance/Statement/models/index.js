@@ -21,10 +21,21 @@ export default createListViewModel({
         adjustmentValueType: 'Percentage',
       },
       invoiceList: [],
+      statementPaymentList: [],
+      activeTab: '0',
+      invoicePaymentList: [],
     },
     subscriptions: ({ dispatch, history }) => {
-      history.listen(async (loct, method) => {
+      history.listen((loct, method) => {
         const { pathname, search, query = {} } = loct
+        if (pathname.startsWith('/finance/statement/details')) {
+          dispatch({
+            type: 'statement/setActiveTab',
+            payload: {
+              activeTab: query.t,
+            },
+          })
+        }
       })
     },
     effects: {
@@ -35,6 +46,16 @@ export default createListViewModel({
         //   type: 'queryInvoiceDone',
         //   payload: response,
         // })
+      },
+      *refreshAll ({ payload }, { call, put }) {
+        yield put({
+          type: 'refreshStatement',
+          payload,
+        })
+        yield put({
+          type: 'queryPaymentHistory',
+          payload,
+        })
       },
 
       *refreshStatement ({ payload }, { call, put }) {
@@ -76,8 +97,21 @@ export default createListViewModel({
           notification.success({ message: 'Deleted' })
         }
       },
+      *queryPaymentHistory ({ payload }, { call, put }) {
+        const response = yield call(service.queryPaymentHistory, payload)
+        yield put({
+          type: 'queryPaymentHistoryDone',
+          payload: {
+            statementPaymentList: response.data.statementPaymentList || [],
+            invoicePaymentList: response.data.invoicePaymentList || [],
+          },
+        })
+      },
     },
     reducers: {
+      setActiveTab (st, { payload }) {
+        return { ...st, activeTab: payload.activeTab }
+      },
       queryDone (st, { payload }) {
         const { data } = payload
         return {
@@ -109,6 +143,12 @@ export default createListViewModel({
               ...o,
             }
           }),
+        }
+      },
+      queryPaymentHistoryDone (st, { payload }) {
+        return {
+          ...st,
+          ...payload,
         }
       },
       refreshDone (st, { payload }) {
