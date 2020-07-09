@@ -37,10 +37,11 @@ const authorityCfg = {
   '5': 'queue.consultation.order.openprescription',
 }
 
-@connect(({ global, codetable, visitRegistration }) => ({
+@connect(({ global, codetable, visitRegistration, user }) => ({
   global,
   codetable,
   visitRegistration,
+  user,
 }))
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type }) => {

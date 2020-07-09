@@ -22,10 +22,11 @@ import LowStockInfo from './LowStockInfo'
 import AddFromPast from './AddMedicationFromPast'
 
 let i = 0
-@connect(({ global, codetable, visitRegistration }) => ({
+@connect(({ global, codetable, visitRegistration, user }) => ({
   global,
   codetable,
   visitRegistration,
+  user,
 }))
 @withFormikExtend({
   authority: [
