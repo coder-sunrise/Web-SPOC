@@ -29,7 +29,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
     total: Yup.number().required(),
   }),
 
-  handleSubmit: (values, { props, onConfirm }) => {
+  handleSubmit: (values, { props, onConfirm, setValues }) => {
     const { dispatch, orders, currentType, getNextSequence, user } = props
     const { rows } = orders
     const data = {
@@ -46,6 +46,10 @@ import { calculateAdjustAmount } from '@/utils/utils'
       payload: data,
     })
     if (onConfirm) onConfirm()
+    setValues({
+      ...orders.defaultService,
+      type: orders.type,
+    })
   },
   displayName: 'OrderPage',
 })

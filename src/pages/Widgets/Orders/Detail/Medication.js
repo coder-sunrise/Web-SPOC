@@ -112,8 +112,8 @@ const authorityCfg = {
     ),
   }),
 
-  handleSubmit: (values, { props, onConfirm }) => {
-    const { dispatch, currentType, getNextSequence, user } = props
+  handleSubmit: (values, { props, onConfirm, setValues }) => {
+    const { dispatch, currentType, getNextSequence, user, orders } = props
 
     const getInstruction = (instructions) => {
       let instruction = ''
@@ -198,6 +198,13 @@ const authorityCfg = {
     })
 
     if (onConfirm) onConfirm()
+
+    setValues({
+      ...orders.defaultMedication,
+      type: orders.type,
+      visitPurposeFK: orders.visitPurposeFK,
+      drugCode: orders.type === '5' ? 'MISC' : undefined,
+    })
   },
   displayName: 'OrderPage',
 })

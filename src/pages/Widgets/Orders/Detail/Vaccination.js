@@ -52,7 +52,7 @@ let i = 0
     quantity: Yup.number().required(),
   }),
 
-  handleSubmit: (values, { props, onConfirm, resetForm }) => {
+  handleSubmit: (values, { props, onConfirm, resetForm, setValues }) => {
     const { dispatch, orders, currentType, getNextSequence, user } = props
     const { rows } = orders
     var batchNo = values.batchNo
@@ -78,6 +78,10 @@ let i = 0
     })
 
     if (onConfirm) onConfirm()
+    setValues({
+      ...orders.defaultService,
+      type: orders.type,
+    })
   },
   displayName: 'OrderPage',
 })

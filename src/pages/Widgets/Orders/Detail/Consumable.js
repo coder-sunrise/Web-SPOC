@@ -31,8 +31,8 @@ import LowStockInfo from './LowStockInfo'
     quantity: Yup.number().required(),
   }),
 
-  handleSubmit: (values, { props, onConfirm }) => {
-    const { dispatch, currentType, getNextSequence, user } = props
+  handleSubmit: (values, { props, onConfirm, setValues }) => {
+    const { dispatch, currentType, getNextSequence, user, orders } = props
     let { batchNo } = values
     if (batchNo instanceof Array) {
       if (batchNo && batchNo.length > 0) {
@@ -54,6 +54,10 @@ import LowStockInfo from './LowStockInfo'
       payload: data,
     })
     if (onConfirm) onConfirm()
+    setValues({
+      ...orders.defaultConsumable,
+      type: orders.type,
+    })
   },
   displayName: 'OrderPage',
 })

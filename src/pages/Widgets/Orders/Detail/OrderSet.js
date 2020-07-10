@@ -35,7 +35,7 @@ const { qtyFormat } = config
   validationSchema: Yup.object().shape({
     inventoryOrderSetFK: Yup.number().required(),
   }),
-  handleSubmit: (values, { props, onConfirm }) => {
+  handleSubmit: (values, { props, onConfirm, setValues }) => {
     const { dispatch, orders, codetable, getNextSequence, user } = props
     const { rows } = orders
     const {
@@ -338,6 +338,10 @@ const { qtyFormat } = config
       payload: datas,
     })
     if (onConfirm) onConfirm()
+    setValues({
+      ...orders.defaultOrderSet,
+      type: orders.type,
+    })
   },
   displayName: 'OrderPage',
 })
