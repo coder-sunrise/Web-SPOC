@@ -6,6 +6,7 @@ import moment from 'moment'
 import { createListViewModel } from 'medisys-model'
 // common components
 import { notification } from '@/components'
+import { APPOINTMENT_STATUS } from '@/utils/constants'
 import * as service from '@/services/calendar'
 import { queryList as queryPublicHolidays } from '@/pages/Setting/PublicHoliday/services'
 import { queryList as queryClinicBreakHour } from '@/pages/Setting/ClinicBreakHour/services'
@@ -364,7 +365,7 @@ export default createListViewModel({
       },
       *getCalendarList ({ payload }, { call, put }) {
         const result = yield call(service.queryList, {
-          apiCriteria:{
+          apiCriteria: {
             ...payload,
             isCancelled: false,
           },
@@ -495,9 +496,20 @@ export default createListViewModel({
           .formatUTC()
 
         const getCalendarListPayload = {
-            apptDateFrom:start,
-            apptDateTo:end,
-            }
+          apptDateFrom: start,
+          apptDateTo: end,
+          appStatus: [
+            APPOINTMENT_STATUS.CONFIRMED,
+            APPOINTMENT_STATUS.DRAFT,
+            // APPOINTMENT_STATUS.CANCELLED,
+            APPOINTMENT_STATUS.TURNEDUP,
+            APPOINTMENT_STATUS.RESCHEDULED,
+            APPOINTMENT_STATUS.PFA_RESCHEDULED,
+            APPOINTMENT_STATUS.PFA_CANCELLED,
+            APPOINTMENT_STATUS.TURNEDUPLATE,
+            APPOINTMENT_STATUS.PFA_NOSHOW,
+          ].join(),
+        }
 
         yield all([
           put({ type: 'getCalendarList', payload: getCalendarListPayload }),

@@ -24,6 +24,7 @@ import PatientProfile from '@/pages/PatientDatabase/Detail'
 import AppointmentHistory from '@/pages/Widgets/AppointmentHistory'
 import { getAppendUrl } from '@/utils/utils'
 import { APPOINTMENT_STATUS, APPOINTMENT_CANCELLEDBY } from '@/utils/constants'
+import { getBizSession } from '@/services/queue'
 import PatientSearchModal from '../../PatientSearch'
 import DeleteConfirmation from './DeleteConfirmation'
 import AppointmentDataGrid from './AppointmentDataGrid'
@@ -41,7 +42,6 @@ import {
   getEndTime,
 } from './formUtils'
 import styles from './style'
-import { getBizSession } from '@/services/queue'
 
 const gridValidationSchema = Yup.object().shape({
   startTime: Yup.string().required(),
@@ -961,6 +961,7 @@ class Form extends React.PureComponent {
       conflicts,
       selectedSlot,
       height,
+      onHistoryRowSelected,
     } = this.props
 
     const {
@@ -1089,7 +1090,9 @@ class Form extends React.PureComponent {
                   style={{ maxHeight: this.props.height - 200 }}
                 >
                   <h4 style={{ fontWeight: 500 }}>Appointment History</h4>
-                  <AppointmentHistory />
+                  <AppointmentHistory
+                    handleRowDoubleClick={onHistoryRowSelected}
+                  />
                 </CardContainer>
               </GridItem>
             </GridContainer>

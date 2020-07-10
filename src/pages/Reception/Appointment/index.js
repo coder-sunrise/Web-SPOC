@@ -6,6 +6,10 @@ import { Popover, withStyles } from '@material-ui/core'
 // common component
 import { CardContainer, CommonModal } from '@/components'
 // sub component
+import { APPOINTMENT_STATUS } from '@/utils/constants'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
+import { getRemovedUrl } from '@/utils/utils'
+import Authorized from '@/utils/Authorized'
 import FilterBar from './components/FilterBar'
 import FuncCalendarView from './components/FuncCalendarView'
 import ApptPopover from './components/ApptPopover'
@@ -20,10 +24,7 @@ import {
   DoctorFormValidation,
   InitialPopoverEvent,
 } from './utils'
-import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 // utils
-import { getRemovedUrl } from '@/utils/utils'
-import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   popover: {
@@ -307,7 +308,13 @@ class Appointment extends React.PureComponent {
       doctor,
       isEditedAsSingleAppointment,
       isEnableRecurrence,
+      appointmentStatusFk,
+      isHistory,
     } = selectedEvent
+    console.log(selectedEvent)
+    const isDoctorBlock = doctor && doctor.id > 0
+
+    if (isHistory || appointmentStatusFk === APPOINTMENT_STATUS.DELETED) return
 
     const viewApptAccessRight = Authorized.check(
       'appointment.appointmentdetails',
@@ -319,14 +326,14 @@ class Appointment extends React.PureComponent {
     if (
       (viewApptAccessRight &&
         viewApptAccessRight.rights !== 'enable' &&
-        !doctor) ||
-      (doctor &&
+        !isDoctorBlock) ||
+      (isDoctorBlock &&
         viewDoctorBlockAccessRight &&
         viewDoctorBlockAccessRight.rights !== 'enable')
     )
       return
 
-    if (doctor) {
+    if (isDoctorBlock) {
       this.props
         .dispatch({
           type: 'doctorBlock/queryOne',
@@ -346,6 +353,14 @@ class Appointment extends React.PureComponent {
       const selectedAppointmentID =
         appointmentFK === undefined ? id : appointmentFK
       let shouldShowApptForm = true
+
+      if (this.state.showAppointmentForm) {
+        this.setState({
+          selectedAppointmentFK: undefined,
+          showAppointmentForm: false,
+          isDragging: false,
+        })
+      }
 
       if (isEnableRecurrence) {
         if (!isEditedAsSingleAppointment) {
@@ -609,6 +624,7 @@ class Appointment extends React.PureComponent {
               resources={resources}
               selectedAppointmentID={selectedAppointmentFK}
               selectedSlot={selectedSlot}
+              onHistoryRowSelected={this.onSelectEvent}
               // calendarEvents={calendarEvents}
             />
           )}

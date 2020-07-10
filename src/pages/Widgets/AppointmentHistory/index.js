@@ -45,7 +45,8 @@ class AppointmentHistory extends PureComponent {
   }
 
   async getAppts (patientId) {
-    const { user } = this.props
+    console.log('getAppts', patientId)
+    const { user, dispatch } = this.props
     const commonParams = {
       combineCondition: 'and',
       sorting: [
@@ -65,6 +66,12 @@ class AppointmentHistory extends PureComponent {
       doctor = user.data.clinicianProfile.id
     }
 
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ltappointmentstatus',
+      },
+    })
     const [
       previous,
       future,
@@ -117,11 +124,14 @@ class AppointmentHistory extends PureComponent {
     })
   }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  async UNSAFE_componentWillReceiveProps (nextProps) {
     const { patient } = nextProps
 
     if (this.state.patientProfileFK !== patient.id && patient.id > 0) {
-      this.getAppts(patient.id)
+      this.setState({
+        patientProfileFK: patient.id,
+      })
+      await this.getAppts(patient.id)
     }
   }
 
@@ -166,7 +176,7 @@ class AppointmentHistory extends PureComponent {
   }
 
   render () {
-    const { classes, theme } = this.props
+    const { classes, theme, handleRowDoubleClick } = this.props
     const { previousAppt, futureAppt } = this.state
     return (
       <div>
@@ -176,6 +186,7 @@ class AppointmentHistory extends PureComponent {
           <CommonTableGrid
             size='sm'
             rows={futureAppt}
+            onRowDoubleClick={handleRowDoubleClick}
             {...futureApptTableParams}
           />
 
