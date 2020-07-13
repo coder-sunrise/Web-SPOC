@@ -5,6 +5,7 @@ import * as Yup from 'yup'
 import { formatMessage } from 'umi/locale'
 import { withStyles, Divider } from '@material-ui/core'
 import { getBizSession } from '@/services/queue'
+import Authorized from '@/utils/Authorized'
 import {
   GridContainer,
   GridItem,
@@ -334,7 +335,11 @@ class Modal extends PureComponent {
       // rightAlign: true,
       noUnderline: true,
     }
+    const accessRight = Authorized.check('finance/deposit/addtopastsession')
 
+    const allowAddToPastSession = accessRight && accessRight.rights === 'enable'
+
+    //
     return (
       <React.Fragment>
         <div>
@@ -349,6 +354,7 @@ class Modal extends PureComponent {
                     disabledDate={(d) => !d || d.isAfter(moment())}
                     label='Date'
                     autoFocus
+                    disabled={!allowAddToPastSession}
                     {...args}
                   />
                 )}
@@ -359,7 +365,12 @@ class Modal extends PureComponent {
               <Field
                 name='patientDepositTransaction.transactionBizSessionFK'
                 render={(args) => (
-                  <Select label='Session' options={bizSessionList} {...args} />
+                  <Select
+                    label='Session'
+                    options={bizSessionList}
+                    {...args}
+                    disabled={!allowAddToPastSession}
+                  />
                 )}
               />
             </GridItem>
@@ -415,14 +426,20 @@ class Modal extends PureComponent {
                 <GridItem xs={4} />
               </React.Fragment>
             )}
-            {/* <GridItem xs={12}>
+            <GridItem xs={12}>
               <Field
-                name='remarks'
+                name='patientDepositTransaction.modeRemarks'
                 render={(args) => (
-                  <TextField multiline rowsMax='5' label='Remarks' {...args} />
+                  <TextField
+                    multiline
+                    rowsMax='3'
+                    label='Mode Remarks'
+                    maxLength={200}
+                    {...args}
+                  />
                 )}
               />
-            </GridItem> */}
+            </GridItem>
             <GridItem xs={12}>
               <Field
                 name='patientDepositTransaction.remarks'
