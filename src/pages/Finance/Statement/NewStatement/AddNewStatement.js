@@ -313,7 +313,12 @@ class AddNewStatement extends PureComponent {
 
   clearInvoiceList = (e, op) => {
     const { setFieldValue } = this.props
-    const { adminCharge, adminChargeType, copayerAdjustment, copayerAdjustmentType } = op
+    const {
+      adminCharge,
+      adminChargeType,
+      copayerAdjustment,
+      copayerAdjustmentType,
+    } = op
     setFieldValue('adminChargeValue', adminCharge || 0)
     setFieldValue('adminChargeValueType', adminChargeType || 'Percentage')
     setFieldValue('adjustmentValue', copayerAdjustment || 0)
@@ -414,7 +419,10 @@ class AddNewStatement extends PureComponent {
                   }}
                 />
               </GridItem>
-              <GridItem md={1}>
+              <GridItem
+                md={1}
+                style={{ display: 'flex', alignItems: 'flex-end' }}
+              >
                 <Field
                   name='adjustmentValueType'
                   render={(args) => (
@@ -474,7 +482,10 @@ class AddNewStatement extends PureComponent {
                   }}
                 />
               </GridItem>
-              <GridItem md={3}>
+              <GridItem
+                md={3}
+                style={{ display: 'flex', alignItems: 'flex-end' }}
+              >
                 <Field
                   name='adminChargeValueType'
                   render={(args) => (
