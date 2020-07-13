@@ -86,6 +86,7 @@ class Grid extends PureComponent {
       FuncProps: {
         pager: true,
         filter: true,
+        columnSelectable: true,
       },
     }
   }

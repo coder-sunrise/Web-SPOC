@@ -266,6 +266,12 @@ export const defaultTheme = createMuiTheme({
   },
   overrides: {
     ...sharedOverrides,
+    MuiExpansionPanelDetails: {
+      root: {
+        display: 'inherit',
+      },
+    },
+
     MuiToggleButtonGroup: {
       ...sharedToggleButtonGroup,
       groupedSizeSmall: {

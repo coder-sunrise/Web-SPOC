@@ -45,8 +45,11 @@ import {
   Toolbar,
   TableFixedColumns,
   VirtualTable,
+  TableColumnVisibility,
+  ColumnChooser,
   TableTreeColumn,
 } from '@devexpress/dx-react-grid-material-ui'
+import * as userService from '@/services/user'
 import { control } from '@/components/Decorator'
 import { smallTheme, defaultTheme } from '@/utils/theme'
 import NumberTypeProvider from './EditCellComponents/NumberTypeProvider'
@@ -65,6 +68,7 @@ import TableCell from './plugins/TableCell'
 import { enableTableForceRender } from '@/utils/utils'
 import { LoadingWrapper } from '@/components/_medisys'
 
+// console.log(userService)
 window.$tempGridRow = {}
 
 const cellStyle = {
@@ -196,6 +200,7 @@ class CommonTableGrid extends PureComponent {
         ...pagerDefaultState,
       },
       rows: [],
+      hiddenCols: [],
     }
     const cls = classNames({
       [classes.tableStriped]: oddEven,
@@ -474,6 +479,17 @@ class CommonTableGrid extends PureComponent {
           root: {
             '& .Mui-disabled > svg': {
               display: 'none',
+            },
+          },
+        },
+        Toolbar: {
+          toolbar: {
+            minHeight: 'auto !important',
+            zIndex: 2,
+            '& > button': {
+              position: 'absolute',
+              right: 2,
+              top: 7,
             },
           },
         },
@@ -780,6 +796,7 @@ class CommonTableGrid extends PureComponent {
       sort,
       sortConfig,
       filter,
+      columnSelectable,
     } = {
       ...this.defaultFunctionConfig,
       ...FuncProps,
@@ -932,6 +949,8 @@ class CommonTableGrid extends PureComponent {
     // const _loading = type ? loading.effects[`${type}/query`] : false
     const rowData = this.getData()
     // console.log(rowData, this.state)
+    const showToolbar =
+      (grouping && groupingConfig.showToolbar) || columnSelectable
     return (
       <MuiThemeProvider theme={this.theme}>
         <Paper
@@ -1081,7 +1100,7 @@ class CommonTableGrid extends PureComponent {
                   {...groupingConfig.row}
                 />
               )}
-              {grouping && groupingConfig.showToolbar && <Toolbar />}
+              {showToolbar && <Toolbar />}
               {grouping &&
               groupingConfig.showToolbar && (
                 <GroupingPanel showSortingControls />
@@ -1099,6 +1118,28 @@ class CommonTableGrid extends PureComponent {
                   {...summaryConfig.row}
                 />
               )}
+              {columnSelectable && (
+                <TableColumnVisibility
+                  // defaultHiddenColumnNames={this.state.hiddenCols}
+                  // hiddenColumnNames={this.state.hiddenCols}
+                  onHiddenColumnNamesChange={(ary) => {
+                    console.log(ary)
+                    enableTableForceRender()
+                    this.setState({
+                      hiddenCols: ary,
+                    })
+                    userService.saveUserPreference({
+                      userPreferenceDetails: JSON.stringify({
+                        Identifier: 'patient_grid',
+                        Columns: ary,
+                      }),
+                      itemIdentifier: 'patient_grid',
+                      type: 4,
+                    })
+                  }}
+                />
+              )}
+              {columnSelectable && <ColumnChooser />}
               {tree && <TableTreeColumn {...treeColumnConfig} />}
               {extraColumn.map((o) => o)}
               <TableFixedColumns

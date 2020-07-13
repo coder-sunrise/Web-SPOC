@@ -41,3 +41,11 @@ export const resetPassword = (payload) =>
     data: stringify(payload),
     contentType: 'application/x-www-form-urlencoded',
   })
+
+export const saveUserPreference = async (payload) => {
+  const r = await request(`${userProfileURL}/SaveUserPreference`, {
+    method: 'POST',
+    body: payload,
+  })
+  return r
+}
