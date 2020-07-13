@@ -41,7 +41,11 @@ import Contact from './Contact'
         then: Yup.number().required(),
         otherwise: Yup.number().nullable(),
       }),
-
+      statementAdjustment: Yup.number().when('settingCompany', {
+        is: () => settingCompany.companyType.id === 1,
+        then: Yup.number().min(0),
+        otherwise: Yup.number().nullable(),
+      }),
       url: Yup.object().when('settingCompany', {
         is: () => settingCompany.companyType.id === 1,
         then: Yup.object().shape({
@@ -264,6 +268,7 @@ class Detail extends PureComponent {
                               label='Statement Adjustment'
                               defaultValue='0.00'
                               precision={2}
+                              min={0}
                               {...args}
                             />
                           )
@@ -274,6 +279,7 @@ class Detail extends PureComponent {
                             label='Statement Adjustment'
                             defaultValue='0.00'
                             precision={2}
+                            min={0}
                             {...args}
                           />
                         )
