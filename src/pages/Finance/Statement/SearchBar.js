@@ -252,8 +252,11 @@ class SearchBar extends PureComponent {
           </GridItem>
 
           <GridItem xs sm={6} md={6} lg={8}>
-            <ProgressButton color='primary' icon={<p />} onClick={handleSubmit}>
-              <Search />
+            <ProgressButton
+              color='primary'
+              icon={<Search />}
+              onClick={handleSubmit}
+            >
               <FormattedMessage id='form.search' />
             </ProgressButton>
             <Authorized authority='finance/statement'>
