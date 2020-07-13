@@ -255,13 +255,13 @@ class Detail extends PureComponent {
                 <React.Fragment>
                   <GridItem md={4}>
                     <Field
-                      name='copayerAdjustment'
+                      name='statementAdjustment'
                       render={(args) => {
-                        if (values.copayerAdjustmentType === 'ExactAmount') {
+                        if (values.statementAdjustmentType === 'ExactAmount') {
                           return (
                             <NumberInput
                               currency
-                              label='Co-payer Adjustment'
+                              label='Statement Adjustment'
                               defaultValue='0.00'
                               precision={2}
                               {...args}
@@ -271,7 +271,7 @@ class Detail extends PureComponent {
                         return (
                           <NumberInput
                             percentage
-                            label='Co-payer Adjustment'
+                            label='Statement Adjustment'
                             defaultValue='0.00'
                             precision={2}
                             {...args}
@@ -282,7 +282,7 @@ class Detail extends PureComponent {
                   </GridItem>
                   <GridItem md={2}>
                     <Field
-                      name='copayerAdjustmentType'
+                      name='statementAdjustmentType'
                       render={(args) => (
                         <Switch
                           checkedChildren='$'
