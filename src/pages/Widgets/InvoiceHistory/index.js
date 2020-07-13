@@ -45,7 +45,7 @@ const InvoiceHistory = ({
   invoiceHistory: { list },
   classes,
 }) => {
-  useEffect(() => {
+  const refreshInvoiceList = () => {
     const { patientAccountNo } = patient.entity
     dispatch({
       type: 'patientHistory/queryInvoiceHistory',
@@ -53,6 +53,10 @@ const InvoiceHistory = ({
         'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.PatientAccountNo': patientAccountNo,
       },
     })
+  }
+
+  useEffect(() => {
+    refreshInvoiceList()
   }, [])
 
   const [
@@ -71,7 +75,7 @@ const InvoiceHistory = ({
   }
 
   const getContent = () => {
-    return <PaymentDetails />
+    return <PaymentDetails refreshInvoiceList={refreshInvoiceList} />
   }
 
   const getTitle = (row) => {
