@@ -154,7 +154,7 @@ export const viewReport = (row, props) => {
 }))
 @withFormikExtend({
   authority: [
-    'queue.consultation.widgets.consultationdocument',
+    'queue.consultation.widgets.forms',
   ],
   mapPropsToValues: ({ consultation }) => {
     const _values = consultation.entity || consultation.default
