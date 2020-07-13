@@ -19,9 +19,7 @@ import {
   serverDateFormat,
 } from '@/components'
 
-import { 
-  CreditCardNumberInput,
-} from '@/components/_medisys'
+import { CreditCardNumberInput } from '@/components/_medisys'
 
 const style = () => ({
   totalPayment: {
@@ -341,7 +339,7 @@ class Modal extends PureComponent {
       <React.Fragment>
         <div>
           <GridContainer>
-            <GridItem xs={12}>
+            <GridItem xs={8}>
               <Field
                 name='patientDepositTransaction.transactionDate'
                 render={(args) => (
@@ -356,8 +354,8 @@ class Modal extends PureComponent {
                 )}
               />
             </GridItem>
-
-            <GridItem xs={12}>
+            <GridItem xs={4} />
+            <GridItem xs={8}>
               <Field
                 name='patientDepositTransaction.transactionBizSessionFK'
                 render={(args) => (
@@ -365,8 +363,8 @@ class Modal extends PureComponent {
                 )}
               />
             </GridItem>
-
-            <GridItem xs={12}>
+            <GridItem xs={4} />
+            <GridItem xs={8}>
               <Field
                 name='patientDepositTransaction.transactionModeFK'
                 render={(args) => (
@@ -388,29 +386,34 @@ class Modal extends PureComponent {
                 )}
               />
             </GridItem>
+            <GridItem xs={4} />
             {isCardPayment && (
-              <GridItem xs={12}>
-                <Field
-                  name='patientDepositTransaction.creditCardTypeFK'
-                  render={(args) => (
-                    <CodeSelect
-                      label='Card Type'
-                      code='ctCreditCardType'
-                      {...args}
-                    />
-                  )}
-                />
-              </GridItem>
+              <React.Fragment>
+                <GridItem xs={8}>
+                  <Field
+                    name='patientDepositTransaction.creditCardTypeFK'
+                    render={(args) => (
+                      <CodeSelect
+                        label='Card Type'
+                        code='ctCreditCardType'
+                        {...args}
+                      />
+                    )}
+                  />
+                </GridItem>
+                <GridItem xs={4} />
+              </React.Fragment>
             )}
             {isCardPayment && (
-              <GridItem xs={12}>
-                <Field
-                  name='patientDepositTransaction.cardNumber'
-                  render={(args) => (
-                    <CreditCardNumberInput {...args} /> 
-                  )}
-                />
-              </GridItem>
+              <React.Fragment>
+                <GridItem xs={8}>
+                  <Field
+                    name='patientDepositTransaction.cardNumber'
+                    render={(args) => <CreditCardNumberInput {...args} />}
+                  />
+                </GridItem>
+                <GridItem xs={4} />
+              </React.Fragment>
             )}
             {/* <GridItem xs={12}>
               <Field
