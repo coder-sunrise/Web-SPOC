@@ -124,8 +124,16 @@ class PaymentDetails extends Component {
   }
 
   refresh = () => {
-    const { dispatch, invoiceDetail, invoicePayment } = this.props
+    const {
+      dispatch,
+      invoiceDetail,
+      invoicePayment,
+      refreshInvoiceList,
+    } = this.props
 
+    if (refreshInvoiceList) {
+      refreshInvoiceList()
+    }
     dispatch({
       type: 'invoiceDetail/query',
       payload: {
