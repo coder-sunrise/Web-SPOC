@@ -541,6 +541,7 @@ const Procedures = ({
                             showAddCommand: canAddSurgicalCharges,
                             onCommitChanges: onCommitSurgicalChargesChanges,
                             onAddedRowsChange: onAddedSurgicalChargesRowsChange,
+                            isDeletable: (row) => row.surgicalRoleFK !== 1,
                           }}
                           FuncProps={{
                             pager: false,
