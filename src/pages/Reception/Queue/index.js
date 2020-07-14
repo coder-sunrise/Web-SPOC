@@ -772,14 +772,7 @@ class Queue extends React.Component {
   }
 
   showVisitForms = async (row) => {
-    const {
-      id,
-      visitStatus,
-      doctor,
-      patientAccountNo,
-      patientName,
-      patientReferenceNo,
-    } = row
+    const { id, visitStatus, doctor, patientAccountNo, patientName } = row
     await this.props.dispatch({
       type: 'formListing/updateState',
       payload: {
@@ -788,7 +781,6 @@ class Queue extends React.Component {
           visitID: id,
           doctorProfileFK: doctor ? doctor.id : 0,
           patientName,
-          patientNRICNo: patientReferenceNo,
           patientAccountNo,
         },
       },
