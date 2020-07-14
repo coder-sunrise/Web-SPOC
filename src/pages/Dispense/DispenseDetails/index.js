@@ -9,6 +9,7 @@ import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 import AddAlert from '@material-ui/icons/AddAlert'
+import { formatMessage } from 'umi/locale'
 // sub components
 import TableData from './TableData'
 import VaccinationGrid from './VaccinationGrid'
@@ -20,6 +21,9 @@ import {
   GridItem,
   GridContainer,
   SizeContainer,
+  Field,
+  TextField,
+  CommonModal,
 } from '@/components'
 // variables
 import {
@@ -36,8 +40,6 @@ import { VISIT_TYPE } from '@/utils/constants'
 import CONSTANTS from './constants'
 
 import { dangerColor } from '@/assets/jss'
-
-import { CommonModal } from '@/components'
 // const styles = (theme) => ({
 //   gridRow: {
 //     margin: `${theme.spacing.unit}px 0px`,
@@ -97,7 +99,7 @@ const DispenseDetails = ({
   onDrugLabelSelectionClose,
   onDrugLabelSelected,
   onDrugLabelNoChanged,
-  selectedDrugs, 
+  selectedDrugs,
 }) => {
   const {
     prescription,
@@ -207,17 +209,17 @@ const DispenseDetails = ({
       <GridContainer>
         <GridItem justify='flex-start' md={6} className={classes.actionButtons}>
           {!viewOnly &&
-            !isRetailVisit && (
-              <Button
-                color='info'
-                size='sm'
-                onClick={onReloadClick}
-                disabled={disableRefreshOrder}
-              >
-                <Refresh />
+          !isRetailVisit && (
+            <Button
+              color='info'
+              size='sm'
+              onClick={onReloadClick}
+              disabled={disableRefreshOrder}
+            >
+              <Refresh />
               Refresh Order
-              </Button>
-            )}
+            </Button>
+          )}
           <Button
             color='primary'
             size='sm'
@@ -344,9 +346,23 @@ const DispenseDetails = ({
             />
           </Paper>
         </GridItem>
-        <GridItem xs={2} md={9} />
+        <GridItem xs={8} md={9}>
+          <Field
+            name='visitRemarks'
+            render={(args) => (
+              <TextField
+                {...args}
+                disabled
+                multiline
+                label={formatMessage({
+                  id: 'reception.queue.visitRegistration.visitRemarks',
+                })}
+              />
+            )}
+          />
+        </GridItem>
         {!viewOnly && (
-          <GridItem xs={10} md={3}>
+          <GridItem xs={4} md={3}>
             <AmountSummary
               rows={invoiceItem}
               adjustments={invoiceAdjustment}
@@ -371,13 +387,13 @@ const DispenseDetails = ({
         onClose={() => {
           onDrugLabelSelectionClose()
         }}
-      // onConfirm={() => { 
-      //    onDrugLabelSelectionClose()
-      //    onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
-      // }}
+        // onConfirm={() => {
+        //    onDrugLabelSelectionClose()
+        //    onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
+        // }}
       >
         <DrugLabelSelection
-          prescription={selectedDrugs} 
+          prescription={selectedDrugs}
           codetable={codetable}
           handleDrugLabelSelected={onDrugLabelSelected}
           handleDrugLabelNoChanged={onDrugLabelNoChanged}
