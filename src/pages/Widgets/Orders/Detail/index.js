@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 import { connect } from 'dva'
+import $ from 'jquery'
 
 import { Divider, withStyles } from '@material-ui/core'
 import _ from 'lodash'
@@ -49,10 +50,30 @@ class Details extends PureComponent {
     disableEdit: false,
   }
 
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    const { orders: nextOrders } = nextProps
+    const { orders } = this.props
+    if (
+      nextOrders.type &&
+      (orders.type !== nextOrders.type || nextOrders.type === '1')
+    ) {
+      this.autoFocuseItem(nextOrders.type)
+    }
+  }
+
+  autoFocuseItem = (type) => {
+    setTimeout(() => {
+      if (type === '5') {
+        $(`#autofocus_${type} input`).focus()
+      } else $(`#autofocus_${type} .ant-select`).click()
+    }, 500)
+  }
+
   footerBtns = ({ onSave, onReset, showAdjustment = true }) => {
     const { classes, orders } = this.props
     // console.log(this.props)
-    const { entity } = orders
+    const { entity, type } = orders
     return (
       <React.Fragment>
         <Divider />
@@ -107,7 +128,14 @@ class Details extends PureComponent {
           >
             Discard
           </Button>
-          <ProgressButton color='primary' onClick={onSave} icon={null}>
+          <ProgressButton
+            color='primary'
+            onClick={() => {
+              onSave()
+              this.autoFocuseItem(type)
+            }}
+            icon={null}
+          >
             {!entity ? 'Add' : 'Save'}
           </ProgressButton>
         </div>
@@ -215,6 +243,7 @@ class Details extends PureComponent {
           return false
         return true
       })
+
     return (
       <div>
         <div className={classes.detail}>

@@ -522,14 +522,16 @@ class OrderSet extends PureComponent {
               name='inventoryOrderSetFK'
               render={(args) => {
                 return (
-                  <CodeSelect
-                    temp
-                    label='Order Set Name'
-                    code='inventoryorderset'
-                    labelField='displayValue'
-                    onChange={this.changeOrderSet}
-                    {...args}
-                  />
+                  <div id={`autofocus_${values.type}`}>
+                    <CodeSelect
+                      temp
+                      label='Order Set Name'
+                      code='inventoryorderset'
+                      labelField='displayValue'
+                      onChange={this.changeOrderSet}
+                      {...args}
+                    />
+                  </div>
                 )
               }}
             />
