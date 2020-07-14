@@ -20,8 +20,12 @@ import { calculateAdjustAmount } from '@/utils/utils'
   authority: [
     'queue.consultation.order.service',
   ],
-  mapPropsToValues: ({ orders = {}, type }) =>
-    orders.entity || orders.defaultService,
+  mapPropsToValues: ({ orders = {}, type }) => {
+    return {
+      ...(orders.entity || orders.defaultService),
+      type,
+    }
+  },
   enableReinitialize: true,
   validationSchema: Yup.object().shape({
     serviceFK: Yup.number().required(),
@@ -194,21 +198,23 @@ class Service extends PureComponent {
               name='serviceFK'
               render={(args) => {
                 return (
-                  <Select
-                    label='Service Name'
-                    options={services.filter(
-                      (o) =>
-                        !serviceCenterFK ||
-                        o.serviceCenters.find(
-                          (m) => m.value === serviceCenterFK,
-                        ),
-                    )}
-                    onChange={() =>
-                      setTimeout(() => {
-                        this.getServiceCenterService()
-                      }, 1)}
-                    {...args}
-                  />
+                  <div id={`autofocus_${values.type}`}>
+                    <Select
+                      label='Service Name'
+                      options={services.filter(
+                        (o) =>
+                          !serviceCenterFK ||
+                          o.serviceCenters.find(
+                            (m) => m.value === serviceCenterFK,
+                          ),
+                      )}
+                      onChange={() =>
+                        setTimeout(() => {
+                          this.getServiceCenterService()
+                        }, 1)}
+                      {...args}
+                    />
+                  </div>
                 )
               }}
             />

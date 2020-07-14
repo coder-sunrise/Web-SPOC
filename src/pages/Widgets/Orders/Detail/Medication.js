@@ -6,7 +6,6 @@ import Delete from '@material-ui/icons/Delete'
 import { formatMessage } from 'umi/locale'
 import { VISIT_TYPE } from '@/utils/constants'
 
-import LowStockInfo from './LowStockInfo'
 import {
   Button,
   GridContainer,
@@ -28,6 +27,7 @@ import {
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
+import LowStockInfo from './LowStockInfo'
 
 const authorityCfg = {
   '1': 'queue.consultation.order.medication',
@@ -621,6 +621,7 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
+
     const accessRight = authorityCfg[values.type]
     return (
       <Authorized authority={accessRight}>
@@ -633,11 +634,13 @@ class Medication extends PureComponent {
                     name='drugName'
                     render={(args) => {
                       return (
-                        <TextField
-                          label='Open Prescription Name'
-                          {...args}
-                          autocomplete='nope'
-                        />
+                        <div id={`autofocus_${values.type}`}>
+                          <TextField
+                            label='Open Prescription Name'
+                            {...args}
+                            autocomplete='nope'
+                          />
+                        </div>
                       )
                     }}
                   />
@@ -646,7 +649,10 @@ class Medication extends PureComponent {
                     name='inventoryMedicationFK'
                     render={(args) => {
                       return (
-                        <div style={{ position: 'relative' }}>
+                        <div
+                          id={`autofocus_${values.type}`}
+                          style={{ position: 'relative' }}
+                        >
                           <CodeSelect
                             temp
                             label='Medication Name'
