@@ -46,11 +46,11 @@ const InvoiceHistory = ({
   classes,
 }) => {
   const refreshInvoiceList = () => {
-    const { patientAccountNo } = patient.entity
+    const { id } = patient.entity
     dispatch({
       type: 'patientHistory/queryInvoiceHistory',
       payload: {
-        'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.PatientAccountNo': patientAccountNo,
+        'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.Id': id,
       },
     })
   }
@@ -109,7 +109,10 @@ const InvoiceHistory = ({
                 size='sm'
                 color='primary'
                 icon
-                onClick={() => toggleReport(row)}
+                onClick={(event) => {
+                  toggleReport(row)
+                  event.stopPropagation() 
+                }}
               >
                 <Printer />Print Invoice
               </Button>
@@ -134,8 +137,7 @@ const InvoiceHistory = ({
         </div>
 
         <div className={classes.accordionStyle}>
-          <Accordion
-            defaultActive={0}
+          <Accordion 
             onChange={(event, p, expanded) => {
               if (expanded) {
                 const { row } = p.prop
