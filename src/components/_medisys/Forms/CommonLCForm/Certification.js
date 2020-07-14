@@ -43,7 +43,7 @@ const Certification = ({ values, setFieldValue, formCategory }) => {
   return (
     <div>
       <GridContainer>
-        <GridItem>
+        <GridItem md={12}>
           <span
             style={{ display: 'flex', fontSize: '0.75rem', fontWeight: 500 }}
           >
