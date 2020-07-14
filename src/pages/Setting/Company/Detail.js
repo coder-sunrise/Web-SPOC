@@ -41,7 +41,11 @@ import Contact from './Contact'
         then: Yup.number().required(),
         otherwise: Yup.number().nullable(),
       }),
-
+      statementAdjustment: Yup.number().when('settingCompany', {
+        is: () => settingCompany.companyType.id === 1,
+        then: Yup.number().min(0),
+        otherwise: Yup.number().nullable(),
+      }),
       url: Yup.object().when('settingCompany', {
         is: () => settingCompany.companyType.id === 1,
         then: Yup.object().shape({
@@ -255,15 +259,16 @@ class Detail extends PureComponent {
                 <React.Fragment>
                   <GridItem md={4}>
                     <Field
-                      name='copayerAdjustment'
+                      name='statementAdjustment'
                       render={(args) => {
-                        if (values.copayerAdjustmentType === 'ExactAmount') {
+                        if (values.statementAdjustmentType === 'ExactAmount') {
                           return (
                             <NumberInput
                               currency
-                              label='Co-payer Adjustment'
+                              label='Statement Adjustment'
                               defaultValue='0.00'
                               precision={2}
+                              min={0}
                               {...args}
                             />
                           )
@@ -271,9 +276,10 @@ class Detail extends PureComponent {
                         return (
                           <NumberInput
                             percentage
-                            label='Co-payer Adjustment'
+                            label='Statement Adjustment'
                             defaultValue='0.00'
                             precision={2}
+                            min={0}
                             {...args}
                           />
                         )
@@ -282,7 +288,7 @@ class Detail extends PureComponent {
                   </GridItem>
                   <GridItem md={2}>
                     <Field
-                      name='copayerAdjustmentType'
+                      name='statementAdjustmentType'
                       render={(args) => (
                         <Switch
                           checkedChildren='$'
