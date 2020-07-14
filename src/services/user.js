@@ -49,3 +49,10 @@ export const saveUserPreference = async (payload) => {
   })
   return r
 }
+
+export const getUserPreference = async (payload) => {
+  const r = await request(`${userProfileURL}/GetUserPreference/${payload}`, {
+    method: 'GET',
+  })
+  return r
+}
