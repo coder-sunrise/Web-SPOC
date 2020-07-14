@@ -426,10 +426,7 @@ class PaymentDetails extends Component {
     }
 
     return (
-      <div
-        className={classes.container}
-        style={{ overflow: 'auto', width: '100%' }}
-      >
+      <div className={classes.container}>
         {readOnly ? (
           <div style={{ paddingTop: 5 }}>
             <WarningSnackbar
