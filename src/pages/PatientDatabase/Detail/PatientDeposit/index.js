@@ -27,6 +27,7 @@ import { withStyles, TextField } from '@material-ui/core'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 
 import depositModel from '@/pages/Finance/Deposit/models/deposit'
+import DeleteConfirm from './DeleteConfirm'
 import DepositGrid from './DepositGrid'
 import FilterBar from './FilterBar'
 
@@ -59,6 +60,8 @@ class PatientDeposit extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
+      showDeleteConfirmation: false,
+      deletingRow: {},
       reportViewerOpen: false,
       reportID: undefined,
       reportParameters: {},
@@ -102,13 +105,7 @@ class PatientDeposit extends PureComponent {
   }
 
   handleDeleteRow = async (row) => {
-    await this.props.dispatch({
-      type: 'deposit/deleteTransaction',
-      payload: {
-        id: row.id,
-      },
-    })
-    this.searchResult()
+    this.setState({ showDeleteConfirmation: true, deletingRow: row })
   }
 
   handleTypeChange = (opt) => {
@@ -122,9 +119,25 @@ class PatientDeposit extends PureComponent {
     })
   }
 
+  closeDeleteConfirmationModal = () =>
+    this.setState({ showDeleteConfirmation: false, deletingRow: undefined })
+
+  confirmDelete = async (reason) => {
+    const { deletingRow } = this.state
+    console.log(deletingRow, reason)
+
+    await this.props.dispatch({
+      type: 'deposit/deleteTransaction',
+      payload: {
+        id: deletingRow.id,
+      },
+    })
+    this.searchResult()
+  }
+
   render () {
     const { dispatch, user, patient: { deposit }, classes } = this.props
-    const { selectedTypeIds } = this.state
+    const { selectedTypeIds, showDeleteConfirmation } = this.state
     const patientId = Number(findGetParameter('pid'))
 
     let transactionList = []
@@ -203,6 +216,19 @@ class PatientDeposit extends PureComponent {
             </GridItem>
           </GridContainer>
         </CardContainer>
+
+        <CommonModal
+          open={showDeleteConfirmation}
+          title='Delete Deposit'
+          onConfirm={this.closeDeleteConfirmationModal}
+          onClose={this.closeDeleteConfirmationModal}
+          maxWidth='sm'
+        >
+          <DeleteConfirm
+            onClose={this.closeDeleteConfirmationModal}
+            handleConfirm={this.confirmDelete}
+          />
+        </CommonModal>
 
         <CommonModal
           open={this.state.reportViewerOpen}

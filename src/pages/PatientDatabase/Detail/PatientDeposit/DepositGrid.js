@@ -21,13 +21,26 @@ const DepositGrid = ({
       { name: 'action', title: 'Action' },
     ],
     columnExtensions: [
-      { columnName: 'transactionDate', type: 'date' },
+      {
+        columnName: 'transactionDate',
+        type: 'date',
+        width: 120,
+      },
       {
         columnName: 'transactionTypeFK',
         type: 'codeSelect',
         code: 'LTDepositTransactionType',
+        width: 120,
       },
-      { columnName: 'amount', type: 'currency' },
+      {
+        columnName: 'amount',
+        type: 'currency',
+        width: 120,
+      },
+      {
+        columnName: 'transactionMode',
+        width: 120,
+      },
       {
         columnName: 'action',
         sortingEnabled: false,
@@ -58,21 +71,17 @@ const DepositGrid = ({
               )}
               {isEnableDelete ? (
                 <Tooltip title='Delete' placement='bottom'>
-                  <Popconfirm
-                    title='Are you sure you want to delete the selected item?'
-                    onConfirm={() => {
+                  <Button
+                    size='sm'
+                    justIcon
+                    color='danger'
+                    style={{ marginRight: 0, width: 25 }}
+                    onClick={() => {
                       handleDeleteRow(row)
                     }}
                   >
-                    <Button
-                      size='sm'
-                      justIcon
-                      color='danger'
-                      style={{ marginRight: 0, width: 25 }}
-                    >
-                      <Delete />
-                    </Button>
-                  </Popconfirm>
+                    <Delete />
+                  </Button>
                 </Tooltip>
               ) : (
                 <div
