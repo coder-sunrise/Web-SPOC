@@ -577,7 +577,7 @@ class Main extends React.Component {
     )
     if (forms.rows.filter((o) => o.statusFK === 1).length > 0) {
       notification.warning({
-        message: `Please finalize all forms.`,
+        message: `Draft forms found, please finalize it before sign off.`,
       })
       return
     }
