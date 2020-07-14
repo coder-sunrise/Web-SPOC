@@ -322,6 +322,7 @@ const Procedures = ({
                       (row.implantFees || 0) +
                       (row.otherFees || 0)
                   },
+                  min: 0,
                 },
                 {
                   columnName: 'implantFees',
@@ -333,6 +334,7 @@ const Procedures = ({
                       (row.surgeonFees || 0) +
                       (row.otherFees || 0)
                   },
+                  min: 0,
                 },
                 {
                   columnName: 'otherFees',
@@ -344,6 +346,7 @@ const Procedures = ({
                       (row.implantFees || 0) +
                       (row.surgeonFees || 0)
                   },
+                  min: 0,
                 },
                 {
                   columnName: 'totalSurgicalFees',

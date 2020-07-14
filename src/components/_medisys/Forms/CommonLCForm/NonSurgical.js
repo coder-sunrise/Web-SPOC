@@ -153,6 +153,7 @@ const NonSurgical = ({ setFieldValue, values, nonSurgicalChargesSchema }) => {
           row.totalSurgicalFees = (value || 0) + (row.otherFees || 0)
         },
         width: 190,
+        min: 0,
       },
       {
         columnName: 'otherFees',
@@ -162,6 +163,7 @@ const NonSurgical = ({ setFieldValue, values, nonSurgicalChargesSchema }) => {
           row.totalSurgicalFees =
             (value || 0) + (row.inpatientAttendanceFees || 0)
         },
+        min: 0,
       },
       {
         columnName: 'totalSurgicalFees',
