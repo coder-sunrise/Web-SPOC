@@ -44,10 +44,11 @@ const styles = (theme) => ({
   },
 })
 // @skeleton()
-@connect(({ orders, codetable, clinicInfo }) => ({
+@connect(({ orders, codetable, clinicInfo, consultation }) => ({
   orders,
   codetable,
   clinicInfo,
+  consultation,
 }))
 class Orders extends PureComponent {
   state = {
@@ -106,14 +107,25 @@ class Orders extends PureComponent {
 
   render () {
     const { props } = this
-    const { className, footer, ...restProps } = props
+    const {
+      className,
+      footer,
+      consultation,
+      fromDispense,
+      ...restProps
+    } = props
+    let isInclusiveCoPayer
+    if (!fromDispense) {
+      isInclusiveCoPayer = consultation.entity.isInclusiveCoPayer
+    }
     return (
       <div className={className}>
-        <Detail {...restProps} />
+        <Detail {...restProps} isInclusiveCoPayer={isInclusiveCoPayer} />
         {/* <Divider light /> */}
 
         <Grid
           {...props}
+          isInclusiveCoPayer={isInclusiveCoPayer}
           // summary={this.state}
           // handleAddAdjustment={this.addAdjustment}
         />

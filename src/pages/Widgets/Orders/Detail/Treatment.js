@@ -16,6 +16,7 @@ import {
 } from '@/components'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
+import Authorized from '@/utils/Authorized'
 
 const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
 // @Authorized.Secured('queue.dispense.editorder')
@@ -347,6 +348,7 @@ class Treatment extends PureComponent {
       handleSubmit,
       handleReset,
       from,
+      isInclusiveCoPayer,
     } = this.props
     // const {
     //   data = [],
@@ -357,148 +359,168 @@ class Treatment extends PureComponent {
     const isDoctor = from === 'doctor'
     const { cttreatment = [] } = codetable
     // console.log(cttreatment)
+    const addAccessRight = Authorized.check(
+      'queue.consultation.order.treatment',
+    )
     return (
-      <div>
-        <GridContainer>
-          <GridItem xs={12} md={8}>
-            {/* <p style={{ marginBottom: 0 }}>Tooth No. {values.tooth}</p> */}
-            <p>
-              {/* Tooth No.{' '} */}
-              {(values.groups || []).map((o) => {
-                return (
-                  <Chip
-                    // icon={<FaceIcon />}
-                    label={o.text}
-                    onDelete={() => {
-                      dispatch({
-                        type: 'dentalChartComponent/toggleMultiSelect',
-                        payload: o.items.map((m) => ({
-                          ...m,
-                          deleted: true,
-                        })),
-                      })
-                      // console.log(o)
-                    }}
-                    style={{ margin: theme.spacing(0, 0.25, 0.25, 0) }}
-                    color='primary'
-                  />
-                )
-              })}
-            </p>
-            <FastField
-              name='remark'
-              render={(args) => (
-                <OutlinedTextField
-                  // autoFocus
-                  label='Treatment Details'
-                  multiline
-                  maxLength={2000}
-                  rowsMax={6}
-                  rows={6}
-                  onChange={(e) => {
-                    this.updateValueToStore({
-                      remark: e.target.value,
-                    })
-                  }}
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs={12} md={4}>
-            {!isDoctor && (
+      <Authorized.Context.Provider
+        value={
+          isInclusiveCoPayer ? (
+            {
+              rights: 'disable',
+            }
+          ) : (
+            {
+              rights: addAccessRight ? addAccessRight.rights : 'hidden',
+            }
+          )
+        }
+      >
+        <div>
+          <GridContainer>
+            <GridItem xs={12} md={8}>
+              {/* <p style={{ marginBottom: 0 }}>Tooth No. {values.tooth}</p> */}
+              <p>
+                {/* Tooth No.{' '} */}
+                {(values.groups || []).map((o) => {
+                  return (
+                    <Chip
+                      // icon={<FaceIcon />}
+                      label={o.text}
+                      onDelete={() => {
+                        dispatch({
+                          type: 'dentalChartComponent/toggleMultiSelect',
+                          payload: o.items.map((m) => ({
+                            ...m,
+                            deleted: true,
+                          })),
+                        })
+                        // console.log(o)
+                      }}
+                      style={{ margin: theme.spacing(0, 0.25, 0.25, 0) }}
+                      color='primary'
+                    />
+                  )
+                })}
+              </p>
               <FastField
-                name='treatmentCategoryFK'
+                name='remark'
                 render={(args) => (
-                  <CodeSelect
-                    label='Treatment Category'
-                    code='cttreatmentcategory'
-                    labelField='name'
-                    onChange={() => setFieldValue('treatmentFK', undefined)}
+                  <OutlinedTextField
+                    // autoFocus
+                    label='Treatment Details'
+                    multiline
+                    maxLength={2000}
+                    rowsMax={6}
+                    rows={6}
+                    onChange={(e) => {
+                      this.updateValueToStore({
+                        remark: e.target.value,
+                      })
+                    }}
                     {...args}
                   />
                 )}
               />
-            )}
-            <Field
-              name='treatmentFK'
-              render={(args) => (
-                <Select
-                  options={
-                    isDoctor ? (
-                      cttreatment
-                    ) : (
-                      cttreatment.filter(
-                        (o) =>
-                          o.treatmentCategoryFK === values.treatmentCategoryFK,
+            </GridItem>
+            <GridItem xs={12} md={4}>
+              {!isDoctor && (
+                <FastField
+                  name='treatmentCategoryFK'
+                  render={(args) => (
+                    <CodeSelect
+                      label='Treatment Category'
+                      code='cttreatmentcategory'
+                      labelField='name'
+                      onChange={() => setFieldValue('treatmentFK', undefined)}
+                      {...args}
+                    />
+                  )}
+                />
+              )}
+              <Field
+                name='treatmentFK'
+                render={(args) => (
+                  <Select
+                    options={
+                      isDoctor ? (
+                        cttreatment
+                      ) : (
+                        cttreatment.filter(
+                          (o) =>
+                            o.treatmentCategoryFK ===
+                            values.treatmentCategoryFK,
+                        )
                       )
-                    )
-                  }
-                  valueField='id'
-                  labelField='displayValue'
-                  label='Treatment'
-                  disabled={isDoctor}
-                  onChange={(v, op) => {
-                    this.changeTreatment(op)
-                  }}
-                  {...args}
-                />
-              )}
-            />
-            <FastField
-              name='quantity'
-              render={(args) => (
-                <NumberInput
-                  label='Unit'
-                  onChange={() => {
-                    setTimeout(() => {
-                      this.setTotalPrice()
-                    }, 1)
-                  }}
-                  disabled={isDoctor && values.chartMethodFK}
-                  {...args}
-                />
-              )}
-            />
-            <FastField
-              name='unitPrice'
-              render={(args) => (
-                <NumberInput
-                  label='Unit Price'
-                  currency
-                  onChange={(v) => {
-                    setTimeout(() => {
-                      this.setTotalPrice()
-                    }, 1)
-                  }}
-                  {...args}
-                />
-              )}
-            />
-            <FastField
-              name='totalPrice'
-              render={(args) => {
-                return <NumberInput label='Total' disabled currency {...args} />
-              }}
-            />
-            <FastField
-              name='totalAfterItemAdjustment'
-              render={(args) => (
-                <NumberInput
-                  disabled
-                  currency
-                  label='Total After Adj'
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-        </GridContainer>
-        {footer({
-          onSave: handleSubmit,
-          onReset: this.handleReset,
-        })}
-      </div>
+                    }
+                    valueField='id'
+                    labelField='displayValue'
+                    label='Treatment'
+                    disabled={isDoctor}
+                    onChange={(v, op) => {
+                      this.changeTreatment(op)
+                    }}
+                    {...args}
+                  />
+                )}
+              />
+              <FastField
+                name='quantity'
+                render={(args) => (
+                  <NumberInput
+                    label='Unit'
+                    onChange={() => {
+                      setTimeout(() => {
+                        this.setTotalPrice()
+                      }, 1)
+                    }}
+                    disabled={isDoctor && values.chartMethodFK}
+                    {...args}
+                  />
+                )}
+              />
+              <FastField
+                name='unitPrice'
+                render={(args) => (
+                  <NumberInput
+                    label='Unit Price'
+                    currency
+                    onChange={(v) => {
+                      setTimeout(() => {
+                        this.setTotalPrice()
+                      }, 1)
+                    }}
+                    {...args}
+                  />
+                )}
+              />
+              <FastField
+                name='totalPrice'
+                render={(args) => {
+                  return (
+                    <NumberInput label='Total' disabled currency {...args} />
+                  )
+                }}
+              />
+              <FastField
+                name='totalAfterItemAdjustment'
+                render={(args) => (
+                  <NumberInput
+                    disabled
+                    currency
+                    label='Total After Adj'
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          {footer({
+            onSave: handleSubmit,
+            onReset: this.handleReset,
+          })}
+        </div>
+      </Authorized.Context.Provider>
     )
   }
 }

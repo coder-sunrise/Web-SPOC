@@ -16,14 +16,12 @@ import {
 import Yup from '@/utils/yup'
 import { getUniqueId } from '@/utils/utils'
 import config from '@/utils/config'
+import Authorized from '@/utils/Authorized'
 
 const { qtyFormat } = config
 
 @connect(({ global, codetable }) => ({ global, codetable }))
 @withFormikExtend({
-  authority: [
-    'queue.consultation.order.orderset',
-  ],
   mapPropsToValues: ({ orders = {}, type }) => {
     const v = {
       ...(orders.entity || orders.defaultOrderSet),
@@ -513,43 +511,64 @@ class OrderSet extends PureComponent {
   }
 
   render () {
-    const { theme, values, footer, handleSubmit } = this.props
+    const {
+      theme,
+      values,
+      footer,
+      handleSubmit,
+      isInclusiveCoPayer,
+    } = this.props
+    const addAccessRight = Authorized.check('queue.consultation.order.orderset')
     return (
-      <div>
-        <GridContainer>
-          <GridItem xs={6}>
-            <Field
-              name='inventoryOrderSetFK'
-              render={(args) => {
-                return (
-                  <CodeSelect
-                    temp
-                    label='Order Set Name'
-                    code='inventoryorderset'
-                    labelField='displayValue'
-                    onChange={this.changeOrderSet}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs={12}>
-            <CommonTableGrid
-              rows={values.orderSetItems}
-              style={{
-                margin: `${theme.spacing(1)}px 0`,
-              }}
-              {...this.tableProps}
-            />
-          </GridItem>
-        </GridContainer>
-        {footer({
-          onSave: handleSubmit,
-          onReset: this.handleReset,
-          showAdjustment: false,
-        })}
-      </div>
+      <Authorized.Context.Provider
+        value={
+          isInclusiveCoPayer ? (
+            {
+              rights: 'disable',
+            }
+          ) : (
+            {
+              rights: addAccessRight ? addAccessRight.rights : 'hidden',
+            }
+          )
+        }
+      >
+        <div>
+          <GridContainer>
+            <GridItem xs={6}>
+              <Field
+                name='inventoryOrderSetFK'
+                render={(args) => {
+                  return (
+                    <CodeSelect
+                      temp
+                      label='Order Set Name'
+                      code='inventoryorderset'
+                      labelField='displayValue'
+                      onChange={this.changeOrderSet}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={12}>
+              <CommonTableGrid
+                rows={values.orderSetItems}
+                style={{
+                  margin: `${theme.spacing(1)}px 0`,
+                }}
+                {...this.tableProps}
+              />
+            </GridItem>
+          </GridContainer>
+          {footer({
+            onSave: handleSubmit,
+            onReset: this.handleReset,
+            showAdjustment: false,
+          })}
+        </div>
+      </Authorized.Context.Provider>
     )
   }
 }

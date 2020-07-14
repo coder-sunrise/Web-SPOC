@@ -21,7 +21,14 @@ import { orderTypes } from '@/pages/Consultation/utils'
 import Authorized from '@/utils/Authorized'
 
 // console.log(orderTypes)
-export default ({ orders, dispatch, classes, from, codetable }) => {
+export default ({
+  orders,
+  dispatch,
+  classes,
+  from,
+  codetable,
+  isInclusiveCoPayer,
+}) => {
   const { rows, summary, finalAdjustments, isGSTInclusive, gstValue } = orders
   const { total, gst, totalWithGST } = summary
   const [
@@ -40,6 +47,7 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
 
   const adjustments = finalAdjustments.filter((o) => !o.isDeleted)
   const editRow = (row) => {
+    if (isInclusiveCoPayer) return
     if (!row.isActive && row.type !== '5') return
 
     dispatch({
@@ -231,51 +239,57 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
                 const c1 = items.splice(0, items.length - 1)
                 const c2 = items.splice(items.length - 1)
                 return (
-                  <Table.Cell
-                    colSpan={3}
-                    style={{
-                      fontSize: 'inherit',
-                      color: 'inherit',
-                      fontWeight: 500,
-                      border: 'transparent',
+                  <Authorized.Context.Provider
+                    value={{
+                      rights: isInclusiveCoPayer ? 'disable' : 'enable',
                     }}
                   >
-                    <span>
-                      Invoice Adjustment:&nbsp;
-                      <Tooltip title='Add Adjustment'>
-                        <Button
-                          justIcon
-                          color='primary'
-                          style={{ top: -1 }}
-                          onClick={addAdjustment}
-                        >
-                          <Add />
-                        </Button>
-                      </Tooltip>
-                    </span>
-                    {c1}
-                    {gstValue >= 0 && (
-                      <Checkbox
-                        simple
-                        label={formatMessage({
-                          id: 'app.general.inclusiveGST',
-                        })}
-                        checked={checkedStatusIncldGST}
-                        onChange={(e) => {
-                          dispatch({
-                            type: 'orders/updateState',
-                            payload: {
-                              isGSTInclusive: e.target.value,
-                            },
-                          })
-                          dispatch({
-                            type: 'orders/calculateAmount',
-                          })
-                        }}
-                      />
-                    )}
-                    {c2}
-                  </Table.Cell>
+                    <Table.Cell
+                      colSpan={3}
+                      style={{
+                        fontSize: 'inherit',
+                        color: 'inherit',
+                        fontWeight: 500,
+                        border: 'transparent',
+                      }}
+                    >
+                      <span>
+                        Invoice Adjustment:&nbsp;
+                        <Tooltip title='Add Adjustment'>
+                          <Button
+                            justIcon
+                            color='primary'
+                            style={{ top: -1 }}
+                            onClick={addAdjustment}
+                          >
+                            <Add />
+                          </Button>
+                        </Tooltip>
+                      </span>
+                      {c1}
+                      {gstValue >= 0 && (
+                        <Checkbox
+                          simple
+                          label={formatMessage({
+                            id: 'app.general.inclusiveGST',
+                          })}
+                          checked={checkedStatusIncldGST}
+                          onChange={(e) => {
+                            dispatch({
+                              type: 'orders/updateState',
+                              payload: {
+                                isGSTInclusive: e.target.value,
+                              },
+                            })
+                            dispatch({
+                              type: 'orders/calculateAmount',
+                            })
+                          }}
+                        />
+                      )}
+                      {c2}
+                    </Table.Cell>
+                  </Authorized.Context.Provider>
                 )
               }
               return null
@@ -376,8 +390,23 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
               (item) => item.value === row.type,
             ) || { accessRight: '' }
             const { accessRight } = orderType
+            const editAccessRight = Authorized.check(accessRight)
             return (
-              <Authorized authority={accessRight}>
+              <Authorized.Context.Provider
+                value={
+                  isInclusiveCoPayer ? (
+                    {
+                      rights: 'disable',
+                    }
+                  ) : (
+                    {
+                      rights: editAccessRight
+                        ? editAccessRight.rights
+                        : 'hidden',
+                    }
+                  )
+                }
+              >
                 <div>
                   <Tooltip title='Edit'>
                     <Button
@@ -431,7 +460,7 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
                     </Tooltip>
                   </Popconfirm>
                 </div>
-              </Authorized>
+              </Authorized.Context.Provider>
             )
           },
         },
