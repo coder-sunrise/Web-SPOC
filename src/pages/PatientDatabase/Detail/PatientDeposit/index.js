@@ -124,14 +124,15 @@ class PatientDeposit extends PureComponent {
 
   confirmDelete = async (reason) => {
     const { deletingRow } = this.state
-    console.log(deletingRow, reason)
 
     await this.props.dispatch({
       type: 'deposit/deleteTransaction',
       payload: {
         id: deletingRow.id,
+        reason,
       },
     })
+    this.setState({ showDeleteConfirmation: false, deletingRow: undefined })
     this.searchResult()
   }
 

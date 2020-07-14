@@ -20,7 +20,7 @@ const DeleteConfirm = ({ classes, handleConfirm, onClose }) => {
   return (
     <GridContainer justify='center' alignItems='center'>
       <GridItem md={12} className={classes.centerText}>
-        <h4>Are you sure delete this deposit?</h4>
+        <h4>Are you sure delete this record?</h4>
       </GridItem>
       <GridItem md={10} className={classes.spacing}>
         <TextField
