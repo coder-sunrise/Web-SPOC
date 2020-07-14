@@ -184,7 +184,7 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     treatmentFK: Yup.number().required(),
   }),
 
-  handleSubmit: async (values, { props, onConfirm }) => {
+  handleSubmit: async (values, { props, onConfirm, setValues }) => {
     const { dispatch, orders, currentType, getNextSequence, user } = props
 
     const data = {
@@ -212,6 +212,20 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     })
 
     if (onConfirm) onConfirm()
+    dispatch({
+      type: 'dentalChartComponent/deleteTreatment',
+      payload: values,
+    })
+    dispatch({
+      type: 'dentalChartComponent/updateState',
+      payload: {
+        action: undefined,
+      },
+    })
+    setValues({
+      ...orders.defaultTreatment,
+      type: orders.type,
+    })
   },
   enableReinitialize: true,
   displayName: 'TreatmentForm',
