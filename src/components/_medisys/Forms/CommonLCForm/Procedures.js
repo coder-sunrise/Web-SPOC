@@ -25,14 +25,17 @@ const Procedures = ({
   values,
   formListing,
   surgicalChargesSchema,
+  visit,
 }) => {
   const addProcedure = () => {
-    const { visitDate } = formListing.visitDetail
     const maxIndev = _.maxBy(values.formData.procuderes, 'index').index
     let newProcedure = values.formData.procuderes.map((o) => o)
     newProcedure.push({
       index: maxIndev + 1,
-      procedureDate: visitDate,
+      procedureDate:
+        formListing && formListing.visitDetail
+          ? formListing.visitDetail.visitDate
+          : visit.visitDate,
       procedureStartTime: moment(),
       procedureEndTime: moment(),
       natureOfOpertation: 'Medical',
