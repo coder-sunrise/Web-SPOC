@@ -46,6 +46,14 @@ export const saveUserPreference = async (payload) => {
   const r = await request(`${userProfileURL}/SaveUserPreference`, {
     method: 'POST',
     body: payload,
+    suppressException: true,
+  })
+  return r
+}
+
+export const getUserPreference = async (payload) => {
+  const r = await request(`${userProfileURL}/GetUserPreference/${payload}`, {
+    method: 'GET',
   })
   return r
 }
