@@ -146,13 +146,12 @@ class PatientDeposit extends PureComponent {
     let refundableAmount = 0
     if (deposit && deposit.patientDepositTransaction) {
       const { patientDepositTransaction } = deposit
-      const sumReducer = (p, n) => {
-        return p + n
-      }
+
       totalAmount = roundTo(
         patientDepositTransaction
+          .filter((f) => !f.isCancelled)
           .map((row) => row.amount)
-          .reduce(sumReducer, 0),
+          .reduce((p, c) => p + c, 0),
       )
       refundableAmount = roundTo(deposit.balance)
 
