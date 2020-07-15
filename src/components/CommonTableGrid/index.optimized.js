@@ -830,7 +830,7 @@ class CommonTableGrid extends PureComponent {
       sort,
       sortConfig,
       filter,
-      columnSelectable = true,
+      columnSelectable = false,
       columnReorderable = false,
     } = {
       ...this.defaultFunctionConfig,

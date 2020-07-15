@@ -51,6 +51,7 @@ export const FuncConfig = {
   pager: false,
   sort: true,
   columnReorderable: true,
+  columnSelectable: true,
   sortConfig: {
     defaultSorting: [
       { columnName: 'queueNo', direction: 'asc' },
