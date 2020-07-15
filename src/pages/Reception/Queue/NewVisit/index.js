@@ -102,7 +102,7 @@ const getHeight = (propsHeight) => {
   handleSubmit: formikHandleSubmit,
 })
 class NewVisit extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.myRef = React.createRef()
@@ -137,7 +137,7 @@ class NewVisit extends PureComponent {
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     // call file index API METHOD='DELETE'
     // for Attachments where fileStatus === 'Uploaded' but not 'Confirmed'
     // unmount will be invoked too when submit succeeded,
@@ -243,7 +243,7 @@ class NewVisit extends PureComponent {
       if (accessRight) {
         const { rights } = accessRight
         return (rights === 'readwrite' || rights === 'enable') &&
-        (isReadOnly || isRetail)
+          (isReadOnly || isRetail)
           ? 'disable'
           : rights
       }
@@ -286,7 +286,7 @@ class NewVisit extends PureComponent {
     }, [])
   }
 
-  render () {
+  render() {
     const {
       classes,
       footer,
@@ -302,6 +302,7 @@ class NewVisit extends PureComponent {
       dispatch,
       rights,
       setFieldValue,
+      clinicSettings,
     } = this.props
 
     if (expandRefractionForm) {
@@ -319,17 +320,18 @@ class NewVisit extends PureComponent {
       (queueNumbers, queue) =>
         queue.visitFK === values.id
           ? [
-              ...queueNumbers,
-            ]
+            ...queueNumbers,
+          ]
           : [
-              ...queueNumbers,
-              queue.queueNo,
-            ],
+            ...queueNumbers,
+            queue.queueNo,
+          ],
       [],
     )
     const isReadOnly =
       values.visitStatus !== VISIT_STATUS.WAITING &&
       values.visitStatus !== VISIT_STATUS.UPCOMING_APPT
+    const isReadonlyAfterSigned = clinicSettings.settings.isVisitEditableAfterEndConsultation && values.visitPurposeFK===1 && values.isLastClinicalObjectRecordSigned ? false : isReadOnly
     const isEdit = !!values.id
     const fetchingVisitInfo =
       loading.effects['visitRegistration/fetchVisitInfo']
@@ -371,7 +373,7 @@ class NewVisit extends PureComponent {
                       value={{
                         rights:
                           (rights === 'readwrite' || rights === 'enable') &&
-                          isReadOnly
+                            isReadOnly
                             ? 'disable'
                             : rights,
                       }}
@@ -379,6 +381,7 @@ class NewVisit extends PureComponent {
                       <GridItem xs={12} className={classes.row}>
                         <VisitInfoCard
                           // isReadOnly={isReadOnly}
+                          isVisitRemarksDisabled={isReadonlyAfterSigned}
                           existingQNo={existingQNo}
                           handleUpdateAttachments={this.updateAttachments}
                           attachments={values.visitAttachment}
@@ -393,7 +396,7 @@ class NewVisit extends PureComponent {
                       value={{
                         rights:
                           (rights === 'readwrite' || rights === 'enable') &&
-                          (isReadOnly || isRetail)
+                            (isReadOnly || isRetail)
                             ? 'disable'
                             : rights,
                       }}
@@ -406,7 +409,7 @@ class NewVisit extends PureComponent {
                                 rights:
                                   (vitalAccessRight === 'readwrite' ||
                                     vitalAccessRight === 'enable') &&
-                                  isReadOnly
+                                    isReadonlyAfterSigned
                                     ? 'disable'
                                     : vitalAccessRight,
                               }}
@@ -470,7 +473,7 @@ class NewVisit extends PureComponent {
               confirmBtnText: isEdit ? 'Save' : 'Register visit',
               onConfirm: this.validatePatient,
               confirmProps: {
-                disabled: isReadOnly,
+                disabled: isReadonlyAfterSigned,
               },
             })}
         </div>
