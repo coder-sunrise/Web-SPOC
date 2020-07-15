@@ -48,7 +48,7 @@ const styles = (theme) => ({
     marginRight: theme.spacing(1),
   },
 })
-
+ 
 const { Secured } = Authorized
 
 const ContextMenu = ({
@@ -57,9 +57,10 @@ const ContextMenu = ({
   rights,
   onMenuItemClick,
   onMenuClick,
-}) => {
-  console.log({ rights })
-  const isStatusWaiting = row.visitStatus === VISIT_STATUS.WAITING
+  clinicSettings,
+}) => {  
+  const isStatusWaiting = row.visitStatus === VISIT_STATUS.WAITING 
+  const isVisitEditable = isStatusWaiting || (clinicSettings.isVisitEditableAfterEndConsultation && row.isLastClinicalObjectRecordSigned)
   const isStatusInProgress = filterMap[StatusIndicator.IN_PROGRESS].includes(
     row.visitStatus,
   )
@@ -141,9 +142,9 @@ const ContextMenu = ({
       const isDisabled = rights === 'disable'
       switch (opt.id) {
         case 0: // edit visit
-          return { ...opt, hidden: !isStatusWaiting }
+          return { ...opt, hidden: !isVisitEditable }
         case 0.1: // view visit
-          return { ...opt, hidden: isStatusWaiting }
+          return { ...opt, hidden: isStatusWaiting|| isVisitEditable }
         case 1: // dispense
           return {
             ...opt,
