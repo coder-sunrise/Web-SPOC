@@ -167,7 +167,7 @@ export default {
           }
 
           const gridSetting = yield call(getUserPreference, 4)
-          console.log(gridSetting)
+          // console.log(gridSetting)
           user = {
             data: data.userProfileDetailDto,
             accessRights: _.orderBy(accessRights, (o) => o.name),
