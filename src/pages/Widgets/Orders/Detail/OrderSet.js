@@ -512,6 +512,17 @@ class OrderSet extends PureComponent {
     }
   }
 
+  validateAndSubmitIfOk = async () => {
+    const { handleSubmit, validateForm } = this.props
+    const validateResult = await validateForm()
+    const isFormValid = _.isEmpty(validateResult)
+    if (isFormValid) {
+      handleSubmit()
+      return true
+    }
+    return false
+  }
+
   render () {
     const { theme, values, footer, handleSubmit } = this.props
     return (
@@ -547,7 +558,7 @@ class OrderSet extends PureComponent {
           </GridItem>
         </GridContainer>
         {footer({
-          onSave: handleSubmit,
+          onSave: this.validateAndSubmitIfOk,
           onReset: this.handleReset,
           showAdjustment: false,
         })}

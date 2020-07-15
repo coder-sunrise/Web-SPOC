@@ -52,18 +52,18 @@ class Details extends PureComponent {
   }
 
   // eslint-disable-next-line camelcase
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    const { orders: nextOrders } = nextProps
-    const { orders } = this.props
+  // UNSAFE_componentWillReceiveProps (nextProps) {
+  //   const { orders: nextOrders } = nextProps
+  //   const { orders } = this.props
 
-    if (
-      nextOrders.type !== this.state.prevKey &&
-      nextOrders.type &&
-      (orders.type !== nextOrders.type || nextOrders.type === '1')
-    ) {
-      this.autoFocuseItem(nextOrders.type)
-    }
-  }
+  //   if (
+  //     nextOrders.type !== this.state.prevKey &&
+  //     nextOrders.type &&
+  //     (orders.type !== nextOrders.type || nextOrders.type === '1')
+  //   ) {
+  //     this.autoFocuseItem(nextOrders.type)
+  //   }
+  // }
 
   autoFocuseItem = (type) => {
     setTimeout(() => {
@@ -137,9 +137,9 @@ class Details extends PureComponent {
           </Button>
           <ProgressButton
             color='primary'
-            onClick={() => {
-              onSave()
-              this.autoFocuseItem(type)
+            onClick={async () => {
+              const isSaveOk = await onSave()
+              if (isSaveOk) this.autoFocuseItem(type)
             }}
             icon={null}
           >
@@ -277,6 +277,7 @@ class Details extends PureComponent {
                       type: key,
                     },
                   })
+                  this.autoFocuseItem(key)
                   // dispatch({
                   //   type: 'global/incrementCommitCount',
                   // })
