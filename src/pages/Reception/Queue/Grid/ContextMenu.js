@@ -60,7 +60,7 @@ const ContextMenu = ({
   clinicSettings,
 }) => {  
   const isStatusWaiting = row.visitStatus === VISIT_STATUS.WAITING 
-  const isVisitEditable = isStatusWaiting || (clinicSettings.isVisitEditableAfterEndConsultation && row.visitPurposeFK===1 && row.isLastClinicalObjectRecordSigned)
+  const isVisitEditable = isStatusWaiting || (clinicSettings.isVisitEditableAfterEndConsultation && row.isLastClinicalObjectRecordSigned)
   const isStatusInProgress = filterMap[StatusIndicator.IN_PROGRESS].includes(
     row.visitStatus,
   )
