@@ -40,6 +40,7 @@ const DiagnosisSelect = ({
   label,
   onDataSouceChange,
   filterStyle = { position: 'absolute', bottom: 8, right: 0 },
+  clinicSettings,
   ...props
 }) => {
   let selectProps = props
@@ -139,6 +140,18 @@ const DiagnosisSelect = ({
         labelField='displayvalue'
         handleFilter={(input, opt) => {
           const { data } = opt.props
+
+          // default use .indexOf
+          const { diagnosisSearchUseStartWith = false } = clinicSettings
+
+          if (diagnosisSearchUseStartWith) {
+            const found =
+              data.displayvalue.toLowerCase().startsWith(input.toLowerCase()) ||
+              data.code.toLowerCase().startsWith(input.toLowerCase())
+            console.log({ found, input })
+            return found
+          }
+
           return (
             data.displayvalue.toLowerCase().indexOf(input.toLowerCase()) >= 0 ||
             data.code.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -199,6 +212,8 @@ const DiagnosisSelect = ({
   )
 }
 
-const Connected = connect()(DiagnosisSelect)
+const Connected = connect(({ clinicSettings }) => ({
+  clinicSettings: clinicSettings.settings,
+}))(DiagnosisSelect)
 
 export default withStyles(styles, { withTheme: true })(Connected)
