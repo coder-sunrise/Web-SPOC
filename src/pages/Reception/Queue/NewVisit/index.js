@@ -331,7 +331,7 @@ class NewVisit extends PureComponent {
     const isReadOnly =
       values.visitStatus !== VISIT_STATUS.WAITING &&
       values.visitStatus !== VISIT_STATUS.UPCOMING_APPT
-    const isReadonlyAfterSigned = clinicSettings.settings.isVisitEditableAfterEndConsultation && values.visitPurposeFK===1 && values.isLastClinicalObjectRecordSigned ? false : isReadOnly
+    const isReadonlyAfterSigned = clinicSettings.settings.isVisitEditableAfterEndConsultation && values.isLastClinicalObjectRecordSigned ? false : isReadOnly
     const isEdit = !!values.id
     const fetchingVisitInfo =
       loading.effects['visitRegistration/fetchVisitInfo']
