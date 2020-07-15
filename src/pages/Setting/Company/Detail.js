@@ -240,7 +240,7 @@ class Detail extends PureComponent {
                 <Field
                   name='autoInvoiceAdjustment'
                   render={(args) => {
-                    if (values.adminChargeType === 'ExactAmount') {
+                    if (values.autoInvoiceAdjustmentType === 'ExactAmount') {
                       return (
                         <NumberInput
                           currency
