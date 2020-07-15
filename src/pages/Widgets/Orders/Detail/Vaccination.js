@@ -280,6 +280,17 @@ class Vaccination extends PureComponent {
     }
   }
 
+  validateAndSubmitIfOk = async () => {
+    const { handleSubmit, validateForm } = this.props
+    const validateResult = await validateForm()
+    const isFormValid = _.isEmpty(validateResult)
+    if (isFormValid) {
+      handleSubmit()
+      return true
+    }
+    return false
+  }
+
   render () {
     const {
       theme,
@@ -510,7 +521,7 @@ class Vaccination extends PureComponent {
           </GridItem>
         </GridContainer>
         {footer({
-          onSave: handleSubmit,
+          onSave: this.validateAndSubmitIfOk,
           onReset: this.handleReset,
         })}
       </div>
