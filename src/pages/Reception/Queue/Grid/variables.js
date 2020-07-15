@@ -50,6 +50,7 @@ const compareQueueNo = (a, b) => {
 export const FuncConfig = {
   pager: false,
   sort: true,
+  columnReorderable: true,
   sortConfig: {
     defaultSorting: [
       { columnName: 'queueNo', direction: 'asc' },
