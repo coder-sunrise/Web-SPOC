@@ -48,13 +48,16 @@ const styles = (theme) => ({
 class Details extends PureComponent {
   state = {
     disableEdit: false,
+    prevKey: null,
   }
 
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps (nextProps) {
     const { orders: nextOrders } = nextProps
     const { orders } = this.props
+
     if (
+      nextOrders.type !== this.state.prevKey &&
       nextOrders.type &&
       (orders.type !== nextOrders.type || nextOrders.type === '1')
     ) {
@@ -67,6 +70,10 @@ class Details extends PureComponent {
       if (type === '5') {
         $(`#autofocus_${type} input`).focus()
       } else $(`#autofocus_${type} .ant-select`).click()
+
+      this.setState({
+        prevKey: type,
+      })
     }, 500)
   }
 
