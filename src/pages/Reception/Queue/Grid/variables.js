@@ -154,6 +154,7 @@ export const QueueTableConfig = {
     { name: 'invoiceOutstanding', title: 'Outstanding' },
     { name: 'patientScheme', title: 'Scheme' },
     { name: 'patientMobile', title: 'Phone' },
+    { name: 'visitOrderTemplate', title: 'Visit Order Template' },
     { name: 'action', title: 'Action' },
   ],
   leftColumns: [
@@ -281,5 +282,9 @@ export const QueueColumnExtensions = [
     columnName: 'doctor',
     compare: compareDoctor,
     render: (row) => <DoctorLabel doctor={row.doctor} hideMCR />,
+  },
+  {
+    columnName: 'visitOrderTemplate',
+    width: 180,
   },
 ]
