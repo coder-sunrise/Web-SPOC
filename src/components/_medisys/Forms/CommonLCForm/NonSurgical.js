@@ -67,7 +67,7 @@ const NonSurgical = ({ setFieldValue, values, nonSurgicalChargesSchema }) => {
         title: (
           <div>
             <div>Total Fees</div>
-            <div style={{ fontSize: '0.4rem', fontStyle: 'italic' }}>
+            <div style={{ fontSize: '0.8rem', fontStyle: 'italic' }}>
               (including GST if applicable)
             </div>
           </div>
