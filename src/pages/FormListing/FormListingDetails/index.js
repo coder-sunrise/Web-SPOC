@@ -90,6 +90,15 @@ class FormListingDetails extends PureComponent {
     this.queryFormListing()
   }
 
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'formListing/updateState',
+      payload: {
+        list: [],
+      },
+    })
+  }
+
   queryFormListing = () => {
     const { formListing, formFrom, formCategory } = this.props
 
