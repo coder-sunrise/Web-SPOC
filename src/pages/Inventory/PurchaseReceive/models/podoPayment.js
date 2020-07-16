@@ -1,7 +1,7 @@
 import { createFormViewModel } from 'medisys-model'
-import * as service from '../services/podoPayment'
 import { INVOICE_STATUS } from '@/utils/constants'
 import { notification } from '@/components'
+import * as service from '../services/podoPayment'
 
 export default createFormViewModel({
   namespace: 'podoPayment',
@@ -49,6 +49,11 @@ export default createFormViewModel({
           })
           return true
         }
+
+        yield put({
+          type: 'setCurrentBizSession',
+          payload: {},
+        })
         return false
       },
       *queryPodoPayment ({ payload }, { call, put }) {
