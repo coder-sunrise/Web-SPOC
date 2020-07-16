@@ -267,6 +267,14 @@ class Banner extends PureComponent {
       currentSchemeType: schemeData.schemeTypeFK,
     })
 
+    const { codetable } = this.props
+    const { ctschemetype, copaymentscheme } = codetable
+    const schemeType = ctschemetype.find(
+      (o) => o.id === schemeData.schemeTypeFK,
+    )
+    const copaymentScheme = copaymentscheme.find(
+      (o) => o.id === schemeData.coPaymentSchemeFK,
+    )
     return {
       balance,
       patientCoPaymentSchemeFK: schemeData.id,
@@ -290,6 +298,8 @@ class Banner extends PureComponent {
         refreshedSchemeData.isSuccessful !== ''
           ? refreshedSchemeData.isSuccessful
           : '',
+      schemeTypeName: schemeType ? schemeType.name : undefined,
+      copaymentSchemeName: copaymentScheme ? copaymentScheme.name : undefined,
     }
   }
 
@@ -494,7 +504,7 @@ class Banner extends PureComponent {
                 header={
                   <div style={headerStyles}>
                     Scheme
-                    <span style={{ position: 'absolute', bottom: -2 }}>
+                    <span style={{ bottom: -2 }}>
                       {(entity.patientScheme || [])
                         .filter((o) => o.schemeTypeFK <= 6).length > 0 && (
                         <IconButton onClick={this.refreshChasBalance}>
@@ -502,18 +512,108 @@ class Banner extends PureComponent {
                         </IconButton>
                       )}
                     </span>
+                    {entity.patientScheme &&
+                    entity.patientScheme.length > 0 && (
+                      <Popover
+                        icon={null}
+                        content={entity.patientScheme.map((o) => {
+                          const schemeData = this.getSchemeDetails(o)
+                          return (
+                            <div style={{ marginTop: 10, marginBottom: 10 }}>
+                              <div>
+                                {schemeData.schemeTypeFK <= 6 ? (
+                                  schemeData.schemeTypeName
+                                ) : (
+                                  schemeData.copaymentSchemeName
+                                )}
+                              </div>
+                              <div>
+                                Validity:{' '}
+                                {schemeData.validFrom ? (
+                                  <DatePicker
+                                    text
+                                    format={dateFormatLong}
+                                    value={schemeData.validFrom}
+                                  />
+                                ) : (
+                                  ''
+                                )}
+                                -
+                                {schemeData.validTo ? (
+                                  <DatePicker
+                                    text
+                                    format={dateFormatLong}
+                                    value={schemeData.validTo}
+                                  />
+                                ) : (
+                                  ''
+                                )}
+                              </div>
+                              {schemeData.schemeTypeFK <= 6 ? (
+                                <div>
+                                  Balance: {' '}
+                                  <NumberInput
+                                    text
+                                    currency
+                                    value={schemeData.balance}
+                                  />
+                                </div>
+                              ) : (
+                                ''
+                              )}
+                              {schemeData.schemeTypeFK <= 6 ? (
+                                <div>
+                                  Patient Acute Visit Balance: {' '}
+                                  <NumberInput
+                                    text
+                                    currency
+                                    value={schemeData.acuteVisitPatientBalance}
+                                  />
+                                </div>
+                              ) : (
+                                ''
+                              )}
+                              {schemeData.schemeTypeFK <= 6 ? (
+                                <div>
+                                  Patient Acute Clinic Balance: {' '}
+                                  <NumberInput
+                                    text
+                                    currency
+                                    value={schemeData.acuteVisitClinicBalance}
+                                  />
+                                </div>
+                              ) : (
+                                ''
+                              )}
+                            </div>
+                          )
+                        })}
+                        trigger='click'
+                        placement='rightTop'
+                      >
+                        <div
+                          style={{
+                            display: 'inline-block',
+                            marginLeft: -5,
+                          }}
+                        >
+                          <MoreButton />
+                        </div>
+                      </Popover>
+                    )}
                   </div>
                 }
                 body={
                   <div>
-                    {entity.patientScheme &&
-                    entity.patientScheme.length > 0 &&
-                    entity.patientScheme.filter((o) => o.schemeTypeFK <= 6)
-                      .length > 0 ? (
-                      entity.patientScheme
-                        .filter((o) => o.schemeTypeFK <= 6)
-                        .map((o) => {
+                    {entity.patientScheme && entity.patientScheme.length > 0 ? (
+                      <div>
+                        {entity.patientScheme.slice(0, 2).map((o) => {
                           const schemeData = this.getSchemeDetails(o)
+                          const displayString = `${schemeData.schemeTypeFK <= 6
+                            ? schemeData.schemeTypeName
+                            : schemeData.copaymentSchemeName} (Exp: ${schemeData.validTo
+                            ? moment(schemeData.validTo).format('DD MMM YYYY')
+                            : '-'})`
                           return (
                             <div>
                               {schemeData.statusDescription && (
@@ -524,53 +624,25 @@ class Banner extends PureComponent {
                                   />
                                 </Tooltip>
                               )}
-                              <CodeSelect
-                                style={{
-                                  marginLeft: schemeData.statusDescription
-                                    ? 20
-                                    : 'inherit',
-                                }}
-                                text
-                                code='ctSchemeType'
-                                value={schemeData.schemeTypeFK}
-                              />
-                              <div
-                                style={{
-                                  fontWeight: 500,
-                                  display: 'inline-block',
-                                }}
-                              >
-                                :{' '}
-                                {schemeData.chronicBalanceStatusCode ===
-                                'SC105' ? (
-                                  'Full Balance'
-                                ) : (
-                                  <NumberInput
-                                    text
-                                    currency
-                                    value={schemeData.balance}
-                                  />
-                                )}
-                              </div>
-                              <SchemePopover
-                                isBanner
-                                isShowReplacementModal={
-                                  schemeData.isShowReplacementModal
-                                }
-                                handleRefreshChasBalance={() =>
-                                  this.refreshChasBalance(
-                                    schemeData.patientCoPaymentSchemeFK,
-                                    schemeData.schemeTypeFK,
-                                  )}
-                                entity={entity}
-                                schemeData={schemeData}
-                              />
-                              {/* <p style={{ color: 'red' }}>
-                              {schemeData.statusDescription}
-                            </p> */}
+                              {
+                                <Tooltip title={displayString}>
+                                  <div
+                                    style={{
+                                      whiteSpace: 'nowrap',
+                                      overflow: 'hidden',
+                                      display: 'inline-block',
+                                      textOverflow: 'ellipsis',
+                                      width: '100%',
+                                    }}
+                                  >
+                                    {displayString}
+                                  </div>
+                                </Tooltip>
+                              }
                             </div>
                           )
-                        })
+                        })}
+                      </div>
                     ) : (
                       '-'
                     )}
