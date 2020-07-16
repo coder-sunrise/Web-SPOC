@@ -583,7 +583,7 @@ class Queue extends React.Component {
           }).then((o) => {
             if (o)
               router.push(
-                `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
+                `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
               )
           })
         }
@@ -605,12 +605,12 @@ class Queue extends React.Component {
             }).then((o) => {
               if (o)
                 router.push(
-                  `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
+                  `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
                 )
             })
           } else {
             router.push(
-              `/reception/queue/consultation?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}`,
+              `/reception/queue/consultation?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&pid=${row.patientProfileFK}&v=${version}`,
             )
           }
         }
@@ -652,7 +652,7 @@ class Queue extends React.Component {
                         },
                       }).then((c) => {
                         router.push(
-                          `/reception/queue/consultation?qid=${row.id}&cid=${c.id}&v=${version}`,
+                          `/reception/queue/consultation?qid=${row.id}&cid=${c.id}&pid=${row.patientProfileFK}&v=${version}`,
                         )
                       })
                     },
@@ -660,7 +660,7 @@ class Queue extends React.Component {
                 })
               } else {
                 router.push(
-                  `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
+                  `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
                 )
               }
           })
