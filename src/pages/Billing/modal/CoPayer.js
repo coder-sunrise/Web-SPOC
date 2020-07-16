@@ -202,7 +202,6 @@ class CoPayer extends Component {
       _isDeleted: false,
       schemeConfig: {},
     }
-    console.log(returnValue)
     this.props.onAddCoPayerClick(returnValue)
   }
 
