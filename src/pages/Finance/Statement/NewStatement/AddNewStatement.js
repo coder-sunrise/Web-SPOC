@@ -53,6 +53,14 @@ const styles = () => ({
       ...returnValue,
       adminChargeValueType,
       adjustmentValueType,
+      invoiceRows: returnValue.statementInvoice,
+      selectedRows: returnValue.statementInvoice
+        .filter(
+          (si) =>
+            !(si.statementInvoicePayment || [])
+              .find((o) => o.invoicePayment.isCancelled === false),
+        )
+        .map((o) => o.id),
     }
   },
   validationSchema: Yup.object().shape({
@@ -236,11 +244,6 @@ class AddNewStatement extends PureComponent {
 
     this.setState({
       selectedRows: defaultIds,
-    })
-    setValues({
-      ...values,
-      selectedRows: defaultIds,
-      invoiceRows: values.statementInvoice,
     })
   }
 
@@ -598,8 +601,12 @@ class AddNewStatement extends PureComponent {
                           return rows.reduce((pre, cur) => {
                             console.log({ cur })
                             if (
-                              values.selectedRows &&
-                              values.selectedRows.includes(cur.id)
+                              (values.selectedRows &&
+                                values.selectedRows.includes(cur.id)) ||
+                              (cur.statementInvoicePayment || [])
+                                .find(
+                                  (o) => o.invoicePayment.isCancelled === false,
+                                )
                             ) {
                               return pre + getValue(cur) || 0
                             }
@@ -645,7 +652,6 @@ class AddNewStatement extends PureComponent {
               color='primary'
               disabled={mode === 'Add' && this.state.selectedRows.length <= 0}
               onClick={() => {
-                this.setState({ selectedRows: [] })
                 handleSubmit()
               }}
             >
