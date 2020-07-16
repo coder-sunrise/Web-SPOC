@@ -101,12 +101,14 @@ const DispenseDetails = ({
   onDrugLabelNoChanged,
   selectedDrugs,
 }) => {
+  console.log(values)
   const {
     prescription,
     vaccination,
     otherOrder,
     invoice,
     visitPurposeFK,
+    visitRemarks,
   } = values || {
     invoice: { invoiceItem: [] },
   }
@@ -209,17 +211,17 @@ const DispenseDetails = ({
       <GridContainer>
         <GridItem justify='flex-start' md={6} className={classes.actionButtons}>
           {!viewOnly &&
-          !isRetailVisit && (
-            <Button
-              color='info'
-              size='sm'
-              onClick={onReloadClick}
-              disabled={disableRefreshOrder}
-            >
-              <Refresh />
+            !isRetailVisit && (
+              <Button
+                color='info'
+                size='sm'
+                onClick={onReloadClick}
+                disabled={disableRefreshOrder}
+              >
+                <Refresh />
               Refresh Order
-            </Button>
-          )}
+              </Button>
+            )}
           <Button
             color='primary'
             size='sm'
@@ -347,18 +349,13 @@ const DispenseDetails = ({
           </Paper>
         </GridItem>
         <GridItem xs={8} md={9}>
-          <Field
-            name='visitRemarks'
-            render={(args) => (
-              <TextField
-                {...args}
-                disabled
-                multiline
-                label={formatMessage({
-                  id: 'reception.queue.visitRegistration.visitRemarks',
-                })}
-              />
-            )}
+          <TextField
+            value={visitRemarks}
+            disabled
+            multiline
+            label={formatMessage({
+              id: 'reception.queue.visitRegistration.visitRemarks',
+            })}
           />
         </GridItem>
         {!viewOnly && (
@@ -387,10 +384,10 @@ const DispenseDetails = ({
         onClose={() => {
           onDrugLabelSelectionClose()
         }}
-        // onConfirm={() => {
-        //    onDrugLabelSelectionClose()
-        //    onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
-        // }}
+      // onConfirm={() => {
+      //    onDrugLabelSelectionClose()
+      //    onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
+      // }}
       >
         <DrugLabelSelection
           prescription={selectedDrugs}
