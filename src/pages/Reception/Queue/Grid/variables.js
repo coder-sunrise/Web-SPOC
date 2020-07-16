@@ -72,6 +72,7 @@ export const AppointmentTableConfig = {
     { name: 'patientContactNo', title: 'Phone' },
     { name: 'action', title: 'Action' },
   ],
+  identifier: 'reception_appointment',
 }
 
 export const ApptColumnExtensions = [
@@ -138,6 +139,7 @@ export const QueueTableConfig = {
   columns: [
     { name: 'visitStatus', title: 'Status' },
     { name: 'queueNo', title: 'Q. No.' },
+    { name: 'patientReferenceNo', title: 'Ref. No.' },
     { name: 'patientName', title: 'Patient Name' },
     { name: 'patientAccountNo', title: 'Acc. No.' },
     { name: 'gender/age', title: 'Gender / Age' },
@@ -163,6 +165,7 @@ export const QueueTableConfig = {
     'visitStatus',
     'queueNo',
   ],
+  identifier: 'reception',
 }
 
 export const QueueColumnExtensions = [
