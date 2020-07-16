@@ -563,7 +563,7 @@ class Banner extends PureComponent {
                               )}
                               {schemeData.schemeTypeFK <= 6 ? (
                                 <div>
-                                  Patient Acute Visit balance: {' '}
+                                  Patient Acute Visit Balance: {' '}
                                   <NumberInput
                                     text
                                     currency
@@ -575,7 +575,7 @@ class Banner extends PureComponent {
                               )}
                               {schemeData.schemeTypeFK <= 6 ? (
                                 <div>
-                                  Patient Acute Clinic balance: {' '}
+                                  Patient Acute Clinic Balance: {' '}
                                   <NumberInput
                                     text
                                     currency
