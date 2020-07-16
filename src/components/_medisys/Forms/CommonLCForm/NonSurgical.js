@@ -138,6 +138,7 @@ const NonSurgical = ({ setFieldValue, values, nonSurgicalChargesSchema }) => {
         isDisabled: (row) => row.surgicalRoleFK === 1,
         onChange: ({ val, option, row }) => {
           if (val && val === 1) {
+            document.activeElement.blur()
             row.surgicalSurgeonFK = values.formData.principalSurgeonFK
             row.surgicalSurgeonMCRNo = values.formData.principalSurgeonMCRNo
             row.surgicalSurgeonName = values.formData.principalSurgeonName
