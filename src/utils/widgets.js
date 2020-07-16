@@ -172,7 +172,8 @@ const widgets = [
     name: 'Patient History',
     accessRight: 'queue.consultation.widgets.patienthistory',
     component: Loadable({
-      loader: () => import('@/pages/Widgets/PatientHistory'),
+      loader: () =>
+        import('@/pages/Widgets/PatientHistory/consultationDisplay'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return <Cmpnet {...p} widget mode='integrated' />
