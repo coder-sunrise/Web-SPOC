@@ -280,7 +280,7 @@ class Banner extends PureComponent {
     })
 
     const { codetable } = this.props
-    const { ctschemetype, copaymentscheme } = codetable
+    const { ctschemetype = [], copaymentscheme = [] } = codetable
     const schemeType = ctschemetype.find(
       (o) => o.id === schemeData.schemeTypeFK,
     )
