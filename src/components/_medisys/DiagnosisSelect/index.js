@@ -74,37 +74,19 @@ const DiagnosisSelect = ({
     const search = {
       props:
         'id,displayvalue,code,complication,isChasAcuteClaimable,isChasChronicClaimable,isHazeClaimable',
-      sorting: [
-        { columnName: 'displayvalue', direction: 'asc' },
-      ],
+
       pagesize: 30,
     }
-    if (typeof v === 'string') {
-      search.group = [
-        {
-          displayvalue: v,
-          code: v,
-          combineCondition: 'or',
-        },
-      ]
-      if (
-        !(
-          diagnosisFilter.length === 0 ||
-          diagnosisFilter.length === filterOptions.length
-        )
-      ) {
-        search.group.push({
-          combineCondition: 'or',
-        })
-        diagnosisFilter.forEach((df) => {
-          search.group[1][df] = true
-        })
-      }
-    } else {
-      search.id = Number(v)
+    search.apiCriteria = {
+      searchValue: v || undefined,
+      diagnosisCategories:
+        diagnosisFilter.length === 0 ||
+        diagnosisFilter.length === filterOptions.length
+          ? undefined
+          : diagnosisFilter.join(),
+      id: typeof v === 'string' ? undefined : Number(v),
     }
 
-    // console.log(diagnosisFilter)
     const response = await queryList('/api/codetable/ctsnomeddiagnosis', search)
     if (response && response.data) {
       setCtDiagnosis(response.data.data)
@@ -138,25 +120,7 @@ const DiagnosisSelect = ({
         options={ctDiagnosis}
         valueField='id'
         labelField='displayvalue'
-        handleFilter={(input, opt) => {
-          const { data } = opt.props
-
-          // default use .indexOf
-          const { diagnosisSearchUseStartWith = false } = clinicSettings
-
-          if (diagnosisSearchUseStartWith) {
-            const found =
-              data.displayvalue.toLowerCase().startsWith(input.toLowerCase()) ||
-              data.code.toLowerCase().startsWith(input.toLowerCase())
-            console.log({ found, input })
-            return found
-          }
-
-          return (
-            data.displayvalue.toLowerCase().indexOf(input.toLowerCase()) >= 0 ||
-            data.code.toLowerCase().indexOf(input.toLowerCase()) >= 0
-          )
-        }}
+        handleFilter={(input, opt) => true}
         // autoComplete
         renderDropdown={(option) => {
           const {
