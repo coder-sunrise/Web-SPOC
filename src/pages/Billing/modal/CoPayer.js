@@ -54,13 +54,16 @@ const validationSchema = Yup.object().shape({
       [
         'patientCopayAmountType',
         'invoiceItems',
+        'selectedRows',
       ],
-      (patientCopayAmountType, invoiceItems, schema) => {
-        let maxAmount = invoiceItems.reduce((p, c) => {
-          return p + (c.payableBalance || 0)
-        }, 0)
+      (patientCopayAmountType, invoiceItems, selectedRows = [], schema) => {
+        let maxAmount = invoiceItems
+          .filter((r) => selectedRows.includes(r.id))
+          .reduce((p, c) => {
+            return p + (c.payableBalance || 0)
+          }, 0)
         const isPercentage =
-          !patientCopayAmountType || patientCopayAmountType === 'Percentag'
+          !patientCopayAmountType || patientCopayAmountType === 'Percentage'
         if (isPercentage) {
           return schema.min(0).max(100)
         }
@@ -107,6 +110,7 @@ class CoPayer extends Component {
       selectedItems,
       patientCopayAmountType,
       patientCopayAmount,
+      selected,
     )
     this.setState({ invoiceItems: newItems })
     this.props.dispatch({
@@ -118,18 +122,22 @@ class CoPayer extends Component {
     invoiceItems,
     patientCopayAmountType = 'Percentage',
     patientCopayAmount,
+    selectedRows,
   ) => {
     const newitems = invoiceItems.map((i) => {
       const payableAmount = i.payableBalance
       let claimAmount = i.payableBalance || 0
 
-      if (i.claimAmount === undefined) {
+      if (!selectedRows.includes(i.id) || i.claimAmount === undefined) {
         return i
       }
 
       if (patientCopayAmount > 0 && payableAmount > 0) {
         if (patientCopayAmountType === 'Percentage') {
-          claimAmount -= roundTo(payableAmount * patientCopayAmount / 100)
+          const amt = roundTo(payableAmount * patientCopayAmount / 100)
+          if (claimAmount > amt) {
+            claimAmount -= amt
+          } else claimAmount = 0
         } else if (payableAmount > patientCopayAmount) {
           claimAmount -= patientCopayAmount
           patientCopayAmount = 0
@@ -144,11 +152,12 @@ class CoPayer extends Component {
   }
 
   reCalcluteClaimAmount = (patientCopayAmountType, patientCopayAmount) => {
-    const { invoiceItems } = this.state
+    const { invoiceItems, selectedRows } = this.state
     const newItems = this.assignPatientCopayAmount(
       invoiceItems,
       patientCopayAmountType,
       patientCopayAmount,
+      selectedRows,
     )
     this.setState({ invoiceItems: newItems })
     this.props.dispatch({
@@ -159,6 +168,8 @@ class CoPayer extends Component {
   handleSelectionChange = (selection) => {
     this.populateClaimAmount(selection)
     this.setState({ selectedRows: selection })
+    const { setFieldValue } = this.props
+    setFieldValue('selectedRows', selection)
   }
 
   onConfirmClick = async () => {
@@ -302,6 +313,7 @@ class CoPayer extends Component {
                       currency
                       label='Patient Copay Amount'
                       defaultValue='0.00'
+                      min={0}
                       precision={2}
                       {...args}
                     />
@@ -312,6 +324,8 @@ class CoPayer extends Component {
                     percentage
                     label='Patient Copay Amount'
                     defaultValue='0.00'
+                    max={100}
+                    min={0}
                     precision={2}
                     {...args}
                   />
@@ -363,10 +377,12 @@ class CoPayer extends Component {
                   },
                   integrated: {
                     calculator: (type, rows, getValue) => {
-                      return rows.reduce((pre, cur) => {
-                        const v = getValue(cur)
-                        return pre + (v || 0)
-                      }, 0)
+                      return rows
+                        .filter((r) => selectedRows.includes(r.id))
+                        .reduce((pre, cur) => {
+                          const v = getValue(cur)
+                          return pre + (v || 0)
+                        }, 0)
                     },
                   },
                   row: {
