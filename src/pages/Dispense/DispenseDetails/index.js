@@ -348,21 +348,13 @@ const DispenseDetails = ({
           </Paper>
         </GridItem>
         <GridItem xs={8} md={9}>
-          <Field
-            name='visitRemarks'
-            render={(args) => {
-              console.log({ args })
-              return (<TextField
-                disabled
-                {...args}
-                multiline
-                label={
-                  formatMessage({
-                    id: 'reception.queue.visitRegistration.visitRemarks',
-                  })
-                }
-              />)
-            }}
+          <TextField
+            value={visitRemarks}
+            disabled
+            multiline
+            label={formatMessage({
+              id: 'reception.queue.visitRegistration.visitRemarks',
+            })}
           />
         </GridItem>
         {!viewOnly && (
