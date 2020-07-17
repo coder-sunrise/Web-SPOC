@@ -136,13 +136,18 @@ class CommonTableGrid extends PureComponent {
       getRowId,
       FuncProps = {},
       columns,
+      identifier,
     } = props
     // console.log(props)
     this.gridId = `view-${uniqueGid++}`
     this.isScrollable = !!pHeight
-    this.hashCode = generateHashCode(JSON.stringify(columns.map((o) => o.name)))
+    this.hashCode =
+      identifier || generateHashCode(JSON.stringify(columns.map((o) => o.name)))
     const { user: { gridSetting = [] } } = window.g_app._store.getState()
-
+    const gs = gridSetting.find((o) => o.Identifier === this.hashCode) || {}
+    if (gs.ColumnsOrder && gs.ColumnsOrder.length !== columns.length) {
+      gs.ColumnsOrder = columns.map((o) => o.name)
+    }
     // this.myRef = React.createRef()
     const { pagerDefaultState = {} } = FuncProps
     this.state = {
@@ -152,8 +157,7 @@ class CommonTableGrid extends PureComponent {
         ...pagerDefaultState,
       },
       rows: [],
-      gridSetting:
-        gridSetting.find((o) => o.Identifier === this.hashCode) || {},
+      gridSetting: gs,
     }
     const cls = classNames({
       [classes.tableStriped]: oddEven,
