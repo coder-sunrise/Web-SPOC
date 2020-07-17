@@ -279,6 +279,7 @@ class Banner extends PureComponent {
       balance,
       patientCoPaymentSchemeFK: schemeData.id,
       schemeTypeFK: schemeData.schemeTypeFK,
+      coPaymentSchemeFK: schemeData.coPaymentSchemeFK,
       validFrom: schemeData.validFrom,
       validTo: schemeData.validTo,
       acuteVisitPatientBalance: acuteVPBal,
@@ -521,10 +522,10 @@ class Banner extends PureComponent {
                           return (
                             <div style={{ marginTop: 10, marginBottom: 10 }}>
                               <div>
-                                {schemeData.schemeTypeFK <= 6 ? (
-                                  schemeData.schemeTypeName
-                                ) : (
+                                {schemeData.coPaymentSchemeFK ? (
                                   schemeData.copaymentSchemeName
+                                ) : (
+                                  schemeData.schemeTypeName
                                 )}
                               </div>
                               <div>
@@ -609,9 +610,9 @@ class Banner extends PureComponent {
                       <div>
                         {entity.patientScheme.slice(0, 2).map((o) => {
                           const schemeData = this.getSchemeDetails(o)
-                          const displayString = `${schemeData.schemeTypeFK <= 6
-                            ? schemeData.schemeTypeName
-                            : schemeData.copaymentSchemeName} (Exp: ${schemeData.validTo
+                          const displayString = `${schemeData.coPaymentSchemeFK
+                            ? schemeData.copaymentSchemeName
+                            : schemeData.schemeTypeName} (Exp: ${schemeData.validTo
                             ? moment(schemeData.validTo).format('DD MMM YYYY')
                             : '-'})`
                           return (
