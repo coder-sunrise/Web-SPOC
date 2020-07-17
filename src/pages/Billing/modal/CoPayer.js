@@ -123,11 +123,11 @@ class CoPayer extends Component {
       const payableAmount = i.payableBalance
       let claimAmount = i.payableBalance || 0
 
-      if (
-        i.claimAmount !== undefined &&
-        patientCopayAmount > 0 &&
-        payableAmount > 0
-      ) {
+      if (i.claimAmount === undefined) {
+        return i
+      }
+
+      if (patientCopayAmount > 0 && payableAmount > 0) {
         if (patientCopayAmountType === 'Percentage') {
           claimAmount -= roundTo(payableAmount * patientCopayAmount / 100)
         } else if (payableAmount > patientCopayAmount) {
@@ -137,9 +137,8 @@ class CoPayer extends Component {
           patientCopayAmount -= payableAmount
           claimAmount = 0
         }
-        return { ...i, claimAmount }
       }
-      return i
+      return { ...i, claimAmount }
     })
     return newitems
   }
