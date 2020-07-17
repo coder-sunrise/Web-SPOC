@@ -69,6 +69,18 @@ class Banner extends PureComponent {
         code: 'ctsalutation',
       },
     })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctschemetype',
+      },
+    })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'copaymentscheme',
+      },
+    })
   }
 
   getAllergyLink (data) {
