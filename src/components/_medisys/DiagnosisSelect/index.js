@@ -79,11 +79,14 @@ const DiagnosisSelect = ({
     }
     search.apiCriteria = {
       searchValue: v || undefined,
-      diagnosisCategories: diagnosisFilter,
+      diagnosisCategories:
+        diagnosisFilter.length === 0 ||
+        diagnosisFilter.length === filterOptions.length
+          ? undefined
+          : diagnosisFilter.join(),
       id: typeof v === 'string' ? undefined : Number(v),
     }
 
-    // console.log(diagnosisFilter)
     const response = await queryList('/api/codetable/ctsnomeddiagnosis', search)
     if (response && response.data) {
       setCtDiagnosis(response.data.data)
