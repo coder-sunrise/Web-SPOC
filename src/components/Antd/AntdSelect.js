@@ -695,6 +695,15 @@ class AntdSelect extends React.PureComponent {
           allowClear={allowClear}
           dropdownMatchSelectWidth={dropdownMatchSelectWidth}
           maxTagPlaceholder={(vv) => {
+            const selectItem = vv.filter((o) => o !== allValue)
+            if (selectItem.length < 1) return null
+            if (selectItem.length === 1) {
+              const selectOption = opts.find(
+                (opt) => opt.props.value === selectItem[0],
+              )
+              if (selectOption) return selectOption.props.label
+              return null
+            }
             return `${vv.filter((o) => o !== allValue)
               .length} ${customTagPlaceholder} selected`
           }}
