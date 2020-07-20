@@ -4,7 +4,12 @@ import { gstChargedTypes, surgicalRoles } from '@/utils/codes'
 import { GridContainer, GridItem, EditableTableGrid } from '@/components'
 import { DoctorLabel } from '@/components/_medisys'
 
-const NonSurgical = ({ setFieldValue, values, nonSurgicalChargesSchema }) => {
+const NonSurgical = ({
+  setFieldValue,
+  values,
+  nonSurgicalChargesSchema,
+  dispatch,
+}) => {
   let isContainsNonPrincipalSurgeon = false
 
   const commitChanges = ({ rows, added, deleted }) => {
@@ -29,6 +34,9 @@ const NonSurgical = ({ setFieldValue, values, nonSurgicalChargesSchema }) => {
       rows[index].sortOrder = index
     }
     setFieldValue('formData.nonSurgicalCharges', rows)
+    dispatch({
+      type: 'global/incrementCommitCount',
+    })
   }
 
   const onAddedRowsChange = (addedRows) => {
