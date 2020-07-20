@@ -32,12 +32,13 @@ let i = 0
   authority: [
     'queue.consultation.order.vaccination',
   ],
-  mapPropsToValues: ({ orders = {} }) => {
+  mapPropsToValues: ({ orders = {}, type }) => {
     const newOrders = orders.entity || orders.defaultVaccination
 
     return {
       minQuantity: 1,
       ...newOrders,
+      type,
       isEditVaccination: !_.isEmpty(orders.entity),
     }
   },
@@ -55,7 +56,7 @@ let i = 0
   handleSubmit: (values, { props, onConfirm, resetForm, setValues }) => {
     const { dispatch, orders, currentType, getNextSequence, user } = props
     const { rows } = orders
-    var batchNo = values.batchNo
+    let { batchNo } = values
     if (batchNo instanceof Array) {
       if (batchNo && batchNo.length > 0) {
         batchNo = batchNo[0]
@@ -319,6 +320,17 @@ class Vaccination extends PureComponent {
     }
   }
 
+  validateAndSubmitIfOk = async () => {
+    const { handleSubmit, validateForm } = this.props
+    const validateResult = await validateForm()
+    const isFormValid = _.isEmpty(validateResult)
+    if (isFormValid) {
+      handleSubmit()
+      return true
+    }
+    return false
+  }
+
   resetVaccinationHistoryResult = () => {
     this.props.dispatch({
       type: 'medicationHistory/updateState',
@@ -351,7 +363,10 @@ class Vaccination extends PureComponent {
               name='inventoryVaccinationFK'
               render={(args) => {
                 return (
-                  <div style={{ position: 'relative' }}>
+                  <div
+                    id={`autofocus_${values.type}`}
+                    style={{ position: 'relative' }}
+                  >
                     <CodeSelect
                       temp
                       label='Vaccination Name'
@@ -572,7 +587,7 @@ class Vaccination extends PureComponent {
           </GridItem>
         </GridContainer>
         {footer({
-          onSave: handleSubmit,
+          onSave: this.validateAndSubmitIfOk,
           onReset: this.handleReset,
         })}
         <CommonModal

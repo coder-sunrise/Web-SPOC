@@ -14,6 +14,7 @@ export default ({
   placement,
   useTimer,
   stopOnClickPropagation = false,
+  hideOnClick = false,
   ...props
 }) => {
   if (disabled) return children
@@ -71,6 +72,7 @@ export default ({
   }
 
   const onOverlayClick = (event) => {
+    if (hideOnClick) setAnchorEl(null)
     if (stopOnClickPropagation) event.stopPropagation()
   }
 

@@ -248,7 +248,8 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
             totalCellComponent: (p) => {
               const { children, column } = p
               if (column.name === 'totalAfterItemAdjustment') {
-                const items = children.props.children
+                const items = children.props.children || []
+
                 const c1 = items.splice(0, items.length - 1)
                 const c2 = items.splice(items.length - 1)
                 return (
