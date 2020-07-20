@@ -47,6 +47,7 @@ const styles = (theme) => ({
 
 const VisitInfoCard = ({
   isReadOnly = false,
+  isVisitRemarksDisabled = false,
   attachments,
   handleUpdateAttachments,
   existingQNo,
@@ -251,6 +252,8 @@ const VisitInfoCard = ({
                 // disabled={isReadOnly}
                 multiline
                 rowsMax={3}
+                authority='none'
+                disabled={isVisitRemarksDisabled}
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.visitRemarks',
                 })}

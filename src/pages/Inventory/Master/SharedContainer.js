@@ -3,7 +3,6 @@ import { CardContainer } from '@/components'
 
 const SharedContainer = ({ global, children }) => {
   const height = global.mainDivHeight
-  console.log(height)
   return (
     <CardContainer
       hideHeader

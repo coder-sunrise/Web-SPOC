@@ -18,6 +18,9 @@ import {
 import Authorized from '@/utils/Authorized'
 import ContextMenu from './ContextMenu'
 
+@connect(({ clinicSettings }) => ({
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
+}))
 class RightClickContextMenu extends React.Component {
   constructor (props) {
     super(props)
@@ -135,6 +138,7 @@ class RightClickContextMenu extends React.Component {
                 show
                 onMenuClick={this.handleContextMenuClick}
                 row={rightClickedRow}
+                clinicSettings
                 {...restProps}
               />
             </Paper>

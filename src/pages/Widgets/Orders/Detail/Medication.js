@@ -6,7 +6,6 @@ import Delete from '@material-ui/icons/Delete'
 import { formatMessage } from 'umi/locale'
 import { VISIT_TYPE } from '@/utils/constants'
 
-import LowStockInfo from './LowStockInfo'
 import {
   Button,
   GridContainer,
@@ -30,6 +29,7 @@ import {
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
+import LowStockInfo from './LowStockInfo'
 import AddFromPast from './AddMedicationFromPast'
 
 const authorityCfg = {
@@ -205,6 +205,7 @@ const authorityCfg = {
       visitPurposeFK: orders.visitPurposeFK,
       drugCode: orders.type === '5' ? 'MISC' : undefined,
     })
+    return true
   },
   displayName: 'OrderPage',
 })
@@ -638,6 +639,17 @@ class Medication extends PureComponent {
     }
   }
 
+  validateAndSubmitIfOk = async () => {
+    const { handleSubmit, validateForm } = this.props
+    const validateResult = await validateForm()
+    const isFormValid = _.isEmpty(validateResult)
+    if (isFormValid) {
+      handleSubmit()
+      return true
+    }
+    return false
+  }
+
   resetMedicationHistoryResult = () => {
     this.props.dispatch({
       type: 'medicationHistory/updateState',
@@ -671,6 +683,7 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
+
     const accessRight = authorityCfg[values.type]
     return (
       <Authorized authority={accessRight}>
@@ -683,11 +696,13 @@ class Medication extends PureComponent {
                     name='drugName'
                     render={(args) => {
                       return (
-                        <TextField
-                          label='Open Prescription Name'
-                          {...args}
-                          autocomplete='nope'
-                        />
+                        <div id={`autofocus_${values.type}`}>
+                          <TextField
+                            label='Open Prescription Name'
+                            {...args}
+                            autocomplete='nope'
+                          />
+                        </div>
                       )
                     }}
                   />
@@ -696,7 +711,10 @@ class Medication extends PureComponent {
                     name='inventoryMedicationFK'
                     render={(args) => {
                       return (
-                        <div style={{ position: 'relative' }}>
+                        <div
+                          id={`autofocus_${values.type}`}
+                          style={{ position: 'relative' }}
+                        >
                           <CodeSelect
                             temp
                             label='Medication Name'
@@ -1291,7 +1309,7 @@ class Medication extends PureComponent {
             </GridItem>
           </GridContainer>
           {footer({
-            onSave: handleSubmit,
+            onSave: this.validateAndSubmitIfOk,
             onReset: this.handleReset,
           })}
           <CommonModal

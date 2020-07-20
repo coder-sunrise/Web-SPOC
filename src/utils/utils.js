@@ -1276,6 +1276,11 @@ const enableTableForceRender = (duration = 1000) => {
   }, duration)
 }
 
+const generateHashCode = (s) =>
+  `${s
+    .split('')
+    .reduce((a, b) => Math.abs((a << 5) - a + b.charCodeAt(0)) | 0, 0)}`
+
 module.exports = {
   ...cdrssUtil,
   ...module.exports,
@@ -1307,6 +1312,7 @@ module.exports = {
   commonDataWriterTransform,
   locationQueryParameters,
   enableTableForceRender,
+  generateHashCode,
   // toUTC,
   // toLocal,
 }

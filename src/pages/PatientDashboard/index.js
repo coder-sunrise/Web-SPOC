@@ -5,13 +5,13 @@ import router from 'umi/router'
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 import { findGetParameter } from '@/utils/utils'
 import { ProgressButton } from '@/components'
-import Banner from './Banner'
 import PatientHistory from '@/pages/Widgets/PatientHistory'
 import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE } from '@/utils/constants'
 import { CallingQueueButton } from '@/components/_medisys'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { initRoomAssignment } from '@/utils/codes'
+import Banner from './Banner'
 
 const styles = (theme) => ({
   ...inputStyle(theme),
@@ -115,19 +115,15 @@ class PatientDashboard extends PureComponent {
         },
       })
       .then((o) => {
-        if (o)
-          // router.push(
-          //   getAppendUrl({
-          //     md2: 'cons',
-          //     cid: o.id,
-          //   }),
-          // )
-
+        if (o) {
+          const patientID = this.props.visitRegistration.entity.visit
+            .patientProfileFK
           router.push(
             `/reception/queue/consultation?qid=${findGetParameter(
               'qid',
-            )}&cid=${o.id}&v=${version}`,
+            )}&cid=${o.id}&pid=${patientID}&v=${version}`,
           )
+        }
       })
   }
 

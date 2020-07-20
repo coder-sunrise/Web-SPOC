@@ -66,6 +66,7 @@
     "html-to-draftjs": "^1.4.0",
     "html-to-text": "^5.1.1",
     "humps": "^2.0.1",
+    "immutable": "^4.0.0-rc.12",
     "jquery": "3.4.1",
     "jsonp": "^0.2.1",
     "lodash": "4.17.15",

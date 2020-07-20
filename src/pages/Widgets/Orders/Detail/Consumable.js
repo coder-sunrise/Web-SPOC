@@ -21,8 +21,12 @@ import LowStockInfo from './LowStockInfo'
   authority: [
     'queue.consultation.order.consumable',
   ],
-  mapPropsToValues: ({ orders = {}, type }) =>
-    orders.entity || orders.defaultConsumable,
+  mapPropsToValues: ({ orders = {}, type }) => {
+    return {
+      ...(orders.entity || orders.defaultConsumable),
+      type,
+    }
+  },
   enableReinitialize: true,
   validationSchema: Yup.object().shape({
     inventoryConsumableFK: Yup.number().required(),
@@ -202,6 +206,17 @@ class Consumable extends PureComponent {
     }
   }
 
+  validateAndSubmitIfOk = async () => {
+    const { handleSubmit, validateForm } = this.props
+    const validateResult = await validateForm()
+    const isFormValid = _.isEmpty(validateResult)
+    if (isFormValid) {
+      handleSubmit()
+      return true
+    }
+    return false
+  }
+
   render () {
     const {
       theme,
@@ -221,7 +236,10 @@ class Consumable extends PureComponent {
               name='inventoryConsumableFK'
               render={(args) => {
                 return (
-                  <div style={{ position: 'relative' }}>
+                  <div
+                    id={`autofocus_${values.type}`}
+                    style={{ position: 'relative' }}
+                  >
                     <CodeSelect
                       temp
                       label='Consumable Name'
@@ -352,7 +370,7 @@ class Consumable extends PureComponent {
           </GridItem>
         </GridContainer>
         {footer({
-          onSave: handleSubmit,
+          onSave: this.validateAndSubmitIfOk,
           onReset: this.handleReset,
         })}
       </div>

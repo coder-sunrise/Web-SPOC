@@ -206,8 +206,7 @@ class Grid extends React.Component {
           loading={isLoading || queryingFormData}
           text={loadingText}
         >
-          {filter !== StatusIndicator.APPOINTMENT &&
-          filter !== StatusIndicator.E_QUEUE && (
+          {filter !== StatusIndicator.APPOINTMENT && (
             <CommonTableGrid
               size='sm'
               TableProps={TableProps}
