@@ -11,6 +11,7 @@ import {
   INVOICE_ITEM_TYPE_BY_NAME,
   ORDER_TYPE_TAB,
   CLINIC_TYPE,
+  REVENUE_CATEGORY,
 } from '@/utils/constants'
 import { roundTo, getUniqueId } from '@/utils/utils'
 import Order from '../../Widgets/Orders'
@@ -55,7 +56,7 @@ const AddOrder = ({
               medicationItem = inventorymedication.find(
                 (medication) =>
                   medication.id ===
-                    o.retailVisitInvoiceDrug.inventoryMedicationFK &&
+                  o.retailVisitInvoiceDrug.inventoryMedicationFK &&
                   medication.isActive,
               )
             } else {
@@ -92,7 +93,7 @@ const AddOrder = ({
             const { serviceId, serviceCenterId } = servicesList.find(
               (s) =>
                 s.serviceCenter_ServiceId ===
-                  o.retailVisitInvoiceService.serviceCenterServiceFK &&
+                o.retailVisitInvoiceService.serviceCenterServiceFK &&
                 s.isActive,
             )
             const serviceItem = ctservice.find(
@@ -118,7 +119,7 @@ const AddOrder = ({
             const consumableItem = inventoryconsumable.find(
               (consumable) =>
                 consumable.id ===
-                  o.retailVisitInvoiceConsumable.inventoryConsumableFK &&
+                o.retailVisitInvoiceConsumable.inventoryConsumableFK &&
                 consumable.isActive,
             )
             obj = {
@@ -187,7 +188,7 @@ const AddOrder = ({
                 </ul>
               </div>
             ),
-            onConfirmSave: () => {},
+            onConfirmSave: () => { },
           },
         })
       }
@@ -386,7 +387,7 @@ export default compose(
               const medication = inventorymedication.find(
                 (c) => c.id === o.inventoryMedicationFK,
               )
-              revenueCategory = medication ? medication.revenueCategory : {}
+              revenueCategory = medication ? medication.revenueCategory : { id: REVENUE_CATEGORY.OTHER }
               const {
                 corPrescriptionItemInstruction,
                 corPrescriptionItemPrecaution,
