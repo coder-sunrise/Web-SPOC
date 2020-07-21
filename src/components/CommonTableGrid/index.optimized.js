@@ -702,23 +702,15 @@ class CommonTableGrid extends PureComponent {
       Identifier: this.hashCode,
       ...data,
     }
-    userService.saveUserPreference({
-      userPreferenceDetails: JSON.stringify(newData),
-      itemIdentifier: this.hashCode,
-      type: 4,
+
+    window.g_app._store.dispatch({
+      type: 'user/saveUserPreference',
+      payload: {
+        data: newData,
+        itemIdentifier: this.hashCode,
+      },
     })
 
-    const userSession = JSON.parse(sessionStorage.getItem('user'))
-    const { gridSetting } = userSession
-    const existIndex = gridSetting.indexOf(
-      gridSetting.find((o) => o.Identifier === this.hashCode),
-    )
-    if (existIndex >= 0) {
-      gridSetting.splice(existIndex, 1, newData)
-    } else {
-      gridSetting.push(newData)
-    }
-    sessionStorage.setItem('user', JSON.stringify(userSession))
     if (cb) cb()
   }
 
