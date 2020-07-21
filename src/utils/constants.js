@@ -452,3 +452,13 @@ export const FORM_CATEGORY = {
   VISITFORM: 1,
   CORFORM: 2,
 }
+
+export const REVENUE_CATEGORY = {
+  CONSULTATION: 1,
+  EXAMINATION: 2,
+  PROCEDURE: 3,
+  DIAGNOSTIC: 4,
+  DRUG: 5,
+  CONSUMABLE: 6,
+  OTHER: 7,
+}
