@@ -185,12 +185,12 @@ class PatientNurseNotes extends PureComponent {
                   hideHeader
                   title='History'
                   style={{
-                    height: 'calc(100vh - 255px)',
+                    height: 'calc(100vh - 305px)',
                   }}
                 >
                   <div
                     style={{
-                      height: 'calc(100vh - 280px)',
+                      height: 'calc(100vh - 330px)',
                       marginTop: '15px',
                       overflow: 'scroll',
                     }}
@@ -226,7 +226,7 @@ class PatientNurseNotes extends PureComponent {
                 hideHeader
                 title='Current'
                 style={{
-                  height: 'calc(100vh - 255px)',
+                  height: 'calc(100vh - 305px)',
                 }}
               >
                 <GridItem md={12}>
