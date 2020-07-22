@@ -3,7 +3,7 @@ import { formatMessage } from 'umi/locale'
 import moment from 'moment'
 import {
   dateFormatLong,
-  dateFormatLongWithTimeNoSec,
+  dateFormatLongWithTime,
   Field,
   FastField,
   RadioGroup,
@@ -22,7 +22,7 @@ const PatientNurseNotesContent = ({ canEdit, entity, handleEdit }) => {
     createByUserTitle = '',
     notes,
   } = entity
-  const formateDate = moment(createDate).format(dateFormatLongWithTimeNoSec)
+  const formateDate = moment(createDate).format('DD MMM YYYY HH:mm')
   const createByUserFullName = `${createByUserTitle} ${createByUserName}`
   let e = document.createElement('div')
   e.innerHTML = notes
