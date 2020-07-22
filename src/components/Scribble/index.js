@@ -1206,7 +1206,7 @@ class Scribble extends React.Component {
                   )
                 }
                 onChange={this._onSketchChange}
-                forceValue={false}
+                forceValue
                 height={this.state.sketchHeight}
                 width={this.state.sketchWidth}
               />
