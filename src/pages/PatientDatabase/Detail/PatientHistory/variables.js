@@ -4,7 +4,8 @@ import AppointmentHistory from '@/pages/Widgets/AppointmentHistory'
 import DispenseHistory from '@/pages/Widgets/DispenseHistory'
 import { PATIENT_HISTORY_TABS } from '@/utils/constants'
 import InvoiceHistory from '@/pages/Widgets/InvoiceHistory'
-import PatientNurseNotes from '@/pages/patientdatabase/Detail/PatientNurseNotes'
+import PatientNurseNotes from '@/pages/PatientDatabase/Detail/PatientNurseNotes'
+import ViewPatientNurseNotes from '@/pages/Widgets/PatientNurseNotes'
 
 const addContent = (type, props) => {
   switch (type) {
@@ -17,6 +18,11 @@ const addContent = (type, props) => {
     case PATIENT_HISTORY_TABS.INVOICE:
       return <InvoiceHistory mode='integrated' {...props} />
     case PATIENT_HISTORY_TABS.NURSENOTES:
+      const accessRight = Authorized.check(
+        'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
+      )
+      if (accessRight.rights === 'disable')
+        return <ViewPatientNurseNotes {...props} />
       return <PatientNurseNotes {...props} />
     default:
       return <PatientHistory {...props} />
@@ -28,7 +34,8 @@ const checkAccessRight = (accessRightNames) => {
 
   for (let i = 0; i < accessRightNames.length; i++) {
     const accessRight = Authorized.check(accessRightNames[i])
-    if (accessRight.rights === 'enable') return true
+    if (accessRight.rights === 'hidden') return false
+    return true
   }
   return false
 }
