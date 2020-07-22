@@ -673,6 +673,7 @@ class SketchField extends PureComponent {
     // }, 10000)
 
     canvas.loadFromJSON(json, () => {
+      this._selectedTool.configureCanvas(this.props)
       canvas.renderAll()
       // if (this.props.onChange) {
       //   this.props.onChange()

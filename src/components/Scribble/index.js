@@ -449,6 +449,7 @@ class Scribble extends React.Component {
 
   @keydown('ctrl+z')
   shortcutKeyUndo () {
+    if (this.props.scriblenotes.isReadonly) return
     if (this.state.canUndo) {
       this._undo()
     }
@@ -456,6 +457,7 @@ class Scribble extends React.Component {
 
   @keydown('ctrl+y')
   shortcutKeyRedo () {
+    if (this.props.scriblenotes.isReadonly) return
     if (this.state.canRedo) {
       this._redo()
     }
@@ -463,6 +465,7 @@ class Scribble extends React.Component {
 
   @keydown('delete')
   shortcutKeyDelete () {
+    if (this.props.scriblenotes.isReadonly) return
     const result = this._sketch._deleteSelectedObject()
     if (!result) {
       this.setState({
@@ -1203,7 +1206,7 @@ class Scribble extends React.Component {
                   )
                 }
                 onChange={this._onSketchChange}
-                forceValue
+                forceValue={false}
                 height={this.state.sketchHeight}
                 width={this.state.sketchWidth}
               />
