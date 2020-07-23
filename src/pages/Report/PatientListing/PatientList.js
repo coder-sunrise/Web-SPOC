@@ -51,8 +51,8 @@ class PatientList extends PureComponent {
     ]
     const SummaryRow = (p) => {
       const { children } = p
-      let countCol = children.find((c) => {
-        return c.props.tableColumn.column.name === 'patientReferenceNo'
+      let countCol = children.find((c) => { 
+        return c.props.tableColumn.column && c.props.tableColumn.column.name === 'patientReferenceNo'
       })
       if (countCol) {
         const newChildren = [
