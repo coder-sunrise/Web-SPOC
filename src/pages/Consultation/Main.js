@@ -350,8 +350,8 @@ const discardConsultation = ({
               shouldPromptConfirm: false,
               action: 'sign',
               successCallback: () => {
+                dispatch({ type: `consultation/closeSignOffModal` })
                 if (result && result.length > 0) {
-                  dispatch({ type: `consultation/closeSignOffModal` })
                   let printedData = result
                   if (printedData && printedData.length > 0) {
                     const token = localStorage.getItem('token')
