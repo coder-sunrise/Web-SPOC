@@ -124,9 +124,8 @@ class Details extends PureComponent {
               <ProgressButton
                 color='primary'
                 onClick={this.handleRefresh}
-                icon={null}
+                icon={<Refresh />}
               >
-                <Refresh />
                 <FormattedMessage id='finance.statement.details.refreshStatement' />
               </ProgressButton>
               <PrintStatementReport id={values.id}>
@@ -192,6 +191,9 @@ class Details extends PureComponent {
               width: 100,
             },
           ]}
+          TableProps={{
+            height: 'calc(100vh - 370px)',
+          }}
           FuncProps={{
             pager: false,
             selectable: true,
