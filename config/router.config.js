@@ -1171,12 +1171,12 @@ const _routes = [
             ],
           },
           {
-              path: '/setting/refractiontesttype',
-              name: 'refractiontesttype',
-              component: './Setting/RefractionTestType',
-              authority: [
-                  'settings.clinicsetting.refractiontesttype',
-              ],
+            path: '/setting/refractiontesttype',
+            name: 'refractiontesttype',
+            component: './Setting/RefractionTestType',
+            authority: [
+              'settings.clinicsetting.refractiontesttype',
+            ],
           },
         ],
       },
@@ -1246,7 +1246,7 @@ const routes =
   process.env.NODE_ENV === 'production'
     ? _routes
     : _routes.map((r, index) => {
-        if (index === 1) {
+        if (index === 2) {
           return {
             ...r,
             routes: [
@@ -1258,4 +1258,4 @@ const routes =
         return r
       })
 
-export default _routes
+export default routes

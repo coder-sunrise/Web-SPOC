@@ -205,12 +205,12 @@ const styles = () => ({})
 })
 class StatementDetails extends PureComponent {
   componentDidMount = () => {
-    const { statement, dispatch, history } = this.props
-    if (statement.currentId) {
+    const { statement, dispatch, history, match } = this.props
+    if (match.params.id) {
       dispatch({
         type: 'statement/refreshStatement',
         payload: {
-          id: statement.currentId,
+          id: match.params.id,
         },
       }).then((response) => {
         if (response) this.fetchLatestBizSessions()

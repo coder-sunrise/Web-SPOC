@@ -31,6 +31,7 @@ import {
   CustomPaging,
   TreeDataState,
   CustomTreeData,
+  VirtualTableState,
 } from '@devexpress/dx-react-grid'
 
 import {
@@ -85,7 +86,6 @@ import styles from './style'
 
 // console.log(userService)
 window.$tempGridRow = {}
-
 const cellStyle = {
   cell: {
     // borderRight: '1px solid rgba(0, 0, 0, 0.12)',
@@ -135,7 +135,7 @@ class CommonTableGrid extends PureComponent {
       editableGrid,
       getRowId,
       FuncProps = {},
-      columns,
+      columns = [],
       identifier,
     } = props
     // console.log(props)
@@ -170,6 +170,7 @@ class CommonTableGrid extends PureComponent {
 
     this.TableBase = ({ height, scrollable, dispatch, ...restProps }) => {
       const isScrollable = !!height
+      console.log(height)
       const dragCfg = {}
       // if(rowDragable){
       //   dragCfg.rowComponent=({ row, ...restProps }) => {
@@ -393,6 +394,12 @@ class CommonTableGrid extends PureComponent {
           },
         },
         TableHeaderCell: {
+          cell: {
+            ...cellStyle.cell,
+            borderTop: '1px solid rgba(0, 0, 0, 0.12)',
+          },
+        },
+        TableSelectAllCell: {
           cell: {
             ...cellStyle.cell,
             borderTop: '1px solid rgba(0, 0, 0, 0.12)',
@@ -1107,6 +1114,7 @@ class CommonTableGrid extends PureComponent {
               <RowErrorTypeProvider {...cellComponentConfig} /> */}
               {(columnReorderable || grouping) && <DragDropProvider />}
               {tree && <CustomTreeData getChildRows={this.getChildRows} />}
+
               <TableBase
                 // height={height}
                 bodyComponent={this.TableBody}
