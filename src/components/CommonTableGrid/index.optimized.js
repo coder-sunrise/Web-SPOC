@@ -170,8 +170,7 @@ class CommonTableGrid extends PureComponent {
 
     this.TableBase = ({ height, scrollable, dispatch, ...restProps }) => {
       const isScrollable = !!height
-      console.log(height)
-      const dragCfg = {}
+      // const dragCfg = {}
       // if(rowDragable){
       //   dragCfg.rowComponent=({ row, ...restProps }) => {
       //     const TableRow = SortableElement(this.TableRow);
