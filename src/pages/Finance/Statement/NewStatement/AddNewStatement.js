@@ -502,7 +502,40 @@ class AddNewStatement extends PureComponent {
             </h4>
           </div>
           <GridContainer style={{ margin: theme.spacing(1), marginTop: 0 }}>
-            <GridItem container direction='row' spacing={0} />
+            <GridItem container direction='row' spacing={0}>
+              <GridItem xs md={3}>
+                <FastField
+                  name='InvoiceNo'
+                  render={(args) => <TextField label='Invoice No' {...args} />}
+                />
+              </GridItem>
+
+              <GridItem md={3}>
+                <FastField
+                  name='effectiveDates'
+                  render={(args) => {
+                    return (
+                      <DateRangePicker
+                        label='Invoice From Date'
+                        label2='Invoice To Date'
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+              <GridItem classes={{ grid: classes.searchBtn }} xs md={3}>
+                <ProgressButton
+                  color='primary'
+                  disabled={!values.copayerFK}
+                  onClick={() => this.getInvoiceList()}
+                  icon={<p />}
+                >
+                  <Search />
+                  <FormattedMessage id='form.search' />
+                </ProgressButton>
+              </GridItem>
+            </GridItem>
           </GridContainer>
           <GridItem xs={12}>
             <CommonTableGrid
