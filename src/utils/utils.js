@@ -1313,6 +1313,7 @@ module.exports = {
   locationQueryParameters,
   enableTableForceRender,
   generateHashCode,
+  roundTo,
   // toUTC,
   // toLocal,
 }

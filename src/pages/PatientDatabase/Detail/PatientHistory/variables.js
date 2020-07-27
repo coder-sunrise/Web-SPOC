@@ -6,6 +6,7 @@ import { PATIENT_HISTORY_TABS } from '@/utils/constants'
 import InvoiceHistory from '@/pages/Widgets/InvoiceHistory'
 import PatientNurseNotes from '@/pages/PatientDatabase/Detail/PatientNurseNotes'
 import ViewPatientNurseNotes from '@/pages/Widgets/PatientNurseNotes'
+import PatientDeposit from '@/pages/patientdatabase/Detail/patientdeposit'
 
 const addContent = (type, props) => {
   switch (type) {
@@ -24,6 +25,8 @@ const addContent = (type, props) => {
       if (accessRight.rights === 'disable')
         return <ViewPatientNurseNotes {...props} />
       return <PatientNurseNotes {...props} />
+    case PATIENT_HISTORY_TABS.DEPOSIT:
+      return <PatientDeposit {...props} />
     default:
       return <PatientHistory {...props} />
   }
@@ -69,6 +72,14 @@ export const PatientHistoryTabOption = (props) => {
       authority: [
         'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
       ],
+    },
+    {
+      id: PATIENT_HISTORY_TABS.DEPOSIT,
+      name: 'Deposit',
+      authority: [
+        'patientdatabase.patientprofiledetails.patienthistory.deposit',
+      ],
+      content: addContent(PATIENT_HISTORY_TABS.DEPOSIT, props),
     },
   ]
   return Tabs.filter((f) => checkAccessRight(f.authority))
