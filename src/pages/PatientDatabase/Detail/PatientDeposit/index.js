@@ -87,6 +87,15 @@ class PatientDeposit extends PureComponent {
         id: patientId,
       },
     })
+    dispatch({
+      type: 'deposit/updateState',
+      payload: {
+        entity: {},
+        list: [],
+        pagination: {},
+        queryCount: 0,
+      },
+    })
   }
 
   toggleReportViewer = (reportID, reportParameters = {}) => {
@@ -139,7 +148,6 @@ class PatientDeposit extends PureComponent {
   render () {
     const { dispatch, user, patient: { deposit }, classes } = this.props
     const { selectedTypeIds, showDeleteConfirmation } = this.state
-    const patientId = Number(findGetParameter('pid'))
 
     let transactionList = []
     let totalAmount = 0
