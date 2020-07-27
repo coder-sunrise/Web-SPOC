@@ -41,6 +41,11 @@ import Contact from './Contact'
         then: Yup.number().required(),
         otherwise: Yup.number().nullable(),
       }),
+      adminCharge: Yup.number().when('settingCompany', {
+        is: () => settingCompany.companyType.id === 1,
+        then: Yup.number().min(0),
+        otherwise: Yup.number().nullable(),
+      }),
       statementAdjustment: Yup.number().when('settingCompany', {
         is: () => settingCompany.companyType.id === 1,
         then: Yup.number().min(0),
@@ -222,6 +227,7 @@ class Detail extends PureComponent {
                           currency
                           label='Corporate Charges'
                           defaultValue='0.00'
+                          min={0}
                           precision={2}
                           {...args}
                         />
@@ -232,6 +238,7 @@ class Detail extends PureComponent {
                         percentage
                         label='Corporate Charges'
                         defaultValue='0.00'
+                        min={0}
                         precision={2}
                         {...args}
                       />
@@ -303,50 +310,54 @@ class Detail extends PureComponent {
                   </GridItem>
                 </React.Fragment>
               )}
-
-              <GridItem md={4}>
-                <Field
-                  name='autoInvoiceAdjustment'
-                  render={(args) => {
-                    if (values.autoInvoiceAdjustmentType === 'ExactAmount') {
-                      return (
-                        <NumberInput
-                          currency
-                          label='Invoice Adjustment'
-                          defaultValue='0.00'
-                          precision={2}
+              {isCopayer && (
+                <React.Fragment>
+                  <GridItem md={4}>
+                    <Field
+                      name='autoInvoiceAdjustment'
+                      render={(args) => {
+                        if (
+                          values.autoInvoiceAdjustmentType === 'ExactAmount'
+                        ) {
+                          return (
+                            <NumberInput
+                              currency
+                              label='Invoice Adjustment'
+                              defaultValue='0.00'
+                              precision={2}
+                              {...args}
+                            />
+                          )
+                        }
+                        return (
+                          <NumberInput
+                            percentage
+                            label='Invoice Adjustment'
+                            defaultValue='0.00'
+                            precision={2}
+                            {...args}
+                          />
+                        )
+                      }}
+                    />
+                  </GridItem>
+                  <GridItem md={2}>
+                    <Field
+                      name='autoInvoiceAdjustmentType'
+                      render={(args) => (
+                        <Switch
+                          checkedChildren='$'
+                          checkedValue='ExactAmount'
+                          unCheckedChildren='%'
+                          unCheckedValue='Percentage'
+                          label=' '
                           {...args}
                         />
-                      )
-                    }
-                    return (
-                      <NumberInput
-                        percentage
-                        label='Invoice Adjustment'
-                        defaultValue='0.00'
-                        precision={2}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-              <GridItem md={2}>
-                <Field
-                  name='autoInvoiceAdjustmentType'
-                  render={(args) => (
-                    <Switch
-                      checkedChildren='$'
-                      checkedValue='ExactAmount'
-                      unCheckedChildren='%'
-                      unCheckedValue='Percentage'
-                      label=' '
-                      {...args}
+                      )}
                     />
-                  )}
-                />
-              </GridItem>
-
+                  </GridItem>
+                </React.Fragment>
+              )}
               <GridItem md={2}>
                 {!isCopayer ? (
                   <div style={{ position: 'relative' }}>
