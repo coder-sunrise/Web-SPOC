@@ -299,19 +299,6 @@ export default createFormViewModel({
           },
         })
       },
-      *queryDeposit ({ payload }, { call, put }) {
-        const response = yield call(service.queryDeposit, payload)
-        if (response && response.status === '200') {
-          const { data } = response
-
-          yield put({
-            type: 'updateState',
-            payload: {
-              deposit: data,
-            },
-          })
-        }
-      },
     },
     reducers: {
       updateDefaultEntity (state, { payload }) {

@@ -29,5 +29,4 @@ module.exports = {
   update: (params) => service.update(url, params),
   upsert: (params) => service.upsert(url, params),
   requestChasBalance: (params) => service.upsert(chasBalanceUrl, params),
-  queryDeposit: (params) => service.query(`${url}/Deposit`, params),
 }
