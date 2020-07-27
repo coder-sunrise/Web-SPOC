@@ -50,6 +50,8 @@ class FilterBar extends PureComponent {
 
   addDepositRefund = async (isDeposit) => {
     const { dispatch, patient: { deposit } } = this.props
+    const patientId = Number(findGetParameter('pid'))
+
     if (deposit && deposit.id > 0) {
       await dispatch({
         type: 'deposit/queryOne',
@@ -62,7 +64,9 @@ class FilterBar extends PureComponent {
         type: 'deposit/updateState',
         payload: {
           showModal: true,
-          entity: {},
+          entity: {
+            patientProfileFK: patientId,
+          },
         },
       })
     }
