@@ -14,7 +14,7 @@ import PaymentDetails from './PaymentDetails'
 import AppliedSchemes from './AppliedSchemes'
 // styling
 import styles from './styles'
-
+ 
 const Content = ({ classes, clinicSettings, values, ...restProps }) => {
   const { invoiceDetail, invoicePayment, dispatch } = restProps
   const { currentBizSessionInfo } = invoicePayment
@@ -33,6 +33,10 @@ const Content = ({ classes, clinicSettings, values, ...restProps }) => {
     if (bizSessionFK === '') return false
 
     if (bizSessionFK && invoiceBizSessionFK) {
+      // temperary enhancement for Bless Xray only
+      if (clinicSettings.enablePaymentInFinanceWithoutSessionClose) {
+        return false
+      }
       const isSameBizSessionAndIsSessionClosed =
         parseInt(bizSessionFK, 10) === parseInt(invoiceBizSessionFK, 10) &&
         !currentBizSessionInfo.isClinicSessionClosed
