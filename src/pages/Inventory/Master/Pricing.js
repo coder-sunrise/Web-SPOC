@@ -183,7 +183,7 @@ const Pricing = ({
                         id: 'inventory.master.pricing.suggestedSellingPrice',
                       })}
                       disabled={isEditMode()}
-                      precision={4}
+                      precision={2}
                       {...args}
                     />
                   )}
