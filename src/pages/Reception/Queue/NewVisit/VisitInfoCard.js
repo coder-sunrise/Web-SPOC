@@ -90,7 +90,7 @@ const VisitInfoCard = ({
       totalTempCharge = getVisitOrderTemplateTotal(visitType, template)
     }
     if ((value || 0) > totalTempCharge) {
-      return `Total Charges can not more than visit template total amount(${totalTempCharge}).`
+      return `Cannot more than default charges(${totalTempCharge}).`
     }
     return ''
   }
