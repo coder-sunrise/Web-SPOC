@@ -5,7 +5,6 @@ import * as Yup from 'yup'
 import { formatMessage } from 'umi/locale'
 import { withStyles, Divider } from '@material-ui/core'
 import { getBizSession } from '@/services/queue'
-import Authorized from '@/utils/Authorized'
 import {
   GridContainer,
   GridItem,
@@ -20,7 +19,9 @@ import {
   serverDateFormat,
 } from '@/components'
 
-import { CreditCardNumberInput } from '@/components/_medisys'
+import { 
+  CreditCardNumberInput,
+} from '@/components/_medisys'
 
 const style = () => ({
   totalPayment: {
@@ -89,6 +90,12 @@ const style = () => ({
         creditCardTypeFK: Yup.number().when('transactionModeFK', {
           is: (val) => val === 1,
           then: Yup.number().required(),
+        }),
+        cardNumber: Yup.string().nullable().when('transactionModeFK', {
+          is: (val) => val === 1,
+          then: Yup.string()
+            .nullable()
+            .length(4, 'Enter 4 digits of the card number'),
         }),
 
         // cardNumber: Yup.number().when('transactionModeFK', {
@@ -300,6 +307,7 @@ class Modal extends PureComponent {
       setFieldValue('patientDepositTransaction.creditCardTypeFK', 1)
     } else {
       this.setState({ isCardPayment: false })
+      setFieldValue('patientDepositTransaction.cardNumber', '')
       setFieldValue('patientDepositTransaction.creditCardTypeFK', undefined)
     }
   }
@@ -328,11 +336,7 @@ class Modal extends PureComponent {
       // rightAlign: true,
       noUnderline: true,
     }
-    const accessRight = Authorized.check('finance/deposit/addtopastsession')
 
-    const allowAddToPastSession = accessRight && accessRight.rights === 'enable'
-
-    //
     return (
       <React.Fragment>
         <div>
@@ -347,25 +351,21 @@ class Modal extends PureComponent {
                     disabledDate={(d) => !d || d.isAfter(moment())}
                     label='Date'
                     autoFocus
-                    disabled={!allowAddToPastSession}
                     {...args}
                   />
                 )}
               />
             </GridItem>
+
             <GridItem xs={12}>
               <Field
                 name='patientDepositTransaction.transactionBizSessionFK'
                 render={(args) => (
-                  <Select
-                    label='Session'
-                    options={bizSessionList}
-                    {...args}
-                    disabled={!allowAddToPastSession}
-                  />
+                  <Select label='Session' options={bizSessionList} {...args} />
                 )}
               />
             </GridItem>
+
             <GridItem xs={12}>
               <Field
                 name='patientDepositTransaction.transactionModeFK'
@@ -388,7 +388,6 @@ class Modal extends PureComponent {
                 )}
               />
             </GridItem>
-
             {isCardPayment && (
               <GridItem xs={12}>
                 <Field
@@ -403,21 +402,24 @@ class Modal extends PureComponent {
                 />
               </GridItem>
             )}
-
-            <GridItem xs={12}>
+            {isCardPayment && (
+              <GridItem xs={12}>
+                <Field
+                  name='patientDepositTransaction.cardNumber'
+                  render={(args) => (
+                    <CreditCardNumberInput {...args} /> 
+                  )}
+                />
+              </GridItem>
+            )}
+            {/* <GridItem xs={12}>
               <Field
-                name='patientDepositTransaction.modeRemarks'
+                name='remarks'
                 render={(args) => (
-                  <TextField
-                    multiline
-                    rowsMax='3'
-                    label='Mode Remarks'
-                    maxLength={200}
-                    {...args}
-                  />
+                  <TextField multiline rowsMax='5' label='Remarks' {...args} />
                 )}
               />
-            </GridItem>
+            </GridItem> */}
             <GridItem xs={12}>
               <Field
                 name='patientDepositTransaction.remarks'

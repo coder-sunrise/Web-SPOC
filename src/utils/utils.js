@@ -1268,7 +1268,6 @@ module.exports = {
   commonDataWriterTransform,
   locationQueryParameters,
   enableTableForceRender,
-  roundTo,
   // toUTC,
   // toLocal,
 }

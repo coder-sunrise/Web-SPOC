@@ -16,13 +16,7 @@ module.exports = {
     })
     return r
   },
-  deleteTransaction: async (params) => {
-    const r = await request(`${url}/transaction/${params.id}`, {
-      method: 'DELETE',
-      body: params.reason,
-    })
-    return r
-  },
+
   query: (params) => service.query(url, params),
   queryBizSession: (params) => service.queryList(bizSessionUrl, params),
 }
