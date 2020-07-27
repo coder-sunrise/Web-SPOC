@@ -328,7 +328,7 @@ class Modal extends PureComponent {
       // rightAlign: true,
       noUnderline: true,
     }
-    const accessRight = Authorized.check('finance/deposit/addtopastsession')
+    const accessRight = Authorized.check('finance.deposit.addtopastsession')
 
     const allowAddToPastSession = accessRight && accessRight.rights === 'enable'
 
