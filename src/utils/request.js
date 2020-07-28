@@ -288,7 +288,7 @@ const request = (
   ) {
     newUrl = dynamicURL + newUrl
   }
-  const requestTimeoutInMs = 60000
+  const requestTimeoutInMs = 120000
   try {
     let r = $.when(
       $.ajax({
