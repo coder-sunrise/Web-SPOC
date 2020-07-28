@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { withStyles } from '@material-ui/core'
+import { connect } from 'dva'
 import * as Yup from 'yup'
 import {
   TextField,
@@ -12,6 +13,10 @@ import {
   Checkbox,
   OutlinedTextField,
 } from '@/components'
+import moment from 'moment'
+import Print from '@material-ui/icons/Print'
+import { commonDataReaderTransform } from '@/utils/utils'
+import AuthorizedContext from '@/components/Context/Authorized'
 
 import Grid from './Grid'
 import NearAddGrid from './NearAddGrid'
@@ -20,7 +25,10 @@ const styles = (theme) => ({})
 const gridValidationSchema = Yup.object().shape({
   EyeRefractionTestTypeFK: Yup.number().min(0, 'This field is required'),
 })
-
+@connect(({ patient, visitRegistration }) => ({
+  patient,
+  visitRegistration,
+}))
 class RefractionForm extends PureComponent {
   onCommitChanges = (p) => {
     const { rows = [], deleted, form: { setFieldValue } } = p
@@ -59,8 +67,11 @@ class RefractionForm extends PureComponent {
   }
 
   getRows = (args) => {
-    const { form: { values } } = args
-    let thisFormData = Object.byString(values, this.props.prefix)
+    let thisFormData
+    if (args && args.form) {
+      const { form: { values } } = args
+      thisFormData = Object.byString(values, this.props.prefix)
+    }
     return thisFormData ? thisFormData.Tests || [] : []
   }
 
@@ -136,12 +147,59 @@ class RefractionForm extends PureComponent {
     }
   }
 
+  handlePrintPrescription = (args) => {
+    const rows = this.getRows(args) || {}
+    const selectedRows = rows.filter((r) => r.IsSelected === true)
+    if (selectedRows.length !== 1) {
+      return
+    }
+
+    const { patient, visitRegistration, prefix } = this.props
+    const { entity } = patient
+    const { entity: visitEntity, visitInfo: { visit } } = visitRegistration
+    const { form: { values } } = args
+
+    let visitDate
+    if (visitEntity && visitEntity.visit) {
+      visitDate = visitEntity.visit.visitDate
+    } else if (visit) {
+      visitDate = visit.visitDate
+    } else visitDate = moment().formatUTC(true)
+
+    let formData = Object.byString(values, prefix) || {}
+    const reportParameters = {
+      ...selectedRows[0],
+      visitDate,
+      patientName: entity.name,
+      patientAccountNo: entity.patientAccountNo,
+      remarks: formData.TestRemarks,
+    }
+
+    window.g_app._store.dispatch({
+      type: 'report/updateState',
+      payload: {
+        reportTypeID: 61,
+        reportParameters: {
+          isSaved: false,
+          reportContent: JSON.stringify(
+            commonDataReaderTransform({
+              RefractionTestDetails: [
+                reportParameters,
+              ],
+            }),
+          ),
+        },
+      },
+    })
+  }
+
   render () {
-    const { theme, prefix } = this.props
-    // const isDisabledPrint = () => {
-    //   const rows = this.getRows()
-    //   return !rows || rows.filter((r) => r.IsSelected === true).length !== 1
-    // }
+    const { theme, prefix, isEditable = true } = this.props
+    const isDisabledPrint = (args) => {
+      const rows = this.getRows(args)
+
+      return !rows || rows.filter((r) => r.IsSelected === true).length !== 1
+    }
 
     // console.log(values)
     // console.log('render ', Object.byString(values, prefix))
@@ -149,147 +207,158 @@ class RefractionForm extends PureComponent {
     const _prefix = `${prefix}.`
     return (
       <GridContainer>
-        <GridContainer style={{ marginTop: theme.spacing(1) }}>
-          <GridItem xs sm={2} md={2} style={{ marginTop: '20px' }}>
-            <TextField value='Tonometry' text />
-          </GridItem>
-          <GridItem xs sm={4} md={3}>
-            <FastField
-              name={`${_prefix}Tenometry.R`}
-              render={(args) => (
-                <NumberInput
-                  {...args}
-                  label='R'
-                  format='0.0'
-                  maxLength={10}
-                  min={0}
-                  suffix='mmHg'
+        <AuthorizedContext.Provider
+          value={{
+            rights: isEditable ? 'enable' : 'disable',
+          }}
+        >
+          <React.Fragment>
+            <GridContainer style={{ marginTop: theme.spacing(1) }}>
+              <GridItem xs sm={2} md={2} style={{ marginTop: '20px' }}>
+                <TextField value='Tonometry' text />
+              </GridItem>
+              <GridItem xs sm={4} md={3}>
+                <FastField
+                  name={`${_prefix}Tenometry.R`}
+                  render={(args) => (
+                    <NumberInput
+                      {...args}
+                      label='R'
+                      format='0.0'
+                      maxLength={10}
+                      min={0}
+                      suffix='mmHg'
+                    />
+                  )}
                 />
-              )}
-            />
-          </GridItem>
-          <GridItem xs sm={4} md={3}>
-            <FastField
-              name={`${_prefix}Tenometry.L`}
-              render={(args) => (
-                <NumberInput
-                  {...args}
-                  label='L'
-                  maxLength={10}
-                  format='0.0'
-                  min={0}
-                  suffix='mmHg'
+              </GridItem>
+              <GridItem xs sm={4} md={3}>
+                <FastField
+                  name={`${_prefix}Tenometry.L`}
+                  render={(args) => (
+                    <NumberInput
+                      {...args}
+                      label='L'
+                      maxLength={10}
+                      format='0.0'
+                      min={0}
+                      suffix='mmHg'
+                    />
+                  )}
                 />
-              )}
-            />
-          </GridItem>
-        </GridContainer>
-        <GridContainer style={{ marginTop: theme.spacing(1) }}>
-          <GridItem xs sm={2} md={2}>
-            <TextField value='Eye Dominance' text />
-          </GridItem>
-          <GridItem xs sm={2} md={1}>
-            <FastField
-              name={`${_prefix}EyeDominance.Left`}
-              render={(args) => (
-                <Checkbox
-                  {...args}
-                  label='Left'
-                  onChange={(e) => {
-                    this.handleEyeDominanceChange(
-                      e.target.value,
-                      `${_prefix}EyeDominance.Right`,
-                      args,
+              </GridItem>
+            </GridContainer>
+            <GridContainer style={{ marginTop: theme.spacing(1) }}>
+              <GridItem xs sm={2} md={2}>
+                <TextField value='Eye Dominance' text />
+              </GridItem>
+              <GridItem xs sm={2} md={1}>
+                <FastField
+                  name={`${_prefix}EyeDominance.Left`}
+                  render={(args) => (
+                    <Checkbox
+                      {...args}
+                      label='Left'
+                      onChange={(e) => {
+                        this.handleEyeDominanceChange(
+                          e.target.value,
+                          `${_prefix}EyeDominance.Right`,
+                          args,
+                        )
+                      }}
+                    />
+                  )}
+                />
+              </GridItem>
+              <GridItem xs sm={2} md={1}>
+                <FastField
+                  name={`${_prefix}EyeDominance.Right`}
+                  render={(args) => (
+                    <Checkbox
+                      {...args}
+                      label='Right'
+                      onChange={(e) => {
+                        this.handleEyeDominanceChange(
+                          e.target.value,
+                          `${_prefix}EyeDominance.Left`,
+                          args,
+                        )
+                      }}
+                    />
+                  )}
+                />
+              </GridItem>
+            </GridContainer>
+            <GridContainer style={{ marginTop: theme.spacing(1) }}>
+              <GridItem xs sm={2} md={2}>
+                <TextField value='Van Herick' text />
+              </GridItem>
+              <GridItem xs sm={10} md={10}>
+                <FastField
+                  name={`${_prefix}VanHerick`}
+                  render={(args) => {
+                    return (
+                      <OutlinedTextField
+                        label='Van Herick'
+                        multiline
+                        maxLength={2000}
+                        rowsMax={5}
+                        rows={2}
+                        {...args}
+                      />
                     )
                   }}
                 />
-              )}
-            />
-          </GridItem>
-          <GridItem xs sm={2} md={1}>
-            <FastField
-              name={`${_prefix}EyeDominance.Right`}
-              render={(args) => (
-                <Checkbox
-                  {...args}
-                  label='Right'
-                  onChange={(e) => {
-                    this.handleEyeDominanceChange(
-                      e.target.value,
-                      `${_prefix}EyeDominance.Left`,
-                      args,
+              </GridItem>
+            </GridContainer>
+            <GridContainer style={{ marginTop: theme.spacing(1) }}>
+              <GridItem xs sm={2} md={2} style={{ marginTop: '20px' }}>
+                <TextField value='Pupil Size (scotopic)' text />
+              </GridItem>
+              <GridItem xs sm={4} md={3}>
+                <FastField
+                  name={`${_prefix}PupilSize.R`}
+                  render={(args) => (
+                    <TextField {...args} label='R' maxLength={50} />
+                  )}
+                />
+              </GridItem>
+              <GridItem xs sm={4} md={3}>
+                <FastField
+                  name={`${_prefix}PupilSize.L`}
+                  render={(args) => (
+                    <TextField {...args} label='L' maxLength={50} />
+                  )}
+                />
+              </GridItem>
+            </GridContainer>
+            <GridContainer style={{ marginTop: theme.spacing(1) }}>
+              <GridItem xs sm={2} md={2}>
+                <TextField value='Remarks' text />
+              </GridItem>
+              <GridItem xs sm={10} md={10}>
+                <FastField
+                  name={`${_prefix}Remarks`}
+                  render={(args) => {
+                    return (
+                      <OutlinedTextField
+                        label='Remarks'
+                        multiline
+                        maxLength={2000}
+                        rowsMax={5}
+                        rows={2}
+                        {...args}
+                      />
                     )
                   }}
                 />
-              )}
-            />
-          </GridItem>
-        </GridContainer>
-        <GridContainer style={{ marginTop: theme.spacing(1) }}>
-          <GridItem xs sm={2} md={2}>
-            <TextField value='Van Herick' text />
-          </GridItem>
-          <GridItem xs sm={10} md={10}>
-            <FastField
-              name={`${_prefix}VanHerick`}
-              render={(args) => {
-                return (
-                  <OutlinedTextField
-                    label='Van Herick'
-                    multiline
-                    maxLength={2000}
-                    rowsMax={5}
-                    rows={2}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-        </GridContainer>
-        <GridContainer style={{ marginTop: theme.spacing(1) }}>
-          <GridItem xs sm={2} md={2} style={{ marginTop: '20px' }}>
-            <TextField value='Pupil Size (scotopic)' text />
-          </GridItem>
-          <GridItem xs sm={4} md={3}>
-            <FastField
-              name={`${_prefix}PupilSize.R`}
-              render={(args) => (
-                <TextField {...args} label='R' maxLength={50} />
-              )}
-            />
-          </GridItem>
-          <GridItem xs sm={4} md={3}>
-            <FastField
-              name={`${_prefix}PupilSize.L`}
-              render={(args) => (
-                <TextField {...args} label='L' maxLength={50} />
-              )}
-            />
-          </GridItem>
-        </GridContainer>
-        <GridContainer style={{ marginTop: theme.spacing(1) }}>
-          <GridItem xs sm={2} md={2}>
-            <TextField value='Remarks' text />
-          </GridItem>
-          <GridItem xs sm={10} md={10}>
-            <FastField
-              name={`${_prefix}Remarks`}
-              render={(args) => {
-                return (
-                  <OutlinedTextField
-                    label='Remarks'
-                    multiline
-                    maxLength={2000}
-                    rowsMax={5}
-                    rows={2}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-          {/* <GridItem xs sm={4} md={4} style={{ alignSelf: 'flex-end' }}>
+              </GridItem>
+            </GridContainer>
+          </React.Fragment>
+        </AuthorizedContext.Provider>
+
+        <GridContainer>
+          <GridItem xs sm={4} md={4} style={{ alignSelf: 'flex-end' }}>
             <FastField
               render={(args) => {
                 return (
@@ -297,14 +366,17 @@ class RefractionForm extends PureComponent {
                     color='primary'
                     icon={null}
                     style={{ margin: theme.spacing(1) }}
-                    disabled={isDisabledPrint()}
+                    disabled={isDisabledPrint(args)}
+                    onClick={() => {
+                      this.handlePrintPrescription(args)
+                    }}
                   >
-                    Print Spectacle Prescription
+                    <Print /> Print Spectacle Prescription
                   </Button>
                 )
               }}
             />
-          </GridItem> */}
+          </GridItem>
         </GridContainer>
 
         <GridContainer style={{ marginTop: theme.spacing(1) }}>
@@ -326,43 +398,51 @@ class RefractionForm extends PureComponent {
           </GridItem>
         </GridContainer>
 
-        <GridContainer style={{ marginTop: theme.spacing(1) }}>
-          <GridItem xs>
-            <Field
-              render={(args) => {
-                return (
-                  <NearAddGrid
-                    rows={this.getNearAddRows(args)}
-                    setArrayValue={(p) => {
-                      this.updateNearAddValue({ ...args, ...p })
-                    }}
-                    {...this.props}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-        </GridContainer>
+        <AuthorizedContext.Provider
+          value={{
+            rights: isEditable ? 'enable' : 'disable',
+          }}
+        >
+          <React.Fragment>
+            <GridContainer style={{ marginTop: theme.spacing(1) }}>
+              <GridItem xs>
+                <Field
+                  render={(args) => {
+                    return (
+                      <NearAddGrid
+                        rows={this.getNearAddRows(args)}
+                        setArrayValue={(p) => {
+                          this.updateNearAddValue({ ...args, ...p })
+                        }}
+                        {...this.props}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+            </GridContainer>
 
-        <GridContainer style={{ marginTop: theme.spacing(1) }}>
-          <GridItem xs>
-            <FastField
-              name={`${_prefix}TestRemarks`}
-              render={(args) => {
-                return (
-                  <OutlinedTextField
-                    label='Remarks'
-                    multiline
-                    maxLength={2000}
-                    rowsMax={5}
-                    rows={2}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-        </GridContainer>
+            <GridContainer style={{ marginTop: theme.spacing(1) }}>
+              <GridItem xs>
+                <FastField
+                  name={`${_prefix}TestRemarks`}
+                  render={(args) => {
+                    return (
+                      <OutlinedTextField
+                        label='Remarks'
+                        multiline
+                        maxLength={2000}
+                        rowsMax={5}
+                        rows={2}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+            </GridContainer>
+          </React.Fragment>
+        </AuthorizedContext.Provider>
       </GridContainer>
     )
   }

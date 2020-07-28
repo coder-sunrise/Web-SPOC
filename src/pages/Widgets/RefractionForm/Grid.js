@@ -52,12 +52,12 @@ export default ({
       },
       {
         columnName: 'EyeRefractionTestTypeFK',
-
         type: 'codeSelect',
         width: 130,
         code: 'cteyerefractiontesttype',
-        editingEnabled: true,
+        editingEnabled: isEditable,
         sortingEnabled: false,
+        disabled: !isEditable,
         onChange: (e) => {
           if (e.row) {
             if (e.option) e.row.EyeRefractionTestType = e.option.name
