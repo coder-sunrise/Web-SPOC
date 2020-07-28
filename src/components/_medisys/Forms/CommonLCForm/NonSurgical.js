@@ -32,6 +32,17 @@ const NonSurgical = ({
     }
     for (let index = 0; index < rows.length; index++) {
       rows[index].sortOrder = index
+      if (
+        !rows[index].inpatientAttendanceFees ||
+        rows[index].inpatientAttendanceFees < 0
+      ) {
+        rows[index].inpatientAttendanceFees = 0
+      }
+      if (!rows[index].otherFees || rows[index].otherFees < 0) {
+        rows[index].otherFees = 0
+      }
+      rows[index].totalSurgicalFees =
+        rows[index].inpatientAttendanceFees + rows[index].otherFees
     }
     setFieldValue('formData.nonSurgicalCharges', rows)
     dispatch({
@@ -158,9 +169,6 @@ const NonSurgical = ({
         columnName: 'inpatientAttendanceFees',
         type: 'currency',
         sortingEnabled: false,
-        onChange: ({ value, row }) => {
-          row.totalSurgicalFees = (value || 0) + (row.otherFees || 0)
-        },
         width: 190,
         min: 0,
       },
@@ -168,10 +176,6 @@ const NonSurgical = ({
         columnName: 'otherFees',
         type: 'currency',
         sortingEnabled: false,
-        onChange: ({ value, row }) => {
-          row.totalSurgicalFees =
-            (value || 0) + (row.inpatientAttendanceFees || 0)
-        },
         min: 0,
       },
       {

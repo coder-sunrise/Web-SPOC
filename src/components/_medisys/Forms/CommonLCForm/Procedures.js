@@ -217,6 +217,19 @@ const Procedures = ({
               }
               for (let index = 0; index < rows.length; index++) {
                 rows[index].sortOrder = index
+                if (!rows[index].surgeonFees || rows[index].surgeonFees < 0) {
+                  rows[index].surgeonFees = 0
+                }
+                if (!rows[index].implantFees || rows[index].implantFees < 0) {
+                  rows[index].implantFees = 0
+                }
+                if (!rows[index].otherFees || rows[index].otherFees < 0) {
+                  rows[index].otherFees = 0
+                }
+                rows[index].totalSurgicalFees =
+                  rows[index].surgeonFees +
+                  rows[index].implantFees +
+                  rows[index].otherFees
               }
               setFieldValue(`formData.procuderes[${i}].surgicalCharges`, rows)
             }
@@ -316,36 +329,18 @@ const Procedures = ({
                   columnName: 'surgeonFees',
                   type: 'currency',
                   sortingEnabled: false,
-                  onChange: ({ value, row }) => {
-                    row.totalSurgicalFees =
-                      (value || 0) +
-                      (row.implantFees || 0) +
-                      (row.otherFees || 0)
-                  },
                   min: 0,
                 },
                 {
                   columnName: 'implantFees',
                   type: 'currency',
                   sortingEnabled: false,
-                  onChange: ({ value, row }) => {
-                    row.totalSurgicalFees =
-                      (value || 0) +
-                      (row.surgeonFees || 0) +
-                      (row.otherFees || 0)
-                  },
                   min: 0,
                 },
                 {
                   columnName: 'otherFees',
                   type: 'currency',
                   sortingEnabled: false,
-                  onChange: ({ value, row }) => {
-                    row.totalSurgicalFees =
-                      (value || 0) +
-                      (row.implantFees || 0) +
-                      (row.surgeonFees || 0)
-                  },
                   min: 0,
                 },
                 {
