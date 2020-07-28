@@ -37,7 +37,7 @@ const checkAccessRight = (accessRightNames) => {
 
   for (let i = 0; i < accessRightNames.length; i++) {
     const accessRight = Authorized.check(accessRightNames[i])
-    if (accessRight.rights === 'hidden') return false
+    if (accessRight && accessRight.rights === 'hidden') return false
     return true
   }
   return false
