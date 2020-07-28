@@ -22,7 +22,7 @@ const addContent = (type, props) => {
       const accessRight = Authorized.check(
         'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
       )
-      if (accessRight === null || accessRight.rights === 'disable')
+      if (!accessRight || accessRight.rights === 'disable')
         return <ViewPatientNurseNotes {...props} />
       return <PatientNurseNotes {...props} />
     case PATIENT_HISTORY_TABS.DEPOSIT:
@@ -40,7 +40,7 @@ const checkAccessRight = (accessRightNames) => {
     if (!accessRight) {
       return false
     }
-    if (accessRight && accessRight.rights === 'hidden') return false
+    if (accessRight.rights === 'hidden') return false
     return true
   }
   return false
