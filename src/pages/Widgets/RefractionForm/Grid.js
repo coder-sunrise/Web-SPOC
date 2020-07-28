@@ -48,6 +48,7 @@ export default ({
         columnName: 'IsSelected',
         width: 50,
         type: 'checkbox',
+        authority: 'none',
         sortingEnabled: false,
       },
       {

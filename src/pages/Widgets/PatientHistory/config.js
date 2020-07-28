@@ -317,13 +317,19 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return (
-          <Cmpnet
-            {...props}
-            {...p}
-            isEditable={false}
-            prefix='corEyeRefractionForm.formData'
-            values={p.patientHistory.entity}
-          />
+          <AuthorizedContext.Provider
+            value={{
+              rights: 'disable',
+            }}
+          >
+            <Cmpnet
+              {...props}
+              {...p}
+              isEditable={false}
+              prefix='corEyeRefractionForm.formData'
+              values={p.patientHistory.entity}
+            />
+          </AuthorizedContext.Provider>
         )
       },
       loading: Loading,
