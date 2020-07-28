@@ -244,15 +244,13 @@ class FormModuleGrid extends PureComponent {
   render () {
     const { overrideTableParas = {}, formListing } = this.props
     return (
-      <React.Fragment>
-        <CommonTableGrid
-          type='formListing'
-          rows={formListing.list}
-          onRowDoubleClick={this.editRow}
-          {...this.tableParas}
-          {...overrideTableParas}
-        />
-      </React.Fragment>
+      <CommonTableGrid
+        type='formListing'
+        rows={formListing.list}
+        onRowDoubleClick={this.editRow}
+        {...this.tableParas}
+        {...overrideTableParas}
+      />
     )
   }
 }
