@@ -22,7 +22,7 @@ import CollectPaymentConfirm from './CollectPaymentConfirm'
 import ExtractAsSingle from './ExtractAsSingle'
 import PrintStatementReport from '../PrintStatementReport'
 
-const styles = () => ({
+const styles = (theme) => ({
   gridContainer: {
     marginBottom: '10px',
   },
@@ -32,7 +32,12 @@ const styles = () => ({
   collectPaymentBtn: {
     paddingRight: '0 !important',
   },
-})
+  refreshStatementButton: {
+    margin: `${theme.spacing(2)}px ${theme.spacing(1)}px ${theme.spacing(
+      2,
+    )}px 0`,
+  },
+}) 
 
 @connect(({ statement }) => ({
   statement,
@@ -123,6 +128,7 @@ class Details extends PureComponent {
             <GridItem style={{ marginRight: -16 }}>
               <ProgressButton
                 color='primary'
+                style={styles.refreshStatementButton}
                 onClick={this.handleRefresh}
                 icon={<Refresh />}
               >
