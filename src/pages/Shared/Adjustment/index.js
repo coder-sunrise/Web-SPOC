@@ -176,36 +176,53 @@ class Adjustment extends PureComponent {
             <Snackbar variant='warning' message={errors.finalAmount} />
           )}
           <GridContainer>
-            <GridItem xs={1}>
-              <FastField
-                name='isMinus'
-                render={(args) => {
-                  return (
-                    <Switch
-                      checkedChildren='-'
-                      unCheckedChildren='+'
-                      label=''
-                      onChange={() => {
-                        setTimeout(() => {
-                          this.onConditionChange()
-                        }, 1)
-                      }}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={9} style={{ paddingLeft: theme.spacing(2) }}>
-              <Field
-                name='adjustment'
-                render={(args) => {
-                  args.min = 0
-                  if (values.isExactAmount) {
+            <GridItem xs={10}>
+              <div style={{ position: 'relative' }}>
+                <FastField
+                  name='isMinus'
+                  render={(args) => {
+                    return (
+                      <Switch
+                        style={{ position: 'absolute' }}
+                        checkedChildren='-'
+                        unCheckedChildren='+'
+                        label=''
+                        onChange={() => {
+                          setTimeout(() => {
+                            this.onConditionChange()
+                          }, 1)
+                        }}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+                <Field
+                  name='adjustment'
+                  render={(args) => {
+                    args.min = 0
+                    if (values.isExactAmount) {
+                      return (
+                        <NumberInput
+                          style={{ marginLeft: 60, paddingRight: 60 }}
+                          autoFocus
+                          currency
+                          label='Adjustment'
+                          onChange={() => {
+                            setTimeout(() => {
+                              this.onConditionChange()
+                            }, 1)
+                          }}
+                          {...args}
+                        />
+                      )
+                    }
                     return (
                       <NumberInput
+                        style={{ marginLeft: 60, paddingRight: 60 }}
+                        percentage
                         autoFocus
-                        currency
+                        max={999}
                         label='Adjustment'
                         onChange={() => {
                           setTimeout(() => {
@@ -215,23 +232,9 @@ class Adjustment extends PureComponent {
                         {...args}
                       />
                     )
-                  }
-                  return (
-                    <NumberInput
-                      percentage
-                      autoFocus
-                      max={999}
-                      label='Adjustment'
-                      onChange={() => {
-                        setTimeout(() => {
-                          this.onConditionChange()
-                        }, 1)
-                      }}
-                      {...args}
-                    />
-                  )
-                }}
-              />
+                  }}
+                />
+              </div>
             </GridItem>
             <GridItem xs={2}>
               <FastField

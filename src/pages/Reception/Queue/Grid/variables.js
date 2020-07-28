@@ -160,6 +160,7 @@ export const QueueTableConfig = {
   leftColumns: [
     'visitStatus',
     'queueNo',
+    'patientName',
   ],
 }
 
