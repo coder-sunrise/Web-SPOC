@@ -11,9 +11,9 @@ const devRoutes = {
     },
     {
       path: '/development/test',
-      name: 'Test',
-      mini: 'C',
-      component: './Development/Control',
+      name: 'Table',
+      mini: 'T',
+      component: './Development/Table',
     },
     {
       path: '/development/imageeditor2',

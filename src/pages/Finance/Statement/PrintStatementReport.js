@@ -38,9 +38,9 @@ const PrintStatementReport = (props) => {
           [classes.pooperResponsive]: true,
           [classes.pooperNav]: true,
         })}
-        style={{
-          zIndex: 1,
-        }}
+        // style={{ //commented by chris, it was shown under table header
+        //   zIndex: 1,
+        // }}
         overlay={
           <MenuList role='menu'>
             <MenuItem onClick={() => toggleReport('Patient')}>

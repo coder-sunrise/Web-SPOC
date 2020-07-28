@@ -1294,4 +1294,4 @@ const routes =
         return r
       })
 
-export default _routes
+export default routes
