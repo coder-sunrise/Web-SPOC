@@ -490,7 +490,7 @@ class NewVisit extends PureComponent {
               confirmBtnText: isEdit ? 'Save' : 'Register visit',
               onConfirm: this.validatePatient,
               confirmProps: {
-                disabled: isReadOnly || !this.state.hasActiveSession,
+                disabled: isReadonlyAfterSigned || !this.state.hasActiveSession,
               },
             })}
         </div>
