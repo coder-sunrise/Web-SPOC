@@ -19,7 +19,7 @@ const PatientDeposit = ({ DepositDatas }) => {
   const PastPaymentCollectionTableColumn = [
     { name: 'transactionDate', title: 'Date' },
     { name: 'patientName', title: 'Patient Name' },
-    { name: 'patientAccountNo', title: 'Ref No.' },
+    { name: 'patientReferenceNo', title: 'Ref No.' },
     { name: 'remarks', title: 'Remarks' },
     { name: 'paymentMode', title: 'Mode' },
     { name: 'amount', title: 'Amount' },
@@ -28,7 +28,7 @@ const PatientDeposit = ({ DepositDatas }) => {
   const PastPaymentCollectionTableColumnExtension = [
     { columnName: 'transactionDate', sortingEnabled: false },
     { columnName: 'patientName', sortingEnabled: false },
-    { columnName: 'patientAccountNo', sortingEnabled: false },
+    { columnName: 'patientReferenceNo', sortingEnabled: false },
     { columnName: 'remarks', sortingEnabled: false },
     { columnName: 'paymentMode', sortingEnabled: false },
     { columnName: 'amount', type: 'currency', currency: true, sortingEnabled: false },
