@@ -110,6 +110,8 @@ class FormModuleGrid extends PureComponent {
   render () {
     return (
       <CommonTableGrid
+        getRowId={(r) => r.id}
+        forceRender
         type='formListing'
         onRowDoubleClick={this.editRow}
         columns={[

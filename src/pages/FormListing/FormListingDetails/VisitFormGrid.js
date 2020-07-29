@@ -218,7 +218,8 @@ class VisitFormGrid extends PureComponent {
           }}
         />
         <CommonTableGrid
-          getRowId={(r) => r.uid}
+          getRowId={(r) => r.id}
+          forceRender
           size='sm'
           style={{ margin: 0 }}
           rows={
