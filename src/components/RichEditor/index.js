@@ -1,7 +1,7 @@
 import React, { PureComponent, Component } from 'react'
 import PropTypes, { instanceOf } from 'prop-types'
 import jss from 'jss'
-import _ from 'lodash'
+import _ from 'lodash' 
 import {
   EditorState,
   ContentState,
@@ -35,7 +35,7 @@ const STYLES = (theme) => {
     },
   }
 }
-
+ 
 @control()
 class RichEditor extends React.PureComponent {
   static propTypes = {
@@ -69,6 +69,7 @@ class RichEditor extends React.PureComponent {
       value: EditorState.moveSelectionToEnd(editorState),
       anchorEl: null,
       isEditorFocused: false,
+      focusedOnce: false,
       sheet: this.calculateEditorHeight(),
     }
 
@@ -108,7 +109,7 @@ class RichEditor extends React.PureComponent {
 
   // eslint-disable-next-line camelcase
   // eslint-disable-next-line react/sort-comp
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { field, value, height } = nextProps
     const { isEditorFocused } = this.state
     let v = value || ''
@@ -271,8 +272,8 @@ class RichEditor extends React.PureComponent {
           textEditorValue === ''
             ? ''
             : htmlEncodeByRegExp(
-                draftToHtml(convertToRaw(this.state.value.getCurrentContent())),
-              ),
+              draftToHtml(convertToRaw(this.state.value.getCurrentContent())),
+            ),
         // name: props.field.name,
       },
     }
@@ -431,7 +432,16 @@ class RichEditor extends React.PureComponent {
     const labelProps = {
       shrink: true,
     }
-    // console.log('render richeditor', props)
+
+    if (this.props.autoFocus && !this.props.disabled && !this.state.focusedOnce) {
+      setTimeout(() => {
+        this.setState(() => ({
+          isEditorFocused: true,
+          focusedOnce:true,
+        }))
+        this.editorReferece.focus()
+      }, 1000)
+    }
 
     return (
       <React.Fragment>
@@ -472,25 +482,25 @@ RichEditor.insertBlock = (editorState, blocks, isBefore) => {
     .rest()
   let newBlocks = isBefore
     ? [
-        ...blocks.map((o) => [
-          o.getKey(),
-          o,
-        ]),
-        [
-          currentBlock.getKey(),
-          currentBlock,
-        ],
-      ]
+      ...blocks.map((o) => [
+        o.getKey(),
+        o,
+      ]),
+      [
+        currentBlock.getKey(),
+        currentBlock,
+      ],
+    ]
     : [
-        [
-          currentBlock.getKey(),
-          currentBlock,
-        ],
-        ...blocks.map((o) => [
-          o.getKey(),
-          o,
-        ]),
-      ]
+      [
+        currentBlock.getKey(),
+        currentBlock,
+      ],
+      ...blocks.map((o) => [
+        o.getKey(),
+        o,
+      ]),
+    ]
   const newBlockMap = blocksBefore.concat(newBlocks, blocksAfter).toOrderedMap()
 
   const newContentState = contentState.merge({

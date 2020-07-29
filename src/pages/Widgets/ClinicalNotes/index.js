@@ -98,12 +98,14 @@ window.g_app.replaceModel(cannedTextModel)
     scriblenotes,
     consultation,
     visitRegistration,
+    loading,
   }) => ({
     clinicInfo,
     clinicalnotes,
     scriblenotes,
     consultation,
     visitRegistration,
+    loading,
   }),
 )
 class ClinicalNotes extends Component {
@@ -111,7 +113,7 @@ class ClinicalNotes extends Component {
     prefix: 'corDoctorNote',
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     const config = getConfig()
     const contents = getContent(config)
@@ -128,7 +130,7 @@ class ClinicalNotes extends Component {
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { config } = this.state
     const { fields } = config
     const payload = {
@@ -393,7 +395,7 @@ class ClinicalNotes extends Component {
       type: 'cannedText/queryPrevDoctorNotes',
       payload: { visitId: visitRegistration.entity.visit.id },
     })
-    const { cannedTextRow } = this.state 
+    const { cannedTextRow } = this.state
     const { consultation, prefix } = this.props
     const { entity } = consultation
     let text = ''
@@ -474,7 +476,7 @@ class ClinicalNotes extends Component {
     })
   }
 
-  render () {
+  render() {
     const {
       prefix,
       classes,
@@ -483,6 +485,7 @@ class ClinicalNotes extends Component {
       dispatch,
       consultation,
       clinicInfo,
+      loading,
     } = this.props
 
     const { config, contents, showCannedText } = this.state
@@ -585,7 +588,7 @@ class ClinicalNotes extends Component {
                                 categoryIndex={item.scribbleNoteTypeFK}
                                 scribbleNoteArray={
                                   scriblenotes[item.category][
-                                    item.scribbleField
+                                  item.scribbleField
                                   ]
                                 }
                                 gridItemWidth={this.state.width}
@@ -606,6 +609,7 @@ class ClinicalNotes extends Component {
 
                             <RichEditor
                               autoFocus={index === 0}
+                              disabled={loading.global} 
                               style={{ marginBottom: 0 }}
                               strongLabel
                               onBlur={this.onEditorChange(item.fieldName)}
