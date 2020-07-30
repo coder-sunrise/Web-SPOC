@@ -26,7 +26,7 @@ import Authorized from '@/utils/Authorized'
     }
 
     if (v.uid) {
-      if (v.adjValue <= 0) {
+      if (v.adjAmount <= 0) {
         v.adjValue = Math.abs(v.adjValue)
         v.isMinus = true
       } else {
@@ -34,10 +34,6 @@ import Authorized from '@/utils/Authorized'
       }
 
       v.isExactAmount = v.adjType !== 'Percentage'
-    } else {
-      v.isMinus = true
-      v.adjValue = 0
-      v.isExactAmount = true
     }
 
     return { ...v }
