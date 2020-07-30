@@ -22,8 +22,6 @@ import { calculateAdjustAmount } from '@/utils/utils'
   authority: [
     'queue.consultation.order.service',
   ],
-  mapPropsToValues: ({ orders = {}, type }) =>
-    orders.entity || orders.defaultService,
   mapPropsToValues: ({ orders = {}, type }) => {
     const v = {
       ...(orders.entity || orders.defaultService),
@@ -263,146 +261,84 @@ class Service extends PureComponent {
     const { serviceFK, serviceCenterFK } = values
 
     return (
-        <div>
-          <GridContainer>
-            <GridItem xs={8}>
-              <Field
-                name='serviceFK'
-                render={(args) => {
-                  return (
-                    <Select
-                      label='Service Name'
-                      options={services.filter(
-                        (o) =>
-                          !serviceCenterFK ||
-                          o.serviceCenters.find(
-                            (m) => m.value === serviceCenterFK,
-                          ),
-                      )}
-                      onChange={() =>
-                        setTimeout(() => {
-                          this.getServiceCenterService()
-                        }, 1)}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={4}>
+      <div>
+        <GridContainer>
+          <GridItem xs={8}>
+            <Field
+              name='serviceFK'
+              render={(args) => {
+                return (
+                  <Select
+                    label='Service Name'
+                    options={services.filter(
+                      (o) =>
+                        !serviceCenterFK ||
+                        o.serviceCenters.find(
+                          (m) => m.value === serviceCenterFK,
+                        ),
+                    )}
+                    onChange={() =>
+                      setTimeout(() => {
+                        this.getServiceCenterService()
+                      }, 1)}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={4}>
+            <FastField
+              name='total'
+              render={(args) => {
+                return (
+                  <NumberInput
+                    label='Total'
+                    min={0}
+                    currency
+                    onChange={(e) => {
+                      this.updateTotalPrice(e.target.value)
+                    }}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+        </GridContainer>
+        <GridContainer>
+          <GridItem xs={8}>
+            <Field
+              name='serviceCenterFK'
+              render={(args) => {
+                return (
+                  <Select
+                    label='Service Center Name'
+                    options={serviceCenters.filter(
+                      (o) =>
+                        !serviceFK ||
+                        o.services.find((m) => m.value === serviceFK),
+                    )}
+                    onChange={() =>
+                      setTimeout(() => {
+                        this.getServiceCenterService()
+                      }, 1)}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={3}>
+            <div style={{ position: 'relative' }}>
               <FastField
-                name='total'
-                render={(args) => {
-                  return (
-                    <NumberInput
-                      label='Total'
-                      min={0}
-                      currency
-                      onChange={(e) => {
-                        this.updateTotalPrice(e.target.value)
-                      }}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-          </GridContainer>
-          <GridContainer>
-            <GridItem xs={8}>
-              <Field
-                name='serviceCenterFK'
-                render={(args) => {
-                  return (
-                    <Select
-                      label='Service Center Name'
-                      options={serviceCenters.filter(
-                        (o) =>
-                          !serviceFK ||
-                          o.services.find((m) => m.value === serviceFK),
-                      )}
-                      onChange={() =>
-                        setTimeout(() => {
-                          this.getServiceCenterService()
-                        }, 1)}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={3}>
-              <div style={{ position: 'relative' }}>
-                <FastField
-                  name='isMinus'
-                  render={(args) => {
-                    return (
-                      <Switch
-                        style={{ position: 'absolute' }}
-                        checkedChildren='-'
-                        unCheckedChildren='+'
-                        label=''
-                        onChange={() => {
-                          setTimeout(() => {
-                            this.onAdjustmentConditionChange()
-                          }, 1)
-                        }}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-                <Field
-                  name='adjValue'
-                  render={(args) => {
-                    args.min = 0
-                    if (values.isExactAmount) {
-                      return (
-                        <NumberInput
-                          style={{
-                            marginLeft: 55,
-                            paddingRight: 45,
-                          }}
-                          currency
-                          label='Adjustment'
-                          onChange={() => {
-                            setTimeout(() => {
-                              this.onAdjustmentConditionChange()
-                            }, 1)
-                          }}
-                          {...args}
-                        />
-                      )
-                    }
-                    return (
-                      <NumberInput
-                        style={{
-                          marginLeft: 55,
-                          paddingRight: 45,
-                        }}
-                        percentage
-                        max={999}
-                        label='Adjustment'
-                        onChange={() => {
-                          setTimeout(() => {
-                            this.onAdjustmentConditionChange()
-                          }, 1)
-                        }}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </div>
-            </GridItem>
-            <GridItem xs={1}>
-              <FastField
-                name='isExactAmount'
+                name='isMinus'
                 render={(args) => {
                   return (
                     <Switch
-                      checkedChildren='$'
-                      unCheckedChildren='%'
+                      style={{ position: 'absolute' }}
+                      checkedChildren='-'
+                      unCheckedChildren='+'
                       label=''
                       onChange={() => {
                         setTimeout(() => {
@@ -414,46 +350,103 @@ class Service extends PureComponent {
                   )
                 }}
               />
-            </GridItem>
-          </GridContainer>
-          <GridContainer>
-            <GridItem xs={8} className={classes.editor}>
-              <FastField
-                name='remark'
-                render={(args) => {
-                  // return <RichEditor placeholder='Remarks' {...args} />
-                  return (
-                    <TextField
-                      multiline
-                      rowsMax='5'
-                      label='Remarks'
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={4} className={classes.editor}>
               <Field
-                name='totalAfterItemAdjustment'
+                name='adjValue'
                 render={(args) => {
+                  args.min = 0
+                  if (values.isExactAmount) {
+                    return (
+                      <NumberInput
+                        style={{
+                          marginLeft: 55,
+                          paddingRight: 45,
+                        }}
+                        currency
+                        label='Adjustment'
+                        onChange={() => {
+                          setTimeout(() => {
+                            this.onAdjustmentConditionChange()
+                          }, 1)
+                        }}
+                        {...args}
+                      />
+                    )
+                  }
                   return (
                     <NumberInput
-                      label='Total After Adj'
-                      currency
-                      disabled
+                      style={{
+                        marginLeft: 55,
+                        paddingRight: 45,
+                      }}
+                      percentage
+                      max={999}
+                      label='Adjustment'
+                      onChange={() => {
+                        setTimeout(() => {
+                          this.onAdjustmentConditionChange()
+                        }, 1)
+                      }}
                       {...args}
                     />
                   )
                 }}
               />
-            </GridItem>
-          </GridContainer>
-          {footer({
-            onSave: handleSubmit,
-            onReset: this.handleReset,
-          })}
-        </div>
+            </div>
+          </GridItem>
+          <GridItem xs={1}>
+            <FastField
+              name='isExactAmount'
+              render={(args) => {
+                return (
+                  <Switch
+                    checkedChildren='$'
+                    unCheckedChildren='%'
+                    label=''
+                    onChange={() => {
+                      setTimeout(() => {
+                        this.onAdjustmentConditionChange()
+                      }, 1)
+                    }}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+        </GridContainer>
+        <GridContainer>
+          <GridItem xs={8} className={classes.editor}>
+            <FastField
+              name='remark'
+              render={(args) => {
+                // return <RichEditor placeholder='Remarks' {...args} />
+                return (
+                  <TextField multiline rowsMax='5' label='Remarks' {...args} />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={4} className={classes.editor}>
+            <Field
+              name='totalAfterItemAdjustment'
+              render={(args) => {
+                return (
+                  <NumberInput
+                    label='Total After Adj'
+                    currency
+                    disabled
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+        </GridContainer>
+        {footer({
+          onSave: handleSubmit,
+          onReset: this.handleReset,
+        })}
+      </div>
     )
   }
 }

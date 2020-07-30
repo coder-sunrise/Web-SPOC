@@ -407,12 +407,12 @@ class Vaccination extends PureComponent {
     const { isEditVaccination } = values
     const { showAddFromPastModal } = this.state
     return (
-        <div>
-          <GridContainer>
-            <GridItem xs={8}>
-              <Field
-                name='inventoryVaccinationFK'
-                render={(args) => {
+      <div>
+        <GridContainer>
+          <GridItem xs={8}>
+            <Field
+              name='inventoryVaccinationFK'
+              render={(args) => {
                   return (
                     <div style={{ position: 'relative' }}>
                       <CodeSelect
@@ -428,28 +428,28 @@ class Vaccination extends PureComponent {
                     </div>
                   )
                 }}
-              />
-            </GridItem>
-            <GridItem xs={4}>
-              {!isEditVaccination && (
-                <Tooltip title='Add From Past'>
-                  <ProgressButton
-                    color='primary'
-                    icon={<Add />}
-                    style={{ marginTop: theme.spacing(2) }}
-                    onClick={this.onSearchVaccinationHistory}
-                  >
+            />
+          </GridItem>
+          <GridItem xs={4}>
+            {!isEditVaccination && (
+            <Tooltip title='Add From Past'>
+              <ProgressButton
+                color='primary'
+                icon={<Add />}
+                style={{ marginTop: theme.spacing(2) }}
+                onClick={this.onSearchVaccinationHistory}
+              >
                     Add From Past
-                  </ProgressButton>
-                </Tooltip>
+              </ProgressButton>
+            </Tooltip>
               )}
-            </GridItem>
-          </GridContainer>
-          <GridContainer>
-            <GridItem xs={2}>
-              <Field
-                name='usageMethodFK'
-                render={(args) => {
+          </GridItem>
+        </GridContainer>
+        <GridContainer>
+          <GridItem xs={2}>
+            <Field
+              name='usageMethodFK'
+              render={(args) => {
                   return (
                     <CodeSelect
                       label='Usage'
@@ -469,12 +469,12 @@ class Vaccination extends PureComponent {
                     />
                   )
                 }}
-              />
-            </GridItem>
-            <GridItem xs={2}>
-              <FastField
-                name='dosageFK'
-                render={(args) => {
+            />
+          </GridItem>
+          <GridItem xs={2}>
+            <FastField
+              name='dosageFK'
+              render={(args) => {
                   return (
                     <CodeSelect
                       label='Dosage'
@@ -494,12 +494,12 @@ class Vaccination extends PureComponent {
                     />
                   )
                 }}
-              />
-            </GridItem>
-            <GridItem xs={2}>
-              <FastField
-                name='uomfk'
-                render={(args) => {
+            />
+          </GridItem>
+          <GridItem xs={2}>
+            <FastField
+              name='uomfk'
+              render={(args) => {
                   return (
                     <CodeSelect
                       label='UOM'
@@ -516,20 +516,20 @@ class Vaccination extends PureComponent {
                     />
                   )
                 }}
-              />
-            </GridItem>
-            <GridItem xs={2}>
-              <FastField
-                name='vaccinationGivenDate'
-                render={(args) => {
+            />
+          </GridItem>
+          <GridItem xs={2}>
+            <FastField
+              name='vaccinationGivenDate'
+              render={(args) => {
                   return <DatePicker label='Date Given' {...args} />
                 }}
-              />
-            </GridItem>
-            <GridItem xs={4}>
-              <FastField
-                name='quantity'
-                render={(args) => {
+            />
+          </GridItem>
+          <GridItem xs={4}>
+            <FastField
+              name='quantity'
+              render={(args) => {
                   return (
                     <NumberInput
                       label='Quantity'
@@ -546,14 +546,14 @@ class Vaccination extends PureComponent {
                     />
                   )
                 }}
-              />
-            </GridItem>
-          </GridContainer>
-          <GridContainer>
-            <GridItem xs={4} className={classes.editor}>
-              <Field
-                name='batchNo'
-                render={(args) => {
+            />
+          </GridItem>
+        </GridContainer>
+        <GridContainer>
+          <GridItem xs={4} className={classes.editor}>
+            <Field
+              name='batchNo'
+              render={(args) => {
                   return (
                     <CodeSelect
                       mode='tags'
@@ -576,12 +576,12 @@ class Vaccination extends PureComponent {
                     />
                   )
                 }}
-              />
-            </GridItem>
-            <GridItem xs={4} className={classes.editor}>
-              <Field
-                name='expiryDate'
-                render={(args) => {
+            />
+          </GridItem>
+          <GridItem xs={4} className={classes.editor}>
+            <Field
+              name='expiryDate'
+              render={(args) => {
                   return (
                     <DatePicker
                       label='Expiry Date'
@@ -590,12 +590,12 @@ class Vaccination extends PureComponent {
                     />
                   )
                 }}
-              />
-            </GridItem>
-            <GridItem xs={4} className={classes.editor}>
-              <FastField
-                name='totalPrice'
-                render={(args) => {
+            />
+          </GridItem>
+          <GridItem xs={4} className={classes.editor}>
+            <FastField
+              name='totalPrice'
+              render={(args) => {
                   return (
                     <NumberInput
                       label='Total'
@@ -608,14 +608,14 @@ class Vaccination extends PureComponent {
                     />
                   )
                 }}
-              />
-            </GridItem>
-          </GridContainer>
-          <GridContainer>
-            <GridItem xs={8} className={classes.editor}>
-              <FastField
-                name='remarks'
-                render={(args) => {
+            />
+          </GridItem>
+        </GridContainer>
+        <GridContainer>
+          <GridItem xs={8} className={classes.editor}>
+            <FastField
+              name='remarks'
+              render={(args) => {
                   // return <RichEditor placeholder='Remarks' {...args} />
                   return (
                     <TextField
@@ -626,13 +626,13 @@ class Vaccination extends PureComponent {
                     />
                   )
                 }}
-              />
-            </GridItem>
-            <GridItem xs={3} className={classes.editor}>
-              <div style={{ position: 'relative' }}>
-                <FastField
-                  name='isMinus'
-                  render={(args) => {
+            />
+          </GridItem>
+          <GridItem xs={3} className={classes.editor}>
+            <div style={{ position: 'relative' }}>
+              <FastField
+                name='isMinus'
+                render={(args) => {
                     return (
                       <Switch
                         style={{ position: 'absolute' }}
@@ -648,10 +648,10 @@ class Vaccination extends PureComponent {
                       />
                     )
                   }}
-                />
-                <Field
-                  name='adjValue'
-                  render={(args) => {
+              />
+              <Field
+                name='adjValue'
+                render={(args) => {
                     args.min = 0
                     if (values.isExactAmount) {
                       return (
@@ -689,13 +689,13 @@ class Vaccination extends PureComponent {
                       />
                     )
                   }}
-                />
-              </div>
-            </GridItem>
-            <GridItem xs={1} className={classes.editor}>
-              <FastField
-                name='isExactAmount'
-                render={(args) => {
+              />
+            </div>
+          </GridItem>
+          <GridItem xs={1} className={classes.editor}>
+            <FastField
+              name='isExactAmount'
+              render={(args) => {
                   return (
                     <Switch
                       checkedChildren='$'
@@ -710,15 +710,15 @@ class Vaccination extends PureComponent {
                     />
                   )
                 }}
-              />
-            </GridItem>
-          </GridContainer>
-          <GridContainer>
-            <GridItem xs={8} />
-            <GridItem xs={4}>
-              <FastField
-                name='totalAfterItemAdjustment'
-                render={(args) => {
+            />
+          </GridItem>
+        </GridContainer>
+        <GridContainer>
+          <GridItem xs={8} />
+          <GridItem xs={4}>
+            <FastField
+              name='totalAfterItemAdjustment'
+              render={(args) => {
                   return (
                     <NumberInput
                       label='Total After Adj'
@@ -728,26 +728,26 @@ class Vaccination extends PureComponent {
                     />
                   )
                 }}
-              />
-            </GridItem>
-          </GridContainer>
-          {footer({
+            />
+          </GridItem>
+        </GridContainer>
+        {footer({
             onSave: handleSubmit,
             onReset: this.handleReset,
           })}
-          <CommonModal
-            open={showAddFromPastModal}
-            title='Add Vaccination From Past'
-            onClose={this.toggleAddFromPastModal}
-            onConfirm={this.toggleAddFromPastModal}
-            maxWidth='md'
-            showFooter={false}
-            overrideLoading
-            cancelText='Cancel'
-          >
-            <AddFromPast {...this.props} />
-          </CommonModal>
-        </div>
+        <CommonModal
+          open={showAddFromPastModal}
+          title='Add Vaccination From Past'
+          onClose={this.toggleAddFromPastModal}
+          onConfirm={this.toggleAddFromPastModal}
+          maxWidth='md'
+          showFooter={false}
+          overrideLoading
+          cancelText='Cancel'
+        >
+          <AddFromPast {...this.props} />
+        </CommonModal>
+      </div>
     )
   }
 }
