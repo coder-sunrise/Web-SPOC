@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import { isNumber } from 'util'
 import {
   GridContainer,
   GridItem,
@@ -10,6 +11,7 @@ import {
   withFormikExtend,
   Field,
   DatePicker,
+  Switch,
 } from '@/components'
 
 import Yup from '@/utils/yup'
@@ -19,14 +21,36 @@ import Authorized from '@/utils/Authorized'
 
 @connect(({ global, codetable }) => ({ global, codetable }))
 @withFormikExtend({
-  mapPropsToValues: ({ orders = {}, type }) =>
-    orders.entity || orders.defaultConsumable,
+  mapPropsToValues: ({ orders = {}, type }) => {
+    const v = { ...(orders.entity || orders.defaultConsumable) }
+
+    if (v.uid) {
+      if (v.adjValue <= 0) {
+        v.adjValue = Math.abs(v.adjValue)
+        v.isMinus = true
+      } else {
+        v.isMinus = false
+      }
+
+      v.isExactAmount = v.adjType !== 'Percentage'
+    } else {
+      v.isMinus = true
+      v.adjValue = 0
+      v.isExactAmount = true
+    }
+
+    return { ...v }
+  },
   enableReinitialize: true,
   validationSchema: Yup.object().shape({
     inventoryConsumableFK: Yup.number().required(),
     // unitPrice: Yup.number().required(),
     totalPrice: Yup.number().required(),
     quantity: Yup.number().required(),
+    totalAfterItemAdjustment: Yup.number().min(
+      0.0,
+      'The amount should be more than 0.00',
+    ),
   }),
 
   handleSubmit: (values, { props, onConfirm }) => {
@@ -43,6 +67,11 @@ import Authorized from '@/utils/Authorized'
       subject: currentType.getSubject(values),
       isDeleted: false,
       batchNo,
+      adjValue:
+        values.adjAmount < 0
+          ? -Math.abs(values.adjValue)
+          : Math.abs(values.adjValue),
+      unitPrice: values.totalPrice / values.quantity,
     }
     dispatch({
       type: 'orders/upsertRow',
@@ -126,14 +155,26 @@ class Consumable extends PureComponent {
 
   updateTotalPrice = (v) => {
     if (v || v === 0) {
-      const { adjType, adjValue } = this.props.values
-      const adjustment = calculateAdjustAmount(
-        adjType === 'ExactAmount',
+      const { isExactAmount, isMinus, adjValue } = this.props.values
+
+      let value = adjValue
+      if (!isMinus) {
+        value = Math.abs(adjValue)
+      } else {
+        value = -Math.abs(adjValue)
+      }
+
+      const finalAmount = calculateAdjustAmount(
+        isExactAmount,
         v,
-        adjValue,
+        value || adjValue,
       )
-      this.props.setFieldValue('totalAfterItemAdjustment', adjustment.amount)
-      this.props.setFieldValue('adjAmount', adjustment.adjAmount)
+      this.props.setFieldValue('totalAfterItemAdjustment', finalAmount.amount)
+      this.props.setFieldValue('adjAmount', finalAmount.adjAmount)
+      this.props.setFieldValue(
+        'adjType',
+        isExactAmount ? 'ExactAmount' : 'Percentage',
+      )
     } else {
       this.props.setFieldValue('totalAfterItemAdjustment', undefined)
       this.props.setFieldValue('adjAmount', undefined)
@@ -193,6 +234,41 @@ class Consumable extends PureComponent {
     }
   }
 
+  onAdjustmentConditionChange = (v) => {
+    const { values } = this.props
+    const { isMinus, adjValue, isExactAmount } = values
+    if (!isNumber(adjValue)) return
+
+    let value = adjValue
+    if (!isExactAmount && adjValue > 100) {
+      value = 100
+      this.props.setFieldValue('adjValue', 100)
+    }
+
+    if (!isMinus) {
+      value = Math.abs(value)
+    } else {
+      value = -Math.abs(value)
+    }
+    v = value
+
+    this.getFinalAmount({ value })
+  }
+
+  getFinalAmount = ({ value } = {}) => {
+    const { values, setFieldValue } = this.props
+    const { isExactAmount, adjValue, totalPrice = 0 } = values
+    const finalAmount = calculateAdjustAmount(
+      isExactAmount,
+      totalPrice,
+      value || adjValue,
+    )
+
+    setFieldValue('totalAfterItemAdjustment', finalAmount.amount)
+    setFieldValue('adjAmount', finalAmount.adjAmount)
+    setFieldValue('adjType', isExactAmount ? 'ExactAmount' : 'Percentage')
+  }
+
   render () {
     const {
       theme,
@@ -223,7 +299,7 @@ class Consumable extends PureComponent {
       >
         <div>
           <GridContainer>
-            <GridItem xs={6}>
+            <GridItem xs={8}>
               <FastField
                 name='inventoryConsumableFK'
                 render={(args) => {
@@ -244,9 +320,6 @@ class Consumable extends PureComponent {
                 }}
               />
             </GridItem>
-          </GridContainer>
-
-          <GridContainer>
             <GridItem xs={4}>
               <FastField
                 name='quantity'
@@ -269,42 +342,10 @@ class Consumable extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem xs={4}>
-              <FastField
-                name='totalPrice'
-                render={(args) => {
-                  return (
-                    <NumberInput
-                      label='Total'
-                      currency
-                      onChange={(e) => {
-                        this.updateTotalPrice(e.target.value)
-                      }}
-                      min={0}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={4}>
-              <FastField
-                name='totalAfterItemAdjustment'
-                render={(args) => {
-                  return (
-                    <NumberInput
-                      label='Total After Adj'
-                      currency
-                      disabled
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
           </GridContainer>
+
           <GridContainer>
-            <GridItem xs={2} className={classes.editor}>
+            <GridItem xs={4} className={classes.editor}>
               <Field
                 name='batchNo'
                 render={(args) => {
@@ -332,7 +373,7 @@ class Consumable extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem xs={2} className={classes.editor}>
+            <GridItem xs={4} className={classes.editor}>
               <Field
                 name='expiryDate'
                 render={(args) => {
@@ -346,6 +387,26 @@ class Consumable extends PureComponent {
                 }}
               />
             </GridItem>
+            <GridItem xs={4} className={classes.editor}>
+              <FastField
+                name='totalPrice'
+                render={(args) => {
+                  return (
+                    <NumberInput
+                      label='Total'
+                      currency
+                      onChange={(e) => {
+                        this.updateTotalPrice(e.target.value)
+                      }}
+                      min={0}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
             <GridItem xs={8} className={classes.editor}>
               <FastField
                 name='remark'
@@ -356,6 +417,108 @@ class Consumable extends PureComponent {
                       multiline
                       rowsMax='5'
                       label='Remarks'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={3} className={classes.editor}>
+              <div style={{ position: 'relative' }}>
+                <FastField
+                  name='isMinus'
+                  render={(args) => {
+                    return (
+                      <Switch
+                        style={{ position: 'absolute' }}
+                        checkedChildren='-'
+                        unCheckedChildren='+'
+                        label=''
+                        onChange={() => {
+                          setTimeout(() => {
+                            this.onAdjustmentConditionChange()
+                          }, 1)
+                        }}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+                <Field
+                  name='adjValue'
+                  render={(args) => {
+                    args.min = 0
+                    if (values.isExactAmount) {
+                      return (
+                        <NumberInput
+                          style={{
+                            marginLeft: 55,
+                            paddingRight: 45,
+                          }}
+                          currency
+                          label='Adjustment'
+                          onChange={() => {
+                            setTimeout(() => {
+                              this.onAdjustmentConditionChange()
+                            }, 1)
+                          }}
+                          {...args}
+                        />
+                      )
+                    }
+                    return (
+                      <NumberInput
+                        style={{
+                          marginLeft: 55,
+                          paddingRight: 45,
+                        }}
+                        percentage
+                        max={999}
+                        label='Adjustment'
+                        onChange={() => {
+                          setTimeout(() => {
+                            this.onAdjustmentConditionChange()
+                          }, 1)
+                        }}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </div>
+            </GridItem>
+            <GridItem xs={1} className={classes.editor}>
+              <FastField
+                name='isExactAmount'
+                render={(args) => {
+                  return (
+                    <Switch
+                      checkedChildren='$'
+                      unCheckedChildren='%'
+                      label=''
+                      onChange={() => {
+                        setTimeout(() => {
+                          this.onAdjustmentConditionChange()
+                        }, 1)
+                      }}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem xs={8} />
+            <GridItem xs={4}>
+              <FastField
+                name='totalAfterItemAdjustment'
+                render={(args) => {
+                  return (
+                    <NumberInput
+                      label='Total After Adj'
+                      currency
+                      disabled
                       {...args}
                     />
                   )
