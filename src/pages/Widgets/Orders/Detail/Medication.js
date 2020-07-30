@@ -650,7 +650,6 @@ class Medication extends PureComponent {
       setFieldValue,
       disableEdit,
       setDisable,
-      isInclusiveCoPayer,
     } = this.props
 
     const { isEditMedication } = values
@@ -664,21 +663,8 @@ class Medication extends PureComponent {
       },
     }
     const accessRight = authorityCfg[values.type]
-    const addAccessRight = Authorized.check(accessRight)
     return (
-      <Authorized.Context.Provider
-        value={
-          isInclusiveCoPayer ? (
-            {
-              rights: 'disable',
-            }
-          ) : (
-            {
-              rights: addAccessRight ? addAccessRight.rights : 'hidden',
-            }
-          )
-        }
-      >
+      <Authorized authority={accessRight}>
         <div>
           <GridContainer>
             <GridItem xs={6}>
@@ -1315,7 +1301,7 @@ class Medication extends PureComponent {
             />
           </CommonModal>
         </div>
-      </Authorized.Context.Provider>
+      </Authorized>
     )
   }
 }

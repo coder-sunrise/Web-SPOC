@@ -535,7 +535,17 @@ export const updateInvoicePayerPayableBalance = (
           itemWithSubtotal.invoiceItemFK === item.invoiceItemFK,
       )
 
-      if (!_existed) return { ...item, payableBalance: item.totalAfterGst }
+      if (!_existed) {
+        const original = originalInvoiceItems.find(
+          (oriInvoiceItem) => oriInvoiceItem.id === item.invoiceItemFK,
+        )
+        return {
+          ...item,
+          payableBalance: original
+            ? original.totalAfterGst
+            : item.payableBalance,
+        }
+      }
       return {
         ...item,
         payableBalance: _existed.error
