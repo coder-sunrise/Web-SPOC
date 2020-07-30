@@ -17,10 +17,14 @@ import {
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 import LowStockInfo from './LowStockInfo'
-import Authorized from '@/utils/Authorized'
 
 @connect(({ global, codetable }) => ({ global, codetable }))
 @withFormikExtend({
+  authority: [
+    'queue.consultation.order.consumable',
+  ],
+  mapPropsToValues: ({ orders = {}, type }) =>
+    orders.entity || orders.defaultConsumable,
   mapPropsToValues: ({ orders = {}, type }) => {
     const v = { ...(orders.entity || orders.defaultConsumable) }
 
@@ -274,25 +278,9 @@ class Consumable extends PureComponent {
       setFieldValue,
       classes,
       disableEdit,
-      isInclusiveCoPayer,
     } = this.props
-    const addAccessRight = Authorized.check(
-      'queue.consultation.order.consumable',
-    )
+
     return (
-      <Authorized.Context.Provider
-        value={
-          isInclusiveCoPayer ? (
-            {
-              rights: 'disable',
-            }
-          ) : (
-            {
-              rights: addAccessRight ? addAccessRight.rights : 'hidden',
-            }
-          )
-        }
-      >
         <div>
           <GridContainer>
             <GridItem xs={8}>
@@ -527,7 +515,6 @@ class Consumable extends PureComponent {
             onReset: this.handleReset,
           })}
         </div>
-      </Authorized.Context.Provider>
     )
   }
 }

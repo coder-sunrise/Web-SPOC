@@ -16,10 +16,14 @@ import {
 import Yup from '@/utils/yup'
 import { getServices } from '@/utils/codetable'
 import { calculateAdjustAmount } from '@/utils/utils'
-import Authorized from '@/utils/Authorized'
 
 @connect(({ codetable, global }) => ({ codetable, global }))
 @withFormikExtend({
+  authority: [
+    'queue.consultation.order.service',
+  ],
+  mapPropsToValues: ({ orders = {}, type }) =>
+    orders.entity || orders.defaultService,
   mapPropsToValues: ({ orders = {}, type }) => {
     const v = {
       ...(orders.entity || orders.defaultService),
@@ -254,31 +258,11 @@ class Service extends PureComponent {
   }
 
   render () {
-    const {
-      theme,
-      classes,
-      values = {},
-      footer,
-      handleSubmit,
-      isInclusiveCoPayer,
-    } = this.props
+    const { theme, classes, values = {}, footer, handleSubmit } = this.props
     const { services, serviceCenters } = this.state
     const { serviceFK, serviceCenterFK } = values
-    const addAccessRight = Authorized.check('queue.consultation.order.service')
+
     return (
-      <Authorized.Context.Provider
-        value={
-          isInclusiveCoPayer ? (
-            {
-              rights: 'disable',
-            }
-          ) : (
-            {
-              rights: addAccessRight ? addAccessRight.rights : 'hidden',
-            }
-          )
-        }
-      >
         <div>
           <GridContainer>
             <GridItem xs={8}>
@@ -470,7 +454,6 @@ class Service extends PureComponent {
             onReset: this.handleReset,
           })}
         </div>
-      </Authorized.Context.Provider>
     )
   }
 }

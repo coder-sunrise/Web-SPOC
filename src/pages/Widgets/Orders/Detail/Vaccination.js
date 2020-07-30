@@ -22,7 +22,6 @@ import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 import LowStockInfo from './LowStockInfo'
 import AddFromPast from './AddMedicationFromPast'
-import Authorized from '@/utils/Authorized'
 
 let i = 0
 @connect(({ global, codetable, visitRegistration }) => ({
@@ -31,6 +30,9 @@ let i = 0
   visitRegistration,
 }))
 @withFormikExtend({
+  authority: [
+    'queue.consultation.order.vaccination',
+  ],
   mapPropsToValues: ({ orders = {} }) => {
     const newOrders = orders.entity || orders.defaultVaccination
 
@@ -400,28 +402,11 @@ class Vaccination extends PureComponent {
       classes,
       disableEdit,
       getNextSequence,
-      isInclusiveCoPayer,
       ...reset
     } = this.props
     const { isEditVaccination } = values
     const { showAddFromPastModal } = this.state
-    const addAccessRight = Authorized.check(
-      'queue.consultation.order.vaccination',
-    )
     return (
-      <Authorized.Context.Provider
-        value={
-          isInclusiveCoPayer ? (
-            {
-              rights: 'disable',
-            }
-          ) : (
-            {
-              rights: addAccessRight ? addAccessRight.rights : 'hidden',
-            }
-          )
-        }
-      >
         <div>
           <GridContainer>
             <GridItem xs={8}>
@@ -763,7 +748,6 @@ class Vaccination extends PureComponent {
             <AddFromPast {...this.props} />
           </CommonModal>
         </div>
-      </Authorized.Context.Provider>
     )
   }
 }
