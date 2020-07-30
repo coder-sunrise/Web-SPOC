@@ -14,10 +14,12 @@ import {
 import Yup from '@/utils/yup'
 import { getServices } from '@/utils/codetable'
 import { calculateAdjustAmount } from '@/utils/utils'
-import Authorized from '@/utils/Authorized'
 
 @connect(({ codetable, global }) => ({ codetable, global }))
 @withFormikExtend({
+  authority: [
+    'queue.consultation.order.service',
+  ],
   mapPropsToValues: ({ orders = {}, type }) =>
     orders.entity || orders.defaultService,
   enableReinitialize: true,
@@ -180,139 +182,113 @@ class Service extends PureComponent {
   }
 
   render () {
-    const {
-      theme,
-      classes,
-      values = {},
-      footer,
-      handleSubmit,
-      isInclusiveCoPayer,
-    } = this.props
+    const { theme, classes, values = {}, footer, handleSubmit } = this.props
     const { services, serviceCenters } = this.state
     const { serviceFK, serviceCenterFK } = values
-    const addAccessRight = Authorized.check('queue.consultation.order.service')
+
     return (
-      <Authorized.Context.Provider
-        value={
-          isInclusiveCoPayer ? (
-            {
-              rights: 'disable',
-            }
-          ) : (
-            {
-              rights: addAccessRight ? addAccessRight.rights : 'hidden',
-            }
-          )
-        }
-      >
-        <div>
-          <GridContainer>
-            <GridItem xs={6}>
-              <Field
-                name='serviceFK'
-                render={(args) => {
-                  return (
-                    <Select
-                      label='Service Name'
-                      options={services.filter(
-                        (o) =>
-                          !serviceCenterFK ||
-                          o.serviceCenters.find(
-                            (m) => m.value === serviceCenterFK,
-                          ),
-                      )}
-                      onChange={() =>
-                        setTimeout(() => {
-                          this.getServiceCenterService()
-                        }, 1)}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={6}>
-              <Field
-                name='serviceCenterFK'
-                render={(args) => {
-                  return (
-                    <Select
-                      label='Service Center Name'
-                      options={serviceCenters.filter(
-                        (o) =>
-                          !serviceFK ||
-                          o.services.find((m) => m.value === serviceFK),
-                      )}
-                      onChange={() =>
-                        setTimeout(() => {
-                          this.getServiceCenterService()
-                        }, 1)}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-          </GridContainer>
-          <GridContainer>
-            <GridItem xs={6}>
-              <FastField
-                name='total'
-                render={(args) => {
-                  return (
-                    <NumberInput
-                      label='Total'
-                      min={0}
-                      currency
-                      onChange={(e) => {
-                        this.updateTotalPrice(e.target.value)
-                      }}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={6}>
-              <Field
-                name='totalAfterItemAdjustment'
-                render={(args) => {
-                  return (
-                    <NumberInput
-                      label='Total After Adj'
-                      currency
-                      disabled
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-          </GridContainer>
-          <GridContainer>
-            <GridItem xs={12} className={classes.editor}>
-              <FastField
-                name='remark'
-                render={(args) => {
-                  // return <RichEditor placeholder='Remarks' {...args} />
-                  return (
-                    <TextField
-                      multiline
-                      rowsMax='5'
-                      label='Remarks'
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-          </GridContainer>
-          {footer({
-            onSave: handleSubmit,
-            onReset: this.handleReset,
-          })}
-        </div>
-      </Authorized.Context.Provider>
+      <div>
+        <GridContainer>
+          <GridItem xs={6}>
+            <Field
+              name='serviceFK'
+              render={(args) => {
+                return (
+                  <Select
+                    label='Service Name'
+                    options={services.filter(
+                      (o) =>
+                        !serviceCenterFK ||
+                        o.serviceCenters.find(
+                          (m) => m.value === serviceCenterFK,
+                        ),
+                    )}
+                    onChange={() =>
+                      setTimeout(() => {
+                        this.getServiceCenterService()
+                      }, 1)}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={6}>
+            <Field
+              name='serviceCenterFK'
+              render={(args) => {
+                return (
+                  <Select
+                    label='Service Center Name'
+                    options={serviceCenters.filter(
+                      (o) =>
+                        !serviceFK ||
+                        o.services.find((m) => m.value === serviceFK),
+                    )}
+                    onChange={() =>
+                      setTimeout(() => {
+                        this.getServiceCenterService()
+                      }, 1)}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+        </GridContainer>
+        <GridContainer>
+          <GridItem xs={6}>
+            <FastField
+              name='total'
+              render={(args) => {
+                return (
+                  <NumberInput
+                    label='Total'
+                    min={0}
+                    currency
+                    onChange={(e) => {
+                      this.updateTotalPrice(e.target.value)
+                    }}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={6}>
+            <Field
+              name='totalAfterItemAdjustment'
+              render={(args) => {
+                return (
+                  <NumberInput
+                    label='Total After Adj'
+                    currency
+                    disabled
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+        </GridContainer>
+        <GridContainer>
+          <GridItem xs={12} className={classes.editor}>
+            <FastField
+              name='remark'
+              render={(args) => {
+                // return <RichEditor placeholder='Remarks' {...args} />
+                return (
+                  <TextField multiline rowsMax='5' label='Remarks' {...args} />
+                )
+              }}
+            />
+          </GridItem>
+        </GridContainer>
+        {footer({
+          onSave: handleSubmit,
+          onReset: this.handleReset,
+        })}
+      </div>
     )
   }
 }

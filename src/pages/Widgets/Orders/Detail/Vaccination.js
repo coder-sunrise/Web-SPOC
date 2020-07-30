@@ -20,7 +20,6 @@ import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 import LowStockInfo from './LowStockInfo'
 import AddFromPast from './AddMedicationFromPast'
-import Authorized from '@/utils/Authorized'
 
 let i = 0
 @connect(({ global, codetable, visitRegistration }) => ({
@@ -29,6 +28,9 @@ let i = 0
   visitRegistration,
 }))
 @withFormikExtend({
+  authority: [
+    'queue.consultation.order.vaccination',
+  ],
   mapPropsToValues: ({ orders = {} }) => {
     const newOrders = orders.entity || orders.defaultVaccination
 
@@ -330,284 +332,255 @@ class Vaccination extends PureComponent {
       classes,
       disableEdit,
       getNextSequence,
-      isInclusiveCoPayer,
       ...reset
     } = this.props
     const { isEditVaccination } = values
     const { showAddFromPastModal } = this.state
-    const addAccessRight = Authorized.check(
-      'queue.consultation.order.vaccination',
-    )
     return (
-      <Authorized.Context.Provider
-        value={
-          isInclusiveCoPayer ? (
-            {
-              rights: 'disable',
-            }
-          ) : (
-            {
-              rights: addAccessRight ? addAccessRight.rights : 'hidden',
-            }
-          )
-        }
-      >
-        <div>
-          <GridContainer>
-            <GridItem xs={6}>
-              <Field
-                name='inventoryVaccinationFK'
-                render={(args) => {
-                  return (
-                    <div style={{ position: 'relative' }}>
-                      <CodeSelect
-                        temp
-                        label='Vaccination Name'
-                        labelField='displayValue'
-                        code='inventoryvaccination'
-                        onChange={this.changeVaccination}
-                        {...args}
-                        style={{ paddingRight: 20 }}
-                      />
-                      <LowStockInfo sourceType='vaccination' {...this.props} />
-                    </div>
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={6}>
-              {!isEditVaccination && (
-                <Tooltip title='Add From Past'>
-                  <ProgressButton
-                    color='primary'
-                    icon={<Add />}
-                    style={{ marginTop: theme.spacing(2) }}
-                    onClick={this.onSearchVaccinationHistory}
-                  >
-                    Add From Past
-                  </ProgressButton>
-                </Tooltip>
-              )}
-            </GridItem>
-          </GridContainer>
-          <GridContainer>
-            <GridItem xs={6}>
-              <FastField
-                name='vaccinationGivenDate'
-                render={(args) => {
-                  return <DatePicker label='Date Given' {...args} />
-                }}
-              />
-            </GridItem>
-          </GridContainer>
-          <GridContainer>
-            <GridItem xs={4}>
-              <Field
-                name='usageMethodFK'
-                render={(args) => {
-                  return (
+      <div>
+        <GridContainer>
+          <GridItem xs={6}>
+            <Field
+              name='inventoryVaccinationFK'
+              render={(args) => {
+                return (
+                  <div style={{ position: 'relative' }}>
                     <CodeSelect
-                      label='Usage'
-                      allowClear={false}
-                      code='ctVaccinationUsage'
-                      onChange={(v, op = {}) => {
-                        setFieldValue(
-                          'usageMethodCode',
-                          op ? op.code : undefined,
-                        )
-                        setFieldValue(
-                          'usageMethodDisplayValue',
-                          op ? op.name : undefined,
-                        )
-                      }}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={4}>
-              <FastField
-                name='dosageFK'
-                render={(args) => {
-                  return (
-                    <CodeSelect
-                      label='Dosage'
+                      temp
+                      label='Vaccination Name'
                       labelField='displayValue'
-                      allowClear={false}
-                      code='ctmedicationdosage'
-                      onChange={(v, op = {}) => {
-                        setFieldValue('dosageCode', op ? op.code : undefined)
-                        setFieldValue(
-                          'dosageDisplayValue',
-                          op ? op.displayValue : undefined,
-                        )
-                        setTimeout(this.calculateQuantity, 1)
-                      }}
-                      valueFiled='id'
+                      code='inventoryvaccination'
+                      onChange={this.changeVaccination}
                       {...args}
+                      style={{ paddingRight: 20 }}
                     />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={4}>
-              <FastField
-                name='uomfk'
-                render={(args) => {
-                  return (
-                    <CodeSelect
-                      label='UOM'
-                      allowClear={false}
-                      code='ctvaccinationunitofmeasurement'
-                      onChange={(v, op = {}) => {
-                        setFieldValue('uomCode', op ? op.code : undefined)
-                        setFieldValue(
-                          'uomDisplayValue',
-                          op ? op.name : undefined,
-                        )
-                      }}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={4}>
-              <FastField
-                name='quantity'
-                render={(args) => {
-                  return (
-                    <NumberInput
-                      label='Quantity'
-                      formatter={(v) => `${v} Tab/s`}
-                      step={1}
-                      min={values.minQuantity}
-                      onChange={(e) => {
-                        if (values.unitPrice) {
-                          const total = e.target.value * values.unitPrice
-                          setFieldValue('totalPrice', total)
-                          this.updateTotalPrice(total)
-                        }
-                      }}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={4}>
-              <FastField
-                name='totalPrice'
-                render={(args) => {
-                  return (
-                    <NumberInput
-                      label='Total'
-                      currency
-                      onChange={(e) => {
-                        this.updateTotalPrice(e.target.value)
-                      }}
-                      min={0}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={4}>
-              <FastField
-                name='totalAfterItemAdjustment'
-                render={(args) => {
-                  return (
-                    <NumberInput
-                      label='Total After Adj'
-                      currency
-                      disabled
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-          </GridContainer>
-          <GridContainer>
-            <GridItem xs={2} className={classes.editor}>
-              <Field
-                name='batchNo'
-                render={(args) => {
-                  return (
-                    <CodeSelect
-                      mode='tags'
-                      maxSelected={1}
-                      disableAll
-                      label='Batch No.'
-                      labelField='batchNo'
-                      valueField='batchNo'
-                      options={this.state.selectedVaccination.vaccinationStock}
-                      onChange={(e, op = {}) => {
-                        if (op && op.length > 0) {
-                          const { expiryDate } = op[0]
-                          setFieldValue(`expiryDate`, expiryDate)
-                        } else {
-                          setFieldValue(`expiryDate`, undefined)
-                        }
-                      }}
-                      disabled={disableEdit}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={2} className={classes.editor}>
-              <Field
-                name='expiryDate'
-                render={(args) => {
-                  return (
-                    <DatePicker
-                      label='Expiry Date'
-                      disabled={disableEdit}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={8} className={classes.editor}>
-              <FastField
-                name='remarks'
-                render={(args) => {
-                  // return <RichEditor placeholder='Remarks' {...args} />
-                  return (
-                    <TextField
-                      multiline
-                      rowsMax='5'
-                      label='Remarks'
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-          </GridContainer>
-          {footer({
-            onSave: handleSubmit,
-            onReset: this.handleReset,
-          })}
-          <CommonModal
-            open={showAddFromPastModal}
-            title='Add Vaccination From Past'
-            onClose={this.toggleAddFromPastModal}
-            onConfirm={this.toggleAddFromPastModal}
-            maxWidth='md'
-            showFooter={false}
-            overrideLoading
-            cancelText='Cancel'
-          >
-            <AddFromPast {...this.props} />
-          </CommonModal>
-        </div>
-      </Authorized.Context.Provider>
+                    <LowStockInfo sourceType='vaccination' {...this.props} />
+                  </div>
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={6}>
+            {!isEditVaccination && (
+              <Tooltip title='Add From Past'>
+                <ProgressButton
+                  color='primary'
+                  icon={<Add />}
+                  style={{ marginTop: theme.spacing(2) }}
+                  onClick={this.onSearchVaccinationHistory}
+                >
+                  Add From Past
+                </ProgressButton>
+              </Tooltip>
+            )}
+          </GridItem>
+        </GridContainer>
+        <GridContainer>
+          <GridItem xs={6}>
+            <FastField
+              name='vaccinationGivenDate'
+              render={(args) => {
+                return <DatePicker label='Date Given' {...args} />
+              }}
+            />
+          </GridItem>
+        </GridContainer>
+        <GridContainer>
+          <GridItem xs={4}>
+            <Field
+              name='usageMethodFK'
+              render={(args) => {
+                return (
+                  <CodeSelect
+                    label='Usage'
+                    allowClear={false}
+                    code='ctVaccinationUsage'
+                    onChange={(v, op = {}) => {
+                      setFieldValue('usageMethodCode', op ? op.code : undefined)
+                      setFieldValue(
+                        'usageMethodDisplayValue',
+                        op ? op.name : undefined,
+                      )
+                    }}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={4}>
+            <FastField
+              name='dosageFK'
+              render={(args) => {
+                return (
+                  <CodeSelect
+                    label='Dosage'
+                    labelField='displayValue'
+                    allowClear={false}
+                    code='ctmedicationdosage'
+                    onChange={(v, op = {}) => {
+                      setFieldValue('dosageCode', op ? op.code : undefined)
+                      setFieldValue(
+                        'dosageDisplayValue',
+                        op ? op.displayValue : undefined,
+                      )
+                      setTimeout(this.calculateQuantity, 1)
+                    }}
+                    valueFiled='id'
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={4}>
+            <FastField
+              name='uomfk'
+              render={(args) => {
+                return (
+                  <CodeSelect
+                    label='UOM'
+                    allowClear={false}
+                    code='ctvaccinationunitofmeasurement'
+                    onChange={(v, op = {}) => {
+                      setFieldValue('uomCode', op ? op.code : undefined)
+                      setFieldValue('uomDisplayValue', op ? op.name : undefined)
+                    }}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={4}>
+            <FastField
+              name='quantity'
+              render={(args) => {
+                return (
+                  <NumberInput
+                    label='Quantity'
+                    formatter={(v) => `${v} Tab/s`}
+                    step={1}
+                    min={values.minQuantity}
+                    onChange={(e) => {
+                      if (values.unitPrice) {
+                        const total = e.target.value * values.unitPrice
+                        setFieldValue('totalPrice', total)
+                        this.updateTotalPrice(total)
+                      }
+                    }}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={4}>
+            <FastField
+              name='totalPrice'
+              render={(args) => {
+                return (
+                  <NumberInput
+                    label='Total'
+                    currency
+                    onChange={(e) => {
+                      this.updateTotalPrice(e.target.value)
+                    }}
+                    min={0}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={4}>
+            <FastField
+              name='totalAfterItemAdjustment'
+              render={(args) => {
+                return (
+                  <NumberInput
+                    label='Total After Adj'
+                    currency
+                    disabled
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+        </GridContainer>
+        <GridContainer>
+          <GridItem xs={2} className={classes.editor}>
+            <Field
+              name='batchNo'
+              render={(args) => {
+                return (
+                  <CodeSelect
+                    mode='tags'
+                    maxSelected={1}
+                    disableAll
+                    label='Batch No.'
+                    labelField='batchNo'
+                    valueField='batchNo'
+                    options={this.state.selectedVaccination.vaccinationStock}
+                    onChange={(e, op = {}) => {
+                      if (op && op.length > 0) {
+                        const { expiryDate } = op[0]
+                        setFieldValue(`expiryDate`, expiryDate)
+                      } else {
+                        setFieldValue(`expiryDate`, undefined)
+                      }
+                    }}
+                    disabled={disableEdit}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={2} className={classes.editor}>
+            <Field
+              name='expiryDate'
+              render={(args) => {
+                return (
+                  <DatePicker
+                    label='Expiry Date'
+                    disabled={disableEdit}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={8} className={classes.editor}>
+            <FastField
+              name='remarks'
+              render={(args) => {
+                // return <RichEditor placeholder='Remarks' {...args} />
+                return (
+                  <TextField multiline rowsMax='5' label='Remarks' {...args} />
+                )
+              }}
+            />
+          </GridItem>
+        </GridContainer>
+        {footer({
+          onSave: handleSubmit,
+          onReset: this.handleReset,
+        })}
+        <CommonModal
+          open={showAddFromPastModal}
+          title='Add Vaccination From Past'
+          onClose={this.toggleAddFromPastModal}
+          onConfirm={this.toggleAddFromPastModal}
+          maxWidth='md'
+          showFooter={false}
+          overrideLoading
+          cancelText='Cancel'
+        >
+          <AddFromPast {...this.props} />
+        </CommonModal>
+      </div>
     )
   }
 }

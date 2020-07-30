@@ -24,6 +24,7 @@ const PaymentRow = ({
   handleVoidClick,
   handlePrinterClick,
   readOnly,
+  printDisabled = false,
   ...payment
 }) => {
   const {
@@ -62,7 +63,7 @@ const PaymentRow = ({
             color='primary'
             id={itemID}
             className={classes.printButton}
-            disabled={isCancelled}
+            disabled={isCancelled || printDisabled}
             onClick={() => handlePrinterClick(type, id)}
           >
             <Printer />

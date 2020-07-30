@@ -71,6 +71,7 @@ const styles = (theme) => ({
     dispense,
     loading,
     patient,
+    clinicSettings,
   }) => ({
     billing,
     dispense,
@@ -82,6 +83,7 @@ const styles = (theme) => ({
     ctcopaymentscheme: codetable.copaymentscheme || [],
     ctschemetype: codetable.ctschemetype || [],
     commitCount: global.commitCount,
+    clinicSettings: clinicSettings.settings,
   }),
 )
 @withFormikExtend({
@@ -146,6 +148,7 @@ class Billing extends Component {
     },
     showDrugLabelSelection: false,
     selectedDrugs: [],
+    isExistingOldPayerItem: false,
   }
 
   componentWillMount () {
@@ -623,6 +626,10 @@ class Billing extends Component {
     })
   }
 
+  handleIsExistingOldPayerItem = (isExistingOldPayerItem) => {
+    this.setState({ isExistingOldPayerItem })
+  }
+
   render () {
     const {
       showReport,
@@ -647,6 +654,7 @@ class Billing extends Component {
       commitCount,
       ctschemetype,
       ctcopaymentscheme,
+      clinicSettings,
     } = this.props
     const formikBag = {
       values,
@@ -713,6 +721,10 @@ class Billing extends Component {
                   onPrinterClick={this.onPrinterClick}
                   saveBilling={this.handleSaveBillingClick}
                   fromBilling
+                  handleIsExistingOldPayerItem={
+                    this.handleIsExistingOldPayerItem
+                  }
+                  clinicSettings={clinicSettings}
                 />
               )}
             </GridContainer>
@@ -772,7 +784,11 @@ class Billing extends Component {
                 </Button>
                 <Button
                   color='success'
-                  disabled={this.state.isEditing || values.id === undefined}
+                  disabled={
+                    this.state.isEditing ||
+                    values.id === undefined ||
+                    this.state.isExistingOldPayerItem
+                  }
                   onClick={this.onCompletePaymentClick}
                 >
                   Complete Payment
