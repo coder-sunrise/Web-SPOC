@@ -53,6 +53,7 @@ class PatientDeposit extends PureComponent {
       reportViewerOpen: false,
       reportID: undefined,
       reportParameters: {},
+      depositTransactionType: [],
       selectedTypeIds: [
         -99,
       ],
@@ -68,15 +69,21 @@ class PatientDeposit extends PureComponent {
   searchResult = () => {
     const { dispatch } = this.props
     const patientId = Number(findGetParameter('pid'))
-
     dispatch({
-      type: 'patient/queryDeposit',
+      type: 'codetable/fetchCodes',
       payload: {
-        id: patientId,
+        code: 'ltdeposittransactiontype',
       },
-    })
-    dispatch({
-      type: 'deposit/reset',
+    }).then((r) => {
+      dispatch({
+        type: 'patient/queryDeposit',
+        payload: {
+          id: patientId,
+        },
+      })
+      dispatch({
+        type: 'deposit/reset',
+      })
     })
   }
 
@@ -179,9 +186,9 @@ class PatientDeposit extends PureComponent {
                 <GridContainer>
                   <FilterBar
                     {...this.props}
-                    refresh={this.searchResult}
                     disabled={depositAccessRight !== 'enable'}
                     refundableAmount={refundableAmount}
+                    refresh={this.searchResult}
                     handleTypeChange={this.handleTypeChange}
                   />
                 </GridContainer>

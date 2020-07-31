@@ -23,7 +23,7 @@ const DepositGrid = ({
     rows: transactionList,
     columns: [
       { name: 'transactionDate', title: 'Date' },
-      { name: 'transactionTypeFK', title: 'Type' },
+      { name: 'transactionTypeName', title: 'Type' },
       { name: 'amount', title: 'Amount' },
       { name: 'transactionMode', title: 'Payment Mode' },
       { name: 'remarks', title: 'Remarks' },
@@ -49,22 +49,8 @@ const DepositGrid = ({
         },
       },
       {
-        columnName: 'transactionTypeFK',
-        type: 'codeSelect',
-        code: 'LTDepositTransactionType',
+        columnName: 'transactionTypeName',
         width: 120,
-        render: (row) => {
-          return (
-            <CodeSelect
-              text
-              code='LTDepositTransactionType'
-              value={row.transactionTypeFK}
-              style={
-                row.isCancelled ? { textDecorationLine: 'line-through' } : {}
-              }
-            />
-          )
-        },
       },
       {
         columnName: 'amount',
@@ -200,7 +186,12 @@ const DepositGrid = ({
     },
   }
 
-  return <CommonTableGrid {...configs} />
+  return (
+    <CommonTableGrid
+      {...configs}
+      style={{ height: window.innerHeight - 430, overflow: 'auto' }}
+    />
+  )
 }
 
 export default DepositGrid
