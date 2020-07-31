@@ -1,9 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import $ from 'jquery'
-import Yup from '@/utils/yup'
-import Refresh from '@material-ui/icons/Refresh'
-import moment from 'moment'
+import Authorized from '@/utils/Authorized'
 import { findGetParameter, roundTo } from '@/utils/utils'
 import { ReportViewer } from '@/components/_medisys'
 
@@ -11,15 +8,6 @@ import {
   GridContainer,
   GridItem,
   CardContainer,
-  Card,
-  Button,
-  notification,
-  FastField,
-  Field,
-  OutlinedTextField,
-  withFormikExtend,
-  Tooltip,
-  RichEditor,
   NumberInput,
   CommonModal,
 } from '@/components'
@@ -65,6 +53,7 @@ class PatientDeposit extends PureComponent {
       reportViewerOpen: false,
       reportID: undefined,
       reportParameters: {},
+      depositTransactionType: [],
       selectedTypeIds: [
         -99,
       ],
@@ -80,21 +69,21 @@ class PatientDeposit extends PureComponent {
   searchResult = () => {
     const { dispatch } = this.props
     const patientId = Number(findGetParameter('pid'))
-
     dispatch({
-      type: 'patient/queryDeposit',
+      type: 'codetable/fetchCodes',
       payload: {
-        id: patientId,
+        code: 'ltdeposittransactiontype',
       },
-    })
-    dispatch({
-      type: 'deposit/updateState',
-      payload: {
-        entity: {},
-        list: [],
-        pagination: {},
-        queryCount: 0,
-      },
+    }).then((r) => {
+      dispatch({
+        type: 'patient/queryDeposit',
+        payload: {
+          id: patientId,
+        },
+      })
+      dispatch({
+        type: 'deposit/reset',
+      })
     })
   }
 
@@ -181,75 +170,91 @@ class PatientDeposit extends PureComponent {
       fullWidth: false,
     }
     return (
-      <React.Fragment>
-        <CardContainer hideHeader size='sm'>
-          <GridContainer>
-            <FilterBar
-              {...this.props}
-              refresh={this.searchResult}
-              handleTypeChange={this.handleTypeChange}
-            />
-          </GridContainer>
-          <GridContainer style={{ marginTop: 20 }}>
-            <GridItem md={12}>
-              <DepositGrid
-                transactionList={transactionList}
-                handlePrint={this.handlePrintReceipt}
-                handleDeleteRow={this.handleDeleteRow}
-              />
-            </GridItem>
-
-            <GridItem md={2} />
-            <GridItem md={10} style={{ marginTop: 20 }}>
-              <GridContainer>
-                <GridItem md={12} style={{ textAlign: 'right' }}>
-                  <span className={classes.summaryText}>Balance:</span>
-                  <NumberInput
-                    {...amountProps}
-                    style={{ width: 100 }}
-                    value={totalAmount}
+      <Authorized authority='patientdatabase.patientprofiledetails.patienthistory.deposit'>
+        {({ rights: depositAccessRight }) => (
+          <Authorized.Context.Provider
+            value={{
+              rights:
+                depositAccessRight === 'readwrite' ||
+                depositAccessRight === 'enable'
+                  ? 'enable'
+                  : depositAccessRight,
+            }}
+          >
+            <React.Fragment>
+              <CardContainer hideHeader size='sm'>
+                <GridContainer>
+                  <FilterBar
+                    {...this.props}
+                    disabled={depositAccessRight !== 'enable'}
+                    refundableAmount={refundableAmount}
+                    refresh={this.searchResult}
+                    handleTypeChange={this.handleTypeChange}
                   />
-                </GridItem>
-                <GridItem md={12} style={{ textAlign: 'right' }}>
-                  <span className={classes.summaryText}>
-                    Refundable Balance:
-                  </span>
-                  <NumberInput
-                    {...amountProps}
-                    style={{ width: 100 }}
-                    value={refundableAmount}
-                  />
-                </GridItem>
-              </GridContainer>
-            </GridItem>
-          </GridContainer>
-        </CardContainer>
+                </GridContainer>
+                <GridContainer style={{ marginTop: 20 }}>
+                  <GridItem md={12}>
+                    <DepositGrid
+                      transactionList={transactionList}
+                      handlePrint={this.handlePrintReceipt}
+                      handleDeleteRow={this.handleDeleteRow}
+                    />
+                  </GridItem>
 
-        <CommonModal
-          open={showDeleteConfirmation}
-          title='Delete Deposit'
-          onConfirm={this.closeDeleteConfirmationModal}
-          onClose={this.closeDeleteConfirmationModal}
-          maxWidth='sm'
-        >
-          <DeleteConfirm
-            onClose={this.closeDeleteConfirmationModal}
-            handleConfirm={this.confirmDelete}
-          />
-        </CommonModal>
+                  <GridItem md={2} />
+                  <GridItem md={10} style={{ marginTop: 20 }}>
+                    <GridContainer>
+                      <GridItem md={12} style={{ textAlign: 'right' }}>
+                        <span className={classes.summaryText}>Balance:</span>
+                        <NumberInput
+                          {...amountProps}
+                          style={{ width: 100 }}
+                          value={totalAmount}
+                        />
+                      </GridItem>
+                      <GridItem md={12} style={{ textAlign: 'right' }}>
+                        <span className={classes.summaryText}>
+                          Refundable Balance:
+                        </span>
+                        <NumberInput
+                          {...amountProps}
+                          style={{ width: 100 }}
+                          value={refundableAmount}
+                        />
+                      </GridItem>
+                    </GridContainer>
+                  </GridItem>
+                </GridContainer>
+              </CardContainer>
 
-        <CommonModal
-          open={this.state.reportViewerOpen}
-          onClose={this.toggleReportViewer}
-          title='Patient Deposit Transaction Details'
-          maxWidth='lg'
-        >
-          <ReportViewer
-            reportID={this.state.reportID}
-            reportParameters={this.state.reportParameters}
-          />
-        </CommonModal>
-      </React.Fragment>
+              <CommonModal
+                open={showDeleteConfirmation}
+                title='Delete Deposit'
+                onConfirm={this.closeDeleteConfirmationModal}
+                onClose={this.closeDeleteConfirmationModal}
+                maxWidth='sm'
+              >
+                <DeleteConfirm
+                  onClose={this.closeDeleteConfirmationModal}
+                  handleConfirm={this.confirmDelete}
+                />
+              </CommonModal>
+
+              <CommonModal
+                open={this.state.reportViewerOpen}
+                onClose={this.toggleReportViewer}
+                title='Patient Deposit Transaction Details'
+                maxWidth='lg'
+              >
+                <ReportViewer
+                  reportID={this.state.reportID}
+                  reportParameters={this.state.reportParameters}
+                />
+              </CommonModal>
+            </React.Fragment>
+          </Authorized.Context.Provider>
+        )}
+      </Authorized>
     )
   }
 }
