@@ -13,6 +13,7 @@ import Pan from './pan'
 import Eraser from './eraser'
 import Tool from './tools'
 import None from './none'
+import Crop from './crop'
 
 const { fabric } = require('fabric')
 
@@ -92,6 +93,7 @@ class SketchField extends PureComponent {
     this._tools[Tool.Pan] = new Pan(fabricCanvas)
     this._tools[Tool.Eraser] = new Eraser(fabricCanvas)
     this._tools[Tool.None] = new None(fabricCanvas)
+    this._tools[Tool.Crop] = new Crop(fabricCanvas)
   }
 
   /**
@@ -404,7 +406,8 @@ class SketchField extends PureComponent {
    */
   _resize = (e) => {
     if (e) e.preventDefault()
-    let { widthCorrection, heightCorrection } = this.props
+    let { widthCorrection, heightCorrection, disableResize } = this.props
+    if (disableResize) return
     let canvas = this._fc
     let { offsetWidth, clientHeight } = this._container
     let prevWidth = canvas.getWidth()
@@ -465,6 +468,7 @@ class SketchField extends PureComponent {
     let canvas = this._fc
     let objects = canvas.getObjects()
     for (let i in objects) {
+      objects[i].factor = factor
       objects[i].scaleX = objects[i].scaleX * factor
       objects[i].scaleY = objects[i].scaleY * factor
       objects[i].left = objects[i].left * factor
@@ -864,7 +868,7 @@ class SketchField extends PureComponent {
     // img.src = dataUrl
   }
 
-  setBackgroundFromData = (imageData) => {
+  setBackgroundFromData = (imageData, resizeCanvas, propertys = {}, loaded) => {
     let canvas = this._fc
     let { indexCount } = this.state
     let history = this._history
@@ -881,8 +885,14 @@ class SketchField extends PureComponent {
     image.src = imageData
     image.onload = () => {
       let imgbase64 = new fabric.Image(image, {})
-      imgbase64.width = canvas.width
-      imgbase64.height = canvas.height
+
+      if (resizeCanvas) {
+        canvas.setWidth(imgbase64.width)
+        canvas.setHeight(imgbase64.height)
+      } else {
+        imgbase64.width = canvas.width
+        imgbase64.height = canvas.height
+      }
       imgbase64.set({
         zindex: oldIndexCount,
       })
@@ -890,7 +900,12 @@ class SketchField extends PureComponent {
       imgbase64.selectable = false
       imgbase64.evented = false
 
+      for (let k in propertys) {
+        imgbase64[k] = propertys[k]
+      }
+
       canvas.sendToBack(imgbase64)
+      if (loaded) loaded(imgbase64)
     }
   }
 
@@ -997,6 +1012,47 @@ class SketchField extends PureComponent {
 
     const result = canvas.toDataURL()
     return result
+  }
+
+  setAngle = (number, calback) => {
+    let canvas = this._fc
+    let obj = canvas.getActiveObject()
+
+    if (obj) {
+      let absNum = Math.abs(number)
+      if (absNum > 360) {
+        absNum = absNum - parseInt(absNum / 360, 10) * 360
+      }
+      number = (obj.angle || 0) + absNum * (number >= 0 ? 1 : -1)
+      obj.rotate(number)
+      canvas.sendToBack(obj)
+      if (calback) calback(number)
+    }
+  }
+  mirror = () => {
+    let canvas = this._fc
+    let obj = canvas.getActiveObject()
+    if (obj) {
+      this.setAngle(-180)
+      this.flipY()
+    }
+  }
+  flipX = () => {
+    let canvas = this._fc
+    var obj = canvas.getActiveObject()
+    if (obj) {
+      obj.set('flipX', !obj.flipX)
+      canvas.renderAll()
+    }
+  }
+
+  flipY = () => {
+    let canvas = this._fc
+    var obj = canvas.getActiveObject()
+    if (obj) {
+      obj.set('flipY', !obj.flipY)
+      canvas.renderAll()
+    }
   }
 
   addText = (text, color, options = {}) => {
@@ -1121,6 +1177,7 @@ class SketchField extends PureComponent {
       >
         <canvas
           id={uuid4()}
+          backgroundColor='red'
           ref={(c) => {
             this._canvas = c
           }}
