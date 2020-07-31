@@ -1,23 +1,12 @@
-import React, { PureComponent, memo } from 'react'
-import { formatMessage } from 'umi/locale'
-import Search from '@material-ui/icons/Search'
+import React, { PureComponent } from 'react'
 import { findGetParameter } from '@/utils/utils'
-import moment from 'moment'
-import { standardRowHeight } from 'mui-pro-jss'
 import Printer from '@material-ui/icons/Print'
 import { ReportViewer } from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
 import {
-  GridContainer,
   GridItem,
   FastField,
-  TextField,
   CodeSelect,
-  withFormikExtend,
-  DateRangePicker,
-  ProgressButton,
-  Tooltip,
-  Checkbox,
   Button,
   CommonModal,
 } from '@/components'
@@ -31,14 +20,7 @@ class FilterBar extends PureComponent {
       showDepositRefundModal: false,
       isDeposit: true,
     }
-    // const { setFieldValue } = props
   }
-
-  // componentDidMount = () => {
-  //   setTimeout(() => {
-  //     this.searchResult()
-  //   }, 100)
-  // }
 
   openReportViewer = () => {
     this.setState({ reportViewerOpen: true })
@@ -86,23 +68,18 @@ class FilterBar extends PureComponent {
 
   render () {
     const { isDeposit, showDepositRefundModal } = this.state
-    const { disabled, refundableAmount } = this.props
+    const { disabled, refundableAmount, selectedTypeIds } = this.props
     const patientId = Number(findGetParameter('pid'))
 
     return (
       <React.Fragment>
         <GridItem md={3}>
-          <FastField
-            name='depositTransactionTypeFK'
-            render={(args) => (
-              <CodeSelect
-                label='Type'
-                {...args}
-                code='LTDepositTransactionType'
-                mode='multiple'
-                onChange={this.props.handleTypeChange}
-              />
-            )}
+          <CodeSelect
+            label='Type'
+            value={selectedTypeIds}
+            code='LTDepositTransactionType'
+            mode='multiple'
+            onChange={this.props.handleTypeChange}
           />
         </GridItem>
 

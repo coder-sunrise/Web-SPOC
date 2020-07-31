@@ -75,6 +75,16 @@ class PatientDeposit extends PureComponent {
         code: 'ltdeposittransactiontype',
       },
     }).then((r) => {
+      const allids = r.reduce((p, c) => {
+        return [
+          ...p,
+          c.id,
+        ]
+      }, [])
+
+      this.setState({
+        selectedTypeIds: allids,
+      })
       dispatch({
         type: 'patient/queryDeposit',
         payload: {
@@ -186,6 +196,7 @@ class PatientDeposit extends PureComponent {
                 <GridContainer>
                   <FilterBar
                     {...this.props}
+                    selectedTypeIds={selectedTypeIds}
                     disabled={depositAccessRight !== 'enable'}
                     refundableAmount={refundableAmount}
                     refresh={this.searchResult}

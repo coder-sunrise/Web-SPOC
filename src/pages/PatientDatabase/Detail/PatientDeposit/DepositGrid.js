@@ -19,6 +19,11 @@ const DepositGrid = ({
   handlePrint,
   handleDeleteRow,
 }) => {
+  const getDeleteStyle = (row) => {
+    return {
+      textDecorationLine: row.isCancelled ? 'line-through' : '',
+    }
+  }
   const configs = {
     rows: transactionList,
     columns: [
@@ -41,9 +46,7 @@ const DepositGrid = ({
               text
               format={dateFormatLong}
               value={row.transactionDate}
-              style={
-                row.isCancelled ? { textDecorationLine: 'line-through' } : {}
-              }
+              style={getDeleteStyle(row)}
             />
           )
         },
@@ -51,6 +54,11 @@ const DepositGrid = ({
       {
         columnName: 'transactionTypeName',
         width: 120,
+        render: (row) => {
+          return (
+            <span style={getDeleteStyle(row)}>{row.transactionTypeName}</span>
+          )
+        },
       },
       {
         columnName: 'amount',
@@ -62,9 +70,7 @@ const DepositGrid = ({
               currency
               text
               value={row.amount}
-              style={
-                row.isCancelled ? { textDecorationLine: 'line-through' } : {}
-              }
+              style={getDeleteStyle(row)}
             />
           )
         },
@@ -77,9 +83,7 @@ const DepositGrid = ({
             <TextField
               text
               value={row.transactionMode}
-              style={
-                row.isCancelled ? { textDecorationLine: 'line-through' } : {}
-              }
+              style={getDeleteStyle(row)}
             />
           )
         },
@@ -87,29 +91,13 @@ const DepositGrid = ({
       {
         columnName: 'remarks',
         render: (row) => {
-          return (
-            <TextField
-              text
-              value={row.remarks}
-              style={
-                row.isCancelled ? { textDecorationLine: 'line-through' } : {}
-              }
-            />
-          )
+          return <span style={getDeleteStyle(row)}>{row.remarks}</span>
         },
       },
       {
         columnName: 'cancelReason',
         render: (row) => {
-          return (
-            <TextField
-              text
-              value={row.cancelReason}
-              style={
-                row.isCancelled ? { textDecorationLine: 'line-through' } : {}
-              }
-            />
-          )
+          return <span style={getDeleteStyle(row)}>{row.cancelReason}</span>
         },
       },
       {
