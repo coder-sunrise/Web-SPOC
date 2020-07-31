@@ -86,7 +86,9 @@ class FilterBar extends PureComponent {
 
   render () {
     const { isDeposit, showDepositRefundModal } = this.state
+    const { disabled } = this.props
     const patientId = Number(findGetParameter('pid'))
+
     return (
       <React.Fragment>
         <GridItem md={3}>
@@ -114,17 +116,20 @@ class FilterBar extends PureComponent {
               onClick={() => {
                 this.addDepositRefund(true)
               }}
+              disabled={disabled}
               color='primary'
             >
               Deposit
             </Button>
           </Authorized>
+
           <Authorized authority='deposit.refund'>
             <Button
               size='lg'
               onClick={() => {
                 this.addDepositRefund(false)
               }}
+              disabled={disabled}
               color='primary'
             >
               Refund
