@@ -146,6 +146,7 @@ const ApplyClaims = ({
     updatedPayer,
     updatedIndex,
     invoicePayerList,
+    autoApply = false,
   ) => {
     const _list = invoicePayerList || tempInvoicePayer
     const invoicePayerWithUpdatedPayer = _list.map(
@@ -155,6 +156,7 @@ const ApplyClaims = ({
       updatedInvoiceItems,
       invoicePayerWithUpdatedPayer,
       updatedIndex,
+      autoApply,
     )
     setTempInvoicePayer(newInvoicePayer)
     incrementCommitCount()
@@ -166,6 +168,7 @@ const ApplyClaims = ({
     invoicePayerList,
     invoiceItems,
     allSchemes,
+    autoApply = false,
   ) => {
     const flattenSchemes = allSchemes.reduce(
       (schemes, cs) => [
@@ -195,7 +198,12 @@ const ApplyClaims = ({
       isModified: true,
       invoicePayerItem: payerInvoiceItems,
     }
-    updateTempInvoicePayer(updatedPayer, index, invoicePayerList || null)
+    updateTempInvoicePayer(
+      updatedPayer,
+      index,
+      invoicePayerList || null,
+      autoApply,
+    )
   }
 
   const toggleCopayerModal = () => setShowCoPaymentModal(!showCoPaymentModal)
@@ -282,6 +290,7 @@ const ApplyClaims = ({
         ],
         invoice.invoiceItems,
         claimableSchemes,
+        true,
       )
     } else {
       setInitialState([])

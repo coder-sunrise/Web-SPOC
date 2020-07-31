@@ -487,6 +487,7 @@ export const updateInvoicePayerPayableBalance = (
   originalInvoiceItems,
   list,
   updatedIndex,
+  autoApply = false,
 ) => {
   const result = list.reduce((_payers, payer, index) => {
     // dp nothing when payer isCancelled
@@ -497,7 +498,28 @@ export const updateInvoicePayerPayableBalance = (
       ]
 
     // first payer use totalAfterGst as payable balance
-    if (index === 0)
+    if (index === 0) {
+      let autoApplyMessage = {}
+      if (autoApply) {
+        autoApplyMessage = {
+          payerDistributedAmt: roundTo(
+            payer.invoicePayerItem.reduce(
+              (subtotal, item) => subtotal + item.claimAmount,
+              0,
+            ),
+          ),
+          payerOutstanding: roundTo(
+            payer.invoicePayerItem.reduce(
+              (subtotal, item) => subtotal + item.claimAmount,
+              0,
+            ),
+          ),
+          isModified: true,
+          _isConfirmed: true,
+          _isEditing: false,
+          _isDeleted: false,
+        }
+      }
       return [
         ..._payers,
         {
@@ -513,8 +535,10 @@ export const updateInvoicePayerPayableBalance = (
                 : item.payableBalance,
             }
           }),
+          ...autoApplyMessage,
         },
       ]
+    }
 
     // all previous payer remains the same as is
     if (index < updatedIndex)
@@ -555,7 +579,10 @@ export const updateInvoicePayerPayableBalance = (
     })
     return [
       ..._payers,
-      { ...payer, invoicePayerItem: newInvoicePayerItem },
+      {
+        ...payer,
+        invoicePayerItem: newInvoicePayerItem,
+      },
     ]
   }, [])
 

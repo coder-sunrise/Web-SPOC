@@ -205,14 +205,18 @@ class Main extends Component {
     })
   }
 
-  makePayment = async () => {
+  makePayment = async (voidPayment = false, voidReason = '') => {
     const { dispatch, dispense, values } = this.props
     const _values = constructPayload(values)
     const finalizeResponse = await dispatch({
       type: 'dispense/finalize',
       payload: {
         id: dispense.visitID,
-        values: _values,
+        values: {
+          ..._values,
+          voidPayment,
+          voidReason,
+        },
       },
     })
     if (finalizeResponse === 204) {

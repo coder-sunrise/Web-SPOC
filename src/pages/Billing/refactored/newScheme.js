@@ -196,7 +196,7 @@ const Scheme = ({
   const onPaymentDeleteClick = (payment) => {
     onPaymentVoidClick(index, payment)
   }
-  const { IsEnableAddPaymentInBilling = true } = clinicSettings
+  const { isEnableAddPaymentInBilling = false } = clinicSettings
   return (
     <Paper key={_key} elevation={4} className={classes.gridRow}>
       <GridContainer style={{ marginBottom: 16 }} alignItems='flex-start'>
@@ -358,7 +358,7 @@ const Scheme = ({
           )}
         </GridItem>
         {fromBilling &&
-        IsEnableAddPaymentInBilling && (
+        isEnableAddPaymentInBilling && (
           <GridContainer>
             <GridItem md={12}>
               <CardContainer hideHeader size='sm'>
