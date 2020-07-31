@@ -4,6 +4,7 @@ import _ from 'lodash'
 import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
 import { formatMessage } from 'umi/locale'
+import { isNumber } from 'util'
 import { VISIT_TYPE } from '@/utils/constants'
 
 import LowStockInfo from './LowStockInfo'
@@ -26,6 +27,7 @@ import {
   Field,
   CommonModal,
   ProgressButton,
+  Switch,
 } from '@/components'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
@@ -54,6 +56,18 @@ const authorityCfg = {
     if (type === '5') {
       v.drugCode = 'MISC'
     }
+
+    if (v.uid) {
+      if (v.adjAmount <= 0) {
+        v.adjValue = Math.abs(v.adjValue)
+        v.isMinus = true
+      } else {
+        v.isMinus = false
+      }
+
+      v.isExactAmount = v.adjType !== 'Percentage'
+    }
+
     // v.corPrescriptionItemPrecaution =
     //   v.corPrescriptionItemPrecaution && v.corPrescriptionItemPrecaution[0]
     //     ? v.corPrescriptionItemPrecaution
@@ -90,6 +104,10 @@ const authorityCfg = {
       .required(),
     dispenseUOMFK: Yup.number().required(),
     totalPrice: Yup.number().required(),
+    totalAfterItemAdjustment: Yup.number().min(
+      0.0,
+      'The amount should be more than 0.00',
+    ),
     type: Yup.string(),
     inventoryMedicationFK: Yup.number().when('type', {
       is: (val) => val !== '5',
@@ -188,6 +206,11 @@ const authorityCfg = {
       subject: currentType.getSubject(values),
       isDeleted: false,
       batchNo,
+      adjValue:
+        values.adjAmount < 0
+          ? -Math.abs(values.adjValue)
+          : Math.abs(values.adjValue),
+      unitPrice: values.totalPrice / values.quantity,
     }
 
     dispatch({
@@ -207,6 +230,7 @@ class Medication extends PureComponent {
     batchNo: '',
     expiryDate: '',
     showAddFromPastModal: false,
+    isExternal: false,
   }
 
   getActionItem = (i, arrayHelpers, prop, tooltip, defaultValue) => {
@@ -255,7 +279,7 @@ class Medication extends PureComponent {
   }
 
   calculateQuantity = (medication) => {
-    const { codetable, setFieldValue, disableEdit } = this.props
+    const { codetable, setFieldValue } = this.props
     let currentMedication = medication || this.state.selectedMedication
 
     const { form } = this.descriptionArrayHelpers
@@ -299,7 +323,7 @@ class Medication extends PureComponent {
     }
     setFieldValue(`quantity`, newTotalQuantity)
 
-    if (disableEdit === false) {
+    if (this.state.isExternal === false) {
       if (currentMedication.sellingPrice) {
         setFieldValue('unitPrice', currentMedication.sellingPrice)
         this.updateTotalPrice(currentMedication.sellingPrice * newTotalQuantity)
@@ -311,8 +335,8 @@ class Medication extends PureComponent {
   }
 
   setTotalPrice = () => {
-    const { values, disableEdit } = this.props
-    if (disableEdit === false) {
+    const { values } = this.props
+    if (this.state.isExternal === false) {
       if (values.unitPrice) {
         const total = (values.quantity || 0) * values.unitPrice
         this.updateTotalPrice(total)
@@ -412,7 +436,7 @@ class Medication extends PureComponent {
   }
 
   changeMedication = (v, op = {}) => {
-    const { setFieldValue, disableEdit, values } = this.props
+    const { setFieldValue, values } = this.props
 
     let defaultBatch
     if (op.medicationStock) {
@@ -447,7 +471,7 @@ class Medication extends PureComponent {
 
     setFieldValue('corPrescriptionItemInstruction', newPrescriptionInstruction)
 
-    if (disableEdit === false) {
+    if (this.state.isExternal === false) {
       setFieldValue('batchNo', defaultBatch ? defaultBatch.batchNo : undefined)
       setFieldValue(
         'expiryDate',
@@ -517,6 +541,10 @@ class Medication extends PureComponent {
     setFieldValue('drugCode', op.code)
     setFieldValue('drugName', op.displayValue)
 
+    setFieldValue('isMinus', true)
+    setFieldValue('isExactAmount', true)
+    setFieldValue('adjValue', 0)
+
     setTimeout(() => {
       this.calculateQuantity(op)
     }, 1)
@@ -524,15 +552,26 @@ class Medication extends PureComponent {
 
   updateTotalPrice = (v) => {
     if (v || v === 0) {
-      const { adjType, adjValue } = this.props.values
-      const adjustment = calculateAdjustAmount(
-        adjType === 'ExactAmount',
+      const { isExactAmount, isMinus, adjValue } = this.props.values
+      let value = adjValue
+      if (!isMinus) {
+        value = Math.abs(adjValue)
+      } else {
+        value = -Math.abs(adjValue)
+      }
+
+      const finalAmount = calculateAdjustAmount(
+        isExactAmount,
         v,
-        adjValue,
+        value || adjValue,
+      )
+      this.props.setFieldValue('totalAfterItemAdjustment', finalAmount.amount)
+      this.props.setFieldValue('adjAmount', finalAmount.adjAmount)
+      this.props.setFieldValue(
+        'adjType',
+        isExactAmount ? 'ExactAmount' : 'Percentage',
       )
       this.props.setFieldValue('totalPrice', v)
-      this.props.setFieldValue('totalAfterItemAdjustment', adjustment.amount)
-      this.props.setFieldValue('adjAmount', adjustment.adjAmount)
     } else {
       this.props.setFieldValue('totalPrice', v)
       this.props.setFieldValue('totalAfterItemAdjustment', undefined)
@@ -639,6 +678,41 @@ class Medication extends PureComponent {
     })
   }
 
+  onAdjustmentConditionChange = (v) => {
+    const { values } = this.props
+    const { isMinus, adjValue, isExactAmount } = values
+    if (!isNumber(adjValue)) return
+
+    let value = adjValue
+    if (!isExactAmount && adjValue > 100) {
+      value = 100
+      this.props.setFieldValue('adjValue', 100)
+    }
+
+    if (!isMinus) {
+      value = Math.abs(value)
+    } else {
+      value = -Math.abs(value)
+    }
+    v = value
+
+    this.getFinalAmount({ value })
+  }
+
+  getFinalAmount = ({ value } = {}) => {
+    const { values, setFieldValue } = this.props
+    const { isExactAmount, adjValue, totalPrice = 0 } = values
+    const finalAmount = calculateAdjustAmount(
+      isExactAmount,
+      totalPrice,
+      value || adjValue,
+    )
+
+    setFieldValue('totalAfterItemAdjustment', finalAmount.amount)
+    setFieldValue('adjAmount', finalAmount.adjAmount)
+    setFieldValue('adjType', isExactAmount ? 'ExactAmount' : 'Percentage')
+  }
+
   render () {
     const {
       theme,
@@ -648,7 +722,6 @@ class Medication extends PureComponent {
       footer,
       handleSubmit,
       setFieldValue,
-      disableEdit,
       setDisable,
     } = this.props
 
@@ -667,7 +740,7 @@ class Medication extends PureComponent {
       <Authorized authority={accessRight}>
         <div>
           <GridContainer>
-            <GridItem xs={6}>
+            <GridItem xs={8}>
               <React.Fragment>
                 {openPrescription ? (
                   <FastField
@@ -708,14 +781,17 @@ class Medication extends PureComponent {
                 )}
               </React.Fragment>
             </GridItem>
-            <GridItem xs={6}>
+            <GridItem xs={4}>
               {!openPrescription &&
               !isEditMedication && (
                 <Tooltip title='Add From Past'>
                   <ProgressButton
                     color='primary'
                     icon={<Add />}
-                    style={{ marginTop: theme.spacing(2) }}
+                    style={{
+                      marginTop: theme.spacing(2),
+                      marginLeft: 55,
+                    }}
                     onClick={this.onSearchMedicationHistory}
                   >
                     Add From Past
@@ -727,7 +803,7 @@ class Medication extends PureComponent {
           <GridContainer gutter={0}>
             <GridItem xs={12}>
               <CustomInputWrapper
-                label='Description'
+                label='Instructions'
                 style={{ paddingTop: 14 }}
                 labelProps={{
                   shrink: true,
@@ -1077,38 +1153,15 @@ class Medication extends PureComponent {
               </CustomInputWrapper>
             </GridItem>
           </GridContainer>
-
           <GridContainer>
-            <GridItem xs={2}>
-              <Field
-                name='quantity'
-                render={(args) => {
-                  return (
-                    <NumberInput
-                      label='Quantity'
-                      // formatter={(v) => `${v} Bottle${v > 1 ? 's' : ''}`}
-                      step={1}
-                      min={0}
-                      // currency
-                      onChange={() => {
-                        setTimeout(() => {
-                          this.setTotalPrice()
-                        }, 1)
-                      }}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={2}>
+            <GridItem xs={4} className={classes.editor}>
               <FastField
                 name='dispenseUOMFK'
                 render={(args) => {
                   return (
                     <CodeSelect
                       disabled={!openPrescription}
-                      label='UOM'
+                      label='Dispense UOM'
                       allowClear={false}
                       code='ctMedicationUnitOfMeasurement'
                       onChange={(v, op = {}) => {
@@ -1127,48 +1180,6 @@ class Medication extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem xs={3}>
-              <Field
-                name='totalPrice'
-                render={(args) => {
-                  return (
-                    <NumberInput
-                      label='Total'
-                      onChange={(e) => {
-                        this.updateTotalPrice(e.target.value)
-                      }}
-                      min={0}
-                      disabled={disableEdit}
-                      currency
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={3}>
-              <Field
-                name='totalAfterItemAdjustment'
-                render={(args) => {
-                  // if (
-                  //   orders.totalAfterItemAdjustment &&
-                  //   args.field.value !== orders.totalAfterItemAdjustment
-                  // ) {
-                  //   args.form.setFieldValue('totalAfterItemAdjustment', orders.totalAfterItemAdjustment)
-                  // }
-                  return (
-                    <NumberInput
-                      label='Total After Adj'
-                      disabled
-                      currency
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-          </GridContainer>
-          <GridContainer>
             <GridItem xs={2} className={classes.editor}>
               <Field
                 name='batchNo'
@@ -1190,7 +1201,7 @@ class Medication extends PureComponent {
                           setFieldValue(`expiryDate`, undefined)
                         }
                       }}
-                      disabled={disableEdit}
+                      disabled={this.state.isExternal}
                       {...args}
                     />
                   )
@@ -1204,14 +1215,42 @@ class Medication extends PureComponent {
                   return (
                     <DatePicker
                       label='Expiry Date'
-                      disabled={disableEdit}
+                      disabled={this.state.isExternal}
                       {...args}
                     />
                   )
                 }}
               />
             </GridItem>
-            <GridItem xs={6} className={classes.editor}>
+            <GridItem xs={3} className={classes.editor}>
+              <Field
+                name='quantity'
+                render={(args) => {
+                  return (
+                    <NumberInput
+                      label='Quantity'
+                      style={{
+                        marginLeft: 55,
+                        paddingRight: 45,
+                      }}
+                      // formatter={(v) => `${v} Bottle${v > 1 ? 's' : ''}`}
+                      step={1}
+                      min={0}
+                      // currency
+                      onChange={() => {
+                        setTimeout(() => {
+                          this.setTotalPrice()
+                        }, 1)
+                      }}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem xs={8} className={classes.editor}>
               {/* <Button link className={classes.editorBtn}>
               Add Diagnosis
             </Button> */}
@@ -1231,7 +1270,32 @@ class Medication extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem xs={12}>
+            <GridItem xs={3} className={classes.editor}>
+              <Field
+                name='totalPrice'
+                render={(args) => {
+                  return (
+                    <NumberInput
+                      label='Total'
+                      style={{
+                        marginLeft: 55,
+                        paddingRight: 45,
+                      }}
+                      onChange={(e) => {
+                        this.updateTotalPrice(e.target.value)
+                      }}
+                      min={0}
+                      disabled={this.state.isExternal}
+                      currency
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem xs={8} className={classes.editor}>
               {values.visitPurposeFK !== VISIT_TYPE.RETAIL ? (
                 <FastField
                   name='isExternalPrescription'
@@ -1244,7 +1308,6 @@ class Medication extends PureComponent {
                     return (
                       <Checkbox
                         label='External Prescription'
-                        labelPlacement='start'
                         // fullWidth={false}
                         {...args}
                         onChange={(e) => {
@@ -1257,6 +1320,11 @@ class Medication extends PureComponent {
                             this.props.setFieldValue('totalPrice', 0)
                             this.props.setFieldValue('expiryDate', undefined)
                             this.props.setFieldValue('batchNo', undefined)
+                            this.props.setFieldValue('isMinus', true)
+                            this.props.setFieldValue('isExactAmount', true)
+                            this.props.setFieldValue('adjValue', 0)
+
+                            this.setState({ isExternal: true })
                           } else {
                             this.props.setFieldValue(
                               'expiryDate',
@@ -1266,6 +1334,7 @@ class Medication extends PureComponent {
                               'batchNo',
                               this.state.batchNo,
                             )
+                            this.setState({ isExternal: false })
                             setTimeout(() => {
                               this.calculateQuantity()
                             }, 1)
@@ -1279,6 +1348,124 @@ class Medication extends PureComponent {
               ) : (
                 ''
               )}
+            </GridItem>
+            <Authorized.Context.Provider
+              value={{
+                rights: this.state.isExternal ? 'disable' : 'enable',
+              }}
+            >
+              <GridItem xs={3} className={classes.editor}>
+                <div style={{ position: 'relative' }}>
+                  <FastField
+                    name='isMinus'
+                    render={(args) => {
+                      return (
+                        <Switch
+                          style={{ position: 'absolute' }}
+                          checkedChildren='-'
+                          unCheckedChildren='+'
+                          label=''
+                          onChange={() => {
+                            setTimeout(() => {
+                              this.onAdjustmentConditionChange()
+                            }, 1)
+                          }}
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                  <Field
+                    name='adjValue'
+                    render={(args) => {
+                      args.min = 0
+                      if (values.isExactAmount) {
+                        return (
+                          <NumberInput
+                            style={{
+                              marginLeft: 55,
+                              paddingRight: 45,
+                            }}
+                            currency
+                            label='Adjustment'
+                            onChange={() => {
+                              setTimeout(() => {
+                                this.onAdjustmentConditionChange()
+                              }, 1)
+                            }}
+                            {...args}
+                          />
+                        )
+                      }
+                      return (
+                        <NumberInput
+                          style={{
+                            marginLeft: 55,
+                            paddingRight: 45,
+                          }}
+                          percentage
+                          max={999}
+                          label='Adjustment'
+                          onChange={() => {
+                            setTimeout(() => {
+                              this.onAdjustmentConditionChange()
+                            }, 1)
+                          }}
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </div>
+              </GridItem>
+              <GridItem xs={1} className={classes.editor}>
+                <FastField
+                  name='isExactAmount'
+                  render={(args) => {
+                    return (
+                      <Switch
+                        checkedChildren='$'
+                        unCheckedChildren='%'
+                        label=''
+                        onChange={() => {
+                          setTimeout(() => {
+                            this.onAdjustmentConditionChange()
+                          }, 1)
+                        }}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+            </Authorized.Context.Provider>
+          </GridContainer>
+          <GridContainer>
+            <GridItem xs={8} />
+            <GridItem xs={3}>
+              <Field
+                name='totalAfterItemAdjustment'
+                render={(args) => {
+                  // if (
+                  //   orders.totalAfterItemAdjustment &&
+                  //   args.field.value !== orders.totalAfterItemAdjustment
+                  // ) {
+                  //   args.form.setFieldValue('totalAfterItemAdjustment', orders.totalAfterItemAdjustment)
+                  // }
+                  return (
+                    <NumberInput
+                      label='Total After Adj'
+                      style={{
+                        marginLeft: 55,
+                        paddingRight: 45,
+                      }}
+                      disabled
+                      currency
+                      {...args}
+                    />
+                  )
+                }}
+              />
             </GridItem>
           </GridContainer>
           {footer({

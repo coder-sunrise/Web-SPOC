@@ -155,6 +155,7 @@ class Service extends PureComponent {
         quantity: 1,
       }
     }
+
     if (serviceFK && !serviceCenterFK) {
       const serviceCenterService =
         this.state.serviceCenterServices.find(
@@ -164,6 +165,9 @@ class Service extends PureComponent {
         setValues({
           ...obj(serviceCenterService),
           serviceCenterFK: serviceCenterService.serviceCenterId,
+          isMinus: true,
+          isExactAmount: true,
+          adjValue: 0,
         })
         this.updateTotalPrice(serviceCenterService.unitPrice)
       }
@@ -179,6 +183,9 @@ class Service extends PureComponent {
     if (serviceCenterService) {
       setValues({
         ...obj(serviceCenterService),
+        isMinus: true,
+        isExactAmount: true,
+        adjValue: 0,
       })
       this.updateTotalPrice(serviceCenterService.unitPrice)
     }
@@ -287,13 +294,17 @@ class Service extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={4}>
+          <GridItem xs={3}>
             <FastField
               name='total'
               render={(args) => {
                 return (
                   <NumberInput
                     label='Total'
+                    style={{
+                      marginLeft: 55,
+                      paddingRight: 45,
+                    }}
                     min={0}
                     currency
                     onChange={(e) => {
@@ -426,13 +437,17 @@ class Service extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={4} className={classes.editor}>
+          <GridItem xs={3} className={classes.editor}>
             <Field
               name='totalAfterItemAdjustment'
               render={(args) => {
                 return (
                   <NumberInput
                     label='Total After Adj'
+                    style={{
+                      marginLeft: 55,
+                      paddingRight: 45,
+                    }}
                     currency
                     disabled
                     {...args}

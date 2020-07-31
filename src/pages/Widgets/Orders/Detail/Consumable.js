@@ -140,6 +140,10 @@ class Consumable extends PureComponent {
     setFieldValue('consumableName', op.displayValue)
     setFieldValue('unitOfMeasurement', op.uom ? op.uom.name : undefined)
 
+    setFieldValue('isMinus', true)
+    setFieldValue('isExactAmount', true)
+    setFieldValue('adjValue', 0)
+
     if (op.sellingPrice) {
       setFieldValue('unitPrice', op.sellingPrice)
       setFieldValue('totalPrice', op.sellingPrice * values.quantity)
@@ -302,13 +306,17 @@ class Consumable extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={4}>
+          <GridItem xs={3}>
             <FastField
               name='quantity'
               render={(args) => {
                 return (
                   <NumberInput
                     label='Quantity'
+                    style={{
+                      marginLeft: 55,
+                      paddingRight: 45,
+                    }}
                     step={1}
                     min={1}
                     onChange={(e) => {
@@ -369,13 +377,17 @@ class Consumable extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={4} className={classes.editor}>
+          <GridItem xs={3} className={classes.editor}>
             <FastField
               name='totalPrice'
               render={(args) => {
                 return (
                   <NumberInput
                     label='Total'
+                    style={{
+                      marginLeft: 55,
+                      paddingRight: 45,
+                    }}
                     currency
                     onChange={(e) => {
                       this.updateTotalPrice(e.target.value)
@@ -487,13 +499,17 @@ class Consumable extends PureComponent {
         </GridContainer>
         <GridContainer>
           <GridItem xs={8} />
-          <GridItem xs={4}>
+          <GridItem xs={3}>
             <FastField
               name='totalAfterItemAdjustment'
               render={(args) => {
                 return (
                   <NumberInput
                     label='Total After Adj'
+                    style={{
+                      marginLeft: 55,
+                      paddingRight: 45,
+                    }}
                     currency
                     disabled
                     {...args}

@@ -6,6 +6,9 @@ import { getUniqueId, maxReducer, calculateAmount } from '@/utils/utils'
 
 const sharedMedicationValue = {
   // quantity: 0,
+  isMinus: true,
+  adjValue: 0,
+  isExactAmount: true,
   corPrescriptionItemPrecaution: [
     {
       precaution: '',
