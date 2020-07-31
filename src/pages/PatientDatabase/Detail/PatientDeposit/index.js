@@ -181,6 +181,7 @@ class PatientDeposit extends PureComponent {
                     {...this.props}
                     refresh={this.searchResult}
                     disabled={depositAccessRight !== 'enable'}
+                    refundableAmount={refundableAmount}
                     handleTypeChange={this.handleTypeChange}
                   />
                 </GridContainer>

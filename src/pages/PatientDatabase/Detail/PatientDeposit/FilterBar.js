@@ -86,7 +86,7 @@ class FilterBar extends PureComponent {
 
   render () {
     const { isDeposit, showDepositRefundModal } = this.state
-    const { disabled } = this.props
+    const { disabled, refundableAmount } = this.props
     const patientId = Number(findGetParameter('pid'))
 
     return (
@@ -129,7 +129,7 @@ class FilterBar extends PureComponent {
               onClick={() => {
                 this.addDepositRefund(false)
               }}
-              disabled={disabled}
+              disabled={disabled || refundableAmount <= 0}
               color='primary'
             >
               Refund
