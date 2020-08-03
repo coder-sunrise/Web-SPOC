@@ -175,11 +175,12 @@ const withWebSocket = () => (Component) => {
     toggleModal = () => {
       this.setState((preState) => ({
         showScanner: !preState.showScanner,
+        loading: false,
       }))
     }
 
     handleCloseScanner = () => {
-      this.setState({ showScanner: false, scanResults: [] })
+      this.setState({ showScanner: false, loading: false, scanResults: [] })
     }
 
     render () {

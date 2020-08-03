@@ -466,6 +466,7 @@ class SketchField extends PureComponent {
    */
   zoom = (factor) => {
     let canvas = this._fc
+
     let objects = canvas.getObjects()
     for (let i in objects) {
       objects[i].factor = factor
@@ -1177,9 +1178,11 @@ class SketchField extends PureComponent {
       >
         <canvas
           id={uuid4()}
-          backgroundColor='red'
           ref={(c) => {
             this._canvas = c
+          }}
+          style={{
+            border: '1px solid red',
           }}
         >
           Sorry, Canvas HTML5 element is not supported by your browser :(

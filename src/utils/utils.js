@@ -93,6 +93,11 @@ export const roundTo = (amount, precision = 2) => {
   return Math.round(amount * 10 ** precision) / 10 ** precision
 }
 
+export const roundUp = (num, precision = 2) => {
+  precision = 10 ** precision
+  return Math.ceil(num * precision) / precision
+}
+
 export function fixedZero (val) {
   return val * 1 < 10 ? `0${val}` : val
 }
@@ -1314,6 +1319,7 @@ module.exports = {
   enableTableForceRender,
   generateHashCode,
   roundTo,
+  roundUp,
   // toUTC,
   // toLocal,
 }

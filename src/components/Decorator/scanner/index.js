@@ -18,6 +18,7 @@ import {
   Tabs,
   Popconfirm,
 } from '@/components'
+import { roundUp } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup'
 import ToggleButton from '@material-ui/lab/ToggleButton'
@@ -50,7 +51,6 @@ class Scanner extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      sketchHeight: 700,
       tool: Tools.None,
     }
     this.sketchs = []
@@ -110,10 +110,15 @@ class Scanner extends Component {
 
   renderThumbnailImg = (imageData) => {
     const { uid, image } = imageData
-    const base64Data = `${base64Prefix}${image}`
-    this.generateThumbnail(base64Data).then((thumbnail) => {
-      $(`#thum_${uid}`)[0].src = thumbnail
-    })
+    if (this.sketchs[uid]) {
+      this.updateThumbnail(this.sketchs[uid], uid)
+    } else {
+      const base64Data = `${base64Prefix}${image}`
+      this.generateThumbnail(base64Data).then((thumbnail) => {
+        const thumObj = $(`#thum_${uid}`)
+        if (thumObj) thumObj[0].src = thumbnail
+      })
+    }
   }
 
   handelConfirmDelete = (uid) => {
@@ -131,6 +136,14 @@ class Scanner extends Component {
       delete this.sketchs[uid]
       handleDeleteItem(uid)
     }
+  }
+
+  updateThumbnail = (sketch, uid) => {
+    const imgData = sketch.exportToImageDataUrl()
+    this.generateThumbnail(imgData).then((thumbnail) => {
+      const thumObj = $(`#thum_${uid}`)
+      if (thumObj) thumObj[0].src = thumbnail
+    })
   }
 
   getTabOptions = () => {
@@ -161,7 +174,7 @@ class Scanner extends Component {
                   <Button
                     style={{
                       position: 'absolute',
-                      left: 98,
+                      left: thumbnailSize.width - 2,
                       top: 5,
                     }}
                     justIcon
@@ -177,7 +190,7 @@ class Scanner extends Component {
         ),
         content: (
           <SketchField
-            name={`image${uid}`}
+            name={`image-${uid}`}
             ref={(c) => {
               if (c) {
                 if (!this.sketchs[uid]) {
@@ -204,6 +217,7 @@ class Scanner extends Component {
                 this.setState({
                   tool: Tools.None,
                 })
+                this.updateThumbnail(this.sketchs[uid], uid)
               }
             }}
           />
@@ -229,27 +243,44 @@ class Scanner extends Component {
     if (selected) {
       const objects = selected._fc.getObjects()
       selected._fc.setActiveObject(objects[0])
-      process(selected)
+      process(selected, objects[0])
       objects[0].selectable = false
       objects[0].evented = false
     }
   }
 
   rotate90 = (direction) => {
-    this.doChangeImages((selected) => {
+    this.doChangeImages((selected, obj) => {
       let rotateNum = 0
       if (direction === 'left') {
         rotateNum -= 90
       } else {
         rotateNum += 90
       }
+      const canvas = selected._fc
+      let height = canvas.getHeight()
+      let width = canvas.getWidth()
+
+      canvas.setHeight(width)
+      canvas.setWidth(height)
+
+      // let center = canvas.getCenter()
+      // console.log(center)
+
       selected.setAngle(rotateNum)
+
+      setTimeout(() => {
+        this.updateThumbnail(selected, this.state.activeKey)
+      }, 100)
     })
   }
 
   mirror = () => {
     this.doChangeImages((selected) => {
       selected.mirror()
+      setTimeout(() => {
+        this.updateThumbnail(selected, this.state.activeKey)
+      }, 100)
     })
   }
 
@@ -259,27 +290,31 @@ class Scanner extends Component {
     })
   }
 
-  ZoomIn = () => {
+  Zoom = (factor) => {
     this.doChangeImages((selected) => {
-      let factor = selected.factor || 1
-      selected.zoom(factor + 0.1)
-    })
-  }
+      let canvas = selected._fc
 
-  ZoomOut = () => {
-    this.doChangeImages((selected) => {
-      let factor = selected.factor || 1
-      selected.zoom(factor - 0.1)
+      const currentZoom = canvas.getZoom()
+      const newZoom = currentZoom * (1 + factor)
+
+      const height = canvas.getHeight()
+      const width = canvas.getWidth()
+      const zoomBy = roundUp(newZoom / currentZoom, 6)
+
+      canvas.setHeight(roundUp(height * zoomBy, 6))
+      canvas.setWidth(roundUp(width * zoomBy, 6))
+
+      canvas.setZoom(newZoom)
     })
   }
 
   handleToolClick = (toolId) => {
     switch (toolId) {
       case ToolTypes.ZoomIn:
-        this.ZoomIn()
+        this.Zoom(0.1)
         break
       case ToolTypes.ZoomOut:
-        this.ZoomOut()
+        this.Zoom(-0.1)
         break
       case ToolTypes.RotateLeft:
         this.rotate90('left')
@@ -305,7 +340,7 @@ class Scanner extends Component {
   }
 
   render () {
-    const { classes, dispatch, handleScaning } = this.props
+    const { classes, handleScaning } = this.props
 
     return (
       <GridContainer style={{ minHeight: window.innerHeight - 250 }}>
