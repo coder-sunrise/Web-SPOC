@@ -229,7 +229,6 @@ class Service extends PureComponent {
     const { services, serviceCenters } = this.state
     const { serviceFK, serviceCenterFK } = values
 
-    console.log(services)
     return (
       <div>
         <GridContainer>
