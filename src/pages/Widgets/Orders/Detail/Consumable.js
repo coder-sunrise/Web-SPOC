@@ -98,6 +98,22 @@ class Consumable extends PureComponent {
     }
   }
 
+  getConsumableOptions = () => {
+    const { codetable: { inventoryconsumable = [] } } = this.props
+
+    return inventoryconsumable.reduce((p, c) => {
+      const { code, displayValue, sellingPrice, uom } = c
+      let opt = {
+        ...c,
+        displayValue: `${displayValue} - ${code} (${sellingPrice} / ${uom.name})`,
+      }
+      return [
+        ...p,
+        opt,
+      ]
+    }, [])
+  }
+
   changeConsumable = (v, op = {}) => {
     const { setFieldValue, values, disableEdit } = this.props
 
@@ -246,6 +262,7 @@ class Consumable extends PureComponent {
                       code='inventoryconsumable'
                       labelField='displayValue'
                       onChange={this.changeConsumable}
+                      options={this.getConsumableOptions()}
                       {...args}
                       style={{ paddingRight: 20 }}
                     />

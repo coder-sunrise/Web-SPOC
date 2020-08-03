@@ -421,6 +421,22 @@ class Medication extends PureComponent {
       )
   }
 
+  getMedicationOptions = () => {
+    const { codetable: { inventorymedication = [] } } = this.props
+
+    return inventorymedication.reduce((p, c) => {
+      const { code, displayValue, sellingPrice, dispensingUOM } = c
+      let opt = {
+        ...c,
+        displayValue: `${displayValue} - ${code} (${sellingPrice} / ${dispensingUOM.name})`,
+      }
+      return [
+        ...p,
+        opt,
+      ]
+    }, [])
+  }
+
   changeMedication = (v, op = {}) => {
     const { setFieldValue, disableEdit, values } = this.props
 
@@ -721,6 +737,7 @@ class Medication extends PureComponent {
                             code='inventorymedication'
                             labelField='displayValue'
                             onChange={this.changeMedication}
+                            options={this.getMedicationOptions()}
                             {...args}
                             style={{ paddingRight: 20 }}
                           />

@@ -311,6 +311,28 @@ class Treatment extends PureComponent {
     }
   }
 
+  getTreatmentOptions = (isDoctor) => {
+    const { values, codetable: { cttreatment = [] } } = this.props
+
+    const treatments = isDoctor
+      ? cttreatment
+      : cttreatment.filter(
+          (o) => o.treatmentCategoryFK === values.treatmentCategoryFK,
+        )
+
+    return treatments.reduce((p, c) => {
+      const { code, displayValue, sellingPrice } = c
+      let opt = {
+        ...c,
+        displayValue: `${displayValue} - ${code} (${sellingPrice})`,
+      }
+      return [
+        ...p,
+        opt,
+      ]
+    }, [])
+  }
+
   changeTreatment = (option = {}) => {
     const { setFieldValue } = this.props
     const { sellingPrice } = option
@@ -440,16 +462,7 @@ class Treatment extends PureComponent {
               name='treatmentFK'
               render={(args) => (
                 <Select
-                  options={
-                    isDoctor ? (
-                      cttreatment
-                    ) : (
-                      cttreatment.filter(
-                        (o) =>
-                          o.treatmentCategoryFK === values.treatmentCategoryFK,
-                      )
-                    )
-                  }
+                  options={this.getTreatmentOptions(isDoctor)}
                   valueField='id'
                   labelField='displayValue'
                   label='Treatment'

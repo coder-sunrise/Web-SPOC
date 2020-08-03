@@ -115,6 +115,22 @@ class Vaccination extends PureComponent {
     }
   }
 
+  getVaccinationOptions = () => {
+    const { codetable: { inventoryvaccination = [] } } = this.props
+
+    return inventoryvaccination.reduce((p, c) => {
+      const { code, displayValue, sellingPrice, dispensingUOM } = c
+      let opt = {
+        ...c,
+        displayValue: `${displayValue} - ${code} (${sellingPrice} / ${dispensingUOM.name})`,
+      }
+      return [
+        ...p,
+        opt,
+      ]
+    }, [])
+  }
+
   changeVaccination = (v, op = {}) => {
     const { setFieldValue, values, disableEdit } = this.props
     // console.log(v, op)
@@ -302,6 +318,7 @@ class Vaccination extends PureComponent {
         })
     }
   }
+
   onSearchVaccinationHistory = async () => {
     const { dispatch, values, visitRegistration } = this.props
     const { patientProfileFK } = visitRegistration.entity.visit
@@ -373,6 +390,7 @@ class Vaccination extends PureComponent {
                       labelField='displayValue'
                       code='inventoryvaccination'
                       onChange={this.changeVaccination}
+                      options={this.getVaccinationOptions()}
                       {...args}
                       style={{ paddingRight: 20 }}
                     />
