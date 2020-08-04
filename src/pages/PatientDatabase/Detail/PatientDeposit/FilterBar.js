@@ -45,7 +45,6 @@ class FilterBar extends PureComponent {
       dispatch({
         type: 'deposit/updateState',
         payload: {
-          showModal: true,
           entity: {
             patientProfileFK: patientId,
           },
@@ -119,9 +118,10 @@ class FilterBar extends PureComponent {
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
           maxWidth='sm'
-          observe='Deposit'
+          observe='PatientDeposit'
           showFooter={false}
           bodyNoPadding
+          keepMounted={false}
         >
           <Modal isDeposit={isDeposit} />
         </CommonModal>
