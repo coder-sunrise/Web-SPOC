@@ -406,9 +406,12 @@ class Billing extends Component {
     await setFieldValue('visitStatus', 'COMPLETED')
 
     // check if invoice is OVERPAID and prompt user for confirmation
-    const { invoice } = values
+    const { invoice, invoicePayer = [] } = values
     const { outstandingBalance = 0 } = invoice
-    if (outstandingBalance < 0) {
+    if (
+      outstandingBalance < 0 ||
+      invoicePayer.find((ip) => ip.payerOutstanding < 0)
+    ) {
       return dispatch({
         type: 'global/updateState',
         payload: {

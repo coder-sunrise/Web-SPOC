@@ -362,17 +362,6 @@ const ApplyClaims = ({
       // abort early if failed to reset bill
       if (!response) return
 
-      if (
-        tempInvoicePayer.find((o) =>
-          o.invoicePayment.find((payment) => !payment.isCancelled),
-        )
-      ) {
-        notification.warn({
-          message: 'please remove payments before reset claims',
-        })
-        return
-      }
-
       const _newTempInvoicePayer = tempInvoicePayer.map((i) => ({
         ...i,
         _isDeleted: true,
@@ -510,7 +499,7 @@ const ApplyClaims = ({
               (subtotal, item) => subtotal + item.claimAmount,
               0,
             ),
-          ) - _.sum(tempInvoicePayer[index].invoicePayment, 'TotalAmtPaid'),
+          ) - _.sumBy(tempInvoicePayer[index].invoicePayment, 'totalAmtPaid'),
         isModified: true,
         invoicePayerItem: invoiceItems,
         _isConfirmed: !hasInvalidRow,
@@ -791,8 +780,7 @@ const ApplyClaims = ({
           <div style={{ paddingLeft: 8, paddingBottom: 8 }}>
             <WarningSnackbar
               variant='warning'
-              message='Invoice has been updated. Kindly remove the existing copayer/ scheme
-              and re-apply again!'
+              message='Invoice has been updated. Kindly remove the payment(s) made for existing copayer/ scheme and re-apply the copayer/ scheme again!'
             />
           </div>
         </GridItem>
@@ -825,7 +813,13 @@ const ApplyClaims = ({
         </Button> */}
         {!noExtraOptions && (
           <ResetButton
-            disabled={visitPurposeFK === VISIT_TYPE.RETAIL}
+            disabled={
+              visitPurposeFK === VISIT_TYPE.RETAIL ||
+              tempInvoicePayer.find((payer) =>
+                (payer.invoicePayment || [])
+                  .find((payment) => !payment.isCancelled),
+              )
+            }
             handleResetClick={handleResetClick}
             handleRestoreClick={handleRestoreClick}
           />

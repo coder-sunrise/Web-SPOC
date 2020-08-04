@@ -5,11 +5,12 @@ import { GridItem, NumberInput, SizeContainer } from '@/components'
 
 const amountProps = {
   style: { margin: 0 },
+  showZero: true,
   noUnderline: true,
   currency: true,
-  disabled: true,
   rightAlign: true,
-  normalText: true,
+  text: true,
+  fullWidth: true,
 }
 
 const PaymentSummary = ({ payerDistributedAmt = 0.0, outstanding = 0.0 }) => {
