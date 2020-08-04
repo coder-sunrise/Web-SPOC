@@ -364,7 +364,7 @@ export default createListViewModel({
       },
       *getCalendarList ({ payload }, { call, put }) {
         const result = yield call(service.queryList, {
-          apiCriteria:{
+          apiCriteria: {
             ...payload,
             isCancelled: false,
           },
@@ -476,28 +476,23 @@ export default createListViewModel({
         let end
         let isDayView = false
         let calendarView = 'month'
-        let offSet = -8
 
         if (targetView === BigCalendar.Views.WEEK) calendarView = 'week'
         if (targetView === BigCalendar.Views.DAY) {
           isDayView = true
           calendarView = 'day'
-          offSet = -8
         }
 
-        start = moment(targetDate)
-          .startOf(calendarView)
-          .add(offSet, 'hours')
-          .formatUTC()
+        start = moment(targetDate).startOf(calendarView).formatUTC()
         end = moment(targetDate)
           .endOf(calendarView)
-          .add(offSet, 'hours')
-          .formatUTC()
+          .endOf('day')
+          .formatUTC(false)
 
         const getCalendarListPayload = {
-            apptDateFrom:start,
-            apptDateTo:end,
-            }
+          apptDateFrom: start,
+          apptDateTo: end,
+        }
 
         yield all([
           put({ type: 'getCalendarList', payload: getCalendarListPayload }),
