@@ -14,6 +14,7 @@ import {
 
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
+import { currencySymbol } from '@/utils/config'
 import LowStockInfo from './LowStockInfo'
 
 @connect(({ global, codetable, user }) => ({ global, codetable, user }))
@@ -106,7 +107,9 @@ class Consumable extends PureComponent {
       const { name: uomName = '' } = uom
       let opt = {
         ...c,
-        displayValue: `${displayValue} - ${code} (${sellingPrice} / ${uomName})`,
+        displayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
+          2,
+        )} / ${uomName})`,
       }
       return [
         ...p,

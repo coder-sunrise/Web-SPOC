@@ -18,6 +18,7 @@ import {
 } from '@/components'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
+import { currencySymbol } from '@/utils/config'
 import LowStockInfo from './LowStockInfo'
 import AddFromPast from './AddMedicationFromPast'
 
@@ -123,7 +124,9 @@ class Vaccination extends PureComponent {
       const { name: uomName = '' } = dispensingUOM
       let opt = {
         ...c,
-        displayValue: `${displayValue} - ${code} (${sellingPrice} / ${uomName})`,
+        displayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
+          2,
+        )} / ${uomName})`,
       }
       return [
         ...p,

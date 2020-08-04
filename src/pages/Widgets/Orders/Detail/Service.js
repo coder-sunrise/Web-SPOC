@@ -14,6 +14,7 @@ import {
 import Yup from '@/utils/yup'
 import { getServices } from '@/utils/codetable'
 import { calculateAdjustAmount } from '@/utils/utils'
+import { currencySymbol } from '@/utils/config'
 
 @connect(({ codetable, global, user }) => ({ codetable, global, user }))
 @withFormikExtend({
@@ -92,7 +93,7 @@ class Service extends PureComponent {
 
         const opt = {
           ...c,
-          name: `${name} - ${code} (${unitPrice})`,
+          name: `${name} - ${code} (${currencySymbol}${unitPrice.toFixed(2)})`,
         }
         return [
           ...p,

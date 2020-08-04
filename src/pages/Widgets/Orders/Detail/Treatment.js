@@ -16,6 +16,7 @@ import {
 } from '@/components'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
+import { currencySymbol } from '@/utils/config'
 
 const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
 // @Authorized.Secured('queue.dispense.editorder')
@@ -324,7 +325,9 @@ class Treatment extends PureComponent {
       const { code, displayValue, sellingPrice = 0 } = c
       let opt = {
         ...c,
-        displayValue: `${displayValue} - ${code} (${sellingPrice})`,
+        displayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
+          2,
+        )})`,
       }
       return [
         ...p,
