@@ -46,6 +46,8 @@ import {
   TableFixedColumns,
   VirtualTable,
   TableTreeColumn,
+  TableColumnResizing,
+  TableSelection,
 } from '@devexpress/dx-react-grid-material-ui'
 import { control } from '@/components/Decorator'
 import { smallTheme, defaultTheme } from '@/utils/theme'
@@ -99,6 +101,19 @@ const styles = (theme) => ({
       //   theme.palette.secondary.main,
       //   0.05,
       // ),
+      backgroundColor: hoverColor,
+    },
+
+    '& > tbody > tr.grid-edit-row': {
+      backgroundColor: '#ffffff',
+    },
+
+    '& > tbody > tr.grid-edit-row:hover': {
+      backgroundColor: '#ffffff',
+    },
+  },
+  selectableTableStriped: {
+    '& > tbody > tr:not(.group):hover': {
       backgroundColor: hoverColor,
     },
 
@@ -183,12 +198,17 @@ class CommonTableGrid extends PureComponent {
       editableGrid,
       getRowId,
       FuncProps = {},
+      columnExtensions = [],
     } = props
     // console.log(props)
     this.gridId = `view-${uniqueGid++}`
     this.isScrollable = !!pHeight
     // this.myRef = React.createRef()
     const { pagerDefaultState = {} } = FuncProps
+    const { rowhighlightable } = {
+      ...this.defaultFunctionConfig,
+      ...FuncProps,
+    }
     this.state = {
       pagination: {
         current: 1,
@@ -196,11 +216,23 @@ class CommonTableGrid extends PureComponent {
         ...pagerDefaultState,
       },
       rows: [],
+      columnWidths: columnExtensions.map((o) => {
+        return { columnName: o.columnName, width: o.width }
+      }),
+      selectedItem: [],
     }
-    const cls = classNames({
-      [classes.tableStriped]: oddEven,
-      [classes.tableCursorPointer]: onRowDoubleClick !== undefined,
-    })
+    let cls
+    if (rowhighlightable) {
+      cls = classNames({
+        [classes.selectableTableStriped]: oddEven,
+        [classes.tableCursorPointer]: onRowDoubleClick !== undefined,
+      })
+    } else {
+      cls = classNames({
+        [classes.tableStriped]: oddEven,
+        [classes.tableCursorPointer]: onRowDoubleClick !== undefined,
+      })
+    }
     const TableComponent = ({ ...restProps }) => {
       // console.log('TableComponent', restProps)
       return <Table.Table {...restProps} className={cls} />
@@ -297,6 +329,8 @@ class CommonTableGrid extends PureComponent {
     this.defaultFunctionConfig = {
       filter: false,
       selectable: false,
+      resizable: false,
+      rowhighlightable: false,
       pager: true,
       pagerStateConfig: {
         onCurrentPageChange: (current) => {
@@ -765,6 +799,8 @@ class CommonTableGrid extends PureComponent {
     const {
       grouping,
       selectable,
+      resizable,
+      rowhighlightable,
       selectConfig = {
         showSelectAll: false,
         rowSelectionEnabled: (row) => true,
@@ -994,10 +1030,16 @@ class CommonTableGrid extends PureComponent {
                   {...sortConfig}
                 />
               )}
-              {selectable && (
+              {(selectable || rowhighlightable) && (
                 <SelectionState
-                  selection={selection}
-                  onSelectionChange={onSelectionChange}
+                  selection={selectable ? selection : this.state.selectedItem}
+                  onSelectionChange={(e) => {
+                    if (selectable) {
+                      onSelectionChange(e)
+                    } else {
+                      this.setState({ selectedItem: e })
+                    }
+                  }}
                 />
               )}
               {summary && <SummaryState {...summaryConfig.state} />}
@@ -1070,7 +1112,24 @@ class CommonTableGrid extends PureComponent {
                   {...selectConfig}
                 />
               )}
+              {header &&
+              resizable && (
+                <TableColumnResizing
+                  columnWidths={this.state.columnWidths}
+                  onColumnWidthsChange={(e) => {
+                    this.setState({ columnWidths: e })
+                  }}
+                />
+              )}
               {header && <HeaderRow showSortingControls />}
+              {rowhighlightable && (
+                <TableSelection
+                  highlightRow
+                  selectByRowClick
+                  showSelectionColumn={false}
+                  {...selectConfig}
+                />
+              )}
               {extraRow.map((o) => o)}
               {pager && <PagingPanel pageSizes={pageSizes} {...pagerConfig} />}
               {grouping && (
@@ -1155,6 +1214,8 @@ CommonTableGrid.propTypes = {
     pager: PropTypes.bool,
     pagerConfig: PropTypes.object,
     selectable: PropTypes.bool,
+    resizable: PropTypes.bool,
+    rowhighlightable: PropTypes.bool,
   }),
   FilteringProps: PropTypes.shape({
     defaultFilters: PropTypes.array,
