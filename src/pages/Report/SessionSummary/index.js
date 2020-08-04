@@ -48,8 +48,8 @@ class SessionSummary extends ReportBase {
       }
       if (params.dateTo) {
         criteria.lst_sessionCloseDate = moment(params.dateTo)
-          .add(1, 'day')
-          .formatUTC()
+          .endOf('day')
+          .formatUTC(false)
       }
       const result = await getBizSession(criteria)
       const { status, data } = result
@@ -127,8 +127,8 @@ const SessionSummaryWithFormik = withFormik({
     dateFrom: Yup.date().required(),
   }),
   mapPropsToValues: () => ({
-    dateFrom: moment(new Date()).toDate(),
-    dateTo: moment(new Date()).toDate(),
+    dateFrom: moment(),
+    dateTo: moment(),
   }),
 })(SessionSummary)
 export default SessionSummaryWithFormik

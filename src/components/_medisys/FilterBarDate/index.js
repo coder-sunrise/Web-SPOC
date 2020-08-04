@@ -81,6 +81,7 @@ const FilterBarDate = ({
     <DatePicker
       {...args}
       label={label}
+      endDay={isEndDate}
       onChange={onChange}
       disabledDate={_disabledDate}
       {...restProps}

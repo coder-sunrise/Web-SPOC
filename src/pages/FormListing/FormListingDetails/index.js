@@ -108,7 +108,7 @@ class FormListingDetails extends PureComponent {
         payload: {
           apiCriteria: {
             visitDateFrom: moment().add(-1, 'month').formatUTC(),
-            visitDateTo: moment().formatUTC(false),
+            visitDateTo: moment().endOf('day').formatUTC(false),
           },
         },
       })
