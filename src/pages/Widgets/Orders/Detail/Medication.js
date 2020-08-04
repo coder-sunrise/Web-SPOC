@@ -59,7 +59,7 @@ const authorityCfg = {
 
     if (v.uid) {
       if (v.adjAmount <= 0) {
-        v.adjValue = Math.abs(v.adjValue)
+        v.adjValue = Math.abs(v.adjValue || 0)
         v.isMinus = true
       } else {
         v.isMinus = false
@@ -210,6 +210,7 @@ const authorityCfg = {
         values.adjAmount < 0
           ? -Math.abs(values.adjValue)
           : Math.abs(values.adjValue),
+      adjType: values.isExactAmount ? 'ExactAmount' : 'Percentage',
       unitPrice: values.totalPrice / values.quantity,
     }
 
@@ -230,7 +231,6 @@ class Medication extends PureComponent {
     batchNo: '',
     expiryDate: '',
     showAddFromPastModal: false,
-    isExternal: false,
   }
 
   getActionItem = (i, arrayHelpers, prop, tooltip, defaultValue) => {
@@ -245,21 +245,18 @@ class Medication extends PureComponent {
         }}
       >
         {activeRows.length > 1 && (
-          <Popconfirm
-            title='Are you sure delete this item?'
-            onConfirm={() => {
-              setFieldValue(`${prop}[${i}].isDeleted`, true)
-              if (prop === 'corPrescriptionItemInstruction') {
-                setTimeout(() => {
-                  this.calculateQuantity()
-                }, 1)
-              }
-            }}
-          >
-            <Button justIcon color='danger'>
-              <Delete />
-            </Button>
-          </Popconfirm>
+          <Button justIcon color='danger'>
+            <Delete
+              onClick={() => {
+                setFieldValue(`${prop}[${i}].isDeleted`, true)
+                if (prop === 'corPrescriptionItemInstruction') {
+                  setTimeout(() => {
+                    this.calculateQuantity()
+                  }, 1)
+                }
+              }}
+            />
+          </Button>
         )}
         {activeRows.length < 3 && (
           <Button
@@ -279,7 +276,7 @@ class Medication extends PureComponent {
   }
 
   calculateQuantity = (medication) => {
-    const { codetable, setFieldValue } = this.props
+    const { codetable, setFieldValue, values } = this.props
     let currentMedication = medication || this.state.selectedMedication
 
     const { form } = this.descriptionArrayHelpers
@@ -323,7 +320,10 @@ class Medication extends PureComponent {
     }
     setFieldValue(`quantity`, newTotalQuantity)
 
-    if (this.state.isExternal === false) {
+    if (
+      values.isExternalPrescription === undefined ||
+      values.isExternalPrescription === false
+    ) {
       if (currentMedication.sellingPrice) {
         setFieldValue('unitPrice', currentMedication.sellingPrice)
         this.updateTotalPrice(currentMedication.sellingPrice * newTotalQuantity)
@@ -336,7 +336,10 @@ class Medication extends PureComponent {
 
   setTotalPrice = () => {
     const { values } = this.props
-    if (this.state.isExternal === false) {
+    if (
+      values.isExternalPrescription === undefined ||
+      values.isExternalPrescription === false
+    ) {
       if (values.unitPrice) {
         const total = (values.quantity || 0) * values.unitPrice
         this.updateTotalPrice(total)
@@ -471,7 +474,10 @@ class Medication extends PureComponent {
 
     setFieldValue('corPrescriptionItemInstruction', newPrescriptionInstruction)
 
-    if (this.state.isExternal === false) {
+    if (
+      values.isExternalPrescription === undefined ||
+      values.isExternalPrescription === false
+    ) {
       setFieldValue('batchNo', defaultBatch ? defaultBatch.batchNo : undefined)
       setFieldValue(
         'expiryDate',
@@ -1201,7 +1207,7 @@ class Medication extends PureComponent {
                           setFieldValue(`expiryDate`, undefined)
                         }
                       }}
-                      disabled={this.state.isExternal}
+                      disabled={values.isExternalPrescription}
                       {...args}
                     />
                   )
@@ -1215,7 +1221,7 @@ class Medication extends PureComponent {
                   return (
                     <DatePicker
                       label='Expiry Date'
-                      disabled={this.state.isExternal}
+                      disabled={values.isExternalPrescription}
                       {...args}
                     />
                   )
@@ -1285,7 +1291,7 @@ class Medication extends PureComponent {
                         this.updateTotalPrice(e.target.value)
                       }}
                       min={0}
-                      disabled={this.state.isExternal}
+                      disabled={values.isExternalPrescription}
                       currency
                       {...args}
                     />
@@ -1297,7 +1303,7 @@ class Medication extends PureComponent {
           <GridContainer>
             <GridItem xs={8} className={classes.editor}>
               {values.visitPurposeFK !== VISIT_TYPE.RETAIL ? (
-                <FastField
+                <Field
                   name='isExternalPrescription'
                   render={(args) => {
                     if (args.field.value) {
@@ -1323,8 +1329,6 @@ class Medication extends PureComponent {
                             this.props.setFieldValue('isMinus', true)
                             this.props.setFieldValue('isExactAmount', true)
                             this.props.setFieldValue('adjValue', 0)
-
-                            this.setState({ isExternal: true })
                           } else {
                             this.props.setFieldValue(
                               'expiryDate',
@@ -1334,7 +1338,6 @@ class Medication extends PureComponent {
                               'batchNo',
                               this.state.batchNo,
                             )
-                            this.setState({ isExternal: false })
                             setTimeout(() => {
                               this.calculateQuantity()
                             }, 1)
@@ -1349,84 +1352,18 @@ class Medication extends PureComponent {
                 ''
               )}
             </GridItem>
-            <Authorized.Context.Provider
-              value={{
-                rights: this.state.isExternal ? 'disable' : 'enable',
-              }}
-            >
-              <GridItem xs={3} className={classes.editor}>
-                <div style={{ position: 'relative' }}>
-                  <FastField
-                    name='isMinus'
-                    render={(args) => {
-                      return (
-                        <Switch
-                          style={{ position: 'absolute' }}
-                          checkedChildren='-'
-                          unCheckedChildren='+'
-                          label=''
-                          onChange={() => {
-                            setTimeout(() => {
-                              this.onAdjustmentConditionChange()
-                            }, 1)
-                          }}
-                          {...args}
-                        />
-                      )
-                    }}
-                  />
-                  <Field
-                    name='adjValue'
-                    render={(args) => {
-                      args.min = 0
-                      if (values.isExactAmount) {
-                        return (
-                          <NumberInput
-                            style={{
-                              marginLeft: 55,
-                              paddingRight: 45,
-                            }}
-                            currency
-                            label='Adjustment'
-                            onChange={() => {
-                              setTimeout(() => {
-                                this.onAdjustmentConditionChange()
-                              }, 1)
-                            }}
-                            {...args}
-                          />
-                        )
-                      }
-                      return (
-                        <NumberInput
-                          style={{
-                            marginLeft: 55,
-                            paddingRight: 45,
-                          }}
-                          percentage
-                          max={999}
-                          label='Adjustment'
-                          onChange={() => {
-                            setTimeout(() => {
-                              this.onAdjustmentConditionChange()
-                            }, 1)
-                          }}
-                          {...args}
-                        />
-                      )
-                    }}
-                  />
-                </div>
-              </GridItem>
-              <GridItem xs={1} className={classes.editor}>
-                <FastField
-                  name='isExactAmount'
+            <GridItem xs={3} className={classes.editor}>
+              <div style={{ position: 'relative' }}>
+                <Field
+                  name='isMinus'
                   render={(args) => {
                     return (
                       <Switch
-                        checkedChildren='$'
-                        unCheckedChildren='%'
+                        style={{ position: 'absolute' }}
+                        checkedChildren='-'
+                        unCheckedChildren='+'
                         label=''
+                        disabled={values.isExternalPrescription}
                         onChange={() => {
                           setTimeout(() => {
                             this.onAdjustmentConditionChange()
@@ -1437,8 +1374,72 @@ class Medication extends PureComponent {
                     )
                   }}
                 />
-              </GridItem>
-            </Authorized.Context.Provider>
+                <Field
+                  name='adjValue'
+                  render={(args) => {
+                    args.min = 0
+                    if (values.isExactAmount) {
+                      return (
+                        <NumberInput
+                          style={{
+                            marginLeft: 55,
+                            paddingRight: 45,
+                          }}
+                          currency
+                          label='Adjustment'
+                          disabled={values.isExternalPrescription}
+                          onChange={() => {
+                            setTimeout(() => {
+                              this.onAdjustmentConditionChange()
+                            }, 1)
+                          }}
+                          {...args}
+                        />
+                      )
+                    }
+                    return (
+                      <NumberInput
+                        style={{
+                          marginLeft: 55,
+                          paddingRight: 45,
+                        }}
+                        percentage
+                        max={999}
+                        label='Adjustment'
+                        disabled={values.isExternalPrescription}
+                        onChange={() => {
+                          setTimeout(() => {
+                            this.onAdjustmentConditionChange()
+                          }, 1)
+                        }}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </div>
+            </GridItem>
+            <GridItem xs={1} className={classes.editor}>
+              <Field
+                name='isExactAmount'
+                render={(args) => {
+                  return (
+                    <Switch
+                      checkedChildren='$'
+                      unCheckedChildren='%'
+                      label=''
+                      disabled={values.isExternalPrescription}
+                      onChange={() => {
+                        setTimeout(() => {
+                          this.onAdjustmentConditionChange()
+                        }, 1)
+                      }}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
           </GridContainer>
           <GridContainer>
             <GridItem xs={8} />
