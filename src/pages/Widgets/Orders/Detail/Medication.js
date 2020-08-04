@@ -1354,26 +1354,27 @@ class Medication extends PureComponent {
             </GridItem>
             <GridItem xs={3} className={classes.editor}>
               <div style={{ position: 'relative' }}>
-                <Field
-                  name='isMinus'
-                  render={(args) => {
-                    return (
-                      <Switch
-                        style={{ position: 'absolute' }}
-                        checkedChildren='-'
-                        unCheckedChildren='+'
-                        label=''
-                        disabled={values.isExternalPrescription}
-                        onChange={() => {
-                          setTimeout(() => {
-                            this.onAdjustmentConditionChange()
-                          }, 1)
-                        }}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
+                <div style={{ marginTop: 16, position: 'absolute' }}>
+                  <Field
+                    name='isMinus'
+                    render={(args) => {
+                      return (
+                        <Switch
+                          checkedChildren='-'
+                          unCheckedChildren='+'
+                          label=''
+                          disabled={values.isExternalPrescription}
+                          onChange={() => {
+                            setTimeout(() => {
+                              this.onAdjustmentConditionChange()
+                            }, 1)
+                          }}
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </div>
                 <Field
                   name='adjValue'
                   render={(args) => {
@@ -1420,25 +1421,27 @@ class Medication extends PureComponent {
               </div>
             </GridItem>
             <GridItem xs={1} className={classes.editor}>
-              <Field
-                name='isExactAmount'
-                render={(args) => {
-                  return (
-                    <Switch
-                      checkedChildren='$'
-                      unCheckedChildren='%'
-                      label=''
-                      disabled={values.isExternalPrescription}
-                      onChange={() => {
-                        setTimeout(() => {
-                          this.onAdjustmentConditionChange()
-                        }, 1)
-                      }}
-                      {...args}
-                    />
-                  )
-                }}
-              />
+              <div style={{ marginTop: 16 }}>
+                <Field
+                  name='isExactAmount'
+                  render={(args) => {
+                    return (
+                      <Switch
+                        checkedChildren='$'
+                        unCheckedChildren='%'
+                        label=''
+                        disabled={values.isExternalPrescription}
+                        onChange={() => {
+                          setTimeout(() => {
+                            this.onAdjustmentConditionChange()
+                          }, 1)
+                        }}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </div>
             </GridItem>
           </GridContainer>
           <GridContainer>

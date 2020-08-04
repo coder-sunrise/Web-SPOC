@@ -634,25 +634,26 @@ class Vaccination extends PureComponent {
           </GridItem>
           <GridItem xs={3} className={classes.editor}>
             <div style={{ position: 'relative' }}>
-              <FastField
-                name='isMinus'
-                render={(args) => {
-                  return (
-                    <Switch
-                      style={{ position: 'absolute' }}
-                      checkedChildren='-'
-                      unCheckedChildren='+'
-                      label=''
-                      onChange={() => {
-                        setTimeout(() => {
-                          this.onAdjustmentConditionChange()
-                        }, 1)
-                      }}
-                      {...args}
-                    />
-                  )
-                }}
-              />
+              <div style={{ marginTop: 16, position: 'absolute' }}>
+                <FastField
+                  name='isMinus'
+                  render={(args) => {
+                    return (
+                      <Switch
+                        checkedChildren='-'
+                        unCheckedChildren='+'
+                        label=''
+                        onChange={() => {
+                          setTimeout(() => {
+                            this.onAdjustmentConditionChange()
+                          }, 1)
+                        }}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </div>
               <Field
                 name='adjValue'
                 render={(args) => {
@@ -697,24 +698,26 @@ class Vaccination extends PureComponent {
             </div>
           </GridItem>
           <GridItem xs={1} className={classes.editor}>
-            <FastField
-              name='isExactAmount'
-              render={(args) => {
-                return (
-                  <Switch
-                    checkedChildren='$'
-                    unCheckedChildren='%'
-                    label=''
-                    onChange={() => {
-                      setTimeout(() => {
-                        this.onAdjustmentConditionChange()
-                      }, 1)
-                    }}
-                    {...args}
-                  />
-                )
-              }}
-            />
+            <div style={{ marginTop: 16 }}>
+              <FastField
+                name='isExactAmount'
+                render={(args) => {
+                  return (
+                    <Switch
+                      checkedChildren='$'
+                      unCheckedChildren='%'
+                      label=''
+                      onChange={() => {
+                        setTimeout(() => {
+                          this.onAdjustmentConditionChange()
+                        }, 1)
+                      }}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </div>
           </GridItem>
         </GridContainer>
         <GridContainer>
