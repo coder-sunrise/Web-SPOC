@@ -1017,41 +1017,59 @@ class SketchField extends PureComponent {
 
   setAngle = (number, calback) => {
     let canvas = this._fc
-    let obj = canvas.getActiveObject()
+    //let obj = canvas.getActiveObject()
+    const objects = canvas.getObjects()
 
-    if (obj) {
+    if (objects) {
       let absNum = Math.abs(number)
       if (absNum > 360) {
         absNum = absNum - parseInt(absNum / 360, 10) * 360
       }
-      number = (obj.angle || 0) + absNum * (number >= 0 ? 1 : -1)
-      obj.rotate(number)
-      canvas.sendToBack(obj)
-      if (calback) calback(number)
+
+      var num = absNum * (number >= 0 ? 1 : -1)
+      objects.forEach((obj) => {
+        let targetNum = (obj.angle || 0) + num
+        targetNum = Math.abs(targetNum) === 360 ? 0 : targetNum
+
+        obj.rotate(targetNum)
+        canvas.sendToBack(obj)
+        if (calback) calback(obj, targetNum)
+
+        const { angle, width, height, left, top, flipX, flipY } = obj
+        console.log({
+          angle,
+          width,
+          height,
+          left,
+          top,
+          flipX,
+          flipY,
+        })
+      })
     }
   }
   mirror = () => {
-    let canvas = this._fc
-    let obj = canvas.getActiveObject()
-    if (obj) {
-      this.setAngle(-180)
-      this.flipY()
-    }
+    this.flipY()
+    this.setAngle(-180)
   }
   flipX = () => {
     let canvas = this._fc
-    var obj = canvas.getActiveObject()
-    if (obj) {
-      obj.set('flipX', !obj.flipX)
+    const objects = canvas.getObjects()
+    if (objects) {
+      objects.forEach((obj) => {
+        obj.set('flipX', !obj.flipX)
+      })
       canvas.renderAll()
     }
   }
 
   flipY = () => {
     let canvas = this._fc
-    var obj = canvas.getActiveObject()
-    if (obj) {
-      obj.set('flipY', !obj.flipY)
+    const objects = canvas.getObjects()
+    if (objects) {
+      objects.forEach((obj) => {
+        obj.set('flipY', !obj.flipY)
+      })
       canvas.renderAll()
     }
   }

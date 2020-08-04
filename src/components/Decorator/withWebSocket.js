@@ -119,7 +119,7 @@ const withWebSocket = () => (Component) => {
         const { data } = message
         const returnMessage = JSON.parse(data)
         const { MessageType, Data } = returnMessage
-
+        console.log(returnMessage)
         if (MessageType === WebSocketMessageType.Scan) {
           this.setState((preState) => ({
             scanResults: [
@@ -200,6 +200,7 @@ const withWebSocket = () => (Component) => {
             title='Scan'
             maxWidth='lg'
             minHeight={500}
+            keepMounted={false}
           >
             <div style={{ position: 'relative' }}>
               <div

@@ -81,10 +81,27 @@ class Scanner extends Component {
       if (selectedImage && selectedImage.image) {
         const base64Data = `${base64Prefix}${selectedImage.image}`
 
-        this.sketchs[activeKey].setBackgroundFromData(base64Data, true, {
-          hasControls: false,
-          hasBorders: false,
-        })
+        this.sketchs[activeKey].setBackgroundFromData(
+          base64Data,
+          true,
+          {
+            hasControls: false,
+            hasBorders: false,
+          },
+          (img) => {
+            // const containerSize = this.getSketchContainerSize()
+            // let canvas = this.sketchs[activeKey]._fc
+            // img.scaleToHeight(containerSize.height)
+            // const { scaleX, scaleY } = img
+            // console.log(img)
+            // const realHeight = roundUp(img.height * scaleY, 6)
+            // const realWidht = roundUp(img.width * scaleY, 6)
+            // canvas.setWidth(realWidht)
+            // canvas.setHeight(realHeight)
+            // img.height = realHeight
+            // img.width = realWidht
+          },
+        )
       }
     }
   }
@@ -146,9 +163,16 @@ class Scanner extends Component {
     })
   }
 
+  getSketchContainerSize = () => {
+    return {
+      width: 1024,
+      height: window.innerHeight - 300,
+    }
+  }
+
   getTabOptions = () => {
     const { imageDatas = [] } = this.props
-
+    const containerSize = this.getSketchContainerSize()
     return imageDatas.reduce((p, cur) => {
       const { uid } = cur
       const opt = {
@@ -206,10 +230,9 @@ class Scanner extends Component {
             fillColor='transparent'
             backgroundColor='transparent'
             forceValue
-            height={window.innerHeight - 300}
+            height={containerSize.height}
             disableResize
             style={{ overflow: 'auto' }}
-            width={window.width - 100}
             onChange={(e) => {
               if (
                 this.sketchs[uid]._selectedTool.getToolName() === Tools.Crop
@@ -258,16 +281,27 @@ class Scanner extends Component {
         rotateNum += 90
       }
       const canvas = selected._fc
-      let height = canvas.getHeight()
-      let width = canvas.getWidth()
+      let canvasHeight = canvas.getHeight()
+      let canvasWidth = canvas.getWidth()
 
-      canvas.setHeight(width)
-      canvas.setWidth(height)
+      canvas.setHeight(canvasWidth)
+      canvas.setWidth(canvasHeight)
 
-      // let center = canvas.getCenter()
-      // console.log(center)
-
-      selected.setAngle(rotateNum)
+      selected.setAngle(rotateNum, (rotateObj, num) => {
+        const { width, height, angle } = rotateObj
+        // let width = canvas.getWidth()
+        // let height = canvas.getHeight()
+        // let { angle } = rotateObj
+        if (angle === 0) {
+          obj.set({ top: 0, left: 0 })
+        } else if (angle === -90 || angle === 270) {
+          obj.set({ top: width, left: 0 })
+        } else if (Math.abs(angle) === 180) {
+          obj.set({ top: height, left: width })
+        } else if (angle === -270 || angle === 90) {
+          obj.set({ top: 0, left: height })
+        }
+      })
 
       setTimeout(() => {
         this.updateThumbnail(selected, this.state.activeKey)
@@ -291,7 +325,7 @@ class Scanner extends Component {
   }
 
   Zoom = (factor) => {
-    this.doChangeImages((selected) => {
+    this.doChangeImages((selected, obj) => {
       let canvas = selected._fc
 
       const currentZoom = canvas.getZoom()
@@ -301,10 +335,17 @@ class Scanner extends Component {
       const width = canvas.getWidth()
       const zoomBy = roundUp(newZoom / currentZoom, 6)
 
-      canvas.setHeight(roundUp(height * zoomBy, 6))
-      canvas.setWidth(roundUp(width * zoomBy, 6))
+      const zoomHeight = roundUp(height * zoomBy, 6)
+      const zoomWidth = roundUp(width * zoomBy, 6)
+
+      canvas.setHeight(zoomHeight)
+      canvas.setWidth(zoomWidth)
+
+      // obj.set({ width: zoomWidth, heigh: zoomHeight })
 
       canvas.setZoom(newZoom)
+
+      console.log(zoomHeight, zoomWidth, obj)
     })
   }
 
