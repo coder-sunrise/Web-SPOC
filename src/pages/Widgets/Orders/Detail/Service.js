@@ -88,7 +88,8 @@ class Service extends PureComponent {
             (o) => o.serviceId === serviceFK && o.isDefault,
           ) || {}
 
-        const { unitPrice } = serviceCenterService
+        const { unitPrice = 0 } = serviceCenterService || {}
+
         const opt = {
           ...c,
           name: `${name} - ${code} (${unitPrice})`,

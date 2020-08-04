@@ -321,7 +321,7 @@ class Treatment extends PureComponent {
         )
 
     return treatments.reduce((p, c) => {
-      const { code, displayValue, sellingPrice } = c
+      const { code, displayValue, sellingPrice = 0 } = c
       let opt = {
         ...c,
         displayValue: `${displayValue} - ${code} (${sellingPrice})`,

@@ -425,10 +425,11 @@ class Medication extends PureComponent {
     const { codetable: { inventorymedication = [] } } = this.props
 
     return inventorymedication.reduce((p, c) => {
-      const { code, displayValue, sellingPrice, dispensingUOM } = c
+      const { code, displayValue, sellingPrice = 0, dispensingUOM = {} } = c
+      const { name: uomName = '' } = dispensingUOM
       let opt = {
         ...c,
-        displayValue: `${displayValue} - ${code} (${sellingPrice} / ${dispensingUOM.name})`,
+        displayValue: `${displayValue} - ${code} (${sellingPrice} / ${uomName})`,
       }
       return [
         ...p,
