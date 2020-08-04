@@ -28,6 +28,7 @@ import {
 } from '@/components'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
+import { currencySymbol } from '@/utils/config'
 import Authorized from '@/utils/Authorized'
 import LowStockInfo from './LowStockInfo'
 import AddFromPast from './AddMedicationFromPast'
@@ -421,6 +422,25 @@ class Medication extends PureComponent {
       )
   }
 
+  getMedicationOptions = () => {
+    const { codetable: { inventorymedication = [] } } = this.props
+
+    return inventorymedication.reduce((p, c) => {
+      const { code, displayValue, sellingPrice = 0, dispensingUOM = {} } = c
+      const { name: uomName = '' } = dispensingUOM
+      let opt = {
+        ...c,
+        displayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
+          2,
+        )} / ${uomName})`,
+      }
+      return [
+        ...p,
+        opt,
+      ]
+    }, [])
+  }
+
   changeMedication = (v, op = {}) => {
     const { setFieldValue, disableEdit, values } = this.props
 
@@ -721,6 +741,7 @@ class Medication extends PureComponent {
                             code='inventorymedication'
                             labelField='displayValue'
                             onChange={this.changeMedication}
+                            options={this.getMedicationOptions()}
                             {...args}
                             style={{ paddingRight: 20 }}
                           />

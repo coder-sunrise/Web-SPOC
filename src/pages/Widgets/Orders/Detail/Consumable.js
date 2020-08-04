@@ -14,6 +14,7 @@ import {
 
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
+import { currencySymbol } from '@/utils/config'
 import LowStockInfo from './LowStockInfo'
 
 @connect(({ global, codetable, user }) => ({ global, codetable, user }))
@@ -96,6 +97,25 @@ class Consumable extends PureComponent {
       batchNo: '',
       expiryDate: '',
     }
+  }
+
+  getConsumableOptions = () => {
+    const { codetable: { inventoryconsumable = [] } } = this.props
+
+    return inventoryconsumable.reduce((p, c) => {
+      const { code, displayValue, sellingPrice = 0, uom = {} } = c
+      const { name: uomName = '' } = uom
+      let opt = {
+        ...c,
+        displayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
+          2,
+        )} / ${uomName})`,
+      }
+      return [
+        ...p,
+        opt,
+      ]
+    }, [])
   }
 
   changeConsumable = (v, op = {}) => {
@@ -246,6 +266,7 @@ class Consumable extends PureComponent {
                       code='inventoryconsumable'
                       labelField='displayValue'
                       onChange={this.changeConsumable}
+                      options={this.getConsumableOptions()}
                       {...args}
                       style={{ paddingRight: 20 }}
                     />

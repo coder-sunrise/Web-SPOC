@@ -18,6 +18,7 @@ import {
 } from '@/components'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
+import { currencySymbol } from '@/utils/config'
 import LowStockInfo from './LowStockInfo'
 import AddFromPast from './AddMedicationFromPast'
 
@@ -113,6 +114,25 @@ class Vaccination extends PureComponent {
       expiryDate: '',
       showAddFromPastModal: false,
     }
+  }
+
+  getVaccinationOptions = () => {
+    const { codetable: { inventoryvaccination = [] } } = this.props
+
+    return inventoryvaccination.reduce((p, c) => {
+      const { code, displayValue, sellingPrice = 0, dispensingUOM = {} } = c
+      const { name: uomName = '' } = dispensingUOM
+      let opt = {
+        ...c,
+        displayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
+          2,
+        )} / ${uomName})`,
+      }
+      return [
+        ...p,
+        opt,
+      ]
+    }, [])
   }
 
   changeVaccination = (v, op = {}) => {
@@ -302,6 +322,7 @@ class Vaccination extends PureComponent {
         })
     }
   }
+
   onSearchVaccinationHistory = async () => {
     const { dispatch, values, visitRegistration } = this.props
     const { patientProfileFK } = visitRegistration.entity.visit
@@ -373,6 +394,7 @@ class Vaccination extends PureComponent {
                       labelField='displayValue'
                       code='inventoryvaccination'
                       onChange={this.changeVaccination}
+                      options={this.getVaccinationOptions()}
                       {...args}
                       style={{ paddingRight: 20 }}
                     />
