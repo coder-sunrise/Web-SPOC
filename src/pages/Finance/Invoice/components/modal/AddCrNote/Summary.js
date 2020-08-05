@@ -12,32 +12,15 @@ import {
 } from '@/components'
 import styles from './styles'
 
-const Summary = ({ classes }) => {
+const Summary = ({ invoiceDetail, classes }) => { 
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
-        <GridContainer className={classes.summary} alignItems='flex-end'>
-          {/* <GridItem md={4}>
-            <FastField
-              name='gst'
-              render={(args) => (
-                <NumberInput
-                  {...args}
-                  noUnderline
-                  currency
-                  disabled
-                  rightAlign
-                  normalText
-                  defaultValue={8.4}
-                  prefix='GST (7%)'
-                />
-              )}
-            />
-          </GridItem> */}
-          {/* <GridItem md={8} />
+        <GridContainer className={classes.summary} alignItems='flex-end'>  
+          <GridItem md={9} />
           <GridItem md={3}>
             <FastField
-              name='creditNoteBalance'
+              name='subTotal'
               render={(args) => (
                 <NumberInput
                   {...args}
@@ -46,13 +29,32 @@ const Summary = ({ classes }) => {
                   disabled
                   rightAlign
                   normalText
-                  prefix='Total Paid: '
+                  prefix='Sub Total: '
                   defaultValue='0'
                 />
               )}
             />
-            <GridItem md={1} />
-          </GridItem> */}
+          </GridItem>
+
+          <GridItem md={9} />
+          <GridItem md={3}>
+            <FastField
+              name='gstAmount'
+              render={(args) => {
+                return <NumberInput
+                  {...args}
+                  noUnderline
+                  currency
+                  disabled
+                  rightAlign
+                  normalText
+                  defaultValue={0} 
+                  prefix={invoiceDetail.isGSTInclusive ? `${invoiceDetail.gstValue}% GST Inclusive:` : `GST (${invoiceDetail.gstValue}%):`}
+                />
+              }
+              }
+            />
+          </GridItem>
 
           <GridItem md={9} />
           <GridItem md={3}>
@@ -66,7 +68,7 @@ const Summary = ({ classes }) => {
                   disabled
                   rightAlign
                   normalText
-                  prefix='Final Credit: '
+                  prefix='Grand Total: '
                   defaultValue='0'
                 />
               )}

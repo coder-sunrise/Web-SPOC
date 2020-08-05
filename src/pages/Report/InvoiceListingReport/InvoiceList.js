@@ -25,7 +25,7 @@ class InvoiceList extends PureComponent {
       { name: 'invoiceNo', title: 'Invoice No.' },
       { name: 'doctorName', title: 'Doctor' },
       { name: 'patientName', title: 'Patient Name' },
-      { name: 'invoiceAmt', title: 'Invoice Amt.' },
+      { name: 'invoiceAmt', title: 'Amount(Bef. GST)' },
       { name: 'gstAmt', title: 'GST' },
       { name: 'adj', title: 'ADJ' },
       { name: 'patientPayable', title: 'Patient Payable' },

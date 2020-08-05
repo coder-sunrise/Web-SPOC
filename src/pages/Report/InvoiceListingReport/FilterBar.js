@@ -9,6 +9,7 @@ import {
   GridItem,
   SizeContainer,
   CodeSelect,
+  Checkbox,
 } from '@/components'
 import { DoctorProfileSelect } from '@/components/_medisys'
 import ReportDateRangePicker from '../ReportDateRangePicker'
@@ -47,6 +48,12 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
               )}
             />
           </GridItem>
+          <GridItem md={1}>
+            <FastField
+              name='asAt'
+              render={(args) => <Checkbox {...args} label='As At' />}
+            />
+          </GridItem>
           <GridItem md={2}>
             <Button
               color='primary'
@@ -55,8 +62,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
             >
               Generate Report
             </Button>
-          </GridItem>
-          <GridItem md={4} />
+          </GridItem> 
           <GridItem md={4}>
             <FastField
               name='doctorIDs'

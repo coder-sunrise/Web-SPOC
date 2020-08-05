@@ -24,7 +24,7 @@ const amountProps = {
 
 const Summary = ({ classes, values }) => {
   const getGST = (gstValue = 0, isGstInclusive = false) =>
-    `${gstValue.toFixed(2)}% GST${isGstInclusive ? ' inclusive' : ''}:`
+  `${gstValue.toFixed(2)}% GST${isGstInclusive ? ' Inclusive' : ''}:`
   const { invoiceAdjustment = [] } = values
 
   return (
