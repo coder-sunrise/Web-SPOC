@@ -61,7 +61,7 @@ const PaymentCollections = ({
   let PaymentCollectionsColumns = [
     { name: 'invoiceNo', title: 'Invoice No.' },
     { name: 'totalAftAdj', title: 'Total Amount' },
-    { name: 'gstAmt', title: 'Gst' },
+    { name: 'gstAmt', title: 'GST' },
     { name: 'payerName', title: 'Payer Name' },
     { name: 'receiptNo', title: 'Receipt No.' },
     { name: 'totalAmtPaid', title: 'Payment' },
