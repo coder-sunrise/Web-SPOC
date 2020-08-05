@@ -167,14 +167,31 @@ class RefractionForm extends PureComponent {
     } else visitDate = moment().formatUTC(true)
 
     let formData = Object.byString(values, prefix) || {}
+    let nearAdd = formData.NearAdd || {}
+    let nearAddData = {}
+    let haveNearAdd = false
+    for (let k in nearAdd) {
+      if (k.startsWith('NearAdd')) {
+        nearAddData[k] = nearAdd[k]
+        if (
+          !haveNearAdd &&
+          nearAdd[k] !== '' &&
+          nearAdd[k] !== null &&
+          nearAdd[k] !== undefined
+        )
+          haveNearAdd = true
+      }
+    }
     const reportParameters = {
       ...selectedRows[0],
       visitDate,
       patientName: entity.name,
       patientAccountNo: entity.patientAccountNo,
       remarks: formData.TestRemarks,
+      haveNearAdd,
+      ...nearAddData,
     }
-
+    console.log(reportParameters)
     window.g_app._store.dispatch({
       type: 'report/updateState',
       payload: {
