@@ -229,6 +229,7 @@ class Grid extends React.Component {
                   columnName: 'action',
                   align: 'center',
                   render: this.getActionButton,
+                  width: 95,
                 },
                 {
                   columnName: 'visitPurposeFK',
@@ -273,6 +274,7 @@ class Grid extends React.Component {
                   columnName: 'action',
                   align: 'center',
                   render: this.getActionButton,
+                  width: 95,
                 },
                 {
                   columnName: 'gender/age',
