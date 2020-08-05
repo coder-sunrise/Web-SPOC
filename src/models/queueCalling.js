@@ -187,7 +187,6 @@ export default createFormViewModel({
         ]
 
         const remainingPendingQCall = pendingQCall.filter((q, idx) => idx !== 0)
-        console.log('pendingQCall11', pendingQCall)
         return {
           ...st,
           qCallList: qArray,
