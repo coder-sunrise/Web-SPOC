@@ -1137,7 +1137,7 @@ const formTypes = [
                 : 0,
               GSTChargedDisplayValue: element.surgicalCharges[index]
                 ? element.surgicalCharges[index].gSTChargedName
-                : 'Charged',
+                : '',
             })
           }
         })
@@ -1180,7 +1180,7 @@ const formTypes = [
                 : 0,
               GSTChargedDisplayValue: element.surgicalCharges[index]
                 ? element.surgicalCharges[index].gSTChargedName
-                : 'Charged',
+                : '',
             })
           }
         })
@@ -1208,7 +1208,7 @@ const formTypes = [
               : 0,
             GSTChargedDisplayValue: formData.nonSurgicalCharges[index]
               ? formData.nonSurgicalCharges[index].gSTChargedName
-              : 'Charged',
+              : '',
           })
         }
 

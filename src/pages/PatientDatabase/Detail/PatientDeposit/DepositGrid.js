@@ -19,11 +19,16 @@ const DepositGrid = ({
   handlePrint,
   handleDeleteRow,
 }) => {
+  const getDeleteStyle = (row) => {
+    return {
+      textDecorationLine: row.isCancelled ? 'line-through' : '',
+    }
+  }
   const configs = {
     rows: transactionList,
     columns: [
       { name: 'transactionDate', title: 'Date' },
-      { name: 'transactionTypeFK', title: 'Type' },
+      { name: 'transactionTypeName', title: 'Type' },
       { name: 'amount', title: 'Amount' },
       { name: 'transactionMode', title: 'Payment Mode' },
       { name: 'remarks', title: 'Remarks' },
@@ -41,28 +46,17 @@ const DepositGrid = ({
               text
               format={dateFormatLong}
               value={row.transactionDate}
-              style={
-                row.isCancelled ? { textDecorationLine: 'line-through' } : {}
-              }
+              style={getDeleteStyle(row)}
             />
           )
         },
       },
       {
-        columnName: 'transactionTypeFK',
-        type: 'codeSelect',
-        code: 'LTDepositTransactionType',
+        columnName: 'transactionTypeName',
         width: 120,
         render: (row) => {
           return (
-            <CodeSelect
-              text
-              code='LTDepositTransactionType'
-              value={row.transactionTypeFK}
-              style={
-                row.isCancelled ? { textDecorationLine: 'line-through' } : {}
-              }
-            />
+            <span style={getDeleteStyle(row)}>{row.transactionTypeName}</span>
           )
         },
       },
@@ -76,9 +70,7 @@ const DepositGrid = ({
               currency
               text
               value={row.amount}
-              style={
-                row.isCancelled ? { textDecorationLine: 'line-through' } : {}
-              }
+              style={getDeleteStyle(row)}
             />
           )
         },
@@ -91,9 +83,7 @@ const DepositGrid = ({
             <TextField
               text
               value={row.transactionMode}
-              style={
-                row.isCancelled ? { textDecorationLine: 'line-through' } : {}
-              }
+              style={getDeleteStyle(row)}
             />
           )
         },
@@ -101,29 +91,13 @@ const DepositGrid = ({
       {
         columnName: 'remarks',
         render: (row) => {
-          return (
-            <TextField
-              text
-              value={row.remarks}
-              style={
-                row.isCancelled ? { textDecorationLine: 'line-through' } : {}
-              }
-            />
-          )
+          return <span style={getDeleteStyle(row)}>{row.remarks}</span>
         },
       },
       {
         columnName: 'cancelReason',
         render: (row) => {
-          return (
-            <TextField
-              text
-              value={row.cancelReason}
-              style={
-                row.isCancelled ? { textDecorationLine: 'line-through' } : {}
-              }
-            />
-          )
+          return <span style={getDeleteStyle(row)}>{row.cancelReason}</span>
         },
       },
       {
@@ -200,7 +174,12 @@ const DepositGrid = ({
     },
   }
 
-  return <CommonTableGrid {...configs} />
+  return (
+    <CommonTableGrid
+      {...configs}
+      style={{ height: window.innerHeight - 430, overflow: 'auto' }}
+    />
+  )
 }
 
 export default DepositGrid

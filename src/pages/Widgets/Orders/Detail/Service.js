@@ -14,6 +14,7 @@ import {
 import Yup from '@/utils/yup'
 import { getServices } from '@/utils/codetable'
 import { calculateAdjustAmount } from '@/utils/utils'
+import { currencySymbol } from '@/utils/config'
 
 @connect(({ codetable, global, user }) => ({ codetable, global, user }))
 @withFormikExtend({
@@ -74,11 +75,34 @@ class Service extends PureComponent {
       },
     }).then((list) => {
       // eslint-disable-next-line compat/compat
-      const { services, serviceCenters, serviceCenterServices } = getServices(
-        list,
-      )
+      const {
+        services = [],
+        serviceCenters = [],
+        serviceCenterServices = [],
+      } = getServices(list)
+
+      const newServices = services.reduce((p, c) => {
+        const { value: serviceFK, name, code } = c
+
+        const serviceCenterService =
+          serviceCenterServices.find(
+            (o) => o.serviceId === serviceFK && o.isDefault,
+          ) || {}
+
+        const { unitPrice = 0 } = serviceCenterService || {}
+
+        const opt = {
+          ...c,
+          name: `${name} - ${code} (${currencySymbol}${unitPrice.toFixed(2)})`,
+        }
+        return [
+          ...p,
+          opt,
+        ]
+      }, [])
+
       this.setState({
-        services,
+        services: newServices,
         serviceCenters,
         serviceCenterServices,
       })

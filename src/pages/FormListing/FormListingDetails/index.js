@@ -2,16 +2,16 @@ import React, { PureComponent } from 'react'
 import moment from 'moment'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
-import FilterBar from './FilterBar'
-import FormModuleGrid from './FormModuleGrid'
-import VisitFormGrid from './VisitFormGrid'
 import { CardContainer, CommonModal, notification } from '@/components'
 import { FORM_CATEGORY, FORM_FROM } from '@/utils/constants'
-import model from './models'
-import AddForm from './FormDetail/AddForm'
 import { commonDataReaderTransform } from '@/utils/utils'
 import { formTypes } from '@/utils/codes'
 import { download } from '@/utils/request'
+import model from './models'
+import AddForm from './FormDetail/AddForm'
+import FilterBar from './FilterBar'
+import FormModuleGrid from './FormModuleGrid'
+import VisitFormGrid from './VisitFormGrid'
 
 window.g_app.replaceModel(model)
 
@@ -108,7 +108,7 @@ class FormListingDetails extends PureComponent {
         payload: {
           apiCriteria: {
             visitDateFrom: moment().add(-1, 'month').formatUTC(),
-            visitDateTo: moment().formatUTC(false),
+            visitDateTo: moment().endOf('day').formatUTC(false),
           },
         },
       })
