@@ -26,6 +26,7 @@ import { Delete, ImageSearch } from '@material-ui/icons'
 
 import { getThumbnail } from '@/components/_medisys/AttachmentWithThumbnail/utils'
 import { leftTools, ToolTypes } from './variables'
+import { Scanconfig } from './scanconfig'
 
 const base64Prefix = 'data:image/jpeg;base64,'
 const thumbnailSize = { width: 100, height: 80 }
@@ -73,6 +74,38 @@ class Scanner extends Component {
   //   return shouldUpdate
   // }
 
+  scaleToViewWH = (sketch) => {
+    const canvas = sketch._fc
+    const container = sketch._container
+    let { offsetWidth, clientHeight } = container
+    const currentZoom = canvas.getZoom()
+
+    const canvasWidth = canvas.getWidth()
+    const canvasHeight = canvas.getHeight()
+
+    const sw = offsetWidth / canvasWidth
+    const sh = clientHeight / canvasHeight
+
+    let newZoom = Math.min(sw, sh)
+    const zoomBy = roundUp(newZoom / currentZoom, 6)
+
+    const zoomHeight = roundUp(canvasHeight * zoomBy, 6)
+    const zoomWidth = roundUp(canvasWidth * zoomBy, 6)
+
+    canvas.setHeight(zoomHeight)
+    canvas.setWidth(zoomWidth)
+
+    canvas.setZoom(newZoom)
+
+    console.log({
+      offsetWidth,
+      clientHeight,
+      canvasWidth,
+      canvasHeight,
+      currentZoom,
+    })
+  }
+
   setBackgroundFromData = (activeKey) => {
     if (this.sketchs[activeKey]) {
       const { imageDatas = [] } = this.props
@@ -89,17 +122,8 @@ class Scanner extends Component {
             hasBorders: false,
           },
           (img) => {
-            // const containerSize = this.getSketchContainerSize()
-            // let canvas = this.sketchs[activeKey]._fc
-            // img.scaleToHeight(containerSize.height)
-            // const { scaleX, scaleY } = img
-            // console.log(img)
-            // const realHeight = roundUp(img.height * scaleY, 6)
-            // const realWidht = roundUp(img.width * scaleY, 6)
-            // canvas.setWidth(realWidht)
-            // canvas.setHeight(realHeight)
-            // img.height = realHeight
-            // img.width = realWidht
+            const sketch = this.sketchs[activeKey]
+            this.scaleToViewWH(sketch)
           },
         )
       }
@@ -163,16 +187,8 @@ class Scanner extends Component {
     })
   }
 
-  getSketchContainerSize = () => {
-    return {
-      width: 1024,
-      height: window.innerHeight - 300,
-    }
-  }
-
   getTabOptions = () => {
     const { imageDatas = [] } = this.props
-    const containerSize = this.getSketchContainerSize()
     return imageDatas.reduce((p, cur) => {
       const { uid } = cur
       const opt = {
@@ -230,9 +246,11 @@ class Scanner extends Component {
             fillColor='transparent'
             backgroundColor='transparent'
             forceValue
-            height={containerSize.height}
+            height={window.innerHeight - 300}
             disableResize
             style={{ overflow: 'auto' }}
+            canvasStyle={{ border: '1px solid #EDF3FF' }}
+            onDoubleClick={() => this.Zoom(0.2)}
             onChange={(e) => {
               if (
                 this.sketchs[uid]._selectedTool.getToolName() === Tools.Crop
@@ -341,11 +359,7 @@ class Scanner extends Component {
       canvas.setHeight(zoomHeight)
       canvas.setWidth(zoomWidth)
 
-      // obj.set({ width: zoomWidth, heigh: zoomHeight })
-
       canvas.setZoom(newZoom)
-
-      console.log(zoomHeight, zoomWidth, obj)
     })
   }
 
@@ -385,7 +399,7 @@ class Scanner extends Component {
 
     return (
       <GridContainer style={{ minHeight: window.innerHeight - 250 }}>
-        <GridItem xs={11} md={10}>
+        <GridItem xs={10} md={10}>
           <div style={{ display: 'flex' }}>
             <ToggleButtonGroup
               exclusive
@@ -413,7 +427,7 @@ class Scanner extends Component {
                     <ToggleButton
                       key={id}
                       onClick={(e) => {
-                        this.handleToolClick(id)
+                        this.handleToolClick(id, e)
                       }}
                     >
                       {icon}
@@ -442,10 +456,8 @@ class Scanner extends Component {
           </div>
         </GridItem>
 
-        <GridItem xs={1} md={2} style={{ textAlign: 'center' }}>
-          <Button onClick={handleScaning} color='primary'>
-            <ImageSearch /> Scan
-          </Button>
+        <GridItem xs={2} md={2} style={{ textAlign: 'center' }}>
+          <Scanconfig handleScaning={handleScaning} />
         </GridItem>
       </GridContainer>
     )

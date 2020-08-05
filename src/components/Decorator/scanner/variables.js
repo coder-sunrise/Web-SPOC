@@ -7,6 +7,8 @@ import {
   PanTool as Select,
   ZoomIn as ZoomInIcon,
   ZoomOut as ZoomOutIcon,
+  Fullscreen as FullscreenIcon,
+  FullscreenExit as FullscreenExitIcon,
 } from '@material-ui/icons'
 import { Tools } from '@/components'
 

@@ -49,6 +49,7 @@ class SketchField extends PureComponent {
     heightCorrection: PropTypes.number,
     // Specify action on change
     onChange: PropTypes.func,
+    onDoubleClick: PropTypes.func,
     // Default initial value
     defaultValue: PropTypes.object,
     // Sketch width
@@ -375,6 +376,13 @@ class SketchField extends PureComponent {
     //     onChange(e.e)
     //   }, 10)
     // }
+  }
+
+  _onDoubleClick = (e) => {
+    const { onDoubleClick } = this.props
+    if (onDoubleClick) {
+      onDoubleClick(e)
+    }
   }
 
   _onMouseUp = (e) => {
@@ -1126,6 +1134,7 @@ class SketchField extends PureComponent {
     canvas.on('mouse:move', this._onMouseMove)
     canvas.on('mouse:up', this._onMouseUp)
     canvas.on('mouse:out', this._onMouseOut)
+    canvas.on('mouse:dblclick', this._onDoubleClick)
     canvas.on('object:moving', this._onObjectMoving)
     canvas.on('object:scaling', this._onObjectScaling)
     canvas.on('object:rotating', this._onObjectRotating)
@@ -1177,7 +1186,7 @@ class SketchField extends PureComponent {
   }
 
   render = () => {
-    let { className, style, width, height } = this.props
+    let { className, style, width, height, canvasStyle = {} } = this.props
 
     let canvasDivStyle = Object.assign(
       {},
@@ -1200,7 +1209,7 @@ class SketchField extends PureComponent {
             this._canvas = c
           }}
           style={{
-            border: '1px solid red',
+            ...canvasStyle,
           }}
         >
           Sorry, Canvas HTML5 element is not supported by your browser :(
