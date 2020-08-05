@@ -112,19 +112,6 @@ const styles = (theme) => ({
       backgroundColor: '#ffffff',
     },
   },
-  selectableTableStriped: {
-    '& > tbody > tr:not(.group):hover': {
-      backgroundColor: hoverColor,
-    },
-
-    '& > tbody > tr.grid-edit-row': {
-      backgroundColor: '#ffffff',
-    },
-
-    '& > tbody > tr.grid-edit-row:hover': {
-      backgroundColor: '#ffffff',
-    },
-  },
   paperContainer: {
     // margin: '0 5px',
     '& > div': {
@@ -205,10 +192,6 @@ class CommonTableGrid extends PureComponent {
     this.isScrollable = !!pHeight
     // this.myRef = React.createRef()
     const { pagerDefaultState = {} } = FuncProps
-    const { rowhighlightable } = {
-      ...this.defaultFunctionConfig,
-      ...FuncProps,
-    }
     this.state = {
       pagination: {
         current: 1,
@@ -221,18 +204,10 @@ class CommonTableGrid extends PureComponent {
       }),
       selectedItem: [],
     }
-    let cls
-    if (rowhighlightable) {
-      cls = classNames({
-        [classes.selectableTableStriped]: oddEven,
-        [classes.tableCursorPointer]: onRowDoubleClick !== undefined,
-      })
-    } else {
-      cls = classNames({
-        [classes.tableStriped]: oddEven,
-        [classes.tableCursorPointer]: onRowDoubleClick !== undefined,
-      })
-    }
+    const cls = classNames({
+      [classes.tableStriped]: oddEven,
+      [classes.tableCursorPointer]: onRowDoubleClick !== undefined,
+    })
     const TableComponent = ({ ...restProps }) => {
       // console.log('TableComponent', restProps)
       return <Table.Table {...restProps} className={cls} />
