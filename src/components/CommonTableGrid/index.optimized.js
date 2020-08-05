@@ -58,6 +58,17 @@ import SettingsApplicationsIcon from '@material-ui/icons/SettingsApplications'
 import * as userService from '@/services/user'
 import { control } from '@/components/Decorator'
 import { smallTheme, defaultTheme } from '@/utils/theme'
+import { enableTableForceRender, generateHashCode } from '@/utils/utils'
+import { LoadingWrapper } from '@/components/_medisys'
+import {
+  Badge,
+  SizeContainer,
+  IconButton,
+  Popper,
+  Button,
+  Tooltip,
+  notification,
+} from '@/components'
 import NumberTypeProvider from './EditCellComponents/NumberTypeProvider'
 import TextTypeProvider from './EditCellComponents/TextTypeProvider'
 import SelectTypeProvider from './EditCellComponents/SelectTypeProvider'
@@ -71,17 +82,6 @@ import PatchedTableSelection from './plugins/PatchedTableSelection'
 import PatchedIntegratedSelection from './plugins/PatchedIntegratedSelection'
 import TableRow from './plugins/TableRow'
 import TableCell from './plugins/TableCell'
-import { enableTableForceRender, generateHashCode } from '@/utils/utils'
-import { LoadingWrapper } from '@/components/_medisys'
-import {
-  Badge,
-  SizeContainer,
-  IconButton,
-  Popper,
-  Button,
-  Tooltip,
-  notification,
-} from '@/components'
 import styles from './style'
 
 // console.log(userService)
@@ -496,7 +496,7 @@ class CommonTableGrid extends PureComponent {
         })
       }
       return {
-        pagination: _entity.pagination,
+        pagination: _entity.pagination || {},
         rows: _entity.list,
         filter: _entity.filter,
         entity: _entity,
