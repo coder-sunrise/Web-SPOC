@@ -42,7 +42,7 @@ const Templates = ({
   const [
     selectedTemplateId,
     setSelectedTemplateId,
-  ] = useState(null)
+  ] = useState()
 
   const saveFilterTemplate = (requestDelete, saveAsFavorite) => {
     let newFilterTemplates = [
@@ -111,11 +111,12 @@ const Templates = ({
               id: false,
             },
           })
-          setSelectedTemplateId(undefined)
+          setSelectedTemplateId(null)
         } else {
           notification.success({
             message: `Template ${newTemplateObj.templateName} saved`,
           })
+          setTemplateName('')
         }
         handleFilterTemplate()
         dispatch({
