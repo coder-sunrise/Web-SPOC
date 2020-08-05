@@ -67,7 +67,7 @@ class FilterBar extends PureComponent {
 
   render () {
     const { isDeposit, showDepositRefundModal } = this.state
-    const { disabled, refundableAmount, selectedTypeIds } = this.props
+    const { disabled, refundableAmount = 0, selectedTypeIds } = this.props
     const patientId = Number(findGetParameter('pid'))
 
     return (

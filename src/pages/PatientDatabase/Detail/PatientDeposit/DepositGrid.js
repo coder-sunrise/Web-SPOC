@@ -56,7 +56,9 @@ const DepositGrid = ({
         width: 120,
         render: (row) => {
           return (
-            <span style={getDeleteStyle(row)}>{row.transactionTypeName}</span>
+            <Tooltip title={row.transactionTypeName}>
+              <span style={getDeleteStyle(row)}>{row.transactionTypeName}</span>
+            </Tooltip>
           )
         },
       },
@@ -91,13 +93,21 @@ const DepositGrid = ({
       {
         columnName: 'remarks',
         render: (row) => {
-          return <span style={getDeleteStyle(row)}>{row.remarks}</span>
+          return (
+            <Tooltip title={row.remarks}>
+              <span style={getDeleteStyle(row)}>{row.remarks}</span>
+            </Tooltip>
+          )
         },
       },
       {
         columnName: 'cancelReason',
         render: (row) => {
-          return <span style={getDeleteStyle(row)}>{row.cancelReason}</span>
+          return (
+            <Tooltip title={row.cancelReason}>
+              <span style={getDeleteStyle(row)}>{row.cancelReason}</span>
+            </Tooltip>
+          )
         },
       },
       {
