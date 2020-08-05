@@ -305,7 +305,7 @@ class CommonTableGrid extends PureComponent {
       filter: false,
       selectable: false,
       resizable: false,
-      selectrowhighlightable: false,
+      selectRowHighlightable: false,
       pager: true,
       pagerStateConfig: {
         onCurrentPageChange: (current) => {
@@ -775,7 +775,7 @@ class CommonTableGrid extends PureComponent {
       grouping,
       selectable,
       resizable,
-      selectrowhighlightable,
+      selectRowHighlightable,
       selectConfig = {
         showSelectAll: false,
         rowSelectionEnabled: (row) => true,
@@ -1005,7 +1005,7 @@ class CommonTableGrid extends PureComponent {
                   {...sortConfig}
                 />
               )}
-              {(selectable || selectrowhighlightable) && (
+              {(selectable || selectRowHighlightable) && (
                 <SelectionState
                   selection={selectable ? selection : this.state.selectedItem}
                   onSelectionChange={(e) => {
@@ -1097,7 +1097,7 @@ class CommonTableGrid extends PureComponent {
                 />
               )}
               {header && <HeaderRow showSortingControls />}
-              {selectrowhighlightable && (
+              {selectRowHighlightable && (
                 <TableSelection
                   highlightRow
                   selectByRowClick
@@ -1190,7 +1190,7 @@ CommonTableGrid.propTypes = {
     pagerConfig: PropTypes.object,
     selectable: PropTypes.bool,
     resizable: PropTypes.bool,
-    selectrowhighlightable: PropTypes.bool,
+    selectRowHighlightable: PropTypes.bool,
   }),
   FilteringProps: PropTypes.shape({
     defaultFilters: PropTypes.array,
