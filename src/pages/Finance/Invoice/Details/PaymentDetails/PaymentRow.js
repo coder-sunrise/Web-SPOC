@@ -37,6 +37,7 @@ const PaymentRow = ({
     isCancelled,
     patientDepositTransaction,
     invoicePaymentMode = [],
+    cancelReason,
   } = payment
 
   const sortedInvoicePaymentModes = [
@@ -116,6 +117,8 @@ const PaymentRow = ({
                   paymentModeDetails={sortedInvoicePaymentModes}
                   setHoveredRowId={setHoveredRowId}
                   id={id}
+                  cancelReason={cancelReason}
+                  isCancelled={isCancelled}
                 />
               }
             >

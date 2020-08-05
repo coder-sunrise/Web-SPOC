@@ -443,7 +443,7 @@ const DispenseDetails = ({
               columns={[
                 { name: 'payerName', title: 'Payer Name' },
                 { name: 'paymentReceivedBy', title: 'Received By' },
-                { name: 'receiptNo', title: 'Recption No.' },
+                { name: 'receiptNo', title: 'Receipt No.' },
                 { name: 'paymentReceivedDate', title: 'Payment Date' },
                 { name: 'totalAmtPaid', title: 'Amount ($)' },
               ]}
@@ -480,9 +480,9 @@ const DispenseDetails = ({
             />
 
             <div>
-              Note: Current visit already have payments for co-payer, click Void
-              to void all payments directly, or click Skip to manually proceed
-              in billing.
+              Note: There are existing payments with some co-payers, click
+              "Void" to cancel all payments, or click "Skip" to remove co-payers
+              & payments manually.
             </div>
           </GridContainer>
           <GridContainer
