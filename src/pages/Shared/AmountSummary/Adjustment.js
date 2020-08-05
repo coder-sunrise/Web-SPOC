@@ -24,31 +24,20 @@ const Adjustment = ({
   // console.log('Adjustment', amountProps)
   const isExactAmount = type === 'ExactAmount'
   return (
-    <GridContainer style={{ margin: '4px 0' }}>
+    <GridContainer>
       <GridItem xs={7}>
         <div
           style={{
-            width: '90%',
+            width: '105%',
             overflow: 'hidden',
             display: 'inline-block',
             textOverflow: 'ellipsis',
             wordBreak: 'keep-all',
             whiteSpace: 'nowrap',
-            marginLeft: 20,
+            marginLeft: 8,
+            textAlign: 'right',
           }}
         >
-          <Popconfirm
-            title='Do you want to remove this adjustment?'
-            onConfirm={() => {
-              onDelete(index)
-            }}
-          >
-            <Tooltip title='Delete Adjustment'>
-              <Button color='danger' size='sm' aria-label='Delete' justIcon>
-                <Delete />
-              </Button>
-            </Tooltip>
-          </Popconfirm>
           <Tooltip title={adjRemark}>
             <span>
               {adjRemark}
@@ -57,7 +46,25 @@ const Adjustment = ({
           </Tooltip>
         </div>
       </GridItem>
-      <GridItem xs={5}>
+      <GridItem xs={1}>
+        <Tooltip title='Delete Adjustment'>
+          <Button
+            color='danger'
+            size='sm'
+            aria-label='Delete'
+            justIcon
+            onClick={() => {
+              onDelete(index)
+            }}
+            style={{
+              marginLeft: 15,
+            }}
+          >
+            <Delete />
+          </Button>
+        </Tooltip>
+      </GridItem>
+      <GridItem xs={4}>
         <NumberInput
           value={adjAmount}
           {...amountProps}

@@ -111,16 +111,19 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
     messages.gst = (
       <div
         style={{
-          overflow: 'hidden',
-          display: 'inline-block',
-          textOverflow: 'ellipsis',
+          textAlign: 'right',
           position: 'relative',
+          marginLeft: 5,
         }}
       >
         <Checkbox
           simple
-          label=''
-          style={{ position: 'absolute', marginTop: -1 }}
+          label={`Inclusive GST (${numeral(gstValue).format('0.00')}%)`}
+          style={{
+            position: 'absolute',
+            marginTop: -1,
+          }}
+          controlStyle={{ fontWeight: 500 }}
           checked={checkedStatusIncldGST}
           onChange={(e) => {
             dispatch({
@@ -134,22 +137,6 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
             })
           }}
         />
-        <span
-          style={{
-            marginLeft: 18,
-            fontWeight: 500,
-          }}
-        >
-          Inclusive
-        </span>
-        <span
-          style={{
-            marginLeft: 4,
-            fontWeight: 500,
-          }}
-        >
-          GST ({numeral(gstValue).format('0.00')}%)
-        </span>
       </div>
     )
   }
