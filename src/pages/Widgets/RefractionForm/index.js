@@ -191,7 +191,7 @@ class RefractionForm extends PureComponent {
       haveNearAdd,
       ...nearAddData,
     }
-    console.log(reportParameters)
+
     window.g_app._store.dispatch({
       type: 'report/updateState',
       payload: {
