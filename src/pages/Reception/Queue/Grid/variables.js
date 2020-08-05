@@ -56,7 +56,7 @@ export const FuncConfig = {
     ],
   },
   resizable: true,
-  rowhighlightable: true,
+  selectrowhighlightable: true,
 }
 
 export const AppointmentTableConfig = {
