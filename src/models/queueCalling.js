@@ -23,6 +23,17 @@ export default createFormViewModel({
           const newCalledQueue = { qNo, roomNo }
 
           return dispatch({
+            type: 'refreshQueueCallList',
+            payload: {
+              callingQueue: newCalledQueue,
+            },
+          })
+        },
+      })
+
+      subscribeNotification('QueueClear', {
+        callback: () => {
+          return dispatch({
             type: 'getExistingQueueCallList',
             payload: {
               keys: VALUE_KEYS.QUEUECALLING,
@@ -176,6 +187,7 @@ export default createFormViewModel({
         ]
 
         const remainingPendingQCall = pendingQCall.filter((q, idx) => idx !== 0)
+        console.log('pendingQCall11', pendingQCall)
         return {
           ...st,
           qCallList: qArray,
