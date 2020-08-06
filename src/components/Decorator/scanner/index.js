@@ -456,7 +456,7 @@ class Scanner extends Component {
           </div>
         </GridItem>
 
-        <GridItem xs={2} md={2} style={{ textAlign: 'center' }}>
+        <GridItem xs={2} md={2}>
           <Scanconfig handleScaning={handleScaning} />
         </GridItem>
       </GridContainer>
