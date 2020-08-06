@@ -42,6 +42,7 @@ const styles = () => ({
     marginRight: 30,
     marginTop: 5,
     fontWeight: 'bold',
+    color: 'red',
   },
   printButtonStyle: {
     marginLeft: 'auto',
@@ -111,7 +112,11 @@ const InvoiceHistory = ({
             <p className={classes.title}>
               Total Paid: {currencyFormatter(totalPayment)}
             </p>
-            <p className={patientOutstanding > 0 ? classes.titleBold : classes.title}>
+            <p
+              className={
+                patientOutstanding > 0 ? classes.titleBold : classes.title
+              }
+            >
               Patient O/S Balance: {currencyFormatter(patientOutstanding)}
             </p>
             <p className={classes.printButtonStyle}>
