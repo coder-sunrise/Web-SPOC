@@ -61,7 +61,7 @@ import MiscCrNote from './MiscCrNote'
       remark,
       finalCredit,
       gstAmount,
-    } = values 
+    } = values
     // const gstAmount = creditNoteItem.reduce(
     //   (totalGstAmount, item) =>
     //     item.isSelected ? totalGstAmount + item.gstAmount : totalGstAmount,
@@ -139,9 +139,7 @@ class AddCrNote extends Component {
     }, 0)
     setFieldValue('finalCredit', roundTo(finalCreditTotal))
 
-    const gstAmount = invoiceDetail.isGSTInclusive ?
-      (finalCreditTotal - finalCreditTotal / (1 + invoiceDetail.gstValue / 100))
-      : finalCreditTotal * (invoiceDetail.gstValue / 100)
+    const gstAmount = finalCreditTotal / (1 + invoiceDetail.gstValue / 100) * (invoiceDetail.gstValue / 100)
     setFieldValue('gstAmount', roundTo(gstAmount))
     setFieldValue('subTotal', roundTo(finalCreditTotal) - roundTo(gstAmount))
   }
@@ -383,7 +381,7 @@ class AddCrNote extends Component {
 
         <GridContainer>
           <GridItem md={9}>
-            <p>Note: Total Price($) are after GST.</p>
+            <p>Note: Total Amount ($) is GST inclusive.</p>
           </GridItem>
           <GridItem md={3} style={{ textAlign: 'right' }}>
             <Button color='danger' onClick={onConfirm}>
