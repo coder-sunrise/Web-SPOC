@@ -20,6 +20,7 @@ class EmergencyContact extends PureComponent {
   }
 
   tableParas = {
+    extraColumn: [],
     columns: [
       { name: 'accountNoTypeFK', title: 'Account Type' },
       { name: 'accountNo', title: 'Account No' },
