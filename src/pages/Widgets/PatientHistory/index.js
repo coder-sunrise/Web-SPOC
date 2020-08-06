@@ -126,13 +126,22 @@ class PatientHistory extends Component {
       const accessRight = Authorized.check(o.authority)
       return accessRight && accessRight.rights !== 'hidden'
     })
+    const activedItems = this.widgets.map((widget) => widget.id)
+    const storageItems = JSON.parse(
+      localStorage.getItem('patientHistoryWidgets') || '[]',
+    )
 
+    let selectedItems = storageItems
+    if (storageItems.length <= 0) {
+      selectedItems = activedItems
+    } else {
+      selectedItems = storageItems.filter((i) => activedItems.includes(i))
+    }
     this.state = {
-      selectedItems: localStorage.getItem('patientHistoryWidgets')
-        ? JSON.parse(localStorage.getItem('patientHistoryWidgets'))
-        : this.widgets.map((widget) => widget.id),
+      selectedItems,
       selectedData: '',
     }
+    localStorage.setItem('patientHistoryWidgets', JSON.stringify(selectedItems))
   }
 
   componentWillMount () {
@@ -159,6 +168,7 @@ class PatientHistory extends Component {
   }
 
   onSelectChange = (val) => {
+    console.log(val)
     this.setState({
       selectedItems: val,
     })
