@@ -4,8 +4,11 @@ import Print from '@material-ui/icons/Print'
 import Info from '@material-ui/icons/Info'
 import { withStyles } from '@material-ui/core'
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
-import { ReportViewer, DeleteWithPopover, AccordionTitle } from '@/components/_medisys'
-import * as service from '../services/index'
+import {
+  ReportViewer,
+  DeleteWithPopover,
+  AccordionTitle,
+} from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
 import {
   Button,
@@ -19,6 +22,7 @@ import {
   Danger,
   Accordion,
 } from '@/components'
+import * as service from '../services/index'
 // material ui
 // common components
 // sub components
@@ -46,10 +50,11 @@ class PaymentHistory extends PureComponent {
   }
 
   componentDidMount () {
+    const { match: { params } } = this.props
     this.props.dispatch({
       type: 'statement/queryPaymentHistory',
       payload: {
-        id: this.props.values.id,
+        id: params.id,
       },
     })
   }
@@ -73,7 +78,10 @@ class PaymentHistory extends PureComponent {
   }
 
   handleConfirmDelete = async (id, toggleVisibleCallback) => {
-    if (this.state.cancelReason === '' || this.state.cancelReason === undefined) {
+    if (
+      this.state.cancelReason === '' ||
+      this.state.cancelReason === undefined
+    ) {
       this.setState({
         showError: true,
         errorMessage: 'Void reason is required',
@@ -98,7 +106,10 @@ class PaymentHistory extends PureComponent {
   }
 
   handleConfirmDeleteSinglePayment = async (item, toggleVisibleCallback) => {
-    if (this.state.cancelReason === '' || this.state.cancelReason === undefined) {
+    if (
+      this.state.cancelReason === '' ||
+      this.state.cancelReason === undefined
+    ) {
       this.setState({
         showError: true,
         errorMessage: 'Void reason is required',
@@ -148,7 +159,8 @@ class PaymentHistory extends PureComponent {
     this.setState({
       reportId: 56,
       reportParameters: {
-        isSaved: true, StatementPaymentId: paymentId,
+        isSaved: true,
+        StatementPaymentId: paymentId,
       },
       open: true,
     })
@@ -158,7 +170,8 @@ class PaymentHistory extends PureComponent {
     this.setState({
       reportId: 29,
       reportParameters: {
-        isSaved: true, InvoicePaymentId: paymentId,
+        isSaved: true,
+        InvoicePaymentId: paymentId,
       },
       open: true,
     })
@@ -171,7 +184,10 @@ class PaymentHistory extends PureComponent {
   }
 
   render () {
-    const { classes, statement: { statementPaymentList, invoicePaymentList } } = this.props
+    const {
+      classes,
+      statement: { statementPaymentList, invoicePaymentList },
+    } = this.props
     const cloumns = [
       { name: 'receiptNo', title: 'Receipt No.' },
       { name: 'paymentReceivedDate', title: 'Receipt Date' },
@@ -182,43 +198,45 @@ class PaymentHistory extends PureComponent {
       { name: 'cancelReason', title: 'Voided Reason' },
       { name: 'action', title: 'Action' },
     ]
-    const cloumnExtensions = [{
-      columnName: 'receiptNo',
-      sortingEnabled: false,
-      width: 120,
-    },
-    {
-      columnName: 'paymentReceivedDate',
-      sortingEnabled: false,
-      type: 'date',
-      width: 120,
-    },
-    {
-      columnName: 'paymentMode',
-      sortingEnabled: false,
-    },
-    {
-      columnName: 'amount',
-      type: 'number',
-      currency: true,
-      sortingEnabled: false,
-      width: 120,
-    },
-    {
-      columnName: 'remark',
-      sortingEnabled: false,
-    },
-    {
-      columnName: 'cancelDate',
-      type: 'date',
-      format: dateFormatLong,
-      sortingEnabled: false,
-      width: 120,
-    },
-    {
-      columnName: 'cancelReason',
-      sortingEnabled: false,
-    }]
+    const cloumnExtensions = [
+      {
+        columnName: 'receiptNo',
+        sortingEnabled: false,
+        width: 120,
+      },
+      {
+        columnName: 'paymentReceivedDate',
+        sortingEnabled: false,
+        type: 'date',
+        width: 120,
+      },
+      {
+        columnName: 'paymentMode',
+        sortingEnabled: false,
+      },
+      {
+        columnName: 'amount',
+        type: 'number',
+        currency: true,
+        sortingEnabled: false,
+        width: 120,
+      },
+      {
+        columnName: 'remark',
+        sortingEnabled: false,
+      },
+      {
+        columnName: 'cancelDate',
+        type: 'date',
+        format: dateFormatLong,
+        sortingEnabled: false,
+        width: 120,
+      },
+      {
+        columnName: 'cancelReason',
+        sortingEnabled: false,
+      },
+    ]
     return (
       <div>
         <Accordion
@@ -234,160 +252,169 @@ class PaymentHistory extends PureComponent {
           collapses={[
             {
               title: <AccordionTitle title='Statement Payment' />,
-              content: <CommonTableGrid
-                rows={statementPaymentList}
-                onRowDoubleClick={this.showDetails}
-                columns={cloumns}
-                columnExtensions={[
-                  ...cloumnExtensions,
-                  {
-                    columnName: 'action',
-                    sortingEnabled: false,
-                    align: 'center',
-                    width: 150,
-                    render: (item) => {
-                      return (
-                        <div>
-                          <Tooltip title='Show Details'>
-                            <Button
-                              size='sm'
-                              onClick={() => {
-                                this.showDetails(item)
-                              }}
-                              justIcon
-                              color='primary'
-                            >
-                              <Info />
-                            </Button>
-                          </Tooltip>
-                          <DeleteWithPopover
-                            index={item.id}
-                            title='Void Payment'
-                            tooltipText='void this Payment'
-                            contentText='Confirm to void this payment?'
-                            extraCmd={
-                              item.id ? (
-                                <div className={classes.errorContainer}>
-                                  <FastField
-                                    name='cancelReason'
-                                    render={(args) => (
-                                      <TextField
-                                        label='Void Reason'
-                                        autoFocus
-                                        {...args}
-                                        onChange={this.onCancelReasonChange}
-                                      />
+              content: (
+                <CommonTableGrid
+                  rows={statementPaymentList}
+                  onRowDoubleClick={this.showDetails}
+                  columns={cloumns}
+                  columnExtensions={[
+                    ...cloumnExtensions,
+                    {
+                      columnName: 'action',
+                      sortingEnabled: false,
+                      align: 'center',
+                      width: 150,
+                      render: (item) => {
+                        return (
+                          <div>
+                            <Tooltip title='Show Details'>
+                              <Button
+                                size='sm'
+                                onClick={() => {
+                                  this.showDetails(item)
+                                }}
+                                justIcon
+                                color='primary'
+                              >
+                                <Info />
+                              </Button>
+                            </Tooltip>
+                            <DeleteWithPopover
+                              index={item.id}
+                              title='Void Payment'
+                              tooltipText='void this Payment'
+                              contentText='Confirm to void this payment?'
+                              extraCmd={
+                                item.id ? (
+                                  <div className={classes.errorContainer}>
+                                    <FastField
+                                      name='cancelReason'
+                                      render={(args) => (
+                                        <TextField
+                                          label='Void Reason'
+                                          autoFocus
+                                          {...args}
+                                          onChange={this.onCancelReasonChange}
+                                        />
+                                      )}
+                                    />
+                                    {this.state.showError && (
+                                      <Danger>
+                                        <span>{this.state.errorMessage}</span>
+                                      </Danger>
                                     )}
-                                  />
-                                  {this.state.showError && (
-                                    <Danger>
-                                      <span>{this.state.errorMessage}</span>
-                                    </Danger>
-                                  )}
-                                </div>
-                              ) : (
+                                  </div>
+                                ) : (
                                   undefined
                                 )
-                            }
-                            onCancelClick={this.handleCancelClick}
-                            onConfirmDelete={this.handleConfirmDelete}
-                            disabled={item.isCancelled}
-                          />
-                          <Tooltip title='Print Payment Receipt'>
-                            <Button
-                              size='sm'
-                              onClick={() => {
-                                this.onPrintReceiptClick(item.id)
-                              }}
-                              justIcon
-                              color='primary'
+                              }
+                              onCancelClick={this.handleCancelClick}
+                              onConfirmDelete={this.handleConfirmDelete}
                               disabled={item.isCancelled}
-                            >
-                              <Print />
-                            </Button>
-                          </Tooltip>
-                        </div>
-                      )
+                            />
+                            <Tooltip title='Print Payment Receipt'>
+                              <Button
+                                size='sm'
+                                onClick={() => {
+                                  this.onPrintReceiptClick(item.id)
+                                }}
+                                justIcon
+                                color='primary'
+                                disabled={item.isCancelled}
+                              >
+                                <Print />
+                              </Button>
+                            </Tooltip>
+                          </div>
+                        )
+                      },
                     },
-                  },
-                ]}
-                FuncProps={{
-                  pager: false,
-                }}
-              />,
+                  ]}
+                  FuncProps={{
+                    pager: false,
+                  }}
+                />
+              ),
             },
             {
               title: <AccordionTitle title='Invoice Payment' />,
-              content: <CommonTableGrid
-                rows={invoicePaymentList}
-                columns={cloumns}
-                columnExtensions={[
-                  ...cloumnExtensions,
-                  {
-                    columnName: 'action',
-                    sortingEnabled: false,
-                    align: 'center',
-                    width: 150,
-                    render: (item) => {
-                      return (
-                        <div>
-                          <DeleteWithPopover
-                            index={item.id}
-                            title='Void Payment'
-                            tooltipText='void this Payment'
-                            contentText='Confirm to void this payment?'
-                            extraCmd={
-                              item.id ? (
-                                <div className={classes.errorContainer}>
-                                  <FastField
-                                    name='cancelReason'
-                                    render={(args) => (
-                                      <TextField
-                                        label='Void Reason'
-                                        autoFocus
-                                        {...args}
-                                        onChange={this.onCancelReasonChange}
-                                      />
+              content: (
+                <CommonTableGrid
+                  rows={invoicePaymentList}
+                  columns={cloumns}
+                  columnExtensions={[
+                    ...cloumnExtensions,
+                    {
+                      columnName: 'action',
+                      sortingEnabled: false,
+                      align: 'center',
+                      width: 150,
+                      render: (item) => {
+                        return (
+                          <div>
+                            <DeleteWithPopover
+                              index={item.id}
+                              title='Void Payment'
+                              tooltipText='void this Payment'
+                              contentText='Confirm to void this payment?'
+                              extraCmd={
+                                item.id ? (
+                                  <div className={classes.errorContainer}>
+                                    <FastField
+                                      name='cancelReason'
+                                      render={(args) => (
+                                        <TextField
+                                          label='Void Reason'
+                                          autoFocus
+                                          {...args}
+                                          onChange={this.onCancelReasonChange}
+                                        />
+                                      )}
+                                    />
+                                    {this.state.showError && (
+                                      <Danger>
+                                        <span>{this.state.errorMessage}</span>
+                                      </Danger>
                                     )}
-                                  />
-                                  {this.state.showError && (
-                                    <Danger>
-                                      <span>{this.state.errorMessage}</span>
-                                    </Danger>
-                                  )}
-                                </div>
-                              ) : (
+                                  </div>
+                                ) : (
                                   undefined
                                 )
-                            }
-                            onCancelClick={this.handleCancelClick}
-                            onConfirmDelete={(id, toggleVisibleCallback) => {
-                              this.handleConfirmDeleteSinglePayment(item, toggleVisibleCallback)
-                            }}
-                            disabled={item.isCancelled}
-                          />
-                          <Tooltip title='Print Payment Receipt'>
-                            <Button
-                              size='sm'
-                              onClick={() => {
-                                this.onPrintInvoicePaymentReceiptClick(item.id)
+                              }
+                              onCancelClick={this.handleCancelClick}
+                              onConfirmDelete={(id, toggleVisibleCallback) => {
+                                this.handleConfirmDeleteSinglePayment(
+                                  item,
+                                  toggleVisibleCallback,
+                                )
                               }}
-                              justIcon
-                              color='primary'
                               disabled={item.isCancelled}
-                            >
-                              <Print />
-                            </Button>
-                          </Tooltip>
-                        </div>
-                      )
+                            />
+                            <Tooltip title='Print Payment Receipt'>
+                              <Button
+                                size='sm'
+                                onClick={() => {
+                                  this.onPrintInvoicePaymentReceiptClick(
+                                    item.id,
+                                  )
+                                }}
+                                justIcon
+                                color='primary'
+                                disabled={item.isCancelled}
+                              >
+                                <Print />
+                              </Button>
+                            </Tooltip>
+                          </div>
+                        )
+                      },
                     },
-                  },
-                ]}
-                FuncProps={{
-                  pager: false,
-                }}
-              />,
+                  ]}
+                  FuncProps={{
+                    pager: false,
+                  }}
+                />
+              ),
             },
           ]}
         />
