@@ -796,7 +796,7 @@ class Medication extends PureComponent {
                     icon={<Add />}
                     style={{
                       marginTop: theme.spacing(2),
-                      marginLeft: 55,
+                      marginLeft: theme.spacing(7),
                     }}
                     onClick={this.onSearchMedicationHistory}
                   >
@@ -1236,8 +1236,8 @@ class Medication extends PureComponent {
                     <NumberInput
                       label='Quantity'
                       style={{
-                        marginLeft: 55,
-                        paddingRight: 45,
+                        marginLeft: theme.spacing(7),
+                        paddingRight: theme.spacing(6),
                       }}
                       // formatter={(v) => `${v} Bottle${v > 1 ? 's' : ''}`}
                       step={1}
@@ -1284,8 +1284,8 @@ class Medication extends PureComponent {
                     <NumberInput
                       label='Total'
                       style={{
-                        marginLeft: 55,
-                        paddingRight: 45,
+                        marginLeft: theme.spacing(7),
+                        paddingRight: theme.spacing(6),
                       }}
                       onChange={(e) => {
                         this.updateTotalPrice(e.target.value)
@@ -1354,7 +1354,9 @@ class Medication extends PureComponent {
             </GridItem>
             <GridItem xs={3} className={classes.editor}>
               <div style={{ position: 'relative' }}>
-                <div style={{ marginTop: 16, position: 'absolute' }}>
+                <div
+                  style={{ marginTop: theme.spacing(2), position: 'absolute' }}
+                >
                   <Field
                     name='isMinus'
                     render={(args) => {
@@ -1383,8 +1385,8 @@ class Medication extends PureComponent {
                       return (
                         <NumberInput
                           style={{
-                            marginLeft: 55,
-                            paddingRight: 45,
+                            marginLeft: theme.spacing(7),
+                            paddingRight: theme.spacing(6),
                           }}
                           currency
                           label='Adjustment'
@@ -1401,8 +1403,8 @@ class Medication extends PureComponent {
                     return (
                       <NumberInput
                         style={{
-                          marginLeft: 55,
-                          paddingRight: 45,
+                          marginLeft: theme.spacing(7),
+                          paddingRight: theme.spacing(6),
                         }}
                         percentage
                         max={999}
@@ -1421,7 +1423,7 @@ class Medication extends PureComponent {
               </div>
             </GridItem>
             <GridItem xs={1} className={classes.editor}>
-              <div style={{ marginTop: 16 }}>
+              <div style={{ marginTop: theme.spacing(2) }}>
                 <Field
                   name='isExactAmount'
                   render={(args) => {
@@ -1460,8 +1462,8 @@ class Medication extends PureComponent {
                     <NumberInput
                       label='Total After Adj'
                       style={{
-                        marginLeft: 55,
-                        paddingRight: 45,
+                        marginLeft: theme.spacing(7),
+                        paddingRight: theme.spacing(6),
                       }}
                       disabled
                       currency

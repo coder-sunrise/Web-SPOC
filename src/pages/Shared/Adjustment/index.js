@@ -183,7 +183,10 @@ class Adjustment extends PureComponent {
                   render={(args) => {
                     return (
                       <Switch
-                        style={{ position: 'absolute' }}
+                        style={{
+                          position: 'absolute',
+                          marginTop: theme.spacing(2.5),
+                        }}
                         checkedChildren='-'
                         unCheckedChildren='+'
                         label=''
@@ -251,6 +254,7 @@ class Adjustment extends PureComponent {
                         }, 1)
                       }}
                       {...args}
+                      style={{ marginTop: theme.spacing(2.5) }}
                     />
                   )
                 }}

@@ -314,8 +314,8 @@ class Consumable extends PureComponent {
                   <NumberInput
                     label='Quantity'
                     style={{
-                      marginLeft: 55,
-                      paddingRight: 45,
+                      marginLeft: theme.spacing(7),
+                      paddingRight: theme.spacing(6),
                     }}
                     step={1}
                     min={1}
@@ -385,8 +385,8 @@ class Consumable extends PureComponent {
                   <NumberInput
                     label='Total'
                     style={{
-                      marginLeft: 55,
-                      paddingRight: 45,
+                      marginLeft: theme.spacing(7),
+                      paddingRight: theme.spacing(6),
                     }}
                     currency
                     onChange={(e) => {
@@ -414,7 +414,9 @@ class Consumable extends PureComponent {
           </GridItem>
           <GridItem xs={3} className={classes.editor}>
             <div style={{ position: 'relative' }}>
-              <div style={{ marginTop: 16, position: 'absolute' }}>
+              <div
+                style={{ marginTop: theme.spacing(2), position: 'absolute' }}
+              >
                 <FastField
                   name='isMinus'
                   render={(args) => {
@@ -442,8 +444,8 @@ class Consumable extends PureComponent {
                     return (
                       <NumberInput
                         style={{
-                          marginLeft: 55,
-                          paddingRight: 45,
+                          marginLeft: theme.spacing(7),
+                          paddingRight: theme.spacing(6),
                         }}
                         currency
                         label='Adjustment'
@@ -459,8 +461,8 @@ class Consumable extends PureComponent {
                   return (
                     <NumberInput
                       style={{
-                        marginLeft: 55,
-                        paddingRight: 45,
+                        marginLeft: theme.spacing(7),
+                        paddingRight: theme.spacing(6),
                       }}
                       percentage
                       max={999}
@@ -478,7 +480,7 @@ class Consumable extends PureComponent {
             </div>
           </GridItem>
           <GridItem xs={1} className={classes.editor}>
-            <div style={{ marginTop: 16 }}>
+            <div style={{ marginTop: theme.spacing(2) }}>
               <FastField
                 name='isExactAmount'
                 render={(args) => {
@@ -510,8 +512,8 @@ class Consumable extends PureComponent {
                   <NumberInput
                     label='Total After Adj'
                     style={{
-                      marginLeft: 55,
-                      paddingRight: 45,
+                      marginLeft: theme.spacing(7),
+                      paddingRight: theme.spacing(6),
                     }}
                     currency
                     disabled

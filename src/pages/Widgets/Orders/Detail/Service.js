@@ -302,8 +302,8 @@ class Service extends PureComponent {
                   <NumberInput
                     label='Total'
                     style={{
-                      marginLeft: 55,
-                      paddingRight: 45,
+                      marginLeft: theme.spacing(7),
+                      paddingRight: theme.spacing(6),
                     }}
                     min={0}
                     currency
@@ -342,7 +342,9 @@ class Service extends PureComponent {
           </GridItem>
           <GridItem xs={3}>
             <div style={{ position: 'relative' }}>
-              <div style={{ marginTop: 16, position: 'absolute' }}>
+              <div
+                style={{ marginTop: theme.spacing(2), position: 'absolute' }}
+              >
                 <FastField
                   name='isMinus'
                   render={(args) => {
@@ -370,8 +372,8 @@ class Service extends PureComponent {
                     return (
                       <NumberInput
                         style={{
-                          marginLeft: 55,
-                          paddingRight: 45,
+                          marginLeft: theme.spacing(7),
+                          paddingRight: theme.spacing(6),
                         }}
                         currency
                         label='Adjustment'
@@ -387,8 +389,8 @@ class Service extends PureComponent {
                   return (
                     <NumberInput
                       style={{
-                        marginLeft: 55,
-                        paddingRight: 45,
+                        marginLeft: theme.spacing(7),
+                        paddingRight: theme.spacing(6),
                       }}
                       percentage
                       max={999}
@@ -406,7 +408,7 @@ class Service extends PureComponent {
             </div>
           </GridItem>
           <GridItem xs={1}>
-            <div style={{ marginTop: 16 }}>
+            <div style={{ marginTop: theme.spacing(2) }}>
               <FastField
                 name='isExactAmount'
                 render={(args) => {
@@ -448,8 +450,8 @@ class Service extends PureComponent {
                   <NumberInput
                     label='Total After Adj'
                     style={{
-                      marginLeft: 55,
-                      paddingRight: 45,
+                      marginLeft: theme.spacing(7),
+                      paddingRight: theme.spacing(6),
                     }}
                     currency
                     disabled

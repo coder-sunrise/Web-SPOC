@@ -20,6 +20,7 @@ const Adjustment = ({
   onDelete,
   amountProps,
   type,
+  theme,
 }) => {
   // console.log('Adjustment', amountProps)
   const isExactAmount = type === 'ExactAmount'
@@ -28,13 +29,13 @@ const Adjustment = ({
       <GridItem xs={7}>
         <div
           style={{
-            width: '105%',
+            width: '100%',
             overflow: 'hidden',
             display: 'inline-block',
             textOverflow: 'ellipsis',
             wordBreak: 'keep-all',
             whiteSpace: 'nowrap',
-            marginLeft: 8,
+            marginLeft: theme.spacing(2),
             textAlign: 'right',
           }}
         >
@@ -57,7 +58,7 @@ const Adjustment = ({
               onDelete(index)
             }}
             style={{
-              marginLeft: 15,
+              marginLeft: theme.spacing(2),
             }}
           >
             <Delete />

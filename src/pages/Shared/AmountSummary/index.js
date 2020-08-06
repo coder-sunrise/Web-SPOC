@@ -177,7 +177,7 @@ class AmountSummary extends PureComponent {
               style={{
                 textAlign: 'right',
                 fontWeight: 500,
-                marginRight: -20,
+                marginRight: theme.spacing(-2),
               }}
             >
               <span>Sub Total</span>
@@ -206,7 +206,7 @@ class AmountSummary extends PureComponent {
               style={{
                 textAlign: 'right',
                 fontWeight: 500,
-                marginRight: -20,
+                marginRight: theme.spacing(-2),
               }}
             >
               <span>Invoice Adjustment</span>
@@ -220,7 +220,7 @@ class AmountSummary extends PureComponent {
                 justIcon
                 key='addAdjustment'
                 onClick={this.addAdjustment}
-                style={{ marginLeft: 15 }}
+                style={{ marginLeft: theme.spacing(2) }}
               >
                 <Add />
               </Button>
@@ -240,6 +240,7 @@ class AmountSummary extends PureComponent {
                 amountProps={amountProps}
                 // calcPurchaseOrderSummary={calcPurchaseOrderSummary}
                 {...v}
+                theme={theme}
               />
             )
           }
@@ -252,7 +253,7 @@ class AmountSummary extends PureComponent {
               <div
                 style={{
                   textAlign: 'right',
-                  marginRight: -35,
+                  marginRight: theme.spacing(-4),
                 }}
               >
                 <Checkbox
@@ -293,7 +294,7 @@ class AmountSummary extends PureComponent {
               style={{
                 textAlign: 'right',
                 fontWeight: 500,
-                marginRight: -20,
+                marginRight: theme.spacing(-2),
               }}
             >
               <span>Total</span>

@@ -22,7 +22,7 @@ import { orderTypes } from '@/pages/Consultation/utils'
 import Authorized from '@/utils/Authorized'
 
 // console.log(orderTypes)
-export default ({ orders, dispatch, classes, from, codetable }) => {
+export default ({ orders, dispatch, classes, from, codetable, theme }) => {
   const { rows, summary, finalAdjustments, isGSTInclusive, gstValue } = orders
   const { total, gst, totalWithGST, subTotal } = summary
   const [
@@ -113,7 +113,7 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
         style={{
           textAlign: 'right',
           position: 'relative',
-          marginLeft: 5,
+          marginLeft: theme.spacing(1),
         }}
       >
         <Checkbox
@@ -153,11 +153,11 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
       >
         <div
           style={{
-            width: '60%',
+            width: '58%',
             overflow: 'hidden',
             display: 'inline-block',
             textOverflow: 'ellipsis',
-            marginLeft: 10,
+            marginLeft: theme.spacing(2),
             textAlign: 'right',
             position: 'absolute',
           }}
@@ -168,7 +168,7 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
         </div>
         <div
           style={{
-            marginLeft: 320,
+            marginLeft: theme.spacing(39.5),
             position: 'absolute',
           }}
         >
@@ -301,24 +301,26 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
                     }}
                   >
                     <div>
-                      <div style={{ marginLeft: 252 }}>{itemSubTotal}</div>
+                      <div style={{ marginLeft: theme.spacing(31) }}>
+                        {itemSubTotal}
+                      </div>
                       <div
                         style={{
-                          marginBottom: 3,
-                          marginLeft: 10,
-                          paddingRight: 70,
+                          marginBottom: theme.spacing(1),
+                          marginLeft: theme.spacing(1),
+                          paddingRight: theme.spacing(8),
                         }}
                       >
                         <Divider />
                       </div>
-                      <div style={{ marginLeft: 188 }}>
+                      <div style={{ marginLeft: theme.spacing(23) }}>
                         <span>
                           Invoice Adjustment
                           <Tooltip title='Add Adjustment'>
                             <Button
                               justIcon
                               color='primary'
-                              style={{ top: -1, marginLeft: 8 }}
+                              style={{ top: -1, marginLeft: theme.spacing(1) }}
                               onClick={addAdjustment}
                             >
                               <Add />
@@ -328,18 +330,22 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
                       </div>
                       {itemAdj}
                       {gstValue >= 0 && (
-                        <div style={{ marginLeft: 154 }}>{itemGST}</div>
+                        <div style={{ marginLeft: theme.spacing(18) }}>
+                          {itemGST}
+                        </div>
                       )}
                       <div
                         style={{
-                          marginTop: 3,
-                          marginLeft: 10,
-                          paddingRight: 70,
+                          marginBottom: theme.spacing(1),
+                          marginLeft: theme.spacing(1),
+                          paddingRight: theme.spacing(8),
                         }}
                       >
                         <Divider />
                       </div>
-                      <div style={{ marginLeft: 280 }}>{itemTotal}</div>
+                      <div style={{ marginLeft: theme.spacing(34.5) }}>
+                        {itemTotal}
+                      </div>
                     </div>
                   </Table.Cell>
                 )
