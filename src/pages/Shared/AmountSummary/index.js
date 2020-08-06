@@ -172,8 +172,16 @@ class AmountSummary extends PureComponent {
     return (
       <div className={classes.cls01}>
         <GridContainer style={{ marginBottom: 4 }}>
-          <GridItem xs={6}>
-            <span>Sub Total:</span>
+          <GridItem xs={7}>
+            <div
+              style={{
+                textAlign: 'right',
+                fontWeight: 500,
+                marginRight: theme.spacing(-2),
+              }}
+            >
+              <span>Sub Total</span>
+            </div>
             {/* <FastField
           name={`${poPrefix}.IsGSTEnabled`}
           render={(args) => (
@@ -186,18 +194,25 @@ class AmountSummary extends PureComponent {
           )}
         /> */}
           </GridItem>
-          <GridItem xs={6}>
+          <GridItem xs={1} />
+          <GridItem xs={4}>
             <NumberInput {...amountProps} value={subTotal} />
           </GridItem>
         </GridContainer>
-
+        <Divider style={{ margin: theme.spacing(1) }} />
         <GridContainer style={{ marginBottom: 4 }}>
-          <GridItem xs={12}>
-            <span>
-              {formatMessage({
-                id: 'inventory.pr.detail.pod.summary.adjustment',
-              })}
-            </span>
+          <GridItem xs={7}>
+            <div
+              style={{
+                textAlign: 'right',
+                fontWeight: 500,
+                marginRight: theme.spacing(-2),
+              }}
+            >
+              <span>Invoice Adjustment</span>
+            </div>
+          </GridItem>
+          <GridItem xs={1}>
             {showAddAdjustment && (
               <Button
                 color='primary'
@@ -205,6 +220,7 @@ class AmountSummary extends PureComponent {
                 justIcon
                 key='addAdjustment'
                 onClick={this.addAdjustment}
+                style={{ marginLeft: theme.spacing(2) }}
               >
                 <Add />
               </Button>
@@ -224,16 +240,33 @@ class AmountSummary extends PureComponent {
                 amountProps={amountProps}
                 // calcPurchaseOrderSummary={calcPurchaseOrderSummary}
                 {...v}
+                theme={theme}
               />
             )
           }
           return null
         })}
 
-        {gstValue ? (
+        {gstValue >= 0 ? (
           <GridContainer>
-            <GridItem xs={6}>
-              <span>{`${numeral(gstValue).format('0.00')}`}% GST:</span>
+            <GridItem xs={7}>
+              <div
+                style={{
+                  textAlign: 'right',
+                  marginRight: theme.spacing(-4),
+                }}
+              >
+                <Checkbox
+                  style={{ top: -1 }}
+                  controlStyle={{ fontWeight: 500 }}
+                  label={`Inclusive GST (${numeral(gstValue).format('0.00')}%)`}
+                  simple
+                  checked={isGSTInclusive}
+                  onChange={(e) => {
+                    this.onChangeGstToggle(e.target.value)
+                  }}
+                />
+              </div>
               {/* <FastField
                 name={`${poPrefix}.IsGSTEnabled`}
                 render={(args) => (
@@ -246,22 +279,9 @@ class AmountSummary extends PureComponent {
                 )}
               /> */}
             </GridItem>
-            <GridItem xs={6}>
+            <GridItem xs={1} />
+            <GridItem xs={4}>
               <NumberInput {...amountProps} value={gst} />
-            </GridItem>
-
-            <GridItem xs={12}>
-              <Checkbox
-                style={{ top: 1 }}
-                label={formatMessage({
-                  id: 'app.general.inclusiveGST',
-                })}
-                simple
-                checked={isGSTInclusive}
-                onChange={(e) => {
-                  this.onChangeGstToggle(e.target.value)
-                }}
-              />
             </GridItem>
           </GridContainer>
         ) : (
@@ -269,12 +289,16 @@ class AmountSummary extends PureComponent {
         )}
         <Divider style={{ margin: theme.spacing(1) }} />
         <GridContainer>
-          <GridItem xs={6}>
-            <span>
-              {formatMessage({
-                id: 'inventory.pr.detail.pod.summary.total',
-              })}
-            </span>
+          <GridItem xs={7}>
+            <div
+              style={{
+                textAlign: 'right',
+                fontWeight: 500,
+                marginRight: theme.spacing(-2),
+              }}
+            >
+              <span>Total</span>
+            </div>
 
             {/* <FastField
                 name={`${poPrefix}.IsGSTEnabled`}
@@ -288,7 +312,8 @@ class AmountSummary extends PureComponent {
                 )}
               /> */}
           </GridItem>
-          <GridItem xs={6}>
+          <GridItem xs={1} />
+          <GridItem xs={4}>
             <NumberInput {...amountProps} value={totalWithGST} />
           </GridItem>
         </GridContainer>

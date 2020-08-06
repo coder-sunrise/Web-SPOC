@@ -445,12 +445,7 @@ class Detail extends PureComponent {
                   <Field
                     name='isTrackResults'
                     render={(args) => {
-                      return (
-                        <Switch
-                          label='Track Results'
-                          {...args}
-                        />
-                      )
+                      return <Switch label='Track Results' {...args} />
                     }}
                   />
                 </GridItem>

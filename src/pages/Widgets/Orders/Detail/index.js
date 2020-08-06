@@ -58,7 +58,7 @@ class Details extends PureComponent {
         <Divider />
 
         <div className={classnames(classes.footer)}>
-          {showAdjustment && (
+          {/* showAdjustment && (
             <Button
               color='primary'
               style={{ float: 'left' }}
@@ -67,7 +67,7 @@ class Details extends PureComponent {
             >
               {currencySymbol} Adjustment
             </Button>
-          )}
+          ) */}
           {/* {!!entity && (
             <Button
               color='danger'
