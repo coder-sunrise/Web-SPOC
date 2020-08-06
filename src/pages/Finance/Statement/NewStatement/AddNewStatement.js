@@ -46,6 +46,7 @@ const styles = () => ({
   enableReinitialize: true,
   mapPropsToValues: ({ statement }) => {
     const returnValue = statement.entity || statement.default
+    console.log(returnValue)
     const adminChargeValueType =
       returnValue.adminChargeValueType || 'Percentage'
     const adjustmentValueType = returnValue.adjustmentValueType || 'Percentage'
@@ -560,13 +561,17 @@ class AddNewStatement extends PureComponent {
                 </ProgressButton>
               </GridItem>
             </GridItem>
+          </GridContainer>
+          <GridItem xs={12}>
             <CommonTableGrid
-              style={{ margin: theme.spacing(2) }}
               rows={
                 invoiceRows.length > 0 ? invoiceRows : values.statementInvoice
               }
               columns={columns}
               columnExtensions={columnExtensions}
+              TableProps={{
+                height: 'calc(100vh - 465px)',
+              }}
               FuncProps={{
                 pager: false,
                 selectable: true,
@@ -632,7 +637,7 @@ class AddNewStatement extends PureComponent {
               selection={this.state.selectedRows}
               onSelectionChange={this.handleSelectionChange}
             />
-          </GridContainer>
+          </GridItem>
           <GridItem
             container
             style={{

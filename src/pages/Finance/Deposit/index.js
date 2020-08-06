@@ -31,7 +31,7 @@ class Deposit extends PureComponent {
         apiCriteria: {
           OnlyWithDeposit: false,
           startDate: moment().add(-1, 'month').formatUTC(),
-          endDate: moment().formatUTC(false),
+          endDate: moment().endOf('day').formatUTC(false),
         },
       },
     })

@@ -30,7 +30,7 @@ import { FilterBarDate } from '@/components/_medisys'
 @withFormik({
   mapPropsToValues: () => ({
     transactionStartDate: moment().startOf('month').formatUTC(),
-    transactionEndDate: moment().formatUTC(false),
+    transactionEndDate: moment().endOf('day').formatUTC(false),
   }),
   handleSubmit: () => {},
   displayName: 'PurchaseReceiveFilter',

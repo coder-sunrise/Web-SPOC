@@ -23,7 +23,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={1}>
             <FastField
               name='asAt'
-              render={(args) => <Checkbox {...args} label='As At' />}
+              render={(args) => <Checkbox {...args} label='Till Today' />}
             />
           </GridItem>
           <GridItem md={6} />

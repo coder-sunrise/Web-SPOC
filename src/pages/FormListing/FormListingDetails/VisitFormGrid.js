@@ -7,8 +7,6 @@ import { Tooltip } from '@material-ui/core'
 import { Delete, Edit, Print, Add } from '@material-ui/icons'
 import { FORM_CATEGORY } from '@/utils/constants'
 import { formTypes, formStatus } from '@/utils/codes'
-import VoidWithPopover from './FormDetail/VoidWithPopover'
-
 import {
   CommonTableGrid,
   Button,
@@ -19,6 +17,7 @@ import {
   Popover,
   Checkbox,
 } from '@/components'
+import VoidWithPopover from './FormDetail/VoidWithPopover'
 
 const styles = (theme) => ({
   item: {
@@ -219,7 +218,8 @@ class VisitFormGrid extends PureComponent {
           }}
         />
         <CommonTableGrid
-          getRowId={(r) => r.uid}
+          getRowId={(r) => r.id}
+          forceRender
           size='sm'
           style={{ margin: 0 }}
           rows={

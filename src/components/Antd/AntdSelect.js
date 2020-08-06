@@ -279,7 +279,7 @@ class AntdSelect extends React.PureComponent {
         'tags',
       ].includes(mode)
         ? value || []
-        : value
+        : value === null ? undefined : value
       if (
         [
           'multiple',
@@ -307,6 +307,7 @@ class AntdSelect extends React.PureComponent {
       if (!_.isEqual(v, this.state.value)) {
         this.setState({
           value: v,
+          shrink: v !== undefined && v !== null && v.length > 0,
         })
       }
     } else if (!this.state.value || this.state.value.length) {

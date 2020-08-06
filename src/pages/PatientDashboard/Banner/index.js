@@ -29,6 +29,7 @@ import {
 } from '@/components'
 import { getAppendUrl } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
+import { currencySymbol } from '@/utils/config'
 import Block from './Block'
 import HistoryDiagnosis from './HistoryDiagnosis'
 import { control } from '@/components/Decorator'
@@ -668,9 +669,27 @@ class Banner extends PureComponent {
             <Block
               header={<div style={headerStyles}>Outstanding</div>}
               body={
-                <div>
-                  <NumberInput text currency value={info.outstandingBalance} />
-                </div>
+                <Tooltip
+                  title={
+                    info.outstandingBalance ? (
+                      `${currencySymbol}${info.outstandingBalance.toFixed(2)}`
+                    ) : (
+                      ''
+                    )
+                  }
+                >
+                  <div
+                    style={{
+                      fontWeight: 500,
+                    }}
+                  >
+                    {info.outstandingBalance ? (
+                      `${currencySymbol}${info.outstandingBalance.toFixed(2)}`
+                    ) : (
+                      '-'
+                    )}
+                  </div>
+                </Tooltip>
               }
             />
           </GridItem>

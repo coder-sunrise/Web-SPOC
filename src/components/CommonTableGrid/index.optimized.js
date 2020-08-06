@@ -31,6 +31,7 @@ import {
   CustomPaging,
   TreeDataState,
   CustomTreeData,
+  VirtualTableState,
 } from '@devexpress/dx-react-grid'
 
 import {
@@ -57,6 +58,17 @@ import SettingsApplicationsIcon from '@material-ui/icons/SettingsApplications'
 import * as userService from '@/services/user'
 import { control } from '@/components/Decorator'
 import { smallTheme, defaultTheme } from '@/utils/theme'
+import { enableTableForceRender, generateHashCode } from '@/utils/utils'
+import { LoadingWrapper } from '@/components/_medisys'
+import {
+  Badge,
+  SizeContainer,
+  IconButton,
+  Popper,
+  Button,
+  Tooltip,
+  notification,
+} from '@/components'
 import NumberTypeProvider from './EditCellComponents/NumberTypeProvider'
 import TextTypeProvider from './EditCellComponents/TextTypeProvider'
 import SelectTypeProvider from './EditCellComponents/SelectTypeProvider'
@@ -70,22 +82,10 @@ import PatchedTableSelection from './plugins/PatchedTableSelection'
 import PatchedIntegratedSelection from './plugins/PatchedIntegratedSelection'
 import TableRow from './plugins/TableRow'
 import TableCell from './plugins/TableCell'
-import { enableTableForceRender, generateHashCode } from '@/utils/utils'
-import { LoadingWrapper } from '@/components/_medisys'
-import {
-  Badge,
-  SizeContainer,
-  IconButton,
-  Popper,
-  Button,
-  Tooltip,
-  notification,
-} from '@/components'
 import styles from './style'
 
 // console.log(userService)
 window.$tempGridRow = {}
-
 const cellStyle = {
   cell: {
     // borderRight: '1px solid rgba(0, 0, 0, 0.12)',
@@ -135,7 +135,7 @@ class CommonTableGrid extends PureComponent {
       editableGrid,
       getRowId,
       FuncProps = {},
-      columns,
+      columns = [],
       identifier,
     } = props
     // console.log(props)
@@ -170,7 +170,7 @@ class CommonTableGrid extends PureComponent {
 
     this.TableBase = ({ height, scrollable, dispatch, ...restProps }) => {
       const isScrollable = !!height
-      const dragCfg = {}
+      // const dragCfg = {}
       // if(rowDragable){
       //   dragCfg.rowComponent=({ row, ...restProps }) => {
       //     const TableRow = SortableElement(this.TableRow);
@@ -398,6 +398,12 @@ class CommonTableGrid extends PureComponent {
             borderTop: '1px solid rgba(0, 0, 0, 0.12)',
           },
         },
+        TableSelectAllCell: {
+          cell: {
+            ...cellStyle.cell,
+            borderTop: '1px solid rgba(0, 0, 0, 0.12)',
+          },
+        },
         Table: {
           table: {
             // tableLayout: 'auto',
@@ -490,7 +496,7 @@ class CommonTableGrid extends PureComponent {
         })
       }
       return {
-        pagination: _entity.pagination,
+        pagination: _entity.pagination || {},
         rows: _entity.list,
         filter: _entity.filter,
         entity: _entity,
@@ -1099,6 +1105,7 @@ class CommonTableGrid extends PureComponent {
               <RowErrorTypeProvider {...cellComponentConfig} /> */}
               {(columnReorderable || grouping) && <DragDropProvider />}
               {tree && <CustomTreeData getChildRows={this.getChildRows} />}
+
               <TableBase
                 // height={height}
                 bodyComponent={this.TableBody}

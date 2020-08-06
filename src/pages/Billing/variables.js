@@ -26,7 +26,8 @@ export const ApplyClaimsColumnExtension = [
     columnName: 'invoiceItemTypeFK',
     width: 150,
     render: (row) => {
-      if (row.invoiceItemTypeFK) return INVOICE_ITEM_TYPE[row.invoiceItemTypeFK]
+      if (row.itemType || row.invoiceItemTypeFK)
+        return row.itemType || INVOICE_ITEM_TYPE[row.invoiceItemTypeFK]
       return ''
     },
     disabled: true,

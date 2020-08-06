@@ -1,23 +1,12 @@
-import React, { PureComponent, memo } from 'react'
-import { formatMessage } from 'umi/locale'
-import Search from '@material-ui/icons/Search'
+import React, { PureComponent } from 'react'
 import { findGetParameter } from '@/utils/utils'
-import moment from 'moment'
-import { standardRowHeight } from 'mui-pro-jss'
 import Printer from '@material-ui/icons/Print'
 import { ReportViewer } from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
 import {
-  GridContainer,
   GridItem,
   FastField,
-  TextField,
   CodeSelect,
-  withFormikExtend,
-  DateRangePicker,
-  ProgressButton,
-  Tooltip,
-  Checkbox,
   Button,
   CommonModal,
 } from '@/components'
@@ -31,14 +20,7 @@ class FilterBar extends PureComponent {
       showDepositRefundModal: false,
       isDeposit: true,
     }
-    // const { setFieldValue } = props
   }
-
-  // componentDidMount = () => {
-  //   setTimeout(() => {
-  //     this.searchResult()
-  //   }, 100)
-  // }
 
   openReportViewer = () => {
     this.setState({ reportViewerOpen: true })
@@ -50,6 +32,8 @@ class FilterBar extends PureComponent {
 
   addDepositRefund = async (isDeposit) => {
     const { dispatch, patient: { deposit } } = this.props
+    const patientId = Number(findGetParameter('pid'))
+
     if (deposit && deposit.id > 0) {
       await dispatch({
         type: 'deposit/queryOne',
@@ -61,8 +45,9 @@ class FilterBar extends PureComponent {
       dispatch({
         type: 'deposit/updateState',
         payload: {
-          showModal: true,
-          entity: {},
+          entity: {
+            patientProfileFK: patientId,
+          },
         },
       })
     }
@@ -82,21 +67,18 @@ class FilterBar extends PureComponent {
 
   render () {
     const { isDeposit, showDepositRefundModal } = this.state
+    const { disabled, refundableAmount = 0, selectedTypeIds } = this.props
     const patientId = Number(findGetParameter('pid'))
+
     return (
       <React.Fragment>
         <GridItem md={3}>
-          <FastField
-            name='depositTransactionTypeFK'
-            render={(args) => (
-              <CodeSelect
-                label='Type'
-                {...args}
-                code='LTDepositTransactionType'
-                mode='multiple'
-                onChange={this.props.handleTypeChange}
-              />
-            )}
+          <CodeSelect
+            label='Type'
+            value={selectedTypeIds}
+            code='LTDepositTransactionType'
+            mode='multiple'
+            onChange={this.props.handleTypeChange}
           />
         </GridItem>
 
@@ -110,17 +92,20 @@ class FilterBar extends PureComponent {
               onClick={() => {
                 this.addDepositRefund(true)
               }}
+              disabled={disabled}
               color='primary'
             >
               Deposit
             </Button>
           </Authorized>
+
           <Authorized authority='deposit.refund'>
             <Button
               size='lg'
               onClick={() => {
                 this.addDepositRefund(false)
               }}
+              disabled={disabled || refundableAmount <= 0}
               color='primary'
             >
               Refund
@@ -133,9 +118,10 @@ class FilterBar extends PureComponent {
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
           maxWidth='sm'
-          observe='Deposit'
+          observe='PatientDeposit'
           showFooter={false}
           bodyNoPadding
+          keepMounted={false}
         >
           <Modal isDeposit={isDeposit} />
         </CommonModal>

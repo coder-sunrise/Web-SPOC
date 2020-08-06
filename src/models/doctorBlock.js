@@ -19,7 +19,7 @@ export default createListViewModel({
         const { pathname } = location
         if (pathname === '/setting/doctorblock') {
           const dateFrom = moment().formatUTC()
-          const dateTo = moment().add(6, 'months').endOf('day').formatUTC()
+          const dateTo = moment().add(6, 'months').endOf('day').formatUTC(false)
           dispatch({
             type: 'query',
             payload: {

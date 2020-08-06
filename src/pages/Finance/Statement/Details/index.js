@@ -2,7 +2,12 @@ import React, { PureComponent } from 'react'
 import { withStyles, Paper } from '@material-ui/core'
 import { connect } from 'dva'
 import moment from 'moment'
-import { withFormikExtend, Tabs, serverDateFormat, notification } from '@/components'
+import {
+  withFormikExtend,
+  Tabs,
+  serverDateFormat,
+  notification,
+} from '@/components'
 import Yup from '@/utils/yup'
 import { PAYMENT_MODE, DEFAULT_PAYMENT_MODE_GIRO } from '@/utils/constants'
 import { roundToPrecision } from '@/utils/codes'
@@ -163,16 +168,20 @@ const styles = () => ({})
     const payload = {
       ...values,
       statementInvoice: newPaymentStatementInvoice,
-      newStatementPayment: (newPaymentStatementInvoice && newPaymentStatementInvoice.length > 0) ? {
-        statementFK: values.id,
-        paymentCreatedBizSessionFK,
-        paymentReceivedBizSessionFK: paymentCreatedBizSessionFK,
-        paymentReceivedByUserFK,
-        paymentReceivedDate: moment(paymentDate, serverDateFormat).formatUTC(
-          false,
-        ),
-        Remark: remarks,
-      } : null,
+      newStatementPayment:
+        newPaymentStatementInvoice && newPaymentStatementInvoice.length > 0
+          ? {
+              statementFK: values.id,
+              paymentCreatedBizSessionFK,
+              paymentReceivedBizSessionFK: paymentCreatedBizSessionFK,
+              paymentReceivedByUserFK,
+              paymentReceivedDate: moment(
+                paymentDate,
+                serverDateFormat,
+              ).formatUTC(false),
+              Remark: remarks,
+            }
+          : null,
     }
     dispatch({
       type: 'statement/upsert',
@@ -180,13 +189,15 @@ const styles = () => ({})
     }).then((r) => {
       if (r) {
         if (onConfirm) onConfirm()
+
+        const { entity } = statement
         dispatch({
           type: 'statement/refreshAll',
           payload: {
-            id: statement.currentId,
+            id: entity.id,
           },
         })
-        history.replace(`/finance/statement/details/${statement.currentId}?t=${2}`)
+        history.replace(`/finance/statement/details/${entity.id}?t=${2}`)
         // history.push('/finance/statement')
       }
     })
@@ -208,7 +219,6 @@ class StatementDetails extends PureComponent {
       history.push('/finance/statement/')
     }
   }
-
 
   fetchLatestBizSessions = () => {
     const { setFieldValue } = this.props
@@ -279,14 +289,16 @@ class StatementDetails extends PureComponent {
   }
 
   onTabChange = (tab) => {
-    const { statement, dispatch, history } = this.props
+    const { statement: { entity }, dispatch, history } = this.props
     // dispatch({
     //   type: 'statement/setActiveTab',
     //   payload: {
     //     activeTab: tab,
     //   },
     // })
-    this.props.history.replace(`/finance/statement/details/${statement.currentId}?t=${tab}`)
+    this.props.history.replace(
+      `/finance/statement/details/${entity.id}?t=${tab}`,
+    )
   }
 
   render () {

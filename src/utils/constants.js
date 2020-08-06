@@ -168,6 +168,7 @@ export const REPORT_TYPE = {
   29: 'Payment Receipt',
   37: 'Inventory Trending Report',
   55: 'Letter of Certification',
+  61: 'Refraction Form Report',
 }
 
 export const REPORT_ID = {

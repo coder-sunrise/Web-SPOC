@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
 import _ from 'lodash'
 import { withStyles } from '@material-ui/core'
+import { connect } from 'dva'
 import Yup from '@/utils/yup'
 import { getBizSession } from '@/services/queue'
 import {
@@ -64,6 +65,9 @@ const modalityItemSchema = Yup.object().shape({
 //     }),
 //   )
 
+@connect(({ clinicSettings }) => ({
+  clinicSettings,
+}))
 @withFormikExtend({
   mapPropsToValues: ({ settingClinicService }) => {
     // console.log('settingClinicService', settingClinicService)
@@ -425,7 +429,7 @@ class Detail extends PureComponent {
       classes,
       theme,
       footer,
-
+      clinicSettings,
       settingClinicService,
       errors,
     } = props
@@ -443,6 +447,7 @@ class Detail extends PureComponent {
     const serviceSettingsErrMsg = errors.ctServiceCenter_ServiceNavigation
     const shoudDisableSaveButton =
       serviceSettings.filter((row) => !row.isDeleted).length === 0
+    const { settings = [] } = clinicSettings
 
     return (
       <React.Fragment>
@@ -668,25 +673,32 @@ class Detail extends PureComponent {
               {...this.tableParas}
             />
 
-            <h4 style={{ fontWeight: 400 }}>
-              <b>Modality Settings</b>
-            </h4>
-            <EditableTableGrid
-              forceRender
-              style={{ marginTop: theme.spacing(1), margin: theme.spacing(2) }}
-              rows={this.state.modalitySettings}
-              FuncProps={{
-                pagerConfig: {
-                  containerExtraComponent: this.PagerContent,
-                },
-              }}
-              EditingProps={{
-                showAddCommand: true,
-                onCommitChanges: this.commitModalityChanges,
-              }}
-              schema={modalityItemSchema}
-              {...this.modalityTableParas}
-            />
+            {settings.isEnableServiceModality === true && (
+              <React.Fragment>
+                <h4 style={{ fontWeight: 400 }}>
+                  <b>Modality Settings</b>
+                </h4>
+                <EditableTableGrid
+                  forceRender
+                  style={{
+                    marginTop: theme.spacing(1),
+                    margin: theme.spacing(2),
+                  }}
+                  rows={this.state.modalitySettings}
+                  FuncProps={{
+                    pagerConfig: {
+                      containerExtraComponent: this.PagerContent,
+                    },
+                  }}
+                  EditingProps={{
+                    showAddCommand: true,
+                    onCommitChanges: this.commitModalityChanges,
+                  }}
+                  schema={modalityItemSchema}
+                  {...this.modalityTableParas}
+                />
+              </React.Fragment>
+            )}
           </div>
         </div>
         {/* </SizeContainer> */}
