@@ -670,16 +670,24 @@ class Banner extends PureComponent {
               header={<div style={headerStyles}>Outstanding</div>}
               body={
                 <Tooltip
-                  title={`${currencySymbol}${info.outstandingBalance.toFixed(
-                    2,
-                  )}`}
+                  title={
+                    info.outstandingBalance ? (
+                      `${currencySymbol}${info.outstandingBalance.toFixed(2)}`
+                    ) : (
+                      ''
+                    )
+                  }
                 >
                   <div
                     style={{
                       fontWeight: 500,
                     }}
                   >
-                    {`${currencySymbol}${info.outstandingBalance.toFixed(2)}`}
+                    {info.outstandingBalance ? (
+                      `${currencySymbol}${info.outstandingBalance.toFixed(2)}`
+                    ) : (
+                      '-'
+                    )}
                   </div>
                 </Tooltip>
               }
