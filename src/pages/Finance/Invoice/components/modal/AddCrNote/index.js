@@ -141,7 +141,7 @@ class AddCrNote extends Component {
 
     const gstAmount = finalCreditTotal / (1 + invoiceDetail.gstValue / 100) * (invoiceDetail.gstValue / 100)
     setFieldValue('gstAmount', roundTo(gstAmount))
-    setFieldValue('subTotal',invoiceDetail.isGSTInclusive ? roundTo(finalCreditTotal): roundTo(finalCreditTotal) - roundTo(gstAmount))
+    setFieldValue('subTotal', roundTo(finalCreditTotal) - roundTo(gstAmount))
   }
 
   handleSelectionChange = (selection) => {
