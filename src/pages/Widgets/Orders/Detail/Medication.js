@@ -211,7 +211,6 @@ const authorityCfg = {
           ? -Math.abs(values.adjValue)
           : Math.abs(values.adjValue),
       adjType: values.isExactAmount ? 'ExactAmount' : 'Percentage',
-      unitPrice: values.totalPrice / values.quantity,
     }
 
     dispatch({
@@ -1407,7 +1406,7 @@ class Medication extends PureComponent {
                           paddingRight: theme.spacing(6),
                         }}
                         percentage
-                        max={999}
+                        max={100}
                         label='Adjustment'
                         disabled={values.isExternalPrescription}
                         onChange={() => {

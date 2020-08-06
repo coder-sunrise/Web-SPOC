@@ -87,7 +87,6 @@ let i = 0
         values.adjAmount < 0
           ? -Math.abs(values.adjValue)
           : Math.abs(values.adjValue),
-      unitPrice: values.totalPrice / values.quantity,
     }
     dispatch({
       type: 'orders/upsertRow',
@@ -685,7 +684,7 @@ class Vaccination extends PureComponent {
                         paddingRight: theme.spacing(6),
                       }}
                       percentage
-                      max={999}
+                      max={100}
                       label='Adjustment'
                       onChange={() => {
                         setTimeout(() => {

@@ -63,7 +63,6 @@ import { calculateAdjustAmount } from '@/utils/utils'
         values.adjAmount < 0
           ? -Math.abs(values.adjValue)
           : Math.abs(values.adjValue),
-      unitPrice: values.total / values.quantity,
     }
 
     dispatch({
@@ -393,7 +392,7 @@ class Service extends PureComponent {
                         paddingRight: theme.spacing(6),
                       }}
                       percentage
-                      max={999}
+                      max={100}
                       label='Adjustment'
                       onChange={() => {
                         setTimeout(() => {

@@ -69,7 +69,6 @@ import LowStockInfo from './LowStockInfo'
         values.adjAmount < 0
           ? -Math.abs(values.adjValue)
           : Math.abs(values.adjValue),
-      unitPrice: values.totalPrice / values.quantity,
     }
     dispatch({
       type: 'orders/upsertRow',
@@ -465,7 +464,7 @@ class Consumable extends PureComponent {
                         paddingRight: theme.spacing(6),
                       }}
                       percentage
-                      max={999}
+                      max={100}
                       label='Adjustment'
                       onChange={() => {
                         setTimeout(() => {
