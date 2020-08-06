@@ -27,6 +27,7 @@ import { Delete, ImageSearch } from '@material-ui/icons'
 import { getThumbnail } from '@/components/_medisys/AttachmentWithThumbnail/utils'
 import { leftTools, ToolTypes } from './variables'
 import { Scanconfig } from './scanconfig'
+import { ImageList } from './imagelist'
 
 const base64Prefix = 'data:image/jpeg;base64,'
 const thumbnailSize = { width: 100, height: 80 }
@@ -395,11 +396,11 @@ class Scanner extends Component {
   }
 
   render () {
-    const { classes, handleScaning } = this.props
-
+    const { classes, handleScaning, imageDatas = [] } = this.props
+    console.log('----------------------------------------render scanner')
     return (
       <GridContainer style={{ minHeight: window.innerHeight - 250 }}>
-        <GridItem xs={10} md={10}>
+        <GridItem xs={9} md={9}>
           <div style={{ display: 'flex' }}>
             <ToggleButtonGroup
               exclusive
@@ -456,8 +457,15 @@ class Scanner extends Component {
           </div>
         </GridItem>
 
-        <GridItem xs={2} md={2}>
-          <Scanconfig handleScaning={handleScaning} />
+        <GridItem
+          xs={3}
+          md={3}
+          style={imageDatas.length > 1 ? { paddingLeft: 30 } : {}}
+        >
+          <React.Fragment>
+            <Scanconfig handleScaning={handleScaning} />
+            <ImageList rows={imageDatas} />
+          </React.Fragment>
         </GridItem>
       </GridContainer>
     )

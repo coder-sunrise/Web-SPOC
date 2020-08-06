@@ -135,7 +135,8 @@ const withWebSocket = () => (Component) => {
       }
     }
 
-    handleScaning = async () => {
+    handleScaning = async (params) => {
+      console.log('handleScaning', params)
       const result = await this.prepareJobForWebSocket(
         AESEncryptor.encrypt(
           JSON.stringify({
