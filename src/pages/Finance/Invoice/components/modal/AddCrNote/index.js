@@ -381,7 +381,7 @@ class AddCrNote extends Component {
 
         <GridContainer>
           <GridItem md={9}>
-            <p>Note: Total Amount($) is GST inclusive.</p>
+            <p>Note: Total Amount ($) is GST inclusive.</p>
           </GridItem>
           <GridItem md={3} style={{ textAlign: 'right' }}>
             <Button color='danger' onClick={onConfirm}>

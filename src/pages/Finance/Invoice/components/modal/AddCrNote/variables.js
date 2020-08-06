@@ -3,7 +3,7 @@ export const CrNoteColumns = [
   { name: 'itemName', title: 'Name' },
   { name: 'quantity', title: 'Quantity' },
   // { name: 'unitPrice', title: 'Unit Price' },
-  { name: 'totalAfterGST', title: 'Total Amount($)' },
+  { name: 'totalAfterGST', title: 'Total Amount ($)' },
   { name: 'action', title: 'Action' },
 ]
 
