@@ -39,24 +39,33 @@ class StatementSummaryReport extends ReportBase {
 
   renderContent = (reportDatas) => {
     if (!reportDatas) return null
+    const segments = reportDatas.ListingDetails[0].asAt ? [
+      {
+        title: <AccordionTitle title='Statement Summary' />,
+        content: <StatementList reportDatas={reportDatas} />,
+      },
+      {
+        title: <AccordionTitle title='Ageing Report' />,
+        content: <AgeingList reportDatas={reportDatas} />,
+      },
+    ] :
+    [
+      {
+        title: <AccordionTitle title='Statement Summary' />,
+        content: <StatementList reportDatas={reportDatas} />,
+      },
+    ]
+
     return (
       <Accordion
         defaultActive={[
           0,
+          1,
         ]}
         mode='multiple'
         leftIcon
         expandIcon={<SolidExpandMore fontSize='large' />}
-        collapses={[
-          {
-            title: <AccordionTitle title='Statement Summary' />,
-            content: <StatementList reportDatas={reportDatas} />,
-          },
-          {
-            title: <AccordionTitle title='Ageing Report' />,
-            content: <AgeingList reportDatas={reportDatas} />,
-          },
-        ]}
+        collapses={segments}
       />
     )
   }
