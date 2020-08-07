@@ -430,7 +430,7 @@ class Medication extends PureComponent {
       const { name: uomName = '' } = dispensingUOM
       let opt = {
         ...c,
-        displayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
+        combinDisplayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
           2,
         )} / ${uomName})`,
       }
@@ -598,6 +598,17 @@ class Medication extends PureComponent {
     return match
   }
 
+  componentDidMount = async () => {
+    const { codetable, dispatch } = this.props
+    const { inventorymedication = [] } = codetable
+    if (inventorymedication.length <= 0) {
+      await dispatch({
+        type: 'codetable/fetchCodes',
+        payload: { code: 'inventorymedication' },
+      })
+    }
+  }
+
   UNSAFE_componentWillReceiveProps (nextProps) {
     if (nextProps.orders.type === this.props.type)
       if (
@@ -727,7 +738,7 @@ class Medication extends PureComponent {
                     }}
                   />
                 ) : (
-                  <FastField
+                  <Field
                     name='inventoryMedicationFK'
                     render={(args) => {
                       return (
@@ -738,8 +749,8 @@ class Medication extends PureComponent {
                           <CodeSelect
                             temp
                             label='Medication Name'
-                            code='inventorymedication'
-                            labelField='displayValue'
+                            // code='inventorymedication'
+                            labelField='combinDisplayValue'
                             onChange={this.changeMedication}
                             options={this.getMedicationOptions()}
                             {...args}
