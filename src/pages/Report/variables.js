@@ -72,6 +72,12 @@ export const menuData = [
     authority: 'report.finance.chasclaim',
   },
   {
+    title: 'Finance',
+    text: 'Patient Ageing Report',
+    url: '/report/patientageingreport',
+    authority: 'report.finance.patientageingreport',
+  },
+  {
     title: 'Inventory',
     text: 'Medication Movement Report',
     url: '/report/medicationmovementreport',

@@ -165,8 +165,9 @@ export default {
   'menu.report.salessummary': 'Sales Summary Report',
   'menu.report.diagnosistrending': 'Diagnosis Trending Report',
   'menu.report.sessionsummary': 'Session Summary Report',
+  'menu.report.patientageingreport': 'Patient Ageing Report',
   'menu.report.viewreport': 'View Report',
-
+  
   'menu.support': 'Support',
   'menu.support.support': 'Support',
   'menu.support.contactus': 'Contact Us',

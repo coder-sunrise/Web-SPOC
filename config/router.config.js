@@ -714,6 +714,14 @@ const _routes = [
               'report.inventory.inventorylistingreport',
             ],
           },
+          {
+            path: '/report/patientageingreport',
+            name: 'patientageingreport',
+            component: './Report/PatientAgeingReport',
+            authority: [
+              'report.finance.patientageingreport',
+            ],
+          },
         ],
       },
       // Report
