@@ -188,7 +188,7 @@ export const Scanconfig = ({ handleScaning }) => {
         </React.Fragment>
       )}
 
-      <GridItem xs={12} style={{ textAlign: 'center', marginTop: 20 }}>
+      <GridItem xs={12} style={{ marginTop: 20 }}>
         <Button onClick={onScanningClick} color='primary'>
           <ImageSearch /> Scan
         </Button>

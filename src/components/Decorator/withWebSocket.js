@@ -2,7 +2,7 @@ import React from 'react'
 // common component
 import { notification, CommonModal, Primary } from '@/components'
 import { CircularProgress } from '@material-ui/core'
-
+import moment from 'moment'
 // services
 import { getPDF } from '@/services/report'
 // utils
@@ -19,6 +19,7 @@ const defaultSocketPortsState = [
 const WebSocketMessageType = {
   Print: 1,
   Scan: 2,
+  ScanCompleted: 3,
 }
 
 const withWebSocket = () => (Component) => {
@@ -120,6 +121,7 @@ const withWebSocket = () => (Component) => {
         const returnMessage = JSON.parse(data)
         const { MessageType, Data } = returnMessage
         console.log(returnMessage)
+
         if (MessageType === WebSocketMessageType.Scan) {
           this.setState((preState) => ({
             scanResults: [
@@ -127,10 +129,13 @@ const withWebSocket = () => (Component) => {
               {
                 uid: getUniqueGUID(),
                 image: Data,
+                name: moment().format('YYYYMMDD_hhmmss'),
               },
             ],
             loading: false,
           }))
+        } else if (MessageType === WebSocketMessageType.ScanCompleted) {
+          this.setState({ loading: false })
         }
       }
     }
@@ -152,8 +157,20 @@ const withWebSocket = () => (Component) => {
       scanResults.forEach((o, index) => {
         if (o.uid === uid) scanResults.splice(index, 1)
       })
-      console.log('delete after', scanResults)
+
       this.setState({ scanResults })
+    }
+
+    handleUpdateName = (row) => {
+      const { uid, name } = row
+      this.setState((prevState) => ({
+        scanResults: prevState.scanResults.map((m) => {
+          if (m.uid === uid) {
+            return { ...m, name }
+          }
+          return m
+        }),
+      }))
     }
 
     connectionAsync = async (socket, timeout = 1000) => {
@@ -236,6 +253,7 @@ const withWebSocket = () => (Component) => {
                 <Scanner
                   handleScaning={this.handleScaning}
                   handleDeleteItem={this.handleDeleteItem}
+                  handleUpdateName={this.handleUpdateName}
                   imageDatas={scanResults}
                 />
               </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-
+import $ from 'jquery'
 import { ImageSearch } from '@material-ui/icons'
 
 import {
@@ -13,7 +13,7 @@ import {
 
 const base64Prefix = 'data:image/jpeg;base64,'
 
-export const ImageList = ({ rows = [], handleCommitChanges }) => {
+export const ImageList = ({ imgRows = [], handleCommitChanges }) => {
   const tableParas = {
     columns: [
       { name: 'uid', title: ' ' },
@@ -32,17 +32,26 @@ export const ImageList = ({ rows = [], handleCommitChanges }) => {
         disabled: true,
         sortingEnabled: false,
         render: (row) => {
-          const base64Data = `${base64Prefix}${row.image}`
+          const setSrc = (e, uid) => {
+            const element = $(`img[uid='${uid}']`)[0]
+            $(`#tip_${uid} img`)[0].src = element.src
+          }
           return (
             <Tooltip
+              id={`tip_${row.uid}`}
               arrow
               placement='left-end'
-              title={
-                <img alt={row.name} width={200} height={200} src={base64Data} />
-              }
+              onOpen={(e) => setSrc(e, row.uid)}
+              title={<img alt={row.name} width={200} height={200} />}
             >
               <div>
-                <img alt={row.name} width={50} height={50} src={base64Data} />
+                <img
+                  uid={`${row.uid}`}
+                  alt={row.name}
+                  width={50}
+                  height={50}
+                  src=''
+                />
               </div>
             </Tooltip>
           )
@@ -56,15 +65,12 @@ export const ImageList = ({ rows = [], handleCommitChanges }) => {
     ],
   }
 
-  const commitChanges = (row) => {
-    console.log(row)
-  }
-
   return (
     <GridItem xs={12} style={{ padding: 0, marginTop: 20 }}>
       <EditableTableGrid
-        rows={rows}
+        rows={imgRows}
         getRowId={(r) => r.uid}
+        // extraColumn={[]}
         FuncProps={{
           edit: true,
           pager: false,
@@ -73,7 +79,11 @@ export const ImageList = ({ rows = [], handleCommitChanges }) => {
           showAddCommand: false,
           showEditCommand: true,
           showDeleteCommand: true,
-          onCommitChanges: commitChanges,
+          deleteConfirm: {
+            show: true,
+            title: 'Are you sure you want to delete this row?',
+          },
+          onCommitChanges: handleCommitChanges,
         }}
         {...tableParas}
       />

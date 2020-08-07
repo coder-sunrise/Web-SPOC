@@ -31,10 +31,6 @@ import { ImageList } from './imagelist'
 
 const base64Prefix = 'data:image/jpeg;base64,'
 const thumbnailSize = { width: 100, height: 80 }
-// @connect(({ patient, patientNurseNotes }) => ({
-//   patient,
-//   patientNurseNotes,
-// }))
 
 const styles = (theme) => ({
   root: {
@@ -131,14 +127,14 @@ class Scanner extends Component {
     }
   }
 
-  generateThumbnail = async (imageSource) => {
+  generateThumbnail = async (imageSource, size = thumbnailSize) => {
     try {
       let thumbnailData
       await new Promise((resolve) => {
         const image = new Image()
         image.src = imageSource
         image.onload = () => {
-          const thumbnail = getThumbnail(image, thumbnailSize)
+          const thumbnail = getThumbnail(image, size)
           thumbnailData = thumbnail.toDataURL(`image/jpeg`)
 
           resolve()
@@ -147,19 +143,6 @@ class Scanner extends Component {
       return thumbnailData
     } catch (error) {
       return null
-    }
-  }
-
-  renderThumbnailImg = (imageData) => {
-    const { uid, image } = imageData
-    if (this.sketchs[uid]) {
-      this.updateThumbnail(this.sketchs[uid], uid)
-    } else {
-      const base64Data = `${base64Prefix}${image}`
-      this.generateThumbnail(base64Data).then((thumbnail) => {
-        const thumObj = $(`#thum_${uid}`)
-        if (thumObj) thumObj[0].src = thumbnail
-      })
     }
   }
 
@@ -180,18 +163,53 @@ class Scanner extends Component {
     }
   }
 
+  handleCommitChanges = ({ rows, deleted }) => {
+    rows.forEach((r) => {
+      if (deleted && r.isDeleted === true) {
+        this.handelConfirmDelete(r.uid)
+      } else {
+        this.props.handleUpdateName(r)
+      }
+    })
+  }
+
+  renderThumbnailImg = (imageData) => {
+    const { uid, image } = imageData
+    if (this.sketchs[uid]) {
+      this.updateThumbnail(this.sketchs[uid], uid)
+    } else {
+      const base64Data = `${base64Prefix}${image}`
+      this.generateThumbnail(base64Data, {
+        width: 200,
+        height: 200,
+      }).then((thumbnail) => {
+        this.updateThumbnailToElement(uid, thumbnail)
+      })
+    }
+  }
+
   updateThumbnail = (sketch, uid) => {
     const imgData = sketch.exportToImageDataUrl()
-    this.generateThumbnail(imgData).then((thumbnail) => {
-      const thumObj = $(`#thum_${uid}`)
-      if (thumObj) thumObj[0].src = thumbnail
+    this.generateThumbnail(imgData, {
+      width: 200,
+      height: 200,
+    }).then((thumbnail) => {
+      this.updateThumbnailToElement(uid, thumbnail)
     })
+  }
+
+  updateThumbnailToElement = (uid, thumbnail) => {
+    let imgs = $(`img[uid='${uid}']`) || []
+    for (let index = 0; index < imgs.length; index++) {
+      const element = imgs[index]
+      element.src = thumbnail
+    }
   }
 
   getTabOptions = () => {
     const { imageDatas = [] } = this.props
     return imageDatas.reduce((p, cur) => {
-      const { uid } = cur
+      const { uid, name } = cur
       const opt = {
         id: uid,
         name: (
@@ -202,7 +220,7 @@ class Scanner extends Component {
                 this.state.activeKey !== uid ? { opacity: 0.4 } : thumbnailSize
               }
             >
-              <img id={`thum_${uid}`} alt='' style={thumbnailSize} />
+              <img uid={`${uid}`} alt='' style={thumbnailSize} />
             </div>
             <div onClick={(e) => e.stopPropagation()}>
               <Popconfirm
@@ -211,7 +229,7 @@ class Scanner extends Component {
                   this.handelConfirmDelete(uid)
                 }}
               >
-                <Tooltip title={`delete ${uid}`}>
+                <Tooltip title={`delete ${name}`}>
                   <Button
                     style={{
                       position: 'absolute',
@@ -464,7 +482,10 @@ class Scanner extends Component {
         >
           <React.Fragment>
             <Scanconfig handleScaning={handleScaning} />
-            <ImageList rows={imageDatas} />
+            <ImageList
+              imgRows={imageDatas}
+              handleCommitChanges={this.handleCommitChanges}
+            />
           </React.Fragment>
         </GridItem>
       </GridContainer>
