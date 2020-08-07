@@ -62,8 +62,8 @@ export const Scanconfig = ({ handleScaning }) => {
   ] = useState(false)
 
   const [
-    scale,
-    setScale,
+    isScale,
+    setIsScale,
   ] = useState(false)
 
   const [
@@ -86,7 +86,7 @@ export const Scanconfig = ({ handleScaning }) => {
       duplex,
       resolution,
       pixelType: pixelType.value,
-      scale,
+      isScale,
       scaleBy,
       scaleWidth,
       scaleHeight,
@@ -141,13 +141,13 @@ export const Scanconfig = ({ handleScaning }) => {
       <GridItem xs={12}>
         <Checkbox
           label='Scale'
-          checked={scale}
+          checked={isScale}
           onChange={(e) => {
-            setScale(e.target.value)
+            setIsScale(e.target.value)
           }}
         />
       </GridItem>
-      {scale && (
+      {isScale && (
         <React.Fragment>
           <GridItem xs={12}>
             <Select
@@ -165,7 +165,7 @@ export const Scanconfig = ({ handleScaning }) => {
               <div style={{ display: 'flex' }}>
                 <TextField
                   label='Width'
-                  disabled={!scale}
+                  disabled={!isScale}
                   value={scaleWidth}
                   onChange={(e) => {
                     setScaleWidth(e.target.value)
@@ -176,7 +176,7 @@ export const Scanconfig = ({ handleScaning }) => {
                 </div>
                 <TextField
                   label='Height'
-                  disabled={!scale}
+                  disabled={!isScale}
                   value={scaleHeight}
                   onChange={(e) => {
                     setScaleHeight(e.target.value)
