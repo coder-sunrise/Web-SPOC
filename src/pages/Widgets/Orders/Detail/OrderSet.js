@@ -123,6 +123,8 @@ const { qtyFormat } = config
           unitPrice: orderSetItem.unitPrice,
           totalPrice: orderSetItem.unitPrice * orderSetItem.quantity,
           adjAmount: 0,
+          adjType: 'ExactAmount',
+          adjValue: 0,
           totalAfterItemAdjustment:
             orderSetItem.unitPrice * orderSetItem.quantity,
           totalAfterOverallAdjustment:
@@ -221,6 +223,8 @@ const { qtyFormat } = config
           unitPrice: orderSetItem.unitPrice,
           totalPrice: orderSetItem.unitPrice * orderSetItem.quantity,
           adjAmount: 0,
+          adjType: 'ExactAmount',
+          adjValue: 0,
           totalAfterItemAdjustment:
             orderSetItem.unitPrice * orderSetItem.quantity,
           totalAfterOverallAdjustment:
@@ -255,6 +259,8 @@ const { qtyFormat } = config
           unitPrice: orderSetItem.unitPrice,
           total: orderSetItem.unitPrice * orderSetItem.quantity,
           adjAmount: 0,
+          adjType: 'ExactAmount',
+          adjValue: 0,
           totalAfterItemAdjustment:
             orderSetItem.unitPrice * orderSetItem.quantity,
           totalAfterOverallAdjustment:
@@ -282,6 +288,8 @@ const { qtyFormat } = config
           unitPrice: orderSetItem.unitPrice,
           totalPrice: orderSetItem.unitPrice * orderSetItem.quantity,
           adjAmount: 0,
+          adjType: 'ExactAmount',
+          adjValue: 0,
           totalAfterItemAdjustment:
             orderSetItem.unitPrice * orderSetItem.quantity,
           totalAfterOverallAdjustment:
