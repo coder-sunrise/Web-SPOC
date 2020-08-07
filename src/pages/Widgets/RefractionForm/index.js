@@ -367,7 +367,7 @@ class RefractionForm extends PureComponent {
         </GridContainer>
 
         <GridContainer>
-          <GridItem xs sm={4} md={4} style={{ alignSelf: 'flex-end' }}>
+          <GridItem xs sm={12} md={12} style={{ alignSelf: 'flex-end' }}>
             <FastField
               render={(args) => {
                 return (
