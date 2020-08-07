@@ -325,7 +325,7 @@ class Treatment extends PureComponent {
       const { code, displayValue, sellingPrice = 0 } = c
       let opt = {
         ...c,
-        displayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
+        combinDisplayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
           2,
         )})`,
       }
@@ -467,7 +467,7 @@ class Treatment extends PureComponent {
                 <Select
                   options={this.getTreatmentOptions(isDoctor)}
                   valueField='id'
-                  labelField='displayValue'
+                  labelField='combinDisplayValue'
                   label='Treatment'
                   disabled={isDoctor}
                   onChange={(v, op) => {

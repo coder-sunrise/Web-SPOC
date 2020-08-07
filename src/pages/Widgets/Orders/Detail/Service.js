@@ -93,7 +93,9 @@ class Service extends PureComponent {
 
         const opt = {
           ...c,
-          name: `${name} - ${code} (${currencySymbol}${unitPrice.toFixed(2)})`,
+          combinDisplayValue: `${name} - ${code} (${currencySymbol}${unitPrice.toFixed(
+            2,
+          )})`,
         }
         return [
           ...p,
@@ -242,6 +244,7 @@ class Service extends PureComponent {
                   <div id={`autofocus_${values.type}`}>
                     <Select
                       label='Service Name'
+                      labelField='combinDisplayValue'
                       options={services.filter(
                         (o) =>
                           !serviceCenterFK ||
