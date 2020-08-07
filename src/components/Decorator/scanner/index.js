@@ -94,13 +94,13 @@ class Scanner extends Component {
 
     canvas.setZoom(newZoom)
 
-    console.log({
-      offsetWidth,
-      clientHeight,
-      canvasWidth,
-      canvasHeight,
-      currentZoom,
-    })
+    // console.log({
+    //   offsetWidth,
+    //   clientHeight,
+    //   canvasWidth,
+    //   canvasHeight,
+    //   currentZoom,
+    // })
   }
 
   setBackgroundFromData = (activeKey) => {
@@ -176,7 +176,8 @@ class Scanner extends Component {
   renderThumbnailImg = (imageData) => {
     const { uid, image } = imageData
     if (this.sketchs[uid]) {
-      this.updateThumbnail(this.sketchs[uid], uid)
+      // console.log('renderThumbnailImg --1')
+      // this.updateThumbnail(this.sketchs[uid], uid)
     } else {
       const base64Data = `${base64Prefix}${image}`
       this.generateThumbnail(base64Data, {
@@ -475,11 +476,7 @@ class Scanner extends Component {
           </div>
         </GridItem>
 
-        <GridItem
-          xs={3}
-          md={3}
-          style={imageDatas.length > 1 ? { paddingLeft: 30 } : {}}
-        >
+        <GridItem xs={3} md={3} style={{ paddingLeft: 40 }}>
           <React.Fragment>
             <Scanconfig handleScaning={handleScaning} />
             <ImageList

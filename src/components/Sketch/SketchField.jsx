@@ -1044,15 +1044,15 @@ class SketchField extends PureComponent {
         if (calback) calback(obj, targetNum)
 
         const { angle, width, height, left, top, flipX, flipY } = obj
-        console.log({
-          angle,
-          width,
-          height,
-          left,
-          top,
-          flipX,
-          flipY,
-        })
+        // console.log({
+        //   angle,
+        //   width,
+        //   height,
+        //   left,
+        //   top,
+        //   flipX,
+        //   flipY,
+        // })
       })
     }
   }

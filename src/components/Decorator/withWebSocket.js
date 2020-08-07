@@ -142,12 +142,12 @@ const withWebSocket = () => (Component) => {
 
     handleScaning = async (params) => {
       console.log('handleScaning', params)
+      let jsonStr = JSON.stringify({
+        MessageType: WebSocketMessageType.Scan,
+        Message: JSON.stringify(params),
+      })
       const result = await this.prepareJobForWebSocket(
-        AESEncryptor.encrypt(
-          JSON.stringify({
-            messageType: WebSocketMessageType.Scan,
-          }),
-        ),
+        AESEncryptor.encrypt(jsonStr),
       )
       if (result) this.setState({ loading: true })
     }
