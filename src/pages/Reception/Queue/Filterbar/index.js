@@ -80,10 +80,8 @@ const Filterbar = (props) => {
               }
               onClick={() => {
                 handleSubmit()
-                setTimeout(() => {
-                  setFieldValue('search', '')
-                  setSearch('')
-                }, 500)
+                setFieldValue('search', '')
+                setSearch('')
               }
               }
               size='sm'
@@ -150,7 +148,6 @@ const FilterbarWithFormik = withFormik({
     search: '',
   }),
   handleSubmit: ({ search }, { props }) => {
-    console.log(search, 11)
     const { onRegisterVisitEnterPressed } = props
     onRegisterVisitEnterPressed(search)
   },
