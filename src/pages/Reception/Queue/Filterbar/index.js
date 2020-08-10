@@ -32,6 +32,7 @@ const Filterbar = (props) => {
     dispatch,
     toggleNewPatient,
     handleSubmit,
+    setFieldValue,
     selfOnly,
     user,
     setSearch,
@@ -77,7 +78,14 @@ const Filterbar = (props) => {
                   <Search />
                 </Hidden>
               }
-              onClick={handleSubmit}
+              onClick={() => {
+                handleSubmit()
+                setTimeout(() => {
+                  setFieldValue('search', '')
+                  setSearch('')
+                }, 500)
+              }
+              }
               size='sm'
               submitKey='patientSearch/query'
             >
@@ -89,7 +97,12 @@ const Filterbar = (props) => {
               icon={null}
               color='primary'
               size='sm'
-              onClick={toggleNewPatient}
+              onClick={() => {
+                toggleNewPatient()
+                setFieldValue('search', '')
+                setSearch('')
+              }
+              }
               disabled={loading.global}
             >
               <Hidden mdDown>
@@ -137,6 +150,7 @@ const FilterbarWithFormik = withFormik({
     search: '',
   }),
   handleSubmit: ({ search }, { props }) => {
+    console.log(search, 11)
     const { onRegisterVisitEnterPressed } = props
     onRegisterVisitEnterPressed(search)
   },
