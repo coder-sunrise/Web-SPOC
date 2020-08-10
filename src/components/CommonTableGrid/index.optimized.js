@@ -137,7 +137,6 @@ class CommonTableGrid extends PureComponent {
       FuncProps = {},
       columns = [],
       identifier,
-      columnExtensions = [],
     } = props
     // console.log(props)
     this.gridId = `view-${uniqueGid++}`
@@ -159,9 +158,6 @@ class CommonTableGrid extends PureComponent {
       },
       rows: [],
       gridSetting: gs,
-      columnWidths: columnExtensions.map((o) => {
-        return { columnName: o.columnName, width: o.width }
-      }),
       selectedItem: [],
     }
     const cls = classNames({
@@ -1158,24 +1154,15 @@ class CommonTableGrid extends PureComponent {
                   }}
                 />
               )}
-              {false && (
+              {header &&
+              resizable && (
                 <TableColumnResizing
                   defaultColumnWidths={columnExtensions.map((o) => {
                     return {
                       columnName: o.columnName,
-                      width: o.width || 0,
+                      width: o.width || 100,
                     }
                   })}
-                />
-              )}
-
-              {header &&
-              resizable && (
-                <TableColumnResizing
-                  columnWidths={this.state.columnWidths}
-                  onColumnWidthsChange={(e) => {
-                    this.setState({ columnWidths: e })
-                  }}
                 />
               )}
               {header && <HeaderRow showSortingControls />}
