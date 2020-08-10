@@ -348,7 +348,7 @@ const DispenseDetails = ({
             />
           </Paper>
         </GridItem>
-        <GridItem xs={8} md={9}>
+        <GridItem xs={8} md={8} style={{ marginTop: -14 }}>
           <TextField
             value={visitRemarks}
             disabled
@@ -359,7 +359,7 @@ const DispenseDetails = ({
           />
         </GridItem>
         {!viewOnly && (
-          <GridItem xs={4} md={3}>
+          <GridItem xs={4} md={4}>
             <div style={{ paddingRight: 90 }}>
               <AmountSummary
                 rows={invoiceItem}
