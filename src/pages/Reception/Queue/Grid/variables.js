@@ -57,7 +57,7 @@ export const FuncConfig = {
       { columnName: 'queueNo', direction: 'asc' },
     ],
   },
-  resizable: false,
+  resizable: true,
   selectRowHighlightable: true,
 }
 
