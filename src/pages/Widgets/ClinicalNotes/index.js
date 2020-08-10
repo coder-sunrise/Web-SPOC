@@ -98,12 +98,14 @@ window.g_app.replaceModel(cannedTextModel)
     scriblenotes,
     consultation,
     visitRegistration,
+    loading,
   }) => ({
     clinicInfo,
     clinicalnotes,
     scriblenotes,
     consultation,
     visitRegistration,
+    loading,
   }),
 )
 class ClinicalNotes extends Component {
@@ -391,27 +393,23 @@ class ClinicalNotes extends Component {
     const { visitRegistration } = this.props
     let previousDoctorNote = await this.props.dispatch({
       type: 'cannedText/queryPrevDoctorNotes',
-      payload: { visitId: visitRegistration.entity.id },
+      payload: { visitId: visitRegistration.entity.visit.id },
     })
     const { cannedTextRow } = this.state
-
     const { consultation, prefix } = this.props
     const { entity } = consultation
-    let text = ""
+    let text = ''
     if (previousDoctorNote) {
-      if (cannedTextTypeFK === 0) {
+      if (cannedTextTypeFK === 1) {
         text = previousDoctorNote.note || ''
-      }
-      else if (cannedTextTypeFK === 1) {
-        text = previousDoctorNote.chiefComplaints || ''
-      }
-      else if (cannedTextTypeFK === 2) {
+      } else if (cannedTextTypeFK === 6) {
         text = previousDoctorNote.plan || ''
-      }
-      else if (cannedTextTypeFK === 3) {
+      } else if (cannedTextTypeFK === 2) {
+        text = previousDoctorNote.chiefComplaints || ''
+      } else if (cannedTextTypeFK === 3) {
         text = previousDoctorNote.history || ''
       }
-    } 
+    }
     const note = entity[prefix] || []
     const prevData = note.length > 0 ? note[0][cannedTextRow.fieldName] : ''
     const value = `${prevData || ''}${text}`
@@ -487,6 +485,7 @@ class ClinicalNotes extends Component {
       dispatch,
       consultation,
       clinicInfo,
+      loading,
     } = this.props
 
     const { config, contents, showCannedText } = this.state
@@ -559,7 +558,8 @@ class ClinicalNotes extends Component {
             const onCannedTextClick = () =>
               this.handleCannedTextButtonClick(item)
             const onSettingClick = () => this.openCannedText(item)
-            const onPrevDoctorNoteClick = (cannedTextTypeFK) => this.insertPrevDoctorNotes(cannedTextTypeFK)
+            const onPrevDoctorNoteClick = (cannedTextTypeFK) =>
+              this.insertPrevDoctorNotes(cannedTextTypeFK)
             return {
               title: item.fieldTitle,
               content: (
@@ -588,7 +588,7 @@ class ClinicalNotes extends Component {
                                 categoryIndex={item.scribbleNoteTypeFK}
                                 scribbleNoteArray={
                                   scriblenotes[item.category][
-                                  item.scribbleField
+                                    item.scribbleField
                                   ]
                                 }
                                 gridItemWidth={this.state.width}
@@ -609,6 +609,7 @@ class ClinicalNotes extends Component {
 
                             <RichEditor
                               autoFocus={index === 0}
+                              disabled={loading.global}
                               style={{ marginBottom: 0 }}
                               strongLabel
                               onBlur={this.onEditorChange(item.fieldName)}

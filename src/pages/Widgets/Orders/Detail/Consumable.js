@@ -16,9 +16,10 @@ import {
 
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
+import { currencySymbol } from '@/utils/config'
 import LowStockInfo from './LowStockInfo'
 
-@connect(({ global, codetable }) => ({ global, codetable }))
+@connect(({ global, codetable, user }) => ({ global, codetable, user }))
 @withFormikExtend({
   authority: [
     'queue.consultation.order.consumable',
@@ -51,15 +52,18 @@ import LowStockInfo from './LowStockInfo'
     ),
   }),
 
-  handleSubmit: (values, { props, onConfirm }) => {
-    const { dispatch, currentType, getNextSequence } = props
+  handleSubmit: (values, { props, onConfirm, setValues }) => {
+    const { dispatch, currentType, getNextSequence, user, orders } = props
     let { batchNo } = values
     if (batchNo instanceof Array) {
       if (batchNo && batchNo.length > 0) {
         batchNo = batchNo[0]
       }
     }
+
     const data = {
+      isOrderedByDoctor:
+        user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
       sequence: getNextSequence(),
       ...values,
       subject: currentType.getSubject(values),
@@ -75,6 +79,10 @@ import LowStockInfo from './LowStockInfo'
       payload: data,
     })
     if (onConfirm) onConfirm()
+    setValues({
+      ...orders.defaultConsumable,
+      type: orders.type,
+    })
   },
   displayName: 'OrderPage',
 })
@@ -109,6 +117,25 @@ class Consumable extends PureComponent {
       batchNo: '',
       expiryDate: '',
     }
+  }
+
+  getConsumableOptions = () => {
+    const { codetable: { inventoryconsumable = [] } } = this.props
+
+    return inventoryconsumable.reduce((p, c) => {
+      const { code, displayValue, sellingPrice = 0, uom = {} } = c
+      const { name: uomName = '' } = uom
+      let opt = {
+        ...c,
+        combinDisplayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
+          2,
+        )} / ${uomName})`,
+      }
+      return [
+        ...p,
+        opt,
+      ]
+    }, [])
   }
 
   changeConsumable = (v, op = {}) => {
@@ -190,6 +217,17 @@ class Consumable extends PureComponent {
     })
   }
 
+  componentDidMount = async () => {
+    const { codetable, dispatch } = this.props
+    const { inventoryconsumable = [] } = codetable
+    if (inventoryconsumable.length <= 0) {
+      await dispatch({
+        type: 'codetable/fetchCodes',
+        payload: { code: 'inventoryconsumable' },
+      })
+    }
+  }
+
   UNSAFE_componentWillReceiveProps (nextProps) {
     if (nextProps.orders.type === this.props.type)
       if (
@@ -233,6 +271,17 @@ class Consumable extends PureComponent {
           },
         })
     }
+  }
+
+  validateAndSubmitIfOk = async () => {
+    const { handleSubmit, validateForm } = this.props
+    const validateResult = await validateForm()
+    const isFormValid = _.isEmpty(validateResult)
+    if (isFormValid) {
+      handleSubmit()
+      return true
+    }
+    return false
   }
 
   onAdjustmentConditionChange = (v) => {
@@ -285,17 +334,21 @@ class Consumable extends PureComponent {
       <div>
         <GridContainer>
           <GridItem xs={8}>
-            <FastField
+            <Field
               name='inventoryConsumableFK'
               render={(args) => {
                 return (
-                  <div style={{ position: 'relative' }}>
+                  <div
+                    id={`autofocus_${values.type}`}
+                    style={{ position: 'relative' }}
+                  >
                     <CodeSelect
                       temp
                       label='Consumable Name'
-                      code='inventoryconsumable'
-                      labelField='displayValue'
+                      // code='inventoryconsumable'
+                      labelField='combinDisplayValue'
                       onChange={this.changeConsumable}
+                      options={this.getConsumableOptions()}
                       {...args}
                       style={{ paddingRight: 20 }}
                     />
@@ -524,7 +577,7 @@ class Consumable extends PureComponent {
           </GridItem>
         </GridContainer>
         {footer({
-          onSave: handleSubmit,
+          onSave: this.validateAndSubmitIfOk,
           onReset: this.handleReset,
         })}
       </div>

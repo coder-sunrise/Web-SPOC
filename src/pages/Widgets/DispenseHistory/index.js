@@ -150,7 +150,10 @@ class DispenseHistory extends Component {
             return (
               <div ref={this.myRef}>
                 <Accordion
-                  defaultActive={0}
+                  mode='multiple'
+                  defaultActive={[
+                    0,
+                  ]}
                   onChange={(event, p, expanded) => {
                     if (expanded) {
                       setTimeout(() => {

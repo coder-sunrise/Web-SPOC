@@ -35,7 +35,7 @@ class Invoice extends React.Component {
       type: 'invoiceList/query',
       payload: {
         lgteql_invoiceDate: moment().add(-1, 'month').formatUTC(),
-        lsteql_invoiceDate: moment().formatUTC(false),
+        lsteql_invoiceDate: moment().endOf('day').formatUTC(false),
       },
     })
   }

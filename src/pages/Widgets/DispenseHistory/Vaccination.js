@@ -4,28 +4,28 @@ import * as config from './config'
 
 export const tableColumns = [
   { name: 'visitDate', title: 'Date' },
-  { name: 'code', title: 'Code' },
+  // { name: 'code', title: 'Code' },
   { name: 'name', title: 'Name' },
-  { name: 'remarks', title: 'Remarks' },
-  { name: 'dispensedQuanity', title: 'Qty' },
+  { name: 'dispensedQuanity', title: 'Qty.' },
   { name: 'dispenseUOM', title: 'UOM' },
   { name: 'totalPrice', title: 'Subtotal' },
-  { name: 'adjAmt', title: 'Adjustment' },
+  { name: 'adjAmt', title: 'Adj.' },
   { name: 'totalAfterItemAdjustment', title: 'Total' },
+  { name: 'remarks', title: 'Remarks' },
 ]
 
-export const TableColumnExtensions =
-  [
-    { columnName: 'code', compare: config.compareString },
-    { columnName: 'name', compare: config.compareString },
-    { columnName: 'remarks', compare: config.compareString }, 
-    { columnName: 'visitDate', type: 'date' },
-    { columnName: 'totalPrice', type: 'currency'},
-    { columnName: 'adjAmt', type: 'currency'},
-    { columnName: 'totalAfterItemAdjustment', type: 'currency'},
-    { columnName: 'dispensedQuanity', type: 'number'},
-  ]
-  
+export const TableColumnExtensions = [
+  { columnName: 'visitDate', width: 105, type: 'date' },
+  // { columnName: 'code', width: 120,  },
+  { columnName: 'name', width: 250 },
+  { columnName: 'remarks' },
+  { columnName: 'dispensedQuanity', width: 80, type: 'number' },
+  { columnName: 'dispenseUOM', width: 90 },
+  { columnName: 'totalPrice', width: 90, type: 'currency' },
+  { columnName: 'adjAmt', width: 80, type: 'currency' },
+  { columnName: 'totalAfterItemAdjustment', width: 90, type: 'currency' },
+]
+
 export default ({ classes, current, fieldName = '' }) => {
   return (
     <CardContainer hideHeader size='sm' style={{ margin: 0 }}>

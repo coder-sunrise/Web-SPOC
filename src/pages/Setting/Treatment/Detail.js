@@ -24,6 +24,7 @@ const styles = (theme) => ({})
     displayValue: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
     treatmentCategoryFK: Yup.number().required(),
+    revenueCategoryFK: Yup.number().required(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const {

@@ -124,8 +124,16 @@ class PaymentDetails extends Component {
   }
 
   refresh = () => {
-    const { dispatch, invoiceDetail, invoicePayment } = this.props
+    const {
+      dispatch,
+      invoiceDetail,
+      invoicePayment,
+      refreshInvoiceList,
+    } = this.props
 
+    if (refreshInvoiceList) {
+      refreshInvoiceList()
+    }
     dispatch({
       type: 'invoiceDetail/query',
       payload: {
@@ -250,25 +258,30 @@ class PaymentDetails extends Component {
 
     switch (type) {
       case 'Payment':
-        this.onShowReport(29, { InvoicePaymentId: itemID })
+        this.onShowReport(29, { InvoicePaymentId: itemID }, 'Payment')
         break
       case 'Credit Note':
-        this.onShowReport(18, { CreditNoteId: itemID })
+        this.onShowReport(18, { CreditNoteId: itemID }, 'Credit Note')
         break
       case 'TaxInvoice':
-        this.onShowReport(15, {
-          InvoiceId: invoicePayment ? invoicePayment.currentId : '',
-          CopayerId: copayerID,
-        })
+        this.onShowReport(
+          15,
+          {
+            InvoiceId: invoicePayment ? invoicePayment.currentId : '',
+            CopayerId: copayerID,
+          },
+          'Invoice',
+        )
         break
       default:
         break
     }
   }
 
-  onShowReport = (reportID, reportParameters) => {
+  onShowReport = (reportID, reportParameters, title) => {
     this.setState({
       showReport: true,
+      showReportTitle: title,
       reportPayload: {
         reportID,
         reportParameters,
@@ -415,6 +428,7 @@ class PaymentDetails extends Component {
       showDeleteConfirmation,
       onVoid,
       showReport,
+      showReportTitle,
       reportPayload,
       invoicePayerName,
       invoicePayerPayment,
@@ -426,10 +440,7 @@ class PaymentDetails extends Component {
     }
 
     return (
-      <div
-        className={classes.container}
-        style={{ overflow: 'auto', width: '100%' }}
-      >
+      <div className={classes.container}>
         {readOnly ? (
           <div style={{ paddingTop: 5 }}>
             <WarningSnackbar
@@ -546,7 +557,7 @@ class PaymentDetails extends Component {
         <CommonModal
           open={showReport}
           onClose={this.onCloseReport}
-          title='Invoice'
+          title={showReportTitle}
           maxWidth='lg'
         >
           <ReportViewer

@@ -1,33 +1,20 @@
 import React from 'react'
 import { formatMessage } from 'umi/locale'
 import moment from 'moment'
-import {
-  dateFormatLong,
-  dateFormatLongWithTimeNoSec,
-  Field,
-  FastField,
-  RadioGroup,
-  GridContainer,
-  GridItem,
-  NumberInput,
-  Switch,
-  Button,
-} from '@/components'
+import { Button } from '@/components'
 import Edit from '@material-ui/icons/Edit'
+import { htmlEncodeByRegExp, htmlDecodeByRegExp } from '@/utils/utils'
 
 const PatientNurseNotesContent = ({ canEdit, entity, handleEdit }) => {
   const {
     createDate,
     createByUserName = '',
     createByUserTitle = '',
-    notes,
+    notes = '',
   } = entity
-  const formateDate = moment(createDate).format(dateFormatLongWithTimeNoSec)
+  const formateDate = moment(createDate).format('DD MMM YYYY HH:mm')
   const createByUserFullName = `${createByUserTitle} ${createByUserName}`
-  let e = document.createElement('div')
-  e.innerHTML = notes
-  let htmlData = e.childNodes.length === 0 ? '' : e.childNodes[0].nodeValue
-
+  const html = htmlDecodeByRegExp(notes)
   return (
     <React.Fragment>
       <div style={{ margin: '20px 20px 10px 10px', fontWeight: 'bold' }}>
@@ -49,7 +36,7 @@ const PatientNurseNotesContent = ({ canEdit, entity, handleEdit }) => {
         )}
       </div>
       <div
-        dangerouslySetInnerHTML={{ __html: htmlData }}
+        dangerouslySetInnerHTML={{ __html: html }}
         style={{ paddingLeft: 20 }}
       />
     </React.Fragment>

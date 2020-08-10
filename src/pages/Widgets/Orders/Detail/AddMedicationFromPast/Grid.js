@@ -86,7 +86,9 @@ class Grid extends PureComponent {
             items = _.orderBy(
               o.corPrescriptionItem.filter((drug) => {
                 return (
-                  drug.drugName.indexOf(filterName) >= 0 &&
+                  drug.drugName
+                    .toLowerCase()
+                    .indexOf(filterName.toLowerCase()) >= 0 &&
                   (!isRetail || !drug.isExternalPrescription)
                 )
               }),
@@ -103,7 +105,11 @@ class Grid extends PureComponent {
           ) {
             items = _.orderBy(
               o.retailPrescriptionItem.filter((drug) => {
-                return drug.drugName.indexOf(filterName) >= 0
+                return (
+                  drug.drugName
+                    .toLowerCase()
+                    .indexOf(filterName.toLowerCase()) >= 0
+                )
               }),
               [
                 'drugName',
@@ -117,7 +123,11 @@ class Grid extends PureComponent {
           if (o.corVaccinationItem && o.corVaccinationItem.length > 0) {
             items = _.orderBy(
               o.corVaccinationItem.filter((vacc) => {
-                return vacc.vaccinationName.indexOf(filterName) >= 0
+                return (
+                  vacc.vaccinationName
+                    .toLowerCase()
+                    .indexOf(filterName.toLowerCase()) >= 0
+                )
               }),
               [
                 'vaccinationName',

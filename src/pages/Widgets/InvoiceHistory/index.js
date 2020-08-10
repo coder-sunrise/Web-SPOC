@@ -24,15 +24,25 @@ const styles = () => ({
   totalOSStyle: {
     float: 'right',
     fontWeight: 'bold',
+    marginTop: 10,
+    marginBottom: 10,
   },
   accordionStyle: {
-    marginTop: 30,
+    marginTop: 50,
   },
   titleContainer: {
     display: 'flex',
   },
   title: {
     marginRight: 30,
+    marginTop: 5,
+    fontWeight: 'normal',
+  },
+  titleBold: {
+    marginRight: 30,
+    marginTop: 5,
+    fontWeight: 'bold',
+    color: 'red',
   },
   printButtonStyle: {
     marginLeft: 'auto',
@@ -45,14 +55,18 @@ const InvoiceHistory = ({
   invoiceHistory: { list },
   classes,
 }) => {
-  useEffect(() => {
-    const { patientAccountNo } = patient.entity
+  const refreshInvoiceList = () => {
+    const { id } = patient.entity
     dispatch({
       type: 'patientHistory/queryInvoiceHistory',
       payload: {
-        'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.PatientAccountNo': patientAccountNo,
+        'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.Id': id,
       },
     })
+  }
+
+  useEffect(() => {
+    refreshInvoiceList()
   }, [])
 
   const [
@@ -71,7 +85,7 @@ const InvoiceHistory = ({
   }
 
   const getContent = () => {
-    return <PaymentDetails />
+    return <PaymentDetails refreshInvoiceList={refreshInvoiceList} />
   }
 
   const getTitle = (row) => {
@@ -79,8 +93,9 @@ const InvoiceHistory = ({
       invoiceNo,
       invoiceDate,
       totalPayment,
-      patientPayableAmount,
       totalOutstanding,
+      patientOutstanding,
+      invoiceTotalAftGST,
     } = row
 
     return (
@@ -92,20 +107,27 @@ const InvoiceHistory = ({
               Date: {moment(invoiceDate).format(dateFormatLong)}
             </p>
             <p className={classes.title}>
-              Amount: {currencyFormatter(totalPayment)}
+              Invoice Amount: {currencyFormatter(invoiceTotalAftGST)}
             </p>
             <p className={classes.title}>
-              Total Paid: {currencyFormatter(patientPayableAmount)}
+              Total Paid: {currencyFormatter(totalPayment)}
             </p>
-            <p className={classes.title}>
-              O/S Balance: {currencyFormatter(totalOutstanding)}
+            <p
+              className={
+                patientOutstanding > 0 ? classes.titleBold : classes.title
+              }
+            >
+              Patient O/S Balance: {currencyFormatter(patientOutstanding)}
             </p>
             <p className={classes.printButtonStyle}>
               <Button
                 size='sm'
                 color='primary'
                 icon
-                onClick={() => toggleReport(row)}
+                onClick={(event) => {
+                  toggleReport(row)
+                  event.stopPropagation()
+                }}
               >
                 <Printer />Print Invoice
               </Button>
@@ -116,9 +138,9 @@ const InvoiceHistory = ({
     )
   }
 
-  const getTotalOS = () => {
+  const getTotalPatientOS = () => {
     return list.reduce((totalOS, invoice) => {
-      return totalOS + invoice.totalOutstanding
+      return totalOS + invoice.patientOutstanding
     }, 0)
   }
 
@@ -126,12 +148,11 @@ const InvoiceHistory = ({
     <div>
       <CardContainer hideHeader size='sm'>
         <div className={classes.totalOSStyle}>
-          Total O/S Balance: {currencyFormatter(getTotalOS())}
+          Total Patient O/S Balance: {currencyFormatter(getTotalPatientOS())}
         </div>
 
         <div className={classes.accordionStyle}>
           <Accordion
-            defaultActive={0}
             onChange={(event, p, expanded) => {
               if (expanded) {
                 const { row } = p.prop

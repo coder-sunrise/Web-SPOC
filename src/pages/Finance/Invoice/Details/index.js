@@ -43,7 +43,11 @@ class InvoiceDetails extends Component {
   }
 
   refresh = () => {
-    const { dispatch, invoiceDetail } = this.props
+    const { dispatch, invoiceDetail, refreshInvoiceList } = this.props
+
+    if (refreshInvoiceList) {
+      refreshInvoiceList()
+    }
 
     dispatch({
       type: 'invoiceDetail/query',

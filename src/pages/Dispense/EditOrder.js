@@ -21,7 +21,6 @@ import { convertToConsultation } from '@/pages/Consultation/utils'
 // utils
 import { getAppendUrl } from '@/utils/utils'
 import { widgets } from '@/utils/widgets'
-import Authorized from '@/utils/Authorized'
 
 const discardConsultation = async ({ dispatch, dispense }) => {
   try {
@@ -213,26 +212,22 @@ class EditOrder extends Component {
             <Order className={classes.orderPanel} status='' from='ca' />
           </GridItem>
           <GridItem xs={12} md={6}>
-            <Authorized authority={formsWidget.accessRight}>
-              <h5>
-                <span style={{ display: 'inline-block' }}>Forms</span>
-                <span className={classes.cdAddButton}>
-                  {cdWidget.toolbarAddon}
-                </span>
-              </h5>
-              <Forms />
-            </Authorized>
-            <Authorized authority={cdWidget.accessRight}>
-              <h5>
-                <span style={{ display: 'inline-block' }}>
-                  Consultation Document
-                </span>
-                <span className={classes.cdAddButton}>
-                  {cdWidget.toolbarAddon}
-                </span>
-              </h5>
-              <ConsultationDocument forDispense />
-            </Authorized>
+            <h5>
+              <span style={{ display: 'inline-block' }}>Forms</span>
+              <span className={classes.cdAddButton}>
+                {cdWidget.toolbarAddon}
+              </span>
+            </h5>
+            <Forms />
+            <h5>
+              <span style={{ display: 'inline-block' }}>
+                Consultation Document
+              </span>
+              <span className={classes.cdAddButton}>
+                {cdWidget.toolbarAddon}
+              </span>
+            </h5>
+            <ConsultationDocument forDispense />
             <GridItem xs={12} md={6}>
               <FastField
                 name='dispenseAcknowledgement.editDispenseReasonFK'

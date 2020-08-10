@@ -39,6 +39,7 @@ const calculateInvoiceAmounts = (entity) => {
       invoiceTotalAftAdj: summary.totalAfterAdj,
       invoiceTotalAftGST: summary.totalWithGST,
       outstandingBalance: summary.totalWithGST - obj.invoice.totalPayment,
+      invoiceGSTAdjustment: summary.gstAdj,
       invoiceGSTAmt: Math.round(summary.gst * 100) / 100,
     }
   }
@@ -117,6 +118,7 @@ const constructPayload = (values) => {
     const { dispatch, dispense } = props
     const vid = dispense.visitID
     const _values = constructPayload(values)
+
     dispatch({
       type: `dispense/save`,
       payload: {

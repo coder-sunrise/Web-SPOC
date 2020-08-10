@@ -44,8 +44,8 @@ class FilterBar extends PureComponent {
       status = [],
       formType = [],
     } = values
-    const maxformstatusCount = status.length <= 1 ? 1 : 0
-    const maxformtypesCount = formType.length <= 1 ? 1 : 0
+    const maxformstatusCount = status.length < 1 ? 1 : 0
+    const maxformtypesCount = formType.length < 1 ? 1 : 0
     return (
       <div className={classes.filterBar}>
         <GridContainer>

@@ -25,14 +25,17 @@ const Procedures = ({
   values,
   formListing,
   surgicalChargesSchema,
+  visit,
 }) => {
   const addProcedure = () => {
-    const { visitDate } = formListing.visitDetail
     const maxIndev = _.maxBy(values.formData.procuderes, 'index').index
     let newProcedure = values.formData.procuderes.map((o) => o)
     newProcedure.push({
       index: maxIndev + 1,
-      procedureDate: visitDate,
+      procedureDate:
+        formListing && formListing.visitDetail
+          ? formListing.visitDetail.visitDate
+          : visit.visitDate,
       procedureStartTime: moment(),
       procedureEndTime: moment(),
       natureOfOpertation: 'Medical',
@@ -214,6 +217,19 @@ const Procedures = ({
               }
               for (let index = 0; index < rows.length; index++) {
                 rows[index].sortOrder = index
+                if (!rows[index].surgeonFees || rows[index].surgeonFees < 0) {
+                  rows[index].surgeonFees = 0
+                }
+                if (!rows[index].implantFees || rows[index].implantFees < 0) {
+                  rows[index].implantFees = 0
+                }
+                if (!rows[index].otherFees || rows[index].otherFees < 0) {
+                  rows[index].otherFees = 0
+                }
+                rows[index].totalSurgicalFees =
+                  rows[index].surgeonFees +
+                  rows[index].implantFees +
+                  rows[index].otherFees
               }
               setFieldValue(`formData.procuderes[${i}].surgicalCharges`, rows)
             }
@@ -313,34 +329,19 @@ const Procedures = ({
                   columnName: 'surgeonFees',
                   type: 'currency',
                   sortingEnabled: false,
-                  onChange: ({ value, row }) => {
-                    row.totalSurgicalFees =
-                      (value || 0) +
-                      (row.implantFees || 0) +
-                      (row.otherFees || 0)
-                  },
+                  min: 0,
                 },
                 {
                   columnName: 'implantFees',
                   type: 'currency',
                   sortingEnabled: false,
-                  onChange: ({ value, row }) => {
-                    row.totalSurgicalFees =
-                      (value || 0) +
-                      (row.surgeonFees || 0) +
-                      (row.otherFees || 0)
-                  },
+                  min: 0,
                 },
                 {
                   columnName: 'otherFees',
                   type: 'currency',
                   sortingEnabled: false,
-                  onChange: ({ value, row }) => {
-                    row.totalSurgicalFees =
-                      (value || 0) +
-                      (row.implantFees || 0) +
-                      (row.surgeonFees || 0)
-                  },
+                  min: 0,
                 },
                 {
                   columnName: 'totalSurgicalFees',
@@ -538,6 +539,7 @@ const Procedures = ({
                             showAddCommand: canAddSurgicalCharges,
                             onCommitChanges: onCommitSurgicalChargesChanges,
                             onAddedRowsChange: onAddedSurgicalChargesRowsChange,
+                            isDeletable: (row) => row.surgicalRoleFK !== 1,
                           }}
                           FuncProps={{
                             pager: false,

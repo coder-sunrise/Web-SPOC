@@ -479,6 +479,15 @@ const _routes = [
               'finance/statement',
             ],
           },
+          {
+            path: '/finance/statement/statementpayment/:id',
+            name: 'statement/statementpayment',
+            hideInMenu: true,
+            component: './Finance/Statement/StatementPayment',
+            authority: [
+              'finance/statement',
+            ],
+          },
           // {
           //   path: '/finance/expense',
           //   name: 'doctor-expense',
@@ -603,6 +612,14 @@ const _routes = [
             ],
           },
           {
+            path: '/report/invoicelistingreport',
+            name: 'invoiceListingReport',
+            component: './Report/InvoiceListingReport',
+            authority: [
+              'report.finance.invoicelisting',
+            ],
+          },
+          {
             path: '/report/lowstockconsumablesreport',
             name: 'lowStockConsumablesReport',
             component: './Report/LowStockConsumablesReport',
@@ -712,6 +729,22 @@ const _routes = [
             component: './Report/InventoryListingReport',
             authority: [
               'report.inventory.inventorylistingreport',
+            ],
+          },
+          {
+            path: '/report/statementsummaryreport',
+            name: 'statementsummaryreport',
+            component: './Report/StatementSummaryReport',
+            authority: [
+              'report.finance.statementsummaryreport',
+            ],
+          },
+          {
+            path: '/report/paymentcollectionsummary',
+            name: 'paymentcollectionsummary',
+            component: './Report/PaymentCollectionSummary',
+            authority: [
+              'report.finance.paymentcollectionsummary',
             ],
           },
         ],
@@ -1261,4 +1294,4 @@ const routes =
         return r
       })
 
-export default _routes
+export default routes
