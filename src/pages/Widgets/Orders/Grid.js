@@ -43,6 +43,27 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
   const editRow = (row) => {
     if (!row.isActive && row.type !== '5') return
 
+    if (row.type === '7' && from !== 'ca') return
+
+    let editAccessRight
+    const orderType = orderTypes.find((item) => item.value === row.type) || {
+      accessRight: '',
+    }
+    editAccessRight = orderType.accessRight
+
+    if (from && from === 'ca' && row.isOrderedByDoctor) {
+      const consultaionAccessRight = Authorized.check(editAccessRight)
+      if (
+        consultaionAccessRight &&
+        consultaionAccessRight.rights === 'enable'
+      ) {
+        editAccessRight = 'queue.dispense.editorder.modifydoctororder'
+      }
+    }
+
+    const accessRight = Authorized.check(editAccessRight)
+    if (!accessRight || accessRight.rights !== 'enable') return
+
     dispatch({
       type: 'orders/updateState',
       payload: {
@@ -444,12 +465,24 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
           sortingEnabled: false,
           render: (row) => {
             if (row.type === '7' && from !== 'ca') return null
+            let editAccessRight
+
             const orderType = orderTypes.find(
               (item) => item.value === row.type,
             ) || { accessRight: '' }
-            const { accessRight } = orderType
+            editAccessRight = orderType.accessRight
+
+            if (from && from === 'ca' && row.isOrderedByDoctor) {
+              const consultaionAccessRight = Authorized.check(editAccessRight)
+              if (
+                consultaionAccessRight &&
+                consultaionAccessRight.rights === 'enable'
+              ) {
+                editAccessRight = 'queue.dispense.editorder.modifydoctororder'
+              }
+            }
             return (
-              <Authorized authority={accessRight}>
+              <Authorized authority={editAccessRight}>
                 <div>
                   <Tooltip title='Edit'>
                     <Button

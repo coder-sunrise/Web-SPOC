@@ -57,8 +57,7 @@ const Contact = (props) => {
             />
           </GridItem>
 
-          {!isCopayer &&
-          !isReferral && (
+          {!isReferral && (
             <GridItem md={6}>
               <FastField
                 name='contactPerson'
@@ -89,27 +88,23 @@ const Contact = (props) => {
             />
           </GridItem>
 
-          {!isCopayer && (
-            <GridItem md={6}>
-              <FastField
-                name='contact.officeContactNumber.number'
-                render={(args) => (
-                  <MobileNumberInput {...args} label='Office Number' />
-                )}
-              />
-            </GridItem>
-          )}
+          <GridItem md={6}>
+            <FastField
+              name='contact.officeContactNumber.number'
+              render={(args) => (
+                <MobileNumberInput {...args} label='Office Number' />
+              )}
+            />
+          </GridItem>
 
-          {!isCopayer && (
-            <GridItem md={6}>
-              <FastField
-                name='contact.faxContactNumber.number'
-                render={(args) => (
-                  <MobileNumberInput {...args} label='Fax Number' />
-                )}
-              />
-            </GridItem>
-          )}
+          <GridItem md={6}>
+            <FastField
+              name='contact.faxContactNumber.number'
+              render={(args) => (
+                <MobileNumberInput {...args} label='Fax Number' />
+              )}
+            />
+          </GridItem>
 
           {(isCopayer || isReferral) && (
             <Fragment>

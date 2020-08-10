@@ -354,6 +354,7 @@ class Index extends Component {
               poAdjustment.purchaseOrderItemAdjustment,
           }
         } else {
+          x.totalAfterGST = x.totalAfterGst
           result = {
             ...x,
           }

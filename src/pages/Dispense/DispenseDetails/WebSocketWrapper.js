@@ -184,7 +184,8 @@ const WebSocketWrapper = ({
     if (withoutPrintPreview.includes(type)) {
       let printResult = await getPrintResult(type, row, printAllDrugLabel)
       if (printData && printData.length > 0)
-        printResult = printResult && printResult.concat(printData)
+        printResult = (printResult || []).concat(printData)
+
       if (!printResult || printResult.length <= 0) return
       await handlePrint(JSON.stringify(printResult))
     } else {

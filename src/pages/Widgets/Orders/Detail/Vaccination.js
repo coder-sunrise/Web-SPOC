@@ -20,20 +20,22 @@ import {
 } from '@/components'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
+import { currencySymbol } from '@/utils/config'
 import LowStockInfo from './LowStockInfo'
 import AddFromPast from './AddMedicationFromPast'
 
 let i = 0
-@connect(({ global, codetable, visitRegistration }) => ({
+@connect(({ global, codetable, visitRegistration, user }) => ({
   global,
   codetable,
   visitRegistration,
+  user,
 }))
 @withFormikExtend({
   authority: [
     'queue.consultation.order.vaccination',
   ],
-  mapPropsToValues: ({ orders = {} }) => {
+  mapPropsToValues: ({ orders = {}, type }) => {
     const newOrders = orders.entity || orders.defaultVaccination
 
     if (newOrders.uid) {
@@ -50,6 +52,7 @@ let i = 0
     return {
       minQuantity: 1,
       ...newOrders,
+      type,
       isEditVaccination: !_.isEmpty(orders.entity),
     }
   },
@@ -68,8 +71,8 @@ let i = 0
     ),
   }),
 
-  handleSubmit: (values, { props, onConfirm, resetForm }) => {
-    const { dispatch, orders, currentType, getNextSequence } = props
+  handleSubmit: (values, { props, onConfirm, resetForm, setValues }) => {
+    const { dispatch, orders, currentType, getNextSequence, user } = props
     const { rows } = orders
     let { batchNo } = values
     if (batchNo instanceof Array) {
@@ -78,6 +81,8 @@ let i = 0
       }
     }
     const data = {
+      isOrderedByDoctor:
+        user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
       sequence: getNextSequence(),
       ...values,
       subject: currentType.getSubject(values),
@@ -96,6 +101,10 @@ let i = 0
     })
 
     if (onConfirm) onConfirm()
+    setValues({
+      ...orders.defaultService,
+      type: orders.type,
+    })
   },
   displayName: 'OrderPage',
 })
@@ -126,6 +135,25 @@ class Vaccination extends PureComponent {
       expiryDate: '',
       showAddFromPastModal: false,
     }
+  }
+
+  getVaccinationOptions = () => {
+    const { codetable: { inventoryvaccination = [] } } = this.props
+
+    return inventoryvaccination.reduce((p, c) => {
+      const { code, displayValue, sellingPrice = 0, dispensingUOM = {} } = c
+      const { name: uomName = '' } = dispensingUOM
+      let opt = {
+        ...c,
+        combinDisplayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
+          2,
+        )} / ${uomName})`,
+      }
+      return [
+        ...p,
+        opt,
+      ]
+    }, [])
   }
 
   changeVaccination = (v, op = {}) => {
@@ -350,6 +378,17 @@ class Vaccination extends PureComponent {
     }
   }
 
+  validateAndSubmitIfOk = async () => {
+    const { handleSubmit, validateForm } = this.props
+    const validateResult = await validateForm()
+    const isFormValid = _.isEmpty(validateResult)
+    if (isFormValid) {
+      handleSubmit()
+      return true
+    }
+    return false
+  }
+
   resetVaccinationHistoryResult = () => {
     this.props.dispatch({
       type: 'medicationHistory/updateState',
@@ -417,13 +456,17 @@ class Vaccination extends PureComponent {
               name='inventoryVaccinationFK'
               render={(args) => {
                 return (
-                  <div style={{ position: 'relative' }}>
+                  <div
+                    id={`autofocus_${values.type}`}
+                    style={{ position: 'relative' }}
+                  >
                     <CodeSelect
                       temp
                       label='Vaccination Name'
-                      labelField='displayValue'
+                      labelField='combinDisplayValue'
                       code='inventoryvaccination'
                       onChange={this.changeVaccination}
+                      options={this.getVaccinationOptions()}
                       {...args}
                       style={{ paddingRight: 20 }}
                     />
@@ -744,7 +787,7 @@ class Vaccination extends PureComponent {
           </GridItem>
         </GridContainer>
         {footer({
-          onSave: handleSubmit,
+          onSave: this.validateAndSubmitIfOk,
           onReset: this.handleReset,
         })}
         <CommonModal

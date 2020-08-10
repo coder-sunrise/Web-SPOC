@@ -278,7 +278,7 @@ const FilterBar = ({
         </GridItem>
         <GridItem xs md={12}>
           <ProgressButton
-            icon={null}
+            icon={<Search />}
             color='primary'
             size='sm'
             onClick={async () => {
@@ -286,7 +286,6 @@ const FilterBar = ({
               handleSubmit()
             }}
           >
-            <Search />
             Search
           </ProgressButton>
           <Authorized authority='appointment.newappointment'>

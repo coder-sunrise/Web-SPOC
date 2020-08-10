@@ -16,8 +16,9 @@ import {
 import Yup from '@/utils/yup'
 import { getServices } from '@/utils/codetable'
 import { calculateAdjustAmount } from '@/utils/utils'
+import { currencySymbol } from '@/utils/config'
 
-@connect(({ codetable, global }) => ({ codetable, global }))
+@connect(({ codetable, global, user }) => ({ codetable, global, user }))
 @withFormikExtend({
   authority: [
     'queue.consultation.order.service',
@@ -51,10 +52,12 @@ import { calculateAdjustAmount } from '@/utils/utils'
     ),
   }),
 
-  handleSubmit: (values, { props, onConfirm }) => {
-    const { dispatch, orders, currentType, getNextSequence } = props
+  handleSubmit: (values, { props, onConfirm, setValues }) => {
+    const { dispatch, orders, currentType, getNextSequence, user } = props
     const { rows } = orders
     const data = {
+      isOrderedByDoctor:
+        user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
       sequence: getNextSequence(),
       ...values,
       subject: currentType.getSubject(values),
@@ -70,6 +73,10 @@ import { calculateAdjustAmount } from '@/utils/utils'
       payload: data,
     })
     if (onConfirm) onConfirm()
+    setValues({
+      ...orders.defaultService,
+      type: orders.type,
+    })
   },
   displayName: 'OrderPage',
 })
@@ -90,11 +97,36 @@ class Service extends PureComponent {
       },
     }).then((list) => {
       // eslint-disable-next-line compat/compat
-      const { services, serviceCenters, serviceCenterServices } = getServices(
-        list,
-      )
+      const {
+        services = [],
+        serviceCenters = [],
+        serviceCenterServices = [],
+      } = getServices(list)
+
+      const newServices = services.reduce((p, c) => {
+        const { value: serviceFK, name, code } = c
+
+        const serviceCenterService =
+          serviceCenterServices.find(
+            (o) => o.serviceId === serviceFK && o.isDefault,
+          ) || {}
+
+        const { unitPrice = 0 } = serviceCenterService || {}
+
+        const opt = {
+          ...c,
+          combinDisplayValue: `${name} - ${code} (${currencySymbol}${unitPrice.toFixed(
+            2,
+          )})`,
+        }
+        return [
+          ...p,
+          opt,
+        ]
+      }, [])
+
       this.setState({
-        services,
+        services: newServices,
         serviceCenters,
         serviceCenterServices,
       })
@@ -261,6 +293,17 @@ class Service extends PureComponent {
     setFieldValue('adjType', isExactAmount ? 'ExactAmount' : 'Percentage')
   }
 
+  validateAndSubmitIfOk = async () => {
+    const { handleSubmit, validateForm } = this.props
+    const validateResult = await validateForm()
+    const isFormValid = _.isEmpty(validateResult)
+    if (isFormValid) {
+      handleSubmit()
+      return true
+    }
+    return false
+  }
+
   render () {
     const { theme, classes, values = {}, footer, handleSubmit } = this.props
     const { services, serviceCenters } = this.state
@@ -274,21 +317,24 @@ class Service extends PureComponent {
               name='serviceFK'
               render={(args) => {
                 return (
-                  <Select
-                    label='Service Name'
-                    options={services.filter(
-                      (o) =>
-                        !serviceCenterFK ||
-                        o.serviceCenters.find(
-                          (m) => m.value === serviceCenterFK,
-                        ),
-                    )}
-                    onChange={() =>
-                      setTimeout(() => {
-                        this.getServiceCenterService()
-                      }, 1)}
-                    {...args}
-                  />
+                  <div id={`autofocus_${values.type}`}>
+                    <Select
+                      label='Service Name'
+                      labelField='combinDisplayValue'
+                      options={services.filter(
+                        (o) =>
+                          !serviceCenterFK ||
+                          o.serviceCenters.find(
+                            (m) => m.value === serviceCenterFK,
+                          ),
+                      )}
+                      onChange={() =>
+                        setTimeout(() => {
+                          this.getServiceCenterService()
+                        }, 1)}
+                      {...args}
+                    />
+                  </div>
                 )
               }}
             />
@@ -462,7 +508,7 @@ class Service extends PureComponent {
           </GridItem>
         </GridContainer>
         {footer({
-          onSave: handleSubmit,
+          onSave: this.validateAndSubmitIfOk,
           onReset: this.handleReset,
         })}
       </div>

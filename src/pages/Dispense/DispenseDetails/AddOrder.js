@@ -11,6 +11,7 @@ import {
   INVOICE_ITEM_TYPE_BY_NAME,
   ORDER_TYPE_TAB,
   CLINIC_TYPE,
+  REVENUE_CATEGORY,
 } from '@/utils/constants'
 import { roundTo, getUniqueId } from '@/utils/utils'
 import Order from '../../Widgets/Orders'
@@ -386,7 +387,9 @@ export default compose(
               const medication = inventorymedication.find(
                 (c) => c.id === o.inventoryMedicationFK,
               )
-              revenueCategory = medication ? medication.revenueCategory : {}
+              revenueCategory = medication
+                ? medication.revenueCategory
+                : { id: REVENUE_CATEGORY.OTHER }
               const {
                 corPrescriptionItemInstruction,
                 corPrescriptionItemPrecaution,

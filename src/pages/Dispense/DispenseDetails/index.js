@@ -9,18 +9,25 @@ import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 import AddAlert from '@material-ui/icons/AddAlert'
-// sub components
-import TableData from './TableData'
-import VaccinationGrid from './VaccinationGrid'
-import DrugLabelSelection from './DrugLabelSelection'
-// common component
+import { formatMessage } from 'umi/locale' // common component
 import {
   Button,
   ProgressButton,
   GridItem,
   GridContainer,
   SizeContainer,
+  Field,
+  TextField,
+  CommonModal,
 } from '@/components'
+import AmountSummary from '@/pages/Shared/AmountSummary'
+import Authorized from '@/utils/Authorized'
+import { VISIT_TYPE } from '@/utils/constants'
+import { dangerColor } from '@/assets/jss'
+// sub components
+import TableData from './TableData'
+import VaccinationGrid from './VaccinationGrid'
+import DrugLabelSelection from './DrugLabelSelection'
 // variables
 import {
   PrescriptionColumns,
@@ -30,14 +37,9 @@ import {
   OtherOrdersColumns,
   OtherOrdersColumnExtensions,
 } from '../variables'
-import AmountSummary from '@/pages/Shared/AmountSummary'
-import Authorized from '@/utils/Authorized'
-import { VISIT_TYPE } from '@/utils/constants'
+
 import CONSTANTS from './constants'
 
-import { dangerColor } from '@/assets/jss'
-
-import { CommonModal } from '@/components'
 // const styles = (theme) => ({
 //   gridRow: {
 //     margin: `${theme.spacing.unit}px 0px`,
@@ -105,6 +107,7 @@ const DispenseDetails = ({
     otherOrder,
     invoice,
     visitPurposeFK,
+    visitRemarks,
   } = values || {
     invoice: { invoiceItem: [] },
   }
@@ -177,6 +180,7 @@ const DispenseDetails = ({
       invoiceTotalAftGST: v.summary.totalWithGST,
       outstandingBalance: v.summary.totalWithGST - values.invoice.totalPayment,
       invoiceGSTAmt: Math.round(v.summary.gst * 100) / 100,
+      invoiceGSTAdjustment: v.summary.gstAdj,
       invoiceAdjustment: v.adjustments,
       isGSTInclusive: !!v.summary.isGSTInclusive,
     }
@@ -344,9 +348,18 @@ const DispenseDetails = ({
             />
           </Paper>
         </GridItem>
-        <GridItem xs={2} md={8} />
+        <GridItem xs={8} md={9}>
+          <TextField
+            value={visitRemarks}
+            disabled
+            multiline
+            label={formatMessage({
+              id: 'reception.queue.visitRegistration.visitRemarks',
+            })}
+          />
+        </GridItem>
         {!viewOnly && (
-          <GridItem xs={10} md={4}>
+          <GridItem xs={4} md={3}>
             <div style={{ paddingRight: 90 }}>
               <AmountSummary
                 rows={invoiceItem}

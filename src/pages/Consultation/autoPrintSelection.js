@@ -1,10 +1,14 @@
 import React from 'react'
 import * as Yup from 'yup'
 // common components
+import { withStyles } from '@material-ui/core'
 import {
-  withStyles,
-} from '@material-ui/core'
-import { GridContainer, GridItem, NumberInput, Checkbox, EditableTableGrid } from '@/components'
+  GridContainer,
+  GridItem,
+  NumberInput,
+  Checkbox,
+  EditableTableGrid,
+} from '@/components'
 import styles from './style'
 
 class AutoPrintSelection extends React.PureComponent {
@@ -81,7 +85,7 @@ class AutoPrintSelection extends React.PureComponent {
     },
   }
 
-  constructor(props) {
+  constructor (props) {
     super(props)
     let id = 0
     let data = props.data.reduce((pre, cur) => {
@@ -90,15 +94,16 @@ class AutoPrintSelection extends React.PureComponent {
         return pre
       }
       id += 1
-      return [...pre, { item: cur.item, Copies: cur.Copies, id: cur.item }]
+      return [
+        ...pre,
+        { item: cur.item, Copies: cur.Copies, id: cur.item },
+      ]
     }, [])
-    console.log({ data })
     this.state = {
       selectedRows: data.map((item) => item.id),
       data,
     }
   }
-
 
   handleSelectionChange = (rows) => {
     this.setState(() => ({
@@ -115,21 +120,15 @@ class AutoPrintSelection extends React.PureComponent {
   }
 
   render () {
-    const {
-      handleSubmit,
-      footer,
-      classes,
-    } = this.props
-    console.log(this.state)
+    const { handleSubmit, footer, classes } = this.props
     const validationSchema = Yup.object().shape({
-      Copies: Yup.number()
-        .min(1),
+      Copies: Yup.number().min(1),
     })
     return (
       <div>
         <GridContainer>
           <GridItem md={12}>
-            {this.state.data &&
+            {this.state.data && (
               <div className={classes.tableContainer}>
                 <h5>Print the following document after sign off</h5>
                 <EditableTableGrid
@@ -148,15 +147,24 @@ class AutoPrintSelection extends React.PureComponent {
                   }}
                   schema={validationSchema}
                 />
-              </div>}
+              </div>
+            )}
           </GridItem>
         </GridContainer>
         {footer({
           onConfirm: () => {
-            const selectedData = this.state.data.filter((item) => this.state.selectedRows.includes(item.id) > -1)
+            const { selectedRows, data } = this.state
+
+            const selectedData = data.filter((item) =>
+              selectedRows.includes(item.id),
+            )
+
             let printData = selectedData.reduce((pre, cur) => {
               let itemData = this.props.data.filter((x) => x.item === cur.item)
-              return [...pre, ...(itemData.map((i) => ({ ...i, Copies: cur.Copies })))]
+              return [
+                ...pre,
+                ...itemData.map((i) => ({ ...i, Copies: cur.Copies })),
+              ]
             }, [])
             handleSubmit(printData)
           },

@@ -49,6 +49,7 @@ export default {
   'menu.finance.statement/newstatement': 'New Statement',
   'menu.finance.statement/editstatement': 'Edit Statement',
   'menu.finance.statement/detail': 'Statement Details',
+  'menu.finance.statement/statementpayment': 'Statement Payment',
   'menu.finance.scheme': 'Scheme',
   'menu.finance.scheme/detail': 'Scheme Detail',
 
@@ -87,6 +88,7 @@ export default {
   'menu.report.chasClaimReport': 'CHAS Claim Report',
   'menu.report.voidCreditNoteReport': 'Void Credit Note & Payment Report',
   'menu.report.salesListingReport': 'Sales Listing Report',
+  'menu.report.invoiceListingReport': 'Invoice Listing Report',
   'menu.report.lowStockConsumablesReport': 'Low Stock Consumables Report',
   'menu.report.lowStockMedicationReport': 'Low Stock Medication Report',
   'menu.report.depositTransactionReport': 'Deposit Transaction Report',
@@ -161,10 +163,12 @@ export default {
   'menu.report.queueListingReport': 'Queue Listing Report',
   'menu.report.patientListingReport': 'Patient Listing Report',
   'menu.report.paymentCollection': 'Payment Collection Report',
+  'menu.report.paymentcollectionsummary': 'Payment Collection Report (Summary)',
   'menu.report.outstandingPaymentReport': 'Outstanding Payment Report',
   'menu.report.salessummary': 'Sales Summary Report',
   'menu.report.diagnosistrending': 'Diagnosis Trending Report',
   'menu.report.sessionsummary': 'Session Summary Report',
+  'menu.report.statementsummaryreport': 'Statement Summary Report',
   'menu.report.viewreport': 'View Report',
 
   'menu.support': 'Support',

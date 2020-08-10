@@ -16,7 +16,13 @@ import {
   Snackbar,
 } from '@/components'
 
-const styles = () => ({})
+const styles = (theme) => ({
+  mainInput: {
+    width: 'calc(100% - 120px)',
+    display: 'inline-block',
+    marginRight: theme.spacing(),
+  },
+})
 @connect(({ global }) => ({
   global,
 }))
@@ -159,7 +165,15 @@ class Adjustment extends PureComponent {
   }
 
   render () {
-    const { theme, footer, values, global, errors, ...props } = this.props
+    const {
+      theme,
+      footer,
+      values,
+      global,
+      errors,
+      classes,
+      ...props
+    } = this.props
     const { openAdjustmentConfig = {} } = global
     const {
       showRemark,
@@ -176,56 +190,42 @@ class Adjustment extends PureComponent {
             <Snackbar variant='warning' message={errors.finalAmount} />
           )}
           <GridContainer>
-            <GridItem xs={10}>
-              <div style={{ position: 'relative' }}>
-                <FastField
-                  name='isMinus'
-                  render={(args) => {
-                    return (
-                      <Switch
-                        style={{
-                          position: 'absolute',
-                          marginTop: theme.spacing(2.5),
-                        }}
-                        checkedChildren='-'
-                        unCheckedChildren='+'
-                        label=''
-                        onChange={() => {
-                          setTimeout(() => {
-                            this.onConditionChange()
-                          }, 1)
-                        }}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-                <Field
-                  name='adjustment'
-                  render={(args) => {
-                    args.min = 0
-                    if (values.isExactAmount) {
-                      return (
-                        <NumberInput
-                          style={{ marginLeft: 60, paddingRight: 60 }}
-                          autoFocus
-                          currency
-                          label='Adjustment'
-                          onChange={() => {
-                            setTimeout(() => {
-                              this.onConditionChange()
-                            }, 1)
-                          }}
-                          {...args}
-                        />
-                      )
-                    }
+            <GridItem xs={12}>
+              <FastField
+                name='isMinus'
+                render={(args) => {
+                  return (
+                    <Switch
+                      style={{
+                        width: 50,
+                        display: 'inline-block',
+                        marginTop: theme.spacing(2.5),
+                      }}
+                      checkedChildren='-'
+                      unCheckedChildren='+'
+                      label=''
+                      onChange={() => {
+                        setTimeout(() => {
+                          this.onConditionChange()
+                        }, 1)
+                      }}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+              <Field
+                name='adjustment'
+                render={(args) => {
+                  args.min = 0
+                  if (values.isExactAmount) {
                     return (
                       <NumberInput
-                        style={{ marginLeft: 60, paddingRight: 60 }}
-                        percentage
+                        formControlProps={{
+                          className: classes.mainInput,
+                        }}
                         autoFocus
-                        max={999}
+                        currency
                         label='Adjustment'
                         onChange={() => {
                           setTimeout(() => {
@@ -235,16 +235,36 @@ class Adjustment extends PureComponent {
                         {...args}
                       />
                     )
-                  }}
-                />
-              </div>
-            </GridItem>
-            <GridItem xs={2}>
+                  }
+                  return (
+                    <NumberInput
+                      formControlProps={{
+                        className: classes.mainInput,
+                      }}
+                      percentage
+                      autoFocus
+                      max={999}
+                      label='Adjustment'
+                      onChange={() => {
+                        setTimeout(() => {
+                          this.onConditionChange()
+                        }, 1)
+                      }}
+                      {...args}
+                    />
+                  )
+                }}
+              />
               <FastField
                 name='isExactAmount'
                 render={(args) => {
                   return (
                     <Switch
+                      style={{
+                        width: 50,
+                        display: 'inline-block',
+                        marginTop: theme.spacing(2.5),
+                      }}
                       checkedChildren='$'
                       unCheckedChildren='%'
                       label=''
@@ -254,7 +274,6 @@ class Adjustment extends PureComponent {
                         }, 1)
                       }}
                       {...args}
-                      style={{ marginTop: theme.spacing(2.5) }}
                     />
                   )
                 }}

@@ -15,7 +15,7 @@ const defaultSocketPortsState = [
 
 const withWebSocket = () => (Component) => {
   class WebSocketBase extends React.Component {
-    constructor(props) {
+    constructor (props) {
       super(props)
       this.state = {
         pendingJob: [],
@@ -108,7 +108,7 @@ const withWebSocket = () => (Component) => {
     }
 
     handlePrint = async (content) => {
-      console.log(`handlePrint: ${content}`)
+      // console.log(`handlePrint: ${content}`)
       if (content) {
         await this.prepareJobForWebSocket(AESEncryptor.encrypt(content))
       }

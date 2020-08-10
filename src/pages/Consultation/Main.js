@@ -5,12 +5,8 @@ import _ from 'lodash'
 import numeral from 'numeral'
 import Timer from 'react-compound-timer'
 
-
-import {
-  withStyles,
-} from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import TimerIcon from '@material-ui/icons/Timer'
-import AutoPrintSelection from './autoPrintSelection'
 import {
   CommonModal,
   GridContainer,
@@ -24,14 +20,25 @@ import {
 import Authorized from '@/utils/Authorized'
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 
-import { getAppendUrl, navigateDirtyCheck, commonDataReaderTransform } from '@/utils/utils'
-import { convertToConsultation, convertConsultationDocument } from '@/pages/Consultation/utils'
+import {
+  getAppendUrl,
+  navigateDirtyCheck,
+  commonDataReaderTransform,
+} from '@/utils/utils'
+import {
+  convertToConsultation,
+  convertConsultationDocument,
+} from '@/pages/Consultation/utils'
 // import model from '@/pages/Widgets/Orders/models'
 import { VISIT_TYPE } from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { CallingQueueButton } from '@/components/_medisys'
-import { initRoomAssignment, consultationDocumentTypes, ReportsOnSignOffOption } from '@/utils/codes'
-
+import {
+  initRoomAssignment,
+  consultationDocumentTypes,
+  ReportsOnSignOffOption,
+} from '@/utils/codes'
+import AutoPrintSelection from './autoPrintSelection'
 
 // import PatientSearch from '@/pages/PatientDatabase/Search'
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
@@ -46,16 +53,27 @@ import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
 const discardMessage = 'Discard consultation?'
 const formName = 'ConsultationPage'
 
-const generatePrintData = async (settings, consultationDocument, user, patient, orders, visitEntity) => {
+const generatePrintData = async (
+  settings,
+  consultationDocument,
+  user,
+  patient,
+  orders,
+  visitEntity,
+) => {
   let documents = convertConsultationDocument(consultationDocument)
-  const {
-    autoPrintOnSignOff,
-    autoPrintReportsOnSignOff,
-  } = settings
+  const { autoPrintOnSignOff, autoPrintReportsOnSignOff } = settings
 
   if (autoPrintOnSignOff === true) {
     let reportsOnSignOff = autoPrintReportsOnSignOff.split(',')
-    const { corMemo, corCertificateOfAttendance, corMedicalCertificate, corOtherDocuments, corReferralLetter, corVaccinationCert } = documents
+    const {
+      corMemo,
+      corCertificateOfAttendance,
+      corMedicalCertificate,
+      corOtherDocuments,
+      corReferralLetter,
+      corVaccinationCert,
+    } = documents
     let printData = []
 
     let doctor = user.data.clinicianProfile
@@ -69,54 +87,76 @@ const generatePrintData = async (settings, consultationDocument, user, patient, 
     let getPrintData = (type, list) => {
       if (list && list.length > 0) {
         const documentType = consultationDocumentTypes.find(
-          (o) =>
-            o.name === type ,
+          (o) => o.name === type,
         )
         return list.filter((item) => !item.isDeleted).map((item) => ({
           item: type,
-          description: `  ${item.subject ?? ''}`,
+          description: `  ${item.subject || ''}`,
           Copies: 1,
           print: true,
           ReportId: documentType.downloadConfig.id,
-          ReportData: `${JSON.stringify(commonDataReaderTransform(
-            documentType.downloadConfig.draft(
-              {
+          ReportData: `${JSON.stringify(
+            commonDataReaderTransform(
+              documentType.downloadConfig.draft({
                 ...item,
                 doctorName,
                 doctorMCRNo,
                 patientName,
                 patientAccountNo,
-              })))}`,
+              }),
+            ),
+          )}`,
         }))
       }
       return []
     }
     if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.DrugLabel) > -1) {
       // const { versionNumber } = values
-      // versionNumber === 1 && 
+      // versionNumber === 1 &&
       if (orders && orders.rows) {
         const { rows = [] } = orders
         // prescriptionItems
         const prescriptionItems = rows.filter(
           (f) => f.type === '1' && !f.isDeleted,
         )
-        let drugLabelData = await getDrugLabelPrintData(settings, patient.entity, visitEntity.id, prescriptionItems)
+        let drugLabelData = await getDrugLabelPrintData(
+          settings,
+          patient.entity,
+          visitEntity.id,
+          prescriptionItems,
+        )
         if (drugLabelData && drugLabelData.length > 0)
           printData = printData.concat(drugLabelData)
       }
     }
     if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.Memo) > -1)
       printData = printData.concat(getPrintData('Memo', corMemo))
-    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.MedicalCertificate) > -1)
-      printData = printData.concat(getPrintData('Medical Certificate', corMedicalCertificate))
-    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.CertificateofAttendance) > -1)
-      printData = printData.concat(getPrintData('Certificate of Attendance', corCertificateOfAttendance))
+    if (
+      reportsOnSignOff.indexOf(ReportsOnSignOffOption.MedicalCertificate) > -1
+    )
+      printData = printData.concat(
+        getPrintData('Medical Certificate', corMedicalCertificate),
+      )
+    if (
+      reportsOnSignOff.indexOf(ReportsOnSignOffOption.CertificateofAttendance) >
+      -1
+    )
+      printData = printData.concat(
+        getPrintData('Certificate of Attendance', corCertificateOfAttendance),
+      )
     if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.OtherDocuments) > -1)
       printData = printData.concat(getPrintData('Others', corOtherDocuments))
     if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.ReferralLetter) > -1)
-      printData = printData.concat(getPrintData('Referral Letter', corReferralLetter))
-    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.VaccinationCertificate) > -1)
-      printData = printData.concat(getPrintData('Vaccination Certificate', corVaccinationCert))
+      printData = printData.concat(
+        getPrintData('Referral Letter', corReferralLetter),
+      )
+    if (
+      reportsOnSignOff.indexOf(ReportsOnSignOffOption.VaccinationCertificate) >
+      -1
+    )
+      printData = printData.concat(
+        getPrintData('Vaccination Certificate', corVaccinationCert),
+      )
     return printData
   }
   return []
@@ -193,7 +233,6 @@ const saveConsultation = ({
     onConfirmSave()
   }
 }
-
 
 const discardConsultation = ({
   dispatch,
@@ -273,16 +312,11 @@ const discardConsultation = ({
   onDirtyDiscard: discardConsultation,
   handleSubmit: async (values, { props }) => {
     const { versionNumber } = values
-    const {
-      dispatch,
-      handlePrint,
-    } = props
+    const { dispatch, handlePrint } = props
     let printData = []
     if (versionNumber === 1) {
       let settings = JSON.parse(localStorage.getItem('clinicSettings'))
-      const {
-        autoPrintOnSignOff,
-      } = settings
+      const { autoPrintOnSignOff } = settings
 
       if (autoPrintOnSignOff === true) {
         const {
@@ -291,7 +325,14 @@ const discardConsultation = ({
           visitRegistration: { entity: visitEntity },
           patient,
         } = props
-        printData = await generatePrintData(settings, consultationDocument, props.user, patient, orders, visitEntity)
+        printData = await generatePrintData(
+          settings,
+          consultationDocument,
+          props.user,
+          patient,
+          orders,
+          visitEntity,
+        )
       }
     }
     if (printData && printData.length > 0) {
@@ -309,8 +350,8 @@ const discardConsultation = ({
               shouldPromptConfirm: false,
               action: 'sign',
               successCallback: () => {
+                dispatch({ type: `consultation/closeSignOffModal` })
                 if (result && result.length > 0) {
-                  dispatch({ type: `consultation/closeSignOffModal` })
                   let printedData = result
                   if (printedData && printedData.length > 0) {
                     const token = localStorage.getItem('token')
@@ -536,7 +577,7 @@ class Main extends React.Component {
     )
     if (forms.rows.filter((o) => o.statusFK === 1).length > 0) {
       notification.warning({
-        message: `Please finalize all forms.`,
+        message: `Draft forms found, please finalize it before sign off.`,
       })
       return
     }
@@ -621,63 +662,63 @@ class Main extends React.Component {
               {({ rights }) => {
                 //
                 return rights === 'enable' &&
-                  [
-                    'IN CONS',
-                    'WAITING',
-                  ].includes(visit.visitStatus) &&
-                  values.id ? (
-                    <GridItem>
-                      <h5 style={{ marginTop: -3, fontWeight: 'bold' }}>
-                        <Timer
-                          initialTime={
-                            Number(
-                              sessionStorage.getItem(
-                                `${values.id}_consultationTimer`,
-                              ),
-                            ) ||
-                            values.duration ||
-                            0
-                          }
-                          direction='forward'
-                          startImmediately={this.state.recording}
-                        >
-                          {({
-                            start,
-                            resume,
-                            pause,
-                            stop,
-                            reset,
-                            getTimerState,
-                            getTime,
-                          }) => {
-                            sessionStorage.setItem(
+                [
+                  'IN CONS',
+                  'WAITING',
+                ].includes(visit.visitStatus) &&
+                values.id ? (
+                  <GridItem>
+                    <h5 style={{ marginTop: -3, fontWeight: 'bold' }}>
+                      <Timer
+                        initialTime={
+                          Number(
+                            sessionStorage.getItem(
                               `${values.id}_consultationTimer`,
-                              getTime(),
-                            )
-                            return (
-                              <React.Fragment>
-                                <TimerIcon
-                                  style={{
-                                    height: 17,
-                                    top: 2,
-                                    left: -5,
-                                    position: 'relative',
-                                  }}
-                                />
-                                <Timer.Hours
-                                  formatValue={(value) =>
-                                    `${numeral(value).format('00')} : `}
-                                />
-                                <Timer.Minutes
-                                  formatValue={(value) =>
-                                    `${numeral(value).format('00')} : `}
-                                />
-                                <Timer.Seconds
-                                  formatValue={(value) =>
-                                    `${numeral(value).format('00')}`}
-                                />
+                            ),
+                          ) ||
+                          values.duration ||
+                          0
+                        }
+                        direction='forward'
+                        startImmediately={this.state.recording}
+                      >
+                        {({
+                          start,
+                          resume,
+                          pause,
+                          stop,
+                          reset,
+                          getTimerState,
+                          getTime,
+                        }) => {
+                          sessionStorage.setItem(
+                            `${values.id}_consultationTimer`,
+                            getTime(),
+                          )
+                          return (
+                            <React.Fragment>
+                              <TimerIcon
+                                style={{
+                                  height: 17,
+                                  top: 2,
+                                  left: -5,
+                                  position: 'relative',
+                                }}
+                              />
+                              <Timer.Hours
+                                formatValue={(value) =>
+                                  `${numeral(value).format('00')} : `}
+                              />
+                              <Timer.Minutes
+                                formatValue={(value) =>
+                                  `${numeral(value).format('00')} : `}
+                              />
+                              <Timer.Seconds
+                                formatValue={(value) =>
+                                  `${numeral(value).format('00')}`}
+                              />
 
-                                {/* {!this.state.recording && (
+                              {/* {!this.state.recording && (
                       <IconButton
                         style={{ padding: 0, top: -1, right: -6 }}
                         onClick={() => {
@@ -703,13 +744,13 @@ class Main extends React.Component {
                         <Pause />
                       </IconButton>
                     )} */}
-                              </React.Fragment>
-                            )
-                          }}
-                        </Timer>
-                      </h5>
-                    </GridItem>
-                  ) : null
+                            </React.Fragment>
+                          )
+                        }}
+                      </Timer>
+                    </h5>
+                  </GridItem>
+                ) : null
               }}
             </Authorized>
             {clinicSettings.showTotalInvoiceAmtInConsultation ? (
@@ -753,14 +794,14 @@ class Main extends React.Component {
                     'IN CONS',
                     'WAITING',
                   ].includes(visit.visitStatus) && (
-                      <ProgressButton
-                        onClick={this.pauseConsultation}
-                        color='info'
-                        icon={null}
-                      >
-                        Pause
-                      </ProgressButton>
-                    )}
+                    <ProgressButton
+                      onClick={this.pauseConsultation}
+                      color='info'
+                      icon={null}
+                    >
+                      Pause
+                    </ProgressButton>
+                  )}
                   {visit.visitStatus === 'PAUSED' && (
                     <ProgressButton
                       onClick={this.resumeConsultation}
@@ -926,16 +967,17 @@ class Main extends React.Component {
       disabled,
       ...resetProps
     } = this.props
-    console.log(consultation)
-    const { entity, showSignOffModal, printData, onSignOffConfirm } = consultation
+    const {
+      entity,
+      showSignOffModal,
+      printData,
+      onSignOffConfirm,
+    } = consultation
     const { entity: vistEntity = {} } = visitRegistration
     // if (!vistEntity) return null
     const { visit = {} } = vistEntity
     // const { summary } = orders
     // const { adjustments, total, gst, totalWithGst } = summary
-    // console.log('values', values, this.props)
-    // console.log(currentLayout)
-    console.log(printData)
     const matches = {
       rights:
         rights === 'enable' && visit.visitStatus === 'PAUSED'

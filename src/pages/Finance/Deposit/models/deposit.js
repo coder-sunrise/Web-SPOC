@@ -1,5 +1,6 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
+import { notification } from '@/components'
 import * as service from '../services'
 
 export default createListViewModel({
@@ -36,6 +37,12 @@ export default createListViewModel({
       *updateDeposit ({ payload }, { call, put }) {
         const response = yield call(service.upsertDeposit, payload)
         return response
+      },
+      *deleteTransaction ({ payload }, { call, put }) {
+        const result = yield call(service.deleteTransaction, payload)
+        if (result === 204) {
+          notification.success({ message: 'Deleted' })
+        }
       },
     },
     reducers: {

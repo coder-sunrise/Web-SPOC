@@ -42,6 +42,7 @@ const VisitListing = ({ reportDatas, classes }) => {
   let VisitListingColumns = [
     { name: 'queueNo', title: 'Queue No.' },
     { name: 'patientName', title: 'Patient Name' },
+    { name: 'patientReferenceNo', title: 'Ref No.' },
     { name: 'doctorName', title: 'Doctor' },
     { name: 'timeIn', title: 'Time In' },
     { name: 'timeOut', title: 'Time Out' },
@@ -59,6 +60,7 @@ const VisitListing = ({ reportDatas, classes }) => {
   let VisitListingColumnExtension = [
     { columnName: 'queueNo', width: 80, sortingEnabled: false },
     { columnName: 'patientName', width: 180, sortingEnabled: false },
+    { columnName: 'patientReferenceNo', width: 100, sortingEnabled: false },
     { columnName: 'doctorName', width: 180, sortingEnabled: false },
     { columnName: 'timeIn', width: 80, sortingEnabled: false },
     { columnName: 'timeOut', width: 80, sortingEnabled: false },
@@ -144,16 +146,28 @@ const VisitListing = ({ reportDatas, classes }) => {
   const visitListingRow = (p) => {
     const { row, children } = p
     if (row.countNumber === 1) {
-      const newchildren = children.map((item, index) => (index < children.length - 5 || index > children.length - 4) ? {
-        ...children[index],
-        props: {
-          ...children[index].props,
-          rowSpan: row.rowspan,
-        },
-      } : item)
+      const newchildren = children.map(
+        (item, index) =>
+          index < children.length - 5 || index > children.length - 4
+            ? {
+                ...children[index],
+                props: {
+                  ...children[index].props,
+                  rowSpan: row.rowspan,
+                },
+              }
+            : item,
+      )
       return <Table.Row {...p}>{newchildren}</Table.Row>
     }
-    return <Table.Row className={classes.subRow}>{[children[children.length - 5], children[children.length - 4]]} </Table.Row>
+    return (
+      <Table.Row className={classes.subRow}>
+        {[
+          children[children.length - 5],
+          children[children.length - 4],
+        ]}{' '}
+      </Table.Row>
+    )
   }
 
   return (
