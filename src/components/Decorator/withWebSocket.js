@@ -31,6 +31,7 @@ const withWebSocket = () => (Component) => {
         scanResults: [],
         isWsConnected: false,
         loading: false,
+        loadingText: 'Scanning...',
       }
       // this.isWsConnected = false
       this.wsConnection = null
@@ -119,8 +120,8 @@ const withWebSocket = () => (Component) => {
       if (message && message.data) {
         const { data } = message
         const returnMessage = JSON.parse(data)
-        const { MessageType, Data } = returnMessage
-        console.log(returnMessage)
+        const { MessageType, Status, Data } = returnMessage
+        // console.log(returnMessage)
 
         if (MessageType === WebSocketMessageType.Scan) {
           this.setState((preState) => ({
@@ -132,16 +133,20 @@ const withWebSocket = () => (Component) => {
                 name: moment().format('YYYYMMDD_hhmmss'),
               },
             ],
-            loading: false,
           }))
         } else if (MessageType === WebSocketMessageType.ScanCompleted) {
           this.setState({ loading: false })
+          if (Status !== 'Success') {
+            notification.error({
+              message: Data,
+            })
+          }
         }
       }
     }
 
     handleScaning = async (params) => {
-      console.log('handleScaning', params)
+      // console.log('handleScaning', params)
       let jsonStr = JSON.stringify({
         MessageType: WebSocketMessageType.Scan,
         Message: JSON.stringify(params),
@@ -173,6 +178,11 @@ const withWebSocket = () => (Component) => {
       }))
     }
 
+    handleUploading = (imgDatas) => {
+      const { onUploading } = this.props
+      if (onUploading) onUploading(imgDatas)
+    }
+
     connectionAsync = async (socket, timeout = 1000) => {
       const isOpened = () => socket.readyState === WebSocket.OPEN
 
@@ -202,7 +212,13 @@ const withWebSocket = () => (Component) => {
     }
 
     render () {
-      const { pendingJob = [], scanResults = [], loading } = this.state
+      const {
+        pendingJob = [],
+        scanResults = [],
+        loading,
+        loadingText,
+      } = this.state
+      const { isEnableScanner } = this.props
 
       return (
         <React.Fragment>
@@ -212,53 +228,56 @@ const withWebSocket = () => (Component) => {
             handleOpenScanner={this.toggleModal}
             sendingJob={pendingJob.length > 0}
           />
-          <CommonModal
-            open={this.state.showScanner}
-            onClose={this.handleCloseScanner}
-            title='Scan'
-            maxWidth='lg'
-            minHeight={500}
-            keepMounted={false}
-          >
-            <div style={{ position: 'relative' }}>
-              <div
-                style={
-                  loading ? (
-                    {
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: '100%',
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      zIndex: 1200,
-                      '& h4': {
-                        fontWeight: 500,
-                      },
-                    }
-                  ) : (
-                    { display: 'none' }
-                  )
-                }
-              >
-                <CircularProgress />
-                <Primary>
-                  <h4>Scaning...</h4>
-                </Primary>
+          {isEnableScanner && (
+            <CommonModal
+              open={this.state.showScanner}
+              onClose={this.handleCloseScanner}
+              title='Scan'
+              maxWidth='lg'
+              minHeight={500}
+              keepMounted={false}
+            >
+              <div style={{ position: 'relative' }}>
+                <div
+                  style={
+                    loading ? (
+                      {
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        zIndex: 1200,
+                        '& h4': {
+                          fontWeight: 500,
+                        },
+                      }
+                    ) : (
+                      { display: 'none' }
+                    )
+                  }
+                >
+                  <CircularProgress />
+                  <Primary>
+                    <h4>{loadingText}</h4>
+                  </Primary>
+                </div>
+                <div style={loading ? { opacity: 0.4 } : {}}>
+                  <Scanner
+                    onScaning={this.handleScaning}
+                    onDeleteItem={this.handleDeleteItem}
+                    onUpdateName={this.handleUpdateName}
+                    onUploading={this.handleUploading}
+                    imageDatas={scanResults}
+                  />
+                </div>
               </div>
-              <div style={loading ? { opacity: 0.4 } : {}}>
-                <Scanner
-                  handleScaning={this.handleScaning}
-                  handleDeleteItem={this.handleDeleteItem}
-                  handleUpdateName={this.handleUpdateName}
-                  imageDatas={scanResults}
-                />
-              </div>
-            </div>
-          </CommonModal>
+            </CommonModal>
+          )}
         </React.Fragment>
       )
     }

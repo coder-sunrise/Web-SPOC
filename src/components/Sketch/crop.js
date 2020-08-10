@@ -67,11 +67,13 @@ class Crop extends FabricCanvasTool {
     this.isDown = false
     let cropped = new Image()
     const border = this._width
+    const zoom = canvas.getZoom()
+
     cropped.src = canvas.toDataURL({
-      left: this.rect.left + border,
-      top: this.rect.top + border,
-      width: this.rect.width - border,
-      height: this.rect.height - border,
+      left: this.rect.left * zoom + border,
+      top: this.rect.top * zoom + border,
+      width: this.rect.width * zoom - border,
+      height: this.rect.height * zoom - border,
     })
     cropped.onload = function () {
       canvas.clear()

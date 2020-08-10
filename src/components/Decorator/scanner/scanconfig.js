@@ -1,22 +1,15 @@
 import React, { useState } from 'react'
-
-import { ImageSearch } from '@material-ui/icons'
+import _ from 'lodash'
+import { ImageSearch, CloudUpload } from '@material-ui/icons'
 
 import {
   GridContainer,
   GridItem,
-  CardContainer,
-  Accordion,
-  withFormikExtend,
-  IconButton,
   Button,
-  Tooltip,
-  Tabs,
-  Popconfirm,
+  ProgressButton,
   Select,
   CheckboxGroup,
   RadioButtonGroup,
-  FastField,
   TextField,
   Checkbox,
 } from '@/components'
@@ -39,7 +32,12 @@ const ResolutionOptions = [
   { id: '200', name: '200' },
   { id: '300', name: '300' },
 ]
-export const Scanconfig = ({ handleScaning }) => {
+export const Scanconfig = ({
+  onScaning,
+  onUploading,
+  onSizeChanged,
+  canUploading = false,
+}) => {
   const defaultPixelType = PixelTypeOptions.find((f) => f.value === 'Color')
   const [
     pixelType,
@@ -81,7 +79,7 @@ export const Scanconfig = ({ handleScaning }) => {
   ] = useState('W')
 
   const onScanningClick = () => {
-    handleScaning({
+    onScaning({
       autoFeeder,
       duplex,
       resolution,
@@ -92,6 +90,11 @@ export const Scanconfig = ({ handleScaning }) => {
       scaleHeight,
     })
   }
+  const debounceOnUploading = _.debounce(onUploading, 500, {
+    leading: true,
+    trailing: false,
+  })
+
   return (
     <React.Fragment>
       <GridItem xs={12}>
@@ -144,6 +147,7 @@ export const Scanconfig = ({ handleScaning }) => {
           checked={isScale}
           onChange={(e) => {
             setIsScale(e.target.value)
+            setTimeout(onSizeChanged, 100)
           }}
         />
       </GridItem>
@@ -171,7 +175,7 @@ export const Scanconfig = ({ handleScaning }) => {
                     setScaleWidth(e.target.value)
                   }}
                 />
-                <div style={{ width: 30, marginTop: 30, textAlign: 'center' }}>
+                <div style={{ width: 60, marginTop: 30, textAlign: 'center' }}>
                   x
                 </div>
                 <TextField
@@ -188,11 +192,23 @@ export const Scanconfig = ({ handleScaning }) => {
         </React.Fragment>
       )}
 
-      <GridItem xs={12} style={{ marginTop: 20 }}>
-        <Button onClick={onScanningClick} color='primary'>
-          <ImageSearch /> Scan
-        </Button>
-      </GridItem>
+      <GridContainer>
+        <GridItem xs={6}>
+          <Button onClick={onScanningClick} color='primary'>
+            <ImageSearch /> Scan
+          </Button>
+        </GridItem>
+        <GridItem xs={6}>
+          <ProgressButton
+            onClick={debounceOnUploading}
+            disabled={!canUploading}
+            color='primary'
+            icon={<CloudUpload />}
+          >
+            Upload
+          </ProgressButton>
+        </GridItem>
+      </GridContainer>
     </React.Fragment>
   )
 }

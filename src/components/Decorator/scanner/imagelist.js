@@ -42,7 +42,7 @@ export const ImageList = ({ imgRows = [], handleCommitChanges }) => {
               arrow
               placement='left-end'
               onOpen={(e) => setSrc(e, row.uid)}
-              title={<img alt={row.name} width={200} height={200} />}
+              title={<img alt={row.name} width={300} height={300} />}
             >
               <div>
                 <img
@@ -66,27 +66,25 @@ export const ImageList = ({ imgRows = [], handleCommitChanges }) => {
   }
 
   return (
-    <GridItem xs={12} style={{ padding: 0, marginTop: 20 }}>
-      <EditableTableGrid
-        rows={imgRows}
-        getRowId={(r) => r.uid}
-        // extraColumn={[]}
-        FuncProps={{
-          edit: true,
-          pager: false,
-        }}
-        EditingProps={{
-          showAddCommand: false,
-          showEditCommand: true,
-          showDeleteCommand: true,
-          deleteConfirm: {
-            show: true,
-            title: 'Are you sure you want to delete this row?',
-          },
-          onCommitChanges: handleCommitChanges,
-        }}
-        {...tableParas}
-      />
-    </GridItem>
+    <EditableTableGrid
+      rows={imgRows}
+      getRowId={(r) => r.uid}
+      // extraColumn={[]}
+      FuncProps={{
+        edit: true,
+        pager: false,
+      }}
+      EditingProps={{
+        showAddCommand: false,
+        showEditCommand: true,
+        showDeleteCommand: true,
+        deleteConfirm: {
+          show: true,
+          title: 'Are you sure you want to delete this row?',
+        },
+        onCommitChanges: handleCommitChanges,
+      }}
+      {...tableParas}
+    />
   )
 }

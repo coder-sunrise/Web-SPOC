@@ -61,7 +61,7 @@ export const leftTools = ({ currentTool }) => {
     },
     {
       id: ToolTypes.Download,
-      title: 'Download',
+      title: 'Download with original size',
       icon: <SaveAlt style={{ color: '#191919' }} />,
     },
   ]

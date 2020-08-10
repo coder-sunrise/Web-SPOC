@@ -29,7 +29,7 @@ import { leftTools, ToolTypes } from './variables'
 import { Scanconfig } from './scanconfig'
 import { ImageList } from './imagelist'
 
-const base64Prefix = 'data:image/jpeg;base64,'
+const base64Prefix = 'data:image/png;base64,'
 const thumbnailSize = { width: 100, height: 80 }
 
 const styles = (theme) => ({
@@ -43,6 +43,7 @@ const styles = (theme) => ({
     border: '1px solid #e8e8e8',
     width: '100%',
     height: '100%',
+    overflow: 'hidden',
   },
 })
 class Scanner extends Component {
@@ -52,6 +53,16 @@ class Scanner extends Component {
       tool: Tools.None,
     }
     this.sketchs = []
+    this._imagelistRef = React.createRef()
+  }
+
+  componentDidMount = () => {
+    window.addEventListener('resize', this._resize, false)
+    setTimeout(this._resize, 100)
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener('resize', this._resize)
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
@@ -62,14 +73,25 @@ class Scanner extends Component {
     }
   }
 
-  // shouldComponentUpdate (nextProps) {
-  //   const nextImages = nextProps.imageDatas || []
-  //   const thisImages = this.props.imageDatas || []
+  getContainerHeight = () => {
+    return window.innerHeight - 190
+  }
 
-  //   const shouldUpdate = nextImages.length !== thisImages.length
-  //   console.log(shouldUpdate)
-  //   return shouldUpdate
-  // }
+  _resize = (e) => {
+    if (this._imagelistRef.current) {
+      let current = $(this._imagelistRef.current)
+      let prev = current.prev()
+      const containerHeight = this.getContainerHeight()
+      // console.log(containerHeight, prev[0].offsetHeight)
+
+      let currentHeight = containerHeight - prev[0].offsetHeight - 20
+      const gridDiv = current.find('.medisys-edit-table>div')
+      if (gridDiv && gridDiv.length > 0) {
+        gridDiv.eq(0).height(currentHeight)
+        gridDiv[0].style.overflow = 'auto'
+      }
+    }
+  }
 
   scaleToViewWH = (sketch) => {
     const canvas = sketch._fc
@@ -110,7 +132,6 @@ class Scanner extends Component {
       const selectedImage = imageDatas.find((i) => i.uid === activeKey)
       if (selectedImage && selectedImage.image) {
         const base64Data = `${base64Prefix}${selectedImage.image}`
-
         this.sketchs[activeKey].setBackgroundFromData(
           base64Data,
           true,
@@ -135,7 +156,7 @@ class Scanner extends Component {
         image.src = imageSource
         image.onload = () => {
           const thumbnail = getThumbnail(image, size)
-          thumbnailData = thumbnail.toDataURL(`image/jpeg`)
+          thumbnailData = thumbnail.toDataURL(`image/png`)
 
           resolve()
         }
@@ -147,10 +168,15 @@ class Scanner extends Component {
   }
 
   handelConfirmDelete = (uid) => {
-    const { imageDatas = [], handleDeleteItem } = this.props
+    const { imageDatas = [], onDeleteItem } = this.props
     {
       const item = imageDatas.find((f) => f.uid === uid)
-      if (
+      const activeItems = imageDatas.filter((f) => f.uid !== uid)
+      if (activeItems.length > 0 && this.state.activeKey === uid) {
+        this.setState({
+          activeKey: activeItems[activeItems.length - 1].uid,
+        })
+      } else if (
         imageDatas.length >= 2 &&
         imageDatas.indexOf(item) === imageDatas.length - 1
       ) {
@@ -159,7 +185,7 @@ class Scanner extends Component {
         })
       }
       delete this.sketchs[uid]
-      handleDeleteItem(uid)
+      onDeleteItem(uid)
     }
   }
 
@@ -168,7 +194,7 @@ class Scanner extends Component {
       if (deleted && r.isDeleted === true) {
         this.handelConfirmDelete(r.uid)
       } else {
-        this.props.handleUpdateName(r)
+        this.props.onUpdateName(r)
       }
     })
   }
@@ -181,8 +207,8 @@ class Scanner extends Component {
     } else {
       const base64Data = `${base64Prefix}${image}`
       this.generateThumbnail(base64Data, {
-        width: 200,
-        height: 200,
+        width: 300,
+        height: 300,
       }).then((thumbnail) => {
         this.updateThumbnailToElement(uid, thumbnail)
       })
@@ -192,8 +218,8 @@ class Scanner extends Component {
   updateThumbnail = (sketch, uid) => {
     const imgData = sketch.exportToImageDataUrl()
     this.generateThumbnail(imgData, {
-      width: 200,
-      height: 200,
+      width: 300,
+      height: 300,
     }).then((thumbnail) => {
       this.updateThumbnailToElement(uid, thumbnail)
     })
@@ -254,7 +280,7 @@ class Scanner extends Component {
             ref={(c) => {
               if (c) {
                 if (!this.sketchs[uid]) {
-                  console.log('ref-->', c)
+                  // console.log('ref-->', c)
                   this.sketchs[uid] = c
                   this.setBackgroundFromData(uid)
                 }
@@ -357,8 +383,21 @@ class Scanner extends Component {
   }
 
   download = () => {
-    this.doChangeImages((selected) => {
+    this.doChangeImages((selected, obj) => {
+      const canvas = selected._fc
+      const origZoom = canvas.getZoom()
+      const origWidth = canvas.getWidth()
+      const origHeight = canvas.getHeight()
+
+      canvas.setZoom(1)
+      canvas.setWidth(obj.width)
+      canvas.setHeight(obj.height)
+
       selected.downloadImage()
+
+      canvas.setZoom(origZoom)
+      canvas.setWidth(origWidth)
+      canvas.setHeight(origHeight)
     })
   }
 
@@ -414,13 +453,38 @@ class Scanner extends Component {
     }
   }
 
+  handleUploading = async () => {
+    const { onUploading, imageDatas = [] } = this.props
+    const uploadImages = []
+    if (this.sketchs) {
+      // eslint-disable-next-line guard-for-in
+      for (let k in this.sketchs) {
+        const item = imageDatas.find((f) => f.uid === k)
+        const imgData = this.sketchs[k].exportToImageDataUrl()
+        const thumbnailData = await this.generateThumbnail(imgData)
+        uploadImages.push({
+          uid: k,
+          imgData: imgData.split(',')[1],
+          thumbnailData: thumbnailData.split(',')[1],
+          name: item.name,
+          fileExtension: '.png',
+        })
+      }
+    }
+    onUploading(uploadImages)
+  }
+
   render () {
-    const { classes, handleScaning, imageDatas = [] } = this.props
-    console.log('----------------------------------------render scanner')
+    const { classes, onScaning, imageDatas = [] } = this.props
+    // console.log('----------------------------------------render scanner')
     return (
-      <GridContainer style={{ minHeight: window.innerHeight - 250 }}>
+      <GridContainer style={{ height: this.getContainerHeight() }}>
         <GridItem xs={9} md={9}>
-          <div style={{ display: 'flex' }}>
+          <div
+            style={{
+              display: 'flex',
+            }}
+          >
             <ToggleButtonGroup
               exclusive
               size='small'
@@ -475,14 +539,22 @@ class Scanner extends Component {
             </div>
           </div>
         </GridItem>
-
-        <GridItem xs={3} md={3} style={{ paddingLeft: 40 }}>
+        <GridItem xs={3} md={3}>
           <React.Fragment>
-            <Scanconfig handleScaning={handleScaning} />
-            <ImageList
-              imgRows={imageDatas}
-              handleCommitChanges={this.handleCommitChanges}
-            />
+            <div>
+              <Scanconfig
+                onScaning={onScaning}
+                onUploading={this.handleUploading}
+                onSizeChanged={this._resize}
+                canUploading={imageDatas.length > 0}
+              />
+            </div>
+            <div ref={this._imagelistRef} style={{ marginTop: 20 }}>
+              <ImageList
+                imgRows={imageDatas}
+                handleCommitChanges={this.handleCommitChanges}
+              />
+            </div>
           </React.Fragment>
         </GridItem>
       </GridContainer>
