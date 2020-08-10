@@ -137,7 +137,6 @@ class CommonTableGrid extends PureComponent {
       FuncProps = {},
       columns = [],
       identifier,
-      columnExtensions = [],
     } = props
     // console.log(props)
     this.gridId = `view-${uniqueGid++}`
