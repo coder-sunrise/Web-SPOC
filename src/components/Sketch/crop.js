@@ -80,6 +80,9 @@ class Crop extends FabricCanvasTool {
       let image = new fabric.Image(cropped)
       image.setCoords()
       canvas.add(image)
+      canvas.setZoom(1)
+      canvas.setWidth(image.width)
+      canvas.setHeight(image.height)
       canvas.renderAll()
     }
   }

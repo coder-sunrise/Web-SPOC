@@ -12,6 +12,7 @@ import {
   RadioButtonGroup,
   TextField,
   Checkbox,
+  NumberInput,
 } from '@/components'
 
 const PixelTypeOptions = [
@@ -26,7 +27,7 @@ const ScaleByOptions = [
   { id: 'WH', name: 'Fixed Width&Height' },
 ]
 
-const ResolutionOptions = [
+const DpiOptions = [
   { id: '100', name: '100' },
   { id: '150', name: '150' },
   { id: '200', name: '200' },
@@ -45,8 +46,8 @@ export const Scanconfig = ({
   ] = useState(defaultPixelType)
 
   const [
-    resolution,
-    setResolution,
+    dpi,
+    setDpi,
   ] = useState('300')
 
   const [
@@ -67,12 +68,12 @@ export const Scanconfig = ({
   const [
     scaleWidth,
     setScaleWidth,
-  ] = useState(null)
+  ] = useState(undefined)
 
   const [
     scaleHeight,
     setScaleHeight,
-  ] = useState(null)
+  ] = useState(undefined)
   const [
     scaleBy,
     setScaleBy,
@@ -82,7 +83,7 @@ export const Scanconfig = ({
     onScaning({
       autoFeeder,
       duplex,
-      resolution,
+      dpi,
       pixelType: pixelType.value,
       isScale,
       scaleBy,
@@ -125,19 +126,19 @@ export const Scanconfig = ({
             const selected = PixelTypeOptions.find((f) => f.value === v)
             setPixelType(selected)
             if (v === 'BW') {
-              setResolution('200')
-            } else setResolution('300')
+              setDpi('200')
+            } else setDpi('300')
           }}
         />
       </GridItem>
       <GridItem xs={12}>
         <Select
-          label='Resolution'
+          label='Dpi'
           valueField='id'
-          value={resolution}
-          options={ResolutionOptions}
+          value={dpi}
+          options={DpiOptions}
           onChange={(v, opts) => {
-            setResolution(v)
+            setDpi(v)
           }}
         />
       </GridItem>
@@ -167,10 +168,11 @@ export const Scanconfig = ({
           <GridItem xs={12}>
             <React.Fragment>
               <div style={{ display: 'flex' }}>
-                <TextField
+                <NumberInput
                   label='Width'
-                  disabled={!isScale}
+                  disabled={!isScale || (scaleBy !== 'W' && scaleBy !== 'WH')}
                   value={scaleWidth}
+                  min={1}
                   onChange={(e) => {
                     setScaleWidth(e.target.value)
                   }}
@@ -178,10 +180,11 @@ export const Scanconfig = ({
                 <div style={{ width: 60, marginTop: 30, textAlign: 'center' }}>
                   x
                 </div>
-                <TextField
+                <NumberInput
                   label='Height'
-                  disabled={!isScale}
+                  disabled={!isScale || (scaleBy !== 'H' && scaleBy !== 'WH')}
                   value={scaleHeight}
+                  min={1}
                   onChange={(e) => {
                     setScaleHeight(e.target.value)
                   }}

@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import $ from 'jquery'
 import { connect } from 'dva'
 import classnames from 'classnames'
-import { withStyles, Fab } from '@material-ui/core'
+import { withStyles, Fab, ClickAwayListener } from '@material-ui/core'
 import PropTypes from 'prop-types'
 import {
   GridContainer,
@@ -16,18 +16,27 @@ import {
   Tools,
   Tooltip,
   Tabs,
+  Popper,
+  Popover,
   Popconfirm,
+  NumberInput,
 } from '@/components'
+
 import { roundUp } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup'
 import ToggleButton from '@material-ui/lab/ToggleButton'
-import { Delete, ImageSearch } from '@material-ui/icons'
+import {
+  Delete,
+  ImageSearch,
+  AspectRatio as AspectRatioIcon,
+} from '@material-ui/icons'
 
 import { getThumbnail } from '@/components/_medisys/AttachmentWithThumbnail/utils'
 import { leftTools, ToolTypes } from './variables'
 import { Scanconfig } from './scanconfig'
 import { ImageList } from './imagelist'
+import ResizeImage from './resize'
 
 const base64Prefix = 'data:image/png;base64,'
 const thumbnailSize = { width: 100, height: 80 }
@@ -51,9 +60,11 @@ class Scanner extends Component {
     super(props)
     this.state = {
       tool: Tools.None,
+      resize: { width: undefined, height: undefined },
     }
     this.sketchs = []
     this._imagelistRef = React.createRef()
+    this._tabRef = React.createRef()
   }
 
   componentDidMount = () => {
@@ -95,14 +106,16 @@ class Scanner extends Component {
 
   scaleToViewWH = (sketch) => {
     const canvas = sketch._fc
-    const container = sketch._container
-    let { offsetWidth, clientHeight } = container
+    const container = $(this._tabRef.current) // sketch._container
+    let { clientWidth, clientHeight } = container[0]
+    clientHeight -= 120
+
     const currentZoom = canvas.getZoom()
 
     const canvasWidth = canvas.getWidth()
     const canvasHeight = canvas.getHeight()
 
-    const sw = offsetWidth / canvasWidth
+    const sw = clientWidth / canvasWidth
     const sh = clientHeight / canvasHeight
 
     let newZoom = Math.min(sw, sh)
@@ -111,18 +124,19 @@ class Scanner extends Component {
     const zoomHeight = roundUp(canvasHeight * zoomBy, 6)
     const zoomWidth = roundUp(canvasWidth * zoomBy, 6)
 
+    // console.log({
+    //   currentZoom,
+    //   newZoom,
+    //   canvasHeight,
+    //   canvasWidth,
+    //   clientWidth,
+    //   clientHeight,
+    // })
+
     canvas.setHeight(zoomHeight)
     canvas.setWidth(zoomWidth)
 
     canvas.setZoom(newZoom)
-
-    // console.log({
-    //   offsetWidth,
-    //   clientHeight,
-    //   canvasWidth,
-    //   canvasHeight,
-    //   currentZoom,
-    // })
   }
 
   setBackgroundFromData = (activeKey) => {
@@ -389,10 +403,7 @@ class Scanner extends Component {
       const origWidth = canvas.getWidth()
       const origHeight = canvas.getHeight()
 
-      canvas.setZoom(1)
-      canvas.setWidth(obj.width)
-      canvas.setHeight(obj.height)
-
+      this.FullScreen()
       selected.downloadImage()
 
       canvas.setZoom(origZoom)
@@ -422,6 +433,33 @@ class Scanner extends Component {
     })
   }
 
+  FullScreen = () => {
+    this.doChangeImages((selected, obj) => {
+      let canvas = selected._fc
+      const currentZoom = canvas.getZoom()
+      const newZoom = 1
+
+      const height = canvas.getHeight()
+      const width = canvas.getWidth()
+      const zoomBy = roundUp(newZoom / currentZoom, 6)
+
+      const zoomHeight = roundUp(height * zoomBy, 6)
+      const zoomWidth = roundUp(width * zoomBy, 6)
+
+      canvas.setHeight(zoomHeight)
+      canvas.setWidth(zoomWidth)
+
+      canvas.setZoom(1)
+    })
+  }
+
+  FitOnScreen = () => {
+    this.doChangeImages((selected, obj) => {
+      this.FullScreen()
+      this.scaleToViewWH(selected)
+    })
+  }
+
   handleToolClick = (toolId) => {
     switch (toolId) {
       case ToolTypes.ZoomIn:
@@ -446,6 +484,12 @@ class Scanner extends Component {
         break
       case ToolTypes.Download:
         this.download()
+        break
+      case ToolTypes.Full:
+        this.FullScreen()
+        break
+      case ToolTypes.Fit:
+        this.FitOnScreen()
         break
 
       default:
@@ -472,6 +516,136 @@ class Scanner extends Component {
       }
     }
     onUploading(uploadImages)
+  }
+
+  scaleWH = (w = 0, h = 0, aspectRatio) => {
+    let towidth = w
+    let toheight = h
+    this.doChangeImages((selected, obj) => {
+      let rmaxhw_d1w = w > 0 ? obj.width / w : 0
+      let rmaxhw_d2h = h > 0 ? obj.height / h : 0
+
+      if (rmaxhw_d1w > rmaxhw_d2h) {
+        if (rmaxhw_d1w <= 1) {
+          towidth = obj.width
+          h = obj.height
+        } else {
+          towidth = w
+          toheight = obj.height * w / obj.width
+        }
+      } else if (rmaxhw_d2h <= 1) {
+        towidth = obj.width
+        h = obj.height
+      } else {
+        toheight = h
+        towidth = obj.width * h / obj.height
+      }
+    })
+    return { width: towidth, height: toheight }
+  }
+
+  getResizeComponent = (tool) => {
+    const { id, title, icon } = tool
+    const { resize: { width, height, aspectRatio } } = this.state
+
+    return (
+      <Popover
+        icon={null}
+        content={
+          <GridContainer style={{ width: 300 }}>
+            <GridItem xs={12} md={12}>
+              <div style={{ display: 'flex' }}>
+                <NumberInput
+                  label='Width'
+                  value={width}
+                  min={1}
+                  precision={0}
+                  onChange={(e) => {
+                    console.log(e.target.value)
+                    this.setState((pre) => ({
+                      resize: { ...pre.resize, width: e.target.value },
+                    }))
+                  }}
+                />
+                <div style={{ width: 60, marginTop: 30, textAlign: 'center' }}>
+                  x
+                </div>
+                <NumberInput
+                  label='Height'
+                  value={height}
+                  min={1}
+                  precision={0}
+                  onChange={(e) => {
+                    this.setState((pre) => ({
+                      resize: { ...pre.resize, height: e.target.value },
+                    }))
+                  }}
+                />
+                <Tooltip title='Aspect Ratio'>
+                  <ToggleButton
+                    style={{ width: 24, height: 24, marginTop: 25 }}
+                    onChange={(e) => {
+                      let aftWH = this.scaleWH(width, height)
+                      console.log(aftWH)
+                      this.setState((pre) => ({
+                        resize: {
+                          ...pre.resize,
+                          width: aftWH.width,
+                          height: aftWH.height,
+                        },
+                      }))
+                    }}
+                  >
+                    <AspectRatioIcon color='primary' />
+                  </ToggleButton>
+                </Tooltip>
+              </div>
+            </GridItem>
+            <GridItem xs={12} md={12}>
+              <div style={{ marginTop: 20, textAlign: 'right' }}>
+                <Button color='danger'>Cancel</Button>
+                <Button
+                  color='primary'
+                  onClick={() => {
+                    console.log('confirm resize')
+                  }}
+                >
+                  Confirm
+                </Button>
+              </div>
+            </GridItem>
+          </GridContainer>
+        }
+        title='Resize'
+        trigger='click'
+        placement='right'
+        visible={this.state.openResize}
+        onVisibleChange={(e) => {
+          if (e && this.state.activeKey) {
+            this.doChangeImages((selected, obj) => {
+              console.log(obj.width, obj.height)
+              this.setState({
+                openResize: e,
+                resize: {
+                  width: obj.width,
+                  height: obj.height,
+                  aspectRatio: false,
+                },
+              })
+            })
+          } else {
+            this.setState({ openResize: e })
+          }
+        }}
+        onClick={() => {
+          this.setState({ openResize: true })
+        }}
+      >
+        <Tooltip title={title}>
+          <ToggleButton key={id}>{icon}</ToggleButton>
+        </Tooltip>
+      </Popover>
+    )
   }
 
   render () {
@@ -506,6 +680,8 @@ class Scanner extends Component {
             >
               {leftTools({ currentTool: this.state.tool }).map((t) => {
                 const { id, title, icon } = t
+                if (id === ToolTypes.Resize) return this.getResizeComponent(t)
+
                 return (
                   <Tooltip title={title}>
                     <ToggleButton
@@ -521,7 +697,7 @@ class Scanner extends Component {
               })}
             </ToggleButtonGroup>
 
-            <div className={classes.tabArea}>
+            <div ref={this._tabRef} className={classes.tabArea}>
               <Tabs
                 activeKey={this.state.activeKey}
                 type='line'

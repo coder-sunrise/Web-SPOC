@@ -9,6 +9,7 @@ import {
   ZoomOut as ZoomOutIcon,
   Fullscreen as FullscreenIcon,
   FullscreenExit as FullscreenExitIcon,
+  AspectRatio as AspectRatioIcon,
 } from '@material-ui/icons'
 import { Tools } from '@/components'
 
@@ -20,6 +21,9 @@ export const ToolTypes = {
   Mirror: 6,
   Crop: 7,
   Download: 8,
+  Full: 9,
+  Fit: 10,
+  Resize: 11,
 }
 
 export const leftTools = ({ currentTool }) => {
@@ -33,6 +37,16 @@ export const leftTools = ({ currentTool }) => {
       id: ToolTypes.ZoomOut,
       title: 'Zoom Out',
       icon: <ZoomOutIcon style={{ color: '#191919' }} />,
+    },
+    {
+      id: ToolTypes.Full,
+      title: '1:1',
+      icon: <FullscreenIcon style={{ color: '#191919' }} />,
+    },
+    {
+      id: ToolTypes.Fit,
+      title: 'Fit On Screen',
+      icon: <FullscreenExitIcon style={{ color: '#191919' }} />,
     },
     {
       id: ToolTypes.RotateLeft,
@@ -58,6 +72,11 @@ export const leftTools = ({ currentTool }) => {
           style={{ color: currentTool === Tools.Crop ? '' : '#191919' }}
         />
       ),
+    },
+    {
+      id: ToolTypes.Resize,
+      title: 'Resize',
+      icon: <AspectRatioIcon color='primary' style={{ color: '#191919' }} />,
     },
     {
       id: ToolTypes.Download,
