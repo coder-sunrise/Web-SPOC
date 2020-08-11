@@ -51,8 +51,21 @@ const FilterBar = ({
           </GridItem>
           <GridItem md={2}>
             <FastField
-              name='doctorID'
-              render={(args) => <DoctorProfileSelect {...args} />}
+              name='doctorIDs'
+              render={(args) => (
+                <DoctorProfileSelect
+                  mode='multiple'
+                  {...args}
+                  allValue={-99}
+                  allValueOption={{
+                    id: -99,
+                    clinicianProfile: {
+                      name: 'All',
+                    },
+                  }}
+                  labelField='clinicianProfile.name'
+                />
+              )}
             />
           </GridItem>
           <GridItem>
