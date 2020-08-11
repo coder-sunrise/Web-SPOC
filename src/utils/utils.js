@@ -961,7 +961,9 @@ const calculateGSTAdj = ({
   activeRows.forEach((r, index) => {
     if (index === activeRows.length - 1) {
       r[gstAmtField] += diff
-      r.totalAfterGST += diff
+      if (!isGSTInclusive) {
+        r.totalAfterGST += diff
+      }
     }
   })
 
