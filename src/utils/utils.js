@@ -944,7 +944,7 @@ const calculateGSTAdj = ({
   isGSTInclusive = false,
   activeRows,
   totalAfterAdj,
-  gstValue,
+  gstValue = 0,
   gstAmtField = 'gstAmount',
 }) => {
   let gst = roundTo(totalAfterAdj * gstValue / 100)
