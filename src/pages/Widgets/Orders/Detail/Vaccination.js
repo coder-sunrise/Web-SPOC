@@ -124,7 +124,7 @@ class Vaccination extends PureComponent {
       const { name: uomName = '' } = dispensingUOM
       let opt = {
         ...c,
-        displayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
+        combinDisplayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
           2,
         )} / ${uomName})`,
       }
@@ -391,7 +391,7 @@ class Vaccination extends PureComponent {
                     <CodeSelect
                       temp
                       label='Vaccination Name'
-                      labelField='displayValue'
+                      labelField='combinDisplayValue'
                       code='inventoryvaccination'
                       onChange={this.changeVaccination}
                       options={this.getVaccinationOptions()}

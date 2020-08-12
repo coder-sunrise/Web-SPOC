@@ -949,7 +949,7 @@ const calculateGSTAdj = ({
   isGSTInclusive = false,
   activeRows,
   totalAfterAdj,
-  gstValue,
+  gstValue = 0,
   gstAmtField = 'gstAmount',
 }) => {
   let gst = roundTo(totalAfterAdj * gstValue / 100)
@@ -966,7 +966,9 @@ const calculateGSTAdj = ({
   activeRows.forEach((r, index) => {
     if (index === activeRows.length - 1) {
       r[gstAmtField] += diff
-      r.totalAfterGST += diff
+      if (!isGSTInclusive) {
+        r.totalAfterGST += diff
+      }
     }
   })
 

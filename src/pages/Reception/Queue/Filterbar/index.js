@@ -32,6 +32,7 @@ const Filterbar = (props) => {
     dispatch,
     toggleNewPatient,
     handleSubmit,
+    setFieldValue,
     selfOnly,
     user,
     setSearch,
@@ -77,7 +78,12 @@ const Filterbar = (props) => {
                   <Search />
                 </Hidden>
               }
-              onClick={handleSubmit}
+              onClick={() => {
+                handleSubmit()
+                setFieldValue('search', '')
+                setSearch('')
+              }
+              }
               size='sm'
               submitKey='patientSearch/query'
             >
@@ -89,7 +95,12 @@ const Filterbar = (props) => {
               icon={null}
               color='primary'
               size='sm'
-              onClick={toggleNewPatient}
+              onClick={() => {
+                toggleNewPatient()
+                setFieldValue('search', '')
+                setSearch('')
+              }
+              }
               disabled={loading.global}
             >
               <Hidden mdDown>

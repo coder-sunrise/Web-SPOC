@@ -107,7 +107,7 @@ class Consumable extends PureComponent {
       const { name: uomName = '' } = uom
       let opt = {
         ...c,
-        displayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
+        combinDisplayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
           2,
         )} / ${uomName})`,
       }
@@ -181,6 +181,17 @@ class Consumable extends PureComponent {
     })
   }
 
+  componentDidMount = async () => {
+    const { codetable, dispatch } = this.props
+    const { inventoryconsumable = [] } = codetable
+    if (inventoryconsumable.length <= 0) {
+      await dispatch({
+        type: 'codetable/fetchCodes',
+        payload: { code: 'inventoryconsumable' },
+      })
+    }
+  }
+
   UNSAFE_componentWillReceiveProps (nextProps) {
     if (nextProps.orders.type === this.props.type)
       if (
@@ -252,7 +263,7 @@ class Consumable extends PureComponent {
       <div>
         <GridContainer>
           <GridItem xs={6}>
-            <FastField
+            <Field
               name='inventoryConsumableFK'
               render={(args) => {
                 return (
@@ -263,8 +274,8 @@ class Consumable extends PureComponent {
                     <CodeSelect
                       temp
                       label='Consumable Name'
-                      code='inventoryconsumable'
-                      labelField='displayValue'
+                      // code='inventoryconsumable'
+                      labelField='combinDisplayValue'
                       onChange={this.changeConsumable}
                       options={this.getConsumableOptions()}
                       {...args}
