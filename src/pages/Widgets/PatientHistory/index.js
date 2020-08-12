@@ -1,5 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, { Component } from 'react'
+import { Tag } from 'antd'
 import $ from 'jquery'
 import { connect } from 'dva'
 import router from 'umi/router'
@@ -137,9 +138,11 @@ class PatientHistory extends Component {
     } else {
       selectedItems = storageItems.filter((i) => activedItems.includes(i))
     }
+    const activeHistoryTags = this.getActiveHistoryTags()
     this.state = {
       selectedItems,
       selectedData: '',
+      selectTag: activeHistoryTags.length > 0 ? activeHistoryTags[0].value : '',
     }
     localStorage.setItem('patientHistoryWidgets', JSON.stringify(selectedItems))
   }
@@ -165,6 +168,22 @@ class PatientHistory extends Component {
         selectedSubRow: '',
       },
     })
+  }
+
+  getActiveHistoryTags = () => {
+    const activeHistoryTags = WidgetConfig.historyTags.filter((o) => {
+      const enableAuthority = o.children.find((a) => {
+        const accessRight = Authorized.check(a)
+        if (!accessRight || accessRight.rights === 'hidden') return false
+        return true
+      })
+
+      if (enableAuthority) {
+        return true
+      }
+      return false
+    })
+    return activeHistoryTags
   }
 
   onSelectChange = (val) => {
@@ -535,6 +554,27 @@ class PatientHistory extends Component {
     })
   }
 
+  getFilterBar = () => {
+    const { CheckableTag } = Tag
+    return (
+      <div style={{ margin: '10px 0' }}>
+        {this.getActiveHistoryTags().map((tag) => (
+          <CheckableTag
+            style={{ padding: '5px 10px' }}
+            key={tag.value}
+            checked={this.state.selectTag === tag.value}
+            onChange={(checked) => {
+              if (checked) this.setState({ selectTag: tag.value })
+              else this.setState({ selectTag: '' })
+            }}
+          >
+            {tag.name}
+          </CheckableTag>
+        ))}
+      </div>
+    )
+  }
+
   render () {
     const {
       theme,
@@ -580,6 +620,7 @@ class PatientHistory extends Component {
             [override.leftPanel]: !widget,
           })}
         >
+          {this.getFilterBar()}
           {sortedPatientHistory ? sortedPatientHistory.length >
           0 ? settings.showConsultationVersioning === false ||
           settings.showConsultationVersioning === undefined ? (

@@ -17,6 +17,63 @@ export const WIDGETS_ID = {
   TREATMENT: '10',
 }
 
+export const historyTags = [
+  {
+    value: 'Notes',
+    name: 'Notes',
+    authority: [
+      'queue.consultation.clinicalnotes.history',
+      'queue.consultation.clinicalnotes.chiefcomplaints',
+      'queue.consultation.clinicalnotes.clinicalnotes',
+      'queue.consultation.clinicalnotes.plan',
+      'queue.consultation.widgets.diagnosis',
+      'queue.consultation.clinicalnotes.intraoral',
+      'queue.consultation.clinicalnotes.extraoral',
+    ],
+    children: [
+      '3',
+      '2',
+      '1',
+      '11',
+      '12',
+      '4',
+      '5',
+    ],
+  },
+  {
+    value: 'Orders',
+    name: 'Orders',
+    authority: [
+      'queue.consultation.widgets.order',
+      'queue.consultation.widgets.dentalchart',
+    ],
+    children: [
+      '7',
+      '20',
+      '9',
+      '10',
+      '8',
+    ],
+  },
+  {
+    value: 'ConsultationDocuments',
+    name: 'Consultation Documents',
+    authority: [
+      'queue.consultation.widgets.consultationdocument',
+      'queue.consultation.widgets.eyevisualacuity',
+      'queue.consultation.widgets.eyerefractionform',
+      'queue.consultation.widgets.eyeexaminationform',
+      'queue.consultation.widgets.forms',
+    ],
+    children: [
+      '13',
+      '11',
+      '12',
+      '14',
+    ],
+  },
+]
+
 export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
   {
     id: '3',
