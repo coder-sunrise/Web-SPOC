@@ -235,6 +235,7 @@ const withWebSocket = () => (Component) => {
               title='Scan'
               maxWidth='lg'
               minHeight={500}
+              bodyNoPadding
               keepMounted={false}
             >
               <div style={{ position: 'relative' }}>

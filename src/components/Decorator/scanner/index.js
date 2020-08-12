@@ -20,6 +20,7 @@ import {
   Popover,
   Popconfirm,
   NumberInput,
+  TextField,
 } from '@/components'
 
 import { roundUp } from '@/utils/utils'
@@ -36,7 +37,6 @@ import { getThumbnail } from '@/components/_medisys/AttachmentWithThumbnail/util
 import { leftTools, ToolTypes } from './variables'
 import { Scanconfig } from './scanconfig'
 import { ImageList } from './imagelist'
-import ResizeImage from './resize'
 
 const base64Prefix = 'data:image/png;base64,'
 const thumbnailSize = { width: 100, height: 80 }
@@ -85,7 +85,7 @@ class Scanner extends Component {
   }
 
   getContainerHeight = () => {
-    return window.innerHeight - 190
+    return window.innerHeight - 160 // 190
   }
 
   _resize = (e) => {
@@ -108,8 +108,11 @@ class Scanner extends Component {
     const canvas = sketch._fc
     const container = $(this._tabRef.current) // sketch._container
     let { clientWidth, clientHeight } = container[0]
-    clientHeight -= 120
+    clientHeight -= 170
+    this.scaleCavans(canvas, clientWidth, clientHeight)
+  }
 
+  scaleCavans = (canvas, clientWidth, clientHeight) => {
     const currentZoom = canvas.getZoom()
 
     const canvasWidth = canvas.getWidth()
@@ -124,19 +127,23 @@ class Scanner extends Component {
     const zoomHeight = roundUp(canvasHeight * zoomBy, 6)
     const zoomWidth = roundUp(canvasWidth * zoomBy, 6)
 
-    // console.log({
-    //   currentZoom,
-    //   newZoom,
-    //   canvasHeight,
-    //   canvasWidth,
-    //   clientWidth,
-    //   clientHeight,
-    // })
-
     canvas.setHeight(zoomHeight)
     canvas.setWidth(zoomWidth)
 
     canvas.setZoom(newZoom)
+
+    // console.log({
+    //   currentZoom,
+    //   newZoom,
+    //   clientWidth,
+    //   clientHeight,
+    //   zoomWidth,
+    //   zoomHeight,
+    //   canvasHeight,
+    //   canvasWidth,
+    //   canvasAftW: canvas.getWidth(),
+    //   canvasAftH: canvas.getHeight(),
+    // })
   }
 
   setBackgroundFromData = (activeKey) => {
@@ -170,7 +177,7 @@ class Scanner extends Component {
         image.src = imageSource
         image.onload = () => {
           const thumbnail = getThumbnail(image, size)
-          thumbnailData = thumbnail.toDataURL(`image/png`)
+          thumbnailData = thumbnail.toDataURL(`image/jpg`)
 
           resolve()
         }
@@ -201,16 +208,6 @@ class Scanner extends Component {
       delete this.sketchs[uid]
       onDeleteItem(uid)
     }
-  }
-
-  handleCommitChanges = ({ rows, deleted }) => {
-    rows.forEach((r) => {
-      if (deleted && r.isDeleted === true) {
-        this.handelConfirmDelete(r.uid)
-      } else {
-        this.props.onUpdateName(r)
-      }
-    })
   }
 
   renderThumbnailImg = (imageData) => {
@@ -245,91 +242,6 @@ class Scanner extends Component {
       const element = imgs[index]
       element.src = thumbnail
     }
-  }
-
-  getTabOptions = () => {
-    const { imageDatas = [] } = this.props
-    return imageDatas.reduce((p, cur) => {
-      const { uid, name } = cur
-      const opt = {
-        id: uid,
-        name: (
-          <React.Fragment>
-            {this.renderThumbnailImg(cur)}
-            <div
-              style={
-                this.state.activeKey !== uid ? { opacity: 0.4 } : thumbnailSize
-              }
-            >
-              <img uid={`${uid}`} alt='' style={thumbnailSize} />
-            </div>
-            <div onClick={(e) => e.stopPropagation()}>
-              <Popconfirm
-                title='Are you sure delete this item?'
-                onConfirm={() => {
-                  this.handelConfirmDelete(uid)
-                }}
-              >
-                <Tooltip title={`delete ${name}`}>
-                  <Button
-                    style={{
-                      position: 'absolute',
-                      left: thumbnailSize.width - 2,
-                      top: 5,
-                    }}
-                    justIcon
-                    size='sm'
-                    color='danger'
-                  >
-                    <Delete />
-                  </Button>
-                </Tooltip>
-              </Popconfirm>
-            </div>
-          </React.Fragment>
-        ),
-        content: (
-          <SketchField
-            name={`image-${uid}`}
-            ref={(c) => {
-              if (c) {
-                if (!this.sketchs[uid]) {
-                  // console.log('ref-->', c)
-                  this.sketchs[uid] = c
-                  this.setBackgroundFromData(uid)
-                }
-              }
-            }}
-            tool={this.state.tool}
-            lineWidth={1}
-            lineColor='blue'
-            fillColor='transparent'
-            backgroundColor='transparent'
-            forceValue
-            height={window.innerHeight - 300}
-            disableResize
-            style={{ overflow: 'auto' }}
-            canvasStyle={{ border: '1px solid #EDF3FF' }}
-            onDoubleClick={() => this.Zoom(0.2)}
-            onChange={(e) => {
-              if (
-                this.sketchs[uid]._selectedTool.getToolName() === Tools.Crop
-              ) {
-                this.setState({
-                  tool: Tools.None,
-                })
-                this.updateThumbnail(this.sketchs[uid], uid)
-              }
-            }}
-          />
-        ),
-      }
-
-      return [
-        ...p,
-        opt,
-      ]
-    }, [])
   }
 
   doChangeImages = (process) => {
@@ -449,6 +361,13 @@ class Scanner extends Component {
       canvas.setHeight(zoomHeight)
       canvas.setWidth(zoomWidth)
 
+      console.log('setfullscreen', {
+        zoomWidth,
+        zoomHeight,
+        canvasW: canvas.getWidth(),
+        canvasH: canvas.getHeight(),
+      })
+
       canvas.setZoom(1)
     })
   }
@@ -518,134 +437,174 @@ class Scanner extends Component {
     onUploading(uploadImages)
   }
 
-  scaleWH = (w = 0, h = 0, aspectRatio) => {
-    let towidth = w
-    let toheight = h
-    this.doChangeImages((selected, obj) => {
-      let rmaxhw_d1w = w > 0 ? obj.width / w : 0
-      let rmaxhw_d2h = h > 0 ? obj.height / h : 0
+  renderTabBar = (tabProps, defaultTabBar) => {
+    const { imageDatas = [] } = this.props
 
-      if (rmaxhw_d1w > rmaxhw_d2h) {
-        if (rmaxhw_d1w <= 1) {
-          towidth = obj.width
-          h = obj.height
-        } else {
-          towidth = w
-          toheight = obj.height * w / obj.width
-        }
-      } else if (rmaxhw_d2h <= 1) {
-        towidth = obj.width
-        h = obj.height
-      } else {
-        toheight = h
-        towidth = obj.width * h / obj.height
-      }
+    const tabInfo = []
+    tabProps.panels.forEach((item) => {
+      tabInfo.push({
+        key: item.key,
+        title: item.props.tab,
+      })
     })
-    return { width: towidth, height: toheight }
-  }
-
-  getResizeComponent = (tool) => {
-    const { id, title, icon } = tool
-    const { resize: { width, height, aspectRatio } } = this.state
 
     return (
-      <Popover
-        icon={null}
-        content={
-          <GridContainer style={{ width: 300 }}>
-            <GridItem xs={12} md={12}>
-              <div style={{ display: 'flex' }}>
-                <NumberInput
-                  label='Width'
-                  value={width}
-                  min={1}
-                  precision={0}
-                  onChange={(e) => {
-                    console.log(e.target.value)
-                    this.setState((pre) => ({
-                      resize: { ...pre.resize, width: e.target.value },
-                    }))
-                  }}
-                />
-                <div style={{ width: 60, marginTop: 30, textAlign: 'center' }}>
-                  x
-                </div>
-                <NumberInput
-                  label='Height'
-                  value={height}
-                  min={1}
-                  precision={0}
-                  onChange={(e) => {
-                    this.setState((pre) => ({
-                      resize: { ...pre.resize, height: e.target.value },
-                    }))
-                  }}
-                />
-                <Tooltip title='Aspect Ratio'>
-                  <ToggleButton
-                    style={{ width: 24, height: 24, marginTop: 25 }}
-                    onChange={(e) => {
-                      let aftWH = this.scaleWH(width, height)
-                      console.log(aftWH)
-                      this.setState((pre) => ({
-                        resize: {
-                          ...pre.resize,
-                          width: aftWH.width,
-                          height: aftWH.height,
-                        },
-                      }))
+      <div style={{ display: 'flex' }}>
+        {tabInfo.map((t) => {
+          let cur = imageDatas.find((f) => f.uid === t.key)
+          this.renderThumbnailImg(cur)
+          const { uid, name } = cur
+
+          return (
+            <div style={{ margin: 10 }}>
+              <div
+                onClick={() => this.setState({ activeKey: uid })}
+                style={
+                  this.state.activeKey !== uid ? (
+                    { opacity: 0.6 }
+                  ) : (
+                    thumbnailSize
+                  )
+                }
+              >
+                <img uid={`${uid}`} alt='' style={thumbnailSize} />
+                <Tooltip title={`delete ${name}`}>
+                  <Button
+                    style={{
+                      // position: 'absolute',
+                      textAlign: 'right',
+                      left: thumbnailSize.width - 2,
+                      top: 5,
+                    }}
+                    justIcon
+                    size='sm'
+                    color='danger'
+                    onClick={() => {
+                      this.handelConfirmDelete(uid)
                     }}
                   >
-                    <AspectRatioIcon color='primary' />
-                  </ToggleButton>
+                    <Delete />
+                  </Button>
                 </Tooltip>
               </div>
-            </GridItem>
-            <GridItem xs={12} md={12}>
-              <div style={{ marginTop: 20, textAlign: 'right' }}>
-                <Button color='danger'>Cancel</Button>
-                <Button
-                  color='primary'
-                  onClick={() => {
-                    console.log('confirm resize')
+
+              <div
+                onClick={(e) => {
+                  e.stopPropagation()
+                }}
+              >
+                <TextField
+                  value={name}
+                  multiline
+                  rowsMax={3}
+                  style={{ width: thumbnailSize.width, maxHeight: 50 }}
+                  maxLength={50}
+                  onChange={(e) => {
+                    this.props.onUpdateName({ ...cur, name: e.target.value })
                   }}
-                >
-                  Confirm
-                </Button>
+                />
               </div>
-            </GridItem>
-          </GridContainer>
-        }
-        title='Resize'
-        trigger='click'
-        placement='right'
-        visible={this.state.openResize}
-        onVisibleChange={(e) => {
-          if (e && this.state.activeKey) {
-            this.doChangeImages((selected, obj) => {
-              console.log(obj.width, obj.height)
-              this.setState({
-                openResize: e,
-                resize: {
-                  width: obj.width,
-                  height: obj.height,
-                  aspectRatio: false,
-                },
-              })
-            })
-          } else {
-            this.setState({ openResize: e })
-          }
-        }}
-        onClick={() => {
-          this.setState({ openResize: true })
-        }}
-      >
-        <Tooltip title={title}>
-          <ToggleButton key={id}>{icon}</ToggleButton>
-        </Tooltip>
-      </Popover>
+            </div>
+          )
+        })}
+      </div>
     )
+  }
+
+  getTabOptions = () => {
+    const { imageDatas = [] } = this.props
+    return imageDatas.reduce((p, cur) => {
+      const { uid, name } = cur
+      const opt = {
+        id: uid,
+        // name: (
+        //   <div>
+        //     {this.renderThumbnailImg(cur)}
+        //     <div
+        //       style={
+        //         this.state.activeKey !== uid ? { opacity: 0.6 } : thumbnailSize
+        //       }
+        //     >
+        //       <img uid={`${uid}`} alt='' style={thumbnailSize} />
+        //     </div>
+
+        //     <Tooltip title={`delete ${name}`}>
+        //       <Button
+        //         style={{
+        //           position: 'absolute',
+        //           left: thumbnailSize.width - 2,
+        //           top: 5,
+        //         }}
+        //         justIcon
+        //         size='sm'
+        //         color='danger'
+        //         onClick={() => {
+        //           this.handelConfirmDelete(uid)
+        //         }}
+        //       >
+        //         <Delete />
+        //       </Button>
+        //     </Tooltip>
+        //     <div
+        //       onClick={(e) => {
+        //         e.stopPropagation()
+        //       }}
+        //     >
+        //       <TextField
+        //         value={name}
+        //         multiline
+        //         rowsMax={3}
+        //         style={{ width: thumbnailSize.width, maxHeight: 50 }}
+        //         maxLength={50}
+        //         onChange={(e) => {
+        //           this.props.onUpdateName({ ...cur, name: e.target.value })
+        //         }}
+        //       />
+        //     </div>
+        //   </div>
+        // ),
+        content: (
+          <SketchField
+            name={`image-${uid}`}
+            ref={(c) => {
+              if (c) {
+                if (!this.sketchs[uid]) {
+                  // console.log('ref-->', c)
+                  this.sketchs[uid] = c
+                  this.setBackgroundFromData(uid)
+                }
+              }
+            }}
+            tool={this.state.tool}
+            lineWidth={1}
+            lineColor='blue'
+            fillColor='transparent'
+            backgroundColor='transparent'
+            forceValue
+            height={window.innerHeight - 330}
+            disableResize
+            style={{ overflow: 'auto' }}
+            canvasStyle={{ border: '1px solid #EDF3FF' }}
+            onDoubleClick={() => this.Zoom(0.2)}
+            onChange={(e) => {
+              if (
+                this.sketchs[uid]._selectedTool.getToolName() === Tools.Crop
+              ) {
+                this.setState({
+                  tool: Tools.None,
+                })
+                this.updateThumbnail(this.sketchs[uid], uid)
+              }
+            }}
+          />
+        ),
+      }
+
+      return [
+        ...p,
+        opt,
+      ]
+    }, [])
   }
 
   render () {
@@ -654,11 +613,7 @@ class Scanner extends Component {
     return (
       <GridContainer style={{ height: this.getContainerHeight() }}>
         <GridItem xs={9} md={9}>
-          <div
-            style={{
-              display: 'flex',
-            }}
-          >
+          <div style={{ display: 'flex' }}>
             <ToggleButtonGroup
               exclusive
               size='small'
@@ -680,7 +635,7 @@ class Scanner extends Component {
             >
               {leftTools({ currentTool: this.state.tool }).map((t) => {
                 const { id, title, icon } = t
-                if (id === ToolTypes.Resize) return this.getResizeComponent(t)
+                // if (id === ToolTypes.Resize) return this.getResizeComponent(t)
 
                 return (
                   <Tooltip title={title}>
@@ -711,6 +666,7 @@ class Scanner extends Component {
                 onChange={(k) => {
                   this.setState({ activeKey: k })
                 }}
+                renderTabBar={this.renderTabBar}
               />
             </div>
           </div>
@@ -723,12 +679,6 @@ class Scanner extends Component {
                 onUploading={this.handleUploading}
                 onSizeChanged={this._resize}
                 canUploading={imageDatas.length > 0}
-              />
-            </div>
-            <div ref={this._imagelistRef} style={{ marginTop: 20 }}>
-              <ImageList
-                imgRows={imageDatas}
-                handleCommitChanges={this.handleCommitChanges}
               />
             </div>
           </React.Fragment>

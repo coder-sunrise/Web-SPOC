@@ -2,16 +2,7 @@ import React, { useState } from 'react'
 import $ from 'jquery'
 import { ImageSearch } from '@material-ui/icons'
 
-import {
-  GridItem,
-  Button,
-  Tooltip,
-  EditableTableGrid,
-  TextField,
-  CommonTableGrid,
-} from '@/components'
-
-const base64Prefix = 'data:image/jpeg;base64,'
+import { Tooltip, EditableTableGrid } from '@/components'
 
 export const ImageList = ({ imgRows = [], handleCommitChanges }) => {
   const tableParas = {
@@ -78,10 +69,10 @@ export const ImageList = ({ imgRows = [], handleCommitChanges }) => {
         showAddCommand: false,
         showEditCommand: true,
         showDeleteCommand: true,
-        deleteConfirm: {
-          show: true,
-          title: 'Are you sure you want to delete this row?',
-        },
+        // deleteConfirm: {
+        //   show: true,
+        //   title: 'Are you sure you want to delete this row?',
+        // },
         onCommitChanges: handleCommitChanges,
       }}
       {...tableParas}

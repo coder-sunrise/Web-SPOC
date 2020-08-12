@@ -73,11 +73,11 @@ export const leftTools = ({ currentTool }) => {
         />
       ),
     },
-    {
-      id: ToolTypes.Resize,
-      title: 'Resize',
-      icon: <AspectRatioIcon color='primary' style={{ color: '#191919' }} />,
-    },
+    // {
+    //   id: ToolTypes.Resize,
+    //   title: 'Resize',
+    //   icon: <AspectRatioIcon color='primary' style={{ color: '#191919' }} />,
+    // },
     {
       id: ToolTypes.Download,
       title: 'Download with original size',

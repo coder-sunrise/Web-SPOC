@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import _ from 'lodash'
 import { ImageSearch, CloudUpload } from '@material-ui/icons'
-
 import {
   GridContainer,
   GridItem,
@@ -14,11 +13,12 @@ import {
   Checkbox,
   NumberInput,
 } from '@/components'
+import { ImageList } from './imagelist'
 
 const PixelTypeOptions = [
-  { value: 'BW', label: 'B&W' },
-  { value: 'Gray', label: 'Gray' },
-  { value: 'Color', label: 'Color' },
+  { id: 'BW', name: 'B&W' },
+  { id: 'Gray', name: 'Gray' },
+  { id: 'Color', name: 'Color' },
 ]
 
 const ScaleByOptions = [
@@ -26,10 +26,15 @@ const ScaleByOptions = [
   { id: 'H', name: 'Height' },
   { id: 'WH', name: 'Fixed Width&Height' },
 ]
+const FileTypeOptions = [
+  { id: 'Jpeg', name: 'Jpeg' },
+  { id: 'Png', name: 'Png' },
+  { id: 'Bmp', name: 'Bmp' },
+]
 
 const DpiOptions = [
-  { id: '100', name: '100' },
-  { id: '150', name: '150' },
+  // { id: '100', name: '100' },
+  // { id: '150', name: '150' },
   { id: '200', name: '200' },
   { id: '300', name: '300' },
 ]
@@ -38,17 +43,19 @@ export const Scanconfig = ({
   onUploading,
   onSizeChanged,
   canUploading = false,
+  imageDatas,
+  handleCommitChanges,
 }) => {
-  const defaultPixelType = PixelTypeOptions.find((f) => f.value === 'Color')
+  // const defaultPixelType = PixelTypeOptions.find((f) => f.id === 'Color')
   const [
     pixelType,
     setPixelType,
-  ] = useState(defaultPixelType)
+  ] = useState('Color')
 
   const [
     dpi,
     setDpi,
-  ] = useState('300')
+  ] = useState('200')
 
   const [
     autoFeeder,
@@ -74,17 +81,23 @@ export const Scanconfig = ({
     scaleHeight,
     setScaleHeight,
   ] = useState(undefined)
+
   const [
     scaleBy,
     setScaleBy,
   ] = useState('W')
 
+  const [
+    fileType,
+    setFileType,
+  ] = useState('Jpeg')
   const onScanningClick = () => {
     onScaning({
       autoFeeder,
       duplex,
       dpi,
-      pixelType: pixelType.value,
+      fileType,
+      pixelType,
       isScale,
       scaleBy,
       scaleWidth,
@@ -116,18 +129,17 @@ export const Scanconfig = ({
         />
       </GridItem>
       <GridItem xs={12}>
-        <RadioButtonGroup
+        <Select
           label='Pixel Type'
-          row
-          itemHorizontal
-          field={pixelType}
+          valueField='id'
+          value={pixelType}
           options={PixelTypeOptions}
-          onChange={(e, v) => {
-            const selected = PixelTypeOptions.find((f) => f.value === v)
-            setPixelType(selected)
+          onChange={(v, opts) => {
             if (v === 'BW') {
               setDpi('200')
             } else setDpi('300')
+
+            setPixelType(v)
           }}
         />
       </GridItem>
@@ -139,6 +151,17 @@ export const Scanconfig = ({
           options={DpiOptions}
           onChange={(v, opts) => {
             setDpi(v)
+          }}
+        />
+      </GridItem>
+      <GridItem xs={12}>
+        <Select
+          label='File Type'
+          valueField='id'
+          value={fileType}
+          options={FileTypeOptions}
+          onChange={(v, opts) => {
+            setFileType(v)
           }}
         />
       </GridItem>
@@ -194,7 +217,12 @@ export const Scanconfig = ({
           </GridItem>
         </React.Fragment>
       )}
-
+      {/* <GridContainer>
+        <ImageList
+          imgRows={imageDatas}
+          handleCommitChanges={handleCommitChanges}
+        />
+      </GridContainer> */}
       <GridContainer>
         <GridItem xs={6}>
           <Button onClick={onScanningClick} color='primary'>
