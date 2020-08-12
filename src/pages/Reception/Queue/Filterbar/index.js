@@ -80,8 +80,10 @@ const Filterbar = (props) => {
               }
               onClick={() => {
                 handleSubmit()
-                setFieldValue('search', '')
-                setSearch('')
+                setTimeout(() => {
+                  setFieldValue('search', '')
+                  setSearch('')
+                }, 500)
               }
               }
               size='sm'
