@@ -12,11 +12,11 @@ import {
 } from '@/components'
 import styles from './styles'
 
-const Summary = ({ invoiceDetail, classes }) => { 
+const Summary = ({ invoiceDetail, classes, showGST = true }) => {
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
-        <GridContainer className={classes.summary} alignItems='flex-end'>  
+        <GridContainer className={classes.summary} alignItems='flex-end'>
           <GridItem md={9} />
           <GridItem md={3}>
             <FastField
@@ -35,26 +35,29 @@ const Summary = ({ invoiceDetail, classes }) => {
               )}
             />
           </GridItem>
-
-          <GridItem md={9} />
-          <GridItem md={3}>
-            <FastField
-              name='gstAmount'
-              render={(args) => {
-                return <NumberInput
-                  {...args}
-                  noUnderline
-                  currency
-                  disabled
-                  rightAlign
-                  normalText
-                  defaultValue={0} 
-                  prefix={invoiceDetail.isGSTInclusive ? `${invoiceDetail.gstValue}% GST Inclusive:` : `GST (${invoiceDetail.gstValue}%):`}
-                />
-              }
-              }
-            />
-          </GridItem>
+          {showGST && (
+            <GridItem md={9} />)
+          }
+          {showGST && (
+            <GridItem md={3}>
+              <FastField
+                name='gstAmount'
+                render={(args) => {
+                  return <NumberInput
+                    {...args}
+                    noUnderline
+                    currency
+                    disabled
+                    rightAlign
+                    normalText
+                    defaultValue={0}
+                    prefix={invoiceDetail.isGSTInclusive ? `${invoiceDetail.gstValue}% GST Inclusive:` : `GST (${invoiceDetail.gstValue}%):`}
+                  />
+                }
+                }
+              />
+            </GridItem>)
+          }
 
           <GridItem md={9} />
           <GridItem md={3}>

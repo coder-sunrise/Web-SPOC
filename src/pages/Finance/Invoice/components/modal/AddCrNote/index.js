@@ -139,7 +139,7 @@ class AddCrNote extends Component {
     }, 0)
     setFieldValue('finalCredit', roundTo(finalCreditTotal))
 
-    const gstAmount = finalCreditTotal / (1 + invoiceDetail.gstValue / 100) * (invoiceDetail.gstValue / 100)
+    const gstAmount = invoiceDetail.gstValue >= 0 ? (finalCreditTotal / (1 + invoiceDetail.gstValue / 100) * (invoiceDetail.gstValue / 100)) : 0
     setFieldValue('gstAmount', roundTo(gstAmount))
     setFieldValue('subTotal', roundTo(finalCreditTotal) - roundTo(gstAmount))
   }
@@ -371,7 +371,7 @@ class AddCrNote extends Component {
           ]}
         />
 
-        <Summary invoiceDetail={invoiceDetail} />
+        <Summary showGST={invoiceDetail.gstValue>=0} invoiceDetail={invoiceDetail} />
         <MiscCrNote
           handleAddMiscItem={this.handleAddMiscItem}
           handleCalcFinalTotal={this.handleCalcCrNoteItem}
