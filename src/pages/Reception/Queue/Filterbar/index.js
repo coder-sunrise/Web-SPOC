@@ -83,7 +83,7 @@ const Filterbar = (props) => {
                 setTimeout(() => {
                   setFieldValue('search', '')
                   setSearch('')
-                }, 500)
+                }, 1000)
               }
               }
               size='sm'
