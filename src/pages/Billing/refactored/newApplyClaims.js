@@ -5,11 +5,19 @@ import { withStyles } from '@material-ui/core'
 import Add from '@material-ui/icons/AddCircle'
 import Reset from '@material-ui/icons/Cached'
 // common components
-import { CommonModal, Button, GridItem } from '@/components'
+import {
+  CommonModal,
+  Button,
+  GridItem,
+  notification,
+  WarningSnackbar,
+} from '@/components'
 // common utils
 import { roundTo } from '@/utils/utils'
 import { INVOICE_PAYER_TYPE, VISIT_TYPE } from '@/utils/constants'
 // import MedisaveSchemes from './MedisaveSchemes'
+import { AddPayment } from '@/components/_medisys'
+import DeleteConfirmation from '@/pages/Finance/Invoice/components/modal/DeleteConfirmation'
 import Scheme from './newScheme'
 import ResetButton from './ResetButton'
 import CoPayer from '../modal/CoPayer'
@@ -44,6 +52,7 @@ const defaultInvoicePayer = {
   // claimableSchemes: claimableSchemes[0],
   invoicePayerItem: [],
   sequence: 0,
+  invoicePayment: [],
   // payerTypeFK: INVOICE_PAYER_TYPE.SCHEME,
 }
 
@@ -58,7 +67,12 @@ const ApplyClaims = ({
   patient,
   ctschemetype,
   ctcopaymentscheme,
+  onPrinterClick,
+  saveBilling,
   noExtraOptions = false,
+  fromBilling = false,
+  handleIsExistingOldPayerItem,
+  clinicSettings,
 }) => {
   const {
     invoice,
@@ -132,6 +146,7 @@ const ApplyClaims = ({
     updatedPayer,
     updatedIndex,
     invoicePayerList,
+    autoApply = false,
   ) => {
     const _list = invoicePayerList || tempInvoicePayer
     const invoicePayerWithUpdatedPayer = _list.map(
@@ -141,6 +156,7 @@ const ApplyClaims = ({
       updatedInvoiceItems,
       invoicePayerWithUpdatedPayer,
       updatedIndex,
+      autoApply,
     )
     setTempInvoicePayer(newInvoicePayer)
     incrementCommitCount()
@@ -152,6 +168,7 @@ const ApplyClaims = ({
     invoicePayerList,
     invoiceItems,
     allSchemes,
+    autoApply = false,
   ) => {
     const flattenSchemes = allSchemes.reduce(
       (schemes, cs) => [
@@ -181,7 +198,12 @@ const ApplyClaims = ({
       isModified: true,
       invoicePayerItem: payerInvoiceItems,
     }
-    updateTempInvoicePayer(updatedPayer, index, invoicePayerList || null)
+    updateTempInvoicePayer(
+      updatedPayer,
+      index,
+      invoicePayerList || null,
+      autoApply,
+    )
   }
 
   const toggleCopayerModal = () => setShowCoPaymentModal(!showCoPaymentModal)
@@ -268,6 +290,7 @@ const ApplyClaims = ({
         ],
         invoice.invoiceItems,
         claimableSchemes,
+        true,
       )
     } else {
       setInitialState([])
@@ -275,6 +298,23 @@ const ApplyClaims = ({
       setCurEditInvoicePayerBackup(undefined)
       // refTempInvociePayer.current = []
     }
+  }
+
+  const checkExistingOldPayerItem = () => {
+    const { invoiceItems = [] } = invoice
+
+    let existingOldPayerItem = false
+    tempInvoicePayer.filter((tip) => !tip.isCancelled).forEach((ip) => {
+      const { invoicePayerItem = [] } = ip
+      if (
+        invoicePayerItem.find(
+          (ipi) => !invoiceItems.find((ii) => ii.id === ipi.invoiceItemFK),
+        )
+      ) {
+        existingOldPayerItem = true
+      }
+    })
+    return existingOldPayerItem
   }
 
   const updateValues = () => {
@@ -305,6 +345,10 @@ const ApplyClaims = ({
     }
 
     handleIsEditing(hasOtherEditing)
+
+    if (handleIsExistingOldPayerItem)
+      handleIsExistingOldPayerItem(checkExistingOldPayerItem())
+
     setValues(_values)
   }
 
@@ -449,6 +493,19 @@ const ApplyClaims = ({
             0,
           ),
         ),
+        payerOutstanding:
+          roundTo(
+            invoiceItems.reduce(
+              (subtotal, item) => subtotal + item.claimAmount,
+              0,
+            ),
+          ) -
+          _.sumBy(
+            tempInvoicePayer[index].invoicePayment.filter(
+              (p) => !p.isCancelled,
+            ),
+            'totalAmtPaid',
+          ),
         isModified: true,
         invoicePayerItem: invoiceItems,
         _isConfirmed: !hasInvalidRow,
@@ -636,9 +693,104 @@ const ApplyClaims = ({
   useEffect(updateValues, [
     tempInvoicePayer,
   ])
+  const [
+    showAddPaymentModal,
+    setShowAddPaymentModal,
+  ] = useState(false)
 
+  const [
+    selectInvoicePayer,
+    setSelectInvoicePayer,
+  ] = useState({})
+
+  const [
+    onVoid,
+    setOnVoid,
+  ] = useState({})
+
+  const [
+    showDeleteConfirmation,
+    setShowDeleteConfirmation,
+  ] = useState(false)
+
+  const toggleAddPaymentModal = () => {
+    setShowAddPaymentModal(!showAddPaymentModal)
+  }
+
+  const toggleDeleteConfirmation = () => {
+    setShowDeleteConfirmation(!showDeleteConfirmation)
+  }
+
+  const onSubmitAddPayment = async (invoicePaymentList) => {
+    toggleAddPaymentModal()
+    let invoicePayer = tempInvoicePayer[selectInvoicePayer.index]
+    if (invoicePayer.id && invoicePayer.id > 0) {
+      invoicePayer.isModified = true
+    }
+    invoicePayer.invoicePayment = [
+      ...(invoicePayer.invoicePayment || []),
+      invoicePaymentList,
+    ]
+    await setTempInvoicePayer([
+      ...tempInvoicePayer,
+    ])
+    saveBilling()
+  }
+
+  const onAddPaymentClick = async (index) => {
+    let invoicePayer = tempInvoicePayer[index]
+    const invoicePayerPayment = {
+      ...invoice,
+      payerTypeFK: invoicePayer.payerTypeFK,
+      totalAftGst: invoicePayer.payerDistributedAmt,
+      outstandingBalance: invoicePayer.payerOutstanding,
+      finalPayable: invoicePayer.payerOutstanding,
+      totalClaims: undefined,
+    }
+
+    let selectPayerName = ''
+    if (invoicePayer.payerTypeFK === 1)
+      selectPayerName = invoicePayer.patientName
+    if (invoicePayer.payerTypeFK === 2) selectPayerName = 'Scheme'
+    if (invoicePayer.payerTypeFK === 4) selectPayerName = invoicePayer.name
+    await setSelectInvoicePayer({
+      invoicePayerName: selectPayerName,
+      index,
+      invoicePayerPayment,
+    })
+    toggleAddPaymentModal()
+  }
+
+  const onSubmitVoid = async (cancelReason) => {
+    toggleDeleteConfirmation()
+    let invoicePayer = tempInvoicePayer[onVoid.payerIndex]
+    invoicePayer.isModified = true
+    if (onVoid.type === 'Payment') {
+      let payment = invoicePayer.invoicePayment.find((o) => o.id === onVoid.id)
+      payment.isCancelled = true
+      payment.cancelReason = cancelReason
+    }
+    await setTempInvoicePayer([
+      ...tempInvoicePayer,
+    ])
+    saveBilling()
+  }
+  const onPaymentVoidClick = (index, payment) => {
+    setOnVoid({ payerIndex: index, ...payment })
+    toggleDeleteConfirmation()
+  }
   return (
     <Fragment>
+      {checkExistingOldPayerItem() && (
+        <GridItem md={12}>
+          <div style={{ paddingLeft: 8, paddingBottom: 8 }}>
+            <WarningSnackbar
+              variant='warning'
+              message='Invoice has been updated. Kindly remove the payment(s) made for existing copayer/ scheme and re-apply the copayer/ scheme again!'
+            />
+          </div>
+        </GridItem>
+      )}
       <GridItem md={2}>
         <h5 style={{ paddingLeft: 8 }}>Apply Claims</h5>
       </GridItem>
@@ -667,7 +819,13 @@ const ApplyClaims = ({
         </Button> */}
         {!noExtraOptions && (
           <ResetButton
-            disabled={visitPurposeFK === VISIT_TYPE.RETAIL}
+            disabled={
+              visitPurposeFK === VISIT_TYPE.RETAIL ||
+              tempInvoicePayer.find((payer) =>
+                (payer.invoicePayment || [])
+                  .find((payment) => !payment.isCancelled),
+              )
+            }
             handleResetClick={handleResetClick}
             handleRestoreClick={handleRestoreClick}
           />
@@ -692,6 +850,12 @@ const ApplyClaims = ({
               patient={patient}
               ctschemetype={ctschemetype}
               ctcopaymentscheme={ctcopaymentscheme}
+              onPaymentVoidClick={onPaymentVoidClick}
+              onPrinterClick={onPrinterClick}
+              onAddPaymentClick={onAddPaymentClick}
+              fromBilling={fromBilling}
+              invoice={invoice}
+              clinicSettings={clinicSettings}
             />
           )
         })}
@@ -749,6 +913,33 @@ const ApplyClaims = ({
           claimableSchemes={claimableSchemes}
           handleSelectClick={handleSelectClaimClick}
         />
+      </CommonModal>
+      <CommonModal
+        open={showAddPaymentModal}
+        title='Add Payment'
+        onClose={toggleAddPaymentModal}
+        observe='AddPaymentForm'
+        maxWidth='lg'
+      >
+        <AddPayment
+          handleSubmit={onSubmitAddPayment}
+          onClose={toggleAddPaymentModal}
+          invoicePayerName={selectInvoicePayer.invoicePayerName}
+          invoicePayment={[]}
+          showPaymentDate
+          invoice={{
+            ...selectInvoicePayer.invoicePayerPayment,
+          }}
+        />
+      </CommonModal>
+      <CommonModal
+        open={showDeleteConfirmation}
+        title={`Void ${onVoid.type}`}
+        onConfirm={toggleDeleteConfirmation}
+        onClose={toggleDeleteConfirmation}
+        maxWidth='sm'
+      >
+        <DeleteConfirmation handleSubmit={onSubmitVoid} {...onVoid} />
       </CommonModal>
     </Fragment>
   )
