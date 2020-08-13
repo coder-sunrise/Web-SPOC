@@ -48,7 +48,7 @@ const Package = ({ dispatch, history, inventoryPackage }) => {
   const gridProps = {
     ...filterProps,
     inventoryPackage,
-    namespace: 'inventoryPackage',
+    namespace: 'package',
     list: inventoryPackage.list || [],
     tableParas,
     colExtensions,

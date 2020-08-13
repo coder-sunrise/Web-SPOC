@@ -57,6 +57,8 @@ export default {
   'inventory.master.package.description': 'Description',
   'inventory.master.package.remarks': 'Remarks',
   'inventory.master.package.status': 'Status',
+  'inventory.master.package.validDuration': 'Valid Duration',
+  'inventory.master.package.durationUnit': 'Duration Unit',
 
   'inventory.master.pricing.lastCostPriceBefBonus':
     'Last Cost Price (Before Bonus)',

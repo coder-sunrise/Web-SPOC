@@ -159,6 +159,7 @@ export default compose(
       dispatch({
         type: 'packageDetail/upsert',
         payload: {
+          totalPrice: values.totalPrice || 0,
           ...values,
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],
