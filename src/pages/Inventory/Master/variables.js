@@ -3,6 +3,7 @@ import Consumable from './Consumable'
 import Medication from './Medication'
 import Vaccination from './Vaccination'
 import OrderSet from './OrderSet'
+import Package from './Package'
 
 const addContent = (type, props) => {
   switch (type) {
@@ -12,6 +13,10 @@ const addContent = (type, props) => {
       return <Consumable {...props} />
     case 3:
       return <Vaccination {...props} />
+    case 4:
+      return <OrderSet {...props} />
+    case 5:
+      return <Package {...props} />
     default:
       return <OrderSet {...props} />
   }
@@ -42,6 +47,12 @@ export const InventoryMasterOption = (props) => {
       name: 'Order Set',
       authority: 'inventorymaster.orderset',
       content: addContent(4, props),
+    },
+    {
+      id: '4',
+      name: 'Package',
+      authority: 'inventorymaster.package',
+      content: addContent(5, props),
     },
   ]
   return Tabs.filter((tab) => {
