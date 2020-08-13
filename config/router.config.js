@@ -322,6 +322,24 @@ const _routes = [
               'inventory/inventorymaster',
             ],
           },
+          {
+            path: '/inventory/master/package',
+            name: 'package.package',
+            hideInMenu: true,
+            component: './Inventory/Master/Package/Details',
+            authority: [
+              'inventory/inventorymaster',
+            ],
+          },
+          {
+            path: '/inventory/master/editinventorypackage',
+            name: 'package.editpackage',
+            hideInMenu: true,
+            component: './Inventory/Master/Package/Details',
+            authority: [
+              'inventory/inventorymaster',
+            ],
+          },
           // {
           //   path: '/inventory/pd',
           //   name: 'pd',

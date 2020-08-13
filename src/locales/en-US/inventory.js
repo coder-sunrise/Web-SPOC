@@ -52,6 +52,10 @@ export default {
   'inventory.master.orderset.effectiveEndDate': 'Effective End Date',
   'inventory.master.orderset.status': 'Status',
 
+  'inventory.master.package.code': 'Package Code',
+  'inventory.master.package.name': 'Package Name',
+  'inventory.master.package.description': 'Description',
+  'inventory.master.package.remarks': 'Remarks',
   'inventory.master.package.status': 'Status',
 
   'inventory.master.pricing.lastCostPriceBefBonus':
