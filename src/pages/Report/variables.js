@@ -90,6 +90,12 @@ export const menuData = [
     authority: 'report.finance.paymentcollectionsummary',
   },
   {
+    title: 'Finance',
+    text: 'Visit Listing Report',
+    url: '/report/visitlistingreport',
+    authority: 'report.finance.visitlistingreport',
+  },
+  {
     title: 'Inventory',
     text: 'Medication Movement Report',
     url: '/report/medicationmovementreport',

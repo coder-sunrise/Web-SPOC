@@ -24,6 +24,7 @@ const PaymentRow = ({
   handleVoidClick,
   handlePrinterClick,
   readOnly,
+  printDisabled = false,
   ...payment
 }) => {
   const {
@@ -36,6 +37,7 @@ const PaymentRow = ({
     isCancelled,
     patientDepositTransaction,
     invoicePaymentMode = [],
+    cancelReason,
     statementPaymentReceiptNo,
   } = payment
 
@@ -63,7 +65,7 @@ const PaymentRow = ({
             color='primary'
             id={itemID}
             className={classes.printButton}
-            disabled={isCancelled || !!statementPaymentReceiptNo}
+                  disabled={isCancelled || !!statementPaymentReceiptNo || printDisabled}
             onClick={() => handlePrinterClick(type, id)}
           >
             <Printer />
@@ -116,6 +118,8 @@ const PaymentRow = ({
                   paymentModeDetails={sortedInvoicePaymentModes}
                   setHoveredRowId={setHoveredRowId}
                   id={id}
+                  cancelReason={cancelReason}
+                  isCancelled={isCancelled}
                 />
               }
             >
