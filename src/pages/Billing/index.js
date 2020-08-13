@@ -25,10 +25,10 @@ import Authorized from '@/utils/Authorized'
 // sub component
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 import DispenseDetails from '@/pages/Dispense/DispenseDetails/WebSocketWrapper'
+import { ReportsOnCompletePaymentOption } from '@/utils/codes'
 import ApplyClaims from './refactored/newApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 import SchemeValidationPrompt from './components/SchemeValidationPrompt'
-import { ReportsOnCompletePaymentOption } from '@/utils/codes'
 import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
 // page utils
 import {
@@ -264,21 +264,24 @@ class Billing extends Component {
           }
         }
       }
-      if (printData && printData.length > 0) {
-        const token = localStorage.getItem('token')
-        printData = printData.map((item) => ({
-          ...item,
-          Token: token,
-          BaseUrl: process.env.url,
-        }))
-        await this.childOnPrintRef({
-          type: 1,
-          printData,
-          printAllDrugLabel:
-            reportsOnCompletePayment.indexOf(
-              ReportsOnCompletePaymentOption.DrugLabel,
-            ) > -1,
-        })
+      if (
+        reportsOnCompletePayment.indexOf(
+          ReportsOnCompletePaymentOption.DrugLabel,
+        ) > -1
+      ) {
+        if (printData && printData.length > 0) {
+          const token = localStorage.getItem('token')
+          printData = printData.map((item) => ({
+            ...item,
+            Token: token,
+            BaseUrl: process.env.url,
+          }))
+          await this.childOnPrintRef({
+            type: 1,
+            printData,
+            printAllDrugLabel: true,
+          })
+        }
       }
     }
   }
