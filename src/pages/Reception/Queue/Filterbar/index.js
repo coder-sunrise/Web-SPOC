@@ -34,12 +34,13 @@ const Filterbar = (props) => {
     handleSubmit,
     setFieldValue,
     selfOnly,
+    hideSelfOnlyFilter,
     user,
     setSearch,
     loading,
   } = props
   const onSwitchClick = () => dispatch({ type: 'queueLog/toggleSelfOnly' })
-
+ 
   return (
     <div className='div-reception-header'>
       <GridContainer
@@ -111,7 +112,7 @@ const Filterbar = (props) => {
               <FormattedMessage id='reception.queue.createPatient' />
             </Button>
           </Authorized>
-          {user.clinicianProfile.userProfile.role.clinicRoleFK === 1 && (
+          {user.clinicianProfile.userProfile.role.clinicRoleFK === 1 && !hideSelfOnlyFilter && (
             <div className={classes.switch}>
               <Checkbox
                 label='Visit assign to me only'
@@ -119,7 +120,7 @@ const Filterbar = (props) => {
                 checked={selfOnly}
               />
             </div>
-          )}
+          )}          
         </GridItem>
 
         <GridItem
@@ -141,6 +142,7 @@ const Filterbar = (props) => {
 
 const connectedFilterbar = connect(({ queueLog, user, loading }) => ({
   selfOnly: queueLog.selfOnly,
+  hideSelfOnlyFilter: queueLog.hideSelfOnlyFilter,
   user: user.data,
   loading,
 }))(Filterbar)
