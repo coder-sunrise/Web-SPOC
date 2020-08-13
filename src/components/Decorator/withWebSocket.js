@@ -130,7 +130,7 @@ const withWebSocket = () => (Component) => {
               {
                 uid: getUniqueGUID(),
                 image: Data,
-                name: moment().format('YYYYMMDD_hhmmss'),
+                name: moment().format('YYYYMMDD_HHmmss'),
               },
             ],
           }))
@@ -238,7 +238,13 @@ const withWebSocket = () => (Component) => {
               bodyNoPadding
               keepMounted={false}
             >
-              <div style={{ position: 'relative' }}>
+              <div
+                style={{
+                  position: 'relative',
+                  marginTop: -10,
+                  marginBottom: 10,
+                }}
+              >
                 <div
                   style={
                     loading ? (

@@ -39,7 +39,7 @@ import { Scanconfig } from './scanconfig'
 import { ImageList } from './imagelist'
 
 const base64Prefix = 'data:image/png;base64,'
-const thumbnailSize = { width: 100, height: 80 }
+const thumbnailSize = { width: 120, height: 80 }
 
 const styles = (theme) => ({
   root: {
@@ -60,7 +60,7 @@ class Scanner extends Component {
     super(props)
     this.state = {
       tool: Tools.None,
-      resize: { width: undefined, height: undefined },
+      // resize: { width: undefined, height: undefined },
     }
     this.sketchs = []
     this._imagelistRef = React.createRef()
@@ -190,24 +190,24 @@ class Scanner extends Component {
 
   handelConfirmDelete = (uid) => {
     const { imageDatas = [], onDeleteItem } = this.props
-    {
-      const item = imageDatas.find((f) => f.uid === uid)
-      const activeItems = imageDatas.filter((f) => f.uid !== uid)
-      if (activeItems.length > 0 && this.state.activeKey === uid) {
-        this.setState({
-          activeKey: activeItems[activeItems.length - 1].uid,
-        })
-      } else if (
-        imageDatas.length >= 2 &&
-        imageDatas.indexOf(item) === imageDatas.length - 1
-      ) {
-        this.setState({
-          activeKey: imageDatas[imageDatas.length - 2].uid,
-        })
-      }
-      delete this.sketchs[uid]
-      onDeleteItem(uid)
+
+    const item = imageDatas.find((f) => f.uid === uid)
+    const activeItems = imageDatas.filter((f) => f.uid !== uid)
+
+    // deleted selected item or last one
+    if (
+      this.state.activeKey === uid ||
+      imageDatas.indexOf(item) === imageDatas.length - 1
+    ) {
+      this.setState({
+        activeKey:
+          activeItems.length > 0
+            ? activeItems[activeItems.length - 1].uid
+            : undefined,
+      })
     }
+    delete this.sketchs[uid]
+    onDeleteItem(uid)
   }
 
   renderThumbnailImg = (imageData) => {
@@ -437,44 +437,32 @@ class Scanner extends Component {
     onUploading(uploadImages)
   }
 
-  renderTabBar = (tabProps, defaultTabBar) => {
+  getTabOptions = () => {
     const { imageDatas = [] } = this.props
+    return imageDatas.reduce((p, cur) => {
+      const { uid, name } = cur
+      const opt = {
+        id: uid,
+        name: (
+          <CardContainer hideHeader style={{ margin: '-8px -10px' }}>
+            <GridContainer>
+              <div>
+                {this.renderThumbnailImg(cur)}
+                <div
+                  style={{
+                    opacity: this.state.activeKey !== uid ? 0.5 : 1,
+                    ...thumbnailSize,
+                  }}
+                >
+                  <img uid={`${uid}`} alt='' style={thumbnailSize} />
+                </div>
 
-    const tabInfo = []
-    tabProps.panels.forEach((item) => {
-      tabInfo.push({
-        key: item.key,
-        title: item.props.tab,
-      })
-    })
-
-    return (
-      <div style={{ display: 'flex' }}>
-        {tabInfo.map((t) => {
-          let cur = imageDatas.find((f) => f.uid === t.key)
-          this.renderThumbnailImg(cur)
-          const { uid, name } = cur
-
-          return (
-            <div style={{ margin: 10 }}>
-              <div
-                onClick={() => this.setState({ activeKey: uid })}
-                style={
-                  this.state.activeKey !== uid ? (
-                    { opacity: 0.6 }
-                  ) : (
-                    thumbnailSize
-                  )
-                }
-              >
-                <img uid={`${uid}`} alt='' style={thumbnailSize} />
-                <Tooltip title={`delete ${name}`}>
+                <Tooltip title='Remove this item'>
                   <Button
                     style={{
-                      // position: 'absolute',
-                      textAlign: 'right',
-                      left: thumbnailSize.width - 2,
-                      top: 5,
+                      position: 'absolute',
+                      left: thumbnailSize.width - 15,
+                      top: 8,
                     }}
                     justIcon
                     size='sm'
@@ -486,83 +474,37 @@ class Scanner extends Component {
                     <Delete />
                   </Button>
                 </Tooltip>
-              </div>
-
-              <div
-                onClick={(e) => {
-                  e.stopPropagation()
-                }}
-              >
-                <TextField
-                  value={name}
-                  multiline
-                  rowsMax={3}
-                  style={{ width: thumbnailSize.width, maxHeight: 50 }}
-                  maxLength={50}
-                  onChange={(e) => {
-                    this.props.onUpdateName({ ...cur, name: e.target.value })
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation()
                   }}
-                />
+                >
+                  <TextField
+                    value={name}
+                    multiline
+                    rowsMax={3}
+                    style={{ width: thumbnailSize.width, maxHeight: 50 }}
+                    maxLength={50}
+                    onChange={(e) => {
+                      this.props.onUpdateName({ ...cur, name: e.target.value })
+                    }}
+                    onKeyDown={(e) => {
+                      if (
+                        [
+                          'ArrowLeft',
+                          'ArrowRight',
+                          'ArrowUp',
+                          'ArrowDown',
+                        ].includes(e.key)
+                      )
+                        e.stopPropagation()
+                    }}
+                  />
+                </div>
               </div>
-            </div>
-          )
-        })}
-      </div>
-    )
-  }
-
-  getTabOptions = () => {
-    const { imageDatas = [] } = this.props
-    return imageDatas.reduce((p, cur) => {
-      const { uid, name } = cur
-      const opt = {
-        id: uid,
-        // name: (
-        //   <div>
-        //     {this.renderThumbnailImg(cur)}
-        //     <div
-        //       style={
-        //         this.state.activeKey !== uid ? { opacity: 0.6 } : thumbnailSize
-        //       }
-        //     >
-        //       <img uid={`${uid}`} alt='' style={thumbnailSize} />
-        //     </div>
-
-        //     <Tooltip title={`delete ${name}`}>
-        //       <Button
-        //         style={{
-        //           position: 'absolute',
-        //           left: thumbnailSize.width - 2,
-        //           top: 5,
-        //         }}
-        //         justIcon
-        //         size='sm'
-        //         color='danger'
-        //         onClick={() => {
-        //           this.handelConfirmDelete(uid)
-        //         }}
-        //       >
-        //         <Delete />
-        //       </Button>
-        //     </Tooltip>
-        //     <div
-        //       onClick={(e) => {
-        //         e.stopPropagation()
-        //       }}
-        //     >
-        //       <TextField
-        //         value={name}
-        //         multiline
-        //         rowsMax={3}
-        //         style={{ width: thumbnailSize.width, maxHeight: 50 }}
-        //         maxLength={50}
-        //         onChange={(e) => {
-        //           this.props.onUpdateName({ ...cur, name: e.target.value })
-        //         }}
-        //       />
-        //     </div>
-        //   </div>
-        // ),
+            </GridContainer>
+          </CardContainer>
+        ),
         content: (
           <SketchField
             name={`image-${uid}`}
@@ -609,7 +551,7 @@ class Scanner extends Component {
 
   render () {
     const { classes, onScaning, imageDatas = [] } = this.props
-    // console.log('----------------------------------------render scanner')
+    // console.log('-render scanner', this.state.activeKey)
     return (
       <GridContainer style={{ height: this.getContainerHeight() }}>
         <GridItem xs={9} md={9}>
@@ -661,12 +603,18 @@ class Scanner extends Component {
                 centered
                 animated='false'
                 tabStyle={{}}
+                tabBarStyle={{
+                  paddingLeft: 0,
+                  top: 1,
+                  position: 'relative',
+                  margin: 0,
+                }}
                 tabBarGutter={12}
                 options={this.getTabOptions()}
                 onChange={(k) => {
-                  this.setState({ activeKey: k })
+                  if (imageDatas.find((f) => f.uid === k))
+                    this.setState({ activeKey: k })
                 }}
-                renderTabBar={this.renderTabBar}
               />
             </div>
           </div>
