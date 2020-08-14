@@ -23,7 +23,7 @@ import {
   TextField,
 } from '@/components'
 
-import { roundUp } from '@/utils/utils'
+import { roundUp, stringToBytesFaster } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup'
 import ToggleButton from '@material-ui/lab/ToggleButton'
@@ -33,10 +33,10 @@ import {
   AspectRatio as AspectRatioIcon,
 } from '@material-ui/icons'
 
-import { getThumbnail } from '@/components/_medisys/AttachmentWithThumbnail/utils'
+import { generateThumbnailAsync } from '@/components/_medisys/AttachmentWithThumbnail/utils'
 import { leftTools, ToolTypes } from './variables'
 import { Scanconfig } from './scanconfig'
-import { ImageList } from './imagelist'
+// import { ImageList } from './imagelist'
 
 const base64Prefix = 'data:image/png;base64,'
 const thumbnailSize = { width: 120, height: 80 }
@@ -149,10 +149,10 @@ class Scanner extends Component {
   setBackgroundFromData = (activeKey) => {
     if (this.sketchs[activeKey]) {
       const { imageDatas = [] } = this.props
-
       const selectedImage = imageDatas.find((i) => i.uid === activeKey)
       if (selectedImage && selectedImage.image) {
         const base64Data = `${base64Prefix}${selectedImage.image}`
+
         this.sketchs[activeKey].setBackgroundFromData(
           base64Data,
           true,
@@ -166,25 +166,6 @@ class Scanner extends Component {
           },
         )
       }
-    }
-  }
-
-  generateThumbnail = async (imageSource, size = thumbnailSize) => {
-    try {
-      let thumbnailData
-      await new Promise((resolve) => {
-        const image = new Image()
-        image.src = imageSource
-        image.onload = () => {
-          const thumbnail = getThumbnail(image, size)
-          thumbnailData = thumbnail.toDataURL(`image/jpg`)
-
-          resolve()
-        }
-      })
-      return thumbnailData
-    } catch (error) {
-      return null
     }
   }
 
@@ -211,16 +192,13 @@ class Scanner extends Component {
   }
 
   renderThumbnailImg = (imageData) => {
-    const { uid, image } = imageData
+    const { uid, image, fileExtension } = imageData
     if (this.sketchs[uid]) {
       // console.log('renderThumbnailImg --1')
       // this.updateThumbnail(this.sketchs[uid], uid)
     } else {
       const base64Data = `${base64Prefix}${image}`
-      this.generateThumbnail(base64Data, {
-        width: 300,
-        height: 300,
-      }).then((thumbnail) => {
+      generateThumbnailAsync(base64Data, thumbnailSize).then((thumbnail) => {
         this.updateThumbnailToElement(uid, thumbnail)
       })
     }
@@ -228,10 +206,7 @@ class Scanner extends Component {
 
   updateThumbnail = (sketch, uid) => {
     const imgData = sketch.exportToImageDataUrl()
-    this.generateThumbnail(imgData, {
-      width: 300,
-      height: 300,
-    }).then((thumbnail) => {
+    generateThumbnailAsync(imgData, thumbnailSize).then((thumbnail) => {
       this.updateThumbnailToElement(uid, thumbnail)
     })
   }
@@ -324,6 +299,25 @@ class Scanner extends Component {
     })
   }
 
+  exportToImage = (canvas, quality = 1, originalSize = true) => {
+    const origZoom = canvas.getZoom()
+    const origWidth = canvas.getWidth()
+    const origHeight = canvas.getHeight()
+
+    if (originalSize) {
+      this.FullScreen()
+    }
+    // console.log(quality)
+    const result = canvas.toDataURL(`image/png`, quality)
+
+    if (originalSize) {
+      canvas.setZoom(origZoom)
+      canvas.setWidth(origWidth)
+      canvas.setHeight(origHeight)
+    }
+    return result
+  }
+
   Zoom = (factor) => {
     this.doChangeImages((selected, obj) => {
       let canvas = selected._fc
@@ -361,12 +355,12 @@ class Scanner extends Component {
       canvas.setHeight(zoomHeight)
       canvas.setWidth(zoomWidth)
 
-      console.log('setfullscreen', {
-        zoomWidth,
-        zoomHeight,
-        canvasW: canvas.getWidth(),
-        canvasH: canvas.getHeight(),
-      })
+      // console.log('setfullscreen', {
+      //   zoomWidth,
+      //   zoomHeight,
+      //   canvasW: canvas.getWidth(),
+      //   canvasH: canvas.getHeight(),
+      // })
 
       canvas.setZoom(1)
     })
@@ -416,21 +410,24 @@ class Scanner extends Component {
     }
   }
 
-  handleUploading = async () => {
+  handleUploading = () => {
     const { onUploading, imageDatas = [] } = this.props
     const uploadImages = []
     if (this.sketchs) {
       // eslint-disable-next-line guard-for-in
       for (let k in this.sketchs) {
         const item = imageDatas.find((f) => f.uid === k)
-        const imgData = this.sketchs[k].exportToImageDataUrl()
-        const thumbnailData = await this.generateThumbnail(imgData)
+        const canvas = this.sketchs[k]._fc
+        const imgData = this.exportToImage(canvas)
+
+        let fileName = imgData.split(',')
         uploadImages.push({
           uid: k,
-          imgData: imgData.split(',')[1],
-          thumbnailData: thumbnailData.split(',')[1],
-          name: item.name,
-          fileExtension: '.png',
+          imgData: fileName[1],
+          name: `${item.name}.png`,
+          fileExtension: `.png`,
+          size: stringToBytesFaster(fileName[1]).length,
+          type: 'image/png',
         })
       }
     }

@@ -178,8 +178,6 @@ const Thumbnail = ({
   const handleAttachmentClicked = () => {
     if (!attachment) return
 
-    console.log(attachment)
-
     if (
       useImageViewer &&
       imageFileExtensions.includes(attachment.fileExtension.toLowerCase())

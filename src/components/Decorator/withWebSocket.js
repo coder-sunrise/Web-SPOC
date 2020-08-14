@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 // common component
 import { notification, CommonModal, Primary } from '@/components'
 import { CircularProgress } from '@material-ui/core'
@@ -32,6 +32,7 @@ const withWebSocket = () => (Component) => {
         isWsConnected: false,
         loading: false,
         loadingText: 'Scanning...',
+        showScanner: false,
       }
       // this.isWsConnected = false
       this.wsConnection = null
@@ -121,16 +122,19 @@ const withWebSocket = () => (Component) => {
         const { data } = message
         const returnMessage = JSON.parse(data)
         const { MessageType, Status, Data } = returnMessage
-        // console.log(returnMessage)
+        console.log(returnMessage)
 
         if (MessageType === WebSocketMessageType.Scan) {
+          const { Image, FileExtension } = Data
+
           this.setState((preState) => ({
             scanResults: [
               ...preState.scanResults,
               {
                 uid: getUniqueGUID(),
-                image: Data,
+                image: Image,
                 name: moment().format('YYYYMMDD_HHmmss'),
+                fileExtension: FileExtension,
               },
             ],
           }))
@@ -179,8 +183,10 @@ const withWebSocket = () => (Component) => {
     }
 
     handleUploading = (imgDatas) => {
-      const { onUploading } = this.props
-      if (onUploading) onUploading(imgDatas)
+      // console.log(this._CompRef)
+      if (this._CompRef && this._CompRef.onUploadFromScan)
+        this._CompRef.onUploadFromScan(imgDatas)
+      this.toggleModal()
     }
 
     connectionAsync = async (socket, timeout = 1000) => {
@@ -204,11 +210,8 @@ const withWebSocket = () => (Component) => {
       this.setState((preState) => ({
         showScanner: !preState.showScanner,
         loading: false,
+        scanResults: [],
       }))
-    }
-
-    handleCloseScanner = () => {
-      this.setState({ showScanner: false, loading: false, scanResults: [] })
     }
 
     render () {
@@ -218,8 +221,8 @@ const withWebSocket = () => (Component) => {
         loading,
         loadingText,
       } = this.state
-      const { isEnableScanner } = this.props
-
+      const { disableScanner } = this.props
+      // console.log(disableScanner)
       return (
         <React.Fragment>
           <Component
@@ -227,11 +230,14 @@ const withWebSocket = () => (Component) => {
             handlePrint={this.handlePrint}
             handleOpenScanner={this.toggleModal}
             sendingJob={pendingJob.length > 0}
+            onRef={(child) => {
+              this._CompRef = child
+            }}
           />
-          {isEnableScanner && (
+          {disableScanner !== true && (
             <CommonModal
               open={this.state.showScanner}
-              onClose={this.handleCloseScanner}
+              onClose={this.toggleModal}
               title='Scan'
               maxWidth='lg'
               minHeight={500}

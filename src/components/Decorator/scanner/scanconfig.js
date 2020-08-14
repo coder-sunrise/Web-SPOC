@@ -13,7 +13,7 @@ import {
   Checkbox,
   NumberInput,
 } from '@/components'
-import { ImageList } from './imagelist'
+// import { ImageList } from './imagelist'
 
 const PixelTypeOptions = [
   { id: 'BW', name: 'B&W' },
@@ -37,14 +37,13 @@ const DpiOptions = [
   // { id: '150', name: '150' },
   { id: '200', name: '200' },
   { id: '300', name: '300' },
+  { id: '400', name: '400' },
 ]
 export const Scanconfig = ({
   onScaning,
   onUploading,
   onSizeChanged,
   canUploading = false,
-  imageDatas,
-  handleCommitChanges,
 }) => {
   // const defaultPixelType = PixelTypeOptions.find((f) => f.id === 'Color')
   const [
@@ -236,7 +235,7 @@ export const Scanconfig = ({
             color='primary'
             icon={<CloudUpload />}
           >
-            Upload
+            Save
           </ProgressButton>
         </GridItem>
       </GridContainer>
