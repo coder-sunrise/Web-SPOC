@@ -20,7 +20,6 @@ const labelTypes = [
   'PATIENT_LABEL',
   'PATIENT_LAB_LABEL',
   'PATIENT_ADDRESS_LABEL',
-  'Scanner',
 ]
 
 const useStyles = makeStyles(() => ({
@@ -41,7 +40,6 @@ const useStyles = makeStyles(() => ({
 
 const PatientLabelButton = ({
   handlePrint,
-  handleOpenScanner,
   patientId,
   clinicSettings,
   sendingJob,
@@ -77,24 +75,20 @@ const PatientLabelButton = ({
   const handleClick = async (labelType) => {
     if (!Number.isInteger(copyNo[labelType])) return
 
-    if (labelType === 'Scanner') {
-      handleOpenScanner()
-    } else {
-      const { labelPrinterSize } = clinicSettings
+    const { labelPrinterSize } = clinicSettings
 
-      const reportID =
-        REPORT_ID[labelType.concat('_').concat(sizeConverter(labelPrinterSize))]
+    const reportID =
+      REPORT_ID[labelType.concat('_').concat(sizeConverter(labelPrinterSize))]
 
-      const data = await getRawData(reportID, { patientId })
-      const payload = [
-        {
-          ReportId: reportID,
-          Copies: copyNo[labelType],
-          ReportData: JSON.stringify(data),
-        },
-      ]
-      handlePrint(JSON.stringify(payload))
-    }
+    const data = await getRawData(reportID, { patientId })
+    const payload = [
+      {
+        ReportId: reportID,
+        Copies: copyNo[labelType],
+        ReportData: JSON.stringify(data),
+      },
+    ]
+    handlePrint(JSON.stringify(payload))
   }
 
   const handleCopyNoChange = (value, labelType) =>
