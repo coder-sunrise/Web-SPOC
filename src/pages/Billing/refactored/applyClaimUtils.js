@@ -395,7 +395,7 @@ export const validateClaimAmount = (schemeRow) => {
   const patientDistributedAmount =
     totalClaimAmount > 0
       ? roundTo(totalPayable - totalClaimAmount)
-      : patientMinCoPaymentExactAmount
+      : totalPayable
 
   if (patientMinCoPaymentExactAmount > 0) {
     if (patientDistributedAmount < patientMinCoPaymentExactAmount) {
