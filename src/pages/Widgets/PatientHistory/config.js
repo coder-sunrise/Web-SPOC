@@ -17,6 +17,15 @@ export const WIDGETS_ID = {
   TREATMENT: '10',
 }
 
+export const notesTypes = [
+  { value: '3', fieldName: 'history' },
+  { value: '2', fieldName: 'chiefComplaints' },
+  { value: '1', fieldName: 'note' },
+  { value: '11', fieldName: 'plan' },
+  { value: '4', fieldName: 'intraOral' },
+  { value: '5', fieldName: 'extraOral' },
+]
+
 export const historyTags = [
   {
     value: 'Notes',
@@ -29,6 +38,9 @@ export const historyTags = [
       'queue.consultation.widgets.diagnosis',
       'queue.consultation.clinicalnotes.intraoral',
       'queue.consultation.clinicalnotes.extraoral',
+      'queue.consultation.widgets.eyevisualacuity',
+      'queue.consultation.widgets.eyerefractionform',
+      'queue.consultation.widgets.eyeexaminationform',
     ],
     children: [
       '3',
@@ -38,6 +50,9 @@ export const historyTags = [
       '12',
       '4',
       '5',
+      '13',
+      '11',
+      '15',
     ],
   },
   {
@@ -49,7 +64,6 @@ export const historyTags = [
     ],
     children: [
       '7',
-      '20',
       '9',
       '10',
       '8',
@@ -60,15 +74,10 @@ export const historyTags = [
     name: 'Consultation Documents',
     authority: [
       'queue.consultation.widgets.consultationdocument',
-      'queue.consultation.widgets.eyevisualacuity',
-      'queue.consultation.widgets.eyerefractionform',
-      'queue.consultation.widgets.eyeexaminationform',
       'queue.consultation.widgets.forms',
     ],
     children: [
-      '13',
-      '11',
-      '12',
+      '20',
       '14',
     ],
   },
@@ -398,7 +407,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     layoutConfig: {},
   },
   {
-    id: '12',
+    id: '15',
     name: 'Examination Form',
     authority: 'queue.consultation.widgets.eyeexaminationform',
     component: Loadable({

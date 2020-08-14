@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import { Table } from 'antd'
 import { connect } from 'dva'
 import moment from 'moment'
 import PerfectScrollbar from 'perfect-scrollbar'
@@ -104,31 +105,45 @@ export default ({ classes, current, theme, setFieldValue }) => {
       ) : (
         ''
       )}
-
-      <CommonTableGrid
-        size='sm'
-        rows={current.invoice ? current.invoice.invoiceItem : []}
-        columns={columns}
-        FuncProps={{ pager: false }}
-        columnExtensions={[
-          { columnName: 'itemType', width: 150 },
-          { columnName: 'description', width: 'auto' },
-          { columnName: 'quantity', width: 90, type: 'number' },
-          { columnName: 'dispenseUOMDisplayValue', width: 100 },
-          {
-            columnName: 'adjAmt',
-            type: 'number',
-            currency: true,
-            width: 120,
-          },
-          {
-            columnName: 'totalAfterItemAdjustment',
-            type: 'number',
-            currency: true,
-            width: 120,
-          },
+      <Table
+        style={{ fontSize: '0.8em' }}
+        columns={[
+          { dataIndex: 'type', title: 'Type', width: 150 },
+          { dataIndex: 'itemType', title: 'Type' },
+          { dataIndex: 'itemName', title: 'Name' },
+          { dataIndex: 'quantity', title: 'Quantity', width: 90 },
+          { dataIndex: 'dispenseUOMDisplayValue', title: 'UOM', width: 100 },
+          { dataIndex: 'adjAmt', title: 'Adj', width: 120 },
+          { dataIndex: 'totalAfterItemAdjustment', title: 'Total', width: 120 },
         ]}
+        dataSource={current.invoice ? current.invoice.invoiceItem : []}
       />
+      {false && (
+        <CommonTableGrid
+          size='sm'
+          rows={current.invoice ? current.invoice.invoiceItem : []}
+          columns={columns}
+          FuncProps={{ pager: false }}
+          columnExtensions={[
+            { columnName: 'itemType', width: 150 },
+            { columnName: 'description', width: 'auto' },
+            { columnName: 'quantity', width: 90, type: 'number' },
+            { columnName: 'dispenseUOMDisplayValue', width: 100 },
+            {
+              columnName: 'adjAmt',
+              type: 'number',
+              currency: true,
+              width: 120,
+            },
+            {
+              columnName: 'totalAfterItemAdjustment',
+              type: 'number',
+              currency: true,
+              width: 120,
+            },
+          ]}
+        />
+      )}
       <GridContainer
         // direction='column'
         // justify='center'

@@ -93,41 +93,6 @@ export default createListViewModel({
         })
         yield take('query/@@end')
 
-        if (mode === 'split') {
-          const st = yield select((s) => s.patientHistory)
-
-          const { list = [] } = st
-          const filteredList = list.filter(
-            (o) =>
-              o.coHistory.length >= 1 || o.visitPurposeFK === VISIT_TYPE.RETAIL,
-          )
-
-          if (filteredList.length > 0) {
-            if (
-              filteredList[0].visitPurposeFK === VISIT_TYPE.RETAIL
-              // && filteredList[0].coHistory.length > 0
-            ) {
-              yield put({
-                type: 'updateState',
-                payload: {
-                  defaultItem: filteredList[0],
-                },
-              })
-              yield put({
-                type: 'queryRetailHistory',
-                payload: {
-                  id: filteredList[0].invoiceFK,
-                },
-              })
-            } else {
-              yield put({
-                type: 'queryOne',
-                payload: filteredList[0].coHistory[0].id,
-              })
-            }
-          }
-        }
-
         yield put({
           type: 'updateState',
           payload: {
@@ -176,6 +141,36 @@ export default createListViewModel({
       },
     },
     reducers: {
+      queryDone (st, { payload }) {
+        // const { data } = payload
+        st.list = st.list.map((item) => {
+          if (
+            item.visitPurposeFK === VISIT_TYPE.RETAIL ||
+            !item.coHistory ||
+            item.coHistory.length < 1
+          )
+            return item
+          let newEntity = ParseEyeFormData(item.patientHistoryDetail)
+          newEntity = {
+            ...newEntity,
+            forms: newEntity.forms.map((o) => {
+              return {
+                ...o,
+                typeName: formTypes.find(
+                  (type) => parseInt(type.value, 10) === o.type,
+                ).name,
+              }
+            }),
+          }
+          return {
+            ...item,
+            patientHistoryDetail: newEntity,
+          }
+        })
+        return {
+          ...st,
+        }
+      },
       queryOneDone (st, { payload }) {
         // const { data } = payload
         const { entity } = st
@@ -192,28 +187,16 @@ export default createListViewModel({
             }
           }),
         }
-        let sortedPatientHistory = st.list
-          ? st.list.filter((o) => o.coHistory.length >= 1)
-          : []
 
         return {
           ...st,
-          selected:
-            sortedPatientHistory.length > 0 ? sortedPatientHistory[0] : '',
-          selectedSubRow:
-            sortedPatientHistory.length > 0
-              ? sortedPatientHistory[0].coHistory[0]
-              : '',
         }
       },
       getRetailHistory (st, { payload }) {
         const { data } = payload
-        const { defaultItem } = st
         return {
           ...st,
           entity: data,
-          selected: defaultItem,
-          selectedSubRow: defaultItem,
         }
       },
       getInvoiceHistory (st, { payload }) {
