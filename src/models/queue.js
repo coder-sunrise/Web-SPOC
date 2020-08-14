@@ -78,7 +78,12 @@ export default createListViewModel({
             },
           })
         } 
-        const startConsultPermissionIsHidden =Authorized.check('patientdashboard.startresumeconsultation').rights==="hidden" 
+        const startAndResumeRight = Authorized.check('patientdashboard.startresumeconsultation')
+        let startConsultPermissionIsHidden = false
+        if(startAndResumeRight && startAndResumeRight.rights==="hidden")
+        {
+          startConsultPermissionIsHidden = true
+        }
         yield put({
           type: 'updateState',
           payload: {
