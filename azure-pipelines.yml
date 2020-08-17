@@ -7,7 +7,7 @@ trigger:
 - dev
 
 pool:
-  name: 'SEMRGen2'
+  name: 'Medicloud'
 
 variables:
   #override the npm_config_cache environment variable to the custom path
@@ -20,7 +20,7 @@ steps:
 
 - task: Cache@2
   inputs:
-    key: 'npm | "$(Agent.OS)" | package-lock.json'
+    key: 'npm | "$(Agent.OS)" | package.json'
     restoreKeys: |
        npm | "$(Agent.OS)"
     path: $(npm_config_cache)
