@@ -20,7 +20,7 @@ steps:
 
 - task: Cache@2
   inputs:
-    key: 'npm-cache-v3 | "$(Agent.OS)" | package.json'
+    key: 'version2 | npm | "$(Agent.OS)" | package.json'
     restoreKeys: |
        npm | "$(Agent.OS)"
     path: $(npm_config_cache)
