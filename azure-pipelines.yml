@@ -16,9 +16,9 @@ variables:
 steps:
 - task: Cache@2
   inputs:
-    key: 'version4 | npm | "$(Agent.OS)" | package.json'
+    key: 'version5 | npm | "$(Agent.OS)" | package.json'
     restoreKeys: |
-      version4 | npm | "$(Agent.OS)"
+      version5 | npm | "$(Agent.OS)"
     path: $(npm_config_cache)
     cacheHitVar: CACHE_RESTORED
   displayName: Cache npm    
