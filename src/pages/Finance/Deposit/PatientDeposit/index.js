@@ -14,12 +14,12 @@ import {
 import { withStyles, TextField } from '@material-ui/core'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 
-import depositModel from '@/pages/Finance/Deposit/models/deposit'
+// import depositModel from '@/pages/Finance/Deposit/models/deposit'
 import DeleteConfirm from './DeleteConfirm'
 import DepositGrid from './DepositGrid'
 import FilterBar from './FilterBar'
 
-window.g_app.replaceModel(depositModel)
+// window.g_app.replaceModel(depositModel)
 
 const styles = () => ({
   container: {
@@ -67,8 +67,9 @@ class PatientDeposit extends PureComponent {
   }
 
   searchResult = () => {
-    const { dispatch } = this.props
-    const patientId = Number(findGetParameter('pid'))
+    const { dispatch, patient: { entity: patientEntity } } = this.props
+
+    const patientId = patientEntity.id // Number(findGetParameter('pid'))
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {
