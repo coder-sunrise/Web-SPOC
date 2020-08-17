@@ -6,7 +6,7 @@ import { PATIENT_HISTORY_TABS } from '@/utils/constants'
 import InvoiceHistory from '@/pages/Widgets/InvoiceHistory'
 import PatientNurseNotes from '@/pages/PatientDatabase/Detail/PatientNurseNotes'
 import ViewPatientNurseNotes from '@/pages/Widgets/PatientNurseNotes'
-import PatientDeposit from '@/pages/patientdatabase/Detail/patientdeposit'
+import PatientDeposit from '@/pages/Finance/Deposit/PatientDeposit'
 
 const addContent = (type, props) => {
   switch (type) {
