@@ -5,10 +5,16 @@ import { withStyles } from '@material-ui/core/styles'
 import { navigateDirtyCheck } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 
-import { ProgressButton, Button, withFormikExtend } from '@/components'
+import {
+  ProgressButton,
+  Button,
+  withFormikExtend,
+  CardContainer,
+} from '@/components'
 import Yup from '@/utils/yup'
 
 import DetailPanel from './Detail'
+import PackageItemListing from './PackageItemListing'
 
 const { Secured } = Authorized
 
@@ -32,6 +38,7 @@ const Detail = ({
   handleSubmit,
   codetable,
   values,
+  theme,
   ...props
 }) => {
   const [
@@ -66,7 +73,7 @@ const Detail = ({
     setTotalPrice,
   ] = useState(0)
 
-  const typeListingProps = {
+  const packageItemListingProps = {
     dispatch,
     packageDetail,
     setFieldValue,
@@ -81,13 +88,17 @@ const Detail = ({
     ...props,
   }
 
-  console.log('detailProps', detailProps, typeListingProps)
-
   return (
     <React.Fragment>
-      <div style={{ marginTop: 20 }}>
+      <CardContainer
+        hideHeader
+        style={{
+          margin: theme.spacing(1),
+        }}
+      >
         <DetailPanel {...detailProps} />
-      </div>
+        <PackageItemListing {...packageItemListingProps} />
+      </CardContainer>
       <div className={classes.actionDiv}>
         <Button
           color='danger'
@@ -159,7 +170,6 @@ export default compose(
       dispatch({
         type: 'packageDetail/upsert',
         payload: {
-          totalPrice: values.totalPrice || 0,
           ...values,
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],
