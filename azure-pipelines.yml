@@ -11,7 +11,7 @@ pool:
 
 variables:
   #override the npm_config_cache environment variable to the custom path
-  npm_config_cache: $(Pipeline.Workspace)/.npm
+  npm_config_cache: $(Pipeline.Workspace)/.npm 
 
 steps:
 - task: UseNode@1
@@ -28,6 +28,7 @@ steps:
   displayName: Cache npm    
         
 - script: npm install
+  condition: ne(variables.CACHE_RESTORED, 'true')
   #condition: ne(variables.CACHE_RESTORED, 'true')
   displayName: 'npm install'
 - script: 
