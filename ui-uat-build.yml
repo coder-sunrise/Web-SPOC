@@ -30,9 +30,11 @@ steps:
     restoreKeys: |
        npm | "$(Agent.OS)"
     path: $(npm_config_cache)
+    cacheHitVar: CACHE_RESTORED
   displayName: Cache npm        
     
 - script: npm install
+  condition: ne(variables.CACHE_RESTORED, 'true')
   displayName: 'npm install'
 
 - script: copy "config\config.uat.js" "config\config.js" /Y
