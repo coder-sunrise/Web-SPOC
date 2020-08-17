@@ -16,6 +16,8 @@ pool:
   name: 'Medicloud'
 
 steps:
+- task: UseNode@1
+  inputs:
 - script: npm install
   displayName: 'npm install'
 
