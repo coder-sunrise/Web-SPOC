@@ -19,6 +19,7 @@ variables:
   #override the npm_config_cache environment variable to the custom path
   npm_config_cache: $(Build.SourcesDirectory)/node_modules 
 
+steps:
 - task: Cache@2
   inputs:
     key: 'version3 | npm | "$(Agent.OS)" | package.json'
