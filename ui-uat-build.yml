@@ -15,9 +15,9 @@ trigger: none
 pool:
   name: 'Medicloud'
 
-  variables:
+variables:
   #override the npm_config_cache environment variable to the custom path
-  npm_config_cache: $(Pipeline.Workspace)/.npm
+  npm_config_cache: $(Build.SourcesDirectory)/node_modules 
 
 steps:
 - task: UseNode@1
@@ -26,12 +26,12 @@ steps:
 
 - task: Cache@2
   inputs:
-    key: 'npm | "$(Agent.OS)" | package.json'
+    key: 'version3 | npm | "$(Agent.OS)" | package.json'
     restoreKeys: |
-       npm | "$(Agent.OS)"
+      version3 | npm | "$(Agent.OS)"
     path: $(npm_config_cache)
     cacheHitVar: CACHE_RESTORED
-  displayName: Cache npm        
+  displayName: Cache npm          
     
 - script: npm install
   condition: ne(variables.CACHE_RESTORED, 'true')
