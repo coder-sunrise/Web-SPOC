@@ -9,7 +9,23 @@ trigger:
 pool:
   name: 'SEMRGen2'
 
+variables:
+  #override the npm_config_cache environment variable to the custom path
+  npm_config_cache: $(Pipeline.Workspace)/.npm
+
 steps:
+- task: UseNode@1
+  inputs:
+    Version: '10.x'
+
+- task: Cache@2
+  inputs:
+    key: 'npm | "$(Agent.OS)" | package-lock.json'
+    restoreKeys: |
+       npm | "$(Agent.OS)"
+    path: $(npm_config_cache)
+  displayName: Cache npm    
+        
 - script: npm install
   displayName: 'npm install'
 - script: 
