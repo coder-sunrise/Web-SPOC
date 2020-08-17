@@ -13,7 +13,7 @@ trigger: none
 #    - dev
 
 pool:
-  name: 'SEMRGen2'
+  name: 'Medicloud'
 
 steps:
 - script: npm install
