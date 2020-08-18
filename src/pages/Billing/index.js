@@ -25,10 +25,10 @@ import Authorized from '@/utils/Authorized'
 // sub component
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 import DispenseDetails from '@/pages/Dispense/DispenseDetails/WebSocketWrapper'
+import { ReportsOnCompletePaymentOption } from '@/utils/codes'
 import ApplyClaims from './refactored/newApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 import SchemeValidationPrompt from './components/SchemeValidationPrompt'
-import { ReportsOnCompletePaymentOption } from '@/utils/codes'
 import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
 // page utils
 import {
@@ -71,6 +71,7 @@ const styles = (theme) => ({
     dispense,
     loading,
     patient,
+    clinicSettings,
   }) => ({
     billing,
     dispense,
@@ -82,6 +83,7 @@ const styles = (theme) => ({
     ctcopaymentscheme: codetable.copaymentscheme || [],
     ctschemetype: codetable.ctschemetype || [],
     commitCount: global.commitCount,
+    clinicSettings: clinicSettings.settings,
   }),
 )
 @withFormikExtend({
@@ -132,6 +134,10 @@ const styles = (theme) => ({
 class Billing extends Component {
   state = {
     showReport: false,
+    reportPayload: {
+      reportID: undefined,
+      reportParameters: undefined,
+    },
     showAddPaymentModal: false,
     showSchemeValidationPrompt: false,
     isEditing: false,
@@ -142,6 +148,7 @@ class Billing extends Component {
     },
     showDrugLabelSelection: false,
     selectedDrugs: [],
+    isExistingOldPayerItem: false,
   }
 
   componentWillMount () {
@@ -264,21 +271,24 @@ class Billing extends Component {
           }
         }
       }
-      if (printData && printData.length > 0) {
-        const token = localStorage.getItem('token')
-        printData = printData.map((item) => ({
-          ...item,
-          Token: token,
-          BaseUrl: process.env.url,
-        }))
-        await this.childOnPrintRef({
-          type: 1,
-          printData,
-          printAllDrugLabel:
-            reportsOnCompletePayment.indexOf(
-              ReportsOnCompletePaymentOption.DrugLabel,
-            ) > -1,
-        })
+      if (
+        reportsOnCompletePayment.indexOf(
+          ReportsOnCompletePaymentOption.DrugLabel,
+        ) > -1
+      ) {
+        if (printData && printData.length > 0) {
+          const token = localStorage.getItem('token')
+          printData = printData.map((item) => ({
+            ...item,
+            Token: token,
+            BaseUrl: process.env.url,
+          }))
+          await this.childOnPrintRef({
+            type: 1,
+            printData,
+            printAllDrugLabel: true,
+          })
+        }
       }
     }
   }
@@ -334,8 +344,14 @@ class Billing extends Component {
     }
   }
 
-  toggleReport = () => {
-    this.setState((preState) => ({ showReport: !preState.showReport }))
+  onCloseReport = () => {
+    this.setState({
+      showReport: false,
+      reportPayload: {
+        reportID: undefined,
+        reportParameters: undefined,
+      },
+    })
   }
 
   backToDispense = () => {
@@ -393,9 +409,12 @@ class Billing extends Component {
     await setFieldValue('visitStatus', 'COMPLETED')
 
     // check if invoice is OVERPAID and prompt user for confirmation
-    const { invoice } = values
+    const { invoice, invoicePayer = [] } = values
     const { outstandingBalance = 0 } = invoice
-    if (outstandingBalance < 0) {
+    if (
+      outstandingBalance < 0 ||
+      invoicePayer.find((ip) => ip.payerOutstanding < 0)
+    ) {
       return dispatch({
         type: 'global/updateState',
         payload: {
@@ -422,7 +441,20 @@ class Billing extends Component {
     })
   }
 
-  onPrintInvoiceClick = () => {
+  onPrinterClick = (type, itemID, copayerID) => {
+    switch (type) {
+      case 'Payment':
+        this.onShowReport(29, { InvoicePaymentId: itemID })
+        break
+      case 'TaxInvoice':
+        this.onPrintInvoice(copayerID)
+        break
+      default:
+        break
+    }
+  }
+
+  onPrintInvoice = (copayerID) => {
     const { values, dispatch } = this.props
     const { invoicePayer } = values
     const modifiedOrNewAddedPayer = invoicePayer.filter((payer) => {
@@ -430,6 +462,18 @@ class Billing extends Component {
       if (payer.id) return payer.isModified
       return true
     })
+    let parametrPaload
+    if (copayerID) {
+      parametrPaload = {
+        InvoiceId: values.invoice ? values.invoice.id : '',
+        CopayerId: copayerID,
+      }
+    } else {
+      parametrPaload = {
+        InvoiceId: values.invoice ? values.invoice.id : '',
+      }
+    }
+    console.log('parametrPaload', parametrPaload)
     if (modifiedOrNewAddedPayer.length > 0) {
       dispatch({
         type: 'global/updateState',
@@ -443,13 +487,20 @@ class Billing extends Component {
               this.setState((preState) => ({
                 submitCount: preState.submitCount + 1,
               }))
-              this.toggleReport()
+
+              this.onShowReport(15, parametrPaload)
             }
             this.upsertBilling(callback)
           },
         },
       })
-    } else this.toggleReport()
+    } else {
+      this.onShowReport(15, parametrPaload)
+    }
+  }
+
+  onPrintInvoiceClick = () => {
+    this.onPrintInvoice(undefined)
   }
 
   handleAddPayment = async (payment) => {
@@ -571,9 +622,24 @@ class Billing extends Component {
     this.props.dispatch({ type: 'global/incrementCommitCount' })
   }
 
+  onShowReport = (reportID, reportParameters) => {
+    this.setState({
+      showReport: true,
+      reportPayload: {
+        reportID,
+        reportParameters,
+      },
+    })
+  }
+
+  handleIsExistingOldPayerItem = (isExistingOldPayerItem) => {
+    this.setState({ isExistingOldPayerItem })
+  }
+
   render () {
     const {
       showReport,
+      reportPayload,
       showAddPaymentModal,
       showSchemeValidationPrompt,
       schemeValidations,
@@ -594,6 +660,7 @@ class Billing extends Component {
       commitCount,
       ctschemetype,
       ctcopaymentscheme,
+      clinicSettings,
     } = this.props
     const formikBag = {
       values,
@@ -604,6 +671,8 @@ class Billing extends Component {
       patient,
       ctschemetype,
       ctcopaymentscheme,
+      sessionInfo,
+      user,
     }
     return (
       <LoadingWrapper loading={loading} text='Getting billing info...'>
@@ -655,6 +724,13 @@ class Billing extends Component {
                   commitCount={commitCount}
                   {...formikBag}
                   {...commonProps}
+                  onPrinterClick={this.onPrinterClick}
+                  saveBilling={this.handleSaveBillingClick}
+                  fromBilling
+                  handleIsExistingOldPayerItem={
+                    this.handleIsExistingOldPayerItem
+                  }
+                  clinicSettings={clinicSettings}
                 />
               )}
             </GridContainer>
@@ -694,7 +770,14 @@ class Billing extends Component {
                 <Button
                   color='info'
                   onClick={this.backToDispense}
-                  disabled={this.state.isEditing || values.id === undefined}
+                  disabled={
+                    this.state.isEditing ||
+                    values.id === undefined ||
+                    values.invoicePayer.find((payer) =>
+                      (payer.invoicePayment || [])
+                        .find((payment) => !payment.isCancelled),
+                    )
+                  }
                 >
                   <ArrowBack />Dispense
                 </Button>
@@ -707,7 +790,11 @@ class Billing extends Component {
                 </Button>
                 <Button
                   color='success'
-                  disabled={this.state.isEditing || values.id === undefined}
+                  disabled={
+                    this.state.isEditing ||
+                    values.id === undefined ||
+                    this.state.isExistingOldPayerItem
+                  }
                   onClick={this.onCompletePaymentClick}
                 >
                   Complete Payment
@@ -751,16 +838,14 @@ class Billing extends Component {
         </CommonModal>
         <CommonModal
           open={showReport}
-          onClose={this.toggleReport}
+          onClose={this.onCloseReport}
           title='Invoice'
           maxWidth='lg'
         >
           <ReportViewer
             showTopDivider={false}
-            reportID={15}
-            reportParameters={{
-              InvoiceID: values.invoice ? values.invoice.id : '',
-            }}
+            reportID={reportPayload.reportID}
+            reportParameters={reportPayload.reportParameters}
           />
         </CommonModal>
       </LoadingWrapper>

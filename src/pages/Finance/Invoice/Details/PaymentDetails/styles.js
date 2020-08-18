@@ -4,6 +4,11 @@ export default (theme) => ({
     fontSize: '1rem',
   },
   container: {
+    marginLeft: theme.spacing(1),
+    marginTop: theme.spacing(1),
+    marginRight: theme.spacing(1),
+  },
+  lastContainer: {
     margin: theme.spacing(1),
   },
   popupContainer: {
