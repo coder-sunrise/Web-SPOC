@@ -57,7 +57,7 @@ const styles = () => ({})
           ...o,
           tempOutstandingAmount: o.outstandingAmount,
           totalPayableAmount,
-          totalPayment,
+          totalPayment : totalPayableAmount - outstandingAmount,
           statementInvoicePayment: [
             ...statementInvoicePayment,
           ],
