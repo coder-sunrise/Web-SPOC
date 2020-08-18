@@ -17,7 +17,7 @@ import {
 
 const styles = () => ({})
 
-const Detail = ({ packageDetail, dispatch }) => {
+const Detail = ({ packageDetail, dispatch, setIsLoading }) => {
   useEffect(() => {
     if (packageDetail.currentId) {
       dispatch({
@@ -25,8 +25,8 @@ const Detail = ({ packageDetail, dispatch }) => {
         payload: {
           id: packageDetail.currentId,
         },
-      })
-    }
+      }).then((v) => setIsLoading(false))
+    } else setIsLoading(false)
   }, [])
   return (
     <GridContainer gutter={0}>
@@ -39,6 +39,7 @@ const Detail = ({ packageDetail, dispatch }) => {
                 label={formatMessage({
                   id: 'inventory.master.package.code',
                 })}
+                maxLength={10}
                 {...args}
               />
             )
@@ -68,6 +69,7 @@ const Detail = ({ packageDetail, dispatch }) => {
                 label={formatMessage({
                   id: 'inventory.master.package.name',
                 })}
+                maxLength={255}
                 {...args}
               />
             )
@@ -123,6 +125,7 @@ const Detail = ({ packageDetail, dispatch }) => {
                 label={formatMessage({
                   id: 'inventory.master.package.description',
                 })}
+                maxLength={500}
                 {...args}
               />
             )
@@ -141,6 +144,7 @@ const Detail = ({ packageDetail, dispatch }) => {
                 })}
                 multiline
                 rowsMax='5'
+                maxLength={2000}
                 {...args}
               />
             )

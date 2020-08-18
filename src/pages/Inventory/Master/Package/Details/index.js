@@ -4,6 +4,7 @@ import { compose } from 'redux'
 import { withStyles } from '@material-ui/core/styles'
 import { navigateDirtyCheck } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
+import { LoadingWrapper } from '@/components/_medisys'
 
 import {
   ProgressButton,
@@ -42,22 +43,9 @@ const Detail = ({
   ...props
 }) => {
   const [
-    selectedItem,
-    setSelectedItem,
-  ] = useState(() => {})
-
-  const [
-    serviceCenterServicess,
-    setServiceCenterServicess,
-  ] = useState(() => [])
-  const [
-    serviceCenterFK,
-    setServiceCenterFK,
-  ] = useState(() => {})
-  const [
-    price,
-    setPrice,
-  ] = useState(() => undefined)
+    isLoading,
+    setIsLoading,
+  ] = useState(true)
 
   const detailProps = {
     values,
@@ -66,6 +54,7 @@ const Detail = ({
     setFieldValue,
     showTransfer: false,
     errors: props.errors,
+    setIsLoading,
   }
 
   const [
@@ -78,18 +67,13 @@ const Detail = ({
     packageDetail,
     setFieldValue,
     values,
-    selectedItem,
-    setSelectedItem,
-    price,
-    serviceCenterFK,
-    serviceCenterServicess,
     totalPrice,
     setTotalPrice,
     ...props,
   }
 
   return (
-    <React.Fragment>
+    <LoadingWrapper loading={isLoading} text='Getting package details...'>
       <CardContainer
         hideHeader
         style={{
@@ -114,7 +98,7 @@ const Detail = ({
           onClick={handleSubmit}
         />
       </div>
-    </React.Fragment>
+    </LoadingWrapper>
   )
 }
 
@@ -128,24 +112,22 @@ export default compose(
     enableReinitialize: true,
     mapPropsToValues: ({ packageDetail }) => {
       const returnValue = packageDetail.entity || packageDetail.default
-      // const { serviceOrderSetItem } = returnValue
-      // let newserviceOrderSetItem = []
-      // if (serviceOrderSetItem.length > 0) {
-      //   newserviceOrderSetItem = serviceOrderSetItem.map((o) => {
-      //     const { service } = o
-      //     return {
-      //       ...o,
-      //       tempServiceCenterServiceFK: o.serviceCenterServiceFK,
-      //       serviceCenterServiceFK:
-      //         service.ctServiceCenter_ServiceNavigation[0].serviceFK,
-      //       serviceName:
-      //         service.ctServiceCenter_ServiceNavigation[0].serviceCenterFK,
-      //     }
-      //   })
-      // }
+      const { servicePackageItem } = returnValue
+      let newservicePackageItem = []
+      if (servicePackageItem.length > 0) {
+        newservicePackageItem = servicePackageItem.map((o) => {
+          const { serviceCenterService } = o
+          return {
+            ...o,
+            tempServiceCenterServiceFK: o.id,
+            serviceCenterServiceFK: serviceCenterService.serviceFK,
+            serviceName: serviceCenterService.serviceCenterFKNavigation.id,
+          }
+        })
+      }
       return {
         ...returnValue,
-        // serviceOrderSetItem: newserviceOrderSetItem,
+        servicePackageItem: newservicePackageItem,
       }
     },
 
@@ -156,24 +138,23 @@ export default compose(
     }),
 
     handleSubmit: (values, { props, resetForm }) => {
-      const { dispatch, history, codetable } = props
-      // const { serviceOrderSetItem } = values
+      const { dispatch, history } = props
+      const { servicePackageItem } = values
 
-      // const newServiceOrderSetArray = serviceOrderSetItem.map((o) => {
-      //   return {
-      //     ...o,
-      //     serviceCenterServiceFK:
-      //       o.tempServiceCenterServiceFK || o.serviceCenterServiceFK,
-      //     // serviceName: o.tempServiceName,
-      //   }
-      // })
+      const newServicePackageArray = servicePackageItem.map((o) => {
+        return {
+          ...o,
+          serviceCenterServiceFK:
+            o.tempServiceCenterServiceFK || o.serviceCenterServiceFK,
+        }
+      })
       dispatch({
         type: 'packageDetail/upsert',
         payload: {
           ...values,
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],
-          // serviceOrderSetItem: newServiceOrderSetArray,
+          servicePackageItem: newServicePackageArray,
         },
       }).then((r) => {
         if (r) {
