@@ -44,7 +44,7 @@ steps:
 - task: PublishBuildArtifacts@1
   displayName: 'Publish UAT artifacts'
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/UAT'
     ArtifactName: 'drop-uat'
     publishLocation: 'Container'
 
@@ -60,10 +60,10 @@ steps:
   inputs:
     SourceFolder: '.\dist'
     Contents: '**'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/Prod'
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Production artifacts'
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/Prod'
     ArtifactName: 'drop-prod'
     publishLocation: 'Container'
