@@ -16,6 +16,7 @@ export default ({ rows = [], selectedRow }) => {
           rowClassName={(record, index) => {
             return index % 2 === 0 ? tablestyles.once : tablestyles.two
           }}
+          className={tablestyles.table}
           columns={[
             {
               dataIndex: 'IsSelected',

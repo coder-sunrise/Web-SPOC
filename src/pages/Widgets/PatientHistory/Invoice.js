@@ -147,6 +147,7 @@ export default ({ current, theme }) => {
         rowClassName={(record, index) => {
           return index % 2 === 0 ? tablestyles.once : tablestyles.two
         }}
+        className={tablestyles.table}
       />
       <GridContainer style={{ paddingTop: theme.spacing(2) }}>
         <GridItem xs={2} md={9} />

@@ -15,6 +15,7 @@ export default ({ current, codetable, dentalChartComponent }) => {
       rowClassName={(record, index) => {
         return index % 2 === 0 ? tablestyles.once : tablestyles.two
       }}
+      className={tablestyles.table}
       dataSource={current.orders.filter((o) => o.type === 'Treatment') || []}
       columns={[
         {
