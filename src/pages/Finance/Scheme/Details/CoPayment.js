@@ -203,7 +203,6 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
       </GridItem>
       <GridItem xs={2}>
         <Field name='overalCoPaymentValueType' render={CPSwitch('all')} />
-
         <Field
           name='itemGroupValueDto.consumableGroupValue.groupValueType'
           render={CPSwitch('sub')}
@@ -216,15 +215,16 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
           name='itemGroupValueDto.vaccinationGroupValue.groupValueType'
           render={CPSwitch('sub')}
         />
-        {/* Commented Package Input - Need to re-test if enabling it back in the future */}
-        {/* <Field
+        <Field
           name='itemGroupValueDto.serviceGroupValue.groupValueType'
           render={CPSwitch('sub')}
-        /> */}
+        />
+        {/* Commented Package Input - Need to re-test if enabling it back in the future */}
+        {/* 
         <Field
           name='itemGroupValueDto.orderSetGroupValue.groupValueType'
-          render={CPSwitch('sub')}
-        />
+          render={CPSwitch('sub')} 
+        /> */}
       </GridItem>
     </GridContainer>
   )
