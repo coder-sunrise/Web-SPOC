@@ -12,6 +12,7 @@ import classNames from 'classnames'
 import { Divider, withStyles } from '@material-ui/core'
 import Refresh from '@material-ui/icons/Refresh'
 import Stop from '@material-ui/icons/Stop'
+import EventNote from '@material-ui/icons/EventNote'
 
 // custom components
 import {
@@ -865,7 +866,7 @@ class Queue extends React.Component {
               <div className={classNames(classes.toolBtns)}>
                 <Authorized authority='queue.endsession'>
                   <ProgressButton
-                    icon={<Stop />}
+                    icon={<EventNote />}
                     color='info'
                     size='sm'
                     onClick={this.onSessionSummaryClick}
