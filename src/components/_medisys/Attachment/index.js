@@ -1,12 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { Component, useState, useEffect, useRef } from 'react'
 import { connect } from 'dva'
 import classnames from 'classnames'
 // import fetch from 'dva/fetch'
 // material ui
-import AttachFile from '@material-ui/icons/AttachFile'
+import { AttachFile, Scanner } from '@material-ui/icons'
 import { CircularProgress, Chip, withStyles } from '@material-ui/core'
 // custom components
 import { Button, Danger, GridContainer, GridItem } from '@/components'
+import { LoadingWrapper } from '@/components/_medisys'
 // services
 import {
   uploadFile,
@@ -14,8 +15,10 @@ import {
   deleteFileByFileID,
 } from '@/services/file'
 // utils
-import AttachmentChipWithPopover from './AttachmentChipWithPopover'
 import { FILE_CATEGORY, FILE_STATUS } from '@/utils/constants'
+import withWebSocket from '@/components/Decorator/withWebSocket'
+import { convertToBase64 } from '@/utils/utils'
+import AttachmentChipWithPopover from './AttachmentChipWithPopover'
 
 const styles = (theme) => ({
   noPadding: {
@@ -53,55 +56,93 @@ const styles = (theme) => ({
 
 const allowedFiles = '.png, .jpg, .jpeg, .xls, .xlsx, .doc, .docx, .pdf'
 
-const convertToBase64 = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = () => resolve(reader.result.split(',')[1])
-    reader.onerror = (error) => reject(error)
-  })
-
 const getFileExtension = (filename) => {
   return filename.split('.').pop()
 }
 
-const getFileName = (filename) => {
-  return filename.split('.')[0]
-}
+class Attachment extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      errorText: undefined,
+      uploading: false,
+    }
 
-const Attachment = ({
-  global,
-  dispatch,
-  classes,
-  handleUpdateAttachments,
-  attachmentType = '',
-  filterTypes = [],
-  attachments = [],
-  isReadOnly,
-  label = 'Attachment:',
-}) => {
-  const [
-    uploading,
-    setUploading,
-  ] = useState(false)
+    this.inputEl = React.createRef()
+    this.popperRef = React.createRef()
+  }
 
-  const [
-    errorText,
-    setErrorText,
-  ] = useState('')
+  componentDidMount () {
+    this.props.onRef(this)
+  }
 
-  const fileAttachments = attachments.filter(
-    (attachment) =>
-      (!attachmentType ||
-        attachment.attachmentType === attachmentType ||
-        filterTypes.indexOf(attachment.attachmentType) >= 0) &&
-      !attachment.isDeleted,
-  )
-  const inputEl = useRef(null)
+  setUploading = (val) => {
+    this.setState({ uploading: val })
+  }
 
-  const mapFileToUploadObject = async (file) => {
-    // file type and file size validation
-    const base64 = await convertToBase64(file)
+  setErrorText = (val) => {
+    this.setState({
+      errorText: val,
+    })
+  }
+
+  onUploadFromScan = async (datas) => {
+    const { attachmentType = '', dispatch } = this.props
+    try {
+      this.setUploading(true)
+      dispatch({
+        type: 'global/updateState',
+        payload: {
+          disableSave: true,
+        },
+      })
+
+      if (!this.validateFilesTotalSize(datas)) {
+        dispatch({
+          type: 'global/updateState',
+          payload: {
+            disableSave: false,
+          },
+        })
+        return
+      }
+
+      const selectedFilesDto = await Promise.all(
+        datas.map((m) =>
+          this.generateFileDto(m.name, m.size, attachmentType, m.imgData),
+        ),
+      )
+
+      // let addedItems = await this.beginUpload(selectedFilesDto)
+
+      this.setUploading(false)
+      dispatch({
+        type: 'global/updateState',
+        payload: {
+          disableSave: false,
+        },
+      })
+      this.props.handleUpdateAttachments({
+        added: selectedFilesDto,
+      })
+    } catch (error) {
+      console.log({ error })
+    }
+  }
+
+  beginUpload = async (uploadObjects) => {
+    const { attachmentType = '' } = this.props
+    const uploaded = await uploadFile(uploadObjects)
+
+    return uploaded.map((m) => {
+      return {
+        0: m,
+        attachmentType,
+      }
+    })
+  }
+
+  generateFileDto = async (name, size, attachmentType, base64File) => {
     let fileStatusFK
     let fileCategoryFK
     if (attachmentType === 'patientAttachment') {
@@ -117,29 +158,40 @@ const Attachment = ({
     }
 
     const uploadObject = {
-      fileName: file.name,
-      fileSize: file.size,
-      fileExtension: getFileExtension(file.name),
+      fileName: name,
+      fileSize: size,
+      fileExtension: getFileExtension(name),
       fileCategoryFK,
-      content: base64,
+      content: base64File,
       // isConfirmed: false,
       fileStatusFK,
       attachmentType,
     }
-    console.log(uploadObject)
     const uploaded = await uploadFile([
       uploadObject,
     ])
 
     return { ...uploaded, attachmentType }
+
+    // console.log(uploadObject)
+    // return uploadObject
   }
 
-  const onUploadClick = () => {
-    setErrorText('')
-    inputEl.current.click()
+  mapFileToUploadObject = async (file) => {
+    const { attachmentType = '' } = this.props
+    const { name, size } = file
+    // file type and file size validation
+    const base64 = await convertToBase64(file)
+    const dtos = await this.generateFileDto(name, size, attachmentType, base64)
+    return dtos
   }
 
-  const validateFileSize = (files) => {
+  onUploadClick = () => {
+    this.setErrorText('')
+    this.inputEl.current.click()
+  }
+
+  validateFileSize = (files) => {
     const maxMB = 31457280
     const skippedFiles = Object.keys(files).reduce(
       (skipped, key) =>
@@ -158,14 +210,38 @@ const Attachment = ({
     const errTxt = `Skipped ${skippedFiles.join(
       ', ',
     )}. Reason: File(s) is larger than 5mb`
-    setErrorText(errTxt)
+    this.setErrorText(errTxt)
 
     return skippedFiles
   }
 
-  const onFileChange = async (event) => {
+  validateFilesTotalSize = (filesArray) => {
+    const { attachments = [] } = this.props
+
+    let totalFilesSize = 0
+    const maxUploadSize = 31457280
+
+    filesArray &&
+      filesArray.forEach((o) => {
+        totalFilesSize += o.size
+      })
+    attachments.forEach((o) => {
+      if (!o.isDeleted) {
+        totalFilesSize += o.fileSize
+      }
+    })
+
+    if (totalFilesSize > maxUploadSize) {
+      this.setErrorText('Cannot upload more than 30MB')
+      return false
+    }
+    return true
+  }
+
+  onFileChange = async (event) => {
+    const { dispatch } = this.props
     try {
-      setUploading(true)
+      this.setUploading(true)
       dispatch({
         type: 'global/updateState',
         payload: {
@@ -174,28 +250,13 @@ const Attachment = ({
       })
 
       const { files } = event.target
-
-      // const numberOfNewFiles = Object.keys(files).length
-      let totalFilesSize = 0
-      const maxUploadSize = 31457280
       const filesArray = [
         ...files,
       ]
 
-      filesArray &&
-        filesArray.forEach((o) => {
-          totalFilesSize += o.size
-        })
-      attachments.forEach((o) => {
-        if (!o.isDeleted) {
-          totalFilesSize += o.fileSize
-        }
-      })
-
-      if (totalFilesSize > maxUploadSize) {
-        setErrorText('Cannot upload more than 30MB')
-        setUploading(false)
-        dispatch({
+      if (!this.validateFilesTotalSize(filesArray)) {
+        this.setUploading(false)
+        this.props.dispatch({
           type: 'global/updateState',
           payload: {
             disableSave: false,
@@ -203,28 +264,25 @@ const Attachment = ({
         })
         return
       }
-
-      // if (numberOfNewFiles + attachments.length > 5) {
-      //   setErrorText('Cannot upload more than 5 attachments')
-      //   setUploading(false)
-      //   return
-      // }
       // const skipped = validateFileSize(files)
       const skipped = []
 
       const selectedFiles = await Promise.all(
         Object.keys(files)
           .filter((key) => !skipped.includes(files[key].name))
-          .map((key) => mapFileToUploadObject(files[key])),
+          .map((key) => this.mapFileToUploadObject(files[key])),
       )
-      setUploading(false)
+
+      // let addedItems = await this.beginUpload(selectedFiles)
+
+      this.setUploading(false)
       dispatch({
         type: 'global/updateState',
         payload: {
           disableSave: false,
         },
       })
-      handleUpdateAttachments({
+      this.props.handleUpdateAttachments({
         added: selectedFiles,
       })
     } catch (error) {
@@ -232,85 +290,133 @@ const Attachment = ({
     }
   }
 
-  const onDelete = (fileIndexFK, id) => {
+  onDelete = (fileIndexFK, id) => {
     if (!fileIndexFK && id) {
       deleteFileByFileID(id)
     }
 
-    handleUpdateAttachments({
+    this.props.handleUpdateAttachments({
       deleted: !fileIndexFK ? id : fileIndexFK,
     })
   }
 
-  const onClick = (attachment) => {
-    downloadAttachment(attachment)
-  }
-  const labelClass = classnames({
-    [classes.verticalSpacing]: true,
-    [classes.noPadding]: true,
-  })
-
-  const clearValue = (e) => {
+  clearValue = (e) => {
     e.target.value = null
   }
 
-  console.log({ fileAttachments })
+  onClick = (attachment) => {
+    downloadAttachment(attachment)
+  }
 
-  return (
-    <GridContainer>
-      {label && (
-        <GridItem className={labelClass}>
-          <span className={classes.attachmentLabel}>{label}</span>
-          {uploading && <CircularProgress />}
-        </GridItem>
-      )}
-      <GridItem md={10} className={classes.verticalSpacing}>
-        <div>
-          {fileAttachments.map((attachment) => (
-            <AttachmentChipWithPopover
-              title='Delete Attachment'
-              contentText='Confirm to delete this attachment?'
-              isReadOnly={isReadOnly}
-              classes={classes}
-              attachment={attachment}
-              onConfirmDelete={onDelete}
-              onClickAttachment={onClick}
+  render () {
+    const {
+      global,
+      classes,
+      attachmentType = '',
+      filterTypes = [],
+      attachments = [],
+      isReadOnly,
+      label = 'Attachment:',
+      disableScanner = false,
+      handleOpenScanner,
+    } = this.props
+
+    const fileAttachments = attachments.filter(
+      (attachment) =>
+        (!attachmentType ||
+          attachment.attachmentType === attachmentType ||
+          filterTypes.indexOf(attachment.attachmentType) >= 0) &&
+        !attachment.isDeleted,
+    )
+
+    const labelClass = classnames({
+      [classes.verticalSpacing]: true,
+      [classes.noPadding]: true,
+    })
+
+    // console.log({ fileAttachments })
+
+    return (
+      <LoadingWrapper
+        className={labelClass}
+        loading={this.state.uploading}
+        text=''
+      >
+        <GridContainer>
+          {/* {label && (
+          <GridItem className={labelClass}>
+            <span className={classes.attachmentLabel}>{label}</span>
+            {this.state.uploading && <CircularProgress />}
+          </GridItem>
+        )} */}
+          <GridItem md={10} className={classes.verticalSpacing}>
+            <div>
+              {fileAttachments.map((attachment) => (
+                <AttachmentChipWithPopover
+                  title='Delete Attachment'
+                  contentText='Confirm to delete this attachment?'
+                  isReadOnly={isReadOnly}
+                  classes={classes}
+                  attachment={attachment}
+                  onConfirmDelete={this.onDelete}
+                  onClickAttachment={this.onClick}
+                />
+              ))}
+            </div>
+          </GridItem>
+          <GridItem className={classes.noPadding}>
+            <input
+              style={{ display: 'none' }}
+              type='file'
+              accept={allowedFiles}
+              id='uploadVisitAttachment'
+              ref={this.inputEl}
+              multiple='multiple'
+              onChange={this.onFileChange}
+              onClick={this.clearValue}
             />
-          ))}
-        </div>
-      </GridItem>
-      <GridItem className={classes.noPadding}>
-        <input
-          style={{ display: 'none' }}
-          type='file'
-          accept={allowedFiles}
-          id='uploadVisitAttachment'
-          ref={inputEl}
-          multiple='multiple'
-          onChange={onFileChange}
-          onClick={clearValue}
-        />
-        {!isReadOnly && (
-          <Button
-            color='rose'
-            size='sm'
-            onClick={onUploadClick}
-            disabled={uploading || global.disableSave}
-          >
-            <AttachFile />
-            Upload
-          </Button>
-        )}
-      </GridItem>
-      <GridItem>
-        <Danger>
-          <span>{errorText}</span>
-        </Danger>
-      </GridItem>
-    </GridContainer>
-  )
+            {!isReadOnly && (
+              <React.Fragment>
+                <Button
+                  color='rose'
+                  size='sm'
+                  onClick={this.onUploadClick}
+                  disabled={this.state.uploading || global.disableSave}
+                >
+                  <AttachFile />
+                  Upload
+                </Button>
+                {!disableScanner && (
+                  <Button
+                    color='primary'
+                    size='sm'
+                    onClick={handleOpenScanner}
+                    disabled={
+                      isReadOnly || this.state.uploading || global.disableSave
+                    }
+                    className={
+                      fileAttachments.length >= 1 ? classes.uploadBtn : ''
+                    }
+                  >
+                    <Scanner /> Scan
+                  </Button>
+                )}
+              </React.Fragment>
+            )}
+          </GridItem>
+          <GridItem>
+            <Danger>
+              <span>{this.state.errorText}</span>
+            </Danger>
+          </GridItem>
+        </GridContainer>
+      </LoadingWrapper>
+    )
+  }
 }
 
 const ConnectAttachment = connect(({ global }) => ({ global }))(Attachment)
 
-export default withStyles(styles, { name: 'Attachment' })(ConnectAttachment)
+export default withWebSocket()(
+  withStyles(styles, { name: 'Attachment' })(ConnectAttachment),
+)
