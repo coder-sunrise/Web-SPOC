@@ -275,7 +275,7 @@ class PatientHistory extends Component {
         (!scribbleType ||
           scribbleNotes.filter(
             (o) => o.scribbleNoteTypeFK === scribbleType.typeFK,
-          ).length <= 0)
+          ).length === 0)
       )
         return false
     }
@@ -283,7 +283,7 @@ class PatientHistory extends Component {
     // check show diagnosis
     if (
       widget.id === '12' &&
-      (!current.diagnosis || current.diagnosis.length <= 0)
+      (!current.diagnosis || current.diagnosis.length === 0)
     )
       return false
 
@@ -291,7 +291,7 @@ class PatientHistory extends Component {
     if (
       widget.id === '13' &&
       (!current.eyeVisualAcuityTestForms ||
-        current.eyeVisualAcuityTestForms.length <= 0)
+        current.eyeVisualAcuityTestForms.length === 0)
     )
       return false
 
@@ -308,27 +308,27 @@ class PatientHistory extends Component {
       widget.id === '15' &&
       (!current.corEyeExaminationForm ||
         JSON.stringify(current.corEyeExaminationForm.formData) === '{}' ||
-        (current.corEyeExaminationForm.formData.EyeExaminations || []).length <=
-          0)
+        (current.corEyeExaminationForm.formData.EyeExaminations || [])
+          .length === 0)
     )
       return false
 
     // check show forms
-    if (widget.id === '14' && (!current.forms || current.forms.length <= 0))
+    if (widget.id === '14' && (!current.forms || current.forms.length === 0))
       return false
     // check show orders
-    if (widget.id === '7' && (!current.orders || current.orders.length <= 0))
+    if (widget.id === '7' && (!current.orders || current.orders.length === 0))
       return false
     // check show document
     if (
       widget.id === '20' &&
-      (!current.documents || current.documents.length <= 0)
+      (!current.documents || current.documents.length === 0)
     )
       return false
     // check show DentalChart
     if (
       widget.id === '9' &&
-      (!current.dentalChart || current.dentalChart.length <= 0)
+      (!current.dentalChart || current.dentalChart.length === 0)
     )
       return false
     // check show invoice
@@ -338,7 +338,7 @@ class PatientHistory extends Component {
     if (
       widget.id === '10' &&
       (!current.orders ||
-        current.orders.filter((o) => o.type === 'Treatment').length <= 0)
+        current.orders.filter((o) => o.type === 'Treatment').length === 0)
     )
       return false
 
@@ -347,26 +347,31 @@ class PatientHistory extends Component {
 
   getDetailPanel = (history) => {
     const { visitPurposeFK } = history
-    let currentTagWidgets = this.widgets.filter((_widget) => {
-      if (visitPurposeFK === VISIT_TYPE.RETAIL) {
-        return (
-          _widget.id === WidgetConfig.WIDGETS_ID.INVOICE &&
-          this.state.selectTag.children.indexOf(_widget.id) >= 0
-        )
-      }
-      return this.state.selectTag.children.indexOf(_widget.id) >= 0
-    })
     let current = history.patientHistoryDetail || {}
     let visitDetails = {
       visitDate: history.visitDate,
       patientName: history.patientName,
       patientAccountNo: history.patientAccountNo,
     }
+    let currentTagWidgets = this.widgets.filter((_widget) => {
+      if (visitPurposeFK === VISIT_TYPE.RETAIL) {
+        return (
+          _widget.id === WidgetConfig.WIDGETS_ID.INVOICE &&
+          this.state.selectTag.children.indexOf(_widget.id) >= 0 &&
+          this.showWidget(current, _widget)
+        )
+      }
+      return (
+        this.state.selectTag.children.indexOf(_widget.id) >= 0 &&
+        this.showWidget(current, _widget)
+      )
+    })
+
     return (
       <CardContainer hideHeader size='sm'>
-        {currentTagWidgets.map((o) => {
-          const Widget = o.component
-          if (this.showWidget(current, o))
+        {currentTagWidgets.length > 0 ? (
+          currentTagWidgets.map((o) => {
+            const Widget = o.component
             return (
               <div>
                 <h5 style={{ fontWeight: 500, color: 'darkBlue' }}>{o.name}</h5>
@@ -382,8 +387,10 @@ class PatientHistory extends Component {
                 )}
               </div>
             )
-          return ''
-        })}
+          })
+        ) : (
+          'No Data'
+        )}
       </CardContainer>
     )
   }
@@ -449,8 +456,8 @@ class PatientHistory extends Component {
           {sortedPatientHistory ? sortedPatientHistory.length > 0 ? (
             <div>
               <Collapse
+                bordered={false}
                 defaultActiveKey={sortedPatientHistory.map((o) => o.id)}
-                ghost
               >
                 {sortedPatientHistory.map((o) => {
                   return (

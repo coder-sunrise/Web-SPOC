@@ -31,6 +31,7 @@ const Attachment = ({ current }) => {
               <Thumbnail
                 key={`attachment-${index}`}
                 attachment={attachment}
+                isReadOnly
                 indexInAllAttachments={indexInAllAttachments}
                 onClickAttachment={handleClickAttachment}
                 fieldName='eyeVisualAcuityTestAttachments'

@@ -195,18 +195,21 @@ const RefractionForm = ({ current, theme, visitDetails }) => {
 
         <GridContainer>
           <GridItem xs sm={12} md={12} style={{ alignSelf: 'flex-end' }}>
-            <Button
-              color='primary'
-              icon={null}
-              authority='none'
-              style={{ margin: theme.spacing(1) }}
-              disabled={isDisabledPrint()}
-              onClick={() => {
-                handlePrintPrescription()
-              }}
-            >
-              <Print /> Print Spectacle Prescription
-            </Button>
+            {formData.Tests &&
+            formData.Tests.length > 0 && (
+              <Button
+                color='primary'
+                icon={null}
+                authority='none'
+                style={{ margin: theme.spacing(1) }}
+                disabled={isDisabledPrint()}
+                onClick={() => {
+                  handlePrintPrescription()
+                }}
+              >
+                <Print /> Print Spectacle Prescription
+              </Button>
+            )}
           </GridItem>
         </GridContainer>
 
