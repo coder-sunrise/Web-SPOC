@@ -51,7 +51,7 @@ export const historyTags = [
       '4',
       '5',
       '13',
-      '11',
+      '16',
       '15',
     ],
   },
@@ -351,59 +351,26 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     name: 'Visual Acuity Test',
     authority: 'queue.consultation.widgets.eyevisualacuity',
     component: Loadable({
-      loader: () => import('../EyeVisualAcuity'),
+      loader: () => import('./EyeVisualAcuity/index'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return (
-          <AuthorizedContext.Provider
-            value={{
-              rights: 'disable',
-            }}
-          >
-            <Cmpnet
-              {...props}
-              {...p}
-              prefix='eyeVisualAcuityTestForms'
-              attachmentsFieldName='eyeVisualAcuityTestAttachments'
-              fromPatientHistory
-              values={p.patientHistory.entity}
-            />
-          </AuthorizedContext.Provider>
-        )
+        return <Cmpnet {...props} {...p} />
       },
       loading: Loading,
     }),
   },
   {
-    id: '11',
+    id: '16',
     name: 'Refraction Form',
     authority: 'queue.consultation.widgets.eyerefractionform',
     component: Loadable({
-      loader: () => import('@/pages/Widgets/RefractionForm'),
+      loader: () => import('./RefractionForm/index'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return (
-          <AuthorizedContext.Provider
-            value={{
-              rights: 'disable',
-            }}
-          >
-            <Cmpnet
-              {...props}
-              {...p}
-              isEditable={false}
-              prefix='corEyeRefractionForm.formData'
-              values={p.patientHistory.entity}
-            />
-          </AuthorizedContext.Provider>
-        )
+        return <Cmpnet {...props} {...p} />
       },
       loading: Loading,
     }),
-    associatedProps: [
-      'corEyeRefractionForm',
-    ],
-    // model: 'refractionForm',
     layoutConfig: {},
   },
   {
@@ -411,31 +378,13 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     name: 'Examination Form',
     authority: 'queue.consultation.widgets.eyeexaminationform',
     component: Loadable({
-      loader: () => import('@/pages/Widgets/ExaminationForm'),
+      loader: () => import('./ExaminationForm'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return (
-          <AuthorizedContext.Provider
-            value={{
-              rights: 'disable',
-            }}
-          >
-            <Cmpnet
-              {...props}
-              {...p}
-              isEditable={false}
-              prefix='corEyeExaminationForm.formData'
-              values={p.patientHistory.entity}
-            />
-          </AuthorizedContext.Provider>
-        )
+        return <Cmpnet {...props} {...p} />
       },
       loading: Loading,
     }),
-    associatedProps: [
-      'corEyeExaminationForm',
-    ],
-    // model: 'refractionForm',
     layoutConfig: {},
   },
   {

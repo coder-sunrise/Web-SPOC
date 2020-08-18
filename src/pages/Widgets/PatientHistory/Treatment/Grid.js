@@ -1,28 +1,27 @@
 import _ from 'lodash'
-import { CommonTableGrid, Select, Skeleton } from '@/components'
+import { Table } from 'antd'
 import Tooth from '@/pages/Widgets/DentalChart/Tooth'
+import tablestyles from '../TableStyle.less'
 
 export default ({ current, codetable, dentalChartComponent }) => {
   const { data } = dentalChartComponent
   const { cttreatment } = codetable
   const treatments = data.filter((o) => o.action.dentalTreatmentFK)
   return (
-    <CommonTableGrid
-      size='sm'
-      rows={current.orders.filter((o) => o.type === 'Treatment') || []}
-      forceRender
+    <Table
+      size='small'
+      bordered
+      pagination={false}
+      rowClassName={(record, index) => {
+        return index % 2 === 0 ? tablestyles.once : tablestyles.two
+      }}
+      dataSource={current.orders.filter((o) => o.type === 'Treatment') || []}
       columns={[
-        { name: 'legend', title: 'Image' },
-        { name: 'name', title: 'Treatment' },
-        { name: 'toothNumber', title: 'Tooth' },
-        { name: 'description', title: 'Treatment Description' },
-      ]}
-      FuncProps={{ pager: false }}
-      columnExtensions={[
         {
-          columnName: 'legend',
+          dataIndex: 'legend',
+          title: 'Image',
           width: 100,
-          render: (row) => {
+          render: (text, row) => {
             const treatmentList = treatments.filter((o) =>
               cttreatment.find(
                 (m) =>
@@ -60,23 +59,9 @@ export default ({ current, codetable, dentalChartComponent }) => {
           },
         },
         {
-          columnName: 'description',
-          render: (row) => {
-            return (
-              <div
-                style={{
-                  wordWrap: 'break-word',
-                  whiteSpace: 'pre-wrap',
-                }}
-              >
-                {row.description}
-              </div>
-            )
-          },
-        },
-        {
-          columnName: 'toothNumber',
-          render: (row) => {
+          dataIndex: 'toothNumber',
+          title: 'Tooth',
+          render: (text, row) => {
             const treatmentList = treatments.filter((o) =>
               cttreatment.find(
                 (m) =>
@@ -106,6 +91,23 @@ export default ({ current, codetable, dentalChartComponent }) => {
                   ',',
                 )}
               </span>
+            )
+          },
+        },
+        { dataIndex: 'name', title: 'Treatment' },
+        {
+          dataIndex: 'description',
+          title: 'Treatment Description',
+          render: (text) => {
+            return (
+              <div
+                style={{
+                  wordWrap: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                }}
+              >
+                {text}
+              </div>
             )
           },
         },

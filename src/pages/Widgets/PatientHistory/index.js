@@ -10,14 +10,11 @@ import router from 'umi/router'
 import { withStyles } from '@material-ui/core'
 // common components
 import {
-  GridContainer,
-  GridItem,
   CardContainer,
   withFormikExtend,
   Skeleton,
   CommonModal,
   Button,
-  Tabs,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 // utils
@@ -179,9 +176,9 @@ class PatientHistory extends Component {
         <div style={{ fontWeight: 500 }}>
           {`${moment(visitDate).format('DD MMM YYYY')} (Time In: ${moment(
             timeIn,
-          ).format('HH:MM')} Time Out: ${moment(timeOut).format(
-            'HH:MM',
-          )}) - ${userTitle || ''} ${userName}`}
+          ).format('HH:MM')} Time Out: ${timeOut
+            ? moment(timeOut).format('HH:MM')
+            : '-'}) - ${userTitle || ''} ${userName}`}
         </div>
         {!isRetailVisit && (
           <div style={{ marginLeft: 'auto' }}>
@@ -297,10 +294,52 @@ class PatientHistory extends Component {
       return false
 
     // check show eyerefractionform
-    if (widget.id === '11' && !current.corEyeRefractionForm) return false
+    if (
+      widget.id === '16' &&
+      (!current.corEyeRefractionForm ||
+        JSON.stringify(current.corEyeRefractionForm.formData) === '{}')
+    )
+      return false
 
     // check show eyeexaminationform
-    if (widget.id === '15' && !current.corEyeExaminationForm) return false
+    if (
+      widget.id === '15' &&
+      (!current.corEyeExaminationForm ||
+        JSON.stringify(current.corEyeExaminationForm.formData) === '{}' ||
+        (current.corEyeExaminationForm.formData.EyeExaminations || []).length <=
+          0)
+    )
+      return false
+
+    // check show forms
+    if (widget.id === '14' && (!current.forms || current.forms.length <= 0))
+      return false
+    // check show orders
+    if (widget.id === '7' && (!current.orders || current.orders.length <= 0))
+      return false
+    // check show document
+    if (
+      widget.id === '20' &&
+      (!current.documents || current.documents.length <= 0)
+    )
+      return false
+    // check show DentalChart
+    if (
+      widget.id === '9' &&
+      (!current.dentalChart || current.dentalChart.length <= 0)
+    )
+      return false
+    // check show invoice
+    if (widget.id === '8' && !current.invoice) return false
+
+    // check show treatment
+    if (
+      widget.id === '10' &&
+      (!current.orders ||
+        current.orders.filter((o) => o.type === 'Treatment').length <= 0)
+    )
+      return false
+
     return true
   }
 
@@ -316,6 +355,11 @@ class PatientHistory extends Component {
       return this.state.selectTag.children.indexOf(_widget.id) >= 0
     })
     let current = history.patientHistoryDetail || {}
+    let visitDetails = {
+      visitDate: history.visitDate,
+      patientName: history.patientName,
+      patientAccountNo: history.patientAccountNo,
+    }
     return (
       <CardContainer hideHeader size='sm'>
         {currentTagWidgets.map((o) => {
@@ -323,10 +367,11 @@ class PatientHistory extends Component {
           if (this.showWidget(current, o))
             return (
               <div>
-                <h5 style={{ fontWeight: 500 }}>{o.name}</h5>
+                <h5 style={{ fontWeight: 500, color: 'darkBlue' }}>{o.name}</h5>
                 {Widget ? (
                   <Widget
                     current={current}
+                    visitDetails={visitDetails}
                     {...this.props}
                     setFieldValue={this.props.setFieldValue}
                   />
@@ -377,22 +422,6 @@ class PatientHistory extends Component {
         ))}
       </div>
     )
-  }
-
-  getTabOptions = () => {
-    return this.getActiveHistoryTags().map((o) => {
-      return {
-        id: o.value,
-        name: o.name,
-        content: (
-          <HistoryDetails
-            {...this.props}
-            selectTag={o}
-            widgets={this.widgets}
-          />
-        ),
-      }
-    })
   }
 
   render () {
