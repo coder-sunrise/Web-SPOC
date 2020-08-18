@@ -38,14 +38,7 @@ const styles = () => ({})
           outstandingAmount,
           statementAdjustment,
           payableAmount = 0,
-        } = o
-
-        let totalPayment = 0
-        o.statementInvoicePayment.forEach((x) => {
-          if (!x.invoicePayment.isCancelled) {
-            totalPayment += x.invoicePayment.totalAmtPaid
-          } 
-        })
+        } = o 
 
         const totalPayableAmount =
           payableAmount - adminCharge - statementAdjustment
