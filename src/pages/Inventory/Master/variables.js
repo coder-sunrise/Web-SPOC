@@ -22,7 +22,7 @@ const addContent = (type, props) => {
   }
 }
 
-export const InventoryMasterOption = (props) => {
+export const InventoryMasterOption = (props, isEnablePackage) => {
   const Tabs = [
     {
       id: '0',
@@ -56,6 +56,8 @@ export const InventoryMasterOption = (props) => {
     },
   ]
   return Tabs.filter((tab) => {
+    if (tab.name === 'Package' && isEnablePackage === false) return false
+
     const accessRight = Authorized.check(tab.authority)
     if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
       return false

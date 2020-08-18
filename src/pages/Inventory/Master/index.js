@@ -12,7 +12,12 @@ import { InventoryMasterOption } from './variables'
 
 const styles = () => ({})
 
-const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
+const InventoryMaster = ({
+  inventoryMaster,
+  dispatch,
+  history,
+  clinicSettings,
+}) => {
   const [
     activeTab,
     setActiveTab,
@@ -29,7 +34,11 @@ const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
     setActiveTab,
   }
 
-  const itemTabs = InventoryMasterOption(componentProps)
+  const { settings = [] } = clinicSettings
+  const itemTabs = InventoryMasterOption(
+    componentProps,
+    settings.isEnablePackage,
+  )
 
   const didMount = async () => {
     await Promise.all([
@@ -77,8 +86,9 @@ const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
 
 export default compose(
   withStyles(styles, { withTheme: true }),
-  connect(({ inventoryMaster, orderSet }) => ({
+  connect(({ inventoryMaster, orderSet, clinicSettings }) => ({
     inventoryMaster,
     orderSet,
+    clinicSettings,
   })),
 )(InventoryMaster)

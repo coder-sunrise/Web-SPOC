@@ -27,7 +27,7 @@ const styles = (theme) => ({
 })
 
 let commitCount = 1000 // uniqueNumber
-const InventoryTypeListing = ({
+const PackageItemListing = ({
   dispatch,
   classes,
   packageDetail,
@@ -806,4 +806,4 @@ const InventoryTypeListing = ({
     </div>
   )
 }
-export default withStyles(styles, { withTheme: true })(InventoryTypeListing)
+export default withStyles(styles, { withTheme: true })(PackageItemListing)
