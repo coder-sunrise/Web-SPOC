@@ -1,5 +1,4 @@
 import Loadable from 'react-loadable'
-import AuthorizedContext from '@/components/Context/Authorized'
 import Loading from '@/components/PageLoading/index'
 
 export const WIDGETS_ID = {
@@ -173,15 +172,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       loader: () => import('./Diagnosis'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return (
-          <AuthorizedContext.Provider
-            value={{
-              rights: 'disable',
-            }}
-          >
-            <Cmpnet {...props} {...p} />
-          </AuthorizedContext.Provider>
-        )
+        return <Cmpnet {...props} {...p} />
       },
       loading: Loading,
     }),
@@ -194,15 +185,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       loader: () => import('./Notes'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return (
-          <AuthorizedContext.Provider
-            value={{
-              rights: 'disable',
-            }}
-          >
-            <Cmpnet {...props} {...p} fieldName='intraOral' />
-          </AuthorizedContext.Provider>
-        )
+        return <Cmpnet {...props} {...p} fieldName='intraOral' />
       },
       loading: Loading,
     }),
@@ -215,15 +198,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       loader: () => import('./Notes'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return (
-          <AuthorizedContext.Provider
-            value={{
-              rights: 'disable',
-            }}
-          >
-            <Cmpnet {...props} {...p} fieldName='extraOral' />
-          </AuthorizedContext.Provider>
-        )
+        return <Cmpnet {...props} {...p} fieldName='extraOral' />
       },
       loading: Loading,
     }),
@@ -249,15 +224,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       loader: () => import('./Orders'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return (
-          <AuthorizedContext.Provider
-            value={{
-              rights: 'disable',
-            }}
-          >
-            <Cmpnet {...props} {...p} />
-          </AuthorizedContext.Provider>
-        )
+        return <Cmpnet {...props} {...p} />
       },
       loading: Loading,
     }),
@@ -270,15 +237,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       loader: () => import('./ConsultationDocument'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return (
-          <AuthorizedContext.Provider
-            value={{
-              rights: 'disable',
-            }}
-          >
-            <Cmpnet {...props} {...p} />
-          </AuthorizedContext.Provider>
-        )
+        return <Cmpnet {...props} {...p} />
       },
       loading: Loading,
     }),
@@ -291,15 +250,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       loader: () => import('./DentalChart/index'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return (
-          <AuthorizedContext.Provider
-            value={{
-              rights: 'disable',
-            }}
-          >
-            <Cmpnet {...props} {...p} />
-          </AuthorizedContext.Provider>
-        )
+        return <Cmpnet {...props} {...p} />
       },
       loading: Loading,
     }),
@@ -312,15 +263,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       loader: () => import('./Treatment/index'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return (
-          <AuthorizedContext.Provider
-            value={{
-              rights: 'disable',
-            }}
-          >
-            <Cmpnet {...props} {...p} />
-          </AuthorizedContext.Provider>
-        )
+        return <Cmpnet {...props} {...p} />
       },
       loading: Loading,
     }),
@@ -333,15 +276,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       loader: () => import('./Invoice'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return (
-          <AuthorizedContext.Provider
-            value={{
-              rights: 'disable',
-            }}
-          >
-            <Cmpnet {...props} {...p} />
-          </AuthorizedContext.Provider>
-        )
+        return <Cmpnet {...props} {...p} />
       },
       loading: Loading,
     }),

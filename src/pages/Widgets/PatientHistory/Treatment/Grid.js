@@ -58,6 +58,7 @@ export default ({ current, codetable, dentalChartComponent }) => {
             )
           },
         },
+        { dataIndex: 'name', title: 'Treatment' },
         {
           dataIndex: 'toothNumber',
           title: 'Tooth',
@@ -94,7 +95,6 @@ export default ({ current, codetable, dentalChartComponent }) => {
             )
           },
         },
-        { dataIndex: 'name', title: 'Treatment' },
         {
           dataIndex: 'description',
           title: 'Treatment Description',

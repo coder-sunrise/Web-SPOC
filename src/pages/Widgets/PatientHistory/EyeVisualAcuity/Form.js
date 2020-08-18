@@ -220,6 +220,7 @@ const Form = ({ classes, theme, current }) => {
                         suffix='yrs'
                         simple
                         value={val.specsAge}
+                        disabled
                       />
                     </GridItem>
                   </GridContainer>
@@ -273,6 +274,7 @@ const Form = ({ classes, theme, current }) => {
                   rows={3}
                   multiline
                   value={val.remark}
+                  disabled
                 />
               </GridItem>
             </GridContainer>

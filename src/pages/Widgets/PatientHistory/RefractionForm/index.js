@@ -101,7 +101,7 @@ const RefractionForm = ({ current, theme, visitDetails }) => {
             <NumberInput
               label='R'
               format='0.0'
-              text
+              disabled
               suffix='mmHg'
               value={formData.Tenometry ? formData.Tenometry.R : undefined}
             />
@@ -112,7 +112,7 @@ const RefractionForm = ({ current, theme, visitDetails }) => {
               format='0.0'
               suffix='mmHg'
               value={formData.Tenometry ? formData.Tenometry.L : undefined}
-              text
+              disabled
             />
           </GridItem>
         </GridContainer>
@@ -163,7 +163,7 @@ const RefractionForm = ({ current, theme, visitDetails }) => {
             <TextField
               label='R'
               maxLength={50}
-              text
+              disabled
               value={formData.PupilSize ? formData.PupilSize.R : ''}
             />
           </GridItem>
@@ -171,7 +171,7 @@ const RefractionForm = ({ current, theme, visitDetails }) => {
             <TextField
               label='L'
               maxLength={50}
-              text
+              disabled
               value={formData.PupilSize ? formData.PupilSize.L : ''}
             />
           </GridItem>

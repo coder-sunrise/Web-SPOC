@@ -3,7 +3,6 @@ import React, { Component } from 'react'
 import { Tag, Collapse } from 'antd'
 import moment from 'moment'
 import Edit from '@material-ui/icons/Edit'
-import $ from 'jquery'
 import { connect } from 'dva'
 import router from 'umi/router'
 // material ui
@@ -15,6 +14,7 @@ import {
   Skeleton,
   CommonModal,
   Button,
+  Tooltip,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 // utils
@@ -189,66 +189,68 @@ class PatientHistory extends Component {
             </span>
             {!fromConsultation && (
               <Authorized authority='patientdashboard.editconsultation'>
-                <Button
-                  color='primary'
-                  style={{ marginLeft: theme.spacing(2) }}
-                  size='sm'
-                  justIcon
-                  onClick={(event) => {
-                    event.stopPropagation()
-                    dispatch({
-                      type: `consultation/edit`,
-                      payload: {
-                        id: row.id,
-                        version: patientHistory.version,
-                      },
-                    }).then((o) => {
-                      if (o) {
-                        if (o.updateByUserFK !== user.data.id) {
-                          const { clinicianprofile = [] } = codetable
-                          const version = Date.now()
-                          const editingUser = clinicianprofile.find(
-                            (m) => m.userProfileFK === o.updateByUserFK,
-                          ) || {
-                            name: 'Someone',
-                          }
-                          dispatch({
-                            type: 'global/updateAppState',
-                            payload: {
-                              openConfirm: true,
-                              openConfirmContent: `${editingUser.name} is currently editing the patient note, do you want to overwrite?`,
-                              onConfirmSave: () => {
-                                dispatch({
-                                  type: `consultation/overwrite`,
-                                  payload: {
-                                    id: row.id,
-                                    version,
-                                  },
-                                }).then((c) => {
+                <Tooltip title='Edit Consultation'>
+                  <Button
+                    color='primary'
+                    style={{ marginLeft: theme.spacing(2) }}
+                    size='sm'
+                    justIcon
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      dispatch({
+                        type: `consultation/edit`,
+                        payload: {
+                          id: row.id,
+                          version: patientHistory.version,
+                        },
+                      }).then((o) => {
+                        if (o) {
+                          if (o.updateByUserFK !== user.data.id) {
+                            const { clinicianprofile = [] } = codetable
+                            const version = Date.now()
+                            const editingUser = clinicianprofile.find(
+                              (m) => m.userProfileFK === o.updateByUserFK,
+                            ) || {
+                              name: 'Someone',
+                            }
+                            dispatch({
+                              type: 'global/updateAppState',
+                              payload: {
+                                openConfirm: true,
+                                openConfirmContent: `${editingUser.name} is currently editing the patient note, do you want to overwrite?`,
+                                onConfirmSave: () => {
                                   dispatch({
-                                    type: 'patient/closePatientModal',
+                                    type: `consultation/overwrite`,
+                                    payload: {
+                                      id: row.id,
+                                      version,
+                                    },
+                                  }).then((c) => {
+                                    dispatch({
+                                      type: 'patient/closePatientModal',
+                                    })
+                                    router.push(
+                                      `/reception/queue/consultation?qid=${row.queueFK}&pid=${patientID}&cid=${c.id}&v=${version}`,
+                                    )
                                   })
-                                  router.push(
-                                    `/reception/queue/consultation?qid=${row.queueFK}&pid=${patientID}&cid=${c.id}&v=${version}`,
-                                  )
-                                })
+                                },
                               },
-                            },
-                          })
-                        } else {
-                          dispatch({
-                            type: 'patient/closePatientModal',
-                          })
-                          router.push(
-                            `/reception/queue/consultation?qid=${row.queueFK}&pid=${patientID}&cid=${o.id}&v=${patientHistory.version}`,
-                          )
+                            })
+                          } else {
+                            dispatch({
+                              type: 'patient/closePatientModal',
+                            })
+                            router.push(
+                              `/reception/queue/consultation?qid=${row.queueFK}&pid=${patientID}&cid=${o.id}&v=${patientHistory.version}`,
+                            )
+                          }
                         }
-                      }
-                    })
-                  }}
-                >
-                  <Edit />
-                </Button>
+                      })
+                    }}
+                  >
+                    <Edit />
+                  </Button>
+                </Tooltip>
               </Authorized>
             )}
           </div>

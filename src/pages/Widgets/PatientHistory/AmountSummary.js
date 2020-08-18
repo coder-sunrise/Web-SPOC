@@ -92,6 +92,7 @@ const AmountSummary = ({
               })}
               simple
               checked={isGSTInclusive}
+              disabled
             />
           </GridItem>
         </GridContainer>

@@ -7,47 +7,43 @@ import NearAddODOS from './NearAddODOS'
 export default ({ rows = [] }) => {
   return (
     <div>
-      {[
-        rows,
-      ].length > 0 && (
-        <Table
-          size='small'
-          bordered
-          pagination={false}
-          dataSource={[
-            rows,
-          ]}
-          rowClassName={(record, index) => {
-            return index % 2 === 0 ? tablestyles.once : tablestyles.two
-          }}
-          columns={[
-            {
-              dataIndex: 'NearAdd',
-              title: ' ',
-              width: 130,
-              render: () => {
-                return (
-                  <GridItem>
-                    <TextField text value='Near Add:' />
-                  </GridItem>
-                )
-              },
+      <Table
+        size='small'
+        bordered
+        pagination={false}
+        dataSource={[
+          rows,
+        ]}
+        rowClassName={(record, index) => {
+          return index % 2 === 0 ? tablestyles.once : tablestyles.two
+        }}
+        columns={[
+          {
+            dataIndex: 'NearAdd',
+            title: ' ',
+            width: 130,
+            render: () => {
+              return (
+                <GridItem>
+                  <TextField text value='Near Add:' />
+                </GridItem>
+              )
             },
-            {
-              dataIndex: 'OD',
-              title: 'OD',
-              align: 'center',
-              render: (text, row) => <NearAddODOS columnName='OD' row={row} />,
-            },
-            {
-              dataIndex: 'OS',
-              title: 'OS',
-              align: 'center',
-              render: (text, row) => <NearAddODOS columnName='OS' row={row} />,
-            },
-          ]}
-        />
-      )}
+          },
+          {
+            dataIndex: 'OD',
+            title: 'OD',
+            align: 'center',
+            render: (text, row) => <NearAddODOS columnName='OD' row={row} />,
+          },
+          {
+            dataIndex: 'OS',
+            title: 'OS',
+            align: 'center',
+            render: (text, row) => <NearAddODOS columnName='OS' row={row} />,
+          },
+        ]}
+      />
     </div>
   )
 }
