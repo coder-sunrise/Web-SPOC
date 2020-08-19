@@ -4,25 +4,30 @@ import Loading from '@/components/PageLoading/index'
 export const WIDGETS_ID = {
   CLINICAL_NOTE: '1',
   CHIEF_COMPLAINTS: '2',
-  PLAN: '3',
   ASSOCIATED_HISTORY: '3',
   INTRA_ORAL: '4',
   EXTRA_ORAL: '5',
   ATTACHMENT: '6',
   ORDERS: '7',
-  CONSULTATION_DOCUMENT: '20',
   INVOICE: '8',
   DENTAL_CHART: '9',
   TREATMENT: '10',
+  PLAN: '11',
+  DIAGNOSIS: '12',
+  VISUALACUITYTEST: '13',
+  FORMS: '14',
+  EXAMINATIONFORM: '15',
+  REFRACTIONFORM: '16',
+  CONSULTATION_DOCUMENT: '20',
 }
 
 export const notesTypes = [
-  { value: '3', fieldName: 'history' },
-  { value: '2', fieldName: 'chiefComplaints' },
-  { value: '1', fieldName: 'note' },
-  { value: '11', fieldName: 'plan' },
-  { value: '4', fieldName: 'intraOral' },
-  { value: '5', fieldName: 'extraOral' },
+  { value: WIDGETS_ID.ASSOCIATED_HISTORY, fieldName: 'history' },
+  { value: WIDGETS_ID.CHIEF_COMPLAINTS, fieldName: 'chiefComplaints' },
+  { value: WIDGETS_ID.CLINICAL_NOTE, fieldName: 'note' },
+  { value: WIDGETS_ID.PLAN, fieldName: 'plan' },
+  { value: WIDGETS_ID.INTRA_ORAL, fieldName: 'intraOral' },
+  { value: WIDGETS_ID.EXTRA_ORAL, fieldName: 'extraOral' },
 ]
 
 export const historyTags = [
@@ -42,16 +47,16 @@ export const historyTags = [
       'queue.consultation.widgets.eyeexaminationform',
     ],
     children: [
-      '3',
-      '2',
-      '1',
-      '11',
-      '12',
-      '4',
-      '5',
-      '13',
-      '16',
-      '15',
+      WIDGETS_ID.ASSOCIATED_HISTORY,
+      WIDGETS_ID.CHIEF_COMPLAINTS,
+      WIDGETS_ID.CLINICAL_NOTE,
+      WIDGETS_ID.PLAN,
+      WIDGETS_ID.DIAGNOSIS,
+      WIDGETS_ID.INTRA_ORAL,
+      WIDGETS_ID.EXTRA_ORAL,
+      WIDGETS_ID.VISUALACUITYTEST,
+      WIDGETS_ID.REFRACTIONFORM,
+      WIDGETS_ID.EXAMINATIONFORM,
     ],
   },
   {
@@ -62,10 +67,10 @@ export const historyTags = [
       'queue.consultation.widgets.dentalchart',
     ],
     children: [
-      '7',
-      '9',
-      '10',
-      '8',
+      WIDGETS_ID.ORDERS,
+      WIDGETS_ID.DENTAL_CHART,
+      WIDGETS_ID.TREATMENT,
+      WIDGETS_ID.INVOICE,
     ],
   },
   {
@@ -76,15 +81,15 @@ export const historyTags = [
       'queue.consultation.widgets.forms',
     ],
     children: [
-      '20',
-      '14',
+      WIDGETS_ID.CONSULTATION_DOCUMENT,
+      WIDGETS_ID.FORMS,
     ],
   },
 ]
 
 export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
   {
-    id: '3',
+    id: WIDGETS_ID.ASSOCIATED_HISTORY,
     name: 'History',
     authority: 'queue.consultation.clinicalnotes.history',
     component: Loadable({
@@ -105,7 +110,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
   },
 
   {
-    id: '2',
+    id: WIDGETS_ID.CHIEF_COMPLAINTS,
     name: 'Chief Complaints',
     authority: 'queue.consultation.clinicalnotes.chiefcomplaints',
     component: Loadable({
@@ -125,7 +130,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     }),
   },
   {
-    id: '1',
+    id: WIDGETS_ID.CLINICAL_NOTE,
     name: 'Clinical Notes',
     authority: 'queue.consultation.clinicalnotes.clinicalnotes',
     component: Loadable({
@@ -145,7 +150,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     }),
   },
   {
-    id: '11',
+    id: WIDGETS_ID.PLAN,
     name: 'Plan',
     authority: 'queue.consultation.clinicalnotes.plan',
     component: Loadable({
@@ -165,7 +170,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     }),
   },
   {
-    id: '12',
+    id: WIDGETS_ID.DIAGNOSIS,
     name: 'Diagnosis',
     authority: 'queue.consultation.widgets.diagnosis',
     component: Loadable({
@@ -178,7 +183,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     }),
   },
   {
-    id: '4',
+    id: WIDGETS_ID.INTRA_ORAL,
     name: 'Intra Oral',
     authority: 'queue.consultation.clinicalnotes.intraoral',
     component: Loadable({
@@ -191,7 +196,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     }),
   },
   {
-    id: '5',
+    id: WIDGETS_ID.EXTRA_ORAL,
     name: 'Extra Oral',
     authority: 'queue.consultation.clinicalnotes.extraoral',
     component: Loadable({
@@ -217,7 +222,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
   //   }),
   // },
   {
-    id: '7',
+    id: WIDGETS_ID.ORDERS,
     name: 'Orders',
     authority: 'queue.consultation.widgets.order',
     component: Loadable({
@@ -243,7 +248,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     }),
   },
   {
-    id: '9',
+    id: WIDGETS_ID.DENTAL_CHART,
     name: 'Dental Chart',
     authority: 'queue.consultation.widgets.dentalchart',
     component: Loadable({
@@ -256,7 +261,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     }),
   },
   {
-    id: '10',
+    id: WIDGETS_ID.TREATMENT,
     name: 'Treatment',
     authority: 'queue.consultation.widgets.dentalchart',
     component: Loadable({
@@ -269,7 +274,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     }),
   },
   {
-    id: '8',
+    id: WIDGETS_ID.INVOICE,
     name: 'Invoice',
     authority: 'queue.consultation.widgets.order',
     component: Loadable({
@@ -282,7 +287,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     }),
   },
   {
-    id: '13',
+    id: WIDGETS_ID.VISUALACUITYTEST,
     name: 'Visual Acuity Test',
     authority: 'queue.consultation.widgets.eyevisualacuity',
     component: Loadable({
@@ -295,7 +300,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     }),
   },
   {
-    id: '16',
+    id: WIDGETS_ID.REFRACTIONFORM,
     name: 'Refraction Form',
     authority: 'queue.consultation.widgets.eyerefractionform',
     component: Loadable({
@@ -309,7 +314,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     layoutConfig: {},
   },
   {
-    id: '15',
+    id: WIDGETS_ID.EXAMINATIONFORM,
     name: 'Examination Form',
     authority: 'queue.consultation.widgets.eyeexaminationform',
     component: Loadable({
@@ -323,7 +328,7 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     layoutConfig: {},
   },
   {
-    id: '14',
+    id: WIDGETS_ID.FORMS,
     name: 'Forms',
     authority: 'queue.consultation.widgets.forms',
     component: Loadable({
