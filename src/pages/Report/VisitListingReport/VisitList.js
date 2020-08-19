@@ -59,7 +59,10 @@ class VisitList extends PureComponent {
     const SummaryRow = (p) => {
       const { children } = p
       let countCol = children.find((c) => {
-        return c.props.tableColumn.column.name === 'visitDate'
+        return (
+          c.props.tableColumn.column &&
+          c.props.tableColumn.column.name === 'visitDate'
+        )
       })
       if (countCol) {
         const newChildren = [
