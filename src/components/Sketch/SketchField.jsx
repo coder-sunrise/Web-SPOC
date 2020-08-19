@@ -1208,9 +1208,7 @@ class SketchField extends PureComponent {
           ref={(c) => {
             this._canvas = c
           }}
-          style={{
-            ...canvasStyle,
-          }}
+          style={canvasStyle}
         >
           Sorry, Canvas HTML5 element is not supported by your browser :(
         </canvas>
