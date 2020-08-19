@@ -130,7 +130,7 @@ class Attachment extends Component {
     }
 
     if (fromPatientHistory) {
-      _attachment = (values.eyeVisualAcuityTestAttachments || [])
+      _attachment = ((values && values.eyeVisualAcuityTestAttachments) || [])
         .map((o) => o.attachment)
     }
 

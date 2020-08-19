@@ -1,36 +1,44 @@
-import { CommonTableGrid } from '@/components'
-import { printRow, viewReport } from '../ConsultationDocument'
+import { Table } from 'antd'
+import { viewReport } from '../ConsultationDocument'
+import tablestyles from './TableStyle.less'
 
 export default ({ current }) => {
   return (
-    <CommonTableGrid
-      size='sm'
-      rows={current.documents || []}
+    <Table
+      size='small'
+      bordered
+      pagination={false}
       columns={[
-        { name: 'type', title: 'Type' },
-        { name: 'subject', title: 'Subject' },
-        { name: 'from', title: 'From' },
-      ]}
-      FuncProps={{ pager: false }}
-      columnExtensions={[
+        { dataIndex: 'type', title: 'Type' },
         {
-          columnName: 'subject',
-          type: 'link',
-          linkField: 'href',
-          // onClick: printRow,
-          onClick: (row) => viewReport(row, undefined, true),
+          dataIndex: 'subject',
+          title: 'Subject',
+          render: (text, row) => (
+            <a
+              onClick={() => {
+                viewReport(row, undefined, true)
+              }}
+            >
+              {text}
+            </a>
+          ),
         },
         {
-          columnName: 'from',
-          render: (r) => {
-            const title = r.from.clinicianProfile.title
-              ? `${r.from.clinicianProfile.title} `
+          dataIndex: 'from',
+          title: 'From',
+          render: (text, row) => {
+            const title = row.from.clinicianProfile.title
+              ? `${row.from.clinicianProfile.title} `
               : ''
-
-            return `${title}${r.from.clinicianProfile.name}`
+            return `${title}${row.from.clinicianProfile.name}`
           },
         },
       ]}
+      dataSource={current.documents || []}
+      rowClassName={(record, index) => {
+        return index % 2 === 0 ? tablestyles.once : tablestyles.two
+      }}
+      className={tablestyles.table}
     />
   )
 }

@@ -20,6 +20,7 @@ const Adjustment = ({
   onDelete,
   amountProps,
   type,
+  hiddenDelete = false,
 }) => {
   // console.log('Adjustment', amountProps)
   const isExactAmount = type === 'ExactAmount'
@@ -37,18 +38,20 @@ const Adjustment = ({
             marginLeft: 20,
           }}
         >
-          <Popconfirm
-            title='Do you want to remove this adjustment?'
-            onConfirm={() => {
-              onDelete(index)
-            }}
-          >
-            <Tooltip title='Delete Adjustment'>
-              <Button color='danger' size='sm' aria-label='Delete' justIcon>
-                <Delete />
-              </Button>
-            </Tooltip>
-          </Popconfirm>
+          {!hiddenDelete && (
+            <Popconfirm
+              title='Do you want to remove this adjustment?'
+              onConfirm={() => {
+                onDelete(index)
+              }}
+            >
+              <Tooltip title='Delete Adjustment'>
+                <Button color='danger' size='sm' aria-label='Delete' justIcon>
+                  <Delete />
+                </Button>
+              </Tooltip>
+            </Popconfirm>
+          )}
           <Tooltip title={adjRemark}>
             <span>
               {adjRemark}
