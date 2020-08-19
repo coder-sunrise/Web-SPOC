@@ -1,3 +1,4 @@
+import { Tools } from '@/components'
 import FabricCanvasTool from './fabrictool'
 
 class none extends FabricCanvasTool {
@@ -9,6 +10,10 @@ class none extends FabricCanvasTool {
       o.selectable = false
       o.evented = false
     })
+  }
+
+  getToolName () {
+    return Tools.None
   }
 }
 

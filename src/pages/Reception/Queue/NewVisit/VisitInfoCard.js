@@ -21,9 +21,9 @@ import {
   Attachment,
   AttachmentWithThumbnail,
 } from '@/components/_medisys'
-import FormField from './formField'
 import { VISIT_TYPE } from '@/utils/constants'
 import { visitOrderTemplateItemTypes } from '@/utils/codes'
+import FormField from './formField'
 
 const styles = (theme) => ({
   verticalSpacing: {
@@ -268,6 +268,7 @@ const VisitInfoCard = ({
             handleUpdateAttachments={handleUpdateAttachments}
             attachments={attachments}
             isReadOnly={isReadOnly}
+            disableScanner={isReadOnly}
             fieldName='visitAttachment'
           />
         </GridItem>

@@ -84,6 +84,13 @@ moment.prototype.formatUTC = function (dateOnly = true) {
   )
 }
 
+String.prototype.format = function () {
+  if (arguments.length === 0) return this
+  for (var s = this, i = 0; i < arguments.length; i++)
+    s = s.replace(new RegExp(`\\{${i}\\}`, 'g'), arguments[i])
+  return s
+}
+
 // moment.prototype.toUTC = function () {
 //   return this.clone().add(-8, 'hours')
 // }
@@ -91,6 +98,11 @@ moment.prototype.formatUTC = function (dateOnly = true) {
 export const roundTo = (amount, precision = 2) => {
   if (!amount && amount !== 0) return undefined
   return Math.round(amount * 10 ** precision) / 10 ** precision
+}
+
+export const roundUp = (num, precision = 2) => {
+  precision = 10 ** precision
+  return Math.ceil(num * precision) / precision
 }
 
 export function fixedZero (val) {
@@ -1288,6 +1300,32 @@ const generateHashCode = (s) =>
     .split('')
     .reduce((a, b) => Math.abs((a << 5) - a + b.charCodeAt(0)) | 0, 0)}`
 
+const stringToBytesFaster = (str) => {
+  // http://stackoverflow.com/questions/1240408/reading-bytes-from-a-javascript-string
+  let ch
+  let st
+  let re = []
+  let j = 0
+  for (let i = 0; i < str.length; i++) {
+    ch = str.charCodeAt(i)
+    if (ch < 127) {
+      re[j++] = ch & 0xff
+    } else {
+      st = [] // clear stack
+      do {
+        st.push(ch & 0xff) // push byte to stack
+        ch >>= 8 // shift value down by 1 byte
+      } while (ch)
+      // add stack contents to result
+      // done because chars have "wrong" endianness
+      st = st.reverse()
+      for (let k = 0; k < st.length; ++k) re[j++] = st[k]
+    }
+  }
+  // return an array of bytes
+  return re
+}
+
 module.exports = {
   ...cdrssUtil,
   ...module.exports,
@@ -1321,6 +1359,8 @@ module.exports = {
   enableTableForceRender,
   generateHashCode,
   roundTo,
+  roundUp,
+  stringToBytesFaster,
   // toUTC,
   // toLocal,
 }

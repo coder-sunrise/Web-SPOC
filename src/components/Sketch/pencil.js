@@ -1,3 +1,4 @@
+import { Tools } from '@/components'
 import FabricCanvasTool from './fabrictool'
 
 class Pencil extends FabricCanvasTool {
@@ -9,7 +10,10 @@ class Pencil extends FabricCanvasTool {
       o.selectable = false
       o.evented = false
     })
-    
+  }
+
+  getToolName () {
+    return Tools.Pencil
   }
 }
 
