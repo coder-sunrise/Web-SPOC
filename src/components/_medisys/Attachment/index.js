@@ -378,7 +378,7 @@ class Attachment extends Component {
             {!isReadOnly && (
               <React.Fragment>
                 <Button
-                  color='rose'
+                  color='primary'
                   size='sm'
                   onClick={this.onUploadClick}
                   disabled={this.state.uploading || global.disableSave}
