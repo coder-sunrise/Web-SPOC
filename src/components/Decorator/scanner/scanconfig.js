@@ -116,7 +116,7 @@ export const Scanconfig = ({
           textField='name'
           options={[
             { value: 'AutoFeeder', name: 'Auto Feeder' },
-            { value: 'Duplex', name: 'Duplex' },
+            // { value: 'Duplex', name: 'Duplex' },
           ]}
           noUnderline
           onChange={(e) => {
