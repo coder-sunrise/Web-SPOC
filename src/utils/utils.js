@@ -1025,6 +1025,7 @@ const calculateAmount = (
       o.subAdjustment = 0
     })
     let adjAmount = 0
+    let otherItemsAdjAmount = 0
     activeRows.forEach((r, j) => {
       // console.log(r.weightage * fa.adjAmount, r)
       let adj = 0
@@ -1033,7 +1034,10 @@ const calculateAmount = (
         initalRowToal += r[`adjustmen${idx}`]
       }
       if (fa.adjType === 'ExactAmount') {
-        adj = r.weightage * fa.adjValue
+        // --- If is last item, should use [totalAdjAmount] - [sum of other items adj amt] ---//
+        if (activeRows.length - 1 === j) {
+          adj = fa.adjAmount - otherItemsAdjAmount
+        } else adj = r.weightage * fa.adjValue
       } else if (fa.adjType === 'Percentage') {
         adj = roundTo(fa.adjValue / 100 * initalRowToal)
       }
@@ -1043,8 +1047,9 @@ const calculateAmount = (
       // r.subAdjustment += adj
       r[`adjustmen${i}`] = adj
       r[adjustedField] = roundTo(initalRowToal + adj)
+      otherItemsAdjAmount += roundTo(adj)
     })
-    fa.adjAmount = roundTo(adjAmount)
+    if (fa.adjType === 'Percentage') fa.adjAmount = roundTo(adjAmount)
   })
   // activeRows.forEach((r) => {
   //   r[adjustedField] = roundTo(r[adjustedField])

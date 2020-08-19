@@ -5,13 +5,6 @@
 
 trigger: none
 
-#schedules:
-#- cron: '0 10 * * *'
-#  displayName: 'Nightly Build'
-#  branches:
-#    include:
-#    - dev
-
 pool:
   name: 'Medicloud'
 
@@ -27,11 +20,13 @@ steps:
       version4 | npm | "$(Agent.OS)"
     path: $(npm_config_cache)
     cacheHitVar: CACHE_RESTORED
-  displayName: Cache npm          
-    
+  displayName: Cache npm   
+
 - script: npm install
   condition: ne(variables.CACHE_RESTORED, 'true')
   displayName: 'npm install'
+
+### Prepare for UAT Environment ###
 
 - script: copy "config\config.uat.js" "config\config.js" /Y
   displayName: 'update config to uat settings'
@@ -39,14 +34,36 @@ steps:
 - script: 
     #export NODE_OPTIONS="--no-warnings --max-old-space-size=2048" && npm run build
     set NODE_OPTIONS=--max_old_space_size=8192 & npm run build
-  displayName: 'npm build'
+  displayName: 'npm build(UAT)'
 - task: CopyFiles@2
+  displayName: 'Copy UAT artifacts to staging directory'
   inputs:
     SourceFolder: '.\dist'
     Contents: '**'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/UAT'
 - task: PublishBuildArtifacts@1
+  displayName: 'Publish UAT artifacts'
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/UAT'
+    ArtifactName: 'drop-uat'
+    publishLocation: 'Container'
+
+### Prepare for Production Environment ###
+- script: copy "config\config.prod.js" "config\config.js" /Y
+  displayName: 'update config to prod settings'
+- script: 
+    #export NODE_OPTIONS="--no-warnings --max-old-space-size=2048" && npm run build
+    set NODE_OPTIONS=--max_old_space_size=8192 & npm run build
+  displayName: 'npm build (Production)'
+- task: CopyFiles@2
+  displayName: 'Copy Production artifacts to staging directory'
+  inputs:
+    SourceFolder: '.\dist'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/Prod'
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Production artifacts'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/Prod'
+    ArtifactName: 'drop-prod'
     publishLocation: 'Container'
