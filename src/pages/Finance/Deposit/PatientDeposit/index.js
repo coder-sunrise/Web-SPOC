@@ -13,13 +13,9 @@ import {
 } from '@/components'
 import { withStyles, TextField } from '@material-ui/core'
 import withWebSocket from '@/components/Decorator/withWebSocket'
-
-// import depositModel from '@/pages/Finance/Deposit/models/deposit'
 import DeleteConfirm from './DeleteConfirm'
 import DepositGrid from './DepositGrid'
 import FilterBar from './FilterBar'
-
-// window.g_app.replaceModel(depositModel)
 
 const styles = () => ({
   container: {
@@ -37,8 +33,6 @@ const styles = () => ({
     border: 'transparent',
   },
 })
-
-// window.g_app.replaceModel(model)
 
 @connect(({ patient, user }) => ({
   patient,
