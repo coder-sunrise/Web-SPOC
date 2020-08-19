@@ -144,11 +144,7 @@ export default createListViewModel({
       queryDone (st, { payload }) {
         // const { data } = payload
         st.list = st.list.map((item) => {
-          if (
-            item.visitPurposeFK === VISIT_TYPE.RETAIL ||
-            !item.coHistory ||
-            item.coHistory.length < 1
-          )
+          if (item.visitPurposeFK === VISIT_TYPE.RETAIL || !item.coHistory)
             return item
           let newEntity = ParseEyeFormData(item.patientHistoryDetail)
           newEntity = {

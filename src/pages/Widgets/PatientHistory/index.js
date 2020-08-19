@@ -374,7 +374,15 @@ class PatientHistory extends Component {
             const Widget = o.component
             return (
               <div>
-                <h5 style={{ fontWeight: 500, color: 'darkBlue' }}>{o.name}</h5>
+                <h5
+                  style={{
+                    fontWeight: 500,
+                    color: 'darkBlue',
+                    fontSize: '0.85rem',
+                  }}
+                >
+                  {o.name}
+                </h5>
                 {Widget ? (
                   <Widget
                     current={current}
@@ -443,9 +451,7 @@ class PatientHistory extends Component {
 
     sortedPatientHistory = patientHistory.list
       ? patientHistory.list.filter(
-          (o) =>
-            o.visitPurposeFK === VISIT_TYPE.RETAIL ||
-            (o.coHistory && o.coHistory.length >= 1),
+          (o) => o.visitPurposeFK === VISIT_TYPE.RETAIL || o.coHistory,
         )
       : ''
 
