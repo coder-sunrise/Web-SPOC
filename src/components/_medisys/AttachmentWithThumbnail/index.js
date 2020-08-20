@@ -35,6 +35,19 @@ const getFileExtension = (filename) => {
   return filename.split('.').pop()
 }
 
+const AttachmentMenuItems = [
+  {
+    name: ATTACHMENT_TYPE.CLINICALNOTES,
+    title: 'Consultation Attachment',
+    // authority:
+  },
+  {
+    name: ATTACHMENT_TYPE.EYEVISUALACUITY,
+    title: 'Visual Acuity Test',
+    authority: 'queue.consultation.widgets.eyevisualacuity',
+  },
+]
+
 class AttachmentWithThumbnail extends Component {
   constructor (props) {
     super(props)
@@ -65,10 +78,6 @@ class AttachmentWithThumbnail extends Component {
     this.setState({
       errorText: val,
     })
-  }
-
-  setShowPopper = (val) => {
-    this.setState({ showPopper: val })
   }
 
   stopUploading = (reason) => {
@@ -331,13 +340,13 @@ class AttachmentWithThumbnail extends Component {
     this.setDownloading(false)
   }
 
-  handlePopper = () => {
-    this.setShowPopper(!this.state.showPopper)
-  }
-
   onDropDownClick = (selectedAttachmentType) => {
     this.props.handleSelectedAttachmentType(selectedAttachmentType)
-    this.onUploadClick()
+    if (this.state.uploadFrom === 'scan') {
+      this.props.handleOpenScanner()
+    } else {
+      this.onUploadClick()
+    }
   }
 
   render () {
@@ -377,64 +386,92 @@ class AttachmentWithThumbnail extends Component {
     let UploadButton = (
       <Fragment>
         {withDropDown ? (
-          <Fragment>
-            <Button
-              color='primary'
-              size='sm'
-              onClick={this.handlePopper}
-              disabled={isReadOnly || uploading || global.disableSave}
-              className={fileAttachments.length >= 1 ? classes.uploadBtn : ''}
-              buttonRef={(node) => {
-                this.popperRef = node
-              }}
-            >
-              <AttachFile /> Upload
-            </Button>
-            <Popper
-              open={showPopper}
-              anchorEl={this.popperRef}
-              transition
-              disablePortal
-              placement='bottom-end'
-              style={{
-                zIndex: 999,
-                // marginTop: 65,
-                // marginLeft: 8,
-                fontSize: '1em',
-              }}
-            >
-              {({ TransitionProps, placement }) => (
-                <Grow
-                  {...TransitionProps}
-                  id='menu-list'
-                  style={{ transformOrigin: '0 0 -30' }}
+          <ClickAwayListener
+            onClickAway={(e) => {
+              this.setState({
+                showPopper: false,
+                uploadFrom: undefined,
+              })
+            }}
+          >
+            <div>
+              <Button
+                color='primary'
+                size='sm'
+                onClick={(e) => {
+                  e.stopPropagation()
+                  this.setState({
+                    showPopper: true,
+                    uploadFrom: 'upload',
+                  })
+                }}
+                disabled={isReadOnly || uploading || global.disableSave}
+                className={fileAttachments.length >= 1 ? classes.uploadBtn : ''}
+                buttonRef={(node) => {
+                  this.popperRef = node
+                }}
+              >
+                <AttachFile /> Upload
+              </Button>
+              {!disableScanner && (
+                <Button
+                  color='primary'
+                  size='sm'
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    this.setState({
+                      showPopper: true,
+                      uploadFrom: 'scan',
+                    })
+                  }}
+                  // onClick={handleOpenScanner}
+                  disabled={isReadOnly || uploading || global.disableSave}
+                  className={
+                    fileAttachments.length >= 1 ? classes.uploadBtn : ''
+                  }
                 >
-                  <Paper className={classes.dropdown}>
-                    <ClickAwayListener onClickAway={this.handlePopper}>
-                      <MenuList role='menu'>
-                        <MenuItem
-                          onClick={() =>
-                            this.onDropDownClick(ATTACHMENT_TYPE.CLINICALNOTES)}
-                        >
-                          Consultation Attachment
-                        </MenuItem>
-                        <Authorized authority='queue.consultation.widgets.eyevisualacuity'>
-                          <MenuItem
-                            onClick={() =>
-                              this.onDropDownClick(
-                                ATTACHMENT_TYPE.EYEVISUALACUITY,
-                              )}
-                          >
-                            Visual Acuity Test
-                          </MenuItem>
-                        </Authorized>
-                      </MenuList>
-                    </ClickAwayListener>
-                  </Paper>
-                </Grow>
+                  <Scanner /> Scan
+                </Button>
               )}
-            </Popper>
-          </Fragment>
+              <Popper
+                open={showPopper}
+                anchorEl={this.popperRef}
+                transition
+                disablePortal
+                placement='bottom-end'
+                style={{
+                  zIndex: 999,
+                  // marginTop: 65,
+                  marginLeft: this.state.uploadFrom === 'scan' ? 90 : 0,
+                  fontSize: '1em',
+                }}
+              >
+                {({ TransitionProps, placement }) => (
+                  <Grow
+                    {...TransitionProps}
+                    id='menu-list'
+                    style={{ transformOrigin: '0 0 -30' }}
+                  >
+                    <Paper className={classes.dropdown}>
+                      <MenuList role='menu'>
+                        {AttachmentMenuItems.map((m) => {
+                          return (
+                            <Authorized authority={m.authority}>
+                              <MenuItem
+                                onClick={() => this.onDropDownClick(m.name)}
+                              >
+                                {m.title}
+                              </MenuItem>
+                            </Authorized>
+                          )
+                        })}
+                      </MenuList>
+                    </Paper>
+                  </Grow>
+                )}
+              </Popper>
+            </div>
+          </ClickAwayListener>
         ) : (
           <React.Fragment>
             <Button
