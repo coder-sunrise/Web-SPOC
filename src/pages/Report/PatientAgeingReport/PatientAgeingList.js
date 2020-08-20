@@ -26,8 +26,8 @@ class PatientAgeingList extends PureComponent {
     }
 
     const AgeingDetailsCols = [
-      { name: 'patientReferenceNo', title: 'Patient Reference No' },
-      { name: 'patientAccountNo', title: 'Patient Account No' },
+      { name: 'patientReferenceNo', title: 'Patient Reference No.' },
+      { name: 'patientAccountNo', title: 'Patient Account No.' },
       { name: 'patientName', title: 'Patient Name' },
       { name: 'currentOS', title: 'Current' },
       { name: 'preMonth1', title: '1 Mth' },
@@ -39,12 +39,12 @@ class PatientAgeingList extends PureComponent {
     const AgeingDetailsColsExtension = [
       { columnName: 'patientReferenceNo', width: 200, sortingEnabled: false },
       { columnName: 'patientAccountNo', width: 200, sortingEnabled: false },
-      { columnName: 'patientName', width: 300, sortingEnabled: false },
-      { columnName: 'currentOS', type: 'currency', currency: true, sortingEnabled: false },
-      { columnName: 'preMonth1', type: 'currency', currency: true, sortingEnabled: false },
-      { columnName: 'preMonth2', type: 'currency', currency: true, sortingEnabled: false },
-      { columnName: 'preMore', type: 'currency', currency: true, sortingEnabled: false },
-      { columnName: 'total', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'patientName', sortingEnabled: false },
+      { columnName: 'currentOS', type: 'currency', currency: true, sortingEnabled: false, width: 180 },
+      { columnName: 'preMonth1', type: 'currency', currency: true, sortingEnabled: false, width: 180 },
+      { columnName: 'preMonth2', type: 'currency', currency: true, sortingEnabled: false, width: 180 },
+      { columnName: 'preMore', type: 'currency', currency: true, sortingEnabled: false, width: 180 },
+      { columnName: 'total', type: 'currency', currency: true, sortingEnabled: false, width: 180 },
     ]
 
     const sumFirstCalculator = (type, rows, getValue) => {
