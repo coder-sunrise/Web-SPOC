@@ -121,14 +121,6 @@ const PackageItemListing = ({
     serviceCenterServicess,
     setServiceCenterServicess,
   ] = useState(() => [])
-  const [
-    serviceFK,
-    setServiceFK,
-  ] = useState(() => {})
-  const [
-    serviceCenterFK,
-    setServiceCenterFK,
-  ] = useState(() => {})
 
   const fetchCodes = async () => {
     await dispatch({
@@ -345,8 +337,6 @@ const PackageItemListing = ({
             ...serviceRows,
             rows[0],
           ])
-          setServiceCenterFK()
-          setServiceFK()
           return setFieldValue(`${type}`, serviceRows)
         }
         default:
@@ -385,8 +375,6 @@ const PackageItemListing = ({
         }
       }
       const edittedType = getType(type)
-      setServiceCenterFK()
-      setServiceFK()
       edittedType.setStateRow(rows)
       return setFieldValue(`${type}`, rows)
     }
@@ -653,7 +641,6 @@ const PackageItemListing = ({
           return options
         },
         onChange: (e) => {
-          setServiceFK(e.val)
           handleItemOnChange
           getServiceCenterService(e.row)
           e.row.serviceFK = e.val
@@ -677,7 +664,6 @@ const PackageItemListing = ({
         },
 
         onChange: (e) => {
-          setServiceCenterFK(e.val)
           handleItemOnChange
           getServiceCenterService(e.row)
           e.row.serviceCenterFK = e.val
