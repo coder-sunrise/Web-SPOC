@@ -16,7 +16,6 @@ import {
   ProgressButton,
   Tooltip,
 } from '@/components'
-import { ReportViewer } from '@/components/_medisys'
 import CollectPaymentConfirm from './CollectPaymentConfirm'
 import ExtractAsSingle from './ExtractAsSingle'
 import PrintStatementReport from '../PrintStatementReport'
