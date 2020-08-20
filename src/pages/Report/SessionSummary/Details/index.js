@@ -1,4 +1,5 @@
 import React from 'react'
+import { Collapse } from 'antd'
 // common components
 import { GridContainer, GridItem } from '@/components'
 import PaymentCollections from './PaymentCollections'
@@ -10,9 +11,8 @@ const reportId = 5
 const fileName = 'Session Summary Report'
 
 class SessionSummary extends ReportBase {
-  constructor(props) {
-    super(props)
-    console.log({ superState: super.state, thisState: this.state })
+  constructor (props) {
+    super(props) 
     this.state = {
       ...this.state,
       reportId,
@@ -48,29 +48,38 @@ class SessionSummary extends ReportBase {
           companyDetails={reportDatas.CompanyDetails[0]}
         />
         <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
-          <h4>Payment Collections</h4>
-        </GridItem>
-        <GridItem md={12}>
-          <PaymentCollections
-            PaymentCollectionsDetails={reportDatas.PaymentCollections}
-            TotalDetails={reportDatas.PaymentTotal}
-          />
-        </GridItem>
-        <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
-          <h4>Payment Collections for Past Invoices</h4>
-        </GridItem>
-        <GridItem md={12}>
-          <PaymentCollections
-            PaymentCollectionsDetails={reportDatas.PastPaymentCollections}
-            TotalDetails={reportDatas.PastPaymentTotal}
-          />
+          <Collapse style={{ fontSize:'inherit' }} expandIconPosition='right' defaultActiveKey={['0']}>
+            <Collapse.Panel header={<div style={{fontWeight: 500}}>Summary</div>} key={0}>
+              <GridItem md={12}>
+                <PaymentSummary PaymentSummaryDetails={reportDatas.PaymentDetails} />
+              </GridItem> 
+            </Collapse.Panel>
+          </Collapse>
         </GridItem>
         <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
-          <h4>Payment Summary</h4>
-        </GridItem>
-        <GridItem md={12}>
-          <PaymentSummary PaymentSummaryDetails={reportDatas.PaymentDetails} />
-        </GridItem>
+          <Collapse style={{ fontSize:'inherit', padding:5 }} expandIconPosition='right' defaultActiveKey={['0']}>
+            <Collapse.Panel header={<div style={{fontWeight: 500}}>Details</div>} key={0}>
+              <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
+                <h5>Payment Collections</h5>
+              </GridItem>
+              <GridItem md={12}>
+                <PaymentCollections
+                  PaymentCollectionsDetails={reportDatas.PaymentCollections}
+                  TotalDetails={reportDatas.PaymentTotal}
+                />
+              </GridItem>
+              <GridItem md={12} style={{ marginBottom: 8, marginTop: 18 }}>
+                <h5>Payment Collections for Past Invoices</h5>
+              </GridItem>
+              <GridItem md={12}>
+                <PaymentCollections
+                  PaymentCollectionsDetails={reportDatas.PastPaymentCollections}
+                  TotalDetails={reportDatas.PastPaymentTotal}
+                />
+              </GridItem>
+            </Collapse.Panel>
+          </Collapse>
+        </GridItem> 
       </GridContainer>
     )
   }
