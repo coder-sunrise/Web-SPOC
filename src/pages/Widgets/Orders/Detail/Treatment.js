@@ -16,10 +16,11 @@ import {
 } from '@/components'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
+import { currencySymbol } from '@/utils/config'
 
 const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
 // @Authorized.Secured('queue.dispense.editorder')
-@connect(({ codetable, global }) => ({ codetable, global }))
+@connect(({ codetable, global, user }) => ({ codetable, global, user }))
 @withFormikExtend({
   // authority: [
   //   'queue.dispense.editorder',
@@ -184,10 +185,12 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     treatmentFK: Yup.number().required(),
   }),
 
-  handleSubmit: async (values, { props, onConfirm }) => {
-    const { dispatch, orders, currentType, getNextSequence } = props
+  handleSubmit: async (values, { props, onConfirm, setValues }) => {
+    const { dispatch, orders, currentType, getNextSequence, user } = props
 
     const data = {
+      isOrderedByDoctor:
+        user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
       sequence: getNextSequence(),
       ...values,
       subject: currentType.getSubject(values),
@@ -210,6 +213,20 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     })
 
     if (onConfirm) onConfirm()
+    dispatch({
+      type: 'dentalChartComponent/deleteTreatment',
+      payload: values,
+    })
+    dispatch({
+      type: 'dentalChartComponent/updateState',
+      payload: {
+        action: undefined,
+      },
+    })
+    setValues({
+      ...orders.defaultTreatment,
+      type: orders.type,
+    })
   },
   enableReinitialize: true,
   displayName: 'TreatmentForm',
@@ -293,6 +310,30 @@ class Treatment extends PureComponent {
       this.props.setFieldValue('totalAfterItemAdjustment', undefined)
       this.props.setFieldValue('adjAmount', undefined)
     }
+  }
+
+  getTreatmentOptions = (isDoctor) => {
+    const { values, codetable: { cttreatment = [] } } = this.props
+
+    const treatments = isDoctor
+      ? cttreatment
+      : cttreatment.filter(
+          (o) => o.treatmentCategoryFK === values.treatmentCategoryFK,
+        )
+
+    return treatments.reduce((p, c) => {
+      const { code, displayValue, sellingPrice = 0 } = c
+      let opt = {
+        ...c,
+        combinDisplayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
+          2,
+        )})`,
+      }
+      return [
+        ...p,
+        opt,
+      ]
+    }, [])
   }
 
   changeTreatment = (option = {}) => {
@@ -424,18 +465,9 @@ class Treatment extends PureComponent {
               name='treatmentFK'
               render={(args) => (
                 <Select
-                  options={
-                    isDoctor ? (
-                      cttreatment
-                    ) : (
-                      cttreatment.filter(
-                        (o) =>
-                          o.treatmentCategoryFK === values.treatmentCategoryFK,
-                      )
-                    )
-                  }
+                  options={this.getTreatmentOptions(isDoctor)}
                   valueField='id'
-                  labelField='displayValue'
+                  labelField='combinDisplayValue'
                   label='Treatment'
                   disabled={isDoctor}
                   onChange={(v, op) => {

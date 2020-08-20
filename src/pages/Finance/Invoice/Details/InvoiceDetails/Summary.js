@@ -20,11 +20,14 @@ const amountProps = {
   disabled: true,
   rightAlign: true,
   normalText: true,
+  showZero: true,
+  text: true,
+  fullWidth: true,
 }
 
 const Summary = ({ classes, values }) => {
   const getGST = (gstValue = 0, isGstInclusive = false) =>
-    `${gstValue.toFixed(2)}% GST${isGstInclusive ? ' inclusive' : ''}:`
+    `${isGstInclusive ? ' Inclusive ' : ''}GST (${gstValue.toFixed(2)}%):`
   const { invoiceAdjustment = [] } = values
 
   return (
@@ -32,10 +35,17 @@ const Summary = ({ classes, values }) => {
       <GridContainer>
         <GridContainer xs={2} md={9} />
         <GridContainer xs={10} md={3}>
-          <GridItem md={6} xs={6}>
-            <span>Sub Total:</span>
+          <GridItem md={8} xs={8}>
+            <div
+              style={{
+                textAlign: 'right',
+                fontWeight: 500,
+              }}
+            >
+              <span>Sub Total:</span>
+            </div>
           </GridItem>
-          <GridItem md={6} xs={6}>
+          <GridItem md={4} xs={4}>
             <FastField
               name='invoiceTotal'
               render={(args) => {
@@ -43,20 +53,24 @@ const Summary = ({ classes, values }) => {
               }}
             />
           </GridItem>
-
-          <GridItem md={6} xs={6}>
-            {invoiceAdjustment.length > 0 && (
-              <span>
-                {formatMessage({
-                  id: 'inventory.pr.detail.pod.summary.adjustment',
-                })}
-              </span>
-            )}
+          <GridItem md={12} xs={12} className={classes.divider}>
+            <Divider />
           </GridItem>
 
-          <GridItem md={6} xs={6}>
+          <GridItem md={8} xs={8}>
             {invoiceAdjustment.length > 0 && (
-              <NumberInput {...amountProps} disabled />
+              <div
+                style={{
+                  textAlign: 'right',
+                  fontWeight: 500,
+                }}
+              >
+                <span>
+                  {formatMessage({
+                    id: 'inventory.pr.detail.pod.summary.adjustment',
+                  })}
+                </span>
+              </div>
             )}
           </GridItem>
 
@@ -64,7 +78,7 @@ const Summary = ({ classes, values }) => {
             {invoiceAdjustment.map((v) => {
               return (
                 <GridContainer md={12} xs={12}>
-                  <GridItem xs={7}>
+                  <GridItem xs={8}>
                     <div
                       style={{
                         width: '100%',
@@ -73,7 +87,8 @@ const Summary = ({ classes, values }) => {
                         textOverflow: 'ellipsis',
                         wordBreak: 'keep-all',
                         whiteSpace: 'nowrap',
-                        marginLeft: 20,
+                        // marginLeft: 20,
+                        textAlign: 'right',
                       }}
                     >
                       <Tooltip title={v.adjRemark}>
@@ -81,7 +96,7 @@ const Summary = ({ classes, values }) => {
                       </Tooltip>
                     </div>
                   </GridItem>
-                  <GridItem xs={5}>
+                  <GridItem xs={4}>
                     <NumberInput value={v.adjAmount} {...amountProps} />
                   </GridItem>
                 </GridContainer>
@@ -89,12 +104,19 @@ const Summary = ({ classes, values }) => {
             })}
           </GridContainer>
 
-          <GridItem md={6} xs={6}>
+          <GridItem md={8} xs={8}>
             {values.gstValue >= 0 && (
-              <span>{getGST(values.gstValue, values.isGSTInclusive)}</span>
+              <div
+                style={{
+                  textAlign: 'right',
+                  fontWeight: 500,
+                }}
+              >
+                <span>{getGST(values.gstValue, values.isGSTInclusive)}</span>
+              </div>
             )}
           </GridItem>
-          <GridItem md={6} xs={6}>
+          <GridItem md={4} xs={4}>
             {values.gstValue >= 0 && (
               <FastField
                 name='invoiceGSTAmt'
@@ -108,10 +130,17 @@ const Summary = ({ classes, values }) => {
             <Divider />
           </GridItem>
 
-          <GridItem md={6} xs={6}>
-            <span>Total:</span>
+          <GridItem md={8} xs={8}>
+            <div
+              style={{
+                textAlign: 'right',
+                fontWeight: 500,
+              }}
+            >
+              <span>Total:</span>
+            </div>
           </GridItem>
-          <GridItem md={6} xs={6}>
+          <GridItem md={4} xs={4}>
             <FastField
               name='invoiceTotalAftGST'
               render={(args) => {

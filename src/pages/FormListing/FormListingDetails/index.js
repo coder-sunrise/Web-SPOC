@@ -2,16 +2,16 @@ import React, { PureComponent } from 'react'
 import moment from 'moment'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
-import FilterBar from './FilterBar'
-import FormModuleGrid from './FormModuleGrid'
-import VisitFormGrid from './VisitFormGrid'
 import { CardContainer, CommonModal, notification } from '@/components'
 import { FORM_CATEGORY, FORM_FROM } from '@/utils/constants'
-import model from './models'
-import AddForm from './FormDetail/AddForm'
 import { commonDataReaderTransform } from '@/utils/utils'
 import { formTypes } from '@/utils/codes'
 import { download } from '@/utils/request'
+import model from './models'
+import AddForm from './FormDetail/AddForm'
+import FilterBar from './FilterBar'
+import FormModuleGrid from './FormModuleGrid'
+import VisitFormGrid from './VisitFormGrid'
 
 window.g_app.replaceModel(model)
 
@@ -90,6 +90,15 @@ class FormListingDetails extends PureComponent {
     this.queryFormListing()
   }
 
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'formListing/updateState',
+      payload: {
+        list: [],
+      },
+    })
+  }
+
   queryFormListing = () => {
     const { formListing, formFrom, formCategory } = this.props
 
@@ -98,8 +107,8 @@ class FormListingDetails extends PureComponent {
         type: 'formListing/query',
         payload: {
           apiCriteria: {
-            startDate: moment().add(-1, 'month').formatUTC(),
-            endDate: moment().formatUTC(false),
+            visitDateFrom: moment().add(-1, 'month').formatUTC(),
+            visitDateTo: moment().endOf('day').formatUTC(false),
           },
         },
       })

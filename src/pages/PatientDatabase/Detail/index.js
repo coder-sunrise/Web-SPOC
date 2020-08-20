@@ -343,21 +343,6 @@ class PatientDetail extends PureComponent {
           loading: Loading,
         }),
       },
-      {
-        id: '9',
-        name: 'Nurse Notes',
-        access: [
-          'patientdatabase.patientprofiledetails.nursenotes',
-        ],
-        component: Loadable({
-          loader: () => import('./PatientNurseNotes'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...p} />
-          },
-          loading: Loading,
-        }),
-      },
     ]
   }
 

@@ -32,7 +32,6 @@
     "docker:push": "npm run docker-hub:build && npm run docker:tag && docker push chenshuai2144/ant-design-pro"
   },
   "dependencies": {
-    "@antv/data-set": "^0.10.0",
     "@babel/runtime": "^7.1.5",
     "@devexpress/dx-grid-core": "2.2.1",
     "@devexpress/dx-react-core": "2.2.1",
@@ -66,6 +65,7 @@
     "html-to-draftjs": "^1.4.0",
     "html-to-text": "^5.1.1",
     "humps": "^2.0.1",
+    "immutable": "^4.0.0-rc.12",
     "jquery": "3.4.1",
     "jsonp": "^0.2.1",
     "lodash": "4.17.15",

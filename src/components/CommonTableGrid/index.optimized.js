@@ -8,8 +8,8 @@ import {
   withStyles,
 } from '@material-ui/core/styles'
 // import Paper from '@material-ui/core/Paper'
-import { Paper, Tooltip } from '@material-ui/core'
-import { hoverColor, tableEvenRowColor } from 'mui-pro-jss'
+import { Paper } from '@material-ui/core'
+
 import {
   SortableContainer,
   SortableElement,
@@ -31,6 +31,7 @@ import {
   CustomPaging,
   TreeDataState,
   CustomTreeData,
+  VirtualTableState,
 } from '@devexpress/dx-react-grid'
 
 import {
@@ -45,10 +46,30 @@ import {
   Toolbar,
   TableFixedColumns,
   VirtualTable,
+  TableColumnVisibility,
+  ColumnChooser,
   TableTreeColumn,
+  TableColumnResizing,
+  TableColumnReordering,
+  TableSelection,
 } from '@devexpress/dx-react-grid-material-ui'
+import MenuItem from '@material-ui/core/MenuItem'
+import MenuList from '@material-ui/core/MenuList'
+import SettingsApplicationsIcon from '@material-ui/icons/SettingsApplications'
+import * as userService from '@/services/user'
 import { control } from '@/components/Decorator'
 import { smallTheme, defaultTheme } from '@/utils/theme'
+import { enableTableForceRender, generateHashCode } from '@/utils/utils'
+import { LoadingWrapper } from '@/components/_medisys'
+import {
+  Badge,
+  SizeContainer,
+  IconButton,
+  Popper,
+  Button,
+  Tooltip,
+  notification,
+} from '@/components'
 import NumberTypeProvider from './EditCellComponents/NumberTypeProvider'
 import TextTypeProvider from './EditCellComponents/TextTypeProvider'
 import SelectTypeProvider from './EditCellComponents/SelectTypeProvider'
@@ -62,84 +83,15 @@ import PatchedTableSelection from './plugins/PatchedTableSelection'
 import PatchedIntegratedSelection from './plugins/PatchedIntegratedSelection'
 import TableRow from './plugins/TableRow'
 import TableCell from './plugins/TableCell'
-import { enableTableForceRender } from '@/utils/utils'
-import { LoadingWrapper } from '@/components/_medisys'
+import styles from './style'
 
 window.$tempGridRow = {}
-
 const cellStyle = {
   cell: {
     // borderRight: '1px solid rgba(0, 0, 0, 0.12)',
     borderLeft: '1px solid rgba(0, 0, 0, 0.12)',
   },
 }
-
-// console.log(colorManipulator)
-const styles = (theme) => ({
-  tableCursorPointer: {
-    cursor: 'default',
-  },
-
-  tableStriped: {
-    '& > tbody > tr:nth-of-type(odd):not(.group), & > thead > tr:not(.group)': {
-      // backgroundColor: colorManipulator.fade(
-      //   theme.palette.secondary.main,
-      //   0.01,
-      // ),
-      backgroundColor: '#ffffff',
-    },
-    '& > tbody > tr:nth-of-type(even):not(.group)': {
-      backgroundColor: tableEvenRowColor,
-    },
-    // '& > tbody > tr.group': {
-    //   backgroundColor: color(tableEvenRowColor).lighten(0.5).hex(),
-    // },
-    '& > tbody > tr:not(.group):hover': {
-      // backgroundColor: colorManipulator.fade(
-      //   theme.palette.secondary.main,
-      //   0.05,
-      // ),
-      backgroundColor: hoverColor,
-    },
-
-    '& > tbody > tr.grid-edit-row': {
-      backgroundColor: '#ffffff',
-    },
-
-    '& > tbody > tr.grid-edit-row:hover': {
-      backgroundColor: '#ffffff',
-    },
-  },
-  paperContainer: {
-    // margin: '0 5px',
-    '& > div': {
-      width: '100%',
-    },
-  },
-
-  cleanFormat: {
-    fontSize: 'inherit',
-  },
-
-  dragCellContainer: {
-    // display: 'flex',
-    // justifyContent: 'center',
-    // alignItems: 'center',
-    '& > span': {
-      cursor: 'move',
-    },
-  },
-  sortableContainer: {
-    zIndex: 10000,
-    '& > *': {
-      // backgroundColor:'black',
-      width: '100%',
-      '& > *': {
-        minWidth: 200,
-      },
-    },
-  },
-})
 
 const Root = (props) => <DevGrid.Root {...props} style={{ height: '100%' }} />
 
@@ -183,10 +135,19 @@ class CommonTableGrid extends PureComponent {
       editableGrid,
       getRowId,
       FuncProps = {},
+      columns = [],
+      identifier,
     } = props
     // console.log(props)
     this.gridId = `view-${uniqueGid++}`
     this.isScrollable = !!pHeight
+    this.hashCode =
+      identifier || generateHashCode(JSON.stringify(columns.map((o) => o.name)))
+    const { user: { gridSetting = [] } } = window.g_app._store.getState()
+    const gs = gridSetting.find((o) => o.Identifier === this.hashCode) || {}
+    if (gs.ColumnsOrder && gs.ColumnsOrder.length !== columns.length) {
+      gs.ColumnsOrder = columns.map((o) => o.name)
+    }
     // this.myRef = React.createRef()
     const { pagerDefaultState = {} } = FuncProps
     this.state = {
@@ -196,6 +157,8 @@ class CommonTableGrid extends PureComponent {
         ...pagerDefaultState,
       },
       rows: [],
+      gridSetting: gs,
+      selectedItem: [],
     }
     const cls = classNames({
       [classes.tableStriped]: oddEven,
@@ -208,7 +171,7 @@ class CommonTableGrid extends PureComponent {
 
     this.TableBase = ({ height, scrollable, dispatch, ...restProps }) => {
       const isScrollable = !!height
-      const dragCfg = {}
+      // const dragCfg = {}
       // if(rowDragable){
       //   dragCfg.rowComponent=({ row, ...restProps }) => {
       //     const TableRow = SortableElement(this.TableRow);
@@ -297,6 +260,8 @@ class CommonTableGrid extends PureComponent {
     this.defaultFunctionConfig = {
       filter: false,
       selectable: false,
+      resizable: false,
+      selectRowHighlightable: false,
       pager: true,
       pagerStateConfig: {
         onCurrentPageChange: (current) => {
@@ -319,6 +284,10 @@ class CommonTableGrid extends PureComponent {
       summary: false,
       summaryConfig: {},
     }
+
+    this.debouncedUploadGridSetting = _.debounce(this.uploadGridSetting, 2000, {
+      leading: true,
+    })
 
     const tableRowSharedRootConfig = {
       '&.moveable ~ tr td.td-move-cell button:nth-child(1)': {
@@ -432,6 +401,12 @@ class CommonTableGrid extends PureComponent {
             borderTop: '1px solid rgba(0, 0, 0, 0.12)',
           },
         },
+        TableSelectAllCell: {
+          cell: {
+            ...cellStyle.cell,
+            borderTop: '1px solid rgba(0, 0, 0, 0.12)',
+          },
+        },
         Table: {
           table: {
             // tableLayout: 'auto',
@@ -477,9 +452,22 @@ class CommonTableGrid extends PureComponent {
             },
           },
         },
+        Toolbar: {
+          toolbar: {
+            minHeight: 'auto !important',
+            zIndex: 600,
+            '& > .grid-setting-popover': {
+              backgroundColor: 'white',
+              position: 'absolute',
+              right: 0,
+              top: 7,
+            },
+          },
+        },
         ...sizeConfig[size],
       },
     })
+
     // console.log(this.theme)
     // this.search()
     // console.log(props.query, ' c grid')
@@ -511,7 +499,7 @@ class CommonTableGrid extends PureComponent {
         })
       }
       return {
-        pagination: _entity.pagination,
+        pagination: _entity.pagination || {},
         rows: _entity.list,
         filter: _entity.filter,
         entity: _entity,
@@ -711,7 +699,74 @@ class CommonTableGrid extends PureComponent {
     )
   }
 
+  uploadGridSetting = (data, cb) => {
+    // console.log(this.props.columns.map((o) => o.name))
+    // console.log(hashids.encode(this.props.columns.map((o) => o.name)))
+    enableTableForceRender()
+
+    this.setState({
+      gridSetting: data,
+    })
+    const newData = {
+      Identifier: this.hashCode,
+      ...data,
+    }
+
+    window.g_app._store.dispatch({
+      type: 'user/saveUserPreference',
+      payload: {
+        data: newData,
+        itemIdentifier: this.hashCode,
+      },
+    })
+
+    if (cb) cb()
+  }
+
+  renderColumnChooser = ({ onToggle }) => {
+    const { state, props } = this
+    const { classes } = props
+    return (
+      <div className='grid-setting-popover'>
+        <Popper
+          hideOnClick
+          overlay={
+            <MenuList role='menu'>
+              <MenuItem onClick={onToggle}>Change Column Visibility</MenuItem>
+              <MenuItem
+                onClick={() => {
+                  enableTableForceRender()
+                  const gridSetting = {
+                    ...state.gridSetting,
+                    HiddenColumns: [],
+                    ColumnsOrder: undefined,
+                  }
+                  this.setState({
+                    gridSetting,
+                  })
+                  this.debouncedUploadGridSetting(gridSetting, () => {
+                    notification.success({
+                      message:
+                        'Grid reset to default, refresh current page to load default setting',
+                    })
+                  })
+                }}
+              >
+                Reset Grid Setting
+              </MenuItem>
+            </MenuList>
+          }
+        >
+          <IconButton authority='none' className={classes.settingBtn}>
+            <SettingsApplicationsIcon />
+          </IconButton>
+        </Popper>
+      </div>
+    )
+  }
+
   render () {
+    const { state, props } = this
     const {
       classes,
       pageSizes = [
@@ -760,11 +815,13 @@ class CommonTableGrid extends PureComponent {
       gridId,
       extraCellConfig,
       editableGrid,
-    } = this.props
+    } = props
 
     const {
       grouping,
       selectable,
+      resizable,
+      selectRowHighlightable,
       selectConfig = {
         showSelectAll: false,
         rowSelectionEnabled: (row) => true,
@@ -780,6 +837,8 @@ class CommonTableGrid extends PureComponent {
       sort,
       sortConfig,
       filter,
+      columnSelectable = false,
+      columnReorderable = false,
     } = {
       ...this.defaultFunctionConfig,
       ...FuncProps,
@@ -932,6 +991,9 @@ class CommonTableGrid extends PureComponent {
     // const _loading = type ? loading.effects[`${type}/query`] : false
     const rowData = this.getData()
     // console.log(rowData, this.state)
+    const showToolbar =
+      (grouping && groupingConfig.showToolbar) || columnSelectable
+
     return (
       <MuiThemeProvider theme={this.theme}>
         <Paper
@@ -994,10 +1056,16 @@ class CommonTableGrid extends PureComponent {
                   {...sortConfig}
                 />
               )}
-              {selectable && (
+              {(selectable || selectRowHighlightable) && (
                 <SelectionState
-                  selection={selection}
-                  onSelectionChange={onSelectionChange}
+                  selection={selectable ? selection : this.state.selectedItem}
+                  onSelectionChange={(e) => {
+                    if (selectable) {
+                      onSelectionChange(e)
+                    } else {
+                      this.setState({ selectedItem: e })
+                    }
+                  }}
                 />
               )}
               {summary && <SummaryState {...summaryConfig.state} />}
@@ -1046,8 +1114,9 @@ class CommonTableGrid extends PureComponent {
               
 
               <RowErrorTypeProvider {...cellComponentConfig} /> */}
-              {grouping && <DragDropProvider />}
+              {(columnReorderable || grouping) && <DragDropProvider />}
               {tree && <CustomTreeData getChildRows={this.getChildRows} />}
+
               <TableBase
                 // height={height}
                 bodyComponent={this.TableBody}
@@ -1070,7 +1139,41 @@ class CommonTableGrid extends PureComponent {
                   {...selectConfig}
                 />
               )}
+              {columnReorderable && (
+                <TableColumnReordering
+                  defaultOrder={
+                    state.gridSetting.ColumnsOrder ||
+                    newColumns.map((o) => o.name)
+                  }
+                  onOrderChange={(ary) => {
+                    const gridSetting = {
+                      ...state.gridSetting,
+                      ColumnsOrder: ary,
+                    }
+                    this.debouncedUploadGridSetting(gridSetting)
+                  }}
+                />
+              )}
+              {header &&
+              resizable && (
+                <TableColumnResizing
+                  defaultColumnWidths={columnExtensions.map((o) => {
+                    return {
+                      columnName: o.columnName,
+                      width: o.width || 100,
+                    }
+                  })}
+                />
+              )}
               {header && <HeaderRow showSortingControls />}
+              {selectRowHighlightable && (
+                <TableSelection
+                  highlightRow
+                  selectByRowClick
+                  showSelectionColumn={false}
+                  {...selectConfig}
+                />
+              )}
               {extraRow.map((o) => o)}
               {pager && <PagingPanel pageSizes={pageSizes} {...pagerConfig} />}
               {grouping && (
@@ -1081,7 +1184,7 @@ class CommonTableGrid extends PureComponent {
                   {...groupingConfig.row}
                 />
               )}
-              {grouping && groupingConfig.showToolbar && <Toolbar />}
+              {showToolbar && <Toolbar />}
               {grouping &&
               groupingConfig.showToolbar && (
                 <GroupingPanel showSortingControls />
@@ -1097,6 +1200,24 @@ class CommonTableGrid extends PureComponent {
                     )
                   }}
                   {...summaryConfig.row}
+                />
+              )}
+              {columnSelectable && (
+                <TableColumnVisibility
+                  defaultHiddenColumnNames={state.gridSetting.HiddenColumns}
+                  // hiddenColumnNames={this.state.hiddenCols}
+                  onHiddenColumnNamesChange={(ary) => {
+                    const gridSetting = {
+                      ...state.gridSetting,
+                      HiddenColumns: ary,
+                    }
+                    this.debouncedUploadGridSetting(gridSetting)
+                  }}
+                />
+              )}
+              {columnSelectable && (
+                <ColumnChooser
+                  toggleButtonComponent={this.renderColumnChooser}
                 />
               )}
               {tree && <TableTreeColumn {...treeColumnConfig} />}
@@ -1155,6 +1276,8 @@ CommonTableGrid.propTypes = {
     pager: PropTypes.bool,
     pagerConfig: PropTypes.object,
     selectable: PropTypes.bool,
+    resizable: PropTypes.bool,
+    selectRowHighlightable: PropTypes.bool,
   }),
   FilteringProps: PropTypes.shape({
     defaultFilters: PropTypes.array,

@@ -73,9 +73,21 @@ export const menuData = [
   },
   {
     title: 'Finance',
-    text: 'Patient Ageing Report',
-    url: '/report/patientageingreport',
-    authority: 'report.finance.patientageingreport',
+    text: 'Invoice Listing Report',
+    url: '/report/invoicelistingreport',
+    authority: 'report.finance.invoicelisting',
+  },
+  {
+    title: 'Finance',
+    text: 'Statement Summary Report',
+    url: '/report/statementsummaryreport',
+    authority: 'report.finance.statementsummaryreport',
+  },
+  {
+    title: 'Finance',
+    text: 'Payment Collection Report (Summary)',
+    url: '/report/paymentcollectionsummary',
+    authority: 'report.finance.paymentcollectionsummary',
   },
   {
     title: 'Inventory',

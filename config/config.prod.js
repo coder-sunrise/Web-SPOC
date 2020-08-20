@@ -87,7 +87,7 @@ export default {
     'zindex-tooltip': 2060,
   },
   externals: {
-    '@antv/data-set': 'DataSet',
+    // '@antv/data-set': 'DataSet',
   },
   proxy: {
     '/api/': {

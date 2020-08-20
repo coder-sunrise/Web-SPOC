@@ -206,8 +206,7 @@ class Grid extends React.Component {
           loading={isLoading || queryingFormData}
           text={loadingText}
         >
-          {filter !== StatusIndicator.APPOINTMENT &&
-          filter !== StatusIndicator.E_QUEUE && (
+          {filter !== StatusIndicator.APPOINTMENT && (
             <CommonTableGrid
               size='sm'
               TableProps={TableProps}
@@ -229,6 +228,7 @@ class Grid extends React.Component {
                   columnName: 'action',
                   align: 'center',
                   render: this.getActionButton,
+                  width: 95,
                 },
                 {
                   columnName: 'visitPurposeFK',
@@ -273,6 +273,7 @@ class Grid extends React.Component {
                   columnName: 'action',
                   align: 'center',
                   render: this.getActionButton,
+                  width: 95,
                 },
                 {
                   columnName: 'gender/age',

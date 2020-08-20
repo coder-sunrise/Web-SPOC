@@ -18,6 +18,7 @@ import {
   notification,
   ProgressButton,
   AuthorizedContext,
+  withFormikExtend,
 } from '@/components'
 import AddConsultationDocument from './AddConsultationDocument'
 
@@ -143,6 +144,12 @@ export const viewReport = (row, props, useID = false) => {
   patient,
   consultation,
 }))
+@withFormikExtend({
+  authority: [
+    'queue.consultation.widgets.consultationdocument',
+  ],
+  displayName: 'ConsultationDocumentList',
+})
 class ConsultationDocument extends PureComponent {
   constructor (props) {
     super(props)

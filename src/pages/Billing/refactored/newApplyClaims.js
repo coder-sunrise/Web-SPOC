@@ -5,11 +5,19 @@ import { withStyles } from '@material-ui/core'
 import Add from '@material-ui/icons/AddCircle'
 import Reset from '@material-ui/icons/Cached'
 // common components
-import { CommonModal, Button, GridItem, notification } from '@/components'
+import {
+  CommonModal,
+  Button,
+  GridItem,
+  notification,
+  WarningSnackbar,
+} from '@/components'
 // common utils
 import { roundTo } from '@/utils/utils'
 import { INVOICE_PAYER_TYPE, VISIT_TYPE } from '@/utils/constants'
 // import MedisaveSchemes from './MedisaveSchemes'
+import { AddPayment } from '@/components/_medisys'
+import DeleteConfirmation from '@/pages/Finance/Invoice/components/modal/DeleteConfirmation'
 import Scheme from './newScheme'
 import ResetButton from './ResetButton'
 import CoPayer from '../modal/CoPayer'
@@ -28,8 +36,6 @@ import {
   updateInvoicePayerPayableBalance,
   sortItemByID,
 } from './applyClaimUtils'
-import { AddPayment } from '@/components/_medisys'
-import DeleteConfirmation from '@/pages/Finance/Invoice/components/modal/DeleteConfirmation'
 
 const defaultInvoicePayer = {
   _indexInClaimableSchemes: 0,
@@ -65,6 +71,8 @@ const ApplyClaims = ({
   saveBilling,
   noExtraOptions = false,
   fromBilling = false,
+  handleIsExistingOldPayerItem,
+  clinicSettings,
 }) => {
   const {
     invoice,
@@ -283,6 +291,23 @@ const ApplyClaims = ({
     }
   }
 
+  const checkExistingOldPayerItem = () => {
+    const { invoiceItems = [] } = invoice
+
+    let existingOldPayerItem = false
+    tempInvoicePayer.filter((tip) => !tip.isCancelled).forEach((ip) => {
+      const { invoicePayerItem = [] } = ip
+      if (
+        invoicePayerItem.find(
+          (ipi) => !invoiceItems.find((ii) => ii.id === ipi.invoiceItemFK),
+        )
+      ) {
+        existingOldPayerItem = true
+      }
+    })
+    return existingOldPayerItem
+  }
+
   const updateValues = () => {
     const finalClaim = roundTo(
       tempInvoicePayer.reduce(computeTotalForAllSavedClaim, 0),
@@ -311,6 +336,10 @@ const ApplyClaims = ({
     }
 
     handleIsEditing(hasOtherEditing)
+
+    if (handleIsExistingOldPayerItem)
+      handleIsExistingOldPayerItem(checkExistingOldPayerItem())
+
     setValues(_values)
   }
 
@@ -748,6 +777,17 @@ const ApplyClaims = ({
   }
   return (
     <Fragment>
+      {checkExistingOldPayerItem() && (
+        <GridItem md={12}>
+          <div style={{ paddingLeft: 8, paddingBottom: 8 }}>
+            <WarningSnackbar
+              variant='warning'
+              message='Invoice has been updated. Kindly remove the existing copayer/ scheme
+              and re-apply again!'
+            />
+          </div>
+        </GridItem>
+      )}
       <GridItem md={2}>
         <h5 style={{ paddingLeft: 8 }}>Apply Claims</h5>
       </GridItem>
@@ -805,6 +845,8 @@ const ApplyClaims = ({
               onPrinterClick={onPrinterClick}
               onAddPaymentClick={onAddPaymentClick}
               fromBilling={fromBilling}
+              invoice={invoice}
+              clinicSettings={clinicSettings}
             />
           )
         })}

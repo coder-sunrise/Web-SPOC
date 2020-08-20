@@ -6,6 +6,7 @@ import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
+import { Divider } from '@material-ui/core'
 
 import numeral from 'numeral'
 import {
@@ -21,9 +22,9 @@ import { orderTypes } from '@/pages/Consultation/utils'
 import Authorized from '@/utils/Authorized'
 
 // console.log(orderTypes)
-export default ({ orders, dispatch, classes, from, codetable }) => {
+export default ({ orders, dispatch, classes, from, codetable, theme }) => {
   const { rows, summary, finalAdjustments, isGSTInclusive, gstValue } = orders
-  const { total, gst, totalWithGST } = summary
+  const { total, gst, totalWithGST, subTotal } = summary
   const [
     checkedStatusIncldGST,
     setCheckedStatusIncldGST,
@@ -41,6 +42,27 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
   const adjustments = finalAdjustments.filter((o) => !o.isDeleted)
   const editRow = (row) => {
     if (!row.isActive && row.type !== '5') return
+
+    if (row.type === '7' && from !== 'ca') return
+
+    let editAccessRight
+    const orderType = orderTypes.find((item) => item.value === row.type) || {
+      accessRight: '',
+    }
+    editAccessRight = orderType.accessRight
+
+    if (from && from === 'ca' && row.isOrderedByDoctor) {
+      const consultaionAccessRight = Authorized.check(editAccessRight)
+      if (
+        consultaionAccessRight &&
+        consultaionAccessRight.rights === 'enable'
+      ) {
+        editAccessRight = 'queue.dispense.editorder.modifydoctororder'
+      }
+    }
+
+    const accessRight = Authorized.check(editAccessRight)
+    if (!accessRight || accessRight.rights !== 'enable') return
 
     dispatch({
       type: 'orders/updateState',
@@ -103,32 +125,73 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
   ]
   const messages = {
     total: 'Total',
+    subTotal: 'Sub Total',
   }
-  if (gstValue) {
-    messages.gst = `${numeral(gstValue).format('0.00')}% GST`
-    messages.total = 'Total '
-    totalItems.push({ columnName: 'totalAfterItemAdjustment', type: 'gst' })
+
+  if (gstValue >= 0) {
+    messages.gst = (
+      <div
+        style={{
+          textAlign: 'right',
+          position: 'relative',
+          marginLeft: theme.spacing(1),
+        }}
+      >
+        <Checkbox
+          simple
+          label={`Inclusive GST (${numeral(gstValue).format('0.00')}%)`}
+          style={{
+            position: 'absolute',
+            marginTop: -1,
+          }}
+          controlStyle={{ fontWeight: 500 }}
+          checked={checkedStatusIncldGST}
+          onChange={(e) => {
+            dispatch({
+              type: 'orders/updateState',
+              payload: {
+                isGSTInclusive: e.target.value,
+              },
+            })
+            dispatch({
+              type: 'orders/calculateAmount',
+            })
+          }}
+        />
+      </div>
+    )
   }
+  totalItems.push({ columnName: 'totalAfterItemAdjustment', type: 'gst' })
+
   totalItems.push({ columnName: 'totalAfterItemAdjustment', type: 'total' })
+  totalItems.push({ columnName: 'totalAfterItemAdjustment', type: 'subTotal' })
   adjustments.forEach((adj) => {
     messages[adj.uid] = (
       <div
         style={{
-          width: '60%',
-          overflow: 'hidden',
-          display: 'inline-block',
-          textOverflow: 'ellipsis',
-          marginLeft: 20,
+          position: 'relative',
         }}
       >
-        <Popconfirm
-          onConfirm={() =>
-            dispatch({
-              type: 'orders/deleteFinalAdjustment',
-              payload: {
-                uid: adj.uid,
-              },
-            })}
+        <div
+          style={{
+            width: '58%',
+            overflow: 'hidden',
+            display: 'inline-block',
+            textOverflow: 'ellipsis',
+            marginLeft: theme.spacing(2),
+            textAlign: 'right',
+            position: 'absolute',
+          }}
+        >
+          <Tooltip title={adj.adjRemark}>
+            <span>{adj.adjRemark}</span>
+          </Tooltip>
+        </div>
+        <div
+          style={{
+            marginLeft: theme.spacing(39.5),
+            position: 'absolute',
+          }}
         >
           <Tooltip title='Delete Adjustment'>
             <Button
@@ -138,13 +201,18 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
                 top: -1,
               }}
             >
-              <Delete />
+              <Delete
+                onClick={() =>
+                  dispatch({
+                    type: 'orders/deleteFinalAdjustment',
+                    payload: {
+                      uid: adj.uid,
+                    },
+                  })}
+              />
             </Button>
           </Tooltip>
-        </Popconfirm>
-        <Tooltip title={adj.adjRemark}>
-          <span>{adj.adjRemark}</span>
-        </Tooltip>
+        </div>
       </div>
     )
   })
@@ -176,9 +244,17 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
           integrated: {
             calculator: (type, r, getValue) => {
               // console.log(type, rows, getValue)
+              if (type === 'subTotal') {
+                return (
+                  <span style={{ float: 'right', paddingRight: 70 }}>
+                    <NumberInput value={subTotal} text currency />
+                  </span>
+                )
+              }
+
               if (type === 'gst') {
                 return (
-                  <span style={{ float: 'right' }}>
+                  <span style={{ float: 'right', paddingRight: 70 }}>
                     <NumberInput value={gst} text currency />
                   </span>
                 )
@@ -186,7 +262,7 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
 
               if (type === 'total') {
                 return (
-                  <span style={{ float: 'right' }}>
+                  <span style={{ float: 'right', paddingRight: 70 }}>
                     <NumberInput value={totalWithGST} text currency />
                   </span>
                 )
@@ -194,7 +270,7 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
               const adj = adjustments.find((o) => `${o.uid}` === type)
               if (adj) {
                 return (
-                  <span style={{ float: 'right' }}>
+                  <span style={{ float: 'right', paddingRight: 70 }}>
                     <NumberInput value={adj.adjAmount} text currency />
                   </span>
                 )
@@ -208,7 +284,7 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
             totalRowComponent: (p) => {
               const { children, ...restProps } = p
               const newChildren = [
-                <Table.Cell colSpan={3} key={1} />,
+                <Table.Cell colSpan={2} key={1} />,
                 React.cloneElement(children[4], {
                   colSpan: 2,
                   ...restProps,
@@ -228,11 +304,16 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
               const { children, column } = p
               if (column.name === 'totalAfterItemAdjustment') {
                 const items = children.props.children
-                const c1 = items.splice(0, items.length - 1)
-                const c2 = items.splice(items.length - 1)
+                const itemAdj = items.splice(0, items.length - 3)
+                const itemGST = items.splice(items.length - 3, items.length - 2)
+                const itemTotal = items.splice(
+                  items.length - 2,
+                  items.length - 1,
+                )
+                const itemSubTotal = items.splice(items.length - 1)
                 return (
                   <Table.Cell
-                    colSpan={3}
+                    colSpan={4}
                     style={{
                       fontSize: 'inherit',
                       color: 'inherit',
@@ -240,41 +321,53 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
                       border: 'transparent',
                     }}
                   >
-                    <span>
-                      Invoice Adjustment:&nbsp;
-                      <Tooltip title='Add Adjustment'>
-                        <Button
-                          justIcon
-                          color='primary'
-                          style={{ top: -1 }}
-                          onClick={addAdjustment}
-                        >
-                          <Add />
-                        </Button>
-                      </Tooltip>
-                    </span>
-                    {c1}
-                    {gstValue >= 0 && (
-                      <Checkbox
-                        simple
-                        label={formatMessage({
-                          id: 'app.general.inclusiveGST',
-                        })}
-                        checked={checkedStatusIncldGST}
-                        onChange={(e) => {
-                          dispatch({
-                            type: 'orders/updateState',
-                            payload: {
-                              isGSTInclusive: e.target.value,
-                            },
-                          })
-                          dispatch({
-                            type: 'orders/calculateAmount',
-                          })
+                    <div>
+                      <div style={{ marginLeft: theme.spacing(31) }}>
+                        {itemSubTotal}
+                      </div>
+                      <div
+                        style={{
+                          marginBottom: theme.spacing(1),
+                          marginLeft: theme.spacing(1),
+                          paddingRight: theme.spacing(8),
                         }}
-                      />
-                    )}
-                    {c2}
+                      >
+                        <Divider />
+                      </div>
+                      <div style={{ marginLeft: theme.spacing(23) }}>
+                        <span>
+                          Invoice Adjustment
+                          <Tooltip title='Add Adjustment'>
+                            <Button
+                              justIcon
+                              color='primary'
+                              style={{ top: -1, marginLeft: theme.spacing(1) }}
+                              onClick={addAdjustment}
+                            >
+                              <Add />
+                            </Button>
+                          </Tooltip>
+                        </span>
+                      </div>
+                      {itemAdj}
+                      {gstValue >= 0 && (
+                        <div style={{ marginLeft: theme.spacing(18) }}>
+                          {itemGST}
+                        </div>
+                      )}
+                      <div
+                        style={{
+                          marginBottom: theme.spacing(1),
+                          marginLeft: theme.spacing(1),
+                          paddingRight: theme.spacing(8),
+                        }}
+                      >
+                        <Divider />
+                      </div>
+                      <div style={{ marginLeft: theme.spacing(34.5) }}>
+                        {itemTotal}
+                      </div>
+                    </div>
                   </Table.Cell>
                 )
               }
@@ -372,12 +465,24 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
           sortingEnabled: false,
           render: (row) => {
             if (row.type === '7' && from !== 'ca') return null
+            let editAccessRight
+
             const orderType = orderTypes.find(
               (item) => item.value === row.type,
             ) || { accessRight: '' }
-            const { accessRight } = orderType
+            editAccessRight = orderType.accessRight
+
+            if (from && from === 'ca' && row.isOrderedByDoctor) {
+              const consultaionAccessRight = Authorized.check(editAccessRight)
+              if (
+                consultaionAccessRight &&
+                consultaionAccessRight.rights === 'enable'
+              ) {
+                editAccessRight = 'queue.dispense.editorder.modifydoctororder'
+              }
+            }
             return (
-              <Authorized authority={accessRight}>
+              <Authorized authority={editAccessRight}>
                 <div>
                   <Tooltip title='Edit'>
                     <Button
@@ -395,41 +500,39 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
                       <Edit />
                     </Button>
                   </Tooltip>
-                  <Popconfirm
-                    onConfirm={() => {
-                      dispatch({
-                        type: 'orders/deleteRow',
-                        payload: {
-                          uid: row.uid,
-                        },
-                      })
-                      dispatch({
-                        type: 'orders/updateState',
-                        payload: {
-                          entity: undefined,
-                        },
-                      })
-                      // let commitCount = 1000 // uniqueNumber
-                      // dispatch({
-                      //   // force current edit row components to update
-                      //   type: 'global/updateState',
-                      //   payload: {
-                      //     commitCount: (commitCount += 1),
-                      //   },
-                      // })
-                    }}
-                  >
-                    <Tooltip title='Delete'>
-                      <Button
-                        size='sm'
-                        color='danger'
-                        justIcon
-                        disabled={isEditingEntity}
-                      >
-                        <Delete />
-                      </Button>
-                    </Tooltip>
-                  </Popconfirm>
+                  <Tooltip title='Delete'>
+                    <Button
+                      size='sm'
+                      color='danger'
+                      justIcon
+                      disabled={isEditingEntity}
+                    >
+                      <Delete
+                        onClick={() => {
+                          dispatch({
+                            type: 'orders/deleteRow',
+                            payload: {
+                              uid: row.uid,
+                            },
+                          })
+                          dispatch({
+                            type: 'orders/updateState',
+                            payload: {
+                              entity: undefined,
+                            },
+                          })
+                          // let commitCount = 1000 // uniqueNumber
+                          // dispatch({
+                          //   // force current edit row components to update
+                          //   type: 'global/updateState',
+                          //   payload: {
+                          //     commitCount: (commitCount += 1),
+                          //   },
+                          // })
+                        }}
+                      />
+                    </Button>
+                  </Tooltip>
                 </div>
               </Authorized>
             )

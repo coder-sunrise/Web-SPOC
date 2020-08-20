@@ -66,7 +66,7 @@ class FilterBar extends PureComponent {
               />
             </GridItem>
           </Authorized>
-          <GridItem md={12} lg={5}>
+          <GridItem md={12} lg={9}>
             <div className={classes.filterBtn}>
               <Authorized authority='patientdatabase/searchpatient'>
                 <ProgressButton

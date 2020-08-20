@@ -279,7 +279,7 @@ class AntdSelect extends React.PureComponent {
         'tags',
       ].includes(mode)
         ? value || []
-        : value
+        : value === null ? undefined : value
       if (
         [
           'multiple',
@@ -307,6 +307,7 @@ class AntdSelect extends React.PureComponent {
       if (!_.isEqual(v, this.state.value)) {
         this.setState({
           value: v,
+          shrink: v !== undefined && v !== null && v.length > 0,
         })
       }
     } else if (!this.state.value || this.state.value.length) {
@@ -695,6 +696,15 @@ class AntdSelect extends React.PureComponent {
           allowClear={allowClear}
           dropdownMatchSelectWidth={dropdownMatchSelectWidth}
           maxTagPlaceholder={(vv) => {
+            const selectItem = vv.filter((o) => o !== allValue)
+            if (selectItem.length < 1) return null
+            if (selectItem.length === 1) {
+              const selectOption = opts.find(
+                (opt) => opt.props.value === selectItem[0],
+              )
+              if (selectOption) return selectOption.props.label
+              return null
+            }
             return `${vv.filter((o) => o !== allValue)
               .length} ${customTagPlaceholder} selected`
           }}

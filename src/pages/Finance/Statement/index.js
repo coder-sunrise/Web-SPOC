@@ -44,8 +44,12 @@ class Statement extends PureComponent {
 
   componentDidMount () {
     const fromDate = moment().subtract(1, 'months').startOf('month').formatUTC()
-    const toDate = moment().endOf('month').formatUTC(false)
-    const dueToDate = moment().add(3, 'months').endOf('month').formatUTC(false)
+    const toDate = moment().endOf('month').endOf('day').formatUTC(false)
+    const dueToDate = moment()
+      .add(3, 'months')
+      .endOf('month')
+      .endOf('day')
+      .formatUTC(false)
     this.props.dispatch({
       type: 'statement/query',
       payload: {
@@ -101,13 +105,13 @@ class Statement extends PureComponent {
       })
       return
     }
-    // dispatch({
-    //   type: 'statement/updateState',
-    //   payload: {
-    //     currentId: row.id,
-    //   },
-    // })
-    history.push(`/finance/statement/details/${row.id}`)
+    dispatch({
+      type: 'statement/updateState',
+      payload: {
+        currentId: row.id,
+      },
+    })
+    history.push(`/finance/statement/details/${row.id}?t=0`)
   }
 
   render () {

@@ -32,7 +32,7 @@ export default ({
   return (
     <React.Fragment>
       <GridContainer style={{ marginTop: theme.spacing(1) }}>
-        <GridItem xs sm={4} md={3}>
+        <GridItem xs={12} sm={4} md={3}>
           <FastField
             name={`corPatientNoteVitalSign[${index}].temperatureC`}
             render={(args) => (
@@ -49,7 +49,7 @@ export default ({
             )}
           />
         </GridItem>
-        <GridItem xs sm={4} md={3}>
+        <GridItem xs={12} sm={4} md={3}>
           <FastField
             name={`corPatientNoteVitalSign[${index}].bpSysMMHG`}
             render={(args) => (
@@ -63,7 +63,7 @@ export default ({
             )}
           />
         </GridItem>
-        <GridItem xs sm={4} md={3}>
+        <GridItem xs={12} sm={4} md={3}>
           <FastField
             name={`corPatientNoteVitalSign[${index}].bpDiaMMHG`}
             render={(args) => (
@@ -77,7 +77,7 @@ export default ({
             )}
           />
         </GridItem>
-        <GridItem xs sm={4} md={3}>
+        <GridItem xs={12} sm={4} md={3}>
           <FastField
             name={`corPatientNoteVitalSign[${index}].pulseRateBPM`}
             render={(args) => (
@@ -93,7 +93,7 @@ export default ({
             )}
           />
         </GridItem>
-        <GridItem xs sm={4} md={3}>
+        <GridItem xs={12} sm={4} md={3}>
           <FastField
             name={`corPatientNoteVitalSign[${index}].weightKG`}
             render={(args) => (
@@ -115,7 +115,7 @@ export default ({
             )}
           />
         </GridItem>
-        <GridItem xs sm={4} md={3}>
+        <GridItem xs={12} sm={4} md={3}>
           <FastField
             name={`corPatientNoteVitalSign[${index}].heightCM`}
             render={(args) => (
@@ -138,8 +138,7 @@ export default ({
             )}
           />
         </GridItem>
-        <GridItem xs sm={6} md={4} />
-        <GridItem xs sm={4} md={3}>
+        <GridItem xs={11} sm={4} md={3}>
           <FastField
             name={`corPatientNoteVitalSign[${index}].bmi`}
             render={(args) => (

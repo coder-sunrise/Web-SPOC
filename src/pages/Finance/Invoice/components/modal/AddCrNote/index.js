@@ -60,21 +60,24 @@ import MiscCrNote from './MiscCrNote'
       isStockIn,
       remark,
       finalCredit,
+      gstAmount,
     } = values
-    const gstAmount = creditNoteItem.reduce(
-      (totalGstAmount, item) =>
-        item.isSelected ? totalGstAmount + item.gstAmount : totalGstAmount,
-      0,
-    )
-    const gstAmt = roundTo(gstAmount)
+    // const gstAmount = creditNoteItem.reduce(
+    //   (totalGstAmount, item) =>
+    //     item.isSelected ? totalGstAmount + item.gstAmount : totalGstAmount,
+    //   0,
+    // )
+    // const gstAmt = invoiceDetail.isGSTInclusive ?
+    //   (finalCredit - finalCredit / (1 + invoiceDetail.gstValue / 100))
+    //   : finalCredit * (invoiceDetail.gstValue / 100)
     const payload = {
       generatedDate: moment().formatUTC(false),
       invoicePayerFK,
       isStockIn,
       remark,
-      gstAmt,
+      gstAmt: gstAmount,
       gstValue: invoiceDetail.gstValue,
-      total: finalCredit - gstAmt,
+      total: finalCredit - gstAmount,
       totalAftGST: finalCredit,
       creditNoteItem: creditNoteItem
         .filter((x) => x.isSelected)
@@ -118,6 +121,7 @@ class AddCrNote extends Component {
   handleEditRow = (row) => {}
 
   handleCalcCrNoteItem = (selection = undefined) => {
+    const { invoiceDetail, invoiceCreditNote } = this.props
     let rowSelection = []
     const { selectedRows } = this.state
     rowSelection = selection || selectedRows
@@ -134,6 +138,13 @@ class AddCrNote extends Component {
       return total
     }, 0)
     setFieldValue('finalCredit', roundTo(finalCreditTotal))
+
+    const gstAmount =
+      finalCreditTotal /
+      (1 + invoiceDetail.gstValue / 100) *
+      (invoiceDetail.gstValue / 100)
+    setFieldValue('gstAmount', roundTo(gstAmount))
+    setFieldValue('subTotal', roundTo(finalCreditTotal) - roundTo(gstAmount))
   }
 
   handleSelectionChange = (selection) => {
@@ -240,7 +251,7 @@ class AddCrNote extends Component {
   }
 
   render () {
-    const { handleSubmit, onConfirm, values } = this.props
+    const { handleSubmit, onConfirm, values, invoiceDetail } = this.props
     const { creditNoteItem, finalCredit, payerType } = values
 
     return (
@@ -363,7 +374,7 @@ class AddCrNote extends Component {
           ]}
         />
 
-        <Summary />
+        <Summary invoiceDetail={invoiceDetail} />
         <MiscCrNote
           handleAddMiscItem={this.handleAddMiscItem}
           handleCalcFinalTotal={this.handleCalcCrNoteItem}
@@ -373,7 +384,7 @@ class AddCrNote extends Component {
 
         <GridContainer>
           <GridItem md={9}>
-            <p>Note: Total Price($) are after GST.</p>
+            <p>Note: Total Amount ($) is GST inclusive.</p>
           </GridItem>
           <GridItem md={3} style={{ textAlign: 'right' }}>
             <Button color='danger' onClick={onConfirm}>

@@ -60,11 +60,15 @@ const Payments = ({
             size='sm'
             className={classes.printerButton}
             onClick={onPrintClick}
-            disabled={item.isCancelled}
+            disabled={item.isCancelled || !!item.statementPaymentReceiptNo}
           >
             <Print />
           </Button>
-          <h5 className={titleClass}>Receipt No: {item.receiptNo || 'N/A'}</h5>
+          <h5 className={titleClass}>
+            Receipt No: {item.receiptNo || 'N/A'}
+            {item.statementPaymentReceiptNo &&
+              `(${item.statementPaymentReceiptNo})`}
+          </h5>
         </GridItem>
         <GridItem md={1}>
           <DeleteWithPopover
@@ -97,7 +101,7 @@ const Payments = ({
             }
             onCancelClick={handleCancelClick}
             onConfirmDelete={handleConfirmDelete}
-            disabled={item.isCancelled}
+            disabled={item.isCancelled || !!item.statementPaymentReceiptNo}
           />
         </GridItem>
 

@@ -1,24 +1,20 @@
 import React from 'react'
-import {
-  IntegratedSummary,
-} from '@devexpress/dx-react-grid'
+import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { ReportDataGrid } from '@/components/_medisys'
-
 
 const PatientDeposit = ({ DepositDatas }) => {
   let listData = []
   if (DepositDatas) {
-    listData = DepositDatas.map(
-      (item, index) => ({
-        ...item,
-        id: `DepositDatas-${index}-${item.invoiceNo}`,
-      }),
-    )
+    listData = DepositDatas.map((item, index) => ({
+      ...item,
+      id: `DepositDatas-${index}-${item.invoiceNo}`,
+    }))
   }
 
   const PastPaymentCollectionTableColumn = [
     { name: 'transactionDate', title: 'Date' },
     { name: 'patientName', title: 'Patient Name' },
+    { name: 'patientReferenceNo', title: 'Ref No.' },
     { name: 'remarks', title: 'Remarks' },
     { name: 'paymentMode', title: 'Mode' },
     { name: 'amount', title: 'Amount' },
@@ -27,9 +23,15 @@ const PatientDeposit = ({ DepositDatas }) => {
   const PastPaymentCollectionTableColumnExtension = [
     { columnName: 'transactionDate', sortingEnabled: false },
     { columnName: 'patientName', sortingEnabled: false },
+    { columnName: 'patientReferenceNo', sortingEnabled: false },
     { columnName: 'remarks', sortingEnabled: false },
     { columnName: 'paymentMode', sortingEnabled: false },
-    { columnName: 'amount', type: 'currency', currency: true, sortingEnabled: false },
+    {
+      columnName: 'amount',
+      type: 'currency',
+      currency: true,
+      sortingEnabled: false,
+    },
   ]
 
   const FuncProps = {
@@ -45,8 +47,12 @@ const PatientDeposit = ({ DepositDatas }) => {
     summary: true,
     summaryConfig: {
       state: {
-        totalItems: [{ columnName: 'amount', type: 'sum' }],
-        groupItems: [{ columnName: 'amount', type: 'sum' }],
+        totalItems: [
+          { columnName: 'amount', type: 'sum' },
+        ],
+        groupItems: [
+          { columnName: 'amount', type: 'sum' },
+        ],
       },
       integrated: {
         calculator: IntegratedSummary.defaultCalculator,

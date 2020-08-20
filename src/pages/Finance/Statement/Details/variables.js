@@ -1,8 +1,11 @@
 import Details from './Details'
 import CollectPaymentConfirm from './CollectPaymentConfirm'
+import PaymentHistory from './PaymentHistory'
 
 const addContent = (tabNo, props, func) => {
   switch (tabNo) {
+    case 3:
+      return <PaymentHistory {...props} />
     case 1:
       return <Details {...props} fetchLatestBizSessions={func} />
     default:
@@ -29,6 +32,11 @@ export const StatementDetailOption = (
       name: 'Payment',
       content: addContent(2, detailsProps, getBizList),
       disabled: disabledPayment,
+    },
+    {
+      id: 2,
+      name: 'Payment History',
+      content: addContent(3, detailsProps),
     },
   ]
 }

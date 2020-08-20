@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 import { connect } from 'dva'
+import $ from 'jquery'
 
 import { Divider, withStyles } from '@material-ui/core'
 import _ from 'lodash'
@@ -47,18 +48,45 @@ const styles = (theme) => ({
 class Details extends PureComponent {
   state = {
     disableEdit: false,
+    prevKey: null,
+  }
+
+  // eslint-disable-next-line camelcase
+  // UNSAFE_componentWillReceiveProps (nextProps) {
+  //   const { orders: nextOrders } = nextProps
+  //   const { orders } = this.props
+
+  //   if (
+  //     nextOrders.type !== this.state.prevKey &&
+  //     nextOrders.type &&
+  //     (orders.type !== nextOrders.type || nextOrders.type === '1')
+  //   ) {
+  //     this.autoFocuseItem(nextOrders.type)
+  //   }
+  // }
+
+  autoFocuseItem = (type) => {
+    setTimeout(() => {
+      if (type === '5') {
+        $(`#autofocus_${type} input`).focus()
+      } else $(`#autofocus_${type} .ant-select`).click()
+
+      this.setState({
+        prevKey: type,
+      })
+    }, 500)
   }
 
   footerBtns = ({ onSave, onReset, showAdjustment = true }) => {
     const { classes, orders } = this.props
     // console.log(this.props)
-    const { entity } = orders
+    const { entity, type } = orders
     return (
       <React.Fragment>
         <Divider />
 
         <div className={classnames(classes.footer)}>
-          {showAdjustment && (
+          {/* showAdjustment && (
             <Button
               color='primary'
               style={{ float: 'left' }}
@@ -67,7 +95,7 @@ class Details extends PureComponent {
             >
               {currencySymbol} Adjustment
             </Button>
-          )}
+          ) */}
           {/* {!!entity && (
             <Button
               color='danger'
@@ -107,7 +135,14 @@ class Details extends PureComponent {
           >
             Discard
           </Button>
-          <ProgressButton color='primary' onClick={onSave} icon={null}>
+          <ProgressButton
+            color='primary'
+            onClick={async () => {
+              const isSaveOk = await onSave()
+              if (isSaveOk) this.autoFocuseItem(type)
+            }}
+            icon={null}
+          >
             {!entity ? 'Add' : 'Save'}
           </ProgressButton>
         </div>
@@ -215,6 +250,7 @@ class Details extends PureComponent {
           return false
         return true
       })
+
     return (
       <div>
         <div className={classes.detail}>
@@ -241,6 +277,7 @@ class Details extends PureComponent {
                       type: key,
                     },
                   })
+                  this.autoFocuseItem(key)
                   // dispatch({
                   //   type: 'global/incrementCommitCount',
                   // })

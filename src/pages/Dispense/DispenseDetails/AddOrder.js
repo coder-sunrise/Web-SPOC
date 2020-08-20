@@ -11,6 +11,7 @@ import {
   INVOICE_ITEM_TYPE_BY_NAME,
   ORDER_TYPE_TAB,
   CLINIC_TYPE,
+  REVENUE_CATEGORY,
 } from '@/utils/constants'
 import { roundTo, getUniqueId } from '@/utils/utils'
 import Order from '../../Widgets/Orders'
@@ -386,7 +387,9 @@ export default compose(
               const medication = inventorymedication.find(
                 (c) => c.id === o.inventoryMedicationFK,
               )
-              revenueCategory = medication ? medication.revenueCategory : {}
+              revenueCategory = medication
+                ? medication.revenueCategory
+                : { id: REVENUE_CATEGORY.OTHER }
               const {
                 corPrescriptionItemInstruction,
                 corPrescriptionItemPrecaution,
@@ -398,6 +401,8 @@ export default compose(
                 retailPrescriptionItemPrecaution = [],
               } = retailPrescriptionItem
               obj = {
+                adjType: o.adjType,
+                adjValue: o.adjValue,
                 itemCode: o.drugCode,
                 itemName: o.drugName,
                 invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.MEDICATION,
@@ -405,8 +410,6 @@ export default compose(
                 quantity: o.quantity,
                 subTotal: roundTo(o.totalPrice),
                 itemRevenueCategoryFK: revenueCategory.id,
-                // "adjType": "string",
-                // "adjValue": 0,
                 retailVisitInvoiceDrug: {
                   id: o.innerLayerId,
                   concurrencyToken: o.innerLayerConcurrencyToken,
@@ -441,6 +444,8 @@ export default compose(
                 (c) => c.serviceCenter_ServiceId === o.serviceCenterServiceFK,
               )
               obj = {
+                adjType: o.adjType,
+                adjValue: o.adjValue,
                 itemCode: o.serviceCode,
                 itemName: o.serviceName,
                 subTotal: roundTo(o.total),
@@ -468,6 +473,8 @@ export default compose(
               const { retailConsumable, ...restValues } = o
               obj = {
                 invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.CONSUMABLE,
+                adjType: o.adjType,
+                adjValue: o.adjValue,
                 itemCode: o.consumableCode,
                 itemName: o.consumableName,
                 subTotal: roundTo(o.totalPrice),

@@ -9,18 +9,25 @@ import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 import AddAlert from '@material-ui/icons/AddAlert'
-// sub components
-import TableData from './TableData'
-import VaccinationGrid from './VaccinationGrid'
-import DrugLabelSelection from './DrugLabelSelection'
-// common component
+import { formatMessage } from 'umi/locale' // common component
 import {
   Button,
   ProgressButton,
   GridItem,
   GridContainer,
   SizeContainer,
+  Field,
+  TextField,
+  CommonModal,
 } from '@/components'
+import AmountSummary from '@/pages/Shared/AmountSummary'
+import Authorized from '@/utils/Authorized'
+import { VISIT_TYPE } from '@/utils/constants'
+import { dangerColor } from '@/assets/jss'
+// sub components
+import TableData from './TableData'
+import VaccinationGrid from './VaccinationGrid'
+import DrugLabelSelection from './DrugLabelSelection'
 // variables
 import {
   PrescriptionColumns,
@@ -30,14 +37,9 @@ import {
   OtherOrdersColumns,
   OtherOrdersColumnExtensions,
 } from '../variables'
-import AmountSummary from '@/pages/Shared/AmountSummary'
-import Authorized from '@/utils/Authorized'
-import { VISIT_TYPE } from '@/utils/constants'
+
 import CONSTANTS from './constants'
 
-import { dangerColor } from '@/assets/jss'
-
-import { CommonModal } from '@/components'
 // const styles = (theme) => ({
 //   gridRow: {
 //     margin: `${theme.spacing.unit}px 0px`,
@@ -97,7 +99,7 @@ const DispenseDetails = ({
   onDrugLabelSelectionClose,
   onDrugLabelSelected,
   onDrugLabelNoChanged,
-  selectedDrugs, 
+  selectedDrugs,
 }) => {
   const {
     prescription,
@@ -105,6 +107,7 @@ const DispenseDetails = ({
     otherOrder,
     invoice,
     visitPurposeFK,
+    visitRemarks,
   } = values || {
     invoice: { invoiceItem: [] },
   }
@@ -177,6 +180,7 @@ const DispenseDetails = ({
       invoiceTotalAftGST: v.summary.totalWithGST,
       outstandingBalance: v.summary.totalWithGST - values.invoice.totalPayment,
       invoiceGSTAmt: Math.round(v.summary.gst * 100) / 100,
+      invoiceGSTAdjustment: v.summary.gstAdj,
       invoiceAdjustment: v.adjustments,
       isGSTInclusive: !!v.summary.isGSTInclusive,
     }
@@ -207,17 +211,17 @@ const DispenseDetails = ({
       <GridContainer>
         <GridItem justify='flex-start' md={6} className={classes.actionButtons}>
           {!viewOnly &&
-            !isRetailVisit && (
-              <Button
-                color='info'
-                size='sm'
-                onClick={onReloadClick}
-                disabled={disableRefreshOrder}
-              >
-                <Refresh />
+          !isRetailVisit && (
+            <Button
+              color='info'
+              size='sm'
+              onClick={onReloadClick}
+              disabled={disableRefreshOrder}
+            >
+              <Refresh />
               Refresh Order
-              </Button>
-            )}
+            </Button>
+          )}
           <Button
             color='primary'
             size='sm'
@@ -344,23 +348,34 @@ const DispenseDetails = ({
             />
           </Paper>
         </GridItem>
-        <GridItem xs={2} md={9} />
+        <GridItem xs={8} md={8} style={{ marginTop: -14 }}>
+          <TextField
+            value={visitRemarks}
+            disabled
+            multiline
+            label={formatMessage({
+              id: 'reception.queue.visitRegistration.visitRemarks',
+            })}
+          />
+        </GridItem>
         {!viewOnly && (
-          <GridItem xs={10} md={3}>
-            <AmountSummary
-              rows={invoiceItem}
-              adjustments={invoiceAdjustment}
-              showAddAdjustment={!isBillFirstVisit}
-              config={{
-                isGSTInclusive: invoice.isGSTInclusive,
-                totalField: 'totalAfterItemAdjustment',
-                adjustedField: 'totalAfterOverallAdjustment',
-                gstField: 'totalAfterGST',
-                gstAmtField: 'gstAmount',
-                gstValue: invoice.gstValue,
-              }}
-              onValueChanged={updateInvoiceData}
-            />
+          <GridItem xs={4} md={4}>
+            <div style={{ paddingRight: 90 }}>
+              <AmountSummary
+                rows={invoiceItem}
+                adjustments={invoiceAdjustment}
+                showAddAdjustment={!isBillFirstVisit}
+                config={{
+                  isGSTInclusive: invoice.isGSTInclusive,
+                  totalField: 'totalAfterItemAdjustment',
+                  adjustedField: 'totalAfterOverallAdjustment',
+                  gstField: 'totalAfterGST',
+                  gstAmtField: 'gstAmount',
+                  gstValue: invoice.gstValue,
+                }}
+                onValueChanged={updateInvoiceData}
+              />
+            </div>
           </GridItem>
         )}
       </GridContainer>
@@ -371,13 +386,13 @@ const DispenseDetails = ({
         onClose={() => {
           onDrugLabelSelectionClose()
         }}
-      // onConfirm={() => { 
-      //    onDrugLabelSelectionClose()
-      //    onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
-      // }}
+        // onConfirm={() => {
+        //    onDrugLabelSelectionClose()
+        //    onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
+        // }}
       >
         <DrugLabelSelection
-          prescription={selectedDrugs} 
+          prescription={selectedDrugs}
           codetable={codetable}
           handleDrugLabelSelected={onDrugLabelSelected}
           handleDrugLabelNoChanged={onDrugLabelNoChanged}

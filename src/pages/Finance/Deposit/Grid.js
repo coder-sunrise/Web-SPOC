@@ -178,6 +178,7 @@ class Grid extends PureComponent {
             observe='Deposit'
             showFooter={false}
             bodyNoPadding
+            keepMounted={false}
           >
             <Modal isDeposit={isDeposit} />
           </CommonModal>

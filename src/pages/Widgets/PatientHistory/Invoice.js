@@ -135,34 +135,38 @@ export default ({ classes, current, theme, setFieldValue }) => {
         // alignItems='flex-end'
         style={{ paddingTop: theme.spacing(2) }}
       >
-        <GridItem xs={2} md={9} />
-        <GridItem xs={10} md={3}>
-          <AmountSummary
-            showAdjustment
-            rows={invoiceItemData}
-            adjustments={invoiceAdjustmentData}
-            config={{
-              isGSTInclusive: current.invoice
-                ? current.invoice.isGSTInclusive
-                : '',
-              totalField: 'totalAfterItemAdjustment',
-              adjustedField: 'totalAfterOverallAdjustment',
-              gstValue: current.invoice ? current.invoice.gstValue : undefined,
-            }}
-            onValueChanged={(v) => {
-              // console.log('onValueChanged', v)
-              if (setFieldValue) {
-                setFieldValue(
-                  'current.invoice.invoiceTotalAftGST',
-                  v.summary.totalWithGST,
-                )
-                setFieldValue(
-                  'current.invoice.invoiceAdjustment',
-                  v.adjustments,
-                )
-              }
-            }}
-          />
+        <GridItem xs={2} md={8} />
+        <GridItem xs={10} md={4}>
+          <div style={{ marginRight: -5 }}>
+            <AmountSummary
+              showAdjustment
+              rows={invoiceItemData}
+              adjustments={invoiceAdjustmentData}
+              config={{
+                isGSTInclusive: current.invoice
+                  ? current.invoice.isGSTInclusive
+                  : '',
+                totalField: 'totalAfterItemAdjustment',
+                adjustedField: 'totalAfterOverallAdjustment',
+                gstValue: current.invoice
+                  ? current.invoice.gstValue
+                  : undefined,
+              }}
+              onValueChanged={(v) => {
+                // console.log('onValueChanged', v)
+                if (setFieldValue) {
+                  setFieldValue(
+                    'current.invoice.invoiceTotalAftGST',
+                    v.summary.totalWithGST,
+                  )
+                  setFieldValue(
+                    'current.invoice.invoiceAdjustment',
+                    v.adjustments,
+                  )
+                }
+              }}
+            />
+          </div>
         </GridItem>
       </GridContainer>
     </div>

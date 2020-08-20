@@ -12,6 +12,7 @@ import { serverDateFormat, Tooltip } from '@/components'
 // medisys components
 import { LoadingWrapper } from '@/components/_medisys'
 // setting
+import Authorized from '@/utils/Authorized'
 import { doctorEventColorOpts } from '../utils'
 // sub component
 import CalendarToolbar from './Toolbar'
@@ -65,6 +66,16 @@ const maxTime = new Date(
 
 const applyFilter = (filter, data) => {
   const { filterByApptType, filterByDoctor, search = '' } = filter
+  const viewOtherApptAccessRight = Authorized.check(
+    'appointment.viewotherappointment',
+  )
+  if (
+    filterByDoctor.length <= 0 &&
+    (!viewOtherApptAccessRight || viewOtherApptAccessRight.rights !== 'enable')
+  ) {
+    return []
+  }
+
   let returnData = [
     ...data,
   ]
