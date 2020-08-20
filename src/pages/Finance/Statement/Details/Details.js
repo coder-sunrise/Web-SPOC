@@ -14,10 +14,9 @@ import {
   dateFormatLong,
   dateFormatLongWithTimeNoSec12h,
   ProgressButton,
-  serverDateFormat,
+  Tooltip,
 } from '@/components'
-import { getBizSession } from '@/services/queue'
-import { roundTo } from '@/utils/utils'
+import { ReportViewer } from '@/components/_medisys'
 import CollectPaymentConfirm from './CollectPaymentConfirm'
 import ExtractAsSingle from './ExtractAsSingle'
 import PrintStatementReport from '../PrintStatementReport'
@@ -37,7 +36,7 @@ const styles = (theme) => ({
       2,
     )}px 0`,
   },
-}) 
+})
 
 @connect(({ statement }) => ({
   statement,
@@ -59,9 +58,12 @@ class Details extends PureComponent {
       { name: 'totalPayment', title: 'Paid' },
       { name: 'outstandingAmount', title: 'Outstanding' },
       { name: 'remark', title: 'Remarks' },
+      { name: 'action', title: 'Action' },
     ],
 
     showCollectPayment: false,
+    showInvoiceReport: false,
+    invoiceId: undefined,
   }
 
   handleRefresh = () => {
@@ -114,6 +116,17 @@ class Details extends PureComponent {
     })
   }
 
+  printInvoice = (row) => {
+    this.setState({
+      showInvoiceReport: true,
+      invoiceId: row.invoiceFK,
+    })
+  }
+
+  toggleReport = () => {
+    this.setState({ showInvoiceReport: false, invoiceId: undefined })
+  }
+
   render () {
     const {
       columns,
@@ -121,8 +134,11 @@ class Details extends PureComponent {
       showModal,
       extractRows,
       selectedRows,
+      invoiceId,
+      showInvoiceReport,
     } = this.state
-    const { classes, statement, values, theme, history } = this.props
+    const { classes, values, theme, history, statement = {} } = this.props
+    const { entity = {} } = statement
     const { statementInvoice = [] } = values
     return (
       <div>
@@ -155,7 +171,7 @@ class Details extends PureComponent {
             {
               columnName: 'invoiceNo',
               sortingEnabled: false,
-              width: 100,
+              width: 85,
             },
             {
               columnName: 'patientName',
@@ -171,14 +187,14 @@ class Details extends PureComponent {
               type: 'number',
               currency: true,
               sortingEnabled: false,
-              width: 120,
+              width: 110,
             },
             {
               columnName: 'adminCharge',
               type: 'number',
               currency: true,
               sortingEnabled: false,
-              width: 140,
+              width: 130,
             },
             {
               columnName: 'statementAdjustment',
@@ -213,7 +229,7 @@ class Details extends PureComponent {
               type: 'number',
               currency: true,
               sortingEnabled: false,
-              width: 130,
+              width: 110,
             },
             {
               columnName: 'invoiceDate',
@@ -221,6 +237,26 @@ class Details extends PureComponent {
               format: dateFormatLong,
               sortingEnabled: false,
               width: 100,
+            },
+            {
+              columnName: 'action',
+              align: 'center',
+              width: 80,
+              render: (r) => {
+                return (
+                  <Tooltip title='Print'>
+                    <Button
+                      color='primary'
+                      justIcon
+                      onClick={() => {
+                        this.printInvoice(r)
+                      }}
+                    >
+                      <Print />
+                    </Button>
+                  </Tooltip>
+                )
+              },
             },
           ]}
           TableProps={{
@@ -246,8 +282,8 @@ class Details extends PureComponent {
         <p style={{ margin: theme.spacing(1) }}>
           {`Last Refreshed On ${values.lastRefreshTime
             ? moment(values.lastRefreshTime).format(
-              dateFormatLongWithTimeNoSec12h,
-            )
+                dateFormatLongWithTimeNoSec12h,
+              )
             : '-'}`}
         </p>
 
@@ -291,6 +327,20 @@ class Details extends PureComponent {
         >
           Edit Statement
         </Button>
+        <CommonModal
+          open={showInvoiceReport}
+          onClose={this.toggleReport}
+          title='Invoice'
+          maxWidth='lg'
+        >
+          <ReportViewer
+            reportID={15}
+            reportParameters={{
+              InvoiceId: invoiceId,
+              CopayerId: entity.copayerFK,
+            }}
+          />
+        </CommonModal>
       </div>
     )
   }
