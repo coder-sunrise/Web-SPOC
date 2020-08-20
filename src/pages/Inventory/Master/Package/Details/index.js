@@ -11,6 +11,7 @@ import {
   Button,
   withFormikExtend,
   CardContainer,
+  notification,
 } from '@/components'
 import Yup from '@/utils/yup'
 
@@ -37,7 +38,6 @@ const Detail = ({
   history,
   setFieldValue,
   handleSubmit,
-  codetable,
   values,
   theme,
   ...props
@@ -52,8 +52,6 @@ const Detail = ({
     packageDetail,
     dispatch,
     setFieldValue,
-    showTransfer: false,
-    errors: props.errors,
     setIsLoading,
   }
 
@@ -104,31 +102,13 @@ const Detail = ({
 
 export default compose(
   withStyles(styles, { withTheme: true }),
-  connect(({ packageDetail, codetable }) => ({
+  connect(({ packageDetail }) => ({
     packageDetail,
-    codetable,
   })),
   withFormikExtend({
     enableReinitialize: true,
     mapPropsToValues: ({ packageDetail }) => {
-      const returnValue = packageDetail.entity || packageDetail.default
-      const { servicePackageItem } = returnValue
-      let newservicePackageItem = []
-      if (servicePackageItem.length > 0) {
-        newservicePackageItem = servicePackageItem.map((o) => {
-          const { serviceCenterService } = o
-          return {
-            ...o,
-            tempServiceCenterServiceFK: o.id,
-            serviceCenterServiceFK: serviceCenterService.serviceFK,
-            serviceName: serviceCenterService.serviceCenterFKNavigation.id,
-          }
-        })
-      }
-      return {
-        ...returnValue,
-        servicePackageItem: newservicePackageItem,
-      }
+      return packageDetail.entity || packageDetail.default
     },
 
     validationSchema: Yup.object().shape({
@@ -139,22 +119,38 @@ export default compose(
 
     handleSubmit: (values, { props, resetForm }) => {
       const { dispatch, history } = props
-      const { servicePackageItem } = values
 
-      const newServicePackageArray = servicePackageItem.map((o) => {
-        return {
-          ...o,
-          serviceCenterServiceFK:
-            o.tempServiceCenterServiceFK || o.serviceCenterServiceFK,
-        }
-      })
+      const serviceItems = values.servicePackageItem.filter(
+        (item) => item.isDeleted === false && item.isActive === false,
+      )
+      const consumableItems = values.consumablePackageItem.filter(
+        (item) => item.isDeleted === false && item.isActive === false,
+      )
+      const medicationItems = values.medicationPackageItem.filter(
+        (item) => item.isDeleted === false && item.isActive === false,
+      )
+      const vaccinationItems = values.vaccinationPackageItem.filter(
+        (item) => item.isDeleted === false && item.isActive === false,
+      )
+
+      if (
+        serviceItems.length > 0 ||
+        consumableItems.length > 0 ||
+        medicationItems.length > 0 ||
+        vaccinationItems.length > 0
+      ) {
+        notification.warn({
+          message: 'One or more items in the package are inactive.',
+        })
+        return false
+      }
+
       dispatch({
         type: 'packageDetail/upsert',
         payload: {
           ...values,
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],
-          servicePackageItem: newServicePackageArray,
         },
       }).then((r) => {
         if (r) {

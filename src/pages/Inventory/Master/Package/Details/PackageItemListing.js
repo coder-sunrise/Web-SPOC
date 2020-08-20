@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
+import moment from 'moment'
 import Yup from '@/utils/yup'
-import { GridContainer, GridItem } from '@/components'
+import { GridContainer, GridItem, NumberInput } from '@/components'
 import { podoOrderType, inventoryItemListing } from '@/utils/codes'
 import { getServices } from '@/utils/codetable'
 import Authorized from '@/utils/Authorized'
@@ -64,8 +65,8 @@ const PackageItemListing = ({
     subTotal: Yup.number().required().min(0),
   })
   const serviceSchema = Yup.object().shape({
-    serviceCenterServiceFK: Yup.number().required(),
-    serviceName: Yup.number().required(),
+    serviceFK: Yup.number().required(),
+    serviceCenterFK: Yup.number().required(),
     quantity: Yup.number().required().min(1),
     defaultConsumeQuantity: Yup.number().required().min(0),
     subTotal: Yup.number().required().min(0),
@@ -263,6 +264,7 @@ const PackageItemListing = ({
     row.defaultConsumeQuantity = 0
     row.inventoryItemCode = option.code
     row.inventoryItemName = option.name
+    row.isActive = option.isActive
   }
 
   const onCommitChanges = (type) => ({ rows, deleted, added, changed }) => {
@@ -326,21 +328,17 @@ const PackageItemListing = ({
         }
         case 'servicePackageItem': {
           rows[0].inventoryItemTypeFK = ITEM_TYPE.SERVICE
-          const { serviceCenterServiceFK, serviceName } = rows[0]
+          const { serviceFK, serviceCenterFK } = rows[0]
           const serviceCenterService =
             serviceCenterServicess.find(
               (o) =>
-                o.serviceId === serviceCenterServiceFK &&
-                o.serviceCenterId === serviceName,
+                o.serviceId === serviceFK &&
+                o.serviceCenterId === serviceCenterFK,
             ) || {}
           if (serviceCenterService) {
-            const item = servicess.find((o) => o.value === serviceFK)
             rows[0] = {
               ...rows[0],
               isDeleted: false,
-              tempServiceCenterServiceFK:
-                serviceCenterService.serviceCenter_ServiceId,
-              tempServiceName: item ? item.name : undefined,
             }
           }
           setServiceRows([
@@ -387,39 +385,19 @@ const PackageItemListing = ({
         }
       }
       const edittedType = getType(type)
-      const newRows = rows.map((item) => {
-        let tempServiceCenterServiceFK
-        const tempServiceId = serviceFK || item.serviceCenterServiceFK
-        const tempServiceCenterId = serviceCenterFK || item.serviceName
-        const serviceCenterService =
-          serviceCenterServicess.find(
-            (o) =>
-              o.serviceId === tempServiceId &&
-              o.serviceCenterId === tempServiceCenterId,
-          ) || {}
-        if (serviceCenterService) {
-          tempServiceCenterServiceFK =
-            serviceCenterService.serviceCenter_ServiceId
-        }
-        const obj = {
-          ...item,
-          tempServiceCenterServiceFK,
-        }
-        return obj
-      })
       setServiceCenterFK()
       setServiceFK()
-      edittedType.setStateRow(newRows)
-      return setFieldValue(`${type}`, newRows)
+      edittedType.setStateRow(rows)
+      return setFieldValue(`${type}`, rows)
     }
   }
 
   const onAddedRowsChange = (type) => (addedRows) => {
     if (addedRows.length > 0) {
       const newRow = addedRows[0]
-      const { serviceCenterServiceFK, serviceName } = newRow
+      const { serviceFK, serviceCenterFK } = newRow
       if (type === 'service') {
-        if (serviceCenterServiceFK && serviceName) {
+        if (serviceFK && serviceCenterFK) {
           const returnRow = addedRows.map((row) => ({
             ...row,
           }))
@@ -624,31 +602,34 @@ const PackageItemListing = ({
   }
 
   const getServiceCenterService = (row) => {
-    const { serviceCenterServiceFK, serviceName } = row
-    if (!serviceCenterServiceFK || !serviceName) {
+    const { serviceFK, serviceCenterFK } = row
+    if (!serviceFK || !serviceCenterFK) {
       setSelectedItem({})
       return
     }
     const serviceCenterService =
       serviceCenterServicess.find(
         (o) =>
-          o.serviceId === serviceCenterServiceFK &&
-          o.serviceCenterId === serviceName,
+          o.serviceId === serviceFK && o.serviceCenterId === serviceCenterFK,
       ) || {}
     if (serviceCenterService) {
+      row.serviceCenterServiceFK = serviceCenterService.serviceCenter_ServiceId
       row.unitPrice = serviceCenterService.unitPrice || 0
       row.quantity = 1
       row.defaultConsumeQuantity = 0
       row.subTotal = row.quantity * row.unitPrice
       row.inventoryItemCode = serviceCenterService.code
       row.inventoryItemName = serviceCenterService.displayValue
+      row.isActive =
+        moment(serviceCenterService.effectiveStartDate) <= moment() &&
+        moment() <= moment(serviceCenterService.effectiveEndDate)
     }
   }
 
   const serviceProps = {
     columns: [
-      { name: 'serviceCenterServiceFK', title: 'Service' },
-      { name: 'serviceName', title: 'Service Center' },
+      { name: 'serviceFK', title: 'Service' },
+      { name: 'serviceCenterFK', title: 'Service Center' },
       { name: 'defaultConsumeQuantity', title: 'Consume Quantity' },
       { name: 'quantity', title: 'Quantity' },
       { name: 'unitPrice', title: 'Unit Price' },
@@ -657,17 +638,17 @@ const PackageItemListing = ({
 
     columnExtensions: [
       {
-        columnName: 'serviceCenterServiceFK',
+        columnName: 'serviceFK',
         type: 'select',
         options: (row) => {
           const tempArray = [
             ...servicess,
           ]
-          if (!row.serviceName) {
+          if (!row.serviceCenterFK) {
             return tempArray
           }
           const options = tempArray.filter((o) =>
-            o.serviceCenters.find((m) => m.value === row.serviceName),
+            o.serviceCenters.find((m) => m.value === row.serviceCenterFK),
           )
           return options
         },
@@ -675,22 +656,22 @@ const PackageItemListing = ({
           setServiceFK(e.val)
           handleItemOnChange
           getServiceCenterService(e.row)
-          e.row.serviceCenterServiceFK = e.val
+          e.row.serviceFK = e.val
         },
       },
       {
-        columnName: 'serviceName',
+        columnName: 'serviceCenterFK',
         type: 'select',
         width: 250,
         options: (row) => {
           const tempArray = [
             ...serviceCenterss,
           ]
-          if (!row.serviceCenterServiceFK) {
+          if (!row.serviceFK) {
             return tempArray
           }
           const options = tempArray.filter((o) =>
-            o.services.find((m) => m.value === row.serviceCenterServiceFK),
+            o.services.find((m) => m.value === row.serviceFK),
           )
           return options
         },
@@ -699,7 +680,7 @@ const PackageItemListing = ({
           setServiceCenterFK(e.val)
           handleItemOnChange
           getServiceCenterService(e.row)
-          e.row.serviceName = e.val
+          e.row.serviceCenterFK = e.val
         },
       },
       {
@@ -747,7 +728,10 @@ const PackageItemListing = ({
         <GridItem xs={12}>
           <div className={classes.displayDiv}>
             <h4>
-              <b>Package Total Price: ${totalPrice.toFixed(2)}</b>
+              <b>
+                Package Total Price:{' '}
+                <NumberInput text currency value={totalPrice} />
+              </b>
             </h4>
           </div>
         </GridItem>
