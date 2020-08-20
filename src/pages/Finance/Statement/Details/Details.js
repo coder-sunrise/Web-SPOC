@@ -62,8 +62,6 @@ class Details extends PureComponent {
     ],
 
     showCollectPayment: false,
-    showInvoiceReport: false,
-    invoiceId: undefined,
   }
 
   handleRefresh = () => {
@@ -117,14 +115,19 @@ class Details extends PureComponent {
   }
 
   printInvoice = (row) => {
-    this.setState({
-      showInvoiceReport: true,
-      invoiceId: row.invoiceFK,
+    const { statement = {} } = this.props
+    const { entity = {} } = statement
+    window.g_app._store.dispatch({
+      type: 'report/updateState',
+      payload: {
+        reportTypeID: 15,
+        reportParameters: {
+          InvoiceId: row.id,
+          CopayerId: entity.copayerFK,
+          isSaved: true,
+        },
+      },
     })
-  }
-
-  toggleReport = () => {
-    this.setState({ showInvoiceReport: false, invoiceId: undefined })
   }
 
   render () {
@@ -134,11 +137,8 @@ class Details extends PureComponent {
       showModal,
       extractRows,
       selectedRows,
-      invoiceId,
-      showInvoiceReport,
     } = this.state
-    const { classes, values, theme, history, statement = {} } = this.props
-    const { entity = {} } = statement
+    const { classes, values, theme, history } = this.props
     const { statementInvoice = [] } = values
     return (
       <div>
@@ -327,20 +327,6 @@ class Details extends PureComponent {
         >
           Edit Statement
         </Button>
-        <CommonModal
-          open={showInvoiceReport}
-          onClose={this.toggleReport}
-          title='Invoice'
-          maxWidth='lg'
-        >
-          <ReportViewer
-            reportID={15}
-            reportParameters={{
-              InvoiceId: invoiceId,
-              CopayerId: entity.copayerFK,
-            }}
-          />
-        </CommonModal>
       </div>
     )
   }
