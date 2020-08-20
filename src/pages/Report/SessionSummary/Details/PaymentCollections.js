@@ -74,14 +74,14 @@ const PaymentCollections = ({
       type: 'currency',
       currency: true,
       sortingEnabled: false,
-      width: 180,
+      width: 140,
     },
     {
       columnName: 'gstAmt',
       type: 'currency',
       currency: true,
       sortingEnabled: false,
-      width: 180,
+      width: 120,
     },
     { columnName: 'payerName', sortingEnabled: false, wordWrapEnabled: true },
     {
@@ -89,7 +89,7 @@ const PaymentCollections = ({
       type: 'currency',
       currency: true,
       sortingEnabled: false,
-      width: 180,
+      width: 140,
     },
     { columnName: 'receiptNo', sortingEnabled: false, width: 100 },
   ]
