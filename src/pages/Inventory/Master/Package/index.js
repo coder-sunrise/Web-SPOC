@@ -48,7 +48,7 @@ const Package = ({ dispatch, history, inventoryPackage }) => {
   const gridProps = {
     ...filterProps,
     inventoryPackage,
-    namespace: 'package',
+    namespace: 'inventoryPackage',
     list: inventoryPackage.list || [],
     tableParas,
     colExtensions,
@@ -58,6 +58,7 @@ const Package = ({ dispatch, history, inventoryPackage }) => {
     dispatch({
       type: 'inventoryPackage/query',
       payload: {
+        isUserMaintainable: true,
         sorting: [
           { columnName: 'effectiveEndDate', direction: 'desc' },
           { columnName: 'displayValue', direction: 'asc' },

@@ -323,7 +323,7 @@ const _routes = [
             ],
           },
           {
-            path: '/inventory/master/package',
+            path: '/inventory/master/inventorypackage',
             name: 'package.package',
             hideInMenu: true,
             component: './Inventory/Master/Package/Details',
@@ -332,7 +332,7 @@ const _routes = [
             ],
           },
           {
-            path: '/inventory/master/editpackage',
+            path: '/inventory/master/editinventorypackage',
             name: 'package.editpackage',
             hideInMenu: true,
             component: './Inventory/Master/Package/Details',

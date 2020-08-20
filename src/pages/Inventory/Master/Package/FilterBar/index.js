@@ -99,7 +99,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                       currentId: undefined,
                     },
                   })
-                  history.push('/inventory/master/package')
+                  history.push('/inventory/master/inventorypackage')
                 }}
               >
                 <Add />
