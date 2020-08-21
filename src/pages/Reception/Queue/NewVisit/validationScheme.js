@@ -15,7 +15,7 @@ const VitalSignMessage = {
   [FormField['vitalsign.heightCM']]: 'Height must be between 0 and 999',
 }
 
-export default Yup.object().shape({
+const schemaVisit = {
   [FormField['visit.queueNo']]: Yup.string().required(
     VitalSignMessage[FormField['visit.queueNo']],
   ),
@@ -59,4 +59,26 @@ export default Yup.object().shape({
     .integer('Height can only be a whole number')
     .min(0, VitalSignMessage[FormField['vitalsign.heightCM']])
     .max(999, VitalSignMessage[FormField['vitalsign.heightCM']]),
-})
+}
+
+const schemaSalesPerson = {
+  [FormField['visit.salesPersonUserFK']]: Yup.string().required(
+    'Must select a sales person',
+  ),
+}
+
+const VisitValidationSchema = (props) => {
+  const { clinicSettings } = props
+  const { settings } = clinicSettings
+
+  if (settings.isSalesPersonMandatoryInVisit)
+    return Yup.object().shape({
+      ...schemaVisit,
+      ...schemaSalesPerson,
+    })
+  return Yup.object().shape({
+    ...schemaVisit,
+  })
+}
+
+export default VisitValidationSchema
