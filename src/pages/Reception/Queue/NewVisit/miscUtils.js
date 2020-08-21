@@ -9,13 +9,14 @@ const filterDeletedFiles = (item) => {
   return true
 }
 
-const mapAttachmentToUploadInput = (
+export const mapAttachmentToUploadInput = (
   {
     fileIndexFK,
     fileName,
     attachmentType,
     attachmentTypeFK,
     isDeleted,
+    fileExtension,
     thumbnail,
     ...rest
   },
@@ -31,6 +32,7 @@ const mapAttachmentToUploadInput = (
         attachmentType,
         attachmentTypeFK,
         isDeleted,
+        fileExtension,
         remarks: rest.remarks,
       }
     : {
@@ -42,6 +44,7 @@ const mapAttachmentToUploadInput = (
         attachmentType,
         attachmentTypeFK,
         isDeleted,
+        fileExtension,
         sortOrder: index,
       }
 
@@ -97,7 +100,6 @@ const convertEyeForms = (values) => {
     let { formData } = visitEyeRefractionForm
     removeFields(formData, durtyFields)
 
-    console.log('clear datas ==>', formData)
     values.visitEyeRefractionForm.formData = JSON.stringify(formData)
   }
 
