@@ -9,14 +9,13 @@ const filterDeletedFiles = (item) => {
   return true
 }
 
-export const mapAttachmentToUploadInput = (
+const mapAttachmentToUploadInput = (
   {
     fileIndexFK,
     fileName,
     attachmentType,
     attachmentTypeFK,
     isDeleted,
-    fileExtension,
     thumbnail,
     ...rest
   },
@@ -32,7 +31,6 @@ export const mapAttachmentToUploadInput = (
         attachmentType,
         attachmentTypeFK,
         isDeleted,
-        fileExtension,
         remarks: rest.remarks,
       }
     : {
@@ -44,7 +42,6 @@ export const mapAttachmentToUploadInput = (
         attachmentType,
         attachmentTypeFK,
         isDeleted,
-        fileExtension,
         sortOrder: index,
       }
 
@@ -308,7 +305,6 @@ export const formikHandleSubmit = (
   }).then((response) => {
     if (response) {
       const { location } = history
-      onConfirm()
       sendQueueNotification({
         message: 'New visit created.',
         queueNo: payload && payload.queueNo,
@@ -321,8 +317,11 @@ export const formikHandleSubmit = (
         dispatch({
           type: 'queueLog/refresh',
         })
-
+      // reset form can not after onConfirm function.
+      // bcz in NewVisit component have function 'componentWillUnmount'
+      // there will use this.props.values when close registration visit page
       resetForm({})
+      onConfirm()
     } else {
       setSubmitting(false)
     }

@@ -30,11 +30,7 @@ import VisitValidationSchema from './validationScheme'
 import FormFieldName from './formField'
 // services
 // misc utils
-import {
-  formikMapPropsToValues,
-  formikHandleSubmit,
-  mapAttachmentToUploadInput,
-} from './miscUtils'
+import { formikMapPropsToValues, formikHandleSubmit } from './miscUtils'
 import { VISIT_STATUS } from '../variables'
 
 const styles = (theme) => ({
@@ -198,7 +194,7 @@ class NewVisit extends PureComponent {
     if (added)
       updated = [
         ...updated,
-        ...added.map((m) => mapAttachmentToUploadInput(m)),
+        ...added,
       ]
 
     if (deleted)
