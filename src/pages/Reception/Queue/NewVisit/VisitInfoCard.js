@@ -13,6 +13,7 @@ import {
   GridItem,
   CodeSelect,
   Select,
+  ClinicianSelect,
 } from '@/components'
 // medisys components
 import {
@@ -96,8 +97,10 @@ const VisitInfoCard = ({
   }
 
   const handleDoctorChange = (v, op) => {
-    const { roomAssignment = {} } = op.clinicianProfile
-    setFieldValue(FormField['visit.roomFK'], roomAssignment.roomFK)
+    if (op.clinicianProfile) {
+      const { roomAssignment = {} } = op.clinicianProfile
+      setFieldValue(FormField['visit.roomFK'], roomAssignment.roomFK)
+    }
   }
 
   const handleVisitOrderTemplateChange = (vType, opts) => {
@@ -243,7 +246,7 @@ const VisitInfoCard = ({
             }}
           />
         </GridItem>
-        <GridItem xs md={12}>
+        <GridItem xs md={8}>
           <Field
             name={FormField['visit.visitRemarks']}
             render={(args) => (
@@ -257,6 +260,22 @@ const VisitInfoCard = ({
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.visitRemarks',
                 })}
+              />
+            )}
+          />
+        </GridItem>
+        <GridItem xs md={4}>
+          <Field
+            name={FormField['visit.salesPersonUserFK']}
+            render={(args) => (
+              <ClinicianSelect
+                label={formatMessage({
+                  id: 'reception.queue.visitRegistration.salesPerson',
+                })}
+                disabled={isVisitRemarksDisabled}
+                authority='none'
+                noDefaultValue
+                {...args}
               />
             )}
           />

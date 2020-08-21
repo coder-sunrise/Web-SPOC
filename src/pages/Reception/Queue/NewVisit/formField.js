@@ -6,6 +6,7 @@ export default {
   'visit.roomFK': 'roomFK',
   'visit.visitOrderTemplateFK': 'visitOrderTemplateFK',
   'visit.VisitOrderTemplateTotal': 'visitOrderTemplateTotal',
+  'visit.salesPersonUserFK': 'salesPersonUserFK',
 
   'vitalsign.temperatureC': 'temperatureC',
   'vitalsign.bpSysMMHG': 'bpSysMMHG',
