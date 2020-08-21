@@ -21,9 +21,6 @@ const Summary = ({ invoiceDetail, classes, showGST = true }) => {
             <GridItem md={9} />)
           }
           {showGST && (
-          <GridItem md={9} />)
-          }
-          {showGST && (
           <GridItem md={3}>
             <FastField
               name='subTotal'
