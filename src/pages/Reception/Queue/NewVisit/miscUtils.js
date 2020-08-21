@@ -97,7 +97,6 @@ const convertEyeForms = (values) => {
     let { formData } = visitEyeRefractionForm
     removeFields(formData, durtyFields)
 
-    console.log('clear datas ==>', formData)
     values.visitEyeRefractionForm.formData = JSON.stringify(formData)
   }
 
@@ -306,7 +305,6 @@ export const formikHandleSubmit = (
   }).then((response) => {
     if (response) {
       const { location } = history
-      onConfirm()
       sendQueueNotification({
         message: 'New visit created.',
         queueNo: payload && payload.queueNo,
@@ -319,8 +317,11 @@ export const formikHandleSubmit = (
         dispatch({
           type: 'queueLog/refresh',
         })
-
+      // reset form can not after onConfirm function.
+      // bcz in NewVisit component have function 'componentWillUnmount'
+      // there will use this.props.values when close registration visit page
       resetForm({})
+      onConfirm()
     } else {
       setSubmitting(false)
     }
