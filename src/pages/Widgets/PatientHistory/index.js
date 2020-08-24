@@ -182,6 +182,7 @@ class PatientHistory extends Component {
       visitPurposeFK,
       timeIn,
       timeOut,
+      visitPurposeName,
     } = row
     const { patientID } = patientHistory
     const fromConsultation = location.pathname.includes('consultation')
@@ -237,13 +238,11 @@ class PatientHistory extends Component {
                 ? moment(timeOut).format('HH:mm')
                 : '-'})${docotrName ? ` - ${docotrName}` : ''}`}
             </div>
-            {!isRetailVisit && (
-              <span>
-                Last Update:&nbsp;{moment(signOffDate).format(
-                  'DD MMM YYYY HH:mm',
-                )}
-              </span>
-            )}
+            <span>
+              {`${visitPurposeName}, Last Update By: ${moment(
+                signOffDate,
+              ).format('DD MMM YYYY HH:mm')}`}
+            </span>
           </div>
           <div
             style={{
@@ -373,10 +372,7 @@ class PatientHistory extends Component {
     return (
       <div
         style={{
-          marginLeft: 8,
-          marginRight: 8,
-          marginTop: 3,
-          marginBottom: 3,
+          padding: 10,
         }}
       >
         {currentTagWidgets.length > 0 ? (
@@ -407,7 +403,7 @@ class PatientHistory extends Component {
             )
           })
         ) : (
-          'No Data'
+          <div> No Data</div>
         )}
       </div>
     )
@@ -485,7 +481,7 @@ class PatientHistory extends Component {
             >
               unfold_more
             </span>
-            <span style={{ position: 'relative', top: -5 }}>Epande All</span>
+            <span style={{ position: 'relative', top: -5 }}>Expand All</span>
           </span>
           <span
             style={{

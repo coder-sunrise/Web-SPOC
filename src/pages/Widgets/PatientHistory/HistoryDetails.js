@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import moment from 'moment'
 import {
   GridContainer,
   GridItem,
@@ -102,7 +103,22 @@ class HistoryDetails extends PureComponent {
       >
         {newArray.map((o) => {
           const _title = o.userTitle ? `${o.userTitle} ` : ''
-
+          const lastUpdateDate = moment(
+            selectHistory.visitPurposeFK === VISIT_TYPE.RETAIL
+              ? o.visitDate
+              : o.signOffDate,
+          ).format('DD MMM YYYY HH:mm')
+          const {
+            visitDate,
+            timeIn,
+            timeOut,
+            userTitle,
+            userName,
+          } = selectHistory
+          const docotrName =
+            userTitle || userName
+              ? `${userTitle || ''} ${userName || ''}`
+              : undefined
           return (
             <React.Fragment>
               <ListItem
@@ -150,50 +166,28 @@ class HistoryDetails extends PureComponent {
                     <div
                       style={{
                         width: '100%',
-                        paddingRight: 20,
                       }}
                     >
-                      <GridContainer>
-                        <GridItem sm={12} style={{ fontWeight: 500 }}>
-                          <TextField
-                            text
-                            value={selectHistory.visitPurposeName}
-                          />
-                          {selectHistory.visitDate && (
-                            <span style={{ position: 'relative' }}>
-                              &nbsp; (
-                              <DatePicker
-                                text
-                                showTime
-                                format='DD MMM YYYY h:mm a'
-                                value={
-                                  selectHistory.visitPurposeFK ===
-                                  VISIT_TYPE.RETAIL ? (
-                                    selectHistory.visitDate
-                                  ) : (
-                                    o.signOffDate
-                                  )
-                                }
-                              />)
-                            </span>
-                          )}
-                        </GridItem>
-                      </GridContainer>
-                      <GridContainer>
-                        <GridItem sm={7}>
-                          <TextField
-                            text
-                            value={
-                              settings.showConsultationVersioning &&
-                              !isRetailVisit ? (
-                                `V${o.versionNumber}, ${_title}${o.userName}`
-                              ) : (
-                                `${_title}${o.userName}`
-                              )
-                            }
-                          />
-                        </GridItem>
-                      </GridContainer>
+                      <div style={{ fontWeight: 500 }}>
+                        {`${moment(visitDate).format(
+                          'DD MMM YYYY',
+                        )} (Time In: ${moment(timeIn).format(
+                          'HH:mm',
+                        )} Time Out: ${timeOut
+                          ? moment(timeOut).format('HH:mm')
+                          : '-'})${docotrName ? ` - ${docotrName}` : ''}`}
+                      </div>
+                      <div>
+                        {settings.showConsultationVersioning &&
+                        !isRetailVisit ? (
+                          `${selectHistory.visitPurposeName} (V${o.versionNumber}), Last Update By: ${_title}${o.userName ||
+                            ''}${lastUpdateDate ? `, ${lastUpdateDate}` : ''}`
+                        ) : (
+                          `${selectHistory.visitPurposeName}, Last Update By: ${_title}${o.userName}${lastUpdateDate
+                            ? `, ${lastUpdateDate}`
+                            : ''}`
+                        )}
+                      </div>
                     </div>
                   }
                 />
