@@ -126,7 +126,7 @@
     "react-to-print": "^2.5.1",
     "resize-base64": "^1.0.12",
     "resize-image": "^0.1.0",
-    "rrule": "^2.6.2",
+    "rrule": "2.6.2",
     "sanitize-html": "^1.20.1",
     "sass-loader": "7.3.1",
     "sharp": "^0.23.0",
