@@ -271,24 +271,30 @@ class Billing extends Component {
           }
         }
       }
-      if (
+
+      const printDrugLabel =
         reportsOnCompletePayment.indexOf(
           ReportsOnCompletePaymentOption.DrugLabel,
         ) > -1
-      ) {
-        if (printData && printData.length > 0) {
-          const token = localStorage.getItem('token')
-          printData = printData.map((item) => ({
-            ...item,
-            Token: token,
-            BaseUrl: process.env.url,
-          }))
-          await this.childOnPrintRef({
-            type: 1,
-            printData,
-            printAllDrugLabel: true,
-          })
-        }
+      if (!printDrugLabel) {
+        this.setState({ selectedDrugs: [] })
+      }
+
+      if (printData && printData.length > 0) {
+        const token = localStorage.getItem('token')
+        printData = printData.map((item) => ({
+          ...item,
+          Token: token,
+          BaseUrl: process.env.url,
+        }))
+      }
+
+      if (printData.length > 0 || printDrugLabel) {
+        await this.childOnPrintRef({
+          type: 1,
+          printData,
+          printAllDrugLabel: printDrugLabel,
+        })
       }
     }
   }
