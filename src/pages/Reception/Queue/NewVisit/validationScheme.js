@@ -71,13 +71,15 @@ const VisitValidationSchema = (props) => {
   const { clinicSettings } = props
   const { settings } = clinicSettings
 
-  if (settings.isSalesPersonMandatoryInVisit)
-    return Yup.object().shape({
-      ...schemaVisit,
-      ...schemaSalesPerson,
-    })
-  return Yup.object().shape({
+  let schema = {
     ...schemaVisit,
+  }
+
+  if (settings.isSalesPersonMandatoryInVisit)
+    schema = Object.assign(schema, { ...schemaSalesPerson })
+
+  return Yup.object().shape({
+    ...schema,
   })
 }
 
