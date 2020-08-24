@@ -186,6 +186,8 @@ class PatientHistory extends Component {
     const { patientID } = patientHistory
     const fromConsultation = location.pathname.includes('consultation')
     const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
+    const docotrName =
+      userTitle || userName ? `${userTitle || ''} ${userName || ''}` : undefined
     return (
       <div
         style={{
@@ -233,12 +235,12 @@ class PatientHistory extends Component {
                 timeIn,
               ).format('HH:mm')} Time Out: ${timeOut
                 ? moment(timeOut).format('HH:mm')
-                : '-'}) - ${userTitle || ''} ${userName}`}
+                : '-'})${docotrName ? ` - ${docotrName}` : ''}`}
             </div>
             {!isRetailVisit && (
               <span>
-                Update Date:&nbsp;{moment(signOffDate).format(
-                  'DD MMM YYYY HH:mm a',
+                Last Update:&nbsp;{moment(signOffDate).format(
+                  'DD MMM YYYY HH:mm',
                 )}
               </span>
             )}
@@ -369,62 +371,45 @@ class PatientHistory extends Component {
     })
 
     return (
-      <Tooltip
-        title={
-          <div>
-            <div>
-              Visit Date:&nbsp;{moment(history.visitDate).format(
-                'DD MMM YYYY HH:mm a',
-              )}
-            </div>
-            <div>
-              Update Date:&nbsp;{moment(history.signOffDate).format(
-                'DD MMM YYYY HH:mm a',
-              )}
-            </div>
-          </div>
-        }
+      <div
+        style={{
+          marginLeft: 8,
+          marginRight: 8,
+          marginTop: 3,
+          marginBottom: 3,
+        }}
       >
-        <div
-          style={{
-            marginLeft: 8,
-            marginRight: 8,
-            marginTop: 3,
-            marginBottom: 3,
-          }}
-        >
-          {currentTagWidgets.length > 0 ? (
-            currentTagWidgets.map((o) => {
-              const Widget = o.component
-              return (
-                <div>
-                  <span
-                    style={{
-                      fontWeight: 500,
-                      color: 'darkBlue',
-                      fontSize: '0.85rem',
-                    }}
-                  >
-                    {o.name}
-                  </span>
-                  {Widget ? (
-                    <Widget
-                      current={current}
-                      visitDetails={visitDetails}
-                      {...this.props}
-                      setFieldValue={this.props.setFieldValue}
-                    />
-                  ) : (
-                    ''
-                  )}
-                </div>
-              )
-            })
-          ) : (
-            'No Data'
-          )}
-        </div>
-      </Tooltip>
+        {currentTagWidgets.length > 0 ? (
+          currentTagWidgets.map((o) => {
+            const Widget = o.component
+            return (
+              <div>
+                <span
+                  style={{
+                    fontWeight: 500,
+                    color: 'darkBlue',
+                    fontSize: '0.85rem',
+                  }}
+                >
+                  {o.name}
+                </span>
+                {Widget ? (
+                  <Widget
+                    current={current}
+                    visitDetails={visitDetails}
+                    {...this.props}
+                    setFieldValue={this.props.setFieldValue}
+                  />
+                ) : (
+                  ''
+                )}
+              </div>
+            )
+          })
+        ) : (
+          'No Data'
+        )}
+      </div>
     )
   }
 
