@@ -183,12 +183,24 @@ class PatientHistory extends Component {
       timeIn,
       timeOut,
       visitPurposeName,
+      coHistory = [],
     } = row
     const { patientID } = patientHistory
     const fromConsultation = location.pathname.includes('consultation')
     const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
-    const docotrName =
-      userTitle || userName ? `${userTitle || ''} ${userName || ''}` : undefined
+    const docotrName = userName
+      ? `${userTitle || ''} ${userName || ''}`
+      : undefined
+    let LastUpdateBy
+    if (coHistory.length > 0) {
+      LastUpdateBy = coHistory[0].userName
+        ? `${coHistory[0].userTitle || ''} ${coHistory[0].userName || ''}`
+        : undefined
+    } else {
+      LastUpdateBy = userName
+        ? `${userTitle || ''} ${userName || ''}`
+        : undefined
+    }
     return (
       <div
         style={{
@@ -239,9 +251,8 @@ class PatientHistory extends Component {
                 : '-'})${docotrName ? ` - ${docotrName}` : ''}`}
             </div>
             <span>
-              {`${visitPurposeName}, Last Update By: ${moment(
-                signOffDate,
-              ).format('DD MMM YYYY HH:mm')}`}
+              {`${visitPurposeName}, Last Update By: ${LastUpdateBy ||
+                ''} on ${moment(signOffDate).format('DD MMM YYYY HH:mm')}`}
             </span>
           </div>
           <div

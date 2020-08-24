@@ -102,7 +102,9 @@ class HistoryDetails extends PureComponent {
         onClick={() => {}}
       >
         {newArray.map((o) => {
-          const _title = o.userTitle ? `${o.userTitle} ` : ''
+          const updateByUser = o.userName
+            ? `${o.userTitle || ''} ${o.userName || ''}`
+            : undefined
           const lastUpdateDate = moment(
             selectHistory.visitPurposeFK === VISIT_TYPE.RETAIL
               ? o.visitDate
@@ -115,10 +117,9 @@ class HistoryDetails extends PureComponent {
             userTitle,
             userName,
           } = selectHistory
-          const docotrName =
-            userTitle || userName
-              ? `${userTitle || ''} ${userName || ''}`
-              : undefined
+          const docotrName = userName
+            ? `${userTitle || ''} ${userName || ''}`
+            : undefined
           return (
             <React.Fragment>
               <ListItem
@@ -180,12 +181,11 @@ class HistoryDetails extends PureComponent {
                       <div>
                         {settings.showConsultationVersioning &&
                         !isRetailVisit ? (
-                          `${selectHistory.visitPurposeName} (V${o.versionNumber}), Last Update By: ${_title}${o.userName ||
-                            ''}${lastUpdateDate ? `, ${lastUpdateDate}` : ''}`
+                          `${selectHistory.visitPurposeName} (V${o.versionNumber}), Last Update By: ${updateByUser ||
+                            ''}${lastUpdateDate ? ` on ${lastUpdateDate}` : ''}`
                         ) : (
-                          `${selectHistory.visitPurposeName}, Last Update By: ${_title}${o.userName}${lastUpdateDate
-                            ? `, ${lastUpdateDate}`
-                            : ''}`
+                          `${selectHistory.visitPurposeName}, Last Update By: ${updateByUser ||
+                            ''}${lastUpdateDate ? ` on ${lastUpdateDate}` : ''}`
                         )}
                       </div>
                     </div>
