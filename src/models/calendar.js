@@ -489,25 +489,25 @@ export default createListViewModel({
           .endOf(calendarView)
           .endOf('day')
           .formatUTC(false)
-          //const getCalendarListPayload = {
-          //    apptDateFrom: start,
-          //    apptDateTo: end,
-          //    appStatus: [
-          //        APPOINTMENT_STATUS.CONFIRMED,
-          //        APPOINTMENT_STATUS.DRAFT,
-          //        // APPOINTMENT_STATUS.CANCELLED,
-          //        APPOINTMENT_STATUS.TURNEDUP,
-          //        APPOINTMENT_STATUS.RESCHEDULED,
-          //        APPOINTMENT_STATUS.PFA_RESCHEDULED,
-          //        APPOINTMENT_STATUS.PFA_CANCELLED,
-          //        APPOINTMENT_STATUS.TURNEDUPLATE,
-          //        APPOINTMENT_STATUS.PFA_NOSHOW,
-          //    ].join(),
-          //}
         const getCalendarListPayload = {
           apptDateFrom: start,
           apptDateTo: end,
+          appStatus: [
+            APPOINTMENT_STATUS.CONFIRMED,
+            APPOINTMENT_STATUS.DRAFT,
+            // APPOINTMENT_STATUS.CANCELLED,
+            APPOINTMENT_STATUS.TURNEDUP,
+            APPOINTMENT_STATUS.RESCHEDULED,
+            APPOINTMENT_STATUS.PFA_RESCHEDULED,
+            APPOINTMENT_STATUS.PFA_CANCELLED,
+            APPOINTMENT_STATUS.TURNEDUPLATE,
+            APPOINTMENT_STATUS.PFA_NOSHOW,
+          ].join(),
         }
+        // const getCalendarListPayload = {
+        //   apptDateFrom: start,
+        //   apptDateTo: end,
+        // }
 
         yield all([
           put({ type: 'getCalendarList', payload: getCalendarListPayload }),
