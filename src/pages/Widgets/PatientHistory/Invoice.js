@@ -5,7 +5,7 @@ import { currencySymbol } from '@/utils/config'
 import { GridContainer, GridItem, TextField, DatePicker } from '@/components'
 import { VISIT_TYPE } from '@/utils/constants'
 import AmountSummary from './AmountSummary'
-import tablestyles from './TableStyle.less'
+import tablestyles from './PatientHistoryStyle.less'
 
 const numberstyle = {
   color: 'darkBlue',
@@ -29,7 +29,7 @@ const baseColumns = [
   { dataIndex: 'dispenseUOMDisplayValue', title: 'UOM', width: 100 },
   {
     dataIndex: 'adjAmt',
-    title: 'Adj',
+    title: 'Adj.',
     width: 120,
     align: 'right',
     render: (text, row) => (
@@ -115,7 +115,7 @@ export default ({ current, theme }) => {
   }
 
   return (
-    <div>
+    <div style={{ fontSize: '0.875rem' }}>
       {current.invoice ? (
         <GridContainer>
           <GridItem xs={4} md={2}>

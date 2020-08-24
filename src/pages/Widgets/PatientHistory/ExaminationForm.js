@@ -1,5 +1,5 @@
 import { Table } from 'antd'
-import tablestyles from './TableStyle.less'
+import tablestyles from './PatientHistoryStyle.less'
 
 export default ({ current }) => {
   const { formData = {} } = current.corEyeExaminationForm

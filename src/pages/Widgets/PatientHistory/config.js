@@ -1,5 +1,6 @@
 import Loadable from 'react-loadable'
 import Loading from '@/components/PageLoading/index'
+import { scribbleTypes } from '@/utils/codes'
 
 export const WIDGETS_ID = {
   CLINICAL_NOTE: '1',
@@ -341,3 +342,93 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     }),
   },
 ]
+
+export const showWidget = (current, widget) => {
+  // check show notes
+  const notesType = notesTypes.find((type) => type.value === widget.id)
+
+  if (notesType) {
+    const { scribbleNotes = [] } = current
+    const scribbleType = scribbleTypes.find(
+      (o) => o.type === notesType.fieldName,
+    )
+    if (
+      !current[notesType.fieldName] &&
+      (!scribbleType ||
+        scribbleNotes.filter(
+          (o) => o.scribbleNoteTypeFK === scribbleType.typeFK,
+        ).length === 0)
+    )
+      return false
+  }
+
+  // check show diagnosis
+  if (
+    widget.id === WIDGETS_ID.DIAGNOSIS &&
+    (!current.diagnosis || current.diagnosis.length === 0)
+  )
+    return false
+
+  // check show eyevisualacuity
+  if (
+    widget.id === WIDGETS_ID.VISUALACUITYTEST &&
+    (!current.eyeVisualAcuityTestForms ||
+      current.eyeVisualAcuityTestForms.length === 0)
+  )
+    return false
+
+  // check show eyerefractionform
+  if (
+    widget.id === WIDGETS_ID.REFRACTIONFORM &&
+    (!current.corEyeRefractionForm ||
+      JSON.stringify(current.corEyeRefractionForm.formData) === '{}')
+  )
+    return false
+
+  // check show eyeexaminationform
+  if (
+    widget.id === WIDGETS_ID.EXAMINATIONFORM &&
+    (!current.corEyeExaminationForm ||
+      JSON.stringify(current.corEyeExaminationForm.formData) === '{}' ||
+      (current.corEyeExaminationForm.formData.EyeExaminations || []).length ===
+        0)
+  )
+    return false
+
+  // check show forms
+  if (
+    widget.id === WIDGETS_ID.FORMS &&
+    (!current.forms || current.forms.length === 0)
+  )
+    return false
+  // check show orders
+  if (
+    widget.id === WIDGETS_ID.ORDERS &&
+    (!current.orders || current.orders.length === 0)
+  )
+    return false
+  // check show document
+  if (
+    widget.id === WIDGETS_ID.CONSULTATION_DOCUMENT &&
+    (!current.documents || current.documents.length === 0)
+  )
+    return false
+  // check show DentalChart
+  if (
+    widget.id === WIDGETS_ID.DENTAL_CHART &&
+    (!current.dentalChart || current.dentalChart.length === 0)
+  )
+    return false
+  // check show invoice
+  if (widget.id === WIDGETS_ID.INVOICE && !current.invoice) return false
+
+  // check show treatment
+  if (
+    widget.id === WIDGETS_ID.TREATMENT &&
+    (!current.orders ||
+      current.orders.filter((o) => o.type === 'Treatment').length === 0)
+  )
+    return false
+
+  return true
+}

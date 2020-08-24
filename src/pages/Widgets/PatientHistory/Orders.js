@@ -1,7 +1,7 @@
 import { Table } from 'antd'
 import numeral from 'numeral'
 import { currencySymbol } from '@/utils/config'
-import tablestyles from './TableStyle.less'
+import tablestyles from './PatientHistoryStyle.less'
 
 export default ({ current }) => {
   return (

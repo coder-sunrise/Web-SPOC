@@ -1,7 +1,7 @@
 import React from 'react'
 import { Table } from 'antd'
 import { TextField, GridItem } from '@/components'
-import tablestyles from '../TableStyle.less'
+import tablestyles from '../PatientHistoryStyle.less'
 import NearAddODOS from './NearAddODOS'
 
 export default ({ rows = [] }) => {

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Table } from 'antd'
 import { Checkbox, CodeSelect } from '@/components'
-import tablestyles from '../TableStyle.less'
+import tablestyles from '../PatientHistoryStyle.less'
 import ODOS from './ODOS'
 
 export default ({ rows = [], selectedRow }) => {

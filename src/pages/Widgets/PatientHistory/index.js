@@ -20,9 +20,10 @@ import Authorized from '@/utils/Authorized'
 // utils
 import { findGetParameter } from '@/utils/utils'
 import { VISIT_TYPE } from '@/utils/constants'
-import { scribbleTypes } from '@/utils/codes'
 import * as WidgetConfig from './config'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
+import HistoryDetails from './HistoryDetails'
+import customtyles from './PatientHistoryStyle.less'
 
 const styles = (theme) => ({
   root: {},
@@ -109,7 +110,6 @@ const styles = (theme) => ({
 class PatientHistory extends Component {
   constructor (props) {
     super(props)
-
     this.widgets = WidgetConfig.widgets(
       props,
       this.scribbleNoteUpdateState,
@@ -117,12 +117,15 @@ class PatientHistory extends Component {
       const accessRight = Authorized.check(o.authority)
       return accessRight && accessRight.rights !== 'hidden'
     })
-
     const activeHistoryTags = this.getActiveHistoryTags()
+
     this.state = {
       selectedData: '',
       selectTag:
         activeHistoryTags.length > 0 ? activeHistoryTags[0] : { children: [] },
+      showHistoryDetails: false,
+      selectHistory: undefined,
+      activeKey: [],
     }
   }
 
@@ -137,6 +140,18 @@ class PatientHistory extends Component {
         visitID: findGetParameter('visit'),
         patientID: Number(findGetParameter('pid')) || 0,
       },
+    }).then(() => {
+      const { patientHistory } = this.props
+      let sortedPatientHistory = []
+
+      sortedPatientHistory = patientHistory.list
+        ? patientHistory.list.filter(
+            (o) =>
+              o.visitPurposeFK === VISIT_TYPE.RETAIL ||
+              (o.coHistory && o.coHistory.length > 0),
+          )
+        : []
+      this.setState({ activeKey: sortedPatientHistory.map((o) => o.id) })
     })
   }
 
@@ -172,22 +187,70 @@ class PatientHistory extends Component {
     const fromConsultation = location.pathname.includes('consultation')
     const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
     return (
-      <div style={{ display: 'flex', fontSize: '0.9em' }}>
-        <div style={{ fontWeight: 500 }}>
-          {`${moment(visitDate).format('DD MMM YYYY')} (Time In: ${moment(
-            timeIn,
-          ).format('HH:MM')} Time Out: ${timeOut
-            ? moment(timeOut).format('HH:MM')
-            : '-'}) - ${userTitle || ''} ${userName}`}
-        </div>
-        {!isRetailVisit && (
-          <div style={{ marginLeft: 'auto' }}>
-            <span>
-              Update Date:&nbsp;{moment(signOffDate).format(
-                'DD MMM YYYY HH:MM',
+      <div
+        style={{
+          paddingLeft: 5,
+          paddingRight: 5,
+          paddingTop: 2,
+          paddingBottom: 2,
+        }}
+        onClick={() => {
+          this.setState((preState) => {
+            if (preState.activeKey.find((key) => key === row.id)) {
+              return {
+                ...preState,
+                activeKey: preState.activeKey.filter((key) => key !== row.id),
+              }
+            }
+            return {
+              ...preState,
+              activeKey: [
+                ...preState.activeKey,
+                row.id,
+              ],
+            }
+          })
+        }}
+      >
+        <div style={{ display: 'flex' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <span className='material-icons'>
+              {this.state.activeKey.find((key) => key === row.id) ? (
+                'expand_more'
+              ) : (
+                'navigate_next'
               )}
             </span>
-            {!fromConsultation && (
+          </div>
+          <div style={{ fontSize: '0.9em' }}>
+            <div style={{ fontWeight: 500 }}>
+              {`${moment(visitDate).format('DD MMM YYYY')} (Time In: ${moment(
+                timeIn,
+              ).format('HH:mm')} Time Out: ${timeOut
+                ? moment(timeOut).format('HH:mm')
+                : '-'}) - ${userTitle || ''} ${userName}`}
+            </div>
+            {!isRetailVisit && (
+              <span>
+                Update Date:&nbsp;{moment(signOffDate).format(
+                  'DD MMM YYYY HH:mm a',
+                )}
+              </span>
+            )}
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            {!isRetailVisit &&
+            !fromConsultation && (
               <Authorized authority='patientdashboard.editconsultation'>
                 <Tooltip title='Edit Consultation'>
                   <Button
@@ -254,102 +317,33 @@ class PatientHistory extends Component {
               </Authorized>
             )}
           </div>
-        )}
+          <div
+            style={{
+              marginLeft: 'auto',
+              display: 'flex',
+              alignItems: 'center',
+              marginRight: 10,
+            }}
+          >
+            <Tooltip title='View History'>
+              <span
+                className='material-icons'
+                style={{ color: 'gray' }}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  this.setState({
+                    showHistoryDetails: true,
+                    selectHistory: { ...row },
+                  })
+                }}
+              >
+                history
+              </span>
+            </Tooltip>
+          </div>
+        </div>
       </div>
     )
-  }
-
-  showWidget = (current, widget) => {
-    // check show notes
-    const notesTypes = WidgetConfig.notesTypes.find(
-      (type) => type.value === widget.id,
-    )
-
-    if (notesTypes) {
-      const { scribbleNotes = [] } = current
-      const scribbleType = scribbleTypes.find(
-        (o) => o.type === notesTypes.fieldName,
-      )
-      if (
-        !current[notesTypes.fieldName] &&
-        (!scribbleType ||
-          scribbleNotes.filter(
-            (o) => o.scribbleNoteTypeFK === scribbleType.typeFK,
-          ).length === 0)
-      )
-        return false
-    }
-
-    // check show diagnosis
-    if (
-      widget.id === WidgetConfig.WIDGETS_ID.DIAGNOSIS &&
-      (!current.diagnosis || current.diagnosis.length === 0)
-    )
-      return false
-
-    // check show eyevisualacuity
-    if (
-      widget.id === WidgetConfig.WIDGETS_ID.VISUALACUITYTEST &&
-      (!current.eyeVisualAcuityTestForms ||
-        current.eyeVisualAcuityTestForms.length === 0)
-    )
-      return false
-
-    // check show eyerefractionform
-    if (
-      widget.id === WidgetConfig.WIDGETS_ID.REFRACTIONFORM &&
-      (!current.corEyeRefractionForm ||
-        JSON.stringify(current.corEyeRefractionForm.formData) === '{}')
-    )
-      return false
-
-    // check show eyeexaminationform
-    if (
-      widget.id === WidgetConfig.WIDGETS_ID.EXAMINATIONFORM &&
-      (!current.corEyeExaminationForm ||
-        JSON.stringify(current.corEyeExaminationForm.formData) === '{}' ||
-        (current.corEyeExaminationForm.formData.EyeExaminations || [])
-          .length === 0)
-    )
-      return false
-
-    // check show forms
-    if (
-      widget.id === WidgetConfig.WIDGETS_ID.FORMS &&
-      (!current.forms || current.forms.length === 0)
-    )
-      return false
-    // check show orders
-    if (
-      widget.id === WidgetConfig.WIDGETS_ID.ORDERS &&
-      (!current.orders || current.orders.length === 0)
-    )
-      return false
-    // check show document
-    if (
-      widget.id === WidgetConfig.WIDGETS_ID.CONSULTATION_DOCUMENT &&
-      (!current.documents || current.documents.length === 0)
-    )
-      return false
-    // check show DentalChart
-    if (
-      widget.id === WidgetConfig.WIDGETS_ID.DENTAL_CHART &&
-      (!current.dentalChart || current.dentalChart.length === 0)
-    )
-      return false
-    // check show invoice
-    if (widget.id === WidgetConfig.WIDGETS_ID.INVOICE && !current.invoice)
-      return false
-
-    // check show treatment
-    if (
-      widget.id === WidgetConfig.WIDGETS_ID.TREATMENT &&
-      (!current.orders ||
-        current.orders.filter((o) => o.type === 'Treatment').length === 0)
-    )
-      return false
-
-    return true
   }
 
   getDetailPanel = (history) => {
@@ -365,48 +359,72 @@ class PatientHistory extends Component {
         return (
           _widget.id === WidgetConfig.WIDGETS_ID.INVOICE &&
           this.state.selectTag.children.indexOf(_widget.id) >= 0 &&
-          this.showWidget(current, _widget)
+          WidgetConfig.showWidget(current, _widget)
         )
       }
       return (
         this.state.selectTag.children.indexOf(_widget.id) >= 0 &&
-        this.showWidget(current, _widget)
+        WidgetConfig.showWidget(current, _widget)
       )
     })
 
     return (
-      <CardContainer hideHeader size='sm'>
-        {currentTagWidgets.length > 0 ? (
-          currentTagWidgets.map((o) => {
-            const Widget = o.component
-            return (
-              <div>
-                <h5
-                  style={{
-                    fontWeight: 500,
-                    color: 'darkBlue',
-                    fontSize: '0.85rem',
-                  }}
-                >
-                  {o.name}
-                </h5>
-                {Widget ? (
-                  <Widget
-                    current={current}
-                    visitDetails={visitDetails}
-                    {...this.props}
-                    setFieldValue={this.props.setFieldValue}
-                  />
-                ) : (
-                  ''
-                )}
-              </div>
-            )
-          })
-        ) : (
-          'No Data'
-        )}
-      </CardContainer>
+      <Tooltip
+        title={
+          <div>
+            <div>
+              Visit Date:&nbsp;{moment(history.visitDate).format(
+                'DD MMM YYYY HH:mm a',
+              )}
+            </div>
+            <div>
+              Update Date:&nbsp;{moment(history.signOffDate).format(
+                'DD MMM YYYY HH:mm a',
+              )}
+            </div>
+          </div>
+        }
+      >
+        <div
+          style={{
+            marginLeft: 8,
+            marginRight: 8,
+            marginTop: 3,
+            marginBottom: 3,
+          }}
+        >
+          {currentTagWidgets.length > 0 ? (
+            currentTagWidgets.map((o) => {
+              const Widget = o.component
+              return (
+                <div>
+                  <span
+                    style={{
+                      fontWeight: 500,
+                      color: 'darkBlue',
+                      fontSize: '0.85rem',
+                    }}
+                  >
+                    {o.name}
+                  </span>
+                  {Widget ? (
+                    <Widget
+                      current={current}
+                      visitDetails={visitDetails}
+                      {...this.props}
+                      setFieldValue={this.props.setFieldValue}
+                    />
+                  ) : (
+                    ''
+                  )}
+                </div>
+              )
+            })
+          ) : (
+            'No Data'
+          )}
+        </div>
+      </Tooltip>
     )
   }
 
@@ -427,54 +445,133 @@ class PatientHistory extends Component {
     })
   }
 
+  setExpandAll = (isExpandAll = false) => {
+    if (isExpandAll) {
+      const { patientHistory } = this.props
+      let sortedPatientHistory = []
+
+      sortedPatientHistory = patientHistory.list
+        ? patientHistory.list.filter(
+            (o) =>
+              o.visitPurposeFK === VISIT_TYPE.RETAIL ||
+              (o.coHistory && o.coHistory.length > 0),
+          )
+        : []
+      this.setState({ activeKey: sortedPatientHistory.map((o) => o.id) })
+    } else {
+      this.setState({ activeKey: [] })
+    }
+  }
+
   getFilterBar = () => {
     const { CheckableTag } = Tag
     return (
-      <div style={{ margin: '10px 0' }}>
-        {this.getActiveHistoryTags().map((tag) => (
-          <CheckableTag
-            style={{ padding: '5px 10px' }}
-            key={tag.value}
-            checked={this.state.selectTag.value === tag.value}
-            onChange={(checked) => {
-              if (checked) this.setState({ selectTag: tag })
-              else this.setState({ selectTag: { children: [] } })
+      <div style={{ display: 'flex' }}>
+        <div style={{ margin: '10px 0' }} className={customtyles.customTag}>
+          {this.getActiveHistoryTags().map((tag) => (
+            <CheckableTag
+              style={{ padding: '5px 10px' }}
+              key={tag.value}
+              checked={this.state.selectTag.value === tag.value}
+              onChange={(checked) => {
+                if (checked) this.setState({ selectTag: tag })
+                else this.setState({ selectTag: { children: [] } })
+              }}
+            >
+              {tag.name}
+            </CheckableTag>
+          ))}
+        </div>
+        <div style={{ marginLeft: 'auto' }}>
+          <span
+            style={{
+              cursor: 'pointer',
+            }}
+            onClick={() => {
+              this.setExpandAll(true)
             }}
           >
-            {tag.name}
-          </CheckableTag>
-        ))}
+            <span
+              className='material-icons'
+              style={{
+                marginTop: 15,
+                fontSize: '1.2rem',
+              }}
+            >
+              unfold_more
+            </span>
+            <span style={{ position: 'relative', top: -5 }}>Epande All</span>
+          </span>
+          <span
+            style={{
+              cursor: 'pointer',
+              marginLeft: 20,
+              marginRight: 10,
+            }}
+            onClick={() => {
+              this.setExpandAll(false)
+            }}
+          >
+            <span
+              className='material-icons'
+              style={{
+                marginTop: 10,
+                fontSize: '1.2rem',
+              }}
+            >
+              unfold_less
+            </span>
+            <span style={{ position: 'relative', top: -5 }}>Collapse All</span>
+          </span>
+        </div>
       </div>
     )
+  }
+
+  closeHistoryDetails = () => {
+    this.setState({
+      showHistoryDetails: false,
+      selectHistory: undefined,
+    })
+    this.props.dispatch({
+      type: 'patientHistory/updateState',
+      payload: {
+        selectedSubRow: undefined,
+        entity: undefined,
+      },
+    })
   }
 
   render () {
     const { patientHistory, clinicSettings, scriblenotes } = this.props
     const cfg = {}
-
-    if (!clinicSettings) return null
-
-    let sortedPatientHistory = ''
+    let sortedPatientHistory = []
 
     sortedPatientHistory = patientHistory.list
       ? patientHistory.list.filter(
-          (o) => o.visitPurposeFK === VISIT_TYPE.RETAIL || o.coHistory,
+          (o) =>
+            o.visitPurposeFK === VISIT_TYPE.RETAIL ||
+            (o.coHistory && o.coHistory.length > 0),
         )
-      : ''
+      : []
 
+    if (!clinicSettings) return null
+
+    const { showHistoryDetails, selectHistory, activeKey } = this.state
     return (
       <div {...cfg}>
         <CardContainer hideHeader size='sm'>
           {this.getFilterBar()}
           {sortedPatientHistory ? sortedPatientHistory.length > 0 ? (
             <div>
-              <Collapse
-                bordered={false}
-                defaultActiveKey={sortedPatientHistory.map((o) => o.id)}
-              >
+              <Collapse activeKey={activeKey} expandIconPosition={null}>
                 {sortedPatientHistory.map((o) => {
                   return (
-                    <Collapse.Panel header={this.getTitle(o)} key={o.id}>
+                    <Collapse.Panel
+                      header={this.getTitle(o)}
+                      key={o.id}
+                      className={customtyles.customPanel}
+                    >
                       {this.getDetailPanel(o)}
                     </Collapse.Panel>
                   )
@@ -506,6 +603,21 @@ class PatientHistory extends Component {
             {...this.props}
             toggleScribbleModal={this.toggleScribbleModal}
             scribbleData={this.state.selectedData}
+          />
+        </CommonModal>
+        <CommonModal
+          open={showHistoryDetails}
+          title='History'
+          fullScreen
+          bodyNoPadding
+          keepMounted={false}
+          onClose={this.closeHistoryDetails}
+        >
+          <HistoryDetails
+            {...this.props}
+            closeHistoryDetails={this.closeHistoryDetails}
+            selectHistory={selectHistory}
+            scribbleNoteUpdateState={this.scribbleNoteUpdateState}
           />
         </CommonModal>
       </div>

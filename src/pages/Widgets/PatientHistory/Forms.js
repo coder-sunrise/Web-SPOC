@@ -4,7 +4,7 @@ import moment from 'moment'
 // common components
 import { notification, Checkbox } from '@/components'
 import { formTypes, formStatus } from '@/utils/codes'
-import tablestyles from './TableStyle.less'
+import tablestyles from './PatientHistoryStyle.less'
 
 export const viewReport = (row) => {
   const type = formTypes.find((o) => parseInt(o.value, 10) === row.type)
@@ -53,6 +53,7 @@ export default ({ current }) => {
           {
             dataIndex: 'typeName',
             title: 'Type',
+            width: 200,
             render: (text, row) => (
               <a
                 onClick={() => {
@@ -74,6 +75,7 @@ export default ({ current }) => {
           {
             dataIndex: 'statusFK',
             title: 'Status',
+            width: 200,
             render: (text, row) => {
               const status = formStatus.find((o) => o.value === row.statusFK)
               return <span>{status ? status.name : ''}</span>
