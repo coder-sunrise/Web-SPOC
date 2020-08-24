@@ -17,7 +17,10 @@ const Summary = ({ invoiceDetail, classes, showGST = true }) => {
     <SizeContainer size='sm'>
       <React.Fragment>
         <GridContainer className={classes.summary} alignItems='flex-end'>
-          <GridItem md={9} />
+          {showGST && (
+            <GridItem md={9} />)
+          }
+          {showGST && (
           <GridItem md={3}>
             <FastField
               name='subTotal'
@@ -34,7 +37,8 @@ const Summary = ({ invoiceDetail, classes, showGST = true }) => {
                 />
               )}
             />
-          </GridItem>
+          </GridItem>)
+          }
           {showGST && (
             <GridItem md={9} />)
           }
@@ -71,7 +75,7 @@ const Summary = ({ invoiceDetail, classes, showGST = true }) => {
                   disabled
                   rightAlign
                   normalText
-                  prefix='Grand Total: '
+                  prefix='Final Credit: '
                   defaultValue='0'
                 />
               )}
