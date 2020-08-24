@@ -730,48 +730,40 @@ const PackageItemListing = ({
           padding: 5,
         }}
       >
-        <Authorized authority='inventorymaster.package.service'>
-          <PackageItemType
-            title='Service'
-            packageItemTypeProps={serviceProps}
-            schema={serviceSchema}
-            rows={serviceRows}
-            editingProps={serviceEditingProps}
-          />
-        </Authorized>
+        <PackageItemType
+          title='Service'
+          packageItemTypeProps={serviceProps}
+          schema={serviceSchema}
+          rows={serviceRows}
+          editingProps={serviceEditingProps}
+        />
 
-        <Authorized authority='inventorymaster.package.consumable'>
-          <PackageItemType
-            title='Consumable'
-            packageItemTypeProps={consumableProps}
-            schema={consumableSchema}
-            rows={consumableRows}
-            editingProps={consumableEditingProps}
-            style={{ marginTop: theme.spacing(2) }}
-          />
-        </Authorized>
+        <PackageItemType
+          title='Consumable'
+          packageItemTypeProps={consumableProps}
+          schema={consumableSchema}
+          rows={consumableRows}
+          editingProps={consumableEditingProps}
+          style={{ marginTop: theme.spacing(2) }}
+        />
 
-        <Authorized authority='inventorymaster.package.medication'>
-          <PackageItemType
-            title='Medication'
-            packageItemTypeProps={medicationProps}
-            schema={medicationSchema}
-            rows={medicationRows}
-            editingProps={medicationEditingProps}
-            style={{ marginTop: theme.spacing(2) }}
-          />
-        </Authorized>
+        <PackageItemType
+          title='Medication'
+          packageItemTypeProps={medicationProps}
+          schema={medicationSchema}
+          rows={medicationRows}
+          editingProps={medicationEditingProps}
+          style={{ marginTop: theme.spacing(2) }}
+        />
 
-        <Authorized authority='inventorymaster.package.vaccination'>
-          <PackageItemType
-            title='Vaccination'
-            packageItemTypeProps={vaccinationProps}
-            schema={vaccinationSchema}
-            rows={vaccinationRows}
-            editingProps={vaccinationEditingProps}
-            style={{ marginTop: theme.spacing(2) }}
-          />
-        </Authorized>
+        <PackageItemType
+          title='Vaccination'
+          packageItemTypeProps={vaccinationProps}
+          schema={vaccinationSchema}
+          rows={vaccinationRows}
+          editingProps={vaccinationEditingProps}
+          style={{ marginTop: theme.spacing(2) }}
+        />
       </GridContainer>
     </div>
   )

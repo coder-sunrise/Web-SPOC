@@ -87,7 +87,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
             >
               <FormattedMessage id='form.search' />
             </ProgressButton>
-            <Authorized authority='inventorymaster.newinventoryitem'>
+            <Authorized authority='inventorymaster.package'>
               <Button
                 variant='contained'
                 color='primary'

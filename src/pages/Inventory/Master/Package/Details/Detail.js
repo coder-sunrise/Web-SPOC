@@ -107,7 +107,7 @@ const Detail = ({ packageDetail, dispatch, setIsLoading }) => {
                     label={formatMessage({
                       id: 'inventory.master.package.durationUnit',
                     })}
-                    code='ctDurationUnit'
+                    code='ltDurationUnit'
                     {...args}
                   />
                 )

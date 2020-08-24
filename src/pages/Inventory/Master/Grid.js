@@ -21,10 +21,13 @@ class Grid extends React.Component {
     } = this.props
     const showDetail = (row, vmode) => () =>
       history.push(`/inventory/master/edit${namespace}?uid=${row.id}`)
+
+    let accessRightName = 'inventorymaster.inventoryitemdetails'
     const handleDoubleClick = (row) => {
-      const accessRight = Authorized.check(
-        'inventorymaster.inventoryitemdetails',
-      )
+      if (namespace === 'inventorypackage')
+        accessRightName = 'inventorymaster.package'
+
+      const accessRight = Authorized.check(accessRightName)
       if (disabled || accessRight.rights !== 'enable') {
         notification.error({
           message: 'Current user is not authorized to access',
@@ -44,7 +47,7 @@ class Grid extends React.Component {
                 namespace.slice(1)}`}
               placement='bottom'
             >
-              <Authorized authority='inventorymaster.inventoryitemdetails'>
+              <Authorized authority={accessRightName}>
                 <Fragment>
                   <Button
                     size='sm'
