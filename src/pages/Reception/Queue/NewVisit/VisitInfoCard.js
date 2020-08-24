@@ -47,7 +47,7 @@ const styles = (theme) => ({
 
 const VisitInfoCard = ({
   isReadOnly = false,
-  isVisitRemarksDisabled = false,
+  isVisitReadonlyAfterSigned = false,
   attachments,
   handleUpdateAttachments,
   existingQNo,
@@ -204,9 +204,7 @@ const VisitInfoCard = ({
         <GridItem xs md={4}>
           <Field
             name={FormField['visit.visitOrderTemplateFK']}
-            render={(args) => {
-              const { form } = args
-
+            render={(args) => {   
               return (
                 <Select
                   // disabled={isReadOnly}
@@ -215,6 +213,8 @@ const VisitInfoCard = ({
                     id: 'reception.queue.visitRegistration.visitOrderTemplate',
                   })}
                   {...args}
+                  authority='none'
+                  disabled={isVisitReadonlyAfterSigned}
                   onChange={(e, opts) =>
                     handleVisitOrderTemplateChange(visitType, opts)}
                 />
@@ -233,6 +233,7 @@ const VisitInfoCard = ({
                 <NumberInput
                   {...args}
                   currency
+                  authority='none'
                   disabled={readOnly}
                   label={formatMessage({
                     id:
@@ -253,7 +254,7 @@ const VisitInfoCard = ({
                 multiline
                 rowsMax={3}
                 authority='none'
-                disabled={isVisitRemarksDisabled}
+                disabled={isVisitReadonlyAfterSigned}
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.visitRemarks',
                 })}
