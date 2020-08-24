@@ -156,10 +156,10 @@ const VisitInfoCard = ({
                       id: 'reception.queue.visitRegistration.attendantDoctor',
                     })
                   ) : (
-                    formatMessage({
-                      id: 'reception.queue.visitRegistration.doctor',
-                    })
-                  )
+                      formatMessage({
+                        id: 'reception.queue.visitRegistration.doctor',
+                      })
+                    )
                 }
                 {...args}
               />
@@ -204,7 +204,7 @@ const VisitInfoCard = ({
         <GridItem xs md={4}>
           <Field
             name={FormField['visit.visitOrderTemplateFK']}
-            render={(args) => {   
+            render={(args) => {
               return (
                 <Select
                   // disabled={isReadOnly}
@@ -234,13 +234,12 @@ const VisitInfoCard = ({
                   {...args}
                   currency
                   authority='none'
-                  disabled={readOnly}
+                  disabled={readOnly || isVisitReadonlyAfterSigned}
                   label={formatMessage({
                     id:
                       'reception.queue.visitRegistration.visitOrderTotalCharge',
                   })}
-                />
-              )
+                />)
             }}
           />
         </GridItem>
