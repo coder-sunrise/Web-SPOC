@@ -99,8 +99,7 @@ export const getApplicableClaimAmount = (
       (_coPaymentItem) => _coPaymentItem.itemCode === invoicePayerItem.itemCode,
     )
     // TODO get coverage amount from specific item object
-    const itemRemainingAmount =
-      payableBalance - (invoicePayerItem._claimedAmount || 0)
+    const itemRemainingAmount = payableBalance
 
     if (specificItem.itemValueType.toLowerCase() === 'percentage')
       returnClaimAmount = itemRemainingAmount * (specificItem.itemValue / 100)
@@ -114,8 +113,7 @@ export const getApplicableClaimAmount = (
     const itemCategory = coPaymentByCategory.find(
       (category) => category.itemTypeFk === invoicePayerItem.invoiceItemTypeFK,
     )
-    const itemRemainingAmount =
-      payableBalance - (invoicePayerItem._claimedAmount || 0)
+    const itemRemainingAmount = payableBalance
     if (itemCategory.groupValueType.toLowerCase() === 'percentage') {
       returnClaimAmount =
         itemRemainingAmount * (itemCategory.itemGroupValue / 100)
@@ -126,8 +124,7 @@ export const getApplicableClaimAmount = (
           : itemCategory.itemGroupValue
     }
   } else {
-    const itemRemainingAmount =
-      payableBalance - (invoicePayerItem._claimedAmount || 0)
+    const itemRemainingAmount = payableBalance
     const copaymentValue =
       overAllCoPaymentValueType.toLowerCase() === 'percentage'
         ? itemRemainingAmount * (overAllCoPaymentValue / 100)
@@ -223,6 +220,8 @@ export const getInvoiceItemsWithClaimAmount = (
       remainingCoverageMaxCap,
       remainingClaimableAmount,
     )
+
+    console.log('_claimAmount', _claimAmount)
 
     if (existedItem)
       return [

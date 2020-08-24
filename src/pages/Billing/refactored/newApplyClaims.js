@@ -501,9 +501,8 @@ const ApplyClaims = ({
             ),
           ) -
           _.sumBy(
-            tempInvoicePayer[index].invoicePayment.filter(
-              (p) => !p.isCancelled,
-            ),
+            (tempInvoicePayer[index].invoicePayment || [])
+              .filter((p) => !p.isCancelled),
             'totalAmtPaid',
           ),
         isModified: true,
