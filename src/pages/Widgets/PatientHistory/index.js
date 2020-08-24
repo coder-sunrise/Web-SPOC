@@ -182,10 +182,25 @@ class PatientHistory extends Component {
       visitPurposeFK,
       timeIn,
       timeOut,
+      visitPurposeName,
+      coHistory = [],
     } = row
     const { patientID } = patientHistory
     const fromConsultation = location.pathname.includes('consultation')
     const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
+    const docotrName = userName
+      ? `${userTitle || ''} ${userName || ''}`
+      : undefined
+    let LastUpdateBy
+    if (coHistory.length > 0) {
+      LastUpdateBy = coHistory[0].userName
+        ? `${coHistory[0].userTitle || ''} ${coHistory[0].userName || ''}`
+        : undefined
+    } else {
+      LastUpdateBy = userName
+        ? `${userTitle || ''} ${userName || ''}`
+        : undefined
+    }
     return (
       <div
         style={{
@@ -233,15 +248,12 @@ class PatientHistory extends Component {
                 timeIn,
               ).format('HH:mm')} Time Out: ${timeOut
                 ? moment(timeOut).format('HH:mm')
-                : '-'}) - ${userTitle || ''} ${userName}`}
+                : '-'})${docotrName ? ` - ${docotrName}` : ''}`}
             </div>
-            {!isRetailVisit && (
-              <span>
-                Update Date:&nbsp;{moment(signOffDate).format(
-                  'DD MMM YYYY HH:mm a',
-                )}
-              </span>
-            )}
+            <span>
+              {`${visitPurposeName}, Last Update By: ${LastUpdateBy ||
+                ''} on ${moment(signOffDate).format('DD MMM YYYY HH:mm')}`}
+            </span>
           </div>
           <div
             style={{
@@ -369,62 +381,42 @@ class PatientHistory extends Component {
     })
 
     return (
-      <Tooltip
-        title={
-          <div>
-            <div>
-              Visit Date:&nbsp;{moment(history.visitDate).format(
-                'DD MMM YYYY HH:mm a',
-              )}
-            </div>
-            <div>
-              Update Date:&nbsp;{moment(history.signOffDate).format(
-                'DD MMM YYYY HH:mm a',
-              )}
-            </div>
-          </div>
-        }
+      <div
+        style={{
+          padding: 10,
+        }}
       >
-        <div
-          style={{
-            marginLeft: 8,
-            marginRight: 8,
-            marginTop: 3,
-            marginBottom: 3,
-          }}
-        >
-          {currentTagWidgets.length > 0 ? (
-            currentTagWidgets.map((o) => {
-              const Widget = o.component
-              return (
-                <div>
-                  <span
-                    style={{
-                      fontWeight: 500,
-                      color: 'darkBlue',
-                      fontSize: '0.85rem',
-                    }}
-                  >
-                    {o.name}
-                  </span>
-                  {Widget ? (
-                    <Widget
-                      current={current}
-                      visitDetails={visitDetails}
-                      {...this.props}
-                      setFieldValue={this.props.setFieldValue}
-                    />
-                  ) : (
-                    ''
-                  )}
-                </div>
-              )
-            })
-          ) : (
-            'No Data'
-          )}
-        </div>
-      </Tooltip>
+        {currentTagWidgets.length > 0 ? (
+          currentTagWidgets.map((o) => {
+            const Widget = o.component
+            return (
+              <div>
+                <span
+                  style={{
+                    fontWeight: 500,
+                    color: 'darkBlue',
+                    fontSize: '0.85rem',
+                  }}
+                >
+                  {o.name}
+                </span>
+                {Widget ? (
+                  <Widget
+                    current={current}
+                    visitDetails={visitDetails}
+                    {...this.props}
+                    setFieldValue={this.props.setFieldValue}
+                  />
+                ) : (
+                  ''
+                )}
+              </div>
+            )
+          })
+        ) : (
+          <div> No Data</div>
+        )}
+      </div>
     )
   }
 
@@ -500,7 +492,7 @@ class PatientHistory extends Component {
             >
               unfold_more
             </span>
-            <span style={{ position: 'relative', top: -5 }}>Epande All</span>
+            <span style={{ position: 'relative', top: -5 }}>Expand All</span>
           </span>
           <span
             style={{
