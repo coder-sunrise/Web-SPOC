@@ -117,7 +117,7 @@ const History = (props) => {
                     dropdownMatchSelectWidth={false}
                     // value={selected}
                     options={list
-                      .filter((o) => o.coHistory)
+                      .filter((o) => o.coHistory && o.coHistory.length > 0)
                       .map(
                         ({
                           id,
@@ -134,10 +134,10 @@ const History = (props) => {
                       )}
                     onChange={(v, op) => {
                       const item = list.find((o) => o.id === v)
-                      if (item && item.coHistory) {
+                      if (item && item.coHistory && item.coHistory.length > 0) {
                         dispatch({
                           type: 'patientHistory/queryOne',
-                          payload: item.coHistory.id,
+                          payload: item.coHistory[0].id,
                         }).then(({ dentalChart = [] }) => {
                           if (dentalChart[0] && dentalChart[0].dentalChart) {
                             const d = {

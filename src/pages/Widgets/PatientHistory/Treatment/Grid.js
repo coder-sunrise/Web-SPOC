@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { Table } from 'antd'
 import Tooth from '@/pages/Widgets/DentalChart/Tooth'
-import tablestyles from '../TableStyle.less'
+import tablestyles from '../PatientHistoryStyle.less'
 
 export default ({ current, codetable, dentalChartComponent }) => {
   const { data } = dentalChartComponent

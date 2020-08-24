@@ -200,7 +200,7 @@ const RefractionForm = ({ current, theme, visitDetails }) => {
               <Button
                 color='primary'
                 icon={null}
-                authority='none'
+                size='sm'
                 style={{ margin: theme.spacing(1) }}
                 disabled={isDisabledPrint()}
                 onClick={() => {
