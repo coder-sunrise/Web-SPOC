@@ -121,7 +121,7 @@ class Details extends PureComponent {
       payload: {
         reportTypeID: 15,
         reportParameters: {
-          InvoiceId: row.id,
+          InvoiceId: row.invoiceFK,
           CopayerId: entity.copayerFK,
           isSaved: true,
         },
