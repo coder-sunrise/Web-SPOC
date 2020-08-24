@@ -5,10 +5,9 @@ import Yup from '@/utils/yup'
 import { GridContainer, GridItem, NumberInput } from '@/components'
 import { podoOrderType, inventoryItemListing } from '@/utils/codes'
 import { getServices } from '@/utils/codetable'
-import Authorized from '@/utils/Authorized'
 import PackageItemType from './PackageItemType'
 import { ITEM_TYPE } from '@/utils/constants'
-import { roundTo } from '@/utils/utils'
+import { roundTo, maxReducer } from '@/utils/utils'
 
 const styles = (theme) => ({
   displayDiv: {
@@ -254,9 +253,39 @@ const PackageItemListing = ({
     row.unitPrice = sellingPrice || 0
     row.subTotal = row.quantity * row.unitPrice
     row.defaultConsumeQuantity = 0
-    row.inventoryItemCode = option.code
-    row.inventoryItemName = option.name
     row.isActive = option.isActive
+  }
+
+  const getNextSequence = (type) => {
+    let list
+    switch (type) {
+      case 'medicationPackageItem': {
+        list = medicationRows.filter((m) => !m.isDeleted)
+        break
+      }
+      case 'consumablePackageItem': {
+        list = consumableRows.filter((c) => !c.isDeleted)
+        break
+      }
+      case 'vaccinationPackageItem': {
+        list = vaccinationRows.filter((v) => !v.isDeleted)
+        break
+      }
+      case 'servicePackageItem': {
+        list = serviceRows.filter((s) => !s.isDeleted)
+        break
+      }
+      default: {
+        break
+      }
+    }
+
+    let nextSequence = 1
+    if (list && list.length > 0) {
+      nextSequence = list.map((o) => o.sequence).reduce(maxReducer, 0) + 1
+    }
+
+    return nextSequence
   }
 
   const onCommitChanges = (type) => ({ rows, deleted, added, changed }) => {
@@ -293,6 +322,7 @@ const PackageItemListing = ({
         }
       }
     } else if (added) {
+      rows[0].sequence = getNextSequence(type)
       switch (type) {
         case 'medicationPackageItem': {
           rows[0].inventoryItemTypeFK = ITEM_TYPE.MEDICATION
