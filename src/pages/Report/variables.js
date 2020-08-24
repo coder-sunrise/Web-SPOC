@@ -12,6 +12,12 @@ export const menuData = [
     authority: 'report.finance.patientlisting',
   },
   {
+    title: 'Admin',
+    text: 'Visit Listing Report',
+    url: '/report/visitlistingreport',
+    authority: 'report.admin.visitlistingreport',
+  },
+  {
     title: 'Finance',
     text: 'Payment Collection Report',
     url: '/report/paymentcollection',
@@ -70,6 +76,24 @@ export const menuData = [
     text: 'CHAS Claim Report',
     url: '/report/chasclaimreport',
     authority: 'report.finance.chasclaim',
+  },
+  {
+    title: 'Finance',
+    text: 'Invoice Listing Report',
+    url: '/report/invoicelistingreport',
+    authority: 'report.finance.invoicelisting',
+  },
+  {
+    title: 'Finance',
+    text: 'Statement Summary Report',
+    url: '/report/statementsummaryreport',
+    authority: 'report.finance.statementsummaryreport',
+  },
+  {
+    title: 'Finance',
+    text: 'Payment Collection Report (Summary)',
+    url: '/report/paymentcollectionsummary',
+    authority: 'report.finance.paymentcollectionsummary',
   },
   {
     title: 'Inventory',

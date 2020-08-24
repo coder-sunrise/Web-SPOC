@@ -12,6 +12,7 @@ import {
   CustomInput,
 } from '@/components'
 import config from '@/utils/config'
+import PatientDeposit from './PatientDeposit'
 import Modal from './Modal'
 
 const { currencyFormat, currencySymbol } = config
@@ -19,6 +20,7 @@ const { currencyFormat, currencySymbol } = config
 class Grid extends PureComponent {
   state = {
     showDepositRefundModal: false,
+    showPatientDeposit: false,
   }
 
   tableParas = {
@@ -163,12 +165,35 @@ class Grid extends PureComponent {
     }))
   }
 
+  togglePatientDepositModal = () => {
+    this.setState((prevState) => ({
+      showPatientDeposit: !prevState.showPatientDeposit,
+    }))
+  }
+
+  rowDoubleClick = (row) => {
+    const { dispatch } = this.props
+    const { patientProfileFK } = row
+    dispatch({
+      type: 'patient/query',
+      payload: {
+        id: patientProfileFK,
+      },
+    }).then(() => {
+      this.togglePatientDepositModal()
+    })
+  }
+
   render () {
-    const { isDeposit, showDepositRefundModal } = this.state
+    const { isDeposit, showDepositRefundModal, showPatientDeposit } = this.state
     return (
       <Authorized authority='finance/deposit'>
         <React.Fragment>
-          <CommonTableGrid type='deposit' {...this.tableParas} />
+          <CommonTableGrid
+            type='deposit'
+            onRowDoubleClick={this.rowDoubleClick}
+            {...this.tableParas}
+          />
           <CommonModal
             open={showDepositRefundModal}
             title={isDeposit ? 'Deposit' : 'Refund'}
@@ -178,8 +203,22 @@ class Grid extends PureComponent {
             observe='Deposit'
             showFooter={false}
             bodyNoPadding
+            keepMounted={false}
           >
             <Modal isDeposit={isDeposit} />
+          </CommonModal>
+          <CommonModal
+            open={showPatientDeposit}
+            title='Patient Deposit'
+            onClose={this.togglePatientDepositModal}
+            onConfirm={this.togglePatientDepositModal}
+            showFooter={false}
+            bodyNoPadding
+            keepMounted={false}
+          >
+            <div style={{ margin: 10 }}>
+              <PatientDeposit />
+            </div>
           </CommonModal>
         </React.Fragment>
       </Authorized>

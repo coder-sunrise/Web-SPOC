@@ -19,7 +19,7 @@ import config from '@/utils/config'
 
 const { qtyFormat } = config
 
-@connect(({ global, codetable }) => ({ global, codetable }))
+@connect(({ global, codetable, user }) => ({ global, codetable, user }))
 @withFormikExtend({
   authority: [
     'queue.consultation.order.orderset',
@@ -35,8 +35,8 @@ const { qtyFormat } = config
   validationSchema: Yup.object().shape({
     inventoryOrderSetFK: Yup.number().required(),
   }),
-  handleSubmit: (values, { props, onConfirm }) => {
-    const { dispatch, orders, codetable, getNextSequence } = props
+  handleSubmit: (values, { props, onConfirm, setValues }) => {
+    const { dispatch, orders, codetable, getNextSequence, user } = props
     const { rows } = orders
     const {
       ctmedicationusage,
@@ -321,6 +321,8 @@ const { qtyFormat } = config
       const newOrder = getOrderFromOrderSet(orderSetCode, orderSetItems[index])
       if (newOrder) {
         const data = {
+          isOrderedByDoctor:
+            user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
           sequence: nextSequence,
           ...newOrder,
           subject: orderSetItems[index].name,
@@ -336,6 +338,10 @@ const { qtyFormat } = config
       payload: datas,
     })
     if (onConfirm) onConfirm()
+    setValues({
+      ...orders.defaultOrderSet,
+      type: orders.type,
+    })
   },
   displayName: 'OrderPage',
 })
@@ -512,6 +518,17 @@ class OrderSet extends PureComponent {
     }
   }
 
+  validateAndSubmitIfOk = async () => {
+    const { handleSubmit, validateForm } = this.props
+    const validateResult = await validateForm()
+    const isFormValid = _.isEmpty(validateResult)
+    if (isFormValid) {
+      handleSubmit()
+      return true
+    }
+    return false
+  }
+
   render () {
     const { theme, values, footer, handleSubmit } = this.props
     return (
@@ -522,14 +539,16 @@ class OrderSet extends PureComponent {
               name='inventoryOrderSetFK'
               render={(args) => {
                 return (
-                  <CodeSelect
-                    temp
-                    label='Order Set Name'
-                    code='inventoryorderset'
-                    labelField='displayValue'
-                    onChange={this.changeOrderSet}
-                    {...args}
-                  />
+                  <div id={`autofocus_${values.type}`}>
+                    <CodeSelect
+                      temp
+                      label='Order Set Name'
+                      code='inventoryorderset'
+                      labelField='displayValue'
+                      onChange={this.changeOrderSet}
+                      {...args}
+                    />
+                  </div>
                 )
               }}
             />
@@ -545,7 +564,7 @@ class OrderSet extends PureComponent {
           </GridItem>
         </GridContainer>
         {footer({
-          onSave: handleSubmit,
+          onSave: this.validateAndSubmitIfOk,
           onReset: this.handleReset,
           showAdjustment: false,
         })}

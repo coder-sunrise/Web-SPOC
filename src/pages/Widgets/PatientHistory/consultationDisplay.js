@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core'
 import { Tabs } from '@/components'
 import { PATIENT_HISTORY_TABS } from '@/utils/constants'
 import PatientNurseNotes from '@/pages/Widgets/PatientNurseNotes'
+import DispenseHistory from '@/pages/Widgets/DispenseHistory'
 import Authorized from '@/utils/Authorized'
 import PatientHistory from './index'
 
@@ -45,6 +46,11 @@ class HistoryDisplayForConsultation extends PureComponent {
         id: PATIENT_HISTORY_TABS.VISIT,
         name: 'Visit',
         content: <PatientHistory mode='integrated' {...this.props} />,
+      },
+      {
+        id: PATIENT_HISTORY_TABS.DISPENSE,
+        name: 'Dispense',
+        content: <DispenseHistory mode='integrated' {...this.props} />,
       },
       {
         id: PATIENT_HISTORY_TABS.NURSENOTES,

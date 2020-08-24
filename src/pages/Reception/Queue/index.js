@@ -12,6 +12,7 @@ import classNames from 'classnames'
 import { Divider, withStyles } from '@material-ui/core'
 import Refresh from '@material-ui/icons/Refresh'
 import Stop from '@material-ui/icons/Stop'
+import EventNote from '@material-ui/icons/EventNote'
 
 // custom components
 import {
@@ -32,8 +33,15 @@ import { SendNotification } from '@/utils/notification'
 import Authorized from '@/utils/Authorized'
 import { QueueDashboardButton } from '@/components/_medisys'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
-import { FORM_CATEGORY, VALUE_KEYS, VISIT_TYPE } from '@/utils/constants'
+import {
+  FORM_CATEGORY,
+  VALUE_KEYS,
+  VISIT_TYPE,
+  NOTIFICATION_TYPE,
+  NOTIFICATION_STATUS,
+} from '@/utils/constants'
 import { initRoomAssignment } from '@/utils/codes'
+import { sendNotification } from '@/utils/realtime'
 import {
   modelKey,
   AppointmentContextMenu,
@@ -342,46 +350,49 @@ class Queue extends React.Component {
     })
   }
 
+  onSessionSummaryClick = () => {
+    const { queueLog } = this.props
+    const _sessionInfoID = queueLog.sessionInfo.id
+    this.setState({ _sessionInfoID })
+    this.setState({
+      showEndSessionSummary: true,
+    })
+  }
+
   onConfirmEndSession = () => {
-    const { queueLog, dispatch, queueCalling } = this.props
+    const { queueLog, dispatch } = this.props
     const _sessionInfoID = queueLog.sessionInfo.id
     this.setState({ _sessionInfoID })
     dispatch({
       type: `queueLog/endSession`,
       sessionID: queueLog.sessionInfo.id,
     }).then(async (response) => {
-      const { status } = response
       if (response) {
-        dispatch({
-          type: 'queueCalling/getExistingQueueCallList',
-          payload: {
-            keys: VALUE_KEYS.QUEUECALLING,
-          },
-        }).then((res) => {
-          const { value, ...restRespValues } = res
-          dispatch({
-            type: 'queueCalling/upsertQueueCallList',
-            payload: {
-              ...restRespValues,
-              key: VALUE_KEYS.QUEUECALLING,
-              value: '[]',
-            },
-          })
+        this.clearQueueCall()
+        this.setState({
+          showEndSessionSummary: true,
         })
-
-        this.setState(
-          {
-            showEndSessionSummary: true,
-          },
-          () => {
-            // dispatch({
-            //   type: 'queueLog/updateState',
-            //   payload: ,
-            // })
-          },
-        )
       }
     })
+  }
+
+  clearQueueCall = () => {
+    this.props
+      .dispatch({
+        type: 'queueCalling/claearAll',
+        payload: {
+          key: VALUE_KEYS.QUEUECALLING,
+        },
+      })
+      .then((res) => {
+        if (res) {
+          sendNotification('QueueCalled', {
+            type: NOTIFICATION_TYPE.QUEUECALL,
+            status: NOTIFICATION_STATUS.OK,
+            message: 'Queue Called',
+          })
+        }
+      })
   }
 
   onEndSessionSummaryClose = () => {
@@ -594,7 +605,7 @@ class Queue extends React.Component {
           }).then((o) => {
             if (o)
               router.push(
-                `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
+                `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
               )
           })
         }
@@ -616,12 +627,12 @@ class Queue extends React.Component {
             }).then((o) => {
               if (o)
                 router.push(
-                  `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
+                  `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
                 )
             })
           } else {
             router.push(
-              `/reception/queue/consultation?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}`,
+              `/reception/queue/consultation?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&pid=${row.patientProfileFK}&v=${version}`,
             )
           }
         }
@@ -663,7 +674,7 @@ class Queue extends React.Component {
                         },
                       }).then((c) => {
                         router.push(
-                          `/reception/queue/consultation?qid=${row.id}&cid=${c.id}&v=${version}`,
+                          `/reception/queue/consultation?qid=${row.id}&cid=${c.id}&pid=${row.patientProfileFK}&v=${version}`,
                         )
                       })
                     },
@@ -671,7 +682,7 @@ class Queue extends React.Component {
                 })
               } else {
                 router.push(
-                  `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
+                  `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
                 )
               }
           })
@@ -771,14 +782,7 @@ class Queue extends React.Component {
   }
 
   showVisitForms = async (row) => {
-    const {
-      id,
-      visitStatus,
-      doctor,
-      patientAccountNo,
-      patientName,
-      patientReferenceNo,
-    } = row
+    const { id, visitStatus, doctor, patientAccountNo, patientName } = row
     await this.props.dispatch({
       type: 'formListing/updateState',
       payload: {
@@ -787,7 +791,6 @@ class Queue extends React.Component {
           visitID: id,
           doctorProfileFK: doctor ? doctor.id : 0,
           patientName,
-          patientNRICNo: patientReferenceNo,
           patientAccountNo,
         },
       },
@@ -850,17 +853,27 @@ class Queue extends React.Component {
                     {lastCall.qNo.includes('.') ? (
                       lastCall.qNo
                     ) : (
-                      `${lastCall.qNo}.0`
-                    )}
+                        `${lastCall.qNo}.0`
+                      )}
                   </font>
                 </h4>
               ) : (
-                ''
-              )}
+                  ''
+                )}
             </Authorized>
 
             {!isClinicSessionClosed && (
               <div className={classNames(classes.toolBtns)}>
+                <Authorized authority='queue.endsession'>
+                  <ProgressButton
+                    icon={<EventNote />}
+                    color='info'
+                    size='sm'
+                    onClick={this.onSessionSummaryClick}
+                  >
+                    <FormattedMessage id='reception.queue.sessionSummary' />
+                  </ProgressButton>
+                </Authorized>
                 <QueueDashboardButton size='sm' />
                 <ProgressButton
                   color='info'
@@ -897,35 +910,35 @@ class Queue extends React.Component {
                 errorState={error}
               />
             ) : (
-              <div>
-                <DetailsActionBar
-                  // selfOnly={queueLog.selfOnly}
-                  // onSwitchClick={this.toggleFilterSelfOnly}
-                  onRegisterVisitEnterPressed={this.onEnterPressed}
-                  toggleNewPatient={this.toggleRegisterNewPatient}
-                  setSearch={this.setSearch}
-                />
-                <DetailsGrid
-                  // onViewPatientProfileClick={this.onViewPatientProfileClick}
-                  // onViewDispenseClick={this.toggleDispense}
-                  // onRegisterPatientClick={this.toggleRegisterNewPatient}
-                  // handleEditVisitClick={this.showVisitRegistration}
-                  // handleActualizeAppointment={this.handleActualizeAppointment}
-                  onMenuItemClick={this.onMenuItemClick}
-                  onContextMenu={this.onContextMenu}
-                  // handleFormsClick={this.showVisitForms}
-                  history={history}
-                  searchQuery={search}
-                />
-                <RightClickContextMenu
-                  onMenuItemClick={this.onMenuItemClick}
-                  onOutsidePopoverRightClick={this.onHideContextMenu}
-                  anchorEl={this.state.anchorEl}
-                  rightClickedRow={this.state.rightClickedRow}
-                  dispatch={dispatch}
-                />
-              </div>
-            )}
+                <div>
+                  <DetailsActionBar
+                    // selfOnly={queueLog.selfOnly}
+                    // onSwitchClick={this.toggleFilterSelfOnly}
+                    onRegisterVisitEnterPressed={this.onEnterPressed}
+                    toggleNewPatient={this.toggleRegisterNewPatient}
+                    setSearch={this.setSearch}
+                  />
+                  <DetailsGrid
+                    // onViewPatientProfileClick={this.onViewPatientProfileClick}
+                    // onViewDispenseClick={this.toggleDispense}
+                    // onRegisterPatientClick={this.toggleRegisterNewPatient}
+                    // handleEditVisitClick={this.showVisitRegistration}
+                    // handleActualizeAppointment={this.handleActualizeAppointment}
+                    onMenuItemClick={this.onMenuItemClick}
+                    onContextMenu={this.onContextMenu}
+                    // handleFormsClick={this.showVisitForms}
+                    history={history}
+                    searchQuery={search}
+                  />
+                  <RightClickContextMenu
+                    onMenuItemClick={this.onMenuItemClick}
+                    onOutsidePopoverRightClick={this.onHideContextMenu}
+                    anchorEl={this.state.anchorEl}
+                    rightClickedRow={this.state.rightClickedRow}
+                    dispatch={dispatch}
+                  />
+                </div>
+              )}
             <CommonModal
               open={showPatientSearch}
               title={formatMessage({ id: 'reception.queue.patientSearch' })}
@@ -955,8 +968,8 @@ class Queue extends React.Component {
                 this.state.formCategory === FORM_CATEGORY.VisitForms ? (
                   'Visit Forms'
                 ) : (
-                  'Forms'
-                )
+                    'Forms'
+                  )
               }
               onClose={this.toggleForms}
               onConfirm={this.toggleForms}

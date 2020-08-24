@@ -1,3 +1,4 @@
+import { Tools } from '@/components'
 import FabricCanvasTool from './fabrictool'
 
 const { fabric } = require('fabric')
@@ -14,6 +15,10 @@ class Rectangle extends FabricCanvasTool {
     this._width = props.lineWidth
     this._color = props.lineColor
     this._fill = props.fillColor
+  }
+
+  getToolName () {
+    return Tools.Rectangle
   }
 
   doMouseDown (o) {

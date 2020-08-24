@@ -184,7 +184,8 @@ const WebSocketWrapper = ({
     if (withoutPrintPreview.includes(type)) {
       let printResult = await getPrintResult(type, row, printAllDrugLabel)
       if (printData && printData.length > 0)
-        printResult = printResult && printResult.concat(printData)
+        printResult = (printResult || []).concat(printData)
+
       if (!printResult || printResult.length <= 0) return
       await handlePrint(JSON.stringify(printResult))
     } else {
@@ -214,9 +215,9 @@ const WebSocketWrapper = ({
     }
   }
 
-  const handleFinalize = async () => {
+  const handleFinalize = async (voidPayment = false, voidReason = '') => {
     const { onFinalizeClick } = restProps
-    const finalized = await onFinalizeClick()
+    const finalized = await onFinalizeClick(voidPayment, voidReason)
     if (finalized) {
       let settings = JSON.parse(localStorage.getItem('clinicSettings'))
       const { autoPrintDrugLabelOnFinalize = false } = settings

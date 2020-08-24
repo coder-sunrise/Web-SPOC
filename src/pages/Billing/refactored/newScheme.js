@@ -97,6 +97,8 @@ const Scheme = ({
   onPrinterClick,
   onAddPaymentClick,
   fromBilling,
+  invoice,
+  clinicSettings = {},
 }) => {
   const {
     name,
@@ -117,6 +119,16 @@ const Scheme = ({
     payerOutstanding,
     invoicePayment = [],
   } = invoicePayer
+
+  const { invoiceItems = [] } = invoice
+  let existingOldPayerItem
+  if (
+    invoicePayerItem.find(
+      (ipi) => !invoiceItems.find((ii) => ii.id === ipi.invoiceItemFK),
+    )
+  ) {
+    existingOldPayerItem = true
+  }
 
   const handleSchemeChange = (value) => onSchemeChange(value, index)
   const handleCancelClick = () => onCancelClick(index)
@@ -184,6 +196,7 @@ const Scheme = ({
   const onPaymentDeleteClick = (payment) => {
     onPaymentVoidClick(index, payment)
   }
+  const { isEnableAddPaymentInBilling = false } = clinicSettings
   return (
     <Paper key={_key} elevation={4} className={classes.gridRow}>
       <GridContainer style={{ marginBottom: 16 }} alignItems='flex-start'>
@@ -338,13 +351,14 @@ const Scheme = ({
               color='primary'
               className={classes.rightEndBtn}
               onClick={handleEditClick}
-              disabled={disableEdit}
+              disabled={disableEdit || existingOldPayerItem}
             >
               Edit
             </Button>
           )}
         </GridItem>
-        {fromBilling && (
+        {fromBilling &&
+        isEnableAddPaymentInBilling && (
           <GridContainer>
             <GridItem md={12}>
               <CardContainer hideHeader size='sm'>
@@ -356,6 +370,7 @@ const Scheme = ({
                       handleVoidClick={onPaymentDeleteClick}
                       handlePrinterClick={onPrinterClick}
                       readOnly={shoulddisable()}
+                      printDisabled={existingOldPayerItem}
                     />
                   ))}
               </CardContainer>
@@ -364,7 +379,7 @@ const Scheme = ({
               <div>
                 <Button
                   {...ButtonProps}
-                  disabled={shoulddisable()}
+                  disabled={shoulddisable() || existingOldPayerItem}
                   onClick={() => onAddPaymentClick(index)}
                 >
                   <Add />
@@ -372,7 +387,7 @@ const Scheme = ({
                 </Button>
                 <Button
                   {...ButtonProps}
-                  disabled={shoulddisable()}
+                  disabled={shoulddisable() || existingOldPayerItem}
                   onClick={() =>
                     onPrinterClick('TaxInvoice', undefined, companyFK)}
                 >

@@ -62,9 +62,9 @@ export default {
     'process.env.client_env': 'uat',
     'process.env.client_secret':
       '20e392d2ea9bfa76f2a9cb26c31a34d675ad81281a31f89ed5d572de8da0b9e7',
-    'process.env.url': 'https://semr2uat2010.emr.com.sg',
+    'process.env.url': 'https://medicloud-uat-api-200729.semr2.com',
     'process.env.signalrUrl':
-      'https://semr2uat2010-websocket.emr.com.sg/notificationHub',
+      'https://medicloud-uat-websocket-200729.semr2.com/notificationHub',
   },
   // 路由配置
   routes: pageRoutes,
@@ -88,7 +88,7 @@ export default {
     'zindex-tooltip': 2060,
   },
   externals: {
-    '@antv/data-set': 'DataSet',
+    // '@antv/data-set': 'DataSet',
   },
   proxy: {
     '/api/': {

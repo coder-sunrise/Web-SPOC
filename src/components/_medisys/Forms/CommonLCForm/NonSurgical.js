@@ -4,7 +4,12 @@ import { gstChargedTypes, surgicalRoles } from '@/utils/codes'
 import { GridContainer, GridItem, EditableTableGrid } from '@/components'
 import { DoctorLabel } from '@/components/_medisys'
 
-const NonSurgical = ({ setFieldValue, values, nonSurgicalChargesSchema }) => {
+const NonSurgical = ({
+  setFieldValue,
+  values,
+  nonSurgicalChargesSchema,
+  dispatch,
+}) => {
   let isContainsNonPrincipalSurgeon = false
 
   const commitChanges = ({ rows, added, deleted }) => {
@@ -27,8 +32,22 @@ const NonSurgical = ({ setFieldValue, values, nonSurgicalChargesSchema }) => {
     }
     for (let index = 0; index < rows.length; index++) {
       rows[index].sortOrder = index
+      if (
+        !rows[index].inpatientAttendanceFees ||
+        rows[index].inpatientAttendanceFees < 0
+      ) {
+        rows[index].inpatientAttendanceFees = 0
+      }
+      if (!rows[index].otherFees || rows[index].otherFees < 0) {
+        rows[index].otherFees = 0
+      }
+      rows[index].totalSurgicalFees =
+        rows[index].inpatientAttendanceFees + rows[index].otherFees
     }
     setFieldValue('formData.nonSurgicalCharges', rows)
+    dispatch({
+      type: 'global/incrementCommitCount',
+    })
   }
 
   const onAddedRowsChange = (addedRows) => {
@@ -67,7 +86,7 @@ const NonSurgical = ({ setFieldValue, values, nonSurgicalChargesSchema }) => {
         title: (
           <div>
             <div>Total Fees</div>
-            <div style={{ fontSize: '0.4rem', fontStyle: 'italic' }}>
+            <div style={{ fontSize: '0.8rem', fontStyle: 'italic' }}>
               (including GST if applicable)
             </div>
           </div>
@@ -138,6 +157,7 @@ const NonSurgical = ({ setFieldValue, values, nonSurgicalChargesSchema }) => {
         isDisabled: (row) => row.surgicalRoleFK === 1,
         onChange: ({ val, option, row }) => {
           if (val && val === 1) {
+            document.activeElement.blur()
             row.surgicalSurgeonFK = values.formData.principalSurgeonFK
             row.surgicalSurgeonMCRNo = values.formData.principalSurgeonMCRNo
             row.surgicalSurgeonName = values.formData.principalSurgeonName
@@ -149,19 +169,14 @@ const NonSurgical = ({ setFieldValue, values, nonSurgicalChargesSchema }) => {
         columnName: 'inpatientAttendanceFees',
         type: 'currency',
         sortingEnabled: false,
-        onChange: ({ value, row }) => {
-          row.totalSurgicalFees = (value || 0) + (row.otherFees || 0)
-        },
         width: 190,
+        min: 0,
       },
       {
         columnName: 'otherFees',
         type: 'currency',
         sortingEnabled: false,
-        onChange: ({ value, row }) => {
-          row.totalSurgicalFees =
-            (value || 0) + (row.inpatientAttendanceFees || 0)
-        },
+        min: 0,
       },
       {
         columnName: 'totalSurgicalFees',

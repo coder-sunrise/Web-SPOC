@@ -1,25 +1,38 @@
-import React from 'react'
+import React, { useRef } from 'react'
 // common component
-import { notification } from '@/components'
+import { notification, CommonModal, Primary } from '@/components'
+import { CircularProgress } from '@material-ui/core'
+import moment from 'moment'
 // services
 import { getPDF } from '@/services/report'
 // utils
 import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
 import { AESEncryptor } from '@/utils/aesEncryptor'
+import { getUniqueGUID } from '@/utils/utils'
+import Scanner from './scanner/index'
 
 const defaultSocketPortsState = [
   7182,
   7183,
   7184,
 ]
+const WebSocketMessageType = {
+  Print: 1,
+  Scan: 2,
+  ScanCompleted: 3,
+}
 
 const withWebSocket = () => (Component) => {
   class WebSocketBase extends React.Component {
-    constructor(props) {
+    constructor (props) {
       super(props)
       this.state = {
         pendingJob: [],
+        scanResults: [],
         isWsConnected: false,
+        loading: false,
+        loadingText: 'Scanning...',
+        showScanner: false,
       }
       // this.isWsConnected = false
       this.wsConnection = null
@@ -35,28 +48,23 @@ const withWebSocket = () => (Component) => {
     prepareJobForWebSocket = async (content) => {
       // reset port number state to retry all attempt and set job content
       // then initialize web socket connection
-      this.setState({
-        pendingJob: [
-          content,
-        ],
-      })
-      const { isWsConnected } = this.state
+      const pendingJob = [
+        content,
+      ]
+      let sendSuccess = false
+      this.setState({ pendingJob })
 
-      if (isWsConnected === true) {
-        this.sendJobToWebSocket()
+      const { isWsConnected } = this.state
+      if (isWsConnected === true || (await this.tryConnectSocket())) {
+        this.wsConnection.send(content)
+        sendSuccess = true
       } else {
-        const connected = await this.tryConnectSocket()
-        if (connected === true) {
-          await this.sendJobToWebSocket()
-        } else {
-          notification.error({
-            message: `Medicloud printing tool is not running, please start it.`,
-          })
-          this.setState({
-            pendingJob: [],
-          })
-        }
+        notification.error({
+          message: `Medicloud printing tool is not running, please start it.`,
+        })
       }
+      this.setState({ pendingJob: [] })
+      return sendSuccess
     }
 
     tryConnectSocket = async () => {
@@ -80,6 +88,7 @@ const withWebSocket = () => (Component) => {
               isWsConnected: true,
             })
           }
+          this.wsConnection.onmessage = this.onReceivedMessage
           connected = await this.connectionAsync(this.wsConnection)
           if (connected) {
             break
@@ -89,29 +98,95 @@ const withWebSocket = () => (Component) => {
       return connected
     }
 
-    sendJobToWebSocket = async () => {
-      const { pendingJob } = this.state
-
-      if (
-        this.wsConnection &&
-        this.wsConnection.readyState === 1 &&
-        pendingJob.length === 1
-      ) {
-        this.wsConnection.send(pendingJob[0])
-        notification.success({
-          message: `Job sent to the printer.`,
-        })
+    handlePrint = async (content) => {
+      if (content) {
+        const result = await this.prepareJobForWebSocket(
+          AESEncryptor.encrypt(
+            JSON.stringify({
+              messageType: WebSocketMessageType.Print,
+              message: content,
+            }),
+          ),
+        )
+        if (result)
+          notification.success({
+            message: `Job sent to the printer.`,
+          })
+        return result
       }
-      this.setState({
-        pendingJob: [],
-      })
+      return false
     }
 
-    handlePrint = async (content) => {
-      console.log(`handlePrint: ${content}`)
-      if (content) {
-        await this.prepareJobForWebSocket(AESEncryptor.encrypt(content))
+    onReceivedMessage = (message) => {
+      if (message && message.data) {
+        const { data } = message
+        const returnMessage = JSON.parse(data)
+        const { MessageType, Status, Data } = returnMessage
+        console.log(returnMessage)
+
+        if (MessageType === WebSocketMessageType.Scan) {
+          const { Image, FileExtension } = Data
+
+          this.setState((preState) => ({
+            scanResults: [
+              ...preState.scanResults,
+              {
+                uid: getUniqueGUID(),
+                image: Image,
+                name: moment().format('YYYYMMDD_HHmmss'),
+                fileExtension: FileExtension,
+              },
+            ],
+          }))
+        } else if (MessageType === WebSocketMessageType.ScanCompleted) {
+          this.setState({ loading: false })
+          if (Status !== 'Success') {
+            notification.error({
+              message: Data,
+            })
+          }
+        }
       }
+    }
+
+    handleScaning = async (params) => {
+      // console.log('handleScaning', params)
+      let jsonStr = JSON.stringify({
+        MessageType: WebSocketMessageType.Scan,
+        Message: JSON.stringify(params),
+      })
+      const result = await this.prepareJobForWebSocket(
+        AESEncryptor.encrypt(jsonStr),
+      )
+      if (result) this.setState({ loading: true })
+    }
+
+    handleDeleteItem = (uid) => {
+      const { scanResults = [] } = this.state
+      scanResults.forEach((o, index) => {
+        if (o.uid === uid) scanResults.splice(index, 1)
+      })
+
+      this.setState({ scanResults })
+    }
+
+    handleUpdateName = (row) => {
+      const { uid, name } = row
+      this.setState((prevState) => ({
+        scanResults: prevState.scanResults.map((m) => {
+          if (m.uid === uid) {
+            return { ...m, name }
+          }
+          return m
+        }),
+      }))
+    }
+
+    handleUploading = (imgDatas) => {
+      // console.log(this._CompRef)
+      if (this._CompRef && this._CompRef.onUploadFromScan)
+        this._CompRef.onUploadFromScan(imgDatas)
+      this.toggleModal()
     }
 
     connectionAsync = async (socket, timeout = 1000) => {
@@ -131,15 +206,92 @@ const withWebSocket = () => (Component) => {
       return isOpened()
     }
 
-    render () {
-      const { pendingJob = [] } = this.state
+    toggleModal = () => {
+      this.setState((preState) => ({
+        showScanner: !preState.showScanner,
+        loading: false,
+        scanResults: [],
+      }))
+    }
 
+    render () {
+      const {
+        pendingJob = [],
+        scanResults = [],
+        loading,
+        loadingText,
+      } = this.state
+      const { disableScanner } = this.props
+      // console.log(disableScanner)
       return (
-        <Component
-          {...this.props}
-          handlePrint={this.handlePrint}
-          sendingJob={pendingJob.length > 0}
-        />
+        <React.Fragment>
+          <Component
+            {...this.props}
+            handlePrint={this.handlePrint}
+            handleOpenScanner={this.toggleModal}
+            sendingJob={pendingJob.length > 0}
+            onRef={(child) => {
+              this._CompRef = child
+            }}
+          />
+          {disableScanner !== true && (
+            <CommonModal
+              open={this.state.showScanner}
+              onClose={this.toggleModal}
+              title='Scan'
+              maxWidth='lg'
+              minHeight={500}
+              bodyNoPadding
+              keepMounted={false}
+            >
+              <div
+                style={{
+                  position: 'relative',
+                  marginTop: -10,
+                  marginBottom: 10,
+                }}
+              >
+                <div
+                  style={
+                    loading ? (
+                      {
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        zIndex: 1200,
+                        '& h4': {
+                          fontWeight: 500,
+                        },
+                      }
+                    ) : (
+                      { display: 'none' }
+                    )
+                  }
+                >
+                  <CircularProgress />
+                  <Primary>
+                    <h4>{loadingText}</h4>
+                  </Primary>
+                </div>
+                <div style={loading ? { opacity: 0.4 } : {}}>
+                  <Scanner
+                    onScaning={this.handleScaning}
+                    onDeleteItem={this.handleDeleteItem}
+                    onUpdateName={this.handleUpdateName}
+                    onUploading={this.handleUploading}
+                    imageDatas={scanResults}
+                  />
+                </div>
+              </div>
+            </CommonModal>
+          )}
+        </React.Fragment>
       )
     }
   }

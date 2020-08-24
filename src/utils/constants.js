@@ -175,7 +175,8 @@ export const REPORT_TYPE = {
   27: 'Patient Label',
   29: 'Payment Receipt',
   37: 'Inventory Trending Report',
-  45: 'Letter of Certification',
+  55: 'Letter of Certification',
+  61: 'Refraction Form Report',
 }
 
 export const REPORT_ID = {
@@ -330,6 +331,7 @@ export const PATIENT_HISTORY_TABS = {
   APPOINTMENT: 3,
   INVOICE: 4,
   NURSENOTES: 5,
+  DEPOSIT: 6,
 }
 
 export const FILE_STATUS = {
@@ -459,4 +461,14 @@ export const FORM_FROM = {
 export const FORM_CATEGORY = {
   VISITFORM: 1,
   CORFORM: 2,
+}
+
+export const REVENUE_CATEGORY = {
+  CONSULTATION: 1,
+  EXAMINATION: 2,
+  PROCEDURE: 3,
+  DIAGNOSTIC: 4,
+  DRUG: 5,
+  CONSUMABLE: 6,
+  OTHER: 7,
 }

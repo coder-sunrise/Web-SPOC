@@ -24,6 +24,7 @@ const PaymentRow = ({
   handleVoidClick,
   handlePrinterClick,
   readOnly,
+  printDisabled = false,
   ...payment
 }) => {
   const {
@@ -36,6 +37,8 @@ const PaymentRow = ({
     isCancelled,
     patientDepositTransaction,
     invoicePaymentMode = [],
+    cancelReason,
+    statementPaymentReceiptNo,
   } = payment
 
   const sortedInvoicePaymentModes = [
@@ -62,7 +65,7 @@ const PaymentRow = ({
             color='primary'
             id={itemID}
             className={classes.printButton}
-            disabled={isCancelled}
+                  disabled={isCancelled || !!statementPaymentReceiptNo || printDisabled}
             onClick={() => handlePrinterClick(type, id)}
           >
             <Printer />
@@ -115,6 +118,8 @@ const PaymentRow = ({
                   paymentModeDetails={sortedInvoicePaymentModes}
                   setHoveredRowId={setHoveredRowId}
                   id={id}
+                  cancelReason={cancelReason}
+                  isCancelled={isCancelled}
                 />
               }
             >
@@ -129,11 +134,11 @@ const PaymentRow = ({
               </span>
             </Popper>
           ) : (
-            <span>{type}</span>
-          )}
+              <span>{type}</span>
+            )}
         </GridItem>
         <GridItem md={2}>
-          <span>{itemID}</span>
+          <span>{itemID}{statementPaymentReceiptNo && `(${statementPaymentReceiptNo})`}</span>
         </GridItem>
         <GridItem md={2}>
           <span>{moment(date).format(dateFormatLong)}</span>
@@ -158,7 +163,7 @@ const PaymentRow = ({
                 color='danger'
                 id={itemID}
                 onClick={() => handleVoidClick(payment)}
-                disabled={isCancelled || readOnly}
+                disabled={isCancelled || readOnly || !!statementPaymentReceiptNo}
               >
                 <Cross />
               </Button>
@@ -197,8 +202,8 @@ const PaymentRow = ({
                 {patientDepositTransaction.amount ? (
                   currencyFormatter(patientDepositTransaction.amount)
                 ) : (
-                  'N/A'
-                )}
+                    'N/A'
+                  )}
               </span>
             </GridItem>
           </GridItem>

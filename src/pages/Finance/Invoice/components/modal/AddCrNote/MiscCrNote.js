@@ -111,7 +111,7 @@ class MiscCrNote extends PureComponent {
                       <FastField
                         name='total'
                         render={(args) => (
-                          <NumberInput {...args} label='Total: ' currency />
+                          <NumberInput {...args} label='Total Amount: ' currency />
                         )}
                       />
                     </GridItem>

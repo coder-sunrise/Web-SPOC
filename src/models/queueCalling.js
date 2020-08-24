@@ -23,6 +23,17 @@ export default createFormViewModel({
           const newCalledQueue = { qNo, roomNo }
 
           return dispatch({
+            type: 'refreshQueueCallList',
+            payload: {
+              callingQueue: newCalledQueue,
+            },
+          })
+        },
+      })
+
+      subscribeNotification('QueueClear', {
+        callback: () => {
+          return dispatch({
             type: 'getExistingQueueCallList',
             payload: {
               keys: VALUE_KEYS.QUEUECALLING,

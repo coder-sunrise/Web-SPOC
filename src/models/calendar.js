@@ -477,38 +477,36 @@ export default createListViewModel({
         let end
         let isDayView = false
         let calendarView = 'month'
-        let offSet = -8
 
         if (targetView === BigCalendar.Views.WEEK) calendarView = 'week'
         if (targetView === BigCalendar.Views.DAY) {
           isDayView = true
           calendarView = 'day'
-          offSet = -8
         }
 
-        start = moment(targetDate)
-          .startOf(calendarView)
-          .add(offSet, 'hours')
-          .formatUTC()
+        start = moment(targetDate).startOf(calendarView).formatUTC()
         end = moment(targetDate)
           .endOf(calendarView)
-          .add(offSet, 'hours')
-          .formatUTC()
-
+          .endOf('day')
+          .formatUTC(false)
+          //const getCalendarListPayload = {
+          //    apptDateFrom: start,
+          //    apptDateTo: end,
+          //    appStatus: [
+          //        APPOINTMENT_STATUS.CONFIRMED,
+          //        APPOINTMENT_STATUS.DRAFT,
+          //        // APPOINTMENT_STATUS.CANCELLED,
+          //        APPOINTMENT_STATUS.TURNEDUP,
+          //        APPOINTMENT_STATUS.RESCHEDULED,
+          //        APPOINTMENT_STATUS.PFA_RESCHEDULED,
+          //        APPOINTMENT_STATUS.PFA_CANCELLED,
+          //        APPOINTMENT_STATUS.TURNEDUPLATE,
+          //        APPOINTMENT_STATUS.PFA_NOSHOW,
+          //    ].join(),
+          //}
         const getCalendarListPayload = {
           apptDateFrom: start,
           apptDateTo: end,
-          appStatus: [
-            APPOINTMENT_STATUS.CONFIRMED,
-            APPOINTMENT_STATUS.DRAFT,
-            // APPOINTMENT_STATUS.CANCELLED,
-            APPOINTMENT_STATUS.TURNEDUP,
-            APPOINTMENT_STATUS.RESCHEDULED,
-            APPOINTMENT_STATUS.PFA_RESCHEDULED,
-            APPOINTMENT_STATUS.PFA_CANCELLED,
-            APPOINTMENT_STATUS.TURNEDUPLATE,
-            APPOINTMENT_STATUS.PFA_NOSHOW,
-          ].join(),
         }
 
         yield all([

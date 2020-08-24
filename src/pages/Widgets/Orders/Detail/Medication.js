@@ -6,7 +6,6 @@ import Delete from '@material-ui/icons/Delete'
 import { formatMessage } from 'umi/locale'
 import { VISIT_TYPE } from '@/utils/constants'
 
-import LowStockInfo from './LowStockInfo'
 import {
   Button,
   GridContainer,
@@ -29,7 +28,9 @@ import {
 } from '@/components'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
+import { currencySymbol } from '@/utils/config'
 import Authorized from '@/utils/Authorized'
+import LowStockInfo from './LowStockInfo'
 import AddFromPast from './AddMedicationFromPast'
 
 const authorityCfg = {
@@ -37,11 +38,11 @@ const authorityCfg = {
   '5': 'queue.consultation.order.openprescription',
 }
 
-@connect(({ global, codetable }) => ({ global, codetable }))
-@connect(({ global, codetable, visitRegistration }) => ({
+@connect(({ global, codetable, visitRegistration, user }) => ({
   global,
   codetable,
   visitRegistration,
+  user,
 }))
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type }) => {
@@ -112,8 +113,8 @@ const authorityCfg = {
     ),
   }),
 
-  handleSubmit: (values, { props, onConfirm }) => {
-    const { dispatch, currentType, getNextSequence } = props
+  handleSubmit: (values, { props, onConfirm, setValues }) => {
+    const { dispatch, currentType, getNextSequence, user, orders } = props
 
     const getInstruction = (instructions) => {
       let instruction = ''
@@ -181,6 +182,8 @@ const authorityCfg = {
       }
     }
     const data = {
+      isOrderedByDoctor:
+        user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
       sequence: getNextSequence(),
       ...values,
       corPrescriptionItemPrecaution,
@@ -196,6 +199,14 @@ const authorityCfg = {
     })
 
     if (onConfirm) onConfirm()
+
+    setValues({
+      ...orders.defaultMedication,
+      type: orders.type,
+      visitPurposeFK: orders.visitPurposeFK,
+      drugCode: orders.type === '5' ? 'MISC' : undefined,
+    })
+    return true
   },
   displayName: 'OrderPage',
 })
@@ -411,6 +422,25 @@ class Medication extends PureComponent {
       )
   }
 
+  getMedicationOptions = () => {
+    const { codetable: { inventorymedication = [] } } = this.props
+
+    return inventorymedication.reduce((p, c) => {
+      const { code, displayValue, sellingPrice = 0, dispensingUOM = {} } = c
+      const { name: uomName = '' } = dispensingUOM
+      let opt = {
+        ...c,
+        combinDisplayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
+          2,
+        )} / ${uomName})`,
+      }
+      return [
+        ...p,
+        opt,
+      ]
+    }, [])
+  }
+
   changeMedication = (v, op = {}) => {
     const { setFieldValue, disableEdit, values } = this.props
 
@@ -568,6 +598,17 @@ class Medication extends PureComponent {
     return match
   }
 
+  componentDidMount = async () => {
+    const { codetable, dispatch } = this.props
+    const { inventorymedication = [] } = codetable
+    if (inventorymedication.length <= 0) {
+      await dispatch({
+        type: 'codetable/fetchCodes',
+        payload: { code: 'inventorymedication' },
+      })
+    }
+  }
+
   UNSAFE_componentWillReceiveProps (nextProps) {
     if (nextProps.orders.type === this.props.type)
       if (
@@ -629,6 +670,17 @@ class Medication extends PureComponent {
     }
   }
 
+  validateAndSubmitIfOk = async () => {
+    const { handleSubmit, validateForm } = this.props
+    const validateResult = await validateForm()
+    const isFormValid = _.isEmpty(validateResult)
+    if (isFormValid) {
+      handleSubmit()
+      return true
+    }
+    return false
+  }
+
   resetMedicationHistoryResult = () => {
     this.props.dispatch({
       type: 'medicationHistory/updateState',
@@ -662,6 +714,7 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
+
     const accessRight = authorityCfg[values.type]
     return (
       <Authorized authority={accessRight}>
@@ -674,26 +727,32 @@ class Medication extends PureComponent {
                     name='drugName'
                     render={(args) => {
                       return (
-                        <TextField
-                          label='Open Prescription Name'
-                          {...args}
-                          autocomplete='nope'
-                        />
+                        <div id={`autofocus_${values.type}`}>
+                          <TextField
+                            label='Open Prescription Name'
+                            {...args}
+                            autocomplete='nope'
+                          />
+                        </div>
                       )
                     }}
                   />
                 ) : (
-                  <FastField
+                  <Field
                     name='inventoryMedicationFK'
                     render={(args) => {
                       return (
-                        <div style={{ position: 'relative' }}>
+                        <div
+                          id={`autofocus_${values.type}`}
+                          style={{ position: 'relative' }}
+                        >
                           <CodeSelect
                             temp
                             label='Medication Name'
-                            code='inventorymedication'
-                            labelField='displayValue'
+                            // code='inventorymedication'
+                            labelField='combinDisplayValue'
                             onChange={this.changeMedication}
+                            options={this.getMedicationOptions()}
                             {...args}
                             style={{ paddingRight: 20 }}
                           />
@@ -1282,7 +1341,7 @@ class Medication extends PureComponent {
             </GridItem>
           </GridContainer>
           {footer({
-            onSave: handleSubmit,
+            onSave: this.validateAndSubmitIfOk,
             onReset: this.handleReset,
           })}
           <CommonModal

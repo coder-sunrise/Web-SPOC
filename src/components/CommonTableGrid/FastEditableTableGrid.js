@@ -14,18 +14,18 @@ import {
 } from '@devexpress/dx-react-grid-material-ui'
 import { Getter } from '@devexpress/dx-react-core'
 import Add from '@material-ui/icons/Add'
-import CommandComponent from './CommandComponent'
 import {
   getGlobalVariable,
   getUniqueNumericId,
   difference,
   enableTableForceRender,
 } from '@/utils/utils'
+import { Button } from '@/components'
+import Authorized from '@/utils/Authorized'
+import CommandComponent from './CommandComponent'
 import CustomTableEditRow from './CustomTableEditRow'
 import CommonTableGrid from './index.optimized'
 import EditPlugin from './EditPlugin'
-import { Button } from '@/components'
-import Authorized from '@/utils/Authorized'
 import { updateGlobalState } from './EditCellComponents/utils'
 
 let uniqueGid = 0
@@ -569,6 +569,10 @@ class EditableTableGrid extends PureComponent {
         showAddCommand = false,
         showEditCommand = true,
         showDeleteCommand = true,
+        deleteConfirm = {
+          show: false,
+          title: 'Are you sure you want to delete this row?',
+        },
         onRowDelete,
         isDeletable = (f) => true,
         messages = {
@@ -579,6 +583,7 @@ class EditableTableGrid extends PureComponent {
         },
         // EditCell = DefaultEditCell,
       } = {},
+      extraColumn,
       ...props
     } = this.props
 
@@ -602,37 +607,39 @@ class EditableTableGrid extends PureComponent {
     if (this.containerComponent) {
       cfg.containerComponent = this.containerComponent
     }
-    const editableCfg = {
-      extraGetter: [
-        // <EditPlugin />,
-        <Getter
-          // key={`Getter-${uniqueGid}`}
-          name='tableColumns'
-          computed={({ tableColumns }) => {
-            // console.log(tableColumns, TableEditColumn, resetProps)
-            // const col = tableColumns.find(
-            //   (c) => c.type === TableEditColumn.COLUMN_TYPE,
-            // )
-            // if (col) {
-            //   col.fixed = 'right'
-            // }
-            const cols = [
-              ...tableColumns.filter(
-                (c) => c.type !== TableEditColumn.COLUMN_TYPE,
-              ),
-              {
-                key: 'editCommand',
-                type: TableEditColumn.COLUMN_TYPE,
-                fixed: 'right',
-                width: 75,
-              },
-            ]
-            // console.log(cols)
-            return cols
-          }}
-        />,
-      ],
-    }
+    const editableCfg = extraColumn
+      ? {}
+      : {
+          extraGetter: [
+            // <EditPlugin />,
+            <Getter
+              // key={`Getter-${uniqueGid}`}
+              name='tableColumns'
+              computed={({ tableColumns }) => {
+                // console.log(tableColumns, TableEditColumn, resetProps)
+                // const col = tableColumns.find(
+                //   (c) => c.type === TableEditColumn.COLUMN_TYPE,
+                // )
+                // if (col) {
+                //   col.fixed = 'right'
+                // }
+                const cols = [
+                  ...tableColumns.filter(
+                    (c) => c.type !== TableEditColumn.COLUMN_TYPE,
+                  ),
+                  {
+                    key: 'editCommand',
+                    type: TableEditColumn.COLUMN_TYPE,
+                    fixed: 'right',
+                    width: 75,
+                  },
+                ]
+                // console.log(cols)
+                return cols
+              }}
+            />,
+          ],
+        }
 
     // console.log(rowChanges, addedRows)
     // console.log({ columnExtensions })
@@ -676,7 +683,7 @@ class EditableTableGrid extends PureComponent {
                 availableColumns={availableColumns}
               />,
             ],
-            extraColumn: [
+            extraColumn: extraColumn || [
               <TableEditColumn
                 key={`TableEditColumn-${uniqueGid}`}
                 showAddCommand={this.addable}
@@ -708,6 +715,7 @@ class EditableTableGrid extends PureComponent {
                             // getRowId: this.props.getRowId,
                             onRowDelete,
                             isDeletable,
+                            deleteConfirm,
                             // ...o.props,
                           })
                         }

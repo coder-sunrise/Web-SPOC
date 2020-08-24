@@ -57,7 +57,7 @@ const procuderesSchema = Yup.object().shape({
       }
     } else {
       const { visitDate, doctorProfileFK } = visit
-      const { name, patientReferenceNo, patientAccountNo } = patient
+      const { name, patientAccountNo } = patient
       const { doctorprofile } = codetable
       const doctor = doctorprofile.find((o) => o.id === doctorProfileFK)
 
@@ -75,8 +75,8 @@ const procuderesSchema = Yup.object().shape({
         formData: {
           ...forms.defaultLCForm.formData,
           patientName: name,
-          patientNRICNo: patientReferenceNo,
-          patientAccountNo,
+          patientNRICNo: patientAccountNo,
+          patientAccountNo: undefined,
           admissionDate: visitDate,
           dischargeDate: visitDate,
           principalSurgeonFK: doctorProfileFK,

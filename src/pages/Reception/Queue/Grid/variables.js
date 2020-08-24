@@ -50,6 +50,8 @@ const compareQueueNo = (a, b) => {
 export const FuncConfig = {
   pager: false,
   sort: true,
+  columnReorderable: true,
+  columnSelectable: true,
   sortConfig: {
     defaultSorting: [
       { columnName: 'queueNo', direction: 'asc' },
@@ -70,6 +72,7 @@ export const AppointmentTableConfig = {
     { name: 'patientContactNo', title: 'Phone' },
     { name: 'action', title: 'Action' },
   ],
+  identifier: 'reception_appointment',
 }
 
 export const ApptColumnExtensions = [
@@ -137,6 +140,7 @@ export const QueueTableConfig = {
   columns: [
     { name: 'visitStatus', title: 'Status' },
     { name: 'queueNo', title: 'Q. No.' },
+    { name: 'patientReferenceNo', title: 'Ref. No.' },
     { name: 'patientName', title: 'Patient Name' },
     { name: 'patientAccountNo', title: 'Acc. No.' },
     { name: 'gender/age', title: 'Gender / Age' },
@@ -155,12 +159,15 @@ export const QueueTableConfig = {
     { name: 'invoiceOutstanding', title: 'Outstanding' },
     { name: 'patientScheme', title: 'Scheme' },
     { name: 'patientMobile', title: 'Phone' },
+    { name: 'visitOrderTemplate', title: 'Visit Order Template' },
     { name: 'action', title: 'Action' },
   ],
   leftColumns: [
     'visitStatus',
     'queueNo',
+    'patientName',
   ],
+  identifier: 'reception',
 }
 
 export const QueueColumnExtensions = [
@@ -282,5 +289,9 @@ export const QueueColumnExtensions = [
     columnName: 'doctor',
     compare: compareDoctor,
     render: (row) => <DoctorLabel doctor={row.doctor} hideMCR />,
+  },
+  {
+    columnName: 'visitOrderTemplate',
+    width: 180,
   },
 ]

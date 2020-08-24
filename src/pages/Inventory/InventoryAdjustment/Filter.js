@@ -103,7 +103,7 @@ class Filter extends PureComponent {
             <Field
               name='allDate'
               render={(args) => {
-                return <Checkbox inputLabel='' label='All Date' {...args} />
+                return <Checkbox inputLabel=' ' label='All Date' {...args} />
               }}
             />
           </GridItem>

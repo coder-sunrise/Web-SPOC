@@ -204,7 +204,11 @@ class EditOrder extends Component {
     const formsWidget = widgets.find((o) => o.id === '12')
     const Order = orderWidget.component
     const ConsultationDocument = cdWidget.component
+    const consultationDocumentAccessRight = Authorized.check(
+      cdWidget.accessRight,
+    )
     const Forms = formsWidget.component
+    const formAccessRight = Authorized.check(formsWidget.accessRight)
     return (
       <div className={classes.content}>
         <GridContainer>
@@ -213,26 +217,32 @@ class EditOrder extends Component {
             <Order className={classes.orderPanel} status='' from='ca' />
           </GridItem>
           <GridItem xs={12} md={6}>
-            <Authorized authority={formsWidget.accessRight}>
-              <h5>
-                <span style={{ display: 'inline-block' }}>Forms</span>
-                <span className={classes.cdAddButton}>
-                  {cdWidget.toolbarAddon}
-                </span>
-              </h5>
-              <Forms />
-            </Authorized>
-            <Authorized authority={cdWidget.accessRight}>
-              <h5>
-                <span style={{ display: 'inline-block' }}>
-                  Consultation Document
-                </span>
-                <span className={classes.cdAddButton}>
-                  {cdWidget.toolbarAddon}
-                </span>
-              </h5>
-              <ConsultationDocument forDispense />
-            </Authorized>
+            {formAccessRight &&
+            formAccessRight.rights !== 'hidden' && (
+              <div>
+                <h5>
+                  <span style={{ display: 'inline-block' }}>Forms</span>
+                  <span className={classes.cdAddButton}>
+                    {cdWidget.toolbarAddon}
+                  </span>
+                </h5>
+                <Forms />
+              </div>
+            )}
+            {consultationDocumentAccessRight &&
+            consultationDocumentAccessRight.rights !== 'hidden' && (
+              <div>
+                <h5>
+                  <span style={{ display: 'inline-block' }}>
+                    Consultation Document
+                  </span>
+                  <span className={classes.cdAddButton}>
+                    {cdWidget.toolbarAddon}
+                  </span>
+                </h5>
+                <ConsultationDocument forDispense />
+              </div>
+            )}
             <GridItem xs={12} md={6}>
               <FastField
                 name='dispenseAcknowledgement.editDispenseReasonFK'

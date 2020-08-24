@@ -11,6 +11,8 @@ const PaymentDetails = ({
   classes,
   setHoveredRowId,
   id,
+  cancelReason,
+  isCancelled = false,
 }) => {
   const creditCardNChequeNo = (mode) => {
     const { paymentModeFK, chequePayment = {}, creditCardPayment = {} } = mode
@@ -42,26 +44,34 @@ const PaymentDetails = ({
               : mode.paymentMode
           return (
             <GridContainer className={classes.container}>
-              <GridItem xs={12} container>
-                <GridItem xs={8}>
-                  <p>
-                    <b>{modeName}</b>
-                  </p>
-                </GridItem>
-                <GridItem xs={3}>
-                  <p className={classes.currency}>
-                    {mode.amt ? currencyFormatter(mode.amt) : 'N/A'}
-                  </p>
-                </GridItem>
-                <GridItem>
-                  {creditCardNChequeNo(mode)}
-                  <p>Remarks: {mode.remark || '-'}</p>
-                </GridItem>
+              <GridItem xs={8}>
+                <p>
+                  <b>{modeName}</b>
+                </p>
+              </GridItem>
+              <GridItem xs={4}>
+                <p className={classes.currency}>
+                  {mode.amt ? currencyFormatter(mode.amt) : 'N/A'}
+                </p>
+              </GridItem>
+              <GridItem xs={12}>
+                {creditCardNChequeNo(mode)}
+                <p>Remarks: {mode.remark || '-'}</p>
               </GridItem>
             </GridContainer>
           )
         })}
       </GridContainer>
+
+      {isCancelled && (
+        <GridContainer className={classes.popupContainer}>
+          <GridContainer className={classes.lastContainer}>
+            <GridItem xs={12}>
+              <p> Void Reason: {cancelReason || '-'}</p>
+            </GridItem>
+          </GridContainer>
+        </GridContainer>
+      )}
     </Fragment>
   )
 }

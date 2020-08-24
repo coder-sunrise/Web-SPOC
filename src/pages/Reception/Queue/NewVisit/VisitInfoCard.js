@@ -21,9 +21,9 @@ import {
   Attachment,
   AttachmentWithThumbnail,
 } from '@/components/_medisys'
-import FormField from './formField'
 import { VISIT_TYPE } from '@/utils/constants'
 import { visitOrderTemplateItemTypes } from '@/utils/codes'
+import FormField from './formField'
 
 const styles = (theme) => ({
   verticalSpacing: {
@@ -47,6 +47,7 @@ const styles = (theme) => ({
 
 const VisitInfoCard = ({
   isReadOnly = false,
+  isVisitRemarksDisabled = false,
   attachments,
   handleUpdateAttachments,
   existingQNo,
@@ -89,7 +90,7 @@ const VisitInfoCard = ({
       totalTempCharge = getVisitOrderTemplateTotal(visitType, template)
     }
     if ((value || 0) > totalTempCharge) {
-      return `Total Charges can not more than visit template total amount(${totalTempCharge}).`
+      return `Cannot more than default charges(${totalTempCharge}).`
     }
     return ''
   }
@@ -251,6 +252,8 @@ const VisitInfoCard = ({
                 // disabled={isReadOnly}
                 multiline
                 rowsMax={3}
+                authority='none'
+                disabled={isVisitRemarksDisabled}
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.visitRemarks',
                 })}
@@ -265,6 +268,7 @@ const VisitInfoCard = ({
             handleUpdateAttachments={handleUpdateAttachments}
             attachments={attachments}
             isReadOnly={isReadOnly}
+            disableScanner={isReadOnly}
             fieldName='visitAttachment'
           />
         </GridItem>
