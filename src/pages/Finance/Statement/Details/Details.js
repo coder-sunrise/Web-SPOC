@@ -114,15 +114,13 @@ class Details extends PureComponent {
   }
 
   printInvoice = (row) => {
-    const { statement = {} } = this.props
-    const { entity = {} } = statement
     window.g_app._store.dispatch({
       type: 'report/updateState',
       payload: {
         reportTypeID: 15,
         reportParameters: {
           InvoiceId: row.invoiceFK,
-          CopayerId: entity.copayerFK,
+          CopayerId: undefined,
           isSaved: true,
         },
       },
