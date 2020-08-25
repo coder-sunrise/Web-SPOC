@@ -144,7 +144,7 @@ const Scheme = ({
     const statuses = chasClaimStatuses.map((status) => status.toLowerCase())
     if (
       hasPayments ||
-      statuses.includes('draft') ||
+      //statuses.includes('draft') ||
       statuses.includes('approved')
     )
       return true
