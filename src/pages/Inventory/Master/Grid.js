@@ -17,18 +17,17 @@ class Grid extends React.Component {
       colExtensions,
       columnWidths,
       list,
-      disabled,
     } = this.props
     const showDetail = (row, vmode) => () =>
       history.push(`/inventory/master/edit${namespace}?uid=${row.id}`)
 
     let accessRightName = 'inventorymaster.inventoryitemdetails'
-    const handleDoubleClick = (row) => {
-      if (namespace === 'inventorypackage')
-        accessRightName = 'inventorymaster.package'
+    if (namespace === 'inventoryPackage')
+      accessRightName = 'inventorymaster.package'
+    const accessRight = Authorized.check(accessRightName)
 
-      const accessRight = Authorized.check(accessRightName)
-      if (disabled || accessRight.rights !== 'enable') {
+    const handleDoubleClick = (row) => {
+      if (!accessRight || accessRight.rights === 'hidden') {
         notification.error({
           message: 'Current user is not authorized to access',
         })
@@ -47,7 +46,14 @@ class Grid extends React.Component {
                 namespace.slice(1)}`}
               placement='bottom'
             >
-              <Authorized authority={accessRightName}>
+              <Authorized.Context.Provider
+                value={{
+                  rights:
+                    !accessRight || accessRight.rights === 'hidden'
+                      ? 'hidden'
+                      : 'enable',
+                }}
+              >
                 <Fragment>
                   <Button
                     size='sm'
@@ -59,7 +65,7 @@ class Grid extends React.Component {
                     <Edit />
                   </Button>
                 </Fragment>
-              </Authorized>
+              </Authorized.Context.Provider>
             </Tooltip>
           </Table.Cell>
         )
