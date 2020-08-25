@@ -119,14 +119,12 @@ export default ({ current, theme }) => {
     <div style={{ fontSize: '0.875rem' }}>
       {current.invoice ? (
         <div style={{ marginBottom: 5 }}>
+          <span>{`Invoice No: ${current.invoice.invoiceNo}`}</span>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           <span>
-            <span>{`Invoice No: ${current.invoice.invoiceNo}`}</span>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <span>
-              {`Invoice Date: ${moment(current.invoice.invoiceDate).format(
-                'DD MMM YYYY',
-              )}`}
-            </span>
+            {`Invoice Date: ${moment(current.invoice.invoiceDate).format(
+              'DD MMM YYYY',
+            )}`}
           </span>
         </div>
       ) : (
