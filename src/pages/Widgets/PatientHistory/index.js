@@ -467,7 +467,7 @@ class PatientHistory extends Component {
               checked={this.state.selectTag.value === tag.value}
               onChange={(checked) => {
                 if (checked) this.setState({ selectTag: tag })
-                else this.setState({ selectTag: { children: [] } })
+                return null
               }}
             >
               {tag.name}
