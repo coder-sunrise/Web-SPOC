@@ -225,7 +225,7 @@ const DispenseDetails = ({
   coPayer.forEach((ip) => {
     const { invoicePayment = [], name } = ip
     coPayerPayments = coPayerPayments.concat(
-      invoicePayment.map((o) => ({
+      invoicePayment.filter((o) => !o.isCancelled).map((o) => ({
         ...o,
         payerName: name,
       })),
