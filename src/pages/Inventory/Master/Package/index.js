@@ -5,7 +5,7 @@ import { compose } from 'redux'
 import { CardContainer } from '@/components'
 import { status } from '@/utils/codes'
 import FilterBar from './FilterBar'
-import Grid from '../Grid'
+import Grid from './Grid'
 
 const styles = () => ({})
 const Package = ({ dispatch, history, inventoryPackage }) => {
