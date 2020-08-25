@@ -21,10 +21,10 @@ import {
 import { LoadingWrapper, Recurrence } from '@/components/_medisys'
 // custom components
 import PatientProfile from '@/pages/PatientDatabase/Detail'
-import AppointmentHistory from '@/pages/Widgets/AppointmentHistory'
 import { getAppendUrl } from '@/utils/utils'
 import { APPOINTMENT_STATUS, APPOINTMENT_CANCELLEDBY } from '@/utils/constants'
 import { getBizSession } from '@/services/queue'
+import AppointmentHistory from './AppointmentHistory'
 import PatientSearchModal from '../../PatientSearch'
 import DeleteConfirmation from './DeleteConfirmation'
 import AppointmentDataGrid from './AppointmentDataGrid'

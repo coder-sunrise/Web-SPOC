@@ -3,9 +3,9 @@ import moment from 'moment'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import { CardContainer, CommonTableGrid } from '@/components'
-import { APPOINTMENT_STATUS } from '@/utils/constants'
 import { queryList as queryAppointments } from '@/services/calendar'
 import Authorized from '@/utils/Authorized'
+import { LoadingWrapper } from '@/components/_medisys'
 import { futureApptTableParams, previousApptTableParams } from './variables'
 
 const styles = (theme) => ({
@@ -20,9 +20,10 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ patient, user }) => ({
+@connect(({ patient, user, loading }) => ({
   patient: patient.entity || {},
   user,
+  loading,
 }))
 class AppointmentHistory extends PureComponent {
   state = {
@@ -45,7 +46,7 @@ class AppointmentHistory extends PureComponent {
   }
 
   async getAppts (patientId) {
-    // console.log('getAppts', patientId)
+    console.log('getAppts', patientId)
     const { user, dispatch } = this.props
     const commonParams = {
       combineCondition: 'and',
@@ -72,28 +73,56 @@ class AppointmentHistory extends PureComponent {
         code: 'ltappointmentstatus',
       },
     })
-
+    // const previous = undefined
     const [
       previous,
+      future,
     ] = await Promise.all([
       queryAppointments({
         apiCriteria: {
+          // appStatus: [
+          //   APPOINTMENT_STATUS.CANCELLED,
+          //   APPOINTMENT_STATUS.TURNEDUP,
+          //   APPOINTMENT_STATUS.TURNEDUPLATE,
+          //   // APPOINTMENT_STATUS.NOSHOW,
+          // ].join(),
+          apptDateTo: moment().add(-1, 'd').formatUTC(),
+          patientProfileId: patientId,
+          doctor,
           isIncludeHistory: true,
-          isIncludeRescheduledByClinic: true,
+          isIncludeRescheduledByClinic: false,
+        },
+        ...commonParams,
+      }),
+      queryAppointments({
+        apiCriteria: {
+          apptDateFrom: moment().formatUTC(),
+          isIncludeHistory: true,
+          isIncludeRescheduledByClinic: false,
+          // appStatus: [
+          //   APPOINTMENT_STATUS.CONFIRMED,
+          //   APPOINTMENT_STATUS.RESCHEDULED,
+          //   APPOINTMENT_STATUS.PFA_RESCHEDULED,
+          // ].join(),
           patientProfileId: patientId,
           doctor,
         },
         ...commonParams,
       }),
     ])
-
     let previousAppt = []
-
+    let futureAppt = []
     if (previous) {
       const { status, data } = previous
       if (status === '200') previousAppt = this.reBuildApptDatas(data.data)
     }
+
+    if (future) {
+      const { status, data } = future
+      if (status === '200') futureAppt = this.reBuildApptDatas(data.data)
+    }
     this.setState({
+      futureAppt,
       previousAppt,
       patientProfileFK: patientId,
     })
@@ -151,17 +180,36 @@ class AppointmentHistory extends PureComponent {
   }
 
   render () {
-    const { previousAppt } = this.state
+    const { classes, theme, handleRowDoubleClick, loading } = this.props
+    const { previousAppt, futureAppt } = this.state
     return (
-      <div>
-        <CardContainer hideHeader size='sm'>
-          <CommonTableGrid
-            size='sm'
-            rows={previousAppt}
-            {...previousApptTableParams}
-          />
-        </CardContainer>
-      </div>
+      <LoadingWrapper loading={loading.global} text='loading...'>
+        <div>
+          <CardContainer hideHeader size='sm'>
+            <h4 style={{ marginTop: 20 }}>Current & Future Appointment</h4>
+
+            <CommonTableGrid
+              size='sm'
+              rows={futureAppt}
+              onRowDoubleClick={handleRowDoubleClick}
+              {...futureApptTableParams}
+            />
+
+            <h4
+              style={{
+                marginTop: theme.spacing(2),
+              }}
+            >
+              Previous Appointment
+            </h4>
+            <CommonTableGrid
+              size='sm'
+              rows={previousAppt}
+              {...previousApptTableParams}
+            />
+          </CardContainer>
+        </div>
+      </LoadingWrapper>
     )
   }
 }
