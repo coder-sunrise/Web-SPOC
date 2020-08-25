@@ -47,7 +47,7 @@ const DeleteConfirmation = ({
   const [
     step,
     setStep,
-  ] = useState(0)
+  ] = useState(isSeries ? 0 : 1)
 
   const onContinueClick = () => {
     if (isSeries && values.type === '') {

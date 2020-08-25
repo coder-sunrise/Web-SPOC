@@ -681,7 +681,8 @@ class Form extends React.PureComponent {
           apptDurationMinute,
           preClinicianFK,
           roomFk,
-          appointmentTypeFK } = resource
+          appointmentTypeFK,
+        } = resource
         return {
           appointmentFK,
           clinicianFK,
@@ -703,51 +704,62 @@ class Form extends React.PureComponent {
       })
       let originalResource = {}
       if (originalAppointment) {
-        originalResource = Array.from(originalAppointment.appointments_Resources, (resource) => {
-          console.log(resource)
-          const { appointmentFK,
-            clinicianFK,
-            clinicianName,
-            clinicianTitle,
-            startTime,
-            endTime,
-            sortOrder,
-            isPrimaryClinician,
-            id,
-            isDeleted,
-            concurrencyToken,
-            apptDurationHour,
-            apptDurationMinute,
-            preClinicianFK,
-            roomFk,
-            appointmentTypeFK } = resource
-          return {
-            appointmentFK,
-            clinicianFK,
-            clinicianName,
-            clinicianTitle,
-            startTime,
-            endTime,
-            sortOrder,
-            isPrimaryClinician,
-            id,
-            isDeleted,
-            concurrencyToken,
-            apptDurationHour,
-            apptDurationMinute,
-            preClinicianFK,
-            roomFk,
-            appointmentTypeFK,
-          }
-        })
+        originalResource = Array.from(
+          originalAppointment.appointments_Resources,
+          (resource) => {
+            console.log(resource)
+            const {
+              appointmentFK,
+              clinicianFK,
+              clinicianName,
+              clinicianTitle,
+              startTime,
+              endTime,
+              sortOrder,
+              isPrimaryClinician,
+              id,
+              isDeleted,
+              concurrencyToken,
+              apptDurationHour,
+              apptDurationMinute,
+              preClinicianFK,
+              roomFk,
+              appointmentTypeFK,
+            } = resource
+            return {
+              appointmentFK,
+              clinicianFK,
+              clinicianName,
+              clinicianTitle,
+              startTime,
+              endTime,
+              sortOrder,
+              isPrimaryClinician,
+              id,
+              isDeleted,
+              concurrencyToken,
+              apptDurationHour,
+              apptDurationMinute,
+              preClinicianFK,
+              roomFk,
+              appointmentTypeFK,
+            }
+          },
+        )
       }
-      let resourceChanged = originalAppointment && JSON.stringify(originalResource) !== JSON.stringify(newResource)
-        let dateChanged = originalAppointment && originalAppointment.appointmentDate.indexOf(values.currentAppointment.appointmentDate) === -1
-        const canChangeToRescheduleStatus = [
-            APPOINTMENT_STATUS.CONFIRMED,
-            APPOINTMENT_STATUS.RESCHEDULED,
-            APPOINTMENT_STATUS.PFA_RESCHEDULED,
-        ]
+      let resourceChanged =
+        originalAppointment &&
+        JSON.stringify(originalResource) !== JSON.stringify(newResource)
+      let dateChanged =
+        originalAppointment &&
+        originalAppointment.appointmentDate.indexOf(
+          values.currentAppointment.appointmentDate,
+        ) === -1
+      const canChangeToRescheduleStatus = [
+        APPOINTMENT_STATUS.CONFIRMED,
+        APPOINTMENT_STATUS.RESCHEDULED,
+        APPOINTMENT_STATUS.PFA_RESCHEDULED,
+      ]
       if (
         values.currentAppointment &&
         canChangeToRescheduleStatus.includes(
@@ -822,15 +834,15 @@ class Form extends React.PureComponent {
 
   onConfirmReschedule = async (rescheduleValues) => {
     const { setValues, values } = this.props
-    const { rescheduledByFK } = rescheduleValues
-    let { appointmentStatusFk } = values
+    // const { rescheduledByFK } = rescheduleValues
+    // let { appointmentStatusFk } = values
 
     // by patient
-    if (rescheduledByFK === '2') {
-      appointmentStatusFk = APPOINTMENT_STATUS.PFA_RESCHEDULED
-      this.setState({ tempNewAppointmentStatusFK: appointmentStatusFk })
-    }
-
+    // if (rescheduledByFK === '2') {
+    //   appointmentStatusFk = APPOINTMENT_STATUS.PFA_RESCHEDULED
+    //   this.setState({ tempNewAppointmentStatusFK: appointmentStatusFk })
+    // }
+    this.setState({ tempNewAppointmentStatusFK: APPOINTMENT_STATUS.CONFIRMED })
     await setValues({ ...values, ...rescheduleValues })
     this.closeRescheduleForm()
     this._submit()
@@ -1088,7 +1100,9 @@ class Form extends React.PureComponent {
                 >
                   <h4 style={{ fontWeight: 500 }}>Appointment History</h4>
                   <AppointmentHistory
-                    handleRowDoubleClick={onHistoryRowSelected}
+                    handleRowDoubleClick={(data) => {
+                      onHistoryRowSelected({ ...data, isHistory: true })
+                    }}
                   />
                 </CardContainer>
               </GridItem>

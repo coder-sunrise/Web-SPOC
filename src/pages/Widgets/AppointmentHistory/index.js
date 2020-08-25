@@ -72,6 +72,7 @@ class AppointmentHistory extends PureComponent {
         code: 'ltappointmentstatus',
       },
     })
+    // const previous = undefined
     const [
       previous,
       future,
@@ -88,6 +89,7 @@ class AppointmentHistory extends PureComponent {
           patientProfileId: patientId,
           doctor,
           isIncludeHistory: true,
+          isIncludeRescheduledByClinic: false,
         },
         ...commonParams,
       }),
@@ -95,6 +97,7 @@ class AppointmentHistory extends PureComponent {
         apiCriteria: {
           apptDateFrom: moment().formatUTC(),
           isIncludeHistory: true,
+          isIncludeRescheduledByClinic: false,
           // appStatus: [
           //   APPOINTMENT_STATUS.CONFIRMED,
           //   APPOINTMENT_STATUS.RESCHEDULED,

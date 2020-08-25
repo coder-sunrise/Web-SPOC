@@ -311,10 +311,17 @@ class Appointment extends React.PureComponent {
       appointmentStatusFk,
       isHistory,
     } = selectedEvent
-    console.log(selectedEvent)
+
     const isDoctorBlock = doctor && doctor.id > 0
 
-    if (isHistory || appointmentStatusFk === APPOINTMENT_STATUS.DELETED) return
+    if (
+      isHistory &&
+      ![
+        APPOINTMENT_STATUS.DRAFT,
+        APPOINTMENT_STATUS.CONFIRMED,
+      ].includes(appointmentStatusFk)
+    )
+      return
 
     const viewApptAccessRight = Authorized.check(
       'appointment.appointmentdetails',
