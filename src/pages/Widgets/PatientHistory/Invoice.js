@@ -1,5 +1,6 @@
 import React from 'react'
 import { Table } from 'antd'
+import moment from 'moment'
 import numeral from 'numeral'
 import { currencySymbol } from '@/utils/config'
 import { GridContainer, GridItem, TextField, DatePicker } from '@/components'
@@ -117,24 +118,15 @@ export default ({ current, theme }) => {
   return (
     <div style={{ fontSize: '0.875rem' }}>
       {current.invoice ? (
-        <GridContainer>
-          <GridItem xs={4} md={2}>
-            <TextField
-              prefix='Invoice No: '
-              text
-              value={current.invoice.invoiceNo}
-              noUnderline
-            />
-          </GridItem>
-          <GridItem xs={4} md={2}>
-            <DatePicker
-              prefix='Invoice Date: '
-              text
-              value={current.invoice.invoiceDate}
-              noUnderline
-            />
-          </GridItem>
-        </GridContainer>
+        <div style={{ marginBottom: 5 }}>
+          <span>{`Invoice No: ${current.invoice.invoiceNo}`}</span>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <span>
+            {`Invoice Date: ${moment(current.invoice.invoiceDate).format(
+              'DD MMM YYYY',
+            )}`}
+          </span>
+        </div>
       ) : (
         ''
       )}
