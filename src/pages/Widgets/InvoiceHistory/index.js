@@ -61,6 +61,7 @@ const InvoiceHistory = ({
       type: 'patientHistory/queryInvoiceHistory',
       payload: {
         'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.Id': id,
+        pagesize: 9999,
       },
     })
   }
