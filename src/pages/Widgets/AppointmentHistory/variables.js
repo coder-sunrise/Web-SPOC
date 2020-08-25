@@ -29,30 +29,17 @@ export const commonExt = [
   {
     columnName: 'cancellationReason',
     render: (row) => {
-      const {
-        appointmentStatusFk,
-        cancellationReasonTypeFK,
-        cancellationReason,
-      } = row
-      const appointmentStatus = parseInt(appointmentStatusFk, 10)
-      const title = cancellationReason || ''
-      if (appointmentStatus === APPOINTMENT_STATUS.CANCELLED) {
-        if (cancellationReasonTypeFK === CANCELLATION_REASON_TYPE.NOSHOW)
-          return (
-            <CodeSelect
-              code='ltcancelreasontype'
-              value={cancellationReasonTypeFK}
-              text
-            />
-          )
-        if (cancellationReasonTypeFK === CANCELLATION_REASON_TYPE.OTHERS)
-          return (
-            <Tooltip title={title}>
-              <span>{title}</span>
-            </Tooltip>
-          )
-      }
-      return ''
+      const { cancellationReason, rescheduleReason } = row
+      let title = cancellationReason || ''
+      if (title !== '') {
+        title = `${title}, ${rescheduleReason}`
+      } else title = rescheduleReason
+
+      return (
+        <Tooltip title={title}>
+          <span>{title}</span>
+        </Tooltip>
+      )
     },
   },
 ]
