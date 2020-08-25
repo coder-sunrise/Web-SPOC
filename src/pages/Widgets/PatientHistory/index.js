@@ -172,7 +172,14 @@ class PatientHistory extends Component {
   }
 
   getTitle = (row) => {
-    const { theme, patientHistory, dispatch, codetable, user } = this.props
+    const {
+      theme,
+      patientHistory,
+      dispatch,
+      codetable,
+      user,
+      clinicSettings,
+    } = this.props
     const { location } = window
     const {
       userTitle,
@@ -185,6 +192,7 @@ class PatientHistory extends Component {
       visitPurposeName,
       coHistory = [],
     } = row
+    const { settings = [] } = clinicSettings
     const { patientID } = patientHistory
     const fromConsultation = location.pathname.includes('consultation')
     const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
@@ -329,30 +337,32 @@ class PatientHistory extends Component {
               </Authorized>
             )}
           </div>
-          <div
-            style={{
-              marginLeft: 'auto',
-              display: 'flex',
-              alignItems: 'center',
-              marginRight: 10,
-            }}
-          >
-            <Tooltip title='View History'>
-              <span
-                className='material-icons'
-                style={{ color: 'gray' }}
-                onClick={(event) => {
-                  event.stopPropagation()
-                  this.setState({
-                    showHistoryDetails: true,
-                    selectHistory: { ...row },
-                  })
-                }}
-              >
-                history
-              </span>
-            </Tooltip>
-          </div>
+          {settings.showConsultationVersioning && (
+            <div
+              style={{
+                marginLeft: 'auto',
+                display: 'flex',
+                alignItems: 'center',
+                marginRight: 10,
+              }}
+            >
+              <Tooltip title='View History'>
+                <span
+                  className='material-icons'
+                  style={{ color: 'gray' }}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    this.setState({
+                      showHistoryDetails: true,
+                      selectHistory: { ...row },
+                    })
+                  }}
+                >
+                  history
+                </span>
+              </Tooltip>
+            </div>
+          )}
         </div>
       </div>
     )
