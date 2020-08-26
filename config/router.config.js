@@ -1214,6 +1214,14 @@ const _routes = [
               'settings.clinicsetting.refractiontesttype',
             ],
           },
+          {
+            path: '/setting/package',
+            name: 'package',
+            component: './Setting/Package',
+            authority: [
+              'settings.clinicsetting.package',
+            ],
+          },
         ],
       },
       // Settings

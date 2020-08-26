@@ -54,24 +54,11 @@ const styles = () => ({
   },
 })
 
-const filterByAccessRight = (_result, m) => {
-  const accessRight = Authorized.check(m.authority)
-
-  if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
-    return [
-      ..._result,
-    ]
-
-  return [
-    ..._result,
-    { ...m, rights: accessRight.rights },
-  ]
-}
-
-@connect(({ systemSetting, global, user }) => ({
+@connect(({ systemSetting, global, user, clinicSettings }) => ({
   systemSetting,
   global,
   user,
+  clinicSettings,
 }))
 class SystemSetting extends PureComponent {
   constructor (props) {
@@ -80,10 +67,31 @@ class SystemSetting extends PureComponent {
   }
 
   menus = () => {
-    const { classes, theme, systemSetting } = this.props
+    const { classes, theme, systemSetting, clinicSettings } = this.props
 
+    const { settings = [] } = clinicSettings
     const { filterValues } = systemSetting
     const { searchText } = filterValues
+
+    const filterByAccessRight = (_result, m) => {
+      const accessRight = Authorized.check(m.authority)
+
+      if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
+        return [
+          ..._result,
+        ]
+
+      if (m.text === 'Package' && !settings.isEnablePackage)
+        return [
+          ..._result,
+        ]
+
+      return [
+        ..._result,
+        { ...m, rights: accessRight.rights },
+      ]
+    }
+
     return Object.keys(this.group).map((o) => {
       const filteredByAccessRight = this.group[o]
         .reduce(filterByAccessRight, [])
