@@ -322,24 +322,6 @@ const _routes = [
               'inventory/inventorymaster',
             ],
           },
-          {
-            path: '/inventory/master/inventorypackage',
-            name: 'package.package',
-            hideInMenu: true,
-            component: './Inventory/Master/Package/Details',
-            authority: [
-              'inventory/inventorymaster',
-            ],
-          },
-          {
-            path: '/inventory/master/editinventorypackage',
-            name: 'package.editpackage',
-            hideInMenu: true,
-            component: './Inventory/Master/Package/Details',
-            authority: [
-              'inventory/inventorymaster',
-            ],
-          },
           // {
           //   path: '/inventory/pd',
           //   name: 'pd',
@@ -1230,6 +1212,14 @@ const _routes = [
             component: './Setting/RefractionTestType',
             authority: [
               'settings.clinicsetting.refractiontesttype',
+            ],
+          },
+          {
+            path: '/setting/package',
+            name: 'package',
+            component: './Setting/Package',
+            authority: [
+              'settings.clinicsetting.package',
             ],
           },
         ],

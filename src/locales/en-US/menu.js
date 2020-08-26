@@ -75,8 +75,6 @@ export default {
   'menu.inventory.orderset.orderset': 'Add Order Set',
   'menu.inventory.orderset.editorderset': 'Edit Order Set',
   'menu.inventory.inventoryadjustment': 'Inventory Adjustment',
-  'menu.inventory.package.package': 'Add Package',
-  'menu.inventory.package.editpackage': 'Edit Package',
 
   'menu.queuelisting': 'Queue Listing',
   'menu.patientdashboard': 'Patient Dashboard',
@@ -159,6 +157,7 @@ export default {
   'menu.setting.casetype': 'Case Type',
   'menu.setting.casedescription': 'Case Description',
   'menu.setting.refractiontesttype': 'Refraction Test Type',
+  'menu.setting.package': 'Package',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',
