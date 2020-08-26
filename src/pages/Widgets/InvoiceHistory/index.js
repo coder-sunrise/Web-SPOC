@@ -18,7 +18,8 @@ import {
 // utils
 import { currencyFormatter } from '@/utils/utils'
 import { ReportViewer } from '@/components/_medisys'
-import PaymentDetails from '@/pages/Finance/Invoice/Details/PaymentDetails'
+import { getBizSession } from '@/services/queue'
+import PaymentDetails from './PaymentDetails'
 
 const styles = () => ({
   totalOSStyle: {
@@ -65,7 +66,23 @@ const InvoiceHistory = ({
     })
   }
 
-  useEffect(() => {
+  const [
+    hasActiveSession,
+    setHasActiveSession,
+  ] = useState(false)
+
+  const checkHasActiveSession = async () => {
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+    }
+    const result = await getBizSession(bizSessionPayload)
+    const { data } = result.data
+
+    setHasActiveSession(data.length > 0)
+  }
+
+  useEffect(async () => {
+    await checkHasActiveSession()
     refreshInvoiceList()
   }, [])
 
@@ -84,8 +101,16 @@ const InvoiceHistory = ({
     })
   }
 
-  const getContent = () => {
-    return <PaymentDetails refreshInvoiceList={refreshInvoiceList} />
+  const getContent = (o) => {
+    return (
+      <PaymentDetails
+        invoiceDetail={o.invoiceDetail}
+        invoicePayer={o.invoicePayer}
+        refreshInvoiceList={refreshInvoiceList}
+        hasActiveSession={hasActiveSession}
+        dispatch={dispatch}
+      />
+    )
   }
 
   const getTitle = (row) => {
@@ -153,33 +178,7 @@ const InvoiceHistory = ({
 
         <div className={classes.accordionStyle}>
           <Accordion
-            onChange={(event, p, expanded) => {
-              if (expanded) {
-                const { row } = p.prop
-
-                dispatch({
-                  type: 'invoicePayment/updateState',
-                  payload: {
-                    entity: null,
-                    currentId: null,
-                  },
-                })
-
-                dispatch({
-                  type: 'invoiceDetail/query',
-                  payload: {
-                    id: row.id,
-                  },
-                })
-
-                dispatch({
-                  type: 'invoicePayment/query',
-                  payload: {
-                    id: row.id,
-                  },
-                })
-              }
-            }}
+            mode='multiple'
             collapses={list.map((o) => {
               const returnValue = {
                 title: getTitle(o),
