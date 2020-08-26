@@ -20,10 +20,9 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ patient, user, loading }) => ({
+@connect(({ patient, user }) => ({
   patient: patient.entity || {},
   user,
-  loading,
 }))
 class AppointmentHistory extends PureComponent {
   state = {
@@ -31,6 +30,7 @@ class AppointmentHistory extends PureComponent {
     previousAppt: [],
     futureAppt: [],
     patientProfileFK: undefined,
+    loadingAppt: false,
   }
 
   componentDidMount () {
@@ -46,86 +46,94 @@ class AppointmentHistory extends PureComponent {
   }
 
   async getAppts (patientId) {
-    console.log('getAppts', patientId)
-    const { user, dispatch } = this.props
-    const commonParams = {
-      combineCondition: 'and',
-      sorting: [
-        { columnName: 'appointmentDate', direction: 'asc' },
-      ],
-    }
+    this.setState({ loadingAppt: true })
+    try {
+      // console.log('getAppts', patientId)
+      const { user, dispatch } = this.props
+      const commonParams = {
+        combineCondition: 'and',
+        sorting: [
+          { columnName: 'appointmentDate', direction: 'desc' },
+        ],
+      }
 
-    const viewOtherApptAccessRight = Authorized.check(
-      'appointment.viewotherappointment',
-    )
+      const viewOtherApptAccessRight = Authorized.check(
+        'appointment.viewotherappointment',
+      )
 
-    let doctor
-    if (
-      !viewOtherApptAccessRight ||
-      viewOtherApptAccessRight.rights !== 'enable'
-    ) {
-      doctor = user.data.clinicianProfile.id
-    }
+      let doctor
+      if (
+        !viewOtherApptAccessRight ||
+        viewOtherApptAccessRight.rights !== 'enable'
+      ) {
+        doctor = user.data.clinicianProfile.id
+      }
 
-    await dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ltappointmentstatus',
-      },
-    })
-    // const previous = undefined
-    const [
-      previous,
-      future,
-    ] = await Promise.all([
-      queryAppointments({
-        apiCriteria: {
-          // appStatus: [
-          //   APPOINTMENT_STATUS.CANCELLED,
-          //   APPOINTMENT_STATUS.TURNEDUP,
-          //   APPOINTMENT_STATUS.TURNEDUPLATE,
-          //   // APPOINTMENT_STATUS.NOSHOW,
-          // ].join(),
-          apptDateTo: moment().add(-1, 'd').formatUTC(),
-          patientProfileId: patientId,
-          doctor,
-          isIncludeHistory: true,
-          isIncludeRescheduledByClinic: false,
+      await dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ltappointmentstatus',
         },
-        ...commonParams,
-      }),
-      queryAppointments({
-        apiCriteria: {
-          apptDateFrom: moment().formatUTC(),
-          isIncludeHistory: true,
-          isIncludeRescheduledByClinic: false,
-          // appStatus: [
-          //   APPOINTMENT_STATUS.CONFIRMED,
-          //   APPOINTMENT_STATUS.RESCHEDULED,
-          //   APPOINTMENT_STATUS.PFA_RESCHEDULED,
-          // ].join(),
-          patientProfileId: patientId,
-          doctor,
-        },
-        ...commonParams,
-      }),
-    ])
-    let previousAppt = []
-    let futureAppt = []
-    if (previous) {
-      const { status, data } = previous
-      if (status === '200') previousAppt = this.reBuildApptDatas(data.data)
-    }
+      })
 
-    if (future) {
-      const { status, data } = future
-      if (status === '200') futureAppt = this.reBuildApptDatas(data.data)
+      // const future = undefined
+      const [
+        previous,
+        future,
+      ] = await Promise.all([
+        queryAppointments({
+          apiCriteria: {
+            // appStatus: [
+            //   APPOINTMENT_STATUS.CANCELLED,
+            //   APPOINTMENT_STATUS.TURNEDUP,
+            //   APPOINTMENT_STATUS.TURNEDUPLATE,
+            //   // APPOINTMENT_STATUS.NOSHOW,
+            // ].join(),
+            apptDateTo: moment().add(-1, 'd').formatUTC(),
+            patientProfileId: patientId,
+            doctor,
+            isIncludeHistory: true,
+            isIncludeRescheduledByClinic: false,
+          },
+          ...commonParams,
+        }),
+        queryAppointments({
+          apiCriteria: {
+            apptDateFrom: moment().formatUTC(),
+            isIncludeHistory: true,
+            isIncludeRescheduledByClinic: false,
+            // appStatus: [
+            //   APPOINTMENT_STATUS.CONFIRMED,
+            //   APPOINTMENT_STATUS.RESCHEDULED,
+            //   APPOINTMENT_STATUS.PFA_RESCHEDULED,
+            // ].join(),
+            patientProfileId: patientId,
+            doctor,
+          },
+          ...commonParams,
+        }),
+      ])
+      let previousAppt = []
+      let futureAppt = []
+      if (previous) {
+        const { status, data } = previous
+        if (status === '200') previousAppt = this.reBuildApptDatas(data.data)
+      }
+
+      if (future) {
+        const { status, data } = future
+        if (status === '200') futureAppt = this.reBuildApptDatas(data.data)
+      }
+      this.setState({
+        futureAppt,
+        previousAppt,
+        patientProfileFK: patientId,
+        loadingAppt: false,
+      })
+    } catch (error) {
+      console.log(error)
+      this.setState({ loadingAppt: false })
     }
-    this.setState({
-      futureAppt,
-      previousAppt,
-      patientProfileFK: patientId,
-    })
   }
 
   async UNSAFE_componentWillReceiveProps (nextProps) {
@@ -180,10 +188,10 @@ class AppointmentHistory extends PureComponent {
   }
 
   render () {
-    const { classes, theme, handleRowDoubleClick, loading } = this.props
-    const { previousAppt, futureAppt } = this.state
+    const { classes, theme, handleRowDoubleClick } = this.props
+    const { previousAppt, futureAppt, loadingAppt } = this.state
     return (
-      <LoadingWrapper loading={loading.global} text='loading...'>
+      <LoadingWrapper loading={loadingAppt} text='loading...'>
         <div>
           <CardContainer hideHeader size='sm'>
             <h4 style={{ marginTop: 20 }}>Current & Future Appointment</h4>

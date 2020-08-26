@@ -6,8 +6,30 @@ import { CodeSelect, Tooltip } from '@/components'
 export const commonExt = [
   {
     columnName: 'appointmentStatusFk',
-    type: 'codeSelect',
-    code: 'ltappointmentstatus',
+    // type: 'codeSelect',
+    // code: 'ltappointmentstatus',
+    render: (row) => {
+      const redColorStatus = [
+        APPOINTMENT_STATUS.PFA_CANCELLED,
+        APPOINTMENT_STATUS.PFA_NOSHOW,
+        APPOINTMENT_STATUS.PFA_RESCHEDULED,
+      ]
+      return (
+        <div
+          style={{
+            color: redColorStatus.includes(row.appointmentStatusFk)
+              ? 'red'
+              : undefined,
+          }}
+        >
+          <CodeSelect
+            code='ltappointmentstatus'
+            text
+            value={row.appointmentStatusFk}
+          />
+        </div>
+      )
+    },
   },
   {
     columnName: 'appointmentDate',
@@ -29,12 +51,11 @@ export const commonExt = [
   {
     columnName: 'cancellationReason',
     render: (row) => {
-      const { cancellationReason, rescheduleReason } = row
-      let title = cancellationReason || ''
-      if (title !== '') {
-        title = `${title}, ${rescheduleReason}`
-      } else title = rescheduleReason
-
+      const { cancellationReason = '', rescheduleReason = '' } = row
+      let reasons = []
+      if (cancellationReason !== '') reasons.push(cancellationReason)
+      if (rescheduleReason !== '') reasons.push(rescheduleReason)
+      const title = reasons.join(', ')
       return (
         <Tooltip title={title}>
           <span>{title}</span>
