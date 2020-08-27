@@ -50,7 +50,9 @@ const NotificationContent = ({ notification, classes, dispatch }) => {
   const icon = ICONS[notification.type] || Object.values(ICONS)[0]
   if (notification.type === NOTIFICATION_TYPE.QUEUE) {
     const { queueNo = 'xx.x' } = notification
-    messageTitle = `${TITLE[NOTIFICATION_TYPE.QUEUE]} ${queueNo} -`
+    messageTitle = `${TITLE[NOTIFICATION_TYPE.QUEUE]} ${queueNo.includes('.')
+      ? queueNo
+      : `${queueNo}.0`} -`
   }
   const isError = notification.type === NOTIFICATION_TYPE.ERROR
 
