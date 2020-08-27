@@ -36,8 +36,9 @@ const PatientInfoInput = ({
     patientProfileFK !== undefined && patientProfileFK !== null
 
   const allowedToActualize = [
-    APPOINTMENT_STATUS.SCHEDULED,
+    APPOINTMENT_STATUS.CONFIRMED,
     APPOINTMENT_STATUS.RESCHEDULED,
+    APPOINTMENT_STATUS.PFA_RESCHEDULED,
   ].includes(appointmentStatusFK)
 
   return (
