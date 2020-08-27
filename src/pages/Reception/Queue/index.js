@@ -821,10 +821,7 @@ class Queue extends React.Component {
     } = this.state
     const { sessionInfo, error } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
-    const { oriQCallList = [] } = queueCalling
-    const [
-      lastCall,
-    ] = oriQCallList
+    const { tracker } = queueCalling
 
     return (
       <PageHeaderWrapper
@@ -838,7 +835,7 @@ class Queue extends React.Component {
             </h3>
 
             <Authorized authority='openqueuedisplay'>
-              {lastCall ? (
+              {tracker ? (
                 <h4
                   className={classNames(classes.sessionNo)}
                   style={{
@@ -850,16 +847,16 @@ class Queue extends React.Component {
                 >
                   <font color='red'>
                     NOW SERVING:{' '}
-                    {lastCall.qNo.includes('.') ? (
-                      lastCall.qNo
+                    {tracker.qNo.includes('.') ? (
+                      tracker.qNo
                     ) : (
-                        `${lastCall.qNo}.0`
-                      )}
+                      `${tracker.qNo}.0`
+                    )}
                   </font>
                 </h4>
               ) : (
-                  ''
-                )}
+                ''
+              )}
             </Authorized>
 
             {!isClinicSessionClosed && (
@@ -910,35 +907,35 @@ class Queue extends React.Component {
                 errorState={error}
               />
             ) : (
-                <div>
-                  <DetailsActionBar
-                    // selfOnly={queueLog.selfOnly}
-                    // onSwitchClick={this.toggleFilterSelfOnly}
-                    onRegisterVisitEnterPressed={this.onEnterPressed}
-                    toggleNewPatient={this.toggleRegisterNewPatient}
-                    setSearch={this.setSearch}
-                  />
-                  <DetailsGrid
-                    // onViewPatientProfileClick={this.onViewPatientProfileClick}
-                    // onViewDispenseClick={this.toggleDispense}
-                    // onRegisterPatientClick={this.toggleRegisterNewPatient}
-                    // handleEditVisitClick={this.showVisitRegistration}
-                    // handleActualizeAppointment={this.handleActualizeAppointment}
-                    onMenuItemClick={this.onMenuItemClick}
-                    onContextMenu={this.onContextMenu}
-                    // handleFormsClick={this.showVisitForms}
-                    history={history}
-                    searchQuery={search}
-                  />
-                  <RightClickContextMenu
-                    onMenuItemClick={this.onMenuItemClick}
-                    onOutsidePopoverRightClick={this.onHideContextMenu}
-                    anchorEl={this.state.anchorEl}
-                    rightClickedRow={this.state.rightClickedRow}
-                    dispatch={dispatch}
-                  />
-                </div>
-              )}
+              <div>
+                <DetailsActionBar
+                  // selfOnly={queueLog.selfOnly}
+                  // onSwitchClick={this.toggleFilterSelfOnly}
+                  onRegisterVisitEnterPressed={this.onEnterPressed}
+                  toggleNewPatient={this.toggleRegisterNewPatient}
+                  setSearch={this.setSearch}
+                />
+                <DetailsGrid
+                  // onViewPatientProfileClick={this.onViewPatientProfileClick}
+                  // onViewDispenseClick={this.toggleDispense}
+                  // onRegisterPatientClick={this.toggleRegisterNewPatient}
+                  // handleEditVisitClick={this.showVisitRegistration}
+                  // handleActualizeAppointment={this.handleActualizeAppointment}
+                  onMenuItemClick={this.onMenuItemClick}
+                  onContextMenu={this.onContextMenu}
+                  // handleFormsClick={this.showVisitForms}
+                  history={history}
+                  searchQuery={search}
+                />
+                <RightClickContextMenu
+                  onMenuItemClick={this.onMenuItemClick}
+                  onOutsidePopoverRightClick={this.onHideContextMenu}
+                  anchorEl={this.state.anchorEl}
+                  rightClickedRow={this.state.rightClickedRow}
+                  dispatch={dispatch}
+                />
+              </div>
+            )}
             <CommonModal
               open={showPatientSearch}
               title={formatMessage({ id: 'reception.queue.patientSearch' })}
@@ -968,8 +965,8 @@ class Queue extends React.Component {
                 this.state.formCategory === FORM_CATEGORY.VisitForms ? (
                   'Visit Forms'
                 ) : (
-                    'Forms'
-                  )
+                  'Forms'
+                )
               }
               onClose={this.toggleForms}
               onConfirm={this.toggleForms}
