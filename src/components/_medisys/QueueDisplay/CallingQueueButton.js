@@ -144,10 +144,11 @@ const CallingQueueButton = ({
           },
         })
         sendNotification('QueueCalled', {
-          type: NOTIFICATION_TYPE.QUEUECALL,
+          type: NOTIFICATION_TYPE.QUEUE,
           status: NOTIFICATION_STATUS.OK,
           message: 'Queue Called',
           ...callingQueue,
+          queueNo: callingQueue.qNo,
         })
       } else {
         dispatch({
