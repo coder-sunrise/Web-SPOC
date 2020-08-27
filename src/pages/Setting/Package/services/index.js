@@ -1,6 +1,6 @@
 import * as service from '@/services/common'
 
-const url = '/api/InventoryPackage'
+const url = '/api/Package'
 
 module.exports = {
   query: (params) => service.query(url, params),
