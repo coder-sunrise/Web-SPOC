@@ -91,17 +91,19 @@ export const commonExt = [
     // type: 'codeSelect',
     // code: 'ltappointmentstatus',
     render: (row) => {
+      let color
       const redColorStatus = [
         APPOINTMENT_STATUS.PFA_CANCELLED,
         APPOINTMENT_STATUS.PFA_NOSHOW,
         APPOINTMENT_STATUS.PFA_RESCHEDULED,
       ]
+      if (redColorStatus.includes(row.appointmentStatusFk)) color = 'red'
+      if (row.appointmentStatusFk === APPOINTMENT_STATUS.CONFIRMED)
+        color = 'green'
       return (
         <div
           style={{
-            color: redColorStatus.includes(row.appointmentStatusFk)
-              ? 'red'
-              : undefined,
+            color,
           }}
         >
           <CodeSelect
