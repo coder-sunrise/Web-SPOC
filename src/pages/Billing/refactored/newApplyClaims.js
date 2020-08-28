@@ -72,7 +72,7 @@ const ApplyClaims = ({
   noExtraOptions = false,
   fromBilling = false,
   handleIsExistingOldPayerItem,
-  clinicSettings,
+  clinicSettings = {},
 }) => {
   const {
     invoice,
