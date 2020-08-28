@@ -110,7 +110,7 @@ export const Scanconfig = ({
 
   return (
     <React.Fragment>
-      <GridItem xs={12}>
+      {/* <GridItem xs={12}>
         <CheckboxGroup
           vertical
           textField='name'
@@ -126,7 +126,7 @@ export const Scanconfig = ({
             setDuplex(isDuplex)
           }}
         />
-      </GridItem>
+      </GridItem> */}
       <GridItem xs={12}>
         <Select
           label='Pixel Type'
