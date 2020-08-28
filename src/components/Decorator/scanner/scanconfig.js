@@ -110,7 +110,7 @@ export const Scanconfig = ({
 
   return (
     <React.Fragment>
-      {/* <GridItem xs={12}>
+      <GridItem xs={12}>
         <CheckboxGroup
           vertical
           textField='name'
@@ -119,6 +119,7 @@ export const Scanconfig = ({
             // { value: 'Duplex', name: 'Duplex' },
           ]}
           noUnderline
+          disabled={autoFeeder}
           onChange={(e) => {
             const isAutoFeeder = e.target.value.indexOf('AutoFeeder') >= 0
             const isDuplex = e.target.value.indexOf('Duplex') >= 0
@@ -126,7 +127,7 @@ export const Scanconfig = ({
             setDuplex(isDuplex)
           }}
         />
-      </GridItem> */}
+      </GridItem>
       <GridItem xs={12}>
         <Select
           label='Pixel Type'
