@@ -119,6 +119,7 @@ export const Scanconfig = ({
             // { value: 'Duplex', name: 'Duplex' },
           ]}
           noUnderline
+          disabled={autoFeeder}
           onChange={(e) => {
             const isAutoFeeder = e.target.value.indexOf('AutoFeeder') >= 0
             const isDuplex = e.target.value.indexOf('Duplex') >= 0
