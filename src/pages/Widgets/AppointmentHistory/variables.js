@@ -14,6 +14,7 @@ export const commonExt = [
         APPOINTMENT_STATUS.PFA_CANCELLED,
         APPOINTMENT_STATUS.PFA_NOSHOW,
         APPOINTMENT_STATUS.PFA_RESCHEDULED,
+        APPOINTMENT_STATUS.TURNEDUPLATE,
       ]
       if (redColorStatus.includes(row.appointmentStatusFk)) color = 'red'
       if (row.appointmentStatusFk === APPOINTMENT_STATUS.CONFIRMED)
