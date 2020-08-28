@@ -787,7 +787,7 @@ const ApplyClaims = ({
           <div style={{ paddingLeft: 8, paddingBottom: 8 }}>
             <WarningSnackbar
               variant='warning'
-              message='Invoice has been updated. Kindly remove the payment(s) made for existing copayer/ scheme and re-apply the copayer/ scheme again!'
+              message='Invoice has been updated. Kindly remove if there is any payment(s) made for existing copayer/scheme and re-apply the copayer/scheme again!'
             />
           </div>
         </GridItem>
