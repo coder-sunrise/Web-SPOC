@@ -351,7 +351,10 @@ const Scheme = ({
               color='primary'
               className={classes.rightEndBtn}
               onClick={handleEditClick}
-              disabled={disableEdit || existingOldPayerItem}
+              disabled={
+                disableEdit ||
+                (isEnableAddPaymentInBilling && existingOldPayerItem)
+              }
             >
               Edit
             </Button>
