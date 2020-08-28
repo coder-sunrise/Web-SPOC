@@ -680,6 +680,7 @@ class Billing extends Component {
       sessionInfo,
       user,
     }
+    const { isEnableAddPaymentInBilling = false } = clinicSettings
     return (
       <LoadingWrapper loading={loading} text='Getting billing info...'>
         <PatientBanner />
@@ -779,10 +780,11 @@ class Billing extends Component {
                   disabled={
                     this.state.isEditing ||
                     values.id === undefined ||
-                    values.invoicePayer.find((payer) =>
-                      (payer.invoicePayment || [])
-                        .find((payment) => !payment.isCancelled),
-                    )
+                    (isEnableAddPaymentInBilling &&
+                      values.invoicePayer.find((payer) =>
+                        (payer.invoicePayment || [])
+                          .find((payment) => !payment.isCancelled),
+                      ))
                   }
                 >
                   <ArrowBack />Dispense
@@ -799,7 +801,8 @@ class Billing extends Component {
                   disabled={
                     this.state.isEditing ||
                     values.id === undefined ||
-                    this.state.isExistingOldPayerItem
+                    (isEnableAddPaymentInBilling &&
+                      this.state.isExistingOldPayerItem)
                   }
                   onClick={this.onCompletePaymentClick}
                 >

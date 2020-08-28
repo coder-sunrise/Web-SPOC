@@ -778,9 +778,11 @@ const ApplyClaims = ({
     setOnVoid({ payerIndex: index, ...payment })
     toggleDeleteConfirmation()
   }
+  const { isEnableAddPaymentInBilling = false } = clinicSettings
   return (
     <Fragment>
-      {checkExistingOldPayerItem() && (
+      {isEnableAddPaymentInBilling &&
+      checkExistingOldPayerItem() && (
         <GridItem md={12}>
           <div style={{ paddingLeft: 8, paddingBottom: 8 }}>
             <WarningSnackbar
