@@ -25,6 +25,8 @@ import {
   Field,
   CommonModal,
   ProgressButton,
+  notification,
+  EditableTableGrid,
 } from '@/components'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
@@ -37,6 +39,10 @@ const authorityCfg = {
   '1': 'queue.consultation.order.medication',
   '5': 'queue.consultation.order.openprescription',
 }
+
+const drugMixtureItemSchema = Yup.object().shape({
+  inventoryMedicationFK: Yup.string().required(),
+})
 
 @connect(({ global, codetable, visitRegistration, user }) => ({
   global,
@@ -92,10 +98,21 @@ const authorityCfg = {
     dispenseUOMFK: Yup.number().required(),
     totalPrice: Yup.number().required(),
     type: Yup.string(),
-    inventoryMedicationFK: Yup.number().when('type', {
-      is: (val) => val !== '5',
-      then: Yup.number().required(),
-    }),
+    // inventoryMedicationFK: Yup.number().when('type', {
+    //   is: (val) => val !== '5',
+    //   then: Yup.number().required(),
+    // }),
+    inventoryMedicationFK: Yup.number().when(
+      [
+        'type',
+        'isDrugMixture',
+      ],
+      (type, isDrugMixture) => {
+        if (type === '1' && !isDrugMixture) return Yup.number().required()
+        return Yup.number()
+      },
+    ),
+
     drugName: Yup.string().when('type', {
       is: (val) => val === '5',
       then: Yup.string().required(),
@@ -110,6 +127,19 @@ const authorityCfg = {
         sequence: Yup.number().required(),
         stepdose: Yup.string().required(),
       }),
+    ),
+    corPrescriptionItemDrugMixture: Yup.array().when(
+      [
+        'type',
+        'isDrugMixture',
+      ],
+      (type, isDrugMixture) => {
+        if (type === '1' && isDrugMixture)
+          return Yup.array()
+            .compact((v) => v.isDeleted)
+            .of(drugMixtureItemSchema)
+        return Yup.array().compact((v) => v.isDeleted)
+      },
     ),
   }),
 
@@ -691,6 +721,91 @@ class Medication extends PureComponent {
     })
   }
 
+  drugMixtureTableParas = {
+    columns: [
+      { name: 'inventoryMedicationFK', title: 'Name' },
+    ],
+    columnExtensions: [
+      {
+        columnName: 'inventoryMedicationFK',
+        type: 'codeSelect',
+        code: 'inventorymedication',
+        onChange: ({ val, row }) => {
+          const { values } = this.props
+          const rs = values.corPrescriptionItemDrugMixture.filter(
+            (o) =>
+              !o.isDeleted &&
+              o.inventoryMedicationFK === val &&
+              o.id !== row.id,
+          )
+          if (rs.length > 0) {
+            notification.warn({
+              message: 'The medication already exist in the list',
+            })
+          }
+        },
+      },
+    ],
+  }
+
+  checkIsDrugMixtureItemUnique = ({ rows, changed }) => {
+    if (!changed) return rows
+    const key = Object.keys(changed)[0]
+    const obj = changed[key]
+    if (obj.inventoryMedicationFK !== undefined) {
+      const hasDuplicate = rows.filter(
+        (i) =>
+          !i.isDeleted && i.inventoryMedicationFK === obj.inventoryMedicationFK,
+      )
+      if (hasDuplicate.length >= 2) {
+        return rows.map(
+          (row) =>
+            row.id === parseInt(key, 10)
+              ? { ...row, inventoryMedicationFK: undefined }
+              : row,
+        )
+      }
+    }
+    return rows
+  }
+
+  commitDrugMixtureItemChanges = ({ rows, deleted, added, changed }) => {
+    const { setFieldValue, values } = this.props
+    if (deleted) {
+      const tempArray = [
+        ...values.corPrescriptionItemDrugMixture,
+      ]
+
+      const newArray = tempArray.map((o) => {
+        if (o.id === deleted[0]) {
+          return {
+            ...o,
+            isDeleted: true,
+          }
+        }
+        return {
+          ...o,
+        }
+      })
+
+      setFieldValue('corPrescriptionItemDrugMixture', newArray)
+      this.setState(() => {
+        return {
+          corPrescriptionItemDrugMixture: newArray,
+        }
+      })
+    } else {
+      const _rows = this.checkIsDrugMixtureItemUnique({ rows, changed })
+
+      _rows.forEach((val, i) => {
+        val.prescriptionItemFK = values.id
+        val.inventoryMedicationFKNavigation = null
+      })
+
+      setFieldValue('corPrescriptionItemDrugMixture', _rows)
+    }
+  }
+
   render () {
     const {
       theme,
@@ -722,14 +837,21 @@ class Medication extends PureComponent {
           <GridContainer>
             <GridItem xs={6}>
               <React.Fragment>
-                {openPrescription ? (
+                {openPrescription || values.isDrugMixture ? (
                   <FastField
                     name='drugName'
                     render={(args) => {
                       return (
                         <div id={`autofocus_${values.type}`}>
                           <TextField
-                            label='Open Prescription Name'
+                            label={
+                              values.isDrugMixture ? (
+                                'Drug Mixture'
+                              ) : (
+                                'Open Prescription Name'
+                              )
+                            }
+                            disabled={!openPrescription && values.isDrugMixture}
                             {...args}
                             autocomplete='nope'
                           />
@@ -767,7 +889,32 @@ class Medication extends PureComponent {
                 )}
               </React.Fragment>
             </GridItem>
-            <GridItem xs={6}>
+            <GridItem xs={2} style={{ marginTop: theme.spacing(2) }}>
+              {!openPrescription && (
+                <FastField
+                  name='isDrugMixture'
+                  render={(args) => {
+                    return (
+                      <Checkbox
+                        label='Drug Mixture'
+                        disabled={isEditMedication}
+                        {...args}
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            this.props.setFieldValue('drugCode', 'Drug Mixture')
+                            this.props.setFieldValue('drugName', 'Drug Mixture')
+                          } else {
+                            this.props.setFieldValue('drugCode', undefined)
+                            this.props.setFieldValue('drugName', undefined)
+                          }
+                        }}
+                      />
+                    )
+                  }}
+                />
+              )}
+            </GridItem>
+            <GridItem xs={4}>
               {!openPrescription &&
               !isEditMedication && (
                 <Tooltip title='Add From Past'>
@@ -783,6 +930,28 @@ class Medication extends PureComponent {
               )}
             </GridItem>
           </GridContainer>
+          {values.isDrugMixture && (
+            <GridContainer>
+              <GridItem xs={12}>
+                <EditableTableGrid
+                  forceRender
+                  style={{
+                    margin: theme.spacing(1),
+                  }}
+                  rows={values.corPrescriptionItemDrugMixture}
+                  FuncProps={{
+                    pager: false,
+                  }}
+                  EditingProps={{
+                    showAddCommand: true,
+                    onCommitChanges: this.commitDrugMixtureItemChanges,
+                  }}
+                  schema={drugMixtureItemSchema}
+                  {...this.drugMixtureTableParas}
+                />
+              </GridItem>
+            </GridContainer>
+          )}
           <GridContainer gutter={0}>
             <GridItem xs={12}>
               <CustomInputWrapper
@@ -1161,12 +1330,12 @@ class Medication extends PureComponent {
               />
             </GridItem>
             <GridItem xs={2}>
-              <FastField
+              <Field
                 name='dispenseUOMFK'
                 render={(args) => {
                   return (
                     <CodeSelect
-                      disabled={!openPrescription}
+                      disabled={!openPrescription && !values.isDrugMixture}
                       label='UOM'
                       allowClear={false}
                       code='ctMedicationUnitOfMeasurement'
@@ -1291,7 +1460,8 @@ class Medication extends PureComponent {
               />
             </GridItem>
             <GridItem xs={12}>
-              {values.visitPurposeFK !== VISIT_TYPE.RETAIL ? (
+              {values.visitPurposeFK !== VISIT_TYPE.RETAIL &&
+              !values.isDrugMixture ? (
                 <FastField
                   name='isExternalPrescription'
                   render={(args) => {
