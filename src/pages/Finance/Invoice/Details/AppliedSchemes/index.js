@@ -86,6 +86,7 @@ class AppliedScheme extends Component {
   state = {
     submitCount: 0,
     isEditing: false,
+    loadInvoicePayer: false,
   }
 
   componentWillMount () {
@@ -97,6 +98,8 @@ class AppliedScheme extends Component {
         id: entity.id,
         invoiceVersionNo: entity.invoiceVersionNo,
       },
+    }).then(() => {
+      this.setState({ loadInvoicePayer: true })
     })
   }
 
@@ -232,7 +235,12 @@ class AppliedScheme extends Component {
           >
             <ArrowLeft />Back To Invoice Details
           </Button>
-          <Button size='sm' color='primary' onClick={this.handleSaveClick}>
+          <Button
+            size='sm'
+            color='primary'
+            onClick={this.handleSaveClick}
+            disabled={!this.state.loadInvoicePayer}
+          >
             <Save />Save Changes
           </Button>
         </div>
