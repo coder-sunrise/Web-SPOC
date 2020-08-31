@@ -398,7 +398,7 @@ class NewVisit extends PureComponent {
                       <GridItem xs={12} className={classes.row}>
                         <VisitInfoCard
                           // isReadOnly={isReadOnly}
-                          isVisitRemarksDisabled={isReadonlyAfterSigned}
+                          isVisitReadonlyAfterSigned={isReadonlyAfterSigned}
                           existingQNo={existingQNo}
                           handleUpdateAttachments={this.updateAttachments}
                           attachments={values.visitAttachment}

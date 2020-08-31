@@ -30,9 +30,9 @@ import {
 import { getAppendUrl } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import { currencySymbol } from '@/utils/config'
+import { control } from '@/components/Decorator'
 import Block from './Block'
 import HistoryDiagnosis from './HistoryDiagnosis'
-import { control } from '@/components/Decorator'
 
 const headerStyles = {
   color: 'darkblue',
@@ -624,19 +624,26 @@ class Banner extends PureComponent {
                         {entity.patientScheme.slice(0, 2).map((o) => {
                           const schemeData = this.getSchemeDetails(o)
                           const displayString = `${schemeData.coPaymentSchemeFK
-                            ? schemeData.copaymentSchemeName
-                            : schemeData.schemeTypeName} (Exp: ${schemeData.validTo
+                            ? schemeData.copaymentSchemeName || ''
+                            : schemeData.schemeTypeName ||
+                              ''} (Exp: ${schemeData.validTo
                             ? moment(schemeData.validTo).format('DD MMM YYYY')
                             : '-'})`
                           return (
-                            <div>
+                            <div style={{ display: 'flex' }}>
                               {schemeData.statusDescription && (
-                                <Tooltip title={schemeData.statusDescription}>
-                                  <Warining
-                                    color='error'
-                                    style={{ position: 'absolute' }}
-                                  />
-                                </Tooltip>
+                                <div
+                                  style={{
+                                    width: 25,
+                                  }}
+                                >
+                                  <Tooltip title={schemeData.statusDescription}>
+                                    <Warining
+                                      color='error'
+                                      style={{ position: 'absolute' }}
+                                    />
+                                  </Tooltip>
+                                </div>
                               )}
                               {
                                 <Tooltip title={displayString}>

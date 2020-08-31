@@ -1,65 +1,68 @@
-import React, { PureComponent } from 'react'
-import { connect } from 'dva'
+import React from 'react'
+import { Table } from 'antd'
 import moment from 'moment'
-import PerfectScrollbar from 'perfect-scrollbar'
-import Link from 'umi/link'
-import DateRange from '@material-ui/icons/DateRange'
-import {
-  withStyles,
-  MenuItem,
-  MenuList,
-  Divider,
-  Paper,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
-  Typography,
-} from '@material-ui/core'
-import {
-  PictureUpload,
-  GridContainer,
-  GridItem,
-  CardContainer,
-  Transition,
-  TextField,
-  AntdInput,
-  Select,
-  Accordion,
-  Button,
-  CommonTableGrid,
-  DatePicker,
-  NumberInput,
-} from '@/components'
-import AmountSummary from '@/pages/Shared/AmountSummary'
+import numeral from 'numeral'
+import { currencySymbol } from '@/utils/config'
+import { GridContainer, GridItem, TextField, DatePicker } from '@/components'
 import { VISIT_TYPE } from '@/utils/constants'
+import AmountSummary from './AmountSummary'
+import tablestyles from './PatientHistoryStyle.less'
+
+const numberstyle = {
+  color: 'darkBlue',
+  fontWeight: 500,
+}
 
 const baseColumns = [
-  { name: 'itemType', title: 'Type' },
-  { name: 'itemName', title: 'Name' },
-  { name: 'quantity', title: 'Quantity' },
-  { name: 'dispenseUOMDisplayValue', title: 'UOM' },
-  { name: 'adjAmt', title: 'Adj' },
-  { name: 'totalAfterItemAdjustment', title: 'Total' },
+  { dataIndex: 'itemType', title: 'Type', width: 150 },
+  { dataIndex: 'itemName', title: 'Name' },
+  {
+    dataIndex: 'quantity',
+    title: 'Quantity',
+    align: 'right',
+    width: 90,
+    render: (text, row) => (
+      <div style={numberstyle}>
+        {`${numeral(row.quantity || 0).format('0,0.00')}`}
+      </div>
+    ),
+  },
+  { dataIndex: 'dispenseUOMDisplayValue', title: 'UOM', width: 100 },
+  {
+    dataIndex: 'adjAmt',
+    title: 'Adj.',
+    width: 120,
+    align: 'right',
+    render: (text, row) => (
+      <div style={numberstyle}>
+        {`${currencySymbol}${numeral(row.adjAmt || 0).format('0,0.00')}`}
+      </div>
+    ),
+  },
+  {
+    dataIndex: 'totalAfterItemAdjustment',
+    title: 'Total',
+    width: 120,
+    align: 'right',
+    render: (text, row) => (
+      <div style={numberstyle}>
+        {`${currencySymbol}${numeral(row.totalAfterItemAdjustment || 0).format(
+          '0,0.00',
+        )}`}
+      </div>
+    ),
+  },
 ]
 
-export default ({ classes, current, theme, setFieldValue }) => {
-  const amountProps = {
-    text: true,
-    currency: true,
-    rightAlign: true,
-  }
-
-  let invoiceItemData = []
+export default ({ current, theme }) => {
   let invoiceAdjustmentData = []
   let columns = baseColumns
+
   if (current.invoice) {
     const {
-      invoiceItem = [],
       invoiceAdjustment = [],
       visitPurposeFK = VISIT_TYPE.CONS,
     } = current.invoice
-    invoiceItemData = invoiceItem
     invoiceAdjustmentData = invoiceAdjustment
 
     if (
@@ -67,106 +70,84 @@ export default ({ classes, current, theme, setFieldValue }) => {
       visitPurposeFK === VISIT_TYPE.BILL_FIRST
     ) {
       columns = [
-        { name: 'itemType', title: 'Type' },
-        { name: 'itemName', title: 'Name' },
+        { dataIndex: 'itemType', title: 'Type', width: 150 },
+        { dataIndex: 'itemName', title: 'Name' },
         {
-          name: 'description',
+          dataIndex: 'description',
           title: 'Description',
         },
-        { name: 'quantity', title: 'Quantity' },
-        { name: 'adjAmt', title: 'Adj' },
-        { name: 'totalAfterItemAdjustment', title: 'Total' },
+        {
+          dataIndex: 'quantity',
+          title: 'Quantity',
+          align: 'right',
+          width: 90,
+          render: (text, row) => (
+            <div style={numberstyle}>
+              {`${numeral(row.quantity || 0).format('0,0.00')}`}
+            </div>
+          ),
+        },
+        {
+          dataIndex: 'adjAmt',
+          title: 'Adj',
+          width: 120,
+          align: 'right',
+          render: (text, row) => (
+            <div style={numberstyle}>
+              {`${currencySymbol}${numeral(row.adjAmt || 0).format('0,0.00')}`}
+            </div>
+          ),
+        },
+        {
+          dataIndex: 'totalAfterItemAdjustment',
+          title: 'Total',
+          width: 120,
+          align: 'right',
+          render: (text, row) => (
+            <div style={numberstyle}>
+              {`${currencySymbol}${numeral(
+                row.totalAfterItemAdjustment || 0,
+              ).format('0,0.00')}`}
+            </div>
+          ),
+        },
       ]
     }
   }
 
   return (
-    <div>
+    <div style={{ fontSize: '0.875rem' }}>
       {current.invoice ? (
-        <GridContainer>
-          <GridItem xs={12}>
-            <TextField
-              prefix='Invoice No: '
-              text
-              value={current.invoice.invoiceNo}
-              noUnderline
-            />
-          </GridItem>
-          <GridItem xs={12}>
-            <DatePicker
-              prefix='Invoice Date: '
-              text
-              value={current.invoice.invoiceDate}
-              noUnderline
-            />
-          </GridItem>
-        </GridContainer>
+        <div style={{ marginBottom: 5 }}>
+          <span>{`Invoice No: ${current.invoice.invoiceNo}`}</span>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <span>
+            {`Invoice Date: ${moment(current.invoice.invoiceDate).format(
+              'DD MMM YYYY',
+            )}`}
+          </span>
+        </div>
       ) : (
         ''
       )}
-
-      <CommonTableGrid
-        size='sm'
-        rows={current.invoice ? current.invoice.invoiceItem : []}
+      <Table
+        size='small'
+        bordered
+        pagination={false}
         columns={columns}
-        FuncProps={{ pager: false }}
-        columnExtensions={[
-          { columnName: 'itemType', width: 150 },
-          { columnName: 'description', width: 'auto' },
-          { columnName: 'quantity', width: 90, type: 'number' },
-          { columnName: 'dispenseUOMDisplayValue', width: 100 },
-          {
-            columnName: 'adjAmt',
-            type: 'number',
-            currency: true,
-            width: 120,
-          },
-          {
-            columnName: 'totalAfterItemAdjustment',
-            type: 'number',
-            currency: true,
-            width: 120,
-          },
-        ]}
+        dataSource={current.invoice ? current.invoice.invoiceItem : []}
+        rowClassName={(record, index) => {
+          return index % 2 === 0 ? tablestyles.once : tablestyles.two
+        }}
+        className={tablestyles.table}
       />
-      <GridContainer
-        // direction='column'
-        // justify='center'
-        // alignItems='flex-end'
-        style={{ paddingTop: theme.spacing(2) }}
-      >
-        <GridItem xs={2} md={8} />
-        <GridItem xs={10} md={4}>
-          <div style={{ marginRight: -5 }}>
-            <AmountSummary
-              showAdjustment
-              rows={invoiceItemData}
-              adjustments={invoiceAdjustmentData}
-              config={{
-                isGSTInclusive: current.invoice
-                  ? current.invoice.isGSTInclusive
-                  : '',
-                totalField: 'totalAfterItemAdjustment',
-                adjustedField: 'totalAfterOverallAdjustment',
-                gstValue: current.invoice
-                  ? current.invoice.gstValue
-                  : undefined,
-              }}
-              onValueChanged={(v) => {
-                // console.log('onValueChanged', v)
-                if (setFieldValue) {
-                  setFieldValue(
-                    'current.invoice.invoiceTotalAftGST',
-                    v.summary.totalWithGST,
-                  )
-                  setFieldValue(
-                    'current.invoice.invoiceAdjustment',
-                    v.adjustments,
-                  )
-                }
-              }}
-            />
-          </div>
+      <GridContainer style={{ paddingTop: theme.spacing(2) }}>
+        <GridItem xs={2} md={9} />
+        <GridItem xs={10} md={3}>
+          <AmountSummary
+            adjustments={invoiceAdjustmentData}
+            invoice={current.invoice}
+          />
         </GridItem>
       </GridContainer>
     </div>

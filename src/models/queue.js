@@ -41,6 +41,7 @@ export default createListViewModel({
       appointmentList: [],
       currentFilter: StatusIndicator.ALL,
       selfOnly: false,
+      hideSelfOnlyFilter: false,
       _modifiedSelftOnly: false,
       error: {
         hasError: false,
@@ -76,16 +77,22 @@ export default createListViewModel({
               code: 'clinicianprofile',
             },
           })
+        } 
+        const startAndResumeRight = Authorized.check('patientdashboard.startresumeconsultation')
+        let startConsultPermissionIsHidden = false
+        if(startAndResumeRight && startAndResumeRight.rights==="hidden")
+        {
+          startConsultPermissionIsHidden = true
         }
-
         yield put({
           type: 'updateState',
           payload: {
             list: [],
             sessionInfo: { ...InitialSessionInfo },
-            selfOnly: !queueLogState._modifiedSelftOnly
-              ? userRole && userRole.clinicRoleFK === 1
-              : queueLogState.selfOnly,
+            hideSelfOnlyFilter: startConsultPermissionIsHidden,
+            selfOnly:  !queueLogState._modifiedSelftOnly
+            ? userRole && userRole.clinicRoleFK === 1 && !startConsultPermissionIsHidden
+            : queueLogState.selfOnly,
           },
         })
       },

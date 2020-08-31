@@ -1,3 +1,4 @@
+import { Tools } from '@/components'
 import FabricCanvasTool from './fabrictool'
 
 class Eraser extends FabricCanvasTool {
@@ -10,6 +11,10 @@ class Eraser extends FabricCanvasTool {
       o.evented = true
     })
     canvas.defaultCursor = 'cell'
+  }
+
+  getToolName () {
+    return Tools.Eraser
   }
 
   doMouseDown () {

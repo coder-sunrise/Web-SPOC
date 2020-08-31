@@ -52,12 +52,6 @@ const CallingQueueButton = ({
         setDisable(() => !disable)
         setTimeout(() => {
           setDisable(() => false)
-          dispatch({
-            type: 'queueCalling/updateState',
-            payload: {
-              tracker: undefined,
-            },
-          })
         }, 3000)
       }
     },
@@ -144,10 +138,11 @@ const CallingQueueButton = ({
           },
         })
         sendNotification('QueueCalled', {
-          type: NOTIFICATION_TYPE.QUEUECALL,
+          type: NOTIFICATION_TYPE.QUEUE,
           status: NOTIFICATION_STATUS.OK,
           message: 'Queue Called',
           ...callingQueue,
+          queueNo: callingQueue.qNo,
         })
       } else {
         dispatch({

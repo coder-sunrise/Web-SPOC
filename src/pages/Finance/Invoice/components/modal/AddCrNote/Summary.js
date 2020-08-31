@@ -12,12 +12,15 @@ import {
 } from '@/components'
 import styles from './styles'
 
-const Summary = ({ invoiceDetail, classes }) => {
+const Summary = ({ invoiceDetail, classes, showGST = true }) => {
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
         <GridContainer className={classes.summary} alignItems='flex-end'>
-          <GridItem md={9} />
+          {showGST && (
+            <GridItem md={9} />)
+          }
+          {showGST && (
           <GridItem md={3}>
             <FastField
               name='subTotal'
@@ -34,15 +37,17 @@ const Summary = ({ invoiceDetail, classes }) => {
                 />
               )}
             />
-          </GridItem>
-
-          <GridItem md={9} />
-          <GridItem md={3}>
-            <FastField
-              name='gstAmount'
-              render={(args) => {
-                return (
-                  <NumberInput
+          </GridItem>)
+          }
+          {showGST && (
+            <GridItem md={9} />)
+          }
+          {showGST && (
+            <GridItem md={3}>
+              <FastField
+                name='gstAmount'
+                render={(args) => {
+                  return <NumberInput
                     {...args}
                     noUnderline
                     currency
@@ -50,18 +55,13 @@ const Summary = ({ invoiceDetail, classes }) => {
                     rightAlign
                     normalText
                     defaultValue={0}
-                    prefix={
-                      invoiceDetail.isGSTInclusive ? (
-                        `${invoiceDetail.gstValue}% GST Inclusive:`
-                      ) : (
-                        `GST (${invoiceDetail.gstValue}%):`
-                      )
-                    }
+                    prefix={invoiceDetail.isGSTInclusive ? `${invoiceDetail.gstValue}% GST Inclusive:` : `GST (${invoiceDetail.gstValue}%):`}
                   />
-                )
-              }}
-            />
-          </GridItem>
+                }
+                }
+              />
+            </GridItem>)
+          }
 
           <GridItem md={9} />
           <GridItem md={3}>
@@ -75,7 +75,7 @@ const Summary = ({ invoiceDetail, classes }) => {
                   disabled
                   rightAlign
                   normalText
-                  prefix='Grand Total: '
+                  prefix='Final Credit: '
                   defaultValue='0'
                 />
               )}

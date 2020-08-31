@@ -201,6 +201,12 @@ class CoPayer extends Component {
       payerDistributedAmt: roundTo(
         invoicePayerItem.reduce((total, item) => total + item.claimAmount, 0),
       ),
+      payerOutstanding: roundTo(
+        invoicePayerItem.reduce(
+          (subtotal, item) => subtotal + item.claimAmount,
+          0,
+        ),
+      ),
       payerTypeFK: INVOICE_PAYER_TYPE.COMPANY,
       name: copayerItem.displayValue,
       companyFK: copayerItem.id,

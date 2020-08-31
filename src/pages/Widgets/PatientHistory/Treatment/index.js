@@ -1,16 +1,9 @@
 import { connect } from 'dva'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import Chart from '@/pages/Widgets/DentalChart/Chart'
-
-import {
-  CommonTableGrid,
-  Select,
-  Skeleton,
-  GridContainer,
-  GridItem,
-} from '@/components'
+import { Skeleton, GridContainer, GridItem } from '@/components'
 import Grid from './Grid'
-// @connect(({ codetable }) => ({ codetable }))
+
 const DiagnosisPanel = (props) => {
   const { dispatch } = props
 
@@ -29,16 +22,15 @@ const DiagnosisPanel = (props) => {
     })
   }, [])
 
-  const { patientHistory, codetable } = props
+  const { current, codetable } = props
   const { ctchartmethod, cttreatment } = codetable
-  const { entity } = patientHistory
 
   if (
     !ctchartmethod ||
     !cttreatment ||
-    !entity ||
-    !entity.dentalChart ||
-    !entity.dentalChart[0]
+    !current ||
+    !current.dentalChart ||
+    !current.dentalChart[0]
   ) {
     return (
       <React.Fragment>
@@ -47,7 +39,7 @@ const DiagnosisPanel = (props) => {
       </React.Fragment>
     )
   }
-  const { dentalChart, isPedoChart, isSurfaceLabel } = entity.dentalChart[0]
+  const { dentalChart, isPedoChart, isSurfaceLabel } = current.dentalChart[0]
   const dentalChartData = JSON.parse(dentalChart) || []
   const dentalChartComponent = {
     isPedoChart,

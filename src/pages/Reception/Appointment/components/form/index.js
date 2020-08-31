@@ -21,7 +21,10 @@ import {
 import { LoadingWrapper, Recurrence } from '@/components/_medisys'
 // custom components
 import PatientProfile from '@/pages/PatientDatabase/Detail'
-import AppointmentHistory from '@/pages/Widgets/AppointmentHistory'
+import { getAppendUrl } from '@/utils/utils'
+import { APPOINTMENT_STATUS, APPOINTMENT_CANCELLEDBY } from '@/utils/constants'
+import { getBizSession } from '@/services/queue'
+import AppointmentHistory from './AppointmentHistory'
 import PatientSearchModal from '../../PatientSearch'
 import DeleteConfirmation from './DeleteConfirmation'
 import AppointmentDataGrid from './AppointmentDataGrid'
@@ -38,10 +41,7 @@ import {
   sortDataGrid,
   getEndTime,
 } from './formUtils'
-import { getAppendUrl } from '@/utils/utils'
-import { APPOINTMENT_STATUS } from '@/utils/constants'
 import styles from './style'
-import { getBizSession } from '@/services/queue'
 
 const gridValidationSchema = Yup.object().shape({
   startTime: Yup.string().required(),
@@ -352,20 +352,29 @@ class Form extends React.PureComponent {
     // }
   }
 
-  onConfirmCancelAppointment = ({ type, reasonType, reason }) => {
+  onConfirmCancelAppointment = ({
+    type,
+    cancelBy = APPOINTMENT_CANCELLEDBY.CLINIC,
+    reasonType,
+    reason,
+  }) => {
     const { values, onClose, user, dispatch } = this.props
-    const noShowStatus = APPOINTMENT_STATUS.NOSHOW
-    const cancelStatus = APPOINTMENT_STATUS.CANCELLED
+    // const noShowStatus = APPOINTMENT_STATUS.NOSHOW
+    const cancelStatus =
+      cancelBy === APPOINTMENT_CANCELLEDBY.PATIENT
+        ? APPOINTMENT_STATUS.PFA_CANCELLED
+        : APPOINTMENT_STATUS.CANCELLED
 
     const payload = {
       id: values.currentAppointment.id,
       concurrencyToken: values.currentAppointment.concurrencyToken,
-      appointmentStatusFK: reasonType === '1' ? noShowStatus : cancelStatus,
+      appointmentStatusFK: cancelStatus,
       cancellationDateTime: moment().formatUTC(),
       cancellationReasonTypeFK: reasonType,
       cancellationReason: reason,
       cancelByUserFk: user.id,
       cancelSeries: type === '2',
+      cancelledByFK: cancelBy,
       isCancelled: false,
     }
 
@@ -648,11 +657,13 @@ class Form extends React.PureComponent {
     const { values, mode, viewingAppointment } = this.props
     try {
       const { datagrid } = this.state
-      let newAppointmentStatusFK = APPOINTMENT_STATUS.SCHEDULED
+      let newAppointmentStatusFK = APPOINTMENT_STATUS.CONFIRMED
       const rescheduleFK = APPOINTMENT_STATUS.RESCHEDULED
       let originalAppointment = viewingAppointment.appointments.find(
         (t) => t.id === values.currentAppointment.id,
       )
+
+      console.log(originalAppointment)
       let newResource = Array.from(datagrid, (resource) => {
         let startTime = `${resource.startTime}:00`
         let endTime = `${resource.endTime}:00`
@@ -744,12 +755,16 @@ class Form extends React.PureComponent {
         originalAppointment.appointmentDate.indexOf(
           values.currentAppointment.appointmentDate,
         ) === -1
+      const canChangeToRescheduleStatus = [
+        APPOINTMENT_STATUS.CONFIRMED,
+        APPOINTMENT_STATUS.RESCHEDULED,
+        APPOINTMENT_STATUS.PFA_RESCHEDULED,
+      ]
       if (
         values.currentAppointment &&
-        (values.currentAppointment.appointmentStatusFk ===
-          APPOINTMENT_STATUS.SCHEDULED ||
-          values.currentAppointment.appointmentStatusFk ===
-            APPOINTMENT_STATUS.RESCHEDULED)
+        canChangeToRescheduleStatus.includes(
+          values.currentAppointment.appointmentStatusFk,
+        )
       ) {
         if (resourceChanged || dateChanged) {
           newAppointmentStatusFK = rescheduleFK
@@ -819,6 +834,15 @@ class Form extends React.PureComponent {
 
   onConfirmReschedule = async (rescheduleValues) => {
     const { setValues, values } = this.props
+    // const { rescheduledByFK } = rescheduleValues
+    // let { appointmentStatusFk } = values
+
+    // by patient
+    // if (rescheduledByFK === '2') {
+    //   appointmentStatusFk = APPOINTMENT_STATUS.PFA_RESCHEDULED
+    //   this.setState({ tempNewAppointmentStatusFK: appointmentStatusFk })
+    // }
+    this.setState({ tempNewAppointmentStatusFK: APPOINTMENT_STATUS.CONFIRMED })
     await setValues({ ...values, ...rescheduleValues })
     this.closeRescheduleForm()
     this._submit()
@@ -913,6 +937,7 @@ class Form extends React.PureComponent {
     const _disabledStatus = [
       APPOINTMENT_STATUS.CANCELLED,
       APPOINTMENT_STATUS.TURNEDUP,
+      APPOINTMENT_STATUS.TURNEDUPLATE,
     ]
     if (_disabledStatus.includes(currentAppointment.appointmentStatusFk))
       return true
@@ -925,8 +950,9 @@ class Form extends React.PureComponent {
     if (!values.id) return false
     const disablingList = [
       APPOINTMENT_STATUS.CANCELLED,
-      APPOINTMENT_STATUS.NOSHOW,
+      // APPOINTMENT_STATUS.NOSHOW,
       APPOINTMENT_STATUS.TURNEDUP,
+      APPOINTMENT_STATUS.TURNEDUPLATE,
     ]
     return (
       values.isEnableRecurrence || disablingList.includes(appointmentStatusFk)
@@ -944,6 +970,7 @@ class Form extends React.PureComponent {
       conflicts,
       selectedSlot,
       height,
+      onHistoryRowSelected,
     } = this.props
 
     const {
@@ -1072,7 +1099,11 @@ class Form extends React.PureComponent {
                   style={{ maxHeight: this.props.height - 200 }}
                 >
                   <h4 style={{ fontWeight: 500 }}>Appointment History</h4>
-                  <AppointmentHistory />
+                  <AppointmentHistory
+                    handleRowDoubleClick={(data) => {
+                      onHistoryRowSelected({ ...data, isHistory: true })
+                    }}
+                  />
                 </CardContainer>
               </GridItem>
             </GridContainer>

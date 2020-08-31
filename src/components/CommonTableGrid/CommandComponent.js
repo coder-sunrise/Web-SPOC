@@ -7,7 +7,7 @@ import Save from '@material-ui/icons/Save'
 import Edit from '@material-ui/icons/Edit'
 import Cancel from '@material-ui/icons/Clear'
 
-import { Button, Tooltip } from '@/components'
+import { Button, Tooltip, Popconfirm } from '@/components'
 import { updateGlobalVariable, getGlobalVariable } from '@/utils/utils'
 
 let commitCount = 0
@@ -90,30 +90,44 @@ const DeleteButton = ({
   text,
   isDeletable,
   row,
+  deleteConfirm = {},
   ...restProps
 }) => {
+  const { show, title } = deleteConfirm
+  const confirmDelete = (e) => {
+    if (onRowDelete) {
+      const r = onRowDelete(row, () => {
+        onExecute(e)
+      })
+      if (r) onExecute(e)
+    } else {
+      onExecute(e)
+    }
+  }
   return (
     <Tooltip title={text} placement='top'>
-      <Button
-        tabindex='0'
-        size='sm'
-        onClick={(e) => {
-          // updateGlobalVariable('gridIgnoreValidation', true)
-          if (onRowDelete) {
-            const r = onRowDelete(row, () => {
-              onExecute(e)
-            })
-            if (r) onExecute(e)
-          } else {
-            onExecute(e)
-          }
+      <Popconfirm
+        title={title}
+        onConfirm={() => {
+          confirmDelete()
         }}
-        disabled={!isDeletable(row)}
-        justIcon
-        color='danger'
       >
-        <Delete />
-      </Button>
+        <Button
+          tabindex='0'
+          size='sm'
+          onClick={(e) => {
+            if (!show) {
+              confirmDelete(e)
+              e.stopPropagation()
+            }
+          }}
+          disabled={!isDeletable(row)}
+          justIcon
+          color='danger'
+        >
+          <Delete />
+        </Button>
+      </Popconfirm>
     </Tooltip>
   )
 }

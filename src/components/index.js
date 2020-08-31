@@ -70,7 +70,29 @@ export * from './formik/index'
 
 export AuthorizedContext from './Context/Authorized'
 
-export * from '@material-ui/lab'
+// export * from '@material-ui/lab'
+
+export { default as ToggleButton } from '@material-ui/lab/ToggleButton'
+export {
+  default as ToggleButtonGroup,
+} from '@material-ui/lab/ToggleButtonGroup'
+export { default as TreeItem } from '@material-ui/lab/TreeItem'
+export { default as TreeView } from '@material-ui/lab/TreeView'
+export { default as useAutocomplete } from '@material-ui/lab/useAutocomplete'
+export { default as Alert } from '@material-ui/lab/Alert'
+export { default as AlertTitle } from '@material-ui/lab/AlertTitle'
+export { default as Autocomplete } from '@material-ui/lab/Autocomplete'
+export { default as AvatarGroup } from '@material-ui/lab/AvatarGroup'
+export { default as LoadingButton } from '@material-ui/lab/LoadingButton'
+export { default as Pagination } from '@material-ui/lab/Pagination'
+export { default as PaginationItem } from '@material-ui/lab/PaginationItem'
+export { default as Skeleton } from '@material-ui/lab/Skeleton'
+export { default as SpeedDial } from '@material-ui/lab/SpeedDial'
+export { default as SpeedDialAction } from '@material-ui/lab/SpeedDialAction'
+export { default as SpeedDialIcon } from '@material-ui/lab/SpeedDialIcon'
+export { default as TabContext } from '@material-ui/lab/TabContext'
+export { default as TabList } from '@material-ui/lab/TabList'
+export { default as TabPanel } from '@material-ui/lab/TabPanel'
 
 export { default as Scribble } from './Scribble'
 
