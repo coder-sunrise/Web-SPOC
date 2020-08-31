@@ -137,9 +137,9 @@ class PatientDashboard extends PureComponent {
       ...resetProps
     } = this.props
     const { patientDashboard, global, history, visitRegistration } = resetProps
-    const { entity, queueNo } = visitRegistration
+    const { entity } = visitRegistration
     if (!entity) return null
-    const { visit = {} } = entity
+    const { visit = {}, queueNo } = entity
     const { visitPurposeFK = VISIT_TYPE.CONS, roomFK, doctorProfileFK } = visit
 
     return (
