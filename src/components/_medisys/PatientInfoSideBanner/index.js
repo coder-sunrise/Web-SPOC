@@ -221,6 +221,10 @@ class PatientInfoSideBanner extends PureComponent {
         <PrintLabLabelButton
           patientId={entity.id}
           clinicSettings={clinicSettings}
+          isEnableScanner
+          onUploading={(imgDatas) => {
+            console.log(imgDatas)
+          }}
         />
         <Divider light />
         <div

@@ -2,11 +2,17 @@ import React, { PureComponent } from 'react'
 import moment from 'moment'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
-import { CardContainer, CommonTableGrid } from '@/components'
+import {
+  CardContainer,
+  CommonTableGrid,
+  GridContainer,
+  GridItem,
+  Checkbox,
+} from '@/components'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
 import { queryList as queryAppointments } from '@/services/calendar'
-import { futureApptTableParams, previousApptTableParams } from './variables'
 import Authorized from '@/utils/Authorized'
+import { previousApptTableParams } from './variables'
 
 const styles = (theme) => ({
   gridRow: {
@@ -28,7 +34,6 @@ class AppointmentHistory extends PureComponent {
   state = {
     height: 100,
     previousAppt: [],
-    futureAppt: [],
     patientProfileFK: undefined,
   }
 
@@ -36,7 +41,7 @@ class AppointmentHistory extends PureComponent {
     this.resize()
     window.addEventListener('resize', this.resize.bind(this))
     if (this.props.patient && this.props.patient.id > 0) {
-      this.getAppts(this.props.patient.id)
+      this.getAppts(this.props.patient.id, false)
     }
   }
 
@@ -44,12 +49,13 @@ class AppointmentHistory extends PureComponent {
     window.removeEventListener('resize', this.resize.bind(this))
   }
 
-  async getAppts (patientId) {
-    const { user } = this.props
+  async getAppts (patientId, showRecheduledByClinic) {
+    // console.log('getAppts', patientId)
+    const { user, dispatch } = this.props
     const commonParams = {
       combineCondition: 'and',
       sorting: [
-        { columnName: 'appointmentDate', direction: 'asc' },
+        { columnName: 'appointmentDate', direction: 'desc' },
       ],
     }
 
@@ -65,57 +71,47 @@ class AppointmentHistory extends PureComponent {
       doctor = user.data.clinicianProfile.id
     }
 
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ltappointmentstatus',
+      },
+    })
+
     const [
       previous,
-      future,
     ] = await Promise.all([
       queryAppointments({
         apiCriteria: {
-          appStatus: [
-            APPOINTMENT_STATUS.CANCELLED,
-            APPOINTMENT_STATUS.TURNEDUP,
-            APPOINTMENT_STATUS.NOSHOW,
-          ].join(),
-          patientProfileId: patientId,
-          doctor,
-        },
-        ...commonParams,
-      }),
-      queryAppointments({
-        apiCriteria: {
-          appStatus: [
-            APPOINTMENT_STATUS.SCHEDULED,
-            APPOINTMENT_STATUS.RESCHEDULED,
-          ].join(),
+          isIncludeHistory: true,
+          isIncludeRescheduledByClinic: showRecheduledByClinic,
           patientProfileId: patientId,
           doctor,
         },
         ...commonParams,
       }),
     ])
+
     let previousAppt = []
-    let futureAppt = []
+
     if (previous) {
       const { status, data } = previous
       if (status === '200') previousAppt = this.reBuildApptDatas(data.data)
     }
-
-    if (future) {
-      const { status, data } = future
-      if (status === '200') futureAppt = this.reBuildApptDatas(data.data)
-    }
     this.setState({
-      futureAppt,
       previousAppt,
       patientProfileFK: patientId,
     })
   }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  async UNSAFE_componentWillReceiveProps (nextProps) {
     const { patient } = nextProps
 
     if (this.state.patientProfileFK !== patient.id && patient.id > 0) {
-      this.getAppts(patient.id)
+      this.setState({
+        patientProfileFK: patient.id,
+      })
+      await this.getAppts(patient.id)
     }
   }
 
@@ -159,34 +155,32 @@ class AppointmentHistory extends PureComponent {
     })
   }
 
+  toggleShowRecheduledByClinic = (e) => {
+    this.getAppts(this.props.patient.id, e.target.value)
+  }
+
   render () {
-    const { classes, theme } = this.props
-    const { previousAppt, futureAppt } = this.state
+    const { previousAppt } = this.state
+
     return (
-      <div>
-        <CardContainer hideHeader size='sm'>
-          <h4 style={{ marginTop: 20 }}>Current & Future Appointment</h4>
-
-          <CommonTableGrid
-            size='sm'
-            rows={futureAppt}
-            {...futureApptTableParams}
-          />
-
-          <h4
-            style={{
-              marginTop: theme.spacing(2),
-            }}
-          >
-            Previous Appointment
-          </h4>
-          <CommonTableGrid
-            size='sm'
-            rows={previousAppt}
-            {...previousApptTableParams}
-          />
-        </CardContainer>
-      </div>
+      <CardContainer hideHeader size='sm'>
+        <GridContainer>
+          <GridItem xs={12}>
+            <Checkbox
+              simple
+              label='Show Rescheduled by Clinic'
+              onChange={this.toggleShowRecheduledByClinic}
+            />
+          </GridItem>
+          <GridItem xs={12}>
+            <CommonTableGrid
+              size='sm'
+              rows={previousAppt}
+              {...previousApptTableParams}
+            />
+          </GridItem>
+        </GridContainer>
+      </CardContainer>
     )
   }
 }

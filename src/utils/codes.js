@@ -312,7 +312,6 @@ const consultationDocumentTypes = [
               mcIssueDate: moment(row.mcIssueDate).format(dateFormatLong),
               mcStartDate: moment(row.mcStartDate).format(dateFormatLong),
               mcEndDate: moment(row.mcEndDate).format(dateFormatLong),
-              otherUnfitTypeDescription: row.otherUnfitTypeDescription,
             },
           ],
         }

@@ -14,9 +14,9 @@ const BooleanProvider = (props) => {
 
   return (
     <GridContainer className={classes.verticalSpacing}>
-      <GridItem md={1}>
+      <GridItem md={2}>
         <h4>
-          <b>{item.settingKey}</b>
+          <b>{item.displayValue}</b>
         </h4>
       </GridItem>
       <GridItem md={3}>
@@ -51,7 +51,7 @@ const StringProvider = (props) => {
           name={fieldName}
           render={(args) => {
             return (
-              <TextField label={item.settingKey} {...args} maxLength={255} />
+              <TextField label={item.displayValue} {...args} maxLength={255} />
             )
           }}
         />
@@ -69,7 +69,7 @@ const NumberProvider = (props) => {
         <FastField
           name={fieldName}
           render={(args) => {
-            return <NumberInput label={item.settingKey} {...args} />
+            return <NumberInput label={item.displayValue} {...args} />
           }}
         />
       </GridItem>
@@ -101,7 +101,6 @@ const dataTypeProvider = [
 const SettingParameter = (props) => {
   const { values } = props
   const { reportSettingParameter = [] } = values
-  // console.log(reportSettingParameter)
   return reportSettingParameter.map((item, index) => {
     const { dataType } = item
     const provider = dataTypeProvider.find(

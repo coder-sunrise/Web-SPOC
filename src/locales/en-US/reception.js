@@ -26,6 +26,7 @@ export default {
   'reception.queue.deleteVisit': 'Delete Visit',
   'reception.queue.printTotal': 'Print Total',
   'reception.queue.endSession': 'End Session',
+  'reception.queue.sessionSummary': 'Session Summary',
 
   'reception.common.remarks': 'Remarks',
   'reception.common.save': 'Save',
