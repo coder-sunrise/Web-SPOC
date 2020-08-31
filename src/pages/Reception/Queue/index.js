@@ -386,10 +386,10 @@ class Queue extends React.Component {
       })
       .then((res) => {
         if (res) {
-          sendNotification('QueueCalled', {
+          sendNotification('QueueClear', {
             type: NOTIFICATION_TYPE.QUEUECALL,
             status: NOTIFICATION_STATUS.OK,
-            message: 'Queue Called',
+            message: 'Queue Clear',
           })
         }
       })
@@ -835,7 +835,7 @@ class Queue extends React.Component {
             </h3>
 
             <Authorized authority='openqueuedisplay'>
-              {tracker ? (
+              {tracker && tracker.qNo ? (
                 <h4
                   className={classNames(classes.sessionNo)}
                   style={{

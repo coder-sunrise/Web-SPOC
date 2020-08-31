@@ -72,7 +72,7 @@ const ApplyClaims = ({
   noExtraOptions = false,
   fromBilling = false,
   handleIsExistingOldPayerItem,
-  clinicSettings,
+  clinicSettings = {},
 }) => {
   const {
     invoice,
@@ -778,14 +778,16 @@ const ApplyClaims = ({
     setOnVoid({ payerIndex: index, ...payment })
     toggleDeleteConfirmation()
   }
+  const { isEnableAddPaymentInBilling = false } = clinicSettings
   return (
     <Fragment>
-      {checkExistingOldPayerItem() && (
+      {isEnableAddPaymentInBilling &&
+      checkExistingOldPayerItem() && (
         <GridItem md={12}>
           <div style={{ paddingLeft: 8, paddingBottom: 8 }}>
             <WarningSnackbar
               variant='warning'
-              message='Invoice has been updated. Kindly remove the payment(s) made for existing copayer/ scheme and re-apply the copayer/ scheme again!'
+              message='Invoice has been updated. Kindly remove if there is any payment(s) made for existing copayer/scheme and re-apply the copayer/scheme again!'
             />
           </div>
         </GridItem>
