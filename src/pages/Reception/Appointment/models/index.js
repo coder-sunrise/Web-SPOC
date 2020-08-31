@@ -99,14 +99,24 @@ export default createListViewModel({
         const { status, data } = r
 
         if (status === '200') {
-          yield put({
-            type: 'setFilterTemplate',
-            payload: {
-              data,
-            },
-          })
+          if (data.userPreferenceDetails) {
+            const parsedFilterTemplate = JSON.parse(data.userPreferenceDetails)
+
+            const favFilterTemplate = parsedFilterTemplate.find(
+              (template) => template.isFavorite,
+            )
+            const filterTemplate = {
+              filterTemplates: parsedFilterTemplate,
+              currentFilterTemplate: favFilterTemplate,
+            }
+            yield put({
+              type: 'setFilterTemplate',
+              payload: filterTemplate,
+            })
+            return filterTemplate
+          }
         }
-        return false
+        return null
       },
     },
     reducers: {
@@ -146,25 +156,11 @@ export default createListViewModel({
       },
 
       setFilterTemplate (st, { payload }) {
-        const { data } = payload
-
-        if (data.userPreferenceDetails) {
-          const parsedFilterTemplate = JSON.parse(data.userPreferenceDetails)
-          const favFilterTemplate = parsedFilterTemplate.find(
-            (template) => template.isFavorite,
-          )
-          return {
-            ...st,
-            filterTemplates: parsedFilterTemplate,
-            currentFilterTemplate: favFilterTemplate
-              ? {
-                  ...favFilterTemplate,
-                }
-              : null,
-          }
-        }
+        const { filterTemplates, currentFilterTemplate } = payload
         return {
           ...st,
+          filterTemplates,
+          currentFilterTemplate,
         }
       },
       setCurrentFilterTemplate (st, { payload }) {

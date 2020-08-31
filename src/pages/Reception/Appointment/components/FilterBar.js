@@ -74,7 +74,18 @@ const FilterBar = (props) => {
   const handleFilterTemplate = () => {
     setShowFilterTemplate(!showFilterTemplate)
   }
+  const handleApplyTemplate = (selectedTemplate) => {
+    const {
+      filterByApptType: appTypes,
+      filterByDoctor: doctors,
+    } = selectedTemplate
 
+    handleUpdateFilter({
+      ...values,
+      filterByApptType: appTypes,
+      filterByDoctor: doctors,
+    })
+  }
   return (
     <React.Fragment>
       <GridContainer alignItems='center'>
@@ -169,6 +180,7 @@ const FilterBar = (props) => {
                   filterByDoctor={values.filterByDoctor}
                   filterByApptType={values.filterByApptType}
                   handleFilterTemplate={handleFilterTemplate}
+                  handleApplyTemplate={handleApplyTemplate}
                 />
               </Paper>
             }
@@ -243,23 +255,8 @@ export default compose(
   })),
   withFormik({
     enableReinitialize: true,
-    mapPropsToValues: ({ filterByDoctor, appointment }) => {
+    mapPropsToValues: ({ filterByDoctor }) => {
       count += 1
-      if (appointment.currentFilterTemplate) {
-        const {
-          filterByDoctor: doctorFilterTemplate,
-          filterByApptType: apptTypeFiltertemplate,
-        } = appointment.currentFilterTemplate
-        return {
-          filterByDoctor: [
-            ...doctorFilterTemplate,
-          ],
-          filterByApptType: [
-            ...apptTypeFiltertemplate,
-          ],
-          count,
-        }
-      }
 
       return {
         filterByDoctor: [
