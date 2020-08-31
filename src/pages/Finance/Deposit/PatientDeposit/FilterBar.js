@@ -31,8 +31,8 @@ class FilterBar extends PureComponent {
   }
 
   addDepositRefund = async (isDeposit) => {
-    const { dispatch, patient: { deposit } } = this.props
-    const patientId = Number(findGetParameter('pid'))
+    const { dispatch, patient: { deposit, entity } } = this.props
+    const patientId = entity.id
 
     if (deposit && deposit.id > 0) {
       await dispatch({
@@ -67,8 +67,13 @@ class FilterBar extends PureComponent {
 
   render () {
     const { isDeposit, showDepositRefundModal } = this.state
-    const { disabled, refundableAmount = 0, selectedTypeIds } = this.props
-    const patientId = Number(findGetParameter('pid'))
+    const {
+      patient: { entity },
+      disabled,
+      refundableAmount = 0,
+      selectedTypeIds,
+    } = this.props
+    const patientId = entity.id
 
     return (
       <React.Fragment>

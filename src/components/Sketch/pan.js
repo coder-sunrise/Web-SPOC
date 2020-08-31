@@ -1,3 +1,4 @@
+import { Tools } from '@/components'
 import FabricCanvasTool from './fabrictool'
 
 class Pan extends FabricCanvasTool {
@@ -10,6 +11,10 @@ class Pan extends FabricCanvasTool {
       o.evented = true
     })
     canvas.defaultCursor = 'move'
+  }
+
+  getToolName () {
+    return Tools.Pan
   }
 
   doMouseDown (o) {

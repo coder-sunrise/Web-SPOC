@@ -684,6 +684,14 @@ const _routes = [
             ],
           },
           {
+            path: '/report/visitlistingreport',
+            name: 'visitListingReport',
+            component: './Report/VisitListingReport',
+            authority: [
+              'report.admin.visitlistingreport',
+            ],
+          },
+          {
             path: '/report/diagnosistrending',
             name: 'diagnosistrending',
             component: './Report/DiagnosisTrending',

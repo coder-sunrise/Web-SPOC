@@ -151,7 +151,7 @@ const AddOrder = ({
       const assignRetailAdjustmentIdToOrderAdjustmentUid = (o) => {
         return {
           ...o,
-          uid: o.id,
+          uid: getUniqueId(),
         }
       }
 

@@ -89,6 +89,8 @@ const createPayload = (values, viewOtherApptAccessRight, isActiveDoctor) => {
     searchValue: searchValue || undefined,
     appType: filterByApptType.join() || undefined,
     appStatus: filterByAppointmentStatus.join() || undefined,
+    isIncludeRescheduledByClinic: true,
+    isIncludeHistory: true,
   }
 }
 
@@ -262,12 +264,12 @@ const FilterBar = ({
             name='filterByAppointmentStatus'
             render={(args) => {
               return (
-                <Select
+                <CodeSelect
+                  mode='multiple'
+                  code='ltappointmentstatus'
                   label={formatMessage({
                     id: 'sms.appointment.status',
                   })}
-                  mode='multiple'
-                  options={appointmentStatusReception}
                   maxTagCount={maxAppointmentStatusTagCount}
                   maxTagPlaceholder='appointment status'
                   {...args}

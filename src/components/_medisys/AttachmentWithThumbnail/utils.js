@@ -44,3 +44,29 @@ export const getThumbnail = (original, { scale, width, height }) => {
 
   return canvas
 }
+
+export const generateThumbnailAsync = async (
+  imageSource,
+  size,
+  fileExtension = 'jpeg',
+) => {
+  try {
+    let thumbnailData
+    await new Promise((resolve, reject) => {
+      try {
+        const image = new Image()
+        image.src = imageSource
+        image.onload = () => {
+          const thumbnail = getThumbnail(image, size)
+          thumbnailData = thumbnail.toDataURL(`image/${fileExtension}`)
+          resolve()
+        }
+      } catch (ex) {
+        reject(ex)
+      }
+    })
+    return thumbnailData
+  } catch (error) {
+    return null
+  }
+}

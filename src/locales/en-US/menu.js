@@ -171,6 +171,7 @@ export default {
   'menu.report.sessionsummary': 'Session Summary Report',
   'menu.report.statementsummaryreport': 'Statement Summary Report',
   'menu.report.viewreport': 'View Report',
+  'menu.report.visitListingReport': 'Visit Listing Report',
 
   'menu.support': 'Support',
   'menu.support.support': 'Support',

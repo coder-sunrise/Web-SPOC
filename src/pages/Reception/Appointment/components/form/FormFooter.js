@@ -5,8 +5,8 @@ import { withStyles } from '@material-ui/core'
 // custom component
 import { Button, GridContainer, GridItem, SizeContainer } from '@/components'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
-import style from './style'
 import Authorized from '@/utils/Authorized'
+import style from './style'
 
 const ButtonText = {
   DELETE: 'Delete',
@@ -31,8 +31,12 @@ const FormFooter = ({
 }) => {
   const isNew = appointmentStatusFK === undefined
   const isDraft = appointmentStatusFK === 2
-  const isTurnedUp = appointmentStatusFK === APPOINTMENT_STATUS.TURNEDUP
-  const isCancelled = appointmentStatusFK === APPOINTMENT_STATUS.CANCELLED
+  const isTurnedUp =
+    appointmentStatusFK === APPOINTMENT_STATUS.TURNEDUP ||
+    appointmentStatusFK === APPOINTMENT_STATUS.TURNEDUPLATE
+  const isCancelled =
+    appointmentStatusFK === APPOINTMENT_STATUS.CANCELLED ||
+    appointmentStatusFK === APPOINTMENT_STATUS.PFA_CANCELLED
 
   const hideCancelAppointmentClass = {
     [classes.hideCancelAppointmentBtn]: isNew,

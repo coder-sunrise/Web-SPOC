@@ -72,7 +72,7 @@ const ApplyClaims = ({
   noExtraOptions = false,
   fromBilling = false,
   handleIsExistingOldPayerItem,
-  clinicSettings,
+  clinicSettings = {},
 }) => {
   const {
     invoice,
@@ -146,6 +146,7 @@ const ApplyClaims = ({
     updatedPayer,
     updatedIndex,
     invoicePayerList,
+    autoApply = false,
   ) => {
     const _list = invoicePayerList || tempInvoicePayer
     const invoicePayerWithUpdatedPayer = _list.map(
@@ -155,6 +156,7 @@ const ApplyClaims = ({
       updatedInvoiceItems,
       invoicePayerWithUpdatedPayer,
       updatedIndex,
+      autoApply,
     )
     setTempInvoicePayer(newInvoicePayer)
     incrementCommitCount()
@@ -166,6 +168,7 @@ const ApplyClaims = ({
     invoicePayerList,
     invoiceItems,
     allSchemes,
+    autoApply = false,
   ) => {
     const flattenSchemes = allSchemes.reduce(
       (schemes, cs) => [
@@ -195,7 +198,12 @@ const ApplyClaims = ({
       isModified: true,
       invoicePayerItem: payerInvoiceItems,
     }
-    updateTempInvoicePayer(updatedPayer, index, invoicePayerList || null)
+    updateTempInvoicePayer(
+      updatedPayer,
+      index,
+      invoicePayerList || null,
+      autoApply,
+    )
   }
 
   const toggleCopayerModal = () => setShowCoPaymentModal(!showCoPaymentModal)
@@ -282,6 +290,7 @@ const ApplyClaims = ({
         ],
         invoice.invoiceItems,
         claimableSchemes,
+        true,
       )
     } else {
       setInitialState([])
@@ -352,17 +361,6 @@ const ApplyClaims = ({
 
       // abort early if failed to reset bill
       if (!response) return
-
-      if (
-        tempInvoicePayer.find((o) =>
-          o.invoicePayment.find((payment) => !payment.isCancelled),
-        )
-      ) {
-        notification.warn({
-          message: 'please remove payments before reset claims',
-        })
-        return
-      }
 
       const _newTempInvoicePayer = tempInvoicePayer.map((i) => ({
         ...i,
@@ -501,7 +499,12 @@ const ApplyClaims = ({
               (subtotal, item) => subtotal + item.claimAmount,
               0,
             ),
-          ) - _.sum(tempInvoicePayer[index].invoicePayment, 'TotalAmtPaid'),
+          ) -
+          _.sumBy(
+            (tempInvoicePayer[index].invoicePayment || [])
+              .filter((p) => !p.isCancelled),
+            'totalAmtPaid',
+          ),
         isModified: true,
         invoicePayerItem: invoiceItems,
         _isConfirmed: !hasInvalidRow,
@@ -775,15 +778,16 @@ const ApplyClaims = ({
     setOnVoid({ payerIndex: index, ...payment })
     toggleDeleteConfirmation()
   }
+  const { isEnableAddPaymentInBilling = false } = clinicSettings
   return (
     <Fragment>
-      {checkExistingOldPayerItem() && (
+      {isEnableAddPaymentInBilling &&
+      checkExistingOldPayerItem() && (
         <GridItem md={12}>
           <div style={{ paddingLeft: 8, paddingBottom: 8 }}>
             <WarningSnackbar
               variant='warning'
-              message='Invoice has been updated. Kindly remove the existing copayer/ scheme
-              and re-apply again!'
+              message='Invoice has been updated. Kindly remove if there is any payment(s) made for existing copayer/scheme and re-apply the copayer/scheme again!'
             />
           </div>
         </GridItem>
@@ -816,7 +820,13 @@ const ApplyClaims = ({
         </Button> */}
         {!noExtraOptions && (
           <ResetButton
-            disabled={visitPurposeFK === VISIT_TYPE.RETAIL}
+            disabled={
+              visitPurposeFK === VISIT_TYPE.RETAIL ||
+              tempInvoicePayer.find((payer) =>
+                (payer.invoicePayment || [])
+                  .find((payment) => !payment.isCancelled),
+              )
+            }
             handleResetClick={handleResetClick}
             handleRestoreClick={handleRestoreClick}
           />

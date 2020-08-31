@@ -17,7 +17,6 @@ import {
 } from '@/components'
 import * as service from '@/services/common'
 import { getClinicianProfile } from './utils'
-import { UNFIT_TYPE } from '@/utils/constants'
 
 @withFormikExtend({
   mapPropsToValues: ({ consultationDocument, codetable, visitEntity }) => {
@@ -36,10 +35,6 @@ import { UNFIT_TYPE } from '@/utils/constants'
     mcDays: Yup.number().required(),
     mcStartEndDate: Yup.array().of(Yup.date()).min(2).required(),
     unfitTypeFK: Yup.number().required(),
-    otherUnfitTypeDescription: Yup.string().when('unfitTypeFK', {
-      is: (val) => val && UNFIT_TYPE[val] === 'Others',
-      then: Yup.string().required(),
-    }),
   }),
 
   handleSubmit: (values, { props }) => {
@@ -99,9 +94,8 @@ class MedicalCertificate extends PureComponent {
   }
 
   render () {
-    const { footer, handleSubmit, classes, values, setFieldValue } = this.props
+    const { footer, handleSubmit, classes, values } = this.props
     // console.log({ values })
-    const { unfitTypeFK } = values
     return (
       <div>
         {values.mcReferenceNo && (
@@ -166,7 +160,7 @@ class MedicalCertificate extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={6}>
+          <GridItem xs={12}>
             <FastField
               name='unfitTypeFK'
               render={(args) => {
@@ -174,28 +168,6 @@ class MedicalCertificate extends PureComponent {
                   <CodeSelect
                     code='ctUnfitType'
                     label='Description'
-                    onChange={(v) => {
-                      if (!v || UNFIT_TYPE[v] !== 'Others') {
-                        setFieldValue('otherUnfitTypeDescription', '')
-                      }
-                    }}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs={6}>
-            <FastField
-              name='otherUnfitTypeDescription'
-              render={(args) => {
-                return (
-                  <TextField
-                    label='If Others, pls. specify'
-                    disabled={
-                      !unfitTypeFK || UNFIT_TYPE[unfitTypeFK] !== 'Others'
-                    }
-                    maxLength={200}
                     {...args}
                   />
                 )
