@@ -214,6 +214,21 @@ class Appointment extends React.PureComponent {
 
     dispatch({
       type: 'appointment/getFilterTemplate',
+    }).then((filterTemplate) => {
+      if (filterTemplate) {
+        console.log(filterTemplate)
+        const { currentFilterTemplate } = filterTemplate
+        if (currentFilterTemplate) {
+          const { filterByDoctor, filterByApptType } = currentFilterTemplate
+
+          this.setState({
+            filter: {
+              filterByDoctor,
+              filterByApptType,
+            },
+          })
+        }
+      }
     })
   }
 
