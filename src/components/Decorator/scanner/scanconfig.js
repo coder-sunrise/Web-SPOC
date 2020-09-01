@@ -145,6 +145,9 @@ export const Scanconfig = ({
             checked={duplex}
             onChange={(e) => {
               setDuplex(e.target.value)
+              if (e.target.value) {
+                setAutoFeeder(true)
+              }
             }}
           />
         </GridItem>
