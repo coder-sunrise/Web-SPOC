@@ -263,7 +263,6 @@ class Demographic extends PureComponent {
                     <CodeSelect
                       label='Nationality'
                       code='ctNationality'
-                      autoComplete
                       max={5}
                       {...args}
                     />
