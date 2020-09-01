@@ -1,11 +1,18 @@
 import React, { PureComponent } from 'react'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
+import { withStyles } from '@material-ui/core/styles'
 
 import { ReportDataGrid } from '@/components/_medisys'
 
+const styles = () => ({
+  paymentModeHeader: {
+    whiteSpace: 'pre-line',
+    wordBreak: 'break-word',
+  },
+})
 class PaymentCollectionSummaryDetails extends PureComponent {
   render () {
-    const { reportDatas } = this.props
+    const { reportDatas, classes } = this.props
     if (!reportDatas) return null
     let PaymentCollectionSummaryDetailsCols = [
       { name: 'paymentDate', title: 'Date' },
@@ -72,7 +79,7 @@ class PaymentCollectionSummaryDetails extends PureComponent {
           groupItems.push({ columnName: cur.paymentMode, type: 'sum' })
           colInfo.push({
             name: cur.paymentMode,
-            title: cur.paymentMode,
+            title: <div className={classes.paymentModeHeader}>{cur.paymentMode}</div>,
             sortOrder: cur.sortOrder,
           })
         }
@@ -149,4 +156,4 @@ class PaymentCollectionSummaryDetails extends PureComponent {
     )
   }
 }
-export default PaymentCollectionSummaryDetails
+export default withStyles(styles, { withTheme: true })(PaymentCollectionSummaryDetails)
