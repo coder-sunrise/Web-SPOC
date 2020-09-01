@@ -44,7 +44,13 @@ export const Scanconfig = ({
   onUploading,
   onSizeChanged,
   canUploading = false,
+  scannerList = [],
 }) => {
+  const [
+    scanner,
+    setScanner,
+  ] = useState(undefined)
+
   // const defaultPixelType = PixelTypeOptions.find((f) => f.id === 'Color')
   const [
     pixelType,
@@ -101,6 +107,7 @@ export const Scanconfig = ({
       scaleBy,
       scaleWidth,
       scaleHeight,
+      scanner,
     })
   }
   const debounceOnUploading = _.debounce(onUploading, 500, {
@@ -110,24 +117,41 @@ export const Scanconfig = ({
 
   return (
     <React.Fragment>
-      <GridItem xs={12}>
-        <CheckboxGroup
-          vertical
-          textField='name'
-          options={[
-            { value: 'AutoFeeder', name: 'Auto Feeder' },
-            // { value: 'Duplex', name: 'Duplex' },
-          ]}
-          noUnderline
-          disabled={autoFeeder}
-          onChange={(e) => {
-            const isAutoFeeder = e.target.value.indexOf('AutoFeeder') >= 0
-            const isDuplex = e.target.value.indexOf('Duplex') >= 0
-            setAutoFeeder(isAutoFeeder)
-            setDuplex(isDuplex)
+      {/* <GridItem xs={12}>
+        <Select
+          label='Scanner'
+          valueField='id'
+          value={scanner}
+          options={scannerList.map((m) => ({ id: m, name: m }))}
+          onChange={(v) => {
+            setScanner(v)
           }}
         />
-      </GridItem>
+      </GridItem> */}
+      <GridContainer>
+        <GridItem xs={6}>
+          <Checkbox
+            label='AutoFeeder'
+            checked={autoFeeder}
+            disabled={autoFeeder}
+            onChange={(e) => {
+              setAutoFeeder(e.target.value)
+            }}
+          />
+        </GridItem>
+        <GridItem xs={6}>
+          <Checkbox
+            label='Duplex'
+            checked={duplex}
+            onChange={(e) => {
+              setDuplex(e.target.value)
+              if (e.target.value) {
+                setAutoFeeder(true)
+              }
+            }}
+          />
+        </GridItem>
+      </GridContainer>
       <GridItem xs={12}>
         <Select
           label='Pixel Type'
