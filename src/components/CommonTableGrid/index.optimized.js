@@ -377,7 +377,7 @@ class CommonTableGrid extends PureComponent {
         TableFixedCell: {
           fixedCell: {
             zIndex: 1,
-            overflow: 'visible',
+            // overflow: 'visible',
             backgroundColor: 'inherit',
             borderLeft: '1px solid rgba(0, 0, 0, 0.12)',
           },
