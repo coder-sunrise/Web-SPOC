@@ -20,6 +20,7 @@ const WebSocketMessageType = {
   Print: 1,
   Scan: 2,
   ScanCompleted: 3,
+  RequestScanner: 4,
 }
 
 const withWebSocket = () => (Component) => {
@@ -124,7 +125,20 @@ const withWebSocket = () => (Component) => {
         const { MessageType, Status, Data } = returnMessage
         console.log(returnMessage)
 
-        if (MessageType === WebSocketMessageType.Scan) {
+        if (MessageType === WebSocketMessageType.RequestScanner) {
+          if (Status === 'Success') {
+            this.setState({
+              showScanner: true,
+              loading: false,
+              scanResults: [],
+              scannerList: Data,
+            })
+          } else if (Data) {
+            notification.error({
+              message: Data,
+            })
+          }
+        } else if (MessageType === WebSocketMessageType.Scan) {
           const { Image, FileExtension } = Data
 
           this.setState((preState) => ({
@@ -214,10 +228,18 @@ const withWebSocket = () => (Component) => {
       }))
     }
 
+    requestOpenScan = () => {
+      let jsonStr = JSON.stringify({
+        MessageType: WebSocketMessageType.RequestScanner,
+      })
+      this.prepareJobForWebSocket(AESEncryptor.encrypt(jsonStr))
+    }
+
     render () {
       const {
         pendingJob = [],
         scanResults = [],
+        scannerList = [],
         loading,
         loadingText,
       } = this.state
@@ -228,7 +250,7 @@ const withWebSocket = () => (Component) => {
           <Component
             {...this.props}
             handlePrint={this.handlePrint}
-            handleOpenScanner={this.toggleModal}
+            handleOpenScanner={this.requestOpenScan}
             sendingJob={pendingJob.length > 0}
             onRef={(child) => {
               this._CompRef = child
@@ -285,6 +307,7 @@ const withWebSocket = () => (Component) => {
                     onDeleteItem={this.handleDeleteItem}
                     onUpdateName={this.handleUpdateName}
                     onUploading={this.handleUploading}
+                    scannerList={scannerList}
                     imageDatas={scanResults}
                   />
                 </div>
