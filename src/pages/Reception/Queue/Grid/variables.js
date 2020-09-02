@@ -167,7 +167,7 @@ export const QueueTableConfig = {
     { name: 'invoiceOutstanding', title: 'Outstanding' },
     { name: 'patientScheme', title: 'Scheme' },
     { name: 'patientMobile', title: 'Phone' },
-    { name: 'visitOrderTemplate', title: 'Visit Order Template' },
+    { name: 'visitOrderTemplate', title: 'Visit Purpose' },
     { name: 'action', title: 'Action' },
   ],
   leftColumns: [
