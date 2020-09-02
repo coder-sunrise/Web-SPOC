@@ -18,11 +18,12 @@ import {
   DatePicker,
   RadioGroup,
   CheckboxGroup,
+  Switch,
 } from '@/components'
 import { getUniqueNumericId } from '@/utils/utils'
 import { queryList } from '@/services/patient'
-import Address from './Address'
 import { MobileNumberInput } from '@/components/_medisys'
+import Address from './Address'
 
 const styles = () => ({
   contactIcon: {
@@ -200,7 +201,7 @@ class Demographic extends PureComponent {
                   }}
                 />
               </GridItem>
-              <GridItem xs={12}>
+              <GridItem xs={10}>
                 <FastField
                   name='callingName'
                   render={(args) => {
@@ -208,6 +209,20 @@ class Demographic extends PureComponent {
                       <TextField
                         label='Calling Name'
                         maxLength='100'
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+              <GridItem xs={2} style={{ marginTop: 15, textAlign: 'right' }}>
+                <FastField
+                  name='isActive'
+                  render={(args) => {
+                    return (
+                      <Switch
+                        checkedChildren='Active'
+                        unCheckedChildren='Inactive'
                         {...args}
                       />
                     )
