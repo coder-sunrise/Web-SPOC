@@ -201,7 +201,7 @@ class Demographic extends PureComponent {
                   }}
                 />
               </GridItem>
-              <GridItem xs={10}>
+              <GridItem xs={12}>
                 <FastField
                   name='callingName'
                   render={(args) => {
@@ -209,20 +209,6 @@ class Demographic extends PureComponent {
                       <TextField
                         label='Calling Name'
                         maxLength='100'
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-              <GridItem xs={2} style={{ marginTop: 15, textAlign: 'right' }}>
-                <FastField
-                  name='isActive'
-                  render={(args) => {
-                    return (
-                      <Switch
-                        checkedChildren='Active'
-                        unCheckedChildren='Inactive'
                         {...args}
                       />
                     )
