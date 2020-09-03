@@ -44,7 +44,8 @@ class PatientInfoSideBanner extends PureComponent {
         return schemeData
       })
     }
-    if (allowChangePatientStatus) this.checkPatientIntoActiveSession(entity.id)
+    if (allowChangePatientStatus && entity)
+      this.checkPatientIntoActiveSession(entity.id)
   }
 
   refreshChasBalance = (patientCoPaymentSchemeFK, oldSchemeTypeFK) => {
@@ -207,7 +208,7 @@ class PatientInfoSideBanner extends PureComponent {
     const entityNameClass = classnames({
       [classes.cardCategory]: true,
       [classes.entityName]: true,
-      [classes.isInActive]: !entity.isActive,
+      [classes.isInActive]: !entity || !entity.isActive,
     })
 
     return entity && entity.id ? (
@@ -215,7 +216,7 @@ class PatientInfoSideBanner extends PureComponent {
         <h4 className={entityNameClass}>
           {!entity.isActive && (
             <Tooltip title={entity.isActive ? 'Active' : 'Inactive'}>
-              <WarningIcon style={{ marginRight: 5 }} />
+              <WarningIcon />
             </Tooltip>
           )}
           <CodeSelect
