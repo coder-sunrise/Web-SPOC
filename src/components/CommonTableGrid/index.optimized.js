@@ -51,6 +51,7 @@ import {
   TableTreeColumn,
   TableColumnResizing,
   TableColumnReordering,
+  TableSelection,
 } from '@devexpress/dx-react-grid-material-ui'
 import MenuItem from '@material-ui/core/MenuItem'
 import MenuList from '@material-ui/core/MenuList'
@@ -84,7 +85,6 @@ import TableRow from './plugins/TableRow'
 import TableCell from './plugins/TableCell'
 import styles from './style'
 
-// console.log(userService)
 window.$tempGridRow = {}
 const cellStyle = {
   cell: {
@@ -158,6 +158,7 @@ class CommonTableGrid extends PureComponent {
       },
       rows: [],
       gridSetting: gs,
+      selectedItem: [],
     }
     const cls = classNames({
       [classes.tableStriped]: oddEven,
@@ -259,6 +260,8 @@ class CommonTableGrid extends PureComponent {
     this.defaultFunctionConfig = {
       filter: false,
       selectable: false,
+      resizable: false,
+      selectRowHighlightable: false,
       pager: true,
       pagerStateConfig: {
         onCurrentPageChange: (current) => {
@@ -377,7 +380,7 @@ class CommonTableGrid extends PureComponent {
         TableFixedCell: {
           fixedCell: {
             zIndex: 1,
-            overflow: 'visible',
+            // overflow: 'visible',
             backgroundColor: 'inherit',
             borderLeft: '1px solid rgba(0, 0, 0, 0.12)',
           },
@@ -817,6 +820,8 @@ class CommonTableGrid extends PureComponent {
     const {
       grouping,
       selectable,
+      resizable,
+      selectRowHighlightable,
       selectConfig = {
         showSelectAll: false,
         rowSelectionEnabled: (row) => true,
@@ -1051,10 +1056,16 @@ class CommonTableGrid extends PureComponent {
                   {...sortConfig}
                 />
               )}
-              {selectable && (
+              {(selectable || selectRowHighlightable) && (
                 <SelectionState
-                  selection={selection}
-                  onSelectionChange={onSelectionChange}
+                  selection={selectable ? selection : this.state.selectedItem}
+                  onSelectionChange={(e) => {
+                    if (selectable) {
+                      onSelectionChange(e)
+                    } else {
+                      this.setState({ selectedItem: e })
+                    }
+                  }}
                 />
               )}
               {summary && <SummaryState {...summaryConfig.state} />}
@@ -1143,18 +1154,26 @@ class CommonTableGrid extends PureComponent {
                   }}
                 />
               )}
-              {false && (
+              {header &&
+              resizable && (
                 <TableColumnResizing
                   defaultColumnWidths={columnExtensions.map((o) => {
                     return {
                       columnName: o.columnName,
-                      width: o.width || 0,
+                      width: o.width || 100,
                     }
                   })}
                 />
               )}
-
               {header && <HeaderRow showSortingControls />}
+              {selectRowHighlightable && (
+                <TableSelection
+                  highlightRow
+                  selectByRowClick
+                  showSelectionColumn={false}
+                  {...selectConfig}
+                />
+              )}
               {extraRow.map((o) => o)}
               {pager && <PagingPanel pageSizes={pageSizes} {...pagerConfig} />}
               {grouping && (
@@ -1257,6 +1276,8 @@ CommonTableGrid.propTypes = {
     pager: PropTypes.bool,
     pagerConfig: PropTypes.object,
     selectable: PropTypes.bool,
+    resizable: PropTypes.bool,
+    selectRowHighlightable: PropTypes.bool,
   }),
   FilteringProps: PropTypes.shape({
     defaultFilters: PropTypes.array,

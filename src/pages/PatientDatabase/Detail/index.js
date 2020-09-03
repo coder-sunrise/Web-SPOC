@@ -142,6 +142,12 @@ const mapEntityToValues = (entity) => {
       },
     }).then((r) => {
       dispatch({
+        type: 'global/updateState',
+        payload: {
+          disableSave: false,
+        },
+      })
+      dispatch({
         type: 'patient/updateState',
         payload: {
           shouldQueryOnClose: location.pathname.includes('patientdb'),
@@ -385,9 +391,24 @@ class PatientDetail extends PureComponent {
 
   validatePatient = async () => {
     const { handleSubmit, dispatch, values } = this.props
-
-    if (values.patientAccountNo === undefined || values.patientAccountNo === '')
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        disableSave: true,
+      },
+    })
+    if (
+      values.patientAccountNo === undefined ||
+      values.patientAccountNo === ''
+    ) {
+      dispatch({
+        type: 'global/updateState',
+        payload: {
+          disableSave: false,
+        },
+      })
       return handleSubmit()
+    }
 
     const search = {
       eql_patientAccountNo: values.patientAccountNo,
@@ -414,6 +435,12 @@ class PatientDetail extends PureComponent {
       }
     }
     if (shouldPromptSaveConfirmation) {
+      dispatch({
+        type: 'global/updateState',
+        payload: {
+          disableSave: false,
+        },
+      })
       return dispatch({
         type: 'global/updateAppState',
         payload: {

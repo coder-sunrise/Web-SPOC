@@ -57,6 +57,8 @@ export const FuncConfig = {
       { columnName: 'queueNo', direction: 'asc' },
     ],
   },
+  resizable: true,
+  selectRowHighlightable: true,
 }
 
 export const AppointmentTableConfig = {
@@ -81,7 +83,7 @@ export const ApptColumnExtensions = [
   //   width: 180,
   //   render: (row) => <VisitStatusTag row={row} />,
   // },
-  { columnName: 'patientAccountNo', compare: compareString },
+  { columnName: 'patientAccountNo', compare: compareString, width: 120 },
   {
     columnName: 'patientName',
     width: 250,
@@ -117,11 +119,13 @@ export const ApptColumnExtensions = [
         </React.Fragment>
       )
     },
+    width: 100,
     sortingEnabled: false,
   },
   {
     columnName: 'roomNo',
     render: (row) => row.roomNo || '-',
+    width: 120,
   },
   {
     columnName: 'remarks',
@@ -130,9 +134,13 @@ export const ApptColumnExtensions = [
   },
   {
     columnName: 'appointmentTime',
-    width: 180,
+    width: 170,
     type: 'date',
     showTime: true,
+  },
+  {
+    columnName: 'patientContactNo',
+    width: 120,
   },
 ]
 
@@ -159,7 +167,7 @@ export const QueueTableConfig = {
     { name: 'invoiceOutstanding', title: 'Outstanding' },
     { name: 'patientScheme', title: 'Scheme' },
     { name: 'patientMobile', title: 'Phone' },
-    { name: 'visitOrderTemplate', title: 'Visit Order Template' },
+    { name: 'visitOrderTemplate', title: 'Visit Purpose' },
     { name: 'action', title: 'Action' },
   ],
   leftColumns: [
@@ -207,20 +215,29 @@ export const QueueColumnExtensions = [
       )
     },
   },
-  { columnName: 'patientAccountNo', compare: compareString },
+  { columnName: 'patientAccountNo', compare: compareString, width: 120 },
 
-  { columnName: 'invoiceNo' },
+  { columnName: 'invoiceNo', width: 120 },
   {
     columnName: 'roomNo',
+    width: 120,
   },
   {
     columnName: 'remarks',
     width: 180,
   },
-  // {
-  //   columnName: 'patientScheme',
-  //   render: (row) => row.patientScheme || '-',
-  // },
+  {
+    columnName: 'patientScheme',
+    width: 200,
+  },
+  {
+    columnName: 'invoiceStatus',
+    width: 120,
+  },
+  {
+    columnName: 'patientMobile',
+    width: 120,
+  },
   // {
   //   columnName: 'invoicePaymentMode',
   //   width: 150,
@@ -234,20 +251,29 @@ export const QueueColumnExtensions = [
   { columnName: 'referralCompany', width: 150 },
   { columnName: 'referralPerson', width: 150 },
   { columnName: 'referralRemarks', width: 150 },
-  { columnName: 'invoiceAmount', type: 'number', currency: true },
-  { columnName: 'invoicePaymentAmount', type: 'number', currency: true },
-  { columnName: 'invoiceGST', type: 'number', currency: true },
-  { columnName: 'invoiceOutstanding', type: 'number', currency: true },
-  { columnName: 'Action', width: 100, align: 'center' },
+  { columnName: 'invoiceAmount', type: 'number', currency: true, width: 120 },
+  {
+    columnName: 'invoicePaymentAmount',
+    type: 'number',
+    currency: true,
+    width: 120,
+  },
+  { columnName: 'invoiceGST', type: 'number', currency: true, width: 120 },
+  {
+    columnName: 'invoiceOutstanding',
+    type: 'number',
+    currency: true,
+    width: 120,
+  },
   {
     columnName: 'timeIn',
-    width: 180,
+    width: 170,
     type: 'date',
     showTime: true,
   },
   {
     columnName: 'timeOut',
-    width: 180,
+    width: 170,
     type: 'date',
     showTime: true,
   },
@@ -263,11 +289,12 @@ export const QueueColumnExtensions = [
         </Tooltip>
       )
     },
+    width: 100,
     sortingEnabled: false,
   },
   {
     columnName: 'appointmentTime',
-    width: 180,
+    width: 160,
     type: 'date',
     showTime: true,
     // compare: compareTime,
