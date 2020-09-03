@@ -117,7 +117,7 @@ const History = (props) => {
                     dropdownMatchSelectWidth={false}
                     // value={selected}
                     options={list
-                      .filter((o) => o.coHistory && o.coHistory.length)
+                      .filter((o) => o.coHistory && o.coHistory.length > 0)
                       .map(
                         ({
                           id,
@@ -134,7 +134,7 @@ const History = (props) => {
                       )}
                     onChange={(v, op) => {
                       const item = list.find((o) => o.id === v)
-                      if (item && item.coHistory[0]) {
+                      if (item && item.coHistory && item.coHistory.length > 0) {
                         dispatch({
                           type: 'patientHistory/queryOne',
                           payload: item.coHistory[0].id,

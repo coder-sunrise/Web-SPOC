@@ -81,7 +81,6 @@ const styles = (theme) => ({
       labTrackingResults.push({
         ...labTrackingResult,
         attachmentType: 'labTrackingResults',
-        fileExtension: 'pdf',
       })
       return labTrackingResult
     })

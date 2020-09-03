@@ -14,18 +14,18 @@ import {
 } from '@devexpress/dx-react-grid-material-ui'
 import { Getter } from '@devexpress/dx-react-core'
 import Add from '@material-ui/icons/Add'
-import CommandComponent from './CommandComponent'
 import {
   getGlobalVariable,
   getUniqueNumericId,
   difference,
   enableTableForceRender,
 } from '@/utils/utils'
+import { Button } from '@/components'
+import Authorized from '@/utils/Authorized'
+import CommandComponent from './CommandComponent'
 import CustomTableEditRow from './CustomTableEditRow'
 import CommonTableGrid from './index.optimized'
 import EditPlugin from './EditPlugin'
-import { Button } from '@/components'
-import Authorized from '@/utils/Authorized'
 import { updateGlobalState } from './EditCellComponents/utils'
 
 let uniqueGid = 0
@@ -569,6 +569,10 @@ class EditableTableGrid extends PureComponent {
         showAddCommand = false,
         showEditCommand = true,
         showDeleteCommand = true,
+        deleteConfirm = {
+          show: false,
+          title: 'Are you sure you want to delete this row?',
+        },
         onRowDelete,
         isDeletable = (f) => true,
         messages = {
@@ -711,6 +715,7 @@ class EditableTableGrid extends PureComponent {
                             // getRowId: this.props.getRowId,
                             onRowDelete,
                             isDeletable,
+                            deleteConfirm,
                             // ...o.props,
                           })
                         }

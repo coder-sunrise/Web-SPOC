@@ -684,6 +684,14 @@ const _routes = [
             ],
           },
           {
+            path: '/report/visitlistingreport',
+            name: 'visitListingReport',
+            component: './Report/VisitListingReport',
+            authority: [
+              'report.admin.visitlistingreport',
+            ],
+          },
+          {
             path: '/report/diagnosistrending',
             name: 'diagnosistrending',
             component: './Report/DiagnosisTrending',
@@ -1212,6 +1220,14 @@ const _routes = [
             component: './Setting/RefractionTestType',
             authority: [
               'settings.clinicsetting.refractiontesttype',
+            ],
+          },
+          {
+            path: '/setting/package',
+            name: 'package',
+            component: './Setting/Package',
+            authority: [
+              'settings.clinicsetting.package',
             ],
           },
         ],

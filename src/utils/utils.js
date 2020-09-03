@@ -84,6 +84,13 @@ moment.prototype.formatUTC = function (dateOnly = true) {
   )
 }
 
+String.prototype.format = function () {
+  if (arguments.length === 0) return this
+  for (var s = this, i = 0; i < arguments.length; i++)
+    s = s.replace(new RegExp(`\\{${i}\\}`, 'g'), arguments[i])
+  return s
+}
+
 // moment.prototype.toUTC = function () {
 //   return this.clone().add(-8, 'hours')
 // }
@@ -91,6 +98,11 @@ moment.prototype.formatUTC = function (dateOnly = true) {
 export const roundTo = (amount, precision = 2) => {
   if (!amount && amount !== 0) return undefined
   return Math.round(amount * 10 ** precision) / 10 ** precision
+}
+
+export const roundUp = (num, precision = 2) => {
+  precision = 10 ** precision
+  return Math.ceil(num * precision) / precision
 }
 
 export function fixedZero (val) {
@@ -944,7 +956,7 @@ const calculateGSTAdj = ({
   isGSTInclusive = false,
   activeRows,
   totalAfterAdj,
-  gstValue,
+  gstValue = 0,
   gstAmtField = 'gstAmount',
 }) => {
   let gst = roundTo(totalAfterAdj * gstValue / 100)
@@ -961,7 +973,9 @@ const calculateGSTAdj = ({
   activeRows.forEach((r, index) => {
     if (index === activeRows.length - 1) {
       r[gstAmtField] += diff
-      r.totalAfterGST += diff
+      if (!isGSTInclusive) {
+        r.totalAfterGST += diff
+      }
     }
   })
 
@@ -1011,6 +1025,7 @@ const calculateAmount = (
       o.subAdjustment = 0
     })
     let adjAmount = 0
+    let otherItemsAdjAmount = 0
     activeRows.forEach((r, j) => {
       // console.log(r.weightage * fa.adjAmount, r)
       let adj = 0
@@ -1019,7 +1034,10 @@ const calculateAmount = (
         initalRowToal += r[`adjustmen${idx}`]
       }
       if (fa.adjType === 'ExactAmount') {
-        adj = r.weightage * fa.adjValue
+        // --- If is last item, should use [totalAdjAmount] - [sum of other items adj amt] ---//
+        if (activeRows.length - 1 === j) {
+          adj = fa.adjAmount - otherItemsAdjAmount
+        } else adj = r.weightage * fa.adjValue
       } else if (fa.adjType === 'Percentage') {
         adj = roundTo(fa.adjValue / 100 * initalRowToal)
       }
@@ -1029,8 +1047,9 @@ const calculateAmount = (
       // r.subAdjustment += adj
       r[`adjustmen${i}`] = adj
       r[adjustedField] = roundTo(initalRowToal + adj)
+      otherItemsAdjAmount += roundTo(adj)
     })
-    fa.adjAmount = roundTo(adjAmount)
+    if (fa.adjType === 'Percentage') fa.adjAmount = roundTo(adjAmount)
   })
   // activeRows.forEach((r) => {
   //   r[adjustedField] = roundTo(r[adjustedField])
@@ -1281,6 +1300,32 @@ const generateHashCode = (s) =>
     .split('')
     .reduce((a, b) => Math.abs((a << 5) - a + b.charCodeAt(0)) | 0, 0)}`
 
+const stringToBytesFaster = (str) => {
+  // http://stackoverflow.com/questions/1240408/reading-bytes-from-a-javascript-string
+  let ch
+  let st
+  let re = []
+  let j = 0
+  for (let i = 0; i < str.length; i++) {
+    ch = str.charCodeAt(i)
+    if (ch < 127) {
+      re[j++] = ch & 0xff
+    } else {
+      st = [] // clear stack
+      do {
+        st.push(ch & 0xff) // push byte to stack
+        ch >>= 8 // shift value down by 1 byte
+      } while (ch)
+      // add stack contents to result
+      // done because chars have "wrong" endianness
+      st = st.reverse()
+      for (let k = 0; k < st.length; ++k) re[j++] = st[k]
+    }
+  }
+  // return an array of bytes
+  return re
+}
+
 module.exports = {
   ...cdrssUtil,
   ...module.exports,
@@ -1314,6 +1359,8 @@ module.exports = {
   enableTableForceRender,
   generateHashCode,
   roundTo,
+  roundUp,
+  stringToBytesFaster,
   // toUTC,
   // toLocal,
 }

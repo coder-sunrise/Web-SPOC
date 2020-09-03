@@ -25,10 +25,10 @@ import Authorized from '@/utils/Authorized'
 // sub component
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 import DispenseDetails from '@/pages/Dispense/DispenseDetails/WebSocketWrapper'
+import { ReportsOnCompletePaymentOption } from '@/utils/codes'
 import ApplyClaims from './refactored/newApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 import SchemeValidationPrompt from './components/SchemeValidationPrompt'
-import { ReportsOnCompletePaymentOption } from '@/utils/codes'
 import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
 // page utils
 import {
@@ -271,6 +271,15 @@ class Billing extends Component {
           }
         }
       }
+
+      const printDrugLabel =
+        reportsOnCompletePayment.indexOf(
+          ReportsOnCompletePaymentOption.DrugLabel,
+        ) > -1
+      if (!printDrugLabel) {
+        this.setState({ selectedDrugs: [] })
+      }
+
       if (printData && printData.length > 0) {
         const token = localStorage.getItem('token')
         printData = printData.map((item) => ({
@@ -278,13 +287,13 @@ class Billing extends Component {
           Token: token,
           BaseUrl: process.env.url,
         }))
+      }
+
+      if (printData.length > 0 || printDrugLabel) {
         await this.childOnPrintRef({
           type: 1,
           printData,
-          printAllDrugLabel:
-            reportsOnCompletePayment.indexOf(
-              ReportsOnCompletePaymentOption.DrugLabel,
-            ) > -1,
+          printAllDrugLabel: printDrugLabel,
         })
       }
     }
@@ -406,9 +415,12 @@ class Billing extends Component {
     await setFieldValue('visitStatus', 'COMPLETED')
 
     // check if invoice is OVERPAID and prompt user for confirmation
-    const { invoice } = values
+    const { invoice, invoicePayer = [] } = values
     const { outstandingBalance = 0 } = invoice
-    if (outstandingBalance < 0) {
+    if (
+      outstandingBalance < 0 ||
+      invoicePayer.find((ip) => ip.payerOutstanding < 0)
+    ) {
       return dispatch({
         type: 'global/updateState',
         payload: {
@@ -668,6 +680,7 @@ class Billing extends Component {
       sessionInfo,
       user,
     }
+    const { isEnableAddPaymentInBilling = false } = clinicSettings
     return (
       <LoadingWrapper loading={loading} text='Getting billing info...'>
         <PatientBanner />
@@ -767,10 +780,11 @@ class Billing extends Component {
                   disabled={
                     this.state.isEditing ||
                     values.id === undefined ||
-                    values.invoicePayer.find((payer) =>
-                      (payer.invoicePayment || [])
-                        .find((payment) => !payment.isCancelled),
-                    )
+                    (isEnableAddPaymentInBilling &&
+                      values.invoicePayer.find((payer) =>
+                        (payer.invoicePayment || [])
+                          .find((payment) => !payment.isCancelled),
+                      ))
                   }
                 >
                   <ArrowBack />Dispense
@@ -787,7 +801,8 @@ class Billing extends Component {
                   disabled={
                     this.state.isEditing ||
                     values.id === undefined ||
-                    this.state.isExistingOldPayerItem
+                    (isEnableAddPaymentInBilling &&
+                      this.state.isExistingOldPayerItem)
                   }
                   onClick={this.onCompletePaymentClick}
                 >

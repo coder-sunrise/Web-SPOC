@@ -144,7 +144,7 @@ const Scheme = ({
     const statuses = chasClaimStatuses.map((status) => status.toLowerCase())
     if (
       hasPayments ||
-      statuses.includes('draft') ||
+      //statuses.includes('draft') ||
       statuses.includes('approved')
     )
       return true
@@ -196,7 +196,7 @@ const Scheme = ({
   const onPaymentDeleteClick = (payment) => {
     onPaymentVoidClick(index, payment)
   }
-  const { IsEnableAddPaymentInBilling = true } = clinicSettings
+  const { isEnableAddPaymentInBilling = false } = clinicSettings
   return (
     <Paper key={_key} elevation={4} className={classes.gridRow}>
       <GridContainer style={{ marginBottom: 16 }} alignItems='flex-start'>
@@ -351,14 +351,17 @@ const Scheme = ({
               color='primary'
               className={classes.rightEndBtn}
               onClick={handleEditClick}
-              disabled={disableEdit || existingOldPayerItem}
+              disabled={
+                disableEdit ||
+                (isEnableAddPaymentInBilling && existingOldPayerItem)
+              }
             >
               Edit
             </Button>
           )}
         </GridItem>
         {fromBilling &&
-        IsEnableAddPaymentInBilling && (
+        isEnableAddPaymentInBilling && (
           <GridContainer>
             <GridItem md={12}>
               <CardContainer hideHeader size='sm'>

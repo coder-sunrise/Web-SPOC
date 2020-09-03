@@ -202,10 +202,10 @@ export const menuData = [
     url: '/setting/casedescription',
   },
   {
-      authority: 'settings.clinicsetting.refractiontesttype',
-      title: 'Clinic Setting',
-      text: 'REFRACTION TEST TYPE',
-      url: '/setting/refractiontesttype',
+    authority: 'settings.clinicsetting.refractiontesttype',
+    title: 'Clinic Setting',
+    text: 'REFRACTION TEST TYPE',
+    url: '/setting/refractiontesttype',
   },
   {
     authority: 'settings.systemuser.systemuser',
@@ -265,5 +265,11 @@ export const menuData = [
     title: 'Contact',
     text: 'Referral Source',
     url: '/setting/referralsource',
+  },
+  {
+    authority: 'settings.clinicsetting.package',
+    title: 'Clinic Setting',
+    text: 'Package',
+    url: '/setting/package',
   },
 ]
