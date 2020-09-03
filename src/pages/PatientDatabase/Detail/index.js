@@ -538,7 +538,7 @@ class PatientDetail extends PureComponent {
     const { currentComponent, currentId, menuErrors, entity } = patient
 
     const isCreatingPatient = entity
-      ? Object.prototype.hasOwnProperty.call(entity, 'id')
+      ? Object.prototype.hasOwnProperty.call(entity, 'id') && entity.isActive
       : false
 
     const currentMenu =
