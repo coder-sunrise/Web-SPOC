@@ -132,9 +132,10 @@ export default createListViewModel({
         }
       },
       querySuccess (st, { payload }) {
-        console.log('querySuccess', payload)
         const { data, filter = {}, version, keepFilter = true } = payload
-        const list = splitApptResource(data) // data.entities ? data.entities : data.data
+        const list = splitApptResource(
+          data.entities ? data.entities : data.data,
+        )
         const { sorting } = filter
         const cfg = {}
         if (version) {
