@@ -158,7 +158,7 @@ class CommonTableGrid extends PureComponent {
       },
       rows: [],
       gridSetting: gs,
-      selectedItem: [],
+      selectedItem: 0,
     }
     const cls = classNames({
       [classes.tableStriped]: oddEven,
@@ -1058,14 +1058,8 @@ class CommonTableGrid extends PureComponent {
               )}
               {(selectable || selectRowHighlightable) && (
                 <SelectionState
-                  selection={selectable ? selection : this.state.selectedItem}
-                  onSelectionChange={(e) => {
-                    if (selectable) {
-                      onSelectionChange(e)
-                    } else {
-                      this.setState({ selectedItem: e })
-                    }
-                  }}
+                  selection={selection}
+                  onSelectionChange={onSelectionChange()}
                 />
               )}
               {summary && <SummaryState {...summaryConfig.state} />}
@@ -1168,7 +1162,34 @@ class CommonTableGrid extends PureComponent {
               {header && <HeaderRow showSortingControls />}
               {selectRowHighlightable && (
                 <TableSelection
-                  highlightRow
+                  rowComponent={(row) => {
+                    const { tableRow, children } = row
+                    const click = () => {
+                      this.setState((preState) => {
+                        if (preState.selectedItem === tableRow.row.id)
+                          return {
+                            selectedItem: 0,
+                          }
+                        return {
+                          selectedItem: tableRow.row.id,
+                        }
+                      })
+                    }
+                    if (this.state.selectedItem === tableRow.row.id)
+                      return (
+                        <TableSelection.Row
+                          style={{ backgroundColor: '#c8dafd' }}
+                          onClick={click}
+                        >
+                          {children}
+                        </TableSelection.Row>
+                      )
+                    return (
+                      <TableSelection.Row onClick={click}>
+                        {children}
+                      </TableSelection.Row>
+                    )
+                  }}
                   selectByRowClick
                   showSelectionColumn={false}
                   {...selectConfig}
