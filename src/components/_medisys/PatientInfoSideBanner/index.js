@@ -29,11 +29,11 @@ import styles from './styles.js'
 class PatientInfoSideBanner extends PureComponent {
   state = {
     refreshedSchemeData: {},
-    inActiveSession: false,
+    patientIntoActiveSession: false,
   }
 
   componentDidMount = () => {
-    const { entity, autoRefreshChas, activePatient } = this.props
+    const { entity, autoRefreshChas, allowChangePatientStatus } = this.props
     if (autoRefreshChas && entity && entity.patientScheme) {
       entity.patientScheme.filter((o) => o.schemeTypeFK <= 6).map((o) => {
         const schemeData = this.getSchemeDetails(o)
@@ -44,7 +44,7 @@ class PatientInfoSideBanner extends PureComponent {
         return schemeData
       })
     }
-    if (activePatient) this.checkPatientInActiveSession(entity.id)
+    if (allowChangePatientStatus) this.checkPatientIntoActiveSession(entity.id)
   }
 
   refreshChasBalance = (patientCoPaymentSchemeFK, oldSchemeTypeFK) => {
@@ -118,14 +118,14 @@ class PatientInfoSideBanner extends PureComponent {
     })
   }
 
-  checkPatientInActiveSession = (patientId) => {
+  checkPatientIntoActiveSession = (patientId) => {
     const bizSessionPayload = {
       IsClinicSessionClosed: false,
       'Visit.PatientProfileFK': patientId,
     }
     getBizSession(bizSessionPayload).then((result) => {
       const { data: { totalRecords } } = result
-      this.setState({ inActiveSession: totalRecords === 0 })
+      this.setState({ patientIntoActiveSession: totalRecords === 0 })
     })
   }
 
@@ -199,7 +199,7 @@ class PatientInfoSideBanner extends PureComponent {
       entity,
       loading,
       clinicSettings,
-      activePatient,
+      allowChangePatientStatus,
       onActiveStatusChange,
       dispatch,
     } = this.props
@@ -250,8 +250,8 @@ class PatientInfoSideBanner extends PureComponent {
             clinicSettings={clinicSettings}
             isEnableScanner
           />
-          {activePatient &&
-          this.state.inActiveSession && (
+          {allowChangePatientStatus &&
+          this.state.patientIntoActiveSession && (
             <div
               style={{
                 width: 100,

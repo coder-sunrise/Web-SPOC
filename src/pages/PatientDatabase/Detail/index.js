@@ -532,7 +532,7 @@ class PatientDetail extends PureComponent {
             <Card profile>
               <CardBody profile>
                 <PatientInfoSideBanner
-                  activePatient
+                  allowChangePatientStatus
                   onActiveStatusChange={this.onActiveStatusChanged}
                   entity={entity}
                   {...this.props}
