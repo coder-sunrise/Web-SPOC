@@ -73,18 +73,20 @@ const InvoiceHistory = ({
     setHasActiveSession,
   ] = useState(true)
 
-  const checkHasActiveSession = async () => {
+  const checkHasActiveSession = () => {
     const bizSessionPayload = {
       IsClinicSessionClosed: false,
     }
-    const result = await getBizSession(bizSessionPayload)
-    const { data } = result.data
-
-    setHasActiveSession(data.length > 0)
+      getBizSession(bizSessionPayload).then((result) => {
+          if (result) {
+              const { data } = result.data
+              setHasActiveSession(data.length > 0)
+          }
+    })
   }
 
-  useEffect(async () => {
-    await checkHasActiveSession()
+  useEffect(() => {
+    checkHasActiveSession()
     refreshInvoiceList()
   }, [])
 
