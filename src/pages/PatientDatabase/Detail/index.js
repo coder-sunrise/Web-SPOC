@@ -472,6 +472,31 @@ class PatientDetail extends PureComponent {
     })
   }
 
+  onActiveStatusChanged = async (status) => {
+    const { setFieldValue, patient: { entity } } = this.props
+
+    if (status === true) {
+      setFieldValue('EffectiveStartDate', moment().formatUTC())
+      setFieldValue('EffectiveEndDate', moment('2099-12-31').formatUTC())
+    } else {
+      const bizSessionPayload = {
+        IsClinicSessionClosed: false,
+        'Visit.PatientProfileFK': entity.id,
+      }
+      const result = await getBizSession(bizSessionPayload)
+      const { data: { totalRecords } } = result
+      if (totalRecords !== 0) {
+        notification.error({
+          message:
+            'Can not change patient status to inactive if patient in active session.',
+        })
+        return
+      }
+      setFieldValue('EffectiveEndDate', moment().formatUTC())
+    }
+    this.validatePatient()
+  }
+
   UNSAFE_componentWillReceiveProps (nextProps) {
     const { errors, dispatch, patient, values, validateForm } = nextProps
     // validateForm(values).then((o) => {
@@ -533,7 +558,12 @@ class PatientDetail extends PureComponent {
           <GridItem xs={12} sm={12} md={2}>
             <Card profile>
               <CardBody profile>
-                <PatientInfoSideBanner entity={entity} {...this.props} />
+                <PatientInfoSideBanner
+                  allowChangePatientStatus
+                  onActiveStatusChange={this.onActiveStatusChanged}
+                  entity={entity}
+                  {...this.props}
+                />
                 <MenuList>
                   {this.widgets
                     .filter(

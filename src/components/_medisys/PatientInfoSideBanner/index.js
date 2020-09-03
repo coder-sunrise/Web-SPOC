@@ -7,8 +7,10 @@ import _ from 'lodash'
 import { withStyles, Divider } from '@material-ui/core'
 // common components
 import Refresh from '@material-ui/icons/Sync'
+import WarningIcon from '@material-ui/icons/Warning'
 import { SchemePopover } from 'medisys-components'
 import { locationQueryParameters } from '@/utils/utils'
+import { getBizSession } from '@/services/queue'
 import {
   NumberInput,
   CodeSelect,
@@ -16,6 +18,8 @@ import {
   DatePicker,
   IconButton,
   TextField,
+  Switch,
+  Tooltip,
 } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
 import PrintLabLabelButton from './PatientLabelBtn'
@@ -25,10 +29,11 @@ import styles from './styles.js'
 class PatientInfoSideBanner extends PureComponent {
   state = {
     refreshedSchemeData: {},
+    patientIntoActiveSession: false,
   }
 
   componentDidMount = () => {
-    const { entity, autoRefreshChas } = this.props
+    const { entity, autoRefreshChas, allowChangePatientStatus } = this.props
     if (autoRefreshChas && entity && entity.patientScheme) {
       entity.patientScheme.filter((o) => o.schemeTypeFK <= 6).map((o) => {
         const schemeData = this.getSchemeDetails(o)
@@ -39,6 +44,7 @@ class PatientInfoSideBanner extends PureComponent {
         return schemeData
       })
     }
+    if (allowChangePatientStatus) this.checkPatientIntoActiveSession(entity.id)
   }
 
   refreshChasBalance = (patientCoPaymentSchemeFK, oldSchemeTypeFK) => {
@@ -112,6 +118,17 @@ class PatientInfoSideBanner extends PureComponent {
     })
   }
 
+  checkPatientIntoActiveSession = (patientId) => {
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+      'Visit.PatientProfileFK': patientId,
+    }
+    getBizSession(bizSessionPayload).then((result) => {
+      const { data: { totalRecords } } = result
+      this.setState({ patientIntoActiveSession: totalRecords === 0 })
+    })
+  }
+
   getSchemeDetails = (schemeData) => {
     if (
       !_.isEmpty(this.state.refreshedSchemeData) &&
@@ -182,16 +199,25 @@ class PatientInfoSideBanner extends PureComponent {
       entity,
       loading,
       clinicSettings,
+      allowChangePatientStatus,
+      onActiveStatusChange,
+      dispatch,
     } = this.props
 
     const entityNameClass = classnames({
       [classes.cardCategory]: true,
       [classes.entityName]: true,
+      [classes.isInActive]: !entity.isActive,
     })
 
     return entity && entity.id ? (
       <React.Fragment>
         <h4 className={entityNameClass}>
+          {!entity.isActive && (
+            <Tooltip title={entity.isActive ? 'Active' : 'Inactive'}>
+              <WarningIcon style={{ marginRight: 5 }} />
+            </Tooltip>
+          )}
           <CodeSelect
             // authority='none'
             text
@@ -218,14 +244,43 @@ class PatientInfoSideBanner extends PureComponent {
             value={entity.genderFK}
           />)
         </p>
-        <PrintLabLabelButton
-          patientId={entity.id}
-          clinicSettings={clinicSettings}
-          isEnableScanner
-          onUploading={(imgDatas) => {
-            console.log(imgDatas)
-          }}
-        />
+        <div style={{ display: 'inline-flex' }}>
+          <PrintLabLabelButton
+            patientId={entity.id}
+            clinicSettings={clinicSettings}
+            isEnableScanner
+          />
+          {allowChangePatientStatus &&
+          this.state.patientIntoActiveSession && (
+            <div
+              style={{
+                width: 100,
+                marginBottom: 8,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Switch
+                checked={entity.isActive}
+                checkedChildren='Active'
+                unCheckedChildren='Inactive'
+                onClick={(e) => {
+                  if (e === false) {
+                    dispatch({
+                      type: 'global/updateAppState',
+                      payload: {
+                        openConfirm: true,
+                        openConfirmContent: `Are you sure want to inactive this patient?`,
+                        onConfirmSave: () => onActiveStatusChange(e),
+                      },
+                    })
+                  } else onActiveStatusChange(true)
+                }}
+              />
+            </div>
+          )}
+        </div>
         <Divider light />
         <div
           className={classes.schemeContainer}
