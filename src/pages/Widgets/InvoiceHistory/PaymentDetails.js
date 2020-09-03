@@ -7,7 +7,7 @@ import { AddPayment } from 'medisys-components'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { CommonModal, WarningSnackbar, notification } from '@/components'
+import { CommonModal, notification } from '@/components'
 // sub components
 import Transfer from '@/pages/Finance/Invoice/components/modal/Transfer'
 import WriteOff from '@/pages/Finance/Invoice/components/modal/WriteOff'
@@ -342,17 +342,6 @@ class PaymentDetails extends Component {
 
     return (
       <div className={classes.container}>
-        {readOnly ? (
-          <div style={{ paddingTop: 5 }}>
-            <WarningSnackbar
-              variant='warning'
-              className={classes.margin}
-              message='Action(s) is not allowed due to no active session was found.'
-            />
-          </div>
-        ) : (
-          ''
-        )}
         {invoicePayer.length > 0 ? (
           invoicePayer
             .sort((a, b) => a.payerTypeFK - b.payerTypeFK)

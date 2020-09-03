@@ -14,6 +14,7 @@ import {
   dateFormatLong,
   Button,
   CommonModal,
+  WarningSnackbar,
 } from '@/components'
 // utils
 import { currencyFormatter } from '@/utils/utils'
@@ -70,7 +71,7 @@ const InvoiceHistory = ({
   const [
     hasActiveSession,
     setHasActiveSession,
-  ] = useState(false)
+  ] = useState(true)
 
   const checkHasActiveSession = async () => {
     const bizSessionPayload = {
@@ -108,6 +109,7 @@ const InvoiceHistory = ({
         invoiceDetail={o.invoiceDetail}
         invoicePayer={o.invoicePayer}
         refreshInvoiceList={refreshInvoiceList}
+        readOnly={!hasActiveSession}
         hasActiveSession={hasActiveSession}
         dispatch={dispatch}
       />
@@ -173,6 +175,17 @@ const InvoiceHistory = ({
   return (
     <div>
       <CardContainer hideHeader size='sm'>
+        {!hasActiveSession ? (
+          <div style={{ paddingTop: 5 }}>
+            <WarningSnackbar
+              variant='warning'
+              className={classes.margin}
+              message='Action(s) is not allowed due to no active session was found.'
+            />
+          </div>
+        ) : (
+          ''
+        )}
         <div className={classes.totalOSStyle}>
           Total Patient O/S Balance: {currencyFormatter(getTotalPatientOS())}
         </div>
