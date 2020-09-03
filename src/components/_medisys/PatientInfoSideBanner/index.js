@@ -7,7 +7,6 @@ import _ from 'lodash'
 import { withStyles, Divider } from '@material-ui/core'
 // common components
 import Refresh from '@material-ui/icons/Sync'
-import WarningIcon from '@material-ui/icons/Warning'
 import { SchemePopover } from 'medisys-components'
 import { locationQueryParameters } from '@/utils/utils'
 import { getBizSession } from '@/services/queue'
@@ -214,18 +213,23 @@ class PatientInfoSideBanner extends PureComponent {
     return entity && entity.id ? (
       <React.Fragment>
         <h4 className={entityNameClass}>
-          {!entity.isActive && (
-            <Tooltip title={entity.isActive ? 'Active' : 'Inactive'}>
-              <WarningIcon />
-            </Tooltip>
-          )}
-          <CodeSelect
-            // authority='none'
-            text
-            code='ctSalutation'
-            value={entity.salutationFK}
-          />&nbsp;
-          {entity.name}
+          <Tooltip
+            title={
+              entity.isActive ? 'Active' : 'This patient has been inactived'
+            }
+          >
+            <div>
+              <CodeSelect
+                text
+                code='ctSalutation'
+                value={entity.salutationFK}
+                style={
+                  entity.isActive ? {} : { textDecorationLine: 'line-through' }
+                }
+              />&nbsp;
+              {entity.name}
+            </div>
+          </Tooltip>
         </h4>
         <p>{entity.patientReferenceNo}</p>
         <p>
@@ -272,7 +276,7 @@ class PatientInfoSideBanner extends PureComponent {
                       type: 'global/updateAppState',
                       payload: {
                         openConfirm: true,
-                        openConfirmContent: `Are you sure want to inactive this patient?`,
+                        openConfirmContent: `Inactive this patient?`,
                         onConfirmSave: () => onActiveStatusChange(e),
                       },
                     })
