@@ -28,7 +28,7 @@ const Detail = ({ orderSetDetail, dispatch, values, theme }) => {
         payload: {
           id: orderSetDetail.currentId,
         },
-      }) // .then((v) => console.log('v', v))
+      })
     }
   }, [])
   return (
@@ -105,21 +105,6 @@ const Detail = ({ orderSetDetail, dispatch, values, theme }) => {
                 }}
               />
             </GridItem>
-            {/* <GridItem xs={12}>
-              <FastField
-                name='isOrderable'
-                render={(args) => {
-                  return (
-                    <Switch
-                      label={formatMessage({
-                        id: 'inventory.master.package.orderable',
-                      })}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem> */}
           </GridContainer>
         </GridItem>
         <GridItem xs={12} md={2} />
@@ -141,7 +126,6 @@ const Detail = ({ orderSetDetail, dispatch, values, theme }) => {
           </GridContainer>
         </GridItem>
       </GridContainer>
-      {/* <Divider style={{ margin: '40px 0 20px 0' }} /> */}
     </CardContainer>
   )
 }
