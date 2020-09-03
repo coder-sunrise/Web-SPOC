@@ -104,7 +104,7 @@ class Appointment extends React.PureComponent {
     selectedAppointmentFK: -1,
   }
 
-  componentWillMount () {
+  async componentWillMount () {
     const { dispatch, clinicInfo } = this.props
     const startOfMonth = moment().startOf('month').formatUTC()
     const endOfMonth = moment().endOf('month').endOf('day').formatUTC(false)
@@ -131,16 +131,30 @@ class Appointment extends React.PureComponent {
       },
     })
 
-    dispatch({
+    let filter
+    const filterTemplate = await dispatch({
+      type: 'appointment/getFilterTemplate',
+    })
+    if (filterTemplate) {
+      const { currentFilterTemplate } = filterTemplate
+      if (currentFilterTemplate) {
+        const { filterByDoctor, filterByApptType } = currentFilterTemplate
+        filter = {
+          filterByDoctor,
+          filterByApptType,
+        }
+      }
+    }
+
+    const response = await dispatch({
       type: 'codetable/fetchCodes',
       payload: {
         code: 'doctorprofile',
         force: true,
         filter: {},
       },
-    }).then((response) => {
-      response
-
+    })
+    if (response) {
       let filterByDoctor = []
       let resources = []
       let primaryClinicianFK
@@ -187,14 +201,16 @@ class Appointment extends React.PureComponent {
       }
 
       this.setState((preState) => ({
-        filter: {
+        filter: filter || {
           ...preState.filter,
           filterByDoctor,
         },
         primaryClinicianFK,
         resources,
       }))
-    })
+    } else {
+      this.setState({ filter })
+    }
 
     dispatch({
       type: 'calendar/initState',
@@ -210,24 +226,6 @@ class Appointment extends React.PureComponent {
     dispatch({
       type: 'calendar/setCurrentViewDate',
       payload: moment().toDate(),
-    })
-
-    dispatch({
-      type: 'appointment/getFilterTemplate',
-    }).then((filterTemplate) => {
-      if (filterTemplate) {
-        const { currentFilterTemplate } = filterTemplate
-        if (currentFilterTemplate) {
-          const { filterByDoctor, filterByApptType } = currentFilterTemplate
-
-          this.setState({
-            filter: {
-              filterByDoctor,
-              filterByApptType,
-            },
-          })
-        }
-      }
     })
   }
 
