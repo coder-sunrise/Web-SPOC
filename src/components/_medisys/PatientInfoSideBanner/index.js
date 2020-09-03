@@ -207,7 +207,7 @@ class PatientInfoSideBanner extends PureComponent {
     const entityNameClass = classnames({
       [classes.cardCategory]: true,
       [classes.entityName]: true,
-      [classes.isActive]: !entity.isActive,
+      [classes.isInActive]: !entity.isActive,
     })
 
     return entity && entity.id ? (

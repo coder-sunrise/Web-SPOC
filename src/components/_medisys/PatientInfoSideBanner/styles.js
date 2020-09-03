@@ -6,5 +6,5 @@ export default (theme) => ({
     paddingTop: theme.spacing(1),
     overflow: 'auto',
   },
-  isActive: { color: 'red' },
+  isInActive: { color: 'red' },
 })
