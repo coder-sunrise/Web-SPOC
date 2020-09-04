@@ -74,7 +74,7 @@ const createPayload = (values, viewOtherApptAccessRight, isActiveDoctor) => {
       room: filterByRoomBlockGroup > 0 ? filterByRoomBlockGroup : undefined,
       SearchText: searchValue || undefined,
       ApptType: filterByApptType.length > 0 ? filterByApptType : undefined,
-      AapptStatus:
+      ApptStatus:
         filterByAppointmentStatus.length > 0
           ? filterByAppointmentStatus
           : undefined,
