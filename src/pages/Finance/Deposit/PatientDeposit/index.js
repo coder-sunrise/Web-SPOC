@@ -3,13 +3,14 @@ import { connect } from 'dva'
 import Authorized from '@/utils/Authorized'
 import { findGetParameter, roundTo } from '@/utils/utils'
 import { ReportViewer } from '@/components/_medisys'
-
+import { getBizSession } from '@/services/queue'
 import {
   GridContainer,
   GridItem,
   CardContainer,
   NumberInput,
   CommonModal,
+  WarningSnackbar,
 } from '@/components'
 import { withStyles, TextField } from '@material-ui/core'
 import withWebSocket from '@/components/Decorator/withWebSocket'
@@ -51,13 +52,27 @@ class PatientDeposit extends PureComponent {
       selectedTypeIds: [
         -99,
       ],
+      hasActiveSession: true,
     }
   }
 
   componentDidMount () {
+    this.checkHasActiveSession()
     setTimeout(() => {
       this.searchResult()
     }, 10)
+  }
+
+  checkHasActiveSession = () => {
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+    }
+    getBizSession(bizSessionPayload).then((result) => {
+      if (result) {
+        const { data } = result.data
+        this.setState({ hasActiveSession: data.length > 0 })
+      }
+    })
   }
 
   searchResult = () => {
@@ -188,6 +203,17 @@ class PatientDeposit extends PureComponent {
           >
             <React.Fragment>
               <CardContainer hideHeader size='sm'>
+                {!this.state.hasActiveSession ? (
+                  <div style={{ paddingTop: 5 }}>
+                    <WarningSnackbar
+                      variant='warning'
+                      className={classes.margin}
+                      message='Action(s) is not allowed due to no active session was found.'
+                    />
+                  </div>
+                ) : (
+                  ''
+                )}
                 <GridContainer>
                   <FilterBar
                     {...this.props}
@@ -196,6 +222,7 @@ class PatientDeposit extends PureComponent {
                     refundableAmount={refundableAmount}
                     refresh={this.searchResult}
                     handleTypeChange={this.handleTypeChange}
+                    hasActiveSession={this.state.hasActiveSession}
                   />
                 </GridContainer>
                 <GridContainer style={{ marginTop: 20 }}>
@@ -204,6 +231,7 @@ class PatientDeposit extends PureComponent {
                       transactionList={transactionList}
                       handlePrint={this.handlePrintReceipt}
                       handleDeleteRow={this.handleDeleteRow}
+                      hasActiveSession={this.state.hasActiveSession}
                     />
                   </GridItem>
 

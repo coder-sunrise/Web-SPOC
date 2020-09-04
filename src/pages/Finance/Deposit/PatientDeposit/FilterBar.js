@@ -72,6 +72,7 @@ class FilterBar extends PureComponent {
       disabled,
       refundableAmount = 0,
       selectedTypeIds,
+      hasActiveSession,
     } = this.props
     const patientId = entity.id
 
@@ -97,7 +98,7 @@ class FilterBar extends PureComponent {
               onClick={() => {
                 this.addDepositRefund(true)
               }}
-              disabled={disabled}
+              disabled={disabled || !hasActiveSession}
               color='primary'
             >
               Deposit
@@ -110,7 +111,7 @@ class FilterBar extends PureComponent {
               onClick={() => {
                 this.addDepositRefund(false)
               }}
-              disabled={disabled || refundableAmount <= 0}
+              disabled={disabled || refundableAmount <= 0 || !hasActiveSession}
               color='primary'
             >
               Refund
