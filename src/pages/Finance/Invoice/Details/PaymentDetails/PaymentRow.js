@@ -65,7 +65,9 @@ const PaymentRow = ({
             color='primary'
             id={itemID}
             className={classes.printButton}
-                  disabled={isCancelled || !!statementPaymentReceiptNo || printDisabled}
+            disabled={
+              isCancelled || !!statementPaymentReceiptNo || printDisabled
+            }
             onClick={() => handlePrinterClick(type, id)}
           >
             <Printer />
@@ -110,6 +112,7 @@ const PaymentRow = ({
               style={{
                 width: 450,
                 border: '1px solid',
+                zIndex: 9999,
               }}
               disabledTransition
               placement='right'
