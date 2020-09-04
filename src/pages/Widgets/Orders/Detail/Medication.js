@@ -217,14 +217,17 @@ const drugMixtureItemSchema = Yup.object().shape({
     }
 
     let drugMixtureName = ''
-    const activeDrugMixtureItems = values.corPrescriptionItemDrugMixture.filter(
-      (item) => !item.isDeleted,
-    )
-    // reorder and overwrite sequence, get combined drug name
-    activeDrugMixtureItems.forEach((item, index) => {
-      item.sequence = index + 1
-      drugMixtureName += index === 0 ? item.drugName : `/${item.drugName}`
-    })
+    if (values.corPrescriptionItemDrugMixture) {
+      const activeDrugMixtureItems = values.corPrescriptionItemDrugMixture.filter(
+        (item) => !item.isDeleted,
+      )
+      // reorder and overwrite sequence, get combined drug name
+      activeDrugMixtureItems.forEach((item, index) => {
+        item.sequence = index + 1
+        drugMixtureName += index === 0 ? item.drugName : `/${item.drugName}`
+        if (item.isNew && item.id < 0) item.id = undefined
+      })
+    }
 
     const data = {
       isOrderedByDoctor:
@@ -791,11 +794,12 @@ class Medication extends PureComponent {
     row.uOMFK = option.dispensingUOM.id
     row.uOMCode = option.dispensingUOM.code
     row.uOMDisplayValue = option.dispensingUOM.name
+    row.costPrice = option.averageCostPrice || 0
     row.unitPrice = option.sellingPrice || 0
     row.totalPrice = row.unitPrice * row.quantity
     row.drugCode = option.code
     row.drugName = option.displayValue
-    row.revenueCategory = option.revenueCategory.id
+    row.revenueCategoryFK = option.revenueCategory.id
 
     const defaultBatch = this.getMixtureItemBatchStock(row).find(
       (batch) => batch.isDefault,
@@ -1138,6 +1142,7 @@ class Medication extends PureComponent {
                   style={{
                     margin: theme.spacing(1),
                   }}
+                  getRowId={(r) => r.id}
                   rows={values.corPrescriptionItemDrugMixture}
                   FuncProps={{
                     pager: false,
