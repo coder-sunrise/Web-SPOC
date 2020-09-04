@@ -94,6 +94,7 @@ class Grid extends PureComponent {
               <Authorized authority='deposit.deposit'>
                 <Tooltip title='Deposit' placement='bottom'>
                   <Button
+                    disabled={!row.patientIsActive}
                     size='sm'
                     onClick={() => {
                       this.editRow(row, true)
@@ -110,7 +111,9 @@ class Grid extends PureComponent {
                 <Tooltip title='Refund' placement='bottom'>
                   <Button
                     size='sm'
-                    disabled={row.balance <= 0 || !row.balance}
+                    disabled={
+                      row.balance <= 0 || !row.balance || !row.patientIsActive
+                    }
                     onClick={() => {
                       this.editRow(row, false)
                     }}

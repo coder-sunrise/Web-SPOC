@@ -16,10 +16,16 @@ import AppliedSchemes from './AppliedSchemes'
 import styles from './styles'
 
 const Content = ({ classes, clinicSettings, values, ...restProps }) => {
-  const { invoiceDetail, invoicePayment, dispatch } = restProps
+  const {
+    invoiceDetail,
+    invoicePayment,
+    dispatch,
+    patient: { entity: patientProfile },
+  } = restProps
   const { currentBizSessionInfo } = invoicePayment
   const { entity } = invoiceDetail
   const invoiceBizSessionFK = entity ? entity.bizSessionFK : undefined
+  const patientIsActive = patientProfile && patientProfile.isActive
 
   const [
     active,
@@ -86,7 +92,7 @@ const Content = ({ classes, clinicSettings, values, ...restProps }) => {
             className={classes.applySchemeButton}
             color='primary'
             onClick={switchMode}
-            disabled={isInvoiceCurrentBizSession()}
+            disabled={isInvoiceCurrentBizSession() || !patientIsActive}
           >
             Apply Scheme
           </Button>

@@ -83,6 +83,7 @@ const styles = (theme) => ({
     codetable,
     user,
     scriblenotes,
+    patient,
   }) => ({
     patientHistory,
     clinicSettings,
@@ -90,6 +91,7 @@ const styles = (theme) => ({
     user,
     clinicInfo,
     scriblenotes,
+    patient,
   }),
 )
 @withFormikExtend({
@@ -179,6 +181,7 @@ class PatientHistory extends Component {
       codetable,
       user,
       clinicSettings,
+      patient: { entity },
     } = this.props
     const { location } = window
     const {
@@ -196,6 +199,7 @@ class PatientHistory extends Component {
     const { patientID } = patientHistory
     const fromConsultation = location.pathname.includes('consultation')
     const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
+    const patientIsActive = entity && entity.isActive
     const docotrName = userName
       ? `${userTitle || ''} ${userName || ''}`
       : undefined
@@ -269,7 +273,8 @@ class PatientHistory extends Component {
               alignItems: 'center',
             }}
           >
-            {!isRetailVisit &&
+            {patientIsActive &&
+            !isRetailVisit &&
             !fromConsultation && (
               <Authorized authority='patientdashboard.editconsultation'>
                 <Tooltip title='Edit Consultation'>

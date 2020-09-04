@@ -530,12 +530,12 @@ class PatientDetail extends PureComponent {
       footer,
       ...resetProps
     } = this.props
-
     const { hasActiveSession } = this.state
 
     const { patient, global, resetForm, values, dispatch } = resetProps
     if (!patient) return null
     const { currentComponent, currentId, menuErrors, entity } = patient
+    const patientIsActiveOrCreating = !entity || entity.isActive
 
     const isCreatingPatient = entity
       ? Object.prototype.hasOwnProperty.call(entity, 'id') && entity.isActive
@@ -546,6 +546,13 @@ class PatientDetail extends PureComponent {
         (o) => o.id === (this.state.selectedMenu || currentComponent),
       ) || {}
     const CurrentComponent = currentMenu.component
+    const currentItemDisabled =
+      [
+        '1',
+        '2',
+        '3',
+        '4',
+      ].includes(currentMenu.id) && !patientIsActiveOrCreating
 
     return (
       <Authorized
@@ -659,7 +666,13 @@ class PatientDetail extends PureComponent {
                   )
                 }
               >
-                <CurrentComponent {...resetProps} />
+                <Authorized.Context.Provider
+                  value={{
+                    rights: currentItemDisabled ? 'disable' : 'enable', //
+                  }}
+                >
+                  <CurrentComponent {...resetProps} />
+                </Authorized.Context.Provider>
               </div>
             </CardContainer>
 
@@ -684,7 +697,9 @@ class PatientDetail extends PureComponent {
                     },
                   })
                 },
-                onConfirm: this.validatePatient,
+                onConfirm: patientIsActiveOrCreating
+                  ? this.validatePatient
+                  : undefined,
                 confirmBtnText: 'Save',
               })}
             </div>
