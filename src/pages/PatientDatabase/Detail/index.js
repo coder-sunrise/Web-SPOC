@@ -480,8 +480,14 @@ class PatientDetail extends PureComponent {
       setFieldValue('EffectiveEndDate', moment('2099-12-31').formatUTC())
     } else {
       const bizSessionPayload = {
-        IsClinicSessionClosed: false,
         'Visit.PatientProfileFK': entity.id,
+        group: [
+          {
+            'Visit.VisitStatusFKNavigation.Status': 'WAITING',
+            IsClinicSessionClosed: false,
+            combineCondition: 'or',
+          },
+        ],
       }
       const result = await getBizSession(bizSessionPayload)
       const { data: { totalRecords } } = result
