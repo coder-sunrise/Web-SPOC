@@ -100,6 +100,7 @@ class Grid extends PureComponent {
                     }}
                     color='primary'
                     style={{ marginRight: 5, width: 60, minWidth: 60 }}
+                    disabled={!this.props.hasActiveSession}
                   >
                     {/* <PanTool /> */}
                     Deposit
@@ -110,7 +111,11 @@ class Grid extends PureComponent {
                 <Tooltip title='Refund' placement='bottom'>
                   <Button
                     size='sm'
-                    disabled={row.balance <= 0 || !row.balance}
+                    disabled={
+                      row.balance <= 0 ||
+                      !row.balance ||
+                      !this.props.hasActiveSession
+                    }
                     onClick={() => {
                       this.editRow(row, false)
                     }}
