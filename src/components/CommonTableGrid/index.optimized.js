@@ -1059,7 +1059,7 @@ class CommonTableGrid extends PureComponent {
               {(selectable || selectRowHighlightable) && (
                 <SelectionState
                   selection={selection}
-                  onSelectionChange={onSelectionChange()}
+                  onSelectionChange={onSelectionChange}
                 />
               )}
               {summary && <SummaryState {...summaryConfig.state} />}
