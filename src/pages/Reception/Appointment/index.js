@@ -227,7 +227,7 @@ class Appointment extends React.PureComponent {
       payload: { start: startOfMonth },
     })
     dispatch({
-      type: 'doctorBlock/queryAll',
+      type: 'doctorBlock/query',
       payload: {
         lgteql_startDateTime: startOfMonth,
       },
