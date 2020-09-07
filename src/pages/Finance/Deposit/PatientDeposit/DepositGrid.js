@@ -19,6 +19,7 @@ const DepositGrid = ({
   handlePrint,
   handleDeleteRow,
   hasActiveSession,
+  isReadOnly,
 }) => {
   const getDeleteStyle = (row) => {
     return {
@@ -127,7 +128,8 @@ const DepositGrid = ({
           } = row
           const isDeposit = transactionTypeFK === 1 //
           const isRefund = transactionTypeFK === 2
-          const isEnableDelete = isDeposit && refundableBalance >= amount
+          const isEnableDelete =
+            isDeposit && refundableBalance >= amount && !isReadOnly
           const isEnablePrint = isDeposit || isRefund
           return (
             !isCancelled && (

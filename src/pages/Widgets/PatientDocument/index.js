@@ -8,12 +8,12 @@ import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLa
 import { FastField } from '@/components'
 import { Attachment } from '@/components/_medisys'
 // sub components
+import { findGetParameter } from '@/utils/utils'
 import Filter from './Filter'
 import Grid from './Grid'
 // models
 import model from './models'
 // utils
-import { findGetParameter } from '@/utils/utils'
 
 window.g_app.replaceModel(model)
 
@@ -109,28 +109,32 @@ class PatientDocument extends Component {
   }
 
   render () {
+    const { patient: { entity } } = this.props
+    const patientIsActive = entity && entity.isActive
     return (
       <div>
         <Filter {...this.props} />
         <Grid {...this.props} />
-        <div style={{ float: 'left' }}>
-          <FastField
-            name='patientAttachment'
-            render={(args) => {
-              this.form = args.form
+        {patientIsActive && (
+          <div style={{ float: 'left' }}>
+            <FastField
+              name='patientAttachment'
+              render={(args) => {
+                this.form = args.form
 
-              return (
-                <Attachment
-                  attachmentType='patientAttachment'
-                  handleUpdateAttachments={this.updateAttachments(args)}
-                  attachments={args.field.value}
-                  label=''
-                  // isReadOnly
-                />
-              )
-            }}
-          />
-        </div>
+                return (
+                  <Attachment
+                    attachmentType='patientAttachment'
+                    handleUpdateAttachments={this.updateAttachments(args)}
+                    attachments={args.field.value}
+                    label=''
+                    // isReadOnly
+                  />
+                )
+              }}
+            />
+          </div>
+        )}
       </div>
     )
   }

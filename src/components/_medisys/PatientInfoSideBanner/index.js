@@ -120,8 +120,14 @@ class PatientInfoSideBanner extends PureComponent {
 
   checkPatientIntoActiveSession = (patientId) => {
     const bizSessionPayload = {
-      IsClinicSessionClosed: false,
       'Visit.PatientProfileFK': patientId,
+      group: [
+        {
+          'Visit.VisitStatusFKNavigation.Status': 'WAITING',
+          IsClinicSessionClosed: false,
+          combineCondition: 'or',
+        },
+      ],
     }
     getBizSession(bizSessionPayload).then((result) => {
       const { data: { totalRecords } } = result

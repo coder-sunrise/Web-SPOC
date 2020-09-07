@@ -93,14 +93,14 @@ class Grid extends PureComponent {
             <Table.Cell {...props} style={{ paddingRight: 0 }}>
               <Authorized authority='deposit.deposit'>
                 <Tooltip title='Deposit' placement='bottom'>
-                  <Button
+                  <Button 
                     size='sm'
                     onClick={() => {
                       this.editRow(row, true)
                     }}
                     color='primary'
                     style={{ marginRight: 5, width: 60, minWidth: 60 }}
-                    disabled={!this.props.hasActiveSession}
+                    disabled={!this.props.hasActiveSession || !row.patientIsActive}
                   >
                     {/* <PanTool /> */}
                     Deposit
@@ -114,7 +114,8 @@ class Grid extends PureComponent {
                     disabled={
                       row.balance <= 0 ||
                       !row.balance ||
-                      !this.props.hasActiveSession
+                        !this.props.hasActiveSession ||
+                        !row.patientIsActive
                     }
                     onClick={() => {
                       this.editRow(row, false)

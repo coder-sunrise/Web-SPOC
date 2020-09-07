@@ -53,7 +53,7 @@ class FormModuleGrid extends PureComponent {
     }
   }
 
-  VoidForm = ({ classes, dispatch, row, user }) => {
+  VoidForm = ({ classes, dispatch, row, user, disabled }) => {
     const [
       reason,
       setReason,
@@ -78,6 +78,7 @@ class FormModuleGrid extends PureComponent {
     })
     return (
       <VoidWithPopover
+        disabled={disabled}
         title='Void Form'
         contentText='Confirm to void this form?'
         tooltipText='Void Form'
@@ -176,6 +177,10 @@ class FormModuleGrid extends PureComponent {
             sortingEnabled: false,
             render: (row) => {
               const { classes, dispatch, user } = this.props
+              const patientIsActive =
+                (row.patientIsActive || 'false').toUpperCase() === 'TRUE'
+
+              console.log(patientIsActive)
               return (
                 <React.Fragment>
                   <Tooltip title='Print'>
@@ -194,6 +199,7 @@ class FormModuleGrid extends PureComponent {
                   {(row.statusFK === 1 || row.statusFK === 2) && (
                     <Tooltip title='Edit'>
                       <Button
+                        disabled={!patientIsActive}
                         size='sm'
                         onClick={() => {
                           this.editRow(row)
@@ -222,7 +228,12 @@ class FormModuleGrid extends PureComponent {
                           })}
                     >
                       <Tooltip title='Delete'>
-                        <Button size='sm' color='danger' justIcon>
+                        <Button
+                          size='sm'
+                          color='danger'
+                          justIcon
+                          disabled={!patientIsActive}
+                        >
                           <Delete />
                         </Button>
                       </Tooltip>
@@ -234,6 +245,7 @@ class FormModuleGrid extends PureComponent {
                       dispatch={dispatch}
                       row={row}
                       user={user}
+                      disabled={!patientIsActive}
                     />
                   )}
                 </React.Fragment>

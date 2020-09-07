@@ -123,7 +123,10 @@ class PatientDeposit extends PureComponent {
   }
 
   handleDeleteRow = async (row) => {
-    this.setState({ showDeleteConfirmation: true, deletingRow: row })
+    const { patient: { entity } } = this.props
+    if (entity && entity.isActive) {
+      this.setState({ showDeleteConfirmation: true, deletingRow: row })
+    }
   }
 
   handleTypeChange = (opt) => {
@@ -155,8 +158,9 @@ class PatientDeposit extends PureComponent {
   }
 
   render () {
-    const { dispatch, user, patient: { deposit }, classes } = this.props
+    const { dispatch, user, patient: { entity, deposit }, classes } = this.props
     const { selectedTypeIds, showDeleteConfirmation } = this.state
+    const patientIsActive = entity && entity.isActive
 
     let transactionList = []
     let totalAmount = 0
@@ -218,7 +222,9 @@ class PatientDeposit extends PureComponent {
                   <FilterBar
                     {...this.props}
                     selectedTypeIds={selectedTypeIds}
-                    disabled={depositAccessRight !== 'enable'}
+                    disabled={
+                      depositAccessRight !== 'enable' || !patientIsActive
+                    }
                     refundableAmount={refundableAmount}
                     refresh={this.searchResult}
                     handleTypeChange={this.handleTypeChange}
@@ -232,6 +238,7 @@ class PatientDeposit extends PureComponent {
                       handlePrint={this.handlePrintReceipt}
                       handleDeleteRow={this.handleDeleteRow}
                       hasActiveSession={this.state.hasActiveSession}
+                      isReadOnly={!patientIsActive}
                     />
                   </GridItem>
 
