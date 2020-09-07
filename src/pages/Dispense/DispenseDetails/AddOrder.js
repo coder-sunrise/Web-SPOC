@@ -596,7 +596,7 @@ export default compose(
             gstAmount: o.gstAmount,
             isDeleted: o.isDeleted,
             ...obj,
-            revenueCategoryFK: o.revenueCategoryFK || obj.itemRevenueCategoryFK,
+            revenueCategoryFK: obj.itemRevenueCategoryFK || o.revenueCategoryFK,
           }
         }
 

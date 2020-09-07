@@ -791,7 +791,7 @@ class Medication extends PureComponent {
     }
 
     row.quantity = option.dispensingQuantity || 0
-    row.uOMFK = option.dispensingUOM.id
+    row.uomfk = option.dispensingUOM.id
     row.uOMCode = option.dispensingUOM.code
     row.uOMDisplayValue = option.dispensingUOM.name
     row.costPrice = option.averageCostPrice || 0
@@ -948,7 +948,7 @@ class Medication extends PureComponent {
       columns: [
         { name: 'inventoryMedicationFK', title: 'Name' },
         { name: 'quantity', title: 'Quantity' },
-        { name: 'uOMFK', title: 'UOM' },
+        { name: 'uomfk', title: 'UOM' },
         { name: 'totalPrice', title: 'Total' },
         { name: 'batchNo', title: 'Batch No.' },
         { name: 'expiryDate', title: 'Expiry Date' },
@@ -978,7 +978,7 @@ class Medication extends PureComponent {
           isDisabled: (row) => row.inventoryMedicationFK === undefined,
         },
         {
-          columnName: 'uOMFK',
+          columnName: 'uomfk',
           width: 80,
           type: 'codeSelect',
           code: 'ctMedicationUnitOfMeasurement',
