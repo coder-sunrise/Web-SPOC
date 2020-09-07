@@ -915,7 +915,12 @@ class Form extends React.PureComponent {
   shouldDisableButtonAction = () => {
     const { values } = this.props
     const { isDataGridValid } = this.state
-    if (!isDataGridValid || !values.patientName || !values.patientContactNo)
+    if (
+      !isDataGridValid ||
+      !values.patientName ||
+      values.patientContactNo === undefined ||
+      values.patientContactNo === null
+    )
       return true
 
     return false
