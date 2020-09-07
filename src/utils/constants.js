@@ -32,6 +32,10 @@ export const APPOINTMENT_STATUSOPTIONS = [
     name: 'Turned Up',
   },
   {
+    id: APPOINTMENT_STATUS.RESCHEDULED,
+    name: 'Rescheduled',
+  },
+  {
     id: APPOINTMENT_STATUS.PFA_RESCHEDULED,
     name: 'PFA(Rescheduled)',
   },
