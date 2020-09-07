@@ -165,7 +165,6 @@ const generateRecurringRoomBlock = (recurrenceDto, roomBlock) => {
         )
         endDate.add(parseInt(durationHour, 10), 'hours')
         endDate.add(parseInt(durationMinute, 10), 'minutes')
-        console.log(durationMinute)
         const startDate = moment(
           `${roomBlockDate} ${time}`,
           `${dateFormatLong} ${_timeFormat}`,
