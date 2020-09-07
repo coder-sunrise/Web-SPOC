@@ -78,7 +78,7 @@ const generateRecurringRoomBlock = (recurrenceDto, roomBlock) => {
       const start = moment(selectedRoomBlock.startDateTime)
       const end = moment(selectedRoomBlock.endDateTime)
       const hour = end.diff(start, 'hour')
-      const minute = (end.diff(start, 'minute') / 60 - hour) * 60
+      const minute = end.diff(start, 'minute') % 60 
 
       return {
         ...restValues,
