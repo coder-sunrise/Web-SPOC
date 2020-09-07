@@ -9,7 +9,7 @@ import {
   GridItem,
   Checkbox,
 } from '@/components'
-import { APPOINTMENT_STATUS } from '@/utils/constants'
+import { APPOINTMENT_STATUSOPTIONS } from '@/utils/constants'
 import { queryList as queryAppointments } from '@/services/calendar'
 import Authorized from '@/utils/Authorized'
 import { previousApptTableParams } from './variables'
@@ -142,13 +142,18 @@ class AppointmentHistory extends PureComponent {
           'YYYY-MM-DD',
         )} ${moment(firstAppointment.startTime, 'HH:mm:ss').format('HH:mm:ss')}`
       }
+      const apptStatusId = parseInt(o.appointmentStatusFk, 10)
+      const apptStatus = APPOINTMENT_STATUSOPTIONS.find(
+        (m) => m.id === apptStatusId,
+      )
 
       const newRow = {
         ...o,
         appointmentDate,
         startTime,
         doctor,
-        appointmentStatusFk: parseInt(o.appointmentStatusFk, 10),
+        appointmentStatus: apptStatus ? apptStatus.name || '' : '',
+        appointmentStatusFk: apptStatusId,
         appointmentRemarks: o.appointmentRemarks || '',
       }
       return newRow
