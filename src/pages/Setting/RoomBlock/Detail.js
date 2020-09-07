@@ -78,7 +78,7 @@ const generateRecurringRoomBlock = (recurrenceDto, roomBlock) => {
       const start = moment(selectedRoomBlock.startDateTime)
       const end = moment(selectedRoomBlock.endDateTime)
       const hour = end.diff(start, 'hour')
-      const minute = end.format(timeFormat24Hour).split(':')[1]
+      const minute = (end.diff(start, 'minute') / 60 - hour) * 60
 
       return {
         ...restValues,
@@ -165,7 +165,7 @@ const generateRecurringRoomBlock = (recurrenceDto, roomBlock) => {
         )
         endDate.add(parseInt(durationHour, 10), 'hours')
         endDate.add(parseInt(durationMinute, 10), 'minutes')
-
+        console.log(durationMinute)
         const startDate = moment(
           `${roomBlockDate} ${time}`,
           `${dateFormatLong} ${_timeFormat}`,
@@ -203,35 +203,7 @@ const generateRecurringRoomBlock = (recurrenceDto, roomBlock) => {
       })
     } catch (error) {
       console.log({ error })
-    }
-
-    // console.log('check', hours, minutes, eventDate, moment(), endDate, duration)
-    // const roomBlock = {
-    //   // startDateTime: eventDate + duration,
-    //   startDateTime: eventDate,
-    //   endDateTime: eventDate,
-    //   remarks,
-    // }
-
-    // dispatch({
-    //   type: 'roomBlock/upsert',
-    //   payload: {
-    //     ...restValues,
-    //     effectiveStartDate: effectiveDates[0],
-    //     effectiveEndDate: effectiveDates[1],
-    //     roomStatusFK: 1,
-    //     roomBlock: [
-    //       roomBlock,
-    //     ],
-    //   },
-    // }).then((r) => {
-    //   if (r) {
-    //     if (onConfirm) onConfirm()
-    //     dispatch({
-    //       type: 'roomBlock/query',
-    //     })
-    //   }
-    // })
+    } 
   },
   displayName: 'RoomDetail',
 })
@@ -280,30 +252,6 @@ class Detail extends PureComponent {
                 )}
               />
             </GridItem>
-            {/* <GridItem md={6}>
-              <FastField
-                name='eventDate'
-                render={(args) => (
-                  <DatePicker
-                    label='Event Date'
-                    format={fullDateTime}
-                    showTime={{ format: 'HH:mm' }}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem> */}
-
-            {/* <GridItem md={6}>
-              <FastField
-                name='duration'
-                render={(args) => {
-                  return (
-                    <TimePicker use12Hours={false} label='Duration' {...args} />
-                  )
-                }}
-              />
-            </GridItem> */}
             <GridItem md={6}>
               <FastField
                 name='durationHour'
