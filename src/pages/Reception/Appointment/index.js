@@ -198,6 +198,12 @@ class Appointment extends React.PureComponent {
             }))
         }
         filterByDoctor = resources.map((res) => res.clinicianFK)
+
+        if (filter && filter.filterByDoctor) {
+          resources = resources.filter((m) =>
+            filter.filterByDoctor.includes(m.clinicianFK),
+          )
+        }
       }
 
       this.setState((preState) => ({
