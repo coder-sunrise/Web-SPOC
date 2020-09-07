@@ -154,15 +154,13 @@ class Appointment extends React.PureComponent {
         filter: {},
       },
     })
+
     if (response) {
       let filterByDoctor = []
       let resources = []
       let primaryClinicianFK
-      if (response) {
-        const lastSelected = JSON.parse(
-          sessionStorage.getItem('appointmentDoctors') || '[]',
-        )
 
+      if (response) {
         const viewOtherApptAccessRight = Authorized.check(
           'appointment.viewotherappointment',
         )
@@ -170,12 +168,24 @@ class Appointment extends React.PureComponent {
           viewOtherApptAccessRight &&
           viewOtherApptAccessRight.rights === 'enable'
         ) {
+          const favDoctors = filter ? filter.filterByDoctor || [] : []
+          const lastSelected = JSON.parse(
+            sessionStorage.getItem('appointmentDoctors') || '[]',
+          )
+          console.log(lastSelected)
+          let filterDoctors = []
+          if (favDoctors.length > 0) {
+            filterDoctors = favDoctors
+          } else if (lastSelected.length > 0) {
+            filterDoctors = lastSelected
+          }
+
           resources = response
             .filter((clinician) => clinician.clinicianProfile.isActive)
             .filter(
               (_, index) =>
-                lastSelected.length > 0
-                  ? lastSelected.includes(_.clinicianProfile.id)
+                filterDoctors.length > 0
+                  ? filterDoctors.includes(_.clinicianProfile.id)
                   : index < 5,
             )
             .map((clinician) => ({
@@ -198,12 +208,6 @@ class Appointment extends React.PureComponent {
             }))
         }
         filterByDoctor = resources.map((res) => res.clinicianFK)
-
-        if (filter && filter.filterByDoctor) {
-          resources = resources.filter((m) =>
-            filter.filterByDoctor.includes(m.clinicianFK),
-          )
-        }
       }
 
       this.setState((preState) => ({
