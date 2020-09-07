@@ -8,6 +8,7 @@ import {
   Popconfirm,
   DatePicker,
 } from '@/components'
+import { NavLink } from 'react-router-dom'
 // import * as service from './services'
 
 import { downloadAttachment } from '@/services/file'
@@ -18,7 +19,7 @@ class Grid extends PureComponent {
   }
 
   render () {
-    const { dispatch, patient: { entity } } = this.props
+    const { dispatch, onPreview, patient: { entity } } = this.props
     const patientIsActive = entity && entity.isActive
     return (
       <CommonTableGrid
@@ -32,10 +33,21 @@ class Grid extends PureComponent {
         ]}
         columnExtensions={[
           {
-            columnName: 'documentTemplateTypeFK',
-            sortingEnabled: false,
-            type: 'codeSelect',
-            code: 'LTDocumentTemplateType',
+            columnName: 'fileName',
+            render: (row) => {
+              // return <span>{row.fileName}</span>
+
+              return (
+                <NavLink
+                  to='#'
+                  // className={`${classes.itemLink  } ${  classes.userCollapseButton}`}
+                  onClick={() => onPreview(row)}
+                >
+                  {' '}
+                  <span>{row.fileName}</span>
+                </NavLink>
+              )
+            },
           },
           {
             columnName: 'createDate',

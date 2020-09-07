@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core'
 // styles
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 // common components
-import { FastField } from '@/components'
+import { FastField, Carousel } from '@/components'
 import { Attachment } from '@/components/_medisys'
 // sub components
 import { findGetParameter } from '@/utils/utils'
@@ -14,6 +14,7 @@ import Grid from './Grid'
 // models
 import model from './models'
 // utils
+import 'react-responsive-carousel/lib/styles/carousel.min.css'
 
 window.g_app.replaceModel(model)
 
@@ -28,7 +29,9 @@ const getLargestSortOrder = (largestIndex, attachment) =>
   patientAttachment,
 }))
 class PatientDocument extends Component {
-  state = {}
+  state = {
+    showImagePreview: false,
+  }
 
   componentDidMount () {
     const { dispatch, values } = this.props
@@ -108,13 +111,20 @@ class PatientDocument extends Component {
       })
   }
 
+  onPreview = (file) => {
+    console.log(file)
+    this.setState({ showImagePreview: true })
+  }
+
   render () {
     const { patient: { entity } } = this.props
+    const { showImagePreview } = this.state
     const patientIsActive = entity && entity.isActive
+
     return (
       <div>
         <Filter {...this.props} />
-        <Grid {...this.props} />
+        <Grid {...this.props} onPreview={this.onPreview} />
         {patientIsActive && (
           <div style={{ float: 'left' }}>
             <FastField
@@ -134,6 +144,17 @@ class PatientDocument extends Component {
               }}
             />
           </div>
+        )}
+        {showImagePreview && (
+          <Carousel>
+            <div>
+              <img
+                alt=''
+                src='http://lorempixel.com/output/cats-q-c-640-480-1.jpg'
+              />
+              <p className='legend'>Legend 1</p>
+            </div>
+          </Carousel>
         )}
       </div>
     )
