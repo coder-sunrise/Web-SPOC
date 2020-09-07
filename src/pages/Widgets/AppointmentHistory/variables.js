@@ -5,7 +5,7 @@ import { CodeSelect, Tooltip } from '@/components'
 
 export const commonExt = [
   {
-    columnName: 'appointmentStatusFk',
+    columnName: 'appointmentStatus',
     // type: 'codeSelect',
     // code: 'ltappointmentstatus',
     render: (row) => {
@@ -25,11 +25,7 @@ export const commonExt = [
             color,
           }}
         >
-          <CodeSelect
-            code='ltappointmentstatus'
-            text
-            value={row.appointmentStatusFk}
-          />
+          <span>{row.appointmentStatus}</span>
         </div>
       )
     },
@@ -73,7 +69,7 @@ export const previousApptTableParams = {
     { name: 'appointmentDate', title: 'Date' },
     { name: 'startTime', title: 'Time' },
     { name: 'doctor', title: 'Doctor' },
-    { name: 'appointmentStatusFk', title: 'Status' },
+    { name: 'appointmentStatus', title: 'Status' },
     { name: 'appointmentRemarks', title: 'Remarks' },
     {
       name: 'cancellationReason',
@@ -91,7 +87,7 @@ export const futureApptTableParams = {
     { name: 'startTime', title: 'Time' },
     { name: 'doctor', title: 'Doctor' },
     { name: 'appointmentRemarks', title: 'Remarks' },
-    { name: 'appointmentStatusFk', title: 'Status' },
+    { name: 'appointmentStatus', title: 'Status' },
   ],
   columnExtensions: [
     ...commonExt,

@@ -172,7 +172,6 @@ class Appointment extends React.PureComponent {
           const lastSelected = JSON.parse(
             sessionStorage.getItem('appointmentDoctors') || '[]',
           )
-          console.log(lastSelected)
           let filterDoctors = []
           if (favDoctors.length > 0) {
             filterDoctors = favDoctors

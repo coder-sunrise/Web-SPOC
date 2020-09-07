@@ -6,6 +6,7 @@ import { CardContainer, CommonTableGrid } from '@/components'
 import { queryList as queryAppointments } from '@/services/calendar'
 import Authorized from '@/utils/Authorized'
 import { LoadingWrapper } from '@/components/_medisys'
+import { APPOINTMENT_STATUSOPTIONS } from '@/utils/constants'
 import { futureApptTableParams, previousApptTableParams } from './variables'
 
 const styles = (theme) => ({
@@ -174,13 +175,18 @@ class AppointmentHistory extends PureComponent {
           'YYYY-MM-DD',
         )} ${moment(firstAppointment.startTime, 'HH:mm:ss').format('HH:mm:ss')}`
       }
+      const apptStatusId = parseInt(o.appointmentStatusFk, 10)
+      const apptStatus = APPOINTMENT_STATUSOPTIONS.find(
+        (m) => m.id === apptStatusId,
+      )
 
       const newRow = {
         ...o,
         appointmentDate,
         startTime,
         doctor,
-        appointmentStatusFk: parseInt(o.appointmentStatusFk, 10),
+        appointmentStatus: apptStatus ? apptStatus.name || '' : '',
+        appointmentStatusFk: apptStatusId,
         appointmentRemarks: o.appointmentRemarks || '',
       }
       return newRow
