@@ -919,7 +919,6 @@ class Form extends React.PureComponent {
     if (
       !isDataGridValid ||
       !values.patientName ||
-      !values.patientContactNo ||
       values.patientContactNo === undefined ||
       values.patientContactNo === null ||
       (patientProfile && !patientProfile.isActive)
