@@ -52,7 +52,6 @@ class SubmittedCHAS extends React.Component {
   handleLoadingVisibility = (visibility = false) =>
     this.setState({ isLoading: visibility })
 
-
   handleSelectionChange = (selection) =>
     this.setState({ selectedRows: selection })
 
@@ -91,7 +90,7 @@ class SubmittedCHAS extends React.Component {
       dispatch,
       values,
     } = this.props
-    const { isLoading,selectedRows } = this.state
+    const { isLoading, selectedRows } = this.state
     const { list } = claimSubmissionSubmitted || []
 
     return (
@@ -119,7 +118,7 @@ class SubmittedCHAS extends React.Component {
                   selectable: true,
                   selectConfig: {
                     showSelectAll: true,
-                    rowSelectionEnabled: () => true,
+                    rowSelectionEnabled: (row) => row.patientIsActive,
                   },
                 }}
                 selection={this.state.selectedRows}

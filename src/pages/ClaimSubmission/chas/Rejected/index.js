@@ -11,7 +11,8 @@ import {
   GridContainer,
   GridItem,
   notification,
-  CardContainer, Tooltip,
+  CardContainer,
+  Tooltip,
 } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
@@ -49,14 +50,16 @@ class RejectedCHAS extends React.Component {
 
   onRefreshClicked = () => {
     const { selectedRows } = this.state
-    this.props.dispatch({
-      type: 'claimSubmissionRejected/refreshPatientDetails',
-      payload:{claimIds: selectedRows},
-    }).then((r)=>{
-      if(!r){
-        this.refreshDataGrid()
-      }
-    })
+    this.props
+      .dispatch({
+        type: 'claimSubmissionRejected/refreshPatientDetails',
+        payload: { claimIds: selectedRows },
+      })
+      .then((r) => {
+        if (!r) {
+          this.refreshDataGrid()
+        }
+      })
   }
 
   refreshDataGrid = () => {
@@ -137,7 +140,7 @@ class RejectedCHAS extends React.Component {
                   selectable: true,
                   selectConfig: {
                     showSelectAll: true,
-                    rowSelectionEnabled: () => true,
+                    rowSelectionEnabled: (row) => row.patientIsActive,
                   },
                 }}
                 selection={this.state.selectedRows}
@@ -149,10 +152,12 @@ class RejectedCHAS extends React.Component {
             </GridItem>
 
             <GridItem md={4} className={classes.buttonGroup}>
-              <Tooltip placement='bottom-start'
+              <Tooltip
+                placement='bottom-start'
                 title={formatMessage({
-                         id: 'claimsubmission.invoiceClaim.refreshPatientDetail.tooltips',
-                       })}
+                  id:
+                    'claimsubmission.invoiceClaim.refreshPatientDetail.tooltips',
+                })}
               >
                 <div style={{ display: 'inline-block' }}>
                   <ProgressButton
@@ -175,8 +180,8 @@ class RejectedCHAS extends React.Component {
                   onClick={this.onReSubmitClaimClicked}
                 >
                   {formatMessage({
-                  id: 'claimsubmission.invoiceClaim.ResubmitClaim',
-                })}
+                    id: 'claimsubmission.invoiceClaim.ResubmitClaim',
+                  })}
                 </ProgressButton>
               </Authorized>
             </GridItem>

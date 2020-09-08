@@ -312,15 +312,17 @@ class PatientInfoSideBanner extends PureComponent {
                         code='ctSchemeType'
                         value={schemeData.schemeTypeFK}
                       />
-                      <IconButton>
-                        <Refresh
-                          onClick={() =>
-                            this.refreshChasBalance(
-                              schemeData.patientCoPaymentSchemeFK,
-                              schemeData.schemeTypeFK,
-                            )}
-                        />
-                      </IconButton>
+                      {entity.isActive && (
+                        <IconButton>
+                          <Refresh
+                            onClick={() =>
+                              this.refreshChasBalance(
+                                schemeData.patientCoPaymentSchemeFK,
+                                schemeData.schemeTypeFK,
+                              )}
+                          />
+                        </IconButton>
+                      )}
 
                       <SchemePopover
                         isShowReplacementModal={

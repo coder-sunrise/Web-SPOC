@@ -914,14 +914,13 @@ class Form extends React.PureComponent {
   }
 
   shouldDisableButtonAction = () => {
-    const { values, patientProfile } = this.props
+    const { values } = this.props
     const { isDataGridValid } = this.state
     if (
       !isDataGridValid ||
       !values.patientName ||
       values.patientContactNo === undefined ||
-      values.patientContactNo === null ||
-      (patientProfile && !patientProfile.isActive)
+      values.patientContactNo === null
     )
       return true
 
@@ -1024,15 +1023,15 @@ class Form extends React.PureComponent {
               className={classnames(classes.formContent)}
               alignItems='flex-start'
             >
-              <Authorized.Context.Provider
-                value={{
-                  rights:
-                    patientProfile && !patientProfile.isActive
-                      ? 'disable'
-                      : 'enable',
-                }}
-              >
-                <GridItem container xs={12} md={7}>
+              <GridItem container xs={12} md={7}>
+                <Authorized.Context.Provider
+                  value={{
+                    rights:
+                      patientProfile && !patientProfile.isActive
+                        ? 'disable'
+                        : 'enable',
+                  }}
+                >
                   <GridItem
                     container
                     xs
@@ -1099,25 +1098,24 @@ class Form extends React.PureComponent {
                       />
                     </GridItem>
                   </GridItem>
-                  <GridItem xs md={12} className={classes.footerGrid}>
-                    <FormFooter
-                      // isNew={slotInfo.type === 'add'}
-                      appointmentStatusFK={
-                        currentAppointment.appointmentStatusFk
-                      }
-                      onClose={onClose}
-                      disabled={disableFooterButton}
-                      disabledCheckAvailability={
-                        disableCheckAvailabilityFooterButton
-                      }
-                      handleCancelOrDeleteClick={this.onCancelOrDeleteClick}
-                      handleSaveDraftClick={this.onSaveDraftClick}
-                      handleConfirmClick={this.onConfirmClick}
-                      handleValidateClick={this.onValidateClick}
-                    />
-                  </GridItem>
+                </Authorized.Context.Provider>
+                <GridItem xs md={12} className={classes.footerGrid}>
+                  <FormFooter
+                    // isNew={slotInfo.type === 'add'}
+                    appointmentStatusFK={currentAppointment.appointmentStatusFk}
+                    onClose={onClose}
+                    disabled={disableFooterButton}
+                    patientIsActive={patientProfile && patientProfile.isActive}
+                    disabledCheckAvailability={
+                      disableCheckAvailabilityFooterButton
+                    }
+                    handleCancelOrDeleteClick={this.onCancelOrDeleteClick}
+                    handleSaveDraftClick={this.onSaveDraftClick}
+                    handleConfirmClick={this.onConfirmClick}
+                    handleValidateClick={this.onValidateClick}
+                  />
                 </GridItem>
-              </Authorized.Context.Provider>
+              </GridItem>
               <GridItem xs={12} md={5}>
                 <CardContainer
                   hideHeader
