@@ -1,8 +1,8 @@
 import moment from 'moment'
 import Print from '@material-ui/icons/Print'
 import { FormattedMessage } from 'umi/locale'
-import { currencySymbol, currencyFormat } from '@/utils/config'
 import numeral from 'numeral'
+import { currencySymbol, currencyFormat } from '@/utils/config'
 import {
   NumberInput,
   TextField,
@@ -14,6 +14,7 @@ import {
   Select,
 } from '@/components'
 import LowStockInfo from '@/pages/Widgets/Orders/Detail/LowStockInfo'
+import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import { InventoryTypes } from '@/utils/codes'
 import CONSTANTS from './DispenseDetails/constants'
 
@@ -35,12 +36,20 @@ const lowStockIndicator = (row) => {
         : row[currentType.itemFKName],
   }
 
+  // If is drug mixture, show drug mixture indicator
+  const isDrugMixture = currentType.name === 'Medication' && row.isDrugMixture
+
   return (
     <div style={{ position: 'relative', top: 2 }}>
-      <LowStockInfo
-        sourceType={currentType.name.toLowerCase()}
-        values={values}
-      />
+      {isDrugMixture && (
+        <DrugMixtureInfo values={row.prescriptionDrugMixture} />
+      )}
+      {!isDrugMixture && (
+        <LowStockInfo
+          sourceType={currentType.name.toLowerCase()}
+          values={values}
+        />
+      )}
     </div>
   )
 }
