@@ -31,6 +31,7 @@ const PatientInfoInput = ({
   appointmentStatusFK,
   values,
   hasActiveSession,
+  patientIsActive,
 }) => {
   const isRegisteredPatient =
     patientProfileFK !== undefined && patientProfileFK !== null
@@ -109,7 +110,9 @@ const PatientInfoInput = ({
                   <Button
                     size='sm'
                     color='primary'
-                    disabled={!isEdit || !allowedToActualize}
+                    disabled={
+                      !isEdit || !allowedToActualize || !patientIsActive
+                    }
                     onClick={onRegisterToVisitClick}
                   >
                     Register To Visit

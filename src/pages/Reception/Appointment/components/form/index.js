@@ -1052,6 +1052,13 @@ class Form extends React.PureComponent {
                       patientContactNo={values.patientContactNo}
                       patientName={values.patientName}
                       patientProfileFK={values.patientProfileFK}
+                      patientIsActive={
+                        values.patientProfileFK > 0 ? (
+                          patientProfile && patientProfile.isActive
+                        ) : (
+                          true
+                        )
+                      }
                       appointmentStatusFK={
                         currentAppointment.appointmentStatusFk
                       }

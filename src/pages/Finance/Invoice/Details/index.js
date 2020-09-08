@@ -41,6 +41,12 @@ class InvoiceDetails extends Component {
         mode: INVOICE_VIEW_MODE.DEFAULT,
       },
     })
+    this.props.dispatch({
+      type: 'patient/updateState',
+      payload: {
+        entity: null,
+      },
+    })
   }
 
   refresh = () => {
@@ -91,6 +97,7 @@ class InvoiceDetails extends Component {
     }
     const bannerProps = {
       values,
+      patient,
     }
 
     return (

@@ -53,7 +53,7 @@ const FormFooter = ({
             color='danger'
             className={classnames(hideCancelAppointmentClass)}
             onClick={handleCancelOrDeleteClick}
-            disabled={disabled || isTurnedUp || isCancelled}
+            disabled={disabled || isTurnedUp || isCancelled || !patientIsActive}
           >
             {isDraft ? ButtonText.DELETE : ButtonText.CANCEL_APPOINTMENT}
           </Button>

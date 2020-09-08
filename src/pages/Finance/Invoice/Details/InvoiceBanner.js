@@ -11,8 +11,10 @@ import {
   GridItem,
   NumberInput,
   dateFormatLong,
+  Tooltip,
 } from '@/components'
 // styles
+import Warining from '@material-ui/icons/Error'
 import styles from './styles'
 
 const amountProps = {
@@ -24,18 +26,43 @@ const amountProps = {
 }
 
 const InvoiceBanner = ({ classes, ...restProps }) => {
-  const { values } = restProps
+  const { values, patient = {} } = restProps
+  const { entity = {} } = patient
+  console.log(entity)
   return (
-    <CardContainer hideHeader size='sm'>
+    <CardContainer
+      hideHeader
+      size='sm'
+      style={
+        entity && !entity.isActive ? (
+          {
+            backgroundColor: 'lightYellow',
+          }
+        ) : (
+          {}
+        )
+      }
+    >
       <GridContainer xs={12}>
         <GridContainer item md={3} alignItems='flex-start'>
           <GridItem md={4}>
             <h5 className={classes.boldText}>Patient Name: </h5>
           </GridItem>
           <GridItem md={8}>
-            <h5 className={classes.normalText}>
-              {values.patientName || 'N/A'}&nbsp;({values.patientAccountNo || 'N/A'})
-            </h5>
+            <div style={{ display: 'flex' }}>
+              <h5 className={classes.normalText}>
+                {values.patientName || 'N/A'}&nbsp;({values.patientAccountNo || 'N/A'})
+              </h5>
+              {entity &&
+              !entity.isActive && (
+                <Tooltip title='This patient has been inactived.'>
+                  <Warining
+                    color='error'
+                    style={{ marginLeft: 5, marginTop: 8 }}
+                  />
+                </Tooltip>
+              )}
+            </div>
           </GridItem>
           <GridItem md={4}>
             <h5 className={classes.boldText}>Invoice No: </h5>
