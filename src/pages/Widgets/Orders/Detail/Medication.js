@@ -82,6 +82,17 @@ const drugMixtureItemSchema = Yup.object().shape({
         }
       })
 
+    let newDrugMixtureRowId = 0
+    const newCorPrescriptionItemDrugMixture = (v.corPrescriptionItemDrugMixture ||
+      [])
+      .map((drugMixture) => {
+        newDrugMixtureRowId -= 1
+        return {
+          ...drugMixture,
+          id: drugMixture.isNew ? newDrugMixtureRowId : drugMixture.id,
+        }
+      })
+
     return {
       ...v,
       corPrescriptionItemPrecaution:
@@ -90,6 +101,10 @@ const drugMixtureItemSchema = Yup.object().shape({
           : [
               {},
             ],
+      corPrescriptionItemDrugMixture:
+        newCorPrescriptionItemDrugMixture.length > 0
+          ? newCorPrescriptionItemDrugMixture
+          : [],
     }
   },
   enableReinitialize: true,
