@@ -162,7 +162,9 @@ class PatientDashboard extends PureComponent {
                   height: '100%',
                 }}
               >
-                {visit.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
+                {patientProfile &&
+                patientProfile.isActive &&
+                visit.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
                   <Authorized authority='openqueuedisplay'>
                     <CallingQueueButton
                       qId={queueNo}
