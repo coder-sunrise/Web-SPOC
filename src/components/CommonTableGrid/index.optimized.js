@@ -659,7 +659,7 @@ class CommonTableGrid extends PureComponent {
   // }
 
   Row = (p) => {
-    const { classes, FuncProps, ...restProps } = this.props
+    const { classes, FuncProps = {}, ...restProps } = this.props
     const { selectRowHighlightable = false } = FuncProps
     return (
       <TableRow
