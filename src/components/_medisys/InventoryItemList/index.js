@@ -20,6 +20,7 @@ import { getUniqueId, currencyFormatter } from '@/utils/utils'
 import { InventoryTypes, visitOrderTemplateItemTypes } from '@/utils/codes'
 import { ITEM_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
+import { currencySymbol } from '@/utils/config'
 
 const CPSwitch = (label) => (args) => {
   if (!args.field.value) {
@@ -326,18 +327,45 @@ class InventoryItemList extends React.Component {
                   onChange={(e, option) => this.onItemSelect(e, option, type)}
                   code={type}
                   renderDropdown={(option) => {
-                    let suffix = ''
-                    if (type === 'ctservice') {
-                      suffix = option.serviceCenter
+                    let {
+                      code,
+                      displayValue,
+                      sellingPrice = 0,
+                      dispensingUOM,
+                      uom = {},
+                      unitPrice = 0,
+                      totalPrice = 0,
+                    } = option
+                    let uomName = ''
+
+                    if (
+                      type === 'inventorymedication' ||
+                      type === 'inventoryvaccination'
+                    ) {
+                      uomName = dispensingUOM.name
+                    } else if (type === 'inventoryconsumable') {
+                      uomName = uom.name
+                    } else if (type === 'ctservice') {
+                      const suffix = option.serviceCenter
                         ? `(${option.serviceCenter})`
                         : ''
+
+                      const optDisplay = `${displayValue} - ${code} (${currencySymbol}${unitPrice.toFixed(
+                        2,
+                      )}) ${suffix}`
+                      return <span>{optDisplay}</span>
+                    } else if (type === 'inventoryorderset') {
+                      const optDisplay = `${displayValue} - ${code} (${currencySymbol}${totalPrice.toFixed(
+                        2,
+                      )}) `
+                      return <span>{optDisplay}</span>
                     }
-                    return (
-                      <span>
-                        {option.displayValue}&nbsp;
-                        {suffix}
-                      </span>
-                    )
+
+                    const optDisplay = `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
+                      2,
+                    )} / ${uomName})`
+
+                    return <span>{optDisplay}</span>
                   }}
                   disabled={isDisabled}
                   {...args}
