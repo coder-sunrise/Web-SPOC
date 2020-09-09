@@ -41,10 +41,9 @@ const lowStockIndicator = (row) => {
 
   return (
     <div style={{ position: 'relative', top: 2 }}>
-      {isDrugMixture && (
+      {isDrugMixture ? (
         <DrugMixtureInfo values={row.prescriptionDrugMixture} />
-      )}
-      {!isDrugMixture && (
+      ) : (
         <LowStockInfo
           sourceType={currentType.name.toLowerCase()}
           values={values}

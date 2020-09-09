@@ -15,6 +15,7 @@ const DrugMixtureInfo = ({ values = {} }) => {
         )
       })
     }
+    return null
   }
 
   return (
