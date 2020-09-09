@@ -479,25 +479,6 @@ class PatientDetail extends PureComponent {
       setFieldValue('EffectiveStartDate', moment().formatUTC())
       setFieldValue('EffectiveEndDate', moment('2099-12-31').formatUTC())
     } else {
-      const bizSessionPayload = {
-        'Visit.PatientProfileFK': entity.id,
-        group: [
-          {
-            'Visit.VisitStatusFKNavigation.Status': 'WAITING',
-            IsClinicSessionClosed: false,
-            combineCondition: 'or',
-          },
-        ],
-      }
-      const result = await getBizSession(bizSessionPayload)
-      const { data: { totalRecords } } = result
-      if (totalRecords !== 0) {
-        notification.error({
-          message:
-            'Can not change patient status to inactive if patient in active session.',
-        })
-        return
-      }
       setFieldValue('EffectiveEndDate', moment().formatUTC())
     }
     this.validatePatient()
