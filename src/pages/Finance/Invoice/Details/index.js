@@ -39,6 +39,7 @@ class InvoiceDetails extends Component {
       type: 'invoiceDetail/updateState',
       payload: {
         mode: INVOICE_VIEW_MODE.DEFAULT,
+        entity: null,
       },
     })
     this.props.dispatch({

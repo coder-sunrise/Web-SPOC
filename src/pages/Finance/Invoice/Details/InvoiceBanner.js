@@ -15,6 +15,7 @@ import {
 } from '@/components'
 // styles
 import Warining from '@material-ui/icons/Error'
+import classnames from 'classnames'
 import styles from './styles'
 
 const amountProps = {
@@ -28,7 +29,6 @@ const amountProps = {
 const InvoiceBanner = ({ classes, ...restProps }) => {
   const { values, patient = {} } = restProps
   const { entity = {} } = patient
-  console.log(entity)
   return (
     <CardContainer
       hideHeader
@@ -50,7 +50,12 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
           </GridItem>
           <GridItem md={8}>
             <div style={{ display: 'flex' }}>
-              <h5 className={classes.normalText}>
+              <h5
+                className={classnames({
+                  [classes.normalText]: true,
+                  [classes.inActiveText]: entity && !entity.isActive,
+                })}
+              >
                 {values.patientName || 'N/A'}&nbsp;({values.patientAccountNo || 'N/A'})
               </h5>
               {entity &&
