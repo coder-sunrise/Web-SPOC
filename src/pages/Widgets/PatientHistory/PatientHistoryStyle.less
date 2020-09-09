@@ -21,6 +21,10 @@
   :global(.ant-table-small.ant-table-bordered .ant-table-placeholder) {
     padding: 8px !important;
   }
+
+  :global(.ant-table-small > .ant-table-content > .ant-table-body) {
+    margin: 0px !important;
+  }
 }
 .customPanel {
   :global(.ant-collapse-content-box) {
@@ -45,5 +49,12 @@
     border-color: #4255bd !important;
     color: #4255bd !important;
     opacity: 0.85;
+  }
+}
+
+.historyText {
+  :global(.MuiInputBase-root.Mui-disabled) {
+    font-size: 0.875rem !important;
+    margin-left: 8px;
   }
 }

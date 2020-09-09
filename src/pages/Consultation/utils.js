@@ -128,7 +128,23 @@ const convertEyeForms = (values) => {
   ) {
     let { formData } = corEyeExaminationForm
     removeFields(formData, durtyFields)
-    values.corEyeExaminationForm.formData = JSON.stringify(formData)
+    const { EyeExaminations = [] } = formData
+    console.log('EyeExaminations', EyeExaminations)
+    if (
+      EyeExaminations.find(
+        (ee) =>
+          (ee.LeftEye !== undefined &&
+            ee.LeftEye !== null &&
+            ee.LeftEye !== '') ||
+          (ee.RightEye !== undefined &&
+            ee.RightEye !== null &&
+            ee.RightEye !== ''),
+      )
+    ) {
+      values.corEyeExaminationForm.formData = JSON.stringify(formData)
+    } else {
+      values.corEyeExaminationForm.formData = JSON.stringify({})
+    }
   }
   return values
 }
@@ -182,19 +198,19 @@ const convertToConsultation = (
   formTypes.forEach((p) => {
     values[p.prop] = formRows
       ? formRows.filter((o) => o.type === p.value).map((val) => {
-        return {
-          ...val,
-          formData: JSON.stringify({
-            ...val.formData,
-            otherDiagnosis: val.formData.otherDiagnosis.map((d) => {
-              const { diagnosiss, ...retainData } = d
-              return {
-                ...retainData,
-              }
+          return {
+            ...val,
+            formData: JSON.stringify({
+              ...val.formData,
+              otherDiagnosis: val.formData.otherDiagnosis.map((d) => {
+                const { diagnosiss, ...retainData } = d
+                return {
+                  ...retainData,
+                }
+              }),
             }),
-          }),
-        }
-      })
+          }
+        })
       : []
   })
   return {

@@ -3,7 +3,7 @@ import { Table } from 'antd'
 import moment from 'moment'
 import numeral from 'numeral'
 import { currencySymbol } from '@/utils/config'
-import { GridContainer, GridItem, TextField, DatePicker } from '@/components'
+import { GridContainer, GridItem, TextField } from '@/components'
 import { VISIT_TYPE } from '@/utils/constants'
 import AmountSummary from './AmountSummary'
 import tablestyles from './PatientHistoryStyle.less'
@@ -142,7 +142,21 @@ export default ({ current, theme }) => {
         className={tablestyles.table}
       />
       <GridContainer style={{ paddingTop: theme.spacing(2) }}>
-        <GridItem xs={2} md={9} />
+        <GridItem xs={2} md={9}>
+          {current.invoice &&
+          current.invoice.remark && (
+            <div style={{ marginLeft: -8 }}>
+              <span style={{ fontWeight: 500 }}>Invoice Remarks:</span>
+              <TextField
+                className={tablestyles.historyText}
+                noUnderline
+                multiline
+                disabled
+                value={current.invoice.remark || ''}
+              />
+            </div>
+          )}
+        </GridItem>
         <GridItem xs={10} md={3}>
           <AmountSummary
             adjustments={invoiceAdjustmentData}

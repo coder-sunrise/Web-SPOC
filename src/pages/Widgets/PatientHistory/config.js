@@ -19,6 +19,8 @@ export const WIDGETS_ID = {
   FORMS: '14',
   EXAMINATIONFORM: '15',
   REFRACTIONFORM: '16',
+  VISITREMARKS: '17',
+  VITALSIGN: '18',
   CONSULTATION_DOCUMENT: '20',
 }
 
@@ -29,6 +31,7 @@ export const notesTypes = [
   { value: WIDGETS_ID.PLAN, fieldName: 'plan' },
   { value: WIDGETS_ID.INTRA_ORAL, fieldName: 'intraOral' },
   { value: WIDGETS_ID.EXTRA_ORAL, fieldName: 'extraOral' },
+  { value: WIDGETS_ID.VISITREMARKS, fieldName: 'visitRemarks' },
 ]
 
 export const historyTags = [
@@ -46,6 +49,7 @@ export const historyTags = [
       'queue.consultation.widgets.eyevisualacuity',
       'queue.consultation.widgets.eyerefractionform',
       'queue.consultation.widgets.eyeexaminationform',
+      'queue.consultation.widgets.vitalsign',
     ],
     children: [
       WIDGETS_ID.ASSOCIATED_HISTORY,
@@ -58,6 +62,8 @@ export const historyTags = [
       WIDGETS_ID.VISUALACUITYTEST,
       WIDGETS_ID.REFRACTIONFORM,
       WIDGETS_ID.EXAMINATIONFORM,
+      WIDGETS_ID.VISITREMARKS,
+      WIDGETS_ID.VITALSIGN,
     ],
   },
   {
@@ -80,10 +86,12 @@ export const historyTags = [
     authority: [
       'queue.consultation.widgets.consultationdocument',
       'queue.consultation.widgets.forms',
+      'queue.consultation.widgets.attachment',
     ],
     children: [
       WIDGETS_ID.CONSULTATION_DOCUMENT,
       WIDGETS_ID.FORMS,
+      WIDGETS_ID.ATTACHMENT,
     ],
   },
 ]
@@ -171,6 +179,32 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     }),
   },
   {
+    id: WIDGETS_ID.VISITREMARKS,
+    name: 'Visit Remarks',
+    authority: '',
+    component: Loadable({
+      loader: () => import('./Notes'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} fieldName='visitRemarks' />
+      },
+      loading: Loading,
+    }),
+  },
+  {
+    id: WIDGETS_ID.VITALSIGN,
+    name: 'Vital Sign',
+    authority: 'queue.consultation.widgets.vitalsign',
+    component: Loadable({
+      loader: () => import('./VitalSign'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} />
+      },
+      loading: Loading,
+    }),
+  },
+  {
     id: WIDGETS_ID.DIAGNOSIS,
     name: 'Diagnosis',
     authority: 'queue.consultation.widgets.diagnosis',
@@ -209,19 +243,6 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       loading: Loading,
     }),
   },
-  // {
-  //   id: '6',
-  //   name: 'Attachment',
-  //   authority: 'queue.consultation.widgets.attachment',
-  //   component: Loadable({
-  //     loader: () => import('./Attachment'),
-  //     render: (loaded, p) => {
-  //       let Cmpnet = loaded.default
-  //       return <Cmpnet {...props} {...p} />
-  //     },
-  //     loading: Loading,
-  //   }),
-  // },
   {
     id: WIDGETS_ID.ORDERS,
     name: 'Orders',
@@ -341,6 +362,19 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       loading: Loading,
     }),
   },
+  {
+    id: WIDGETS_ID.ATTACHMENT,
+    name: 'Attachment',
+    authority: 'queue.consultation.widgets.attachment',
+    component: Loadable({
+      loader: () => import('./Attachment'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} />
+      },
+      loading: Loading,
+    }),
+  },
 ]
 
 export const showWidget = (current, widget) => {
@@ -401,6 +435,12 @@ export const showWidget = (current, widget) => {
     (!current.forms || current.forms.length === 0)
   )
     return false
+  // check show attachments
+  if (
+    widget.id === WIDGETS_ID.ATTACHMENT &&
+    (current.attachment || current.visitAttachments || []).length === 0
+  )
+    return false
   // check show orders
   if (
     widget.id === WIDGETS_ID.ORDERS &&
@@ -429,6 +469,12 @@ export const showWidget = (current, widget) => {
       current.orders.filter((o) => o.type === 'Treatment').length === 0)
   )
     return false
-
+  // check show vital sign
+  if (
+    widget.id === WIDGETS_ID.VITALSIGN &&
+    (!current.patientNoteVitalSigns ||
+      current.patientNoteVitalSigns.length === 0)
+  )
+    return false
   return true
 }

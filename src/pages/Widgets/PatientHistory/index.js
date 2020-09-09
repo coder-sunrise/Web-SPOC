@@ -342,7 +342,8 @@ class PatientHistory extends Component {
               </Authorized>
             )}
           </div>
-          {settings.showConsultationVersioning && (
+          {settings.showConsultationVersioning &&
+          !isRetailVisit && (
             <div
               style={{
                 marginLeft: 'auto',
