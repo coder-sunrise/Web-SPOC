@@ -362,13 +362,14 @@ class PatientDetail extends PureComponent {
   }
 
   onActiveStatusChanged = async (status) => {
-    const { setFieldValue, dispatch } = this.props
+    const { setFieldValue, dispatch, values } = this.props
+    const { effectiveStartDate, effectiveEndDate } = values
 
     if (status === true) {
-      await setFieldValue('EffectiveStartDate', moment().formatUTC())
-      await setFieldValue('EffectiveEndDate', moment('2099-12-31').formatUTC())
+      await setFieldValue('effectiveStartDate', moment().formatUTC())
+      await setFieldValue('effectiveEndDate', moment('2099-12-31').formatUTC())
     } else {
-      await setFieldValue('EffectiveEndDate', moment().formatUTC())
+      await setFieldValue('effectiveEndDate', moment().formatUTC())
     }
     dispatch({
       type: 'global/updateState',
@@ -376,7 +377,13 @@ class PatientDetail extends PureComponent {
         disableSave: true,
       },
     })
-    upsertPatient(this.props)
+
+    const response = await upsertPatient(this.props)
+    if (response === false) {
+      // reset Effective Date
+      await setFieldValue('effectiveStartDate', effectiveStartDate)
+      await setFieldValue('effectiveEndDate', effectiveEndDate)
+    }
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {

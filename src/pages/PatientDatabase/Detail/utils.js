@@ -100,5 +100,6 @@ const upsertPatient = async ({
       onConfirm()
     }
   }
+  return response
 }
 export { upsertPatient, mapEntityToValues }
