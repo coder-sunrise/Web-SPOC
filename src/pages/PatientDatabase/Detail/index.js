@@ -42,6 +42,7 @@ import Authorized from '@/utils/Authorized'
 import { queryList } from '@/services/patient'
 import { getBizSession } from '@/services/queue'
 import schema from './schema'
+import { mapEntityToValues, upsertPatient } from './utils'
 
 // moment.updateLocale('en', {
 //   relativeTime: {
@@ -58,28 +59,6 @@ const styles = () => ({
   },
 })
 
-const mapEntityToValues = (entity) => {
-  const mappedValues = {
-    ...entity,
-    pdpaConsent: entity.patientPdpaConsent.reduce(
-      (consents, item) =>
-        item.isConsent
-          ? [
-              ...consents,
-              item.pdpaConsentTypeFK,
-            ]
-          : [
-              ...consents,
-            ],
-      [],
-    ),
-  }
-  return {
-    ...mappedValues,
-    nationalityFK: entity.id ? entity.nationalityFK : 173,
-  }
-}
-
 @connect(({ patient, global }) => ({
   patient,
   global,
@@ -91,26 +70,6 @@ const mapEntityToValues = (entity) => {
   ],
   enableReinitialize: false,
   mapPropsToValues: ({ patient }) => {
-    // const mappedValues = {
-    //   ...(patient.entity || patient.default),
-    //   pdpaConsent: (patient.entity || patient.default).patientPdpaConsent
-    //     .reduce(
-    //       (consents, item) =>
-    //         item.isConsent
-    //           ? [
-    //               ...consents,
-    //               item.pdpaConsentTypeFK,
-    //             ]
-    //           : [
-    //               ...consents,
-    //             ],
-    //       [],
-    //     ),
-    // }
-    // return {
-    //   ...mappedValues,
-    //   nationalityFK: patient.entity ? patient.entity.nationalityFK : 173,
-    // }
     return mapEntityToValues(patient.entity || patient.default)
   },
   validationSchema: schema,
@@ -119,84 +78,14 @@ const mapEntityToValues = (entity) => {
     const { props, resetForm } = component
     const { dispatch, history, patient, onConfirm } = props
     const { location } = history
-    const shouldCloseForm = location.pathname
-      ? !location.pathname.includes('patientdb')
-      : false
 
-    const cfg = {
-      message: 'Patient profile saved.',
-    }
-    dispatch({
-      type: 'patient/upsert',
-      payload: {
-        ...values,
-        patientScheme: values.patientScheme.map((ps) => {
-          if (ps.isDeleted)
-            return {
-              ...ps,
-              schemeTypeFK: ps.schemeTypeFK || ps.preSchemeTypeFK,
-            }
-          return ps
-        }),
-        cfg,
-      },
-    }).then((r) => {
-      dispatch({
-        type: 'global/updateState',
-        payload: {
-          disableSave: false,
-        },
-      })
-      dispatch({
-        type: 'patient/updateState',
-        payload: {
-          shouldQueryOnClose: location.pathname.includes('patientdb'),
-        },
-      })
-      if (r) {
-        // POST request -> r.id === true
-        // PUT request -> r.id === false
-        if (r.id) {
-          if (!patient.callback) {
-            history.push(
-              getRemovedUrl(
-                [
-                  'new',
-                ],
-                getAppendUrl({
-                  pid: r.id,
-                }),
-              ),
-            )
-          }
-        }
-        dispatch({
-          type: 'patient/query',
-          payload: {
-            id: r.id || values.id,
-          },
-        }).then((response) => {
-          if (patient.callback) patient.callback(r.id)
-          const newEntity = mapEntityToValues(response)
-          resetForm(newEntity)
-        })
-
-        if (onConfirm && shouldCloseForm) {
-          onConfirm()
-        }
-
-        // if (!shouldCloseForm) {
-        //   dispatch({
-        //     type: 'patientSearch/query',
-        //     payload: {
-        //       sorting: [
-        //         // { columnName: 'isActive', direction: 'asc' },
-        //         { columnName: 'name', direction: 'asc' },
-        //       ],
-        //     },
-        //   })
-        // }
-      }
+    upsertPatient({
+      values,
+      history,
+      dispatch,
+      patient,
+      resetForm,
+      onConfirm,
     })
   },
   displayName: 'PatientDetail',
@@ -473,15 +362,21 @@ class PatientDetail extends PureComponent {
   }
 
   onActiveStatusChanged = async (status) => {
-    const { setFieldValue, patient: { entity } } = this.props
+    const { setFieldValue, dispatch } = this.props
 
     if (status === true) {
-      setFieldValue('EffectiveStartDate', moment().formatUTC())
-      setFieldValue('EffectiveEndDate', moment('2099-12-31').formatUTC())
+      await setFieldValue('EffectiveStartDate', moment().formatUTC())
+      await setFieldValue('EffectiveEndDate', moment('2099-12-31').formatUTC())
     } else {
-      setFieldValue('EffectiveEndDate', moment().formatUTC())
+      await setFieldValue('EffectiveEndDate', moment().formatUTC())
     }
-    this.validatePatient()
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        disableSave: true,
+      },
+    })
+    upsertPatient(this.props)
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
