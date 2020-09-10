@@ -50,9 +50,9 @@ const withFormikExtend = (props) => (Component) => {
     if (dirty) {
       window.dirtyForms[displayName] = {
         displayName,
-        dirtyCheckMessage,
+        dirtyCheckMessage: window.g_app._store.getState().global.secondConfirmMessage ?? dirtyCheckMessage,
         confirmText,
-        showSecondConfirmButton,
+        showSecondConfirmButton: window.g_app._store.getState().global.isShowSecondConfirmButton ?? false,
         secondConfirmText,
         onDirtyDiscard: () => {
           if (onDirtyDiscard) {

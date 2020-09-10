@@ -51,7 +51,7 @@ import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
 // window.g_app.replaceModel(model)
 
 const discardMessage = 'Discard consultation?'
-const onPageLeaveMessage = 'Do you want to Save Consultation Notes?'
+const onPageLeaveMessage = 'Do you want to save consultation notes?'
 const formName = 'ConsultationPage'
 
 const generatePrintData = async (
@@ -337,12 +337,31 @@ const pauseConsultation = ({
     'patientdashboard.startresumeconsultation',
     'patientdashboard.editconsultation',
   ],
-  mapPropsToValues: ({ consultation = {} }) => {
+  mapPropsToValues: ({ consultation = {}, visitRegistration }) => {
+    if (window.g_app._store.getState().global.isShowSecondConfirmButton === undefined && visitRegistration && visitRegistration.entity) {
+      if (visitRegistration.entity.visit.visitStatus && visitRegistration.entity.visit.visitStatus !== 'IN CONS' && visitRegistration.entity.visit.visitStatus !== 'WAITING') {
+        window.g_app._store.dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            isShowSecondConfirmButton: false,
+            secondConfirmMessage: discardMessage,
+          },
+        })
+      }
+      else {
+        window.g_app._store.dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            isShowSecondConfirmButton: true,
+            secondConfirmMessage: 'Do you want to save consultation notes?',
+          },
+        })
+      }
+    }
     return consultation.entity || consultation.default
   },
   validationSchema: schema,
   enableReinitialize: false,
-  showSecondConfirmButton: true,
   onSecondConfirm: pauseConsultation,
   secondConfirmText: 'Pause',
   confirmText: 'Discard',
@@ -437,7 +456,7 @@ class Main extends React.Component {
     // console.log('Main')
     initRoomAssignment()
     setTimeout(() => {
-      this.props.setFieldValue('fakeField', 'setdirty')
+      this.props.setFieldValue('fakeField', 'setdirty') 
     }, 500)
   }
 
@@ -446,6 +465,19 @@ class Main extends React.Component {
       type: 'consultation/updateState',
       payload: {
         entity: undefined,
+      },
+    })
+    this.props.dispatch({
+      type: 'visitRegistration/updateState',
+      payload: {
+        entity: undefined,
+      },
+    })
+    window.g_app._store.dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        isShowSecondConfirmButton: undefined,
+        secondConfirmMessage: undefined,
       },
     })
   }
@@ -460,11 +492,12 @@ class Main extends React.Component {
     )
       return true
     if (
+      nextProps.visitRegistration &&
       nextProps.visitRegistration.version !==
       this.props.visitRegistration.version
     )
       return true
-    if (
+    if (nextProps.visitRegistration && nextProps.visitRegistration.entity &&
       nextProps.visitRegistration.entity.id !==
       this.props.visitRegistration.entity.id
     )
@@ -940,25 +973,6 @@ class Main extends React.Component {
 
   onCloseSignOffModal = () => {
     this.props.dispatch({ type: `consultation/closeSignOffModal` })
-  }
-
-  // componentWillUnmount () {
-  //   this.props.dispatch({
-  //     type: 'formik/updateState',
-  //     payload: {
-  //       ConsultationPage: undefined,
-  //       ConsultationDocumentList: undefined,
-  //       OrderPage: undefined,
-  //     },
-  //   })
-  // }
-  componentWillUnmount () {
-    this.props.dispatch({
-      type: 'consultation/updateState',
-      payload: {
-        entity: undefined,
-      },
-    })
   }
 
   render () {
