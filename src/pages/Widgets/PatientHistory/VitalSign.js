@@ -20,7 +20,7 @@ export default ({ current }) => {
               <span>
                 {`${row.temperatureC
                   ? numeral(row.temperatureC).format('0.0')
-                  : '0.0'} ${formatMessage({
+                  : '-'} ${formatMessage({
                   id: 'reception.queue.visitRegistration.temperature.suffix',
                 })}`}
               </span>
@@ -33,7 +33,7 @@ export default ({ current }) => {
               <span>
                 {`${row.bpSysMMHG
                   ? numeral(row.bpSysMMHG).format('0.0')
-                  : '0.0'} ${formatMessage({
+                  : '-'} ${formatMessage({
                   id: 'reception.queue.visitRegistration.mmhg',
                 })}`}
               </span>
@@ -47,7 +47,7 @@ export default ({ current }) => {
               <span>
                 {`${row.bpDiaMMHG
                   ? numeral(row.bpDiaMMHG).format('0.0')
-                  : '0.0'} ${formatMessage({
+                  : '-'} ${formatMessage({
                   id: 'reception.queue.visitRegistration.mmhg',
                 })}`}
               </span>
@@ -60,7 +60,7 @@ export default ({ current }) => {
               <span>
                 {`${row.pulseRateBPM
                   ? numeral(row.pulseRateBPM).format('0.0')
-                  : '0.0'} ${formatMessage({
+                  : '-'} ${formatMessage({
                   id: 'reception.queue.visitRegistration.heartRate.suffix',
                 })}`}
               </span>
@@ -73,7 +73,7 @@ export default ({ current }) => {
               <span>
                 {`${row.weightKG
                   ? numeral(row.weightKG).format('0')
-                  : '0'} ${formatMessage({
+                  : '-'} ${formatMessage({
                   id: 'reception.queue.visitRegistration.weight.suffix',
                 })}`}
               </span>
@@ -86,7 +86,7 @@ export default ({ current }) => {
               <span>
                 {`${row.heightCM
                   ? numeral(row.heightCM).format('0.0')
-                  : '0.0'} ${formatMessage({
+                  : '-'} ${formatMessage({
                   id: 'reception.queue.visitRegistration.height.suffix',
                 })}`}
               </span>

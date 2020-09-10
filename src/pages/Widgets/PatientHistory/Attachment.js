@@ -64,7 +64,13 @@ export default ({ current }) => {
       title: 'Referred Date',
       width: 110,
       render: (text, row) => (
-        <span>{moment(row.lastUpdateDate).format('DD MMM YYYY')}</span>
+        <span>
+          {row.referredDate ? (
+            moment(row.referredDate).format('DD MMM YYYY')
+          ) : (
+            ''
+          )}
+        </span>
       ),
     },
     { dataIndex: 'createBy', title: 'From' },
