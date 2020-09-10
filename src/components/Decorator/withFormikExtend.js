@@ -26,7 +26,6 @@ const withFormikExtend = (props) => (Component) => {
     secondConfirmText,
     confirmText,
     dirtyCheckMessage,
-    showSecondConfirmButton,
   } = props
   let startDirtyChecking = false
   if (displayName) {
