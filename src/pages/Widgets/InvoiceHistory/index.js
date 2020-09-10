@@ -86,9 +86,10 @@ const InvoiceHistory = ({
   }
 
   const getContent = () => {
+    const { entity } = patient || {}
     return (
       <PaymentDetails
-        patientIsActive={patient && patient.isActive}
+        patientIsActive={entity && entity.isActive}
         refreshInvoiceList={refreshInvoiceList}
       />
     )
