@@ -51,6 +51,7 @@ import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
 // window.g_app.replaceModel(model)
 
 const discardMessage = 'Discard consultation?'
+const onPageLeaveMessage = 'Do you want to save consultation notes?'
 const formName = 'ConsultationPage'
 
 const generatePrintData = async (
@@ -237,23 +238,8 @@ const saveConsultation = ({
 const discardConsultation = ({
   dispatch,
   values,
-  onClose,
-  consultation,
-  resetForm,
 }) => {
-  // console.log(values)
   if (values.id) {
-    // dispatch({
-    //   type: 'global/updateAppState',
-    //   payload: {
-    //     openConfirm: true,
-    //     openConfirmContent: 'Discard consultation?',
-    //     openConfirmText: 'Confirm',
-    //     onConfirmSave: () => {
-
-    //     },
-    //   },
-    // })
     dispatch({
       type: 'consultation/discard',
       payload: values.id,
@@ -263,6 +249,57 @@ const discardConsultation = ({
       type: 'consultation/discard',
     })
   }
+}
+
+const pauseConsultation = ({
+  dispatch,
+  values,
+  onClose,
+  consultation,
+  resetForm,
+  ...rest
+}) => {
+  const {
+    consultationDocument = {},
+    corEyeRefractionForm,
+    orders = {},
+    forms = {},
+  } = rest
+  const newValues = convertToConsultation(
+    {
+      ...values,
+      corDiagnosis: [
+        ...values.corDiagnosis.filter(
+          (diagnosis) => diagnosis.diagnosisFK !== undefined,
+        ),
+      ],
+    },
+    {
+      orders,
+      consultationDocument,
+      corEyeRefractionForm,
+      forms,
+    },
+  )
+  newValues.duration = Math.floor(
+    Number(sessionStorage.getItem(`${values.id}_consultationTimer`)) || 0,
+  )
+  if (!newValues.visitConsultationTemplate) {
+    newValues.visitConsultationTemplate = {}
+  }
+  newValues.visitConsultationTemplate.consultationTemplate =
+    localStorage.getItem('consultationLayout') || ''
+  dispatch({
+    type: `consultation/pause`,
+    payload: newValues,
+  }).then((r) => {
+    if (r) {
+      sessionStorage.removeItem(`${values.id}_consultationTimer`)
+      notification.success({
+        message: 'Consultation paused.',
+      })
+    }
+  })
 }
 
 // @skeleton()
@@ -300,14 +337,35 @@ const discardConsultation = ({
     'patientdashboard.startresumeconsultation',
     'patientdashboard.editconsultation',
   ],
-  mapPropsToValues: ({ consultation = {} }) => {
-    // console.log('mapPropsToValues', consultation.entity, disabled, reset)
-    // console.log(consultation.entity, consultation.default)
+  mapPropsToValues: ({ consultation = {}, visitRegistration }) => {
+    if (window.g_app._store.getState().global.isShowSecondConfirmButton === undefined && visitRegistration && visitRegistration.entity) {
+      if (visitRegistration.entity.visit.visitStatus && visitRegistration.entity.visit.visitStatus !== 'IN CONS' && visitRegistration.entity.visit.visitStatus !== 'WAITING') {
+        window.g_app._store.dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            isShowSecondConfirmButton: false,
+            secondConfirmMessage: discardMessage,
+          },
+        })
+      }
+      else {
+        window.g_app._store.dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            isShowSecondConfirmButton: true,
+            secondConfirmMessage: 'Do you want to save consultation notes?',
+          },
+        })
+      }
+    }
     return consultation.entity || consultation.default
   },
   validationSchema: schema,
   enableReinitialize: false,
-  dirtyCheckMessage: discardMessage,
+  onSecondConfirm: pauseConsultation,
+  secondConfirmText: 'Pause',
+  confirmText: 'Discard',
+  dirtyCheckMessage: onPageLeaveMessage,
   notDirtyDuration: 0, // this page should alwasy show warning message when leave
   onDirtyDiscard: discardConsultation,
   handleSubmit: async (values, { props }) => {
@@ -398,7 +456,7 @@ class Main extends React.Component {
     // console.log('Main')
     initRoomAssignment()
     setTimeout(() => {
-      this.props.setFieldValue('fakeField', 'setdirty')
+      this.props.setFieldValue('fakeField', 'setdirty') 
     }, 500)
   }
 
@@ -407,6 +465,19 @@ class Main extends React.Component {
       type: 'consultation/updateState',
       payload: {
         entity: undefined,
+      },
+    })
+    this.props.dispatch({
+      type: 'visitRegistration/updateState',
+      payload: {
+        entity: undefined,
+      },
+    })
+    window.g_app._store.dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        isShowSecondConfirmButton: undefined,
+        secondConfirmMessage: undefined,
       },
     })
   }
@@ -421,11 +492,12 @@ class Main extends React.Component {
     )
       return true
     if (
+      nextProps.visitRegistration &&
       nextProps.visitRegistration.version !==
       this.props.visitRegistration.version
     )
       return true
-    if (
+    if (nextProps.visitRegistration && nextProps.visitRegistration.entity &&
       nextProps.visitRegistration.entity.id !==
       this.props.visitRegistration.entity.id
     )
@@ -437,24 +509,6 @@ class Main extends React.Component {
       return true
     return false
   }
-
-  // constructor (props) {
-  //   super(props)
-  //   discardConsultation = discardConsultation.bind(this)
-  // }
-
-  // static getDerivedStateFromProps (nextProps, preState) {
-  //   const { global } = nextProps
-  //   // console.log(value)
-  //   if (global.collapsed !== preState.collapsed) {
-  //     return {
-  //       collapsed: global.collapsed,
-  //       currentLayout: _.cloneDeep(preState.currentLayout),
-  //     }
-  //   }
-
-  //   return null
-  // }
 
   showInvoiceAdjustment = () => {
     const { theme, ...resetProps } = this.props
@@ -476,9 +530,21 @@ class Main extends React.Component {
     saveConsultation({
       props: this.props,
       confirmMessage: 'Pause consultation?',
-      successMessage: 'Consultation paused',
+      successMessage: 'Consultation paused.',
       action: 'pause',
     })
+  }
+
+  discardConsultation = () => {
+    const {
+      dispatch,
+      values,
+    } = this.props
+    dispatch({
+      type: 'consultation/discard',
+      payload: values.id,
+    })
+    router.push('/reception/queue')
   }
 
   resumeConsultation = () => {
@@ -662,95 +728,68 @@ class Main extends React.Component {
               {({ rights }) => {
                 //
                 return rights === 'enable' &&
-                [
-                  'IN CONS',
-                  'WAITING',
-                ].includes(visit.visitStatus) &&
-                values.id ? (
-                  <GridItem>
-                    <h5 style={{ marginTop: -3, fontWeight: 'bold' }}>
-                      <Timer
-                        initialTime={
-                          Number(
-                            sessionStorage.getItem(
+                  [
+                    'IN CONS',
+                    'WAITING',
+                  ].includes(visit.visitStatus) &&
+                  values.id ? (
+                    <GridItem>
+                      <h5 style={{ marginTop: -3, fontWeight: 'bold' }}>
+                        <Timer
+                          initialTime={
+                            Number(
+                              sessionStorage.getItem(
+                                `${values.id}_consultationTimer`,
+                              ),
+                            ) ||
+                            values.duration ||
+                            0
+                          }
+                          direction='forward'
+                          startImmediately={this.state.recording}
+                        >
+                          {({
+                            start,
+                            resume,
+                            pause,
+                            stop,
+                            reset,
+                            getTimerState,
+                            getTime,
+                          }) => {
+                            sessionStorage.setItem(
                               `${values.id}_consultationTimer`,
-                            ),
-                          ) ||
-                          values.duration ||
-                          0
-                        }
-                        direction='forward'
-                        startImmediately={this.state.recording}
-                      >
-                        {({
-                          start,
-                          resume,
-                          pause,
-                          stop,
-                          reset,
-                          getTimerState,
-                          getTime,
-                        }) => {
-                          sessionStorage.setItem(
-                            `${values.id}_consultationTimer`,
-                            getTime(),
-                          )
-                          return (
-                            <React.Fragment>
-                              <TimerIcon
-                                style={{
-                                  height: 17,
-                                  top: 2,
-                                  left: -5,
-                                  position: 'relative',
-                                }}
-                              />
-                              <Timer.Hours
-                                formatValue={(value) =>
-                                  `${numeral(value).format('00')} : `}
-                              />
-                              <Timer.Minutes
-                                formatValue={(value) =>
-                                  `${numeral(value).format('00')} : `}
-                              />
-                              <Timer.Seconds
-                                formatValue={(value) =>
-                                  `${numeral(value).format('00')}`}
-                              />
-
-                              {/* {!this.state.recording && (
-                      <IconButton
-                        style={{ padding: 0, top: -1, right: -6 }}
-                        onClick={() => {
-                          resume()
-                          this.setState({
-                            recording: true,
-                          })
-                        }}
-                      >
-                        <PlayArrow />
-                      </IconButton>
-                    )}
-                    {this.state.recording && (
-                      <IconButton
-                        style={{ padding: 0, top: -1, right: -6 }}
-                        onClick={() => {
-                          pause()
-                          this.setState({
-                            recording: false,
-                          })
-                        }}
-                      >
-                        <Pause />
-                      </IconButton>
-                    )} */}
-                            </React.Fragment>
-                          )
-                        }}
-                      </Timer>
-                    </h5>
-                  </GridItem>
-                ) : null
+                              getTime(),
+                            )
+                            return (
+                              <React.Fragment>
+                                <TimerIcon
+                                  style={{
+                                    height: 17,
+                                    top: 2,
+                                    left: -5,
+                                    position: 'relative',
+                                  }}
+                                />
+                                <Timer.Hours
+                                  formatValue={(value) =>
+                                    `${numeral(value).format('00')} : `}
+                                />
+                                <Timer.Minutes
+                                  formatValue={(value) =>
+                                    `${numeral(value).format('00')} : `}
+                                />
+                                <Timer.Seconds
+                                  formatValue={(value) =>
+                                    `${numeral(value).format('00')}`}
+                                />
+                              </React.Fragment>
+                            )
+                          }}
+                        </Timer>
+                      </h5>
+                    </GridItem>
+                  ) : null
               }}
             </Authorized>
             {clinicSettings.showTotalInvoiceAmtInConsultation ? (
@@ -781,7 +820,10 @@ class Main extends React.Component {
                   color='danger'
                   onClick={navigateDirtyCheck({
                     displayName: formName,
+                    confirmText: 'Confirm',
                     redirectUrl: '/reception/queue',
+                    showSecondConfirmButton: false,
+                    openConfirmContent: discardMessage,
                   })}
                   icon={null}
                 >
@@ -794,14 +836,14 @@ class Main extends React.Component {
                     'IN CONS',
                     'WAITING',
                   ].includes(visit.visitStatus) && (
-                    <ProgressButton
-                      onClick={this.pauseConsultation}
-                      color='info'
-                      icon={null}
-                    >
-                      Pause
-                    </ProgressButton>
-                  )}
+                      <ProgressButton
+                        onClick={this.pauseConsultation}
+                        color='info'
+                        icon={null}
+                      >
+                        Pause
+                      </ProgressButton>
+                    )}
                   {visit.visitStatus === 'PAUSED' && (
                     <ProgressButton
                       onClick={this.resumeConsultation}
@@ -931,25 +973,6 @@ class Main extends React.Component {
 
   onCloseSignOffModal = () => {
     this.props.dispatch({ type: `consultation/closeSignOffModal` })
-  }
-
-  // componentWillUnmount () {
-  //   this.props.dispatch({
-  //     type: 'formik/updateState',
-  //     payload: {
-  //       ConsultationPage: undefined,
-  //       ConsultationDocumentList: undefined,
-  //       OrderPage: undefined,
-  //     },
-  //   })
-  // }
-  componentWillUnmount () {
-    this.props.dispatch({
-      type: 'consultation/updateState',
-      payload: {
-        entity: undefined,
-      },
-    })
   }
 
   render () {
