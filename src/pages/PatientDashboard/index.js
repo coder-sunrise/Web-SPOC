@@ -50,10 +50,11 @@ const styles = (theme) => ({
     marginTop: theme.spacing(1),
   },
 })
-@connect(({ patientDashboard, global, visitRegistration }) => ({
+@connect(({ patientDashboard, global, visitRegistration, patient }) => ({
   visitRegistration,
   patientDashboard,
   global,
+  patient,
 }))
 @Authorized.Secured('patientdashboard')
 class PatientDashboard extends PureComponent {
@@ -136,7 +137,13 @@ class PatientDashboard extends PureComponent {
       onMenuClick = (p) => p,
       ...resetProps
     } = this.props
-    const { patientDashboard, global, history, visitRegistration } = resetProps
+    const {
+      patientDashboard,
+      global,
+      history,
+      visitRegistration,
+      patient: { entity: patientProfile },
+    } = resetProps
     const { entity } = visitRegistration
     if (!entity) return null
     const { visit = {}, queueNo } = entity
@@ -155,7 +162,9 @@ class PatientDashboard extends PureComponent {
                   height: '100%',
                 }}
               >
-                {visit.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
+                {patientProfile &&
+                patientProfile.isActive &&
+                visit.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
                   <Authorized authority='openqueuedisplay'>
                     <CallingQueueButton
                       qId={queueNo}
@@ -164,7 +173,9 @@ class PatientDashboard extends PureComponent {
                     />
                   </Authorized>
                 )}
-                {visit.visitStatus === VISIT_STATUS.WAITING && (
+                {visit.visitStatus === VISIT_STATUS.WAITING &&
+                patientProfile &&
+                patientProfile.isActive && (
                   <Authorized authority='patientdashboard.startresumeconsultation'>
                     <div style={{ padding: '30px 0' }}>
                       <ProgressButton

@@ -136,8 +136,13 @@ const PatientLabelButton = ({
           </ClickAwayListener>
         }
       >
-        <Button color='primary' onClick={openPopper}>
-          <Print />
+        <Button
+          color='primary'
+          onClick={openPopper}
+          size='sm'
+          style={{ height: 25, marginTop: 2 }}
+        >
+          <Print /> Label
         </Button>
       </Popper>
     </div>

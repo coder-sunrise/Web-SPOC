@@ -98,6 +98,9 @@ class FilterBar extends PureComponent {
                         // ],
                         apiCriteria: {
                           searchValue: search,
+                          includeinactive: window.location.pathname.includes(
+                            'patientdb',
+                          ),
                         },
                       },
                     })

@@ -120,55 +120,58 @@ class Banner extends PureComponent {
     }
 
     return (
-      <div style={{ display: 'inline-block' }}>
-        {data === 'link' ? (
-          <Link
-            to={getAppendUrl({
-              md: 'pt',
-              cmt: 3,
-              pid: info.id,
-            })}
-            tabIndex='-1'
-          >
-            <IconButton>
-              <Edit color='action' />
-            </IconButton>
-          </Link>
-        ) : (
-          <div>
-            {allergyData.length > 25 ? (
-              `${allergyData.substring(0, 25).trim()}...`
-            ) : (
-              allergyData
-            )}
+      entity &&
+      entity.isActive && (
+        <div style={{ display: 'inline-block' }}>
+          {data === 'link' ? (
+            <Link
+              to={getAppendUrl({
+                md: 'pt',
+                cmt: 3,
+                pid: info.id,
+              })}
+              tabIndex='-1'
+            >
+              <IconButton>
+                <Edit color='action' />
+              </IconButton>
+            </Link>
+          ) : (
+            <div>
+              {allergyData.length > 25 ? (
+                `${allergyData.substring(0, 25).trim()}...`
+              ) : (
+                allergyData
+              )}
 
-            {da.length > 0 && (
-              <Popover
-                icon={null}
-                content={
-                  <div>
-                    {da.map((item, i) => {
-                      return (
-                        <GridContainer>
-                          <GridItem>
-                            {i + 1}. {item.allergyName}
-                          </GridItem>
-                        </GridContainer>
-                      )
-                    })}
+              {da.length > 0 && (
+                <Popover
+                  icon={null}
+                  content={
+                    <div>
+                      {da.map((item, i) => {
+                        return (
+                          <GridContainer>
+                            <GridItem>
+                              {i + 1}. {item.allergyName}
+                            </GridItem>
+                          </GridContainer>
+                        )
+                      })}
+                    </div>
+                  }
+                  trigger='click'
+                  placement='bottomLeft'
+                >
+                  <div style={{ display: 'inline-block' }}>
+                    <MoreButton />
                   </div>
-                }
-                trigger='click'
-                placement='bottomLeft'
-              >
-                <div style={{ display: 'inline-block' }}>
-                  <MoreButton />
-                </div>
-              </Popover>
-            )}
-          </div>
-        )}
-      </div>
+                </Popover>
+              )}
+            </div>
+          )}
+        </div>
+      )
     )
   }
 
@@ -519,7 +522,8 @@ class Banner extends PureComponent {
                   <div style={headerStyles}>
                     Scheme
                     <span style={{ bottom: -2 }}>
-                      {(entity.patientScheme || [])
+                      {entity.isActive &&
+                      (entity.patientScheme || [])
                         .filter((o) => o.schemeTypeFK <= 6).length > 0 && (
                         <IconButton onClick={this.refreshChasBalance}>
                           <Refresh />

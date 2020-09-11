@@ -2,7 +2,7 @@ import moment from 'moment'
 import { timeFormat, CodeSelect, Tooltip } from '@/components'
 import { DoctorLabel } from '@/components/_medisys'
 import { dateFormatLong } from '@/utils/format'
-import { APPOINTMENT_STATUS, CANCELLATION_REASON_TYPE } from '@/utils/constants'
+import { APPOINTMENT_STATUS } from '@/utils/constants'
 
 import ErrorPopover from './ErrorPopover'
 import ApptDuration from './ApptDuration'
@@ -87,7 +87,7 @@ export const initialAptInfo = {
 
 export const commonExt = [
   {
-    columnName: 'appointmentStatusFk',
+    columnName: 'appointmentStatus',
     // type: 'codeSelect',
     // code: 'ltappointmentstatus',
     render: (row) => {
@@ -101,17 +101,14 @@ export const commonExt = [
       if (redColorStatus.includes(row.appointmentStatusFk)) color = 'red'
       if (row.appointmentStatusFk === APPOINTMENT_STATUS.CONFIRMED)
         color = 'green'
+
       return (
         <div
           style={{
             color,
           }}
         >
-          <CodeSelect
-            code='ltappointmentstatus'
-            text
-            value={row.appointmentStatusFk}
-          />
+          <span>{row.appointmentStatus}</span>
         </div>
       )
     },
@@ -155,7 +152,7 @@ export const previousApptTableParams = {
     { name: 'appointmentDate', title: 'Date' },
     { name: 'startTime', title: 'Time' },
     { name: 'doctor', title: 'Doctor' },
-    { name: 'appointmentStatusFk', title: 'Status' },
+    { name: 'appointmentStatus', title: 'Status' },
     {
       name: 'cancellationReason',
       title: 'Reason',
@@ -172,7 +169,7 @@ export const futureApptTableParams = {
     { name: 'appointmentDate', title: 'Date' },
     { name: 'startTime', title: 'Time' },
     { name: 'doctor', title: 'Doctor' },
-    { name: 'appointmentStatusFk', title: 'Status' },
+    { name: 'appointmentStatus', title: 'Status' },
     { name: 'appointmentRemarks', title: 'Remarks' },
   ],
   columnExtensions: [

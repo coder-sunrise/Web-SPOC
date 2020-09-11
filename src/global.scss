@@ -635,11 +635,6 @@ html {
   // margin-left: -1px;
 }
 
-tr[class^='TableSelectRow-selected-'],
-tr[class*='TableSelectRow-selected-'] {
-  background-color: #c8dafd !important;
-}
-
 @-webkit-keyframes fadeInFromNone {
   0% {
     display: none;

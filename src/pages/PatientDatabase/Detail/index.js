@@ -472,6 +472,37 @@ class PatientDetail extends PureComponent {
     })
   }
 
+  onActiveStatusChanged = async (status) => {
+    const { setFieldValue, patient: { entity } } = this.props
+
+    if (status === true) {
+      setFieldValue('EffectiveStartDate', moment().formatUTC())
+      setFieldValue('EffectiveEndDate', moment('2099-12-31').formatUTC())
+    } else {
+      const bizSessionPayload = {
+        'Visit.PatientProfileFK': entity.id,
+        group: [
+          {
+            'Visit.VisitStatusFKNavigation.Status': 'WAITING',
+            IsClinicSessionClosed: false,
+            combineCondition: 'or',
+          },
+        ],
+      }
+      const result = await getBizSession(bizSessionPayload)
+      const { data: { totalRecords } } = result
+      if (totalRecords !== 0) {
+        notification.error({
+          message:
+            'Can not change patient status to inactive if patient in active session.',
+        })
+        return
+      }
+      setFieldValue('EffectiveEndDate', moment().formatUTC())
+    }
+    this.validatePatient()
+  }
+
   UNSAFE_componentWillReceiveProps (nextProps) {
     const { errors, dispatch, patient, values, validateForm } = nextProps
     // validateForm(values).then((o) => {
@@ -505,15 +536,15 @@ class PatientDetail extends PureComponent {
       footer,
       ...resetProps
     } = this.props
-
     const { hasActiveSession } = this.state
 
     const { patient, global, resetForm, values, dispatch } = resetProps
     if (!patient) return null
     const { currentComponent, currentId, menuErrors, entity } = patient
+    const patientIsActiveOrCreating = !entity || entity.isActive
 
     const isCreatingPatient = entity
-      ? Object.prototype.hasOwnProperty.call(entity, 'id')
+      ? Object.prototype.hasOwnProperty.call(entity, 'id') && entity.isActive
       : false
 
     const currentMenu =
@@ -521,6 +552,13 @@ class PatientDetail extends PureComponent {
         (o) => o.id === (this.state.selectedMenu || currentComponent),
       ) || {}
     const CurrentComponent = currentMenu.component
+    const currentItemDisabled =
+      [
+        '1',
+        '2',
+        '3',
+        '4',
+      ].includes(currentMenu.id) && !patientIsActiveOrCreating
 
     return (
       <Authorized
@@ -533,7 +571,12 @@ class PatientDetail extends PureComponent {
           <GridItem xs={12} sm={12} md={2}>
             <Card profile>
               <CardBody profile>
-                <PatientInfoSideBanner entity={entity} {...this.props} />
+                <PatientInfoSideBanner
+                  allowChangePatientStatus
+                  onActiveStatusChange={this.onActiveStatusChanged}
+                  entity={entity}
+                  {...this.props}
+                />
                 <MenuList>
                   {this.widgets
                     .filter(
@@ -629,7 +672,13 @@ class PatientDetail extends PureComponent {
                   )
                 }
               >
-                <CurrentComponent {...resetProps} />
+                <Authorized.Context.Provider
+                  value={{
+                    rights: currentItemDisabled ? 'disable' : 'enable', //
+                  }}
+                >
+                  <CurrentComponent {...resetProps} />
+                </Authorized.Context.Provider>
               </div>
             </CardContainer>
 
@@ -654,7 +703,9 @@ class PatientDetail extends PureComponent {
                     },
                   })
                 },
-                onConfirm: this.validatePatient,
+                onConfirm: patientIsActiveOrCreating
+                  ? this.validatePatient
+                  : undefined,
                 confirmBtnText: 'Save',
               })}
             </div>

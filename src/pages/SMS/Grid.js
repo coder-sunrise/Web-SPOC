@@ -157,7 +157,9 @@ const Grid = ({
           selectable: true,
           selectConfig: {
             showSelectAll: true,
-            rowSelectionEnabled: () => true,
+            rowSelectionEnabled: (row) => {
+              return row.patientIsActive
+            },
           },
         }}
         {...tableParas}

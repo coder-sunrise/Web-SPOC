@@ -106,7 +106,13 @@ class LabTrackingDetails extends PureComponent {
   }
 
   render () {
-    const { resultType, dispatch, labTrackingDetails, patientId } = this.props
+    const {
+      resultType,
+      dispatch,
+      labTrackingDetails,
+      patientId,
+      isPatientInactive,
+    } = this.props
     const IsOverallGrid = resultType === PATIENT_LAB.LAB_TRACKING
 
     let patientID = patientId || Number(findGetParameter('pid')) || undefined
@@ -123,11 +129,17 @@ class LabTrackingDetails extends PureComponent {
           IsOverallGrid={IsOverallGrid}
           patientId={patientID}
         />
+
         <div style={{ margin: 10 }}>
           {IsOverallGrid ? (
             <OverallGrid dispatch={dispatch} {...cfg} {...this.props} />
           ) : (
-            <PatientGrid dispatch={dispatch} {...cfg} {...this.props} />
+            <PatientGrid
+              readOnly={isPatientInactive}
+              dispatch={dispatch}
+              {...cfg}
+              {...this.props}
+            />
           )}
         </div>
         <CommonModal

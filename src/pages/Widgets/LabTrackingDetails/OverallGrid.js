@@ -35,6 +35,8 @@ class OverallGrid extends PureComponent {
         width: 100,
         render: (row) => {
           const { clinicSettings, handlePrintClick } = this.props
+          const readOnly = !row.patientIsActive
+
           return (
             <React.Fragment>
               <PatientResultButton
@@ -44,6 +46,7 @@ class OverallGrid extends PureComponent {
               />
               <Tooltip title='Edit Patient Lab Result' placement='bottom'>
                 <Button
+                  disabled={readOnly}
                   size='sm'
                   onClick={() => {
                     this.editRow(row)
@@ -65,6 +68,9 @@ class OverallGrid extends PureComponent {
   editRow = (row, e) => {
     const { dispatch, labTrackingDetails } = this.props
     const { list } = labTrackingDetails
+    const readOnly = !row.patientIsActive
+
+    if (readOnly) return
 
     dispatch({
       type: 'labTrackingDetails/updateState',
