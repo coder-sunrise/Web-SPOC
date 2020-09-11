@@ -80,10 +80,12 @@ const mapEntityToValues = (entity) => {
   }
 }
 
-@connect(({ patient, global }) => ({
+@connect(({ patient, global, clinicSettings }) => ({
   patient,
   global,
-}))
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
+})) 
+
 @withFormikExtend({
   authority: [
     'patientdatabase.newpatient',
@@ -212,6 +214,7 @@ class PatientDetail extends PureComponent {
 
   constructor (props) {
     super(props)
+    let schemas =  schema(props).demographic
     this.widgets = [
       {
         id: '1',
@@ -220,7 +223,7 @@ class PatientDetail extends PureComponent {
           'patientdatabase.newpatient',
           'patientdatabase.patientprofiledetails',
         ],
-        schema: schema.demographic,
+        schema: schemas.demographic,
         component: Loadable({
           loader: () => import('./Demographics'),
           render: (loaded, p) => {
@@ -237,7 +240,7 @@ class PatientDetail extends PureComponent {
           'patientdatabase.newpatient',
           'patientdatabase.patientprofiledetails',
         ],
-        schema: schema.emergencyContact,
+        schema: schemas.emergencyContact,
         component: Loadable({
           loader: () => import('./EmergencyContact'),
           render: (loaded, p) => {
@@ -245,7 +248,7 @@ class PatientDetail extends PureComponent {
             return (
               <Cmpnet
                 schema={
-                  schema.emergencyContact.patientEmergencyContact._subType
+                  schemas.emergencyContact.patientEmergencyContact._subType
                 }
                 {...p}
               />
@@ -261,12 +264,12 @@ class PatientDetail extends PureComponent {
           'patientdatabase.newpatient',
           'patientdatabase.patientprofiledetails',
         ],
-        schema: schema.allergies,
+        schema: schemas.allergies,
         component: Loadable({
           loader: () => import('./Allergies'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet schema={schema.allergies} {...p} />
+            return <Cmpnet schema={schemas.allergies} {...p} />
           },
           loading: Loading,
         }),
@@ -278,12 +281,12 @@ class PatientDetail extends PureComponent {
           'patientdatabase.newpatient',
           'patientdatabase.patientprofiledetails',
         ],
-        schema: schema.schemes,
+        schema: schemas.schemes,
         component: Loadable({
           loader: () => import('./Schemes'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet schema={schema.schemes} {...p} />
+            return <Cmpnet schema={schemas.schemes} {...p} />
           },
           loading: Loading,
         }),

@@ -693,19 +693,19 @@ export const watchForElementChange = (e) => {
   let r =
     undefined === i
       ? {
-          childList: true,
-          characterData: true,
-          subtree: true,
-          attributes: true,
-        }
+        childList: true,
+        characterData: true,
+        subtree: true,
+        attributes: true,
+      }
       : i
-  ;(observers[t] = new MutationObserver((e1) => {
-    e1.forEach((e2) => {
-      a(e2)
-    }),
-      n || observers[t].disconnect()
-  })),
-    observers[t].observe(e.container || document, r)
+    ; (observers[t] = new MutationObserver((e1) => {
+      e1.forEach((e2) => {
+        a(e2)
+      }),
+        n || observers[t].disconnect()
+    })),
+      observers[t].observe(e.container || document, r)
 }
 
 const confirmBeforeReload = (e) => {
@@ -726,16 +726,12 @@ const _checkCb = ({ redirectUrl, onProceed }, e) => {
 const navigateDirtyCheck = ({
   onConfirm,
   displayName,
+  showSecondConfirmButton,
   openConfirmContent,
+  confirmText,
+  onSecondConfirm,
   ...restProps
 }) => (e) => {
-  // console.log(
-  //   onConfirm,
-  //   displayName,
-  //   restProps,
-  //   window.beforeReloadHandlerAdded,
-  //   window.dirtyForms,
-  // )
   if (window.beforeReloadHandlerAdded) {
     let f = {}
 
@@ -748,11 +744,26 @@ const navigateDirtyCheck = ({
         return
       }
     }
-
+    let showSecConfirmButton = false
+    if (showSecondConfirmButton === undefined) {
+      showSecConfirmButton = f.showSecondConfirmButton
+    }
+    else {
+      showSecConfirmButton = showSecondConfirmButton
+    }
+    let confirmButtonText = onConfirm ? 'Save Changes' : 'Confirm'
+    if (f.confirmText) {
+      confirmButtonText = f.confirmText
+    }
+    if (confirmText) {
+      confirmButtonText = confirmText
+    }
     window.g_app._store.dispatch({
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
+        showSecondConfirmButton: showSecConfirmButton,
+        onSecondConfirm: null || f.onSecondConfirm,
         openConfirmContent:
           openConfirmContent ||
           (typeof f.dirtyCheckMessage === 'function'
@@ -762,7 +773,7 @@ const navigateDirtyCheck = ({
             id: 'app.general.leave-without-save',
           }),
         onConfirmSave: onConfirm,
-        openConfirmText: onConfirm ? 'Save Changes' : 'Confirm',
+        openConfirmText: confirmButtonText,
         onConfirmClose: () => {
           window.g_app._store.dispatch({
             type: 'global/updateAppState',
