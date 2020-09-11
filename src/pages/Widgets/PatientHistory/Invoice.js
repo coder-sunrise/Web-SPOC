@@ -116,7 +116,7 @@ export default ({ current, theme }) => {
   }
 
   return (
-    <div style={{ fontSize: '0.875rem' }}>
+    <div style={{ fontSize: '0.875rem', marginBottom: 8, marginTop: 8 }}>
       {current.invoice ? (
         <div style={{ marginBottom: 5 }}>
           <span>{`Invoice No: ${current.invoice.invoiceNo}`}</span>
@@ -148,7 +148,7 @@ export default ({ current, theme }) => {
             <div style={{ marginLeft: -8 }}>
               <span style={{ fontWeight: 500 }}>Invoice Remarks:</span>
               <TextField
-                className={tablestyles.historyText}
+                inputRootCustomClasses={tablestyles.historyText}
                 noUnderline
                 multiline
                 disabled

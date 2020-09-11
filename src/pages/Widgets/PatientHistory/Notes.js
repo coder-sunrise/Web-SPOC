@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import moment from 'moment'
 import { GridContainer, TextField } from '@/components'
 import { scribbleTypes } from '@/utils/codes'
 import tablestyles from './PatientHistoryStyle.less'
@@ -12,12 +13,28 @@ export default ({
   if (fieldName === 'visitRemarks') {
     return (
       <TextField
-        className={tablestyles.historyText}
+        inputRootCustomClasses={tablestyles.historyText}
         noUnderline
         multiline
         disabled
         value={current.visitRemarks || ''}
       />
+    )
+  }
+  if (fieldName === 'visitReferral') {
+    const { referralBy = '', referralInstitution = '', referralDate } = current
+    return (
+      <div style={{ fontSize: '0.875rem', marginLeft: 8 }}>
+        <span>{`Referred By: ${referralBy}`}</span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span>
+          {`Referral Date: ${referralDate
+            ? moment(referralDate).format('DD MMM YYYY')
+            : '-'}`}
+        </span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span>{`Institution: ${referralInstitution}`}</span>
+      </div>
     )
   }
   let e = document.createElement('div')

@@ -1,16 +1,16 @@
 import React from 'react'
 import { Table } from 'antd'
-import moment from 'moment'
 import { downloadAttachment } from '@/services/file'
 import { ATTACHMENT_TYPE } from '@/utils/constants'
 import Download from '@material-ui/icons/GetApp'
 import { Button } from '@/components'
+import { imageFileExtensions } from '@/components/_medisys/AttachmentWithThumbnail/utils'
 import tablestyles from './PatientHistoryStyle.less'
 
-export default ({ current }) => {
+export default ({ current, dispatch }) => {
   const { attachments = [], visitAttachments = [] } = current
   const currentAttachments =
-    attachments.legth > 0 ? attachments : visitAttachments
+    attachments.length > 0 ? attachments : visitAttachments
   const visitAttachment = currentAttachments.filter(
     (item) => item.attachmentType === ATTACHMENT_TYPE.VISIT,
   )
@@ -24,56 +24,49 @@ export default ({ current }) => {
     (item) => item.attachmentType === ATTACHMENT_TYPE.EYEVISUALACUITY,
   )
 
+  const sortAttachments = [
+    ...visitAttachment.map((o) => {
+      return { ...o, type: 'Visit Attachment' }
+    }),
+    ...visitReferralAttachment.map((o) => {
+      return { ...o, type: 'Referral Attachment' }
+    }),
+    ...consultationAttachment.map((o) => {
+      return { ...o, type: 'Consultation Attachment' }
+    }),
+    ...eyeVisualAcuityAttachment.map((o) => {
+      return { ...o, type: 'Visual Acuity Test' }
+    }),
+  ]
   let attachmentColumns = [
     {
-      dataIndex: 'fileName',
-      title: 'Document',
+      dataIndex: 'type',
+      title: 'Type',
+      width: 180,
     },
-    { dataIndex: 'remarks', title: 'Remarks' },
-    { dataIndex: 'createBy', title: 'From' },
-    {
-      dataIndex: '',
-      title: 'Action',
-      width: 60,
-      align: 'center',
-      render: (text, row) => (
-        <Button
-          size='sm'
-          onClick={() => {
-            downloadAttachment(row)
-          }}
-          justIcon
-          color='primary'
-          style={{ marginRight: 5 }}
-        >
-          <Download />
-        </Button>
-      ),
-    },
-  ]
-  let visitReferralAttachmentColumns = [
     {
       dataIndex: 'fileName',
       title: 'Document',
+      render: (text, row) =>
+        imageFileExtensions.includes(row.fileExtension.toLowerCase()) ? (
+          <a
+            onClick={() => {
+              dispatch({
+                type: 'imageViewer/updateState',
+                payload: {
+                  attachment: row,
+                },
+              })
+            }}
+          >
+            {text}
+          </a>
+        ) : (
+          <span>{text}</span>
+        ),
     },
     { dataIndex: 'remarks', title: 'Remarks' },
-    { dataIndex: 'referredBy', title: 'Referred By' },
-    { dataIndex: 'referredInstitution', title: 'Institution' },
-    {
-      dataIndex: 'referredDate',
-      title: 'Referred Date',
-      width: 110,
-      render: (text, row) => (
-        <span>
-          {row.referredDate ? (
-            moment(row.referredDate).format('DD MMM YYYY')
-          ) : (
-            ''
-          )}
-        </span>
-      ),
-    },
-    { dataIndex: 'createBy', title: 'From' },
+    { dataIndex: 'createBy', title: 'From', width: 150 },
     {
       dataIndex: '',
       title: 'Action',
@@ -95,79 +88,18 @@ export default ({ current }) => {
     },
   ]
   return (
-    <div style={{ marginLeft: 8 }}>
-      {visitAttachment.length > 0 && (
-        <div>
-          <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>
-            Visit Attachment
-          </span>
-          <Table
-            size='small'
-            bordered
-            pagination={false}
-            columns={attachmentColumns}
-            dataSource={visitAttachment}
-            rowClassName={(record, index) => {
-              return index % 2 === 0 ? tablestyles.once : tablestyles.two
-            }}
-            className={tablestyles.table}
-          />
-        </div>
-      )}
-      {visitReferralAttachment.length > 0 && (
-        <div style={{ marginTop: 8 }}>
-          <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>
-            Referral Attachment
-          </span>
-          <Table
-            size='small'
-            bordered
-            pagination={false}
-            columns={visitReferralAttachmentColumns}
-            dataSource={visitReferralAttachment}
-            rowClassName={(record, index) => {
-              return index % 2 === 0 ? tablestyles.once : tablestyles.two
-            }}
-            className={tablestyles.table}
-          />
-        </div>
-      )}
-      {consultationAttachment.length > 0 && (
-        <div style={{ marginTop: 8 }}>
-          <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>
-            Consultation Attachment
-          </span>
-          <Table
-            size='small'
-            bordered
-            pagination={false}
-            columns={attachmentColumns}
-            dataSource={consultationAttachment}
-            rowClassName={(record, index) => {
-              return index % 2 === 0 ? tablestyles.once : tablestyles.two
-            }}
-            className={tablestyles.table}
-          />
-        </div>
-      )}
-      {eyeVisualAcuityAttachment.length > 0 && (
-        <div style={{ marginTop: 8 }}>
-          <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>
-            Visual Acuity Test
-          </span>
-          <Table
-            size='small'
-            bordered
-            pagination={false}
-            columns={attachmentColumns}
-            dataSource={eyeVisualAcuityAttachment}
-            rowClassName={(record, index) => {
-              return index % 2 === 0 ? tablestyles.once : tablestyles.two
-            }}
-            className={tablestyles.table}
-          />
-        </div>
-      )}
+    <div style={{ marginBottom: 8, marginTop: 8 }}>
+      <Table
+        size='small'
+        bordered
+        pagination={false}
+        columns={attachmentColumns}
+        dataSource={sortAttachments}
+        rowClassName={(record, index) => {
+          return index % 2 === 0 ? tablestyles.once : tablestyles.two
+        }}
+        className={tablestyles.table}
+      />
     </div>
   )
 }

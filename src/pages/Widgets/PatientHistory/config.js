@@ -21,6 +21,7 @@ export const WIDGETS_ID = {
   REFRACTIONFORM: '16',
   VISITREMARKS: '17',
   VITALSIGN: '18',
+  REFERRAL: '19',
   CONSULTATION_DOCUMENT: '20',
 }
 
@@ -64,6 +65,7 @@ export const historyTags = [
       WIDGETS_ID.EXAMINATIONFORM,
       WIDGETS_ID.VISITREMARKS,
       WIDGETS_ID.VITALSIGN,
+      WIDGETS_ID.REFERRAL,
     ],
   },
   {
@@ -191,6 +193,20 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       loading: Loading,
     }),
   },
+  {
+    id: WIDGETS_ID.REFERRAL,
+    name: 'Referral',
+    authority: '',
+    component: Loadable({
+      loader: () => import('./Notes'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} fieldName='visitReferral' />
+      },
+      loading: Loading,
+    }),
+  },
+
   {
     id: WIDGETS_ID.VITALSIGN,
     name: 'Vital Sign',
@@ -438,9 +454,10 @@ export const showWidget = (current, widget) => {
   // check show attachments
   if (
     widget.id === WIDGETS_ID.ATTACHMENT &&
-    (current.attachment || current.visitAttachments || []).length === 0
-  )
+    (current.attachments || current.visitAttachments || []).length === 0
+  ) {
     return false
+  }
   // check show orders
   if (
     widget.id === WIDGETS_ID.ORDERS &&
@@ -476,5 +493,16 @@ export const showWidget = (current, widget) => {
       current.patientNoteVitalSigns.length === 0)
   )
     return false
+  // check show visit referral
+  if (widget.id === WIDGETS_ID.REFERRAL) {
+    const { referralBy, referralInstitution, referralDate } = current
+    if (
+      (!referralBy || referralBy === '') &&
+      (!referralInstitution || referralInstitution === '') &&
+      !referralDate
+    )
+      return false
+  }
+
   return true
 }

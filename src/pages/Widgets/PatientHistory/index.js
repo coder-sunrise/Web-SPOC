@@ -376,7 +376,14 @@ class PatientHistory extends Component {
 
   getDetailPanel = (history) => {
     const { visitPurposeFK } = history
-    let current = history.patientHistoryDetail || {}
+    let current = {
+      ...history.patientHistoryDetail,
+      visitAttachments: history.visitAttachments,
+      visitRemarks: history.visitRemarks,
+      referredBy: history.referredBy,
+      referredInstitution: history.referredInstitution,
+      referredDate: history.referredDate,
+    }
     let visitDetails = {
       visitDate: history.visitDate,
       patientName: history.patientName,
@@ -385,7 +392,10 @@ class PatientHistory extends Component {
     let currentTagWidgets = this.widgets.filter((_widget) => {
       if (visitPurposeFK === VISIT_TYPE.RETAIL) {
         return (
-          _widget.id === WidgetConfig.WIDGETS_ID.INVOICE &&
+          (_widget.id === WidgetConfig.WIDGETS_ID.INVOICE ||
+            _widget.id === WidgetConfig.WIDGETS_ID.VISITREMARKS ||
+            _widget.id === WidgetConfig.WIDGETS_ID.REFERRAL ||
+            _widget.id === WidgetConfig.WIDGETS_ID.ATTACHMENT) &&
           this.state.selectTag.children.indexOf(_widget.id) >= 0 &&
           WidgetConfig.showWidget(current, _widget)
         )
