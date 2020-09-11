@@ -118,7 +118,7 @@ class SubmittedCHAS extends React.Component {
                   selectable: true,
                   selectConfig: {
                     showSelectAll: true,
-                    rowSelectionEnabled: (row) => row.patientIsActive,
+                    rowSelectionEnabled: () => true,
                   },
                 }}
                 selection={this.state.selectedRows}

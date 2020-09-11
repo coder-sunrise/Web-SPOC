@@ -65,7 +65,7 @@ export const SubmittedCHASColumnExtensions = [
     columnName: 'diagnosis',
     sortingEnabled: false,
     render: (row) => {
-      let diagnoisisList = row.diagnosis.join(", ")
+      let diagnoisisList = row.diagnosis.join(', ')
       return (
         <Tooltip title={diagnoisisList}>
           <span className title={diagnoisisList}>
