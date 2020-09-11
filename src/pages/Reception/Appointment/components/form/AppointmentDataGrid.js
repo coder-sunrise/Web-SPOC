@@ -4,14 +4,18 @@ import moment from 'moment'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common component
-import { FastEditableTableGrid, dateFormat } from '@/components'
+import {
+  FastEditableTableGrid,
+  CommonTableGrid,
+  dateFormat,
+} from '@/components'
 import { AppointmentTypeLabel } from '@/components/_medisys'
+import AuthorizedContext from '@/components/Context/Authorized'
 import {
   AppointmentDataColExtensions,
   AppointmentDataColumn,
 } from './variables'
 import ErrorPopover from './ErrorPopover'
-import AuthorizedContext from '@/components/Context/Authorized'
 
 const styles = () => ({
   container: {
@@ -176,43 +180,50 @@ class AppointmentDataGrid extends React.Component {
       selectedSlot,
     } = this.props
 
+    const tempColumnExtensions = [
+      ...this.columnExtensions,
+      {
+        columnName: 'conflicts',
+        // type: 'error',
+        editingEnabled: false,
+        sortingEnabled: false,
+        disabled: true,
+        width: 60,
+        render: (row) => {
+          if (row.conflicts && row.conflicts.length > 0) {
+            return <ErrorPopover errors={row.conflicts} />
+          }
+
+          return null
+        },
+      },
+    ]
+    const funcProps = {
+      edit: false,
+      pager: false,
+      sort: true,
+      sortConfig: {
+        defaultSorting: [
+          { columnName: 'startTime', direction: 'asc' },
+        ],
+      },
+    }
     return (
       <div className={classes.container}>
-        <AuthorizedContext.Provider
-          value={{ rights: disabled ? 'disable' : 'enable' }}
-        >
+        {disabled ? (
+          <CommonTableGrid
+            rows={data}
+            columns={AppointmentDataColumn}
+            columnExtensions={tempColumnExtensions}
+            FuncProps={funcProps}
+          />
+        ) : (
           <FastEditableTableGrid
             rows={data}
-            disabled={disabled}
+            // disabled={disabled}
             columns={AppointmentDataColumn}
-            columnExtensions={[
-              ...this.columnExtensions,
-              {
-                columnName: 'conflicts',
-                // type: 'error',
-                editingEnabled: false,
-                sortingEnabled: false,
-                disabled: true,
-                width: 60,
-                render: (row) => {
-                  if (row.conflicts && row.conflicts.length > 0) {
-                    return <ErrorPopover errors={row.conflicts} />
-                  }
-
-                  return null
-                },
-              },
-            ]}
-            FuncProps={{
-              edit: false,
-              pager: false,
-              sort: true,
-              sortConfig: {
-                defaultSorting: [
-                  { columnName: 'startTime', direction: 'asc' },
-                ],
-              },
-            }}
+            columnExtensions={tempColumnExtensions}
+            FuncProps={funcProps}
             EditingProps={{
               messages: {
                 deleteCommand: 'Delete appointment slot',
@@ -222,13 +233,12 @@ class AppointmentDataGrid extends React.Component {
                 data.filter((item) => !item.isDeleted).length > 1,
               onCommitChanges: handleCommitChanges,
               onAddedRowsChange: (rows) => {
-                console.log({ rows })
                 return rows
               },
             }}
             schema={validationSchema}
           />
-        </AuthorizedContext.Provider>
+        )}
       </div>
     )
   }

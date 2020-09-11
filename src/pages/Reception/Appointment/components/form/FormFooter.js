@@ -23,6 +23,7 @@ const FormFooter = ({
   disabled = false,
   disabledCheckAvailability = false,
   appointmentStatusFK,
+  patientIsActive = true,
   onClose,
   handleCancelOrDeleteClick,
   handleSaveDraftClick,
@@ -52,7 +53,7 @@ const FormFooter = ({
             color='danger'
             className={classnames(hideCancelAppointmentClass)}
             onClick={handleCancelOrDeleteClick}
-            disabled={disabled || isTurnedUp || isCancelled}
+            disabled={disabled || isTurnedUp || isCancelled || !patientIsActive}
           >
             {isDraft ? ButtonText.DELETE : ButtonText.CANCEL_APPOINTMENT}
           </Button>
@@ -67,7 +68,7 @@ const FormFooter = ({
         {(isNew || isDraft) && (
           <Authorized authority='appointment.appointmentdetails'>
             <Button
-              disabled={disabled}
+              disabled={disabled || !patientIsActive}
               onClick={handleSaveDraftClick}
               color='primary'
             >
@@ -77,7 +78,7 @@ const FormFooter = ({
         )}
         <Authorized authority='appointment.appointmentdetails'>
           <Button
-            disabled={disabled || isTurnedUp}
+            disabled={disabled || isTurnedUp || !patientIsActive}
             onClick={handleConfirmClick}
             color='primary'
           >

@@ -89,7 +89,7 @@ const calculateDuration = (startTime, endTime) => {
 
 const constructDefaultNewRow = (selectedSlot) => {
   let defaultNewRow = { isPrimaryClinician: true, id: getUniqueNumericId() }
-
+  selectedSlot = selectedSlot || {}
   const startTime = moment(selectedSlot.start)
   const selectedEndTime = moment(selectedSlot.end)
 
@@ -147,7 +147,7 @@ export const mapPropsToValues = ({
     bookedByUser: `${_title}${user.clinicianProfile.name}`,
     bookedByUserFK: user.id,
     currentAppointment: {
-      appointmentDate: moment(selectedSlot.start).formatUTC(),
+      appointmentDate: moment((selectedSlot || {}).start).formatUTC(),
       appointments_Resources: [
         constructDefaultNewRow(selectedSlot),
       ],

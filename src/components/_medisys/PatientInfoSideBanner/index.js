@@ -121,17 +121,11 @@ class PatientInfoSideBanner extends PureComponent {
   checkPatientIntoActiveSession = (patientId) => {
     const bizSessionPayload = {
       'Visit.PatientProfileFK': patientId,
-      group: [
-        {
-          'Visit.VisitStatusFKNavigation.Status': 'WAITING',
-          IsClinicSessionClosed: false,
-          combineCondition: 'or',
-        },
-      ],
+      IsClinicSessionClosed: false,
     }
     getBizSession(bizSessionPayload).then((result) => {
       const { data: { totalRecords } } = result
-      this.setState({ patientIntoActiveSession: totalRecords === 0 })
+      this.setState({ patientIntoActiveSession: totalRecords > 0 })
     })
   }
 
@@ -262,7 +256,7 @@ class PatientInfoSideBanner extends PureComponent {
             isEnableScanner
           />
           {allowChangePatientStatus &&
-          this.state.patientIntoActiveSession && (
+          (!this.state.patientIntoActiveSession || !entity.isActive) && (
             <div
               style={{
                 width: 100,
@@ -312,15 +306,17 @@ class PatientInfoSideBanner extends PureComponent {
                         code='ctSchemeType'
                         value={schemeData.schemeTypeFK}
                       />
-                      <IconButton>
-                        <Refresh
-                          onClick={() =>
-                            this.refreshChasBalance(
-                              schemeData.patientCoPaymentSchemeFK,
-                              schemeData.schemeTypeFK,
-                            )}
-                        />
-                      </IconButton>
+                      {entity.isActive && (
+                        <IconButton>
+                          <Refresh
+                            onClick={() =>
+                              this.refreshChasBalance(
+                                schemeData.patientCoPaymentSchemeFK,
+                                schemeData.schemeTypeFK,
+                              )}
+                          />
+                        </IconButton>
+                      )}
 
                       <SchemePopover
                         isShowReplacementModal={
