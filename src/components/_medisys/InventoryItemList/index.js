@@ -346,13 +346,9 @@ class InventoryItemList extends React.Component {
                     } else if (type === 'inventoryconsumable') {
                       uomName = uom.name
                     } else if (type === 'ctservice') {
-                      const suffix = option.serviceCenter
-                        ? `(${option.serviceCenter})`
-                        : ''
-
                       const optDisplay = `${displayValue} - ${code} (${currencySymbol}${unitPrice.toFixed(
                         2,
-                      )}) ${suffix}`
+                      )})`
                       return <span>{optDisplay}</span>
                     } else if (type === 'inventoryorderset') {
                       const optDisplay = `${displayValue} - ${code} (${currencySymbol}${totalPrice.toFixed(
