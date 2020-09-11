@@ -1,6 +1,6 @@
 import React from 'react'
 // formik
-import { FastField } from 'formik'
+import { FastField, Field } from 'formik'
 // custom component
 import {
   GridContainer,
@@ -14,7 +14,7 @@ const AppointmentDate = ({ disabled }) => (
   <React.Fragment>
     <GridItem xs md={3} />
     <GridItem xs md={3}>
-      <FastField
+      <Field
         name='currentAppointment.appointmentDate'
         // validate={this.startDateValidation}
         render={(args) => (

@@ -32,7 +32,7 @@ const compareOperationHour = (value, operationHour = []) => {
   if (operationHour.length === 0) return false
 
   const isBeforeOperationHour = operationHour.reduce((_matched, item) => {
-    const { start, end } = item
+    const { start, end } = item || {}
     if (!start || !end) return false
     const [
       startHour,
@@ -66,7 +66,7 @@ const compareBreakHour = (value, breakHour) => {
 
   const isBreakHour = breakHour.reduce(
     (_matched, item) => {
-      const { start, end } = item
+      const { start, end } = item || {}
       if (!start || !end) return false
       const [
         startHour,

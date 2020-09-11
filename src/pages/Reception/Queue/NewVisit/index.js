@@ -316,6 +316,7 @@ class NewVisit extends PureComponent {
       rights,
       setFieldValue,
       clinicSettings,
+      patientInfo,
     } = this.props
 
     if (expandRefractionForm) {
@@ -342,8 +343,9 @@ class NewVisit extends PureComponent {
       [],
     )
     const isReadOnly =
-      values.visitStatus !== VISIT_STATUS.WAITING &&
-      values.visitStatus !== VISIT_STATUS.UPCOMING_APPT
+      (values.visitStatus !== VISIT_STATUS.WAITING &&
+        values.visitStatus !== VISIT_STATUS.UPCOMING_APPT) ||
+      (!patientInfo || !patientInfo.isActive)
     const isReadonlyAfterSigned =
       clinicSettings.settings.isVisitEditableAfterEndConsultation &&
       values.isLastClinicalObjectRecordSigned
