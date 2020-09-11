@@ -972,8 +972,10 @@ class Medication extends PureComponent {
         {
           columnName: 'inventoryMedicationFK',
           type: 'codeSelect',
-          code: 'inventorymedication',
-          labelField: 'displayValue',
+          // code: 'inventorymedication',
+          // labelField: 'displayValue',
+          labelField: 'combinDisplayValue',
+          options: this.getMedicationOptions,
           sortingEnabled: false,
           onChange: (e) => {
             if (e.option) {
@@ -994,7 +996,7 @@ class Medication extends PureComponent {
         },
         {
           columnName: 'uomfk',
-          width: 80,
+          width: 70,
           type: 'codeSelect',
           code: 'ctMedicationUnitOfMeasurement',
           labelField: 'name',
@@ -1003,7 +1005,7 @@ class Medication extends PureComponent {
         },
         {
           columnName: 'totalPrice',
-          width: 100,
+          width: 95,
           type: 'number',
           currency: true,
           sortingEnabled: false,
@@ -1012,7 +1014,7 @@ class Medication extends PureComponent {
         {
           columnName: 'batchNo',
           type: 'select',
-          width: 120,
+          width: 115,
           sortingEnabled: false,
           mode: 'tags',
           maxSelected: 1,
@@ -1031,7 +1033,7 @@ class Medication extends PureComponent {
         {
           columnName: 'expiryDate',
           type: 'date',
-          width: 120,
+          width: 110,
           sortingEnabled: false,
           isDisabled: (row) => row.inventoryMedicationFK === undefined,
         },
