@@ -342,12 +342,43 @@ class Vaccination extends PureComponent {
   }
 
   validateAndSubmitIfOk = async () => {
-    const { handleSubmit, validateForm } = this.props
+    const { handleSubmit, validateForm, dispatch } = this.props
     const validateResult = await validateForm()
     const isFormValid = _.isEmpty(validateResult)
+
     if (isFormValid) {
-      handleSubmit()
-      return true
+      const { caution = '', code, displayValue } =
+        this.state.selectedVaccination || {}
+
+      if (caution.trim().length > 0) {
+        dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            openConfirm: true,
+            // alignContent: 'left',
+            openConfirmContent: () => {
+              return (
+                <div
+                  style={{
+                    minHeight: 80,
+                    display: 'grid',
+                    alignItems: 'center',
+                  }}
+                >
+                  <p>
+                    <b>{displayValue || code}</b> - {caution}
+                  </p>
+                </div>
+              )
+            },
+            onConfirmSave: handleSubmit,
+            openConfirmText: 'OK',
+          },
+        })
+      } else {
+        handleSubmit()
+        return true
+      }
     }
     return false
   }

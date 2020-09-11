@@ -441,6 +441,7 @@ class OrderSet extends PureComponent {
                 orderTypes.find((type) => type.value === '1').name +
                 (o.inventoryMedication.isActive === true ? '' : ' (Inactive)'),
               isActive: o.inventoryMedication.isActive === true,
+              caution: o.inventoryMedication.caution,
             }
           }),
         )
@@ -457,6 +458,7 @@ class OrderSet extends PureComponent {
                 orderTypes.find((type) => type.value === '2').name +
                 (o.inventoryVaccination.isActive === true ? '' : ' (Inactive)'),
               isActive: o.inventoryVaccination.isActive === true,
+              caution: o.inventoryVaccination.caution,
             }
           }),
         )
@@ -519,12 +521,47 @@ class OrderSet extends PureComponent {
   }
 
   validateAndSubmitIfOk = async () => {
-    const { handleSubmit, validateForm } = this.props
+    const {
+      handleSubmit,
+      validateForm,
+      dispatch,
+      values: { orderSetItems = [] },
+    } = this.props
     const validateResult = await validateForm()
     const isFormValid = _.isEmpty(validateResult)
     if (isFormValid) {
-      handleSubmit()
-      return true
+      const hasCautionItems = orderSetItems.filter(
+        (f) => f.caution && f.caution.trim().length > 0,
+      )
+      if (hasCautionItems.length > 0) {
+        dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            openConfirm: true,
+            alignContent: 'left',
+            openConfirmContent: () => {
+              return (
+                <div
+                  style={{
+                    minHeight: 80,
+                    display: 'grid',
+                    alignItems: 'center',
+                  }}
+                >
+                  {hasCautionItems.map((m) => (
+                    <p>
+                      <b>{m.name}</b> - {m.caution}
+                    </p>
+                  ))}
+                </div>
+              )
+            },
+            // openConfirmContent: `${displayValue || code} - ${caution}`,
+            onConfirmSave: handleSubmit,
+            openConfirmText: 'OK',
+          },
+        })
+      }
     }
     return false
   }

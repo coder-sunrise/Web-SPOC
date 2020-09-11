@@ -5,7 +5,6 @@ import { formatMessage } from 'umi/locale'
 import { FastField } from 'formik'
 import { connect } from 'dva'
 import { compose } from 'redux'
-import Sdd from '../../Sdd'
 import {
   CommonModal,
   CardContainer,
@@ -19,6 +18,7 @@ import {
   dateFormatLong,
   CheckboxGroup,
 } from '@/components'
+import Sdd from '../../Sdd'
 
 const styles = () => ({})
 
@@ -132,7 +132,22 @@ const Detail = ({
                 }}
               />
             </GridItem>
-
+            <GridItem xs={12}>
+              <FastField
+                name='caution'
+                render={(args) => (
+                  <TextField
+                    label={formatMessage({
+                      id: 'inventory.master.vaccination.caution',
+                    })}
+                    multiline
+                    rowsMax='5'
+                    maxLength={200}
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
             <GridItem xs={12} style={{ marginTop: '10px' }} />
           </GridContainer>
         </GridItem>
@@ -222,6 +237,7 @@ const Detail = ({
             </GridItem> */}
           </GridContainer>
         </GridItem>
+
         <GridItem>
           <FastField
             name='chas'
