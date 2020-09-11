@@ -205,10 +205,12 @@ export default createFormViewModel({
               data: response,
             },
           })
-          sendQueueNotification({
-            message: 'Consultation resumed.',
-            queueNo: entity.queueNo,
-          })
+          if (entity) {
+            sendQueueNotification({
+              message: 'Consultation resumed.',
+              queueNo: entity.queueNo,
+            })
+          }
         }
         return response
       },
