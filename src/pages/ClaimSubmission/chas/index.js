@@ -78,7 +78,10 @@ class CHAS extends React.Component {
             id: row.id,
           },
         }).then((r) => {
-          if (r) this.openClaimDetails(allowEdit)
+          if (r) {
+            const { patientDetail = {} } = r
+            this.openClaimDetails(allowEdit && !!patientDetail.isActive)
+          }
         })
         break
       case '1':
@@ -89,7 +92,7 @@ class CHAS extends React.Component {
             id: row.id,
           },
         }).then((r) => {
-          if (r) this.navigateToInvoiceDetails(r.payload)
+          if (r) this.navigateToInvoiceDetails(r)
         })
         break
       default:
@@ -220,7 +223,7 @@ class CHAS extends React.Component {
           ]}
         /> */}
         <CommonModal
-          title='Claim Details'
+          title='Claim Details 1'
           open={showClaimDetails}
           onClose={this.closeClaimDetails}
           onConfirm={this.saveClaimDetails}
