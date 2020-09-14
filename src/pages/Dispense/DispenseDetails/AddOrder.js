@@ -14,7 +14,10 @@ import {
   REVENUE_CATEGORY,
 } from '@/utils/constants'
 import { roundTo, getUniqueId } from '@/utils/utils'
-import { getCautionAlertContent } from '@/pages/Widgets/Orders/utils'
+import {
+  getRetailCautionAlertContent,
+  getCautionAlertContent,
+} from '@/pages/Widgets/Orders/utils'
 import Order from '../../Widgets/Orders'
 
 const styles = () => ({})
@@ -179,25 +182,10 @@ const AddOrder = ({
           type: 'global/updateAppState',
           payload: {
             openConfirm: true,
-            openConfirmContent: getCautionAlertContent(
-              cuationItems,
-              isVaccinationExist.length > 0 && (
-                <div>
-                  <p style={{ fontWeight: 400 }}>
-                    <h4>Vaccination item(s) will not be added.</h4>
-                  </p>
-                  <div style={{ fontSize: '1.3em' }}>
-                    <ul style={{ listStylePosition: 'inside' }}>
-                      {isVaccinationExist.map((item) => (
-                        <li>
-                          <b>{item.subject}</b>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              ),
-            ),
+            openConfirmContent:
+              isVaccinationExist.length > 0
+                ? getRetailCautionAlertContent(cuationItems, isVaccinationExist)
+                : getCautionAlertContent(cuationItems),
             alignContent: 'left',
             isInformType: true,
             onConfirmSave: () => {},

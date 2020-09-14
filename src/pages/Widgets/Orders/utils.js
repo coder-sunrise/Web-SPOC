@@ -1,3 +1,5 @@
+import { Divider } from '@material-ui/core'
+
 const getCautionAlertContent = (cuationItems, subContents) => () => {
   return (
     <div
@@ -24,6 +26,75 @@ const getCautionAlertContent = (cuationItems, subContents) => () => {
         </div>
       ))}
       {subContents}
+    </div>
+  )
+}
+
+const getRetailCautionAlertContent = (
+  cuationItems = [],
+  ignoreVaccinationItems = [],
+) => () => {
+  return (
+    <div
+      style={{
+        minHeight: 80,
+        display: 'grid',
+        alignItems: 'center',
+      }}
+    >
+      <div style={{ margin: 5 }}>
+        {cuationItems.length > 0 && (
+          <div>
+            <p>
+              <h4 style={{ fontWeight: 400 }}>Caution</h4>
+            </p>
+          </div>
+        )}
+
+        {cuationItems.map((m) => (
+          <div
+            style={{
+              display: 'flex',
+              marginLeft: 20,
+              marginTop: 5,
+              marginBottom: 5,
+            }}
+          >
+            <div
+              style={{
+                width: 150,
+                textAlign: 'left',
+                display: 'inline-table',
+              }}
+            >
+              <span>
+                <b>{m.subject} - </b>
+              </span>
+            </div>
+            <div style={{ textAlign: 'left' }}>{m.caution}</div>
+          </div>
+        ))}
+      </div>
+      {ignoreVaccinationItems.length > 0 &&
+      cuationItems.length > 0 && (
+        <Divider light style={{ marginBottom: 10, marginTop: 10 }} />
+      )}
+      {ignoreVaccinationItems.length > 0 && (
+        <div style={{ marginLeft: 5, marginRight: 5 }}>
+          <p>
+            <h4 style={{ fontWeight: 400 }}>
+              Vaccination item(s) will not be added.
+            </h4>
+          </p>
+          <div style={{ marginLeft: 20 }}>
+            {ignoreVaccinationItems.map((item) => (
+              <span>
+                <b>{item.subject}</b>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -67,4 +138,5 @@ export {
   getCautionAlertContent,
   openCautionAlertPrompt,
   openCautionAlertOnStartConsultation,
+  getRetailCautionAlertContent,
 }
