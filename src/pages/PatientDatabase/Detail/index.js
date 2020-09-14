@@ -102,7 +102,7 @@ class PatientDetail extends PureComponent {
 
   constructor (props) {
     super(props)
-    let schemas = schema(props).demographic
+    let schemas = schema(props)
     this.widgets = [
       {
         id: '1',
