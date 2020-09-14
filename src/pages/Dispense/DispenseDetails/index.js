@@ -348,6 +348,7 @@ const DispenseDetails = ({
             <TableData
               title='Prescription'
               idPrefix='prescription'
+              forceRender
               columns={PrescriptionColumns}
               colExtensions={PrescriptionColumnExtensions(
                 viewOnly,
