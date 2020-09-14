@@ -18,11 +18,12 @@ import {
   DatePicker,
   RadioGroup,
   CheckboxGroup,
+  Switch,
 } from '@/components'
 import { getUniqueNumericId } from '@/utils/utils'
 import { queryList } from '@/services/patient'
-import Address from './Address'
 import { MobileNumberInput } from '@/components/_medisys'
+import Address from './Address'
 
 const styles = () => ({
   contactIcon: {

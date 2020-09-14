@@ -121,7 +121,9 @@ const VisitStatusTag = (props) => {
       className={classnames({
         ...cssClass,
       })}
-      onClick={statusTagClicked ? undefined : handleClick}
+      onClick={
+        statusTagClicked || !row.patientIsActive ? undefined : handleClick
+      }
       onDoubleClick={handleDoubleClick}
     >
       <span>

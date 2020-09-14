@@ -5,9 +5,9 @@ import { CardContainer, GridContainer, GridItem } from '@/components'
 import { podoOrderType, inventoryItemListing } from '@/utils/codes'
 import { getServices } from '@/utils/codetable'
 import Authorized from '@/utils/Authorized'
+import { currencySymbol } from '@/utils/config'
 
 import InventoryType from './InventoryType'
-import { AuthorizationWrapper } from '@/components/_medisys'
 
 const styles = () => ({
   displayDiv: {
@@ -68,6 +68,7 @@ const InventoryTypeListing = ({
     quantity: Yup.number().required().min(1),
   })
   const serviceSchema = Yup.object().shape({
+    serviceFK: Yup.number().required(),
     serviceCenterServiceFK: Yup.number().required(),
     serviceName: Yup.number().required(),
     quantity: Yup.number().required().min(1),
@@ -144,16 +145,6 @@ const InventoryTypeListing = ({
       setServicess(services)
       setServiceCenterss(serviceCenters)
       setServiceCenterServicess(serviceCenterServices)
-      // if (
-      //   orderSetDetail.entity &&
-      //   orderSetDetail.entity.serviceOrderSetItem.length > 0
-      // ) {
-      //   serviceOrderSetItem.forEach((o) => {
-      //     o.serviceName = serviceCenterServices.find(
-      //       (i) => i.serviceCenter_ServiceId === o.serviceCenterServiceFK,
-      //     ).serviceCenterId
-      //   })
-      // }
     })
 
     podoOrderType.forEach((x) => {
@@ -164,6 +155,7 @@ const InventoryTypeListing = ({
         },
       }).then((list) => {
         const { inventoryItemList } = inventoryItemListing(list)
+
         switch (x.stateName) {
           case 'ConsumableItemList': {
             return setConsumableList(inventoryItemList)
@@ -180,14 +172,6 @@ const InventoryTypeListing = ({
         }
       })
     })
-
-    // dispatch({
-    //   // force current edit row components to update
-    //   type: 'global/updateState',
-    //   payload: {
-    //     commitCount: (commitCount += 1),
-    //   },
-    // })
   }
 
   useEffect(
@@ -287,51 +271,6 @@ const InventoryTypeListing = ({
       serviceRows,
     ],
   )
-
-  // useEffect(
-  //   () => {
-  //     if (serviceRows.length > 0 && serviceCenterServicess.length > 0) {
-  //       const newServiceRows = serviceRows.map((o) => {
-  //         if (o.tempServiceCenterServiceFK) {
-  //           return {
-  //             ...o,
-  //           }
-  //         }
-  //         return {
-  //           ...o,
-  //           serviceCenterServiceFK: serviceCenterServicess.find(
-  //             (s) => s.serviceCenter_ServiceId === o.serviceCenterServiceFK,
-  //           ).serviceId,
-  //           serviceName: serviceCenterServicess.find(
-  //             (s) => s.serviceCenter_ServiceId === o.serviceCenterServiceFK,
-  //           ).serviceCenterId,
-  //         }
-  //       })
-
-  //       setServiceRows(newServiceRows)
-
-  //       dispatch({
-  //         // force current edit row components to update
-  //         type: 'global/updateState',
-  //         payload: {
-  //           commitCount: (commitCount += 1),
-  //         },
-  //       })
-  //       dispatch({
-  //         type: 'orderSetDetail/updateState',
-  //         payload: {
-  //           entity: {
-  //             ...values,
-  //             serviceOrderSetItem: newServiceRows,
-  //           },
-  //         },
-  //       })
-  //     }
-  //   },
-  //   [
-  //     serviceCenterServicess,
-  //   ],
-  // )
 
   const onCommitChanges = (type) => ({ rows, deleted, added, changed }) => {
     if (deleted) {
@@ -457,17 +396,6 @@ const InventoryTypeListing = ({
       const edittedType = getType(type)
 
       const newRows = rows.map((item) => {
-        // const {
-        //   medicationName,
-        //   inventoryMedication,
-        //   consumableName,
-        //   inventoryConsumable,
-        //   vaccinationName,
-        //   inventoryVaccination,
-        //   service,
-        //   ...restFields
-        // } = item
-
         let tempServiceCenterServiceFK
         const tempServiceId = serviceFK || item.serviceCenterServiceFK
         const tempServiceCenterId = serviceCenterFK || item.serviceName
@@ -486,7 +414,6 @@ const InventoryTypeListing = ({
           ...item,
           tempServiceCenterServiceFK,
         }
-
         return obj
       })
 
@@ -494,68 +421,18 @@ const InventoryTypeListing = ({
       setServiceFK()
       edittedType.setStateRow(newRows)
       return setFieldValue(`${type}`, newRows)
-
-      // Object.entries(changed).map(([ key, value,
-      // ]) => {
-
-      //   const newArray = edittedType.stateRows.map((item) => {
-      //     if (item.id === parseInt(key, 10)) {
-      //       const {
-      //         medicationName,
-      //         inventoryMedication,
-      //         consumableName,
-      //         inventoryConsumable,
-      //         vaccinationName,
-      //         inventoryVaccination,
-      //         service,
-      //         ...restFields
-      //       } = item
-
-      //       let tempServiceCenterServiceFK
-      //       const tempServiceId = serviceFK || item.serviceCenterServiceFK
-      //       const tempServiceCenterId = serviceCenterFK || item.serviceName
-      //       const serviceCenterService =
-      //         serviceCenterServicess.find(
-      //           (o) =>
-      //             o.serviceId === tempServiceId &&
-      //             o.serviceCenterId === tempServiceCenterId,
-      //         ) || {}
-      //       if (serviceCenterService) {
-      //         tempServiceCenterServiceFK =
-      //           serviceCenterService.serviceCenter_ServiceId
-      //       }
-      //       console.log('asds', restFields)
-
-      //       const obj = {
-      //         ...restFields,
-      //         // ...value,
-      //         tempServiceCenterServiceFK,
-      //       }
-      //       console.log('obj', obj)
-
-      //       return obj
-      //     }
-      //     return item
-      //   })
-      //   setServiceCenterFK()
-      //   setServiceFK()
-      //   edittedType.setStateRow(newArray)
-      //   return setFieldValue(`${type}`, newArray)
-      // })
     }
   }
 
   const getServiceCenterService = (row) => {
-    const { serviceCenterServiceFK, serviceName } = row
-    if (!serviceCenterServiceFK || !serviceName) {
+    const { servicefk = serviceFK, serviceName } = row
+    if (!servicefk || !serviceName) {
       setSelectedItem({})
       return
     }
     const serviceCenterService =
       serviceCenterServicess.find(
-        (o) =>
-          o.serviceId === serviceCenterServiceFK &&
-          o.serviceCenterId === serviceName,
+        (o) => o.serviceId === servicefk && o.serviceCenterId === serviceName,
       ) || {}
     if (serviceCenterService) {
       row.unitPrice = serviceCenterService.unitPrice
@@ -571,48 +448,30 @@ const InventoryTypeListing = ({
     if (addedRows.length > 0) {
       const newRow = addedRows[0]
 
-      const {
-        quantity,
-        unitPrice,
-        serviceCenterServiceFK,
-        serviceName,
-      } = newRow
+      const { servicefk = serviceFK, serviceName } = newRow
 
-      // const total = () => {
-      //   if (quantity && unitPrice) {
-      //     return quantity * unitPrice
-      //   }
-      //   return 0.0
-      // }
       if (type === 'service') {
-        if (serviceCenterServiceFK && serviceName) {
+        if (servicefk && serviceName) {
           const returnRow = addedRows.map((row) => ({
             ...row,
-            // subTotal: total(),
           }))
           return returnRow
         }
 
         return addedRows.map((row) => ({
           ...row,
-          quantity: undefined,
-          unitPrice: undefined,
-          subTotal: undefined,
-          // subTotal: total(),
         }))
       }
 
       if (selectedItem) {
         return addedRows.map((row) => ({
           ...row,
-          // subTotal: total(),
         }))
       }
     }
     return addedRows.map((row) => {
       return {
         ...row,
-        subTotal: 0,
       }
     })
   }
@@ -621,17 +480,9 @@ const InventoryTypeListing = ({
     const { option, row } = e
     const { sellingPrice } = option
     setSelectedItem(option)
-    row.quantity = undefined
+    row.quantity = 1
     row.unitPrice = sellingPrice
-    row.subTotal = 0
-
-    // dispatch({
-    //   // force current edit row components to update
-    //   type: 'global/updateState',
-    //   payload: {
-    //     commitCount: (commitCount += 1),
-    //   },
-    // })
+    row.subTotal = row.quantity * row.unitPrice
   }
 
   const medicationProps = {
@@ -646,7 +497,7 @@ const InventoryTypeListing = ({
       {
         columnName: 'inventoryMedicationFK',
         type: 'select',
-        labelField: 'name',
+        labelField: 'displayValue', // name
         options: medicationList,
         onChange: handleItemOnChange,
       },
@@ -685,7 +536,7 @@ const InventoryTypeListing = ({
       {
         columnName: 'inventoryVaccinationFK',
         type: 'select',
-        labelField: 'name',
+        labelField: 'displayValue',
         options: vaccinationList,
         onChange: handleItemOnChange,
       },
@@ -725,7 +576,7 @@ const InventoryTypeListing = ({
       {
         columnName: 'inventoryConsumableFK',
         type: 'select',
-        labelField: 'name',
+        labelField: 'displayValue',
         options: consumableList,
         onChange: handleItemOnChange,
       },
@@ -756,7 +607,7 @@ const InventoryTypeListing = ({
 
   const serviceProps = {
     columns: [
-      { name: 'serviceCenterServiceFK', title: 'Service' },
+      { name: 'serviceFK', title: 'Service' },
       { name: 'serviceName', title: 'Service Center' },
       { name: 'quantity', title: 'Quantity' },
       { name: 'unitPrice', title: 'Unit Price' },
@@ -765,74 +616,89 @@ const InventoryTypeListing = ({
 
     columnExtensions: [
       {
-        columnName: 'serviceCenterServiceFK',
+        columnName: 'serviceFK',
         type: 'select',
+        labelField: 'displayValue',
         options: (row) => {
+          let options = []
           const tempArray = [
             ...servicess,
           ]
           if (!row.serviceName) {
-            return tempArray
+            options = tempArray
+          } else {
+            options = tempArray.filter((o) =>
+              o.serviceCenters.find((m) => m.value === row.serviceName),
+            )
           }
-          const options = tempArray.filter((o) =>
-            o.serviceCenters.find((m) => m.value === row.serviceName),
-          )
-          return options
-          // return tempArray.filter(
-          //   (o) =>
-          //     !serviceCenterFK ||
-          //     o.serviceCenters.find((m) => m.value === serviceCenterFK),
-          // )
+          return options.map((m) => {
+            const defaultServiceCenter =
+              m.serviceCenters.find((o) => o.isDefault) || {}
+            const { unitPrice = 0 } = defaultServiceCenter
+            return {
+              ...m,
+              displayValue: `${m.name} - ${m.code} (${currencySymbol}${unitPrice.toFixed(
+                2,
+              )})`,
+            }
+          })
         },
         onChange: (e) => {
           setServiceFK(e.val)
           handleItemOnChange
           getServiceCenterService(e.row)
-          e.row.serviceCenterServiceFK = e.val
-          // dispatch({
-          //   // force current edit row components to update
-          //   type: 'global/updateState',
-          //   payload: {
-          //     commitCount: (commitCount += 1),
-          //   },
-          // })
+          if (!e.row.quantity) {
+            e.row.quantity = 1
+          }
+          const serviceCenterService = serviceCenterServicess.find(
+            (o) => o.serviceId === e.val && o.isDefault,
+          )
+          if (serviceCenterService) {
+            e.row.unitPrice = serviceCenterService.unitPrice
+            e.row.serviceName = serviceCenterService.serviceCenterId
+            e.row.subTotal = e.row.quantity * serviceCenterService.unitPrice
+            e.row.serviceCenterServiceFK =
+              serviceCenterService.serviceCenter_ServiceId
+          }
+          calSubtotal
         },
       },
       {
         columnName: 'serviceName',
         type: 'select',
         options: (row) => {
+          let options = []
           const tempArray = [
             ...serviceCenterss,
           ]
-          if (!row.serviceCenterServiceFK) {
-            return tempArray
+          if (!row.serviceFK) {
+            options = tempArray
           }
-          const options = tempArray.filter((o) =>
-            o.services.find((m) => m.value === row.serviceCenterServiceFK),
+          options = tempArray.filter((o) =>
+            o.services.find((m) => m.value === row.serviceFK),
           )
           return options
-          // return tempArray.filter(
-          //   (o) =>
-          //     !serviceFK ||
-          //     o.services.find(
-          //       (m) => m.value === serviceFK || m.value === row.serviceName,
-          //     ),
-          // )
         },
-
         onChange: (e) => {
           setServiceCenterFK(e.val)
           handleItemOnChange
           getServiceCenterService(e.row)
           e.row.serviceName = e.val
-          // dispatch({
-          //   // force current edit row components to update
-          //   type: 'global/updateState',
-          //   payload: {
-          //     commitCount: (commitCount += 1),
-          //   },
-          // })
+          let originServiceCenterService = serviceCenterServicess.find(
+            (o) => o.serviceCenter_ServiceId === e.row.serviceCenterServiceFK,
+          )
+          const serviceCenterService = serviceCenterServicess.find(
+            (o) =>
+              o.serviceId === originServiceCenterService.serviceId &&
+              o.serviceCenterId === e.val,
+          )
+          if (serviceCenterService) {
+            e.row.unitPrice = serviceCenterService.unitPrice
+            e.row.subTotal = e.row.quantity * serviceCenterService.unitPrice
+            e.row.serviceCenterServiceFK =
+              serviceCenterService.serviceCenter_ServiceId
+          }
+          calSubtotal
         },
       },
       {

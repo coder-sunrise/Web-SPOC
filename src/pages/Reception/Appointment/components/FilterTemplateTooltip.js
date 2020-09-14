@@ -33,6 +33,7 @@ const Templates = ({
   filterByDoctor,
   filterByApptType,
   handleFilterTemplate,
+  handleApplyTemplate,
 }) => {
   const [
     templateName,
@@ -133,6 +134,12 @@ const Templates = ({
         id: selectedTemplateId,
       },
     })
+    const selectedTemplate = filterTemplates.find(
+      (template) => template.id === selectedTemplateId,
+    )
+    if (selectedTemplate) {
+      handleApplyTemplate(selectedTemplate)
+    }
   }
 
   return (

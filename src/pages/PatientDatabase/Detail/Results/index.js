@@ -1,4 +1,4 @@
-import React, { PureComponent,Fragment } from 'react'
+import React, { PureComponent, Fragment } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import { CardContainer } from '@/components'
@@ -15,7 +15,6 @@ const styles = () => ({
 })
 
 class Results extends PureComponent {
-
   componentDidMount () {
     this.resize()
     window.addEventListener('resize', this.resize.bind(this))
@@ -35,17 +34,18 @@ class Results extends PureComponent {
   }
 
   render () {
-
+    const { patient: { entity } } = this.props
+    const isPatientInactive = !entity || !entity.isActive
     return (
       <div>
-        <CardContainer
-          hideHeader
-          size='sm'
-        >
-          <LabTrackingDetails resultType={PATIENT_LAB.PATIENT_PROFILE} />
+        <CardContainer hideHeader size='sm'>
+          <LabTrackingDetails
+            isPatientInactive={isPatientInactive}
+            resultType={PATIENT_LAB.PATIENT_PROFILE}
+          />
         </CardContainer>
       </div>
-        )
+    )
   }
 }
 

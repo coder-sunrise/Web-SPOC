@@ -24,6 +24,7 @@ import PatientProfile from '@/pages/PatientDatabase/Detail'
 import { getAppendUrl } from '@/utils/utils'
 import { APPOINTMENT_STATUS, APPOINTMENT_CANCELLEDBY } from '@/utils/constants'
 import { getBizSession } from '@/services/queue'
+import Authorized from '@/utils/Authorized'
 import AppointmentHistory from './AppointmentHistory'
 import PatientSearchModal from '../../PatientSearch'
 import DeleteConfirmation from './DeleteConfirmation'
@@ -915,31 +916,47 @@ class Form extends React.PureComponent {
   shouldDisableButtonAction = () => {
     const { values } = this.props
     const { isDataGridValid } = this.state
-    if (!isDataGridValid || !values.patientName || !values.patientContactNo)
+    if (
+      !isDataGridValid ||
+      !values.patientName ||
+      values.patientContactNo === undefined ||
+      values.patientContactNo === null
+    )
       return true
 
     return false
   }
 
   shouldDisableCheckAvailabilityButtonAction = () => {
+    const { patientProfile, values = {} } = this.props
     const { isDataGridValid } = this.state
-
-    if (!isDataGridValid) return true
+    const patientIsActive =
+      values.patientProfileFK > 0
+        ? patientProfile && patientProfile.isActive
+        : true
+    if (!isDataGridValid || !patientIsActive) return true
 
     return false
   }
 
   shouldDisableDatagrid = () => {
-    const { values } = this.props
+    const { values, patientProfile } = this.props
 
     const { currentAppointment = {} } = values
+    const patientIsActive =
+      values.patientProfileFK > 0
+        ? patientProfile && patientProfile.isActive
+        : true
 
     const _disabledStatus = [
       APPOINTMENT_STATUS.CANCELLED,
       APPOINTMENT_STATUS.TURNEDUP,
       APPOINTMENT_STATUS.TURNEDUPLATE,
     ]
-    if (_disabledStatus.includes(currentAppointment.appointmentStatusFk))
+    if (
+      _disabledStatus.includes(currentAppointment.appointmentStatusFk) ||
+      !patientIsActive
+    )
       return true
     return false
   }
@@ -971,6 +988,7 @@ class Form extends React.PureComponent {
       selectedSlot,
       height,
       onHistoryRowSelected,
+      patientProfile,
     } = this.props
 
     const {
@@ -982,6 +1000,11 @@ class Form extends React.PureComponent {
       datagrid,
       editingRows,
     } = this.state
+
+    const patientIsActive =
+      values.patientProfileFK > 0
+        ? patientProfile && patientProfile.isActive
+        : true
 
     const { currentAppointment = {} } = values
     const disablePatientInfo = this.shouldDisablePatientInfo()
@@ -1001,7 +1024,8 @@ class Form extends React.PureComponent {
 
     const show =
       loading.effects['patientSearch/query'] || loading.models.calendar
-    const _disableAppointmentDate = this.shouldDisableAppointmentDate()
+    const _disableAppointmentDate =
+      this.shouldDisableAppointmentDate() || !patientIsActive
 
     return (
       <LoadingWrapper loading={show} text='Loading...'>
@@ -1032,6 +1056,7 @@ class Form extends React.PureComponent {
                     patientContactNo={values.patientContactNo}
                     patientName={values.patientName}
                     patientProfileFK={values.patientProfileFK}
+                    patientIsActive={patientIsActive}
                     appointmentStatusFK={currentAppointment.appointmentStatusFk}
                     values={values}
                     hasActiveSession={this.state.hasActiveSession}
@@ -1076,12 +1101,14 @@ class Form extends React.PureComponent {
                     />
                   </GridItem>
                 </GridItem>
+
                 <GridItem xs md={12} className={classes.footerGrid}>
                   <FormFooter
                     // isNew={slotInfo.type === 'add'}
                     appointmentStatusFK={currentAppointment.appointmentStatusFk}
                     onClose={onClose}
                     disabled={disableFooterButton}
+                    patientIsActive={patientIsActive}
                     disabledCheckAvailability={
                       disableCheckAvailabilityFooterButton
                     }
@@ -1107,7 +1134,6 @@ class Form extends React.PureComponent {
                 </CardContainer>
               </GridItem>
             </GridContainer>
-
             <CommonModal
               open={showSearchPatientModal}
               title='Search Patient'

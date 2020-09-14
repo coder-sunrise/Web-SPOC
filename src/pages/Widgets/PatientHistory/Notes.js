@@ -1,6 +1,8 @@
 import _ from 'lodash'
-import { GridContainer } from '@/components'
+import moment from 'moment'
+import { GridContainer, TextField } from '@/components'
 import { scribbleTypes } from '@/utils/codes'
+import tablestyles from './PatientHistoryStyle.less'
 
 export default ({
   classes,
@@ -8,6 +10,33 @@ export default ({
   scribbleNoteUpdateState,
   fieldName = '',
 }) => {
+  if (fieldName === 'visitRemarks') {
+    return (
+      <TextField
+        inputRootCustomClasses={tablestyles.historyText}
+        noUnderline
+        multiline
+        disabled
+        value={current.visitRemarks || ''}
+      />
+    )
+  }
+  if (fieldName === 'visitReferral') {
+    const { referralBy = '', referralInstitution = '', referralDate } = current
+    return (
+      <div style={{ fontSize: '0.875rem', marginLeft: 8 }}>
+        <span>{`Referred By: ${referralBy}`}</span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span>
+          {`Referral Date: ${referralDate
+            ? moment(referralDate).format('DD MMM YYYY')
+            : '-'}`}
+        </span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span>{`Institution: ${referralInstitution}`}</span>
+      </div>
+    )
+  }
   let e = document.createElement('div')
   e.innerHTML = current[fieldName]
   let htmlData = e.childNodes.length === 0 ? '' : e.childNodes[0].nodeValue
@@ -51,6 +80,7 @@ export default ({
       <div
         style={{
           margin: 10,
+          fontSize: '0.875rem',
         }}
       >
         <span>{o.subject}</span>
@@ -81,6 +111,7 @@ export default ({
     <div>
       {current[fieldName] !== undefined ? (
         <div
+          style={{ fontSize: '0.875rem' }}
           className={classes.paragraph}
           dangerouslySetInnerHTML={{ __html: htmlData }}
         />

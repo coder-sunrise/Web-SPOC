@@ -83,6 +83,7 @@ const styles = (theme) => ({
     codetable,
     user,
     scriblenotes,
+    patient,
   }) => ({
     patientHistory,
     clinicSettings,
@@ -90,6 +91,7 @@ const styles = (theme) => ({
     user,
     clinicInfo,
     scriblenotes,
+    patient,
   }),
 )
 @withFormikExtend({
@@ -179,6 +181,7 @@ class PatientHistory extends Component {
       codetable,
       user,
       clinicSettings,
+      patient: { entity },
     } = this.props
     const { location } = window
     const {
@@ -196,6 +199,7 @@ class PatientHistory extends Component {
     const { patientID } = patientHistory
     const fromConsultation = location.pathname.includes('consultation')
     const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
+    const patientIsActive = entity && entity.isActive
     const docotrName = userName
       ? `${userTitle || ''} ${userName || ''}`
       : undefined
@@ -269,7 +273,8 @@ class PatientHistory extends Component {
               alignItems: 'center',
             }}
           >
-            {!isRetailVisit &&
+            {patientIsActive &&
+            !isRetailVisit &&
             !fromConsultation && (
               <Authorized authority='patientdashboard.editconsultation'>
                 <Tooltip title='Edit Consultation'>
@@ -337,7 +342,8 @@ class PatientHistory extends Component {
               </Authorized>
             )}
           </div>
-          {settings.showConsultationVersioning && (
+          {settings.showConsultationVersioning &&
+          !isRetailVisit && (
             <div
               style={{
                 marginLeft: 'auto',
@@ -370,7 +376,14 @@ class PatientHistory extends Component {
 
   getDetailPanel = (history) => {
     const { visitPurposeFK } = history
-    let current = history.patientHistoryDetail || {}
+    let current = {
+      ...history.patientHistoryDetail,
+      visitAttachments: history.visitAttachments,
+      visitRemarks: history.visitRemarks,
+      referredBy: history.referredBy,
+      referredInstitution: history.referredInstitution,
+      referredDate: history.referredDate,
+    }
     let visitDetails = {
       visitDate: history.visitDate,
       patientName: history.patientName,
@@ -379,7 +392,10 @@ class PatientHistory extends Component {
     let currentTagWidgets = this.widgets.filter((_widget) => {
       if (visitPurposeFK === VISIT_TYPE.RETAIL) {
         return (
-          _widget.id === WidgetConfig.WIDGETS_ID.INVOICE &&
+          (_widget.id === WidgetConfig.WIDGETS_ID.INVOICE ||
+            _widget.id === WidgetConfig.WIDGETS_ID.VISITREMARKS ||
+            _widget.id === WidgetConfig.WIDGETS_ID.REFERRAL ||
+            _widget.id === WidgetConfig.WIDGETS_ID.ATTACHMENT) &&
           this.state.selectTag.children.indexOf(_widget.id) >= 0 &&
           WidgetConfig.showWidget(current, _widget)
         )

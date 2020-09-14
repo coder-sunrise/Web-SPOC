@@ -927,7 +927,6 @@ const ApplyClaims = ({
           onClose={toggleAddPaymentModal}
           invoicePayerName={selectInvoicePayer.invoicePayerName}
           invoicePayment={[]}
-          showPaymentDate
           invoice={{
             ...selectInvoicePayer.invoicePayerPayment,
           }}

@@ -1,6 +1,7 @@
 import React from 'react'
-import {Tooltip} from '@/components'
+import { Tooltip } from '@/components'
 import NumberInput from '@/components/NumberInput'
+import Warining from '@material-ui/icons/Error'
 
 export const ApprovedCHASColumns = [
   {
@@ -77,10 +78,33 @@ export const ApprovedCHASColumnExtensions = [
     sortBy: 'DoctorProfileFKNavigation.ClinicianProfile.Name',
   },
   {
+    columnName: 'patientName',
+    render: (row) => {
+      return (
+        <Tooltip
+          title={
+            row.patientIsActive ? (
+              row.patientName
+            ) : (
+              'This patient has been inactived.'
+            )
+          }
+        >
+          <span>
+            {!row.patientIsActive && (
+              <Warining color='error' style={{ marginRight: 5 }} />
+            )}
+            {row.patientName}
+          </span>
+        </Tooltip>
+      )
+    },
+  },
+  {
     columnName: 'diagnosis',
     sortingEnabled: false,
     render: (row) => {
-      let diagnoisisList = row.diagnosis.join(", ")
+      let diagnoisisList = row.diagnosis.join(', ')
       return (
         <Tooltip title={diagnoisisList}>
           <span className title={diagnoisisList}>
@@ -118,10 +142,17 @@ export const ApprovedCHASColumnExtensions = [
     currency: true,
     sortingEnabled: false,
     render: (row) => {
-      if(row.chasClaimStatusDescription==='Paid')
-        return (<NumberInput currency text value={row.collectedPayment} rightAlign readonly />)
+      if (row.chasClaimStatusDescription === 'Paid')
+        return (
+          <NumberInput
+            currency
+            text
+            value={row.collectedPayment}
+            rightAlign
+            readonly
+          />
+        )
       return '-'
-
     },
   },
   {
@@ -130,9 +161,17 @@ export const ApprovedCHASColumnExtensions = [
     currency: true,
     sortBy: 'ApprovedAmt',
     render: (row) => {
-       if(row.chasClaimStatusDescription==='Paid')
-         return (<NumberInput currency text value={row.approvedAmount} rightAlign readonly />)
-       return '-'
+      if (row.chasClaimStatusDescription === 'Paid')
+        return (
+          <NumberInput
+            currency
+            text
+            value={row.approvedAmount}
+            rightAlign
+            readonly
+          />
+        )
+      return '-'
     },
   },
 ]

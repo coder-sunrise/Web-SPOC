@@ -18,6 +18,8 @@ const DepositGrid = ({
   transactionList = [],
   handlePrint,
   handleDeleteRow,
+  hasActiveSession,
+  isReadOnly,
 }) => {
   const getDeleteStyle = (row) => {
     return {
@@ -25,7 +27,9 @@ const DepositGrid = ({
     }
   }
   const configs = {
-    rows: transactionList,
+    rows: transactionList.map((o) => {
+      return { ...o, hasActiveSession }
+    }),
     columns: [
       { name: 'transactionDate', title: 'Date' },
       { name: 'transactionTypeName', title: 'Type' },
@@ -124,7 +128,8 @@ const DepositGrid = ({
           } = row
           const isDeposit = transactionTypeFK === 1 //
           const isRefund = transactionTypeFK === 2
-          const isEnableDelete = isDeposit && refundableBalance >= amount
+          const isEnableDelete =
+            isDeposit && refundableBalance >= amount && !isReadOnly
           const isEnablePrint = isDeposit || isRefund
           return (
             !isCancelled && (
@@ -150,6 +155,7 @@ const DepositGrid = ({
                       size='sm'
                       justIcon
                       color='danger'
+                      disabled={!row.hasActiveSession}
                       style={{ marginRight: 0, width: 25 }}
                       onClick={() => {
                         handleDeleteRow(row)
