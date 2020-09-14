@@ -15,16 +15,16 @@ import {
   Button,
 } from '@/components'
 // sub components
+import { ReportViewer } from '@/components/_medisys'
+import { getBizSession } from '@/services/queue'
+import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 import AddCrNote from '../../components/modal/AddCrNote'
 import Transfer from '../../components/modal/Transfer'
 import WriteOff from '../../components/modal/WriteOff'
 import PaymentCard from './PaymentCard'
 import DeleteConfirmation from '../../components/modal/DeleteConfirmation'
-import { ReportViewer } from '@/components/_medisys'
 // styles
 import styles from './styles'
-import { getBizSession } from '@/services/queue'
-import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
 const defaultPatientPayment = {
   id: undefined,
@@ -411,7 +411,13 @@ class PaymentDetails extends Component {
 
   render () {
     // console.log('PaymentIndex', this.props)
-    const { classes, values, readOnly, invoicePayment } = this.props
+    const {
+      classes,
+      values,
+      readOnly,
+      patientIsActive,
+      invoicePayment,
+    } = this.props
     const { hasActiveSession } = this.state
     const paymentActionsProps = {
       handleAddPayment: this.onAddPaymentClick,
@@ -470,6 +476,7 @@ class PaymentDetails extends Component {
                   invoicePayerFK={payment.id}
                   actions={paymentActionsProps}
                   readOnly={readOnly}
+                  patientIsActive={patientIsActive}
                   hasActiveSession={hasActiveSession}
                 />
               )

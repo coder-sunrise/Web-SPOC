@@ -301,6 +301,7 @@ class TextField extends React.PureComponent {
 
     return (
       <BaseInput
+        inputRootCustomClasses={inputRootCustomClasses}
         {...resetProps}
         {...cfg}
         // isDebouncing={this.state.isDebouncing}

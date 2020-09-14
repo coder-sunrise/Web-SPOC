@@ -1,4 +1,4 @@
- import { createListViewModel } from 'medisys-model'
+import { createListViewModel } from 'medisys-model'
 import * as service from '../services'
 
 export default createListViewModel({
@@ -9,6 +9,7 @@ export default createListViewModel({
     state: {
       fixedFilter: {
         status: 'New',
+        'PatientProfileFKNavigation.IsActive': true,
       },
       default: {},
     },
@@ -26,7 +27,7 @@ export default createListViewModel({
         }
         return false
       },
-      *refreshPatientDetails ({payload},{put,call}){
+      *refreshPatientDetails ({ payload }, { put, call }) {
         const response = yield call(service.refreshPatientDetails, payload)
         const { data, status } = response
         if (status === '200') {

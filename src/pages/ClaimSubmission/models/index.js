@@ -1,7 +1,7 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
-import * as service from '../services'
 import { dateFormatLong, dateFormatLongWithTime } from '@/components'
+import * as service from '../services'
 
 export default createListViewModel({
   namespace: 'claimSubmission',
@@ -31,12 +31,13 @@ export default createListViewModel({
         const { data } = response
 
         if (response.status === '200' && data !== null) {
-          return yield put({
+          yield put({
             type: 'setQueryById',
             payload: {
               ...data,
             },
           })
+          return data
         }
         return false
       },

@@ -10,13 +10,13 @@ import {
   GridItem,
 } from '@/components'
 // sub component
+import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 import PaymentRow from './PaymentRow'
 import PaymentActions from './PaymentActions'
 import PaymentSummary from './PaymentSummary'
 // styles
 import styles from './styles'
 import { PayerType } from './variables'
-import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
 const DefaultPaymentInfo = {
   id: 0,
@@ -52,6 +52,7 @@ const PaymentCard = ({
   outstanding,
   invoicePayerFK,
   readOnly,
+  patientIsActive,
   hasActiveSession,
   actions: { handleVoidClick, handlePrinterClick, ...buttonActions },
 }) => {
@@ -94,7 +95,7 @@ const PaymentCard = ({
                 {...payment}
                 handleVoidClick={handleVoidClick}
                 handlePrinterClick={handlePrinterClick}
-                readOnly={readOnly}
+                readOnly={readOnly || !patientIsActive}
               />
             ))
         ) : (
@@ -107,7 +108,7 @@ const PaymentCard = ({
             type={payerTypeFK}
             invoicePayerFK={invoicePayerFK}
             companyFK={companyFK}
-            readOnly={readOnly}
+            readOnly={readOnly || !patientIsActive}
             hasActiveSession={hasActiveSession}
             handlePrinterClick={handlePrinterClick}
             {...buttonActions}

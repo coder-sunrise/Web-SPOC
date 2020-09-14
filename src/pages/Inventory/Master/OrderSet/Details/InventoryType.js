@@ -53,20 +53,6 @@ const InventoryType = ({
         }}
         EditingProps={{ ...editingProps }}
       />
-      {/* <div
-        style={{
-          position: 'absolute',
-          width: 150,
-          bottom: 16,
-          right: 91,
-          textAlign: 'right',
-        }}
-      >
-        <span style={{ fontSize: '1em', fontWeight: 500 }}>
-          Sub Total:&nbsp;
-        </span>
-        <NumberInput text currency value={subtotal} />
-      </div> */}
     </GridItem>
   )
 }

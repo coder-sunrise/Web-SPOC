@@ -86,7 +86,13 @@ const InvoiceHistory = ({
   }
 
   const getContent = () => {
-    return <PaymentDetails refreshInvoiceList={refreshInvoiceList} />
+    const { entity } = patient || {}
+    return (
+      <PaymentDetails
+        patientIsActive={entity && entity.isActive}
+        refreshInvoiceList={refreshInvoiceList}
+      />
+    )
   }
 
   const getTitle = (row) => {

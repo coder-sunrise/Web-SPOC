@@ -436,6 +436,8 @@ const getServices = (data) => {
           return {
             value: m.serviceCenterId,
             name: m.serviceCenter,
+            unitPrice: m.unitPrice,
+            isDefault: m.isDefault,
           }
         }),
       }

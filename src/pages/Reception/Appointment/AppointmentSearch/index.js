@@ -43,6 +43,8 @@ const AppointmentSearch = ({
       payload: {
         apiCriteria: {
           doctor: defaultDoctor.join(),
+          isIncludeRescheduledByClinic: true,
+          isIncludeHistory: true,
         },
       },
     })

@@ -65,7 +65,9 @@ const PaymentRow = ({
             color='primary'
             id={itemID}
             className={classes.printButton}
-                  disabled={isCancelled || !!statementPaymentReceiptNo || printDisabled}
+            disabled={
+              isCancelled || !!statementPaymentReceiptNo || printDisabled
+            }
             onClick={() => handlePrinterClick(type, id)}
           >
             <Printer />
@@ -101,7 +103,12 @@ const PaymentRow = ({
       >
         <GridItem md={2}>
           {getIconByType()}
-          {type === 'Payment' ? (
+          {type === 'Payment' ||
+          ([
+            'Credit Note',
+            'Write Off',
+          ].includes(type) &&
+            isCancelled) ? (
             <Popper
               className={classNames({
                 [classes.pooperResponsive]: true,
