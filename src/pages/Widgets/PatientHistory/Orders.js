@@ -16,7 +16,7 @@ const drugMixtureIndicator = (row) => {
 
 export default ({ current }) => {
   return (
-    <div>
+    <div style={{ marginBottom: 8, marginTop: 8 }}>
       <Table
         size='small'
         bordered

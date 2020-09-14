@@ -128,9 +128,24 @@ const convertEyeForms = (values) => {
     corEyeExaminationForm.formData &&
     typeof corEyeExaminationForm.formData === 'object'
   ) {
-    let { formData } = corEyeExaminationForm
+    let { formData = {} } = corEyeExaminationForm
     removeFields(formData, durtyFields)
-    values.corEyeExaminationForm.formData = JSON.stringify(formData)
+    const { EyeExaminations = [] } = formData
+    if (
+      EyeExaminations.find(
+        (ee) =>
+          (ee.LeftEye !== undefined &&
+            ee.LeftEye !== null &&
+            ee.LeftEye !== '') ||
+          (ee.RightEye !== undefined &&
+            ee.RightEye !== null &&
+            ee.RightEye !== ''),
+      )
+    ) {
+      values.corEyeExaminationForm.formData = JSON.stringify(formData)
+    } else {
+      values.corEyeExaminationForm.formData = JSON.stringify({})
+    }
   }
   return values
 }

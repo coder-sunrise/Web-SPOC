@@ -59,12 +59,11 @@ const styles = () => ({
   },
 })
 
-@connect(({ patient, global }) => ({
+@connect(({ patient, global, clinicSettings }) => ({
   patient,
   global,
   clinicSettings: clinicSettings.settings || clinicSettings.default,
-})) 
-
+}))
 @withFormikExtend({
   authority: [
     'patientdatabase.newpatient',
@@ -103,7 +102,7 @@ class PatientDetail extends PureComponent {
 
   constructor (props) {
     super(props)
-    let schemas =  schema(props).demographic
+    let schemas = schema(props).demographic
     this.widgets = [
       {
         id: '1',
