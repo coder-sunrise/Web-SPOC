@@ -126,10 +126,9 @@ const convertEyeForms = (values) => {
     corEyeExaminationForm.formData &&
     typeof corEyeExaminationForm.formData === 'object'
   ) {
-    let { formData } = corEyeExaminationForm
+    let { formData = {} } = corEyeExaminationForm
     removeFields(formData, durtyFields)
     const { EyeExaminations = [] } = formData
-    console.log('EyeExaminations', EyeExaminations)
     if (
       EyeExaminations.find(
         (ee) =>
