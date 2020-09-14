@@ -138,7 +138,9 @@ class Details extends PureComponent {
           <ProgressButton
             color='primary'
             onClick={async () => {
-              const isSaveOk = await onSave()
+              const isSaveOk = await onSave((success) => {
+                if (success) this.autoFocuseItem(type)
+              })
               if (isSaveOk) this.autoFocuseItem(type)
             }}
             icon={null}

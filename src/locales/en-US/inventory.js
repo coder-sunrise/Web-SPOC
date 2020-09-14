@@ -27,7 +27,7 @@ export default {
   'inventory.master.medication.effectiveStartDate': 'Effective Start Date',
   'inventory.master.medication.effectiveEndDate': 'Effective End Date',
   'inventory.master.medication.status': 'Status',
-  'inventory.master.medication.caution': 'Caution',
+  'inventory.master.medication.caution': 'Caution (show during ordering)',
 
   'inventory.master.vaccination.code': 'Vaccination Code',
   'inventory.master.vaccination.name': 'Vaccination Name',
@@ -42,7 +42,7 @@ export default {
   'inventory.master.vaccination.effectiveStartDate': 'Effective Start Date',
   'inventory.master.vaccination.effectiveEndDate': 'Effective End Date',
   'inventory.master.vaccination.status': 'Status',
-  'inventory.master.vaccination.caution': 'Caution',
+  'inventory.master.vaccination.caution': 'Caution (show during ordering)',
 
   'inventory.master.orderset.code': 'Order Set Code',
   'inventory.master.orderset.name': 'Order Set Name',

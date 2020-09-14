@@ -16,6 +16,7 @@ import {
 import Yup from '@/utils/yup'
 import { getUniqueId } from '@/utils/utils'
 import config from '@/utils/config'
+import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
 
 const { qtyFormat } = config
 
@@ -442,6 +443,7 @@ class OrderSet extends PureComponent {
                 (o.inventoryMedication.isActive === true ? '' : ' (Inactive)'),
               isActive: o.inventoryMedication.isActive === true,
               caution: o.inventoryMedication.caution,
+              subject: o.medicationName,
             }
           }),
         )
@@ -459,6 +461,7 @@ class OrderSet extends PureComponent {
                 (o.inventoryVaccination.isActive === true ? '' : ' (Inactive)'),
               isActive: o.inventoryVaccination.isActive === true,
               caution: o.inventoryVaccination.caution,
+              subject: o.vaccinationName,
             }
           }),
         )
@@ -520,7 +523,7 @@ class OrderSet extends PureComponent {
     }
   }
 
-  validateAndSubmitIfOk = async () => {
+  validateAndSubmitIfOk = async (callback) => {
     const {
       handleSubmit,
       validateForm,
@@ -534,33 +537,13 @@ class OrderSet extends PureComponent {
         (f) => f.caution && f.caution.trim().length > 0,
       )
       if (hasCautionItems.length > 0) {
-        dispatch({
-          type: 'global/updateAppState',
-          payload: {
-            openConfirm: true,
-            alignContent: 'left',
-            openConfirmContent: () => {
-              return (
-                <div
-                  style={{
-                    minHeight: 80,
-                    display: 'grid',
-                    alignItems: 'center',
-                  }}
-                >
-                  {hasCautionItems.map((m) => (
-                    <p>
-                      <b>{m.name}</b> - {m.caution}
-                    </p>
-                  ))}
-                </div>
-              )
-            },
-            // openConfirmContent: `${displayValue || code} - ${caution}`,
-            onConfirmSave: handleSubmit,
-            openConfirmText: 'OK',
-          },
+        openCautionAlertPrompt(hasCautionItems, () => {
+          handleSubmit()
+          if (callback) callback(true)
         })
+      } else {
+        handleSubmit()
+        return true
       }
     }
     return false

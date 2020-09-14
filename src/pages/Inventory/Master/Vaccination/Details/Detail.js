@@ -140,8 +140,8 @@ const Detail = ({
                     label={formatMessage({
                       id: 'inventory.master.vaccination.caution',
                     })}
-                    multiline
-                    rowsMax='5'
+                    // multiline
+                    // rowsMax='5'
                     maxLength={200}
                     {...args}
                   />

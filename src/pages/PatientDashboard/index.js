@@ -11,6 +11,7 @@ import { VISIT_TYPE } from '@/utils/constants'
 import { CallingQueueButton } from '@/components/_medisys'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { initRoomAssignment } from '@/utils/codes'
+import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
 import Banner from './Banner'
 
 const styles = (theme) => ({
@@ -124,6 +125,26 @@ class PatientDashboard extends PureComponent {
               'qid',
             )}&cid=${o.id}&pid=${patientID}&v=${version}`,
           )
+
+          const { corPrescriptionItem = [], corVaccinationItem = [] } = o
+          const drugItems = corPrescriptionItem
+            .filter((i) => i.caution && i.caution.trim().length > 0)
+            .map((m) => {
+              return { subject: m.drugName, caution: m.caution }
+            })
+          const vaccinationItems = corVaccinationItem
+            .filter((i) => i.caution && i.caution.trim().length > 0)
+            .map((m) => {
+              return { subject: m.vaccinationName, caution: m.caution }
+            })
+          const hasCautionItems = [
+            ...drugItems,
+            ...vaccinationItems,
+          ]
+
+          if (hasCautionItems.length > 0) {
+            openCautionAlertPrompt(hasCautionItems)
+          }
         }
       })
   }

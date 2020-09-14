@@ -13,6 +13,7 @@ import { Divider, withStyles } from '@material-ui/core'
 import Refresh from '@material-ui/icons/Refresh'
 import Stop from '@material-ui/icons/Stop'
 import EventNote from '@material-ui/icons/EventNote'
+import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
 
 // custom components
 import {
@@ -603,10 +604,31 @@ class Queue extends React.Component {
               queueNo: row.queueNo,
             },
           }).then((o) => {
-            if (o)
+            if (o) {
               router.push(
                 `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
               )
+
+              const { corPrescriptionItem = [], corVaccinationItem = [] } = o
+              const drugItems = corPrescriptionItem
+                .filter((i) => i.caution && i.caution.trim().length > 0)
+                .map((m) => {
+                  return { subject: m.drugName, caution: m.caution }
+                })
+              const vaccinationItems = corVaccinationItem
+                .filter((i) => i.caution && i.caution.trim().length > 0)
+                .map((m) => {
+                  return { subject: m.vaccinationName, caution: m.caution }
+                })
+              const hasCautionItems = [
+                ...drugItems,
+                ...vaccinationItems,
+              ]
+
+              if (hasCautionItems.length > 0) {
+                openCautionAlertPrompt(hasCautionItems)
+              }
+            }
           })
         }
         break
