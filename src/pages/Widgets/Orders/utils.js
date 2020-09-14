@@ -41,4 +41,30 @@ const openCautionAlertPrompt = (cautionItems, onClose) => {
   })
 }
 
-export { getCautionAlertContent, openCautionAlertPrompt }
+const openCautionAlertOnStartConsultation = (o) => {
+  const { corPrescriptionItem = [], corVaccinationItem = [] } = o
+  const drugItems = corPrescriptionItem
+    .filter((i) => i.caution && i.caution.trim().length > 0)
+    .map((m) => {
+      return { subject: m.drugName, caution: m.caution }
+    })
+  const vaccinationItems = corVaccinationItem
+    .filter((i) => i.caution && i.caution.trim().length > 0)
+    .map((m) => {
+      return { subject: m.vaccinationName, caution: m.caution }
+    })
+  const hasCautionItems = [
+    ...drugItems,
+    ...vaccinationItems,
+  ]
+
+  if (hasCautionItems.length > 0) {
+    openCautionAlertPrompt(hasCautionItems)
+  }
+}
+
+export {
+  getCautionAlertContent,
+  openCautionAlertPrompt,
+  openCautionAlertOnStartConsultation,
+}
