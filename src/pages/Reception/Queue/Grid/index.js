@@ -256,6 +256,7 @@ class Grid extends React.Component {
               size='sm'
               TableProps={TableProps}
               rows={queueListingData}
+              forceRender
               columnExtensions={[
                 ...ApptColumnExtensions,
                 {

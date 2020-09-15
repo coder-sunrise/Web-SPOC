@@ -146,6 +146,7 @@ export default ({ dataSource, onEditClick, onDeleteClick }) => {
   return (
     <CommonTableGrid
       style={{ margin: 0 }}
+      forceRender
       rows={dataSource}
       onRowDoubleClick={handleDoubleClick}
       columnExtensions={columnExtensions}

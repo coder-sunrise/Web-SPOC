@@ -11,6 +11,7 @@ import { VISIT_TYPE } from '@/utils/constants'
 import { CallingQueueButton } from '@/components/_medisys'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { initRoomAssignment } from '@/utils/codes'
+import { openCautionAlertOnStartConsultation } from '@/pages/Widgets/Orders/utils'
 import Banner from './Banner'
 
 const styles = (theme) => ({
@@ -124,6 +125,7 @@ class PatientDashboard extends PureComponent {
               'qid',
             )}&cid=${o.id}&pid=${patientID}&v=${version}`,
           )
+          openCautionAlertOnStartConsultation(o)
         }
       })
   }
@@ -162,7 +164,9 @@ class PatientDashboard extends PureComponent {
                   height: '100%',
                 }}
               >
-                {visit.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
+                {patientProfile &&
+                patientProfile.isActive &&
+                visit.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
                   <Authorized authority='openqueuedisplay'>
                     <CallingQueueButton
                       qId={queueNo}

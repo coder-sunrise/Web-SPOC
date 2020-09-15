@@ -42,6 +42,7 @@ import Authorized from '@/utils/Authorized'
 import { queryList } from '@/services/patient'
 import { getBizSession } from '@/services/queue'
 import schema from './schema'
+import { mapEntityToValues, upsertPatient } from './utils'
 
 // moment.updateLocale('en', {
 //   relativeTime: {
@@ -58,31 +59,10 @@ const styles = () => ({
   },
 })
 
-const mapEntityToValues = (entity) => {
-  const mappedValues = {
-    ...entity,
-    pdpaConsent: entity.patientPdpaConsent.reduce(
-      (consents, item) =>
-        item.isConsent
-          ? [
-              ...consents,
-              item.pdpaConsentTypeFK,
-            ]
-          : [
-              ...consents,
-            ],
-      [],
-    ),
-  }
-  return {
-    ...mappedValues,
-    nationalityFK: entity.id ? entity.nationalityFK : 173,
-  }
-}
-
-@connect(({ patient, global }) => ({
+@connect(({ patient, global, clinicSettings }) => ({
   patient,
   global,
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
 @withFormikExtend({
   authority: [
@@ -91,26 +71,6 @@ const mapEntityToValues = (entity) => {
   ],
   enableReinitialize: false,
   mapPropsToValues: ({ patient }) => {
-    // const mappedValues = {
-    //   ...(patient.entity || patient.default),
-    //   pdpaConsent: (patient.entity || patient.default).patientPdpaConsent
-    //     .reduce(
-    //       (consents, item) =>
-    //         item.isConsent
-    //           ? [
-    //               ...consents,
-    //               item.pdpaConsentTypeFK,
-    //             ]
-    //           : [
-    //               ...consents,
-    //             ],
-    //       [],
-    //     ),
-    // }
-    // return {
-    //   ...mappedValues,
-    //   nationalityFK: patient.entity ? patient.entity.nationalityFK : 173,
-    // }
     return mapEntityToValues(patient.entity || patient.default)
   },
   validationSchema: schema,
@@ -119,84 +79,14 @@ const mapEntityToValues = (entity) => {
     const { props, resetForm } = component
     const { dispatch, history, patient, onConfirm } = props
     const { location } = history
-    const shouldCloseForm = location.pathname
-      ? !location.pathname.includes('patientdb')
-      : false
 
-    const cfg = {
-      message: 'Patient profile saved.',
-    }
-    dispatch({
-      type: 'patient/upsert',
-      payload: {
-        ...values,
-        patientScheme: values.patientScheme.map((ps) => {
-          if (ps.isDeleted)
-            return {
-              ...ps,
-              schemeTypeFK: ps.schemeTypeFK || ps.preSchemeTypeFK,
-            }
-          return ps
-        }),
-        cfg,
-      },
-    }).then((r) => {
-      dispatch({
-        type: 'global/updateState',
-        payload: {
-          disableSave: false,
-        },
-      })
-      dispatch({
-        type: 'patient/updateState',
-        payload: {
-          shouldQueryOnClose: location.pathname.includes('patientdb'),
-        },
-      })
-      if (r) {
-        // POST request -> r.id === true
-        // PUT request -> r.id === false
-        if (r.id) {
-          if (!patient.callback) {
-            history.push(
-              getRemovedUrl(
-                [
-                  'new',
-                ],
-                getAppendUrl({
-                  pid: r.id,
-                }),
-              ),
-            )
-          }
-        }
-        dispatch({
-          type: 'patient/query',
-          payload: {
-            id: r.id || values.id,
-          },
-        }).then((response) => {
-          if (patient.callback) patient.callback(r.id)
-          const newEntity = mapEntityToValues(response)
-          resetForm(newEntity)
-        })
-
-        if (onConfirm && shouldCloseForm) {
-          onConfirm()
-        }
-
-        // if (!shouldCloseForm) {
-        //   dispatch({
-        //     type: 'patientSearch/query',
-        //     payload: {
-        //       sorting: [
-        //         // { columnName: 'isActive', direction: 'asc' },
-        //         { columnName: 'name', direction: 'asc' },
-        //       ],
-        //     },
-        //   })
-        // }
-      }
+    upsertPatient({
+      values,
+      history,
+      dispatch,
+      patient,
+      resetForm,
+      onConfirm,
     })
   },
   displayName: 'PatientDetail',
@@ -212,6 +102,7 @@ class PatientDetail extends PureComponent {
 
   constructor (props) {
     super(props)
+    let schemas = schema(props)
     this.widgets = [
       {
         id: '1',
@@ -220,7 +111,7 @@ class PatientDetail extends PureComponent {
           'patientdatabase.newpatient',
           'patientdatabase.patientprofiledetails',
         ],
-        schema: schema.demographic,
+        schema: schemas.demographic,
         component: Loadable({
           loader: () => import('./Demographics'),
           render: (loaded, p) => {
@@ -237,7 +128,7 @@ class PatientDetail extends PureComponent {
           'patientdatabase.newpatient',
           'patientdatabase.patientprofiledetails',
         ],
-        schema: schema.emergencyContact,
+        schema: schemas.emergencyContact,
         component: Loadable({
           loader: () => import('./EmergencyContact'),
           render: (loaded, p) => {
@@ -245,7 +136,7 @@ class PatientDetail extends PureComponent {
             return (
               <Cmpnet
                 schema={
-                  schema.emergencyContact.patientEmergencyContact._subType
+                  schemas.emergencyContact.patientEmergencyContact._subType
                 }
                 {...p}
               />
@@ -261,12 +152,12 @@ class PatientDetail extends PureComponent {
           'patientdatabase.newpatient',
           'patientdatabase.patientprofiledetails',
         ],
-        schema: schema.allergies,
+        schema: schemas.allergies,
         component: Loadable({
           loader: () => import('./Allergies'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet schema={schema.allergies} {...p} />
+            return <Cmpnet schema={schemas.allergies} {...p} />
           },
           loading: Loading,
         }),
@@ -278,12 +169,12 @@ class PatientDetail extends PureComponent {
           'patientdatabase.newpatient',
           'patientdatabase.patientprofiledetails',
         ],
-        schema: schema.schemes,
+        schema: schemas.schemes,
         component: Loadable({
           loader: () => import('./Schemes'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet schema={schema.schemes} {...p} />
+            return <Cmpnet schema={schemas.schemes} {...p} />
           },
           loading: Loading,
         }),
@@ -473,34 +364,28 @@ class PatientDetail extends PureComponent {
   }
 
   onActiveStatusChanged = async (status) => {
-    const { setFieldValue, patient: { entity } } = this.props
+    const { setFieldValue, dispatch, values } = this.props
+    const { effectiveStartDate, effectiveEndDate } = values
 
     if (status === true) {
-      setFieldValue('EffectiveStartDate', moment().formatUTC())
-      setFieldValue('EffectiveEndDate', moment('2099-12-31').formatUTC())
+      await setFieldValue('effectiveStartDate', moment().formatUTC())
+      await setFieldValue('effectiveEndDate', moment('2099-12-31').formatUTC())
     } else {
-      const bizSessionPayload = {
-        'Visit.PatientProfileFK': entity.id,
-        group: [
-          {
-            'Visit.VisitStatusFKNavigation.Status': 'WAITING',
-            IsClinicSessionClosed: false,
-            combineCondition: 'or',
-          },
-        ],
-      }
-      const result = await getBizSession(bizSessionPayload)
-      const { data: { totalRecords } } = result
-      if (totalRecords !== 0) {
-        notification.error({
-          message:
-            'Can not change patient status to inactive if patient in active session.',
-        })
-        return
-      }
-      setFieldValue('EffectiveEndDate', moment().formatUTC())
+      await setFieldValue('effectiveEndDate', moment().formatUTC())
     }
-    this.validatePatient()
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        disableSave: true,
+      },
+    })
+
+    const response = await upsertPatient(this.props)
+    if (response === false) {
+      // reset Effective Date
+      await setFieldValue('effectiveStartDate', effectiveStartDate)
+      await setFieldValue('effectiveEndDate', effectiveEndDate)
+    }
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {

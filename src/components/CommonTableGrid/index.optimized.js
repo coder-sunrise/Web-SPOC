@@ -51,7 +51,6 @@ import {
   TableTreeColumn,
   TableColumnResizing,
   TableColumnReordering,
-  TableSelection,
 } from '@devexpress/dx-react-grid-material-ui'
 import MenuItem from '@material-ui/core/MenuItem'
 import MenuList from '@material-ui/core/MenuList'
@@ -158,7 +157,7 @@ class CommonTableGrid extends PureComponent {
       },
       rows: [],
       gridSetting: gs,
-      selectedItem: 0,
+      selectedItem: [],
     }
     const cls = classNames({
       [classes.tableStriped]: oddEven,
@@ -660,17 +659,55 @@ class CommonTableGrid extends PureComponent {
   // }
 
   Row = (p) => {
-    const { classes, ...restProps } = this.props
-    return <TableRow {...restProps} {...p} />
+    const { classes, FuncProps = {}, ...restProps } = this.props
+    const { selectRowHighlightable = false } = FuncProps
+    return (
+      <TableRow
+        {...restProps}
+        {...p}
+        onRowClick={(row, event) => {
+          if (selectRowHighlightable) {
+            const rowId = this.props.getRowId(row || p.row)
+            if (this.state.selectedItem.includes(rowId)) {
+              this.setState({
+                selectedItem: [],
+              })
+            } else {
+              this.setState({
+                selectedItem: [
+                  rowId,
+                ],
+              })
+            }
+          }
+        }}
+      />
+    )
   }
 
   Cell = (p) => {
-    const { rows = [], ...restProps } = this.props
+    const { rows = [], FuncProps = {}, ...restProps } = this.props
     // console.log(restProps, p)
+    const { selectRowHighlightable = false } = FuncProps
     const row = rows.find(
       (o) => this.props.getRowId(o) === this.props.getRowId(p.row),
     )
-    return <TableCell {...restProps} {...p} row={row || p.row} />
+    const rowId = this.props.getRowId(row || p.row)
+    const highlitSytle =
+      selectRowHighlightable && this.state.selectedItem.includes(rowId)
+    const { style } = { ...restProps, ...p }
+
+    return (
+      <TableCell
+        {...restProps}
+        {...p}
+        row={row || p.row}
+        style={{
+          ...style,
+          backgroundColor: highlitSytle ? '#c8dafd' : undefined,
+        }}
+      />
+    )
   }
 
   getChildRows = (row, rootRows) => {
@@ -1056,7 +1093,7 @@ class CommonTableGrid extends PureComponent {
                   {...sortConfig}
                 />
               )}
-              {(selectable || selectRowHighlightable) && (
+              {selectable && (
                 <SelectionState
                   selection={selection}
                   onSelectionChange={onSelectionChange}
@@ -1160,41 +1197,7 @@ class CommonTableGrid extends PureComponent {
                 />
               )}
               {header && <HeaderRow showSortingControls />}
-              {selectRowHighlightable && (
-                <TableSelection
-                  rowComponent={(row) => {
-                    const { tableRow, children } = row
-                    const click = () => {
-                      this.setState((preState) => {
-                        if (preState.selectedItem === tableRow.row.id)
-                          return {
-                            selectedItem: 0,
-                          }
-                        return {
-                          selectedItem: tableRow.row.id,
-                        }
-                      })
-                    }
-                    if (this.state.selectedItem === tableRow.row.id)
-                      return (
-                        <TableSelection.Row
-                          style={{ backgroundColor: '#c8dafd' }}
-                          onClick={click}
-                        >
-                          {children}
-                        </TableSelection.Row>
-                      )
-                    return (
-                      <TableSelection.Row onClick={click}>
-                        {children}
-                      </TableSelection.Row>
-                    )
-                  }}
-                  selectByRowClick
-                  showSelectionColumn={false}
-                  {...selectConfig}
-                />
-              )}
+
               {extraRow.map((o) => o)}
               {pager && <PagingPanel pageSizes={pageSizes} {...pagerConfig} />}
               {grouping && (

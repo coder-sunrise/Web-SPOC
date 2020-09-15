@@ -5,6 +5,7 @@ import { CardContainer, GridContainer, GridItem } from '@/components'
 import { podoOrderType, inventoryItemListing } from '@/utils/codes'
 import { getServices } from '@/utils/codetable'
 import Authorized from '@/utils/Authorized'
+import { currencySymbol } from '@/utils/config'
 
 import InventoryType from './InventoryType'
 
@@ -108,7 +109,7 @@ const InventoryTypeListing = ({
   const [
     selectedItem,
     setSelectedItem,
-  ] = useState(() => { })
+  ] = useState(() => {})
 
   const [
     servicess,
@@ -125,11 +126,11 @@ const InventoryTypeListing = ({
   const [
     serviceFK,
     setServiceFK,
-  ] = useState(() => { })
+  ] = useState(() => {})
   const [
     serviceCenterFK,
     setServiceCenterFK,
-  ] = useState(() => { })
+  ] = useState(() => {})
 
   const fetchCodes = async () => {
     await dispatch({
@@ -154,6 +155,7 @@ const InventoryTypeListing = ({
         },
       }).then((list) => {
         const { inventoryItemList } = inventoryItemListing(list)
+
         switch (x.stateName) {
           case 'ConsumableItemList': {
             return setConsumableList(inventoryItemList)
@@ -411,7 +413,7 @@ const InventoryTypeListing = ({
         const obj = {
           ...item,
           tempServiceCenterServiceFK,
-        } 
+        }
         return obj
       })
 
@@ -430,9 +432,7 @@ const InventoryTypeListing = ({
     }
     const serviceCenterService =
       serviceCenterServicess.find(
-        (o) =>
-          o.serviceId === servicefk &&
-          o.serviceCenterId === serviceName,
+        (o) => o.serviceId === servicefk && o.serviceCenterId === serviceName,
       ) || {}
     if (serviceCenterService) {
       row.unitPrice = serviceCenterService.unitPrice
@@ -448,10 +448,7 @@ const InventoryTypeListing = ({
     if (addedRows.length > 0) {
       const newRow = addedRows[0]
 
-      const {
-        servicefk = serviceFK,
-        serviceName,
-      } = newRow
+      const { servicefk = serviceFK, serviceName } = newRow
 
       if (type === 'service') {
         if (servicefk && serviceName) {
@@ -500,7 +497,7 @@ const InventoryTypeListing = ({
       {
         columnName: 'inventoryMedicationFK',
         type: 'select',
-        labelField: 'name',
+        labelField: 'displayValue', // name
         options: medicationList,
         onChange: handleItemOnChange,
       },
@@ -539,7 +536,7 @@ const InventoryTypeListing = ({
       {
         columnName: 'inventoryVaccinationFK',
         type: 'select',
-        labelField: 'name',
+        labelField: 'displayValue',
         options: vaccinationList,
         onChange: handleItemOnChange,
       },
@@ -579,7 +576,7 @@ const InventoryTypeListing = ({
       {
         columnName: 'inventoryConsumableFK',
         type: 'select',
-        labelField: 'name',
+        labelField: 'displayValue',
         options: consumableList,
         onChange: handleItemOnChange,
       },
@@ -621,17 +618,30 @@ const InventoryTypeListing = ({
       {
         columnName: 'serviceFK',
         type: 'select',
+        labelField: 'displayValue',
         options: (row) => {
+          let options = []
           const tempArray = [
             ...servicess,
           ]
           if (!row.serviceName) {
-            return tempArray
+            options = tempArray
+          } else {
+            options = tempArray.filter((o) =>
+              o.serviceCenters.find((m) => m.value === row.serviceName),
+            )
           }
-          const options = tempArray.filter((o) =>
-            o.serviceCenters.find((m) => m.value === row.serviceName),
-          )
-          return options
+          return options.map((m) => {
+            const defaultServiceCenter =
+              m.serviceCenters.find((o) => o.isDefault) || {}
+            const { unitPrice = 0 } = defaultServiceCenter
+            return {
+              ...m,
+              displayValue: `${m.name} - ${m.code} (${currencySymbol}${unitPrice.toFixed(
+                2,
+              )})`,
+            }
+          })
         },
         onChange: (e) => {
           setServiceFK(e.val)
@@ -640,12 +650,15 @@ const InventoryTypeListing = ({
           if (!e.row.quantity) {
             e.row.quantity = 1
           }
-          const serviceCenterService = serviceCenterServicess.find((o) => o.serviceId === e.val && o.isDefault)
+          const serviceCenterService = serviceCenterServicess.find(
+            (o) => o.serviceId === e.val && o.isDefault,
+          )
           if (serviceCenterService) {
             e.row.unitPrice = serviceCenterService.unitPrice
             e.row.serviceName = serviceCenterService.serviceCenterId
             e.row.subTotal = e.row.quantity * serviceCenterService.unitPrice
-            e.row.serviceCenterServiceFK = serviceCenterService.serviceCenter_ServiceId
+            e.row.serviceCenterServiceFK =
+              serviceCenterService.serviceCenter_ServiceId
           }
           calSubtotal
         },
@@ -654,13 +667,14 @@ const InventoryTypeListing = ({
         columnName: 'serviceName',
         type: 'select',
         options: (row) => {
+          let options = []
           const tempArray = [
             ...serviceCenterss,
           ]
           if (!row.serviceFK) {
-            return tempArray
+            options = tempArray
           }
-          const options = tempArray.filter((o) =>
+          options = tempArray.filter((o) =>
             o.services.find((m) => m.value === row.serviceFK),
           )
           return options
@@ -670,12 +684,19 @@ const InventoryTypeListing = ({
           handleItemOnChange
           getServiceCenterService(e.row)
           e.row.serviceName = e.val
-          let originServiceCenterService = serviceCenterServicess.find((o) => o.serviceCenter_ServiceId === e.row.serviceCenterServiceFK)
-          const serviceCenterService = serviceCenterServicess.find((o) => o.serviceId === originServiceCenterService.serviceId && o.serviceCenterId === e.val)
+          let originServiceCenterService = serviceCenterServicess.find(
+            (o) => o.serviceCenter_ServiceId === e.row.serviceCenterServiceFK,
+          )
+          const serviceCenterService = serviceCenterServicess.find(
+            (o) =>
+              o.serviceId === originServiceCenterService.serviceId &&
+              o.serviceCenterId === e.val,
+          )
           if (serviceCenterService) {
             e.row.unitPrice = serviceCenterService.unitPrice
             e.row.subTotal = e.row.quantity * serviceCenterService.unitPrice
-            e.row.serviceCenterServiceFK = serviceCenterService.serviceCenter_ServiceId
+            e.row.serviceCenterServiceFK =
+              serviceCenterService.serviceCenter_ServiceId
           }
           calSubtotal
         },

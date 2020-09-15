@@ -62,6 +62,7 @@ const Content = ({ classes, clinicSettings, values, ...restProps }) => {
         <PaymentDetails
           invoiceDetail={values}
           readOnly={!currentBizSessionInfo.id}
+          patientIsActive={patientIsActive}
         />
       ),
       disabled: isInvoiceCurrentBizSession(),
