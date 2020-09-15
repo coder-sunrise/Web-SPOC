@@ -12,9 +12,7 @@ const orderTypes = [
     value: '1',
     prop: 'corPrescriptionItem',
     accessRight: 'queue.consultation.order.medication',
-    filter: (r) =>
-      !!r.inventoryMedicationFK ||
-      (!r.inventoryMedicationFK && r.isDrugMixture),
+    filter: (r) => r.inventoryMedicationFK || r.isDrugMixture,
     getSubject: (r) => {
       return r.drugName
     },

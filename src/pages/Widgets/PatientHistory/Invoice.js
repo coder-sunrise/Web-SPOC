@@ -14,6 +14,11 @@ const numberstyle = {
   fontWeight: 500,
 }
 
+const wrapCellTextStyle = {
+  wordWrap: 'break-word',
+  whiteSpace: 'pre-wrap',
+}
+
 const drugMixtureIndicator = (row) => {
   if (row.itemType !== 'Medication' || !row.isDrugMixture) return null
 
@@ -32,12 +37,7 @@ const baseColumns = [
     render: (text, row) => {
       return (
         <div style={{ position: 'relative' }}>
-          <div
-            style={{
-              wordWrap: 'break-word',
-              whiteSpace: 'pre-wrap',
-            }}
-          >
+          <div style={wrapCellTextStyle}>
             {row.itemType}
             {drugMixtureIndicator(row)}
           </div>

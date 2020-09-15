@@ -26,6 +26,8 @@ const sharedMedicationValue = {
     },
   ],
   corPrescriptionItemDrugMixture: [],
+  isDrugMixture: false,
+  isClaimable: true,
 }
 const initialState = {
   rows: [],

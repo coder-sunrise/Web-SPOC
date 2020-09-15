@@ -372,8 +372,7 @@ class CoPayer extends Component {
                 summary: true,
                 selectConfig: {
                   showSelectAll: true,
-                  rowSelectionEnabled: (row) =>
-                    !(row.isDrugMixture && !row.isClaimable),
+                  rowSelectionEnabled: (row) => row.isClaimable,
                 },
 
                 summaryConfig: {

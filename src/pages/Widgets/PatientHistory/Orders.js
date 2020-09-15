@@ -4,6 +4,11 @@ import { currencySymbol } from '@/utils/config'
 import tablestyles from './PatientHistoryStyle.less'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 
+const wrapCellTextStyle = {
+  wordWrap: 'break-word',
+  whiteSpace: 'pre-wrap',
+}
+
 const drugMixtureIndicator = (row) => {
   if (row.type !== 'Medication' || !row.isDrugMixture) return null
 
@@ -29,12 +34,7 @@ export default ({ current }) => {
             render: (text, row) => {
               return (
                 <div style={{ position: 'relative' }}>
-                  <div
-                    style={{
-                      wordWrap: 'break-word',
-                      whiteSpace: 'pre-wrap',
-                    }}
-                  >
+                  <div style={wrapCellTextStyle}>
                     {row.type}
                     {drugMixtureIndicator(row)}
                   </div>
@@ -46,16 +46,7 @@ export default ({ current }) => {
           {
             dataIndex: 'description',
             title: 'Description',
-            render: (text) => (
-              <div
-                style={{
-                  wordWrap: 'break-word',
-                  whiteSpace: 'pre-wrap',
-                }}
-              >
-                {text}
-              </div>
-            ),
+            render: (text) => <div style={wrapCellTextStyle}>{text}</div>,
           },
           {
             dataIndex: 'totalAmount',

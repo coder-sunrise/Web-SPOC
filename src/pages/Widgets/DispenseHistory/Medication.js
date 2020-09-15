@@ -3,6 +3,11 @@ import { CardContainer, CommonTableGrid, TextField } from '@/components'
 import * as config from './config'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 
+const wrapCellTextStyle = {
+  wordWrap: 'break-word',
+  whiteSpace: 'pre-wrap',
+}
+
 const drugMixtureIndicator = (row) => {
   if (row.type !== 'Medication' || !row.isDrugMixture) return null
 
@@ -35,12 +40,7 @@ export const TableColumnExtensions = [
     render: (row) => {
       return (
         <div style={{ position: 'relative' }}>
-          <div
-            style={{
-              wordWrap: 'break-word',
-              whiteSpace: 'pre-wrap',
-            }}
-          >
+          <div style={wrapCellTextStyle}>
             {row.name}
             {drugMixtureIndicator(row)}
           </div>

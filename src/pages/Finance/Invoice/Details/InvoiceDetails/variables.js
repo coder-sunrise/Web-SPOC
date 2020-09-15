@@ -2,6 +2,11 @@ import numeral from 'numeral'
 import config from '@/utils/config'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 
+const wrapCellTextStyle = {
+  wordWrap: 'break-word',
+  whiteSpace: 'pre-wrap',
+}
+
 const { qtyFormat } = config
 export const DataGridColumns = [
   { name: 'itemType', title: 'Type' },
@@ -28,12 +33,7 @@ export const DataGridColExtensions = [
     render: (row) => {
       return (
         <div style={{ position: 'relative' }}>
-          <div
-            style={{
-              wordWrap: 'break-word',
-              whiteSpace: 'pre-wrap',
-            }}
-          >
+          <div style={wrapCellTextStyle}>
             {row.itemType}
             {drugMixtureIndicator(row)}
           </div>

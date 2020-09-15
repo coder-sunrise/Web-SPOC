@@ -159,8 +159,7 @@ const Scheme = ({
       type: 'currency',
       width: 150,
       currency: true,
-      isDisabled: (row) =>
-        _isConfirmed || (row.isDrugMixture && !row.isClaimable),
+      isDisabled: (row) => _isConfirmed || !row.isClaimable,
     },
   ]
 

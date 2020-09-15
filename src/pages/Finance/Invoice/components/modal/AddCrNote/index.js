@@ -89,7 +89,8 @@ import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
             ...restProps,
             isInventoryItem:
               restProps.itemType.toLowerCase() !== 'misc' &&
-              restProps.itemType.toLowerCase() !== 'service',
+              restProps.itemType.toLowerCase() !== 'service' &&
+              !restProps.isDrugMixture,
             subTotal: restProps.totalAfterGST,
             itemDescription: restProps.itemName,
           }

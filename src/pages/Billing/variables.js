@@ -102,7 +102,7 @@ export const CoPayerColExtensions = [
     columnName: 'claimAmount',
     type: 'number',
     currency: true,
-    isDisabled: (row) => row.isDrugMixture && !row.isClaimable,
+    isDisabled: (row) => !row.isClaimable,
   },
 ]
 
