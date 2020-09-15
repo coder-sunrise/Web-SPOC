@@ -6,15 +6,12 @@ import { tagList } from '@/utils/codes'
 import {
   withFormikExtend,
   FastField,
-  Button,
   GridContainer,
   GridItem,
   TextField,
   DateRangePicker,
-  OutlinedTextField,
   RichEditor,
   Field,
-  Select,
 } from '@/components'
 
 const styles = (theme) => ({})
@@ -36,6 +33,7 @@ const styles = (theme) => ({})
       return {
         ...settingSmsTemplate.entity,
         templateMessage: newMessage,
+        isEditTemplate: true,
       }
     }
     return settingSmsTemplate.default
@@ -51,7 +49,6 @@ const styles = (theme) => ({})
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
-    // console.log(restValues)
 
     dispatch({
       type: 'settingSmsTemplate/upsert',
@@ -73,7 +70,22 @@ const styles = (theme) => ({})
   displayName: 'TemplateMessageDetail',
 })
 class Detail extends PureComponent {
-  state = {}
+  state = { focused: false }
+
+  setEditorReference = (ref) => {
+    this.setState({ editorReferece: ref })
+  }
+
+  setTemplateFoucus () {
+    if (
+      !this.state.focused &&
+      this.props.values.isEditTemplate &&
+      this.state.editorReferece
+    ) {
+      this.state.editorReferece.focus()
+      this.setState({ focused: true })
+    }
+  }
 
   render () {
     const { props } = this
@@ -118,6 +130,7 @@ class Detail extends PureComponent {
               />
             </GridItem>
             <GridItem md={12}>
+              {this.setTemplateFoucus()}
               <Field
                 name='templateMessage'
                 render={(args) => {
@@ -128,7 +141,7 @@ class Detail extends PureComponent {
                   return (
                     <RichEditor
                       toolbarHidden={() => true}
-                      // handlePastedText={() => false}
+                      editorRef={this.setEditorReference}
                       label='Template Message'
                       tagList={smsTaglist}
                       {...cfg}
@@ -141,21 +154,6 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
-            {/* <GridItem md={12}>
-              <Field
-                name='templateMessage'
-                render={(args) => {
-                  return (
-                    <TextField
-                      label='Template Message'
-                      multiline
-                      rowsMax='5'
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem> */}
           </GridContainer>
         </div>
         {footer &&
