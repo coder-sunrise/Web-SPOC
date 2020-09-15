@@ -20,8 +20,26 @@ import {
 const styles = (theme) => ({})
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingSmsTemplate }) =>
-    settingSmsTemplate.entity || settingSmsTemplate.default,
+  mapPropsToValues: ({ settingSmsTemplate }) => {
+    if (settingSmsTemplate.entity) {
+      let newMessage = settingSmsTemplate.entity.templateMessage || ''
+      const smsTaglist = tagList.filter((f) => f.value !== 'PatientInfo')
+      smsTaglist.forEach((item) => {
+        if (item.value && item.value !== '') {
+          newMessage = newMessage.replaceAll(
+            `@${item.value}`,
+            `&lt;a&nbsp;href=&quot;&quot;&nbsp;class=&quot;wysiwyg-mention&quot;&nbsp;data-mention&nbsp;&gt;@${item.value}&lt;/a&gt;`,
+          )
+        }
+      })
+
+      return {
+        ...settingSmsTemplate.entity,
+        templateMessage: newMessage,
+      }
+    }
+    return settingSmsTemplate.default
+  },
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
