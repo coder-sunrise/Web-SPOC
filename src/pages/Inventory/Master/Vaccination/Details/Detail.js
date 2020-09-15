@@ -117,38 +117,18 @@ const Detail = ({
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='remarks'
-                render={(args) => {
-                  return (
-                    <TextField
-                      label={formatMessage({
-                        id: 'inventory.master.vaccination.remarks',
-                      })}
-                      multiline
-                      rowsMax='5'
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
                 name='caution'
                 render={(args) => (
                   <TextField
                     label={formatMessage({
                       id: 'inventory.master.vaccination.caution',
                     })}
-                    // multiline
-                    // rowsMax='5'
                     maxLength={200}
                     {...args}
                   />
                 )}
               />
             </GridItem>
-            <GridItem xs={12} style={{ marginTop: '10px' }} />
           </GridContainer>
         </GridItem>
 
@@ -237,7 +217,28 @@ const Detail = ({
             </GridItem> */}
           </GridContainer>
         </GridItem>
-
+        <GridItem xs={12} md={5}>
+          <GridContainer>
+            <GridItem xs={12}>
+              <FastField
+                name='remarks'
+                render={(args) => {
+                  return (
+                    <TextField
+                      label={formatMessage({
+                        id: 'inventory.master.vaccination.remarks',
+                      })}
+                      multiline
+                      rowsMax='5'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+          </GridContainer>
+        </GridItem>
+        <GridItem xs={12} md={12} />
         <GridItem>
           <FastField
             name='chas'
