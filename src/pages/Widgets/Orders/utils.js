@@ -1,6 +1,6 @@
 import { Divider } from '@material-ui/core'
 
-const getCautionAlertContent = (cuationItems, subContents) => () => {
+const getCautionAlertContent = (cuationItems) => () => {
   return (
     <div
       style={{
@@ -9,23 +9,42 @@ const getCautionAlertContent = (cuationItems, subContents) => () => {
         alignItems: 'center',
       }}
     >
-      {cuationItems.map((m) => (
-        <div style={{ display: 'flex', margin: 5 }}>
+      <div style={{ margin: 5 }}>
+        {cuationItems.length > 0 && (
+          <div>
+            <p>
+              <h4
+                style={{ fontWeight: 400, textAlign: 'left', marginBottom: 10 }}
+              >
+                Cautions
+              </h4>
+            </p>
+          </div>
+        )}
+        {cuationItems.map((m) => (
           <div
             style={{
-              width: 150,
-              textAlign: 'center',
-              display: 'inline-table',
+              display: 'flex',
+              marginLeft: 20,
+              marginTop: 5,
+              marginBottom: 5,
             }}
           >
-            <span>
-              <b>{m.subject} - </b>
-            </span>
+            <div
+              style={{
+                width: 150,
+                textAlign: 'left',
+                display: 'inline-table',
+              }}
+            >
+              <span>
+                <b>{m.subject} - </b>
+              </span>
+            </div>
+            <div style={{ textAlign: 'left' }}>{m.caution}</div>
           </div>
-          <div style={{ textAlign: 'left' }}>{m.caution}</div>
-        </div>
-      ))}
-      {subContents}
+        ))}
+      </div>
     </div>
   )
 }
