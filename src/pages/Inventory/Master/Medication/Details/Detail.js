@@ -3,8 +3,6 @@ import { formatMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core/styles'
 import { FastField } from 'formik'
 import { compose } from 'redux'
-import SharedContainer from '../../SharedContainer'
-import Sdd from '../../Sdd'
 import {
   CodeSelect,
   CardContainer,
@@ -18,6 +16,8 @@ import {
   dateFormatLong,
   CheckboxGroup,
 } from '@/components'
+import SharedContainer from '../../SharedContainer'
+import Sdd from '../../Sdd'
 
 const styles = () => ({})
 
@@ -124,6 +124,22 @@ const Detail = ({
                   }}
                 />
               </GridItem>
+              <GridItem xs={12}>
+                <FastField
+                  name='caution'
+                  render={(args) => (
+                    <TextField
+                      label={formatMessage({
+                        id: 'inventory.master.medication.caution',
+                      })}
+                      // multiline
+                      // rowsMax='5'
+                      maxLength={200}
+                      {...args}
+                    />
+                  )}
+                />
+              </GridItem>
             </GridContainer>
           </GridItem>
           <GridItem xs={12} md={2} />
@@ -189,6 +205,8 @@ const Detail = ({
               </GridItem>
             </GridContainer>
           </GridItem>
+
+          <GridItem xs={12} />
           <GridItem>
             <FastField
               name='chas'
