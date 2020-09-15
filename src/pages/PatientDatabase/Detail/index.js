@@ -281,7 +281,7 @@ class PatientDetail extends PureComponent {
     this.setState({ showReplacementModal: false })
 
   validatePatient = async () => {
-    const { handleSubmit, dispatch, values } = this.props
+    const { handleSubmit, dispatch, values, validateForm } = this.props
     dispatch({
       type: 'global/updateState',
       payload: {
@@ -343,6 +343,15 @@ class PatientDetail extends PureComponent {
             <h3 style={{ marginTop: 0 }}>Do you wish to proceed?</h3>
           ),
           onConfirmSave: handleSubmit,
+        },
+      })
+    }
+    const isFormValid = await validateForm()
+    if (!_.isEmpty(isFormValid)) {
+      dispatch({
+        type: 'global/updateState',
+        payload: {
+          disableSave: false,
         },
       })
     }
