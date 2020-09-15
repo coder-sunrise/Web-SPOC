@@ -168,16 +168,16 @@ const AddOrder = ({
         assignRetailAdjustmentIdToOrderAdjustmentUid,
       )
 
-      const isVaccinationExist = newRows.filter((row) => !row.type)
+      const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
+      const isVaccinationExist =
+        clinicTypeFK === CLINIC_TYPE.GP
+          ? newRows.filter((row) => !row.type)
+          : []
       const cuationItems = newRows.filter(
         (f) => f.caution && f.caution.trim().length > 0,
       )
 
-      const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
-      if (
-        (clinicTypeFK === CLINIC_TYPE.GP && isVaccinationExist.length > 0) ||
-        cuationItems.length > 0
-      ) {
+      if (isVaccinationExist.length > 0 || cuationItems.length > 0) {
         dispatch({
           type: 'global/updateAppState',
           payload: {
