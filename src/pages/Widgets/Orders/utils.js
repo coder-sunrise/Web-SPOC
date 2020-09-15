@@ -46,7 +46,7 @@ const getRetailCautionAlertContent = (
         {cuationItems.length > 0 && (
           <div>
             <p>
-              <h4 style={{ fontWeight: 400 }}>Caution</h4>
+              <h4 style={{ fontWeight: 400 }}>Cautions</h4>
             </p>
           </div>
         )}
