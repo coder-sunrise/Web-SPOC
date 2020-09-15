@@ -206,6 +206,7 @@ class PastMedication extends PureComponent {
         let newTotalQuantity
         let ItemPrecautions = []
         let itemCorPrescriptionItemDrugMixture = []
+        let itemDrugCaution
         if (item.inventoryMedicationFK) {
           // Normal Drug
           let drug = inventorymedication.find(
@@ -276,6 +277,7 @@ class PastMedication extends PureComponent {
             : undefined
           itemDrugCode = drug.code
           itemDrugName = drug.displayValue
+          itemDrugCaution = drug.caution
         } else if (item.isDrugMixture) {
           // Drug Mixture
           itemExpiryDate = item.expiryDate
@@ -378,7 +380,7 @@ class PastMedication extends PureComponent {
           visitPurposeFK: undefined,
           isDrugMixture: item.isDrugMixture,
           isClaimable: item.isClaimable,
-          caution: drug.caution,
+          caution: itemDrugCaution,
         }
       }),
     )
