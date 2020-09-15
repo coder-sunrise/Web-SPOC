@@ -36,7 +36,6 @@ let i = 0
   ],
   mapPropsToValues: ({ orders = {}, type }) => {
     const newOrders = orders.entity || orders.defaultVaccination
-
     return {
       minQuantity: 1,
       ...newOrders,
@@ -79,13 +78,11 @@ let i = 0
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
-    }).then(() => {
-      resetForm(orders.defaultVaccination)
     })
 
     if (onConfirm) onConfirm()
     setValues({
-      ...orders.defaultService,
+      ...orders.defaultVaccination,
       type: orders.type,
     })
   },
@@ -400,7 +397,6 @@ class Vaccination extends PureComponent {
     } = this.props
     const { isEditVaccination } = values
     const { showAddFromPastModal } = this.state
-
     return (
       <div>
         <GridContainer>
@@ -446,7 +442,7 @@ class Vaccination extends PureComponent {
         </GridContainer>
         <GridContainer>
           <GridItem xs={6}>
-            <FastField
+            <Field
               name='vaccinationGivenDate'
               render={(args) => {
                 return <DatePicker label='Date Given' {...args} />
