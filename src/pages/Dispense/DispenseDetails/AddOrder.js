@@ -14,6 +14,10 @@ import {
   REVENUE_CATEGORY,
 } from '@/utils/constants'
 import { roundTo, getUniqueId } from '@/utils/utils'
+import {
+  getRetailCautionAlertContent,
+  getCautionAlertContent,
+} from '@/pages/Widgets/Orders/utils'
 import Order from '../../Widgets/Orders'
 
 const styles = () => ({})
@@ -90,6 +94,7 @@ const AddOrder = ({
                 o.retailVisitInvoiceDrug.retailPrescriptionItem
                   .retailPrescriptionItemDrugMixture,
               isActive: !!medicationItem,
+              caution: medicationItem.caution,
             }
             break
           }
@@ -168,31 +173,26 @@ const AddOrder = ({
         assignRetailAdjustmentIdToOrderAdjustmentUid,
       )
 
-      const isVaccinationExist = newRows.filter((row) => !row.type)
       const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
-      if (clinicTypeFK === CLINIC_TYPE.GP && isVaccinationExist.length > 0) {
+      const isVaccinationExist =
+        clinicTypeFK === CLINIC_TYPE.GP
+          ? newRows.filter((row) => !row.type)
+          : []
+      const cuationItems = newRows.filter(
+        (f) => f.caution && f.caution.trim().length > 0,
+      )
+
+      if (isVaccinationExist.length > 0 || cuationItems.length > 0) {
         dispatch({
           type: 'global/updateAppState',
           payload: {
             openConfirm: true,
-            openConfirmContent: (
-              <p style={{ fontWeight: 400 }}>
-                Vaccination item(s) will not be added.
-              </p>
-            ),
+            openConfirmContent:
+              isVaccinationExist.length > 0
+                ? getRetailCautionAlertContent(cuationItems, isVaccinationExist)
+                : getCautionAlertContent(cuationItems),
             alignContent: 'left',
             isInformType: true,
-            additionalInfo: (
-              <div style={{ fontSize: '1.3em' }}>
-                <ul style={{ listStylePosition: 'inside' }}>
-                  {isVaccinationExist.map((item) => (
-                    <li>
-                      <b>{item.subject}</b>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ),
             onConfirmSave: () => {},
           },
         })

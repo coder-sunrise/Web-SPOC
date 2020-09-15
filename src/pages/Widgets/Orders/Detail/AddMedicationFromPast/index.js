@@ -5,6 +5,7 @@ import { LoadingWrapper } from '@/components/_medisys'
 // custom component
 import {} from '@/components'
 // sub components
+import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
 import FitlerBar from './FilterBar'
 import Grid from './Grid'
 
@@ -377,6 +378,7 @@ class PastMedication extends PureComponent {
           visitPurposeFK: undefined,
           isDrugMixture: item.isDrugMixture,
           isClaimable: item.isClaimable,
+          caution: drug.caution,
         }
       }),
     )
@@ -449,6 +451,7 @@ class PastMedication extends PureComponent {
           isActive: true,
           isDeleted: false,
           subject: vaccination.displayValue,
+          caution: vaccination.caution,
         }
       }),
     )
@@ -487,12 +490,24 @@ class PastMedication extends PureComponent {
     } else if (type === '2') {
       data = this.GetNewVaccination()
     }
-    dispatch({
-      type: 'orders/upsertRows',
-      payload: data,
-    }).then(() => {
-      if (onConfirm) onConfirm()
-    })
+
+    const updateRows = () => {
+      dispatch({
+        type: 'orders/upsertRows',
+        payload: data,
+      }).then(() => {
+        if (onConfirm) onConfirm()
+      })
+    }
+
+    const hasCautionItems = data.filter(
+      (f) => f.caution && f.caution.trim().length > 0,
+    )
+    if (hasCautionItems && hasCautionItems.length > 0) {
+      openCautionAlertPrompt(hasCautionItems, updateRows)
+    } else {
+      updateRows()
+    }
   }
 
   render () {
