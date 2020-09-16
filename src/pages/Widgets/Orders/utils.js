@@ -107,9 +107,9 @@ const getRetailCautionAlertContent = (
           </p>
           <div style={{ marginLeft: 20 }}>
             {ignoreVaccinationItems.map((item) => (
-              <span>
+              <p>
                 <b>{item.subject}</b>
-              </span>
+              </p>
             ))}
           </div>
         </div>
