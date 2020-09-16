@@ -380,9 +380,9 @@ class PatientHistory extends Component {
       ...history.patientHistoryDetail,
       visitAttachments: history.visitAttachments,
       visitRemarks: history.visitRemarks,
-      referredBy: history.referredBy,
-      referredInstitution: history.referredInstitution,
-      referredDate: history.referredDate,
+      referralBy: history.referralBy,
+      referralInstitution: history.referralInstitution,
+      referralDate: history.referralDate,
     }
     let visitDetails = {
       visitDate: history.visitDate,
