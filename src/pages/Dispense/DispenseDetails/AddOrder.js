@@ -69,9 +69,11 @@ const AddOrder = ({
             }
 
             obj = {
-              type: o.retailVisitInvoiceDrug.inventoryMedicationFK
-                ? o.invoiceItemTypeFK.toString()
-                : ORDER_TYPE_TAB.OPENPRESCRIPTION,
+              type:
+                o.retailVisitInvoiceDrug.inventoryMedicationFK ||
+                o.retailVisitInvoiceDrug.retailPrescriptionItem.isDrugMixture
+                  ? o.invoiceItemTypeFK.toString()
+                  : ORDER_TYPE_TAB.OPENPRESCRIPTION,
               ...o.retailVisitInvoiceDrug,
               innerLayerId: o.retailVisitInvoiceDrug.id,
               innerLayerConcurrencyToken:
@@ -88,6 +90,9 @@ const AddOrder = ({
               corPrescriptionItemPrecaution:
                 o.retailVisitInvoiceDrug.retailPrescriptionItem
                   .retailPrescriptionItemPrecaution,
+              corPrescriptionItemDrugMixture:
+                o.retailVisitInvoiceDrug.retailPrescriptionItem
+                  .retailPrescriptionItemDrugMixture,
               isActive: !!medicationItem,
               caution: medicationItem.caution,
             }
@@ -378,6 +383,68 @@ export default compose(
           return returnedInstructionsArray
         }
 
+        const medicationDrugMixturesArray = (
+          corPrescriptionItemDrugMixture,
+          retailPrescriptionItemDrugMixture,
+          itemIsDeleted,
+        ) => {
+          const combinedOldNewDrugMixtures = _.intersectionWith(
+            corPrescriptionItemDrugMixture,
+            retailPrescriptionItemDrugMixture,
+            _.isEqual,
+          )
+
+          const newAddedDrugMixtures = _.differenceWith(
+            corPrescriptionItemDrugMixture,
+            combinedOldNewDrugMixtures,
+            _.isEqual,
+          )
+
+          const drugMixturesIDArray = retailPrescriptionItemDrugMixture.map(
+            (drugMixture) => drugMixture.id,
+          )
+
+          const formatNewAddedDrugMixtures = newAddedDrugMixtures.map(
+            removeIdAndConcurrencyTokenForNewPrecautionsOrInstructions(
+              drugMixturesIDArray,
+            ),
+          )
+
+          const returnedDrugMixturesArray = [
+            ...combinedOldNewDrugMixtures,
+            ...formatNewAddedDrugMixtures,
+          ].map((o) => setIsDeletedIfWholeItemIsDeleted(o, itemIsDeleted))
+
+          return returnedDrugMixturesArray
+        }
+
+        const getDrugMixtureName = (corPrescriptionItemDrugMixture) => {
+          let drugMixtureName = ''
+          const activeDrugMixtureItems = corPrescriptionItemDrugMixture.filter(
+            (item) => !item.isDeleted,
+          )
+
+          activeDrugMixtureItems.forEach((item, index) => {
+            drugMixtureName += index === 0 ? item.drugName : `/${item.drugName}`
+          })
+
+          return drugMixtureName
+        }
+
+        const getDrugMixtureRevenueCategory = (
+          corPrescriptionItemDrugMixture,
+        ) => {
+          let revenueCategoryId = REVENUE_CATEGORY.OTHER
+          const activeDrugMixtureItems = corPrescriptionItemDrugMixture.filter(
+            (item) => !item.isDeleted,
+          )
+
+          if (activeDrugMixtureItems.length > 0)
+            revenueCategoryId = activeDrugMixtureItems[0].revenueCategoryFK
+
+          return revenueCategoryId
+        }
+
         const mapRetailItemPropertyToApi = (o) => {
           let obj
           switch (o.type) {
@@ -393,23 +460,35 @@ export default compose(
               const {
                 corPrescriptionItemInstruction,
                 corPrescriptionItemPrecaution,
+                corPrescriptionItemDrugMixture,
                 retailPrescriptionItem = {},
                 ...restO
               } = o
               const {
                 retailPrescriptionItemInstruction = [],
                 retailPrescriptionItemPrecaution = [],
+                retailPrescriptionItemDrugMixture = [],
               } = retailPrescriptionItem
               obj = {
                 itemCode: o.drugCode,
-                itemName: o.drugName,
+                itemName: o.isDrugMixture
+                  ? getDrugMixtureName(o.corPrescriptionItemDrugMixture)
+                  : o.drugName,
                 invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.MEDICATION,
-                unitPrice: o.unitPrice,
+                unitPrice: o.isDrugMixture
+                  ? (o.totalPrice || 0) / (o.quantity || 1)
+                  : o.unitPrice,
                 quantity: o.quantity,
                 subTotal: roundTo(o.totalPrice),
-                itemRevenueCategoryFK: revenueCategory.id,
+                itemRevenueCategoryFK: o.isDrugMixture
+                  ? getDrugMixtureRevenueCategory(
+                      o.corPrescriptionItemDrugMixture,
+                    )
+                  : revenueCategory.id,
                 // "adjType": "string",
                 // "adjValue": 0,
+                isDrugMixture: o.isDrugMixture,
+                isClaimable: o.isDrugMixture ? o.isClaimable : true,
                 retailVisitInvoiceDrug: {
                   id: o.innerLayerId,
                   concurrencyToken: o.innerLayerConcurrencyToken,
@@ -420,6 +499,9 @@ export default compose(
                   isDeleted: o.isDeleted,
                   retailPrescriptionItem: {
                     ...restO,
+                    drugName: o.isDrugMixture
+                      ? getDrugMixtureName(o.corPrescriptionItemDrugMixture)
+                      : o.drugName,
                     isDeleted: o.isDeleted,
                     unitPrice: roundTo(o.totalPrice / o.quantity),
                     retailPrescriptionItemInstruction: medicationInstructionsArray(
@@ -430,6 +512,11 @@ export default compose(
                     retailPrescriptionItemPrecaution: medicationPrecautionsArray(
                       corPrescriptionItemPrecaution,
                       retailPrescriptionItemPrecaution,
+                      o.isDeleted,
+                    ),
+                    retailPrescriptionItemDrugMixture: medicationDrugMixturesArray(
+                      corPrescriptionItemDrugMixture,
+                      retailPrescriptionItemDrugMixture,
                       o.isDeleted,
                     ),
                   },
@@ -451,6 +538,8 @@ export default compose(
                 unitPrice: o.unitPrice,
                 quantity: o.quantity,
                 itemRevenueCategoryFK: revenueCategoryFK,
+                isDrugMixture: false,
+                isClaimable: true,
                 retailVisitInvoiceService: {
                   id: o.innerLayerId,
                   concurrencyToken: o.innerLayerConcurrencyToken,
@@ -477,6 +566,8 @@ export default compose(
                 unitPrice: o.unitPrice,
                 quantity: o.quantity,
                 itemRevenueCategoryFK: revenueCategory.id,
+                isDrugMixture: false,
+                isClaimable: true,
                 retailVisitInvoiceConsumable: {
                   id: o.innerLayerId,
                   concurrencyToken: o.innerLayerConcurrencyToken,
@@ -509,7 +600,7 @@ export default compose(
             gstAmount: o.gstAmount,
             isDeleted: o.isDeleted,
             ...obj,
-            revenueCategoryFK: o.revenueCategoryFK || obj.itemRevenueCategoryFK,
+            revenueCategoryFK: obj.itemRevenueCategoryFK || o.revenueCategoryFK,
           }
         }
 
@@ -545,7 +636,7 @@ export default compose(
           orders,
           forms,
         })
-        console.log({ billFirstPayload })
+        // console.log({ billFirstPayload })
         dispatch({
           type: `consultation/signOrder`,
           payload: {

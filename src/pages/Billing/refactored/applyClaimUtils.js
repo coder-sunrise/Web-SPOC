@@ -30,6 +30,14 @@ export const getCoverageAmountAndType = (scheme, invoiceItem) => {
     (_coPaymentItem) => _coPaymentItem.itemCode === invoiceItem.itemCode,
   )
 
+  // If is drug mixture item, check if can claim
+  if (invoiceItem.isDrugMixture && !invoiceItem.isClaimable) {
+    schemeCoverageType = 'Percentage'
+    coverage = convertAmountToPercentOrCurrency(schemeCoverageType, 0)
+    schemeCoverage = 0
+    return { coverage, schemeCoverage, schemeCoverageType }
+  }
+
   if (isSpecificDefined) {
     const coPaymentItem = scheme.coPaymentByItem.find(
       (_coPaymentItem) => _coPaymentItem.itemCode === invoiceItem.itemCode,
@@ -89,6 +97,9 @@ export const getApplicableClaimAmount = (
     invoicePayerItem.totalAfterGst - (invoicePayerItem._claimedAmount || 0)
 
   if (payableBalance <= 0 || !scheme) return returnClaimAmount
+
+  // If is drug mixture item, check if can claim
+  if (invoicePayerItem.isDrugMixture && !invoicePayerItem.isClaimable) return 0
 
   const isSpecificDefined = coPaymentByItem.find(
     (_coPaymentItem) => _coPaymentItem.itemCode === invoicePayerItem.itemCode,

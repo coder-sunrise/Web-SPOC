@@ -26,6 +26,8 @@ import {
   Field,
   CommonModal,
   ProgressButton,
+  notification,
+  EditableTableGrid,
 } from '@/components'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
@@ -38,6 +40,12 @@ const authorityCfg = {
   '1': 'queue.consultation.order.medication',
   '5': 'queue.consultation.order.openprescription',
 }
+
+const drugMixtureItemSchema = Yup.object().shape({
+  inventoryMedicationFK: Yup.string().required(),
+  quantity: Yup.number().min(0),
+  totalPrice: Yup.number().min(0),
+})
 
 @connect(({ global, codetable, visitRegistration, user }) => ({
   global,
@@ -59,6 +67,8 @@ const authorityCfg = {
     if (type === '5') {
       v.drugCode = 'MISC'
     }
+    if (type === '1' && v.isDrugMixture) v.drugName = 'Drug Mixture'
+
     // v.corPrescriptionItemPrecaution =
     //   v.corPrescriptionItemPrecaution && v.corPrescriptionItemPrecaution[0]
     //     ? v.corPrescriptionItemPrecaution
@@ -76,6 +86,17 @@ const authorityCfg = {
         }
       })
 
+    let newDrugMixtureRowId = 0
+    const newCorPrescriptionItemDrugMixture = (v.corPrescriptionItemDrugMixture ||
+      [])
+      .map((drugMixture) => {
+        newDrugMixtureRowId -= 1
+        return {
+          ...drugMixture,
+          id: drugMixture.isNew ? newDrugMixtureRowId : drugMixture.id,
+        }
+      })
+
     return {
       ...v,
       corPrescriptionItemPrecaution:
@@ -84,6 +105,10 @@ const authorityCfg = {
           : [
               {},
             ],
+      corPrescriptionItemDrugMixture:
+        newCorPrescriptionItemDrugMixture.length > 0
+          ? newCorPrescriptionItemDrugMixture
+          : [],
     }
   },
   enableReinitialize: true,
@@ -96,10 +121,21 @@ const authorityCfg = {
     dispenseUOMFK: Yup.number().required(),
     totalPrice: Yup.number().required(),
     type: Yup.string(),
-    inventoryMedicationFK: Yup.number().when('type', {
-      is: (val) => val !== '5',
-      then: Yup.number().required(),
-    }),
+    // inventoryMedicationFK: Yup.number().when('type', {
+    //   is: (val) => val !== '5',
+    //   then: Yup.number().required(),
+    // }),
+    inventoryMedicationFK: Yup.number().when(
+      [
+        'type',
+        'isDrugMixture',
+      ],
+      (type, isDrugMixture) => {
+        if (type === '1' && !isDrugMixture) return Yup.number().required()
+        return Yup.number()
+      },
+    ),
+
     drugName: Yup.string().when('type', {
       is: (val) => val === '5',
       then: Yup.string().required(),
@@ -114,6 +150,19 @@ const authorityCfg = {
         sequence: Yup.number().required(),
         stepdose: Yup.string().required(),
       }),
+    ),
+    corPrescriptionItemDrugMixture: Yup.array().when(
+      [
+        'type',
+        'isDrugMixture',
+      ],
+      (type, isDrugMixture) => {
+        if (type === '1' && isDrugMixture)
+          return Yup.array()
+            .compact((v) => v.isDeleted)
+            .of(drugMixtureItemSchema)
+        return Yup.array().compact((v) => v.isDeleted)
+      },
     ),
   }),
 
@@ -185,14 +234,31 @@ const authorityCfg = {
         batchNo = batchNo[0]
       }
     }
+
+    let drugMixtureName = ''
+    if (values.corPrescriptionItemDrugMixture) {
+      const activeDrugMixtureItems = values.corPrescriptionItemDrugMixture.filter(
+        (item) => !item.isDeleted,
+      )
+      // reorder and overwrite sequence, get combined drug name
+      activeDrugMixtureItems.forEach((item, index) => {
+        item.sequence = index + 1
+        drugMixtureName += index === 0 ? item.drugName : `/${item.drugName}`
+        if (item.isNew && item.id < 0) item.id = undefined
+      })
+    }
+
     const data = {
       isOrderedByDoctor:
         user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
       sequence: getNextSequence(),
       ...values,
+      drugName: values.isDrugMixture ? drugMixtureName : values.drugName,
       corPrescriptionItemPrecaution,
       instruction,
-      subject: currentType.getSubject(values),
+      subject: values.isDrugMixture
+        ? drugMixtureName
+        : currentType.getSubject({ ...values }),
       isDeleted: false,
       batchNo,
     }
@@ -270,7 +336,8 @@ class Medication extends PureComponent {
   }
 
   calculateQuantity = (medication) => {
-    const { codetable, setFieldValue, disableEdit } = this.props
+    const { codetable, setFieldValue, disableEdit, values } = this.props
+    if (values.isDrugMixture) return
     let currentMedication = medication || this.state.selectedMedication
 
     const { form } = this.descriptionArrayHelpers
@@ -327,6 +394,8 @@ class Medication extends PureComponent {
 
   setTotalPrice = () => {
     const { values, disableEdit } = this.props
+    if (values.isDrugMixture) return
+
     if (disableEdit === false) {
       if (values.unitPrice) {
         const total = (values.quantity || 0) * values.unitPrice
@@ -548,12 +617,14 @@ class Medication extends PureComponent {
       op.dispensingUOM ? op.dispensingUOM.name : [],
     )
 
-    setFieldValue('drugCode', op.code)
-    setFieldValue('drugName', op.displayValue)
+    if (!values.isDrugMixture) {
+      setFieldValue('drugCode', op.code)
+      setFieldValue('drugName', op.displayValue)
 
-    setTimeout(() => {
-      this.calculateQuantity(op)
-    }, 1)
+      setTimeout(() => {
+        this.calculateQuantity(op)
+      }, 1)
+    }
   }
 
   updateTotalPrice = (v) => {
@@ -680,6 +751,19 @@ class Medication extends PureComponent {
     const isFormValid = _.isEmpty(validateResult)
     const { editingMedicationFK, inventoryMedicationFK } = values
 
+
+    if (values.type === '1' && values.isDrugMixture) {
+      const drugMixtureItems = values.corPrescriptionItemDrugMixture.filter(
+        (o) => !o.isDeleted,
+      )
+      if (drugMixtureItems.length < 2) {
+        notification.warn({
+          message: 'At least two medications are required',
+        })
+        return false
+      }
+    }
+
     if (isFormValid) {
       const { caution = '', code, displayValue } =
         this.state.selectedMedication || {}
@@ -716,6 +800,167 @@ class Medication extends PureComponent {
     })
   }
 
+  getMixtureItemBatchStock = (row) => {
+    let batchNoOptions = []
+
+    const { codetable } = this.props
+    const { inventorymedication = [] } = codetable
+    const currentItem = inventorymedication.find(
+      (o) => o.id === row.inventoryMedicationFK,
+    )
+    if (currentItem) {
+      batchNoOptions = currentItem.medicationStock
+    }
+
+    return batchNoOptions
+  }
+
+  handleDrugMixtureItemOnChange = (e) => {
+    const { option, row } = e
+    const { values } = this.props
+    const rs = values.corPrescriptionItemDrugMixture.filter(
+      (o) =>
+        !o.isDeleted &&
+        o.inventoryMedicationFK === option.id &&
+        o.id !== row.id,
+    )
+    if (rs.length > 0) {
+      notification.warn({
+        message: 'The medication already exist in the list',
+      })
+    }
+
+    row.quantity = option.dispensingQuantity || 0
+    row.uomfk = option.dispensingUOM.id
+    row.uOMCode = option.dispensingUOM.code
+    row.uOMDisplayValue = option.dispensingUOM.name
+    row.costPrice = option.averageCostPrice || 0
+    row.unitPrice = option.sellingPrice || 0
+    row.totalPrice = row.unitPrice * row.quantity
+    row.drugCode = option.code
+    row.drugName = option.displayValue
+    row.revenueCategoryFK = option.revenueCategory.id
+
+    const defaultBatch = this.getMixtureItemBatchStock(row).find(
+      (batch) => batch.isDefault,
+    )
+    if (defaultBatch) {
+      row.batchNo = defaultBatch.batchNo
+      row.batchNoId = defaultBatch.id
+      row.expiryDate = defaultBatch.expiryDate
+    }
+  }
+
+  handleDrugMixtureItemQuantityOnChange = (e) => {
+    const { row } = e
+    row.totalPrice = row.unitPrice * row.quantity
+  }
+
+  handleMixtureItemSelectedBatch = (e) => {
+    const { option, row, val } = e
+
+    if (option.length > 0) {
+      const { expiryDate, id, batchNo } = option[0]
+      row.batchNo = batchNo
+      row.expiryDate = expiryDate
+      row.batchNoId = id
+    } else {
+      row.batchNo = val[0]
+      row.batchNoId = undefined
+      row.expiryDate = undefined
+    }
+  }
+
+  checkIsDrugMixtureItemUnique = ({ rows, changed }) => {
+    if (!changed) return rows
+    const key = Object.keys(changed)[0]
+    const obj = changed[key]
+    if (obj.inventoryMedicationFK !== undefined) {
+      const hasDuplicate = rows.filter(
+        (i) =>
+          !i.isDeleted && i.inventoryMedicationFK === obj.inventoryMedicationFK,
+      )
+      if (hasDuplicate.length >= 2) {
+        return rows.map(
+          (row) =>
+            row.id === parseInt(key, 10)
+              ? { ...row, inventoryMedicationFK: undefined }
+              : row,
+        )
+      }
+    }
+    return rows
+  }
+
+  commitDrugMixtureItemChanges = ({ rows, deleted, added, changed }) => {
+    const { setFieldValue, values, codetable } = this.props
+    let tempDrugMixtureRows = []
+
+    if (deleted) {
+      const tempArray = [
+        ...values.corPrescriptionItemDrugMixture,
+      ]
+
+      const newArray = tempArray.map((o) => {
+        if (o.id === deleted[0]) {
+          return {
+            ...o,
+            isDeleted: true,
+          }
+        }
+        return {
+          ...o,
+        }
+      })
+
+      tempDrugMixtureRows = newArray
+      setFieldValue('corPrescriptionItemDrugMixture', newArray)
+    } else {
+      let _rows = this.checkIsDrugMixtureItemUnique({ rows, changed })
+      if (added) {
+        _rows = [
+          ...values.corPrescriptionItemDrugMixture,
+          rows[0],
+        ]
+      }
+
+      tempDrugMixtureRows = _rows
+      setFieldValue('corPrescriptionItemDrugMixture', _rows)
+    }
+
+    let totalQuantity = 0
+    let totalPrice = 0
+    const activeDrugMixtureRows = tempDrugMixtureRows.filter(
+      (item) => !item.isDeleted,
+    )
+
+    activeDrugMixtureRows.forEach((item) => {
+      totalQuantity += item.quantity || 0
+      totalPrice += item.totalPrice || 0
+    })
+
+    // If add first medication, set the mixed drug's details (instruction, precaution, uom, batchNo and etc.)
+    if (
+      !deleted &&
+      activeDrugMixtureRows.length === 1 &&
+      activeDrugMixtureRows[0].inventoryMedicationFK
+    ) {
+      const { inventorymedication = [] } = codetable
+      const currentMedication = inventorymedication.find(
+        (o) => o.id === activeDrugMixtureRows[0].inventoryMedicationFK,
+      )
+      if (currentMedication) {
+        this.changeMedication(
+          activeDrugMixtureRows[0].inventoryMedicationFK,
+          currentMedication,
+        )
+      }
+    }
+
+    setFieldValue('quantity', totalQuantity)
+    this.updateTotalPrice(totalPrice)
+  }
+
   render () {
     const {
       theme,
@@ -723,7 +968,6 @@ class Medication extends PureComponent {
       values,
       openPrescription,
       footer,
-      handleSubmit,
       setFieldValue,
       disableEdit,
       setDisable,
@@ -740,6 +984,87 @@ class Medication extends PureComponent {
       },
     }
 
+    const drugMixtureTableParas = {
+      columns: [
+        { name: 'inventoryMedicationFK', title: 'Name' },
+        { name: 'quantity', title: 'Quantity' },
+        { name: 'uomfk', title: 'UOM' },
+        { name: 'totalPrice', title: 'Total' },
+        { name: 'batchNo', title: 'Batch No.' },
+        { name: 'expiryDate', title: 'Expiry Date' },
+      ],
+      columnExtensions: [
+        {
+          columnName: 'inventoryMedicationFK',
+          type: 'codeSelect',
+          // code: 'inventorymedication',
+          // labelField: 'displayValue',
+          labelField: 'combinDisplayValue',
+          options: this.getMedicationOptions,
+          sortingEnabled: false,
+          onChange: (e) => {
+            if (e.option) {
+              this.handleDrugMixtureItemOnChange(e)
+            }
+          },
+        },
+        {
+          columnName: 'quantity',
+          width: 70,
+          type: 'number',
+          format: '0.0',
+          sortingEnabled: false,
+          onChange: (e) => {
+            this.handleDrugMixtureItemQuantityOnChange(e)
+          },
+          isDisabled: (row) => row.inventoryMedicationFK === undefined,
+        },
+        {
+          columnName: 'uomfk',
+          width: 70,
+          type: 'codeSelect',
+          code: 'ctMedicationUnitOfMeasurement',
+          labelField: 'name',
+          sortingEnabled: false,
+          disabled: true,
+        },
+        {
+          columnName: 'totalPrice',
+          width: 95,
+          type: 'number',
+          currency: true,
+          sortingEnabled: false,
+          isDisabled: (row) => row.inventoryMedicationFK === undefined,
+        },
+        {
+          columnName: 'batchNo',
+          type: 'select',
+          width: 115,
+          sortingEnabled: false,
+          mode: 'tags',
+          maxSelected: 1,
+          labelField: 'batchNo',
+          valueField: 'batchNo',
+          disableAll: true,
+          options: this.getMixtureItemBatchStock,
+          onChange: (e) => {
+            this.handleMixtureItemSelectedBatch(e)
+          },
+          render: (row) => {
+            return <TextField text value={row.batchNo} />
+          },
+          isDisabled: (row) => row.inventoryMedicationFK === undefined,
+        },
+        {
+          columnName: 'expiryDate',
+          type: 'date',
+          width: 110,
+          sortingEnabled: false,
+          isDisabled: (row) => row.inventoryMedicationFK === undefined,
+        },
+      ],
+    }
+
     const accessRight = authorityCfg[values.type]
     return (
       <Authorized authority={accessRight}>
@@ -747,14 +1072,21 @@ class Medication extends PureComponent {
           <GridContainer>
             <GridItem xs={6}>
               <React.Fragment>
-                {openPrescription ? (
+                {openPrescription || values.isDrugMixture ? (
                   <FastField
                     name='drugName'
                     render={(args) => {
                       return (
                         <div id={`autofocus_${values.type}`}>
                           <TextField
-                            label='Open Prescription Name'
+                            label={
+                              values.isDrugMixture ? (
+                                'Drug Mixture'
+                              ) : (
+                                'Open Prescription Name'
+                              )
+                            }
+                            disabled={!openPrescription && values.isDrugMixture}
                             {...args}
                             autocomplete='nope'
                           />
@@ -792,7 +1124,43 @@ class Medication extends PureComponent {
                 )}
               </React.Fragment>
             </GridItem>
-            <GridItem xs={6}>
+            <GridItem xs={2} style={{ marginTop: theme.spacing(2) }}>
+              {!openPrescription && (
+                <Field
+                  name='isDrugMixture'
+                  render={(args) => {
+                    return (
+                      <Checkbox
+                        label='Drug Mixture'
+                        disabled={isEditMedication}
+                        {...args}
+                        onChange={(e) => {
+                          const { setValues, orders } = this.props
+                          setValues({
+                            ...orders.defaultMedication,
+                            isDrugMixture: e.target.value,
+                            type: orders.type,
+                            visitPurposeFK: orders.visitPurposeFK,
+                          })
+
+                          if (e.target.value) {
+                            this.props.setFieldValue('drugCode', 'DrugMixture')
+                            this.props.setFieldValue('isClaimable', false)
+                          } else {
+                            this.props.setFieldValue('drugCode', undefined)
+                            this.props.setFieldValue('drugName', undefined)
+                            this.props.setFieldValue('isClaimable', undefined)
+                          }
+
+                          setDisable(false)
+                        }}
+                      />
+                    )
+                  }}
+                />
+              )}
+            </GridItem>
+            <GridItem xs={4}>
               {!openPrescription &&
               !isEditMedication && (
                 <Tooltip title='Add From Past'>
@@ -808,6 +1176,29 @@ class Medication extends PureComponent {
               )}
             </GridItem>
           </GridContainer>
+          {values.isDrugMixture && (
+            <GridContainer>
+              <GridItem xs={12}>
+                <EditableTableGrid
+                  forceRender
+                  style={{
+                    margin: theme.spacing(1),
+                  }}
+                  getRowId={(r) => r.id}
+                  rows={values.corPrescriptionItemDrugMixture}
+                  FuncProps={{
+                    pager: false,
+                  }}
+                  EditingProps={{
+                    showAddCommand: true,
+                    onCommitChanges: this.commitDrugMixtureItemChanges,
+                  }}
+                  schema={drugMixtureItemSchema}
+                  {...drugMixtureTableParas}
+                />
+              </GridItem>
+            </GridContainer>
+          )}
           <GridContainer gutter={0}>
             <GridItem xs={12}>
               <CustomInputWrapper
@@ -1180,18 +1571,19 @@ class Medication extends PureComponent {
                         }, 1)
                       }}
                       {...args}
+                      disabled={values.isDrugMixture}
                     />
                   )
                 }}
               />
             </GridItem>
             <GridItem xs={2}>
-              <FastField
+              <Field
                 name='dispenseUOMFK'
                 render={(args) => {
                   return (
                     <CodeSelect
-                      disabled={!openPrescription}
+                      disabled={!openPrescription && !values.isDrugMixture}
                       label='UOM'
                       allowClear={false}
                       code='ctMedicationUnitOfMeasurement'
@@ -1222,7 +1614,7 @@ class Medication extends PureComponent {
                         this.updateTotalPrice(e.target.value)
                       }}
                       min={0}
-                      disabled={disableEdit}
+                      disabled={disableEdit || values.isDrugMixture}
                       currency
                       {...args}
                     />
@@ -1316,7 +1708,8 @@ class Medication extends PureComponent {
               />
             </GridItem>
             <GridItem xs={12}>
-              {values.visitPurposeFK !== VISIT_TYPE.RETAIL ? (
+              {values.visitPurposeFK !== VISIT_TYPE.RETAIL &&
+              !values.isDrugMixture ? (
                 <FastField
                   name='isExternalPrescription'
                   render={(args) => {
@@ -1328,7 +1721,6 @@ class Medication extends PureComponent {
                     return (
                       <Checkbox
                         label='External Prescription'
-                        labelPlacement='start'
                         // fullWidth={false}
                         {...args}
                         onChange={(e) => {
@@ -1362,6 +1754,14 @@ class Medication extends PureComponent {
                 />
               ) : (
                 ''
+              )}
+              {values.isDrugMixture && (
+                <FastField
+                  name='isClaimable'
+                  render={(args) => {
+                    return <Checkbox label='Claimable' {...args} />
+                  }}
+                />
               )}
             </GridItem>
           </GridContainer>

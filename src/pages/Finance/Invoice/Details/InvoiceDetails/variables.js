@@ -1,5 +1,11 @@
 import numeral from 'numeral'
 import config from '@/utils/config'
+import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
+
+const wrapCellTextStyle = {
+  wordWrap: 'break-word',
+  whiteSpace: 'pre-wrap',
+}
 
 const { qtyFormat } = config
 export const DataGridColumns = [
@@ -10,8 +16,31 @@ export const DataGridColumns = [
   { name: 'totalAfterItemAdjustment', title: 'Total ($)' },
 ]
 
+const drugMixtureIndicator = (row) => {
+  if (row.itemType !== 'Medication' || !row.isDrugMixture) return null
+
+  return (
+    <div style={{ position: 'relative', top: 2 }}>
+      <DrugMixtureInfo values={row.prescriptionDrugMixture} />
+    </div>
+  )
+}
+
 export const DataGridColExtensions = [
-  { columnName: 'itemType', width: 300 },
+  {
+    columnName: 'itemType',
+    width: 300,
+    render: (row) => {
+      return (
+        <div style={{ position: 'relative' }}>
+          <div style={wrapCellTextStyle}>
+            {row.itemType}
+            {drugMixtureIndicator(row)}
+          </div>
+        </div>
+      )
+    },
+  },
   {
     columnName: 'quantity',
     type: 'number',

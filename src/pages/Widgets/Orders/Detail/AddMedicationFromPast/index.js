@@ -193,77 +193,179 @@ class PastMedication extends PureComponent {
 
         let instruction = this.getInstruction(itemInstructions)
 
-        let drug = inventorymedication.find(
-          (medication) => medication.id === item.inventoryMedicationFK,
-        )
-        let defaultBatch = drug.medicationStock.find(
-          (o) => o.isDefault === true,
-        )
-
-        let precautionIndex = 0
+        let itemExpiryDate
+        let itemBatchNo
+        let itemCostPrice
+        let itemUnitPrice
+        let itemDispenseUOMCode
+        let itemDispenseUOMDisplayValue
+        let itemDispenseUOMFK
+        let itemDrugCode
+        let itemDrugName
+        let itemTotalPrice
+        let newTotalQuantity
         let ItemPrecautions = []
-        if (
-          drug.inventoryMedication_MedicationPrecaution &&
-          drug.inventoryMedication_MedicationPrecaution.length > 0
-        ) {
-          ItemPrecautions = ItemPrecautions.concat(
-            drug.inventoryMedication_MedicationPrecaution.map((o) => {
-              let currentPrecautionSequence = precautionIndex
-              precautionIndex += 1
-              return {
-                medicationPrecautionFK: o.medicationPrecautionFK,
-                precaution: o.medicationPrecaution.name,
-                precautionCode: o.medicationPrecaution.code,
-                sequence: currentPrecautionSequence,
-                isDeleted: false,
-              }
-            }),
+        let itemCorPrescriptionItemDrugMixture = []
+        let itemDrugCaution
+        if (item.inventoryMedicationFK) {
+          // Normal Drug
+          let drug = inventorymedication.find(
+            (medication) => medication.id === item.inventoryMedicationFK,
           )
-        } else {
-          ItemPrecautions = [
-            {
-              precaution: '',
-              sequence: 0,
-            },
-          ]
+          let defaultBatch = drug.medicationStock.find(
+            (o) => o.isDefault === true,
+          )
+
+          let precautionIndex = 0
+          if (
+            drug.inventoryMedication_MedicationPrecaution &&
+            drug.inventoryMedication_MedicationPrecaution.length > 0
+          ) {
+            ItemPrecautions = ItemPrecautions.concat(
+              drug.inventoryMedication_MedicationPrecaution.map((o) => {
+                let currentPrecautionSequence = precautionIndex
+                precautionIndex += 1
+                return {
+                  medicationPrecautionFK: o.medicationPrecautionFK,
+                  precaution: o.medicationPrecaution.name,
+                  precautionCode: o.medicationPrecaution.code,
+                  sequence: currentPrecautionSequence,
+                  isDeleted: false,
+                }
+              }),
+            )
+          } else {
+            ItemPrecautions = [
+              {
+                precaution: '',
+                sequence: 0,
+              },
+            ]
+          }
+
+          newTotalQuantity = this.calculateMedicationQuantity(
+            drug,
+            itemInstructions,
+          )
+
+          itemTotalPrice = item.isExternalPrescription
+            ? 0
+            : newTotalQuantity * drug.sellingPrice
+
+          itemExpiryDate =
+            !item.isExternalPrescription && defaultBatch
+              ? defaultBatch.expiryDate
+              : undefined
+          itemBatchNo =
+            !item.isExternalPrescription && defaultBatch
+              ? defaultBatch.batchNo
+              : undefined
+
+          itemCostPrice = drug.averageCostPrice
+          itemUnitPrice = drug.sellingPrice
+
+          itemDispenseUOMCode = drug.dispensingUOM
+            ? drug.dispensingUOM.code
+            : undefined
+
+          itemDispenseUOMDisplayValue = drug.dispensingUOM
+            ? drug.dispensingUOM.name
+            : undefined
+
+          itemDispenseUOMFK = drug.dispensingUOM
+            ? drug.dispensingUOM.id
+            : undefined
+          itemDrugCode = drug.code
+          itemDrugName = drug.displayValue
+          itemDrugCaution = drug.caution
+        } else if (item.isDrugMixture) {
+          // Drug Mixture
+          itemExpiryDate = item.expiryDate
+          itemBatchNo = item.batchNo
+          itemCostPrice = item.costPrice || 0
+          itemUnitPrice = item.unitPrice || 0
+          itemDispenseUOMCode = item.dispenseUOMCode
+          itemDispenseUOMDisplayValue = item.dispenseUOMDisplayValue
+          itemDispenseUOMFK = item.dispenseUOMFK
+          itemDrugCode = item.drugCode
+          itemDrugName = item.drugName
+          itemTotalPrice = item.totalPrice
+          newTotalQuantity = item.quantity
+
+          let precautionIndex = 0
+          const precautions =
+            item.corPrescriptionItemPrecaution ||
+            item.retailPrescriptionItemPrecaution
+          if (precautions && precautions.length > 0) {
+            ItemPrecautions = ItemPrecautions.concat(
+              precautions.map((o) => {
+                let currentPrecautionSequence = precautionIndex
+                precautionIndex += 1
+                return {
+                  medicationPrecautionFK: o.medicationPrecautionFK,
+                  precaution: o.precaution,
+                  precautionCode: o.precautionCode,
+                  sequence: currentPrecautionSequence,
+                  isDeleted: false,
+                }
+              }),
+            )
+          } else {
+            ItemPrecautions = [
+              {
+                precaution: '',
+                sequence: 0,
+              },
+            ]
+          }
+
+          let drugMixtureIndex = 0
+          const drugMixtures =
+            item.corPrescriptionItemDrugMixture ||
+            item.retailPrescriptionItemDrugMixture
+          if (drugMixtures && drugMixtures.length > 0) {
+            itemCorPrescriptionItemDrugMixture = itemCorPrescriptionItemDrugMixture.concat(
+              drugMixtures.map((o) => {
+                let currentDrugMixtureSequence = drugMixtureIndex
+                drugMixtureIndex += 1
+                return {
+                  inventoryMedicationFK: o.inventoryMedicationFK,
+                  drugCode: o.drugCode,
+                  drugName: o.drugName,
+                  quantity: o.quantity,
+                  costPrice: o.costPrice,
+                  unitPrice: o.unitPrice,
+                  totalPrice: o.totalPrice,
+                  uomfk: o.uomfk,
+                  uomCode: o.uomCode,
+                  uomDisplayValue: o.uomDisplayValue,
+                  batchNo: o.batchNo,
+                  expiryDate: o.expiryDate,
+                  revenueCategoryFK: o.revenueCategoryFK,
+                  sequence: currentDrugMixtureSequence,
+                  isDeleted: false,
+                  isNew: true,
+                }
+              }),
+            )
+          }
         }
-
-        let newTotalQuantity = this.calculateMedicationQuantity(
-          drug,
-          itemInstructions,
-        )
-
-        const totalPrice = item.isExternalPrescription
-          ? 0
-          : newTotalQuantity * drug.sellingPrice
-
-        const expiryDate =
-          !item.isExternalPrescription && defaultBatch
-            ? defaultBatch.expiryDate
-            : undefined
-        const batchNo =
-          !item.isExternalPrescription && defaultBatch
-            ? defaultBatch.batchNo
-            : undefined
 
         return {
           type,
           adjAmount: 0,
-          expiryDate,
-          batchNo,
+          expiryDate: itemExpiryDate,
+          batchNo: itemBatchNo,
           corPrescriptionItemInstruction: itemInstructions,
           corPrescriptionItemPrecaution: ItemPrecautions,
-          costPrice: drug.averageCostPrice,
-          unitPrice: drug.sellingPrice,
-          dispenseUOMCode: drug.dispensingUOM
-            ? drug.dispensingUOM.code
-            : undefined,
-          dispenseUOMDisplayValue: drug.dispensingUOM
-            ? drug.dispensingUOM.name
-            : undefined,
-          dispenseUOMFK: drug.dispensingUOM ? drug.dispensingUOM.id : undefined,
-          drugCode: drug.code,
-          drugName: drug.displayValue,
+          corPrescriptionItemDrugMixture: itemCorPrescriptionItemDrugMixture,
+          costPrice: itemCostPrice,
+          unitPrice: itemUnitPrice,
+          dispenseUOMCode: itemDispenseUOMCode,
+          dispenseUOMDisplayValue: itemDispenseUOMDisplayValue,
+          dispenseUOMFK: itemDispenseUOMFK,
+          drugCode: itemDrugCode,
+          drugName: itemDrugName,
           instruction,
           inventoryMedicationFK: item.inventoryMedicationFK,
           isActive: true,
@@ -272,11 +374,13 @@ class PastMedication extends PureComponent {
           remarks: item.remarks,
           sequence: currentSequence,
           subject: item.drugName,
-          totalPrice,
-          totalAfterItemAdjustment: totalPrice,
+          totalPrice: itemTotalPrice,
+          totalAfterItemAdjustment: itemTotalPrice,
           isExternalPrescription: item.isExternalPrescription,
           visitPurposeFK: undefined,
-          caution: drug.caution,
+          isDrugMixture: item.isDrugMixture,
+          isClaimable: item.isClaimable,
+          caution: itemDrugCaution,
         }
       }),
     )
