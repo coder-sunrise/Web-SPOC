@@ -326,6 +326,9 @@ class PastMedication extends PureComponent {
           if (drugMixtures && drugMixtures.length > 0) {
             itemCorPrescriptionItemDrugMixture = itemCorPrescriptionItemDrugMixture.concat(
               drugMixtures.map((o) => {
+                let drug = inventorymedication.find(
+                  (medication) => medication.id === o.inventoryMedicationFK,
+                )
                 let currentDrugMixtureSequence = drugMixtureIndex
                 drugMixtureIndex += 1
                 return {
@@ -345,6 +348,8 @@ class PastMedication extends PureComponent {
                   sequence: currentDrugMixtureSequence,
                   isDeleted: false,
                   isNew: true,
+                  subject: o.drugName,
+                  caution: drug.caution,
                 }
               }),
             )
@@ -487,10 +492,49 @@ class PastMedication extends PureComponent {
   handleSubmit = () => {
     const { dispatch, onConfirm, type } = this.props
     let data = []
+    const cautionItems = []
     if (type === '1') {
       data = this.GetNewMedication()
+      data.map((m) => {
+        if (m.isDrugMixture) {
+          m.corPrescriptionItemDrugMixture
+            .filter((i) => i.caution && i.caution.trim().length > 0)
+            .map((mixture) => {
+              if (
+                !cautionItems.find(
+                  (f) => f.id === mixture.inventoryMedicationFK,
+                )
+              ) {
+                cautionItems.push({
+                  subject: mixture.subject,
+                  caution: mixture.caution,
+                  id: mixture.inventoryMedicationFK,
+                })
+              }
+            })
+        } else if (
+          m.caution &&
+          m.caution.trim().length > 0 &&
+          !cautionItems.find((f) => f.id === m.inventoryMedicationFK)
+        ) {
+          cautionItems.push({
+            subject: m.subject,
+            caution: m.caution,
+            id: m.inventoryMedicationFK,
+          })
+        }
+      })
     } else if (type === '2') {
       data = this.GetNewVaccination()
+      data.filter((f) => f.caution && f.caution.trim().length > 0).map((m) => {
+        if (!cautionItems.find((c) => c.id === m.inventoryVaccinationFK)) {
+          cautionItems.push({
+            subject: m.subject,
+            caution: m.caution,
+            id: m.inventoryVaccinationFK,
+          })
+        }
+      })
     }
 
     const updateRows = () => {
@@ -502,11 +546,8 @@ class PastMedication extends PureComponent {
       })
     }
 
-    const hasCautionItems = data.filter(
-      (f) => f.caution && f.caution.trim().length > 0,
-    )
-    if (hasCautionItems && hasCautionItems.length > 0) {
-      openCautionAlertPrompt(hasCautionItems, updateRows)
+    if (cautionItems.length > 0) {
+      openCautionAlertPrompt(cautionItems, updateRows)
     } else {
       updateRows()
     }
