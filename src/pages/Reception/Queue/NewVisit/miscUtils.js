@@ -55,15 +55,17 @@ const convertEyeForms = (values) => {
     'IsSelected',
     'rowIndex',
     '_errors',
-    'OD',
-    'OS',
   ]
   if (
     visitEyeRefractionForm.formData &&
     typeof visitEyeRefractionForm.formData === 'object'
   ) {
     let { formData } = visitEyeRefractionForm
-    cleanFields(formData, durtyFields)
+    cleanFields(formData, [
+      ...durtyFields,
+      'OD',
+      'OS',
+    ])
 
     values.visitEyeRefractionForm.formData = _.isEmpty(formData)
       ? undefined
@@ -72,7 +74,7 @@ const convertEyeForms = (values) => {
   if (typeof visitEyeVisualAcuityTest === 'object') {
     const { visitEyeVisualAcuityTestForm: testForm } = visitEyeVisualAcuityTest
     const clone = _.cloneDeep(testForm)
-    cleanFields(clone)
+    cleanFields(clone, durtyFields)
 
     const newTestForm = testForm.reduce((p, c) => {
       let newItem = clone.find((i) => i.id === c.id)
