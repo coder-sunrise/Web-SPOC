@@ -28,7 +28,12 @@ const AddOrder = ({
   dispatch,
   dispense,
   height,
-  codetable: { ctservice, inventoryconsumable, inventorymedication },
+  codetable: {
+    ctservice,
+    inventoryconsumable,
+    inventorymedication,
+    inventoryvaccination,
+  },
   visitType,
   location,
   clinicInfo,
@@ -141,6 +146,13 @@ const AddOrder = ({
               ...o.retailVisitInvoiceConsumable.retailConsumable,
               isActive: !!consumableItem,
             }
+            break
+          }
+          case INVOICE_ITEM_TYPE_BY_NAME.VACCINATION: {
+            const vaccinationItem = inventoryvaccination.find(
+              (v) => v.displayValue === o.itemName && v.isActive,
+            )
+            obj = { caution: vaccinationItem.caution }
             break
           }
           default: {
