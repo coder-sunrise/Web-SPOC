@@ -80,7 +80,6 @@ const cleanFields = (obj, dirtyFields = []) => {
     return _.isEmpty(obj)
   }
   if (typeof obj === 'object') {
-    // console.log(obj)
     let invalidColumns = []
     for (let value in obj) {
       if (obj[value] === undefined) {
@@ -97,12 +96,10 @@ const cleanFields = (obj, dirtyFields = []) => {
       }
     }
 
-    // console.log('invalidColumns  =', invalidColumns)
     invalidColumns.concat(dirtyFields).forEach((o) => {
       delete obj[o]
     })
 
-    // check all of fields is empty
     let isEmptyObj = !Object.keys(obj).find((f) => f !== 'id')
     return isEmptyObj
   }
@@ -230,10 +227,8 @@ const convertToConsultation = (
     ]
     // values.corDentalCharts = data.map(o=>)
   }
-  console.log('before convert :>> ', values)
-  values = convertEyeForms(values)
 
-  console.log('after convert', values)
+  values = convertEyeForms(values)
 
   const formRows = forms.rows
   formTypes.forEach((p) => {
