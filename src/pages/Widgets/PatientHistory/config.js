@@ -1,6 +1,8 @@
 import Loadable from 'react-loadable'
 import Loading from '@/components/PageLoading/index'
 import { scribbleTypes } from '@/utils/codes'
+import { cleanFields } from '@/pages/Consultation/utils'
+import _ from 'lodash'
 
 export const WIDGETS_ID = {
   CLINICAL_NOTE: '1',
@@ -420,30 +422,66 @@ export const showWidget = (current, widget) => {
     return false
 
   // check show eyevisualacuity
-  if (
-    widget.id === WIDGETS_ID.VISUALACUITYTEST &&
-    (!current.eyeVisualAcuityTestForms ||
-      current.eyeVisualAcuityTestForms.length === 0)
-  )
-    return false
+  if (widget.id === WIDGETS_ID.VISUALACUITYTEST) {
+    if (_.isEmpty(current.eyeVisualAcuityTestForms)) return false
+    const durtyFields = [
+      'concurrencyToken',
+      'eyeVisualAcuityTestFK',
+      'isDeleted',
+    ]
+    const clonForms = _.cloneDeep(current.eyeVisualAcuityTestForms)
+    cleanFields(clonForms, durtyFields)
+    return !_.isEmpty(clonForms)
+  }
 
   // check show eyerefractionform
-  if (
-    widget.id === WIDGETS_ID.REFRACTIONFORM &&
-    (!current.corEyeRefractionForm ||
-      JSON.stringify(current.corEyeRefractionForm.formData) === '{}')
-  )
-    return false
+  if (widget.id === WIDGETS_ID.REFRACTIONFORM) {
+    if (
+      !current.corEyeRefractionForm ||
+      _.isEmpty(current.corEyeRefractionForm.formData)
+    )
+      return false
+    const durtyFields = [
+      'isDeleted',
+      'isNew',
+      'IsSelected',
+      'rowIndex',
+      '_errors',
+      'id',
+      'EyeRefractionTestTypeFK',
+    ]
+
+    const cloneData = _.cloneDeep(current.corEyeRefractionForm.formData)
+    cleanFields(cloneData, durtyFields)
+    return !_.isEmpty(cloneData)
+  }
 
   // check show eyeexaminationform
-  if (
-    widget.id === WIDGETS_ID.EXAMINATIONFORM &&
-    (!current.corEyeExaminationForm ||
-      JSON.stringify(current.corEyeExaminationForm.formData) === '{}' ||
-      (current.corEyeExaminationForm.formData.EyeExaminations || []).length ===
-        0)
-  )
-    return false
+  if (widget.id === WIDGETS_ID.EXAMINATIONFORM) {
+    if (
+      !current.corEyeExaminationForm ||
+      _.isEmpty(current.corEyeExaminationForm.formData) ||
+      _.isEmpty(current.corEyeExaminationForm.formData.EyeExaminations)
+    )
+      return false
+
+    const durtyFields = [
+      'isDeleted',
+      'isNew',
+      'IsSelected',
+      'rowIndex',
+      '_errors',
+      'id',
+      'EyeExaminationTypeFK',
+      'EyeExaminationType',
+    ]
+    const cloneExaminations = _.cloneDeep(
+      current.corEyeExaminationForm.formData.EyeExaminations,
+    )
+
+    cleanFields(cloneExaminations, durtyFields)
+    return !_.isEmpty(cloneExaminations)
+  }
 
   // check show forms
   if (
