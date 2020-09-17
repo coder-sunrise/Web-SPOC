@@ -1174,7 +1174,7 @@ class Medication extends PureComponent {
       <Authorized authority={accessRight}>
         <div>
           <GridContainer>
-            <GridItem xs={8}>
+            <GridItem xs={6}>
               <React.Fragment>
                 {openPrescription || values.isDrugMixture ? (
                   <FastField
@@ -1273,7 +1273,6 @@ class Medication extends PureComponent {
                     icon={<Add />}
                     style={{
                       marginTop: theme.spacing(2),
-                      marginLeft: theme.spacing(7),
                     }}
                     onClick={this.onSearchMedicationHistory}
                   >
@@ -1660,37 +1659,14 @@ class Medication extends PureComponent {
             </GridItem>
           </GridContainer>
           <GridContainer>
-            <GridItem xs={2}>
-              <Field
-                name='quantity'
-                render={(args) => {
-                  return (
-                    <NumberInput
-                      label='Quantity'
-                      // formatter={(v) => `${v} Bottle${v > 1 ? 's' : ''}`}
-                      step={1}
-                      min={0}
-                      // currency
-                      onChange={() => {
-                        setTimeout(() => {
-                          this.setTotalPrice()
-                        }, 1)
-                      }}
-                      {...args}
-                      disabled={values.isDrugMixture}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={2}>
+            <GridItem xs={4} className={classes.editor}>
               <Field
                 name='dispenseUOMFK'
                 render={(args) => {
                   return (
                     <CodeSelect
                       disabled={!openPrescription && !values.isDrugMixture}
-                      label='UOM'
+                      label='Dispense UOM'
                       allowClear={false}
                       code='ctMedicationUnitOfMeasurement'
                       onChange={(v, op = {}) => {
