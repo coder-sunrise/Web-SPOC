@@ -23,18 +23,17 @@ export default ({
   }
   if (fieldName === 'visitReferral') {
     const { referralBy = '', referralInstitution = '', referralDate } = current
+    const referral = `Referred By: ${referralBy}        Referral Date: ${referralDate
+      ? moment(referralDate).format('DD MMM YYYY')
+      : '-'}        Institution: ${referralInstitution}`
     return (
-      <div style={{ fontSize: '0.875rem', marginLeft: 8 }}>
-        <span>{`Referred By: ${referralBy}`}</span>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <span>
-          {`Referral Date: ${referralDate
-            ? moment(referralDate).format('DD MMM YYYY')
-            : '-'}`}
-        </span>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <span>{`Institution: ${referralInstitution}`}</span>
-      </div>
+      <TextField
+        inputRootCustomClasses={tablestyles.historyText}
+        noUnderline
+        multiline
+        disabled
+        value={referral}
+      />
     )
   }
   let e = document.createElement('div')
