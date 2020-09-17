@@ -80,7 +80,6 @@ const drugMixtureItemSchema = Yup.object().shape({
     }
     if (type === '1' && v.isDrugMixture) v.drugName = 'Drug Mixture'
 
-
     if (v.uid) {
       if (v.adjAmount <= 0) {
         v.adjValue = Math.abs(v.adjValue || 0)
@@ -655,13 +654,14 @@ class Medication extends PureComponent {
       setFieldValue('drugCode', op.code)
       setFieldValue('drugName', op.displayValue)
 
-    setFieldValue('isMinus', true)
-    setFieldValue('isExactAmount', true)
-    setFieldValue('adjValue', 0)
+      setFieldValue('isMinus', true)
+      setFieldValue('isExactAmount', true)
+      setFieldValue('adjValue', 0)
 
-    setTimeout(() => {
-      this.calculateQuantity(op)
-    }, 1)
+      setTimeout(() => {
+        this.calculateQuantity(op)
+      }, 1)
+    }
   }
 
   updateTotalPrice = (v) => {
@@ -1825,7 +1825,7 @@ class Medication extends PureComponent {
           </GridContainer>
           <GridContainer>
             <GridItem xs={8} className={classes.editor}>
-               {values.visitPurposeFK !== VISIT_TYPE.RETAIL &&
+              {values.visitPurposeFK !== VISIT_TYPE.RETAIL &&
               !values.isDrugMixture ? (
                 <FastField
                   name='isExternalPrescription'
