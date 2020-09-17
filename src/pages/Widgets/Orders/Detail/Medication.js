@@ -55,26 +55,29 @@ const drugMixtureItemSchema = Yup.object().shape({
 }))
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type }) => {
+    const isDrugMixture = orders.entity && orders.entity.isDrugMixture
+    const editingMedicationFK = []
+    if (isDrugMixture) {
+      const mixtureItems = orders.entity.corPrescriptionItemDrugMixture || []
+      mixtureItems
+        .filter((o) => !o.isDeleted)
+        .map((m) => editingMedicationFK.push(m.inventoryMedicationFK))
+    } else if (orders.entity && orders.entity.inventoryMedicationFK) {
+      editingMedicationFK.push(orders.entity.inventoryMedicationFK)
+    }
+
     const v = {
       ...(orders.entity || orders.defaultMedication),
       type,
       visitPurposeFK: orders.visitPurposeFK,
       isEditMedication: !_.isEmpty(orders.entity),
-      editingMedicationFK: orders.entity
-        ? orders.entity.inventoryMedicationFK
-        : undefined,
+      editingMedicationFK,
     }
     if (type === '5') {
       v.drugCode = 'MISC'
     }
     if (type === '1' && v.isDrugMixture) v.drugName = 'Drug Mixture'
 
-    // v.corPrescriptionItemPrecaution =
-    //   v.corPrescriptionItemPrecaution && v.corPrescriptionItemPrecaution[0]
-    //     ? v.corPrescriptionItemPrecaution
-    //     : [
-    //         {},
-    //       ]
     let sequence = 0
     const newCorPrescriptionItemPrecaution = (v.corPrescriptionItemPrecaution ||
       [])
@@ -269,7 +272,6 @@ const drugMixtureItemSchema = Yup.object().shape({
     })
 
     if (onConfirm) onConfirm()
-
     setValues({
       ...orders.defaultMedication,
       type: orders.type,
@@ -746,16 +748,28 @@ class Medication extends PureComponent {
   }
 
   validateAndSubmitIfOk = async (callback) => {
-    const { handleSubmit, validateForm, dispatch, values } = this.props
+    const { handleSubmit, validateForm, values, codetable } = this.props
     const validateResult = await validateForm()
     const isFormValid = _.isEmpty(validateResult)
-    const { editingMedicationFK, inventoryMedicationFK } = values
+    const {
+      type,
+      editingMedicationFK = [],
+      inventoryMedicationFK,
+      isDrugMixture,
+      corPrescriptionItemDrugMixture = [],
+    } = values
 
-
-    if (values.type === '1' && values.isDrugMixture) {
-      const drugMixtureItems = values.corPrescriptionItemDrugMixture.filter(
-        (o) => !o.isDeleted,
-      )
+    let drugMixtureItems
+    if (type === '1' && isDrugMixture) {
+      const { inventorymedication = [] } = codetable
+      drugMixtureItems = corPrescriptionItemDrugMixture
+        .filter((o) => !o.isDeleted)
+        .map((m) => {
+          let drug =
+            inventorymedication.find((f) => f.id === m.inventoryMedicationFK) ||
+            {}
+          return { ...m, subject: m.drugName, caution: drug.caution }
+        })
       if (drugMixtureItems.length < 2) {
         notification.warn({
           message: 'At least two medications are required',
@@ -765,23 +779,33 @@ class Medication extends PureComponent {
     }
 
     if (isFormValid) {
-      const { caution = '', code, displayValue } =
+      const { id: inventoryMedicationId, caution = '', code, displayValue } =
         this.state.selectedMedication || {}
 
-      const needShowAlert =
-        caution.trim().length > 0 &&
-        editingMedicationFK !== inventoryMedicationFK
-
-      if (needShowAlert) {
-        openCautionAlertPrompt(
-          [
-            { subject: displayValue || code, caution },
-          ],
-          () => {
-            handleSubmit()
-            if (callback) callback(true)
-          },
+      let alertItems = []
+      if (isDrugMixture) {
+        alertItems = drugMixtureItems.filter(
+          (f) =>
+            !editingMedicationFK.includes(f.inventoryMedicationFK) &&
+            f.caution &&
+            f.caution.length > 0,
         )
+      } else if (
+        caution.trim().length > 0 &&
+        !editingMedicationFK.includes(inventoryMedicationFK)
+      ) {
+        alertItems.push({
+          inventoryMedicationFK: inventoryMedicationId,
+          subject: displayValue || code,
+          caution,
+        })
+      }
+
+      if (alertItems.length > 0) {
+        openCautionAlertPrompt(alertItems, () => {
+          handleSubmit()
+          if (callback) callback(true)
+        })
       } else {
         handleSubmit()
         return true

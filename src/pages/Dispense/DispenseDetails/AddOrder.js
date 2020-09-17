@@ -99,7 +99,9 @@ const AddOrder = ({
                 o.retailVisitInvoiceDrug.retailPrescriptionItem
                   .retailPrescriptionItemDrugMixture,
               isActive: !!medicationItem,
-              caution: medicationItem.caution,
+              _itemId: medicationItem.id,
+              _itemType: INVOICE_ITEM_TYPE_BY_NAME.MEDICATION,
+              _caution: medicationItem.caution,
             }
             break
           }
@@ -152,7 +154,11 @@ const AddOrder = ({
             const vaccinationItem = inventoryvaccination.find(
               (v) => v.displayValue === o.itemName && v.isActive,
             )
-            obj = { caution: vaccinationItem.caution }
+            obj = {
+              _itemId: vaccinationItem.id,
+              _itemType: INVOICE_ITEM_TYPE_BY_NAME.VACCINATION,
+              _caution: vaccinationItem.caution,
+            }
             break
           }
           default: {
@@ -190,9 +196,23 @@ const AddOrder = ({
         clinicTypeFK === CLINIC_TYPE.GP
           ? newRows.filter((row) => !row.type)
           : []
-      const cuationItems = newRows.filter(
-        (f) => f.caution && f.caution.trim().length > 0,
-      )
+
+      const cuationItems = []
+      newRows
+        .filter((f) => f._itemId && f._caution && f._caution.trim().length > 0)
+        .map((m) => {
+          const existItem = cuationItems.find(
+            (c) => c.id === m._itemId && c.type === m._itemType,
+          )
+          if (!existItem) {
+            cuationItems.push({
+              id: m._itemId,
+              type: m._itemType,
+              subject: m.subject,
+              caution: m._caution,
+            })
+          }
+        })
 
       if (isVaccinationExist.length > 0 || cuationItems.length > 0) {
         dispatch({
