@@ -1,6 +1,22 @@
 import React from 'react'
 import { CardContainer, CommonTableGrid, TextField } from '@/components'
 import * as config from './config'
+import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
+
+const wrapCellTextStyle = {
+  wordWrap: 'break-word',
+  whiteSpace: 'pre-wrap',
+}
+
+const drugMixtureIndicator = (row) => {
+  if (row.type !== 'Medication' || !row.isDrugMixture) return null
+
+  return (
+    <div style={{ position: 'relative', top: 2 }}>
+      <DrugMixtureInfo values={row.prescriptionDrugMixture} />
+    </div>
+  )
+}
 
 export const tableColumns = [
   { name: 'visitDate', title: 'Date' },
@@ -18,7 +34,20 @@ export const tableColumns = [
 export const TableColumnExtensions = [
   { columnName: 'visitDate', width: 105, type: 'date' },
   // { columnName: 'code', width: 120, },
-  { columnName: 'name', width: 250 },
+  {
+    columnName: 'name',
+    width: 250,
+    render: (row) => {
+      return (
+        <div style={{ position: 'relative' }}>
+          <div style={wrapCellTextStyle}>
+            {row.name}
+            {drugMixtureIndicator(row)}
+          </div>
+        </div>
+      )
+    },
+  },
   { columnName: 'instruction', width: 200 },
   { columnName: 'remarks' },
   { columnName: 'dispensedQuanity', width: 80, type: 'number' },
