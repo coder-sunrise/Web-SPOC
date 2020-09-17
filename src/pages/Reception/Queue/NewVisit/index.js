@@ -233,6 +233,12 @@ class NewVisit extends PureComponent {
         !registered ? queue.patientProfileFK === patientInfo.id : registered,
       false,
     )
+    const isRetail = values.visitPurposeFK === VISIT_TYPE.RETAIL
+    if (isRetail && values.visitLetterOfCertification) {
+      values.visitLetterOfCertification.forEach((item) => {
+        item.isDeleted = true
+      })
+    }
 
     if (!values.id && alreadyRegisteredVisit)
       return dispatch({
