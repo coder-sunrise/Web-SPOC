@@ -235,10 +235,7 @@ const saveConsultation = ({
   }
 }
 
-const discardConsultation = ({
-  dispatch,
-  values,
-}) => {
+const discardConsultation = ({ dispatch, values }) => {
   if (values.id) {
     dispatch({
       type: 'consultation/discard',
@@ -338,8 +335,17 @@ const pauseConsultation = ({
     'patientdashboard.editconsultation',
   ],
   mapPropsToValues: ({ consultation = {}, visitRegistration }) => {
-    if (window.g_app._store.getState().global.isShowSecondConfirmButton === undefined && visitRegistration && visitRegistration.entity) {
-      if (visitRegistration.entity.visit.visitStatus && visitRegistration.entity.visit.visitStatus !== 'IN CONS' && visitRegistration.entity.visit.visitStatus !== 'WAITING') {
+    if (
+      window.g_app._store.getState().global.isShowSecondConfirmButton ===
+        undefined &&
+      visitRegistration &&
+      visitRegistration.entity
+    ) {
+      if (
+        visitRegistration.entity.visit.visitStatus &&
+        visitRegistration.entity.visit.visitStatus !== 'IN CONS' &&
+        visitRegistration.entity.visit.visitStatus !== 'WAITING'
+      ) {
         window.g_app._store.dispatch({
           type: 'global/updateAppState',
           payload: {
@@ -347,8 +353,7 @@ const pauseConsultation = ({
             secondConfirmMessage: discardMessage,
           },
         })
-      }
-      else {
+      } else {
         window.g_app._store.dispatch({
           type: 'global/updateAppState',
           payload: {
@@ -456,7 +461,7 @@ class Main extends React.Component {
     // console.log('Main')
     initRoomAssignment()
     setTimeout(() => {
-      this.props.setFieldValue('fakeField', 'setdirty') 
+      this.props.setFieldValue('fakeField', 'setdirty')
     }, 500)
   }
 
@@ -494,12 +499,14 @@ class Main extends React.Component {
     if (
       nextProps.visitRegistration &&
       nextProps.visitRegistration.version !==
-      this.props.visitRegistration.version
+        this.props.visitRegistration.version
     )
       return true
-    if (nextProps.visitRegistration && nextProps.visitRegistration.entity &&
+    if (
+      nextProps.visitRegistration &&
+      nextProps.visitRegistration.entity &&
       nextProps.visitRegistration.entity.id !==
-      this.props.visitRegistration.entity.id
+        this.props.visitRegistration.entity.id
     )
       return true
     if (
@@ -536,10 +543,7 @@ class Main extends React.Component {
   }
 
   discardConsultation = () => {
-    const {
-      dispatch,
-      values,
-    } = this.props
+    const { dispatch, values } = this.props
     dispatch({
       type: 'consultation/discard',
       payload: values.id,
@@ -641,7 +645,7 @@ class Main extends React.Component {
       rows.filter((i) => !(i.id === undefined && i.isDeleted)),
       _originalRows,
     )
-    if (forms.rows.filter((o) => o.statusFK === 1).length > 0) {
+    if (forms.rows.filter((o) => o.statusFK === 1 && !o.isDeleted).length > 0) {
       notification.warning({
         message: `Draft forms found, please finalize it before sign off.`,
       })
@@ -728,68 +732,68 @@ class Main extends React.Component {
               {({ rights }) => {
                 //
                 return rights === 'enable' &&
-                  [
-                    'IN CONS',
-                    'WAITING',
-                  ].includes(visit.visitStatus) &&
-                  values.id ? (
-                    <GridItem>
-                      <h5 style={{ marginTop: -3, fontWeight: 'bold' }}>
-                        <Timer
-                          initialTime={
-                            Number(
-                              sessionStorage.getItem(
-                                `${values.id}_consultationTimer`,
-                              ),
-                            ) ||
-                            values.duration ||
-                            0
-                          }
-                          direction='forward'
-                          startImmediately={this.state.recording}
-                        >
-                          {({
-                            start,
-                            resume,
-                            pause,
-                            stop,
-                            reset,
-                            getTimerState,
-                            getTime,
-                          }) => {
-                            sessionStorage.setItem(
+                [
+                  'IN CONS',
+                  'WAITING',
+                ].includes(visit.visitStatus) &&
+                values.id ? (
+                  <GridItem>
+                    <h5 style={{ marginTop: -3, fontWeight: 'bold' }}>
+                      <Timer
+                        initialTime={
+                          Number(
+                            sessionStorage.getItem(
                               `${values.id}_consultationTimer`,
-                              getTime(),
-                            )
-                            return (
-                              <React.Fragment>
-                                <TimerIcon
-                                  style={{
-                                    height: 17,
-                                    top: 2,
-                                    left: -5,
-                                    position: 'relative',
-                                  }}
-                                />
-                                <Timer.Hours
-                                  formatValue={(value) =>
-                                    `${numeral(value).format('00')} : `}
-                                />
-                                <Timer.Minutes
-                                  formatValue={(value) =>
-                                    `${numeral(value).format('00')} : `}
-                                />
-                                <Timer.Seconds
-                                  formatValue={(value) =>
-                                    `${numeral(value).format('00')}`}
-                                />
-                              </React.Fragment>
-                            )
-                          }}
-                        </Timer>
-                      </h5>
-                    </GridItem>
-                  ) : null
+                            ),
+                          ) ||
+                          values.duration ||
+                          0
+                        }
+                        direction='forward'
+                        startImmediately={this.state.recording}
+                      >
+                        {({
+                          start,
+                          resume,
+                          pause,
+                          stop,
+                          reset,
+                          getTimerState,
+                          getTime,
+                        }) => {
+                          sessionStorage.setItem(
+                            `${values.id}_consultationTimer`,
+                            getTime(),
+                          )
+                          return (
+                            <React.Fragment>
+                              <TimerIcon
+                                style={{
+                                  height: 17,
+                                  top: 2,
+                                  left: -5,
+                                  position: 'relative',
+                                }}
+                              />
+                              <Timer.Hours
+                                formatValue={(value) =>
+                                  `${numeral(value).format('00')} : `}
+                              />
+                              <Timer.Minutes
+                                formatValue={(value) =>
+                                  `${numeral(value).format('00')} : `}
+                              />
+                              <Timer.Seconds
+                                formatValue={(value) =>
+                                  `${numeral(value).format('00')}`}
+                              />
+                            </React.Fragment>
+                          )
+                        }}
+                      </Timer>
+                    </h5>
+                  </GridItem>
+                ) : null
               }}
             </Authorized>
             {clinicSettings.showTotalInvoiceAmtInConsultation ? (
@@ -836,14 +840,14 @@ class Main extends React.Component {
                     'IN CONS',
                     'WAITING',
                   ].includes(visit.visitStatus) && (
-                      <ProgressButton
-                        onClick={this.pauseConsultation}
-                        color='info'
-                        icon={null}
-                      >
-                        Pause
-                      </ProgressButton>
-                    )}
+                    <ProgressButton
+                      onClick={this.pauseConsultation}
+                      color='info'
+                      icon={null}
+                    >
+                      Pause
+                    </ProgressButton>
+                  )}
                   {visit.visitStatus === 'PAUSED' && (
                     <ProgressButton
                       onClick={this.resumeConsultation}

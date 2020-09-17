@@ -10,6 +10,7 @@ import {
   ProgressButton,
 } from '@/components'
 import CommonLCForm from '@/components/_medisys/Forms/CommonLCForm/index'
+import Authorized from '@/utils/Authorized'
 
 const diagnosisSchema = Yup.object().shape({
   diagnosisCode: Yup.string().required(),
@@ -216,6 +217,17 @@ class LCForm extends PureComponent {
               icon={null}
               onClick={() => {
                 this.onSubmitButtonClicked('save')
+              }}
+            >
+              save
+            </ProgressButton>
+          )}
+          {statusFK === 1 && (
+            <ProgressButton
+              color='primary'
+              icon={null}
+              onClick={() => {
+                this.onSubmitButtonClicked('Finalize')
               }}
             >
               finalize

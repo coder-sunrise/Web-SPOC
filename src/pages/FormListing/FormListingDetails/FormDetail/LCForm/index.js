@@ -11,6 +11,7 @@ import {
   ProgressButton,
 } from '@/components'
 import CommonLCForm from '@/components/_medisys/Forms/CommonLCForm/index'
+import Authorized from '@/utils/Authorized'
 
 const diagnosisSchema = Yup.object().shape({
   diagnosisCode: Yup.string().required(),
@@ -294,17 +295,24 @@ class LCForm extends PureComponent {
           <Button color='danger' icon={null} onClick={this.cancelLCForm}>
             cancel
           </Button>
+          <ProgressButton
+            color='primary'
+            icon={null}
+            onClick={() => {
+              this.onSubmitButtonClicked('save')
+            }}
+          >
+            save
+          </ProgressButton>
           {(formCategory === FORM_CATEGORY.VISITFORM || statusFK === 1) && (
             <ProgressButton
               color='primary'
               icon={null}
               onClick={() => {
-                this.onSubmitButtonClicked('save')
+                this.onSubmitButtonClicked('finalize')
               }}
             >
-              <sapn>
-                {formCategory === FORM_CATEGORY.VISITFORM ? 'save' : 'finalize'}
-              </sapn>
+              finalize
             </ProgressButton>
           )}
 
