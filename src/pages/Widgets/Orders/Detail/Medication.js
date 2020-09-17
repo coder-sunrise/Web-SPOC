@@ -58,11 +58,13 @@ const drugMixtureItemSchema = Yup.object().shape({
     const isDrugMixture = orders.entity && orders.entity.isDrugMixture
     const editingMedicationFK = []
     if (isDrugMixture) {
-      orders.entity.corPrescriptionItemDrugMixture
+      const mixtureItems = orders.entity.corPrescriptionItemDrugMixture || []
+      mixtureItems
         .filter((o) => !o.isDeleted)
         .map((m) => editingMedicationFK.push(m.inventoryMedicationFK))
-    } else if (orders.entity && orders.entity.inventoryMedicationFK)
+    } else if (orders.entity && orders.entity.inventoryMedicationFK) {
       editingMedicationFK.push(orders.entity.inventoryMedicationFK)
+    }
 
     const v = {
       ...(orders.entity || orders.defaultMedication),

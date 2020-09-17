@@ -497,7 +497,8 @@ class PastMedication extends PureComponent {
       data = this.GetNewMedication()
       data.map((m) => {
         if (m.isDrugMixture) {
-          m.corPrescriptionItemDrugMixture
+          const mixtureItems = m.corPrescriptionItemDrugMixture || []
+          mixtureItems
             .filter((i) => i.caution && i.caution.trim().length > 0)
             .map((mixture) => {
               if (
