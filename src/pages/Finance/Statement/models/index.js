@@ -24,6 +24,7 @@ export default createListViewModel({
       statementPaymentList: [],
       activeTab: '0',
       invoicePaymentList: [],
+      statementNoList: undefined,
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen((loct, method) => {
@@ -107,6 +108,13 @@ export default createListViewModel({
           },
         })
       },
+      *queryRecentStatementNo ({ payload }, { call, put }) {
+        const response = yield call(service.getLastStatementNo, payload)        
+        yield put({
+          type: 'getLastStatementNoDone',
+          payload: response,
+        })
+      },
     },
     reducers: {
       setActiveTab (st, { payload }) {
@@ -156,6 +164,14 @@ export default createListViewModel({
         return {
           ...st,
           entity: data,
+        }
+      },
+      getLastStatementNoDone (st, { payload }) {
+        const { data } = payload
+        console.log(payload)
+        return {
+          ...st,
+          statementNoList: data,
         }
       },
       updateBizSessionList (state, { payload }) {
