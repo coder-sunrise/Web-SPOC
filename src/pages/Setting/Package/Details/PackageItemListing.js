@@ -8,6 +8,7 @@ import { getServices } from '@/utils/codetable'
 import PackageItemType from './PackageItemType'
 import { ITEM_TYPE } from '@/utils/constants'
 import { roundTo, maxReducer } from '@/utils/utils'
+import { currencySymbol } from '@/utils/config'
 
 const styles = (theme) => ({
   displayDiv: {
@@ -468,7 +469,7 @@ const PackageItemListing = ({
       {
         columnName: 'inventoryMedicationFK',
         type: 'select',
-        labelField: 'name',
+        labelField: 'displayValue',
         options: medicationList,
         onChange: handleItemOnChange,
       },
@@ -524,7 +525,7 @@ const PackageItemListing = ({
       {
         columnName: 'inventoryConsumableFK',
         type: 'select',
-        labelField: 'name',
+        labelField: 'displayValue',
         options: consumableList,
         onChange: handleItemOnChange,
       },
@@ -579,7 +580,7 @@ const PackageItemListing = ({
       {
         columnName: 'inventoryVaccinationFK',
         type: 'select',
-        labelField: 'name',
+        labelField: 'displayValue',
         options: vaccinationList,
         onChange: handleItemOnChange,
       },
@@ -661,20 +662,43 @@ const PackageItemListing = ({
       {
         columnName: 'serviceFK',
         type: 'select',
+        labelField: 'displayValue',
         options: (row) => {
+          let options = []
           const tempArray = [
             ...servicess,
           ]
           if (!row.serviceCenterFK) {
-            return tempArray
+            options = tempArray
+          } else {
+            options = tempArray.filter((o) =>
+              o.serviceCenters.find((m) => m.value === row.serviceCenterFK),
+            )
           }
-          const options = tempArray.filter((o) =>
-            o.serviceCenters.find((m) => m.value === row.serviceCenterFK),
-          )
-          return options
+
+          return options.map((m) => {
+            const defaultServiceCenter =
+              m.serviceCenters.find((o) => o.isDefault) || {}
+            const { unitPrice = 0 } = defaultServiceCenter
+            return {
+              ...m,
+              displayValue: `${m.name} - ${m.code} (${currencySymbol}${unitPrice.toFixed(
+                2,
+              )})`,
+            }
+          })
         },
         onChange: (e) => {
           handleItemOnChange
+          if (!e.row.serviceCenterFK) {
+            const serviceCenterService = serviceCenterServicess.find(
+              (o) => o.serviceId === e.val && o.isDefault,
+            )
+            if (serviceCenterService) {
+              e.row.serviceCenterFK = serviceCenterService.serviceCenterId
+            }
+          }
+
           getServiceCenterService(e.row)
           e.row.serviceFK = e.val
         },
