@@ -41,7 +41,7 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
 
   const adjustments = finalAdjustments.filter((o) => !o.isDeleted)
   const editRow = (row) => {
-    if (!row.isActive && row.type !== '5') return
+    if (!row.isActive && row.type !== '5' && !row.isDrugMixture) return
 
     if (row.type === '7' && from !== 'ca') return
 
@@ -382,11 +382,23 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
           width: 150,
           render: (row) => {
             const otype = orderTypes.find((o) => o.value === row.type)
-            const texts = [
-              otype.name,
-              row.isExternalPrescription === true ? '(Ext.)' : '',
-              row.type === '5' || row.isActive ? '' : '(Inactive)',
-            ].join(' ')
+            let texts = []
+
+            if (row.type === '1') {
+              if (row.isDrugMixture === true) texts = 'Drug Mixture'
+              else {
+                texts = [
+                  otype.name,
+                  row.isExternalPrescription === true ? '(Ext.)' : '',
+                  row.isActive ? '' : '(Inactive)',
+                ].join(' ')
+              }
+            } else {
+              texts = [
+                otype.name,
+                row.type === '5' || row.isActive ? '' : '(Inactive)',
+              ].join(' ')
+            }
 
             return (
               <Tooltip title={texts}>
@@ -494,7 +506,10 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
                       color='primary'
                       style={{ marginRight: 5 }}
                       disabled={
-                        isEditingEntity || (!row.isActive && row.type !== '5')
+                        isEditingEntity ||
+                        (!row.isActive &&
+                          row.type !== '5' &&
+                          !row.isDrugMixture)
                       }
                     >
                       <Edit />

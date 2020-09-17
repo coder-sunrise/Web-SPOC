@@ -16,6 +16,7 @@ import {
 import Yup from '@/utils/yup'
 import { getUniqueId } from '@/utils/utils'
 import config from '@/utils/config'
+import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
 
 const { qtyFormat } = config
 
@@ -449,6 +450,8 @@ class OrderSet extends PureComponent {
                 orderTypes.find((type) => type.value === '1').name +
                 (o.inventoryMedication.isActive === true ? '' : ' (Inactive)'),
               isActive: o.inventoryMedication.isActive === true,
+              caution: o.inventoryMedication.caution,
+              subject: o.medicationName,
             }
           }),
         )
@@ -465,6 +468,8 @@ class OrderSet extends PureComponent {
                 orderTypes.find((type) => type.value === '2').name +
                 (o.inventoryVaccination.isActive === true ? '' : ' (Inactive)'),
               isActive: o.inventoryVaccination.isActive === true,
+              caution: o.inventoryVaccination.caution,
+              subject: o.vaccinationName,
             }
           }),
         )
@@ -526,13 +531,28 @@ class OrderSet extends PureComponent {
     }
   }
 
-  validateAndSubmitIfOk = async () => {
-    const { handleSubmit, validateForm } = this.props
+  validateAndSubmitIfOk = async (callback) => {
+    const {
+      handleSubmit,
+      validateForm,
+      dispatch,
+      values: { orderSetItems = [] },
+    } = this.props
     const validateResult = await validateForm()
     const isFormValid = _.isEmpty(validateResult)
     if (isFormValid) {
-      handleSubmit()
-      return true
+      const hasCautionItems = orderSetItems.filter(
+        (f) => f.caution && f.caution.trim().length > 0,
+      )
+      if (hasCautionItems.length > 0) {
+        openCautionAlertPrompt(hasCautionItems, () => {
+          handleSubmit()
+          if (callback) callback(true)
+        })
+      } else {
+        handleSubmit()
+        return true
+      }
     }
     return false
   }
