@@ -7,14 +7,44 @@ import { GridContainer, GridItem, TextField } from '@/components'
 import { VISIT_TYPE } from '@/utils/constants'
 import AmountSummary from './AmountSummary'
 import tablestyles from './PatientHistoryStyle.less'
+import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 
 const numberstyle = {
   color: 'darkBlue',
   fontWeight: 500,
 }
 
+const wrapCellTextStyle = {
+  wordWrap: 'break-word',
+  whiteSpace: 'pre-wrap',
+}
+
+const drugMixtureIndicator = (row) => {
+  if (row.itemType !== 'Medication' || !row.isDrugMixture) return null
+
+  return (
+    <div style={{ position: 'relative', top: 2 }}>
+      <DrugMixtureInfo values={row.prescriptionDrugMixture} />
+    </div>
+  )
+}
+
 const baseColumns = [
-  { dataIndex: 'itemType', title: 'Type', width: 150 },
+  {
+    dataIndex: 'itemType',
+    title: 'Type',
+    width: 150,
+    render: (text, row) => {
+      return (
+        <div style={{ position: 'relative' }}>
+          <div style={wrapCellTextStyle}>
+            {row.itemType}
+            {drugMixtureIndicator(row)}
+          </div>
+        </div>
+      )
+    },
+  },
   { dataIndex: 'itemName', title: 'Name' },
   {
     dataIndex: 'quantity',
@@ -70,7 +100,26 @@ export default ({ current, theme }) => {
       visitPurposeFK === VISIT_TYPE.BILL_FIRST
     ) {
       columns = [
-        { dataIndex: 'itemType', title: 'Type', width: 150 },
+        {
+          dataIndex: 'itemType',
+          title: 'Type',
+          width: 150,
+          render: (text, row) => {
+            return (
+              <div style={{ position: 'relative' }}>
+                <div
+                  style={{
+                    wordWrap: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                  }}
+                >
+                  {row.itemType}
+                  {drugMixtureIndicator(row)}
+                </div>
+              </div>
+            )
+          },
+        },
         { dataIndex: 'itemName', title: 'Name' },
         {
           dataIndex: 'description',

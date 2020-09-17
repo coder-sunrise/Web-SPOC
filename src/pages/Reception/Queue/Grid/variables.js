@@ -134,7 +134,7 @@ export const ApptColumnExtensions = [
   },
   {
     columnName: 'appointmentTime',
-    width: 170,
+    width: 180,
     type: 'date',
     showTime: true,
   },

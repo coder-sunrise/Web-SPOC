@@ -3,8 +3,6 @@ import { formatMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core/styles'
 import { FastField } from 'formik'
 import { compose } from 'redux'
-import SharedContainer from '../../SharedContainer'
-import Sdd from '../../Sdd'
 import {
   CodeSelect,
   CardContainer,
@@ -18,6 +16,8 @@ import {
   dateFormatLong,
   CheckboxGroup,
 } from '@/components'
+import SharedContainer from '../../SharedContainer'
+import Sdd from '../../Sdd'
 
 const styles = () => ({})
 
@@ -109,19 +109,16 @@ const Detail = ({
               </GridItem>
               <GridItem xs={12}>
                 <FastField
-                  name='remarks'
-                  render={(args) => {
-                    return (
-                      <TextField
-                        label={formatMessage({
-                          id: 'inventory.master.medication.remarks',
-                        })}
-                        multiline
-                        rowsMax='5'
-                        {...args}
-                      />
-                    )
-                  }}
+                  name='caution'
+                  render={(args) => (
+                    <TextField
+                      label={formatMessage({
+                        id: 'inventory.master.medication.caution',
+                      })}
+                      maxLength={200}
+                      {...args}
+                    />
+                  )}
                 />
               </GridItem>
             </GridContainer>
@@ -189,6 +186,29 @@ const Detail = ({
               </GridItem>
             </GridContainer>
           </GridItem>
+          <GridItem xs={12} md={5}>
+            <GridContainer>
+              <GridItem xs={12}>
+                <FastField
+                  name='remarks'
+                  render={(args) => {
+                    return (
+                      <TextField
+                        label={formatMessage({
+                          id: 'inventory.master.medication.remarks',
+                        })}
+                        multiline
+                        rowsMax='5'
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+            </GridContainer>
+          </GridItem>
+
+          <GridItem xs={12} />
           <GridItem>
             <FastField
               name='chas'
