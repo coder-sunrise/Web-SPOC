@@ -82,7 +82,7 @@ const cleanFields = (obj, dirtyFields = []) => {
   if (typeof obj === 'object') {
     let invalidColumns = []
     for (let value in obj) {
-      if (obj[value] === undefined) {
+      if (obj[value] === undefined || obj[value] === null) {
         invalidColumns.push(value)
       } else if (Array.isArray(obj[value]) || typeof obj[value] === 'object') {
         const isEmpty = cleanFields(obj[value], dirtyFields)
