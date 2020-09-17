@@ -157,7 +157,6 @@ class EditOrder extends Component {
 
   signOrder = async () => {
     const { values, validateForm, handleSubmit, forms } = this.props
-    console.log(forms)
     if (forms.rows.filter((o) => o.statusFK === 1 && !o.isDeleted).length > 0) {
       notification.warning({
         message: `Draft forms found, please finalize it before save.`,
