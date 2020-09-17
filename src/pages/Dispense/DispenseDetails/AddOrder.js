@@ -201,8 +201,16 @@ const AddOrder = ({
       newRows
         .filter((f) => f._itemId && f._caution && f._caution.trim().length > 0)
         .map((m) => {
-          if (!cuationItems.find((c) => c.id === m._itemId)) {
-            cuationItems.push({ subject: m.subject, caution: m._caution })
+          const existItem = cuationItems.find(
+            (c) => c.id === m._itemId && c.type === m._itemType,
+          )
+          if (!existItem) {
+            cuationItems.push({
+              id: m._itemId,
+              type: m._itemType,
+              subject: m.subject,
+              caution: m._caution,
+            })
           }
         })
 
