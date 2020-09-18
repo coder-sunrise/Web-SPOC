@@ -78,17 +78,18 @@ class FilterBar extends PureComponent {
 
     return (
       <React.Fragment>
-        <GridItem md={3}>
+        <GridItem md={4}>
           <CodeSelect
             label='Type'
             value={selectedTypeIds}
             code='LTDepositTransactionType'
             mode='multiple'
+            style={{ width: 250 }}
             onChange={this.props.handleTypeChange}
           />
         </GridItem>
 
-        <GridItem md={9} style={{ alignSelf: 'center', textAlign: 'right' }}>
+        <GridItem md={8} style={{ alignSelf: 'center', textAlign: 'right' }}>
           <Button size='lg' onClick={this.openReportViewer} color='primary'>
             <Printer /> Transaction Details
           </Button>
