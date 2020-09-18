@@ -1,7 +1,9 @@
 import React, { PureComponent } from 'react'
+import { connect } from 'dva'
+import moment from 'moment'
+import { EditableTableGrid, notification } from '@/components'
 
-import { EditableTableGrid, CardContainer } from '@/components'
-
+@connect(({ codetable }) => ({ codetable }))
 class PayersGrid extends PureComponent {
   tableParas = {
     columns: [
@@ -9,23 +11,90 @@ class PayersGrid extends PureComponent {
       { name: 'payerID', title: 'Payer ID' },
       { name: 'dob', title: 'Date of Birth' },
       { name: 'relationshipFK', title: 'Patient Is' },
-      { name: 'scheme', title: 'Scheme' },
+      { name: 'schemeFK', title: 'Scheme' },
     ],
     columnExtensions: [
       {
         columnName: 'dob',
         type: 'date',
         dobRestrict: true,
+        onChange: ({ row }) => {
+          if(!row.schemeFK) return
+          
+          const { ctschemetype = [] } = this.props.codetable
+          const patSchemeType = ctschemetype.find(
+            (item) => item.id === row.schemeFK,
+          )
+
+          if(patSchemeType.code !== 'FLEXIMEDI') return
+
+          const minAge = moment().subtract(65, 'years')
+          const payerAge = moment(row.dob)
+
+          if(payerAge.isAfter(minAge))
+          notification.error({
+            message: 'Payer DOB must be equal or more than 65 for Flexi-Medisave',
+          })
+        },
       },
       {
         columnName: 'relationshipFK',
         type: 'codeSelect',
         code: 'ctMedisaveRelationShip',
+        onChange: ({ row }) => {  
+          const { ctschemetype = [], ctmedisaverelationship } = this.props.codetable
+
+          const relation = ctmedisaverelationship.find(
+            (item) => item.id === row.relationshipFK,
+          )
+
+          if (relation.name === 'SELF') // auto populate payer
+          {
+            const { entity } = this.props.patient
+            row.payerName = entity.name
+            row.payerID = entity.patientAccountNo
+            row.dob = entity.dob
+          }
+          
+          if(!row.schemeFK) return
+
+          const patSchemeType = ctschemetype.find(
+            (item) => item.id === row.schemeFK,
+          )
+
+          if(patSchemeType.code !== 'FLEXIMEDI') return
+
+          let st = [
+            'SELF',
+            'SPOUSE',
+          ].indexOf(relation.name) < 0
+
+          if (st) {
+            notification.error({
+              message: '“Patient is” must be “Self” or “Spouse” for Flexi-Medisave',
+            })
+          }
+        },
       },
       {
-        columnName: 'scheme',
+        columnName: 'schemeFK',
         type: 'codeSelect',
         code: 'ctSchemeType',
+        localFilter: (opt) => [
+          'FLEXIMEDI',
+          'OPSCAN',
+          'MEDIVISIT',
+        ].indexOf(opt.code) >= 0,
+        render: (row) => {
+          const { ctschemetype = [] } = this.props.codetable
+          const patSchemeType = ctschemetype.find(
+            (item) => item.id === row.schemeFK,
+          )
+
+          return (
+            <span>{patSchemeType ? patSchemeType.name : ''}</span>
+          )
+        },
       },
     ],
   }

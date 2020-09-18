@@ -6,6 +6,7 @@ import {
   getRemovedUrl,
   getAppendUrl,
   getRefreshChasBalanceStatus,
+  getRefreshMedisaveBalanceStatus,
 } from '@/utils/utils'
 
 const defaultPatientEntity = {
@@ -269,6 +270,33 @@ export default createFormViewModel({
 
         if (data) {
           const status = getRefreshChasBalanceStatus(data.status)
+          return { ...data, ...status }
+        }
+
+        return result
+      },
+      *refreshMedisaveBalance ({ payload }, { call }) {
+        const {
+          patientAccountNo,
+          isSaveToDb = false,
+          patientProfileId,
+          schemePayer,
+        } = payload
+        const newPayload = {
+          patientNric: patientAccountNo,
+          year: moment().year(),
+          isSaveToDb,
+          patientProfileId,
+          schemePayers: schemePayer,
+        }
+
+        const response = yield call(service.requestMedisaveBalance, newPayload)
+
+        const { data } = response
+        let result = { isSuccessful: false }
+
+        if (data) {
+          const status = getRefreshMedisaveBalanceStatus(data.status)
           return { ...data, ...status }
         }
 

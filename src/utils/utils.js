@@ -932,6 +932,37 @@ const getRefreshChasBalanceStatus = (status = []) => {
   return { ...defaultResponse, isSuccessful: true }
 }
 
+const getRefreshMedisaveBalanceStatus = (status = []) => {
+  let defaultResponse = { isSuccessful: false, statusDescription: '' }
+  if (_.isEmpty(status)) {
+    return { ...defaultResponse }
+  }
+
+  const successCode = 'SC100'
+  const fullBalanceSuccessCode = 'SC105'
+  const { statusCode, statusDescription } = status[0]
+
+  if (statusCode && // TODO: should never be null, check api
+    statusCode.trim().toLowerCase() ===
+    fullBalanceSuccessCode.trim().toLowerCase()
+  ) {
+    return {
+      ...defaultResponse,
+      isSuccessful: true,
+    }
+  }
+
+  if (statusCode && // TODO: should never be null, check api
+    statusCode.trim().toLowerCase() !== successCode.trim().toLowerCase()) {
+    return {
+      ...defaultResponse,
+      statusDescription,
+    }
+  } 
+
+  return { ...defaultResponse, isSuccessful: true }
+}
+
 const sortAdjustment = (a, b) => {
   const { sequence: aSequence } = a
   const { sequence: bSequence } = b
@@ -1262,6 +1293,7 @@ module.exports = {
   htmlEncodeByRegExp,
   htmlDecodeByRegExp,
   getRefreshChasBalanceStatus,
+  getRefreshMedisaveBalanceStatus,
   calculateAmount,
   removeFields,
   commonDataReaderTransform,

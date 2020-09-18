@@ -40,8 +40,9 @@ const tabHeader = (tabName, detailsProps) => {
         reOrderThreshold,
         criticalThreshold,
         prescriptionToDispenseConversion,
+        inventoryVaccinationMedisaveVaccination,
       } = detailsProps.errors
-      
+
       if (
         (dispensingUOMFK ||
           prescribingUOMFK ||
@@ -51,7 +52,7 @@ const tabHeader = (tabName, detailsProps) => {
         return errorHeader
       }
       if (
-        (code || displayValue || revenueCategoryFK || effectiveDates) &&
+        (code || displayValue || revenueCategoryFK || effectiveDates || inventoryVaccinationMedisaveVaccination) &&
         tabName === 'General'
       ) {
         return errorHeader

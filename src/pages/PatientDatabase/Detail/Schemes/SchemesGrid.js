@@ -45,7 +45,7 @@ class SchemesGrid extends PureComponent {
           },
           sortingEnabled: false,
           isDisabled: (row) => {
-            return this.isMedisaveOrPHPC(row)
+            return this.isPHPC(row)
           },
           // onChange: (date, moments, org, row) => {
           //   row.validFrom = date[0]
@@ -72,7 +72,7 @@ class SchemesGrid extends PureComponent {
             const st = ctSchemeTypes.find((o) => o.id === val)
             if (!st) return
             // console.log('schemesgrid', { rows, st })
-            if (this.isMedisaveOrPHPC(row)) {
+            if (this.isPHPC(row)) {
               row.validRange = []
               row.validFrom = undefined
               row.validTo = undefined
@@ -231,7 +231,7 @@ class SchemesGrid extends PureComponent {
       const newRows = this.getSortedRows(rows)
 
       newRows.forEach((r, i) => {
-        if (r.validRange && !this.isMedisaveOrPHPC(r)) {
+        if (r.validRange && !this.isPHPC(r)) {
           r.validFrom = r.validRange[0]
           r.validTo = r.validRange[1]
         } else {
@@ -318,10 +318,9 @@ class SchemesGrid extends PureComponent {
     if (!r) return false
     return (
       [
-        'MEDI500VISIT',
+        'MEDIVISIT',
         'FLEXIMEDI',
         'OPSCAN',
-        'MEDI500VACCINATION',
       ].indexOf(r.code) >= 0 || r.code.startsWith('PHPC')
     )
   }

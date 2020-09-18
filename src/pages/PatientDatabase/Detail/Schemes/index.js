@@ -1,13 +1,15 @@
 import React, { PureComponent, useEffect, useState } from 'react'
-
+import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import { Button, CommonModal, GridContainer, GridItem } from '@/components'
 
-import SchemesGrid from './SchemesGrid'
 import CHASCardReplacement from '@/components/_medisys/SchemePopover/CHASCardReplacement'
 import { locationQueryParameters } from '@/utils/utils'
+import SchemesGrid from './SchemesGrid'
+import PayersGrid from './PayersGrid'
 
 const styles = () => ({})
+@connect(({ codetable }) => ({ codetable }))
 class Schemes extends PureComponent {
   state = {
     showReplacementModal: false,
@@ -65,6 +67,22 @@ class Schemes extends PureComponent {
         },
       })
     }
+  }
+
+  isMedisave = (row) => {
+    const { codetable } = this.props
+    const schemeTypes = codetable['ctSchemeType'.toLowerCase()] || []
+
+    const r = schemeTypes.find((o) => o.id === row.schemeTypeFK)
+
+    if (!r) return false
+    return (
+      [
+        'MEDIVISIT',
+        'FLEXIMEDI',
+        'MEDI500VACCINATION',
+      ].indexOf(r.code) >= 0
+    )
   }
 
   createNewScheme = (result, values) => {
@@ -246,20 +264,28 @@ class Schemes extends PureComponent {
           />
         </CommonModal>
         {/* TODO: hide medisave payer until feature is fully built */}
-        {/* <h4
+        <div
           style={{
-            marginTop: theme.spacing(2),
-          }}
+              display: values.patientScheme.find((o) => this.isMedisave(o))  ? '' : 'none',
+            }}
         >
-          Medisave Payer
-        </h4>
-        <PayersGrid
-          enableAdd={values.patientScheme ? values.patientScheme.find((o) => o.schemeTypeFK === 11): false} // TODO: check is medisave added
-          rows={values.schemePayer}
-          schema={schema.schemePayer._subType}
-          values={values}
-          {...restProps}
-        /> */}
+          <h4
+            style={{
+              marginTop: theme.spacing(2),
+              marginLeft: theme.spacing(1),
+            }}
+          >
+            Medisave Payer
+          </h4>
+          <PayersGrid
+            enableAdd={values.patientScheme ? values.patientScheme.find((o) => this.isMedisave(o)) : false} // TODO: check is medisave added
+            rows={values.schemePayer}
+            schema={schema.schemePayer._subType}
+            values={values}
+            {...restProps}
+          />
+        </div>
+        
       </div>
     )
   }

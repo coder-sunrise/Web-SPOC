@@ -25,6 +25,7 @@ import styles from './styles.js'
 class PatientInfoSideBanner extends PureComponent {
   state = {
     refreshedSchemeData: {},
+    refreshedSchemePayerData: {},
   }
 
   componentDidMount = () => {
@@ -39,6 +40,18 @@ class PatientInfoSideBanner extends PureComponent {
         return schemeData
       })
     }
+  }
+
+  isMedisave = (schemeTypeFK) => {
+    const { ctSchemeType } = this.props    
+    const r = ctSchemeType.find((o) => o.id === schemeTypeFK)
+    return (
+      [
+        'FLEXIMEDI',
+        'OPSCAN',
+        'MEDIVISIT',
+      ].indexOf(r.code) >= 0
+    )
   }
 
   refreshChasBalance = (patientCoPaymentSchemeFK, oldSchemeTypeFK) => {
@@ -111,6 +124,69 @@ class PatientInfoSideBanner extends PureComponent {
       }
     })
   }
+  
+  refreshMedisaveBalance = (oldSchemeTypeFK, schemePayers) => {
+    const { dispatch, entity, setValues } = this.props
+    const isSaveToDb = true
+
+    dispatch({
+      type: 'patient/refreshMedisaveBalance',
+      payload: {
+        ...entity,
+        isSaveToDb,
+        patientProfileId: entity.id,
+        schemePayers,
+      },
+    }).then((result) => {
+      if (result) {
+        const params = locationQueryParameters()
+        if (params.md !== 'visreg') {
+          dispatch({
+            type: 'patient/query',
+            payload: {
+              id: entity.id,
+            },
+          }).then((pat) => {
+            setValues(pat)
+          })
+        }
+        console.log(result)
+
+        const {
+          balance,
+          schemeTypeFk,
+          validFrom,
+          validTo,
+          isSuccessful,
+          statusDescription,
+        } = result
+        let isShowReplacementModal = false
+        if (!isSuccessful) {
+          this.setState({
+            refreshedSchemePayerData: {
+              statusDescription,
+              isSuccessful,
+            },
+          })
+        } else {
+          if (oldSchemeTypeFK !== schemeTypeFk) {
+            isShowReplacementModal = true
+          }
+          this.setState({
+            refreshedSchemePayerData: {
+              isShowReplacementModal,
+              oldSchemeTypeFK,
+              balance,
+              schemeTypeFK: schemeTypeFk,
+              validFrom,
+              validTo,
+              isSuccessful,
+            },
+          })
+        }
+      }
+    })
+  }
 
   getSchemeDetails = (schemeData) => {
     if (
@@ -167,6 +243,36 @@ class PatientInfoSideBanner extends PureComponent {
         this.state.refreshedSchemeData.isSuccessful === false
           ? 'ERROR'
           : chronicStatus,
+      isSuccessful:
+        this.state.refreshedSchemeData.isSuccessful !== ''
+          ? this.state.refreshedSchemeData.isSuccessful
+          : '',
+    }
+  }
+
+  
+  getSchemePayerDetails = (schemePayer) => {
+    if (
+      !_.isEmpty(this.state.refreshedSchemePayerData) &&
+      this.state.refreshedSchemePayerData.isSuccessful === true
+    ) {
+      return { ...this.state.refreshedSchemePayerData }
+    }
+
+    const { patientScheme } = this.props.entity
+
+    const schemeData = patientScheme.find((row) => row.schemeTypeFK === schemePayer.schemeFK)
+    const balanceData = schemeData.patientSchemeBalance.find((row) => row.schemePayerFK === schemePayer.id)
+
+    return {
+      payerName: schemePayer.payerName,
+      payerAccountNo: schemePayer.payerID,
+      balance: balanceData.balance ??  '',
+      patientCoPaymentSchemeFK: balanceData.patientCopaymentSchemeFK,
+      schemeTypeFK: schemePayer.schemeFK,
+      validFrom: schemeData.validFrom,
+      validTo: schemeData.validTo,
+      statusDescription: this.state.refreshedSchemeData.statusDescription,
       isSuccessful:
         this.state.refreshedSchemeData.isSuccessful !== ''
           ? this.state.refreshedSchemeData.isSuccessful
@@ -233,6 +339,7 @@ class PatientInfoSideBanner extends PureComponent {
               const schemeData = this.getSchemeDetails(o)
 
               return (
+                // == CHAS == //
                 <LoadingWrapper loading={loading} text='Retrieving balance...'>
                   <div style={{ marginBottom: theme.spacing(1) }}>
                     <p style={{ fontWeight: 500 }}>
@@ -311,14 +418,106 @@ class PatientInfoSideBanner extends PureComponent {
         {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).length > 0 && (
           <Divider light />
         )}
+        {entity.schemePayer.length > 0 && (
+          // == MEDISAVE == //
+          <div
+            className={classes.schemeContainer}
+            style={{ maxHeight: height - 455 - 20 }}
+          >
+            {entity.schemePayer
+              .filter((o) => this.isMedisave(o.schemeFK) && !o.isDeleted)
+              .map((o) => {
+                const schemeData = this.getSchemePayerDetails(o)
+                return (
+                  <LoadingWrapper loading={loading} text='Retrieving balance...'>
+                    <div style={{ marginBottom: theme.spacing(3) }}>
+                      {/* <p style={{ fontWeight: 500 }}> */}
+                      {o === entity.schemePayer[0] &&
+                      <p>
+                        {/* <CodeSelect text code='ctSchemeType' value={o.schemeTypeFK} /> */}
+                        {/* <CodeSelect
+                          text
+                          code='ctSchemeType'
+                          value={schemeData.schemeTypeFK}
+                        /> */}
+                        Medisave                        
+                        <IconButton>
+                          <Refresh
+                            onClick={() =>
+                              this.refreshMedisaveBalance(
+                                schemeData.schemeTypeFK,
+                                schemeData.schemePayer,
+                              )}
+                          />
+                        </IconButton>
+                        
+                        {/* <SchemePopover
+                          isShowReplacementModal={
+                            schemeData.isShowReplacementModal
+                          }
+                          handleRefreshChasBalance={() =>
+                            this.refreshMedisaveBalance(
+                              schemeData.patientCoPaymentSchemeFK,
+                              schemeData.schemeTypeFK,
+                              schemeData.schemePayer,
+                            )}
+                          entity={entity}
+                          schemeData={schemeData}
+                        /> */}
+                      </p>}
+                      {schemeData.validFrom && (
+                        <div>
+                          <p>
+                            Payer:&nbsp;
+                            {schemeData.payerName}&nbsp;
+                            [{schemeData.payerAccountNo}]
+                          </p>
+                          <p>
+                            <NumberInput
+                              prefix='Balance:'
+                              text
+                              currency
+                              value={schemeData.balance}
+                            />
+                          </p>
+                          <p>
+                            <DatePicker
+                              prefix='Validity:'
+                              text
+                              format={dateFormatLong}
+                              // value={o.validFrom}
+                              value={schemeData.validFrom}
+                            />&nbsp; -&nbsp;
+                            <DatePicker
+                              text
+                              format={dateFormatLong}
+                              // value={o.validTo}
+                              value={schemeData.validTo}
+                            />
+                          </p>
+                          <p style={{ color: 'red' }}>
+                            {schemeData.statusDescription}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </LoadingWrapper>
+                )
+              })}
+          </div>
+        )}
+        {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).length > 0 && (
+          <Divider light />
+        )}
       </React.Fragment>
     ) : null
   }
 }
 const ConnectedPatientInfoSideBanner = connect(
-  ({ loading, clinicSettings }) => ({
+  ({ loading, clinicSettings, codetable }) => ({
     loading: loading.models.patient,
     clinicSettings: clinicSettings.settings,
+    ctSchemeType: codetable['ctSchemeType'.toLowerCase()] || [],
   }),
 )(PatientInfoSideBanner)
 

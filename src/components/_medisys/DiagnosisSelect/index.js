@@ -30,6 +30,10 @@ const filterOptions = [
     value: 'isHazeClaimable',
     name: 'Haze',
   },
+  {
+    value: 'isCdmpClaimable',
+    name: 'CDMP',
+  },
 ]
 
 const DiagnosisSelect = ({
@@ -126,7 +130,8 @@ const DiagnosisSelect = ({
     showPrefix =
       selected.isChasAcuteClaimable ||
       selected.isChasChronicClaimable ||
-      selected.isHazeClaimable
+      selected.isHazeClaimable ||
+      selected.isCdmpClaimable
   }
 
   return (

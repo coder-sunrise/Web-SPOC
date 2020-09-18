@@ -221,7 +221,7 @@ const schemaSchemes = {
             if (!st) return false
             const notMedisaveOrPhpc =
               [
-                'MEDI500VISUT',
+                'MEDIVISIT',
                 'FLEXIMEDI',
                 'OPSCAN',
               ].indexOf(st.code) < 0 && !st.code.startsWith('PHPC')
@@ -240,7 +240,7 @@ const schemaSchemes = {
       payerName: Yup.string().required(),
       payerID: Yup.string().required(),
       relationshipFK: Yup.number().required(),
-      // scheme: Yup.string().required(),
+      schemeFK: Yup.number().required(),
       dob: Yup.date().required(),
     }),
   ),
