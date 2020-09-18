@@ -43,7 +43,6 @@ class Grid extends PureComponent {
                   // className={`${classes.itemLink  } ${  classes.userCollapseButton}`}
                   onClick={() => onPreview(row)}
                 >
-                  {' '}
                   <span>{row.fileName}</span>
                 </NavLink>
               )
