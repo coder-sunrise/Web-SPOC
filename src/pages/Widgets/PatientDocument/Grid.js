@@ -39,7 +39,7 @@ class Grid extends PureComponent {
 
               return (
                 <NavLink
-                  to='#'
+                  to={window.location.search}
                   // className={`${classes.itemLink  } ${  classes.userCollapseButton}`}
                   onClick={() => onPreview(row)}
                 >

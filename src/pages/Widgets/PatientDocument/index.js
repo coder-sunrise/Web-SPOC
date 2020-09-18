@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core'
 // styles
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 // common components
-import { FastField, Carousel } from '@/components'
+import { FastField, Carousel, CommonModal } from '@/components'
 import { Attachment } from '@/components/_medisys'
 // sub components
 import { findGetParameter } from '@/utils/utils'
@@ -13,8 +13,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 // models
 import model from './models'
-// utils
-import 'react-responsive-carousel/lib/styles/carousel.min.css'
+import ImageItem from './ImageItem'
 
 window.g_app.replaceModel(model)
 
@@ -112,14 +111,18 @@ class PatientDocument extends Component {
   }
 
   onPreview = (file) => {
-    console.log(file)
-    this.setState({ showImagePreview: true })
+    this.setState({ showImagePreview: true, selectedFileId: file.fileIndexFK })
   }
 
   render () {
-    const { patient: { entity } } = this.props
-    const { showImagePreview } = this.state
+    const { patient: { entity }, patientAttachment } = this.props
+    const { showImagePreview, selectedFileId } = this.state
     const patientIsActive = entity && entity.isActive
+
+    const { list = [] } = patientAttachment
+    const allFileIds = list.map((f) => {
+      return f.fileIndexFK
+    })
 
     return (
       <div>
@@ -145,17 +148,13 @@ class PatientDocument extends Component {
             />
           </div>
         )}
-        {showImagePreview && (
-          <Carousel>
-            <div>
-              <img
-                alt=''
-                src='http://lorempixel.com/output/cats-q-c-640-480-1.jpg'
-              />
-              <p className='legend'>Legend 1</p>
-            </div>
-          </Carousel>
-        )}
+        <CommonModal
+          open={showImagePreview}
+          title='Patient Document Preview'
+          onClose={() => this.setState({ showImagePreview: false })}
+        >
+          <ImageItem selectedFileId={selectedFileId} fileIds={allFileIds} />
+        </CommonModal>
       </div>
     )
   }
