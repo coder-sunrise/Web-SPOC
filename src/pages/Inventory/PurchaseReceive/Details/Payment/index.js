@@ -3,13 +3,18 @@ import { connect } from 'dva'
 import _ from 'lodash'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
-import { GridContainer, withFormikExtend, ProgressButton } from '@/components'
-import Header from './Header'
-import Grid from './Grid'
+import {
+  GridContainer,
+  withFormikExtend,
+  ProgressButton,
+  WarningSnackbar,
+} from '@/components'
 import { INVOICE_STATUS } from '@/utils/constants'
 import { navigateDirtyCheck, roundTo } from '@/utils/utils'
 import AuthorizedContext from '@/components/Context/Authorized'
 import Authorized from '@/utils/Authorized'
+import Grid from './Grid'
+import Header from './Header'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -162,17 +167,32 @@ class index extends PureComponent {
   }
 
   render () {
-    const { purchaseOrderDetails, rights } = this.props
+    const {
+      purchaseOrderDetails,
+      rights,
+      values: { currentBizSessionInfo },
+    } = this.props
     const { purchaseOrder: po } = purchaseOrderDetails
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
+    const hasActiveSession =
+      currentBizSessionInfo && currentBizSessionInfo.id > 0
     return (
       <AuthorizedContext.Provider
         value={{
-          rights: isWriteOff === true ? 'disable' : rights,
+          rights: isWriteOff === true || !hasActiveSession ? 'disable' : rights,
         }}
       >
+        {!hasActiveSession && (
+          <div style={{ paddingTop: 5 }}>
+            <WarningSnackbar
+              variant='warning'
+              // className={classes.margin}
+              message='Action(s) is not allowed due to no active session was found.'
+            />
+          </div>
+        )}
         <GridContainer>
           <Header {...this.props} />
           <Grid {...this.props} getTotalPaid={this.getTotalPaid} />

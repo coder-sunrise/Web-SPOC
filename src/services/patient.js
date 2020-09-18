@@ -31,4 +31,5 @@ module.exports = {
   upsert: (params) => service.upsert(url, params),
   requestChasBalance: (params) => service.upsert(chasBalanceUrl, params),
   requestMedisaveBalance: (params) => service.upsert(medisaveBalanceUrl, params),
+  queryDeposit: (params) => service.query(`${url}/Deposit`, params),
 }

@@ -12,6 +12,7 @@ import { calculateAmount, navigateDirtyCheck } from '@/utils/utils'
 import Yup from '@/utils/yup'
 import { VISIT_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
+import { openCautionAlertOnStartConsultation } from '@/pages/Widgets/Orders/utils'
 import DrugLabelSelection from './DispenseDetails/DrugLabelSelection'
 import AddOrder from './DispenseDetails/AddOrder'
 import DispenseDetails from './DispenseDetails/WebSocketWrapper'
@@ -39,6 +40,7 @@ const calculateInvoiceAmounts = (entity) => {
       invoiceTotalAftAdj: summary.totalAfterAdj,
       invoiceTotalAftGST: summary.totalWithGST,
       outstandingBalance: summary.totalWithGST - obj.invoice.totalPayment,
+      invoiceGSTAdjustment: summary.gstAdj,
       invoiceGSTAmt: Math.round(summary.gst * 100) / 100,
     }
   }
@@ -117,6 +119,7 @@ const constructPayload = (values) => {
     const { dispatch, dispense } = props
     const vid = dispense.visitID
     const _values = constructPayload(values)
+
     dispatch({
       type: `dispense/save`,
       payload: {
@@ -147,6 +150,7 @@ class Main extends Component {
     showOrderModal: false,
     showDrugLabelSelection: false,
     selectedDrugs: [],
+    showCautionAlert: false,
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
@@ -193,6 +197,7 @@ class Main extends Component {
       noClinicalObjectRecord &&
       dispense.loadCount === 0
     ) {
+      this.setState({ showCautionAlert: true })
       this.editOrder()
     }
 
@@ -205,14 +210,18 @@ class Main extends Component {
     })
   }
 
-  makePayment = async () => {
+  makePayment = async (voidPayment = false, voidReason = '') => {
     const { dispatch, dispense, values } = this.props
     const _values = constructPayload(values)
     const finalizeResponse = await dispatch({
       type: 'dispense/finalize',
       payload: {
         id: dispense.visitID,
-        values: _values,
+        values: {
+          ..._values,
+          voidPayment,
+          voidReason,
+        },
       },
     })
     if (finalizeResponse === 204) {
@@ -251,6 +260,11 @@ class Main extends Component {
             },
           })
           reloadDispense(this.props)
+
+          if (this.state.showCautionAlert) {
+            this.setState({ showCautionAlert: false })
+            openCautionAlertOnStartConsultation(o)
+          }
         }
       })
     }

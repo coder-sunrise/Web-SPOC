@@ -170,7 +170,14 @@ export default createFormViewModel({
         const { history } = payload || { history: undefined }
 
         if (patientState.shouldQueryOnClose) {
-          yield put({ type: 'patientSearch/query' })
+          yield put({
+            type: 'patientSearch/query',
+            payload: {
+              apiCriteria: {
+                includeinactive: window.location.pathname.includes('patientdb'),
+              },
+            },
+          })
           yield put({
             type: 'updateState',
             payload: {
@@ -326,6 +333,34 @@ export default createFormViewModel({
             entity: data,
           },
         })
+      },
+      *queryDeposit ({ payload }, { select, call, put }) {
+        const response = yield call(service.queryDeposit, payload)
+        if (response && response.status === '200') {
+          const { data = {} } = response
+          const codetable = yield select((state) => state.codetable)
+          const { ltdeposittransactiontype: codetbs = [] } = codetable
+
+          const newTransaction = (data.patientDepositTransaction || [])
+            .reduce((pre, cur) => {
+              const ltType = codetbs.find((f) => f.id === cur.transactionTypeFK)
+              return [
+                ...pre,
+                {
+                  ...cur,
+                  transactionTypeName: ltType ? ltType.name || '' : '',
+                },
+              ]
+            }, [])
+          data.patientDepositTransaction = newTransaction
+
+          yield put({
+            type: 'updateState',
+            payload: {
+              deposit: data,
+            },
+          })
+        }
       },
     },
     reducers: {

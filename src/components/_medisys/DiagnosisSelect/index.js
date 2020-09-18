@@ -44,6 +44,7 @@ const DiagnosisSelect = ({
   label,
   onDataSouceChange,
   filterStyle = { position: 'absolute', bottom: 8, right: 0 },
+  clinicSettings,
   ...props
 }) => {
   let selectProps = props
@@ -82,32 +83,16 @@ const DiagnosisSelect = ({
       ],
       pagesize: 30,
     }
-    if (typeof v === 'string') {
-      search.group = [
-        {
-          displayvalue: v,
-          code: v,
-          combineCondition: 'or',
-        },
-      ]
-      if (
-        !(
-          diagnosisFilter.length === 0 ||
-          diagnosisFilter.length === filterOptions.length
-        )
-      ) {
-        search.group.push({
-          combineCondition: 'or',
-        })
-        diagnosisFilter.forEach((df) => {
-          search.group[1][df] = true
-        })
-      }
-    } else {
-      search.id = Number(v)
+    search.apiCriteria = {
+      searchValue: v || undefined,
+      diagnosisCategories:
+        diagnosisFilter.length === 0 ||
+        diagnosisFilter.length === filterOptions.length
+          ? undefined
+          : diagnosisFilter.join(),
+      id: typeof v === 'string' ? undefined : Number(v),
     }
 
-    // console.log(diagnosisFilter)
     const response = await queryList('/api/codetable/ctsnomeddiagnosis', search)
     if (response && response.data) {
       setCtDiagnosis(response.data.data)
@@ -142,13 +127,7 @@ const DiagnosisSelect = ({
         options={ctDiagnosis}
         valueField='id'
         labelField='displayvalue'
-        handleFilter={(input, opt) => {
-          const { data } = opt.props
-          return (
-            data.displayvalue.toLowerCase().indexOf(input.toLowerCase()) >= 0 ||
-            data.code.toLowerCase().indexOf(input.toLowerCase()) >= 0
-          )
-        }}
+        handleFilter={(input, opt) => true}
         // autoComplete
         renderDropdown={(option) => {
           const {
@@ -205,6 +184,8 @@ const DiagnosisSelect = ({
   )
 }
 
-const Connected = connect()(DiagnosisSelect)
+const Connected = connect(({ clinicSettings }) => ({
+  clinicSettings: clinicSettings.settings,
+}))(DiagnosisSelect)
 
 export default withStyles(styles, { withTheme: true })(Connected)

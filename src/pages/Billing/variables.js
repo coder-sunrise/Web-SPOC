@@ -10,7 +10,7 @@ export const SchemeInvoicePayerColumn = [
   { name: 'coverage', title: 'Coverage' },
   { name: 'payableBalance', title: 'Payable Amount ($)' },
   { name: 'claimAmount', title: 'Claim Amount ($)' },
-  { name: 'error', title: ' ' },
+  // { name: 'error', title: ' ' },
 ]
 
 export const CompanyInvoicePayerColumn = [
@@ -18,7 +18,7 @@ export const CompanyInvoicePayerColumn = [
   { name: 'itemName', title: 'Name' },
   { name: 'payableBalance', title: 'Payable Amount ($)' },
   { name: 'claimAmount', title: 'Claim Amount ($)' },
-  { name: 'error', title: ' ' },
+  // { name: 'error', title: ' ' },
 ]
 
 export const ApplyClaimsColumnExtension = [
@@ -26,7 +26,8 @@ export const ApplyClaimsColumnExtension = [
     columnName: 'invoiceItemTypeFK',
     width: 150,
     render: (row) => {
-      if (row.invoiceItemTypeFK) return INVOICE_ITEM_TYPE[row.invoiceItemTypeFK]
+      if (row.itemType || row.invoiceItemTypeFK)
+        return row.itemType || INVOICE_ITEM_TYPE[row.invoiceItemTypeFK]
       return ''
     },
     disabled: true,
@@ -101,6 +102,7 @@ export const CoPayerColExtensions = [
     columnName: 'claimAmount',
     type: 'number',
     currency: true,
+    isDisabled: (row) => !row.isClaimable,
   },
 ]
 

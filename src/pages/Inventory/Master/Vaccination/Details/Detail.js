@@ -131,19 +131,16 @@ const Detail = ({
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='remarks'
-                render={(args) => {
-                  return (
-                    <TextField
-                      label={formatMessage({
-                        id: 'inventory.master.vaccination.remarks',
-                      })}
-                      multiline
-                      rowsMax='5'
-                      {...args}
-                    />
-                  )
-                }}
+                name='caution'
+                render={(args) => (
+                  <TextField
+                    label={formatMessage({
+                      id: 'inventory.master.vaccination.caution',
+                    })}
+                    maxLength={200}
+                    {...args}
+                  />
+                )}
               />
             </GridItem>
             <GridItem>

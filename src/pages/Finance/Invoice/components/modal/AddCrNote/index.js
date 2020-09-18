@@ -27,6 +27,7 @@ import { CrNoteColumns } from './variables'
 import CrNoteForm from './CrNoteForm'
 import Summary from './Summary'
 import MiscCrNote from './MiscCrNote'
+import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 
 @connect(({ invoiceCreditNote, invoiceDetail }) => ({
   invoiceCreditNote,
@@ -60,21 +61,24 @@ import MiscCrNote from './MiscCrNote'
       isStockIn,
       remark,
       finalCredit,
+      gstAmount,
     } = values
-    const gstAmount = creditNoteItem.reduce(
-      (totalGstAmount, item) =>
-        item.isSelected ? totalGstAmount + item.gstAmount : totalGstAmount,
-      0,
-    )
-    const gstAmt = roundTo(gstAmount)
+    // const gstAmount = creditNoteItem.reduce(
+    //   (totalGstAmount, item) =>
+    //     item.isSelected ? totalGstAmount + item.gstAmount : totalGstAmount,
+    //   0,
+    // )
+    // const gstAmt = invoiceDetail.isGSTInclusive ?
+    //   (finalCredit - finalCredit / (1 + invoiceDetail.gstValue / 100))
+    //   : finalCredit * (invoiceDetail.gstValue / 100)
     const payload = {
       generatedDate: moment().formatUTC(false),
       invoicePayerFK,
       isStockIn,
       remark,
-      gstAmt,
+      gstAmt: gstAmount,
       gstValue: invoiceDetail.gstValue,
-      total: finalCredit - gstAmt,
+      total: finalCredit - gstAmount,
       totalAftGST: finalCredit,
       creditNoteItem: creditNoteItem
         .filter((x) => x.isSelected)
@@ -85,7 +89,8 @@ import MiscCrNote from './MiscCrNote'
             ...restProps,
             isInventoryItem:
               restProps.itemType.toLowerCase() !== 'misc' &&
-              restProps.itemType.toLowerCase() !== 'service',
+              restProps.itemType.toLowerCase() !== 'service' &&
+              !restProps.isDrugMixture,
             subTotal: restProps.totalAfterGST,
             itemDescription: restProps.itemName,
           }
@@ -118,6 +123,7 @@ class AddCrNote extends Component {
   handleEditRow = (row) => {}
 
   handleCalcCrNoteItem = (selection = undefined) => {
+    const { invoiceDetail, invoiceCreditNote } = this.props
     let rowSelection = []
     const { selectedRows } = this.state
     rowSelection = selection || selectedRows
@@ -134,6 +140,15 @@ class AddCrNote extends Component {
       return total
     }, 0)
     setFieldValue('finalCredit', roundTo(finalCreditTotal))
+
+    const gstAmount =
+      invoiceDetail.gstValue >= 0
+        ? finalCreditTotal /
+          (1 + invoiceDetail.gstValue / 100) *
+          (invoiceDetail.gstValue / 100)
+        : 0
+    setFieldValue('gstAmount', roundTo(gstAmount))
+    setFieldValue('subTotal', roundTo(finalCreditTotal) - roundTo(gstAmount))
   }
 
   handleSelectionChange = (selection) => {
@@ -239,8 +254,18 @@ class AddCrNote extends Component {
     }
   }
 
+  drugMixtureIndicator = (row) => {
+    if (row.itemType !== 'Medication' || !row.isDrugMixture) return null
+
+    return (
+      <div style={{ position: 'relative', top: 2 }}>
+        <DrugMixtureInfo values={row.prescriptionDrugMixture} />
+      </div>
+    )
+  }
+
   render () {
-    const { handleSubmit, onConfirm, values } = this.props
+    const { handleSubmit, onConfirm, values, invoiceDetail } = this.props
     const { creditNoteItem, finalCredit, payerType } = values
 
     return (
@@ -263,7 +288,27 @@ class AddCrNote extends Component {
           columns={CrNoteColumns}
           columnExtensions={[
             {
+              columnName: 'itemType',
+              width: 150,
+              render: (row) => {
+                return (
+                  <div style={{ position: 'relative' }}>
+                    <div
+                      style={{
+                        wordWrap: 'break-word',
+                        whiteSpace: 'pre-wrap',
+                      }}
+                    >
+                      {row.itemType}
+                      {this.drugMixtureIndicator(row)}
+                    </div>
+                  </div>
+                )
+              },
+            },
+            {
               columnName: 'quantity',
+              width: 200,
               render: (row) => {
                 const { quantity, originRemainingQty } = row
 
@@ -314,6 +359,7 @@ class AddCrNote extends Component {
               columnName: 'totalAfterGST',
               // type: 'currency',
               // currency: true,
+              width: 200,
               render: (row) => {
                 return (
                   <Field
@@ -363,7 +409,10 @@ class AddCrNote extends Component {
           ]}
         />
 
-        <Summary />
+        <Summary
+          showGST={invoiceDetail.gstValue >= 0}
+          invoiceDetail={invoiceDetail}
+        />
         <MiscCrNote
           handleAddMiscItem={this.handleAddMiscItem}
           handleCalcFinalTotal={this.handleCalcCrNoteItem}
@@ -373,7 +422,7 @@ class AddCrNote extends Component {
 
         <GridContainer>
           <GridItem md={9}>
-            <p>Note: Total Price($) are after GST.</p>
+            <p>Note: Total Amount ($) is GST inclusive.</p>
           </GridItem>
           <GridItem md={3} style={{ textAlign: 'right' }}>
             <Button color='danger' onClick={onConfirm}>

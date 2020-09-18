@@ -4,9 +4,14 @@ import AppointmentHistory from '@/pages/Widgets/AppointmentHistory'
 import DispenseHistory from '@/pages/Widgets/DispenseHistory'
 import { PATIENT_HISTORY_TABS } from '@/utils/constants'
 import InvoiceHistory from '@/pages/Widgets/InvoiceHistory'
-import PatientNurseNotes from '@/pages/Widgets/PatientNurseNotes'
+import PatientNurseNotes from '@/pages/PatientDatabase/Detail/PatientNurseNotes'
+import ViewPatientNurseNotes from '@/pages/Widgets/PatientNurseNotes'
+import PatientDeposit from '@/pages/Finance/Deposit/PatientDeposit'
 
 const addContent = (type, props) => {
+  const { patient: { entity } } = props
+  const patientIsActive = entity && entity.isActive
+
   switch (type) {
     case PATIENT_HISTORY_TABS.VISIT:
       return <PatientHistory mode='integrated' {...props} />
@@ -17,7 +22,14 @@ const addContent = (type, props) => {
     case PATIENT_HISTORY_TABS.INVOICE:
       return <InvoiceHistory mode='integrated' {...props} />
     case PATIENT_HISTORY_TABS.NURSENOTES:
+      const accessRight = Authorized.check(
+        'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
+      )
+      if (!accessRight || accessRight.rights === 'disable' || !patientIsActive)
+        return <ViewPatientNurseNotes {...props} />
       return <PatientNurseNotes {...props} />
+    case PATIENT_HISTORY_TABS.DEPOSIT:
+      return <PatientDeposit {...props} />
     default:
       return <PatientHistory {...props} />
   }
@@ -28,7 +40,10 @@ const checkAccessRight = (accessRightNames) => {
 
   for (let i = 0; i < accessRightNames.length; i++) {
     const accessRight = Authorized.check(accessRightNames[i])
-    if (accessRight.rights === 'enable') return true
+    if (!accessRight || accessRight.rights === 'hidden') {
+      return false
+    }
+    return true
   }
   return false
 }
@@ -62,6 +77,14 @@ export const PatientHistoryTabOption = (props) => {
       authority: [
         'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
       ],
+    },
+    {
+      id: PATIENT_HISTORY_TABS.DEPOSIT,
+      name: 'Deposit',
+      authority: [
+        'patientdatabase.patientprofiledetails.patienthistory.deposit',
+      ],
+      content: addContent(PATIENT_HISTORY_TABS.DEPOSIT, props),
     },
   ]
   return Tabs.filter((f) => checkAccessRight(f.authority))

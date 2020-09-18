@@ -14,15 +14,13 @@ import {
   dateFormatLong,
   dateFormatLongWithTimeNoSec12h,
   ProgressButton,
-  serverDateFormat,
+  Tooltip,
 } from '@/components'
-import { getBizSession } from '@/services/queue'
-import { roundTo } from '@/utils/utils'
 import CollectPaymentConfirm from './CollectPaymentConfirm'
 import ExtractAsSingle from './ExtractAsSingle'
 import PrintStatementReport from '../PrintStatementReport'
 
-const styles = () => ({
+const styles = (theme) => ({
   gridContainer: {
     marginBottom: '10px',
   },
@@ -31,6 +29,11 @@ const styles = () => ({
   },
   collectPaymentBtn: {
     paddingRight: '0 !important',
+  },
+  refreshStatementButton: {
+    margin: `${theme.spacing(2)}px ${theme.spacing(1)}px ${theme.spacing(
+      2,
+    )}px 0`,
   },
 })
 
@@ -46,11 +49,15 @@ class Details extends PureComponent {
       { name: 'invoiceNo', title: 'Invoice No' },
       { name: 'invoiceDate', title: 'Invoice Date' },
       { name: 'patientName', title: 'Patient Name' },
+      { name: 'payableAmount', title: 'Payable Amt.' },
       { name: 'adminCharge', title: 'Corporate Charge' },
       { name: 'statementAdjustment', title: 'Statement Adjustment' },
-      { name: 'totalPayableAmount', title: 'Total Payable Amt' },
+      { name: 'totalPayableAmount', title: 'Total Payable Amt.' },
+      { name: 'creditNoteAmount', title: 'Credit Note' },
+      { name: 'totalPayment', title: 'Paid' },
       { name: 'outstandingAmount', title: 'Outstanding' },
       { name: 'remark', title: 'Remarks' },
+      { name: 'action', title: 'Action' },
     ],
 
     showCollectPayment: false,
@@ -106,6 +113,20 @@ class Details extends PureComponent {
     })
   }
 
+  printInvoice = (row) => {
+    window.g_app._store.dispatch({
+      type: 'report/updateState',
+      payload: {
+        reportTypeID: 15,
+        reportParameters: {
+          InvoiceId: row.invoiceFK,
+          CopayerId: undefined,
+          isSaved: true,
+        },
+      },
+    })
+  }
+
   render () {
     const {
       columns,
@@ -114,7 +135,7 @@ class Details extends PureComponent {
       extractRows,
       selectedRows,
     } = this.state
-    const { classes, statement, values, theme, history } = this.props
+    const { classes, values, theme, history } = this.props
     const { statementInvoice = [] } = values
     return (
       <div>
@@ -123,10 +144,10 @@ class Details extends PureComponent {
             <GridItem style={{ marginRight: -16 }}>
               <ProgressButton
                 color='primary'
+                style={styles.refreshStatementButton}
                 onClick={this.handleRefresh}
-                icon={null}
+                icon={<Refresh />}
               >
-                <Refresh />
                 <FormattedMessage id='finance.statement.details.refreshStatement' />
               </ProgressButton>
               <PrintStatementReport id={values.id}>
@@ -140,49 +161,72 @@ class Details extends PureComponent {
         </GridContainer>
 
         <CommonTableGrid
+          forceRender
           rows={statementInvoice}
           columns={columns}
           columnExtensions={[
             {
               columnName: 'invoiceNo',
               sortingEnabled: false,
-              width: 100,
+              width: 85,
             },
             {
               columnName: 'patientName',
               sortingEnabled: false,
+              width: 250,
             },
             {
               columnName: 'remark',
               sortingEnabled: false,
             },
             {
+              columnName: 'payableAmount',
+              type: 'number',
+              currency: true,
+              sortingEnabled: false,
+              width: 110,
+            },
+            {
               columnName: 'adminCharge',
               type: 'number',
               currency: true,
               sortingEnabled: false,
-              width: 150,
+              width: 130,
             },
             {
               columnName: 'statementAdjustment',
               type: 'number',
               currency: true,
               sortingEnabled: false,
-              width: 180,
+              width: 170,
             },
             {
               columnName: 'totalPayableAmount',
               type: 'number',
               currency: true,
               sortingEnabled: false,
-              width: 150,
+              width: 140,
+            },
+            {
+              columnName: 'creditNoteAmount',
+              type: 'number',
+              currency: true,
+              sortingEnabled: false,
+              width: 110,
+            },
+            {
+              columnName: 'totalPayment',
+              type: 'number',
+              currency: true,
+              sortingEnabled: false,
+              width: 110,
             },
             {
               columnName: 'outstandingAmount',
               type: 'number',
               currency: true,
               sortingEnabled: false,
-              width: 150,
+              width: 110,
             },
             {
               columnName: 'invoiceDate',
@@ -191,7 +235,30 @@ class Details extends PureComponent {
               sortingEnabled: false,
               width: 100,
             },
+            {
+              columnName: 'action',
+              align: 'center',
+              width: 80,
+              render: (r) => {
+                return (
+                  <Tooltip title='Print'>
+                    <Button
+                      color='primary'
+                      justIcon
+                      onClick={() => {
+                        this.printInvoice(r)
+                      }}
+                    >
+                      <Print />
+                    </Button>
+                  </Tooltip>
+                )
+              },
+            },
           ]}
+          TableProps={{
+            height: 'calc(100vh - 370px)',
+          }}
           FuncProps={{
             pager: false,
             selectable: true,

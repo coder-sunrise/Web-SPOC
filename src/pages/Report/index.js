@@ -113,7 +113,6 @@ class Report extends React.Component {
 
   render () {
     const menus = this.menus().filter((item) => item.itemCount > 0)
-
     return (
       <CardContainer hideHeader>
         <TextField prefix={<Search />} onChange={this.onFilterChange} />

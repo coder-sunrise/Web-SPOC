@@ -2,7 +2,12 @@ import React, { PureComponent } from 'react'
 import { withStyles, Paper } from '@material-ui/core'
 import { connect } from 'dva'
 import moment from 'moment'
-import { withFormikExtend, Tabs, serverDateFormat } from '@/components'
+import {
+  withFormikExtend,
+  Tabs,
+  serverDateFormat,
+  notification,
+} from '@/components'
 import Yup from '@/utils/yup'
 import { PAYMENT_MODE, DEFAULT_PAYMENT_MODE_GIRO } from '@/utils/constants'
 import { roundToPrecision } from '@/utils/codes'
@@ -32,11 +37,11 @@ const styles = () => ({})
           adminCharge,
           outstandingAmount,
           statementAdjustment,
-          creditNoteAmount = 0,
           payableAmount = 0,
-        } = o
+        } = o 
+
         const totalPayableAmount =
-          payableAmount - creditNoteAmount - adminCharge - statementAdjustment
+          payableAmount - adminCharge - statementAdjustment
         sumTotalPayableAmount += totalPayableAmount
         totalOS += outstandingAmount
         adminChargeValueField += adminCharge
@@ -45,6 +50,7 @@ const styles = () => ({})
           ...o,
           tempOutstandingAmount: o.outstandingAmount,
           totalPayableAmount,
+          totalPayment : totalPayableAmount - outstandingAmount,
           statementInvoicePayment: [
             ...statementInvoicePayment,
           ],
@@ -79,7 +85,7 @@ const styles = () => ({})
     }),
   }),
   handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, history, user, codetable } = props
+    const { dispatch, onConfirm, history, user, codetable, statement } = props
     const {
       paymentCreatedBizSessionFK,
       paymentModeFK,
@@ -160,37 +166,23 @@ const styles = () => ({})
       }
     })
 
-    // values.statementInvoice.forEach((o) => {
-    //   o.statementInvoicePayment.forEach((i) => {
-    //     if (!i.id) {
-    //       const isCashPayment = paymentModeFK === PAYMENT_MODE.CASH
-    //       const paymentAmt = i.invoicePayment.totalAmtPaid
-    //       const roundingAmt = parseFloat(
-    //         Math.abs(paymentAmt - roundToPrecision(paymentAmt, 0.05)).toFixed(
-    //           2,
-    //         ),
-    //       )
-    //       i.invoicePayment = {
-    //         ...i.invoicePayment,
-    //         paymentCreatedBizSessionFK,
-    //         paymentReceivedBizSessionFK: paymentCreatedBizSessionFK,
-    //         paymentReceivedByUserFK,
-    //         invoicePaymentMode: [
-    //           {
-    //             paymentModeFK,
-    //             amt: i.invoicePayment.totalAmtPaid,
-    //             paymentMode: displayValue,
-    //             cashRouding: isCashPayment ? roundingAmt : 0,
-    //           },
-    //         ],
-    //       }
-    //     }
-    //   })
-    // })
-
     const payload = {
       ...values,
       statementInvoice: newPaymentStatementInvoice,
+      newStatementPayment:
+        newPaymentStatementInvoice && newPaymentStatementInvoice.length > 0
+          ? {
+            statementFK: values.id,
+            paymentCreatedBizSessionFK,
+            paymentReceivedBizSessionFK: paymentCreatedBizSessionFK,
+            paymentReceivedByUserFK,
+            paymentReceivedDate: moment(
+              paymentDate,
+              serverDateFormat,
+            ).formatUTC(false),
+            Remark: remarks,
+          }
+          : null,
     }
     dispatch({
       type: 'statement/upsert',
@@ -198,7 +190,16 @@ const styles = () => ({})
     }).then((r) => {
       if (r) {
         if (onConfirm) onConfirm()
-        history.push('/finance/statement')
+
+        const { entity } = statement
+        dispatch({
+          type: 'statement/refreshAll',
+          payload: {
+            id: entity.id,
+          },
+        })
+        history.replace(`/finance/statement/details/${entity.id}?t=${2}`)
+        // history.push('/finance/statement')
       }
     })
   },
@@ -288,7 +289,21 @@ class StatementDetails extends PureComponent {
     })
   }
 
+  onTabChange = (tab) => {
+    const { statement: { entity }, dispatch, history } = this.props
+    // dispatch({
+    //   type: 'statement/setActiveTab',
+    //   payload: {
+    //     activeTab: tab,
+    //   },
+    // })
+    this.props.history.replace(
+      `/finance/statement/details/${entity.id}?t=${tab}`,
+    )
+  }
+
   render () {
+    const { statement: { activeTab } } = this.props
     return (
       <React.Fragment>
         <Paper>
@@ -298,6 +313,8 @@ class StatementDetails extends PureComponent {
           <Tabs
             style={{ marginTop: 20 }}
             defaultActiveKey='0'
+            onChange={this.onTabChange}
+            activeKey={activeTab}
             options={StatementDetailOption(
               this.props,
               this.fetchLatestBizSessions,

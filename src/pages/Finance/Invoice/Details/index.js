@@ -11,9 +11,10 @@ import { INVOICE_VIEW_MODE } from '@/utils/constants'
 import InvoiceBanner from './InvoiceBanner'
 import InvoiceContent from './Content'
 
-@connect(({ invoiceDetail, invoicePayment, loading }) => ({
+@connect(({ invoiceDetail, invoicePayment, patient, loading }) => ({
   invoiceDetail,
   invoicePayment,
+  patient,
   loading: loading.models.invoiceDetail || loading.models.invoicePayment,
 }))
 @withFormik({
@@ -38,12 +39,23 @@ class InvoiceDetails extends Component {
       type: 'invoiceDetail/updateState',
       payload: {
         mode: INVOICE_VIEW_MODE.DEFAULT,
+        entity: null,
+      },
+    })
+    this.props.dispatch({
+      type: 'patient/updateState',
+      payload: {
+        entity: null,
       },
     })
   }
 
   refresh = () => {
-    const { dispatch, invoiceDetail } = this.props
+    const { dispatch, invoiceDetail, refreshInvoiceList } = this.props
+
+    if (refreshInvoiceList) {
+      refreshInvoiceList()
+    }
 
     dispatch({
       type: 'invoiceDetail/query',
@@ -58,6 +70,14 @@ class InvoiceDetails extends Component {
         id: invoiceDetail.currentId,
       },
     })
+    if (invoiceDetail.entity) {
+      dispatch({
+        type: 'patient/query',
+        payload: {
+          id: invoiceDetail.entity.patientProfileFK,
+        },
+      })
+    }
   }
 
   render () {
@@ -67,15 +87,18 @@ class InvoiceDetails extends Component {
       invoiceDetail,
       invoicePayment,
       loading,
+      patient,
     } = this.props
     const invoiceContentProps = {
       dispatch,
       values,
       invoiceDetail,
       invoicePayment,
+      patient,
     }
     const bannerProps = {
       values,
+      patient,
     }
 
     return (

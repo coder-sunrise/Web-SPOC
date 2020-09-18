@@ -1,24 +1,20 @@
 /* eslint-disable no-nested-ternary */
 import React, { Component } from 'react'
-import $ from 'jquery'
+import { Tag, Collapse } from 'antd'
+import moment from 'moment'
+import Edit from '@material-ui/icons/Edit'
 import { connect } from 'dva'
 import router from 'umi/router'
-import classnames from 'classnames'
 // material ui
-import { withStyles, List, ListItem, ListItemText } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 // common components
 import {
-  GridContainer,
-  GridItem,
-  TextField,
-  Select,
-  DatePicker,
-  ProgressButton,
   CardContainer,
-  Accordion,
   withFormikExtend,
   Skeleton,
   CommonModal,
+  Button,
+  Tooltip,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 // utils
@@ -26,6 +22,8 @@ import { findGetParameter } from '@/utils/utils'
 import { VISIT_TYPE } from '@/utils/constants'
 import * as WidgetConfig from './config'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
+import HistoryDetails from './HistoryDetails'
+import customtyles from './PatientHistoryStyle.less'
 
 const styles = (theme) => ({
   root: {},
@@ -85,6 +83,7 @@ const styles = (theme) => ({
     codetable,
     user,
     scriblenotes,
+    patient,
   }) => ({
     patientHistory,
     clinicSettings,
@@ -92,6 +91,7 @@ const styles = (theme) => ({
     user,
     clinicInfo,
     scriblenotes,
+    patient,
   }),
 )
 @withFormikExtend({
@@ -110,15 +110,8 @@ const styles = (theme) => ({
   },
 })
 class PatientHistory extends Component {
-  static defaultProps = {
-    mode: 'split',
-  }
-
   constructor (props) {
     super(props)
-
-    this.myRef = React.createRef()
-
     this.widgets = WidgetConfig.widgets(
       props,
       this.scribbleNoteUpdateState,
@@ -126,17 +119,20 @@ class PatientHistory extends Component {
       const accessRight = Authorized.check(o.authority)
       return accessRight && accessRight.rights !== 'hidden'
     })
+    const activeHistoryTags = this.getActiveHistoryTags()
 
     this.state = {
-      selectedItems: localStorage.getItem('patientHistoryWidgets')
-        ? JSON.parse(localStorage.getItem('patientHistoryWidgets'))
-        : this.widgets.map((widget) => widget.id),
       selectedData: '',
+      selectTag:
+        activeHistoryTags.length > 0 ? activeHistoryTags[0] : { children: [] },
+      showHistoryDetails: false,
+      selectHistory: undefined,
+      activeKey: [],
     }
   }
 
   componentWillMount () {
-    const { dispatch, mode } = this.props
+    const { dispatch } = this.props
 
     dispatch({
       type: 'patientHistory/initState',
@@ -145,257 +141,154 @@ class PatientHistory extends Component {
         version: Number(findGetParameter('v')) || undefined,
         visitID: findGetParameter('visit'),
         patientID: Number(findGetParameter('pid')) || 0,
-        mode,
       },
-    })
+    }).then(() => {
+      const { patientHistory } = this.props
+      let sortedPatientHistory = []
 
-    dispatch({
-      type: 'patientHistory/updateState',
-      payload: {
-        selected: '',
-        selectedSubRow: '',
-      },
-    })
-  }
-
-  onSelectChange = (val) => {
-    this.setState({
-      selectedItems: val,
-    })
-    localStorage.setItem('patientHistoryWidgets', JSON.stringify(val))
-  }
-
-  getContent = (row) => {
-    const { patientHistory, mode, clinicSettings } = this.props
-    const { settings = [] } = clinicSettings
-    const { selectedSubRow } = patientHistory
-    const isRetailVisit = row.visitPurposeFK === VISIT_TYPE.RETAIL
-    let newArray = []
-
-    if (isRetailVisit) {
-      newArray.push(row)
-    } else if (
-      settings.showConsultationVersioning === false ||
-      settings.showConsultationVersioning === undefined
-    ) {
-      if (row.coHistory.length >= 1) {
-        newArray.push(row.coHistory[0])
-      }
-    } else {
-      newArray = row.coHistory
-    }
-    return (
-      <List
-        component='nav'
-        classes={{
-          root: this.props.classes.listRoot,
-        }}
-        disablePadding
-        onClick={() => {}}
-      >
-        {newArray.map((o) => {
-          const _title = o.userTitle ? `${o.userTitle} ` : ''
-
-          return (
-            <React.Fragment>
-              <ListItem
-                style={{ paddingLeft: 15 }}
-                alignItems='flex-start'
-                classes={{
-                  root: this.props.classes.listItemRoot,
-                }}
-                selected={selectedSubRow && o.id === selectedSubRow.id}
-                divider
-                disableGutters
-                button
-                onClick={() => {
-                  if (
-                    mode === 'integrated' &&
-                    selectedSubRow &&
-                    selectedSubRow.id === o.id
-                  ) {
-                    this.props.dispatch({
-                      type: 'patientHistory/updateState',
-                      payload: {
-                        selectedSubRow: undefined,
-                      },
-                    })
-                    return
-                  }
-                  if (isRetailVisit) {
-                    this.handleRetailVisitHistory(row)
-                  } else
-                    this.props
-                      .dispatch({
-                        type: 'patientHistory/queryOne',
-                        payload: o.id,
-                      })
-                      .then((r) => {
-                        if (r) {
-                          this.props.dispatch({
-                            type: 'patientHistory/updateState',
-                            payload: {
-                              selected: row,
-                              selectedSubRow: o,
-                            },
-                          })
-                          // this.props.dispatch({
-                          //   type: 'consultationDocument/updateState',
-                          //   payload: {
-                          //     rows: r.documents,
-                          //   },
-                          // })
-                        }
-                      })
-                }}
-              >
-                <ListItemText
-                  primary={
-                    <div
-                      style={{
-                        width: '100%',
-                        paddingRight: 20,
-                      }}
-                    >
-                      <GridContainer>
-                        <GridItem sm={12} style={{ fontWeight: 500 }}>
-                          <TextField text value={row.visitPurposeName} />
-                          {row.visitDate && (
-                            <span style={{ position: 'relative' }}>
-                              &nbsp; (
-                              <DatePicker
-                                text
-                                showTime
-                                format='DD MMM YYYY h:mm a'
-                                value={
-                                  row.visitPurposeFK === VISIT_TYPE.RETAIL ? (
-                                    row.visitDate
-                                  ) : (
-                                    o.signOffDate
-                                  )
-                                }
-                              />)
-                            </span>
-                          )}
-                        </GridItem>
-                      </GridContainer>
-                      <GridContainer>
-                        <GridItem sm={7}>
-                          <TextField
-                            text
-                            value={
-                              settings.showConsultationVersioning &&
-                              !isRetailVisit ? (
-                                `V${o.versionNumber}, ${_title}${o.userName}`
-                              ) : (
-                                `${_title}${o.userName}`
-                              )
-                            }
-                          />
-                        </GridItem>
-                      </GridContainer>
-                    </div>
-                  }
-                />
-              </ListItem>
-              {selectedSubRow &&
-              selectedSubRow.id === o.id &&
-              mode === 'integrated' && <div>{this.getDetailPanel()}</div>}
-            </React.Fragment>
+      sortedPatientHistory = patientHistory.list
+        ? patientHistory.list.filter(
+            (o) =>
+              o.visitPurposeFK === VISIT_TYPE.RETAIL ||
+              (o.coHistory && o.coHistory.length > 0),
           )
-        })}
-      </List>
-    )
+        : []
+      this.setState({ activeKey: sortedPatientHistory.map((o) => o.id) })
+    })
+  }
+
+  getActiveHistoryTags = () => {
+    const activeHistoryTags = WidgetConfig.historyTags.filter((o) => {
+      const enableAuthority = o.authority.find((a) => {
+        const accessRight = Authorized.check(a)
+        if (!accessRight || accessRight.rights === 'hidden') return false
+        return true
+      })
+
+      if (enableAuthority) {
+        return true
+      }
+      return false
+    })
+    return activeHistoryTags
   }
 
   getTitle = (row) => {
-    const { visitPurposeName = '' } = row
-    const visitTitleLabel = visitPurposeName
-
-    return (
-      <div className={this.props.classes.title}>
-        <GridContainer>
-          <GridItem sm={12}>
-            <p>
-              <span>{visitTitleLabel}</span>
-              <span style={{ position: 'relative' }}>
-                &nbsp; (<DatePicker text value={row.visitDate} />)
-              </span>
-              <div className={this.props.classes.note}>
-                {row.userTitle} {row.userName}
-              </div>
-            </p>
-          </GridItem>
-        </GridContainer>
-      </div>
-    )
-  }
-
-  getDetailPanel = () => {
     const {
       theme,
-      classes,
-      override = {},
       patientHistory,
       dispatch,
-      widget,
-      showEditPatient,
       codetable,
       user,
+      clinicSettings,
+      patient: { entity },
     } = this.props
-
-    const { entity, selected, patientID } = patientHistory
-    const { visitPurposeFK } = selected
-    const maxItemTagCount = this.state.selectedItems.length <= 1 ? 1 : 0
-    // console.log({ maxItemTagCount, selected: this.state.selectedItems })
-
     const { location } = window
-
+    const {
+      userTitle,
+      userName,
+      visitDate,
+      signOffDate,
+      visitPurposeFK,
+      timeIn,
+      timeOut,
+      visitPurposeName,
+      coHistory = [],
+    } = row
+    const { settings = [] } = clinicSettings
+    const { patientID } = patientHistory
     const fromConsultation = location.pathname.includes('consultation')
-
-    const isRetailVisit = selected.visitPurposeFK === VISIT_TYPE.RETAIL
-
+    const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
+    const patientIsActive = entity && entity.isActive
+    const docotrName = userName
+      ? `${userTitle || ''} ${userName || ''}`
+      : undefined
+    let LastUpdateBy
+    if (coHistory.length > 0) {
+      LastUpdateBy = coHistory[0].userName
+        ? `${coHistory[0].userTitle || ''} ${coHistory[0].userName || ''}`
+        : undefined
+    } else {
+      LastUpdateBy = userName
+        ? `${userTitle || ''} ${userName || ''}`
+        : undefined
+    }
     return (
-      <CardContainer
-        hideHeader
-        size='sm'
-        className={classnames({
-          [classes.rightPanel]: true,
-          [override.rightPanel]: true,
-        })}
-        // style={{ marginLeft: theme.spacing.unit * 2 }}
+      <div
+        style={{
+          paddingLeft: 5,
+          paddingRight: 5,
+          paddingTop: 2,
+          paddingBottom: 2,
+        }}
+        onClick={() => {
+          this.setState((preState) => {
+            if (preState.activeKey.find((key) => key === row.id)) {
+              return {
+                ...preState,
+                activeKey: preState.activeKey.filter((key) => key !== row.id),
+              }
+            }
+            return {
+              ...preState,
+              activeKey: [
+                ...preState.activeKey,
+                row.id,
+              ],
+            }
+          })
+        }}
       >
-        {!isRetailVisit && (
-          <GridContainer gutter={0} alignItems='center'>
-            <GridItem md={4}>
-              <Select
-                // simple
-                value={this.state.selectedItems}
-                allValue='0'
-                // prefix='Filter By'
-                mode='multiple'
-                // maxTagCount={4}
-                options={this.widgets.map((item) => ({
-                  name: item.name,
-                  value: item.id,
-                }))}
-                style={{ marginBottom: theme.spacing(1) }}
-                onChange={this.onSelectChange}
-                maxTagCount={maxItemTagCount}
-              />
-            </GridItem>
-            <Authorized authority='patientdashboard.editconsultation'>
-              <GridItem md={3}>
-                {!fromConsultation && (
-                  <ProgressButton
+        <div style={{ display: 'flex' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <span className='material-icons'>
+              {this.state.activeKey.find((key) => key === row.id) ? (
+                'expand_more'
+              ) : (
+                'navigate_next'
+              )}
+            </span>
+          </div>
+          <div style={{ fontSize: '0.9em' }}>
+            <div style={{ fontWeight: 500 }}>
+              {`${moment(visitDate).format('DD MMM YYYY')} (Time In: ${moment(
+                timeIn,
+              ).format('HH:mm')} Time Out: ${timeOut
+                ? moment(timeOut).format('HH:mm')
+                : '-'})${docotrName ? ` - ${docotrName}` : ''}`}
+            </div>
+            <span>
+              {`${visitPurposeName}, Last Update By: ${LastUpdateBy ||
+                ''} on ${moment(signOffDate).format('DD MMM YYYY HH:mm')}`}
+            </span>
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            {patientIsActive &&
+            !isRetailVisit &&
+            !fromConsultation && (
+              <Authorized authority='patientdashboard.editconsultation'>
+                <Tooltip title='Edit Consultation'>
+                  <Button
                     color='primary'
                     style={{ marginLeft: theme.spacing(2) }}
                     size='sm'
-                    onClick={() => {
+                    justIcon
+                    onClick={(event) => {
+                      event.stopPropagation()
                       dispatch({
                         type: `consultation/edit`,
                         payload: {
-                          id: selected.id,
+                          id: row.id,
                           version: patientHistory.version,
                         },
                       }).then((o) => {
@@ -417,7 +310,7 @@ class PatientHistory extends Component {
                                   dispatch({
                                     type: `consultation/overwrite`,
                                     payload: {
-                                      id: selected.id,
+                                      id: row.id,
                                       version,
                                     },
                                   }).then((c) => {
@@ -425,7 +318,7 @@ class PatientHistory extends Component {
                                       type: 'patient/closePatientModal',
                                     })
                                     router.push(
-                                      `/reception/queue/consultation?qid=${entity.queueFK}&pid=${patientID}&cid=${c.id}&v=${version}`,
+                                      `/reception/queue/consultation?qid=${row.queueFK}&pid=${patientID}&cid=${c.id}&v=${version}`,
                                     )
                                   })
                                 },
@@ -436,76 +329,121 @@ class PatientHistory extends Component {
                               type: 'patient/closePatientModal',
                             })
                             router.push(
-                              `/reception/queue/consultation?qid=${entity.queueFK}&pid=${patientID}&cid=${o.id}&v=${patientHistory.version}`,
+                              `/reception/queue/consultation?qid=${row.queueFK}&pid=${patientID}&cid=${o.id}&v=${patientHistory.version}`,
                             )
                           }
                         }
                       })
                     }}
                   >
-                    Edit Consultation
-                  </ProgressButton>
-                )}
-              </GridItem>
-            </Authorized>
-            <GridItem md={5} style={{ textAlign: 'right' }}>
-              Updated Date:&nbsp;
-              {patientHistory.selectedSubRow.signOffDate && (
-                <DatePicker
-                  text
-                  value={patientHistory.selectedSubRow.signOffDate}
-                />
-              )}
-            </GridItem>
-          </GridContainer>
-        )}
-
-        {this.widgets
-          .filter((_widget) => {
-            if (visitPurposeFK === VISIT_TYPE.RETAIL) {
-              return _widget.id === WidgetConfig.WIDGETS_ID.INVOICE
-            }
-            return (
-              this.state.selectedItems.indexOf('0') >= 0 ||
-              this.state.selectedItems.indexOf(_widget.id) >= 0
-            )
-          })
-          .map((o) => {
-            const Widget = o.component
-            return (
-              <div>
-                <h5 style={{ fontWeight: 500 }}>{o.name}</h5>
-                <Widget
-                  current={entity || {}}
-                  {...this.props}
-                  setFieldValue={this.props.setFieldValue}
-                />
-              </div>
-            )
-          })}
-      </CardContainer>
+                    <Edit />
+                  </Button>
+                </Tooltip>
+              </Authorized>
+            )}
+          </div>
+          {settings.showConsultationVersioning &&
+          !isRetailVisit && (
+            <div
+              style={{
+                marginLeft: 'auto',
+                display: 'flex',
+                alignItems: 'center',
+                marginRight: 10,
+              }}
+            >
+              <Tooltip title='View History'>
+                <span
+                  className='material-icons'
+                  style={{ color: 'gray' }}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    this.setState({
+                      showHistoryDetails: true,
+                      selectHistory: { ...row },
+                    })
+                  }}
+                >
+                  history
+                </span>
+              </Tooltip>
+            </div>
+          )}
+        </div>
+      </div>
     )
   }
 
-  handleRetailVisitHistory = (v) => {
-    this.props
-      .dispatch({
-        type: 'patientHistory/queryRetailHistory',
-        payload: {
-          id: v.invoiceFK,
-        },
-      })
-      .then((r) => {
-        if (r) {
-          this.props.dispatch({
-            type: 'patientHistory/updateState',
-            payload: {
-              selected: v,
-              selectedSubRow: v,
-            },
+  getDetailPanel = (history) => {
+    const { visitPurposeFK } = history
+    let current = {
+      ...history.patientHistoryDetail,
+      visitAttachments: history.visitAttachments,
+      visitRemarks: history.visitRemarks,
+      referralBy: history.referralBy,
+      referralInstitution: history.referralInstitution,
+      referralDate: history.referralDate,
+    }
+    let visitDetails = {
+      visitDate: history.visitDate,
+      patientName: history.patientName,
+      patientAccountNo: history.patientAccountNo,
+    }
+    let currentTagWidgets = this.widgets.filter((_widget) => {
+      if (visitPurposeFK === VISIT_TYPE.RETAIL) {
+        return (
+          (_widget.id === WidgetConfig.WIDGETS_ID.INVOICE ||
+            _widget.id === WidgetConfig.WIDGETS_ID.VISITREMARKS ||
+            _widget.id === WidgetConfig.WIDGETS_ID.REFERRAL ||
+            _widget.id === WidgetConfig.WIDGETS_ID.ATTACHMENT) &&
+          this.state.selectTag.children.indexOf(_widget.id) >= 0 &&
+          WidgetConfig.showWidget(current, _widget)
+        )
+      }
+      return (
+        this.state.selectTag.children.indexOf(_widget.id) >= 0 &&
+        WidgetConfig.showWidget(current, _widget)
+      )
+    })
+
+    return (
+      <div
+        style={{
+          padding: 10,
+        }}
+      >
+        {currentTagWidgets.length > 0 ? (
+          currentTagWidgets.map((o) => {
+            const Widget = o.component
+            return (
+              <div>
+                <span
+                  style={{
+                    fontWeight: 500,
+                    color: 'darkBlue',
+                    fontSize: '0.85rem',
+                  }}
+                >
+                  {o.name}
+                </span>
+                {Widget ? (
+                  <Widget
+                    current={current}
+                    visitDetails={visitDetails}
+                    {...this.props}
+                    setFieldValue={this.props.setFieldValue}
+                  />
+                ) : (
+                  ''
+                )}
+              </div>
+            )
           })
-        }
-      })
+        ) : (
+          <div> No Data</div>
+        )}
+      </div>
+    )
   }
 
   toggleScribbleModal = () => {
@@ -525,88 +463,138 @@ class PatientHistory extends Component {
     })
   }
 
-  render () {
-    const {
-      theme,
-      style,
-      classes,
-      override = {},
-      patientHistory,
-      dispatch,
-      widget,
-      clinicSettings,
-      mode,
-      scriblenotes,
-    } = this.props
-    const { settings = [] } = clinicSettings
-    const { entity, visitInfo, selected } = patientHistory
-    const cfg = {}
+  setExpandAll = (isExpandAll = false) => {
+    if (isExpandAll) {
+      const { patientHistory } = this.props
+      let sortedPatientHistory = []
 
-    if (!clinicSettings) return null
-
-    if (mode === 'split') {
-      cfg.style = style
-    } else if (mode === 'integrated') {
-      cfg.style = {}
+      sortedPatientHistory = patientHistory.list
+        ? patientHistory.list.filter(
+            (o) =>
+              o.visitPurposeFK === VISIT_TYPE.RETAIL ||
+              (o.coHistory && o.coHistory.length > 0),
+          )
+        : []
+      this.setState({ activeKey: sortedPatientHistory.map((o) => o.id) })
+    } else {
+      this.setState({ activeKey: [] })
     }
+  }
 
-    let sortedPatientHistory = ''
+  getFilterBar = () => {
+    const { CheckableTag } = Tag
+    return (
+      <div style={{ display: 'flex' }}>
+        <div style={{ margin: '10px 0' }} className={customtyles.customTag}>
+          {this.getActiveHistoryTags().map((tag) => (
+            <CheckableTag
+              style={{ padding: '5px 10px' }}
+              key={tag.value}
+              checked={this.state.selectTag.value === tag.value}
+              onChange={(checked) => {
+                if (checked) this.setState({ selectTag: tag })
+                return null
+              }}
+            >
+              {tag.name}
+            </CheckableTag>
+          ))}
+        </div>
+        <div style={{ marginLeft: 'auto' }}>
+          <span
+            style={{
+              cursor: 'pointer',
+            }}
+            onClick={() => {
+              this.setExpandAll(true)
+            }}
+          >
+            <span
+              className='material-icons'
+              style={{
+                marginTop: 15,
+                fontSize: '1.2rem',
+              }}
+            >
+              unfold_more
+            </span>
+            <span style={{ position: 'relative', top: -5 }}>Expand All</span>
+          </span>
+          <span
+            style={{
+              cursor: 'pointer',
+              marginLeft: 20,
+              marginRight: 10,
+            }}
+            onClick={() => {
+              this.setExpandAll(false)
+            }}
+          >
+            <span
+              className='material-icons'
+              style={{
+                marginTop: 10,
+                fontSize: '1.2rem',
+              }}
+            >
+              unfold_less
+            </span>
+            <span style={{ position: 'relative', top: -5 }}>Collapse All</span>
+          </span>
+        </div>
+      </div>
+    )
+  }
+
+  closeHistoryDetails = () => {
+    this.setState({
+      showHistoryDetails: false,
+      selectHistory: undefined,
+    })
+    this.props.dispatch({
+      type: 'patientHistory/updateState',
+      payload: {
+        selectedSubRow: undefined,
+        entity: undefined,
+      },
+    })
+  }
+
+  render () {
+    const { patientHistory, clinicSettings, scriblenotes } = this.props
+    const cfg = {}
+    let sortedPatientHistory = []
 
     sortedPatientHistory = patientHistory.list
       ? patientHistory.list.filter(
           (o) =>
-            o.visitPurposeFK === VISIT_TYPE.RETAIL || o.coHistory.length >= 1,
+            o.visitPurposeFK === VISIT_TYPE.RETAIL ||
+            (o.coHistory && o.coHistory.length > 0),
         )
-      : ''
+      : []
 
+    if (!clinicSettings) return null
+
+    const { showHistoryDetails, selectHistory, activeKey } = this.state
     return (
       <div {...cfg}>
-        <CardContainer
-          hideHeader
-          size='sm'
-          className={classnames({
-            [classes.leftPanel]: !widget,
-            [classes.integratedLeftPanel]: mode === 'integrated',
-            [override.leftPanel]: !widget,
-          })}
-        >
-          {sortedPatientHistory ? sortedPatientHistory.length >
-          0 ? settings.showConsultationVersioning === false ||
-          settings.showConsultationVersioning === undefined ? (
-            sortedPatientHistory.map((o) => this.getContent(o))
-          ) : (
-            <div ref={this.myRef}>
-              <Accordion
-                defaultActive={0}
-                onChange={(event, p, expanded) => {
-                  if (expanded) {
-                    setTimeout(() => {
-                      $(this.myRef.current)
-                        .find('div[aria-expanded=true]')
-                        .next()
-                        .find('div[role="button"]:eq(0)')
-                        .trigger('click')
-                    }, 1)
-                  }
-                }}
-                collapses={sortedPatientHistory.map((o) => {
-                  const isRetailVisit = o.visitPurposeFK === VISIT_TYPE.RETAIL
-                  const returnValue = {
-                    title: this.getTitle(o),
-                    content: this.getContent(o),
-                    hideExpendIcon: isRetailVisit,
-                  }
-                  if (isRetailVisit) {
-                    return {
-                      ...returnValue,
-                      onClickSummary: () => this.handleRetailVisitHistory(o),
-                    }
-                  }
-                  return {
-                    ...returnValue,
-                  }
+        <CardContainer hideHeader size='sm'>
+          {this.getFilterBar()}
+          {sortedPatientHistory ? sortedPatientHistory.length > 0 ? (
+            <div>
+              <Collapse activeKey={activeKey} expandIconPosition={null}>
+                {sortedPatientHistory.map((o) => {
+                  return (
+                    <Collapse.Panel
+                      header={this.getTitle(o)}
+                      key={o.id}
+                      className={customtyles.customPanel}
+                    >
+                      {this.getDetailPanel(o)}
+                    </Collapse.Panel>
+                  )
                 })}
-              />
+              </Collapse>
             </div>
           ) : (
             <p>No Visit Record Found</p>
@@ -621,8 +609,6 @@ class PatientHistory extends Component {
             </React.Fragment>
           )}
         </CardContainer>
-
-        {selected && mode === 'split' && this.getDetailPanel()}
         <CommonModal
           open={scriblenotes.showViewScribbleModal}
           title='Scribble'
@@ -635,6 +621,21 @@ class PatientHistory extends Component {
             {...this.props}
             toggleScribbleModal={this.toggleScribbleModal}
             scribbleData={this.state.selectedData}
+          />
+        </CommonModal>
+        <CommonModal
+          open={showHistoryDetails}
+          title='History'
+          fullScreen
+          bodyNoPadding
+          keepMounted={false}
+          onClose={this.closeHistoryDetails}
+        >
+          <HistoryDetails
+            {...this.props}
+            closeHistoryDetails={this.closeHistoryDetails}
+            selectHistory={selectHistory}
+            scribbleNoteUpdateState={this.scribbleNoteUpdateState}
           />
         </CommonModal>
       </div>

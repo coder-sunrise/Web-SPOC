@@ -5,12 +5,8 @@ import _ from 'lodash'
 import numeral from 'numeral'
 import Timer from 'react-compound-timer'
 
-
-import {
-  withStyles,
-} from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import TimerIcon from '@material-ui/icons/Timer'
-import AutoPrintSelection from './autoPrintSelection'
 import {
   CommonModal,
   GridContainer,
@@ -24,14 +20,25 @@ import {
 import Authorized from '@/utils/Authorized'
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 
-import { getAppendUrl, navigateDirtyCheck, commonDataReaderTransform } from '@/utils/utils'
-import { convertToConsultation, convertConsultationDocument } from '@/pages/Consultation/utils'
+import {
+  getAppendUrl,
+  navigateDirtyCheck,
+  commonDataReaderTransform,
+} from '@/utils/utils'
+import {
+  convertToConsultation,
+  convertConsultationDocument,
+} from '@/pages/Consultation/utils'
 // import model from '@/pages/Widgets/Orders/models'
 import { VISIT_TYPE } from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { CallingQueueButton } from '@/components/_medisys'
-import { initRoomAssignment, consultationDocumentTypes, ReportsOnSignOffOption } from '@/utils/codes'
-
+import {
+  initRoomAssignment,
+  consultationDocumentTypes,
+  ReportsOnSignOffOption,
+} from '@/utils/codes'
+import AutoPrintSelection from './autoPrintSelection'
 
 // import PatientSearch from '@/pages/PatientDatabase/Search'
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
@@ -44,18 +51,30 @@ import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
 // window.g_app.replaceModel(model)
 
 const discardMessage = 'Discard consultation?'
+const onPageLeaveMessage = 'Do you want to save consultation notes?'
 const formName = 'ConsultationPage'
 
-const generatePrintData = async (settings, consultationDocument, user, patient, orders, visitEntity) => {
+const generatePrintData = async (
+  settings,
+  consultationDocument,
+  user,
+  patient,
+  orders,
+  visitEntity,
+) => {
   let documents = convertConsultationDocument(consultationDocument)
-  const {
-    autoPrintOnSignOff,
-    autoPrintReportsOnSignOff,
-  } = settings
+  const { autoPrintOnSignOff, autoPrintReportsOnSignOff } = settings
 
   if (autoPrintOnSignOff === true) {
     let reportsOnSignOff = autoPrintReportsOnSignOff.split(',')
-    const { corMemo, corCertificateOfAttendance, corMedicalCertificate, corOtherDocuments, corReferralLetter, corVaccinationCert } = documents
+    const {
+      corMemo,
+      corCertificateOfAttendance,
+      corMedicalCertificate,
+      corOtherDocuments,
+      corReferralLetter,
+      corVaccinationCert,
+    } = documents
     let printData = []
 
     let doctor = user.data.clinicianProfile
@@ -69,54 +88,76 @@ const generatePrintData = async (settings, consultationDocument, user, patient, 
     let getPrintData = (type, list) => {
       if (list && list.length > 0) {
         const documentType = consultationDocumentTypes.find(
-          (o) =>
-            o.name === type ,
+          (o) => o.name === type,
         )
         return list.filter((item) => !item.isDeleted).map((item) => ({
           item: type,
-          description: `  ${item.subject ?? ''}`,
+          description: `  ${item.subject || ''}`,
           Copies: 1,
           print: true,
           ReportId: documentType.downloadConfig.id,
-          ReportData: `${JSON.stringify(commonDataReaderTransform(
-            documentType.downloadConfig.draft(
-              {
+          ReportData: `${JSON.stringify(
+            commonDataReaderTransform(
+              documentType.downloadConfig.draft({
                 ...item,
                 doctorName,
                 doctorMCRNo,
                 patientName,
                 patientAccountNo,
-              })))}`,
+              }),
+            ),
+          )}`,
         }))
       }
       return []
     }
     if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.DrugLabel) > -1) {
       // const { versionNumber } = values
-      // versionNumber === 1 && 
+      // versionNumber === 1 &&
       if (orders && orders.rows) {
         const { rows = [] } = orders
         // prescriptionItems
         const prescriptionItems = rows.filter(
           (f) => f.type === '1' && !f.isDeleted,
         )
-        let drugLabelData = await getDrugLabelPrintData(settings, patient.entity, visitEntity.id, prescriptionItems)
+        let drugLabelData = await getDrugLabelPrintData(
+          settings,
+          patient.entity,
+          visitEntity.id,
+          prescriptionItems,
+        )
         if (drugLabelData && drugLabelData.length > 0)
           printData = printData.concat(drugLabelData)
       }
     }
     if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.Memo) > -1)
       printData = printData.concat(getPrintData('Memo', corMemo))
-    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.MedicalCertificate) > -1)
-      printData = printData.concat(getPrintData('Medical Certificate', corMedicalCertificate))
-    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.CertificateofAttendance) > -1)
-      printData = printData.concat(getPrintData('Certificate of Attendance', corCertificateOfAttendance))
+    if (
+      reportsOnSignOff.indexOf(ReportsOnSignOffOption.MedicalCertificate) > -1
+    )
+      printData = printData.concat(
+        getPrintData('Medical Certificate', corMedicalCertificate),
+      )
+    if (
+      reportsOnSignOff.indexOf(ReportsOnSignOffOption.CertificateofAttendance) >
+      -1
+    )
+      printData = printData.concat(
+        getPrintData('Certificate of Attendance', corCertificateOfAttendance),
+      )
     if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.OtherDocuments) > -1)
       printData = printData.concat(getPrintData('Others', corOtherDocuments))
     if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.ReferralLetter) > -1)
-      printData = printData.concat(getPrintData('Referral Letter', corReferralLetter))
-    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.VaccinationCertificate) > -1)
-      printData = printData.concat(getPrintData('Vaccination Certificate', corVaccinationCert))
+      printData = printData.concat(
+        getPrintData('Referral Letter', corReferralLetter),
+      )
+    if (
+      reportsOnSignOff.indexOf(ReportsOnSignOffOption.VaccinationCertificate) >
+      -1
+    )
+      printData = printData.concat(
+        getPrintData('Vaccination Certificate', corVaccinationCert),
+      )
     return printData
   }
   return []
@@ -194,27 +235,11 @@ const saveConsultation = ({
   }
 }
 
-
 const discardConsultation = ({
   dispatch,
   values,
-  onClose,
-  consultation,
-  resetForm,
 }) => {
-  // console.log(values)
   if (values.id) {
-    // dispatch({
-    //   type: 'global/updateAppState',
-    //   payload: {
-    //     openConfirm: true,
-    //     openConfirmContent: 'Discard consultation?',
-    //     openConfirmText: 'Confirm',
-    //     onConfirmSave: () => {
-
-    //     },
-    //   },
-    // })
     dispatch({
       type: 'consultation/discard',
       payload: values.id,
@@ -224,6 +249,57 @@ const discardConsultation = ({
       type: 'consultation/discard',
     })
   }
+}
+
+const pauseConsultation = ({
+  dispatch,
+  values,
+  onClose,
+  consultation,
+  resetForm,
+  ...rest
+}) => {
+  const {
+    consultationDocument = {},
+    corEyeRefractionForm,
+    orders = {},
+    forms = {},
+  } = rest
+  const newValues = convertToConsultation(
+    {
+      ...values,
+      corDiagnosis: [
+        ...values.corDiagnosis.filter(
+          (diagnosis) => diagnosis.diagnosisFK !== undefined,
+        ),
+      ],
+    },
+    {
+      orders,
+      consultationDocument,
+      corEyeRefractionForm,
+      forms,
+    },
+  )
+  newValues.duration = Math.floor(
+    Number(sessionStorage.getItem(`${values.id}_consultationTimer`)) || 0,
+  )
+  if (!newValues.visitConsultationTemplate) {
+    newValues.visitConsultationTemplate = {}
+  }
+  newValues.visitConsultationTemplate.consultationTemplate =
+    localStorage.getItem('consultationLayout') || ''
+  dispatch({
+    type: `consultation/pause`,
+    payload: newValues,
+  }).then((r) => {
+    if (r) {
+      sessionStorage.removeItem(`${values.id}_consultationTimer`)
+      notification.success({
+        message: 'Consultation paused.',
+      })
+    }
+  })
 }
 
 // @skeleton()
@@ -261,28 +337,44 @@ const discardConsultation = ({
     'patientdashboard.startresumeconsultation',
     'patientdashboard.editconsultation',
   ],
-  mapPropsToValues: ({ consultation = {} }) => {
-    // console.log('mapPropsToValues', consultation.entity, disabled, reset)
-    // console.log(consultation.entity, consultation.default)
+  mapPropsToValues: ({ consultation = {}, visitRegistration }) => {
+    if (window.g_app._store.getState().global.isShowSecondConfirmButton === undefined && visitRegistration && visitRegistration.entity) {
+      if (visitRegistration.entity.visit.visitStatus && visitRegistration.entity.visit.visitStatus !== 'IN CONS' && visitRegistration.entity.visit.visitStatus !== 'WAITING') {
+        window.g_app._store.dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            isShowSecondConfirmButton: false,
+            secondConfirmMessage: discardMessage,
+          },
+        })
+      }
+      else {
+        window.g_app._store.dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            isShowSecondConfirmButton: true,
+            secondConfirmMessage: 'Do you want to save consultation notes?',
+          },
+        })
+      }
+    }
     return consultation.entity || consultation.default
   },
   validationSchema: schema,
   enableReinitialize: false,
-  dirtyCheckMessage: discardMessage,
+  onSecondConfirm: pauseConsultation,
+  secondConfirmText: 'Pause',
+  confirmText: 'Discard',
+  dirtyCheckMessage: onPageLeaveMessage,
   notDirtyDuration: 0, // this page should alwasy show warning message when leave
   onDirtyDiscard: discardConsultation,
   handleSubmit: async (values, { props }) => {
     const { versionNumber } = values
-    const {
-      dispatch,
-      handlePrint,
-    } = props
+    const { dispatch, handlePrint } = props
     let printData = []
     if (versionNumber === 1) {
       let settings = JSON.parse(localStorage.getItem('clinicSettings'))
-      const {
-        autoPrintOnSignOff,
-      } = settings
+      const { autoPrintOnSignOff } = settings
 
       if (autoPrintOnSignOff === true) {
         const {
@@ -291,7 +383,14 @@ const discardConsultation = ({
           visitRegistration: { entity: visitEntity },
           patient,
         } = props
-        printData = await generatePrintData(settings, consultationDocument, props.user, patient, orders, visitEntity)
+        printData = await generatePrintData(
+          settings,
+          consultationDocument,
+          props.user,
+          patient,
+          orders,
+          visitEntity,
+        )
       }
     }
     if (printData && printData.length > 0) {
@@ -309,8 +408,8 @@ const discardConsultation = ({
               shouldPromptConfirm: false,
               action: 'sign',
               successCallback: () => {
+                dispatch({ type: `consultation/closeSignOffModal` })
                 if (result && result.length > 0) {
-                  dispatch({ type: `consultation/closeSignOffModal` })
                   let printedData = result
                   if (printedData && printedData.length > 0) {
                     const token = localStorage.getItem('token')
@@ -357,7 +456,7 @@ class Main extends React.Component {
     // console.log('Main')
     initRoomAssignment()
     setTimeout(() => {
-      this.props.setFieldValue('fakeField', 'setdirty')
+      this.props.setFieldValue('fakeField', 'setdirty') 
     }, 500)
   }
 
@@ -366,6 +465,19 @@ class Main extends React.Component {
       type: 'consultation/updateState',
       payload: {
         entity: undefined,
+      },
+    })
+    this.props.dispatch({
+      type: 'visitRegistration/updateState',
+      payload: {
+        entity: undefined,
+      },
+    })
+    window.g_app._store.dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        isShowSecondConfirmButton: undefined,
+        secondConfirmMessage: undefined,
       },
     })
   }
@@ -380,11 +492,12 @@ class Main extends React.Component {
     )
       return true
     if (
+      nextProps.visitRegistration &&
       nextProps.visitRegistration.version !==
       this.props.visitRegistration.version
     )
       return true
-    if (
+    if (nextProps.visitRegistration && nextProps.visitRegistration.entity &&
       nextProps.visitRegistration.entity.id !==
       this.props.visitRegistration.entity.id
     )
@@ -396,24 +509,6 @@ class Main extends React.Component {
       return true
     return false
   }
-
-  // constructor (props) {
-  //   super(props)
-  //   discardConsultation = discardConsultation.bind(this)
-  // }
-
-  // static getDerivedStateFromProps (nextProps, preState) {
-  //   const { global } = nextProps
-  //   // console.log(value)
-  //   if (global.collapsed !== preState.collapsed) {
-  //     return {
-  //       collapsed: global.collapsed,
-  //       currentLayout: _.cloneDeep(preState.currentLayout),
-  //     }
-  //   }
-
-  //   return null
-  // }
 
   showInvoiceAdjustment = () => {
     const { theme, ...resetProps } = this.props
@@ -435,9 +530,21 @@ class Main extends React.Component {
     saveConsultation({
       props: this.props,
       confirmMessage: 'Pause consultation?',
-      successMessage: 'Consultation paused',
+      successMessage: 'Consultation paused.',
       action: 'pause',
     })
+  }
+
+  discardConsultation = () => {
+    const {
+      dispatch,
+      values,
+    } = this.props
+    dispatch({
+      type: 'consultation/discard',
+      payload: values.id,
+    })
+    router.push('/reception/queue')
   }
 
   resumeConsultation = () => {
@@ -536,7 +643,7 @@ class Main extends React.Component {
     )
     if (forms.rows.filter((o) => o.statusFK === 1).length > 0) {
       notification.warning({
-        message: `Please finalize all forms.`,
+        message: `Draft forms found, please finalize it before sign off.`,
       })
       return
     }
@@ -676,33 +783,6 @@ class Main extends React.Component {
                                   formatValue={(value) =>
                                     `${numeral(value).format('00')}`}
                                 />
-
-                                {/* {!this.state.recording && (
-                      <IconButton
-                        style={{ padding: 0, top: -1, right: -6 }}
-                        onClick={() => {
-                          resume()
-                          this.setState({
-                            recording: true,
-                          })
-                        }}
-                      >
-                        <PlayArrow />
-                      </IconButton>
-                    )}
-                    {this.state.recording && (
-                      <IconButton
-                        style={{ padding: 0, top: -1, right: -6 }}
-                        onClick={() => {
-                          pause()
-                          this.setState({
-                            recording: false,
-                          })
-                        }}
-                      >
-                        <Pause />
-                      </IconButton>
-                    )} */}
                               </React.Fragment>
                             )
                           }}
@@ -740,7 +820,10 @@ class Main extends React.Component {
                   color='danger'
                   onClick={navigateDirtyCheck({
                     displayName: formName,
+                    confirmText: 'Confirm',
                     redirectUrl: '/reception/queue',
+                    showSecondConfirmButton: false,
+                    openConfirmContent: discardMessage,
                   })}
                   icon={null}
                 >
@@ -892,25 +975,6 @@ class Main extends React.Component {
     this.props.dispatch({ type: `consultation/closeSignOffModal` })
   }
 
-  // componentWillUnmount () {
-  //   this.props.dispatch({
-  //     type: 'formik/updateState',
-  //     payload: {
-  //       ConsultationPage: undefined,
-  //       ConsultationDocumentList: undefined,
-  //       OrderPage: undefined,
-  //     },
-  //   })
-  // }
-  componentWillUnmount () {
-    this.props.dispatch({
-      type: 'consultation/updateState',
-      payload: {
-        entity: undefined,
-      },
-    })
-  }
-
   render () {
     const { props, state } = this
     const {
@@ -926,16 +990,17 @@ class Main extends React.Component {
       disabled,
       ...resetProps
     } = this.props
-    console.log(consultation)
-    const { entity, showSignOffModal, printData, onSignOffConfirm } = consultation
+    const {
+      entity,
+      showSignOffModal,
+      printData,
+      onSignOffConfirm,
+    } = consultation
     const { entity: vistEntity = {} } = visitRegistration
     // if (!vistEntity) return null
     const { visit = {} } = vistEntity
     // const { summary } = orders
     // const { adjustments, total, gst, totalWithGst } = summary
-    // console.log('values', values, this.props)
-    // console.log(currentLayout)
-    console.log(printData)
     const matches = {
       rights:
         rights === 'enable' && visit.visitStatus === 'PAUSED'

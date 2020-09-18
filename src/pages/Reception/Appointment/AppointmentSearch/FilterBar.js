@@ -74,7 +74,7 @@ const createPayload = (values, viewOtherApptAccessRight, isActiveDoctor) => {
       room: filterByRoomBlockGroup > 0 ? filterByRoomBlockGroup : undefined,
       SearchText: searchValue || undefined,
       ApptType: filterByApptType.length > 0 ? filterByApptType : undefined,
-      AapptStatus:
+      ApptStatus:
         filterByAppointmentStatus.length > 0
           ? filterByAppointmentStatus
           : undefined,
@@ -89,6 +89,8 @@ const createPayload = (values, viewOtherApptAccessRight, isActiveDoctor) => {
     searchValue: searchValue || undefined,
     appType: filterByApptType.join() || undefined,
     appStatus: filterByAppointmentStatus.join() || undefined,
+    isIncludeRescheduledByClinic: true,
+    isIncludeHistory: true,
   }
 }
 
@@ -262,12 +264,12 @@ const FilterBar = ({
             name='filterByAppointmentStatus'
             render={(args) => {
               return (
-                <Select
+                <CodeSelect
+                  mode='multiple'
+                  code='ltappointmentstatus'
                   label={formatMessage({
                     id: 'sms.appointment.status',
                   })}
-                  mode='multiple'
-                  options={appointmentStatusReception}
                   maxTagCount={maxAppointmentStatusTagCount}
                   maxTagPlaceholder='appointment status'
                   {...args}
@@ -278,7 +280,7 @@ const FilterBar = ({
         </GridItem>
         <GridItem xs md={12}>
           <ProgressButton
-            icon={null}
+            icon={<Search />}
             color='primary'
             size='sm'
             onClick={async () => {
@@ -286,7 +288,6 @@ const FilterBar = ({
               handleSubmit()
             }}
           >
-            <Search />
             Search
           </ProgressButton>
           <Authorized authority='appointment.newappointment'>

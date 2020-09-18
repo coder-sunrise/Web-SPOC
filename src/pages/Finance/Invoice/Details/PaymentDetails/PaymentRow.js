@@ -37,6 +37,8 @@ const PaymentRow = ({
     isCancelled,
     patientDepositTransaction,
     invoicePaymentMode = [],
+    cancelReason,
+    statementPaymentReceiptNo,
   } = payment
 
   const sortedInvoicePaymentModes = [
@@ -63,7 +65,9 @@ const PaymentRow = ({
             color='primary'
             id={itemID}
             className={classes.printButton}
-            disabled={isCancelled || printDisabled}
+            disabled={
+              isCancelled || !!statementPaymentReceiptNo || printDisabled
+            }
             onClick={() => handlePrinterClick(type, id)}
           >
             <Printer />
@@ -99,7 +103,12 @@ const PaymentRow = ({
       >
         <GridItem md={2}>
           {getIconByType()}
-          {type === 'Payment' ? (
+          {type === 'Payment' ||
+          ([
+            'Credit Note',
+            'Write Off',
+          ].includes(type) &&
+            isCancelled) ? (
             <Popper
               className={classNames({
                 [classes.pooperResponsive]: true,
@@ -116,6 +125,8 @@ const PaymentRow = ({
                   paymentModeDetails={sortedInvoicePaymentModes}
                   setHoveredRowId={setHoveredRowId}
                   id={id}
+                  cancelReason={cancelReason}
+                  isCancelled={isCancelled}
                 />
               }
             >
@@ -134,7 +145,10 @@ const PaymentRow = ({
           )}
         </GridItem>
         <GridItem md={2}>
-          <span>{itemID}</span>
+          <span>
+            {itemID}
+            {statementPaymentReceiptNo && `(${statementPaymentReceiptNo})`}
+          </span>
         </GridItem>
         <GridItem md={2}>
           <span>{moment(date).format(dateFormatLong)}</span>
@@ -159,7 +173,9 @@ const PaymentRow = ({
                 color='danger'
                 id={itemID}
                 onClick={() => handleVoidClick(payment)}
-                disabled={isCancelled || readOnly}
+                disabled={
+                  isCancelled || readOnly || !!statementPaymentReceiptNo
+                }
               >
                 <Cross />
               </Button>

@@ -93,6 +93,8 @@ class Grid extends PureComponent {
       FuncProps: {
         pager: true,
         filter: true,
+        // columnSelectable: false,
+        // columnReorderable: false,
       },
     }
   }
@@ -110,6 +112,7 @@ class Grid extends PureComponent {
         <CommonTableGrid
           type='patientSearch'
           entity={patientSearch}
+          forceRender
           TableProps={{ height: simple ? mainDivHeight - 425 : undefined }}
           onRowDoubleClick={onRowDblClick}
           {...this.tableParas}

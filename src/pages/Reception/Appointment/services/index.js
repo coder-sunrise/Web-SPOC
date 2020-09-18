@@ -7,7 +7,7 @@ module.exports = {
 
   upsert: (params) => service.upsert(url, params),
   saveFilterTemplate: (userId, params) =>
-      service.upsert(`${url}/SaveAppointmentFilter/${userId}`, params),
+    service.upsert(`${url}/SaveAppointmentFilter/${userId}`, params),
   getFilterTemplate: (params) =>
-      service.queryList(`${url}/GetAppointmentFilter`, params),
+    service.queryList(`${url}/GetAppointmentFilterByCurrentUser`, params),
 }

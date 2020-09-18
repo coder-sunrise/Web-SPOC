@@ -6,4 +6,8 @@ export default (theme) => ({
     paddingTop: theme.spacing(1),
     overflow: 'auto',
   },
+  isInActive: {
+    color: 'red',
+    textDecorationLine: 'line-through',
+  },
 })

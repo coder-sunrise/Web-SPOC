@@ -18,6 +18,7 @@ class PatientSearch extends PureComponent {
       { name: 'name', title: 'Patient Name' },
       { name: 'patientAccountNo', title: 'Acc. No.' },
       { name: 'gender/age', title: 'Gender / Age' },
+      { name: 'dob', title: 'DOB' },
       { name: 'mobileNo', title: 'Contact' },
       { name: 'action', title: 'Action' },
     ],
@@ -31,6 +32,12 @@ class PatientSearch extends PureComponent {
         sortingEnabled: false,
         render: (row) =>
           `${row.gender.substring(0, 1)}/${calculateAgeFromDOB(row.dob)}`,
+      },
+      {
+        columnName: 'dob',
+        type: 'date',
+        sortingEnabled: false,
+        width: 120,
       },
       {
         columnName: 'action',

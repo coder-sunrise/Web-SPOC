@@ -51,45 +51,45 @@ const searchResult = (values, props) => {
   const visitStartDate =
     visitDate && visitDate.length > 0
       ? moment(visitDate[0])
-          .set({ hour: 0, minute: 0, second: 0 })
-          .formatUTC(false)
+        .set({ hour: 0, minute: 0, second: 0 })
+        .formatUTC(false)
       : undefined
   const visitEndDate =
     visitDate && visitDate.length > 1
       ? moment(visitDate[1])
-          .set({ hour: 23, minute: 59, second: 59 })
-          .formatUTC(false)
+        .set({ hour: 23, minute: 59, second: 59 })
+        .formatUTC(false)
       : undefined
 
   const payload = IsOverallGrid
     ? {
-        visitFKNavigation: undefined,
-        lgteql_visitDate: isAllDateChecked
-          ? undefined
-          : visitStartDate || undefined,
-        lsteql_visitDate: isAllDateChecked
-          ? undefined
-          : visitEndDate || undefined,
-        labTrackingStatusFK: labTrackingStatusFK || undefined,
-        apiCriteria: searchValue ? { searchValue } : undefined,
-        serviceName: serviceName || undefined,
-      }
+      visitFKNavigation: undefined,
+      lgteql_visitDate: isAllDateChecked
+        ? undefined
+        : visitStartDate || undefined,
+      lsteql_visitDate: isAllDateChecked
+        ? undefined
+        : visitEndDate || undefined,
+      labTrackingStatusFK: labTrackingStatusFK || undefined,
+      apiCriteria: searchValue ? { searchValue } : undefined,
+      serviceName: serviceName || undefined,
+    }
     : {
-        visitFKNavigation: patientID
-          ? {
-              patientProfileFK: patientID,
-            }
-          : undefined,
-        lgteql_visitDate: isAllDateChecked
-          ? undefined
-          : visitStartDate || undefined,
-        lsteql_visitDate: isAllDateChecked
-          ? undefined
-          : visitEndDate || undefined,
-        labTrackingStatusFK: labTrackingStatusFK || undefined,
-        serviceName: serviceName || undefined,
-        apiCriteria: searchValue ? { searchValue } : undefined,
-      }
+      visitFKNavigation: patientID
+        ? {
+          patientProfileFK: patientID,
+        }
+        : undefined,
+      lgteql_visitDate: isAllDateChecked
+        ? undefined
+        : visitStartDate || undefined,
+      lsteql_visitDate: isAllDateChecked
+        ? undefined
+        : visitEndDate || undefined,
+      labTrackingStatusFK: labTrackingStatusFK || undefined,
+      serviceName: serviceName || undefined,
+      apiCriteria: searchValue ? { searchValue } : undefined,
+    }
 
   dispatch({
     type: 'labTrackingDetails/query',
@@ -100,7 +100,7 @@ const searchResult = (values, props) => {
 class FilterBar extends PureComponent {
   constructor (props) {
     super(props)
-    const { setFieldValue } = props
+    const { setFieldValue } = props  
 
     setTimeout(() => {
       setFieldValue('visitDate', [
@@ -115,10 +115,10 @@ class FilterBar extends PureComponent {
       const { values } = this.props
       searchResult(values, this.props)
     }, 100)
-  }
+  } 
 
   render () {
-    const { handleSubmit, IsOverallGrid } = this.props
+    const { handleSubmit, IsOverallGrid, values } = this.props
     return (
       <div>
         <GridContainer>
@@ -137,26 +137,26 @@ class FilterBar extends PureComponent {
                 )}
               />
             ) : (
-              <FastField
-                name='serviceName'
-                render={(args) => (
-                  <TextField
-                    {...args}
-                    label={formatMessage({
-                      id: 'patient.patientresult.serviceName',
-                    })}
-                    autoFocus
-                  />
-                )}
-              />
-            )}
+                <FastField
+                  name='serviceName'
+                  render={(args) => (
+                    <TextField
+                      {...args}
+                      label={formatMessage({
+                        id: 'patient.patientresult.serviceName',
+                      })}
+                      autoFocus
+                    />
+                  )}
+                />
+              )}
           </GridItem>
           <GridItem md={1} />
           <GridItem md={3}>
-            <FastField
+            <Field
               name='visitDate'
               render={(args) => (
-                <DateRangePicker label='Visit Date' label2='To' {...args} />
+                <DateRangePicker label='Visit Date' label2='To' {...args} disabled={values.isAllDateChecked} />
               )}
             />
           </GridItem>
@@ -198,12 +198,11 @@ class FilterBar extends PureComponent {
           </GridItem>
           <GridItem xs sm={8} md={4}>
             <ProgressButton
-              icon={null}
+              icon={<Search />}
               color='primary'
               size='sm'
               onClick={handleSubmit}
             >
-              <Search />
               Search
             </ProgressButton>
           </GridItem>

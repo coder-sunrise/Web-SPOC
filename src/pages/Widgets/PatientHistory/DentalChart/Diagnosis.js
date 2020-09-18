@@ -4,15 +4,13 @@ import Chart from '@/pages/Widgets/DentalChart/Chart'
 import DiagnosisPanel from '@/pages/Widgets/DentalChart/DiagnosisPanel'
 
 export default (props) => {
-  const { patientHistory, codetable } = props
+  const { current, codetable } = props
   const { ctchartmethod } = codetable
-  const { entity } = patientHistory
-
   if (
     !ctchartmethod ||
-    !entity ||
-    !entity.dentalChart ||
-    !entity.dentalChart[0]
+    !current ||
+    !current.dentalChart ||
+    !current.dentalChart[0]
   ) {
     return (
       <React.Fragment>
@@ -21,7 +19,7 @@ export default (props) => {
       </React.Fragment>
     )
   }
-  const { dentalChart, isPedoChart, isSurfaceLabel } = entity.dentalChart[0]
+  const { dentalChart, isPedoChart, isSurfaceLabel } = current.dentalChart[0]
   const dentalChartData = JSON.parse(dentalChart) || []
 
   return (

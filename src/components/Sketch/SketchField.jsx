@@ -13,6 +13,7 @@ import Pan from './pan'
 import Eraser from './eraser'
 import Tool from './tools'
 import None from './none'
+import Crop from './crop'
 
 const { fabric } = require('fabric')
 
@@ -48,6 +49,7 @@ class SketchField extends PureComponent {
     heightCorrection: PropTypes.number,
     // Specify action on change
     onChange: PropTypes.func,
+    onDoubleClick: PropTypes.func,
     // Default initial value
     defaultValue: PropTypes.object,
     // Sketch width
@@ -92,6 +94,7 @@ class SketchField extends PureComponent {
     this._tools[Tool.Pan] = new Pan(fabricCanvas)
     this._tools[Tool.Eraser] = new Eraser(fabricCanvas)
     this._tools[Tool.None] = new None(fabricCanvas)
+    this._tools[Tool.Crop] = new Crop(fabricCanvas)
   }
 
   /**
@@ -375,6 +378,13 @@ class SketchField extends PureComponent {
     // }
   }
 
+  _onDoubleClick = (e) => {
+    const { onDoubleClick } = this.props
+    if (onDoubleClick) {
+      onDoubleClick(e)
+    }
+  }
+
   _onMouseUp = (e) => {
     this._selectedTool.doMouseUp(e)
     // Update the final state to new-generated object
@@ -404,7 +414,8 @@ class SketchField extends PureComponent {
    */
   _resize = (e) => {
     if (e) e.preventDefault()
-    let { widthCorrection, heightCorrection } = this.props
+    let { widthCorrection, heightCorrection, disableResize } = this.props
+    if (disableResize) return
     let canvas = this._fc
     let { offsetWidth, clientHeight } = this._container
     let prevWidth = canvas.getWidth()
@@ -463,8 +474,10 @@ class SketchField extends PureComponent {
    */
   zoom = (factor) => {
     let canvas = this._fc
+
     let objects = canvas.getObjects()
     for (let i in objects) {
+      objects[i].factor = factor
       objects[i].scaleX = objects[i].scaleX * factor
       objects[i].scaleY = objects[i].scaleY * factor
       objects[i].left = objects[i].left * factor
@@ -673,6 +686,7 @@ class SketchField extends PureComponent {
     // }, 10000)
 
     canvas.loadFromJSON(json, () => {
+      this._selectedTool.configureCanvas(this.props)
       canvas.renderAll()
       // if (this.props.onChange) {
       //   this.props.onChange()
@@ -863,7 +877,7 @@ class SketchField extends PureComponent {
     // img.src = dataUrl
   }
 
-  setBackgroundFromData = (imageData) => {
+  setBackgroundFromData = (imageData, resizeCanvas, propertys = {}, loaded) => {
     let canvas = this._fc
     let { indexCount } = this.state
     let history = this._history
@@ -880,8 +894,14 @@ class SketchField extends PureComponent {
     image.src = imageData
     image.onload = () => {
       let imgbase64 = new fabric.Image(image, {})
-      imgbase64.width = canvas.width
-      imgbase64.height = canvas.height
+
+      if (resizeCanvas) {
+        canvas.setWidth(imgbase64.width)
+        canvas.setHeight(imgbase64.height)
+      } else {
+        imgbase64.width = canvas.width
+        imgbase64.height = canvas.height
+      }
       imgbase64.set({
         zindex: oldIndexCount,
       })
@@ -889,7 +909,12 @@ class SketchField extends PureComponent {
       imgbase64.selectable = false
       imgbase64.evented = false
 
+      for (let k in propertys) {
+        imgbase64[k] = propertys[k]
+      }
+
       canvas.sendToBack(imgbase64)
+      if (loaded) loaded(imgbase64)
     }
   }
 
@@ -998,6 +1023,65 @@ class SketchField extends PureComponent {
     return result
   }
 
+  setAngle = (number, calback) => {
+    let canvas = this._fc
+    //let obj = canvas.getActiveObject()
+    const objects = canvas.getObjects()
+
+    if (objects) {
+      let absNum = Math.abs(number)
+      if (absNum > 360) {
+        absNum = absNum - parseInt(absNum / 360, 10) * 360
+      }
+
+      var num = absNum * (number >= 0 ? 1 : -1)
+      objects.forEach((obj) => {
+        let targetNum = (obj.angle || 0) + num
+        targetNum = Math.abs(targetNum) === 360 ? 0 : targetNum
+
+        obj.rotate(targetNum)
+        canvas.sendToBack(obj)
+        if (calback) calback(obj, targetNum)
+
+        const { angle, width, height, left, top, flipX, flipY } = obj
+        // console.log({
+        //   angle,
+        //   width,
+        //   height,
+        //   left,
+        //   top,
+        //   flipX,
+        //   flipY,
+        // })
+      })
+    }
+  }
+  mirror = () => {
+    this.flipY()
+    this.setAngle(-180)
+  }
+  flipX = () => {
+    let canvas = this._fc
+    const objects = canvas.getObjects()
+    if (objects) {
+      objects.forEach((obj) => {
+        obj.set('flipX', !obj.flipX)
+      })
+      canvas.renderAll()
+    }
+  }
+
+  flipY = () => {
+    let canvas = this._fc
+    const objects = canvas.getObjects()
+    if (objects) {
+      objects.forEach((obj) => {
+        obj.set('flipY', !obj.flipY)
+      })
+      canvas.renderAll()
+    }
+  }
+
   addText = (text, color, options = {}) => {
     let canvas = this._fc
     let iText = new fabric.IText(text, options)
@@ -1050,6 +1134,7 @@ class SketchField extends PureComponent {
     canvas.on('mouse:move', this._onMouseMove)
     canvas.on('mouse:up', this._onMouseUp)
     canvas.on('mouse:out', this._onMouseOut)
+    canvas.on('mouse:dblclick', this._onDoubleClick)
     canvas.on('object:moving', this._onObjectMoving)
     canvas.on('object:scaling', this._onObjectScaling)
     canvas.on('object:rotating', this._onObjectRotating)
@@ -1101,7 +1186,7 @@ class SketchField extends PureComponent {
   }
 
   render = () => {
-    let { className, style, width, height } = this.props
+    let { className, style, width, height, canvasStyle = {} } = this.props
 
     let canvasDivStyle = Object.assign(
       {},
@@ -1123,6 +1208,7 @@ class SketchField extends PureComponent {
           ref={(c) => {
             this._canvas = c
           }}
+          style={canvasStyle}
         >
           Sorry, Canvas HTML5 element is not supported by your browser :(
         </canvas>

@@ -30,7 +30,7 @@ import { FilterBarDate } from '@/components/_medisys'
 @withFormik({
   mapPropsToValues: () => ({
     transactionStartDate: moment().startOf('month').formatUTC(),
-    transactionEndDate: moment().formatUTC(false),
+    transactionEndDate: moment().endOf('day').formatUTC(false),
   }),
   handleSubmit: () => {},
   displayName: 'PurchaseReceiveFilter',
@@ -44,7 +44,7 @@ class FilterBar extends PureComponent {
       actions: { handleNavigate },
     } = this.props
 
-    const { transactionStartDate, transactionEndDate } = values
+    const { transactionStartDate, transactionEndDate, isAllDateChecked } = values
 
     return (
       <GridContainer>
@@ -63,25 +63,6 @@ class FilterBar extends PureComponent {
             }}
           />
         </GridItem>
-        {/* <GridItem md={6}>
-          <Field
-            name='transactionDates'
-            render={(args) => {
-              return (
-                <DateRangePicker
-                  disabled={values.isAllDateChecked}
-                  label={formatMessage({
-                    id: 'inventory.pr.filter.datefrom',
-                  })}
-                  label2={formatMessage({
-                    id: 'inventory.pr.filter.dateto',
-                  })}
-                  {...args}
-                />
-              )
-            }}
-          />
-        </GridItem> */}
         <GridItem md={3}>
           <Field
             name='transactionStartDate'
@@ -89,6 +70,7 @@ class FilterBar extends PureComponent {
               <FilterBarDate
                 noTodayLimit
                 args={args}
+                disabled={isAllDateChecked}
                 label='Transaction Date From'
                 formValues={{
                   startDate: transactionStartDate,
@@ -107,6 +89,7 @@ class FilterBar extends PureComponent {
                 isEndDate
                 args={args}
                 label='Transaction Date To'
+                disabled={isAllDateChecked}
                 formValues={{
                   startDate: transactionStartDate,
                   endDate: transactionEndDate,

@@ -8,6 +8,7 @@ import {
   TextField,
   DateRangePicker,
   CodeSelect,
+  Select,
   Switch,
   Field,
   NumberInput,
@@ -40,7 +41,16 @@ import Contact from './Contact'
         then: Yup.number().required(),
         otherwise: Yup.number().nullable(),
       }),
-
+      adminCharge: Yup.number().when('settingCompany', {
+        is: () => settingCompany.companyType.id === 1,
+        then: Yup.number().min(0),
+        otherwise: Yup.number().nullable(),
+      }),
+      statementAdjustment: Yup.number().when('settingCompany', {
+        is: () => settingCompany.companyType.id === 1,
+        then: Yup.number().min(0),
+        otherwise: Yup.number().nullable(),
+      }),
       url: Yup.object().when('settingCompany', {
         is: () => settingCompany.companyType.id === 1,
         then: Yup.object().shape({
@@ -119,7 +129,8 @@ class Detail extends PureComponent {
 
     const { theme, footer, values, settingCompany, route, rights } = props
     const { name } = route
-    const type = 'copayer'
+    const isCopayer = name === 'copayer'
+
     const { isUserMaintainable, isGSTEnabled } = values
 
     let finalRights = isUserMaintainable ? 'enable' : 'disable'
@@ -139,7 +150,7 @@ class Detail extends PureComponent {
                   name='code'
                   render={(args) => (
                     <TextField
-                      label={name === type ? 'Co-Payer Code' : 'Company Code'}
+                      label={isCopayer ? 'Co-Payer Code' : 'Company Code'}
                       autoFocus
                       {...args}
                       disabled={!!settingCompany.entity}
@@ -152,7 +163,7 @@ class Detail extends PureComponent {
                   name='displayValue'
                   render={(args) => (
                     <TextField
-                      label={name === type ? 'Co-Payer Name' : 'Company Name'}
+                      label={isCopayer ? 'Co-Payer Name' : 'Company Name'}
                       {...args}
                     />
                   )}
@@ -173,25 +184,38 @@ class Detail extends PureComponent {
                   }}
                 />
               </GridItem>
-
-              <GridItem md={6}>
-                {name === type ? (
-                  <FastField
-                    name='coPayerTypeFK'
-                    render={(args) => (
-                      <CodeSelect
-                        label='Co-Payer Type'
-                        code='ctCopayerType'
-                        disabled
-                        {...args}
-                      />
-                    )}
-                  />
-                ) : (
-                  []
-                )}
-              </GridItem>
-              <GridItem md={6} />
+              {isCopayer && (
+                <React.Fragment>
+                  <GridItem md={6}>
+                    <FastField
+                      name='coPayerTypeFK'
+                      render={(args) => (
+                        <CodeSelect
+                          label='Co-Payer Type'
+                          code='ctCopayerType'
+                          disabled
+                          {...args}
+                        />
+                      )}
+                    />
+                  </GridItem>
+                  {/* <GridItem md={6}>
+                    <FastField
+                      name='generateInvoice'
+                      render={(args) => (
+                        <Select
+                          label='Generate Invoice'
+                          options={[
+                            { value: false, name: 'No' },
+                            { value: true, name: 'Yes' },
+                          ]}
+                          {...args}
+                        />
+                      )}
+                    />
+                  </GridItem> */}
+                </React.Fragment>
+              )}
 
               <GridItem md={4}>
                 <Field
@@ -201,8 +225,9 @@ class Detail extends PureComponent {
                       return (
                         <NumberInput
                           currency
-                          label='Admin Fee'
+                          label='Corporate Charges'
                           defaultValue='0.00'
+                          min={0}
                           precision={2}
                           {...args}
                         />
@@ -211,8 +236,9 @@ class Detail extends PureComponent {
                     return (
                       <NumberInput
                         percentage
-                        label='Admin Fee'
+                        label='Corporate Charges'
                         defaultValue='0.00'
+                        min={0}
                         precision={2}
                         {...args}
                       />
@@ -236,8 +262,104 @@ class Detail extends PureComponent {
                 />
               </GridItem>
 
+              {isCopayer && (
+                <React.Fragment>
+                  <GridItem md={4}>
+                    <Field
+                      name='statementAdjustment'
+                      render={(args) => {
+                        if (values.statementAdjustmentType === 'ExactAmount') {
+                          return (
+                            <NumberInput
+                              currency
+                              label='Statement Adjustment'
+                              defaultValue='0.00'
+                              precision={2}
+                              min={0}
+                              {...args}
+                            />
+                          )
+                        }
+                        return (
+                          <NumberInput
+                            percentage
+                            label='Statement Adjustment'
+                            defaultValue='0.00'
+                            precision={2}
+                            min={0}
+                            {...args}
+                          />
+                        )
+                      }}
+                    />
+                  </GridItem>
+                  <GridItem md={2}>
+                    <Field
+                      name='statementAdjustmentType'
+                      render={(args) => (
+                        <Switch
+                          checkedChildren='$'
+                          checkedValue='ExactAmount'
+                          unCheckedChildren='%'
+                          unCheckedValue='Percentage'
+                          label=' '
+                          {...args}
+                        />
+                      )}
+                    />
+                  </GridItem>
+                </React.Fragment>
+              )}
+              {isCopayer && (
+                <React.Fragment>
+                  <GridItem md={4}>
+                    <Field
+                      name='autoInvoiceAdjustment'
+                      render={(args) => {
+                        if (
+                          values.autoInvoiceAdjustmentType === 'ExactAmount'
+                        ) {
+                          return (
+                            <NumberInput
+                              currency
+                              label='Invoice Adjustment'
+                              defaultValue='0.00'
+                              precision={2}
+                              {...args}
+                            />
+                          )
+                        }
+                        return (
+                          <NumberInput
+                            percentage
+                            label='Invoice Adjustment'
+                            defaultValue='0.00'
+                            precision={2}
+                            {...args}
+                          />
+                        )
+                      }}
+                    />
+                  </GridItem>
+                  <GridItem md={2}>
+                    <Field
+                      name='autoInvoiceAdjustmentType'
+                      render={(args) => (
+                        <Switch
+                          checkedChildren='$'
+                          checkedValue='ExactAmount'
+                          unCheckedChildren='%'
+                          unCheckedValue='Percentage'
+                          label=' '
+                          {...args}
+                        />
+                      )}
+                    />
+                  </GridItem>
+                </React.Fragment>
+              )}
               <GridItem md={2}>
-                {name !== type ? (
+                {!isCopayer ? (
                   <div style={{ position: 'relative' }}>
                     <CustomInput label='' disabled style={{ width: 0 }} />
                     <div
@@ -263,7 +385,7 @@ class Detail extends PureComponent {
                 )}
               </GridItem>
               <GridItem md={4}>
-                {name !== type ? (
+                {!isCopayer ? (
                   <Field
                     name='gstValue'
                     render={(args) => (
@@ -282,6 +404,14 @@ class Detail extends PureComponent {
                   []
                 )}
               </GridItem>
+              {isCopayer && (
+                <GridItem md={12}>
+                  <Field
+                    name='remark'
+                    render={(args) => <TextField label='Remarks' {...args} />}
+                  />
+                </GridItem>
+              )}
             </GridContainer>
 
             <Contact theme={theme} type={name} />

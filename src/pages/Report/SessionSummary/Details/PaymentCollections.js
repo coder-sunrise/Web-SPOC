@@ -61,7 +61,7 @@ const PaymentCollections = ({
   let PaymentCollectionsColumns = [
     { name: 'invoiceNo', title: 'Invoice No.' },
     { name: 'totalAftAdj', title: 'Total Amount' },
-    { name: 'gstAmt', title: 'Gst' },
+    { name: 'gstAmt', title: 'GST' },
     { name: 'payerName', title: 'Payer Name' },
     { name: 'receiptNo', title: 'Receipt No.' },
     { name: 'totalAmtPaid', title: 'Payment' },
@@ -74,14 +74,14 @@ const PaymentCollections = ({
       type: 'currency',
       currency: true,
       sortingEnabled: false,
-      width: 180,
+      width: 140,
     },
     {
       columnName: 'gstAmt',
       type: 'currency',
       currency: true,
       sortingEnabled: false,
-      width: 180,
+      width: 120,
     },
     { columnName: 'payerName', sortingEnabled: false, wordWrapEnabled: true },
     {
@@ -89,7 +89,7 @@ const PaymentCollections = ({
       type: 'currency',
       currency: true,
       sortingEnabled: false,
-      width: 180,
+      width: 140,
     },
     { columnName: 'receiptNo', sortingEnabled: false, width: 100 },
   ]

@@ -6,11 +6,26 @@
 trigger: none
 
 pool:
-  name: 'SEMRGen2'
+  name: 'Medicloud'
+
+variables:
+  #override the npm_config_cache environment variable to the custom path
+  npm_config_cache: $(Build.SourcesDirectory)/node_modules 
 
 steps:
+- task: Cache@2
+  inputs:
+    key: 'version4 | npm | "$(Agent.OS)" | package.json'
+    restoreKeys: |
+      version4 | npm | "$(Agent.OS)"
+    path: $(npm_config_cache)
+    cacheHitVar: CACHE_RESTORED
+  displayName: Cache npm   
+
 - script: npm install
+  condition: ne(variables.CACHE_RESTORED, 'true')
   displayName: 'npm install'
+  
 - script: copy "config\config.prod.js" "config\config.js" /Y
   displayName: 'update config to prod settings'
 - script: 

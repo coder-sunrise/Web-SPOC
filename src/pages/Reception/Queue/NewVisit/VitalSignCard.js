@@ -23,7 +23,7 @@ class VitalSignCard extends PureComponent {
         }
       >
         <GridContainer>
-          <GridItem xs md={3}>
+          <GridItem xs={12} sm={4} md={3}>
             <Field
               name={FormField['vitalsign.temperatureC']}
               render={(args) => (
@@ -41,7 +41,7 @@ class VitalSignCard extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem xs md={3}>
+          <GridItem xs={12} sm={4} md={3}>
             <Field
               name={FormField['vitalsign.bpSysMMHG']}
               render={(args) => (
@@ -56,7 +56,7 @@ class VitalSignCard extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem xs md={3}>
+          <GridItem xs={12} sm={4} md={3}>
             <Field
               name={FormField['vitalsign.bpDiaMMHG']}
               render={(args) => (
@@ -71,7 +71,7 @@ class VitalSignCard extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem xs md={3}>
+          <GridItem xs={12} sm={4} md={3}>
             <Field
               name={FormField['vitalsign.pulseRateBPM']}
               render={(args) => (
@@ -88,7 +88,7 @@ class VitalSignCard extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem xs md={3}>
+          <GridItem xs={12} sm={4} md={3}>
             <Field
               name={FormField['vitalsign.weightKG']}
               render={(args) => (
@@ -111,7 +111,7 @@ class VitalSignCard extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem xs md={3}>
+          <GridItem xs={12} sm={4} md={3}>
             <Field
               name={FormField['vitalsign.heightCM']}
               render={(args) => (
@@ -135,8 +135,7 @@ class VitalSignCard extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem xs md={4} />
-          <GridItem xs md={3}>
+          <GridItem xs={12} sm={4} md={3}>
             <Field
               name={FormField['vitalsign.bmi']}
               render={(args) => (

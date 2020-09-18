@@ -1,4 +1,5 @@
 import { Tooltip } from '@/components'
+import Warining from '@material-ui/icons/Error'
 
 export const RejectedCHASColumns = [
   {
@@ -69,6 +70,29 @@ export const RejectedCHASColumnExtensions = [
   { columnName: 'rejectionDate', type: 'date', width: 130 },
   { columnName: 'submissionDate', type: 'date', width: 140 },
   {
+    columnName: 'patientName',
+    render: (row) => {
+      return (
+        <Tooltip
+          title={
+            row.patientIsActive ? (
+              row.patientName
+            ) : (
+              'This patient has been inactived.'
+            )
+          }
+        >
+          <span>
+            {!row.patientIsActive && (
+              <Warining color='error' style={{ marginRight: 5 }} />
+            )}
+            {row.patientName}
+          </span>
+        </Tooltip>
+      )
+    },
+  },
+  {
     columnName: 'rejectionReason',
     width: 400,
     sortBy: 'ChasClaimStatusDescription',
@@ -98,7 +122,7 @@ export const RejectedCHASColumnExtensions = [
     columnName: 'diagnosis',
     sortingEnabled: false,
     render: (row) => {
-      let diagnoisisList = row.diagnosis.join(", ")
+      let diagnoisisList = row.diagnosis.join(', ')
       return (
         <Tooltip title={diagnoisisList}>
           <span className title={diagnoisisList}>

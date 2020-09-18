@@ -1,5 +1,10 @@
 import _ from 'lodash'
-import { query as queryUsers, queryCurrent } from '@/services/user'
+import {
+  query as queryUsers,
+  queryCurrent,
+  getUserPreference,
+  saveUserPreference,
+} from '@/services/user'
 import { fetchUserProfileByID } from '@/pages/Setting/UserProfile/services'
 import * as serviceQueue from '../services/queue'
 import { CLINIC_TYPE } from '@/utils/constants'
@@ -162,9 +167,12 @@ export default {
             })
           }
 
+          const gridSetting = yield call(getUserPreference, 4)
+          // console.log(gridSetting)
           user = {
             data: data.userProfileDetailDto,
             accessRights: _.orderBy(accessRights, (o) => o.name),
+            gridSetting: JSON.parse(gridSetting.data || '[]'),
           }
           // for AiOT user only
           // if (user && user.data && user.data.id === 46) {
@@ -208,6 +216,34 @@ export default {
           type: 'saveProfileDetails',
           profileDetails: { ...data },
         })
+    },
+
+    *saveUserPreference ({ payload }, { call, put }) {
+      const response = yield call(saveUserPreference, {
+        userPreferenceDetails: JSON.stringify(payload.data),
+        itemIdentifier: payload.itemIdentifier,
+        type: 4,
+      })
+      if (response) {
+        const userSession = JSON.parse(sessionStorage.getItem('user'))
+        const { gridSetting } = userSession
+        const existIndex = gridSetting.indexOf(
+          gridSetting.find((o) => o.Identifier === payload.itemIdentifier),
+        )
+        if (existIndex >= 0) {
+          gridSetting.splice(existIndex, 1, payload.data)
+        } else {
+          gridSetting.push(payload.data)
+        }
+        sessionStorage.setItem('user', JSON.stringify(userSession))
+        // console.log(gridSetting)
+        yield put({
+          type: 'saveCurrentUser',
+          payload: {
+            gridSetting,
+          },
+        })
+      }
     },
   },
 

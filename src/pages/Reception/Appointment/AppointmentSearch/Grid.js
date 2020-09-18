@@ -86,6 +86,7 @@ class Grid extends PureComponent {
       <CommonTableGrid
         style={{ marginTop: 10 }}
         type='appointment'
+        getRowId={(row) => row.uid}
         columns={[
           { name: 'patientName', title: 'Patient' },
           { name: 'patientAccountNo', title: 'Account No.' },

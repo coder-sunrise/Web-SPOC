@@ -1,20 +1,27 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
 import * as Yup from 'yup'
+import _ from 'lodash'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
+import { Table } from '@devexpress/dx-react-grid-material-ui'
 import {
   Button,
   EditableTableGrid,
   GridContainer,
   GridItem,
   CodeSelect,
+  FastField,
+  Field,
+  NumberInput,
+  Switch,
+  withFormikExtend,
 } from '@/components'
 // data table variable
-import { CoPayerColumns, CoPayerColExtensions } from '../variables'
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 import { roundTo, getUniqueId } from '@/utils/utils'
+import { CoPayerColumns, CoPayerColExtensions } from '../variables'
 
 const styles = (theme) => ({
   container: {
@@ -38,17 +45,58 @@ const validationSchema = Yup.object().shape({
 })
 
 @connect(({ codetable }) => ({ codetable }))
+@withFormikExtend({
+  displayName: 'BillingForm-AddCopayer',
+  enableReinitialize: true,
+  validationSchema: Yup.object().shape({
+    coPayer: Yup.number().required(),
+    patientCopayAmount: Yup.number().when(
+      [
+        'patientCopayAmountType',
+        'invoiceItems',
+        'selectedRows',
+      ],
+      (patientCopayAmountType, invoiceItems, selectedRows = [], schema) => {
+        let maxAmount = invoiceItems
+          .filter((r) => selectedRows.includes(r.id))
+          .reduce((p, c) => {
+            return p + (c.payableBalance || 0)
+          }, 0)
+        const isPercentage =
+          !patientCopayAmountType || patientCopayAmountType === 'Percentage'
+        if (isPercentage) {
+          return schema.min(0).max(100)
+        }
+        return schema.min(0).max(maxAmount)
+      },
+    ),
+  }),
+})
 class CoPayer extends Component {
   state = {
     editingRowIds: [],
     selectedRows: [],
-    coPayer: undefined,
     invoiceItems: this.props.invoiceItems,
+  }
+
+  UNSAFE_componentWillReceiveProps = (nextProps) => {
+    const { values: nextValues } = nextProps
+    const { values } = this.props
+
+    const { patientCopayAmountType, patientCopayAmount } = nextValues
+    if (
+      patientCopayAmountType !== values.patientCopayAmountType ||
+      patientCopayAmount !== values.patientCopayAmount
+    ) {
+      this.reCalcluteClaimAmount(patientCopayAmountType, patientCopayAmount)
+    }
   }
 
   populateClaimAmount = (selected) => {
     const { invoiceItems } = this.state
-
+    const {
+      values: { patientCopayAmountType = 'Percentage', patientCopayAmount },
+    } = this.props
     const selectedItems = invoiceItems.map((item) => {
       if (
         selected.includes(item.id) &&
@@ -58,7 +106,60 @@ class CoPayer extends Component {
       return { ...item }
     })
 
-    this.setState({ invoiceItems: selectedItems })
+    const newItems = this.assignPatientCopayAmount(
+      selectedItems,
+      patientCopayAmountType,
+      patientCopayAmount,
+      selected,
+    )
+    this.setState({ invoiceItems: newItems })
+    this.props.dispatch({
+      type: 'global/incrementCommitCount',
+    })
+  }
+
+  assignPatientCopayAmount = (
+    invoiceItems,
+    patientCopayAmountType = 'Percentage',
+    patientCopayAmount,
+    selectedRows,
+  ) => {
+    const newitems = invoiceItems.map((i) => {
+      const payableAmount = i.payableBalance
+      let claimAmount = i.payableBalance || 0
+
+      if (!selectedRows.includes(i.id) || i.claimAmount === undefined) {
+        return i
+      }
+
+      if (patientCopayAmount > 0 && payableAmount > 0) {
+        if (patientCopayAmountType === 'Percentage') {
+          const amt = roundTo(payableAmount * patientCopayAmount / 100)
+          if (claimAmount > amt) {
+            claimAmount -= amt
+          } else claimAmount = 0
+        } else if (payableAmount > patientCopayAmount) {
+          claimAmount -= patientCopayAmount
+          patientCopayAmount = 0
+        } else {
+          patientCopayAmount -= payableAmount
+          claimAmount = 0
+        }
+      }
+      return { ...i, claimAmount }
+    })
+    return newitems
+  }
+
+  reCalcluteClaimAmount = (patientCopayAmountType, patientCopayAmount) => {
+    const { invoiceItems, selectedRows } = this.state
+    const newItems = this.assignPatientCopayAmount(
+      invoiceItems,
+      patientCopayAmountType,
+      patientCopayAmount,
+      selectedRows,
+    )
+    this.setState({ invoiceItems: newItems })
     this.props.dispatch({
       type: 'global/incrementCommitCount',
     })
@@ -67,33 +168,50 @@ class CoPayer extends Component {
   handleSelectionChange = (selection) => {
     this.populateClaimAmount(selection)
     this.setState({ selectedRows: selection })
+    const { setFieldValue } = this.props
+    setFieldValue('selectedRows', selection)
   }
 
-  handleCopayerChange = (value) => {
-    this.setState({ coPayer: value })
-  }
+  onConfirmClick = async () => {
+    const {
+      codetable,
+      values: {
+        coPayer,
+        patientCopayAmountType = 'Percentage',
+        patientCopayAmount = 0,
+      },
+      handleSubmit,
+      validateForm,
+    } = this.props
 
-  onConfirmClick = () => {
-    const { codetable } = this.props
-    const { coPayer, selectedRows, invoiceItems } = this.state
+    const isFormValid = await validateForm()
+    if (!_.isEmpty(isFormValid)) {
+      handleSubmit()
+      return
+    }
+
+    const { selectedRows, invoiceItems } = this.state
     const invoicePayerItem = invoiceItems
       .filter((item) => selectedRows.includes(item.id))
       .map((item) => ({ ...item, id: getUniqueId(), invoiceItemFK: item.id }))
-    const copayer = codetable.ctcopayer.find((item) => item.id === coPayer)
+    const copayerItem = codetable.ctcopayer.find((item) => item.id === coPayer)
 
     const returnValue = {
       invoicePayerItem,
-      invoicePayment: [],
       payerDistributedAmt: roundTo(
         invoicePayerItem.reduce((total, item) => total + item.claimAmount, 0),
       ),
-      payerOutstanding: invoicePayerItem.reduce(
-        (total, item) => total + item.claimAmount,
-        0,
+      payerOutstanding: roundTo(
+        invoicePayerItem.reduce(
+          (subtotal, item) => subtotal + item.claimAmount,
+          0,
+        ),
       ),
       payerTypeFK: INVOICE_PAYER_TYPE.COMPANY,
-      name: copayer.displayValue,
-      companyFK: copayer.id,
+      name: copayerItem.displayValue,
+      companyFK: copayerItem.id,
+      patientCopayAmountType,
+      patientCopayAmount,
       isModified: false,
       _isConfirmed: true,
       _isEditing: false,
@@ -119,7 +237,8 @@ class CoPayer extends Component {
   }
 
   shouldDisableAddCopayer = () => {
-    const { coPayer, selectedRows, editingRowIds, invoiceItems } = this.state
+    const { values: { coPayer } } = this.props
+    const { selectedRows, editingRowIds, invoiceItems } = this.state
     const subtotalAmount = invoiceItems.reduce(
       (subtotal, item) =>
         item.claimAmount === undefined ? subtotal : subtotal + item.claimAmount,
@@ -139,24 +258,100 @@ class CoPayer extends Component {
     )
   }
 
+  SummaryRow = (p) => {
+    const { children } = p
+    let countCol = children.find((c) => {
+      if (!c.props.tableColumn.column) return false
+      return c.props.tableColumn.column.name === 'claimAmount'
+    })
+    if (countCol) {
+      const newChildren = [
+        {
+          ...countCol,
+          props: {
+            ...countCol.props,
+            colSpan: 5,
+            tableColumn: {
+              ...countCol.props.tableColumn,
+              align: 'right',
+            },
+          },
+          key: 'claimAmount-sumtotal',
+        },
+      ]
+      return <Table.Row {...p}>{newChildren}</Table.Row>
+    }
+    return <Table.Row {...p}>{children}</Table.Row>
+  }
+
   render () {
-    const { classes, onClose, copayers = [] } = this.props
-    const { selectedRows, invoiceItems, coPayer } = this.state
+    const { classes, onClose, copayers = [], values } = this.props
+    const { selectedRows, invoiceItems } = this.state
+
     return (
       <div className={classes.container}>
         <GridContainer>
           <GridItem md={4} className={classes.dropdown}>
-            <CodeSelect
-              label='Corporate Copayer'
-              code='ctcopayer'
-              labelField='displayValue'
-              // remoteFilter={{
-              //   coPayerTypeFK: 1,
-              // }}
-              localFilter={(item) =>
-                item.coPayerTypeFK === 1 && !copayers.includes(item.id)}
-              value={coPayer}
-              onChange={this.handleCopayerChange}
+            <FastField
+              name='coPayer'
+              render={(args) => {
+                return (
+                  <CodeSelect
+                    label='Corporate Copayer'
+                    code='ctcopayer'
+                    labelField='displayValue'
+                    localFilter={(item) =>
+                      item.coPayerTypeFK === 1 && !copayers.includes(item.id)}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem md={3} />
+          <GridItem md={4}>
+            <Field
+              name='patientCopayAmount'
+              render={(args) => {
+                if (values.patientCopayAmountType === 'ExactAmount') {
+                  return (
+                    <NumberInput
+                      currency
+                      label='Patient Copay Amount'
+                      defaultValue='0.00'
+                      min={0}
+                      precision={2}
+                      {...args}
+                    />
+                  )
+                }
+                return (
+                  <NumberInput
+                    percentage
+                    label='Patient Copay Amount'
+                    defaultValue='0.00'
+                    max={100}
+                    min={0}
+                    precision={2}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem md={1}>
+            <Field
+              name='patientCopayAmountType'
+              render={(args) => (
+                <Switch
+                  checkedChildren='$'
+                  checkedValue='ExactAmount'
+                  unCheckedChildren='%'
+                  unCheckedValue='Percentage'
+                  label=' '
+                  {...args}
+                />
+              )}
             />
           </GridItem>
           <GridItem md={12}>
@@ -174,9 +369,34 @@ class CoPayer extends Component {
               FuncProps={{
                 pager: false,
                 selectable: true,
+                summary: true,
                 selectConfig: {
                   showSelectAll: true,
-                  rowSelectionEnabled: (row) => true,
+                  rowSelectionEnabled: (row) => row.isClaimable,
+                },
+
+                summaryConfig: {
+                  state: {
+                    totalItems: [
+                      { columnName: 'claimAmount', type: 'sum' },
+                    ],
+                  },
+                  integrated: {
+                    calculator: (type, rows, getValue) => {
+                      return rows
+                        .filter((r) => selectedRows.includes(r.id))
+                        .reduce((pre, cur) => {
+                          const v = getValue(cur)
+                          return pre + (v || 0)
+                        }, 0)
+                    },
+                  },
+                  row: {
+                    totalRowComponent: this.SummaryRow,
+                    messages: {
+                      sum: 'Total Claim Amount',
+                    },
+                  },
                 },
               }}
               EditingProps={{

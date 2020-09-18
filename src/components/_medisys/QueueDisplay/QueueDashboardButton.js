@@ -49,10 +49,10 @@ const QueueDashboardButton = ({
             }).then((res) => {
               if (res) {
                 notification.success({ message: 'Cleared' })
-                sendNotification('QueueCalled', {
+                sendNotification('QueueClear', {
                   type: NOTIFICATION_TYPE.QUEUECALL,
                   status: NOTIFICATION_STATUS.OK,
-                  message: 'Queue Called',
+                  message: 'Queue Clear',
                 })
               }
             })

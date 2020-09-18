@@ -1,6 +1,7 @@
 import moment from 'moment'
 import _ from 'lodash'
 import Authorized from '@/utils/Authorized'
+import { currencySymbol } from '@/utils/config'
 import { dateFormatLong, dateFormatLongWithTime } from './format'
 import { UNFIT_TYPE, SCRIBBLE_NOTE_TYPE, REPORT_ID } from './constants'
 import { calculateAgeFromDOB } from './dateUtils'
@@ -879,19 +880,25 @@ export const inventoryItemListing = (
   stockName = undefined,
 ) => {
   let inventoryItemList = list.map((x) => {
+    const { code, displayValue, sellingPrice = 0 } = x
+    const uom = x.dispensingUOM ? x.dispensingUOM.name : x.uom.name
+
     return {
       value: x.id,
-      name: x.displayValue,
-      code: x.code,
+      name: displayValue,
+      code,
       // uom: prescribingUOM.id,
       stock: x[stockName],
-      uom: x.dispensingUOM ? x.dispensingUOM.name : x.uom.name,
+      uom,
       sellingPrice: x.sellingPrice,
       lastCostPriceBefBonus: x.lastCostPriceBefBonus,
       [itemFKName]: x.id,
       stateName,
       itemFK: x.id,
       isActive: x.isActive,
+      displayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
+        2,
+      )} / ${uom})`,
     }
   })
   return {
@@ -1138,7 +1145,7 @@ const formTypes = [
                 : 0,
               GSTChargedDisplayValue: element.surgicalCharges[index]
                 ? element.surgicalCharges[index].gSTChargedName
-                : 'Charged',
+                : '',
             })
           }
         })
@@ -1181,7 +1188,7 @@ const formTypes = [
                 : 0,
               GSTChargedDisplayValue: element.surgicalCharges[index]
                 ? element.surgicalCharges[index].gSTChargedName
-                : 'Charged',
+                : '',
             })
           }
         })
@@ -1209,7 +1216,7 @@ const formTypes = [
               : 0,
             GSTChargedDisplayValue: formData.nonSurgicalCharges[index]
               ? formData.nonSurgicalCharges[index].gSTChargedName
-              : 'Charged',
+              : '',
           })
         }
 

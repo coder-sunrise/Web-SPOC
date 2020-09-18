@@ -12,6 +12,8 @@ import classNames from 'classnames'
 import { Divider, withStyles } from '@material-ui/core'
 import Refresh from '@material-ui/icons/Refresh'
 import Stop from '@material-ui/icons/Stop'
+import EventNote from '@material-ui/icons/EventNote'
+import { openCautionAlertOnStartConsultation } from '@/pages/Widgets/Orders/utils'
 
 // custom components
 import {
@@ -32,8 +34,15 @@ import { SendNotification } from '@/utils/notification'
 import Authorized from '@/utils/Authorized'
 import { QueueDashboardButton } from '@/components/_medisys'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
-import { FORM_CATEGORY, VALUE_KEYS, VISIT_TYPE } from '@/utils/constants'
+import {
+  FORM_CATEGORY,
+  VALUE_KEYS,
+  VISIT_TYPE,
+  NOTIFICATION_TYPE,
+  NOTIFICATION_STATUS,
+} from '@/utils/constants'
 import { initRoomAssignment } from '@/utils/codes'
+import { sendNotification } from '@/utils/realtime'
 import {
   modelKey,
   AppointmentContextMenu,
@@ -342,46 +351,49 @@ class Queue extends React.Component {
     })
   }
 
+  onSessionSummaryClick = () => {
+    const { queueLog } = this.props
+    const _sessionInfoID = queueLog.sessionInfo.id
+    this.setState({ _sessionInfoID })
+    this.setState({
+      showEndSessionSummary: true,
+    })
+  }
+
   onConfirmEndSession = () => {
-    const { queueLog, dispatch, queueCalling } = this.props
+    const { queueLog, dispatch } = this.props
     const _sessionInfoID = queueLog.sessionInfo.id
     this.setState({ _sessionInfoID })
     dispatch({
       type: `queueLog/endSession`,
       sessionID: queueLog.sessionInfo.id,
     }).then(async (response) => {
-      const { status } = response
       if (response) {
-        dispatch({
-          type: 'queueCalling/getExistingQueueCallList',
-          payload: {
-            keys: VALUE_KEYS.QUEUECALLING,
-          },
-        }).then((res) => {
-          const { value, ...restRespValues } = res
-          dispatch({
-            type: 'queueCalling/upsertQueueCallList',
-            payload: {
-              ...restRespValues,
-              key: VALUE_KEYS.QUEUECALLING,
-              value: '[]',
-            },
-          })
+        this.clearQueueCall()
+        this.setState({
+          showEndSessionSummary: true,
         })
-
-        this.setState(
-          {
-            showEndSessionSummary: true,
-          },
-          () => {
-            // dispatch({
-            //   type: 'queueLog/updateState',
-            //   payload: ,
-            // })
-          },
-        )
       }
     })
+  }
+
+  clearQueueCall = () => {
+    this.props
+      .dispatch({
+        type: 'queueCalling/claearAll',
+        payload: {
+          key: VALUE_KEYS.QUEUECALLING,
+        },
+      })
+      .then((res) => {
+        if (res) {
+          sendNotification('QueueClear', {
+            type: NOTIFICATION_TYPE.QUEUECALL,
+            status: NOTIFICATION_STATUS.OK,
+            message: 'Queue Clear',
+          })
+        }
+      })
   }
 
   onEndSessionSummaryClose = () => {
@@ -592,10 +604,12 @@ class Queue extends React.Component {
               queueNo: row.queueNo,
             },
           }).then((o) => {
-            if (o)
+            if (o) {
               router.push(
-                `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
+                `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
               )
+              openCautionAlertOnStartConsultation(o)
+            }
           })
         }
         break
@@ -616,12 +630,12 @@ class Queue extends React.Component {
             }).then((o) => {
               if (o)
                 router.push(
-                  `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
+                  `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
                 )
             })
           } else {
             router.push(
-              `/reception/queue/consultation?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}`,
+              `/reception/queue/consultation?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&pid=${row.patientProfileFK}&v=${version}`,
             )
           }
         }
@@ -663,7 +677,7 @@ class Queue extends React.Component {
                         },
                       }).then((c) => {
                         router.push(
-                          `/reception/queue/consultation?qid=${row.id}&cid=${c.id}&v=${version}`,
+                          `/reception/queue/consultation?qid=${row.id}&cid=${c.id}&pid=${row.patientProfileFK}&v=${version}`,
                         )
                       })
                     },
@@ -671,7 +685,7 @@ class Queue extends React.Component {
                 })
               } else {
                 router.push(
-                  `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
+                  `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
                 )
               }
           })
@@ -771,14 +785,7 @@ class Queue extends React.Component {
   }
 
   showVisitForms = async (row) => {
-    const {
-      id,
-      visitStatus,
-      doctor,
-      patientAccountNo,
-      patientName,
-      patientReferenceNo,
-    } = row
+    const { id, visitStatus, doctor, patientAccountNo, patientName } = row
     await this.props.dispatch({
       type: 'formListing/updateState',
       payload: {
@@ -787,7 +794,6 @@ class Queue extends React.Component {
           visitID: id,
           doctorProfileFK: doctor ? doctor.id : 0,
           patientName,
-          patientNRICNo: patientReferenceNo,
           patientAccountNo,
         },
       },
@@ -818,10 +824,7 @@ class Queue extends React.Component {
     } = this.state
     const { sessionInfo, error } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
-    const { oriQCallList = [] } = queueCalling
-    const [
-      lastCall,
-    ] = oriQCallList
+    const { tracker } = queueCalling
 
     return (
       <PageHeaderWrapper
@@ -835,7 +838,7 @@ class Queue extends React.Component {
             </h3>
 
             <Authorized authority='openqueuedisplay'>
-              {lastCall ? (
+              {tracker && tracker.qNo ? (
                 <h4
                   className={classNames(classes.sessionNo)}
                   style={{
@@ -847,10 +850,10 @@ class Queue extends React.Component {
                 >
                   <font color='red'>
                     NOW SERVING:{' '}
-                    {lastCall.qNo.includes('.') ? (
-                      lastCall.qNo
+                    {tracker.qNo.includes('.') ? (
+                      tracker.qNo
                     ) : (
-                      `${lastCall.qNo}.0`
+                      `${tracker.qNo}.0`
                     )}
                   </font>
                 </h4>
@@ -861,6 +864,16 @@ class Queue extends React.Component {
 
             {!isClinicSessionClosed && (
               <div className={classNames(classes.toolBtns)}>
+                <Authorized authority='queue.endsession'>
+                  <ProgressButton
+                    icon={<EventNote />}
+                    color='info'
+                    size='sm'
+                    onClick={this.onSessionSummaryClick}
+                  >
+                    <FormattedMessage id='reception.queue.sessionSummary' />
+                  </ProgressButton>
+                </Authorized>
                 <QueueDashboardButton size='sm' />
                 <ProgressButton
                   color='info'

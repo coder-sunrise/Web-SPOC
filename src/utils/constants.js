@@ -3,12 +3,62 @@
  */
 
 export const APPOINTMENT_STATUS = {
-  SCHEDULED: 1,
+  CONFIRMED: 1,
   DRAFT: 2,
   CANCELLED: 3,
   TURNEDUP: 4,
   RESCHEDULED: 5,
-  NOSHOW: 6,
+  PFA_RESCHEDULED: 6,
+  PFA_CANCELLED: 7,
+  TURNEDUPLATE: 8,
+  DELETED: 9,
+  PFA_NOSHOW: 10,
+}
+export const APPOINTMENT_STATUSOPTIONS = [
+  {
+    id: APPOINTMENT_STATUS.CONFIRMED,
+    name: 'Confirmed',
+  },
+  {
+    id: APPOINTMENT_STATUS.DRAFT,
+    name: 'Draft',
+  },
+  {
+    id: APPOINTMENT_STATUS.CANCELLED,
+    name: 'Cancelled',
+  },
+  {
+    id: APPOINTMENT_STATUS.TURNEDUP,
+    name: 'Turned Up',
+  },
+  {
+    id: APPOINTMENT_STATUS.RESCHEDULED,
+    name: 'Rescheduled',
+  },
+  {
+    id: APPOINTMENT_STATUS.PFA_RESCHEDULED,
+    name: 'PFA(Rescheduled)',
+  },
+  {
+    id: APPOINTMENT_STATUS.PFA_CANCELLED,
+    name: 'PFA(Cancelled)',
+  },
+  {
+    id: APPOINTMENT_STATUS.TURNEDUPLATE,
+    name: 'Turned Up(Late)',
+  },
+  {
+    id: APPOINTMENT_STATUS.DELETED,
+    name: 'Deleted',
+  },
+  {
+    id: APPOINTMENT_STATUS.PFA_NOSHOW,
+    name: 'PFA(No Show)',
+  },
+]
+export const APPOINTMENT_CANCELLEDBY = {
+  CLINIC: 1,
+  PATIENT: 2,
 }
 
 export const PATIENT_LAB = {
@@ -167,7 +217,8 @@ export const REPORT_TYPE = {
   27: 'Patient Label',
   29: 'Payment Receipt',
   37: 'Inventory Trending Report',
-  45: 'Letter of Certification',
+  55: 'Letter of Certification',
+  61: 'Refraction Form Report',
 }
 
 export const REPORT_ID = {
@@ -322,6 +373,7 @@ export const PATIENT_HISTORY_TABS = {
   APPOINTMENT: 3,
   INVOICE: 4,
   NURSENOTES: 5,
+  DEPOSIT: 6,
 }
 
 export const FILE_STATUS = {
@@ -451,4 +503,14 @@ export const FORM_FROM = {
 export const FORM_CATEGORY = {
   VISITFORM: 1,
   CORFORM: 2,
+}
+
+export const REVENUE_CATEGORY = {
+  CONSULTATION: 1,
+  EXAMINATION: 2,
+  PROCEDURE: 3,
+  DIAGNOSTIC: 4,
+  DRUG: 5,
+  CONSUMABLE: 6,
+  OTHER: 7,
 }

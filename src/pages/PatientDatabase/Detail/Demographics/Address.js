@@ -156,12 +156,11 @@ class Address extends Component {
     const btnSearch = (
       <ProgressButton
         color='primary'
-        icon={null}
+        icon={<Search />}
         onClick={this.handleGetAddress}
         uid={searchBtnUid}
         defaultbinding='none'
       >
-        <Search />
         Get Address
       </ProgressButton>
     )

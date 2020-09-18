@@ -9,18 +9,26 @@ import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 import AddAlert from '@material-ui/icons/AddAlert'
-// sub components
-import TableData from './TableData'
-import VaccinationGrid from './VaccinationGrid'
-import DrugLabelSelection from './DrugLabelSelection'
-// common component
+import { formatMessage } from 'umi/locale' // common component
 import {
   Button,
   ProgressButton,
   GridItem,
   GridContainer,
   SizeContainer,
+  CommonTableGrid,
+  TextField,
+  Field,
+  CommonModal,
 } from '@/components'
+import AmountSummary from '@/pages/Shared/AmountSummary'
+import Authorized from '@/utils/Authorized'
+import { VISIT_TYPE } from '@/utils/constants'
+import { dangerColor } from '@/assets/jss'
+// sub components
+import TableData from './TableData'
+import VaccinationGrid from './VaccinationGrid'
+import DrugLabelSelection from './DrugLabelSelection'
 // variables
 import {
   PrescriptionColumns,
@@ -30,14 +38,9 @@ import {
   OtherOrdersColumns,
   OtherOrdersColumnExtensions,
 } from '../variables'
-import AmountSummary from '@/pages/Shared/AmountSummary'
-import Authorized from '@/utils/Authorized'
-import { VISIT_TYPE } from '@/utils/constants'
+
 import CONSTANTS from './constants'
 
-import { dangerColor } from '@/assets/jss'
-
-import { CommonModal } from '@/components'
 // const styles = (theme) => ({
 //   gridRow: {
 //     margin: `${theme.spacing.unit}px 0px`,
@@ -97,7 +100,7 @@ const DispenseDetails = ({
   onDrugLabelSelectionClose,
   onDrugLabelSelected,
   onDrugLabelNoChanged,
-  selectedDrugs, 
+  selectedDrugs,
 }) => {
   const {
     prescription,
@@ -105,10 +108,16 @@ const DispenseDetails = ({
     otherOrder,
     invoice,
     visitPurposeFK,
+    visitRemarks,
   } = values || {
     invoice: { invoiceItem: [] },
   }
-  const { invoiceItem = [], invoiceAdjustment = [], totalPayment } = invoice
+  const {
+    invoiceItem = [],
+    invoiceAdjustment = [],
+    totalPayment,
+    coPayer = [],
+  } = invoice
 
   const { inventorymedication, inventoryvaccination } = codetable
 
@@ -177,6 +186,7 @@ const DispenseDetails = ({
       invoiceTotalAftGST: v.summary.totalWithGST,
       outstandingBalance: v.summary.totalWithGST - values.invoice.totalPayment,
       invoiceGSTAmt: Math.round(v.summary.gst * 100) / 100,
+      invoiceGSTAdjustment: v.summary.gstAdj,
       invoiceAdjustment: v.adjustments,
       isGSTInclusive: !!v.summary.isGSTInclusive,
     }
@@ -201,23 +211,42 @@ const DispenseDetails = ({
   const isBillFirstVisit = visitPurposeFK === VISIT_TYPE.BILL_FIRST
   const disableRefreshOrder = isBillFirstVisit && !clinicalObjectRecordFK
   const disableDiscard = totalPayment > 0 || !!clinicalObjectRecordFK
+  const [
+    showRemovePayment,
+    setShowRemovePayment,
+  ] = useState(false)
 
+  const [
+    voidReason,
+    setVoidReason,
+  ] = useState('')
+
+  let coPayerPayments = []
+  coPayer.forEach((ip) => {
+    const { invoicePayment = [], name } = ip
+    coPayerPayments = coPayerPayments.concat(
+      invoicePayment.filter((o) => !o.isCancelled).map((o) => ({
+        ...o,
+        payerName: name,
+      })),
+    )
+  })
   return (
     <React.Fragment>
       <GridContainer>
         <GridItem justify='flex-start' md={6} className={classes.actionButtons}>
           {!viewOnly &&
-            !isRetailVisit && (
-              <Button
-                color='info'
-                size='sm'
-                onClick={onReloadClick}
-                disabled={disableRefreshOrder}
-              >
-                <Refresh />
+          !isRetailVisit && (
+            <Button
+              color='info'
+              size='sm'
+              onClick={onReloadClick}
+              disabled={disableRefreshOrder}
+            >
+              <Refresh />
               Refresh Order
-              </Button>
-            )}
+            </Button>
+          )}
           <Button
             color='primary'
             size='sm'
@@ -301,7 +330,13 @@ const DispenseDetails = ({
                 color='primary'
                 size='sm'
                 icon={<AttachMoney />}
-                onClick={onFinalizeClick}
+                onClick={() => {
+                  if (coPayerPayments.length > 0) {
+                    setShowRemovePayment(true)
+                  } else {
+                    onFinalizeClick()
+                  }
+                }}
               >
                 Finalize
               </ProgressButton>
@@ -313,6 +348,7 @@ const DispenseDetails = ({
             <TableData
               title='Prescription'
               idPrefix='prescription'
+              forceRender
               columns={PrescriptionColumns}
               colExtensions={PrescriptionColumnExtensions(
                 viewOnly,
@@ -344,23 +380,34 @@ const DispenseDetails = ({
             />
           </Paper>
         </GridItem>
-        <GridItem xs={2} md={9} />
+        <GridItem xs={8} md={8} style={{ marginTop: -14 }}>
+          <TextField
+            value={visitRemarks}
+            disabled
+            multiline
+            label={formatMessage({
+              id: 'reception.queue.visitRegistration.visitRemarks',
+            })}
+          />
+        </GridItem>
         {!viewOnly && (
-          <GridItem xs={10} md={3}>
-            <AmountSummary
-              rows={invoiceItem}
-              adjustments={invoiceAdjustment}
-              showAddAdjustment={!isBillFirstVisit}
-              config={{
-                isGSTInclusive: invoice.isGSTInclusive,
-                totalField: 'totalAfterItemAdjustment',
-                adjustedField: 'totalAfterOverallAdjustment',
-                gstField: 'totalAfterGST',
-                gstAmtField: 'gstAmount',
-                gstValue: invoice.gstValue,
-              }}
-              onValueChanged={updateInvoiceData}
-            />
+          <GridItem xs={4} md={4}>
+            <div style={{ paddingRight: 90 }}>
+              <AmountSummary
+                rows={invoiceItem}
+                adjustments={invoiceAdjustment}
+                showAddAdjustment={!isBillFirstVisit}
+                config={{
+                  isGSTInclusive: invoice.isGSTInclusive,
+                  totalField: 'totalAfterItemAdjustment',
+                  adjustedField: 'totalAfterOverallAdjustment',
+                  gstField: 'totalAfterGST',
+                  gstAmtField: 'gstAmount',
+                  gstValue: invoice.gstValue,
+                }}
+                onValueChanged={updateInvoiceData}
+              />
+            </div>
           </GridItem>
         )}
       </GridContainer>
@@ -371,13 +418,13 @@ const DispenseDetails = ({
         onClose={() => {
           onDrugLabelSelectionClose()
         }}
-      // onConfirm={() => { 
-      //    onDrugLabelSelectionClose()
-      //    onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
-      // }}
+        // onConfirm={() => {
+        //    onDrugLabelSelectionClose()
+        //    onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
+        // }}
       >
         <DrugLabelSelection
-          prescription={selectedDrugs} 
+          prescription={selectedDrugs}
           codetable={codetable}
           handleDrugLabelSelected={onDrugLabelSelected}
           handleDrugLabelNoChanged={onDrugLabelNoChanged}
@@ -386,6 +433,102 @@ const DispenseDetails = ({
             onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
           }}
         />
+      </CommonModal>
+      <CommonModal
+        title='Information'
+        open={showRemovePayment}
+        observe='DispenseDetails'
+        onClose={() => {
+          setShowRemovePayment(false)
+        }}
+      >
+        <div
+          style={{
+            marginLeft: 20,
+            marginRight: 20,
+          }}
+        >
+          <GridContainer>
+            <CommonTableGrid
+              style={{
+                marginBottom: 10,
+              }}
+              size='sm'
+              rows={coPayerPayments}
+              columns={[
+                { name: 'payerName', title: 'Payer Name' },
+                { name: 'paymentReceivedBy', title: 'Received By' },
+                { name: 'receiptNo', title: 'Receipt No.' },
+                { name: 'paymentReceivedDate', title: 'Payment Date' },
+                { name: 'totalAmtPaid', title: 'Amount ($)' },
+              ]}
+              columnExtensions={[
+                {
+                  columnName: 'receiptNo',
+                  width: 110,
+                },
+                {
+                  columnName: 'totalAmtPaid',
+                  type: 'number',
+                  currency: true,
+                  width: 110,
+                },
+                {
+                  columnName: 'paymentReceivedDate',
+                  type: 'date',
+                  width: 110,
+                },
+              ]}
+              FuncProps={{
+                pager: false,
+              }}
+            />
+            <TextField
+              label='Void Reason'
+              multiline
+              rowsMax='5'
+              value={voidReason}
+              maxLegth={200}
+              onChange={(e) => {
+                setVoidReason(e.target.value)
+              }}
+            />
+
+            <div>
+              Note: There are existing payments with some co-payers, click
+              "Void" to cancel all payments, or click "Skip" to remove co-payers
+              & payments manually.
+            </div>
+          </GridContainer>
+          <GridContainer
+            style={{
+              marginTop: 20,
+              marginBottom: 20,
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <Button
+              color='danger'
+              icon={null}
+              disabled={!voidReason}
+              onClick={() => {
+                onFinalizeClick(true, voidReason)
+              }}
+            >
+              void
+            </Button>
+            <Button
+              color='primary'
+              icon={null}
+              onClick={() => {
+                onFinalizeClick()
+              }}
+            >
+              skip
+            </Button>
+          </GridContainer>
+        </div>
       </CommonModal>
     </React.Fragment>
   )

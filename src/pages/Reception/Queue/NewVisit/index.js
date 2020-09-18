@@ -315,6 +315,8 @@ class NewVisit extends PureComponent {
       dispatch,
       rights,
       setFieldValue,
+      clinicSettings,
+      patientInfo,
     } = this.props
 
     if (expandRefractionForm) {
@@ -341,8 +343,14 @@ class NewVisit extends PureComponent {
       [],
     )
     const isReadOnly =
-      values.visitStatus !== VISIT_STATUS.WAITING &&
-      values.visitStatus !== VISIT_STATUS.UPCOMING_APPT
+      (values.visitStatus !== VISIT_STATUS.WAITING &&
+        values.visitStatus !== VISIT_STATUS.UPCOMING_APPT) ||
+      (!patientInfo || !patientInfo.isActive)
+    const isReadonlyAfterSigned =
+      clinicSettings.settings.isVisitEditableAfterEndConsultation &&
+      values.isLastClinicalObjectRecordSigned
+        ? false
+        : isReadOnly
     const isEdit = !!values.id
     const fetchingVisitInfo =
       loading.effects['visitRegistration/fetchVisitInfo']
@@ -392,6 +400,7 @@ class NewVisit extends PureComponent {
                       <GridItem xs={12} className={classes.row}>
                         <VisitInfoCard
                           // isReadOnly={isReadOnly}
+                          isVisitReadonlyAfterSigned={isReadonlyAfterSigned}
                           existingQNo={existingQNo}
                           handleUpdateAttachments={this.updateAttachments}
                           attachments={values.visitAttachment}
@@ -419,7 +428,7 @@ class NewVisit extends PureComponent {
                                 rights:
                                   (vitalAccessRight === 'readwrite' ||
                                     vitalAccessRight === 'enable') &&
-                                  isReadOnly
+                                  isReadonlyAfterSigned
                                     ? 'disable'
                                     : vitalAccessRight,
                               }}
@@ -483,7 +492,7 @@ class NewVisit extends PureComponent {
               confirmBtnText: isEdit ? 'Save' : 'Register visit',
               onConfirm: this.validatePatient,
               confirmProps: {
-                disabled: isReadOnly || !this.state.hasActiveSession,
+                disabled: isReadonlyAfterSigned || !this.state.hasActiveSession,
               },
             })}
         </div>

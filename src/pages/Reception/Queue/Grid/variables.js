@@ -50,6 +50,8 @@ const compareQueueNo = (a, b) => {
 export const FuncConfig = {
   pager: false,
   sort: true,
+  columnReorderable: true,
+  columnSelectable: true,
   sortConfig: {
     defaultSorting: [
       { columnName: 'queueNo', direction: 'asc' },
@@ -72,6 +74,7 @@ export const AppointmentTableConfig = {
     { name: 'patientContactNo', title: 'Phone' },
     { name: 'action', title: 'Action' },
   ],
+  identifier: 'reception_appointment',
 }
 
 export const ApptColumnExtensions = [
@@ -131,7 +134,7 @@ export const ApptColumnExtensions = [
   },
   {
     columnName: 'appointmentTime',
-    width: 170,
+    width: 180,
     type: 'date',
     showTime: true,
   },
@@ -145,6 +148,7 @@ export const QueueTableConfig = {
   columns: [
     { name: 'visitStatus', title: 'Status' },
     { name: 'queueNo', title: 'Q. No.' },
+    { name: 'patientReferenceNo', title: 'Ref. No.' },
     { name: 'patientName', title: 'Patient Name' },
     { name: 'patientAccountNo', title: 'Acc. No.' },
     { name: 'gender/age', title: 'Gender / Age' },
@@ -163,6 +167,7 @@ export const QueueTableConfig = {
     { name: 'invoiceOutstanding', title: 'Outstanding' },
     { name: 'patientScheme', title: 'Scheme' },
     { name: 'patientMobile', title: 'Phone' },
+    { name: 'visitOrderTemplate', title: 'Visit Purpose' },
     { name: 'action', title: 'Action' },
   ],
   leftColumns: [
@@ -170,6 +175,7 @@ export const QueueTableConfig = {
     'queueNo',
     'patientName',
   ],
+  identifier: 'reception',
 }
 
 export const QueueColumnExtensions = [
@@ -194,7 +200,8 @@ export const QueueColumnExtensions = [
           >
             <span>{row.queueNo}</span>
             <div>
-              {row.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
+              {row.patientIsActive &&
+              row.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
                 <Authorized authority='openqueuedisplay'>
                   <CallingQueueButton
                     qId={row.queueNo}
@@ -311,5 +318,9 @@ export const QueueColumnExtensions = [
     compare: compareDoctor,
     render: (row) => <DoctorLabel doctor={row.doctor} hideMCR />,
     width: 150,
+  },
+  {
+    columnName: 'visitOrderTemplate',
+    width: 180,
   },
 ]

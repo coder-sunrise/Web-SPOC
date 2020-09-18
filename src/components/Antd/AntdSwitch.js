@@ -1,5 +1,5 @@
 import { Switch } from 'antd'
-import { primaryColor } from 'mui-pro-jss'
+import { primaryColor, dangerColor, successColor } from 'mui-pro-jss'
 import React from 'react'
 import PropTypes, { instanceOf } from 'prop-types'
 import classnames from 'classnames'
@@ -23,6 +23,12 @@ const STYLES = () => {
     },
     switchUnchecked: {
       backgroundColor: `${primaryColor} !important`,
+    },
+    minusChecked: {
+      backgroundColor: `${dangerColor} !important`,
+    },
+    plusChecked: {
+      backgroundColor: `${successColor} !important`,
     },
   }
 }
@@ -101,21 +107,35 @@ class AntdSwitch extends React.PureComponent {
     const cfg = {
       checked: this.state.value,
     }
+
+    const getSwtichCheckedClass = () => {
+      if (
+        [
+          '$',
+          '%',
+        ].includes(restProps.unCheckedChildren)
+      )
+        return classes.switchUnchecked
+      if (
+        [
+          '+',
+          '-',
+        ].includes(restProps.unCheckedChildren)
+      ) {
+        if (this.state.value) return classes.minusChecked
+        return classes.plusChecked
+      }
+
+      return ''
+    }
+
     // console.log(newOptions, this.state.value, restProps)
     return (
       <div style={{ width: '100%' }} {...props}>
         <Switch
           className={classnames(
             classes.switchContainer,
-            onOffMode &&
-            ![
-              '$',
-              '%',
-              '+',
-              '-',
-            ].includes(restProps.unCheckedChildren)
-              ? ''
-              : classes.switchUnchecked,
+            onOffMode && getSwtichCheckedClass(),
           )}
           onChange={this.handleValueChange}
           checkedChildren='Yes'

@@ -57,9 +57,6 @@ const Setting = ({
     searchLabel: 'Precaution Name',
   }
 
-  const height = global.mainDivHeight
-  console.log(height)
-
   return (
     <SharedContainer>
       <div

@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import { FastField } from 'formik'
 import _ from 'lodash'
 import { withStyles } from '@material-ui/core'
+import { connect } from 'dva'
 import Yup from '@/utils/yup'
 import { getBizSession } from '@/services/queue'
 import {
@@ -39,6 +40,10 @@ const itemSchema = Yup.object().shape({
   costPrice: Yup.number().required(),
   unitPrice: Yup.number().required(),
 })
+
+const modalityItemSchema = Yup.object().shape({
+  modalityFK: Yup.string().required(),
+})
 // const itemSchema = Yup.array()
 //   .compact((item) => item.isDeleted)
 //   .unique(
@@ -61,6 +66,9 @@ const itemSchema = Yup.object().shape({
 //     }),
 //   )
 
+@connect(({ clinicSettings }) => ({
+  clinicSettings,
+}))
 @withFormikExtend({
   mapPropsToValues: ({ settingClinicService }) => {
     // console.log('settingClinicService', settingClinicService)
@@ -89,6 +97,9 @@ const itemSchema = Yup.object().shape({
     ctServiceCenter_ServiceNavigation: Yup.array()
       .compact((v) => v.isDeleted)
       .required('At least one service setting is required.'),
+    modalitySettingItem: Yup.array()
+      .compact((v) => v.isDeleted)
+      .of(modalityItemSchema),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
@@ -145,6 +156,7 @@ class Detail extends PureComponent {
     ddlMedisaveHealthScreening: this.props.initialValues.isMedisaveHealthScreening,
     ddlOutpatientScan: this.props.initialValues.isOutpatientScan,
     serviceSettings: this.props.values.ctServiceCenter_ServiceNavigation,
+    modalitySettings: this.props.values.ctService_Modality,
   }
 
   tableParas = {
@@ -198,6 +210,30 @@ class Detail extends PureComponent {
               serviceSettingItem,
             )
             setFieldTouched('ctServiceCenter_ServiceNavigation', true)
+          }
+        },
+      },
+    ],
+  }
+
+  modalityTableParas = {
+    columns: [
+      { name: 'modalityFK', title: 'Modality' },
+    ],
+    columnExtensions: [
+      {
+        columnName: 'modalityFK',
+        type: 'codeSelect',
+        code: 'ctModality',
+        onChange: ({ val, row }) => {
+          const { modalitySettings } = this.state
+          const rs = modalitySettings.filter(
+            (o) => !o.isDeleted && o.modalityFK === val && o.id !== row.id,
+          )
+          if (rs.length > 0) {
+            notification.error({
+              message: 'The modality already exist in the list',
+            })
           }
         },
       },
@@ -366,12 +402,51 @@ class Detail extends PureComponent {
     return addedRows
   }
 
+  checkIsModalityUnique = ({ rows, changed }) => {
+    if (!changed) return rows
+    const key = Object.keys(changed)[0]
+    const obj = changed[key]
+    if (obj.modalityFK !== undefined) {
+      const hasDuplicate = rows.filter(
+        (i) => !i.isDeleted && i.modalityFK === obj.modalityFK,
+      )
+      if (hasDuplicate.length >= 2) {
+        return rows.map(
+          (row) =>
+            row.id === parseInt(key, 10)
+              ? { ...row, modalityFK: undefined }
+              : row,
+        )
+      }
+    }
+    return rows
+  }
+
+  commitModalityChanges = ({ rows, changed }) => {
+    const _rows = this.checkIsModalityUnique({ rows, changed })
+    const { setFieldValue, values } = this.props
+
+    _rows.forEach((val, i) => {
+      val.serviceFK = values.id
+      val.modalityFKNavigation = null
+    })
+
+    setFieldValue('CTService_Modality', _rows)
+    this.setState(() => {
+      return {
+        modalitySettings: _rows,
+      }
+    })
+    return _rows
+  }
+
   render () {
     const { props } = this
     const {
       classes,
       theme,
       footer,
+      clinicSettings,
       settingClinicService,
       errors,
     } = props
@@ -379,6 +454,7 @@ class Detail extends PureComponent {
     const serviceSettingsErrMsg = errors.ctServiceCenter_ServiceNavigation
     const shoudDisableSaveButton =
       serviceSettings.filter((row) => !row.isDeleted).length === 0
+    const { settings = [] } = clinicSettings
 
     return (
       <React.Fragment>
@@ -451,12 +527,7 @@ class Detail extends PureComponent {
                   <Field
                     name='isTrackResults'
                     render={(args) => {
-                      return (
-                        <Switch
-                          label='Track Results'
-                          {...args}
-                        />
-                      )
+                      return <Switch label='Track Results' {...args} />
                     }}
                   />
                 </GridItem>
@@ -605,6 +676,33 @@ class Detail extends PureComponent {
               schema={itemSchema}
               {...this.tableParas}
             />
+
+            {settings.isEnableServiceModality === true && (
+              <React.Fragment>
+                <h4 style={{ fontWeight: 400 }}>
+                  <b>Modality Settings</b>
+                </h4>
+                <EditableTableGrid
+                  forceRender
+                  style={{
+                    marginTop: theme.spacing(1),
+                    margin: theme.spacing(2),
+                  }}
+                  rows={this.state.modalitySettings}
+                  FuncProps={{
+                    pagerConfig: {
+                      containerExtraComponent: this.PagerContent,
+                    },
+                  }}
+                  EditingProps={{
+                    showAddCommand: true,
+                    onCommitChanges: this.commitModalityChanges,
+                  }}
+                  schema={modalityItemSchema}
+                  {...this.modalityTableParas}
+                />
+              </React.Fragment>
+            )}
           </div>
         </div>
         {/* </SizeContainer> */}

@@ -26,6 +26,7 @@ export default {
   'reception.queue.deleteVisit': 'Delete Visit',
   'reception.queue.printTotal': 'Print Total',
   'reception.queue.endSession': 'End Session',
+  'reception.queue.sessionSummary': 'Session Summary',
 
   'reception.common.remarks': 'Remarks',
   'reception.common.save': 'Save',
@@ -128,8 +129,7 @@ export default {
   'reception.queue.visitRegistration.visitRemarks': 'Visit Remarks',
   'reception.queue.visitRegistration.attachment': 'Attachment',
   'reception.queue.visitRegistration.room': 'Room',
-  'reception.queue.visitRegistration.visitOrderTemplate':
-    'Visit Order Template',
+  'reception.queue.visitRegistration.visitOrderTemplate': 'Visit Purpose',
   'reception.queue.visitRegistration.visitOrderTotalCharge': 'Total Charges',
 
   'reception.queue.visitRegistration.vitalSign': 'Vital Sign',
