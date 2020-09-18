@@ -571,7 +571,7 @@ class PatientInfoSideBanner extends PureComponent {
               })}
           </div>
         )}
-        {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).length > 0 && (
+        {entity.patientScheme.filter((o) => this.isMedisave(o.schemeTypeFK)).length > 0 && (
           <Divider light />
         )}
       </React.Fragment>
