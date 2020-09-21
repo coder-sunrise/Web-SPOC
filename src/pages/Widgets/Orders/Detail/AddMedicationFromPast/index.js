@@ -177,13 +177,15 @@ class PastMedication extends PureComponent {
             usageMethodDisplayValue: usage ? usage.name : undefined,
             dosageFK: dosage ? dosage.id : undefined,
             dosageCode: dosage ? dosage.code : undefined,
-            dosageDisplayValue: dosage ? dosage.name : undefined,
+            dosageDisplayValue: dosage ? dosage.displayValue : undefined,
             prescribeUOMFK: uom ? uom.id : undefined,
             prescribeUOMCode: uom ? uom.code : undefined,
             prescribeUOMDisplayValue: uom ? uom.name : undefined,
             drugFrequencyFK: frequency ? frequency.id : undefined,
             drugFrequencyCode: frequency ? frequency.code : undefined,
-            drugFrequencyDisplayValue: frequency ? frequency.name : undefined,
+            drugFrequencyDisplayValue: frequency
+              ? frequency.displayValue
+              : undefined,
             duration: instruction.duration,
             sequence: instruction.sequence,
             stepdose: instruction.stepdose,
