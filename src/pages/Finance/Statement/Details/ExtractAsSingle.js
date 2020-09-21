@@ -17,10 +17,9 @@ const styles = theme => ({})
 const statementSchema = Yup.object().shape({
   copayerFK: Yup.number().required(),
   isTransferToExistingStatement: Yup.boolean(),
-  existingStatementFK: Yup.number().when('isTransferToExistingStatement', {
+  transferToStatementFK: Yup.number().when('isTransferToExistingStatement', {
     is: val => val,
     then: Yup.number().required(),
-    otherwise: Yup.number(),
   }),
 })
 @connect(({ statement }) => ({
@@ -34,7 +33,7 @@ const statementSchema = Yup.object().shape({
         ...t,
         isTransferToExistingStatement: false,
       }
-    })
+    }) 
     return {
       rows: newRowData,
     }
@@ -70,6 +69,7 @@ const statementSchema = Yup.object().shape({
 })
 class ExtractAsSingle extends PureComponent {
   state = {
+    transferToExistingStatement: false,
     columns: [
       { name: 'patientName', title: 'Patient Name' },
       { name: 'invoiceNo', title: 'Invoice No.' },
@@ -77,7 +77,7 @@ class ExtractAsSingle extends PureComponent {
       { name: 'invoiceAmt', title: 'Invoice Amount' },
       { name: 'copayerFK', title: 'Co-Payer' },
       { name: 'isTransferToExistingStatement', title: ' ' },
-      { name: 'existingStatementFK', title: 'Statement No.' },
+      { name: 'transferToStatementFK', title: 'Statement No.' },
     ],
     columnExtensions: [
       {
@@ -118,23 +118,25 @@ class ExtractAsSingle extends PureComponent {
           const { statement, setFieldValue, values } = this.props
           const { statementNoList } = statement
           const { rows } = values
-          if (statementNoList) {
-            const correspStatementNo = statementNoList.filter(
+          let recentStatementNoList = []
+          if (this.state.transferToExistingStatement) {
+            recentStatementNoList = statementNoList.filter(
               s => s.copayerFK === row.copayerFK,
             )
-            setFieldValue(
-              'rows',
-              rows.map(o => ({
-                ...o,
-                existingStatementFK: null,
-                recentStatementNoList: correspStatementNo,
-              })),
-            )
-          }
+          } 
+          setFieldValue(
+            'rows',
+            rows.map(o => ({
+              ...o,
+              _errors: undefined,
+              transferToStatementFK: o.id === row.id ? undefined : o.transferToStatementFK,
+              recentStatementNoList: o.id === row.id ? recentStatementNoList : o.recentStatementNoList,
+            })),
+          )
         },
       },
       {
-        columnName: 'existingStatementFK',
+        columnName: 'transferToStatementFK',
         type: 'select',
         labelField: 'statementNo',
         valueField: 'id',
@@ -168,7 +170,6 @@ class ExtractAsSingle extends PureComponent {
       values,
     } = props
     const { rows } = values
-    console.log(values)
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(2) }}>
@@ -179,6 +180,9 @@ class ExtractAsSingle extends PureComponent {
               name='isTransferToExistingStatement'
               simple
               onChange={e => {
+                this.setState({
+                  transferToExistingStatement: e.target.value,
+                })
                 if (!statement.statementNoList) {
                   dispatch({
                     type: 'statement/queryRecentStatementNo',
@@ -191,14 +195,15 @@ class ExtractAsSingle extends PureComponent {
                   'rows',
                   rows.map(o => ({
                     ...o,
-                    existingStatementFK: e.target.value ? o.existingStatementFK : null,
-                    recentStatementNoList: e.target.value ? o.recentStatementNoList : [],
+                    _errors: undefined,
+                    transferToStatementFK: e.target.value ? o.transferToStatementFK : undefined,
+                    recentStatementNoList: e.target.value ? (statement.statementNoList.filter(
+                      s => s.copayerFK === o.copayerFK,
+                    )) : [],
                     isTransferToExistingStatement: e.target.value,
                   })),
                 )
-                this.setState({
-                  transferToExistingStatement: e.target.value,
-                })
+                console.log(rows)
               }}
               label='Transfer invoice(s) to an existing statement'
             />
