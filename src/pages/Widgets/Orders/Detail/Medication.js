@@ -856,8 +856,8 @@ class Medication extends PureComponent {
 
     row.quantity = option.dispensingQuantity || 0
     row.uomfk = option.dispensingUOM.id
-    row.uOMCode = option.dispensingUOM.code
-    row.uOMDisplayValue = option.dispensingUOM.name
+    row.uomCode = option.dispensingUOM.code
+    row.uomDisplayValue = option.dispensingUOM.name
     row.costPrice = option.averageCostPrice || 0
     row.unitPrice = option.sellingPrice || 0
     row.totalPrice = row.unitPrice * row.quantity

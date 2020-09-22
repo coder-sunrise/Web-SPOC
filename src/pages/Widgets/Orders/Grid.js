@@ -180,11 +180,14 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
 
   const drugMixtureIndicator = (row) => {
     if (row.type !== '1' || !row.isDrugMixture) return null
+    const activePrescriptionItemDrugMixture = row.corPrescriptionItemDrugMixture.filter(
+      (item) => !item.isDeleted,
+    )
 
     return (
       <div style={{ position: 'relative', top: 2 }}>
         <DrugMixtureInfo
-          values={row.corPrescriptionItemDrugMixture}
+          values={activePrescriptionItemDrugMixture}
           isShowTooltip={false}
         />
       </div>
@@ -195,6 +198,7 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
     <CommonTableGrid
       size='sm'
       style={{ margin: 0 }}
+      forceRender
       rows={rows}
       onRowDoubleClick={editRow}
       getRowId={(r) => r.uid}
