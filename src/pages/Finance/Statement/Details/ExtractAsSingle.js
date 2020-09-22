@@ -33,7 +33,7 @@ const statementSchema = Yup.object().shape({
         ...t,
         isTransferToExistingStatement: false,
       }
-    }) 
+    })
     return {
       rows: newRowData,
     }
@@ -45,6 +45,7 @@ const statementSchema = Yup.object().shape({
       return {
         invoiceId: o.invoiceFK,
         copayerFK: o.copayerFK,
+        transferToStatementFK: o.transferToStatementFK,
       }
     })
 
@@ -123,7 +124,7 @@ class ExtractAsSingle extends PureComponent {
             recentStatementNoList = statementNoList.filter(
               s => s.copayerFK === row.copayerFK,
             )
-          } 
+          }
           setFieldValue(
             'rows',
             rows.map(o => ({
@@ -153,6 +154,16 @@ class ExtractAsSingle extends PureComponent {
     setFieldValue('rows', rows)
   }
 
+  componentDidMount = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'statement/queryRecentStatementNo',
+      payload: {
+        count: 5,
+      },
+    })
+  }
+
   render () {
     const { props } = this
     const {
@@ -170,6 +181,8 @@ class ExtractAsSingle extends PureComponent {
       values,
     } = props
     const { rows } = values
+    let statementNoCol = columnExtensions.find(t => t.columnName === 'transferToStatementFK')
+    statementNoCol.disabled = !transferToExistingStatement
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(2) }}>
@@ -183,17 +196,6 @@ class ExtractAsSingle extends PureComponent {
                 this.setState({
                   transferToExistingStatement: e.target.value,
                 })
-                if (!statement.statementNoList) { 
-                  statement.statementNoList = JSON.parse(
-                    '[{"statementNo":"SM-000069","copayerFK":4,"id":69,"isDeleted":false,"concurrencyToken":28263},{"statementNo":"SM-000058","copayerFK":4,"id":58,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000057","copayerFK":4,"id":57,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000031","copayerFK":4,"id":31,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000029","copayerFK":4,"id":29,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000068","copayerFK":3,"id":68,"isDeleted":false,"concurrencyToken":28237},{"statementNo":"SM-000064","copayerFK":3,"id":64,"isDeleted":false,"concurrencyToken":26561},{"statementNo":"SM-000055","copayerFK":3,"id":55,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000027","copayerFK":3,"id":27,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000023","copayerFK":3,"id":23,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000067","copayerFK":7,"id":67,"isDeleted":false,"concurrencyToken":26690},{"statementNo":"SM-000063","copayerFK":7,"id":63,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000060","copayerFK":7,"id":60,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000056","copayerFK":7,"id":56,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000052","copayerFK":7,"id":52,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000066","copayerFK":2,"id":66,"isDeleted":false,"concurrencyToken":27556},{"statementNo":"SM-000054","copayerFK":2,"id":54,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000053","copayerFK":2,"id":53,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000047","copayerFK":2,"id":47,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000045","copayerFK":2,"id":45,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000065","copayerFK":5,"id":65,"isDeleted":false,"concurrencyToken":27595},{"statementNo":"SM-000061","copayerFK":5,"id":61,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000051","copayerFK":5,"id":51,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000049","copayerFK":5,"id":49,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000042","copayerFK":5,"id":42,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000044","copayerFK":6,"id":44,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000043","copayerFK":6,"id":43,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000015","copayerFK":6,"id":15,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000014","copayerFK":6,"id":14,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000007","copayerFK":6,"id":7,"isDeleted":false,"concurrencyToken":7747},{"statementNo":"SM-000016","copayerFK":1,"id":16,"isDeleted":false,"concurrencyToken":7747}]',
-                  )
-                  // dispatch({
-                  //   type: 'statement/queryRecentStatementNo',
-                  //   payload: {
-                  //     count: 5,
-                  //   },
-                  // })
-                }
                 setFieldValue(
                   'rows',
                   rows.map(o => ({
@@ -206,7 +208,17 @@ class ExtractAsSingle extends PureComponent {
                     isTransferToExistingStatement: e.target.value,
                   })),
                 )
-                console.log(rows)
+                let disableSaveButton = false
+                if (e.target.value) {
+                  disableSaveButton = rows.filter(s => !s.copayerFK,).length > 0 || rows.filter(s => !s.transferToStatementFK).length > 0
+                }
+                else {
+                  disableSaveButton = rows.filter(s => !s.copayerFK,).length > 0
+                }
+                dispatch({
+                  type: 'global/updateState',
+                  payload: { disableSave: disableSaveButton },
+                })
               }}
               label='Transfer invoice(s) to an existing statement'
             />
