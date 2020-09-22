@@ -38,9 +38,11 @@ const styles = () => ({
 })
 
 // @Authorized.Secured('patientdatabase.patientprofiledetails')
-@connect(({ streetAddress }) => ({
+@connect(({ clinicSettings, streetAddress }) => ({
   streetAddress,
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
+
 class Demographic extends PureComponent {
   state = {}
 
@@ -129,6 +131,7 @@ class Demographic extends PureComponent {
   render () {
     const { props } = this
     const { values, theme, setFieldValue, classes } = props
+    const { isPatientNameAutoUpperCase } = props.clinicSettings
 
     return (
       <div>
@@ -187,13 +190,15 @@ class Demographic extends PureComponent {
                     return (
                       <TextField
                         label='Full Name'
+                        uppercase={isPatientNameAutoUpperCase}
                         maxLength='100'
                         onChange={(e) => {
-                          // if (
-                          //   !values.callingName ||
-                          //   e.target.value.indexOf(values.callingName) === 0
-                          // )
-                          setFieldValue('callingName', e.target.value)
+                          if (isPatientNameAutoUpperCase) {
+                            setFieldValue('callingName', (e.target.value || '').toUpperCase())
+                          }
+                          else {
+                            setFieldValue('callingName', e.target.value)
+                          }
                         }}
                         {...args}
                       />
@@ -207,6 +212,7 @@ class Demographic extends PureComponent {
                   render={(args) => {
                     return (
                       <TextField
+                        uppercase={isPatientNameAutoUpperCase}
                         label='Calling Name'
                         maxLength='100'
                         {...args}
@@ -351,7 +357,7 @@ class Demographic extends PureComponent {
                 <FastField
                   name='contact.mobileContactNumber.number'
                   render={(args) => <MobileNumberInput {...args} />}
-                  // render={(args) => <NumberInput label='Mobile' {...args} />}
+                // render={(args) => <NumberInput label='Mobile' {...args} />}
                 />
               </GridItem>
               <GridItem xs={3}>
