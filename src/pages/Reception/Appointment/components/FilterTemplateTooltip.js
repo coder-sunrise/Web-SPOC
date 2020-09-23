@@ -29,6 +29,7 @@ const Templates = ({
   dispatch,
   theme,
   classes,
+  visible = false,
   appointment: { filterTemplates },
   filterByDoctor,
   filterByApptType,
@@ -44,6 +45,8 @@ const Templates = ({
     selectedTemplateId,
     setSelectedTemplateId,
   ] = useState()
+
+  if (!visible && selectedTemplateId) setSelectedTemplateId(null)
 
   const saveFilterTemplate = (requestDelete, saveAsFavorite) => {
     let newFilterTemplates = [
