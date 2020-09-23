@@ -185,9 +185,9 @@ class ExtractAsSingle extends PureComponent {
     statementNoCol.disabled = !transferToExistingStatement
     return (
       <React.Fragment>
-        <div style={{ margin: theme.spacing(2) }}>
+        <div style={{ margin: theme.spacing(2), marginTop: 0 }}>
           <p
-            style={{ margin: theme.spacing(1), marginLeft: 0, marginRight: 0 }}
+            style={{ margin: theme.spacing(1), marginTop: 0, marginLeft: 0, marginRight: 0 }}
           >
             <Checkbox
               name='isTransferToExistingStatement'
@@ -237,6 +237,13 @@ class ExtractAsSingle extends PureComponent {
           >
             <i>
               Changing the co-payer will update co-payer in patient invoice.
+            </i>
+          </p>
+          <p
+            style={{ margin: theme.spacing(1), marginLeft: 0, marginRight: 0 }}
+          >
+            <i>
+              Statement No. will display latest 5 unpaid statement only.
             </i>
           </p>
         </div>
