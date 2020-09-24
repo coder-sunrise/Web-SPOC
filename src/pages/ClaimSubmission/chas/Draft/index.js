@@ -11,7 +11,8 @@ import {
   ProgressButton,
   GridContainer,
   GridItem,
-  CardContainer, Tooltip,
+  CardContainer,
+  Tooltip,
 } from '@/components'
 // sub components
 import BaseSearchBar from '../../common/BaseSearchBar'
@@ -55,15 +56,16 @@ class DraftCHAS extends React.Component {
 
   onRefreshClicked = () => {
     const { selectedRows } = this.state
-    this.props.dispatch({
-      type: 'claimSubmissionDraft/refreshPatientDetails',
-      payload:{claimIds: selectedRows},
-    }).then((r)=>{
-      if(!r){
-        this.refreshDataGrid()
-      }
-    })
-
+    this.props
+      .dispatch({
+        type: 'claimSubmissionDraft/refreshPatientDetails',
+        payload: { claimIds: selectedRows },
+      })
+      .then((r) => {
+        if (!r) {
+          this.refreshDataGrid()
+        }
+      })
   }
 
   render () {
@@ -108,7 +110,7 @@ class DraftCHAS extends React.Component {
                 selectable: true,
                 selectConfig: {
                   showSelectAll: true,
-                  rowSelectionEnabled: () => true,
+                  rowSelectionEnabled: (row) => row.patientIsActive,
                 },
               }}
               selection={this.state.selectedRows}
@@ -120,10 +122,12 @@ class DraftCHAS extends React.Component {
             />
           </GridItem>
           <GridItem md={4} className={classes.buttonGroup}>
-            <Tooltip placement='bottom-start'
+            <Tooltip
+              placement='bottom-start'
               title={formatMessage({
-                       id: 'claimsubmission.invoiceClaim.refreshPatientDetail.tooltips',
-                     })}
+                id:
+                  'claimsubmission.invoiceClaim.refreshPatientDetail.tooltips',
+              })}
             >
               <div style={{ display: 'inline-block' }}>
                 <ProgressButton

@@ -9,6 +9,9 @@ import ViewPatientNurseNotes from '@/pages/Widgets/PatientNurseNotes'
 import PatientDeposit from '@/pages/Finance/Deposit/PatientDeposit'
 
 const addContent = (type, props) => {
+  const { patient: { entity } } = props
+  const patientIsActive = entity && entity.isActive
+
   switch (type) {
     case PATIENT_HISTORY_TABS.VISIT:
       return <PatientHistory mode='integrated' {...props} />
@@ -22,7 +25,7 @@ const addContent = (type, props) => {
       const accessRight = Authorized.check(
         'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
       )
-      if (!accessRight || accessRight.rights === 'disable')
+      if (!accessRight || accessRight.rights === 'disable' || !patientIsActive)
         return <ViewPatientNurseNotes {...props} />
       return <PatientNurseNotes {...props} />
     case PATIENT_HISTORY_TABS.DEPOSIT:

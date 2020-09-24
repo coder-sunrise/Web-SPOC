@@ -547,7 +547,7 @@ class Scanner extends Component {
   }
 
   render () {
-    const { classes, onScaning, imageDatas = [] } = this.props
+    const { classes, onScaning, imageDatas = [], scannerList = [] } = this.props
     // console.log('-render scanner', this.state.activeKey)
     return (
       <GridContainer style={{ height: this.getContainerHeight() }}>
@@ -624,6 +624,7 @@ class Scanner extends Component {
                 onUploading={this.handleUploading}
                 onSizeChanged={this._resize}
                 canUploading={imageDatas.length > 0}
+                scannerList={scannerList}
               />
             </div>
           </React.Fragment>

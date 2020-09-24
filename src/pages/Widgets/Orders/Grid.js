@@ -20,6 +20,7 @@ import {
 } from '@/components'
 import { orderTypes } from '@/pages/Consultation/utils'
 import Authorized from '@/utils/Authorized'
+import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 
 // console.log(orderTypes)
 export default ({ orders, dispatch, classes, from, codetable, theme }) => {
@@ -41,7 +42,7 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
 
   const adjustments = finalAdjustments.filter((o) => !o.isDeleted)
   const editRow = (row) => {
-    if (!row.isActive && row.type !== '5') return
+    if (!row.isActive && row.type !== '5' && !row.isDrugMixture) return
 
     if (row.type === '7' && from !== 'ca') return
 
@@ -219,10 +220,32 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
 
   const isEditingEntity = !_.isEmpty(orders.entity)
 
+  const wrapCellTextStyle = {
+    wordWrap: 'break-word',
+    whiteSpace: 'pre-wrap',
+  }
+
+  const drugMixtureIndicator = (row) => {
+    if (row.type !== '1' || !row.isDrugMixture) return null
+    const activePrescriptionItemDrugMixture = row.corPrescriptionItemDrugMixture.filter(
+      (item) => !item.isDeleted,
+    )
+
+    return (
+      <div style={{ position: 'relative', top: 2 }}>
+        <DrugMixtureInfo
+          values={activePrescriptionItemDrugMixture}
+          isShowTooltip={false}
+        />
+      </div>
+    )
+  }
+
   return (
     <CommonTableGrid
       size='sm'
       style={{ margin: 0 }}
+      forceRender
       rows={rows}
       onRowDoubleClick={editRow}
       getRowId={(r) => r.uid}
@@ -382,21 +405,29 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
           width: 150,
           render: (row) => {
             const otype = orderTypes.find((o) => o.value === row.type)
-            const texts = [
-              otype.name,
-              row.isExternalPrescription === true ? '(Ext.)' : '',
-              row.type === '5' || row.isActive ? '' : '(Inactive)',
-            ].join(' ')
+            let texts = []
+
+            if (row.type === '1') {
+              if (row.isDrugMixture === true) texts = 'Drug Mixture'
+              else {
+                texts = [
+                  otype.name,
+                  row.isExternalPrescription === true ? '(Ext.)' : '',
+                  row.isActive ? '' : '(Inactive)',
+                ].join(' ')
+              }
+            } else {
+              texts = [
+                otype.name,
+                row.type === '5' || row.isActive ? '' : '(Inactive)',
+              ].join(' ')
+            }
 
             return (
               <Tooltip title={texts}>
-                <div
-                  style={{
-                    wordWrap: 'break-word',
-                    whiteSpace: 'pre-wrap',
-                  }}
-                >
+                <div style={wrapCellTextStyle}>
                   {texts}
+                  {drugMixtureIndicator(row)}
                 </div>
               </Tooltip>
             )
@@ -494,7 +525,10 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
                       color='primary'
                       style={{ marginRight: 5 }}
                       disabled={
-                        isEditingEntity || (!row.isActive && row.type !== '5')
+                        isEditingEntity ||
+                        (!row.isActive &&
+                          row.type !== '5' &&
+                          !row.isDrugMixture)
                       }
                     >
                       <Edit />

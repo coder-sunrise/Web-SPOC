@@ -313,6 +313,7 @@ class PaymentDetails extends Component {
       readOnly,
       hasActiveSession,
       invoiceDetail,
+      patientIsActive,
     } = this.props
     const paymentActionsProps = {
       handleAddPayment: this.onAddPaymentClick,
@@ -361,6 +362,7 @@ class PaymentDetails extends Component {
                   actions={paymentActionsProps}
                   readOnly={readOnly}
                   hasActiveSession={hasActiveSession}
+                  patientIsActive={patientIsActive}
                 />
               )
             })

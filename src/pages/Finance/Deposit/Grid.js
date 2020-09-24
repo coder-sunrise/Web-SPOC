@@ -100,6 +100,9 @@ class Grid extends PureComponent {
                     }}
                     color='primary'
                     style={{ marginRight: 5, width: 60, minWidth: 60 }}
+                    disabled={
+                      !this.props.hasActiveSession || !row.patientIsActive
+                    }
                   >
                     {/* <PanTool /> */}
                     Deposit
@@ -110,7 +113,12 @@ class Grid extends PureComponent {
                 <Tooltip title='Refund' placement='bottom'>
                   <Button
                     size='sm'
-                    disabled={row.balance <= 0 || !row.balance}
+                    disabled={
+                      row.balance <= 0 ||
+                      !row.balance ||
+                      !this.props.hasActiveSession ||
+                      !row.patientIsActive
+                    }
                     onClick={() => {
                       this.editRow(row, false)
                     }}
@@ -213,12 +221,9 @@ class Grid extends PureComponent {
             onClose={this.togglePatientDepositModal}
             onConfirm={this.togglePatientDepositModal}
             showFooter={false}
-            bodyNoPadding
             keepMounted={false}
           >
-            <div style={{ margin: 10 }}>
-              <PatientDeposit />
-            </div>
+            <PatientDeposit />
           </CommonModal>
         </React.Fragment>
       </Authorized>

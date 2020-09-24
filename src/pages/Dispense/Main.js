@@ -12,6 +12,7 @@ import { calculateAmount, navigateDirtyCheck } from '@/utils/utils'
 import Yup from '@/utils/yup'
 import { VISIT_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
+import { openCautionAlertOnStartConsultation } from '@/pages/Widgets/Orders/utils'
 import DrugLabelSelection from './DispenseDetails/DrugLabelSelection'
 import AddOrder from './DispenseDetails/AddOrder'
 import DispenseDetails from './DispenseDetails/WebSocketWrapper'
@@ -149,6 +150,7 @@ class Main extends Component {
     showOrderModal: false,
     showDrugLabelSelection: false,
     selectedDrugs: [],
+    showCautionAlert: false,
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
@@ -178,6 +180,7 @@ class Main extends Component {
         (prevState) => {
           return {
             showOrderModal: !prevState.showOrderModal,
+            isFirstAddOrder: true,
           }
         },
         () => {
@@ -195,6 +198,7 @@ class Main extends Component {
       noClinicalObjectRecord &&
       dispense.loadCount === 0
     ) {
+      this.setState({ showCautionAlert: true })
       this.editOrder()
     }
 
@@ -257,6 +261,11 @@ class Main extends Component {
             },
           })
           reloadDispense(this.props)
+
+          if (this.state.showCautionAlert) {
+            this.setState({ showCautionAlert: false })
+            openCautionAlertOnStartConsultation(o)
+          }
         }
       })
     }
@@ -308,6 +317,7 @@ class Main extends Component {
       (prevState) => {
         return {
           showOrderModal: !prevState.showOrderModal,
+          isFirstAddOrder: false,
         }
       },
       () => {
@@ -442,6 +452,7 @@ class Main extends Component {
         >
           <AddOrder
             visitType={values.visitPurposeFK}
+            isFirstLoad={this.state.isFirstAddOrder}
             onReloadClick={() => {
               reloadDispense(this.props)
             }}

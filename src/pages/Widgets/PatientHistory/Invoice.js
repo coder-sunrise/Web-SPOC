@@ -3,18 +3,48 @@ import { Table } from 'antd'
 import moment from 'moment'
 import numeral from 'numeral'
 import { currencySymbol } from '@/utils/config'
-import { GridContainer, GridItem, TextField, DatePicker } from '@/components'
+import { GridContainer, GridItem, TextField } from '@/components'
 import { VISIT_TYPE } from '@/utils/constants'
 import AmountSummary from './AmountSummary'
 import tablestyles from './PatientHistoryStyle.less'
+import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 
 const numberstyle = {
   color: 'darkBlue',
   fontWeight: 500,
 }
 
+const wrapCellTextStyle = {
+  wordWrap: 'break-word',
+  whiteSpace: 'pre-wrap',
+}
+
+const drugMixtureIndicator = (row) => {
+  if (row.itemType !== 'Medication' || !row.isDrugMixture) return null
+
+  return (
+    <div style={{ position: 'relative', top: 2 }}>
+      <DrugMixtureInfo values={row.prescriptionDrugMixture} />
+    </div>
+  )
+}
+
 const baseColumns = [
-  { dataIndex: 'itemType', title: 'Type', width: 150 },
+  {
+    dataIndex: 'itemType',
+    title: 'Type',
+    width: 150,
+    render: (text, row) => {
+      return (
+        <div style={{ position: 'relative' }}>
+          <div style={wrapCellTextStyle}>
+            {row.itemType}
+            {drugMixtureIndicator(row)}
+          </div>
+        </div>
+      )
+    },
+  },
   { dataIndex: 'itemName', title: 'Name' },
   {
     dataIndex: 'quantity',
@@ -70,7 +100,26 @@ export default ({ current, theme }) => {
       visitPurposeFK === VISIT_TYPE.BILL_FIRST
     ) {
       columns = [
-        { dataIndex: 'itemType', title: 'Type', width: 150 },
+        {
+          dataIndex: 'itemType',
+          title: 'Type',
+          width: 150,
+          render: (text, row) => {
+            return (
+              <div style={{ position: 'relative' }}>
+                <div
+                  style={{
+                    wordWrap: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                  }}
+                >
+                  {row.itemType}
+                  {drugMixtureIndicator(row)}
+                </div>
+              </div>
+            )
+          },
+        },
         { dataIndex: 'itemName', title: 'Name' },
         {
           dataIndex: 'description',
@@ -116,7 +165,7 @@ export default ({ current, theme }) => {
   }
 
   return (
-    <div style={{ fontSize: '0.875rem' }}>
+    <div style={{ fontSize: '0.875rem', marginBottom: 8, marginTop: 8 }}>
       {current.invoice ? (
         <div style={{ marginBottom: 5 }}>
           <span>{`Invoice No: ${current.invoice.invoiceNo}`}</span>
@@ -142,7 +191,21 @@ export default ({ current, theme }) => {
         className={tablestyles.table}
       />
       <GridContainer style={{ paddingTop: theme.spacing(2) }}>
-        <GridItem xs={2} md={9} />
+        <GridItem xs={2} md={9}>
+          {current.invoice &&
+          current.invoice.remark && (
+            <div style={{ marginLeft: -8 }}>
+              <span style={{ fontWeight: 500 }}>Invoice Remarks:</span>
+              <TextField
+                inputRootCustomClasses={tablestyles.historyText}
+                noUnderline
+                multiline
+                disabled
+                value={current.invoice.remark || ''}
+              />
+            </div>
+          )}
+        </GridItem>
         <GridItem xs={10} md={3}>
           <AmountSummary
             adjustments={invoiceAdjustmentData}

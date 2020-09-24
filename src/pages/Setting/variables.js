@@ -246,7 +246,7 @@ export const menuData = [
   {
     authority: 'settings.templates.visitordertemplate',
     title: 'Templates',
-    text: 'Visit Order Template',
+    text: 'Visit Purpose',
     url: '/setting/visitordertemplate',
   },
   // {

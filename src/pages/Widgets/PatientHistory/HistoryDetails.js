@@ -200,7 +200,14 @@ class HistoryDetails extends PureComponent {
       patientName: selectHistory.patientName,
       patientAccountNo: selectHistory.patientAccountNo,
     }
-    const { entity } = patientHistory
+    let current = {
+      ...patientHistory.entity,
+      visitAttachments: selectHistory.visitAttachments,
+      visitRemarks: selectHistory.visitRemarks,
+      referralBy: selectHistory.referralBy,
+      referralInstitution: selectHistory.referralInstitution,
+      referralDate: selectHistory.referralDate,
+    }
     const { visitPurposeFK } = selectHistory
     return (
       <CardContainer
@@ -216,10 +223,10 @@ class HistoryDetails extends PureComponent {
             if (visitPurposeFK === VISIT_TYPE.RETAIL) {
               return (
                 _widget.id === WidgetConfig.WIDGETS_ID.INVOICE &&
-                WidgetConfig.showWidget(entity || {}, _widget)
+                WidgetConfig.showWidget(current, _widget)
               )
             }
-            return WidgetConfig.showWidget(entity || {}, _widget)
+            return WidgetConfig.showWidget(current, _widget)
           })
           .map((o) => {
             const Widget = o.component
@@ -235,7 +242,7 @@ class HistoryDetails extends PureComponent {
                   {o.name}
                 </span>
                 <Widget
-                  current={entity || {}}
+                  current={current}
                   visitDetails={visitDetails}
                   {...this.props}
                   setFieldValue={this.props.setFieldValue}

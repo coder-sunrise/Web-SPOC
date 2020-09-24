@@ -22,6 +22,9 @@ const withFormikExtend = (props) => (Component) => {
     authority,
     notDirtyDuration = 1.5,
     onDirtyDiscard,
+    onSecondConfirm,
+    secondConfirmText,
+    confirmText,
     dirtyCheckMessage,
   } = props
   let startDirtyChecking = false
@@ -46,10 +49,18 @@ const withFormikExtend = (props) => (Component) => {
     if (dirty) {
       window.dirtyForms[displayName] = {
         displayName,
-        dirtyCheckMessage,
+        dirtyCheckMessage: window.g_app._store.getState().global.secondConfirmMessage ?? dirtyCheckMessage,
+        confirmText,
+        showSecondConfirmButton: window.g_app._store.getState().global.isShowSecondConfirmButton ?? false,
+        secondConfirmText,
         onDirtyDiscard: () => {
           if (onDirtyDiscard) {
             onDirtyDiscard(ps)
+          }
+        },
+        onSecondConfirm: () => {
+          if (onSecondConfirm) {
+            onSecondConfirm(ps)
           }
         },
       }
@@ -245,8 +256,8 @@ const withFormikExtend = (props) => (Component) => {
           }}
         </Authorized>
       ) : (
-        <Component {...this.props} />
-      )
+          <Component {...this.props} />
+        )
     }
   }
 

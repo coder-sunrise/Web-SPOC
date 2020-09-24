@@ -30,11 +30,16 @@ const New = ({
   setFieldValue,
 }) => {
   const allowSent = () => {
-    if (recipient && values.content) {
+    if (recipient && values.content && recipient.patientIsActive) {
       return true
     }
 
-    if (values.content && lodash.isEmpty(errors) && selectedRows.length > 0) {
+    if (
+      values.content &&
+      lodash.isEmpty(errors) &&
+      selectedRows &&
+      selectedRows.length > 0
+    ) {
       return true
     }
 

@@ -103,7 +103,12 @@ const PaymentRow = ({
       >
         <GridItem md={2}>
           {getIconByType()}
-          {type === 'Payment' ? (
+          {type === 'Payment' ||
+          ([
+            'Credit Note',
+            'Write Off',
+          ].includes(type) &&
+            isCancelled) ? (
             <Popper
               className={classNames({
                 [classes.pooperResponsive]: true,

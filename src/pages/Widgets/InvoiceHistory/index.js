@@ -77,11 +77,11 @@ const InvoiceHistory = ({
     const bizSessionPayload = {
       IsClinicSessionClosed: false,
     }
-      getBizSession(bizSessionPayload).then((result) => {
-          if (result) {
-              const { data } = result.data
-              setHasActiveSession(data.length > 0)
-          }
+    getBizSession(bizSessionPayload).then((result) => {
+      if (result) {
+        const { data } = result.data
+        setHasActiveSession(data.length > 0)
+      }
     })
   }
 
@@ -106,6 +106,8 @@ const InvoiceHistory = ({
   }
 
   const getContent = (o) => {
+    const { entity = {} } = patient || {}
+
     return (
       <PaymentDetails
         invoiceDetail={o.invoiceDetail}
@@ -113,6 +115,7 @@ const InvoiceHistory = ({
         refreshInvoiceList={refreshInvoiceList}
         readOnly={!hasActiveSession}
         hasActiveSession={hasActiveSession}
+        patientIsActive={entity.isActive}
         dispatch={dispatch}
       />
     )
@@ -123,7 +126,6 @@ const InvoiceHistory = ({
       invoiceNo,
       invoiceDate,
       totalPayment,
-      totalOutstanding,
       patientOutstanding,
       invoiceTotalAftGST,
     } = row

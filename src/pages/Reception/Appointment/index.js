@@ -104,7 +104,7 @@ class Appointment extends React.PureComponent {
     selectedAppointmentFK: -1,
   }
 
-  componentWillMount () {
+  async componentWillMount () {
     const { dispatch, clinicInfo } = this.props
     const startOfMonth = moment().startOf('month').formatUTC()
     const endOfMonth = moment().endOf('month').endOf('day').formatUTC(false)
@@ -131,24 +131,36 @@ class Appointment extends React.PureComponent {
       },
     })
 
-    dispatch({
+    let filter
+    const filterTemplate = await dispatch({
+      type: 'appointment/getFilterTemplate',
+    })
+    if (filterTemplate) {
+      const { currentFilterTemplate } = filterTemplate
+      if (currentFilterTemplate) {
+        const { filterByDoctor, filterByApptType } = currentFilterTemplate
+        filter = {
+          filterByDoctor,
+          filterByApptType,
+        }
+      }
+    }
+
+    const response = await dispatch({
       type: 'codetable/fetchCodes',
       payload: {
         code: 'doctorprofile',
         force: true,
         filter: {},
       },
-    }).then((response) => {
-      response
+    })
 
+    if (response) {
       let filterByDoctor = []
       let resources = []
       let primaryClinicianFK
-      if (response) {
-        const lastSelected = JSON.parse(
-          sessionStorage.getItem('appointmentDoctors') || '[]',
-        )
 
+      if (response) {
         const viewOtherApptAccessRight = Authorized.check(
           'appointment.viewotherappointment',
         )
@@ -156,12 +168,23 @@ class Appointment extends React.PureComponent {
           viewOtherApptAccessRight &&
           viewOtherApptAccessRight.rights === 'enable'
         ) {
+          const favDoctors = filter ? filter.filterByDoctor || [] : []
+          const lastSelected = JSON.parse(
+            sessionStorage.getItem('appointmentDoctors') || '[]',
+          )
+          let filterDoctors = []
+          if (favDoctors.length > 0) {
+            filterDoctors = favDoctors
+          } else if (lastSelected.length > 0) {
+            filterDoctors = lastSelected
+          }
+
           resources = response
             .filter((clinician) => clinician.clinicianProfile.isActive)
             .filter(
               (_, index) =>
-                lastSelected.length > 0
-                  ? lastSelected.includes(_.clinicianProfile.id)
+                filterDoctors.length > 0
+                  ? filterDoctors.includes(_.clinicianProfile.id)
                   : index < 5,
             )
             .map((clinician) => ({
@@ -187,21 +210,23 @@ class Appointment extends React.PureComponent {
       }
 
       this.setState((preState) => ({
-        filter: {
+        filter: filter || {
           ...preState.filter,
           filterByDoctor,
         },
         primaryClinicianFK,
         resources,
       }))
-    })
+    } else {
+      this.setState({ filter })
+    }
 
     dispatch({
       type: 'calendar/initState',
       payload: { start: startOfMonth },
     })
     dispatch({
-      type: 'doctorBlock/queryAll',
+      type: 'doctorBlock/query',
       payload: {
         lgteql_startDateTime: startOfMonth,
       },
@@ -210,10 +235,6 @@ class Appointment extends React.PureComponent {
     dispatch({
       type: 'calendar/setCurrentViewDate',
       payload: moment().toDate(),
-    })
-
-    dispatch({
-      type: 'appointment/getFilterTemplate',
     })
   }
 
@@ -281,7 +302,7 @@ class Appointment extends React.PureComponent {
   }
 
   onSelectSlot = (props) => {
-    const { start, end, resourceId } = props
+    const { start, end, resourceId } = props || {}
     const createApptAccessRight = Authorized.check('appointment.newappointment')
 
     if (createApptAccessRight && createApptAccessRight.rights !== 'enable')

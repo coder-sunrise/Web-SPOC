@@ -138,7 +138,7 @@ class NewCHAS extends React.Component {
                   selectable: true,
                   selectConfig: {
                     showSelectAll: true,
-                    rowSelectionEnabled: () => true,
+                    rowSelectionEnabled: (row) => row.patientIsActive,
                   },
                 }}
                 selection={this.state.selectedRows}

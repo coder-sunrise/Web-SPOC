@@ -42,6 +42,7 @@ import Authorized from '@/utils/Authorized'
 import { queryList } from '@/services/patient'
 import { getBizSession } from '@/services/queue'
 import schema from './schema'
+import { mapEntityToValues, upsertPatient } from './utils'
 
 // moment.updateLocale('en', {
 //   relativeTime: {
@@ -58,31 +59,10 @@ const styles = () => ({
   },
 })
 
-const mapEntityToValues = (entity) => {
-  const mappedValues = {
-    ...entity,
-    pdpaConsent: entity.patientPdpaConsent.reduce(
-      (consents, item) =>
-        item.isConsent
-          ? [
-              ...consents,
-              item.pdpaConsentTypeFK,
-            ]
-          : [
-              ...consents,
-            ],
-      [],
-    ),
-  }
-  return {
-    ...mappedValues,
-    nationalityFK: entity.id ? entity.nationalityFK : 173,
-  }
-}
-
-@connect(({ patient, global }) => ({
+@connect(({ patient, global, clinicSettings }) => ({
   patient,
   global,
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
 @withFormikExtend({
   authority: [
@@ -91,26 +71,6 @@ const mapEntityToValues = (entity) => {
   ],
   enableReinitialize: false,
   mapPropsToValues: ({ patient }) => {
-    // const mappedValues = {
-    //   ...(patient.entity || patient.default),
-    //   pdpaConsent: (patient.entity || patient.default).patientPdpaConsent
-    //     .reduce(
-    //       (consents, item) =>
-    //         item.isConsent
-    //           ? [
-    //               ...consents,
-    //               item.pdpaConsentTypeFK,
-    //             ]
-    //           : [
-    //               ...consents,
-    //             ],
-    //       [],
-    //     ),
-    // }
-    // return {
-    //   ...mappedValues,
-    //   nationalityFK: patient.entity ? patient.entity.nationalityFK : 173,
-    // }
     return mapEntityToValues(patient.entity || patient.default)
   },
   validationSchema: schema,
@@ -119,78 +79,14 @@ const mapEntityToValues = (entity) => {
     const { props, resetForm } = component
     const { dispatch, history, patient, onConfirm } = props
     const { location } = history
-    const shouldCloseForm = location.pathname
-      ? !location.pathname.includes('patientdb')
-      : false
 
-    const cfg = {
-      message: 'Patient profile saved.',
-    }
-    dispatch({
-      type: 'patient/upsert',
-      payload: {
-        ...values,
-        patientScheme: values.patientScheme.map((ps) => {
-          if (ps.isDeleted)
-            return {
-              ...ps,
-              schemeTypeFK: ps.schemeTypeFK || ps.preSchemeTypeFK,
-            }
-          return ps
-        }),
-        cfg,
-      },
-    }).then((r) => {
-      dispatch({
-        type: 'patient/updateState',
-        payload: {
-          shouldQueryOnClose: location.pathname.includes('patientdb'),
-        },
-      })
-      if (r) {
-        // POST request -> r.id === true
-        // PUT request -> r.id === false
-        if (r.id) {
-          if (!patient.callback) {
-            history.push(
-              getRemovedUrl(
-                [
-                  'new',
-                ],
-                getAppendUrl({
-                  pid: r.id,
-                }),
-              ),
-            )
-          }
-        }
-        dispatch({
-          type: 'patient/query',
-          payload: {
-            id: r.id || values.id,
-          },
-        }).then((response) => {
-          if (patient.callback) patient.callback(r.id)
-          const newEntity = mapEntityToValues(response)
-          resetForm(newEntity)
-        })
-
-        if (onConfirm && shouldCloseForm) {
-          onConfirm()
-        }
-
-        // if (!shouldCloseForm) {
-        //   dispatch({
-        //     type: 'patientSearch/query',
-        //     payload: {
-        //       sorting: [
-        //         // { columnName: 'isActive', direction: 'asc' },
-        //         { columnName: 'name', direction: 'asc' },
-        //       ],
-        //     },
-        //   })
-        // }
-      }
+    upsertPatient({
+      values,
+      history,
+      dispatch,
+      patient,
+      resetForm,
+      onConfirm,
     })
   },
   displayName: 'PatientDetail',
@@ -206,6 +102,7 @@ class PatientDetail extends PureComponent {
 
   constructor (props) {
     super(props)
+    let schemas = schema(props)
     this.widgets = [
       {
         id: '1',
@@ -214,7 +111,7 @@ class PatientDetail extends PureComponent {
           'patientdatabase.newpatient',
           'patientdatabase.patientprofiledetails',
         ],
-        schema: schema.demographic,
+        schema: schemas.demographic,
         component: Loadable({
           loader: () => import('./Demographics'),
           render: (loaded, p) => {
@@ -231,7 +128,7 @@ class PatientDetail extends PureComponent {
           'patientdatabase.newpatient',
           'patientdatabase.patientprofiledetails',
         ],
-        schema: schema.emergencyContact,
+        schema: schemas.emergencyContact,
         component: Loadable({
           loader: () => import('./EmergencyContact'),
           render: (loaded, p) => {
@@ -239,7 +136,7 @@ class PatientDetail extends PureComponent {
             return (
               <Cmpnet
                 schema={
-                  schema.emergencyContact.patientEmergencyContact._subType
+                  schemas.emergencyContact.patientEmergencyContact._subType
                 }
                 {...p}
               />
@@ -255,12 +152,12 @@ class PatientDetail extends PureComponent {
           'patientdatabase.newpatient',
           'patientdatabase.patientprofiledetails',
         ],
-        schema: schema.allergies,
+        schema: schemas.allergies,
         component: Loadable({
           loader: () => import('./Allergies'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet schema={schema.allergies} {...p} />
+            return <Cmpnet schema={schemas.allergies} {...p} />
           },
           loading: Loading,
         }),
@@ -272,12 +169,12 @@ class PatientDetail extends PureComponent {
           'patientdatabase.newpatient',
           'patientdatabase.patientprofiledetails',
         ],
-        schema: schema.schemes,
+        schema: schemas.schemes,
         component: Loadable({
           loader: () => import('./Schemes'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet schema={schema.schemes} {...p} />
+            return <Cmpnet schema={schemas.schemes} {...p} />
           },
           loading: Loading,
         }),
@@ -384,10 +281,25 @@ class PatientDetail extends PureComponent {
     this.setState({ showReplacementModal: false })
 
   validatePatient = async () => {
-    const { handleSubmit, dispatch, values } = this.props
-
-    if (values.patientAccountNo === undefined || values.patientAccountNo === '')
+    const { handleSubmit, dispatch, values, validateForm } = this.props
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        disableSave: true,
+      },
+    })
+    if (
+      values.patientAccountNo === undefined ||
+      values.patientAccountNo === ''
+    ) {
+      dispatch({
+        type: 'global/updateState',
+        payload: {
+          disableSave: false,
+        },
+      })
       return handleSubmit()
+    }
 
     const search = {
       eql_patientAccountNo: values.patientAccountNo,
@@ -414,6 +326,12 @@ class PatientDetail extends PureComponent {
       }
     }
     if (shouldPromptSaveConfirmation) {
+      dispatch({
+        type: 'global/updateState',
+        payload: {
+          disableSave: false,
+        },
+      })
       return dispatch({
         type: 'global/updateAppState',
         payload: {
@@ -425,6 +343,15 @@ class PatientDetail extends PureComponent {
             <h3 style={{ marginTop: 0 }}>Do you wish to proceed?</h3>
           ),
           onConfirmSave: handleSubmit,
+        },
+      })
+    }
+    const isFormValid = await validateForm()
+    if (!_.isEmpty(isFormValid)) {
+      dispatch({
+        type: 'global/updateState',
+        payload: {
+          disableSave: false,
         },
       })
     }
@@ -443,6 +370,35 @@ class PatientDetail extends PureComponent {
         hasActiveSession: data.length > 0,
       }
     })
+  }
+
+  onActiveStatusChanged = async (status) => {
+    const { setFieldValue, dispatch, values } = this.props
+    const { effectiveStartDate, effectiveEndDate } = values
+
+    const { selectedMenu } = this.state
+
+    if (status === true) {
+      await setFieldValue('effectiveStartDate', moment().formatUTC())
+      await setFieldValue('effectiveEndDate', moment('2099-12-31').formatUTC())
+    } else {
+      await setFieldValue('effectiveEndDate', moment().formatUTC())
+    }
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        disableSave: true,
+      },
+    })
+
+    this.setState({ selectedMenu: undefined })
+    const response = await upsertPatient(this.props)
+    if (response === false) {
+      // reset Effective Date
+      await setFieldValue('effectiveStartDate', effectiveStartDate)
+      await setFieldValue('effectiveEndDate', effectiveEndDate)
+    }
+    this.setState({ selectedMenu })
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
@@ -478,15 +434,15 @@ class PatientDetail extends PureComponent {
       footer,
       ...resetProps
     } = this.props
-
     const { hasActiveSession } = this.state
 
     const { patient, global, resetForm, values, dispatch } = resetProps
     if (!patient) return null
     const { currentComponent, currentId, menuErrors, entity } = patient
+    const patientIsActiveOrCreating = !entity || entity.isActive
 
     const isCreatingPatient = entity
-      ? Object.prototype.hasOwnProperty.call(entity, 'id')
+      ? Object.prototype.hasOwnProperty.call(entity, 'id') && entity.isActive
       : false
 
     const currentMenu =
@@ -494,6 +450,13 @@ class PatientDetail extends PureComponent {
         (o) => o.id === (this.state.selectedMenu || currentComponent),
       ) || {}
     const CurrentComponent = currentMenu.component
+    const currentItemDisabled =
+      [
+        '1',
+        '2',
+        '3',
+        '4',
+      ].includes(currentMenu.id) && !patientIsActiveOrCreating
 
     return (
       <Authorized
@@ -506,7 +469,12 @@ class PatientDetail extends PureComponent {
           <GridItem xs={12} sm={12} md={2}>
             <Card profile>
               <CardBody profile>
-                <PatientInfoSideBanner entity={entity} {...this.props} />
+                <PatientInfoSideBanner
+                  allowChangePatientStatus
+                  onActiveStatusChange={this.onActiveStatusChanged}
+                  entity={entity}
+                  {...this.props}
+                />
                 <MenuList>
                   {this.widgets
                     .filter(
@@ -602,7 +570,13 @@ class PatientDetail extends PureComponent {
                   )
                 }
               >
-                <CurrentComponent {...resetProps} />
+                <Authorized.Context.Provider
+                  value={{
+                    rights: currentItemDisabled ? 'disable' : 'enable', //
+                  }}
+                >
+                  <CurrentComponent {...resetProps} />
+                </Authorized.Context.Provider>
               </div>
             </CardContainer>
 
@@ -627,7 +601,9 @@ class PatientDetail extends PureComponent {
                     },
                   })
                 },
-                onConfirm: this.validatePatient,
+                onConfirm: patientIsActiveOrCreating
+                  ? this.validatePatient
+                  : undefined,
                 confirmBtnText: 'Save',
               })}
             </div>

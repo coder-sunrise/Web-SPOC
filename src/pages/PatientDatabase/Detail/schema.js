@@ -10,7 +10,7 @@ getCodes('ctSchemeType').then((codetableData) => {
 })
 
 // prettier-ignore
-const _multiples = [2,7,6,5,4,3,2]
+const _multiples = [2, 7, 6, 5, 4, 3, 2]
 Yup.addMethod(Yup.string, 'NRIC', function (message) {
   return this.test('isValidNRIC', message, function (value = '') {
     const { parent, createError } = this
@@ -25,27 +25,21 @@ Yup.addMethod(Yup.string, 'NRIC', function (message) {
       case 4: // SO
         if (firstChar === 'F')
           // prettier-ignore
-          outputChars = ['X','W','U','T','R','Q','P','N','M','L','K']
+          outputChars = ['X', 'W', 'U', 'T', 'R', 'Q', 'P', 'N', 'M', 'L', 'K']
         else if (firstChar === 'G')
           // prettier-ignore
-          outputChars = ['R','Q','P','N','M','L','K','X','W','U','T']
+          outputChars = ['R', 'Q', 'P', 'N', 'M', 'L', 'K', 'X', 'W', 'U', 'T']
         break
-      // case 5:
-      // case 6:
-      // case 10:
-      // case 11:
-      // case 12:
-      // case 13: // nric
 
       case 1: // SP
       case 2: // SH
       case 3: // SB
         if (firstChar === 'S')
           // prettier-ignore
-          outputChars = ['J','Z','I','H','G','F','E','D','C','B','A']
+          outputChars = ['J', 'Z', 'I', 'H', 'G', 'F', 'E', 'D', 'C', 'B', 'A']
         else if (firstChar === 'T')
           // prettier-ignore
-          outputChars = ['G','F','E','D','C','B','A','J','Z','I','H']
+          outputChars = ['G', 'F', 'E', 'D', 'C', 'B', 'A', 'J', 'Z', 'I', 'H']
         break
 
       default:
@@ -83,12 +77,6 @@ Yup.addMethod(Yup.string, 'NRIC', function (message) {
       const mDob = moment(dob)
 
       switch (typeFK) {
-        // case 5:
-        // case 6:
-        // case 10:
-        // case 11:
-        // case 12:
-        // case 13:
         //   // nric
         case 1: // SP
         case 2: // SH
@@ -128,10 +116,6 @@ const schemaDemographic = {
   genderFK: Yup.number().required(),
   nationalityFK: Yup.number().required(),
   referredBy: Yup.string(),
-  // referralRemarks: Yup.string().when('referredBy', {
-  //   is: 'Company',
-  //   then: Yup.string().required(),
-  // }),
   referralCompanyReferenceNo: Yup.string().when('referredBy', {
     is: 'Company',
     then: Yup.string().required(),
@@ -140,22 +124,11 @@ const schemaDemographic = {
     is: (value) => value === 'Patient',
     then: Yup.number().required(),
   }),
-  // dialect: Yup.string().required(),
-  // contact.mobileContactNumber.number:Yup.string().render(),
   contact: Yup.object().shape({
-    // contactAddress: Yup.array().compact((v) => v.isDeleted).of(
-    //   Yup.object().shape({
-    //     postcode: Yup.number().required(),
-    //     countryFK: Yup.string().required(),
-    //   }),
-    // ),
     contactEmailAddress: Yup.object().shape({
       emailAddress: Yup.string().email(),
     }),
-    mobileContactNumber: Yup.object().shape({
-      number: Yup.string().required(),
-      countryCodeFK: Yup.string().required(),
-    }),
+    mobileContactNumber: null,
   }),
 }
 
@@ -204,8 +177,6 @@ const schemaSchemes = {
         // accountNumber: Yup.string().required(),
         coPaymentSchemeFK: Yup.number().when('schemeTypeFK', {
           is: (val) => {
-            // return false
-
             return (
               val ===
               schemeTypes.find((o) => o.code.toUpperCase() === 'CORPORATE').id
@@ -228,10 +199,8 @@ const schemaSchemes = {
 
             const isCorporate = st.id === 15
             return notMedisaveOrPhpc && !isCorporate
-          }, // val === undefined,
+          },
           then: Yup.array().of(Yup.date()).required().min(2),
-          // otherwise: null,
-          // otherwise: Yup.array().of(Yup.date().min(2)),
         }),
       }),
     ),
@@ -245,16 +214,47 @@ const schemaSchemes = {
     }),
   ),
 }
-const schema = Yup.object().shape({
-  ...schemaDemographic,
-  ...schemaEmergencyContact,
-  ...schemaAllergies,
-  ...schemaSchemes,
-})
+const schema = (props) => {
+  const { clinicSettings } = props
+  if (!clinicSettings.isNationalityMandatoryInRegistration) {
+    schemaDemographic.nationalityFK = Yup.number()
+  }
+  else {
+    schemaDemographic.nationalityFK = Yup.number().required()
+  }
+  if (!clinicSettings.isContactNoMandatoryInRegistration) {
+    schemaDemographic.contact = Yup.object().shape({
+      contactEmailAddress: Yup.object().shape({
+        emailAddress: Yup.string().email(),
+      }),
+      mobileContactNumber: Yup.object().shape({
+        number: Yup.string(),
+        countryCodeFK: Yup.string(),
+      }),
+    })
+  }
+  else {
+    schemaDemographic.contact = Yup.object().shape({
+      contactEmailAddress: Yup.object().shape({
+        emailAddress: Yup.string().email(),
+      }),
+      mobileContactNumber: Yup.object().shape({
+        number: Yup.string().required(),
+        countryCodeFK: Yup.string().required(),
+      }),
+    })
+  }
+  const patientDatabaseSchema = Yup.object().shape({
+    ...schemaDemographic,
+    ...schemaEmergencyContact,
+    ...schemaAllergies,
+    ...schemaSchemes,
+  })
 
-schema.demographic = schemaDemographic
-schema.schemes = schemaSchemes
-schema.allergies = schemaAllergies
-schema.emergencyContact = schemaEmergencyContact
-
-export default schema
+  patientDatabaseSchema.demographic = schemaDemographic
+  patientDatabaseSchema.schemes = schemaSchemes
+  patientDatabaseSchema.allergies = schemaAllergies
+  patientDatabaseSchema.emergencyContact = schemaEmergencyContact
+  return patientDatabaseSchema
+}
+export default schema  
