@@ -62,7 +62,7 @@ const statementSchema = Yup.object().shape({
         if (onConfirm) {
           onConfirm()
         }
-        notification.success({ message: 'Extracted success' })
+        notification.success({ message: 'Transfer invoice success.' })
       }
     })
   },
@@ -79,7 +79,7 @@ class ExtractAsSingle extends PureComponent {
       { name: 'copayerFK', title: (<div>Co-Payer<sup>1</sup></div>) },
       { name: 'isTransferToExistingStatement', title: ' ' },
       {
-        name: 'transferToStatementFK', title: () => (<div>Statement No.<sup>2</sup></div>),
+        name: 'transferToStatementFK', title: 'Statement No.',
       },
     ],
     columnExtensions: [
@@ -225,7 +225,7 @@ class ExtractAsSingle extends PureComponent {
                   payload: { disableSave: disableSaveButton },
                 })
               }}
-              label='Transfer invoice(s) to an existing statement'
+              label='Transfer invoice(s) to existing statement'
             />
           </p>
           <EditableTableGrid
