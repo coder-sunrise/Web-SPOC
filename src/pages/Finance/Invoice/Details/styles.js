@@ -28,4 +28,9 @@ export default (theme) => ({
     top: 0,
     right: 0,
   },
+  editInvoiceButton: {
+    position: 'absolute',
+    top: 0,
+    right: 170,
+  },
 })
