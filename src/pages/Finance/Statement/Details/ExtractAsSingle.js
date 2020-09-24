@@ -76,9 +76,11 @@ class ExtractAsSingle extends PureComponent {
       { name: 'invoiceNo', title: 'Invoice No.' },
       { name: 'invoiceDate', title: 'Invoice Date' },
       { name: 'invoiceAmt', title: 'Invoice Amount' },
-      { name: 'copayerFK', title: 'Co-Payer' },
+      { name: 'copayerFK', title: (<div>Co-Payer<sup>1</sup></div>) },
       { name: 'isTransferToExistingStatement', title: ' ' },
-      { name: 'transferToStatementFK', title: 'Statement No.' },
+      {
+        name: 'transferToStatementFK', title: () => (<div>Statement No.<sup>2</sup></div>),
+      },
     ],
     columnExtensions: [
       {
@@ -181,8 +183,11 @@ class ExtractAsSingle extends PureComponent {
       values,
     } = props
     const { rows } = values
-    let statementNoCol = columnExtensions.find(t => t.columnName === 'transferToStatementFK')
-    statementNoCol.disabled = !transferToExistingStatement
+    let statementNoExtCol = columnExtensions.find(t => t.columnName === 'transferToStatementFK')
+    statementNoExtCol.disabled = !transferToExistingStatement
+
+    let statementNoCol = columns.find(t => t.name === 'transferToStatementFK')
+    statementNoCol.title = transferToExistingStatement ? (<div>Statement No.<sup>2</sup></div>) : (<div>Statement No.</div>)
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(2), marginTop: 0 }}>
@@ -236,14 +241,14 @@ class ExtractAsSingle extends PureComponent {
             style={{ margin: theme.spacing(1), marginLeft: 0, marginRight: 0 }}
           >
             <i>
-              Changing the co-payer will update co-payer in patient invoice.
+              <sup>1</sup>&nbsp;Changing the co-payer will update co-payer in patient invoice.
             </i>
           </p>
           <p
-            style={{ margin: theme.spacing(1), marginLeft: 0, marginRight: 0 }}
+            style={{ margin: theme.spacing(1), display: this.state.transferToExistingStatement ? 'block' : 'none', marginLeft: 0, marginRight: 0 }}
           >
             <i>
-              Statement No. will display latest 5 unpaid statement only.
+              <sup>2</sup>&nbsp;Statement No. will display latest 5 unpaid statement only.
             </i>
           </p>
         </div>
