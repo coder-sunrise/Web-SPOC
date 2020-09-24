@@ -9,7 +9,10 @@ class PatientGrid extends PureComponent {
   configs = {
     columns: [
       { name: 'visitDate', title: 'Visit Date' },
-      { name: 'doctorName', title: 'Doctor' },
+      {
+        name: 'doctorProfileFKNavigation.ClinicianProfile.Name',
+        title: 'Doctor',
+      },
       { name: 'serviceName', title: 'Service Name' },
       { name: 'caseTypeDisplayValue', title: 'Case Type' },
       { name: 'caseDescriptionDisplayValue', title: 'Case Description' },
@@ -19,6 +22,16 @@ class PatientGrid extends PureComponent {
     ],
     columnExtensions: [
       { columnName: 'visitDate', type: 'date' },
+      {
+        columnName: 'doctorProfileFKNavigation.ClinicianProfile.Name',
+        render: (row) => {
+          return (
+            <Tooltip title={row.doctorName}>
+              <span>{row.doctorName}</span>
+            </Tooltip>
+          )
+        },
+      },
       {
         columnName: 'action',
         sortingEnabled: false,
