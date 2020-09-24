@@ -177,6 +177,7 @@ const FilterBar = (props) => {
             content={
               <Paper className={classes.container}>
                 <FilterTemplateTooltip
+                  visible={showFilterTemplate}
                   filterByDoctor={values.filterByDoctor}
                   filterByApptType={values.filterByApptType}
                   handleFilterTemplate={handleFilterTemplate}

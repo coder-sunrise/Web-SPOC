@@ -13,6 +13,7 @@ import {
   NumberInput,
   SizeContainer,
   Field,
+  Select,
 } from '@/components'
 // medisys components
 import { DoctorProfileSelect } from '@/components/_medisys'
@@ -82,6 +83,33 @@ const FilterBar = ({ handleSubmit, values, isSubmitting }) => {
           <GridItem md={4} />
           <GridItem md={2}>
             <FastField
+              name='patientStatus'
+              render={(args) => (
+                <Select
+                  {...args}
+                  label='Status'
+                  options={[
+                    {
+                      name: 'All',
+                      value: 'all',
+                    },
+                    {
+                      name: 'Active',
+                      value: 'active',
+                    },
+                    {
+                      name: 'Inactive',
+                      value: 'inactive',
+                    },
+                  ]}
+                  labelField='name'
+                  valueField='value'
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem md={2}>
+            <FastField
               name='doctorIDs'
               render={(args) => (
                 <DoctorProfileSelect
@@ -99,7 +127,7 @@ const FilterBar = ({ handleSubmit, values, isSubmitting }) => {
               )}
             />
           </GridItem>
-          <GridItem md={3}>
+          <GridItem md={1}>
             <FastField
               name='isGroupByDoctor'
               render={(args) => <Checkbox {...args} label='Group By Doctor' />}
