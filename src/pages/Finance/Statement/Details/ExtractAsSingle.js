@@ -237,20 +237,22 @@ class ExtractAsSingle extends PureComponent {
             FuncProps={{ pager: false }}
             EditingProps={{ onCommitChanges: this.handleCommitChanges }}
           />
-          <p
-            style={{ margin: theme.spacing(1), marginLeft: 0, marginRight: 0 }}
-          >
-            <i>
-              <sup>1</sup>&nbsp;Changing the co-payer will update co-payer in patient invoice.
-            </i>
-          </p>
-          <p
-            style={{ margin: theme.spacing(1), display: this.state.transferToExistingStatement ? 'block' : 'none', marginLeft: 0, marginRight: 0 }}
-          >
-            <i>
-              <sup>2</sup>&nbsp;Statement No. will display latest 5 unpaid statement only.
-            </i>
-          </p>
+          <div style={{ height: 42 }}>
+            <p
+              style={{ margin: theme.spacing(1), marginLeft: 0, marginRight: 0 }}
+            >
+              <i>
+                <sup>1</sup>&nbsp;Changing the co-payer will update co-payer in patient invoice.
+              </i>
+            </p>
+            <p
+              style={{ margin: theme.spacing(1), display: this.state.transferToExistingStatement ? 'block' : 'none', marginLeft: 0, marginRight: 0 }}
+            >
+              <i>
+                <sup>2</sup>&nbsp;Statement No. will display latest 5 unpaid statement only.
+              </i>
+            </p>
+          </div>
         </div>
         {footer &&
           rows.length > 0 &&
