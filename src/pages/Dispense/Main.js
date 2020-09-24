@@ -180,6 +180,7 @@ class Main extends Component {
         (prevState) => {
           return {
             showOrderModal: !prevState.showOrderModal,
+            isFirstAddOrder: true,
           }
         },
         () => {
@@ -316,6 +317,7 @@ class Main extends Component {
       (prevState) => {
         return {
           showOrderModal: !prevState.showOrderModal,
+          isFirstAddOrder: false,
         }
       },
       () => {
@@ -450,6 +452,7 @@ class Main extends Component {
         >
           <AddOrder
             visitType={values.visitPurposeFK}
+            isFirstLoad={this.state.isFirstAddOrder}
             onReloadClick={() => {
               reloadDispense(this.props)
             }}

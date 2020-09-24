@@ -376,6 +376,8 @@ class PatientDetail extends PureComponent {
     const { setFieldValue, dispatch, values } = this.props
     const { effectiveStartDate, effectiveEndDate } = values
 
+    const { selectedMenu } = this.state
+
     if (status === true) {
       await setFieldValue('effectiveStartDate', moment().formatUTC())
       await setFieldValue('effectiveEndDate', moment('2099-12-31').formatUTC())
@@ -389,12 +391,14 @@ class PatientDetail extends PureComponent {
       },
     })
 
+    this.setState({ selectedMenu: undefined })
     const response = await upsertPatient(this.props)
     if (response === false) {
       // reset Effective Date
       await setFieldValue('effectiveStartDate', effectiveStartDate)
       await setFieldValue('effectiveEndDate', effectiveEndDate)
     }
+    this.setState({ selectedMenu })
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
