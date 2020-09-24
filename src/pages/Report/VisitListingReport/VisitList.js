@@ -25,6 +25,7 @@ class VisitList extends PureComponent {
       { name: 'invoiceNo', title: 'Invoice No.' },
       { name: 'doctorName', title: 'Doctor' },
       { name: 'diagnosis', title: 'Diagnosis' },
+      { name: 'visitRemarks', title: 'Remarks' },
     ]
 
     const VisitListingColumnsExtensions = [
@@ -55,6 +56,7 @@ class VisitList extends PureComponent {
           )
         },
       },
+      { columnName: 'visitRemarks', sortingEnabled: false, width: 180 },
     ]
     const SummaryRow = (p) => {
       const { children } = p
