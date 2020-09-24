@@ -361,6 +361,8 @@ class PastMedication extends PureComponent {
         return {
           type,
           adjAmount: 0,
+          adjType: 'ExactAmount',
+          adjValue: 0,
           expiryDate: itemExpiryDate,
           batchNo: itemBatchNo,
           corPrescriptionItemInstruction: itemInstructions,
@@ -452,6 +454,8 @@ class PastMedication extends PureComponent {
           unitPrice: vaccination.sellingPrice,
           totalPrice,
           adjAmount: 0.0,
+          adjType: 'ExactAmount',
+          adjValue: 0,
           totalAfterItemAdjustment: totalPrice,
           sequence: currentSequence,
           expiryDate: defaultBatch ? defaultBatch.expiryDate : undefined,

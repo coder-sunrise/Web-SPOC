@@ -9,12 +9,7 @@ import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 import AddAlert from '@material-ui/icons/AddAlert'
-import { formatMessage } from 'umi/locale'
-// sub components
-import TableData from './TableData'
-import VaccinationGrid from './VaccinationGrid'
-import DrugLabelSelection from './DrugLabelSelection'
-// common component
+import { formatMessage } from 'umi/locale' // common component
 import {
   Button,
   ProgressButton,
@@ -26,6 +21,14 @@ import {
   Field,
   CommonModal,
 } from '@/components'
+import AmountSummary from '@/pages/Shared/AmountSummary'
+import Authorized from '@/utils/Authorized'
+import { VISIT_TYPE } from '@/utils/constants'
+import { dangerColor } from '@/assets/jss'
+// sub components
+import TableData from './TableData'
+import VaccinationGrid from './VaccinationGrid'
+import DrugLabelSelection from './DrugLabelSelection'
 // variables
 import {
   PrescriptionColumns,
@@ -35,12 +38,9 @@ import {
   OtherOrdersColumns,
   OtherOrdersColumnExtensions,
 } from '../variables'
-import AmountSummary from '@/pages/Shared/AmountSummary'
-import Authorized from '@/utils/Authorized'
-import { VISIT_TYPE } from '@/utils/constants'
+
 import CONSTANTS from './constants'
 
-import { dangerColor } from '@/assets/jss'
 // const styles = (theme) => ({
 //   gridRow: {
 //     margin: `${theme.spacing.unit}px 0px`,
@@ -380,7 +380,7 @@ const DispenseDetails = ({
             />
           </Paper>
         </GridItem>
-        <GridItem xs={8} md={9}>
+        <GridItem xs={8} md={8} style={{ marginTop: -14 }}>
           <TextField
             value={visitRemarks}
             disabled
@@ -391,21 +391,23 @@ const DispenseDetails = ({
           />
         </GridItem>
         {!viewOnly && (
-          <GridItem xs={4} md={3}>
-            <AmountSummary
-              rows={invoiceItem}
-              adjustments={invoiceAdjustment}
-              showAddAdjustment={!isBillFirstVisit}
-              config={{
-                isGSTInclusive: invoice.isGSTInclusive,
-                totalField: 'totalAfterItemAdjustment',
-                adjustedField: 'totalAfterOverallAdjustment',
-                gstField: 'totalAfterGST',
-                gstAmtField: 'gstAmount',
-                gstValue: invoice.gstValue,
-              }}
-              onValueChanged={updateInvoiceData}
-            />
+          <GridItem xs={4} md={4}>
+            <div style={{ paddingRight: 90 }}>
+              <AmountSummary
+                rows={invoiceItem}
+                adjustments={invoiceAdjustment}
+                showAddAdjustment={!isBillFirstVisit}
+                config={{
+                  isGSTInclusive: invoice.isGSTInclusive,
+                  totalField: 'totalAfterItemAdjustment',
+                  adjustedField: 'totalAfterOverallAdjustment',
+                  gstField: 'totalAfterGST',
+                  gstAmtField: 'gstAmount',
+                  gstValue: invoice.gstValue,
+                }}
+                onValueChanged={updateInvoiceData}
+              />
+            </div>
           </GridItem>
         )}
       </GridContainer>

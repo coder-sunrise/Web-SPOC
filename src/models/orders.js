@@ -6,6 +6,9 @@ import { getUniqueId, maxReducer, calculateAmount } from '@/utils/utils'
 
 const sharedMedicationValue = {
   // quantity: 0,
+  isMinus: true,
+  adjValue: 0,
+  isExactAmount: true,
   corPrescriptionItemPrecaution: [
     {
       precaution: '',
@@ -38,13 +41,25 @@ const initialState = {
   },
   defaultService: {
     unitPrice: 0,
+    isMinus: true,
+    adjValue: 0,
+    isExactAmount: true,
   },
   defaultVaccination: {
     vaccinationGivenDate: moment(),
     quantity: 1,
     unitPrice: 0,
+    isMinus: true,
+    adjValue: 0,
+    isExactAmount: true,
   },
-  defaultConsumable: { quantity: 1 },
+  defaultConsumable: {
+    quantity: 1,
+    unitPrice: 0,
+    isMinus: true,
+    adjValue: 0,
+    isExactAmount: true,
+  },
   defaultOrderSet: {
     orderSetItems: [],
   },

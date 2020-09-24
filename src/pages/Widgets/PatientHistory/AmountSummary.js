@@ -69,6 +69,7 @@ const AmountSummary = ({
               dispatch={dispatch}
               amountProps={amountProps}
               {...v}
+              theme={theme}
             />
           )
         }

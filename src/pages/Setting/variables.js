@@ -266,4 +266,10 @@ export const menuData = [
     text: 'Referral Source',
     url: '/setting/referralsource',
   },
+  {
+    authority: 'settings.clinicsetting.package',
+    title: 'Clinic Setting',
+    text: 'Package',
+    url: '/setting/package',
+  },
 ]

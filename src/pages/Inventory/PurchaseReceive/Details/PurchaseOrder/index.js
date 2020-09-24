@@ -65,7 +65,7 @@ const styles = (theme) => ({
       .compact((x) => x.isDeleted)
       .required('At least one item is required.'),
   }),
-  handleSubmit: () => { },
+  handleSubmit: () => {},
 })
 class Index extends Component {
   state = {
@@ -284,7 +284,7 @@ class Index extends Component {
           },
           purchaseOrderItemAdjustment: poAdjustment.purchaseOrderItemAdjustment,
         }
-      }) 
+      })
     } else if (type === 'dup') {
       newPurchaseOrderStatusFK = PURCHASE_ORDER_STATUS.DRAFT
       delete purchaseOrder.id
@@ -317,8 +317,8 @@ class Index extends Component {
           },
           purchaseOrderItemAdjustment: poAdjustment.purchaseOrderItemAdjustment,
         }
-      }) 
-    } else { 
+      })
+    } else {
       if (!isSaveAction) {
         newPurchaseOrderStatusFK = purchaseOrderStatusFK
       } else if (purchaseOrderStatusFK === PURCHASE_ORDER_STATUS.COMPLETED) {
@@ -354,7 +354,7 @@ class Index extends Component {
               poAdjustment.purchaseOrderItemAdjustment,
           }
         } else {
-          x.totalAfterGST = x.totalAfterGst 
+          x.totalAfterGST = x.totalAfterGst
           result = {
             ...x,
           }
@@ -582,52 +582,54 @@ class Index extends Component {
           }}
         > */}
         <GridContainer>
-          <GridItem xs={2} md={9} />
-          <GridItem xs={10} md={3}>
-            <AmountSummary
-              rows={rows}
-              adjustments={purchaseOrderAdjustment}
-              config={{
-                isGSTInclusive: isGstInclusive,
-                itemFkField: 'purchaseOrderItemFK',
-                itemAdjustmentFkField: 'purchaseOrderAdjustmentFK',
-                invoiceItemAdjustmentField: 'purchaseOrderItemAdjustment',
-                totalField: 'totalPrice',
-                adjustedField: 'totalAfterAdjustments',
-                gstField: 'totalAfterGst',
-                gstAmtField: 'itemLevelGST',
-                gstValue: currentGstValue,
-              }}
-              onValueChanged={(v) => {
-                setFieldValue('purchaseOrder.totalAmount', v.summary.total)
-                setFieldValue(
-                  'purchaseOrder.totalAfterAdj',
-                  v.summary.totalAfterAdj,
-                )
-                setFieldValue(
-                  'purchaseOrder.totalAftGst',
-                  v.summary.totalWithGST,
-                )
-                setFieldValue(
-                  'purchaseOrder.gstAmount',
-                  Math.round(v.summary.gst * 100) / 100,
-                )
+          <GridItem xs={2} md={8} />
+          <GridItem xs={10} md={4}>
+            <div style={{ paddingRight: 22 }}>
+              <AmountSummary
+                rows={rows}
+                adjustments={purchaseOrderAdjustment}
+                config={{
+                  isGSTInclusive: isGstInclusive,
+                  itemFkField: 'purchaseOrderItemFK',
+                  itemAdjustmentFkField: 'purchaseOrderAdjustmentFK',
+                  invoiceItemAdjustmentField: 'purchaseOrderItemAdjustment',
+                  totalField: 'totalPrice',
+                  adjustedField: 'totalAfterAdjustments',
+                  gstField: 'totalAfterGst',
+                  gstAmtField: 'itemLevelGST',
+                  gstValue: currentGstValue,
+                }}
+                onValueChanged={(v) => {
+                  setFieldValue('purchaseOrder.totalAmount', v.summary.total)
+                  setFieldValue(
+                    'purchaseOrder.totalAfterAdj',
+                    v.summary.totalAfterAdj,
+                  )
+                  setFieldValue(
+                    'purchaseOrder.totalAftGst',
+                    v.summary.totalWithGST,
+                  )
+                  setFieldValue(
+                    'purchaseOrder.gstAmount',
+                    Math.round(v.summary.gst * 100) / 100,
+                  )
 
-                setFieldValue(
-                  'purchaseOrderAdjustment',
-                  v.adjustments.map((a) => {
-                    return {
-                      sequence: a.index + 1,
-                      ...a,
-                    }
-                  }),
-                )
-                setFieldValue(
-                  'purchaseOrder.isGstInclusive',
-                  v.summary.isGSTInclusive,
-                )
-              }}
-            />
+                  setFieldValue(
+                    'purchaseOrderAdjustment',
+                    v.adjustments.map((a) => {
+                      return {
+                        sequence: a.index + 1,
+                        ...a,
+                      }
+                    }),
+                  )
+                  setFieldValue(
+                    'purchaseOrder.isGstInclusive',
+                    v.summary.isGSTInclusive,
+                  )
+                }}
+              />
+            </div>
           </GridItem>
         </GridContainer>
         {/* </AuthorizedContext.Provider> */}
@@ -642,22 +644,22 @@ class Index extends Component {
           {poStatus !== PURCHASE_ORDER_STATUS.COMPLETED && (
             <div>
               {poStatus !== PURCHASE_ORDER_STATUS.CANCELLED &&
-                deliveryOrder.length === 0 &&
-                purchaseOrderPayment.length === 0 &&
-                type === 'edit' ? (
-                  <ProgressButton
-                    color='danger'
-                    icon={null}
-                    onClick={() =>
-                      this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
-                  >
-                    {formatMessage({
-                      id: 'inventory.pr.detail.pod.cancelpo',
-                    })}
-                  </ProgressButton>
-                ) : (
-                  ''
-                )}
+              deliveryOrder.length === 0 &&
+              purchaseOrderPayment.length === 0 &&
+              type === 'edit' ? (
+                <ProgressButton
+                  color='danger'
+                  icon={null}
+                  onClick={() =>
+                    this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
+                >
+                  {formatMessage({
+                    id: 'inventory.pr.detail.pod.cancelpo',
+                  })}
+                </ProgressButton>
+              ) : (
+                ''
+              )}
 
               <ProgressButton
                 color='primary'
@@ -683,8 +685,8 @@ class Index extends Component {
                   })}
                 </ProgressButton>
               ) : (
-                  ''
-                )}
+                ''
+              )}
               {isPOStatusDraft(poStatus) && type !== 'new' && type !== 'dup' ? (
                 <ProgressButton
                   color='success'
@@ -697,8 +699,8 @@ class Index extends Component {
                   })}
                 </ProgressButton>
               ) : (
-                  ''
-                )}
+                ''
+              )}
             </div>
           )}
 
