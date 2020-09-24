@@ -175,8 +175,8 @@ const Templates = ({
                 renderDropdown={(o) => {
                   return (
                     <span>
-                      {o.templateName}
                       <font color='red'>{o.isFavorite ? ' * ' : ''}</font>
+                      {o.templateName}
                     </span>
                   )
                 }}
