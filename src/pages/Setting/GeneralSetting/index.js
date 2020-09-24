@@ -210,7 +210,6 @@ class GeneralSetting extends PureComponent {
       values,
       ...restProps
     } = this.props
-    console.log(values)
     const { hasActiveSession, autoPrintOnSignOff, autoPrintOnCompletePayment } = this.state
     return (
       <React.Fragment>
