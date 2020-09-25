@@ -388,7 +388,6 @@ class GeneralSetting extends PureComponent {
               <Field
                 name='autoPrintReportsOnSignOff.settingValue'
                 render={(args) => {
-                  console.log(args)
                   return (
                     <CheckboxGroup
                       valueField='code'
