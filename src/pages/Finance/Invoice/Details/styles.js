@@ -28,6 +28,13 @@ export default (theme) => ({
     top: 0,
     right: 0,
   },
+  overTextEllipsis: {
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+    display: 'inline-block',
+    width: '100%',
+    overflow: 'hidden',
+  },
   editInvoiceButton: {
     position: 'absolute',
     top: 0,

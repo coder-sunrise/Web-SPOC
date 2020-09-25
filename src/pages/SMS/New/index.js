@@ -21,6 +21,45 @@ import {
   timeFormatSmallCase,
 } from '@/components'
 
+const templateTags = [
+  {
+    name: '@PatientName',
+    replace: (contents, { patientName = '' }) => {
+      return contents.replaceAll(/@PatientName/g, patientName)
+    },
+  },
+  {
+    name: '@AppointmentDateTime',
+    replace: (contents, { appointmentDateTime = '' }) => {
+      return contents.replaceAll(/@AppointmentDateTime/g, appointmentDateTime)
+    },
+  },
+  {
+    name: '@Doctor',
+    replace: (contents, { doctor = '' }) => {
+      return contents.replaceAll(/@Doctor/g, doctor)
+    },
+  },
+  {
+    name: '@NewLine',
+    replace: (contents) => {
+      return contents.replaceAll(/@NewLine/g, '\n')
+    },
+  },
+  {
+    name: '@PatientCallingName',
+    replace: (contents, { patientCallingName = '' }) => {
+      return contents.replaceAll(/@PatientCallingName/g, patientCallingName)
+    },
+  },
+  {
+    name: '@LastVisitDate',
+    replace: (contents, { lastVisitDate = '' }) => {
+      return contents.replaceAll(/@LastVisitDate/g, lastVisitDate)
+    },
+  },
+]
+
 const New = ({
   values,
   errors,
@@ -154,6 +193,13 @@ export default compose(
           lastVisitDate = '',
         } = selectedItem
 
+        const appointmentDateTime = `${moment(upcomingAppointmentDate).format(
+          dateFormatLong,
+        )} ${moment(
+          upcomingAppointmentStartTime,
+          timeFormat24HourWithSecond,
+        ).format(timeFormatSmallCase)}`
+
         const {
           smsPatient: smsPat,
           smsAppointment: smsAppt,
@@ -167,27 +213,13 @@ export default compose(
           appointmentFK = undefined
         }
         let formattedContent = content
-        formattedContent = formattedContent.replace(
-          /@PatientName/g,
-          patientName,
-        )
-        formattedContent = formattedContent.replace(
-          /@AppointmentDateTime/g,
-          `${moment(upcomingAppointmentDate).format(dateFormatLong)} ${moment(
-            upcomingAppointmentStartTime,
-            timeFormat24HourWithSecond,
-          ).format(timeFormatSmallCase)}`,
-        )
-        formattedContent = formattedContent.replace(/@Doctor/g, doctor)
-        formattedContent = formattedContent.replace(/@NewLine/g, '\n')
-        formattedContent = formattedContent.replace(
-          /@PatientCallingName/g,
-          callingName,
-        )
-        formattedContent = formattedContent.replace(
-          /@LastVisitDate/g,
-          moment(lastVisitDate).format(dateFormatLong),
-        )
+        templateTags.map((m) => {
+          formattedContent = m.replace(formattedContent, {
+            ...selectedItem,
+            appointmentDateTime,
+          })
+        })
+
         const tempObject = {
           ...restValues,
           content: formattedContent,

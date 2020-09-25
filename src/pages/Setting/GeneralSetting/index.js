@@ -148,6 +148,8 @@ const styles = (theme) => ({
 class GeneralSetting extends PureComponent {
   state = {
     hasActiveSession: false,
+    autoPrintOnSignOff: false,
+    autoPrintOnCompletePayment: false,
   }
 
   componentDidMount = () => {
@@ -171,6 +173,33 @@ class GeneralSetting extends PureComponent {
     })
   }
 
+  autoPrintOnSignOffChanged = (checked, e) => {
+    const { values } = this.props
+    if (!checked) {
+      const { autoPrintReportsOnSignOff } = values
+      autoPrintReportsOnSignOff.settingValue = []
+    }
+    this.setState(() => {
+      return {
+        autoPrintOnSignOff: !checked,
+      }
+    })
+
+  }
+
+  autoPrintOnCompletePaymentChanged = (checked, e) => {
+    const { values } = this.props
+    if (!checked) {
+      const { autoPrintReportsOnCompletePayment } = values
+      autoPrintReportsOnCompletePayment.settingValue = []
+    }
+    this.setState(() => {
+      return {
+        autoPrintOnCompletePayment: !checked,
+      }
+    })
+  }
+
   render () {
     const {
       classes,
@@ -181,7 +210,7 @@ class GeneralSetting extends PureComponent {
       values,
       ...restProps
     } = this.props
-    const { hasActiveSession } = this.state
+    const { hasActiveSession, autoPrintOnSignOff, autoPrintOnCompletePayment } = this.state
     return (
       <React.Fragment>
         {hasActiveSession && (
@@ -281,7 +310,7 @@ class GeneralSetting extends PureComponent {
                 )}
               />
             </GridItem>
-            <GridItem md={2} style={{ margin: 0}}>
+            <GridItem md={2} style={{ margin: 0 }}>
               <Field
                 name='labelPrinterSize.settingValue'
                 render={(args) => (
@@ -295,7 +324,7 @@ class GeneralSetting extends PureComponent {
                 )}
               />
             </GridItem>
-            <GridItem md={2} style={{ margin: 0}}>
+            <GridItem md={2} style={{ margin: 0 }}>
               <Field
                 name='showTotalInvoiceAmtInConsultation.settingValue'
                 render={(args) => (
@@ -348,6 +377,7 @@ class GeneralSetting extends PureComponent {
                     {...args}
                     style={{ marginTop: 0 }}
                     disabled={!!hasActiveSession}
+                    onChange={this.autoPrintOnSignOffChanged}
                   />
                 )}
               />
@@ -362,7 +392,7 @@ class GeneralSetting extends PureComponent {
                     <CheckboxGroup
                       valueField='code'
                       textField='description'
-                      disabled={!!hasActiveSession}
+                      disabled={!!hasActiveSession || autoPrintOnSignOff}
                       options={ReportsOnSignOff}
                       noUnderline
                       {...args}
@@ -384,6 +414,7 @@ class GeneralSetting extends PureComponent {
                     {...args}
                     style={{ marginTop: 0 }}
                     disabled={!!hasActiveSession}
+                    onChange={this.autoPrintOnCompletePaymentChanged}
                   />
                 )}
               />
@@ -396,7 +427,7 @@ class GeneralSetting extends PureComponent {
                 render={(args) => {
                   return (
                     <CheckboxGroup
-                      disabled={!!hasActiveSession}
+                      disabled={!!hasActiveSession || autoPrintOnCompletePayment}
                       valueField='code'
                       textField='description'
                       options={ReportsOnCompletePayment}

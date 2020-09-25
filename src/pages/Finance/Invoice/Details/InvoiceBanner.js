@@ -29,6 +29,9 @@ const amountProps = {
 const InvoiceBanner = ({ classes, ...restProps }) => {
   const { values, patient = {} } = restProps
   const { entity = {} } = patient
+  const pateintDisplayName = `${values.patientName ||
+    'N/A'} ${values.patientAccountNo || 'N/A'}`
+
   return (
     <CardContainer
       hideHeader
@@ -50,14 +53,20 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
           </GridItem>
           <GridItem md={8}>
             <div style={{ display: 'flex' }}>
-              <h5
-                className={classnames({
-                  [classes.normalText]: true,
-                  [classes.inActiveText]: entity && !entity.isActive,
-                })}
-              >
-                {values.patientName || 'N/A'}&nbsp;({values.patientAccountNo || 'N/A'})
-              </h5>
+              <Tooltip title={pateintDisplayName}>
+                <span
+                  className={classnames({
+                    [classes.normalText]: true,
+                    [classes.overTextEllipsis]: true,
+                    [classes.inActiveText]: entity && !entity.isActive,
+                  })}
+                  style={{
+                    fontWeight: '600',
+                  }}
+                >
+                  {pateintDisplayName}
+                </span>
+              </Tooltip>
               {entity &&
               !entity.isActive && (
                 <Tooltip title='This patient has been inactived.'>
@@ -84,7 +93,7 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
                 text
                 format={dateFormatLong}
                 value={values.invoiceDate}
-              />{' '}
+              />
             </h5>
           </GridItem>
         </GridContainer>

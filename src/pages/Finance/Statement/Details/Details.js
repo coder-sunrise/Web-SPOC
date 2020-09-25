@@ -297,7 +297,7 @@ class Details extends PureComponent {
           <CollectPaymentConfirm />
         </CommonModal>
         <CommonModal
-          title='Statement'
+          title='Transfer Invoice'
           open={showModal}
           maxWidth='md'
           bodyNoPadding
@@ -313,7 +313,7 @@ class Details extends PureComponent {
           onClick={this.handleClick}
           disabled={selectedRows.length <= 0}
         >
-          Extract As Single
+          Transfer Invoice
         </Button>
         <Button
           style={{ marginTop: 10 }}
