@@ -74,8 +74,9 @@ module.exports = {
   },
 
   getLastStatementNo: async (params) => {
-    return request(`${copayerRecentStatementNoUrl}/${params.count}`, {
+    return request(`${copayerRecentStatementNoUrl}`, {
       method: 'GET',
+      body: params,
     })
   },
 }

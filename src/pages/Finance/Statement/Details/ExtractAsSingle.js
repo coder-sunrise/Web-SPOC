@@ -157,11 +157,12 @@ class ExtractAsSingle extends PureComponent {
   }
 
   componentDidMount = () => {
-    const { dispatch } = this.props
+    const { dispatch, statement } = this.props
     dispatch({
       type: 'statement/queryRecentStatementNo',
       payload: {
         count: 5,
+        currentStatementId: statement.entity.id,
       },
     })
   }
