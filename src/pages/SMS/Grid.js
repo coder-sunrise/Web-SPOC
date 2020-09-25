@@ -85,11 +85,6 @@ const Grid = ({
                 >
                   <ForumIcon />
                 </Button>
-                {/* <GridButton
-                  row={tableProps.row}
-                   ontextMenuOptions={options}
-                  onClick={handleMenuItemClick}
-                /> */}
               </div>
             </Tooltip>
           </Authorized>
