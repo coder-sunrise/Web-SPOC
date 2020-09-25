@@ -1,4 +1,6 @@
-import React, { Component } from 'react'
+import React, { Component, useState } from 'react'
+import numeral from 'numeral'
+import config from '@/utils/config'
 // dva
 import { connect } from 'dva'
 import Yup from '@/utils/yup'
@@ -311,14 +313,25 @@ class EditInvoice extends Component {
               {
                 columnName: 'quantity',
                 type: 'number',
-                width: 120,
+                width: 160,
                 disabled: true,
+                render: (row) => {
+                  const { qtyFormat } = config
+                  const { quantity, dispenseUOMDisplayValue = '' } = row
+                  return `${numeral(quantity).format(
+                    qtyFormat,
+                  )} ${dispenseUOMDisplayValue}`
+                },
               },
               {
                 columnName: 'adjAmt',
                 width: 200,
                 isReactComponent: true,
                 render: (currentrow) => {
+                  const [
+                    focused,
+                    setFocused,
+                  ] = useState(false)
                   const { row } = currentrow
                   const index = invoiceItem.map((i) => i.id).indexOf(row.id)
                   return (
@@ -327,6 +340,7 @@ class EditInvoice extends Component {
                         name={`invoiceItem[${index}].isMinus`}
                         render={(args) => (
                           <Switch
+                            style={{ margin: 0 }}
                             checkedChildren='-'
                             unCheckedChildren='+'
                             label=''
@@ -336,15 +350,32 @@ class EditInvoice extends Component {
                               }, 1)
                             }}
                             {...args}
+                            inputProps={{
+                              onMouseUp: (e) => {
+                                if (!focused) {
+                                  setFocused(true)
+                                  e.target.click()
+                                }
+                              },
+                            }}
                           />
                         )}
                       />
-                      <div style={{ marginLeft: -34, marginRight: 8 }}>
+                      <div
+                        style={{
+                          marginLeft: -24,
+                          marginRight: 10,
+                        }}
+                      >
                         {row.isExactAmount ? (
                           <Field
                             name={`invoiceItem[${index}].adjValue`}
                             render={(args) => (
                               <NumberInput
+                                style={{
+                                  marginBottom: 0,
+                                  marginTop: 0,
+                                }}
                                 currency
                                 label=''
                                 onChange={() => {
@@ -355,6 +386,14 @@ class EditInvoice extends Component {
                                 min={0}
                                 precision={2}
                                 {...args}
+                                inputProps={{
+                                  onMouseUp: (e) => {
+                                    if (!focused) {
+                                      setFocused(true)
+                                      e.target.focus()
+                                    }
+                                  },
+                                }}
                               />
                             )}
                           />
@@ -363,6 +402,10 @@ class EditInvoice extends Component {
                             name={`invoiceItem[${index}].adjValue`}
                             render={(args) => (
                               <NumberInput
+                                style={{
+                                  marginBottom: 0,
+                                  marginTop: 0,
+                                }}
                                 percentage
                                 max={100}
                                 label=''
@@ -374,6 +417,14 @@ class EditInvoice extends Component {
                                 min={0}
                                 precision={2}
                                 {...args}
+                                inputProps={{
+                                  onMouseUp: (e) => {
+                                    if (!focused) {
+                                      setFocused(true)
+                                      e.target.focus()
+                                    }
+                                  },
+                                }}
                               />
                             )}
                           />
@@ -383,7 +434,11 @@ class EditInvoice extends Component {
                         name={`invoiceItem[${index}].isExactAmount`}
                         render={(args) => (
                           <Switch
-                            style={{ marginRight: -40 }}
+                            style={{
+                              marginRight: -30,
+                              marginBottom: 0,
+                              marginTop: 0,
+                            }}
                             checkedChildren='$'
                             unCheckedChildren='%'
                             label=''
@@ -393,6 +448,14 @@ class EditInvoice extends Component {
                               }, 1)
                             }}
                             {...args}
+                            inputProps={{
+                              onMouseUp: (e) => {
+                                if (!focused) {
+                                  setFocused(true)
+                                  e.target.click()
+                                }
+                              },
+                            }}
                           />
                         )}
                       />
@@ -413,8 +476,7 @@ class EditInvoice extends Component {
             schema={itemSchema}
             FuncProps={{ pager: false }}
             EditingProps={{
-              showAddCommand: false,
-              showDeleteCommand: false,
+              showCommandColumn: false,
               onCommitChanges: this.handleCommitChanges,
             }}
           />

@@ -272,15 +272,20 @@ const Scheme = ({
                 size='sm'
                 FuncProps={{ pager: false }}
                 EditingProps={{
-                  showAddCommand: false,
-                  showDeleteCommand: false,
+                  showCommandColumn: false,
                   onCommitChanges,
                 }}
                 columns={
                   payerTypeFK === INVOICE_PAYER_TYPE.SCHEME ? (
-                    SchemeInvoicePayerColumn
+                    [
+                      ...SchemeInvoicePayerColumn,
+                      { name: 'error', title: ' ' },
+                    ]
                   ) : (
-                    CompanyInvoicePayerColumn
+                    [
+                      ...CompanyInvoicePayerColumn,
+                      { name: 'error', title: ' ' },
+                    ]
                   )
                 }
                 columnExtensions={columnExtensions}
