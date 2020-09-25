@@ -29,12 +29,15 @@ const amountProps = {
 const InvoiceBanner = ({ classes, ...restProps }) => {
   const { values, patient = {} } = restProps
   const { entity = {} } = patient
+  const pateintDisplayName = `${values.patientName ||
+    'N/A'} ${values.patientAccountNo || 'N/A'}`
+  const patientIsActive = entity && entity.isActive
   return (
     <CardContainer
       hideHeader
       size='sm'
       style={
-        entity && !entity.isActive ? (
+        !patientIsActive ? (
           {
             backgroundColor: 'lightYellow',
           }
@@ -50,16 +53,21 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
           </GridItem>
           <GridItem md={8}>
             <div style={{ display: 'flex' }}>
-              <h5
-                className={classnames({
-                  [classes.normalText]: true,
-                  [classes.inActiveText]: entity && !entity.isActive,
-                })}
-              >
-                {values.patientName || 'N/A'}&nbsp;({values.patientAccountNo || 'N/A'})
-              </h5>
-              {entity &&
-              !entity.isActive && (
+              <Tooltip title={pateintDisplayName}>
+                <span
+                  className={classnames({
+                    [classes.normalText]: true,
+                    [classes.overTextEllipsis]: true,
+                    [classes.inActiveText]: !patientIsActive,
+                  })}
+                  style={{
+                    fontWeight: '600',
+                  }}
+                >
+                  {pateintDisplayName}
+                </span>
+              </Tooltip>
+              {!patientIsActive && (
                 <Tooltip title='This patient has been inactived.'>
                   <Warining
                     color='error'
@@ -84,7 +92,7 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
                 text
                 format={dateFormatLong}
                 value={values.invoiceDate}
-              />{' '}
+              />
             </h5>
           </GridItem>
         </GridContainer>
