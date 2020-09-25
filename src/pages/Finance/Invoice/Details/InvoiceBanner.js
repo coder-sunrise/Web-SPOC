@@ -31,13 +31,13 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
   const { entity = {} } = patient
   const pateintDisplayName = `${values.patientName ||
     'N/A'} ${values.patientAccountNo || 'N/A'}`
-  const patientIsActive = entity && entity.isActive
+
   return (
     <CardContainer
       hideHeader
       size='sm'
       style={
-        !patientIsActive ? (
+        entity && !entity.isActive ? (
           {
             backgroundColor: 'lightYellow',
           }
@@ -58,7 +58,7 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
                   className={classnames({
                     [classes.normalText]: true,
                     [classes.overTextEllipsis]: true,
-                    [classes.inActiveText]: !patientIsActive,
+                    [classes.inActiveText]: entity && !entity.isActive,
                   })}
                   style={{
                     fontWeight: '600',
@@ -67,7 +67,8 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
                   {pateintDisplayName}
                 </span>
               </Tooltip>
-              {!patientIsActive && (
+              {entity &&
+              !entity.isActive && (
                 <Tooltip title='This patient has been inactived.'>
                   <Warining
                     color='error'
