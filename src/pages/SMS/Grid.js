@@ -11,7 +11,7 @@ import MarkunreadIcon from '@material-ui/icons/Markunread'
 // common components
 import { GridContextMenuButton as GridButton } from 'medisys-components'
 
-import { CommonTableGrid, Tooltip, CommonModal } from '@/components'
+import { CommonTableGrid, Tooltip, CommonModal, Button } from '@/components'
 // medisys components
 import Authorized from '@/utils/Authorized'
 import MessageListing from './Reminder/MessageListing'
@@ -68,52 +68,28 @@ const Grid = ({
     setSelectedRows(selection)
   }
 
-  const handleContextMenuClick = (recordRow, id) => {
-    setRecipient(recordRow)
-    switch (id) {
-      case '0':
-        setShowMessageModal(true)
-        break
-      default:
-        break
-    }
-  }
-
   const Cell = React.memo(({ ...tableProps }) => {
-    const handleMenuItemClick = (row, id) => {
-      handleContextMenuClick(row, id)
-    }
-
-    const defaultContextMenuOptions = [
-      {
-        id: 0,
-        label: 'View SMS History',
-        Icon: ForumIcon,
-      },
-      // {
-      //   id: 1,
-      //   label: 'Mark as Read',
-      //   Icon: DraftsIcon,
-      // },
-      // {
-      //   id: 1,
-      //   label: 'Mark as Unread',
-      //   Icon: MarkunreadIcon,
-      // },
-    ]
-    const options = defaultContextMenuOptions
-
     if (tableProps.column.name === 'Action') {
       return (
         <Table.Cell {...tableProps}>
           <Authorized authority='sms.viewsms'>
-            <Tooltip title='More Actions' placement='bottom'>
+            <Tooltip title='View SMS History' placement='bottom'>
               <div style={{ display: 'inline-block' }}>
-                <GridButton
+                <Button
+                  justIcon
+                  color='primary'
+                  onClick={() => {
+                    setRecipient(tableProps.row)
+                    setShowMessageModal(true)
+                  }}
+                >
+                  <ForumIcon />
+                </Button>
+                {/* <GridButton
                   row={tableProps.row}
-                  contextMenuOptions={options}
+                   ontextMenuOptions={options}
                   onClick={handleMenuItemClick}
-                />
+                /> */}
               </div>
             </Tooltip>
           </Authorized>
