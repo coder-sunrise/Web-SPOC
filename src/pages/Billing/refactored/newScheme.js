@@ -277,15 +277,9 @@ const Scheme = ({
                 }}
                 columns={
                   payerTypeFK === INVOICE_PAYER_TYPE.SCHEME ? (
-                    [
-                      ...SchemeInvoicePayerColumn,
-                      { name: 'error', title: ' ' },
-                    ]
+                    SchemeInvoicePayerColumn
                   ) : (
-                    [
-                      ...CompanyInvoicePayerColumn,
-                      { name: 'error', title: ' ' },
-                    ]
+                    CompanyInvoicePayerColumn
                   )
                 }
                 columnExtensions={columnExtensions}
