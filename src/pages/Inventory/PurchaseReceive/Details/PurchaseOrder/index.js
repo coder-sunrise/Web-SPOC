@@ -643,9 +643,10 @@ class Index extends Component {
         >
           {poStatus !== PURCHASE_ORDER_STATUS.COMPLETED && (
             <div>
-              {poStatus !== PURCHASE_ORDER_STATUS.CANCELLED &&
+              {poStatus <= PURCHASE_ORDER_STATUS.FINALIZED &&
               deliveryOrder.length === 0 &&
               purchaseOrderPayment.length === 0 &&
+              !isWriteOff &&
               type === 'edit' && (
                 <ProgressButton
                   color='danger'
