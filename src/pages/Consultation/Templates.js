@@ -66,7 +66,7 @@ const Templates = ({
 
   const updateTemplate = () => {
     if (onSaveTemplate) onSaveTemplate()
-    let tempName = list.find(x => x.cesId === currentId).name
+    let tempName = list.find((x) => x.cesId === currentId).name
     dispatch({
       type: 'cestemplate/update',
       payload: currentId,
@@ -80,7 +80,7 @@ const Templates = ({
           type: 'cestemplate/query',
         }).then((x) => {
           if (x) {
-            let newCES = x.find(t => t.name === tempName)
+            let newCES = x.find((t) => t.name === tempName)
             if (newCES) {
               setCurrentId(newCES.cesId)
             }

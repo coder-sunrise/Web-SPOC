@@ -144,6 +144,7 @@ class AutoPrintSelection extends React.PureComponent {
                     showAddCommand: false,
                     showDeleteCommand: false,
                     onCommitChanges: this.handleCommitChanges,
+                    showCommandColumn: false,
                   }}
                   schema={validationSchema}
                 />

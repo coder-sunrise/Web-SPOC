@@ -352,21 +352,21 @@ class CollectPaymentConfirm extends PureComponent {
               />
             </GridItem>
 
-              <GridItem>
-                <Field
-                  name='paymentModeFK'
-                  render={(args) => (
-                    <CodeSelect
-                      {...args}
-                      label='Payment Mode'
-                      code='ctPaymentMode'
-                      labelField='displayValue'
-                      localFilter={(item) => item.code !== 'DEPOSIT'}
-                      onChange={(e, op = {}) => this.onChangePaymentMode(e, op)}
-                    />
-                  )}
-                />
-              </GridItem>
+            <GridItem>
+              <Field
+                name='paymentModeFK'
+                render={(args) => (
+                  <CodeSelect
+                    {...args}
+                    label='Payment Mode'
+                    code='ctPaymentMode'
+                    labelField='displayValue'
+                    localFilter={(item) => item.code !== 'DEPOSIT'}
+                    onChange={(e, op = {}) => this.onChangePaymentMode(e, op)}
+                  />
+                )}
+              />
+            </GridItem>
 
             {isCardPayment && (
               <React.Fragment>

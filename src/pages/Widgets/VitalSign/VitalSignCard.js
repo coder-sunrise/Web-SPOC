@@ -137,7 +137,7 @@ export default ({
               />
             )}
           />
-        </GridItem> 
+        </GridItem>
         <GridItem xs={11} sm={4} md={3}>
           <FastField
             name={`corPatientNoteVitalSign[${index}].bmi`}

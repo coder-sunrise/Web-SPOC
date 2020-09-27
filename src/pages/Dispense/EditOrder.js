@@ -156,18 +156,18 @@ class EditOrder extends Component {
   }
 
   signOrder = async () => {
-    const { values, validateForm, handleSubmit } = this.props
+    const { values, validateForm, handleSubmit, forms } = this.props
+    if (forms.rows.filter((o) => o.statusFK === 1 && !o.isDeleted).length > 0) {
+      notification.warning({
+        message: `Draft forms found, please finalize it before save.`,
+      })
+      return
+    }
     const isFormValid = await validateForm()
     if (!_.isEmpty(isFormValid)) {
       handleSubmit()
     } else {
-      const {
-        consultationDocument,
-        orders,
-        dispatch,
-        dispense,
-        forms,
-      } = this.props
+      const { consultationDocument, orders, dispatch, dispense } = this.props
       const payload = convertToConsultation(values, {
         consultationDocument,
         orders,

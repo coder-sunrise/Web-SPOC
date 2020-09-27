@@ -196,7 +196,11 @@ class Adjustment extends PureComponent {
                 render={(args) => {
                   return (
                     <Switch
-                      style={{ width: 50, display: 'inline-block' }}
+                      style={{
+                        width: 50,
+                        display: 'inline-block',
+                        marginTop: theme.spacing(2.5),
+                      }}
                       checkedChildren='-'
                       unCheckedChildren='+'
                       label=''
@@ -256,7 +260,11 @@ class Adjustment extends PureComponent {
                 render={(args) => {
                   return (
                     <Switch
-                      style={{ width: 50, display: 'inline-block' }}
+                      style={{
+                        width: 50,
+                        display: 'inline-block',
+                        marginTop: theme.spacing(2.5),
+                      }}
                       checkedChildren='$'
                       unCheckedChildren='%'
                       label=''

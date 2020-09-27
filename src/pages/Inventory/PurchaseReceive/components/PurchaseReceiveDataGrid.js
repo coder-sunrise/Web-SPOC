@@ -50,6 +50,7 @@ const PurchaseReceiveDataGrid = ({
       style={{ margin: 0 }}
       type='purchaseReceiveList'
       selection={selectedRows}
+      forceRender
       // onSelectionChange={(selection) => setSelectedRows(selection)}
       onSelectionChange={handleOnSelectionChange}
       columns={PurchaseReceiveGridCol}

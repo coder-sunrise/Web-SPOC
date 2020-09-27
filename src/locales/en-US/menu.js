@@ -157,6 +157,7 @@ export default {
   'menu.setting.casetype': 'Case Type',
   'menu.setting.casedescription': 'Case Description',
   'menu.setting.refractiontesttype': 'Refraction Test Type',
+  'menu.setting.package': 'Package',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',

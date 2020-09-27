@@ -582,52 +582,54 @@ class Index extends Component {
           }}
         > */}
         <GridContainer>
-          <GridItem xs={2} md={9} />
-          <GridItem xs={10} md={3}>
-            <AmountSummary
-              rows={rows}
-              adjustments={purchaseOrderAdjustment}
-              config={{
-                isGSTInclusive: isGstInclusive,
-                itemFkField: 'purchaseOrderItemFK',
-                itemAdjustmentFkField: 'purchaseOrderAdjustmentFK',
-                invoiceItemAdjustmentField: 'purchaseOrderItemAdjustment',
-                totalField: 'totalPrice',
-                adjustedField: 'totalAfterAdjustments',
-                gstField: 'totalAfterGst',
-                gstAmtField: 'itemLevelGST',
-                gstValue: currentGstValue,
-              }}
-              onValueChanged={(v) => {
-                setFieldValue('purchaseOrder.totalAmount', v.summary.total)
-                setFieldValue(
-                  'purchaseOrder.totalAfterAdj',
-                  v.summary.totalAfterAdj,
-                )
-                setFieldValue(
-                  'purchaseOrder.totalAftGst',
-                  v.summary.totalWithGST,
-                )
-                setFieldValue(
-                  'purchaseOrder.gstAmount',
-                  Math.round(v.summary.gst * 100) / 100,
-                )
+          <GridItem xs={2} md={8} />
+          <GridItem xs={10} md={4}>
+            <div style={{ paddingRight: 22 }}>
+              <AmountSummary
+                rows={rows}
+                adjustments={purchaseOrderAdjustment}
+                config={{
+                  isGSTInclusive: isGstInclusive,
+                  itemFkField: 'purchaseOrderItemFK',
+                  itemAdjustmentFkField: 'purchaseOrderAdjustmentFK',
+                  invoiceItemAdjustmentField: 'purchaseOrderItemAdjustment',
+                  totalField: 'totalPrice',
+                  adjustedField: 'totalAfterAdjustments',
+                  gstField: 'totalAfterGst',
+                  gstAmtField: 'itemLevelGST',
+                  gstValue: currentGstValue,
+                }}
+                onValueChanged={(v) => {
+                  setFieldValue('purchaseOrder.totalAmount', v.summary.total)
+                  setFieldValue(
+                    'purchaseOrder.totalAfterAdj',
+                    v.summary.totalAfterAdj,
+                  )
+                  setFieldValue(
+                    'purchaseOrder.totalAftGst',
+                    v.summary.totalWithGST,
+                  )
+                  setFieldValue(
+                    'purchaseOrder.gstAmount',
+                    Math.round(v.summary.gst * 100) / 100,
+                  )
 
-                setFieldValue(
-                  'purchaseOrderAdjustment',
-                  v.adjustments.map((a) => {
-                    return {
-                      sequence: a.index + 1,
-                      ...a,
-                    }
-                  }),
-                )
-                setFieldValue(
-                  'purchaseOrder.isGstInclusive',
-                  v.summary.isGSTInclusive,
-                )
-              }}
-            />
+                  setFieldValue(
+                    'purchaseOrderAdjustment',
+                    v.adjustments.map((a) => {
+                      return {
+                        sequence: a.index + 1,
+                        ...a,
+                      }
+                    }),
+                  )
+                  setFieldValue(
+                    'purchaseOrder.isGstInclusive',
+                    v.summary.isGSTInclusive,
+                  )
+                }}
+              />
+            </div>
           </GridItem>
         </GridContainer>
         {/* </AuthorizedContext.Provider> */}

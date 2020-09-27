@@ -317,6 +317,7 @@ export const QueueColumnExtensions = [
     columnName: 'doctor',
     compare: compareDoctor,
     render: (row) => <DoctorLabel doctor={row.doctor} hideMCR />,
+    width: 150,
   },
   {
     columnName: 'visitOrderTemplate',

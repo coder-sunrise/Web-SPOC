@@ -581,6 +581,7 @@ class EditableTableGrid extends PureComponent {
           deleteCommand: 'Delete',
           cancelCommand: 'Cancel',
         },
+        showCommandColumn = true,
         // EditCell = DefaultEditCell,
       } = {},
       extraColumn,
@@ -623,17 +624,21 @@ class EditableTableGrid extends PureComponent {
                 // if (col) {
                 //   col.fixed = 'right'
                 // }
-                const cols = [
-                  ...tableColumns.filter(
-                    (c) => c.type !== TableEditColumn.COLUMN_TYPE,
-                  ),
-                  {
-                    key: 'editCommand',
-                    type: TableEditColumn.COLUMN_TYPE,
-                    fixed: 'right',
-                    width: 75,
-                  },
-                ]
+                let cols = tableColumns.filter(
+                  (c) => c.type !== TableEditColumn.COLUMN_TYPE,
+                )
+
+                if (showCommandColumn) {
+                  cols = [
+                    ...cols,
+                    {
+                      key: 'editCommand',
+                      type: TableEditColumn.COLUMN_TYPE,
+                      fixed: 'right',
+                      width: 75,
+                    },
+                  ]
+                }
                 // console.log(cols)
                 return cols
               }}

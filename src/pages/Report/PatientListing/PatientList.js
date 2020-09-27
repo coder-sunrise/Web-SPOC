@@ -1,26 +1,19 @@
 import React, { PureComponent } from 'react'
-import {
-  IntegratedSummary,
-} from '@devexpress/dx-react-grid'
+import { IntegratedSummary } from '@devexpress/dx-react-grid'
 // common components
-import {
-  Table,
-} from '@devexpress/dx-react-grid-material-ui'
+import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { ReportDataGrid } from '@/components/_medisys'
 
 class PatientList extends PureComponent {
   render () {
     let listData = []
     const { reportDatas } = this.props
-    if (!reportDatas)
-      return null
+    if (!reportDatas) return null
     if (reportDatas && reportDatas.PatientListSummary) {
-      listData = reportDatas.PatientListSummary.map(
-        (item, index) => ({
-          ...item,
-          id: `PatientListSummary-${index}-${item.patientReferenceNo}`,
-        }),
-      )
+      listData = reportDatas.PatientListSummary.map((item, index) => ({
+        ...item,
+        id: `PatientListSummary-${index}-${item.patientReferenceNo}`,
+      }))
     }
     const PatientListingColumns = [
       { name: 'patientReferenceNo', title: 'Reference No.' },
@@ -51,8 +44,11 @@ class PatientList extends PureComponent {
     ]
     const SummaryRow = (p) => {
       const { children } = p
-      let countCol = children.find((c) => { 
-        return c.props.tableColumn.column && c.props.tableColumn.column.name === 'patientReferenceNo'
+      let countCol = children.find((c) => {
+        return (
+          c.props.tableColumn.column &&
+          c.props.tableColumn.column.name === 'patientReferenceNo'
+        )
       })
       if (countCol) {
         const newChildren = [
@@ -104,7 +100,11 @@ class PatientList extends PureComponent {
       },
     }
 
-    if (reportDatas.PatientListDetails && reportDatas.PatientListDetails.length > 0 && reportDatas.PatientListDetails[0].isGroupByDoctor) {
+    if (
+      reportDatas.PatientListDetails &&
+      reportDatas.PatientListDetails.length > 0 &&
+      reportDatas.PatientListDetails[0].isGroupByDoctor
+    ) {
       FuncProps = {
         ...FuncProps,
         summary: true,

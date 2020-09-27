@@ -507,6 +507,8 @@ export default compose(
                 retailPrescriptionItemDrugMixture = [],
               } = retailPrescriptionItem
               obj = {
+                adjType: o.adjType,
+                adjValue: o.adjValue,
                 itemCode: o.drugCode,
                 itemName: o.isDrugMixture
                   ? getDrugMixtureName(o.corPrescriptionItemDrugMixture)
@@ -568,6 +570,8 @@ export default compose(
                 (c) => c.serviceCenter_ServiceId === o.serviceCenterServiceFK,
               )
               obj = {
+                adjType: o.adjType,
+                adjValue: o.adjValue,
                 itemCode: o.serviceCode,
                 itemName: o.serviceName,
                 subTotal: roundTo(o.total),
@@ -597,6 +601,8 @@ export default compose(
               const { retailConsumable, ...restValues } = o
               obj = {
                 invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.CONSUMABLE,
+                adjType: o.adjType,
+                adjValue: o.adjValue,
                 itemCode: o.consumableCode,
                 itemName: o.consumableName,
                 subTotal: roundTo(o.totalPrice),
