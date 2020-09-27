@@ -74,7 +74,7 @@ const ApptDuration = ({ row, columnConfig, cellProps }) => {
             onMouseUp: (e) => {
               if (!focused) {
                 setFocused(true)
-                e.target.click()
+                if (typeof e.target.click === 'function') e.target.click()
               }
             },
           }}
@@ -112,7 +112,7 @@ const ApptDuration = ({ row, columnConfig, cellProps }) => {
             onMouseUp: (e) => {
               if (!focused) {
                 setFocused(true)
-                e.target.click()
+                if (typeof e.target.click === 'function') e.target.click()
               }
             },
           }}
