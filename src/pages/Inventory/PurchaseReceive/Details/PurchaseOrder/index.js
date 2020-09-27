@@ -14,9 +14,11 @@ import {
   notification,
 } from '@/components'
 import { ReportViewer } from '@/components/_medisys'
-import POForm from './POForm'
-import POGrid from './POGrid'
 import { calculateItemLevelAdjustment } from '@/utils/utils'
+import { podoOrderType } from '@/utils/codes'
+import { INVOICE_STATUS, PURCHASE_ORDER_STATUS } from '@/utils/constants'
+import AuthorizedContext from '@/components/Context/Authorized'
+import AmountSummary from '@/pages/Shared/AmountSummary'
 import {
   isPOStatusDraft,
   poSubmitAction,
@@ -26,10 +28,8 @@ import {
   enableSaveButton,
   getAccessRight,
 } from '../../variables'
-import { podoOrderType } from '@/utils/codes'
-import { INVOICE_STATUS, PURCHASE_ORDER_STATUS } from '@/utils/constants'
-import AuthorizedContext from '@/components/Context/Authorized'
-import AmountSummary from '@/pages/Shared/AmountSummary'
+import POGrid from './POGrid'
+import POForm from './POForm'
 
 const styles = (theme) => ({
   errorMsgStyle: {
@@ -65,7 +65,7 @@ const styles = (theme) => ({
       .compact((x) => x.isDeleted)
       .required('At least one item is required.'),
   }),
-  handleSubmit: () => { },
+  handleSubmit: () => {},
 })
 class Index extends Component {
   state = {
@@ -284,7 +284,7 @@ class Index extends Component {
           },
           purchaseOrderItemAdjustment: poAdjustment.purchaseOrderItemAdjustment,
         }
-      }) 
+      })
     } else if (type === 'dup') {
       newPurchaseOrderStatusFK = PURCHASE_ORDER_STATUS.DRAFT
       delete purchaseOrder.id
@@ -317,8 +317,8 @@ class Index extends Component {
           },
           purchaseOrderItemAdjustment: poAdjustment.purchaseOrderItemAdjustment,
         }
-      }) 
-    } else { 
+      })
+    } else {
       if (!isSaveAction) {
         newPurchaseOrderStatusFK = purchaseOrderStatusFK
       } else if (purchaseOrderStatusFK === PURCHASE_ORDER_STATUS.COMPLETED) {
@@ -354,7 +354,7 @@ class Index extends Component {
               poAdjustment.purchaseOrderItemAdjustment,
           }
         } else {
-          x.totalAfterGST = x.totalAfterGst 
+          x.totalAfterGST = x.totalAfterGst
           result = {
             ...x,
           }
@@ -642,22 +642,21 @@ class Index extends Component {
           {poStatus !== PURCHASE_ORDER_STATUS.COMPLETED && (
             <div>
               {poStatus !== PURCHASE_ORDER_STATUS.CANCELLED &&
-                deliveryOrder.length === 0 &&
-                purchaseOrderPayment.length === 0 &&
-                type === 'edit' ? (
-                  <ProgressButton
-                    color='danger'
-                    icon={null}
-                    onClick={() =>
-                      this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
-                  >
-                    {formatMessage({
-                      id: 'inventory.pr.detail.pod.cancelpo',
-                    })}
-                  </ProgressButton>
-                ) : (
-                  ''
-                )}
+              deliveryOrder.length === 0 &&
+              purchaseOrderPayment.length === 0 &&
+              type === 'edit' && (
+                <ProgressButton
+                  color='danger'
+                  icon={null}
+                  authority='none'
+                  onClick={() =>
+                    this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
+                >
+                  {formatMessage({
+                    id: 'inventory.pr.detail.pod.cancelpo',
+                  })}
+                </ProgressButton>
+              )}
 
               <ProgressButton
                 color='primary'
@@ -669,7 +668,7 @@ class Index extends Component {
                   id: 'inventory.pr.detail.pod.save',
                 })}
               </ProgressButton>
-              {!isPOStatusDraft(poStatus) ? (
+              {!isPOStatusDraft(poStatus) && (
                 <ProgressButton
                   color='success'
                   icon={null}
@@ -682,10 +681,10 @@ class Index extends Component {
                     id: 'inventory.pr.detail.pod.complete',
                   })}
                 </ProgressButton>
-              ) : (
-                  ''
-                )}
-              {isPOStatusDraft(poStatus) && type !== 'new' && type !== 'dup' ? (
+              )}
+              {isPOStatusDraft(poStatus) &&
+              type !== 'new' &&
+              type !== 'dup' && (
                 <ProgressButton
                   color='success'
                   icon={null}
@@ -696,9 +695,7 @@ class Index extends Component {
                     id: 'inventory.pr.detail.pod.finalize',
                   })}
                 </ProgressButton>
-              ) : (
-                  ''
-                )}
+              )}
             </div>
           )}
 
