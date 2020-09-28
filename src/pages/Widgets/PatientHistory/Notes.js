@@ -79,7 +79,7 @@ export default ({
       <div
         style={{
           margin: 10,
-          fontSize: '0.875rem',
+          fontSize: '0.85rem',
         }}
       >
         <span>{o.subject}</span>
@@ -110,7 +110,7 @@ export default ({
     <div>
       {current[fieldName] !== undefined ? (
         <div
-          style={{ fontSize: '0.875rem' }}
+          style={{ fontSize: '0.85rem' }}
           className={classes.paragraph}
           dangerouslySetInnerHTML={{ __html: htmlData }}
         />

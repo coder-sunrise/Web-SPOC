@@ -53,6 +53,7 @@ const styles = (theme) => ({
   },
   paragraph: {
     marginLeft: theme.spacing(1),
+    fontSize: '0.85em',
   },
   leftPanel: {
     position: 'sticky',
@@ -375,6 +376,7 @@ class PatientHistory extends Component {
   }
 
   getDetailPanel = (history) => {
+    const { isFullScreen = true } = this.props
     const { visitPurposeFK } = history
     let current = {
       ...history.patientHistoryDetail,
@@ -432,6 +434,7 @@ class PatientHistory extends Component {
                     visitDetails={visitDetails}
                     {...this.props}
                     setFieldValue={this.props.setFieldValue}
+                    isFullScreen={isFullScreen}
                   />
                 ) : (
                   ''

@@ -674,7 +674,7 @@ class Layout extends PureComponent {
               position: 'relative',
             }}
 
-          // onScroll={this.delayedMainDivScroll}
+            // onScroll={this.delayedMainDivScroll}
           >
             <ResponsiveGridLayout {...layoutCfg}>
               {state.currentLayout.widgets.map((id) => {
@@ -768,17 +768,17 @@ class Layout extends PureComponent {
                                       </Tooltip>
                                     </Popconfirm>
                                   ) : (
-                                      <Tooltip title='Delete'>
-                                        <IconButton
-                                          onClick={() => this.removeWidget(id)}
-                                          aria-label='Delete'
-                                          size='small'
-                                          disabled={w.persist}
-                                        >
-                                          <Clear />
-                                        </IconButton>
-                                      </Tooltip>
-                                    )}
+                                    <Tooltip title='Delete'>
+                                      <IconButton
+                                        onClick={() => this.removeWidget(id)}
+                                        aria-label='Delete'
+                                        size='small'
+                                        disabled={w.persist}
+                                      >
+                                        <Clear />
+                                      </IconButton>
+                                    </Tooltip>
+                                  )}
                                 </React.Fragment>
                               )}
                               {state.fullScreenWidget === id && (
@@ -805,6 +805,7 @@ class Layout extends PureComponent {
                           <LoadableComponent
                             {...widgetProps}
                             {...w.restProps}
+                            isFullScreen={state.fullScreenWidget === id}
                           />
                         </SizeContainer>
                       </div>
@@ -993,7 +994,11 @@ class Layout extends PureComponent {
               <LabTrackingDrawer
                 {...widgetProps}
                 patientId={
-                  this.props.visitRegistration.entity ? this.props.visitRegistration.entity.visit.patientProfileFK : undefined
+                  this.props.visitRegistration.entity ? (
+                    this.props.visitRegistration.entity.visit.patientProfileFK
+                  ) : (
+                    undefined
+                  )
                 }
                 onClose={this.toggleLabTrackingDrawer}
               />
