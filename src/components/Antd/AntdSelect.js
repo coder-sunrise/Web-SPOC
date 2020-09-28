@@ -382,8 +382,6 @@ class AntdSelect extends React.PureComponent {
           contentLi.width(adjWidth)
         }
       }
-
-      console.log(antdSel.width(), contentEl.width())
     }
   }
 
