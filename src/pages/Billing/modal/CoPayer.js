@@ -402,6 +402,7 @@ class CoPayer extends Component {
               EditingProps={{
                 showAddCommand: false,
                 showDeleteCommand: false,
+                showCommandColumn: false,
                 onCommitChanges: this.handleCommitChanges,
                 onEditingRowIdsChange: this.handleEditingRowIdsChange,
               }}
