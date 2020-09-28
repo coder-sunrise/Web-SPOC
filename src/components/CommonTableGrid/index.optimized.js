@@ -226,35 +226,37 @@ class CommonTableGrid extends PureComponent {
       }
     }
 
-    this.TableHeaderRow = ({ row, ...restProps }) => (
-      <TableHeaderRow
-        {...restProps}
-        titleComponent={({ children }) => {
-          return (
-            <Tooltip title={children} placement='top'>
-              <div>{children}</div>
-            </Tooltip>
-          )
-        }}
-        sortLabelComponent={({ children, ...p }) => {
-          // console.log({ children, p })
-
-          return (
-            <TableHeaderRow.SortLabel
-              {...p}
-              getMessage={(ps) => {
-                // console.log(ps)
-                return ''
-              }}
-            >
+    this.TableHeaderRow = ({ row, ...restProps }) => {
+      return (
+        <TableHeaderRow
+          {...restProps}
+          titleComponent={({ children }) => {
+            return (
               <Tooltip title={children} placement='top'>
                 <div>{children}</div>
               </Tooltip>
-            </TableHeaderRow.SortLabel>
-          )
-        }}
-      />
-    )
+            )
+          }}
+          sortLabelComponent={({ children, ...p }) => {
+            // console.log({ children, p })
+
+            return (
+              <TableHeaderRow.SortLabel
+                {...p}
+                getMessage={(ps) => {
+                  // console.log(ps)
+                  return ''
+                }}
+              >
+                <Tooltip title={children} placement='top'>
+                  <div>{children}</div>
+                </Tooltip>
+              </TableHeaderRow.SortLabel>
+            )
+          }}
+        />
+      )
+    }
 
     this.defaultFunctionConfig = {
       filter: false,
@@ -392,6 +394,11 @@ class CommonTableGrid extends PureComponent {
           cell: {
             padding: '7px 8px 7px 8px',
             ...cellStyle.cell,
+          },
+        },
+        EditColumn: {
+          headingCell: {
+            borderTop: '1px solid rgba(0, 0, 0, 0.12)',
           },
         },
         TableHeaderCell: {
