@@ -226,37 +226,35 @@ class CommonTableGrid extends PureComponent {
       }
     }
 
-    this.TableHeaderRow = ({ row, ...restProps }) => {
-      return (
-        <TableHeaderRow
-          {...restProps}
-          titleComponent={({ children }) => {
-            return (
+    this.TableHeaderRow = ({ row, ...restProps }) => (
+      <TableHeaderRow
+        {...restProps}
+        titleComponent={({ children }) => {
+          return (
+            <Tooltip title={children} placement='top'>
+              <div>{children}</div>
+            </Tooltip>
+          )
+        }}
+        sortLabelComponent={({ children, ...p }) => {
+          // console.log({ children, p })
+
+          return (
+            <TableHeaderRow.SortLabel
+              {...p}
+              getMessage={(ps) => {
+                // console.log(ps)
+                return ''
+              }}
+            >
               <Tooltip title={children} placement='top'>
                 <div>{children}</div>
               </Tooltip>
-            )
-          }}
-          sortLabelComponent={({ children, ...p }) => {
-            // console.log({ children, p })
-
-            return (
-              <TableHeaderRow.SortLabel
-                {...p}
-                getMessage={(ps) => {
-                  // console.log(ps)
-                  return ''
-                }}
-              >
-                <Tooltip title={children} placement='top'>
-                  <div>{children}</div>
-                </Tooltip>
-              </TableHeaderRow.SortLabel>
-            )
-          }}
-        />
-      )
-    }
+            </TableHeaderRow.SortLabel>
+          )
+        }}
+      />
+    )
 
     this.defaultFunctionConfig = {
       filter: false,
