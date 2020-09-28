@@ -2,9 +2,7 @@ import React from 'react'
 import { withStyles, Divider } from '@material-ui/core'
 import { formatMessage } from 'umi/locale'
 import numeral from 'numeral'
-
-import { GridContainer, GridItem, NumberInput, Checkbox } from '@/components'
-import Adjustment from '@/pages/Shared/AmountSummary/Adjustment'
+import { GridContainer, GridItem, NumberInput, Tooltip } from '@/components'
 
 const amountProps = {
   showZero: true,
@@ -21,15 +19,17 @@ const styles = (theme) => ({
       lineHeight: `${theme.spacing(3)}px`,
     },
   },
+
+  subTitle: {
+    textAlign: 'right',
+    fontWeight: 500,
+  },
 })
 
-const AmountSummary = ({
-  dispatch,
-  classes,
-  theme,
-  invoice = {},
-  adjustments,
-}) => {
+const AmountSummary = ({ classes, theme, invoice = {}, adjustments }) => {
+  const getGST = (gstValue = 0, isGstInclusive = false) =>
+    `${isGstInclusive ? ' Inclusive ' : ''}GST (${gstValue.toFixed(2)}%):`
+
   const {
     invoiceTotal: subTotal,
     invoiceTotalAftGST: totalWithGST,
@@ -40,36 +40,55 @@ const AmountSummary = ({
   return (
     <div className={classes.cls01}>
       <GridContainer style={{ marginBottom: 4 }}>
-        <GridItem xs={6}>
-          <span>Sub Total:</span>
+        <GridItem md={8} xs={8}>
+          <div className={classes.subTitle}>
+            <span>Sub Total:</span>
+          </div>
         </GridItem>
-        <GridItem xs={6}>
+        <GridItem md={4} xs={4}>
           <NumberInput {...amountProps} value={subTotal} />
         </GridItem>
       </GridContainer>
 
       <GridContainer style={{ marginBottom: 4 }}>
-        <GridItem xs={12}>
-          <span>
-            {formatMessage({
-              id: 'inventory.pr.detail.pod.summary.adjustment',
-            })}
-          </span>
+        <GridItem xs={8}>
+          {adjustments.length > 0 && (
+            <div className={classes.subTitle}>
+              <span>
+                {formatMessage({
+                  id: 'inventory.pr.detail.pod.summary.adjustment',
+                })}
+              </span>
+            </div>
+          )}
         </GridItem>
       </GridContainer>
 
       {adjustments.map((v, i) => {
         if (!v.isDeleted) {
           return (
-            <Adjustment
-              hiddenDelete
-              key={v.id || i}
-              index={i}
-              type={v.adjType}
-              dispatch={dispatch}
-              amountProps={amountProps}
-              {...v}
-            />
+            <GridContainer md={12} xs={12}>
+              <GridItem xs={8}>
+                <div
+                  style={{
+                    width: '100%',
+                    overflow: 'hidden',
+                    display: 'inline-block',
+                    textOverflow: 'ellipsis',
+                    wordBreak: 'keep-all',
+                    whiteSpace: 'nowrap',
+                    textAlign: 'right',
+                  }}
+                >
+                  <Tooltip title={v.adjRemark}>
+                    <span>{v.adjRemark}</span>
+                  </Tooltip>
+                </div>
+              </GridItem>
+              <GridItem xs={4}>
+                <NumberInput value={v.adjAmount} {...amountProps} />
+              </GridItem>
+            </GridContainer>
           )
         }
         return null
@@ -77,23 +96,13 @@ const AmountSummary = ({
 
       {gstValue ? (
         <GridContainer>
-          <GridItem xs={6}>
-            <span>{`${numeral(gstValue).format('0.00')}`}% GST:</span>
+          <GridItem md={8} xs={8}>
+            <div className={classes.subTitle}>
+              <span>{getGST(gstValue, isGSTInclusive)}</span>
+            </div>
           </GridItem>
-          <GridItem xs={6}>
+          <GridItem md={4} xs={4}>
             <NumberInput {...amountProps} value={gst} />
-          </GridItem>
-
-          <GridItem xs={12}>
-            <Checkbox
-              style={{ top: 1 }}
-              label={formatMessage({
-                id: 'app.general.inclusiveGST',
-              })}
-              simple
-              checked={isGSTInclusive}
-              disabled
-            />
           </GridItem>
         </GridContainer>
       ) : (
@@ -101,14 +110,16 @@ const AmountSummary = ({
       )}
       <Divider style={{ margin: theme.spacing(1) }} />
       <GridContainer>
-        <GridItem xs={6}>
-          <span>
-            {formatMessage({
-              id: 'inventory.pr.detail.pod.summary.total',
-            })}
-          </span>
+        <GridItem md={8} xs={8}>
+          <div className={classes.subTitle}>
+            <span>
+              {formatMessage({
+                id: 'inventory.pr.detail.pod.summary.total',
+              })}
+            </span>
+          </div>
         </GridItem>
-        <GridItem xs={6}>
+        <GridItem md={4} xs={4}>
           <NumberInput {...amountProps} text value={totalWithGST} />
         </GridItem>
       </GridContainer>

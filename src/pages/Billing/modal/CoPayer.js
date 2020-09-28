@@ -5,6 +5,7 @@ import _ from 'lodash'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
+import { Table } from '@devexpress/dx-react-grid-material-ui'
 import {
   Button,
   EditableTableGrid,
@@ -17,7 +18,6 @@ import {
   Switch,
   withFormikExtend,
 } from '@/components'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
 // data table variable
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 import { roundTo, getUniqueId } from '@/utils/utils'
@@ -372,7 +372,7 @@ class CoPayer extends Component {
                 summary: true,
                 selectConfig: {
                   showSelectAll: true,
-                  rowSelectionEnabled: (row) => true,
+                  rowSelectionEnabled: (row) => row.isClaimable,
                 },
 
                 summaryConfig: {
@@ -402,6 +402,7 @@ class CoPayer extends Component {
               EditingProps={{
                 showAddCommand: false,
                 showDeleteCommand: false,
+                showCommandColumn: false,
                 onCommitChanges: this.handleCommitChanges,
                 onEditingRowIdsChange: this.handleEditingRowIdsChange,
               }}

@@ -204,9 +204,9 @@ class HistoryDetails extends PureComponent {
       ...patientHistory.entity,
       visitAttachments: selectHistory.visitAttachments,
       visitRemarks: selectHistory.visitRemarks,
-      referredBy: selectHistory.referredBy,
-      referredInstitution: selectHistory.referredInstitution,
-      referredDate: selectHistory.referredDate,
+      referralBy: selectHistory.referralBy,
+      referralInstitution: selectHistory.referralInstitution,
+      referralDate: selectHistory.referralDate,
     }
     const { visitPurposeFK } = selectHistory
     return (

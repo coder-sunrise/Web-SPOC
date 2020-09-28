@@ -9,8 +9,10 @@ import {
   withFormikExtend,
   Button,
   ProgressButton,
+  notification,
 } from '@/components'
 import CommonLCForm from '@/components/_medisys/Forms/CommonLCForm/index'
+import Authorized from '@/utils/Authorized'
 
 const diagnosisSchema = Yup.object().shape({
   diagnosisCode: Yup.string().required(),
@@ -136,14 +138,6 @@ const procuderesSchema = Yup.object().shape({
         }),
         otherDiagnosis: Yup.array().of(diagnosisSchema),
         procuderes: Yup.array().of(procuderesSchema),
-        signatureThumbnail:
-          formCategory === FORM_CATEGORY.CORFORM
-            ? Yup.string().required()
-            : undefined,
-        principalSurgeonSignatureDate:
-          formCategory === FORM_CATEGORY.CORFORM
-            ? Yup.date().required()
-            : undefined,
         admissionDate: Yup.date().required(),
         dischargeDate: Yup.date().required(),
       }),
@@ -170,47 +164,51 @@ class LCForm extends PureComponent {
     if (!_.isEmpty(isFormValid)) {
       this.props.handleSubmit()
     } else {
+      if (
+        (action === 'submit' || action === 'finalize') &&
+        !values.formData.signatureThumbnail
+      ) {
+        notification.warning({
+          message: `Signature is required.`,
+        })
+        return
+      }
       let nextSequence
       if (formFrom === FORM_FROM.QUEUELOG) {
         nextSequence = getNextSequence()
       }
-      let saveData
+      let saveData = {
+        sequence: nextSequence,
+        ...values,
+        formData: JSON.stringify({
+          ...values.formData,
+          otherDiagnosis: values.formData.otherDiagnosis.map((d) => {
+            const { diagnosiss, ...retainData } = d
+            return {
+              ...retainData,
+            }
+          }),
+        }),
+        updateByUser: user.data.clinicianProfile.name,
+      }
       if (action === 'submit') {
         saveData = {
-          sequence: nextSequence,
-          ...values,
-          formData: JSON.stringify({
-            ...values.formData,
-            otherDiagnosis: values.formData.otherDiagnosis.map((d) => {
-              const { diagnosiss, ...retainData } = d
-              return {
-                ...retainData,
-              }
-            }),
-          }),
-          updateByUser: user.data.clinicianProfile.name,
+          ...saveData,
           statusFK: 3,
           submissionDate: moment(),
           submissionByUserFK: user.data.clinicianProfile.id,
         }
-      } else {
+      } else if (action === 'finalize') {
         saveData = {
-          sequence: nextSequence,
-          ...values,
-          formData: JSON.stringify({
-            ...values.formData,
-            otherDiagnosis: values.formData.otherDiagnosis.map((d) => {
-              const { diagnosiss, ...retainData } = d
-              return {
-                ...retainData,
-              }
-            }),
-          }),
-          updateByUser: user.data.clinicianProfile.name,
-          statusFK:
-            formCategory === FORM_CATEGORY.VISITFORM ? values.statusFK : 2,
+          ...saveData,
+          statusFK: 2,
           finalizeDate: moment(),
           finalizeByUserFK: user.data.clinicianProfile.id,
+        }
+      } else {
+        saveData = {
+          ...saveData,
+          statusFK: 1,
         }
       }
       const { currentCORId, visitID } = visitDetail
@@ -294,7 +292,7 @@ class LCForm extends PureComponent {
           <Button color='danger' icon={null} onClick={this.cancelLCForm}>
             cancel
           </Button>
-          {(formCategory === FORM_CATEGORY.VISITFORM || statusFK === 1) && (
+          {formCategory === FORM_CATEGORY.VISITFORM && (
             <ProgressButton
               color='primary'
               icon={null}
@@ -302,23 +300,37 @@ class LCForm extends PureComponent {
                 this.onSubmitButtonClicked('save')
               }}
             >
-              <sapn>
-                {formCategory === FORM_CATEGORY.VISITFORM ? 'save' : 'finalize'}
-              </sapn>
+              save
             </ProgressButton>
+          )}
+          {formCategory === FORM_CATEGORY.CORFORM &&
+          statusFK === 1 && (
+            <Authorized authority='forms.finalize'>
+              <ProgressButton
+                color='primary'
+                icon={null}
+                onClick={() => {
+                  this.onSubmitButtonClicked('finalize')
+                }}
+              >
+                finalize
+              </ProgressButton>
+            </Authorized>
           )}
 
           {formCategory === FORM_CATEGORY.CORFORM &&
           (statusFK === 1 || statusFK === 2) && (
-            <ProgressButton
-              color='success'
-              icon={null}
-              onClick={() => {
-                this.onSubmitButtonClicked('submit')
-              }}
-            >
-              submit
-            </ProgressButton>
+            <Authorized authority='forms.submit'>
+              <ProgressButton
+                color='success'
+                icon={null}
+                onClick={() => {
+                  this.onSubmitButtonClicked('submit')
+                }}
+              >
+                submit
+              </ProgressButton>
+            </Authorized>
           )}
         </GridContainer>
       </div>

@@ -5,6 +5,7 @@ import Service from '@/pages/Widgets/Orders/Detail/Service'
 import Consumable from '@/pages/Widgets/Orders/Detail/Consumable'
 import OrderSet from '@/pages/Widgets/Orders/Detail/OrderSet'
 import Treatment from '@/pages/Widgets/Orders/Detail/Treatment'
+import _ from 'lodash'
 
 const orderTypes = [
   {
@@ -12,7 +13,7 @@ const orderTypes = [
     value: '1',
     prop: 'corPrescriptionItem',
     accessRight: 'queue.consultation.order.medication',
-    filter: (r) => !!r.inventoryMedicationFK,
+    filter: (r) => r.inventoryMedicationFK || r.isDrugMixture,
     getSubject: (r) => {
       return r.drugName
     },
@@ -47,7 +48,7 @@ const orderTypes = [
     value: '5',
     prop: 'corPrescriptionItem',
     accessRight: 'queue.consultation.order.openprescription',
-    filter: (r) => !r.inventoryMedicationFK,
+    filter: (r) => !r.inventoryMedicationFK && !r.isDrugMixture,
     getSubject: (r) => r.drugName,
     component: (props) => <Medication openPrescription {...props} />,
   },
@@ -67,40 +68,50 @@ const orderTypes = [
   },
 ]
 
-const convertEyeForms = (values) => {
-  const { corEyeRefractionForm, corEyeExaminationForm } = values
-
-  const removeFields = (obj, fields = []) => {
-    if (Array.isArray(obj)) {
-      for (let n = 0; n < obj.length; n++) {
-        const isEmpty = removeFields(obj[n], fields)
-        if (isEmpty) {
-          obj.splice(n, 1)
-          n--
-        }
+const cleanFields = (obj, dirtyFields = []) => {
+  if (Array.isArray(obj)) {
+    for (let n = 0; n < obj.length; n++) {
+      const isEmptyObj = cleanFields(obj[n], dirtyFields)
+      if (isEmptyObj) {
+        obj.splice(n, 1)
+        n--
       }
-    } else if (typeof obj === 'object') {
-      for (let value in obj) {
-        if (Array.isArray(obj[value])) {
-          removeFields(obj[value], fields)
-        }
-      }
-      fields.forEach((o) => {
-        delete obj[o]
-      })
-
-      // check all of fields is empty
-      let allFieldIsEmtpy = true
-      for (let i in obj) {
-        if (i !== 'id' && obj[i] !== undefined && obj[i] !== '') {
-          allFieldIsEmtpy = false
-          break
-        }
-      }
-
-      return allFieldIsEmtpy
     }
+    return _.isEmpty(obj)
   }
+  if (typeof obj === 'object') {
+    let invalidColumns = []
+    for (let value in obj) {
+      if (obj[value] === undefined || obj[value] === null) {
+        invalidColumns.push(value)
+      } else if (Array.isArray(obj[value]) || typeof obj[value] === 'object') {
+        const isEmpty = cleanFields(obj[value], dirtyFields)
+        if (isEmpty || !obj[value] || _.isEmpty(obj[value])) {
+          invalidColumns.push(value)
+        }
+      } else if (typeof obj[value] === 'boolean' && obj[value] === false) {
+        invalidColumns.push(value)
+      } else if (typeof obj[value] === 'string' && obj[value].trim() === '') {
+        invalidColumns.push(value)
+      }
+    }
+
+    invalidColumns.concat(dirtyFields).forEach((o) => {
+      delete obj[o]
+    })
+
+    let isEmptyObj = !Object.keys(obj).find((f) => f !== 'id')
+    return isEmptyObj
+  }
+  return false
+}
+
+const convertEyeForms = (values) => {
+  const {
+    corEyeRefractionForm,
+    corEyeExaminationForm,
+    corEyeVisualAcuityTest,
+  } = values
 
   const durtyFields = [
     'isDeleted',
@@ -108,42 +119,68 @@ const convertEyeForms = (values) => {
     'IsSelected',
     'rowIndex',
     '_errors',
-    'OD',
-    'OS',
   ]
-  if (
-    corEyeRefractionForm &&
-    corEyeRefractionForm.formData &&
-    typeof corEyeRefractionForm.formData === 'object'
-  ) {
-    let { formData } = values.corEyeRefractionForm
-    removeFields(formData, durtyFields)
+  if (corEyeRefractionForm) {
+    let { formData = {} } = values.corEyeRefractionForm
+    cleanFields(formData, [
+      ...durtyFields,
+      'OD',
+      'OS',
+    ])
 
-    values.corEyeRefractionForm.formData = JSON.stringify(formData)
+    values.corEyeRefractionForm.formData = _.isEmpty(formData)
+      ? undefined
+      : JSON.stringify(formData)
   }
-  if (
-    corEyeExaminationForm &&
-    corEyeExaminationForm.formData &&
-    typeof corEyeExaminationForm.formData === 'object'
-  ) {
+  if (corEyeExaminationForm) {
     let { formData = {} } = corEyeExaminationForm
-    removeFields(formData, durtyFields)
-    const { EyeExaminations = [] } = formData
-    if (
-      EyeExaminations.find(
-        (ee) =>
-          (ee.LeftEye !== undefined &&
-            ee.LeftEye !== null &&
-            ee.LeftEye !== '') ||
-          (ee.RightEye !== undefined &&
-            ee.RightEye !== null &&
-            ee.RightEye !== ''),
-      )
-    ) {
-      values.corEyeExaminationForm.formData = JSON.stringify(formData)
-    } else {
-      values.corEyeExaminationForm.formData = JSON.stringify({})
-    }
+    cleanFields(formData, durtyFields)
+
+    const examinations = formData.EyeExaminations || []
+    const ignoreColumns = [
+      'id',
+      'EyeExaminationTypeFK',
+      'EyeExaminationType',
+    ]
+    const validObjects = examinations.filter(
+      (f) => _.difference(Object.keys(f), ignoreColumns).length > 0,
+    )
+    formData.EyeExaminations = validObjects
+    values.corEyeExaminationForm.formData =
+      validObjects.length === 0 ? undefined : JSON.stringify(formData)
+  }
+
+  if (typeof corEyeVisualAcuityTest === 'object') {
+    const { eyeVisualAcuityTestForms: testForm } = corEyeVisualAcuityTest
+    const clone = _.cloneDeep(testForm)
+    cleanFields(clone)
+
+    const newTestForm = testForm.reduce((p, c) => {
+      let newItem = clone.find((i) => i.id === c.id)
+      if (!newItem) {
+        if (c.id > 0 && c.concurrencyToken && c.isDeleted === false) {
+          return [
+            ...p,
+            {
+              ...c,
+              isDeleted: true,
+            },
+          ]
+        }
+      } else {
+        return [
+          ...p,
+          {
+            ...newItem,
+            isDeleted: c.isDeleted,
+          },
+        ]
+      }
+
+      return p
+    }, [])
+
+    values.corEyeVisualAcuityTest.eyeVisualAcuityTestForms = newTestForm
   }
   return values
 }
@@ -223,4 +260,5 @@ module.exports = {
   orderTypes,
   convertToConsultation,
   convertConsultationDocument,
+  cleanFields,
 }

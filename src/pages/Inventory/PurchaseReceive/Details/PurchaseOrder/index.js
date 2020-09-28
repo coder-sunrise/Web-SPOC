@@ -14,9 +14,11 @@ import {
   notification,
 } from '@/components'
 import { ReportViewer } from '@/components/_medisys'
-import POForm from './POForm'
-import POGrid from './POGrid'
 import { calculateItemLevelAdjustment } from '@/utils/utils'
+import { podoOrderType } from '@/utils/codes'
+import { INVOICE_STATUS, PURCHASE_ORDER_STATUS } from '@/utils/constants'
+import AuthorizedContext from '@/components/Context/Authorized'
+import AmountSummary from '@/pages/Shared/AmountSummary'
 import {
   isPOStatusDraft,
   poSubmitAction,
@@ -26,10 +28,8 @@ import {
   enableSaveButton,
   getAccessRight,
 } from '../../variables'
-import { podoOrderType } from '@/utils/codes'
-import { INVOICE_STATUS, PURCHASE_ORDER_STATUS } from '@/utils/constants'
-import AuthorizedContext from '@/components/Context/Authorized'
-import AmountSummary from '@/pages/Shared/AmountSummary'
+import POGrid from './POGrid'
+import POForm from './POForm'
 
 const styles = (theme) => ({
   errorMsgStyle: {
@@ -65,7 +65,7 @@ const styles = (theme) => ({
       .compact((x) => x.isDeleted)
       .required('At least one item is required.'),
   }),
-  handleSubmit: () => { },
+  handleSubmit: () => {},
 })
 class Index extends Component {
   state = {
@@ -284,7 +284,7 @@ class Index extends Component {
           },
           purchaseOrderItemAdjustment: poAdjustment.purchaseOrderItemAdjustment,
         }
-      }) 
+      })
     } else if (type === 'dup') {
       newPurchaseOrderStatusFK = PURCHASE_ORDER_STATUS.DRAFT
       delete purchaseOrder.id
@@ -317,8 +317,8 @@ class Index extends Component {
           },
           purchaseOrderItemAdjustment: poAdjustment.purchaseOrderItemAdjustment,
         }
-      }) 
-    } else { 
+      })
+    } else {
       if (!isSaveAction) {
         newPurchaseOrderStatusFK = purchaseOrderStatusFK
       } else if (purchaseOrderStatusFK === PURCHASE_ORDER_STATUS.COMPLETED) {
@@ -354,7 +354,7 @@ class Index extends Component {
               poAdjustment.purchaseOrderItemAdjustment,
           }
         } else {
-          x.totalAfterGST = x.totalAfterGst 
+          x.totalAfterGST = x.totalAfterGst
           result = {
             ...x,
           }
@@ -582,52 +582,54 @@ class Index extends Component {
           }}
         > */}
         <GridContainer>
-          <GridItem xs={2} md={9} />
-          <GridItem xs={10} md={3}>
-            <AmountSummary
-              rows={rows}
-              adjustments={purchaseOrderAdjustment}
-              config={{
-                isGSTInclusive: isGstInclusive,
-                itemFkField: 'purchaseOrderItemFK',
-                itemAdjustmentFkField: 'purchaseOrderAdjustmentFK',
-                invoiceItemAdjustmentField: 'purchaseOrderItemAdjustment',
-                totalField: 'totalPrice',
-                adjustedField: 'totalAfterAdjustments',
-                gstField: 'totalAfterGst',
-                gstAmtField: 'itemLevelGST',
-                gstValue: currentGstValue,
-              }}
-              onValueChanged={(v) => {
-                setFieldValue('purchaseOrder.totalAmount', v.summary.total)
-                setFieldValue(
-                  'purchaseOrder.totalAfterAdj',
-                  v.summary.totalAfterAdj,
-                )
-                setFieldValue(
-                  'purchaseOrder.totalAftGst',
-                  v.summary.totalWithGST,
-                )
-                setFieldValue(
-                  'purchaseOrder.gstAmount',
-                  Math.round(v.summary.gst * 100) / 100,
-                )
+          <GridItem xs={2} md={8} />
+          <GridItem xs={10} md={4}>
+            <div style={{ paddingRight: 22 }}>
+              <AmountSummary
+                rows={rows}
+                adjustments={purchaseOrderAdjustment}
+                config={{
+                  isGSTInclusive: isGstInclusive,
+                  itemFkField: 'purchaseOrderItemFK',
+                  itemAdjustmentFkField: 'purchaseOrderAdjustmentFK',
+                  invoiceItemAdjustmentField: 'purchaseOrderItemAdjustment',
+                  totalField: 'totalPrice',
+                  adjustedField: 'totalAfterAdjustments',
+                  gstField: 'totalAfterGst',
+                  gstAmtField: 'itemLevelGST',
+                  gstValue: currentGstValue,
+                }}
+                onValueChanged={(v) => {
+                  setFieldValue('purchaseOrder.totalAmount', v.summary.total)
+                  setFieldValue(
+                    'purchaseOrder.totalAfterAdj',
+                    v.summary.totalAfterAdj,
+                  )
+                  setFieldValue(
+                    'purchaseOrder.totalAftGst',
+                    v.summary.totalWithGST,
+                  )
+                  setFieldValue(
+                    'purchaseOrder.gstAmount',
+                    Math.round(v.summary.gst * 100) / 100,
+                  )
 
-                setFieldValue(
-                  'purchaseOrderAdjustment',
-                  v.adjustments.map((a) => {
-                    return {
-                      sequence: a.index + 1,
-                      ...a,
-                    }
-                  }),
-                )
-                setFieldValue(
-                  'purchaseOrder.isGstInclusive',
-                  v.summary.isGSTInclusive,
-                )
-              }}
-            />
+                  setFieldValue(
+                    'purchaseOrderAdjustment',
+                    v.adjustments.map((a) => {
+                      return {
+                        sequence: a.index + 1,
+                        ...a,
+                      }
+                    }),
+                  )
+                  setFieldValue(
+                    'purchaseOrder.isGstInclusive',
+                    v.summary.isGSTInclusive,
+                  )
+                }}
+              />
+            </div>
           </GridItem>
         </GridContainer>
         {/* </AuthorizedContext.Provider> */}
@@ -641,23 +643,23 @@ class Index extends Component {
         >
           {poStatus !== PURCHASE_ORDER_STATUS.COMPLETED && (
             <div>
-              {poStatus !== PURCHASE_ORDER_STATUS.CANCELLED &&
-                deliveryOrder.length === 0 &&
-                purchaseOrderPayment.length === 0 &&
-                type === 'edit' ? (
-                  <ProgressButton
-                    color='danger'
-                    icon={null}
-                    onClick={() =>
-                      this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
-                  >
-                    {formatMessage({
-                      id: 'inventory.pr.detail.pod.cancelpo',
-                    })}
-                  </ProgressButton>
-                ) : (
-                  ''
-                )}
+              {poStatus <= PURCHASE_ORDER_STATUS.FINALIZED &&
+              deliveryOrder.length === 0 &&
+              purchaseOrderPayment.length === 0 &&
+              !isWriteOff &&
+              type === 'edit' && (
+                <ProgressButton
+                  color='danger'
+                  icon={null}
+                  authority='none'
+                  onClick={() =>
+                    this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
+                >
+                  {formatMessage({
+                    id: 'inventory.pr.detail.pod.cancelpo',
+                  })}
+                </ProgressButton>
+              )}
 
               <ProgressButton
                 color='primary'
@@ -669,7 +671,7 @@ class Index extends Component {
                   id: 'inventory.pr.detail.pod.save',
                 })}
               </ProgressButton>
-              {!isPOStatusDraft(poStatus) ? (
+              {!isPOStatusDraft(poStatus) && (
                 <ProgressButton
                   color='success'
                   icon={null}
@@ -682,10 +684,10 @@ class Index extends Component {
                     id: 'inventory.pr.detail.pod.complete',
                   })}
                 </ProgressButton>
-              ) : (
-                  ''
-                )}
-              {isPOStatusDraft(poStatus) && type !== 'new' && type !== 'dup' ? (
+              )}
+              {isPOStatusDraft(poStatus) &&
+              type !== 'new' &&
+              type !== 'dup' && (
                 <ProgressButton
                   color='success'
                   icon={null}
@@ -696,9 +698,7 @@ class Index extends Component {
                     id: 'inventory.pr.detail.pod.finalize',
                   })}
                 </ProgressButton>
-              ) : (
-                  ''
-                )}
+              )}
             </div>
           )}
 

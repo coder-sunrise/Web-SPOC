@@ -144,7 +144,7 @@ const Scheme = ({
     const statuses = chasClaimStatuses.map((status) => status.toLowerCase())
     if (
       hasPayments ||
-      //statuses.includes('draft') ||
+      // statuses.includes('draft') ||
       statuses.includes('approved')
     )
       return true
@@ -159,7 +159,7 @@ const Scheme = ({
       type: 'currency',
       width: 150,
       currency: true,
-      disabled: _isConfirmed,
+      isDisabled: (row) => _isConfirmed || !row.isClaimable,
     },
   ]
 
@@ -275,6 +275,7 @@ const Scheme = ({
                   showAddCommand: false,
                   showDeleteCommand: false,
                   onCommitChanges,
+                  showCommandColumn: false,
                 }}
                 columns={
                   payerTypeFK === INVOICE_PAYER_TYPE.SCHEME ? (

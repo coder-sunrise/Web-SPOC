@@ -8,8 +8,10 @@ import {
   withFormikExtend,
   Button,
   ProgressButton,
+  notification,
 } from '@/components'
 import CommonLCForm from '@/components/_medisys/Forms/CommonLCForm/index'
+import Authorized from '@/utils/Authorized'
 
 const diagnosisSchema = Yup.object().shape({
   diagnosisCode: Yup.string().required(),
@@ -130,8 +132,6 @@ const procuderesSchema = Yup.object().shape({
       }),
       otherDiagnosis: Yup.array().of(diagnosisSchema),
       procuderes: Yup.array().of(procuderesSchema),
-      signatureThumbnail: Yup.string().required(),
-      principalSurgeonSignatureDate: Yup.date().required(),
       admissionDate: Yup.date().required(),
       dischargeDate: Yup.date().required(),
     }),
@@ -152,25 +152,39 @@ class LCForm extends PureComponent {
     if (!_.isEmpty(isFormValid)) {
       this.props.handleSubmit()
     } else {
+      if (
+        (action === 'submit' || action === 'finalize') &&
+        !values.formData.signatureThumbnail
+      ) {
+        notification.warning({
+          message: `Signature is required.`,
+        })
+        return
+      }
       const nextSequence = getNextSequence()
-      let payload
+      let payload = {
+        sequence: nextSequence,
+        ...values,
+        updateByUser: user.data.clinicianProfile.name,
+      }
       if (action === 'submit') {
         payload = {
-          sequence: nextSequence,
-          ...values,
-          updateByUser: user.data.clinicianProfile.name,
+          ...payload,
           statusFK: 3,
           submissionDate: moment(),
           submissionByUserFK: user.data.clinicianProfile.id,
         }
-      } else {
+      } else if (action === 'finalize') {
         payload = {
-          sequence: nextSequence,
-          ...values,
-          updateByUser: user.data.clinicianProfile.name,
+          ...payload,
           statusFK: 2,
           finalizeDate: moment(),
           finalizeByUserFK: user.data.clinicianProfile.id,
+        }
+      } else {
+        payload = {
+          ...payload,
+          statusFK: 1,
         }
       }
       dispatch({
@@ -218,20 +232,35 @@ class LCForm extends PureComponent {
                 this.onSubmitButtonClicked('save')
               }}
             >
-              finalize
+              save
             </ProgressButton>
+          )}
+          {statusFK === 1 && (
+            <Authorized authority='forms.finalize'>
+              <ProgressButton
+                color='primary'
+                icon={null}
+                onClick={() => {
+                  this.onSubmitButtonClicked('finalize')
+                }}
+              >
+                finalize
+              </ProgressButton>
+            </Authorized>
           )}
 
           {(statusFK === 1 || statusFK === 2) && (
-            <ProgressButton
-              color='success'
-              icon={null}
-              onClick={() => {
-                this.onSubmitButtonClicked('submit')
-              }}
-            >
-              submit
-            </ProgressButton>
+            <Authorized authority='forms.submit'>
+              <ProgressButton
+                color='success'
+                icon={null}
+                onClick={() => {
+                  this.onSubmitButtonClicked('submit')
+                }}
+              >
+                submit
+              </ProgressButton>
+            </Authorized>
           )}
         </GridContainer>
       </div>

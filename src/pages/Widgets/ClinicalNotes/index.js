@@ -113,7 +113,7 @@ class ClinicalNotes extends Component {
     prefix: 'corDoctorNote',
   }
 
-  constructor(props) {
+  constructor (props) {
     super(props)
     const config = getConfig()
     const contents = getContent(config)
@@ -130,7 +130,7 @@ class ClinicalNotes extends Component {
     }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     const { config } = this.state
     const { fields } = config
     const payload = {
@@ -476,7 +476,7 @@ class ClinicalNotes extends Component {
     })
   }
 
-  render() {
+  render () {
     const {
       prefix,
       classes,
@@ -588,7 +588,7 @@ class ClinicalNotes extends Component {
                                 categoryIndex={item.scribbleNoteTypeFK}
                                 scribbleNoteArray={
                                   scriblenotes[item.category][
-                                  item.scribbleField
+                                    item.scribbleField
                                   ]
                                 }
                                 gridItemWidth={this.state.width}
@@ -609,7 +609,7 @@ class ClinicalNotes extends Component {
 
                             <RichEditor
                               autoFocus={index === 0}
-                              disabled={loading.global} 
+                              disabled={loading.global}
                               style={{ marginBottom: 0 }}
                               strongLabel
                               onBlur={this.onEditorChange(item.fieldName)}

@@ -5,6 +5,7 @@ import numeral from 'numeral'
 import { currencySymbol } from '@/utils/config'
 import { GridContainer, GridItem, TextField } from '@/components'
 import { VISIT_TYPE } from '@/utils/constants'
+import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import AmountSummary from './AmountSummary'
 import tablestyles from './PatientHistoryStyle.less'
 
@@ -13,8 +14,37 @@ const numberstyle = {
   fontWeight: 500,
 }
 
+const wrapCellTextStyle = {
+  wordWrap: 'break-word',
+  whiteSpace: 'pre-wrap',
+}
+
+const drugMixtureIndicator = (row) => {
+  if (row.itemType !== 'Medication' || !row.isDrugMixture) return null
+
+  return (
+    <div style={{ position: 'relative', top: 2 }}>
+      <DrugMixtureInfo values={row.prescriptionDrugMixture} />
+    </div>
+  )
+}
+
 const baseColumns = [
-  { dataIndex: 'itemType', title: 'Type', width: 150 },
+  {
+    dataIndex: 'itemType',
+    title: 'Type',
+    width: 150,
+    render: (text, row) => {
+      return (
+        <div style={{ position: 'relative' }}>
+          <div style={wrapCellTextStyle}>
+            {row.itemType}
+            {drugMixtureIndicator(row)}
+          </div>
+        </div>
+      )
+    },
+  },
   { dataIndex: 'itemName', title: 'Name' },
   {
     dataIndex: 'quantity',
@@ -54,7 +84,7 @@ const baseColumns = [
   },
 ]
 
-export default ({ current, theme }) => {
+export default ({ current, theme, isFullScreen = true }) => {
   let invoiceAdjustmentData = []
   let columns = baseColumns
 
@@ -70,7 +100,26 @@ export default ({ current, theme }) => {
       visitPurposeFK === VISIT_TYPE.BILL_FIRST
     ) {
       columns = [
-        { dataIndex: 'itemType', title: 'Type', width: 150 },
+        {
+          dataIndex: 'itemType',
+          title: 'Type',
+          width: 150,
+          render: (text, row) => {
+            return (
+              <div style={{ position: 'relative' }}>
+                <div
+                  style={{
+                    wordWrap: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                  }}
+                >
+                  {row.itemType}
+                  {drugMixtureIndicator(row)}
+                </div>
+              </div>
+            )
+          },
+        },
         { dataIndex: 'itemName', title: 'Name' },
         {
           dataIndex: 'description',
@@ -116,7 +165,7 @@ export default ({ current, theme }) => {
   }
 
   return (
-    <div style={{ fontSize: '0.875rem', marginBottom: 8, marginTop: 8 }}>
+    <div style={{ fontSize: '0.85rem', marginBottom: 8, marginTop: 8 }}>
       {current.invoice ? (
         <div style={{ marginBottom: 5 }}>
           <span>{`Invoice No: ${current.invoice.invoiceNo}`}</span>
@@ -142,7 +191,7 @@ export default ({ current, theme }) => {
         className={tablestyles.table}
       />
       <GridContainer style={{ paddingTop: theme.spacing(2) }}>
-        <GridItem xs={2} md={9}>
+        <GridItem xs={12} sm={6} md={isFullScreen ? 8 : 6}>
           {current.invoice &&
           current.invoice.remark && (
             <div style={{ marginLeft: -8 }}>
@@ -157,7 +206,7 @@ export default ({ current, theme }) => {
             </div>
           )}
         </GridItem>
-        <GridItem xs={10} md={3}>
+        <GridItem xs={12} sm={6} md={isFullScreen ? 4 : 6}>
           <AmountSummary
             adjustments={invoiceAdjustmentData}
             invoice={current.invoice}

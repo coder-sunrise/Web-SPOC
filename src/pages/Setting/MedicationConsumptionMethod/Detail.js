@@ -15,9 +15,15 @@ import {
 const styles = (theme) => ({})
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingMedicationConsumptionMethod }) =>
-    settingMedicationConsumptionMethod.entity ||
-    settingMedicationConsumptionMethod.default,
+  mapPropsToValues: ({ settingMedicationConsumptionMethod }) => {
+    let settings = settingMedicationConsumptionMethod.entity || settingMedicationConsumptionMethod.default
+    if (settings && settings.translationLink && settings.translationLink.translationMasters) {
+      settings.translationLink.translationMasters = settings.translationLink.translationMasters.map((o) => {
+        return { ...o, tempLanguageFK: o.languageFK, originalLanguageFK: o.languageFK, originalDisplayValue: o.displayValue }
+      })
+    }
+    return settings
+  },
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
@@ -51,6 +57,21 @@ const styles = (theme) => ({})
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
+    const { translationLink } = restValues
+    // if translate language has been removed, then just update the IsDeleted to True
+    if (translationLink && translationLink.translationMasters && translationLink.translationMasters.length > 0) {
+      if (!translationLink.translationMasters[0].languageFK) {
+        if (translationLink.id) {
+          translationLink.translationMasters[0].isDeleted = true
+          translationLink.translationMasters[0].languageFK = translationLink.translationMasters[0].originalLanguageFK
+          translationLink.translationMasters[0].displayValue = translationLink.translationMasters[0].originalDisplayValue
+          translationLink.isDeleted = true
+        }
+        else {
+          restValues.translationLink = undefined
+        }
+      }
+    }
     dispatch({
       type: 'settingMedicationConsumptionMethod/upsert',
       payload: {

@@ -117,6 +117,7 @@ const PaymentRow = ({
               style={{
                 width: 450,
                 border: '1px solid',
+                zIndex: 9999,
               }}
               disabledTransition
               placement='right'

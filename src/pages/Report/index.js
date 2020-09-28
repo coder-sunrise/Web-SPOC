@@ -41,7 +41,7 @@ const filterByAccessRight = (m) => {
 }
 
 class Report extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.group = _.groupBy(menuData, 'title')
   }

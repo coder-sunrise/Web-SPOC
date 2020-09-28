@@ -91,7 +91,7 @@ class Checkbox extends React.Component {
           [className]: true,
           'checkbox-container': true,
         })}
-        style={{ width: '100%' }}
+        style={{ width: '100%', ...controlStyle }}
         {...props}
       >
         <FormControlLabel

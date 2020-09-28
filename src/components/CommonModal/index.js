@@ -191,7 +191,7 @@ class CommonModal extends React.PureComponent {
           },
         })
       }
-      if (force !== true) {
+      if (force !== true && this.props.global.openConfirm !== true) {
         this.setState({
           openConfirm: true,
         })
@@ -209,7 +209,11 @@ class CommonModal extends React.PureComponent {
       const ob = window.g_app._store.getState().formik[o]
       // console.log(ob,this.props.observe)
       if (ob) {
-        if (ob.dirty && force !== true) {
+        if (
+          ob.dirty &&
+          force !== true &&
+          this.props.global.openConfirm !== true
+        ) {
           this.setState({
             openConfirm: true,
           })

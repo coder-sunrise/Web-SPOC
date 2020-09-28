@@ -134,7 +134,7 @@ class VitalSignCard extends PureComponent {
                 />
               )}
             />
-          </GridItem> 
+          </GridItem>
           <GridItem xs={12} sm={4} md={3}>
             <Field
               name={FormField['vitalsign.bmi']}
