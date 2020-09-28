@@ -292,7 +292,7 @@ class LCForm extends PureComponent {
           <Button color='danger' icon={null} onClick={this.cancelLCForm}>
             cancel
           </Button>
-          {(formCategory === FORM_CATEGORY.VISITFORM || statusFK === 1) && (
+          {formCategory === FORM_CATEGORY.VISITFORM && (
             <ProgressButton
               color='primary'
               icon={null}

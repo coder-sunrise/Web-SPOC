@@ -274,6 +274,7 @@ const Scheme = ({
                 EditingProps={{
                   showCommandColumn: false,
                   onCommitChanges,
+                  showCommandColumn: false,
                 }}
                 columns={
                   payerTypeFK === INVOICE_PAYER_TYPE.SCHEME ? (

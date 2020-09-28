@@ -5,9 +5,9 @@ import numeral from 'numeral'
 import { currencySymbol } from '@/utils/config'
 import { GridContainer, GridItem, TextField } from '@/components'
 import { VISIT_TYPE } from '@/utils/constants'
+import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import AmountSummary from './AmountSummary'
 import tablestyles from './PatientHistoryStyle.less'
-import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 
 const numberstyle = {
   color: 'darkBlue',
@@ -84,7 +84,7 @@ const baseColumns = [
   },
 ]
 
-export default ({ current, theme }) => {
+export default ({ current, theme, isFullScreen = true }) => {
   let invoiceAdjustmentData = []
   let columns = baseColumns
 
@@ -165,7 +165,7 @@ export default ({ current, theme }) => {
   }
 
   return (
-    <div style={{ fontSize: '0.875rem', marginBottom: 8, marginTop: 8 }}>
+    <div style={{ fontSize: '0.85rem', marginBottom: 8, marginTop: 8 }}>
       {current.invoice ? (
         <div style={{ marginBottom: 5 }}>
           <span>{`Invoice No: ${current.invoice.invoiceNo}`}</span>
@@ -191,7 +191,7 @@ export default ({ current, theme }) => {
         className={tablestyles.table}
       />
       <GridContainer style={{ paddingTop: theme.spacing(2) }}>
-        <GridItem xs={2} md={9}>
+        <GridItem xs={12} sm={6} md={isFullScreen ? 8 : 6}>
           {current.invoice &&
           current.invoice.remark && (
             <div style={{ marginLeft: -8 }}>
@@ -206,7 +206,7 @@ export default ({ current, theme }) => {
             </div>
           )}
         </GridItem>
-        <GridItem xs={10} md={3}>
+        <GridItem xs={12} sm={6} md={isFullScreen ? 4 : 6}>
           <AmountSummary
             adjustments={invoiceAdjustmentData}
             invoice={current.invoice}
