@@ -138,6 +138,12 @@ export const menuData = [
     authority: 'report.inventory.inventorystockcountreport',
   },
   {
+    title: 'Inventory',
+    text: 'Purchase & Receiving Report',
+    url: '/report/purchasereceivinglistingreport',
+    authority: '',
+  },
+  {
     title: 'Other',
     text: 'Diagnosis Trending Report',
     url: '/report/diagnosistrending',
