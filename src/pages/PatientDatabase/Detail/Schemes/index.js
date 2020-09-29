@@ -266,7 +266,7 @@ class Schemes extends PureComponent {
         {/* TODO: hide medisave payer until feature is fully built */}
         <div
           style={{
-              display: values.patientScheme.find((o) => this.isMedisave(o))  ? '' : 'none',
+              display: values.patientScheme.filter((o) => this.isMedisave(o) && !o.isDeleted).length > 0  ? '' : 'none',
             }}
         >
           <h4

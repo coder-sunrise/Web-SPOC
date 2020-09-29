@@ -77,7 +77,7 @@ const DiagnosisSelect = ({
   const onDiagnosisSearch = async (v) => {
     const search = {
       props:
-        'id,displayvalue,code,complication,isChasAcuteClaimable,isChasChronicClaimable,isHazeClaimable,iCD10AMFK,iCD10AMDiagnosisCode,iCD10AMDiagnosisName',
+        'id,displayvalue,code,complication,isChasAcuteClaimable,isChasChronicClaimable,isHazeClaimable,isCdmpClaimable,iCD10AMFK,iCD10AMDiagnosisCode,iCD10AMDiagnosisName',
       sorting: [
         { columnName: 'displayvalue', direction: 'asc' },
       ],
@@ -119,6 +119,8 @@ const DiagnosisSelect = ({
       selected.isCdmpClaimable
   }
 
+  console.log(selected)
+
   return (
     <div style={{ position: 'relative' }}>
       <Select
@@ -134,12 +136,14 @@ const DiagnosisSelect = ({
             isChasAcuteClaimable,
             isChasChronicClaimable,
             isHazeClaimable,
+            isCdmpClaimable,
           } = option
           return (
             <span>
               {(isChasAcuteClaimable ||
                 isChasChronicClaimable ||
-                isHazeClaimable) && <AttachMoney className={classes.money} />}
+                isHazeClaimable ||
+                isCdmpClaimable) && <AttachMoney className={classes.money} />}
 
               {option.displayvalue}
             </span>
