@@ -102,6 +102,7 @@ const FilterBar = ({ handleSubmit, values, isSubmitting }) => {
                       value: 'inactive',
                     },
                   ]}
+                  allowClear={false}
                   labelField='name'
                   valueField='value'
                 />

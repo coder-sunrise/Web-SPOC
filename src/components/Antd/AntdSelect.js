@@ -44,6 +44,9 @@ const STYLES = () => {
         lineHeight: 'inherit',
         marginRight: 0,
       },
+      '& .ant-select-selection__rendered >ul': {
+        width: 99999,
+      },
       '& .ant-select-selection--single': {
         height: '100%',
         lineHeight: '1.4em',
@@ -361,6 +364,25 @@ class AntdSelect extends React.PureComponent {
   handleFocus = (e) => {
     this.setState({ shrink: true, focus: true })
     this.debounceFocus(this.myRef.current)
+    this.resizeChoiceContents()
+  }
+
+  resizeChoiceContents = () => {
+    if (this.myRef.current) {
+      const antdSel = $(this.myRef.current).find('.ant-select')
+      const contentLi = antdSel.find('.ant-select-selection__choice').eq(0)
+      const contentEl = antdSel
+        .find('.ant-select-selection__choice__content')
+        .eq(0)
+
+      if (contentEl) {
+        if (antdSel.width() < contentLi.width() + 20) {
+          const adjWidth = contentLi.width() - 30
+          contentEl.width(adjWidth + 10)
+          contentLi.width(adjWidth)
+        }
+      }
+    }
   }
 
   handleBlur = () => {
@@ -416,6 +438,7 @@ class AntdSelect extends React.PureComponent {
         newVal = _.reject(newVal, (v) => v === allValue)
         newVal = newVal.slice(-maxSelected)
       }
+      this.resizeChoiceContents()
     }
     let proceed = true
 
