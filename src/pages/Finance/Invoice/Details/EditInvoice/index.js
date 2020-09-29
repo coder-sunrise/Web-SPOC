@@ -305,6 +305,7 @@ class EditInvoice extends Component {
                 columnName: 'unitPrice',
                 type: 'number',
                 currency: true,
+                sortingEnabled: false,
                 width: 120,
                 onChange: (e) => {
                   this.updateUnitPrice(e.row)
@@ -315,6 +316,7 @@ class EditInvoice extends Component {
                 type: 'number',
                 width: 160,
                 disabled: true,
+                sortingEnabled: false,
                 render: (row) => {
                   const { qtyFormat } = config
                   const { quantity, dispenseUOMDisplayValue = '' } = row
@@ -327,6 +329,7 @@ class EditInvoice extends Component {
                 columnName: 'adjAmt',
                 width: 200,
                 isReactComponent: true,
+                sortingEnabled: false,
                 render: (currentrow) => {
                   const [
                     focused,
@@ -467,6 +470,7 @@ class EditInvoice extends Component {
                 columnName: 'totalAfterItemAdjustment',
                 type: 'number',
                 currency: true,
+                sortingEnabled: false,
                 width: 120,
                 onChange: (e) => {
                   this.updateTotal(e.row)
