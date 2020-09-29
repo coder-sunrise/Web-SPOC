@@ -76,6 +76,7 @@ class HeaderLinks extends React.Component {
       type: 'global/updateAppState',
       payload: {
         showUserProfile: true,
+        accountModalTitle: 'My Account',
       },
     })
   }

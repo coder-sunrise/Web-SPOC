@@ -161,7 +161,8 @@ class GlobalModalContainer extends PureComponent {
         </CommonModal>
 
         <CommonModal
-          title='My Account'
+          title={global.accountModalTitle}
+          // title='My Account'
           open={global.showUserProfile}
           onClose={this.closeUserProfile}
           onConfirm={this.closeUserProfile}
