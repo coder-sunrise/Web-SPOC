@@ -98,9 +98,10 @@ const Content = ({
     if (
       (!editInvoiceWithPaymentRight ||
         editInvoiceWithPaymentRight.rights !== 'enable') &&
-      invoicePayment.entity.find((item) =>
-        item.invoicePayment.find((payment) => !payment.isCancelled),
-      )
+      (invoicePayment.entity || [])
+        .find((item) =>
+          item.invoicePayment.find((payment) => !payment.isCancelled),
+        )
     )
       return true
 
