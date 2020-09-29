@@ -120,9 +120,6 @@ class PatientDocument extends Component {
     const patientIsActive = entity && entity.isActive
 
     const { list = [] } = patientAttachment
-    const allFileIds = list.map((f) => {
-      return f.fileIndexFK
-    })
 
     return (
       <div>
@@ -151,9 +148,10 @@ class PatientDocument extends Component {
         <CommonModal
           open={showImagePreview}
           title='Patient Document Preview'
+          maxWidth='lg'
           onClose={() => this.setState({ showImagePreview: false })}
         >
-          <ImageItem selectedFileId={selectedFileId} fileIds={allFileIds} />
+          <ImageItem selectedFileId={selectedFileId} files={list} />
         </CommonModal>
       </div>
     )
