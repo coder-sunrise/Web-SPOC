@@ -110,7 +110,6 @@ export default createListViewModel({
       },
       *queryRecentStatementNo ({ payload }, { call, put }) {
         const response = yield call(service.getLastStatementNo, payload)        
-        console.log(response)
         yield put({
           type: 'getLastStatementNoDone',
           payload: response,
