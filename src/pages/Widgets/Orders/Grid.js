@@ -20,6 +20,7 @@ import {
 } from '@/components'
 import { orderTypes } from '@/pages/Consultation/utils'
 import Authorized from '@/utils/Authorized'
+import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 
 // console.log(orderTypes)
 export default ({ orders, dispatch, classes, from, codetable, theme }) => {
@@ -219,10 +220,32 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
 
   const isEditingEntity = !_.isEmpty(orders.entity)
 
+  const wrapCellTextStyle = {
+    wordWrap: 'break-word',
+    whiteSpace: 'pre-wrap',
+  }
+
+  const drugMixtureIndicator = (row) => {
+    if (row.type !== '1' || !row.isDrugMixture) return null
+    const activePrescriptionItemDrugMixture = row.corPrescriptionItemDrugMixture.filter(
+      (item) => !item.isDeleted,
+    )
+
+    return (
+      <div style={{ position: 'relative', top: 2 }}>
+        <DrugMixtureInfo
+          values={activePrescriptionItemDrugMixture}
+          isShowTooltip={false}
+        />
+      </div>
+    )
+  }
+
   return (
     <CommonTableGrid
       size='sm'
       style={{ margin: 0 }}
+      forceRender
       rows={rows}
       onRowDoubleClick={editRow}
       getRowId={(r) => r.uid}
@@ -402,13 +425,9 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
 
             return (
               <Tooltip title={texts}>
-                <div
-                  style={{
-                    wordWrap: 'break-word',
-                    whiteSpace: 'pre-wrap',
-                  }}
-                >
+                <div style={wrapCellTextStyle}>
                   {texts}
+                  {drugMixtureIndicator(row)}
                 </div>
               </Tooltip>
             )

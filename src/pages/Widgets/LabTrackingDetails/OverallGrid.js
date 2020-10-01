@@ -11,7 +11,10 @@ class OverallGrid extends PureComponent {
       { name: 'visitDate', title: 'Visit Date' },
       { name: 'patientAccountNo', title: 'Acc. No' },
       { name: 'patientName', title: 'Patient name' },
-      { name: 'doctorName', title: 'Doctor' },
+      {
+        name: 'doctorProfileFKNavigation.ClinicianProfile.Name',
+        title: 'Doctor',
+      },
       { name: 'serviceName', title: 'Service Name' },
       { name: 'supplierName', title: 'Supplier' },
       { name: 'caseTypeDisplayValue', title: 'Case Type' },
@@ -28,6 +31,16 @@ class OverallGrid extends PureComponent {
       { columnName: 'estimateReceiveDate', type: 'date' },
       { columnName: 'orderedDate', type: 'date' },
       { columnName: 'receivedDate', type: 'date' },
+      {
+        columnName: 'doctorProfileFKNavigation.ClinicianProfile.Name',
+        render: (row) => {
+          return (
+            <Tooltip title={row.doctorName}>
+              <span>{row.doctorName}</span>
+            </Tooltip>
+          )
+        },
+      },
       {
         columnName: 'action',
         sortingEnabled: false,

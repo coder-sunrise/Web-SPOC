@@ -37,6 +37,7 @@ const AddOrder = ({
   visitType,
   location,
   clinicInfo,
+  isFirstLoad,
 }) => {
   const displayExistingOrders = async (id, servicesList) => {
     const r = await dispatch({
@@ -198,21 +199,25 @@ const AddOrder = ({
           : []
 
       const cuationItems = []
-      newRows
-        .filter((f) => f._itemId && f._caution && f._caution.trim().length > 0)
-        .map((m) => {
-          const existItem = cuationItems.find(
-            (c) => c.id === m._itemId && c.type === m._itemType,
+      if (isFirstLoad) {
+        newRows
+          .filter(
+            (f) => f._itemId && f._caution && f._caution.trim().length > 0,
           )
-          if (!existItem) {
-            cuationItems.push({
-              id: m._itemId,
-              type: m._itemType,
-              subject: m.subject,
-              caution: m._caution,
-            })
-          }
-        })
+          .map((m) => {
+            const existItem = cuationItems.find(
+              (c) => c.id === m._itemId && c.type === m._itemType,
+            )
+            if (!existItem) {
+              cuationItems.push({
+                id: m._itemId,
+                type: m._itemType,
+                subject: m.subject,
+                caution: m._caution,
+              })
+            }
+          })
+      }
 
       if (isVaccinationExist.length > 0 || cuationItems.length > 0) {
         dispatch({
