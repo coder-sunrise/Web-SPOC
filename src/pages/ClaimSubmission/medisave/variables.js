@@ -1,180 +1,73 @@
-import moment from 'moment'
-import { dateFormatLong } from '@/components'
+import Draft from './Draft'
+import New from './New'
+import Submitted from './Submitted'
+import Approved from './Approved'
+import Rejected from './Rejected'
 
-export const DraftMedisaveColumns = [
-  {
-    name: 'vistDate',
-    title: 'Visit Date',
-  },
-  {
-    name: 'accountNo',
-    title: 'Account No',
-  },
-  {
-    name: 'patientName',
-    title: 'Patient Name',
-  },
-  {
-    name: 'doctor',
-    title: 'Doctor',
-  },
-  {
-    name: 'diagnosis',
-    title: 'Diagnosis',
-  },
-  {
-    name: 'chargeCode',
-    title: 'Charge Code',
-  },
-  {
-    name: 'claimStatus',
-    title: 'Claim Status',
-  },
-  {
-    name: 'invoiceNo',
-    title: 'Invoice No.',
-  },
-  {
-    name: 'invoiceDate',
-    title: 'Invoice Date',
-  },
-  {
-    name: 'invoiceAmount',
-    title: 'Invoice Amt.',
-  },
-  {
-    name: 'claimAmount',
-    title: 'Claim Amt.',
-  },
-  {
-    name: 'action',
-    title: 'Action',
-  },
-]
-
-export const DraftMedisaveColumnExtensions = [
-  { columnName: 'vistDate', type: 'date' },
-  { columnName: 'invoiceDate', type: 'date' },
-  { columnName: 'invoiceAmount', type: 'currency', currency: true },
-  { columnName: 'claimAmount', type: 'currency', currency: true },
-]
-
-const generateDraftMedisaveData = () => {
-  let data = []
-  for (let i = 0; i < 15; i++) {
-    data.push({
-      id: i,
-      vistDate: moment().formatUTC(dateFormatLong),
-      accountNo: 'S1234567D',
-      patientName: 'Tan Kok Wei',
-      doctor: 'Dr Levine',
-      diagnosis: 'Asthma',
-      chargeCode: `AB00${i}`,
-
-      invoiceNo: `INV/0000${i}`,
-      invoiceDate: moment(),
-      invoiceAmount: 100,
-      claimAmount: 80,
-    })
+const addContent = (type, claimSubmissionActionProps) => {
+  const {
+    handleContextMenuItemClick,
+    handleSubmitClaimStatus,
+  } = claimSubmissionActionProps
+  switch (type) {
+    case 1:
+      return <Draft handleContextMenuItemClick={handleContextMenuItemClick} />
+    case 2:
+      return (
+        <New
+          handleSubmitClaimStatus={handleSubmitClaimStatus}
+          handleContextMenuItemClick={handleContextMenuItemClick}
+        />
+      )
+    case 3:
+      return (
+        <Submitted handleContextMenuItemClick={handleContextMenuItemClick} />
+      )
+    case 4:
+      return (
+        <Approved handleContextMenuItemClick={handleContextMenuItemClick} />
+      )
+    case 5:
+      return (
+        <Rejected 
+          handleSubmitClaimStatus={handleSubmitClaimStatus}
+          handleContextMenuItemClick={handleContextMenuItemClick}
+        />
+      )
+    default:
+      return (
+        <New
+          handleSubmitClaimStatus={handleSubmitClaimStatus}
+          handleContextMenuItemClick={handleContextMenuItemClick}
+        />
+      )
   }
-  return data
 }
 
-export const DraftMedisaveTableData = generateDraftMedisaveData()
-
-export const TableConfig = {
-  FuncProps: {
-    selectable: true,
-    selectConfig: { showSelectAll: true },
-  },
-}
-
-export const NewMedisaveColumns = [
+export const ClaimSubmissionMedisaveTabOption = (claimSubmissionActionProps) => [
   {
-    name: 'hrnNo',
-    title: 'HRN No.',
+    id: 1,
+    name: 'Draft',
+    content: addContent(1, claimSubmissionActionProps),
   },
   {
-    name: 'vistDate',
-    title: 'Visit Date',
+    id: 2,
+    name: 'New',
+    content: addContent(2, claimSubmissionActionProps),
   },
   {
-    name: 'accountNo',
-    title: 'Account No',
+    id: 3,
+    name: 'Submitted',
+    content: addContent(3, claimSubmissionActionProps),
   },
   {
-    name: 'patientName',
-    title: 'Patient Name',
+    id: 4,
+    name: 'Approved',
+    content: addContent(4, claimSubmissionActionProps),
   },
   {
-    name: 'payerName',
-    title: 'Payer Name',
-  },
-  {
-    name: 'doctor',
-    title: 'Doctor',
-  },
-  {
-    name: 'diagnosis',
-    title: 'Diagnosis',
-  },
-  {
-    name: 'chargeCode',
-    title: 'Charge Code',
-  },
-  {
-    name: 'claimStatus',
-    title: 'Claim Status',
-  },
-  {
-    name: 'invoiceNo',
-    title: 'Invoice No.',
-  },
-  {
-    name: 'invoiceDate',
-    title: 'Invoice Date',
-  },
-  {
-    name: 'invoiceAmount',
-    title: 'Invoice Amt.',
-  },
-  {
-    name: 'claimAmount',
-    title: 'Claim Amt.',
-  },
-  {
-    name: 'action',
-    title: 'Action',
+    id: 5,
+    name: 'Rejected',
+    content: addContent(5, claimSubmissionActionProps),
   },
 ]
-
-export const NewMedisaveColumnExtensions = [
-  { columnName: 'vistDate', type: 'date' },
-  { columnName: 'invoiceDate', type: 'date' },
-  { columnName: 'invoiceAmount', type: 'currency', currency: true },
-  { columnName: 'claimAmount', type: 'currency', currency: true },
-]
-
-const generateNewMedisaveData = () => {
-  let data = []
-  for (let i = 0; i < 15; i++) {
-    data.push({
-      id: i,
-      vistDate: moment().formatUTC(dateFormatLong),
-      accountNo: 'S1234567D',
-      patientName: 'Tan Kok Wei',
-      payerName: 'Ali',
-      doctor: 'Dr Levine',
-      diagnosis: 'Asthma',
-      chargeCode: `AB00${i}`,
-
-      invoiceNo: `INV/0000${i}`,
-      invoiceDate: moment(),
-      invoiceAmount: 100,
-      claimAmount: 80,
-    })
-  }
-  return data
-}
-
-export const NewMedisaveTableData = generateNewMedisaveData()

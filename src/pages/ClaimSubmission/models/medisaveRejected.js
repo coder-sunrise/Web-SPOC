@@ -2,13 +2,14 @@ import { createListViewModel } from 'medisys-model'
 import * as service from '../services'
 
 export default createListViewModel({
-  namespace: 'claimSubmissionRejected',
+  namespace: 'medisaveClaimSubmissionRejected',
   config: {},
   param: {
     service,
     state: {
       fixedFilter: {
         status: 'Rejected',
+        schemeCode: 'MEDI',
       },
       default: {},
     },

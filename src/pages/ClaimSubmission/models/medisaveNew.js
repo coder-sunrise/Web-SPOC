@@ -2,7 +2,7 @@ import { createListViewModel } from 'medisys-model'
 import * as service from '../services'
 
 export default createListViewModel({
-  namespace: 'claimSubmissionNew',
+  namespace: 'medisaveClaimSubmissionNew',
   config: {},
   param: {
     service,
@@ -10,6 +10,7 @@ export default createListViewModel({
       fixedFilter: {
         status: 'New',
         'PatientProfileFKNavigation.IsActive': true,
+        schemeCode: 'MEDI',
       },
       default: {},
     },

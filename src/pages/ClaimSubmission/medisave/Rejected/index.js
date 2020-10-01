@@ -1,12 +1,11 @@
 import React from 'react'
 import { connect } from 'dva'
+import { formatMessage } from 'umi/locale'
 // formik
 import { withFormik } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { formatMessage } from 'umi/locale'
-import { LoadingWrapper } from '@/components/_medisys'
 import {
   ProgressButton,
   GridContainer,
@@ -15,12 +14,13 @@ import {
   CardContainer,
   Tooltip,
 } from '@/components'
-// sub components
+import { LoadingWrapper } from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
+// sub components
 import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../TableGrid'
 // variables
-import { NewCHASColumnExtensions, NewCHASColumns } from './variables'
+import { RejectedMedisaveColumnExtensions, RejectedMedisaveColumns } from './variables'
 
 const styles = (theme) => ({
   cardContainer: {
@@ -32,30 +32,27 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ chasClaimSubmissionNew }) => ({
-  chasClaimSubmissionNew,
+@connect(({ medisaveClaimSubmissionRejected }) => ({
+  medisaveClaimSubmissionRejected,
 }))
 @withFormik({
   mapPropsToValues: () => ({}),
 })
-class NewCHAS extends React.Component {
+class RejectedMedisave extends React.Component {
   state = {
     selectedRows: [],
     isLoading: false,
   }
 
-  componentWillMount () {
-    // this.refreshDataGrid()
-    this.props.dispatch({
-      type: 'chasClaimSubmissionNew/query',
-    })
+  componentDidMount () {
+    this.refreshDataGrid()
   }
 
   onRefreshClicked = () => {
     const { selectedRows } = this.state
     this.props
       .dispatch({
-        type: 'chasClaimSubmissionNew/refreshPatientDetails',
+        type: 'medisaveClaimSubmissionRejected/refreshPatientDetails',
         payload: { claimIds: selectedRows },
       })
       .then((r) => {
@@ -65,25 +62,25 @@ class NewCHAS extends React.Component {
       })
   }
 
-  handleSelectionChange = (selection) =>
-    this.setState({ selectedRows: selection })
-
   refreshDataGrid = () => {
     this.props.dispatch({
-      type: 'chasClaimSubmissionNew/query',
+      type: 'medisaveClaimSubmissionRejected/query',
     })
   }
+
+  handleSelectionChange = (selection) =>
+    this.setState({ selectedRows: selection })
 
   handleLoadingVisibility = (visibility = false) =>
     this.setState({ isLoading: visibility })
 
-  onSubmitClaimClicked = () => {
+  onReSubmitClaimClicked = () => {
     const { selectedRows } = this.state
     if (selectedRows.length > 0) {
       this.handleLoadingVisibility(true)
       this.props
         .dispatch({
-          type: 'chasClaimSubmissionNew/submitChasClaim',
+          type: 'medisaveClaimSubmissionRejected/reSubmitChasClaim',
           payload: { claimIds: selectedRows },
         })
         .then((r) => {
@@ -93,7 +90,7 @@ class NewCHAS extends React.Component {
               this.props.handleSubmitClaimStatus(r.failedCount)
             } else {
               notification.success({
-                message: 'Claim Submission Success.',
+                message: 'Claim Re-Submission Success.',
               })
             }
 
@@ -106,13 +103,13 @@ class NewCHAS extends React.Component {
   render () {
     const {
       classes,
-      chasClaimSubmissionNew,
+      medisaveClaimSubmissionRejected,
       handleContextMenuItemClick,
       dispatch,
       values,
     } = this.props
     const { isLoading, selectedRows } = this.state
-    const { list } = chasClaimSubmissionNew || []
+    const { list } = medisaveClaimSubmissionRejected || []
 
     return (
       <CardContainer
@@ -125,15 +122,20 @@ class NewCHAS extends React.Component {
         <BaseSearchBar
           dispatch={dispatch}
           values={values}
-          modelsName='chasClaimSubmissionNew'
+          modelsName='medisaveClaimSubmissionRejected'
         />
-        <LoadingWrapper linear loading={isLoading} text='Submitting Claim...'>
+        <LoadingWrapper
+          linear
+          loading={isLoading}
+          text='Re-submitting Claim...'
+        >
           <GridContainer>
             <GridItem md={12}>
               <TableGrid
                 data={list}
-                columnExtensions={NewCHASColumnExtensions}
-                columns={NewCHASColumns}
+                columnExtensions={RejectedMedisaveColumnExtensions}
+                columns={RejectedMedisaveColumns}
+                // tableConfig={TableConfig}
                 FuncProps={{
                   selectable: true,
                   selectConfig: {
@@ -145,19 +147,8 @@ class NewCHAS extends React.Component {
                 onSelectionChange={this.handleSelectionChange}
                 onContextMenuItemClick={(row, id) =>
                   handleContextMenuItemClick(row, id, true)}
-                type='new'
+                type='rejected'
               />
-              {/* <CommonTableGrid
-                getRowId={(row) => row.id}
-                type='chasClaimSubmissionNew'
-                // rows={data}
-                columns={NewCHASColumns}
-                columnExtensions={NewCHASColumnExtensions}
-                // {...TableConfig}
-                // selection={selection}
-                // onSelectionChange={onSelectionChange}
-                // ActionProps={{ TableCellComponent: Cell }}
-              /> */}
             </GridItem>
 
             <GridItem md={4} className={classes.buttonGroup}>
@@ -186,10 +177,10 @@ class NewCHAS extends React.Component {
                   icon={null}
                   color='primary'
                   disabled={selectedRows.length <= 0}
-                  onClick={this.onSubmitClaimClicked}
+                  onClick={this.onReSubmitClaimClicked}
                 >
                   {formatMessage({
-                    id: 'claimsubmission.invoiceClaim.SubmitClaim',
+                    id: 'claimsubmission.invoiceClaim.ResubmitClaim',
                   })}
                 </ProgressButton>
               </Authorized>
@@ -201,4 +192,4 @@ class NewCHAS extends React.Component {
   }
 }
 
-export default withStyles(styles, { name: 'NewCHAS' })(NewCHAS)
+export default withStyles(styles, { name: 'RejectedMedisave' })(RejectedMedisave)

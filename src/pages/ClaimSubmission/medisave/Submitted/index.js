@@ -19,8 +19,8 @@ import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../TableGrid'
 // variables
 import {
-  SubmittedCHASColumnExtensions,
-  SubmittedCHASColumns,
+  SubmittedMedisaveColumnExtensions,
+  SubmittedMedisaveColumns,
 } from './variables'
 
 const styles = (theme) => ({
@@ -33,13 +33,13 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ chasClaimSubmissionSubmitted }) => ({
-  chasClaimSubmissionSubmitted,
+@connect(({ medisaveClaimSubmissionSubmitted }) => ({
+  medisaveClaimSubmissionSubmitted,
 }))
 @withFormik({
   mapPropsToValues: () => ({}),
 })
-class SubmittedCHAS extends React.Component {
+class SubmittedMedisave extends React.Component {
   state = {
     selectedRows: [],
     isLoading: false,
@@ -57,7 +57,7 @@ class SubmittedCHAS extends React.Component {
 
   refreshDataGrid = () => {
     this.props.dispatch({
-      type: 'chasClaimSubmissionSubmitted/query',
+      type: 'medisaveClaimSubmissionSubmitted/query',
     })
   }
 
@@ -67,7 +67,7 @@ class SubmittedCHAS extends React.Component {
       this.handleLoadingVisibility(true)
       this.props
         .dispatch({
-          type: 'chasClaimSubmissionSubmitted/getSubmittedStatus',
+          type: 'medisaveClaimSubmissionSubmitted/getSubmittedStatus',
           payload: { claimIds: selectedRows },
         })
         .then((r) => {
@@ -85,13 +85,13 @@ class SubmittedCHAS extends React.Component {
   render () {
     const {
       classes,
-      chasClaimSubmissionSubmitted,
+      medisaveClaimSubmissionSubmitted,
       handleContextMenuItemClick,
       dispatch,
       values,
     } = this.props
     const { isLoading, selectedRows } = this.state
-    const { list } = chasClaimSubmissionSubmitted || []
+    const { list } = medisaveClaimSubmissionSubmitted || []
 
     return (
       <CardContainer
@@ -104,15 +104,15 @@ class SubmittedCHAS extends React.Component {
         <BaseSearchBar
           dispatch={dispatch}
           values={values}
-          modelsName='chasClaimSubmissionSubmitted'
+          modelsName='medisaveClaimSubmissionSubmitted'
         />
         <LoadingWrapper linear loading={isLoading} text='Get status...'>
           <GridContainer>
             <GridItem md={12}>
               <TableGrid
                 data={list}
-                columnExtensions={SubmittedCHASColumnExtensions}
-                columns={SubmittedCHASColumns}
+                columnExtensions={SubmittedMedisaveColumnExtensions}
+                columns={SubmittedMedisaveColumns}
                 // tableConfig={TableConfig}
                 FuncProps={{
                   selectable: true,
@@ -146,4 +146,4 @@ class SubmittedCHAS extends React.Component {
   }
 }
 
-export default withStyles(styles, { name: 'SubmittedCHAS' })(SubmittedCHAS)
+export default withStyles(styles, { name: 'SubmittedMedisave' })(SubmittedMedisave)

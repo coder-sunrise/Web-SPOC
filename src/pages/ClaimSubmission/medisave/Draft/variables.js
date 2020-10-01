@@ -1,6 +1,6 @@
 import { Tooltip } from '@/components'
 
-export const DraftCHASColumns = [
+export const DraftMedisaveColumns = [
   {
     name: 'visitDate',
     title: 'Visit Date',
@@ -14,6 +14,14 @@ export const DraftCHASColumns = [
     title: 'Patient Name',
   },
   {
+    name: 'schemeTypeDisplayValue',
+    title: 'Scheme Type',
+  },
+  {
+    name: 'payerName',
+    title: 'Payer Name',
+  },
+  {
     name: 'visitDoctorName',
     title: 'Doctor',
   },
@@ -22,12 +30,8 @@ export const DraftCHASColumns = [
     title: 'Diagnosis',
   },
   {
-    name: 'schemeTypeDisplayValue',
-    title: 'Scheme Type',
-  },
-  {
-    name: 'schemeCategoryDisplayValue',
-    title: 'Scheme Category',
+    name: 'chargeCode',
+    title: 'Charge Code',
   },
   {
     name: 'invoiceNo',
@@ -42,6 +46,10 @@ export const DraftCHASColumns = [
     title: 'Invoice Amt.',
   },
   {
+    name: 'chasClaimAmt',
+    title: 'CHAS Claim Amt.',
+  },
+  {
     name: 'claimAmount',
     title: 'Claim Amt.',
   },
@@ -51,7 +59,7 @@ export const DraftCHASColumns = [
   },
 ]
 
-export const DraftCHASColumnExtensions = [
+export const DraftMedisaveColumnExtensions = [
   { columnName: 'visitDate', type: 'date' },
   { columnName: 'invoiceDate', type: 'date' },
   {
@@ -70,6 +78,12 @@ export const DraftCHASColumnExtensions = [
     type: 'currency',
     currency: true,
     sortBy: 'claimAmt',
+  },
+  {
+    columnName: 'chasClaimAmt',
+    type: 'currency',
+    currency: true,
+    sortBy: 'chasClaimAmt',
   },
   {
     columnName: 'schemeTypeDisplayValue',

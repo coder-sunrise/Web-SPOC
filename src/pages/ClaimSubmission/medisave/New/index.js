@@ -20,7 +20,7 @@ import Authorized from '@/utils/Authorized'
 import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../TableGrid'
 // variables
-import { NewCHASColumnExtensions, NewCHASColumns } from './variables'
+import { NewMedisaveColumnExtensions, NewMedisaveColumns } from './variables'
 
 const styles = (theme) => ({
   cardContainer: {
@@ -32,13 +32,13 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ chasClaimSubmissionNew }) => ({
-  chasClaimSubmissionNew,
+@connect(({ medisaveClaimSubmissionNew }) => ({
+  medisaveClaimSubmissionNew,
 }))
 @withFormik({
   mapPropsToValues: () => ({}),
 })
-class NewCHAS extends React.Component {
+class NewMedisave extends React.Component {
   state = {
     selectedRows: [],
     isLoading: false,
@@ -47,7 +47,7 @@ class NewCHAS extends React.Component {
   componentWillMount () {
     // this.refreshDataGrid()
     this.props.dispatch({
-      type: 'chasClaimSubmissionNew/query',
+      type: 'medisaveClaimSubmissionNew/query',
     })
   }
 
@@ -55,7 +55,7 @@ class NewCHAS extends React.Component {
     const { selectedRows } = this.state
     this.props
       .dispatch({
-        type: 'chasClaimSubmissionNew/refreshPatientDetails',
+        type: 'medisaveClaimSubmissionNew/refreshPatientDetails',
         payload: { claimIds: selectedRows },
       })
       .then((r) => {
@@ -70,7 +70,7 @@ class NewCHAS extends React.Component {
 
   refreshDataGrid = () => {
     this.props.dispatch({
-      type: 'chasClaimSubmissionNew/query',
+      type: 'medisaveClaimSubmissionNew/query',
     })
   }
 
@@ -83,7 +83,7 @@ class NewCHAS extends React.Component {
       this.handleLoadingVisibility(true)
       this.props
         .dispatch({
-          type: 'chasClaimSubmissionNew/submitChasClaim',
+          type: 'medisaveClaimSubmissionNew/submitChasClaim',
           payload: { claimIds: selectedRows },
         })
         .then((r) => {
@@ -106,13 +106,13 @@ class NewCHAS extends React.Component {
   render () {
     const {
       classes,
-      chasClaimSubmissionNew,
+      medisaveClaimSubmissionNew,
       handleContextMenuItemClick,
       dispatch,
       values,
     } = this.props
     const { isLoading, selectedRows } = this.state
-    const { list } = chasClaimSubmissionNew || []
+    const { list } = medisaveClaimSubmissionNew || []
 
     return (
       <CardContainer
@@ -125,15 +125,15 @@ class NewCHAS extends React.Component {
         <BaseSearchBar
           dispatch={dispatch}
           values={values}
-          modelsName='chasClaimSubmissionNew'
+          modelsName='medisaveClaimSubmissionNew'
         />
         <LoadingWrapper linear loading={isLoading} text='Submitting Claim...'>
           <GridContainer>
             <GridItem md={12}>
               <TableGrid
                 data={list}
-                columnExtensions={NewCHASColumnExtensions}
-                columns={NewCHASColumns}
+                columnExtensions={NewMedisaveColumnExtensions}
+                columns={NewMedisaveColumns}
                 FuncProps={{
                   selectable: true,
                   selectConfig: {
@@ -149,10 +149,10 @@ class NewCHAS extends React.Component {
               />
               {/* <CommonTableGrid
                 getRowId={(row) => row.id}
-                type='chasClaimSubmissionNew'
+                type='medisaveClaimSubmissionNew'
                 // rows={data}
-                columns={NewCHASColumns}
-                columnExtensions={NewCHASColumnExtensions}
+                columns={NewMedisaveColumns}
+                columnExtensions={NewMedisaveColumnExtensions}
                 // {...TableConfig}
                 // selection={selection}
                 // onSelectionChange={onSelectionChange}
@@ -201,4 +201,4 @@ class NewCHAS extends React.Component {
   }
 }
 
-export default withStyles(styles, { name: 'NewCHAS' })(NewCHAS)
+export default withStyles(styles, { name: 'NewMedisave' })(NewMedisave)

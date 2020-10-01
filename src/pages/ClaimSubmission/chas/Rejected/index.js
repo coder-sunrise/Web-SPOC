@@ -18,7 +18,7 @@ import { LoadingWrapper } from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
 // sub components
 import BaseSearchBar from '../../common/BaseSearchBar'
-import TableGrid from '../../common/TableGrid'
+import TableGrid from '../TableGrid'
 // variables
 import { RejectedCHASColumnExtensions, RejectedCHASColumns } from './variables'
 
@@ -32,8 +32,8 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ claimSubmissionRejected }) => ({
-  claimSubmissionRejected,
+@connect(({ chasClaimSubmissionRejected }) => ({
+  chasClaimSubmissionRejected,
 }))
 @withFormik({
   mapPropsToValues: () => ({}),
@@ -52,7 +52,7 @@ class RejectedCHAS extends React.Component {
     const { selectedRows } = this.state
     this.props
       .dispatch({
-        type: 'claimSubmissionRejected/refreshPatientDetails',
+        type: 'chasClaimSubmissionRejected/refreshPatientDetails',
         payload: { claimIds: selectedRows },
       })
       .then((r) => {
@@ -64,7 +64,7 @@ class RejectedCHAS extends React.Component {
 
   refreshDataGrid = () => {
     this.props.dispatch({
-      type: 'claimSubmissionRejected/query',
+      type: 'chasClaimSubmissionRejected/query',
     })
   }
 
@@ -80,13 +80,14 @@ class RejectedCHAS extends React.Component {
       this.handleLoadingVisibility(true)
       this.props
         .dispatch({
-          type: 'claimSubmissionRejected/reSubmitChasClaim',
+          type: 'chasClaimSubmissionRejected/reSubmitChasClaim',
           payload: { claimIds: selectedRows },
         })
         .then((r) => {
           this.handleLoadingVisibility(false)
           if (r) {
             if (r.failedCount !== 0) {
+              console.log(this.props)
               this.props.handleSubmitClaimStatus(r.failedCount)
             } else {
               notification.success({
@@ -103,13 +104,13 @@ class RejectedCHAS extends React.Component {
   render () {
     const {
       classes,
-      claimSubmissionRejected,
+      chasClaimSubmissionRejected,
       handleContextMenuItemClick,
       dispatch,
       values,
     } = this.props
     const { isLoading, selectedRows } = this.state
-    const { list } = claimSubmissionRejected || []
+    const { list } = chasClaimSubmissionRejected || []
 
     return (
       <CardContainer
@@ -122,7 +123,7 @@ class RejectedCHAS extends React.Component {
         <BaseSearchBar
           dispatch={dispatch}
           values={values}
-          modelsName='claimSubmissionRejected'
+          modelsName='chasClaimSubmissionRejected'
         />
         <LoadingWrapper
           linear

@@ -18,7 +18,7 @@ import {
 import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../TableGrid'
 // variables
-import { DraftCHASColumnExtensions, DraftCHASColumns } from './variables'
+import { DraftMedisaveColumnExtensions, DraftMedisaveColumns } from './variables'
 
 const styles = (theme) => ({
   cardContainer: {
@@ -30,13 +30,13 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ chasClaimSubmissionDraft }) => ({
-  chasClaimSubmissionDraft,
+@connect(({ medisaveClaimSubmissionDraft }) => ({
+  medisaveClaimSubmissionDraft,
 }))
 @withFormik({
   mapPropsToValues: () => ({}),
 })
-class DraftCHAS extends React.Component {
+class DraftMedisave extends React.Component {
   state = {
     selectedRows: [],
   }
@@ -47,7 +47,7 @@ class DraftCHAS extends React.Component {
 
   refreshDataGrid = () => {
     this.props.dispatch({
-      type: 'chasClaimSubmissionDraft/query',
+      type: 'medisaveClaimSubmissionDraft/query',
     })
   }
 
@@ -58,7 +58,7 @@ class DraftCHAS extends React.Component {
     const { selectedRows } = this.state
     this.props
       .dispatch({
-        type: 'chasClaimSubmissionDraft/refreshPatientDetails',
+        type: 'medisaveClaimSubmissionDraft/refreshPatientDetails',
         payload: { claimIds: selectedRows },
       })
       .then((r) => {
@@ -78,12 +78,12 @@ class DraftCHAS extends React.Component {
     ]
     const {
       classes,
-      chasClaimSubmissionDraft,
+      medisaveClaimSubmissionDraft,
       handleContextMenuItemClick,
       values,
       dispatch,
     } = this.props
-    const { list } = chasClaimSubmissionDraft || []
+    const { list } = medisaveClaimSubmissionDraft || []
     
     const { selectedRows } = this.state
     return (
@@ -98,14 +98,14 @@ class DraftCHAS extends React.Component {
           hideInvoiceDate
           dispatch={dispatch}
           values={values}
-          modelsName='chasClaimSubmissionDraft'
+          modelsName='medisaveClaimSubmissionDraft'
         />
         <GridContainer>
           <GridItem md={12}>
             <TableGrid
               data={list}
-              columnExtensions={DraftCHASColumnExtensions}
-              columns={DraftCHASColumns}
+              columnExtensions={DraftMedisaveColumnExtensions}
+              columns={DraftMedisaveColumns}
               // tableConfig={TableConfig}
               FuncProps={{
                 selectable: true,
@@ -150,4 +150,4 @@ class DraftCHAS extends React.Component {
   }
 }
 
-export default withStyles(styles, { name: 'DraftCHAS' })(DraftCHAS)
+export default withStyles(styles, { name: 'DraftMedisave' })(DraftMedisave)

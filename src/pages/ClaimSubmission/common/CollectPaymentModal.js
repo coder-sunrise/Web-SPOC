@@ -69,15 +69,15 @@ const constructPayment = ({ row, ctpaymentmode, values }) => {
   return basePayload
 }
 
-@connect(({ claimSubmissionApproved, user, codetable }) => ({
-  claimSubmissionApproved,
+@connect(({ chasClaimSubmissionApproved, user, codetable }) => ({
+  chasClaimSubmissionApproved,
   user,
   ctpaymentmode: codetable.ctpaymentmode,
 }))
 @withFormikExtend({
   name: 'claimSubmissionCollectPayment',
-  mapPropsToValues: ({ claimSubmissionApproved }) => {
-    return claimSubmissionApproved.entity || {}
+  mapPropsToValues: ({ chasClaimSubmissionApproved }) => {
+    return chasClaimSubmissionApproved.entity || {}
   },
   validationSchema: Yup.object().shape({
     paymentDate: Yup.string().required(),
@@ -102,7 +102,7 @@ const constructPayment = ({ row, ctpaymentmode, values }) => {
           values: { ...values, paymentReceivedByUserFK },
         })
         return dispatch({
-          type: 'claimSubmissionApproved/submitInvoicePayment',
+          type: 'chasClaimSubmissionApproved/submitInvoicePayment',
           payload: basePayload,
         })
       }),
@@ -208,7 +208,7 @@ class CollectPaymentModal extends PureComponent {
     ).formatUTC(false)
 
     dispatch({
-      type: 'claimSubmissionApproved/getAllBizSession',
+      type: 'chasClaimSubmissionApproved/getAllBizSession',
       payload: {
         pagesize: 999,
         lsteql_SessionStartDate: endDateTime,
@@ -224,7 +224,7 @@ class CollectPaymentModal extends PureComponent {
         ],
       },
     }).then(() => {
-      const { bizSessionList } = this.props.claimSubmissionApproved
+      const { bizSessionList } = this.props.chasClaimSubmissionApproved
       setFieldValue(
         'paymentCreatedBizSessionFK',
         bizSessionList.length === 0 || bizSessionList === undefined
@@ -239,8 +239,8 @@ class CollectPaymentModal extends PureComponent {
   }
 
   render () {
-    const { classes, values, footer, claimSubmissionApproved } = this.props
-    const { bizSessionList } = claimSubmissionApproved
+    const { classes, values, footer, chasClaimSubmissionApproved } = this.props
+    const { bizSessionList } = chasClaimSubmissionApproved
     const { rows } = values
 
     return (

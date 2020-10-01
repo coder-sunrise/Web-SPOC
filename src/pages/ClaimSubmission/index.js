@@ -5,8 +5,8 @@ import { Badge, withStyles } from '@material-ui/core'
 import Note from '@material-ui/icons/EventNote'
 // common components
 import { Button, GridContainer, GridItem } from '@/components'
-import { authorityConfig } from './config'
 import Authorized from '@/utils/Authorized'
+import { authorityConfig } from './config'
 
 const styles = (theme) => ({
   container: {

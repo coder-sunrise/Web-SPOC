@@ -68,22 +68,22 @@ const TableGrid = ({
   const currentType = () => {
     switch (type) {
       case 'draft': {
-        return 'claimSubmissionDraft'
+        return 'medisaveClaimSubmissionDraft'
       }
       case 'new': {
-        return 'claimSubmissionNew'
+        return 'medisaveClaimSubmissionNew'
       }
       case 'approved': {
-        return 'claimSubmissionApproved'
+        return 'medisaveClaimSubmissionApproved'
       }
       case 'rejected': {
-        return 'claimSubmissionRejected'
+        return 'medisaveClaimSubmissionRejected'
       }
       case 'submitted': {
-        return 'claimSubmissionSubmitted'
+        return 'medisaveClaimSubmissionSubmitted'
       }
       default: {
-        return 'claimSubmissionNew'
+        return 'medisaveClaimSubmissionNew'
       }
     }
   }

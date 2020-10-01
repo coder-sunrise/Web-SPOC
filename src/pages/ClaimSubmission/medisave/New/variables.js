@@ -1,6 +1,10 @@
 import { Tooltip } from '@/components'
 
-export const DraftCHASColumns = [
+export const NewMedisaveColumns = [
+  {
+    name: 'hrnNo',
+    title: 'HRN No',
+  },
   {
     name: 'visitDate',
     title: 'Visit Date',
@@ -14,6 +18,14 @@ export const DraftCHASColumns = [
     title: 'Patient Name',
   },
   {
+    name: 'schemeTypeDisplayValue',
+    title: 'Scheme Type',
+  },
+  {
+    name: 'payerName',
+    title: 'Payer Name',
+  },
+  {
     name: 'visitDoctorName',
     title: 'Doctor',
   },
@@ -22,12 +34,8 @@ export const DraftCHASColumns = [
     title: 'Diagnosis',
   },
   {
-    name: 'schemeTypeDisplayValue',
-    title: 'Scheme Type',
-  },
-  {
-    name: 'schemeCategoryDisplayValue',
-    title: 'Scheme Category',
+    name: 'chargeCode',
+    title: 'Charge Code',
   },
   {
     name: 'invoiceNo',
@@ -42,8 +50,16 @@ export const DraftCHASColumns = [
     title: 'Invoice Amt.',
   },
   {
+    name: 'chasClaimAmt',
+    title: 'CHAS Claim Amt.',
+  },
+  {
     name: 'claimAmount',
     title: 'Claim Amt.',
+  },
+  {
+    name: 'rejectionReason',
+    title: 'Rejection Reason',
   },
   {
     name: 'action',
@@ -51,9 +67,14 @@ export const DraftCHASColumns = [
   },
 ]
 
-export const DraftCHASColumnExtensions = [
+export const NewMedisaveColumnExtensions = [
   { columnName: 'visitDate', type: 'date' },
   { columnName: 'invoiceDate', type: 'date' },
+  {
+    columnName: 'rejectionReason',
+    width: 400,
+    sortBy: 'ResponseStatusDescription',
+  },
   {
     columnName: 'schemeCategoryDisplayValue',
     width: 145,
@@ -72,8 +93,10 @@ export const DraftCHASColumnExtensions = [
     sortBy: 'claimAmt',
   },
   {
-    columnName: 'schemeTypeDisplayValue',
-    sortBy: 'SchemeTypeFKNavigation.DisplayValue',
+    columnName: 'chasClaimAmt',
+    type: 'currency',
+    currency: true,
+    sortBy: 'chasClaimAmt',
   },
   {
     columnName: 'visitDoctorName',
@@ -92,5 +115,9 @@ export const DraftCHASColumnExtensions = [
         </Tooltip>
       )
     },
+  },
+  {
+    columnName: 'schemeTypeDisplayValue',
+    sortBy: 'SchemeTypeFKNavigation.DisplayValue',
   },
 ]

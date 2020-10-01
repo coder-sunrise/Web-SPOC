@@ -24,7 +24,7 @@ import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../TableGrid'
 import CollectPaymentModal from '../../common/CollectPaymentModal'
 // variables
-import { ApprovedCHASColumnExtensions, ApprovedCHASColumns } from './variables'
+import { ApprovedMedisaveColumnExtensions, ApprovedMedisaveColumns } from './variables'
 
 const styles = (theme) => ({
   cardContainer: {
@@ -36,14 +36,14 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ claimSubmission, chasClaimSubmissionApproved }) => ({
+@connect(({ claimSubmission, medisaveClaimSubmissionApproved }) => ({
   claimSubmission,
-  chasClaimSubmissionApproved,
+  medisaveClaimSubmissionApproved,
 }))
 @withFormik({
   mapPropsToValues: () => ({}),
 })
-class ApprovedCHAS extends React.Component {
+class ApprovedMedisave extends React.Component {
   state = {
     selectedRows: [],
     isLoading: false,
@@ -65,7 +65,7 @@ class ApprovedCHAS extends React.Component {
 
   refreshDataGrid = () => {
     this.props.dispatch({
-      type: 'chasClaimSubmissionApproved/query',
+      type: 'medisaveClaimSubmissionApproved/query',
     })
   }
 
@@ -75,7 +75,7 @@ class ApprovedCHAS extends React.Component {
       this.handleLoadingVisibility(true)
       this.props
         .dispatch({
-          type: 'chasClaimSubmissionApproved/getApprovedStatus',
+          type: 'medisaveClaimSubmissionApproved/getApprovedStatus',
           payload: { claimIds: selectedRows },
         })
         .then((r) => {
@@ -91,9 +91,9 @@ class ApprovedCHAS extends React.Component {
   }
 
   onClickCollectPayment = () => {
-    const { dispatch, chasClaimSubmissionApproved } = this.props
+    const { dispatch, medisaveClaimSubmissionApproved } = this.props
     const { selectedRows } = this.state
-    const { list } = chasClaimSubmissionApproved || []
+    const { list } = medisaveClaimSubmissionApproved || []
     const rows = list.filter((i) => selectedRows.includes(i.id))
     const outstandingPayment = rows
       .filter(
@@ -106,7 +106,7 @@ class ApprovedCHAS extends React.Component {
       })
 
     dispatch({
-      type: 'chasClaimSubmissionApproved/updateState',
+      type: 'medisaveClaimSubmissionApproved/updateState',
       payload: {
         entity: {
           rows: outstandingPayment,
@@ -149,7 +149,7 @@ class ApprovedCHAS extends React.Component {
         <BaseSearchBar
           dispatch={dispatch}
           values={values}
-          modelsName='chasClaimSubmissionApproved'
+          modelsName='medisaveClaimSubmissionApproved'
         >
           <GridItem md={12}>
             <FastField
@@ -173,8 +173,8 @@ class ApprovedCHAS extends React.Component {
             <GridItem md={12}>
               <TableGrid
                 data={list}
-                columnExtensions={ApprovedCHASColumnExtensions}
-                columns={ApprovedCHASColumns}
+                columnExtensions={ApprovedMedisaveColumnExtensions}
+                columns={ApprovedMedisaveColumns}
                 // tableConfig={TableConfig}
                 FuncProps={{
                   selectable: true,
@@ -237,4 +237,4 @@ class ApprovedCHAS extends React.Component {
   }
 }
 
-export default withStyles(styles, { name: 'ApprovedCHAS' })(ApprovedCHAS)
+export default withStyles(styles, { name: 'ApprovedMedisave' })(ApprovedMedisave)
