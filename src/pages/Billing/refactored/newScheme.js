@@ -18,6 +18,8 @@ import {
   CardContainer,
 } from '@/components'
 // sub components
+import PaymentSummary from '@/pages/Finance/Invoice/Details/PaymentDetails/PaymentSummary'
+import PaymentRow from '@/pages/Finance/Invoice/Details/PaymentDetails/PaymentRow'
 import MaxCap from './MaxCap'
 import BalanceLabel from './BalanceLabel'
 import DeleteWithPopover from '../components/DeleteWithPopover'
@@ -27,8 +29,12 @@ import {
   CompanyInvoicePayerColumn,
   ApplyClaimsColumnExtension,
 } from '../variables'
-import PaymentSummary from '@/pages/Finance/Invoice/Details/PaymentDetails/PaymentSummary'
-import PaymentRow from '@/pages/Finance/Invoice/Details/PaymentDetails/PaymentRow'
+
+const visitTypes = [
+  'CDMP',
+  'Vaccination',
+  'Health Screening',
+]
 
 const styles = (theme) => ({
   gridRow: {
@@ -92,11 +98,20 @@ const Scheme = ({
   onApplyClick,
   onDeleteClick,
   onSchemeChange,
+  onSchemePayerChange,
+  onMediVisitTypeChange,
+  onMediVaccinationChange,
   onCommitChanges,
   onPaymentVoidClick,
   onPrinterClick,
   onAddPaymentClick,
   fromBilling,
+  patient,
+  ctschemetype,
+  ctcopaymentscheme,
+  tempInvoicePayer,
+  medisaveSchemes,
+  inventoryvaccination,
   invoice,
   clinicSettings = {},
 }) => {
@@ -118,7 +133,13 @@ const Scheme = ({
     payerDistributedAmt,
     payerOutstanding,
     invoicePayment = [],
+    schemePayerFK,
+    medisaveVisitType,
+    medisaveVaccinationFK,
+    medisaveVaccinationList = [],
   } = invoicePayer
+
+  console.log('invoicePayer',invoicePayer)
 
   const { invoiceItems = [] } = invoice
   let existingOldPayerItem
@@ -131,6 +152,9 @@ const Scheme = ({
   }
 
   const handleSchemeChange = (value) => onSchemeChange(value, index)
+  const handleSchemePayerChange = (value) => onSchemePayerChange(value, index)
+  const handleVisitTypeChange = (value) => onMediVisitTypeChange(value, index)
+  const handleMedisaveVaccinationChange = (value) => onMediVaccinationChange(value, index)
   const handleCancelClick = () => onCancelClick(index)
   const handleEditClick = () => onEditClick(index)
   const handleApplyClick = () => onApplyClick(index)
@@ -181,6 +205,32 @@ const Scheme = ({
     return _isEditing || hasOtherEditing
   }
 
+  const getPayerList = () => {
+    // copayment scheme get scheme type fk, use it to find schemefk in schemepayer
+    const scheme = ctcopaymentscheme.find((a) => a.id === schemeConfig.id)
+    const schemeType = scheme ? ctschemetype.find((c) => c.name === scheme.schemeTypeName) : []
+    
+    const addedSchemes = scheme ? tempInvoicePayer.filter((r) => r.copaymentSchemeFK !== scheme.id).map((a) => {return a.copaymentSchemeFK}) : []
+    
+    // console.log(scheme, schemeType, addedSchemes)
+
+    return patient.schemePayer.filter((b) => b.schemeFK === schemeType.id && addedSchemes.indexOf(schemeConfig.id) < 0)
+    .map((p) => {
+      return {
+        name: p.payerName,
+        id: p.id,
+      }
+    })
+  }
+
+  const getDefaultMedisaveVaccination = (invoiceItemCode) => {
+    const item = inventoryvaccination.find(mv => mv.code === invoiceItemCode)
+    if(!item) return null
+    console.log('getDefaultMedisaveVaccination',item)
+
+    return item.medisaveVaccination.id
+  }
+
   let payments = []
   payments = payments.concat(
     invoicePayment.map((o) => {
@@ -197,10 +247,87 @@ const Scheme = ({
     onPaymentVoidClick(index, payment)
   }
   const { isEnableAddPaymentInBilling = false } = clinicSettings
+
+  let isCorporate = schemeConfig && schemeConfig.copayerFK !== 1
+  const isMedisave = payerTypeFK === INVOICE_PAYER_TYPE.PAYERACCOUNT
+  const isMediVisit = isMedisave && name.includes('Visit') // visitTypes.filter(m => m === medisaveVisitType).length > 0
+  let visitName = isMediVisit && visitTypes.some(v => name.includes(v)) ? 'Medisave 500/700 Visit' : null
+  console.log('visitTypes', visitTypes, name)
+  const isMediVaccination = isMediVisit && invoicePayerItem.length > 0 && invoicePayerItem.filter((o) => o.invoiceItemTypeFK === 3).length > 0
+  console.log('newScheme', invoicePayer, visitName)
+  console.log('isMedisave', isCorporate, isMedisave, isMediVisit, isMediVaccination)
+
+  const firstVacc = inventoryvaccination.find(mv => mv.code === invoicePayerItem[0].itemCode)
+  console.log('firstVacc',firstVacc)
+  
+  const defaultVaccination = isMediVaccination && !medisaveVaccinationFK && firstVacc 
+    ? firstVacc.medisaveVaccinationList.find(l => l.isDefault).medisaveVaccinationFK 
+    : null
+  const medisaveVaccinationLists = isMediVaccination && firstVacc ? firstVacc.medisaveVaccinationList.map(m => {
+    return {
+      name: m.name,
+      id: m.medisaveVaccinationFK,
+    }
+  }) : []
+  console.log('medisaveVaccinationLists',medisaveVaccinationLists, defaultVaccination)
+
+  const payerList = getPayerList(schemeConfig)
+  console.log('payerList',payerList)
+
+  let binMid = 1
+  if(!isCorporate)
+    binMid = 5
+  else if(isMedisave)
+    binMid = 1
+  else
+    binMid = 7
+
+  console.log('newInvoicePayer',invoicePayer)
+  
   return (
     <Paper key={_key} elevation={4} className={classes.gridRow}>
       <GridContainer style={{ marginBottom: 16 }} alignItems='flex-start'>
         <GridItem md={3} style={{ marginTop: 8, marginBottom: 16 }}>
+          {/* Copayment Scheme [Only chas can select] */}
+          <span
+            style={{
+              width: '100%',
+              display: 'flex',
+              fontWeight: 500,
+              fontSize: '1rem',
+              color: titleColor,
+              marginRight: 20,
+            }}
+          >
+            {disableEdit && <NotEditableInfo />}
+            {payerTypeFK === INVOICE_PAYER_TYPE.SCHEME &&
+            _isEditing && (
+            <Select
+              style={{ width: '100%' }}
+              size='sm'
+              allowClear={false}
+              simple
+              valueField='id'
+              onChange={handleSchemeChange}
+              value={copaymentSchemeFK}
+              disabled={_isConfirmed}
+              options={[
+                ...claimableSchemes.map((item) => ({
+                  id: item.id,
+                  name: item.coPaymentSchemeName,
+                })),
+              ]}
+            />
+            )}
+            {payerTypeFK !== INVOICE_PAYER_TYPE.SCHEME &&
+            _isEditing && <span>{visitName || name}</span>}
+
+            {_isConfirmed && <span>{visitName || name}</span>}
+          </span>
+        </GridItem>
+        {isMediVisit && 
+        <GridItem md={2} style={{ marginTop: 8, marginBottom: 16 }}>
+          {/* Medisave Visit Type [CDMP or vaccination] */}
           <div
             style={{
               width: '100%',
@@ -208,36 +335,116 @@ const Scheme = ({
               fontWeight: 500,
               fontSize: '1rem',
               color: titleColor,
+              marginRight: 20,
             }}
           >
             {disableEdit && <NotEditableInfo />}
-            {payerTypeFK === INVOICE_PAYER_TYPE.SCHEME &&
-            _isEditing && (
+            {payerTypeFK !== INVOICE_PAYER_TYPE.PATIENT &&
+            // _isEditing && 
+            (
               <Select
                 style={{ width: '100%' }}
                 size='sm'
                 allowClear={false}
                 simple
                 valueField='id'
-                onChange={handleSchemeChange}
-                value={copaymentSchemeFK}
+                onChange={handleVisitTypeChange}
+                value={medisaveVisitType}
+                disabled// ={_isConfirmed}
+                options={visitTypes}
+              />
+            )}
+            {// _isConfirmed && <div>CDMP</div>
+            }
+          </div>
+        </GridItem>
+        }
+        {isMedisave &&
+        <GridItem md={2} style={{ marginTop: 8, marginBottom: 16 }}>
+          {/* Payer */}
+          
+          <div
+            style={{
+              width: '100%',
+              display: 'flex',
+              fontWeight: 500,
+              fontSize: '1rem',
+              color: titleColor,
+              marginRight: 20,
+            }}
+          >
+            {disableEdit && <NotEditableInfo />}
+            {payerTypeFK !== INVOICE_PAYER_TYPE.COMPANY &&
+              // _isEditing && 
+              (
+              <Select
+                style={{ width: '100%' }}
+                size='sm'
+                allowClear={false}
+                simple
+                valueField='id'
+                onChange={handleSchemePayerChange}
+                value={schemePayerFK}
                 disabled={_isConfirmed}
                 options={[
-                  ...claimableSchemes.map((item) => ({
+                  ...payerList.map((item) => ({
                     id: item.id,
-                    name: item.coPaymentSchemeName,
+                    name: item.name,
                   })),
                 ]}
               />
             )}
-            {payerTypeFK === INVOICE_PAYER_TYPE.COMPANY &&
-            _isEditing && <span>{name}</span>}
-
-            {_isConfirmed && <span>{name}</span>}
           </div>
         </GridItem>
-        {schemeConfig &&
-        schemeConfig.copayerFK === 1 && (
+        }
+        {isMedisave && !isMediVisit && !isMediVaccination && <GridItem md={2} />}
+        {isMedisave && medisaveVisitType !== 'Vaccination' && <GridItem md={2} />}
+        {isMediVaccination && medisaveVisitType === 'Vaccination' && 
+        <GridItem md={2} style={{ marginTop: 8, marginBottom: 16 }}>
+          {/* Vaccination Item */}
+          <div
+            style={{
+              width: '100%',
+              display: 'flex',
+              fontWeight: 500,
+              fontSize: '1rem',
+              color: titleColor,
+              marginRight: 20,
+            }}
+          >
+            {disableEdit && <NotEditableInfo />}
+            {payerTypeFK !== INVOICE_PAYER_TYPE.PATIENT &&
+            // _isEditing && 
+            (
+              <Select
+                style={{ width: '100%' }}
+                size='sm'
+                allowClear={false}
+                simple
+                valueField='id'
+                onChange={handleMedisaveVaccinationChange}
+                value={medisaveVaccinationFK || defaultVaccination}
+                disabled={_isConfirmed}
+                // options={medisaveVaccinationList}            
+                options={[
+                  ...medisaveVaccinationLists.map((item) => ({
+                      id: item.id,
+                      name: item.name,
+                    }
+                  )),
+                ]}
+                /* options={[
+                  'Heb P Heb',
+                  'Medisave Vaccination 1',
+                ]} */
+              />
+            )}
+            {// _isConfirmed && <div>Medisave Vaccination 1</div>
+            }
+          </div>
+        </GridItem>
+        }
+        {!isCorporate && (
           <GridItem md={2} style={{ marginTop: 8, marginBottom: 8 }}>
             <BalanceLabel schemeConfig={schemeConfig} />
           </GridItem>
@@ -245,13 +452,15 @@ const Scheme = ({
         <GridItem md={2} style={{ marginTop: 8, marginBottom: 8 }}>
           <MaxCap
             payerTypeFK={payerTypeFK}
-            claimableSchemes={claimableSchemes}
+            claimableSchemes={[
+              claimableSchemes,
+            ]}
             copaymentSchemeFK={copaymentSchemeFK}
             schemeConfig={schemeConfig}
           />
         </GridItem>
         <GridItem
-          md={schemeConfig && schemeConfig.copayerFK === 1 ? 5 : 7}
+          md={binMid}
           style={{
             textAlign: 'right',
             marginTop: 8,

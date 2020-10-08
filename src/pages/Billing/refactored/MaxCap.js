@@ -1,7 +1,7 @@
 import React from 'react'
 import { NumberInput, TextField } from '@/components'
-import MaxCapInfo from '../components/MaxCapInfo'
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
+import MaxCapInfo from '../components/MaxCapInfo'
 
 const MaxCap = ({
   payerTypeFK,
@@ -9,7 +9,8 @@ const MaxCap = ({
   copaymentSchemeFK,
   schemeConfig,
 }) => {
-  if (payerTypeFK === INVOICE_PAYER_TYPE.SCHEME) {
+  if (payerTypeFK !== INVOICE_PAYER_TYPE.COMPANY) {
+    console.log('MaxCap',schemeConfig)
     if (schemeConfig && schemeConfig.isCoverageMaxCapCheckRequired)
       return (
         <NumberInput

@@ -43,6 +43,7 @@ const headerStyles = {
 @connect(({ patient, codetable, loading }) => ({
   patient,
   codetable,
+  ctschemetype: codetable.ctschemetype || [],
   refreshingChasBalance: loading.effects['patient/refreshChasBalance'],
 }))
 class Banner extends PureComponent {
@@ -55,31 +56,7 @@ class Banner extends PureComponent {
 
   constructor (props) {
     super(props)
-    const { dispatch } = props
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctdrugallergy',
-      },
-    })
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctsalutation',
-      },
-    })
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctschemetype',
-      },
-    })
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'copaymentscheme',
-      },
-    })
+    this.fetchCodeTables()
   }
 
   getAllergyLink (data) {
@@ -171,6 +148,34 @@ class Banner extends PureComponent {
         </div>
       )
     )
+  }
+
+  fetchCodeTables = async () => {
+    const { dispatch } = this.props
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctdrugallergy',
+      },
+    })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctsalutation',
+      },
+    })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctschemetype',
+      },
+    })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'copaymentscheme',
+      },
+    })
   }
 
   refreshGovtBalance = () => {
@@ -526,6 +531,7 @@ class Banner extends PureComponent {
     const viewPatientProfileAccess = Authorized.check(
       'patientdatabase.patientprofiledetails',
     )
+    // console.log('banner-render',schemeDataList)
     return (
       // <Affix target={() => window.mainPanel} offset={headerHeight + 1}>
       <Paper style={style}>
@@ -764,14 +770,32 @@ class Banner extends PureComponent {
                   <div>
                     {schemeDataList.length > 0 ? (
                       <div>
-                        {schemeDataList.filter((fil) => fil !== schemeDataList.filter((p) => this.isMedisave(p.schemeTypeFK))[0]).sort((a,b) => a.schemeTypeFK - b.schemeTypeFK).slice(0, 2).map((o) => {
+                        {schemeDataList // .filter((fil) => !this.isMedisave(fil.schemeTyeFK))
+                        .reduce((_schemeDataList, scheme) => {
+                          if(!this.isMedisave(scheme.schemeTypeFK) || 
+                          _schemeDataList.filter(data => this.isMedisave(data.schemeTypeFK)).length === 0) 
+                            _schemeDataList.push(scheme)
+                          return _schemeDataList
+                        },[])
+                        .sort((a,b) => a.schemeTypeFK - b.schemeTypeFK)
+                        .slice(0, 2).map((o) => {
+                          console.log('schemeData',o)
                           const schemeData = o
-                          const displayString = `${schemeData.coPaymentSchemeFK || this.isMedisave(schemeData.schemeTypeFK)
+                          const isMedisave = this.isMedisave(schemeData.schemeTypeFK)
+                          const displayString = 
+                          `
+                          ${schemeData.coPaymentSchemeFK || isMedisave
                             ? schemeData.copaymentSchemeName || ''
                             : schemeData.schemeTypeName || ''
-                          } (Exp: ${schemeData.validTo
-                            ? moment(schemeData.validTo).format('DD MMM YYYY')
-                            : '-'})`
+                          } 
+                          ${!isMedisave ? '(Exp:' : '' } 
+                          ${!isMedisave && schemeData.validTo
+                            ? moment(schemeData.validTo).format('DD MMM YYYY)')
+                            : ''}
+                          ${!isMedisave && !schemeData.validTo
+                          ? '-)'
+                          : ''}
+                          `
                           return (
                             <div style={{ display: 'flex' }}>
                               {schemeData.statusDescription && (

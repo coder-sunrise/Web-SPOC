@@ -82,6 +82,10 @@ const styles = (theme) => ({
     sessionInfo: queueLog.sessionInfo,
     ctcopaymentscheme: codetable.copaymentscheme || [],
     ctschemetype: codetable.ctschemetype || [],
+    ctcopayer: codetable.ctcopayer || [],
+    inventorymedication: codetable.inventorymedication || [],
+    inventoryvaccination: codetable.inventoryvaccination || [],
+    ctservice: codetable.ctservice || [],
     commitCount: global.commitCount,
     clinicSettings: clinicSettings.settings,
   }),
@@ -132,6 +136,11 @@ const styles = (theme) => ({
 })
 @Authorized.Secured('queue.dispense.makepayment')
 class Billing extends Component {
+  constructor (props) {
+    super(props)
+    this.fetchCodeTables()
+  }
+
   state = {
     showReport: false,
     reportPayload: {
@@ -151,7 +160,7 @@ class Billing extends Component {
     isExistingOldPayerItem: false,
   }
 
-  componentWillMount () {
+  /* componentWillMount () {
     const { billing, history, dispatch } = this.props
     const { patientID } = billing
     const { query } = history.location
@@ -159,6 +168,12 @@ class Billing extends Component {
       type: 'codetable/fetchCodes',
       payload: {
         code: 'copaymentscheme',
+      },
+    })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventoryvaccination',
       },
     })
     dispatch({
@@ -174,7 +189,8 @@ class Billing extends Component {
           id: query.vid,
         },
       })
-  }
+  } */
+
 
   componentWillUnmount () {
     this.props.dispatch({
@@ -189,6 +205,55 @@ class Billing extends Component {
         entity: null,
       },
     })
+  }
+
+  fetchCodeTables = () => {
+    const { history, dispatch } = this.props
+    const { query } = history.location
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctcopayer',
+      },
+    })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'copaymentscheme',
+      },
+    })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctschemetype',
+      },
+    })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctservice',
+      },
+    })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventoryvaccination',
+      },
+    })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventorymedication',
+      },
+    })
+    if (query.vid)
+      dispatch({
+        type: 'billing/query',
+        payload: {
+          id: query.vid,
+        },
+      })
+
   }
 
   onPrintRef = (ref) => {
@@ -302,6 +367,7 @@ class Billing extends Component {
   upsertBilling = async (callback = null, noValidation = false) => {
     const { dispatch, values, resetForm, patient } = this.props
     const { visitStatus, invoicePayer = [] } = values
+    console.log('upsertBilling',values)
 
     try {
       const isSchemesValid = noValidation
@@ -666,6 +732,10 @@ class Billing extends Component {
       commitCount,
       ctschemetype,
       ctcopaymentscheme,
+      ctcopayer,
+      ctservice,
+      inventoryvaccination,
+      inventorymedication,
       clinicSettings,
     } = this.props
     const formikBag = {
@@ -738,6 +808,11 @@ class Billing extends Component {
                     this.handleIsExistingOldPayerItem
                   }
                   clinicSettings={clinicSettings}
+                  inventoryvaccination={inventoryvaccination}
+                  inventorymedication={inventorymedication}
+                  ctservice={ctservice}
+                  patient={patient}
+                  ctcopayer={ctcopayer}
                 />
               )}
             </GridContainer>

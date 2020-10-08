@@ -171,6 +171,7 @@ export const getInvoiceItemsWithClaimAmount = (
   currentInvoiceItems = [],
   shouldGenerateDummyID = false,
 ) => {
+  console.log('getInvoiceItemsWithClaimAmount',originalInvoiceItems)
   if (!schemeConfig || _.isEmpty(schemeConfig)) return []
   const {
     coverageMaxCap,
@@ -232,7 +233,7 @@ export const getInvoiceItemsWithClaimAmount = (
       remainingClaimableAmount,
     )
 
-    console.log('_claimAmount', _claimAmount)
+    // console.log('_claimAmount', _claimAmount)
 
     if (existedItem)
       return [
@@ -246,13 +247,15 @@ export const getInvoiceItemsWithClaimAmount = (
           claimAmount: _claimAmount,
         },
       ]
-
+    
+    // if new item
     return [
       ...result,
       {
         ...item,
-        id: shouldGenerateDummyID ? getUniqueId() : item.id,
-        invoiceItemFK: item.id,
+        // id: shouldGenerateDummyID ? getUniqueId() : item.id,
+        id: item.invoiceItemFK ? item.id : getUniqueId(),
+        invoiceItemFK: item.invoiceItemFK ? item.invoiceItemFK : item.id,
         invoiceItemTypeFK,
         payableBalance: item.totalAfterGst,
         coverage,
@@ -263,6 +266,7 @@ export const getInvoiceItemsWithClaimAmount = (
       },
     ]
   }, [])
+  console.log('invoiceItems',invoiceItems)
   return invoiceItems
 }
 
@@ -521,8 +525,10 @@ export const updateInvoicePayerPayableBalance = (
   updatedIndex,
   autoApply = false,
 ) => {
+  console.log('updateInvoicePayerPayableBalance',list)
   const result = list.reduce((_payers, payer, index) => {
     // dp nothing when payer isCancelled
+    console.log('payer',payer)
     if (payer.isCancelled)
       return [
         ..._payers,
@@ -591,6 +597,7 @@ export const updateInvoicePayerPayableBalance = (
           itemWithSubtotal.invoiceItemFK === item.invoiceItemFK,
       )
 
+      console.log(_existed)
       if (!_existed) {
         const original = originalInvoiceItems.find(
           (oriInvoiceItem) => oriInvoiceItem.id === item.invoiceItemFK,
@@ -609,6 +616,17 @@ export const updateInvoicePayerPayableBalance = (
           : _existed.payableBalance - _existed._prevClaimedAmount,
       }
     })
+    // if is initialising put as confirmed
+    if(!payer._isEditing)
+      return [
+        ..._payers,
+        {
+          ...payer,
+          invoicePayerItem: newInvoicePayerItem,
+          _isConfirmed: true,
+          _isEditing: false,
+        },
+      ]
     return [
       ..._payers,
       {
