@@ -168,7 +168,6 @@ export default createListViewModel({
       },
       getLastStatementNoDone (st, { payload }) {
         const { data } = payload
-        console.log(payload)
         return {
           ...st,
           statementNoList: data,
