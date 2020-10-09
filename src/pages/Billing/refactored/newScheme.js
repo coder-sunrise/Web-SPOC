@@ -248,14 +248,17 @@ const Scheme = ({
   }
   const { isEnableAddPaymentInBilling = false } = clinicSettings
 
-  let isCorporate = schemeConfig && schemeConfig.copayerFK !== 1
+  let isCHAS = schemeConfig && schemeConfig.copayerFK === 1
   const isMedisave = payerTypeFK === INVOICE_PAYER_TYPE.PAYERACCOUNT
-  const isMediVisit = isMedisave && name.includes('Visit') // visitTypes.filter(m => m === medisaveVisitType).length > 0
-  let visitName = isMediVisit && visitTypes.some(v => name.includes(v)) ? 'Medisave 500/700 Visit' : null
+  const isMediVisit = isMedisave && medisaveVisitType !== '' // && name.includes('Visit') // visitTypes.filter(m => m === medisaveVisitType).length > 0
+  let visitName = null
+  if(isMediVisit && name.includes('500'))
+    visitName = 'Medisave 500 Visit'
+  if(isMediVisit && name.includes('700'))
+    visitName = 'Medisave 700 Visit'
   console.log('visitTypes', visitTypes, name)
-  const isMediVaccination = isMediVisit && invoicePayerItem.length > 0 && invoicePayerItem.filter((o) => o.invoiceItemTypeFK === 3).length > 0
-  console.log('newScheme', invoicePayer, visitName)
-  console.log('isMedisave', isCorporate, isMedisave, isMediVisit, isMediVaccination)
+  const isMediVaccination = isMediVisit && medisaveVisitType === 'Vaccination' // invoicePayerItem.length > 0 && invoicePayerItem.filter((o) => o.invoiceItemTypeFK === 3).length > 0
+  console.log('isMedisave', isCHAS, isMedisave, isMediVisit, isMediVaccination)
 
   const firstVacc = inventoryvaccination.find(mv => mv.code === invoicePayerItem[0].itemCode)
   console.log('firstVacc',firstVacc)
@@ -275,7 +278,7 @@ const Scheme = ({
   console.log('payerList',payerList)
 
   let binMid = 1
-  if(!isCorporate)
+  if(isCHAS)
     binMid = 5
   else if(isMedisave)
     binMid = 1
@@ -444,7 +447,7 @@ const Scheme = ({
           </div>
         </GridItem>
         }
-        {!isCorporate && (
+        {isCHAS && (
           <GridItem md={2} style={{ marginTop: 8, marginBottom: 8 }}>
             <BalanceLabel schemeConfig={schemeConfig} />
           </GridItem>

@@ -51,9 +51,13 @@ class PayersGrid extends PureComponent {
           if (relation.name === 'SELF') // auto populate payer
           {
             const { entity } = this.props.patient
-            row.payerName = entity.name
-            row.payerID = entity.patientAccountNo
-            row.dob = entity.dob
+            if(entity)
+            {
+              row.payerName = entity.name
+              row.payerID = entity.patientAccountNo
+              row.dob = entity.dob
+
+            }
           }
           
           if(!row.schemeFK) return
