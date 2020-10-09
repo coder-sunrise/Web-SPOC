@@ -70,7 +70,6 @@ const LTInvoiceStatus = [
 ]
 
 const isDuplicatePOAllowed = (status) => {
-  console.log(status)
   const allowedStatus = [
     'Partially Received',
     'Finalized',
