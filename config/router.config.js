@@ -744,7 +744,7 @@ const _routes = [
             name: 'purchasereceivinglistingreport',
             component: './Report/purchasereceivinglistingreport',
             authority: [
-              //'report.inventory.purchasereceivinglistingreport',
+              'report.inventory.purchasereceivinglistingreport',
             ],
           },
           {

@@ -141,7 +141,7 @@ export const menuData = [
     title: 'Inventory',
     text: 'Purchase & Receiving Report',
     url: '/report/purchasereceivinglistingreport',
-    authority: '',
+    authority: 'report.inventory.purchasereceivinglistingreport',
   },
   {
     title: 'Other',
