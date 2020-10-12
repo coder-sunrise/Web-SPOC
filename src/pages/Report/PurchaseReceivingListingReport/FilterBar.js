@@ -11,7 +11,6 @@ import {
   Checkbox,
 } from '@/components'
 import ReportDateRangePicker from '../ReportDateRangePicker'
-import Authorized from '@/utils/Authorized'
 
 const FilterBar = ({ handleSubmit, isSubmitting }) => {
   return (
@@ -23,15 +22,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={3}>
             <Button
               color='primary'
-              onClick={() => {
-                console.log(
-                  '3333',
-                  Authorized.check(
-                    'report.inventory.purchasereceivinglistingreport',
-                  ),
-                )
-              }}
-              //handleSubmit}
+              onClick={handleSubmit}
               disabled={isSubmitting}
             >
               Generate Report
