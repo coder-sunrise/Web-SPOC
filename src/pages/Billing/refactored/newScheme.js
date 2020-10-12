@@ -354,6 +354,7 @@ const Scheme = ({
               onClick={handleEditClick}
               disabled={
                 disableEdit ||
+                hasOtherEditing ||
                 (isEnableAddPaymentInBilling && existingOldPayerItem)
               }
             >
