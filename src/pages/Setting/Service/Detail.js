@@ -492,8 +492,8 @@ class Detail extends PureComponent {
                             settingClinicService.entity ? (
                               this.state.hasActiveSession
                             ) : (
-                              false
-                            )
+                                false
+                              )
                           }
                           {...args}
                         />
@@ -569,85 +569,6 @@ class Detail extends PureComponent {
                 </GridItem>
               </GridContainer>
             </div>
-            {/* <h5 className={classes.detailHeader}>Medisave Settings</h5>
-            <Divider />
-            <GridContainer>
-              <GridItem
-                xs={12}
-                md={6}
-                className={classes.detailHeaderContainer}
-              >
-                <FastField
-                  name='isMedisaveHealthScreening'
-                  render={(args) => {
-                    return (
-                      <Checkbox
-                        onChange={this.onChangeMedisaveHealthScreening}
-                        formControlProps={{ className: classes.medisaveCheck }}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-
-                <Field
-                  name='medisaveHealthScreeningDiagnosisFK'
-                  render={(args) => {
-                    return (
-                      <Select
-                        style={{ paddingLeft: 20 }}
-                        prefix='Medisave Health Screening'
-                        disabled={this.state.ddlMedisaveHealthScreening}
-                        options={
-                          medisaveSettingValue.MedisaveHealthScreeningValue
-                        }
-                        {...args}
-                      />
-                      // <CodeSelect
-                      //   style={{ paddingLeft: 20 }}
-                      //   prefix='Medisave Health Screening'
-                      //   code='ctMedisaveHealthScreeningDiagnosis'
-                      //   {...args}
-                      // />
-                    )
-                  }}
-                />
-              </GridItem>
-            </GridContainer>
-            <GridContainer>
-              <GridItem
-                xs={12}
-                md={6}
-                className={classes.detailHeaderContainer}
-              >
-                <FastField
-                  name='isOutpatientScan'
-                  render={(args) => {
-                    return (
-                      <Checkbox
-                        formControlProps={{ className: classes.medisaveCheck }}
-                        onChange={this.onChangeOutpatientScan}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-                <Field
-                  name='outPatientScanDiagnosisFK'
-                  render={(args) => {
-                    return (
-                      <Select
-                        style={{ paddingLeft: 20 }}
-                        prefix='OutPatient Scan'
-                        disabled={this.state.ddlOutpatientScan}
-                        options={medisaveSettingValue.OutpatientScanValue}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-            </GridContainer> */}
             <h4 style={{ fontWeight: 400 }}>
               <b>Service Settings</b>
             </h4>
@@ -668,6 +589,9 @@ class Detail extends PureComponent {
                 showAddCommand: true,
                 onCommitChanges: this.commitChanges,
                 onAddedRowsChange: this.onAddedRowsChange,
+                isDeletable: () => {
+                  return !this.state.hasActiveSession
+                },
               }}
               schema={itemSchema}
               {...this.tableParas}
