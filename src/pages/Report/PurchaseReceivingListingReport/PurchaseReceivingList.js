@@ -44,6 +44,7 @@ class PurchaseReceivingList extends PureComponent {
           return {
             ...item,
             id: `purchaseReceiving-${index}-${item.itemCode}`,
+            groupID: `${item.transactionType}-${item.porgid}`,
             countNumber: firstRow ? 1 : 0,
             rowspan: firstRow
               ? reportDatas.PurchaseReceivingListingDetails.filter(
@@ -105,7 +106,7 @@ class PurchaseReceivingList extends PureComponent {
       { name: 'totalPrice', title: 'Total Price' },
       { name: 'expiryDate', title: 'Exp. Date' },
       { name: 'batchNo', title: 'Batch No.' },
-      { name: 'poNo', title: 'Details' },
+      { name: 'groupID', title: 'Details' },
     ]
 
     if (reportDatas.PurchaseReceivingListingInfo[0].isGroupBySupplier) {
@@ -174,7 +175,7 @@ class PurchaseReceivingList extends PureComponent {
       { columnName: 'batchNo', sortingEnabled: false, width: 120 },
       { columnName: 'supplierName', width: 0 },
       {
-        columnName: 'poNo',
+        columnName: 'groupID',
         width: 0,
       },
     ]
@@ -188,7 +189,7 @@ class PurchaseReceivingList extends PureComponent {
     grouping = [
       ...grouping,
       {
-        columnName: 'poNo',
+        columnName: 'groupID',
       },
     ]
     let FuncProps = {
@@ -208,9 +209,9 @@ class PurchaseReceivingList extends PureComponent {
                   {row.value}
                 </span>
               )
-            if (row.groupedBy === 'poNo') {
+            if (row.groupedBy === 'groupID') {
               const groupRow = incomeData.find(
-                (data) => data.poNo === row.value,
+                (data) => data.groupID === row.value,
               )
               return (
                 <span>
