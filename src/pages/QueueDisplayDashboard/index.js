@@ -217,7 +217,7 @@ const QueueDisplayDasboard = ({
               dispatch({
                 type: 'queueCalling/clearCurrentQCall',
               })
-            }, 5000)
+            }, 4800)
           }
         }
       }, 500)
