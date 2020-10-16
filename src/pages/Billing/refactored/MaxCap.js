@@ -9,8 +9,9 @@ const MaxCap = ({
   copaymentSchemeFK,
   schemeConfig,
 }) => {
-  if (payerTypeFK !== INVOICE_PAYER_TYPE.COMPANY) {
-    console.log('MaxCap',schemeConfig)
+  if (payerTypeFK === INVOICE_PAYER_TYPE.SCHEME || 
+    payerTypeFK === INVOICE_PAYER_TYPE.PAYERACCOUNT) {
+    console.log('MaxCap',schemeConfig, claimableSchemes, copaymentSchemeFK)
     if (schemeConfig && schemeConfig.isCoverageMaxCapCheckRequired)
       return (
         <NumberInput

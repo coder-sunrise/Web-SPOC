@@ -53,6 +53,11 @@ const constructSchemeList = (
           ],
     [],
   ) */
+  
+  const allItemsClaimed = invoiceItems.filter((v) => {
+    return v._claimedAmount && v._claimedAmount < v.totalAfterGst
+  }).length === 0
+
   const result = list
   /* .sort((a,b) => {
     if(a[0].schemeCategoryFK === 5) a[0].schemeCategoryFK = 99
@@ -65,7 +70,8 @@ const constructSchemeList = (
     if (scheme[0].coPaymentSchemeName.includes('CHAS')) {
       const disabled =
         // currentClaims.length > 0 || 
-        currentClaims.filter((item) => item < 6).length > 0
+        currentClaims.filter((item) => item < 6).length > 0 || 
+        allItemsClaimed
 
       return [
         ..._result,
@@ -103,11 +109,11 @@ const constructSchemeList = (
           return v.invoiceItemTypeFK === 3 && !fullyClaimed && medisaveVaccinations.find(m => m.code === v.itemCode)
         if(medisavescheme.code === 'MEDISAVEHS')
           return v.invoiceItemTypeFK === 4 && !fullyClaimed && healthScreenings.find(m => m.code === v.itemCode)
-
-        return true
+        
+        return !fullyClaimed
       }).length === 0
-      console.log('disabled', isClaimed, isMedisaveConflict, isMedisaveClaimed)
-      const disabled = isClaimed || isMedisaveConflict || isMedisaveClaimed      
+      console.log('disabled', isClaimed, allItemsClaimed, isMedisaveConflict, isMedisaveClaimed)
+      const disabled = isClaimed || allItemsClaimed || isMedisaveConflict || isMedisaveClaimed      
       // (!isMedisaveVisit && currentClaims.includes(scheme[0].id)) || payersList.length === 0 || 
       // (isMedisaveVisit && currentVisitTypes.length > 2)
       // console.log(medisavescheme, disabled)
@@ -131,7 +137,7 @@ const constructSchemeList = (
         claimableSchemesFK: s.id,
         claimableSchemesIndex: index,
         nestedIndex,
-        disabled: currentClaims.includes(s.id),
+        disabled: currentClaims.includes(s.id) || allItemsClaimed,
         schemeName: s.coPaymentSchemeName,
       })),
     ]

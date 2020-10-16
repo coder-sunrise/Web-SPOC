@@ -110,7 +110,6 @@ const Scheme = ({
   ctschemetype,
   ctcopaymentscheme,
   tempInvoicePayer,
-  medisaveSchemes,
   inventoryvaccination,
   invoice,
   clinicSettings = {},
@@ -135,8 +134,8 @@ const Scheme = ({
     invoicePayment = [],
     schemePayerFK,
     medisaveVisitType,
-    medisaveVaccinationFK,
-    medisaveVaccinationList = [],
+    // medisaveVaccinationFK,
+    // medisaveVaccinationList = [],
   } = invoicePayer
 
   console.log('invoicePayer',invoicePayer)
@@ -205,16 +204,16 @@ const Scheme = ({
     return _isEditing || hasOtherEditing
   }
 
-  const getPayerList = () => {
+  const getPayerList = (payerScheme) => {
     // copayment scheme get scheme type fk, use it to find schemefk in schemepayer
-    const scheme = ctcopaymentscheme.find((a) => a.id === schemeConfig.id)
+    const scheme = ctcopaymentscheme.find((a) => a.id === payerScheme.copaymentSchemeFK)
     const schemeType = scheme ? ctschemetype.find((c) => c.name === scheme.schemeTypeName) : []
     
     const addedSchemes = scheme ? tempInvoicePayer.filter((r) => r.copaymentSchemeFK !== scheme.id).map((a) => {return a.copaymentSchemeFK}) : []
     
     // console.log(scheme, schemeType, addedSchemes)
 
-    return patient.schemePayer.filter((b) => b.schemeFK === schemeType.id && addedSchemes.indexOf(schemeConfig.id) < 0)
+    return patient.schemePayer.filter((b) => b.schemeFK === schemeType.id && addedSchemes.indexOf(payerScheme.copaymentSchemeFK) < 0)
     .map((p) => {
       return {
         name: p.payerName,
@@ -250,7 +249,7 @@ const Scheme = ({
 
   let isCHAS = schemeConfig && schemeConfig.copayerFK === 1
   const isMedisave = payerTypeFK === INVOICE_PAYER_TYPE.PAYERACCOUNT
-  const isMediVisit = isMedisave && medisaveVisitType !== '' // && name.includes('Visit') // visitTypes.filter(m => m === medisaveVisitType).length > 0
+  const isMediVisit = isMedisave && visitTypes.find(v => v === medisaveVisitType)// !== '' // && name.includes('Visit') // visitTypes.filter(m => m === medisaveVisitType).length > 0
   let visitName = null
   if(isMediVisit && name.includes('500'))
     visitName = 'Medisave 500 Visit'
@@ -263,6 +262,7 @@ const Scheme = ({
   const firstVacc = inventoryvaccination.find(mv => mv.code === invoicePayerItem[0].itemCode)
   console.log('firstVacc',firstVacc)
   
+  /* 
   const defaultVaccination = isMediVaccination && !medisaveVaccinationFK && firstVacc 
     ? firstVacc.medisaveVaccinationList.find(l => l.isDefault).medisaveVaccinationFK 
     : null
@@ -273,8 +273,10 @@ const Scheme = ({
     }
   }) : []
   console.log('medisaveVaccinationLists',medisaveVaccinationLists, defaultVaccination)
+  */
 
-  const payerList = getPayerList(schemeConfig)
+  console.log('getPayerList',invoicePayer)
+  const payerList = getPayerList(invoicePayer)
   console.log('payerList',payerList)
 
   let binMid = 1
@@ -401,10 +403,8 @@ const Scheme = ({
         </GridItem>
         }
         {isMedisave && !isMediVisit && !isMediVaccination && <GridItem md={2} />}
-        {isMedisave && medisaveVisitType !== 'Vaccination' && <GridItem md={2} />}
-        {isMediVaccination && medisaveVisitType === 'Vaccination' && 
+        {/* isMediVaccination && medisaveVisitType === 'Vaccination' && 
         <GridItem md={2} style={{ marginTop: 8, marginBottom: 16 }}>
-          {/* Vaccination Item */}
           <div
             style={{
               width: '100%',
@@ -436,18 +436,14 @@ const Scheme = ({
                     }
                   )),
                 ]}
-                /* options={[
-                  'Heb P Heb',
-                  'Medisave Vaccination 1',
-                ]} */
               />
             )}
             {// _isConfirmed && <div>Medisave Vaccination 1</div>
             }
           </div>
         </GridItem>
-        }
-        {isCHAS && (
+        */}
+        {(isCHAS || isMedisave) && (
           <GridItem md={2} style={{ marginTop: 8, marginBottom: 8 }}>
             <BalanceLabel schemeConfig={schemeConfig} />
           </GridItem>

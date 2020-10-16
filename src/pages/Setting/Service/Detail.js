@@ -153,6 +153,7 @@ const modalityItemSchema = Yup.object().shape({
 
 class Detail extends PureComponent {
   state = {
+    ddlIsCdmpClaimable: this.props.initialValues.isCdmpClaimable,
     ddlMedisaveHealthScreening: this.props.initialValues.isMedisaveHealthScreening,
     ddlOutpatientScan: this.props.initialValues.isOutpatientScan,
     serviceSettings: this.props.values.ctServiceCenter_ServiceNavigation,
@@ -264,13 +265,14 @@ class Detail extends PureComponent {
         ddlMedisaveHealthScreening:
           settingClinicService.entity.isMedisaveHealthScreening,
         ddlOutpatientScan: settingClinicService.entity.isOutpatientScan,
+        ddlIsCdmpClaimable: settingClinicService.entity.isCdmpClaimable,
       })
     }
   }
 
   onChangeMedisaveHealthScreening = (e) => {
     if (e) {
-      this.setState(({ ddlMedisaveHealthScreening }) => ({
+      this.setState(() => ({
         ddlMedisaveHealthScreening: e.target.value,
       }))
 
@@ -284,7 +286,7 @@ class Detail extends PureComponent {
 
   onChangeOutpatientScan = (e) => {    
     if (e) {
-      this.setState(({ ddlOutpatientScan }) => ({
+      this.setState(() => ({
         ddlOutpatientScan: e.target.value,
       }))
 
@@ -292,6 +294,20 @@ class Detail extends PureComponent {
       setFieldValue('isOutpatientScan', e.target.value)
       if(e.target.value === false)
         values.outPatientScanDiagnosisFK = null
+    }
+  }
+
+  onChangeCdmpClaimable = (e) => {    
+    if (e) {
+      this.setState(() => ({
+        ddlIsCdmpClaimable: e.target.value,
+      }))
+    }
+
+    if(!e.target.value)
+    {
+      this.onChangeMedisaveHealthScreening(e)
+      this.onChangeOutpatientScan(e)
     }
   }
 
@@ -450,7 +466,7 @@ class Detail extends PureComponent {
       settingClinicService,
       errors,
     } = props
-    const { serviceSettings, ddlMedisaveHealthScreening, ddlOutpatientScan } = this.state
+    const { serviceSettings, ddlMedisaveHealthScreening, ddlOutpatientScan, ddlIsCdmpClaimable } = this.state
     const serviceSettingsErrMsg = errors.ctServiceCenter_ServiceNavigation
     const shoudDisableSaveButton =
       serviceSettings.filter((row) => !row.isDeleted).length === 0
@@ -574,84 +590,106 @@ class Detail extends PureComponent {
                     }}
                   />
                 </GridItem>
+                <GridItem xs={12}>
+                  <FastField
+                    name='isCdmpClaimable'
+                    render={(args) => {
+                      return (
+                        <span>
+                          <Checkbox
+                            checked={ddlIsCdmpClaimable}
+                            // formControlProps={{ className: classes.medisaveCheck }}
+                            onChange={(e) => this.onChangeCdmpClaimable(e)}
+                            label='CDMP Claimable'
+                            {...args}
+                          />
+                        </span>
+                      )
+                    }}
+                  />
+                </GridItem>
               </GridContainer>
             </div>
-            <h4 style={{ fontWeight: 400 }}>
-              <b>Medisave Settings</b>
-            </h4>
-            <div style={{ margin: theme.spacing(1) }}>
-              <GridContainer>
-                <GridItem
-                  xs={1}
-                  className={classes.detailHeaderContainer}
-                  style={{ paddingLeft: 20 }}
-                >
-                  <FastField
-                    name='isMedisaveHealthScreening'
-                    render={(args) => {
-                      return (
-                        <Checkbox
-                          checked={ddlMedisaveHealthScreening}
-                          // formControlProps={{ className: classes.medisaveCheck }}
-                          onChange={(e) => this.onChangeMedisaveHealthScreening(e)}
-                          {...args}
-                        />
-                      )
-                    }}
-                  />
-                </GridItem>
-                <GridItem xs={8}>
-                  <Field
-                    name='medisaveHealthScreeningDiagnosisFK'
-                    render={(args) => {
-                      return (
-                        <CodeSelect
-                          label='Medisave Health Screening'
-                          code='ctmedisavehealthscreeningdiagnosis'
-                          disabled={!ddlMedisaveHealthScreening}
-                          {...args}
-                        />
-                      )}
-                    }
-                  />
-                </GridItem>
-                <GridItem xs={3} />
-                <GridItem
-                  xs={1}
-                  className={classes.detailHeaderContainer}
-                  style={{ paddingLeft: 20 }}
-                >
-                  <FastField
-                    name='isOutpatientScan'
-                    render={(args) => {
-                      return (
-                        <Checkbox
-                          checked={ddlOutpatientScan}
-                          // formControlProps={{ className: classes.medisaveCheck }}
-                          onChange={(e) => this.onChangeOutpatientScan(e)}
-                        />
-                      )
-                    }}
-                  />
-                </GridItem>
-                <GridItem xs={8}>
-                  <Field
-                    name='outPatientScanDiagnosisFK'
-                    render={(args) => {
-                      return (
-                        <CodeSelect
-                          label='Medisave Outpatient Scan'
-                          code='ctmedisaveoutpatientscandiagnosis'
-                          disabled={!ddlOutpatientScan}
-                          {...args}
-                        />
-                      )
-                    }}
-                  />
-                </GridItem>
-                <GridItem xs={3} />
-              </GridContainer>
-            </div>
+            {ddlIsCdmpClaimable && 
+            <div>
+              <h4 style={{ fontWeight: 400 }}>
+                <b>Medisave Settings</b>
+              </h4>
+              <div style={{ margin: theme.spacing(1) }}>
+                <GridContainer>
+                  <GridItem
+                    xs={1}
+                    className={classes.detailHeaderContainer}
+                    style={{ paddingLeft: 20 }}
+                  >
+                    <FastField
+                      name='isMedisaveHealthScreening'
+                      render={(args) => {
+                        return (
+                          <Checkbox
+                            style={{ verticalAlign: 'bottom' }}
+                            checked={ddlMedisaveHealthScreening}
+                            // formControlProps={{ className: classes.medisaveCheck }}
+                            onChange={(e) => this.onChangeMedisaveHealthScreening(e)}
+                            {...args}
+                          />
+                        )
+                      }}
+                    />
+                  </GridItem>
+                  <GridItem xs={8}>
+                    <FastField
+                      name='medisaveHealthScreeningDiagnosisFK'
+                      render={(args) => {
+                        return (
+                          <CodeSelect
+                            label='Medisave Health Screening'
+                            code='ctmedisavehealthscreeningdiagnosis'
+                            disabled={!ddlMedisaveHealthScreening}
+                            {...args}
+                          />
+                        )}
+                      }
+                    />
+                  </GridItem>
+                  <GridItem xs={3} />
+                  <GridItem
+                    xs={1}
+                    className={classes.detailHeaderContainer}
+                    style={{ paddingLeft: 20 }}
+                  >
+                    <FastField
+                      name='isOutpatientScan'
+                      render={(args) => {
+                        return (
+                          <Checkbox
+                            checked={ddlOutpatientScan}
+                            // formControlProps={{ className: classes.medisaveCheck }}
+                            onChange={(e) => this.onChangeOutpatientScan(e)}
+                          />
+                        )
+                      }}
+                    />
+                  </GridItem>
+                  <GridItem xs={8}>
+                    <FastField
+                      name='outPatientScanDiagnosisFK'
+                      render={(args) => {
+                        return (
+                          <CodeSelect
+                            label='Medisave Outpatient Scan'
+                            code='ctmedisaveoutpatientscandiagnosis'
+                            disabled={!ddlOutpatientScan}
+                            {...args}
+                          />
+                        )
+                      }}
+                    />
+                  </GridItem>
+                  <GridItem xs={3} />
+                </GridContainer>
+              </div>
+            </div>}
             <h4 style={{ fontWeight: 400 }}>
               <b>Service Settings</b>
             </h4>
