@@ -74,7 +74,7 @@ const isDuplicatePOAllowed = (status) => {
     'Partially Received',
     'Finalized',
     'Fulfilled',
-    'Completed', 
+    'Completed',
   ]
   return !(allowedStatus.indexOf(status) > -1)
 }

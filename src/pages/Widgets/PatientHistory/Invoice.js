@@ -14,6 +14,11 @@ const numberstyle = {
   fontWeight: 500,
 }
 
+const negativeNumberstyle = {
+  color: 'red',
+  fontWeight: 500,
+}
+
 const wrapCellTextStyle = {
   wordWrap: 'break-word',
   whiteSpace: 'pre-wrap',
@@ -25,6 +30,20 @@ const drugMixtureIndicator = (row) => {
   return (
     <div style={{ position: 'relative', top: 2 }}>
       <DrugMixtureInfo values={row.prescriptionDrugMixture} />
+    </div>
+  )
+}
+
+const showCurrency = (value = 0) => {
+  if (value >= 0)
+    return (
+      <div style={numberstyle}>
+        {`${currencySymbol}${numeral(value).format('0,0.00')}`}
+      </div>
+    )
+  return (
+    <div style={negativeNumberstyle}>
+      {`(${currencySymbol}${numeral(value * -1).format('0,0.00')})`}
     </div>
   )
 }
@@ -63,24 +82,14 @@ const baseColumns = [
     title: 'Adj.',
     width: 120,
     align: 'right',
-    render: (text, row) => (
-      <div style={numberstyle}>
-        {`${currencySymbol}${numeral(row.adjAmt || 0).format('0,0.00')}`}
-      </div>
-    ),
+    render: (text, row) => showCurrency(row.adjAmt),
   },
   {
     dataIndex: 'totalAfterItemAdjustment',
     title: 'Total',
     width: 120,
     align: 'right',
-    render: (text, row) => (
-      <div style={numberstyle}>
-        {`${currencySymbol}${numeral(row.totalAfterItemAdjustment || 0).format(
-          '0,0.00',
-        )}`}
-      </div>
-    ),
+    render: (text, row) => showCurrency(row.totalAfterItemAdjustment),
   },
 ]
 
@@ -141,24 +150,14 @@ export default ({ current, theme, isFullScreen = true }) => {
           title: 'Adj',
           width: 120,
           align: 'right',
-          render: (text, row) => (
-            <div style={numberstyle}>
-              {`${currencySymbol}${numeral(row.adjAmt || 0).format('0,0.00')}`}
-            </div>
-          ),
+          render: (text, row) => showCurrency(row.adjAmt),
         },
         {
           dataIndex: 'totalAfterItemAdjustment',
           title: 'Total',
           width: 120,
           align: 'right',
-          render: (text, row) => (
-            <div style={numberstyle}>
-              {`${currencySymbol}${numeral(
-                row.totalAfterItemAdjustment || 0,
-              ).format('0,0.00')}`}
-            </div>
-          ),
+          render: (text, row) => showCurrency(row.totalAfterItemAdjustment),
         },
       ]
     }

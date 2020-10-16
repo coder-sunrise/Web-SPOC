@@ -64,6 +64,18 @@ const styles = (theme) => ({
   integratedLeftPanel: {
     width: '100%',
   },
+  wrapCellTextStyle: {
+    wordWrap: 'break-word',
+    whiteSpace: 'pre-wrap',
+  },
+  numberstyle: {
+    color: 'darkBlue',
+    fontWeight: 500,
+  },
+  negativeNumberstyle: {
+    color: 'red',
+    fontWeight: 500,
+  },
 })
 @withFormikExtend({
   mapPropsToValues: ({ patientHistory }) => {},
