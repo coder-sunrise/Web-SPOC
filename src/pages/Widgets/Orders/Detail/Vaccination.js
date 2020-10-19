@@ -160,7 +160,6 @@ class Vaccination extends PureComponent {
 
   changeVaccination = (v, op = {}) => {
     const { setFieldValue, values, disableEdit } = this.props
-    // console.log(v, op)
     let defaultBatch
     if (op.vaccinationStock) {
       defaultBatch = op.vaccinationStock.find((o) => o.isDefault === true)
@@ -238,13 +237,11 @@ class Vaccination extends PureComponent {
 
   calculateQuantity = (vaccination) => {
     const { codetable, setFieldValue, values, disableEdit, dirty } = this.props
-    // console.log(this.props)
     const { minQuantity = 0 } = values
     let currentVaccination =
       vaccination && Object.values(vaccination).length ? vaccination : undefined
     if (!currentVaccination) currentVaccination = this.state.selectedVaccination
     let newTotalQuantity = 0
-    // console.log(currentVaccination, values)
     if (currentVaccination && currentVaccination.dispensingQuantity && !dirty) {
       newTotalQuantity = currentVaccination.dispensingQuantity
     } else if (currentVaccination.prescribingDosage) {
@@ -267,7 +264,6 @@ class Vaccination extends PureComponent {
       newTotalQuantity < minQuantity ? minQuantity : newTotalQuantity
 
     setFieldValue(`quantity`, newTotalQuantity)
-    // console.log(newTotalQuantity)
     if (currentVaccination.sellingPrice) {
       setFieldValue('unitPrice', currentVaccination.sellingPrice)
       setFieldValue(
@@ -517,17 +513,7 @@ class Vaccination extends PureComponent {
           </GridItem>
         </GridContainer>
         <GridContainer>
-          <GridItem xs={6}>
-            <Field
-              name='vaccinationGivenDate'
-              render={(args) => {
-                return <DatePicker label='Date Given' {...args} />
-              }}
-            />
-          </GridItem>
-        </GridContainer>
-        <GridContainer>
-          <GridItem xs={4}>
+          <GridItem xs={2}>
             <Field
               name='usageMethodFK'
               render={(args) => {
