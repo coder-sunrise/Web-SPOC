@@ -268,13 +268,13 @@ export const QueueColumnExtensions = [
   },
   {
     columnName: 'timeIn',
-    width: 170,
+    width: 180,
     type: 'date',
     showTime: true,
   },
   {
     columnName: 'timeOut',
-    width: 170,
+    width: 180,
     type: 'date',
     showTime: true,
   },
@@ -295,7 +295,7 @@ export const QueueColumnExtensions = [
   },
   {
     columnName: 'appointmentTime',
-    width: 160,
+    width: 180,
     type: 'date',
     showTime: true,
     // compare: compareTime,

@@ -740,6 +740,14 @@ const _routes = [
             ],
           },
           {
+            path: '/report/purchasereceivinglistingreport',
+            name: 'purchasereceivinglistingreport',
+            component: './Report/purchasereceivinglistingreport',
+            authority: [
+              'report.inventory.purchasereceivinglistingreport',
+            ],
+          },
+          {
             path: '/report/statementsummaryreport',
             name: 'statementsummaryreport',
             component: './Report/StatementSummaryReport',
