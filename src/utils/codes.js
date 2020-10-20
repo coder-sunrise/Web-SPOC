@@ -1515,6 +1515,11 @@ const ltAdmittingSpecialty = [
   },
 ]
 
+const enableDisableOptions = [
+  { value: true, name: 'Enabled' },
+  { value: false, name: 'Disabled' },
+]
+
 module.exports = {
   appointmentStatus,
   recurrenceTypes,
@@ -1550,5 +1555,6 @@ module.exports = {
   gstChargedTypes,
   surgicalRoles,
   ltAdmittingSpecialty,
+  enableDisableOptions,
   ...module.exports,
-}
+} 
