@@ -3,23 +3,20 @@ import { connect } from 'dva'
 import Authorized from '@/utils/Authorized'
 import { findGetParameter, roundTo } from '@/utils/utils'
 import { ReportViewer } from '@/components/_medisys'
-
+import { getBizSession } from '@/services/queue'
 import {
   GridContainer,
   GridItem,
   CardContainer,
   NumberInput,
   CommonModal,
+  WarningSnackbar,
 } from '@/components'
 import { withStyles, TextField } from '@material-ui/core'
 import withWebSocket from '@/components/Decorator/withWebSocket'
-
-import depositModel from '@/pages/Finance/Deposit/models/deposit'
 import DeleteConfirm from './DeleteConfirm'
 import DepositGrid from './DepositGrid'
 import FilterBar from './FilterBar'
-
-window.g_app.replaceModel(depositModel)
 
 const styles = () => ({
   container: {
@@ -38,8 +35,6 @@ const styles = () => ({
   },
 })
 
-// window.g_app.replaceModel(model)
-
 @connect(({ patient, user }) => ({
   patient,
   user,
@@ -57,18 +52,33 @@ class PatientDeposit extends PureComponent {
       selectedTypeIds: [
         -99,
       ],
+      hasActiveSession: true,
     }
   }
 
   componentDidMount () {
+    this.checkHasActiveSession()
     setTimeout(() => {
       this.searchResult()
     }, 10)
   }
 
+  checkHasActiveSession = () => {
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+    }
+    getBizSession(bizSessionPayload).then((result) => {
+      if (result) {
+        const { data } = result.data
+        this.setState({ hasActiveSession: data.length > 0 })
+      }
+    })
+  }
+
   searchResult = () => {
-    const { dispatch } = this.props
-    const patientId = Number(findGetParameter('pid'))
+    const { dispatch, patient: { entity: patientEntity } } = this.props
+
+    const patientId = patientEntity.id // Number(findGetParameter('pid'))
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {
@@ -113,7 +123,10 @@ class PatientDeposit extends PureComponent {
   }
 
   handleDeleteRow = async (row) => {
-    this.setState({ showDeleteConfirmation: true, deletingRow: row })
+    const { patient: { entity } } = this.props
+    if (entity && entity.isActive) {
+      this.setState({ showDeleteConfirmation: true, deletingRow: row })
+    }
   }
 
   handleTypeChange = (opt) => {
@@ -145,8 +158,9 @@ class PatientDeposit extends PureComponent {
   }
 
   render () {
-    const { dispatch, user, patient: { deposit }, classes } = this.props
+    const { dispatch, user, patient: { entity, deposit }, classes } = this.props
     const { selectedTypeIds, showDeleteConfirmation } = this.state
+    const patientIsActive = entity && entity.isActive
 
     let transactionList = []
     let totalAmount = 0
@@ -193,14 +207,28 @@ class PatientDeposit extends PureComponent {
           >
             <React.Fragment>
               <CardContainer hideHeader size='sm'>
+                {!this.state.hasActiveSession ? (
+                  <div style={{ paddingTop: 5 }}>
+                    <WarningSnackbar
+                      variant='warning'
+                      className={classes.margin}
+                      message='Action(s) is not allowed due to no active session was found.'
+                    />
+                  </div>
+                ) : (
+                  ''
+                )}
                 <GridContainer>
                   <FilterBar
                     {...this.props}
                     selectedTypeIds={selectedTypeIds}
-                    disabled={depositAccessRight !== 'enable'}
+                    disabled={
+                      depositAccessRight !== 'enable' || !patientIsActive
+                    }
                     refundableAmount={refundableAmount}
                     refresh={this.searchResult}
                     handleTypeChange={this.handleTypeChange}
+                    hasActiveSession={this.state.hasActiveSession}
                   />
                 </GridContainer>
                 <GridContainer style={{ marginTop: 20 }}>
@@ -209,6 +237,8 @@ class PatientDeposit extends PureComponent {
                       transactionList={transactionList}
                       handlePrint={this.handlePrintReceipt}
                       handleDeleteRow={this.handleDeleteRow}
+                      hasActiveSession={this.state.hasActiveSession}
+                      isReadOnly={!patientIsActive}
                     />
                   </GridItem>
 

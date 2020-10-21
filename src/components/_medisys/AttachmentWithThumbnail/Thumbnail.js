@@ -121,6 +121,7 @@ const Thumbnail = ({
     thumbnailIndexFK,
     thumbnail = { id: undefined },
     useImageViewer = true,
+    remarks,
   } = attachment
 
   const [
@@ -177,8 +178,6 @@ const Thumbnail = ({
 
   const handleAttachmentClicked = () => {
     if (!attachment) return
-
-    console.log(attachment)
 
     if (
       useImageViewer &&
@@ -280,17 +279,21 @@ const Thumbnail = ({
           {!hideRemarks && (
             <GridItem md={12}>
               <SizeContainer size='sm'>
-                <FastField
-                  name={`${fieldName}[${indexInAllAttachments}].remarks`}
-                  render={(args) => (
-                    <TextField
-                      {...args}
-                      size='sm'
-                      label='Remarks'
-                      disabled={isReadOnly}
-                    />
-                  )}
-                />
+                {!isReadOnly ? (
+                  <FastField
+                    name={`${fieldName}[${indexInAllAttachments}].remarks`}
+                    render={(args) => (
+                      <TextField {...args} size='sm' label='Remarks' />
+                    )}
+                  />
+                ) : (
+                  <TextField
+                    size='sm'
+                    label='Remarks'
+                    value={remarks}
+                    disabled
+                  />
+                )}
               </SizeContainer>
             </GridItem>
           )}

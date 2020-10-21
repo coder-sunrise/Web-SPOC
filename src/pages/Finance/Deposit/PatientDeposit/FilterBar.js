@@ -31,8 +31,8 @@ class FilterBar extends PureComponent {
   }
 
   addDepositRefund = async (isDeposit) => {
-    const { dispatch, patient: { deposit } } = this.props
-    const patientId = Number(findGetParameter('pid'))
+    const { dispatch, patient: { deposit, entity } } = this.props
+    const patientId = entity.id
 
     if (deposit && deposit.id > 0) {
       await dispatch({
@@ -67,22 +67,29 @@ class FilterBar extends PureComponent {
 
   render () {
     const { isDeposit, showDepositRefundModal } = this.state
-    const { disabled, refundableAmount = 0, selectedTypeIds } = this.props
-    const patientId = Number(findGetParameter('pid'))
+    const {
+      patient: { entity },
+      disabled,
+      refundableAmount = 0,
+      selectedTypeIds,
+      hasActiveSession,
+    } = this.props
+    const patientId = entity.id
 
     return (
       <React.Fragment>
-        <GridItem md={3}>
+        <GridItem md={4}>
           <CodeSelect
             label='Type'
             value={selectedTypeIds}
             code='LTDepositTransactionType'
             mode='multiple'
+            style={{ width: 250 }}
             onChange={this.props.handleTypeChange}
           />
         </GridItem>
 
-        <GridItem md={9} style={{ alignSelf: 'center', textAlign: 'right' }}>
+        <GridItem md={8} style={{ alignSelf: 'center', textAlign: 'right' }}>
           <Button size='lg' onClick={this.openReportViewer} color='primary'>
             <Printer /> Transaction Details
           </Button>
@@ -92,7 +99,7 @@ class FilterBar extends PureComponent {
               onClick={() => {
                 this.addDepositRefund(true)
               }}
-              disabled={disabled}
+              disabled={disabled || !hasActiveSession}
               color='primary'
             >
               Deposit
@@ -105,7 +112,7 @@ class FilterBar extends PureComponent {
               onClick={() => {
                 this.addDepositRefund(false)
               }}
-              disabled={disabled || refundableAmount <= 0}
+              disabled={disabled || refundableAmount <= 0 || !hasActiveSession}
               color='primary'
             >
               Refund

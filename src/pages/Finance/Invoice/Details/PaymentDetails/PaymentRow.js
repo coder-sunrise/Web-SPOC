@@ -37,6 +37,7 @@ const PaymentRow = ({
     isCancelled,
     patientDepositTransaction,
     invoicePaymentMode = [],
+    cancelReason,
     statementPaymentReceiptNo,
   } = payment
 
@@ -102,7 +103,12 @@ const PaymentRow = ({
       >
         <GridItem md={2}>
           {getIconByType()}
-          {type === 'Payment' ? (
+          {type === 'Payment' ||
+          ([
+            'Credit Note',
+            'Write Off',
+          ].includes(type) &&
+            isCancelled) ? (
             <Popper
               className={classNames({
                 [classes.pooperResponsive]: true,
@@ -119,6 +125,8 @@ const PaymentRow = ({
                   paymentModeDetails={sortedInvoicePaymentModes}
                   setHoveredRowId={setHoveredRowId}
                   id={id}
+                  cancelReason={cancelReason}
+                  isCancelled={isCancelled}
                 />
               }
             >

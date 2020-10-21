@@ -1,6 +1,7 @@
+import { Tools } from '@/components'
 import FabricCanvasTool from './fabrictool'
 
-const {fabric} = require('fabric')
+const { fabric } = require('fabric')
 
 class Line extends FabricCanvasTool {
   configureCanvas (props) {
@@ -9,10 +10,14 @@ class Line extends FabricCanvasTool {
     canvas.selection = false
     canvas.forEachObject((o) => {
       o.selectable = false
-      o.evented = false 
+      o.evented = false
     })
     this._width = props.lineWidth
     this._color = props.lineColor
+  }
+
+  getToolName () {
+    return Tools.Line
   }
 
   doMouseDown (o) {

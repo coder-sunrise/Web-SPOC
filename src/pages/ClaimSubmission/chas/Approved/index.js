@@ -18,13 +18,13 @@ import {
   CommonModal,
 } from '@/components'
 // sub components
+import { approvedStatus } from '@/utils/codes'
+import { PAYMENT_MODE } from '@/utils/constants'
 import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../../common/TableGrid'
 import CollectPaymentModal from '../../common/CollectPaymentModal'
 // variables
 import { ApprovedCHASColumnExtensions, ApprovedCHASColumns } from './variables'
-import { approvedStatus } from '@/utils/codes'
-import { PAYMENT_MODE } from '@/utils/constants'
 
 const styles = (theme) => ({
   cardContainer: {
@@ -181,6 +181,7 @@ class ApprovedCHAS extends React.Component {
                   selectConfig: {
                     showSelectAll: true,
                     rowSelectionEnabled: (row) =>
+                      row.patientIsActive &&
                       !(
                         row.chasClaimStatusCode.toLowerCase() === 'pd' &&
                         row.approvedAmount === row.collectedPayment
@@ -193,7 +194,7 @@ class ApprovedCHAS extends React.Component {
                 type='approved'
               />
             </GridItem>
-            <GridItem md={12} style={{ marginTop: 12}}>
+            <GridItem md={12} style={{ marginTop: 12 }}>
               <p className={classes.footerNote}>
                 Approved Amt. only available for Paid claim status.
               </p>

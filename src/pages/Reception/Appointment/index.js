@@ -6,6 +6,10 @@ import { Popover, withStyles } from '@material-ui/core'
 // common component
 import { CardContainer, CommonModal } from '@/components'
 // sub component
+import { APPOINTMENT_STATUS } from '@/utils/constants'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
+import { getRemovedUrl } from '@/utils/utils'
+import Authorized from '@/utils/Authorized'
 import FilterBar from './components/FilterBar'
 import FuncCalendarView from './components/FuncCalendarView'
 import ApptPopover from './components/ApptPopover'
@@ -20,10 +24,7 @@ import {
   DoctorFormValidation,
   InitialPopoverEvent,
 } from './utils'
-import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 // utils
-import { getRemovedUrl } from '@/utils/utils'
-import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   popover: {
@@ -103,7 +104,7 @@ class Appointment extends React.PureComponent {
     selectedAppointmentFK: -1,
   }
 
-  componentWillMount () {
+  async componentWillMount () {
     const { dispatch, clinicInfo } = this.props
     const startOfMonth = moment().startOf('month').formatUTC()
     const endOfMonth = moment().endOf('month').endOf('day').formatUTC(false)
@@ -130,24 +131,36 @@ class Appointment extends React.PureComponent {
       },
     })
 
-    dispatch({
+    let filter
+    const filterTemplate = await dispatch({
+      type: 'appointment/getFilterTemplate',
+    })
+    if (filterTemplate) {
+      const { currentFilterTemplate } = filterTemplate
+      if (currentFilterTemplate) {
+        const { filterByDoctor, filterByApptType } = currentFilterTemplate
+        filter = {
+          filterByDoctor,
+          filterByApptType,
+        }
+      }
+    }
+
+    const response = await dispatch({
       type: 'codetable/fetchCodes',
       payload: {
         code: 'doctorprofile',
         force: true,
         filter: {},
       },
-    }).then((response) => {
-      response
+    })
 
+    if (response) {
       let filterByDoctor = []
       let resources = []
       let primaryClinicianFK
-      if (response) {
-        const lastSelected = JSON.parse(
-          sessionStorage.getItem('appointmentDoctors') || '[]',
-        )
 
+      if (response) {
         const viewOtherApptAccessRight = Authorized.check(
           'appointment.viewotherappointment',
         )
@@ -155,12 +168,23 @@ class Appointment extends React.PureComponent {
           viewOtherApptAccessRight &&
           viewOtherApptAccessRight.rights === 'enable'
         ) {
+          const favDoctors = filter ? filter.filterByDoctor || [] : []
+          const lastSelected = JSON.parse(
+            sessionStorage.getItem('appointmentDoctors') || '[]',
+          )
+          let filterDoctors = []
+          if (favDoctors.length > 0) {
+            filterDoctors = favDoctors
+          } else if (lastSelected.length > 0) {
+            filterDoctors = lastSelected
+          }
+
           resources = response
             .filter((clinician) => clinician.clinicianProfile.isActive)
             .filter(
               (_, index) =>
-                lastSelected.length > 0
-                  ? lastSelected.includes(_.clinicianProfile.id)
+                filterDoctors.length > 0
+                  ? filterDoctors.includes(_.clinicianProfile.id)
                   : index < 5,
             )
             .map((clinician) => ({
@@ -186,21 +210,23 @@ class Appointment extends React.PureComponent {
       }
 
       this.setState((preState) => ({
-        filter: {
+        filter: filter || {
           ...preState.filter,
           filterByDoctor,
         },
         primaryClinicianFK,
         resources,
       }))
-    })
+    } else {
+      this.setState({ filter })
+    }
 
     dispatch({
       type: 'calendar/initState',
       payload: { start: startOfMonth },
     })
     dispatch({
-      type: 'doctorBlock/queryAll',
+      type: 'doctorBlock/query',
       payload: {
         lgteql_startDateTime: startOfMonth,
       },
@@ -209,10 +235,6 @@ class Appointment extends React.PureComponent {
     dispatch({
       type: 'calendar/setCurrentViewDate',
       payload: moment().toDate(),
-    })
-
-    dispatch({
-      type: 'appointment/getFilterTemplate',
     })
   }
 
@@ -280,7 +302,7 @@ class Appointment extends React.PureComponent {
   }
 
   onSelectSlot = (props) => {
-    const { start, end, resourceId } = props
+    const { start, end, resourceId } = props || {}
     const createApptAccessRight = Authorized.check('appointment.newappointment')
 
     if (createApptAccessRight && createApptAccessRight.rights !== 'enable')
@@ -307,7 +329,20 @@ class Appointment extends React.PureComponent {
       doctor,
       isEditedAsSingleAppointment,
       isEnableRecurrence,
+      appointmentStatusFk,
+      isHistory,
     } = selectedEvent
+
+    const isDoctorBlock = doctor && doctor.id > 0
+
+    if (
+      isHistory &&
+      ![
+        APPOINTMENT_STATUS.DRAFT,
+        APPOINTMENT_STATUS.CONFIRMED,
+      ].includes(appointmentStatusFk)
+    )
+      return
 
     const viewApptAccessRight = Authorized.check(
       'appointment.appointmentdetails',
@@ -319,14 +354,14 @@ class Appointment extends React.PureComponent {
     if (
       (viewApptAccessRight &&
         viewApptAccessRight.rights !== 'enable' &&
-        !doctor) ||
-      (doctor &&
+        !isDoctorBlock) ||
+      (isDoctorBlock &&
         viewDoctorBlockAccessRight &&
         viewDoctorBlockAccessRight.rights !== 'enable')
     )
       return
 
-    if (doctor) {
+    if (isDoctorBlock) {
       this.props
         .dispatch({
           type: 'doctorBlock/queryOne',
@@ -346,6 +381,14 @@ class Appointment extends React.PureComponent {
       const selectedAppointmentID =
         appointmentFK === undefined ? id : appointmentFK
       let shouldShowApptForm = true
+
+      if (this.state.showAppointmentForm) {
+        this.setState({
+          selectedAppointmentFK: undefined,
+          showAppointmentForm: false,
+          isDragging: false,
+        })
+      }
 
       if (isEnableRecurrence) {
         if (!isEditedAsSingleAppointment) {
@@ -609,6 +652,7 @@ class Appointment extends React.PureComponent {
               resources={resources}
               selectedAppointmentID={selectedAppointmentFK}
               selectedSlot={selectedSlot}
+              onHistoryRowSelected={this.onSelectEvent}
               // calendarEvents={calendarEvents}
             />
           )}

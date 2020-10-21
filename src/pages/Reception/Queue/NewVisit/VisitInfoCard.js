@@ -22,9 +22,9 @@ import {
   Attachment,
   AttachmentWithThumbnail,
 } from '@/components/_medisys'
-import FormField from './formField'
 import { VISIT_TYPE } from '@/utils/constants'
 import { visitOrderTemplateItemTypes } from '@/utils/codes'
+import FormField from './formField'
 
 const styles = (theme) => ({
   verticalSpacing: {
@@ -48,7 +48,7 @@ const styles = (theme) => ({
 
 const VisitInfoCard = ({
   isReadOnly = false,
-  isVisitRemarksDisabled = false,
+  isVisitReadonlyAfterSigned = false,
   attachments,
   handleUpdateAttachments,
   existingQNo,
@@ -159,10 +159,10 @@ const VisitInfoCard = ({
                       id: 'reception.queue.visitRegistration.attendantDoctor',
                     })
                   ) : (
-                    formatMessage({
-                      id: 'reception.queue.visitRegistration.doctor',
-                    })
-                  )
+                      formatMessage({
+                        id: 'reception.queue.visitRegistration.doctor',
+                      })
+                    )
                 }
                 {...args}
               />
@@ -208,8 +208,6 @@ const VisitInfoCard = ({
           <Field
             name={FormField['visit.visitOrderTemplateFK']}
             render={(args) => {
-              const { form } = args
-
               return (
                 <Select
                   // disabled={isReadOnly}
@@ -218,6 +216,8 @@ const VisitInfoCard = ({
                     id: 'reception.queue.visitRegistration.visitOrderTemplate',
                   })}
                   {...args}
+                  authority='none'
+                  disabled={isVisitReadonlyAfterSigned}
                   onChange={(e, opts) =>
                     handleVisitOrderTemplateChange(visitType, opts)}
                 />
@@ -236,13 +236,13 @@ const VisitInfoCard = ({
                 <NumberInput
                   {...args}
                   currency
-                  disabled={readOnly}
+                  authority='none'
+                  disabled={readOnly || isVisitReadonlyAfterSigned}
                   label={formatMessage({
                     id:
                       'reception.queue.visitRegistration.visitOrderTotalCharge',
                   })}
-                />
-              )
+                />)
             }}
           />
         </GridItem>
@@ -256,7 +256,7 @@ const VisitInfoCard = ({
                 multiline
                 rowsMax={3}
                 authority='none'
-                disabled={isVisitRemarksDisabled}
+                disabled={isVisitReadonlyAfterSigned}
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.visitRemarks',
                 })}
@@ -287,6 +287,7 @@ const VisitInfoCard = ({
             handleUpdateAttachments={handleUpdateAttachments}
             attachments={attachments}
             isReadOnly={isReadOnly}
+            disableScanner={isReadOnly}
             fieldName='visitAttachment'
           />
         </GridItem>

@@ -9,7 +9,10 @@ class PatientGrid extends PureComponent {
   configs = {
     columns: [
       { name: 'visitDate', title: 'Visit Date' },
-      { name: 'doctorName', title: 'Doctor' },
+      {
+        name: 'doctorProfileFKNavigation.ClinicianProfile.Name',
+        title: 'Doctor',
+      },
       { name: 'serviceName', title: 'Service Name' },
       { name: 'caseTypeDisplayValue', title: 'Case Type' },
       { name: 'caseDescriptionDisplayValue', title: 'Case Description' },
@@ -20,12 +23,22 @@ class PatientGrid extends PureComponent {
     columnExtensions: [
       { columnName: 'visitDate', type: 'date' },
       {
+        columnName: 'doctorProfileFKNavigation.ClinicianProfile.Name',
+        render: (row) => {
+          return (
+            <Tooltip title={row.doctorName}>
+              <span>{row.doctorName}</span>
+            </Tooltip>
+          )
+        },
+      },
+      {
         columnName: 'action',
         sortingEnabled: false,
         align: 'center',
         width: 100,
         render: (row) => {
-          const { clinicSettings, handlePrintClick } = this.props
+          const { clinicSettings, handlePrintClick, readOnly } = this.props
           return (
             <React.Fragment>
               <PatientResultButton
@@ -33,19 +46,21 @@ class PatientGrid extends PureComponent {
                 clinicSettings={clinicSettings}
                 handlePrint={handlePrintClick}
               />
-              <Tooltip title='Edit Patient Lab Result' placement='bottom'>
-                <Button
-                  size='sm'
-                  onClick={() => {
-                    this.editRow(row)
-                  }}
-                  justIcon
-                  color='primary'
-                  style={{ marginRight: 0 }}
-                >
-                  <Edit />
-                </Button>
-              </Tooltip>
+              {!readOnly && (
+                <Tooltip title='Edit Patient Lab Result' placement='bottom'>
+                  <Button
+                    size='sm'
+                    onClick={() => {
+                      this.editRow(row)
+                    }}
+                    justIcon
+                    color='primary'
+                    style={{ marginRight: 0 }}
+                  >
+                    <Edit />
+                  </Button>
+                </Tooltip>
+              )}
             </React.Fragment>
           )
         },
@@ -54,8 +69,9 @@ class PatientGrid extends PureComponent {
   }
 
   editRow = (row, e) => {
-    const { dispatch, labTrackingDetails } = this.props
+    const { dispatch, labTrackingDetails, readOnly } = this.props
     const { list } = labTrackingDetails
+    if (readOnly) return
 
     dispatch({
       type: 'labTrackingDetails/updateState',

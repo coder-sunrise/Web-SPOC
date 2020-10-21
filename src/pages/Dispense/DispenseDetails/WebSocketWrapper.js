@@ -215,9 +215,9 @@ const WebSocketWrapper = ({
     }
   }
 
-  const handleFinalize = async () => {
+  const handleFinalize = async (voidPayment = false, voidReason = '') => {
     const { onFinalizeClick } = restProps
-    const finalized = await onFinalizeClick()
+    const finalized = await onFinalizeClick(voidPayment, voidReason)
     if (finalized) {
       let settings = JSON.parse(localStorage.getItem('clinicSettings'))
       const { autoPrintDrugLabelOnFinalize = false } = settings

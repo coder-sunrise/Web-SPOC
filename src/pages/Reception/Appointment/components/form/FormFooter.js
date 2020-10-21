@@ -5,8 +5,8 @@ import { withStyles } from '@material-ui/core'
 // custom component
 import { Button, GridContainer, GridItem, SizeContainer } from '@/components'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
-import style from './style'
 import Authorized from '@/utils/Authorized'
+import style from './style'
 
 const ButtonText = {
   DELETE: 'Delete',
@@ -23,6 +23,7 @@ const FormFooter = ({
   disabled = false,
   disabledCheckAvailability = false,
   appointmentStatusFK,
+  patientIsActive = true,
   onClose,
   handleCancelOrDeleteClick,
   handleSaveDraftClick,
@@ -31,8 +32,12 @@ const FormFooter = ({
 }) => {
   const isNew = appointmentStatusFK === undefined
   const isDraft = appointmentStatusFK === 2
-  const isTurnedUp = appointmentStatusFK === APPOINTMENT_STATUS.TURNEDUP
-  const isCancelled = appointmentStatusFK === APPOINTMENT_STATUS.CANCELLED
+  const isTurnedUp =
+    appointmentStatusFK === APPOINTMENT_STATUS.TURNEDUP ||
+    appointmentStatusFK === APPOINTMENT_STATUS.TURNEDUPLATE
+  const isCancelled =
+    appointmentStatusFK === APPOINTMENT_STATUS.CANCELLED ||
+    appointmentStatusFK === APPOINTMENT_STATUS.PFA_CANCELLED
 
   const hideCancelAppointmentClass = {
     [classes.hideCancelAppointmentBtn]: isNew,
@@ -48,7 +53,7 @@ const FormFooter = ({
             color='danger'
             className={classnames(hideCancelAppointmentClass)}
             onClick={handleCancelOrDeleteClick}
-            disabled={disabled || isTurnedUp || isCancelled}
+            disabled={disabled || isTurnedUp || isCancelled || !patientIsActive}
           >
             {isDraft ? ButtonText.DELETE : ButtonText.CANCEL_APPOINTMENT}
           </Button>
@@ -63,7 +68,7 @@ const FormFooter = ({
         {(isNew || isDraft) && (
           <Authorized authority='appointment.appointmentdetails'>
             <Button
-              disabled={disabled}
+              disabled={disabled || !patientIsActive}
               onClick={handleSaveDraftClick}
               color='primary'
             >
@@ -73,7 +78,7 @@ const FormFooter = ({
         )}
         <Authorized authority='appointment.appointmentdetails'>
           <Button
-            disabled={disabled || isTurnedUp}
+            disabled={disabled || isTurnedUp || !patientIsActive}
             onClick={handleConfirmClick}
             color='primary'
           >

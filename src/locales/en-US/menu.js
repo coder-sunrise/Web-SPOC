@@ -153,10 +153,11 @@ export default {
   'menu.setting.paymentmode': 'Payment Mode',
   'menu.setting.appointmenttype': 'Appointment Type',
   'menu.setting.referralsource': 'Referral Source',
-  'menu.setting.visitordertemplate': 'Visit Order Template',
+  'menu.setting.visitordertemplate': 'Visit Purpose',
   'menu.setting.casetype': 'Case Type',
   'menu.setting.casedescription': 'Case Description',
   'menu.setting.refractiontesttype': 'Refraction Test Type',
+  'menu.setting.package': 'Package',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',
@@ -170,6 +171,7 @@ export default {
   'menu.report.sessionsummary': 'Session Summary Report',
   'menu.report.statementsummaryreport': 'Statement Summary Report',
   'menu.report.viewreport': 'View Report',
+  'menu.report.visitListingReport': 'Visit Listing Report',
 
   'menu.support': 'Support',
   'menu.support.support': 'Support',

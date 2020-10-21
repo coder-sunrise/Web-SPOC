@@ -18,7 +18,8 @@ class Grid extends PureComponent {
   }
 
   render () {
-    const { dispatch } = this.props
+    const { dispatch, patient: { entity } } = this.props
+    const patientIsActive = entity && entity.isActive
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
@@ -75,7 +76,12 @@ class Grid extends PureComponent {
                     }}
                   >
                     <Tooltip title='Delete'>
-                      <Button size='sm' color='danger' justIcon>
+                      <Button
+                        size='sm'
+                        disabled={!patientIsActive}
+                        color='danger'
+                        justIcon
+                      >
                         <Delete />
                       </Button>
                     </Tooltip>

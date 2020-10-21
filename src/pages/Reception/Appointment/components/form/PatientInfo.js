@@ -2,7 +2,7 @@ import React from 'react'
 import classnames from 'classnames'
 import { formatMessage } from 'umi/locale'
 // formik
-import { FastField } from 'formik'
+import { FastField, Field } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 import Search from '@material-ui/icons/Search'
@@ -31,13 +31,15 @@ const PatientInfoInput = ({
   appointmentStatusFK,
   values,
   hasActiveSession,
+  patientIsActive,
 }) => {
   const isRegisteredPatient =
     patientProfileFK !== undefined && patientProfileFK !== null
 
   const allowedToActualize = [
-    APPOINTMENT_STATUS.SCHEDULED,
+    APPOINTMENT_STATUS.CONFIRMED,
     APPOINTMENT_STATUS.RESCHEDULED,
+    APPOINTMENT_STATUS.PFA_RESCHEDULED,
   ].includes(appointmentStatusFK)
 
   return (
@@ -108,7 +110,9 @@ const PatientInfoInput = ({
                   <Button
                     size='sm'
                     color='primary'
-                    disabled={!isEdit || !allowedToActualize}
+                    disabled={
+                      !isEdit || !allowedToActualize || !patientIsActive
+                    }
                     onClick={onRegisterToVisitClick}
                   >
                     Register To Visit
@@ -141,7 +145,7 @@ const PatientInfoInput = ({
         )}
       </GridItem>
       <GridItem xs md={3}>
-        <FastField
+        <Field
           name='countryCodeFK'
           render={(args) => (
             <CodeSelect
@@ -155,7 +159,7 @@ const PatientInfoInput = ({
         />
       </GridItem>
       <GridItem xs md={3}>
-        <FastField
+        <Field
           name='patientContactNo'
           render={(args) => (
             <MobileNumberInput

@@ -1,3 +1,4 @@
+import { Tools } from '@/components'
 import { linearDistance } from './utils'
 import FabricCanvasTool from './fabrictool'
 
@@ -15,6 +16,10 @@ class Circle extends FabricCanvasTool {
     this._width = props.lineWidth
     this._color = props.lineColor
     this._fill = props.fillColor
+  }
+
+  getToolName () {
+    return Tools.Corp
   }
 
   doMouseDown (o) {

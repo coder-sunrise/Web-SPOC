@@ -61,6 +61,7 @@ const InvoiceHistory = ({
       type: 'patientHistory/queryInvoiceHistory',
       payload: {
         'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.Id': id,
+        pagesize: 9999,
       },
     })
   }
@@ -85,7 +86,13 @@ const InvoiceHistory = ({
   }
 
   const getContent = () => {
-    return <PaymentDetails refreshInvoiceList={refreshInvoiceList} />
+    const { entity } = patient || {}
+    return (
+      <PaymentDetails
+        patientIsActive={entity && entity.isActive}
+        refreshInvoiceList={refreshInvoiceList}
+      />
+    )
   }
 
   const getTitle = (row) => {

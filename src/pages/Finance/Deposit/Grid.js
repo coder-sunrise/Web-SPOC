@@ -12,6 +12,7 @@ import {
   CustomInput,
 } from '@/components'
 import config from '@/utils/config'
+import PatientDeposit from './PatientDeposit'
 import Modal from './Modal'
 
 const { currencyFormat, currencySymbol } = config
@@ -19,6 +20,7 @@ const { currencyFormat, currencySymbol } = config
 class Grid extends PureComponent {
   state = {
     showDepositRefundModal: false,
+    showPatientDeposit: false,
   }
 
   tableParas = {
@@ -98,6 +100,9 @@ class Grid extends PureComponent {
                     }}
                     color='primary'
                     style={{ marginRight: 5, width: 60, minWidth: 60 }}
+                    disabled={
+                      !this.props.hasActiveSession || !row.patientIsActive
+                    }
                   >
                     {/* <PanTool /> */}
                     Deposit
@@ -108,7 +113,12 @@ class Grid extends PureComponent {
                 <Tooltip title='Refund' placement='bottom'>
                   <Button
                     size='sm'
-                    disabled={row.balance <= 0 || !row.balance}
+                    disabled={
+                      row.balance <= 0 ||
+                      !row.balance ||
+                      !this.props.hasActiveSession ||
+                      !row.patientIsActive
+                    }
                     onClick={() => {
                       this.editRow(row, false)
                     }}
@@ -163,12 +173,35 @@ class Grid extends PureComponent {
     }))
   }
 
+  togglePatientDepositModal = () => {
+    this.setState((prevState) => ({
+      showPatientDeposit: !prevState.showPatientDeposit,
+    }))
+  }
+
+  rowDoubleClick = (row) => {
+    const { dispatch } = this.props
+    const { patientProfileFK } = row
+    dispatch({
+      type: 'patient/query',
+      payload: {
+        id: patientProfileFK,
+      },
+    }).then(() => {
+      this.togglePatientDepositModal()
+    })
+  }
+
   render () {
-    const { isDeposit, showDepositRefundModal } = this.state
+    const { isDeposit, showDepositRefundModal, showPatientDeposit } = this.state
     return (
       <Authorized authority='finance/deposit'>
         <React.Fragment>
-          <CommonTableGrid type='deposit' {...this.tableParas} />
+          <CommonTableGrid
+            type='deposit'
+            onRowDoubleClick={this.rowDoubleClick}
+            {...this.tableParas}
+          />
           <CommonModal
             open={showDepositRefundModal}
             title={isDeposit ? 'Deposit' : 'Refund'}
@@ -181,6 +214,16 @@ class Grid extends PureComponent {
             keepMounted={false}
           >
             <Modal isDeposit={isDeposit} />
+          </CommonModal>
+          <CommonModal
+            open={showPatientDeposit}
+            title='Patient Deposit'
+            onClose={this.togglePatientDepositModal}
+            onConfirm={this.togglePatientDepositModal}
+            showFooter={false}
+            keepMounted={false}
+          >
+            <PatientDeposit />
           </CommonModal>
         </React.Fragment>
       </Authorized>

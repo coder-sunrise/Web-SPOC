@@ -276,7 +276,7 @@ class printoutSetting extends PureComponent {
               className={classes.container}
             >
               <GridContainer className={classes.verticalSpacing}>
-                <GridItem md={1}>
+                <GridItem md={2}>
                   <h4>
                     <b>Letter Head</b>
                   </h4>
@@ -335,7 +335,7 @@ class printoutSetting extends PureComponent {
                 ''
               )}
               <GridContainer className={classes.verticalSpacing}>
-                <GridItem md={1}>
+                <GridItem md={2}>
                   <h4>
                     <b>Header Info</b>
                   </h4>
@@ -375,7 +375,7 @@ class printoutSetting extends PureComponent {
               )}
 
               <GridContainer className={classes.verticalSpacing}>
-                <GridItem md={1}>
+                <GridItem md={2}>
                   <h4>
                     <b>Footer Info</b>
                   </h4>
@@ -414,7 +414,7 @@ class printoutSetting extends PureComponent {
               )}
 
               <GridContainer className={classes.verticalSpacing}>
-                <GridItem md={1}>
+                <GridItem md={2}>
                   <h4>
                     <b>Disclaimer</b>
                   </h4>

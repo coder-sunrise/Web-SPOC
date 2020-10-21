@@ -36,7 +36,6 @@ const styles = (theme) => ({
     letterSpacing: ' 0.03333em',
   },
 })
-let commitCount = 1000 // uniqueNumber
 
 const inventoryAdjustmentSchema = Yup.object().shape({
   inventoryTypeFK: Yup.number().required(),
@@ -50,6 +49,9 @@ const inventoryAdjustmentSchema = Yup.object().shape({
   adjustmentQty: Yup.number()
     .min(-9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9')
     .max(9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9'),
+  physicalStock: Yup.number()
+    .min(-9999.9, 'Physical stock must between -9,999.9 and 9,999.9')
+    .max(9999.9, 'Physical stock must between -9,999.9 and 9,999.9'),
   expiryDate: Yup.string().nullable(),
 })
 
@@ -78,7 +80,6 @@ const inventoryAdjustmentSchema = Yup.object().shape({
     const { dispatch, onConfirm } = props
     const list =
       inventoryAdjustmentItems.length > 0 ? inventoryAdjustmentItems : stockList
-    // console.log('list', inventoryAdjustmentItems, stockList)
     const newInventoryAdjustmentItem = list.map((o, index) => {
       if (o.isDeleted) {
         return {
@@ -209,24 +210,6 @@ const inventoryAdjustmentSchema = Yup.object().shape({
           },
         }
       }
-
-      // console.log({ values })
-      // return {
-      //   ...o,
-      //   batchNo: getBatchNo(),
-      //   id: o.getFromApi ? undefined : o.id,
-      //   [getType.itemFK]: o.code || o[getType.typeName][getType.itemFK],
-      //   [getType.typeName]: {
-      //     batchNo: getBatchNo(),
-      //     expiryDate: o.expiryDate,
-      //     [getType.stockFK]: stockFK,
-      //     [getType.codeName]:
-      //       o.codeString || o[getType.typeName][getType.codeName],
-      //     [getType.nameName]:
-      //       o.displayValueString || o[getType.typeName][getType.nameName],
-      //     [getType.stock]: getStockObject(),
-      //   },
-      // }
     })
     dispatch({
       type: 'inventoryAdjustment/upsert',
@@ -286,6 +269,7 @@ class Detail extends PureComponent {
       { name: 'expiryDate', title: 'Expiry Date' },
       { name: 'stock', title: 'Current Stock' },
       { name: 'adjustmentQty', title: 'Adjustment Qty' },
+      { name: 'physicalStock', title: 'Physical Stock' },
     ],
     columnExtensions: [
       {
@@ -298,15 +282,6 @@ class Detail extends PureComponent {
         ],
         onChange: (e) => {
           this.setState({ type: `inventory${e.val}` })
-          // this.props.dispatch(
-          //   {
-          //     // force current edit row components to update
-          //     // type: 'global/updateState',
-          //     // payload: {
-          //     //   commitCount: (commitCount += 1),
-          //     // },
-          //   },
-          // )
         },
       },
       {
@@ -380,6 +355,18 @@ class Detail extends PureComponent {
         type: 'number',
         format: '0.0',
         qty: true,
+        onChange: (e) => {
+          this.handleAdjQuantity(e)
+        },
+      },
+      {
+        columnName: 'physicalStock',
+        type: 'number',
+        format: '0.0',
+        qty: true,
+        onChange: (e) => {
+          this.handlePhysicStock(e)
+        },
       },
     ],
     columnEditingEnabled: false,
@@ -409,14 +396,6 @@ class Detail extends PureComponent {
   componentDidMount = async () => {
     const { dispatch, values, inventoryAdjustment, setValues } = this.props
     await this.initializeStateItemList()
-
-    // dispatch({
-    //   // force current edit row components to update
-    //   type: 'global/updateState',
-    //   payload: {
-    //     commitCount: (commitCount += 1),
-    //   },
-    // })
     if (values.stockList) {
       const newStockList = values.stockList.map((o) => {
         return {
@@ -428,6 +407,7 @@ class Detail extends PureComponent {
           stockFK: o.id,
           code: o.inventoryItemFK,
           codeString: o.code,
+          physicalStock: o.stock,
           displayValue: o.inventoryItemFK,
           displayValueString: o.displayValue,
           getFromApi: true,
@@ -449,10 +429,8 @@ class Detail extends PureComponent {
               o[getType.typeName].batchNo,
             ],
             expiryDate: o[getType.typeName].expiryDate,
-            // stock: o[getType.typeName][getType.stock]
-            //   ? o[getType.typeName][getType.stock].stock
-            //   : undefined,
             stock: o.oldQty,
+            physicalStock: o.oldQty + o.adjustmentQty,
             restValues: o[getType.typeName],
           }
         })
@@ -463,8 +441,6 @@ class Detail extends PureComponent {
   }
 
   initializeStateItemList = async () => {
-    const { dispatch } = this.props
-
     const excludeInactiveCodes = () => {
       const { values } = this.props
       if (!Number.isNaN(values.id)) {
@@ -631,9 +607,11 @@ class Detail extends PureComponent {
         row.batchNo = val
         row.batchNoString = firstIndex
         if (option.length > 0) {
-          const { expiryDate, stock, id, concurrencyToken } = option[0]
+          const { expiryDate, stock, id } = option[0]
           row.expiryDate = expiryDate
           row.stock = stock
+          row.adjustmentQty = undefined
+          row.physicalStock = stock
           row.stockFK = id
           row.stockId = id
           row.isManuallyCreated = false
@@ -642,22 +620,17 @@ class Detail extends PureComponent {
           row.isManuallyCreated = true
           row.expiryDate = undefined
           row.stock = undefined
+          row.adjustmentQty = undefined
+          row.physicalStock = undefined
         }
       } else {
         row.expiryDate = undefined
         row.stock = undefined
-        // row.stockId = undefined
+        row.adjustmentQty = undefined
+        row.physicalStock = undefined
         row.batchNoString = undefined
-        // row.concurrencyToken = undefined
       }
     }
-    // this.props.dispatch({
-    //   // force current edit row components to update
-    //   type: 'global/updateState',
-    //   payload: {
-    //     commitCount: (commitCount += 1),
-    //   },
-    // })
   }
 
   type = (v) => {
@@ -716,6 +689,8 @@ class Detail extends PureComponent {
       row.batchNoString = undefined
       row.expiryDate = undefined
       row.stock = undefined
+      row.physicalStock = undefined
+      row.adjustmentQty = undefined
       row.stockList = stock
       row.itemFK = value
       this.setState({ selectedItem: e })
@@ -732,11 +707,22 @@ class Detail extends PureComponent {
           ]
           row.stockFK = defaultStock.id
           row.stock = defaultStock.stock
+          row.physicalStock = defaultStock.stock
           row.expiryDate = defaultStock.expiryDate
           this.setState({ selectedBatch: defaultStock })
         }
       }
     }
+  }
+
+  handlePhysicStock = (e) => {
+    const { row } = e
+    row.adjustmentQty = (e.value || 0) - row.stock
+  }
+
+  handleAdjQuantity = (e) => {
+    const { row } = e 
+    row.physicalStock = (e.value || 0) + row.stock
   }
 
   onCommitChanges = ({ rows, deleted }) => {
@@ -820,6 +806,7 @@ class Detail extends PureComponent {
       expiryDate: undefined,
       stock: undefined,
       adjustmentQty: undefined,
+      physicalStock: undefined,
     }))
     return returnRows
   }
@@ -883,10 +870,6 @@ class Detail extends PureComponent {
                       <DatePicker
                         label='Transaction Date'
                         {...args}
-                        // disabled={
-                        //   values.inventoryAdjustmentStatusFK !==
-                        //   INVENTORY_ADJUSTMENT_STATUS.DRAFT
-                        // }
                       />
                     )}
                   />
@@ -918,10 +901,6 @@ class Detail extends PureComponent {
                         multiline
                         rowsMax={2}
                         rows={2}
-                        // disabled={
-                        //   values.inventoryAdjustmentStatusFK !==
-                        //   INVENTORY_ADJUSTMENT_STATUS.DRAFT
-                        // }
                         {...args}
                       />
                     )
@@ -930,12 +909,11 @@ class Detail extends PureComponent {
               </GridItem>
             </GridContainer>
             {inventoryAdjustmentItems &&
-            !Array.isArray(inventoryAdjustmentItems) && (
-              <p className={classes.errorMessage}>{inventoryAdjustmentItems}</p>
-            )}
+              !Array.isArray(inventoryAdjustmentItems) && (
+                <p className={classes.errorMessage}>{inventoryAdjustmentItems}</p>
+              )}
             <EditableTableGrid
               style={{ marginTop: 10 }}
-              // forceRenderDuration={5000}
               forceRender
               FuncProps={{
                 edit: isEditable,
@@ -943,17 +921,10 @@ class Detail extends PureComponent {
                 addNewLabelName: 'New Inventory Adjustment',
               }}
               schema={inventoryAdjustmentSchema}
-              // onRowDoubleClick={this.onEditingRowsChange}
               EditingProps={{
                 showAddCommand:
                   values.inventoryAdjustmentStatusFK ===
                   INVENTORY_ADJUSTMENT_STATUS.DRAFT,
-                // showEditCommand:
-                //   values.inventoryAdjustmentStatusFK ===
-                //   INVENTORY_ADJUSTMENT_STATUS.DRAFT,
-                // showDeleteCommand:
-                //   values.inventoryAdjustmentStatusFK ===
-                //   INVENTORY_ADJUSTMENT_STATUS.DRAFT,
                 onCommitChanges: this.onCommitChanges,
                 onAddedRowsChange: this.onAddedRowsChange,
                 onEditingRowIdsChange: this.changeEditingRowIds,
@@ -964,34 +935,11 @@ class Detail extends PureComponent {
                 this.state.inventoryAdjustmentItems.length === 0 ? (
                   this.state.stockList
                 ) : (
-                  this.state.inventoryAdjustmentItems
-                )
+                    this.state.inventoryAdjustmentItems
+                  )
               }
-              // row={values.inventoryAdjustmentItems}
               {...this.tableParas}
             />
-            {/* <GridContainer
-            direction='row'
-            justify='flex-end'
-            alignItems='flex-end'
-          >
-            <Button color='danger' onClick={navigateDirtyCheck('/inventory/master?t=0')}>
-              Cancel
-            </Button>
-            <ProgressButton
-              submitKey='inventoryAdjustment/submit'
-              onClick={handleSubmit}
-              disabled={values.inventoryAdjustmentStatusFK !== 1}
-            />
-            <Button
-              color='info'
-              type='submit'
-              onClick={this.updateStatus}
-              disabled={values.inventoryAdjustmentStatusFK !== 1}
-            >
-              Finalize
-            </Button>
-          </GridContainer> */}
             {footer &&
               footer({
                 onConfirm: props.handleSubmit,
@@ -1001,19 +949,10 @@ class Detail extends PureComponent {
                     color='info'
                     type='submit'
                     onClick={this.updateStatus}
-                    // disabled={
-                    //   values.inventoryAdjustmentStatusFK !==
-                    //   INVENTORY_ADJUSTMENT_STATUS.DRAFT
-                    // }
                   >
                     Finalize
                   </ProgressButton>
                 ),
-                // confirmProps: {
-                //   disabled:
-                //     values.inventoryAdjustmentStatusFK !==
-                //     INVENTORY_ADJUSTMENT_STATUS.DRAFT,
-                // },
               })}
           </div>
         </AuthorizedContext.Provider>
