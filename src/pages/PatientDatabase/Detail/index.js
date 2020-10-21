@@ -19,6 +19,7 @@ import Error from '@material-ui/icons/Error'
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight'
 import { navigateDirtyCheck, getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import Loading from '@/components/PageLoading/index'
+
 import {
   withFormikExtend,
   NumberInput,
@@ -36,6 +37,7 @@ import {
   Button,
   CommonModal,
   withFormik,
+  TextField,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 
@@ -43,6 +45,7 @@ import { queryList } from '@/services/patient'
 import { getBizSession } from '@/services/queue'
 import schema from './schema'
 import { mapEntityToValues, upsertPatient } from './utils'
+import PatientDocument from './PatientDocument'
 
 // moment.updateLocale('en', {
 //   relativeTime: {
@@ -222,7 +225,14 @@ class PatientDetail extends PureComponent {
           loader: () => import('./PatientDocument'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet {...p} />
+            return (
+              <Cmpnet
+                {...p}
+                onClose={() => {
+                  console.log('onclose patient docuemnt')
+                }}
+              />
+            )
           },
           loading: Loading,
         }),
@@ -492,23 +502,20 @@ class PatientDetail extends PureComponent {
                             global.disableSave && currentMenu.name !== o.name
                           }
                           onClick={(e) => {
-                            onMenuClick(e, o)
-                            // console.log('here', entity, values)
-                            dispatch({
-                              type: 'patient/updateState',
-                              payload: {
-                                entity: entity || undefined,
-                              },
-                            })
-                            this.setState({
-                              selectedMenu: o.id,
-                            })
-                            // this.props.history.push(
-                            //   getAppendUrl({
-                            //     md: 'pt',
-                            //     cmt: o.id,
-                            //   }),
-                            // )
+                            if (o.id === '7') {
+                              this.setState({ showPatientDocument: true })
+                            } else {
+                              onMenuClick(e, o)
+                              dispatch({
+                                type: 'patient/updateState',
+                                payload: {
+                                  entity: entity || undefined,
+                                },
+                              })
+                              this.setState({
+                                selectedMenu: o.id,
+                              })
+                            }
                           }}
                         >
                           <ListItemIcon style={{ minWidth: 25 }}>
@@ -555,30 +562,47 @@ class PatientDetail extends PureComponent {
             </Card>
           </GridItem>
           <GridItem xs={12} sm={12} md={10}>
-            <CardContainer hideHeader title={currentMenu.name}>
-              <div
-                style={
-                  height > 0 ? (
-                    {
-                      height: height - 95 - 20,
-                      overflow: 'auto',
-                      padding: 4,
-                      paddingTop: 20,
-                    }
-                  ) : (
-                    { padding: 4, paddingTop: 20 }
-                  )
-                }
+            {this.state.showPatientDocument ? (
+              <CommonModal
+                title='Patient Profile'
+                fullScreen
+                open
+                onClose={() => {
+                  console.log('close patient document')
+                  this.setState({ showPatientDocument: false })
+                }}
               >
-                <Authorized.Context.Provider
-                  value={{
-                    rights: currentItemDisabled ? 'disable' : 'enable', //
-                  }}
+                <PatientDocument {...resetProps} />
+              </CommonModal>
+            ) : (
+              <CardContainer hideHeader title={currentMenu.name}>
+                <div
+                  style={
+                    height > 0 ? (
+                      {
+                        height: height - 95 - 20,
+                        overflow: 'auto',
+                        padding: 4,
+                        paddingTop: 20,
+                      }
+                    ) : (
+                      { padding: 4, paddingTop: 20 }
+                    )
+                  }
                 >
-                  <CurrentComponent {...resetProps} />
-                </Authorized.Context.Provider>
-              </div>
-            </CardContainer>
+                  <Authorized.Context.Provider
+                    value={{
+                      rights: currentItemDisabled ? 'disable' : 'enable', //
+                    }}
+                  >
+                    <div style={{ width: 0, height: 0, overflow: 'hidden' }}>
+                      <TextField autoFocus />
+                    </div>
+                    <CurrentComponent {...resetProps} />
+                  </Authorized.Context.Provider>
+                </div>
+              </CardContainer>
+            )}
 
             <div
               style={{
