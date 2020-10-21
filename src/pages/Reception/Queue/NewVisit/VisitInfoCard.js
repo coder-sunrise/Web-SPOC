@@ -272,7 +272,7 @@ const VisitInfoCard = ({
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.salesPerson',
                 })}
-                disabled={isVisitRemarksDisabled}
+                disabled={isVisitReadonlyAfterSigned}
                 authority='none'
                 noDefaultValue
                 {...args}
