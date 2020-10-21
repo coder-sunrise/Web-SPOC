@@ -29,14 +29,14 @@ const generateStatementSchema = Yup.object().shape({
     const {
       statementDate,
       paymentTerms,
-      invoiceDetaFrom,
+      invoiceDateFrom,
       invoiceDateTo } = values
     dispatch({
       type: 'statement/autoGenerateStatement',
       payload: {
         statementDate,
         paymentTerms,
-        invoiceDetaFrom,
+        invoiceDateFrom,
         invoiceDateTo,
       },
     }).then((r) => {
