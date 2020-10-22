@@ -172,7 +172,12 @@ class PatientDocument extends Component {
 
   render () {
     const { patient: { entity }, patientAttachment, folder } = this.props
-    const { viewMode, selectedFolderFK } = this.state
+    const {
+      viewMode,
+      selectedFolderFK,
+      leftContainerHeight,
+      rightContainerHeight,
+    } = this.state
     const patientIsActive = entity && entity.isActive
     const { list = [] } = patientAttachment
 
@@ -189,7 +194,10 @@ class PatientDocument extends Component {
     return (
       <GridContainer>
         <GridItem md={3}>
-          <CardContainer hideHeader>
+          <CardContainer
+            hideHeader
+            style={{ height: window.innerHeight - 100, overflow: 'scroll' }}
+          >
             <FolderList
               folderList={folderList}
               selectedFolderFK={selectedFolderFK}
@@ -202,8 +210,11 @@ class PatientDocument extends Component {
           </CardContainer>
         </GridItem>
         <GridItem md={9}>
-          <CardContainer hideHeader>
-            <GridContainer>
+          <CardContainer
+            hideHeader
+            style={{ height: window.innerHeight - 100, overflow: 'scroll' }}
+          >
+            <GridContainer style={{ height: 'auto' }}>
               <GridItem md={12} align='Right' style={{ marginBottom: 10 }}>
                 <div>
                   <Button

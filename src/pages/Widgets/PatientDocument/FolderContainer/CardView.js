@@ -60,25 +60,27 @@ class CardView extends Component {
     const { classes, attachmentList = {}, selectedFolderFK } = this.props
 
     return (
-      <CardContainer hideHeader>
-        <div className={classes.root}>
-          {attachmentList
-            .filter(
-              (f) =>
-                f.folderFKs.includes(selectedFolderFK) ||
-                selectedFolderFK === -99,
+      <div className={classes.root}>
+        {attachmentList
+          .filter(
+            (f) =>
+              f.folderFKs.includes(selectedFolderFK) ||
+              selectedFolderFK === -99,
+          )
+          .map((p) => {
+            return (
+              <Card className={classes.card}>
+                <CardContent>
+                  <CardItem key={p.id} file={p} {...this.props} />
+                </CardContent>
+              </Card>
             )
-            .map((p) => {
-              return (
-                <Card className={classes.card}>
-                  <CardContent>
-                    <CardItem key={p.id} file={p} {...this.props} />
-                  </CardContent>
-                </Card>
-              )
-            })}
-        </div>
-      </CardContainer>
+          })}
+      </div>
+      //   <CardContainer
+      //   hideHeader
+      //   style={{ height: window.innerHeight - 175, overflow: 'scroll' }}
+      // ></CardContainer>
     )
   }
 }

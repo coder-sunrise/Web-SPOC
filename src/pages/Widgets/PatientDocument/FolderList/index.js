@@ -183,7 +183,7 @@ class FolderList extends Component {
     const { showNewFolder, folderList, isEditMode } = this.state
 
     return (
-      <GridContainer>
+      <GridContainer style={{ height: 'auto' }}>
         <GridItem md={12}>
           <div>
             <div style={{ display: 'flex', float: 'left' }}>

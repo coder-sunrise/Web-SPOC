@@ -82,7 +82,7 @@ class ImagePreviewer extends Component {
   }
 
   componentWillUnmount () {
-    window.removeEventListener('resize', this._resize)
+    window.removeEventListener('resize', this.resize)
   }
 
   // eslint-disable-next-line react/sort-comp
@@ -437,6 +437,7 @@ class ImagePreviewer extends Component {
               <TextField
                 label='File Name'
                 value={selectedImage.fileName}
+                maxLength={50}
                 onChange={(e) => {
                   selectedImage.fileName = e.target.value
                   this.setState({ imageList })
@@ -517,6 +518,10 @@ class ImagePreviewer extends Component {
                 </Button>
                 <Button
                   color='primary'
+                  disabled={
+                    selectedImage.fileName === undefined ||
+                    selectedImage.fileName.trim() === ''
+                  }
                   onClick={() => {
                     onFileUpdated(selectedImage)
                   }}

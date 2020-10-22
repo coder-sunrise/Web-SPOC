@@ -121,11 +121,13 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
   }
   return (
     <React.Fragment>
-      {viewMode === 'card' ? (
-        <CardView {...restProps} {...cfg} />
-      ) : (
-        <Grid {...restProps} {...cfg} />
-      )}
+      <div style={{ height: window.innerHeight - 160, overflow: 'scroll' }}>
+        {viewMode === 'card' ? (
+          <CardView {...restProps} {...cfg} />
+        ) : (
+          <Grid {...restProps} {...cfg} />
+        )}
+      </div>
       <CommonModal
         open={showImagePreview}
         title='Patient Document Preview'

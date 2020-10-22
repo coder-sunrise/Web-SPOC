@@ -38,12 +38,18 @@ import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
 import pdfIcon from '@/assets/thumbnail-icons/pdf-icon.png'
 import wordIcon from '@/assets/thumbnail-icons/word-icon.png'
 import excelIcon from '@/assets/thumbnail-icons/excel-icon.png'
+import dummyIcon from '@/assets/thumbnail-icons/dummy-thumbnail-icon.png'
+import pptIcon from '@/assets/thumbnail-icons/ppt-icon.png'
 import SetFolderWithPopover from './SetFolderWithPopover'
 
 const base64Prefix = 'data:image/png;base64,'
 const wordExt = [
   'DOC',
   'DOCX',
+]
+const pptExt = [
+  'PPT',
+  'PPTX',
 ]
 const excelExt = [
   'XLS',
@@ -82,6 +88,10 @@ class CardItem extends Component {
       this.setState({ imageData: excelIcon })
     } else if (fileExtension.toUpperCase() === 'PDF') {
       this.setState({ imageData: pdfIcon })
+    } else if (pptExt.includes(fileExtension.toUpperCase())) {
+      this.setState({ imageData: pptIcon })
+    } else {
+      this.setState({ imageData: dummyIcon })
     }
   }
 
@@ -190,12 +200,14 @@ class CardItem extends Component {
                     onPreview(file)
                   }}
                 >
-                  <img
-                    width={40}
-                    height={40}
-                    src={imageData}
-                    alt={file.fileName}
-                  />
+                  {imageData && (
+                    <img
+                      width={40}
+                      height={40}
+                      src={imageData}
+                      alt={file.fileName}
+                    />
+                  )}
                 </div>
               </GridItem>
               <GridItem md={9}>

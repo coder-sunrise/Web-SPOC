@@ -55,7 +55,7 @@ class Grid extends PureComponent {
     const patientIsActive = entity && entity.isActive
     return (
       <CommonTableGrid
-        style={{ margin: 0 }}
+        style={{ margin: '0px 1px 0px 0px' }}
         forceRender
         rows={attachmentList
           .filter(
@@ -183,7 +183,7 @@ class Grid extends PureComponent {
             columnName: 'action',
             sortingEnabled: false,
             disabled: true,
-            width: 100,
+            width: 110,
             render: (row) => {
               return (
                 <React.Fragment>

@@ -15,6 +15,7 @@ const TextEditor = ({ item = {}, handleSubmit, onClose }) => {
             label={item.label}
             onChange={(e) => setName(e.target.value)}
             defaultValue={item.value}
+            maxLength={50}
             autoFocus
           />
         </GridItem>
