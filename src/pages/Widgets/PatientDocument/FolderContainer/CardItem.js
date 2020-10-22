@@ -57,7 +57,7 @@ const imageExt = [
   'GIF',
 ]
 
-class FileItem extends Component {
+class CardItem extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -162,47 +162,46 @@ class FileItem extends Component {
               </Popconfirm>
             </div>
           </GridItem>
-          <GridItem md={12} style={{ padding: 0, marginTop: 5 }}>
+          <GridItem md={12} style={{ marginTop: 5 }}>
+            <Tooltip title={file.fileName}>
+              <p
+                style={{
+                  whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis',
+                  display: 'inline-block',
+                  width: '100%',
+                  overflow: 'hidden',
+                }}
+              >
+                <NavLink
+                  to={window.location.search}
+                  onClick={() => onPreview(file)}
+                >
+                  <span>{file.fileName}</span>
+                </NavLink>
+              </p>
+            </Tooltip>
+          </GridItem>
+          <GridItem md={12}>
             <GridContainer>
-              <GridItem md={4} align='center'>
+              <GridItem md={3} align='left'>
                 <div
                   onClick={() => {
                     onPreview(file)
                   }}
                 >
                   <img
-                    width={60}
-                    height={60}
+                    width={40}
+                    height={40}
                     src={imageData}
                     alt={file.fileName}
                   />
                 </div>
               </GridItem>
-              <GridItem md={8}>
+              <GridItem md={9}>
                 <div>
+                  <div>{file.createByUserName}</div>
                   <div>
-                    <Tooltip title={file.fileName}>
-                      <p
-                        style={{
-                          whiteSpace: 'nowrap',
-                          textOverflow: 'ellipsis',
-                          display: 'inline-block',
-                          width: '100%',
-                          overflow: 'hidden',
-                          // float: 'left',
-                        }}
-                      >
-                        <NavLink
-                          to={window.location.search}
-                          onClick={() => onPreview(file)}
-                        >
-                          <span>{file.fileName}</span>
-                        </NavLink>
-                      </p>
-                    </Tooltip>
-                  </div>
-                  <p>{file.createByUserName}</p>
-                  <p>
                     Folder as:
                     <SetFolderWithPopover
                       justIcon
@@ -227,12 +226,12 @@ class FileItem extends Component {
                       }}
                       onAddNewFolders={onAddNewFolders}
                     />
-                  </p>
+                  </div>
                 </div>
               </GridItem>
             </GridContainer>
           </GridItem>
-          <GridItem md={12} style={{ overflow: 'auto', height: 60 }}>
+          <GridItem md={12} style={{ overflow: 'auto', height: 65 }}>
             {folderList
               .filter((f) => file.folderFKs.includes(f.id))
               .map((item) => (
@@ -252,4 +251,4 @@ class FileItem extends Component {
   }
 }
 
-export default FileItem
+export default CardItem

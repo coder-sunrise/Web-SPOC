@@ -3,7 +3,7 @@ import { findDOMNode } from 'react-dom'
 import { DragSource, DropTarget, useDrag, useDrop } from 'react-dnd'
 import { MenuItem, ListItemText, ListItemIcon } from '@material-ui/core'
 import _ from 'lodash'
-import { IconButton, Button, Badge, TextField } from '@/components'
+import { IconButton, Button, Badge, TextField, Tooltip } from '@/components'
 import { DragIndicator, Delete } from '@material-ui/icons'
 
 const Types = {
@@ -91,19 +91,47 @@ class DragableItem extends Component {
         {connectDragPreview(
           <div
             style={{
-              opacity,
-              marginRight: 25,
               border: isDragging ? '1px dashed gray' : '0px',
+              opacity,
             }}
           >
-            {isEditMode && !isItemAll ? (
-              <TextField
-                style={{ float: 'left', paddingLeft: 10 }}
-                value={item.displayValue}
-                onChange={(e) => {
-                  onItemChanged({ ...item, displayValue: e.target.value })
-                }}
-              />
+            {isEditMode ? (
+              !isItemAll && (
+                <div style={{ margin: '10px 0px' }}>
+                  <div
+                    style={{
+                      float: 'left',
+                      width: '100%',
+                      paddingLeft: 10,
+                      paddingRight: 40,
+                      marginRight: -35,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <TextField
+                      maxLength={50}
+                      value={item.displayValue}
+                      onChange={(e) => {
+                        onItemChanged({ ...item, displayValue: e.target.value })
+                      }}
+                    />
+                  </div>
+                  {item.fileCount === 0 && (
+                    <Button
+                      color='danger'
+                      justIcon
+                      style={{
+                        float: 'right',
+                      }}
+                      onClick={(e) => {
+                        onItemChanged({ ...item, isDeleted: true })
+                      }}
+                    >
+                      <Delete />
+                    </Button>
+                  )}
+                </div>
+              )
             ) : (
               <MenuItem
                 key={item.id}
@@ -111,61 +139,41 @@ class DragableItem extends Component {
                 onClick={(e) => {
                   onItemClick(item)
                 }}
-                style={{ float: 'left', width: '100%', paddingRight: 0 }}
               >
-                <ListItemText primary={<span>{item.displayValue}</span>} />
-              </MenuItem>
-            )}
-
-            <div
-              style={{
-                float: 'right',
-                width: 80,
-                height: '100%',
-                marginRight: -80,
-                marginTop: 10,
-              }}
-            >
-              {isEditMode ? (
-                item.fileCount === 0 && (
-                  <Button
-                    color='danger'
-                    justIcon
-                    style={{ marginRight: 10, marginLeft: 10 }}
-                    onClick={(e) => {
-                      onItemChanged({ ...item, isDeleted: true })
-                    }}
-                  >
-                    <Delete />
-                  </Button>
-                )
-              ) : (
-                connectDragSource(
-                  <div style={{ cursor: !isItemAll ? 'move' : 'pointer' }}>
-                    <Badge
-                      badgeContent={item.fileCount}
-                      color='primary'
-                      overlap='circle'
-                      anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                      }}
-                    >
-                      {isItemAll ? (
-                        <div style={{ marginRight: 10, width: 18 }} />
-                      ) : (
+                {!isItemAll &&
+                  connectDragSource(
+                    <div style={{ cursor: 'move' }}>
+                      <ListItemIcon style={{ minWidth: 25, marginTop: 5 }}>
                         <DragIndicator
-                          style={{ marginRight: 10 }}
-                          onClick={(e) => {
+                          onMouseDown={(e) => {
                             e.stopPropagation()
                           }}
                         />
-                      )}
-                    </Badge>
-                  </div>,
-                )
-              )}
-            </div>
+                      </ListItemIcon>
+                    </div>,
+                  )}
+
+                <Tooltip title={item.displayValue}>
+                  <ListItemText
+                    primary={<span>{item.displayValue}</span>}
+                    style={{
+                      marginRight: 15,
+                      paddingLeft: isItemAll ? 25 : 0,
+                      overflow: 'hidden',
+                    }}
+                  />
+                </Tooltip>
+                <Badge
+                  badgeContent={item.fileCount}
+                  color='primary'
+                  overlap='circle'
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                />
+              </MenuItem>
+            )}
 
             <div style={{ clear: 'both' }} />
           </div>,

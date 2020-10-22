@@ -564,11 +564,10 @@ class PatientDetail extends PureComponent {
           <GridItem xs={12} sm={12} md={10}>
             {this.state.showPatientDocument ? (
               <CommonModal
-                title='Patient Profile'
+                title='Patient Document'
                 fullScreen
                 open
                 onClose={() => {
-                  console.log('close patient document')
                   this.setState({ showPatientDocument: false })
                 }}
               >

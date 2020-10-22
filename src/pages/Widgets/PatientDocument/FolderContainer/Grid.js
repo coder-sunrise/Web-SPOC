@@ -27,7 +27,16 @@ import SetFolderWithPopover from './SetFolderWithPopover'
 
 class Grid extends PureComponent {
   downloadFile = (row) => {
-    downloadAttachment(row)
+    const { fileName } = row
+    const splits = fileName.split('.')
+    const ext = splits[splits.length - 1]
+
+    if (ext !== row.fileExtension) {
+      downloadAttachment({
+        ...row,
+        fileName: `${fileName}.${row.fileExtension}`,
+      })
+    } else downloadAttachment(row)
   }
 
   render () {
@@ -163,7 +172,7 @@ class Grid extends PureComponent {
             type: 'date',
             format: 'DD MMM YYYY ',
             disabled: true,
-            width: 120,
+            width: 110,
           },
           {
             columnName: 'createByUserName',
@@ -174,7 +183,7 @@ class Grid extends PureComponent {
             columnName: 'action',
             sortingEnabled: false,
             disabled: true,
-            width: 150,
+            width: 100,
             render: (row) => {
               return (
                 <React.Fragment>

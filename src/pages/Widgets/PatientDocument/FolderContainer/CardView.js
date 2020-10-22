@@ -8,7 +8,7 @@ import Card from '@material-ui/core/Card'
 import CardContent from '@material-ui/core/CardContent'
 
 import { downloadAttachment } from '@/services/file'
-import FileItem from './FileItem'
+import CardItem from './CardItem'
 
 const styles = () => ({
   root: {
@@ -72,7 +72,7 @@ class CardView extends Component {
               return (
                 <Card className={classes.card}>
                   <CardContent>
-                    <FileItem key={p.id} file={p} {...this.props} />
+                    <CardItem key={p.id} file={p} {...this.props} />
                   </CardContent>
                 </Card>
               )

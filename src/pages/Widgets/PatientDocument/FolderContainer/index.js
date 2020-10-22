@@ -8,6 +8,7 @@ import {
 } from '@/components'
 import printJS from 'print-js'
 import moment from 'moment'
+import _ from 'lodash'
 import {
   downloadAttachment,
   getFileByFileID,
@@ -59,18 +60,18 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
   }
 
   const onAddNewFolders = (name) => {
-    restProps
-      .dispatch({
-        type: 'folder/upsert',
-        payload: {
-          code: name,
-          displayValue: name,
-          description: name,
-          effectiveStartDate: moment().formatUTC(true),
-          effectiveEndDate: moment('2099-12-31').formatUTC(true),
-        },
-      })
-      .then(refreshFolders)
+    const { folderList = [], dispatch } = restProps
+    dispatch({
+      type: 'folder/upsert',
+      payload: {
+        code: name,
+        displayValue: name,
+        description: name,
+        sortOrder: (_.maxBy(folderList, 'sortOrder').sortOrder || 0) + 1,
+        effectiveStartDate: moment().formatUTC(true),
+        effectiveEndDate: moment('2099-12-31').formatUTC(true),
+      },
+    }).then(refreshFolders)
   }
 
   const onPreview = (file) => {

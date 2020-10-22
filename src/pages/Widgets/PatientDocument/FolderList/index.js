@@ -127,7 +127,7 @@ class FolderList extends Component {
     const { folderList: origFolder = [] } = this.props
     const { folderList } = this.state
     const updated = []
-    origFolder.map((f) => {
+    origFolder.filter((fo) => fo.id > 0).map((f) => {
       const newFolder = folderList.find((o) => o.id === f.id)
       if (newFolder && newFolder.sortOrder !== f.sortOrder)
         updated.push({ ...f, sortOrder: newFolder.sortOrder })
