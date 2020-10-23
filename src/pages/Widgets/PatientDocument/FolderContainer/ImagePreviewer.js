@@ -78,6 +78,8 @@ class ImagePreviewer extends Component {
 
   componentDidMount () {
     const { defaultFileFK, files } = this.props
+
+    console.log('componentDidMount', { defaultFileFK, files })
     this.cacheImageList(files, defaultFileFK)
     window.addEventListener('resize', this.resize.bind(this))
   }
@@ -88,11 +90,7 @@ class ImagePreviewer extends Component {
 
   // eslint-disable-next-line react/sort-comp
   UNSAFE_componentWillReceiveProps (nextProps) {
-    // const { defaultFileFK, files } = this.props
-    const {
-      // defaultFileFK: nextDefaultFileFK,
-      files: nextFiles = [],
-    } = nextProps
+    const { files: nextFiles = [] } = nextProps
     const { imageList } = this.state
 
     // handle on removed selected image
@@ -102,6 +100,7 @@ class ImagePreviewer extends Component {
         const nextSelectedIndex =
           preSelectedIndex <= 0 ? 0 : preSelectedIndex - 1
         const selectedFileIndexFK = nextFiles[nextSelectedIndex].fileIndexFK
+
         this.cacheImageList(nextFiles, selectedFileIndexFK)
       }
     } else {
@@ -125,11 +124,13 @@ class ImagePreviewer extends Component {
 
     const imageWH = this.getImageContainerWH()
     this.setState({ ...imageWH, imageList }, () => {
-      const currentImg = this.state.imageList.find(
-        (s) => s.fileIndexFK === fileIndexFK,
-      )
+      const currentImg = imageList.find((s) => s.fileIndexFK === fileIndexFK)
       if (!currentImg || !currentImg.image)
         this.fetchImage(imageList, fileIndexFK)
+      else {
+        currentImg.isSelected = true
+        this.setState({ imageList })
+      }
     })
   }
 
