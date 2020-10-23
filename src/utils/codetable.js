@@ -99,6 +99,15 @@ const tenantCodesMap = new Map([
     },
   ],
   [
+    'package',
+    {
+      ...defaultParams,
+      sorting: [
+        { columnName: 'displayValue', direction: 'asc' },
+      ],
+    },
+  ],
+  [
     'role',
     {
       ...defaultParams,

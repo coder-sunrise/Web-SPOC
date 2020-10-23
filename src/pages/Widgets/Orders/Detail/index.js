@@ -42,8 +42,9 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ orders }) => ({
+@connect(({ orders, clinicSettings }) => ({
   orders,
+  clinicSettings,
 }))
 class Details extends PureComponent {
   state = {
@@ -214,7 +215,7 @@ class Details extends PureComponent {
 
   render () {
     const { props } = this
-    const { classes, orders, dispatch, fromDispense, singleMode, from } = props
+    const { classes, orders, dispatch, fromDispense, singleMode, from, clinicSettings } = props
     const { type } = orders
     // console.log({ props })
     const cfg = {
@@ -229,8 +230,16 @@ class Details extends PureComponent {
     let orderTypeArray = orderTypes
     if (fromDispense) {
       orderTypeArray = orderTypes.filter(
-        (o) => o.value !== '2' && o.value !== '6',
+        (o) => o.value !== '2' && o.value !== '6' && o.value !== '8',
       )
+    }
+    else {
+      const { settings = [] } = clinicSettings
+      if (!settings.isEnablePackage) {
+        orderTypeArray = orderTypes.filter(
+          (o) => o.value !== '8',
+        )
+      }
     }
 
     // if (clinicTypeFK === CLINIC_TYPE.DENTAL) {

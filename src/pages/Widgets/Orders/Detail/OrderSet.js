@@ -126,6 +126,7 @@ const { qtyFormat } = config
           adjAmount: 0,
           adjType: 'ExactAmount',
           adjValue: 0,
+          isClaimable: true,
           totalAfterItemAdjustment:
             orderSetItem.unitPrice * orderSetItem.quantity,
           totalAfterOverallAdjustment:

@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { consultationDocumentTypes, formTypes } from '@/utils/codes'
 import Medication from '@/pages/Widgets/Orders/Detail/Medication'
 import Vaccination from '@/pages/Widgets/Orders/Detail/Vaccination'
@@ -5,7 +6,7 @@ import Service from '@/pages/Widgets/Orders/Detail/Service'
 import Consumable from '@/pages/Widgets/Orders/Detail/Consumable'
 import OrderSet from '@/pages/Widgets/Orders/Detail/OrderSet'
 import Treatment from '@/pages/Widgets/Orders/Detail/Treatment'
-import _ from 'lodash'
+import Package from '@/pages/Widgets/Orders/Detail/Package'
 
 const orderTypes = [
   {
@@ -65,6 +66,12 @@ const orderTypes = [
     accessRight: 'queue.consultation.order.treatment',
     getSubject: (r) => r.itemName,
     component: (props) => <Treatment {...props} />,
+  },
+  {
+    name: 'Package',
+    value: '8',
+    accessRight: 'queue.consultation.order.package',
+    component: (props) => <Package {...props} />,
   },
 ]
 
@@ -201,7 +208,7 @@ const convertToConsultation = (
   consultationDocumentTypes.forEach((p) => {
     values[p.prop] = rows.filter((o) => o.type === p.value)
   })
-  const { rows: orderRows = [], finalAdjustments = [], isGSTInclusive } = orders
+  const { rows: orderRows = [], finalAdjustments = [], isGSTInclusive, corPackages = [] } = orders
   values.corOrderAdjustment = finalAdjustments
   orderTypes.forEach((p, i) => {
     if (p.prop) {
@@ -249,6 +256,9 @@ const convertToConsultation = (
         })
       : []
   })
+
+  values.corPackages = corPackages
+  
   return {
     ...values,
     isGSTInclusive,

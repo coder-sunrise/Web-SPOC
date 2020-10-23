@@ -64,6 +64,10 @@ const initialState = {
     orderSetItems: [],
   },
   defaultTreatment: {},
+  corPackages: [],
+  defaultPackage: {
+    packageItems: [],
+  },
 }
 export default createListViewModel({
   namespace: 'orders',
@@ -143,6 +147,13 @@ export default createListViewModel({
         const result = yield call(service.queryStockDetails, payload)
         return result
         // yield put({ type: 'saveStockDetails', payload: result })
+      },
+
+      *addPackage ({ payload }, { select, call, put, delay }) {
+        yield put({
+          type: 'addPackageState',
+          payload,
+        })
       },
     },
 
@@ -298,6 +309,18 @@ export default createListViewModel({
             if (o.uid === payload.uid) o.isDeleted = true
             return o
           }),
+        }
+      },
+
+      addPackageState (state, { payload }) {
+        let { corPackages } = state
+        corPackages.push({
+          ...payload,
+          uid: getUniqueId(),
+        })
+        return {
+          ...state,
+          corPackages,
         }
       },
     },
