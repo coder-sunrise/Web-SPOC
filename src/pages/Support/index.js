@@ -11,15 +11,21 @@ import { GridContainer, GridItem, CardContainer, Button } from '@/components'
 
 const menuData = [
   {
-    title: 'Download',
+    title: 'Support',
     text: 'Contact Us',
     url: '/support/contactus',
     icon: <Call style={{ transform: 'rotate(-90deg)' }} />,
   },
   {
-    title: 'Download',
+    title: 'Support',
     text: formatMessage({ id: 'menu.support.printingtool' }),
     url: '/support/printingtool',
+    icon: <Print />,
+  },
+  {
+    title: 'Support',
+    text: 'Queue Processor',
+    url: '/support/QueueProcessor',
     icon: <Print />,
   },
 ]
