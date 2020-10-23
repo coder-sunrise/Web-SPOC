@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 
 import { withStyles } from '@material-ui/core'
 
+import { CommonModal } from '@/components'
 import PatientDocument from '@/pages/Widgets/PatientDocument'
 
 const styles = () => ({
@@ -33,7 +34,16 @@ class Document extends PureComponent {
   }
 
   render () {
-    return <PatientDocument {...this.props} />   
+    return (
+      <CommonModal
+        open
+        fullScreen
+        onClose={this.props.onClose}
+        title='Patient Document'
+      >
+        <PatientDocument {...this.props} />
+      </CommonModal>
+    )
   }
 }
 

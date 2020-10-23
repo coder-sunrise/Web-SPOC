@@ -35,9 +35,7 @@ import {
   DateRangePicker,
   DatePicker,
   Button,
-  CommonModal,
   withFormik,
-  TextField,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 
@@ -45,7 +43,6 @@ import { queryList } from '@/services/patient'
 import { getBizSession } from '@/services/queue'
 import schema from './schema'
 import { mapEntityToValues, upsertPatient } from './utils'
-import PatientDocument from './PatientDocument'
 
 // moment.updateLocale('en', {
 //   relativeTime: {
@@ -225,7 +222,15 @@ class PatientDetail extends PureComponent {
           loader: () => import('./PatientDocument'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet {...p} />
+            return (
+              <Cmpnet
+                {...p}
+                onClose={(e) => {
+                  const { preSelectedMenu } = this.state
+                  this.setState({ selectedMenu: preSelectedMenu })
+                }}
+              />
+            )
           },
           loading: Loading,
         }),
@@ -495,20 +500,18 @@ class PatientDetail extends PureComponent {
                             global.disableSave && currentMenu.name !== o.name
                           }
                           onClick={(e) => {
-                            if (o.id === '7') {
-                              this.setState({ showPatientDocument: true })
-                            } else {
-                              onMenuClick(e, o)
-                              dispatch({
-                                type: 'patient/updateState',
-                                payload: {
-                                  entity: entity || undefined,
-                                },
-                              })
-                              this.setState({
-                                selectedMenu: o.id,
-                              })
-                            }
+                            console.log(onMenuClick)
+                            onMenuClick(e, o)
+                            dispatch({
+                              type: 'patient/updateState',
+                              payload: {
+                                entity: entity || undefined,
+                              },
+                            })
+                            this.setState((pre) => ({
+                              selectedMenu: o.id,
+                              preSelectedMenu: pre.selectedMenu,
+                            }))
                           }}
                         >
                           <ListItemIcon style={{ minWidth: 25 }}>
@@ -555,46 +558,30 @@ class PatientDetail extends PureComponent {
             </Card>
           </GridItem>
           <GridItem xs={12} sm={12} md={10}>
-            {this.state.showPatientDocument ? (
-              <CommonModal
-                title='Patient Document'
-                fullScreen
-                open
-                onClose={() => {
-                  this.setState({ showPatientDocument: false })
-                }}
+            <CardContainer hideHeader title={currentMenu.name}>
+              <div
+                style={
+                  height > 0 ? (
+                    {
+                      height: height - 95 - 20,
+                      overflow: 'auto',
+                      padding: 4,
+                      paddingTop: 20,
+                    }
+                  ) : (
+                    { padding: 4, paddingTop: 20 }
+                  )
+                }
               >
-                <PatientDocument {...resetProps} />
-              </CommonModal>
-            ) : (
-              <CardContainer hideHeader title={currentMenu.name}>
-                <div
-                  style={
-                    height > 0 ? (
-                      {
-                        height: height - 95 - 20,
-                        overflow: 'auto',
-                        padding: 4,
-                        paddingTop: 20,
-                      }
-                    ) : (
-                      { padding: 4, paddingTop: 20 }
-                    )
-                  }
+                <Authorized.Context.Provider
+                  value={{
+                    rights: currentItemDisabled ? 'disable' : 'enable', //
+                  }}
                 >
-                  <Authorized.Context.Provider
-                    value={{
-                      rights: currentItemDisabled ? 'disable' : 'enable', //
-                    }}
-                  >
-                    <div style={{ width: 0, height: 0, overflow: 'hidden' }}>
-                      <TextField autoFocus />
-                    </div>
-                    <CurrentComponent {...resetProps} />
-                  </Authorized.Context.Provider>
-                </div>
-              </CardContainer>
-            )}
+                  <CurrentComponent {...resetProps} />
+                </Authorized.Context.Provider>
+              </div>
+            </CardContainer>
 
             <div
               style={{
