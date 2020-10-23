@@ -19,6 +19,7 @@ import { validateInvoicePayer } from '../../services/appliedScheme'
 const styles = (theme) => ({
   cardContainer: {
     margin: theme.spacing(1),
+    marginTop: 20,
   },
   errorPromptContainer: {
     textAlign: 'center',

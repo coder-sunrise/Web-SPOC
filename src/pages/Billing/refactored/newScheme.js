@@ -272,8 +272,7 @@ const Scheme = ({
                 size='sm'
                 FuncProps={{ pager: false }}
                 EditingProps={{
-                  showAddCommand: false,
-                  showDeleteCommand: false,
+                  showCommandColumn: false,
                   onCommitChanges,
                   showCommandColumn: false,
                 }}

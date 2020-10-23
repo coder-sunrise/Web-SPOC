@@ -758,6 +758,22 @@ const _routes = [
             ],
           },
           {
+            path: '/report/patientageingreport',
+            name: 'patientageingreport',
+            component: './Report/PatientAgeingReport',
+            authority: [
+              'report.finance.patientageingreport',
+            ],
+          },
+          {
+            path: '/report/purchasereceivinglistingreport',
+            name: 'purchasereceivinglistingreport',
+            component: './Report/purchasereceivinglistingreport',
+            authority: [
+              'report.inventory.purchasereceivinglistingreport',
+            ],
+          },
+          {
             path: '/report/statementsummaryreport',
             name: 'statementsummaryreport',
             component: './Report/StatementSummaryReport',
@@ -773,6 +789,7 @@ const _routes = [
               'report.finance.paymentcollectionsummary',
             ],
           },
+
         ],
       },
       // Report

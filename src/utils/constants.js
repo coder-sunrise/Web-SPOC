@@ -498,6 +498,7 @@ export const SCHEME_TYPE = {
 export const INVOICE_VIEW_MODE = {
   DEFAULT: 'default',
   APPLIED_SCHEME: 'applied_scheme',
+  Edit_Invoice: 'edit_invoice',
 }
 
 export const ATTACHMENT_TYPE = {
