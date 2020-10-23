@@ -12,6 +12,7 @@ import {
   Button,
   TextField,
   dateFormatLong,
+  Popconfirm,
 } from '@/components'
 import { LoadingWrapper } from 'medisys-components'
 import printJS from 'print-js'
@@ -543,14 +544,16 @@ class ImagePreviewer extends Component {
                     >
                       <Save /> Save
                     </Button>
-                    <Button
-                      color='danger'
-                      onClick={() => {
+
+                    <Popconfirm
+                      onConfirm={() => {
                         this.deleteImage(selectedImage)
                       }}
                     >
-                      <Delete /> Delete
-                    </Button>
+                      <Button color='danger'>
+                        <Delete /> Delete
+                      </Button>
+                    </Popconfirm>
                   </React.Fragment>
                 )}
               </div>
