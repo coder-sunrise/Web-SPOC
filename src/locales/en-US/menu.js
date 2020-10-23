@@ -65,6 +65,8 @@ export default {
   'menu.inventory': 'Inventory',
   'menu.inventory.pd': 'Purchasing & Receiving',
   'menu.inventory.pd.detail': 'PO & DO Detail',
+  'menu.inventory.rg': 'Receiving Goods',
+  'menu.inventory.rg.detail': 'Receiving Goods Detail',
   'menu.inventory.master': 'Inventory Master',
   'menu.inventory.consumable.consumable': 'Add Consumable',
   'menu.inventory.consumable.editconsumable': 'Edit Consumable',
