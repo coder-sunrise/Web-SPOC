@@ -4,6 +4,7 @@ import { connect } from 'dva'
 import moment from 'moment'
 import _ from 'lodash'
 import router from 'umi/router'
+import $ from 'jquery'
 
 // medisys-components
 import { PatientInfoSideBanner } from 'medisys-components'
@@ -227,7 +228,11 @@ class PatientDetail extends PureComponent {
                 {...p}
                 onClose={(e) => {
                   const { preSelectedMenu } = this.state
-                  this.setState({ selectedMenu: preSelectedMenu })
+                  $('input').eq(0).focus()
+                  this.setState({
+                    selectedMenu: preSelectedMenu,
+                    preSelectedMenu: undefined,
+                  })
                 }}
               />
             )
@@ -500,7 +505,6 @@ class PatientDetail extends PureComponent {
                             global.disableSave && currentMenu.name !== o.name
                           }
                           onClick={(e) => {
-                            console.log(onMenuClick)
                             onMenuClick(e, o)
                             dispatch({
                               type: 'patient/updateState',

@@ -40,6 +40,7 @@ class Document extends PureComponent {
         fullScreen
         onClose={this.props.onClose}
         title='Patient Document'
+        keepMounted={false}
       >
         <PatientDocument {...this.props} />
       </CommonModal>
