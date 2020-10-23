@@ -225,14 +225,7 @@ class PatientDetail extends PureComponent {
           loader: () => import('./PatientDocument'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return (
-              <Cmpnet
-                {...p}
-                onClose={() => {
-                  console.log('onclose patient docuemnt')
-                }}
-              />
-            )
+            return <Cmpnet {...p} />
           },
           loading: Loading,
         }),

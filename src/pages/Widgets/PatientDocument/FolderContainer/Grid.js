@@ -50,6 +50,7 @@ class Grid extends PureComponent {
       onEditFileName,
       onAddNewFolders,
       onFileUpdated,
+      readOnly,
     } = this.props
 
     const patientIsActive = entity && entity.isActive
@@ -101,22 +102,24 @@ class Grid extends PureComponent {
                       </NavLink>
                     </div>
                   </Tooltip>
-                  <div
-                    style={{
-                      float: 'right',
-                      width: 40,
-                      marginRight: -40,
-                    }}
-                  >
-                    <IconButton
-                      color='primary'
-                      onClick={() => {
-                        onEditFileName(row)
+                  {!readOnly && (
+                    <div
+                      style={{
+                        float: 'right',
+                        width: 40,
+                        marginRight: -40,
                       }}
                     >
-                      <BorderColor />
-                    </IconButton>
-                  </div>
+                      <IconButton
+                        color='primary'
+                        onClick={() => {
+                          onEditFileName(row)
+                        }}
+                      >
+                        <BorderColor />
+                      </IconButton>
+                    </div>
+                  )}
                 </div>
               )
             },
@@ -178,24 +181,28 @@ class Grid extends PureComponent {
                       <Download />
                     </Button>
                   </Tooltip>
-                  <SetFolderWithPopover
-                    key={row.id}
-                    folderList={row.folderList}
-                    selectedFolderFKs={row.folderFKs || []}
-                    onClose={(selectedFolder) => {
-                      const originalFolders = _.sortedUniq(row.folderFKs || [])
-                      const newFolders = _.sortedUniq(selectedFolder)
+                  {!readOnly && (
+                    <SetFolderWithPopover
+                      key={row.id}
+                      folderList={row.folderList}
+                      selectedFolderFKs={row.folderFKs || []}
+                      onClose={(selectedFolder) => {
+                        const originalFolders = _.sortedUniq(
+                          row.folderFKs || [],
+                        )
+                        const newFolders = _.sortedUniq(selectedFolder)
 
-                      if (
-                        originalFolders.length !== newFolders.length ||
-                        originalFolders.join(',') !== newFolders.join(',')
-                      ) {
-                        row.folderFKs = newFolders
-                        onFileUpdated(row)
-                      }
-                    }}
-                    onAddNewFolders={onAddNewFolders}
-                  />
+                        if (
+                          originalFolders.length !== newFolders.length ||
+                          originalFolders.join(',') !== newFolders.join(',')
+                        ) {
+                          row.folderFKs = newFolders
+                          onFileUpdated(row)
+                        }
+                      }}
+                      onAddNewFolders={onAddNewFolders}
+                    />
+                  )}
                   <Popconfirm
                     onConfirm={() => {
                       dispatch({
@@ -213,7 +220,7 @@ class Grid extends PureComponent {
                     <Tooltip title='Delete'>
                       <Button
                         size='sm'
-                        disabled={!patientIsActive}
+                        disabled={readOnly}
                         color='danger'
                         justIcon
                       >

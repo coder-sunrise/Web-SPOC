@@ -121,6 +121,7 @@ class CardItem extends Component {
       onPreview,
       onEditFileName,
       patient: { entity },
+      readOnly,
     } = this.props
     const { loading, imageData } = this.state
     const patientIsActive = entity && entity.isActive
@@ -139,6 +140,7 @@ class CardItem extends Component {
               <Button
                 color='primary'
                 justIcon
+                disabled={readOnly}
                 onClick={() => {
                   onEditFileName(file)
                 }}
@@ -160,12 +162,7 @@ class CardItem extends Component {
                 }}
               >
                 <Tooltip title='Delete'>
-                  <Button
-                    size='sm'
-                    disabled={!patientIsActive}
-                    color='danger'
-                    justIcon
-                  >
+                  <Button size='sm' color='danger' justIcon disabled={readOnly}>
                     <Delete />
                   </Button>
                 </Tooltip>
@@ -214,30 +211,31 @@ class CardItem extends Component {
                 <div>
                   <div>{file.createByUserName}</div>
                   <div>
-                    Folder as:
-                    <SetFolderWithPopover
-                      justIcon
-                      key={file.id}
-                      folderList={folderList}
-                      selectedFolderFKs={file.folderFKs || []}
-                      onClose={(selectedFolder) => {
-                        const originalFolders = _.sortedUniq(
-                          file.folderFKs || [],
-                        )
-                        const newFolders = _.sortedUniq(selectedFolder)
+                    Folder as:{!readOnly && (
+                      <SetFolderWithPopover
+                        justIcon
+                        key={file.id}
+                        folderList={folderList}
+                        selectedFolderFKs={file.folderFKs || []}
+                        onClose={(selectedFolder) => {
+                          const originalFolders = _.sortedUniq(
+                            file.folderFKs || [],
+                          )
+                          const newFolders = _.sortedUniq(selectedFolder)
 
-                        if (
-                          originalFolders.length !== newFolders.length ||
-                          originalFolders.join(',') !== newFolders.join(',')
-                        ) {
-                          onFileUpdated({
-                            ...file,
-                            folderFKs: newFolders,
-                          })
-                        }
-                      }}
-                      onAddNewFolders={onAddNewFolders}
-                    />
+                          if (
+                            originalFolders.length !== newFolders.length ||
+                            originalFolders.join(',') !== newFolders.join(',')
+                          ) {
+                            onFileUpdated({
+                              ...file,
+                              folderFKs: newFolders,
+                            })
+                          }
+                        }}
+                        onAddNewFolders={onAddNewFolders}
+                      />
+                    )}
                   </div>
                 </div>
               </GridItem>

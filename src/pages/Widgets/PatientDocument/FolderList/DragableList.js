@@ -8,7 +8,8 @@ import DragableItem from './DragableItem'
 
 class DragableList extends Component {
   render () {
-    const { folderList, selectedFolderFK, ...restProps } = this.props
+    const { folderList, selectedFolderFK, readOnly, ...restProps } = this.props
+
     return (
       // MenuList
       <MenuList>
@@ -20,6 +21,7 @@ class DragableList extends Component {
               item={item}
               index={i}
               isSelected={item.id === selectedFolderFK}
+              readOnly={readOnly}
               {...restProps}
             />
           ))}

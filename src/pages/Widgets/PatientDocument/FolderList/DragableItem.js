@@ -82,6 +82,7 @@ class DragableItem extends Component {
       onItemClick,
       onItemChanged,
       isEditMode,
+      readOnly,
     } = this.props
 
     let opacity = isDragging ? 0.4 : 1
@@ -140,7 +141,8 @@ class DragableItem extends Component {
                   onItemClick(item)
                 }}
               >
-                {!isItemAll &&
+                {!readOnly &&
+                  !isItemAll &&
                   connectDragSource(
                     <div style={{ cursor: 'move' }}>
                       <ListItemIcon style={{ minWidth: 25, marginTop: 5 }}>
@@ -158,7 +160,7 @@ class DragableItem extends Component {
                     primary={<span>{item.displayValue}</span>}
                     style={{
                       marginRight: 15,
-                      paddingLeft: isItemAll ? 25 : 0,
+                      paddingLeft: isItemAll && !readOnly ? 25 : 0,
                       overflow: 'hidden',
                     }}
                   />

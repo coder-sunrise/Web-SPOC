@@ -172,12 +172,7 @@ class PatientDocument extends Component {
 
   render () {
     const { patient: { entity }, patientAttachment, folder } = this.props
-    const {
-      viewMode,
-      selectedFolderFK,
-      leftContainerHeight,
-      rightContainerHeight,
-    } = this.state
+    const { viewMode, selectedFolderFK } = this.state
     const patientIsActive = entity && entity.isActive
     const { list = [] } = patientAttachment
 
@@ -199,6 +194,7 @@ class PatientDocument extends Component {
             style={{ height: window.innerHeight - 100, overflow: 'scroll' }}
           >
             <FolderList
+              readOnly={!patientIsActive}
               folderList={folderList}
               selectedFolderFK={selectedFolderFK}
               updateAttachments={this.updateAttachments}
@@ -240,6 +236,7 @@ class PatientDocument extends Component {
               <GridItem md={12}>
                 <FolderContainer
                   {...this.props}
+                  readOnly={!patientIsActive}
                   folderList={folderList}
                   viewMode={viewMode}
                   attachmentList={list}

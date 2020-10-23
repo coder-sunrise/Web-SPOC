@@ -181,116 +181,119 @@ class FolderList extends Component {
   }
 
   render () {
-    const { updateAttachments, selectedFolderFK = -99 } = this.props
+    const { readOnly, updateAttachments, selectedFolderFK = -99 } = this.props
     const { showNewFolder, folderList, isEditMode } = this.state
 
     return (
       <GridContainer style={{ height: 'auto' }}>
-        <GridItem md={12}>
-          <div>
-            <div style={{ display: 'flex', float: 'left' }}>
-              <IconButton
-                color='primary'
-                style={{ width: 50, marginTop: 5 }}
-                onClick={() => {
-                  this.setState({ showNewFolder: true })
-                }}
-              >
-                <CreateNewFolder
-                  fontSize='inherit'
-                  style={{ width: 40, height: 40 }}
-                />
-              </IconButton>
-              <FastField
-                name='patientAttachment'
-                render={(args) => {
-                  this.form = args.form
-                  return (
-                    <Attachment
-                      attachmentType='patientAttachment'
-                      handleUpdateAttachments={(att) => {
-                        let { added = [] } = att
-                        const { selectedFolderFK: folderFK } = this.props
-                        if (folderFK > 0 && added.length > 0) {
-                          added = added.map((ad) => {
-                            const { 0: fileDetails } = ad
-                            const retVal = {
-                              ...ad,
-                              0: {
-                                ...fileDetails,
-                                patientAttachment_Folder: [
-                                  { folderFK },
-                                ],
-                              },
-                            }
-                            return retVal
-                          })
-                        }
-                        updateAttachments(args)({ ...att, added })
-                      }}
-                      attachments={args.field.value}
-                      label=''
-                    />
-                  )
-                }}
-              />
-            </div>
-
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                float: 'right',
-                height: 50,
-                marginTop: 5,
-              }}
-            >
-              {isEditMode ? (
-                <React.Fragment>
-                  <Tooltip title='Save'>
-                    <Button
-                      justIcon
-                      color='primary'
-                      size='sm'
-                      onClick={() => {
-                        this.handleOnSave()
-                        this.setState({ isEditMode: false })
-                      }}
-                    >
-                      <Save />
-                    </Button>
-                  </Tooltip>
-                  <Tooltip title='Cancel'>
-                    <Button
-                      justIcon
-                      color='danger'
-                      size='sm'
-                      onClick={() => {
-                        this.mapPropsToStates()
-                        this.setState({ isEditMode: false })
-                      }}
-                    >
-                      <Cancel />
-                    </Button>
-                  </Tooltip>
-                </React.Fragment>
-              ) : (
-                <Button
-                  justIcon
+        {!readOnly && (
+          <GridItem md={12}>
+            <div>
+              <div style={{ display: 'flex', float: 'left' }}>
+                <IconButton
                   color='primary'
-                  size='sm'
+                  style={{ width: 50, marginTop: 5 }}
                   onClick={() => {
-                    this.setState({ isEditMode: true })
+                    this.setState({ showNewFolder: true })
                   }}
                 >
-                  <Edit />
-                </Button>
-              )}
+                  <CreateNewFolder
+                    fontSize='inherit'
+                    style={{ width: 40, height: 40 }}
+                  />
+                </IconButton>
+                <FastField
+                  name='patientAttachment'
+                  render={(args) => {
+                    this.form = args.form
+                    return (
+                      <Attachment
+                        attachmentType='patientAttachment'
+                        handleUpdateAttachments={(att) => {
+                          let { added = [] } = att
+                          const { selectedFolderFK: folderFK } = this.props
+                          if (folderFK > 0 && added.length > 0) {
+                            added = added.map((ad) => {
+                              const { 0: fileDetails } = ad
+                              const retVal = {
+                                ...ad,
+                                0: {
+                                  ...fileDetails,
+                                  patientAttachment_Folder: [
+                                    { folderFK },
+                                  ],
+                                },
+                              }
+                              return retVal
+                            })
+                          }
+                          updateAttachments(args)({ ...att, added })
+                        }}
+                        attachments={args.field.value}
+                        label=''
+                      />
+                    )
+                  }}
+                />
+              </div>
+
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  float: 'right',
+                  height: 50,
+                  marginTop: 5,
+                }}
+              >
+                {isEditMode ? (
+                  <React.Fragment>
+                    <Tooltip title='Save'>
+                      <Button
+                        justIcon
+                        color='primary'
+                        size='sm'
+                        onClick={() => {
+                          this.handleOnSave()
+                          this.setState({ isEditMode: false })
+                        }}
+                      >
+                        <Save />
+                      </Button>
+                    </Tooltip>
+                    <Tooltip title='Cancel'>
+                      <Button
+                        justIcon
+                        color='danger'
+                        size='sm'
+                        onClick={() => {
+                          this.mapPropsToStates()
+                          this.setState({ isEditMode: false })
+                        }}
+                      >
+                        <Cancel />
+                      </Button>
+                    </Tooltip>
+                  </React.Fragment>
+                ) : (
+                  <Button
+                    justIcon
+                    color='primary'
+                    size='sm'
+                    onClick={() => {
+                      this.setState({ isEditMode: true })
+                    }}
+                  >
+                    <Edit />
+                  </Button>
+                )}
+              </div>
             </div>
-          </div>
-        </GridItem>
+          </GridItem>
+        )}
         <GridItem md={12}>
           <DragableList
+            readOnly={readOnly}
             isEditMode={isEditMode}
             folderList={folderList.filter((f) => !f.isDeleted)}
             selectedFolderFK={selectedFolderFK}

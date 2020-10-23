@@ -134,7 +134,7 @@ class ImagePreviewer extends Component {
 
   getImageContainerWH = () => {
     const imageContainerHeight = window.innerHeight - 80
-    const containerWidth = window.innerWidth - 40
+    const containerWidth = window.innerWidth - 50
     const imageContainerWidth = containerWidth - 400
     return { imageContainerHeight, imageContainerWidth }
   }
@@ -317,34 +317,35 @@ class ImagePreviewer extends Component {
   }
 
   checkFileChanged = (file, onConfirm) => {
-    const { fileName, folderFKs } = this.props.files.find(
-      (f) => f.id === file.id,
-    )
-    if (
-      file.fileName !== fileName ||
-      _.sortedUniq(file.folderFKs).join(',') !==
-        _.sortedUniq(folderFKs).join(',')
-    ) {
-      this.props.dispatch({
-        type: 'global/updateAppState',
-        payload: {
-          openConfirm: true,
-          openConfirmContent: formatMessage({
-            id: 'app.general.leave-without-save',
-          }),
-          onConfirmSave: () => {
-            // restore file to state
-            const { imageList } = this.state
-            const changedFile = imageList.find((f) => f.id === file.id)
-            changedFile.fileName = fileName
-            changedFile.folderFKs = _.sortedUniq(folderFKs)
-            this.setState({ imageList })
-            onConfirm()
+    const origFile = this.props.files.find((f) => f.id === file.id)
+    if (origFile) {
+      const { fileName, folderFKs } = origFile
+      if (
+        file.fileName !== fileName ||
+        _.sortedUniq(file.folderFKs).join(',') !==
+          _.sortedUniq(folderFKs).join(',')
+      ) {
+        this.props.dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            openConfirm: true,
+            openConfirmContent: formatMessage({
+              id: 'app.general.leave-without-save',
+            }),
+            onConfirmSave: () => {
+              // restore file to state
+              const { imageList } = this.state
+              const changedFile = imageList.find((f) => f.id === file.id)
+              changedFile.fileName = fileName
+              changedFile.folderFKs = _.sortedUniq(folderFKs)
+              this.setState({ imageList })
+              onConfirm()
+            },
           },
-        },
-      })
-    } else {
-      onConfirm()
+        })
+      } else {
+        onConfirm()
+      }
     }
   }
 
@@ -352,6 +353,7 @@ class ImagePreviewer extends Component {
     const { imageList = [], loading = false, imageContainerWidth } = this.state
     const {
       classes,
+      readOnly,
       folder: { list: folderList },
       onFileUpdated,
       onAddNewFolders,
@@ -450,31 +452,34 @@ class ImagePreviewer extends Component {
                   selectedImage.fileName = e.target.value
                   this.setState({ imageList })
                 }}
+                text={readOnly}
               />
             </GridItem>
             <GridItem md={12} style={{ marginTop: 10 }}>
               <div>
                 <span style={{ marginRight: 10 }}>Folder as:</span>
-                <SetFolderWithPopover
-                  key={selectedImage.id}
-                  folderList={folderList}
-                  selectedFolderFKs={selectedImage.folderFKs || []}
-                  onClose={(selectedFolder) => {
-                    const originalFolders = _.sortedUniq(
-                      selectedImage.folderFKs || [],
-                    )
-                    const newFolders = _.sortedUniq(selectedFolder)
+                {!readOnly && (
+                  <SetFolderWithPopover
+                    key={selectedImage.id}
+                    folderList={folderList}
+                    selectedFolderFKs={selectedImage.folderFKs || []}
+                    onClose={(selectedFolder) => {
+                      const originalFolders = _.sortedUniq(
+                        selectedImage.folderFKs || [],
+                      )
+                      const newFolders = _.sortedUniq(selectedFolder)
 
-                    if (
-                      originalFolders.length !== newFolders.length ||
-                      originalFolders.join(',') !== newFolders.join(',')
-                    ) {
-                      selectedImage.folderFKs = newFolders
-                      this.setState({ imageList })
-                    }
-                  }}
-                  onAddNewFolders={onAddNewFolders}
-                />
+                      if (
+                        originalFolders.length !== newFolders.length ||
+                        originalFolders.join(',') !== newFolders.join(',')
+                      ) {
+                        selectedImage.folderFKs = newFolders
+                        this.setState({ imageList })
+                      }
+                    }}
+                    onAddNewFolders={onAddNewFolders}
+                  />
+                )}
               </div>
             </GridItem>
             {selectedImage.folderFKs &&
@@ -524,26 +529,30 @@ class ImagePreviewer extends Component {
                 >
                   <Print /> Print
                 </Button>
-                <Button
-                  color='primary'
-                  disabled={
-                    selectedImage.fileName === undefined ||
-                    selectedImage.fileName.trim() === ''
-                  }
-                  onClick={() => {
-                    onFileUpdated(selectedImage)
-                  }}
-                >
-                  <Save /> Save
-                </Button>
-                <Button
-                  color='danger'
-                  onClick={() => {
-                    this.deleteImage(selectedImage)
-                  }}
-                >
-                  <Delete /> Delete
-                </Button>
+                {!readOnly && (
+                  <React.Fragment>
+                    <Button
+                      color='primary'
+                      disabled={
+                        selectedImage.fileName === undefined ||
+                        selectedImage.fileName.trim() === ''
+                      }
+                      onClick={() => {
+                        onFileUpdated(selectedImage)
+                      }}
+                    >
+                      <Save /> Save
+                    </Button>
+                    <Button
+                      color='danger'
+                      onClick={() => {
+                        this.deleteImage(selectedImage)
+                      }}
+                    >
+                      <Delete /> Delete
+                    </Button>
+                  </React.Fragment>
+                )}
               </div>
             </GridItem>
           </GridContainer>
