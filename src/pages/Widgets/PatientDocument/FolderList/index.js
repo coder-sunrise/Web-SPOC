@@ -93,7 +93,9 @@ class FolderList extends Component {
         description: name,
         effectiveStartDate: moment().formatUTC(true),
         effectiveEndDate: moment('2099-12-31').formatUTC(true),
-        sortOrder: (_.maxBy(folderList, 'sortOrder').sortOrder || 0) + 1,
+        sortOrder:
+          (_.maxBy(folderList.filter((f) => f.id > 0), 'sortOrder').sortOrder ||
+            0) + 1,
       },
     }).then(this.refreshFolders)
 

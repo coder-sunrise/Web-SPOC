@@ -103,7 +103,16 @@ class SetFolderWithPopover extends Component {
                 <Button
                   size='sm'
                   onClick={() => {
-                    onAddNewFolders(newFolder)
+                    const entity = {
+                      code: newFolder,
+                      displayValue: newFolder,
+                      description: newFolder,
+                      sortOrder:
+                        (_.maxBy(folderList, 'sortOrder').sortOrder || 0) + 1,
+                      effectiveStartDate: moment().formatUTC(true),
+                      effectiveEndDate: moment('2099-12-31').formatUTC(true),
+                    }
+                    onAddNewFolders(entity)
                   }}
                   justIcon
                   round

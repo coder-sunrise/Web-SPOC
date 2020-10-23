@@ -69,15 +69,7 @@ class Grid extends PureComponent {
         FuncProps={{
           pager: false,
         }}
-        EditingProps={{
-          showCommandColumn: false,
-          onCommitChanges: (p) => {
-            console.log(p)
-          },
-        }}
-        // onRowDoubleClick={this.downloadFile}
         columns={[
-          // { name: 'preview', title: ' ' },
           { name: 'fileName', title: 'Document' },
           { name: 'folderFKs', title: 'Folders' },
           { name: 'createByUserName', title: 'Created By' },
@@ -85,20 +77,6 @@ class Grid extends PureComponent {
           { name: 'action', title: 'Action' },
         ]}
         columnExtensions={[
-          // {
-          //   columnName: 'preview',
-          //   disabled: true,
-          //   width: 50,
-          //   render: (row) => {
-          //     return (
-          //       <Tooltip title='Preview'>
-          //         <IconButton color='primary' onClick={() => onPreview(row)}>
-          //           <Visibility />
-          //         </IconButton>
-          //       </Tooltip>
-          //     )
-          //   },
-          // },
           {
             columnName: 'fileName',
             width: 400,

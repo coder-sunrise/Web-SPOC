@@ -95,11 +95,16 @@ class ImagePreviewer extends Component {
     const { imageList } = this.state
 
     // handle on removed selected image
-    if (imageList.length !== nextFiles.length) {
-      const preSelectedIndex = imageList.findIndex((f) => f.isSelected)
-      const nextSelectedIndex = preSelectedIndex <= 0 ? 0 : preSelectedIndex - 1
-      const selectedFileIndexFK = nextFiles[nextSelectedIndex].fileIndexFK
-      this.cacheImageList(nextFiles, selectedFileIndexFK)
+    if (nextFiles.length > 0) {
+      if (imageList.length !== nextFiles.length) {
+        const preSelectedIndex = imageList.findIndex((f) => f.isSelected)
+        const nextSelectedIndex =
+          preSelectedIndex <= 0 ? 0 : preSelectedIndex - 1
+        const selectedFileIndexFK = nextFiles[nextSelectedIndex].fileIndexFK
+        this.cacheImageList(nextFiles, selectedFileIndexFK)
+      }
+    } else {
+      this.setState({ imageList: [] })
     }
   }
 
@@ -302,6 +307,9 @@ class ImagePreviewer extends Component {
         },
       })
       .then(() => {
+        if (this.state.imageList.filter((f) => f.id !== file.id).length === 0)
+          this.props.onClose()
+
         this.props.dispatch({
           type: 'patientAttachment/query',
         })

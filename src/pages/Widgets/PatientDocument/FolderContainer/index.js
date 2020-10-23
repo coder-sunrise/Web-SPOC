@@ -59,18 +59,11 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
     })
   }
 
-  const onAddNewFolders = (name) => {
-    const { folderList = [], dispatch } = restProps
+  const onAddNewFolders = (newFolder) => {
+    const { dispatch } = restProps
     dispatch({
       type: 'folder/upsert',
-      payload: {
-        code: name,
-        displayValue: name,
-        description: name,
-        sortOrder: (_.maxBy(folderList, 'sortOrder').sortOrder || 0) + 1,
-        effectiveStartDate: moment().formatUTC(true),
-        effectiveEndDate: moment('2099-12-31').formatUTC(true),
-      },
+      payload: newFolder,
     }).then(refreshFolders)
   }
 
@@ -123,9 +116,9 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
     <React.Fragment>
       <div style={{ height: window.innerHeight - 160, overflow: 'scroll' }}>
         {viewMode === 'card' ? (
-          <CardView {...restProps} {...cfg} />
+          <CardView key='cardview' {...restProps} {...cfg} />
         ) : (
-          <Grid {...restProps} {...cfg} />
+          <Grid key='gridview' {...restProps} {...cfg} />
         )}
       </div>
       <CommonModal
