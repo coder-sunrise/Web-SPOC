@@ -14,10 +14,8 @@ import {
   dateFormatLong,
   dateFormatLongWithTimeNoSec12h,
   ProgressButton,
-  serverDateFormat,
+  Tooltip,
 } from '@/components'
-import { getBizSession } from '@/services/queue'
-import { roundTo } from '@/utils/utils'
 import CollectPaymentConfirm from './CollectPaymentConfirm'
 import ExtractAsSingle from './ExtractAsSingle'
 import PrintStatementReport from '../PrintStatementReport'
@@ -51,11 +49,15 @@ class Details extends PureComponent {
       { name: 'invoiceNo', title: 'Invoice No' },
       { name: 'invoiceDate', title: 'Invoice Date' },
       { name: 'patientName', title: 'Patient Name' },
+      { name: 'payableAmount', title: 'Payable Amt.' },
       { name: 'adminCharge', title: 'Corporate Charge' },
       { name: 'statementAdjustment', title: 'Statement Adjustment' },
-      { name: 'totalPayableAmount', title: 'Total Payable Amt' },
+      { name: 'totalPayableAmount', title: 'Total Payable Amt.' },
+      { name: 'creditNoteAmount', title: 'Credit Note' },
+      { name: 'totalPayment', title: 'Paid' },
       { name: 'outstandingAmount', title: 'Outstanding' },
       { name: 'remark', title: 'Remarks' },
+      { name: 'action', title: 'Action' },
     ],
 
     showCollectPayment: false,
@@ -111,6 +113,20 @@ class Details extends PureComponent {
     })
   }
 
+  printInvoice = (row) => {
+    window.g_app._store.dispatch({
+      type: 'report/updateState',
+      payload: {
+        reportTypeID: 15,
+        reportParameters: {
+          InvoiceId: row.invoiceFK,
+          CopayerId: undefined,
+          isSaved: true,
+        },
+      },
+    })
+  }
+
   render () {
     const {
       columns,
@@ -119,7 +135,7 @@ class Details extends PureComponent {
       extractRows,
       selectedRows,
     } = this.state
-    const { classes, statement, values, theme, history } = this.props
+    const { classes, values, theme, history } = this.props
     const { statementInvoice = [] } = values
     return (
       <div>
@@ -152,43 +168,65 @@ class Details extends PureComponent {
             {
               columnName: 'invoiceNo',
               sortingEnabled: false,
-              width: 100,
+              width: 85,
             },
             {
               columnName: 'patientName',
               sortingEnabled: false,
+              width: 250,
             },
             {
               columnName: 'remark',
               sortingEnabled: false,
             },
             {
+              columnName: 'payableAmount',
+              type: 'number',
+              currency: true,
+              sortingEnabled: false,
+              width: 110,
+            },
+            {
               columnName: 'adminCharge',
               type: 'number',
               currency: true,
               sortingEnabled: false,
-              width: 150,
+              width: 130,
             },
             {
               columnName: 'statementAdjustment',
               type: 'number',
               currency: true,
               sortingEnabled: false,
-              width: 180,
+              width: 170,
             },
             {
               columnName: 'totalPayableAmount',
               type: 'number',
               currency: true,
               sortingEnabled: false,
-              width: 150,
+              width: 140,
+            },
+            {
+              columnName: 'creditNoteAmount',
+              type: 'number',
+              currency: true,
+              sortingEnabled: false,
+              width: 110,
+            },
+            {
+              columnName: 'totalPayment',
+              type: 'number',
+              currency: true,
+              sortingEnabled: false,
+              width: 110,
             },
             {
               columnName: 'outstandingAmount',
               type: 'number',
               currency: true,
               sortingEnabled: false,
-              width: 150,
+              width: 110,
             },
             {
               columnName: 'invoiceDate',
@@ -196,6 +234,26 @@ class Details extends PureComponent {
               format: dateFormatLong,
               sortingEnabled: false,
               width: 100,
+            },
+            {
+              columnName: 'action',
+              align: 'center',
+              width: 80,
+              render: (r) => {
+                return (
+                  <Tooltip title='Print'>
+                    <Button
+                      color='primary'
+                      justIcon
+                      onClick={() => {
+                        this.printInvoice(r)
+                      }}
+                    >
+                      <Print />
+                    </Button>
+                  </Tooltip>
+                )
+              },
             },
           ]}
           TableProps={{
@@ -239,7 +297,7 @@ class Details extends PureComponent {
           <CollectPaymentConfirm />
         </CommonModal>
         <CommonModal
-          title='Statement'
+          title='Transfer Invoice'
           open={showModal}
           maxWidth='md'
           bodyNoPadding
@@ -255,7 +313,7 @@ class Details extends PureComponent {
           onClick={this.handleClick}
           disabled={selectedRows.length <= 0}
         >
-          Extract As Single
+          Transfer Invoice
         </Button>
         <Button
           style={{ marginTop: 10 }}

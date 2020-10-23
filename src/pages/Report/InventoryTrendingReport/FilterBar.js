@@ -16,20 +16,7 @@ import {
 } from '@/components'
 import ReportDateRangePicker from '../ReportDateRangePicker'
 
-const FilterBar = ({ handleSubmit, isSubmitting, formikProps, codetable }) => {
-  // inventory${form.values.inventoryType}
-  const { values, setFieldValue } = formikProps
-  const { items = [] } = values
-
-  const ctinventory =
-    codetable[`inventory${values.inventoryType.toLowerCase()}`] || []
-
-  const selectedItems = ctinventory.filter((item) => items.includes(item.id))
-
-  const handleDelete = (id) => {
-    setFieldValue('items', items.filter((item) => item !== id))
-  }
-
+const FilterBar = ({ handleSubmit, isSubmitting }) => {
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
@@ -95,7 +82,6 @@ const FilterBar = ({ handleSubmit, isSubmitting, formikProps, codetable }) => {
                     {...args}
                     label='Item List'
                     mode='multiple'
-                    maxTagCount={5}
                     code={`inventory${form.values.inventoryType}`}
                     labelField='displayValue'
                     temp
@@ -121,19 +107,6 @@ const FilterBar = ({ handleSubmit, isSubmitting, formikProps, codetable }) => {
             >
               Generate Report
             </Button>
-          </GridItem>
-          <GridItem md={12}>
-            {selectedItems.map((item) => (
-              <Chip
-                style={{ margin: 8 }}
-                key={item.code}
-                size='small'
-                variant='outlined'
-                label={item.displayValue}
-                color='primary'
-                onDelete={() => handleDelete(item.id)}
-              />
-            ))}
           </GridItem>
         </GridContainer>
       </React.Fragment>

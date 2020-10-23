@@ -90,7 +90,7 @@ const styles = (theme) => ({
       doctorProfile: Yup.object()
         .transform((value) => (value === null ? {} : value))
         .when('role', {
-          is(val) {
+          is (val) {
             if (val === undefined) return false
             return ctRole.find((item) => item.id === parseInt(val, 10)).clinicalRoleName === 'Doctor' || ctRole.find((item) => item.id === parseInt(val, 10)).clinicalRoleName === 'Doctor Owner'
           },
@@ -350,7 +350,7 @@ class UserProfileForm extends React.PureComponent {
     return true
   }
 
-  render() {
+  render () {
     const {
       classes,
       footer,
@@ -464,6 +464,26 @@ class UserProfileForm extends React.PureComponent {
                     </Button>
                     </GridItem>
                   )}
+              </GridContainer>
+
+              <GridItem md={12} className={classes.verticalSpacing}>
+                <h4>User Role</h4>
+              </GridItem>
+              <GridContainer className={classes.indent}>
+                <GridItem md={6}>
+                  <Field
+                    name='role'
+                    render={(args) => (
+                      <CodeSelect
+                        {...args}
+                        label='Role'
+                        code='role'
+                        disabled={isMyAccount}
+                        onChange={this.onRoleChange}
+                      />
+                    )}
+                  />
+                </GridItem>
               </GridContainer>
 
               <GridItem md={12} className={classes.verticalSpacing}>
@@ -588,25 +608,6 @@ class UserProfileForm extends React.PureComponent {
                         label='Effective Start Date'
                         label2='Effective End Date'
                         disabled={isEdit ? hasActiveSession : false}
-                      />
-                    )}
-                  />
-                </GridItem>
-              </GridContainer>
-              <GridItem md={12} className={classes.verticalSpacing}>
-                <h4>User Role</h4>
-              </GridItem>
-              <GridContainer className={classes.indent}>
-                <GridItem md={6}>
-                  <Field
-                    name='role'
-                    render={(args) => (
-                      <CodeSelect
-                        {...args}
-                        label='Role'
-                        code='role'
-                        disabled={isMyAccount}
-                        onChange={this.onRoleChange}
                       />
                     )}
                   />

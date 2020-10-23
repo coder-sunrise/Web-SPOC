@@ -21,6 +21,7 @@ const Adjustment = ({
   amountProps,
   type,
   theme,
+  hiddenDelete = false,
 }) => {
   // console.log('Adjustment', amountProps)
   const isExactAmount = type === 'ExactAmount'
@@ -48,22 +49,24 @@ const Adjustment = ({
         </div>
       </GridItem>
       <GridItem xs={1}>
-        <Tooltip title='Delete Adjustment'>
-          <Button
-            color='danger'
-            size='sm'
-            aria-label='Delete'
-            justIcon
-            onClick={() => {
-              onDelete(index)
-            }}
-            style={{
-              marginLeft: theme.spacing(2),
-            }}
-          >
-            <Delete />
-          </Button>
-        </Tooltip>
+        {!hiddenDelete && (
+          <Tooltip title='Delete Adjustment'>
+            <Button
+              color='danger'
+              size='sm'
+              aria-label='Delete'
+              justIcon
+              onClick={() => {
+                onDelete(index)
+              }}
+              style={{
+                marginLeft: theme.spacing(2),
+              }}
+            >
+              <Delete />
+            </Button>
+          </Tooltip>
+        )}
       </GridItem>
       <GridItem xs={4}>
         <NumberInput

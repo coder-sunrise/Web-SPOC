@@ -61,11 +61,23 @@ const ApptDuration = ({ row, columnConfig, cellProps }) => {
     ],
   )
 
+  const [
+    focused,
+    setFocused,
+  ] = useState(false)
+
   return (
     <GridContainer>
       <GridItem xs={5}>
         <Select
-          autoFocus={autoFocus}
+          inputProps={{
+            onMouseUp: (e) => {
+              if (!focused) {
+                setFocused(true)
+                if (typeof e.target.click === 'function') e.target.click()
+              }
+            },
+          }}
           value={row.apptDurationHour}
           options={hourOptions}
           {...restProps}
@@ -96,6 +108,14 @@ const ApptDuration = ({ row, columnConfig, cellProps }) => {
       </GridItem>
       <GridItem xs={6}>
         <Select
+          inputProps={{
+            onMouseUp: (e) => {
+              if (!focused) {
+                setFocused(true)
+                if (typeof e.target.click === 'function') e.target.click()
+              }
+            },
+          }}
           value={row.apptDurationMinute}
           options={minuteOptions}
           {...restProps}

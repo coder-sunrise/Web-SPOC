@@ -61,7 +61,7 @@ export default ({
         disabled: !isEditable,
         onChange: (e) => {
           if (e.row) {
-            if (e.option) e.row.EyeRefractionTestType = e.option.name
+            e.row.EyeRefractionTestType = e.option ? e.option.name : undefined
           }
         },
       },

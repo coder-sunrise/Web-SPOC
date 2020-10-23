@@ -14,9 +14,11 @@ import {
   notification,
 } from '@/components'
 import { ReportViewer } from '@/components/_medisys'
-import POForm from './POForm'
-import POGrid from './POGrid'
 import { calculateItemLevelAdjustment } from '@/utils/utils'
+import { podoOrderType } from '@/utils/codes'
+import { INVOICE_STATUS, PURCHASE_ORDER_STATUS } from '@/utils/constants'
+import AuthorizedContext from '@/components/Context/Authorized'
+import AmountSummary from '@/pages/Shared/AmountSummary'
 import {
   isPOStatusDraft,
   poSubmitAction,
@@ -26,10 +28,8 @@ import {
   enableSaveButton,
   getAccessRight,
 } from '../../variables'
-import { podoOrderType } from '@/utils/codes'
-import { INVOICE_STATUS, PURCHASE_ORDER_STATUS } from '@/utils/constants'
-import AuthorizedContext from '@/components/Context/Authorized'
-import AmountSummary from '@/pages/Shared/AmountSummary'
+import POGrid from './POGrid'
+import POForm from './POForm'
 
 const styles = (theme) => ({
   errorMsgStyle: {
@@ -65,7 +65,7 @@ const styles = (theme) => ({
       .compact((x) => x.isDeleted)
       .required('At least one item is required.'),
   }),
-  handleSubmit: () => {},
+  handleSubmit: () => { },
 })
 class Index extends Component {
   state = {
@@ -548,32 +548,33 @@ class Index extends Component {
     const currentGstValue = isGSTEnabled ? gstValue : undefined
 
     return (
-      <AuthorizedContext.Provider
-        value={{
-          rights: this.isEditable(poStatus, isWriteOff) ? 'enable' : 'disable',
-        }}
-      >
-        <POForm
-          isReadOnly={this.getRights(type, poStatus, isWriteOff) === 'disable'}
-          isFinalize={isPOStatusFinalizedFulFilledPartialReceived(poStatus)}
-          setFieldValue={setFieldValue}
-          isCompletedOrCancelled={isCompletedOrCancelled}
-          {...this.props}
-        />
-        {/* <AuthorizedContext.Provider
+      <GridContainer>
+        <AuthorizedContext.Provider
+          value={{
+            rights: this.isEditable(poStatus, isWriteOff) ? 'enable' : 'disable',
+          }}
+        >
+          <POForm
+            isReadOnly={this.getRights(type, poStatus, isWriteOff) === 'disable'}
+            isFinalize={isPOStatusFinalizedFulFilledPartialReceived(poStatus)}
+            setFieldValue={setFieldValue}
+            isCompletedOrCancelled={isCompletedOrCancelled}
+            {...this.props}
+          />
+          {/* <AuthorizedContext.Provider
           value={{
             rights: this.isEditable(poStatus, isWriteOff)
               ? 'enable'
               : 'disable',
           }}
         > */}
-        {errors.rows && <p className={classes.errorMsgStyle}>{errors.rows}</p>}
-        <POGrid
-          calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
-          isEditable={this.isEditable(poStatus, isWriteOff, 'poItem')}
-          {...this.props}
-        />
-        {/* </AuthorizedContext.Provider>
+          {errors.rows && <p className={classes.errorMsgStyle}>{errors.rows}</p>}
+          <POGrid
+            calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
+            isEditable={this.isEditable(poStatus, isWriteOff, 'poItem')}
+            {...this.props}
+          />
+          {/* </AuthorizedContext.Provider>
         <AuthorizedContext.Provider
           value={{
             rights: this.isEditable(poStatus, isWriteOff)
@@ -581,142 +582,141 @@ class Index extends Component {
               : 'disable',
           }}
         > */}
-        <GridContainer>
-          <GridItem xs={2} md={8} />
-          <GridItem xs={10} md={4}>
-            <div style={{ paddingRight: 22 }}>
-              <AmountSummary
-                rows={rows}
-                adjustments={purchaseOrderAdjustment}
-                config={{
-                  isGSTInclusive: isGstInclusive,
-                  itemFkField: 'purchaseOrderItemFK',
-                  itemAdjustmentFkField: 'purchaseOrderAdjustmentFK',
-                  invoiceItemAdjustmentField: 'purchaseOrderItemAdjustment',
-                  totalField: 'totalPrice',
-                  adjustedField: 'totalAfterAdjustments',
-                  gstField: 'totalAfterGst',
-                  gstAmtField: 'itemLevelGST',
-                  gstValue: currentGstValue,
-                }}
-                onValueChanged={(v) => {
-                  setFieldValue('purchaseOrder.totalAmount', v.summary.total)
-                  setFieldValue(
-                    'purchaseOrder.totalAfterAdj',
-                    v.summary.totalAfterAdj,
-                  )
-                  setFieldValue(
-                    'purchaseOrder.totalAftGst',
-                    v.summary.totalWithGST,
-                  )
-                  setFieldValue(
-                    'purchaseOrder.gstAmount',
-                    Math.round(v.summary.gst * 100) / 100,
-                  )
+          <GridContainer>
+            <GridItem xs={2} md={8} />
+            <GridItem xs={10} md={4}>
+              <div style={{ paddingRight: 22 }}>
+                <AmountSummary
+                  rows={rows}
+                  adjustments={purchaseOrderAdjustment}
+                  config={{
+                    isGSTInclusive: isGstInclusive,
+                    itemFkField: 'purchaseOrderItemFK',
+                    itemAdjustmentFkField: 'purchaseOrderAdjustmentFK',
+                    invoiceItemAdjustmentField: 'purchaseOrderItemAdjustment',
+                    totalField: 'totalPrice',
+                    adjustedField: 'totalAfterAdjustments',
+                    gstField: 'totalAfterGst',
+                    gstAmtField: 'itemLevelGST',
+                    gstValue: currentGstValue,
+                  }}
+                  onValueChanged={(v) => {
+                    setFieldValue('purchaseOrder.totalAmount', v.summary.total)
+                    setFieldValue(
+                      'purchaseOrder.totalAfterAdj',
+                      v.summary.totalAfterAdj,
+                    )
+                    setFieldValue(
+                      'purchaseOrder.totalAftGst',
+                      v.summary.totalWithGST,
+                    )
+                    setFieldValue(
+                      'purchaseOrder.gstAmount',
+                      Math.round(v.summary.gst * 100) / 100,
+                    )
 
-                  setFieldValue(
-                    'purchaseOrderAdjustment',
-                    v.adjustments.map((a) => {
-                      return {
-                        sequence: a.index + 1,
-                        ...a,
-                      }
-                    }),
-                  )
-                  setFieldValue(
-                    'purchaseOrder.isGstInclusive',
-                    v.summary.isGSTInclusive,
-                  )
-                }}
-              />
-            </div>
-          </GridItem>
-        </GridContainer>
-        {/* </AuthorizedContext.Provider> */}
+                    setFieldValue(
+                      'purchaseOrderAdjustment',
+                      v.adjustments.map((a) => {
+                        return {
+                          sequence: a.index + 1,
+                          ...a,
+                        }
+                      }),
+                    )
+                    setFieldValue(
+                      'purchaseOrder.isGstInclusive',
+                      v.summary.isGSTInclusive,
+                    )
+                  }}
+                />
+              </div>
+            </GridItem>
+          </GridContainer>
+          {/* </AuthorizedContext.Provider> */}
 
-        <GridContainer
-          style={{
-            marginTop: 20,
-            display: 'flex',
-            justifyContent: 'flex-end',
-          }}
-        >
-          {poStatus !== PURCHASE_ORDER_STATUS.COMPLETED && (
-            <div>
-              {poStatus !== PURCHASE_ORDER_STATUS.CANCELLED &&
-              deliveryOrder.length === 0 &&
-              purchaseOrderPayment.length === 0 &&
-              type === 'edit' ? (
-                <ProgressButton
-                  color='danger'
-                  icon={null}
-                  onClick={() =>
-                    this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
-                >
-                  {formatMessage({
-                    id: 'inventory.pr.detail.pod.cancelpo',
-                  })}
-                </ProgressButton>
-              ) : (
-                ''
-              )}
-
-              <ProgressButton
-                color='primary'
-                icon={null}
-                disabled={!enableSaveButton(poStatus)}
-                onClick={() => this.onSubmitButtonClicked(poSubmitAction.SAVE)}
-              >
-                {formatMessage({
-                  id: 'inventory.pr.detail.pod.save',
-                })}
-              </ProgressButton>
-              {!isPOStatusDraft(poStatus) ? (
-                <ProgressButton
-                  color='success'
-                  icon={null}
-                  authority='none'
-                  onClick={() =>
-                    this.onSubmitButtonClicked(poSubmitAction.COMPLETE)}
-                  disabled={!isPOStatusFulfilled(poStatus)}
-                >
-                  {formatMessage({
-                    id: 'inventory.pr.detail.pod.complete',
-                  })}
-                </ProgressButton>
-              ) : (
-                ''
-              )}
-              {isPOStatusDraft(poStatus) && type !== 'new' && type !== 'dup' ? (
-                <ProgressButton
-                  color='success'
-                  icon={null}
-                  onClick={() =>
-                    this.onSubmitButtonClicked(poSubmitAction.FINALIZE)}
-                >
-                  {formatMessage({
-                    id: 'inventory.pr.detail.pod.finalize',
-                  })}
-                </ProgressButton>
-              ) : (
-                ''
-              )}
-            </div>
-          )}
-
-          <ProgressButton
-            color='info'
-            icon={null}
-            onClick={this.toggleReport}
-            authority='none'
-            disabled={!values.id || type === 'dup'}
+          <GridContainer
+            style={{
+              marginTop: 20,
+              display: 'flex',
+              justifyContent: 'flex-end',
+            }}
           >
-            {formatMessage({
-              id: 'inventory.pr.detail.print',
-            })}
-          </ProgressButton>
-        </GridContainer>
+            {poStatus !== PURCHASE_ORDER_STATUS.COMPLETED && (
+              <div>
+                {poStatus <= PURCHASE_ORDER_STATUS.FINALIZED &&
+                  deliveryOrder.length === 0 &&
+                  purchaseOrderPayment.length === 0 &&
+                  !isWriteOff &&
+                  type === 'edit' && (
+                    <ProgressButton
+                      color='danger'
+                      icon={null}
+                      authority='none'
+                      onClick={() =>
+                        this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
+                    >
+                      {formatMessage({
+                        id: 'inventory.pr.detail.pod.cancelpo',
+                      })}
+                    </ProgressButton>
+                  )}
 
+                <ProgressButton
+                  color='primary'
+                  icon={null}
+                  disabled={!enableSaveButton(poStatus)}
+                  onClick={() => this.onSubmitButtonClicked(poSubmitAction.SAVE)}
+                >
+                  {formatMessage({
+                    id: 'inventory.pr.detail.pod.save',
+                  })}
+                </ProgressButton>
+                {!isPOStatusDraft(poStatus) && (
+                  <ProgressButton
+                    color='success'
+                    icon={null}
+                    authority='none'
+                    onClick={() =>
+                      this.onSubmitButtonClicked(poSubmitAction.COMPLETE)}
+                    disabled={!isPOStatusFulfilled(poStatus)}
+                  >
+                    {formatMessage({
+                      id: 'inventory.pr.detail.pod.complete',
+                    })}
+                  </ProgressButton>
+                )}
+                {isPOStatusDraft(poStatus) &&
+                  type !== 'new' &&
+                  type !== 'dup' && (
+                    <ProgressButton
+                      color='success'
+                      icon={null}
+                      onClick={() =>
+                        this.onSubmitButtonClicked(poSubmitAction.FINALIZE)}
+                    >
+                      {formatMessage({
+                        id: 'inventory.pr.detail.pod.finalize',
+                      })}
+                    </ProgressButton>
+                  )}
+              </div>
+            )}
+
+            <ProgressButton
+              color='info'
+              icon={null}
+              onClick={this.toggleReport}
+              authority='none'
+              disabled={!values.id || type === 'dup'}
+            >
+              {formatMessage({
+                id: 'inventory.pr.detail.print',
+              })}
+            </ProgressButton>
+          </GridContainer>
+
+        </AuthorizedContext.Provider>
         <CommonModal
           open={this.state.showReport}
           onClose={this.toggleReport}
@@ -730,7 +730,7 @@ class Index extends Component {
             }}
           />
         </CommonModal>
-      </AuthorizedContext.Provider>
+      </GridContainer>
     )
   }
 }

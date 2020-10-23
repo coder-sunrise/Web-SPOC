@@ -12,6 +12,8 @@ import classNames from 'classnames'
 import { Divider, withStyles } from '@material-ui/core'
 import Refresh from '@material-ui/icons/Refresh'
 import Stop from '@material-ui/icons/Stop'
+import EventNote from '@material-ui/icons/EventNote'
+import { openCautionAlertOnStartConsultation } from '@/pages/Widgets/Orders/utils'
 
 // custom components
 import {
@@ -349,8 +351,17 @@ class Queue extends React.Component {
     })
   }
 
+  onSessionSummaryClick = () => {
+    const { queueLog } = this.props
+    const _sessionInfoID = queueLog.sessionInfo.id
+    this.setState({ _sessionInfoID })
+    this.setState({
+      showEndSessionSummary: true,
+    })
+  }
+
   onConfirmEndSession = () => {
-    const { queueLog, dispatch, queueCalling } = this.props
+    const { queueLog, dispatch } = this.props
     const _sessionInfoID = queueLog.sessionInfo.id
     this.setState({ _sessionInfoID })
     dispatch({
@@ -376,10 +387,10 @@ class Queue extends React.Component {
       })
       .then((res) => {
         if (res) {
-          sendNotification('QueueCalled', {
+          sendNotification('QueueClear', {
             type: NOTIFICATION_TYPE.QUEUECALL,
             status: NOTIFICATION_STATUS.OK,
-            message: 'Queue Called',
+            message: 'Queue Clear',
           })
         }
       })
@@ -593,10 +604,12 @@ class Queue extends React.Component {
               queueNo: row.queueNo,
             },
           }).then((o) => {
-            if (o)
+            if (o) {
               router.push(
                 `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
               )
+              openCautionAlertOnStartConsultation(o)
+            }
           })
         }
         break
@@ -811,10 +824,7 @@ class Queue extends React.Component {
     } = this.state
     const { sessionInfo, error } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
-    const { oriQCallList = [] } = queueCalling
-    const [
-      lastCall,
-    ] = oriQCallList
+    const { tracker } = queueCalling
 
     return (
       <PageHeaderWrapper
@@ -828,7 +838,7 @@ class Queue extends React.Component {
             </h3>
 
             <Authorized authority='openqueuedisplay'>
-              {lastCall ? (
+              {tracker && tracker.qNo ? (
                 <h4
                   className={classNames(classes.sessionNo)}
                   style={{
@@ -840,10 +850,10 @@ class Queue extends React.Component {
                 >
                   <font color='red'>
                     NOW SERVING:{' '}
-                    {lastCall.qNo.includes('.') ? (
-                      lastCall.qNo
+                    {tracker.qNo.includes('.') ? (
+                      tracker.qNo
                     ) : (
-                      `${lastCall.qNo}.0`
+                      `${tracker.qNo}.0`
                     )}
                   </font>
                 </h4>
@@ -854,6 +864,16 @@ class Queue extends React.Component {
 
             {!isClinicSessionClosed && (
               <div className={classNames(classes.toolBtns)}>
+                <Authorized authority='queue.endsession'>
+                  <ProgressButton
+                    icon={<EventNote />}
+                    color='info'
+                    size='sm'
+                    onClick={this.onSessionSummaryClick}
+                  >
+                    <FormattedMessage id='reception.queue.sessionSummary' />
+                  </ProgressButton>
+                </Authorized>
                 <QueueDashboardButton size='sm' />
                 <ProgressButton
                   color='info'

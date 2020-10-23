@@ -31,15 +31,6 @@ const Certification = ({ values, setFieldValue, formCategory }) => {
     src = `${base64Prefix}${values.formData.signatureThumbnail}`
   }
 
-  let borderColor = '1px solid #CCCCCC'
-  let showMessage = false
-  if (
-    (!formCategory || formCategory === FORM_CATEGORY.CORFORM) &&
-    !values.formData.signatureThumbnail
-  ) {
-    borderColor = '1px solid red'
-    showMessage = true
-  }
   return (
     <div>
       <GridContainer>
@@ -100,7 +91,7 @@ const Certification = ({ values, setFieldValue, formCategory }) => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    border: borderColor,
+                    border: '1px solid #CCCCCC',
                     width: 240,
                     height: 132,
                     cursor: 'pointer',
@@ -120,10 +111,6 @@ const Certification = ({ values, setFieldValue, formCategory }) => {
                     <span>No Signature</span>
                   )}
                 </div>
-
-                {showMessage && (
-                  <span style={{ color: 'red' }}>Signature is required</span>
-                )}
               </div>
 
               <div style={{ marginLeft: 10, width: 250 }}>

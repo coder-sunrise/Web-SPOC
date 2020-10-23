@@ -77,7 +77,11 @@ const NotificationComponent = ({
       overlay={overlay}
     >
       <Badge
-        badgeContent={notifications.filter((o) => !o.read).length}
+        badgeContent={
+          notifications.filter(
+            (o) => TYPES.find((t) => !t.id || o.type === t.id) && !o.read,
+          ).length
+        }
         color='primary'
         anchorOrigin={{
           vertical: 'top',

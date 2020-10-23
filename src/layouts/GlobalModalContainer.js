@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Fragment } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import {
@@ -91,6 +91,7 @@ class GlobalModalContainer extends PureComponent {
         openConfirmTitle: null,
         openConfirmContent: null,
         onConfirmDiscard: null,
+        onSecondConfirm: null,
         onConfirmSave: null,
         // onConfirm: null,
         openConfirmText: 'Confirm',
@@ -160,7 +161,8 @@ class GlobalModalContainer extends PureComponent {
         </CommonModal>
 
         <CommonModal
-          title='My Account'
+          title={global.accountModalTitle}
+          // title='My Account'
           open={global.showUserProfile}
           onClose={this.closeUserProfile}
           onConfirm={this.closeUserProfile}
@@ -211,26 +213,43 @@ class GlobalModalContainer extends PureComponent {
           cancelText={global.cancelText || 'Cancel'}
           maxWidth='sm'
           confirmText={global.openConfirmText || 'Confirm'}
+          secondConfirmText={global.secondConfirmText || 'Pause'}
           isInformType={global.isInformType}
           footProps={{
             extraButtons: global.onConfirmDiscard ? (
-              <Button
-                color='primary'
-                onClick={() => {
-                  if (global.onConfirmDiscard) {
-                    global.onConfirmDiscard()
-                  }
-                  this.closeConfirmationPrompt()
-                }}
-              >
-                Confirm
-              </Button>
+              <Fragment>
+                {global.showSecondConfirmButton ? (
+                  <Button
+                    color='primary'
+                    onClick={() => {
+                      if (global.onSecondConfirm) {
+                        global.onSecondConfirm()
+                      }
+                      this.closeConfirmationPrompt()
+                    }}
+                  >
+                    {global.secondConfirmText || 'Pause'}
+                  </Button>
+                ) : null
+                }
+                <Button
+                  color='primary'
+                  onClick={() => {
+                    if (global.onConfirmDiscard) {
+                      global.onConfirmDiscard()
+                    }
+                    this.closeConfirmationPrompt()
+                  }}
+                >
+                  {global.openConfirmText || 'Confirm'}
+                </Button>
+              </Fragment>
             ) : null,
             onConfirm: global.onConfirmSave
               ? () => {
-                  global.onConfirmSave()
-                  this.closeConfirmationPrompt()
-                }
+                global.onConfirmSave()
+                this.closeConfirmationPrompt()
+              }
               : undefined,
           }}
           onClose={() => {
@@ -241,7 +260,12 @@ class GlobalModalContainer extends PureComponent {
           showFooter
         >
           <div style={{ textAlign: global.alignContent || 'center' }}>
-            <h3>{global.openConfirmContent || 'Confirm to proceed?'}</h3>
+            {typeof global.openConfirmContent === 'function' ? (
+              <global.openConfirmContent />
+            ) : (
+              <h3>{global.openConfirmContent || 'Confirm to proceed?'}</h3>
+            )}
+
             {global.additionalInfo}
           </div>
         </CommonModal>

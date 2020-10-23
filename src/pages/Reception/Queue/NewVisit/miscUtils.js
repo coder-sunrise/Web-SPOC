@@ -1,5 +1,7 @@
 import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import { bool } from 'prop-types'
+import _ from 'lodash'
+import { cleanFields } from '@/pages/Consultation/utils'
 import { VISIT_STATUS } from '../variables'
 
 const filterDeletedFiles = (item) => {
@@ -46,59 +48,59 @@ const mapAttachmentToUploadInput = (
       }
 
 const convertEyeForms = (values) => {
-  let { visitEyeRefractionForm = undefined } = values
-
-  const removeFields = (obj, fields = []) => {
-    if (Array.isArray(obj)) {
-      for (let n = 0; n < obj.length; n++) {
-        const isEmpty = removeFields(obj[n], fields)
-        if (isEmpty) {
-          obj.splice(n, 1)
-          n--
-        }
-      }
-    } else if (typeof obj === 'object') {
-      for (let value in obj) {
-        if (Array.isArray(obj[value])) {
-          removeFields(obj[value], fields)
-        }
-      }
-      fields.forEach((o) => {
-        delete obj[o]
-      })
-
-      // check all of fields is empty
-      let allFieldIsEmtpy = true
-      for (let i in obj) {
-        if (i !== 'id' && obj[i] !== undefined && obj[i] !== '') {
-          allFieldIsEmtpy = false
-          break
-        }
-      }
-
-      return allFieldIsEmtpy
-    }
-  }
-
+  let { visitEyeRefractionForm = {}, visitEyeVisualAcuityTest } = values
   const durtyFields = [
     'isDeleted',
     'isNew',
     'IsSelected',
     'rowIndex',
     '_errors',
-    'OD',
-    'OS',
   ]
   if (
-    visitEyeRefractionForm &&
     visitEyeRefractionForm.formData &&
     typeof visitEyeRefractionForm.formData === 'object'
   ) {
     let { formData } = visitEyeRefractionForm
-    removeFields(formData, durtyFields)
+    cleanFields(formData, [
+      ...durtyFields,
+      'OD',
+      'OS',
+    ])
 
-    console.log('clear datas ==>', formData)
-    values.visitEyeRefractionForm.formData = JSON.stringify(formData)
+    values.visitEyeRefractionForm.formData = _.isEmpty(formData)
+      ? undefined
+      : JSON.stringify(formData)
+  }
+  if (typeof visitEyeVisualAcuityTest === 'object') {
+    const { visitEyeVisualAcuityTestForm: testForm } = visitEyeVisualAcuityTest
+    const clone = _.cloneDeep(testForm)
+    cleanFields(clone, durtyFields)
+
+    const newTestForm = testForm.reduce((p, c) => {
+      let newItem = clone.find((i) => i.id === c.id)
+      if (!newItem) {
+        if (c.id > 0 && c.concurrencyToken && c.isDeleted === false) {
+          return [
+            ...p,
+            {
+              ...c,
+              isDeleted: true,
+            },
+          ]
+        }
+      } else {
+        return [
+          ...p,
+          {
+            ...newItem,
+            isDeleted: c.isDeleted,
+          },
+        ]
+      }
+
+      return p
+    }, [])
+    values.visitEyeVisualAcuityTest.visitEyeVisualAcuityTestForm = newTestForm
   }
 
   return values
@@ -306,7 +308,6 @@ export const formikHandleSubmit = (
   }).then((response) => {
     if (response) {
       const { location } = history
-      onConfirm()
       sendQueueNotification({
         message: 'New visit created.',
         queueNo: payload && payload.queueNo,
@@ -319,8 +320,11 @@ export const formikHandleSubmit = (
         dispatch({
           type: 'queueLog/refresh',
         })
-
+      // reset form can not after onConfirm function.
+      // bcz in NewVisit component have function 'componentWillUnmount'
+      // there will use this.props.values when close registration visit page
       resetForm({})
+      onConfirm()
     } else {
       setSubmitting(false)
     }

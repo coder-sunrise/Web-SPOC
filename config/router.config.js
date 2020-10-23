@@ -684,6 +684,14 @@ const _routes = [
             ],
           },
           {
+            path: '/report/visitlistingreport',
+            name: 'visitListingReport',
+            component: './Report/VisitListingReport',
+            authority: [
+              'report.admin.visitlistingreport',
+            ],
+          },
+          {
             path: '/report/diagnosistrending',
             name: 'diagnosistrending',
             component: './Report/DiagnosisTrending',
@@ -737,6 +745,14 @@ const _routes = [
             component: './Report/PatientAgeingReport',
             authority: [
               'report.finance.patientageingreport',
+            ],
+          },
+          {
+            path: '/report/purchasereceivinglistingreport',
+            name: 'purchasereceivinglistingreport',
+            component: './Report/purchasereceivinglistingreport',
+            authority: [
+              'report.inventory.purchasereceivinglistingreport',
             ],
           },
           {
@@ -1221,6 +1237,14 @@ const _routes = [
             component: './Setting/RefractionTestType',
             authority: [
               'settings.clinicsetting.refractiontesttype',
+            ],
+          },
+          {
+            path: '/setting/package',
+            name: 'package',
+            component: './Setting/Package',
+            authority: [
+              'settings.clinicsetting.package',
             ],
           },
         ],

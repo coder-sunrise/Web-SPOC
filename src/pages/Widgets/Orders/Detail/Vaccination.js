@@ -21,6 +21,7 @@ import {
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 import { currencySymbol } from '@/utils/config'
+import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
 import LowStockInfo from './LowStockInfo'
 import AddFromPast from './AddMedicationFromPast'
 
@@ -54,6 +55,9 @@ let i = 0
       ...newOrders,
       type,
       isEditVaccination: !_.isEmpty(orders.entity),
+      editingVaccinationFK: orders.entity
+        ? orders.entity.inventoryVaccinationFK
+        : undefined,
     }
   },
 
@@ -96,13 +100,11 @@ let i = 0
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
-    }).then(() => {
-      resetForm(orders.defaultVaccination)
     })
 
     if (onConfirm) onConfirm()
     setValues({
-      ...orders.defaultService,
+      ...orders.defaultVaccination,
       type: orders.type,
     })
   },
@@ -158,7 +160,6 @@ class Vaccination extends PureComponent {
 
   changeVaccination = (v, op = {}) => {
     const { setFieldValue, values, disableEdit } = this.props
-    // console.log(v, op)
     let defaultBatch
     if (op.vaccinationStock) {
       defaultBatch = op.vaccinationStock.find((o) => o.isDefault === true)
@@ -236,13 +237,11 @@ class Vaccination extends PureComponent {
 
   calculateQuantity = (vaccination) => {
     const { codetable, setFieldValue, values, disableEdit, dirty } = this.props
-    // console.log(this.props)
     const { minQuantity = 0 } = values
     let currentVaccination =
       vaccination && Object.values(vaccination).length ? vaccination : undefined
     if (!currentVaccination) currentVaccination = this.state.selectedVaccination
     let newTotalQuantity = 0
-    // console.log(currentVaccination, values)
     if (currentVaccination && currentVaccination.dispensingQuantity && !dirty) {
       newTotalQuantity = currentVaccination.dispensingQuantity
     } else if (currentVaccination.prescribingDosage) {
@@ -265,7 +264,6 @@ class Vaccination extends PureComponent {
       newTotalQuantity < minQuantity ? minQuantity : newTotalQuantity
 
     setFieldValue(`quantity`, newTotalQuantity)
-    // console.log(newTotalQuantity)
     if (currentVaccination.sellingPrice) {
       setFieldValue('unitPrice', currentVaccination.sellingPrice)
       setFieldValue(
@@ -378,13 +376,33 @@ class Vaccination extends PureComponent {
     }
   }
 
-  validateAndSubmitIfOk = async () => {
-    const { handleSubmit, validateForm } = this.props
+  validateAndSubmitIfOk = async (callback) => {
+    const { handleSubmit, validateForm, dispatch, values } = this.props
     const validateResult = await validateForm()
     const isFormValid = _.isEmpty(validateResult)
+    const { editingVaccinationFK, inventoryVaccinationFK } = values
+
     if (isFormValid) {
-      handleSubmit()
-      return true
+      const { caution = '', code, displayValue } =
+        this.state.selectedVaccination || {}
+      const needShowAlert =
+        caution.trim().length > 0 &&
+        editingVaccinationFK !== inventoryVaccinationFK
+
+      if (needShowAlert) {
+        openCautionAlertPrompt(
+          [
+            { subject: displayValue || code, caution },
+          ],
+          () => {
+            handleSubmit()
+            if (callback) callback(true)
+          },
+        )
+      } else {
+        handleSubmit()
+        return true
+      }
     }
     return false
   }

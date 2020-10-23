@@ -1,9 +1,9 @@
 import React, { Fragment, useEffect } from 'react'
 import { connect } from 'dva'
 
+import Authorized from '@/utils/Authorized'
 import FitlerBar from './FilterBar'
 import Grid from './Grid'
-import Authorized from '@/utils/Authorized'
 
 const AppointmentSearch = ({
   dispatch,
@@ -43,6 +43,8 @@ const AppointmentSearch = ({
       payload: {
         apiCriteria: {
           doctor: defaultDoctor.join(),
+          isIncludeRescheduledByClinic: true,
+          isIncludeHistory: true,
         },
       },
     })
@@ -82,7 +84,11 @@ const AppointmentSearch = ({
         viewOtherApptAccessRight={viewOtherApptAccessRight}
         isActiveDoctor={isActiveDoctor}
       />
-      <Grid handleSelectEvent={handleSelectEvent} />
+      <Grid
+        handleSelectEvent={(data) => {
+          handleSelectEvent({ ...data, isHistory: true })
+        }}
+      />
     </Fragment>
   )
 }

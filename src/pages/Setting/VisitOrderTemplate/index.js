@@ -51,9 +51,9 @@ class VisitOrderTemplate extends PureComponent {
           observe='VisitOrderTemplateDetail'
           title={
             settingVisitOrderTemplate.entity ? (
-              'Edit Visit Order Template'
+              'Edit Visit Purpose'
             ) : (
-              'Add Visit Order Template'
+              'Add Visit Purpose'
             )
           }
           maxWidth='md'

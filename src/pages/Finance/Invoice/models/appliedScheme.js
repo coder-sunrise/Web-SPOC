@@ -65,6 +65,8 @@ export default createFormViewModel({
               id: invoiceId,
             },
           })
+            yield take('invoiceDetail/query/@@end')
+
           yield put({
             type: 'invoicePayment/query',
             payload: {
@@ -72,7 +74,6 @@ export default createFormViewModel({
             },
           })
 
-          yield take('invoiceDetail/query/@@end')
           yield take('invoicePayment/query/@@end')
           yield put({
             type: 'invoiceDetail/updateState',

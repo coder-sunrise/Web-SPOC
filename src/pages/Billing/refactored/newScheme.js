@@ -144,7 +144,7 @@ const Scheme = ({
     const statuses = chasClaimStatuses.map((status) => status.toLowerCase())
     if (
       hasPayments ||
-      statuses.includes('draft') ||
+      // statuses.includes('draft') ||
       statuses.includes('approved')
     )
       return true
@@ -159,7 +159,7 @@ const Scheme = ({
       type: 'currency',
       width: 150,
       currency: true,
-      disabled: _isConfirmed,
+      isDisabled: (row) => _isConfirmed || !row.isClaimable,
     },
   ]
 
@@ -196,7 +196,7 @@ const Scheme = ({
   const onPaymentDeleteClick = (payment) => {
     onPaymentVoidClick(index, payment)
   }
-  const { IsEnableAddPaymentInBilling = true } = clinicSettings
+  const { isEnableAddPaymentInBilling = false } = clinicSettings
   return (
     <Paper key={_key} elevation={4} className={classes.gridRow}>
       <GridContainer style={{ marginBottom: 16 }} alignItems='flex-start'>
@@ -272,9 +272,9 @@ const Scheme = ({
                 size='sm'
                 FuncProps={{ pager: false }}
                 EditingProps={{
-                  showAddCommand: false,
-                  showDeleteCommand: false,
+                  showCommandColumn: false,
                   onCommitChanges,
+                  showCommandColumn: false,
                 }}
                 columns={
                   payerTypeFK === INVOICE_PAYER_TYPE.SCHEME ? (
@@ -351,14 +351,18 @@ const Scheme = ({
               color='primary'
               className={classes.rightEndBtn}
               onClick={handleEditClick}
-              disabled={disableEdit || existingOldPayerItem}
+              disabled={
+                disableEdit ||
+                hasOtherEditing ||
+                (isEnableAddPaymentInBilling && existingOldPayerItem)
+              }
             >
               Edit
             </Button>
           )}
         </GridItem>
         {fromBilling &&
-        IsEnableAddPaymentInBilling && (
+        isEnableAddPaymentInBilling && (
           <GridContainer>
             <GridItem md={12}>
               <CardContainer hideHeader size='sm'>

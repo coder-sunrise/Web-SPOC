@@ -32,13 +32,15 @@ const Filterbar = (props) => {
     dispatch,
     toggleNewPatient,
     handleSubmit,
+    setFieldValue,
     selfOnly,
+    hideSelfOnlyFilter,
     user,
     setSearch,
     loading,
   } = props
   const onSwitchClick = () => dispatch({ type: 'queueLog/toggleSelfOnly' })
-
+ 
   return (
     <div className='div-reception-header'>
       <GridContainer
@@ -77,7 +79,14 @@ const Filterbar = (props) => {
                   <Search />
                 </Hidden>
               }
-              onClick={handleSubmit}
+              onClick={() => {
+                handleSubmit()
+                setTimeout(() => {
+                  setFieldValue('search', '')
+                  setSearch('')
+                }, 1000)
+              }
+              }
               size='sm'
               submitKey='patientSearch/query'
             >
@@ -89,7 +98,12 @@ const Filterbar = (props) => {
               icon={null}
               color='primary'
               size='sm'
-              onClick={toggleNewPatient}
+              onClick={() => {
+                toggleNewPatient()
+                setFieldValue('search', '')
+                setSearch('')
+              }
+              }
               disabled={loading.global}
             >
               <Hidden mdDown>
@@ -98,7 +112,7 @@ const Filterbar = (props) => {
               <FormattedMessage id='reception.queue.createPatient' />
             </Button>
           </Authorized>
-          {user.clinicianProfile.userProfile.role.clinicRoleFK === 1 && (
+          {user.clinicianProfile.userProfile.role.clinicRoleFK === 1 && !hideSelfOnlyFilter && (
             <div className={classes.switch}>
               <Checkbox
                 label='Visit assign to me only'
@@ -106,7 +120,7 @@ const Filterbar = (props) => {
                 checked={selfOnly}
               />
             </div>
-          )}
+          )}          
         </GridItem>
 
         <GridItem
@@ -128,6 +142,7 @@ const Filterbar = (props) => {
 
 const connectedFilterbar = connect(({ queueLog, user, loading }) => ({
   selfOnly: queueLog.selfOnly,
+  hideSelfOnlyFilter: queueLog.hideSelfOnlyFilter,
   user: user.data,
   loading,
 }))(Filterbar)

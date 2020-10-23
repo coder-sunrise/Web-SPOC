@@ -195,7 +195,7 @@ export default createFormViewModel({
           yield put({
             type: 'updateErrorState',
             payload: {
-              patientInfo: 'Failed to retrieve visit order templates',
+              patientInfo: 'Failed to retrieve visit purposes',
             },
           })
           return false

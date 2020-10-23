@@ -6,6 +6,8 @@ import withStyles from '@material-ui/core/styles/withStyles'
 import { primaryColor } from 'mui-pro-jss'
 
 // variables
+import Authorized from '@/utils/Authorized'
+import { VISIT_TYPE } from '@/utils/constants'
 import {
   StatusIndicator,
   ContextMenuOptions,
@@ -13,8 +15,6 @@ import {
   filterMap,
   VISIT_STATUS,
 } from '../variables'
-import Authorized from '@/utils/Authorized'
-import { VISIT_TYPE } from '@/utils/constants'
 
 const styles = (theme) => ({
   leftAlign: {
@@ -126,7 +126,7 @@ const ContextMenu = ({
           case 8: // register visit
             return {
               ...opt,
-              disabled: !row.patientProfileFk,
+              disabled: !row.patientProfileFk || !row.patientIsActive,
               hidden: !row.patientProfileFk,
             }
           case 9: // register patient
@@ -151,36 +151,37 @@ const ContextMenu = ({
         case 1: // dispense
           return {
             ...opt,
-            disabled: !enableDispense(),
+            disabled: !row.patientIsActive || !enableDispense(),
           }
         case 1.1: // billing
           return {
             ...opt,
-            disabled: !enableBilling || isDisabled,
+            disabled: !row.patientIsActive || !enableBilling || isDisabled,
           }
         case 2: // delete visit
-          return { ...opt, disabled: !isStatusWaiting }
+          return { ...opt, disabled: !row.patientIsActive || !isStatusWaiting }
         case 5: // start consultation
           return {
             ...opt,
-            disabled: isStatusInProgress || isDisabled,
+            disabled: !row.patientIsActive || isStatusInProgress || isDisabled,
             hidden: !isStatusWaiting || isRetailVisit || isBillFirstVisit,
           }
         case 6: // resume consultation
           return {
             ...opt,
-            disabled: !isStatusInProgress || isDisabled,
+            disabled: !row.patientIsActive || !isStatusInProgress || isDisabled,
             hidden: hideResumeButton || isRetailVisit || isBillFirstVisit,
           }
         case 7: // edit consultation
           return {
             ...opt,
-            disabled: !isStatusCompleted || isDisabled,
+            disabled: !row.patientIsActive || !isStatusCompleted || isDisabled,
             hidden: hideEditConsultation,
           }
         case 10: // forms
           return {
             ...opt,
+            disabled: !row.patientIsActive,
             hidden: isRetailVisit,
           }
         default:

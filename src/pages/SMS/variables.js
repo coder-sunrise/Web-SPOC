@@ -129,7 +129,7 @@ const appointmentColumnsExtensions = [
   },
   {
     columnName: 'lastSMSSentDate',
-    width: 190,
+    width: 170,
     sortingEnabled: false,
     // sortBy:
     //   'AppointmentReminders.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.SendDate',
@@ -181,7 +181,7 @@ const patientColumnsExtensions = [
   },
   {
     columnName: 'lastSMSSentDate',
-    width: 190,
+    width: 170,
     // sortBy: 'PatientOutgoingSMS.OutgoingSMSFKNavigation.SendDate',
     sortingEnabled: false,
     render: (row) =>

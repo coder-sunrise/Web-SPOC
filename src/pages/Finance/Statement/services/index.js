@@ -9,6 +9,8 @@ const bizSessionUrl = '/api/bizSession'
 const statementPaymentUrl = '/api/StatementPayment'
 const statementPaymentHistoryUrl = '/api/StatementPayment/History'
 const invoicePaymentUrl = '/api/InvoicePayment'
+const copayerRecentStatementNoUrl = '/api/Statement/Recent'
+
 
 // const runningNoUrl = '/api/InventoryAdjustment/GenerateRunningNo'
 // const stockUrl = '/api/InventoryAdjustment/StockDetails'
@@ -68,6 +70,13 @@ module.exports = {
     return request(`${url}/${params.id}`, {
       method: 'DELETE',
       body: 'Statement cancelled',
+    })
+  },
+
+  getLastStatementNo: async (params) => {
+    return request(`${copayerRecentStatementNoUrl}`, {
+      method: 'GET',
+      body: params,
     })
   },
 }

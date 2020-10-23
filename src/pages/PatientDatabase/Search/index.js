@@ -5,9 +5,9 @@ import AccountCircle from '@material-ui/icons/AccountCircle'
 import { getAppendUrl } from '@/utils/utils'
 import { compare } from '@/layouts'
 import { CardContainer, Button, Tooltip } from '@/components'
+import Authorized from '@/utils/Authorized'
 import FilterBar from './FilterBar'
 import Grid from './Grid'
-import Authorized from '@/utils/Authorized'
 
 const styles = () => ({})
 
@@ -78,6 +78,9 @@ class PatientSearch extends PureComponent {
       this.props.dispatch({
         type: 'patientSearch/query',
         payload: {
+          apiCriteria: {
+            includeinactive: window.location.pathname.includes('patientdb'),
+          },
           sorting: [
             // { columnName: 'isActive', direction: 'asc' },
             { columnName: 'name', direction: 'asc' },

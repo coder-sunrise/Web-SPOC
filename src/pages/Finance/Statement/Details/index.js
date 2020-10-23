@@ -37,11 +37,11 @@ const styles = () => ({})
           adminCharge,
           outstandingAmount,
           statementAdjustment,
-          creditNoteAmount = 0,
           payableAmount = 0,
-        } = o
+        } = o 
+
         const totalPayableAmount =
-          payableAmount - creditNoteAmount - adminCharge - statementAdjustment
+          payableAmount - adminCharge - statementAdjustment
         sumTotalPayableAmount += totalPayableAmount
         totalOS += outstandingAmount
         adminChargeValueField += adminCharge
@@ -50,6 +50,7 @@ const styles = () => ({})
           ...o,
           tempOutstandingAmount: o.outstandingAmount,
           totalPayableAmount,
+          totalPayment : totalPayableAmount - outstandingAmount,
           statementInvoicePayment: [
             ...statementInvoicePayment,
           ],
@@ -171,16 +172,16 @@ const styles = () => ({})
       newStatementPayment:
         newPaymentStatementInvoice && newPaymentStatementInvoice.length > 0
           ? {
-              statementFK: values.id,
-              paymentCreatedBizSessionFK,
-              paymentReceivedBizSessionFK: paymentCreatedBizSessionFK,
-              paymentReceivedByUserFK,
-              paymentReceivedDate: moment(
-                paymentDate,
-                serverDateFormat,
-              ).formatUTC(false),
-              Remark: remarks,
-            }
+            statementFK: values.id,
+            paymentCreatedBizSessionFK,
+            paymentReceivedBizSessionFK: paymentCreatedBizSessionFK,
+            paymentReceivedByUserFK,
+            paymentReceivedDate: moment(
+              paymentDate,
+              serverDateFormat,
+            ).formatUTC(false),
+            Remark: remarks,
+          }
           : null,
     }
     dispatch({

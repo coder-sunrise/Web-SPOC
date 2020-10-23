@@ -2,7 +2,6 @@ import { createListViewModel } from 'medisys-model'
 // moment
 import moment from 'moment'
 import { subscribeNotification, sendNotification } from '@/utils/realtime'
-import * as service from '../services/queue'
 import { notification } from '@/components'
 import {
   StatusIndicator,
@@ -10,6 +9,8 @@ import {
 } from '@/pages/Reception/Queue/variables'
 import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import Authorized from '@/utils/Authorized'
+import { VALUE_KEYS } from '@/utils/constants'
+import * as service from '../services/queue'
 
 const InitialSessionInfo = {
   isClinicSessionClosed: undefined,
@@ -41,6 +42,7 @@ export default createListViewModel({
       appointmentList: [],
       currentFilter: StatusIndicator.ALL,
       selfOnly: false,
+      hideSelfOnlyFilter: false,
       _modifiedSelftOnly: false,
       error: {
         hasError: false,
@@ -48,6 +50,35 @@ export default createListViewModel({
       },
     },
     subscriptions: ({ history, dispatch, ...restProps }) => {
+      history.listen(async (location) => {
+        const { pathname } = location
+        if (pathname === '/reception/queue') {
+          dispatch({
+            type: 'queueCalling/getExistingQueueCallList',
+            payload: {
+              keys: VALUE_KEYS.QUEUECALLING,
+            },
+          }).then((response) => {
+            const { value } = response
+            const {
+              lastUpdateDate: lastUpdateTime,
+              concurrencyToken,
+            } = response
+            if (value) {
+              const existingQCall = JSON.parse(value)
+              dispatch({
+                type: 'queueCalling/updateState',
+                payload: {
+                  lastUpdateDate: lastUpdateTime,
+                  oriQCallList: existingQCall,
+                  concurrencyToken,
+                },
+              })
+            }
+          })
+        }
+      })
+
       subscribeNotification('QueueListing', {
         callback: (response) => {
           const { location } = history
@@ -77,14 +108,23 @@ export default createListViewModel({
             },
           })
         }
-
+        const startAndResumeRight = Authorized.check(
+          'patientdashboard.startresumeconsultation',
+        )
+        let startConsultPermissionIsHidden = false
+        if (startAndResumeRight && startAndResumeRight.rights === 'hidden') {
+          startConsultPermissionIsHidden = true
+        }
         yield put({
           type: 'updateState',
           payload: {
             list: [],
             sessionInfo: { ...InitialSessionInfo },
+            hideSelfOnlyFilter: startConsultPermissionIsHidden,
             selfOnly: !queueLogState._modifiedSelftOnly
-              ? userRole && userRole.clinicRoleFK === 1
+              ? userRole &&
+                userRole.clinicRoleFK === 1 &&
+                !startConsultPermissionIsHidden
               : queueLogState.selfOnly,
           },
         })

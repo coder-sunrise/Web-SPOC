@@ -3,12 +3,62 @@
  */
 
 export const APPOINTMENT_STATUS = {
-  SCHEDULED: 1,
+  CONFIRMED: 1,
   DRAFT: 2,
   CANCELLED: 3,
   TURNEDUP: 4,
   RESCHEDULED: 5,
-  NOSHOW: 6,
+  PFA_RESCHEDULED: 6,
+  PFA_CANCELLED: 7,
+  TURNEDUPLATE: 8,
+  DELETED: 9,
+  PFA_NOSHOW: 10,
+}
+export const APPOINTMENT_STATUSOPTIONS = [
+  {
+    id: APPOINTMENT_STATUS.CONFIRMED,
+    name: 'Confirmed',
+  },
+  {
+    id: APPOINTMENT_STATUS.DRAFT,
+    name: 'Draft',
+  },
+  {
+    id: APPOINTMENT_STATUS.CANCELLED,
+    name: 'Cancelled',
+  },
+  {
+    id: APPOINTMENT_STATUS.TURNEDUP,
+    name: 'Turned Up',
+  },
+  {
+    id: APPOINTMENT_STATUS.RESCHEDULED,
+    name: 'Rescheduled',
+  },
+  {
+    id: APPOINTMENT_STATUS.PFA_RESCHEDULED,
+    name: 'PFA(Rescheduled)',
+  },
+  {
+    id: APPOINTMENT_STATUS.PFA_CANCELLED,
+    name: 'PFA(Cancelled)',
+  },
+  {
+    id: APPOINTMENT_STATUS.TURNEDUPLATE,
+    name: 'Turned Up(Late)',
+  },
+  {
+    id: APPOINTMENT_STATUS.DELETED,
+    name: 'Deleted',
+  },
+  {
+    id: APPOINTMENT_STATUS.PFA_NOSHOW,
+    name: 'PFA(No Show)',
+  },
+]
+export const APPOINTMENT_CANCELLEDBY = {
+  CLINIC: 1,
+  PATIENT: 2,
 }
 
 export const PATIENT_LAB = {
@@ -436,6 +486,7 @@ export const SCHEME_TYPE = {
 export const INVOICE_VIEW_MODE = {
   DEFAULT: 'default',
   APPLIED_SCHEME: 'applied_scheme',
+  Edit_Invoice: 'edit_invoice',
 }
 
 export const ATTACHMENT_TYPE = {

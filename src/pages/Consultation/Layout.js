@@ -805,6 +805,7 @@ class Layout extends PureComponent {
                           <LoadableComponent
                             {...widgetProps}
                             {...w.restProps}
+                            isFullScreen={state.fullScreenWidget === id}
                           />
                         </SizeContainer>
                       </div>
@@ -993,7 +994,11 @@ class Layout extends PureComponent {
               <LabTrackingDrawer
                 {...widgetProps}
                 patientId={
-                  this.props.visitRegistration.entity.visit.patientProfileFK
+                  this.props.visitRegistration.entity ? (
+                    this.props.visitRegistration.entity.visit.patientProfileFK
+                  ) : (
+                    undefined
+                  )
                 }
                 onClose={this.toggleLabTrackingDrawer}
               />

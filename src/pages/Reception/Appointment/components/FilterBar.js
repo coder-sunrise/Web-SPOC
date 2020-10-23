@@ -31,6 +31,7 @@ import FilterTemplateTooltip from './FilterTemplateTooltip'
 const styles = () => ({
   selectorContainer: {
     textAlign: 'left',
+    minWidth: 290,
   },
   antdSelect: {
     width: '100%',
@@ -74,7 +75,18 @@ const FilterBar = (props) => {
   const handleFilterTemplate = () => {
     setShowFilterTemplate(!showFilterTemplate)
   }
+  const handleApplyTemplate = (selectedTemplate) => {
+    const {
+      filterByApptType: appTypes,
+      filterByDoctor: doctors,
+    } = selectedTemplate
 
+    handleUpdateFilter({
+      ...values,
+      filterByApptType: appTypes,
+      filterByDoctor: doctors,
+    })
+  }
   return (
     <React.Fragment>
       <GridContainer alignItems='center'>
@@ -91,7 +103,7 @@ const FilterBar = (props) => {
             )}
           />
         </GridItem>
-        <GridItem xs md={2}>
+        <GridItem xs md={2} style={{ minWidth: 220 }}>
           <Field
             name='filterByDoctor'
             render={(args) => (
@@ -125,68 +137,71 @@ const FilterBar = (props) => {
           />
         </GridItem>
         <GridItem xs md={2} className={classnames(classes.selectorContainer)}>
-          <Field
-            name='filterByApptType'
-            render={(args) => (
-              <CodeSelect
-                {...args}
-                mode='multiple'
-                allowClear={false}
-                all={-99}
-                label='Filter by Appointment Type'
-                code='ctappointmenttype'
-                labelField='displayValue'
-                renderDropdown={(option) => (
-                  <AppointmentTypeLabel
-                    color={option.tagColorHex}
-                    label={option.displayValue}
-                  />
-                )}
-                defaultOptions={[
-                  {
-                    isExtra: true,
-                    id: -99,
-                    displayValue: 'All appointment types',
-                  },
-                ]}
-                maxTagCount={0}
-                maxTagPlaceholder='appt. types'
-              />
-            )}
-          />
-        </GridItem>
-
-        <GridItem md={1}>
-          <Popover
-            icon={null}
-            trigger='click'
-            placement='bottom'
-            visible={showFilterTemplate}
-            onVisibleChange={handleFilterTemplate}
-            content={
-              <Paper className={classes.container}>
-                <FilterTemplateTooltip
-                  filterByDoctor={values.filterByDoctor}
-                  filterByApptType={values.filterByApptType}
-                  handleFilterTemplate={handleFilterTemplate}
+          <div style={{ display: 'flex' }}>
+            <Field
+              name='filterByApptType'
+              render={(args) => (
+                <CodeSelect
+                  {...args}
+                  mode='multiple'
+                  allowClear={false}
+                  all={-99}
+                  label='Filter by Appointment Type'
+                  code='ctappointmenttype'
+                  labelField='displayValue'
+                  renderDropdown={(option) => (
+                    <AppointmentTypeLabel
+                      color={option.tagColorHex}
+                      label={option.displayValue}
+                    />
+                  )}
+                  defaultOptions={[
+                    {
+                      isExtra: true,
+                      id: -99,
+                      displayValue: 'All appointment types',
+                    },
+                  ]}
+                  maxTagCount={0}
+                  maxTagPlaceholder='appt. types'
                 />
-              </Paper>
-            }
-          >
-            <Tooltip title='Manage Filter Template'>
-              <Fab
-                size='small'
-                color='secondary'
-                className={classes.fabButtonStyle}
-                onClick={handleFilterTemplate}
-              >
-                <BookmarkIcon />
-              </Fab>
-            </Tooltip>
-          </Popover>
+              )}
+            />
+            <Popover
+              icon={null}
+              trigger='click'
+              placement='bottom'
+              visible={showFilterTemplate}
+              onVisibleChange={handleFilterTemplate}
+              content={
+                <Paper className={classes.container}>
+                  <FilterTemplateTooltip
+                    visible={showFilterTemplate}
+                    filterByDoctor={values.filterByDoctor}
+                    filterByApptType={values.filterByApptType}
+                    handleFilterTemplate={handleFilterTemplate}
+                    handleApplyTemplate={handleApplyTemplate}
+                  />
+                </Paper>
+              }
+            >
+              <Tooltip title='Manage Filter Template'>
+                <div style={{ marginLeft: 20, alignSelf: 'center', width: 30 }}>
+                  <Fab
+                    size='small'
+                    color='secondary'
+                    className={classes.fabButtonStyle}
+                    onClick={handleFilterTemplate}
+                  >
+                    <BookmarkIcon />
+                  </Fab>
+                </div>
+              </Tooltip>
+            </Popover>
+          </div>
         </GridItem>
 
-        <GridItem md={4}>
+        <GridItem md={4} style={{ textAlign: 'center' }}>
           <ProgressButton
             icon={<Search />}
             color='primary'
@@ -243,23 +258,8 @@ export default compose(
   })),
   withFormik({
     enableReinitialize: true,
-    mapPropsToValues: ({ filterByDoctor, appointment }) => {
+    mapPropsToValues: ({ filterByDoctor }) => {
       count += 1
-      if (appointment.currentFilterTemplate) {
-        const {
-          filterByDoctor: doctorFilterTemplate,
-          filterByApptType: apptTypeFiltertemplate,
-        } = appointment.currentFilterTemplate
-        return {
-          filterByDoctor: [
-            ...doctorFilterTemplate,
-          ],
-          filterByApptType: [
-            ...apptTypeFiltertemplate,
-          ],
-          count,
-        }
-      }
 
       return {
         filterByDoctor: [

@@ -169,7 +169,14 @@ export default createFormViewModel({
         const { history } = payload || { history: undefined }
 
         if (patientState.shouldQueryOnClose) {
-          yield put({ type: 'patientSearch/query' })
+          yield put({
+            type: 'patientSearch/query',
+            payload: {
+              apiCriteria: {
+                includeinactive: window.location.pathname.includes('patientdb'),
+              },
+            },
+          })
           yield put({
             type: 'updateState',
             payload: {

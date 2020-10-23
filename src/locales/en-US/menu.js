@@ -96,6 +96,7 @@ export default {
   'menu.report.inventorytrendingreport': 'Inventory Trending Report',
   'menu.report.inventorylistingreport': 'Inventory Listing Report',
   'menu.report.inventorystockcountreport': 'Inventory Stock Count Report',
+  'menu.report.purchasereceivinglistingreport': 'Purchase & Receiving Report',
   'menu.communication': 'Communication',
   'menu.communication.sms': 'SMS',
   'menu.queue': 'Queue',
@@ -153,10 +154,11 @@ export default {
   'menu.setting.paymentmode': 'Payment Mode',
   'menu.setting.appointmenttype': 'Appointment Type',
   'menu.setting.referralsource': 'Referral Source',
-  'menu.setting.visitordertemplate': 'Visit Order Template',
+  'menu.setting.visitordertemplate': 'Visit Purpose',
   'menu.setting.casetype': 'Case Type',
   'menu.setting.casedescription': 'Case Description',
   'menu.setting.refractiontesttype': 'Refraction Test Type',
+  'menu.setting.package': 'Package',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',
@@ -172,6 +174,8 @@ export default {
   'menu.report.statementsummaryreport': 'Statement Summary Report',
   'menu.report.viewreport': 'View Report',
   
+  'menu.report.visitListingReport': 'Visit Listing Report',
+
   'menu.support': 'Support',
   'menu.support.support': 'Support',
   'menu.support.contactus': 'Contact Us',

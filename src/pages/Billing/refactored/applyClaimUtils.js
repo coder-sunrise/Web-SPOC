@@ -29,6 +29,15 @@ export const getCoverageAmountAndType = (scheme, invoiceItem) => {
   const isSpecificDefined = scheme.coPaymentByItem.find(
     (_coPaymentItem) => _coPaymentItem.itemCode === invoiceItem.itemCode,
   )
+
+  // If is drug mixture item, check if can claim
+  if (invoiceItem.isDrugMixture && !invoiceItem.isClaimable) {
+    schemeCoverageType = 'Percentage'
+    coverage = convertAmountToPercentOrCurrency(schemeCoverageType, 0)
+    schemeCoverage = 0
+    return { coverage, schemeCoverage, schemeCoverageType }
+  }
+
   if (isSpecificDefined) {
     const coPaymentItem = scheme.coPaymentByItem.find(
       (_coPaymentItem) => _coPaymentItem.itemCode === invoiceItem.itemCode,
@@ -89,6 +98,9 @@ export const getApplicableClaimAmount = (
 
   if (payableBalance <= 0 || !scheme) return returnClaimAmount
 
+  // If is drug mixture item, check if can claim
+  if (invoicePayerItem.isDrugMixture && !invoicePayerItem.isClaimable) return 0
+
   const isSpecificDefined = coPaymentByItem.find(
     (_coPaymentItem) => _coPaymentItem.itemCode === invoicePayerItem.itemCode,
   )
@@ -98,8 +110,7 @@ export const getApplicableClaimAmount = (
       (_coPaymentItem) => _coPaymentItem.itemCode === invoicePayerItem.itemCode,
     )
     // TODO get coverage amount from specific item object
-    const itemRemainingAmount =
-      payableBalance - (invoicePayerItem._claimedAmount || 0)
+    const itemRemainingAmount = payableBalance
 
     if (specificItem.itemValueType.toLowerCase() === 'percentage')
       returnClaimAmount = itemRemainingAmount * (specificItem.itemValue / 100)
@@ -113,8 +124,7 @@ export const getApplicableClaimAmount = (
     const itemCategory = coPaymentByCategory.find(
       (category) => category.itemTypeFk === invoicePayerItem.invoiceItemTypeFK,
     )
-    const itemRemainingAmount =
-      payableBalance - (invoicePayerItem._claimedAmount || 0)
+    const itemRemainingAmount = payableBalance
     if (itemCategory.groupValueType.toLowerCase() === 'percentage') {
       returnClaimAmount =
         itemRemainingAmount * (itemCategory.itemGroupValue / 100)
@@ -125,8 +135,7 @@ export const getApplicableClaimAmount = (
           : itemCategory.itemGroupValue
     }
   } else {
-    const itemRemainingAmount =
-      payableBalance - (invoicePayerItem._claimedAmount || 0)
+    const itemRemainingAmount = payableBalance
     const copaymentValue =
       overAllCoPaymentValueType.toLowerCase() === 'percentage'
         ? itemRemainingAmount * (overAllCoPaymentValue / 100)
@@ -163,16 +172,27 @@ export const getInvoiceItemsWithClaimAmount = (
   shouldGenerateDummyID = false,
 ) => {
   if (!schemeConfig || _.isEmpty(schemeConfig)) return []
-  const { coverageMaxCap, patientMinCoPaymentAmount = 0 } = schemeConfig
+  const {
+    coverageMaxCap,
+    patientMinCoPaymentAmount = 0,
+    patientMinCoPaymentAmountType,
+  } = schemeConfig
 
-  const totalInvoiceAmount = originalInvoiceItems
-    .map((item) => item.totalAfterGst - (item._claimedAmount || 0))
-    .reduce(sumAll, 0)
+  const totalInvoiceAmount = roundTo(
+    originalInvoiceItems
+      .map((item) => item.totalAfterGst - (item._claimedAmount || 0))
+      .reduce(sumAll, 0),
+  )
+
+  const patientMinCoPaymentExactAmount =
+    patientMinCoPaymentAmountType === 'ExactAmount'
+      ? patientMinCoPaymentAmount
+      : roundTo(totalInvoiceAmount * (patientMinCoPaymentAmount / 100))
 
   const totalClaimableAmount =
-    totalInvoiceAmount < patientMinCoPaymentAmount
+    totalInvoiceAmount < patientMinCoPaymentExactAmount
       ? 0
-      : totalInvoiceAmount - patientMinCoPaymentAmount
+      : roundTo(totalInvoiceAmount - patientMinCoPaymentExactAmount)
 
   const invoiceItems = originalInvoiceItems.reduce((result, item) => {
     if (
@@ -191,6 +211,7 @@ export const getInvoiceItemsWithClaimAmount = (
       schemeCoverage, // for sending to backend
       schemeCoverageType, // for sending to backend
     } = getCoverageAmountAndType(schemeConfig, item)
+
     const { invoiceItemTypeFK } = item
 
     const pastItemClaimedAmount = result.reduce(
@@ -210,6 +231,8 @@ export const getInvoiceItemsWithClaimAmount = (
       remainingCoverageMaxCap,
       remainingClaimableAmount,
     )
+
+    console.log('_claimAmount', _claimAmount)
 
     if (existedItem)
       return [
@@ -303,6 +326,9 @@ export const validateInvoicePayerItems = (invoicePayerItem) => {
     if (item.schemeCoverageType.toLowerCase() === 'percentage') {
       maxAmount = roundTo(item.payableBalance * item.schemeCoverage / 100, 4)
       type = 'Coverage Amount'
+    } else if (item.schemeCoverageType.toLowerCase() === 'exactamount') {
+      maxAmount = item.schemeCoverage
+      type = 'Coverage Amount'
     } else maxAmount = item.payableBalance
 
     if (item.claimAmount > maxAmount) {
@@ -315,20 +341,18 @@ export const validateInvoicePayerItems = (invoicePayerItem) => {
 }
 
 const getItemTypeSubtotal = (list, type) =>
-  list.reduce(
-    (subtotal, item) =>
-      item.invoiceItemTypeFK === type ? subtotal + item.claimAmount : subtotal,
-    0,
+  roundTo(
+    list.reduce(
+      (subtotal, item) =>
+        item.invoiceItemTypeFK === type
+          ? subtotal + item.claimAmount
+          : subtotal,
+      0,
+    ),
   )
 
 const calculateTotalPaybable = (total, item) => {
-  let coverageAmount = item.schemeCoverage
-  if (item.schemeCoverageType === 'Percentage')
-    coverageAmount = roundTo(item.payableBalance * item.schemeCoverage / 100, 4)
-  else {
-    coverageAmount = Math.min(item.schemeCoverage, item.payableBalance)
-  }
-  return total + coverageAmount
+  return total + item.payableBalance
 }
 
 export const validateClaimAmount = (schemeRow) => {
@@ -362,37 +386,43 @@ export const validateClaimAmount = (schemeRow) => {
   if (isBalanceCheckRequired)
     listOfLimits.push({ type: 'Balance', value: balance })
 
-  const totalClaimAmount = invoicePayerItem.reduce(
-    (totalClaim, item) => totalClaim + (item.claimAmount || 0),
-    0,
+  const totalClaimAmount = roundTo(
+    invoicePayerItem.reduce(
+      (totalClaim, item) => totalClaim + (item.claimAmount || 0),
+      0,
+    ),
   )
 
-  const totalPayable = invoicePayerItem.reduce(calculateTotalPaybable, 0)
+  const totalPayable = roundTo(
+    invoicePayerItem.reduce(calculateTotalPaybable, 0),
+  )
+
+  const patientMinCoPaymentExactAmount =
+    patientMinCoPaymentAmountType === 'ExactAmount'
+      ? patientMinCoPaymentAmount
+      : roundTo(totalPayable * (patientMinCoPaymentAmount / 100))
+
   const patientDistributedAmount =
     totalClaimAmount > 0
-      ? totalPayable - totalClaimAmount
-      : patientMinCoPaymentAmount
+      ? roundTo(totalPayable - totalClaimAmount)
+      : totalPayable
 
-  if (patientMinCoPaymentAmount > 0) {
-    const amount =
-      patientMinCoPaymentAmountType === 'ExactAmount'
-        ? patientMinCoPaymentAmount
-        : totalClaimAmount * (patientMinCoPaymentAmount / 100)
-    if (patientDistributedAmount < patientMinCoPaymentAmount) {
+  if (patientMinCoPaymentExactAmount > 0) {
+    if (patientDistributedAmount < patientMinCoPaymentExactAmount) {
       invalidMessage.push(
         `Current Patient Min. Payment Amount is: $${patientDistributedAmount.toFixed(
           2,
         )}`,
       )
       invalidMessage.push(
-        `Patient Min. Payment Amount must be at least: $${patientMinCoPaymentAmount.toFixed(
+        `Patient Min. Payment Amount must be at least: $${patientMinCoPaymentExactAmount.toFixed(
           2,
         )}`,
       )
     } else
       listOfLimits.push({
         type: 'Amount after Patient Min. Payable',
-        value: totalPayable - amount,
+        value: totalPayable - patientMinCoPaymentExactAmount,
       })
   }
   if (isCoverageMaxCapCheckRequired) {
@@ -453,6 +483,8 @@ export const validateClaimAmount = (schemeRow) => {
     { type: '', value: 999999 },
   )
 
+  maximumLimit.value = roundTo(maximumLimit.value)
+
   if (
     maximumLimit.type !== '' &&
     maximumLimit.value > 0 &&
@@ -487,6 +519,7 @@ export const updateInvoicePayerPayableBalance = (
   originalInvoiceItems,
   list,
   updatedIndex,
+  autoApply = false,
 ) => {
   const result = list.reduce((_payers, payer, index) => {
     // dp nothing when payer isCancelled
@@ -497,7 +530,28 @@ export const updateInvoicePayerPayableBalance = (
       ]
 
     // first payer use totalAfterGst as payable balance
-    if (index === 0)
+    if (index === 0) {
+      let autoApplyMessage = {}
+      if (autoApply) {
+        autoApplyMessage = {
+          payerDistributedAmt: roundTo(
+            payer.invoicePayerItem.reduce(
+              (subtotal, item) => subtotal + item.claimAmount,
+              0,
+            ),
+          ),
+          payerOutstanding: roundTo(
+            payer.invoicePayerItem.reduce(
+              (subtotal, item) => subtotal + item.claimAmount,
+              0,
+            ),
+          ),
+          isModified: true,
+          _isConfirmed: true,
+          _isEditing: false,
+          _isDeleted: false,
+        }
+      }
       return [
         ..._payers,
         {
@@ -513,8 +567,10 @@ export const updateInvoicePayerPayableBalance = (
                 : item.payableBalance,
             }
           }),
+          ...autoApplyMessage,
         },
       ]
+    }
 
     // all previous payer remains the same as is
     if (index < updatedIndex)
@@ -555,7 +611,10 @@ export const updateInvoicePayerPayableBalance = (
     })
     return [
       ..._payers,
-      { ...payer, invoicePayerItem: newInvoicePayerItem },
+      {
+        ...payer,
+        invoicePayerItem: newInvoicePayerItem,
+      },
     ]
   }, [])
 

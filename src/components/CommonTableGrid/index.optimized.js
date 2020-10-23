@@ -51,7 +51,6 @@ import {
   TableTreeColumn,
   TableColumnResizing,
   TableColumnReordering,
-  TableSelection,
 } from '@devexpress/dx-react-grid-material-ui'
 import MenuItem from '@material-ui/core/MenuItem'
 import MenuList from '@material-ui/core/MenuList'
@@ -380,7 +379,7 @@ class CommonTableGrid extends PureComponent {
         TableFixedCell: {
           fixedCell: {
             zIndex: 1,
-            overflow: 'visible',
+            // overflow: 'visible',
             backgroundColor: 'inherit',
             borderLeft: '1px solid rgba(0, 0, 0, 0.12)',
           },
@@ -393,6 +392,11 @@ class CommonTableGrid extends PureComponent {
           cell: {
             padding: '7px 8px 7px 8px',
             ...cellStyle.cell,
+          },
+        },
+        EditColumn: {
+          headingCell: {
+            borderTop: '1px solid rgba(0, 0, 0, 0.12)',
           },
         },
         TableHeaderCell: {
@@ -660,17 +664,55 @@ class CommonTableGrid extends PureComponent {
   // }
 
   Row = (p) => {
-    const { classes, ...restProps } = this.props
-    return <TableRow {...restProps} {...p} />
+    const { classes, FuncProps = {}, ...restProps } = this.props
+    const { selectRowHighlightable = false } = FuncProps
+    return (
+      <TableRow
+        {...restProps}
+        {...p}
+        onRowClick={(row, event) => {
+          if (selectRowHighlightable) {
+            const rowId = this.props.getRowId(row || p.row)
+            if (this.state.selectedItem.includes(rowId)) {
+              this.setState({
+                selectedItem: [],
+              })
+            } else {
+              this.setState({
+                selectedItem: [
+                  rowId,
+                ],
+              })
+            }
+          }
+        }}
+      />
+    )
   }
 
   Cell = (p) => {
-    const { rows = [], ...restProps } = this.props
+    const { rows = [], FuncProps = {}, ...restProps } = this.props
     // console.log(restProps, p)
+    const { selectRowHighlightable = false } = FuncProps
     const row = rows.find(
       (o) => this.props.getRowId(o) === this.props.getRowId(p.row),
     )
-    return <TableCell {...restProps} {...p} row={row || p.row} />
+    const rowId = this.props.getRowId(row || p.row)
+    const highlitSytle =
+      selectRowHighlightable && this.state.selectedItem.includes(rowId)
+    const { style } = { ...restProps, ...p }
+
+    return (
+      <TableCell
+        {...restProps}
+        {...p}
+        row={row || p.row}
+        style={{
+          ...style,
+          backgroundColor: highlitSytle ? '#c8dafd' : undefined,
+        }}
+      />
+    )
   }
 
   getChildRows = (row, rootRows) => {
@@ -1056,16 +1098,10 @@ class CommonTableGrid extends PureComponent {
                   {...sortConfig}
                 />
               )}
-              {(selectable || selectRowHighlightable) && (
+              {selectable && (
                 <SelectionState
-                  selection={selectable ? selection : this.state.selectedItem}
-                  onSelectionChange={(e) => {
-                    if (selectable) {
-                      onSelectionChange(e)
-                    } else {
-                      this.setState({ selectedItem: e })
-                    }
-                  }}
+                  selection={selection}
+                  onSelectionChange={onSelectionChange}
                 />
               )}
               {summary && <SummaryState {...summaryConfig.state} />}
@@ -1166,14 +1202,7 @@ class CommonTableGrid extends PureComponent {
                 />
               )}
               {header && <HeaderRow showSortingControls />}
-              {selectRowHighlightable && (
-                <TableSelection
-                  highlightRow
-                  selectByRowClick
-                  showSelectionColumn={false}
-                  {...selectConfig}
-                />
-              )}
+
               {extraRow.map((o) => o)}
               {pager && <PagingPanel pageSizes={pageSizes} {...pagerConfig} />}
               {grouping && (

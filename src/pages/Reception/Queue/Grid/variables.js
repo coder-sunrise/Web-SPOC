@@ -134,7 +134,7 @@ export const ApptColumnExtensions = [
   },
   {
     columnName: 'appointmentTime',
-    width: 170,
+    width: 180,
     type: 'date',
     showTime: true,
   },
@@ -167,7 +167,7 @@ export const QueueTableConfig = {
     { name: 'invoiceOutstanding', title: 'Outstanding' },
     { name: 'patientScheme', title: 'Scheme' },
     { name: 'patientMobile', title: 'Phone' },
-    { name: 'visitOrderTemplate', title: 'Visit Order Template' },
+    { name: 'visitOrderTemplate', title: 'Visit Purpose' },
     { name: 'action', title: 'Action' },
   ],
   leftColumns: [
@@ -200,7 +200,8 @@ export const QueueColumnExtensions = [
           >
             <span>{row.queueNo}</span>
             <div>
-              {row.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
+              {row.patientIsActive &&
+              row.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
                 <Authorized authority='openqueuedisplay'>
                   <CallingQueueButton
                     qId={row.queueNo}
@@ -267,13 +268,13 @@ export const QueueColumnExtensions = [
   },
   {
     columnName: 'timeIn',
-    width: 170,
+    width: 180,
     type: 'date',
     showTime: true,
   },
   {
     columnName: 'timeOut',
-    width: 170,
+    width: 180,
     type: 'date',
     showTime: true,
   },
@@ -294,7 +295,7 @@ export const QueueColumnExtensions = [
   },
   {
     columnName: 'appointmentTime',
-    width: 160,
+    width: 180,
     type: 'date',
     showTime: true,
     // compare: compareTime,

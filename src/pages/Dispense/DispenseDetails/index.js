@@ -16,8 +16,9 @@ import {
   GridItem,
   GridContainer,
   SizeContainer,
-  Field,
+  CommonTableGrid,
   TextField,
+  Field,
   CommonModal,
 } from '@/components'
 import AmountSummary from '@/pages/Shared/AmountSummary'
@@ -111,7 +112,12 @@ const DispenseDetails = ({
   } = values || {
     invoice: { invoiceItem: [] },
   }
-  const { invoiceItem = [], invoiceAdjustment = [], totalPayment } = invoice
+  const {
+    invoiceItem = [],
+    invoiceAdjustment = [],
+    totalPayment,
+    coPayer = [],
+  } = invoice
 
   const { inventorymedication, inventoryvaccination } = codetable
 
@@ -205,7 +211,26 @@ const DispenseDetails = ({
   const isBillFirstVisit = visitPurposeFK === VISIT_TYPE.BILL_FIRST
   const disableRefreshOrder = isBillFirstVisit && !clinicalObjectRecordFK
   const disableDiscard = totalPayment > 0 || !!clinicalObjectRecordFK
+  const [
+    showRemovePayment,
+    setShowRemovePayment,
+  ] = useState(false)
 
+  const [
+    voidReason,
+    setVoidReason,
+  ] = useState('')
+
+  let coPayerPayments = []
+  coPayer.forEach((ip) => {
+    const { invoicePayment = [], name } = ip
+    coPayerPayments = coPayerPayments.concat(
+      invoicePayment.filter((o) => !o.isCancelled).map((o) => ({
+        ...o,
+        payerName: name,
+      })),
+    )
+  })
   return (
     <React.Fragment>
       <GridContainer>
@@ -305,7 +330,13 @@ const DispenseDetails = ({
                 color='primary'
                 size='sm'
                 icon={<AttachMoney />}
-                onClick={onFinalizeClick}
+                onClick={() => {
+                  if (coPayerPayments.length > 0) {
+                    setShowRemovePayment(true)
+                  } else {
+                    onFinalizeClick()
+                  }
+                }}
               >
                 Finalize
               </ProgressButton>
@@ -317,6 +348,7 @@ const DispenseDetails = ({
             <TableData
               title='Prescription'
               idPrefix='prescription'
+              forceRender
               columns={PrescriptionColumns}
               colExtensions={PrescriptionColumnExtensions(
                 viewOnly,
@@ -401,6 +433,102 @@ const DispenseDetails = ({
             onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
           }}
         />
+      </CommonModal>
+      <CommonModal
+        title='Information'
+        open={showRemovePayment}
+        observe='DispenseDetails'
+        onClose={() => {
+          setShowRemovePayment(false)
+        }}
+      >
+        <div
+          style={{
+            marginLeft: 20,
+            marginRight: 20,
+          }}
+        >
+          <GridContainer>
+            <CommonTableGrid
+              style={{
+                marginBottom: 10,
+              }}
+              size='sm'
+              rows={coPayerPayments}
+              columns={[
+                { name: 'payerName', title: 'Payer Name' },
+                { name: 'paymentReceivedBy', title: 'Received By' },
+                { name: 'receiptNo', title: 'Receipt No.' },
+                { name: 'paymentReceivedDate', title: 'Payment Date' },
+                { name: 'totalAmtPaid', title: 'Amount ($)' },
+              ]}
+              columnExtensions={[
+                {
+                  columnName: 'receiptNo',
+                  width: 110,
+                },
+                {
+                  columnName: 'totalAmtPaid',
+                  type: 'number',
+                  currency: true,
+                  width: 110,
+                },
+                {
+                  columnName: 'paymentReceivedDate',
+                  type: 'date',
+                  width: 110,
+                },
+              ]}
+              FuncProps={{
+                pager: false,
+              }}
+            />
+            <TextField
+              label='Void Reason'
+              multiline
+              rowsMax='5'
+              value={voidReason}
+              maxLegth={200}
+              onChange={(e) => {
+                setVoidReason(e.target.value)
+              }}
+            />
+
+            <div>
+              Note: There are existing payments with some co-payers, click
+              "Void" to cancel all payments, or click "Skip" to remove co-payers
+              & payments manually.
+            </div>
+          </GridContainer>
+          <GridContainer
+            style={{
+              marginTop: 20,
+              marginBottom: 20,
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <Button
+              color='danger'
+              icon={null}
+              disabled={!voidReason}
+              onClick={() => {
+                onFinalizeClick(true, voidReason)
+              }}
+            >
+              void
+            </Button>
+            <Button
+              color='primary'
+              icon={null}
+              onClick={() => {
+                onFinalizeClick()
+              }}
+            >
+              skip
+            </Button>
+          </GridContainer>
+        </div>
       </CommonModal>
     </React.Fragment>
   )
