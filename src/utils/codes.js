@@ -1519,6 +1519,31 @@ const enableDisableOptions = [
   { value: true, name: 'Enabled' },
   { value: false, name: 'Disabled' },
 ]
+const queueProcessorType = [
+  {
+    value: 1,
+    name: 'Auto Generate Statement',
+  },
+]
+
+const queueItemStatus = [
+  {
+    value: 1,
+    name: 'Pending',
+  },
+  {
+    value: 2,
+    name: 'Processing',
+  },
+  {
+    value: 3,
+    name: 'Successful',
+  },
+  {
+    value: 4,
+    name: 'Failed',
+  },
+]
 
 module.exports = {
   appointmentStatus,
@@ -1556,5 +1581,7 @@ module.exports = {
   surgicalRoles,
   ltAdmittingSpecialty,
   enableDisableOptions,
+  queueProcessorType,
+  queueItemStatus,
   ...module.exports,
 } 

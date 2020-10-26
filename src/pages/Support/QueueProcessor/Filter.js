@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react'
 import { FormattedMessage } from 'umi/locale'
 import Search from '@material-ui/icons/Search'
-import Add from '@material-ui/icons/Add'
-import { status } from '@/utils/codes'
+import { queueProcessorType, queueItemStatus } from '@/utils/codes'
+import { DoctorProfileSelect } from '@/components/_medisys'
 import {
   withFormikExtend,
   FastField,
@@ -12,6 +12,8 @@ import {
   TextField,
   Select,
   ProgressButton,
+  CodeSelect,
+  DateRangePicker,
 } from '@/components'
 
 @withFormikExtend({
@@ -25,19 +27,54 @@ class Filter extends PureComponent {
     return (
       <div className={classes.filterBar}>
         <GridContainer>
-          <GridItem xs={6} md={3}>
+          <GridItem xs={6} md={4}>
             <FastField
-              name='codeDisplayValue'
+              name='processType'
               render={(args) => {
-                return <TextField label='Code / Display Value' {...args} />
+                return (
+                  <CodeSelect
+                    label='Process Type'
+                    options={queueProcessorType}
+                    {...args}
+                    valueField='value'
+                    all={-99}
+                    defaultOptions={[
+                      {
+                        isExtra: true,
+                        id: -99,
+                        displayValue: 'All',
+                      },
+                    ]}
+                  />
+                )
               }}
             />
           </GridItem>
-          <GridItem xs={6} md={2}>
+          <GridItem md={4}>
             <FastField
-              name='isActive'
+              name='invoiceDates'
               render={(args) => {
-                return <Select label='Status' options={status} {...args} />
+                return (
+                  <DateRangePicker
+                    label='Request Date From'
+                    label2='Request Date To'
+                    {...args}
+                  />)
+              }
+              }
+            />
+          </GridItem>
+          <GridItem xs={6} md={4}>
+            <FastField
+              name='doctorID'
+              render={(args) => <DoctorProfileSelect {...args} />}
+            />
+          </GridItem>
+          <GridItem xs={6} md={4}>
+            <FastField
+              name='status'
+              render={(args) => {
+                return <Select label='Status' options={queueItemStatus} {...args} />
               }}
             />
           </GridItem>
@@ -50,40 +87,19 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={<Search />}
                 onClick={() => {
-                  const { codeDisplayValue, isActive } = this.props.values
+                  const { status, processType } = this.props.values
+                  console.log({ status, processType })
                   this.props.dispatch({
                     type: 'queueProcessor/query',
                     payload: {
-                      isActive,
-                      group: [
-                        {
-                          code: codeDisplayValue,
-                          displayValue: codeDisplayValue,
-                          combineCondition: 'or',
-                        },
-                      ],
+                      status,
+                      processType, 
                     },
                   })
                 }}
               >
                 <FormattedMessage id='form.search' />
-              </ProgressButton>
-
-              <Button
-                color='primary'
-                onClick={() => {
-                  this.props.dispatch({
-                    type: 'queueProcessor/updateState',
-                    payload: {
-                      entity: undefined,
-                    },
-                  })
-                  this.props.toggleModal()
-                }}
-              >
-                <Add />
-                Add New
-              </Button>
+              </ProgressButton> 
             </div>
           </GridItem>
         </GridContainer>

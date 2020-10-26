@@ -3,32 +3,17 @@ import moment from 'moment'
 import * as service from '../services'
 
 export default createListViewModel({
-  namespace: 'queueprocessor',
+  namespace: 'queueProcessor',
   param: {
     service,
     state: {
       default: {
-        isUserMaintainable: true,
-        effectiveDates: [
-          moment().formatUTC(),
-          moment('2099-12-31T23:59:59').formatUTC(false),
-        ],
+        isUserMaintainable: true, 
         description: '',
       },
     },
     effects: {},
-    reducers: {
-      queryOneDone (st, { payload }) {
-        const { data } = payload
-        data.effectiveDates = [
-          data.effectiveStartDate,
-          data.effectiveEndDate,
-        ]
-        return {
-          ...st,
-          entity: data,
-        }
-      },
+    reducers: { 
       queryDone (st, { payload }) {
         const { data } = payload
 
@@ -36,11 +21,7 @@ export default createListViewModel({
           ...st,
           list: data.data.map((o) => {
             return {
-              ...o,
-              effectiveDates: [
-                o.effectiveStartDate,
-                o.effectiveEndDate,
-              ],
+              ...o, 
             }
           }),
         }
