@@ -17,6 +17,7 @@ import { ReportViewer } from '@/components/_medisys'
 import { rgType } from '@/utils/codes'
 import { INVOICE_STATUS, RECEIVING_GOODS_STATUS } from '@/utils/constants'
 import AuthorizedContext from '@/components/Context/Authorized'
+import Authorized from '@/utils/Authorized'
 import AmountSummary from '@/pages/Shared/AmountSummary'
 import { roundTo } from '@/utils/utils'
 import {
@@ -549,23 +550,25 @@ class Index extends Component {
                 </ProgressButton>
               )}
               {rgStatus === RECEIVING_GOODS_STATUS.COMPLETED && (
-                <ProgressButton
-                  color='success'
-                  icon={null}
-                  authority='none'
-                  disabled={
-                    isWriteOff ||
-                    receivingGoodsPayment.find(
-                      (rgp) => !rgp.clinicPaymentDto.isCancelled,
-                    )
-                  }
-                  onClick={() =>
-                    this.onSubmitButtonClicked(rgSubmitAction.UNLOCK)}
-                >
-                  {formatMessage({
-                    id: 'inventory.rg.detail.rgd.unlock',
-                  })}
-                </ProgressButton>
+                <Authorized authority='receivinggoods.unlockreceivinggoods'>
+                  <ProgressButton
+                    color='success'
+                    icon={null}
+                    authority='none'
+                    disabled={
+                      isWriteOff ||
+                      receivingGoodsPayment.find(
+                        (rgp) => !rgp.clinicPaymentDto.isCancelled,
+                      )
+                    }
+                    onClick={() =>
+                      this.onSubmitButtonClicked(rgSubmitAction.UNLOCK)}
+                  >
+                    {formatMessage({
+                      id: 'inventory.rg.detail.rgd.unlock',
+                    })}
+                  </ProgressButton>
+                </Authorized>
               )}
             </div>
 
