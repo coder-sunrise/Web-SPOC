@@ -101,14 +101,16 @@ class ReceivingGoods extends Component {
         receivingGoodsIds: selectedRows,
         writeOffReason,
       },
-    }).then(() => {
-      this.handleResetSelection()
-      notification.success({
-        message: 'Write-Off complete.',
-      })
-      dispatch({
-        type: 'receivingGoodsList/query',
-      })
+    }).then((r) => {
+      if (r) {
+        this.handleResetSelection()
+        notification.success({
+          message: 'Write-Off complete.',
+        })
+        dispatch({
+          type: 'receivingGoodsList/query',
+        })
+      }
     })
   }
 

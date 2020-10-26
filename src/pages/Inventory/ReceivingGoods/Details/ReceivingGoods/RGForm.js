@@ -151,36 +151,37 @@ const RGForm = ({ setFieldValue, isReadOnly = false }) => {
                 }}
               />
             </GridItem>
-            <GridItem xs={9}>
-              <Field
-                name={`${prefix}.remark`}
-                render={(args) => {
-                  return (
-                    <TextField
-                      label={formatMessage({
-                        id: 'inventory.rg.detail.rgd.remarks',
-                      })}
-                      multiline
-                      rowsMax={4}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={3}>
-              <Field
-                name={`${prefix}.isShowRemarkInPrintout`}
-                render={(args) => {
-                  return (
-                    <Checkbox
-                      label='show in printout'
-                      inputLabel=' '
-                      {...args}
-                    />
-                  )
-                }}
-              />
+            <GridItem xs={12} style={{ paddingRight: 145 }}>
+              <div style={{ position: 'relative' }}>
+                <Field
+                  name={`${prefix}.remark`}
+                  render={(args) => {
+                    return (
+                      <TextField
+                        label={formatMessage({
+                          id: 'inventory.rg.detail.rgd.remarks',
+                        })}
+                        multiline
+                        rowsMax={4}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+                <Field
+                  name={`${prefix}.isShowRemarkInPrintout`}
+                  render={(args) => {
+                    return (
+                      <Checkbox
+                        style={{ position: 'absolute', bottom: 2 }}
+                        label='show in printout'
+                        inputLabel=' '
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </div>
             </GridItem>
           </GridContainer>
         </GridItem>
