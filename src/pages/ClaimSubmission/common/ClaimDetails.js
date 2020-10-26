@@ -57,7 +57,7 @@ const styles = (theme) => ({
     let complicationList = []
     let selectedComplication = []
     let chargeCodeList = []
-    let selectedChargeCode = []
+    let selectedChargeCode = null
 
     if (diagnosis) {
       diagnosis.forEach((o) => {
@@ -88,8 +88,9 @@ const styles = (theme) => ({
 
           chargeCodeList.push(`${o.chargeCode} - ${displayValue}`)
           if(o.isPrimary) {
-            selectedChargeCode.push(`${o.chargeCode} - ${displayValue}`)
+            selectedChargeCode = `${o.chargeCode} - ${displayValue}`
           }
+          // if no isprimary in diagnosis list? or do in api?
         }
 
     })
@@ -99,6 +100,17 @@ const styles = (theme) => ({
       diagnosisOptions.push(-99)
     }
 
+    if(!selectedChargeCode)
+    {
+      return {
+        ...returnValue,
+        diagnosisSelections: diagnosisOptions,
+        complicationList,
+        selectedComplication,
+        chargeCodeList,
+      }
+
+    }
     return {
       ...returnValue,
       diagnosisSelections: diagnosisOptions,
@@ -109,6 +121,8 @@ const styles = (theme) => ({
     }
   },
   validationSchema: Yup.object().shape({
+    selectedChargeCode: Yup.string()
+      .required('Charge code is required.'),
     diagnosisSelections: Yup.array()
       .required('At least one diagnosis is required.'),
     selectedComplication: Yup.array().when(['schemeCategoryDisplayValue', 'diagnosisSelections'],
@@ -150,8 +164,24 @@ class ClaimDetails extends Component {
   save = () => {
     const { values, validateForm } = this.props
     const { diagnosisSelections, diagnosis, selectedChargeCode } = values
+    
+    if(diagnosisSelections.length < 1)
+    {
+        notification.error({
+          message: 'At least one diagnosis is required',
+      })
+      return
+    }
+    if(!selectedChargeCode)
+    {
+        notification.error({
+          message: 'Charge code is required',
+      })
+      return
+    }
+
     const chargeCodeSelections = []
-    const selected = selectedChargeCode.toString()
+    const selected = selectedChargeCode || ''
 
     diagnosis.forEach((o) => {
       const selectedId = diagnosisSelections.find((i) => i === o.id)
@@ -170,8 +200,9 @@ class ClaimDetails extends Component {
     
     const e = chargeCodeSelections.find((c) => selected.includes(c))
     if(!e)
-      notification.error('Charge code is not in selected list of diagnoses')
-
+      notification.error({
+        message: 'Charge code is not in selected list of diagnoses',
+    })
     if(e)
     {
       validateForm()
@@ -501,7 +532,7 @@ class ClaimDetails extends Component {
                     render={(args) => (
                       <Select
                         label='Charge Code'
-                        // disabled={!allowEdit}
+                        disabled={values.status === 'Draft'}
                         disableAll
                         options={chargeCodeList}
                         labelField='chargeCodeDescription'
@@ -528,7 +559,13 @@ class ClaimDetails extends Component {
                 <GridItem md={7} />
               </GridItem>
             )}
-
+            {values.status === 'Draft' && 
+            <GridItem md={12}>
+              <font color='red'>
+                *Draft claim records are not editable. Please end the current session to edit record and view invoice.
+              </font>
+            </GridItem>
+            }
             <GridItem md={12} className={classes.footer}>
               <Button color='danger' onClick={onClose}>
                 Close
@@ -541,6 +578,7 @@ class ClaimDetails extends Component {
                 ''
               )}
             </GridItem>
+            
           </GridContainer>
         </React.Fragment>
       </SizeContainer>

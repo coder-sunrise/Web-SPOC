@@ -93,6 +93,7 @@ class SubmittedMedisave extends React.Component {
     const { isLoading, selectedRows } = this.state
     const { list } = medisaveClaimSubmissionSubmitted || []
 
+    console.log('submitted',medisaveClaimSubmissionSubmitted)
     return (
       <CardContainer
         hideHeader
@@ -115,11 +116,11 @@ class SubmittedMedisave extends React.Component {
                 columns={SubmittedMedisaveColumns}
                 // tableConfig={TableConfig}
                 FuncProps={{
-                  selectable: true,
-                  selectConfig: {
-                    showSelectAll: true,
-                    rowSelectionEnabled: () => true,
-                  },
+                 selectable: true,
+                 selectConfig: {
+                   showSelectAll: true,
+                   rowSelectionEnabled: () => true,
+                 },
                 }}
                 selection={this.state.selectedRows}
                 onSelectionChange={this.handleSelectionChange}
@@ -131,7 +132,7 @@ class SubmittedMedisave extends React.Component {
               <ProgressButton
                 icon={null}
                 color='primary'
-                disabled={selectedRows.length <= 0}
+                disabled={list && list.length <= 0}
                 onClick={this.handleGetStatusClicked}
               >
                 {formatMessage({

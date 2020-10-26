@@ -281,23 +281,25 @@ const ApplyClaims = ({
     })
     let newVisitType = null
     let newCopaymentSchemeFK = null
-    if(cdmpVaccinations && [30,33].indexOf(midPayer.copaymentSchemeFK) >= 0) 
+    const copaymentSchemeCode = ctcopaymentscheme.find(cps => cps.id === midPayer.copaymentSchemeFK).code
+    console.log('copaymentSchemeCode',copaymentSchemeCode)
+    if(cdmpVaccinations && copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500VACC) 
     {
       newVisitType = 'Vaccination'
       mediInvoiceItems = cdmpVaccinations
     }
-    if(cdmpScreenings && [31,34].indexOf(midPayer.copaymentSchemeFK) >= 0) 
+    if(cdmpScreenings && copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500HS) 
     {
       newVisitType = 'Health Screening'
       mediInvoiceItems = cdmpScreenings
       
     }
-    if(cdmpItems && [29,32].indexOf(midPayer.copaymentSchemeFK) >= 0) 
+    if(cdmpItems && (copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500CDMP || copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE700CDMP)) 
     { // 2nd condition can be removed
       newVisitType = 'CDMP'
       mediInvoiceItems = cdmpItems
     }
-    if(cdmpScans && midPayer.copaymentSchemeFK === 36)
+    if(cdmpScans && copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVEOPSCAN)
     {
       console.log('scan-detected','')
       newVisitType = ''
@@ -672,7 +674,7 @@ const ApplyClaims = ({
   }
 
   const constructAvailableClaims = (claimableSchemesList) => { 
-    // console.log('constructAvailableClaims',claimableSchemesList) 
+    console.log('constructAvailableClaims',claimableSchemesList) 
     let invoicePayerList = []
     const is700Visit = claimableSchemesList.some(c => c[0].coPaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE700CDMP)
     const cdmp500scheme = medisaveSchemes.find(m => m.code === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500CDMP)
@@ -1344,7 +1346,9 @@ const ApplyClaims = ({
           medisaveItems={{
             medisaveMedications,
             medisaveVaccinations,
+            medisaveServices,
             healthScreenings,
+            outpatientScans,
           }}
         />
       </CommonModal>

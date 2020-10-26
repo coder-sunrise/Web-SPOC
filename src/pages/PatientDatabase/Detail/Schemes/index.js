@@ -211,6 +211,7 @@ class Schemes extends PureComponent {
       tempSchemeTypeFK = schemeTypeFK
     }
 
+    console.log('patientScheme',values.patientScheme)
     return (
       <div>
         <div>
@@ -278,8 +279,16 @@ class Schemes extends PureComponent {
             Medisave Payer
           </h4>
           <PayersGrid
-            enableAdd={values.patientScheme ? values.patientScheme.find((o) => this.isMedisave(o)) : false} // TODO: check is medisave added
-            rows={values.schemePayer}
+            enableAdd={values.patientScheme && !isCreatingPatient ? values.patientScheme.find((o) => this.isMedisave(o)) : false} // TODO: check is medisave added
+            rows={values.schemePayer}/* .map(sp => {
+              const existScheme = values.patientScheme.find(p => !p.isDeleted && p.schemeTypeFK === sp.schemeFK)
+              if(!existScheme && sp.schemeFK)
+               return {
+                 ...sp,
+                 isDeleted: !existScheme,
+               }
+              return sp
+            })} */
             schema={schema.schemePayer._subType}
             values={values}
             {...restProps}

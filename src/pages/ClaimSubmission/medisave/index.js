@@ -205,6 +205,7 @@ class Medisave extends React.Component {
               name: 'Rejected',
               content: (
                 <Rejected
+                  handleSubmitClaimStatus={this.openSubmitClaimStatus}
                   handleContextMenuItemClick={this.handleContextMenuItemClick}
                 />
               ),

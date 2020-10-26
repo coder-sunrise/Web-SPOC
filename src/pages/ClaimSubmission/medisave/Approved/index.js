@@ -90,6 +90,16 @@ class ApprovedMedisave extends React.Component {
     }
   }
 
+  collectPaymentIsDisabled = (selectedRows) => {
+    const selectedInvoiceNo = selectedRows
+                              .map(s => s.invoiceNo)
+                              .map((s, i, array) => array.indexOf(s) === i && i)
+                              .filter(s => selectedRows[s])
+                              .map(s => selectedRows[s])
+    console.log('selectedInvoiceNo',selectedInvoiceNo)
+    return selectedRows.length === 0 || selectedInvoiceNo.length < selectedRows.length
+  }
+
   onClickCollectPayment = () => {
     const { dispatch, medisaveClaimSubmissionApproved } = this.props
     const { selectedRows } = this.state
@@ -128,16 +138,17 @@ class ApprovedMedisave extends React.Component {
   render () {
     const {
       classes,
-      claimSubmissionApproved,
+      medisaveClaimSubmissionApproved,
       handleContextMenuItemClick,
       dispatch,
       values,
     } = this.props
     const { isLoading } = this.state
-    const { list } = claimSubmissionApproved || []
+    const { list } = medisaveClaimSubmissionApproved || []
     const { showCollectPayment } = this.state
     const { selectedRows } = this.state
 
+    console.log('approved', this.props)
     return (
       <CardContainer
         hideHeader
@@ -183,7 +194,6 @@ class ApprovedMedisave extends React.Component {
                     rowSelectionEnabled: (row) =>
                       row.patientIsActive &&
                       !(
-                        row.chasClaimStatusCode.toLowerCase() === 'pd' &&
                         row.approvedAmount === row.collectedPayment
                       ),
                   },
@@ -214,7 +224,7 @@ class ApprovedMedisave extends React.Component {
                 icon={null}
                 color='success'
                 onClick={this.onClickCollectPayment}
-                disabled={selectedRows.length <= 0}
+                disabled={this.collectPaymentIsDisabled(selectedRows)}
               >
                 {formatMessage({
                   id: 'claimsubmission.invoiceClaim.CollectPayment',

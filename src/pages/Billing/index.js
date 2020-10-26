@@ -207,40 +207,40 @@ class Billing extends Component {
     })
   }
 
-  fetchCodeTables = () => {
+  fetchCodeTables = async () => {
     const { history, dispatch } = this.props
     const { query } = history.location
-    dispatch({
+    await dispatch({
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctcopayer',
       },
     })
-    dispatch({
+    await dispatch({
       type: 'codetable/fetchCodes',
       payload: {
         code: 'copaymentscheme',
       },
     })
-    dispatch({
+    await dispatch({
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctschemetype',
       },
     })
-    dispatch({
+    await dispatch({
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctservice',
       },
     })
-    dispatch({
+    await dispatch({
       type: 'codetable/fetchCodes',
       payload: {
         code: 'inventoryvaccination',
       },
     })
-    dispatch({
+    await dispatch({
       type: 'codetable/fetchCodes',
       payload: {
         code: 'inventorymedication',

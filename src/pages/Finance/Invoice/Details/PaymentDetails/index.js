@@ -410,7 +410,7 @@ class PaymentDetails extends Component {
   }
 
   render () {
-    // console.log('PaymentIndex', this.props)
+    console.log('PaymentIndex', this.props)
     const {
       classes,
       values,
@@ -462,12 +462,15 @@ class PaymentDetails extends Component {
           values
             .sort((a, b) => a.payerTypeFK - b.payerTypeFK)
             .map((payment) => {
+              console.log('payment',payment)
               return (
                 <PaymentCard
                   coPaymentSchemeFK={payment.coPaymentSchemeFK}
                   companyFK={payment.companyFK}
                   companyName={payment.companyName}
                   patientName={payment.patientName}
+                  payerName={payment.payerName}
+                  payerID={payment.payerID}
                   payerType={payment.payerType}
                   payerTypeFK={payment.payerTypeFK}
                   payments={payment.paymentTxnList}

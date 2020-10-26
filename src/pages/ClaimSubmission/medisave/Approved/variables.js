@@ -61,7 +61,7 @@ export const ApprovedMedisaveColumns = [
     title: 'Claim Amt.',
   },
   {
-    name: 'chasClaimStatusDescription',
+    name: 'status',
     title: 'Claim Status',
   },
   {
@@ -149,6 +149,7 @@ export const ApprovedMedisaveColumnExtensions = [
     type: 'currency',
     currency: true,
     sortBy: 'chasClaimAmt',
+    width: 145,
   },
   {
     columnName: 'collectedPayment',
@@ -156,7 +157,7 @@ export const ApprovedMedisaveColumnExtensions = [
     currency: true,
     sortingEnabled: false,
     render: (row) => {
-      if (row.chasClaimStatusDescription === 'Paid')
+      if (row.collectedPayment) // if calculated has payment
         return (
           <NumberInput
             currency
@@ -175,7 +176,7 @@ export const ApprovedMedisaveColumnExtensions = [
     currency: true,
     sortBy: 'ApprovedAmt',
     render: (row) => {
-      if (row.chasClaimStatusDescription === 'Paid')
+      if (['AI','AP'].indexOf(row.responseStatusCode) >= 0) // if approved
         return (
           <NumberInput
             currency
@@ -187,5 +188,12 @@ export const ApprovedMedisaveColumnExtensions = [
         )
       return '-'
     },
+  },
+  {
+    columnName: 'status',
+    render: (row) => {
+      return row.collectedPayment ? 'Paid' : row.responseStatusDescription
+    },
+
   },
 ]

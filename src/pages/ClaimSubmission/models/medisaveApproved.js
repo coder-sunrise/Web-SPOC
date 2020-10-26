@@ -51,7 +51,7 @@ export default createListViewModel({
         })
       },
       *getApprovedStatus ({ payload }, { put, call }) {
-        const response = yield call(service.getStatus, payload)
+        const response = yield call(service.getMedisaveStatus, payload)
         const { data, status } = response
         if (status === '200') {
           return data
@@ -92,14 +92,15 @@ export default createListViewModel({
       },
 
       *submitInvoicePayment ({ payload }, { put, call }) {
+        console.log('medisaveClaimSubmissionApproved',payload)
         const response = yield call(service.postInvoicePayment, payload)
-
-        const { data, status } = response
-        if (status === '200') {
+        return response !== false
+        // const { data, status } = response
+        // if (status === '200') {
           // notification.success({ message: 'Collected' })
-          return true
-        }
-        return false
+        //   return true
+        // }
+        // return false
       },
     },
     reducers: {

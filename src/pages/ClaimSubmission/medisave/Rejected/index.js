@@ -80,13 +80,14 @@ class RejectedMedisave extends React.Component {
       this.handleLoadingVisibility(true)
       this.props
         .dispatch({
-          type: 'medisaveClaimSubmissionRejected/reSubmitChasClaim',
+          type: 'medisaveClaimSubmissionRejected/resubmitMedisaveClaim',
           payload: { claimIds: selectedRows },
         })
         .then((r) => {
           this.handleLoadingVisibility(false)
           if (r) {
             if (r.failedCount !== 0) {
+              console.log('failedCount',r.failedCount)
               this.props.handleSubmitClaimStatus(r.failedCount)
             } else {
               notification.success({

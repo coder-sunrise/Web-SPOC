@@ -28,6 +28,7 @@ import styles from './styles.js'
 class PatientInfoSideBanner extends PureComponent {
   state = {
     refreshedSchemeData: {},
+    refreshedSchemePayerData: [],
     patientIntoActiveSession: false,
   }
 
@@ -50,13 +51,15 @@ class PatientInfoSideBanner extends PureComponent {
   isMedisave = (schemeTypeFK) => {
     const { ctSchemeType } = this.props    
     const r = ctSchemeType.find((o) => o.id === schemeTypeFK)
-    return (
-      [
-        'FLEXIMEDI',
-        'OPSCAN',
-        'MEDIVISIT',
-      ].indexOf(r.code) >= 0
-    )
+    if(r.code)
+      return (
+        [
+          'FLEXIMEDI',
+          'OPSCAN',
+          'MEDIVISIT',
+        ].indexOf(r.code) >= 0
+      )
+    return false
   }
 
   refreshChasBalance = (patientCoPaymentSchemeFK, oldSchemeTypeFK) => {
@@ -84,6 +87,7 @@ class PatientInfoSideBanner extends PureComponent {
             setValues(pat)
           })
         }
+        console.log('result',result)
 
         const {
           balance,
@@ -143,6 +147,7 @@ class PatientInfoSideBanner extends PureComponent {
         schemePayers,
       },
     }).then((result) => {
+      console.log('result',result)
       if (result) {
         const params = locationQueryParameters()
         if (params.md !== 'visreg') {
@@ -155,40 +160,48 @@ class PatientInfoSideBanner extends PureComponent {
             setValues(pat)
           })
         }
-        console.log(result)
 
         const {
-          balance,
-          schemeTypeFk,
+          // balance,
+          // schemeTypeFk,
           validFrom,
           validTo,
+          payerBalance,
           isSuccessful,
+          status,
           statusDescription,
         } = result
         let isShowReplacementModal = false
-        if (!isSuccessful) {
-          this.setState({
-            refreshedSchemePayerData: {
-              statusDescription,
-              isSuccessful,
-            },
-          })
-        } else {
-          if (oldSchemeTypeFK !== schemeTypeFk) {
-            isShowReplacementModal = true
-          }
-          this.setState({
-            refreshedSchemePayerData: {
-              isShowReplacementModal,
-              oldSchemeTypeFK,
-              balance,
-              schemeTypeFK: schemeTypeFk,
-              validFrom,
-              validTo,
-              isSuccessful,
-            },
+        let payerBalanceList = []
+        if (isSuccessful && payerBalance)
+        {
+          payerBalance.forEach(pb => {
+            if(pb.enquiryType === 'MSVBAL') return
+            if (oldSchemeTypeFK !== pb.schemeTypeFK) {
+              isShowReplacementModal = true
+            }
+            const { finalBalance } = pb
+            payerBalanceList.push({
+                isShowReplacementModal,
+                oldSchemeTypeFK,
+                finalBalance,
+                schemeTypeFK: pb.schemeTypeFK,
+                schemePayerFK: pb.schemePayerFK,
+                validFrom,
+                validTo,
+                isSuccessful,
+            })
           })
         }
+
+        this.setState({
+          refreshedSchemePayerData: {
+            statusDescription,
+            isSuccessful,
+            payerBalanceList,
+          },
+        })
+
       }
     })
   }
@@ -268,17 +281,39 @@ class PatientInfoSideBanner extends PureComponent {
 
   
   getSchemePayerDetails = (schemePayer) => {
-    if (
-      !_.isEmpty(this.state.refreshedSchemePayerData) &&
-      this.state.refreshedSchemePayerData.isSuccessful === true
-    ) {
-      return { ...this.state.refreshedSchemePayerData }
-    }
-
     const { patientScheme } = this.props.entity
-
     const schemeData = patientScheme.find((row) => row.schemeTypeFK === schemePayer.schemeFK)
     const balanceData = schemeData.patientSchemeBalance.find((row) => row.schemePayerFK === schemePayer.id)
+
+    if (
+      !_.isEmpty(this.state.refreshedSchemePayerData.payerBalanceList) 
+      && this.state.refreshedSchemePayerData.isSuccessful === true
+    ) {
+      console.log('this.state.refreshedSchemePayerData',this.state.refreshedSchemePayerData)
+      // return { ...this.state.refreshedSchemePayerData }
+      
+      const refreshData = this.state.refreshedSchemePayerData.payerBalanceList.find((row) => row.schemePayerFK === schemePayer.id)
+
+      console.log('refreshData', refreshData)
+
+      if(refreshData)
+        return {
+          payerName: schemePayer.payerName,
+          payerAccountNo: schemePayer.payerID,
+          balance: balanceData.balance ??  '',
+          patientCoPaymentSchemeFK: refreshData.finalBalance,
+          schemeTypeFK: refreshData.schemeTypeFK,
+          validFrom: schemeData.validFrom,
+          validTo: schemeData.validTo,
+          statusDescription: refreshData.statusDescription,
+          isSuccessful:
+          refreshData.isSuccessful !== ''
+              ? refreshData.isSuccessful
+              : '',
+        }
+    }
+
+    const errorData = this.state.refreshedSchemePayerData
 
     return {
       payerName: schemePayer.payerName,
@@ -288,13 +323,11 @@ class PatientInfoSideBanner extends PureComponent {
       schemeTypeFK: schemePayer.schemeFK,
       validFrom: schemeData.validFrom,
       validTo: schemeData.validTo,
-      statusDescription: this.state.refreshedSchemeData.statusDescription,
-      isSuccessful:
-        this.state.refreshedSchemeData.isSuccessful !== ''
-          ? this.state.refreshedSchemeData.isSuccessful
-          : '',
+      statusDescription: errorData.statusDescription || schemeData.statusDescription,
+      isSuccessful: errorData.isSuccessful || schemeData.isSuccessful,
     }
   }
+
 
   render () {
     const {
@@ -314,6 +347,8 @@ class PatientInfoSideBanner extends PureComponent {
       [classes.entityName]: true,
       [classes.isInActive]: !entity || !entity.isActive,
     })
+
+    console.log('refreshedSchemePayerData',this.state.refreshedSchemePayerData)
 
     return entity && entity.id ? (
       <React.Fragment>
@@ -492,6 +527,7 @@ class PatientInfoSideBanner extends PureComponent {
             {entity.schemePayer
               .filter((o) => this.isMedisave(o.schemeFK) && !o.isDeleted)
               .map((o) => {
+                // console.log('schemePayer',o)
                 const schemeData = this.getSchemePayerDetails(o)
                 return (
                   <LoadingWrapper loading={loading} text='Retrieving balance...'>
@@ -530,21 +566,23 @@ class PatientInfoSideBanner extends PureComponent {
                           schemeData={schemeData}
                         /> */}
                       </p>}
+                      <div>
+                        <p>
+                          Payer:&nbsp;
+                          {schemeData.payerName}&nbsp;
+                          [{schemeData.payerAccountNo}]
+                        </p>
+                        <p>
+                          <NumberInput
+                            prefix='Balance:'
+                            text
+                            currency
+                            value={schemeData.balance || '-'}
+                          />
+                        </p>
+                      </div>
                       {schemeData.validFrom && (
                         <div>
-                          <p>
-                            Payer:&nbsp;
-                            {schemeData.payerName}&nbsp;
-                            [{schemeData.payerAccountNo}]
-                          </p>
-                          <p>
-                            <NumberInput
-                              prefix='Balance:'
-                              text
-                              currency
-                              value={schemeData.balance}
-                            />
-                          </p>
                           <p>
                             <DatePicker
                               prefix='Validity:'
@@ -560,11 +598,15 @@ class PatientInfoSideBanner extends PureComponent {
                               value={schemeData.validTo}
                             />
                           </p>
-                          <p style={{ color: 'red' }}>
-                            {schemeData.statusDescription}
-                          </p>
                         </div>
                       )}
+                      {schemeData.statusDescription && (
+                      <div>
+                        <p style={{ color: 'red' }}>
+                          {schemeData.statusDescription}
+                        </p>
+                      </div>
+                        )}
                     </div>
                   </LoadingWrapper>
                 )

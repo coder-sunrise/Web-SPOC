@@ -20,8 +20,9 @@ export default createListViewModel({
       })
     },
     effects: {
-      *submitChasClaim ({ payload }, { put, call }) {
-        const response = yield call(service.submitChasClaim, payload)
+      *submitMedisaveClaim ({ payload }, { put, call }) {
+        console.log('submitMedisaveClaim',payload)
+        const response = yield call(service.submitMedisaveClaim, payload)
         const { data, status } = response
         if (status === '200') {
           return data

@@ -75,6 +75,7 @@ class MedisaveVaccinations extends PureComponent {
           type: 'radio',
           align: 'center',
           sortingEnabled: false,
+          width: '100px',
           onChange: (row) => {
             const { rows, setFieldValue } = this.props
 

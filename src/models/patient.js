@@ -299,11 +299,12 @@ export default createFormViewModel({
 
         const response = yield call(service.requestMedisaveBalance, newPayload)
 
+        console.log('response', response)
         const { data } = response
         let result = { isSuccessful: false }
 
         if (data) {
-          const status = getRefreshMedisaveBalanceStatus(data.status)
+          const status = getRefreshMedisaveBalanceStatus(data)
           return { ...data, ...status }
         }
 

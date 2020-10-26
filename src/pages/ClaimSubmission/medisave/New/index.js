@@ -81,14 +81,16 @@ class NewMedisave extends React.Component {
     const { selectedRows } = this.state
     if (selectedRows.length > 0) {
       this.handleLoadingVisibility(true)
+      console.log('onSubmitClaimClicked',this.props)
       this.props
         .dispatch({
-          type: 'medisaveClaimSubmissionNew/submitChasClaim',
+          type: 'medisaveClaimSubmissionNew/submitMedisaveClaim',
           payload: { claimIds: selectedRows },
         })
         .then((r) => {
           this.handleLoadingVisibility(false)
           if (r) {
+            console.log('saved',r)
             if (r.failedCount !== 0) {
               this.props.handleSubmitClaimStatus(r.failedCount)
             } else {
@@ -113,6 +115,8 @@ class NewMedisave extends React.Component {
     } = this.props
     const { isLoading, selectedRows } = this.state
     const { list } = medisaveClaimSubmissionNew || []
+
+    console.log('New',list)
 
     return (
       <CardContainer

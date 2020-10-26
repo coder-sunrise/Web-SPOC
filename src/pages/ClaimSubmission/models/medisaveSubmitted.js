@@ -20,7 +20,7 @@ export default createListViewModel({
     },
     effects: {
       *getSubmittedStatus ({ payload }, { put, call }) {
-        const response = yield call(service.getStatus, payload)
+        const response = yield call(service.getMedisaveStatus, payload)
         const { data, status } = response
         if (status === '200') {
           return data

@@ -32,9 +32,9 @@ class PayersGrid extends PureComponent {
           const payerAge = moment(row.dob)
 
           if(payerAge.isAfter(minAge))
-          notification.error({
-            message: 'Payer DOB must be equal or more than 65 for Flexi-Medisave',
-          })
+            notification.error({
+              message: 'Payer DOB must be equal or more than 65 for Flexi-Medisave',
+            })
         },
       },
       {
@@ -99,6 +99,18 @@ class PayersGrid extends PureComponent {
             <span>{patSchemeType ? patSchemeType.name : ''}</span>
           )
         },
+        onChange: ({ row }) => {  
+          const { patientScheme } = this.props.values
+
+          if(!patientScheme.find(ps => ps.schemeTypeFK === row.schemeFK))
+          {
+            row.schemeFK = undefined
+            console.log('changed-error',row.schemeFK)
+            notification.error({
+              message: 'Scheme for Medisave Payer not in list of added Schemes.',
+            })
+          }
+        },
       },
     ],
   }
@@ -123,6 +135,7 @@ class PayersGrid extends PureComponent {
   }
 
   render () {
+    console.log('PayersGrid', this.props)
     const { enableAdd, rows, schema } = this.props
 
     const EditingProps = {

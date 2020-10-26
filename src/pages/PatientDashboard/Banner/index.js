@@ -50,6 +50,7 @@ class Banner extends PureComponent {
   state = {
     showWarning: false,
     refreshedSchemeData: {},
+    refreshedSchemePayerData: {},
     currPatientCoPaymentSchemeFK: 0,
     currentSchemeType: 0,
   }
@@ -278,30 +279,50 @@ class Banner extends PureComponent {
           },
         })
 
+
         const {
-          balance,
-          schemeTypeFk,
+          // balance,
+          // schemeTypeFk,
           validFrom,
           validTo,
+          payerBalance,
           isSuccessful,
+          status,
           statusDescription,
         } = result
         let isShowReplacementModal = false
         if (!isSuccessful) {
           this.setState({
             refreshedSchemePayerData: {
+              payerBalanceList: [],
               statusDescription,
               isSuccessful,
             },
           })
-        } else {
+        } else if (payerBalance){
+          
+          let payerBalanceList = []
+          payerBalance.forEach(pb => {
+            if(pb.enquiryType === 'MSVBAL') return
+            /* if (oldSchemeTypeFK !== pb.schemeTypeFK) {
+              isShowReplacementModal = true
+            } */
+            const { finalBalance } = pb
+            payerBalanceList.push({
+                isShowReplacementModal,
+                // oldSchemeTypeFK,
+                finalBalance,
+                schemeTypeFK: pb.schemeTypeFK,
+                schemePayerFK: pb.schemePayerFK,
+                validFrom,
+                validTo,
+                isSuccessful,
+            })
+          })
           this.setState({
             refreshedSchemePayerData: {
-              isShowReplacementModal,
-              balance,
-              schemeTypeFK: schemeTypeFk,
-              validFrom,
-              validTo,
+              payerBalanceList,
+              statusDescription,
               isSuccessful,
             },
           })
@@ -321,37 +342,6 @@ class Banner extends PureComponent {
         'MEDIVISIT',
       ].indexOf(r.code) >= 0
     )
-  }
-
-  getSchemePayerDetails = (schemePayer) => {
-    if (
-      !_.isEmpty(this.state.refreshedSchemePayerData) &&
-      this.state.refreshedSchemePayerData.isSuccessful === true
-    ) {
-      return { ...this.state.refreshedSchemePayerData }
-    }
-
-    const { patientScheme } = this.props.patient.entity
-
-    const schemeData = patientScheme.find((row) => row.schemeTypeFK === schemePayer.schemeFK)
-    const balanceData = schemeData.patientSchemeBalance.find((row) => row.schemePayerFK === schemePayer.id)
-
-    return {
-      payerName: schemePayer.payerName,
-      payerAccountNo: schemePayer.payerID,
-      balance: balanceData.balance ??  '',
-      patientCoPaymentSchemeFK: balanceData.patientCopaymentSchemeFK,
-      schemeTypeFK: schemePayer.schemeFK,
-      validFrom: schemeData.validFrom,
-      validTo: schemeData.validTo,
-      statusDescription: this.state.refreshedSchemeData.statusDescription,
-      isSuccessful:
-        this.state.refreshedSchemeData.isSuccessful !== ''
-          ? this.state.refreshedSchemeData.isSuccessful
-          : '',
-      schemeTypeName: '',
-      copaymentSchemeName: 'Medisave',
-    }
   }
 
   getSchemeDetails = (schemeData) => {
@@ -424,6 +414,55 @@ class Banner extends PureComponent {
           : '',
       schemeTypeName: schemeType ? schemeType.name : undefined,
       copaymentSchemeName: copaymentScheme ? copaymentScheme.name : undefined,
+    }
+  }
+
+  getSchemePayerDetails = (schemePayer) => {
+    const { patientScheme } = this.props.patient.entity
+    const schemeData = patientScheme.find((row) => row.schemeTypeFK === schemePayer.schemeFK)
+    const balanceData = schemeData.patientSchemeBalance.find((row) => row.schemePayerFK === schemePayer.id)
+
+    if (
+      !_.isEmpty(this.state.refreshedSchemePayerData.payerBalanceList) 
+      && this.state.refreshedSchemePayerData.isSuccessful === true
+    ) {
+      // return { ...this.state.refreshedSchemePayerData }
+      
+      const refreshData = this.state.refreshedSchemePayerData.payerBalanceList.find((row) => row.schemePayerFK === schemePayer.id)
+
+      if(refreshData)
+        return {
+          payerName: schemePayer.payerName,
+          payerAccountNo: schemePayer.payerID,
+          balance: balanceData.balance ??  '',
+          patientCoPaymentSchemeFK: refreshData.finalBalance,
+          schemeTypeFK: refreshData.schemeTypeFK,
+          validFrom: schemeData.validFrom,
+          validTo: schemeData.validTo,
+          statusDescription: refreshData.statusDescription,
+          isSuccessful:
+          refreshData.isSuccessful !== ''
+              ? refreshData.isSuccessful
+              : '',
+          schemeTypeName: '',
+          copaymentSchemeName: 'Medisave',
+        }
+    }
+
+    const errorData = this.state.refreshedSchemePayerData
+
+    return {
+      payerName: schemePayer.payerName,
+      payerAccountNo: schemePayer.payerID,
+      balance: balanceData.balance ??  '',
+      patientCoPaymentSchemeFK: balanceData.patientCopaymentSchemeFK,
+      schemeTypeFK: schemePayer.schemeFK,
+      validFrom: schemeData.validFrom,
+      validTo: schemeData.validTo,
+      statusDescription: errorData.statusDescription || schemeData.statusDescription,
+      isSuccessful: errorData.isSuccessful || schemeData.isSuccessful,
+      schemeTypeName: '',
+      copaymentSchemeName: 'Medisave',
     }
   }
 

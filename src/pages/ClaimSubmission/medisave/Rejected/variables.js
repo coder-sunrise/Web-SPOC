@@ -123,6 +123,12 @@ export const RejectedMedisaveColumnExtensions = [
     sortBy: 'claimAmt',
   },
   {
+    columnName: 'chasClaimAmt',
+    type: 'currency',
+    currency: true,
+    sortBy: 'chasClaimAmt',
+  },
+  {
     columnName: 'visitDoctorName',
     sortBy: 'DoctorProfileFKNavigation.ClinicianProfile.Name',
   },
