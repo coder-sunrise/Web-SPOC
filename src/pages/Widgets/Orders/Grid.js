@@ -549,6 +549,16 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
                               uid: row.uid,
                             },
                           })
+
+                          if (row.isPackage === true) {
+                            dispatch({
+                              type: 'orders/deletePackageItem',
+                              payload: {
+                                packageGlobalId: row.packageGlobalId,
+                              },
+                            })
+                          }
+
                           dispatch({
                             type: 'orders/updateState',
                             payload: {

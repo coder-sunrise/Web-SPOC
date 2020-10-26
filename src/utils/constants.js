@@ -515,3 +515,10 @@ export const REVENUE_CATEGORY = {
   CONSUMABLE: 6,
   OTHER: 7,
 }
+
+export const DURATION_UNIT = {
+  DAY: 1,
+  WEEK: 2,
+  MONTH: 3,
+  YEAR: 4,
+}

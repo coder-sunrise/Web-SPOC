@@ -64,7 +64,7 @@ const initialState = {
     orderSetItems: [],
   },
   defaultTreatment: {},
-  corPackages: [],
+  corPackage: [],
   defaultPackage: {
     packageItems: [],
   },
@@ -152,6 +152,13 @@ export default createListViewModel({
       *addPackage ({ payload }, { select, call, put, delay }) {
         yield put({
           type: 'addPackageState',
+          payload,
+        })
+      },
+
+      *deletePackageItem ({ payload }, { select, call, put, delay }) {
+        yield put({
+          type: 'deletePackageItemState',
           payload,
         })
       },
@@ -313,14 +320,29 @@ export default createListViewModel({
       },
 
       addPackageState (state, { payload }) {
-        let { corPackages } = state
-        corPackages.push({
+        let { corPackage } = state
+        corPackage.push({
           ...payload,
           uid: getUniqueId(),
         })
         return {
           ...state,
-          corPackages,
+          corPackage,
+        }
+      },
+
+      deletePackageItemState (state, { payload }) {
+        let { corPackage, rows } = state
+        
+        const activePackageItems = rows.filter(item => item.packageGlobalId === payload.packageGlobalId && item.isDeleted === false)
+        if (activePackageItems.length === 0) {
+          const beDeletedPackage = corPackage.find(p => p.packageGlobalId === payload.packageGlobalId)
+          beDeletedPackage.isDeleted = true
+        }
+        
+        return {
+          ...state,
+          corPackage,
         }
       },
     },

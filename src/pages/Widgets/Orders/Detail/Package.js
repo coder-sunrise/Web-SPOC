@@ -11,12 +11,19 @@ import {
   Field,
   serverDateTimeFormatFull,
   notification,
+  DatePicker,
 } from '@/components'
 import Yup from '@/utils/yup'
-import { getUniqueId, roundTo } from '@/utils/utils'
+import { getUniqueId, getUniqueGUID, roundTo } from '@/utils/utils'
 import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
+import { DURATION_UNIT } from '@/utils/constants'
 
-@connect(({ global, codetable, user }) => ({ global, codetable, user }))
+@connect(({ global, codetable, user, visitRegistration }) => ({ 
+  global, 
+  codetable, 
+  user,
+  visitRegistration,
+}))
 @withFormikExtend({
   authority: [
     'queue.consultation.order.package',
@@ -33,11 +40,17 @@ import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
     packageFK: Yup.number().required(),
   }),
   handleSubmit: (values, { props, onConfirm, setValues }) => {
-    const { dispatch, orders, codetable, getNextSequence, user } = props
+    const { dispatch, orders, codetable, getNextSequence, user, visitRegistration } = props
     const {
       inventorymedication,
       inventoryvaccination,
+      doctorprofile,
     } = codetable
+
+    const { doctorProfileFK } = visitRegistration.entity.visit
+    const visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK).clinicianProfile.userProfileFK
+
+    const packageGlobalId = getUniqueGUID()
 
     const getInstruction = (medication) => {
       let instruction = ''
@@ -56,7 +69,7 @@ import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
       return instruction
     }
 
-    const getOrderMedicationFromPackage = (packageCode, packageItem) => {
+    const getOrderMedicationFromPackage = (packageCode, packageName, packageItem) => {
       const medication = inventorymedication.find(
         (item) =>
           item.id === packageItem.inventoryMedicationFK,
@@ -100,8 +113,7 @@ import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
           adjValue: 0,
           isClaimable: true,
           totalAfterItemAdjustment: packageItem.subTotal,
-          totalAfterOverallAdjustment: packageItem.subTotal,
-          packageCode,
+          totalAfterOverallAdjustment: packageItem.subTotal,          
           expiryDate: isDefaultBatchNo
             ? isDefaultBatchNo.expiryDate
             : undefined,
@@ -150,15 +162,18 @@ import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
             },
           ],
           isPackage: true,
+          packageCode,
+          packageName,
           defaultConsumeQuantity: packageItem.defaultConsumeQuantity,
           packageConsumeQuantity: packageItem.consumeQuantity,
-          // performingUserFK: 1,
+          performingUserFK: visitDoctorUserId,
+          packageGlobalId,
         }
       }
       return item
     }
 
-    const getOrderVaccinationFromPackage = (packageCode, packageItem) => {
+    const getOrderVaccinationFromPackage = (packageCode, packageName, packageItem) => {
       const vaccination = inventoryvaccination.find(
         (item) =>
           item.id === packageItem.inventoryVaccinationFK,
@@ -200,15 +215,17 @@ import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
           adjValue: 0,
           totalAfterItemAdjustment: packageItem.subTotal,
           totalAfterOverallAdjustment: packageItem.subTotal,
-          packageCode,
           expiryDate: isDefaultBatchNo
             ? isDefaultBatchNo.expiryDate
             : undefined,
           batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
           isPackage: true,
+          packageCode,
+          packageName,
           defaultConsumeQuantity: packageItem.defaultConsumeQuantity,
           packageConsumeQuantity: packageItem.consumeQuantity,
-          // performingUserFK: 1,
+          performingUserFK: visitDoctorUserId,
+          packageGlobalId,
         }
       }
       return item
@@ -216,6 +233,7 @@ import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
 
     const getOrderServiceCenterServiceFromPackage = (
       packageCode,
+      packageName,
       packageItem,
     ) => {
       let item
@@ -230,20 +248,22 @@ import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
         adjValue: 0,
         totalAfterItemAdjustment: packageItem.subTotal,
         totalAfterOverallAdjustment: packageItem.subTotal,
-        packageCode,
         serviceCode: packageItem.serviceCode,
         serviceName: packageItem.serviceName,
         serviceFK: packageItem.serviceFK,
         serviceCenterFK: packageItem.serviceCenterFK,
         isPackage: true,
+        packageCode,
+        packageName,
         defaultConsumeQuantity: packageItem.defaultConsumeQuantity,
         packageConsumeQuantity: packageItem.consumeQuantity,
-        // performingUserFK: 1,        
+        performingUserFK: visitDoctorUserId,   
+        packageGlobalId,   
       }
       return item
     }
 
-    const getOrderConsumableFromPackage = (packageCode, packageItem) => {
+    const getOrderConsumableFromPackage = (packageCode, packageName, packageItem) => {
       let item
       item = {
         inventoryConsumableFK: packageItem.inventoryConsumableFK,
@@ -256,40 +276,42 @@ import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
         adjValue: 0,
         totalAfterItemAdjustment: packageItem.subTotal,
         totalAfterOverallAdjustment: packageItem.subTotal,
-        packageCode,
         consumableCode: packageItem.consumableCode,
         consumableName: packageItem.consumableName,
         isPackage: true,
+        packageCode,
+        packageName,
         defaultConsumeQuantity: packageItem.defaultConsumeQuantity,
         packageConsumeQuantity: packageItem.consumeQuantity,
-        // performingUserFK: 1,
+        performingUserFK: visitDoctorUserId,
+        packageGlobalId,
       }
 
       return item
     }
 
-    const getOrderFromPackage = (packageCode, packageItem) => {
+    const getOrderFromPackage = (packageCode, packageName, packageItem) => {
       let item
       if (packageItem.type === '1') {
-        item = getOrderMedicationFromPackage(packageCode, packageItem)
+        item = getOrderMedicationFromPackage(packageCode, packageName, packageItem)
       }
       if (packageItem.type === '2') {
-        item = getOrderVaccinationFromPackage(packageCode, packageItem)
+        item = getOrderVaccinationFromPackage(packageCode, packageName, packageItem)
       }
       if (packageItem.type === '3') {
-        item = getOrderServiceCenterServiceFromPackage(packageCode, packageItem)
+        item = getOrderServiceCenterServiceFromPackage(packageCode, packageName, packageItem)
       }
       if (packageItem.type === '4') {
-        item = getOrderConsumableFromPackage(packageCode, packageItem)
+        item = getOrderConsumableFromPackage(packageCode, packageName, packageItem)
       }
       return item
     }
 
-    const { packageItems, packageCode } = values
+    const { packageItems, selectedPackage, expiryDate } = values
     let datas = []
     let nextSequence = getNextSequence()
     for (let index = 0; index < packageItems.length; index++) {
-      const newOrder = getOrderFromPackage(packageCode, packageItems[index])
+      const newOrder = getOrderFromPackage(selectedPackage.code, selectedPackage.displayValue, packageItems[index])
       if (newOrder) {
         const data = {
           isOrderedByDoctor:
@@ -304,11 +326,26 @@ import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
         nextSequence += 1
       }
     }
-    console.log('handleSubmit', datas)
+    
     dispatch({
       type: 'orders/upsertRows',
       payload: datas,
     })
+
+    if (datas.length > 0) {
+      dispatch({
+        type: 'orders/addPackage',
+        payload: {
+          packageFK: selectedPackage.id,
+          packageCode: selectedPackage.code,
+          packageName: selectedPackage.displayValue,
+          expiryDate,
+          totalPrice: selectedPackage.totalPrice,
+          packageGlobalId,
+        },
+      })
+    }
+
     if (onConfirm) onConfirm()
     setValues({
       ...orders.defaultPackage,
@@ -320,7 +357,6 @@ import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
 class Package extends PureComponent {
   constructor (props) {
     super(props)
-    const { dispatch } = props
 
     const calUnitPrice = (e) => {
       const { row } = e
@@ -389,6 +425,35 @@ class Package extends PureComponent {
           onChange: calUnitPrice,
         },
       ],
+    }
+
+    const calculateExpiryDate = (duration, durationUnit) => {
+      const today = new Date()
+      let untilDate
+      if (duration) {
+        switch (durationUnit) {
+          case DURATION_UNIT.DAY:
+            untilDate = moment(today).add(duration, 'days').toDate()
+            break
+          case DURATION_UNIT.WEEK:
+            untilDate = moment(today).add(duration, 'weeks').toDate()
+            break
+          case DURATION_UNIT.MONTH:
+            untilDate = moment(today).add(duration, 'months').toDate()
+            break
+          case DURATION_UNIT.YEAR:
+            untilDate = moment(today).add(duration, 'years').toDate()
+            break
+          default:
+            break
+        }
+
+        untilDate = new Date(
+          Date.UTC(untilDate.getUTCFullYear(), untilDate.getUTCMonth(), untilDate.getUTCDate())
+        )
+      }
+
+      return untilDate
     }
 
     this.changePackage = (v, op) => {
@@ -462,10 +527,13 @@ class Package extends PureComponent {
           }),
         )
       }
+
+      const untilDate = calculateExpiryDate(op.validDuration, op.durationUnitFK)   
       setValues({
         ...values,
         packageItems: rows,
-        packageCode: op ? op.code : '',
+        selectedPackage: op,
+        expiryDate: untilDate,
       })
     }
 
@@ -535,6 +603,19 @@ class Package extends PureComponent {
                   </div>
                 )
               }}
+            />
+          </GridItem>
+          <GridItem xs={2}>
+            <Field
+              name='expiryDate'
+              render={(args) => {
+                  return (
+                    <DatePicker
+                      label='Expiry Date'
+                      {...args}
+                    />
+                  )
+                }}
             />
           </GridItem>
           <GridItem xs={12}>
