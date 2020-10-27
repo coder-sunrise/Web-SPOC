@@ -125,7 +125,7 @@ class PatientDocument extends Component {
             patientProfileFK: findGetParameter('pid'),
             sortOrder: startOrder + index,
             fileIndexFK: attachment.fileIndexFK,
-            fileName: attachment.fileName,
+            displayValue: attachment.fileName,
             patientAttachment_Folder: attachment.patientAttachment_Folder,
           },
         }),

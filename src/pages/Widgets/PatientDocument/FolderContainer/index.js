@@ -73,6 +73,7 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
     })
     const payload = {
       ...file,
+      displayValue: file.fileName,
       patientAttachment_Folder,
     }
 
