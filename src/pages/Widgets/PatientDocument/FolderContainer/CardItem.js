@@ -165,6 +165,7 @@ class CardItem extends Component {
                 onAddNewFolders={onAddNewFolders}
               />
               <Popconfirm
+                title='Are you sure want to permanently delete this file in all folders?'
                 onConfirm={() => {
                   dispatch({
                     type: 'patientAttachment/removeRow',
