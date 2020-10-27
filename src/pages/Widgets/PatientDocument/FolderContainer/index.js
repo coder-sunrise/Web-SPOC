@@ -1,23 +1,8 @@
 import React, { useState } from 'react'
-import {
-  Button,
-  GridContainer,
-  GridItem,
-  TextField,
-  CommonModal,
-} from '@/components'
+import { CommonModal } from '@/components'
 import printJS from 'print-js'
-import moment from 'moment'
-import _ from 'lodash'
-import {
-  downloadAttachment,
-  getFileByFileID,
-  getPDFFile,
-} from '@/services/file'
-import {
-  arrayBufferToBase64,
-  BASE64_MARKER,
-} from '@/components/_medisys/ReportViewer/utils'
+import { getFileByFileID } from '@/services/file'
+import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
 
 import Grid from './Grid'
 import CardView from './CardView'

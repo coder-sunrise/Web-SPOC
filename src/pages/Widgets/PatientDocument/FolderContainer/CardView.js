@@ -1,9 +1,5 @@
 import React, { Component } from 'react'
-import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
-
-import { CardContainer } from '@/components'
-
 import Card from '@material-ui/core/Card'
 import CardContent from '@material-ui/core/CardContent'
 
@@ -16,9 +12,9 @@ const styles = () => ({
     flexWrap: 'wrap',
   },
   card: {
-    width: 250,
+    width: 300,
     margin: 5,
-    height: 200,
+    height: 330,
   },
   bullet: {
     display: 'inline-block',
@@ -51,13 +47,47 @@ const styles = () => ({
   },
 })
 
+const CardZoom = [
+  {
+    zoom: 5,
+    width: 800,
+    height: 750,
+  },
+  {
+    zoom: 4,
+    width: 650,
+    height: 750,
+  },
+  {
+    zoom: 3,
+    width: 400,
+    height: 400,
+  },
+  {
+    zoom: 2,
+    width: 330,
+    height: 390,
+  },
+  {
+    zoom: 1,
+    width: 260,
+    height: 300,
+  },
+]
+
 class CardView extends Component {
   downloadFile = (row) => {
     downloadAttachment(row)
   }
 
   render () {
-    const { classes, attachmentList = {}, selectedFolderFK } = this.props
+    const {
+      classes,
+      attachmentList = {},
+      selectedFolderFK,
+      zoom = 4,
+    } = this.props
+    const zoomStyle = CardZoom.find((c) => c.zoom === zoom)
 
     return (
       <div className={classes.root}>
@@ -69,9 +99,20 @@ class CardView extends Component {
           )
           .map((p) => {
             return (
-              <Card className={classes.card}>
+              <Card
+                style={{
+                  width: zoomStyle.width,
+                  height: zoomStyle.height,
+                  margin: 5,
+                }}
+              >
                 <CardContent>
-                  <CardItem key={p.id} file={p} {...this.props} />
+                  <CardItem
+                    key={p.id}
+                    file={p}
+                    {...this.props}
+                    {...zoomStyle}
+                  />
                 </CardContent>
               </Card>
             )

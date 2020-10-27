@@ -117,20 +117,20 @@ class DragableItem extends Component {
                       }}
                     />
                   </div>
-                  {item.fileCount === 0 && (
-                    <Button
-                      color='danger'
-                      justIcon
-                      style={{
-                        float: 'right',
-                      }}
-                      onClick={(e) => {
-                        onItemChanged({ ...item, isDeleted: true })
-                      }}
-                    >
-                      <Delete />
-                    </Button>
-                  )}
+
+                  <Button
+                    color='danger'
+                    justIcon
+                    disabled={item.fileCount > 0}
+                    style={{
+                      float: 'right',
+                    }}
+                    onClick={(e) => {
+                      onItemChanged({ ...item, isDeleted: true })
+                    }}
+                  >
+                    <Delete />
+                  </Button>
                 </div>
               )
             ) : (

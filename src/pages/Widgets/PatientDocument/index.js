@@ -1,50 +1,28 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
 
-// printjs
-import printJS from 'print-js'
-
 // material ui
-import { withStyles } from '@material-ui/core'
+import { withStyles, Slider } from '@material-ui/core'
+
 // styles
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 // common components
 import {
-  FastField,
-  Carousel,
-  CommonModal,
   GridContainer,
   GridItem,
   CardContainer,
   Button,
-  IconButton,
+  Tooltip,
+  Popover,
 } from '@/components'
-import { Attachment } from '@/components/_medisys'
 // sub components
 import { findGetParameter } from '@/utils/utils'
 import {
-  arrayBufferToBase64,
-  BASE64_MARKER,
-} from '@/components/_medisys/ReportViewer/utils'
-import {
-  downloadAttachment,
-  getFileByFileID,
-  getPDFFile,
-} from '@/services/file'
-import {
-  getPDF,
-  getUnsavedPDF,
-  exportUnsavedReport,
-  exportPdfReport,
-  exportExcelReport,
-} from '@/services/report'
-import {
-  CreateNewFolder,
   List as ListIcon,
   Apps as AppsIcon,
+  ZoomIn as ZoomInIcon,
 } from '@material-ui/icons'
 
-import Filter from './Filter'
 // models
 import model from './models'
 import FolderList from './FolderList/index'
@@ -56,14 +34,6 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-const imageExt = [
-  'JPG',
-  'JPEG',
-  'PNG',
-  'BMP',
-  'GIF',
-]
-
 @connect(({ patientAttachment, folder }) => ({
   patientAttachment,
   folder,
@@ -71,7 +41,8 @@ const imageExt = [
 class PatientDocument extends Component {
   state = {
     selectedFolderFK: -99, // all
-    viewMode: 'list',
+    viewMode: 'card',
+    zoom: 4,
   }
 
   componentDidMount () {
@@ -172,7 +143,7 @@ class PatientDocument extends Component {
 
   render () {
     const { patient: { entity }, patientAttachment, folder } = this.props
-    const { viewMode, selectedFolderFK } = this.state
+    const { viewMode, selectedFolderFK, zoom } = this.state
     const patientIsActive = entity && entity.isActive
     const { list = [] } = patientAttachment
 
@@ -213,29 +184,66 @@ class PatientDocument extends Component {
             <GridContainer style={{ height: 'auto' }}>
               <GridItem md={12} align='Right' style={{ marginBottom: 10 }}>
                 <div>
-                  <Button
-                    justIcon
-                    color='primary'
-                    onClick={() => {
-                      this.setState({ viewMode: 'list' })
-                    }}
-                  >
-                    <ListIcon />
-                  </Button>
-                  <Button
-                    justIcon
-                    color='primary'
-                    onClick={() => {
-                      this.setState({ viewMode: 'card' })
-                    }}
-                  >
-                    <AppsIcon />
-                  </Button>
+                  {viewMode === 'card' && (
+                    <Popover
+                      icon={null}
+                      placement='bottom'
+                      content={
+                        <div style={{ width: 150 }}>
+                          <Slider
+                            // orientation='vertical'
+                            // getAriaValueText={valuetext}
+                            defaultValue={4}
+                            aria-labelledby='vertical-slider'
+                            valueLabelDisplay='off'
+                            step={1}
+                            marks
+                            min={1}
+                            max={5}
+                            onChange={(e, v) => {
+                              if (zoom !== v) {
+                                this.setState({ zoom: v })
+                              }
+                            }}
+                          />
+                        </div>
+                      }
+                    >
+                      <Tooltip title='Zoom'>
+                        <Button justIcon color='primary'>
+                          <ZoomInIcon />
+                        </Button>
+                      </Tooltip>
+                    </Popover>
+                  )}
+                  <Tooltip title='List View'>
+                    <Button
+                      justIcon
+                      color='primary'
+                      onClick={() => {
+                        this.setState({ viewMode: 'list' })
+                      }}
+                    >
+                      <ListIcon />
+                    </Button>
+                  </Tooltip>
+                  <Tooltip title='Card View'>
+                    <Button
+                      justIcon
+                      color='primary'
+                      onClick={() => {
+                        this.setState({ viewMode: 'card' })
+                      }}
+                    >
+                      <AppsIcon />
+                    </Button>
+                  </Tooltip>
                 </div>
               </GridItem>
               <GridItem md={12}>
                 <FolderContainer
                   {...this.props}
+                  zoom={zoom}
                   readOnly={!patientIsActive}
                   folderList={folderList}
                   viewMode={viewMode}

@@ -69,7 +69,6 @@ class CardItem extends Component {
     this.state = {
       loading: false,
       imageData: undefined,
-      isEditMode: false,
     }
   }
 
@@ -105,7 +104,6 @@ class CardItem extends Component {
         this.setState({
           loading: false,
           imageData: contentInBase64,
-          selectedFileId,
         })
       }
     })
@@ -120,22 +118,21 @@ class CardItem extends Component {
       dispatch,
       onPreview,
       onEditFileName,
-      patient: { entity },
       readOnly,
+      width,
+      height,
     } = this.props
     const { loading, imageData } = this.state
-    const patientIsActive = entity && entity.isActive
 
     return (
       <LoadingWrapper loading={loading}>
         <GridContainer>
-          <GridItem md={8}>
-            <TextField
-              value={moment(file.createDate).format(dateFormatLong)}
-              text
-            />
+          <GridItem md={6}>
+            <span style={{ fontWeight: 600 }}>
+              {moment(file.createDate).format(dateFormatLong)}
+            </span>
           </GridItem>
-          <GridItem md={4} align='Right' style={{ padding: 0 }}>
+          <GridItem md={6} align='Right' style={{ padding: 0 }}>
             <div>
               <Button
                 color='primary'
@@ -147,6 +144,26 @@ class CardItem extends Component {
               >
                 <Edit />
               </Button>
+              <SetFolderWithPopover
+                key={file.id}
+                folderList={folderList}
+                selectedFolderFKs={file.folderFKs || []}
+                onClose={(selectedFolder) => {
+                  const originalFolders = _.sortedUniq(file.folderFKs || [])
+                  const newFolders = _.sortedUniq(selectedFolder)
+
+                  if (
+                    originalFolders.length !== newFolders.length ||
+                    originalFolders.join(',') !== newFolders.join(',')
+                  ) {
+                    onFileUpdated({
+                      ...file,
+                      folderFKs: newFolders,
+                    })
+                  }
+                }}
+                onAddNewFolders={onAddNewFolders}
+              />
               <Popconfirm
                 onConfirm={() => {
                   dispatch({
@@ -169,6 +186,25 @@ class CardItem extends Component {
               </Popconfirm>
             </div>
           </GridItem>
+          <GridItem md={12}>
+            <Tooltip title={`Created by: ${file.createByUserName}`}>
+              <div
+                style={{ textAlign: 'center', marginTop: 5 }}
+                onClick={() => {
+                  onPreview(file)
+                }}
+              >
+                {imageData && (
+                  <img
+                    width={width - 80}
+                    height={height - 110}
+                    src={imageData}
+                    alt={file.fileName}
+                  />
+                )}
+              </div>
+            </Tooltip>
+          </GridItem>
           <GridItem md={12} style={{ marginTop: 5 }}>
             <Tooltip title={file.fileName}>
               <p
@@ -184,64 +220,18 @@ class CardItem extends Component {
                   to={window.location.search}
                   onClick={() => onPreview(file)}
                 >
-                  <span>{file.fileName}</span>
+                  <span
+                    style={{
+                      fontWeight: 600,
+                    }}
+                  >
+                    {file.fileName}
+                  </span>
                 </NavLink>
               </p>
             </Tooltip>
           </GridItem>
-          <GridItem md={12}>
-            <GridContainer>
-              <GridItem md={3} align='left'>
-                <div
-                  onClick={() => {
-                    onPreview(file)
-                  }}
-                >
-                  {imageData && (
-                    <img
-                      width={40}
-                      height={40}
-                      src={imageData}
-                      alt={file.fileName}
-                    />
-                  )}
-                </div>
-              </GridItem>
-              <GridItem md={9}>
-                <div>
-                  <div>{file.createByUserName}</div>
-                  <div>
-                    Folder as:{!readOnly && (
-                      <SetFolderWithPopover
-                        justIcon
-                        key={file.id}
-                        folderList={folderList}
-                        selectedFolderFKs={file.folderFKs || []}
-                        onClose={(selectedFolder) => {
-                          const originalFolders = _.sortedUniq(
-                            file.folderFKs || [],
-                          )
-                          const newFolders = _.sortedUniq(selectedFolder)
-
-                          if (
-                            originalFolders.length !== newFolders.length ||
-                            originalFolders.join(',') !== newFolders.join(',')
-                          ) {
-                            onFileUpdated({
-                              ...file,
-                              folderFKs: newFolders,
-                            })
-                          }
-                        }}
-                        onAddNewFolders={onAddNewFolders}
-                      />
-                    )}
-                  </div>
-                </div>
-              </GridItem>
-            </GridContainer>
-          </GridItem>
-          <GridItem md={12} style={{ overflow: 'auto', height: 65 }}>
+          <GridItem md={12} style={{ overflow: 'auto', height: 29 }}>
             {folderList
               .filter((f) => file.folderFKs.includes(f.id))
               .map((item) => (
