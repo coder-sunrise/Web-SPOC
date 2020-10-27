@@ -6,6 +6,7 @@ import { Button, Tabs } from '@/components'
 // utils
 import { INVOICE_VIEW_MODE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
+import AuthorizedContext from '@/components/Context/Authorized'
 // sub components
 import InvoiceDetails from './InvoiceDetails'
 import PaymentDetails from './PaymentDetails'
@@ -90,21 +91,6 @@ const Content = ({
         )
     )
       return true
-
-    const editInvoiceWithPaymentRight = Authorized.check(
-      'finance.editinvoice.editinvoicewithpayment',
-    )
-    // if not access right for edit invoice after payment and contains any payments, can't edit invoice
-    if (
-      (!editInvoiceWithPaymentRight ||
-        editInvoiceWithPaymentRight.rights !== 'enable') &&
-      (invoicePayment.entity || [])
-        .find((item) =>
-          item.invoicePayment.find((payment) => !payment.isCancelled),
-        )
-    )
-      return true
-
     return false
   }
 
@@ -137,6 +123,30 @@ const Content = ({
     })
   }
 
+  const checkEditInvoiceAccessRight = () => {
+    const editInvoiceRight = Authorized.check('finance.editinvoice')
+
+    if (!editInvoiceRight || editInvoiceRight.rights !== 'enable') {
+      return editInvoiceRight ? editInvoiceRight.rights : 'hidden'
+    }
+
+    const editInvoiceWithPaymentRight = Authorized.check(
+      'finance.editinvoice.editinvoicewithpayment',
+    )
+    if (
+      (!editInvoiceWithPaymentRight ||
+        editInvoiceWithPaymentRight.rights !== 'enable') &&
+      (invoicePayment.entity || [])
+        .find((item) =>
+          item.invoicePayment.find((payment) => !payment.isCancelled),
+        )
+    )
+      return editInvoiceWithPaymentRight
+        ? editInvoiceWithPaymentRight.rights
+        : 'hidden'
+    return 'enable'
+  }
+
   return (
     <React.Fragment>
       {invoiceDetail.mode === INVOICE_VIEW_MODE.DEFAULT && (
@@ -148,7 +158,11 @@ const Content = ({
             onChange={(e) => setActive(e)}
             options={InvoicePaymentTabOption}
           />
-          <Authorized authority='finance.editinvoice'>
+          <AuthorizedContext.Provider
+            value={{
+              rights: checkEditInvoiceAccessRight(),
+            }}
+          >
             <Button
               className={classes.editInvoiceButton}
               color='primary'
@@ -159,7 +173,7 @@ const Content = ({
             >
               Edit Invoice
             </Button>
-          </Authorized>
+          </AuthorizedContext.Provider>
 
           <Button
             className={classes.applySchemeButton}

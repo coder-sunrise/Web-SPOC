@@ -262,7 +262,10 @@ class EditInvoice extends Component {
             size='sm'
             color='primary'
             onClick={this.handleSaveClick}
-            disabled={values.invoiceTotalAftGST < 0}
+            disabled={
+              values.invoiceTotalAftGST < 0 ||
+              invoiceItem.find((item) => item.totalAfterItemAdjustment < 0)
+            }
           >
             Save Changes
           </ProgressButton>
