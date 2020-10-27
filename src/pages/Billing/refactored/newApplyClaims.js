@@ -686,12 +686,13 @@ const ApplyClaims = ({
     claimableSchemesList.forEach((s, index) => {
 
       const schemePayers = getPayerList(s[0].id, claimableSchemesList)
+      console.log('schemePayers',schemePayers)
       const isPayerAccount = medisaveSchemes.find(m => m.id === s[0].id)
       const invoicePayer = {
         ...defaultInvoicePayer,
         claimableSchemes: [s[0]],
         payerTypeFK: getPayerType(s[0]),
-        schemePayerFK: schemePayers.length > 0 ? schemePayers[0].id : null,
+        schemePayerFK: schemePayers.length > 0 ? schemePayers[0].id : null, // if first payer means new ones put later?
         // payerName: schemePayers.length > 0 ? schemePayers[0].payerName : '',
         medisaveVisitType: setMedisaveVisitType(s[0].id), // medisaveVisit && sortedClaimables[0][0].id === medisaveVisit.id ? 'CDMP' : '',
       }

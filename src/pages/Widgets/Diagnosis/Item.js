@@ -64,9 +64,15 @@ const DiagnosisItem = ({
     setShowPersistMsg,
   ] = useState(false)
 
+  const [
+    diagnosisFilter,
+    setDiagnosisFilter,
+  ] = useState([])
+
   const { form } = arrayHelpers
 
   const onDiagnosisChange = (v, op) => {
+    console.log('onDiagnosisChange',v, op)
     const { setFieldValue, values: vals, setValues } = form
     const { entity } = consultation
     if (op) {
@@ -76,7 +82,13 @@ const DiagnosisItem = ({
       vals.corDiagnosis[index].diagnosisICD10AMCode = op.iCD10AMDiagnosisCode
       vals.corDiagnosis[index].diagnosisICD10AMName = op.iCD10AMDiagnosisName
       if (op.complication && op.complication.length) {
-        setCtComplicationPairedWithDiag(op.complication)
+        if(diagnosisFilter.length === 1 && diagnosisFilter.find(df => df === 'isCdmpClaimable'))
+        {
+          const complications = op.complication.filter(c => c.cdmpComplicationCode)
+          setCtComplicationPairedWithDiag(complications || [])
+        }
+        else
+          setCtComplicationPairedWithDiag(op.complication)
       } else {
         vals.corDiagnosis[index].complication = []
         vals.corDiagnosis[index].corComplication = []
@@ -93,7 +105,8 @@ const DiagnosisItem = ({
       })
     }
   }
-  const onDataSouceChange = (data) => {
+  const onDataSouceChange = (data, filter) => {
+    setDiagnosisFilter(filter)
     if (
       form.values.corDiagnosis[index] &&
       form.values.corDiagnosis[index].diagnosisFK
@@ -105,7 +118,13 @@ const DiagnosisItem = ({
         (item) => parseInt(item.id, 10) === parseInt(diagnosisFK, 10),
       )
       if (diagnosis) {
-        setCtComplicationPairedWithDiag(diagnosis.complication || [])
+        if(diagnosisFilter.length === 1 && diagnosisFilter.find(df => df === 'isCdmpClaimable'))
+        {
+          const complications = diagnosis.complication.filter(c => c.cdmpComplicationCode)
+          setCtComplicationPairedWithDiag(complications || [])
+        }
+        else
+          setCtComplicationPairedWithDiag(diagnosis.complication || [])
       }
     }
   }

@@ -152,7 +152,7 @@ const DiagnosisSelect = ({
         query={onDiagnosisSearch}
         onDataSouceChange={(data) => {
           setCtDiagnosis(data)
-          if (onDataSouceChange) onDataSouceChange(data)
+          if (onDataSouceChange) onDataSouceChange(data, diagnosisFilter)
         }}
         onChange={(values, opts) => {
           console.log('sdfsdfsdfsd')

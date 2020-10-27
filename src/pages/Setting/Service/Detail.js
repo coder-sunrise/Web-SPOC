@@ -620,7 +620,10 @@ class Detail extends PureComponent {
                   <GridItem
                     xs={1}
                     className={classes.detailHeaderContainer}
-                    style={{ paddingLeft: 20 }}
+                    style={{ 
+                      paddingLeft: 20,
+                      paddingTop: 10,
+                    }}
                   >
                     <FastField
                       name='isMedisaveHealthScreening'
@@ -656,7 +659,10 @@ class Detail extends PureComponent {
                   <GridItem
                     xs={1}
                     className={classes.detailHeaderContainer}
-                    style={{ paddingLeft: 20 }}
+                    style={{ 
+                      paddingLeft: 20,
+                      paddingTop: 10,
+                    }}
                   >
                     <FastField
                       name='isOutpatientScan'

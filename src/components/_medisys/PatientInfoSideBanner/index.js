@@ -43,6 +43,14 @@ class PatientInfoSideBanner extends PureComponent {
         )
         return schemeData
       })
+      entity.schemePayer.filter((o) => this.isMedisave(o.schemeFK) && !o.isDeleted).map((o) => {
+        const schemeData = this.getSchemePayerDetails(o)
+        this.refreshMedisaveBalance(
+          schemeData.schemeTypeFK,
+          schemeData.schemePayer,
+        )
+        return schemeData
+      })
     }
     if (allowChangePatientStatus && entity)
       this.checkPatientIntoActiveSession(entity.id)

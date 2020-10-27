@@ -955,28 +955,29 @@ const getRefreshChasBalanceStatus = (status = []) => {
   return { ...defaultResponse, isSuccessful: true }
 }
 
-const getRefreshMedisaveBalanceStatus = (status = []) => {
+const getRefreshMedisaveBalanceStatus = (response = []) => {
   let defaultResponse = { isSuccessful: false, statusDescription: '' }
-  if (_.isEmpty(status)) {
+  if (_.isEmpty(response)) {
     return { ...defaultResponse }
   }
 
-  const successCode = 'SC100'
+  const successCode = 'SUCCESS'
   const fullBalanceSuccessCode = 'SC105'
-  const { statusCode, statusDescription } = status[0]
+  console.log('status',response)
+  const { status, statusDescription } = response
 
-  if (statusCode && // TODO: should never be null, check api
-    statusCode.trim().toLowerCase() ===
+  /* if (status && // TODO: should never be null, check api
+    status.trim().toLowerCase() ===
     fullBalanceSuccessCode.trim().toLowerCase()
   ) {
     return {
       ...defaultResponse,
       isSuccessful: true,
     }
-  }
+  } */
 
-  if (statusCode && // TODO: should never be null, check api
-    statusCode.trim().toLowerCase() !== successCode.trim().toLowerCase()) {
+  if (status && // TODO: should never be null, check api
+    status.trim().toLowerCase() !== successCode.trim().toLowerCase()) {
     return {
       ...defaultResponse,
       statusDescription,
