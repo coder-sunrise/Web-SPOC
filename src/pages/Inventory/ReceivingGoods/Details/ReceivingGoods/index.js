@@ -407,8 +407,10 @@ class Index extends Component {
       closeDate,
       createByUser,
       createDate,
+      cancellationDate,
+      updateByUser,
     } =
-      receivingGoods || false
+      receivingGoods || {}
     const isWriteOff = rg
       ? rg.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
@@ -480,15 +482,24 @@ class Index extends Component {
           <GridContainer xs={4} md={4}>
             <GridItem>
               <div>
-                <div>
-                  {`Created by ${createByUser} on ${moment(createDate).format(
-                    'DD MMM YYYY HH:mm',
-                  )}`}
-                </div>
+                {type === 'edit' && (
+                  <div>
+                    {`Created by ${createByUser} on ${moment(createDate).format(
+                      'DD MMM YYYY HH:mm',
+                    )}`}
+                  </div>
+                )}
                 {isClosed && (
                   <div>
                     {`Completed by ${closedByUser} on ${moment(
                       closeDate,
+                    ).format('DD MMM YYYY HH:mm')}`}
+                  </div>
+                )}
+                {rgStatus === 2 && (
+                  <div>
+                    {`Cancelled by ${updateByUser} on ${moment(
+                      cancellationDate,
                     ).format('DD MMM YYYY HH:mm')}`}
                   </div>
                 )}
