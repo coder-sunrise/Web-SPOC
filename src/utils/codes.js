@@ -511,6 +511,42 @@ export const podoOrderType = [
   },
 ]
 
+export const rgType = [
+  {
+    value: 1,
+    name: 'Medication',
+    prop: 'receivingGoodsMedicationItem',
+    itemFKName: 'inventoryMedicationFK',
+    ctName: 'inventorymedication',
+    stateName: 'MedicationItemList',
+    itemCode: 'inventoryMedicationCode',
+    itemName: 'inventoryMedicationName',
+    stockName: 'medicationStock',
+  },
+  {
+    value: 2,
+    name: 'Consumable',
+    prop: 'receivingGoodsConsumableItem',
+    itemFKName: 'inventoryConsumableFK',
+    ctName: 'inventoryconsumable',
+    stateName: 'ConsumableItemList',
+    itemCode: 'inventoryConsumableCode',
+    itemName: 'inventoryConsumableName',
+    stockName: 'consumableStock',
+  },
+  {
+    value: 3,
+    name: 'Vaccination',
+    prop: 'receivingGoodsVaccinationItem',
+    itemFKName: 'inventoryVaccinationFK',
+    ctName: 'inventoryvaccination',
+    stateName: 'VaccinationItemList',
+    itemCode: 'inventoryVaccinationCode',
+    itemName: 'inventoryVaccinationName',
+    stockName: 'vaccinationStock',
+  },
+]
+
 export const InventoryTypes = [
   {
     value: 1,

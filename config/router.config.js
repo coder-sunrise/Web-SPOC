@@ -353,6 +353,24 @@ const _routes = [
             ],
           },
           {
+            path: '/inventory/rg',
+            name: 'rg',
+            component: './Inventory/ReceivingGoods',
+            authority: [
+              'inventory/receivinggoods',
+            ],
+            mini: 'RG',
+          },
+          {
+            path: '/inventory/rg/rgdetails',
+            name: 'rg.detail',
+            hideInMenu: true,
+            component: './Inventory/ReceivingGoods/Details',
+            authority: [
+              'inventory/receivinggoods',
+            ],
+          },
+          {
             path: '/inventory/inventoryadjustment',
             name: 'inventoryadjustment',
             component: './Inventory/InventoryAdjustment',
