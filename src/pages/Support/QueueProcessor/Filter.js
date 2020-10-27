@@ -29,7 +29,7 @@ class Filter extends PureComponent {
         <GridContainer>
           <GridItem xs={6} md={4}>
             <FastField
-              name='processType'
+              name='queueProcessTypeFK'
               render={(args) => {
                 return (
                   <CodeSelect
@@ -72,7 +72,7 @@ class Filter extends PureComponent {
           </GridItem>
           <GridItem xs={6} md={4}>
             <FastField
-              name='status'
+              name='queueProcessStatusFK'
               render={(args) => {
                 return <Select label='Status' options={queueItemStatus} {...args} />
               }}

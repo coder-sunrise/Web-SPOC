@@ -3,6 +3,7 @@ import classnames from 'classnames'
 import _ from 'lodash'
 import Call from '@material-ui/icons/Call'
 import Print from '@material-ui/icons/Print'
+import FormatListNumberedOutlinedIcon from '@material-ui/icons/FormatListNumberedOutlined'
 import { formatMessage } from 'umi/locale'
 
 import { withStyles } from '@material-ui/core'
@@ -26,7 +27,7 @@ const menuData = [
     title: 'Support',
     text: 'Queue Processor',
     url: '/support/QueueProcessor',
-    icon: <Print />,
+    icon: <FormatListNumberedOutlinedIcon />,
   },
 ]
 const styles = () => ({

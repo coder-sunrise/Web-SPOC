@@ -1,8 +1,9 @@
 import React, { PureComponent } from 'react'
 
 import { Table } from '@devexpress/dx-react-grid-material-ui'
+import moment from 'moment'
 import Delete from '@material-ui/icons/Delete'
-import { CommonTableGrid, Button, Tooltip, dateFormatLongWithTime } from '@/components'
+import { CommonTableGrid, Button, Tooltip, dateFormatLong, dateFormatLongWithTime } from '@/components'
 import { queueProcessorType, queueItemStatus } from '@/utils/codes'
 import * as service from './services'
 
@@ -46,6 +47,12 @@ class Grid extends PureComponent {
         format: dateFormatLongWithTime,
       },
       {
+        columnName: 'data',
+        render: (row) => {
+          return this.formatParameter(row)
+        },
+      },
+      {
         columnName: 'result', width: 260,
         render: (row) => {
           return this.formatResultMessage(row)
@@ -78,6 +85,7 @@ class Grid extends PureComponent {
     let type = row.queueProcessTypeFK
     if (type === 1) {
       let parameter = JSON.parse(row.data)
+      return `Statement Date: ${moment(parameter.StatementDate).format(dateFormatLong)}, Payment Terms: ${parameter.PaymentTerms} day(s), Invoice Date From: ' ${parameter.InvoiceDateFrom ? moment(parameter.InvoiceDateFrom).format(dateFormatLong) : '-'}, Invoice Date To: ' ${parameter.InvoiceDateTo ? moment(parameter.InvoiceDateTo).format(dateFormatLong) : '-'}`
     }
     return ''
   }
