@@ -46,7 +46,7 @@ const receivingDetailsSchema = Yup.object().shape({
     deliveryOrderDate: Yup.date().required(),
     rows: Yup.array().required('At least one item is required.'),
     // rows: Yup.array().compact((v) => v.isDeleted).of(receivingDetailsSchema),
-    remark: Yup.string().max(500),
+    remark: Yup.string().max(2000),
   }),
   handleSubmit: (values, { props }) => {
     const { rows, ...restValues } = values
@@ -648,6 +648,7 @@ class DODetails extends PureComponent {
                         multiline
                         rowsMax={2}
                         rows={2}
+                        maxLength={2000}
                         {...args}
                       />
                     )

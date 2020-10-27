@@ -163,6 +163,7 @@ const RGForm = ({ setFieldValue, isReadOnly = false }) => {
                         })}
                         multiline
                         rowsMax={4}
+                        maxLength={2000}
                         {...args}
                       />
                     )
