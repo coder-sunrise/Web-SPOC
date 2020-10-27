@@ -1,5 +1,6 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
+import _ from 'lodash'
 import * as service from '@/pages/Inventory/InventoryAdjustment/services'
 
 import { getUniqueId, maxReducer, calculateAmount } from '@/utils/utils'
@@ -335,9 +336,12 @@ export default createListViewModel({
         let { corPackage, rows } = state
         
         const activePackageItems = rows.filter(item => item.packageGlobalId === payload.packageGlobalId && item.isDeleted === false)
-        if (activePackageItems.length === 0) {
-          const beDeletedPackage = corPackage.find(p => p.packageGlobalId === payload.packageGlobalId)
-          beDeletedPackage.isDeleted = true
+        const toBeUpdatedPackage = corPackage.find(p => p.packageGlobalId === payload.packageGlobalId)
+        if (activePackageItems.length === 0) {          
+          toBeUpdatedPackage.isDeleted = true
+        }
+        else {
+          toBeUpdatedPackage.totalPrice = _.sumBy(activePackageItems, 'totalPrice') || 0
         }
         
         return {

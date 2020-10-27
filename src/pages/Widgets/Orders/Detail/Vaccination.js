@@ -24,6 +24,7 @@ import { currencySymbol } from '@/utils/config'
 import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
 import LowStockInfo from './LowStockInfo'
 import AddFromPast from './AddMedicationFromPast'
+import { DoctorProfileSelect } from '@/components/_medisys'
 
 let i = 0
 @connect(({ global, codetable, visitRegistration, user }) => ({
@@ -36,7 +37,7 @@ let i = 0
   authority: [
     'queue.consultation.order.vaccination',
   ],
-  mapPropsToValues: ({ orders = {}, type }) => {
+  mapPropsToValues: ({ orders = {}, type, codetable, visitRegistration }) => {
     const newOrders = orders.entity || orders.defaultVaccination
 
     if (newOrders.uid) {
@@ -48,6 +49,16 @@ let i = 0
       }
 
       newOrders.isExactAmount = newOrders.adjType !== 'Percentage'
+    }
+
+    if (_.isEmpty(orders.entity)) {
+      const { doctorprofile } = codetable
+      if(visitRegistration && visitRegistration.entity) {
+        const { doctorProfileFK } = visitRegistration.entity.visit      
+        if (doctorprofile && doctorProfileFK) {
+          newOrders.performingUserFK = doctorprofile.find(d => d.id === doctorProfileFK).clinicianProfile.userProfileFK
+        }
+      }
     }
 
     return {
@@ -73,6 +84,7 @@ let i = 0
       0.0,
       'The amount should be more than 0.00',
     ),
+    performingUserFK: Yup.number().required(),
   }),
 
   handleSubmit: (values, { props, onConfirm, resetForm, setValues }) => {
@@ -237,6 +249,7 @@ class Vaccination extends PureComponent {
 
   calculateQuantity = (vaccination) => {
     const { codetable, setFieldValue, values, disableEdit, dirty } = this.props
+    if (values.isPackage) return
     const { minQuantity = 0 } = values
     let currentVaccination =
       vaccination && Object.values(vaccination).length ? vaccination : undefined
@@ -280,7 +293,8 @@ class Vaccination extends PureComponent {
 
   updateTotalPrice = (v) => {
     if (v || v === 0) {
-      const { isExactAmount, isMinus, adjValue } = this.props.values
+      const { isExactAmount, isMinus, adjValue, isPackage } = this.props.values
+      if (isPackage) return
 
       let value = adjValue
       if (!isMinus) {
@@ -487,6 +501,7 @@ class Vaccination extends PureComponent {
                       options={this.getVaccinationOptions()}
                       {...args}
                       style={{ paddingRight: 20 }}
+                      disabled={values.isPackage}
                     />
                     <LowStockInfo sourceType='vaccination' {...this.props} />
                   </div>
@@ -587,32 +602,76 @@ class Vaccination extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={3}>
-            <FastField
-              name='quantity'
-              render={(args) => {
-                return (
-                  <NumberInput
-                    label='Quantity'
-                    style={{
-                      marginLeft: theme.spacing(7),
-                      paddingRight: theme.spacing(6),
-                    }}
-                    step={1}
-                    min={values.minQuantity}
-                    onChange={(e) => {
-                      if (values.unitPrice) {
-                        const total = e.target.value * values.unitPrice
-                        setFieldValue('totalPrice', total)
-                        this.updateTotalPrice(total)
-                      }
-                    }}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
+          {values.isPackage && (
+            <React.Fragment>
+              <GridItem xs={3}>
+                <Field
+                  name='packageConsumeQuantity'
+                  render={(args) => {
+                    return (
+                      <NumberInput
+                        label='Consumed Quantity'
+                        style={{
+                          marginLeft: theme.spacing(7),
+                          paddingRight: theme.spacing(6),
+                        }}
+                        step={1}
+                        min={0}
+                        max={values.quantity}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+              <GridItem xs={1}>
+                <Field
+                  name='quantity'
+                  render={(args) => {
+                    return (
+                      <NumberInput
+                        style={{
+                          marginTop: theme.spacing(3),
+                        }}
+                        formatter={(v) => `/ ${parseFloat(v).toFixed(1)}`}
+                        // prefix='/'
+                        text
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+            </React.Fragment>
+          )}
+          {!values.isPackage && (
+            <GridItem xs={3}>
+              <Field
+                name='quantity'
+                render={(args) => {
+                  return (
+                    <NumberInput
+                      label='Quantity'
+                      style={{
+                        marginLeft: theme.spacing(7),
+                        paddingRight: theme.spacing(6),
+                      }}
+                      step={1}
+                      min={values.minQuantity}
+                      onChange={(e) => {
+                        if (values.unitPrice) {
+                          const total = e.target.value * values.unitPrice
+                          setFieldValue('totalPrice', total)
+                          this.updateTotalPrice(total)
+                        }
+                      }}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+          )}
         </GridContainer>
         <GridContainer>
           <GridItem xs={4} className={classes.editor}>
@@ -658,7 +717,7 @@ class Vaccination extends PureComponent {
             />
           </GridItem>
           <GridItem xs={3} className={classes.editor}>
-            <FastField
+            <Field
               name='totalPrice'
               render={(args) => {
                 return (
@@ -673,6 +732,7 @@ class Vaccination extends PureComponent {
                       this.updateTotalPrice(e.target.value)
                     }}
                     min={0}
+                    disabled={values.isPackage}
                     {...args}
                   />
                 )
@@ -682,22 +742,23 @@ class Vaccination extends PureComponent {
         </GridContainer>
         <GridContainer>
           <GridItem xs={8} className={classes.editor}>
-            <FastField
-              name='remarks'
-              render={(args) => {
-                // return <RichEditor placeholder='Remarks' {...args} />
-                return (
-                  <TextField multiline rowsMax='5' label='Remarks' {...args} />
-                )
-              }}
+            <Field
+              name='performingUserFK'
+              render={(args) => (
+                <DoctorProfileSelect
+                  label='Performed By'
+                  {...args}
+                  valueField='clinicianProfile.userProfileFK'
+                />
+              )}
             />
-          </GridItem>
+          </GridItem>          
           <GridItem xs={3} className={classes.editor}>
             <div style={{ position: 'relative' }}>
               <div
                 style={{ marginTop: theme.spacing(2), position: 'absolute' }}
               >
-                <FastField
+                <Field
                   name='isMinus'
                   render={(args) => {
                     return (
@@ -710,6 +771,7 @@ class Vaccination extends PureComponent {
                             this.onAdjustmentConditionChange()
                           }, 1)
                         }}
+                        disabled={values.isPackage}
                         {...args}
                       />
                     )
@@ -734,6 +796,7 @@ class Vaccination extends PureComponent {
                             this.onAdjustmentConditionChange()
                           }, 1)
                         }}
+                        disabled={values.isPackage}
                         {...args}
                       />
                     )
@@ -752,6 +815,7 @@ class Vaccination extends PureComponent {
                           this.onAdjustmentConditionChange()
                         }, 1)
                       }}
+                      disabled={values.isPackage}
                       {...args}
                     />
                   )
@@ -761,7 +825,7 @@ class Vaccination extends PureComponent {
           </GridItem>
           <GridItem xs={1} className={classes.editor}>
             <div style={{ marginTop: theme.spacing(2) }}>
-              <FastField
+              <Field
                 name='isExactAmount'
                 render={(args) => {
                   return (
@@ -774,6 +838,7 @@ class Vaccination extends PureComponent {
                           this.onAdjustmentConditionChange()
                         }, 1)
                       }}
+                      disabled={values.isPackage}
                       {...args}
                     />
                   )
@@ -783,8 +848,18 @@ class Vaccination extends PureComponent {
           </GridItem>
         </GridContainer>
         <GridContainer>
-          <GridItem xs={8} />
-          <GridItem xs={3}>
+          <GridItem xs={8} className={classes.editor}>
+            <FastField
+              name='remarks'
+              render={(args) => {
+                // return <RichEditor placeholder='Remarks' {...args} />
+                return (
+                  <TextField multiline rowsMax='5' label='Remarks' {...args} />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={3} className={classes.editor} v>
             <FastField
               name='totalAfterItemAdjustment'
               render={(args) => {

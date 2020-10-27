@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import moment from 'moment'
+import _ from 'lodash'
 import {
   GridContainer,
   GridItem,
@@ -44,6 +45,7 @@ import { DURATION_UNIT } from '@/utils/constants'
     const {
       inventorymedication,
       inventoryvaccination,
+      inventoryconsumable,
       doctorprofile,
     } = codetable
 
@@ -264,27 +266,42 @@ import { DURATION_UNIT } from '@/utils/constants'
     }
 
     const getOrderConsumableFromPackage = (packageCode, packageName, packageItem) => {
+      const consumable = inventoryconsumable.find(
+        (item) =>
+          item.id === packageItem.inventoryConsumableFK,
+      )
+
       let item
-      item = {
-        inventoryConsumableFK: packageItem.inventoryConsumableFK,
-        isActive: packageItem.isActive,
-        quantity: packageItem.quantity,
-        unitPrice: packageItem.unitPrice,
-        totalPrice: packageItem.subTotal,
-        adjAmount: 0,
-        adjType: 'ExactAmount',
-        adjValue: 0,
-        totalAfterItemAdjustment: packageItem.subTotal,
-        totalAfterOverallAdjustment: packageItem.subTotal,
-        consumableCode: packageItem.consumableCode,
-        consumableName: packageItem.consumableName,
-        isPackage: true,
-        packageCode,
-        packageName,
-        defaultConsumeQuantity: packageItem.defaultConsumeQuantity,
-        packageConsumeQuantity: packageItem.consumeQuantity,
-        performingUserFK: visitDoctorUserId,
-        packageGlobalId,
+      if (consumable.isActive === true) {
+        const isDefaultBatchNo = consumable.consumableStock.find(
+          (o) => o.isDefault === true,
+        )
+
+        item = {
+          inventoryConsumableFK: packageItem.inventoryConsumableFK,
+          isActive: packageItem.isActive,
+          quantity: packageItem.quantity,
+          unitPrice: packageItem.unitPrice,
+          totalPrice: packageItem.subTotal,
+          adjAmount: 0,
+          adjType: 'ExactAmount',
+          adjValue: 0,
+          totalAfterItemAdjustment: packageItem.subTotal,
+          totalAfterOverallAdjustment: packageItem.subTotal,
+          consumableCode: packageItem.consumableCode,
+          consumableName: packageItem.consumableName,
+          expiryDate: isDefaultBatchNo
+            ? isDefaultBatchNo.expiryDate
+            : undefined,
+          batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
+          isPackage: true,
+          packageCode,
+          packageName,
+          defaultConsumeQuantity: packageItem.defaultConsumeQuantity,
+          packageConsumeQuantity: packageItem.consumeQuantity,
+          performingUserFK: visitDoctorUserId,
+          packageGlobalId,
+        }
       }
 
       return item
@@ -340,7 +357,7 @@ import { DURATION_UNIT } from '@/utils/constants'
           packageCode: selectedPackage.code,
           packageName: selectedPackage.displayValue,
           expiryDate,
-          totalPrice: selectedPackage.totalPrice,
+          totalPrice: _.sumBy(datas, 'total') || 0,
           packageGlobalId,
         },
       })

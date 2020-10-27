@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-
+import _ from 'lodash'
 import { isNumber } from 'util'
 import {
   GridContainer,
@@ -17,13 +17,25 @@ import Yup from '@/utils/yup'
 import { getServices } from '@/utils/codetable'
 import { calculateAdjustAmount } from '@/utils/utils'
 import { currencySymbol } from '@/utils/config'
+import { DoctorProfileSelect } from '@/components/_medisys'
 
-@connect(({ codetable, global, user }) => ({ codetable, global, user }))
+const getVisitDoctorUserId = props => {
+  const { doctorprofile } = props.codetable
+  const { doctorProfileFK } = props.visitRegistration.entity.visit   
+  let visitDoctorUserId
+  if (doctorprofile && doctorProfileFK) {
+    visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK).clinicianProfile.userProfileFK
+  }
+
+  return visitDoctorUserId
+}
+
+@connect(({ codetable, global, user, visitRegistration }) => ({ codetable, global, user, visitRegistration }))
 @withFormikExtend({
   authority: [
     'queue.consultation.order.service',
   ],
-  mapPropsToValues: ({ orders = {}, type }) => {
+  mapPropsToValues: ({ orders = {}, type, codetable, visitRegistration }) => {
     const v = {
       ...(orders.entity || orders.defaultService),
     }
@@ -39,17 +51,29 @@ import { currencySymbol } from '@/utils/config'
       v.isExactAmount = v.adjType !== 'Percentage'
     }
 
+    if (_.isEmpty(orders.entity)) {
+      const { doctorprofile } = codetable
+      if(visitRegistration && visitRegistration.entity) {
+        const { doctorProfileFK } = visitRegistration.entity.visit              
+        if (doctorprofile && doctorProfileFK) {
+          v.performingUserFK = doctorprofile.find(d => d.id === doctorProfileFK).clinicianProfile.userProfileFK
+        }
+      }
+    }
+
     return { ...v }
   },
   enableReinitialize: true,
   validationSchema: Yup.object().shape({
     serviceFK: Yup.number().required(),
     serviceCenterFK: Yup.number().required(),
+    quantity: Yup.number().required(),
     total: Yup.number().required(),
     totalAfterItemAdjustment: Yup.number().min(
       0.0,
       'The amount should be more than 0.00',
     ),
+    performingUserFK: Yup.number().required(),
   }),
 
   handleSubmit: (values, { props, onConfirm, setValues }) => {
@@ -76,6 +100,7 @@ import { currencySymbol } from '@/utils/config'
     setValues({
       ...orders.defaultService,
       type: orders.type,
+      performingUserFK: getVisitDoctorUserId(props),
     })
   },
   displayName: 'OrderPage',
@@ -224,7 +249,8 @@ class Service extends PureComponent {
 
   updateTotalPrice = (v) => {
     if (v || v === 0) {
-      const { isExactAmount, isMinus, adjValue } = this.props.values
+      const { isExactAmount, isMinus, adjValue, isPackage } = this.props.values
+      if (isPackage) return
 
       let value = adjValue
       if (!isMinus) {
@@ -255,6 +281,7 @@ class Service extends PureComponent {
     setValues({
       ...orders.defaultService,
       type: orders.type,
+      performingUserFK: getVisitDoctorUserId(this.props),
     })
   }
 
@@ -305,7 +332,7 @@ class Service extends PureComponent {
   }
 
   render () {
-    const { theme, classes, values = {}, footer, handleSubmit } = this.props
+    const { theme, classes, values = {}, footer, handleSubmit, setFieldValue } = this.props
     const { services, serviceCenters } = this.state
     const { serviceFK, serviceCenterFK } = values
 
@@ -332,6 +359,7 @@ class Service extends PureComponent {
                         setTimeout(() => {
                           this.getServiceCenterService()
                         }, 1)}
+                      disabled={values.isPackage}
                       {...args}
                     />
                   </div>
@@ -339,28 +367,76 @@ class Service extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={3}>
-            <FastField
-              name='total'
-              render={(args) => {
-                return (
-                  <NumberInput
-                    label='Total'
-                    style={{
-                      marginLeft: theme.spacing(7),
-                      paddingRight: theme.spacing(6),
-                    }}
-                    min={0}
-                    currency
-                    onChange={(e) => {
-                      this.updateTotalPrice(e.target.value)
-                    }}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
+          {values.isPackage && (
+            <React.Fragment>
+              <GridItem xs={3}>
+                <Field
+                  name='packageConsumeQuantity'
+                  render={(args) => {
+                    return (
+                      <NumberInput
+                        label='Consumed Quantity'
+                        style={{
+                          marginLeft: theme.spacing(7),
+                          paddingRight: theme.spacing(6),
+                        }}
+                        step={1}
+                        min={0}
+                        max={values.quantity}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+              <GridItem xs={1}>
+                <Field
+                  name='quantity'
+                  render={(args) => {
+                    return (
+                      <NumberInput
+                        style={{
+                          marginTop: theme.spacing(3),
+                        }}
+                        formatter={(v) => `/ ${parseFloat(v).toFixed(1)}`}
+                        // prefix='/'
+                        text
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+            </React.Fragment>
+          )}
+          {!values.isPackage && (
+            <GridItem xs={3}>
+              <Field
+                name='quantity'
+                render={(args) => {
+                  return (
+                    <NumberInput
+                      label='Quantity'
+                      style={{
+                        marginLeft: theme.spacing(7),
+                        paddingRight: theme.spacing(6),
+                      }}
+                      step={1}
+                      min={values.minQuantity}
+                      onChange={(e) => {
+                        if (values.unitPrice) {
+                          const total = e.target.value * values.unitPrice
+                          setFieldValue('total', total)
+                          this.updateTotalPrice(total)
+                        }
+                      }}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+          )}
         </GridContainer>
         <GridContainer>
           <GridItem xs={8}>
@@ -379,6 +455,7 @@ class Service extends PureComponent {
                       setTimeout(() => {
                         this.getServiceCenterService()
                       }, 1)}
+                    disabled={values.isPackage}
                     {...args}
                   />
                 )
@@ -386,11 +463,48 @@ class Service extends PureComponent {
             />
           </GridItem>
           <GridItem xs={3}>
+            <Field
+              name='total'
+              render={(args) => {
+                return (
+                  <NumberInput
+                    label='Total'
+                    style={{
+                      marginLeft: theme.spacing(7),
+                      paddingRight: theme.spacing(6),
+                    }}
+                    min={0}
+                    currency
+                    onChange={(e) => {
+                      this.updateTotalPrice(e.target.value)
+                    }}
+                    disabled={values.isPackage}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+        </GridContainer>
+        <GridContainer>
+          <GridItem xs={8} className={classes.editor}>
+            <Field
+              name='performingUserFK'
+              render={(args) => (
+                <DoctorProfileSelect
+                  label='Performed By'
+                  {...args}
+                  valueField='clinicianProfile.userProfileFK'
+                />
+              )}
+            />
+          </GridItem>  
+          <GridItem xs={3} className={classes.editor}>
             <div style={{ position: 'relative' }}>
               <div
                 style={{ marginTop: theme.spacing(2), position: 'absolute' }}
               >
-                <FastField
+                <Field
                   name='isMinus'
                   render={(args) => {
                     return (
@@ -403,6 +517,7 @@ class Service extends PureComponent {
                             this.onAdjustmentConditionChange()
                           }, 1)
                         }}
+                        disabled={values.isPackage}
                         {...args}
                       />
                     )
@@ -427,6 +542,7 @@ class Service extends PureComponent {
                             this.onAdjustmentConditionChange()
                           }, 1)
                         }}
+                        disabled={values.isPackage}
                         {...args}
                       />
                     )
@@ -445,6 +561,7 @@ class Service extends PureComponent {
                           this.onAdjustmentConditionChange()
                         }, 1)
                       }}
+                      disabled={values.isPackage}
                       {...args}
                     />
                   )
@@ -452,9 +569,9 @@ class Service extends PureComponent {
               />
             </div>
           </GridItem>
-          <GridItem xs={1}>
+          <GridItem xs={1} className={classes.editor}>
             <div style={{ marginTop: theme.spacing(2) }}>
-              <FastField
+              <Field
                 name='isExactAmount'
                 render={(args) => {
                   return (
@@ -467,6 +584,7 @@ class Service extends PureComponent {
                           this.onAdjustmentConditionChange()
                         }, 1)
                       }}
+                      disabled={values.isPackage}
                       {...args}
                     />
                   )
