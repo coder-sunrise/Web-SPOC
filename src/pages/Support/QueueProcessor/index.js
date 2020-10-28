@@ -1,10 +1,10 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 
-import { withStyles, Divider } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
-import { CardContainer, CommonModal, withSettingBase } from '@/components'
+import { CardContainer } from '@/components'
 
 import Filter from './Filter'
 import Grid from './Grid'
@@ -23,32 +23,13 @@ class QueueProcessor extends PureComponent {
     this.props.dispatch({
       type: 'queueProcessor/query',
     })
-  }
+  } 
 
-  toggleModal = () => {
-  }
-
-  render () {
-    const { classes, queueProcessor, dispatch, theme, ...restProps } = this.props
-    const cfg = {
-      toggleModal: this.toggleModal,
-    }
-
+  render () {  
     return (
       <CardContainer hideHeader>
-        <Filter {...cfg} {...this.props} />
-        <Grid {...this.props} />
-        {/* <CommonModal
-          open={settingRoom.showModal}
-          observe='RoomDetail'
-          title={settingRoom.entity ? 'Edit Room' : 'Add Room'}
-          maxWidth='md'
-          bodyNoPadding
-          onClose={this.toggleModal}
-          onConfirm={this.toggleModal}
-        >
-          <Detail {...this.props} />
-        </CommonModal> */}
+        <Filter {...this.props} />
+        <Grid {...this.props} /> 
       </CardContainer>
     )
   }

@@ -279,7 +279,7 @@ class SearchBar extends PureComponent {
                 New Statement
                 </Button>
               </Authorized>
-              <Authorized authority='finance/statement'>
+              <Authorized authority='finance.statement.autogeneratestatement'>
                 <Button
                   variant='contained'
                   color='primary'

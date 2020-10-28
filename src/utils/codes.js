@@ -1543,10 +1543,6 @@ const queueItemStatus = [
     value: 4,
     name: 'Failed',
   },
-  {
-    value: 5,
-    name: 'Canceled',
-  },
 ]
 
 module.exports = {

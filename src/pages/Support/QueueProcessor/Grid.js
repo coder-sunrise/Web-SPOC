@@ -1,10 +1,8 @@
 import React, { PureComponent } from 'react'
 
-import { Table } from '@devexpress/dx-react-grid-material-ui'
 import moment from 'moment'
 import { connect } from 'dva'
-import Delete from '@material-ui/icons/Delete'
-import { CommonTableGrid, Button, Tooltip, dateFormatLong, dateFormatLongWithTime } from '@/components'
+import { CommonTableGrid, Tooltip, dateFormatLong } from '@/components'
 import { queueProcessorType, queueItemStatus } from '@/utils/codes'
 import * as service from './services'
 
@@ -21,11 +19,7 @@ class Grid extends PureComponent {
       { name: 'updateDate', title: 'Completed Date' },
       { name: 'queueProcessStatusFK', title: 'Status' },
       { name: 'data', title: 'Request Parameter' },
-      { name: 'result', title: 'Result Message' },
-      {
-        name: 'action',
-        title: 'Action',
-      },
+      { name: 'result', title: 'Result Message' }, 
     ],
     columnExtensions: [
       {
@@ -67,34 +61,14 @@ class Grid extends PureComponent {
         columnName: 'result', width: 260,
         render: (row) => {
           let result = this.formatResultMessage(row)
+          let tooltip = this.getTooltip(row)
           return (
-            <Tooltip title={result} placement='top'>
+            <Tooltip title={tooltip} placement='top'>
               <div>{result}</div>
-            </Tooltip>
-          ) 
-        },
-        sortingEnabled: false,
-      },
-      {
-        columnName: 'action',
-        align: 'center',
-        render: (row) => {
-          return (
-            <Tooltip title='Cancel'>
-              <Button
-                size='sm'
-                disabled={row.queueProcessStatusFK !== 1}                
-                onClick={() => {
-                  this.cancelQueue(row)
-                }}
-                justIcon
-                color='danger'
-              >
-                <Delete />
-              </Button>
             </Tooltip>
           )
         },
+        sortingEnabled: false,
       },
     ],
   }
@@ -114,41 +88,32 @@ class Grid extends PureComponent {
       if (row.queueProcessStatusFK === 3) {
         return `${(JSON.parse(row.result) || []).length} statement(s) has been generated`
       }
+      if (row.queueProcessStatusFK === 4) {
+        return row.result
+      }
     }
     return ''
   }
 
-  cancelQueue = (row, e) => {
-    const { dispatch, queueProcessor } = this.props
-    const { id } = row
-    dispatch({
-      type: 'global/updateAppState',
-      payload: {
-        openConfirm: true,
-        openConfirmContent: `Cancel this queue item?`,
-        onConfirmSave: () => {
-          dispatch({
-            type: 'queueProcessor/cancelQueue',
-            payload: {
-              id,
-            },
-          }).then(() => {
-            this.props.dispatch({
-              type: 'queueProcessor/query',
-            })
-          })
-        },
-      },
-    }) 
+  getTooltip = (row) => {
+    let type = row.queueProcessTypeFK
+    if (type === 1) {
+      if (row.queueProcessStatusFK === 3) {
+        let newStatementNo = JSON.parse(row.result)
+        if (newStatementNo && newStatementNo.length === 0) {
+          return "0 statement(s) has been generated"
+        }
+        return `New Statement(s): ${newStatementNo.join(', ')}`
+      }
+    }
+    return ''
   }
 
   render () {
-    const { dispatch, classes, queueProcessor, toggleModal } = this.props
-
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
-        type='queueProcessor' 
+        type='queueProcessor'
         {...this.configs}
       />
     )

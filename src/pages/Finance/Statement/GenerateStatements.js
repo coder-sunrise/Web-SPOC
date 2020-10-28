@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { formatMessage } from 'umi/locale'
 import { FastField } from 'formik'
+import moment from 'moment'
 import { withStyles } from '@material-ui/core'
 import _ from 'lodash'
 import Yup from '@/utils/yup'
@@ -23,7 +24,12 @@ const generateStatementSchema = Yup.object().shape({
 @connect(({ statement }) => ({
   statement,
 }))
-@withFormikExtend({
+@withFormikExtend({ 
+  mapPropsToValues: () => ({
+    statementDate: moment(),
+    invoiceDateFrom: moment().subtract(1, 'months').startOf('month'),
+    invoiceDateTo: moment().subtract(1, 'months').endOf('month'),
+  }),
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm } = props
     const {
@@ -41,8 +47,7 @@ const generateStatementSchema = Yup.object().shape({
       },
     }).then((r) => {
       if (r) {
-        if (onConfirm) {
-          console.log(onConfirm)
+        if (onConfirm) { 
           onConfirm()
         }
         notification.success({ message: 'Auto generate statement has been queued.' })
@@ -89,7 +94,7 @@ class GenerateStatements extends PureComponent {
             <FastField
               name='statementDate'
               render={(args) => (
-                <DatePicker label='Statement Date' {...args} />
+                <DatePicker value={moment()} label='Statement Date' {...args} />
               )}
             />
           </GridItem>
@@ -111,6 +116,7 @@ class GenerateStatements extends PureComponent {
               )}
             />
           </GridItem>
+
           <GridItem md={6}>
             <FastField
               name='invoiceDateFrom'
