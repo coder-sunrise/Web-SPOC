@@ -96,6 +96,12 @@ export const menuData = [
     authority: 'report.finance.paymentcollectionsummary',
   },
   {
+    title: 'Finance',
+    text: 'Patient Ageing Report',
+    url: '/report/patientageingreport',
+    authority: 'report.finance.patientageingreport',
+  },
+  {
     title: 'Inventory',
     text: 'Medication Movement Report',
     url: '/report/medicationmovementreport',
