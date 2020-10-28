@@ -345,7 +345,7 @@ class Queue extends React.Component {
       payload: {
         openConfirm: true,
         openConfirmTitle: '',
-        openConfirmContent: `Are you sure to end current session (${sessionNo})`,
+        openConfirmContent: `End current session (${sessionNo})?`,
         onConfirmSave: this.onConfirmEndSession,
       },
     })
@@ -457,7 +457,7 @@ class Queue extends React.Component {
         openConfirm: true,
         openConfirmTitle: '',
         openConfirmText: 'Confirm',
-        openConfirmContent: `Are you sure want to delete this visit (Q No.: ${queueNo})?`,
+        openConfirmContent: `Delete this visit (Q No.: ${queueNo})?`,
         onConfirmSave: () => {
           dispatch({
             type: 'queueLog/deleteQueueByQueueID',

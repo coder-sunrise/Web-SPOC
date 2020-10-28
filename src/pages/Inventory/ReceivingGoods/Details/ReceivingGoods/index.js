@@ -210,8 +210,7 @@ class Index extends Component {
         case rgSubmitAction.CANCEL:
           openConfirmationModal(
             RECEIVING_GOODS_STATUS.CANCELLED,
-            `Are you sure to cancel receiving goods ${values.receivingGoods
-              .receivingGoodsNo}?`,
+            `Cancel receiving goods ${values.receivingGoods.receivingGoodsNo}?`,
             'YES',
             'NO',
           )
@@ -219,7 +218,7 @@ class Index extends Component {
         case rgSubmitAction.COMPLETE:
           openConfirmationModal(
             RECEIVING_GOODS_STATUS.COMPLETED,
-            `Are you sure to complete receiving goods ${values.receivingGoods
+            `Complete receiving goods ${values.receivingGoods
               .receivingGoodsNo}?`,
             'YES',
             'NO',
@@ -229,8 +228,7 @@ class Index extends Component {
           dispatchType = 'receivingGoodsDetails/unlockReceivingGoods'
           openConfirmationModal(
             RECEIVING_GOODS_STATUS.DRAFT,
-            `Are you sure to unlock receiving goods ${values.receivingGoods
-              .receivingGoodsNo}?`,
+            `Unlock receiving goods ${values.receivingGoods.receivingGoodsNo}?`,
             'YES',
             'NO',
           )

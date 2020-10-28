@@ -65,7 +65,7 @@ const styles = (theme) => ({
       .compact((x) => x.isDeleted)
       .required('At least one item is required.'),
   }),
-  handleSubmit: () => { },
+  handleSubmit: () => {},
 })
 class Index extends Component {
   state = {
@@ -221,7 +221,7 @@ class Index extends Component {
           dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
           openConfirmationModal(
             PURCHASE_ORDER_STATUS.CANCELLED,
-            'Are you sure want to cancel PO?',
+            'Cancel PO?',
             'Cancel PO',
           )
           return true
@@ -235,7 +235,7 @@ class Index extends Component {
           dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
           openConfirmationModal(
             PURCHASE_ORDER_STATUS.COMPLETED,
-            'Are you sure want to complete PO?',
+            'Complete PO?',
             'Complete PO',
           )
           return true
@@ -551,11 +551,15 @@ class Index extends Component {
       <GridContainer>
         <AuthorizedContext.Provider
           value={{
-            rights: this.isEditable(poStatus, isWriteOff) ? 'enable' : 'disable',
+            rights: this.isEditable(poStatus, isWriteOff)
+              ? 'enable'
+              : 'disable',
           }}
         >
           <POForm
-            isReadOnly={this.getRights(type, poStatus, isWriteOff) === 'disable'}
+            isReadOnly={
+              this.getRights(type, poStatus, isWriteOff) === 'disable'
+            }
             isFinalize={isPOStatusFinalizedFulFilledPartialReceived(poStatus)}
             setFieldValue={setFieldValue}
             isCompletedOrCancelled={isCompletedOrCancelled}
@@ -568,7 +572,9 @@ class Index extends Component {
               : 'disable',
           }}
         > */}
-          {errors.rows && <p className={classes.errorMsgStyle}>{errors.rows}</p>}
+          {errors.rows && (
+            <p className={classes.errorMsgStyle}>{errors.rows}</p>
+          )}
           <POGrid
             calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
             isEditable={this.isEditable(poStatus, isWriteOff, 'poItem')}
@@ -645,28 +651,29 @@ class Index extends Component {
             {poStatus !== PURCHASE_ORDER_STATUS.COMPLETED && (
               <div>
                 {poStatus <= PURCHASE_ORDER_STATUS.FINALIZED &&
-                  deliveryOrder.length === 0 &&
-                  purchaseOrderPayment.length === 0 &&
-                  !isWriteOff &&
-                  type === 'edit' && (
-                    <ProgressButton
-                      color='danger'
-                      icon={null}
-                      authority='none'
-                      onClick={() =>
-                        this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
-                    >
-                      {formatMessage({
-                        id: 'inventory.pr.detail.pod.cancelpo',
-                      })}
-                    </ProgressButton>
-                  )}
+                deliveryOrder.length === 0 &&
+                purchaseOrderPayment.length === 0 &&
+                !isWriteOff &&
+                type === 'edit' && (
+                  <ProgressButton
+                    color='danger'
+                    icon={null}
+                    authority='none'
+                    onClick={() =>
+                      this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
+                  >
+                    {formatMessage({
+                      id: 'inventory.pr.detail.pod.cancelpo',
+                    })}
+                  </ProgressButton>
+                )}
 
                 <ProgressButton
                   color='primary'
                   icon={null}
                   disabled={!enableSaveButton(poStatus)}
-                  onClick={() => this.onSubmitButtonClicked(poSubmitAction.SAVE)}
+                  onClick={() =>
+                    this.onSubmitButtonClicked(poSubmitAction.SAVE)}
                 >
                   {formatMessage({
                     id: 'inventory.pr.detail.pod.save',
@@ -687,19 +694,19 @@ class Index extends Component {
                   </ProgressButton>
                 )}
                 {isPOStatusDraft(poStatus) &&
-                  type !== 'new' &&
-                  type !== 'dup' && (
-                    <ProgressButton
-                      color='success'
-                      icon={null}
-                      onClick={() =>
-                        this.onSubmitButtonClicked(poSubmitAction.FINALIZE)}
-                    >
-                      {formatMessage({
-                        id: 'inventory.pr.detail.pod.finalize',
-                      })}
-                    </ProgressButton>
-                  )}
+                type !== 'new' &&
+                type !== 'dup' && (
+                  <ProgressButton
+                    color='success'
+                    icon={null}
+                    onClick={() =>
+                      this.onSubmitButtonClicked(poSubmitAction.FINALIZE)}
+                  >
+                    {formatMessage({
+                      id: 'inventory.pr.detail.pod.finalize',
+                    })}
+                  </ProgressButton>
+                )}
               </div>
             )}
 
@@ -715,7 +722,6 @@ class Index extends Component {
               })}
             </ProgressButton>
           </GridContainer>
-
         </AuthorizedContext.Provider>
         <CommonModal
           open={this.state.showReport}

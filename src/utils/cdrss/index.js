@@ -372,7 +372,7 @@ const confirmAction = ({
   title = 'Confirm',
   okText = 'Yes',
   cancelText = 'No',
-  content = 'Are you sure delete this record?',
+  content = 'Delete this record?',
 }) => {
   confirm({
     maskClosable: true,
