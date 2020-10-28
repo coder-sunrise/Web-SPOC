@@ -62,6 +62,18 @@ const imageExt = [
   'BMP',
   'GIF',
 ]
+const styles = () => ({
+  Toolbar: {
+    display: 'none',
+  },
+  CardContainer: {
+    '&:hover': {
+      '& $Toolbar': {
+        display: 'block',
+      },
+    },
+  },
+})
 
 class CardItem extends Component {
   constructor (props) {
@@ -111,6 +123,7 @@ class CardItem extends Component {
 
   render () {
     const {
+      classes,
       file,
       folderList,
       onFileUpdated,
@@ -125,131 +138,138 @@ class CardItem extends Component {
     const { loading, imageData } = this.state
 
     return (
-      <LoadingWrapper loading={loading}>
-        <GridContainer>
-          <GridItem md={6}>
-            <span style={{ fontWeight: 600 }}>
-              {moment(file.createDate).format(dateFormatLong)}
-            </span>
-          </GridItem>
-          <GridItem md={6} align='Right' style={{ padding: 0 }}>
-            <div>
-              <Button
-                color='primary'
-                justIcon
-                disabled={readOnly}
-                onClick={() => {
-                  onEditFileName(file)
-                }}
-              >
-                <Edit />
-              </Button>
-              <SetFolderWithPopover
-                key={file.id}
-                folderList={folderList}
-                selectedFolderFKs={file.folderFKs || []}
-                onClose={(selectedFolder) => {
-                  const originalFolders = _.sortedUniq(file.folderFKs || [])
-                  const newFolders = _.sortedUniq(selectedFolder)
-
-                  if (
-                    originalFolders.length !== newFolders.length ||
-                    originalFolders.join(',') !== newFolders.join(',')
-                  ) {
-                    onFileUpdated({
-                      ...file,
-                      folderFKs: newFolders,
-                    })
-                  }
-                }}
-                onAddNewFolders={onAddNewFolders}
-              />
-              <Popconfirm
-                title='Permanently delete this file in all folders?'
-                onConfirm={() => {
-                  dispatch({
-                    type: 'patientAttachment/removeRow',
-                    payload: {
-                      id: file.id,
-                    },
-                  }).then(() => {
-                    dispatch({
-                      type: 'patientAttachment/query',
-                    })
-                  })
-                }}
-              >
-                <Tooltip title='Delete'>
-                  <Button size='sm' color='danger' justIcon disabled={readOnly}>
-                    <Delete />
-                  </Button>
-                </Tooltip>
-              </Popconfirm>
-            </div>
-          </GridItem>
-          <GridItem md={12}>
-            <Tooltip title={`Created by: ${file.createByUserName}`}>
-              <div
-                style={{ textAlign: 'center', marginTop: 5 }}
-                onClick={() => {
-                  onPreview(file)
-                }}
-              >
-                {imageData && (
-                  <img
-                    width={width - 80}
-                    height={height - 110}
-                    src={imageData}
-                    alt={file.fileName}
-                  />
-                )}
-              </div>
-            </Tooltip>
-          </GridItem>
-          <GridItem md={12} style={{ marginTop: 5 }}>
-            <Tooltip title={file.fileName}>
-              <p
-                style={{
-                  whiteSpace: 'nowrap',
-                  textOverflow: 'ellipsis',
-                  display: 'inline-block',
-                  width: '100%',
-                  overflow: 'hidden',
-                }}
-              >
-                <NavLink
-                  to={window.location.search}
-                  onClick={() => onPreview(file)}
-                >
-                  <span
-                    style={{
-                      fontWeight: 600,
-                    }}
-                  >
-                    {file.fileName}
-                  </span>
-                </NavLink>
-              </p>
-            </Tooltip>
-          </GridItem>
-          <GridItem md={12} style={{ overflow: 'auto', height: 29 }}>
-            {folderList
-              .filter((f) => file.folderFKs.includes(f.id))
-              .map((item) => (
-                <Chip
-                  style={{ marginBottom: 5, marginRight: 5 }}
-                  key={item.id}
-                  size='small'
-                  variant='outlined'
-                  label={item.displayValue}
+      <div className={classes.CardContainer}>
+        <LoadingWrapper loading={loading}>
+          <GridContainer>
+            <GridItem md={6}>
+              <span style={{ fontWeight: 600 }}>
+                {moment(file.createDate).format(dateFormatLong)}
+              </span>
+            </GridItem>
+            <GridItem md={6} align='Right' style={{ padding: 0, height: 25 }}>
+              <div className={classes.Toolbar}>
+                <Button
                   color='primary'
+                  justIcon
+                  disabled={readOnly}
+                  onClick={() => {
+                    onEditFileName(file)
+                  }}
+                >
+                  <Edit />
+                </Button>
+                <SetFolderWithPopover
+                  key={file.id}
+                  folderList={folderList}
+                  selectedFolderFKs={file.folderFKs || []}
+                  onClose={(selectedFolder) => {
+                    const originalFolders = _.sortedUniq(file.folderFKs || [])
+                    const newFolders = _.sortedUniq(selectedFolder)
+
+                    if (
+                      originalFolders.length !== newFolders.length ||
+                      originalFolders.join(',') !== newFolders.join(',')
+                    ) {
+                      onFileUpdated({
+                        ...file,
+                        folderFKs: newFolders,
+                      })
+                    }
+                  }}
+                  onAddNewFolders={onAddNewFolders}
                 />
-              ))}
-          </GridItem>
-        </GridContainer>
-      </LoadingWrapper>
+                <Popconfirm
+                  title='Permanently delete this file in all folders?'
+                  onConfirm={() => {
+                    dispatch({
+                      type: 'patientAttachment/removeRow',
+                      payload: {
+                        id: file.id,
+                      },
+                    }).then(() => {
+                      dispatch({
+                        type: 'patientAttachment/query',
+                      })
+                    })
+                  }}
+                >
+                  <Tooltip title='Delete'>
+                    <Button
+                      size='sm'
+                      color='danger'
+                      justIcon
+                      disabled={readOnly}
+                    >
+                      <Delete />
+                    </Button>
+                  </Tooltip>
+                </Popconfirm>
+              </div>
+            </GridItem>
+            <GridItem md={12}>
+              <Tooltip title={`Created by: ${file.createByUserName}`}>
+                <div
+                  style={{ textAlign: 'center', marginTop: 5 }}
+                  onClick={() => {
+                    onPreview(file)
+                  }}
+                >
+                  {imageData && (
+                    <img
+                      width={width - 80}
+                      height={height - 110}
+                      src={imageData}
+                      alt={file.fileName}
+                    />
+                  )}
+                </div>
+              </Tooltip>
+            </GridItem>
+            <GridItem md={12} style={{ marginTop: 5 }}>
+              <Tooltip title={file.fileName}>
+                <p
+                  style={{
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                    display: 'inline-block',
+                    width: '100%',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <NavLink
+                    to={window.location.search}
+                    onClick={() => onPreview(file)}
+                  >
+                    <span
+                      style={{
+                        fontWeight: 600,
+                      }}
+                    >
+                      {file.fileName}
+                    </span>
+                  </NavLink>
+                </p>
+              </Tooltip>
+            </GridItem>
+            <GridItem md={12} style={{ overflow: 'auto', height: 29 }}>
+              {folderList
+                .filter((f) => file.folderFKs.includes(f.id))
+                .map((item) => (
+                  <Chip
+                    style={{ marginBottom: 5, marginRight: 5 }}
+                    key={item.id}
+                    size='small'
+                    variant='outlined'
+                    label={item.displayValue}
+                    color='primary'
+                  />
+                ))}
+            </GridItem>
+          </GridContainer>
+        </LoadingWrapper>
+      </div>
     )
   }
 }
 
-export default CardItem
+export default withStyles(styles)(CardItem)
