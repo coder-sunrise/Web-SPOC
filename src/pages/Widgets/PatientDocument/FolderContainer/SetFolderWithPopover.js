@@ -103,12 +103,15 @@ class SetFolderWithPopover extends Component {
                 <Button
                   size='sm'
                   onClick={() => {
+                    const maxSort = _.maxBy(
+                      folderList.filter((f) => f.id > 0),
+                      'sortOrder',
+                    )
                     const entity = {
                       code: newFolder,
                       displayValue: newFolder,
                       description: newFolder,
-                      sortOrder:
-                        (_.maxBy(folderList, 'sortOrder').sortOrder || 0) + 1,
+                      sortOrder: maxSort ? maxSort.sortOrder + 1 : 1,
                       effectiveStartDate: moment().formatUTC(true),
                       effectiveEndDate: moment('2099-12-31').formatUTC(true),
                     }
