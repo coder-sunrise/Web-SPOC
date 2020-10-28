@@ -47,16 +47,16 @@ const imageExt = [
   'GIF',
 ]
 const styles = () => ({
-  Toolbar: {
-    display: 'none',
-  },
-  CardContainer: {
-    '&:hover': {
-      '& $Toolbar': {
-        display: 'block',
-      },
-    },
-  },
+  // Toolbar: {
+  //   display: 'none',
+  // },
+  // CardContainer: {
+  //   '&:hover': {
+  //     '& $Toolbar': {
+  //       display: 'block',
+  //     },
+  //   },
+  // },
 })
 
 class CardItem extends Component {
@@ -130,7 +130,7 @@ class CardItem extends Component {
                 {moment(file.createDate).format(dateFormatLong)}
               </span>
             </GridItem>
-            <GridItem md={6} align='Right' style={{ padding: 0, height: 25 }}>
+            <GridItem md={6} align='Right' style={{ padding: 0, height: 20 }}>
               <div className={classes.Toolbar}>
                 <Button
                   color='primary'
