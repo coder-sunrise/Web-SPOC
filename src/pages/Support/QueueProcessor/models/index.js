@@ -1,5 +1,5 @@
 import { createListViewModel } from 'medisys-model'
-import moment from 'moment'
+import { notification } from '@/components'
 import * as service from '../services'
 
 export default createListViewModel({
@@ -12,13 +12,19 @@ export default createListViewModel({
         description: '',
       },
     },
-    effects: {},
+    effects: {
+      *cancelQueue ({ payload }, { call, put }) {
+        const result = yield call(service.remove, payload)
+        if (result === 204) {
+          notification.success({ message: 'Queue item has been canceled.' })
+        }
+      },
+    },
     reducers: { 
-      queryDone (st, { payload }) {
-        const { data } = payload
-
+      queryDone (queuelisting, { payload }) {
+        const { data } = payload  
         return {
-          ...st,
+          ...queuelisting,
           list: data.data.map((o) => {
             return {
               ...o, 

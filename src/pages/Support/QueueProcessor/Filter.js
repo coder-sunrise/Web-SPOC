@@ -14,6 +14,7 @@ import {
   ProgressButton,
   CodeSelect,
   DateRangePicker,
+  ClinicianSelect,
 } from '@/components'
 
 @withFormikExtend({
@@ -52,7 +53,7 @@ class Filter extends PureComponent {
           </GridItem>
           <GridItem md={4}>
             <FastField
-              name='invoiceDates'
+              name='requestDate'
               render={(args) => {
                 return (
                   <DateRangePicker
@@ -66,8 +67,14 @@ class Filter extends PureComponent {
           </GridItem>
           <GridItem xs={6} md={4}>
             <FastField
-              name='doctorID'
-              render={(args) => <DoctorProfileSelect {...args} />}
+              name='createByUserFK'
+              render={(args) => {
+                return <ClinicianSelect
+                  noDefaultValue
+                  label='Requested By'
+                  {...args}
+                />
+              }}
             />
           </GridItem>
           <GridItem xs={6} md={4}>
@@ -87,19 +94,21 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={<Search />}
                 onClick={() => {
-                  const { status, processType } = this.props.values
-                  console.log({ status, processType })
+                  const { queueProcessStatusFK, createByUserFK, queueProcessTypeFK, requestDate } = this.props.values
                   this.props.dispatch({
                     type: 'queueProcessor/query',
                     payload: {
-                      status,
-                      processType, 
+                      queueProcessStatusFK,
+                      queueProcessTypeFK,
+                      createByUserFK,
+                      lgteql_createDate: requestDate ? requestDate[0] : undefined,
+                      lsteql_createDate: requestDate ? requestDate[1] : undefined,
                     },
                   })
                 }}
               >
                 <FormattedMessage id='form.search' />
-              </ProgressButton> 
+              </ProgressButton>
             </div>
           </GridItem>
         </GridContainer>
