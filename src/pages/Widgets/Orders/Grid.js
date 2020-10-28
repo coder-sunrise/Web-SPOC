@@ -21,6 +21,7 @@ import {
 import { orderTypes } from '@/pages/Consultation/utils'
 import Authorized from '@/utils/Authorized'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
+import PackageDrawdownInfo from '@/pages/Widgets/Orders/Detail/PackageDrawdownInfo'
 
 // console.log(orderTypes)
 export default ({ orders, dispatch, classes, from, codetable, theme }) => {
@@ -241,6 +242,18 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
     )
   }
 
+  const packageDrawdownIndicator = (row) => {
+    if (!row.isPackage) return null
+
+    return (
+      <div style={{ position: 'relative' }}>
+        <PackageDrawdownInfo
+          drawdownData={row}
+        />
+      </div>
+    )
+  }
+
   return (
     <CommonTableGrid
       size='sm'
@@ -437,13 +450,15 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
           columnName: 'subject',
           render: (row) => {
             return (
-              <div
-                style={{
-                  wordWrap: 'break-word',
-                  whiteSpace: 'pre-wrap',
-                }}
-              >
-                {row.subject}
+              <div style={wrapCellTextStyle}>
+                {packageDrawdownIndicator(row)}
+                <div style={{
+                    position: 'relative',
+                    left: row.isPackage ? 22 : 0,
+                  }}
+                >
+                  {row.subject}
+                </div>
               </div>
             )
           },

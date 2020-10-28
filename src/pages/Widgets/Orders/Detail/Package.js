@@ -43,11 +43,11 @@ import { DURATION_UNIT } from '@/utils/constants'
   handleSubmit: (values, { props, onConfirm, setValues }) => {
     const { dispatch, orders, codetable, getNextSequence, user, visitRegistration } = props
     const {
-      inventorymedication,
-      inventoryvaccination,
-      inventoryconsumable,
+      inventorymedication = [],
+      inventoryvaccination = [],
+      inventoryconsumable = [],
       doctorprofile,
-    } = codetable
+    } = codetable    
 
     const { doctorProfileFK } = visitRegistration.entity.visit
     const visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK).clinicianProfile.userProfileFK
@@ -272,36 +272,37 @@ import { DURATION_UNIT } from '@/utils/constants'
       )
 
       let item
-      if (consumable.isActive === true) {
-        const isDefaultBatchNo = consumable.consumableStock.find(
+      let isDefaultBatchNo
+      if (consumable) {
+        isDefaultBatchNo = consumable.consumableStock.find(
           (o) => o.isDefault === true,
         )
+      }
 
-        item = {
-          inventoryConsumableFK: packageItem.inventoryConsumableFK,
-          isActive: packageItem.isActive,
-          quantity: packageItem.quantity,
-          unitPrice: packageItem.unitPrice,
-          totalPrice: packageItem.subTotal,
-          adjAmount: 0,
-          adjType: 'ExactAmount',
-          adjValue: 0,
-          totalAfterItemAdjustment: packageItem.subTotal,
-          totalAfterOverallAdjustment: packageItem.subTotal,
-          consumableCode: packageItem.consumableCode,
-          consumableName: packageItem.consumableName,
-          expiryDate: isDefaultBatchNo
-            ? isDefaultBatchNo.expiryDate
-            : undefined,
-          batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
-          isPackage: true,
-          packageCode,
-          packageName,
-          defaultConsumeQuantity: packageItem.defaultConsumeQuantity,
-          packageConsumeQuantity: packageItem.consumeQuantity,
-          performingUserFK: visitDoctorUserId,
-          packageGlobalId,
-        }
+      item = {
+        inventoryConsumableFK: packageItem.inventoryConsumableFK,
+        isActive: packageItem.isActive,
+        quantity: packageItem.quantity,
+        unitPrice: packageItem.unitPrice,
+        totalPrice: packageItem.subTotal,
+        adjAmount: 0,
+        adjType: 'ExactAmount',
+        adjValue: 0,
+        totalAfterItemAdjustment: packageItem.subTotal,
+        totalAfterOverallAdjustment: packageItem.subTotal,
+        consumableCode: packageItem.consumableCode,
+        consumableName: packageItem.consumableName,
+        expiryDate: isDefaultBatchNo
+          ? isDefaultBatchNo.expiryDate
+          : undefined,
+        batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
+        isPackage: true,
+        packageCode,
+        packageName,
+        defaultConsumeQuantity: packageItem.defaultConsumeQuantity,
+        packageConsumeQuantity: packageItem.consumeQuantity,
+        performingUserFK: visitDoctorUserId,
+        packageGlobalId,
       }
 
       return item
