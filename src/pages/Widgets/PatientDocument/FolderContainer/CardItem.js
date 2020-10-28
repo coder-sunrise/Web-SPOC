@@ -1,32 +1,16 @@
-import React, { Component, useState, useEffect } from 'react'
+import React, { Component } from 'react'
 import moment from 'moment'
 import _ from 'lodash'
-import classNames from 'classnames'
 
 import { NavLink } from 'react-router-dom'
 // material ui
 import { withStyles, Chip } from '@material-ui/core'
-import {
-  Delete,
-  CreateNewFolder,
-  BorderColor,
-  Edit,
-  Save,
-  HighlightOff,
-} from '@material-ui/icons'
+import { Delete, Edit } from '@material-ui/icons'
 
 import {
-  FastField,
-  CommonModal,
   Button,
-  IconButton,
   GridContainer,
   GridItem,
-  Select,
-  TextField,
-  Tabs,
-  CardContainer,
-  Popover,
   Tooltip,
   dateFormatLong,
   Popconfirm,
