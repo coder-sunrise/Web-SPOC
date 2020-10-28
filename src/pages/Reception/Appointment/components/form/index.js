@@ -616,7 +616,7 @@ class Form extends React.PureComponent {
           type: 'global/updateAppState',
           payload: {
             openConfirm: true,
-            openConfirmContent: `Are you sure want to delete this draft appointment?`,
+            openConfirmContent: `Delete this draft appointment?`,
             onConfirmSave: () => this.deleteDraft(currentAppointment.id),
           },
         })

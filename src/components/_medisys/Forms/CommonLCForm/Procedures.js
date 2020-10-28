@@ -369,7 +369,7 @@ const Procedures = ({
                 <GridItem md={6} container justify='flex-end'>
                   {i !== 0 && (
                     <Popconfirm
-                      title='Are you sure delete this item?'
+                      title='Delete this item?'
                       onConfirm={() => {
                         deleteProcedure(o)
                       }}
