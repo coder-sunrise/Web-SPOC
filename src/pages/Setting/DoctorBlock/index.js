@@ -78,7 +78,7 @@ class DoctorBlock extends PureComponent {
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
-        openConfirmContent: 'Are you sure want to delete this doctor block?',
+        openConfirmContent: 'Delete this doctor block?',
         onConfirmSave: () => this.confirmDelete(id),
       },
     })

@@ -81,7 +81,7 @@ class Statement extends PureComponent {
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
-        openConfirmContent: `Are you sure want to delete record ${statementNo} ?`,
+        openConfirmContent: `Delete record ${statementNo}?`,
         onConfirmSave: () => {
           dispatch({
             type: 'statement/removeRow',

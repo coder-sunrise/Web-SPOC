@@ -145,6 +145,7 @@ const POForm = ({
                       })}
                       multiline
                       rowsMax={4}
+                      maxLength={2000}
                       disabled={isCompletedOrCancelled}
                       {...args}
                     />

@@ -1,4 +1,5 @@
 import React, { PureComponent, Fragment } from 'react'
+import { connect } from "dva"
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -20,6 +21,14 @@ import AuthorizedContext from '@/components/Context/Authorized'
 import Authorized from '@/utils/Authorized'
 import Contact from './Contact'
 import { enableDisableOptions } from '@/utils/codes'
+
+@connect(
+  ({
+    clinicSettings,
+  }) => ({
+    clinicSettings: clinicSettings.settings,
+  }),
+)
 
 @withFormikExtend({
   authority: [
@@ -133,7 +142,7 @@ class Detail extends PureComponent {
   render () {
     const { props } = this
 
-    const { theme, footer, values, settingCompany, route, rights } = props
+    const { theme, footer, values, settingCompany, route, rights, clinicSettings } = props
     const { name } = route
     const isCopayer = name === 'copayer'
 
@@ -142,6 +151,7 @@ class Detail extends PureComponent {
     let finalRights = isUserMaintainable ? 'enable' : 'disable'
     if (rights === 'disable') finalRights = 'disable'
 
+    const { isEnableAutoGenerateStatement = false } = clinicSettings
     return (
       <React.Fragment>
         <AuthorizedContext.Provider
@@ -176,7 +186,7 @@ class Detail extends PureComponent {
                 />
               </GridItem>
 
-              <GridItem md={6}>
+              <GridItem md={12}>
                 <FastField
                   name='effectiveDates'
                   render={(args) => {
@@ -191,17 +201,6 @@ class Detail extends PureComponent {
                   }}
                 />
               </GridItem>
-              {isCopayer && (
-                <GridItem md={6}>
-                  <FastField
-                    name='isAutoGenerateStatementEnabled'
-                    render={(args) => {
-                      return <Select label='Auto Generate Statement' options={enableDisableOptions} {...args} />
-                    }}
-                  />
-                </GridItem>
-              )}
-
               {isCopayer && (
                 <React.Fragment>
                   <GridItem md={6}>
@@ -409,7 +408,20 @@ class Detail extends PureComponent {
                       []
                     )}
                 </GridItem>
-              </React.Fragment>
+              </React.Fragment> 
+              {isCopayer && isEnableAutoGenerateStatement && (
+                <GridItem md={12}>
+                  <FastField
+                    name='isAutoGenerateStatementEnabled'
+                    render={(args) => {
+                      return <Checkbox
+                        label='Auto Generate Statement'
+                        {...args}
+                      />
+                    }}
+                  />
+                </GridItem>
+              )} 
               {isCopayer && (
                 <GridItem md={12}>
                   <Field

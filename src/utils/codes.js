@@ -1620,10 +1620,6 @@ const ltAdmittingSpecialty = [
   },
 ]
 
-const enableDisableOptions = [
-  { value: true, name: 'Enabled' },
-  { value: false, name: 'Disabled' },
-]
 const queueProcessorType = [
   {
     value: 1,
@@ -1687,8 +1683,7 @@ module.exports = {
   ltAdmittingSpecialty,
   month,
   year,
-  enableDisableOptions,
-  queueProcessorType, 
+  queueProcessorType,
   queueItemStatus,
   ...module.exports,
 }

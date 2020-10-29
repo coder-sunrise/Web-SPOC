@@ -128,7 +128,7 @@ class SimpleModal extends React.Component {
           showCancel
           confirmBtnText={submitting ? 'Processing...' : 'Confirm'}
           // style={{ display: "block", marginTop: "-100px" }}
-          //   title={`Are you sure to void the Payment ${ row.itemCode  } ?`}
+          //   title={`Void the Payment ${ row.itemCode  }?`}
           onConfirm={this.onConfirm}
           onCancel={this.hideAlert}
           cancelBtnCssClass={`${classes.button} ${classes.contained} ${classes.danger} ${classes.containeddanger}`}

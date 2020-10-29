@@ -1,17 +1,14 @@
 import { createListViewModel } from 'medisys-model'
-import * as service from '../services'
 import { notification } from '@/components'
-
+import * as service from '../services'
 
 export default createListViewModel({
   namespace: 'patientAttachment',
-  config: {
-    
-  },
+  config: {},
   param: {
     service,
     state: {
-      default:{test: '123'},
+      default: { test: '123' },
     },
     // subscriptions: ({ dispatch, history }) => {
     //   history.listen(async (loct, method) => {
@@ -19,6 +16,14 @@ export default createListViewModel({
     //   })
     // },
     effects: {
+      *queryOne ({ payload }, { select, call, put }) {
+        const response = yield call(service.queryDone, payload)
+
+        if (response && response.status === '200') {
+          return response.data
+        }
+        return null
+      },
       *removeRow ({ payload }, { call, put }) {
         const result = yield call(service.remove, payload)
         if (result === 204) {

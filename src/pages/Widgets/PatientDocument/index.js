@@ -1,19 +1,32 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
+
 // material ui
-import { withStyles } from '@material-ui/core'
+import { withStyles, Slider } from '@material-ui/core'
+
 // styles
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 // common components
-import { FastField } from '@/components'
-import { Attachment } from '@/components/_medisys'
+import {
+  GridContainer,
+  GridItem,
+  CardContainer,
+  Button,
+  Tooltip,
+  Popover,
+} from '@/components'
 // sub components
 import { findGetParameter } from '@/utils/utils'
-import Filter from './Filter'
-import Grid from './Grid'
+import {
+  List as ListIcon,
+  Apps as AppsIcon,
+  ZoomIn as ZoomInIcon,
+} from '@material-ui/icons'
+
 // models
 import model from './models'
-// utils
+import FolderList from './FolderList/index'
+import FolderContainer from './FolderContainer/index'
 
 window.g_app.replaceModel(model)
 
@@ -21,46 +34,67 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-const getLargestSortOrder = (largestIndex, attachment) =>
-  attachment.sortOrder > largestIndex ? attachment.sortOrder : largestIndex
-
-@connect(({ patientAttachment }) => ({
+@connect(({ patientAttachment, folder }) => ({
   patientAttachment,
+  folder,
 }))
 class PatientDocument extends Component {
-  state = {}
+  state = {
+    selectedFolderFK: -99, // all
+    viewMode: 'card',
+    zoom: 4,
+  }
 
   componentDidMount () {
     const { dispatch, values } = this.props
     dispatch({
+      type: 'folder/query',
+      payload: {
+        pagesize: 999,
+        sorting: [
+          { columnName: 'sortOrder', direction: 'asc' },
+        ],
+      },
+    }).then(this.refreshDocuments)
+  }
+
+  refreshDocuments = () => {
+    const { dispatch, values } = this.props
+    dispatch({
       type: 'patientAttachment/query',
       payload: {
+        pagesize: 999,
         'PatientProfileFKNavigation.Id': values.id,
       },
     })
   }
 
   updateAttachments = (args) => ({ added, deleted }) => {
-    // console.log({ added, deleted }, args)
     const { dispatch, patientAttachment = [] } = this.props
     const { list = [] } = patientAttachment
     const { field } = args
 
+    const getLargestSortOrder = (largestIndex, attachment) =>
+      attachment.sortOrder > largestIndex ? attachment.sortOrder : largestIndex
+
     let updated = [
       ...(field.value || []),
     ]
-    if (added)
+    if (added) {
+      const addedFiles = added.map((file) => {
+        const { 0: fileDetails, attachmentType } = file
+        return {
+          ...fileDetails,
+          fileIndexFK: fileDetails.id,
+          attachmentType,
+        }
+      })
       updated = [
         ...updated,
-        ...added.map((file) => {
-          const { 0: fileDetails, attachmentType } = file
-          return {
-            ...fileDetails,
-            fileIndexFK: fileDetails.id,
-            attachmentType,
-          }
-        }),
+        ...addedFiles,
       ]
+      // this.setState({ showTagModal: true, tagList: addedFiles })
+    }
 
     if (deleted)
       updated = updated.reduce((attachments, item) => {
@@ -94,48 +128,132 @@ class PatientDocument extends Component {
             patientProfileFK: findGetParameter('pid'),
             sortOrder: startOrder + index,
             fileIndexFK: attachment.fileIndexFK,
+            displayValue: attachment.fileName,
+            patientAttachment_Folder: attachment.patientAttachment_Folder,
           },
         }),
       ),
     )
-      .then(() => {
-        dispatch({
-          type: 'patientAttachment/query',
-        })
-      })
+      .then(this.refreshDocuments)
       .catch((error) => {
         console.error({ error })
       })
   }
 
   render () {
-    const { patient: { entity } } = this.props
+    const { patient: { entity }, patientAttachment, folder } = this.props
+    const { viewMode, selectedFolderFK, zoom } = this.state
     const patientIsActive = entity && entity.isActive
-    return (
-      <div>
-        <Filter {...this.props} />
-        <Grid {...this.props} />
-        {patientIsActive && (
-          <div style={{ float: 'left' }}>
-            <FastField
-              name='patientAttachment'
-              render={(args) => {
-                this.form = args.form
+    const { list = [] } = patientAttachment
 
-                return (
-                  <Attachment
-                    attachmentType='patientAttachment'
-                    handleUpdateAttachments={this.updateAttachments(args)}
-                    attachments={args.field.value}
-                    label=''
-                    // isReadOnly
-                  />
-                )
+    let folderList = (folder.list || []).map((l) => {
+      return {
+        ...l,
+        fileCount: list.filter((f) => f.folderFKs.includes(l.id)).length,
+      }
+    })
+    folderList = [
+      { id: -99, displayValue: 'All', sortOrder: -99, fileCount: list.length },
+      ...folderList,
+    ]
+    return (
+      <GridContainer>
+        <GridItem md={3}>
+          <CardContainer
+            hideHeader
+            style={{ height: window.innerHeight - 100, overflow: 'scroll' }}
+          >
+            <FolderList
+              readOnly={!patientIsActive}
+              folderList={folderList}
+              selectedFolderFK={selectedFolderFK}
+              updateAttachments={this.updateAttachments}
+              onSelectionChange={(f) => {
+                this.setState({ selectedFolderFK: f.id })
               }}
+              {...this.props}
             />
-          </div>
-        )}
-      </div>
+          </CardContainer>
+        </GridItem>
+        <GridItem md={9}>
+          <CardContainer
+            hideHeader
+            style={{ height: window.innerHeight - 100, overflow: 'scroll' }}
+          >
+            <GridContainer style={{ height: 'auto' }}>
+              <GridItem md={12} align='Right' style={{ marginBottom: 10 }}>
+                <div>
+                  {viewMode === 'card' && (
+                    <Popover
+                      icon={null}
+                      placement='bottom'
+                      content={
+                        <div style={{ width: 150 }}>
+                          <Slider
+                            // orientation='vertical'
+                            // getAriaValueText={valuetext}
+                            defaultValue={4}
+                            aria-labelledby='vertical-slider'
+                            valueLabelDisplay='off'
+                            step={1}
+                            marks
+                            min={1}
+                            max={5}
+                            onChange={(e, v) => {
+                              if (zoom !== v) {
+                                this.setState({ zoom: v })
+                              }
+                            }}
+                          />
+                        </div>
+                      }
+                    >
+                      <Tooltip title='Zoom'>
+                        <Button justIcon color='primary'>
+                          <ZoomInIcon />
+                        </Button>
+                      </Tooltip>
+                    </Popover>
+                  )}
+                  <Tooltip title='List View'>
+                    <Button
+                      justIcon
+                      color='primary'
+                      onClick={() => {
+                        this.setState({ viewMode: 'list' })
+                      }}
+                    >
+                      <ListIcon />
+                    </Button>
+                  </Tooltip>
+                  <Tooltip title='Card View'>
+                    <Button
+                      justIcon
+                      color='primary'
+                      onClick={() => {
+                        this.setState({ viewMode: 'card' })
+                      }}
+                    >
+                      <AppsIcon />
+                    </Button>
+                  </Tooltip>
+                </div>
+              </GridItem>
+              <GridItem md={12}>
+                <FolderContainer
+                  {...this.props}
+                  zoom={zoom}
+                  readOnly={!patientIsActive}
+                  folderList={folderList}
+                  viewMode={viewMode}
+                  attachmentList={list}
+                  selectedFolderFK={selectedFolderFK}
+                />
+              </GridItem>
+            </GridContainer>
+          </CardContainer>
+        </GridItem>
+      </GridContainer>
     )
   }
 }
