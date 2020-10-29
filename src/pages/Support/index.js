@@ -8,6 +8,7 @@ import { formatMessage } from 'umi/locale'
 import { connect } from 'dva'
 
 import { withStyles } from '@material-ui/core'
+import Authorized from '@/utils/Authorized'
 
 import { GridContainer, GridItem, CardContainer, Button } from '@/components'
 
@@ -50,7 +51,8 @@ class Support extends PureComponent {
     const { clinicSettings } = props
     const { isEnableAutoGenerateStatement = false } = clinicSettings
     super(props)
-    if (!isEnableAutoGenerateStatement) {
+    const accessRight = Authorized.check('support.queueprocessor')
+    if (!isEnableAutoGenerateStatement || (!accessRight || (accessRight && accessRight.rights !== 'enable'))) {
       let index = menuData.findIndex(item => item.text === 'Queue Processor')
       if (index !== -1) {
         menuData.splice(index, 1)
