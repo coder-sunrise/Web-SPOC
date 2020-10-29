@@ -79,7 +79,7 @@ class ImagePreviewer extends Component {
   componentDidMount () {
     const { defaultFileFK, files } = this.props
 
-    console.log('componentDidMount', { defaultFileFK, files })
+    // console.log('componentDidMount', { defaultFileFK, files })
     this.cacheImageList(files, defaultFileFK)
     window.addEventListener('resize', this.resize.bind(this))
   }
@@ -163,17 +163,13 @@ class ImagePreviewer extends Component {
   }
 
   fetchImage = (imageList, fileIndexFK) => {
-    this.setState({ loading: true })
     const {
       imageContainerWidth: width,
       imageContainerHeight: height,
     } = this.state
 
-    getFileByFileID(fileIndexFK).then((response) => {
-      this.setState({ loading: false })
-      if (response) {
-        const { data } = response
-        const contentInBase64 = base64Prefix + arrayBufferToBase64(data)
+    const loadImage = (contentInBase64) => {
+      if (contentInBase64) {
         this.processImage(contentInBase64, width, height).then((content) => {
           let selectedImg
           imageList.map((i) => {
@@ -188,6 +184,7 @@ class ImagePreviewer extends Component {
             selectedImg.image = content.image
             selectedImg.width = content.width
             selectedImg.height = content.height
+            selectedImg.imageData = contentInBase64
 
             this.setState({ imageList, loading: false })
             setTimeout(() => {
@@ -196,7 +193,21 @@ class ImagePreviewer extends Component {
           }
         })
       }
-    })
+    }
+
+    const currentFile = imageList.find((i) => i.fileIndexFK === fileIndexFK)
+    if (currentFile && currentFile.imageData) {
+      loadImage(currentFile.imageData)
+    } else {
+      this.setState({ loading: true })
+      getFileByFileID(fileIndexFK).then((response) => {
+        this.setState({ loading: false })
+        const { data } = response
+        const contentInBase64 = base64Prefix + arrayBufferToBase64(data)
+        loadImage(contentInBase64)
+        this.props.onImageLoaded(fileIndexFK, contentInBase64)
+      })
+    }
   }
 
   processImage = async (data, sourceWidth, sourceHeight) => {
@@ -431,11 +442,12 @@ class ImagePreviewer extends Component {
         </div>
         <div>
           <GridContainer>
-            <GridItem md={12}>
+            <GridItem xs={12} md={12}>
               <TextField
-                label='Create By'
+                label='Created By'
                 text
                 value={selectedImage.createByUserName}
+                style={{ width: '100%' }}
               />
             </GridItem>
             <GridItem md={12}>
@@ -455,6 +467,7 @@ class ImagePreviewer extends Component {
                   this.setState({ imageList })
                 }}
                 text={readOnly}
+                style={{ width: '100%' }}
               />
             </GridItem>
             <GridItem md={12} style={{ marginTop: 10 }}>

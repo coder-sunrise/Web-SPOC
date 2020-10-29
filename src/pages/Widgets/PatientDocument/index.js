@@ -55,14 +55,17 @@ class PatientDocument extends Component {
           { columnName: 'sortOrder', direction: 'asc' },
         ],
       },
-    }).then(() => {
-      dispatch({
-        type: 'patientAttachment/query',
-        payload: {
-          pagesize: 999,
-          'PatientProfileFKNavigation.Id': values.id,
-        },
-      })
+    }).then(this.refreshDocuments)
+  }
+
+  refreshDocuments = () => {
+    const { dispatch, values } = this.props
+    dispatch({
+      type: 'patientAttachment/query',
+      payload: {
+        pagesize: 999,
+        'PatientProfileFKNavigation.Id': values.id,
+      },
     })
   }
 
@@ -131,11 +134,7 @@ class PatientDocument extends Component {
         }),
       ),
     )
-      .then(() => {
-        dispatch({
-          type: 'patientAttachment/query',
-        })
-      })
+      .then(this.refreshDocuments)
       .catch((error) => {
         console.error({ error })
       })

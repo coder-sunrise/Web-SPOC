@@ -24,6 +24,11 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
     setEditingFile,
   ] = useState({})
 
+  const [
+    cachedImageDatas,
+    setCachedImageDatas,
+  ] = useState([])
+
   const imageExt = [
     'JPG',
     'JPEG',
@@ -91,12 +96,28 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
   const onEditFileName = (file) => {
     setEditingFile({ ...file, showNameEditor: true })
   }
+  const onImageLoaded = (fileIndexFK, imageData) => {
+    const cached = cachedImageDatas.find((f) => f.fileIndexFK === fileIndexFK)
+    if (cached) {
+      cached.imageData = imageData
+    } else {
+      setCachedImageDatas([
+        ...cachedImageDatas,
+        { fileIndexFK, imageData },
+      ])
+    }
+  }
   const cfg = {
-    attachmentList,
+    attachmentList: attachmentList.map((a) => {
+      const cached =
+        cachedImageDatas.find((f) => f.fileIndexFK === a.fileIndexFK) || {}
+      return { ...a, imageData: cached.imageData }
+    }),
     onAddNewFolders,
     onEditFileName,
     onFileUpdated,
     onPreview,
+    onImageLoaded,
   }
   return (
     <React.Fragment>
@@ -116,11 +137,12 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
         <ImagePreviewer
           {...restProps}
           defaultFileFK={selectedFileId}
-          files={attachmentList.filter((f) =>
+          files={cfg.attachmentList.filter((f) =>
             imageExt.includes(f.fileExtension.toUpperCase()),
           )}
           onAddNewFolders={onAddNewFolders}
           onFileUpdated={onFileUpdated}
+          onImageLoaded={cfg.onImageLoaded}
         />
       </CommonModal>
       {editingFile && (
