@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import { FormattedMessage } from 'umi/locale'
 import Search from '@material-ui/icons/Search'
+import moment from 'moment'
 import { queueProcessorType, queueItemStatus } from '@/utils/codes'
 import {
   withFormikExtend,
@@ -97,9 +98,9 @@ class Filter extends PureComponent {
                     payload: {
                       queueProcessStatusFK,
                       queueProcessTypeFK,
-                      createByUserFK,
-                      lgteql_createDate: requestDate ? requestDate[0] : undefined,
-                      lsteql_createDate: requestDate ? requestDate[1] : undefined,
+                      createByUserFK, 
+                      lgteql_createDate: requestDate ? moment(requestDate[0]).formatUTC() : undefined,
+                      lsteql_createDate: requestDate ? moment(requestDate[1]).formatUTC() : undefined,
                     },
                   })
                 }}

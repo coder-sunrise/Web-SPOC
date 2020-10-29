@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 
 import moment from 'moment'
 import { connect } from 'dva'
-import { CommonTableGrid, Tooltip, dateFormatLong } from '@/components'
+import { CommonTableGrid, Tooltip, dateFormatLong, dateFormatLongWithTime12h } from '@/components'
 import { queueProcessorType, queueItemStatus } from '@/utils/codes'
 
 @connect(({ queueProcessor }) => ({
@@ -18,7 +18,7 @@ class Grid extends PureComponent {
       { name: 'updateDate', title: 'Completed Date' },
       { name: 'queueProcessStatusFK', title: 'Status' },
       { name: 'data', title: 'Request Parameter' },
-      { name: 'result', title: 'Result Message' }, 
+      { name: 'result', title: 'Result Message' },
     ],
     columnExtensions: [
       {
@@ -43,6 +43,12 @@ class Grid extends PureComponent {
         columnName: 'updateDate', width: 180,
         type: 'date',
         showTime: true,
+        render: (row) => {
+          if (row.queueProcessStatusFK === 3 || row.queueProcessStatusFK === 4) {
+            return moment(row.updateDate).format(dateFormatLongWithTime12h)
+          }
+          return undefined
+        },
       },
       {
         columnName: 'data',
