@@ -218,6 +218,7 @@ const Scheme = ({
       return {
         name: p.payerName,
         id: p.id,
+        balance: p.balance,
       }
     })
   }
@@ -390,7 +391,7 @@ const Scheme = ({
                 valueField='id'
                 onChange={handleSchemePayerChange}
                 value={schemePayerFK}
-                disabled={_isConfirmed}
+                disabled// ={_isConfirmed}
                 options={[
                   ...payerList.map((item) => ({
                     id: item.id,

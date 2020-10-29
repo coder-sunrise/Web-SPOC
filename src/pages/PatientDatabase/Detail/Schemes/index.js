@@ -69,20 +69,18 @@ class Schemes extends PureComponent {
     }
   }
 
-  isMedisave = (row) => {
-    const { codetable } = this.props
-    const schemeTypes = codetable['ctSchemeType'.toLowerCase()] || []
-
-    const r = schemeTypes.find((o) => o.id === row.schemeTypeFK)
-
-    if (!r) return false
-    return (
-      [
-        'MEDIVISIT',
-        'FLEXIMEDI',
-        'MEDI500VACCINATION',
-      ].indexOf(r.code) >= 0
-    )
+  isMedisave = (schemeTypeFK) => {
+    const { ctschemetype } = this.props.codetable
+    const r = ctschemetype.find((o) => o.id === schemeTypeFK)
+    if (r)
+      return (
+        [
+          'MEDIVISIT',
+          'FLEXIMEDI',
+          'MEDI500VACCINATION',
+        ].indexOf(r.code) >= 0
+      )
+    return false
   }
 
   createNewScheme = (result, values) => {
@@ -267,7 +265,7 @@ class Schemes extends PureComponent {
         {/* TODO: hide medisave payer until feature is fully built */}
         <div
           style={{
-              display: values.patientScheme.filter((o) => this.isMedisave(o) && !o.isDeleted).length > 0  ? '' : 'none',
+              display: values.patientScheme.filter((o) => this.isMedisave(o.schemeTypeFK) && !o.isDeleted).length > 0  ? '' : 'none',
             }}
         >
           <h4
@@ -279,7 +277,7 @@ class Schemes extends PureComponent {
             Medisave Payer
           </h4>
           <PayersGrid
-            enableAdd={values.patientScheme && !isCreatingPatient ? values.patientScheme.find((o) => this.isMedisave(o)) : false} // TODO: check is medisave added
+            enableAdd={values.patientScheme && !isCreatingPatient ? values.patientScheme.find((o) => this.isMedisave(o.schemeTypeFK)) : false} // TODO: check is medisave added
             rows={values.schemePayer}/* .map(sp => {
               const existScheme = values.patientScheme.find(p => !p.isDeleted && p.schemeTypeFK === sp.schemeFK)
               if(!existScheme && sp.schemeFK)

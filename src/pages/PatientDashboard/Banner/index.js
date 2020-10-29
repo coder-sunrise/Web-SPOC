@@ -334,14 +334,15 @@ class Banner extends PureComponent {
   isMedisave = (schemeTypeFK) => {
     const { ctschemetype } = this.props.codetable
     const r = ctschemetype.find((o) => o.id === schemeTypeFK)
-    if(!r) return false
-    return (
-      [
-        'FLEXIMEDI',
-        'OPSCAN',
-        'MEDIVISIT',
-      ].indexOf(r.code) >= 0
-    )
+    if(r)
+      return (
+        [
+          'FLEXIMEDI',
+          'OPSCAN',
+          'MEDIVISIT',
+        ].indexOf(r.code) >= 0
+      )
+    return false
   }
 
   getSchemeDetails = (schemeData) => {

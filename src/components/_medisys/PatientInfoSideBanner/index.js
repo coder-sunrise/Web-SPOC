@@ -57,9 +57,9 @@ class PatientInfoSideBanner extends PureComponent {
   }
 
   isMedisave = (schemeTypeFK) => {
-    const { ctSchemeType } = this.props    
+    const { ctSchemeType } = this.props
     const r = ctSchemeType.find((o) => o.id === schemeTypeFK)
-    if(r.code)
+    if(r)
       return (
         [
           'FLEXIMEDI',
