@@ -77,7 +77,7 @@ class PurchaseReceivingList extends PureComponent {
           </div>
         ),
       },
-      { name: 'uom', title: 'Uom' },
+      { name: 'uom', title: 'UOM' },
       {
         name: 'receivedDate',
         title: (
