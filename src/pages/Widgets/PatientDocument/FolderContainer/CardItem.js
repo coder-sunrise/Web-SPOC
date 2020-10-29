@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import moment from 'moment'
 import _ from 'lodash'
-import $ from 'jquery'
 import { NavLink } from 'react-router-dom'
 // material ui
 import { withStyles, Chip } from '@material-ui/core'
