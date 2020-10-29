@@ -5,6 +5,7 @@ import {
   INVOICE_STATUS_TEXT,
   RECEIVING_GOODS_STATUS_TEXT,
 } from '@/utils/constants'
+import Authorized from '@/utils/Authorized'
 import { ContextMenuOptions, ReceivingGoodsGridCol } from '../variables'
 
 const ReceivingGoodsDataGrid = ({
@@ -31,6 +32,9 @@ const ReceivingGoodsDataGrid = ({
         break
     }
   }
+  const viewEditAuthority = Authorized.check(
+    'receivinggoods.receivinggoodsdetails',
+  )
   return (
     <CommonTableGrid
       style={{ margin: 0 }}
@@ -39,7 +43,14 @@ const ReceivingGoodsDataGrid = ({
       forceRender
       onSelectionChange={handleOnSelectionChange}
       columns={ReceivingGoodsGridCol}
-      onRowDoubleClick={(row) => handleNavigate('edit', row.id)}
+      onRowDoubleClick={(row) => {
+        if (
+          row.receivingGoodsStatus === RECEIVING_GOODS_STATUS_TEXT.CANCELLED ||
+          viewEditAuthority.rights !== 'enable'
+        )
+          return
+        handleNavigate('edit', row.id)
+      }}
       columnExtensions={[
         {
           columnName: 'invoiceStatus',

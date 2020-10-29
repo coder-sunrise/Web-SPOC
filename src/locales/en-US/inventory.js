@@ -173,7 +173,7 @@ export default {
   'inventory.rg.detail.payment': 'Payment',
   'inventory.rg.detail.rgd.invoiceDate': 'Invoice Date',
   'inventory.rg.detail.rgd.remarks': 'Remarks',
-  'inventory.rg.detail.rgd.rgDate': 'Receiving Goods Date',
+  'inventory.rg.detail.rgd.rgDate': 'Receiving Date',
   'inventory.rg.detail.rgd.documentNo': 'Document No.',
   'inventory.rg.detail.rgd.supplierInfo': 'Supplier Info',
   'inventory.rg.detail.rgd.contactPerson': 'Contact Person',
@@ -186,7 +186,7 @@ export default {
   'inventory.rg.detail.rgd.unlock': 'Unlock',
   'inventory.rg.detail.payment.rgNo': 'Receiving No.',
   'inventory.rg.detail.payment.invoiceAmount': 'Invoice Amount',
-  'inventory.rg.detail.payment.receivingGoodsDate': 'Receiving Goods Date',
+  'inventory.rg.detail.payment.receivingGoodsDate': 'Receiving Date',
   'inventory.rg.detail.payment.outstandingAmount': 'Outstanding Amount',
   'inventory.rg.detail.payment.addPayment': 'Add Payment',
 }
