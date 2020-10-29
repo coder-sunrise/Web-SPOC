@@ -29,6 +29,7 @@ const Templates = ({
   dispatch,
   theme,
   classes,
+  visible = false,
   appointment: { filterTemplates },
   filterByDoctor,
   filterByApptType,
@@ -44,6 +45,8 @@ const Templates = ({
     selectedTemplateId,
     setSelectedTemplateId,
   ] = useState()
+
+  if (!visible && selectedTemplateId) setSelectedTemplateId(null)
 
   const saveFilterTemplate = (requestDelete, saveAsFavorite) => {
     let newFilterTemplates = [
@@ -127,57 +130,60 @@ const Templates = ({
     })
   }
 
-  const loadTemplate = async () => {
+  const loadTemplate = async (templateId) => {
     await dispatch({
       type: 'appointment/setCurrentFilterTemplate',
       payload: {
-        id: selectedTemplateId,
+        id: templateId,
       },
     })
+
     const selectedTemplate = filterTemplates.find(
-      (template) => template.id === selectedTemplateId,
+      (template) => template.id === templateId,
     )
+
     if (selectedTemplate) {
       handleApplyTemplate(selectedTemplate)
     }
   }
 
+  const onTemplateSelecteChanged = (v, opt) => {
+    loadTemplate(v)
+    setSelectedTemplateId(v)
+  }
+
   return (
     <SizeContainer size='sm'>
       <div>
-        <GridContainer gutter={0}>
-          <GridItem xs={12}>
-            <h5 style={{ fontWeight: 500, lineHeight: 1.3 }}>
-              Manage Filter Template
-            </h5>
-          </GridItem>
-          <GridItem xs={8}>
-            <Select
-              label='My Filter Template'
-              strongLabel
-              value={selectedTemplateId}
-              options={filterTemplates}
-              valueField='id'
-              labelField='templateName'
-              dropdownMatchSelectWidth={false}
-              onChange={(v) => {
-                setSelectedTemplateId(v)
-                setTemplateName('')
-              }}
-            />
-          </GridItem>
-          <GridItem xs={4} alignItems='flex-end' justify='flex-end' container>
-            <Authorized authority='appointment.viewotherappointment'>
-              <ProgressButton
-                icon={<GetApp />}
-                disabled={!selectedTemplateId}
-                onClick={loadTemplate}
-              >
-                Load
-              </ProgressButton>
-            </Authorized>
-          </GridItem>
-        </GridContainer>
+        <Authorized authority='appointment.viewotherappointment'>
+          <GridContainer gutter={0}>
+            <GridItem xs={12}>
+              <h5 style={{ fontWeight: 500, lineHeight: 1.3 }}>
+                Manage Filter Template
+              </h5>
+            </GridItem>
+            <GridItem xs={8}>
+              <Select
+                label='My Filter Template'
+                strongLabel
+                value={selectedTemplateId}
+                options={filterTemplates}
+                valueField='id'
+                labelField='templateName'
+                dropdownMatchSelectWidth={false}
+                onChange={onTemplateSelecteChanged}
+                renderDropdown={(o) => {
+                  return (
+                    <span>
+                      <font color='red'>{o.isFavorite ? ' * ' : ''}</font>
+                      {o.templateName}
+                    </span>
+                  )
+                }}
+              />
+            </GridItem>
+          </GridContainer>
+        </Authorized>
 
         {selectedTemplateId && (
           <GridContainer gutter={0} style={{ marginTop: 10 }}>
@@ -274,7 +280,9 @@ const Templates = ({
                   }}
                 >
                   <li>
-                    <p>Save current filter value as my favourite.</p>
+                    <p>
+                      Save current filter value as my favourite(<font color='red'>*</font>).
+                    </p>
                   </li>
                   <li>
                     <p>

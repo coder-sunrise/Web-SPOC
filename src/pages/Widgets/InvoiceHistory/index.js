@@ -14,11 +14,13 @@ import {
   dateFormatLong,
   Button,
   CommonModal,
+  WarningSnackbar,
 } from '@/components'
 // utils
 import { currencyFormatter } from '@/utils/utils'
 import { ReportViewer } from '@/components/_medisys'
-import PaymentDetails from '@/pages/Finance/Invoice/Details/PaymentDetails'
+import { getBizSession } from '@/services/queue'
+import PaymentDetails from './PaymentDetails'
 
 const styles = () => ({
   totalOSStyle: {
@@ -66,7 +68,25 @@ const InvoiceHistory = ({
     })
   }
 
+  const [
+    hasActiveSession,
+    setHasActiveSession,
+  ] = useState(true)
+
+  const checkHasActiveSession = () => {
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+    }
+    getBizSession(bizSessionPayload).then((result) => {
+      if (result) {
+        const { data } = result.data
+        setHasActiveSession(data.length > 0)
+      }
+    })
+  }
+
   useEffect(() => {
+    checkHasActiveSession()
     refreshInvoiceList()
   }, [])
 
@@ -85,12 +105,18 @@ const InvoiceHistory = ({
     })
   }
 
-  const getContent = () => {
-    const { entity } = patient || {}
+  const getContent = (o) => {
+    const { entity = {} } = patient || {}
+
     return (
       <PaymentDetails
-        patientIsActive={entity && entity.isActive}
+        invoiceDetail={o.invoiceDetail}
+        invoicePayer={o.invoicePayer}
         refreshInvoiceList={refreshInvoiceList}
+        readOnly={!hasActiveSession}
+        hasActiveSession={hasActiveSession}
+        patientIsActive={entity.isActive}
+        dispatch={dispatch}
       />
     )
   }
@@ -100,7 +126,6 @@ const InvoiceHistory = ({
       invoiceNo,
       invoiceDate,
       totalPayment,
-      totalOutstanding,
       patientOutstanding,
       invoiceTotalAftGST,
     } = row
@@ -154,39 +179,24 @@ const InvoiceHistory = ({
   return (
     <div>
       <CardContainer hideHeader size='sm'>
+        {!hasActiveSession ? (
+          <div style={{ paddingTop: 5 }}>
+            <WarningSnackbar
+              variant='warning'
+              className={classes.margin}
+              message='Action(s) is not allowed due to no active session was found.'
+            />
+          </div>
+        ) : (
+          ''
+        )}
         <div className={classes.totalOSStyle}>
           Total Patient O/S Balance: {currencyFormatter(getTotalPatientOS())}
         </div>
 
         <div className={classes.accordionStyle}>
           <Accordion
-            onChange={(event, p, expanded) => {
-              if (expanded) {
-                const { row } = p.prop
-
-                dispatch({
-                  type: 'invoicePayment/updateState',
-                  payload: {
-                    entity: null,
-                    currentId: null,
-                  },
-                })
-
-                dispatch({
-                  type: 'invoiceDetail/query',
-                  payload: {
-                    id: row.id,
-                  },
-                })
-
-                dispatch({
-                  type: 'invoicePayment/query',
-                  payload: {
-                    id: row.id,
-                  },
-                })
-              }
-            }}
+            mode='multiple'
             collapses={list.map((o) => {
               const returnValue = {
                 title: getTitle(o),

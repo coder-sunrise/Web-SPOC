@@ -174,7 +174,7 @@ class SearchBar extends PureComponent {
                 <FilterBarDate
                   isEndDate
                   noTodayLimit
-                  args={args}
+                  args={args} 
                   label='Statement To Date'
                   disabled={isAllDateChecked}
                   formValues={{

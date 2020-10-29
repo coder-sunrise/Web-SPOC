@@ -394,6 +394,11 @@ class CommonTableGrid extends PureComponent {
             ...cellStyle.cell,
           },
         },
+        EditColumn: {
+          headingCell: {
+            borderTop: '1px solid rgba(0, 0, 0, 0.12)',
+          },
+        },
         TableHeaderCell: {
           cell: {
             ...cellStyle.cell,

@@ -1082,8 +1082,8 @@ class Form extends React.PureComponent {
                           {...args}
                           disabled={disableDataGrid}
                           rows='10'
-                          rowsMax='10'
                           multiline
+                          maxLength={2000}
                           label='Appointment Remarks'
                         />
                       )}

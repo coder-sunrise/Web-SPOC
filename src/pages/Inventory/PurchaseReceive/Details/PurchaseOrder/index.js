@@ -14,9 +14,11 @@ import {
   notification,
 } from '@/components'
 import { ReportViewer } from '@/components/_medisys'
-import POForm from './POForm'
-import POGrid from './POGrid'
 import { calculateItemLevelAdjustment } from '@/utils/utils'
+import { podoOrderType } from '@/utils/codes'
+import { INVOICE_STATUS, PURCHASE_ORDER_STATUS } from '@/utils/constants'
+import AuthorizedContext from '@/components/Context/Authorized'
+import AmountSummary from '@/pages/Shared/AmountSummary'
 import {
   isPOStatusDraft,
   poSubmitAction,
@@ -26,10 +28,8 @@ import {
   enableSaveButton,
   getAccessRight,
 } from '../../variables'
-import { podoOrderType } from '@/utils/codes'
-import { INVOICE_STATUS, PURCHASE_ORDER_STATUS } from '@/utils/constants'
-import AuthorizedContext from '@/components/Context/Authorized'
-import AmountSummary from '@/pages/Shared/AmountSummary'
+import POGrid from './POGrid'
+import POForm from './POForm'
 
 const styles = (theme) => ({
   errorMsgStyle: {
@@ -643,13 +643,15 @@ class Index extends Component {
         >
           {poStatus !== PURCHASE_ORDER_STATUS.COMPLETED && (
             <div>
-              {poStatus !== PURCHASE_ORDER_STATUS.CANCELLED &&
+              {poStatus <= PURCHASE_ORDER_STATUS.FINALIZED &&
               deliveryOrder.length === 0 &&
               purchaseOrderPayment.length === 0 &&
-              type === 'edit' ? (
+              !isWriteOff &&
+              type === 'edit' && (
                 <ProgressButton
                   color='danger'
                   icon={null}
+                  authority='none'
                   onClick={() =>
                     this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
                 >
@@ -657,8 +659,6 @@ class Index extends Component {
                     id: 'inventory.pr.detail.pod.cancelpo',
                   })}
                 </ProgressButton>
-              ) : (
-                ''
               )}
 
               <ProgressButton
@@ -671,7 +671,7 @@ class Index extends Component {
                   id: 'inventory.pr.detail.pod.save',
                 })}
               </ProgressButton>
-              {!isPOStatusDraft(poStatus) ? (
+              {!isPOStatusDraft(poStatus) && (
                 <ProgressButton
                   color='success'
                   icon={null}
@@ -684,10 +684,10 @@ class Index extends Component {
                     id: 'inventory.pr.detail.pod.complete',
                   })}
                 </ProgressButton>
-              ) : (
-                ''
               )}
-              {isPOStatusDraft(poStatus) && type !== 'new' && type !== 'dup' ? (
+              {isPOStatusDraft(poStatus) &&
+              type !== 'new' &&
+              type !== 'dup' && (
                 <ProgressButton
                   color='success'
                   icon={null}
@@ -698,8 +698,6 @@ class Index extends Component {
                     id: 'inventory.pr.detail.pod.finalize',
                   })}
                 </ProgressButton>
-              ) : (
-                ''
               )}
             </div>
           )}

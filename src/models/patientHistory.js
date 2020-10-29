@@ -204,7 +204,110 @@ export default createListViewModel({
           ...st,
           invoiceHistory: {
             entity: data,
-            list: data.data,
+            list: data.data.map((o) => {
+              return {
+                ...o,
+                invoicePayer: o.invoicePayer.map((ip) => {
+                  let paymentTxnList = []
+                  const {
+                    invoicePayment,
+                    invoicePayerWriteOff,
+                    creditNote,
+                    statementInvoice,
+                  } = ip
+
+                  // Payment
+                  paymentTxnList = (paymentTxnList || []).concat(
+                    (invoicePayment || []).map((z) => {
+                      return {
+                        ...z,
+                        // id: z.id,
+                        type: 'Payment',
+                        itemID: z.receiptNo,
+                        date: z.paymentReceivedDate,
+                        amount: z.totalAmtPaid,
+                        isCancelled: z.isCancelled,
+                      }
+                    }),
+                  )
+
+                  // Write-Off
+                  paymentTxnList = (paymentTxnList || []).concat(
+                    (invoicePayerWriteOff || []).map((z) => {
+                      return {
+                        ...z,
+                        // id: z.id,
+                        type: 'Write Off',
+                        itemID: z.writeOffCode,
+                        date: z.writeOffDate,
+                        amount: z.writeOffAmount,
+                        reason: z.writeOffReason,
+                        isCancelled: z.isCancelled,
+                      }
+                    }),
+                  )
+
+                  // Credit Note
+                  paymentTxnList = (paymentTxnList || []).concat(
+                    (creditNote || []).map((z) => {
+                      return {
+                        ...z,
+                        // id: z.id,
+                        type: 'Credit Note',
+                        itemID: z.creditNoteNo,
+                        date: z.generatedDate,
+                        amount: z.totalAftGST,
+                        reason: z.remark,
+                        isCancelled: z.isCancelled,
+                      }
+                    }),
+                  )
+
+                  // Statement Corporate Charges
+                  paymentTxnList = (paymentTxnList || []).concat(
+                    (statementInvoice || [])
+                      .filter((x) => x.adminCharge > 0)
+                      .map((z) => {
+                        return {
+                          ...z,
+                          // id: z.id,
+                          type: 'Corporate Charges',
+                          itemID: z.statementNo,
+                          date: z.statementDate,
+                          amount: z.adminCharge,
+                          reason: '',
+                          isCancelled: undefined,
+                        }
+                      }),
+                  )
+
+                  // Statement Adjustment
+                  paymentTxnList = (paymentTxnList || []).concat(
+                    (statementInvoice || [])
+                      .filter(
+                        (x) =>
+                          x.statementAdjustment && x.statementAdjustment > 0,
+                      )
+                      .map((z) => {
+                        return {
+                          ...z,
+                          // id: z.id,
+                          type: 'Statement Adjustment',
+                          itemID: z.statementNo,
+                          date: z.statementDate,
+                          amount: z.statementAdjustment,
+                          reason: '',
+                          isCancelled: undefined,
+                        }
+                      }),
+                  )
+                  return {
+                    ...ip,
+                    paymentTxnList,
+                  }
+                }),
+              }
+            }),
           },
         }
       },

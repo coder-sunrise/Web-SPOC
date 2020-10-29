@@ -99,6 +99,7 @@ function onComponentChange (args, config) {
     onChange,
     gridId,
     getRowId,
+    triggerOnError = true,
     ...restProps
   } = cfg
   if (value === Object.values(args)[0]) return
@@ -116,7 +117,7 @@ function onComponentChange (args, config) {
   // this.setState({
   //   row: latestRow,
   // })
-  if (!error) {
+  if (!error || triggerOnError) {
     if (onChange) {
       onChange({
         row: latestRow,

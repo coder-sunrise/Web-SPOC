@@ -43,6 +43,7 @@ const PatientListingWithFormik = withFormik({
     ageFrom: 0,
     ageTo: 0,
     isAllDate: false,
+    patientStatus: 'all',
   }),
 })(PatientListing)
 
