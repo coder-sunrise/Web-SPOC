@@ -542,8 +542,8 @@ class AddNewStatement extends PureComponent {
                   render={(args) => {
                     return (
                       <DateRangePicker
-                        label='Invoice From Date'
-                        label2='Invoice To Date'
+                        label='Invoice Date From'
+                        label2='Invoice Date To'
                         {...args}
                       />
                     )

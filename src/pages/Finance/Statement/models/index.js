@@ -115,6 +115,13 @@ export default createListViewModel({
           payload: response,
         })
       },
+      *autoGenerateStatement ({ payload }, { call, put }) {
+        const r = yield call(service.autoGenerateStatement, payload)
+        if (r) {
+          return r
+        }
+        return false
+      },
     },
     reducers: {
       setActiveTab (st, { payload }) {
@@ -183,6 +190,13 @@ export default createListViewModel({
               name: x.sessionNo,
             }
           }),
+        }
+      },
+      autoGenerateStatementDone (state, { payload }) {
+        const { data } = payload
+        return {
+          ...state,
+          result: data,
         }
       },
     },

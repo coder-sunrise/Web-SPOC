@@ -1,4 +1,5 @@
 import React, { PureComponent, Fragment } from 'react'
+import { connect } from "dva"
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -19,6 +20,15 @@ import {
 import AuthorizedContext from '@/components/Context/Authorized'
 import Authorized from '@/utils/Authorized'
 import Contact from './Contact'
+import { enableDisableOptions } from '@/utils/codes'
+
+@connect(
+  ({
+    clinicSettings,
+  }) => ({
+    clinicSettings: clinicSettings.settings,
+  }),
+)
 
 @withFormikExtend({
   authority: [
@@ -40,6 +50,11 @@ import Contact from './Contact'
         is: () => settingCompany.companyType.id === 1,
         then: Yup.number().required(),
         otherwise: Yup.number().nullable(),
+      }),
+      isAutoGenerateStatementEnabled: Yup.boolean().when('settingCompany', {
+        is: () => settingCompany.companyType.id === 1,
+        then: Yup.boolean().required(),
+        otherwise: Yup.boolean().nullable(),
       }),
       adminCharge: Yup.number().when('settingCompany', {
         is: () => settingCompany.companyType.id === 1,
@@ -127,7 +142,7 @@ class Detail extends PureComponent {
   render () {
     const { props } = this
 
-    const { theme, footer, values, settingCompany, route, rights } = props
+    const { theme, footer, values, settingCompany, route, rights, clinicSettings } = props
     const { name } = route
     const isCopayer = name === 'copayer'
 
@@ -136,6 +151,7 @@ class Detail extends PureComponent {
     let finalRights = isUserMaintainable ? 'enable' : 'disable'
     if (rights === 'disable') finalRights = 'disable'
 
+    const { isEnableAutoGenerateStatement = false } = clinicSettings
     return (
       <React.Fragment>
         <AuthorizedContext.Provider
@@ -169,6 +185,7 @@ class Detail extends PureComponent {
                   )}
                 />
               </GridItem>
+
               <GridItem md={12}>
                 <FastField
                   name='effectiveDates'
@@ -199,32 +216,28 @@ class Detail extends PureComponent {
                       )}
                     />
                   </GridItem>
-                  {/* <GridItem md={6}>
-                    <FastField
-                      name='generateInvoice'
-                      render={(args) => (
-                        <Select
-                          label='Generate Invoice'
-                          options={[
-                            { value: false, name: 'No' },
-                            { value: true, name: 'Yes' },
-                          ]}
-                          {...args}
-                        />
-                      )}
-                    />
-                  </GridItem> */}
                 </React.Fragment>
               )}
-
-              <GridItem md={4}>
-                <Field
-                  name='adminCharge'
-                  render={(args) => {
-                    if (values.adminChargeType === 'ExactAmount') {
+              <React.Fragment>
+                <GridItem md={4}>
+                  <Field
+                    name='adminCharge'
+                    render={(args) => {
+                      if (values.adminChargeType === 'ExactAmount') {
+                        return (
+                          <NumberInput
+                            currency
+                            label='Corporate Charges'
+                            defaultValue='0.00'
+                            min={0}
+                            precision={2}
+                            {...args}
+                          />
+                        )
+                      }
                       return (
                         <NumberInput
-                          currency
+                          percentage
                           label='Corporate Charges'
                           defaultValue='0.00'
                           min={0}
@@ -232,35 +245,25 @@ class Detail extends PureComponent {
                           {...args}
                         />
                       )
-                    }
-                    return (
-                      <NumberInput
-                        percentage
-                        label='Corporate Charges'
-                        defaultValue='0.00'
-                        min={0}
-                        precision={2}
+                    }}
+                  />
+                </GridItem>
+                <GridItem md={2}>
+                  <Field
+                    name='adminChargeType'
+                    render={(args) => (
+                      <Switch
+                        checkedChildren='$'
+                        checkedValue='ExactAmount'
+                        unCheckedChildren='%'
+                        unCheckedValue='Percentage'
+                        label=' '
                         {...args}
                       />
-                    )
-                  }}
-                />
-              </GridItem>
-              <GridItem md={2}>
-                <Field
-                  name='adminChargeType'
-                  render={(args) => (
-                    <Switch
-                      checkedChildren='$'
-                      checkedValue='ExactAmount'
-                      unCheckedChildren='%'
-                      unCheckedValue='Percentage'
-                      label=' '
-                      {...args}
-                    />
-                  )}
-                />
-              </GridItem>
+                    )}
+                  />
+                </GridItem>
+              </React.Fragment>
 
               {isCopayer && (
                 <React.Fragment>
@@ -358,52 +361,67 @@ class Detail extends PureComponent {
                   </GridItem>
                 </React.Fragment>
               )}
-              <GridItem md={2}>
-                {!isCopayer ? (
-                  <div style={{ position: 'relative' }}>
-                    <CustomInput label='' disabled style={{ width: 0 }} />
-                    <div
-                      style={{
-                        position: 'absolute',
-                        bottom: 0,
-                      }}
-                    >
-                      <Field
-                        name='isGSTEnabled'
-                        render={(args) => (
-                          <Checkbox
-                            label='Enable GST'
-                            onChange={this.handleOnChange}
-                            {...args}
-                          />
-                        )}
-                      />
+              <React.Fragment>
+                <GridItem md={2}>
+                  {!isCopayer ? (
+                    <div style={{ position: 'relative', top: 16 }}>
+                      <CustomInput label='' disabled style={{ width: 0 }} />
+                      <div
+                        style={{
+                          position: 'absolute',
+                          bottom: 0,
+                        }}
+                      >
+                        <FastField
+                          name='isGSTEnabled'
+                          render={(args) => (
+                            <Checkbox
+                              label='Enable GST'
+                              onChange={this.handleOnChange}
+                              {...args}
+                            />
+                          )}
+                        />
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  []
-                )}
-              </GridItem>
-              <GridItem md={4}>
-                {!isCopayer ? (
-                  <Field
-                    name='gstValue'
-                    render={(args) => (
-                      <NumberInput
-                        label='GST Value'
-                        {...args}
-                        disabled={!isGSTEnabled}
-                        suffix='%'
-                        format='0.00'
-                        precision={2}
-                        notAllowDashNEqual
-                      />
+                  ) : (
+                      []
                     )}
+                </GridItem>
+                <GridItem md={4}>
+                  {!isCopayer ? (
+                    <Field
+                      name='gstValue'
+                      render={(args) => (
+                        <NumberInput
+                          label='GST Value'
+                          {...args}
+                          disabled={!isGSTEnabled}
+                          suffix='%'
+                          format='0.00'
+                          precision={2}
+                          notAllowDashNEqual
+                        />
+                      )}
+                    />
+                  ) : (
+                      []
+                    )}
+                </GridItem>
+              </React.Fragment> 
+              {isCopayer && isEnableAutoGenerateStatement && (
+                <GridItem md={12}>
+                  <FastField
+                    name='isAutoGenerateStatementEnabled'
+                    render={(args) => {
+                      return <Checkbox
+                        label='Auto Generate Statement'
+                        {...args}
+                      />
+                    }}
                   />
-                ) : (
-                  []
-                )}
-              </GridItem>
+                </GridItem>
+              )} 
               {isCopayer && (
                 <GridItem md={12}>
                   <Field

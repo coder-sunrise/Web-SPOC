@@ -1311,6 +1311,11 @@ const _routes = [
             name: 'printingtool',
             component: './support/PrintingTool',
           },
+          {
+            path: '/support/queueprocessor',
+            name: 'queueprocessor',
+            component: './support/QueueProcessor',
+          },
         ],
       },
       // Support

@@ -182,6 +182,7 @@ export default {
   'menu.support.support': 'Support',
   'menu.support.contactus': 'Contact Us',
   'menu.support.printingtool': 'Printing Tool',
+  'menu.support.queueprocessor': 'Queue Processor',
 
   'menu.wardmanagement': 'Ward Management',
   'menu.patient-monitoring': 'Patient Monitoring',
