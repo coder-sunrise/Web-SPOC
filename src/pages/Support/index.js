@@ -5,6 +5,7 @@ import Call from '@material-ui/icons/Call'
 import Print from '@material-ui/icons/Print'
 import FormatListNumberedOutlinedIcon from '@material-ui/icons/FormatListNumberedOutlined'
 import { formatMessage } from 'umi/locale'
+import { connect } from 'dva'
 
 import { withStyles } from '@material-ui/core'
 
@@ -37,16 +38,31 @@ const styles = () => ({
   },
 })
 
+@connect(
+  ({
+    clinicSettings,
+  }) => ({
+    clinicSettings: clinicSettings.settings,
+  }),
+)
 class Support extends PureComponent {
   constructor (props) {
+    const { clinicSettings } = props
+    const { isEnableAutoGenerateStatement = false } = clinicSettings
     super(props)
+    if (!isEnableAutoGenerateStatement) {
+      let index = menuData.findIndex(item => item.text === 'Queue Processor')
+      if (index !== -1) {
+        menuData.splice(index, 1)
+      }
+    }
     this.group = _.groupBy(menuData, 'title')
   }
 
   state = {}
 
   supportItems = () => {
-    const { classes, theme } = this.props
+    const { classes, theme } = this.props 
 
     return Object.keys(this.group).map((o) => {
       return (
@@ -55,7 +71,7 @@ class Support extends PureComponent {
             .filter((m) => {
               return (
                 m.text.toLocaleLowerCase().indexOf(this.state.searchText) >=
-                  0 || !this.state.searchText
+                0 || !this.state.searchText
               )
             })
             .map((item, i) => {
