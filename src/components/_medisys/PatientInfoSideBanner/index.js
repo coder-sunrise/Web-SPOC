@@ -439,13 +439,12 @@ class PatientInfoSideBanner extends PureComponent {
           className={classes.schemeContainer}
           style={{ maxHeight: height - 455 - 20 }}
         >
-          {entity.patientScheme
+          {// == CHAS == //
+            entity.patientScheme
             .filter((o) => o.schemeTypeFK <= 6 && !o.isDeleted)
             .map((o) => {
               const schemeData = this.getSchemeDetails(o)
-
               return (
-                // == CHAS == //
                 <LoadingWrapper loading={loading} text='Retrieving balance...'>
                   <div style={{ marginBottom: theme.spacing(1) }}>
                     <p style={{ fontWeight: 500 }}>
@@ -530,7 +529,7 @@ class PatientInfoSideBanner extends PureComponent {
           // == MEDISAVE == //
           <div
             className={classes.schemeContainer}
-            style={{ maxHeight: height - 455 - 20 }}
+            style={{ maxHeight: 200 }}
           >
             {entity.schemePayer
               .filter((o) => this.isMedisave(o.schemeFK) && !o.isDeleted)
