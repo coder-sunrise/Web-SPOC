@@ -142,6 +142,7 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
           )}
           onAddNewFolders={onAddNewFolders}
           onFileUpdated={onFileUpdated}
+          onImageLoaded={cfg.onImageLoaded}
         />
       </CommonModal>
       {editingFile && (

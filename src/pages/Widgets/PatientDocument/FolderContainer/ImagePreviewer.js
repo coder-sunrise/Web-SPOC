@@ -205,6 +205,7 @@ class ImagePreviewer extends Component {
         const { data } = response
         const contentInBase64 = base64Prefix + arrayBufferToBase64(data)
         loadImage(contentInBase64)
+        this.props.onImageLoaded(fileIndexFK, contentInBase64)
       })
     }
   }
