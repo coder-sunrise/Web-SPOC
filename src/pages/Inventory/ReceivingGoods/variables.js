@@ -2,6 +2,7 @@ import Edit from '@material-ui/icons/Edit'
 import Duplicate from '@material-ui/icons/FileCopy'
 import Print from '@material-ui/icons/Print'
 import Authorized from '@/utils/Authorized'
+import { RECEIVING_GOODS_STATUS_TEXT } from '@/utils/constants'
 
 export const rgSubmitAction = {
   SAVE: 1,
@@ -103,7 +104,9 @@ export const ContextMenuOptions = (row) => {
       id: 0,
       label: `Edit`,
       Icon: Edit,
-      disabled: viewEditAuthority.rights !== 'enable',
+      disabled:
+        row.receivingGoodsStatus === RECEIVING_GOODS_STATUS_TEXT.CANCELLED ||
+        viewEditAuthority.rights !== 'enable',
       width: 130,
     },
     {

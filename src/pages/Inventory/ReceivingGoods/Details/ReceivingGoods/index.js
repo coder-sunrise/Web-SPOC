@@ -191,7 +191,7 @@ class Index extends Component {
             openConfirm: true,
             openConfirmContent: content,
             onConfirmSave: async () => {
-              processedPayload = this.processSubmitPayload(false, statusCode)
+              processedPayload = this.processSubmitPayload(statusCode)
               await submit()
               if (statusCode === RECEIVING_GOODS_STATUS.CANCELLED) {
                 history.push('/inventory/rg')
@@ -205,7 +205,9 @@ class Index extends Component {
 
       switch (action) {
         case rgSubmitAction.SAVE:
-          processedPayload = this.processSubmitPayload(true)
+          processedPayload = this.processSubmitPayload(
+            RECEIVING_GOODS_STATUS.DRAFT,
+          )
           break
         case rgSubmitAction.CANCEL:
           openConfirmationModal(
@@ -218,8 +220,7 @@ class Index extends Component {
         case rgSubmitAction.COMPLETE:
           openConfirmationModal(
             RECEIVING_GOODS_STATUS.COMPLETED,
-            `Complete receiving goods ${values.receivingGoods
-              .receivingGoodsNo}?`,
+            `Complete this receiving goods?`,
             'YES',
             'NO',
           )
@@ -241,7 +242,7 @@ class Index extends Component {
     return validation
   }
 
-  processSubmitPayload = (isSaveAction = false, receivingGoodsStatusFK) => {
+  processSubmitPayload = (receivingGoodsStatusFK) => {
     const { receivingGoodsDetails, values } = this.props
     const { type } = receivingGoodsDetails
     const { receivingGoods, rows } = values
@@ -249,7 +250,11 @@ class Index extends Component {
     let newReceivingGoodsStatusFK = receivingGoodsStatusFK
 
     if (type === 'new') {
-      newReceivingGoodsStatusFK = RECEIVING_GOODS_STATUS.DRAFT
+      if (receivingGoodsStatusFK === RECEIVING_GOODS_STATUS.COMPLETED) {
+        newReceivingGoodsStatusFK = receivingGoodsStatusFK
+      } else {
+        newReceivingGoodsStatusFK = RECEIVING_GOODS_STATUS.DRAFT
+      }
       receivingGoodsItem = rows.map((x) => {
         const itemType = rgType.find((y) => y.value === x.type)
         return {
@@ -275,7 +280,11 @@ class Index extends Component {
         }
       })
     } else if (type === 'dup') {
-      newReceivingGoodsStatusFK = RECEIVING_GOODS_STATUS.DRAFT
+      if (receivingGoodsStatusFK === RECEIVING_GOODS_STATUS.COMPLETED) {
+        newReceivingGoodsStatusFK = receivingGoodsStatusFK
+      } else {
+        newReceivingGoodsStatusFK = RECEIVING_GOODS_STATUS.DRAFT
+      }
       delete receivingGoods.id
       delete receivingGoods.concurrencyToken
 
@@ -303,14 +312,7 @@ class Index extends Component {
         }
       })
     } else {
-      if (!isSaveAction) {
-        newReceivingGoodsStatusFK = receivingGoodsStatusFK
-      } else if (receivingGoodsStatusFK === RECEIVING_GOODS_STATUS.COMPLETED) {
-        newReceivingGoodsStatusFK = receivingGoodsStatusFK
-      } else {
-        newReceivingGoodsStatusFK = receivingGoods.receivingGoodsStatusFK
-      }
-
+      newReceivingGoodsStatusFK = receivingGoodsStatusFK
       receivingGoodsItem = rows.map((x) => {
         const itemType = rgType.find((y) => y.value === x.type)
         let result = {}
@@ -544,8 +546,7 @@ class Index extends Component {
                   })}
                 </ProgressButton>
               )}
-              {rgStatus === RECEIVING_GOODS_STATUS.DRAFT &&
-              type === 'edit' && (
+              {rgStatus === RECEIVING_GOODS_STATUS.DRAFT && (
                 <ProgressButton
                   color='success'
                   icon={null}

@@ -350,7 +350,7 @@ class Grid extends PureComponent {
         { name: 'orderQuantity', title: 'Order Qty.' },
         { name: 'quantityReceived', title: 'Received Qty.' },
         { name: 'bonusReceived', title: 'Bonus Qty.' },
-        { name: 'totalReceived', title: 'Total Received Qty' },
+        { name: 'totalReceived', title: 'Total Received Qty.' },
         { name: 'unitPrice', title: 'Unit Price' },
         { name: 'totalPrice', title: 'Total Price' },
         { name: 'batchNo', title: 'Batch No.' },
