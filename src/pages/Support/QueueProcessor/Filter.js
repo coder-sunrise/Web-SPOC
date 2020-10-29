@@ -2,14 +2,11 @@ import React, { PureComponent } from 'react'
 import { FormattedMessage } from 'umi/locale'
 import Search from '@material-ui/icons/Search'
 import { queueProcessorType, queueItemStatus } from '@/utils/codes'
-import { DoctorProfileSelect } from '@/components/_medisys'
 import {
   withFormikExtend,
   FastField,
   GridContainer,
-  GridItem,
-  Button,
-  TextField,
+  GridItem, 
   Select,
   ProgressButton,
   CodeSelect,

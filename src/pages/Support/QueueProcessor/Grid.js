@@ -4,7 +4,6 @@ import moment from 'moment'
 import { connect } from 'dva'
 import { CommonTableGrid, Tooltip, dateFormatLong } from '@/components'
 import { queueProcessorType, queueItemStatus } from '@/utils/codes'
-import * as service from './services'
 
 @connect(({ queueProcessor }) => ({
   queueProcessor,
