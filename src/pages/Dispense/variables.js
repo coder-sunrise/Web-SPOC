@@ -22,18 +22,14 @@ export const tableConfig = {
   FuncProps: { pager: false },
 }
 
-const columnwidth = '10%'
 const columnWidth = '10%'
 
-const lowStockIndicator = (row) => {
+const lowStockIndicator = (row, itemIdFieldName) => {
   const currentType = InventoryTypes.find((type) => type.name === row.type)
   if (!currentType) return null
 
   const values = {
-    [currentType.itemFKName]:
-      currentType.name === 'Consumable'
-        ? row.itemFK
-        : row[currentType.itemFKName],
+    [currentType.itemFKName]: row[itemIdFieldName],
   }
 
   // If is drug mixture, show drug mixture indicator
@@ -117,7 +113,7 @@ export const PrescriptionColumnExtensions = (
             }}
           >
             {row.name}
-            {lowStockIndicator(row)}
+            {lowStockIndicator(row, 'inventoryMedicationFK')}
           </div>
         </div>
       )
@@ -310,7 +306,7 @@ export const VaccinationColumnExtensions = (
             }}
           >
             {row.name}
-            {lowStockIndicator(row)}
+            {lowStockIndicator(row, 'inventoryVaccinationFK')}
           </div>
         </div>
       )
@@ -479,7 +475,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
               }}
             >
               {row.description}
-              {lowStockIndicator(row)}
+              {lowStockIndicator(row, 'itemFK')}
             </div>
           </div>
         </Tooltip>
@@ -686,5 +682,150 @@ export const DrugLabelSelectionColumnExtensions = (
         />
       )
     },
+  },
+]
+
+export const PackageColumns = [
+  {
+    name: 'type',
+    title: 'Type',
+  },
+  {
+    name: 'description',
+    title: 'Description',
+  },
+  {
+    name: 'packageConsumeQuantity',
+    title: 'Consumed',
+  },
+  {
+    name: 'packageRemainingQuantity',
+    title: 'Balance',
+  },
+  {
+    name: 'totalAfterItemAdjustment',
+    title: 'Total ($)',
+  },
+  {
+    name: 'action',
+    title: 'Action',
+  },
+  {
+    name: 'visitInvoicePackageFK',
+    title: 'Package',
+  },
+]
+
+export const PackageColumnExtensions = (onPrint) => [
+  {
+    columnName: 'type',
+    compare: compareString,
+    width: 160,
+    sortingEnabled: false,
+    render: (row) => {
+      return (
+        <div
+          style={{
+            wordWrap: 'break-word',
+            whiteSpace: 'pre-wrap',
+          }}
+        >
+          {row.type}
+        </div>
+      )
+    },
+  },
+  {
+    columnName: 'description',
+    compare: compareString,
+    sortingEnabled: false,
+    render: (row) => {
+      const { code = '', description = '', unitPrice = 0 } = row
+      const title = `${description} - ${code} (${currencySymbol}${numeral(
+        unitPrice,
+      ).format(currencyFormat)})`
+      return (
+        <Tooltip title={title}>
+          <div style={{ position: 'relative' }}>
+            <div
+              style={{
+                wordWrap: 'break-word',
+                whiteSpace: 'pre-wrap',
+              }}
+            >
+              {row.description}
+              {lowStockIndicator(row, 'itemFK')}
+            </div>
+          </div>
+        </Tooltip>
+      )
+    },
+  },
+  {
+    columnName: 'packageConsumeQuantity',
+    align: 'right',
+    width: columnWidth,
+    sortingEnabled: false,
+    render: (row) => {
+      return <NumberInput text value={row.packageConsumeQuantity} />
+    },
+  },
+  {
+    columnName: 'packageRemainingQuantity',
+    align: 'right',
+    width: columnWidth,
+    sortingEnabled: false,
+    render: (row) => {
+      return <NumberInput text value={row.packageRemainingQuantity} />
+    },
+  },
+  {
+    columnName: 'totalAfterItemAdjustment',
+    align: 'right',
+    width: columnWidth,
+    sortingEnabled: false,
+    render: (row) => {
+      return (
+        <NumberInput
+          text
+          currency
+          showZero
+          value={row.totalAfterItemAdjustment}
+        />
+      )
+    },
+  },
+  {
+    columnName: 'action',
+    align: 'center',
+    width: 80,
+    sortingEnabled: false,
+    render: (r) => {
+      const { type } = r
+
+      if (type === 'Service' || type === 'Consumable' || type === 'Vaccination')
+        return null
+      return (
+        <Tooltip title={
+          <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
+        }
+        >
+          <Button
+            color='primary'
+            justIcon
+            onClick={() => {
+              onPrint({ type: CONSTANTS.DRUG_LABEL, row: r })
+            }}
+          >
+            <Print />
+          </Button>
+        </Tooltip>
+      )
+    },
+  },
+  {
+    columnName: 'visitInvoicePackageFK',
+    width: 0,
+    sortingEnabled: false,
   },
 ]

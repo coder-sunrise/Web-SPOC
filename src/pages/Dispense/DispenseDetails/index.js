@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { connect } from 'dva'
 import { compose } from 'redux'
+import _ from 'lodash'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
 import Print from '@material-ui/icons/Print'
@@ -20,6 +21,7 @@ import {
   TextField,
   Field,
   CommonModal,
+  NumberInput,
 } from '@/components'
 import AmountSummary from '@/pages/Shared/AmountSummary'
 import Authorized from '@/utils/Authorized'
@@ -37,6 +39,8 @@ import {
   VaccinationColumnExtensions,
   OtherOrdersColumns,
   OtherOrdersColumnExtensions,
+  PackageColumns,
+  PackageColumnExtensions,
 } from '../variables'
 
 import CONSTANTS from './constants'
@@ -101,11 +105,13 @@ const DispenseDetails = ({
   onDrugLabelSelected,
   onDrugLabelNoChanged,
   selectedDrugs,
+  clinicSettings,
 }) => {
   const {
     prescription,
     vaccination,
     otherOrder,
+    packageItem,
     invoice,
     visitPurposeFK,
     visitRemarks,
@@ -120,6 +126,7 @@ const DispenseDetails = ({
   } = invoice
 
   const { inventorymedication, inventoryvaccination } = codetable
+  const { settings = [] } = clinicSettings
 
   const handleSelectedBatch = (e, op = {}, row) => {
     // console.log({ e, op, row })
@@ -231,6 +238,57 @@ const DispenseDetails = ({
       })),
     )
   })
+
+  const [
+    expandedGroups,
+    setExpandedGroups,
+  ] = useState([])
+
+  const handleExpandedGroupsChange = (e) => {
+    setExpandedGroups(e)
+  }
+
+  useEffect(() => {
+    if (packageItem) {
+      const groups = packageItem.reduce(
+        (distinct, data) =>
+          distinct.includes(data.visitInvoicePackageFK.toString())
+            ? [
+                ...distinct,
+              ]
+            : [
+                ...distinct,
+                data.visitInvoicePackageFK.toString(),
+              ],
+        [],
+      )
+
+      setExpandedGroups(groups)
+    }
+  }, [packageItem])
+
+  const packageGroupCellContent = ({ row }) => {
+    let label = 'Package'
+    let totalPrice = 0
+    if (!packageItem) return ''
+    const data = packageItem.filter(
+      (item) => item.visitInvoicePackageFK === row.value,
+    )
+    if (data.length > 0) {
+      totalPrice = _.sumBy(data, 'totalAfterItemAdjustment') || 0
+      label = `${data[0].packageCode} - ${data[0].packageName} (Total: `
+    }
+    return (
+      <span style={{ verticalAlign: 'middle', paddingRight: 8 }}>
+        <strong>
+          {label} 
+          <NumberInput text currency value={totalPrice} />
+          )        
+        </strong>
+      </span>
+    )
+  }
+
   return (
     <React.Fragment>
       <GridContainer>
@@ -378,6 +436,34 @@ const DispenseDetails = ({
               colExtensions={OtherOrdersColumnExtensions(viewOnly, onPrint)}
               data={otherOrder}
             />
+
+            {settings.isEnablePackage && (
+              <TableData
+                title='Package'
+                idPrefix='package'
+                columns={PackageColumns}
+                colExtensions={PackageColumnExtensions(onPrint)}
+                data={packageItem}
+                FuncProps={{
+                  pager: false,
+                  grouping: true,
+                  groupingConfig: {
+                    state: {
+                      grouping: [
+                        { columnName: 'visitInvoicePackageFK' },
+                      ],
+                      expandedGroups: [
+                        ...expandedGroups,
+                      ],
+                      onExpandedGroupsChange: handleExpandedGroupsChange,
+                    },
+                    row: {
+                      contentComponent: packageGroupCellContent,
+                    },
+                  },
+                }}
+              />
+            )}
           </Paper>
         </GridItem>
         <GridItem xs={8} md={8} style={{ marginTop: -14 }}>
@@ -536,7 +622,8 @@ const DispenseDetails = ({
 
 export default compose(
   withStyles(styles, { name: 'DispenseDetailsGrid' }),
-  connect(({ codetable }) => ({
+  connect(({ codetable, clinicSettings }) => ({
     codetable,
+    clinicSettings,
   })),
 )(DispenseDetails)

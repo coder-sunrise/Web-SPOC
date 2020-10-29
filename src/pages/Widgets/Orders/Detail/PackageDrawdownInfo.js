@@ -1,18 +1,60 @@
+import { Table } from 'antd'
+import moment from 'moment'
 import { Popover, Tooltip, Button } from '@/components'
+import tablestyles from '@/pages/Widgets/PatientHistory/PatientHistoryStyle.less'
 
 const PackageDrawdownInfo = ({ drawdownData = {} }) => {
+  const drawdownButtonStyle = {
+    position: 'absolute',
+    left: -5,
+    top: -2,
+    backgroundColor: '#9932CC',
+  }
+
   const parseToOneDecimalString = (value = 0.0) => value.toFixed(1)
 
   const drawdownTransactionDetails = (data) => {
     if (data.length > 0) {
-      return data.map((row) => {
-        return (
-          <p>
-            {row.consumeDate}  {row.consumeQuantity}
-          </p>
-        )
-      })
+      return (
+        <div style={{
+          fontSize: 14,
+        }}
+        >
+          <Table
+            size='small'
+            bordered
+            pagination={false}
+            columns={[
+              {
+                dataIndex: 'consumeDate',
+                title: 'Consume Date',
+                align: 'left',
+                render: (text, row) => (
+                  <span>{moment(row.consumeDate).format('DD MMM YYYY HH:mm')}</span>
+                ),
+              },
+              {
+                dataIndex: 'consumeQuantity',
+                title: 'Consumed Quantity',
+                align: 'right',
+                width: 140,
+                render: (text, row) => (
+                  <span>
+                    {parseToOneDecimalString(row.consumeQuantity)}
+                  </span>
+                ),
+              },
+            ]}
+            dataSource={data || []}
+            rowClassName={(record, index) => {
+              return index % 2 === 0 ? tablestyles.once : tablestyles.two
+            }}
+            className={tablestyles.table}
+          />
+        </div>
+      )
     }
+    return null
   }
 
   const packageDrawdownDetails = (data) => {
@@ -40,7 +82,7 @@ const PackageDrawdownInfo = ({ drawdownData = {} }) => {
             Package Drawdown (to-date: {parseToOneDecimalString(totalDrawdown)}/{parseToOneDecimalString(totalQty)} = {parseToOneDecimalString(balanceQty)} bal) 
             (today: {parseToOneDecimalString(data.packageConsumeQuantity)})
           </p>
-
+          <br />
           {drawdownTransactionDetails(drawdownTransaction)}
         </div>
       )
@@ -65,16 +107,11 @@ const PackageDrawdownInfo = ({ drawdownData = {} }) => {
     >
       <Tooltip title='Package Drawdown'>        
         <Button
-          style={{
-              position: 'absolute',
-              left: -5,
-              top: -1,
-            }}
+          style={drawdownButtonStyle}
           size='sm'
-          color='rose'
           justIcon
         >
-            PD
+          PD
         </Button>        
       </Tooltip>
     </Popover>
