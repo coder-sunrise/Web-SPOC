@@ -118,10 +118,6 @@ class CardView extends Component {
             )
           })}
       </div>
-      //   <CardContainer
-      //   hideHeader
-      //   style={{ height: window.innerHeight - 175, overflow: 'scroll' }}
-      // ></CardContainer>
     )
   }
 }

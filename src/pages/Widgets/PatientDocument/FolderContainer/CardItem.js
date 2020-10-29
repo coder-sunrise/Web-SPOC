@@ -73,10 +73,11 @@ class CardItem extends Component {
   }
 
   refreshImage = (props) => {
-    const { file: { fileExtension, fileIndexFK } } = props
+    const { file: { fileExtension, fileIndexFK, imageData } } = props
 
     if (imageExt.includes(fileExtension.toUpperCase())) {
-      this.fetchImage(fileIndexFK)
+      if (!imageData) this.fetchImage(fileIndexFK)
+      else this.setState({ imageData })
     } else if (wordExt.includes(fileExtension.toUpperCase())) {
       this.setState({ imageData: wordIcon })
     } else if (excelExt.includes(fileExtension.toUpperCase())) {
@@ -101,6 +102,7 @@ class CardItem extends Component {
           loading: false,
           imageData: contentInBase64,
         })
+        this.props.onImageLoaded(selectedFileId, contentInBase64)
       }
     })
   }
