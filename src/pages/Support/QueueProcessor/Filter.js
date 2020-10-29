@@ -48,7 +48,7 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem md={4}>
+          <GridItem xs={6} md={4}>
             <FastField
               name='requestDate'
               render={(args) => {
