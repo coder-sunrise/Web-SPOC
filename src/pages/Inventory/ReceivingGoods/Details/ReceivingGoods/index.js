@@ -491,7 +491,7 @@ class Index extends Component {
                 {type === 'edit' && (
                   <div>
                     {`Created by ${createByUser} on ${moment(createDate).format(
-                      'DD MMM YYYY HH:mm',
+                      'DD MMM YYYY hh:mm:ss A',
                     )}`}
                   </div>
                 )}
@@ -499,14 +499,14 @@ class Index extends Component {
                   <div>
                     {`Completed by ${closedByUser} on ${moment(
                       closeDate,
-                    ).format('DD MMM YYYY HH:mm')}`}
+                    ).format('DD MMM YYYY hh:mm:ss A')}`}
                   </div>
                 )}
                 {rgStatus === 2 && (
                   <div>
                     {`Cancelled by ${updateByUser} on ${moment(
                       cancellationDate,
-                    ).format('DD MMM YYYY HH:mm')}`}
+                    ).format('DD MMM YYYY hh:mm:ss A')}`}
                   </div>
                 )}
               </div>
