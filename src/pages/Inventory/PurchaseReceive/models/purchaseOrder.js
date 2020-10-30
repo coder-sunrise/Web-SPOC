@@ -129,6 +129,9 @@ export default createFormViewModel({
             invoiceDate: undefined,
             invoiceNo: undefined,
             remark: undefined,
+            invoiceStatusFK: undefined,
+            invoiceStatus: '',
+            writeOffReason: undefined,
             deliveryOrder: [],
             purchaseOrderPayment: [],
             purchaseOrderItem: data.purchaseOrderItem

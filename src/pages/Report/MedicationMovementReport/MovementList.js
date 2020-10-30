@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react'
 import { ReportDataGrid } from '@/components/_medisys'
 
 class MovementList extends PureComponent {
-
   handleExpandedGroupsChange = (expandedGroups) => {
     this.setState((prevState) => {
       return { ...prevState, tableGroupRows: expandedGroups }
@@ -12,15 +11,12 @@ class MovementList extends PureComponent {
   render () {
     let incomeData = []
     const { reportDatas } = this.props
-    if (!reportDatas)
-      return null
+    if (!reportDatas) return null
     if (reportDatas && reportDatas.MedicationStockDetails) {
-      incomeData = reportDatas.MedicationStockDetails.map(
-        (item, index) => ({
-          ...item,
-          id: `medicationMovement-${index}-${item.medicationCode}`,
-        }),
-      )
+      incomeData = reportDatas.MedicationStockDetails.map((item, index) => ({
+        ...item,
+        id: `medicationMovement-${index}-${item.medicationCode}`,
+      }))
     }
 
     const MedicationStockDetailsCols = [
@@ -29,14 +25,18 @@ class MovementList extends PureComponent {
       { name: 'medicationName', title: 'Name' },
       { name: 'transactionCategory', title: 'Transaction' },
       { name: 'transactionQuantity', title: 'Qty' },
-      { name: 'uom', title: 'Uom' },
+      { name: 'uom', title: 'UOM' },
       { name: 'remark', title: 'Remarks' },
       { name: 'patientAccountNo', title: 'Acc. No.' },
       { name: 'patientName', title: 'Patient Name' },
     ]
     const MedicationStockDetailsExtensions = [
       { columnName: 'transactionDate', type: 'date', sortingEnabled: false },
-      { columnName: 'transactionQuantity', type: 'number', sortingEnabled: false },
+      {
+        columnName: 'transactionQuantity',
+        type: 'number',
+        sortingEnabled: false,
+      },
       { columnName: 'medicationCode', sortingEnabled: false },
       { columnName: 'medicationName', sortingEnabled: false },
       { columnName: 'transactionCategory', sortingEnabled: false },

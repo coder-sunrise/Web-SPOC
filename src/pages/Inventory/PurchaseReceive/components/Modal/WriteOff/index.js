@@ -12,7 +12,7 @@ const WriteOff = ({ classes, handleSubmit, onClose }) => {
   return (
     <div>
       {/* <h4 className={classes.title}>
-        Are you sure to Write off the selected invoice?
+        Write off the selected invoice?
       </h4> */}
       <GridContainer justify='center' alignItems='center'>
         <GridItem md={10} className={classes.reason}>

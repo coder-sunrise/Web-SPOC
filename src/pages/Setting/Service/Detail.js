@@ -515,8 +515,8 @@ class Detail extends PureComponent {
                             settingClinicService.entity ? (
                               this.state.hasActiveSession
                             ) : (
-                              false
-                            )
+                                false
+                              )
                           }
                           {...args}
                         />
@@ -716,6 +716,9 @@ class Detail extends PureComponent {
                 showAddCommand: true,
                 onCommitChanges: this.commitChanges,
                 onAddedRowsChange: this.onAddedRowsChange,
+                isDeletable: () => {
+                  return !this.state.hasActiveSession
+                },
               }}
               schema={itemSchema}
               {...this.tableParas}

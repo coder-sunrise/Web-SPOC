@@ -124,6 +124,7 @@ class InvoiceDetails extends Component {
       invoicePayment,
       loading,
       patient,
+      history,
     } = this.props
     const invoiceContentProps = {
       dispatch,
@@ -131,6 +132,7 @@ class InvoiceDetails extends Component {
       invoiceDetail,
       invoicePayment,
       patient,
+      history,
     }
     const bannerProps = {
       values,

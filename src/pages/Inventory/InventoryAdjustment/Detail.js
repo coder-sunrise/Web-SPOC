@@ -721,7 +721,7 @@ class Detail extends PureComponent {
   }
 
   handleAdjQuantity = (e) => {
-    const { row } = e 
+    const { row } = e
     row.physicalStock = (e.value || 0) + row.stock
   }
 
@@ -867,10 +867,7 @@ class Detail extends PureComponent {
                   <Field
                     name='adjustmentTransactionDate'
                     render={(args) => (
-                      <DatePicker
-                        label='Transaction Date'
-                        {...args}
-                      />
+                      <DatePicker label='Transaction Date' {...args} />
                     )}
                   />
                 </GridItem>
@@ -901,6 +898,7 @@ class Detail extends PureComponent {
                         multiline
                         rowsMax={2}
                         rows={2}
+                        maxLength={2000}
                         {...args}
                       />
                     )
@@ -909,9 +907,9 @@ class Detail extends PureComponent {
               </GridItem>
             </GridContainer>
             {inventoryAdjustmentItems &&
-              !Array.isArray(inventoryAdjustmentItems) && (
-                <p className={classes.errorMessage}>{inventoryAdjustmentItems}</p>
-              )}
+            !Array.isArray(inventoryAdjustmentItems) && (
+              <p className={classes.errorMessage}>{inventoryAdjustmentItems}</p>
+            )}
             <EditableTableGrid
               style={{ marginTop: 10 }}
               forceRender
@@ -935,8 +933,8 @@ class Detail extends PureComponent {
                 this.state.inventoryAdjustmentItems.length === 0 ? (
                   this.state.stockList
                 ) : (
-                    this.state.inventoryAdjustmentItems
-                  )
+                  this.state.inventoryAdjustmentItems
+                )
               }
               {...this.tableParas}
             />

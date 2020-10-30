@@ -1,5 +1,4 @@
 import { createFormViewModel } from 'medisys-model'
-import moment from 'moment'
 import * as service from '@/services/invoice'
 import { INVOICE_VIEW_MODE } from '@/utils/constants'
 
@@ -44,6 +43,41 @@ export default createFormViewModel({
             },
           })
         }
+      },
+      *saveEditInvoice ({ payload }, { call, put, take }) {
+        const response = yield call(service.saveEditInvoice, payload)
+        if (response) {
+          const { id } = response
+          yield put({
+            type: 'updateState',
+            payload: {
+              currentId: Number(id),
+            },
+          })
+          yield put({
+            type: 'invoiceDetail/query',
+            payload: {
+              id,
+            },
+          })
+          yield take('invoiceDetail/query/@@end')
+
+          yield put({
+            type: 'invoicePayment/query',
+            payload: {
+              id,
+            },
+          })
+
+          yield take('invoicePayment/query/@@end')
+          yield put({
+            type: 'invoiceDetail/updateState',
+            payload: {
+              mode: INVOICE_VIEW_MODE.DEFAULT,
+            },
+          })
+        }
+        return response
       },
     },
     reducers: {

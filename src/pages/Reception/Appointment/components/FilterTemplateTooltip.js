@@ -55,10 +55,12 @@ const Templates = ({
     let newTemplateObj
     let newId = 1
 
-    const favTemplateExist = newFilterTemplates.find(
-      (template) => template.isFavorite,
-    )
-    if (favTemplateExist) favTemplateExist.isFavorite = false
+    if (saveAsFavorite === true) {
+      const favTemplateExist = newFilterTemplates.find(
+        (template) => template.isFavorite,
+      )
+      if (favTemplateExist) favTemplateExist.isFavorite = false
+    }
 
     if (selectedTemplateId) {
       const selectedTemplate = filterTemplates.find(
