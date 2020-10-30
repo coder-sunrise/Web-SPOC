@@ -44,12 +44,8 @@ const ReceivingGoodsDataGrid = ({
       onSelectionChange={handleOnSelectionChange}
       columns={ReceivingGoodsGridCol}
       onRowDoubleClick={(row) => {
-        if (
-          row.receivingGoodsStatus === RECEIVING_GOODS_STATUS_TEXT.CANCELLED ||
-          viewEditAuthority.rights !== 'enable'
-        )
-          return
-        handleNavigate('edit', row.id)
+        if (viewEditAuthority && viewEditAuthority.rights === 'enable')
+          handleNavigate('edit', row.id)
       }}
       columnExtensions={[
         {
