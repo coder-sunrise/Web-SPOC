@@ -255,7 +255,7 @@ class Index extends Component {
       } else {
         newReceivingGoodsStatusFK = RECEIVING_GOODS_STATUS.DRAFT
       }
-      receivingGoodsItem = rows.map((x) => {
+      receivingGoodsItem = rows.filter((item) => !item.isDeleted).map((x) => {
         const itemType = rgType.find((y) => y.value === x.type)
         return {
           isDeleted: x.isDeleted || false,
@@ -288,7 +288,7 @@ class Index extends Component {
       delete receivingGoods.id
       delete receivingGoods.concurrencyToken
 
-      receivingGoodsItem = rows.map((x) => {
+      receivingGoodsItem = rows.filter((item) => !item.isDeleted).map((x) => {
         const itemType = rgType.find((y) => y.value === x.type)
         return {
           inventoryItemTypeFK: itemType.value,
@@ -313,45 +313,51 @@ class Index extends Component {
       })
     } else {
       newReceivingGoodsStatusFK = receivingGoodsStatusFK
-      receivingGoodsItem = rows.map((x) => {
-        const itemType = rgType.find((y) => y.value === x.type)
-        let result = {}
+      receivingGoodsItem = rows
+        .filter((item) => !item.isNew || !item.isDeleted)
+        .map((x) => {
+          const itemType = rgType.find((y) => y.value === x.type)
+          let result = {}
 
-        if (x.isNew && !x.isDeleted) {
-          result = {
-            isDeleted: x.isDeleted || false,
-            inventoryItemTypeFK: itemType.value,
-            orderQuantity: x.orderQuantity,
-            bonusReceived: x.bonusReceived,
-            quantityReceived: x.quantityReceived,
-            totalReceived: x.totalReceived,
-            totalPrice: x.totalPrice,
-            unitPrice: x.unitPrice,
-            totalAfterGST: roundTo(x.totalAfterGST),
-            sortOrder: x.sortOrder,
-            IsACPUpdated: false,
-            unitOfMeasurement: x.unitOfMeasurement,
-            batchNo: x.batchNo,
-            expiryDate: x.expiryDate,
-            [itemType.prop]: {
-              [itemType.itemFKName]: x[itemType.itemFKName],
-              [itemType.itemCode]: x.codeString,
-              [itemType.itemName]: x.nameString,
-            },
+          if (x.isNew && !x.isDeleted) {
+            result = {
+              isDeleted: x.isDeleted || false,
+              inventoryItemTypeFK: itemType.value,
+              orderQuantity: x.orderQuantity,
+              bonusReceived: x.bonusReceived,
+              quantityReceived: x.quantityReceived,
+              totalReceived: x.totalReceived,
+              totalPrice: x.totalPrice,
+              unitPrice: x.unitPrice,
+              totalAfterGST: roundTo(x.totalAfterGST),
+              sortOrder: x.sortOrder,
+              IsACPUpdated: false,
+              unitOfMeasurement: x.unitOfMeasurement,
+              batchNo: x.batchNo,
+              expiryDate: x.expiryDate,
+              [itemType.prop]: {
+                [itemType.itemFKName]: x[itemType.itemFKName],
+                [itemType.itemCode]: x.codeString,
+                [itemType.itemName]: x.nameString,
+              },
+            }
+          } else if (!x.isDeleted) {
+            result = {
+              ...x,
+              [itemType.prop]: {
+                ...x[itemType.prop],
+                [itemType.itemFKName]: x[itemType.itemFKName],
+                [itemType.itemCode]: x.codeString,
+                [itemType.itemName]: x.nameString,
+              },
+            }
+          } else {
+            result = {
+              ...x,
+            }
           }
-        } else {
-          result = {
-            ...x,
-            [itemType.prop]: {
-              ...x[itemType.prop],
-              [itemType.itemFKName]: x[itemType.itemFKName],
-              [itemType.itemCode]: x.codeString,
-              [itemType.itemName]: x.nameString,
-            },
-          }
-        }
-        return result
-      })
+          return result
+        })
     }
     return {
       ...receivingGoods,
