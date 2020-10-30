@@ -134,6 +134,7 @@ const Scheme = ({
     invoicePayment = [],
     schemePayerFK,
     medisaveVisitType,
+    payerName,
     // medisaveVaccinationFK,
     // medisaveVaccinationList = [],
   } = invoicePayer
@@ -153,7 +154,6 @@ const Scheme = ({
   const handleSchemeChange = (value) => onSchemeChange(value, index)
   const handleSchemePayerChange = (value) => onSchemePayerChange(value, index)
   const handleVisitTypeChange = (value) => onMediVisitTypeChange(value, index)
-  const handleMedisaveVaccinationChange = (value) => onMediVaccinationChange(value, index)
   const handleCancelClick = () => onCancelClick(index)
   const handleEditClick = () => onEditClick(index)
   const handleApplyClick = () => onApplyClick(index)
@@ -218,18 +218,18 @@ const Scheme = ({
       return {
         name: p.payerName,
         id: p.id,
-        balance: p.balance,
+        // balance: p.balance,
       }
     })
   }
 
-  const getDefaultMedisaveVaccination = (invoiceItemCode) => {
+  /* const getDefaultMedisaveVaccination = (invoiceItemCode) => {
     const item = inventoryvaccination.find(mv => mv.code === invoiceItemCode)
     if(!item) return null
     console.log('getDefaultMedisaveVaccination',item)
 
     return item.medisaveVaccination.id
-  }
+  } */
 
   let payments = []
   payments = payments.concat(
@@ -251,11 +251,11 @@ const Scheme = ({
   let isCHAS = schemeConfig && schemeConfig.copayerFK === 1
   const isMedisave = payerTypeFK === INVOICE_PAYER_TYPE.PAYERACCOUNT
   const isMediVisit = isMedisave && visitTypes.find(v => v === medisaveVisitType)// !== '' // && name.includes('Visit') // visitTypes.filter(m => m === medisaveVisitType).length > 0
-  let visitName = null
+  /* let visitName = null
   if(isMediVisit && name.includes('500'))
     visitName = 'Medisave 500 Visit'
   if(isMediVisit && name.includes('700'))
-    visitName = 'Medisave 700 Visit'
+    visitName = 'Medisave 700 Visit' */
   console.log('visitTypes', visitTypes, name)
   const isMediVaccination = isMediVisit && medisaveVisitType === 'Vaccination' // invoicePayerItem.length > 0 && invoicePayerItem.filter((o) => o.invoiceItemTypeFK === 3).length > 0
   console.log('isMedisave', isCHAS, isMedisave, isMediVisit, isMediVaccination)
@@ -276,24 +276,26 @@ const Scheme = ({
   console.log('medisaveVaccinationLists',medisaveVaccinationLists, defaultVaccination)
   */
 
-  console.log('getPayerList',invoicePayer)
+  console.log('invoicePayer',invoicePayer)
   const payerList = getPayerList(invoicePayer)
   console.log('payerList',payerList)
 
-  let binMid = 1
-  if(isCHAS)
-    binMid = 5
-  else if(isMedisave)
-    binMid = 1
-  else
-    binMid = 7
+  // let binMid = 1
+  // if(isCHAS)
+  //   binMid = 5
+  // else if(isMedisave)
+  //   binMid = 1
+  // else
+  //   binMid = 7
 
   console.log('newInvoicePayer',invoicePayer)
+  const payer = payerList.find(p => p.id === schemePayerFK)
+  console.log('payer',payer)
   
   return (
     <Paper key={_key} elevation={4} className={classes.gridRow}>
       <GridContainer style={{ marginBottom: 16 }} alignItems='flex-start'>
-        <GridItem md={3} style={{ marginTop: 8, marginBottom: 16 }}>
+        <GridItem md={6} style={{ marginTop: 8, marginBottom: 16 }}>
           {/* Copayment Scheme [Only chas can select] */}
           <span
             style={{
@@ -326,12 +328,20 @@ const Scheme = ({
             />
             )}
             {payerTypeFK !== INVOICE_PAYER_TYPE.SCHEME &&
-            _isEditing && <span>{visitName || name}</span>}
+            _isEditing && !payerName && !payer && <span>{name}</span>}
+            {payerTypeFK !== INVOICE_PAYER_TYPE.SCHEME &&
+            _isEditing && payer && <span>{name} - {payer.name}</span> 
+            }
+            {payerTypeFK !== INVOICE_PAYER_TYPE.SCHEME &&
+            _isEditing && payerName && <span>{name} - {payerName}</span> 
+            }
 
-            {_isConfirmed && <span>{visitName || name}</span>}
+            {_isConfirmed && !payerName && !payer && <span>{name}</span>}
+            {_isConfirmed && payer && <span>{name} - {payer.name}</span>}
+            {_isConfirmed && payerName && <span>{name} - {payerName}</span>}
           </span>
         </GridItem>
-        {isMediVisit && 
+        {false && isMediVisit && 
         <GridItem md={2} style={{ marginTop: 8, marginBottom: 16 }}>
           {/* Medisave Visit Type [CDMP or vaccination] */}
           <div
@@ -365,7 +375,7 @@ const Scheme = ({
           </div>
         </GridItem>
         }
-        {isMedisave &&
+        {false && isMedisave &&
         <GridItem md={2} style={{ marginTop: 8, marginBottom: 16 }}>
           {/* Payer */}
           
@@ -403,7 +413,7 @@ const Scheme = ({
           </div>
         </GridItem>
         }
-        {isMedisave && !isMediVisit && !isMediVaccination && <GridItem md={2} />}
+        {/* isMedisave && !isMediVisit && !isMediVaccination && <GridItem md={2} /> */}
         {/* isMediVaccination && medisaveVisitType === 'Vaccination' && 
         <GridItem md={2} style={{ marginTop: 8, marginBottom: 16 }}>
           <div
@@ -460,7 +470,8 @@ const Scheme = ({
           />
         </GridItem>
         <GridItem
-          md={binMid}
+          md={(schemeConfig && schemeConfig.copayerFK === 1) || isMedisave ? 2 : 4}
+          // md={binMid}
           style={{
             textAlign: 'right',
             marginTop: 8,

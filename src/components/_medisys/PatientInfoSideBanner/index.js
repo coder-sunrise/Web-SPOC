@@ -290,8 +290,6 @@ class PatientInfoSideBanner extends PureComponent {
   
   getSchemePayerDetails = (schemePayer) => {
     const { patientScheme } = this.props.entity
-    const schemeData = patientScheme.find((row) => row.schemeTypeFK === schemePayer.schemeFK)
-    const balanceData = schemeData.patientSchemeBalance.find((row) => row.schemePayerFK === schemePayer.id)
 
     if (
       !_.isEmpty(this.state.refreshedSchemePayerData.payerBalanceList) 
@@ -300,6 +298,9 @@ class PatientInfoSideBanner extends PureComponent {
       console.log('this.state.refreshedSchemePayerData',this.state.refreshedSchemePayerData)
       // return { ...this.state.refreshedSchemePayerData }
       
+      const schemeData = patientScheme.find((row) => row.schemeTypeFK === schemePayer.schemeFK)
+      const balanceData = schemeData.patientSchemeBalance.find((row) => row.schemePayerFK === schemePayer.id)
+
       const refreshData = this.state.refreshedSchemePayerData.payerBalanceList.find((row) => row.schemePayerFK === schemePayer.id)
 
       console.log('refreshData', refreshData)
@@ -326,13 +327,13 @@ class PatientInfoSideBanner extends PureComponent {
     return {
       payerName: schemePayer.payerName,
       payerAccountNo: schemePayer.payerID,
-      balance: balanceData.balance ??  '',
-      patientCoPaymentSchemeFK: balanceData.patientCopaymentSchemeFK,
+      // balance: balanceData.balance ??  '',
+      // patientCoPaymentSchemeFK: balanceData.patientCopaymentSchemeFK,
       schemeTypeFK: schemePayer.schemeFK,
-      validFrom: schemeData.validFrom,
-      validTo: schemeData.validTo,
-      statusDescription: errorData.statusDescription || schemeData.statusDescription,
-      isSuccessful: errorData.isSuccessful || schemeData.isSuccessful,
+      // validFrom: schemeData.validFrom,
+      // validTo: schemeData.validTo,
+      statusDescription: errorData.statusDescription || '',
+      isSuccessful: errorData.isSuccessful || '',
     }
   }
 

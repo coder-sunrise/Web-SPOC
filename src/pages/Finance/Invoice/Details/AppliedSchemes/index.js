@@ -34,6 +34,10 @@ const styles = (theme) => ({
     appliedSchemes,
     commitCount: global.commitCount,
     patient: patient.entity || patient.default,
+    ctcopayer: codetable.ctcopayer || [],
+    ctservice: codetable.ctservice || [],
+    inventoryvaccination: codetable.inventoryvaccination || [],
+    inventorymedication: codetable.inventorymedication || [],
     ctcopaymentscheme: codetable.copaymentscheme || [],
     ctschemetype: codetable.ctschemetype || [],
     loading: loading.effects['appliedSchemes/fetchInvoicePayers'],
@@ -203,8 +207,12 @@ class AppliedScheme extends Component {
       setFieldValue,
       setValues,
       patient,
+      ctcopayer,
       ctschemetype,
       ctcopaymentscheme,
+      ctservice,
+      inventoryvaccination,
+      inventorymedication,
       loading = false,
     } = this.props
     const { submitCount } = this.state
@@ -217,6 +225,10 @@ class AppliedScheme extends Component {
       patient,
       ctschemetype,
       ctcopaymentscheme,
+      ctcopayer,
+      ctservice,
+      inventoryvaccination,
+      inventorymedication,
     }
 
     return (

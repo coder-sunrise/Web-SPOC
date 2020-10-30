@@ -209,7 +209,7 @@ class Schemes extends PureComponent {
       tempSchemeTypeFK = schemeTypeFK
     }
 
-    console.log('patientScheme',values.patientScheme)
+    console.log('patientScheme',values)
     return (
       <div>
         <div>
