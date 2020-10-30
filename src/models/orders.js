@@ -341,7 +341,7 @@ export default createListViewModel({
           toBeUpdatedPackage.isDeleted = true
         }
         else {
-          toBeUpdatedPackage.totalPrice = _.sumBy(activePackageItems, 'totalPrice') || 0
+          toBeUpdatedPackage.totalPrice = _.sumBy(activePackageItems, 'totalAfterItemAdjustment') || 0
         }
         
         return {

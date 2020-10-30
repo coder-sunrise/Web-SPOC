@@ -63,11 +63,12 @@ const PackageDrawdownInfo = ({ drawdownData = {} }) => {
       let totalQty = 0
       let balanceQty = 0
       let drawdownTransaction = []
+      const todayQuantity = data.packageConsumeQuantity
 
       const { packageDrawdown } = data
       if (packageDrawdown) {        
         totalQty = packageDrawdown.totalQuantity
-        balanceQty = packageDrawdown.remainingQuantity
+        balanceQty = packageDrawdown.remainingQuantity + todayQuantity
         totalDrawdown = totalQty - balanceQty
         drawdownTransaction = packageDrawdown.packageDrawdownTransaction
       }
@@ -80,7 +81,7 @@ const PackageDrawdownInfo = ({ drawdownData = {} }) => {
         <div>
           <p>
             Package Drawdown (to-date: {parseToOneDecimalString(totalDrawdown)}/{parseToOneDecimalString(totalQty)} = {parseToOneDecimalString(balanceQty)} bal) 
-            (today: {parseToOneDecimalString(data.packageConsumeQuantity)})
+            (today: {parseToOneDecimalString(todayQuantity)})
           </p>
           <br />
           {drawdownTransactionDetails(drawdownTransaction)}

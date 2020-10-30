@@ -15,6 +15,7 @@ import {
 } from '@/components'
 import LowStockInfo from '@/pages/Widgets/Orders/Detail/LowStockInfo'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
+import PackageDrawdownInfo from '@/pages/Widgets/Orders/Detail/PackageDrawdownInfo'
 import { InventoryTypes } from '@/utils/codes'
 import CONSTANTS from './DispenseDetails/constants'
 
@@ -45,6 +46,18 @@ const lowStockIndicator = (row, itemIdFieldName) => {
           values={values}
         />
       )}
+    </div>
+  )
+}
+
+const packageDrawdownIndicator = (row) => {
+  if (!row.isPackage) return null
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <PackageDrawdownInfo
+        drawdownData={row}
+      />
     </div>
   )
 }
@@ -745,17 +758,22 @@ export const PackageColumnExtensions = (onPrint) => [
         unitPrice,
       ).format(currencyFormat)})`
       return (
-        <Tooltip title={title}>
-          <div style={{ position: 'relative' }}>
-            <div
-              style={{
+        <Tooltip title={title}>          
+          <div
+            style={{
                 wordWrap: 'break-word',
                 whiteSpace: 'pre-wrap',
               }}
+          >
+            {packageDrawdownIndicator(row)}
+            <div style={{
+                position: 'relative',
+                left: 22,
+              }}
             >
-              {row.description}
-              {lowStockIndicator(row, 'itemFK')}
+              {row.description}              
             </div>
+            {lowStockIndicator(row, 'itemFK')}
           </div>
         </Tooltip>
       )
