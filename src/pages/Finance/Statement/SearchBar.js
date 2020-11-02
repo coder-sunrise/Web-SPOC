@@ -4,6 +4,7 @@ import { FastField, Field, withFormik } from 'formik'
 import { withStyles } from '@material-ui/core'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
+import { connect } from 'dva'
 import moment from 'moment'
 import {
   GridContainer,
@@ -12,7 +13,7 @@ import {
   Checkbox,
   Button,
   CodeSelect,
-  ProgressButton, 
+  ProgressButton,
 } from '@/components'
 import { FilterBarDate } from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
@@ -30,6 +31,10 @@ const styles = () => ({
     right: 0,
   },
 })
+
+@connect(({ clinicSettings }) => ({
+  clinicSettings,
+}))
 
 @withFormik({
   mapPropsToValues: () => ({
@@ -124,7 +129,7 @@ class SearchBar extends PureComponent {
   toggleReport = (v) => {
     this.setState((preState) => ({ showReport: !preState.showReport }))
   }
- 
+
   toggleReportSelection = () => {
     this.setState((preState) => ({
       showReportSelection: !preState.showReportSelection,
@@ -132,7 +137,8 @@ class SearchBar extends PureComponent {
   }
 
   render () {
-    const { classes, history, dispatch, values, handleSubmit, showGenerateStatement } = this.props
+    const { classes, history, dispatch, values, handleSubmit, showGenerateStatement, clinicSettings } = this.props
+    const { isEnableAutoGenerateStatement } = clinicSettings.settings
     const {
       statementStartDate,
       statementEndDate,
@@ -278,15 +284,17 @@ class SearchBar extends PureComponent {
                 New Statement
                 </Button>
               </Authorized>
-              <Authorized authority='finance.statement.autogeneratestatement'>
-                <Button
-                  variant='contained'
-                  color='primary'
-                  onClick={showGenerateStatement}
-                >
-                  Generate Statements
-                </Button>
-              </Authorized>
+              {isEnableAutoGenerateStatement &&
+                <Authorized authority='finance.statement.autogeneratestatement'>
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    onClick={showGenerateStatement}
+                  >
+                    Generate Statements
+                  </Button>
+                </Authorized>
+              }
             </GridItem>
           </GridItem>
         </GridContainer>
