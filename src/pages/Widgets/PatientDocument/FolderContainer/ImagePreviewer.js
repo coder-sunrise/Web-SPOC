@@ -24,6 +24,7 @@ import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos'
 import $ from 'jquery'
 import _ from 'lodash'
 import SetFolderWithPopover from './SetFolderWithPopover'
+import ZImage from './ZImage'
 
 // import 'antd/dist/antd.css'
 import './style.css'
@@ -363,7 +364,12 @@ class ImagePreviewer extends Component {
   }
 
   render () {
-    const { imageList = [], loading = false, imageContainerWidth } = this.state
+    const {
+      imageList = [],
+      loading = false,
+      imageContainerWidth,
+      imageContainerHeight,
+    } = this.state
     const {
       classes,
       readOnly,
@@ -394,9 +400,9 @@ class ImagePreviewer extends Component {
         >
           <div
             style={{
-              background: 'black',
+              backgroundColor: 'black',
               width: imageContainerWidth,
-              minHeight: 400,
+              // minHeight: 400,
             }}
           >
             <Carousel
@@ -404,23 +410,24 @@ class ImagePreviewer extends Component {
                 this.carouselRef = el
               }}
               effect='fade'
-              beforeChange={(from, to) => {
-                // console.log('beforeChange ', from, to)
-              }}
               afterChange={this.afterChangeImage}
             >
               {this.state.imageList.map((img) => {
-                const { image, fileName, width, height } = img
+                const { image, width, height } = img
                 return (
                   <div>
-                    <div className={classes.imageContainer}>
+                    <div
+                      className={classes.imageContainer}
+                      style={{
+                        height: imageContainerHeight,
+                      }}
+                    >
                       {image && (
-                        <img
-                          alt={fileName}
+                        <ZImage
+                          key={image.fileIndexFK}
                           src={image.src}
                           width={width}
                           height={height}
-                          style={{ display: 'inline' }}
                         />
                       )}
                     </div>
