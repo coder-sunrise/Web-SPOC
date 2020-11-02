@@ -278,6 +278,16 @@ class Grid extends PureComponent {
     }
   }
 
+  updateOrderQuantiry = (e) => {
+    const { row } = e
+    if (row) {
+      const { orderQuantity = 0, unitPrice = 0, bonusReceived = 0 } = row
+      row.quantityReceived = orderQuantity
+      row.totalReceived = bonusReceived + orderQuantity
+      row.totalPrice = roundTo(orderQuantity * unitPrice)
+    }
+  }
+
   calculateTotalReceivedQuatity = (e) => {
     const { row } = e
     if (row) {
@@ -404,7 +414,7 @@ class Grid extends PureComponent {
           columnName: 'orderQuantity',
           type: 'number',
           precision: 1,
-          onChange: this.calculateTotalPrice,
+          onChange: this.updateOrderQuantiry,
           width: 100,
           sortingEnabled: false,
           isDisabled: (row) => row.isClosed,

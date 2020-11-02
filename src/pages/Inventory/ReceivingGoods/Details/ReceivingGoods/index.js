@@ -558,7 +558,9 @@ class Index extends Component {
                 <ProgressButton
                   color='success'
                   icon={null}
-                  authority='none'
+                  disabled={rows.find(
+                    (item) => !item.isDeleted && item.totalReceived <= 0,
+                  )}
                   onClick={() =>
                     this.onSubmitButtonClicked(rgSubmitAction.COMPLETE)}
                 >
