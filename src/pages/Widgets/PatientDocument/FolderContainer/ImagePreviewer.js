@@ -560,6 +560,7 @@ class ImagePreviewer extends Component {
                     </Button>
 
                     <Popconfirm
+                      title='Permanently delete this file in all folders?'
                       onConfirm={() => {
                         this.deleteImage(selectedImage)
                       }}
