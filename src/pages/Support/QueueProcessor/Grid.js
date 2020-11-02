@@ -5,8 +5,9 @@ import { connect } from 'dva'
 import { CommonTableGrid, Tooltip, dateFormatLong, dateFormatLongWithTime12h } from '@/components'
 import { queueProcessorType, queueItemStatus } from '@/utils/codes'
 
-@connect(({ queueProcessor }) => ({
+@connect(({ queueProcessor, clinicSettings }) => ({
   queueProcessor,
+  clinicSettings,
 }))
 
 class Grid extends PureComponent {
@@ -79,10 +80,15 @@ class Grid extends PureComponent {
   }
 
   formatParameter = (row) => {
-    let type = row.queueProcessTypeFK
+    let type = row.queueProcessTypeFK 
+    const { clinicSettings } = this.props
+    const { systemTimeZoneInt } = clinicSettings.settings
     if (type === 1) {
       let parameter = JSON.parse(row.data)
-      return `Statement Date: ${moment(parameter.StatementDate).format(dateFormatLong)}, Payment Terms: ${parameter.PaymentTerms} day(s), Invoice Date From: ${parameter.InvoiceDateFrom ? moment(parameter.InvoiceDateFrom).format(dateFormatLong) : '-'}, Invoice Date To: ${parameter.InvoiceDateTo ? moment(parameter.InvoiceDateTo).format(dateFormatLong) : '-'}`
+      return `Statement Date: ${moment(parameter.StatementDate).add(systemTimeZoneInt, 'hours').format(dateFormatLong)}
+      , Payment Terms: ${parameter.PaymentTerms} day(s)
+      , Invoice Date From: ${parameter.InvoiceDateFrom ? moment(parameter.InvoiceDateFrom).add(systemTimeZoneInt, 'hours').format(dateFormatLong) : '-'}
+      , Invoice Date To: ${parameter.InvoiceDateTo ? moment(parameter.InvoiceDateTo).add(systemTimeZoneInt, 'hours').format(dateFormatLong) : '-'}`
     }
     return ''
   }
