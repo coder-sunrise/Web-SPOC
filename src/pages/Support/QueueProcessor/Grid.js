@@ -36,12 +36,12 @@ class Grid extends PureComponent {
       },
       { columnName: 'requestedBy', width: 140 },
       {
-        columnName: 'createDate', width: 180,
+        columnName: 'createDate', width: 190,
         type: 'date',
         showTime: true,
       },
       {
-        columnName: 'updateDate', width: 180,
+        columnName: 'updateDate', width: 190,
         type: 'date',
         showTime: true,
         render: (row) => {
@@ -57,7 +57,7 @@ class Grid extends PureComponent {
           let result = this.formatParameter(row)
           return (
             <Tooltip title={result} placement='top'>
-              <div>{result}</div>
+              <div style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>{result}</div>
             </Tooltip>
           )
         },
@@ -70,7 +70,7 @@ class Grid extends PureComponent {
           let tooltip = this.getTooltip(row)
           return (
             <Tooltip title={tooltip} placement='top'>
-              <div>{result}</div>
+              <div style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>{result}</div>
             </Tooltip>
           )
         },
