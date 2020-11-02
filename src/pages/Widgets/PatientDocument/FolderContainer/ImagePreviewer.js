@@ -62,7 +62,6 @@ const styles = (theme) => ({
     display: 'inherit',
     textAlign: 'center',
     width: '100%',
-    height: 890,
   },
 })
 
@@ -365,7 +364,12 @@ class ImagePreviewer extends Component {
   }
 
   render () {
-    const { imageList = [], loading = false, imageContainerWidth } = this.state
+    const {
+      imageList = [],
+      loading = false,
+      imageContainerWidth,
+      imageContainerHeight,
+    } = this.state
     const {
       classes,
       readOnly,
@@ -396,9 +400,9 @@ class ImagePreviewer extends Component {
         >
           <div
             style={{
-              // backgroundColor: 'black',
+              backgroundColor: 'black',
               width: imageContainerWidth,
-              minHeight: 400,
+              // minHeight: 400,
             }}
           >
             <Carousel
@@ -406,30 +410,27 @@ class ImagePreviewer extends Component {
                 this.carouselRef = el
               }}
               effect='fade'
-              beforeChange={(from, to) => {
-                // console.log('beforeChange ', from, to)
-              }}
               afterChange={this.afterChangeImage}
             >
-              {this.state.imageList.map((img, index) => {
-                const { image, fileName, width, height } = img
+              {this.state.imageList.map((img) => {
+                const { image, width, height } = img
                 return (
-                  <div className={classes.imageContainer}>
-                    {image && (
-                      // <img
-                      //   alt={fileName}
-                      //   src={image.src}
-                      //   width={width}
-                      //   height={height}
-                      //   style={{ display: 'inline' }}
-                      // />
-                      <ZImage
-                        key={image.fileIndexFK}
-                        src={image.src}
-                        width={width}
-                        height={height}
-                      />
-                    )}
+                  <div>
+                    <div
+                      className={classes.imageContainer}
+                      style={{
+                        height: imageContainerHeight,
+                      }}
+                    >
+                      {image && (
+                        <ZImage
+                          key={image.fileIndexFK}
+                          src={image.src}
+                          width={width}
+                          height={height}
+                        />
+                      )}
+                    </div>
                   </div>
                 )
               })}
