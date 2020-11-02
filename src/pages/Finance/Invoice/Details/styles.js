@@ -35,4 +35,9 @@ export default (theme) => ({
     width: '100%',
     overflow: 'hidden',
   },
+  editInvoiceButton: {
+    position: 'absolute',
+    top: 0,
+    right: 170,
+  },
 })

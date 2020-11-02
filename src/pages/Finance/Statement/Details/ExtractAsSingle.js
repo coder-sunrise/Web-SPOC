@@ -116,7 +116,7 @@ class ExtractAsSingle extends PureComponent {
         code: 'ctcopayer',
         valueField: 'id',
         labelField: 'displayValue',
-        remoteFilter: { coPayerTypeFK: 1 },
+        localFilter: (item) => item.coPayerTypeFK === 1,
         onChange: ({ option, row }) => {
           const { statement, setFieldValue, values } = this.props
           const { statementNoList } = statement
@@ -132,7 +132,7 @@ class ExtractAsSingle extends PureComponent {
             rows.map(o => ({
               ...o,
               _errors: undefined,
-              transferToStatementFK: o.id === row.id ? undefined : o.transferToStatementFK,
+              // transferToStatementFK: o.id === row.id ? undefined : o.transferToStatementFK,
               recentStatementNoList: o.id === row.id ? recentStatementNoList : o.recentStatementNoList,
             })),
           )
@@ -157,11 +157,12 @@ class ExtractAsSingle extends PureComponent {
   }
 
   componentDidMount = () => {
-    const { dispatch } = this.props
+    const { dispatch, statement } = this.props
     dispatch({
       type: 'statement/queryRecentStatementNo',
       payload: {
         count: 5,
+        currentStatementId: statement.entity.id,
       },
     })
   }
@@ -206,7 +207,7 @@ class ExtractAsSingle extends PureComponent {
                   rows.map(o => ({
                     ...o,
                     _errors: undefined,
-                    transferToStatementFK: e.target.value ? o.transferToStatementFK : undefined,
+                    transferToStatementFK: e.target.value ? null : undefined,
                     recentStatementNoList: e.target.value ? (statement.statementNoList.filter(
                       s => s.copayerFK === o.copayerFK,
                     )) : [],

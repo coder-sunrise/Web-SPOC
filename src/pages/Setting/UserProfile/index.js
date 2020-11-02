@@ -77,7 +77,15 @@ class UserProfile extends React.Component {
       type: 'settingUserProfile/fetchUserProfileByID',
       payload: { id: currentTarget.id },
     })
-    if (response) this.openModal()
+    if (response) {
+      dispatch({
+        type: 'global/updateState',
+        payload: {
+          showUserProfile: true,
+          accountModalTitle: 'Edit User Profile',
+        },
+      })
+    }
   }
 
   Cell = (row) => {
@@ -122,6 +130,7 @@ class UserProfile extends React.Component {
       type: 'global/updateState',
       payload: {
         showUserProfile: true,
+        accountModalTitle: 'New User Profile',
       },
     })
   }

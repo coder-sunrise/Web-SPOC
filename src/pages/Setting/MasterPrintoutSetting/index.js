@@ -111,7 +111,7 @@ const errorMessage = (v) => {
   }),
   handleSubmit: (values, { props }) => {
     const { dispatch } = props
-    const { customLetterHeadImage, footerDisclaimerImage,id } = values
+    const { customLetterHeadImage, footerDisclaimerImage, id } = values
     console.log(customLetterHeadImage)
     const noHeaderBase64 = (v) => {
       if (v === '') return v
@@ -176,9 +176,9 @@ class MasterPrintoutSetting extends PureComponent {
         type: 'global/updateAppState',
         payload: {
           openConfirm: true,
-          openConfirmContent: 'Are you sure want to discard the changes?',
+          openConfirmContent: 'Discard the changes?',
           onConfirmSave: () => {
-            this.setState({ prevSelectedId: e })  
+            this.setState({ prevSelectedId: e })
             this.getSelectedReportSetting(e)
           },
           onConfirmClose: () => {
@@ -195,7 +195,7 @@ class MasterPrintoutSetting extends PureComponent {
   }
 
   getSelectedReportSetting = (e) => {
-    const { dispatch,setFieldValue, resetForm } = this.props
+    const { dispatch, setFieldValue, resetForm } = this.props
     resetForm()
     if (e) {
       dispatch({
@@ -204,22 +204,22 @@ class MasterPrintoutSetting extends PureComponent {
           id: e,
         },
       }).then((v) => {
-        if (v) { 
+        if (v) {
           this.setState(() => {
             return {
               selected: true,
             }
           })
-        } else { 
+        } else {
           notification.warn({
             message: 'No default setting for the selected report in database',
-          })  
-          this.setState({ prevSelectedId: e }) 
+          })
+          this.setState({ prevSelectedId: e })
           setFieldValue('id', e)
         }
       })
 
-      this.setState({ prevSelectedId: e }) 
+      this.setState({ prevSelectedId: e })
       setFieldValue('id', e)
     } else {
       this.setState(() => {
@@ -250,7 +250,7 @@ class MasterPrintoutSetting extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <FastField
-                name='id'                
+                name='id'
                 render={(args) => (
                   <CodeSelect
                     label='Select Printout'

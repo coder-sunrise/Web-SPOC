@@ -27,7 +27,7 @@ class Grid extends PureComponent {
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
-        openConfirmContent: `Are you sure want to delete referral source ${row.name} ?`,
+        openConfirmContent: `Delete referral source ${row.name}?`,
         onConfirmSave: async () => {
           await dispatch({
             type: 'settingReferralSource/deleteReferralSource',

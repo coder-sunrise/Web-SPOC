@@ -337,7 +337,7 @@ class AddCrNote extends Component {
                   <div>
                     {row.itemType.toLowerCase() === 'misc' ? (
                       <Popconfirm
-                        title='Are you sure you want to delete the selected item?'
+                        title='Delete the selected item?'
                         onConfirm={() => {
                           this.handleDeleteRow(row)
                         }}

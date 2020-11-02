@@ -10,6 +10,7 @@ const statementPaymentUrl = '/api/StatementPayment'
 const statementPaymentHistoryUrl = '/api/StatementPayment/History'
 const invoicePaymentUrl = '/api/InvoicePayment'
 const copayerRecentStatementNoUrl = '/api/Statement/Recent'
+const autoGenerateStatementUrl = '/api/Statement/autogenerate'
 
 
 // const runningNoUrl = '/api/InventoryAdjustment/GenerateRunningNo'
@@ -74,8 +75,16 @@ module.exports = {
   },
 
   getLastStatementNo: async (params) => {
-    return request(`${copayerRecentStatementNoUrl}/${params.count}`, {
+    return request(`${copayerRecentStatementNoUrl}`, {
       method: 'GET',
+      body: params,
+    })
+  },
+
+  autoGenerateStatement: async (params) => {
+    return request(`${autoGenerateStatementUrl}`, {
+      method: 'POST',
+      body: params,
     })
   },
 }

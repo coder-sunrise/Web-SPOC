@@ -71,7 +71,7 @@ export const ImageList = ({ imgRows = [], handleCommitChanges }) => {
         showDeleteCommand: true,
         // deleteConfirm: {
         //   show: true,
-        //   title: 'Are you sure you want to delete this row?',
+        //   title: 'Delete this row?',
         // },
         onCommitChanges: handleCommitChanges,
       }}

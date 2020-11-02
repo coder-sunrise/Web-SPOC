@@ -5,6 +5,7 @@ import moment from 'moment'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 import Print from '@material-ui/icons/Print'
+import _ from 'lodash'
 
 // custom components
 import { withStyles } from '@material-ui/core'
@@ -13,6 +14,7 @@ import {
   Button,
   CommonTableGrid,
   Tooltip,
+  CommonModal,
   dateFormatLong,
   CardContainer,
   notification,
@@ -20,6 +22,7 @@ import {
 // sub components
 import SearchBar from './SearchBar'
 import PrintStatementReport from './PrintStatementReport'
+import GenerateStatements from './GenerateStatements'
 
 const styles = () => ({})
 
@@ -28,6 +31,7 @@ const styles = () => ({})
 }))
 class Statement extends PureComponent {
   state = {
+    showGenerateStatement: false,
     selectedRows: [],
     columns: [
       { name: 'statementNo', title: 'Statement No.' },
@@ -77,7 +81,7 @@ class Statement extends PureComponent {
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
-        openConfirmContent: `Are you sure want to delete record ${statementNo} ?`,
+        openConfirmContent: `Delete record ${statementNo}?`,
         onConfirmSave: () => {
           dispatch({
             type: 'statement/removeRow',
@@ -114,10 +118,15 @@ class Statement extends PureComponent {
     history.push(`/finance/statement/details/${row.id}?t=0`)
   }
 
+  toggleGenerateStatement = () => {
+    this.setState((preState) => ({
+      showGenerateStatement: !preState.showGenerateStatement,
+    }))
+  }
+
   render () {
     const { history, dispatch } = this.props
-    const { rows, columns } = this.state
-
+    const { rows, columns, showGenerateStatement } = this.state
     return (
       <CardContainer hideHeader>
         <SearchBar
@@ -126,6 +135,7 @@ class Statement extends PureComponent {
           handleAddNew={this.toggleAddNewStatementModal}
           dispatch={dispatch}
           selectedRows={this.state.selectedRows}
+          showGenerateStatement={this.toggleGenerateStatement}
         />
         <CommonTableGrid
           style={{ margin: 0 }}
@@ -226,6 +236,18 @@ class Statement extends PureComponent {
             },
           ]}
         />
+
+        <CommonModal
+          title='Generate Statements'
+          open={showGenerateStatement}
+          maxWidth='md'
+          bodyNoPadding
+          onClose={this.toggleGenerateStatement}
+          onConfirm={this.toggleGenerateStatement}
+          observe='generateStatements'
+        >
+          <GenerateStatements />
+        </CommonModal>
       </CardContainer>
     )
   }

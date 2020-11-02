@@ -1,21 +1,27 @@
 import React, { useState } from 'react'
-import classnames from 'classnames'
 // material ui
 import { withStyles } from '@material-ui/core/styles'
-import Printer from '@material-ui/icons/Print'
 // common components
-import { Button, CommonModal, Tabs } from '@/components'
-import { ReportViewer } from '@/components/_medisys'
+import { Button, Tabs } from '@/components'
 // utils
 import { INVOICE_VIEW_MODE } from '@/utils/constants'
+import Authorized from '@/utils/Authorized'
+import AuthorizedContext from '@/components/Context/Authorized'
 // sub components
 import InvoiceDetails from './InvoiceDetails'
 import PaymentDetails from './PaymentDetails'
 import AppliedSchemes from './AppliedSchemes'
+import EditInvoice from './EditInvoice'
 // styling
 import styles from './styles'
 
-const Content = ({ classes, clinicSettings, values, ...restProps }) => {
+const Content = ({
+  classes,
+  clinicSettings,
+  values,
+  history,
+  ...restProps
+}) => {
   const {
     invoiceDetail,
     invoicePayment,
@@ -49,6 +55,45 @@ const Content = ({ classes, clinicSettings, values, ...restProps }) => {
     return false
   }
 
+  const disableEditInvoice = () => {
+    // if not active session, can't edit invoice
+    if (
+      currentBizSessionInfo.id === '' ||
+      currentBizSessionInfo.isClinicSessionClosed
+    )
+      return true
+
+    // if current invoice not close session, can't edit invoice
+    if (
+      currentBizSessionInfo.id &&
+      invoiceBizSessionFK &&
+      parseInt(currentBizSessionInfo.id, 10) ===
+        parseInt(invoiceBizSessionFK, 10)
+    ) {
+      return true
+    }
+
+    // if patient is inactive, can't edit invoice
+    if (!patientIsActive) return true
+
+    // if there are some credit notes, write off or invoice claim(Approved/Submitted), can't edit invoice
+    if (
+      (invoicePayment.entity || [])
+        .find(
+          (item) =>
+            item.creditNote.find((cn) => !cn.isCancelled) ||
+            item.invoicePayerWriteOff.find((w) => !w.isCancelled) ||
+            item.invoiceClaim.find(
+              (ic) =>
+                !ic.isCancelled &&
+                (ic.status === 'Approved' || ic.status === 'Submitted'),
+            ),
+        )
+    )
+      return true
+    return false
+  }
+
   const InvoicePaymentTabOption = [
     {
       id: 1,
@@ -69,13 +114,37 @@ const Content = ({ classes, clinicSettings, values, ...restProps }) => {
     },
   ]
 
-  const switchMode = () => {
+  const switchMode = (mode) => {
     dispatch({
       type: 'invoiceDetail/updateState',
       payload: {
-        mode: INVOICE_VIEW_MODE.APPLIED_SCHEME,
+        mode,
       },
     })
+  }
+
+  const checkEditInvoiceAccessRight = () => {
+    const editInvoiceRight = Authorized.check('finance.editinvoice')
+
+    if (!editInvoiceRight || editInvoiceRight.rights !== 'enable') {
+      return editInvoiceRight ? editInvoiceRight.rights : 'hidden'
+    }
+
+    const editInvoiceWithPaymentRight = Authorized.check(
+      'finance.editinvoice.editinvoicewithpayment',
+    )
+    if (
+      (!editInvoiceWithPaymentRight ||
+        editInvoiceWithPaymentRight.rights !== 'enable') &&
+      (invoicePayment.entity || [])
+        .find((item) =>
+          item.invoicePayment.find((payment) => !payment.isCancelled),
+        )
+    )
+      return editInvoiceWithPaymentRight
+        ? editInvoiceWithPaymentRight.rights
+        : 'hidden'
+    return 'enable'
   }
 
   return (
@@ -89,10 +158,29 @@ const Content = ({ classes, clinicSettings, values, ...restProps }) => {
             onChange={(e) => setActive(e)}
             options={InvoicePaymentTabOption}
           />
+          <AuthorizedContext.Provider
+            value={{
+              rights: checkEditInvoiceAccessRight(),
+            }}
+          >
+            <Button
+              className={classes.editInvoiceButton}
+              color='primary'
+              onClick={() => {
+                switchMode(INVOICE_VIEW_MODE.Edit_Invoice)
+              }}
+              disabled={disableEditInvoice()}
+            >
+              Edit Invoice
+            </Button>
+          </AuthorizedContext.Provider>
+
           <Button
             className={classes.applySchemeButton}
             color='primary'
-            onClick={switchMode}
+            onClick={() => {
+              switchMode(INVOICE_VIEW_MODE.APPLIED_SCHEME)
+            }}
             disabled={isInvoiceCurrentBizSession() || !patientIsActive}
           >
             Apply Scheme
@@ -101,6 +189,9 @@ const Content = ({ classes, clinicSettings, values, ...restProps }) => {
       )}
       {invoiceDetail.mode === INVOICE_VIEW_MODE.APPLIED_SCHEME && (
         <AppliedSchemes />
+      )}
+      {invoiceDetail.mode === INVOICE_VIEW_MODE.Edit_Invoice && (
+        <EditInvoice history={history} />
       )}
     </React.Fragment>
   )
