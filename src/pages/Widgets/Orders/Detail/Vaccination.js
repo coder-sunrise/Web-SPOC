@@ -617,7 +617,7 @@ class Vaccination extends PureComponent {
                         }}
                         step={1}
                         min={0}
-                        max={values.quantity}
+                        max={values.remainingQuantity}
                         {...args}
                       />
                     )
@@ -626,7 +626,7 @@ class Vaccination extends PureComponent {
               </GridItem>
               <GridItem xs={1}>
                 <Field
-                  name='quantity'
+                  name='remainingQuantity'
                   render={(args) => {
                     return (
                       <NumberInput

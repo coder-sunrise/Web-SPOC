@@ -724,7 +724,7 @@ export const PackageColumns = [
     title: 'Action',
   },
   {
-    name: 'visitInvoicePackageFK',
+    name: 'packageGlobalId',
     title: 'Package',
   },
 ]
@@ -842,7 +842,7 @@ export const PackageColumnExtensions = (onPrint) => [
     },
   },
   {
-    columnName: 'visitInvoicePackageFK',
+    columnName: 'packageGlobalId',
     width: 0,
     sortingEnabled: false,
   },

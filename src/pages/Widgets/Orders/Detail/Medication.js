@@ -1771,7 +1771,7 @@ class Medication extends PureComponent {
                           }}
                           step={1}
                           min={0}
-                          max={values.quantity}
+                          max={values.remainingQuantity}
                           {...args}
                         />
                       )
@@ -1780,7 +1780,7 @@ class Medication extends PureComponent {
                 </GridItem>
                 <GridItem xs={1} className={classes.editor}>
                   <Field
-                    name='quantity'
+                    name='remainingQuantity'
                     render={(args) => {
                       return (
                         <NumberInput

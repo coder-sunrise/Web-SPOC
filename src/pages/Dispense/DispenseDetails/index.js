@@ -252,13 +252,13 @@ const DispenseDetails = ({
     if (packageItem) {
       const groups = packageItem.reduce(
         (distinct, data) =>
-          distinct.includes(data.visitInvoicePackageFK.toString())
+          distinct.includes(data.packageGlobalId)
             ? [
                 ...distinct,
               ]
             : [
                 ...distinct,
-                data.visitInvoicePackageFK.toString(),
+                data.packageGlobalId,
               ],
         [],
       )
@@ -272,7 +272,7 @@ const DispenseDetails = ({
     let totalPrice = 0
     if (!packageItem) return ''
     const data = packageItem.filter(
-      (item) => item.visitInvoicePackageFK === row.value,
+      (item) => item.packageGlobalId === row.value,
     )
     if (data.length > 0) {
       totalPrice = _.sumBy(data, 'totalAfterItemAdjustment') || 0
@@ -450,7 +450,7 @@ const DispenseDetails = ({
                   groupingConfig: {
                     state: {
                       grouping: [
-                        { columnName: 'visitInvoicePackageFK' },
+                        { columnName: 'packageGlobalId' },
                       ],
                       expandedGroups: [
                         ...expandedGroups,

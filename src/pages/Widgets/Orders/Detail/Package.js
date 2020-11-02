@@ -168,6 +168,7 @@ import { DURATION_UNIT } from '@/utils/constants'
           packageName,
           defaultConsumeQuantity: packageItem.defaultConsumeQuantity,
           packageConsumeQuantity: packageItem.consumeQuantity,
+          remainingQuantity: packageItem.quantity,
           performingUserFK: visitDoctorUserId,
           packageGlobalId,
         }
@@ -226,6 +227,7 @@ import { DURATION_UNIT } from '@/utils/constants'
           packageName,
           defaultConsumeQuantity: packageItem.defaultConsumeQuantity,
           packageConsumeQuantity: packageItem.consumeQuantity,
+          remainingQuantity: packageItem.quantity,
           performingUserFK: visitDoctorUserId,
           packageGlobalId,
         }
@@ -259,6 +261,7 @@ import { DURATION_UNIT } from '@/utils/constants'
         packageName,
         defaultConsumeQuantity: packageItem.defaultConsumeQuantity,
         packageConsumeQuantity: packageItem.consumeQuantity,
+        remainingQuantity: packageItem.quantity,
         performingUserFK: visitDoctorUserId,   
         packageGlobalId,   
       }
@@ -301,6 +304,7 @@ import { DURATION_UNIT } from '@/utils/constants'
         packageName,
         defaultConsumeQuantity: packageItem.defaultConsumeQuantity,
         packageConsumeQuantity: packageItem.consumeQuantity,
+        remainingQuantity: packageItem.quantity,
         performingUserFK: visitDoctorUserId,
         packageGlobalId,
       }
