@@ -105,9 +105,6 @@ export default createFormViewModel({
             receivingGoodsItem: (data.receivingGoodsItem || []).map((o) => {
               return {
                 ...o,
-                bonusReceived: 0,
-                quantityReceived: 0,
-                totalReceived: 0,
                 inventoryTransactionItemFK: undefined,
                 isACPUpdated: false,
                 acpAfterUpdate: 0,

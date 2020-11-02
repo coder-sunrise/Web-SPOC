@@ -57,7 +57,6 @@ const { Secured } = Authorized
     const { receivingGoodsPayment, currentBizSessionInfo } = values
 
     let paymentData = receivingGoodsPayment.map((x, index) => {
-      x.isCancelled = x.isDeleted
       if (_.has(x, 'isNew')) {
         return {
           receivingGoodsFK: values.id,
@@ -76,7 +75,6 @@ const { Secured } = Authorized
         }
       }
 
-      delete x.isDeleted
       return {
         ...x,
         clinicPaymentDto: {
@@ -150,14 +148,14 @@ class index extends PureComponent {
 
   getTotalPaid = () => {
     const activeRows = this.props.values.receivingGoodsPayment.filter(
-      (payment) => !payment.isDeleted,
+      (payment) => !payment.isDeleted && !payment.isCancelled,
     )
     return _.sumBy(activeRows, 'paymentAmount') || 0
   }
 
   isPaymentUpdated = () => {
     const { values: { receivingGoodsPayment } } = this.props
-    if (receivingGoodsPayment.find((item) => item.id <= 0 || item.isDeleted))
+    if (receivingGoodsPayment.find((item) => item.id <= 0 || item.isUpdate))
       return true
     return false
   }

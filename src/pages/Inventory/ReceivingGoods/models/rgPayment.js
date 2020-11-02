@@ -96,22 +96,24 @@ export default createFormViewModel({
         let newReceivingGoodsPayment
         if (receivingGoodsPayment.length >= 1) {
           let tempId = 9999 // temp id for paymentModeFK to match with the paymentMode list
-          newReceivingGoodsPayment = receivingGoodsPayment
-            .filter((x) => x.clinicPaymentDto.isCancelled === false)
-            .map((x) => {
-              x.cpId = x.clinicPaymentDto.id
-              x.cpConcurrencyToken = x.clinicPaymentDto.concurrencyToken
+          newReceivingGoodsPayment = receivingGoodsPayment.map((x) => {
+            x.cpId = x.clinicPaymentDto.id
+            x.cpConcurrencyToken = x.clinicPaymentDto.concurrencyToken
+            x.isCancelled = x.clinicPaymentDto.isCancelled
+            x.cancelReason = x.clinicPaymentDto.cancelReason
+            if (!x.clinicPaymentDto.isCancelled) {
               totalPaidAmount += x.clinicPaymentDto.paymentAmount
-              if (x.clinicPaymentDto.creditCardTypeFK) {
-                x.clinicPaymentDto.paymentModeFK =
-                  tempId + x.clinicPaymentDto.creditCardTypeFK
-              }
+            }
+            if (x.clinicPaymentDto.creditCardTypeFK) {
+              x.clinicPaymentDto.paymentModeFK =
+                tempId + x.clinicPaymentDto.creditCardTypeFK
+            }
 
-              return {
-                ...x.clinicPaymentDto,
-                ...x,
-              }
-            })
+            return {
+              ...x.clinicPaymentDto,
+              ...x,
+            }
+          })
         }
 
         return {
