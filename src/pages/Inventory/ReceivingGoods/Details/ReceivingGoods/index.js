@@ -62,7 +62,6 @@ const styles = (theme) => ({
   validationSchema: Yup.object().shape({
     receivingGoods: Yup.object().shape({
       supplierFK: Yup.string().required(),
-      receivingGoodsDate: Yup.date().required(),
     }),
     rows: Yup.array()
       .compact((x) => x.isDeleted)
@@ -82,7 +81,10 @@ class Index extends Component {
   componentWillUnmount () {
     this.props.dispatch({
       type: 'receivingGoodsDetails/updateState',
-      payload: {},
+      payload: {
+        receivingGoods: {},
+        rows: [],
+      },
     })
   }
 
