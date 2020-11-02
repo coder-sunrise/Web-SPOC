@@ -24,6 +24,7 @@ import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos'
 import $ from 'jquery'
 import _ from 'lodash'
 import SetFolderWithPopover from './SetFolderWithPopover'
+import ZImage from './ZImage'
 
 // import 'antd/dist/antd.css'
 import './style.css'
@@ -61,6 +62,7 @@ const styles = (theme) => ({
     display: 'inherit',
     textAlign: 'center',
     width: '100%',
+    height: 890,
   },
 })
 
@@ -394,7 +396,7 @@ class ImagePreviewer extends Component {
         >
           <div
             style={{
-              background: 'black',
+              // backgroundColor: 'black',
               width: imageContainerWidth,
               minHeight: 400,
             }}
@@ -409,21 +411,25 @@ class ImagePreviewer extends Component {
               }}
               afterChange={this.afterChangeImage}
             >
-              {this.state.imageList.map((img) => {
+              {this.state.imageList.map((img, index) => {
                 const { image, fileName, width, height } = img
                 return (
-                  <div>
-                    <div className={classes.imageContainer}>
-                      {image && (
-                        <img
-                          alt={fileName}
-                          src={image.src}
-                          width={width}
-                          height={height}
-                          style={{ display: 'inline' }}
-                        />
-                      )}
-                    </div>
+                  <div className={classes.imageContainer}>
+                    {image && (
+                      // <img
+                      //   alt={fileName}
+                      //   src={image.src}
+                      //   width={width}
+                      //   height={height}
+                      //   style={{ display: 'inline' }}
+                      // />
+                      <ZImage
+                        key={image.fileIndexFK}
+                        src={image.src}
+                        width={width}
+                        height={height}
+                      />
+                    )}
                   </div>
                 )
               })}
@@ -560,6 +566,7 @@ class ImagePreviewer extends Component {
                     </Button>
 
                     <Popconfirm
+                      title='Permanently delete this file in all folders?'
                       onConfirm={() => {
                         this.deleteImage(selectedImage)
                       }}

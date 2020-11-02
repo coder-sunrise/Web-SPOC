@@ -1,0 +1,105 @@
+.ant-image-preview {
+  height: 100%;
+  text-align: center;
+}
+.ant-image-preview-body {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+}
+.ant-image-preview-img {
+  max-width: 100%;
+  max-height: 100%;
+  vertical-align: middle;
+  -webkit-transform: scaleX(1);
+  transform: scaleX(1);
+  cursor: -webkit-grab;
+  cursor: grab;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  pointer-events: auto;
+}
+.ant-image-preview-img,
+.ant-image-preview-img-wrapper {
+  -webkit-transition: -webkit-transform .3s cubic-bezier(.215, .61, .355, 1) 0s;
+  transition: -webkit-transform .3s cubic-bezier(.215, .61, .355, 1) 0s;
+  transition: transform .3s cubic-bezier(.215, .61, .355, 1) 0s;
+  transition: transform .3s cubic-bezier(.215, .61, .355, 1) 0s,
+    -webkit-transform .3s cubic-bezier(.215, .61, .355, 1) 0s;
+}
+.ant-image-preview-img-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+.ant-image-preview-img-wrapper:before {
+  display: inline-block;
+  width: 1px;
+  height: 50%;
+  margin-right: -1px;
+  content: "";
+}
+.ant-image-preview-moving .ant-image-preview-img {
+  cursor: -webkit-grabbing;
+  cursor: grabbing;
+}
+.ant-image-preview-moving .ant-image-preview-img-wrapper {
+  -webkit-transition-duration: 0s;
+  transition-duration: 0s;
+}
+.ant-image-preview-wrap {
+  z-index: 1080;
+}
+.ant-image-preview-operations {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  color: rgba(0, 0, 0, .85);
+  font-size: 14px;
+  font-variant: tabular-nums;
+  line-height: 1.5715;
+  -webkit-font-feature-settings: "tnum";
+  font-feature-settings: "tnum";
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: reverse;
+  -ms-flex-direction: row-reverse;
+  flex-direction: row-reverse;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  width: 100%;
+  color: hsla(0, 0%, 100%, .85);
+  list-style: none;
+  background: rgba(0, 0, 0, .1);
+  pointer-events: auto;
+}
+.ant-image-preview-operations-operation {
+  margin-left: 12px;
+  padding: 12px;
+  cursor: pointer;
+}
+.ant-image-preview-operations-operation-disabled {
+  color: hsla(0, 0%, 100%, .45);
+  pointer-events: none;
+}
+.ant-image-preview-operations-operation:last-of-type {
+  margin-left: 0;
+}
+.ant-image-preview-operations-icon {
+  font-size: 18px;
+}
