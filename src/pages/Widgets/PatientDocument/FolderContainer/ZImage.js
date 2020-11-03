@@ -217,7 +217,13 @@ const ZImage = (props) => {
   )
   return (
     <div className='ant-image-preview-root'>
-      <div tabIndex='-1' className='ant-image-preview-wrap' role='dialog'>
+      <div
+        tabIndex='-1'
+        className={`ant-image-preview-wrap ${isMoving
+          ? 'ant-image-preview-moving'
+          : ''}`}
+        role='dialog'
+      >
         <div role='document' className='ant-image-preview'>
           <div className='ant-image-preview-content'>
             <div className='ant-image-preview-body'>
