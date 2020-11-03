@@ -413,7 +413,7 @@ class ImagePreviewer extends Component {
               afterChange={this.afterChangeImage}
             >
               {this.state.imageList.map((img) => {
-                const { image, width, height } = img
+                const { image, width, height, fileIndexFK, isSelected } = img
                 return (
                   <div>
                     <div
@@ -422,9 +422,10 @@ class ImagePreviewer extends Component {
                         height: imageContainerHeight,
                       }}
                     >
-                      {image && (
+                      {image &&
+                      isSelected && (
                         <ZImage
-                          key={image.fileIndexFK}
+                          key={fileIndexFK}
                           src={image.src}
                           width={width}
                           height={height}
