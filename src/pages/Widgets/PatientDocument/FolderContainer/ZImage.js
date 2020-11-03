@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import $ from 'jquery'
-import { getOffset, getClientSize } from 'rc-util/lib/Dom/css'
+import { getOffset } from 'rc-util/lib/Dom/css'
 
-import { IconButton, Button } from '@/components'
+import { IconButton } from '@/components'
 import { RotateLeft, RotateRight, ZoomOut, ZoomIn } from '@material-ui/icons'
 
 import useFrameSetState from './hooks/useFrameSetState'
@@ -161,6 +161,7 @@ const ZImage = (props) => {
   const onMouseDown = (event) => {
     event.preventDefault()
     event.stopPropagation()
+    console.log('onMouseDown', props.fileIndexFK)
 
     originPositionRef.current.deltaX = event.pageX - position.x
     originPositionRef.current.deltaY = event.pageY - position.y
