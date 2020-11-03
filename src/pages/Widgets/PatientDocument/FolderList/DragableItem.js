@@ -157,7 +157,19 @@ class DragableItem extends Component {
 
                 <Tooltip title={item.displayValue}>
                   <ListItemText
-                    primary={<span>{item.displayValue}</span>}
+                    primary={
+                      <span
+                        style={{
+                          whiteSpace: 'nowrap',
+                          textOverflow: 'ellipsis',
+                          display: 'block',
+                          width: '100%',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        {item.displayValue}
+                      </span>
+                    }
                     style={{
                       marginRight: 15,
                       paddingLeft: isItemAll && !readOnly ? 25 : 0,
