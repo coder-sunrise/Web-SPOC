@@ -161,7 +161,6 @@ const ZImage = (props) => {
   const onMouseDown = (event) => {
     event.preventDefault()
     event.stopPropagation()
-    console.log('onMouseDown', props.fileIndexFK)
 
     originPositionRef.current.deltaX = event.pageX - position.x
     originPositionRef.current.deltaY = event.pageY - position.y
