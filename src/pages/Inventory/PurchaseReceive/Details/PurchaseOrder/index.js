@@ -549,29 +549,18 @@ class Index extends Component {
 
     return (
       <GridContainer>
+        <POForm
+          isReadOnly={this.getRights(type, poStatus, isWriteOff) === 'disable'}
+          isFinalize={isPOStatusFinalizedFulFilledPartialReceived(poStatus)}
+          setFieldValue={setFieldValue}
+          isCompletedOrCancelled={isCompletedOrCancelled}
+          {...this.props}
+        />
         <AuthorizedContext.Provider
           value={{
-            rights: this.isEditable(poStatus, isWriteOff)
-              ? 'enable'
-              : 'disable',
+            rights: this.getRights(type, poStatus, isWriteOff),
           }}
         >
-          <POForm
-            isReadOnly={
-              this.getRights(type, poStatus, isWriteOff) === 'disable'
-            }
-            isFinalize={isPOStatusFinalizedFulFilledPartialReceived(poStatus)}
-            setFieldValue={setFieldValue}
-            isCompletedOrCancelled={isCompletedOrCancelled}
-            {...this.props}
-          />
-          {/* <AuthorizedContext.Provider
-          value={{
-            rights: this.isEditable(poStatus, isWriteOff)
-              ? 'enable'
-              : 'disable',
-          }}
-        > */}
           {errors.rows && (
             <p className={classes.errorMsgStyle}>{errors.rows}</p>
           )}
@@ -580,14 +569,12 @@ class Index extends Component {
             isEditable={this.isEditable(poStatus, isWriteOff, 'poItem')}
             {...this.props}
           />
-          {/* </AuthorizedContext.Provider>
+        </AuthorizedContext.Provider>
         <AuthorizedContext.Provider
           value={{
-            rights: this.isEditable(poStatus, isWriteOff)
-              ? 'enable'
-              : 'disable',
+            rights: this.getRights(type, poStatus, isWriteOff),
           }}
-        > */}
+        >
           <GridContainer>
             <GridItem xs={2} md={8} />
             <GridItem xs={10} md={4}>
@@ -639,90 +626,88 @@ class Index extends Component {
               </div>
             </GridItem>
           </GridContainer>
-          {/* </AuthorizedContext.Provider> */}
+        </AuthorizedContext.Provider>
 
-          <GridContainer
-            style={{
-              marginTop: 20,
-              display: 'flex',
-              justifyContent: 'flex-end',
-            }}
-          >
-            {poStatus !== PURCHASE_ORDER_STATUS.COMPLETED && (
-              <div>
-                {poStatus <= PURCHASE_ORDER_STATUS.FINALIZED &&
-                deliveryOrder.length === 0 &&
-                purchaseOrderPayment.length === 0 &&
-                !isWriteOff &&
-                type === 'edit' && (
-                  <ProgressButton
-                    color='danger'
-                    icon={null}
-                    authority='none'
-                    onClick={() =>
-                      this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
-                  >
-                    {formatMessage({
-                      id: 'inventory.pr.detail.pod.cancelpo',
-                    })}
-                  </ProgressButton>
-                )}
-
+        <GridContainer
+          style={{
+            marginTop: 20,
+            display: 'flex',
+            justifyContent: 'flex-end',
+          }}
+        >
+          {poStatus !== PURCHASE_ORDER_STATUS.COMPLETED && (
+            <div>
+              {poStatus <= PURCHASE_ORDER_STATUS.FINALIZED &&
+              deliveryOrder.length === 0 &&
+              purchaseOrderPayment.length === 0 &&
+              !isWriteOff &&
+              type === 'edit' && (
                 <ProgressButton
-                  color='primary'
+                  color='danger'
                   icon={null}
-                  disabled={!enableSaveButton(poStatus)}
+                  authority='none'
                   onClick={() =>
-                    this.onSubmitButtonClicked(poSubmitAction.SAVE)}
+                    this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
                 >
                   {formatMessage({
-                    id: 'inventory.pr.detail.pod.save',
+                    id: 'inventory.pr.detail.pod.cancelpo',
                   })}
                 </ProgressButton>
-                {!isPOStatusDraft(poStatus) && (
-                  <ProgressButton
-                    color='success'
-                    icon={null}
-                    authority='none'
-                    onClick={() =>
-                      this.onSubmitButtonClicked(poSubmitAction.COMPLETE)}
-                    disabled={!isPOStatusFulfilled(poStatus)}
-                  >
-                    {formatMessage({
-                      id: 'inventory.pr.detail.pod.complete',
-                    })}
-                  </ProgressButton>
-                )}
-                {isPOStatusDraft(poStatus) &&
-                type !== 'new' &&
-                type !== 'dup' && (
-                  <ProgressButton
-                    color='success'
-                    icon={null}
-                    onClick={() =>
-                      this.onSubmitButtonClicked(poSubmitAction.FINALIZE)}
-                  >
-                    {formatMessage({
-                      id: 'inventory.pr.detail.pod.finalize',
-                    })}
-                  </ProgressButton>
-                )}
-              </div>
-            )}
+              )}
 
-            <ProgressButton
-              color='info'
-              icon={null}
-              onClick={this.toggleReport}
-              authority='none'
-              disabled={!values.id || type === 'dup'}
-            >
-              {formatMessage({
-                id: 'inventory.pr.detail.print',
-              })}
-            </ProgressButton>
-          </GridContainer>
-        </AuthorizedContext.Provider>
+              <ProgressButton
+                color='primary'
+                icon={null}
+                disabled={!enableSaveButton(poStatus)}
+                onClick={() => this.onSubmitButtonClicked(poSubmitAction.SAVE)}
+              >
+                {formatMessage({
+                  id: 'inventory.pr.detail.pod.save',
+                })}
+              </ProgressButton>
+              {!isPOStatusDraft(poStatus) && (
+                <ProgressButton
+                  color='success'
+                  icon={null}
+                  authority='none'
+                  onClick={() =>
+                    this.onSubmitButtonClicked(poSubmitAction.COMPLETE)}
+                  disabled={!isPOStatusFulfilled(poStatus)}
+                >
+                  {formatMessage({
+                    id: 'inventory.pr.detail.pod.complete',
+                  })}
+                </ProgressButton>
+              )}
+              {isPOStatusDraft(poStatus) &&
+              type !== 'new' &&
+              type !== 'dup' && (
+                <ProgressButton
+                  color='success'
+                  icon={null}
+                  onClick={() =>
+                    this.onSubmitButtonClicked(poSubmitAction.FINALIZE)}
+                >
+                  {formatMessage({
+                    id: 'inventory.pr.detail.pod.finalize',
+                  })}
+                </ProgressButton>
+              )}
+            </div>
+          )}
+
+          <ProgressButton
+            color='info'
+            icon={null}
+            onClick={this.toggleReport}
+            authority='none'
+            disabled={!values.id || type === 'dup'}
+          >
+            {formatMessage({
+              id: 'inventory.pr.detail.print',
+            })}
+          </ProgressButton>
+        </GridContainer>
         <CommonModal
           open={this.state.showReport}
           onClose={this.toggleReport}

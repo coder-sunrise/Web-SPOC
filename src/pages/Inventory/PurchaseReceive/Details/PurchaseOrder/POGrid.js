@@ -454,6 +454,7 @@ class Grid extends PureComponent {
               pager: false,
             }}
             EditingProps={{
+              showCommandColumn: isEditable,
               showAddCommand: isEditable,
               // showEditCommand: isEditable,
               // showDeleteCommand: isEditable,
