@@ -8,6 +8,7 @@ import {
   withFormikExtend,
   ProgressButton,
   WarningSnackbar,
+  Button,
 } from '@/components'
 import { INVOICE_STATUS } from '@/utils/constants'
 import { navigateDirtyCheck } from '@/utils/utils'
@@ -193,7 +194,7 @@ class index extends PureComponent {
 
         {this.isPaymentUpdated() && (
           <div style={{ textAlign: 'center' }}>
-            <ProgressButton
+            <Button
               color='danger'
               icon={null}
               onClick={navigateDirtyCheck({
@@ -201,7 +202,7 @@ class index extends PureComponent {
               })}
             >
               Cancel
-            </ProgressButton>
+            </Button>
             <ProgressButton onClick={this.props.handleSubmit} />
           </div>
         )}

@@ -156,6 +156,7 @@ class AmountSummary extends PureComponent {
       classes,
       config = {},
       showAdjustment = true,
+      global,
     } = this.props
     const { summary, adjustments } = this.state
     if (!summary) return null
@@ -230,6 +231,7 @@ class AmountSummary extends PureComponent {
                   key='addAdjustment'
                   onClick={this.addAdjustment}
                   style={{ marginLeft: theme.spacing(2) }}
+                  disabled={global.disableSave}
                 >
                   <Add />
                 </Button>
