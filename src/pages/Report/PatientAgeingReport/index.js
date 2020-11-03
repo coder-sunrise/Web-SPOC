@@ -34,7 +34,8 @@ class PatientAgeingReport extends ReportBase {
 const PatientAgeingReportWithFormik = withFormik({
   validationSchema: Yup.object().shape(
     {
-      // patientCriteria: Yup.string().required(),
+      month: Yup.string().required(),
+      year: Yup.string().required(),
     }
   ),
   mapPropsToValues: () => ({
