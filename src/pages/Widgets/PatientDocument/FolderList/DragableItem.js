@@ -121,7 +121,7 @@ class DragableItem extends Component {
                   <Button
                     color='danger'
                     justIcon
-                    disabled={item.fileCount > 0}
+                    disabled={!item.isEmpty}
                     style={{
                       float: 'right',
                     }}
