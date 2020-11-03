@@ -14,27 +14,20 @@ import {
   dateFormatLong,
   Popconfirm,
 } from '@/components'
-import { LoadingWrapper } from 'medisys-components'
+import { LoadingWrapper, ZImage } from 'medisys-components'
 import printJS from 'print-js'
 // import 'react-responsive-carousel/lib/styles/carousel.min.css'
 import { getFileByFileID } from '@/services/file'
 import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
 import { Carousel } from 'antd'
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos'
-import $ from 'jquery'
 import _ from 'lodash'
+import { scaleImage } from '@/utils/image'
 import SetFolderWithPopover from './SetFolderWithPopover'
-import ZImage from './ZImage'
 
 // import 'antd/dist/antd.css'
 import './style.css'
 
-const ScaleMode = {
-  FixedWH: 1,
-  FixedW: 2,
-  FixedH: 3,
-  MaxWH: 4,
-}
 const base64Prefix = 'data:image/png;base64,'
 const styles = (theme) => ({
   previous: {
@@ -150,11 +143,10 @@ class ImagePreviewer extends Component {
     } = this.getImageContainerWH()
 
     imageList.filter((s) => s.image && s.image.src).map((img) => {
-      let scaleWH = this.scaleImage(
+      let scaleWH = scaleImage(
         img.image,
         imageContainerWidth,
         imageContainerHeight,
-        ScaleMode.MaxWH,
       )
       img.width = scaleWH.width
       img.height = scaleWH.height
@@ -218,12 +210,7 @@ class ImagePreviewer extends Component {
       try {
         image.src = data
         image.onload = () => {
-          scaleWH = this.scaleImage(
-            image,
-            containerWidth,
-            containerHeight,
-            ScaleMode.MaxWH,
-          )
+          scaleWH = scaleImage(image, containerWidth, containerHeight)
           resolve()
         }
       } catch (ex) {
@@ -235,55 +222,6 @@ class ImagePreviewer extends Component {
       image,
       ...scaleWH,
     }
-  }
-
-  scaleImage = (image, containerWidth, containerHeight, mode) => {
-    let towidth = containerWidth
-    let toheight = containerHeight
-
-    switch (mode) {
-      case ScaleMode.FixedWH:
-        break
-      case ScaleMode.FixedW:
-        toheight = image.height * containerWidth / image.width
-        break
-      case ScaleMode.FixedH:
-        towidth = image.width * containerHeight / image.height
-        break
-      case ScaleMode.MaxWH:
-        // eslint-disable-next-line no-case-declarations
-        const rmaxW = image.width * 1.0 / containerWidth
-        // eslint-disable-next-line no-case-declarations
-        const rmaxH = image.height * 1.0 / containerHeight
-
-        if (rmaxW > rmaxH) {
-          if (rmaxW <= 1) {
-            towidth = image.width
-            containerHeight = image.height
-            toheight = containerHeight
-            // goto case ScaleMode.FixedWH;
-            break
-          }
-          towidth = containerWidth
-          // goto case ScaleMode.FixedW;
-          toheight = image.height * containerWidth / image.width
-          break
-        }
-        if (rmaxH <= 1) {
-          towidth = image.width
-          containerHeight = image.height
-          toheight = containerHeight
-          // goto case ScaleMode.FixedWH;
-          break
-        }
-        toheight = containerHeight
-        // goto case ScaleMode.FixedH;
-        towidth = image.width * containerHeight / image.height
-        break
-      default:
-        break
-    }
-    return { width: towidth, height: toheight }
   }
 
   previous = (current) => {
