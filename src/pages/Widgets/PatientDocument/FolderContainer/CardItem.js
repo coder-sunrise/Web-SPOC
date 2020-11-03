@@ -5,6 +5,7 @@ import { NavLink } from 'react-router-dom'
 // material ui
 import { withStyles, Chip } from '@material-ui/core'
 import { Delete, Edit } from '@material-ui/icons'
+import { scaleImage } from '@/utils/image'
 
 import {
   Button,
@@ -65,6 +66,18 @@ class CardItem extends Component {
     this.state = {
       loading: false,
       imageData: undefined,
+      originalImageSize: {},
+    }
+    this.imgRef = React.createRef()
+  }
+
+  // eslint-disable-next-line react/sort-comp
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    const { width, height } = this.props
+    const { width: nextWidth, height: nextHeight } = nextProps
+
+    if (width !== nextWidth || height !== nextHeight) {
+      this.resize(nextProps)
     }
   }
 
@@ -106,6 +119,29 @@ class CardItem extends Component {
   handleInViewChanged = (inView, entry) => {
     if (inView) {
       this.refreshImage()
+    }
+  }
+
+  handleImageLoaded = (e) => {
+    const { width, height } = this.props
+    this.setState({
+      originalImageSize: { width: e.target.width, height: e.target.height },
+    })
+
+    const scaleWH = scaleImage(e.target, width - 50, height - 120)
+    e.target.width = scaleWH.width
+    e.target.height = scaleWH.height
+  }
+
+  resize = ({ width, height }) => {
+    if (this.imgRef.current) {
+      const { originalImageSize } = this.state
+
+      this.imgRef.current.width = originalImageSize.width
+      this.imgRef.current.height = originalImageSize.height
+      const scaleWH = scaleImage(this.imgRef.current, width - 50, height - 120)
+      this.imgRef.current.width = scaleWH.width
+      this.imgRef.current.height = scaleWH.height
     }
   }
 
@@ -204,12 +240,20 @@ class CardItem extends Component {
                     }}
                   >
                     {imageData && (
-                      <img
-                        width={width - 80}
-                        height={height - 110}
-                        src={imageData}
-                        alt={file.fileName}
-                      />
+                      <div
+                        style={{
+                          height: height - 120,
+                          overflow: 'hidden',
+                          display: 'inline-block',
+                        }}
+                      >
+                        <img
+                          ref={this.imgRef}
+                          src={imageData}
+                          alt={file.fileName}
+                          onLoad={this.handleImageLoaded.bind(this)}
+                        />
+                      </div>
                     )}
                   </div>
                 </Tooltip>
