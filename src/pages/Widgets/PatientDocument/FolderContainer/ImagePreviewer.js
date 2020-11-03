@@ -211,7 +211,7 @@ class ImagePreviewer extends Component {
     }
   }
 
-  processImage = async (data, sourceWidth, sourceHeight) => {
+  processImage = async (data, containerWidth, containerHeight) => {
     let scaleWH = {}
     const image = new Image()
     await new Promise((resolve, reject) => {
@@ -220,8 +220,8 @@ class ImagePreviewer extends Component {
         image.onload = () => {
           scaleWH = this.scaleImage(
             image,
-            sourceWidth,
-            sourceHeight,
+            containerWidth,
+            containerHeight,
             ScaleMode.MaxWH,
           )
           resolve()
@@ -237,45 +237,48 @@ class ImagePreviewer extends Component {
     }
   }
 
-  scaleImage = (image, w, h, mode) => {
-    let towidth = w
-    let toheight = h
+  scaleImage = (image, containerWidth, containerHeight, mode) => {
+    let towidth = containerWidth
+    let toheight = containerHeight
 
     switch (mode) {
       case ScaleMode.FixedWH:
         break
       case ScaleMode.FixedW:
-        toheight = image.height * w / image.width
+        toheight = image.height * containerWidth / image.width
         break
       case ScaleMode.FixedH:
-        towidth = image.width * h / image.height
+        towidth = image.width * containerHeight / image.height
         break
       case ScaleMode.MaxWH:
         // eslint-disable-next-line no-case-declarations
-        const rmaxW = image.width * 1.0 / w
+        const rmaxW = image.width * 1.0 / containerWidth
         // eslint-disable-next-line no-case-declarations
-        const rmaxH = image.height * 1.0 / h
+        const rmaxH = image.height * 1.0 / containerHeight
+
         if (rmaxW > rmaxH) {
           if (rmaxW <= 1) {
             towidth = image.width
-            h = image.height
+            containerHeight = image.height
+            toheight = containerHeight
             // goto case ScaleMode.FixedWH;
             break
           }
-          towidth = w
+          towidth = containerWidth
           // goto case ScaleMode.FixedW;
-          toheight = image.height * w / image.width
+          toheight = image.height * containerWidth / image.width
           break
         }
         if (rmaxH <= 1) {
           towidth = image.width
-          h = image.height
+          containerHeight = image.height
+          toheight = containerHeight
           // goto case ScaleMode.FixedWH;
           break
         }
-        toheight = h
+        toheight = containerHeight
         // goto case ScaleMode.FixedH;
-        towidth = image.width * h / image.height
+        towidth = image.width * containerHeight / image.height
         break
       default:
         break
