@@ -3,7 +3,7 @@ import moment from 'moment'
 import { Popover, Tooltip, Button } from '@/components'
 import tablestyles from '@/pages/Widgets/PatientHistory/PatientHistoryStyle.less'
 
-const PackageDrawdownInfo = ({ drawdownData = {} }) => {
+const PackageDrawdownInfo = ({ drawdownData = {}, asAtDate }) => {
   const drawdownButtonStyle = {
     position: 'absolute',
     left: -5,
@@ -57,24 +57,30 @@ const PackageDrawdownInfo = ({ drawdownData = {} }) => {
     return null
   }
 
-  const packageDrawdownDetails = (data) => {
-    if (data) {
+  const packageDrawdownDetails = () => {
+    if (drawdownData) {
       let totalDrawdown = 0
       let totalQty = 0
       let balanceQty = 0
       let drawdownTransaction = []
-      const todayQuantity = data.packageConsumeQuantity
+      let lastDrawdownTransaction
+      const todayQuantity = drawdownData.packageConsumeQuantity
 
-      const { packageDrawdown } = data
-      if (packageDrawdown) {        
+      const { packageDrawdown } = drawdownData
+      if (packageDrawdown) {       
+        if (packageDrawdown.packageDrawdownTransaction && packageDrawdown.packageDrawdownTransaction.length > 0) { 
+          drawdownTransaction = packageDrawdown.packageDrawdownTransaction.filter(t => t.consumeDate < asAtDate)
+          lastDrawdownTransaction = drawdownTransaction[0]
+        }
+
         totalQty = packageDrawdown.totalQuantity
-        balanceQty = packageDrawdown.remainingQuantity + todayQuantity
+        balanceQty = lastDrawdownTransaction ? lastDrawdownTransaction.quantityAfterConsume : packageDrawdown.totalQuantity
         totalDrawdown = totalQty - balanceQty
-        drawdownTransaction = packageDrawdown.packageDrawdownTransaction
+        
       }
       else {
-        totalQty = data.quantity
-        balanceQty = data.quantity
+        totalQty = drawdownData.quantity
+        balanceQty = drawdownData.quantity
       }
 
       return (
@@ -102,7 +108,7 @@ const PackageDrawdownInfo = ({ drawdownData = {} }) => {
             fontSize: 14,
           }}
         >
-          {packageDrawdownDetails(drawdownData)}
+          {packageDrawdownDetails()}
         </div>
       }
     >

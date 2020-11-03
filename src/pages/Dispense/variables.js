@@ -57,6 +57,7 @@ const packageDrawdownIndicator = (row) => {
     <div style={{ position: 'relative' }}>
       <PackageDrawdownInfo
         drawdownData={row}
+        asAtDate={row.packageDrawdownAsAtDate}
       />
     </div>
   )
@@ -794,7 +795,22 @@ export const PackageColumnExtensions = (onPrint) => [
     width: columnWidth,
     sortingEnabled: false,
     render: (row) => {
-      return <NumberInput text value={row.packageRemainingQuantity} />
+      const { packageDrawdown } = row
+      let drawdownTransaction = []
+      let lastDrawdownTransaction
+      let balanceQty = row.quantity
+      const todayQuantity = row.packageConsumeQuantity
+
+      if (packageDrawdown) {       
+        if (packageDrawdown.packageDrawdownTransaction && packageDrawdown.packageDrawdownTransaction.length > 0) { 
+          drawdownTransaction = packageDrawdown.packageDrawdownTransaction.filter(t => t.consumeDate < row.packageDrawdownAsAtDate)
+          lastDrawdownTransaction = drawdownTransaction[0]
+        }
+
+        balanceQty = lastDrawdownTransaction ? lastDrawdownTransaction.quantityAfterConsume : packageDrawdown.totalQuantity        
+      }
+
+      return <NumberInput text value={balanceQty - todayQuantity} />
     },
   },
   {

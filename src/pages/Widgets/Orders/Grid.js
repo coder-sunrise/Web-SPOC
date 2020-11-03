@@ -249,6 +249,7 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
       <div style={{ position: 'relative' }}>
         <PackageDrawdownInfo
           drawdownData={row}
+          asAtDate={row.packageDrawdownAsAtDate}
         />
       </div>
     )

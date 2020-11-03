@@ -1772,6 +1772,7 @@ class Medication extends PureComponent {
                           step={1}
                           min={0}
                           max={values.remainingQuantity}
+                          disabled={this.props.visitRegistration.entity.visit.isInvoiceFinalized}
                           {...args}
                         />
                       )
