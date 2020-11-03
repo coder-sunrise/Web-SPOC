@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import $ from 'jquery'
+import { getOffset, getClientSize } from 'rc-util/lib/Dom/css'
 
 import { IconButton, Button } from '@/components'
 import { RotateLeft, RotateRight, ZoomOut, ZoomIn } from '@material-ui/icons'
@@ -65,10 +66,12 @@ const ZImage = (props) => {
     {
       icon: <ZoomIn />,
       onClick: onZoomIn,
+      disabled: scale >= 10,
     },
     {
       icon: <ZoomOut />,
       onClick: onZoomOut,
+      disabled: scale <= 1,
     },
     {
       icon: <RotateRight />,
@@ -105,9 +108,8 @@ const ZImage = (props) => {
   }
 
   const getFixScaleEleTransPosition = (width, height, left, top) => {
-    // const { width: clientWidth, height: clientHeight } = getClientSize()
-    const clientWidth = $(imgRef.current).width()
-    const clientHeight = $(imgRef.current).height()
+    const clientWidth = $(imgRef.current).parent().width()
+    const clientHeight = $(imgRef.current).parent().height()
 
     let fixPos = null
 
@@ -130,22 +132,21 @@ const ZImage = (props) => {
     if (isMoving) {
       const sWidth = imgRef.current.offsetWidth * scale
       const sHeight = imgRef.current.offsetHeight * scale
-      // const { left, top } = getOffset(imgRef.current)
-      const { left, top } = $(imgRef.current).offset()
+      const { left, top } = getOffset(imgRef.current)
       const isRotate = rotate % 180 !== 0
 
       setMoving(false)
 
-      // const fixState = getFixScaleEleTransPosition(
-      //   isRotate ? sHeight : sWidth,
-      //   isRotate ? sWidth : sHeight,
-      //   left,
-      //   top,
-      // )
+      const fixState = getFixScaleEleTransPosition(
+        isRotate ? sHeight : sWidth,
+        isRotate ? sWidth : sHeight,
+        left,
+        top,
+      )
 
-      // if (fixState) {
-      //   setPosition({ ...fixState })
-      // }
+      if (fixState) {
+        setPosition({ ...fixState })
+      }
     }
   }
 
@@ -225,10 +226,14 @@ const ZImage = (props) => {
                   <li className='ant-image-preview-operations-operation'>
                     <span
                       role='img'
-                      className='anticon anticon-zoom-in ant-image-preview-operations-icon'
+                      className={`anticon anticon-zoom-in ant-image-preview-operations-icon ${t.disabled
+                        ? 'ant-image-preview-operations-operation-disabled'
+                        : ''}`}
                       onClick={t.onClick}
                     >
-                      <IconButton style={{ color: 'white' }}>
+                      <IconButton
+                        style={{ color: t.disabled ? 'Gray' : 'white' }}
+                      >
                         {t.icon}
                       </IconButton>
                     </span>
