@@ -108,7 +108,7 @@ let i = 0
         values.adjAmount < 0
           ? -Math.abs(values.adjValue)
           : Math.abs(values.adjValue),
-      packageGlobalId: '',
+      packageGlobalId: values.packageGlobalId !== undefined ? values.packageGlobalId : '',
     }
     dispatch({
       type: 'orders/upsertRow',

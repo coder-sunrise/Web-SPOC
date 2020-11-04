@@ -437,7 +437,7 @@ const DispenseDetails = ({
               data={otherOrder}
             />
 
-            {settings.isEnablePackage && (
+            {settings.isEnablePackage && visitPurposeFK !== VISIT_TYPE.RETAIL && (
               <TableData
                 title='Package'
                 idPrefix='package'

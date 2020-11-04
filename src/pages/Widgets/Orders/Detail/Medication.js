@@ -315,7 +315,7 @@ const getVisitDoctorUserId = props => {
           ? -Math.abs(values.adjValue)
           : Math.abs(values.adjValue),
       adjType: values.isExactAmount ? 'ExactAmount' : 'Percentage',
-      packageGlobalId: '',
+      packageGlobalId: values.packageGlobalId !== undefined ? values.packageGlobalId : '',
     }
 
     dispatch({

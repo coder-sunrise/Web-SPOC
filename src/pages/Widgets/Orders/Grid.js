@@ -343,6 +343,10 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
       onRowDoubleClick={editRow}
       getRowId={(r) => r.uid}
       columns={newColumns}
+      defaultSorting={[
+        { columnName: 'packageGlobalId', direction: 'asc' },
+        { columnName: 'sequence', direction: 'asc' },
+      ]}
       FuncProps={{
         pager: false,
         grouping: isExistPackage,
