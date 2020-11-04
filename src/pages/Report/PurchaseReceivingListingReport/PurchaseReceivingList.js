@@ -5,6 +5,7 @@ import { ReportDataGrid } from '@/components/_medisys'
 import { currencySymbol } from '@/utils/config'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { withStyles } from '@material-ui/core'
+import _ from 'lodash'
 
 const styles = (theme) => ({
   subRow: {
@@ -43,6 +44,7 @@ class PurchaseReceivingList extends PureComponent {
 
           return {
             ...item,
+            supplierName: item.supplierName || '',
             id: `purchaseReceiving-${index}-${item.itemCode}`,
             groupID: `${item.transactionType}-${item.porgid}`,
             countNumber: firstRow ? 1 : 0,
@@ -181,10 +183,27 @@ class PurchaseReceivingList extends PureComponent {
     ]
 
     let grouping = []
+    let defaultExpandedGroups = []
     if (reportDatas.PurchaseReceivingListingInfo[0].isGroupBySupplier) {
       grouping = [
         { columnName: 'supplierName' },
       ]
+
+      defaultExpandedGroups = defaultExpandedGroups.concat(
+        _.uniqBy(incomeData, 'supplierName').map((o) => o.supplierName),
+      )
+    }
+
+    if (grouping.length > 0) {
+      defaultExpandedGroups = defaultExpandedGroups.concat(
+        _.uniqBy(incomeData, 'groupID').map(
+          (o) => `${o.supplierName}|${o.groupID}`,
+        ),
+      )
+    } else {
+      defaultExpandedGroups = defaultExpandedGroups.concat(
+        _.uniqBy(incomeData, 'groupID').map((o) => o.groupID),
+      )
     }
     grouping = [
       ...grouping,
@@ -198,6 +217,7 @@ class PurchaseReceivingList extends PureComponent {
       groupingConfig: {
         state: {
           grouping,
+          defaultExpandedGroups,
         },
         row: {
           contentComponent: (group) => {
