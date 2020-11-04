@@ -32,9 +32,47 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
     setCheckedStatusIncldGST,
   ] = useState(isGSTInclusive)
 
+  const [
+    isExistPackage,
+    setIsExistPackage,
+  ] = useState(false)
+
+  const [
+    expandedGroups,
+    setExpandedGroups,
+  ] = useState([])
+
+  const handleExpandedGroupsChange = (e) => {
+    setExpandedGroups(e)
+  }
+
   useEffect(
     () => {
-      setCheckedStatusIncldGST(orders.isGSTInclusive)
+      setCheckedStatusIncldGST(orders.isGSTInclusive) 
+      
+      const settings = JSON.parse(localStorage.getItem('clinicSettings'))
+      const { isEnablePackage = false } = settings
+
+      const packageItems = rows.filter(item => item.isPackage && !item.isDeleted)
+      const existPackage = isEnablePackage && packageItems.length > 0
+      setIsExistPackage(existPackage)
+
+      if (existPackage && rows) {
+        const groups = rows.reduce(
+          (distinct, data) =>
+            distinct.includes(data.packageGlobalId)
+              ? [
+                  ...distinct,
+                ]
+              : [
+                  ...distinct,
+                  data.packageGlobalId,
+                ],
+          [],
+        )
+  
+        setExpandedGroups(groups)
+      }
     },
     [
       orders,
@@ -176,7 +214,7 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
       >
         <div
           style={{
-            width: '58%',
+            width: isExistPackage ? '54%' : '58%',
             overflow: 'hidden',
             display: 'inline-block',
             textOverflow: 'ellipsis',
@@ -191,7 +229,7 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
         </div>
         <div
           style={{
-            marginLeft: theme.spacing(39.5),
+            marginLeft: isExistPackage ? theme.spacing(34.5) : theme.spacing(39.5),
             position: 'absolute',
           }}
         >
@@ -255,6 +293,47 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
     )
   }
 
+  const packageGroupCellContent = ({ row }) => {
+    if (row.value === undefined || row.value === '')
+      return null
+
+    let label = 'Package'
+    let totalPrice = 0
+    if (!rows) return ''
+    const data = rows.filter(
+      (item) => item.packageGlobalId === row.value,
+    )
+    if (data.length > 0) {
+      totalPrice = _.sumBy(data, 'totalAfterItemAdjustment') || 0
+      label = `${data[0].packageCode} - ${data[0].packageName} (Total: `
+    }
+    return (
+      <span style={{ verticalAlign: 'middle', paddingRight: 8 }}>
+        <strong>
+          {label} 
+          <NumberInput text currency value={totalPrice} />
+          )        
+        </strong>
+      </span>
+    )
+  }
+
+  let newColumns = [        
+    { name: 'type', title: 'Type' },
+    { name: 'subject', title: 'Name' },
+    { name: 'description', title: 'Description' },
+    { name: 'adjAmount', title: 'Adj.' },
+    { name: 'totalAfterItemAdjustment', title: 'Total' },
+    { name: 'actions', title: 'Actions' },    
+  ]
+
+  if (isExistPackage) {
+    newColumns.push({
+      name: 'packageGlobalId',
+      title: 'Package',
+    })
+  }
+
   return (
     <CommonTableGrid
       size='sm'
@@ -263,16 +342,29 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
       rows={rows}
       onRowDoubleClick={editRow}
       getRowId={(r) => r.uid}
-      columns={[
-        { name: 'type', title: 'Type' },
-        { name: 'subject', title: 'Name' },
-        { name: 'description', title: 'Description' },
-        { name: 'adjAmount', title: 'Adj.' },
-        { name: 'totalAfterItemAdjustment', title: 'Total' },
-        { name: 'actions', title: 'Actions' },
-      ]}
+      columns={newColumns}
       FuncProps={{
         pager: false,
+        grouping: isExistPackage,
+        groupingConfig: {
+          state: {
+            grouping: [
+              { columnName: 'packageGlobalId' },
+            ],
+            expandedGroups: [
+              ...expandedGroups,
+            ],
+            onExpandedGroupsChange: handleExpandedGroupsChange,
+          },
+          row: {
+            contentComponent: packageGroupCellContent,
+            // contentComponent: ({ column, row }) => (
+            //   <span>
+            //     {row.value}
+            //   </span>
+            // ),
+          },
+        },
         summary: true,
         summaryConfig: {
           state: {
@@ -318,15 +410,28 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
           },
           row: {
             messages,
-            totalRowComponent: (p) => {
-              const { children, ...restProps } = p
-              const newChildren = [
-                <Table.Cell colSpan={2} key={1} />,
-                React.cloneElement(children[4], {
-                  colSpan: 2,
-                  ...restProps,
-                }),
-              ]
+            totalRowComponent: (p) => {              
+              const { children, ...restProps } = p              
+              let newChildren = []
+              if (isExistPackage) {
+                newChildren = [
+                  <Table.Cell colSpan={3} key={1} />,
+                  React.cloneElement(children[5], {
+                    colSpan: 3,
+                    ...restProps,
+                  }),
+                ]
+              }
+              else {
+                newChildren = [
+                  <Table.Cell colSpan={2} key={1} />,
+                  React.cloneElement(children[4], {
+                    colSpan: 2,
+                    ...restProps,
+                  }),
+                ]
+              }
+              
               return <Table.Row>{newChildren}</Table.Row>
             },
             itemComponent: (p) => {
@@ -359,7 +464,7 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
                     }}
                   >
                     <div>
-                      <div style={{ marginLeft: theme.spacing(31) }}>
+                      <div style={{ marginLeft: isExistPackage ? theme.spacing(26) : theme.spacing(31) }}>
                         {itemSubTotal}
                       </div>
                       <div
@@ -371,7 +476,7 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
                       >
                         <Divider />
                       </div>
-                      <div style={{ marginLeft: theme.spacing(23) }}>
+                      <div style={{ marginLeft: isExistPackage ? theme.spacing(18) : theme.spacing(23) }}>
                         <span>
                           Invoice Adjustment
                           <Tooltip title='Add Adjustment'>
@@ -388,7 +493,7 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
                       </div>
                       {itemAdj}
                       {gstValue >= 0 && (
-                        <div style={{ marginLeft: theme.spacing(18) }}>
+                        <div style={{ marginLeft: isExistPackage ? theme.spacing(13) : theme.spacing(18) }}>
                           {itemGST}
                         </div>
                       )}
@@ -401,7 +506,7 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
                       >
                         <Divider />
                       </div>
-                      <div style={{ marginLeft: theme.spacing(34.5) }}>
+                      <div style={{ marginLeft: isExistPackage ? theme.spacing(29.5) : theme.spacing(34.5) }}>
                         {itemTotal}
                       </div>
                     </div>
@@ -466,7 +571,7 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
         },
         {
           columnName: 'description',
-          width: 260,
+          width: isExistPackage ? 220 : 260,
           observeFields: [
             'instruction',
             'remark',
@@ -597,7 +702,7 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
               </Authorized>
             )
           },
-        },
+        },        
       ]}
     />
   )

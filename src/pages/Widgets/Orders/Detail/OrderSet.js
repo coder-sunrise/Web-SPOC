@@ -184,6 +184,7 @@ const { qtyFormat } = config
             },
           ],
           performingUserFK: visitDoctorUserId,
+          packageGlobalId: '',
         }
       }
       return item
@@ -242,6 +243,7 @@ const { qtyFormat } = config
             : undefined,
           batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
           performingUserFK: visitDoctorUserId,
+          packageGlobalId: '',
         }
       }
       return item
@@ -280,6 +282,7 @@ const { qtyFormat } = config
           serviceFK: service.id,
           serviceCenterFK: serviceCenterService.serviceCenterFK,
           performingUserFK: visitDoctorUserId,
+          packageGlobalId: '',
         }
       }
       return item
@@ -316,6 +319,7 @@ const { qtyFormat } = config
             : undefined,
           batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
           performingUserFK: visitDoctorUserId,
+          packageGlobalId: '',
         }
       }
 

@@ -97,6 +97,7 @@ const getVisitDoctorUserId = props => {
         values.adjAmount < 0
           ? -Math.abs(values.adjValue)
           : Math.abs(values.adjValue),
+      packageGlobalId: '',
     }
     dispatch({
       type: 'orders/upsertRow',

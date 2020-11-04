@@ -402,6 +402,7 @@ class PastMedication extends PureComponent {
           isClaimable: item.isClaimable,
           caution: itemDrugCaution,
           performingUserFK: this.getVisitDoctorUserId(this.props),
+          packageGlobalId: '',
         }
       }),
     )
@@ -478,6 +479,7 @@ class PastMedication extends PureComponent {
           subject: vaccination.displayValue,
           caution: vaccination.caution,
           performingUserFK: this.getVisitDoctorUserId(this.props),
+          packageGlobalId: '',
         }
       }),
     )
