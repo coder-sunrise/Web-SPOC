@@ -591,11 +591,27 @@ class Billing extends Component {
 
   handleDrugLabelClick = () => {
     const { dispense } = this.props
-    const { prescription = [] } = dispense.entity
+    const { prescription = [], packageItem = [] } = dispense.entity
+
+    let drugList = []
+
+    prescription.forEach(item => {
+      drugList.push(item)
+    })
+    packageItem.forEach(item => {
+      if (item.type === 'Medication') {
+        drugList.push({
+          ...item, 
+          name: item.description,
+          dispensedQuanity: item.packageConsumeQuantity,
+        })
+      }
+    })
+
     this.setState((prevState) => {
       return {
         showDrugLabelSelection: !prevState.showDrugLabelSelection,
-        selectedDrugs: prescription.map((x) => {
+        selectedDrugs: drugList.map((x) => {
           return { ...x, no: 1, selected: true }
         }),
       }

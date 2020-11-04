@@ -154,10 +154,25 @@ class Main extends Component {
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
-    const { prescription = [] } = nextProps.values
+    const { prescription = [], packageItem = [] } = nextProps.values
+
+    let drugList = []
+    prescription.forEach(item => {
+      drugList.push(item)
+    })
+    packageItem.forEach(item => {
+      if (item.type === 'Medication') {
+        drugList.push({
+          ...item, 
+          name: item.description,
+          dispensedQuanity: item.packageConsumeQuantity,
+        })
+      }
+    })
+
     this.setState(() => {
       return {
-        selectedDrugs: prescription.map((x) => {
+        selectedDrugs: drugList.map((x) => {
           return { ...x, no: 1, selected: true }
         }),
       }
@@ -166,7 +181,7 @@ class Main extends Component {
 
   componentDidMount = async () => {
     const { dispatch, values, dispense } = this.props
-    const { otherOrder = [], prescription = [], visitPurposeFK } = values
+    const { otherOrder = [], prescription = [], packageItem = [], visitPurposeFK } = values
     dispatch({
       type: 'dispense/incrementLoadCount',
     })
@@ -202,9 +217,23 @@ class Main extends Component {
       this.editOrder()
     }
 
+    let drugList = []
+    prescription.forEach(item => {
+      drugList.push(item)
+    })
+    packageItem.forEach(item => {
+      if (item.type === 'Medication') {
+        drugList.push({
+          ...item, 
+          name: item.description,
+          dispensedQuanity: item.packageConsumeQuantity,
+        })
+      }
+    })
+
     this.setState(() => {
       return {
-        selectedDrugs: prescription.map((x) => {
+        selectedDrugs: drugList.map((x) => {
           return { ...x, no: 1, selected: true }
         }),
       }
@@ -388,11 +417,26 @@ class Main extends Component {
 
   handleDrugLabelClick = () => {
     const { values } = this.props
-    const { prescription = [] } = values
+    const { prescription = [], packageItem = [] } = values
+    let drugList = []
+
+    prescription.forEach(item => {
+      drugList.push(item)
+    })
+    packageItem.forEach(item => {
+      if (item.type === 'Medication') {
+        drugList.push({
+          ...item, 
+          name: item.description,
+          dispensedQuanity: item.packageConsumeQuantity,
+        })
+      }
+    })
+    
     this.setState((prevState) => {
       return {
         showDrugLabelSelection: !prevState.showDrugLabelSelection,
-        selectedDrugs: prescription.map((x) => {
+        selectedDrugs: drugList.map((x) => {
           return { ...x, no: 1, selected: true }
         }),
       }

@@ -608,7 +608,7 @@ export const DrugLabelSelectionColumnExtensions = (
               whiteSpace: 'pre-wrap',
             }}
           >
-            {row.name}
+            {row.code}
           </div>
         </div>
       )
