@@ -63,6 +63,7 @@ class FolderList extends Component {
       sortOrder: n.sortOrder || 0,
       fileCount: n.fileCount || 0,
       isDeleted: n.isDeleted,
+      isEmpty: n.isEmpty,
     }
   }
 
