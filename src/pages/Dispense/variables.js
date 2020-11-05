@@ -857,9 +857,4 @@ export const PackageColumnExtensions = (onPrint) => [
       )
     },
   },
-  {
-    columnName: 'packageGlobalId',
-    width: 0,
-    sortingEnabled: false,
-  },
 ]

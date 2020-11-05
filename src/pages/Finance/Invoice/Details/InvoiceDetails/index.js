@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 // material ui
 import { withStyles } from '@material-ui/core'
+import _ from 'lodash'
 // common component
 import Printer from '@material-ui/icons/Print'
 import {
@@ -11,6 +12,7 @@ import {
   OutlinedTextField,
   FastField,
   Button,
+  NumberInput,
 } from '@/components'
 import { ReportViewer } from '@/components/_medisys'
 // utils
@@ -21,14 +23,47 @@ import Summary from './Summary'
 import styles from './styles'
 // variables
 import {
-  TableConfig,
-  DataGridColumns,
   DataGridColExtensions,
 } from './variables'
 
 class InvoiceDetails extends Component {
   state = {
     showReport: false,
+    isExistPackage: false,
+    expandedGroups: [],
+  }
+
+  componentWillReceiveProps (nextProps) {
+    const { values } = nextProps
+    const settings = JSON.parse(localStorage.getItem('clinicSettings'))
+    const { isEnablePackage = false } = settings
+
+    if (values.invoiceItem) {
+      const packageItems = values.invoiceItem.filter(item => item.isPackage && !item.isDeleted)
+      const existPackage = isEnablePackage && packageItems.length > 0
+      this.setState({
+        isExistPackage: existPackage,
+      })
+
+      if (existPackage) {
+        const groups = values.invoiceItem.reduce(
+          (distinct, data) =>
+            distinct.includes(data.packageGlobalId)
+              ? [
+                  ...distinct,
+                ]
+              : [
+                  ...distinct,
+                  data.packageGlobalId,
+                ],
+          [],
+        )
+  
+        this.setState({
+          expandedGroups: groups,
+        })
+      }
+    }
   }
 
   toggleReport = () => {
@@ -37,6 +72,53 @@ class InvoiceDetails extends Component {
 
   render () {
     const { classes, values } = this.props
+
+    const handleExpandedGroupsChange = (e) => {
+      this.setState({
+        expandedGroups: e,
+      })
+    }
+    
+    const packageGroupCellContent = ({ row }) => {
+      if (row.value === undefined || row.value === '')
+        return null
+
+      let label = 'Package'
+      let totalPrice = 0
+      if (!values.invoiceItem) return ''
+      const data = values.invoiceItem.filter(
+        (item) => item.packageGlobalId === row.value,
+      )
+      if (data.length > 0) {
+        totalPrice = _.sumBy(data, 'totalAfterItemAdjustment') || 0
+        label = `${data[0].packageCode} - ${data[0].packageName} (Total: `
+      }
+      return (
+        <span style={{ verticalAlign: 'middle', paddingRight: 8 }}>
+          <strong>
+            {label} 
+            <NumberInput text currency value={totalPrice} />
+            )        
+          </strong>
+        </span>
+      )
+    }
+
+    let newColumns = [
+      { name: 'itemType', title: 'Type' },
+      { name: 'itemName', title: 'Name' },
+      { name: 'quantity', title: 'Quantity' },
+      { name: 'adjAmt', title: 'Adjustment' },
+      { name: 'totalAfterItemAdjustment', title: 'Total ($)' },
+    ]
+  
+    if (this.state.isExistPackage) {
+      newColumns.push({
+        name: 'packageGlobalId',
+        title: 'Package',
+      })
+    }
+
     return (
       <div className={classes.cardContainer}>
         <div
@@ -54,9 +136,30 @@ class InvoiceDetails extends Component {
           size='sm'
           height={300}
           rows={values.invoiceItem}
-          columns={DataGridColumns}
+          columns={newColumns}
           columnExtensions={DataGridColExtensions}
-          {...TableConfig}
+          defaultSorting={[
+            { columnName: 'packageGlobalId', direction: 'asc' },
+            { columnName: 'invoiceItemTypeFK', direction: 'asc' },
+          ]}
+          FuncProps={{
+            pager: false,
+            grouping: this.state.isExistPackage,
+            groupingConfig: {
+              state: {
+                grouping: [
+                  { columnName: 'packageGlobalId' },
+                ],
+                expandedGroups: [
+                  ...this.state.expandedGroups,
+                ],
+                onExpandedGroupsChange: handleExpandedGroupsChange,
+              },
+              row: {
+                contentComponent: packageGroupCellContent,
+              },
+            },
+          }}
         />
         <Summary values={values} />
         <GridContainer className={classes.summaryContainer}>

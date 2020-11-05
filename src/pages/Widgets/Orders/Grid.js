@@ -362,11 +362,6 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
           },
           row: {
             contentComponent: packageGroupCellContent,
-            // contentComponent: ({ column, row }) => (
-            //   <span>
-            //     {row.value}
-            //   </span>
-            // ),
           },
         },
         summary: true,
