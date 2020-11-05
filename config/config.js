@@ -16,6 +16,7 @@ const plugins = [
       targets: {
         ie: 11,
       },
+
       locale: {
         enable: true, // default false
         default: 'en-US', // default zh-CN
@@ -34,15 +35,8 @@ const plugins = [
       ...(!process.env.TEST && os.platform() === 'darwin'
         ? {
             dll: {
-              include: [
-                'dva',
-                'dva/router',
-                'dva/saga',
-                'dva/fetch',
-              ],
-              exclude: [
-                '@babel/runtime',
-              ],
+              include: ['dva', 'dva/router', 'dva/saga', 'dva/fetch'],
+              exclude: ['@babel/runtime'],
             },
             hardSource: true,
           }
@@ -57,6 +51,7 @@ export default {
   targets: {
     ie: 11,
   },
+  hash: true,
   define: {
     APP_TYPE: process.env.APP_TYPE || '',
     'process.env.client_env': 'development',
@@ -118,8 +113,8 @@ export default {
         const antdProPath = match[1].replace('.less', '').replace('.scss', '')
         const arr = antdProPath
           .split('/')
-          .map((a) => a.replace(/([A-Z])/g, '-$1'))
-          .map((a) => a.toLowerCase())
+          .map(a => a.replace(/([A-Z])/g, '-$1'))
+          .map(a => a.toLowerCase())
         return `antd-pro${arr.join('-')}-${localName}`.replace(/--/g, '-')
       }
       return localName
