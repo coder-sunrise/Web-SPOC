@@ -57,7 +57,7 @@ class PatientInfoSideBanner extends PureComponent {
   }
 
   isMedisave = (schemeTypeFK) => {
-    const { ctSchemeType } = this.props
+    /* const { ctSchemeType } = this.props
     const r = ctSchemeType.find((o) => o.id === schemeTypeFK)
     if(r)
       return (
@@ -66,7 +66,10 @@ class PatientInfoSideBanner extends PureComponent {
           'OPSCAN',
           'MEDIVISIT',
         ].indexOf(r.code) >= 0
-      )
+      )  */
+    if(schemeTypeFK)
+      return [12,13,14].indexOf(schemeTypeFK) >= 0
+
     return false
   }
 
@@ -290,6 +293,8 @@ class PatientInfoSideBanner extends PureComponent {
   
   getSchemePayerDetails = (schemePayer) => {
     const { patientScheme } = this.props.entity
+    const schemeData = patientScheme.find((row) => row.schemeTypeFK === schemePayer.schemeFK)
+    const balanceData = schemeData.patientSchemeBalance.find((row) => row.schemePayerFK === schemePayer.id)
 
     if (
       !_.isEmpty(this.state.refreshedSchemePayerData.payerBalanceList) 
@@ -297,10 +302,6 @@ class PatientInfoSideBanner extends PureComponent {
     ) {
       console.log('this.state.refreshedSchemePayerData',this.state.refreshedSchemePayerData)
       // return { ...this.state.refreshedSchemePayerData }
-      
-      const schemeData = patientScheme.find((row) => row.schemeTypeFK === schemePayer.schemeFK)
-      const balanceData = schemeData.patientSchemeBalance.find((row) => row.schemePayerFK === schemePayer.id)
-
       const refreshData = this.state.refreshedSchemePayerData.payerBalanceList.find((row) => row.schemePayerFK === schemePayer.id)
 
       console.log('refreshData', refreshData)
@@ -309,12 +310,12 @@ class PatientInfoSideBanner extends PureComponent {
         return {
           payerName: schemePayer.payerName,
           payerAccountNo: schemePayer.payerID,
-          balance: balanceData.balance ??  '',
-          patientCoPaymentSchemeFK: refreshData.finalBalance,
+          balance: refreshData.finalBalance,
+          patientCoPaymentSchemeFK: balanceData.patientCoPaymentSchemeFK,
           schemeTypeFK: refreshData.schemeTypeFK,
           validFrom: schemeData.validFrom,
           validTo: schemeData.validTo,
-          statusDescription: refreshData.statusDescription,
+          // statusDescription: refreshData.statusDescription,
           isSuccessful:
           refreshData.isSuccessful !== ''
               ? refreshData.isSuccessful
@@ -323,12 +324,13 @@ class PatientInfoSideBanner extends PureComponent {
     }
 
     const errorData = this.state.refreshedSchemePayerData
+    console.log('errorData', errorData)
 
     return {
       payerName: schemePayer.payerName,
       payerAccountNo: schemePayer.payerID,
-      // balance: balanceData.balance ??  '',
-      // patientCoPaymentSchemeFK: balanceData.patientCopaymentSchemeFK,
+      balance: balanceData.balance ??  '',
+      patientCoPaymentSchemeFK: balanceData.patientCopaymentSchemeFK,
       schemeTypeFK: schemePayer.schemeFK,
       // validFrom: schemeData.validFrom,
       // validTo: schemeData.validTo,
@@ -537,6 +539,7 @@ class PatientInfoSideBanner extends PureComponent {
               .map((o) => {
                 // console.log('schemePayer',o)
                 const schemeData = this.getSchemePayerDetails(o)
+                console.log('schemeData',schemeData)
                 return (
                   <LoadingWrapper loading={loading} text='Retrieving balance...'>
                     <div style={{ marginBottom: theme.spacing(3) }}>

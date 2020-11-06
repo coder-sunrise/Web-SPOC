@@ -79,6 +79,7 @@ export const ApprovedMedisaveColumns = [
 ]
 
 export const ApprovedMedisaveColumnExtensions = [
+  { columnName: 'hrnNo', width: 145 },
   { columnName: 'visitDate', type: 'date' },
   { columnName: 'invoiceDate', type: 'date' },
   {

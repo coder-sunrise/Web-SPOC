@@ -80,11 +80,14 @@ const styles = (theme) => ({
           const screening = ctmedisavehealthscreeningdiagnosis.find((c) => c.code === o.chargeCode)
           const scan = ctmedisaveoutpatientscandiagnosis.find((c) => c.code === o.chargeCode)
           const vaccination = ctmedisavevaccination.find((c) => c.code === o.chargeCode)
+          const flexi = o.chargeCode === 'Z519'
+          console.log('chargeCode',cdmp, screening, scan, vaccination, flexi)
           let displayValue = ''
           if(cdmp) displayValue = cdmp.name
           if(screening) displayValue = screening.name
           if(scan) displayValue = scan.name
           if(vaccination) displayValue = vaccination.name
+          if(flexi) displayValue = 'Medical care, unspecified'
 
           chargeCodeList.push(`${o.chargeCode} - ${displayValue}`)
           if(o.isPrimary) {
@@ -229,9 +232,9 @@ class ClaimDetails extends Component {
     setFieldValue('selectedComplication',latestSelectedComplication)
   }
 
-  isMedisave = (schemeType) => {
-    const { ctschemetype } = this.props.codetable
-    const r = ctschemetype.find((o) => o.code === schemeType)
+  isMedisave = (schemeTypeFK) => {
+    /* const { ctschemetype } = this.props.codetable
+    const r = ctschemetype.find((o) => o.code === schemeTypeFK)
     if(r) {
       return (
         [
@@ -240,7 +243,10 @@ class ClaimDetails extends Component {
           'MEDIVISIT',
         ].indexOf(r.code) >= 0
       )
-    }
+    } */
+    if(schemeTypeFK)
+      return [12,13,14].indexOf(schemeTypeFK) >= 0
+      
     return false
   }
 
@@ -373,7 +379,7 @@ class ClaimDetails extends Component {
             {}
             {renderClaimDetails !== undefined ? (
               renderClaimDetails(readOnly)
-            ) : (!this.isMedisave(values.schemeType) && // CHAS //
+            ) : (!this.isMedisave(values.schemeTypeFK) && // CHAS //
               <GridItem md={12} container>
                 <GridItem md={5}>
                   <FastField

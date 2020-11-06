@@ -63,7 +63,7 @@ export const RejectedMedisaveColumns = [
     title: 'Rejection Date',
   },
   {
-    name: 'rejectionReason',
+    name: 'responseStatusDescription',
     title: 'Rejection Reason',
   },
   {
@@ -73,6 +73,7 @@ export const RejectedMedisaveColumns = [
 ]
 
 export const RejectedMedisaveColumnExtensions = [
+  { columnName: 'hrnNo', width: 145 },
   { columnName: 'visitDate', type: 'date' },
   { columnName: 'invoiceDate', type: 'date' },
   { columnName: 'rejectionDate', type: 'date', width: 130 },
@@ -101,9 +102,9 @@ export const RejectedMedisaveColumnExtensions = [
     },
   },
   {
-    columnName: 'rejectionReason',
+    columnName: 'responseStatusDescription',
     width: 400,
-    sortBy: 'ChasClaimStatusDescription',
+    sortBy: 'responseStatusDescription',
   },
   {
     columnName: 'schemeCategoryDisplayValue',

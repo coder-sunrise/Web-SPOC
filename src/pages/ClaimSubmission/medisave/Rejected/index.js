@@ -86,7 +86,7 @@ class RejectedMedisave extends React.Component {
         .then((r) => {
           this.handleLoadingVisibility(false)
           if (r) {
-            if (r.failedCount !== 0) {
+            if (r.failedCount > 0) {
               console.log('failedCount',r.failedCount)
               this.props.handleSubmitClaimStatus(r.failedCount)
             } else {

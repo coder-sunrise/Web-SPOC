@@ -308,7 +308,7 @@ export default createFormViewModel({
           return { ...data, ...status }
         }
 
-        return result
+        return data
       },
       *queryDone ({ payload }, { select, put }) {
         const codetable = yield select((state) => state.codetable)

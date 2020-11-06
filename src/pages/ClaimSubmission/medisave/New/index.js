@@ -91,7 +91,7 @@ class NewMedisave extends React.Component {
           this.handleLoadingVisibility(false)
           if (r) {
             console.log('saved',r)
-            if (r.failedCount !== 0) {
+            if (r.failedCount > 0) {
               this.props.handleSubmitClaimStatus(r.failedCount)
             } else {
               notification.success({

@@ -330,15 +330,15 @@ const Scheme = ({
             {payerTypeFK !== INVOICE_PAYER_TYPE.SCHEME &&
             _isEditing && !payerName && !payer && <span>{name}</span>}
             {payerTypeFK !== INVOICE_PAYER_TYPE.SCHEME &&
-            _isEditing && payer && <span>{name} - {payer.name}</span> 
+            _isEditing && payer && !payerName && <span>{name} - {payer.name}</span>  // first dispense
             }
             {payerTypeFK !== INVOICE_PAYER_TYPE.SCHEME &&
-            _isEditing && payerName && <span>{name} - {payerName}</span> 
+            _isEditing && payerName && payer && <span>{name} - {payerName}</span>  // billed
             }
 
             {_isConfirmed && !payerName && !payer && <span>{name}</span>}
-            {_isConfirmed && payer && <span>{name} - {payer.name}</span>}
-            {_isConfirmed && payerName && <span>{name} - {payerName}</span>}
+            {_isConfirmed && payer && !payerName && <span>{name} - {payer.name}</span>}
+            {_isConfirmed && payerName && payer && <span>{name} - {payerName}</span>}
           </span>
         </GridItem>
         {false && isMediVisit && 

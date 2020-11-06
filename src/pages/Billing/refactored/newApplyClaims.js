@@ -281,12 +281,12 @@ const ApplyClaims = ({
     let newVisitType = null
     const copaymentSchemeCode = ctcopaymentscheme.find(cps => cps.id === midPayer.copaymentSchemeFK).code
     console.log('copaymentSchemeCode',copaymentSchemeCode)
-    if(cdmpVaccinations && copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500VACC) 
+    if(cdmpVaccinations && (copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500VACC || copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE700VACC)) 
     {
       newVisitType = 'Vaccination'
       mediInvoiceItems = cdmpVaccinations
     }
-    if(cdmpScreenings && copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500HS) 
+    if(cdmpScreenings && (copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500HS || copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE700HS)) 
     {
       newVisitType = 'Health Screening'
       mediInvoiceItems = cdmpScreenings
@@ -341,14 +341,17 @@ const ApplyClaims = ({
       {
         updatedPayer = null
       }
-      const totalClaimed = updatedPayer.invoicePayerItem.reduce((oldTotal, newTotal) => {
-        return oldTotal + newTotal.claimAmount
-      }, 0)
-      console.log('totalClaimed',totalClaimed)
-      if(totalClaimed === 0) // items claimed total is 0
+      else
       {
-        console.log('is0')
-        updatedPayer = null
+        const totalClaimed = updatedPayer.invoicePayerItem.reduce((oldTotal, newTotal) => {
+          return oldTotal + newTotal.claimAmount
+        }, 0)
+        console.log('totalClaimed',totalClaimed)
+        if(totalClaimed === 0) // items claimed total is 0
+        {
+          console.log('is0')
+          updatedPayer = null
+        }
       }
     // }
     
@@ -818,7 +821,7 @@ const ApplyClaims = ({
 
       if(claimableSchemes.length > 0)
       {
-        const invoicePayerList = constructAvailableClaims(claimableSchemes)
+        const invoicePayerList = constructAvailableClaims(claimableSchemes.filter(c => !c[0].schemePayerFK))
         const newInvoicePayers = processAvailableClaims([], invoicePayerList)
         console.log('newInvoicePayers',newInvoicePayers)
       }    

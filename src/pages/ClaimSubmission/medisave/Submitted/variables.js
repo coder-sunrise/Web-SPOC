@@ -64,6 +64,7 @@ export const SubmittedMedisaveColumns = [
 ]
 
 export const SubmittedMedisaveColumnExtensions = [
+  { columnName: 'hrnNo', width: 145 },
   { columnName: 'submissionDate', type: 'date', width: 140 },
   {
     columnName: 'visitDoctorName',

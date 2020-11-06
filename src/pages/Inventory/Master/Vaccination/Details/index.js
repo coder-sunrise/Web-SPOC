@@ -218,6 +218,14 @@ export default compose(
       criticalThreshold: Yup.number()
         .min(0, 'Critical Threshold must between 0 and 999,999.9')
         .max(999999.9, 'Critical Threshold must between 0 and 999,999.9'),
+
+      inventoryVaccination_MedisaveVaccination: Yup.array().compact((v) => v.isDeleted).of(
+        Yup.object().shape({
+          medisaveVaccinationFK: Yup.string().required(),
+          isDefault: Yup.boolean(),
+        })
+        
+      ),
     }),
     handleSubmit: (values, { props, resetForm }) => {
       const { dispatch, history } = props

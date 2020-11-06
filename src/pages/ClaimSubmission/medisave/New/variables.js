@@ -1,10 +1,10 @@
 import { Tooltip } from '@/components'
 
 export const NewMedisaveColumns = [
-  {
+  /* {
     name: 'hrnNo',
     title: 'HRN No',
-  },
+  }, */
   {
     name: 'visitDate',
     title: 'Visit Date',
@@ -68,6 +68,10 @@ export const NewMedisaveColumns = [
 ]
 
 export const NewMedisaveColumnExtensions = [
+  {
+    columnName: 'hrnNo',
+    width: 150,
+  },
   { columnName: 'visitDate', type: 'date' },
   { columnName: 'invoiceDate', type: 'date' },
   {

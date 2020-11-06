@@ -70,16 +70,19 @@ class Schemes extends PureComponent {
   }
 
   isMedisave = (schemeTypeFK) => {
-    const { ctschemetype } = this.props.codetable
+    /* const { ctschemetype } = this.props.codetable
     const r = ctschemetype.find((o) => o.id === schemeTypeFK)
     if (r)
       return (
         [
           'MEDIVISIT',
           'FLEXIMEDI',
-          'MEDI500VACCINATION',
+          'OPSCAN',
         ].indexOf(r.code) >= 0
-      )
+      )    */
+    if(schemeTypeFK)
+      return [12,13,14].indexOf(schemeTypeFK) >= 0
+
     return false
   }
 

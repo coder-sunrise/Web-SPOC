@@ -132,7 +132,7 @@ class SubmittedMedisave extends React.Component {
               <ProgressButton
                 icon={null}
                 color='primary'
-                disabled={list && list.length <= 0}
+                disabled={selectedRows.length <= 0}
                 onClick={this.handleGetStatusClicked}
               >
                 {formatMessage({

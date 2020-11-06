@@ -22,7 +22,8 @@ const checkCombination = (claimedMedisaveSchemeTypes, schemeTypeFK) => {
   console.log('checkCombination', claimedMedisaveSchemeTypes, schemeTypeFK)
   switch (schemeTypeFK) {
     case 12: // Medisave 500/700 Visit
-      return claimedMedisaveSchemeTypes.includes(14)// Outpatient Scan
+      return claimedMedisaveSchemeTypes.includes(14) // Outpatient Scan
+      || claimedMedisaveSchemeTypes.includes(12) // Only one visit type
     case 14: // Outpatient Scan
       return claimedMedisaveSchemeTypes.includes(12)// Medisave 500/700 Visit
     default:
@@ -114,7 +115,7 @@ const constructSchemeList = (
 
       // const isMedisaveVisit = medisavescheme.schemeTypeName === 'Medisave 500/700 Visit' // medisaveSchemes.filter(ms => ms.name.includes('Visit') && ms.id === medisavescheme.id)// medisavescheme.name === 'Medisave 500/700 Visit'
       // console.log('currentVisitTypes', currentVisitTypes)
-      const isClaimedScheme = currentClaims.filter((item) => scheme[0].id === item.id && scheme[0].schemePayerFK === item.payerFK).length > 0
+      const isClaimedScheme = currentClaims.filter((item) => scheme[0].id === item.id).length > 0// && scheme[0].schemePayerFK === item.payerFK).length > 0
       const isMedisaveConflict = checkCombination(currentMediSchemeTypes.map(m => m.id), schemeType.id)
       const isMedisaveClaimed = invoiceItems.filter((v) => {
         const fullyClaimed = v._claimedAmount && v._claimedAmount >= v.totalAfterGst
