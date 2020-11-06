@@ -12,6 +12,7 @@ module.exports = {
         { columnName: 'sortOrder', direction: 'asc' },
       ],
     }),
+  queryDone: (params) => service.query(url, params),
   upsert: (params) => service.upsert(url, params),
   remove: (params) => service.remove(url, params),
 }

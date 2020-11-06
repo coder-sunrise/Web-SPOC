@@ -150,7 +150,14 @@ class AmountSummary extends PureComponent {
   }
 
   render () {
-    const { theme, showAddAdjustment = true, classes, config = {} } = this.props
+    const {
+      theme,
+      showAddAdjustment = true,
+      classes,
+      config = {},
+      showAdjustment = true,
+      global,
+    } = this.props
     const { summary, adjustments } = this.state
     if (!summary) return null
     // console.log(summary, config)
@@ -199,35 +206,39 @@ class AmountSummary extends PureComponent {
             <NumberInput {...amountProps} value={subTotal} />
           </GridItem>
         </GridContainer>
-        <Divider style={{ margin: theme.spacing(1) }} />
-        <GridContainer style={{ marginBottom: 4 }}>
-          <GridItem xs={7}>
-            <div
-              style={{
-                textAlign: 'right',
-                fontWeight: 500,
-                marginRight: theme.spacing(-2),
-              }}
-            >
-              <span>Invoice Adjustment</span>
-            </div>
-          </GridItem>
-          <GridItem xs={1}>
-            {showAddAdjustment && (
-              <Button
-                color='primary'
-                size='sm'
-                justIcon
-                key='addAdjustment'
-                onClick={this.addAdjustment}
-                style={{ marginLeft: theme.spacing(2) }}
+        {(gstValue >= 0 || showAdjustment) && (
+          <Divider style={{ margin: theme.spacing(1) }} />
+        )}
+        {showAdjustment && (
+          <GridContainer style={{ marginBottom: 4 }}>
+            <GridItem xs={7}>
+              <div
+                style={{
+                  textAlign: 'right',
+                  fontWeight: 500,
+                  marginRight: theme.spacing(-2),
+                }}
               >
-                <Add />
-              </Button>
-            )}
-          </GridItem>
-        </GridContainer>
-
+                <span>Invoice Adjustment</span>
+              </div>
+            </GridItem>
+            <GridItem xs={1}>
+              {showAddAdjustment && (
+                <Button
+                  color='primary'
+                  size='sm'
+                  justIcon
+                  key='addAdjustment'
+                  onClick={this.addAdjustment}
+                  style={{ marginLeft: theme.spacing(2) }}
+                  disabled={global.disableSave}
+                >
+                  <Add />
+                </Button>
+              )}
+            </GridItem>
+          </GridContainer>
+        )}
         {adjustments.map((v, i) => {
           if (!v.isDeleted) {
             return (
@@ -287,7 +298,9 @@ class AmountSummary extends PureComponent {
         ) : (
           []
         )}
-        <Divider style={{ margin: theme.spacing(1) }} />
+        {(gstValue >= 0 || showAdjustment) && (
+          <Divider style={{ margin: theme.spacing(1) }} />
+        )}
         <GridContainer>
           <GridItem xs={7}>
             <div

@@ -4,6 +4,7 @@ import { connect } from 'dva'
 import moment from 'moment'
 import _ from 'lodash'
 import router from 'umi/router'
+import $ from 'jquery'
 
 // medisys-components
 import { PatientInfoSideBanner } from 'medisys-components'
@@ -19,6 +20,7 @@ import Error from '@material-ui/icons/Error'
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight'
 import { navigateDirtyCheck, getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import Loading from '@/components/PageLoading/index'
+
 import {
   withFormikExtend,
   NumberInput,
@@ -34,7 +36,6 @@ import {
   DateRangePicker,
   DatePicker,
   Button,
-  CommonModal,
   withFormik,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
@@ -222,7 +223,19 @@ class PatientDetail extends PureComponent {
           loader: () => import('./PatientDocument'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet {...p} />
+            return (
+              <Cmpnet
+                {...p}
+                onClose={(e) => {
+                  const { preSelectedMenu } = this.state
+                  $('input').eq(0).focus()
+                  this.setState({
+                    selectedMenu: preSelectedMenu,
+                    preSelectedMenu: undefined,
+                  })
+                }}
+              />
+            )
           },
           loading: Loading,
         }),
@@ -493,22 +506,16 @@ class PatientDetail extends PureComponent {
                           }
                           onClick={(e) => {
                             onMenuClick(e, o)
-                            // console.log('here', entity, values)
                             dispatch({
                               type: 'patient/updateState',
                               payload: {
                                 entity: entity || undefined,
                               },
                             })
-                            this.setState({
+                            this.setState((pre) => ({
                               selectedMenu: o.id,
-                            })
-                            // this.props.history.push(
-                            //   getAppendUrl({
-                            //     md: 'pt',
-                            //     cmt: o.id,
-                            //   }),
-                            // )
+                              preSelectedMenu: pre.selectedMenu,
+                            }))
                           }}
                         >
                           <ListItemIcon style={{ minWidth: 25 }}>

@@ -70,7 +70,7 @@ class RoomBlock extends PureComponent {
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
-        openConfirmContent: 'Are you sure want to delete this room block?',
+        openConfirmContent: 'Delete this room block?',
         onConfirmSave: () => this.confirmDelete(id),
       },
     })

@@ -65,6 +65,8 @@ export default {
   'menu.inventory': 'Inventory',
   'menu.inventory.pd': 'Purchasing & Receiving',
   'menu.inventory.pd.detail': 'PO & DO Detail',
+  'menu.inventory.rg': 'Receiving Goods',
+  'menu.inventory.rg.detail': 'Receiving Goods Detail',
   'menu.inventory.master': 'Inventory Master',
   'menu.inventory.consumable.consumable': 'Add Consumable',
   'menu.inventory.consumable.editconsumable': 'Edit Consumable',
@@ -170,14 +172,17 @@ export default {
   'menu.report.salessummary': 'Sales Summary Report',
   'menu.report.diagnosistrending': 'Diagnosis Trending Report',
   'menu.report.sessionsummary': 'Session Summary Report',
+  'menu.report.patientageingreport': 'Patient Ageing Report',
   'menu.report.statementsummaryreport': 'Statement Summary Report',
   'menu.report.viewreport': 'View Report',
+  
   'menu.report.visitListingReport': 'Visit Listing Report',
 
   'menu.support': 'Support',
   'menu.support.support': 'Support',
   'menu.support.contactus': 'Contact Us',
   'menu.support.printingtool': 'Printing Tool',
+  'menu.support.queueprocessor': 'Queue Processor',
 
   'menu.wardmanagement': 'Ward Management',
   'menu.patient-monitoring': 'Patient Monitoring',

@@ -108,7 +108,7 @@ class DoctorExpense extends PureComponent {
         )}
         {showConfirmDelete && (
           <SimpleModal
-            title='Are you sure to delete the expenses?'
+            title='Delete the expenses?'
             open={showConfirmDelete}
             onCancel={this.toggleShowConfirmDelete}
             onConfirm={this.toggleShowConfirmDelete}

@@ -25,9 +25,9 @@ const DeleteConfirmation = ({
     setCancelReason,
   ] = useState('')
 
-  const _paymentlabel = `Are you sure to void the ${type} ${itemID}`
-  const _writeOffLabel = `Are you sure to void the selected write-off?`
-  const _otherLabel = `Are you sure to void the selected ${type.toLowerCase()}?`
+  const _paymentlabel = `Void the ${type} ${itemID}`
+  const _writeOffLabel = `Void the selected write-off?`
+  const _otherLabel = `Void the selected ${type.toLowerCase()}?`
 
   let _label = _otherLabel
   if (type === 'Write Off') _label = _writeOffLabel

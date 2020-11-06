@@ -37,6 +37,7 @@ const dateFormat = 'DD-MM-YYYY'
 const reversedDateFormat = 'YYYY-MM-DD'
 const dateFormatWithTime = 'DD-MM-YYYY HH:mm:ss'
 const dateFormatLongWithTime = 'DD MMM YYYY HH:mm:ss'
+const dateFormatLongWithTime12h = 'DD MMM YYYY hh:mm:ss A'
 const dateFormatLongWithTimeNoSec = 'DD MMM YYYY, HH:mm A'
 const dateFormatLongWithTimeNoSec12h = 'DD MMM YYYY hh:mm A'
 const timeFormatWithSecond = 'hh:mm:ss'
@@ -93,6 +94,7 @@ module.exports = {
   dateFormatLongWithTime,
   dateFormatLongWithTimeNoSec,
   dateFormatLongWithTimeNoSec12h,
+  dateFormatLongWithTime12h,
   dateFormatLong,
   fullDateTime,
   timeFormatSmallCase,

@@ -170,7 +170,7 @@ class printoutSetting extends PureComponent {
         type: 'global/updateAppState',
         payload: {
           openConfirm: true,
-          openConfirmContent: 'Are you sure want to discard the changes?',
+          openConfirmContent: 'Discard the changes?',
           onConfirmSave: () => {
             this.getSelectedReportSetting(e)
           },

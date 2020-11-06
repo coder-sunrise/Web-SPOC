@@ -3,24 +3,33 @@ import classnames from 'classnames'
 import _ from 'lodash'
 import Call from '@material-ui/icons/Call'
 import Print from '@material-ui/icons/Print'
+import FormatListNumberedOutlinedIcon from '@material-ui/icons/FormatListNumberedOutlined'
 import { formatMessage } from 'umi/locale'
+import { connect } from 'dva'
 
 import { withStyles } from '@material-ui/core'
+import Authorized from '@/utils/Authorized'
 
 import { GridContainer, GridItem, CardContainer, Button } from '@/components'
 
 const menuData = [
   {
-    title: 'Download',
+    title: 'Support',
     text: 'Contact Us',
     url: '/support/contactus',
     icon: <Call style={{ transform: 'rotate(-90deg)' }} />,
   },
   {
-    title: 'Download',
+    title: 'Support',
     text: formatMessage({ id: 'menu.support.printingtool' }),
     url: '/support/printingtool',
     icon: <Print />,
+  },
+  {
+    title: 'Support',
+    text: 'Queue Processor',
+    url: '/support/QueueProcessor',
+    icon: <FormatListNumberedOutlinedIcon />,
   },
 ]
 const styles = () => ({
@@ -30,16 +39,32 @@ const styles = () => ({
   },
 })
 
+@connect(
+  ({
+    clinicSettings,
+  }) => ({
+    clinicSettings: clinicSettings.settings,
+  }),
+)
 class Support extends PureComponent {
   constructor (props) {
+    const { clinicSettings } = props
+    const { isEnableAutoGenerateStatement = false } = clinicSettings
     super(props)
+    const accessRight = Authorized.check('support.queueprocessor')
+    if (!isEnableAutoGenerateStatement || (!accessRight || (accessRight && accessRight.rights !== 'enable'))) {
+      let index = menuData.findIndex(item => item.text === 'Queue Processor')
+      if (index !== -1) {
+        menuData.splice(index, 1)
+      }
+    }
     this.group = _.groupBy(menuData, 'title')
   }
 
   state = {}
 
   supportItems = () => {
-    const { classes, theme } = this.props
+    const { classes, theme } = this.props 
 
     return Object.keys(this.group).map((o) => {
       return (
@@ -48,7 +73,7 @@ class Support extends PureComponent {
             .filter((m) => {
               return (
                 m.text.toLocaleLowerCase().indexOf(this.state.searchText) >=
-                  0 || !this.state.searchText
+                0 || !this.state.searchText
               )
             })
             .map((item, i) => {

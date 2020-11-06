@@ -1140,8 +1140,7 @@ class Scribble extends React.Component {
                           type: 'global/updateAppState',
                           payload: {
                             openConfirm: true,
-                            openConfirmContent:
-                              'Are you sure want to delete this scribble note ?',
+                            openConfirmContent: 'Delete this scribble note?',
                             onConfirmSave: () => deleteScribbleNote(),
                           },
                         })

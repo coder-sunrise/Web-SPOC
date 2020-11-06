@@ -260,6 +260,12 @@ export const PURCHASE_ORDER_STATUS_TEXT = {
   COMPLETED: 'Completed',
 }
 
+export const RECEIVING_GOODS_STATUS_TEXT = {
+  DRAFT: 'Draft',
+  CANCELLED: 'Cancelled',
+  COMPLETED: 'Completed',
+}
+
 export const INVOICE_STATUS_TEXT = {
   PAID: 'Paid',
   OVERPAID: 'Overpaid',
@@ -452,6 +458,12 @@ export const PURCHASE_ORDER_STATUS = {
   CANCELLED: 4,
   FULFILLED: 5,
   COMPLETED: 6,
+}
+
+export const RECEIVING_GOODS_STATUS = {
+  DRAFT: 1,
+  CANCELLED: 2,
+  COMPLETED: 3,
 }
 
 export const NUMBER_TYPE = {

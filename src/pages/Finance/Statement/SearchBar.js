@@ -4,6 +4,7 @@ import { FastField, Field, withFormik } from 'formik'
 import { withStyles } from '@material-ui/core'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
+import { connect } from 'dva'
 import moment from 'moment'
 import {
   GridContainer,
@@ -30,6 +31,10 @@ const styles = () => ({
     right: 0,
   },
 })
+
+@connect(({ clinicSettings }) => ({
+  clinicSettings,
+}))
 
 @withFormik({
   mapPropsToValues: () => ({
@@ -132,7 +137,8 @@ class SearchBar extends PureComponent {
   }
 
   render () {
-    const { classes, history, dispatch, values, handleSubmit } = this.props
+    const { classes, history, dispatch, values, handleSubmit, showGenerateStatement, clinicSettings } = this.props
+    const { isEnableAutoGenerateStatement } = clinicSettings.settings
     const {
       statementStartDate,
       statementEndDate,
@@ -142,144 +148,157 @@ class SearchBar extends PureComponent {
       isAllDueDateChecked,
     } = values
     return (
-      <GridContainer className={classes.container}>
-        <GridItem container xs md={12}>
-          <GridItem md={3}>
-            <FastField
-              name='statementNo'
-              render={(args) => <TextField label='Statement No.' {...args} />}
-            />
-          </GridItem>
-          <GridItem md={3}>
-            <Field
-              name='statementStartDate'
-              render={(args) => (
-                <FilterBarDate
-                  noTodayLimit
-                  args={args}
-                  label='Statement From Date'
-                  disabled={isAllDateChecked}
-                  formValues={{
-                    startDate: statementStartDate,
-                    endDate: statementEndDate,
-                  }}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem md={3}>
-            <Field
-              name='statementEndDate'
-              render={(args) => (
-                <FilterBarDate
-                  isEndDate
-                  noTodayLimit
-                  args={args} 
-                  label='Statement To Date'
-                  disabled={isAllDateChecked}
-                  formValues={{
-                    startDate: statementStartDate,
-                    endDate: statementEndDate,
-                  }}
-                />
-              )}
-            />
-          </GridItem>
-
-          <GridItem xs sm={1} md={1} style={{ marginTop: 13 }}>
-            <FastField
-              name='isAllDateChecked'
-              render={(args) => {
-                return <Checkbox label='All Date' {...args} />
-              }}
-            />
-          </GridItem>
-        </GridItem>
-        <GridItem container xs md={12}>
-          <GridItem xs sm={3} md={3} style={{ position: 'relative' }}>
-            <FastField
-              name='copayerFK'
-              render={(args) => {
-                return (
-                  <CodeSelect
-                    {...args}
-                    label='Company'
-                    code='ctCopayer'
-                    labelField='displayValue'
-                    localFilter={(item) => item.coPayerTypeFK === 1}
+      <div>
+        <GridContainer className={classes.container}>
+          <GridItem container xs md={12}>
+            <GridItem md={3}>
+              <FastField
+                name='statementNo'
+                render={(args) => <TextField label='Statement No.' {...args} />}
+              />
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='statementStartDate'
+                render={(args) => (
+                  <FilterBarDate
+                    noTodayLimit
+                    args={args}
+                    label='Statement From Date'
+                    disabled={isAllDateChecked}
+                    formValues={{
+                      startDate: statementStartDate,
+                      endDate: statementEndDate,
+                    }}
                   />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem md={3}>
-            <Field
-              name='dueStartDate'
-              render={(args) => (
-                <FilterBarDate
-                  noTodayLimit
-                  args={args}
-                  label='Statement Due From Date'
-                  disabled={isAllDueDateChecked}
-                  formValues={{ startDate: dueStartDate, endDate: dueEndDate }}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem md={3}>
-            <Field
-              name='dueEndDate'
-              render={(args) => (
-                <FilterBarDate
-                  label='Statement Due End Date'
-                  isEndDate
-                  noTodayLimit
-                  args={args}
-                  disabled={isAllDueDateChecked}
-                  formValues={{ startDate: dueStartDate, endDate: dueEndDate }}
-                />
-              )}
-            />
-          </GridItem>
+                )}
+              />
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='statementEndDate'
+                render={(args) => (
+                  <FilterBarDate
+                    isEndDate
+                    noTodayLimit
+                    args={args}
+                    label='Statement To Date'
+                    disabled={isAllDateChecked}
+                    formValues={{
+                      startDate: statementStartDate,
+                      endDate: statementEndDate,
+                    }}
+                  />
+                )}
+              />
+            </GridItem>
 
-          <GridItem xs sm={1} md={1} style={{ marginTop: 13 }}>
-            <FastField
-              name='isAllDueDateChecked'
-              render={(args) => {
-                return <Checkbox label='All Date' {...args} />
-              }}
-            />
-          </GridItem>
-
-          <GridItem xs sm={6} md={6} lg={8}>
-            <ProgressButton
-              color='primary'
-              icon={<Search />}
-              onClick={handleSubmit}
-            >
-              <FormattedMessage id='form.search' />
-            </ProgressButton>
-            <Authorized authority='finance/statement'>
-              <Button
-                variant='contained'
-                color='primary'
-                onClick={() => {
-                  dispatch({
-                    type: 'statement/updateState',
-                    payload: {
-                      entity: undefined,
-                    },
-                  })
-                  history.push('/finance/statement/newstatement')
+            <GridItem xs sm={1} md={1} style={{ marginTop: 13 }}>
+              <FastField
+                name='isAllDateChecked'
+                render={(args) => {
+                  return <Checkbox label='All Date' {...args} />
                 }}
-              >
-                <Add />
-                New Statement
-              </Button>
-            </Authorized>
+              />
+            </GridItem>
           </GridItem>
-        </GridItem>
-      </GridContainer>
+          <GridItem container xs md={12}>
+            <GridItem xs sm={3} md={3} style={{ position: 'relative' }}>
+              <FastField
+                name='copayerFK'
+                render={(args) => {
+                  return (
+                    <CodeSelect
+                      {...args}
+                      label='Company'
+                      code='ctCopayer'
+                      labelField='displayValue'
+                      localFilter={(item) => item.coPayerTypeFK === 1}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='dueStartDate'
+                render={(args) => (
+                  <FilterBarDate
+                    noTodayLimit
+                    args={args}
+                    label='Statement Due From Date'
+                    disabled={isAllDueDateChecked}
+                    formValues={{ startDate: dueStartDate, endDate: dueEndDate }}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='dueEndDate'
+                render={(args) => (
+                  <FilterBarDate
+                    label='Statement Due End Date'
+                    isEndDate
+                    noTodayLimit
+                    args={args}
+                    disabled={isAllDueDateChecked}
+                    formValues={{ startDate: dueStartDate, endDate: dueEndDate }}
+                  />
+                )}
+              />
+            </GridItem>
+
+            <GridItem xs sm={1} md={1} style={{ marginTop: 13 }}>
+              <FastField
+                name='isAllDueDateChecked'
+                render={(args) => {
+                  return <Checkbox label='All Date' {...args} />
+                }}
+              />
+            </GridItem>
+
+            <GridItem xs sm={6} md={6} lg={8}>
+              <ProgressButton
+                color='primary'
+                icon={<Search />}
+                onClick={handleSubmit}
+              >
+                <FormattedMessage id='form.search' />
+              </ProgressButton>
+              <Authorized authority='finance/statement'>
+                <Button
+                  variant='contained'
+                  color='primary'
+                  onClick={() => {
+                    dispatch({
+                      type: 'statement/updateState',
+                      payload: {
+                        entity: undefined,
+                      },
+                    })
+                    history.push('/finance/statement/newstatement')
+                  }}
+                >
+                  <Add />
+                New Statement
+                </Button>
+              </Authorized>
+              {isEnableAutoGenerateStatement &&
+                <Authorized authority='finance.statement.autogeneratestatement'>
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    onClick={showGenerateStatement}
+                  >
+                    Generate Statements
+                  </Button>
+                </Authorized>
+              }
+            </GridItem>
+          </GridItem>
+        </GridContainer>
+      </div>
     )
   }
 }

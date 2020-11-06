@@ -353,6 +353,24 @@ const _routes = [
             ],
           },
           {
+            path: '/inventory/rg',
+            name: 'rg',
+            component: './Inventory/ReceivingGoods',
+            authority: [
+              'inventory/receivinggoods',
+            ],
+            mini: 'RG',
+          },
+          {
+            path: '/inventory/rg/rgdetails',
+            name: 'rg.detail',
+            hideInMenu: true,
+            component: './Inventory/ReceivingGoods/Details',
+            authority: [
+              'inventory/receivinggoods',
+            ],
+          },
+          {
             path: '/inventory/inventoryadjustment',
             name: 'inventoryadjustment',
             component: './Inventory/InventoryAdjustment',
@@ -740,6 +758,14 @@ const _routes = [
             ],
           },
           {
+            path: '/report/patientageingreport',
+            name: 'patientageingreport',
+            component: './Report/PatientAgeingReport',
+            authority: [
+              'report.finance.patientageingreport',
+            ],
+          },
+          {
             path: '/report/purchasereceivinglistingreport',
             name: 'purchasereceivinglistingreport',
             component: './Report/purchasereceivinglistingreport',
@@ -763,6 +789,7 @@ const _routes = [
               'report.finance.paymentcollectionsummary',
             ],
           },
+
         ],
       },
       // Report
@@ -1283,6 +1310,11 @@ const _routes = [
             path: '/support/printingtool',
             name: 'printingtool',
             component: './support/PrintingTool',
+          },
+          {
+            path: '/support/queueprocessor',
+            name: 'queueprocessor',
+            component: './support/QueueProcessor',
           },
         ],
       },
