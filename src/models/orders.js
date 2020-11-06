@@ -337,11 +337,13 @@ export default createListViewModel({
         
         const activePackageItems = rows.filter(item => item.packageGlobalId === payload.packageGlobalId && item.isDeleted === false)
         const toBeUpdatedPackage = corPackage.find(p => p.packageGlobalId === payload.packageGlobalId)
-        if (activePackageItems.length === 0) {          
-          toBeUpdatedPackage.isDeleted = true
-        }
-        else {
-          toBeUpdatedPackage.totalPrice = _.sumBy(activePackageItems, 'totalAfterItemAdjustment') || 0
+        if (toBeUpdatedPackage) {
+          if (activePackageItems.length === 0) {          
+            toBeUpdatedPackage.isDeleted = true
+          }
+          else {
+            toBeUpdatedPackage.totalPrice = _.sumBy(activePackageItems, 'totalAfterItemAdjustment') || 0
+          }
         }
         
         return {

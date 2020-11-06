@@ -53,7 +53,7 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
       const settings = JSON.parse(localStorage.getItem('clinicSettings'))
       const { isEnablePackage = false } = settings
 
-      const packageItems = rows.filter(item => item.isPackage && !item.isDeleted)
+      const packageItems = rows.filter(item => item.isPackage)
       const existPackage = isEnablePackage && packageItems.length > 0
       setIsExistPackage(existPackage)
 

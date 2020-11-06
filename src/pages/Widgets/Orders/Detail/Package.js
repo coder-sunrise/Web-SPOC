@@ -362,7 +362,7 @@ import { DURATION_UNIT } from '@/utils/constants'
           packageCode: selectedPackage.code,
           packageName: selectedPackage.displayValue,
           expiryDate,
-          totalPrice: _.sumBy(datas, 'total') || 0,
+          totalPrice: _.sumBy(datas, 'totalAfterItemAdjustment') || 0,
           packageGlobalId,
         },
       })
