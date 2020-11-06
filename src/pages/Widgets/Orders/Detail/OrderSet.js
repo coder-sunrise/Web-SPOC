@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import _ from 'lodash'
 import moment from 'moment'
 import { CustomInput } from 'mui-pro-components'
 import numeral from 'numeral'
@@ -520,6 +521,13 @@ class OrderSet extends PureComponent {
         orderSetItems: rows,
         orderSetCode: op ? op.code : '',
       })
+
+      const hasCautionItems = rows.filter(
+        (f) => f.caution && f.caution.trim().length > 0,
+      )
+      if (hasCautionItems.length > 0) {
+        openCautionAlertPrompt(hasCautionItems, () => {})
+      }
     }
 
     this.handleReset = () => {
@@ -531,28 +539,13 @@ class OrderSet extends PureComponent {
     }
   }
 
-  validateAndSubmitIfOk = async (callback) => {
-    const {
-      handleSubmit,
-      validateForm,
-      dispatch,
-      values: { orderSetItems = [] },
-    } = this.props
+  validateAndSubmitIfOk = async () => {
+    const { handleSubmit, validateForm } = this.props
     const validateResult = await validateForm()
     const isFormValid = _.isEmpty(validateResult)
     if (isFormValid) {
-      const hasCautionItems = orderSetItems.filter(
-        (f) => f.caution && f.caution.trim().length > 0,
-      )
-      if (hasCautionItems.length > 0) {
-        openCautionAlertPrompt(hasCautionItems, () => {
-          handleSubmit()
-          if (callback) callback(true)
-        })
-      } else {
-        handleSubmit()
-        return true
-      }
+      handleSubmit()
+      return true
     }
     return false
   }
