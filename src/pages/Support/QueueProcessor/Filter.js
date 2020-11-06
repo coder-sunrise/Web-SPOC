@@ -100,7 +100,7 @@ class Filter extends PureComponent {
                       queueProcessTypeFK,
                       createByUserFK, 
                       lgteql_createDate: requestDate ? moment(requestDate[0]).formatUTC() : undefined,
-                      lsteql_createDate: requestDate ? moment(requestDate[1]).formatUTC() : undefined,
+                      lsteql_createDate: requestDate ? moment(requestDate[1]).endOf('day').formatUTC(false) : undefined,
                     },
                   })
                 }}
