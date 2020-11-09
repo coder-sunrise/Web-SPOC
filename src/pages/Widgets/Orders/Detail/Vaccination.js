@@ -434,9 +434,9 @@ class Vaccination extends PureComponent {
     setFieldValue('adjType', isExactAmount ? 'ExactAmount' : 'Percentage')
   }
 
-  getCautions = () => {
+  getCaution = () => {
     const { values, codetable: { inventoryvaccination = [] } } = this.props
-    let Cautions = []
+    let cautions
 
     const { inventoryVaccinationFK } = values
     const selectVaccination = inventoryvaccination.find(
@@ -447,11 +447,9 @@ class Vaccination extends PureComponent {
       selectVaccination.caution &&
       selectVaccination.caution.trim().length
     ) {
-      Cautions = [
-        { message: selectVaccination.caution },
-      ]
+      cautions = selectVaccination.caution
     }
-    return Cautions
+    return cautions
   }
 
   render () {
@@ -468,7 +466,7 @@ class Vaccination extends PureComponent {
     } = this.props
     const { isEditVaccination } = values
     const { showAddFromPastModal } = this.state
-    const cautions = this.getCautions()
+    const caution = this.getCaution()
     return (
       <div>
         <GridContainer>
@@ -521,7 +519,7 @@ class Vaccination extends PureComponent {
               style={{
                 position: 'relative',
                 paddingLeft: 90,
-                marginTop: 14,
+                marginTop: 4,
                 fontSize: '0.85rem',
                 height: 26,
               }}
@@ -536,20 +534,19 @@ class Vaccination extends PureComponent {
               >
                 Instructions
               </div>
-              {cautions.length > 0 && (
+              {caution && (
                 <Alert
                   message={
                     <Tooltip
                       useTooltip2
                       title={
                         <div>
-                          {cautions.map((o) => {
-                            return <div>{o.message}</div>
-                          })}
+                          <div style={{ weight: 500 }}>Caution:</div>
+                          <div style={{ marginLeft: 10 }}>{caution}</div>
                         </div>
                       }
                     >
-                      <span>{cautions[0].message}</span>
+                      <span>{caution}</span>
                     </Tooltip>
                   }
                   banner
