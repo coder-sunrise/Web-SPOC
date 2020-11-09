@@ -1422,7 +1422,7 @@ class Medication extends PureComponent {
                           useTooltip2
                           title={
                             <div>
-                              <div style={{ weight: 500 }}>Caution(s):</div>
+                              <div style={{ weight: 500 }}>Cautions:</div>
                               {cautions.map((o) => {
                                 return (
                                   <div style={{ marginLeft: 10 }}>
