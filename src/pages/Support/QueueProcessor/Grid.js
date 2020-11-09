@@ -34,7 +34,11 @@ class Grid extends PureComponent {
           return queueItemStatus.find(x => x.value === row.queueProcessStatusFK).name
         },
       },
-      { columnName: 'requestedBy', width: 140 },
+      {
+        columnName: 'requestedBy',
+        width: 140,
+        sortBy: 'CreateByUserFkNavigation.ClinicianProfile.Name',
+      },
       {
         columnName: 'createDate', width: 190,
         type: 'date',
