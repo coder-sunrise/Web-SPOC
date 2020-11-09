@@ -46,6 +46,48 @@ const drugMixtureItemSchema = Yup.object().shape({
   totalPrice: Yup.number().min(0),
 })
 
+const getCautions = (
+  inventorymedication = [],
+  openPrescription,
+  isDrugMixture,
+  corPrescriptionItemDrugMixture = [],
+  inventoryMedicationFK,
+) => {
+  let Cautions = []
+  if (isDrugMixture) {
+    corPrescriptionItemDrugMixture
+      .filter((o) => !o.isDeleted)
+      .forEach((item) => {
+        const selectMedication = inventorymedication.find(
+          (medication) => medication.id === item.inventoryMedicationFK,
+        )
+        if (
+          selectMedication &&
+          selectMedication.caution &&
+          selectMedication.caution.trim().length
+        ) {
+          Cautions.push({
+            id: item.id,
+            message: `${selectMedication.displayValue ||
+              ''} - ${selectMedication.caution}`,
+          })
+        }
+      })
+  } else if (!openPrescription) {
+    const selectMedication = inventorymedication.find(
+      (medication) => medication.id === inventoryMedicationFK,
+    )
+    if (
+      selectMedication &&
+      selectMedication.caution &&
+      selectMedication.caution.trim().length
+    ) {
+      Cautions.push({ message: selectMedication.caution })
+    }
+  }
+  return Cautions
+}
+
 @connect(({ global, codetable, visitRegistration, user }) => ({
   global,
   codetable,
@@ -53,7 +95,7 @@ const drugMixtureItemSchema = Yup.object().shape({
   user,
 }))
 @withFormikExtend({
-  mapPropsToValues: ({ orders = {}, type }) => {
+  mapPropsToValues: ({ orders = {}, type, codetable }) => {
     const isDrugMixture = orders.entity && orders.entity.isDrugMixture
     const editingMedicationFK = []
     if (isDrugMixture) {
@@ -116,6 +158,15 @@ const drugMixtureItemSchema = Yup.object().shape({
         }
       })
 
+    const { inventorymedication = [] } = codetable
+
+    let cautions = getCautions(
+      inventorymedication,
+      type === '5',
+      isDrugMixture,
+      newCorPrescriptionItemDrugMixture,
+      v.inventoryMedicationFK,
+    )
     return {
       ...v,
       corPrescriptionItemPrecaution:
@@ -128,6 +179,7 @@ const drugMixtureItemSchema = Yup.object().shape({
         newCorPrescriptionItemDrugMixture.length > 0
           ? newCorPrescriptionItemDrugMixture
           : [],
+      cautions,
     }
   },
   enableReinitialize: true,
@@ -658,6 +710,21 @@ class Medication extends PureComponent {
       setTimeout(() => {
         this.calculateQuantity(op)
       }, 1)
+
+      if (op) {
+        const { codetable, openPrescription } = this.props
+        const { inventorymedication = [] } = codetable
+        let cautions = getCautions(
+          inventorymedication,
+          openPrescription,
+          values.isDrugMixture,
+          values.corPrescriptionItemDrugMixture,
+          op.id,
+        )
+        setFieldValue('cautions', cautions)
+      } else {
+        setFieldValue('cautions', [])
+      }
     }
   }
 
@@ -862,9 +929,11 @@ class Medication extends PureComponent {
         o.id !== row.id,
     )
     if (rs.length > 0) {
+      e.row.inventoryMedicationFK = undefined
       notification.warn({
         message: 'The medication already exist in the list',
       })
+      e.onValueChange()
     }
 
     row.quantity = option.dispensingQuantity || 0
@@ -952,6 +1021,10 @@ class Medication extends PureComponent {
 
       tempDrugMixtureRows = newArray
       setFieldValue('corPrescriptionItemDrugMixture', newArray)
+      const newCautions = [
+        ...values.cautions,
+      ].filter((o) => o.id !== deleted[0])
+      setFieldValue('cautions', newCautions)
     } else {
       let _rows = this.checkIsDrugMixtureItemUnique({ rows, changed })
       if (added) {
@@ -1033,69 +1106,8 @@ class Medication extends PureComponent {
     setFieldValue('adjType', isExactAmount ? 'ExactAmount' : 'Percentage')
   }
 
-  getCautions = () => {
-    const {
-      values,
-      openPrescription,
-      codetable: { inventorymedication = [] },
-    } = this.props
-    let Cautions = []
-    if (values.isDrugMixture) {
-      const { corPrescriptionItemDrugMixture = [] } = values
-      corPrescriptionItemDrugMixture.forEach((item) => {
-        const selectMedication = inventorymedication.find(
-          (medication) => medication.id === item.inventoryMedicationFK,
-        )
-        if (
-          selectMedication &&
-          selectMedication.caution &&
-          selectMedication.caution.trim().length
-        ) {
-          Cautions.push({
-            message: `${selectMedication.displayValue ||
-              ''} - ${selectMedication.caution}`,
-          })
-        }
-      })
-    } else if (!openPrescription) {
-      const { inventoryMedicationFK } = values
-      const selectMedication = inventorymedication.find(
-        (medication) => medication.id === inventoryMedicationFK,
-      )
-      if (
-        selectMedication &&
-        selectMedication.caution &&
-        selectMedication.caution.trim().length
-      ) {
-        Cautions.push({ message: selectMedication.caution })
-      }
-    }
-    return Cautions
-  }
-
-  render () {
-    const {
-      theme,
-      classes,
-      values,
-      openPrescription,
-      footer,
-      setFieldValue,
-      setDisable,
-    } = this.props
-
-    const { isEditMedication } = values
-    const { showAddFromPastModal } = this.state
-
-    const commonSelectProps = {
-      handleFilter: this.filterOptions,
-      dropdownMatchSelectWidth: false,
-      dropdownStyle: {
-        width: 300,
-      },
-    }
-
-    const drugMixtureTableParas = {
+  drugMixtureTableParas = () => {
+    return {
       columns: [
         { name: 'inventoryMedicationFK', title: 'Name' },
         { name: 'quantity', title: 'Quantity' },
@@ -1114,9 +1126,53 @@ class Medication extends PureComponent {
           options: this.getMedicationOptions,
           sortingEnabled: false,
           onChange: (e) => {
+            const { values, setFieldValue } = this.props
+            const { row = {} } = e
+            let newCautions = [
+              ...values.cautions,
+            ]
             if (e.option) {
               this.handleDrugMixtureItemOnChange(e)
+
+              const { codetable: { inventorymedication = [] } } = this.props
+              const selectMedication = inventorymedication.find(
+                (medication) => medication.id === e.row.inventoryMedicationFK,
+              )
+              if (
+                selectMedication &&
+                selectMedication.caution &&
+                selectMedication.caution.trim().length
+              ) {
+                const existsCaution = newCautions.find((o) => o.id === row.id)
+                if (existsCaution) {
+                  newCautions = newCautions.map((o) => {
+                    return {
+                      ...o,
+                      message:
+                        o.id === row.id
+                          ? `${selectMedication.displayValue ||
+                              ''} - ${selectMedication.caution}`
+                          : o.message,
+                    }
+                  })
+                } else {
+                  newCautions = [
+                    ...newCautions,
+                    {
+                      id: row.id,
+                      message: `${selectMedication.displayValue ||
+                        ''} - ${selectMedication.caution}`,
+                    },
+                  ]
+                }
+              } else {
+                newCautions = newCautions.filter((o) => o.id !== row.id)
+              }
+            } else {
+              newCautions = newCautions.filter((o) => o.id !== row.id)
             }
+
+            setFieldValue('cautions', newCautions)
           },
         },
         {
@@ -1175,10 +1231,31 @@ class Medication extends PureComponent {
         },
       ],
     }
+  }
+
+  render () {
+    const {
+      theme,
+      classes,
+      values,
+      openPrescription,
+      footer,
+      setFieldValue,
+      setDisable,
+    } = this.props
+
+    const { isEditMedication, cautions = [] } = values
+    const { showAddFromPastModal } = this.state
+
+    const commonSelectProps = {
+      handleFilter: this.filterOptions,
+      dropdownMatchSelectWidth: false,
+      dropdownStyle: {
+        width: 300,
+      },
+    }
 
     const accessRight = authorityCfg[values.type]
-
-    const cautions = this.getCautions()
     return (
       <Authorized authority={accessRight}>
         <div>
@@ -1266,6 +1343,7 @@ class Medication extends PureComponent {
                           }
 
                           setDisable(false)
+                          this.props.setFieldValue('cautions', [])
                         }}
                       />
                     )
@@ -1309,7 +1387,7 @@ class Medication extends PureComponent {
                     onCommitChanges: this.commitDrugMixtureItemChanges,
                   }}
                   schema={drugMixtureItemSchema}
-                  {...drugMixtureTableParas}
+                  {...this.drugMixtureTableParas()}
                 />
               </GridItem>
             </GridContainer>
@@ -1322,7 +1400,7 @@ class Medication extends PureComponent {
                     position: 'relative',
                     paddingLeft: 90,
                     marginLeft: 10,
-                    marginTop: 14,
+                    marginTop: 4,
                     fontSize: '0.85rem',
                     height: 26,
                   }}
@@ -1344,8 +1422,13 @@ class Medication extends PureComponent {
                           useTooltip2
                           title={
                             <div>
+                              <div style={{ weight: 500 }}>Cautions:</div>
                               {cautions.map((o) => {
-                                return <div>{o.message}</div>
+                                return (
+                                  <div style={{ marginLeft: 10 }}>
+                                    {o.message}
+                                  </div>
+                                )
                               })}
                             </div>
                           }
@@ -1598,7 +1681,7 @@ class Medication extends PureComponent {
                 <div
                   style={{
                     marginLeft: 10,
-                    marginTop: 14,
+                    marginTop: 8,
                     paddingTop: 3,
                     paddingBottom: 3,
                     fontSize: '0.85rem',
