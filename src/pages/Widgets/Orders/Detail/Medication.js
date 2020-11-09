@@ -1433,7 +1433,7 @@ class Medication extends PureComponent {
                             </div>
                           }
                         >
-                          <span>{cautions[0].message}</span>
+                          <span>{cautions[cautions.length - 1].message}</span>
                         </Tooltip>
                       }
                       banner
