@@ -68,8 +68,8 @@ const getCautions = (
         ) {
           Cautions.push({
             id: item.id,
-            message: `${selectMedication.displayValue ||
-              ''} - ${selectMedication.caution}`,
+            name: selectMedication.displayValue || '',
+            message: selectMedication.caution,
           })
         }
       })
@@ -1148,11 +1148,9 @@ class Medication extends PureComponent {
                   newCautions = newCautions.map((o) => {
                     return {
                       ...o,
+                      name: selectMedication.displayValue || '',
                       message:
-                        o.id === row.id
-                          ? `${selectMedication.displayValue ||
-                              ''} - ${selectMedication.caution}`
-                          : o.message,
+                        o.id === row.id ? selectMedication.caution : o.message,
                     }
                   })
                 } else {
@@ -1160,8 +1158,8 @@ class Medication extends PureComponent {
                     ...newCautions,
                     {
                       id: row.id,
-                      message: `${selectMedication.displayValue ||
-                        ''} - ${selectMedication.caution}`,
+                      name: selectMedication.displayValue || '',
+                      message: selectMedication.caution,
                     },
                   ]
                 }
@@ -1422,18 +1420,61 @@ class Medication extends PureComponent {
                           useTooltip2
                           title={
                             <div>
-                              <div style={{ weight: 500 }}>Cautions:</div>
+                              <div style={{ fontWeight: 500 }}>Cautions:</div>
                               {cautions.map((o) => {
+                                if (values.isDrugMixture) {
+                                  return (
+                                    <div style={{ marginLeft: 10 }}>
+                                      <span>
+                                        <span
+                                          style={{
+                                            fontWeight: 500,
+                                          }}
+                                        >
+                                          {`${o.name} - `}
+                                        </span>
+                                        <span>{o.message}</span>
+                                      </span>
+                                    </div>
+                                  )
+                                }
                                 return (
                                   <div style={{ marginLeft: 10 }}>
-                                    {o.message}
+                                    <span>{o.message}</span>
                                   </div>
                                 )
                               })}
                             </div>
                           }
                         >
-                          <span>{cautions[0].message}</span>
+                          <span>
+                            {[
+                              ...cautions,
+                            ]
+                              .reverse()
+                              .map((o, index) => {
+                                if (values.isDrugMixture) {
+                                  return (
+                                    <span>
+                                      <span
+                                        style={{
+                                          fontWeight: 500,
+                                        }}
+                                      >
+                                        {`${o.name} - `}
+                                      </span>
+                                      <span>
+                                        {`${o.message}${index <
+                                        cautions.length - 1
+                                          ? '; '
+                                          : ''}`}
+                                      </span>
+                                    </span>
+                                  )
+                                }
+                                return <span>{o.message}</span>
+                              })}
+                          </span>
                         </Tooltip>
                       }
                       banner
