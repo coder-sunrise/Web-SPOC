@@ -1420,7 +1420,7 @@ class Medication extends PureComponent {
                           useTooltip2
                           title={
                             <div>
-                              <div style={{ weight: 500 }}>Cautions:</div>
+                              <div style={{ fontWeight: 500 }}>Cautions:</div>
                               {cautions.map((o) => {
                                 if (values.isDrugMixture) {
                                   return (
@@ -1440,9 +1440,7 @@ class Medication extends PureComponent {
                                 }
                                 return (
                                   <div style={{ marginLeft: 10 }}>
-                                    <span style={{ weight: 500 }}>
-                                      {o.message}
-                                    </span>
+                                    <span>{o.message}</span>
                                   </div>
                                 )
                               })}

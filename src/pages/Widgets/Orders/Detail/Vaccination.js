@@ -541,7 +541,7 @@ class Vaccination extends PureComponent {
                       useTooltip2
                       title={
                         <div>
-                          <div style={{ weight: 500 }}>Caution:</div>
+                          <div style={{ fontWeight: 500 }}>Caution:</div>
                           <div style={{ marginLeft: 10 }}>{caution}</div>
                         </div>
                       }
