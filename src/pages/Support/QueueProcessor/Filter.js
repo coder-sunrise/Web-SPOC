@@ -7,7 +7,7 @@ import {
   withFormikExtend,
   FastField,
   GridContainer,
-  GridItem, 
+  GridItem,
   Select,
   ProgressButton,
   CodeSelect,
@@ -98,9 +98,9 @@ class Filter extends PureComponent {
                     payload: {
                       queueProcessStatusFK,
                       queueProcessTypeFK,
-                      createByUserFK, 
-                      lgteql_createDate: requestDate ? moment(requestDate[0]).formatUTC() : undefined,
-                      lsteql_createDate: requestDate ? moment(requestDate[1]).formatUTC() : undefined,
+                      createByUserFK,
+                      lgteql_createDate: requestDate?.length ? moment(requestDate[0]).formatUTC() : undefined,
+                      lsteql_createDate: requestDate?.length ? moment(requestDate[1]).endOf('day').formatUTC(false) : undefined,
                     },
                   })
                 }}
