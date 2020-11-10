@@ -1486,6 +1486,7 @@ class Medication extends PureComponent {
                         overflow: 'hidden',
                         paddingTop: 3,
                         paddingBottom: 3,
+                        lineHeight: '25px',
                         fontSize: '0.85rem',
                       }}
                     />
