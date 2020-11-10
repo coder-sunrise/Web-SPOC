@@ -127,6 +127,7 @@ class Grid extends PureComponent {
   render () {
     return (
       <CommonTableGrid
+        forceRender
         style={{ margin: 0 }}
         type='queueProcessor'
         {...this.configs}
