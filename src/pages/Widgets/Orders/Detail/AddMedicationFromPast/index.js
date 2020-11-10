@@ -77,66 +77,6 @@ class PastMedication extends PureComponent {
     return instruction
   }
 
-  calculateVaccinationQuantity = (currentVaccination) => {
-    let newTotalQuantity = 0
-    let minQuantity = 1
-    if (currentVaccination && currentVaccination.dispensingQuantity) {
-      newTotalQuantity = currentVaccination.dispensingQuantity
-    } else if (currentVaccination.prescribingDosage) {
-      const { ctmedicationdosage } = this.props.codetable
-
-      const dosage = ctmedicationdosage.find(
-        (o) => o.id === currentVaccination.prescribingDosage.id,
-      )
-      if (dosage) {
-        newTotalQuantity = Math.ceil(dosage.multiplier)
-      }
-      const { prescriptionToDispenseConversion } = currentVaccination
-      if (prescriptionToDispenseConversion)
-        newTotalQuantity = Math.ceil(
-          newTotalQuantity / prescriptionToDispenseConversion,
-        )
-    }
-    newTotalQuantity =
-      newTotalQuantity < minQuantity ? minQuantity : newTotalQuantity
-    return newTotalQuantity
-  }
-
-  calculateMedicationQuantity = (currentMedication, instructions) => {
-    const { ctmedicationdosage, ctmedicationfrequency } = this.props.codetable
-    let newTotalQuantity = 0
-    if (currentMedication && currentMedication.dispensingQuantity) {
-      newTotalQuantity = currentMedication.dispensingQuantity
-    } else {
-      for (let i = 0; i < instructions.length; i++) {
-        if (
-          instructions[i].dosageFK &&
-          instructions[i].drugFrequencyFK &&
-          instructions[i].duration
-        ) {
-          const dosage = ctmedicationdosage.find(
-            (o) => o.id === instructions[i].dosageFK,
-          )
-
-          const frequency = ctmedicationfrequency.find(
-            (o) => o.id === instructions[i].drugFrequencyFK,
-          )
-
-          newTotalQuantity +=
-            dosage.multiplier * frequency.multiplier * instructions[i].duration
-        }
-      }
-
-      newTotalQuantity = Math.ceil(newTotalQuantity * 10) / 10 || 0
-      const { prescriptionToDispenseConversion } = currentMedication
-      if (prescriptionToDispenseConversion)
-        newTotalQuantity = Math.ceil(
-          newTotalQuantity / prescriptionToDispenseConversion,
-        )
-    }
-    return newTotalQuantity
-  }
-
   GetNewMedication = () => {
     const { getNextSequence, codetable, type } = this.props
     const {
@@ -245,10 +185,7 @@ class PastMedication extends PureComponent {
             ]
           }
 
-          newTotalQuantity = this.calculateMedicationQuantity(
-            drug,
-            itemInstructions,
-          )
+          newTotalQuantity = item.quantity
 
           itemTotalPrice = item.isExternalPrescription
             ? 0
@@ -431,7 +368,7 @@ class PastMedication extends PureComponent {
         let uom = ctvaccinationunitofmeasurement.find(
           (vaccuom) => vaccuom.id === item.uomfk,
         )
-        let newTotalQuantity = this.calculateVaccinationQuantity(vaccination)
+        let newTotalQuantity = item.quantity
 
         const totalPrice = newTotalQuantity * vaccination.sellingPrice
 
