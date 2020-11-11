@@ -36,8 +36,12 @@ const styles = (theme) => ({
 
 const itemSchema = Yup.object().shape({
   serviceCenterFK: Yup.string().required(),
-  costPrice: Yup.number().required(),
-  unitPrice: Yup.number().required(),
+  costPrice: Yup.number()
+    .required()
+    .min(0, 'Cost Price must be greater than or equal to $0.00'),
+  unitPrice: Yup.number()
+    .required()
+    .min(0, 'Selling Price must be greater than or equal to $0.00'),
 })
 
 const modalityItemSchema = Yup.object().shape({
@@ -492,8 +496,8 @@ class Detail extends PureComponent {
                             settingClinicService.entity ? (
                               this.state.hasActiveSession
                             ) : (
-                                false
-                              )
+                              false
+                            )
                           }
                           {...args}
                         />
