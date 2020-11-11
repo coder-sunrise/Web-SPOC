@@ -28,8 +28,8 @@ export const rounding = (config, amount) => {
           const _cents = roundTo(cents % 0.1)
           const flooredCents = Math.floor(cents * 10) / 10
           cents =
-            _cents > roundingPoint
-              ? Math.round(cents)
+            _cents === 0 || _cents > roundingPoint
+              ? Math.round(cents * 10) / 10
               : flooredCents + roundingPoint
           break
         }
@@ -40,7 +40,7 @@ export const rounding = (config, amount) => {
               : cents
           break
         case 0.5:
-          cents = cents < roundingPoint ? roundingPoint : 1.0
+          cents = cents <= roundingPoint ? roundingPoint : 1.0
           break
         case 1.0:
           cents = 1.0

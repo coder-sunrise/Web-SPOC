@@ -43,7 +43,7 @@ const generateStatementSchema = Yup.object().shape({
         statementDate,
         paymentTerms,
         invoiceDateFrom,
-        invoiceDateTo,
+        invoiceDateTo: moment(invoiceDateTo).endOf('day').formatUTC(false),
       },
     }).then((r) => {
       if (r) {

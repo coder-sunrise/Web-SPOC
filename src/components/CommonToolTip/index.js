@@ -33,6 +33,10 @@ const STYLES = () => ({
     // whiteSpace: 'normal',
     // lineBreak: 'auto',
   },
+  tooltip2: {
+    fontSize: '0.8rem',
+    maxWidth: 540,
+  },
   popper: {
     zIndex: 3000,
   },
@@ -55,12 +59,16 @@ class CommonTooltip extends PureComponent {
       children,
       enterDelay = 750,
       placement = 'top-start',
+      useTooltip2 = false,
       ...restProps
     } = this.props
     // console.log(placement, restProps)
     return (
       <Tooltip
-        classes={{ tooltip: classes.tooltip, popper: classes.popper }}
+        classes={{
+          tooltip: useTooltip2 ? classes.tooltip2 : classes.tooltip,
+          popper: classes.popper,
+        }}
         // interactive
         // leaveDelay={999999}
         title={title}

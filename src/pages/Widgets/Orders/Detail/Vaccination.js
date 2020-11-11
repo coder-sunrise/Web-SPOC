@@ -3,6 +3,7 @@ import { connect } from 'dva'
 import _ from 'lodash'
 import Add from '@material-ui/icons/Add'
 import { isNumber } from 'util'
+import { Alert } from 'antd'
 import {
   GridContainer,
   GridItem,
@@ -21,7 +22,6 @@ import {
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 import { currencySymbol } from '@/utils/config'
-import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
 import LowStockInfo from './LowStockInfo'
 import AddFromPast from './AddMedicationFromPast'
 import { DoctorProfileSelect } from '@/components/_medisys'
@@ -391,34 +391,16 @@ class Vaccination extends PureComponent {
     }
   }
 
-  validateAndSubmitIfOk = async (callback) => {
-    const { handleSubmit, validateForm, dispatch, values } = this.props
+  validateAndSubmitIfOk = async () => {
+    const { handleSubmit, validateForm } = this.props
     const validateResult = await validateForm()
     const isFormValid = _.isEmpty(validateResult)
-    const { editingVaccinationFK, inventoryVaccinationFK } = values
 
     if (isFormValid) {
-      const { caution = '', code, displayValue } =
-        this.state.selectedVaccination || {}
-      const needShowAlert =
-        caution.trim().length > 0 &&
-        editingVaccinationFK !== inventoryVaccinationFK
-
-      if (needShowAlert) {
-        openCautionAlertPrompt(
-          [
-            { subject: displayValue || code, caution },
-          ],
-          () => {
-            handleSubmit()
-            if (callback) callback(true)
-          },
-        )
-      } else {
-        handleSubmit()
-        return true
-      }
+      handleSubmit()
+      return true
     }
+    handleSubmit()
     return false
   }
 
@@ -467,6 +449,24 @@ class Vaccination extends PureComponent {
     setFieldValue('adjType', isExactAmount ? 'ExactAmount' : 'Percentage')
   }
 
+  getCaution = () => {
+    const { values, codetable: { inventoryvaccination = [] } } = this.props
+    let cautions
+
+    const { inventoryVaccinationFK } = values
+    const selectVaccination = inventoryvaccination.find(
+      (vaccination) => vaccination.id === inventoryVaccinationFK,
+    )
+    if (
+      selectVaccination &&
+      selectVaccination.caution &&
+      selectVaccination.caution.trim().length
+    ) {
+      cautions = selectVaccination.caution
+    }
+    return cautions
+  }
+
   render () {
     const {
       theme,
@@ -481,6 +481,7 @@ class Vaccination extends PureComponent {
     } = this.props
     const { isEditVaccination } = values
     const { showAddFromPastModal } = this.state
+    const caution = this.getCaution()
     return (
       <div>
         <GridContainer>
@@ -529,6 +530,58 @@ class Vaccination extends PureComponent {
           </GridItem>
         </GridContainer>
         <GridContainer>
+          <GridItem xs={12}>
+            <div
+              style={{
+                position: 'relative',
+                paddingLeft: 90,
+                marginTop: 4,
+                fontSize: '0.85rem',
+                height: 26,
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  paddingTop: 3,
+                  paddingBottom: 3,
+                  lineHeight: '25px',
+                }}
+              >
+                Instructions
+              </div>
+              {caution && (
+                <Alert
+                  message={
+                    <Tooltip
+                      useTooltip2
+                      title={
+                        <div>
+                          <div style={{ fontWeight: 500 }}>Caution:</div>
+                          <div style={{ marginLeft: 10 }}>{caution}</div>
+                        </div>
+                      }
+                    >
+                      <span>{caution}</span>
+                    </Tooltip>
+                  }
+                  banner
+                  style={{
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                    display: 'inline-block',
+                    width: '100%',
+                    overflow: 'hidden',
+                    paddingTop: 3,
+                    paddingBottom: 3,
+                    lineHeight: '25px',
+                    fontSize: '0.85rem',
+                  }}
+                />
+              )}
+            </div>
+          </GridItem>
           <GridItem xs={2}>
             <Field
               name='usageMethodFK'

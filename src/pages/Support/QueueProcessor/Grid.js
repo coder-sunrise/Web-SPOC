@@ -34,7 +34,11 @@ class Grid extends PureComponent {
           return queueItemStatus.find(x => x.value === row.queueProcessStatusFK).name
         },
       },
-      { columnName: 'requestedBy', width: 140 },
+      {
+        columnName: 'requestedBy',
+        width: 140,
+        sortBy: 'CreateByUserFkNavigation.ClinicianProfile.Name',
+      },
       {
         columnName: 'createDate', width: 190,
         type: 'date',
@@ -84,11 +88,11 @@ class Grid extends PureComponent {
     const { clinicSettings } = this.props
     const { systemTimeZoneInt } = clinicSettings.settings
     if (type === 1) {
-      let parameter = JSON.parse(row.data)
-      return `Statement Date: ${moment(parameter.StatementDate).add(systemTimeZoneInt, 'hours').format(dateFormatLong)}
+      let parameter = JSON.parse(row.data) 
+      return `Statement Date: ${moment.utc(parameter.StatementDate).add(systemTimeZoneInt, 'hours').format(dateFormatLong)}
       , Payment Terms: ${parameter.PaymentTerms} day(s)
-      , Invoice Date From: ${parameter.InvoiceDateFrom ? moment(parameter.InvoiceDateFrom).add(systemTimeZoneInt, 'hours').format(dateFormatLong) : '-'}
-      , Invoice Date To: ${parameter.InvoiceDateTo ? moment(parameter.InvoiceDateTo).add(systemTimeZoneInt, 'hours').format(dateFormatLong) : '-'}`
+      , Invoice Date From: ${parameter.InvoiceDateFrom ? moment.utc(parameter.InvoiceDateFrom).add(systemTimeZoneInt, 'hours').format(dateFormatLong) : '-'}
+      , Invoice Date To: ${parameter.InvoiceDateTo ? moment.utc(parameter.InvoiceDateTo).add(systemTimeZoneInt, 'hours').format(dateFormatLong) : '-'}`
     }
     return ''
   }
@@ -123,6 +127,7 @@ class Grid extends PureComponent {
   render () {
     return (
       <CommonTableGrid
+        forceRender
         style={{ margin: 0 }}
         type='queueProcessor'
         {...this.configs}

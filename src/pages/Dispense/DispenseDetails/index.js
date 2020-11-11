@@ -482,7 +482,6 @@ const DispenseDetails = ({
               <AmountSummary
                 rows={invoiceItem}
                 adjustments={invoiceAdjustment}
-                showAddAdjustment={!isBillFirstVisit}
                 config={{
                   isGSTInclusive: invoice.isGSTInclusive,
                   totalField: 'totalAfterItemAdjustment',

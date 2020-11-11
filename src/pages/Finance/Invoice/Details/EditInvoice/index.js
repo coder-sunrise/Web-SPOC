@@ -22,7 +22,7 @@ import {
   ProgressButton,
 } from '@/components'
 // utils
-import { INVOICE_VIEW_MODE, VISIT_TYPE } from '@/utils/constants'
+import { INVOICE_VIEW_MODE } from '@/utils/constants'
 import {
   roundTo,
   navigateDirtyCheck,
@@ -236,11 +236,9 @@ class EditInvoice extends Component {
     const {
       invoiceItem = [],
       invoiceAdjustment = [],
-      visitPurposeFK,
       isGSTInclusive,
       gstValue,
     } = values
-    const isBillFirstVisit = visitPurposeFK === VISIT_TYPE.BILL_FIRST
     return (
       <div className={classes.cardContainer}>
         <div
@@ -507,7 +505,6 @@ class EditInvoice extends Component {
             <AmountSummary
               rows={invoiceItem}
               adjustments={invoiceAdjustment}
-              showAddAdjustment={!isBillFirstVisit}
               config={{
                 isGSTInclusive,
                 totalField: 'totalAfterItemAdjustment',
