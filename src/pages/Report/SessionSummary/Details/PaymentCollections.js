@@ -110,7 +110,7 @@ const PaymentCollections = ({
     { columnName: 'gstAmt', type: 'gstAmt' },
     { columnName: 'totalAmtPaid', type: 'totalAmtPaid' },
   ]
-  if (!TotalDetails[0].isDisplayGST || isCompanyPaymentCollectionsForPast) {
+  if (!TotalDetails[0].isDisplayGST) {
     PaymentCollectionsColumns.splice(2, 1)
     PaymentCollectionsColumnExtension.splice(2, 1)
     totalItems.splice(1, 1)
