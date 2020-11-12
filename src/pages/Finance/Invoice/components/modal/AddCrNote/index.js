@@ -62,6 +62,7 @@ import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
       remark,
       finalCredit,
       gstAmount,
+      generatedDate,
     } = values
     // const gstAmount = creditNoteItem.reduce(
     //   (totalGstAmount, item) =>
@@ -72,7 +73,7 @@ import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
     //   (finalCredit - finalCredit / (1 + invoiceDetail.gstValue / 100))
     //   : finalCredit * (invoiceDetail.gstValue / 100)
     const payload = {
-      generatedDate: moment().formatUTC(false),
+      generatedDate,
       invoicePayerFK,
       isStockIn,
       remark,
