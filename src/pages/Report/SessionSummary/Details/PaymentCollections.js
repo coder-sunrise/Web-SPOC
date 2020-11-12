@@ -17,6 +17,7 @@ const PaymentCollections = ({
   PaymentCollectionsDetails,
   TotalDetails,
   classes,
+  isCompanyPaymentCollectionsForPast,
 }) => {
   if (!PaymentCollectionsDetails) return null
   let listData = []
@@ -58,8 +59,17 @@ const PaymentCollections = ({
     }
   }
 
+  let invoiceNoTitle = 'Invoice No.'
+  if (isCompanyPaymentCollectionsForPast) {
+    invoiceNoTitle = (
+      <div><span style={{ display: 'block' }}>Statement No.</span>
+        <span style={{ display: 'block' }}>/ Invoice No.</span>
+      </div>
+    )
+  }
+
   let PaymentCollectionsColumns = [
-    { name: 'invoiceNo', title: 'Invoice No.' },
+    { name: 'invoiceNo', title: invoiceNoTitle },
     { name: 'totalAftAdj', title: 'Total Amount' },
     { name: 'gstAmt', title: 'GST' },
     { name: 'payerName', title: 'Payer Name' },
@@ -67,8 +77,9 @@ const PaymentCollections = ({
     { name: 'totalAmtPaid', title: 'Payment' },
   ]
 
+
   let PaymentCollectionsColumnExtension = [
-    { columnName: 'invoiceNo', width: 100, sortingEnabled: false },
+    { columnName: 'invoiceNo', width: 130, sortingEnabled: false },
     {
       columnName: 'totalAftAdj',
       type: 'currency',
@@ -93,16 +104,17 @@ const PaymentCollections = ({
     },
     { columnName: 'receiptNo', sortingEnabled: false, width: 100 },
   ]
+
   let totalItems = [
     { columnName: 'totalAftAdj', type: 'totalAftAdj' },
     { columnName: 'gstAmt', type: 'gstAmt' },
     { columnName: 'totalAmtPaid', type: 'totalAmtPaid' },
   ]
-  if (!TotalDetails[0].isDisplayGST) {
+  if (!TotalDetails[0].isDisplayGST || isCompanyPaymentCollectionsForPast) {
     PaymentCollectionsColumns.splice(2, 1)
     PaymentCollectionsColumnExtension.splice(2, 1)
     totalItems.splice(1, 1)
-  }
+  } 
   const PaymentCollectionsRow = (p) => {
     const { row, children } = p
     let newchildren = []
