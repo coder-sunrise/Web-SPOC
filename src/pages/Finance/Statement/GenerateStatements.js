@@ -24,7 +24,7 @@ const generateStatementSchema = Yup.object().shape({
 @connect(({ statement }) => ({
   statement,
 }))
-@withFormikExtend({ 
+@withFormikExtend({
   mapPropsToValues: () => ({
     statementDate: moment(),
     invoiceDateFrom: moment().subtract(1, 'months').startOf('month'),
@@ -43,11 +43,11 @@ const generateStatementSchema = Yup.object().shape({
         statementDate,
         paymentTerms,
         invoiceDateFrom,
-        invoiceDateTo: moment(invoiceDateTo).endOf('day').formatUTC(false),
+        invoiceDateTo: invoiceDateTo ? moment(invoiceDateTo).endOf('day').formatUTC(false) : undefined,
       },
     }).then((r) => {
       if (r) {
-        if (onConfirm) { 
+        if (onConfirm) {
           onConfirm()
         }
         notification.success({ message: 'Auto generate statement has been queued.' })
