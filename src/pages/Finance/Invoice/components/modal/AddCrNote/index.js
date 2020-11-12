@@ -92,8 +92,9 @@ import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
               restProps.itemType.toLowerCase() !== 'misc' &&
               restProps.itemType.toLowerCase() !== 'service' &&
               !restProps.isDrugMixture,
-            subTotal: restProps.totalAfterGST,
+            subTotal: restProps.isPackage ? restProps.packageRemainingAmountAfterGST : restProps.totalAfterGST,
             itemDescription: restProps.itemName,
+            quantity: restProps.isPackage ? restProps.packageRemainingQuantity : restProps.quantity,
           }
           return { ...item }
         }),
@@ -421,7 +422,7 @@ class AddCrNote extends Component {
             selectable: true,
             selectConfig: {
               showSelectAll: false,
-              rowSelectionEnabled: (row) => row.itemType !== 'Misc',
+              rowSelectionEnabled: (row) => row.itemType !== 'Misc' && (!row.isPackage || (row.isPackage && row.packageRemainingAmountAfterGST > 0)),
             },
             pager: false,
             grouping: this.state.isExistPackage,
