@@ -25,9 +25,7 @@ export const AppointmentDataColExtensions = [
     code: 'doctorprofile',
     labelField: 'clinicianProfile.name',
     valueField: 'clinicianProfile.id',
-    remoteFilter: {
-      'clinicianProfile.isActive': false,
-    },
+    localFilter: (o) => o.clinicianProfile.isActive,
     renderDropdown: (option) => <DoctorLabel doctor={option} />,
   },
   {
