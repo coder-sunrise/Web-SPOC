@@ -557,6 +557,13 @@ class Package extends PureComponent {
         selectedPackage: op,
         expiryDate: untilDate,
       })
+
+      const hasCautionItems = rows.filter(
+        (f) => f.caution && f.caution.trim().length > 0,
+      )
+      if (hasCautionItems.length > 0) {
+        openCautionAlertPrompt(hasCautionItems, () => {})
+      }
     }
 
     this.handleReset = () => {
@@ -568,7 +575,7 @@ class Package extends PureComponent {
     }
   }
 
-  validateAndSubmitIfOk = async (callback) => {
+  validateAndSubmitIfOk = async () => {
     const {
       handleSubmit,
       validateForm,
@@ -587,18 +594,8 @@ class Package extends PureComponent {
         return false
       }
 
-      const hasCautionItems = packageItems.filter(
-        (f) => f.caution && f.caution.trim().length > 0,
-      )
-      if (hasCautionItems.length > 0) {
-        openCautionAlertPrompt(hasCautionItems, () => {
-          handleSubmit()
-          if (callback) callback(true)
-        })
-      } else {
-        handleSubmit()
-        return true
-      }
+      handleSubmit()
+      return true      
     }
     return false
   }
