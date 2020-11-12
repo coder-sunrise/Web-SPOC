@@ -797,7 +797,7 @@ export const getInventoryItem = (
       if (
         item &&
         item.orderQuantity - item.quantityReceived ===
-        o.totalCurrentReceivingQty
+          o.totalCurrentReceivingQty
       ) {
         return {
           ...o,
@@ -1643,6 +1643,21 @@ const queueItemStatus = [
   {
     value: 4,
     name: 'Failed',
+  },
+]
+
+export const acpTypes = [
+  {
+    value: 1,
+    name: 'Average Cost Price',
+  },
+  {
+    value: 2,
+    name: 'Last Cost Price (Before Bonus)',
+  },
+  {
+    value: 3,
+    name: 'Last Cost Price (After Bonus)',
   },
 ]
 

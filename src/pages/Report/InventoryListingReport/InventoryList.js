@@ -68,7 +68,10 @@ class InventoryList extends PureComponent {
       { name: 'status', title: 'Status' },
       { name: 'stock', title: 'Stock' },
       { name: 'uom', title: 'UOM' },
-      { name: 'acp', title: 'ACP' },
+      {
+        name: 'acp',
+        title: <span>{reportDatas.InventoryListInfo[0].acpType}</span>,
+      },
       { name: 'amount', title: 'Amount' },
     ]
     const InventoryListExtensions = [
