@@ -85,7 +85,6 @@ class SessionSummary extends ReportBase {
                 <PaymentCollections
                   PaymentCollectionsDetails={reportDatas.PrivatePastPaymentCollections}
                   TotalDetails={reportDatas.PrivatePastPaymentTotal}
-                  isPrivatePaymentCollectionsForPast
                 />
               </GridItem>
             </Collapse.Panel>
