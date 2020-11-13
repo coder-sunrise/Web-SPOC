@@ -176,9 +176,8 @@ class PatientHistory extends Component {
   }
 
   isAssignedDoctor = () => {
-    const { clinicianProfile: { doctorProfile } } = this.props.user
-
-    if (!doctorProfile) {
+    const { clinicianProfile = {} } = this.props.user
+    if (!clinicianProfile || !clinicianProfile.doctorProfile) {
       notification.error({
         message: 'Current user is not authorized to access',
       })

@@ -19,7 +19,7 @@ export default ({ current }) => {
                 viewReport(row, undefined, true)
               }}
             >
-              {text}
+              {row.type === 'Others' ? row.title : row.subject}
             </a>
           ),
         },
