@@ -65,7 +65,7 @@ const styles = (theme) => ({
       .compact((x) => x.isDeleted)
       .required('At least one item is required.'),
   }),
-  handleSubmit: () => {},
+  handleSubmit: () => { },
 })
 class Index extends Component {
   state = {
@@ -362,6 +362,17 @@ class Index extends Component {
         return result
       })
     }
+
+    let purchaseOrderTotalAfterGst = 0
+    let purchaseOrderTotalAfterAdj = 0
+    purchaseOrderItem.map((x) => {
+      purchaseOrderTotalAfterGst += x.totalAfterGst
+      purchaseOrderTotalAfterAdj += x.totalAfterAdjustments
+      return x
+    })
+    purchaseOrder.totalAftGst = purchaseOrderTotalAfterGst
+    purchaseOrder.totalAfterAdj = purchaseOrderTotalAfterAdj
+
     return {
       ...purchaseOrder,
       purchaseOrderStatusFK: newPurchaseOrderStatusFK,
@@ -638,22 +649,22 @@ class Index extends Component {
           {poStatus !== PURCHASE_ORDER_STATUS.COMPLETED && (
             <div>
               {poStatus <= PURCHASE_ORDER_STATUS.FINALIZED &&
-              deliveryOrder.length === 0 &&
-              purchaseOrderPayment.length === 0 &&
-              !isWriteOff &&
-              type === 'edit' && (
-                <ProgressButton
-                  color='danger'
-                  icon={null}
-                  authority='none'
-                  onClick={() =>
-                    this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
-                >
-                  {formatMessage({
-                    id: 'inventory.pr.detail.pod.cancelpo',
-                  })}
-                </ProgressButton>
-              )}
+                deliveryOrder.length === 0 &&
+                purchaseOrderPayment.length === 0 &&
+                !isWriteOff &&
+                type === 'edit' && (
+                  <ProgressButton
+                    color='danger'
+                    icon={null}
+                    authority='none'
+                    onClick={() =>
+                      this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
+                  >
+                    {formatMessage({
+                      id: 'inventory.pr.detail.pod.cancelpo',
+                    })}
+                  </ProgressButton>
+                )}
 
               <ProgressButton
                 color='primary'
@@ -680,19 +691,19 @@ class Index extends Component {
                 </ProgressButton>
               )}
               {isPOStatusDraft(poStatus) &&
-              type !== 'new' &&
-              type !== 'dup' && (
-                <ProgressButton
-                  color='success'
-                  icon={null}
-                  onClick={() =>
-                    this.onSubmitButtonClicked(poSubmitAction.FINALIZE)}
-                >
-                  {formatMessage({
-                    id: 'inventory.pr.detail.pod.finalize',
-                  })}
-                </ProgressButton>
-              )}
+                type !== 'new' &&
+                type !== 'dup' && (
+                  <ProgressButton
+                    color='success'
+                    icon={null}
+                    onClick={() =>
+                      this.onSubmitButtonClicked(poSubmitAction.FINALIZE)}
+                  >
+                    {formatMessage({
+                      id: 'inventory.pr.detail.pod.finalize',
+                    })}
+                  </ProgressButton>
+                )}
             </div>
           )}
 
