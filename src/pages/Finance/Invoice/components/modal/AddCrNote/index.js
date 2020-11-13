@@ -529,8 +529,8 @@ class AddCrNote extends Component {
               width: 150,
               align: 'right',
               render: (row) => {
-                const { quantity, packageRemainingQuantity, itemType } = row
-                const totalConsumedQuantity = itemType === 'Misc' ? undefined : quantity - (packageRemainingQuantity || 0)
+                const { quantity, packageRemainingQuantity, isPackage } = row
+                const totalConsumedQuantity = isPackage !== true ? undefined : quantity - (packageRemainingQuantity || 0)
 
                 return (
                   <NumberInput
