@@ -1646,7 +1646,7 @@ const queueItemStatus = [
   },
 ]
 
-export const acpTypes = [
+export const costPriceTypes = [
   {
     value: 1,
     name: 'Average Cost Price',

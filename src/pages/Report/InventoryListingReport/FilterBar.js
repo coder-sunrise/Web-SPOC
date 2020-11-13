@@ -1,7 +1,7 @@
 import React from 'react'
 // formik
 import { FastField, Field } from 'formik'
-import { status, acpTypes } from '@/utils/codes'
+import { status, costPriceTypes } from '@/utils/codes'
 // common components
 import {
   Button,
@@ -84,9 +84,15 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           </GridItem>
           <GridItem md={3}>
             <FastField
-              name='acpType'
+              name='costPriceType'
               render={(args) => {
-                return <Select label='ACP Type' {...args} options={acpTypes} />
+                return (
+                  <Select
+                    label='Cost Price Type'
+                    {...args}
+                    options={costPriceTypes}
+                  />
+                )
               }}
             />
           </GridItem>

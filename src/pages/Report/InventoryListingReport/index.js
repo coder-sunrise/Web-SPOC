@@ -17,7 +17,6 @@ class InventoryListingReport extends ReportBase {
       ...this.state,
       reportId,
       fileName,
-      acpType: 1,
     }
   }
 
@@ -33,11 +32,11 @@ class InventoryListingReport extends ReportBase {
 const InventoryListingReportWithFormik = withFormik({
   validationSchema: Yup.object().shape({
     inventoryType: Yup.string().required(),
-    acpType: Yup.number().required(),
+    costPriceType: Yup.number().required(),
   }),
   mapPropsToValues: () => ({
     inventoryType: 'MEDICATION',
-    acpType: 1,
+    costPriceType: 1,
   }),
 })(InventoryListingReport)
 
