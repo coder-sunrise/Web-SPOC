@@ -7,8 +7,10 @@ import {
   EditableTableGrid,
   withFormikExtend,
   serverDateTimeFormatFull,
+  NumberInput,
 } from '@/components'
 import Yup from '@/utils/yup'
+import { DoctorProfileSelect, DoctorLabel } from '@/components/_medisys'
 
 const getNextSequence = (props) => {
   const { orders: { rows } } = props
@@ -50,13 +52,12 @@ const getType = (typeId) => {
 @withFormikExtend({
   mapPropsToValues: ({ consultation }) => consultation.entity,
   handleSubmit: (values, {props}) => {
-    const { dispatch, onConfirm, user, codetable, visitRegistration } = props
+    const { dispatch, onConfirm, user, codetable } = props
     const { pendingPackage } = values
     const {
       inventorymedication = [],
       inventoryvaccination = [],
       inventoryconsumable = [],
-      doctorprofile,
     } = codetable  
 
     let datas = []
@@ -68,9 +69,6 @@ const getType = (typeId) => {
         if (onConfirm) onConfirm()
       })
     }
-
-    const { doctorProfileFK } = visitRegistration.entity.visit
-    const visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK).clinicianProfile.userProfileFK
 
     const getInstruction = (medication) => {
       let instruction = ''
@@ -187,7 +185,7 @@ const getType = (typeId) => {
           defaultConsumeQuantity: packageItem.defaultConsumeQuantity,
           packageConsumeQuantity: packageItem.consumeQuantity,
           remainingQuantity: packageItem.remainingQuantity,
-          performingUserFK: visitDoctorUserId,
+          performingUserFK: packageItem.performingUserFK,
           packageGlobalId: packageItem.packageGlobalId,
         }
       }
@@ -246,7 +244,7 @@ const getType = (typeId) => {
           defaultConsumeQuantity: packageItem.defaultConsumeQuantity,
           packageConsumeQuantity: packageItem.consumeQuantity,
           remainingQuantity: packageItem.remainingQuantity,
-          performingUserFK: visitDoctorUserId,
+          performingUserFK: packageItem.performingUserFK,
           packageGlobalId: packageItem.packageGlobalId,
         }
       }
@@ -277,7 +275,7 @@ const getType = (typeId) => {
           defaultConsumeQuantity: packageItem.defaultConsumeQuantity,
           packageConsumeQuantity: packageItem.consumeQuantity,
           remainingQuantity: packageItem.remainingQuantity,
-          performingUserFK: visitDoctorUserId,   
+          performingUserFK: packageItem.performingUserFK,   
           packageGlobalId: packageItem.packageGlobalId,
         }
       }
@@ -322,7 +320,7 @@ const getType = (typeId) => {
           defaultConsumeQuantity: packageItem.defaultConsumeQuantity,
           packageConsumeQuantity: packageItem.consumeQuantity,
           remainingQuantity: packageItem.remainingQuantity,
-          performingUserFK: visitDoctorUserId,
+          performingUserFK: packageItem.performingUserFK,
           packageGlobalId: packageItem.packageGlobalId,
         }
       }
@@ -378,77 +376,123 @@ const getType = (typeId) => {
 })
 
 class ConsumePackage extends Component {
-  state = {
-    expandedGroups: [],
+  gridColumnExtensions = [
+    {
+      columnName: 'itemCode',
+      width: 160,
+      type: 'text',
+      sortingEnabled: false,
+      disabled: true,
+    },
+    {
+      columnName: 'itemName',
+      sortingEnabled: false,
+      disabled: true,
+      render: (row) => {
+        let texts = []
+  
+        texts = [
+          row.itemName,
+          row.isActive ? '' : '(Inactive)',
+        ].join(' ')
+  
+        return (
+          <div>
+            {texts}
+          </div>
+        )
+      },
+    },
+    {
+      columnName: 'unitPrice',
+      width: 100,
+      type: 'number',
+      currency: true,
+      sortingEnabled: false,
+      disabled: true,
+    },
+    {
+      columnName: 'consumeQuantity',
+      width: 140,
+      sortingEnabled: false,
+      type: 'number',
+      format: '0.0',
+      isDisabled: (row) => row.isActive !== true,
+    },
+    {
+      columnName: 'remainingQuantity',
+      width: 140,
+      type: 'number',
+      format: '0.0',
+      sortingEnabled: false,
+      disabled: true,
+    },
+    {
+      columnName: 'performingUserFK',
+      width: 150,
+      sortingEnabled: false,
+      type: 'codeSelect',
+      code: 'doctorprofile',
+      labelField: 'clinicianProfile.name',
+      valueField: 'clinicianProfile.userProfileFK',
+      remoteFilter: {
+        'clinicianProfile.isActive': true,
+      },
+      renderDropdown: (option) => <DoctorLabel doctor={option} />,
+      onChange: ({ option, row }) => {
+        const { pendingPackage } = this.props.values
+        const changedRow = pendingPackage.find(p => p.id === row.id)
+        if (changedRow) {
+          changedRow.performingUserFK = row.performingUserFK
+        }
+      },
+    },
+  ]
+
+  constructor (props) {
+    super(props)
+
+    const newColumnExtensions = this.gridColumnExtensions.map((column) => {
+      if (column.columnName === 'consumeQuantity') {
+        return {
+          ...column,
+          render: (row) => {
+            return (
+              <NumberInput
+                value={row.consumeQuantity}
+                format='0.0'
+                text={row.isActive !== true}
+              />
+            )
+          },
+        }
+      }
+      if (column.columnName === 'performingUserFK') {
+        return {
+          ...column,
+          render: (row) => {
+            return (
+              <DoctorProfileSelect
+                label=''
+                value={row.performingUserFK}
+                valueField='clinicianProfile.userProfileFK'
+                disabled={row.isActive !== true}
+              />
+            )
+          },
+        }
+      }
+      
+      return { ...column }
+    })
+
+    this.newColumnExtensions = [
+      ...newColumnExtensions,
+    ]
   }
 
-  pendingPackageSchema = Yup.object().shape({
-    consumeQuantity: Yup.number().required()
-      .min(0, 'Consumed quantity must be greater than or equal to 0')
-      .max(Yup.ref('remainingQuantity'), 'Consumed quantity cannot exceed Remaining Quantity'),
-  })
-
-  tableProps = {
-    columns: [
-      { name: 'itemCode', title: 'Code' },
-      { name: 'itemName', title: 'Name' },
-      { name: 'unitPrice', title: 'Unit Price' },
-      { name: 'consumeQuantity', title: 'Consume Quantity' },
-      { name: 'remainingQuantity', title: 'Remaining Quantity' },
-      { name: 'patientPackageFK', title: '' },
-    ],
-    columnExtensions: [
-      {
-        columnName: 'itemCode',
-        width: 160,
-        type: 'text',
-        sortingEnabled: false,
-        disabled: true,
-      },
-      {
-        columnName: 'itemName',
-        sortingEnabled: false,
-        disabled: true,
-        render: (row) => {
-          let texts = []
-
-          texts = [
-            row.itemName,
-            row.isActive ? '' : '(Inactive)',
-          ].join(' ')
-
-          return (
-            <div>
-              {texts}
-            </div>
-          )
-        },
-      },
-      {
-        columnName: 'unitPrice',
-        width: 100,
-        type: 'number',
-        currency: true,
-        sortingEnabled: false,
-        disabled: true,
-      },
-      {
-        columnName: 'consumeQuantity',
-        width: 140,
-        type: 'number',
-        format: '0.0',
-        sortingEnabled: false,
-        isDisabled: (row) => row.isActive !== true,
-      },
-      {
-        columnName: 'remainingQuantity',
-        width: 140,
-        type: 'number',
-        format: '0.0',
-        sortingEnabled: false,
-        disabled: true,
-      },
-    ],
+  state = {
+    expandedGroups: [],
   }
 
   componentDidMount = () => {
@@ -479,6 +523,27 @@ class ConsumePackage extends Component {
 
   render () {
     const { footer, values, setFieldValue, theme } = this.props
+    const {pendingPackage} = values
+
+    const pendingPackageSchema = Yup.object().shape({
+      consumeQuantity: Yup.number().required()
+        .min(0, 'Consumed quantity must be greater than or equal to 0')
+        .max(Yup.ref('remainingQuantity'), 'Consumed quantity cannot exceed Remaining Quantity'),
+      performingUserFK: Yup.number().required(),
+    })
+
+    const tableProps = {
+      columns: [
+        { name: 'itemCode', title: 'Code' },
+        { name: 'itemName', title: 'Name' },
+        { name: 'unitPrice', title: 'Unit Price' },
+        { name: 'consumeQuantity', title: 'Consume Quantity' },
+        { name: 'remainingQuantity', title: 'Remaining Quantity' },
+        { name: 'performingUserFK', title: 'Performed By' },
+        { name: 'patientPackageFK', title: '' },
+      ],
+      columnExtensions: this.newColumnExtensions,
+    }
 
     const handleCommitChanges = ({ rows }) => {
       setFieldValue('pendingPackage', rows)
@@ -496,8 +561,8 @@ class ConsumePackage extends Component {
 
       let label = 'Package'
       let expiryDateLabel = '-'
-      if (!values.pendingPackage) return ''
-      const data = values.pendingPackage.filter(
+      if (!pendingPackage) return ''
+      const data = pendingPackage.filter(
         (item) => item.patientPackageFK === row.value,
       )
       if (data.length > 0) {
@@ -520,10 +585,11 @@ class ConsumePackage extends Component {
       <CardContainer hideHeader>
         <div>          
           <EditableTableGrid
+            size='sm'
             forceRender
-            rows={values.pendingPackage}
-            {...this.tableProps}
-            schema={this.pendingPackageSchema}
+            rows={pendingPackage}
+            {...tableProps}
+            schema={pendingPackageSchema}
             EditingProps={{
               showCommandColumn: false,
               onCommitChanges: handleCommitChanges,
