@@ -47,14 +47,13 @@ class InventoryList extends PureComponent {
       summaryConfig: {
         state: {
           totalItems: [
-            { columnName: 'stock', type: 'sum' },
+            { columnName: 'amount', type: 'sum' },
           ],
         },
         integrated: IntegratedSummary.defaultCalculator,
         row: {
-          totalRowComponent: SummaryRow,
           messages: {
-            sum: 'Total Number of Stock',
+            sum: 'Total',
           },
         },
       },
@@ -68,33 +67,40 @@ class InventoryList extends PureComponent {
       { name: 'status', title: 'Status' },
       { name: 'stock', title: 'Stock' },
       { name: 'uom', title: 'UOM' },
-      { name: 'acp', title: 'ACP' },
+      {
+        name: 'acp',
+        title: <span>{reportDatas.InventoryListInfo[0].costPriceType}</span>,
+      },
       { name: 'amount', title: 'Amount' },
     ]
     const InventoryListExtensions = [
-      { columnName: 'inventoryType', sortingEnabled: false },
-      { columnName: 'inventoryCode', sortingEnabled: false },
+      { columnName: 'inventoryType', sortingEnabled: false, width: 120 },
+      { columnName: 'inventoryCode', sortingEnabled: false, width: 150 },
       { columnName: 'inventoryItem', sortingEnabled: false },
       { columnName: 'supplier', sortingEnabled: false },
-      { columnName: 'status', sortingEnabled: false },
+      { columnName: 'status', sortingEnabled: false, width: 80 },
       {
         columnName: 'stock',
         sortingEnabled: false,
         type: 'number',
         precision: 1,
+        width: 100,
       },
-      { columnName: 'uom', sortingEnabled: false, align: 'right' },
+      { columnName: 'uom', sortingEnabled: false, width: 130 },
       {
         columnName: 'acp',
         sortingEnabled: false,
         type: 'currency',
         currency: true,
+        precision: 4,
+        width: 120,
       },
       {
         columnName: 'amount',
         sortingEnabled: false,
         type: 'currency',
         currency: true,
+        width: 160,
       },
     ]
 

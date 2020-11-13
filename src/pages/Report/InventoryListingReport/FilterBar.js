@@ -1,7 +1,7 @@
 import React from 'react'
 // formik
 import { FastField, Field } from 'formik'
-import { status } from '@/utils/codes'
+import { status, costPriceTypes } from '@/utils/codes'
 // common components
 import {
   Button,
@@ -9,9 +9,7 @@ import {
   GridItem,
   SizeContainer,
   CodeSelect,
-  RadioGroup,
   Select,
-  Checkbox,
 } from '@/components'
 
 const FilterBar = ({ handleSubmit, isSubmitting }) => {
@@ -19,7 +17,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
     <SizeContainer size='sm'>
       <React.Fragment>
         <GridContainer alignItems='flex-end'>
-          <GridItem md={4}>
+          <GridItem md={3}>
             <Field
               name='inventoryType'
               render={(args) => {
@@ -43,22 +41,22 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
               }}
             />
           </GridItem>
-          <GridItem md={4}>
-          <FastField
-          name='Suppliers'
-          render={(args) => (
-            <CodeSelect
-              label='Supplier'
-              code='ctSupplier'
-              mode='multiple'
-              labelField='displayValue'
-              {...args}
+          <GridItem md={3}>
+            <FastField
+              name='Suppliers'
+              render={(args) => (
+                <CodeSelect
+                  label='Supplier'
+                  code='ctSupplier'
+                  mode='multiple'
+                  labelField='displayValue'
+                  {...args}
+                />
+              )}
             />
-          )}
-        />
-        </GridItem>
-          <GridItem md={4} />
-          <GridItem md={4}>
+          </GridItem>
+          <GridItem md={6} />
+          <GridItem md={3}>
             <Field
               name='items'
               render={(args) => {
@@ -76,11 +74,25 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
               }}
             />
           </GridItem>
-          <GridItem md={4}>
+          <GridItem md={3}>
             <FastField
               name='IsActive'
               render={(args) => {
                 return <Select label='Status' {...args} options={status} />
+              }}
+            />
+          </GridItem>
+          <GridItem md={3}>
+            <FastField
+              name='costPriceType'
+              render={(args) => {
+                return (
+                  <Select
+                    label='Cost Price Type'
+                    {...args}
+                    options={costPriceTypes}
+                  />
+                )
               }}
             />
           </GridItem>
