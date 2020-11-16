@@ -1,6 +1,6 @@
 import React from 'react'
 // formik
-import { FastField } from 'formik'
+import { FastField, Field } from 'formik'
 // common components
 import {
   Button,
@@ -12,9 +12,10 @@ import {
   Select,
 } from '@/components'
 import { osBalanceStatus } from '@/utils/codes'
+import AuthorizedContext from '@/components/Context/Authorized'
 import ReportDateRangePicker from '../ReportDateRangePicker'
 
-const FilterBar = ({ handleSubmit, isSubmitting }) => {
+const FilterBar = ({ handleSubmit, isSubmitting, values, setFieldValue }) => {
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
@@ -29,7 +30,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={6} />
 
           <GridItem md={2}>
-            <FastField
+            <Field
               name='companyIDS'
               render={(args) => (
                 <CodeSelect
@@ -38,6 +39,11 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                   labelField='displayValue'
                   mode='multiple'
                   label='Company'
+                  onChange={(val) => {
+                    if (val.length === 0 && values.isPrintDetails) {
+                      setFieldValue('isPrintDetails', false)
+                    }
+                  }}
                 />
               )}
             />
@@ -56,21 +62,44 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
               }}
             />
           </GridItem>
-          <GridItem md={2}>
-            <FastField
-              name='groupByCompany'
-              render={(args) => <Checkbox {...args} label='Group By Company' />}
-            />
-          </GridItem>
-          
-          <GridItem md={2}>
-            <Button
-              color='primary'
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-            >
-              Generate Report
-            </Button>
+          <GridItem md={8}>
+            <div>
+              <div style={{ display: 'inline-Block' }}>
+                <FastField
+                  name='groupByCompany'
+                  render={(args) => (
+                    <Checkbox {...args} label='Group By Company' />
+                  )}
+                />
+              </div>
+              <div style={{ display: 'inline-Block', marginLeft: 10 }}>
+                <AuthorizedContext.Provider
+                  style={{ padding: 0 }}
+                  value={{
+                    rights:
+                      (values.companyIDS || []).length === 0
+                        ? 'disable'
+                        : 'enable',
+                  }}
+                >
+                  <FastField
+                    name='isPrintDetails'
+                    render={(args) => (
+                      <Checkbox {...args} label='Print Details' />
+                    )}
+                  />
+                </AuthorizedContext.Provider>
+              </div>
+              <div style={{ display: 'inline-Block', marginLeft: 10 }}>
+                <Button
+                  color='primary'
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                >
+                  Generate Report
+                </Button>
+              </div>
+            </div>
           </GridItem>
         </GridContainer>
       </React.Fragment>
