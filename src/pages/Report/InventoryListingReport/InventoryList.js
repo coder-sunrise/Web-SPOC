@@ -18,9 +18,8 @@ class InventoryList extends PureComponent {
       const { children } = p
       let countCol = children.find((c) => {
         if (!c.props.tableColumn.column) return false
-        return c.props.tableColumn.column.name === 'stock'
+        return c.props.tableColumn.column.name === 'amount'
       })
-      // console.log({ countCol })
 
       if (countCol) {
         const newChildren = [
@@ -31,7 +30,7 @@ class InventoryList extends PureComponent {
               colSpan: 9,
               tableColumn: {
                 ...countCol.props.tableColumn,
-                align: 'left',
+                align: 'right',
               },
             },
             key: 1111,
@@ -52,8 +51,9 @@ class InventoryList extends PureComponent {
         },
         integrated: IntegratedSummary.defaultCalculator,
         row: {
+          totalRowComponent: SummaryRow,
           messages: {
-            sum: 'Total',
+            sum: 'Grand Total',
           },
         },
       },
@@ -71,7 +71,7 @@ class InventoryList extends PureComponent {
         name: 'acp',
         title: <span>{reportDatas.InventoryListInfo[0].costPriceType}</span>,
       },
-      { name: 'amount', title: 'Amount' },
+      { name: 'amount', title: 'Total Cost' },
     ]
     const InventoryListExtensions = [
       { columnName: 'inventoryType', sortingEnabled: false, width: 120 },
