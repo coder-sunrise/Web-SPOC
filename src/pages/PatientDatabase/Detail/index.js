@@ -253,6 +253,22 @@ class PatientDetail extends PureComponent {
           loading: Loading,
         }),
       },
+      {
+        id: '9',
+        name: 'Package Drawdown',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
+        component: Loadable({
+          loader: () => import('./PatientPackageDrawdown'),
+          render: (loaded, p) => {
+            let Cmpnet = loaded.default
+            return <Cmpnet {...p} />
+          },
+          loading: Loading,
+        }),
+      },
     ]
   }
 
