@@ -56,13 +56,12 @@ class Grid extends React.Component {
   onRowDoubleClick = (row) => {
     const { visitStatus, visitPurposeFK = VISIT_TYPE.CONS } = row
     const isWaiting = visitStatus === VISIT_STATUS.WAITING
-    const { clinicianProfile: { doctorProfile } } = this.props.user.data
     const retailVisits = [
       VISIT_TYPE.RETAIL,
       VISIT_TYPE.BILL_FIRST,
       VISIT_TYPE.TELE_CONS,
     ]
-    if (!doctorProfile || retailVisits.includes(visitPurposeFK)) return false
+    if (retailVisits.includes(visitPurposeFK)) return false
 
     if (isWaiting) this.props.onMenuItemClick(row, '5') // start consultation context menu id = 5
 
