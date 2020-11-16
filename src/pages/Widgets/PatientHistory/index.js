@@ -175,17 +175,6 @@ class PatientHistory extends Component {
     return activeHistoryTags
   }
 
-  isAssignedDoctor = () => {
-    const { clinicianProfile = {} } = this.props.user
-    if (!clinicianProfile || !clinicianProfile.doctorProfile) {
-      notification.error({
-        message: 'Current user is not authorized to access',
-      })
-      return false
-    }
-    return true
-  }
-
   getTitle = (row) => {
     const {
       theme,
@@ -298,58 +287,56 @@ class PatientHistory extends Component {
                     justIcon
                     onClick={(event) => {
                       event.stopPropagation()
-                      const valid = this.isAssignedDoctor()
-                      if (valid) {
-                        dispatch({
-                          type: `consultation/edit`,
-                          payload: {
-                            id: row.id,
-                            version: patientHistory.version,
-                          },
-                        }).then((o) => {
-                          if (o) {
-                            if (o.updateByUserFK !== user.data.id) {
-                              const { clinicianprofile = [] } = codetable
-                              const version = Date.now()
-                              const editingUser = clinicianprofile.find(
-                                (m) => m.userProfileFK === o.updateByUserFK,
-                              ) || {
-                                name: 'Someone',
-                              }
-                              dispatch({
-                                type: 'global/updateAppState',
-                                payload: {
-                                  openConfirm: true,
-                                  openConfirmContent: `${editingUser.name} is currently editing the patient note, do you want to overwrite?`,
-                                  onConfirmSave: () => {
-                                    dispatch({
-                                      type: `consultation/overwrite`,
-                                      payload: {
-                                        id: row.id,
-                                        version,
-                                      },
-                                    }).then((c) => {
-                                      dispatch({
-                                        type: 'patient/closePatientModal',
-                                      })
-                                      router.push(
-                                        `/reception/queue/consultation?qid=${row.queueFK}&pid=${patientID}&cid=${c.id}&v=${version}`,
-                                      )
-                                    })
-                                  },
-                                },
-                              })
-                            } else {
-                              dispatch({
-                                type: 'patient/closePatientModal',
-                              })
-                              router.push(
-                                `/reception/queue/consultation?qid=${row.queueFK}&pid=${patientID}&cid=${o.id}&v=${patientHistory.version}`,
-                              )
+
+                      dispatch({
+                        type: `consultation/edit`,
+                        payload: {
+                          id: row.id,
+                          version: patientHistory.version,
+                        },
+                      }).then((o) => {
+                        if (o) {
+                          if (o.updateByUserFK !== user.data.id) {
+                            const { clinicianprofile = [] } = codetable
+                            const version = Date.now()
+                            const editingUser = clinicianprofile.find(
+                              (m) => m.userProfileFK === o.updateByUserFK,
+                            ) || {
+                              name: 'Someone',
                             }
+                            dispatch({
+                              type: 'global/updateAppState',
+                              payload: {
+                                openConfirm: true,
+                                openConfirmContent: `${editingUser.name} is currently editing the patient note, do you want to overwrite?`,
+                                onConfirmSave: () => {
+                                  dispatch({
+                                    type: `consultation/overwrite`,
+                                    payload: {
+                                      id: row.id,
+                                      version,
+                                    },
+                                  }).then((c) => {
+                                    dispatch({
+                                      type: 'patient/closePatientModal',
+                                    })
+                                    router.push(
+                                      `/reception/queue/consultation?qid=${row.queueFK}&pid=${patientID}&cid=${c.id}&v=${version}`,
+                                    )
+                                  })
+                                },
+                              },
+                            })
+                          } else {
+                            dispatch({
+                              type: 'patient/closePatientModal',
+                            })
+                            router.push(
+                              `/reception/queue/consultation?qid=${row.queueFK}&pid=${patientID}&cid=${o.id}&v=${patientHistory.version}`,
+                            )
                           }
-                        })
-                      }
+                        }
+                      })
                     }}
                   >
                     <Edit />
