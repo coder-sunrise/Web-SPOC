@@ -274,6 +274,11 @@ class PatientDetail extends PureComponent {
 
   componentDidMount () {
     this.checkHasActiveSession()
+
+    const { clinicSettings } = this.props
+    if (!clinicSettings.isEnablePackage) {
+      this.widgets = this.widgets.filter(w => w.id !== '9')
+    }
   }
 
   componentWillUnmount () {

@@ -12,12 +12,13 @@ import {
   DatePicker,
   dateFormatLong,
   NumberInput,
+  SizeContainer,
 } from '@/components'
 import model from './models'
 
 window.g_app.replaceModel(model)
 
-const styles = () => ({
+const styles = (theme) => ({
   titleContainer: {
     display: 'flex',
   },
@@ -25,12 +26,15 @@ const styles = () => ({
     fontWeight: 'normal',
     color: 'black',
   },
-  // titleBold: {
-  //   marginRight: 30,
-  //   marginTop: 5,
-  //   fontWeight: 'bold',
-  //   color: 'red',
-  // },
+  noRecordsDiv: {
+    height: 'calc(100vh - 250px)',
+    paddingTop: 5,
+    marginLeft: theme.spacing(1),
+  },
+  contentDiv: {
+    height: 'calc(100vh - 250px)',
+    overflow: 'scroll',
+  },
 })
 
 @connect(({ patient, patientPackageDrawdown }) => ({
@@ -49,19 +53,33 @@ const styles = () => ({
   handleSubmit: async (values, { props }) => {
     const {dispatch, patient} = props
 
+    const uncompletedPackages = values.filter(p => !p.isCompleted && !p.isExpired)
+
     dispatch({
       type: 'patientPackageDrawdown/savePatientPackage',
       payload: {
         patientId: patient.entity.id,
-        patientPackage: values,
+        patientPackage: uncompletedPackages,
       },
     })
   },
   displayName: 'PatientPackageDrawdown',
 })
 class PatientPackageDrawdown extends PureComponent {
+  state = {
+    isAllPackageCompleted: false,
+  }
+
   componentDidMount () {
     this.refreshPackageDrawdown()
+  }
+
+  componentWillReceiveProps (nextProps) {
+    const { values } = nextProps
+    const uncompletedPackages = values.filter(p => !p.isCompleted && !p.isExpired)
+    this.setState({
+      isAllPackageCompleted: uncompletedPackages.length <= 0,
+    })
   }
 
   refreshPackageDrawdown = () => {
@@ -143,18 +161,20 @@ class PatientPackageDrawdown extends PureComponent {
               )
             }
             {!isCompleted && !isExpired && (
-              <DatePicker 
-                label='Exp. Date' 
-                format={dateFormatLong} 
-                value={expiryDate} 
-                onChange={value => {
-                  const changedPacakge = values.find(p => p.id === id)
-                  if (changedPacakge) {
-                    changedPacakge.expiryDate = value || undefined
-                  }
-                }              
-              }
-              />
+              <SizeContainer size='sm'>
+                <DatePicker 
+                  label='Exp. Date' 
+                  format={dateFormatLong} 
+                  value={expiryDate} 
+                  onChange={value => {
+                    const changedPacakge = values.find(p => p.id === id)
+                    if (changedPacakge) {
+                      changedPacakge.expiryDate = value || undefined
+                    }
+                  }              
+                }
+                />
+              </SizeContainer>
               )
             }
             {!isCompleted && isExpired && (
@@ -201,17 +221,15 @@ class PatientPackageDrawdown extends PureComponent {
   render () {
     const {
       patientPackageDrawdown: { list = [] },
+      patient,
+      classes,
     } = this.props
 
     if(list.length > 0) {      
       return (      
         <GridContainer>
           <GridItem md={12}>
-            <div style={{
-              height: 'calc(100vh - 250px)',
-              overflow: 'scroll',
-            }}
-            >
+            <div className={classes.contentDiv}>
               <Accordion
                 mode='multiple'
                 collapses={list.map((o) => {
@@ -228,7 +246,11 @@ class PatientPackageDrawdown extends PureComponent {
             </div>
           </GridItem>
           <GridItem md={12}>
-            <Button color='primary' onClick={this.props.handleSubmit}>
+            <Button 
+              color='primary' 
+              onClick={this.props.handleSubmit}
+              disabled={this.state.isAllPackageCompleted || patient.entity.isActive === false}
+            >
               Save
             </Button>
             <Button color='primary'>
@@ -240,17 +262,11 @@ class PatientPackageDrawdown extends PureComponent {
     }
 
     return (
-      <div
-        style={{
-          height: 'calc(100vh - 250px)',
-          paddingTop: 5,
-          marginLeft: 5,
-        }}
-      >
+      <div className={classes.noRecordsDiv}>
         There is no records.
       </div>
     )
   }
 }
 
-export default withStyles(styles)(PatientPackageDrawdown)
+export default withStyles(styles, { withTheme: true })(PatientPackageDrawdown)

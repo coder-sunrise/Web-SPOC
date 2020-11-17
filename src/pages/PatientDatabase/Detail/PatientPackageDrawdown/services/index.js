@@ -7,6 +7,6 @@ export const getPatientPackageDrawdown = (params) => commonService.query(url, pa
 
 export const savePatientPackage = (payload) => {
   const { patientId } = payload
-  return request(`${url}/save/${patientId}`, { method: 'PUT', body: payload })
+  return request(`${url}/${patientId}`, { method: 'PUT', body: payload })
 }
 

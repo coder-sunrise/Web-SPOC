@@ -28,16 +28,16 @@ export default createListViewModel({
         }
         return false
       },
-      *savePatientPackage ({ payload }, { call, put, take, select }) {
+      *savePatientPackage ({ payload }, { call, put, take }) {
         const response = yield call(service.savePatientPackage, payload)
         if (response) {
-          // yield put({
-          //   type: 'getPatientPackageDrawdown',
-          //   payload: {
-          //     patientId: payload.patientId,
-          //   },
-          // })
-          // yield take('patientPackageDrawdown/getPatientPackageDrawdown/@@end')
+          yield put({
+            type: 'getPatientPackageDrawdown',
+            payload: {
+              patientId: payload.patientId,
+            },
+          })
+          yield take('patientPackageDrawdown/getPatientPackageDrawdown/@@end')
           
           return response
         }
