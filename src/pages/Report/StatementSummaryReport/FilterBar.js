@@ -12,7 +12,6 @@ import {
   Select,
 } from '@/components'
 import { osBalanceStatus } from '@/utils/codes'
-import AuthorizedContext from '@/components/Context/Authorized'
 import ReportDateRangePicker from '../ReportDateRangePicker'
 
 const FilterBar = ({ handleSubmit, isSubmitting, values, setFieldValue }) => {
@@ -73,22 +72,16 @@ const FilterBar = ({ handleSubmit, isSubmitting, values, setFieldValue }) => {
                 />
               </div>
               <div style={{ display: 'inline-Block', marginLeft: 10 }}>
-                <AuthorizedContext.Provider
-                  style={{ padding: 0 }}
-                  value={{
-                    rights:
-                      (values.companyIDS || []).length === 0
-                        ? 'disable'
-                        : 'enable',
-                  }}
-                >
-                  <FastField
-                    name='isPrintDetails'
-                    render={(args) => (
-                      <Checkbox {...args} label='Print Details' />
-                    )}
-                  />
-                </AuthorizedContext.Provider>
+                <Field
+                  name='isPrintDetails'
+                  render={(args) => (
+                    <Checkbox
+                      {...args}
+                      label='Print Details'
+                      disabled={(values.companyIDS || []).length === 0}
+                    />
+                  )}
+                />
               </div>
               <div style={{ display: 'inline-Block', marginLeft: 10 }}>
                 <Button
