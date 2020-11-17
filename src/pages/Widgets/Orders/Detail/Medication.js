@@ -167,6 +167,10 @@ const getCautions = (
       newCorPrescriptionItemDrugMixture,
       v.inventoryMedicationFK,
     )
+
+    const medication = inventorymedication.find(
+      (item) => item.id === v.inventoryMedicationFK,
+    )
     return {
       ...v,
       corPrescriptionItemPrecaution:
@@ -180,6 +184,9 @@ const getCautions = (
           ? newCorPrescriptionItemDrugMixture
           : [],
       cautions,
+      selectedMedication: medication || {
+        medicationStock: [],
+      },
     }
   },
   enableReinitialize: true,
@@ -361,9 +368,6 @@ const getCautions = (
 })
 class Medication extends PureComponent {
   state = {
-    selectedMedication: {
-      medicationStock: [],
-    },
     batchNo: '',
     expiryDate: '',
     showAddFromPastModal: false,
@@ -414,7 +418,7 @@ class Medication extends PureComponent {
   calculateQuantity = (medication) => {
     const { codetable, setFieldValue, disableEdit, values } = this.props
     if (values.isDrugMixture) return
-    let currentMedication = medication || this.state.selectedMedication
+    let currentMedication = medication || values.selectedMedication
 
     const { form } = this.descriptionArrayHelpers
     let newTotalQuantity = 0
@@ -507,7 +511,7 @@ class Medication extends PureComponent {
 
   setInstruction = (index = 0) => {
     const { setFieldValue, codetable, values } = this.props
-    const { selectedMedication } = this.state
+    const { selectedMedication } = values
     let op = selectedMedication
 
     if (!selectedMedication || !selectedMedication.id) {
@@ -593,7 +597,12 @@ class Medication extends PureComponent {
     }, [])
   }
 
-  changeMedication = (v, op = {}) => {
+  changeMedication = (
+    v,
+    op = {
+      medicationStock: [],
+    },
+  ) => {
     const { setFieldValue, values } = this.props
 
     let defaultBatch
@@ -640,15 +649,9 @@ class Medication extends PureComponent {
       )
     }
     setFieldValue('isActive', op.isActive)
+    setFieldValue('selectedMedication', op)
 
-    this.setState(
-      {
-        selectedMedication: op,
-      },
-      () => {
-        this.setInstruction(newPrescriptionInstruction.length - 1)
-      },
-    )
+    this.setInstruction(newPrescriptionInstruction.length - 1)
 
     if (
       op.inventoryMedication_MedicationPrecaution &&
@@ -811,32 +814,6 @@ class Medication extends PureComponent {
           },
         })
       }
-
-    const { values: nextValues } = nextProps
-    const { values: currentValues } = this.props
-    if (
-      !!nextValues.id &&
-      nextValues.id !== currentValues.id &&
-      nextValues.type === '1' // type === 'Medication'
-    ) {
-      const { codetable } = this.props
-      const { inventorymedication = [] } = codetable
-      const { inventoryMedicationFK } = nextValues
-      const medication = inventorymedication.find(
-        (item) => item.id === inventoryMedicationFK,
-      )
-
-      if (medication)
-        this.setState({
-          selectedMedication: medication,
-        })
-      else
-        this.setState({
-          selectedMedication: {
-            medicationStock: [],
-          },
-        })
-    }
   }
 
   onSearchMedicationHistory = async () => {
@@ -1881,7 +1858,7 @@ class Medication extends PureComponent {
                       label='Batch No.'
                       labelField='batchNo'
                       valueField='batchNo'
-                      options={this.state.selectedMedication.medicationStock}
+                      options={values.selectedMedication.medicationStock}
                       onChange={(e, op = {}) => {
                         if (op && op.length > 0) {
                           const { expiryDate } = op[0]
