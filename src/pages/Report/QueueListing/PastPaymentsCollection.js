@@ -5,27 +5,46 @@ import {
 import { ReportDataGrid } from '@/components/_medisys'
 
 
-const PastPaymentsCollection = ({ reportDatas }) => {
+const PastPaymentsCollection = ({ reportDatas, isCompany }) => {
   if (!reportDatas)
     return null
   let listData = []
-  const { PastInvoicePaymentDetails } = reportDatas
-  if (PastInvoicePaymentDetails) {
-    listData = PastInvoicePaymentDetails.map(
+  const { PrivatePastInvoicePaymentDetails, CompanyPastInvoicePaymentDetails } = reportDatas
+  if (!isCompany && PrivatePastInvoicePaymentDetails) {
+    listData = PrivatePastInvoicePaymentDetails.map(
       (item, index) => ({
         ...item,
-        id: `PastInvoicePaymentDetails-${index}-${item.invoiceNo}`,
+        id: `PrivatePastInvoicePaymentDetails-${index}-${item.invoiceNo}`,
+      }),
+    )
+  }
+  else if (CompanyPastInvoicePaymentDetails && isCompany) {
+    listData = CompanyPastInvoicePaymentDetails.map(
+      (item, index) => ({
+        ...item,
+        id: `CompanyPastInvoicePaymentDetails-${index}-${item.invoiceNo}`,
       }),
     )
   }
 
+  let invoiceNoTitle = 'Invoice No.'
+  let payerNameTitle = 'Payer Name'
+  let doctorNameTitle = 'Doctor'
+  let invoiceDateTitle = 'Invoice Date'
+  if (isCompany) {
+    invoiceNoTitle = 'Statement No. / Invoice No.'
+    payerNameTitle = 'Payer Code'
+    doctorNameTitle = 'Payer Name'
+    invoiceDateTitle = 'Statement Date'
+  }
+
   const PastPaymentCollectionTableColumn = [
-    { name: 'payerName', title: 'Payer Name' },
-    { name: 'doctorName', title: 'Doctor' },
-    { name: 'invoiceNo', title: 'Invoice No.' },
-    { name: 'invoiceDate', title: 'Invoice Date' },
+    { name: 'payerName', title: payerNameTitle },
+    { name: 'doctorName', title: doctorNameTitle },
+    { name: 'invoiceDate', title: invoiceDateTitle },
+    { name: 'invoiceNo', title: invoiceNoTitle },
     { name: 'mode', title: 'Payment Mode' },
-    { name: 'amt', title: 'Invoice Amt.' },
+    { name: 'amt', title: 'Payment Amt.' },
     { name: 'paymentReceivedDate', title: 'Payment Received Date' },
   ]
 
