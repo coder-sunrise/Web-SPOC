@@ -35,7 +35,7 @@ const PastPaymentsCollection = ({ reportDatas, isCompany }) => {
     invoiceNoTitle = 'Statement No. / Invoice No.'
     payerNameTitle = 'Payer Code'
     doctorNameTitle = 'Payer Name'
-    invoiceDateTitle = 'Statement Date'
+    invoiceDateTitle = 'Statement Date / Invoice Date'
   }
 
   const PastPaymentCollectionTableColumn = [
@@ -54,7 +54,7 @@ const PastPaymentsCollection = ({ reportDatas, isCompany }) => {
     { columnName: 'invoiceNo', sortingEnabled: false },
     { columnName: 'invoiceDate', sortingEnabled: false },
     { columnName: 'mode', sortingEnabled: false },
-    { columnName: 'paymentReceivedDate', sortingEnabled: false },
+    { columnName: 'paymentReceivedDate', sortingEnabled: false },                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
     { columnName: 'amt', type: 'currency', currency: true, sortingEnabled: false },
   ]
 

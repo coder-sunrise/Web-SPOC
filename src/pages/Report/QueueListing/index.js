@@ -50,11 +50,11 @@ class QueueListing extends ReportBase {
             content: <VisitListing reportDatas={reportDatas} />,
           },
           {
-            title: <AccordionTitle title='Past Payments Collection (Company)' />,
+            title: <AccordionTitle title='Payment Collections for Past Invoices (Company)' />,
             content: <PastPaymentsCollection reportDatas={reportDatas} isCompany />,
           },
           {
-            title: <AccordionTitle title='Past Payments Collection (Private)' />,
+            title: <AccordionTitle title='Payment Collections for Past Invoices (Private)' />,
             content: <PastPaymentsCollection reportDatas={reportDatas} />,
           },
           {
