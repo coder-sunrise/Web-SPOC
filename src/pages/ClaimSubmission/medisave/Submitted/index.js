@@ -72,6 +72,7 @@ class SubmittedMedisave extends React.Component {
         })
         .then((r) => {
           this.handleLoadingVisibility(false)
+          console.log('getSubmittedStatus',r) // this is just response, change to claims updated
           if (r) {
             notification.success({
               message: 'Get Status Success.',

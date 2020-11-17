@@ -46,12 +46,14 @@ const styles = (theme) => ({
   enableReinitialize: true,
   mapPropsToValues: ({ claimSubmission, allowEdit, codetable }) => {
     const returnValue = claimSubmission.entity || {}
+    /*
     const {
-      ctmedisavecdmpchargecode, 
+      ctmedisavecdmpdiagnosis, 
       ctmedisavehealthscreeningdiagnosis, 
       ctmedisaveoutpatientscandiagnosis, 
       ctmedisavevaccination,
     } = codetable
+    */
     const { diagnosis } = returnValue
     let diagnosisOptions = []
     let complicationList = []
@@ -76,22 +78,27 @@ const styles = (theme) => ({
         })
 
         if(o.chargeCode) {
-          const cdmp = ctmedisavecdmpchargecode.find((c) => c.code === o.chargeCode)
+          /*
+          console.log('ctmedisavecdmpdiagnosis',ctmedisavecdmpdiagnosis)
+          const cdmpSimple = ctmedisavecdmpdiagnosis.find((c) => c.simpleChargeCode === o.chargeCode)
+          const cdmpComplex = ctmedisavecdmpdiagnosis.find((c) => c.complexChargeCode === o.chargeCode)
           const screening = ctmedisavehealthscreeningdiagnosis.find((c) => c.code === o.chargeCode)
           const scan = ctmedisaveoutpatientscandiagnosis.find((c) => c.code === o.chargeCode)
           const vaccination = ctmedisavevaccination.find((c) => c.code === o.chargeCode)
-          const flexi = o.chargeCode === 'Z519'
-          console.log('chargeCode',cdmp, screening, scan, vaccination, flexi)
+          const flexi = o.chargeCode === 'FM0065'
+          console.log('chargeCode', cdmpSimple, cdmpComplex, screening, scan, vaccination, flexi)
           let displayValue = ''
-          if(cdmp) displayValue = cdmp.name
+          if(cdmpSimple) displayValue = cdmpSimple.simpleChargeCodeDescription
+          if(cdmpComplex) displayValue = cdmpComplex.complexChargeCodeDescription
           if(screening) displayValue = screening.name
           if(scan) displayValue = scan.name
           if(vaccination) displayValue = vaccination.name
           if(flexi) displayValue = 'Medical care, unspecified'
+          */
 
-          chargeCodeList.push(`${o.chargeCode} - ${displayValue}`)
+          chargeCodeList.push(`${o.chargeCode} - ${o.chargeCodeDescription}`)
           if(o.isPrimary) {
-            selectedChargeCode = `${o.chargeCode} - ${displayValue}`
+            selectedChargeCode = `${o.chargeCode} - ${o.chargeCodeDescription}`
           }
           // if no isprimary in diagnosis list? or do in api?
         }
@@ -197,8 +204,10 @@ class ClaimDetails extends Component {
     })
 
     diagnosis.forEach((o) => {
-      if(selected.includes(o.chargeCode))
+      if(selected.includes(`${o.chargeCode} - ${o.chargeCodeDescription}`))
         o.isPrimary = true
+      else
+        o.isPrimary = false
     })
     
     const e = chargeCodeSelections.find((c) => selected.includes(c))
@@ -244,6 +253,7 @@ class ClaimDetails extends Component {
         ].indexOf(r.code) >= 0
       )
     } */
+    console.log('schemeTypeFK',schemeTypeFK)
     if(schemeTypeFK)
       return [12,13,14].indexOf(schemeTypeFK) >= 0
       
@@ -273,6 +283,8 @@ class ClaimDetails extends Component {
 
     const { doctorMCRNo } = doctorProfile
     let doctorNameLabel = `${title ?? ''} ${name} (${doctorMCRNo})`
+
+    console.log('render',values)
 
     return (
       <SizeContainer size='md'>
@@ -464,7 +476,7 @@ class ClaimDetails extends Component {
             )}
             {renderClaimDetails !== undefined ? (
               renderClaimDetails(readOnly)
-            ) : (this.isMedisave(values.schemeType) && // MEDISAVE //
+            ) : (this.isMedisave(values.schemeTypeFK) && // MEDISAVE //
               <GridItem md={12} container>
                 <GridItem md={5}>
                   <FastField
@@ -538,7 +550,7 @@ class ClaimDetails extends Component {
                     render={(args) => (
                       <Select
                         label='Charge Code'
-                        disabled={values.status === 'Draft'}
+                        disabled={!allowEdit}
                         disableAll
                         options={chargeCodeList}
                         labelField='chargeCodeDescription'

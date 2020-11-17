@@ -60,6 +60,7 @@ class NewMedisave extends React.Component {
       })
       .then((r) => {
         if (!r) {
+          console.log('onRefreshClicked',r)
           this.refreshDataGrid()
         }
       })
@@ -90,14 +91,16 @@ class NewMedisave extends React.Component {
         .then((r) => {
           this.handleLoadingVisibility(false)
           if (r) {
+            const failedCount = r.filter(t => t.status !== 'SUCCESS').length
             console.log('saved',r)
-            if (r.failedCount > 0) {
-              this.props.handleSubmitClaimStatus(r.failedCount)
-            } else {
+            if(failedCount === 0){ 
               notification.success({
                 message: 'Claim Submission Success.',
               })
             }
+            else {
+              this.props.handleSubmitClaimStatus(failedCount)
+            } 
 
             this.refreshDataGrid()
           }

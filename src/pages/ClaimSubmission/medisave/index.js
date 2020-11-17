@@ -20,7 +20,7 @@ class Medisave extends React.Component {
   constructor (props) {
     super(props)
     const { dispatch } = props
-    dispatch({
+    /* dispatch({
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctschemetype',
@@ -29,7 +29,7 @@ class Medisave extends React.Component {
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {
-        code: 'ctmedisavecdmpchargecode',
+        code: 'ctmedisavecdmpdiagnosis',
       },
     })
     dispatch({
@@ -49,7 +49,7 @@ class Medisave extends React.Component {
       payload: {
         code: 'ctmedisavevaccination',
       },
-    })
+    }) */
   }
 
   state = {

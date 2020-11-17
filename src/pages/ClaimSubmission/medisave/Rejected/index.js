@@ -86,14 +86,15 @@ class RejectedMedisave extends React.Component {
         .then((r) => {
           this.handleLoadingVisibility(false)
           if (r) {
-            if (r.failedCount > 0) {
-              console.log('failedCount',r.failedCount)
-              this.props.handleSubmitClaimStatus(r.failedCount)
-            } else {
+            const failedCount = r.filter(t => t.status !== 'SUCCESS').length          
+            if(failedCount === 0){ 
               notification.success({
                 message: 'Claim Re-Submission Success.',
               })
             }
+            else {
+              this.props.handleSubmitClaimStatus(failedCount)
+            } 
 
             this.refreshDataGrid()
           }

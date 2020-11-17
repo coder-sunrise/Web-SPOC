@@ -611,11 +611,11 @@ class Detail extends PureComponent {
               </GridContainer>
             </div>
             {ddlIsCdmpClaimable && 
-            <div>
+            <div style={{ margin: theme.spacing(1,2) }}>
               <h4 style={{ fontWeight: 400 }}>
                 <b>Medisave Settings</b>
               </h4>
-              <div style={{ margin: theme.spacing(1) }}>
+              <div>
                 <GridContainer>
                   <GridItem
                     xs={1}

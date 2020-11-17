@@ -111,7 +111,17 @@ class MedisaveVaccinations extends PureComponent {
     
     this.commitChanges = ({ rows, added, changed, deleted }) => {
       const { setFieldValue } = this.props
-      setFieldValue('inventoryVaccination_MedisaveVaccination', rows)
+        
+      const newRows = rows && rows.filter(r => !r.isDeleted).length === 1 
+      ? rows.map(row => {
+        return {
+          ...row,
+          isDefault: true,
+        } // won't update in dto, only in ui
+      })
+      : rows
+
+      setFieldValue('inventoryVaccination_MedisaveVaccination', newRows)
       // return _newRows
     }
   }
@@ -119,11 +129,17 @@ class MedisaveVaccinations extends PureComponent {
   changeIsDefault = ({ row }) => {
     const { rows, setFieldValue } = this.props
 
-    const newRows = rows.forEach((o) => {
-        if(o.id !== row.id)
-          o.isDefault = false
-        else
-          o.isDefault = true
+    const newRows = rows.map((r) => {
+      if (r === row.row) {
+        return {
+          ...r,
+          isDefault: true,
+        }
+      }
+      return {
+        ...r,
+        isDefault: false,
+      }
     })
 
     setFieldValue('inventoryVaccination_MedisaveVaccination', newRows)
@@ -141,50 +157,12 @@ class MedisaveVaccinations extends PureComponent {
     setFieldValue('inventoryVaccination_MedisaveVaccination', newRows)
   }
 
-  isDuplicate = ({ rows, changed }) => {
-    if (!changed) return rows
-    const key = Object.keys(changed)[0]
-    const { schemeTypeFK } = changed[key]
-
-    // not changing scheme type or scheme type is Corporate, skip all the checking
-    if (!schemeTypeFK || schemeTypeFK === 15) return rows
-
-    const hasDuplicate = key
-      ? rows.filter((r) => !r.isDeleted && r.schemeTypeFK === schemeTypeFK)
-          .length >= 2
-      : []
-    const chasSchemes = rows.filter(
-      (r) => !r.isDeleted && this.isCHAS(r.schemeTypeFK),
-    )
-    const isCurrentSelectedCHAS = this.isCHAS(schemeTypeFK)
-
-    let _newRows = [
-      ...rows,
-    ]
-
-    if (hasDuplicate || (chasSchemes.length >= 2 && isCurrentSelectedCHAS)) {
-      _newRows = _newRows.map(
-        (r) =>
-          r.id === parseInt(key, 10) ? { ...r, schemeTypeFK: undefined } : r,
-      )
-    }
-
-    return _newRows
-  }
-
-  isExistingRow = (row) => {
-    if (this.isCHAS(row.schemeTypeFK) && row.id && row.id > 0) {
-      return true
-    }
-    return false
-  }
-
-  getSortedRows = (rows) => {
+  /* getSortedRows = (rows) => {
     return _.orderBy(rows, [
       'sequence',
       'schemeTypeFK',
     ])
-  }
+  } */
 
   render () {
     const { editingRowIds, rowChanges } = this.state
@@ -196,6 +174,16 @@ class MedisaveVaccinations extends PureComponent {
       onCommitChanges: this.commitChanges,
     }
 
+    const newRows = rows && rows.filter(r => !r.isDeleted).length === 1 
+    ? rows.map(row => {
+      return {
+        ...row,
+        isDefault: true,
+      } // won't update in dto, only in ui
+    })
+    : rows
+
+    console.log('newRows', newRows)
     /* return <CommonTableGrid 
       rows={rows} 
       columns={this.tableParas.columns} 
@@ -205,7 +193,7 @@ class MedisaveVaccinations extends PureComponent {
     /> */
     return (
       <EditableTableGrid
-        rows={rows}
+        rows={newRows}
         FuncProps={{ pager: false }}
         EditingProps={EditingProps}
         schema={schema}

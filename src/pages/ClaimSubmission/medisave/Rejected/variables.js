@@ -73,7 +73,11 @@ export const RejectedMedisaveColumns = [
 ]
 
 export const RejectedMedisaveColumnExtensions = [
-  { columnName: 'hrnNo', width: 145 },
+  {
+    columnName: 'hrnNo',
+    width: 145,
+    sortBy: 'Hrn',
+  },
   { columnName: 'visitDate', type: 'date' },
   { columnName: 'invoiceDate', type: 'date' },
   { columnName: 'rejectionDate', type: 'date', width: 130 },

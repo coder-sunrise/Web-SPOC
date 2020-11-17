@@ -48,14 +48,17 @@ class PayersGrid extends PureComponent {
             (item) => item.id === row.relationshipFK,
           )
 
-          if (relation.name === 'SELF') // auto populate payer
+          if (relation && relation.name === 'SELF') // auto populate payer
           {
-            const { entity } = this.props.patient
-            if(entity)
+            // console.log('relation',this.props.values) // formik.patientDetail?
+            // const { entity } = this.props.patient
+
+            const patientInfo = this.props.values || this.props.patient.entity
+            if(patientInfo)
             {
-              row.payerName = entity.name
-              row.payerID = entity.patientAccountNo
-              row.dob = entity.dob
+              row.payerName = patientInfo.name
+              row.payerID = patientInfo.patientAccountNo
+              row.dob = patientInfo.dob
 
             }
           }
@@ -67,6 +70,16 @@ class PayersGrid extends PureComponent {
           )
 
           if(patSchemeType.code !== 'FLEXIMEDI') return
+
+          // TODO: Throw validaiton to schema.js
+          const minAge = moment().subtract(65, 'years')
+          const payerAge = moment(row.dob)
+
+          console.log('dob',row.dob,payerAge)
+          if(payerAge && payerAge.isAfter(minAge))
+            notification.error({
+              message: 'Payer DOB must be equal or more than 65 for Flexi-Medisave',
+            })
 
           let st = [
             'SELF',

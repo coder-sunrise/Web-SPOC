@@ -68,10 +68,6 @@ export const NewMedisaveColumns = [
 ]
 
 export const NewMedisaveColumnExtensions = [
-  {
-    columnName: 'hrnNo',
-    width: 150,
-  },
   { columnName: 'visitDate', type: 'date' },
   { columnName: 'invoiceDate', type: 'date' },
   {

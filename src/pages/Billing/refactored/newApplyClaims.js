@@ -285,6 +285,9 @@ const ApplyClaims = ({
     {
       newVisitType = 'Vaccination'
       mediInvoiceItems = cdmpVaccinations
+      // first vaccination only? should allow flexibility
+      // const [firstItem] = cdmpVaccinations
+      // mediInvoiceItems = [firstItem]
     }
     if(cdmpScreenings && (copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500HS || copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE700HS)) 
     {

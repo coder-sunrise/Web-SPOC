@@ -92,6 +92,7 @@ const TableGrid = ({
     <CommonTableGrid
       getRowId={(row) => row.id}
       type={currentType()}
+      forceRender
       // rows={data}
       columns={columns}
       columnExtensions={columnExtensions}

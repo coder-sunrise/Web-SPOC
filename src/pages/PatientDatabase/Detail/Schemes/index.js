@@ -280,7 +280,7 @@ class Schemes extends PureComponent {
             Medisave Payer
           </h4>
           <PayersGrid
-            enableAdd={values.patientScheme && !isCreatingPatient ? values.patientScheme.find((o) => this.isMedisave(o.schemeTypeFK)) : false} // TODO: check is medisave added
+            enableAdd={values.patientScheme ? values.patientScheme.find((o) => this.isMedisave(o.schemeTypeFK)) : false} // TODO: check is medisave added
             rows={values.schemePayer}/* .map(sp => {
               const existScheme = values.patientScheme.find(p => !p.isDeleted && p.schemeTypeFK === sp.schemeFK)
               if(!existScheme && sp.schemeFK)

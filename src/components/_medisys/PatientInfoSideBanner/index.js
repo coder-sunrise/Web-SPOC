@@ -310,12 +310,12 @@ class PatientInfoSideBanner extends PureComponent {
         return {
           payerName: schemePayer.payerName,
           payerAccountNo: schemePayer.payerID,
-          balance: refreshData.finalBalance,
+          balance: refreshData.finalBalance >= 0 ? refreshData.finalBalance : '-',
           patientCoPaymentSchemeFK: balanceData.patientCoPaymentSchemeFK,
           schemeTypeFK: refreshData.schemeTypeFK,
           validFrom: schemeData.validFrom,
           validTo: schemeData.validTo,
-          // statusDescription: refreshData.statusDescription,
+          statusDescription: null,
           isSuccessful:
           refreshData.isSuccessful !== ''
               ? refreshData.isSuccessful
@@ -329,12 +329,12 @@ class PatientInfoSideBanner extends PureComponent {
     return {
       payerName: schemePayer.payerName,
       payerAccountNo: schemePayer.payerID,
-      balance: balanceData.balance ??  '',
+      balance: balanceData.balance >= 0 ? balanceData.balance : '-',
       patientCoPaymentSchemeFK: balanceData.patientCopaymentSchemeFK,
       schemeTypeFK: schemePayer.schemeFK,
       // validFrom: schemeData.validFrom,
       // validTo: schemeData.validTo,
-      statusDescription: errorData.statusDescription || '',
+      statusDescription: errorData.statusDescription,
       isSuccessful: errorData.isSuccessful || '',
     }
   }
@@ -490,7 +490,7 @@ class PatientInfoSideBanner extends PureComponent {
                               prefix='Balance:'
                               text
                               currency
-                              value={schemeData.balance}
+                              value={schemeData.balance || '-'}
                             />
                           ) : (
                             <TextField
@@ -537,7 +537,7 @@ class PatientInfoSideBanner extends PureComponent {
             {entity.schemePayer
               .filter((o) => this.isMedisave(o.schemeFK) && !o.isDeleted)
               .map((o) => {
-                // console.log('schemePayer',o)
+                console.log('schemePayer',o)
                 const schemeData = this.getSchemePayerDetails(o)
                 console.log('schemeData',schemeData)
                 return (
@@ -588,7 +588,7 @@ class PatientInfoSideBanner extends PureComponent {
                             prefix='Balance:'
                             text
                             currency
-                            value={schemeData.balance || '-'}
+                            value={schemeData.balance >= 0 ? schemeData.balance : '-'}
                           />
                         </p>
                       </div>

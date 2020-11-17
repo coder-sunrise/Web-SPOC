@@ -961,8 +961,7 @@ const getRefreshMedisaveBalanceStatus = (response = []) => {
     return { ...defaultResponse }
   }
 
-  const successCode = 'SUCCESS'
-  const fullBalanceSuccessCode = 'SC105'
+  const successCode = 'WN800'
   console.log('status',response)
   const { status, statusDescription } = response
 
