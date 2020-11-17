@@ -11,10 +11,10 @@ import {
   Accordion,
   DatePicker,
   dateFormatLong,
-  NumberInput,
   SizeContainer,
 } from '@/components'
 import model from './models'
+import PackageDrawdownAccordion from './PackageDrawdownAccordion'
 
 window.g_app.replaceModel(model)
 
@@ -35,7 +35,19 @@ const styles = (theme) => ({
     height: 'calc(100vh - 250px)',
     overflow: 'scroll',
   },
+  drawdownQuantity: {
+    marginLeft: theme.spacing(4),
+    fontWeight: 'bold',
+  },
+  drawdownInfo: {
+    fontWeight: 'bold',
+  },
+  drawdownRemarks: {
+    marginLeft: theme.spacing(3),
+  },
 })
+
+const parseToOneDecimalString = (value = 0.0) => value.toFixed(1)
 
 @connect(({ patient, patientPackageDrawdown }) => ({
   patient,
@@ -95,16 +107,29 @@ class PatientPackageDrawdown extends PureComponent {
   getDrawdownTitle = (row) => {
     const {
       itemName,
+      remainingQuantity,
+      totalQuantity,
     } = row
+
+    const totalDrawdownQuantity = totalQuantity - remainingQuantity
+    const label = `${itemName} (drawdown to-date: ${parseToOneDecimalString(totalDrawdownQuantity)} / ${parseToOneDecimalString(totalQuantity)})`
 
     return (
       <div>
-        <p>{itemName}</p>
+        {remainingQuantity > 0 && (
+        <p>{label}</p>
+        )
+        }
+        {remainingQuantity <= 0 && (
+        <p><font color='black'>{label}</font></p>
+        )
+        }
       </div>
     )
   }
 
   getDrawdownContent = (row) => {
+    const { classes } = this.props
     const {
       patientPackageDrawdownTransaction,
     } = row
@@ -112,16 +137,35 @@ class PatientPackageDrawdown extends PureComponent {
     return (
       <div>
         {patientPackageDrawdownTransaction.map((transaction) => {
+          const dateLabel = `on ${moment(transaction.transactionDate).format('DD MMM YYYY HH:mm')}`
+          let infoLabel = `${dateLabel} by ${transaction.performingUserName}`
+          if (transaction.transactionType === 'Transfer') {
+            if (transaction.transferFromPatient)
+              infoLabel = `${dateLabel} received from ${transaction.transferFromPatient}`
+            else
+              infoLabel = `${dateLabel} transferred to ${transaction.transferToPatient}`
+          }
+
           return (
-            <div>
-              <p>- <NumberInput
-                label=''
-                text
-                value={transaction.transactionQuantity}
-                precision={1}
-              />
-              </p>
-            </div>
+            <GridContainer>
+              <GridItem md={1}>
+                <p className={classes.drawdownQuantity}>
+                  - {parseToOneDecimalString(transaction.transactionQuantity)}           
+                </p>
+              </GridItem>
+              <GridItem md={11}>
+                <div>
+                  <p className={classes.drawdownInfo}>
+                    {infoLabel}
+                  </p>
+                  {transaction.remarks && (
+                    <p className={classes.drawdownRemarks}>
+                      Remark: {transaction.remarks}
+                    </p>
+                  )}
+                </div>
+              </GridItem>
+            </GridContainer>
           )
         })}
       </div>
@@ -162,18 +206,28 @@ class PatientPackageDrawdown extends PureComponent {
             }
             {!isCompleted && !isExpired && (
               <SizeContainer size='sm'>
-                <DatePicker 
-                  label='Exp. Date' 
-                  format={dateFormatLong} 
-                  value={expiryDate} 
-                  onChange={value => {
-                    const changedPacakge = values.find(p => p.id === id)
-                    if (changedPacakge) {
-                      changedPacakge.expiryDate = value || undefined
-                    }
-                  }              
+                <div 
+                  onClick={(e) => {
+                  e.stopPropagation()
+                }}
+                >
+                  <DatePicker 
+                    style={{
+                      width: 120, 
+                      marginTop: -2,
+                    }}
+                    label='Exp. Date' 
+                    format={dateFormatLong} 
+                    value={expiryDate} 
+                    onChange={value => {
+                      const changedPacakge = values.find(p => p.id === id)
+                      if (changedPacakge) {
+                        changedPacakge.expiryDate = value || undefined
+                      }
+                    }              
                 }
-                />
+                  />
+                </div>
               </SizeContainer>
               )
             }
@@ -197,9 +251,17 @@ class PatientPackageDrawdown extends PureComponent {
       patientPackageDrawdown,
     } = row
 
+    let expandArrary = []
+    let index = 0
+    patientPackageDrawdown.forEach(d => {
+      expandArrary.push(index)
+      index += 1
+    })
+
     return (
       <div>
-        <Accordion
+        <PackageDrawdownAccordion
+          defaultActive={expandArrary}
           leftIcon
           expandIcon={<SolidExpandMore fontSize='large' />}
           mode='multiple'
