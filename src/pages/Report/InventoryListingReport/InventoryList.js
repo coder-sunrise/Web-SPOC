@@ -93,7 +93,7 @@ class InventoryList extends PureComponent {
         type: 'currency',
         currency: true,
         precision: 4,
-        width: 120,
+        width: 140,
       },
       {
         columnName: 'amount',
