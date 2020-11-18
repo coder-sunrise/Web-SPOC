@@ -146,7 +146,7 @@ const constructSchemeList = (
           claimableSchemesIndex: index,
           nestedIndex: 0,
           disabled,
-          schemeName: scheme[0].coPaymentSchemeName.replace(' 500','').replace(' 700',''),
+          schemeName: scheme[0].coPaymentSchemeName,// .replace(' 500','').replace(' 700',''),
           schemePayerFK: scheme[0].schemePayerFK,
           payerName: newPayer ? newPayer.payerName : '',
           schemeTypeFK: schemeType.id,

@@ -56,6 +56,7 @@ class RejectedMedisave extends React.Component {
         payload: { claimIds: selectedRows },
       })
       .then((r) => {
+        console.log('onRefreshClicked',r)
         if (!r) {
           this.refreshDataGrid()
         }
@@ -112,6 +113,8 @@ class RejectedMedisave extends React.Component {
     } = this.props
     const { isLoading, selectedRows } = this.state
     const { list } = medisaveClaimSubmissionRejected || []
+
+    console.log('Rejected',list)
 
     return (
       <CardContainer
