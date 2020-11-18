@@ -30,10 +30,7 @@ class InventoryListingReport extends ReportBase {
 }
 
 const InventoryListingReportWithFormik = withFormik({
-  validationSchema: Yup.object().shape({
-    inventoryType: Yup.string().required(),
-    costPriceType: Yup.number().required(),
-  }),
+  validationSchema: Yup.object().shape({}),
   mapPropsToValues: () => ({
     inventoryType: 'MEDICATION',
     costPriceType: 1,

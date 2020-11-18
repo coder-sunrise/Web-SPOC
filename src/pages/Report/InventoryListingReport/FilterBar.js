@@ -31,6 +31,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                       { name: 'Consumable', value: 'CONSUMABLE' },
                       { name: 'Vaccination', value: 'VACCINATION' },
                     ]}
+                    allowClear={false}
                     onChange={(e) => {
                       if (e) {
                         fm.setFieldValue('items', undefined)
@@ -91,6 +92,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                     label='Cost Price Type'
                     {...args}
                     options={costPriceTypes}
+                    allowClear={false}
                   />
                 )
               }}
