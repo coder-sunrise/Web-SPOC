@@ -553,6 +553,7 @@ class PatientInfoSideBanner extends PureComponent {
                           value={schemeData.schemeTypeFK}
                         /> */}
                         Medisave                        
+                        {entity.isActive && (
                         <IconButton>
                           <Refresh
                             onClick={() =>
@@ -562,16 +563,16 @@ class PatientInfoSideBanner extends PureComponent {
                               )}
                           />
                         </IconButton>
+                        )}
                         
                         {/* <SchemePopover
                           isShowReplacementModal={
                             schemeData.isShowReplacementModal
                           }
                           handleRefreshChasBalance={() =>
-                            this.refreshMedisaveBalance(
-                              schemeData.patientCoPaymentSchemeFK,
-                              schemeData.schemeTypeFK,
-                              schemeData.schemePayer,
+                              this.refreshMedisaveBalance(
+                                schemeData.schemeTypeFK,
+                                schemeData.schemePayer,
                             )}
                           entity={entity}
                           schemeData={schemeData}
