@@ -10,3 +10,7 @@ export const savePatientPackage = (payload) => {
   return request(`${url}/${patientId}`, { method: 'PUT', body: payload })
 }
 
+export const transferPatientPackage = (payload) => {
+  return request(`${url}/transfer`, { method: 'PUT', body: payload })
+}
+

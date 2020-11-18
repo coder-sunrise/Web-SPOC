@@ -3,6 +3,7 @@ import { connect } from 'dva'
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 import moment from 'moment'
 import withStyles from '@material-ui/core/styles/withStyles'
+import BusinessCenterIcon from '@material-ui/icons/BusinessCenter'
 import {
   GridContainer,
   GridItem,
@@ -12,9 +13,11 @@ import {
   DatePicker,
   dateFormatLong,
   SizeContainer,
+  CommonModal,
 } from '@/components'
 import model from './models'
 import PackageDrawdownAccordion from './PackageDrawdownAccordion'
+import TransferPackage from './transferPackage'
 
 window.g_app.replaceModel(model)
 
@@ -44,6 +47,11 @@ const styles = (theme) => ({
   },
   drawdownRemarks: {
     marginLeft: theme.spacing(3),
+  },
+  transferButton: {
+    marginTop: -2,
+    marginLeft: theme.spacing(2),
+    backgroundColor: '#14bace',
   },
 })
 
@@ -80,6 +88,8 @@ const parseToOneDecimalString = (value = 0.0) => value.toFixed(1)
 class PatientPackageDrawdown extends PureComponent {
   state = {
     isAllPackageCompleted: false,
+    isShowPackageTransferModal: false,
+    selectedPackageDrawdown: {},
   }
 
   componentDidMount () {
@@ -104,7 +114,8 @@ class PatientPackageDrawdown extends PureComponent {
     })
   }
 
-  getDrawdownTitle = (row) => {
+  getDrawdownTitle = (row, isCompleted, isExpired) => {
+    const { classes } = this.props
     const {
       itemName,
       remainingQuantity,
@@ -115,15 +126,31 @@ class PatientPackageDrawdown extends PureComponent {
     const label = `${itemName} (drawdown to-date: ${parseToOneDecimalString(totalDrawdownQuantity)} / ${parseToOneDecimalString(totalQuantity)})`
 
     return (
-      <div>
+      <div className={classes.titleContainer}>
         {remainingQuantity > 0 && (
-        <p>{label}</p>
+          <p>{label}</p>
         )
         }
         {remainingQuantity <= 0 && (
-        <p><font color='black'>{label}</font></p>
+          <p><font color='black'>{label}</font></p>
         )
         }
+        {!isCompleted && !isExpired && (
+          <Button className={classes.transferButton}
+            size='sm'
+            justIcon
+            onClick={(e) => {
+              e.stopPropagation()
+
+              this.setState({
+                isShowPackageTransferModal: true,
+                selectedPackageDrawdown: row,
+              })
+            }}
+          >
+            <BusinessCenterIcon />
+          </Button>
+        )}
       </div>
     )
   }
@@ -208,8 +235,8 @@ class PatientPackageDrawdown extends PureComponent {
               <SizeContainer size='sm'>
                 <div 
                   onClick={(e) => {
-                  e.stopPropagation()
-                }}
+                    e.stopPropagation()
+                  }}
                 >
                   <DatePicker 
                     style={{
@@ -267,7 +294,7 @@ class PatientPackageDrawdown extends PureComponent {
           mode='multiple'
           collapses={patientPackageDrawdown.map((o) => {
             const returnValue = {
-              title: this.getDrawdownTitle(o),
+              title: this.getDrawdownTitle(o, row.isCompleted, row.isExpired),
               content: this.getDrawdownContent(o),
             }
             return {
@@ -280,6 +307,20 @@ class PatientPackageDrawdown extends PureComponent {
     )
   }
 
+  closePackageTransferModal = () => {
+    this.setState({
+      isShowPackageTransferModal: false,
+    })
+  }
+
+  confirmPackageTransferModal = () => {
+    this.setState({
+      isShowPackageTransferModal: false,
+    })
+
+    this.refreshPackageDrawdown()
+  }
+
   render () {
     const {
       patientPackageDrawdown: { list = [] },
@@ -289,12 +330,13 @@ class PatientPackageDrawdown extends PureComponent {
 
     if(list.length > 0) {      
       return (      
-        <GridContainer>
-          <GridItem md={12}>
-            <div className={classes.contentDiv}>
-              <Accordion
-                mode='multiple'
-                collapses={list.map((o) => {
+        <div>
+          <GridContainer>
+            <GridItem md={12}>
+              <div className={classes.contentDiv}>
+                <Accordion
+                  mode='multiple'
+                  collapses={list.map((o) => {
                   const returnValue = {
                     title: this.getPackageTitle(o),
                     content: this.getPackageContent(o),
@@ -304,22 +346,35 @@ class PatientPackageDrawdown extends PureComponent {
                     row: o,
                   }
                 })}
-              />
-            </div>
-          </GridItem>
-          <GridItem md={12}>
-            <Button 
-              color='primary' 
-              onClick={this.props.handleSubmit}
-              disabled={this.state.isAllPackageCompleted || patient.entity.isActive === false}
-            >
-              Save
-            </Button>
-            <Button color='primary'>
+                />
+              </div>
+            </GridItem>
+            <GridItem md={12}>
+              {!this.state.isAllPackageCompleted && patient.entity.isActive && (
+              <Button 
+                color='primary' 
+                onClick={this.props.handleSubmit}
+              >
+                Save
+              </Button>
+            )}
+              <Button color='primary'>
               Print
-            </Button>
-          </GridItem>
-        </GridContainer>
+              </Button>
+            </GridItem>
+          </GridContainer>
+
+          <CommonModal
+            cancelText='Cancel'
+            maxWidth='sm'
+            title='Transfering Package Item'
+            onClose={this.closePackageTransferModal}
+            onConfirm={this.confirmPackageTransferModal}
+            open={this.state.isShowPackageTransferModal}
+          >
+            <TransferPackage selectedPackageDrawdown={this.state.selectedPackageDrawdown} {...this.props} />
+          </CommonModal>
+        </div>
       )
     }
 
