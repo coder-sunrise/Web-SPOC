@@ -361,6 +361,9 @@ const getCautions = (
       type: orders.type,
       visitPurposeFK: orders.visitPurposeFK,
       drugCode: orders.type === '5' ? 'MISC' : undefined,
+      selectedMedication: {
+        medicationStock: [],
+      },
     })
     return true
   },
