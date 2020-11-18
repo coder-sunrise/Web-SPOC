@@ -84,7 +84,7 @@ class Details extends PureComponent {
     })
   }
 
-  gridGetRowID = (row) => row.invoiceNo
+  gridGetRowID = (row) => row.invoicePayerFK
 
   handleSelectionChange = (selection) => {
     this.setState({ selectedRows: selection })
@@ -96,13 +96,13 @@ class Details extends PureComponent {
     let selectedInvoiceNos = []
     this.state.selectedRows.forEach((o) => {
       const invoice = statement.entity.statementInvoice.find(
-        (r) => r.invoiceNo === o,
+        (r) => r.invoicePayerFK === o,
       )
       if (!invoice) {
         return
       }
       rows.push(invoice)
-      selectedInvoiceNos.push(invoice.invoiceNo)
+      selectedInvoiceNos.push(invoice.invoicePayerFK)
     })
     this.setState({
       extractRows: rows,
