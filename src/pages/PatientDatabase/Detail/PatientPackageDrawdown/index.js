@@ -51,7 +51,6 @@ const styles = (theme) => ({
   transferButton: {
     marginTop: -2,
     marginLeft: theme.spacing(2),
-    backgroundColor: '#14bace',
   },
 })
 
@@ -138,6 +137,7 @@ class PatientPackageDrawdown extends PureComponent {
         {!isCompleted && !isExpired && remainingQuantity > 0 && (
           <Button className={classes.transferButton}
             size='sm'
+            color='info'
             justIcon
             onClick={(e) => {
               e.stopPropagation()

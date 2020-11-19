@@ -61,7 +61,7 @@ class Signature extends React.Component {
   }
 
   render () {
-    const { classes, signatureName } = this.props
+    const { classes, signatureName, isEditable = true } = this.props
     return (
       <div>
         <GridContainer>
@@ -77,7 +77,7 @@ class Signature extends React.Component {
               lineWidth={6}
               lineColor='black'
               className={classes.container}
-              tool={Tools.Pencil}
+              tool={isEditable ? Tools.Pencil : Tools.None}
               fillColor='transparent'
               backgroundColor='transparent'
               forceValue
@@ -95,18 +95,22 @@ class Signature extends React.Component {
             justifyContent: 'center',
           }}
         >
-          <Button
-            color='primary'
-            icon={null}
-            onClick={this.onSubmitButtonClicked}
-          >
-            OK
-          </Button>
-          <Button color='danger' icon={null} onClick={this.clearSignature}>
-            clear
-          </Button>
+          {isEditable && (
+            <React.Fragment>
+              <Button
+                color='primary'
+                icon={null}
+                onClick={this.onSubmitButtonClicked}
+              >
+                OK
+              </Button>
+              <Button color='danger' icon={null} onClick={this.clearSignature}>
+                clear
+              </Button>
+            </React.Fragment>
+          )}
           <Button color='danger' icon={null} onClick={this.props.onClose}>
-            cancel
+            {isEditable ? 'Cancel' : 'Close'}
           </Button>
         </GridContainer>
       </div>

@@ -194,6 +194,21 @@ export default createFormViewModel({
           router.push(destinationUrl)
         }
       },
+      *savePackageAcknowledge ({ payload }, { call, put, take }) {
+        const response = yield call(service.savePackageAcknowledge, payload)
+        if (response) {
+          yield put({
+            type: 'query',
+            payload: {
+              id: payload.visitId,
+            },
+          })
+          yield take('billing/query/@@end')
+
+          return response
+        }
+        return false
+      },
     },
     reducers: {
       addItems (state, { payload }) {
