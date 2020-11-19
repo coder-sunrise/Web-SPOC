@@ -135,7 +135,7 @@ class PatientPackageDrawdown extends PureComponent {
           <p><font color='black'>{label}</font></p>
         )
         }
-        {!isCompleted && !isExpired && (
+        {!isCompleted && !isExpired && remainingQuantity > 0 && (
           <Button className={classes.transferButton}
             size='sm'
             justIcon
