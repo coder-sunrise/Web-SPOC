@@ -644,52 +644,48 @@ class Queue extends React.Component {
       }
       case '7': {
         // edit consultation
-        const valid = this.isAssignedDoctor(row)
-        if (valid) {
-          const version = Date.now()
-
-          dispatch({
-            type: `consultation/edit`,
-            payload: {
-              id: row.visitFK,
-              version,
-            },
-          }).then((o) => {
-            if (o)
-              if (o.updateByUserFK !== this.props.user.id) {
-                const { clinicianprofile = [] } = this.props.codetable
-                const editingUser = clinicianprofile.find(
-                  (m) => m.userProfileFK === o.updateByUserFK,
-                ) || {
-                  name: 'Someone',
-                }
-                dispatch({
-                  type: 'global/updateAppState',
-                  payload: {
-                    openConfirm: true,
-                    openConfirmContent: `${editingUser.name} is currently editing the patient note, do you want to overwrite?`,
-                    onConfirmSave: () => {
-                      dispatch({
-                        type: `consultation/overwrite`,
-                        payload: {
-                          id: row.visitFK,
-                          version,
-                        },
-                      }).then((c) => {
-                        router.push(
-                          `/reception/queue/consultation?qid=${row.id}&cid=${c.id}&pid=${row.patientProfileFK}&v=${version}`,
-                        )
-                      })
-                    },
-                  },
-                })
-              } else {
-                router.push(
-                  `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
-                )
+        const version = Date.now()
+        dispatch({
+          type: `consultation/edit`,
+          payload: {
+            id: row.visitFK,
+            version,
+          },
+        }).then((o) => {
+          if (o)
+            if (o.updateByUserFK !== this.props.user.id) {
+              const { clinicianprofile = [] } = this.props.codetable
+              const editingUser = clinicianprofile.find(
+                (m) => m.userProfileFK === o.updateByUserFK,
+              ) || {
+                name: 'Someone',
               }
-          })
-        }
+              dispatch({
+                type: 'global/updateAppState',
+                payload: {
+                  openConfirm: true,
+                  openConfirmContent: `${editingUser.name} is currently editing the patient note, do you want to overwrite?`,
+                  onConfirmSave: () => {
+                    dispatch({
+                      type: `consultation/overwrite`,
+                      payload: {
+                        id: row.visitFK,
+                        version,
+                      },
+                    }).then((c) => {
+                      router.push(
+                        `/reception/queue/consultation?qid=${row.id}&cid=${c.id}&pid=${row.patientProfileFK}&v=${version}`,
+                      )
+                    })
+                  },
+                },
+              })
+            } else {
+              router.push(
+                `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
+              )
+            }
+        })
         break
       }
       case '8': {

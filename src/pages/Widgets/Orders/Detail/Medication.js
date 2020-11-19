@@ -189,6 +189,10 @@ const getVisitDoctorUserId = props => {
       newCorPrescriptionItemDrugMixture,
       v.inventoryMedicationFK,
     )
+
+    const medication = inventorymedication.find(
+      (item) => item.id === v.inventoryMedicationFK,
+    )
     return {
       ...v,
       corPrescriptionItemPrecaution:
@@ -202,6 +206,9 @@ const getVisitDoctorUserId = props => {
           ? newCorPrescriptionItemDrugMixture
           : [],
       cautions,
+      selectedMedication: medication || {
+        medicationStock: [],
+      },
     }
   },
   enableReinitialize: true,
@@ -379,6 +386,9 @@ const getVisitDoctorUserId = props => {
       type: orders.type,
       visitPurposeFK: orders.visitPurposeFK,
       drugCode: orders.type === '5' ? 'MISC' : undefined,
+      selectedMedication: {
+        medicationStock: [],
+      },
       performingUserFK: getVisitDoctorUserId(props),
     })
     return true
@@ -387,9 +397,6 @@ const getVisitDoctorUserId = props => {
 })
 class Medication extends PureComponent {
   state = {
-    selectedMedication: {
-      medicationStock: [],
-    },
     batchNo: '',
     expiryDate: '',
     showAddFromPastModal: false,
@@ -440,7 +447,7 @@ class Medication extends PureComponent {
   calculateQuantity = (medication) => {
     const { codetable, setFieldValue, disableEdit, values } = this.props
     if (values.isDrugMixture || values.isPackage) return
-    let currentMedication = medication || this.state.selectedMedication
+    let currentMedication = medication || values.selectedMedication
 
     const { form } = this.descriptionArrayHelpers
     let newTotalQuantity = 0
@@ -533,7 +540,7 @@ class Medication extends PureComponent {
 
   setInstruction = (index = 0) => {
     const { setFieldValue, codetable, values } = this.props
-    const { selectedMedication } = this.state
+    const { selectedMedication } = values
     let op = selectedMedication
 
     if (!selectedMedication || !selectedMedication.id) {
@@ -619,7 +626,12 @@ class Medication extends PureComponent {
     }, [])
   }
 
-  changeMedication = (v, op = {}) => {
+  changeMedication = (
+    v,
+    op = {
+      medicationStock: [],
+    },
+  ) => {
     const { setFieldValue, values } = this.props
 
     let defaultBatch
@@ -636,10 +648,48 @@ class Medication extends PureComponent {
       corPrescriptionItemInstruction = [],
       corPrescriptionItemPrecaution = [],
     } = values
-    const defaultInstruction = {
+    let defaultInstruction = {
       sequence: 0,
       stepdose: 'AND',
     }
+
+    if (op.id) {
+      defaultInstruction = {
+        ...defaultInstruction,
+        usageMethodFK: op.medicationUsage ? op.medicationUsage.id : undefined,
+        usageMethodCode: op.medicationUsage
+          ? op.medicationUsage.code
+          : undefined,
+        usageMethodDisplayValue: op.medicationUsage
+          ? op.medicationUsage.name
+          : undefined,
+        dosageFK: op.prescribingDosage ? op.prescribingDosage.id : undefined,
+        dosageCode: op.prescribingDosage
+          ? op.prescribingDosage.code
+          : undefined,
+        dosageDisplayValue: op.prescribingDosage
+          ? op.prescribingDosage.name
+          : undefined,
+        prescribeUOMFK: op.prescribingUOM ? op.prescribingUOM.id : undefined,
+        prescribeUOMCode: op.prescribingUOM
+          ? op.prescribingUOM.code
+          : undefined,
+        prescribeUOMDisplayValue: op.prescribingUOM
+          ? op.prescribingUOM.name
+          : undefined,
+        drugFrequencyFK: op.medicationFrequency
+          ? op.medicationFrequency.id
+          : undefined,
+        drugFrequencyCode: op.medicationFrequency
+          ? op.medicationFrequency.code
+          : undefined,
+        drugFrequencyDisplayValue: op.medicationFrequency
+          ? op.medicationFrequency.name
+          : undefined,
+        duration: op.duration,
+      }
+    }
+
     const isEdit = !!values.id
     const newPrescriptionInstruction = isEdit
       ? [
@@ -666,15 +716,7 @@ class Medication extends PureComponent {
       )
     }
     setFieldValue('isActive', op.isActive)
-
-    this.setState(
-      {
-        selectedMedication: op,
-      },
-      () => {
-        this.setInstruction(newPrescriptionInstruction.length - 1)
-      },
-    )
+    setFieldValue('selectedMedication', op)
 
     if (
       op.inventoryMedication_MedicationPrecaution &&
@@ -791,6 +833,9 @@ class Medication extends PureComponent {
       type: orders.type,
       visitPurposeFK: orders.visitPurposeFK,
       drugCode: orders.type === '5' ? 'MISC' : undefined,
+      selectedMedication: {
+        medicationStock: [],
+      },
       performingUserFK: getVisitDoctorUserId(this.props),
     })
   }
@@ -839,32 +884,6 @@ class Medication extends PureComponent {
           },
         })
       }
-
-    const { values: nextValues } = nextProps
-    const { values: currentValues } = this.props
-    if (
-      !!nextValues.id &&
-      nextValues.id !== currentValues.id &&
-      nextValues.type === '1' // type === 'Medication'
-    ) {
-      const { codetable } = this.props
-      const { inventorymedication = [] } = codetable
-      const { inventoryMedicationFK } = nextValues
-      const medication = inventorymedication.find(
-        (item) => item.id === inventoryMedicationFK,
-      )
-
-      if (medication)
-        this.setState({
-          selectedMedication: medication,
-        })
-      else
-        this.setState({
-          selectedMedication: {
-            medicationStock: [],
-          },
-        })
-    }
   }
 
   onSearchMedicationHistory = async () => {
@@ -1358,6 +1377,9 @@ class Medication extends PureComponent {
                             isDrugMixture: e.target.value,
                             type: orders.type,
                             visitPurposeFK: orders.visitPurposeFK,
+                            selectedMedication: {
+                              medicationStock: [],
+                            },
                             performingUserFK: getVisitDoctorUserId(this.props),
                           })
 
@@ -1911,7 +1933,7 @@ class Medication extends PureComponent {
                       label='Batch No.'
                       labelField='batchNo'
                       valueField='batchNo'
-                      options={this.state.selectedMedication.medicationStock}
+                      options={values.selectedMedication.medicationStock}
                       onChange={(e, op = {}) => {
                         if (op && op.length > 0) {
                           const { expiryDate } = op[0]

@@ -23,13 +23,13 @@ class QueueProcessor extends PureComponent {
     this.props.dispatch({
       type: 'queueProcessor/query',
     })
-  } 
+  }
 
-  render () {  
+  render () {
     return (
       <CardContainer hideHeader>
         <Filter {...this.props} />
-        <Grid {...this.props} /> 
+        <Grid {...this.props} />
       </CardContainer>
     )
   }

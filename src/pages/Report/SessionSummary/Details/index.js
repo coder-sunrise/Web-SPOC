@@ -69,12 +69,22 @@ class SessionSummary extends ReportBase {
                 />
               </GridItem>
               <GridItem md={12} style={{ marginBottom: 8, marginTop: 18 }}>
-                <h5>Payment Collections for Past Invoices</h5>
+                <h5>Payment Collections for Past Invoices (Company)</h5>
               </GridItem>
               <GridItem md={12}>
                 <PaymentCollections
-                  PaymentCollectionsDetails={reportDatas.PastPaymentCollections}
-                  TotalDetails={reportDatas.PastPaymentTotal}
+                  PaymentCollectionsDetails={reportDatas.CompanyPastPaymentCollections}
+                  TotalDetails={reportDatas.CompanyPastPaymentTotal}
+                  isCompanyPaymentCollectionsForPast
+                />
+              </GridItem>
+              <GridItem md={12} style={{ marginBottom: 8, marginTop: 18 }}>
+                <h5>Payment Collections for Past Invoices (Private)</h5>
+              </GridItem>
+              <GridItem md={12}>
+                <PaymentCollections
+                  PaymentCollectionsDetails={reportDatas.PrivatePastPaymentCollections}
+                  TotalDetails={reportDatas.PrivatePastPaymentTotal}
                 />
               </GridItem>
             </Collapse.Panel>

@@ -46,7 +46,6 @@ const styles = () => ({
   enableReinitialize: true,
   mapPropsToValues: ({ statement }) => {
     const returnValue = statement.entity || statement.default
-    console.log(returnValue)
     const adminChargeValueType =
       returnValue.adminChargeValueType || 'Percentage'
     const adjustmentValueType = returnValue.adjustmentValueType || 'Percentage'
@@ -97,7 +96,7 @@ const styles = () => ({
         invoicePayerFK: o.copayerInvoicePayerId || o.invoicePayerFK,
         payableAmount: o.copayerPayableAmount || o.payableAmount,
         outstandingAmount: o.copayerOutstanding || o.outstandingAmount,
-        invoiceAmt: o.copayerPayableAmount || o.invoiceAmt,
+        invoiceAmt: o.invoiceAmt,
       }
 
       // check if the invoice is selected && is the invoice has existing payment
@@ -192,25 +191,8 @@ class AddNewStatement extends PureComponent {
         sortingEnabled: false,
         width: 100,
       },
-    ],
-    // currencyColumns: [
-    //   'amount',
-    //   'outstandingBalance',
-    // ],
-    // dateColumns: [
-    //   'invoiceDate',
-    // ],
-    invoiceRows: [
-      // {
-      //   id: 'PT-000001A',
-      //   invoiceNo: 'IV-000001',
-      //   invoiceDate: moment()
-      //     .add(Math.ceil(Math.random() * 100) - 100, 'days')
-      //     .format('LLL'),
-      //   patientName: 'Patient 01',
-      //   amount: 100,
-      //   outstandingBalance: 100,
-      // },
+    ], 
+    invoiceRows: [ 
     ],
     selectedRows: [],
   }
@@ -276,23 +258,49 @@ class AddNewStatement extends PureComponent {
       payload,
     }).then((invoiceList) => {
       if (invoiceList) {
-        const { data } = invoiceList.data
-        const newData = data.map((o) => {
-          return {
-            ...o,
-            payableAmount: o.copayerPayableAmount,
-            outstandingAmount: o.copayerOutstanding,
-          }
-        })
-
+        const { data } = invoiceList.data 
         let statementInvoices = []
         if (statement.entity) {
+          let newData = []
+          data.forEach((p) => {
+            p.invoicePayer.forEach((payer) => {
+              if (payer.payerTypeFK == 2 || payer.payerTypeFK == 4) {
+                let existsInStatement = values.statementInvoice.find(t => t.invoicePayerFK === payer.id)
+                if (!existsInStatement && payer.companyFK === copayerFK) {
+                  newData.push({
+                    ...p,
+                    invoiceFK: p.id,
+                    id: payer.id,
+                    copayerInvoicePayerId: payer.id,
+                    payableAmount: payer.payerDistributedAmt,
+                    outstandingAmount: payer.outStanding
+                  })
+                }
+              }
+            })
+          })
+
           statementInvoices = [
             ...values.statementInvoice,
             ...newData,
           ]
         } else {
-          statementInvoices = data
+          let records = []
+          data.forEach((p) => {
+            p.invoicePayer.forEach((payer) => {
+              if ((payer.payerTypeFK == 2 || payer.payerTypeFK == 4) && payer.companyFK === copayerFK) {
+                records.push({
+                  ...p,
+                  invoiceFK: p.id,
+                  id: payer.id,
+                  copayerInvoicePayerId: payer.id,
+                  copayerPayableAmount: payer.payerDistributedAmt,
+                  copayerOutstanding: payer.outStanding
+                })
+              }
+            })
+          })
+          statementInvoices = records
         }
 
         this.setState(() => {
@@ -339,9 +347,7 @@ class AddNewStatement extends PureComponent {
     const { classes, theme, values, handleSubmit, statement } = this.props
     const { invoiceRows, columns, columnExtensions } = this.state
     const { entity } = statement
-    const mode = entity && entity.id > 0 ? 'Edit' : 'Add'
-    // console.log('values', values)
-    // console.log('props', this.props)
+    const mode = entity && entity.id > 0 ? 'Edit' : 'Add' 
     return (
       <React.Fragment>
         <CardContainer hideHeader>
@@ -604,7 +610,6 @@ class AddNewStatement extends PureComponent {
                       if (type === 'payableAmount') {
                         if (rows && rows.length > 0) {
                           return rows.reduce((pre, cur) => {
-                            console.log({ cur })
                             if (
                               (values.selectedRows &&
                                 values.selectedRows.includes(cur.id)) ||

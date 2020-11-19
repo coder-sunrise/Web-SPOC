@@ -44,6 +44,7 @@ export default createListViewModel({
         statementAdjustment: 0,
         coPayerTypeFK: 1,
         isGSTEnabled: false,
+        isAutoGenerateStatementEnabled: false,
         contact: {
           contactAddress: [
             {

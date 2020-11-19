@@ -45,6 +45,7 @@ const statementSchema = Yup.object().shape({
       return {
         invoiceId: o.invoiceFK,
         copayerFK: o.copayerFK,
+        invoicePayerFK: o.invoicePayerFK,
         transferToStatementFK: o.transferToStatementFK,
       }
     })

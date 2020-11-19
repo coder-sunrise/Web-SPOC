@@ -84,11 +84,11 @@ class Grid extends PureComponent {
   }
 
   formatParameter = (row) => {
-    let type = row.queueProcessTypeFK 
+    let type = row.queueProcessTypeFK
     const { clinicSettings } = this.props
     const { systemTimeZoneInt } = clinicSettings.settings
     if (type === 1) {
-      let parameter = JSON.parse(row.data) 
+      let parameter = JSON.parse(row.data)
       return `Statement Date: ${moment.utc(parameter.StatementDate).add(systemTimeZoneInt, 'hours').format(dateFormatLong)}
       , Payment Terms: ${parameter.PaymentTerms} day(s)
       , Invoice Date From: ${parameter.InvoiceDateFrom ? moment.utc(parameter.InvoiceDateFrom).add(systemTimeZoneInt, 'hours').format(dateFormatLong) : '-'}

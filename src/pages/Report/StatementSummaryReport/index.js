@@ -13,6 +13,7 @@ import FilterBar from './FilterBar'
 import StatementList from './StatementList'
 import AgeingList from './AgeingList'
 import ReportBase from '../ReportBase'
+import StatementInvoiceList from './StatementInvoiceList'
 
 const reportId = 54
 const fileName = 'Statement Summary Report'
@@ -34,27 +35,44 @@ class StatementSummaryReport extends ReportBase {
   }
 
   renderFilterBar = (handleSubmit, isSubmitting) => {
-    return <FilterBar handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
+    return (
+      <FilterBar
+        handleSubmit={handleSubmit}
+        isSubmitting={isSubmitting}
+        values={this.props.values}
+        setFieldValue={this.props.setFieldValue}
+      />
+    )
   }
 
   renderContent = (reportDatas) => {
     if (!reportDatas) return null
-    const segments = reportDatas.ListingDetails[0].asAt ? [
-      {
-        title: <AccordionTitle title='Statement Summary' />,
-        content: <StatementList reportDatas={reportDatas} />,
-      },
-      {
-        title: <AccordionTitle title='Ageing Report' />,
-        content: <AgeingList reportDatas={reportDatas} />,
-      },
-    ] :
-    [
+    let segments = [
       {
         title: <AccordionTitle title='Statement Summary' />,
         content: <StatementList reportDatas={reportDatas} />,
       },
     ]
+
+    if (reportDatas.ListingDetails[0].isPrintDetails) {
+      segments = [
+        ...segments,
+        {
+          title: <AccordionTitle title='Statement Details' />,
+          content: <StatementInvoiceList reportDatas={reportDatas} />,
+        },
+      ]
+    }
+
+    if (reportDatas.ListingDetails[0].asAt) {
+      segments = [
+        ...segments,
+        {
+          title: <AccordionTitle title='Ageing Report' />,
+          content: <AgeingList reportDatas={reportDatas} />,
+        },
+      ]
+    }
 
     return (
       <Accordion
@@ -78,6 +96,7 @@ const StatementSummaryReportWithFormik = withFormik({
   mapPropsToValues: () => ({
     dateFrom: moment(new Date()).startOf('month').toDate(),
     dateTo: moment(new Date()).endOf('month').toDate(),
+    isPrintDetails: false,
   }),
 })(StatementSummaryReport)
 

@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
 import _ from 'lodash'
+import moment from 'moment'
 import { withStyles } from '@material-ui/core'
 import { connect } from 'dva'
 import Yup from '@/utils/yup'
@@ -36,8 +37,12 @@ const styles = (theme) => ({
 
 const itemSchema = Yup.object().shape({
   serviceCenterFK: Yup.string().required(),
-  costPrice: Yup.number().required(),
-  unitPrice: Yup.number().required(),
+  costPrice: Yup.number()
+    .required()
+    .min(0, 'Cost Price must be greater than or equal to $0.00'),
+  unitPrice: Yup.number()
+    .required()
+    .min(0, 'Unit Price must be greater than or equal to $0.00'),
 })
 
 const modalityItemSchema = Yup.object().shape({
@@ -108,6 +113,18 @@ const modalityItemSchema = Yup.object().shape({
       type: 'settingClinicService/upsert',
       payload: {
         ...restValues,
+        ctServiceCenter_ServiceNavigation: restValues.ctServiceCenter_ServiceNavigation.map(
+          (item) => {
+            return {
+              ...item,
+              effectiveStartDate:
+                item.effectiveStartDate || moment().formatUTC(),
+              effectiveEndDate:
+                item.effectiveEndDate ||
+                moment('2099-12-31T23:59:59').formatUTC(false),
+            }
+          },
+        ),
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
       },
@@ -492,8 +509,8 @@ class Detail extends PureComponent {
                             settingClinicService.entity ? (
                               this.state.hasActiveSession
                             ) : (
-                                false
-                              )
+                              false
+                            )
                           }
                           {...args}
                         />
