@@ -19,6 +19,8 @@ import {
 const styles = theme => ({})
 const generateStatementSchema = Yup.object().shape({
   statementDate: Yup.date().required(),
+  invoiceDateFrom: Yup.date().required(),
+  invoiceDateTo: Yup.date().required(),
   paymentTerms: Yup.number().required(),
 })
 @connect(({ statement }) => ({
