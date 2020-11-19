@@ -131,6 +131,7 @@ const DoctorEventForm = ({
               <DoctorProfileSelect
                 {...args}
                 valueField='clinicianProfile.userProfileFK'
+                localFilter={(option) => option.clinicianProfile.isActive}
               />
             )}
           />
