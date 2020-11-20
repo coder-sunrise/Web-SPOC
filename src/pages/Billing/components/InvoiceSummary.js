@@ -72,8 +72,18 @@ const InvoiceSummary = ({
     invoiceNo,
     isGstInclusive,
     outstandingBalance,
-  } = invoice
+  } = invoice 
+  
+  let totalCashRound = 0
+  for (var i = 0; i < invoicePayment.length; i++) {
+    if (!invoicePayment[i].isCancelled) {
+      for (let j = 0; j < invoicePayment[i].invoicePaymentMode.length; j++) {
+        let paymentMode = invoicePayment[i].invoicePaymentMode[j]
+        totalCashRound += paymentMode.cashRounding
+      }
+    }
 
+  }
   const handleConfirmDelete = useCallback(
     (id, toggleVisibleCallback) => {
       const payment = invoicePayment.find(
@@ -189,6 +199,12 @@ const InvoiceSummary = ({
                 handleConfirmDelete={handleConfirmDelete}
                 handlePrintReceiptClick={handlePrintReceiptClick}
               />
+            </GridItem>
+            <GridItem md={6}>
+              Cash Rounding
+            </GridItem>
+            <GridItem md={6} className={classes.rightAlign}>
+              <NumberInput currency text value={totalCashRound} style={{ padding: '0px 8px' }} />
             </GridItem>
             <GridItem md={12}>
               <Divider
