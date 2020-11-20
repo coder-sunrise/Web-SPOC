@@ -7,8 +7,8 @@ export const query = (params) =>
   request(`${url}?cannedTextTypeId=${params}`, {
     method: 'GET',
   })
-export const moveCannedText = async (params) => {
-  await request(`${url}/MoveCannedText`, {
+export const changeOrder = async (params) => {
+  await request(`${url}/ChangeOrder`, {
     method: 'PUT',
     body: params,
   })

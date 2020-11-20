@@ -29,8 +29,10 @@ const Editor = ({
   setValues,
   user,
   cannedTextTypeFK,
+  resetForm,
 }) => {
   const handleCancelClick = () => {
+    resetForm()
     onCancel()
     setValues({ ...defaultEntity, ownedByUserFK: user.id, cannedTextTypeFK })
   }
@@ -78,7 +80,10 @@ const Editor = ({
   )
 }
 
-const handleSubmit = async (values, { props, onConfirm, setValues }) => {
+const handleSubmit = async (
+  values,
+  { props, onConfirm, setValues, resetForm },
+) => {
   const { dispatch, cannedTextTypeFK, handleEditorConfirmClick, user } = props
   const response = await dispatch({
     type: 'cannedText/upsert',
@@ -87,6 +92,7 @@ const handleSubmit = async (values, { props, onConfirm, setValues }) => {
 
   if (response) {
     if (onConfirm) onConfirm()
+    resetForm()
     handleEditorConfirmClick()
     setValues({ ...defaultEntity, ownedByUserFK: user.id, cannedTextTypeFK })
   }

@@ -62,8 +62,8 @@ export default createFormViewModel({
         }
         return false
       },
-      *moveCannedText ({ payload }, { call, put }) {
-        const response = yield call(service.moveCannedText, payload)
+      *changeOrder ({ payload }, { call, put }) {
+        const response = yield call(service.changeOrder, payload)
         return response
       },
     },

@@ -42,9 +42,9 @@ const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
     setEditEntity,
   ] = useState(undefined)
 
-  const moveCannedText = (payload) => {
+  const changeOrder = (payload) => {
     dispatch({
-      type: 'cannedText/moveCannedText',
+      type: 'cannedText/changeOrder',
       payload,
     }).then(() => {
       dispatch({
@@ -87,20 +87,19 @@ const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
 
   const handleRowDrop = (rows, oldIndex, newIndex) => {
     if (oldIndex !== newIndex) {
-      const moveCannedTextId = rows[newIndex].id
-      let nearCannedTextId
-      let insertType
+      const currentCannedTextId = rows[newIndex].id
+      let targetCannedTextId
+      let isInsertBefore = false
       if (newIndex < rows.length - 1) {
-        nearCannedTextId = rows[newIndex + 1].id
-        insertType = 'Before'
+        targetCannedTextId = rows[newIndex + 1].id
+        isInsertBefore = true
       } else {
-        nearCannedTextId = rows[newIndex - 1].id
-        insertType = 'After'
+        targetCannedTextId = rows[newIndex - 1].id
       }
-      moveCannedText({
-        moveCannedTextId,
-        nearCannedTextId,
-        insertType,
+      changeOrder({
+        currentCannedTextId,
+        targetCannedTextId,
+        isInsertBefore,
       })
     }
   }
