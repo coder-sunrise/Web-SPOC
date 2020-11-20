@@ -47,7 +47,10 @@ export default createFormViewModel({
         yield all(queryDone)
       },
       *queryPrevDoctorNotes ({ payload }, { call, put }) {
-        const response = yield call(patientHistoryService.queryPrevDoctorNotes, payload)
+        const response = yield call(
+          patientHistoryService.queryPrevDoctorNotes,
+          payload,
+        )
         if (response.status === '200') {
           yield put({
             type: 'updateState',
@@ -58,6 +61,10 @@ export default createFormViewModel({
           return response.data
         }
         return false
+      },
+      *moveCannedText ({ payload }, { call, put }) {
+        const response = yield call(service.moveCannedText, payload)
+        return response
       },
     },
     reducers: {
@@ -93,10 +100,6 @@ export default createFormViewModel({
 
         const result = data.reduce(splitByCannedTextType, { ...restState })
         return { ...state, ...result }
-      },
-      setList (state, { payload }) {
-        const { field, list } = payload
-        return { ...state, [field]: list }
       },
       setSelectedNote (state, { payload }) {
         return { ...state, selectedNote: payload }

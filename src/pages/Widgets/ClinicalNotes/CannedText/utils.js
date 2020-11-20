@@ -1,4 +1,5 @@
 import { EditorState, ContentState } from 'draft-js'
+import _ from 'lodash'
 import htmlToDraft from 'html-to-draftjs'
 import { Checkbox } from '@/components'
 import { htmlDecodeByRegExp } from '@/utils/utils'
@@ -18,15 +19,21 @@ export const columns = [
   { name: 'isShared', title: 'Is Shared' },
   { name: 'actions', title: 'Action' },
 ]
+export const columnsOthers = [
+  { name: 'title', title: 'Title' },
+  { name: 'text', title: 'Canned Text' },
+]
 
 export const columnExtensions = [
   {
     columnName: 'drag',
     width: 100,
+    sortingEnabled: false,
   },
   {
     columnName: 'title',
     width: '25%',
+    sortingEnabled: false,
   },
   {
     columnName: 'text',
@@ -41,11 +48,13 @@ export const columnExtensions = [
       }
       return ''
     },
+    sortingEnabled: false,
   },
   {
     columnName: 'isShared',
     width: 90,
     render: (row) => <Checkbox checked={row.isShared} simple disabled />,
+    sortingEnabled: false,
   },
 ]
 
@@ -63,11 +72,34 @@ export const generateData = () => {
   return data
 }
 
-export const applyFilter = (filter, rows) => {
+export const applyFilter = (filter, rows, showType, userID) => {
   let returnData = [
     ...rows,
   ]
-  if (filter !== '') {
+  if (showType === 'Self') {
+    returnData = _.orderBy(
+      returnData.filter((o) => o.ownedByUserFK === userID),
+      [
+        'sortOrder',
+        'title',
+      ],
+      [
+        'asc',
+      ],
+    )
+  } else {
+    returnData = _.orderBy(
+      returnData.filter((o) => o.ownedByUserFK !== userID),
+      [
+        'title',
+      ],
+      [
+        'asc',
+      ],
+    )
+  }
+
+  if (filter && filter !== '') {
     returnData = returnData.filter((each) => {
       const { title, text } = each
       const contentBlock = htmlToDraft(htmlDecodeByRegExp(text))

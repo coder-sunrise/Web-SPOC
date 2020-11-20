@@ -9,7 +9,7 @@ import { DeleteWithPopover } from '@/components/_medisys'
 import Filterbar from './Filterbar'
 import Editor from './Editor'
 // utils
-import { applyFilter, columns, columnExtensions } from './utils'
+import { applyFilter, columns, columnExtensions, columnsOthers } from './utils'
 
 const styles = (theme) => ({
   root: {
@@ -33,17 +33,28 @@ const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
   ] = useState('')
 
   const [
+    showType,
+    setShowType,
+  ] = useState('Self')
+
+  const [
     editEntity,
     setEditEntity,
   ] = useState(undefined)
 
-  const setList = (_list) => {
+  const moveCannedText = (payload) => {
     dispatch({
-      type: 'cannedText/setList',
-      payload: {
-        field: selectedNote.fieldName,
-        list: _list,
-      },
+      type: 'cannedText/moveCannedText',
+      payload,
+    }).then(() => {
+      dispatch({
+        type: 'cannedText/query',
+        payload: selectedNote.cannedTextTypeFK,
+      }).then(() => {
+        dispatch({
+          type: 'global/incrementCommitCount',
+        })
+      })
     })
   }
 
@@ -61,6 +72,10 @@ const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
       dispatch({
         type: 'cannedText/query',
         payload: selectedNote.cannedTextTypeFK,
+      }).then(() => {
+        dispatch({
+          type: 'global/incrementCommitCount',
+        })
       })
     }
   }
@@ -68,20 +83,30 @@ const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
   const onEditClick = (id) => {
     const entity = list.find((item) => item.id === id)
     setEditEntity(entity)
-    dispatch({
-      type: 'global/incrementCommitCount',
-    })
   }
 
-  const handleRowDrop = (rows) => {
-    setList(rows)
+  const handleRowDrop = (rows, oldIndex, newIndex) => {
+    if (oldIndex !== newIndex) {
+      const moveCannedTextId = rows[newIndex].id
+      let nearCannedTextId
+      let insertType
+      if (newIndex < rows.length - 1) {
+        nearCannedTextId = rows[newIndex + 1].id
+        insertType = 'Before'
+      } else {
+        nearCannedTextId = rows[newIndex - 1].id
+        insertType = 'After'
+      }
+      moveCannedText({
+        moveCannedTextId,
+        nearCannedTextId,
+        insertType,
+      })
+    }
   }
 
   const clearEditEntity = () => {
     setEditEntity(undefined)
-    dispatch({
-      type: 'global/incrementCommitCount',
-    })
   }
 
   const handleSearch = (value) => {
@@ -89,6 +114,15 @@ const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
   }
 
   const handleEditorConfirmClick = () => {
+    dispatch({
+      type: 'cannedText/query',
+      payload: selectedNote.cannedTextTypeFK,
+    }).then(() => {
+      dispatch({
+        type: 'global/incrementCommitCount',
+      })
+    })
+
     clearEditEntity()
   }
 
@@ -124,31 +158,36 @@ const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
 
   return (
     <div className={classes.root} style={{ maxHeight }}>
-      <h5>New Canned Text</h5>
+      <h5>{!editEntity ? 'New Canned Text' : 'Edit Canned Text'}</h5>
       <Editor
         dispatch={dispatch}
         entity={editEntity}
         onCancel={handleEditorCancelClick}
-        onConfirm={handleEditorConfirmClick}
+        handleEditorConfirmClick={handleEditorConfirmClick}
         user={user}
         cannedTextTypeFK={selectedNote.cannedTextTypeFK}
       />
       <h5>Canned Text List</h5>
       <CardContainer hideHeader>
-        <Filterbar onSearchClick={handleSearch} />
+        <Filterbar
+          onSearchClick={handleSearch}
+          showType={showType}
+          setShowType={setShowType}
+        />
         <DragableTableGrid
-          dataSource={applyFilter(filter, list)}
-          columns={columns}
+          dataSource={applyFilter(filter, list, showType, user.id)}
+          columns={showType === 'Self' ? columns : columnsOthers}
+          disableDrag={editEntity}
           columnExtensions={[
             ...columnExtensions,
             {
               columnName: 'actions',
               width: 110,
               render: ActionButtons,
+              sortingEnabled: false,
             },
           ]}
           onRowDrop={handleRowDrop}
-          handleCommitChanges={handleRowDrop}
         />
       </CardContainer>
     </div>

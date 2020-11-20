@@ -54,11 +54,12 @@ const DragableTableGrid = ({
   onRowDrop,
   handleCommitChanges,
   height,
+  disableDrag,
   ...restGridProps
 }) => {
   const onSortEnd = ({ newIndex, oldIndex }) => {
     const newRows = arrayMove(dataSource, oldIndex, newIndex)
-    onRowDrop(newRows)
+    onRowDrop(newRows, oldIndex, newIndex)
     dispatch({
       type: 'global/incrementCommitCount',
     })
@@ -105,7 +106,20 @@ const DragableTableGrid = ({
       return (
         <Table.Cell {...restProps}>
           <div className={classes.dragCellContainer}>
-            <DragHandle />
+            {disableDrag ? (
+              <Tooltip title='Disable Drag'>
+                <span
+                  style={{
+                    ...restProps.style,
+                    ...{ cursor: 'move', paddingTop: 4, margin: '0px 8px' },
+                  }}
+                >
+                  <ReOrder disabled />
+                </span>
+              </Tooltip>
+            ) : (
+              <DragHandle />
+            )}
             {/* <Checkbox
               style={{ display: 'inline-block' }}
               simple

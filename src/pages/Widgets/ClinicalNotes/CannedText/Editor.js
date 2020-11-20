@@ -22,10 +22,17 @@ const defaultEntity = {
   ownedByUserFK: undefined,
 }
 
-const Editor = ({ values, resetForm, onCancel, handleSubmit }) => {
+const Editor = ({
+  values,
+  onCancel,
+  handleSubmit,
+  setValues,
+  user,
+  cannedTextTypeFK,
+}) => {
   const handleCancelClick = () => {
-    resetForm(defaultEntity)
     onCancel()
+    setValues({ ...defaultEntity, ownedByUserFK: user.id, cannedTextTypeFK })
   }
   const isEdit = values.id !== undefined
   return (
@@ -35,11 +42,7 @@ const Editor = ({ values, resetForm, onCancel, handleSubmit }) => {
           <FastField
             name='title'
             render={(args) => (
-              <TextField
-                label='Canned Text Title'
-                {...args}
-                autocomplete='off'
-              />
+              <TextField label='Canned Text Title' autoFocus {...args} />
             )}
           />
         </GridItem>
@@ -53,16 +56,7 @@ const Editor = ({ values, resetForm, onCancel, handleSubmit }) => {
           <FastField
             name='text'
             render={(args) => (
-              <RichEditor
-                strongLabel
-                label='Canned Text'
-                {...args}
-                // onBlur={(html, text) => {
-                //   const decodedHtml = htmlDecodeByRegExp(html)
-                //   setFieldValue('plainText', text)
-                //   setFieldValue('htmlCannedText', decodedHtml)
-                // }}
-              />
+              <RichEditor strongLabel label='Canned Text' {...args} />
             )}
           />
         </GridItem>
@@ -84,20 +78,17 @@ const Editor = ({ values, resetForm, onCancel, handleSubmit }) => {
   )
 }
 
-const handleSubmit = async (values, { props, resetForm }) => {
-  const { dispatch, onConfirm, cannedTextTypeFK } = props
+const handleSubmit = async (values, { props, onConfirm, setValues }) => {
+  const { dispatch, cannedTextTypeFK, handleEditorConfirmClick, user } = props
   const response = await dispatch({
     type: 'cannedText/upsert',
     payload: values,
   })
 
   if (response) {
-    dispatch({
-      type: 'cannedText/query',
-      payload: cannedTextTypeFK,
-    })
-    if (onConfirm) onConfirm(response)
-    resetForm()
+    if (onConfirm) onConfirm()
+    handleEditorConfirmClick()
+    setValues({ ...defaultEntity, ownedByUserFK: user.id, cannedTextTypeFK })
   }
 }
 
