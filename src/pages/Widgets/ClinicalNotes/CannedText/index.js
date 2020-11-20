@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { connect } from 'dva'
+import _ from 'lodash'
 // material ui
 import { withStyles } from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
@@ -132,29 +133,22 @@ const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
   const ActionButtons = (row) => {
     const handleDeleteClick = () => onDeleteClick(row.id)
     const handleEditClick = () => onEditClick(row.id)
-    const isOwnCannedText = row.ownedByUserFK === user.id
     return (
       <React.Fragment>
         <Tooltip title='Edit'>
-          <Button
-            justIcon
-            color='primary'
-            onClick={handleEditClick}
-            disabled={!isOwnCannedText}
-          >
+          <Button justIcon color='primary' onClick={handleEditClick}>
             <Edit />
           </Button>
         </Tooltip>
         <DeleteWithPopover
           onConfirmDelete={handleDeleteClick}
-          disabled={!!editEntity || !isOwnCannedText}
+          disabled={row.isEdit}
         />
       </React.Fragment>
     )
   }
 
   const maxHeight = height ? height - 150 : defaultMaxHeight
-
   return (
     <div className={classes.root} style={{ maxHeight }}>
       <h5>{!editEntity ? 'New Canned Text' : 'Edit Canned Text'}</h5>
@@ -174,7 +168,13 @@ const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
           setShowType={setShowType}
         />
         <DragableTableGrid
-          dataSource={applyFilter(filter, list, showType, user.id)}
+          dataSource={applyFilter(
+            filter,
+            list,
+            showType,
+            user.id,
+            !_.isEmpty(editEntity),
+          )}
           columns={showType === 'Self' ? columns : columnsOthers}
           disableDrag={editEntity}
           columnExtensions={[

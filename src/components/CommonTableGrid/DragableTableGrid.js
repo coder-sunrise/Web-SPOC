@@ -104,19 +104,22 @@ const DragableTableGrid = ({
     }
     if (column.name === 'drag') {
       return (
-        <Table.Cell {...restProps}>
+        <Table.Cell {...restProps} style={{ paddingLeft: 10, paddingRiht: 0 }}>
           <div className={classes.dragCellContainer}>
             {disableDrag ? (
-              <Tooltip title='Disable Drag'>
-                <span
-                  style={{
-                    ...restProps.style,
-                    ...{ cursor: 'move', paddingTop: 4, margin: '0px 8px' },
-                  }}
-                >
-                  <ReOrder disabled />
-                </span>
-              </Tooltip>
+              <span
+                style={{
+                  ...restProps.style,
+                  ...{
+                    cursor: 'not-allowed',
+                    paddingTop: 4,
+                    margin: '0px 8px',
+                  },
+                  color: 'gray',
+                }}
+              >
+                <ReOrder />
+              </span>
             ) : (
               <DragHandle />
             )}
@@ -154,6 +157,7 @@ const DragableTableGrid = ({
     <CommonTableGrid
       rows={dataSource}
       getRowId={(row) => row.id}
+      forceRender
       columns={columns}
       columnExtensions={columnExtensions}
       ActionProps={{

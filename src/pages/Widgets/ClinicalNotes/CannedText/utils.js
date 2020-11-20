@@ -27,7 +27,7 @@ export const columnsOthers = [
 export const columnExtensions = [
   {
     columnName: 'drag',
-    width: 100,
+    width: 60,
     sortingEnabled: false,
   },
   {
@@ -53,7 +53,15 @@ export const columnExtensions = [
   {
     columnName: 'isShared',
     width: 90,
-    render: (row) => <Checkbox checked={row.isShared} simple disabled />,
+    align: 'center',
+    render: (row) => (
+      <Checkbox
+        style={{ marginLeft: 30 }}
+        checked={row.isShared}
+        simple
+        disabled
+      />
+    ),
     sortingEnabled: false,
   },
 ]
@@ -72,9 +80,11 @@ export const generateData = () => {
   return data
 }
 
-export const applyFilter = (filter, rows, showType, userID) => {
+export const applyFilter = (filter, rows, showType, userID, isEdit) => {
   let returnData = [
-    ...rows,
+    ...rows.map((o) => {
+      return { ...o, isEdit }
+    }),
   ]
   if (showType === 'Self') {
     returnData = _.orderBy(
