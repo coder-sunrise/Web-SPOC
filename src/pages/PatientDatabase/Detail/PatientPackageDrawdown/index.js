@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'dva'
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 import moment from 'moment'
@@ -48,6 +48,12 @@ const styles = (theme) => ({
   drawdownRemarks: {
     marginLeft: theme.spacing(3),
   },
+  drawdownGrid: {
+    marginTop: theme.spacing(1),
+  },
+  acknowledgeInfo: {
+    marginLeft: theme.spacing(2),
+  },
   transferButton: {
     marginTop: -2,
     marginLeft: theme.spacing(2),
@@ -84,7 +90,7 @@ const parseToOneDecimalString = (value = 0.0) => value.toFixed(1)
   },
   displayName: 'PatientPackageDrawdown',
 })
-class PatientPackageDrawdown extends PureComponent {
+class PatientPackageDrawdown extends Component {
   state = {
     isAllPackageCompleted: false,
     isShowPackageTransferModal: false,
@@ -174,7 +180,7 @@ class PatientPackageDrawdown extends PureComponent {
           }
 
           return (
-            <GridContainer>
+            <GridContainer className={classes.drawdownGrid}>
               <GridItem md={1}>
                 <p className={classes.drawdownQuantity}>
                   - {parseToOneDecimalString(transaction.transactionQuantity)}           
@@ -182,9 +188,14 @@ class PatientPackageDrawdown extends PureComponent {
               </GridItem>
               <GridItem md={11}>
                 <div>
-                  <p className={classes.drawdownInfo}>
-                    {infoLabel}
-                  </p>
+                  <div className={classes.titleContainer}>
+                    <p className={classes.drawdownInfo}>
+                      {infoLabel}
+                    </p>
+                    {transaction.transactionQuantity > 0 && transaction.signatureDate && (
+                    <p className={classes.acknowledgeInfo}><font color='red'>(Acknowledged on {moment(transaction.signatureDate).format('DD MMM YYYY')})</font></p>
+                  )}
+                  </div>
                   {transaction.remarks && (
                     <p className={classes.drawdownRemarks}>
                       Remark: {transaction.remarks}

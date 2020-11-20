@@ -20,7 +20,7 @@ import {
 import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
 // common utils
 import { roundTo } from '@/utils/utils'
-import { INVOICE_PAYER_TYPE } from '@/utils/constants'
+import { INVOICE_PAYER_TYPE, PACKAGE_SIGNATURE_CHECK_OPTION } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
 // sub component
 import PatientBanner from '@/pages/PatientDashboard/Banner'
@@ -426,14 +426,51 @@ class Billing extends Component {
     return false
   }
 
-  onCompletePaymentClick = async () => {
+  checkPackageSignature = () => {
+    const { dispatch, values, clinicSettings } = this.props
+    const { packageRedeemAcknowledge } = values
+    const { isEnablePackage, isCheckPackageSignature } = clinicSettings
+    const isExistingPackageSignature = packageRedeemAcknowledge &&
+                                        packageRedeemAcknowledge.signature !== '' && 
+                                        packageRedeemAcknowledge.signature !== undefined
+
+    if (!isEnablePackage || !this.state.isConsumedPackage)
+      return this.checkInvoiceOutstanding()
+
+    if (isCheckPackageSignature.toLowerCase() === PACKAGE_SIGNATURE_CHECK_OPTION.IGNORE.toLowerCase() || isExistingPackageSignature) 
+      return this.checkInvoiceOutstanding()
+    
+    if (isCheckPackageSignature.toLowerCase() === PACKAGE_SIGNATURE_CHECK_OPTION.OPTIONAL.toLowerCase()) {
+      return dispatch({
+        type: 'global/updateState',
+        payload: {
+          openConfirm: true,
+          openConfirmTitle: '',
+          openConfirmText: 'Confirm',
+          openConfirmContent:
+            'Patient signature is not provided, confirm to complete billing?',
+          onConfirmSave: () => {
+            this.checkInvoiceOutstanding()
+          },
+        },
+      })
+    }
+    if (isCheckPackageSignature.toLowerCase() === PACKAGE_SIGNATURE_CHECK_OPTION.MANDATORY.toLowerCase()) {
+      notification.error({ message: 'Patient signature is mandatory for package acknowledgement' })
+      return false
+    }
+    return false
+  }
+
+  checkInvoiceOutstanding = async () => {
     const { dispatch, values, setFieldValue } = this.props
     await setFieldValue('mode', 'save')
     await setFieldValue('visitStatus', 'COMPLETED')
-
-    // check if invoice is OVERPAID and prompt user for confirmation
+    
     const { invoice, invoicePayer = [] } = values
     const { outstandingBalance = 0 } = invoice
+
+    // check if invoice is OVERPAID and prompt user for confirmation
     if (
       outstandingBalance < 0 ||
       invoicePayer.find((ip) => ip.payerOutstanding < 0)
@@ -451,6 +488,11 @@ class Billing extends Component {
       })
     }
     return this.upsertBilling()
+  }
+
+  onCompletePaymentClick = async () => {
+    // check package acknowledge 
+    this.checkPackageSignature()      
   }
 
   onPrintReceiptClick = (invoicePaymentID) => {

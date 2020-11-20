@@ -69,7 +69,7 @@ const PackageDrawdownInfo = ({ drawdownData = {}, asAtDate }) => {
       const { packageDrawdown } = drawdownData
       if (packageDrawdown) {       
         if (packageDrawdown.packageDrawdownTransaction && packageDrawdown.packageDrawdownTransaction.length > 0) { 
-          drawdownTransaction = packageDrawdown.packageDrawdownTransaction.filter(t => t.consumeDate < asAtDate)
+          drawdownTransaction = packageDrawdown.packageDrawdownTransaction.filter(t => t.consumeDate < asAtDate && t.consumeQuantity > 0)
           lastDrawdownTransaction = drawdownTransaction[0]
         }
 

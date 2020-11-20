@@ -534,3 +534,9 @@ export const DURATION_UNIT = {
   MONTH: 3,
   YEAR: 4,
 }
+
+export const PACKAGE_SIGNATURE_CHECK_OPTION = {
+  MANDATORY: 'Mandatory',
+  OPTIONAL: 'Optional',
+  IGNORE: 'Ignore',
+}
