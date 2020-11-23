@@ -16,6 +16,7 @@ import Payments from './Payments'
 // utils
 import { roundTo } from '@/utils/utils'
 import config from '@/utils/config'
+import _ from 'lodash'
 
 const { currencyFormat } = config
 
@@ -72,7 +73,12 @@ const InvoiceSummary = ({
     invoiceNo,
     isGstInclusive,
     outstandingBalance,
-  } = invoice
+  } = invoice 
+  
+  let totalCashRound = 0
+  invoicePayment.filter(o => !o.isCancelled).forEach(o => {
+    totalCashRound += _.sumBy(o.invoicePaymentMode || [], (payment) => payment.cashRounding)
+  })  
 
   const handleConfirmDelete = useCallback(
     (id, toggleVisibleCallback) => {
@@ -189,6 +195,12 @@ const InvoiceSummary = ({
                 handleConfirmDelete={handleConfirmDelete}
                 handlePrintReceiptClick={handlePrintReceiptClick}
               />
+            </GridItem>
+            <GridItem md={6}>
+              Cash Rounding
+            </GridItem>
+            <GridItem md={6} className={classes.rightAlign}>
+              <NumberInput currency text value={totalCashRound} style={{ padding: '0px 8px' }} />
             </GridItem>
             <GridItem md={12}>
               <Divider

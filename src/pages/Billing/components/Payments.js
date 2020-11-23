@@ -48,7 +48,7 @@ const Payments = ({
       [classes.crossed]: item.isCancelled,
       [classes.inline]: true,
     })
-
+ 
     const onPrintClick = () => handlePrintReceiptClick(item.id)
 
     return (

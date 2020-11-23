@@ -57,20 +57,6 @@ const SessionDetails = ({ sessionDetails, companyDetails }) => {
           value={sessionDetails.totalSessionOutstandingBalance}
         />
       </GridItem>
-      <GridItem md={3} style={{ marginBottom: 16 }}>
-        <NumberInput
-          label='Company Payable Amt.'
-          disabled
-          currency
-          value={
-            companyDetails.totalCompanyAmount ? (
-              companyDetails.totalCompanyAmount
-            ) : (
-              0
-            )
-          }
-        />
-      </GridItem>
     </GridContainer>
   )
 }
