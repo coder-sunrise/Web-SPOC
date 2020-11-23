@@ -181,7 +181,7 @@ const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
             ...columnExtensions,
             {
               columnName: 'actions',
-              width: 110,
+              width: 80,
               render: ActionButtons,
               sortingEnabled: false,
             },

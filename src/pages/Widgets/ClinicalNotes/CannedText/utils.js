@@ -17,6 +17,7 @@ export const columns = [
   { name: 'title', title: 'Title' },
   { name: 'text', title: 'Canned Text' },
   { name: 'isShared', title: 'Is Shared' },
+  { name: 'sortOrder', title: 'Sort Order' },
   { name: 'actions', title: 'Action' },
 ]
 export const columnsOthers = [
@@ -33,7 +34,6 @@ export const columnExtensions = [
   {
     columnName: 'title',
     width: '25%',
-    sortingEnabled: false,
   },
   {
     columnName: 'text',
@@ -48,7 +48,6 @@ export const columnExtensions = [
       }
       return ''
     },
-    sortingEnabled: false,
   },
   {
     columnName: 'isShared',
@@ -62,7 +61,10 @@ export const columnExtensions = [
         disabled
       />
     ),
-    sortingEnabled: false,
+  },
+  {
+    columnName: 'sortOrder',
+    width: '80',
   },
 ]
 
