@@ -34,8 +34,8 @@ class StatementInvoiceList extends PureComponent {
       { name: 'doctorName', title: 'Doctor Name' },
       { name: 'patientAccountNo', title: 'Acc. No.' },
       { name: 'patientName', title: 'Patient Name' },
-      { name: 'invoiceAmt', title: 'Invoice Amt.' },
-      { name: 'payableAmt', title: 'payable Amt.' },
+      { name: 'invoiceAmt', title: 'Total Amt.' },
+      { name: 'payableAmt', title: 'Payable Amt.' },
       { name: 'outstanding', title: 'O/S Amt.' },
       { name: 'statementJoinCompany', title: 'Statement' },
     ]
