@@ -132,14 +132,11 @@ class PatientPackageDrawdown extends Component {
 
     return (
       <div className={classes.titleContainer}>
-        {remainingQuantity > 0 && (
+        {remainingQuantity > 0 ? (
           <p>{label}</p>
-        )
-        }
-        {remainingQuantity <= 0 && (
+        ) : (
           <p><font color='black'>{label}</font></p>
-        )
-        }
+        )}
         {!isCompleted && !isExpired && remainingQuantity > 0 && (
           <Button className={classes.transferButton}
             size='sm'
@@ -183,7 +180,11 @@ class PatientPackageDrawdown extends Component {
             <GridContainer className={classes.drawdownGrid}>
               <GridItem md={1}>
                 <p className={classes.drawdownQuantity}>
-                  - {parseToOneDecimalString(transaction.transactionQuantity)}           
+                  {transaction.transferFromPatient ? (
+                    <font color='green'>- {parseToOneDecimalString(transaction.transactionQuantity)}</font>
+                  ) : (
+                    <p>- {parseToOneDecimalString(transaction.transactionQuantity)}</p>
+                  )}
                 </p>
               </GridItem>
               <GridItem md={11}>
@@ -226,16 +227,13 @@ class PatientPackageDrawdown extends Component {
       <div className={classes.titleContainer}>
         <GridContainer>
           <GridItem md={8}>
-            {isCompleted && (
+            {isCompleted ? (
               <p>
                 <font color='black'> {packageCode} - {packageName}</font>
               </p>
-              )
-            }
-            {!isCompleted && (
-              <p>{packageCode} - {packageName}</p>
-            )
-          }
+              ) : (
+                <p>{packageCode} - {packageName}</p>
+            )}
           </GridItem>
           <GridItem md={2}>
             {isCompleted && (
@@ -295,6 +293,7 @@ class PatientPackageDrawdown extends Component {
       expandArrary.push(index)
       index += 1
     })
+    expandArrary.push(index)
 
     return (
       <div>

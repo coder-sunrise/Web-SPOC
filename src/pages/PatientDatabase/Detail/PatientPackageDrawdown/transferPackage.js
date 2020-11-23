@@ -237,7 +237,7 @@ class TransferPackage extends Component {
                   {values.transferToPatientId !== undefined && (
                     <ProgressButton                  
                       size='sm'
-                      color='primary'
+                      color='danger'
                       onClick={this.onResetPatientClick}
                       icon={<Replay />}
                     >
