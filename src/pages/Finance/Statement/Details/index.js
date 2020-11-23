@@ -45,12 +45,11 @@ const styles = () => ({})
         sumTotalPayableAmount += totalPayableAmount
         totalOS += outstandingAmount
         adminChargeValueField += adminCharge
-        adjustmentValueField += statementAdjustment
+        adjustmentValueField += statementAdjustment 
         return {
           ...o,
           tempOutstandingAmount: o.outstandingAmount,
-          totalPayableAmount,
-          totalPayment : totalPayableAmount - outstandingAmount,
+          totalPayableAmount, 
           statementInvoicePayment: [
             ...statementInvoicePayment,
           ],
