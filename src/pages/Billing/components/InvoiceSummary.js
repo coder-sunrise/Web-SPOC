@@ -16,6 +16,7 @@ import Payments from './Payments'
 // utils
 import { roundTo } from '@/utils/utils'
 import config from '@/utils/config'
+import _ from 'lodash'
 
 const { currencyFormat } = config
 
@@ -75,15 +76,10 @@ const InvoiceSummary = ({
   } = invoice 
   
   let totalCashRound = 0
-  for (var i = 0; i < invoicePayment.length; i++) {
-    if (!invoicePayment[i].isCancelled) {
-      for (let j = 0; j < invoicePayment[i].invoicePaymentMode.length; j++) {
-        let paymentMode = invoicePayment[i].invoicePaymentMode[j]
-        totalCashRound += paymentMode.cashRounding
-      }
-    }
+  invoicePayment.filter(o => !o.isCancelled).forEach(o => {
+    totalCashRound += _.sumBy(o.invoicePaymentMode || [], (payment) => payment.cashRounding)
+  })  
 
-  }
   const handleConfirmDelete = useCallback(
     (id, toggleVisibleCallback) => {
       const payment = invoicePayment.find(
