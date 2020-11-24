@@ -16,8 +16,9 @@ import {
   CommonModal,
 } from '@/components'
 import model from './models'
-import PackageDrawdownAccordion from './PackageDrawdownAccordion'
+import PackageDrawdownAccordion from './packageDrawdownAccordion'
 import TransferPackage from './transferPackage'
+import { ReportViewer } from '@/components/_medisys'
 
 window.g_app.replaceModel(model)
 
@@ -95,6 +96,11 @@ class PatientPackageDrawdown extends Component {
     isAllPackageCompleted: false,
     isShowPackageTransferModal: false,
     selectedPackageDrawdown: {},
+    isShowReport: false,
+    reportPayload: {
+      reportID: undefined,
+      reportParameters: undefined,
+    },
   }
 
   componentDidMount () {
@@ -287,18 +293,10 @@ class PatientPackageDrawdown extends Component {
       patientPackageDrawdown,
     } = row
 
-    let expandArrary = []
-    let index = 0
-    patientPackageDrawdown.forEach(d => {
-      expandArrary.push(index)
-      index += 1
-    })
-    expandArrary.push(index)
-
     return (
       <div>
         <PackageDrawdownAccordion
-          defaultActive={expandArrary}
+          defaultActive={[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]}
           leftIcon
           expandIcon={<SolidExpandMore fontSize='large' />}
           mode='multiple'
@@ -329,6 +327,28 @@ class PatientPackageDrawdown extends Component {
     })
 
     this.refreshPackageDrawdown()
+  }
+
+  onCloseReport = () => {
+    this.setState({
+      isShowReport: false,
+      reportPayload: {
+        reportID: undefined,
+        reportParameters: undefined,
+      },
+    })
+  }
+
+  onPrintClick = () => {    
+    const { patient } = this.props
+    
+    this.setState({
+      isShowReport: true,
+      reportPayload: {
+        reportID: 66,
+        reportParameters: { patientId: patient.entity.id },
+      },
+    })
   }
 
   render () {
@@ -368,7 +388,10 @@ class PatientPackageDrawdown extends Component {
                 Save
               </Button>
             )}
-              <Button color='primary'>
+              <Button 
+                color='primary'
+                onClick={this.onPrintClick}
+              >
               Print
               </Button>
             </GridItem>
@@ -383,6 +406,18 @@ class PatientPackageDrawdown extends Component {
             open={this.state.isShowPackageTransferModal}
           >
             <TransferPackage selectedPackageDrawdown={this.state.selectedPackageDrawdown} {...this.props} />
+          </CommonModal>
+          <CommonModal
+            open={this.state.isShowReport}
+            onClose={this.onCloseReport}
+            title='Package Drawdown'
+            maxWidth='lg'
+          >
+            <ReportViewer
+              showTopDivider={false}
+              reportID={this.state.reportPayload.reportID}
+              reportParameters={this.state.reportPayload.reportParameters}
+            />
           </CommonModal>
         </div>
       )
