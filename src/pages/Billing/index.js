@@ -247,7 +247,7 @@ class Billing extends Component {
       },
     })
     if (query.vid)
-      dispatch({
+    await dispatch({
         type: 'billing/query',
         payload: {
           id: query.vid,

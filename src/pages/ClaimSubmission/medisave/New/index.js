@@ -62,6 +62,9 @@ class NewMedisave extends React.Component {
         if (!r) {
           console.log('onRefreshClicked',r)
           this.refreshDataGrid()
+            notification.success({
+              message: 'Patient Info Updated.',
+            })
         }
       })
   }

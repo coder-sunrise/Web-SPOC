@@ -106,9 +106,9 @@ const styles = (theme) => ({
     })
   }
 
-    if (diagnosis.length === diagnosisOptions.length && allowEdit) {
-      diagnosisOptions.push(-99)
-    }
+    // if (diagnosis.length === diagnosisOptions.length && allowEdit) {
+    //   diagnosisOptions.push(-99)
+    // }
 
     if(!selectedChargeCode)
     {
@@ -532,11 +532,11 @@ class ClaimDetails extends Component {
                         disabled={!allowEdit}
                         mode='multiple'
                         options={diagnosis}
-                        disableAll={!allowEdit}
+                        disableAll// ={!allowEdit}
                         labelField='diagnosisDescription'
                         valueField='id'
                         // onChange={this.diagnosisOnSelectHandler}
-                        maxTagCount={allowEdit ? 0 : undefined}
+                        maxTagCount={allowEdit ? 3 : undefined}
                         maxTagPlaceholder='diagnosis'
                         {...args}
                       />

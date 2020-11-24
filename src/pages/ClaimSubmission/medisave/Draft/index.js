@@ -12,6 +12,7 @@ import {
   GridContainer,
   GridItem,
   CardContainer,
+  notification,
   Tooltip,
 } from '@/components'
 // sub components
@@ -64,6 +65,9 @@ class DraftMedisave extends React.Component {
       .then((r) => {
         if (!r) {
           this.refreshDataGrid()
+            notification.success({
+              message: 'Patient Info Updated.',
+            })
         }
       })
   }

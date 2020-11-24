@@ -92,9 +92,9 @@ export const getApplicableClaimAmount = (
     overAllCoPaymentValue,
     overAllCoPaymentValueType,
   } = scheme
+  console.log('getApplicableClaimAmount',invoicePayerItem, totalClaimableAmount)
   let returnClaimAmount = 0
-  const payableBalance =
-    invoicePayerItem.totalAfterGst - (invoicePayerItem._claimedAmount || 0)
+  const payableBalance = invoicePayerItem.totalAfterGst - (invoicePayerItem._claimedAmount || 0)
 
   if (payableBalance <= 0 || !scheme) return returnClaimAmount
 
@@ -106,6 +106,7 @@ export const getApplicableClaimAmount = (
   )
 
   if (isSpecificDefined) {
+    console.log('isSpecificDefined')
     const specificItem = coPaymentByItem.find(
       (_coPaymentItem) => _coPaymentItem.itemCode === invoicePayerItem.itemCode,
     )
@@ -121,6 +122,7 @@ export const getApplicableClaimAmount = (
           : specificItem.itemValue
     }
   } else if (coPaymentByCategory.length > 0) {
+    console.log('coPaymentByCategory')
     const itemCategory = coPaymentByCategory.find(
       (category) => category.itemTypeFk === invoicePayerItem.invoiceItemTypeFK,
     )
@@ -141,12 +143,14 @@ export const getApplicableClaimAmount = (
         ? itemRemainingAmount * (overAllCoPaymentValue / 100)
         : overAllCoPaymentValue
 
+    console.log('itemRemainingAmount', payableBalance, overAllCoPaymentValue, copaymentValue)
     returnClaimAmount =
       copaymentValue > itemRemainingAmount
         ? itemRemainingAmount
         : copaymentValue
   }
 
+  // console.log('returnClaimAmount', returnClaimAmount)
   if (isCoverageMaxCapCheckRequired) {
     if (returnClaimAmount > remainingCoverageMaxCap) {
       returnClaimAmount = remainingCoverageMaxCap
@@ -157,10 +161,14 @@ export const getApplicableClaimAmount = (
       returnClaimAmount = remainingCoverageMaxCap
     }
   }
+  // console.log('returnClaimAmount', returnClaimAmount)
   if (returnClaimAmount > payableBalance) returnClaimAmount = payableBalance
 
+  console.log('returnClaimAmount', returnClaimAmount)
   if (returnClaimAmount > totalClaimableAmount)
     returnClaimAmount = totalClaimableAmount
+
+  console.log('returnClaimAmount', returnClaimAmount)
 
   return roundTo(returnClaimAmount, 4)
 }
@@ -170,8 +178,9 @@ export const getInvoiceItemsWithClaimAmount = (
   originalInvoiceItems = [],
   currentInvoiceItems = [],
   shouldGenerateDummyID = false,
+  allPayers,
 ) => {
-  console.log('getInvoiceItemsWithClaimAmount',originalInvoiceItems)
+  console.log('getInvoiceItemsWithClaimAmount',originalInvoiceItems, allPayers)
   if (!schemeConfig || _.isEmpty(schemeConfig)) return []
   const {
     coverageMaxCap,
@@ -181,7 +190,10 @@ export const getInvoiceItemsWithClaimAmount = (
 
   const totalInvoiceAmount = roundTo(
     originalInvoiceItems
-      .map((item) => item.totalAfterGst - (item._claimedAmount || 0))
+      .map((item) => {
+        console.log(item)
+        return item.totalAfterGst - (allPayers ? item._chasAmount || 0 : item._claimedAmount || 0)
+        }) // fixed value if cdmp, based on chas, determine fixed max claimable
       .reduce(sumAll, 0),
   )
 
@@ -190,6 +202,7 @@ export const getInvoiceItemsWithClaimAmount = (
       ? patientMinCoPaymentAmount
       : roundTo(totalInvoiceAmount * (patientMinCoPaymentAmount / 100))
 
+  console.log('totalInvoiceAmount',totalInvoiceAmount, patientMinCoPaymentExactAmount)
   const totalClaimableAmount =
     totalInvoiceAmount < patientMinCoPaymentExactAmount
       ? 0
@@ -215,17 +228,40 @@ export const getInvoiceItemsWithClaimAmount = (
 
     const { invoiceItemTypeFK } = item
 
+    // console.log('pastItemClaimedAmount',result) // result is always null for single item, is for all items in scheme
     const pastItemClaimedAmount = result.reduce(
       (total, i) => total + i.claimAmount,
       0,
     )
 
+    // get claim amount based on other schemes instead of within scheme
+    const payers = allPayers ? allPayers.filter(a => !a.isCancelled && a.medisaveVisitType === 'CDMP' && a.invoicePayerItem.length > 0)
+    .reduce((items, p) => {
+      p.invoicePayerItem.forEach(i => items.push(i))
+      return items
+    },[]) : []
+    
+    const pastSchemeClaimedAmount = payers.length > 0 
+    ? payers.reduce(
+      (total, i) => total + i.claimAmount,
+      0,
+    )
+    : 0
+    console.log('allPayers', allPayers,payers, pastSchemeClaimedAmount)
+
+    // const cdmpClaimedAmount = item._claimedAmount - (item._chasAmount || 0)
+
     const remainingCoverageMaxCap = coverageMaxCap - pastItemClaimedAmount
     const remainingClaimableAmount =
-      totalClaimableAmount - pastItemClaimedAmount <= 0
+      totalClaimableAmount - pastItemClaimedAmount - pastSchemeClaimedAmount <= 0
         ? 0
-        : totalClaimableAmount - pastItemClaimedAmount
+        : totalClaimableAmount - pastItemClaimedAmount - pastSchemeClaimedAmount
+    console.log('totalClaimableAmount', allPayers, totalClaimableAmount, pastItemClaimedAmount)
 
+    // should be 69.27 - 50
+    // take totalaftgst - total _claimAmount, then %
+    // 100 - 68.5, * 85%
+    // 100 - 18.5, * 85%, -50
     const _claimAmount = getApplicableClaimAmount(
       item,
       schemeConfig,
@@ -300,11 +336,55 @@ export const updateOriginalInvoiceItemList = (
       }
       return roundTo(subtotal)
     }
+
+    // only need one chas amount, so getInvoiceItemsWithClaimAmount can get
+    const computeInvoicePayerChasSubtotal = (subtotal, invoicePayer) => {
+      if (invoicePayer.isCancelled || invoicePayer._isEditing || !invoicePayer.name.startsWith('CHAS'))
+        return roundTo(subtotal)
+      const _invoicePayerItem = invoicePayer.invoicePayerItem.find(
+        (payerItem) =>
+          payerItem.invoiceItemFK
+            ? payerItem.invoiceItemFK === item.id
+            : payerItem.id === item.id,
+      )
+
+      if (_invoicePayerItem) {
+        return roundTo(subtotal + _invoicePayerItem._chasAmount || 0)
+      }
+      return roundTo(subtotal)
+    }
+
+    /* const computeInvoicePayerCdmpSubtotal = (subtotal, invoicePayer) => {
+      if (invoicePayer.isCancelled || invoicePayer._isEditing)
+        return roundTo(subtotal)
+      const _invoicePayerItem = invoicePayer.invoicePayerItem.find(
+        (payerItem) =>
+          payerItem.invoiceItemFK
+            ? payerItem.invoiceItemFK === item.id
+            : payerItem.id === item.id,
+      )
+
+      if (_invoicePayerItem) {
+        return roundTo(subtotal + _invoicePayerItem._cdmpAmount || 0)
+      }
+      return roundTo(subtotal)
+    } */
+
     const _subtotal = currentInvoicePayerList.reduce(
       computeInvoicePayerSubtotal,
       0,
     )
-    return { ...item, _claimedAmount: _subtotal }
+    const _chasSubtotal = currentInvoicePayerList.reduce(
+      computeInvoicePayerChasSubtotal,
+      0,
+    )
+
+    console.log('subtotal', _subtotal, _chasSubtotal)
+    // if(_cdmpSubtotal > 0)
+    //  return { ...item, _claimedAmount: _subtotal, _cdmpAmount: _cdmpSubtotal } 
+    // if(_chasSubtotal > 0)
+    //  return { ...item, _claimedAmount: _subtotal, _chasAmount: _chasSubtotal }   
+    return { ...item, _claimedAmount: _subtotal, _chasAmount: _chasSubtotal }
   })
 
   return _resultInvoiceItems

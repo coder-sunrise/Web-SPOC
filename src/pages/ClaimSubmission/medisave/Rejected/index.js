@@ -59,6 +59,9 @@ class RejectedMedisave extends React.Component {
         console.log('onRefreshClicked',r)
         if (!r) {
           this.refreshDataGrid()
+            notification.success({
+              message: 'Patient Info Updated.',
+            })
         }
       })
   }
