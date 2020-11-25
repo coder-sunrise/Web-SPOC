@@ -185,6 +185,12 @@ const tenantCodesMap = new Map([
       ...defaultParams,
     },
   ],
+  [
+    'ctinvoiceadjustment',
+    {
+      ...defaultParams,
+    },
+  ],
   // [
   //   'ctEyeRefractiontestType',
   //   {

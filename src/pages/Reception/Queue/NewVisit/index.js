@@ -91,6 +91,7 @@ const getHeight = (propsHeight) => {
     visitRegistration,
     patientInfo: patient.entity,
     doctorProfiles: codetable.doctorprofile,
+      ctinvoiceadjustment: codetable.ctinvoiceadjustment,
   }),
 )
 @withFormikExtend({
@@ -137,7 +138,7 @@ class NewVisit extends PureComponent {
         payload: {
           visitOrderTemplateOptions: templateOptions,
         },
-      })
+      }) 
     }
 
     const bizSession = await dispatch({
@@ -148,8 +149,18 @@ class NewVisit extends PureComponent {
     })
     const { data = [] } = bizSession
     this.setState({ hasActiveSession: data.length > 0 })
+    await this.getCodeTables()
   }
 
+  getCodeTables = async () => {
+    const { dispatch } = this.props
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctinvoiceadjustment',
+      },
+    })
+  }
   componentWillUnmount () {
     // call file index API METHOD='DELETE'
     // for Attachments where fileStatus === 'Uploaded' but not 'Confirmed'
@@ -256,7 +267,7 @@ class NewVisit extends PureComponent {
       if (accessRight) {
         const { rights } = accessRight
         return (rights === 'readwrite' || rights === 'enable') &&
-        (isReadOnly || isRetail)
+          (isReadOnly || isRetail)
           ? 'disable'
           : rights
       }
@@ -317,8 +328,10 @@ class NewVisit extends PureComponent {
       setFieldValue,
       clinicSettings,
       patientInfo,
-    } = this.props
-
+      ctinvoiceadjustment,
+      codetable,
+    } = this.props 
+ 
     if (expandRefractionForm) {
       let div = $(this.myRef.current).find('div[aria-expanded]:eq(1)')
       if (div.attr('aria-expanded') === 'false') div.click()
@@ -334,12 +347,12 @@ class NewVisit extends PureComponent {
       (queueNumbers, queue) =>
         queue.visitFK === values.id
           ? [
-              ...queueNumbers,
-            ]
+            ...queueNumbers,
+          ]
           : [
-              ...queueNumbers,
-              queue.queueNo,
-            ],
+            ...queueNumbers,
+            queue.queueNo,
+          ],
       [],
     )
     const isReadOnly =
@@ -348,7 +361,7 @@ class NewVisit extends PureComponent {
       (!patientInfo || !patientInfo.isActive)
     const isReadonlyAfterSigned =
       clinicSettings.settings.isVisitEditableAfterEndConsultation &&
-      values.isLastClinicalObjectRecordSigned
+        values.isLastClinicalObjectRecordSigned
         ? false
         : isReadOnly
     const isEdit = !!values.id
@@ -392,7 +405,7 @@ class NewVisit extends PureComponent {
                       value={{
                         rights:
                           (rights === 'readwrite' || rights === 'enable') &&
-                          isReadOnly
+                            isReadOnly
                             ? 'disable'
                             : rights,
                       }}
@@ -401,7 +414,9 @@ class NewVisit extends PureComponent {
                         <VisitInfoCard
                           // isReadOnly={isReadOnly}
                           isVisitReadonlyAfterSigned={isReadonlyAfterSigned}
+                          isSigned={values.isLastClinicalObjectRecordSigned}
                           existingQNo={existingQNo}
+                          copaymentScheme={patientInfo?.patientScheme.filter(t => t.schemeTypeFK === 15)}
                           handleUpdateAttachments={this.updateAttachments}
                           attachments={values.visitAttachment}
                           visitType={values.visitPurposeFK}
@@ -415,7 +430,7 @@ class NewVisit extends PureComponent {
                       value={{
                         rights:
                           (rights === 'readwrite' || rights === 'enable') &&
-                          (isReadOnly || isRetail)
+                            (isReadOnly || isRetail)
                             ? 'disable'
                             : rights,
                       }}
@@ -428,7 +443,7 @@ class NewVisit extends PureComponent {
                                 rights:
                                   (vitalAccessRight === 'readwrite' ||
                                     vitalAccessRight === 'enable') &&
-                                  isReadonlyAfterSigned
+                                    isReadonlyAfterSigned
                                     ? 'disable'
                                     : vitalAccessRight,
                               }}

@@ -19,6 +19,7 @@ import {
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 import PatientBanner from '@/pages/PatientDashboard/Banner'
+import Warining from '@material-ui/icons/Error'
 
 import {
   getAppendUrl,
@@ -804,6 +805,9 @@ class Main extends React.Component {
                     <span>
                       &nbsp;:&nbsp;
                       <NumberInput text currency value={summary.totalWithGST} />
+                      {summary.totalWithGST < 0 ?
+                        <Warining style={{ position: 'absolute', top: '2px', width: '1.3rem', height: '1.3rem' }} color='error' />
+                        : undefined}
                     </span>
                   )}
                 </h4>
