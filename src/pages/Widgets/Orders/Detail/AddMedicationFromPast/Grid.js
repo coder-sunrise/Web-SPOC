@@ -81,13 +81,22 @@ class Grid extends PureComponent {
   }
 
   Visits = () => {
-    const { classes, onSelectItems, addedItems, type, loadVisits } = this.props
+    const {
+      classes,
+      onSelectItems,
+      addedItems,
+      type,
+      loadVisits,
+      isRetail,
+    } = this.props
     return loadVisits.map((o) => {
       let items = []
       if (type === '1') {
         if (o.corPrescriptionItem && o.corPrescriptionItem.length > 0) {
           items = _.orderBy(
-            o.corPrescriptionItem,
+            o.corPrescriptionItem.filter((drug) => {
+              return !isRetail || !drug.isExternalPrescription
+            }),
             [
               'drugName',
             ],
@@ -168,6 +177,14 @@ class Grid extends PureComponent {
           <div>
             {items.map((item) => {
               let addedItem = addedItems.find((added) => added.id === item.id)
+              let warningLabel
+              if (item.isExternalPrescription) {
+                warningLabel = '*'
+              } else if (!item.isActive) {
+                warningLabel = '**'
+              } else if (item.inventoryDispenseUOMFK !== item.dispenseUOMFK) {
+                warningLabel = '***'
+              }
               return (
                 <div
                   style={{
@@ -178,8 +195,8 @@ class Grid extends PureComponent {
                 >
                   <GridContainer>
                     <div className={classes.nameColumn}>
-                      {item.isExternalPrescription && (
-                        <span style={{ color: 'red' }}>*</span>
+                      {warningLabel && (
+                        <span style={{ color: 'red' }}>{warningLabel}</span>
                       )}
                       <Tooltip title={item.drugName || item.vaccinationName}>
                         <span>{item.drugName || item.vaccinationName}</span>
@@ -204,25 +221,10 @@ class Grid extends PureComponent {
                     </div>
                     <div className={classes.quantityColumn}>
                       <Tooltip
-                        title={
-                          item.inventoryDispenseUOMFK === item.dispenseUOMFK ? (
-                            `${item.quantity} ${item.dispenseUOMDisplayValue ||
-                              item.uomDisplayValue}`
-                          ) : (
-                            'Dispense UOM is not same as inventory default value'
-                          )
-                        }
+                        title={`${item.quantity} ${item.dispenseUOMDisplayValue ||
+                          item.uomDisplayValue}`}
                       >
-                        <span
-                          style={
-                            item.inventoryDispenseUOMFK !==
-                            item.dispenseUOMFK ? (
-                              { textDecorationLine: 'line-through' }
-                            ) : (
-                              {}
-                            )
-                          }
-                        >
+                        <span>
                           {`${item.quantity} ${item.dispenseUOMDisplayValue ||
                             item.uomDisplayValue}`}
                         </span>
@@ -282,11 +284,11 @@ class Grid extends PureComponent {
   content = () => {
     const {
       type,
-      isRetail,
       height,
       handelLoadMore,
       moreData,
       isScrollBottom,
+      isRetail,
     } = this.props
     let visits = _.orderBy(
       this.Visits().filter((visit) => {
@@ -336,11 +338,27 @@ class Grid extends PureComponent {
                 display: 'inline-Block',
               }}
             >
-              {type === '1' &&
-              !isRetail && (
+              {type === '1' && (
                 <span>
-                  Note:&nbsp;<span style={{ color: 'red' }}>*</span> Denotes the
-                  external prescription
+                  Note:&nbsp;{!isRetail && (
+                    <span>
+                      <span style={{ color: 'red' }}>*</span>
+                      external prescription &nbsp;&nbsp;
+                    </span>
+                  )}
+                  <span style={{ color: 'red' }}>**</span>
+                  inactive medication &nbsp;&nbsp;<span
+                    style={{ color: 'red' }}
+                  >
+                    ***
+                  </span>
+                  dispensing UOM changed
+                </span>
+              )}
+              {type === '2' && (
+                <span>
+                  Note:&nbsp;<span style={{ color: 'red' }}>**</span>
+                  inactive vaccination
                 </span>
               )}
             </div>
