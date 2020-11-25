@@ -1,10 +1,17 @@
 import React, { Fragment } from 'react'
 import { withStyles } from '@material-ui/core'
-import classnames from 'classnames'
+import { Field } from 'formik'
+import Search from '@material-ui/icons/Search'
 // custom component
-import { GridContainer, GridItem, TextField } from '@/components'
-import { FrequecyTypes } from './variables'
+import {
+  GridContainer,
+  GridItem,
+  TextField,
+  Checkbox,
+  ProgressButton,
+} from '@/components'
 import { primaryColor } from '@/assets/jss'
+import { FilterBarDate } from '@/components/_medisys'
 
 const styles = () => ({
   container: {
@@ -21,46 +28,80 @@ const styles = () => ({
 })
 
 const FilterBar = (props) => {
-  const {
-    setFilterName,
-    setFrequecyType,
-    frequecyType,
-    classes,
-    type,
-    selectItemCount,
-  } = props
+  const { handelSearch, type, selectItemCount, values } = props
+  const { visitFromDate, visitToDate, isAllDate } = values
+
   return (
     <Fragment>
       <GridContainer>
-        <GridItem xs={12} sm={12} md={4} lg={4}>
-          <TextField
-            autoFocus
-            label={type === '1' ? 'Medication Name' : 'Vaccination Name'}
-            onChange={(e) => {
-              setFilterName(e.target.value)
-            }}
-          />
+        <GridItem xs={12} sm={12} md={10} lg={10}>
+          <div>
+            <div style={{ display: 'inline-Block', width: 150 }}>
+              <Field
+                name='visitFromDate'
+                render={(args) => (
+                  <FilterBarDate
+                    {...args}
+                    label='Visit Date From'
+                    formValues={{
+                      startDate: visitFromDate,
+                      endDate: visitToDate,
+                    }}
+                    disabled={isAllDate}
+                  />
+                )}
+              />
+            </div>
+            <div
+              style={{ display: 'inline-Block', marginLeft: 10, width: 150 }}
+            >
+              <Field
+                name='visitToDate'
+                render={(args) => (
+                  <FilterBarDate
+                    {...args}
+                    label='Visit Date To'
+                    isEndDate
+                    formValues={{
+                      startDate: visitFromDate,
+                      endDate: visitToDate,
+                    }}
+                    disabled={isAllDate}
+                  />
+                )}
+              />
+            </div>
+            <div style={{ display: 'inline-Block', marginLeft: 10 }}>
+              <Field
+                name='isAllDate'
+                render={(args) => <Checkbox {...args} label='All Date' />}
+              />
+            </div>
+            <div style={{ display: 'inline-Block' }}>
+              <Field
+                name='searchName'
+                render={(args) => (
+                  <TextField
+                    {...args}
+                    label={
+                      type === '1' ? 'Medication Name' : 'Vaccination Name'
+                    }
+                  />
+                )}
+              />
+            </div>
+            <div style={{ display: 'inline-Block', marginLeft: 10 }}>
+              <ProgressButton
+                color='primary'
+                icon={<Search />}
+                onClick={handelSearch}
+              >
+                Search
+              </ProgressButton>
+            </div>
+          </div>
         </GridItem>
-        <GridItem xs={9} sm={9} md={6} lg={6} alignItems='center' container>
-          <Fragment>
-            {'Visits in past:'}
-            {FrequecyTypes.map((o) => {
-              return (
-                <div
-                  className={classnames(classes.container)}
-                  style={{
-                    background: frequecyType === o.id ? '#CCCCCC' : 'white',
-                  }}
-                  onClick={() => {
-                    setFrequecyType(o.id === frequecyType ? undefined : o.id)
-                  }}
-                >
-                  {o.label}
-                </div>
-              )
-            })}
-          </Fragment>
-        </GridItem>
+
         <GridItem
           xs={3}
           sm={3}
@@ -69,8 +110,9 @@ const FilterBar = (props) => {
           justify='flex-end'
           alignItems='center'
           container
+          style={{ position: 'relative' }}
         >
-          <span>
+          <span style={{ position: 'absolute', bottom: 8 }}>
             <span style={{ color: 'red' }}>{selectItemCount}</span>{' '}
             {selectItemCount > 1 ? 'item(s)' : 'item'} selected
           </span>

@@ -15,11 +15,19 @@ export default createListViewModel({
           yield put({
             type: 'updateState',
             payload: {
-              list: response.data,
+              list: response.data.data,
+              totalVisits: response.data.totalRecords,
             },
           })
-          return response.data
+          return response.data.data
         }
+        yield put({
+          type: 'updateState',
+          payload: {
+            list: [],
+            totalVisits: 0,
+          },
+        })
         return false
       },
     },

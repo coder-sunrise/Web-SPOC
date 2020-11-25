@@ -1,38 +1,74 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import * as Yup from 'yup'
+import moment from 'moment'
 // medisys components
 import { LoadingWrapper } from '@/components/_medisys'
 // custom component
 import {} from '@/components'
+import { withFormik } from 'formik'
 // sub components
 import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
 import FitlerBar from './FilterBar'
 import Grid from './Grid'
 
-@connect(({ loading, medicationHistory, codetable }) => ({
-  loading,
-  medicationHistory,
-  codetable,
-}))
+const defaultValue = {
+  visitFromDate: moment(new Date()).startOf('day').toDate(),
+  visitToDate: moment(new Date()).endOf('day').toDate(),
+  searchName: '',
+  isAllDate: true,
+}
+
+@connect(
+  ({
+    loading,
+    medicationHistory,
+    codetable,
+    visitRegistration,
+    clinicSettings,
+  }) => ({
+    loading,
+    medicationHistory,
+    codetable,
+    visitRegistration,
+    clinicSettings: clinicSettings.settings || clinicSettings.default,
+  }),
+)
+@withFormik({
+  displayName: 'PastMedication',
+  validationSchema: Yup.object().shape({}),
+  mapPropsToValues: () => ({
+    ...defaultValue,
+  }),
+  handleSubmit: () => ({}),
+})
 class PastMedication extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      filterName: '',
-      frequecyType: 1,
       addedItems: [],
+      visitFromDate: moment(new Date()).startOf('day').toDate(),
+      visitToDate: moment(new Date()).endOf('day').toDate(),
+      searchName: '',
+      isAllDate: true,
+      pageIndex: 0,
+      loadVisits: [],
+      isScrollBottom: false,
     }
   }
 
-  setFilterName = (v) => {
-    this.setState({
-      filterName: v,
-    })
+  componentWillMount () {
+    this.searchHistory()
   }
 
-  setFrequecyType = (v) => {
-    this.setState({
-      frequecyType: v,
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'medicationHistory/updateState',
+      payload: {
+        filter: {},
+        list: [],
+        totalVisit: undefined,
+      },
     })
   }
 
@@ -497,8 +533,86 @@ class PastMedication extends PureComponent {
     }
   }
 
+  handelSearch = () => {
+    const { values } = this.props
+    const { visitFromDate, visitToDate, searchName, isAllDate } = values
+    this.setState(
+      {
+        visitFromDate,
+        visitToDate,
+        searchName,
+        isAllDate,
+        pageIndex: 0,
+        loadVisits: [],
+        addedItems: [],
+        isScrollBottom: false,
+      },
+      this.searchHistory,
+    )
+  }
+
+  handelLoadMore = () => {
+    this.searchHistory()
+  }
+
+  searchHistory = () => {
+    const {
+      visitFromDate,
+      visitToDate,
+      searchName,
+      isAllDate,
+      pageIndex,
+    } = this.state
+    const { dispatch, visitRegistration, clinicSettings, type } = this.props
+    const { patientProfileFK } = visitRegistration.entity.visit
+    const { viewVisitPageSize = 10 } = clinicSettings
+    dispatch({
+      type: 'medicationHistory/queryMedicationHistory',
+      payload: {
+        visitFromDate: visitFromDate
+          ? moment(visitFromDate).startOf('day').formatUTC()
+          : undefined,
+        visitToDate: visitToDate
+          ? moment(visitToDate).endOf('day').formatUTC(false)
+          : undefined,
+        searchName,
+        isAllDate,
+        pageIndex: pageIndex + 1,
+        pageSize: viewVisitPageSize,
+        patientProfileId: patientProfileFK,
+        IsSearchMedication: type === '1',
+      },
+    }).then((r) => {
+      if (r) {
+        this.setState((preState) => {
+          return {
+            ...preState,
+            loadVisits: [
+              ...preState.loadVisits,
+              ...r,
+            ],
+            pageIndex: preState.pageIndex + 1,
+          }
+        })
+      }
+    })
+  }
+
+  setScrollBottom = (isScrollBottom) => {
+    this.setState({ isScrollBottom })
+  }
+
   render () {
-    const { loading, type, footer } = this.props
+    const {
+      loading,
+      type,
+      footer,
+      medicationHistory: { totalVisits = 0 },
+      clinicSettings,
+    } = this.props
+    const { viewVisitPageSize = 10 } = clinicSettings
+    const { pageIndex, loadVisits, isScrollBottom } = this.state
+    const moreData = totalVisits > pageIndex * viewVisitPageSize
     const show = loading.effects['medicationHistory/queryMedicationHistory']
     return (
       <LoadingWrapper
@@ -507,18 +621,20 @@ class PastMedication extends PureComponent {
       >
         <div>
           <FitlerBar
-            setFilterName={this.setFilterName}
-            setFrequecyType={this.setFrequecyType}
-            frequecyType={this.state.frequecyType}
             type={type}
             selectItemCount={this.state.addedItems.length}
+            handelSearch={this.handelSearch}
+            {...this.props}
           />
           <Grid
             onSelectMedication={this.onSelectMedication}
-            filterName={this.state.filterName}
-            frequecyType={this.state.frequecyType}
             onSelectItems={this.onSelectItems}
             addedItems={this.state.addedItems}
+            moreData={moreData}
+            handelLoadMore={this.handelLoadMore}
+            loadVisits={loadVisits}
+            isScrollBottom={isScrollBottom}
+            setScrollBottom={this.setScrollBottom}
             {...this.props}
           />
         </div>
