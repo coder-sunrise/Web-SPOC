@@ -54,11 +54,12 @@ const DragableTableGrid = ({
   onRowDrop,
   handleCommitChanges,
   height,
+  disableDrag,
   ...restGridProps
 }) => {
   const onSortEnd = ({ newIndex, oldIndex }) => {
     const newRows = arrayMove(dataSource, oldIndex, newIndex)
-    onRowDrop(newRows)
+    onRowDrop(newRows, oldIndex, newIndex)
     dispatch({
       type: 'global/incrementCommitCount',
     })
@@ -103,9 +104,25 @@ const DragableTableGrid = ({
     }
     if (column.name === 'drag') {
       return (
-        <Table.Cell {...restProps}>
+        <Table.Cell {...restProps} style={{ paddingLeft: 10, paddingRiht: 0 }}>
           <div className={classes.dragCellContainer}>
-            <DragHandle />
+            {disableDrag ? (
+              <span
+                style={{
+                  ...restProps.style,
+                  ...{
+                    cursor: 'not-allowed',
+                    paddingTop: 4,
+                    margin: '0px 8px',
+                  },
+                  color: 'gray',
+                }}
+              >
+                <ReOrder />
+              </span>
+            ) : (
+              <DragHandle />
+            )}
             {/* <Checkbox
               style={{ display: 'inline-block' }}
               simple
@@ -140,6 +157,7 @@ const DragableTableGrid = ({
     <CommonTableGrid
       rows={dataSource}
       getRowId={(row) => row.id}
+      forceRender
       columns={columns}
       columnExtensions={columnExtensions}
       ActionProps={{

@@ -12,6 +12,7 @@ import {
   GridItem,
   RichEditor,
   TextField,
+  NumberInput,
 } from '@/components'
 
 const defaultEntity = {
@@ -20,12 +21,22 @@ const defaultEntity = {
   htmlCannedText: undefined,
   isShared: false,
   ownedByUserFK: undefined,
+  sortOrder: undefined,
 }
 
-const Editor = ({ values, resetForm, onCancel, handleSubmit }) => {
+const Editor = ({
+  values,
+  onCancel,
+  handleSubmit,
+  setValues,
+  user,
+  cannedTextTypeFK,
+  resetForm,
+}) => {
   const handleCancelClick = () => {
-    resetForm(defaultEntity)
+    resetForm()
     onCancel()
+    setValues({ ...defaultEntity, ownedByUserFK: user.id, cannedTextTypeFK })
   }
   const isEdit = values.id !== undefined
   return (
@@ -35,34 +46,40 @@ const Editor = ({ values, resetForm, onCancel, handleSubmit }) => {
           <FastField
             name='title'
             render={(args) => (
-              <TextField
-                label='Canned Text Title'
-                {...args}
-                autocomplete='off'
-              />
+              <TextField label='Canned Text Title' autoFocus {...args} />
             )}
           />
         </GridItem>
-        <GridItem md={3}>
-          <FastField
-            name='isShared'
-            render={(args) => <Checkbox {...args} simple label='Is Shared' />}
-          />
+        <GridItem md={6}>
+          <div>
+            <div style={{ display: 'inline-Block' }}>
+              <FastField
+                name='isShared'
+                render={(args) => (
+                  <Checkbox {...args} simple label='Is Shared' />
+                )}
+              />
+            </div>
+            <div style={{ display: 'inline-Block', marginLeft: 10 }}>
+              <FastField
+                name='sortOrder'
+                render={(args) => (
+                  <NumberInput
+                    label='Sort Order'
+                    min={1}
+                    precision={0}
+                    {...args}
+                  />
+                )}
+              />
+            </div>
+          </div>
         </GridItem>
         <GridItem md={12}>
           <FastField
             name='text'
             render={(args) => (
-              <RichEditor
-                strongLabel
-                label='Canned Text'
-                {...args}
-                // onBlur={(html, text) => {
-                //   const decodedHtml = htmlDecodeByRegExp(html)
-                //   setFieldValue('plainText', text)
-                //   setFieldValue('htmlCannedText', decodedHtml)
-                // }}
-              />
+              <RichEditor strongLabel label='Canned Text' {...args} />
             )}
           />
         </GridItem>
@@ -84,20 +101,21 @@ const Editor = ({ values, resetForm, onCancel, handleSubmit }) => {
   )
 }
 
-const handleSubmit = async (values, { props, resetForm }) => {
-  const { dispatch, onConfirm, cannedTextTypeFK } = props
+const handleSubmit = async (
+  values,
+  { props, onConfirm, setValues, resetForm },
+) => {
+  const { dispatch, cannedTextTypeFK, handleEditorConfirmClick, user } = props
   const response = await dispatch({
     type: 'cannedText/upsert',
     payload: values,
   })
 
   if (response) {
-    dispatch({
-      type: 'cannedText/query',
-      payload: cannedTextTypeFK,
-    })
-    if (onConfirm) onConfirm(response)
+    if (onConfirm) onConfirm()
     resetForm()
+    handleEditorConfirmClick()
+    setValues({ ...defaultEntity, ownedByUserFK: user.id, cannedTextTypeFK })
   }
 }
 
@@ -105,12 +123,19 @@ const mapPropsToValues = ({ entity, user, cannedTextTypeFK }) => {
   const _entity = _.isEmpty(entity)
     ? { ...defaultEntity, ownedByUserFK: user.id, cannedTextTypeFK }
     : { ...entity }
-  return _entity
+  return {
+    ..._entity,
+    isEdit: !_.isEmpty(entity),
+  }
 }
 
 const ValidationSchema = Yup.object().shape({
   title: Yup.string().required(),
   text: Yup.string().required(),
+  sortOrder: Yup.number().when('isEdit', {
+    is: (val) => val,
+    then: Yup.number().required(),
+  }),
 })
 
 export default withFormik({
