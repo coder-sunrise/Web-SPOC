@@ -54,22 +54,12 @@ class PastMedication extends PureComponent {
       pageIndex: 0,
       loadVisits: [],
       isScrollBottom: false,
+      totalVisits: 0,
     }
   }
 
   componentWillMount () {
     this.searchHistory()
-  }
-
-  componentWillUnmount () {
-    this.props.dispatch({
-      type: 'medicationHistory/updateState',
-      payload: {
-        filter: {},
-        list: [],
-        totalVisit: undefined,
-      },
-    })
   }
 
   setAddedItems = (v) => {
@@ -546,6 +536,7 @@ class PastMedication extends PureComponent {
         loadVisits: [],
         addedItems: [],
         isScrollBottom: false,
+        totalVisits: 0,
       },
       this.searchHistory,
     )
@@ -589,8 +580,9 @@ class PastMedication extends PureComponent {
             ...preState,
             loadVisits: [
               ...preState.loadVisits,
-              ...r,
+              ...r.list,
             ],
+            totalVisits: r.totalVisits,
             pageIndex: preState.pageIndex + 1,
           }
         })
@@ -603,15 +595,9 @@ class PastMedication extends PureComponent {
   }
 
   render () {
-    const {
-      loading,
-      type,
-      footer,
-      medicationHistory: { totalVisits = 0 },
-      clinicSettings,
-    } = this.props
+    const { loading, type, footer, clinicSettings } = this.props
     const { viewVisitPageSize = 10 } = clinicSettings
-    const { pageIndex, loadVisits, isScrollBottom } = this.state
+    const { pageIndex, loadVisits, isScrollBottom, totalVisits } = this.state
     const moreData = totalVisits > pageIndex * viewVisitPageSize
     const show = loading.effects['medicationHistory/queryMedicationHistory']
     return (

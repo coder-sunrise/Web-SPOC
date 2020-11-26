@@ -12,22 +12,11 @@ export default createListViewModel({
       *queryMedicationHistory ({ payload }, { call, put }) {
         const response = yield call(service.queryMedicationHistory, payload)
         if (response.status === '200') {
-          yield put({
-            type: 'updateState',
-            payload: {
-              list: response.data.data,
-              totalVisits: response.data.totalRecords,
-            },
-          })
-          return response.data.data
+          return {
+            list: response.data.data,
+            totalVisits: response.data.totalRecords,
+          }
         }
-        yield put({
-          type: 'updateState',
-          payload: {
-            list: [],
-            totalVisits: 0,
-          },
-        })
         return false
       },
     },
