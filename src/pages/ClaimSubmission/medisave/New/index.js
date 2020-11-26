@@ -60,7 +60,6 @@ class NewMedisave extends React.Component {
       })
       .then((r) => {
         if (!r) {
-          console.log('onRefreshClicked',r)
           this.refreshDataGrid()
             notification.success({
               message: 'Patient Info Updated.',
@@ -85,7 +84,6 @@ class NewMedisave extends React.Component {
     const { selectedRows } = this.state
     if (selectedRows.length > 0) {
       this.handleLoadingVisibility(true)
-      console.log('onSubmitClaimClicked',this.props)
       this.props
         .dispatch({
           type: 'medisaveClaimSubmissionNew/submitMedisaveClaim',
@@ -95,7 +93,6 @@ class NewMedisave extends React.Component {
           this.handleLoadingVisibility(false)
           if (r) {
             const failedCount = r.filter(t => t.status !== 'SUCCESS').length
-            console.log('saved',r)
             if(failedCount === 0){ 
               notification.success({
                 message: 'Claim Submission Success.',
@@ -121,8 +118,6 @@ class NewMedisave extends React.Component {
     } = this.props
     const { isLoading, selectedRows } = this.state
     const { list } = medisaveClaimSubmissionNew || []
-
-    console.log('New',list)
 
     return (
       <CardContainer

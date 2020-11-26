@@ -46,14 +46,6 @@ const styles = (theme) => ({
   enableReinitialize: true,
   mapPropsToValues: ({ claimSubmission, allowEdit, codetable }) => {
     const returnValue = claimSubmission.entity || {}
-    /*
-    const {
-      ctmedisavecdmpdiagnosis, 
-      ctmedisavehealthscreeningdiagnosis, 
-      ctmedisaveoutpatientscandiagnosis, 
-      ctmedisavevaccination,
-    } = codetable
-    */
     const { diagnosis } = returnValue
     let diagnosisOptions = []
     let complicationList = []
@@ -78,38 +70,13 @@ const styles = (theme) => ({
         })
 
         if(o.chargeCode) {
-          /*
-          console.log('ctmedisavecdmpdiagnosis',ctmedisavecdmpdiagnosis)
-          const cdmpSimple = ctmedisavecdmpdiagnosis.find((c) => c.simpleChargeCode === o.chargeCode)
-          const cdmpComplex = ctmedisavecdmpdiagnosis.find((c) => c.complexChargeCode === o.chargeCode)
-          const screening = ctmedisavehealthscreeningdiagnosis.find((c) => c.code === o.chargeCode)
-          const scan = ctmedisaveoutpatientscandiagnosis.find((c) => c.code === o.chargeCode)
-          const vaccination = ctmedisavevaccination.find((c) => c.code === o.chargeCode)
-          const flexi = o.chargeCode === 'FM0065'
-          console.log('chargeCode', cdmpSimple, cdmpComplex, screening, scan, vaccination, flexi)
-          let displayValue = ''
-          if(cdmpSimple) displayValue = cdmpSimple.simpleChargeCodeDescription
-          if(cdmpComplex) displayValue = cdmpComplex.complexChargeCodeDescription
-          if(screening) displayValue = screening.name
-          if(scan) displayValue = scan.name
-          if(vaccination) displayValue = vaccination.name
-          if(flexi) displayValue = 'Medical care, unspecified'
-          */
-
           chargeCodeList.push(`${o.chargeCode} - ${o.chargeCodeDescription}`)
           if(o.isPrimary) {
             selectedChargeCode = `${o.chargeCode} - ${o.chargeCodeDescription}`
           }
-          // if no isprimary in diagnosis list? or do in api?
         }
-
     })
   }
-
-    // if (diagnosis.length === diagnosisOptions.length && allowEdit) {
-    //   diagnosisOptions.push(-99)
-    // }
-
     if(!selectedChargeCode)
     {
       return {
@@ -119,7 +86,6 @@ const styles = (theme) => ({
         selectedComplication,
         chargeCodeList,
       }
-
     }
     return {
       ...returnValue,
@@ -131,8 +97,6 @@ const styles = (theme) => ({
     }
   },
   validationSchema: Yup.object().shape({
-    selectedChargeCode: Yup.string()
-      .required('Charge code is required.'),
     diagnosisSelections: Yup.array()
       .required('At least one diagnosis is required.'),
     selectedComplication: Yup.array().when(['schemeCategoryDisplayValue', 'diagnosisSelections'],
@@ -141,6 +105,10 @@ const styles = (theme) => ({
         then : Yup.array().min(1,'At least two diagnosis / one diagnosis with one complication for Chronic Tier 2'),
         otherwise : Yup.array().min(0,'Not Required'),
       }),
+    selectedChargeCode: Yup.number().when('schemeTypeFK',{ 
+      is:(schemeTypeFK) => this.isMedisave(schemeTypeFK),
+      then: Yup.number().required('Charge code is required.'),
+    }),
   }),
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm } = props
@@ -180,17 +148,17 @@ class ClaimDetails extends Component {
         notification.error({
           message: 'At least one diagnosis is required',
       })
-      return
+      return null
     }
-    if(!selectedChargeCode)
+    if(this.isMedisave(values.schemeTypeFK) && !selectedChargeCode)
     {
         notification.error({
           message: 'Charge code is required',
       })
-      return
+      return null
     }
 
-    const chargeCodeSelections = []
+    let chargeCodeSelections = []
     const selected = selectedChargeCode || ''
 
     diagnosis.forEach((o) => {
@@ -211,16 +179,18 @@ class ClaimDetails extends Component {
     })
     
     const e = chargeCodeSelections.find((c) => selected.includes(c))
-    if(!e)
+    if(this.isMedisave(values.schemeTypeFK) && !e)
+    {
       notification.error({
         message: 'Charge code is not in selected list of diagnoses',
-    })
-    if(e)
-    {
-      validateForm()
-      this.props.handleSubmit()
+      })
+      return null
 
     }
+
+    validateForm()
+    this.props.handleSubmit()
+    return null
   }
 
   diagnosisOnChangeHandler = (v, op = {}) =>{
@@ -242,18 +212,6 @@ class ClaimDetails extends Component {
   }
 
   isMedisave = (schemeTypeFK) => {
-    /* const { ctschemetype } = this.props.codetable
-    const r = ctschemetype.find((o) => o.code === schemeTypeFK)
-    if(r) {
-      return (
-        [
-          'FLEXIMEDI',
-          'OPSCAN',
-          'MEDIVISIT',
-        ].indexOf(r.code) >= 0
-      )
-    } */
-    console.log('schemeTypeFK',schemeTypeFK)
     if(schemeTypeFK)
       return [12,13,14].indexOf(schemeTypeFK) >= 0
       
@@ -280,11 +238,7 @@ class ClaimDetails extends Component {
       invoiceDate,
       diagnosis,
     } = values
-
     const { doctorMCRNo } = doctorProfile
-    let doctorNameLabel = `${title ?? ''} ${name} (${doctorMCRNo})`
-
-    console.log('render',values)
 
     return (
       <SizeContainer size='md'>
@@ -324,7 +278,7 @@ class ClaimDetails extends Component {
               </GridItem>
               <GridItem md={1} />
               <GridItem md={5}>
-                <TextField disabled label='Doctor' value={doctorNameLabel} />
+                <TextField disabled label='Doctor' value={`${title ?? ''} ${name} (${doctorMCRNo})`} />
               </GridItem>
               <GridItem md={1} />
               <GridItem md={5}>
@@ -510,7 +464,7 @@ class ClaimDetails extends Component {
                     disabled
                     label='Payer DOB'
                     format={dateFormatLong}
-                    value={values.patientDob}
+                    value={values.payerDob}
                   />
                 </GridItem>
                 <GridItem md={1} />

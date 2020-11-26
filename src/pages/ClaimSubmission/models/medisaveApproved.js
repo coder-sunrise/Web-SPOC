@@ -92,7 +92,6 @@ export default createListViewModel({
       },
 
       *submitInvoicePayment ({ payload }, { put, call }) {
-        console.log('medisaveClaimSubmissionApproved',payload)
         const response = yield call(service.postInvoicePayment, payload)
         return response !== false
         // const { data, status } = response

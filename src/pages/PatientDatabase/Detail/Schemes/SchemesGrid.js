@@ -310,8 +310,6 @@ class SchemesGrid extends PureComponent {
 
   isMedisaveOrPHPC = (row) => {
     const { codetable } = this.props
-    // const r = schemeTypes.find((o) => o.id === row.schemeTypeFK)
-
     const ctSchemeTypes = codetable[ctSchemeType.toLowerCase()] || []
     const r = ctSchemeTypes.find((o) => o.id === row.schemeTypeFK)
 

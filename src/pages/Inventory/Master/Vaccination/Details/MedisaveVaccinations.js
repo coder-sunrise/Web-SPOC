@@ -1,28 +1,14 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
-import { 
-  Button,
-  CodeSelect, 
-  CommonTableGrid,
-  EditableTableGrid, 
-  Tooltip,
-  notification } from '@/components'
-import Delete from '@material-ui/icons/Delete'
-import { Radio } from 'antd'
+import { EditableTableGrid } from '@/components'
 
 @connect(({ codetable }) => ({ codetable }))
 class MedisaveVaccinations extends PureComponent {
-  state = {
-    editingRowIds: [],
-    rowChanges: {},
-  }
-
   constructor (props) {
     super(props)
 
-    const { title, titleChildren, dispatch, type } = props
-    const { state } = this
+    const { title, titleChildren } = props
 
     this.titleComponent = (
       <div style={{ position: 'relative' }}>
@@ -155,7 +141,6 @@ class MedisaveVaccinations extends PureComponent {
     })
     : rows
 
-    console.log('newRows', newRows)
     return (
       <EditableTableGrid
         rows={newRows}

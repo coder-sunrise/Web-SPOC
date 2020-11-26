@@ -962,20 +962,9 @@ const getRefreshMedisaveBalanceStatus = (response = []) => {
   }
 
   const successCode = 'WN800'
-  console.log('status',response)
   const { status, statusDescription } = response
 
-  /* if (status && // TODO: should never be null, check api
-    status.trim().toLowerCase() ===
-    fullBalanceSuccessCode.trim().toLowerCase()
-  ) {
-    return {
-      ...defaultResponse,
-      isSuccessful: true,
-    }
-  } */
-
-  if (status && // TODO: should never be null, check api
+  if (status &&
     status.trim().toLowerCase() !== successCode.trim().toLowerCase()) {
     return {
       ...defaultResponse,

@@ -45,8 +45,6 @@ const MaxCapInfo = ({ classes, claimableSchemes = [], copaymentSchemeFK }) => {
   let patientMinPayable
   let categoriesMaxCap = []
 
-  console.log('MaxCapInfo-scheme', scheme)
-
   if (scheme) {
     const {
       patientMinCoPaymentAmount,

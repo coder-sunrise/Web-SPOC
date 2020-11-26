@@ -39,11 +39,9 @@ const Detail = ({
   ] = useState(false)
 
   const toggleModal = () => {
-    console.log('toggle')
     setToggle(!toggle)
   }
   const handleSelectSdd = (row) => {
-    console.log('toggleMedisaveVaccination', row, values)
     const { id, code, name } = row
     setToggle(!toggle)
     dispatch({
@@ -60,7 +58,6 @@ const Detail = ({
   }
 
   const toggleMedisaveVaccination =(o) => {
-    console.log('toggleMedisaveVaccination', o, values)
     dispatch({
       type: 'vaccinationDetail/updateState',
       payload: {

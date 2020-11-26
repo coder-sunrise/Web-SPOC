@@ -7,10 +7,10 @@ import { EditableTableGrid, notification } from '@/components'
 class PayersGrid extends PureComponent {
   tableParas = {
     columns: [
-      { name: 'relationshipFK', title: 'Patient Is' },
       { name: 'payerName', title: 'Payer Name' },
       { name: 'payerID', title: 'Payer ID' },
       { name: 'dob', title: 'Date of Birth' },
+      { name: 'relationshipFK', title: 'Patient Is' },
       { name: 'schemeFK', title: 'Scheme' },
     ],
     columnExtensions: [
@@ -40,7 +40,6 @@ class PayersGrid extends PureComponent {
           const relation = ctmedisaverelationship.find(
             (item) => item.id === row.relationshipFK,
           )
-          console.log('render-relationshipFK',row.relationshipFK,relation)
           return (
             <span>{relation ? relation.name : ''}</span>
           )
@@ -57,24 +56,19 @@ class PayersGrid extends PureComponent {
         ].indexOf(opt.code) >= 0,
         onChange: ({ row }) => {  
           const { patientScheme } = this.props.values
-
           if(!patientScheme.find(ps => ps.schemeTypeFK === row.schemeFK))
           {
             row.schemeFK = undefined
-            console.log('changed-error',row.schemeFK)
             notification.error({
               message: 'Scheme for Medisave Payer not in list of added Schemes.',
             })
           }
-          console.log('onChange-ctSchemeType',row.schemeFK)
         },
         render: (row) => {
           const { ctschemetype = [] } = this.props.codetable
           const patSchemeType = ctschemetype.find(
             (item) => item.id === row.schemeFK,
           )
-
-          console.log('render-ctSchemeType',row.schemeFK)
           return (
             <span>{patSchemeType ? patSchemeType.name : ''}</span>
           )
@@ -103,7 +97,6 @@ class PayersGrid extends PureComponent {
   }
 
   render () {
-    console.log('PayersGrid', this.props)
     const { enableAdd, rows, schema } = this.props
 
     const EditingProps = {

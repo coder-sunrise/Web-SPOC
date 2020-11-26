@@ -82,7 +82,6 @@ const styles = (theme) => ({
         return values
       }
     } catch (error) {
-      console.log({ error })
     }
     return { ...appliedSchemes.default, visitId: appliedSchemes.visitID }
   },

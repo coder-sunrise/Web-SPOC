@@ -117,8 +117,6 @@ class RejectedMedisave extends React.Component {
     const { isLoading, selectedRows } = this.state
     const { list } = medisaveClaimSubmissionRejected || []
 
-    console.log('Rejected',list)
-
     return (
       <CardContainer
         hideHeader

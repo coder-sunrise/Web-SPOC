@@ -706,11 +706,11 @@ class Banner extends PureComponent {
                           return (
                             <div style={{ marginBottom: 15 }}>
                               <div>
-                                {schemeData.coPaymentSchemeFK || schemeDataList.filter((p) => this.isMedisave(p.schemeTypeFK))[0] === schemeData ? (
-                                  schemeData.copaymentSchemeName
-                                ) : (
-                                  schemeData.schemeTypeName
-                                )}
+                                {schemeData.coPaymentSchemeFK || 
+                                schemeDataList.filter((p) => this.isMedisave(p.schemeTypeFK))[0] === schemeData 
+                                ? (schemeData.copaymentSchemeName) 
+                                : (schemeData.schemeTypeName)
+                                }
                                 <span style={{ bottom: -2 }}>
                                   {schemeData.schemeTypeFK <= 6 && (
                                     <IconButton onClick={this.refreshChasBalance}>
@@ -813,7 +813,7 @@ class Banner extends PureComponent {
                   <div>
                     {schemeDataList.length > 0 ? (
                       <div>
-                        {schemeDataList // .filter((fil) => !this.isMedisave(fil.schemeTyeFK))
+                        {schemeDataList
                         .reduce((_schemeDataList, scheme) => {
                           if(!this.isMedisave(scheme.schemeTypeFK) || 
                           _schemeDataList.filter(data => this.isMedisave(data.schemeTypeFK)).length === 0) 
@@ -822,7 +822,6 @@ class Banner extends PureComponent {
                         },[])
                         .sort((a,b) => a.schemeTypeFK - b.schemeTypeFK)
                         .slice(0, 2).map((o) => {
-                          console.log('schemeData',o)
                           const schemeData = o
                           const isMedisave = this.isMedisave(schemeData.schemeTypeFK)
                           const displayString = 

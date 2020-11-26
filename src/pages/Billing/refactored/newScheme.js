@@ -30,12 +30,6 @@ import {
   ApplyClaimsColumnExtension,
 } from '../variables'
 
-const visitTypes = [
-  'CDMP',
-  'Vaccination',
-  'Health Screening',
-]
-
 const styles = (theme) => ({
   gridRow: {
     margin: theme.spacing(1),
@@ -98,8 +92,6 @@ const Scheme = ({
   onApplyClick,
   onDeleteClick,
   onSchemeChange,
-  onSchemePayerChange,
-  onMediVisitTypeChange,
   onCommitChanges,
   onPaymentVoidClick,
   onPrinterClick,
@@ -131,11 +123,8 @@ const Scheme = ({
     payerOutstanding,
     invoicePayment = [],
     schemePayerFK,
-    medisaveVisitType,
     payerName,
   } = invoicePayer
-
-  console.log('invoicePayer',invoicePayer)
 
   const { invoiceItems = [] } = invoice
   let existingOldPayerItem
@@ -148,8 +137,6 @@ const Scheme = ({
   }
 
   const handleSchemeChange = (value) => onSchemeChange(value, index)
-  // const handleSchemePayerChange = (value) => onSchemePayerChange(value, index)
-  // const handleVisitTypeChange = (value) => onMediVisitTypeChange(value, index)
   const handleCancelClick = () => onCancelClick(index)
   const handleEditClick = () => onEditClick(index)
   const handleApplyClick = () => onApplyClick(index)
@@ -206,14 +193,12 @@ const Scheme = ({
     if(!scheme || scheme === undefined) return []
     const schemeType = ctschemetype.find((c) => c.name === scheme.schemeTypeName) || []
     const addedSchemes = tempInvoicePayer.filter((r) => r.copaymentSchemeFK !== scheme.id).map((a) => {return a.copaymentSchemeFK}) || []
-    // console.log(scheme, schemeType, addedSchemes)
     if(!schemeType) return []
     return patient.schemePayer.filter((b) => b.schemeFK === schemeType.id && addedSchemes.indexOf(payerScheme.copaymentSchemeFK) < 0)
     .map((p) => {
       return {
         name: p.payerName,
         id: p.id,
-        // balance: p.balance,
       }
     })
   }
@@ -237,31 +222,9 @@ const Scheme = ({
 
   const isCHAS = schemeConfig && schemeConfig.copayerFK === 1
   const isMedisave = payerTypeFK === INVOICE_PAYER_TYPE.PAYERACCOUNT
-  const isMediVisit = isMedisave && visitTypes.find(v => v === medisaveVisitType)// !== '' // && name.includes('Visit') // visitTypes.filter(m => m === medisaveVisitType).length > 0
-  console.log('visitTypes', visitTypes, name)
-  const isMediVaccination = isMediVisit && medisaveVisitType === 'Vaccination' // invoicePayerItem.length > 0 && invoicePayerItem.filter((o) => o.invoiceItemTypeFK === 3).length > 0
-  console.log('isMedisave', isCHAS, isMedisave, isMediVisit, isMediVaccination)
-  
-  /* 
-  const defaultVaccination = isMediVaccination && !medisaveVaccinationFK && firstVacc 
-    ? firstVacc.medisaveVaccinationList.find(l => l.isDefault).medisaveVaccinationFK 
-    : null
-  const medisaveVaccinationLists = isMediVaccination && firstVacc ? firstVacc.medisaveVaccinationList.map(m => {
-    return {
-      name: m.name,
-      id: m.medisaveVaccinationFK,
-    }
-  }) : []
-  console.log('medisaveVaccinationLists',medisaveVaccinationLists, defaultVaccination)
-  */
 
-  console.log('invoicePayerItem',invoicePayerItem)
   const payerList = getPayerList(invoicePayer)
-  console.log('payerList',payerList)
-
-  console.log('newInvoicePayer',invoicePayer)
   const payer = payerList.find(p => p.id === schemePayerFK)
-  console.log('payer',payer, payerName)
   
   return (
     <Paper key={_key} elevation={4} className={classes.gridRow}>

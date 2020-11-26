@@ -72,7 +72,6 @@ const DiagnosisItem = ({
   const { form } = arrayHelpers
 
   const onDiagnosisChange = (v, op) => {
-    console.log('onDiagnosisChange',v, op)
     const { setFieldValue, values: vals, setValues } = form
     const { entity } = consultation
     if (op) {

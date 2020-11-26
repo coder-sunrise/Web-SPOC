@@ -87,7 +87,6 @@ class PatientInfoSideBanner extends PureComponent {
             setValues(pat)
           })
         }
-        console.log('result',result)
 
         const {
           balance,
@@ -147,7 +146,6 @@ class PatientInfoSideBanner extends PureComponent {
         schemePayers,
       },
     }).then((result) => {
-      console.log('result',result)
       if (result) {
         const params = locationQueryParameters()
         if (params.md !== 'visreg') {
@@ -287,10 +285,7 @@ class PatientInfoSideBanner extends PureComponent {
       !_.isEmpty(this.state.refreshedSchemePayerData.payerBalanceList) 
       && this.state.refreshedSchemePayerData.isSuccessful === true
     ) {
-      console.log('this.state.refreshedSchemePayerData',this.state.refreshedSchemePayerData)
       const refreshData = this.state.refreshedSchemePayerData.payerBalanceList.find((row) => row.schemePayerFK === schemePayer.id)
-
-      console.log('refreshData', refreshData)
 
       if(refreshData)
         return {
@@ -310,8 +305,6 @@ class PatientInfoSideBanner extends PureComponent {
     }
 
     const errorData = this.state.refreshedSchemePayerData
-    console.log('errorData', errorData)
-
     return {
       payerName: schemePayer.payerName,
       payerAccountNo: schemePayer.payerID,
@@ -324,7 +317,6 @@ class PatientInfoSideBanner extends PureComponent {
       isSuccessful: errorData.isSuccessful || '',
     }
   }
-
 
   render () {
     const {
@@ -344,8 +336,6 @@ class PatientInfoSideBanner extends PureComponent {
       [classes.entityName]: true,
       [classes.isInActive]: !entity || !entity.isActive,
     })
-
-    console.log('refreshedSchemePayerData',this.state.refreshedSchemePayerData)
 
     return entity && entity.id ? (
       <React.Fragment>
@@ -424,157 +414,68 @@ class PatientInfoSideBanner extends PureComponent {
           )}
         </div>
         <Divider light />
-        <div
-          className={classes.schemeContainer}
-          style={{ maxHeight: height - 455 - 20 }}
-        >
-          {// == CHAS == //
-            entity.patientScheme
-            .filter((o) => o.schemeTypeFK <= 6 && !o.isDeleted)
-            .map((o) => {
-              const schemeData = this.getSchemeDetails(o)
-              return (
-                <LoadingWrapper loading={loading} text='Retrieving balance...'>
-                  <div style={{ marginBottom: theme.spacing(1) }}>
-                    <p style={{ fontWeight: 500 }}>
-                      {/* <CodeSelect text code='ctSchemeType' value={o.schemeTypeFK} /> */}
-                      <CodeSelect
-                        text
-                        code='ctSchemeType'
-                        value={schemeData.schemeTypeFK}
-                      />
-                      {entity.isActive && (
-                        <IconButton>
-                          <Refresh
-                            onClick={() =>
-                              this.refreshChasBalance(
-                                schemeData.patientCoPaymentSchemeFK,
-                                schemeData.schemeTypeFK,
-                              )}
-                          />
-                        </IconButton>
-                      )}
-
-                      <SchemePopover
-                        isShowReplacementModal={
-                          schemeData.isShowReplacementModal
-                        }
-                        handleRefreshChasBalance={() =>
-                          this.refreshChasBalance(
-                            schemeData.patientCoPaymentSchemeFK,
-                            schemeData.schemeTypeFK,
-                          )}
-                        entity={entity}
-                        schemeData={schemeData}
-                      />
-                    </p>
-                    {schemeData.validFrom && (
-                      <div>
-                        <p>
-                          {schemeData.chronicBalanceStatusCode !== 'SC105' ? (
-                            <NumberInput
-                              prefix='Balance:'
-                              text
-                              currency
-                              value={schemeData.balance || '-'}
-                            />
-                          ) : (
-                            <TextField
-                              text
-                              prefix='Balance:'
-                              value='Full Balance'
-                            />
-                          )}
-                        </p>
-                        <p>
-                          <DatePicker
-                            prefix='Validity:'
-                            text
-                            format={dateFormatLong}
-                            // value={o.validFrom}
-                            value={schemeData.validFrom}
-                          />&nbsp; -&nbsp;
-                          <DatePicker
-                            text
-                            format={dateFormatLong}
-                            // value={o.validTo}
-                            value={schemeData.validTo}
-                          />
-                        </p>
-                        <p style={{ color: 'red' }}>
-                          {schemeData.statusDescription}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </LoadingWrapper>
-              )
-            })}
-        </div>
-        {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).length > 0 && (
-          <Divider light />
-        )}
-        {entity.schemePayer.length > 0 && (
-          // == MEDISAVE == //
+        <LoadingWrapper loading={loading} text='Retrieving balance...'>
           <div
             className={classes.schemeContainer}
-            style={{ maxHeight: 200 }}
+            style={{ maxHeight: height - 455 - 20 }}
           >
-            {entity.schemePayer
-              .filter((o) => this.isMedisave(o.schemeFK) && !o.isDeleted)
+            {// == CHAS == //
+              entity.patientScheme
+              .filter((o) => o.schemeTypeFK <= 6 && !o.isDeleted)
               .map((o) => {
-                console.log('schemePayer',o)
-                const schemeData = this.getSchemePayerDetails(o)
-                console.log('schemeData',schemeData)
+                const schemeData = this.getSchemeDetails(o)
                 return (
-                  <LoadingWrapper loading={loading} text='Retrieving balance...'>
-                    <div style={{ marginBottom: theme.spacing(3) }}>
-                      {/* <p style={{ fontWeight: 500 }}> */}
-                      {o === entity.schemePayer[0] &&
-                      <p>
-                        Medisave                        
+                    <div style={{ marginBottom: theme.spacing(1) }}>
+                      <p style={{ fontWeight: 500 }}>
+                        {/* <CodeSelect text code='ctSchemeType' value={o.schemeTypeFK} /> */}
+                        <CodeSelect
+                          text
+                          code='ctSchemeType'
+                          value={schemeData.schemeTypeFK}
+                        />
                         {entity.isActive && (
-                        <IconButton>
-                          <Refresh
-                            onClick={() =>
-                              this.refreshMedisaveBalance(
-                                schemeData.schemeTypeFK,
-                                schemeData.schemePayer,
-                              )}
-                          />
-                        </IconButton>
+                          <IconButton>
+                            <Refresh
+                              onClick={() =>
+                                this.refreshChasBalance(
+                                  schemeData.patientCoPaymentSchemeFK,
+                                  schemeData.schemeTypeFK,
+                                )}
+                            />
+                          </IconButton>
                         )}
-                        
-                        {/* <SchemePopover
+
+                        <SchemePopover
                           isShowReplacementModal={
                             schemeData.isShowReplacementModal
                           }
                           handleRefreshChasBalance={() =>
-                              this.refreshMedisaveBalance(
-                                schemeData.schemeTypeFK,
-                                schemeData.schemePayer,
+                            this.refreshChasBalance(
+                              schemeData.patientCoPaymentSchemeFK,
+                              schemeData.schemeTypeFK,
                             )}
                           entity={entity}
                           schemeData={schemeData}
-                        /> */}
-                      </p>}
-                      <div>
-                        <p>
-                          Payer:&nbsp;
-                          {schemeData.payerName}&nbsp;
-                          [{schemeData.payerAccountNo}]
-                        </p>
-                        <p>
-                          <NumberInput
-                            prefix='Balance:'
-                            text
-                            currency
-                            value={schemeData.balance >= 0 ? schemeData.balance : '-'}
-                          />
-                        </p>
-                      </div>
+                        />
+                      </p>
                       {schemeData.validFrom && (
                         <div>
+                          <p>
+                            {schemeData.chronicBalanceStatusCode !== 'SC105' ? (
+                              <NumberInput
+                                prefix='Balance:'
+                                text
+                                currency
+                                value={schemeData.balance || '-'}
+                              />
+                            ) : (
+                              <TextField
+                                text
+                                prefix='Balance:'
+                                value='Full Balance'
+                              />
+                            )}
+                          </p>
                           <p>
                             <DatePicker
                               prefix='Validity:'
@@ -590,21 +491,93 @@ class PatientInfoSideBanner extends PureComponent {
                               value={schemeData.validTo}
                             />
                           </p>
+                          <p style={{ color: 'red' }}>
+                            {schemeData.statusDescription}
+                          </p>
                         </div>
                       )}
-                      {schemeData.statusDescription && (
-                      <div>
-                        <p style={{ color: 'red' }}>
-                          {schemeData.statusDescription}
-                        </p>
-                      </div>
-                        )}
                     </div>
-                  </LoadingWrapper>
                 )
               })}
           </div>
-        )}
+          {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).length > 0 && (
+            <Divider light />
+          )}
+          {entity.schemePayer.length > 0 && (
+            // == MEDISAVE == //
+            <div
+              className={classes.schemeContainer}
+              style={{ maxHeight: 200 }}
+            >
+              {entity.schemePayer
+                .filter((o) => this.isMedisave(o.schemeFK) && !o.isDeleted)
+                .map((o) => {
+                  const schemeData = this.getSchemePayerDetails(o)
+                  return (
+                      <div style={{ marginBottom: theme.spacing(3) }}>
+                        {/* <p style={{ fontWeight: 500 }}> */}
+                        {o === entity.schemePayer[0] &&
+                        <p>
+                          Medisave                        
+                          {entity.isActive && (
+                          <IconButton>
+                            <Refresh
+                              onClick={() =>
+                                this.refreshMedisaveBalance(
+                                  schemeData.schemeTypeFK,
+                                  schemeData.schemePayer,
+                                )}
+                            />
+                          </IconButton>
+                          )}
+                        </p>}
+                        <div>
+                          <p>
+                            Payer:&nbsp;
+                            {schemeData.payerName}&nbsp;
+                            [{schemeData.payerAccountNo}]
+                          </p>
+                          <p>
+                            <NumberInput
+                              prefix='Balance:'
+                              text
+                              currency
+                              value={schemeData.balance >= 0 ? schemeData.balance : '-'}
+                            />
+                          </p>
+                        </div>
+                        {schemeData.validFrom && (
+                          <div>
+                            <p>
+                              <DatePicker
+                                prefix='Validity:'
+                                text
+                                format={dateFormatLong}
+                                // value={o.validFrom}
+                                value={schemeData.validFrom}
+                              />&nbsp; -&nbsp;
+                              <DatePicker
+                                text
+                                format={dateFormatLong}
+                                // value={o.validTo}
+                                value={schemeData.validTo}
+                              />
+                            </p>
+                          </div>
+                        )}
+                        {schemeData.statusDescription && (
+                        <div>
+                          <p style={{ color: 'red' }}>
+                            {schemeData.statusDescription}
+                          </p>
+                        </div>
+                          )}
+                      </div>
+                  )
+                })}
+            </div>
+          )}
+        </LoadingWrapper>
         {entity.patientScheme.filter((o) => this.isMedisave(o.schemeTypeFK)).length > 0 && (
           <Divider light />
         )}

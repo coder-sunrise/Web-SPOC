@@ -95,19 +95,12 @@ const constructPayment = ({ row, ctpaymentmode, values }) => {
     const { rows } = values
     const paymentReceivedByUserFK = user.data.id
 
-    const dispatchType = [
-      'FLEXIMEDI',
-      'OPSCAN',
-      'MEDIVISIT',
-    ].indexOf(rows[0].schemeType) >= 0
+    const dispatchType = [12,13,14].indexOf(rows[0].schemeTypeFK) >= 0
     ? 'medisaveClaimSubmissionApproved/submitInvoicePayment'
     : 'chasClaimSubmissionApproved/submitInvoicePayment'
 
-    console.log('dispatchType',dispatchType)
-    console.log('rows',rows)
     const results = await Promise.all(
       rows.map((row) => {
-        console.log('handleSubmit',row)
         const basePayload = constructPayment({
           row,
           ctpaymentmode,
@@ -120,7 +113,6 @@ const constructPayment = ({ row, ctpaymentmode, values }) => {
       }),
     )
 
-    console.log('results',results)
     if(results && results.filter(r => r === false).length === rows.length) return
     
     if (results) {
@@ -258,8 +250,6 @@ class CollectPaymentModal extends PureComponent {
     const { classes, values, footer, chasClaimSubmissionApproved } = this.props
     const { bizSessionList } = chasClaimSubmissionApproved
     const { rows } = values
-
-    console.log('CollectPaymentModal', this.props)
 
     return (
       <React.Fragment>

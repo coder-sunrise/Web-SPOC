@@ -298,16 +298,12 @@ export default createFormViewModel({
         }
 
         const response = yield call(service.requestMedisaveBalance, newPayload)
-
-        console.log('response', response)
         const { data } = response
-        let result = { isSuccessful: false }
-
         if (data) {
           const status = getRefreshMedisaveBalanceStatus(data)
           return { ...data, ...status }
         }
-
+        
         return data
       },
       *queryDone ({ payload }, { select, put }) {

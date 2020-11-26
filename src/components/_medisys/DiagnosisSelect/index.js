@@ -119,8 +119,6 @@ const DiagnosisSelect = ({
       selected.isCdmpClaimable
   }
 
-  console.log(selected)
-
   return (
     <div style={{ position: 'relative' }}>
       <Select

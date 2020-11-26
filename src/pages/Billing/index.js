@@ -367,7 +367,6 @@ class Billing extends Component {
   upsertBilling = async (callback = null, noValidation = false) => {
     const { dispatch, values, resetForm, patient } = this.props
     const { visitStatus, invoicePayer = [] } = values
-    console.log('upsertBilling',values)
 
     try {
       const isSchemesValid = noValidation

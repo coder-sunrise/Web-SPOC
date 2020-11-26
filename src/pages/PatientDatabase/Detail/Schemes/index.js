@@ -70,19 +70,8 @@ class Schemes extends PureComponent {
   }
 
   isMedisave = (schemeTypeFK) => {
-    /* const { ctschemetype } = this.props.codetable
-    const r = ctschemetype.find((o) => o.id === schemeTypeFK)
-    if (r)
-      return (
-        [
-          'MEDIVISIT',
-          'FLEXIMEDI',
-          'OPSCAN',
-        ].indexOf(r.code) >= 0
-      )    */
     if(schemeTypeFK)
       return [12,13,14].indexOf(schemeTypeFK) >= 0
-
     return false
   }
 
@@ -212,7 +201,6 @@ class Schemes extends PureComponent {
       tempSchemeTypeFK = schemeTypeFK
     }
 
-    console.log('patientScheme',values)
     return (
       <div>
         <div>
@@ -265,7 +253,6 @@ class Schemes extends PureComponent {
             handleOnClose={() => this.handleReplacementModalVisibility(false)}
           />
         </CommonModal>
-        {/* TODO: hide medisave payer until feature is fully built */}
         <div
           style={{
               display: values.patientScheme.filter((o) => this.isMedisave(o.schemeTypeFK) && !o.isDeleted).length > 0  ? '' : 'none',
@@ -280,16 +267,8 @@ class Schemes extends PureComponent {
             Medisave Payer
           </h4>
           <PayersGrid
-            enableAdd={values.patientScheme ? values.patientScheme.find((o) => this.isMedisave(o.schemeTypeFK)) : false} // TODO: check is medisave added
-            rows={values.schemePayer}/* .map(sp => {
-              const existScheme = values.patientScheme.find(p => !p.isDeleted && p.schemeTypeFK === sp.schemeFK)
-              if(!existScheme && sp.schemeFK)
-               return {
-                 ...sp,
-                 isDeleted: !existScheme,
-               }
-              return sp
-            })} */
+            enableAdd={values.patientScheme ? values.patientScheme.find((o) => this.isMedisave(o.schemeTypeFK)) : false}
+            rows={values.schemePayer}
             schema={schema.schemePayer._subType}
             values={values}
             {...restProps}
