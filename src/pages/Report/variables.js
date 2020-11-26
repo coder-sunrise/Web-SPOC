@@ -155,4 +155,10 @@ export const menuData = [
     url: '/report/diagnosistrending',
     authority: 'report.other.diagnosistrending',
   },
+  {
+    title: 'Finance',
+    text: 'WIP Revenue Report',
+    url: '/report/wiprevenue',
+    authority: 'report.finance.wiprevenuereport',
+  },
 ]

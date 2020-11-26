@@ -789,7 +789,14 @@ const _routes = [
               'report.finance.paymentcollectionsummary',
             ],
           },
-
+          {
+            path: '/report/wiprevenue',
+            name: 'wiprevenue',
+            component: './Report/WIPRevenue',
+            authority: [
+              'report.finance.wiprevenuereport',
+            ],
+          },
         ],
       },
       // Report
