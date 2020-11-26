@@ -25,6 +25,7 @@ import * as WidgetConfig from './config'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 import HistoryDetails from './HistoryDetails'
 import customtyles from './PatientHistoryStyle.less'
+import FitlerBar from './FilterBar'
 
 const styles = (theme) => ({
   root: {},
@@ -130,6 +131,15 @@ class PatientHistory extends Component {
       showHistoryDetails: false,
       selectHistory: undefined,
       activeKey: [],
+      selectItems: [],
+      visitFromDate: moment(new Date()).startOf('day').toDate(),
+      visitToDate: moment(new Date()).endOf('day').toDate(),
+      selectDoctors: [],
+      selectCategories: [],
+      isAllDate: true,
+      pageIndex: 0,
+      loadVisits: [],
+      isScrollBottom: false,
     }
   }
 
@@ -565,6 +575,8 @@ class PatientHistory extends Component {
     })
   }
 
+  handelSearch = () => {}
+
   render () {
     const { patientHistory, clinicSettings, scriblenotes } = this.props
     const cfg = {}
@@ -584,6 +596,11 @@ class PatientHistory extends Component {
     return (
       <div {...cfg}>
         <CardContainer hideHeader size='sm'>
+          <FitlerBar
+            selectItemCount={this.state.selectItems.length}
+            handelSearch={this.handelSearch}
+            {...this.props}
+          />
           {this.getFilterBar()}
           {sortedPatientHistory ? sortedPatientHistory.length > 0 ? (
             <div>
