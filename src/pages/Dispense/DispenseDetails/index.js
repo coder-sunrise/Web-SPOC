@@ -40,6 +40,7 @@ import {
 } from '../variables'
 
 import CONSTANTS from './constants'
+import Warining from '@material-ui/icons/Error'
 
 // const styles = (theme) => ({
 //   gridRow: {
@@ -215,6 +216,10 @@ const DispenseDetails = ({
     showRemovePayment,
     setShowRemovePayment,
   ] = useState(false)
+  const [
+    showInvoiceNegativeWarning,
+    setShowInvoiceNegativeWarning,
+  ] = useState(false)
 
   const [
     voidReason,
@@ -236,17 +241,17 @@ const DispenseDetails = ({
       <GridContainer>
         <GridItem justify='flex-start' md={6} className={classes.actionButtons}>
           {!viewOnly &&
-          !isRetailVisit && (
-            <Button
-              color='info'
-              size='sm'
-              onClick={onReloadClick}
-              disabled={disableRefreshOrder}
-            >
-              <Refresh />
+            !isRetailVisit && (
+              <Button
+                color='info'
+                size='sm'
+                onClick={onReloadClick}
+                disabled={disableRefreshOrder}
+              >
+                <Refresh />
               Refresh Order
-            </Button>
-          )}
+              </Button>
+            )}
           <Button
             color='primary'
             size='sm'
@@ -333,7 +338,26 @@ const DispenseDetails = ({
                 onClick={() => {
                   if (coPayerPayments.length > 0) {
                     setShowRemovePayment(true)
-                  } else {
+                  }
+                  else if (dispense && dispense.totalWithGST < 0) {
+                    window.g_app._store.dispatch({
+                      type: 'global/updateAppState',
+                      payload: {
+                        openConfirm: true,
+                        isInformType: true,
+                        customWidth: 'md',
+                        openConfirmContent: () => {
+                          return <div>
+                            <Warining style={{ width: '1.3rem', height: '1.3rem', marginLeft: '10px', color: 'red' }} />
+                            <h3 style={{ marginLeft: '10px', display: 'inline-block' }}>Unable to finalize. Make sure the total amount is not less than zero.</h3>
+                          </div>
+                        },
+                        openConfirmText: 'OK',
+                        onConfirmClose: () => { },
+                      },
+                    })
+                  }
+                  else {
                     onFinalizeClick()
                   }
                 }}
@@ -417,10 +441,10 @@ const DispenseDetails = ({
         onClose={() => {
           onDrugLabelSelectionClose()
         }}
-        // onConfirm={() => {
-        //    onDrugLabelSelectionClose()
-        //    onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
-        // }}
+      // onConfirm={() => {
+      //    onDrugLabelSelectionClose()
+      //    onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
+      // }}
       >
         <DrugLabelSelection
           prescription={selectedDrugs}
@@ -521,6 +545,8 @@ const DispenseDetails = ({
               color='primary'
               icon={null}
               onClick={() => {
+                console.log(dispense)
+                // const { } = dispense
                 onFinalizeClick()
               }}
             >
@@ -529,7 +555,7 @@ const DispenseDetails = ({
           </GridContainer>
         </div>
       </CommonModal>
-    </React.Fragment>
+    </React.Fragment >
   )
 }
 
