@@ -19,21 +19,12 @@ const defaultValue = {
   isAllDate: true,
 }
 
-@connect(
-  ({
-    loading,
-    medicationHistory,
-    codetable,
-    visitRegistration,
-    clinicSettings,
-  }) => ({
-    loading,
-    medicationHistory,
-    codetable,
-    visitRegistration,
-    clinicSettings: clinicSettings.settings || clinicSettings.default,
-  }),
-)
+@connect(({ loading, codetable, visitRegistration, clinicSettings }) => ({
+  loading,
+  codetable,
+  visitRegistration,
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
+}))
 @withFormik({
   displayName: 'PastMedication',
   validationSchema: Yup.object().shape({}),
