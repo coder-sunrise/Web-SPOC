@@ -293,8 +293,9 @@ class PatientInfoSideBanner extends PureComponent {
   
   getSchemePayerDetails = (schemePayer) => {
     const { patientScheme } = this.props.entity
-    const schemeData = patientScheme.find((row) => row.schemeTypeFK === schemePayer.schemeFK)
-    const balanceData = schemeData.patientSchemeBalance.find((row) => row.schemePayerFK === schemePayer.id)
+    const schemeData = patientScheme.find((row) => row.schemeTypeFK === schemePayer.schemeFK) || []
+    const { patientSchemeBalance } = schemeData
+    const balanceData = patientSchemeBalance !== undefined ? patientSchemeBalance.find((row) => row.schemePayerFK === schemePayer.id) : []
 
     if (
       !_.isEmpty(this.state.refreshedSchemePayerData.payerBalanceList) 
@@ -546,12 +547,6 @@ class PatientInfoSideBanner extends PureComponent {
                       {/* <p style={{ fontWeight: 500 }}> */}
                       {o === entity.schemePayer[0] &&
                       <p>
-                        {/* <CodeSelect text code='ctSchemeType' value={o.schemeTypeFK} /> */}
-                        {/* <CodeSelect
-                          text
-                          code='ctSchemeType'
-                          value={schemeData.schemeTypeFK}
-                        /> */}
                         Medisave                        
                         {entity.isActive && (
                         <IconButton>

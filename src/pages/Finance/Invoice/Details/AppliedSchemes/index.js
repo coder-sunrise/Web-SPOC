@@ -269,6 +269,11 @@ class AppliedScheme extends Component {
               submitCount={submitCount}
               dispatch={dispatch}
               commitCount={commitCount}
+              inventoryvaccination={inventoryvaccination}
+              inventorymedication={inventorymedication}
+              ctservice={ctservice}
+              patient={patient}
+              ctcopayer={ctcopayer}
               {...formikBag}
               {...commonProps}
               noExtraOptions

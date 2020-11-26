@@ -182,13 +182,13 @@ const Scheme = ({
       type: 'currency',
       width: 150,
       currency: true,
-      isDisabled: (row) => _isConfirmed || !row.isClaimable,
+      isDisabled: (row) => _isConfirmed,// || !row.isClaimable,
     },
   ]
 
   const showGrid = companyFK || !_.isEmpty(schemeConfig)
   const disableEdit =
-    payerTypeFK === INVOICE_PAYER_TYPE.SCHEME &&
+    (payerTypeFK === INVOICE_PAYER_TYPE.SCHEME || payerTypeFK === INVOICE_PAYER_TYPE.PAYERACCOUNT) &&
     id !== undefined &&
     _.isEmpty(schemeConfig)
   const titleColor = disableEdit ? 'grey' : 'darkblue'
@@ -207,12 +207,11 @@ const Scheme = ({
   const getPayerList = (payerScheme) => {
     // copayment scheme get scheme type fk, use it to find schemefk in schemepayer
     const scheme = ctcopaymentscheme.find((a) => a.id === payerScheme.copaymentSchemeFK)
-    const schemeType = scheme ? ctschemetype.find((c) => c.name === scheme.schemeTypeName) : []
-    
-    const addedSchemes = scheme ? tempInvoicePayer.filter((r) => r.copaymentSchemeFK !== scheme.id).map((a) => {return a.copaymentSchemeFK}) : []
-    
+    if(!scheme || scheme === undefined) return []
+    const schemeType = ctschemetype.find((c) => c.name === scheme.schemeTypeName) || []
+    const addedSchemes = tempInvoicePayer.filter((r) => r.copaymentSchemeFK !== scheme.id).map((a) => {return a.copaymentSchemeFK}) || []
     // console.log(scheme, schemeType, addedSchemes)
-
+    if(!schemeType) return []
     return patient.schemePayer.filter((b) => b.schemeFK === schemeType.id && addedSchemes.indexOf(payerScheme.copaymentSchemeFK) < 0)
     .map((p) => {
       return {
@@ -260,8 +259,8 @@ const Scheme = ({
   const isMediVaccination = isMediVisit && medisaveVisitType === 'Vaccination' // invoicePayerItem.length > 0 && invoicePayerItem.filter((o) => o.invoiceItemTypeFK === 3).length > 0
   console.log('isMedisave', isCHAS, isMedisave, isMediVisit, isMediVaccination)
 
-  const firstVacc = inventoryvaccination.find(mv => mv.code === invoicePayerItem[0].itemCode)
-  console.log('firstVacc',firstVacc)
+  // const firstVacc = inventoryvaccination.find(mv => mv.code === invoicePayerItem[0].itemCode)
+  // console.log('firstVacc',firstVacc)
   
   /* 
   const defaultVaccination = isMediVaccination && !medisaveVaccinationFK && firstVacc 
@@ -276,7 +275,7 @@ const Scheme = ({
   console.log('medisaveVaccinationLists',medisaveVaccinationLists, defaultVaccination)
   */
 
-  console.log('invoicePayer',invoicePayer)
+  console.log('invoicePayerItem',invoicePayerItem)
   const payerList = getPayerList(invoicePayer)
   console.log('payerList',payerList)
 
@@ -290,7 +289,7 @@ const Scheme = ({
 
   console.log('newInvoicePayer',invoicePayer)
   const payer = payerList.find(p => p.id === schemePayerFK)
-  console.log('payer',payer)
+  console.log('payer',payer, payerName)
   
   return (
     <Paper key={_key} elevation={4} className={classes.gridRow}>
@@ -327,138 +326,16 @@ const Scheme = ({
               ]}
             />
             )}
-            {payerTypeFK !== INVOICE_PAYER_TYPE.SCHEME &&
-            _isEditing && !payerName && !payer && <span>{name}</span>}
-            {payerTypeFK !== INVOICE_PAYER_TYPE.SCHEME &&
-            _isEditing && payer && !payerName && <span>{name} - {payer.name}</span>  // first dispense
-            }
-            {payerTypeFK !== INVOICE_PAYER_TYPE.SCHEME &&
-            _isEditing && payerName && payer && <span>{name} - {payerName}</span>  // billed
-            }
-
             {_isConfirmed && !payerName && !payer && <span>{name}</span>}
-            {_isConfirmed && payer && !payerName && <span>{name} - {payer.name}</span>}
-            {_isConfirmed && payerName && payer && <span>{name} - {payerName}</span>}
+            {payerTypeFK === INVOICE_PAYER_TYPE.PAYERACCOUNT && <span>{name} - {payerName || payer.name}</span>}
           </span>
         </GridItem>
-        {false && isMediVisit && 
-        <GridItem md={2} style={{ marginTop: 8, marginBottom: 16 }}>
-          {/* Medisave Visit Type [CDMP or vaccination] */}
-          <div
-            style={{
-              width: '100%',
-              display: 'flex',
-              fontWeight: 500,
-              fontSize: '1rem',
-              color: titleColor,
-              marginRight: 20,
-            }}
-          >
-            {disableEdit && <NotEditableInfo />}
-            {payerTypeFK !== INVOICE_PAYER_TYPE.PATIENT &&
-            // _isEditing && 
-            (
-              <Select
-                style={{ width: '100%' }}
-                size='sm'
-                allowClear={false}
-                simple
-                valueField='id'
-                onChange={handleVisitTypeChange}
-                value={medisaveVisitType}
-                disabled// ={_isConfirmed}
-                options={visitTypes}
-              />
-            )}
-            {// _isConfirmed && <div>CDMP</div>
-            }
-          </div>
-        </GridItem>
-        }
-        {false && isMedisave &&
-        <GridItem md={2} style={{ marginTop: 8, marginBottom: 16 }}>
-          {/* Payer */}
-          
-          <div
-            style={{
-              width: '100%',
-              display: 'flex',
-              fontWeight: 500,
-              fontSize: '1rem',
-              color: titleColor,
-              marginRight: 20,
-            }}
-          >
-            {disableEdit && <NotEditableInfo />}
-            {payerTypeFK !== INVOICE_PAYER_TYPE.COMPANY &&
-              // _isEditing && 
-              (
-              <Select
-                style={{ width: '100%' }}
-                size='sm'
-                allowClear={false}
-                simple
-                valueField='id'
-                onChange={handleSchemePayerChange}
-                value={schemePayerFK}
-                disabled// ={_isConfirmed}
-                options={[
-                  ...payerList.map((item) => ({
-                    id: item.id,
-                    name: item.name,
-                  })),
-                ]}
-              />
-            )}
-          </div>
-        </GridItem>
-        }
-        {/* isMedisave && !isMediVisit && !isMediVaccination && <GridItem md={2} /> */}
-        {/* isMediVaccination && medisaveVisitType === 'Vaccination' && 
-        <GridItem md={2} style={{ marginTop: 8, marginBottom: 16 }}>
-          <div
-            style={{
-              width: '100%',
-              display: 'flex',
-              fontWeight: 500,
-              fontSize: '1rem',
-              color: titleColor,
-              marginRight: 20,
-            }}
-          >
-            {disableEdit && <NotEditableInfo />}
-            {payerTypeFK !== INVOICE_PAYER_TYPE.PATIENT &&
-            // _isEditing && 
-            (
-              <Select
-                style={{ width: '100%' }}
-                size='sm'
-                allowClear={false}
-                simple
-                valueField='id'
-                onChange={handleMedisaveVaccinationChange}
-                value={medisaveVaccinationFK || defaultVaccination}
-                disabled={_isConfirmed}
-                // options={medisaveVaccinationList}            
-                options={[
-                  ...medisaveVaccinationLists.map((item) => ({
-                      id: item.id,
-                      name: item.name,
-                    }
-                  )),
-                ]}
-              />
-            )}
-            {// _isConfirmed && <div>Medisave Vaccination 1</div>
-            }
-          </div>
-        </GridItem>
-        */}
         {(isCHAS || isMedisave) && (
           <GridItem md={2} style={{ marginTop: 8, marginBottom: 8 }}>
             <BalanceLabel schemeConfig={schemeConfig} />
           </GridItem>
         )}
+        {!disableEdit && (
         <GridItem md={2} style={{ marginTop: 8, marginBottom: 8 }}>
           <MaxCap
             payerTypeFK={payerTypeFK}
@@ -469,6 +346,8 @@ const Scheme = ({
             schemeConfig={schemeConfig}
           />
         </GridItem>
+        )}
+        {disableEdit && (<GridItem md={2} />)}
         <GridItem
           md={(schemeConfig && schemeConfig.copayerFK === 1) || isMedisave ? 2 : 4}
           // md={binMid}
@@ -494,7 +373,6 @@ const Scheme = ({
                 EditingProps={{
                   showCommandColumn: false,
                   onCommitChanges,
-                  showCommandColumn: false,
                 }}
                 columns={
                   payerTypeFK === INVOICE_PAYER_TYPE.SCHEME ? (

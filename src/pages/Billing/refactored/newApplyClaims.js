@@ -145,13 +145,6 @@ const ApplyClaims = ({
   const healthScreenings = medisaveServices.filter(cs => cs.isMedisaveHealthScreening)
   const outpatientScans = medisaveServices.filter(cs => cs.isOutpatientScan)
 
-  /* const currentVisitTypes = tempInvoicePayer
-  .filter((p) => p.medisaveVisitType && !p.isCancelled)
-  .map((payer) => {
-      return payer.medisaveVisitType
-  }) */
-  // console.log('currentVisitTypes',currentVisitTypes)
-
   const hasOtherEditing = tempInvoicePayer.reduce(
     (editing, payer) => payer._isEditing || editing,
     false,
@@ -265,9 +258,6 @@ const ApplyClaims = ({
 
     const schemeConfig = flattenSchemes.find((item) => item.id === value && payer.schemePayerFK === item.schemePayerFK)
     console.log('schemeConfig', schemeConfig, value)
-  
-    console.log('handleSchemeChange-invoiceItems', invoiceItems)
-    console.log('handleSchemeChange-updatedInvoiceItems', updatedInvoiceItems)
     
     let midPayer = {
       ...payer,
@@ -280,7 +270,7 @@ const ApplyClaims = ({
 
     // check for vaccination
     const tempInvoiceItems = invoiceItems || updatedInvoiceItems
-    console.log('handleSchemeChange-tempInvoiceItems', tempInvoiceItems)
+    console.log('handleSchemeChange-tempInvoiceItems', invoiceItems, updatedInvoiceItems, tempInvoiceItems)
     let mediInvoiceItems = null
     const cdmpItems = tempInvoiceItems.filter((v) => {
       return (
@@ -328,25 +318,6 @@ const ApplyClaims = ({
     }
     console.log('handleSchemeChange--', cdmpVaccinations, cdmpScreenings, cdmpScans)
     
-    /* const chasClaimed = tempInvoicePayer.filter(t => !t.isCancelled).reduce((sum, newItem) => {
-      if(newItem.claimableSchemes[0].schemeCategoryFK < 5) 
-        return sum + newItem.invoicePayerItem.reduce((partial, item) => partial + item.claimAmount, 0)
-      // console.log('addSum', newItem, addSum)
-      return sum
-    }, 0)
-
-    const cdmpClaimed = tempInvoicePayer.filter(t => !t.isCancelled).reduce((sum, newItem) => {
-      let addSum = 0
-      if(newItem.claimableSchemes[0].schemeCategoryFK === 6) 
-        addSum = newItem.invoicePayerItem.reduce((partial, item) => partial + item.claimAmount, 0)
-      console.log('addSum', newItem, addSum)
-      return sum + addSum
-    }, 0)
-
-    const totalAftChas = roundTo((invoice.totalAftGst - chasClaimed) * 0.85,2)
-    console.log('exceedCdmpClaim?', cdmpClaimed, invoice.totalAftGst, chasClaimed, totalAftChas) // if exceeds, null, else claimamount for items need to change
-*/
-
     let payerInvoiceItems = getInvoiceItemsWithClaimAmount(
       { ...schemeConfig, claimType: payer.claimType },
       invoiceItems || updatedInvoiceItems,
@@ -374,16 +345,6 @@ const ApplyClaims = ({
         invoicePayerList || tempInvoicePayer, // so to calculate total for all cdmp payers
       )
     }
-    /* console.log('copaymentSchemeCode-starts',payerInvoiceItems)
-    payerInvoiceItems = payerInvoiceItems.map(p => {
-      return {
-        ...p,
-        _chasAmount: copaymentSchemeCode.startsWith('CHAS') ? p.claimAmount : null, 
-      }
-    })
-    console.log('copaymentSchemeCodestarts',payerInvoiceItems) 
-    */
-   // is only in chas scheme's invoiceitems, ensure map in utils
 
     console.log('handleSchemeChange-midPayer', midPayer, midPayer.name)
     console.log('handleSchemeChange-payerInvoiceItems', payerInvoiceItems)
@@ -413,37 +374,20 @@ const ApplyClaims = ({
         updatedPayer = null
       }
     }    
-    // if(cdmpClaimed >= totalAftChas && (copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500CDMP || copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE700CDMP))
-    //  updatedPayer = null // TODO: check this in Applicable Claims
     console.log('handleSchemeChange-updatedPayer-null', updatedPayer === null)
-    /* let newInvoicePayer
-    updatedPayerList.forEach(element => {
-      newInvoicePayer = updateTempInvoicePayer(
-        updatedPayer,
-        index,
-        invoicePayerList || null,
-        autoApply,
-        newInvoicePayers,
-      )
-      
-    })
-
-    console.log('handleSchemeChange-updatedPayer', updatedPayer)
-    */
-   let newInvoicePayer = null
-   if(updatedPayer)
-   {
-      console.log('handleSchemeChange-updateTempInvoicePayer', updatedPayer)
-      newInvoicePayer = updateTempInvoicePayer(
-        updatedPayer,
-        index,
-        invoicePayerList || null,
-        autoApply,
-        newInvoicePayers,
-      )
-
-   }
     
+    let newInvoicePayer = null
+    if(updatedPayer)
+    {
+        console.log('handleSchemeChange-updateTempInvoicePayer', updatedPayer)
+        newInvoicePayer = updateTempInvoicePayer(
+          updatedPayer,
+          index,
+          invoicePayerList || null,
+          autoApply,
+          newInvoicePayers,
+        )
+    }
     return newInvoicePayer || newInvoicePayers
   }
 

@@ -31,6 +31,14 @@ const checkCombination = (claimedMedisaveSchemeTypes, schemeTypeFK) => {
   }
 }
 
+const checkCombinationByPayer = (currentMediSchemeTypes, schemeTypeFK, schemePayerFK) => {
+  const payerSchemes = currentMediSchemeTypes.filter(p => p.schemePayerFK === schemePayerFK)
+  console.log('checkCombinationByPayer', currentMediSchemeTypes, schemeTypeFK, schemePayerFK, payerSchemes)  
+  if(payerSchemes)
+    return checkCombination(payerSchemes.map(f => f.id), schemeTypeFK)
+  return false
+}
+
 const constructSchemeList = (
     list, 
     claims = [], 
@@ -49,19 +57,7 @@ const constructSchemeList = (
     }
   })
   console.log('constructSchemeList', list, claims, currentClaims, invoiceItems, payers)// , ctschemetype, ctcopaymentscheme)
-  /* const claimedMedisaveID = currentClaims.reduce(
-    (claimed, item) =>
-      _medisaveSchemesID.includes(item.id)
-        ? [
-            ...claimed,
-            item.id,
-          ]
-        : [
-            ...claimed,
-          ],
-    [],
-  ) */
-  
+
   const allItemsClaimed = invoiceItems.filter((v) => {
     if(!v._claimedAmount) return false
     return v._claimedAmount >= v.totalAfterGst
@@ -69,7 +65,7 @@ const constructSchemeList = (
 
   const result = list
   .reduce((_result, scheme, index) => {
-    console.log('constructSchemeList-scheme',scheme[0])
+    console.log('---constructSchemeList-scheme',scheme[0].coPaymentSchemeName)
     // chas
     if (scheme[0].coPaymentSchemeName.includes('CHAS')) {
       const disabled =
@@ -86,13 +82,11 @@ const constructSchemeList = (
           disabled,
           schemeName: 'CHAS',
         },
-        // ...scheme.map((s, nestedIndex) => ({
-        // })),
       ]
     }
     // medisave
     const medisavescheme = ctcopaymentscheme.find((p) => p.id === scheme[0].id)
-    console.log('medisavescheme',medisavescheme)
+    console.log('constructSchemeList-medisavescheme',medisavescheme)
     if (medisavescheme.coPayerType === 'Government') { // left medisave
       const schemeType = ctschemetype.find((item) => item.name === medisavescheme.schemeTypeName)
       const currentMediSchemeTypes = currentClaims.map(cc => {
@@ -107,17 +101,11 @@ const constructSchemeList = (
           }
         return {}
       })
-      // const currentCopaymentSchemes = ctcopaymentscheme.filter(c1 => currentClaims.filter(c => c.id === c1.id) >= 0)
-      // const currentMediSchemes = currentCopaymentSchemes.filter(c2 => c2.coPayerName === 'MEDISAVE').map(c3 => c3.schemeTypeName)
-      // const currentMediSchemeTypes = ctschemetype.filter((item) => currentMediSchemes.indexOf(item.name) >= 0).map(c4 => c4.id)
-      // currentclaims but with schemetypefk
       console.log('currentMediSchemeTypes', currentMediSchemeTypes)
-
-      // const isMedisaveVisit = medisavescheme.schemeTypeName === 'Medisave 500/700 Visit' // medisaveSchemes.filter(ms => ms.name.includes('Visit') && ms.id === medisavescheme.id)// medisavescheme.name === 'Medisave 500/700 Visit'
-      // console.log('currentVisitTypes', currentVisitTypes)
-      const isClaimedScheme = currentClaims.filter((item) => scheme[0].id === item.id).length > 0// && scheme[0].schemePayerFK === item.payerFK).length > 0
-      const isMedisaveConflict = checkCombination(currentMediSchemeTypes.map(m => m.id), schemeType.id)
-      const isMedisaveClaimed = invoiceItems.filter((v) => {
+      console.log('currentClaims',currentClaims)
+      const isClaimedScheme = currentClaims.filter((item) => scheme[0].id === item.id && scheme[0].schemePayerFK === item.payerFK).length > 0// && scheme[0].schemePayerFK === item.payerFK).length > 0
+      const isMedisaveConflict = checkCombinationByPayer(currentMediSchemeTypes, schemeType.id, scheme[0].schemePayerFK)
+      const isMedisaveItemFullyClaimed = invoiceItems.filter((v) => {
         const fullyClaimed = v._claimedAmount && v._claimedAmount >= v.totalAfterGst
         /* if(medisavescheme.code === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500CDMP || medisavescheme.code === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE700CDMP)
           // return v.invoiceItemTypeFK === 1 && 
@@ -135,8 +123,8 @@ const constructSchemeList = (
           return v.invoiceItemTypeFK === 4 && !fullyClaimed && outpatientScans.find(m => m.code === v.itemCode)
         return !fullyClaimed
       }).length === 0
-      console.log('disabled', allItemsClaimed, isClaimedScheme, isMedisaveConflict, isMedisaveClaimed)// , payersClaimed.length >= payersAll.length)
-      const disabled = allItemsClaimed || isClaimedScheme || isMedisaveConflict || isMedisaveClaimed// || payersClaimed.length >= payersAll.length 
+      console.log('disabled', allItemsClaimed, isClaimedScheme, isMedisaveConflict, isMedisaveItemFullyClaimed)// , payersClaimed.length >= payersAll.length)
+      const disabled = allItemsClaimed || isClaimedScheme || isMedisaveConflict || isMedisaveItemFullyClaimed// || payersClaimed.length >= payersAll.length 
 
       const newPayer = payers.find(p => p.id === scheme[0].schemePayerFK)
       return [
@@ -201,6 +189,7 @@ const ApplicableClaims = ({
   )
 
   console.log('constructSchemeList',schemesList)
+  const hasMedisave = schemePayer.length > 0
 
   const _handleSelectClick = (scheme) => {
     handleSelectClick(
@@ -219,10 +208,10 @@ const ApplicableClaims = ({
           const onClick = () => _handleSelectClick(scheme)
           return (
             <React.Fragment>
-              <GridItem md={2}>
+              <GridItem md={hasMedisave ? 1 : 2}>
                 <span>{index + 1}</span>
               </GridItem>
-              <GridItem md={7}>
+              <GridItem md={hasMedisave ? 8 : 7}>
                 <span>{nameLabel}</span>
               </GridItem>
               <GridItem md={3} className={classes.row}>

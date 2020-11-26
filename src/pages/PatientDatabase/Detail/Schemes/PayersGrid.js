@@ -18,35 +18,13 @@ class PayersGrid extends PureComponent {
         columnName: 'dob',
         type: 'date',
         dobRestrict: true,
-        onChange: ({ row }) => {
-          /* if(!row.schemeFK) return
-          
-          const { ctschemetype = [] } = this.props.codetable
-          const patSchemeType = ctschemetype.find(
-            (item) => item.id === row.schemeFK,
-          ) */
-
-          // if(patSchemeType.code !== 'FLEXIMEDI') return
-          // const minAge = moment().subtract(65, 'years')
-          // const payerAge = moment(row.dob)
-          /* if(payerAge.isAfter(minAge))
-            notification.error({
-              message: 'Payer DOB must be equal or more than 65 for Flexi-Medisave',
-            }) */
-        },
       },
       {
         columnName: 'relationshipFK',
         type: 'codeSelect',
         code: 'ctMedisaveRelationShip',
         onChange: ({ row }) => {  
-          /* const { ctschemetype = [], ctmedisaverelationship } = this.props.codetable
-
-          const relation = ctmedisaverelationship.find(
-            (item) => item.id === row.relationshipFK,
-          ) */
-
-          if (row.relationshipFK === 1) // auto populate payer
+          if (row.relationshipFK === 1) // auto populate self payer
           {
             const patientInfo = this.props.values || this.props.patient.entity
             if(patientInfo)
@@ -56,33 +34,16 @@ class PayersGrid extends PureComponent {
               row.dob = patientInfo.dob
             }
           }
-          
-          /* if(!row.schemeFK) return
-
-          const patSchemeType = ctschemetype.find(
-            (item) => item.id === row.schemeFK,
-          ) */
-
-          // if(patSchemeType.code !== 'FLEXIMEDI') return
-          // TODO: Throw validaiton to schema.js
-          // const minAge = moment().subtract(65, 'years')
-          // const payerAge = moment(row.dob)
-          /* console.log('dob',row.dob,payerAge)
-          if(payerAge && payerAge.isAfter(minAge))
-            notification.error({
-              message: 'Payer DOB must be equal or more than 65 for Flexi-Medisave',
-            }) */
-
-          /* let st = [
-            'SELF',
-            'SPOUSE',
-          ].indexOf(relation.name) < 0
-
-          if (st) {
-            notification.error({
-              message: '“Patient is” must be “Self” or “Spouse” for Flexi-Medisave',
-            })
-          } */
+        },
+        render: (row) => {
+          const { ctmedisaverelationship = [] } = this.props.codetable
+          const relation = ctmedisaverelationship.find(
+            (item) => item.id === row.relationshipFK,
+          )
+          console.log('render-relationshipFK',row.relationshipFK,relation)
+          return (
+            <span>{relation ? relation.name : ''}</span>
+          )
         },
       },
       {
@@ -94,16 +55,6 @@ class PayersGrid extends PureComponent {
           'OPSCAN',
           'MEDIVISIT',
         ].indexOf(opt.code) >= 0,
-        render: (row) => {
-          const { ctschemetype = [] } = this.props.codetable
-          const patSchemeType = ctschemetype.find(
-            (item) => item.id === row.schemeFK,
-          )
-
-          return (
-            <span>{patSchemeType ? patSchemeType.name : ''}</span>
-          )
-        },
         onChange: ({ row }) => {  
           const { patientScheme } = this.props.values
 
@@ -115,6 +66,18 @@ class PayersGrid extends PureComponent {
               message: 'Scheme for Medisave Payer not in list of added Schemes.',
             })
           }
+          console.log('onChange-ctSchemeType',row.schemeFK)
+        },
+        render: (row) => {
+          const { ctschemetype = [] } = this.props.codetable
+          const patSchemeType = ctschemetype.find(
+            (item) => item.id === row.schemeFK,
+          )
+
+          console.log('render-ctSchemeType',row.schemeFK)
+          return (
+            <span>{patSchemeType ? patSchemeType.name : ''}</span>
+          )
         },
       },
     ],
