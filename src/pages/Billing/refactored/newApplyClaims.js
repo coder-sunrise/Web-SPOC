@@ -137,8 +137,6 @@ const ApplyClaims = ({
       code: mScheme.code,
     }
   })
-  // const medisaveSchemeIDs = medisaveSchemes.map((m) => m.id)
-
   const medisaveMedications = inventorymedication.filter(im => im.isMedisaveClaimable)
   const medisaveVaccinations = inventoryvaccination.filter(iv => iv.isMedisaveClaimable)
   const medisaveServices = ctservice.filter(iv => iv.isCdmpClaimable)
@@ -184,7 +182,7 @@ const ApplyClaims = ({
       autoApply,
     )
     
-    // assume chas always apply first
+    // assume chas always apply first, add chas amount to payer
     console.log('copaymentSchemeCode-starts',newInvoicePayer)
     const newInvoicePayerAmt = newInvoicePayer.reduce((list, n) => {
       console.log('newInvoicePayerAmt',list, n)
@@ -206,8 +204,7 @@ const ApplyClaims = ({
     console.log('copaymentSchemeCodestarts',newInvoicePayerAmt)
 
     const newInvoicePayerFilled = newInvoicePayers ? newInvoicePayerAmt.filter((o) => o.copaymentSchemeFK) : []
-    console.log('updateTempInvoicePayer2', newInvoicePayers)
-    console.log('updateTempInvoicePayer2', newInvoicePayerFilled)
+    console.log('updateTempInvoicePayer2', newInvoicePayers, newInvoicePayerFilled)
     let newInvoicePayerList = []
     if(newInvoicePayers)
     {
@@ -259,7 +256,7 @@ const ApplyClaims = ({
     const schemeConfig = flattenSchemes.find((item) => item.id === value && payer.schemePayerFK === item.schemePayerFK)
     console.log('schemeConfig', schemeConfig, value)
     
-    let midPayer = {
+    const midPayer = {
       ...payer,
       schemeConfig,
       name: schemeConfig.coPaymentSchemeName,
@@ -268,7 +265,7 @@ const ApplyClaims = ({
       isModified: true,
     }
 
-    // check for vaccination
+    // filter medisave items based on visit type
     const tempInvoiceItems = invoiceItems || updatedInvoiceItems
     console.log('handleSchemeChange-tempInvoiceItems', invoiceItems, updatedInvoiceItems, tempInvoiceItems)
     let mediInvoiceItems = null
@@ -295,9 +292,6 @@ const ApplyClaims = ({
     {
       newVisitType = 'Vaccination'
       mediInvoiceItems = cdmpVaccinations
-      // first vaccination only? should allow flexibility
-      // const [firstItem] = cdmpVaccinations
-      // mediInvoiceItems = [firstItem]
     }
     if(cdmpScreenings && (copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500HS || copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE700HS)) 
     {
@@ -306,7 +300,7 @@ const ApplyClaims = ({
       
     }
     if(cdmpItems && (copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500CDMP || copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE700CDMP)) 
-    { // 2nd condition can be removed
+    {
       newVisitType = 'CDMP'
       mediInvoiceItems = cdmpItems
     }
@@ -316,78 +310,42 @@ const ApplyClaims = ({
       newVisitType = ''
       mediInvoiceItems = cdmpScans
     }
-    console.log('handleSchemeChange--', cdmpVaccinations, cdmpScreenings, cdmpScans)
+    console.log('handleSchemeChange-mediInvoiceItems', cdmpVaccinations, cdmpScreenings, cdmpScans)
     
-    let payerInvoiceItems = getInvoiceItemsWithClaimAmount(
+    const payerInvoiceItems = getInvoiceItemsWithClaimAmount(
       { ...schemeConfig, claimType: payer.claimType },
-      invoiceItems || updatedInvoiceItems,
+      mediInvoiceItems || invoiceItems || updatedInvoiceItems,
       payer.invoicePayerItem,
       payer.id === undefined,
+      (copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500CDMP || copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE700CDMP) 
+      ? invoicePayerList || tempInvoicePayer
+      : null,
     )
-    if(mediInvoiceItems)
-    {
-      console.log('mediInvoiceItems',mediInvoiceItems)
-      payerInvoiceItems = getInvoiceItemsWithClaimAmount(
-        { ...schemeConfig, claimType: payer.claimType },
-        mediInvoiceItems,
-        payer.invoicePayerItem,
-        payer.id === undefined,
-      )
-    }
-    if((copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500CDMP || copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE700CDMP))
-    {
-      console.log('mediInvoiceItems',mediInvoiceItems)
-      payerInvoiceItems = getInvoiceItemsWithClaimAmount(
-        { ...schemeConfig, claimType: payer.claimType },
-        mediInvoiceItems, // should be all items with cdmpclaimable only
-        payer.invoicePayerItem,
-        payer.id === undefined,
-        invoicePayerList || tempInvoicePayer, // so to calculate total for all cdmp payers
-      )
-    }
-
     console.log('handleSchemeChange-midPayer', midPayer, midPayer.name)
     console.log('handleSchemeChange-payerInvoiceItems', payerInvoiceItems)
     console.log('handleSchemeChange-payer', payer)
 
-    let updatedPayer = {
+    const totalClaimed = payerInvoiceItems.reduce((oldTotal, newTotal) => {
+      return oldTotal + newTotal.claimAmount
+    }, 0)
+    console.log('updatedPayer-isnull', payerInvoiceItems.length === 0)
+    console.log('updatedPayer-totalClaimed',totalClaimed)
+    const updatedPayer = payerInvoiceItems.length > 0 && totalClaimed > 0 ? {
       ...midPayer,
       schemeConfig,
       invoicePayerItem: payerInvoiceItems,
       medisaveVisitType: newVisitType || payer.medisaveVisitType,
-    }
+    } : null
     console.log('handleSchemeChange-updatedPayer', updatedPayer) // , updatedPayer.copaymentSchemeFK)
-    console.log('updatedPayer-isnull', updatedPayer.invoicePayerItem.length === 0)
-    if(updatedPayer.invoicePayerItem.length === 0)// !== '' && !newVisitType) // if medivisit but not updated type
-    {
-      updatedPayer = null
-    }
-    else
-    {
-      const totalClaimed = updatedPayer.invoicePayerItem.reduce((oldTotal, newTotal) => {
-        return oldTotal + newTotal.claimAmount
-      }, 0)
-      console.log('totalClaimed',totalClaimed)
-      if(totalClaimed === 0) // items claimed total is 0
-      {
-        console.log('is0')
-        updatedPayer = null
-      }
-    }    
     console.log('handleSchemeChange-updatedPayer-null', updatedPayer === null)
-    
-    let newInvoicePayer = null
-    if(updatedPayer)
-    {
-        console.log('handleSchemeChange-updateTempInvoicePayer', updatedPayer)
-        newInvoicePayer = updateTempInvoicePayer(
-          updatedPayer,
-          index,
-          invoicePayerList || null,
-          autoApply,
-          newInvoicePayers,
-        )
-    }
+    const newInvoicePayer = updatedPayer ? updateTempInvoicePayer(
+      updatedPayer,
+      index,
+      invoicePayerList || null,
+      autoApply,
+      newInvoicePayers,
+    ) : null
+
     return newInvoicePayer || newInvoicePayers
   }
 
@@ -415,7 +373,7 @@ const ApplyClaims = ({
     })
   }
 
-  const handleSchemePayerChange = (
+  /* const handleSchemePayerChange = (
     value,
     index,
     invoicePayerList = null,
@@ -434,9 +392,9 @@ const ApplyClaims = ({
       index,
       invoicePayerList || null,
     )
-  }
+  } */
 
-  const handleMedisaveVaccinationChange = (
+  /* const handleMedisaveVaccinationChange = (
     value,
     index,
     invoicePayerList = null,
@@ -455,9 +413,9 @@ const ApplyClaims = ({
       index,
       invoicePayerList || null,
     )
-  }
+  } */
 
-  const handleMediVisitTypeChange = (
+  /* const handleMediVisitTypeChange = (
     value,
     index,
     invoicePayerList = null,
@@ -476,7 +434,7 @@ const ApplyClaims = ({
       index,
       invoicePayerList || null,
     )
-  }
+  } */
 
   const toggleCopayerModal = () => setShowCoPaymentModal(!showCoPaymentModal)
 
@@ -1284,9 +1242,9 @@ const ApplyClaims = ({
               invoicePayer={invoicePayer}
               index={index}
               onSchemeChange={handleSchemeChange}
-              onSchemePayerChange={handleSchemePayerChange}
-              onMediVisitTypeChange={handleMediVisitTypeChange}
-              onMediVaccinationChange={handleMedisaveVaccinationChange}
+              // onSchemePayerChange={handleSchemePayerChange}
+              // onMediVisitTypeChange={handleMediVisitTypeChange}
+              // onMediVaccinationChange={handleMedisaveVaccinationChange}
               onCommitChanges={handleCommitChanges}
               onCancelClick={handleCancelClick}
               onEditClick={handleEditClick}

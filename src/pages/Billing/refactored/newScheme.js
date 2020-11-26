@@ -100,7 +100,6 @@ const Scheme = ({
   onSchemeChange,
   onSchemePayerChange,
   onMediVisitTypeChange,
-  onMediVaccinationChange,
   onCommitChanges,
   onPaymentVoidClick,
   onPrinterClick,
@@ -110,7 +109,6 @@ const Scheme = ({
   ctschemetype,
   ctcopaymentscheme,
   tempInvoicePayer,
-  inventoryvaccination,
   invoice,
   clinicSettings = {},
 }) => {
@@ -135,8 +133,6 @@ const Scheme = ({
     schemePayerFK,
     medisaveVisitType,
     payerName,
-    // medisaveVaccinationFK,
-    // medisaveVaccinationList = [],
   } = invoicePayer
 
   console.log('invoicePayer',invoicePayer)
@@ -152,8 +148,8 @@ const Scheme = ({
   }
 
   const handleSchemeChange = (value) => onSchemeChange(value, index)
-  const handleSchemePayerChange = (value) => onSchemePayerChange(value, index)
-  const handleVisitTypeChange = (value) => onMediVisitTypeChange(value, index)
+  // const handleSchemePayerChange = (value) => onSchemePayerChange(value, index)
+  // const handleVisitTypeChange = (value) => onMediVisitTypeChange(value, index)
   const handleCancelClick = () => onCancelClick(index)
   const handleEditClick = () => onEditClick(index)
   const handleApplyClick = () => onApplyClick(index)
@@ -222,14 +218,6 @@ const Scheme = ({
     })
   }
 
-  /* const getDefaultMedisaveVaccination = (invoiceItemCode) => {
-    const item = inventoryvaccination.find(mv => mv.code === invoiceItemCode)
-    if(!item) return null
-    console.log('getDefaultMedisaveVaccination',item)
-
-    return item.medisaveVaccination.id
-  } */
-
   let payments = []
   payments = payments.concat(
     invoicePayment.map((o) => {
@@ -247,20 +235,12 @@ const Scheme = ({
   }
   const { isEnableAddPaymentInBilling = false } = clinicSettings
 
-  let isCHAS = schemeConfig && schemeConfig.copayerFK === 1
+  const isCHAS = schemeConfig && schemeConfig.copayerFK === 1
   const isMedisave = payerTypeFK === INVOICE_PAYER_TYPE.PAYERACCOUNT
   const isMediVisit = isMedisave && visitTypes.find(v => v === medisaveVisitType)// !== '' // && name.includes('Visit') // visitTypes.filter(m => m === medisaveVisitType).length > 0
-  /* let visitName = null
-  if(isMediVisit && name.includes('500'))
-    visitName = 'Medisave 500 Visit'
-  if(isMediVisit && name.includes('700'))
-    visitName = 'Medisave 700 Visit' */
   console.log('visitTypes', visitTypes, name)
   const isMediVaccination = isMediVisit && medisaveVisitType === 'Vaccination' // invoicePayerItem.length > 0 && invoicePayerItem.filter((o) => o.invoiceItemTypeFK === 3).length > 0
   console.log('isMedisave', isCHAS, isMedisave, isMediVisit, isMediVaccination)
-
-  // const firstVacc = inventoryvaccination.find(mv => mv.code === invoicePayerItem[0].itemCode)
-  // console.log('firstVacc',firstVacc)
   
   /* 
   const defaultVaccination = isMediVaccination && !medisaveVaccinationFK && firstVacc 
@@ -278,14 +258,6 @@ const Scheme = ({
   console.log('invoicePayerItem',invoicePayerItem)
   const payerList = getPayerList(invoicePayer)
   console.log('payerList',payerList)
-
-  // let binMid = 1
-  // if(isCHAS)
-  //   binMid = 5
-  // else if(isMedisave)
-  //   binMid = 1
-  // else
-  //   binMid = 7
 
   console.log('newInvoicePayer',invoicePayer)
   const payer = payerList.find(p => p.id === schemePayerFK)

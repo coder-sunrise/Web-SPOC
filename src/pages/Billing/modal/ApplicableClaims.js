@@ -12,12 +12,6 @@ const styles = (theme) => ({
   },
 })
 
-/* const _medisaveSchemesID = [ // by scheme category
-  6, // medisave cdmp
-  7, // Flexi
-  8, // outpatient
-  9, // medisave vaccination
-] */
 const checkCombination = (claimedMedisaveSchemeTypes, schemeTypeFK) => {
   console.log('checkCombination', claimedMedisaveSchemeTypes, schemeTypeFK)
   switch (schemeTypeFK) {
@@ -123,8 +117,8 @@ const constructSchemeList = (
           return v.invoiceItemTypeFK === 4 && !fullyClaimed && outpatientScans.find(m => m.code === v.itemCode)
         return !fullyClaimed
       }).length === 0
-      console.log('disabled', allItemsClaimed, isClaimedScheme, isMedisaveConflict, isMedisaveItemFullyClaimed)// , payersClaimed.length >= payersAll.length)
-      const disabled = allItemsClaimed || isClaimedScheme || isMedisaveConflict || isMedisaveItemFullyClaimed// || payersClaimed.length >= payersAll.length 
+      console.log('disabled', allItemsClaimed, isClaimedScheme, isMedisaveConflict, isMedisaveItemFullyClaimed)
+      const disabled = allItemsClaimed || isClaimedScheme || isMedisaveConflict || isMedisaveItemFullyClaimed
 
       const newPayer = payers.find(p => p.id === scheme[0].schemePayerFK)
       return [
@@ -134,7 +128,7 @@ const constructSchemeList = (
           claimableSchemesIndex: index,
           nestedIndex: 0,
           disabled,
-          schemeName: scheme[0].coPaymentSchemeName,// .replace(' 500','').replace(' 700',''),
+          schemeName: scheme[0].coPaymentSchemeName,
           schemePayerFK: scheme[0].schemePayerFK,
           payerName: newPayer ? newPayer.payerName : '',
           schemeTypeFK: schemeType.id,
@@ -176,7 +170,6 @@ const ApplicableClaims = ({
   invoiceItems,
   medisaveItems,
 }) => {
-  // const payers = patient.schemePayer
   console.log('medisaveItems',medisaveItems)
   const schemesList = constructSchemeList(
     claimableSchemes, 

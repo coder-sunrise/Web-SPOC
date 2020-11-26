@@ -57,19 +57,8 @@ class PatientInfoSideBanner extends PureComponent {
   }
 
   isMedisave = (schemeTypeFK) => {
-    /* const { ctSchemeType } = this.props
-    const r = ctSchemeType.find((o) => o.id === schemeTypeFK)
-    if(r)
-      return (
-        [
-          'FLEXIMEDI',
-          'OPSCAN',
-          'MEDIVISIT',
-        ].indexOf(r.code) >= 0
-      )  */
     if(schemeTypeFK)
       return [12,13,14].indexOf(schemeTypeFK) >= 0
-
     return false
   }
 
@@ -173,13 +162,10 @@ class PatientInfoSideBanner extends PureComponent {
         }
 
         const {
-          // balance,
-          // schemeTypeFk,
           validFrom,
           validTo,
           payerBalance,
           isSuccessful,
-          status,
           statusDescription,
         } = result
         let isShowReplacementModal = false
@@ -302,7 +288,6 @@ class PatientInfoSideBanner extends PureComponent {
       && this.state.refreshedSchemePayerData.isSuccessful === true
     ) {
       console.log('this.state.refreshedSchemePayerData',this.state.refreshedSchemePayerData)
-      // return { ...this.state.refreshedSchemePayerData }
       const refreshData = this.state.refreshedSchemePayerData.payerBalanceList.find((row) => row.schemePayerFK === schemePayer.id)
 
       console.log('refreshData', refreshData)

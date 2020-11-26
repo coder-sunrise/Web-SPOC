@@ -56,7 +56,6 @@ class MedisaveVaccinations extends PureComponent {
                 ...r,
               }
             })
-
             setFieldValue('inventoryVaccination_MedisaveVaccination', newRows)
           },
           render: (row) => {
@@ -91,25 +90,13 @@ class MedisaveVaccinations extends PureComponent {
                 isDefault: false,
               }
             })
-            
             setFieldValue('inventoryVaccination_MedisaveVaccination', newRows)
           },
-          /* render: (row) => {
-            return (
-              <span>
-                <Radio
-                  checked={row.isDefault}
-                  // onChange={() => this.changeIsDefault(row)}
-                  disabled={row.isDefault}
-                />
-              </span>
-            )
-          }, */
         },
       ],
     }
     
-    this.commitChanges = ({ rows, added, changed, deleted }) => {
+    this.commitChanges = ({ rows }) => {
       const { setFieldValue } = this.props
         
       const newRows = rows && rows.filter(r => !r.isDeleted).length === 1 
@@ -120,7 +107,6 @@ class MedisaveVaccinations extends PureComponent {
         } // won't update in dto, only in ui
       })
       : rows
-
       setFieldValue('inventoryVaccination_MedisaveVaccination', newRows)
       // return _newRows
     }
@@ -128,7 +114,6 @@ class MedisaveVaccinations extends PureComponent {
 
   changeIsDefault = ({ row }) => {
     const { rows, setFieldValue } = this.props
-
     const newRows = rows.map((r) => {
       if (r === row.row) {
         return {
@@ -141,36 +126,23 @@ class MedisaveVaccinations extends PureComponent {
         isDefault: false,
       }
     })
-
     setFieldValue('inventoryVaccination_MedisaveVaccination', newRows)
-
   }
 
   handleDelete = ({ row }) => {
     const { rows, setFieldValue } = this.props
-
     const newRows = rows.forEach((o) => {
       if(o.id === row.id)
         o.isDeleted = true
     })
-
     setFieldValue('inventoryVaccination_MedisaveVaccination', newRows)
   }
 
-  /* getSortedRows = (rows) => {
-    return _.orderBy(rows, [
-      'sequence',
-      'schemeTypeFK',
-    ])
-  } */
-
   render () {
-    const { editingRowIds, rowChanges } = this.state
-    const { type, rows, values, schema, errors } = this.props
+    const { rows, schema } = this.props
 
     const EditingProps = {
       showAddCommand: true,
-
       onCommitChanges: this.commitChanges,
     }
 
@@ -184,13 +156,6 @@ class MedisaveVaccinations extends PureComponent {
     : rows
 
     console.log('newRows', newRows)
-    /* return <CommonTableGrid 
-      rows={rows} 
-      columns={this.tableParas.columns} 
-      FuncProps={{ pager: false }}
-      schema={schema}
-      {...this.tableParas} 
-    /> */
     return (
       <EditableTableGrid
         rows={newRows}
