@@ -178,12 +178,12 @@ class Grid extends PureComponent {
             {items.map((item) => {
               let addedItem = addedItems.find((added) => added.id === item.id)
               let warningLabel
-              if (item.isExternalPrescription) {
-                warningLabel = '*'
-              } else if (!item.isActive) {
-                warningLabel = '**'
+              if (!item.isActive) {
+                warningLabel = '#1'
               } else if (item.inventoryDispenseUOMFK !== item.dispenseUOMFK) {
-                warningLabel = '***'
+                warningLabel = '#2'
+              } else if (item.isExternalPrescription) {
+                warningLabel = '#3'
               }
               return (
                 <div
@@ -196,7 +196,9 @@ class Grid extends PureComponent {
                   <GridContainer>
                     <div className={classes.nameColumn}>
                       {warningLabel && (
-                        <span style={{ color: 'red' }}>{warningLabel}</span>
+                        <span style={{ color: 'red', fontStyle: 'italic' }}>
+                          <sup>{warningLabel}&nbsp;</sup>
+                        </span>
                       )}
                       <Tooltip title={item.drugName || item.vaccinationName}>
                         <span>{item.drugName || item.vaccinationName}</span>
@@ -340,24 +342,32 @@ class Grid extends PureComponent {
             >
               {type === '1' && (
                 <span>
-                  Note:&nbsp;{!isRetail && (
+                  Note:&nbsp;
+                  <span style={{ color: 'red', fontStyle: 'italic' }}>
+                    <sup>#1&nbsp;</sup>
+                  </span>
+                  inactive medication &nbsp;&nbsp;
+                  <span style={{ color: 'red', fontStyle: 'italic' }}>
+                    <sup>#2&nbsp;</sup>
+                  </span>
+                  dispensing UOM changed&nbsp;&nbsp;
+                  {!isRetail && (
                     <span>
-                      <span style={{ color: 'red' }}>*</span>
-                      external prescription &nbsp;&nbsp;
+                      <span style={{ color: 'red', fontStyle: 'italic' }}>
+                        <sup>#3&nbsp;</sup>
+                      </span>
+                      external prescription
                     </span>
                   )}
-                  <span style={{ color: 'red' }}>**</span>
-                  inactive medication &nbsp;&nbsp;<span
-                    style={{ color: 'red' }}
-                  >
-                    ***
-                  </span>
-                  dispensing UOM changed
                 </span>
               )}
               {type === '2' && (
                 <span>
-                  Note:&nbsp;<span style={{ color: 'red' }}>**</span>
+                  Note:&nbsp;<span
+                    style={{ color: 'red', fontStyle: 'italic' }}
+                  >
+                    <sup>#1&nbsp;</sup>
+                  </span>
                   inactive vaccination
                 </span>
               )}
