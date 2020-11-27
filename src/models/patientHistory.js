@@ -77,6 +77,18 @@ export default createListViewModel({
           patientID = visit.patientProfileFK
           yield
         }
+
+        yield put({
+          type: 'updateState',
+          payload: {
+            queueID,
+            patientID,
+          },
+        })
+      },
+
+      *queryPatientHistoy ({ payload }, { call, put }) {
+        const { patientID, version } = payload
         yield put({
           type: 'query',
           payload: {
@@ -91,15 +103,17 @@ export default createListViewModel({
             'neql_VisitStatusFKNavigation.Status': 'WAITING',
           },
         })
-        yield take('query/@@end')
+      },
 
-        yield put({
-          type: 'updateState',
-          payload: {
-            queueID,
-            patientID,
-          },
-        })
+      *queryVisitHistory ({ payload }, { call }) {
+        const response = yield call(service.queryVisitHistory, payload)
+        if (response.status === '200') {
+          return {
+            list: response.data.data || [],
+            totalVisits: response.data.totalRecords,
+          }
+        }
+        return false
       },
       *queryDispenseHistory ({ payload }, { call, put }) {
         const response = yield call(service.queryDispenseHistory, payload)

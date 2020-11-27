@@ -34,4 +34,7 @@ module.exports = {
       {},
     )
   },
+  queryVisitHistory: (params) => {
+    return service.query(`${url}/VisitHistory`, params)
+  },
 }

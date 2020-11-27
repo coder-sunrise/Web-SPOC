@@ -1,10 +1,12 @@
 /* eslint-disable no-nested-ternary */
 import React, { Component } from 'react'
-import { Tag, Collapse } from 'antd'
+import { Collapse } from 'antd'
 import moment from 'moment'
-import Edit from '@material-ui/icons/Edit'
+import { Edit, Print } from '@material-ui/icons'
 import { connect } from 'dva'
 import router from 'umi/router'
+import { Field } from 'formik'
+import Search from '@material-ui/icons/Search'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
@@ -15,17 +17,27 @@ import {
   CommonModal,
   Button,
   Tooltip,
-  notification,
+  Checkbox,
+  ProgressButton,
+  CodeSelect,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 // utils
 import { findGetParameter } from '@/utils/utils'
 import { VISIT_TYPE } from '@/utils/constants'
+import { FilterBarDate, DoctorProfileSelect } from '@/components/_medisys'
 import * as WidgetConfig from './config'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 import HistoryDetails from './HistoryDetails'
 import customtyles from './PatientHistoryStyle.less'
-import FitlerBar from './FilterBar'
+
+const defaultValue = {
+  visitFromDate: moment(new Date()).startOf('day').toDate(),
+  visitToDate: moment(new Date()).endOf('day').toDate(),
+  selectDoctors: [],
+  selectCategories: [],
+  isAllDate: true,
+}
 
 const styles = (theme) => ({
   root: {},
@@ -80,54 +92,47 @@ const styles = (theme) => ({
 })
 @connect(
   ({
-    patientHistory,
     clinicInfo,
     clinicSettings,
     codetable,
     user,
     scriblenotes,
     patient,
+    patientHistory,
   }) => ({
-    patientHistory,
     clinicSettings,
     codetable,
     user,
     clinicInfo,
     scriblenotes,
     patient,
+    patientHistory,
   }),
 )
 @withFormikExtend({
   enableReinitialize: true,
-  mapPropsToValues: ({ patientHistory }) => {
-    const returnValue = patientHistory.entity
-      ? patientHistory.entity
-      : patientHistory.default
-
-    return {
-      ...returnValue,
-      eyeVisualAcuityTestAttachments: (returnValue.eyeVisualAcuityTestAttachments ||
-        [])
-        .map((eyeAttachment) => eyeAttachment.attachment),
-    }
-  },
+  mapPropsToValues: () => ({
+    ...defaultValue,
+  }),
 })
 class PatientHistory extends Component {
   constructor (props) {
     super(props)
+    this.scrollRef = React.createRef()
     this.widgets = WidgetConfig.widgets(
       props,
       this.scribbleNoteUpdateState,
     ).filter((o) => {
       const accessRight = Authorized.check(o.authority)
-      return accessRight && accessRight.rights !== 'hidden'
+      return (
+        accessRight &&
+        accessRight.rights !== 'hidden' &&
+        this.getCategoriesOptions().find((c) => c.value === o.id)
+      )
     })
-    const activeHistoryTags = this.getActiveHistoryTags()
 
     this.state = {
       selectedData: '',
-      selectTag:
-        activeHistoryTags.length > 0 ? activeHistoryTags[0] : { children: [] },
       showHistoryDetails: false,
       selectHistory: undefined,
       activeKey: [],
@@ -140,6 +145,7 @@ class PatientHistory extends Component {
       pageIndex: 0,
       loadVisits: [],
       isScrollBottom: false,
+      totalVisits: 0,
     }
   }
 
@@ -155,34 +161,69 @@ class PatientHistory extends Component {
         patientID: Number(findGetParameter('pid')) || 0,
       },
     }).then(() => {
-      const { patientHistory } = this.props
-      let sortedPatientHistory = []
-
-      sortedPatientHistory = patientHistory.list
-        ? patientHistory.list.filter(
-            (o) =>
-              o.visitPurposeFK === VISIT_TYPE.RETAIL ||
-              (o.coHistory && o.coHistory.length > 0),
-          )
-        : []
-      this.setState({ activeKey: sortedPatientHistory.map((o) => o.id) })
+      this.queryVisitHistory()
     })
   }
 
-  getActiveHistoryTags = () => {
-    const activeHistoryTags = WidgetConfig.historyTags.filter((o) => {
-      const enableAuthority = o.authority.find((a) => {
-        const accessRight = Authorized.check(a)
-        if (!accessRight || accessRight.rights === 'hidden') return false
-        return true
+  componentDidMount () {
+    if (this.scrollRef) {
+      this.scrollRef.addEventListener('scroll', (e) => {
+        const { isScrollBottom } = this.state
+        if (!isScrollBottom) {
+          const { clientHeight, scrollHeight, scrollTop } = e.target
+          const isBottom = clientHeight + scrollTop === scrollHeight
+          if (isBottom) {
+            this.setState({ isScrollBottom: isBottom })
+          }
+        }
       })
+    }
+  }
 
-      if (enableAuthority) {
-        return true
-      }
-      return false
+  queryVisitHistory = () => {
+    const {
+      visitFromDate,
+      visitToDate,
+      isAllDate,
+      pageIndex,
+      selectDoctors = [],
+    } = this.state
+    const { dispatch, clinicSettings, patientHistory } = this.props
+    const { settings = [] } = clinicSettings
+    const { viewVisitPageSize = 10 } = settings
+    dispatch({
+      type: 'patientHistory/queryVisitHistory',
+      payload: {
+        visitFromDate: visitFromDate
+          ? moment(visitFromDate).startOf('day').formatUTC()
+          : undefined,
+        visitToDate: visitToDate
+          ? moment(visitToDate).endOf('day').formatUTC(false)
+          : undefined,
+        isAllDate,
+        pageIndex: pageIndex + 1,
+        pageSize: viewVisitPageSize,
+        patientProfileId: patientHistory.patientID,
+        selectDoctors: selectDoctors.join(','),
+      },
+    }).then((r) => {
+      this.setState((preState) => {
+        const currentVisits = [
+          ...preState.loadVisits,
+          ...r.list,
+        ]
+        return {
+          ...preState,
+          loadVisits: currentVisits,
+          totalVisits: r.totalVisits,
+          pageIndex: preState.pageIndex + 1,
+          activeKey: [
+            ...preState.activeKey,
+            ...r.list.map((o) => o.id),
+          ],
+        }
+      })
     })
-    return activeHistoryTags
   }
 
   getTitle = (row) => {
@@ -387,6 +428,14 @@ class PatientHistory extends Component {
     )
   }
 
+  checkSelectWidget = (widgetId) => {
+    const { selectCategories = [] } = this.state
+    if (selectCategories.length > 0) {
+      return selectCategories.find((c) => c === widgetId)
+    }
+    return true
+  }
+
   getDetailPanel = (history) => {
     const { isFullScreen = true } = this.props
     const { visitPurposeFK } = history
@@ -410,12 +459,12 @@ class PatientHistory extends Component {
             _widget.id === WidgetConfig.WIDGETS_ID.VISITREMARKS ||
             _widget.id === WidgetConfig.WIDGETS_ID.REFERRAL ||
             _widget.id === WidgetConfig.WIDGETS_ID.ATTACHMENT) &&
-          this.state.selectTag.children.indexOf(_widget.id) >= 0 &&
+          this.checkSelectWidget(_widget.id) &&
           WidgetConfig.showWidget(current, _widget)
         )
       }
       return (
-        this.state.selectTag.children.indexOf(_widget.id) >= 0 &&
+        this.checkSelectWidget(_widget.id) &&
         WidgetConfig.showWidget(current, _widget)
       )
     })
@@ -479,83 +528,222 @@ class PatientHistory extends Component {
   }
 
   setExpandAll = (isExpandAll = false) => {
+    const { loadVisits } = this.state
     if (isExpandAll) {
-      const { patientHistory } = this.props
-      let sortedPatientHistory = []
-
-      sortedPatientHistory = patientHistory.list
-        ? patientHistory.list.filter(
-            (o) =>
-              o.visitPurposeFK === VISIT_TYPE.RETAIL ||
-              (o.coHistory && o.coHistory.length > 0),
-          )
-        : []
-      this.setState({ activeKey: sortedPatientHistory.map((o) => o.id) })
+      this.setState({ activeKey: loadVisits.map((o) => o.id) })
     } else {
       this.setState({ activeKey: [] })
     }
   }
 
+  getCategoriesOptions = () => {
+    let client = 'Dental'
+    let categories = []
+    if (client === 'GP') {
+      categories = WidgetConfig.GPCategory
+    } else if (client === 'Dental') {
+      categories = WidgetConfig.DentalCategory
+    } else if (client === 'Eye') {
+      categories = WidgetConfig.EyeCategory
+    }
+    return WidgetConfig.categoryTypes
+      .filter((o) => {
+        const accessRight = Authorized.check(o.authority)
+        if (!accessRight || accessRight.rights === 'hidden') return false
+
+        if (categories.find((c) => c === o.value)) {
+          return true
+        }
+        return false
+      })
+      .map((o) => {
+        return { ...o }
+      })
+  }
+
   getFilterBar = () => {
-    const { CheckableTag } = Tag
+    const { values } = this.props
+    const { visitFromDate, visitToDate, isAllDate } = values
+    const { selectItems } = this.state
     return (
-      <div style={{ display: 'flex' }}>
-        <div style={{ margin: '10px 0' }} className={customtyles.customTag}>
-          {this.getActiveHistoryTags().map((tag) => (
-            <CheckableTag
-              style={{ padding: '5px 10px' }}
-              key={tag.value}
-              checked={this.state.selectTag.value === tag.value}
-              onChange={(checked) => {
-                if (checked) this.setState({ selectTag: tag })
-                return null
-              }}
+      <div>
+        <div style={{ display: 'flex' }}>
+          <div>
+            <div style={{ display: 'inline-Block', width: 120 }}>
+              <Field
+                name='visitFromDate'
+                render={(args) => (
+                  <FilterBarDate
+                    {...args}
+                    label='Visit Date From'
+                    formValues={{
+                      startDate: visitFromDate,
+                      endDate: visitToDate,
+                    }}
+                    disabled={isAllDate}
+                  />
+                )}
+              />
+            </div>
+            <div
+              style={{ display: 'inline-Block', marginLeft: 10, width: 120 }}
             >
-              {tag.name}
-            </CheckableTag>
-          ))}
+              <Field
+                name='visitToDate'
+                render={(args) => (
+                  <FilterBarDate
+                    {...args}
+                    label='Visit Date To'
+                    isEndDate
+                    formValues={{
+                      startDate: visitFromDate,
+                      endDate: visitToDate,
+                    }}
+                    disabled={isAllDate}
+                  />
+                )}
+              />
+            </div>
+            <div style={{ display: 'inline-Block', marginLeft: 5 }}>
+              <Field
+                name='isAllDate'
+                render={(args) => <Checkbox {...args} label='All Date' />}
+              />
+            </div>
+            <div style={{ display: 'inline-Block', marginLeft: 5, width: 130 }}>
+              <Field
+                name='selectCategories'
+                render={(args) => (
+                  <CodeSelect
+                    valueField='value'
+                    label='Categories'
+                    mode='multiple'
+                    options={this.getCategoriesOptions()}
+                    {...args}
+                  />
+                )}
+              />
+            </div>
+            <div
+              style={{ display: 'inline-Block', marginLeft: 10, width: 130 }}
+            >
+              <Field
+                name='selectDoctors'
+                render={(args) => (
+                  <DoctorProfileSelect
+                    mode='multiple'
+                    {...args}
+                    allValue={-99}
+                    allValueOption={{
+                      id: -99,
+                      clinicianProfile: {
+                        name: 'All',
+                        isActive: true,
+                      },
+                    }}
+                    labelField='clinicianProfile.name'
+                    localFilter={(option) => option.clinicianProfile.isActive}
+                  />
+                )}
+              />
+            </div>
+            <div style={{ display: 'inline-Block', marginLeft: 10 }}>
+              <ProgressButton
+                color='primary'
+                size='sm'
+                icon={<Search />}
+                onClick={this.handelSearch}
+              >
+                Search
+              </ProgressButton>
+            </div>
+          </div>
         </div>
-        <div style={{ marginLeft: 'auto' }}>
-          <span
+        <div style={{ display: 'flex' }}>
+          <div
             style={{
-              cursor: 'pointer',
-            }}
-            onClick={() => {
-              this.setExpandAll(true)
+              position: 'relative',
+              bottom: -8,
             }}
           >
-            <span
-              className='material-icons'
+            <div style={{ display: 'inline-Block' }}>
+              <Field
+                name='isSelectAll'
+                render={(args) => <Checkbox {...args} label='Select All' />}
+              />
+            </div>
+            <div
               style={{
-                marginTop: 15,
-                fontSize: '1.2rem',
+                display: 'inline-Block',
+                fontWeight: 500,
               }}
             >
-              unfold_more
-            </span>
-            <span style={{ position: 'relative', top: -5 }}>Expand All</span>
-          </span>
-          <span
-            style={{
-              cursor: 'pointer',
-              marginLeft: 20,
-              marginRight: 10,
-            }}
-            onClick={() => {
-              this.setExpandAll(false)
-            }}
-          >
-            <span
-              className='material-icons'
+              {`(Select: ${selectItems.length})`}
+            </div>
+          </div>
+          <div style={{ marginLeft: 'auto' }}>
+            <div
               style={{
-                marginTop: 10,
-                fontSize: '1.2rem',
+                display: 'inline-Block',
               }}
             >
-              unfold_less
-            </span>
-            <span style={{ position: 'relative', top: -5 }}>Collapse All</span>
-          </span>
+              <span
+                style={{
+                  cursor: 'pointer',
+                }}
+                onClick={() => {
+                  this.setExpandAll(true)
+                }}
+              >
+                <span
+                  className='material-icons'
+                  style={{
+                    marginTop: 15,
+                    fontSize: '1.2rem',
+                  }}
+                >
+                  unfold_more
+                </span>
+                <span style={{ position: 'relative', top: -5 }}>
+                  Expand All
+                </span>
+              </span>
+              <span
+                style={{
+                  cursor: 'pointer',
+                  marginLeft: 20,
+                  marginRight: 10,
+                }}
+                onClick={() => {
+                  this.setExpandAll(false)
+                }}
+              >
+                <span
+                  className='material-icons'
+                  style={{
+                    marginTop: 10,
+                    fontSize: '1.2rem',
+                  }}
+                >
+                  unfold_less
+                </span>
+                <span style={{ position: 'relative', top: -5 }}>
+                  Collapse All
+                </span>
+              </span>
+            </div>
+            <Button
+              color='primary'
+              icon={null}
+              size='sm'
+              style={{
+                position: 'relative',
+                bottom: 8,
+              }}
+            >
+              <Print />print
+            </Button>
+          </div>
         </div>
       </div>
     )
@@ -575,60 +763,101 @@ class PatientHistory extends Component {
     })
   }
 
-  handelSearch = () => {}
+  handelSearch = () => {
+    const { values } = this.props
+    const {
+      visitFromDate,
+      visitToDate,
+      isAllDate,
+      selectDoctors,
+      selectCategories,
+    } = values
+    this.setState(
+      {
+        visitFromDate,
+        visitToDate,
+        isAllDate,
+        pageIndex: 0,
+        loadVisits: [],
+        activeKey: [],
+        selectItems: [],
+        isScrollBottom: false,
+        totalVisits: 0,
+        selectDoctors,
+        selectCategories,
+      },
+      this.queryVisitHistory,
+    )
+  }
+
+  handelLoadMore = () => {
+    this.queryVisitHistory()
+  }
 
   render () {
-    const { patientHistory, clinicSettings, scriblenotes } = this.props
+    const { clinicSettings, scriblenotes, height } = this.props
     const cfg = {}
-    let sortedPatientHistory = []
 
-    sortedPatientHistory = patientHistory.list
-      ? patientHistory.list.filter(
-          (o) =>
-            o.visitPurposeFK === VISIT_TYPE.RETAIL ||
-            (o.coHistory && o.coHistory.length > 0),
-        )
-      : []
-
-    if (!clinicSettings) return null
-
-    const { showHistoryDetails, selectHistory, activeKey } = this.state
+    const {
+      showHistoryDetails,
+      selectHistory,
+      activeKey,
+      totalVisits,
+      pageIndex,
+      isScrollBottom,
+      loadVisits = [],
+    } = this.state
+    const { settings = [] } = clinicSettings
+    const { viewVisitPageSize = 10 } = settings
+    const moreData = totalVisits > pageIndex * viewVisitPageSize
+    const ContentHeight = height - 300
+    const visitContentHeight = ContentHeight - 30
     return (
       <div {...cfg}>
         <CardContainer hideHeader size='sm'>
-          <FitlerBar
-            selectItemCount={this.state.selectItems.length}
-            handelSearch={this.handelSearch}
-            {...this.props}
-          />
           {this.getFilterBar()}
-          {sortedPatientHistory ? sortedPatientHistory.length > 0 ? (
-            <div>
-              <Collapse activeKey={activeKey} expandIconPosition={null}>
-                {sortedPatientHistory.map((o) => {
-                  return (
-                    <Collapse.Panel
-                      header={this.getTitle(o)}
-                      key={o.id}
-                      className={customtyles.customPanel}
-                    >
-                      {this.getDetailPanel(o)}
-                    </Collapse.Panel>
-                  )
-                })}
-              </Collapse>
+          <div
+            ref={(e) => (this.scrollRef = e)}
+            style={{
+              overflow: 'auto',
+              height: 520,
+            }}
+          >
+            {loadVisits.length > 0 ? (
+              <div>
+                <Collapse activeKey={activeKey} expandIconPosition={null}>
+                  {loadVisits.map((o) => {
+                    return (
+                      <Collapse.Panel
+                        header={this.getTitle(o)}
+                        key={o.id}
+                        className={customtyles.customPanel}
+                      >
+                        {this.getDetailPanel(o)}
+                      </Collapse.Panel>
+                    )
+                  })}
+                </Collapse>
+              </div>
+            ) : (
+              <p>No Visit Record Found</p>
+            )}
+          </div>
+          {isScrollBottom &&
+          moreData && (
+            <div
+              style={{
+                display: 'inline-Block',
+                float: 'right',
+              }}
+            >
+              <a
+                style={{ textDecoration: 'underline', fontStyle: 'italic' }}
+                onClick={this.handelLoadMore}
+              >
+                Load More
+              </a>
             </div>
-          ) : (
-            <p>No Visit Record Found</p>
-          ) : (
-            <React.Fragment>
-              <Skeleton height={30} />
-              <Skeleton height={30} width='80%' />
-              <Skeleton height={30} width='80%' />
-              <Skeleton height={30} />
-              <Skeleton height={30} width='80%' />
-              <Skeleton height={30} width='80%' />
-            </React.Fragment>
           )}
         </CardContainer>
         <CommonModal
