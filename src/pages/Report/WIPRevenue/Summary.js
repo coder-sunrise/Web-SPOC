@@ -8,11 +8,43 @@ import {
 const Summary = ({ reportDatas }) => {
   if (!reportDatas)
     return null
-
-  const { RevenueSummary } = reportDatas
+  
+  const { RevenueSummary } = reportDatas  
+  let summaryData
+  RevenueSummary.forEach(element => {
+    summaryData = element
+  })
 
   return (
-    <div>Summary content</div>
+    <GridContainer md={6}>
+      <GridItem md={12}>
+        <NumberInput
+          prefix='Total Revenue Amount'
+          currency
+          disabled
+          value={summaryData.totalRevenueAmount}
+          rightAlign
+        />
+      </GridItem>
+      <GridItem md={12}>
+        <NumberInput
+          prefix='Total Balance Amount'
+          currency
+          disabled
+          value={summaryData.totalBalanceAmount}
+          rightAlign
+        />
+      </GridItem>
+      <GridItem md={12}>
+        <NumberInput
+          prefix='Total Credit Note Amount'
+          currency
+          disabled
+          value={summaryData.totalCreditNoteAmount}
+          rightAlign
+        />
+      </GridItem>
+    </GridContainer>
   )
 }
 

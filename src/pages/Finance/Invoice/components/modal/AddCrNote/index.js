@@ -18,7 +18,6 @@ import {
   Popconfirm,
   notification,
   SizeContainer,
-  Checkbox,
 } from '@/components'
 import { showErrorNotification } from '@/utils/error'
 import { roundTo } from '@/utils/utils'
@@ -380,6 +379,9 @@ class AddCrNote extends Component {
       )
       if (data.length > 0) {
         label = `${data[0].packageCode} - ${data[0].packageName}`
+        if (data[0].isPackageExpired) {
+          label += ' (Expired)'
+        }
       }
 
       return (
@@ -422,7 +424,7 @@ class AddCrNote extends Component {
             selectable: true,
             selectConfig: {
               showSelectAll: false,
-              rowSelectionEnabled: (row) => row.itemType !== 'Misc' && (!row.isPackage || (row.isPackage && row.packageRemainingAmountAfterGST > 0)),
+              rowSelectionEnabled: (row) => row.itemType !== 'Misc' && (!row.isPackage || (row.isPackage && !row.isPackageExpired && row.packageRemainingAmountAfterGST > 0)),
             },
             pager: false,
             grouping: this.state.isExistPackage,
