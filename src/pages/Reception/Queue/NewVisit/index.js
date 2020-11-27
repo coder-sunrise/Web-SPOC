@@ -158,6 +158,10 @@ class NewVisit extends PureComponent {
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctinvoiceadjustment',
+        force: true,
+        filter: {
+          isActive: true,
+        },
       },
     })
   }

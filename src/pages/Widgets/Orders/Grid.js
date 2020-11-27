@@ -118,6 +118,28 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
       },
     })
   }
+
+  const editAdjustment = (adj) => {
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        openAdjustment: true,
+        openAdjustmentConfig: {
+          callbackConfig: {
+            model: 'orders',
+            reducer: 'editFinalAdjustment',
+          },
+          showRemark: true,
+          showAmountPreview: false,
+          defaultValues: {
+            // ...this.props.orders.entity,
+            initialAmout: total,
+            ...adj,
+          },
+        },
+      },
+    })
+  }
   const totalItems = [
     ...adjustments.map((o) => ({
       columnName: 'totalAfterItemAdjustment',
@@ -179,7 +201,7 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
             overflow: 'hidden',
             display: 'inline-block',
             textOverflow: 'ellipsis',
-            marginLeft: theme.spacing(2),
+            marginLeft: theme.spacing(-1),
             textAlign: 'right',
             position: 'absolute',
           }}
@@ -190,10 +212,25 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
         </div>
         <div
           style={{
-            marginLeft: theme.spacing(39.5),
+            marginLeft: theme.spacing(36.5),
             position: 'absolute',
           }}
         >
+          <Tooltip title='Edit Adjustment'>
+            <Button
+              justIcon
+              color='primary'
+              style={{
+                top: -1,
+              }}
+            >
+              <Edit
+                onClick={() =>
+                  editAdjustment(adj)
+                }
+              />
+            </Button>
+          </Tooltip>
           <Tooltip title='Delete Adjustment'>
             <Button
               justIcon
@@ -357,7 +394,7 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
                       >
                         <Divider />
                       </div>
-                      <div style={{ marginLeft: theme.spacing(23) }}>
+                      <div style={{ marginLeft: theme.spacing(20) }}>
                         <span>
                           Invoice Adjustment
                           <Tooltip title='Add Adjustment'>
@@ -374,7 +411,7 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
                       </div>
                       {itemAdj}
                       {gstValue >= 0 && (
-                        <div style={{ marginLeft: theme.spacing(18) }}>
+                        <div style={{ marginLeft: theme.spacing(15) }}>
                           {itemGST}
                         </div>
                       )}
@@ -387,7 +424,7 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
                       >
                         <Divider />
                       </div>
-                      <div style={{ marginLeft: theme.spacing(34.5) }}>
+                      <div style={{ marginLeft: theme.spacing(31.5) }}>
                         {itemTotal}
                       </div>
                     </div>

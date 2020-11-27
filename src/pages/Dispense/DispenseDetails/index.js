@@ -349,7 +349,7 @@ const DispenseDetails = ({
                         openConfirmContent: () => {
                           return <div>
                             <Warining style={{ width: '1.3rem', height: '1.3rem', marginLeft: '10px', color: 'red' }} />
-                            <h3 style={{ marginLeft: '10px', display: 'inline-block' }}>Unable to finalize. Make sure the total amount is not less than zero.</h3>
+                            <h3 style={{ marginLeft: '10px', display: 'inline-block' }}>Unable to finalize, total amount cannot be <span style={{ fontWeight: 400 }}>negative</span></h3>
                           </div>
                         },
                         openConfirmText: 'OK',
@@ -404,7 +404,7 @@ const DispenseDetails = ({
             />
           </Paper>
         </GridItem>
-        <GridItem xs={8} md={8} style={{ marginTop: -14 }}>
+        <GridItem xs={7} md={7} style={{ marginTop: -14 }}>
           <TextField
             value={visitRemarks}
             disabled
@@ -415,7 +415,7 @@ const DispenseDetails = ({
           />
         </GridItem>
         {!viewOnly && (
-          <GridItem xs={4} md={4}>
+          <GridItem xs={5} md={5}>
             <div style={{ paddingRight: 90 }}>
               <AmountSummary
                 rows={invoiceItem}

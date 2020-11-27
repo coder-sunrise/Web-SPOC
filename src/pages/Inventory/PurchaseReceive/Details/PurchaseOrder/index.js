@@ -587,9 +587,9 @@ class Index extends Component {
           }}
         >
           <GridContainer>
-            <GridItem xs={2} md={8} />
-            <GridItem xs={10} md={4}>
-              <div style={{ paddingRight: 22 }}>
+            <GridItem xs={2} md={6} />
+            <GridItem xs={10} md={6}>
+              <div style={{ paddingRight: 100 }}>
                 <AmountSummary
                   rows={rows}
                   adjustments={purchaseOrderAdjustment}
