@@ -14,26 +14,20 @@ import {
   dateFormatLong,
   Popconfirm,
 } from '@/components'
-import { LoadingWrapper } from 'medisys-components'
+import { LoadingWrapper, ZImage } from 'medisys-components'
 import printJS from 'print-js'
 // import 'react-responsive-carousel/lib/styles/carousel.min.css'
 import { getFileByFileID } from '@/services/file'
 import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
 import { Carousel } from 'antd'
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos'
-import $ from 'jquery'
 import _ from 'lodash'
+import { scaleImage } from '@/utils/image'
 import SetFolderWithPopover from './SetFolderWithPopover'
 
 // import 'antd/dist/antd.css'
 import './style.css'
 
-const ScaleMode = {
-  FixedWH: 1,
-  FixedW: 2,
-  FixedH: 3,
-  MaxWH: 4,
-}
 const base64Prefix = 'data:image/png;base64,'
 const styles = (theme) => ({
   previous: {
@@ -149,11 +143,10 @@ class ImagePreviewer extends Component {
     } = this.getImageContainerWH()
 
     imageList.filter((s) => s.image && s.image.src).map((img) => {
-      let scaleWH = this.scaleImage(
+      let scaleWH = scaleImage(
         img.image,
         imageContainerWidth,
         imageContainerHeight,
-        ScaleMode.MaxWH,
       )
       img.width = scaleWH.width
       img.height = scaleWH.height
@@ -210,19 +203,14 @@ class ImagePreviewer extends Component {
     }
   }
 
-  processImage = async (data, sourceWidth, sourceHeight) => {
+  processImage = async (data, containerWidth, containerHeight) => {
     let scaleWH = {}
     const image = new Image()
     await new Promise((resolve, reject) => {
       try {
         image.src = data
         image.onload = () => {
-          scaleWH = this.scaleImage(
-            image,
-            sourceWidth,
-            sourceHeight,
-            ScaleMode.MaxWH,
-          )
+          scaleWH = scaleImage(image, containerWidth, containerHeight)
           resolve()
         }
       } catch (ex) {
@@ -234,52 +222,6 @@ class ImagePreviewer extends Component {
       image,
       ...scaleWH,
     }
-  }
-
-  scaleImage = (image, w, h, mode) => {
-    let towidth = w
-    let toheight = h
-
-    switch (mode) {
-      case ScaleMode.FixedWH:
-        break
-      case ScaleMode.FixedW:
-        toheight = image.height * w / image.width
-        break
-      case ScaleMode.FixedH:
-        towidth = image.width * h / image.height
-        break
-      case ScaleMode.MaxWH:
-        // eslint-disable-next-line no-case-declarations
-        const rmaxW = image.width * 1.0 / w
-        // eslint-disable-next-line no-case-declarations
-        const rmaxH = image.height * 1.0 / h
-        if (rmaxW > rmaxH) {
-          if (rmaxW <= 1) {
-            towidth = image.width
-            h = image.height
-            // goto case ScaleMode.FixedWH;
-            break
-          }
-          towidth = w
-          // goto case ScaleMode.FixedW;
-          toheight = image.height * w / image.width
-          break
-        }
-        if (rmaxH <= 1) {
-          towidth = image.width
-          h = image.height
-          // goto case ScaleMode.FixedWH;
-          break
-        }
-        toheight = h
-        // goto case ScaleMode.FixedH;
-        towidth = image.width * h / image.height
-        break
-      default:
-        break
-    }
-    return { width: towidth, height: toheight }
   }
 
   previous = (current) => {
@@ -363,7 +305,12 @@ class ImagePreviewer extends Component {
   }
 
   render () {
-    const { imageList = [], loading = false, imageContainerWidth } = this.state
+    const {
+      imageList = [],
+      loading = false,
+      imageContainerWidth,
+      imageContainerHeight,
+    } = this.state
     const {
       classes,
       readOnly,
@@ -394,9 +341,9 @@ class ImagePreviewer extends Component {
         >
           <div
             style={{
-              background: 'black',
+              backgroundColor: 'black',
               width: imageContainerWidth,
-              minHeight: 400,
+              // minHeight: 400,
             }}
           >
             <Carousel
@@ -404,23 +351,25 @@ class ImagePreviewer extends Component {
                 this.carouselRef = el
               }}
               effect='fade'
-              beforeChange={(from, to) => {
-                // console.log('beforeChange ', from, to)
-              }}
               afterChange={this.afterChangeImage}
             >
               {this.state.imageList.map((img) => {
-                const { image, fileName, width, height } = img
+                const { image, width, height, fileIndexFK, isSelected } = img
                 return (
                   <div>
-                    <div className={classes.imageContainer}>
-                      {image && (
-                        <img
-                          alt={fileName}
+                    <div
+                      className={classes.imageContainer}
+                      style={{
+                        height: imageContainerHeight,
+                      }}
+                    >
+                      {image &&
+                      isSelected && (
+                        <ZImage
+                          key={fileIndexFK}
                           src={image.src}
                           width={width}
                           height={height}
-                          style={{ display: 'inline' }}
                         />
                       )}
                     </div>
@@ -560,6 +509,7 @@ class ImagePreviewer extends Component {
                     </Button>
 
                     <Popconfirm
+                      title='Permanently delete this file in all folders?'
                       onConfirm={() => {
                         this.deleteImage(selectedImage)
                       }}

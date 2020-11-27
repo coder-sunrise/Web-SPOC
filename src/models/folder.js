@@ -29,7 +29,7 @@ export default createListViewModel({
     effects: {
       *upsertList ({ payload }, { call, put }) {
         const response = yield call(service.upsertList, payload)
-        notification.success({ message: 'Updated.' })
+        if (response) notification.success({ message: 'Updated.' })
         return response
       },
     },

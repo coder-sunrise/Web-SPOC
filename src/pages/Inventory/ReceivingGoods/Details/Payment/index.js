@@ -8,6 +8,7 @@ import {
   withFormikExtend,
   ProgressButton,
   WarningSnackbar,
+  Button,
 } from '@/components'
 import { INVOICE_STATUS } from '@/utils/constants'
 import { navigateDirtyCheck } from '@/utils/utils'
@@ -57,7 +58,6 @@ const { Secured } = Authorized
     const { receivingGoodsPayment, currentBizSessionInfo } = values
 
     let paymentData = receivingGoodsPayment.map((x, index) => {
-      x.isCancelled = x.isDeleted
       if (_.has(x, 'isNew')) {
         return {
           receivingGoodsFK: values.id,
@@ -76,7 +76,6 @@ const { Secured } = Authorized
         }
       }
 
-      delete x.isDeleted
       return {
         ...x,
         clinicPaymentDto: {
@@ -150,14 +149,14 @@ class index extends PureComponent {
 
   getTotalPaid = () => {
     const activeRows = this.props.values.receivingGoodsPayment.filter(
-      (payment) => !payment.isDeleted,
+      (payment) => !payment.isDeleted && !payment.isCancelled,
     )
     return _.sumBy(activeRows, 'paymentAmount') || 0
   }
 
   isPaymentUpdated = () => {
     const { values: { receivingGoodsPayment } } = this.props
-    if (receivingGoodsPayment.find((item) => item.id <= 0 || item.isDeleted))
+    if (receivingGoodsPayment.find((item) => item.id <= 0 || item.isUpdate))
       return true
     return false
   }
@@ -195,7 +194,7 @@ class index extends PureComponent {
 
         {this.isPaymentUpdated() && (
           <div style={{ textAlign: 'center' }}>
-            <ProgressButton
+            <Button
               color='danger'
               icon={null}
               onClick={navigateDirtyCheck({
@@ -203,7 +202,7 @@ class index extends PureComponent {
               })}
             >
               Cancel
-            </ProgressButton>
+            </Button>
             <ProgressButton onClick={this.props.handleSubmit} />
           </div>
         )}

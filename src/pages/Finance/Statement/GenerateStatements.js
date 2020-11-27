@@ -19,12 +19,14 @@ import {
 const styles = theme => ({})
 const generateStatementSchema = Yup.object().shape({
   statementDate: Yup.date().required(),
+  invoiceDateFrom: Yup.date().required(),
+  invoiceDateTo: Yup.date().required(),
   paymentTerms: Yup.number().required(),
 })
 @connect(({ statement }) => ({
   statement,
 }))
-@withFormikExtend({ 
+@withFormikExtend({
   mapPropsToValues: () => ({
     statementDate: moment(),
     invoiceDateFrom: moment().subtract(1, 'months').startOf('month'),
@@ -43,11 +45,11 @@ const generateStatementSchema = Yup.object().shape({
         statementDate,
         paymentTerms,
         invoiceDateFrom,
-        invoiceDateTo,
+        invoiceDateTo: invoiceDateTo ? moment(invoiceDateTo).endOf('day').formatUTC(false) : undefined,
       },
     }).then((r) => {
       if (r) {
-        if (onConfirm) { 
+        if (onConfirm) {
           onConfirm()
         }
         notification.success({ message: 'Auto generate statement has been queued.' })

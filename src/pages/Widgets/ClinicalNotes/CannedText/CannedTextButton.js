@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { connect } from 'dva'
+import _ from 'lodash'
 import color from 'color'
 // material ui
 import { Divider, withStyles } from '@material-ui/core'
@@ -71,6 +72,7 @@ const CannedTextButton = ({
   onCannedTextClick,
   onPrevDoctorNoteClick,
   loading,
+  user,
 }) => {
   const [
     show,
@@ -83,7 +85,28 @@ const CannedTextButton = ({
 
   const fieldName = CANNED_TEXT_TYPE_FIELD_NAME[cannedTextTypeFK]
 
-  const list = cannedText[fieldName] || []
+  let list = cannedText[fieldName] || []
+  list = [
+    ..._.orderBy(
+      list.filter((o) => o.ownedByUserFK === user.id),
+      [
+        'sortOrder',
+        'title',
+      ],
+      [
+        'asc',
+      ],
+    ),
+    ..._.orderBy(
+      list.filter((o) => o.ownedByUserFK !== user.id),
+      [
+        'title',
+      ],
+      [
+        'asc',
+      ],
+    ),
+  ]
 
   const toggleVisibleChange = () => {
     setShow(!show)
@@ -136,14 +159,17 @@ const CannedTextButton = ({
       content={
         <LoadingWrapper loading={loading}>
           <div className={classes.popoverContainer}>
-            <div className={classes.item} onClick={handlePreviousVisitNoteClick}>
+            <div
+              className={classes.item}
+              onClick={handlePreviousVisitNoteClick}
+            >
               <History />
               <span>Previous Notes</span>
             </div>
             <Popover
               icon={null}
-              placement="right"
-              trigger="hover"
+              placement='right'
+              trigger='hover'
               visible={showCannedText}
               content={
                 <div className={classes.popoverContainer}>
@@ -168,7 +194,10 @@ const CannedTextButton = ({
                 </div>
               }
             >
-              <div className={classes.item} onMouseEnter={showCannedTextPopover}>
+              <div
+                className={classes.item}
+                onMouseEnter={showCannedTextPopover}
+              >
                 <ListAlt />
                 <span>Canned Text</span>
                 <NavigateNext className={classes.arrowRight} />
@@ -185,9 +214,10 @@ const CannedTextButton = ({
   )
 }
 
-const Connected = connect(({ cannedText, loading }) => ({
+const Connected = connect(({ cannedText, loading, user }) => ({
   cannedText,
   loading: loading.effects['cannedText/query'],
+  user: user.data,
 }))(CannedTextButton)
 
 export default withStyles(styles, { name: 'CannedTextButton' })(Connected)

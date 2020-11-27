@@ -60,9 +60,10 @@ import MiscCrNote from '@/pages/Finance/Invoice/components/modal/AddCrNote/MiscC
       remark,
       finalCredit,
       gstAmount,
+      generatedDate,
     } = values
     const payload = {
-      generatedDate: moment().formatUTC(false),
+      generatedDate,
       invoicePayerFK,
       isStockIn,
       remark,

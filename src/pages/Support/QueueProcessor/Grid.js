@@ -5,8 +5,9 @@ import { connect } from 'dva'
 import { CommonTableGrid, Tooltip, dateFormatLong, dateFormatLongWithTime12h } from '@/components'
 import { queueProcessorType, queueItemStatus } from '@/utils/codes'
 
-@connect(({ queueProcessor }) => ({
+@connect(({ queueProcessor, clinicSettings }) => ({
   queueProcessor,
+  clinicSettings,
 }))
 
 class Grid extends PureComponent {
@@ -33,14 +34,18 @@ class Grid extends PureComponent {
           return queueItemStatus.find(x => x.value === row.queueProcessStatusFK).name
         },
       },
-      { columnName: 'requestedBy', width: 140 },
       {
-        columnName: 'createDate', width: 180,
+        columnName: 'requestedBy',
+        width: 140,
+        sortBy: 'CreateByUserFkNavigation.ClinicianProfile.Name',
+      },
+      {
+        columnName: 'createDate', width: 190,
         type: 'date',
         showTime: true,
       },
       {
-        columnName: 'updateDate', width: 180,
+        columnName: 'updateDate', width: 190,
         type: 'date',
         showTime: true,
         render: (row) => {
@@ -56,7 +61,7 @@ class Grid extends PureComponent {
           let result = this.formatParameter(row)
           return (
             <Tooltip title={result} placement='top'>
-              <div>{result}</div>
+              <div style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>{result}</div>
             </Tooltip>
           )
         },
@@ -69,7 +74,7 @@ class Grid extends PureComponent {
           let tooltip = this.getTooltip(row)
           return (
             <Tooltip title={tooltip} placement='top'>
-              <div>{result}</div>
+              <div style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>{result}</div>
             </Tooltip>
           )
         },
@@ -80,9 +85,14 @@ class Grid extends PureComponent {
 
   formatParameter = (row) => {
     let type = row.queueProcessTypeFK
+    const { clinicSettings } = this.props
+    const { systemTimeZoneInt } = clinicSettings.settings
     if (type === 1) {
       let parameter = JSON.parse(row.data)
-      return `Statement Date: ${moment(parameter.StatementDate).format(dateFormatLong)}, Payment Terms: ${parameter.PaymentTerms} day(s), Invoice Date From: ${parameter.InvoiceDateFrom ? moment(parameter.InvoiceDateFrom).format(dateFormatLong) : '-'}, Invoice Date To: ${parameter.InvoiceDateTo ? moment(parameter.InvoiceDateTo).format(dateFormatLong) : '-'}`
+      return `Statement Date: ${moment.utc(parameter.StatementDate).add(systemTimeZoneInt, 'hours').format(dateFormatLong)}
+      , Payment Terms: ${parameter.PaymentTerms} day(s)
+      , Invoice Date From: ${parameter.InvoiceDateFrom ? moment.utc(parameter.InvoiceDateFrom).add(systemTimeZoneInt, 'hours').format(dateFormatLong) : '-'}
+      , Invoice Date To: ${parameter.InvoiceDateTo ? moment.utc(parameter.InvoiceDateTo).add(systemTimeZoneInt, 'hours').format(dateFormatLong) : '-'}`
     }
     return ''
   }
@@ -117,6 +127,7 @@ class Grid extends PureComponent {
   render () {
     return (
       <CommonTableGrid
+        forceRender
         style={{ margin: 0 }}
         type='queueProcessor'
         {...this.configs}

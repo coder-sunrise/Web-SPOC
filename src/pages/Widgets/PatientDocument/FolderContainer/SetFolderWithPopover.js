@@ -95,6 +95,7 @@ class SetFolderWithPopover extends Component {
             <div style={{ display: 'flex' }}>
               <TextField
                 label='New Folder'
+                maxLength={50}
                 onChange={(e) => {
                   this.setNewFolder(e.target.value)
                 }}

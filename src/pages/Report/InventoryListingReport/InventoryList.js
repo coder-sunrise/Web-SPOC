@@ -18,9 +18,8 @@ class InventoryList extends PureComponent {
       const { children } = p
       let countCol = children.find((c) => {
         if (!c.props.tableColumn.column) return false
-        return c.props.tableColumn.column.name === 'stock'
+        return c.props.tableColumn.column.name === 'amount'
       })
-      // console.log({ countCol })
 
       if (countCol) {
         const newChildren = [
@@ -31,7 +30,7 @@ class InventoryList extends PureComponent {
               colSpan: 9,
               tableColumn: {
                 ...countCol.props.tableColumn,
-                align: 'left',
+                align: 'right',
               },
             },
             key: 1111,
@@ -47,14 +46,14 @@ class InventoryList extends PureComponent {
       summaryConfig: {
         state: {
           totalItems: [
-            { columnName: 'stock', type: 'sum' },
+            { columnName: 'amount', type: 'sum' },
           ],
         },
         integrated: IntegratedSummary.defaultCalculator,
         row: {
           totalRowComponent: SummaryRow,
           messages: {
-            sum: 'Total Number of Stock',
+            sum: 'Grand Total',
           },
         },
       },
@@ -68,33 +67,40 @@ class InventoryList extends PureComponent {
       { name: 'status', title: 'Status' },
       { name: 'stock', title: 'Stock' },
       { name: 'uom', title: 'UOM' },
-      { name: 'acp', title: 'ACP' },
-      { name: 'amount', title: 'Amount' },
+      {
+        name: 'acp',
+        title: <span>{reportDatas.InventoryListInfo[0].costPriceType}</span>,
+      },
+      { name: 'amount', title: 'Total Cost' },
     ]
     const InventoryListExtensions = [
-      { columnName: 'inventoryType', sortingEnabled: false },
-      { columnName: 'inventoryCode', sortingEnabled: false },
+      { columnName: 'inventoryType', sortingEnabled: false, width: 120 },
+      { columnName: 'inventoryCode', sortingEnabled: false, width: 150 },
       { columnName: 'inventoryItem', sortingEnabled: false },
       { columnName: 'supplier', sortingEnabled: false },
-      { columnName: 'status', sortingEnabled: false },
+      { columnName: 'status', sortingEnabled: false, width: 80 },
       {
         columnName: 'stock',
         sortingEnabled: false,
         type: 'number',
         precision: 1,
+        width: 100,
       },
-      { columnName: 'uom', sortingEnabled: false, align: 'right' },
+      { columnName: 'uom', sortingEnabled: false, width: 130 },
       {
         columnName: 'acp',
         sortingEnabled: false,
         type: 'currency',
         currency: true,
+        precision: 4,
+        width: 140,
       },
       {
         columnName: 'amount',
         sortingEnabled: false,
         type: 'currency',
         currency: true,
+        width: 160,
       },
     ]
 

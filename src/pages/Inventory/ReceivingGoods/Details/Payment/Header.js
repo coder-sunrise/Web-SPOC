@@ -7,15 +7,22 @@ import {
   DatePicker,
   NumberInput,
 } from '@/components'
+import { INVOICE_STATUS } from '@/utils/constants'
 
 class Header extends PureComponent {
   render () {
     const {
       receivingGoodsDetails: {
-        receivingGoods: { receivingGoodsNo, receivingGoodsDate, totalAftGST },
+        receivingGoods: {
+          receivingGoodsNo,
+          receivingGoodsDate,
+          totalAftGST,
+          invoiceStatusFK,
+        },
       },
       getTotalPaid,
     } = this.props
+
     return (
       <React.Fragment>
         <GridContainer>
@@ -56,7 +63,13 @@ class Header extends PureComponent {
               label={formatMessage({
                 id: 'inventory.rg.detail.payment.outstandingAmount',
               })}
-              value={totalAftGST - getTotalPaid()}
+              value={
+                invoiceStatusFK === INVOICE_STATUS.WRITEOFF ? (
+                  0
+                ) : (
+                  totalAftGST - getTotalPaid()
+                )
+              }
             />
           </GridItem>
         </GridContainer>

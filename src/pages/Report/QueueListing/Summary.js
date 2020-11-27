@@ -68,17 +68,6 @@ const Summary = ({ reportDatas }) => {
   return (
     <GridContainer md={6} style={{ marginBottom: 8 }}>
       <GridItem md={12}>
-        <NumberInput
-          prefix='Total Cash Rounding:'
-          style={{ margin: 6 }}
-          currency
-          text
-          value={PaymentModeDetails.reduce((pre, cur) => {
-            return pre + cur.cashRounding
-          }, 0)}
-        />
-      </GridItem>
-      <GridItem md={12}>
         <ReportDataGrid
           noHeight
           data={listData}
@@ -87,18 +76,41 @@ const Summary = ({ reportDatas }) => {
           FuncProps={FuncProps}
         />
       </GridItem>
-      <GridItem md={12}>
+      <GridItem md={12} style={{ marginTop: '10px' }}>
+        <span style={{ display: 'inline-block', textAlign: 'left', fontWeight: '500', width: '160px' }}>Total Cash Collected:</span>
         <NumberInput
-          prefix=' Company Payable Amount:'
+          prefix=''
           currency
-          style={{ margin: 6 }}
+          style={{ padding: '0px 8px', width: '100px', textAlign: 'right' }}
           text
+          value={PaymentModeDetails.reduce((pre, cur) => {
+            return pre + cur.cashCollected
+          }, 0)}
+        />
+      </GridItem>
+      <GridItem md={12}>
+        <span style={{ display: 'inline-block', textAlign: 'left', fontWeight: '500', width: '160px' }}>Total Cash Rounding:</span>
+        <NumberInput
+          currency
+          text
+          style={{ padding: '0px 8px', width: '100px', textAlign: 'right' }}
+          value={PaymentModeDetails.reduce((pre, cur) => {
+            return pre + cur.cashRounding
+          }, 0)}
+        />
+      </GridItem>
+      <GridItem md={12}>
+        <span style={{ display: 'inline-block', textAlign: 'left', fontWeight: '500', width: '160px' }}>Company Payable Amt.:</span>
+        <NumberInput
+          currency
+          text
+          style={{ padding: '0px 8px', width: '100px', textAlign: 'right' }} 
           value={InvoicePayerDetail.reduce((pre, cur) => {
             return pre + cur.coPayerPayable
           }, 0)}
         />
       </GridItem>
-      <GridItem md={12}>
+      <GridItem md={12} style={{ marginTop: '10px' }}>
         <InvoicePayer reportDatas={reportDatas} />
       </GridItem>
     </GridContainer>

@@ -15,6 +15,7 @@ import {
   CommonModal,
   Button,
   Tooltip,
+  notification,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 // utils
@@ -286,6 +287,7 @@ class PatientHistory extends Component {
                     justIcon
                     onClick={(event) => {
                       event.stopPropagation()
+
                       dispatch({
                         type: `consultation/edit`,
                         payload: {
