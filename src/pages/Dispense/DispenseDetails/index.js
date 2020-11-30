@@ -552,8 +552,6 @@ const DispenseDetails = ({
               color='primary'
               icon={null}
               onClick={() => {
-                console.log(dispense)
-                // const { } = dispense
                 onFinalizeClick()
               }}
             >
