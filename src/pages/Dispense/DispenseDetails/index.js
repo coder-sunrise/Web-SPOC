@@ -349,11 +349,18 @@ const DispenseDetails = ({
                         openConfirmContent: () => {
                           return <div>
                             <Warining style={{ width: '1.3rem', height: '1.3rem', marginLeft: '10px', color: 'red' }} />
-                            <h3 style={{ marginLeft: '10px', display: 'inline-block' }}>Unable to finalize, total amount cannot be <span style={{ fontWeight: 400 }}>negative</span></h3>
+                            <h3 style={{ marginLeft: '10px', display: 'inline-block' }}>Unable to finalize, total amount cannot be <span style={{ fontWeight: 400 }}>negative</span>.</h3>
                           </div>
                         },
                         openConfirmText: 'OK',
-                        onConfirmClose: () => { },
+                        onConfirmClose: () => {
+                          window.g_app._store.dispatch({
+                            type: 'global/updateAppState',
+                            payload: {
+                              customWidth: undefined
+                            }
+                          })
+                        },
                       },
                     })
                   }

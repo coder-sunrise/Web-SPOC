@@ -269,7 +269,9 @@ class GlobalModalContainer extends PureComponent {
             {global.additionalInfo}
           </div>
         </CommonModal>
-
+        {report.reportTypeID && <ReportModal />}
+        <ImageViewer />
+        <CustomConfirm />
         <CommonModal
           open={global.openAdjustment}
           title={global.openAdjustmentTitle}
@@ -300,9 +302,6 @@ class GlobalModalContainer extends PureComponent {
         >
           <Adjustment />
         </CommonModal>
-        {report.reportTypeID && <ReportModal />}
-        <ImageViewer />
-        <CustomConfirm />
       </div>
     )
   }
