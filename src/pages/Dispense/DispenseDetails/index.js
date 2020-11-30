@@ -23,7 +23,12 @@ import {
 } from '@/components'
 import AmountSummary from '@/pages/Shared/AmountSummary'
 import Authorized from '@/utils/Authorized'
-import { VISIT_TYPE } from '@/utils/constants'
+import {
+  VISIT_TYPE,
+  NOTIFICATION_TYPE,
+  NOTIFICATION_STATUS,
+} from '@/utils/constants'
+import { sendNotification } from '@/utils/realtime'
 import { dangerColor } from '@/assets/jss'
 // sub components
 import TableData from './TableData'
@@ -154,7 +159,15 @@ const DispenseDetails = ({
       payload: {
         id,
       },
-    }).then(discardCallback)
+    }).then((r) => {
+      sendNotification('EditedConsultation', {
+        type: NOTIFICATION_TYPE.CONSULTAION,
+        status: NOTIFICATION_STATUS.OK,
+        message: 'Completed Consultation',
+        visitID: values.id,
+      })
+      discardCallback(r)
+    })
   }
 
   const discardBillOrder = () => {

@@ -359,21 +359,12 @@ class Vaccination extends PureComponent {
   }
 
   onSearchVaccinationHistory = async () => {
-    const { dispatch, values, visitRegistration } = this.props
-    const { patientProfileFK } = visitRegistration.entity.visit
-    await dispatch({
-      type: 'medicationHistory/queryMedicationHistory',
-      payload: { patientProfileId: patientProfileFK },
-    })
     this.toggleAddFromPastModal()
   }
 
   toggleAddFromPastModal = () => {
     const { showAddFromPastModal } = this.state
     this.setState({ showAddFromPastModal: !showAddFromPastModal })
-    if (showAddFromPastModal) {
-      this.resetVaccinationHistoryResult()
-    }
   }
 
   validateAndSubmitIfOk = async () => {

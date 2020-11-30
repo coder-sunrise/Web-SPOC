@@ -22,6 +22,8 @@ import { convertToConsultation } from '@/pages/Consultation/utils'
 import { getAppendUrl } from '@/utils/utils'
 import { widgets } from '@/utils/widgets'
 import Authorized from '@/utils/Authorized'
+import { sendNotification } from '@/utils/realtime'
+import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
 import Warining from '@material-ui/icons/Error'
 
 const discardConsultation = async ({ dispatch, dispense }) => {
@@ -168,7 +170,7 @@ class EditOrder extends Component {
     if (!_.isEmpty(isFormValid)) {
       handleSubmit()
     } else {
-      const { consultationDocument, orders, dispatch, dispense } = this.props 
+      const { consultationDocument, orders, dispatch, dispense } = this.props
       if (orders.summary.totalWithGST < 0) {
         window.g_app._store.dispatch({
           type: 'global/updateAppState',
@@ -201,12 +203,22 @@ class EditOrder extends Component {
         orders,
         forms,
       })
-      
+
       const signResult = await dispatch({
         type: `consultation/signOrder`,
         payload,
       })
       if (signResult) {
+        const { visitRegistration } = this.props
+        const { entity: visit = {} } = visitRegistration
+        const { id } = visit
+        sendNotification('EditedConsultation', {
+          type: NOTIFICATION_TYPE.CONSULTAION,
+          status: NOTIFICATION_STATUS.OK,
+          message: 'Completed Consultation',
+          visitID: id,
+        })
+
         notification.success({
           message: 'Order signed',
         })

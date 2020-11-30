@@ -4,6 +4,7 @@ import _ from 'lodash'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import { withRouter } from 'react-router-dom'
+import { sendNotification } from '@/utils/realtime'
 import { SizeContainer, withFormikExtend } from '@/components'
 import { convertToConsultation } from '@/pages/Consultation/utils'
 import {
@@ -12,6 +13,8 @@ import {
   ORDER_TYPE_TAB,
   CLINIC_TYPE,
   REVENUE_CATEGORY,
+  NOTIFICATION_TYPE,
+  NOTIFICATION_STATUS,
 } from '@/utils/constants'
 import { roundTo, getUniqueId } from '@/utils/utils'
 import {
@@ -661,6 +664,12 @@ export default compose(
           payload,
         }).then((r) => {
           if (r) {
+            sendNotification('EditedConsultation', {
+              type: NOTIFICATION_TYPE.CONSULTAION,
+              status: NOTIFICATION_STATUS.OK,
+              message: 'Completed Consultation',
+              visitID: dispense.visitID,
+            })
             if (onConfirm) onConfirm()
             history.push({
               pathname: history.location.pathname,
