@@ -23,8 +23,8 @@ class Grid extends PureComponent {
       { name: 'displayValue', title: 'Display Value' },
       { name: 'description', title: 'Remarks' },
       { name: 'adjustment', title: 'Adjustment' },
-      { name: 'isActive', title: 'Status' },
       { name: 'sortOrder', title: 'Sort Order' },
+      { name: 'isActive', title: 'Status' },
       {
         name: 'action',
         title: 'Action',
