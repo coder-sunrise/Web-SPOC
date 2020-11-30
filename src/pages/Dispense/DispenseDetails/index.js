@@ -349,10 +349,7 @@ const DispenseDetails = ({
                 size='sm'
                 icon={<AttachMoney />}
                 onClick={() => {
-                  if (coPayerPayments.length > 0) {
-                    setShowRemovePayment(true)
-                  }
-                  else if (dispense && dispense.totalWithGST < 0) {
+                  if (dispense && dispense.totalWithGST < 0) {
                     window.g_app._store.dispatch({
                       type: 'global/updateAppState',
                       payload: {
@@ -376,6 +373,9 @@ const DispenseDetails = ({
                         },
                       },
                     })
+                  }
+                  else if (coPayerPayments.length > 0) {
+                    setShowRemovePayment(true)
                   }
                   else {
                     onFinalizeClick()
