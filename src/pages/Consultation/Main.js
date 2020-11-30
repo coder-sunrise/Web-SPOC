@@ -4,7 +4,7 @@ import router from 'umi/router'
 import _ from 'lodash'
 import numeral from 'numeral'
 import Timer from 'react-compound-timer'
-
+import { sendNotification } from '@/utils/realtime'
 import { withStyles } from '@material-ui/core'
 import TimerIcon from '@material-ui/icons/Timer'
 import {
@@ -30,7 +30,11 @@ import {
   convertConsultationDocument,
 } from '@/pages/Consultation/utils'
 // import model from '@/pages/Widgets/Orders/models'
-import { VISIT_TYPE } from '@/utils/constants'
+import {
+  VISIT_TYPE,
+  NOTIFICATION_TYPE,
+  NOTIFICATION_STATUS,
+} from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { CallingQueueButton } from '@/components/_medisys'
 import {
@@ -213,6 +217,18 @@ const saveConsultation = ({
             message: successMessage,
           })
         }
+        const { visitRegistration } = props
+        const { entity: visit = {} } = visitRegistration
+        const { id } = visit
+        if (action === 'sign') {
+          sendNotification('EditedConsultation', {
+            type: NOTIFICATION_TYPE.CONSULTAION,
+            status: NOTIFICATION_STATUS.OK,
+            message: 'Completed Consultation',
+            visitID: id,
+          })
+        }
+
         sessionStorage.removeItem(`${values.id}_consultationTimer`)
         if (successCallback) {
           successCallback()

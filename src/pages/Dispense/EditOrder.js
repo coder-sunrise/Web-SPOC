@@ -22,6 +22,8 @@ import { convertToConsultation } from '@/pages/Consultation/utils'
 import { getAppendUrl } from '@/utils/utils'
 import { widgets } from '@/utils/widgets'
 import Authorized from '@/utils/Authorized'
+import { sendNotification } from '@/utils/realtime'
+import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
 
 const discardConsultation = async ({ dispatch, dispense }) => {
   try {
@@ -179,6 +181,16 @@ class EditOrder extends Component {
         payload,
       })
       if (signResult) {
+        const { visitRegistration } = this.props
+        const { entity: visit = {} } = visitRegistration
+        const { id } = visit
+        sendNotification('EditedConsultation', {
+          type: NOTIFICATION_TYPE.CONSULTAION,
+          status: NOTIFICATION_STATUS.OK,
+          message: 'Completed Consultation',
+          visitID: id,
+        })
+
         notification.success({
           message: 'Order signed',
         })
