@@ -610,10 +610,37 @@ class Main extends React.Component {
   }
 
   signOffAndCompleteBilling = () => {
-    const { visitRegistration, dispatch, values } = this.props
+    const { visitRegistration, dispatch, values, orders } = this.props
     const { entity: vistEntity = {} } = visitRegistration
     const { visit = {} } = vistEntity
     const { id: visitId } = visit
+    const { summary } = orders
+    if (summary && summary.totalWithGST < 0) {
+      window.g_app._store.dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          isInformType: true,
+          customWidth: 'md',
+          openConfirmContent: () => {
+            return <div>
+              <Warining style={{ width: '1.3rem', height: '1.3rem', marginLeft: '10px', color: 'red' }} />
+              <h3 style={{ marginLeft: '10px', display: 'inline-block' }}>Unable to complete visit, total amount cannot be <span style={{ fontWeight: 400 }}>negative</span>.</h3>
+            </div>
+          },
+          openConfirmText: 'OK',
+          onConfirmClose: () => {
+            window.g_app._store.dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                customWidth: undefined
+              }
+            })
+          },
+        },
+      })
+      return
+    }
     const successCallback = () => {
       dispatch({ type: 'consultation/closeModal' })
       dispatch({
