@@ -24,15 +24,7 @@ class Filter extends PureComponent {
     const { classes } = this.props
     return (
       <div className={classes.filterBar}>
-        <GridContainer>
-          {/* <GridItem xs={6} md={3}>
-            <FastField
-              name='code'
-              render={(args) => {
-                return <TextField label='Code' {...args} />
-              }}
-            />
-          </GridItem> */}
+        <GridContainer> 
           <GridItem xs={6} md={3}>
             <FastField
               name='codeDisplayValue'

@@ -24,7 +24,6 @@ const Adjustment = ({
   type,
   theme,
   hiddenDelete = false,
-  hideEdit = true,
 }) => {
   // console.log('Adjustment', amountProps)
   const isExactAmount = type === 'ExactAmount'

@@ -1,11 +1,8 @@
 import React, { PureComponent } from 'react'
 
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 import { status } from '@/utils/codes'
 import { CommonTableGrid, Button, Tooltip, NumberInput } from '@/components'
-import * as service from './services'
 
 const amountProps = {
   style: { margin: 0 },
@@ -74,7 +71,7 @@ class Grid extends PureComponent {
         align: 'center',
         render: (row) => {
           return (
-            <Tooltip title='Edit InvoiceAdjustment'>
+            <Tooltip title='Edit Invoice Adjustment'>
               <Button
                 size='sm'
                 onClick={() => {

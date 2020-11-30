@@ -23,12 +23,7 @@ export default createListViewModel({
         adjType: 'ExactAmount',
         adjValue: 0,
       },
-    },
-    // subscriptions: ({ dispatch, history }) => {
-    //   history.listen(async (loct, method) => {
-    //     const { pathname, search, query = {} } = loct
-    //   })
-    // },
+    }, 
     effects: {},
     reducers: {
       queryOneDone (st, { payload }) {

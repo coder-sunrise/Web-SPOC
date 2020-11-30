@@ -280,7 +280,6 @@ class AmountSummary extends PureComponent {
                 onDelete={this.deleteAdjustment}
                 onEdit={this.editAdjustment}
                 amountProps={amountProps}
-                hideEdit={false}
                 // calcPurchaseOrderSummary={calcPurchaseOrderSummary}
                 {...v}
                 theme={theme}

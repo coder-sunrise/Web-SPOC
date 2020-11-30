@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 import _ from 'lodash'
-import { formatMessage, FormattedMessage } from 'umi/locale'
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -13,8 +12,6 @@ import {
   TextField,
   DateRangePicker,
 } from '@/components'
-
-const styles = (theme) => ({})
 
 @withFormikExtend({
   mapPropsToValues: ({ settingInvoiceAdjustment }) =>

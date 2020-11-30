@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 
-import { withStyles, Divider } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
 import { CardContainer, CommonModal, withSettingBase } from '@/components'
