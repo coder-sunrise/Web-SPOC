@@ -283,7 +283,7 @@ class Adjustment extends PureComponent {
             <GridItem md={1} />
             <GridItem md={11}>
               {showError && (
-                <Alert style={{ padding: '5px 15px 5px 37px' }} message="Adding this adjustment will result in overpaid invoice." banner />
+                <Alert style={{ padding: '5px 15px 5px 37px' }} message="Adding this adjustment will make the total bill negative." banner />
               )}
             </GridItem>
             {showRemark && (
