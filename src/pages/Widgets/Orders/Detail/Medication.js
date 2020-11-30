@@ -859,21 +859,12 @@ class Medication extends PureComponent {
   }
 
   onSearchMedicationHistory = async () => {
-    const { dispatch, visitRegistration } = this.props
-    const { patientProfileFK } = visitRegistration.entity.visit
-    await dispatch({
-      type: 'medicationHistory/queryMedicationHistory',
-      payload: { patientProfileId: patientProfileFK },
-    })
     this.toggleAddFromPastModal()
   }
 
   toggleAddFromPastModal = () => {
     const { showAddFromPastModal } = this.state
     this.setState({ showAddFromPastModal: !showAddFromPastModal })
-    if (showAddFromPastModal) {
-      this.resetMedicationHistoryResult()
-    }
   }
 
   validateAndSubmitIfOk = async () => {
@@ -911,16 +902,6 @@ class Medication extends PureComponent {
     }
     handleSubmit()
     return false
-  }
-
-  resetMedicationHistoryResult = () => {
-    this.props.dispatch({
-      type: 'medicationHistory/updateState',
-      payload: {
-        filter: {},
-        list: [],
-      },
-    })
   }
 
   getMixtureItemBatchStock = (row) => {
@@ -1364,6 +1345,13 @@ class Medication extends PureComponent {
 
                           setDisable(false)
                           this.props.setFieldValue('cautions', [])
+
+                          this.props.dispatch({
+                            type: 'global/updateState',
+                            payload: {
+                              disableSave: false,
+                            },
+                          })
                         }}
                       />
                     )
