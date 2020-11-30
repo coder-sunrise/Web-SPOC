@@ -24,6 +24,7 @@ import { widgets } from '@/utils/widgets'
 import Authorized from '@/utils/Authorized'
 import { sendNotification } from '@/utils/realtime'
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
+import Warining from '@material-ui/icons/Error'
 
 const discardConsultation = async ({ dispatch, dispense }) => {
   try {
@@ -170,6 +171,33 @@ class EditOrder extends Component {
       handleSubmit()
     } else {
       const { consultationDocument, orders, dispatch, dispense } = this.props
+      if (orders.summary.totalWithGST < 0) {
+        window.g_app._store.dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            openConfirm: true,
+            isInformType: true,
+            customWidth: 'md',
+            openConfirmContent: () => {
+              return <div>
+                <Warining style={{ width: '1.3rem', height: '1.3rem', marginLeft: '10px', color: 'red' }} />
+                <h3 style={{ marginLeft: '10px', display: 'inline-block' }}>Unable to save, total amount cannot be <span style={{ fontWeight: 400 }}>negative</span>.</h3>
+              </div>
+            },
+            openConfirmText: 'OK',
+            onConfirmClose: () => {
+              window.g_app._store.dispatch({
+                type: 'global/updateAppState',
+                payload: {
+                  customWidth: undefined
+                }
+              })
+            },
+          },
+        })
+        return
+      }
+
       const payload = convertToConsultation(values, {
         consultationDocument,
         orders,
@@ -230,31 +258,31 @@ class EditOrder extends Component {
           </GridItem>
           <GridItem xs={12} md={6}>
             {formAccessRight &&
-            formAccessRight.rights !== 'hidden' && (
-              <div>
-                <h5>
-                  <span style={{ display: 'inline-block' }}>Forms</span>
-                  <span className={classes.cdAddButton}>
-                    {cdWidget.toolbarAddon}
-                  </span>
-                </h5>
-                <Forms />
-              </div>
-            )}
+              formAccessRight.rights !== 'hidden' && (
+                <div>
+                  <h5>
+                    <span style={{ display: 'inline-block' }}>Forms</span>
+                    <span className={classes.cdAddButton}>
+                      {cdWidget.toolbarAddon}
+                    </span>
+                  </h5>
+                  <Forms />
+                </div>
+              )}
             {consultationDocumentAccessRight &&
-            consultationDocumentAccessRight.rights !== 'hidden' && (
-              <div>
-                <h5>
-                  <span style={{ display: 'inline-block' }}>
-                    Consultation Document
+              consultationDocumentAccessRight.rights !== 'hidden' && (
+                <div>
+                  <h5>
+                    <span style={{ display: 'inline-block' }}>
+                      Consultation Document
                   </span>
-                  <span className={classes.cdAddButton}>
-                    {cdWidget.toolbarAddon}
-                  </span>
-                </h5>
-                <ConsultationDocument forDispense />
-              </div>
-            )}
+                    <span className={classes.cdAddButton}>
+                      {cdWidget.toolbarAddon}
+                    </span>
+                  </h5>
+                  <ConsultationDocument forDispense />
+                </div>
+              )}
             <GridItem xs={12} md={6}>
               <FastField
                 name='dispenseAcknowledgement.editDispenseReasonFK'

@@ -45,6 +45,16 @@ const styles = (theme) => ({
   },
 })
 
+const amountProps = {
+  style: { margin: 0 },
+  noUnderline: true,
+  currency: true,
+  disabled: true,
+  normalText: true,
+  showZero: true, 
+  fullWidth: false,
+}
+
 const VisitInfoCard = ({
   isReadOnly = false,
   isVisitReadonlyAfterSigned = false,
@@ -54,8 +64,12 @@ const VisitInfoCard = ({
   visitType,
   visitOrderTemplateOptions,
   setFieldValue,
+  ctinvoiceadjustment,
+  copaymentScheme,
+  patientInfo,
   ...restProps
 }) => {
+
   const validateQNo = (value) => {
     const qNo = parseFloat(value).toFixed(1)
     if (existingQNo.includes(qNo))
@@ -121,8 +135,18 @@ const VisitInfoCard = ({
     if (template) {
       handleVisitOrderTemplateChange(v, template)
     }
-  }
+  } 
 
+  const { values } = restProps
+  let totalTempCharge = 0
+  if ((values.visitOrderTemplateFK || 0) > 0) {
+    const template = visitOrderTemplateOptions.find(
+      (i) => i.id === values.visitOrderTemplateFK,
+    )
+    totalTempCharge = getVisitOrderTemplateTotal(visitType, template)
+  }
+  let showNotApplyAdjustment = totalTempCharge !== (values.visitOrderTemplateTotal || 0)
+  let showAdjusment = values.visitStatus === 'WAITING' || values.visitStatus === 'UPCOMING APPT.'
   return (
     <CommonCard title='Visit Information'>
       <GridContainer alignItems='center'>
@@ -243,6 +267,50 @@ const VisitInfoCard = ({
             }}
           />
         </GridItem>
+        {
+          (showAdjusment && ((ctinvoiceadjustment || []).length > 0 || (copaymentScheme || []).length > 0)) ?
+            <GridItem xs md={12}>
+              <div style={{ marginTop: '5px' }}>
+                <p>Below invoice adjustment(s) will {showNotApplyAdjustment ? <span style={{ fontWeight: 500, color: 'red' }}>NOT</span> : undefined} be applied to the total bill:</p>
+                {(ctinvoiceadjustment || []).map((t => {
+                  if (t.adjType === 'ExactAmount') {
+                    return <span style={{ display: 'inline-block', marginRight: '20px' }}><span style={{ fontWeight: '600' }}>{t.displayValue}</span>: <NumberInput text {...amountProps} style={{ display: 'inline-block' }} value={t.adjValue}></NumberInput>; </span>
+                  }
+                  else {
+                    if (t.adjValue > 0) {
+                      return <span style={{ display: 'inline-block', marginRight: '20px' }}>
+                        <span style={{ fontWeight: '600' }}>{t.displayValue}</span>
+                        <NumberInput {...amountProps} currency={false} precision={2} value={t.adjValue} />
+                        <span>%;</span>
+                      </span>
+                    }
+                    else {
+                      return (
+                        <span style={{ display: 'inline-block', marginRight: '20px' }}>
+                          <span style={{ fontWeight: '600' }}>{t.displayValue}:</span>
+                          <span style={{
+                            color: 'red', display: 'inline-block', fontWeight: '500'
+                          }}>
+                            <span>(</span>
+                            <span>{Math.abs(t.adjValue).toFixed(2)}</span>
+                            <span>%</span>
+                            <span>);</span>
+                          </span>
+                        </span>)
+                    }
+                  }
+                }))}
+                {(copaymentScheme || []).length > 0 ?
+                  <p>
+                    {(copaymentScheme || []).map((t => {
+                      return <span style={{ display: 'inline-block', marginRight: '20px' }}><span style={{ fontWeight: '600' }}>{t.coPayerName}</span>: <NumberInput text {...amountProps} style={{ display: 'inline-block' }} value={t.copayerInvoiceAdjustmentValue}></NumberInput>; </span>
+                    }))}
+                  </p> : undefined
+                }
+              </div>
+            </GridItem>
+            : undefined
+        }
         <GridItem xs md={12}>
           <Field
             name={FormField['visit.visitRemarks']}

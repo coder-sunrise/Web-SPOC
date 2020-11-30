@@ -211,7 +211,7 @@ class GlobalModalContainer extends PureComponent {
           open={global.openConfirm}
           title={global.openConfirmTitle}
           cancelText={global.cancelText || 'Cancel'}
-          maxWidth='sm'
+          maxWidth={global.customWidth || 'sm'}
           confirmText={global.openConfirmText || 'Confirm'}
           secondConfirmText={global.secondConfirmText || 'Pause'}
           isInformType={global.isInformType}
@@ -269,7 +269,9 @@ class GlobalModalContainer extends PureComponent {
             {global.additionalInfo}
           </div>
         </CommonModal>
-
+        {report.reportTypeID && <ReportModal />}
+        <ImageViewer />
+        <CustomConfirm />
         <CommonModal
           open={global.openAdjustment}
           title={global.openAdjustmentTitle}
@@ -300,9 +302,6 @@ class GlobalModalContainer extends PureComponent {
         >
           <Adjustment />
         </CommonModal>
-        {report.reportTypeID && <ReportModal />}
-        <ImageViewer />
-        <CustomConfirm />
       </div>
     )
   }

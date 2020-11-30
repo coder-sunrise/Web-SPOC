@@ -1,5 +1,6 @@
 import React from 'react'
 import Delete from '@material-ui/icons/Delete'
+import Edit from '@material-ui/icons/Edit'
 import {
   GridContainer,
   GridItem,
@@ -18,6 +19,7 @@ const Adjustment = ({
   adjValue,
   adjRemark,
   onDelete,
+  onEdit,
   amountProps,
   type,
   theme,
@@ -27,7 +29,7 @@ const Adjustment = ({
   const isExactAmount = type === 'ExactAmount'
   return (
     <GridContainer>
-      <GridItem xs={7}>
+      <GridItem xs={6}>
         <div
           style={{
             width: '100%',
@@ -48,7 +50,25 @@ const Adjustment = ({
           </Tooltip>
         </div>
       </GridItem>
-      <GridItem xs={1}>
+      <GridItem xs={2}>
+        {(
+          <Tooltip title='Edit Adjustment'>
+            <Button
+              color='primary'
+              size='sm'
+              aria-label='Edit'
+              justIcon
+              onClick={() => {
+                onEdit(index)
+              }}
+              style={{
+                marginLeft: theme.spacing(2),
+              }}
+            >
+              <Edit />
+            </Button>
+          </Tooltip>
+        )}
         {!hiddenDelete && (
           <Tooltip title='Delete Adjustment'>
             <Button
@@ -60,7 +80,7 @@ const Adjustment = ({
                 onDelete(index)
               }}
               style={{
-                marginLeft: theme.spacing(2),
+                marginLeft: 0,
               }}
             >
               <Delete />

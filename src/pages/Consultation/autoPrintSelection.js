@@ -10,6 +10,7 @@ import {
   EditableTableGrid,
 } from '@/components'
 import styles from './style'
+import { Alert } from 'antd';
 
 class AutoPrintSelection extends React.PureComponent {
   columns = [
@@ -120,7 +121,7 @@ class AutoPrintSelection extends React.PureComponent {
   }
 
   render () {
-    const { handleSubmit, footer, classes } = this.props
+    const { handleSubmit, footer, classes, showInvoiceAmountNegativeWarning } = this.props
     const validationSchema = Yup.object().shape({
       Copies: Yup.number().min(1),
     })
@@ -130,6 +131,7 @@ class AutoPrintSelection extends React.PureComponent {
           <GridItem md={12}>
             {this.state.data && (
               <div className={classes.tableContainer}>
+                {showInvoiceAmountNegativeWarning ? <Alert style={{ padding: '5px 15px 5px 37px', marginBottom: '5px' }} message="Total invoice amount is negative." banner /> : undefined}
                 <h5>Print the following document after sign off</h5>
                 <EditableTableGrid
                   size='sm'
