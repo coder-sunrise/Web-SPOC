@@ -165,13 +165,12 @@ class PatientDetail extends PureComponent {
       },
       {
         id: '9',
-        name: 'Medical History',
-        schema: schemas.medicalhistory,
+        name: 'Medical History', 
         component: Loadable({
           loader: () => import('./MedicalHistory'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet schema={schemas.medicalhistory} {...p} />
+            return <Cmpnet {...p} />
           },
           loading: Loading,
         }),
