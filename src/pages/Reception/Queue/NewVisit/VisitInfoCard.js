@@ -299,7 +299,7 @@ const VisitInfoCard = ({
                 }))}
                 {(copaymentScheme || []).length > 0 ?
                   <p>
-                    {(copaymentScheme || []).map((t => { 
+                    {(copaymentScheme || []).filter((t) => t.copayerInvoiceAdjustmentValue !== 0).map((t => {
                       if (t.copayerInvoiceAdjustmentType === 'ExactAmount') {
                         return <span style={{ display: 'inline-block', marginRight: '20px' }}><span style={{ fontWeight: '600' }}>{t.coPayerName}</span>: <NumberInput text {...amountProps} style={{ display: 'inline-block' }} value={t.copayerInvoiceAdjustmentValue} />; </span>
                       }
