@@ -297,7 +297,7 @@ const VisitInfoCard = ({
                       </span>;
                     </span>) 
                 }))}
-                {(copaymentScheme || []).length > 0 ?
+                {(copaymentScheme || []).filter((t) => t.copayerInvoiceAdjustmentValue !== 0).length > 0 ?
                   <p>
                     {(copaymentScheme || []).filter((t) => t.copayerInvoiceAdjustmentValue !== 0).map((t => {
                       if (t.copayerInvoiceAdjustmentType === 'ExactAmount') {
