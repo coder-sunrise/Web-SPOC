@@ -77,6 +77,23 @@ const widgets = [
     ),
   },
   {
+    id: '13',
+    name: 'Medical History',
+    accessRight: 'queue.consultation.widgets.medicalhistory',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/MedicalHistory'),
+      loading: Loading,
+    }),
+    model: 'patientMedicalHistory',
+    layoutConfig: {
+      h: 2,
+      w: 12,
+      style: {
+        padding: 5,
+      },
+    },
+  },
+  {
     id: '2',
     name: 'Diagnosis',
     accessRight: 'queue.consultation.widgets.diagnosis',
@@ -95,24 +112,6 @@ const widgets = [
         padding: 5,
       },
     },
-  },
-  {
-    id: '13',
-    name: 'Medical History',
-    accessRight: 'queue.consultation.widgets.medicalhistory',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/MedicalHistory'),
-      loading: Loading,
-    }),
-    model: 'patientMedicalHistory',
-    layoutConfig: {
-      minW: 12,
-      minH: 3,
-      h: 3,
-      style: {
-        padding: 5,
-      },
-    }, 
   },
   {
     id: '3',

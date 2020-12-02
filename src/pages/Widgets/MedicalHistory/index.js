@@ -1,28 +1,20 @@
 import React, { PureComponent } from 'react'
-import moment from 'moment'
 import { connect } from 'dva'
-import { FieldArray } from 'formik'
-import { getUniqueGUID } from 'utils'
 import { withStyles } from '@material-ui/core'
-import Add from '@material-ui/icons/Add'
 import {
-  AuthorizedContext,
-  Button,
   GridContainer,
   GridItem,
   FastField,
   TextField,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
-import withFormikExtend from '@/components/Decorator/withFormikExtend'
 
 const styles = (theme) => ({
 })
 
 const { Secured } = Authorized
 @Secured('queue.consultation.widgets.medicalhistory')
-@connect(({ patient, components, codetable }) => ({
-  codetable,
+@connect(({ patient }) => ({
   patient,
 }))
 
@@ -60,6 +52,7 @@ class MedicalHistory extends PureComponent {
                     multiline
                     maxLength={4000}
                     rowsMax={5}
+                    rows={1}
                     disabled={disabledByAccessRight}
                     {...args}
                   />
