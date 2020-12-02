@@ -164,6 +164,18 @@ class PatientDetail extends PureComponent {
         }),
       },
       {
+        id: '9',
+        name: 'Medical History', 
+        component: Loadable({
+          loader: () => import('./MedicalHistory'),
+          render: (loaded, p) => {
+            let Cmpnet = loaded.default
+            return <Cmpnet {...p} />
+          },
+          loading: Loading,
+        }),
+      },
+      {
         id: '4',
         name: 'Schemes',
         access: [
@@ -254,6 +266,14 @@ class PatientDetail extends PureComponent {
         }),
       },
     ]
+
+    const accessRight = Authorized.check('patientdatabase.patientprofiledetails.medicalhistory')
+    if (accessRight) {
+      const hiddenMedicalHistoryByAccessRight = accessRight.rights === 'hidden'
+      if (hiddenMedicalHistoryByAccessRight) {
+        this.widgets = this.widgets.filter((t) => t.id !== '9')
+      }
+    }
   }
 
   componentDidMount () {
@@ -493,7 +513,7 @@ class PatientDetail extends PureComponent {
                     .filter(
                       (o) =>
                         (!!patient.entity && !!patient.entity.id) ||
-                        Number(o.id) <= 4,
+                        Number(o.id) <= 4 || Number(o.id) === 9,
                     )
                     .map((o) => (
                       <Authorized authority={o.access}>
@@ -547,17 +567,17 @@ class PatientDetail extends PureComponent {
                 </MenuList>
                 {isCreatingPatient && <Divider light />}
                 {hasActiveSession &&
-                isCreatingPatient && (
-                  <Authorized authority='queue.registervisit'>
-                    <Button
-                      color='primary'
-                      style={{ marginTop: theme.spacing(1) }}
-                      onClick={this.registerVisit}
-                    >
-                      Register Visit
+                  isCreatingPatient && (
+                    <Authorized authority='queue.registervisit'>
+                      <Button
+                        color='primary'
+                        style={{ marginTop: theme.spacing(1) }}
+                        onClick={this.registerVisit}
+                      >
+                        Register Visit
                     </Button>
-                  </Authorized>
-                )}
+                    </Authorized>
+                  )}
               </CardBody>
             </Card>
           </GridItem>
@@ -573,8 +593,8 @@ class PatientDetail extends PureComponent {
                       paddingTop: 20,
                     }
                   ) : (
-                    { padding: 4, paddingTop: 20 }
-                  )
+                      { padding: 4, paddingTop: 20 }
+                    )
                 }
               >
                 <Authorized.Context.Provider
@@ -594,12 +614,6 @@ class PatientDetail extends PureComponent {
             >
               {footer({
                 align: 'center',
-                // onReset:
-                //   values && values.id
-                //     ? () => {
-                //         resetForm(patient.entity)
-                //       }
-                //     : undefined,
                 onCancel: () => {
                   dispatch({
                     type: 'patient/closePatientModal',

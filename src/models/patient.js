@@ -14,6 +14,11 @@ const defaultPatientEntity = {
   patientAccountNo: '',
   patientEmergencyContact: [],
   patientAllergy: [],
+  patientMedicalHistory: {
+    medicalHistory: '',
+    socialHistory: '',
+    familyHistory: '',
+  },
   patientAllergyMetaData: [],
   patientMedicalAlert: [],
   patientScheme: [],
@@ -281,10 +286,7 @@ export default createFormViewModel({
 
         return result
       },
-      *queryDone ({ payload }, { select, put }) {
-        const codetable = yield select((state) => state.codetable)
-        const { copaymentscheme = [] } = codetable
-
+      *queryDone ({ payload }, { put }) {
         const { data } = payload
         // console.log(payload)
         data.patientScheme.forEach((ps) => {
@@ -298,7 +300,8 @@ export default createFormViewModel({
           }
 
           ps.preSchemeTypeFK = ps.schemeTypeFK
-        })
+        }) 
+        data.patientMedicalHistory = data.patientMedicalHistory || defaultPatientEntity.patientMedicalHistory
         yield put({
           type: 'updateState',
           payload: {

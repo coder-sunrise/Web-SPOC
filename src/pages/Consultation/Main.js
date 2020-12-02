@@ -179,6 +179,7 @@ const saveConsultation = ({
   const {
     dispatch,
     values,
+    patient,
     consultationDocument = {},
     corEyeRefractionForm,
     orders = {},
@@ -209,6 +210,10 @@ const saveConsultation = ({
     }
     newValues.visitConsultationTemplate.consultationTemplate =
       localStorage.getItem('consultationLayout') || ''
+
+    if (newValues.patientMedicalHistory && !newValues.patientMedicalHistory.patientProfileFK) {
+      newValues.patientMedicalHistory.patientProfileFK = patient.entity.id
+    }
     dispatch({
       type: `consultation/${action}`,
       payload: newValues,
@@ -272,6 +277,7 @@ const pauseConsultation = ({
   onClose,
   consultation,
   resetForm,
+  patient,
   ...rest
 }) => {
   const {
@@ -279,7 +285,7 @@ const pauseConsultation = ({
     corEyeRefractionForm,
     orders = {},
     forms = {},
-  } = rest
+  } = rest 
   const newValues = convertToConsultation(
     {
       ...values,
@@ -304,11 +310,14 @@ const pauseConsultation = ({
   }
   newValues.visitConsultationTemplate.consultationTemplate =
     localStorage.getItem('consultationLayout') || ''
+  if (newValues.patientMedicalHistory && !newValues.patientMedicalHistory.patientProfileFK) {
+    newValues.patientMedicalHistory.patientProfileFK = patient.entity.id
+  }
   dispatch({
     type: `consultation/pause`,
     payload: newValues,
   }).then((r) => {
-    if (r) {
+    if (r) { 
       sessionStorage.removeItem(`${values.id}_consultationTimer`)
       notification.success({
         message: 'Consultation paused.',
