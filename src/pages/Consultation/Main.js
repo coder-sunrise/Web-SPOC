@@ -1091,7 +1091,7 @@ class Main extends React.Component {
         </Authorized.Context.Provider>
         <CommonModal
           cancelText='Cancel'
-          maxWidth='md'
+          maxWidth='sm'
           title='Confirm sign off current consultation?'
           onClose={this.onCloseSignOffModal}
           open={showSignOffModal}
