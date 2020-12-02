@@ -293,10 +293,7 @@ const VisitInfoCard = ({
                         color: 'red', display: 'inline-block', fontWeight: '500',
                       }}
                       >
-                        <span>(</span>
-                        <span>{Math.abs(t.adjValue).toFixed(2)}</span>
-                        <span>%</span>
-                        <span>)</span>
+                        <span>({Math.abs(t.adjValue).toFixed(2)}%)</span>
                       </span>;
                     </span>) 
                 }))}
@@ -323,10 +320,7 @@ const VisitInfoCard = ({
                             color: 'red', display: 'inline-block', fontWeight: '500',
                           }}
                           >
-                            <span>(</span>
-                            <span>{Math.abs(t.copayerInvoiceAdjustmentValue).toFixed(2)}</span>
-                            <span>%</span>
-                            <span>)</span>
+                            <span>({Math.abs(t.copayerInvoiceAdjustmentValue).toFixed(2)}%)</span>
                           </span>;
                         </span>) 
                     }))}
