@@ -30,7 +30,7 @@ document.addEventListener('click', () => {
   window.alreadyFocused = false
 })
 
-Object.byString = function(o, s) {
+Object.byString = function (o, s) {
   if (o === undefined || o === null) return ''
   // console.log(o, s)
   s = s.replace(/\[(\w+)\]/g, '.$1') // convert indexes to properties
@@ -54,18 +54,18 @@ Object.byString = function(o, s) {
   return o
 }
 
-String.prototype.replaceAll = function(search, replacement) {
+String.prototype.replaceAll = function (search, replacement) {
   let target = this
   return target.replace(new RegExp(search, 'g'), replacement)
 }
 
-Number.prototype.currencyString = function() {
+Number.prototype.currencyString = function () {
   if (this === undefined || this === null) return '-'
   return `${config.currencySymbol}${numeral(Math.abs(this)).format(
     config.currencyFormat,
   )}`
 }
-Number.prototype.formatString = function() {
+Number.prototype.formatString = function () {
   if (this === undefined || this === null) return '-'
   return `${numeral(Math.abs(this)).format(config.numberFormat)}`
 }
@@ -78,13 +78,13 @@ Number.prototype.formatString = function() {
 //   return moment(m.formatUTC()).add(-8, 'hours')
 // }
 
-moment.prototype.formatUTC = function(dateOnly = true) {
+moment.prototype.formatUTC = function (dateOnly = true) {
   return this.format(
     dateOnly ? `${serverDateFormat}T00:00:00` : serverDateTimeFormatFull,
   )
 }
 
-String.prototype.format = function() {
+String.prototype.format = function () {
   if (arguments.length === 0) return this
   for (var s = this, i = 0; i < arguments.length; i++)
     s = s.replace(new RegExp(`\\{${i}\\}`, 'g'), arguments[i])
@@ -106,11 +106,11 @@ export const roundUp = (num, decimal = 2) => {
 }
 /* eslint-disable */
 
-export function fixedZero(val) {
+export function fixedZero (val) {
   return val * 1 < 10 ? `0${val}` : val
 }
 
-export function getTimeDistance(type) {
+export function getTimeDistance (type) {
   const now = new Date()
   const oneDay = 1000 * 60 * 60 * 24
 
@@ -159,7 +159,7 @@ export function getTimeDistance(type) {
   return [moment(`${year}-01-01 00:00:00`), moment(`${year}-12-31 23:59:59`)]
 }
 
-export function getPlainNode(nodeList, parentPath = '') {
+export function getPlainNode (nodeList, parentPath = '') {
   const arr = []
   nodeList.forEach(node => {
     const item = node
@@ -177,11 +177,11 @@ export function getPlainNode(nodeList, parentPath = '') {
   return arr
 }
 
-export function digitUppercase(n) {
+export function digitUppercase (n) {
   return nzh.toMoney(n)
 }
 
-function getRelation(str1, str2) {
+function getRelation (str1, str2) {
   if (str1 === str2) {
     console.warn('Two path are equal!') // eslint-disable-line
   }
@@ -196,7 +196,7 @@ function getRelation(str1, str2) {
   return 3
 }
 
-function getRenderArr(routes) {
+function getRenderArr (routes) {
   let renderArr = []
   renderArr.push(routes[0])
   for (let i = 1; i < routes.length; i += 1) {
@@ -217,7 +217,7 @@ function getRenderArr(routes) {
  * @param {string} path
  * @param {routerData} routerData
  */
-export function getRoutes(path, routerData) {
+export function getRoutes (path, routerData) {
   let routes = Object.keys(routerData).filter(
     routePath => routePath.indexOf(path) === 0 && routePath !== path,
   )
@@ -240,11 +240,11 @@ export function getRoutes(path, routerData) {
   return renderRoutes
 }
 
-export function getPageQuery(url) {
+export function getPageQuery (url) {
   return parse((url || window.location.href).split('?')[1])
 }
 
-export function getQueryPath(path = '', query = {}) {
+export function getQueryPath (path = '', query = {}) {
   const search = stringify(query)
   if (search.length) {
     return `${path}?${search}`
@@ -255,11 +255,11 @@ export function getQueryPath(path = '', query = {}) {
 /* eslint no-useless-escape:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/
 
-export function isUrl(path) {
+export function isUrl (path) {
   return reg.test(path)
 }
 
-export function formatWan(val) {
+export function formatWan (val) {
   const v = val * 1
   if (!v || Number.isNaN(v)) return ''
 
@@ -288,12 +288,12 @@ export function formatWan(val) {
 }
 
 // 给官方演示站点用，用于关闭真实开发环境不需要使用的特性
-export function isAntdPro() {
+export function isAntdPro () {
   return window.location.hostname === 'preview.pro.ant.design'
 }
 
-export function extendFunc(...args) {
-  const funcNew = function() {
+export function extendFunc (...args) {
+  const funcNew = function () {
     for (let i = 0; i < args.length; i++) {
       if (args[i]) {
         const r = args[i].apply(this, arguments)
@@ -312,8 +312,8 @@ const maxReducer = (p, n) => {
   return p >= n ? p : n
 }
 
-export function difference(object, base) {
-  function changes(o, b = {}) {
+export function difference (object, base) {
+  function changes (o, b = {}) {
     const v = lodash.transform(o, (result, value, key) => {
       // console.log(value, b, key, result, o, React.isValidElement(o))
       if (_.isFunction(value) || React.isValidElement(value)) {
@@ -677,19 +677,19 @@ export const watchForElementChange = e => {
   let r =
     undefined === i
       ? {
-          childList: true,
-          characterData: true,
-          subtree: true,
-          attributes: true,
-        }
+        childList: true,
+        characterData: true,
+        subtree: true,
+        attributes: true,
+      }
       : i
-  ;(observers[t] = new MutationObserver(e1 => {
-    e1.forEach(e2 => {
-      a(e2)
-    }),
-      n || observers[t].disconnect()
-  })),
-    observers[t].observe(e.container || document, r)
+    ; (observers[t] = new MutationObserver(e1 => {
+      e1.forEach(e2 => {
+        a(e2)
+      }),
+        n || observers[t].disconnect()
+    })),
+      observers[t].observe(e.container || document, r)
 }
 
 const confirmBeforeReload = e => {
@@ -1033,7 +1033,7 @@ const calculateAmount = (
           // --- If is last item, should use [totalAdjAmount] - [sum of other items adj amt] ---//
           if (activeRows.length - 1 === j) {
             adj = fa.adjAmount - otherItemsAdjAmount
-          } else adj = r.weightage * fa.adjValue
+          } else adj = roundTo(r.weightage * fa.adjValue, 2)
         } else if (fa.adjType === 'Percentage') {
           adj = roundTo((fa.adjValue / 100) * initalRowToal)
         }
