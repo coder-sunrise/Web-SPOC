@@ -3,9 +3,11 @@ import React, { PureComponent } from 'react'
 import Edit from '@material-ui/icons/Edit'
 import { status } from '@/utils/codes'
 import { CommonTableGrid, Button, Tooltip, NumberInput } from '@/components'
+import { roundTo } from '@/utils/utils'
+import numeral from 'numeral'
 
 const amountProps = {
-  style: { margin: 0 },
+  style: { margin: 0, fontWeight: 500, color: 'darkblue' },
   noUnderline: true,
   currency: true,
   disabled: true,
@@ -39,23 +41,16 @@ class Grid extends PureComponent {
         render: (row) => {
           if (row.adjType === 'ExactAmount')
             return (<NumberInput {...amountProps} value={row.adjValue} />)
-          else if (row.adjValue > 0)
+          if (row.adjValue > 0)
             return (
-              <div style={{ marginRight: '10px' }}>
-                <NumberInput {...amountProps} currency={false} precision={2} value={row.adjValue} />
-                <span>%</span>
-              </div>)
-          else {
-            return (
-              <div style={{
-                color: 'red', fontWeight: '500', textAlign: 'right'
-              }}>
-                <span>(</span>
-                <span>{Math.abs(row.adjValue).toFixed(2)}</span>
-                <span>%</span>
-                <span>)</span>
-              </div>)
-          }
+              <span style={{ display: 'inline-block' }}>
+                <span style={{ fontWeight: '500', color: 'darkblue', fontSize: '14px' }}>{numeral(roundTo(row.adjValue, 2)).format('0.00')}%</span>
+              </span>)
+
+          return (
+            <div style={{ color: 'red', fontWeight: '500', textAlign: 'right' }}>
+              <span>({numeral(roundTo(Math.abs(row.adjValue), 2)).format('0.00')}%)</span>
+            </div>) 
         },
       },
       {

@@ -23,6 +23,8 @@ import {
 } from '@/components/_medisys'
 import { VISIT_TYPE } from '@/utils/constants'
 import { visitOrderTemplateItemTypes } from '@/utils/codes'
+import { roundTo } from '@/utils/utils'
+import numeral from 'numeral'
 import FormField from './formField'
 
 const styles = (theme) => ({
@@ -51,7 +53,7 @@ const amountProps = {
   currency: true,
   disabled: true,
   normalText: true,
-  showZero: true,
+  showZero: true, 
   fullWidth: false,
 }
 
@@ -280,9 +282,7 @@ const VisitInfoCard = ({
                   if (t.adjValue > 0) {
                     return (
                       <span style={{ display: 'inline-block', marginRight: '20px' }}>
-                        <span style={{ fontWeight: '600' }}>{t.displayValue}:</span>
-                        <NumberInput {...amountProps} currency={false} precision={2} value={t.adjValue} />
-                        <span>%;</span>
+                        <span style={{ fontWeight: '500', fontSize: '14px' }}>{t.displayValue}: <span style={{ color: 'darkblue' }}>{numeral(roundTo(t.adjValue)).format('0.00')}%;</span></span>
                       </span>)
                   }
 
@@ -293,7 +293,7 @@ const VisitInfoCard = ({
                         color: 'red', display: 'inline-block', fontWeight: '500',
                       }}
                       >
-                        <span>({Math.abs(t.adjValue).toFixed(2)}%)</span>
+                        <span>({numeral(roundTo(Math.abs(t.adjValue), 2)).format('0.00')}%)</span>
                       </span>;
                     </span>) 
                 }))}
@@ -307,9 +307,7 @@ const VisitInfoCard = ({
                       if (t.copayerInvoiceAdjustmentValue > 0) {
                         return (
                           <span style={{ display: 'inline-block', marginRight: '20px' }}>
-                            <span style={{ fontWeight: '600' }}>{t.coPayerName}:</span>
-                            <NumberInput {...amountProps} currency={false} precision={2} value={t.copayerInvoiceAdjustmentValue} />
-                            <span>%;</span>
+                            <span style={{ fontWeight: '500' }}>{t.coPayerName}: <span style={{ color: 'darkblue' }}>{numeral(roundTo(t.copayerInvoiceAdjustmentValue, 2)).format('0.00')}%;</span></span>
                           </span>)
                       }
 
@@ -320,7 +318,7 @@ const VisitInfoCard = ({
                             color: 'red', display: 'inline-block', fontWeight: '500',
                           }}
                           >
-                            <span>({Math.abs(t.copayerInvoiceAdjustmentValue).toFixed(2)}%)</span>
+                            <span>({numeral(roundTo(Math.abs(t.copayerInvoiceAdjustmentValue), 2)).format('0.00')}%)</span>
                           </span>;
                         </span>) 
                     }))}
