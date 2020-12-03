@@ -443,6 +443,7 @@ export const DENTAL_CANNED_TEXT_TYPE_FIELD = {
 export const CLINIC_TYPE = {
   GP: 1,
   DENTAL: 2,
+  EYE: 4,
 }
 
 export const FILE_CATEGORY = {

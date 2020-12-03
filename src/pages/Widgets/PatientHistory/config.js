@@ -476,9 +476,9 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
   },
 ]
 
-export const showWidget = (current, widget) => {
+export const showWidget = (current, widgetId) => {
   // check show notes
-  const notesType = notesTypes.find((type) => type.value === widget.id)
+  const notesType = notesTypes.find((type) => type.value === widgetId)
 
   if (notesType) {
     const { scribbleNotes = [] } = current
@@ -497,13 +497,13 @@ export const showWidget = (current, widget) => {
 
   // check show diagnosis
   if (
-    widget.id === WIDGETS_ID.DIAGNOSIS &&
+    widgetId === WIDGETS_ID.DIAGNOSIS &&
     (!current.diagnosis || current.diagnosis.length === 0)
   )
     return false
 
   // check show eyevisualacuity
-  if (widget.id === WIDGETS_ID.VISUALACUITYTEST) {
+  if (widgetId === WIDGETS_ID.VISUALACUITYTEST) {
     if (_.isEmpty(current.eyeVisualAcuityTestForms)) return false
     const durtyFields = [
       'concurrencyToken',
@@ -516,7 +516,7 @@ export const showWidget = (current, widget) => {
   }
 
   // check show eyerefractionform
-  if (widget.id === WIDGETS_ID.REFRACTIONFORM) {
+  if (widgetId === WIDGETS_ID.REFRACTIONFORM) {
     if (
       !current.corEyeRefractionForm ||
       _.isEmpty(current.corEyeRefractionForm.formData)
@@ -538,7 +538,7 @@ export const showWidget = (current, widget) => {
   }
 
   // check show eyeexaminationform
-  if (widget.id === WIDGETS_ID.EXAMINATIONFORM) {
+  if (widgetId === WIDGETS_ID.EXAMINATIONFORM) {
     if (
       !current.corEyeExaminationForm ||
       _.isEmpty(current.corEyeExaminationForm.formData) ||
@@ -566,54 +566,54 @@ export const showWidget = (current, widget) => {
 
   // check show forms
   if (
-    widget.id === WIDGETS_ID.FORMS &&
+    widgetId === WIDGETS_ID.FORMS &&
     (!current.forms || current.forms.length === 0)
   )
     return false
   // check show attachments
   if (
-    widget.id === WIDGETS_ID.ATTACHMENT &&
+    widgetId === WIDGETS_ID.ATTACHMENT &&
     (current.attachments || current.visitAttachments || []).length === 0
   ) {
     return false
   }
   // check show orders
   if (
-    widget.id === WIDGETS_ID.ORDERS &&
+    widgetId === WIDGETS_ID.ORDERS &&
     (!current.orders || current.orders.length === 0)
   )
     return false
   // check show document
   if (
-    widget.id === WIDGETS_ID.CONSULTATION_DOCUMENT &&
+    widgetId === WIDGETS_ID.CONSULTATION_DOCUMENT &&
     (!current.documents || current.documents.length === 0)
   )
     return false
   // check show DentalChart
   if (
-    widget.id === WIDGETS_ID.DENTAL_CHART &&
+    widgetId === WIDGETS_ID.DENTAL_CHART &&
     (!current.dentalChart || current.dentalChart.length === 0)
   )
     return false
   // check show invoice
-  if (widget.id === WIDGETS_ID.INVOICE && !current.invoice) return false
+  if (widgetId === WIDGETS_ID.INVOICE && !current.invoice) return false
 
   // check show treatment
   if (
-    widget.id === WIDGETS_ID.TREATMENT &&
+    widgetId === WIDGETS_ID.TREATMENT &&
     (!current.orders ||
       current.orders.filter((o) => o.type === 'Treatment').length === 0)
   )
     return false
   // check show vital sign
   if (
-    widget.id === WIDGETS_ID.VITALSIGN &&
+    widgetId === WIDGETS_ID.VITALSIGN &&
     (!current.patientNoteVitalSigns ||
       current.patientNoteVitalSigns.length === 0)
   )
     return false
   // check show visit referral
-  if (widget.id === WIDGETS_ID.REFERRAL) {
+  if (widgetId === WIDGETS_ID.REFERRAL) {
     const { referralBy, referralInstitution, referralDate } = current
     if (
       (!referralBy || referralBy === '') &&

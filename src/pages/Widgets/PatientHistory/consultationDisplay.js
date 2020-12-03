@@ -45,7 +45,13 @@ class HistoryDisplayForConsultation extends PureComponent {
       {
         id: PATIENT_HISTORY_TABS.VISIT,
         name: 'Visit',
-        content: <PatientHistory mode='integrated' {...this.props} />,
+        content: (
+          <PatientHistory
+            fromModule='Consultation'
+            mode='integrated'
+            {...this.props}
+          />
+        ),
       },
       {
         id: PATIENT_HISTORY_TABS.DISPENSE,

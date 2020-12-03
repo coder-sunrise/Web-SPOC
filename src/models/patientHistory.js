@@ -1,7 +1,8 @@
 import { createListViewModel } from 'medisys-model'
 import { VISIT_TYPE } from '@/utils/constants'
-import * as service from '../services/patientHistory'
 import { formTypes } from '@/utils/codes'
+import { getUserPreference, saveUserPreference } from '@/services/user'
+import * as service from '../services/patientHistory'
 
 const ParseEyeFormData = (response) => {
   const { corEyeRefractionForm = {}, corEyeExaminationForm = {} } = response
@@ -64,7 +65,6 @@ export default createListViewModel({
     effects: {
       *initState ({ payload }, { call, put, select, take }) {
         let { queueID, version, patientID, mode } = payload
-
         if (!patientID) {
           yield put({
             type: 'visitRegistration/query',
@@ -83,6 +83,7 @@ export default createListViewModel({
           payload: {
             queueID,
             patientID,
+            version,
           },
         })
       },
@@ -109,7 +110,26 @@ export default createListViewModel({
         const response = yield call(service.queryVisitHistory, payload)
         if (response.status === '200') {
           return {
-            list: response.data.data || [],
+            list: (response.data.data || []).map((item) => {
+              if (item.visitPurposeFK === VISIT_TYPE.RETAIL || item.isNurseNote)
+                return item
+              let newEntity = ParseEyeFormData(item.patientHistoryDetail)
+              newEntity = {
+                ...newEntity,
+                forms: newEntity.forms.map((o) => {
+                  return {
+                    ...o,
+                    typeName: formTypes.find(
+                      (type) => parseInt(type.value, 10) === o.type,
+                    ).name,
+                  }
+                }),
+              }
+              return {
+                ...item,
+                patientHistoryDetail: newEntity,
+              }
+            }),
             totalVisits: response.data.totalRecords,
           }
         }
@@ -152,6 +172,39 @@ export default createListViewModel({
           return response
         }
         return false
+      },
+      *saveUserPreference ({ payload }, { call, put, select }) {
+        const r = yield call(saveUserPreference, {
+          userPreferenceDetails: JSON.stringify(payload.userPreferenceDetails),
+          itemIdentifier: payload.itemIdentifier,
+          type: 5,
+        })
+
+        if (r === 204) return true
+
+        return false
+      },
+      *getUserPreference ({ payload }, { call, put }) {
+        const r = yield call(getUserPreference, 5)
+        const { status, data } = r
+
+        if (status === '200') {
+          if (data) {
+            const parsedPatientHistory = JSON.parse(data)
+            if (parsedPatientHistory.length > 0) {
+              yield put({
+                type: 'updateState',
+                payload: parsedPatientHistory.find(
+                  (o) => o.Identifier === 'SelectCategories',
+                ),
+              })
+              return parsedPatientHistory.find(
+                (o) => o.Identifier === 'SelectCategories',
+              )
+            }
+          }
+        }
+        return null
       },
     },
     reducers: {
