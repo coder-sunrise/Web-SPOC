@@ -16,6 +16,7 @@ import {
   notification,
   FastField,
   OutlinedTextField,
+  WarningSnackbar,
 } from '@/components'
 import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
 // common utils
@@ -167,6 +168,13 @@ class Billing extends Component {
         code: 'ctschemetype',
       },
     })
+    this.props.dispatch({
+      type: 'billing/updateState',
+      payload: {
+        entity: null,
+        shouldRefreshOrder: false,
+      },
+    })
     if (query.vid)
       dispatch({
         type: 'billing/query',
@@ -181,6 +189,7 @@ class Billing extends Component {
       type: 'billing/updateState',
       payload: {
         entity: null,
+        shouldRefreshOrder: false,
       },
     })
     this.props.dispatch({
@@ -667,6 +676,7 @@ class Billing extends Component {
       ctschemetype,
       ctcopaymentscheme,
       clinicSettings,
+      billing,
     } = this.props
     const formikBag = {
       values,
@@ -680,6 +690,7 @@ class Billing extends Component {
       sessionInfo,
       user,
     }
+    const { shouldRefreshOrder } = billing
     const { isEnableAddPaymentInBilling = false } = clinicSettings
     return (
       <LoadingWrapper loading={loading} text='Getting billing info...'>
@@ -721,6 +732,16 @@ class Billing extends Component {
 
         <Paper className={classes.paperContent}>
           <GridContainer justify='center' alignItems='flex-start'>
+            <GridItem md={12}>
+              {shouldRefreshOrder && (
+                <div style={{ paddingBottom: 8 }}>
+                  <WarningSnackbar
+                    variant='warning'
+                    message='Changes detected. Please refresh order in dispensing screen.'
+                  />
+                </div>
+              )}
+            </GridItem>
             <GridContainer item md={8}>
               {values.id && (
                 <ApplyClaims

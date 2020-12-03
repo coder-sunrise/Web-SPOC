@@ -1,6 +1,7 @@
 // import { queryFakeList, fakeSubmitForm } from '@/services/api'
 import router from 'umi/router'
 import { createFormViewModel } from 'medisys-model'
+import { subscribeNotification } from '@/utils/realtime'
 import { getAppendUrl } from '@/utils/utils'
 import * as service from '@/pages/Billing/services'
 import { unlock } from '@/services/dispense'
@@ -42,6 +43,18 @@ export default createFormViewModel({
             payload: { visitID: Number(vid), pid: Number(pid), v, qid },
           })
         }
+      })
+
+      subscribeNotification('EditedConsultation', {
+        callback: (response) => {
+          const { visitID } = response
+          dispatch({
+            type: 'updateShouldRefreshOrder',
+            payload: {
+              visitID,
+            },
+          })
+        },
       })
     },
     effects: {
@@ -203,6 +216,15 @@ export default createFormViewModel({
             ...state.invoiceItems,
             payload,
           ],
+        }
+      },
+      updateShouldRefreshOrder (state, { payload }) {
+        const { visitID } = payload
+        const { entity = {} } = state
+        const { id } = entity
+        return {
+          ...state,
+          shouldRefreshOrder: id === visitID ? true : state.shouldRefreshOrder,
         }
       },
     },

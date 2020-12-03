@@ -478,6 +478,7 @@ export const NOTIFICATION_TYPE = {
   QUEUE: 1,
   CODETABLE: 2,
   ERROR: 3,
+  CONSULTAION: 4,
 }
 
 export const NOTIFICATION_STATUS = {

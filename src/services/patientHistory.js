@@ -29,10 +29,7 @@ module.exports = {
   // },
 
   queryMedicationHistory: (params) => {
-    return service.query(
-      `${url}/MedicationHistory/${params.patientProfileId}`,
-      {},
-    )
+    return service.query(`${url}/MedicationHistory`, params)
   },
   queryVisitHistory: (params) => {
     return service.query(`${url}/VisitHistory`, params)

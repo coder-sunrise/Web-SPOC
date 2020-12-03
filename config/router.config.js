@@ -1265,6 +1265,14 @@ const _routes = [
               'settings.clinicsetting.package',
             ],
           },
+          {
+            path: '/setting/invoiceadjustment',
+            name: 'invoiceadjustment',
+            component: './Setting/InvoiceAdjustment',
+            authority: [
+              'settings.clinicsetting.invoiceadjustment',
+            ],
+          },
         ],
       },
       // Settings
