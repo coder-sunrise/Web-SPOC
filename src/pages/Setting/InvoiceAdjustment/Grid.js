@@ -44,12 +44,12 @@ class Grid extends PureComponent {
           if (row.adjValue > 0)
             return (
               <span style={{ display: 'inline-block' }}>
-                <span style={{ fontWeight: '500', color: 'darkblue', fontSize: '14px' }}>{numeral(roundTo(row.adjValue, 2)).format('0.00')}%</span>
+                <span style={{ fontWeight: '500', color: 'darkblue', fontSize: '14px' }}>{numeral(row.adjValue).format('0.00')}%</span>
               </span>)
 
           return (
             <div style={{ color: 'red', fontWeight: '500', textAlign: 'right' }}>
-              <span>({numeral(roundTo(Math.abs(row.adjValue), 2)).format('0.00')}%)</span>
+              <span>({numeral(Math.abs(row.adjValue)).format('0.00')}%)</span>
             </div>) 
         },
       },

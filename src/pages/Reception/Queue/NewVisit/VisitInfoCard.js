@@ -282,7 +282,7 @@ const VisitInfoCard = ({
                   if (t.adjValue > 0) {
                     return (
                       <span style={{ display: 'inline-block', marginRight: '20px' }}>
-                        <span style={{ fontWeight: '500', fontSize: '14px' }}>{t.displayValue}: <span style={{ color: 'darkblue' }}>{numeral(roundTo(t.adjValue)).format('0.00')}%;</span></span>
+                        <span style={{ fontWeight: '500', fontSize: '14px' }}>{t.displayValue}: <span style={{ color: 'darkblue' }}>{numeral(t.adjValue).format('0.00')}%;</span></span>
                       </span>)
                   }
 
@@ -293,7 +293,7 @@ const VisitInfoCard = ({
                         color: 'red', display: 'inline-block', fontWeight: '500',
                       }}
                       >
-                        <span>({numeral(roundTo(Math.abs(t.adjValue), 2)).format('0.00')}%)</span>
+                        <span>({numeral(Math.abs(t.adjValue)).format('0.00')}%)</span>
                       </span>;
                     </span>) 
                 }))}
@@ -307,7 +307,7 @@ const VisitInfoCard = ({
                       if (t.copayerInvoiceAdjustmentValue > 0) {
                         return (
                           <span style={{ display: 'inline-block', marginRight: '20px' }}>
-                            <span style={{ fontWeight: '500' }}>{t.coPayerName}: <span style={{ color: 'darkblue' }}>{numeral(roundTo(t.copayerInvoiceAdjustmentValue, 2)).format('0.00')}%;</span></span>
+                            <span style={{ fontWeight: '500' }}>{t.coPayerName}: <span style={{ color: 'darkblue' }}>{numeral(t.copayerInvoiceAdjustmentValue).format('0.00')}%;</span></span>
                           </span>)
                       }
 
@@ -318,7 +318,7 @@ const VisitInfoCard = ({
                             color: 'red', display: 'inline-block', fontWeight: '500',
                           }}
                           >
-                            <span>({numeral(roundTo(Math.abs(t.copayerInvoiceAdjustmentValue), 2)).format('0.00')}%)</span>
+                            <span>({numeral(Math.abs(t.copayerInvoiceAdjustmentValue)).format('0.00')}%)</span>
                           </span>;
                         </span>) 
                     }))}
