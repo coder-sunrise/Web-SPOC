@@ -1032,7 +1032,7 @@ const calculateAmount = (
         if (fa.adjType === 'ExactAmount') {
           // --- If is last item, should use [totalAdjAmount] - [sum of other items adj amt] ---//
           if (activeRows.length - 1 === j) {
-            adj = fa.adjAmount - otherItemsAdjAmount
+            adj = roundTo(fa.adjAmount - otherItemsAdjAmount)
           } else adj = roundTo(r.weightage * fa.adjValue, 2)
         } else if (fa.adjType === 'Percentage') {
           adj = roundTo((fa.adjValue / 100) * initalRowToal)
