@@ -112,22 +112,22 @@ export const categoryTypes = [
   {
     value: WIDGETS_ID.DIAGNOSIS,
     name: 'Diagnosis',
-    authority: 'queue.consultation.clinicalnotes.diagnosis',
+    authority: 'queue.consultation.widgets.diagnosis',
   },
   {
     value: WIDGETS_ID.VISUALACUITYTEST,
     name: 'Visual Acuity Test',
-    authority: 'queue.consultation.clinicalnotes.eyevisualacuity',
+    authority: 'queue.consultation.widgets.eyevisualacuity',
   },
   {
     value: WIDGETS_ID.REFRACTIONFORM,
     name: 'Refraction Form',
-    authority: 'queue.consultation.clinicalnotes.eyerefractionform',
+    authority: 'queue.consultation.widgets.eyerefractionform',
   },
   {
     value: WIDGETS_ID.EXAMINATIONFORM,
     name: 'Examination Form',
-    authority: 'queue.consultation.clinicalnotes.eyeexaminationform',
+    authority: 'queue.consultation.widgets.eyeexaminationform',
   },
   {
     value: WIDGETS_ID.VISITREMARKS,
@@ -142,12 +142,12 @@ export const categoryTypes = [
   {
     value: WIDGETS_ID.VITALSIGN,
     name: 'Vital Sign',
-    authority: 'queue.consultation.clinicalnotes.vitalsign',
+    authority: 'queue.consultation.widgets.vitalsign',
   },
   {
     value: WIDGETS_ID.ORDERS,
     name: 'Order',
-    authority: 'queue.consultation.clinicalnotes.order',
+    authority: 'queue.consultation.widgets.order',
   },
   {
     value: WIDGETS_ID.INVOICE,
