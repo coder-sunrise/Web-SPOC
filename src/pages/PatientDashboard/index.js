@@ -199,12 +199,9 @@ class PatientDashboard extends PureComponent {
           {...this.props}
         />
         <div style={{ marginTop: theme.spacing(1) }}>
-          <PatientHistory
-            override={{
-              leftPanel: classes.leftPanel,
-              rightPanel: classes.rightPanel,
-            }}
-          />
+          <Fragment>
+            <PatientHistory fromModule='PatientDashboard' {...resetProps} />
+          </Fragment>
         </div>
       </div>
     )

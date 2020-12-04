@@ -27,6 +27,150 @@ export const WIDGETS_ID = {
   CONSULTATION_DOCUMENT: '20',
 }
 
+export const GPCategory = [
+  WIDGETS_ID.ASSOCIATED_HISTORY,
+  WIDGETS_ID.CHIEF_COMPLAINTS,
+  WIDGETS_ID.CLINICAL_NOTE,
+  WIDGETS_ID.PLAN,
+  WIDGETS_ID.DIAGNOSIS,
+  WIDGETS_ID.VISITREMARKS,
+  WIDGETS_ID.REFERRAL,
+  WIDGETS_ID.VITALSIGN,
+  WIDGETS_ID.ORDERS,
+  WIDGETS_ID.INVOICE,
+  WIDGETS_ID.CONSULTATION_DOCUMENT,
+  WIDGETS_ID.FORMS,
+  WIDGETS_ID.ATTACHMENT,
+]
+
+export const EyeCategory = [
+  WIDGETS_ID.ASSOCIATED_HISTORY,
+  WIDGETS_ID.CHIEF_COMPLAINTS,
+  WIDGETS_ID.CLINICAL_NOTE,
+  WIDGETS_ID.PLAN,
+  WIDGETS_ID.DIAGNOSIS,
+  WIDGETS_ID.VISUALACUITYTEST,
+  WIDGETS_ID.REFRACTIONFORM,
+  WIDGETS_ID.EXAMINATIONFORM,
+  WIDGETS_ID.VISITREMARKS,
+  WIDGETS_ID.REFERRAL,
+  WIDGETS_ID.VITALSIGN,
+  WIDGETS_ID.ORDERS,
+  WIDGETS_ID.INVOICE,
+  WIDGETS_ID.CONSULTATION_DOCUMENT,
+  WIDGETS_ID.FORMS,
+  WIDGETS_ID.ATTACHMENT,
+]
+
+export const DentalCategory = [
+  WIDGETS_ID.ASSOCIATED_HISTORY,
+  WIDGETS_ID.CHIEF_COMPLAINTS,
+  WIDGETS_ID.CLINICAL_NOTE,
+  WIDGETS_ID.PLAN,
+  WIDGETS_ID.DENTAL_CHART,
+  WIDGETS_ID.TREATMENT,
+  WIDGETS_ID.VISITREMARKS,
+  WIDGETS_ID.REFERRAL,
+  WIDGETS_ID.ORDERS,
+  WIDGETS_ID.INVOICE,
+  WIDGETS_ID.CONSULTATION_DOCUMENT,
+  WIDGETS_ID.FORMS,
+  WIDGETS_ID.ATTACHMENT,
+]
+
+export const categoryTypes = [
+  {
+    value: WIDGETS_ID.ASSOCIATED_HISTORY,
+    name: 'History',
+    authority: 'queue.consultation.clinicalnotes.history',
+  },
+  {
+    value: WIDGETS_ID.CHIEF_COMPLAINTS,
+    name: 'Chief Complaints',
+    authority: 'queue.consultation.clinicalnotes.chiefcomplaints',
+  },
+  {
+    value: WIDGETS_ID.CLINICAL_NOTE,
+    name: 'Clinic Notes',
+    authority: 'queue.consultation.clinicalnotes.clinicalnotes',
+  },
+  {
+    value: WIDGETS_ID.PLAN,
+    name: 'Plan',
+    authority: 'queue.consultation.clinicalnotes.plan',
+  },
+  {
+    value: WIDGETS_ID.DENTAL_CHART,
+    name: 'Dental Chart',
+    authority: 'queue.consultation.widgets.dentalchart',
+  },
+  {
+    value: WIDGETS_ID.TREATMENT,
+    name: 'Treatment',
+    authority: 'queue.consultation.widgets.dentalchart',
+  },
+  {
+    value: WIDGETS_ID.DIAGNOSIS,
+    name: 'Diagnosis',
+    authority: 'queue.consultation.clinicalnotes.diagnosis',
+  },
+  {
+    value: WIDGETS_ID.VISUALACUITYTEST,
+    name: 'Visual Acuity Test',
+    authority: 'queue.consultation.clinicalnotes.eyevisualacuity',
+  },
+  {
+    value: WIDGETS_ID.REFRACTIONFORM,
+    name: 'Refraction Form',
+    authority: 'queue.consultation.clinicalnotes.eyerefractionform',
+  },
+  {
+    value: WIDGETS_ID.EXAMINATIONFORM,
+    name: 'Examination Form',
+    authority: 'queue.consultation.clinicalnotes.eyeexaminationform',
+  },
+  {
+    value: WIDGETS_ID.VISITREMARKS,
+    name: 'Visit Remarks',
+    authority: 'queue.visitregistrationdetails',
+  },
+  {
+    value: WIDGETS_ID.REFERRAL,
+    name: 'Referral',
+    authority: '',
+  },
+  {
+    value: WIDGETS_ID.VITALSIGN,
+    name: 'Vital Sign',
+    authority: 'queue.consultation.clinicalnotes.vitalsign',
+  },
+  {
+    value: WIDGETS_ID.ORDERS,
+    name: 'Order',
+    authority: 'queue.consultation.clinicalnotes.order',
+  },
+  {
+    value: WIDGETS_ID.INVOICE,
+    name: 'Invoice',
+    authority: 'finance',
+  },
+  {
+    value: WIDGETS_ID.CONSULTATION_DOCUMENT,
+    name: 'Consultation Document',
+    authority: 'queue.consultation.widgets.consultationdocument',
+  },
+  {
+    value: WIDGETS_ID.FORMS,
+    name: 'Forms',
+    authority: 'queue.consultation.widgets.forms',
+  },
+  {
+    value: WIDGETS_ID.ATTACHMENT,
+    name: 'Attachment',
+    authority: 'queue.consultation.widgets.attachment',
+  },
+]
+
 export const notesTypes = [
   { value: WIDGETS_ID.ASSOCIATED_HISTORY, fieldName: 'history' },
   { value: WIDGETS_ID.CHIEF_COMPLAINTS, fieldName: 'chiefComplaints' },
@@ -35,69 +179,6 @@ export const notesTypes = [
   { value: WIDGETS_ID.INTRA_ORAL, fieldName: 'intraOral' },
   { value: WIDGETS_ID.EXTRA_ORAL, fieldName: 'extraOral' },
   { value: WIDGETS_ID.VISITREMARKS, fieldName: 'visitRemarks' },
-]
-
-export const historyTags = [
-  {
-    value: 'Notes',
-    name: 'Notes',
-    authority: [
-      'queue.consultation.clinicalnotes.history',
-      'queue.consultation.clinicalnotes.chiefcomplaints',
-      'queue.consultation.clinicalnotes.clinicalnotes',
-      'queue.consultation.clinicalnotes.plan',
-      'queue.consultation.widgets.diagnosis',
-      'queue.consultation.clinicalnotes.intraoral',
-      'queue.consultation.clinicalnotes.extraoral',
-      'queue.consultation.widgets.eyevisualacuity',
-      'queue.consultation.widgets.eyerefractionform',
-      'queue.consultation.widgets.eyeexaminationform',
-      'queue.consultation.widgets.vitalsign',
-    ],
-    children: [
-      WIDGETS_ID.ASSOCIATED_HISTORY,
-      WIDGETS_ID.CHIEF_COMPLAINTS,
-      WIDGETS_ID.CLINICAL_NOTE,
-      WIDGETS_ID.PLAN,
-      WIDGETS_ID.DIAGNOSIS,
-      WIDGETS_ID.INTRA_ORAL,
-      WIDGETS_ID.EXTRA_ORAL,
-      WIDGETS_ID.VISUALACUITYTEST,
-      WIDGETS_ID.REFRACTIONFORM,
-      WIDGETS_ID.EXAMINATIONFORM,
-      WIDGETS_ID.VISITREMARKS,
-      WIDGETS_ID.VITALSIGN,
-      WIDGETS_ID.REFERRAL,
-    ],
-  },
-  {
-    value: 'Orders',
-    name: 'Orders',
-    authority: [
-      'queue.consultation.widgets.order',
-      'queue.consultation.widgets.dentalchart',
-    ],
-    children: [
-      WIDGETS_ID.ORDERS,
-      WIDGETS_ID.DENTAL_CHART,
-      WIDGETS_ID.TREATMENT,
-      WIDGETS_ID.INVOICE,
-    ],
-  },
-  {
-    value: 'ConsultationDocuments',
-    name: 'Consultation Documents',
-    authority: [
-      'queue.consultation.widgets.consultationdocument',
-      'queue.consultation.widgets.forms',
-      'queue.consultation.widgets.attachment',
-    ],
-    children: [
-      WIDGETS_ID.CONSULTATION_DOCUMENT,
-      WIDGETS_ID.FORMS,
-      WIDGETS_ID.ATTACHMENT,
-    ],
-  },
 ]
 
 export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
@@ -183,111 +264,6 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     }),
   },
   {
-    id: WIDGETS_ID.VISITREMARKS,
-    name: 'Visit Remarks',
-    authority: '',
-    component: Loadable({
-      loader: () => import('./Notes'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='visitRemarks' />
-      },
-      loading: Loading,
-    }),
-  },
-  {
-    id: WIDGETS_ID.REFERRAL,
-    name: 'Referral',
-    authority: '',
-    component: Loadable({
-      loader: () => import('./Notes'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='visitReferral' />
-      },
-      loading: Loading,
-    }),
-  },
-
-  {
-    id: WIDGETS_ID.VITALSIGN,
-    name: 'Vital Sign',
-    authority: 'queue.consultation.widgets.vitalsign',
-    component: Loadable({
-      loader: () => import('./VitalSign'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
-      },
-      loading: Loading,
-    }),
-  },
-  {
-    id: WIDGETS_ID.DIAGNOSIS,
-    name: 'Diagnosis',
-    authority: 'queue.consultation.widgets.diagnosis',
-    component: Loadable({
-      loader: () => import('./Diagnosis'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
-      },
-      loading: Loading,
-    }),
-  },
-  {
-    id: WIDGETS_ID.INTRA_ORAL,
-    name: 'Intra Oral',
-    authority: 'queue.consultation.clinicalnotes.intraoral',
-    component: Loadable({
-      loader: () => import('./Notes'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='intraOral' />
-      },
-      loading: Loading,
-    }),
-  },
-  {
-    id: WIDGETS_ID.EXTRA_ORAL,
-    name: 'Extra Oral',
-    authority: 'queue.consultation.clinicalnotes.extraoral',
-    component: Loadable({
-      loader: () => import('./Notes'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='extraOral' />
-      },
-      loading: Loading,
-    }),
-  },
-  {
-    id: WIDGETS_ID.ORDERS,
-    name: 'Orders',
-    authority: 'queue.consultation.widgets.order',
-    component: Loadable({
-      loader: () => import('./Orders'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
-      },
-      loading: Loading,
-    }),
-  },
-  {
-    id: WIDGETS_ID.CONSULTATION_DOCUMENT,
-    name: 'Consultation Document',
-    authority: 'queue.consultation.widgets.consultationdocument',
-    component: Loadable({
-      loader: () => import('./ConsultationDocument'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
-      },
-      loading: Loading,
-    }),
-  },
-  {
     id: WIDGETS_ID.DENTAL_CHART,
     name: 'Dental Chart',
     authority: 'queue.consultation.widgets.dentalchart',
@@ -314,11 +290,11 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     }),
   },
   {
-    id: WIDGETS_ID.INVOICE,
-    name: 'Invoice',
-    authority: 'queue.consultation.widgets.order',
+    id: WIDGETS_ID.DIAGNOSIS,
+    name: 'Diagnosis',
+    authority: 'queue.consultation.widgets.diagnosis',
     component: Loadable({
-      loader: () => import('./Invoice'),
+      loader: () => import('./Diagnosis'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return <Cmpnet {...props} {...p} />
@@ -368,6 +344,111 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
     layoutConfig: {},
   },
   {
+    id: WIDGETS_ID.VISITREMARKS,
+    name: 'Visit Remarks',
+    authority: '',
+    component: Loadable({
+      loader: () => import('./Notes'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} fieldName='visitRemarks' />
+      },
+      loading: Loading,
+    }),
+  },
+  {
+    id: WIDGETS_ID.REFERRAL,
+    name: 'Referral',
+    authority: '',
+    component: Loadable({
+      loader: () => import('./Notes'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} fieldName='visitReferral' />
+      },
+      loading: Loading,
+    }),
+  },
+
+  {
+    id: WIDGETS_ID.VITALSIGN,
+    name: 'Vital Sign',
+    authority: 'queue.consultation.widgets.vitalsign',
+    component: Loadable({
+      loader: () => import('./VitalSign'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} />
+      },
+      loading: Loading,
+    }),
+  },
+  {
+    id: WIDGETS_ID.INTRA_ORAL,
+    name: 'Intra Oral',
+    authority: 'queue.consultation.clinicalnotes.intraoral',
+    component: Loadable({
+      loader: () => import('./Notes'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} fieldName='intraOral' />
+      },
+      loading: Loading,
+    }),
+  },
+  {
+    id: WIDGETS_ID.EXTRA_ORAL,
+    name: 'Extra Oral',
+    authority: 'queue.consultation.clinicalnotes.extraoral',
+    component: Loadable({
+      loader: () => import('./Notes'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} fieldName='extraOral' />
+      },
+      loading: Loading,
+    }),
+  },
+  {
+    id: WIDGETS_ID.ORDERS,
+    name: 'Orders',
+    authority: 'queue.consultation.widgets.order',
+    component: Loadable({
+      loader: () => import('./Orders'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} />
+      },
+      loading: Loading,
+    }),
+  },
+  {
+    id: WIDGETS_ID.INVOICE,
+    name: 'Invoice',
+    authority: 'queue.consultation.widgets.order',
+    component: Loadable({
+      loader: () => import('./Invoice'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} />
+      },
+      loading: Loading,
+    }),
+  },
+  {
+    id: WIDGETS_ID.CONSULTATION_DOCUMENT,
+    name: 'Consultation Document',
+    authority: 'queue.consultation.widgets.consultationdocument',
+    component: Loadable({
+      loader: () => import('./ConsultationDocument'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} />
+      },
+      loading: Loading,
+    }),
+  },
+  {
     id: WIDGETS_ID.FORMS,
     name: 'Forms',
     authority: 'queue.consultation.widgets.forms',
@@ -395,9 +476,9 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
   },
 ]
 
-export const showWidget = (current, widget) => {
+export const showWidget = (current, widgetId) => {
   // check show notes
-  const notesType = notesTypes.find((type) => type.value === widget.id)
+  const notesType = notesTypes.find((type) => type.value === widgetId)
 
   if (notesType) {
     const { scribbleNotes = [] } = current
@@ -416,13 +497,13 @@ export const showWidget = (current, widget) => {
 
   // check show diagnosis
   if (
-    widget.id === WIDGETS_ID.DIAGNOSIS &&
+    widgetId === WIDGETS_ID.DIAGNOSIS &&
     (!current.diagnosis || current.diagnosis.length === 0)
   )
     return false
 
   // check show eyevisualacuity
-  if (widget.id === WIDGETS_ID.VISUALACUITYTEST) {
+  if (widgetId === WIDGETS_ID.VISUALACUITYTEST) {
     if (_.isEmpty(current.eyeVisualAcuityTestForms)) return false
     const durtyFields = [
       'concurrencyToken',
@@ -435,7 +516,7 @@ export const showWidget = (current, widget) => {
   }
 
   // check show eyerefractionform
-  if (widget.id === WIDGETS_ID.REFRACTIONFORM) {
+  if (widgetId === WIDGETS_ID.REFRACTIONFORM) {
     if (
       !current.corEyeRefractionForm ||
       _.isEmpty(current.corEyeRefractionForm.formData)
@@ -457,7 +538,7 @@ export const showWidget = (current, widget) => {
   }
 
   // check show eyeexaminationform
-  if (widget.id === WIDGETS_ID.EXAMINATIONFORM) {
+  if (widgetId === WIDGETS_ID.EXAMINATIONFORM) {
     if (
       !current.corEyeExaminationForm ||
       _.isEmpty(current.corEyeExaminationForm.formData) ||
@@ -485,54 +566,54 @@ export const showWidget = (current, widget) => {
 
   // check show forms
   if (
-    widget.id === WIDGETS_ID.FORMS &&
+    widgetId === WIDGETS_ID.FORMS &&
     (!current.forms || current.forms.length === 0)
   )
     return false
   // check show attachments
   if (
-    widget.id === WIDGETS_ID.ATTACHMENT &&
+    widgetId === WIDGETS_ID.ATTACHMENT &&
     (current.attachments || current.visitAttachments || []).length === 0
   ) {
     return false
   }
   // check show orders
   if (
-    widget.id === WIDGETS_ID.ORDERS &&
+    widgetId === WIDGETS_ID.ORDERS &&
     (!current.orders || current.orders.length === 0)
   )
     return false
   // check show document
   if (
-    widget.id === WIDGETS_ID.CONSULTATION_DOCUMENT &&
+    widgetId === WIDGETS_ID.CONSULTATION_DOCUMENT &&
     (!current.documents || current.documents.length === 0)
   )
     return false
   // check show DentalChart
   if (
-    widget.id === WIDGETS_ID.DENTAL_CHART &&
+    widgetId === WIDGETS_ID.DENTAL_CHART &&
     (!current.dentalChart || current.dentalChart.length === 0)
   )
     return false
   // check show invoice
-  if (widget.id === WIDGETS_ID.INVOICE && !current.invoice) return false
+  if (widgetId === WIDGETS_ID.INVOICE && !current.invoice) return false
 
   // check show treatment
   if (
-    widget.id === WIDGETS_ID.TREATMENT &&
+    widgetId === WIDGETS_ID.TREATMENT &&
     (!current.orders ||
       current.orders.filter((o) => o.type === 'Treatment').length === 0)
   )
     return false
   // check show vital sign
   if (
-    widget.id === WIDGETS_ID.VITALSIGN &&
+    widgetId === WIDGETS_ID.VITALSIGN &&
     (!current.patientNoteVitalSigns ||
       current.patientNoteVitalSigns.length === 0)
   )
     return false
   // check show visit referral
-  if (widget.id === WIDGETS_ID.REFERRAL) {
+  if (widgetId === WIDGETS_ID.REFERRAL) {
     const { referralBy, referralInstitution, referralDate } = current
     if (
       (!referralBy || referralBy === '') &&
