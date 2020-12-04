@@ -276,7 +276,7 @@ const VisitInfoCard = ({
                 <p>Below invoice adjustment(s) will {showNotApplyAdjustment ? <span style={{ fontWeight: 500, color: 'red' }}>NOT</span> : undefined} be applied to the total bill:</p>
                 {(ctinvoiceadjustment || []).map((t => {
                   if (t.adjType === 'ExactAmount') {
-                    return <span style={{ display: 'inline-block', marginRight: '20px' }}><span style={{ fontWeight: '600' }}>{t.displayValue}:</span> <NumberInput text {...amountProps} style={{ display: 'inline-block' }} value={t.adjValue} />; </span>
+                    return <span style={{ display: 'inline-block', marginRight: '20px' }}><span style={{ fontWeight: '500' }}>{t.displayValue}:</span> <NumberInput text {...amountProps} style={{ display: 'inline-block' }} value={t.adjValue} />; </span>
                   }
 
                   if (t.adjValue > 0) {
@@ -288,7 +288,7 @@ const VisitInfoCard = ({
 
                   return (
                     <span style={{ display: 'inline-block', marginRight: '20px' }}>
-                      <span style={{ fontWeight: '600' }}>{t.displayValue}: </span>
+                      <span style={{ fontWeight: '500' }}>{t.displayValue}: </span>
                       <span style={{
                         color: 'red', display: 'inline-block', fontWeight: '500',
                       }}
@@ -301,7 +301,7 @@ const VisitInfoCard = ({
                   <p>
                     {(copaymentScheme || []).filter((t) => t.copayerInvoiceAdjustmentValue !== 0).map((t => {
                       if (t.copayerInvoiceAdjustmentType === 'ExactAmount') {
-                        return <span style={{ display: 'inline-block', marginRight: '20px' }}><span style={{ fontWeight: '600' }}>{t.coPayerName}</span>: <NumberInput text {...amountProps} style={{ display: 'inline-block' }} value={t.copayerInvoiceAdjustmentValue} />; </span>
+                        return <span style={{ display: 'inline-block', marginRight: '20px' }}><span style={{ fontWeight: '500' }}>{t.coPayerName}</span>: <NumberInput text {...amountProps} style={{ display: 'inline-block' }} value={t.copayerInvoiceAdjustmentValue} />; </span>
                       }
 
                       if (t.copayerInvoiceAdjustmentValue > 0) {
@@ -313,7 +313,7 @@ const VisitInfoCard = ({
 
                       return (
                         <span style={{ display: 'inline-block', marginRight: '20px' }}>
-                          <span style={{ fontWeight: '600' }}>{t.coPayerName}: </span>
+                          <span style={{ fontWeight: '500' }}>{t.coPayerName}: </span>
                           <span style={{
                             color: 'red', display: 'inline-block', fontWeight: '500',
                           }}
