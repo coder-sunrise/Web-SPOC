@@ -1254,19 +1254,6 @@ class PatientHistory extends Component {
                     mode='multiple'
                     style={{ width: !isFullScreen ? 150 : 240 }}
                     options={this.getCategoriesOptions()}
-                    onChange={(v) => {
-                      const { dispatch } = this.props
-                      dispatch({
-                        type: 'patientHistory/saveUserPreference',
-                        payload: {
-                          userPreferenceDetails: {
-                            SelectCategories: v.filter((o) => o !== -99),
-                            Identifier: 'SelectCategories',
-                          },
-                          itemIdentifier: 'SelectCategories',
-                        },
-                      })
-                    }}
                     {...args}
                   />
                 )}
@@ -1425,7 +1412,7 @@ class PatientHistory extends Component {
   }
 
   handelSearch = () => {
-    const { values } = this.props
+    const { values, dispatch, patientHistory } = this.props
     const { visitDate, isAllDate, selectDoctors, selectCategories } = values
     this.setState(
       {
@@ -1440,7 +1427,37 @@ class PatientHistory extends Component {
         selectDoctors,
         selectCategories,
       },
-      this.queryVisitHistory,
+      () => {
+        const currentSelectCategories = selectCategories.filter(
+          (o) => o !== -99,
+        )
+        if (
+          !patientHistory.SelectCategories ||
+          !_.isEqual(
+            patientHistory.SelectCategories.sort(),
+            currentSelectCategories.sort(),
+          )
+        ) {
+          dispatch({
+            type: 'patientHistory/saveUserPreference',
+            payload: {
+              userPreferenceDetails: {
+                SelectCategories: currentSelectCategories,
+                Identifier: 'SelectCategories',
+              },
+              itemIdentifier: 'SelectCategories',
+            },
+          }).then((r) => {
+            if (r) {
+              dispatch({
+                type: 'patientHistory/getUserPreference',
+                payload: {},
+              })
+            }
+          })
+        }
+        this.queryVisitHistory()
+      },
     )
   }
 
