@@ -1412,7 +1412,7 @@ class PatientHistory extends Component {
   }
 
   handelSearch = () => {
-    const { values, dispatch } = this.props
+    const { values, dispatch, patientHistory } = this.props
     const { visitDate, isAllDate, selectDoctors, selectCategories } = values
     this.setState(
       {
@@ -1427,17 +1427,43 @@ class PatientHistory extends Component {
         selectDoctors,
         selectCategories,
       },
-      this.queryVisitHistory,
-      dispatch({
-        type: 'patientHistory/saveUserPreference',
-        payload: {
-          userPreferenceDetails: {
-            SelectCategories: selectCategories.filter((o) => o !== -99),
-            Identifier: 'SelectCategories',
-          },
-          itemIdentifier: 'SelectCategories',
-        },
-      }),
+      () => {
+        const currentSelectCategories = selectCategories.filter(
+          (o) => o !== -99,
+        )
+        if (
+          !patientHistory.SelectCategories ||
+          _.differenceWith(
+            patientHistory.SelectCategories,
+            currentSelectCategories,
+            _.isEqual,
+          ).length > 0 ||
+          _.differenceWith(
+            currentSelectCategories,
+            patientHistory.SelectCategories,
+            _.isEqual,
+          ).length > 0
+        ) {
+          dispatch({
+            type: 'patientHistory/saveUserPreference',
+            payload: {
+              userPreferenceDetails: {
+                SelectCategories: currentSelectCategories,
+                Identifier: 'SelectCategories',
+              },
+              itemIdentifier: 'SelectCategories',
+            },
+          }).then((r) => {
+            if (r) {
+              dispatch({
+                type: 'patientHistory/getUserPreference',
+                payload: {},
+              })
+            }
+          })
+        }
+        this.queryVisitHistory()
+      },
     )
   }
 
