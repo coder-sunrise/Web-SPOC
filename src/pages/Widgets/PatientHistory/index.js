@@ -1433,16 +1433,10 @@ class PatientHistory extends Component {
         )
         if (
           !patientHistory.SelectCategories ||
-          _.differenceWith(
-            patientHistory.SelectCategories,
-            currentSelectCategories,
-            _.isEqual,
-          ).length > 0 ||
-          _.differenceWith(
-            currentSelectCategories,
-            patientHistory.SelectCategories,
-            _.isEqual,
-          ).length > 0
+          !_.isEqual(
+            patientHistory.SelectCategories.sort(),
+            currentSelectCategories.sort(),
+          )
         ) {
           dispatch({
             type: 'patientHistory/saveUserPreference',
