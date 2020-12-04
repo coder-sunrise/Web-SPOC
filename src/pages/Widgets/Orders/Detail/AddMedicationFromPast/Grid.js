@@ -350,7 +350,7 @@ class Grid extends PureComponent {
                   <span style={{ color: 'red', fontStyle: 'italic' }}>
                     <sup>#2&nbsp;</sup>
                   </span>
-                  dispensing UOM changed&nbsp;&nbsp;
+                  dispensing UOM is changed&nbsp;&nbsp;
                   {!isRetail && (
                     <span>
                       <span style={{ color: 'red', fontStyle: 'italic' }}>
