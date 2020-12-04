@@ -731,7 +731,13 @@ class PatientHistory extends Component {
       patientAllergy,
       genderFK,
       patientAllergyMetaData,
+      patientMedicalHistory = {},
     } = patient
+    const {
+      medicalHistory,
+      familyHistory,
+      socialHistory,
+    } = patientMedicalHistory
     const gender = ctgender.find((o) => o.id === genderFK)
     const nationality = ctnationality.find((o) => o.id === nationalityFK)
     let g6PD
@@ -765,9 +771,9 @@ class PatientHistory extends Component {
         patientSex: gender ? gender.name : 'Unknown',
         patientG6PD: g6PD ? g6PD.name : 'Unknown',
         patientAllergy: allergies.map((o) => o.allergyName).join(', '),
-        patientSocialHistory: '111',
-        patientFamilyHistory: '222',
-        patientMajorInvestigation: '333',
+        patientSocialHistory: socialHistory,
+        patientFamilyHistory: familyHistory,
+        patientMajorInvestigation: medicalHistory,
       },
     ]
   }
