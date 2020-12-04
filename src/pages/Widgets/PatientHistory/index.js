@@ -1254,19 +1254,6 @@ class PatientHistory extends Component {
                     mode='multiple'
                     style={{ width: !isFullScreen ? 150 : 240 }}
                     options={this.getCategoriesOptions()}
-                    onChange={(v) => {
-                      const { dispatch } = this.props
-                      dispatch({
-                        type: 'patientHistory/saveUserPreference',
-                        payload: {
-                          userPreferenceDetails: {
-                            SelectCategories: v.filter((o) => o !== -99),
-                            Identifier: 'SelectCategories',
-                          },
-                          itemIdentifier: 'SelectCategories',
-                        },
-                      })
-                    }}
                     {...args}
                   />
                 )}
@@ -1425,7 +1412,7 @@ class PatientHistory extends Component {
   }
 
   handelSearch = () => {
-    const { values } = this.props
+    const { values, dispatch } = this.props
     const { visitDate, isAllDate, selectDoctors, selectCategories } = values
     this.setState(
       {
@@ -1441,6 +1428,16 @@ class PatientHistory extends Component {
         selectCategories,
       },
       this.queryVisitHistory,
+      dispatch({
+        type: 'patientHistory/saveUserPreference',
+        payload: {
+          userPreferenceDetails: {
+            SelectCategories: selectCategories.filter((o) => o !== -99),
+            Identifier: 'SelectCategories',
+          },
+          itemIdentifier: 'SelectCategories',
+        },
+      }),
     )
   }
 
