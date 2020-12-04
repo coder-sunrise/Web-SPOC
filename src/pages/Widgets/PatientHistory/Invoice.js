@@ -73,7 +73,7 @@ const baseColumns = [
     dataIndex: 'quantity',
     title: 'Quantity',
     align: 'right',
-    width: 90,
+    width: 100,
     render: (text, row) => (
       <div style={numberstyle}>
         {`${numeral(row.quantity || 0).format('0,0.0')}`}

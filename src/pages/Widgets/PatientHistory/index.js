@@ -408,7 +408,7 @@ class PatientHistory extends Component {
             {fromModule !== 'Consultation' && (
               <div
                 style={{
-                  marginTop: -12,
+                  marginTop: fromModule === 'History' ? -12 : -16,
                   marginLeft: 5,
                   height: 24,
                   width: 30,
@@ -1155,7 +1155,7 @@ class PatientHistory extends Component {
               current.orders.map((o) => {
                 return {
                   visitFK: current.currentId,
-                  type: o.type,
+                  type: o.isDrugMixture ? 'Drug Mixture' : o.type,
                   isDrugMixture: o.isDrugMixture,
                   name: o.name,
                   description: o.description,
@@ -1211,19 +1211,26 @@ class PatientHistory extends Component {
   }
 
   getFilterBar = () => {
-    const { values, fromModule } = this.props
+    const { values, fromModule, isFullScreen = true } = this.props
     const { isAllDate } = values
     const { selectItems } = this.state
     return (
       <div>
         <div style={{ display: 'flex' }}>
           <div>
-            <div style={{ display: 'inline-Block', width: 250 }}>
+            <div
+              style={{
+                display: 'inline-Block',
+              }}
+            >
               <Field
                 name='visitDate'
                 render={(args) => (
                   <DateRangePicker
-                    label='Visit Date'
+                    style={{
+                      width: !isFullScreen ? 240 : 300,
+                    }}
+                    label='Visit Date From'
                     label2='To'
                     {...args}
                     disabled={isAllDate}
@@ -1237,7 +1244,7 @@ class PatientHistory extends Component {
                 render={(args) => <Checkbox {...args} label='All Date' />}
               />
             </div>
-            <div style={{ display: 'inline-Block', marginLeft: 5 }}>
+            <div style={{ display: 'inline-Block' }}>
               <Field
                 name='selectCategories'
                 render={(args) => (
@@ -1245,7 +1252,7 @@ class PatientHistory extends Component {
                     valueField='value'
                     label='Categories'
                     mode='multiple'
-                    style={{ width: 130 }}
+                    style={{ width: !isFullScreen ? 150 : 240 }}
                     options={this.getCategoriesOptions()}
                     onChange={(v) => {
                       const { dispatch } = this.props
@@ -1265,12 +1272,13 @@ class PatientHistory extends Component {
                 )}
               />
             </div>
-            <div style={{ display: 'inline-Block', marginLeft: 10 }}>
+            <div style={{ display: 'inline-Block', marginLeft: 5 }}>
               <Field
                 name='selectDoctors'
                 render={(args) => (
                   <DoctorProfileSelect
-                    style={{ width: 130 }}
+                    style={{ width: !isFullScreen ? 150 : 240 }}
+                    label='Doctors'
                     mode='multiple'
                     {...args}
                     allValue={-99}
@@ -1287,7 +1295,7 @@ class PatientHistory extends Component {
                 )}
               />
             </div>
-            <div style={{ display: 'inline-Block', marginLeft: 10 }}>
+            <div style={{ display: 'inline-Block', marginLeft: 5 }}>
               <ProgressButton
                 color='primary'
                 size='sm'
@@ -1325,7 +1333,7 @@ class PatientHistory extends Component {
                   fontWeight: 500,
                 }}
               >
-                {`(Select: ${selectItems.length})`}
+                {`(Selected: ${selectItems.length})`}
               </div>
             </div>
           )}

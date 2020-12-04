@@ -35,7 +35,7 @@ export default ({ current }) => {
               return (
                 <div style={{ position: 'relative' }}>
                   <div style={wrapCellTextStyle}>
-                    {row.type}
+                    {row.isDrugMixture ? 'Drug Mixture' : row.type}
                     {drugMixtureIndicator(row)}
                   </div>
                 </div>
@@ -52,7 +52,7 @@ export default ({ current }) => {
             dataIndex: 'quantity',
             title: 'Quantity',
             align: 'right',
-            width: 90,
+            width: 100,
             render: (text, row) => (
               <div
                 style={{
