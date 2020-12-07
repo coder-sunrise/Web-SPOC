@@ -150,8 +150,9 @@ class AmountSummary extends PureComponent {
   }
 
   editAdjustment = (index) => {
-    const { adjustments, rows } = this.state
+    const { adjustments, rows, summary } = this.state
     const { config, onValueChanged } = this.props
+    const { total } = summary
 
     this.props.dispatch({
       type: 'global/updateState',
@@ -173,6 +174,7 @@ class AmountSummary extends PureComponent {
             adjType: adjustments[index].adjType,
             adjValue: adjustments[index].adjValue,
             adjRemark: adjustments[index].adjRemark,
+            initialAmout: total,
           },
         },
       },
@@ -270,6 +272,7 @@ class AmountSummary extends PureComponent {
           </GridContainer>
         )}
         {adjustments.map((v, i) => {
+          console.log(amountProps)
           if (!v.isDeleted) {
             return (
               <Adjustment
