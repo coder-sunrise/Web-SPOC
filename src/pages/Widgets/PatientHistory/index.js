@@ -1211,7 +1211,7 @@ class PatientHistory extends Component {
   }
 
   getFilterBar = () => {
-    const { values, fromModule, isFullScreen = true } = this.props
+    const { values } = this.props
     const { isAllDate } = values
     const { selectItems } = this.state
     return (
@@ -1228,7 +1228,7 @@ class PatientHistory extends Component {
                 render={(args) => (
                   <DateRangePicker
                     style={{
-                      width: !isFullScreen ? 240 : 300,
+                      width: 300,
                     }}
                     label='Visit Date From'
                     label2='To'
@@ -1238,7 +1238,7 @@ class PatientHistory extends Component {
                 )}
               />
             </div>
-            <div style={{ display: 'inline-Block', marginLeft: 5 }}>
+            <div style={{ display: 'inline-Block', marginLeft: 10 }}>
               <Field
                 name='isAllDate'
                 render={(args) => <Checkbox {...args} label='All Date' />}
@@ -1252,19 +1252,19 @@ class PatientHistory extends Component {
                     valueField='value'
                     label='Categories'
                     mode='multiple'
-                    style={{ width: !isFullScreen ? 150 : 240 }}
+                    style={{ width: 240 }}
                     options={this.getCategoriesOptions()}
                     {...args}
                   />
                 )}
               />
             </div>
-            <div style={{ display: 'inline-Block', marginLeft: 5 }}>
+            <div style={{ display: 'inline-Block', marginLeft: 10 }}>
               <Field
                 name='selectDoctors'
                 render={(args) => (
                   <DoctorProfileSelect
-                    style={{ width: !isFullScreen ? 150 : 240 }}
+                    style={{ width: 240 }}
                     label='Doctors'
                     mode='multiple'
                     {...args}
@@ -1295,35 +1295,33 @@ class PatientHistory extends Component {
           </div>
         </div>
         <div style={{ display: 'flex' }}>
-          {fromModule !== 'Consultation' && (
+          <div
+            style={{
+              position: 'relative',
+              bottom: -8,
+            }}
+          >
+            <div style={{ display: 'inline-Block' }}>
+              <Field
+                name='isSelectAll'
+                render={(args) => (
+                  <Checkbox
+                    onChange={this.selectAllOnChange}
+                    {...args}
+                    label='Select All'
+                  />
+                )}
+              />
+            </div>
             <div
               style={{
-                position: 'relative',
-                bottom: -8,
+                display: 'inline-Block',
+                fontWeight: 500,
               }}
             >
-              <div style={{ display: 'inline-Block' }}>
-                <Field
-                  name='isSelectAll'
-                  render={(args) => (
-                    <Checkbox
-                      onChange={this.selectAllOnChange}
-                      {...args}
-                      label='Select All'
-                    />
-                  )}
-                />
-              </div>
-              <div
-                style={{
-                  display: 'inline-Block',
-                  fontWeight: 500,
-                }}
-              >
-                {`(Selected: ${selectItems.length})`}
-              </div>
+              {`(Selected: ${selectItems.length})`}
             </div>
-          )}
+          </div>
           <div style={{ marginLeft: 'auto' }}>
             <div
               style={{
@@ -1375,24 +1373,234 @@ class PatientHistory extends Component {
                 </span>
               </span>
             </div>
-            {fromModule !== 'Consultation' && (
-              <Button
-                color='primary'
-                icon={null}
-                size='sm'
-                style={{
-                  position: 'relative',
-                  bottom: 8,
-                  marginLeft: 10,
-                }}
-                disabled={selectItems.length === 0}
-                onClick={this.printHandel}
-              >
-                <Print />print
-              </Button>
-            )}
+            <Button
+              color='primary'
+              icon={null}
+              size='sm'
+              style={{
+                position: 'relative',
+                bottom: 8,
+                marginLeft: 10,
+              }}
+              disabled={selectItems.length === 0}
+              onClick={this.printHandel}
+            >
+              <Print />print
+            </Button>
           </div>
         </div>
+      </div>
+    )
+  }
+
+  getConsultationFilterBar = () => {
+    const { values, isFullScreen = true } = this.props
+    const { isAllDate } = values
+    return (
+      <div>
+        <div style={{ display: 'flex' }}>
+          <div>
+            <div
+              style={{
+                display: 'inline-Block',
+              }}
+            >
+              <Field
+                name='visitDate'
+                render={(args) => (
+                  <DateRangePicker
+                    style={{
+                      width: !isFullScreen ? 240 : 300,
+                    }}
+                    label='Visit Date From'
+                    label2='To'
+                    {...args}
+                    disabled={isAllDate}
+                  />
+                )}
+              />
+            </div>
+            <div style={{ display: 'inline-Block', marginLeft: 10 }}>
+              <Field
+                name='isAllDate'
+                render={(args) => <Checkbox {...args} label='All Date' />}
+              />
+            </div>
+            <div style={{ display: 'inline-Block' }}>
+              <Field
+                name='selectCategories'
+                render={(args) => (
+                  <CodeSelect
+                    valueField='value'
+                    label='Categories'
+                    mode='multiple'
+                    style={{ width: !isFullScreen ? 150 : 240 }}
+                    options={this.getCategoriesOptions()}
+                    {...args}
+                  />
+                )}
+              />
+            </div>
+            <div style={{ display: 'inline-Block', marginLeft: 10 }}>
+              <Field
+                name='selectDoctors'
+                render={(args) => (
+                  <DoctorProfileSelect
+                    style={{ width: !isFullScreen ? 150 : 240 }}
+                    label='Doctors'
+                    mode='multiple'
+                    {...args}
+                    allValue={-99}
+                    allValueOption={{
+                      id: -99,
+                      clinicianProfile: {
+                        name: 'All',
+                        isActive: true,
+                      },
+                    }}
+                    labelField='clinicianProfile.name'
+                    localFilter={(option) => option.clinicianProfile.isActive}
+                  />
+                )}
+              />
+            </div>
+            {isFullScreen && (
+              <div style={{ display: 'inline-Block', marginLeft: 5 }}>
+                <ProgressButton
+                  color='primary'
+                  size='sm'
+                  icon={<Search />}
+                  onClick={this.handelSearch}
+                >
+                  Search
+                </ProgressButton>
+              </div>
+            )}
+          </div>
+          {isFullScreen && (
+            <div
+              style={{
+                marginLeft: 'auto',
+                position: 'relative',
+                bottom: -10,
+              }}
+            >
+              <div>
+                <span
+                  style={{
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => {
+                    this.setExpandAll(true)
+                  }}
+                >
+                  <span
+                    className='material-icons'
+                    style={{
+                      marginTop: 15,
+                      fontSize: '1.2rem',
+                    }}
+                  >
+                    unfold_more
+                  </span>
+                  <span style={{ position: 'relative', top: -5 }}>
+                    Expand All
+                  </span>
+                </span>
+                <span
+                  style={{
+                    cursor: 'pointer',
+                    marginLeft: 20,
+                    marginRight: 10,
+                  }}
+                  onClick={() => {
+                    this.setExpandAll(false)
+                  }}
+                >
+                  <span
+                    className='material-icons'
+                    style={{
+                      marginTop: 10,
+                      fontSize: '1.2rem',
+                    }}
+                  >
+                    unfold_less
+                  </span>
+                  <span style={{ position: 'relative', top: -5 }}>
+                    Collapse All
+                  </span>
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+        {!isFullScreen && (
+          <div style={{ display: 'flex' }}>
+            <div
+              style={{
+                position: 'relative',
+                bottom: -8,
+              }}
+            >
+              <ProgressButton
+                color='primary'
+                size='sm'
+                icon={<Search />}
+                onClick={this.handelSearch}
+              >
+                Search
+              </ProgressButton>
+            </div>
+            <div style={{ marginLeft: 'auto' }}>
+              <div>
+                <span
+                  style={{
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => {
+                    this.setExpandAll(true)
+                  }}
+                >
+                  <span
+                    className='material-icons'
+                    style={{
+                      marginTop: 15,
+                      fontSize: '1.2rem',
+                    }}
+                  >
+                    unfold_more
+                  </span>
+                  <span style={{ position: 'relative', top: -5 }}>
+                    Expand All
+                  </span>
+                </span>
+                <span
+                  style={{
+                    cursor: 'pointer',
+                    marginLeft: 20,
+                    marginRight: 10,
+                  }}
+                  onClick={() => {
+                    this.setExpandAll(false)
+                  }}
+                >
+                  <span
+                    className='material-icons'
+                    style={{
+                      marginTop: 10,
+                      fontSize: '1.2rem',
+                    }}
+                  >
+                    unfold_less
+                  </span>
+                  <span style={{ position: 'relative', top: -5 }}>
+                    Collapse All
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     )
   }
@@ -1495,7 +1703,11 @@ class PatientHistory extends Component {
     return (
       <div {...cfg}>
         <CardContainer hideHeader size='sm'>
-          {this.getFilterBar()}
+          {fromModule === 'Consultation' ? (
+            this.getConsultationFilterBar()
+          ) : (
+            this.getFilterBar()
+          )}
           <div
             ref={(e) => (this.scrollRef = e)}
             style={{
