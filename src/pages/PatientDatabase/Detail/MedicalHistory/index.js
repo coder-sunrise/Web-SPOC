@@ -25,7 +25,6 @@ class MedicalHistory extends PureComponent {
                   <OutlinedTextField
                     label='Medical History'
                     multiline
-                    maxLength={4000}
                     rowsMax={5}
                     rows={5}
                     disabled={disabledByAccessRight}
@@ -43,7 +42,6 @@ class MedicalHistory extends PureComponent {
                   <OutlinedTextField
                     label='Family History'
                     multiline
-                    maxLength={4000}
                     rowsMax={5}
                     rows={5}
                     disabled={disabledByAccessRight}
@@ -61,7 +59,6 @@ class MedicalHistory extends PureComponent {
                   <OutlinedTextField
                     label='Social History'
                     multiline
-                    maxLength={4000}
                     rowsMax={5}
                     rows={5}
                     disabled={disabledByAccessRight}

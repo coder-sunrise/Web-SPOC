@@ -49,9 +49,7 @@ class MedicalHistory extends PureComponent {
                 return (
                   <TextField
                     label='Medical History'
-                    multiline
-                    maxLength={4000}
-                    rowsMax={5}
+                    multiline 
                     disabled={disabledByAccessRight}
                     {...args}
                   />
@@ -67,8 +65,6 @@ class MedicalHistory extends PureComponent {
                   <TextField
                     label='Family History'
                     multiline
-                    maxLength={4000}
-                    rowsMax={5}
                     disabled={disabledByAccessRight}
                     {...args}
                   />
@@ -84,8 +80,6 @@ class MedicalHistory extends PureComponent {
                   <TextField
                     label='Social History'
                     multiline
-                    maxLength={4000}
-                    rowsMax={5}
                     disabled={disabledByAccessRight}
                     {...args}
                   />
