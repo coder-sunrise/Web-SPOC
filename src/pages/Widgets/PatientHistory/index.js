@@ -269,29 +269,31 @@ class PatientHistory extends Component {
         selectDoctors: selectDoctors.join(','),
       },
     }).then((r) => {
-      this.setState((preState) => {
-        const list = r.list.map((o) => {
+      if (r) {
+        this.setState((preState) => {
+          const list = (r.list || []).map((o) => {
+            return {
+              ...o,
+              currentId: `${o.isNurseNote ? 'NurseNote' : 'Visit'}-${o.id}`,
+            }
+          })
+          const currentVisits = [
+            ...preState.loadVisits,
+            ...list,
+          ]
           return {
-            ...o,
-            currentId: `${o.isNurseNote ? 'NurseNote' : 'Visit'}-${o.id}`,
+            ...preState,
+            loadVisits: currentVisits,
+            totalVisits: r.totalVisits,
+            pageIndex: preState.pageIndex + 1,
+            activeKey: [
+              ...preState.activeKey,
+              ...list.map((o) => o.currentId),
+            ],
           }
         })
-        const currentVisits = [
-          ...preState.loadVisits,
-          ...list,
-        ]
-        return {
-          ...preState,
-          loadVisits: currentVisits,
-          totalVisits: r.totalVisits,
-          pageIndex: preState.pageIndex + 1,
-          activeKey: [
-            ...preState.activeKey,
-            ...list.map((o) => o.currentId),
-          ],
-        }
-      })
-      if (values.isSelectAll) setFieldValue('isSelectAll', false)
+        if (values.isSelectAll) setFieldValue('isSelectAll', false)
+      }
     })
   }
 
