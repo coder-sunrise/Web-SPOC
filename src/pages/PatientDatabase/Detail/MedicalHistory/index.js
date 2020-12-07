@@ -26,6 +26,7 @@ class MedicalHistory extends PureComponent {
                     label='Medical History'
                     multiline
                     rowsMax={5}
+                    maxLength={9999999}
                     rows={5}
                     disabled={disabledByAccessRight}
                     {...args}
@@ -43,6 +44,7 @@ class MedicalHistory extends PureComponent {
                     label='Family History'
                     multiline
                     rowsMax={5}
+                    maxLength={9999999}
                     rows={5}
                     disabled={disabledByAccessRight}
                     {...args}
@@ -60,6 +62,7 @@ class MedicalHistory extends PureComponent {
                     label='Social History'
                     multiline
                     rowsMax={5}
+                    maxLength={9999999}
                     rows={5}
                     disabled={disabledByAccessRight}
                     {...args}
