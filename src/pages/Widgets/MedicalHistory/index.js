@@ -52,7 +52,6 @@ class MedicalHistory extends PureComponent {
                     multiline
                     maxLength={4000}
                     rowsMax={5}
-                    rows={1}
                     disabled={disabledByAccessRight}
                     {...args}
                   />
