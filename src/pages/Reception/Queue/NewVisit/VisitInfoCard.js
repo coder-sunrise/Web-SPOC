@@ -269,6 +269,24 @@ const VisitInfoCard = ({
             }}
           />
         </GridItem>
+        <GridItem xs md={12}>
+          <Field
+            name={FormField['visit.visitRemarks']}
+            render={(args) => (
+              <TextField
+                {...args}
+                // disabled={isReadOnly}
+                multiline
+                rowsMax={3}
+                authority='none'
+                disabled={isVisitReadonlyAfterSigned}
+                label={formatMessage({
+                  id: 'reception.queue.visitRegistration.visitRemarks',
+                })}
+              />
+            )}
+          />
+        </GridItem>
         {
           (showAdjusment && ((ctinvoiceadjustment || []).length > 0 || (copaymentScheme || []).length > 0)) ?
             <GridItem xs md={12}>
@@ -328,24 +346,6 @@ const VisitInfoCard = ({
             </GridItem>
             : undefined
         }
-        <GridItem xs md={12}>
-          <Field
-            name={FormField['visit.visitRemarks']}
-            render={(args) => (
-              <TextField
-                {...args}
-                // disabled={isReadOnly}
-                multiline
-                rowsMax={3}
-                authority='none'
-                disabled={isVisitReadonlyAfterSigned}
-                label={formatMessage({
-                  id: 'reception.queue.visitRegistration.visitRemarks',
-                })}
-              />
-            )}
-          />
-        </GridItem>
         <GridItem xs md={12}>
           <AttachmentWithThumbnail
             label='Attachment'
