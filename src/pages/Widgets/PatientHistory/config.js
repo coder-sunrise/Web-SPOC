@@ -25,6 +25,7 @@ export const WIDGETS_ID = {
   VITALSIGN: '18',
   REFERRAL: '19',
   CONSULTATION_DOCUMENT: '20',
+  NURSENOTES: '21',
 }
 
 export const GPCategory = [
@@ -41,6 +42,7 @@ export const GPCategory = [
   WIDGETS_ID.CONSULTATION_DOCUMENT,
   WIDGETS_ID.FORMS,
   WIDGETS_ID.ATTACHMENT,
+  WIDGETS_ID.NURSENOTES,
 ]
 
 export const EyeCategory = [
@@ -60,6 +62,7 @@ export const EyeCategory = [
   WIDGETS_ID.CONSULTATION_DOCUMENT,
   WIDGETS_ID.FORMS,
   WIDGETS_ID.ATTACHMENT,
+  WIDGETS_ID.NURSENOTES,
 ]
 
 export const DentalCategory = [
@@ -76,6 +79,7 @@ export const DentalCategory = [
   WIDGETS_ID.CONSULTATION_DOCUMENT,
   WIDGETS_ID.FORMS,
   WIDGETS_ID.ATTACHMENT,
+  WIDGETS_ID.NURSENOTES,
 ]
 
 export const categoryTypes = [
@@ -168,6 +172,12 @@ export const categoryTypes = [
     value: WIDGETS_ID.ATTACHMENT,
     name: 'Attachment',
     authority: 'queue.consultation.widgets.attachment',
+  },
+  {
+    value: WIDGETS_ID.NURSENOTES,
+    name: 'Nurse Notes',
+    authority:
+      'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
   },
 ]
 
