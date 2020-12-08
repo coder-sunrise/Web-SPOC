@@ -1384,20 +1384,22 @@ class PatientHistory extends Component {
                 </span>
               </span>
             </div>
-            <Button
-              color='primary'
-              icon={null}
-              size='sm'
-              style={{
-                position: 'relative',
-                bottom: 8,
-                marginLeft: 10,
-              }}
-              disabled={selectItems.length === 0}
-              onClick={this.printHandel}
-            >
-              <Print />print
-            </Button>
+            {false && (
+              <Button
+                color='primary'
+                icon={null}
+                size='sm'
+                style={{
+                  position: 'relative',
+                  bottom: 8,
+                  marginLeft: 10,
+                }}
+                disabled={selectItems.length === 0}
+                onClick={this.printHandel}
+              >
+                <Print />print
+              </Button>
+            )}
           </div>
         </div>
       </div>
