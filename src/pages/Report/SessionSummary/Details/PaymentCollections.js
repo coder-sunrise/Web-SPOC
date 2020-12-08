@@ -18,6 +18,7 @@ const PaymentCollections = ({
   TotalDetails,
   classes,
   isCompanyPaymentCollectionsForPast,
+  isCurrentSessionPayment,
 }) => {
   if (!PaymentCollectionsDetails) return null
   let listData = []
@@ -67,16 +68,16 @@ const PaymentCollections = ({
       </div>
     )
   }
+  let totalAmtTitle = isCurrentSessionPayment ? 'Total Amount' : 'Total Payable Amt.'
 
   let PaymentCollectionsColumns = [
     { name: 'invoiceNo', title: invoiceNoTitle },
-    { name: 'totalAftAdj', title: 'Total Payable Amt.' },
+    { name: 'totalAftAdj', title: totalAmtTitle },
     { name: 'gstAmt', title: 'GST' },
     { name: 'payerName', title: 'Payer Name' },
     { name: 'receiptNo', title: 'Receipt No.' },
     { name: 'totalAmtPaid', title: 'Payment' },
   ]
-
 
   let PaymentCollectionsColumnExtension = [
     { columnName: 'invoiceNo', width: 130, sortingEnabled: false },
