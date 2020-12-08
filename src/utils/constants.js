@@ -219,6 +219,7 @@ export const REPORT_TYPE = {
   37: 'Inventory Trending Report',
   55: 'Letter of Certification',
   61: 'Refraction Form Report',
+  68: 'Patient History Report',
 }
 
 export const REPORT_ID = {

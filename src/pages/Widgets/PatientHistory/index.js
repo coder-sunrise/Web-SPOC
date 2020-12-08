@@ -232,7 +232,13 @@ class PatientHistory extends Component {
   }
 
   queryVisitHistory = () => {
-    const { isAllDate, pageIndex, selectDoctors = [], visitDate } = this.state
+    const {
+      isAllDate,
+      pageIndex,
+      selectDoctors = [],
+      visitDate,
+      selectCategories = [],
+    } = this.state
     const {
       dispatch,
       clinicSettings,
@@ -267,6 +273,13 @@ class PatientHistory extends Component {
         pageSize: viewVisitPageSize,
         patientProfileId: patientHistory.patientID,
         selectDoctors: selectDoctors.join(','),
+        isViewNurseNote:
+          selectCategories.length === 0 ||
+          !_.isEmpty(
+            selectCategories.find(
+              (o) => o === WidgetConfig.WIDGETS_ID.NURSENOTES,
+            ),
+          ),
       },
     }).then((r) => {
       if (r) {
@@ -1196,20 +1209,16 @@ class PatientHistory extends Component {
       ConsultationDocument: consultationDocument,
     }
 
-    download(
-      `/api/Reports/${68}?ReportFormat=pdf`,
-      {
-        subject: `PatientHistory-${moment().format('DDMMYYYYHHmmss')}`,
-        type: 'pdf',
-      },
-      {
-        method: 'POST',
-        contentType: 'application/x-www-form-urlencoded',
-        data: {
+    window.g_app._store.dispatch({
+      type: 'report/updateState',
+      payload: {
+        reportTypeID: 68,
+        reportParameters: {
+          isSaved: false,
           reportContent: JSON.stringify(commonDataReaderTransform(payload)),
         },
       },
-    )
+    })
   }
 
   getFilterBar = () => {
