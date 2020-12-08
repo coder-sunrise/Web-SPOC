@@ -485,7 +485,7 @@ class EditInvoice extends Component {
               onCommitChanges: this.handleCommitChanges,
             }}
           />
-          <GridItem xs={8} md={8}>
+          <GridItem xs={7} md={7}>
             <FastField
               name='remark'
               render={(args) => {
@@ -501,7 +501,7 @@ class EditInvoice extends Component {
               }}
             />
           </GridItem>
-          <GridItem xs={4} md={4}>
+          <GridItem xs={5} md={5}>
             <AmountSummary
               rows={invoiceItem}
               adjustments={invoiceAdjustment}

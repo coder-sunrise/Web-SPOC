@@ -223,10 +223,10 @@ class HistoryDetails extends PureComponent {
             if (visitPurposeFK === VISIT_TYPE.RETAIL) {
               return (
                 _widget.id === WidgetConfig.WIDGETS_ID.INVOICE &&
-                WidgetConfig.showWidget(current, _widget)
+                WidgetConfig.showWidget(current, _widget.id)
               )
             }
-            return WidgetConfig.showWidget(current, _widget)
+            return WidgetConfig.showWidget(current, _widget.id)
           })
           .map((o) => {
             const Widget = o.component

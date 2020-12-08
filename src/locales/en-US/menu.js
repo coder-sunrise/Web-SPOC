@@ -161,6 +161,7 @@ export default {
   'menu.setting.casedescription': 'Case Description',
   'menu.setting.refractiontesttype': 'Refraction Test Type',
   'menu.setting.package': 'Package',
+  'menu.setting.invoiceadjustment': 'Invoice Adjustment',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',

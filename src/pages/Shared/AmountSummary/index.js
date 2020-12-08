@@ -149,6 +149,38 @@ class AmountSummary extends PureComponent {
     )
   }
 
+  editAdjustment = (index) => {
+    const { adjustments, rows, summary } = this.state
+    const { config, onValueChanged } = this.props
+    const { total } = summary
+
+    this.props.dispatch({
+      type: 'global/updateState',
+      payload: {
+        openAdjustment: true,
+        openAdjustmentConfig: {
+          callbackMethod: (v) => {
+            adjustments.splice(index, 1, v)
+            this.setState(
+              {
+                ...calculateAmount(rows, adjustments, config),
+              },
+              () => onValueChanged(this.state),
+            )
+          },
+          showRemark: true,
+          showAmountPreview: false,
+          defaultValues: {
+            adjType: adjustments[index].adjType,
+            adjValue: adjustments[index].adjValue,
+            adjRemark: adjustments[index].adjRemark,
+            initialAmout: total,
+          },
+        },
+      },
+    })
+  }
+
   render () {
     const {
       theme,
@@ -211,7 +243,7 @@ class AmountSummary extends PureComponent {
         )}
         {showAdjustment && (
           <GridContainer style={{ marginBottom: 4 }}>
-            <GridItem xs={7}>
+            <GridItem xs={6}>
               <div
                 style={{
                   textAlign: 'right',
@@ -222,7 +254,7 @@ class AmountSummary extends PureComponent {
                 <span>Invoice Adjustment</span>
               </div>
             </GridItem>
-            <GridItem xs={1}>
+            <GridItem xs={2}>
               {showAddAdjustment && (
                 <Button
                   color='primary'
@@ -240,6 +272,7 @@ class AmountSummary extends PureComponent {
           </GridContainer>
         )}
         {adjustments.map((v, i) => {
+          console.log(amountProps)
           if (!v.isDeleted) {
             return (
               <Adjustment
@@ -248,6 +281,7 @@ class AmountSummary extends PureComponent {
                 type={v.adjType}
                 dispatch={dispatch}
                 onDelete={this.deleteAdjustment}
+                onEdit={this.editAdjustment}
                 amountProps={amountProps}
                 // calcPurchaseOrderSummary={calcPurchaseOrderSummary}
                 {...v}

@@ -5,6 +5,7 @@ import { isNumber } from 'util'
 import { withStyles } from '@material-ui/core'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
+import { Alert } from 'antd';
 
 import {
   Danger,
@@ -282,13 +283,7 @@ class Adjustment extends PureComponent {
             <GridItem md={1} />
             <GridItem md={11}>
               {showError && (
-                <Danger>
-                  <p>
-                    <b>
-                      Adding this adjustment will result in overpaid invoice.
-                    </b>
-                  </p>
-                </Danger>
+                <Alert style={{ padding: '5px 15px 5px 37px' }} message="Adding this adjustment will make the total bill negative." banner />
               )}
             </GridItem>
             {showRemark && (
@@ -332,7 +327,7 @@ class Adjustment extends PureComponent {
           footer({
             onConfirm: props.handleSubmit,
             confirmProps: {
-              disabled: showError,
+              // disabled: showError,
             },
           })}
       </div>

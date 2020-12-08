@@ -14,6 +14,7 @@ export default ({ current }) => {
             dataIndex: 'RightEye',
             title: 'Right Eye',
             align: 'center',
+            width: 400,
           },
           {
             dataIndex: 'EyeExaminationType',
@@ -24,6 +25,7 @@ export default ({ current }) => {
             dataIndex: 'LeftEye',
             title: 'Left Eye',
             align: 'center',
+            width: 400,
           },
         ]}
         dataSource={formData.EyeExaminations || []}

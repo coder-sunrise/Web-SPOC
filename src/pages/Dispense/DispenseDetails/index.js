@@ -23,7 +23,12 @@ import {
 } from '@/components'
 import AmountSummary from '@/pages/Shared/AmountSummary'
 import Authorized from '@/utils/Authorized'
-import { VISIT_TYPE } from '@/utils/constants'
+import {
+  VISIT_TYPE,
+  NOTIFICATION_TYPE,
+  NOTIFICATION_STATUS,
+} from '@/utils/constants'
+import { sendNotification } from '@/utils/realtime'
 import { dangerColor } from '@/assets/jss'
 // sub components
 import TableData from './TableData'
@@ -40,6 +45,7 @@ import {
 } from '../variables'
 
 import CONSTANTS from './constants'
+import Warining from '@material-ui/icons/Error'
 
 // const styles = (theme) => ({
 //   gridRow: {
@@ -153,7 +159,15 @@ const DispenseDetails = ({
       payload: {
         id,
       },
-    }).then(discardCallback)
+    }).then((r) => {
+      sendNotification('EditedConsultation', {
+        type: NOTIFICATION_TYPE.CONSULTAION,
+        status: NOTIFICATION_STATUS.OK,
+        message: 'Completed Consultation',
+        visitID: values.id,
+      })
+      discardCallback(r)
+    })
   }
 
   const discardBillOrder = () => {
@@ -215,6 +229,10 @@ const DispenseDetails = ({
     showRemovePayment,
     setShowRemovePayment,
   ] = useState(false)
+  const [
+    showInvoiceNegativeWarning,
+    setShowInvoiceNegativeWarning,
+  ] = useState(false)
 
   const [
     voidReason,
@@ -236,17 +254,17 @@ const DispenseDetails = ({
       <GridContainer>
         <GridItem justify='flex-start' md={6} className={classes.actionButtons}>
           {!viewOnly &&
-          !isRetailVisit && (
-            <Button
-              color='info'
-              size='sm'
-              onClick={onReloadClick}
-              disabled={disableRefreshOrder}
-            >
-              <Refresh />
+            !isRetailVisit && (
+              <Button
+                color='info'
+                size='sm'
+                onClick={onReloadClick}
+                disabled={disableRefreshOrder}
+              >
+                <Refresh />
               Refresh Order
-            </Button>
-          )}
+              </Button>
+            )}
           <Button
             color='primary'
             size='sm'
@@ -331,9 +349,35 @@ const DispenseDetails = ({
                 size='sm'
                 icon={<AttachMoney />}
                 onClick={() => {
-                  if (coPayerPayments.length > 0) {
+                  if (dispense && dispense.totalWithGST < 0) {
+                    window.g_app._store.dispatch({
+                      type: 'global/updateAppState',
+                      payload: {
+                        openConfirm: true,
+                        isInformType: true,
+                        customWidth: 'md',
+                        openConfirmContent: () => {
+                          return <div>
+                            <Warining style={{ width: '1.3rem', height: '1.3rem', marginLeft: '10px', color: 'red' }} />
+                            <h3 style={{ marginLeft: '10px', display: 'inline-block' }}>Unable to finalize, total amount cannot be <span style={{ fontWeight: 400 }}>negative</span>.</h3>
+                          </div>
+                        },
+                        openConfirmText: 'OK',
+                        onConfirmClose: () => {
+                          window.g_app._store.dispatch({
+                            type: 'global/updateAppState',
+                            payload: {
+                              customWidth: undefined
+                            }
+                          })
+                        },
+                      },
+                    })
+                  }
+                  else if (coPayerPayments.length > 0) {
                     setShowRemovePayment(true)
-                  } else {
+                  }
+                  else {
                     onFinalizeClick()
                   }
                 }}
@@ -380,7 +424,7 @@ const DispenseDetails = ({
             />
           </Paper>
         </GridItem>
-        <GridItem xs={8} md={8} style={{ marginTop: -14 }}>
+        <GridItem xs={7} md={7} style={{ marginTop: -14 }}>
           <TextField
             value={visitRemarks}
             disabled
@@ -391,7 +435,7 @@ const DispenseDetails = ({
           />
         </GridItem>
         {!viewOnly && (
-          <GridItem xs={4} md={4}>
+          <GridItem xs={5} md={5}>
             <div style={{ paddingRight: 90 }}>
               <AmountSummary
                 rows={invoiceItem}
@@ -417,10 +461,10 @@ const DispenseDetails = ({
         onClose={() => {
           onDrugLabelSelectionClose()
         }}
-        // onConfirm={() => {
-        //    onDrugLabelSelectionClose()
-        //    onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
-        // }}
+      // onConfirm={() => {
+      //    onDrugLabelSelectionClose()
+      //    onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
+      // }}
       >
         <DrugLabelSelection
           prescription={selectedDrugs}
@@ -529,7 +573,7 @@ const DispenseDetails = ({
           </GridContainer>
         </div>
       </CommonModal>
-    </React.Fragment>
+    </React.Fragment >
   )
 }
 

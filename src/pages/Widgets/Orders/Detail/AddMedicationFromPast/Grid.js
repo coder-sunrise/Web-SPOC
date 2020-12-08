@@ -4,7 +4,6 @@ import _ from 'lodash'
 // material ui
 import { withStyles, Divider } from '@material-ui/core'
 import { Collapse } from 'antd'
-import { FrequecyTypes } from './variables'
 // common components
 import {
   GridItem,
@@ -64,217 +63,208 @@ class Grid extends PureComponent {
   Visits = () => {
     const {
       classes,
-      filterName,
-      frequecyType,
       onSelectItems,
       addedItems,
       type,
+      loadVisits,
       isRetail,
     } = this.props
-    const { list = [] } = this.props.medicationHistory
-    const frequecy = FrequecyTypes.find((x) => x.id === frequecyType)
-    return list
-      .filter((visit) => {
-        return frequecy
-          ? moment(visit.visitDate).add(frequecy.value, 'weeks') >= moment()
-          : true
-      })
-      .map((o) => {
-        let items = []
-        if (type === '1') {
-          if (o.corPrescriptionItem && o.corPrescriptionItem.length > 0) {
-            items = _.orderBy(
-              o.corPrescriptionItem.filter((drug) => {
-                return (
-                  drug.drugName
-                    .toLowerCase()
-                    .indexOf(filterName.toLowerCase()) >= 0 &&
-                  (!isRetail || !drug.isExternalPrescription)
-                )
-              }),
-              [
-                'drugName',
-              ],
-              [
-                'asc',
-              ],
-            )
-          } else if (
-            o.retailPrescriptionItem &&
-            o.retailPrescriptionItem.length > 0
-          ) {
-            items = _.orderBy(
-              o.retailPrescriptionItem.filter((drug) => {
-                return (
-                  drug.drugName
-                    .toLowerCase()
-                    .indexOf(filterName.toLowerCase()) >= 0
-                )
-              }),
-              [
-                'drugName',
-              ],
-              [
-                'asc',
-              ],
-            )
-          }
-        } else if (type === '2') {
-          if (o.corVaccinationItem && o.corVaccinationItem.length > 0) {
-            items = _.orderBy(
-              o.corVaccinationItem.filter((vacc) => {
-                return (
-                  vacc.vaccinationName
-                    .toLowerCase()
-                    .indexOf(filterName.toLowerCase()) >= 0
-                )
-              }),
-              [
-                'vaccinationName',
-              ],
-              [
-                'asc',
-              ],
-            )
-          }
+    return loadVisits.map((o) => {
+      let items = []
+      if (type === '1') {
+        if (o.corPrescriptionItem && o.corPrescriptionItem.length > 0) {
+          items = _.orderBy(
+            o.corPrescriptionItem.filter((drug) => {
+              return !isRetail || !drug.isExternalPrescription
+            }),
+            [
+              'drugName',
+            ],
+            [
+              'asc',
+            ],
+          )
+        } else if (
+          o.retailPrescriptionItem &&
+          o.retailPrescriptionItem.length > 0
+        ) {
+          items = _.orderBy(
+            o.retailPrescriptionItem,
+            [
+              'drugName',
+            ],
+            [
+              'asc',
+            ],
+          )
         }
-        return {
-          header: (
-            <GridContainer>
-              <GridItem xs={4} md={3} style={{ padding: 0 }}>
-                <span>
-                  Visit Date:&nbsp;{moment(o.visitDate).format('DD MMM YYYY')}
-                </span>
-              </GridItem>
-              <GridItem xs={4} md={4}>
+      } else if (type === '2') {
+        if (o.corVaccinationItem && o.corVaccinationItem.length > 0) {
+          items = _.orderBy(
+            o.corVaccinationItem,
+            [
+              'vaccinationName',
+            ],
+            [
+              'asc',
+            ],
+          )
+        }
+      }
+      return {
+        header: (
+          <GridContainer>
+            <GridItem xs={4} md={3} style={{ padding: 0 }}>
+              <span>
+                Visit Date:&nbsp;{moment(o.visitDate).format('DD MMM YYYY')}
+              </span>
+            </GridItem>
+            <GridItem xs={4} md={4}>
+              <span
+                className={classes.addIcon}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  onSelectItems(
+                    items.filter(
+                      (item) =>
+                        item.isActive &&
+                        item.inventoryDispenseUOMFK === item.dispenseUOMFK,
+                    ),
+                  )
+                }}
+              >
                 <span
-                  className={classes.addIcon}
-                  onClick={(event) => {
-                    event.stopPropagation()
-                    onSelectItems(items.filter((item) => item.isActive))
+                  className='material-icons'
+                  style={{ position: 'absolute', marginTop: -2 }}
+                >
+                  add_circle_outline
+                </span>
+                <span
+                  style={{
+                    marginLeft: 30,
                   }}
                 >
-                  <span
-                    className='material-icons'
-                    style={{ position: 'absolute', marginTop: -2 }}
-                  >
-                    add_circle_outline
-                  </span>
-                  <span
-                    style={{
-                      marginLeft: 30,
-                    }}
-                  >
-                    Add All
-                  </span>
+                  Add All
                 </span>
-              </GridItem>
-            </GridContainer>
-          ),
-          key: o.id,
-          itemCount: items.length,
-          visitDate: o.visitDate,
-          content: (
-            <div>
-              {items.map((item) => {
-                let addedItem = addedItems.find((added) => added.id === item.id)
-                return (
-                  <div
-                    style={{
-                      background: addedItem ? 'lightGray' : 'white',
-                      width: '100%',
-                      fontSize: 14,
-                    }}
-                  >
-                    <GridContainer>
-                      <div className={classes.nameColumn}>
-                        {item.isExternalPrescription && (
-                          <span style={{ color: 'red' }}>*</span>
-                        )}
-                        <Tooltip title={item.drugName || item.vaccinationName}>
-                          <span>{item.drugName || item.vaccinationName}</span>
-                        </Tooltip>
-                      </div>
-                      <div className={classes.instructionColumn}>
-                        <Tooltip
-                          title={
-                            item.instruction ||
+              </span>
+            </GridItem>
+          </GridContainer>
+        ),
+        key: o.id,
+        itemCount: items.length,
+        visitDate: o.visitDate,
+        content: (
+          <div>
+            {items.map((item) => {
+              let addedItem = addedItems.find((added) => added.id === item.id)
+              let warningLabel
+              if (!item.isActive) {
+                warningLabel = '#1'
+              } else if (item.inventoryDispenseUOMFK !== item.dispenseUOMFK) {
+                warningLabel = '#2'
+              } else if (item.isExternalPrescription) {
+                warningLabel = '#3'
+              }
+              return (
+                <div
+                  style={{
+                    background: addedItem ? 'lightGray' : 'white',
+                    width: '100%',
+                    fontSize: 14,
+                  }}
+                >
+                  <GridContainer>
+                    <div className={classes.nameColumn}>
+                      {warningLabel && (
+                        <span style={{ color: 'red', fontStyle: 'italic' }}>
+                          <sup>{warningLabel}&nbsp;</sup>
+                        </span>
+                      )}
+                      <Tooltip title={item.drugName || item.vaccinationName}>
+                        <span>{item.drugName || item.vaccinationName}</span>
+                      </Tooltip>
+                    </div>
+                    <div className={classes.instructionColumn}>
+                      <Tooltip
+                        title={
+                          item.instruction ||
+                          `${item.usageMethodDisplayValue ||
+                            ''} ${item.dosageDisplayValue ||
+                            ''} ${item.uomDisplayValue || ''}`
+                        }
+                      >
+                        <span>
+                          {item.instruction ||
                             `${item.usageMethodDisplayValue ||
                               ''} ${item.dosageDisplayValue ||
-                              ''} ${item.uomDisplayValue || ''}`
-                          }
-                        >
-                          <span>
-                            {item.instruction ||
-                              `${item.usageMethodDisplayValue ||
-                                ''} ${item.dosageDisplayValue ||
-                                ''} ${item.uomDisplayValue || ''}`}
-                          </span>
-                        </Tooltip>
-                      </div>
-                      <div className={classes.quantityColumn}>
-                        <Tooltip
-                          title={`${item.quantity} ${item.dispenseUOMDisplayValue ||
-                            item.uomDisplayValue}`}
-                        >
-                          <span>
-                            {`${item.quantity} ${item.dispenseUOMDisplayValue ||
-                              item.uomDisplayValue}`}
-                          </span>
-                        </Tooltip>
-                      </div>
-                      <div className={classes.totalPriceColumn}>
-                        <span style={{ float: 'right' }}>
-                          <NumberInput text currency value={item.totalPrice} />
+                              ''} ${item.uomDisplayValue || ''}`}
                         </span>
-                      </div>
-                      <div className={classes.actionColumn}>
-                        {item.isActive &&
-                          (!addedItem ? (
-                            <span
-                              className='material-icons'
-                              style={{
-                                cursor: 'pointer',
-                                color: primaryColor,
-                                marginTop: 4,
-                                marginLeft: 5,
-                              }}
-                              onClick={() => {
-                                onSelectItems(item)
-                              }}
-                            >
-                              add_circle_outline
-                            </span>
-                          ) : (
-                            <span
-                              className='material-icons'
-                              style={{
-                                cursor: 'pointer',
-                                color: 'red',
-                                marginTop: 4,
-                                marginLeft: 5,
-                              }}
-                              onClick={() => {
-                                onSelectItems(item)
-                              }}
-                            >
-                              remove_circle_outline
-                            </span>
-                          ))}
-                      </div>
-                    </GridContainer>
-                    <Divider style={{ marginBottom: 1 }} />
-                  </div>
-                )
-              })}
-            </div>
-          ),
-        }
-      })
+                      </Tooltip>
+                    </div>
+                    <div className={classes.quantityColumn}>
+                      <Tooltip
+                        title={`${item.quantity} ${item.dispenseUOMDisplayValue ||
+                          item.uomDisplayValue}`}
+                      >
+                        <span>
+                          {`${item.quantity} ${item.dispenseUOMDisplayValue ||
+                            item.uomDisplayValue}`}
+                        </span>
+                      </Tooltip>
+                    </div>
+                    <div className={classes.totalPriceColumn}>
+                      <span style={{ float: 'right' }}>
+                        <NumberInput text currency value={item.totalPrice} />
+                      </span>
+                    </div>
+                    <div className={classes.actionColumn}>
+                      {item.isActive &&
+                        item.inventoryDispenseUOMFK === item.dispenseUOMFK &&
+                        (!addedItem ? (
+                          <span
+                            className='material-icons'
+                            style={{
+                              cursor: 'pointer',
+                              color: primaryColor,
+                              marginTop: 4,
+                              marginLeft: 5,
+                            }}
+                            onClick={() => {
+                              onSelectItems(item)
+                            }}
+                          >
+                            add_circle_outline
+                          </span>
+                        ) : (
+                          <span
+                            className='material-icons'
+                            style={{
+                              cursor: 'pointer',
+                              color: 'red',
+                              marginTop: 4,
+                              marginLeft: 5,
+                            }}
+                            onClick={() => {
+                              onSelectItems(item)
+                            }}
+                          >
+                            remove_circle_outline
+                          </span>
+                        ))}
+                    </div>
+                  </GridContainer>
+                  <Divider style={{ marginBottom: 1 }} />
+                </div>
+              )
+            })}
+          </div>
+        ),
+      }
+    })
   }
 
   content = () => {
-    const { type, isRetail, height } = this.props
+    const { type, height, handelLoadMore, moreData, isRetail } = this.props
     let visits = _.orderBy(
       this.Visits().filter((visit) => {
         return visit.itemCount > 0
@@ -288,7 +278,7 @@ class Grid extends PureComponent {
     )
     const ContentHeight = height - 300
     const visitContentHeight = ContentHeight - 30
-    if (visits.length > 0) {
+    if (visits.length >= 0) {
       return (
         <div>
           <div
@@ -310,6 +300,23 @@ class Grid extends PureComponent {
                 )
               })}
             </Collapse>
+            {moreData && (
+              <div
+                style={{
+                  display: 'inline-Block',
+                  float: 'right',
+                  marginRight: 10,
+                  marginTop: 8,
+                }}
+              >
+                <a
+                  style={{ textDecoration: 'underline', fontStyle: 'italic' }}
+                  onClick={handelLoadMore}
+                >
+                  Load More
+                </a>
+              </div>
+            )}
           </div>
           <div
             style={{
@@ -317,13 +324,43 @@ class Grid extends PureComponent {
               paddingTop: 10,
             }}
           >
-            {type === '1' &&
-            !isRetail && (
-              <span>
-                Note:&nbsp;<span style={{ color: 'red' }}>*</span> Denotes the
-                external prescription
-              </span>
-            )}
+            <div
+              style={{
+                display: 'inline-Block',
+              }}
+            >
+              {type === '1' && (
+                <span>
+                  Note:&nbsp;
+                  <span style={{ color: 'red', fontStyle: 'italic' }}>
+                    <sup>#1&nbsp;</sup>
+                  </span>
+                  inactive medication &nbsp;&nbsp;
+                  <span style={{ color: 'red', fontStyle: 'italic' }}>
+                    <sup>#2&nbsp;</sup>
+                  </span>
+                  dispensing UOM is changed&nbsp;&nbsp;
+                  {!isRetail && (
+                    <span>
+                      <span style={{ color: 'red', fontStyle: 'italic' }}>
+                        <sup>#3&nbsp;</sup>
+                      </span>
+                      external prescription
+                    </span>
+                  )}
+                </span>
+              )}
+              {type === '2' && (
+                <span>
+                  Note:&nbsp;<span
+                    style={{ color: 'red', fontStyle: 'italic' }}
+                  >
+                    <sup>#1&nbsp;</sup>
+                  </span>
+                  inactive vaccination
+                </span>
+              )}
+            </div>
           </div>
         </div>
       )

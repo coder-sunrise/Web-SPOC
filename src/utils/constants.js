@@ -219,6 +219,7 @@ export const REPORT_TYPE = {
   37: 'Inventory Trending Report',
   55: 'Letter of Certification',
   61: 'Refraction Form Report',
+  68: 'Patient History Report',
 }
 
 export const REPORT_ID = {
@@ -443,6 +444,7 @@ export const DENTAL_CANNED_TEXT_TYPE_FIELD = {
 export const CLINIC_TYPE = {
   GP: 1,
   DENTAL: 2,
+  EYE: 4,
 }
 
 export const FILE_CATEGORY = {
@@ -477,6 +479,7 @@ export const NOTIFICATION_TYPE = {
   QUEUE: 1,
   CODETABLE: 2,
   ERROR: 3,
+  CONSULTAION: 4,
 }
 
 export const NOTIFICATION_STATUS = {

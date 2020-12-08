@@ -14,7 +14,13 @@ const addContent = (type, props) => {
 
   switch (type) {
     case PATIENT_HISTORY_TABS.VISIT:
-      return <PatientHistory mode='integrated' {...props} />
+      return (
+        <PatientHistory
+          mode='integrated'
+          fromModule='PatientHistory'
+          {...props}
+        />
+      )
     case PATIENT_HISTORY_TABS.DISPENSE:
       return <DispenseHistory mode='integrated' {...props} />
     case PATIENT_HISTORY_TABS.APPOINTMENT:
@@ -31,7 +37,7 @@ const addContent = (type, props) => {
     case PATIENT_HISTORY_TABS.DEPOSIT:
       return <PatientDeposit {...props} />
     default:
-      return <PatientHistory {...props} />
+      return <PatientHistory fromModule='PatientHistory' {...props} />
   }
 }
 

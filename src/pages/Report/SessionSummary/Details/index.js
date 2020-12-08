@@ -12,7 +12,7 @@ const fileName = 'Session Summary Report'
 
 class SessionSummary extends ReportBase {
   constructor (props) {
-    super(props) 
+    super(props)
     this.state = {
       ...this.state,
       reportId,
@@ -38,9 +38,10 @@ class SessionSummary extends ReportBase {
   renderFilterBar = () => {
     return null
   }
+
   renderContent = (reportDatas) => {
     if (!reportDatas) return null
-    let cashPayment = reportDatas.PaymentDetails.find(p => p.paymentMode === 'Cash')
+    let cashPayment = reportDatas.PaymentDetails.find(p => p.paymentMode === 'Cash') || []
     return (
       <GridContainer>
         <SessionDetails
@@ -48,18 +49,18 @@ class SessionSummary extends ReportBase {
           companyDetails={reportDatas.CompanyDetails[0]}
         />
         <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
-          <Collapse style={{ fontSize:'inherit' }} expandIconPosition='right' defaultActiveKey={['0']}>
-            <Collapse.Panel header={<div style={{fontWeight: 500}}>Summary</div>} key={0}>
+          <Collapse style={{ fontSize: 'inherit' }} expandIconPosition='right' defaultActiveKey={['0']}>
+            <Collapse.Panel header={<div style={{ fontWeight: 500 }}>Summary</div>} key={0}>
               <GridItem md={12}>
                 <PaymentSummary PaymentSummaryDetails={reportDatas.PaymentDetails} />
               </GridItem>
               <GridItem md={12} style={{ marginTop: '10px' }}>
                 <span style={{ display: 'inline-block', textAlign: 'left', fontWeight: '500', width: '160px' }}>Total Cash Collected:</span>
-                <NumberInput currency text value={(cashPayment.currentCollected + cashPayment.pastCollected)} style={{ padding: '0px 8px', width: '100px', textAlign: 'right' }} />
+                <NumberInput currency text value={(cashPayment.currentCollected + cashPayment.pastCollected) || 0} style={{ padding: '0px 8px', width: '100px', textAlign: 'right' }} />
               </GridItem>
               <GridItem md={12}>
                 <span style={{ display: 'inline-block', textAlign: 'left', fontWeight: '500', width: '160px' }}>Total Cash Rounding:</span>
-                <NumberInput currency text value={(cashPayment.currentCashRounding + cashPayment.pastCashRounding)} style={{ padding: '0px 8px', width: '100px', textAlign: 'right' }} />
+                <NumberInput currency text value={(cashPayment.currentCashRounding + cashPayment.pastCashRounding) || 0} style={{ padding: '0px 8px', width: '100px', textAlign: 'right' }} />
               </GridItem>
               <GridItem md={12}>
                 <span style={{ display: 'inline-block', textAlign: 'left', fontWeight: '500', width: '160px' }}>Company Payable Amt.:</span>
@@ -69,13 +70,14 @@ class SessionSummary extends ReportBase {
           </Collapse>
         </GridItem>
         <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
-          <Collapse style={{ fontSize:'inherit', padding:5 }} expandIconPosition='right' defaultActiveKey={['0']}>
-            <Collapse.Panel header={<div style={{fontWeight: 500}}>Details</div>} key={0}>
+          <Collapse style={{ fontSize: 'inherit', padding: 5 }} expandIconPosition='right' defaultActiveKey={['0']}>
+            <Collapse.Panel header={<div style={{ fontWeight: 500 }}>Details</div>} key={0}>
               <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
                 <h5>Payment Collections</h5>
               </GridItem>
               <GridItem md={12}>
                 <PaymentCollections
+                  isCurrentSessionPayment
                   PaymentCollectionsDetails={reportDatas.PaymentCollections}
                   TotalDetails={reportDatas.PaymentTotal}
                 />
@@ -101,7 +103,7 @@ class SessionSummary extends ReportBase {
               </GridItem>
             </Collapse.Panel>
           </Collapse>
-        </GridItem> 
+        </GridItem>
       </GridContainer>
     )
   }

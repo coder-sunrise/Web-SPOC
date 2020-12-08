@@ -64,15 +64,19 @@ const baseColumns = [
       )
     },
   },
-  { dataIndex: 'itemName', title: 'Name' },
+  { dataIndex: 'itemName', title: 'Name', width: 300 },
+  {
+    dataIndex: 'description',
+    title: 'Description',
+  },
   {
     dataIndex: 'quantity',
     title: 'Quantity',
     align: 'right',
-    width: 90,
+    width: 100,
     render: (text, row) => (
       <div style={numberstyle}>
-        {`${numeral(row.quantity || 0).format('0,0.00')}`}
+        {`${numeral(row.quantity || 0).format('0,0.0')}`}
       </div>
     ),
   },
@@ -98,69 +102,8 @@ export default ({ current, theme, isFullScreen = true }) => {
   let columns = baseColumns
 
   if (current.invoice) {
-    const {
-      invoiceAdjustment = [],
-      visitPurposeFK = VISIT_TYPE.CONS,
-    } = current.invoice
+    const { invoiceAdjustment = [] } = current.invoice
     invoiceAdjustmentData = invoiceAdjustment
-
-    if (
-      visitPurposeFK === VISIT_TYPE.RETAIL ||
-      visitPurposeFK === VISIT_TYPE.BILL_FIRST
-    ) {
-      columns = [
-        {
-          dataIndex: 'itemType',
-          title: 'Type',
-          width: 150,
-          render: (text, row) => {
-            return (
-              <div style={{ position: 'relative' }}>
-                <div
-                  style={{
-                    wordWrap: 'break-word',
-                    whiteSpace: 'pre-wrap',
-                  }}
-                >
-                  {row.itemType}
-                  {drugMixtureIndicator(row)}
-                </div>
-              </div>
-            )
-          },
-        },
-        { dataIndex: 'itemName', title: 'Name' },
-        {
-          dataIndex: 'description',
-          title: 'Description',
-        },
-        {
-          dataIndex: 'quantity',
-          title: 'Quantity',
-          align: 'right',
-          width: 90,
-          render: (text, row) => (
-            <div style={numberstyle}>
-              {`${numeral(row.quantity || 0).format('0,0.00')}`}
-            </div>
-          ),
-        },
-        {
-          dataIndex: 'adjAmt',
-          title: 'Adj',
-          width: 120,
-          align: 'right',
-          render: (text, row) => showCurrency(row.adjAmt),
-        },
-        {
-          dataIndex: 'totalAfterItemAdjustment',
-          title: 'Total',
-          width: 120,
-          align: 'right',
-          render: (text, row) => showCurrency(row.totalAfterItemAdjustment),
-        },
-      ]
-    }
   }
 
   return (

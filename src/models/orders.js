@@ -128,6 +128,17 @@ export default createListViewModel({
         })
       },
 
+      *editFinalAdjustment ({ payload }, { select, call, put, delay }) {
+        yield put({
+          type: 'editFinalAdjustmentState',
+          payload,
+        })
+
+        yield put({
+          type: 'calculateAmount',
+        })
+      },
+
       *deleteFinalAdjustment ({ payload }, { select, call, put, delay }) {
         yield put({
           type: 'deleteFinalAdjustmentState',
@@ -272,6 +283,34 @@ export default createListViewModel({
                     ...row,
                     ...payload,
                   }
+                : row
+            return n
+          })
+        } else {
+          finalAdjustments.push({
+            ...payload,
+            uid: getUniqueId(),
+            sequence:
+              finalAdjustments.map((o) => o.sequence).reduce(maxReducer, 0) + 1,
+          })
+        }
+        return {
+          ...state,
+          finalAdjustments,
+        }
+      },
+
+      // used by calc total amount
+      editFinalAdjustmentState (state, { payload }) {
+        let { finalAdjustments, rows } = state
+        if (payload.uid) {
+          finalAdjustments = finalAdjustments.map((row) => {
+            const n =
+              row.uid === payload.uid
+                ? {
+                  ...row,
+                  ...payload,
+                }
                 : row
             return n
           })

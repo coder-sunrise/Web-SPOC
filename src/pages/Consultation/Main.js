@@ -4,7 +4,7 @@ import router from 'umi/router'
 import _ from 'lodash'
 import numeral from 'numeral'
 import Timer from 'react-compound-timer'
-
+import { sendNotification } from '@/utils/realtime'
 import { withStyles } from '@material-ui/core'
 import TimerIcon from '@material-ui/icons/Timer'
 import {
@@ -16,9 +16,11 @@ import {
   SizeContainer,
   withFormikExtend,
   NumberInput,
+  Tooltip,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 import PatientBanner from '@/pages/PatientDashboard/Banner'
+import Warining from '@material-ui/icons/Error'
 
 import {
   getAppendUrl,
@@ -30,7 +32,11 @@ import {
   convertConsultationDocument,
 } from '@/pages/Consultation/utils'
 // import model from '@/pages/Widgets/Orders/models'
-import { VISIT_TYPE } from '@/utils/constants'
+import {
+  VISIT_TYPE,
+  NOTIFICATION_TYPE,
+  NOTIFICATION_STATUS,
+} from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { CallingQueueButton } from '@/components/_medisys'
 import {
@@ -173,6 +179,7 @@ const saveConsultation = ({
   const {
     dispatch,
     values,
+    patient,
     consultationDocument = {},
     corEyeRefractionForm,
     orders = {},
@@ -203,6 +210,10 @@ const saveConsultation = ({
     }
     newValues.visitConsultationTemplate.consultationTemplate =
       localStorage.getItem('consultationLayout') || ''
+
+    if (newValues.patientMedicalHistory && !newValues.patientMedicalHistory.patientProfileFK) {
+      newValues.patientMedicalHistory.patientProfileFK = patient.entity.id
+    }
     dispatch({
       type: `consultation/${action}`,
       payload: newValues,
@@ -213,6 +224,18 @@ const saveConsultation = ({
             message: successMessage,
           })
         }
+        const { visitRegistration } = props
+        const { entity: visit = {} } = visitRegistration
+        const { id } = visit
+        if (action === 'sign') {
+          sendNotification('EditedConsultation', {
+            type: NOTIFICATION_TYPE.CONSULTAION,
+            status: NOTIFICATION_STATUS.OK,
+            message: 'Completed Consultation',
+            visitID: id,
+          })
+        }
+
         sessionStorage.removeItem(`${values.id}_consultationTimer`)
         if (successCallback) {
           successCallback()
@@ -254,6 +277,7 @@ const pauseConsultation = ({
   onClose,
   consultation,
   resetForm,
+  patient,
   ...rest
 }) => {
   const {
@@ -261,7 +285,7 @@ const pauseConsultation = ({
     corEyeRefractionForm,
     orders = {},
     forms = {},
-  } = rest
+  } = rest 
   const newValues = convertToConsultation(
     {
       ...values,
@@ -286,11 +310,14 @@ const pauseConsultation = ({
   }
   newValues.visitConsultationTemplate.consultationTemplate =
     localStorage.getItem('consultationLayout') || ''
+  if (newValues.patientMedicalHistory && !newValues.patientMedicalHistory.patientProfileFK) {
+    newValues.patientMedicalHistory.patientProfileFK = patient.entity.id
+  }
   dispatch({
     type: `consultation/pause`,
     payload: newValues,
   }).then((r) => {
-    if (r) {
+    if (r) { 
       sessionStorage.removeItem(`${values.id}_consultationTimer`)
       notification.success({
         message: 'Consultation paused.',
@@ -337,7 +364,7 @@ const pauseConsultation = ({
   mapPropsToValues: ({ consultation = {}, visitRegistration }) => {
     if (
       window.g_app._store.getState().global.isShowSecondConfirmButton ===
-        undefined &&
+      undefined &&
       visitRegistration &&
       visitRegistration.entity
     ) {
@@ -375,7 +402,8 @@ const pauseConsultation = ({
   onDirtyDiscard: discardConsultation,
   handleSubmit: async (values, { props }) => {
     const { versionNumber } = values
-    const { dispatch, handlePrint } = props
+    const { dispatch, handlePrint, orders = {} } = props
+    const { summary } = orders
     let printData = []
     if (versionNumber === 1) {
       let settings = JSON.parse(localStorage.getItem('clinicSettings'))
@@ -397,13 +425,15 @@ const pauseConsultation = ({
           visitEntity,
         )
       }
-    }
+    } 
+
     if (printData && printData.length > 0) {
       dispatch({
         type: 'consultation/showSignOffModal',
         payload: {
           showSignOffModal: true,
           printData,
+          showInvoiceAmountNegativeWarning: summary && summary.totalWithGST < 0,
           onSignOffConfirm: (result) => {
             saveConsultation({
               props: {
@@ -441,7 +471,14 @@ const pauseConsultation = ({
           values,
           ...props,
         },
-        confirmMessage: 'Confirm sign off current consultation?',
+        confirmMessage: (summary && summary.totalWithGST < 0) ?
+          () => {
+            return <div>
+              <h3>Total invoice amount is negative.</h3>
+              <h3 style={{ marginTop: 0 }}>Confirm sign off current consultation?</h3>
+            </div>
+          }
+          : 'Confirm sign off current consultation?',
         successMessage: 'Consultation signed',
         action: 'sign',
         successCallback: () => {
@@ -499,14 +536,14 @@ class Main extends React.Component {
     if (
       nextProps.visitRegistration &&
       nextProps.visitRegistration.version !==
-        this.props.visitRegistration.version
+      this.props.visitRegistration.version
     )
       return true
     if (
       nextProps.visitRegistration &&
       nextProps.visitRegistration.entity &&
       nextProps.visitRegistration.entity.id !==
-        this.props.visitRegistration.entity.id
+      this.props.visitRegistration.entity.id
     )
       return true
     if (
@@ -582,10 +619,37 @@ class Main extends React.Component {
   }
 
   signOffAndCompleteBilling = () => {
-    const { visitRegistration, dispatch, values } = this.props
+    const { visitRegistration, dispatch, values, orders } = this.props
     const { entity: vistEntity = {} } = visitRegistration
     const { visit = {} } = vistEntity
     const { id: visitId } = visit
+    const { summary } = orders
+    if (summary && summary.totalWithGST < 0) {
+      window.g_app._store.dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          isInformType: true,
+          customWidth: 'md',
+          openConfirmContent: () => {
+            return <div>
+              <Warining style={{ width: '1.3rem', height: '1.3rem', marginLeft: '10px', color: 'red' }} />
+              <h3 style={{ marginLeft: '10px', display: 'inline-block' }}>Unable to complete visit, total amount cannot be <span style={{ fontWeight: 400 }}>negative</span>.</h3>
+            </div>
+          },
+          openConfirmText: 'OK',
+          onConfirmClose: () => {
+            window.g_app._store.dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                customWidth: undefined
+              }
+            })
+          },
+        },
+      })
+      return
+    }
     const successCallback = () => {
       dispatch({ type: 'consultation/closeModal' })
       dispatch({
@@ -732,68 +796,68 @@ class Main extends React.Component {
               {({ rights }) => {
                 //
                 return rights === 'enable' &&
-                [
-                  'IN CONS',
-                  'WAITING',
-                ].includes(visit.visitStatus) &&
-                values.id ? (
-                  <GridItem>
-                    <h5 style={{ marginTop: -3, fontWeight: 'bold' }}>
-                      <Timer
-                        initialTime={
-                          Number(
-                            sessionStorage.getItem(
+                  [
+                    'IN CONS',
+                    'WAITING',
+                  ].includes(visit.visitStatus) &&
+                  values.id ? (
+                    <GridItem>
+                      <h5 style={{ marginTop: -3, fontWeight: 'bold' }}>
+                        <Timer
+                          initialTime={
+                            Number(
+                              sessionStorage.getItem(
+                                `${values.id}_consultationTimer`,
+                              ),
+                            ) ||
+                            values.duration ||
+                            0
+                          }
+                          direction='forward'
+                          startImmediately={this.state.recording}
+                        >
+                          {({
+                            start,
+                            resume,
+                            pause,
+                            stop,
+                            reset,
+                            getTimerState,
+                            getTime,
+                          }) => {
+                            sessionStorage.setItem(
                               `${values.id}_consultationTimer`,
-                            ),
-                          ) ||
-                          values.duration ||
-                          0
-                        }
-                        direction='forward'
-                        startImmediately={this.state.recording}
-                      >
-                        {({
-                          start,
-                          resume,
-                          pause,
-                          stop,
-                          reset,
-                          getTimerState,
-                          getTime,
-                        }) => {
-                          sessionStorage.setItem(
-                            `${values.id}_consultationTimer`,
-                            getTime(),
-                          )
-                          return (
-                            <React.Fragment>
-                              <TimerIcon
-                                style={{
-                                  height: 17,
-                                  top: 2,
-                                  left: -5,
-                                  position: 'relative',
-                                }}
-                              />
-                              <Timer.Hours
-                                formatValue={(value) =>
-                                  `${numeral(value).format('00')} : `}
-                              />
-                              <Timer.Minutes
-                                formatValue={(value) =>
-                                  `${numeral(value).format('00')} : `}
-                              />
-                              <Timer.Seconds
-                                formatValue={(value) =>
-                                  `${numeral(value).format('00')}`}
-                              />
-                            </React.Fragment>
-                          )
-                        }}
-                      </Timer>
-                    </h5>
-                  </GridItem>
-                ) : null
+                              getTime(),
+                            )
+                            return (
+                              <React.Fragment>
+                                <TimerIcon
+                                  style={{
+                                    height: 17,
+                                    top: 2,
+                                    left: -5,
+                                    position: 'relative',
+                                  }}
+                                />
+                                <Timer.Hours
+                                  formatValue={(value) =>
+                                    `${numeral(value).format('00')} : `}
+                                />
+                                <Timer.Minutes
+                                  formatValue={(value) =>
+                                    `${numeral(value).format('00')} : `}
+                                />
+                                <Timer.Seconds
+                                  formatValue={(value) =>
+                                    `${numeral(value).format('00')}`}
+                                />
+                              </React.Fragment>
+                            )
+                          }}
+                        </Timer>
+                      </h5>
+                    </GridItem>
+                  ) : null
               }}
             </Authorized>
             {clinicSettings.showTotalInvoiceAmtInConsultation ? (
@@ -804,6 +868,13 @@ class Main extends React.Component {
                     <span>
                       &nbsp;:&nbsp;
                       <NumberInput text currency value={summary.totalWithGST} />
+                      {summary.totalWithGST < 0 ?
+                        <Tooltip title='Total invoice amount is negative.' placement='bottom-start'>
+                          <span>
+                            <Warining style={{ position: 'absolute', top: '2px', width: '1.3rem', height: '1.3rem', color: '#faad14' }} />
+                          </span>
+                        </Tooltip>
+                        : undefined}
                     </span>
                   )}
                 </h4>
@@ -840,14 +911,14 @@ class Main extends React.Component {
                     'IN CONS',
                     'WAITING',
                   ].includes(visit.visitStatus) && (
-                    <ProgressButton
-                      onClick={this.pauseConsultation}
-                      color='info'
-                      icon={null}
-                    >
-                      Pause
-                    </ProgressButton>
-                  )}
+                      <ProgressButton
+                        onClick={this.pauseConsultation}
+                        color='info'
+                        icon={null}
+                      >
+                        Pause
+                      </ProgressButton>
+                    )}
                   {visit.visitStatus === 'PAUSED' && (
                     <ProgressButton
                       onClick={this.resumeConsultation}
@@ -998,6 +1069,7 @@ class Main extends React.Component {
       entity,
       showSignOffModal,
       printData,
+      showInvoiceAmountNegativeWarning,
       onSignOffConfirm,
     } = consultation
     const { entity: vistEntity = {} } = visitRegistration
@@ -1028,13 +1100,14 @@ class Main extends React.Component {
         </Authorized.Context.Provider>
         <CommonModal
           cancelText='Cancel'
-          maxWidth='xs'
+          maxWidth='sm'
           title='Confirm sign off current consultation?'
           onClose={this.onCloseSignOffModal}
           open={showSignOffModal}
         >
           <AutoPrintSelection
             data={printData}
+            showInvoiceAmountNegativeWarning={showInvoiceAmountNegativeWarning}
             handleSubmit={onSignOffConfirm}
           />
         </CommonModal>
