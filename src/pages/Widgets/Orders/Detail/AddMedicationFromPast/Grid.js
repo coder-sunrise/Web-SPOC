@@ -60,26 +60,6 @@ const styles = () => ({
   },
 })
 class Grid extends PureComponent {
-  constructor (props) {
-    super(props)
-    this.scrollRef = React.createRef()
-  }
-
-  componentDidMount () {
-    if (this.scrollRef) {
-      this.scrollRef.addEventListener('scroll', (e) => {
-        const { isScrollBottom, setScrollBottom } = this.props
-        if (!isScrollBottom) {
-          const { clientHeight, scrollHeight, scrollTop } = e.target
-          const isBottom = clientHeight + scrollTop === scrollHeight
-          if (isBottom) {
-            setScrollBottom(isBottom)
-          }
-        }
-      })
-    }
-  }
-
   Visits = () => {
     const {
       classes,
@@ -284,14 +264,7 @@ class Grid extends PureComponent {
   }
 
   content = () => {
-    const {
-      type,
-      height,
-      handelLoadMore,
-      moreData,
-      isScrollBottom,
-      isRetail,
-    } = this.props
+    const { type, height, handelLoadMore, moreData, isRetail } = this.props
     let visits = _.orderBy(
       this.Visits().filter((visit) => {
         return visit.itemCount > 0
@@ -309,7 +282,6 @@ class Grid extends PureComponent {
       return (
         <div>
           <div
-            ref={(e) => (this.scrollRef = e)}
             style={{
               overflow: 'auto',
               height: visitContentHeight,
@@ -328,6 +300,23 @@ class Grid extends PureComponent {
                 )
               })}
             </Collapse>
+            {moreData && (
+              <div
+                style={{
+                  display: 'inline-Block',
+                  float: 'right',
+                  marginRight: 10,
+                  marginTop: 8,
+                }}
+              >
+                <a
+                  style={{ textDecoration: 'underline', fontStyle: 'italic' }}
+                  onClick={handelLoadMore}
+                >
+                  Load More
+                </a>
+              </div>
+            )}
           </div>
           <div
             style={{
@@ -372,22 +361,6 @@ class Grid extends PureComponent {
                 </span>
               )}
             </div>
-            {isScrollBottom &&
-            moreData && (
-              <div
-                style={{
-                  display: 'inline-Block',
-                  float: 'right',
-                }}
-              >
-                <a
-                  style={{ textDecoration: 'underline', fontStyle: 'italic' }}
-                  onClick={handelLoadMore}
-                >
-                  Load More
-                </a>
-              </div>
-            )}
           </div>
         </div>
       )
