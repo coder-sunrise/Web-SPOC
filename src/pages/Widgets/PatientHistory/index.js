@@ -123,7 +123,6 @@ const styles = (theme) => ({
 class PatientHistory extends Component {
   constructor (props) {
     super(props)
-    this.scrollRef = React.createRef()
     this.widgets = WidgetConfig.widgets(
       props,
       this.scribbleNoteUpdateState,
@@ -146,7 +145,6 @@ class PatientHistory extends Component {
       isAllDate: true,
       pageIndex: 0,
       loadVisits: [],
-      isScrollBottom: false,
       totalVisits: 0,
       currentHeight: window.innerHeight,
     }
@@ -190,18 +188,6 @@ class PatientHistory extends Component {
     window.addEventListener('resize', () => {
       this.setState({ currentHeight: window.innerHeight })
     })
-    if (this.scrollRef) {
-      this.scrollRef.addEventListener('scroll', (e) => {
-        const { isScrollBottom } = this.state
-        if (!isScrollBottom) {
-          const { clientHeight, scrollHeight, scrollTop } = e.target
-          const isBottom = clientHeight + scrollTop === scrollHeight
-          if (isBottom) {
-            this.setState({ isScrollBottom: isBottom })
-          }
-        }
-      })
-    }
   }
 
   getCategoriesOptions = () => {
@@ -1056,7 +1042,7 @@ class PatientHistory extends Component {
           // visitListing
           visitListing.push({
             currentId: current.currentId,
-            visitDate: current.visitDate,
+            visitDate: moment(current.visitDate).format('DD MMM YYYY HH:mm'),
             doctor: `${current.userTitle || ''} ${current.userName || ''}`,
             history: isShowHistory ? current.history : '',
             chiefComplaints: isShowChiefComplaints
@@ -1643,7 +1629,6 @@ class PatientHistory extends Component {
         loadVisits: [],
         activeKey: [],
         selectItems: [],
-        isScrollBottom: false,
         totalVisits: 0,
         selectDoctors,
         selectCategories,
@@ -1695,7 +1680,6 @@ class PatientHistory extends Component {
       activeKey,
       totalVisits,
       pageIndex,
-      isScrollBottom,
       loadVisits = [],
       currentHeight,
     } = this.state
@@ -1704,13 +1688,13 @@ class PatientHistory extends Component {
     const moreData = totalVisits > pageIndex * viewVisitPageSize
     let otherHeight = 0
     if (fromModule === 'PatientDashboard') {
-      otherHeight = 320
+      otherHeight = 290
     } else if (fromModule === 'Consultation') {
-      otherHeight = 445
+      otherHeight = 415
     } else if (fromModule === 'History') {
-      otherHeight = 220
+      otherHeight = 190
     } else if (fromModule === 'PatientHistory') {
-      otherHeight = 420
+      otherHeight = 390
     }
     const visitContentHeight = currentHeight - otherHeight
     return (
@@ -1722,7 +1706,6 @@ class PatientHistory extends Component {
             this.getFilterBar()
           )}
           <div
-            ref={(e) => (this.scrollRef = e)}
             style={{
               overflow: 'auto',
               height: visitContentHeight,
@@ -1747,25 +1730,24 @@ class PatientHistory extends Component {
             ) : (
               <p>No Visit Record Found</p>
             )}
-          </div>
-
-          <div
-            style={{
-              display: 'inline-Block',
-              float: 'right',
-              height: 30,
-              paddingTop: 8,
-            }}
-          >
-            {isScrollBottom &&
-            moreData && (
-              <a
-                style={{ textDecoration: 'underline', fontStyle: 'italic' }}
-                onClick={this.handelLoadMore}
-              >
-                Load More
-              </a>
-            )}
+            <div
+              style={{
+                display: 'inline-Block',
+                float: 'right',
+                height: 30,
+                paddingTop: 8,
+                marginRight: 10,
+              }}
+            >
+              {moreData && (
+                <a
+                  style={{ textDecoration: 'underline', fontStyle: 'italic' }}
+                  onClick={this.handelLoadMore}
+                >
+                  Load More
+                </a>
+              )}
+            </div>
           </div>
         </CardContainer>
         <CommonModal

@@ -44,7 +44,6 @@ class PastMedication extends PureComponent {
       isAllDate: true,
       pageIndex: 0,
       loadVisits: [],
-      isScrollBottom: false,
       totalVisits: 0,
     }
   }
@@ -526,7 +525,6 @@ class PastMedication extends PureComponent {
         pageIndex: 0,
         loadVisits: [],
         addedItems: [],
-        isScrollBottom: false,
         totalVisits: 0,
       },
       this.searchHistory,
@@ -581,14 +579,10 @@ class PastMedication extends PureComponent {
     })
   }
 
-  setScrollBottom = (isScrollBottom) => {
-    this.setState({ isScrollBottom })
-  }
-
   render () {
     const { loading, type, footer, clinicSettings } = this.props
     const { viewVisitPageSize = 10 } = clinicSettings
-    const { pageIndex, loadVisits, isScrollBottom, totalVisits } = this.state
+    const { pageIndex, loadVisits, totalVisits } = this.state
     const moreData = totalVisits > pageIndex * viewVisitPageSize
     const show = loading.effects['medicationHistory/queryMedicationHistory']
     return (
@@ -610,8 +604,6 @@ class PastMedication extends PureComponent {
             moreData={moreData}
             handelLoadMore={this.handelLoadMore}
             loadVisits={loadVisits}
-            isScrollBottom={isScrollBottom}
-            setScrollBottom={this.setScrollBottom}
             {...this.props}
           />
         </div>
