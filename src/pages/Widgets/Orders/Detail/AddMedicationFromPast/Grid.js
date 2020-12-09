@@ -68,6 +68,8 @@ class Grid extends PureComponent {
       type,
       loadVisits,
       isRetail,
+      clickCollapseHeader,
+      activeKey,
     } = this.props
     return loadVisits.map((o) => {
       let items = []
@@ -113,13 +115,18 @@ class Grid extends PureComponent {
       }
       return {
         header: (
-          <GridContainer>
-            <GridItem xs={4} md={3} style={{ padding: 0 }}>
+          <div
+            onClick={() => {
+              clickCollapseHeader(o.id)
+            }}
+            style={{ display: 'flex', paddingTop: 6 }}
+          >
+            <div style={{ marginLeft: 5, alignItems: 'center' }}>
               <span>
                 Visit Date:&nbsp;{moment(o.visitDate).format('DD MMM YYYY')}
               </span>
-            </GridItem>
-            <GridItem xs={4} md={4}>
+            </div>
+            <div style={{ alignItems: 'center', marginLeft: 8 }}>
               <span
                 className={classes.addIcon}
                 onClick={(event) => {
@@ -147,8 +154,23 @@ class Grid extends PureComponent {
                   Add All
                 </span>
               </span>
-            </GridItem>
-          </GridContainer>
+            </div>
+            <div
+              style={{
+                marginLeft: 'auto',
+                alignItems: 'center',
+                marginRight: 3,
+              }}
+            >
+              <span className='material-icons'>
+                {activeKey.find((key) => key === o.id) ? (
+                  'expand_more'
+                ) : (
+                  'navigate_next'
+                )}
+              </span>
+            </div>
+          </div>
         ),
         key: o.id,
         itemCount: items.length,
@@ -264,7 +286,14 @@ class Grid extends PureComponent {
   }
 
   content = () => {
-    const { type, height, handelLoadMore, moreData, isRetail } = this.props
+    const {
+      type,
+      height,
+      handelLoadMore,
+      moreData,
+      isRetail,
+      activeKey,
+    } = this.props
     let visits = _.orderBy(
       this.Visits().filter((visit) => {
         return visit.itemCount > 0
@@ -287,7 +316,7 @@ class Grid extends PureComponent {
               height: visitContentHeight,
             }}
           >
-            <Collapse expandIconPosition='right'>
+            <Collapse activeKey={activeKey} expandIconPosition={null}>
               {visits.map((visit) => {
                 return (
                   <Collapse.Panel

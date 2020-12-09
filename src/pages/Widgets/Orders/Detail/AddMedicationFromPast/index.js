@@ -45,6 +45,7 @@ class PastMedication extends PureComponent {
       pageIndex: 0,
       loadVisits: [],
       totalVisits: 0,
+      activeKey: [],
     }
   }
 
@@ -526,6 +527,7 @@ class PastMedication extends PureComponent {
         loadVisits: [],
         addedItems: [],
         totalVisits: 0,
+        activeKey: [],
       },
       this.searchHistory,
     )
@@ -573,8 +575,30 @@ class PastMedication extends PureComponent {
             ],
             totalVisits: r.totalVisits,
             pageIndex: preState.pageIndex + 1,
+            activeKey: [
+              ...preState.activeKey,
+              ...r.list.map((o) => o.id),
+            ],
           }
         })
+      }
+    })
+  }
+
+  clickCollapseHeader = (visitID) => {
+    this.setState((preState) => {
+      if (preState.activeKey.find((key) => key === visitID)) {
+        return {
+          ...preState,
+          activeKey: preState.activeKey.filter((key) => key !== visitID),
+        }
+      }
+      return {
+        ...preState,
+        activeKey: [
+          ...preState.activeKey,
+          visitID,
+        ],
       }
     })
   }
@@ -582,7 +606,7 @@ class PastMedication extends PureComponent {
   render () {
     const { loading, type, footer, clinicSettings } = this.props
     const { viewVisitPageSize = 10 } = clinicSettings
-    const { pageIndex, loadVisits, totalVisits } = this.state
+    const { pageIndex, loadVisits, totalVisits, activeKey } = this.state
     const moreData = totalVisits > pageIndex * viewVisitPageSize
     const show = loading.effects['medicationHistory/queryMedicationHistory']
     return (
@@ -604,6 +628,8 @@ class PastMedication extends PureComponent {
             moreData={moreData}
             handelLoadMore={this.handelLoadMore}
             loadVisits={loadVisits}
+            activeKey={activeKey}
+            clickCollapseHeader={this.clickCollapseHeader}
             {...this.props}
           />
         </div>
