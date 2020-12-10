@@ -1,5 +1,4 @@
-import React, { PureComponent, useEffect, useState } from 'react'
-import { connect } from 'dva'
+import React, { PureComponent } from 'react'
 import { withStyles } from '@material-ui/core'
 import { Button, CommonModal, GridContainer, GridItem } from '@/components'
 
@@ -9,7 +8,6 @@ import SchemesGrid from './SchemesGrid'
 import PayersGrid from './PayersGrid'
 
 const styles = () => ({})
-@connect(({ codetable }) => ({ codetable }))
 class Schemes extends PureComponent {
   state = {
     showReplacementModal: false,

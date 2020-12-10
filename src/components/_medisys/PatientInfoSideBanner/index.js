@@ -424,79 +424,79 @@ class PatientInfoSideBanner extends PureComponent {
               .filter((o) => o.schemeTypeFK <= 6 && !o.isDeleted)
               .map((o) => {
                 const schemeData = this.getSchemeDetails(o)
-                return (
-                    <div style={{ marginBottom: theme.spacing(1) }}>
-                      <p style={{ fontWeight: 500 }}>
-                        {/* <CodeSelect text code='ctSchemeType' value={o.schemeTypeFK} /> */}
-                        <CodeSelect
-                          text
-                          code='ctSchemeType'
-                          value={schemeData.schemeTypeFK}
-                        />
-                        {entity.isActive && (
-                          <IconButton>
-                            <Refresh
-                              onClick={() =>
-                                this.refreshChasBalance(
-                                  schemeData.patientCoPaymentSchemeFK,
-                                  schemeData.schemeTypeFK,
-                                )}
-                            />
-                          </IconButton>
-                        )}
-
-                        <SchemePopover
-                          isShowReplacementModal={
-                            schemeData.isShowReplacementModal
-                          }
-                          handleRefreshChasBalance={() =>
+              return (
+                <div style={{ marginBottom: theme.spacing(1) }}>
+                  <p style={{ fontWeight: 500 }}>
+                    {/* <CodeSelect text code='ctSchemeType' value={o.schemeTypeFK} /> */}
+                    <CodeSelect
+                      text
+                      code='ctSchemeType'
+                      value={schemeData.schemeTypeFK}
+                    />
+                    {entity.isActive && (
+                      <IconButton>
+                        <Refresh
+                          onClick={() =>
                             this.refreshChasBalance(
                               schemeData.patientCoPaymentSchemeFK,
                               schemeData.schemeTypeFK,
                             )}
-                          entity={entity}
-                          schemeData={schemeData}
+                        />
+                      </IconButton>
+                    )}
+
+                    <SchemePopover
+                      isShowReplacementModal={
+                        schemeData.isShowReplacementModal
+                      }
+                      handleRefreshChasBalance={() =>
+                        this.refreshChasBalance(
+                          schemeData.patientCoPaymentSchemeFK,
+                          schemeData.schemeTypeFK,
+                        )}
+                      entity={entity}
+                      schemeData={schemeData}
+                    />
+                  </p>
+                  {schemeData.validFrom && (
+                    <div>
+                      <p>
+                        {schemeData.chronicBalanceStatusCode !== 'SC105' ? (
+                          <NumberInput
+                            prefix='Balance:'
+                            text
+                            currency
+                            value={schemeData.balance || '-'}
+                          />
+                        ) : (
+                          <TextField
+                            text
+                            prefix='Balance:'
+                            value='Full Balance'
+                          />
+                        )}
+                      </p>
+                      <p>
+                        <DatePicker
+                          prefix='Validity:'
+                          text
+                          format={dateFormatLong}
+                          // value={o.validFrom}
+                          value={schemeData.validFrom}
+                        />&nbsp; -&nbsp;
+                        <DatePicker
+                          text
+                          format={dateFormatLong}
+                          // value={o.validTo}
+                          value={schemeData.validTo}
                         />
                       </p>
-                      {schemeData.validFrom && (
-                        <div>
-                          <p>
-                            {schemeData.chronicBalanceStatusCode !== 'SC105' ? (
-                              <NumberInput
-                                prefix='Balance:'
-                                text
-                                currency
-                                value={schemeData.balance || '-'}
-                              />
-                            ) : (
-                              <TextField
-                                text
-                                prefix='Balance:'
-                                value='Full Balance'
-                              />
-                            )}
-                          </p>
-                          <p>
-                            <DatePicker
-                              prefix='Validity:'
-                              text
-                              format={dateFormatLong}
-                              // value={o.validFrom}
-                              value={schemeData.validFrom}
-                            />&nbsp; -&nbsp;
-                            <DatePicker
-                              text
-                              format={dateFormatLong}
-                              // value={o.validTo}
-                              value={schemeData.validTo}
-                            />
-                          </p>
-                          <p style={{ color: 'red' }}>
-                            {schemeData.statusDescription}
-                          </p>
-                        </div>
-                      )}
+                      <p style={{ color: 'red' }}>
+                        {schemeData.statusDescription}
+                      </p>
                     </div>
+                  )}
+                </div>
                 )
               })}
           </div>
@@ -514,9 +514,9 @@ class PatientInfoSideBanner extends PureComponent {
                 .map((o) => {
                   const schemeData = this.getSchemePayerDetails(o)
                   return (
-                      <div style={{ marginBottom: theme.spacing(3) }}>
-                        {/* <p style={{ fontWeight: 500 }}> */}
-                        {o === entity.schemePayer[0] &&
+                    <div style={{ marginBottom: theme.spacing(3) }}>
+                      {/* <p style={{ fontWeight: 500 }}> */}
+                      {o === entity.schemePayer[0] &&
                         <p>
                           Medisave                        
                           {entity.isActive && (
@@ -531,48 +531,48 @@ class PatientInfoSideBanner extends PureComponent {
                           </IconButton>
                           )}
                         </p>}
+                      <div>
+                        <p>
+                          Payer:&nbsp;
+                          {schemeData.payerName}&nbsp;
+                          [{schemeData.payerAccountNo}]
+                        </p>
+                        <p>
+                          <NumberInput
+                            prefix='Balance:'
+                            text
+                            currency
+                            value={schemeData.balance >= 0 ? schemeData.balance : '-'}
+                          />
+                        </p>
+                      </div>
+                      {schemeData.validFrom && (
                         <div>
                           <p>
-                            Payer:&nbsp;
-                            {schemeData.payerName}&nbsp;
-                            [{schemeData.payerAccountNo}]
-                          </p>
-                          <p>
-                            <NumberInput
-                              prefix='Balance:'
+                            <DatePicker
+                              prefix='Validity:'
                               text
-                              currency
-                              value={schemeData.balance >= 0 ? schemeData.balance : '-'}
+                              format={dateFormatLong}
+                              // value={o.validFrom}
+                              value={schemeData.validFrom}
+                            />&nbsp; -&nbsp;
+                            <DatePicker
+                              text
+                              format={dateFormatLong}
+                              // value={o.validTo}
+                              value={schemeData.validTo}
                             />
                           </p>
                         </div>
-                        {schemeData.validFrom && (
-                          <div>
-                            <p>
-                              <DatePicker
-                                prefix='Validity:'
-                                text
-                                format={dateFormatLong}
-                                // value={o.validFrom}
-                                value={schemeData.validFrom}
-                              />&nbsp; -&nbsp;
-                              <DatePicker
-                                text
-                                format={dateFormatLong}
-                                // value={o.validTo}
-                                value={schemeData.validTo}
-                              />
-                            </p>
-                          </div>
-                        )}
-                        {schemeData.statusDescription && (
-                        <div>
-                          <p style={{ color: 'red' }}>
-                            {schemeData.statusDescription}
-                          </p>
-                        </div>
-                          )}
+                      )}
+                      {schemeData.statusDescription && (
+                      <div>
+                        <p style={{ color: 'red' }}>
+                          {schemeData.statusDescription}
+                        </p>
                       </div>
+                        )}
+                    </div>
                   )
                 })}
             </div>
@@ -586,10 +586,9 @@ class PatientInfoSideBanner extends PureComponent {
   }
 }
 const ConnectedPatientInfoSideBanner = connect(
-  ({ loading, clinicSettings, codetable }) => ({
+  ({ loading, clinicSettings }) => ({
     loading: loading.models.patient,
     clinicSettings: clinicSettings.settings,
-    ctSchemeType: codetable['ctSchemeType'.toLowerCase()] || [],
   }),
 )(PatientInfoSideBanner)
 
