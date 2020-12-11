@@ -109,6 +109,19 @@ class DetailsHeader extends PureComponent {
             />
           </GridItem>
           <GridItem md={3} xs={12} className={classes.gridItem}>
+            <FastField
+              name='adjustmentValueField'
+              render={(args) => (
+                <NumberInput
+                  prefix='Statement Adjustment: '
+                  {...cfg}
+                  {...amountProps}
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem md={3} xs={12} className={classes.gridItem}>
             <Field
               name='adminChargeValueField'
               render={(args) => {
@@ -121,19 +134,6 @@ class DetailsHeader extends PureComponent {
                   />
                 )
               }}
-            />
-          </GridItem>
-          <GridItem md={3} xs={12} className={classes.gridItem}>
-            <FastField
-              name='adjustmentValueField'
-              render={(args) => (
-                <NumberInput
-                  prefix='Statement Adjustment: '
-                  {...cfg}
-                  {...amountProps}
-                  {...args}
-                />
-              )}
             />
           </GridItem>
           <GridItem md={3} xs={12} className={classes.gridItem}>
