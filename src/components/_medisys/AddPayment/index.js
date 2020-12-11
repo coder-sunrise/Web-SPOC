@@ -7,6 +7,9 @@ import { withStyles } from '@material-ui/core'
 import { Button, GridContainer, GridItem, serverDateFormat } from '@/components'
 import withFormikExtend from '@/components/Decorator/withFormikExtend'
 // sub component
+import { roundTo } from '@/utils/utils'
+import { PAYMENT_MODE, INVOICE_PAYER_TYPE } from '@/utils/constants'
+import { getBizSession } from '@/services/queue'
 import PayerHeader from './PayerHeader'
 import PaymentType from './PaymentType'
 import PaymentCard from './PaymentCard'
@@ -16,10 +19,6 @@ import PaymentDateAndBizSession from './PaymentDateAndBizSession'
 import styles from './styles'
 import { ValidationSchema, getLargestID } from './variables'
 import { rounding } from './utils'
-import { roundTo } from '@/utils/utils'
-import { PAYMENT_MODE, INVOICE_PAYER_TYPE } from '@/utils/constants'
-// services
-import { getBizSession } from '@/services/queue'
 
 @connect(({ clinicSettings, patient, codetable }) => ({
   clinicSettings: clinicSettings.settings || clinicSettings.default,
@@ -365,6 +364,7 @@ class AddPayment extends Component {
       patient,
       showPaymentDate,
       invoicePayerName = '',
+      showReferrenceNo = false,
     } = this.props
     const { paymentList } = values
     const { bizSessionList, paymentModes } = this.state
@@ -374,6 +374,8 @@ class AddPayment extends Component {
         <PayerHeader
           invoicePayerName={invoicePayerName}
           invoice={invoice}
+          patient={patient}
+          showReferrenceNo={showReferrenceNo}
           outstandingAfterPayment={values.outstandingAfterPayment}
         />
         <React.Fragment>

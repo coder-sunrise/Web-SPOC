@@ -4,15 +4,13 @@ import _ from 'lodash'
 import { AddPayment } from 'medisys-components'
 
 // material ui
-import { withStyles } from '@material-ui/core'
-import Printer from '@material-ui/icons/Print'
+import { withStyles } from '@material-ui/core' 
 // common components
 import {
   CommonModal,
   withFormik,
   WarningSnackbar,
-  notification,
-  Button,
+  notification, 
 } from '@/components'
 // sub components
 import { ReportViewer } from '@/components/_medisys'
@@ -26,51 +24,14 @@ import DeleteConfirmation from '../../components/modal/DeleteConfirmation'
 // styles
 import styles from './styles'
 
-const defaultPatientPayment = {
-  id: undefined,
-  invoiceFK: undefined,
-  invoicePayerWriteOff: [],
-  invoicePayment: [],
-  isCancelled: false,
-  isDeleted: false,
-  outStanding: 0,
-  patientName: '',
-  patientProfileFK: undefined,
-  payerDistributedAmt: 0,
-  payerType: 'Patient',
-  payerTypeFK: 1,
-  paymentTxnList: [],
-  sequence: 0,
-  statementInvoice: [],
-  totalPaid: 0,
-}
-
 @connect(({ invoiceDetail, invoicePayment }) => ({
   invoiceDetail,
-  invoicePayment,
+  invoicePayment, 
 }))
 @withFormik({
   name: 'invoicePayment',
   enableReinitialize: true,
   mapPropsToValues: ({ invoicePayment, invoiceDetail }) => {
-    // console.log({ invoicePayment, invoiceDetail })
-    // const { entity: invoiceDetailEntity } = invoiceDetail
-    // const { entity = [] } = invoicePayment
-
-    // const isEmpty = entity.length === 0
-    // let _values = {}
-    // if (isEmpty) {
-    //   _values = [
-    //     {
-    //       ...defaultPatientPayment,
-    //       invoiceFK: invoiceDetailEntity.id,
-    //       patientName: invoiceDetailEntity.patientName,
-    //       outStanding: invoiceDetailEntity.outstandingBalance,
-    //     },
-    //   ]
-    //   console.log({ _values })
-    //   return _values
-    // }
     return invoicePayment.entity || {}
   },
 })
@@ -171,6 +132,7 @@ class PaymentDetails extends Component {
           totalClaims: undefined,
         }
         let invoicePayerName = ''
+        let showReferrenceNo = invoicePayer.payerTypeFK === 1
         if (invoicePayer.payerTypeFK === 1)
           invoicePayerName = invoicePayer.patientName
         if (invoicePayer.payerTypeFK === 2)
@@ -182,6 +144,7 @@ class PaymentDetails extends Component {
           selectedInvoicePayerFK: invoicePayerFK,
           invoicePayerName,
           invoicePayerPayment,
+          showReferrenceNo,
         })
       }
       showAddPayment()
@@ -201,14 +164,7 @@ class PaymentDetails extends Component {
         selectedInvoicePayerFK: invoicePayerFK,
       })
     }
-    this._validateOutstandingAmount(invoicePayer, showWriteOffModal)
-    // if (invoicePayer.outStanding === 0) {
-    //   notification.error({
-    //     message: 'This payer does not have any outstanding',
-    //   })
-    // } else {
-
-    // }
+    this._validateOutstandingAmount(invoicePayer, showWriteOffModal) 
   }
 
   closeAddCrNoteModal = () =>
@@ -284,8 +240,7 @@ class PaymentDetails extends Component {
       showReportTitle: title,
       reportPayload: {
         reportID,
-        reportParameters,
-        // reportParameters: { [paramKey]: itemID },
+        reportParameters, 
       },
     })
   }
@@ -415,8 +370,7 @@ class PaymentDetails extends Component {
       classes,
       values,
       readOnly,
-      patientIsActive,
-      invoicePayment,
+      patientIsActive, 
     } = this.props
     const { hasActiveSession } = this.state
     const paymentActionsProps = {
@@ -439,6 +393,7 @@ class PaymentDetails extends Component {
       invoicePayerName,
       invoicePayerPayment,
       showAddTransfer,
+      showReferrenceNo,
     } = this.state
 
     const transferProps = {
@@ -483,51 +438,23 @@ class PaymentDetails extends Component {
             })
         ) : (
           ''
-        )}
-        {/* <PaymentCard
-          payerType={PayerType.PATIENT}
-          payerName={invoiceDetail.patientName || 'N/A'}
-          // payments={paymentTxnList.patientPaymentTxn}
-          payments={[]}
-          actions={paymentActionsProps}
-          totalPaid={values.totalPaid}
-          outstanding={values.outStanding}
-        />
-        <PaymentCard
-          actions={paymentActionsProps}
-          payerType={PayerType.GOVT_COPAYER}
-          payerName='CHAS'
-          // payments={paymentTxnList.coPayerPaymentTxn}
-          payments={[]}
-        /> */}
-        {/* <PaymentCard
-          actions={paymentActionsProps}
-          payerType={PayerType.COPAYER}
-          payerName='Medisys'
-          payments={paymentTxnList.govCoPayerPaymentTxn}
-        /> */}
+          )} 
         <CommonModal
           open={showAddPayment}
           title='Add Payment'
           onConfirm={this.closeAddPaymentModal}
           onClose={this.closeAddPaymentModal}
           observe='AddPaymentForm'
-        >
-          {/* <AddPayment handleSubmit={this.onSubmit} /> */}
+        > 
           <AddPayment
             handleSubmit={this.onSubmitAddPayment}
             onClose={this.closeAddPaymentModal}
             invoicePayerName={invoicePayerName}
-            invoicePayment={[]}
-            // invoice={{
-            //   ...invoiceDetail.entity,
-            //   totalAftGst: invoiceDetail.entity.invoiceTotalAftGST,
-            //   finalPayable: invoiceDetail.entity.outstandingBalance,
-            // }}
+            invoicePayment={[]} 
+            showReferrenceNo={showReferrenceNo}
             showPaymentDate
             invoice={{
-              ...invoicePayerPayment,
-              // bizSessionNo: invoicePayment.currentBizSessionInfo,
+              ...invoicePayerPayment, 
             }}
           />
         </CommonModal>
