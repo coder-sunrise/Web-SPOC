@@ -19,6 +19,7 @@ import {
   Tooltip,
   Switch,
 } from '@/components'
+import Authorized from '@/utils/Authorized'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 import { currencySymbol } from '@/utils/config'
@@ -458,6 +459,8 @@ class Vaccination extends PureComponent {
     const { isEditVaccination } = values
     const { showAddFromPastModal } = this.state
     const caution = this.getCaution()
+    const totalPriceReadonly = Authorized.check('queue.consultation.modifyorderitemtotalprice').rights !== 'enable'
+
     return (
       <div>
         <GridContainer>
@@ -716,6 +719,7 @@ class Vaccination extends PureComponent {
                     onChange={(e) => {
                       this.updateTotalPrice(e.target.value)
                     }}
+                    disabled={totalPriceReadonly}
                     min={0}
                     {...args}
                   />
@@ -749,6 +753,7 @@ class Vaccination extends PureComponent {
                         checkedChildren='-'
                         unCheckedChildren='+'
                         label=''
+                        disabled={totalPriceReadonly}
                         onChange={() => {
                           setTimeout(() => {
                             this.onAdjustmentConditionChange()
@@ -772,6 +777,7 @@ class Vaccination extends PureComponent {
                           paddingRight: theme.spacing(6),
                         }}
                         currency
+                        disabled={totalPriceReadonly}
                         label='Adjustment'
                         onChange={() => {
                           setTimeout(() => {
@@ -788,6 +794,7 @@ class Vaccination extends PureComponent {
                         marginLeft: theme.spacing(7),
                         paddingRight: theme.spacing(6),
                       }}
+                      disabled={totalPriceReadonly}
                       percentage
                       max={100}
                       label='Adjustment'
@@ -813,6 +820,7 @@ class Vaccination extends PureComponent {
                       checkedChildren='$'
                       unCheckedChildren='%'
                       label=''
+                      disabled={totalPriceReadonly}
                       onChange={() => {
                         setTimeout(() => {
                           this.onAdjustmentConditionChange()

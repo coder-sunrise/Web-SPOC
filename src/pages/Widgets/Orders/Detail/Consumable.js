@@ -14,6 +14,7 @@ import {
   Switch,
 } from '@/components'
 
+import Authorized from '@/utils/Authorized'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 import { currencySymbol } from '@/utils/config'
@@ -329,6 +330,7 @@ class Consumable extends PureComponent {
       classes,
       disableEdit,
     } = this.props
+    const totalPriceReadonly = Authorized.check('queue.consultation.modifyorderitemtotalprice').rights !== 'enable'
 
     return (
       <div>
@@ -441,6 +443,7 @@ class Consumable extends PureComponent {
                       paddingRight: theme.spacing(6),
                     }}
                     currency
+                    disabled={totalPriceReadonly}
                     onChange={(e) => {
                       this.updateTotalPrice(e.target.value)
                     }}
@@ -476,6 +479,7 @@ class Consumable extends PureComponent {
                       <Switch
                         checkedChildren='-'
                         unCheckedChildren='+'
+                        disabled={totalPriceReadonly}
                         label=''
                         onChange={() => {
                           setTimeout(() => {
@@ -499,6 +503,7 @@ class Consumable extends PureComponent {
                           marginLeft: theme.spacing(7),
                           paddingRight: theme.spacing(6),
                         }}
+                        disabled={totalPriceReadonly}
                         currency
                         label='Adjustment'
                         onChange={() => {
@@ -516,6 +521,7 @@ class Consumable extends PureComponent {
                         marginLeft: theme.spacing(7),
                         paddingRight: theme.spacing(6),
                       }}
+                      disabled={totalPriceReadonly}
                       percentage
                       max={100}
                       label='Adjustment'
@@ -538,6 +544,7 @@ class Consumable extends PureComponent {
                 render={(args) => {
                   return (
                     <Switch
+                      disabled={totalPriceReadonly}
                       checkedChildren='$'
                       unCheckedChildren='%'
                       label=''

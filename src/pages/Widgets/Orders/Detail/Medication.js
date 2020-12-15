@@ -1252,7 +1252,8 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
-
+ 
+    const totalPriceReadonly = Authorized.check('queue.consultation.modifyorderitemtotalprice').rights !== 'enable'
     const accessRight = authorityCfg[values.type]
     return (
       <Authorized authority={accessRight}>
@@ -1984,7 +1985,7 @@ class Medication extends PureComponent {
                         this.updateTotalPrice(e.target.value)
                       }}
                       min={0}
-                      disabled={values.isExternalPrescription}
+                      disabled={values.isExternalPrescription || (totalPriceReadonly && !openPrescription)}
                       currency
                       {...args}
                     />
@@ -2067,7 +2068,7 @@ class Medication extends PureComponent {
                           checkedChildren='-'
                           unCheckedChildren='+'
                           label=''
-                          disabled={values.isExternalPrescription}
+                          disabled={values.isExternalPrescription || (totalPriceReadonly && !openPrescription)}
                           onChange={() => {
                             setTimeout(() => {
                               this.onAdjustmentConditionChange()
@@ -2092,7 +2093,7 @@ class Medication extends PureComponent {
                           }}
                           currency
                           label='Adjustment'
-                          disabled={values.isExternalPrescription}
+                          disabled={values.isExternalPrescription || (totalPriceReadonly && !openPrescription)}
                           onChange={() => {
                             setTimeout(() => {
                               this.onAdjustmentConditionChange()
@@ -2111,7 +2112,7 @@ class Medication extends PureComponent {
                         percentage
                         max={100}
                         label='Adjustment'
-                        disabled={values.isExternalPrescription}
+                        disabled={values.isExternalPrescription || (totalPriceReadonly && !openPrescription)}
                         onChange={() => {
                           setTimeout(() => {
                             this.onAdjustmentConditionChange()
@@ -2134,7 +2135,7 @@ class Medication extends PureComponent {
                         checkedChildren='$'
                         unCheckedChildren='%'
                         label=''
-                        disabled={values.isExternalPrescription}
+                        disabled={values.isExternalPrescription || (totalPriceReadonly && !openPrescription)}
                         onChange={() => {
                           setTimeout(() => {
                             this.onAdjustmentConditionChange()
