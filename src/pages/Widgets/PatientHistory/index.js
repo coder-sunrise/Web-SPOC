@@ -148,6 +148,7 @@ class PatientHistory extends Component {
       loadVisits: [],
       totalVisits: 0,
       currentHeight: window.innerHeight,
+      isLoadingData: true,
     }
   }
 
@@ -290,6 +291,7 @@ class PatientHistory extends Component {
               ...preState.activeKey,
               ...list.map((o) => o.currentId),
             ],
+            isLoadingData: false,
           }
         })
         if (values.isSelectAll) setFieldValue('isSelectAll', false)
@@ -1679,6 +1681,7 @@ class PatientHistory extends Component {
         totalVisits: 0,
         selectDoctors,
         selectCategories,
+        isLoadingData: true,
       },
       () => {
         const currentSelectCategories = selectCategories.filter(
@@ -1729,6 +1732,7 @@ class PatientHistory extends Component {
       pageIndex,
       loadVisits = [],
       currentHeight,
+      isLoadingData,
     } = this.state
     const { settings = [] } = clinicSettings
     const { viewVisitPageSize = 10 } = settings
@@ -1775,7 +1779,7 @@ class PatientHistory extends Component {
                 </Collapse>
               </div>
             ) : (
-              <p>No Visit Record Found</p>
+              <p>{isLoadingData ? 'Loading' : 'No Visit Record Found'}</p>
             )}
             <div
               style={{
