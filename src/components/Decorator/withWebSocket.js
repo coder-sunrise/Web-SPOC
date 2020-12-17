@@ -21,6 +21,7 @@ const WebSocketMessageType = {
   Scan: 2,
   ScanCompleted: 3,
   RequestScanner: 4,
+  Preview: 5,
 }
 
 const withWebSocket = () => (Component) => {
@@ -105,6 +106,25 @@ const withWebSocket = () => (Component) => {
           AESEncryptor.encrypt(
             JSON.stringify({
               messageType: WebSocketMessageType.Print,
+              message: content,
+            }),
+          ),
+        )
+        if (result)
+          notification.success({
+            message: `Job sent to the printer.`,
+          })
+        return result
+      }
+      return false
+    }
+
+    handlePreviewReport = async (content) => {
+      if (content) {
+        const result = await this.prepareJobForWebSocket(
+          AESEncryptor.encrypt(
+            JSON.stringify({
+              messageType: WebSocketMessageType.Preview,
               message: content,
             }),
           ),
@@ -251,6 +271,7 @@ const withWebSocket = () => (Component) => {
             {...this.props}
             handlePrint={this.handlePrint}
             handleOpenScanner={this.requestOpenScan}
+            handlePreviewReport={this.handlePreviewReport}
             sendingJob={pendingJob.length > 0}
             onRef={(child) => {
               this._CompRef = child

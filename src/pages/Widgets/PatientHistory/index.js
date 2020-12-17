@@ -29,6 +29,7 @@ import { download } from '@/utils/request'
 import { findGetParameter, commonDataReaderTransform } from '@/utils/utils'
 import { VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
 import { DoctorProfileSelect } from '@/components/_medisys'
+import withWebSocket from '@/components/Decorator/withWebSocket'
 import * as WidgetConfig from './config'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 import HistoryDetails from './HistoryDetails'
@@ -889,7 +890,10 @@ class PatientHistory extends Component {
 
   printHandel = () => {
     const { loadVisits, selectItems } = this.state
-    const { codetable: { ctcomplication = [] } } = this.props
+    const {
+      codetable: { ctcomplication = [] },
+      handlePreviewReport,
+    } = this.props
     let visitListing = []
     let treatment = []
     let diagnosis = []
@@ -954,13 +958,12 @@ class PatientHistory extends Component {
           visitPurposeFK,
           isNurseNote,
         )
-        const isShowTreatment = false
-        // this.checkShowData(
-        //  WidgetConfig.WIDGETS_ID.TREATMENT,
-        //  current,
-        //  visitPurposeFK,
-        //  isNurseNote,
-        // )
+        const isShowTreatment = this.checkShowData(
+          WidgetConfig.WIDGETS_ID.TREATMENT,
+          current,
+          visitPurposeFK,
+          isNurseNote,
+        )
         const isShowDiagnosis = this.checkShowData(
           WidgetConfig.WIDGETS_ID.DIAGNOSIS,
           current,
@@ -1025,12 +1028,56 @@ class PatientHistory extends Component {
           if (isShowReferral) {
             referral = this.getReferral(current)
           }
-          let refractionFormDetails = { isRefractionForm: false }
+          let refractionFormDetails = {
+            isRefractionForm: false,
+            eyeRefractionFormRemarks: '',
+            eyeRefractionFormTestRemarks: '',
+            eyeRefractionFormTenometryR: '',
+            eyeRefractionFormTenometryL: '',
+            eyeRefractionFormDominanceL: false,
+            eyeRefractionFormDominanceR: false,
+            eyeRefractionFormPupilSizeL: '',
+            eyeRefractionFormPupilSizeR: '',
+            eyeRefractionFormVanHerick: '',
+            eyeRefractionFormNearAddDOD: '',
+            eyeRefractionFormNearAddPHOD: '',
+            eyeRefractionFormNearAddNOD: '',
+            eyeRefractionFormNearAddcmOD: '',
+            eyeRefractionFormNearAddDOS: '',
+            eyeRefractionFormNearAddPHOS: '',
+            eyeRefractionFormNearAddNOS: '',
+            eyeRefractionFormNearAddcmOS: '',
+          }
           if (isShowRefractionForm) {
             refractionFormDetails = this.getRefractionForm(current)
           }
 
-          let eyeVisualAcuityTestDetails = { isEyeVisualAcuityTest: false }
+          let eyeVisualAcuityTestDetails = {
+            isEyeVisualAcuityTest: false,
+            isAided: false,
+            isOwnSpecs: false,
+            isRefractionOn: false,
+            refractionOnRemarks: '',
+            nearVADOD: '',
+            nearVAPHOD: '',
+            nearVANOD: '',
+            nearVAcmOD: '',
+            nearVADOS: '',
+            nearVAPHOS: '',
+            nearVANOS: '',
+            nearVAcmOS: '',
+            isNoSpec: false,
+            specsAge: 0,
+            specSphereOD: '',
+            specCylinderOD: '',
+            specAxisOD: '',
+            specVaOD: '',
+            specSphereOS: '',
+            specCylinderOS: '',
+            specAxisOS: '',
+            specVaOS: '',
+            eyeVisualAcuityTestRemark: '',
+          }
           if (isShowEyeVisualAcuityTest) {
             eyeVisualAcuityTestDetails = this.getEyeVisualAcuityTest(current)
           }
@@ -1065,9 +1112,9 @@ class PatientHistory extends Component {
                 return {
                   visitFK: current.currentId,
                   name: o.name,
-                  toothNumber: o.toothNumber,
+                  toothNumber: o.description,
                   legend: o.legend,
-                  description: o.description,
+                  description: o.treatmentDescription,
                 }
               }),
             )
@@ -1137,8 +1184,8 @@ class PatientHistory extends Component {
                     ? numeral(o.pulseRateBPM).format('0.0')
                     : 0.0} bpm`,
                   weightKG: `${o.weightKG
-                    ? numeral(o.weightKG).format('0')
-                    : 0} KG`,
+                    ? numeral(o.weightKG).format('0.0')
+                    : 0.0} KG`,
                   heightCM: `${o.heightCM
                     ? numeral(o.heightCM).format('0.0')
                     : 0.0} CM`,
@@ -1193,18 +1240,20 @@ class PatientHistory extends Component {
       VitalSign: vitalSign,
       Orders: orders,
       ConsultationDocument: consultationDocument,
+      ReportContext: [],
     }
 
-    window.g_app._store.dispatch({
-      type: 'report/updateState',
-      payload: {
-        reportTypeID: 68,
-        reportParameters: {
-          isSaved: false,
-          reportContent: JSON.stringify(commonDataReaderTransform(payload)),
-        },
+    const payload1 = [
+      {
+        ReportId: 68,
+        Copies: 1,
+        ReportData: JSON.stringify({
+          ...commonDataReaderTransform(payload),
+        }),
       },
-    })
+    ]
+
+    handlePreviewReport(JSON.stringify(payload1))
   }
 
   getFilterBar = () => {
@@ -1370,22 +1419,20 @@ class PatientHistory extends Component {
                 </span>
               </span>
             </div>
-            {false && (
-              <Button
-                color='primary'
-                icon={null}
-                size='sm'
-                style={{
-                  position: 'relative',
-                  bottom: 8,
-                  marginLeft: 10,
-                }}
-                disabled={selectItems.length === 0}
-                onClick={this.printHandel}
-              >
-                <Print />print
-              </Button>
-            )}
+            <Button
+              color='primary'
+              icon={null}
+              size='sm'
+              style={{
+                position: 'relative',
+                bottom: 8,
+                marginLeft: 10,
+              }}
+              disabled={selectItems.length === 0}
+              onClick={this.printHandel}
+            >
+              <Print />print
+            </Button>
           </div>
         </div>
       </div>
@@ -1784,4 +1831,6 @@ class PatientHistory extends Component {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(PatientHistory)
+export default withWebSocket()(
+  withStyles(styles, { withTheme: true })(PatientHistory),
+)
