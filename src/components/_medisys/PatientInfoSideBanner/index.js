@@ -523,7 +523,7 @@ class PatientInfoSideBanner extends PureComponent {
                         </p>}
                       <div>
                         <p>
-                          Payer: {schemeData.payerName} [{schemeData.payerAccountNo}]
+                          Payer: {schemeData.payerName} ({schemeData.payerAccountNo})
                         </p>
                       </div>
                       {schemeData.validFrom && (

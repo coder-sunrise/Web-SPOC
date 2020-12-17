@@ -18,7 +18,7 @@ export const ApprovedMedisaveColumns = [
   },
   {
     name: 'patientAccountNo',
-    title: 'Account No',
+    title: 'Account No.',
   },
   {
     name: 'patientName',
