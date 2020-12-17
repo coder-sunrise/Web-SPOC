@@ -271,7 +271,7 @@ const ApplyClaims = ({
     } else if (
       !invoice.isBillingSaved &&
       claimableSchemes.length > 0 &&
-      invoicePayment.length === 0
+      invoicePayment.filter((o) => !o.isCancelled).length === 0
     ) {
       const _invoicePayer = {
         ...defaultInvoicePayer,
@@ -279,9 +279,7 @@ const ApplyClaims = ({
         payerTypeFK: INVOICE_PAYER_TYPE.SCHEME,
       }
       setCurEditInvoicePayerBackup(_invoicePayer)
-      setInitialState([
-        _invoicePayer,
-      ])
+      setInitialState([])
       handleSchemeChange(
         _invoicePayer.claimableSchemes[0].id,
         0,
