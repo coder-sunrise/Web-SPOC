@@ -13,6 +13,7 @@ import {
   withFormikExtend,
   Switch,
 } from '@/components'
+import Authorized from '@/utils/Authorized'
 import Yup from '@/utils/yup'
 import { getServices } from '@/utils/codetable'
 import { calculateAdjustAmount } from '@/utils/utils'
@@ -308,6 +309,7 @@ class Service extends PureComponent {
     const { theme, classes, values = {}, footer, handleSubmit } = this.props
     const { services, serviceCenters } = this.state
     const { serviceFK, serviceCenterFK } = values
+    const totalPriceReadonly = Authorized.check('queue.consultation.modifyorderitemtotalprice').rights !== 'enable'
 
     return (
       <div>
@@ -351,6 +353,7 @@ class Service extends PureComponent {
                       paddingRight: theme.spacing(6),
                     }}
                     min={0}
+                    disabled={totalPriceReadonly}
                     currency
                     onChange={(e) => {
                       this.updateTotalPrice(e.target.value)
@@ -398,6 +401,7 @@ class Service extends PureComponent {
                         checkedChildren='-'
                         unCheckedChildren='+'
                         label=''
+                        disabled={totalPriceReadonly}
                         onChange={() => {
                           setTimeout(() => {
                             this.onAdjustmentConditionChange()
@@ -421,6 +425,7 @@ class Service extends PureComponent {
                           paddingRight: theme.spacing(6),
                         }}
                         currency
+                        disabled={totalPriceReadonly}
                         label='Adjustment'
                         onChange={() => {
                           setTimeout(() => {
@@ -438,6 +443,7 @@ class Service extends PureComponent {
                         paddingRight: theme.spacing(6),
                       }}
                       percentage
+                      disabled={totalPriceReadonly}
                       max={100}
                       label='Adjustment'
                       onChange={() => {
@@ -462,6 +468,7 @@ class Service extends PureComponent {
                       checkedChildren='$'
                       unCheckedChildren='%'
                       label=''
+                      disabled={totalPriceReadonly}
                       onChange={() => {
                         setTimeout(() => {
                           this.onAdjustmentConditionChange()
