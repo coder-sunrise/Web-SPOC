@@ -509,6 +509,10 @@ export default compose(
                 retailPrescriptionItemPrecaution = [],
                 retailPrescriptionItemDrugMixture = [],
               } = retailPrescriptionItem
+              let actualUnitPrice = o.unitPrice
+              if (_.round(o.unitPrice * o.quantity, 2) !== o.totalPrice) {
+                actualUnitPrice = _.round(o.totalPrice / o.quantity, 2)
+              }
               obj = {
                 adjType: o.adjType,
                 adjValue: o.adjValue,
@@ -518,8 +522,8 @@ export default compose(
                   : o.drugName,
                 invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.MEDICATION,
                 unitPrice: o.isDrugMixture
-                  ? (o.totalPrice || 0) / (o.quantity || 1)
-                  : o.unitPrice,
+                  ? _.round((o.totalPrice || 0) / (o.quantity || 1), 2)
+                  : actualUnitPrice,
                 quantity: o.quantity,
                 subTotal: roundTo(o.totalPrice),
                 itemRevenueCategoryFK: o.isDrugMixture
@@ -571,7 +575,7 @@ export default compose(
               const { retailService, ...restValues } = o
               const { revenueCategoryFK } = ctservice.find(
                 (c) => c.serviceCenter_ServiceId === o.serviceCenterServiceFK,
-              )
+              ) 
               obj = {
                 adjType: o.adjType,
                 adjValue: o.adjValue,
@@ -579,7 +583,7 @@ export default compose(
                 itemName: o.serviceName,
                 subTotal: roundTo(o.total),
                 invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.SERVICE,
-                unitPrice: o.unitPrice,
+                unitPrice: roundTo(o.total),
                 quantity: o.quantity,
                 itemRevenueCategoryFK: revenueCategoryFK,
                 isDrugMixture: false,
@@ -590,7 +594,7 @@ export default compose(
                   serviceCenterServiceFK: o.serviceCenterServiceFK,
                   isDeleted: restValues.isDeleted,
                   retailService: {
-                    unitPrice: o.total,
+                    unitPrice: roundTo(o.total),
                     ...restValues,
                   },
                 },
@@ -602,6 +606,10 @@ export default compose(
                 (c) => c.id === o.inventoryConsumableFK,
               )
               const { retailConsumable, ...restValues } = o
+              let actualUnitPrice = o.unitPrice
+              if (_.round(o.unitPrice * o.quantity, 2) !== o.totalPrice) {
+                actualUnitPrice = _.round(o.totalPrice / o.quantity, 4)
+              }
               obj = {
                 invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.CONSUMABLE,
                 adjType: o.adjType,
@@ -609,7 +617,7 @@ export default compose(
                 itemCode: o.consumableCode,
                 itemName: o.consumableName,
                 subTotal: roundTo(o.totalPrice),
-                unitPrice: o.unitPrice,
+                unitPrice: actualUnitPrice,
                 quantity: o.quantity,
                 itemRevenueCategoryFK: revenueCategory.id,
                 isDrugMixture: false,
@@ -624,7 +632,7 @@ export default compose(
                   retailConsumable: {
                     unitOfMeasurement: uom.name,
                     unitofMeasurementFK: uom.id,
-                    unitPrice: roundTo(o.totalPrice / o.quantity),
+                    unitPrice: actualUnitPrice,
                     ...restValues,
                   },
                 },
