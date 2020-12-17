@@ -166,18 +166,21 @@ export default compose(
         ? vaccinationDetail.entity
         : vaccinationDetail.default
 
-      let chas = []
-      const { isChasAcuteClaimable, isChasChronicClaimable } = returnValue
+      let schemes = []
+      const { isChasAcuteClaimable, isChasChronicClaimable, isMedisaveClaimable } = returnValue
       if (isChasAcuteClaimable) {
-        chas.push('isChasAcuteClaimable')
+        schemes.push('isChasAcuteClaimable')
       }
       if (isChasChronicClaimable) {
-        chas.push('isChasChronicClaimable')
+        schemes.push('isChasChronicClaimable')
+      }
+      if (isMedisaveClaimable) {
+        schemes.push('isMedisaveClaimable')
       }
 
       return {
         ...returnValue,
-        chas,
+        schemes,
       }
     },
 
@@ -215,6 +218,14 @@ export default compose(
       criticalThreshold: Yup.number()
         .min(0, 'Critical Threshold must between 0 and 999,999.9')
         .max(999999.9, 'Critical Threshold must between 0 and 999,999.9'),
+
+      inventoryVaccination_MedisaveVaccination: Yup.array().compact((v) => v.isDeleted).of(
+        Yup.object().shape({
+          medisaveVaccinationFK: Yup.number().required(),
+          isDefault: Yup.boolean(),
+        })
+        
+      ),
     }),
     handleSubmit: (values, { props, resetForm }) => {
       const { dispatch, history } = props
@@ -230,22 +241,25 @@ export default compose(
           },
         ]
       }
-      let chas = {
+      let schemes = {
         isChasAcuteClaimable: false,
         isChasChronicClaimable: false,
+        isMedisaveClaimable: false,
       }
-      values.chas.forEach((o) => {
+      values.schemes.forEach((o) => {
         if (o === 'isChasAcuteClaimable') {
-          chas[o] = true
+          schemes[o] = true
         } else if (o === 'isChasChronicClaimable') {
-          chas[o] = true
+          schemes[o] = true
+        } else if (o === 'isMedisaveClaimable') {
+          schemes[o] = true
         }
       })
       dispatch({
         type: 'vaccinationDetail/upsert',
         payload: {
           ...restValues,
-          ...chas,
+          ...schemes,
           id,
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],

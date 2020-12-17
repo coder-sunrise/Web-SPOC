@@ -2,13 +2,14 @@ import { createListViewModel } from 'medisys-model'
 import * as service from '../services'
 
 export default createListViewModel({
-  namespace: 'claimSubmissionSubmitted',
+  namespace: 'chasClaimSubmissionRejected',
   config: {},
   param: {
     service,
     state: {
       fixedFilter: {
-        status: 'Submitted',
+        status: 'Rejected',
+        schemeCode: 'CHAS',
       },
       default: {},
     },
@@ -18,8 +19,16 @@ export default createListViewModel({
       })
     },
     effects: {
-      *getSubmittedStatus ({ payload }, { put, call }) {
-        const response = yield call(service.getStatus, payload)
+      *reSubmitChasClaim ({ payload }, { put, call }) {
+        const response = yield call(service.submitChasClaim, payload)
+        const { data, status } = response
+        if (status === '200') {
+          return data
+        }
+        return false
+      },
+      *refreshPatientDetails ({payload},{put,call}){
+        const response = yield call(service.refreshPatientDetails, payload)
         const { data, status } = response
         if (status === '200') {
           return data

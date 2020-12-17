@@ -68,22 +68,22 @@ const TableGrid = ({
   const currentType = () => {
     switch (type) {
       case 'draft': {
-        return 'claimSubmissionDraft'
+        return 'chasClaimSubmissionDraft'
       }
       case 'new': {
-        return 'claimSubmissionNew'
+        return 'chasClaimSubmissionNew'
       }
       case 'approved': {
-        return 'claimSubmissionApproved'
+        return 'chasClaimSubmissionApproved'
       }
       case 'rejected': {
-        return 'claimSubmissionRejected'
+        return 'chasClaimSubmissionRejected'
       }
       case 'submitted': {
-        return 'claimSubmissionSubmitted'
+        return 'chasClaimSubmissionSubmitted'
       }
       default: {
-        return 'claimSubmissionNew'
+        return 'chasClaimSubmissionNew'
       }
     }
   }
@@ -92,6 +92,7 @@ const TableGrid = ({
     <CommonTableGrid
       getRowId={(row) => row.id}
       type={currentType()}
+      forceRender
       // rows={data}
       columns={columns}
       columnExtensions={columnExtensions}

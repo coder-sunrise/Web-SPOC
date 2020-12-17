@@ -20,7 +20,8 @@ export default createFormViewModel({
         const { pathname, search, query = {} } = loct
         if (
           pathname.indexOf('/finance/invoice/details') === 0 ||
-          pathname.indexOf('/claim-submission/chas/invoice/details') === 0
+          pathname.indexOf('/claim-submission/chas/invoice/details') === 0 ||
+          pathname.indexOf('/claim-submission/medisave/invoice/details') === 0
         ) {
           dispatch({
             type: 'updateState',

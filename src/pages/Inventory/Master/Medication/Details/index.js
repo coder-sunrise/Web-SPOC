@@ -194,12 +194,15 @@ export default compose(
         : medicationDetail.default
 
       let chas = []
-      const { isChasAcuteClaimable, isChasChronicClaimable } = returnValue
+      const { isChasAcuteClaimable, isChasChronicClaimable, isMedisaveClaimable } = returnValue
       if (isChasAcuteClaimable) {
         chas.push('isChasAcuteClaimable')
       }
       if (isChasChronicClaimable) {
         chas.push('isChasChronicClaimable')
+      }
+      if (isMedisaveClaimable) {
+        chas.push('isMedisaveClaimable')
       }
       // const { sddfk } = returnValue
       // if (sddfk) {
@@ -281,11 +284,14 @@ export default compose(
       let chas = {
         isChasAcuteClaimable: false,
         isChasChronicClaimable: false,
+        isMedisaveClaimable: false,
       }
       values.chas.forEach((o) => {
         if (o === 'isChasAcuteClaimable') {
           chas[o] = true
         } else if (o === 'isChasChronicClaimable') {
+          chas[o] = true
+        } else if (o === 'isMedisaveClaimable') {
           chas[o] = true
         }
       })

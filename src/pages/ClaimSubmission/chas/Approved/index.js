@@ -21,7 +21,7 @@ import {
 import { approvedStatus } from '@/utils/codes'
 import { PAYMENT_MODE } from '@/utils/constants'
 import BaseSearchBar from '../../common/BaseSearchBar'
-import TableGrid from '../../common/TableGrid'
+import TableGrid from '../TableGrid'
 import CollectPaymentModal from '../../common/CollectPaymentModal'
 // variables
 import { ApprovedCHASColumnExtensions, ApprovedCHASColumns } from './variables'
@@ -36,9 +36,9 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ claimSubmission, claimSubmissionApproved }) => ({
+@connect(({ claimSubmission, chasClaimSubmissionApproved }) => ({
   claimSubmission,
-  claimSubmissionApproved,
+  chasClaimSubmissionApproved,
 }))
 @withFormik({
   mapPropsToValues: () => ({}),
@@ -65,7 +65,7 @@ class ApprovedCHAS extends React.Component {
 
   refreshDataGrid = () => {
     this.props.dispatch({
-      type: 'claimSubmissionApproved/query',
+      type: 'chasClaimSubmissionApproved/query',
     })
   }
 
@@ -75,7 +75,7 @@ class ApprovedCHAS extends React.Component {
       this.handleLoadingVisibility(true)
       this.props
         .dispatch({
-          type: 'claimSubmissionApproved/getApprovedStatus',
+          type: 'chasClaimSubmissionApproved/getApprovedStatus',
           payload: { claimIds: selectedRows },
         })
         .then((r) => {
@@ -91,9 +91,9 @@ class ApprovedCHAS extends React.Component {
   }
 
   onClickCollectPayment = () => {
-    const { dispatch, claimSubmissionApproved } = this.props
+    const { dispatch, chasClaimSubmissionApproved } = this.props
     const { selectedRows } = this.state
-    const { list } = claimSubmissionApproved || []
+    const { list } = chasClaimSubmissionApproved || []
     const rows = list.filter((i) => selectedRows.includes(i.id))
     const outstandingPayment = rows
       .filter(
@@ -106,7 +106,7 @@ class ApprovedCHAS extends React.Component {
       })
 
     dispatch({
-      type: 'claimSubmissionApproved/updateState',
+      type: 'chasClaimSubmissionApproved/updateState',
       payload: {
         entity: {
           rows: outstandingPayment,
@@ -149,7 +149,7 @@ class ApprovedCHAS extends React.Component {
         <BaseSearchBar
           dispatch={dispatch}
           values={values}
-          modelsName='claimSubmissionApproved'
+          modelsName='chasClaimSubmissionApproved'
         >
           <GridItem md={12}>
             <FastField

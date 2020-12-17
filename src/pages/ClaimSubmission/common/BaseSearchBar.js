@@ -31,29 +31,43 @@ const BaseSearchBar = ({
   dispatch,
   values,
 }) => {
+  const hasHrn = modelsName.includes('medisave') && (
+    modelsName.includes('Submitted') ||
+    modelsName.includes('Approved') ||
+    modelsName.includes('Rejected')
+  )
   return (
     <React.Fragment>
       <GridContainer>
-        <GridItem container md={8}>
-          <GridItem md={6}>
+        <GridItem container md={12}>
+          <GridItem md={4}>
             <FastField
               name='patientName'
               render={(args) => <TextField {...args} label='Patient Name' />}
             />
           </GridItem>
-          <GridItem md={6}>
+          <GridItem md={4}>
             <FastField
               name='patientAccountNo'
               render={(args) => <TextField {...args} label='Ref. No/Acc. No' />}
             />
           </GridItem>
-          <GridItem md={6}>
+          
+          <GridItem md={4}>
+            {hasHrn && (
+            <FastField
+              name='hrnNo'
+              render={(args) => <TextField {...args} label='HRN No.' />}
+            />
+            )}
+          </GridItem>          
+          <GridItem md={4}>
             <FastField
               name='invoiceNo'
               render={(args) => <TextField {...args} label='Invoice No.' />}
             />
           </GridItem>
-          <GridItem md={6}>
+          <GridItem md={4}>
             {!hideInvoiceDate && (
               <FastField
                 name='invoiceDates'
@@ -73,16 +87,22 @@ const BaseSearchBar = ({
               />
             )}
           </GridItem>
+          <GridItem container md={4}>
+            {children}
+          </GridItem>
           <GridItem md={6} className={classes.searchButton}>
             <ProgressButton
               color='primary'
               icon={<Search />}
               onClick={() => {
-                const { patientName,
+                const { 
+                  patientName,
                   patientAccountNo,
                   invoiceNo,
                   invoiceDates,
-                  chasClaimStatusCode } = values
+                  chasClaimStatusCode,
+                  hrnNo,
+                 } = values
 
                 const fromToDates = (index) => {
                   if (invoiceDates)
@@ -99,6 +119,7 @@ const BaseSearchBar = ({
                     patientAccountNo,
                     invoiceNo,
                     chasClaimStatusCode,
+                    hrn: hrnNo,
                   },
                 })
               }}
@@ -106,9 +127,6 @@ const BaseSearchBar = ({
               <FormattedMessage id='form.search' />
             </ProgressButton>
           </GridItem>
-        </GridItem>
-        <GridItem container md={4}>
-          {children}
         </GridItem>
       </GridContainer>
     </React.Fragment>
