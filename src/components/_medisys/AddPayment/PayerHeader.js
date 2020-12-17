@@ -1,18 +1,26 @@
 import React from 'react'
-import { connect } from 'dva'
 // material ui
 import { withStyles } from '@material-ui/core'
+import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 // common components
 import {
   GridContainer,
   GridItem,
   NumberInput,
-  SizeContainer,
+  Tooltip,
 } from '@/components'
 // styling
 import styles from './styles'
 
-const parseToTwoDecimalString = (value = 0.0) => value.toFixed(2)
+const titleStyle = {
+  width: '100%',
+  display: 'inline-block',
+  overflow: 'hidden',
+  marginTop: 0,
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  fontWeight: '500',
+}
 
 const PayerHeader = ({
   classes,
@@ -22,33 +30,61 @@ const PayerHeader = ({
   outstandingAfterPayment,
 }) => {
   const { totalClaim } = invoice
-  const columnConfig = totalClaim === undefined ? { md: 4 } : { md: 3 }
+  const showReferrenceNo = invoice.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT
+  const payerColumnConfig = showReferrenceNo ? { md: 6 } : { md: 10 }
   return (
-    <GridContainer justify='space-between' className={classes.payerHeader}>
-      <GridItem {...columnConfig} className={classes.leftAlignText}>
-        <h4>Payer: </h4>
-        <h4>{invoicePayerName}</h4>
-      </GridItem>
-      <GridItem {...columnConfig} className={classes.centerText}>
-        <h4>Total Payable: </h4>
-        <NumberInput text currency value={invoice.totalAftGst} />
-      </GridItem>
-      {totalClaim !== undefined && (
-        <GridItem {...columnConfig} className={classes.centerText}>
-          <h4>Total Claim: </h4>
-          <NumberInput text currency value={totalClaim} />
+    <div>
+      <GridContainer justify='space-between' className={classes.payerHeader}>
+        <GridItem md={2}>
+          <h5 style={titleStyle}>Payer: </h5>
         </GridItem>
-      )}
-      <GridItem {...columnConfig} className={classes.rightAlignText}>
-        <h4>Outstanding: </h4>
-        <NumberInput text currency value={outstandingAfterPayment} />
-      </GridItem>
-    </GridContainer>
+        <GridItem {...payerColumnConfig} className={classes.leftAlignText}>
+          <Tooltip title={invoicePayerName}>
+            <h5 title={invoicePayerName} style={titleStyle}>{invoicePayerName}</h5>
+          </Tooltip>
+        </GridItem>
+        {showReferrenceNo && (
+          <GridItem md={2}>
+            <h5 style={titleStyle}>Referrence No.: </h5>
+          </GridItem>
+        )}
+        {showReferrenceNo && (
+          <GridItem md={2} className={classes.leftAlignText}>
+            <h5 style={{ marginTop: 0 }}>{patient.patientAccountNo}</h5>
+          </GridItem>
+        )}
+      </GridContainer>
+      <GridContainer justify='space-between' className={classes.payerHeader}>
+        <GridItem md={2}>
+          <h5 style={titleStyle}>Total Payable: </h5>
+        </GridItem>
+        <GridItem md={2} className={classes.leftAlignText}>
+          <NumberInput text currency value={invoice.totalAftGst} />
+        </GridItem>
+        {totalClaim !== undefined && (
+          <GridItem md={2}>
+            <h5 style={titleStyle}>Total Claim: </h5>
+          </GridItem>
+        )}
+        {totalClaim !== undefined && (
+          <GridItem md={2} className={classes.leftAlignText}>
+            <NumberInput text currency value={totalClaim} />
+          </GridItem>
+        )}
+        {totalClaim === undefined && (
+          <GridItem md={4} className={classes.leftAlignText}>
+            <span>&nbsp;</span>
+          </GridItem>
+        )}
+        <GridItem md={2}>
+          <h5 style={titleStyle}>Outstanding: </h5>
+        </GridItem>
+        <GridItem md={2} className={classes.leftAlignText}>
+          <NumberInput text currency value={outstandingAfterPayment} />
+        </GridItem> 
+      </GridContainer>
+    </div>
   )
 }
-
-// const ConnectedPayerHeader = connect(({ patient }) => ({
-//   patient: patient.entity || patient.default,
-// }))(PayerHeader)
 
 export default withStyles(styles, { name: 'PayerHeader' })(PayerHeader)

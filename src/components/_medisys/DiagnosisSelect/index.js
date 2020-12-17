@@ -30,6 +30,10 @@ const filterOptions = [
     value: 'isHazeClaimable',
     name: 'Haze',
   },
+  {
+    value: 'isCdmpClaimable',
+    name: 'CDMP',
+  },
 ]
 
 const DiagnosisSelect = ({
@@ -73,7 +77,7 @@ const DiagnosisSelect = ({
   const onDiagnosisSearch = async (v) => {
     const search = {
       props:
-        'id,displayvalue,code,complication,isChasAcuteClaimable,isChasChronicClaimable,isHazeClaimable,iCD10AMFK,iCD10AMDiagnosisCode,iCD10AMDiagnosisName',
+        'id,displayvalue,code,complication,isChasAcuteClaimable,isChasChronicClaimable,isHazeClaimable,isCdmpClaimable,iCD10AMFK,iCD10AMDiagnosisCode,iCD10AMDiagnosisName',
       sorting: [
         { columnName: 'displayvalue', direction: 'asc' },
       ],
@@ -111,7 +115,8 @@ const DiagnosisSelect = ({
     showPrefix =
       selected.isChasAcuteClaimable ||
       selected.isChasChronicClaimable ||
-      selected.isHazeClaimable
+      selected.isHazeClaimable ||
+      selected.isCdmpClaimable
   }
 
   return (
@@ -129,12 +134,14 @@ const DiagnosisSelect = ({
             isChasAcuteClaimable,
             isChasChronicClaimable,
             isHazeClaimable,
+            isCdmpClaimable,
           } = option
           return (
             <span>
               {(isChasAcuteClaimable ||
                 isChasChronicClaimable ||
-                isHazeClaimable) && <AttachMoney className={classes.money} />}
+                isHazeClaimable ||
+                isCdmpClaimable) && <AttachMoney className={classes.money} />}
 
               {option.displayvalue}
             </span>
@@ -143,7 +150,7 @@ const DiagnosisSelect = ({
         query={onDiagnosisSearch}
         onDataSouceChange={(data) => {
           setCtDiagnosis(data)
-          if (onDataSouceChange) onDataSouceChange(data)
+          if (onDataSouceChange) onDataSouceChange(data, diagnosisFilter)
         }}
         onChange={(values, opts) => {
           console.log('sdfsdfsdfsd')

@@ -5,8 +5,8 @@ import { Badge, withStyles } from '@material-ui/core'
 import Note from '@material-ui/icons/EventNote'
 // common components
 import { Button, GridContainer, GridItem } from '@/components'
-import { authorityConfig } from './config'
 import Authorized from '@/utils/Authorized'
+import { authorityConfig } from './config'
 
 const styles = (theme) => ({
   container: {
@@ -26,8 +26,8 @@ class ClaimSubmission extends PureComponent {
     const data = {
       'ClaimCountListDto[0].SchemeType': 'CHAS',
       'ClaimCountListDto[0].Status': 'New',
-      // 'ClaimCountListDto[1].SchemeType': 'Corporate',
-      // 'ClaimCountListDto[1].Status': 'New',
+      'ClaimCountListDto[1].SchemeType': 'Medisave',
+      'ClaimCountListDto[1].Status': 'New',
     }
     this.props.dispatch({
       type: 'claimSubmission/getClaimCount',

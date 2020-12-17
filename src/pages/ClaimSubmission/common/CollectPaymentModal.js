@@ -5,7 +5,6 @@ import { withStyles } from '@material-ui/core'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import Yup from '@/utils/yup'
-import styles from './styles'
 import {
   CommonTableGrid,
   SizeContainer,
@@ -22,12 +21,13 @@ import {
   notification,
   serverDateFormat,
 } from '@/components'
-import { CollectPaymentColumns, amountProps } from './variables'
 import { PAYMENT_MODE } from '@/utils/constants'
 import { getBizSession } from '@/services/queue'
 import { 
   CreditCardNumberInput,
 } from '@/components/_medisys'
+import styles from './styles'
+import { CollectPaymentColumns, amountProps } from './variables'
 
 const paymentListSchema = Yup.object().shape({
   amountReceived: Yup.number().required(),
@@ -69,15 +69,16 @@ const constructPayment = ({ row, ctpaymentmode, values }) => {
   return basePayload
 }
 
-@connect(({ claimSubmissionApproved, user, codetable }) => ({
-  claimSubmissionApproved,
+@connect(({ chasClaimSubmissionApproved, medisaveClaimSubmissionApproved, user, codetable }) => ({
+  chasClaimSubmissionApproved,
+  medisaveClaimSubmissionApproved,
   user,
   ctpaymentmode: codetable.ctpaymentmode,
 }))
 @withFormikExtend({
   name: 'claimSubmissionCollectPayment',
-  mapPropsToValues: ({ claimSubmissionApproved }) => {
-    return claimSubmissionApproved.entity || {}
+  mapPropsToValues: ({ chasClaimSubmissionApproved, medisaveClaimSubmissionApproved }) => {
+    return chasClaimSubmissionApproved.entity || medisaveClaimSubmissionApproved.entity || {}
   },
   validationSchema: Yup.object().shape({
     paymentDate: Yup.string().required(),
@@ -94,6 +95,10 @@ const constructPayment = ({ row, ctpaymentmode, values }) => {
     const { rows } = values
     const paymentReceivedByUserFK = user.data.id
 
+    const dispatchType = [12,13,14].indexOf(rows[0].schemeTypeFK) >= 0
+    ? 'medisaveClaimSubmissionApproved/submitInvoicePayment'
+    : 'chasClaimSubmissionApproved/submitInvoicePayment'
+
     const results = await Promise.all(
       rows.map((row) => {
         const basePayload = constructPayment({
@@ -102,11 +107,14 @@ const constructPayment = ({ row, ctpaymentmode, values }) => {
           values: { ...values, paymentReceivedByUserFK },
         })
         return dispatch({
-          type: 'claimSubmissionApproved/submitInvoicePayment',
+          type: dispatchType,
           payload: basePayload,
         })
       }),
     )
+
+    if(results && results.filter(r => r === false).length === rows.length) return
+    
     if (results) {
       notification.success({
         message: 'Payment Collected',
@@ -208,7 +216,7 @@ class CollectPaymentModal extends PureComponent {
     ).formatUTC(false)
 
     dispatch({
-      type: 'claimSubmissionApproved/getAllBizSession',
+      type: 'chasClaimSubmissionApproved/getAllBizSession',
       payload: {
         pagesize: 999,
         lsteql_SessionStartDate: endDateTime,
@@ -224,7 +232,7 @@ class CollectPaymentModal extends PureComponent {
         ],
       },
     }).then(() => {
-      const { bizSessionList } = this.props.claimSubmissionApproved
+      const { bizSessionList } = this.props.chasClaimSubmissionApproved
       setFieldValue(
         'paymentCreatedBizSessionFK',
         bizSessionList.length === 0 || bizSessionList === undefined
@@ -239,8 +247,8 @@ class CollectPaymentModal extends PureComponent {
   }
 
   render () {
-    const { classes, values, footer, claimSubmissionApproved } = this.props
-    const { bizSessionList } = claimSubmissionApproved
+    const { classes, values, footer, chasClaimSubmissionApproved } = this.props
+    const { bizSessionList } = chasClaimSubmissionApproved
     const { rows } = values
 
     return (

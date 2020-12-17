@@ -192,7 +192,7 @@ const schemaSchemes = {
             if (!st) return false
             const notMedisaveOrPhpc =
               [
-                'MEDI500VISUT',
+                'MEDIVISIT',
                 'FLEXIMEDI',
                 'OPSCAN',
               ].indexOf(st.code) < 0 && !st.code.startsWith('PHPC')
@@ -204,13 +204,35 @@ const schemaSchemes = {
         }),
       }),
     ),
-  schemePayer: Yup.array().compact((v) => v.isDeleted).of(
+  schemePayer: Yup.array().compact((v) => v.isDeleted)
+  .unique((v) => `${v.schemeFK}-${v.payerID}`, 'error', () => {
+    notification.error({
+      message: 'Medisave Payer record already exists in the system',
+    })
+  })
+  .of(
     Yup.object().shape({
       payerName: Yup.string().required(),
       payerID: Yup.string().required(),
-      relationshipFK: Yup.number().required(),
-      // scheme: Yup.string().required(),
-      dob: Yup.date().required(),
+      relationshipFK: Yup.number().required().when('schemeFK', {
+        is: (val) => {
+          const st = schemeTypes.find((o) => o.id === val)
+          if (!st) return false
+          return st.code === 'FLEXIMEDI'
+        },
+        then: Yup.number().max(2, 
+        '“Patient Is” must be “SELF” or “SPOUSE” for Flexi-Medisave'),
+      }),
+      schemeFK: Yup.number().required(),
+      dob: Yup.date().required().when('schemeFK', {
+        is: (val) => {
+          const st = schemeTypes.find((o) => o.id === val)
+          if (!st) return false
+          return st.code === 'FLEXIMEDI'
+        },
+        then: Yup.date().max(moment().subtract(65, 'years'), 
+        'Payer DOB must be greater than or equal to 65 for Flexi-Medisave'),
+      }),
     }),
   ),
 }

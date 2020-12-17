@@ -938,6 +938,26 @@ const getRefreshChasBalanceStatus = (status = []) => {
   return { ...defaultResponse, isSuccessful: true }
 }
 
+const getRefreshMedisaveBalanceStatus = (response = []) => {
+  let defaultResponse = { isSuccessful: false, statusDescription: '' }
+  if (_.isEmpty(response)) {
+    return { ...defaultResponse }
+  }
+
+  const successCode = 'WN800'
+  const { status, statusDescription } = response
+
+  if (status &&
+    status.trim().toLowerCase() !== successCode.trim().toLowerCase()) {
+    return {
+      ...defaultResponse,
+      statusDescription,
+    }
+  } 
+
+  return { ...defaultResponse, isSuccessful: true }
+}
+
 const sortAdjustment = (a, b) => {
   const { sequence: aSequence } = a
   const { sequence: bSequence } = b
@@ -1345,6 +1365,7 @@ module.exports = {
   htmlEncodeByRegExp,
   htmlDecodeByRegExp,
   getRefreshChasBalanceStatus,
+  getRefreshMedisaveBalanceStatus,
   calculateAmount,
   removeFields,
   commonDataReaderTransform,

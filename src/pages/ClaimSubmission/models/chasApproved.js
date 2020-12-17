@@ -1,16 +1,17 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
-import * as service from '../services'
 import { notification } from '@/components'
+import * as service from '../services'
 
 export default createListViewModel({
-  namespace: 'claimSubmissionApproved',
+  namespace: 'chasClaimSubmissionApproved',
   config: {},
   param: {
     service,
     state: {
       fixedFilter: {
         status: 'Approved',
+        schemeCode: 'CHAS',
       },
       default: {},
     },
