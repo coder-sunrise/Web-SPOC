@@ -12,6 +12,12 @@ const styles = (theme) => ({
   },
 })
 
+const isMedisave = (schemeTypeFK) => {
+  if(schemeTypeFK)
+    return [12,13,14].indexOf(schemeTypeFK) >= 0
+  return false
+}
+
 const checkCombination = (claimedMedisaveSchemeTypes, schemeTypeFK) => {
   switch (schemeTypeFK) {
     case 12: // Medisave 500/700 Visit
@@ -26,7 +32,7 @@ const checkCombination = (claimedMedisaveSchemeTypes, schemeTypeFK) => {
 
 const checkCombinationByPayer = (currentMediSchemeTypes, schemeTypeFK, schemePayerFK) => {
   const payerSchemes = currentMediSchemeTypes.filter(p => p.schemePayerFK === schemePayerFK)
-  if(payerSchemes)
+  if(payerSchemes.length > 0)
     return checkCombination(payerSchemes.map(f => f.id), schemeTypeFK)
   return false
 }
@@ -74,7 +80,7 @@ const constructSchemeList = (
     }
     // medisave
     const medisavescheme = ctcopaymentscheme.find((p) => p.id === scheme[0].id)
-    if (medisavescheme.coPayerType === 'Government') {
+    if (medisavescheme && medisavescheme.coPayerType === 'Government') {
       const schemeType = ctschemetype.find((item) => item.name === medisavescheme.schemeTypeName)
       const currentMediSchemeTypes = currentClaims.map(cc => {
         const mScheme = ctcopaymentscheme.find(c1 => cc.id === c1.id && c1.coPayerName === 'MEDISAVE')
@@ -168,7 +174,7 @@ const ApplicableClaims = ({
     medisaveItems,
   )
 
-  const hasMedisave = schemePayer.length > 0
+  const hasMedisave = schemePayer.filter(o => isMedisave(o.schemeFK)).length > 0
 
   const _handleSelectClick = (scheme) => {
     handleSelectClick(

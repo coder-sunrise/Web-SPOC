@@ -265,7 +265,7 @@ class Schemes extends PureComponent {
             Medisave Payer
           </h4>
           <PayersGrid
-            enableAdd={values.patientScheme ? values.patientScheme.find((o) => this.isMedisave(o.schemeTypeFK)) : false}
+            enableAdd={values.patientScheme ? values.patientScheme.find((o) => this.isMedisave(o.schemeTypeFK) && !o.isDeleted) : false}
             rows={values.schemePayer}
             schema={schema.schemePayer._subType}
             values={values}

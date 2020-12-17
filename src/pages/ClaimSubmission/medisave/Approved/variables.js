@@ -6,11 +6,15 @@ import Warining from '@material-ui/icons/Error'
 export const ApprovedMedisaveColumns = [
   {
     name: 'hrnNo',
-    title: 'HRN No',
+    title: 'HRN No.',
   },
   {
     name: 'submissionDate',
     title: 'Submission Date',
+  },
+  {
+    name: 'visitDate',
+    title: 'Visit Date',
   },
   {
     name: 'patientAccountNo',
@@ -80,8 +84,9 @@ export const ApprovedMedisaveColumns = [
 
 export const ApprovedMedisaveColumnExtensions = [
   { columnName: 'hrnNo', width: 145 },
-  { columnName: 'visitDate', type: 'date' },
-  { columnName: 'invoiceDate', type: 'date' },
+  { columnName: 'visitDate', type: 'date', width: 100 },
+  { columnName: 'invoiceDate', type: 'date', width: 120 },
+  { columnName: 'chargeCode', width: 120 },
   {
     columnName: 'visitDoctorName',
     sortBy: 'DoctorProfileFKNavigation.ClinicianProfile.Name',
@@ -193,7 +198,9 @@ export const ApprovedMedisaveColumnExtensions = [
   {
     columnName: 'status',
     render: (row) => {
-      return row.collectedPayment ? 'Paid' : row.responseStatusDescription
+      if(row.patientIsActive && row.approvedAmount === row.collectedPayment) return 'Paid'
+      if(row.patientIsActive && row.collectedPayment > 0 && row.approvedAmount > row.collectedPayment) return 'Partially Paid'
+      return row.responseStatusDescription
     },
 
   },

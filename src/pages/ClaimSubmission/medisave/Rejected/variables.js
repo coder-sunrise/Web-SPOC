@@ -4,7 +4,7 @@ import Warining from '@material-ui/icons/Error'
 export const RejectedMedisaveColumns = [
   {
     name: 'hrnNo',
-    title: 'HRN No',
+    title: 'HRN No.',
   },
   {
     name: 'visitDate',
@@ -12,7 +12,7 @@ export const RejectedMedisaveColumns = [
   },
   {
     name: 'patientAccountNo',
-    title: 'Account No',
+    title: 'Account No.',
   },
   {
     name: 'patientName',
@@ -78,10 +78,10 @@ export const RejectedMedisaveColumnExtensions = [
     width: 145,
     sortBy: 'Hrn',
   },
-  { columnName: 'visitDate', type: 'date' },
-  { columnName: 'invoiceDate', type: 'date' },
-  { columnName: 'rejectionDate', type: 'date', width: 130 },
-  { columnName: 'submissionDate', type: 'date', width: 140 },
+  { columnName: 'visitDate', type: 'date', width: 100 },
+  { columnName: 'invoiceDate', type: 'date', width: 120 },
+  { columnName: 'chargeCode', width: 120 },
+  { columnName: 'rejectionDate', type: 'date', width: 125 },
   {
     columnName: 'patientName',
     render: (row) => {
@@ -111,11 +111,6 @@ export const RejectedMedisaveColumnExtensions = [
     sortBy: 'responseStatusDescription',
   },
   {
-    columnName: 'schemeCategoryDisplayValue',
-    width: 145,
-    sortBy: 'schemeCategory',
-  },
-  {
     columnName: 'invoiceAmount',
     type: 'currency',
     currency: true,
@@ -132,6 +127,7 @@ export const RejectedMedisaveColumnExtensions = [
     type: 'currency',
     currency: true,
     sortBy: 'chasClaimAmt',
+    width: 145,
   },
   {
     columnName: 'visitDoctorName',

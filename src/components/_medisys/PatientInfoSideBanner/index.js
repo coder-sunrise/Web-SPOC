@@ -43,14 +43,9 @@ class PatientInfoSideBanner extends PureComponent {
         )
         return schemeData
       })
-      entity.schemePayer.filter((o) => this.isMedisave(o.schemeFK) && !o.isDeleted).map((o) => {
-        const schemeData = this.getSchemePayerDetails(o)
-        this.refreshMedisaveBalance(
-          schemeData.schemeTypeFK,
-          schemeData.schemePayer,
-        )
-        return schemeData
-      })
+      this.refreshMedisaveBalance(
+        entity.schemePayer
+      )
     }
     if (allowChangePatientStatus && entity)
       this.checkPatientIntoActiveSession(entity.id)
@@ -133,7 +128,7 @@ class PatientInfoSideBanner extends PureComponent {
     })
   }
   
-  refreshMedisaveBalance = (oldSchemeTypeFK, schemePayers) => {
+  refreshMedisaveBalance = (schemePayers) => {
     const { dispatch, entity, setValues } = this.props
     const isSaveToDb = true
 
@@ -166,19 +161,16 @@ class PatientInfoSideBanner extends PureComponent {
           isSuccessful,
           statusDescription,
         } = result
-        let isShowReplacementModal = false
         let payerBalanceList = []
         if (isSuccessful && payerBalance)
         {
           payerBalance.forEach(pb => {
             if(pb.enquiryType === 'MSVBAL') return
-            if (oldSchemeTypeFK !== pb.schemeTypeFK) {
-              isShowReplacementModal = true
-            }
+            // if (oldSchemeTypeFK !== pb.schemeTypeFK) {
+            //   isShowReplacementModal = true
+            // }
             const { finalBalance } = pb
             payerBalanceList.push({
-                isShowReplacementModal,
-                oldSchemeTypeFK,
                 finalBalance,
                 schemeTypeFK: pb.schemeTypeFK,
                 schemePayerFK: pb.schemePayerFK,
@@ -277,9 +269,9 @@ class PatientInfoSideBanner extends PureComponent {
   
   getSchemePayerDetails = (schemePayer) => {
     const { patientScheme } = this.props.entity
-    const schemeData = patientScheme.find((row) => row.schemeTypeFK === schemePayer.schemeFK) || []
-    const { patientSchemeBalance } = schemeData
-    const balanceData = patientSchemeBalance !== undefined ? patientSchemeBalance.find((row) => row.schemePayerFK === schemePayer.id) : []
+    const schemeData = patientScheme.find((row) => row.schemeTypeFK === schemePayer.schemeFK) || {}
+    const { patientSchemeBalance = [] } = schemeData
+    const balanceData = patientSchemeBalance.find((row) => row.schemePayerFK === schemePayer.id)
 
     if (
       !_.isEmpty(this.state.refreshedSchemePayerData.payerBalanceList) 
@@ -500,7 +492,7 @@ class PatientInfoSideBanner extends PureComponent {
                 )
               })}
           </div>
-          {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).length > 0 && (
+          {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6).length > 0 && (
             <Divider light />
           )}
           {entity.schemePayer.length > 0 && (
@@ -510,12 +502,11 @@ class PatientInfoSideBanner extends PureComponent {
               style={{ maxHeight: 200 }}
             >
               {entity.schemePayer
-                .filter((o) => this.isMedisave(o.schemeFK) && !o.isDeleted)
+                .filter((o) => this.isMedisave(o.schemeFK))
                 .map((o) => {
                   const schemeData = this.getSchemePayerDetails(o)
                   return (
                     <div style={{ marginBottom: theme.spacing(3) }}>
-                      {/* <p style={{ fontWeight: 500 }}> */}
                       {o === entity.schemePayer[0] &&
                         <p>
                           Medisave                        
@@ -524,7 +515,6 @@ class PatientInfoSideBanner extends PureComponent {
                             <Refresh
                               onClick={() =>
                                 this.refreshMedisaveBalance(
-                                  schemeData.schemeTypeFK,
                                   schemeData.schemePayer,
                                 )}
                             />
@@ -533,17 +523,7 @@ class PatientInfoSideBanner extends PureComponent {
                         </p>}
                       <div>
                         <p>
-                          Payer:&nbsp;
-                          {schemeData.payerName}&nbsp;
-                          [{schemeData.payerAccountNo}]
-                        </p>
-                        <p>
-                          <NumberInput
-                            prefix='Balance:'
-                            text
-                            currency
-                            value={schemeData.balance >= 0 ? schemeData.balance : '-'}
-                          />
+                          Payer: {schemeData.payerName} [{schemeData.payerAccountNo}]
                         </p>
                       </div>
                       {schemeData.validFrom && (
@@ -564,7 +544,15 @@ class PatientInfoSideBanner extends PureComponent {
                             />
                           </p>
                         </div>
-                      )}
+                      )}    
+                      <p>
+                        <NumberInput
+                          prefix='Balance:'
+                          text
+                          currency
+                          value={schemeData.balance >= 0 ? schemeData.balance : '-'}
+                        />
+                      </p>
                       {schemeData.statusDescription && (
                       <div>
                         <p style={{ color: 'red' }}>

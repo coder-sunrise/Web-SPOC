@@ -327,22 +327,6 @@ const ApplyClaims = ({
     return newInvoicePayer || newInvoicePayers
   }
 
-  const getPayerList = (copaymentSchemeFK, newInvoicePayers) => {
-    const payersList = (newInvoicePayers || tempInvoicePayer)
-    // copayment scheme get scheme type fk, use it to find schemefk in schemepayer
-    const scheme = ctcopaymentscheme.find((a) => a.id === copaymentSchemeFK)
-    const schemeType = scheme ? ctschemetype.find((c) => c.name === scheme.schemeTypeName) : []
-
-    return patient.schemePayer.filter((d) => d.schemeFK === schemeType.id)
-    .map((p) => {
-      return {
-        payerName: p.payerName,
-        id: p.id,
-        balance: p.patientSchemeBalance[0].balance,
-      }
-    })
-  }
-
   const toggleCopayerModal = () => setShowCoPaymentModal(!showCoPaymentModal)
 
   const toggleErrorPrompt = () => {
@@ -398,13 +382,16 @@ const ApplyClaims = ({
       claimableSchemes[claimableSchemesIndex].length === 1 ||
       nestedIndex !== undefined
     ) {
-      return handleSchemeChange(
+      const newInvoicePayers = handleSchemeChange(
         invoicePayer.claimableSchemes[nestedIndex].id,
         newTempInvoicePayer.length - 1,
         newTempInvoicePayer,
         undefined,
         claimableSchemes,
       )
+
+      setInitialState(newInvoicePayers)
+      return newInvoicePayers
     }
     return setTempInvoicePayer(newTempInvoicePayer)
   }
@@ -504,10 +491,10 @@ const ApplyClaims = ({
           return item._claimedAmount >= item.totalAfterGst
         }).length >= newItems.length)
           return true
-        setCurEditInvoicePayerBackup(invoicePayer)
-        setInitialState([
-          invoicePayer,
-        ])
+          // setCurEditInvoicePayerBackup(invoicePayer)
+          // setInitialState([
+          //   invoicePayer,
+          // ])
         newInvoicePayers = handleSchemeChange(
           invoicePayer.claimableSchemes[0].id,
           0,
@@ -645,6 +632,9 @@ const ApplyClaims = ({
       {
         const invoicePayerList = constructAvailableClaims(claimableSchemes.filter(c => !c[0].schemePayerFK))
         const newInvoicePayers = processAvailableClaims([], invoicePayerList)
+        setInitialState(newInvoicePayers)
+        setTempInvoicePayer(newInvoicePayers)
+        
       }
     } else {
       setInitialState([])
@@ -675,8 +665,10 @@ const ApplyClaims = ({
       const { claimableSchemes: refreshedClaimableSchemes } = response  
       if (refreshedClaimableSchemes.length > 0)
       {
-        const invoicePayerList = constructAvailableClaims(refreshedClaimableSchemes)
+        const invoicePayerList = constructAvailableClaims(refreshedClaimableSchemes.filter(c => !c[0].schemePayerFK))
         const newInvoicePayers = processAvailableClaims([], invoicePayerList)
+        setInitialState(newInvoicePayers)
+        setTempInvoicePayer(newInvoicePayers)
 
       } else {
         setCurEditInvoicePayerBackup(undefined)

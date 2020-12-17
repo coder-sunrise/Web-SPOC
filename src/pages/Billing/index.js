@@ -758,6 +758,11 @@ class Billing extends Component {
       ctcopaymentscheme,
       sessionInfo,
       user,
+      clinicSettings,
+      inventoryvaccination,
+      inventorymedication,
+      ctservice,
+      ctcopayer,
     }
     const { shouldRefreshOrder } = billing
     const { isEnableAddPaymentInBilling = false } = clinicSettings
@@ -827,12 +832,6 @@ class Billing extends Component {
                   handleIsExistingOldPayerItem={
                     this.handleIsExistingOldPayerItem
                   }
-                  clinicSettings={clinicSettings}
-                  inventoryvaccination={inventoryvaccination}
-                  inventorymedication={inventorymedication}
-                  ctservice={ctservice}
-                  patient={patient}
-                  ctcopayer={ctcopayer}
                 />
               )}
             </GridContainer>

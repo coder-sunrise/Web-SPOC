@@ -1,4 +1,5 @@
 import { Tooltip } from '@/components'
+import Warining from '@material-ui/icons/Error'
 
 export const DraftMedisaveColumns = [
   {
@@ -7,7 +8,7 @@ export const DraftMedisaveColumns = [
   },
   {
     name: 'patientAccountNo',
-    title: 'Account No',
+    title: 'Account No.',
   },
   {
     name: 'patientName',
@@ -60,8 +61,9 @@ export const DraftMedisaveColumns = [
 ]
 
 export const DraftMedisaveColumnExtensions = [
-  { columnName: 'visitDate', type: 'date' },
-  { columnName: 'invoiceDate', type: 'date' },
+  { columnName: 'visitDate', type: 'date', width: 100 },
+  { columnName: 'invoiceDate', type: 'date', width: 120 },
+  { columnName: 'chargeCode', width: 120 },
   {
     columnName: 'schemeCategoryDisplayValue',
     width: 145,
@@ -84,6 +86,7 @@ export const DraftMedisaveColumnExtensions = [
     type: 'currency',
     currency: true,
     sortBy: 'chasClaimAmt',
+    width: 145,
   },
   {
     columnName: 'schemeTypeDisplayValue',
@@ -92,6 +95,29 @@ export const DraftMedisaveColumnExtensions = [
   {
     columnName: 'visitDoctorName',
     sortBy: 'DoctorProfileFKNavigation.ClinicianProfile.Name',
+  },
+  {
+    columnName: 'patientName',
+    render: (row) => {
+      return (
+        <Tooltip
+          title={
+            row.patientIsActive ? (
+              row.patientName
+            ) : (
+              'This patient has been inactived.'
+            )
+          }
+        >
+          <span>
+            {!row.patientIsActive && (
+              <Warining color='error' style={{ marginRight: 5 }} />
+            )}
+            {row.patientName}
+          </span>
+        </Tooltip>
+      )
+    },
   },
   {
     columnName: 'diagnosis',

@@ -231,7 +231,7 @@ const schemaSchemes = {
           return st.code === 'FLEXIMEDI'
         },
         then: Yup.date().max(moment().subtract(65, 'years'), 
-        'Payer DOB must be equal or more than 65 for Flexi-Medisave'),
+        'Payer DOB must be greater than or equal to 65 for Flexi-Medisave'),
       }),
     }),
   ),

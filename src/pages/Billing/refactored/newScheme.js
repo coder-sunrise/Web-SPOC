@@ -165,7 +165,7 @@ const Scheme = ({
       type: 'currency',
       width: 150,
       currency: true,
-      isDisabled: (row) => _isConfirmed,// || !row.isClaimable,
+      isDisabled: (row) => _isConfirmed || !row.isClaimable, // latter is for drug mixture
     },
   ]
 
@@ -262,6 +262,7 @@ const Scheme = ({
             />
             )}
             {_isConfirmed && !payerName && !payer && <span>{name}</span>}
+            {payerTypeFK === INVOICE_PAYER_TYPE.COMPANY && _isEditing && <span>{name}</span>}
             {payerTypeFK === INVOICE_PAYER_TYPE.PAYERACCOUNT && <span>{name} - {payerName || payer.name}</span>}
           </span>
         </GridItem>

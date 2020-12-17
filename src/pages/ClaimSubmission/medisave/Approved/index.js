@@ -159,24 +159,7 @@ class ApprovedMedisave extends React.Component {
           dispatch={dispatch}
           values={values}
           modelsName='medisaveClaimSubmissionApproved'
-        >
-          <GridItem md={12}>
-            <FastField
-              name='chasClaimStatusCode'
-              render={(args) => {
-                return (
-                  <Select
-                    label={formatMessage({
-                      id: 'claimsubmission.invoiceClaim.claimStatus',
-                    })}
-                    options={approvedStatus}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-        </BaseSearchBar>{' '}
+        />{' '}
         <LoadingWrapper linear loading={isLoading} text='Get status...'>
           <GridContainer>
             <GridItem md={12}>

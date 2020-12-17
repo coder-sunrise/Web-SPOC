@@ -20,6 +20,7 @@ import {
   notification,
 } from '@/components'
 import Yup from '@/utils/yup'
+import { calculateAgeFromDOB } from '@/utils/dateUtils'
 
 const styles = (theme) => ({
   container: {
@@ -105,10 +106,10 @@ const styles = (theme) => ({
         then : Yup.array().min(1,'At least two diagnosis / one diagnosis with one complication for Chronic Tier 2'),
         otherwise : Yup.array().min(0,'Not Required'),
       }),
-    selectedChargeCode: Yup.number().when('schemeTypeFK',{ 
-      is:(schemeTypeFK) => this.isMedisave(schemeTypeFK),
-      then: Yup.number().required('Charge code is required.'),
-    }),
+    // selectedChargeCode: Yup.number().when('schemeTypeFK',{ 
+    //   is:(schemeTypeFK) => this.isMedisave(schemeTypeFK),
+    //   then: Yup.number().required('Charge code is required.'),
+    // }),
   }),
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm } = props
@@ -163,21 +164,12 @@ class ClaimDetails extends Component {
 
     diagnosis.forEach((o) => {
       const selectedId = diagnosisSelections.find((i) => i === o.id)
-      if (selectedId) {
-        o.isSelected = true
-        chargeCodeSelections.push(o.chargeCode)
-      } else {
-        o.isSelected = false
-      }
+      o.isSelected = selectedId
+      if(o.isSelected) chargeCodeSelections.push(o.chargeCode)
+
+      o.isPrimary = selected.includes(`${o.chargeCode} - ${o.chargeCodeDescription}`)
     })
 
-    diagnosis.forEach((o) => {
-      if(selected.includes(`${o.chargeCode} - ${o.chargeCodeDescription}`))
-        o.isPrimary = true
-      else
-        o.isPrimary = false
-    })
-    
     const e = chargeCodeSelections.find((c) => selected.includes(c))
     if(this.isMedisave(values.schemeTypeFK) && !e)
     {
@@ -223,7 +215,6 @@ class ClaimDetails extends Component {
     const {
       classes,
       onClose,
-      renderClaimDetails,
       values,
       codetable,
       allowEdit,
@@ -285,7 +276,11 @@ class ClaimDetails extends Component {
                 <FastField
                   name='patientName'
                   render={(args) => (
-                    <TextField {...args} disabled label='Patient Name' />
+                    <TextField 
+                      value={`${values.patientName} (${values.gender}/${calculateAgeFromDOB(patientDob)})`}
+                      disabled
+                      label='Patient Name' 
+                    />
                   )}
                 />
               </GridItem>
@@ -342,195 +337,188 @@ class ClaimDetails extends Component {
               <h4>Claim Details</h4>
               <Divider />
             </GridItem>
-            {}
-            {renderClaimDetails !== undefined ? (
-              renderClaimDetails(readOnly)
-            ) : (!this.isMedisave(values.schemeTypeFK) && // CHAS //
-              <GridItem md={12} container>
-                <GridItem md={5}>
-                  <FastField
-                    name='schemeTypeDisplayValue'
-                    render={(args) => (
-                      <TextField {...args} disabled label='Scheme Type' />
-                    )}
-                  />
-                </GridItem>
-                <GridItem md={7} />
-                <GridItem md={5}>
-                  <FastField
-                    name='schemeCategoryDisplayValue'
-                    render={(args) => (
-                      <TextField {...args} disabled label='Scheme Category' />
-                    )}
-                  />
-                </GridItem>
-                <GridItem md={1} />
-                <GridItem md={2}>
-                  <FastField
-                    name='tier'
-                    render={(args) => (
-                      <TextField {...args} disabled label='Tier' />
-                    )}
-                  />
-                </GridItem>
-                <GridItem md={4} />
-                <GridItem md={5}>
-                  <Field
-                    name='diagnosisSelections'
-                    render={(args) => (
-                      <Select
-                        label='Diagnosis'
-                        disabled={!allowEdit}
-                        mode='multiple'
-                        options={diagnosis}
-                        disableAll={!allowEdit}
-                        labelField='diagnosisDescription'
-                        valueField='id'
-                        onChange={this.diagnosisOnChangeHandler}
-                        maxTagCount={allowEdit ? 0 : undefined}
-                        maxTagPlaceholder='diagnosis'
-                        {...args}
-                      />
-                    )}
-                  />
-                </GridItem>
-                <GridItem md={1} />
-                <GridItem md={5}>
-                  <Field
-                    name='selectedComplication'
-                    render={(args) => (
-                      <Select
-                        label='Complication'
-                        disabled
-                        mode='multiple'
-                        disableAll
-                        options={complicationList}
-                        labelField='complicationDescription'
-                        valueField='id'
-                        {...args}
-                      />
-                    )}
-                  />
-                </GridItem>
-                <GridItem md={5}>
-                  <FastField
-                    name='claimAmt'
-                    render={(args) => (
-                      <NumberInput
-                        {...args}
-                        disabled
-                        currency
-                        label='Claim Amount'
-                      />
-                    )}
-                  />
-                </GridItem>
-                <GridItem md={7} />
+            {!this.isMedisave(values.schemeTypeFK) && // CHAS //
+            <GridItem md={12} container>
+              <GridItem md={5}>
+                <FastField
+                  name='schemeTypeDisplayValue'
+                  render={(args) => (
+                    <TextField {...args} disabled label='Scheme Type' />
+                  )}
+                />
               </GridItem>
-            )}
-            {renderClaimDetails !== undefined ? (
-              renderClaimDetails(readOnly)
-            ) : (this.isMedisave(values.schemeTypeFK) && // MEDISAVE //
-              <GridItem md={12} container>
-                <GridItem md={5}>
-                  <FastField
-                    name='schemeTypeDisplayValue'
-                    render={(args) => (
-                      <TextField {...args} disabled label='Scheme Type' />
-                    )}
-                  />
-                </GridItem>
-                <GridItem md={1} />
-                <GridItem md={5}>
-                  <FastField
-                    name='status'
-                    render={(args) => (
-                      <TextField {...args} disabled label='Status' />
-                    )}
-                  />
-                </GridItem>
-                <GridItem md={1} />
-                <GridItem md={5}>
-                  <FastField
-                    name='payerName'
-                    render={(args) => (
-                      <TextField {...args} disabled label='Payer Name' />
-                    )}
-                  />
-                </GridItem>
-                <GridItem md={1} />
-                <GridItem md={5}>
-                  <DatePicker
-                    disabled
-                    label='Payer DOB'
-                    format={dateFormatLong}
-                    value={values.payerDob}
-                  />
-                </GridItem>
-                <GridItem md={1} />
-                <GridItem md={5}>
-                  <FastField
-                    name='payerAccountNo'
-                    render={(args) => (
-                      <TextField {...args} disabled label='Payer Account No.' />
-                    )}
-                  />
-                </GridItem>
-                <GridItem md={7} />
-                <GridItem md={5}>
-                  <Field
-                    name='diagnosisSelections'
-                    render={(args) => (
-                      <Select
-                        label='Diagnosis'
-                        disabled={!allowEdit}
-                        mode='multiple'
-                        options={diagnosis}
-                        disableAll// ={!allowEdit}
-                        labelField='diagnosisDescription'
-                        valueField='id'
-                        // onChange={this.diagnosisOnSelectHandler}
-                        maxTagCount={allowEdit ? 3 : undefined}
-                        maxTagPlaceholder='diagnosis'
-                        {...args}
-                      />
-                    )}
-                  />
-                </GridItem>
-                <GridItem md={7} />
-                <GridItem md={5}>
-                  <Field
-                    name='selectedChargeCode'
-                    render={(args) => (
-                      <Select
-                        label='Charge Code'
-                        disabled={!allowEdit}
-                        disableAll
-                        options={chargeCodeList}
-                        labelField='chargeCodeDescription'
-                        valueField='id'
-                        {...args}
-                      />
-                    )}
-                  />
-                </GridItem>
-                <GridItem md={7} />
-                <GridItem md={5}>
-                  <FastField
-                    name='claimAmt'
-                    render={(args) => (
-                      <NumberInput
-                        {...args}
-                        disabled
-                        currency
-                        label='Claim Amount'
-                      />
-                    )}
-                  />
-                </GridItem>
-                <GridItem md={7} />
+              <GridItem md={7} />
+              <GridItem md={5}>
+                <FastField
+                  name='schemeCategoryDisplayValue'
+                  render={(args) => (
+                    <TextField {...args} disabled label='Scheme Category' />
+                  )}
+                />
               </GridItem>
-            )}
+              <GridItem md={1} />
+              <GridItem md={2}>
+                <FastField
+                  name='tier'
+                  render={(args) => (
+                    <TextField {...args} disabled label='Tier' />
+                  )}
+                />
+              </GridItem>
+              <GridItem md={4} />
+              <GridItem md={5}>
+                <Field
+                  name='diagnosisSelections'
+                  render={(args) => (
+                    <Select
+                      label='Diagnosis'
+                      disabled={!allowEdit}
+                      mode='multiple'
+                      options={diagnosis}
+                      disableAll={!allowEdit}
+                      labelField='diagnosisDescription'
+                      valueField='id'
+                      onChange={this.diagnosisOnChangeHandler}
+                      maxTagCount={allowEdit ? 0 : undefined}
+                      maxTagPlaceholder='diagnosis'
+                      {...args}
+                    />
+                  )}
+                />
+              </GridItem>
+              <GridItem md={1} />
+              <GridItem md={5}>
+                <Field
+                  name='selectedComplication'
+                  render={(args) => (
+                    <Select
+                      label='Complication'
+                      disabled
+                      mode='multiple'
+                      disableAll
+                      options={complicationList}
+                      labelField='complicationDescription'
+                      valueField='id'
+                      {...args}
+                    />
+                  )}
+                />
+              </GridItem>
+              <GridItem md={5}>
+                <FastField
+                  name='claimAmt'
+                  render={(args) => (
+                    <NumberInput
+                      {...args}
+                      disabled
+                      currency
+                      label='Claim Amount'
+                    />
+                  )}
+                />
+              </GridItem>
+              <GridItem md={7} />
+            </GridItem>
+            }
+            {this.isMedisave(values.schemeTypeFK) && // MEDISAVE //
+            <GridItem md={12} container>
+              <GridItem md={5}>
+                <FastField
+                  name='schemeTypeDisplayValue'
+                  render={(args) => (
+                    <TextField {...args} disabled label='Scheme Type' />
+                  )}
+                />
+              </GridItem>
+              <GridItem md={1} />
+              <GridItem md={5}>
+                <FastField
+                  name='status'
+                  render={(args) => (
+                    <TextField {...args} disabled label='Claim Status' />
+                  )}
+                />
+              </GridItem>
+              <GridItem md={1} />
+              <GridItem md={5}>
+                <FastField
+                  name='payerName'
+                  render={(args) => (
+                    <TextField {...args} disabled label='Payer Name' />
+                  )}
+                />
+              </GridItem>
+              <GridItem md={1} />
+              <GridItem md={5}>
+                <DatePicker
+                  disabled
+                  label='Payer DOB'
+                  format={dateFormatLong}
+                  value={values.payerDob}
+                />
+              </GridItem>
+              <GridItem md={1} />
+              <GridItem md={5}>
+                <FastField
+                  name='payerAccountNo'
+                  render={(args) => (
+                    <TextField {...args} disabled label='Payer Account No.' />
+                  )}
+                />
+              </GridItem>
+              <GridItem md={7} />
+              <GridItem md={5}>
+                <Field
+                  name='diagnosisSelections'
+                  render={(args) => (
+                    <Select
+                      label='Diagnosis'
+                      disabled={!allowEdit}
+                      mode='multiple'
+                      options={diagnosis}
+                      disableAll// ={!allowEdit}
+                      labelField='diagnosisDescription'
+                      valueField='id'
+                      // onChange={this.diagnosisOnSelectHandler}
+                      maxTagCount={allowEdit ? 3 : undefined}
+                      maxTagPlaceholder='diagnosis'
+                      {...args}
+                    />
+                  )}
+                />
+              </GridItem>
+              <GridItem md={7} />
+              <GridItem md={5}>
+                <Field
+                  name='selectedChargeCode'
+                  render={(args) => (
+                    <Select
+                      label='Charge Code'
+                      disabled={!allowEdit}
+                      disableAll
+                      options={chargeCodeList}
+                      {...args}
+                    />
+                  )}
+                />
+              </GridItem>
+              <GridItem md={7} />
+              <GridItem md={5}>
+                <FastField
+                  name='claimAmt'
+                  render={(args) => (
+                    <NumberInput
+                      {...args}
+                      disabled
+                      currency
+                      label='Claim Amount'
+                    />
+                  )}
+                />
+              </GridItem>
+              <GridItem md={7} />
+            </GridItem>
+            }
             {values.status === 'Draft' && 
             <GridItem md={12}>
               <font color='red'>

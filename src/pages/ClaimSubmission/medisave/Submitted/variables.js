@@ -1,17 +1,22 @@
 import { Tooltip } from '@/components'
+import Warining from '@material-ui/icons/Error'
 
 export const SubmittedMedisaveColumns = [
   {
     name: 'hrnNo',
-    title: 'HRN No',
+    title: 'HRN No.',
   },
   {
     name: 'submissionDate',
     title: 'Submission Date',
   },
   {
+    name: 'visitDate',
+    title: 'Visit Date',
+  },
+  {
     name: 'patientAccountNo',
-    title: 'Account No',
+    title: 'Account No.',
   },
   {
     name: 'patientName',
@@ -69,10 +74,36 @@ export const SubmittedMedisaveColumnExtensions = [
     width: 145,
     sortBy: 'Hrn',
   },
+  { columnName: 'visitDate', type: 'date', width: 100 },
+  { columnName: 'invoiceDate', type: 'date', width: 120 },
+  { columnName: 'chargeCode', width: 120 },
   { columnName: 'submissionDate', type: 'date', width: 140 },
   {
     columnName: 'visitDoctorName',
     sortBy: 'DoctorProfileFKNavigation.ClinicianProfile.Name',
+  },
+  {
+    columnName: 'patientName',
+    render: (row) => {
+      return (
+        <Tooltip
+          title={
+            row.patientIsActive ? (
+              row.patientName
+            ) : (
+              'This patient has been inactived.'
+            )
+          }
+        >
+          <span>
+            {!row.patientIsActive && (
+              <Warining color='error' style={{ marginRight: 5 }} />
+            )}
+            {row.patientName}
+          </span>
+        </Tooltip>
+      )
+    },
   },
   {
     columnName: 'diagnosis',
@@ -97,8 +128,6 @@ export const SubmittedMedisaveColumnExtensions = [
     width: 145,
     sortBy: 'schemeCategory',
   },
-  { columnName: 'visitDate', type: 'date' },
-  { columnName: 'invoiceDate', type: 'date' },
   {
     columnName: 'invoiceAmount',
     type: 'currency',
@@ -116,5 +145,6 @@ export const SubmittedMedisaveColumnExtensions = [
     type: 'currency',
     currency: true,
     sortBy: 'chasClaimAmt',
+    width: 145,
   },
 ]

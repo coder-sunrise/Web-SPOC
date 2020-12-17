@@ -692,7 +692,7 @@ class Banner extends PureComponent {
                     <span style={{ bottom: -2 }}>
                       {entity.isActive &&
                       (entity.patientScheme || [])
-                        .filter((o) => o.schemeTypeFK !== 15).length > 0 && (
+                        .filter((o) => o.schemeTypeFK <= 6 || this.isMedisave(o.schemeTypeFK)).length > 0 && (
                         <IconButton onClick={this.refreshGovtBalance}>
                           <Refresh />
                         </IconButton>
@@ -728,9 +728,7 @@ class Banner extends PureComponent {
                               </div>
                               {this.isMedisave(schemeData.schemeTypeFK) && 
                                 <div>
-                                  Payer:&nbsp;
-                                  {schemeData.payerName}&nbsp;
-                                  [{schemeData.payerAccountNo}]
+                                  Payer: {schemeData.payerName} [{schemeData.payerAccountNo}]
                                 </div>
                               }
                               <div>

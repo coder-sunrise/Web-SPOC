@@ -221,7 +221,7 @@ export default compose(
 
       inventoryVaccination_MedisaveVaccination: Yup.array().compact((v) => v.isDeleted).of(
         Yup.object().shape({
-          medisaveVaccinationFK: Yup.string().required(),
+          medisaveVaccinationFK: Yup.number().required(),
           isDefault: Yup.boolean(),
         })
         
