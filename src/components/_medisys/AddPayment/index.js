@@ -364,18 +364,15 @@ class AddPayment extends Component {
       patient,
       showPaymentDate,
       invoicePayerName = '',
-      showReferrenceNo = false,
     } = this.props
     const { paymentList } = values
     const { bizSessionList, paymentModes } = this.state
-
     return (
       <div>
         <PayerHeader
           invoicePayerName={invoicePayerName}
           invoice={invoice}
           patient={patient}
-          showReferrenceNo={showReferrenceNo}
           outstandingAfterPayment={values.outstandingAfterPayment}
         />
         <React.Fragment>

@@ -132,19 +132,17 @@ class PaymentDetails extends Component {
           totalClaims: undefined,
         }
         let invoicePayerName = ''
-        let showReferrenceNo = invoicePayer.payerTypeFK === 1
-        if (invoicePayer.payerTypeFK === 1)
+        if (invoicePayer.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT)
           invoicePayerName = invoicePayer.patientName
-        if (invoicePayer.payerTypeFK === 2)
+        if (invoicePayer.payerTypeFK === INVOICE_PAYER_TYPE.SCHEME)
           invoicePayerName = invoicePayer.payerType
-        if (invoicePayer.payerTypeFK === 4)
+        if (invoicePayer.payerTypeFK === INVOICE_PAYER_TYPE.COMPANY)
           invoicePayerName = invoicePayer.companyName
         this.setState({
           showAddPayment: true,
           selectedInvoicePayerFK: invoicePayerFK,
           invoicePayerName,
           invoicePayerPayment,
-          showReferrenceNo,
         })
       }
       showAddPayment()
@@ -393,7 +391,6 @@ class PaymentDetails extends Component {
       invoicePayerName,
       invoicePayerPayment,
       showAddTransfer,
-      showReferrenceNo,
     } = this.state
 
     const transferProps = {
@@ -451,7 +448,6 @@ class PaymentDetails extends Component {
             onClose={this.closeAddPaymentModal}
             invoicePayerName={invoicePayerName}
             invoicePayment={[]} 
-            showReferrenceNo={showReferrenceNo}
             showPaymentDate
             invoice={{
               ...invoicePayerPayment, 

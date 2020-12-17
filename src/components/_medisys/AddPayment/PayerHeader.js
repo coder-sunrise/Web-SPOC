@@ -1,6 +1,7 @@
 import React from 'react'
 // material ui
 import { withStyles } from '@material-ui/core'
+import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 // common components
 import {
   GridContainer,
@@ -27,9 +28,9 @@ const PayerHeader = ({
   invoice,
   invoicePayerName,
   outstandingAfterPayment,
-  showReferrenceNo,
 }) => {
   const { totalClaim } = invoice
+  const showReferrenceNo = invoice.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT
   const payerColumnConfig = showReferrenceNo ? { md: 6 } : { md: 10 }
   return (
     <div>
