@@ -330,7 +330,6 @@ class PatientInfoSideBanner extends PureComponent {
       [classes.isInActive]: !entity || !entity.isActive,
     })
 
-    console.log('entity.schemePayer', entity.schemePayer)
     return entity && entity.id ? (
       <React.Fragment>
         <h4 className={entityNameClass}>
