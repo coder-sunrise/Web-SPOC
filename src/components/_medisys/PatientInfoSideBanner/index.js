@@ -43,9 +43,10 @@ class PatientInfoSideBanner extends PureComponent {
         )
         return schemeData
       })
-      this.refreshMedisaveBalance(
-        entity.schemePayer
-      )
+      if(entity.schemePayer.length > 0)
+        this.refreshMedisaveBalance(
+          entity.schemePayer
+        )
     }
     if (allowChangePatientStatus && entity)
       this.checkPatientIntoActiveSession(entity.id)
