@@ -110,6 +110,10 @@ const withWebSocket = () => (Component) => {
             }),
           ),
         )
+        if (result)
+          notification.success({
+            message: `Job sent to the printer.`,
+          })
         return result
       }
       return false
@@ -125,10 +129,6 @@ const withWebSocket = () => (Component) => {
             }),
           ),
         )
-        if (result)
-          notification.success({
-            message: `Job sent to the printer.`,
-          })
         return result
       }
       return false
