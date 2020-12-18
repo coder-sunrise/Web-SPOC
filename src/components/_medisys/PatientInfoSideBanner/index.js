@@ -304,8 +304,8 @@ class PatientInfoSideBanner extends PureComponent {
       balance: balanceData.balance >= 0 ? balanceData.balance : '-',
       patientCoPaymentSchemeFK: balanceData.patientCopaymentSchemeFK,
       schemeTypeFK: schemePayer.schemeFK,
-      // validFrom: schemeData.validFrom,
-      // validTo: schemeData.validTo,
+      validFrom: schemeData.validFrom,
+      validTo: schemeData.validTo,
       statusDescription: errorData.statusDescription,
       isSuccessful: errorData.isSuccessful || '',
     }
@@ -330,6 +330,7 @@ class PatientInfoSideBanner extends PureComponent {
       [classes.isInActive]: !entity || !entity.isActive,
     })
 
+    console.log('entity.schemePayer', entity.schemePayer)
     return entity && entity.id ? (
       <React.Fragment>
         <h4 className={entityNameClass}>
