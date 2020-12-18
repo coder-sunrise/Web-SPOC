@@ -1032,23 +1032,8 @@ class PatientHistory extends Component {
           }
           let refractionFormDetails = {
             isRefractionForm: false,
-            eyeRefractionFormRemarks: '',
-            eyeRefractionFormTestRemarks: '',
-            eyeRefractionFormTenometryR: '',
-            eyeRefractionFormTenometryL: '',
             eyeRefractionFormDominanceL: false,
             eyeRefractionFormDominanceR: false,
-            eyeRefractionFormPupilSizeL: '',
-            eyeRefractionFormPupilSizeR: '',
-            eyeRefractionFormVanHerick: '',
-            eyeRefractionFormNearAddDOD: '',
-            eyeRefractionFormNearAddPHOD: '',
-            eyeRefractionFormNearAddNOD: '',
-            eyeRefractionFormNearAddcmOD: '',
-            eyeRefractionFormNearAddDOS: '',
-            eyeRefractionFormNearAddPHOS: '',
-            eyeRefractionFormNearAddNOS: '',
-            eyeRefractionFormNearAddcmOS: '',
           }
           if (isShowRefractionForm) {
             refractionFormDetails = this.getRefractionForm(current)
@@ -1059,26 +1044,8 @@ class PatientHistory extends Component {
             isAided: false,
             isOwnSpecs: false,
             isRefractionOn: false,
-            refractionOnRemarks: '',
-            nearVADOD: '',
-            nearVAPHOD: '',
-            nearVANOD: '',
-            nearVAcmOD: '',
-            nearVADOS: '',
-            nearVAPHOS: '',
-            nearVANOS: '',
-            nearVAcmOS: '',
             isNoSpec: false,
             specsAge: 0,
-            specSphereOD: '',
-            specCylinderOD: '',
-            specAxisOD: '',
-            specVaOD: '',
-            specSphereOS: '',
-            specCylinderOS: '',
-            specAxisOS: '',
-            specVaOS: '',
-            eyeVisualAcuityTestRemark: '',
           }
           if (isShowEyeVisualAcuityTest) {
             eyeVisualAcuityTestDetails = this.getEyeVisualAcuityTest(current)
