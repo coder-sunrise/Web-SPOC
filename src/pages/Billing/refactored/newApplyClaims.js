@@ -626,7 +626,7 @@ const ApplyClaims = ({
     } else if (
       !invoice.isBillingSaved &&
       claimableSchemes.length > 0 &&
-      invoicePayment.length === 0
+      invoicePayment.filter((o) => !o.isCancelled).length === 0
     ) {
       if(claimableSchemes.length > 0)
       {
