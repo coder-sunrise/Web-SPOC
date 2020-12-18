@@ -59,45 +59,14 @@ export default ({ current, codetable, dentalChartComponent }) => {
             )
           },
         },
-        { dataIndex: 'name', title: 'Treatment' },
-        {
-          dataIndex: 'toothNumber',
-          title: 'Tooth',
-          render: (text, row) => {
-            const treatmentList = treatments.filter((o) =>
-              cttreatment.find(
-                (m) =>
-                  m.id === o.action.dentalTreatmentFK &&
-                  m.displayValue === row.name,
-              ),
-            )
-            if (treatmentList.length === 0) return null
-            if (treatmentList[0].action.chartMethodTypeFK === 3) {
-              return (
-                <span>
-                  {_.sortedUniq(
-                    Object.values(
-                      _.groupBy(treatmentList, 'nodes'),
-                    ).map((o) => {
-                      const { nodes } = o[0]
-
-                      return `#${nodes[0]} - ${nodes[1]}`
-                    }),
-                  ).join(',')}
-                </span>
-              )
-            }
-            return (
-              <span>
-                {_.sortedUniq(treatmentList.map((o) => `#${o.toothNo}`)).join(
-                  ',',
-                )}
-              </span>
-            )
-          },
-        },
+        { dataIndex: 'name', title: 'Treatment', width: 300 },
         {
           dataIndex: 'description',
+          title: 'Tooth',
+          width: 200,
+        },
+        {
+          dataIndex: 'treatmentDescription',
           title: 'Treatment Description',
           render: (text) => {
             return (

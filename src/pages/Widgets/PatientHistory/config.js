@@ -156,7 +156,7 @@ export const categoryTypes = [
   {
     value: WIDGETS_ID.INVOICE,
     name: 'Invoice',
-    authority: 'finance',
+    authority: 'finance/invoicepayment',
   },
   {
     value: WIDGETS_ID.CONSULTATION_DOCUMENT,
@@ -166,7 +166,7 @@ export const categoryTypes = [
   {
     value: WIDGETS_ID.FORMS,
     name: 'Forms',
-    authority: 'queue.consultation.widgets.forms',
+    authority: 'patientdashboard.forms',
   },
   {
     value: WIDGETS_ID.ATTACHMENT,
