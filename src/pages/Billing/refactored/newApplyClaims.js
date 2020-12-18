@@ -147,6 +147,7 @@ const ApplyClaims = ({
     (editing, payer) => payer._isEditing || editing,
     false,
   )
+
   const shouldDisableAddClaim =
     tempInvoicePayer.filter(
       (invoicePayer) => invoicePayer.payerTypeFK === INVOICE_PAYER_TYPE.SCHEME
@@ -217,7 +218,7 @@ const ApplyClaims = ({
     }
 
     const returnInvoicePayers = newInvoicePayers ? newInvoicePayerList : newInvoicePayerAmt // end up replacing list
-    setTempInvoicePayer(returnInvoicePayers)
+    setTempInvoicePayer(returnInvoicePayers || [])
     incrementCommitCount()
     return returnInvoicePayers
   }
@@ -393,7 +394,7 @@ const ApplyClaims = ({
       setInitialState(newInvoicePayers)
       return newInvoicePayers
     }
-    return setTempInvoicePayer(newTempInvoicePayer)
+    return setTempInvoicePayer(newTempInvoicePayer || [])
   }
 
   const checkExistingOldPayerItem = () => {
@@ -621,7 +622,7 @@ const ApplyClaims = ({
         }
       }
       const newInvoicePayer = payerList.map(mapResponseToInvoicePayers)
-      setTempInvoicePayer(newInvoicePayer)
+      setTempInvoicePayer(newInvoicePayer || [])
       setInitialState(newInvoicePayer)
     } else if (
       !invoice.isBillingSaved &&
@@ -633,7 +634,7 @@ const ApplyClaims = ({
         const invoicePayerList = constructAvailableClaims(claimableSchemes.filter(c => !c[0].schemePayerFK))
         const newInvoicePayers = processAvailableClaims([], invoicePayerList)
         setInitialState(newInvoicePayers)
-        setTempInvoicePayer(newInvoicePayers)
+        setTempInvoicePayer(newInvoicePayers || [])
         
       }
     } else {
@@ -668,12 +669,12 @@ const ApplyClaims = ({
         const invoicePayerList = constructAvailableClaims(refreshedClaimableSchemes.filter(c => !c[0].schemePayerFK))
         const newInvoicePayers = processAvailableClaims([], invoicePayerList)
         setInitialState(newInvoicePayers)
-        setTempInvoicePayer(newInvoicePayers)
+        setTempInvoicePayer(newInvoicePayers || [])
 
       } else {
         setCurEditInvoicePayerBackup(undefined)
         // setInitialState([])
-        setTempInvoicePayer(_newTempInvoicePayer)
+        setTempInvoicePayer(_newTempInvoicePayer || [])
       }
     },
     [

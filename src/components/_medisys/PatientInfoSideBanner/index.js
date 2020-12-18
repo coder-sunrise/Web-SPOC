@@ -304,8 +304,8 @@ class PatientInfoSideBanner extends PureComponent {
       balance: balanceData.balance >= 0 ? balanceData.balance : '-',
       patientCoPaymentSchemeFK: balanceData.patientCopaymentSchemeFK,
       schemeTypeFK: schemePayer.schemeFK,
-      // validFrom: schemeData.validFrom,
-      // validTo: schemeData.validTo,
+      validFrom: schemeData.validFrom,
+      validTo: schemeData.validTo,
       statusDescription: errorData.statusDescription,
       isSuccessful: errorData.isSuccessful || '',
     }
