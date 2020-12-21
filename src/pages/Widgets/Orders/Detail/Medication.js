@@ -32,6 +32,7 @@ import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 import { currencySymbol } from '@/utils/config'
 import Authorized from '@/utils/Authorized'
+import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
 import LowStockInfo from './LowStockInfo'
 import AddFromPast from './AddMedicationFromPast'
 
@@ -130,12 +131,6 @@ const getCautions = (
       v.isExactAmount = v.adjType !== 'Percentage'
     }
 
-    // v.corPrescriptionItemPrecaution =
-    //   v.corPrescriptionItemPrecaution && v.corPrescriptionItemPrecaution[0]
-    //     ? v.corPrescriptionItemPrecaution
-    //     : [
-    //         {},
-    //       ]
     let sequence = 0
     const newCorPrescriptionItemPrecaution = (v.corPrescriptionItemPrecaution ||
       [])
@@ -203,10 +198,6 @@ const getCautions = (
       'The amount should be more than 0.00',
     ),
     type: Yup.string(),
-    // inventoryMedicationFK: Yup.number().when('type', {
-    //   is: (val) => val !== '5',
-    //   then: Yup.number().required(),
-    // }),
     inventoryMedicationFK: Yup.number().when(
       [
         'type',
@@ -222,11 +213,6 @@ const getCautions = (
       is: (val) => val === '5',
       then: Yup.string().required(),
     }),
-    // corPrescriptionItemPrecaution: Yup.array().of(
-    //   Yup.object().shape({
-    //     medicationPrecautionFK: Yup.number().required(),
-    //   }),
-    // ),
     corPrescriptionItemInstruction: Yup.array().of(
       Yup.object().shape({
         sequence: Yup.number().required(),
@@ -289,9 +275,6 @@ const getCautions = (
     }
 
     const instruction = getInstruction(values.corPrescriptionItemInstruction)
-    // const corPrescriptionItemPrecaution = values.corPrescriptionItemPrecaution.filter(
-    //   (i) => i.medicationPrecautionFK !== undefined,
-    // )
 
     const corPrescriptionItemPrecaution = values.corPrescriptionItemPrecaution.filter(
       (i) => i.medicationPrecautionFK !== undefined,
@@ -1120,8 +1103,6 @@ class Medication extends PureComponent {
         {
           columnName: 'inventoryMedicationFK',
           type: 'codeSelect',
-          // code: 'inventorymedication',
-          // labelField: 'displayValue',
           labelField: 'combinDisplayValue',
           options: this.getMedicationOptions,
           sortingEnabled: false,
@@ -1240,6 +1221,7 @@ class Medication extends PureComponent {
       footer,
       setFieldValue,
       setDisable,
+      from,
     } = this.props
 
     const { isEditMedication, cautions = [] } = values
@@ -1252,11 +1234,13 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
- 
-    const totalPriceReadonly = Authorized.check('queue.consultation.modifyorderitemtotalprice').rights !== 'enable'
+
+    const totalPriceReadonly =
+      Authorized.check('queue.consultation.modifyorderitemtotalprice')
+        .rights !== 'enable'
     const accessRight = authorityCfg[values.type]
     return (
-      <Authorized authority={accessRight}>
+      <Authorized authority={GetOrderItemAccessRight(from, accessRight)}>
         <div>
           <GridContainer>
             <GridItem xs={6}>
@@ -1295,7 +1279,6 @@ class Medication extends PureComponent {
                           <CodeSelect
                             temp
                             label='Medication Name'
-                            // code='inventorymedication'
                             labelField='combinDisplayValue'
                             onChange={this.changeMedication}
                             options={this.getMedicationOptions()}
@@ -1713,8 +1696,6 @@ class Medication extends PureComponent {
                               'corPrescriptionItemInstruction',
                               'Add step dose',
                               {
-                                // drugFrequencyFK: 1,
-                                // duration: 1,
                                 stepdose: 'AND',
                                 sequence: activeRows.length + 1,
                               },
@@ -1771,13 +1752,6 @@ class Medication extends PureComponent {
                             : val.sequence === cor.sequence,
                       )
 
-                      // const i = values.corPrescriptionItemPrecaution.findIndex(
-                      //   (item) =>
-                      //     !val.id
-                      //       ? _.isEqual(item, val)
-                      //       : item.sequence === val.sequence,
-                      // )
-
                       return (
                         <div key={i}>
                           <GridContainer>
@@ -1804,8 +1778,6 @@ class Medication extends PureComponent {
                                         style={{
                                           paddingLeft: 15,
                                         }}
-                                        // label='Precaution'
-                                        // simple
                                         code='ctmedicationprecaution'
                                         labelField='displayValue'
                                         onChange={(v, option = {}) => {
@@ -1817,10 +1789,6 @@ class Medication extends PureComponent {
                                             `corPrescriptionItemPrecaution[${i}].precautionCode`,
                                             option.code,
                                           )
-                                          // setFieldValue(
-                                          //   `corPrescriptionItemPrecaution[${i}].sequence`,
-                                          //   i,
-                                          // )
                                         }}
                                         {...args}
                                       />
@@ -1933,10 +1901,8 @@ class Medication extends PureComponent {
                         marginLeft: theme.spacing(7),
                         paddingRight: theme.spacing(6),
                       }}
-                      // formatter={(v) => `${v} Bottle${v > 1 ? 's' : ''}`}
                       step={1}
                       min={0}
-                      // currency
                       onChange={() => {
                         setTimeout(() => {
                           this.setTotalPrice()
@@ -1951,14 +1917,9 @@ class Medication extends PureComponent {
           </GridContainer>
           <GridContainer>
             <GridItem xs={8} className={classes.editor}>
-              {/* <Button link className={classes.editorBtn}>
-              Add Diagnosis
-            </Button> */}
-
               <FastField
                 name='remarks'
                 render={(args) => {
-                  // return <RichEditor placeholder='Remarks' {...args} />
                   return (
                     <TextField
                       multiline
@@ -1985,7 +1946,10 @@ class Medication extends PureComponent {
                         this.updateTotalPrice(e.target.value)
                       }}
                       min={0}
-                      disabled={values.isExternalPrescription || (totalPriceReadonly && !openPrescription)}
+                      disabled={
+                        values.isExternalPrescription ||
+                        (totalPriceReadonly && !openPrescription)
+                      }
                       currency
                       {...args}
                     />
@@ -2009,7 +1973,6 @@ class Medication extends PureComponent {
                     return (
                       <Checkbox
                         label='External Prescription'
-                        // fullWidth={false}
                         {...args}
                         onChange={(e) => {
                           if (e.target.value) {
@@ -2068,7 +2031,10 @@ class Medication extends PureComponent {
                           checkedChildren='-'
                           unCheckedChildren='+'
                           label=''
-                          disabled={values.isExternalPrescription || (totalPriceReadonly && !openPrescription)}
+                          disabled={
+                            values.isExternalPrescription ||
+                            (totalPriceReadonly && !openPrescription)
+                          }
                           onChange={() => {
                             setTimeout(() => {
                               this.onAdjustmentConditionChange()
@@ -2093,7 +2059,10 @@ class Medication extends PureComponent {
                           }}
                           currency
                           label='Adjustment'
-                          disabled={values.isExternalPrescription || (totalPriceReadonly && !openPrescription)}
+                          disabled={
+                            values.isExternalPrescription ||
+                            (totalPriceReadonly && !openPrescription)
+                          }
                           onChange={() => {
                             setTimeout(() => {
                               this.onAdjustmentConditionChange()
@@ -2112,7 +2081,10 @@ class Medication extends PureComponent {
                         percentage
                         max={100}
                         label='Adjustment'
-                        disabled={values.isExternalPrescription || (totalPriceReadonly && !openPrescription)}
+                        disabled={
+                          values.isExternalPrescription ||
+                          (totalPriceReadonly && !openPrescription)
+                        }
                         onChange={() => {
                           setTimeout(() => {
                             this.onAdjustmentConditionChange()
@@ -2135,7 +2107,10 @@ class Medication extends PureComponent {
                         checkedChildren='$'
                         unCheckedChildren='%'
                         label=''
-                        disabled={values.isExternalPrescription || (totalPriceReadonly && !openPrescription)}
+                        disabled={
+                          values.isExternalPrescription ||
+                          (totalPriceReadonly && !openPrescription)
+                        }
                         onChange={() => {
                           setTimeout(() => {
                             this.onAdjustmentConditionChange()
@@ -2155,12 +2130,6 @@ class Medication extends PureComponent {
               <Field
                 name='totalAfterItemAdjustment'
                 render={(args) => {
-                  // if (
-                  //   orders.totalAfterItemAdjustment &&
-                  //   args.field.value !== orders.totalAfterItemAdjustment
-                  // ) {
-                  //   args.form.setFieldValue('totalAfterItemAdjustment', orders.totalAfterItemAdjustment)
-                  // }
                   return (
                     <NumberInput
                       label='Total After Adj'

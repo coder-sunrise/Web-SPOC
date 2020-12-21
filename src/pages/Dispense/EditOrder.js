@@ -179,18 +179,30 @@ class EditOrder extends Component {
             isInformType: true,
             customWidth: 'md',
             openConfirmContent: () => {
-              return <div>
-                <Warining style={{ width: '1.3rem', height: '1.3rem', marginLeft: '10px', color: 'red' }} />
-                <h3 style={{ marginLeft: '10px', display: 'inline-block' }}>Unable to save, total amount cannot be <span style={{ fontWeight: 400 }}>negative</span>.</h3>
-              </div>
+              return (
+                <div>
+                  <Warining
+                    style={{
+                      width: '1.3rem',
+                      height: '1.3rem',
+                      marginLeft: '10px',
+                      color: 'red',
+                    }}
+                  />
+                  <h3 style={{ marginLeft: '10px', display: 'inline-block' }}>
+                    Unable to save, total amount cannot be{' '}
+                    <span style={{ fontWeight: 400 }}>negative</span>.
+                  </h3>
+                </div>
+              )
             },
             openConfirmText: 'OK',
             onConfirmClose: () => {
               window.g_app._store.dispatch({
                 type: 'global/updateAppState',
                 payload: {
-                  customWidth: undefined
-                }
+                  customWidth: undefined,
+                },
               })
             },
           },
@@ -254,35 +266,35 @@ class EditOrder extends Component {
         <GridContainer>
           <GridItem xs={12} md={6}>
             <h5>Orders</h5>
-            <Order className={classes.orderPanel} status='' from='ca' />
+            <Order className={classes.orderPanel} status='' from='EditOrder' />
           </GridItem>
           <GridItem xs={12} md={6}>
             {formAccessRight &&
-              formAccessRight.rights !== 'hidden' && (
-                <div>
-                  <h5>
-                    <span style={{ display: 'inline-block' }}>Forms</span>
-                    <span className={classes.cdAddButton}>
-                      {cdWidget.toolbarAddon}
-                    </span>
-                  </h5>
-                  <Forms />
-                </div>
-              )}
-            {consultationDocumentAccessRight &&
-              consultationDocumentAccessRight.rights !== 'hidden' && (
-                <div>
-                  <h5>
-                    <span style={{ display: 'inline-block' }}>
-                      Consultation Document
+            formAccessRight.rights !== 'hidden' && (
+              <div>
+                <h5>
+                  <span style={{ display: 'inline-block' }}>Forms</span>
+                  <span className={classes.cdAddButton}>
+                    {cdWidget.toolbarAddon}
                   </span>
-                    <span className={classes.cdAddButton}>
-                      {cdWidget.toolbarAddon}
-                    </span>
-                  </h5>
-                  <ConsultationDocument forDispense />
-                </div>
-              )}
+                </h5>
+                <Forms />
+              </div>
+            )}
+            {consultationDocumentAccessRight &&
+            consultationDocumentAccessRight.rights !== 'hidden' && (
+              <div>
+                <h5>
+                  <span style={{ display: 'inline-block' }}>
+                    Consultation Document
+                  </span>
+                  <span className={classes.cdAddButton}>
+                    {cdWidget.toolbarAddon}
+                  </span>
+                </h5>
+                <ConsultationDocument forDispense />
+              </div>
+            )}
             <GridItem xs={12} md={6}>
               <FastField
                 name='dispenseAcknowledgement.editDispenseReasonFK'
