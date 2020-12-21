@@ -14,9 +14,9 @@ import {
   Tooltip,
   dateFormatLong,
   Popper,
+  NumberInput,
 } from '@/components'
 import styles from './styles'
-import { currencyFormatter } from '@/utils/utils'
 import PaymentDetails from './PaymentDetails'
 
 const PaymentRow = ({
@@ -104,46 +104,46 @@ const PaymentRow = ({
         <GridItem md={2}>
           {getIconByType()}
           {type === 'Payment' ||
-          ([
-            'Credit Note',
-            'Write Off',
-          ].includes(type) &&
-            isCancelled) ? (
-            <Popper
-              className={classNames({
-                [classes.pooperResponsive]: true,
-                [classes.pooperNav]: true,
-              })}
-              style={{
-                width: 450,
-                border: '1px solid',
-                zIndex: 9999,
-              }}
-              disabledTransition
-              placement='right'
-              overlay={
-                <PaymentDetails
-                  paymentModeDetails={sortedInvoicePaymentModes}
-                  setHoveredRowId={setHoveredRowId}
-                  id={id}
-                  cancelReason={cancelReason}
-                  isCancelled={isCancelled}
-                />
-              }
-            >
-              <span
-                style={paymentTextStyle}
-                onMouseOver={() => setHoveredRowId(id)}
-                onMouseOut={() => setHoveredRowId(null)}
-                onFocus={() => 0}
-                onBlur={() => 0}
+            ([
+              'Credit Note',
+              'Write Off',
+            ].includes(type) &&
+              isCancelled) ? (
+              <Popper
+                className={classNames({
+                  [classes.pooperResponsive]: true,
+                  [classes.pooperNav]: true,
+                })}
+                style={{
+                  width: 450,
+                  border: '1px solid',
+                  zIndex: 9999,
+                }}
+                disabledTransition
+                placement='right'
+                overlay={
+                  <PaymentDetails
+                    paymentModeDetails={sortedInvoicePaymentModes}
+                    setHoveredRowId={setHoveredRowId}
+                    id={id}
+                    cancelReason={cancelReason}
+                    isCancelled={isCancelled}
+                  />
+                }
               >
-                {type}
-              </span>
-            </Popper>
-          ) : (
-            <span>{type}</span>
-          )}
+                <span
+                  style={paymentTextStyle}
+                  onMouseOver={() => setHoveredRowId(id)}
+                  onMouseOut={() => setHoveredRowId(null)}
+                  onFocus={() => 0}
+                  onBlur={() => 0}
+                >
+                  {type}
+                </span>
+              </Popper>
+            ) : (
+              <span>{type}</span>
+            )}
         </GridItem>
         <GridItem md={2}>
           <span>
@@ -157,7 +157,7 @@ const PaymentRow = ({
         <GridItem md={6} container justify='flex-end' alignItems='center'>
           <GridItem>
             <span className={classes.currency}>
-              {amount ? currencyFormatter(amount) : 'N/A'}
+              {amount ? <NumberInput text currency value={amount} /> : 'N/A'}
             </span>
           </GridItem>
           <GridItem>
@@ -213,10 +213,10 @@ const PaymentRow = ({
             <GridItem>
               <span className={classes.currency} style={{ paddingRight: 40 }}>
                 {patientDepositTransaction.amount ? (
-                  currencyFormatter(patientDepositTransaction.amount)
+                  <NumberInput text currency value={patientDepositTransaction.amount} />
                 ) : (
-                  'N/A'
-                )}
+                    'N/A'
+                  )}
               </span>
             </GridItem>
           </GridItem>
