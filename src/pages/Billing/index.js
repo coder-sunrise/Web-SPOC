@@ -26,6 +26,7 @@ import Authorized from '@/utils/Authorized'
 // sub component
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 import DispenseDetails from '@/pages/Dispense/DispenseDetails/WebSocketWrapper'
+import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
 import { ReportsOnCompletePaymentOption } from '@/utils/codes'
 import ApplyClaims from './refactored/newApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
@@ -161,45 +162,6 @@ class Billing extends Component {
     isExistingOldPayerItem: false,
   }
 
-  /* componentWillMount () {
-    const { billing, history, dispatch } = this.props
-    const { patientID } = billing
-    const { query } = history.location
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'copaymentscheme',
-      },
-    })
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventoryvaccination',
-      },
-    })
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctschemetype',
-      },
-    })
-    this.props.dispatch({
-      type: 'billing/updateState',
-      payload: {
-        entity: null,
-        shouldRefreshOrder: false,
-      },
-    })
-    if (query.vid)
-      dispatch({
-        type: 'billing/query',
-        payload: {
-          id: query.vid,
-        },
-      })
-  } */
-
-
   componentWillUnmount () {
     this.props.dispatch({
       type: 'billing/updateState',
@@ -256,13 +218,12 @@ class Billing extends Component {
       },
     })
     if (query.vid)
-    await dispatch({
+      await dispatch({
         type: 'billing/query',
         payload: {
           id: query.vid,
         },
       })
-
   }
 
   onPrintRef = (ref) => {
@@ -951,6 +912,7 @@ class Billing extends Component {
             reportParameters={reportPayload.reportParameters}
           />
         </CommonModal>
+        <ViewPatientHistory top='239px' />
       </LoadingWrapper>
     )
   }
