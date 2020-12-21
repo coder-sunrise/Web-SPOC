@@ -208,7 +208,6 @@ const { qtyFormat } = config
           vaccinationGivenDate: moment().format(serverDateTimeFormatFull),
           vaccinationCode: inventoryVaccination.code,
           vaccinationName: inventoryVaccination.displayValue,
-          // vaccinationSequenceDisplayValue:
           usageMethodFK: inventoryVaccination.vaccinationUsageFK,
           usageMethodCode: vaccinationusage ? vaccinationusage.code : undefined,
           usageMethodDisplayValue: vaccinationusage
@@ -250,11 +249,7 @@ const { qtyFormat } = config
       const serviceCenterService = service.ctServiceCenter_ServiceNavigation[0]
       const serviceCenter = serviceCenterService.serviceCenterFKNavigation
       let item
-      if (
-        service.isActive === true &&
-        // serviceCenterService.isActive === true &&
-        serviceCenter.isActive === true
-      ) {
+      if (service.isActive === true && serviceCenter.isActive === true) {
         item = {
           isActive: serviceCenter.isActive && service.isActive,
           serviceCenterServiceFK: serviceCenterService.id,
@@ -269,7 +264,6 @@ const { qtyFormat } = config
           totalAfterOverallAdjustment:
             orderSetItem.unitPrice * orderSetItem.quantity,
           orderSetCode,
-          // priority:,
           serviceCode: service.code,
           serviceName: service.displayValue,
           serviceFK: service.id,
@@ -285,7 +279,6 @@ const { qtyFormat } = config
       if (inventoryConsumable.isActive === true) {
         item = {
           inventoryConsumableFK: inventoryConsumable.id,
-          // unitOfMeasurement:,
           isActive: inventoryConsumable.isActive,
           quantity: orderSetItem.quantity,
           unitPrice: orderSetItem.unitPrice,
@@ -486,13 +479,11 @@ class OrderSet extends PureComponent {
               type: '3',
               typeName:
                 orderTypes.find((type) => type.value === '3').name +
-                // o.service.ctServiceCenter_ServiceNavigation[0].isActive &&
                 (o.service.isActive &&
                 o.service.ctServiceCenter_ServiceNavigation[0]
                   .serviceCenterFKNavigation.isActive === true
                   ? ''
                   : ' (Inactive)'),
-              // o.service.ctServiceCenter_ServiceNavigation[0].isActive &&
               isActive:
                 o.service.isActive &&
                 o.service.ctServiceCenter_ServiceNavigation[0]
