@@ -886,7 +886,7 @@ class Banner extends PureComponent {
                 <Tooltip
                   title={
                     info.outstandingBalance ? (
-                      `${currencySymbol}${info.outstandingBalance.toFixed(2)}`
+                      `${currencySymbol}${_.round(info.outstandingBalance, 2)}`
                     ) : (
                       ''
                     )
@@ -898,7 +898,7 @@ class Banner extends PureComponent {
                     }}
                   >
                     {info.outstandingBalance ? (
-                      `${currencySymbol}${info.outstandingBalance.toFixed(2)}`
+                      <NumberInput text currency value={_.round(info.outstandingBalance, 2)} />
                     ) : (
                       '-'
                     )}
