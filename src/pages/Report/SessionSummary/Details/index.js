@@ -56,7 +56,7 @@ class SessionSummary extends ReportBase {
               </GridItem>
               <GridItem md={12} style={{ marginTop: '10px' }}>
                 <span style={{ display: 'inline-block', textAlign: 'left', fontWeight: '500', width: '160px' }}>Total Cash Collected:</span>
-                <NumberInput currency text value={(cashPayment.currentCollected + cashPayment.pastCollected) || 0} style={{ padding: '0px 8px', width: '100px', textAlign: 'right' }} />
+                <NumberInput currency text value={(cashPayment.currentCollected + cashPayment.pastCollected + cashPayment.currentCashRounding + cashPayment.pastCashRounding) || 0} style={{ padding: '0px 8px', width: '100px', textAlign: 'right' }} />
               </GridItem>
               <GridItem md={12}>
                 <span style={{ display: 'inline-block', textAlign: 'left', fontWeight: '500', width: '160px' }}>Total Cash Rounding:</span>
