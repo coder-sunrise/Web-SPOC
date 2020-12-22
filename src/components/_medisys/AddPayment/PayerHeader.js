@@ -31,7 +31,7 @@ const PayerHeader = ({
 }) => {
   const { totalClaim } = invoice
   const showReferrenceNo = invoice.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT
-  const payerColumnConfig = showReferrenceNo ? { md: 6 } : { md: 10 }
+  const payerColumnConfig = showReferrenceNo ? { md: 6 } : { md: 10 }  
   return (
     <div>
       <GridContainer justify='space-between' className={classes.payerHeader}>
@@ -50,7 +50,7 @@ const PayerHeader = ({
         )}
         {showReferrenceNo && (
           <GridItem md={2} className={classes.leftAlignText}>
-            <h5 style={{ marginTop: 0 }}>{patient.patientAccountNo}</h5>
+            <h5 style={{ marginTop: 0 }}>{patient.patientReferenceNo}</h5>
           </GridItem>
         )}
       </GridContainer>
