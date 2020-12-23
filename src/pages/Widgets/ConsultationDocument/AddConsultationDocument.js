@@ -34,13 +34,13 @@ import {
 } from '@/components'
 import { tagList } from '@/utils/codes'
 
+import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import ReferralLetter from './ReferralLetter'
 import Memo from './Memo'
 import MedicalCertificate from './MedicalCertificate'
 import CertificateAttendance from './CertificateAttendance'
 import Others from './Others'
 import VaccinationCertificate from './VaccinationCertificate'
-import { calculateAgeFromDOB } from '@/utils/dateUtils'
 
 const loadFromCodesConfig = {
   mapPrescriptions: (rows, codetable, patient, isExtPrescription = false) => {
@@ -105,8 +105,8 @@ const loadFromCodesConfig = {
       )
       return `<ul>
               <li><strong>${isExtPrescription
-                ? 'External Prescription'
-                : 'Medication'}</strong></li>
+          ? 'External Prescription'
+          : 'Medication'}</strong></li>
                ${rowHTMLs.join('')}
             </ul>`
     }
@@ -502,6 +502,7 @@ class AddConsultationDocument extends PureComponent {
           {type === '4' && <Others {...cfg} />}
           {type === '5' && <MedicalCertificate {...cfg} />}
           {type === '6' && <CertificateAttendance {...cfg} />}
+
         </div>
       </div>
     )
