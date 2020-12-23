@@ -29,6 +29,7 @@ class SalesList extends PureComponent {
       { name: 'documentNo', title: 'Invoice No.' },
       { name: 'qty', title: 'Qty' },
       { name: 'unitPrice', title: 'Unit Price' },
+      { name: 'adj', title: 'Adj.' },
       { name: 'revenueAMT', title: 'Revenue Amt.' },
       { name: 'cnamt', title: 'CN Amt.' },
     ]
@@ -36,6 +37,7 @@ class SalesList extends PureComponent {
       { columnName: 'date', type: 'date', sortingEnabled: false, width: 100 },
       { columnName: 'qty', type: 'number', sortingEnabled: false, width: 100 },
       { columnName: 'unitPrice', type: 'currency', currency: true, sortingEnabled: false, width: 140 },
+      { columnName: 'adj', type: 'currency', currency: true, sortingEnabled: false, width: 100 },
       { columnName: 'revenueAMT', type: 'currency', currency: true, sortingEnabled: false, width: 180, wordWrapEnabled: true },
       { columnName: 'cnamt', type: 'currency', currency: true, sortingEnabled: false, width: 180, wordWrapEnabled: true },
       { columnName: 'doctorName', sortingEnabled: false, wordWrapEnabled: true },
