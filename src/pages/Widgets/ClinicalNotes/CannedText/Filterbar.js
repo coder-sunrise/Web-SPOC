@@ -14,7 +14,7 @@ import { CANNED_TEXT_TYPE } from '@/utils/constants'
 
 const Filterbar = ({ handleSubmit, showType, setShowType, cannedTextTypeFK }) => {
   let options = []
-  if (cannedTextTypeFK !== CANNED_TEXT_TYPE.MEDICALCERTIFICATION) {
+  if (cannedTextTypeFK !== CANNED_TEXT_TYPE.MEDICALCERTIFICATE) {
     options = [{
       value: 'Self',
       label: 'My Canned Text',

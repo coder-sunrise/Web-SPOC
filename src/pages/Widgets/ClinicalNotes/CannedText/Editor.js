@@ -54,7 +54,7 @@ const Editor = ({
         </GridItem>
         <GridItem md={6}>
           <div>
-            {cannedTextTypeFK !== CANNED_TEXT_TYPE.MEDICALCERTIFICATION &&
+            {cannedTextTypeFK !== CANNED_TEXT_TYPE.MEDICALCERTIFICATE &&
               <div style={{ display: 'inline-Block' }}>
                 <FastField
                   name='isShared'
@@ -79,7 +79,7 @@ const Editor = ({
           </div>
         </GridItem>
         <GridItem md={12}>
-          {cannedTextTypeFK !== CANNED_TEXT_TYPE.MEDICALCERTIFICATION ?
+          {cannedTextTypeFK !== CANNED_TEXT_TYPE.MEDICALCERTIFICATE ?
             <FastField
               name='text'
               render={(args) => (

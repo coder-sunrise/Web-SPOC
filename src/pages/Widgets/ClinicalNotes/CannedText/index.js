@@ -154,7 +154,7 @@ const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
 
   const maxHeight = height ? height - 150 : defaultMaxHeight
   let newcolumns = columns
-  if (selectedNote.cannedTextTypeFK === CANNED_TEXT_TYPE.MEDICALCERTIFICATION) {
+  if (selectedNote.cannedTextTypeFK === CANNED_TEXT_TYPE.MEDICALCERTIFICATE) {
     newcolumns = columns.filter((t) => t.name !== 'isShared')
   }
   return (

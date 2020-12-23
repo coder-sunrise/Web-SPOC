@@ -134,7 +134,7 @@ class MedicalCertificate extends PureComponent {
     const { setFieldValue, values, dispatch } = this.props
     dispatch({
       type: 'cannedText/query',
-      payload: CANNED_TEXT_TYPE.MEDICALCERTIFICATION,
+      payload: CANNED_TEXT_TYPE.MEDICALCERTIFICATE,
     })
 
     if (values.mcReferenceNo === '-')
@@ -177,7 +177,7 @@ class MedicalCertificate extends PureComponent {
   onSettingClick = () => {
     this.props.dispatch({
       type: 'cannedText/setSelectedNote',
-      payload: { cannedTextTypeFK: CANNED_TEXT_TYPE.MEDICALCERTIFICATION, fieldName: CANNED_TEXT_TYPE_FIELD_NAME[CANNED_TEXT_TYPE.MEDICALCERTIFICATION] },
+      payload: { cannedTextTypeFK: CANNED_TEXT_TYPE.MEDICALCERTIFICATE, fieldName: CANNED_TEXT_TYPE_FIELD_NAME[CANNED_TEXT_TYPE.MEDICALCERTIFICATE] },
     })
     this.setState({
       showCannedText: true,
@@ -190,7 +190,7 @@ class MedicalCertificate extends PureComponent {
     })
     this.props.dispatch({
       type: 'cannedText/query',
-      payload: CANNED_TEXT_TYPE.MEDICALCERTIFICATION,
+      payload: CANNED_TEXT_TYPE.MEDICALCERTIFICATE,
     })
   }
 
@@ -209,22 +209,13 @@ class MedicalCertificate extends PureComponent {
         </Tooltip>
       )
     }
-    const fieldName = CANNED_TEXT_TYPE_FIELD_NAME[CANNED_TEXT_TYPE.MEDICALCERTIFICATION]
+    const fieldName = CANNED_TEXT_TYPE_FIELD_NAME[CANNED_TEXT_TYPE.MEDICALCERTIFICATE]
     let list = cannedText[fieldName] || []
     list = [
       ..._.orderBy(
         list.filter((o) => o.ownedByUserFK === user.id),
         [
           'sortOrder',
-          'title',
-        ],
-        [
-          'asc',
-        ],
-      ),
-      ..._.orderBy(
-        list.filter((o) => o.ownedByUserFK !== user.id),
-        [
           'title',
         ],
         [
