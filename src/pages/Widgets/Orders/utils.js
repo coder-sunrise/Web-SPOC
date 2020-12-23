@@ -1,4 +1,5 @@
 import { Divider } from '@material-ui/core'
+import Authorized from '@/utils/Authorized'
 
 const getCautionAlertContent = (cuationItems) => () => {
   return (
@@ -153,9 +154,25 @@ const openCautionAlertOnStartConsultation = (o) => {
   }
 }
 
+const GetOrderItemAccessRight = (from = 'Consultation', accessRight) => {
+  let editAccessRight = accessRight
+  let strOrderAccessRight = ''
+  if (from === 'EditOrder') {
+    strOrderAccessRight = 'queue.dispense.editorder'
+  } else if (from === 'Consultation') {
+    strOrderAccessRight = 'queue.consultation.widgets.order'
+  }
+  const orderAccessRight = Authorized.check(strOrderAccessRight)
+  if (!orderAccessRight || orderAccessRight.rights !== 'enable') {
+    editAccessRight = strOrderAccessRight
+  }
+  return editAccessRight
+}
+
 export {
   getCautionAlertContent,
   openCautionAlertPrompt,
   openCautionAlertOnStartConsultation,
   getRetailCautionAlertContent,
+  GetOrderItemAccessRight,
 }

@@ -277,7 +277,10 @@ const AddOrder = ({
     <React.Fragment>
       <SizeContainer size='sm'>
         <div style={{ maxHeight: height - 128, overflow: 'auto' }}>
-          <Order fromDispense={visitType === VISIT_TYPE.RETAIL} />
+          <Order
+            fromDispense={visitType === VISIT_TYPE.RETAIL}
+            from='AddOrder'
+          />
         </div>
       </SizeContainer>
       {footer &&
@@ -334,13 +337,6 @@ export default compose(
             ...instructionOrPrecaution,
             id: undefined,
             concurrencyToken: undefined,
-          }
-        }
-
-        const setIsDeletedToUnwantedPrecautionsOrInstructions = (o) => {
-          return {
-            ...o,
-            isDeleted: true,
           }
         }
 
@@ -575,7 +571,7 @@ export default compose(
               const { retailService, ...restValues } = o
               const { revenueCategoryFK } = ctservice.find(
                 (c) => c.serviceCenter_ServiceId === o.serviceCenterServiceFK,
-              ) 
+              )
               obj = {
                 adjType: o.adjType,
                 adjValue: o.adjValue,
@@ -696,7 +692,6 @@ export default compose(
           orders,
           forms,
         })
-        // console.log({ billFirstPayload })
         dispatch({
           type: `consultation/signOrder`,
           payload: {

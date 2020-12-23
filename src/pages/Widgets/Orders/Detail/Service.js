@@ -18,12 +18,10 @@ import Yup from '@/utils/yup'
 import { getServices } from '@/utils/codetable'
 import { calculateAdjustAmount } from '@/utils/utils'
 import { currencySymbol } from '@/utils/config'
+import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
 
 @connect(({ codetable, global, user }) => ({ codetable, global, user }))
 @withFormikExtend({
-  authority: [
-    'queue.consultation.order.service',
-  ],
   mapPropsToValues: ({ orders = {}, type }) => {
     const v = {
       ...(orders.entity || orders.defaultService),
@@ -131,19 +129,7 @@ class Service extends PureComponent {
         serviceCenters,
         serviceCenterServices,
       })
-      // this.setState((ps) => {
-      //   return {
-      //     pagination: {
-      //       ...ps.pagination,
-      //       ...payload,
-      //     },
-      //   }
-      // })
     })
-    // const v =
-    //   field.value !== undefined && field.value !== ''
-    //     ? field.value
-    //     : props.value || props.defaultValue
     this.state = {
       services: [],
       serviceCenters: [],
@@ -306,29 +292,85 @@ class Service extends PureComponent {
   }
 
   render () {
-    const { theme, classes, values = {}, footer, handleSubmit } = this.props
+    const { theme, classes, values = {}, footer, from } = this.props
     const { services, serviceCenters } = this.state
     const { serviceFK, serviceCenterFK } = values
-    const totalPriceReadonly = Authorized.check('queue.consultation.modifyorderitemtotalprice').rights !== 'enable'
+    const totalPriceReadonly =
+      Authorized.check('queue.consultation.modifyorderitemtotalprice')
+        .rights !== 'enable'
 
     return (
-      <div>
-        <GridContainer>
-          <GridItem xs={8}>
-            <Field
-              name='serviceFK'
-              render={(args) => {
-                return (
-                  <div id={`autofocus_${values.type}`}>
+      <Authorized
+        authority={GetOrderItemAccessRight(
+          from,
+          'queue.consultation.order.service',
+        )}
+      >
+        <div>
+          <GridContainer>
+            <GridItem xs={8}>
+              <Field
+                name='serviceFK'
+                render={(args) => {
+                  return (
+                    <div id={`autofocus_${values.type}`}>
+                      <Select
+                        label='Service Name'
+                        labelField='combinDisplayValue'
+                        options={services.filter(
+                          (o) =>
+                            !serviceCenterFK ||
+                            o.serviceCenters.find(
+                              (m) => m.value === serviceCenterFK,
+                            ),
+                        )}
+                        onChange={() =>
+                          setTimeout(() => {
+                            this.getServiceCenterService()
+                          }, 1)}
+                        {...args}
+                      />
+                    </div>
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={3}>
+              <FastField
+                name='total'
+                render={(args) => {
+                  return (
+                    <NumberInput
+                      label='Total'
+                      style={{
+                        marginLeft: theme.spacing(7),
+                        paddingRight: theme.spacing(6),
+                      }}
+                      min={0}
+                      disabled={totalPriceReadonly}
+                      currency
+                      onChange={(e) => {
+                        this.updateTotalPrice(e.target.value)
+                      }}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem xs={8}>
+              <Field
+                name='serviceCenterFK'
+                render={(args) => {
+                  return (
                     <Select
-                      label='Service Name'
-                      labelField='combinDisplayValue'
-                      options={services.filter(
+                      label='Service Center Name'
+                      options={serviceCenters.filter(
                         (o) =>
-                          !serviceCenterFK ||
-                          o.serviceCenters.find(
-                            (m) => m.value === serviceCenterFK,
-                          ),
+                          !serviceFK ||
+                          o.services.find((m) => m.value === serviceFK),
                       )}
                       onChange={() =>
                         setTimeout(() => {
@@ -336,70 +378,89 @@ class Service extends PureComponent {
                         }, 1)}
                       {...args}
                     />
-                  </div>
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs={3}>
-            <FastField
-              name='total'
-              render={(args) => {
-                return (
-                  <NumberInput
-                    label='Total'
-                    style={{
-                      marginLeft: theme.spacing(7),
-                      paddingRight: theme.spacing(6),
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={3}>
+              <div style={{ position: 'relative' }}>
+                <div
+                  style={{ marginTop: theme.spacing(2), position: 'absolute' }}
+                >
+                  <FastField
+                    name='isMinus'
+                    render={(args) => {
+                      return (
+                        <Switch
+                          checkedChildren='-'
+                          unCheckedChildren='+'
+                          label=''
+                          disabled={totalPriceReadonly}
+                          onChange={() => {
+                            setTimeout(() => {
+                              this.onAdjustmentConditionChange()
+                            }, 1)
+                          }}
+                          {...args}
+                        />
+                      )
                     }}
-                    min={0}
-                    disabled={totalPriceReadonly}
-                    currency
-                    onChange={(e) => {
-                      this.updateTotalPrice(e.target.value)
-                    }}
-                    {...args}
                   />
-                )
-              }}
-            />
-          </GridItem>
-        </GridContainer>
-        <GridContainer>
-          <GridItem xs={8}>
-            <Field
-              name='serviceCenterFK'
-              render={(args) => {
-                return (
-                  <Select
-                    label='Service Center Name'
-                    options={serviceCenters.filter(
-                      (o) =>
-                        !serviceFK ||
-                        o.services.find((m) => m.value === serviceFK),
-                    )}
-                    onChange={() =>
-                      setTimeout(() => {
-                        this.getServiceCenterService()
-                      }, 1)}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs={3}>
-            <div style={{ position: 'relative' }}>
-              <div
-                style={{ marginTop: theme.spacing(2), position: 'absolute' }}
-              >
+                </div>
+                <Field
+                  name='adjValue'
+                  render={(args) => {
+                    args.min = 0
+                    if (values.isExactAmount) {
+                      return (
+                        <NumberInput
+                          style={{
+                            marginLeft: theme.spacing(7),
+                            paddingRight: theme.spacing(6),
+                          }}
+                          currency
+                          disabled={totalPriceReadonly}
+                          label='Adjustment'
+                          onChange={() => {
+                            setTimeout(() => {
+                              this.onAdjustmentConditionChange()
+                            }, 1)
+                          }}
+                          {...args}
+                        />
+                      )
+                    }
+                    return (
+                      <NumberInput
+                        style={{
+                          marginLeft: theme.spacing(7),
+                          paddingRight: theme.spacing(6),
+                        }}
+                        percentage
+                        disabled={totalPriceReadonly}
+                        max={100}
+                        label='Adjustment'
+                        onChange={() => {
+                          setTimeout(() => {
+                            this.onAdjustmentConditionChange()
+                          }, 1)
+                        }}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </div>
+            </GridItem>
+            <GridItem xs={1}>
+              <div style={{ marginTop: theme.spacing(2) }}>
                 <FastField
-                  name='isMinus'
+                  name='isExactAmount'
                   render={(args) => {
                     return (
                       <Switch
-                        checkedChildren='-'
-                        unCheckedChildren='+'
+                        checkedChildren='$'
+                        unCheckedChildren='%'
                         label=''
                         disabled={totalPriceReadonly}
                         onChange={() => {
@@ -413,112 +474,50 @@ class Service extends PureComponent {
                   }}
                 />
               </div>
-              <Field
-                name='adjValue'
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem xs={8} className={classes.editor}>
+              <FastField
+                name='remark'
                 render={(args) => {
-                  args.min = 0
-                  if (values.isExactAmount) {
-                    return (
-                      <NumberInput
-                        style={{
-                          marginLeft: theme.spacing(7),
-                          paddingRight: theme.spacing(6),
-                        }}
-                        currency
-                        disabled={totalPriceReadonly}
-                        label='Adjustment'
-                        onChange={() => {
-                          setTimeout(() => {
-                            this.onAdjustmentConditionChange()
-                          }, 1)
-                        }}
-                        {...args}
-                      />
-                    )
-                  }
+                  return (
+                    <TextField
+                      multiline
+                      rowsMax='5'
+                      label='Remarks'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={3} className={classes.editor}>
+              <Field
+                name='totalAfterItemAdjustment'
+                render={(args) => {
                   return (
                     <NumberInput
+                      label='Total After Adj'
                       style={{
                         marginLeft: theme.spacing(7),
                         paddingRight: theme.spacing(6),
                       }}
-                      percentage
-                      disabled={totalPriceReadonly}
-                      max={100}
-                      label='Adjustment'
-                      onChange={() => {
-                        setTimeout(() => {
-                          this.onAdjustmentConditionChange()
-                        }, 1)
-                      }}
+                      currency
+                      disabled
                       {...args}
                     />
                   )
                 }}
               />
-            </div>
-          </GridItem>
-          <GridItem xs={1}>
-            <div style={{ marginTop: theme.spacing(2) }}>
-              <FastField
-                name='isExactAmount'
-                render={(args) => {
-                  return (
-                    <Switch
-                      checkedChildren='$'
-                      unCheckedChildren='%'
-                      label=''
-                      disabled={totalPriceReadonly}
-                      onChange={() => {
-                        setTimeout(() => {
-                          this.onAdjustmentConditionChange()
-                        }, 1)
-                      }}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </div>
-          </GridItem>
-        </GridContainer>
-        <GridContainer>
-          <GridItem xs={8} className={classes.editor}>
-            <FastField
-              name='remark'
-              render={(args) => {
-                // return <RichEditor placeholder='Remarks' {...args} />
-                return (
-                  <TextField multiline rowsMax='5' label='Remarks' {...args} />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs={3} className={classes.editor}>
-            <Field
-              name='totalAfterItemAdjustment'
-              render={(args) => {
-                return (
-                  <NumberInput
-                    label='Total After Adj'
-                    style={{
-                      marginLeft: theme.spacing(7),
-                      paddingRight: theme.spacing(6),
-                    }}
-                    currency
-                    disabled
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-        </GridContainer>
-        {footer({
-          onSave: this.validateAndSubmitIfOk,
-          onReset: this.handleReset,
-        })}
-      </div>
+            </GridItem>
+          </GridContainer>
+          {footer({
+            onSave: this.validateAndSubmitIfOk,
+            onReset: this.handleReset,
+          })}
+        </div>
+      </Authorized>
     )
   }
 }

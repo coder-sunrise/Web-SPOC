@@ -13,8 +13,6 @@ import {
   notification,
   Tabs,
 } from '@/components'
-import { currencySymbol } from '@/utils/config'
-// import Others from './Others'
 // utils
 import { orderTypes } from '@/pages/Consultation/utils'
 import Authorized from '@/utils/Authorized'
@@ -51,20 +49,6 @@ class Details extends PureComponent {
     prevKey: null,
   }
 
-  // eslint-disable-next-line camelcase
-  // UNSAFE_componentWillReceiveProps (nextProps) {
-  //   const { orders: nextOrders } = nextProps
-  //   const { orders } = this.props
-
-  //   if (
-  //     nextOrders.type !== this.state.prevKey &&
-  //     nextOrders.type &&
-  //     (orders.type !== nextOrders.type || nextOrders.type === '1')
-  //   ) {
-  //     this.autoFocuseItem(nextOrders.type)
-  //   }
-  // }
-
   autoFocuseItem = (type) => {
     setTimeout(() => {
       if (type === '5') {
@@ -77,42 +61,14 @@ class Details extends PureComponent {
     }, 500)
   }
 
-  footerBtns = ({ onSave, onReset, showAdjustment = true }) => {
+  footerBtns = ({ onSave, onReset }) => {
     const { classes, orders } = this.props
-    // console.log(this.props)
     const { entity, type } = orders
     return (
       <React.Fragment>
         <Divider />
 
         <div className={classnames(classes.footer)}>
-          {/* showAdjustment && (
-            <Button
-              color='primary'
-              style={{ float: 'left' }}
-              disabled={this.state.disableEdit}
-              onClick={this.showAdjustment}
-            >
-              {currencySymbol} Adjustment
-            </Button>
-          ) */}
-          {/* {!!entity && (
-            <Button
-              color='danger'
-              onClick={() => {
-                this.props.dispatch({
-                  type: 'orders/updateState',
-                  payload: {
-                    entity: undefined,
-                    // adjustment: undefined,
-                    // totalAfterAdj: undefined,
-                  },
-                })
-              }}
-            >
-              New
-            </Button>
-          )} */}
           <Button
             color='danger'
             onClick={() => {
@@ -123,10 +79,6 @@ class Details extends PureComponent {
                     entity: undefined,
                   },
                 })
-                // this.props.dispatch({
-                //   // force current edit row components to update
-                //   type: 'global/incrementCommitCount',
-                // })
               }
               if (onReset) {
                 onReset()
@@ -172,7 +124,6 @@ class Details extends PureComponent {
             model: 'orders',
             reducer: 'adjustAmount',
           },
-          // showRemark: true,
           defaultValues: {
             ...this.props.orders.entity,
             initialAmout: this.props.orders.entity.totalPrice, // for item level need inital amount
@@ -216,7 +167,6 @@ class Details extends PureComponent {
     const { props } = this
     const { classes, orders, dispatch, fromDispense, singleMode, from } = props
     const { type } = orders
-    // console.log({ props })
     const cfg = {
       disableEdit: this.state.disableEdit,
       setDisable: this.setDisable,
@@ -233,18 +183,15 @@ class Details extends PureComponent {
       )
     }
 
-    // if (clinicTypeFK === CLINIC_TYPE.DENTAL) {
-    //   orderTypeArray = orderTypes.filter(
-    //     (o) => o.value === '1' || o.value === '4',
-    //   )
-    // }
     if (singleMode)
       return orderTypeArray.find((o) => o.value === '7').component({
         ...cfg,
         type: '7',
       })
     const tabOptions = orderTypeArray
-      .filter((o) => o.value !== '7' || (o.value === '7' && from === 'ca'))
+      .filter(
+        (o) => o.value !== '7' || (o.value === '7' && from === 'EditOrder'),
+      )
       .filter((o) => {
         const accessRight = Authorized.check(o.accessRight)
 
@@ -280,21 +227,10 @@ class Details extends PureComponent {
                     },
                   })
                   this.autoFocuseItem(key)
-                  // dispatch({
-                  //   type: 'global/incrementCommitCount',
-                  // })
                 }}
               />
             </GridItem>
           </GridContainer>
-          {/* <div>
-            {type === '1' && <Medication {...cfg} />}
-            {type === '2' && <Vaccination {...cfg} />}
-            {type === '3' && <Service {...cfg} />}
-            {type === '4' && <Consumable {...cfg} />}
-            {type === '5' && <Medication {...cfg} openPrescription />}
-            {type === '6' && <Package {...cfg} />}
-          </div> */}
         </div>
       </div>
     )

@@ -17,15 +17,12 @@ import {
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 import { currencySymbol } from '@/utils/config'
+import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
+import Authorized from '@/utils/Authorized'
 
 const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
-// @Authorized.Secured('queue.dispense.editorder')
 @connect(({ codetable, global, user }) => ({ codetable, global, user }))
 @withFormikExtend({
-  // authority: [
-  //   'queue.dispense.editorder',
-  // ],
-  // notDirtyDuration: 0, // this page should alwasy show warning message when leave
   mapPropsToValues: ({
     dentalChartComponent = {},
     codetable,
@@ -45,11 +42,9 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
         return {}
       }
     }
-    // console.log(dentalChartComponent, dentalChartTreatment)
     const { data = [], action = {} } = dentalChartComponent
     const { entity = {} } = orders
     const { rows } = orders
-    // console.log(action, data, rows)
 
     let treatment
 
@@ -63,7 +58,6 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
         (codetable.cttreatment || [])
           .find((o) => o.id === action.dentalTreatmentFK) || {}
     }
-    // console.log(rest, this, treatment)
 
     const existedTooths = []
     const otherTreatmentTooths = []
@@ -97,26 +91,12 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
         }
       })
 
-    // console.log(existedTooths, otherTreatmentTooths)
     const dataFiltered = data.filter(
       (o) =>
-        // o.id === action.id &&
         o.action.dentalTreatmentFK === treatment.id &&
         (existedTooths.indexOf(o.toothNo) >= 0 ||
           otherTreatmentTooths.indexOf(o.toothNo) < 0),
-      // (!rows.find((m) =>
-      //   m.groups.find((k) =>
-      //     k.items.find(
-      //       (j) => j.action.id === o.id && j.toothNo === o.toothNo,
-      //     ),
-      //   ),
-      // ) ||
-      //   (entity.chartMethodFK === action.id &&
-      //     entity.groups.find((k) =>
-      //       k.items.find((j) => j.toothNo === o.toothNo),
-      //     ))),
     )
-    // console.log(dataFiltered)
 
     let groupsAry = []
     let quantity = orders.entity ? orders.entity.quantity : undefined
@@ -131,13 +111,10 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
           items: groups[k],
         }
       })
-      // console.log(groupsAry)
       quantity = groupsAry.length
-      // let tooth = groupsAry.map((o) => o.text).join(',')
       if (action.chartMethodTypeFK === 3) {
         quantity = 0
         groupsAry = Object.values(_.groupBy(dataFiltered, 'nodes')).map((o) => {
-          // console.log(o[0].nodes)
           const { nodes } = o[0]
           quantity += o.length
 
@@ -148,14 +125,11 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
         })
       }
     }
-    // console.log(entity)
     let { adjType, adjValue = 0, unitPrice } = entity
     if (!unitPrice || action.dentalTreatmentFK !== entity.treatmentFK) {
       unitPrice = treatment.sellingPrice
     }
     const totalPrice = unitPrice * quantity || undefined
-    // console.log(groupsAry)
-    // console.log(action, entity, treatment, unitPrice)
     const isExactAmount = adjType === 'ExactAmount'
 
     const final = calculateAdjustAmount(isExactAmount, totalPrice, adjValue)
@@ -199,7 +173,6 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
       totalAfterItemAdjustment: values.totalAfterItemAdjustment,
       type: '7',
     }
-    // console.log(data)
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
@@ -267,8 +240,6 @@ class Treatment extends PureComponent {
 
   handleReset = () => {
     const { setValues, orders, dispatch, values } = this.props
-    // console.log(values)
-    // if (!values.uid)
     dispatch({
       type: 'dentalChartComponent/deleteTreatment',
       payload: values,
@@ -389,148 +360,150 @@ class Treatment extends PureComponent {
       handleReset,
       from,
     } = this.props
-    // const {
-    //   data = [],
-    //   isPedoChart,
-    //   isSurfaceLabel,
-    //   action = {},
-    // } = dentalChartComponent
     const isDoctor = from === 'doctor'
     const { cttreatment = [] } = codetable
-    // console.log(cttreatment)
     return (
-      <div>
-        <GridContainer>
-          <GridItem xs={12} md={8}>
-            {/* <p style={{ marginBottom: 0 }}>Tooth No. {values.tooth}</p> */}
-            <p>
-              {/* Tooth No.{' '} */}
-              {(values.groups || []).map((o) => {
-                return (
-                  <Chip
-                    // icon={<FaceIcon />}
-                    label={o.text}
-                    onDelete={() => {
-                      dispatch({
-                        type: 'dentalChartComponent/toggleMultiSelect',
-                        payload: o.items.map((m) => ({
-                          ...m,
-                          deleted: true,
-                        })),
-                      })
-                      // console.log(o)
-                    }}
-                    style={{ margin: theme.spacing(0, 0.25, 0.25, 0) }}
-                    color='primary'
-                  />
-                )
-              })}
-            </p>
-            <FastField
-              name='remark'
-              render={(args) => (
-                <OutlinedTextField
-                  // autoFocus
-                  label='Treatment Details'
-                  multiline
-                  maxLength={2000}
-                  rowsMax={6}
-                  rows={6}
-                  onChange={(e) => {
-                    this.updateValueToStore({
-                      remark: e.target.value,
-                    })
-                  }}
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs={12} md={4}>
-            {!isDoctor && (
+      <Authorized
+        authority={
+          from === 'doctor' ? (
+            ''
+          ) : (
+            GetOrderItemAccessRight(from, 'queue.consultation.order.treatment')
+          )
+        }
+      >
+        <div>
+          <GridContainer>
+            <GridItem xs={12} md={8}>
+              {/* <p style={{ marginBottom: 0 }}>Tooth No. {values.tooth}</p> */}
+              <p>
+                {/* Tooth No.{' '} */}
+                {(values.groups || []).map((o) => {
+                  return (
+                    <Chip
+                      label={o.text}
+                      onDelete={() => {
+                        dispatch({
+                          type: 'dentalChartComponent/toggleMultiSelect',
+                          payload: o.items.map((m) => ({
+                            ...m,
+                            deleted: true,
+                          })),
+                        })
+                      }}
+                      style={{ margin: theme.spacing(0, 0.25, 0.25, 0) }}
+                      color='primary'
+                    />
+                  )
+                })}
+              </p>
               <FastField
-                name='treatmentCategoryFK'
+                name='remark'
                 render={(args) => (
-                  <CodeSelect
-                    label='Treatment Category'
-                    code='cttreatmentcategory'
-                    labelField='name'
-                    onChange={() => setFieldValue('treatmentFK', undefined)}
+                  <OutlinedTextField
+                    label='Treatment Details'
+                    multiline
+                    maxLength={2000}
+                    rowsMax={6}
+                    rows={6}
+                    onChange={(e) => {
+                      this.updateValueToStore({
+                        remark: e.target.value,
+                      })
+                    }}
                     {...args}
                   />
                 )}
               />
-            )}
-            <Field
-              name='treatmentFK'
-              render={(args) => (
-                <Select
-                  options={this.getTreatmentOptions(isDoctor)}
-                  valueField='id'
-                  labelField='combinDisplayValue'
-                  label='Treatment'
-                  disabled={isDoctor}
-                  onChange={(v, op) => {
-                    this.changeTreatment(op)
-                  }}
-                  {...args}
+            </GridItem>
+            <GridItem xs={12} md={4}>
+              {!isDoctor && (
+                <FastField
+                  name='treatmentCategoryFK'
+                  render={(args) => (
+                    <CodeSelect
+                      label='Treatment Category'
+                      code='cttreatmentcategory'
+                      labelField='name'
+                      onChange={() => setFieldValue('treatmentFK', undefined)}
+                      {...args}
+                    />
+                  )}
                 />
               )}
-            />
-            <FastField
-              name='quantity'
-              render={(args) => (
-                <NumberInput
-                  label='Unit'
-                  onChange={() => {
-                    setTimeout(() => {
-                      this.setTotalPrice()
-                    }, 1)
-                  }}
-                  disabled={isDoctor && values.chartMethodFK}
-                  {...args}
-                />
-              )}
-            />
-            <FastField
-              name='unitPrice'
-              render={(args) => (
-                <NumberInput
-                  label='Unit Price'
-                  currency
-                  onChange={(v) => {
-                    setTimeout(() => {
-                      this.setTotalPrice()
-                    }, 1)
-                  }}
-                  {...args}
-                />
-              )}
-            />
-            <FastField
-              name='totalPrice'
-              render={(args) => {
-                return <NumberInput label='Total' disabled currency {...args} />
-              }}
-            />
-            <FastField
-              name='totalAfterItemAdjustment'
-              render={(args) => (
-                <NumberInput
-                  disabled
-                  currency
-                  label='Total After Adj'
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-        </GridContainer>
-        {footer({
-          onSave: handleSubmit,
-          onReset: this.handleReset,
-        })}
-      </div>
+              <Field
+                name='treatmentFK'
+                render={(args) => (
+                  <Select
+                    options={this.getTreatmentOptions(isDoctor)}
+                    valueField='id'
+                    labelField='combinDisplayValue'
+                    label='Treatment'
+                    disabled={isDoctor}
+                    onChange={(v, op) => {
+                      this.changeTreatment(op)
+                    }}
+                    {...args}
+                  />
+                )}
+              />
+              <FastField
+                name='quantity'
+                render={(args) => (
+                  <NumberInput
+                    label='Unit'
+                    onChange={() => {
+                      setTimeout(() => {
+                        this.setTotalPrice()
+                      }, 1)
+                    }}
+                    disabled={isDoctor && values.chartMethodFK}
+                    {...args}
+                  />
+                )}
+              />
+              <FastField
+                name='unitPrice'
+                render={(args) => (
+                  <NumberInput
+                    label='Unit Price'
+                    currency
+                    onChange={(v) => {
+                      setTimeout(() => {
+                        this.setTotalPrice()
+                      }, 1)
+                    }}
+                    {...args}
+                  />
+                )}
+              />
+              <FastField
+                name='totalPrice'
+                render={(args) => {
+                  return (
+                    <NumberInput label='Total' disabled currency {...args} />
+                  )
+                }}
+              />
+              <FastField
+                name='totalAfterItemAdjustment'
+                render={(args) => (
+                  <NumberInput
+                    disabled
+                    currency
+                    label='Total After Adj'
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          {footer({
+            onSave: handleSubmit,
+            onReset: this.handleReset,
+          })}
+        </div>
+      </Authorized>
     )
   }
 }

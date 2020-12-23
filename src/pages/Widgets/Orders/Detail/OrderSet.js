@@ -17,15 +17,16 @@ import {
 import Yup from '@/utils/yup'
 import { getUniqueId } from '@/utils/utils'
 import config from '@/utils/config'
-import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
+import {
+  openCautionAlertPrompt,
+  GetOrderItemAccessRight,
+} from '@/pages/Widgets/Orders/utils'
+import Authorized from '@/utils/Authorized'
 
 const { qtyFormat } = config
 
 @connect(({ global, codetable, user }) => ({ global, codetable, user }))
 @withFormikExtend({
-  authority: [
-    'queue.consultation.order.orderset',
-  ],
   mapPropsToValues: ({ orders = {}, type }) => {
     const v = {
       ...(orders.entity || orders.defaultOrderSet),
@@ -207,7 +208,6 @@ const { qtyFormat } = config
           vaccinationGivenDate: moment().format(serverDateTimeFormatFull),
           vaccinationCode: inventoryVaccination.code,
           vaccinationName: inventoryVaccination.displayValue,
-          // vaccinationSequenceDisplayValue:
           usageMethodFK: inventoryVaccination.vaccinationUsageFK,
           usageMethodCode: vaccinationusage ? vaccinationusage.code : undefined,
           usageMethodDisplayValue: vaccinationusage
@@ -249,11 +249,7 @@ const { qtyFormat } = config
       const serviceCenterService = service.ctServiceCenter_ServiceNavigation[0]
       const serviceCenter = serviceCenterService.serviceCenterFKNavigation
       let item
-      if (
-        service.isActive === true &&
-        // serviceCenterService.isActive === true &&
-        serviceCenter.isActive === true
-      ) {
+      if (service.isActive === true && serviceCenter.isActive === true) {
         item = {
           isActive: serviceCenter.isActive && service.isActive,
           serviceCenterServiceFK: serviceCenterService.id,
@@ -268,7 +264,6 @@ const { qtyFormat } = config
           totalAfterOverallAdjustment:
             orderSetItem.unitPrice * orderSetItem.quantity,
           orderSetCode,
-          // priority:,
           serviceCode: service.code,
           serviceName: service.displayValue,
           serviceFK: service.id,
@@ -284,7 +279,6 @@ const { qtyFormat } = config
       if (inventoryConsumable.isActive === true) {
         item = {
           inventoryConsumableFK: inventoryConsumable.id,
-          // unitOfMeasurement:,
           isActive: inventoryConsumable.isActive,
           quantity: orderSetItem.quantity,
           unitPrice: orderSetItem.unitPrice,
@@ -485,13 +479,11 @@ class OrderSet extends PureComponent {
               type: '3',
               typeName:
                 orderTypes.find((type) => type.value === '3').name +
-                // o.service.ctServiceCenter_ServiceNavigation[0].isActive &&
                 (o.service.isActive &&
                 o.service.ctServiceCenter_ServiceNavigation[0]
                   .serviceCenterFKNavigation.isActive === true
                   ? ''
                   : ' (Inactive)'),
-              // o.service.ctServiceCenter_ServiceNavigation[0].isActive &&
               isActive:
                 o.service.isActive &&
                 o.service.ctServiceCenter_ServiceNavigation[0]
@@ -551,45 +543,52 @@ class OrderSet extends PureComponent {
   }
 
   render () {
-    const { theme, values, footer, handleSubmit } = this.props
+    const { theme, values, footer, from } = this.props
     return (
-      <div>
-        <GridContainer>
-          <GridItem xs={6}>
-            <Field
-              name='inventoryOrderSetFK'
-              render={(args) => {
-                return (
-                  <div id={`autofocus_${values.type}`}>
-                    <CodeSelect
-                      temp
-                      label='Order Set Name'
-                      code='inventoryorderset'
-                      labelField='displayValue'
-                      onChange={this.changeOrderSet}
-                      {...args}
-                    />
-                  </div>
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs={12}>
-            <CommonTableGrid
-              rows={values.orderSetItems}
-              style={{
-                margin: `${theme.spacing(1)}px 0`,
-              }}
-              {...this.tableProps}
-            />
-          </GridItem>
-        </GridContainer>
-        {footer({
-          onSave: this.validateAndSubmitIfOk,
-          onReset: this.handleReset,
-          showAdjustment: false,
-        })}
-      </div>
+      <Authorized
+        authority={GetOrderItemAccessRight(
+          from,
+          'queue.consultation.order.orderset',
+        )}
+      >
+        <div>
+          <GridContainer>
+            <GridItem xs={6}>
+              <Field
+                name='inventoryOrderSetFK'
+                render={(args) => {
+                  return (
+                    <div id={`autofocus_${values.type}`}>
+                      <CodeSelect
+                        temp
+                        label='Order Set Name'
+                        code='inventoryorderset'
+                        labelField='displayValue'
+                        onChange={this.changeOrderSet}
+                        {...args}
+                      />
+                    </div>
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={12}>
+              <CommonTableGrid
+                rows={values.orderSetItems}
+                style={{
+                  margin: `${theme.spacing(1)}px 0`,
+                }}
+                {...this.tableProps}
+              />
+            </GridItem>
+          </GridContainer>
+          {footer({
+            onSave: this.validateAndSubmitIfOk,
+            onReset: this.handleReset,
+            showAdjustment: false,
+          })}
+        </div>
+      </Authorized>
     )
   }
 }
