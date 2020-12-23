@@ -13,6 +13,7 @@ import Yup from '@/utils/yup'
 import { VISIT_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
 import { openCautionAlertOnStartConsultation } from '@/pages/Widgets/Orders/utils'
+import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
 import DrugLabelSelection from './DispenseDetails/DrugLabelSelection'
 import AddOrder from './DispenseDetails/AddOrder'
 import DispenseDetails from './DispenseDetails/WebSocketWrapper'
@@ -458,6 +459,7 @@ class Main extends Component {
             }}
           />
         </CommonModal>
+        <ViewPatientHistory top='213px' />
       </div>
     )
   }

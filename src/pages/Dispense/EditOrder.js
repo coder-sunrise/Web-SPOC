@@ -25,6 +25,7 @@ import Authorized from '@/utils/Authorized'
 import { sendNotification } from '@/utils/realtime'
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
 import Warining from '@material-ui/icons/Error'
+import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
 
 const discardConsultation = async ({ dispatch, dispense }) => {
   try {
@@ -359,6 +360,7 @@ class EditOrder extends Component {
             </GridItem>
           </GridItem>
         </GridContainer>
+        <ViewPatientHistory top='170px' />
       </div>
     )
   }
