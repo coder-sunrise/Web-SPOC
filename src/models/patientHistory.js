@@ -281,6 +281,7 @@ export default createListViewModel({
                     invoicePayerWriteOff,
                     creditNote,
                     statementInvoice,
+                    patientDepositTransaction,
                   } = ip
 
                   // Payment
@@ -326,6 +327,19 @@ export default createListViewModel({
                         amount: z.totalAftGST,
                         reason: z.remark,
                         isCancelled: z.isCancelled,
+                      }
+                    }),
+                  )
+
+                  // Invoice PayerDepposit
+                  paymentTxnList = (paymentTxnList || []).concat(
+                    (patientDepositTransaction || []).map((z) => {
+                      return {
+                        ...z,
+                        type: 'Deposit',
+                        itemID: z.depositTransactionNo,
+                        date: z.transactionDate,
+                        reason: z.remarks,
                       }
                     }),
                   )

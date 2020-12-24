@@ -12,6 +12,7 @@ const PaymentActions = ({
   handleAddPayment,
   handleAddCrNote,
   handleWriteOff,
+  handleTransferToDeposit,
   handlePrinterClick,
   handleTransferClick,
   type,
@@ -37,13 +38,22 @@ const PaymentActions = ({
       </Button>
       {type !== PayerType.GOVT_COPAYER && (
         <Button
-          // onClick={() => handleAddCrNote(type)}
           onClick={() => handleAddCrNote(invoicePayerFK, type)}
           disabled={!handleAddCrNote || readOnly}
           {...ButtonProps}
         >
           <Add />
           Add Cr. Note
+        </Button>
+      )}
+      {type === PayerType.PATIENT && (
+        <Button
+          onClick={() => handleTransferToDeposit(invoicePayerFK)}
+          disabled={!handleTransferToDeposit || readOnly}
+          {...ButtonProps}
+        >
+          <Add />
+          Transfer Deposit
         </Button>
       )}
       {type === PayerType.PATIENT && (
