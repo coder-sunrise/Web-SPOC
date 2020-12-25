@@ -156,6 +156,7 @@ export default {
   'menu.setting.paymentmode': 'Payment Mode',
   'menu.setting.appointmenttype': 'Appointment Type',
   'menu.setting.referralsource': 'Referral Source',
+  'menu.setting.referralperson': 'Referral Person',
   'menu.setting.visitordertemplate': 'Visit Purpose',
   'menu.setting.casetype': 'Case Type',
   'menu.setting.casedescription': 'Case Description',

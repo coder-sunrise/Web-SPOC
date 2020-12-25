@@ -4,7 +4,7 @@ import { notification } from '@/components'
 import * as service from '../services'
 
 export default createListViewModel({
-  namespace: 'settingReferralSource',
+  namespace: 'settingReferralPerson',
   config: {
     queryOnLoad: false,
   },
@@ -26,7 +26,7 @@ export default createListViewModel({
       })
     },
     effects: {
-      *deleteReferralSource ({ payload }, { call, put }) {
+      *deleteReferralPerson ({ payload }, { call, put }) {
         const result = yield call(service.delete, payload)
         if (result === 204) {
           notification.success({ message: 'Deleted' })

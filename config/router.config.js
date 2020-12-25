@@ -1242,6 +1242,14 @@ const _routes = [
             ],
           },
           {
+            path: '/setting/referralperson',
+            name: 'referralperson',
+            component: './Setting/ReferralPerson',
+            authority: [
+              'settings.contact.referralperson',
+            ],
+          },
+          {
             path: '/setting/visitordertemplate',
             name: 'visitordertemplate',
             component: './Setting/VisitOrderTemplate',
