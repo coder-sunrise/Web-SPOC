@@ -230,20 +230,28 @@ class Vaccination extends PureComponent {
   }
 
   calculateQuantity = (vaccination) => {
-    const { codetable, setFieldValue, values, disableEdit, dirty } = this.props
+    const { codetable, setFieldValue, values } = this.props
     const { minQuantity = 0 } = values
     let currentVaccination =
       vaccination && Object.values(vaccination).length ? vaccination : undefined
     if (!currentVaccination) currentVaccination = this.state.selectedVaccination
     let newTotalQuantity = 0
-    if (currentVaccination && currentVaccination.dispensingQuantity && !dirty) {
+    if (
+      vaccination &&
+      currentVaccination &&
+      currentVaccination.dispensingQuantity
+    ) {
       newTotalQuantity = currentVaccination.dispensingQuantity
-    } else if (currentVaccination.prescribingDosage) {
+    } else {
       const { ctmedicationdosage } = codetable
 
       const dosage = ctmedicationdosage.find(
         (o) =>
-          o.id === (values.dosageFK || currentVaccination.prescribingDosage.id),
+          o.id ===
+          (values.dosageFK ||
+            (currentVaccination && currentVaccination.prescribingDosage
+              ? currentVaccination.prescribingDosage.id
+              : undefined)),
       )
       if (dosage) {
         newTotalQuantity = Math.ceil(dosage.multiplier)

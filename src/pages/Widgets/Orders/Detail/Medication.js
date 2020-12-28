@@ -402,14 +402,18 @@ class Medication extends PureComponent {
   }
 
   calculateQuantity = (medication) => {
-    const { codetable, setFieldValue, disableEdit, values } = this.props
+    const { codetable, setFieldValue, values } = this.props
     if (values.isDrugMixture) return
     let currentMedication = medication || values.selectedMedication
 
     const { form } = this.descriptionArrayHelpers
     let newTotalQuantity = 0
 
-    if (currentMedication && currentMedication.dispensingQuantity) {
+    if (
+      medication &&
+      currentMedication &&
+      currentMedication.dispensingQuantity
+    ) {
       newTotalQuantity = currentMedication.dispensingQuantity
     } else {
       const prescriptionItem = form.values.corPrescriptionItemInstruction.filter(
@@ -474,24 +478,14 @@ class Medication extends PureComponent {
   }
 
   handleAddStepdose = (arrayHelpers, defaultValue, prop) => {
-    const { values, codetable, setFieldValue } = this.props
+    const { values } = this.props
     arrayHelpers.push(defaultValue)
     if (prop === 'corPrescriptionItemInstruction') {
       this.setInstruction(values.corPrescriptionItemInstruction.length)
-      const op = codetable.inventorymedication.find(
-        (o) => o.id === values.inventoryMedicationFK,
-      )
 
-      if (op && op.dispensingQuantity) {
-        setFieldValue(`quantity`, op.dispensingQuantity)
-        setTimeout(() => {
-          this.setTotalPrice()
-        }, 1)
-      } else {
-        setTimeout(() => {
-          this.calculateQuantity()
-        }, 1)
-      }
+      setTimeout(() => {
+        this.calculateQuantity()
+      }, 1)
     }
   }
 
