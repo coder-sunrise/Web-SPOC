@@ -409,6 +409,7 @@ class Medication extends PureComponent {
     const { form } = this.descriptionArrayHelpers
     let newTotalQuantity = 0
 
+    // when select medication, TotalQuantity = dispensingQuantity, else calculate quantity by Instructions
     if (
       medication &&
       currentMedication &&
