@@ -7,12 +7,8 @@ import {
   GridItem,
   TextField,
   DateRangePicker,
-  NumberInput,
-  CodeSelect,
 } from '@/components'
 import Contact from '@/pages/Setting/Company/Contact'
-
-const styles = (theme) => ({})
 
 @withFormikExtend({
   mapPropsToValues: ({ settingReferralSource }) =>
@@ -76,10 +72,10 @@ class Detail extends PureComponent {
 
             <GridItem md={6}>
               <FastField
-                name='department'
-                render={(args) => {
-                  return <TextField label='Department' {...args} />
-                }}
+                name='remarks'
+                render={(args) => (
+                  <TextField label='Remarks' multiline {...args} />
+                )}
               />
             </GridItem>
 
@@ -95,14 +91,6 @@ class Detail extends PureComponent {
                     />
                   )
                 }}
-              />
-            </GridItem>
-            <GridItem md={6}>
-              <FastField
-                name='remarks'
-                render={(args) => (
-                  <TextField label='Remarks' multiline {...args} />
-                )}
               />
             </GridItem>
           </GridContainer>

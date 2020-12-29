@@ -5,10 +5,13 @@ import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
 import { CardContainer, CommonModal, withSettingBase } from '@/components'
+import settingReferralSource from "../ReferralSource/models/index"
 
 import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
+
+window.g_app.replaceModel(settingReferralSource)
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -21,12 +24,34 @@ const styles = (theme) => ({
   modelName: 'settingReferralPerson',
 })
 class ReferralPerson extends PureComponent {
-  state = {}
+  state = {
+    referralSource: [],
+  }
 
   componentDidMount () {
     this.props.dispatch({
       type: 'settingReferralPerson/query',
     })
+
+    this.props.dispatch({
+      type: 'settingReferralSource/query',
+      payload: {
+        pagesize: 9999,
+      },
+    })
+      .then((response) => {
+        const { data } = response || []
+        const templateOptions = data
+          .filter((template) => template.isActive)
+          .map((template) => {
+            return {
+              ...template,
+              value: template.id,
+              name: template.name,
+            }
+          })
+        this.setState({ referralSource: templateOptions })
+      })
   }
 
   toggleModal = () => {
@@ -42,6 +67,7 @@ class ReferralPerson extends PureComponent {
     const { settingReferralPerson } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
+      referralSource: this.state.referralSource,
     }
 
     return (

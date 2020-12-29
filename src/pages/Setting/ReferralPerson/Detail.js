@@ -10,10 +10,7 @@ import {
   DateRangePicker,
   CodeSelect,
 } from '@/components'
-import Contact from '@/pages/Setting/Company/Contact'
-import settingReferralSource from "../ReferralSource/models/index"
-
-window.g_app.replaceModel(settingReferralSource)
+import Contact from '@/pages/Setting/Company/Contact' 
 
 @withFormikExtend({
   mapPropsToValues: ({ settingReferralPerson }) =>
@@ -46,33 +43,10 @@ window.g_app.replaceModel(settingReferralSource)
   displayName: 'ReferralPersonDetail',
 })
 class Detail extends PureComponent {
-  state = { referralSource: [] }
-
-  componentDidMount = async () => {
-    this.props.dispatch({
-      type: 'settingReferralSource/query',
-      payload: {
-        pagesize: 9999,
-      },
-    })
-      .then((response) => {
-        const { data } = response || []
-        const templateOptions = data
-          .filter((template) => template.isActive)
-          .map((template) => {
-            return {
-              ...template,
-              value: template.id,
-              name: template.name,
-            }
-          })
-        this.setState({ referralSource: templateOptions })
-      })
-  }
 
   render () {
     const { props } = this
-    const { theme, footer, settingReferralPerson } = props
+    const { theme, footer, settingReferralPerson, referralSource } = props
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
@@ -97,7 +71,7 @@ class Detail extends PureComponent {
                 render={(args) => (
                   <CodeSelect
                     {...args}
-                    options={this.state.referralSource}
+                    options={referralSource}
                     labelField='name'
                     mode='multiple'
                     label='Referral Source'

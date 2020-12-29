@@ -1,9 +1,17 @@
 import React, { PureComponent, Fragment } from 'react'
+import { connect } from 'dva'
 
+import withWebSocket from '@/components/Decorator/withWebSocket'
 import Edit from '@material-ui/icons/Edit'
 import Print from '@material-ui/icons/Print'
 import { CommonTableGrid, Button, Tooltip } from '@/components'
 import { status } from '@/utils/codes'
+import { getRawData } from '@/services/report'
+import { REPORT_ID } from '@/utils/constants'
+
+@connect(({ clinicSettings }) => ({
+  clinicSettings,
+}))
 
 class Grid extends PureComponent {
   editRow = (row, e) => {
@@ -21,30 +29,36 @@ class Grid extends PureComponent {
     })
   }
 
-  deleteRow = async (row, e) => {
-    const { dispatch } = this.props
 
-    dispatch({
-      type: 'global/updateAppState',
-      payload: {
-        openConfirm: true,
-        openConfirmContent: `Delete referral person ${row.name}?`,
-        onConfirmSave: async () => {
-          await dispatch({
-            type: 'settingReferralPerson/deleteReferralPerson',
-            payload: {
-              ...row,
-              isDeleted: true,
-            },
-          }).then(() => {
-            dispatch({
-              type: 'settingReferralPerson/query',
-            })
-          })
-        },
+  handleClick = async (referralPersonId) => {
+    console.log(referralPersonId)
+    if (!Number.isInteger(referralPersonId)) return
+
+    const { handlePrint, clinicSettings } = this.props
+    const { labelPrinterSize } = clinicSettings.settings
+
+    const sizeConverter = (sizeCM) => {
+      return sizeCM
+        .split('x')
+        .map((o) =>
+          (10 * parseFloat(o.replace('cm', ''))).toString().concat('MM'),
+        )
+        .join('_')
+    }
+    const reportID =
+      REPORT_ID['REFERRAL_PERSON_LABEL_'.concat(sizeConverter(labelPrinterSize))]
+
+    const data = await getRawData(reportID, { referralPersonId })
+    const payload = [
+      {
+        ReportId: reportID,
+        ReportData: JSON.stringify({
+          ...data,
+        }),
       },
-    })
-  }
+    ]
+    handlePrint(JSON.stringify(payload))
+  } 
 
   render () {
     return (
@@ -109,7 +123,7 @@ class Grid extends PureComponent {
             render: (row) => {
               return (
                 <Fragment>
-                  <Tooltip title='Edit Referral Source' placement='bottom'>
+                  <Tooltip title='Edit Referral Person' placement='bottom'>
                     <Button
                       size='sm'
                       onClick={() => {
@@ -121,14 +135,12 @@ class Grid extends PureComponent {
                       <Edit />
                     </Button>
                   </Tooltip>
-                  <Tooltip title='Delete Referral Source'>
+                  <Tooltip title='Print Referral Person Label'>
                     <Button
                       size='sm'
-                      onClick={() => {
-                        this.deleteRow(row)
-                      }}
                       justIcon
                       color='primary'
+                      onClick={() => this.handleClick(row.id)}
                     >
                       <Print />
                     </Button>
@@ -143,4 +155,4 @@ class Grid extends PureComponent {
   }
 }
 
-export default Grid
+export default withWebSocket()(Grid)

@@ -56,7 +56,6 @@ class Grid extends PureComponent {
           { name: 'mobileNo', title: 'Mobile No.' },
           { name: 'officeNo', title: 'Office No.' },
           { name: 'institution', title: 'Institution' },
-          { name: 'department', title: 'Department' },
           { name: 'address', title: 'Address' },
           { name: 'email', title: 'Email' },
           { name: 'remarks', title: 'Remarks' },

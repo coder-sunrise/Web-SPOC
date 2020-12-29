@@ -10,20 +10,18 @@ import {
   Button,
   TextField,
   ProgressButton,
+  CodeSelect,
+  Field,
 } from '@/components'
 
 @withFormikExtend({
   mapPropsToValues: ({ settingReferralPerson }) =>
     settingReferralPerson.filter || {},
   handleSubmit: (values, { props }) => {
-
-    const { isActive, name, institution, department } = values
-
+    const { name, referralSourceId } = values
     const payload = {
-      isActive,
       name,
-      institution,
-      department,
+      'ReferralSource_ReferralPerson.ReferralSourceFK': referralSourceId,
     }
 
     props.dispatch({
@@ -36,7 +34,7 @@ import {
 
 class Filter extends PureComponent {
   render () {
-    const { classes, handleSubmit } = this.props
+    const { classes, handleSubmit, referralSource } = this.props
     return (
       <div className={classes.filterBar}>
         <GridContainer>
@@ -48,12 +46,18 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={6} md={3}>
-            <FastField
-              name='institution'
-              render={(args) => {
-                return <TextField label='Company Name' {...args} />
-              }}
+          <GridItem xs={6} md={3}> 
+            <Field
+              name='referralSourceId'
+              render={(args) => (
+                <CodeSelect
+                  {...args}
+                  options={referralSource}
+                  labelField='name'
+                  mode='single'
+                  label='Referral Source'
+                />
+              )}
             />
           </GridItem>
         </GridContainer>
