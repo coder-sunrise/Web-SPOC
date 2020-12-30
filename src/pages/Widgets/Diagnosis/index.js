@@ -6,11 +6,8 @@ import { getUniqueGUID } from 'utils'
 import { withStyles } from '@material-ui/core'
 import Add from '@material-ui/icons/Add'
 import { AuthorizedContext, Button } from '@/components'
-import Item from './Item'
 import Authorized from '@/utils/Authorized'
-// import model from './models'
-
-// window.g_app.replaceModel(model)
+import Item from './Item'
 
 const styles = (theme) => ({
   diagnosisRow: {
@@ -18,39 +15,14 @@ const styles = (theme) => ({
     padding: theme.spacing(0.5),
   },
 })
-
-// @compare('diagnosis')
-// @withFormikExtend({
-//   mapPropsToValues: ({ diagnosis }) => {
-//     console.log(diagnosis)
-//     return diagnosis.entity ? diagnosis.entity : diagnosis.default
-//   },
-//   validationSchema: Yup.object().shape({
-//     corDiagnosis: Yup.array().of(
-//       Yup.object().shape({
-//         diagnosisFK: Yup.number().required(),
-//         // complication: Yup.array().of(Yup.string()).required().min(1),
-//         onsetDate: Yup.string().required(),
-//       }),
-//     ),
-//   }),
-
-//   handleSubmit: () => {},
-//   displayName: 'Diagnosis',
-// })
 const { Secured } = Authorized
 @Secured('queue.consultation.widgets.diagnosis')
-@connect(({ diagnosis, components, codetable, consultation }) => ({
+@connect(({ diagnosis, codetable, consultation }) => ({
   diagnosis,
   codetable,
   consultation,
 }))
 class Diagnosis extends PureComponent {
-  // constructor (props) {
-  //   super(props)
-  //   console.log(this.state, props, 'constructor')
-  // }
-
   componentDidMount () {
     const { dispatch } = this.props
     dispatch({
@@ -59,6 +31,11 @@ class Diagnosis extends PureComponent {
         code: 'ctComplication',
       },
     })
+
+    dispatch({
+      type: 'diagnosis/getUserPreference',
+      payload: {},
+    })
   }
 
   componentWillReceiveProps (nextProps) {
@@ -66,8 +43,6 @@ class Diagnosis extends PureComponent {
       !this.props.diagnosis.shouldAddNew &&
       nextProps.diagnosis.shouldAddNew
     ) {
-      // console.log('shouldAddNew')
-
       let index = 0
       if (this.diagnosises.length === 0) {
         index = 1
@@ -85,11 +60,20 @@ class Diagnosis extends PureComponent {
   }
 
   addDiagnosis = (index) => {
+    const { diagnosis } = this.props
+    let currentSelectCategory = diagnosis.favouriteDiagnosisCategory || []
+    if (currentSelectCategory.length === 4) {
+      currentSelectCategory = [
+        'all',
+        ...currentSelectCategory,
+      ]
+    }
     this.arrayHelpers.push({
       onsetDate: moment(),
       uid: getUniqueGUID(),
       sequence: index,
       isNew: true,
+      currentSelectCategory,
     })
   }
 
@@ -103,8 +87,128 @@ class Diagnosis extends PureComponent {
     this.addDiagnosis(index + 1)
   }
 
+  saveDiagnosisAsFavourite = (dignosisCode, uid) => {
+    const { dispatch, diagnosis } = this.props
+    let newFavouriteDiagnosis
+    let addNewFavorite
+    if ((diagnosis.favouriteDiagnosis || []).find((d) => d === dignosisCode)) {
+      newFavouriteDiagnosis = (diagnosis.favouriteDiagnosis || [])
+        .filter((d) => d !== dignosisCode)
+    } else {
+      addNewFavorite = true
+      newFavouriteDiagnosis = [
+        ...diagnosis.favouriteDiagnosis,
+        dignosisCode,
+      ]
+    }
+    dispatch({
+      type: 'diagnosis/saveUserPreference',
+      payload: {
+        userPreferenceDetails: {
+          value: newFavouriteDiagnosis,
+          Identifier: 'FavouriteDiagnosis',
+        },
+        itemIdentifier: 'FavouriteDiagnosis',
+      },
+    }).then((r) => {
+      if (r) {
+        dispatch({
+          type: 'diagnosis/getUserPreference',
+          payload: {},
+        }).then((response) => {
+          if (response) {
+            const { form } = this.arrayHelpers
+            const { values, setFieldValue } = form
+            setFieldValue(
+              'corDiagnosis',
+              (values.corDiagnosis || []).map((d) => {
+                if (d.uid === uid) {
+                  return {
+                    ...d,
+                    favouriteDiagnosisMessage: addNewFavorite
+                      ? 'Add to favourite successfully'
+                      : 'Remove favourite successfully',
+                  }
+                }
+                return d
+              }),
+            )
+
+            setTimeout(() => {
+              setFieldValue(
+                'corDiagnosis',
+                (values.corDiagnosis || []).map((d) => {
+                  if (d.uid === uid) {
+                    return {
+                      ...d,
+                      favouriteDiagnosisMessage: undefined,
+                    }
+                  }
+                  return d
+                }),
+              )
+            }, 3000)
+          }
+        })
+      }
+    })
+  }
+
+  saveCategoryAsFavourite = (favouriteCategory, uid) => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'diagnosis/saveUserPreference',
+      payload: {
+        userPreferenceDetails: {
+          value: favouriteCategory,
+          Identifier: 'FavouriteDiagnosisCategory',
+        },
+        itemIdentifier: 'FavouriteDiagnosisCategory',
+      },
+    }).then((r) => {
+      if (r) {
+        dispatch({
+          type: 'diagnosis/getUserPreference',
+          payload: {},
+        }).then((response) => {
+          if (response) {
+            const { form } = this.arrayHelpers
+            const { values, setFieldValue } = form
+            setFieldValue(
+              'corDiagnosis',
+              (values.corDiagnosis || []).map((d) => {
+                if (d.uid === uid) {
+                  return {
+                    ...d,
+                    favouriteDiagnosisCategoryMessage: 'Saved successfully',
+                  }
+                }
+                return d
+              }),
+            )
+
+            setTimeout(() => {
+              setFieldValue(
+                'corDiagnosis',
+                (values.corDiagnosis || []).map((d) => {
+                  if (d.uid === uid) {
+                    return {
+                      ...d,
+                      favouriteDiagnosisCategoryMessage: undefined,
+                    }
+                  }
+                  return d
+                }),
+              )
+            }, 3000)
+          }
+        })
+      }
+    })
+  }
+
   render () {
-    const { theme, diagnosis, rights } = this.props
+    const { rights, diagnosis } = this.props
 
     return (
       <div>
@@ -116,13 +220,7 @@ class Diagnosis extends PureComponent {
             this.diagnosises = values.corDiagnosis || []
 
             this.arrayHelpers = arrayHelpers
-            // if (!values || !values.corDiagnosis) return null
-
-            // if (values.corDiagnosis.length <= 0) {
-            //   this.addDiagnosis()
-            // }
             if (this.diagnosises.length === 0) {
-              // if(!values.disabled)
               if (rights === 'enable') {
                 this.addDiagnosis(1)
                 return null
@@ -139,6 +237,19 @@ class Diagnosis extends PureComponent {
                     index={i}
                     arrayHelpers={arrayHelpers}
                     diagnosises={this.diagnosises}
+                    saveCategoryAsFavourite={this.saveCategoryAsFavourite}
+                    saveDiagnosisAsFavourite={this.saveDiagnosisAsFavourite}
+                    uid={v.uid}
+                    diagnosisCode={v.diagnosisCode}
+                    favouriteDiagnosisMessage={v.favouriteDiagnosisMessage}
+                    favouriteDiagnosisCategoryMessage={
+                      v.favouriteDiagnosisCategoryMessage
+                    }
+                    favouriteDiagnosis={diagnosis.favouriteDiagnosis || []}
+                    favouriteDiagnosisCategory={
+                      diagnosis.favouriteDiagnosisCategory || []
+                    }
+                    currentSelectCategory={v.currentSelectCategory || []}
                   />
                 </div>
               )
