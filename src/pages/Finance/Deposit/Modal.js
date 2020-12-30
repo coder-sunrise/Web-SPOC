@@ -20,8 +20,6 @@ import {
   serverDateFormat,
 } from '@/components'
 
-import { CreditCardNumberInput } from '@/components/_medisys'
-
 const style = () => ({
   totalPayment: {
     textAlign: 'right',
@@ -43,70 +41,101 @@ const style = () => ({
 }))
 @withFormikExtend({
   authority: 'finance/deposit',
-  mapPropsToValues: ({ deposit, isDeposit }) => {
+  mapPropsToValues: ({
+    deposit,
+    isDeposit,
+    maxTranseferAmount,
+    invoicePayerFK,
+  }) => {
+    let transactionTypeFK = 2
+    let transactionType = 'Refund'
+    if (isDeposit) {
+      if (invoicePayerFK) {
+        transactionTypeFK = 4
+        transactionType = 'Transfer'
+      } else {
+        transactionTypeFK = 1
+        transactionType = 'Deposit'
+      }
+    }
     if (deposit.entity) {
-      const { patientDepositTransaction, balance } = deposit.entity
-      const transactionTypeFK = isDeposit ? 1 : 2
-      const transactionType = transactionTypeFK === 1 ? 'Deposit' : 'Refund'
+      const { patientDepositTransaction } = deposit.entity
       const transactionModeFK = isDeposit ? undefined : 3
       return {
         ...deposit.entity,
         balance: deposit.entity.balance ? deposit.entity.balance : 0,
         patientDepositTransaction: {
           patientDepositFK: deposit.entity.patientDepositFK,
-          // transactionDate: moment(),
           transactionType,
           transactionTypeFK,
           transactionModeFK,
-          amount: 0,
+          amount: maxTranseferAmount || 0,
+          maxTranseferAmount,
         },
-        balanceAfter: deposit.entity.balance ? deposit.entity.balance : 0,
+        balanceAfter:
+          (deposit.entity.balance ? deposit.entity.balance : 0) +
+          (maxTranseferAmount || 0),
         hasTransactionBefore: !!patientDepositTransaction,
+        invoicePayerFK,
       }
     }
-    return deposit.default
+    return {
+      ...deposit.default,
+      patientDepositTransaction: {
+        ...deposit.default.patientDepositTransaction,
+        amount: maxTranseferAmount || 0,
+        maxTranseferAmount,
+        transactionType,
+        transactionTypeFK,
+      },
+      balanceAfter: maxTranseferAmount || 0,
+      invoicePayerFK,
+    }
   },
   validationSchema: ({ deposit }) => {
     const balance = deposit.entity
       ? deposit.entity.balance
       : deposit.default.balance
-    return Yup.object().shape({
-      patientDepositTransaction: Yup.object().shape({
-        transactionDate: Yup.string().required('Date is required'),
-        transactionBizSessionFK: Yup.number().required(),
-        transactionModeFK: Yup.number().required('Mode is required'),
-        amount: Yup.number().when('transactionTypeFK', {
-          is: (val) => val === 2,
-          then: Yup.number()
+
+    const amountSchema = Yup.number().when(
+      [
+        'transactionTypeFK',
+        'maxTranseferAmount',
+      ],
+      (transactionTypeFK, maxTranseferAmount) => {
+        if (transactionTypeFK === 2)
+          return Yup.number()
             .min(0.01, 'The amount should be more than 0.01')
-            .max(balance, 'The amount should not exceed the balance.'),
-          otherwise: Yup.number().min(
-            0.01,
-            'The amount should be more than 0.01',
-          ),
+            .max(balance, 'The amount should not exceed the balance.')
+        else if (maxTranseferAmount) {
+          return Yup.number()
+            .min(0.01, 'The amount should be more than 0.01')
+            .max(
+              maxTranseferAmount,
+              `The amount should less than or equal to ${maxTranseferAmount}.`,
+            )
+        } else
+          return Yup.number().min(0.01, 'The amount should be more than 0.01')
+      },
+    )
+    return Yup.object().shape({
+      patientDepositTransaction: Yup.object().when('invoicePayerFK', {
+        is: (val) => !val,
+        then: Yup.object().shape({
+          transactionDate: Yup.string().required('Date is required'),
+          transactionBizSessionFK: Yup.number().required(),
+          transactionModeFK: Yup.number().required('Mode is required'),
+          amount: amountSchema,
+          creditCardTypeFK: Yup.number().when('transactionModeFK', {
+            is: (val) => val === 1,
+            then: Yup.number().required(),
+          }),
         }),
-
-        creditCardTypeFK: Yup.number().when('transactionModeFK', {
-          is: (val) => val === 1,
-          then: Yup.number().required(),
+        otherwise: Yup.object().shape({
+          transactionDate: Yup.string().required('Date is required'),
+          transactionBizSessionFK: Yup.number().required(),
+          amount: amountSchema,
         }),
-
-        // cardNumber: Yup.number().when('transactionModeFK', {
-        //   is: (val) => false,
-        //   then: Yup.number().test(
-        //     'test-number', // this is used internally by yup
-        //     'Credit Card number is invalid', //validation message
-        //     (value) => valid.number(value).isValid,
-        //   ), // ret,
-        //   otherwise: Yup.number(),
-        // }),
-        //   cardNumber: Yup.string()
-        //     .test(
-        //       'test-number', // this is used internally by yup
-        //       'Credit Card number is invalid', //validation message
-        //       (value) => valid.number(value).isValid,
-        //     ) // return true false based on validation
-        //     .required(),
       }),
     })
   },
@@ -116,6 +145,7 @@ const style = () => ({
       balanceAfter,
       patientDepositTransaction,
       hasTransactionBefore,
+      invoicePayerFK,
     } = values
     const {
       transactionModeFK,
@@ -127,11 +157,13 @@ const style = () => ({
     const { ctpaymentmode, ctcreditcardtype } = codetable
     let transactionMode
     let creditCardType
-    transactionMode = ctpaymentmode.find((o) => o.id === transactionModeFK)
-      .displayValue
-    if (transactionModeFK === 1) {
-      creditCardType = ctcreditcardtype.find((o) => o.id === creditCardTypeFK)
-        .name
+    if (!invoicePayerFK) {
+      transactionMode = ctpaymentmode.find((o) => o.id === transactionModeFK)
+        .displayValue
+      if (transactionModeFK === 1) {
+        creditCardType = ctcreditcardtype.find((o) => o.id === creditCardTypeFK)
+          .name
+      }
     }
     const transType = patientDepositTransaction.transactionType
     dispatch({
@@ -151,11 +183,12 @@ const style = () => ({
           creditCardTypeFK,
           createdByBizSessionFK: transactionBizSessionFK,
           transactionBizSessionFK,
-          remarks:
-            remarks ||
-            (isDeposit
-              ? 'Deposit for treatments'
-              : 'Refund from patient deposit account'),
+          remarks: invoicePayerFK
+            ? remarks
+            : remarks ||
+              (isDeposit
+                ? 'Deposit for treatments'
+                : 'Refund from patient deposit account'),
         },
       },
     }).then((r) => {
@@ -176,8 +209,6 @@ class Modal extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      // balanceAfter: entity.balance || 0,
-      // isSessionRequired: isDeposit ? false : true,
       isSessionRequired: false,
       isCardPayment: false,
       paymentMode: [],
@@ -286,7 +317,7 @@ class Modal extends PureComponent {
         'patientDepositTransaction.transactionBizSessionFK',
         bizSessionList === undefined || bizSessionList.length === 0
           ? undefined
-          : bizSessionList[0].value, // bizSessionList.slice(-1)[0].value,
+          : bizSessionList[0].value,
       )
     })
   }
@@ -319,20 +350,18 @@ class Modal extends PureComponent {
 
   render () {
     const { props } = this
-    const { classes, footer, isDeposit, deposit } = props
+    const { classes, footer, isDeposit, deposit, invoicePayerFK } = props
     const { bizSessionList } = deposit
     const { isCardPayment, paymentMode } = this.state
     const commonAmountOpts = {
       currency: true,
       fullWidth: true,
-      // rightAlign: true,
       noUnderline: true,
     }
     const accessRight = Authorized.check('finance.deposit.addtopastsession')
 
     const allowAddToPastSession = accessRight && accessRight.rights === 'enable'
 
-    //
     return (
       <React.Fragment>
         <div>
@@ -366,31 +395,28 @@ class Modal extends PureComponent {
                 )}
               />
             </GridItem>
+
             <GridItem xs={12}>
-              <Field
-                name='patientDepositTransaction.transactionModeFK'
-                render={(args) => (
-                  <Select
-                    label='Mode'
-                    onChange={(e) => this.onChangePaymentMode(e)}
-                    options={paymentMode}
-                    labelField='displayValue'
-                    valueField='id'
-                    {...args}
-                  />
-                  //    <CodeSelect
-                  //   label='Mode'
-                  //   labelField='displayValue'
-                  //   onChange={(e) => this.onChangePaymentMode(e)}
-                  //   code='ctpaymentmode'
-                  //   {...args}
-                  // />
-                )}
-              />
+              {!invoicePayerFK && (
+                <Field
+                  name='patientDepositTransaction.transactionModeFK'
+                  render={(args) => (
+                    <Select
+                      label='Mode'
+                      onChange={(e) => this.onChangePaymentMode(e)}
+                      options={paymentMode}
+                      labelField='displayValue'
+                      valueField='id'
+                      {...args}
+                    />
+                  )}
+                />
+              )}
             </GridItem>
 
-            {isCardPayment && (
-              <GridItem xs={12}>
+            <GridItem xs={12}>
+              {!invoicePayerFK &&
+              isCardPayment && (
                 <Field
                   name='patientDepositTransaction.creditCardTypeFK'
                   render={(args) => (
@@ -401,23 +427,26 @@ class Modal extends PureComponent {
                     />
                   )}
                 />
-              </GridItem>
-            )}
+              )}
+            </GridItem>
 
             <GridItem xs={12}>
-              <Field
-                name='patientDepositTransaction.modeRemarks'
-                render={(args) => (
-                  <TextField
-                    multiline
-                    rowsMax='3'
-                    label='Mode Remarks'
-                    maxLength={200}
-                    {...args}
-                  />
-                )}
-              />
+              {!invoicePayerFK && (
+                <Field
+                  name='patientDepositTransaction.modeRemarks'
+                  render={(args) => (
+                    <TextField
+                      multiline
+                      rowsMax='3'
+                      label='Mode Remarks'
+                      maxLength={200}
+                      {...args}
+                    />
+                  )}
+                />
+              )}
             </GridItem>
+
             <GridItem xs={12}>
               <Field
                 name='patientDepositTransaction.remarks'
@@ -425,7 +454,6 @@ class Modal extends PureComponent {
                   <TextField
                     multiline
                     rowsMax='5'
-                    // prefix={isDeposit ? 'Deposit Remarks' : 'Refund Remarks'}
                     label={isDeposit ? 'Deposit Remarks' : 'Refund Remarks'}
                     {...args}
                   />
@@ -437,21 +465,23 @@ class Modal extends PureComponent {
           <GridContainer alignItems='center' justify='center'>
             <GridItem md={3} />
             <GridItem md={3} className={classes.label}>
-              <span>Balance</span>
+              {!invoicePayerFK && <span>Balance</span>}
             </GridItem>
+
             <GridItem md={3}>
-              <Field
-                name='balance'
-                render={(args) => (
-                  <NumberInput
-                    defaultValue='0.00'
-                    disabled
-                    {...commonAmountOpts}
-                    // label='Balance'
-                    {...args}
-                  />
-                )}
-              />
+              {!invoicePayerFK && (
+                <Field
+                  name='balance'
+                  render={(args) => (
+                    <NumberInput
+                      defaultValue='0.00'
+                      disabled
+                      {...commonAmountOpts}
+                      {...args}
+                    />
+                  )}
+                />
+              )}
             </GridItem>
             <GridItem md={3} />
             <GridItem md={3} />
@@ -466,7 +496,6 @@ class Modal extends PureComponent {
                     defaultValue='0.00'
                     onChange={this.calculateBalanceAfter}
                     {...commonAmountOpts}
-                    // label={isDeposit ? 'Deposit Amount' : 'Refund Amount'}
                     min={0}
                     {...args}
                   />
@@ -475,72 +504,26 @@ class Modal extends PureComponent {
             </GridItem>
             <GridItem md={3} />
             <GridItem md={3} />
-            <GridItem md={6}>
-              <Divider />
-            </GridItem>
+            <GridItem md={6}>{!invoicePayerFK && <Divider />}</GridItem>
             <GridItem md={3} />
-
             <GridItem md={3} />
-
             <GridItem md={3}>
-              <Field
-                name='balanceAfter'
-                render={(args) => (
-                  <NumberInput
-                    style={{ top: -5 }}
-                    {...commonAmountOpts}
-                    disabled
-                    defaultValue='0.00'
-                    {...args}
-                  />
-                )}
-              />
+              {!invoicePayerFK && (
+                <Field
+                  name='balanceAfter'
+                  render={(args) => (
+                    <NumberInput
+                      style={{ top: -5 }}
+                      {...commonAmountOpts}
+                      disabled
+                      defaultValue='0.00'
+                      {...args}
+                    />
+                  )}
+                />
+              )}
             </GridItem>
           </GridContainer>
-          {/* <div style={{ width: '40%', margin: 'auto' }}>
-            <Field
-              name='balance'
-              render={(args) => (
-                <NumberInput
-                  {...commonAmountOpts}
-                  style={{
-                    marginTop: theme.spacing.unit * 2,
-                  }}
-                  disabled
-                  defaultValue='0.00'
-                  prefix='Balance'
-                  {...args}
-                />
-              )}
-            />
-            <Field
-              name='patientDepositTransaction.amount'
-              render={(args) => (
-                <NumberInput
-                  defaultValue='0.00'
-                  onChange={this.calculateBalanceAfter}
-                  {...commonAmountOpts}
-                  prefix={isDeposit ? 'Deposit Amount' : 'Refund Amount'}
-                  min={0}
-                  {...args}
-                />
-              )}
-            />
-            <Divider style={{ width: '45%', float: 'right' }} />
-            <Field
-              name='balanceAfter'
-              render={(args) => (
-                <NumberInput
-                  style={{ top: -5 }}
-                  {...commonAmountOpts}
-                  disabled
-                  defaultValue='0.00'
-                  prefix=' '
-                  {...args}
-                />
-              )}
-            />
-          </div> */}
         </div>
 
         {footer &&
