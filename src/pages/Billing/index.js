@@ -31,13 +31,11 @@ import { ReportsOnCompletePaymentOption } from '@/utils/codes'
 import ApplyClaims from './refactored/newApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 import SchemeValidationPrompt from './components/SchemeValidationPrompt'
-import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
 // page utils
 import {
   constructPayload,
   validateApplySchemesWithPatientSchemes,
 } from './utils'
-// window.g_app.replaceModel(model)
 
 const styles = (theme) => ({
   accordionContainer: {
@@ -55,14 +53,11 @@ const styles = (theme) => ({
     textAlign: 'right',
   },
   dispenseContainer: {
-    // maxHeight: '40vh',
-    // overflow: 'auto',
     paddingTop: theme.spacing(1),
     paddingBottom: theme.spacing(2),
   },
 })
 
-// @Authorized.Secured('queue.dispense.makepayment')
 @connect(
   ({
     global,
@@ -93,9 +88,6 @@ const styles = (theme) => ({
   }),
 )
 @withFormikExtend({
-  // authority: [
-  //   'queue.dispense.makepayment',
-  // ],
   notDirtyDuration: 3,
   displayName: 'BillingForm',
   enableReinitialize: true,
@@ -159,7 +151,7 @@ class Billing extends Component {
     },
     showDrugLabelSelection: false,
     selectedDrugs: [],
-    isExistingOldPayerItem: false,
+    isUpdatedAppliedInvoicePayerInfo: false,
   }
 
   componentWillUnmount () {
@@ -174,6 +166,7 @@ class Billing extends Component {
       type: 'dispense/updateState',
       payload: {
         entity: null,
+        shouldRefreshOrder: false,
       },
     })
   }
@@ -396,9 +389,17 @@ class Billing extends Component {
   }
 
   backToDispense = () => {
-    const { dispatch } = this.props
+    const refreshOrder = this.showRefreshOrder()
+    const { dispatch, billing } = this.props
     dispatch({
       type: 'billing/backToDispense',
+    }).then(() => {
+      if (refreshOrder) {
+        dispatch({
+          type: 'dispense/refresh',
+          payload: billing.visitID,
+        })
+      }
     })
   }
 
@@ -514,7 +515,6 @@ class Billing extends Component {
         InvoiceId: values.invoice ? values.invoice.id : '',
       }
     }
-    console.log('parametrPaload', parametrPaload)
     if (modifiedOrNewAddedPayer.length > 0) {
       dispatch({
         type: 'global/updateState',
@@ -587,7 +587,6 @@ class Billing extends Component {
             : { ...payment },
       )
     }
-    // await setFieldValue('invoicePayment', _newInvoicePayment)
     const _newValues = {
       ...values,
       invoicePayment: _newInvoicePayment,
@@ -673,8 +672,23 @@ class Billing extends Component {
     })
   }
 
-  handleIsExistingOldPayerItem = (isExistingOldPayerItem) => {
-    this.setState({ isExistingOldPayerItem })
+  handleUpdatedAppliedInvoicePayerInfo = (isUpdatedAppliedInvoicePayerInfo) => {
+    this.setState({ isUpdatedAppliedInvoicePayerInfo })
+  }
+
+  showRefreshOrder = () => {
+    const { billing, values } = this.props
+    const { shouldRefreshOrder } = billing
+    let showRefreshOrder = shouldRefreshOrder
+    const { visitStatus } = values
+    if (
+      visitStatus &&
+      visitStatus !== 'BILLING' &&
+      visitStatus !== 'COMPLETED'
+    ) {
+      showRefreshOrder = true
+    }
+    return showRefreshOrder
   }
 
   render () {
@@ -706,7 +720,6 @@ class Billing extends Component {
       inventoryvaccination,
       inventorymedication,
       clinicSettings,
-      billing,
     } = this.props
     const formikBag = {
       values,
@@ -725,8 +738,7 @@ class Billing extends Component {
       ctservice,
       ctcopayer,
     }
-    const { shouldRefreshOrder } = billing
-    const { isEnableAddPaymentInBilling = false } = clinicSettings
+
     return (
       <LoadingWrapper loading={loading} text='Getting billing info...'>
         <PatientBanner />
@@ -768,11 +780,11 @@ class Billing extends Component {
         <Paper className={classes.paperContent}>
           <GridContainer justify='center' alignItems='flex-start'>
             <GridItem md={12}>
-              {shouldRefreshOrder && (
+              {this.showRefreshOrder() && (
                 <div style={{ paddingBottom: 8 }}>
                   <WarningSnackbar
                     variant='warning'
-                    message='Changes detected. Please refresh order in dispensing screen.'
+                    message='Changes detected. Please refresh order in dispensing screen. (Delete all the Co-payer payment if any)'
                   />
                 </div>
               )}
@@ -790,9 +802,10 @@ class Billing extends Component {
                   onPrinterClick={this.onPrinterClick}
                   saveBilling={this.handleSaveBillingClick}
                   fromBilling
-                  handleIsExistingOldPayerItem={
-                    this.handleIsExistingOldPayerItem
+                  handleUpdatedAppliedInvoicePayerInfo={
+                    this.handleUpdatedAppliedInvoicePayerInfo
                   }
+                  showRefreshOrder={this.showRefreshOrder()}
                 />
               )}
             </GridContainer>
@@ -820,6 +833,10 @@ class Billing extends Component {
                     maxLength={2000}
                     rowsMax={5}
                     rows={2}
+                    disabled={
+                      this.state.isUpdatedAppliedInvoicePayerInfo ||
+                      this.showRefreshOrder()
+                    }
                     {...args}
                   />
                 )
@@ -835,11 +852,10 @@ class Billing extends Component {
                   disabled={
                     this.state.isEditing ||
                     values.id === undefined ||
-                    (isEnableAddPaymentInBilling &&
-                      values.invoicePayer.find((payer) =>
-                        (payer.invoicePayment || [])
-                          .find((payment) => !payment.isCancelled),
-                      ))
+                    values.invoicePayer.find((payer) =>
+                      (payer.invoicePayment || [])
+                        .find((payment) => !payment.isCancelled),
+                    )
                   }
                 >
                   <ArrowBack />Dispense
@@ -847,7 +863,12 @@ class Billing extends Component {
                 <Button
                   color='primary'
                   onClick={this.handleSaveBillingClick}
-                  disabled={this.state.isEditing || values.id === undefined}
+                  disabled={
+                    this.state.isEditing ||
+                    values.id === undefined ||
+                    this.state.isUpdatedAppliedInvoicePayerInfo ||
+                    this.showRefreshOrder()
+                  }
                 >
                   Save Billing
                 </Button>
@@ -856,8 +877,8 @@ class Billing extends Component {
                   disabled={
                     this.state.isEditing ||
                     values.id === undefined ||
-                    (isEnableAddPaymentInBilling &&
-                      this.state.isExistingOldPayerItem)
+                    this.state.isUpdatedAppliedInvoicePayerInfo ||
+                    this.showRefreshOrder()
                   }
                   onClick={this.onCompletePaymentClick}
                 >
@@ -891,7 +912,6 @@ class Billing extends Component {
               ...values.invoice,
               outstandingBalance: values.invoice.outstandingBalance,
               payerTypeFK: INVOICE_PAYER_TYPE.PATIENT,
-              // paymentReceivedDate: moment().formatUTC(false),
               paymentReceivedByUserFK: user.id,
               paymentCreatedBizSessionFK: sessionInfo.id,
               paymentReceivedBizSessionFK: sessionInfo.id,

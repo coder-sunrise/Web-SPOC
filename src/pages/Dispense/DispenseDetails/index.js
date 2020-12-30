@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { connect } from 'dva'
 import { compose } from 'redux'
 // material ui
@@ -8,17 +8,14 @@ import Refresh from '@material-ui/icons/Refresh'
 import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
-import AddAlert from '@material-ui/icons/AddAlert'
 import { formatMessage } from 'umi/locale' // common component
 import {
   Button,
   ProgressButton,
   GridItem,
   GridContainer,
-  SizeContainer,
   CommonTableGrid,
   TextField,
-  Field,
   CommonModal,
 } from '@/components'
 import AmountSummary from '@/pages/Shared/AmountSummary'
@@ -29,7 +26,7 @@ import {
   NOTIFICATION_STATUS,
 } from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
-import { dangerColor } from '@/assets/jss'
+import Warining from '@material-ui/icons/Error'
 // sub components
 import TableData from './TableData'
 import VaccinationGrid from './VaccinationGrid'
@@ -45,16 +42,6 @@ import {
 } from '../variables'
 
 import CONSTANTS from './constants'
-import Warining from '@material-ui/icons/Error'
-
-// const styles = (theme) => ({
-//   gridRow: {
-//     margin: `${theme.spacing.unit}px 0px`,
-//     '& > h5': {
-//       padding: theme.spacing.unit,
-//     },
-//   },
-// })
 
 const styles = (theme) => ({
   paper: {
@@ -128,7 +115,6 @@ const DispenseDetails = ({
   const { inventorymedication, inventoryvaccination } = codetable
 
   const handleSelectedBatch = (e, op = {}, row) => {
-    // console.log({ e, op, row })
     if (op && op.length > 0) {
       const { expiryDate } = op[0]
       setFieldValue(`prescription[${row.rowIndex}]expiryDate`, expiryDate)
@@ -217,6 +203,26 @@ const DispenseDetails = ({
     })
   }
 
+  const checkUpdatedAppliedInvoicePayerInfo = () => {
+    let isUpdatedAppliedInvoicePayerInfo
+    const activeInvoicePayer = coPayer.filter((tip) => !tip.isCancelled)
+    invoiceItem.forEach((item) => {
+      for (let index = 0; index < activeInvoicePayer.length; index++) {
+        const { invoicePayerItem = [] } = activeInvoicePayer[index]
+        const payerItem = invoicePayerItem.find(
+          (ipi) => item.id === ipi.invoiceItemFK,
+        )
+        if (payerItem) {
+          if (item.totalAfterGST !== payerItem.payableBalance) {
+            isUpdatedAppliedInvoicePayerInfo = true
+          }
+          break
+        }
+      }
+    })
+    return isUpdatedAppliedInvoicePayerInfo
+  }
+
   const { clinicalObjectRecordFK } = values || {
     clinicalObjectRecordFK: undefined,
   }
@@ -229,10 +235,6 @@ const DispenseDetails = ({
     showRemovePayment,
     setShowRemovePayment,
   ] = useState(false)
-  const [
-    showInvoiceNegativeWarning,
-    setShowInvoiceNegativeWarning,
-  ] = useState(false)
 
   const [
     voidReason,
@@ -240,31 +242,33 @@ const DispenseDetails = ({
   ] = useState('')
 
   let coPayerPayments = []
-  coPayer.forEach((ip) => {
-    const { invoicePayment = [], name } = ip
-    coPayerPayments = coPayerPayments.concat(
-      invoicePayment.filter((o) => !o.isCancelled).map((o) => ({
-        ...o,
-        payerName: name,
-      })),
-    )
-  })
+  if (checkUpdatedAppliedInvoicePayerInfo()) {
+    coPayer.forEach((ip) => {
+      const { invoicePayment = [], name } = ip
+      coPayerPayments = coPayerPayments.concat(
+        invoicePayment.filter((o) => !o.isCancelled).map((o) => ({
+          ...o,
+          payerName: name,
+        })),
+      )
+    })
+  }
   return (
     <React.Fragment>
       <GridContainer>
         <GridItem justify='flex-start' md={6} className={classes.actionButtons}>
           {!viewOnly &&
-            !isRetailVisit && (
-              <Button
-                color='info'
-                size='sm'
-                onClick={onReloadClick}
-                disabled={disableRefreshOrder}
-              >
-                <Refresh />
+          !isRetailVisit && (
+            <Button
+              color='info'
+              size='sm'
+              onClick={onReloadClick}
+              disabled={disableRefreshOrder}
+            >
+              <Refresh />
               Refresh Order
-              </Button>
-            )}
+            </Button>
+          )}
           <Button
             color='primary'
             size='sm'
@@ -357,27 +361,44 @@ const DispenseDetails = ({
                         isInformType: true,
                         customWidth: 'md',
                         openConfirmContent: () => {
-                          return <div>
-                            <Warining style={{ width: '1.3rem', height: '1.3rem', marginLeft: '10px', color: 'red' }} />
-                            <h3 style={{ marginLeft: '10px', display: 'inline-block' }}>Unable to finalize, total amount cannot be <span style={{ fontWeight: 400 }}>negative</span>.</h3>
-                          </div>
+                          return (
+                            <div>
+                              <Warining
+                                style={{
+                                  width: '1.3rem',
+                                  height: '1.3rem',
+                                  marginLeft: '10px',
+                                  color: 'red',
+                                }}
+                              />
+                              <h3
+                                style={{
+                                  marginLeft: '10px',
+                                  display: 'inline-block',
+                                }}
+                              >
+                                Unable to finalize, total amount cannot be{' '}
+                                <span style={{ fontWeight: 400 }}>
+                                  negative
+                                </span>.
+                              </h3>
+                            </div>
+                          )
                         },
                         openConfirmText: 'OK',
                         onConfirmClose: () => {
                           window.g_app._store.dispatch({
                             type: 'global/updateAppState',
                             payload: {
-                              customWidth: undefined
-                            }
+                              customWidth: undefined,
+                            },
                           })
                         },
                       },
                     })
-                  }
-                  else if (coPayerPayments.length > 0) {
+                  } else if (coPayerPayments.length > 0) {
                     setShowRemovePayment(true)
-                  }
-                  else {
+                  } else {
                     onFinalizeClick()
                   }
                 }}
@@ -461,10 +482,6 @@ const DispenseDetails = ({
         onClose={() => {
           onDrugLabelSelectionClose()
         }}
-      // onConfirm={() => {
-      //    onDrugLabelSelectionClose()
-      //    onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
-      // }}
       >
         <DrugLabelSelection
           prescription={selectedDrugs}
@@ -573,7 +590,7 @@ const DispenseDetails = ({
           </GridContainer>
         </div>
       </CommonModal>
-    </React.Fragment >
+    </React.Fragment>
   )
 }
 

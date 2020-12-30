@@ -53,7 +53,6 @@ const discardConsultation = async ({ dispatch, dispense }) => {
   }
 }
 const styles = () => ({})
-// @Authorized.Secured('queue.dispense.editorder')
 @connect(({ consultation }) => ({
   consultation,
 }))
@@ -244,6 +243,7 @@ class EditOrder extends Component {
           type: `dispense/updateState`,
           payload: {
             editingOrder: false,
+            shouldRefreshOrder: false,
           },
         })
       }

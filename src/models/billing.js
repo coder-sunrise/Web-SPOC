@@ -1,4 +1,3 @@
-// import { queryFakeList, fakeSubmitForm } from '@/services/api'
 import router from 'umi/router'
 import { createFormViewModel } from 'medisys-model'
 import { subscribeNotification } from '@/utils/realtime'
@@ -47,11 +46,19 @@ export default createFormViewModel({
 
       subscribeNotification('EditedConsultation', {
         callback: (response) => {
-          const { visitID } = response
+          const { visitID, senderId } = response
           dispatch({
             type: 'updateShouldRefreshOrder',
             payload: {
               visitID,
+              senderId,
+            },
+          })
+          dispatch({
+            type: 'dispense/updateShouldRefreshOrder',
+            payload: {
+              visitID,
+              senderId,
             },
           })
         },
@@ -142,22 +149,7 @@ export default createFormViewModel({
         }
         return false
       },
-      // *complete ({ payload }, { call, put }) {
-      //   const response = yield call(service.complete, payload)
-      //   if (response) {
-      //     yield put({ type: 'formik/clean', payload: 'BillingForm' })
-      //     yield put({
-      //       type: 'updateState',
-      //       payload: {
-      //         entity: null,
-      //       },
-      //     })
-      //     notification.success({
-      //       message: 'Billing completed',
-      //     })
-      //     router.push('/reception/queue')
-      //   }
-      // },
+
       *refresh ({ payload }, { put }) {
         yield put({
           type: 'query',
@@ -181,13 +173,6 @@ export default createFormViewModel({
           parameters,
           '/reception/queue/dispense',
         )
-        // const response = yield put({
-        //   type: 'dispense/unlock',
-        //   payload: {
-        //     id: billingState.visitID,
-        //   },
-        // })
-        // yield take('dispense/unlock/@@end')
 
         const response = yield call(unlock, { id: billingState.visitID })
         if (response) {
@@ -207,6 +192,19 @@ export default createFormViewModel({
           router.push(destinationUrl)
         }
       },
+      *updateShouldRefreshOrder ({ payload }, { put, select }) {
+        const user = yield select((state) => state.user)
+        const billing = yield select((state) => state.billing)
+        const { visitID, senderId } = payload
+        const { entity } = billing || {}
+        if (entity && entity.id === visitID && senderId !== user.data.id)
+          yield put({
+            type: 'updateState',
+            payload: {
+              shouldRefreshOrder: true,
+            },
+          })
+      },
     },
     reducers: {
       addItems (state, { payload }) {
@@ -216,15 +214,6 @@ export default createFormViewModel({
             ...state.invoiceItems,
             payload,
           ],
-        }
-      },
-      updateShouldRefreshOrder (state, { payload }) {
-        const { visitID } = payload
-        const { entity = {} } = state
-        const { id } = entity
-        return {
-          ...state,
-          shouldRefreshOrder: id === visitID ? true : state.shouldRefreshOrder,
         }
       },
     },

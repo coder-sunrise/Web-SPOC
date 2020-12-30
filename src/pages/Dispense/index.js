@@ -6,12 +6,11 @@ import { withStyles } from '@material-ui/core'
 import { GridContainer, SizeContainer, NumberInput } from '@/components'
 // sub component
 import Banner from '@/pages/PatientDashboard/Banner'
-import Main from './Main'
-import EditOrder from './EditOrder'
-
-import style from './style'
 // utils
 import { LoadingWrapper } from '@/components/_medisys'
+import Main from './Main'
+import EditOrder from './EditOrder'
+import style from './style'
 
 @connect(
   ({
@@ -51,6 +50,8 @@ class Dispense extends PureComponent {
       type: 'dispense/updateState',
       payload: {
         loadCount: 0,
+        shouldRefreshOrder: false,
+        entity: null,
       },
     })
   }
@@ -71,7 +72,6 @@ class Dispense extends PureComponent {
     }
     return (
       <GridContainer
-        // className={classes.actionPanel}
         direction='column'
         justify='space-evenly'
         alignItems='center'
