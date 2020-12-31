@@ -1,53 +1,62 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Field, FastField } from 'formik'
 import _ from 'lodash'
-import { Paper, Divider } from '@material-ui/core'
+import { Paper } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete'
-import AttachMoney from '@material-ui/icons/AttachMoney'
-import FilterList from '@material-ui/icons/FilterList'
 import moment from 'moment'
 import {
   Button,
   GridContainer,
   GridItem,
   TextField,
-  CodeSelect,
   DatePicker,
   Checkbox,
   Popover,
   Tooltip,
   Select,
-  ButtonSelect,
+  CheckboxGroup,
 } from '@/components'
-import { queryList } from '@/services/common'
 import { DiagnosisSelect } from '@/components/_medisys'
 
 const filterOptions = [
   {
-    value: 'isChasAcuteClaimable',
-    name: 'CHAS Chronic',
+    value: 'all',
+    name: 'All',
   },
   {
     value: 'isChasChronicClaimable',
+    name: 'CHAS Chronic',
+  },
+  {
+    value: 'isChasAcuteClaimable',
     name: 'CHAS Acute',
   },
   {
     value: 'isHazeClaimable',
     name: 'Haze',
   },
+  {
+    value: 'isCdmpClaimable',
+    name: 'CDMP',
+  },
 ]
 
 const DiagnosisItem = ({
-  codetable,
   dispatch,
   theme,
   index,
   arrayHelpers,
-  diagnosises,
   classes,
-  values,
   consultation,
-  ...props
+  saveDiagnosisAsFavourite,
+  saveCategoryAsFavourite,
+  uid,
+  favouriteDiagnosisMessage,
+  favouriteDiagnosisCategoryMessage,
+  favouriteDiagnosis,
+  favouriteDiagnosisCategory,
+  diagnosisCode,
+  currentSelectCategory,
 }) => {
   const [
     show,
@@ -64,15 +73,10 @@ const DiagnosisItem = ({
     setShowPersistMsg,
   ] = useState(false)
 
-  const [
-    diagnosisFilter,
-    setDiagnosisFilter,
-  ] = useState([])
-
   const { form } = arrayHelpers
 
   const onDiagnosisChange = (v, op) => {
-    const { setFieldValue, values: vals, setValues } = form
+    const { values: vals, setValues } = form
     const { entity } = consultation
     if (op) {
       vals.corDiagnosis[index].diagnosisDescription = op.displayvalue
@@ -81,55 +85,117 @@ const DiagnosisItem = ({
       vals.corDiagnosis[index].diagnosisICD10AMCode = op.iCD10AMDiagnosisCode
       vals.corDiagnosis[index].diagnosisICD10AMName = op.iCD10AMDiagnosisName
       if (op.complication && op.complication.length) {
-        if(diagnosisFilter.length === 1 && diagnosisFilter.find(df => df === 'isCdmpClaimable'))
-        {
-          const complications = op.complication.filter(c => c.cdmpComplicationCode)
+        if (
+          currentSelectCategory.length === 1 &&
+          currentSelectCategory.find((df) => df === 'isCdmpClaimable')
+        ) {
+          const complications = op.complication.filter(
+            (c) => c.cdmpComplicationCode,
+          )
           setCtComplicationPairedWithDiag(complications || [])
-        }
-        else
-          setCtComplicationPairedWithDiag(op.complication)
+        } else setCtComplicationPairedWithDiag(op.complication)
       } else {
         vals.corDiagnosis[index].complication = []
         vals.corDiagnosis[index].corComplication = []
 
         setCtComplicationPairedWithDiag([])
       }
-      setValues(vals)
-      entity.corDiagnosis = vals.corDiagnosis
-      dispatch({
-        type: 'consultation/updateState',
-        payload: {
-          entity,
-        },
-      })
+    } else {
+      vals.corDiagnosis[index].diagnosisCode = undefined
     }
+    setValues(vals)
+    entity.corDiagnosis = vals.corDiagnosis
+    dispatch({
+      type: 'consultation/updateState',
+      payload: {
+        entity,
+      },
+    })
   }
-  const onDataSouceChange = (data, filter) => {
-    setDiagnosisFilter(filter)
+  const onDataSouceChange = (data) => {
     if (
       form.values.corDiagnosis[index] &&
       form.values.corDiagnosis[index].diagnosisFK
     ) {
       const { diagnosisFK } = form.values.corDiagnosis[index]
       const ctsnomeddiagnosis = data || []
-      // const { ctcomplication } = codetable
       const diagnosis = ctsnomeddiagnosis.find(
         (item) => parseInt(item.id, 10) === parseInt(diagnosisFK, 10),
       )
       if (diagnosis) {
-        if(diagnosisFilter.length === 1 && diagnosisFilter.find(df => df === 'isCdmpClaimable'))
-        {
-          const complications = diagnosis.complication.filter(c => c.cdmpComplicationCode)
+        if (
+          currentSelectCategory.length === 1 &&
+          currentSelectCategory.find((df) => df === 'isCdmpClaimable')
+        ) {
+          const complications = diagnosis.complication.filter(
+            (c) => c.cdmpComplicationCode,
+          )
           setCtComplicationPairedWithDiag(complications || [])
-        }
-        else
-          setCtComplicationPairedWithDiag(diagnosis.complication || [])
+        } else setCtComplicationPairedWithDiag(diagnosis.complication || [])
       }
     }
+  }
+
+  const handelSaveDiagnosisAsFavourite = () => {
+    saveDiagnosisAsFavourite(diagnosisCode, uid)
+  }
+
+  const updateSelectCategory = (category) => {
+    const { values: vals, setValues } = form
+    vals.corDiagnosis[index].currentSelectCategory = category
+    setValues(vals)
   }
   return (
     <Paper className={classes.diagnosisRow}>
       <GridContainer style={{ marginTop: theme.spacing(1) }}>
+        <GridItem xs={12}>
+          <div style={{ display: 'flex', height: 24 }}>
+            <div>
+              <CheckboxGroup
+                label='Selected Widgets'
+                simple
+                valueField='value'
+                textField='name'
+                value={currentSelectCategory}
+                options={filterOptions}
+                onChange={(v, newVal) => {
+                  if (newVal.all === true) {
+                    updateSelectCategory(filterOptions.map((o) => o.value))
+                  } else if (newVal.all === false) {
+                    updateSelectCategory([])
+                  } else {
+                    updateSelectCategory(
+                      (v.target.value || []).filter((c) => c !== 'all'),
+                    )
+                  }
+                }}
+              />
+            </div>
+            <div style={{ display: 'inline-Block', color: 'green' }}>
+              {favouriteDiagnosisCategoryMessage}
+            </div>
+            {!_.isEqual(
+              favouriteDiagnosisCategory.sort(),
+              currentSelectCategory.filter((c) => c !== 'all').sort(),
+            ) && (
+              <a
+                style={{
+                  fontStyle: 'italic',
+                  textDecoration: 'underline',
+                  marginLeft: 'auto',
+                }}
+                onClick={() => {
+                  saveCategoryAsFavourite(
+                    currentSelectCategory.filter((c) => c !== 'all'),
+                    uid,
+                  )
+                }}
+              >
+                save categories as favourite
+              </a>
+            )}
+          </div>
+        </GridItem>
         <GridItem xs={6} style={{ paddingRight: 35 }}>
           <Field
             name={`corDiagnosis[${index}].diagnosisFK`}
@@ -137,13 +203,29 @@ const DiagnosisItem = ({
               <DiagnosisSelect
                 onChange={onDiagnosisChange}
                 onDataSouceChange={onDataSouceChange}
-                filterStyle={{ position: 'absolute', bottom: 2, right: -35 }}
+                filterStyle={{
+                  position: 'absolute',
+                  bottom: -5,
+                  right: -30,
+                }}
+                from='Consultaion'
+                selectDiagnosisCode={diagnosisCode}
+                favouriteDiagnosis={favouriteDiagnosis}
+                handelSaveDiagnosisAsFavourite={handelSaveDiagnosisAsFavourite}
+                currentSelectCategory={currentSelectCategory.filter(
+                  (o) => o !== 'all',
+                )}
                 {...args}
               />
             )}
           />
         </GridItem>
-        <GridItem xs={6} style={{ position: 'relative' }}>
+        <GridItem xs={5} style={{ position: 'relative' }}>
+          <span style={{ color: 'green', position: 'absolute', bottom: 0 }}>
+            {favouriteDiagnosisMessage}
+          </span>
+        </GridItem>
+        <GridItem xs={1} style={{ position: 'relative' }}>
           <Popover
             content={
               <div
@@ -202,7 +284,6 @@ const DiagnosisItem = ({
                         entity,
                       },
                     })
-                    // arrayHelpers.remove(index)
                   }}
                 >
                   {form.values.corDiagnosis[index].isNew === true ||
@@ -219,7 +300,6 @@ const DiagnosisItem = ({
                     !form.values.corDiagnosis[index].defaultIsPersist
                   }
                   onClick={() => {
-                    // arrayHelpers.remove(index)
                     form.setFieldValue(`corDiagnosis[${index}].isDeleted`, true)
                     form.setFieldValue(
                       `corDiagnosis[${index}].isPermanentDelete`,
@@ -249,18 +329,6 @@ const DiagnosisItem = ({
             </Tooltip>
           </Popover>
         </GridItem>
-        {/* <GridItem xs={6}>
-          {form.values && (
-            <DiagnosisSelect
-              mode='multiple'
-              value={[
-                form.values.corDiagnosis[index].diagnosisFK,
-              ]}
-              onChange={onDiagnosisChange}
-              onDataSouceChange={onDataSouceChange}
-            />
-          )}
-        </GridItem> */}
         <GridItem xs={12}>
           <Field
             name={`corDiagnosis[${index}].complication`}

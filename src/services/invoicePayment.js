@@ -7,6 +7,7 @@ const writeOffUrl = '/api/InvoicePayerWriteOff'
 const creditNoteUrl = '/api/CreditNote'
 const bizSessionAPIURL = '/api/bizsession'
 const transferUrl = `${url}/Transfer`
+const bizVoidInvoicePayerDepositURL = '/api/Deposit/CancelInvoicePayerDeposit'
 
 module.exports = {
   query: (params) => service.query(url, params),
@@ -24,6 +25,8 @@ module.exports = {
   voidWriteOff: (params) => service.upsert(writeOffUrl, params),
   voidPayment: (params) => service.upsert(invoicePaymentUrl, params),
   voidCreditNote: (params) => service.upsert(creditNoteUrl, params),
+  voidInvoicePayerDeposit: (params) =>
+    service.upsert(bizVoidInvoicePayerDepositURL, params),
 
   getTransfer: (params) => service.query(transferUrl, params),
   postTransfer: async (params) => {

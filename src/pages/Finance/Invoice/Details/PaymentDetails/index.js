@@ -4,18 +4,19 @@ import _ from 'lodash'
 import { AddPayment } from 'medisys-components'
 
 // material ui
-import { withStyles } from '@material-ui/core' 
+import { withStyles } from '@material-ui/core'
 // common components
 import {
   CommonModal,
   withFormik,
   WarningSnackbar,
-  notification, 
+  notification,
 } from '@/components'
 // sub components
 import { ReportViewer } from '@/components/_medisys'
 import { getBizSession } from '@/services/queue'
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
+import TransferToDepositModal from '@/pages/Finance/Deposit/Modal'
 import AddCrNote from '../../components/modal/AddCrNote'
 import Transfer from '../../components/modal/Transfer'
 import WriteOff from '../../components/modal/WriteOff'
@@ -24,9 +25,10 @@ import DeleteConfirmation from '../../components/modal/DeleteConfirmation'
 // styles
 import styles from './styles'
 
-@connect(({ invoiceDetail, invoicePayment }) => ({
+@connect(({ invoiceDetail, invoicePayment, patient }) => ({
   invoiceDetail,
-  invoicePayment, 
+  invoicePayment,
+  patient,
 }))
 @withFormik({
   name: 'invoicePayment',
@@ -52,6 +54,8 @@ class PaymentDetails extends Component {
     hasActiveSession: false,
     invoicePayerName: undefined,
     invoicePayerPayment: {},
+    showTransferToDeposit: false,
+    outStanding: 0,
   }
 
   componentDidMount = () => {
@@ -62,6 +66,14 @@ class PaymentDetails extends Component {
     if (invoicePayer.outStanding <= 0) {
       notification.error({
         message: 'This payer does not have any outstanding balance',
+      })
+    } else callback()
+  }
+
+  _validateOverpaidAmount = (invoicePayer, callback) => {
+    if (invoicePayer.outStanding >= 0) {
+      notification.error({
+        message: 'This payer does not have any over paid amount.',
       })
     } else callback()
   }
@@ -120,7 +132,6 @@ class PaymentDetails extends Component {
         dispatch({
           type: 'patient/query',
           payload: { id: invoicePayer.patientProfileFK },
-          // payload: { id: 4 },
         })
       const showAddPayment = () => {
         const invoicePayerPayment = {
@@ -162,7 +173,7 @@ class PaymentDetails extends Component {
         selectedInvoicePayerFK: invoicePayerFK,
       })
     }
-    this._validateOutstandingAmount(invoicePayer, showWriteOffModal) 
+    this._validateOutstandingAmount(invoicePayer, showWriteOffModal)
   }
 
   closeAddCrNoteModal = () =>
@@ -238,7 +249,7 @@ class PaymentDetails extends Component {
       showReportTitle: title,
       reportPayload: {
         reportID,
-        reportParameters, 
+        reportParameters,
       },
     })
   }
@@ -309,6 +320,9 @@ class PaymentDetails extends Component {
       case 'Credit Note':
         dispatchType = 'invoicePayment/submitVoidCreditNote'
         break
+      case 'Deposit':
+        dispatchType = 'invoicePayment/submitVoidInvoicePayerDeposit'
+        break
       default:
         break
     }
@@ -362,13 +376,49 @@ class PaymentDetails extends Component {
     })
   }
 
+  onTransferToDepositClick = async (invoicePayerFK) => {
+    const { values, dispatch, patient = {} } = this.props
+    const { entity = {} } = patient
+    const { patientDeposit } = entity
+    const patientId = entity.id
+    if (patientDeposit && patientDeposit.id > 0) {
+      await dispatch({
+        type: 'deposit/queryOne',
+        payload: {
+          id: patientDeposit.id,
+        },
+      })
+    } else {
+      dispatch({
+        type: 'deposit/updateState',
+        payload: {
+          entity: {
+            patientProfileFK: patientId,
+          },
+        },
+      })
+    }
+    const selectedPayer = values.find((item) => item.id === invoicePayerFK)
+    const showInvoicePayerDepositModal = () => {
+      this.setState({
+        showTransferToDeposit: true,
+        selectedInvoicePayerFK: invoicePayerFK,
+        outStanding: selectedPayer.outStanding,
+      })
+    }
+    this._validateOverpaidAmount(selectedPayer, showInvoicePayerDepositModal)
+  }
+
+  closeTransferToDepositModal = () => {
+    this.setState({
+      showTransferToDeposit: false,
+      selectedInvoicePayerFK: undefined,
+      outStanding: 0,
+    })
+  }
+
   render () {
-    const {
-      classes,
-      values,
-      readOnly,
-      patientIsActive, 
-    } = this.props
+    const { classes, values, readOnly, patientIsActive } = this.props
     const { hasActiveSession } = this.state
     const paymentActionsProps = {
       handleAddPayment: this.onAddPaymentClick,
@@ -377,6 +427,7 @@ class PaymentDetails extends Component {
       handleVoidClick: this.onVoidClick,
       handlePrinterClick: this.onPrinterClick,
       handleTransferClick: this.onTransferClick,
+      handleTransferToDeposit: this.onTransferToDepositClick,
     }
     const {
       showAddPayment,
@@ -390,12 +441,14 @@ class PaymentDetails extends Component {
       invoicePayerName,
       invoicePayerPayment,
       showAddTransfer,
+      showTransferToDeposit,
+      selectedInvoicePayerFK,
+      outStanding,
     } = this.state
 
     const transferProps = {
       ...this.props,
     }
-
     return (
       <div className={classes.container}>
         {readOnly ? (
@@ -436,22 +489,22 @@ class PaymentDetails extends Component {
             })
         ) : (
           ''
-          )} 
+        )}
         <CommonModal
           open={showAddPayment}
           title='Add Payment'
           onConfirm={this.closeAddPaymentModal}
           onClose={this.closeAddPaymentModal}
           observe='AddPaymentForm'
-        > 
+        >
           <AddPayment
             handleSubmit={this.onSubmitAddPayment}
             onClose={this.closeAddPaymentModal}
             invoicePayerName={invoicePayerName}
-            invoicePayment={[]} 
+            invoicePayment={[]}
             showPaymentDate
             invoice={{
-              ...invoicePayerPayment, 
+              ...invoicePayerPayment,
             }}
           />
         </CommonModal>
@@ -506,6 +559,24 @@ class PaymentDetails extends Component {
           observe='TransferDetail'
         >
           <Transfer onRefresh={this.refresh} {...transferProps} />
+        </CommonModal>
+
+        <CommonModal
+          open={showTransferToDeposit}
+          title='Deposit'
+          onConfirm={() => {
+            this.refresh()
+            this.closeTransferToDepositModal()
+          }}
+          onClose={this.closeTransferToDepositModal}
+          maxWidth='sm'
+          observe='PatientDeposit'
+        >
+          <TransferToDepositModal
+            isDeposit
+            invoicePayerFK={selectedInvoicePayerFK}
+            maxTranseferAmount={-(outStanding || 0)}
+          />
         </CommonModal>
       </div>
     )
