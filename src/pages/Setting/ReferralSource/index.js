@@ -13,7 +13,7 @@ import Detail from './Detail'
 const styles = (theme) => ({
   ...basicStyle(theme),
 })
-
+ 
 @connect(({ settingReferralSource }) => ({
   settingReferralSource,
 }))

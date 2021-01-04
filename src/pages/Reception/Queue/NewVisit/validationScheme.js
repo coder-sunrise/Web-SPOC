@@ -59,4 +59,14 @@ export default Yup.object().shape({
     .integer('Height can only be a whole number')
     .min(0, VitalSignMessage[FormField['vitalsign.heightCM']])
     .max(999, VitalSignMessage[FormField['vitalsign.heightCM']]),
+  referralSourceFK: Yup.number() 
+    .when('referralByType', {
+      is: (val) => val === 'Company',
+      then: Yup.number().required(),
+    }),
+  referralPatientProfileFK: Yup.number()
+    .when('referralByType', {
+      is: (val) => val === 'Patient',
+      then: Yup.number().required(),
+    }), 
 })

@@ -1,9 +1,10 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
-import * as service from '../services'
+import { notification } from '@/components'
+import * as service from '../services/referralSource'
 
 export default createListViewModel({
-  namespace: 'settingReferralPerson',
+  namespace: 'settingReferralSource',
   config: {
     queryOnLoad: false,
   },
@@ -25,6 +26,12 @@ export default createListViewModel({
       })
     },
     effects: {
+      *deleteReferralSource ({ payload }, { call, put }) {
+        const result = yield call(service.delete, payload)
+        if (result === 204) {
+          notification.success({ message: 'Deleted' })
+        }
+      },
     },
     reducers: {
       queryDone (st, { payload }) {

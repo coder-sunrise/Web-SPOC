@@ -8,11 +8,12 @@ import {
   TextField,
   DateRangePicker,
 } from '@/components'
-import Contact from '@/pages/Setting/Company/Contact'
+import { connect } from 'dva'
+import Contact from '@/pages/Setting/Company/Contact' 
 
 @withFormikExtend({
   mapPropsToValues: ({ settingReferralSource }) =>
-    settingReferralSource.entity || settingReferralSource.default,
+    settingReferralSource ? settingReferralSource.entity || settingReferralSource.default : {},
   validationSchema: Yup.object().shape({
     name: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
@@ -57,24 +58,8 @@ class Detail extends PureComponent {
                     label='Name'
                     autoFocus
                     {...args}
-                    disabled={!!settingReferralSource.entity}
+                    disabled={settingReferralSource && !!settingReferralSource.entity}
                   />
-                )}
-              />
-            </GridItem>
-
-            <GridItem md={6}>
-              <FastField
-                name='institution'
-                render={(args) => <TextField label='Institution' {...args} />}
-              />
-            </GridItem>
-
-            <GridItem md={6}>
-              <FastField
-                name='remarks'
-                render={(args) => (
-                  <TextField label='Remarks' multiline {...args} />
                 )}
               />
             </GridItem>
@@ -93,6 +78,15 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
+            <GridItem md={12}>
+              <FastField
+                name='remarks'
+                render={(args) => (
+                  <TextField label='Remarks' multiline {...args} />
+                )}
+              />
+            </GridItem>
+
           </GridContainer>
           <Contact theme={theme} type='referral' />
         </div>

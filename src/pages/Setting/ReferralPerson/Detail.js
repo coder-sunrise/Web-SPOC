@@ -10,7 +10,12 @@ import {
   DateRangePicker,
   CodeSelect,
 } from '@/components'
+import { connect } from 'dva'
 import Contact from '@/pages/Setting/Company/Contact' 
+
+@connect(({ settingReferralPerson }) => ({
+  settingReferralPerson,
+}))
 
 @withFormikExtend({
   mapPropsToValues: ({ settingReferralPerson }) =>
@@ -37,13 +42,17 @@ import Contact from '@/pages/Setting/Company/Contact'
         dispatch({
           type: 'settingReferralPerson/query',
         })
+
+        dispatch({
+          type: 'settingReferralPerson/updateState',
+          payload: { entity: undefined },
+        })
       }
     })
   },
   displayName: 'ReferralPersonDetail',
 })
 class Detail extends PureComponent {
-
   render () {
     const { props } = this
     const { theme, footer, settingReferralPerson, referralSource } = props

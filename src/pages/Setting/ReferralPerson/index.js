@@ -5,13 +5,11 @@ import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
 import { CardContainer, CommonModal, withSettingBase } from '@/components'
-import settingReferralSource from "../ReferralSource/models/index"
 
 import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-window.g_app.replaceModel(settingReferralSource)
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -34,7 +32,7 @@ class ReferralPerson extends PureComponent {
     })
 
     this.props.dispatch({
-      type: 'settingReferralSource/query',
+      type: 'settingReferralPerson/getReferralSourceList',
       payload: {
         pagesize: 9999,
       },
