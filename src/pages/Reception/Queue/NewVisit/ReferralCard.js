@@ -301,7 +301,7 @@ class ReferralCard extends PureComponent {
                       <CodeSelect {...args}
                         labelField='name'
                         disabled={disabled}
-                        label='Referred By'
+                        label='Ref. Person Name'
                         options={referralPersonList}
                         onChange={this.onReferralPersonChange}
                         valueField='value'

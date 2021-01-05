@@ -718,6 +718,14 @@ const _routes = [
             ],
           },
           {
+            path: '/report/referralsourcereport',
+            name: 'referralsourcereport',
+            component: './Report/ReferralSourceReport',
+            // authority: [
+            //   'report.diagnosistrendingreport',
+            // ],
+          },
+          {
             path: '/report/sessionsummary',
             name: 'sessionsummary',
             component: './Report/SessionSummary',

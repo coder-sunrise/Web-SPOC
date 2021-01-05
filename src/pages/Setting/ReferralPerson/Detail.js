@@ -83,7 +83,7 @@ class Detail extends PureComponent {
                     options={referralSource}
                     labelField='name'
                     mode='multiple'
-                    label='Referral Source'
+                    label='Company'
                   />
                 )}
               />
