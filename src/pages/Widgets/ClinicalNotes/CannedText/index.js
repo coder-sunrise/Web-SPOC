@@ -28,7 +28,6 @@ const styles = (theme) => ({
 const defaultMaxHeight = 600
 const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
   const { selectedNote } = cannedText
-
   const list = cannedText[selectedNote.fieldName] || []
 
   const [
