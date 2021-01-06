@@ -6,10 +6,10 @@ class SumList extends PureComponent {
     let sumData = []
     const { reportDatas } = this.props
     if (!reportDatas) return null
-    if (reportDatas.SubSumPayment) {
-      sumData = reportDatas.SubSumPayment.map((item, index) => ({
+    if (reportDatas.ReferralSourceSummary) {
+      sumData = reportDatas.ReferralSourceSummary.map((item, index) => ({
         ...item,
-        id: `SubSumPayment-${index}-${item.invoiceNo}`,
+        id: `ReferralSourceSummary-${index}-${item.invoiceNo}`,
       }))
     }
     const sumCols = [

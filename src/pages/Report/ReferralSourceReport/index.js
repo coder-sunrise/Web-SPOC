@@ -18,14 +18,14 @@ import ReportBase from '../ReportBase'
   settingReferralSource, settingReferralPerson,
 }))
 
-class ReferralSource extends ReportBase { 
+class ReferralSource extends ReportBase {
 
   constructor (props) {
     super(props)
     this.state = {
       ...this.state,
       reportId: 72,
-      fileName: 'Referral Source Report', 
+      fileName: 'Referral Source Report',
       referralData: [],
       referralList: [],
       referralPersonData: [],
@@ -38,43 +38,11 @@ class ReferralSource extends ReportBase {
     this.loadReferralPerson()
   }
 
-  onReferralByChange = (value) => {
-    let { values, setFieldValue } = this.props
-    let { referralPersonData } = this.state
-    if (value) {
-      referralPersonData = referralPersonData.filter((m) => m.referralSourceIds.indexOf(value) > -1,)
-    }
-    if (referralPersonData.findIndex(t => t.id === values.referralPersonFK) < 0) {
-      setFieldValue('referralPersonFK', null)
-    }
-    const result = referralPersonData.map((m) => {
-      return { name: m.name, value: m.id }
-    })
-    this.setState({ referralPersonList: result })
-  }
-
-  onReferralPersonChange = (value) => {
-    let { referralData } = this.state
-    let { values, setFieldValue } = this.props
-    if (value) {
-      const referralPerson = this.state.referralPersonData.find(t => t.id === value)
-      referralData = referralPerson.referralSourceIds.map((m) => {
-        return this.state.referralData.find(t => t.id === m)
-      })
-    }
-    if (referralData.findIndex(t => t.id === values.referralSourceFK) < 0) {
-      setFieldValue('referralSourceFK', null)
-    }
-    const result = referralData.map((m) => {
-      return { name: m.name, value: m.id }
-    })
-    this.setState({ referralList: result })
-  }
-
   loadReferralSource = () => {
     this.props
       .dispatch({
         type: 'settingReferralSource/query',
+        payload: { pagesize: 9999 },
       })
       .then((response) => {
         if (response) {
@@ -90,14 +58,12 @@ class ReferralSource extends ReportBase {
   loadReferralPerson = () => {
     this.props.dispatch({
       type: 'settingReferralPerson/query',
+      payload: { pagesize: 9999 },
     })
       .then((response) => {
         if (response) {
           let data = response.data.filter(t => t.isActive)
-          let result = data.map((m) => {
-            return { name: m.name, value: m.id }
-          })
-          this.setState({ referralPersonData: data, referralPersonList: result })
+          this.setState({ referralPersonData: data, referralPersonList: [] })
         }
       })
   }
@@ -109,11 +75,31 @@ class ReferralSource extends ReportBase {
   }
 
   renderFilterBar = (handleSubmit, isSubmitting) => {
+    let { values } = this.props
+    console.log(values.referralSourceIds)
+    let { referralPersonData } = this.state
+    let result = []
+    if (values.referralSourceIds && values.referralSourceIds.length > 0) {
+      referralPersonData.forEach((person) => {
+        if (person.referralSourceIds.find(id => values.referralSourceIds.indexOf(id) > -1)) {
+          result.push(person)
+        }
+      })
+    }
+    let selectedPersonIds = []
+    if (values.referralPersonIds) {
+      console.log(values.referralPersonIds)
+      let tempNewPersonIds = values.referralPersonIds.filter(t => result.findIndex(x => x.id === t) > -1)
+      if (values.referralPersonIds.length !== tempNewPersonIds.length) {
+        selectedPersonIds = tempNewPersonIds
+      }
+    }
+    result = result.map((m) => {
+      return { name: m.name, value: m.id }
+    })
     return <FilterBar handleSubmit={handleSubmit}
       referralList={this.state.referralList}
-      referralPerson={this.state.referralPersonList}
-      onReferralByChange={this.onReferralByChange}
-      onReferralPersonChange={this.onReferralPersonChange}
+      referralPerson={result} 
       isSubmitting={isSubmitting}
     />
   }
@@ -148,7 +134,7 @@ const ReferralSourceWithFormik = withFormik({
   validationSchema: {},
   mapPropsToValues: () => ({
     dateFrom: moment(new Date()).startOf('month').toDate(),
-    dateTo: moment(new Date()).endOf('month').toDate(), 
+    dateTo: moment(new Date()).endOf('month').toDate(),
   }),
 })(ReferralSource)
 

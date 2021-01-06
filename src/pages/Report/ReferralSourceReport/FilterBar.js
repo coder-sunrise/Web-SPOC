@@ -7,14 +7,12 @@ import {
   CodeSelect,
   GridContainer,
   GridItem, Checkbox,
-  RadioGroup,
   SizeContainer,
 } from '@/components'
 // medisys components
 import ReportDateRangePicker from '../ReportDateRangePicker'
 
-const FilterBar = ({ handleSubmit, isSubmitting, referralList, referralPerson, onReferralPersonChange, onReferralByChange }) => { 
-  console.log(handleSubmit)
+const FilterBar = ({ handleSubmit, isSubmitting, referralList, referralPerson }) => {  
   return (
     <SizeContainer size='sm'>
       <GridContainer>
@@ -26,10 +24,10 @@ const FilterBar = ({ handleSubmit, isSubmitting, referralList, referralPerson, o
                   options={referralList}
                   labelField='name'
                   valueField='value'
-                  label='Company Name'
+                  label='Referral Source'
                   mode='multiple'
-                  onChange={(v) => {
-                    onReferralByChange(v)
+                  onChange={(v,d)=>{
+                    console.log(v, d)
                   }}
                   disableAll
                 />
@@ -42,10 +40,10 @@ const FilterBar = ({ handleSubmit, isSubmitting, referralList, referralPerson, o
               render={(args) => (
                 <CodeSelect {...args}
                   labelField='name'
-                  label='Ref. Person Name'
+                  label='Ref. Person Name' 
                   options={referralPerson}
-                  onChange={onReferralPersonChange}
                   valueField='value'
+                  mode='multiple'
                   disableAll
                 />
               )}
