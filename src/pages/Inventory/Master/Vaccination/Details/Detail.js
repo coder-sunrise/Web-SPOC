@@ -30,7 +30,6 @@ const Detail = ({
   schema,
   ...props
 }) => {
-
   const field = vaccinationDetail.entity ? 'entity' : 'default'
 
   const [
@@ -57,7 +56,7 @@ const Detail = ({
     })
   }
 
-  const toggleMedisaveVaccination =(o) => {
+  const toggleMedisaveVaccination = (o) => {
     dispatch({
       type: 'vaccinationDetail/updateState',
       payload: {
@@ -155,6 +154,14 @@ const Detail = ({
                     textField='name'
                     options={[
                       {
+                        id: 'isAutoGenerateCertificate',
+                        name: 'Auto Generate Certificate',
+
+                        layoutConfig: {
+                          style: {},
+                        },
+                      },
+                      {
                         id: 'isChasAcuteClaimable',
                         name: 'CHAS Acute Claimable',
 
@@ -180,7 +187,7 @@ const Detail = ({
                       },
                     ]}
                     onChange={(e, s) => {
-                      if(s.isMedisaveClaimable !== undefined)
+                      if (s.isMedisaveClaimable !== undefined)
                         toggleMedisaveVaccination(s)
                     }}
                     {...args}
@@ -211,7 +218,11 @@ const Detail = ({
                   />
                 </GridItem>
                 <GridItem xs={2} style={{ marginTop: 10 }}>
-                  <Button variant='contained' color='primary' onClick={toggleModal}>
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    onClick={toggleModal}
+                  >
                     Search
                   </Button>
                 </GridItem>
@@ -288,9 +299,10 @@ const Detail = ({
             </GridItem>
             <GridItem xs={2} />
             <GridItem xs={10}>
-              <div style={{ 
-                  display: values.isMedisaveClaimable  ? '' : 'none',
-                  }}
+              <div
+                style={{
+                  display: values.isMedisaveClaimable ? '' : 'none',
+                }}
               >
                 <h4 style={{ marginTop: 15, fontWeight: 400 }}>
                   <b>Medisave Vaccination</b>
@@ -327,10 +339,6 @@ const Detail = ({
   )
 }
 
-export default compose(
-  withStyles(styles, { withTheme: true }),
-  React.memo,
-  // connect(({ vaccinationDetail }) => ({
-  //   vaccinationDetail,
-  // })),
-)(Detail)
+export default compose(withStyles(styles, { withTheme: true }), React.memo)(
+  Detail,
+)
