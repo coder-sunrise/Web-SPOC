@@ -11,14 +11,13 @@ class ReferralSourceList extends PureComponent {
     let listData = []
     const { reportDatas } = this.props
     if (!reportDatas) return null
-    if (reportDatas && reportDatas.ReferralSourceDetails) {
-      listData = reportDatas.ReferralSourceDetails.map((item, index) => ({
+    if (reportDatas && reportDatas.ReferralSourceList) {
+      listData = reportDatas.ReferralSourceList.map((item, index) => ({
         ...item,
         visitDate: moment(item.visitDate).format('DD MMM YYYY'),
-        id: `ReferralSourceDetails-${index}-${item.patientReferenceNo}`,
+        id: `ReferralSourceList-${index}-${item.patientReferenceNo}`,
       }))
-    }
-    console.log(listData)
+    } 
     const ReferralSourceListingColumns = [
       { name: 'companyName', title: 'Company Name' },
       { name: 'referralPerson', title: 'Referral Person' },
