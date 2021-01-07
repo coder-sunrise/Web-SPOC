@@ -184,7 +184,19 @@ class Detail extends PureComponent {
                   return (
                     <RichEditor
                       label='Template Message'
-                      tagList={tagList}
+                      tagList={
+                        documentTemplateTypeFK === 3 ? (
+                          tagList.filter(
+                            (t) =>
+                              [
+                                'Order',
+                                'ExternalPrescription',
+                              ].indexOf(t.value) < 0,
+                          )
+                        ) : (
+                          tagList
+                        )
+                      }
                       {...cfg}
                       {...args}
                     />
