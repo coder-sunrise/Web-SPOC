@@ -53,10 +53,10 @@ class Grid extends PureComponent {
         onRowDoubleClick={this.editRow}
         columns={[
           { name: 'name', title: 'Name' },
-          { name: 'mobileNo', title: 'Mobile No.' },
-          { name: 'officeNo', title: 'Office No.' },
-          { name: 'institution', title: 'Institution' },
           { name: 'address', title: 'Address' },
+          { name: 'officeNo', title: 'Office No.' },
+          { name: 'website', title: 'Website' },
+          { name: 'faxNo', title: 'Fax' },
           { name: 'email', title: 'Email' },
           { name: 'remarks', title: 'Remarks' },
           { name: 'isActive', title: 'Status' },
@@ -67,10 +67,6 @@ class Grid extends PureComponent {
         ]}
         columnExtensions={[
           {
-            columnName: 'mobileNo',
-            sortingEnabled: false,
-          },
-          {
             columnName: 'officeNo',
             sortingEnabled: false,
           },
@@ -80,6 +76,18 @@ class Grid extends PureComponent {
           },
           {
             columnName: 'email',
+            sortingEnabled: false,
+          },
+          {
+            columnName: 'faxNo',
+            sortingEnabled: false,
+          },
+          {
+            columnName: 'remarks',
+            sortingEnabled: false,
+          },
+          {
+            columnName: 'website',
             sortingEnabled: false,
           },
           {

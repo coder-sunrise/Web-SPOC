@@ -247,7 +247,7 @@ class NewVisit extends PureComponent {
       (registered, queue) =>
         !registered ? queue.patientProfileFK === patientInfo.id : registered,
       false,
-    )
+    ) 
 
     if (!values.id && alreadyRegisteredVisit)
       return dispatch({
@@ -395,7 +395,6 @@ class NewVisit extends PureComponent {
     if (!values.referralByType) {
       this.props.setFieldValue('referralByType', referralType)
     }
-
     return (
       <React.Fragment>
         <LoadingWrapper

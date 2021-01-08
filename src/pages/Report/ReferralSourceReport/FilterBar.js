@@ -25,10 +25,7 @@ const FilterBar = ({ handleSubmit, isSubmitting, referralList, referralPerson })
                   labelField='name'
                   valueField='value'
                   label='Referral Source'
-                  mode='multiple'
-                  onChange={(v,d)=>{
-                    console.log(v, d)
-                  }}
+                  mode='multiple' 
                   disableAll
                 />
               )}

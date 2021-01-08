@@ -1,5 +1,6 @@
 import React from 'react'
 import moment from 'moment'
+import _ from 'lodash'
 // formik
 import { withFormik } from 'formik'
 import { connect } from 'dva'
@@ -50,6 +51,7 @@ class ReferralSource extends ReportBase {
           let result = data.map((m) => {
             return { name: m.name, value: m.id }
           })
+          result = _.concat({ name: 'Patient As Referral', value: -1 }, result)
           this.setState({ referralData: data, referralList: result })
         }
       })
@@ -73,7 +75,7 @@ class ReferralSource extends ReportBase {
       ...params,
     }
   }
-
+ 
   renderFilterBar = (handleSubmit, isSubmitting) => {
     let { values } = this.props
     console.log(values.referralSourceIds)
@@ -99,7 +101,8 @@ class ReferralSource extends ReportBase {
     })
     return <FilterBar handleSubmit={handleSubmit}
       referralList={this.state.referralList}
-      referralPerson={result} 
+      onReferralSourceChange={this.onReferralSourceChange}
+      referralPerson={result}
       isSubmitting={isSubmitting}
     />
   }

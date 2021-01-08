@@ -159,6 +159,6 @@ export const menuData = [
     title: 'Other',
     text: 'Referral Source Report ',
     url: '/report/referralsourcereport',
-    // authority: 'report.other.referralsourcereport',
+    authority: 'report.other.referralsource',
   },
 ]

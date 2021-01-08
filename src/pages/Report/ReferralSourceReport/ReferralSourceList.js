@@ -82,7 +82,7 @@ class ReferralSourceList extends PureComponent {
         },
         row: {
           messages: {
-            visitCount: 'Total Visits',
+            visitCount: 'Total Visit',
             groupCount: 'Grand Total',
             visitGrandTotal: 'Grand Total',
             invoiceAmountSum: 'Total',

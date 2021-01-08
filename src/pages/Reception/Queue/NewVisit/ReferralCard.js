@@ -19,7 +19,6 @@ import {
   notification,
   Button,
   Select,
-  withFormikExtend,
   RadioGroup,
 } from '@/components'
 import { AttachmentWithThumbnail } from '@/components/_medisys'
@@ -28,12 +27,10 @@ import Call from '@material-ui/icons/Call'
 import Authorized from '@/utils/Authorized'
 import Detail from "@/pages/Setting/ReferralSource/Detail"
 import ReferralPersonDetail from "@/pages/Setting/ReferralPerson/Detail"
-import FormField from './formField'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
 })
-// // window.g_app.replaceModel(ReferralSourceModel)
 @connect(({ settingReferralSource, settingReferralPerson, clinicSettings, patient }) => ({
   settingReferralSource, settingReferralPerson, clinicSettings, patient,
 }))
@@ -76,10 +73,15 @@ class ReferralCard extends PureComponent {
       .then((response) => {
         if (response) {
           let data = response.data.filter(t => t.isActive)
+          this.setState({ referralPersonData: data })
+          const { referralSourceFK } = this.props.values
+          if (referralSourceFK) {
+            data = data.filter(t => t.referralSourceIds && t.referralSourceIds.indexOf(referralSourceFK) > -1)
+          }
           let result = data.map((m) => {
             return { name: m.name, value: m.id }
           })
-          this.setState({ referralPersonData: data, referralPersonList: result })
+          this.setState({ referralPersonList: result })
         }
       })
   }
@@ -242,6 +244,9 @@ class ReferralCard extends PureComponent {
     ]
     if (clinicSettings.settings.isVisitReferralSourceMandatory) {
       referralTypeOptions = referralTypeOptions.filter(t => t.value !== 'None')
+      if (values.referralByType === 'None') {
+        this.props.setFieldValue('referralByType', 'Company')
+      }
     }
 
     return (
@@ -289,7 +294,6 @@ class ReferralCard extends PureComponent {
                       onClick={this.addNewReferralSource}
                       disabled={disabled}
                       size='sm'
-                      submitKey='patientSearch/query'
                     >
                       <Search /> New Company
                     </Button>
@@ -317,7 +321,6 @@ class ReferralCard extends PureComponent {
                       onClick={this.addNewReferralPerson}
                       disabled={disabled}
                       size='sm'
-                      submitKey='patientSearch/query'
                     >
                       <Search /> New Referral Person
                     </Button>
@@ -325,11 +328,13 @@ class ReferralCard extends PureComponent {
                 </GridItem>
                 <GridItem xs md={12}>
                   <FastField
-                    name='remarks'
+                    name='referralRemarks'
                     render={(args) => (
                       <TextField label='Remarks'
                         disabled={disabled}
                         multiline
+                        maxLength={400}
+                        inputProps={{ maxLength: 400 }}
                         {...args}
                       />
                     )}
@@ -349,7 +354,7 @@ class ReferralCard extends PureComponent {
                 </GridItem>
                 <GridItem xs md={12}>
                   <FastField
-                    name='remarks'
+                    name='referralRemarks'
                     render={(args) => (
                       <TextField label='Remarks' disabled={disabled} multiline {...args} />
                     )}
