@@ -6,7 +6,6 @@ import Add from '@material-ui/icons/Add'
 import { connect } from 'dva'
 import numeral from 'numeral'
 
-import Adjustment from './Adjustment'
 import {
   GridContainer,
   GridItem,
@@ -20,6 +19,7 @@ import {
 } from '@/components'
 
 import { calculateAmount } from '@/utils/utils'
+import Adjustment from './Adjustment'
 
 const amountProps = {
   showZero: true,
@@ -123,9 +123,12 @@ class AmountSummary extends PureComponent {
           },
           showRemark: true,
           showAmountPreview: false,
+          config,
+          rows,
+          adjustments,
+          editAdj: undefined,
           defaultValues: {
-            // ...this.props.orders.entity,
-            initialAmout: nextInitialAmount,
+            initialAmout: total,
           },
         },
       },
@@ -170,6 +173,10 @@ class AmountSummary extends PureComponent {
           },
           showRemark: true,
           showAmountPreview: false,
+          config,
+          rows,
+          adjustments,
+          editAdj: adjustments[index],
           defaultValues: {
             adjType: adjustments[index].adjType,
             adjValue: adjustments[index].adjValue,

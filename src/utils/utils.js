@@ -10,7 +10,7 @@ import { parse, stringify } from 'qs'
 import $ from 'jquery'
 import numeral from 'numeral'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
-import lodash from 'lodash'
+
 import * as cdrssUtil from 'medisys-util'
 import {
   NumberInput,
@@ -21,7 +21,7 @@ import {
 } from '@/components'
 import config from './config'
 
-window.addEventListener('unhandledrejection', event => {
+window.addEventListener('unhandledrejection', (event) => {
   console.log(event)
   event.preventDefault()
 })
@@ -118,7 +118,10 @@ export function getTimeDistance (type) {
     now.setHours(0)
     now.setMinutes(0)
     now.setSeconds(0)
-    return [moment(now), moment(now.getTime() + (oneDay - 1000))]
+    return [
+      moment(now),
+      moment(now.getTime() + (oneDay - 1000)),
+    ]
   }
 
   if (type === 'week') {
@@ -135,7 +138,10 @@ export function getTimeDistance (type) {
 
     const beginTime = now.getTime() - day * oneDay
 
-    return [moment(beginTime), moment(beginTime + (7 * oneDay - 1000))]
+    return [
+      moment(beginTime),
+      moment(beginTime + (7 * oneDay - 1000)),
+    ]
   }
 
   if (type === 'month') {
@@ -156,12 +162,15 @@ export function getTimeDistance (type) {
   }
 
   const year = now.getFullYear()
-  return [moment(`${year}-01-01 00:00:00`), moment(`${year}-12-31 23:59:59`)]
+  return [
+    moment(`${year}-01-01 00:00:00`),
+    moment(`${year}-12-31 23:59:59`),
+  ]
 }
 
 export function getPlainNode (nodeList, parentPath = '') {
   const arr = []
-  nodeList.forEach(node => {
+  nodeList.forEach((node) => {
     const item = node
     item.path = `${parentPath}/${item.path || ''}`.replace(/\/+/g, '/')
     item.exact = true
@@ -201,9 +210,9 @@ function getRenderArr (routes) {
   renderArr.push(routes[0])
   for (let i = 1; i < routes.length; i += 1) {
     // 去重
-    renderArr = renderArr.filter(item => getRelation(item, routes[i]) !== 1)
+    renderArr = renderArr.filter((item) => getRelation(item, routes[i]) !== 1)
     // 是否包含
-    const isAdd = renderArr.every(item => getRelation(item, routes[i]) === 3)
+    const isAdd = renderArr.every((item) => getRelation(item, routes[i]) === 3)
     if (isAdd) {
       renderArr.push(routes[i])
     }
@@ -219,16 +228,16 @@ function getRenderArr (routes) {
  */
 export function getRoutes (path, routerData) {
   let routes = Object.keys(routerData).filter(
-    routePath => routePath.indexOf(path) === 0 && routePath !== path,
+    (routePath) => routePath.indexOf(path) === 0 && routePath !== path,
   )
   // Replace path to '' eg. path='user' /user/name => name
-  routes = routes.map(item => item.replace(path, ''))
+  routes = routes.map((item) => item.replace(path, ''))
   // Get the route to be rendered to remove the deep rendering
   const renderArr = getRenderArr(routes)
   // Conversion and stitching parameters
-  const renderRoutes = renderArr.map(item => {
+  const renderRoutes = renderArr.map((item) => {
     const exact = !routes.some(
-      route => route !== item && getRelation(route, item) === 1,
+      (route) => route !== item && getRelation(route, item) === 1,
     )
     return {
       exact,
@@ -304,7 +313,7 @@ export function extendFunc (...args) {
   return funcNew
 }
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 const sumReducer = (p, n) => {
   return p + n
 }
@@ -359,7 +368,7 @@ const getAppendUrl = (param, targetUrl) => {
       ...(searchToObject() || {}),
       ...param,
     }
-    Object.keys(n).forEach(k => {
+    Object.keys(n).forEach((k) => {
       newPs += `&${k}=${n[k]}`
     })
   } else if (typeof param === 'string') {
@@ -378,7 +387,7 @@ const getRemovedUrl = (ary = [], targetUrl) => {
   // let existP = {}
   // console.debug(p)
   if (Array.isArray(ary)) {
-    ary.forEach(a => {
+    ary.forEach((a) => {
       delete p[a]
     })
     // const n = {
@@ -395,21 +404,23 @@ const getRemovedUrl = (ary = [], targetUrl) => {
   return getQueryPath(window.location.pathname, p)
 }
 
-const findGetParameter = parameterName => {
+const findGetParameter = (parameterName) => {
   let result = null
   let tmp = []
   // eslint-disable-next-line no-restricted-globals
-  location.search
-    .substr(1)
-    .split('&')
-    .forEach(item => {
-      tmp = item.split('=')
-      if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1])
-    })
+  location.search.substr(1).split('&').forEach((item) => {
+    tmp = item.split('=')
+    if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1])
+  })
   return result
 }
 
-const convertToQuery = (query = {}, convertExcludeFields = ['create']) => {
+const convertToQuery = (
+  query = {},
+  convertExcludeFields = [
+    'create',
+  ],
+) => {
   // //console.log(query)
   const {
     current,
@@ -499,7 +510,10 @@ const convertToQuery = (query = {}, convertExcludeFields = ['create']) => {
               prop: `${p}.${Object.keys(val)[0]}`,
               val: v,
               opr:
-                ['boolean', 'number'].indexOf(typeof v) >= 0
+                [
+                  'boolean',
+                  'number',
+                ].indexOf(typeof v) >= 0
                   ? filterType.eql
                   : filterType.like,
             })
@@ -514,7 +528,10 @@ const convertToQuery = (query = {}, convertExcludeFields = ['create']) => {
               val,
               // valueType: valType,
               opr:
-                ['boolean', 'number'].indexOf(typeof val) >= 0
+                [
+                  'boolean',
+                  'number',
+                ].indexOf(typeof val) >= 0
                   ? filterType.eql
                   : filterType.like,
             })
@@ -526,7 +543,7 @@ const convertToQuery = (query = {}, convertExcludeFields = ['create']) => {
 
   const returnVal = {
     ...newQuery,
-    sort: sorting.map(o => ({
+    sort: sorting.map((o) => ({
       sortby: o.sortBy || o.columnName,
       order: o.direction,
     })),
@@ -540,7 +557,7 @@ const convertToQuery = (query = {}, convertExcludeFields = ['create']) => {
 
     // queryExcludeFields,
   }
-  convertExcludeFields.forEach(p => {
+  convertExcludeFields.forEach((p) => {
     if (customQuerys[p] !== undefined) returnVal[p] = customQuerys[p]
   })
   // if (returnVal.columnCriteria && returnVal.columnCriteria.length > 0) {
@@ -557,7 +574,7 @@ export const updateGlobalVariable = (key, value) => {
   window.medisys[key] = value
 }
 
-export const getGlobalVariable = key => {
+export const getGlobalVariable = (key) => {
   if (!window.medisys) {
     window.medisys = {}
   }
@@ -568,7 +585,7 @@ export const updateLoadingState = (type = '@@DVA_LOADING/HIDE') => {
   const { dispatch, getState } = window.g_app._store
   const { loading } = getState()
   if (loading) {
-    Object.keys(loading.effects).forEach(o => {
+    Object.keys(loading.effects).forEach((o) => {
       if (loading.effects[o]) {
         dispatch({
           type,
@@ -665,7 +682,7 @@ export const updateCellValue = (
 }
 
 const observers = {}
-export const watchForElementChange = e => {
+export const watchForElementChange = (e) => {
   let t = e.selector
 
   let n = e.ongoing
@@ -677,22 +694,22 @@ export const watchForElementChange = e => {
   let r =
     undefined === i
       ? {
-        childList: true,
-        characterData: true,
-        subtree: true,
-        attributes: true,
-      }
+          childList: true,
+          characterData: true,
+          subtree: true,
+          attributes: true,
+        }
       : i
-    ; (observers[t] = new MutationObserver(e1 => {
-      e1.forEach(e2 => {
-        a(e2)
-      }),
-        n || observers[t].disconnect()
-    })),
-      observers[t].observe(e.container || document, r)
+  ;(observers[t] = new MutationObserver((e1) => {
+    e1.forEach((e2) => {
+      a(e2)
+    }),
+      n || observers[t].disconnect()
+  })),
+    observers[t].observe(e.container || document, r)
 }
 
-const confirmBeforeReload = e => {
+const confirmBeforeReload = (e) => {
   e.preventDefault()
   // Chrome requires returnValue to be set
   e.returnValue = ''
@@ -715,7 +732,7 @@ const navigateDirtyCheck = ({
   confirmText,
   onSecondConfirm,
   ...restProps
-}) => e => {
+}) => (e) => {
   if (window.beforeReloadHandlerAdded) {
     let f = {}
 
@@ -777,7 +794,7 @@ const navigateDirtyCheck = ({
             if (f.onDirtyDiscard) f.onDirtyDiscard()
             delete window.dirtyForms[displayName]
           } else {
-            Object.values(window.dirtyForms).forEach(f => {
+            Object.values(window.dirtyForms).forEach((f) => {
               window.g_app._store.dispatch({
                 type: 'formik/updateState',
                 payload: {
@@ -826,7 +843,7 @@ const calculateAdjustAmount = (
   }
 }
 
-const errMsgForOutOfRange = field => `${field} must between 0 and 999,999.99`
+const errMsgForOutOfRange = (field) => `${field} must between 0 and 999,999.99`
 const calculateItemLevelAdjustment = (
   adjType = 'ExactAmount',
   adjValue = 0,
@@ -862,7 +879,7 @@ const calculateItemLevelAdjustment = (
   }
 }
 
-const htmlEncode = html => {
+const htmlEncode = (html) => {
   // 1.首先动态创建一个容器标签元素，如DIV
   let temp = document.createElement('div')
   // 2.然后将要转换的字符串设置为这个元素的innerText(ie支持)或者textContent(火狐，google支持)
@@ -874,7 +891,7 @@ const htmlEncode = html => {
   temp = null
   return output
 }
-const htmlDecode = text => {
+const htmlDecode = (text) => {
   // 1.首先动态创建一个容器标签元素，如DIV
   let temp = document.createElement('div')
   // 2.然后将要转换的字符串设置为这个元素的innerHTML(ie，火狐，google都支持)
@@ -947,13 +964,15 @@ const getRefreshMedisaveBalanceStatus = (response = []) => {
   const successCode = 'WN800'
   const { status, statusDescription } = response
 
-  if (status &&
-    status.trim().toLowerCase() !== successCode.trim().toLowerCase()) {
+  if (
+    status &&
+    status.trim().toLowerCase() !== successCode.trim().toLowerCase()
+  ) {
     return {
       ...defaultResponse,
       statusDescription,
     }
-  } 
+  }
 
   return { ...defaultResponse, isSuccessful: true }
 }
@@ -973,13 +992,13 @@ const calculateGSTAdj = ({
   gstValue = 0,
   gstAmtField = 'gstAmount',
 }) => {
-  let gst = roundTo((totalAfterAdj * gstValue) / 100)
+  let gst = roundTo(totalAfterAdj * gstValue / 100)
   if (isGSTInclusive) {
     gst = roundTo(totalAfterAdj - totalAfterAdj / (1 + gstValue / 100))
   }
 
   const totalItemizedGST = roundTo(
-    activeRows.map(i => i[gstAmtField]).reduce(sumReducer, 0),
+    activeRows.map((i) => i[gstAmtField]).reduce(sumReducer, 0),
   )
   const diff = roundTo(gst - totalItemizedGST)
 
@@ -1016,14 +1035,14 @@ const calculateAmount = (
   } = {},
 ) => {
   let gst = 0
-  const activeRows = rows.filter(o => !o.isDeleted)
-  const activeAdjustments = adjustments.filter(o => !o.isDeleted)
+  const activeRows = rows.filter((o) => !o.isDeleted)
+  const activeAdjustments = adjustments.filter((o) => !o.isDeleted)
 
   const total = roundTo(
-    activeRows.map(o => o[totalField]).reduce(sumReducer, 0),
+    activeRows.map((o) => o[totalField]).reduce(sumReducer, 0),
   )
 
-  activeRows.forEach(r => {
+  activeRows.forEach((r) => {
     r.weightage = r[totalField] / total || 0
     // console.log(r[totalField], total, r.weightage)
 
@@ -1034,45 +1053,48 @@ const calculateAmount = (
   if (total === 0 && activeRows[0]) {
     activeRows[0].weightage = 1
   }
-  activeAdjustments
-    .filter(o => !o.isDeleted)
-    .forEach((fa, i) => {
-      activeRows.forEach(o => {
-        o.subAdjustment = 0
-      })
-      let adjAmount = 0
-      let otherItemsAdjAmount = 0
-      activeRows.forEach((r, j) => {
-        // console.log(r.weightage * fa.adjAmount, r)
-        let adj = 0
-        let initalRowToal = r[totalField]
-        for (let idx = 0; idx < i; idx++) {
-          initalRowToal += r[`adjustmen${idx}`]
-        }
-        if (fa.adjType === 'ExactAmount') {
-          // --- If is last item, should use [totalAdjAmount] - [sum of other items adj amt] ---//
-          if (activeRows.length - 1 === j) {
-            adj = roundTo(fa.adjAmount - otherItemsAdjAmount)
-          } else adj = roundTo(r.weightage * fa.adjValue, 2)
-        } else if (fa.adjType === 'Percentage') {
-          adj = roundTo((fa.adjValue / 100) * initalRowToal)
-        }
-        // console.log(r.subAdjustment + adj, r.subAdjustment, adj)
-        adjAmount += adj
-        // r[adjustedField] = roundTo(r[adjustedField] + adj)
-        // r.subAdjustment += adj
-        r[`adjustmen${i}`] = adj
-        r[adjustedField] = roundTo(initalRowToal + adj)
-        otherItemsAdjAmount += roundTo(adj)
-      })
-      if (fa.adjType === 'Percentage') fa.adjAmount = roundTo(adjAmount)
+  activeAdjustments.filter((o) => !o.isDeleted).forEach((fa, i) => {
+    activeRows.forEach((o) => {
+      o.subAdjustment = 0
     })
+    let adjAmount = 0
+    let otherItemsAdjAmount = 0
+    activeRows.forEach((r, j) => {
+      // console.log(r.weightage * fa.adjAmount, r)
+      let adj = 0
+      let initalRowToal = r[totalField]
+      for (let idx = 0; idx < i; idx++) {
+        initalRowToal += r[`adjustmen${idx}`]
+      }
+      if (fa.adjType === 'ExactAmount') {
+        // --- If is last item, should use [totalAdjAmount] - [sum of other items adj amt] ---//
+        if (activeRows.length - 1 === j) {
+          adj = roundTo(fa.adjValue - otherItemsAdjAmount)
+        } else {
+          adj = roundTo(Math.abs(r.weightage) * Math.abs(fa.adjValue), 2)
+
+          if (fa.adjValue < 0) adj = -adj
+        }
+      } else if (fa.adjType === 'Percentage') {
+        adj = roundTo(Math.abs(fa.adjValue) / 100 * Math.abs(initalRowToal))
+
+        if (fa.adjValue < 0) adj = -adj
+      }
+      // console.log(r.subAdjustment + adj, r.subAdjustment, adj)
+      adjAmount += adj
+      // r[adjustedField] = roundTo(r[adjustedField] + adj)
+      // r.subAdjustment += adj
+      r[`adjustmen${i}`] = adj
+      r[adjustedField] = roundTo(initalRowToal + adj)
+      otherItemsAdjAmount += roundTo(adj)
+    })
+    if (fa.adjType === 'Percentage') fa.adjAmount = roundTo(adjAmount)
+  })
   // activeRows.forEach((r) => {
   //   r[adjustedField] = roundTo(r[adjustedField])
   // })
-
   const totalAfterAdj = roundTo(
-    activeRows.map(o => o[adjustedField]).reduce(sumReducer, 0),
+    activeRows.map((o) => o[adjustedField]).reduce(sumReducer, 0),
   )
 
   const { clinicSettings } = window.g_app._store.getState()
@@ -1085,38 +1107,38 @@ const calculateAmount = (
 
   if (gstValue) {
     if (isGSTInclusive) {
-      activeRows.forEach(r => {
+      activeRows.forEach((r) => {
         gst += roundTo(
           r[adjustedField] - r[adjustedField] / (1 + gstValue / 100),
         )
       })
     } else {
-      gst = roundTo((totalAfterAdj * gstValue) / 100)
+      gst = roundTo(totalAfterAdj * gstValue / 100)
     }
-    activeRows.forEach(r => {
+    activeRows.forEach((r) => {
       if (isGSTInclusive) {
         r[gstField] = r[adjustedField]
         r[gstAmtField] = roundTo(
           r[adjustedField] - r[adjustedField] / (1 + gstValue / 100),
         )
       } else {
-        r[gstAmtField] = roundTo((r[adjustedField] * gstValue) / 100)
+        r[gstAmtField] = roundTo(r[adjustedField] * gstValue / 100)
         r[gstField] = roundTo(r[adjustedField] * (1 + gstValue / 100))
       }
       // console.log(r[gstField], r[gstAmtField])
     })
   } else {
-    activeRows.forEach(r => {
+    activeRows.forEach((r) => {
       r[gstAmtField] = 0
       r[gstField] = r[adjustedField]
     })
   }
   // console.log({ activeRows, adjustments })
-  const mapInvoiceItemAdjustment = (adjustment, index) => invoiceItem => {
+  const mapInvoiceItemAdjustment = (adjustment, index) => (invoiceItem) => {
     let itemAdj
     if (adjustment.invoiceItemAdjustment)
       itemAdj = adjustment.invoiceItemAdjustment.find(
-        ss => ss.invoiceItemFK === invoiceItem.id,
+        (ss) => ss.invoiceItemFK === invoiceItem.id,
       )
     return {
       [itemFkField]: invoiceItem.id,
@@ -1149,7 +1171,7 @@ const calculateAmount = (
       .sort(sortAdjustment),
     summary: {
       subTotal: roundTo(
-        activeRows.map(row => row[totalField]).reduce(sumReducer, 0),
+        activeRows.map((row) => row[totalField]).reduce(sumReducer, 0),
       ),
       gst: absoluteGST,
       gstAdj: gstAdjustment,
@@ -1169,7 +1191,7 @@ const calculateAmount = (
 
 const removeFields = (obj, fields = []) => {
   if (Array.isArray(obj)) {
-    obj.forEach(v => {
+    obj.forEach((v) => {
       removeFields(v, fields)
     })
   } else if (typeof obj === 'object') {
@@ -1181,13 +1203,13 @@ const removeFields = (obj, fields = []) => {
         removeFields(value, fields)
       }
     }
-    fields.forEach(o => {
+    fields.forEach((o) => {
       delete obj[o]
     })
   }
 }
 
-export const currencyFormatter = value =>
+export const currencyFormatter = (value) =>
   numeral(value).format(`$${config.currencyFormat}`)
 
 const regDate = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/s
@@ -1200,7 +1222,7 @@ const commonDataReaderTransform = (data, fieldName, keepNull = false) => {
   if (typeof data === 'object') {
     if (Array.isArray(data)) {
       if (fieldName) data = data.sort((a, b) => a[fieldName] - b[fieldName])
-      data.forEach(element => {
+      data.forEach((element) => {
         commonDataReaderTransform(element, fieldName, keepNull)
       })
     } else {
@@ -1213,7 +1235,9 @@ const commonDataReaderTransform = (data, fieldName, keepNull = false) => {
           }
           if (Array.isArray(v)) {
             if (fieldName)
-              data[field] = lodash.sortBy(data[field], [o => o[fieldName]])
+              data[field] = lodash.sortBy(data[field], [
+                (o) => o[fieldName],
+              ])
             for (let subfield in v) {
               if (Object.prototype.hasOwnProperty.call(v, subfield)) {
                 commonDataReaderTransform(
@@ -1243,12 +1267,12 @@ const commonDataReaderTransform = (data, fieldName, keepNull = false) => {
   return data
 }
 
-const commonDataWriterTransform = data => {
+const commonDataWriterTransform = (data) => {
   const { getClinic } = config
   const { systemTimeZoneInt = 8 } = getClinic() || {}
   if (typeof data === 'object') {
     if (Array.isArray(data)) {
-      data.forEach(element => {
+      data.forEach((element) => {
         commonDataWriterTransform(element)
       })
     } else {
@@ -1294,12 +1318,12 @@ const locationQueryParameters = () => {
   return params
 }
 
-export const convertToBase64 = file =>
+export const convertToBase64 = (file) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)
     reader.onload = () => resolve(reader.result.split(',')[1])
-    reader.onerror = error => reject(error)
+    reader.onerror = (error) => reject(error)
   })
 
 const enableTableForceRender = (duration = 1000) => {
@@ -1309,12 +1333,12 @@ const enableTableForceRender = (duration = 1000) => {
   }, duration)
 }
 
-const generateHashCode = s =>
+const generateHashCode = (s) =>
   `${s
     .split('')
     .reduce((a, b) => Math.abs((a << 5) - a + b.charCodeAt(0)) | 0, 0)}`
 
-const stringToBytesFaster = str => {
+const stringToBytesFaster = (str) => {
   // http://stackoverflow.com/questions/1240408/reading-bytes-from-a-javascript-string
   let ch
   let st
