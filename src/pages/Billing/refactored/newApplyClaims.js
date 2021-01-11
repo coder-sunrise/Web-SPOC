@@ -4,7 +4,13 @@ import _ from 'lodash'
 import { withStyles } from '@material-ui/core'
 import Add from '@material-ui/icons/AddCircle'
 // common components
-import { CommonModal, Button, GridItem, WarningSnackbar } from '@/components'
+import {
+  CommonModal,
+  Button,
+  GridItem,
+  WarningSnackbar,
+  Tooltip,
+} from '@/components'
 // common utils
 import { roundTo } from '@/utils/utils'
 import {
@@ -1117,7 +1123,7 @@ const ApplyClaims = ({
           <div style={{ paddingBottom: 8 }}>
             <WarningSnackbar
               variant='warning'
-              message='Invoice has been updated. Kindly remove the payment (s) made for existing copayer/scheme and click clear button.'
+              message='Invoice has been updated. Kindly remove the payment(s) made for existing copayer/scheme and click CLEAR ALL to continue.'
             />
             <div
               style={{
@@ -1129,21 +1135,23 @@ const ApplyClaims = ({
                 marginBottom: -36,
               }}
             >
-              <Button
-                color='danger'
-                size='sm'
-                disabled={
-                  tempInvoicePayer.find(
-                    (payer) =>
-                      !payer.isCancelled &&
-                      (payer.invoicePayment || [])
-                        .find((payment) => !payment.isCancelled),
-                  ) || showRefreshOrder
-                }
-                onClick={ClearAllInvoicePayer}
-              >
-                Clear All
-              </Button>
+              <Tooltip title='Click to remove all Co-Payers'>
+                <Button
+                  color='danger'
+                  size='sm'
+                  disabled={
+                    tempInvoicePayer.find(
+                      (payer) =>
+                        !payer.isCancelled &&
+                        (payer.invoicePayment || [])
+                          .find((payment) => !payment.isCancelled),
+                    ) || showRefreshOrder
+                  }
+                  onClick={ClearAllInvoicePayer}
+                >
+                  Clear All
+                </Button>
+              </Tooltip>
             </div>
           </div>
         </GridItem>

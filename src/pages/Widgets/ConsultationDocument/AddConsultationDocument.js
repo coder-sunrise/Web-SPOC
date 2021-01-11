@@ -1,33 +1,16 @@
-import React, { Component, PureComponent } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import withStyles from '@material-ui/core/styles/withStyles'
 import { convertFromHTML } from 'draft-js'
 import numeral from 'numeral'
 import _ from 'lodash'
-import { htmlEncodeByRegExp, htmlDecodeByRegExp } from '@/utils/utils'
-import Yup from '@/utils/yup'
+import { htmlDecodeByRegExp } from '@/utils/utils'
 import { qtyFormat } from '@/utils/config'
 
 import {
-  withFormikExtend,
-  FastField,
-  Button,
-  CommonHeader,
-  CommonModal,
-  NavPills,
-  PictureUpload,
   GridContainer,
   GridItem,
-  TextField,
-  notification,
   Select,
-  CodeSelect,
-  DatePicker,
-  RadioGroup,
-  ProgressButton,
-  CardContainer,
-  confirm,
-  Checkbox,
   SizeContainer,
   RichEditor,
   ButtonSelect,
@@ -105,37 +88,35 @@ const loadFromCodesConfig = {
       )
       return `<ul>
               <li><strong>${isExtPrescription
-          ? 'External Prescription'
-          : 'Medication'}</strong></li>
+                ? 'External Prescription'
+                : 'Medication'}</strong></li>
                ${rowHTMLs.join('')}
             </ul>`
     }
     return ''
   },
-  InsertVaccination: (rows, patient) => {
-    const vRows = rows
-      .filter((o) => !o.isDeleted && o.type === '2')
-      .map((v) => {
-        const {
-          subject = '',
-          usageMethodDisplayValue: usage = '',
-          dosageDisplayValue: dosage = '',
-          uomDisplayValue: uom = '',
-          remarks = '',
-          quantity = 0,
-          uomDisplayValue = '',
-        } = v
-        const qtyFormatStr = numeral(quantity).format(qtyFormat)
-        const subjectHtml = `<li> - ${subject}</li>`
-        const precautionHtml =
-          usage + dosage + uom !== ''
-            ? `<li>${usage} ${dosage} ${uom} </li>`
-            : ''
-        const qtyHtml = `<li>Quantity: ${qtyFormatStr} ${uomDisplayValue}</li>`
-        const remarksHtml = remarks !== '' ? `<li>${remarks}</li>` : ''
+  InsertVaccination: (rows, isGenerateCertificate) => {
+    const vRows = (isGenerateCertificate
+      ? rows
+      : rows.filter((o) => !o.isDeleted && o.type === '2')).map((v) => {
+      const {
+        subject = '',
+        usageMethodDisplayValue: usage = '',
+        dosageDisplayValue: dosage = '',
+        uomDisplayValue: uom = '',
+        remarks = '',
+        quantity = 0,
+        uomDisplayValue = '',
+      } = v
+      const qtyFormatStr = numeral(quantity).format(qtyFormat)
+      const subjectHtml = `<li> - ${subject}</li>`
+      const precautionHtml =
+        usage + dosage + uom !== '' ? `<li>${usage} ${dosage} ${uom} </li>` : ''
+      const qtyHtml = `<li>Quantity: ${qtyFormatStr} ${uomDisplayValue}</li>`
+      const remarksHtml = remarks !== '' ? `<li>${remarks}</li>` : ''
 
-        return `<ul>${subjectHtml} <ul> ${precautionHtml}${qtyHtml}${remarksHtml}</ul></ul>`
-      })
+      return `<ul>${subjectHtml} <ul> ${precautionHtml}${qtyHtml}${remarksHtml}</ul></ul>`
+    })
     if (vRows && vRows.length > 0)
       return `<ul>
               <li><strong>Vaccination</strong></li>
@@ -170,7 +151,7 @@ const loadFromCodesConfig = {
     return ''
   },
 
-  InsertConsumable: (rows, codetable, patient) => {
+  InsertConsumable: (rows) => {
     const pRows = rows.filter((o) => !o.isDeleted && o.type === '4')
     if (pRows && pRows.length > 0) {
       const rowHTMLs = pRows.map((o) => {
@@ -217,7 +198,7 @@ const loadFromCodesConfig = {
       1,
     )}/${calculateAgeFromDOB(patient.dob)}</p>`
 
-    result += `<p>Drug Allergy: ${patientAllergy || 'NA'}</p>`
+    result += `<p>Drug Allergy: ${patientAllergy || 'N.A.'}</p>`
     return result
   },
   loadFromCodes: [
@@ -257,14 +238,35 @@ const loadFromCodesConfig = {
 
         const ordersHTML = [
           loadFromCodesConfig.InsertMedication(rows, codetable, patient, false),
-          loadFromCodesConfig.InsertVaccination(rows, codetable, patient),
+          loadFromCodesConfig.InsertVaccination(rows, false),
           loadFromCodesConfig.InsertOpenPrescription(rows, codetable, patient),
           loadFromCodesConfig.InsertConsumable(rows, codetable, patient),
           service,
         ]
 
         let htmls = ordersHTML.join('')
-        // console.log(htmls)
+        return htmls
+      },
+    },
+    {
+      value: 'vaccination',
+      name: 'Vaccination',
+      getter: () => {
+        const { orders, consultationDocument } = window.g_app._store.getState()
+        if (!orders) return '-'
+        const { rows = [] } = orders
+        const { entity = {} } = consultationDocument
+
+        const ordersHTML = [
+          loadFromCodesConfig.InsertVaccination(
+            entity.vaccinationUFK
+              ? rows.filter((vc) => vc.uid === entity.vaccinationUFK)
+              : rows,
+            true,
+          ),
+        ]
+
+        let htmls = ordersHTML.join('')
         return htmls
       },
     },
@@ -287,7 +289,6 @@ const loadFromCodesConfig = {
         ]
 
         let htmls = ordersHTML.join('')
-        console.log(htmls)
         return htmls
       },
     },
@@ -303,7 +304,6 @@ const loadFromCodesConfig = {
 
 const styles = (theme) => ({
   editor: {
-    // marginTop: theme.spacing(1),
     position: 'relative',
   },
   editorBtn: {
@@ -315,36 +315,6 @@ const styles = (theme) => ({
 })
 const templateReg = /<a.*?data-value="(.*?)".*?<\/a>/gm
 
-// @withFormikExtend({
-//   mapPropsToValues: ({ consultationDocument }) => {
-//     // console.log(diagnosis)
-//     return consultationDocument.entity || consultationDocument.default
-//   },
-//   validationSchema: Yup.object().shape({
-//     type: Yup.string().required(),
-//     to: Yup.string().when('type', {
-//       is: (val) => val !== '2',
-//       then: Yup.string().required(),
-//     }),
-//     from: Yup.string().required(),
-//     date: Yup.date().required(),
-//     subject: Yup.string().required(),
-
-//     // 3->MC
-
-//     days: Yup.number().when('type', {
-//       is: (val) => val === '3',
-//       then: Yup.number().required(),
-//     }),
-//     fromto: Yup.array().when('type', {
-//       is: (val) => val === '3',
-//       then: Yup.array().of(Yup.date()).min(2).required(),
-//     }),
-//   }),
-
-//   handleSubmit: () => {},
-//   displayName: 'AddConsultationDocument',
-// })
 @connect(
   ({ consultationDocument, user, codetable, visitRegistration, patient }) => ({
     consultationDocument,
@@ -393,7 +363,6 @@ class AddConsultationDocument extends PureComponent {
   getLoader = (editor, setFieldValue, currentType) => {
     const { classes, consultation, codetable, patient, values } = this.props
     const { documenttemplate = [] } = codetable
-    // console.log({ documenttemplate })
     const documentType = parseInt(currentType.value, 10) || -1
     return (
       <div className={classes.editorBtn}>
@@ -406,11 +375,9 @@ class AddConsultationDocument extends PureComponent {
             if (!val) return
             let msg = htmlDecodeByRegExp(option.templateContent)
             const match = msg.match(templateReg) || []
-            // console.log(msg, templateReg, match, tagList)
             match.forEach((s) => {
               const value = s.match(/data-value="(.*?)"/)[1]
               const m = tagList.find((o) => o.value === value)
-              // console.log(text, m)
               if (m && m.getter) msg = msg.replace(s, m.getter())
             })
             setFieldValue('content', msg)
@@ -431,7 +398,6 @@ class AddConsultationDocument extends PureComponent {
               ? option.getter(entity, codetable, patient.entity)
               : Object.byString(entity, option.value) || '-'
             const blocksFromHTML = convertFromHTML(htmlDecodeByRegExp(v))
-            // console.log(editor)
             if (editor && editor.props) {
               const { editorState } = editor.props
               editor.update(
@@ -502,7 +468,6 @@ class AddConsultationDocument extends PureComponent {
           {type === '4' && <Others {...cfg} />}
           {type === '5' && <MedicalCertificate {...cfg} />}
           {type === '6' && <CertificateAttendance {...cfg} />}
-
         </div>
       </div>
     )

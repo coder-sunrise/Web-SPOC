@@ -1,5 +1,4 @@
 import router from 'umi/router'
-import moment from 'moment'
 import _ from 'lodash'
 import { createFormViewModel } from 'medisys-model'
 import { getUniqueId } from '@/utils/utils'
@@ -53,7 +52,6 @@ export default createFormViewModel({
       ],
       showSignOffModal: false,
       printData: [],
-
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -111,17 +109,6 @@ export default createFormViewModel({
             version,
           },
         })
-
-        // yield take('query/@@end')
-        // if (md === 'cons') {
-        //   yield put({
-        //     type: 'global/updateState',
-        //     payload: {
-        //       fullscreen: true,
-        //       showConsultationPanel: true,
-        //     },
-        //   })
-        // }
       },
 
       *start ({ payload }, { call, put, select, take }) {
@@ -265,16 +252,10 @@ export default createFormViewModel({
             message: 'Consultation signed-off.',
             queueNo: entity.queueNo,
           })
-          // yield put({ type: 'closeModal' })
-          // console.log('payload ', payload)
         }
         return response
       },
       *discard ({ payload }, { call, put, select }) {
-        // if (!payload) {
-        //   yield put({ type: 'closeModal' })
-        //   return null
-        // }
         const visitRegistration = yield select(
           (state) => state.visitRegistration,
         )
@@ -287,7 +268,6 @@ export default createFormViewModel({
             message: 'Consultation discarded.',
             queueNo: entity.queueNo,
           })
-          // yield put({ type: 'closeModal', payload })
         }
         return response
       },
@@ -319,7 +299,6 @@ export default createFormViewModel({
               version: payload.version,
             },
           })
-          // console.log(response)
           yield put({
             type: 'queryDone',
             payload: {
@@ -348,18 +327,10 @@ export default createFormViewModel({
           },
         })
         yield take('global/updateAppState/@@end')
-        // yield put({
-        //   type: 'formik/updateState',
-        //   payload: {
-        //     ConsultationPage: undefined,
-        //     ConsultationDocumentList: undefined,
-        //   },
-        // })
 
         router.push('/reception/queue')
       },
       *queryDone ({ payload }, { call, put, select, take }) {
-        // console.log('queryDone', payload)
         const { data, page } = payload
         if (!data) return null
         let cdRows = []
@@ -375,12 +346,6 @@ export default createFormViewModel({
               return p.convert ? p.convert(d) : d
             }),
           )
-        })
-        yield put({
-          type: 'consultationDocument/updateState',
-          payload: {
-            rows: _.sortBy(cdRows, 'sequence'),
-          },
         })
 
         let formRows = []
@@ -446,11 +411,33 @@ export default createFormViewModel({
                   }
                 }
 
+                if (p.value === '2') {
+                  // put auto generated certificate to document
+                  newObj.corVaccinationCert = newObj.corVaccinationCert.map(
+                    (vc) => {
+                      return {
+                        ...vc,
+                        uid: getUniqueId(),
+                        type: '3',
+                        vaccinationUFK: newObj.uid,
+                      }
+                    },
+                  )
+                  cdRows = cdRows.concat(newObj.corVaccinationCert)
+                }
+
                 return p.convert ? p.convert(newObj) : newObj
               }),
             )
           })
         }
+
+        yield put({
+          type: 'consultationDocument/updateState',
+          payload: {
+            rows: _.sortBy(cdRows, 'sequence'),
+          },
+        })
 
         yield put({
           type: 'orders/updateState',

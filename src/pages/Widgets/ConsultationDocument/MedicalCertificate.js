@@ -28,7 +28,7 @@ import NavigateNext from '@material-ui/icons/NavigateNext'
 import ListAlt from '@material-ui/icons/ListAlt'
 import { CANNED_TEXT_TYPE_FIELD_NAME } from '@/pages/Widgets/ClinicalNotes/CannedText/utils'
 import { connect } from 'dva'
-import cannedTextModel from '@/pages/Widgets/ClinicalNotes/models'
+import cannedTextModel from '@/pages/Widgets/ClinicalNotes/models/cannedText'
 import CannedText from '@/pages/Widgets/ClinicalNotes/CannedText'
 import { primaryColor } from 'mui-pro-jss'
 import { getClinicianProfile } from './utils'
@@ -96,6 +96,7 @@ const styles = (theme) => ({
     mcDays: Yup.number().required(),
     mcStartEndDate: Yup.array().of(Yup.date()).min(2).required(),
     unfitTypeFK: Yup.number().required(),
+    remarks: Yup.string().max(2000),
     otherUnfitTypeDescription: Yup.string().when('unfitTypeFK', {
       is: (val) => val && UNFIT_TYPE[val] === 'Others',
       then: Yup.string().required(),
@@ -195,7 +196,7 @@ class MedicalCertificate extends PureComponent {
   }
 
   render () {
-    const { footer, handleSubmit, classes, values, setFieldValue, cannedText, user } = this.props
+    const { footer, handleSubmit, classes, values, setFieldValue, cannedText , user } = this.props
     // console.log({ values })
     const { unfitTypeFK } = values
 
@@ -213,7 +214,7 @@ class MedicalCertificate extends PureComponent {
     let list = cannedText[fieldName] || []
     list = [
       ..._.orderBy(
-        list.filter((o) => o.ownedByUserFK === user.id),
+        list.filter((o) => o.ownedByUserFK === user.data.id),
         [
           'sortOrder',
           'title',
@@ -329,7 +330,7 @@ class MedicalCertificate extends PureComponent {
               name='remarks'
               render={(args) => {
                 return (
-                  <TextField label='Remarks' multiline rowsMax='4' {...args} />
+                  <TextField label='Remarks' maxLength={2000} multiline rowsMax='4' {...args} />
                 )
               }}
             />

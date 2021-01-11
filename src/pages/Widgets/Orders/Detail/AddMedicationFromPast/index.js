@@ -1,16 +1,21 @@
 import React, { PureComponent } from 'react'
+import _ from 'lodash'
 import { connect } from 'dva'
 import * as Yup from 'yup'
 import moment from 'moment'
 // medisys components
 import { LoadingWrapper } from '@/components/_medisys'
 // custom component
-import {} from '@/components'
+import { notification } from '@/components'
 import { withFormik } from 'formik'
 // sub components
-import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
+import {
+  openCautionAlertPrompt,
+  ReplaceCertificateTeplate,
+} from '@/pages/Widgets/Orders/utils'
 import FitlerBar from './FilterBar'
 import Grid from './Grid'
+import { getClinicianProfile } from '../../../ConsultationDocument/utils'
 
 const defaultValue = {
   visitFromDate: moment(new Date()).startOf('day').toDate(),
@@ -19,12 +24,23 @@ const defaultValue = {
   isAllDate: true,
 }
 
-@connect(({ loading, codetable, visitRegistration, clinicSettings }) => ({
-  loading,
-  codetable,
-  visitRegistration,
-  clinicSettings: clinicSettings.settings || clinicSettings.default,
-}))
+@connect(
+  ({
+    loading,
+    codetable,
+    visitRegistration,
+    clinicSettings,
+    patient,
+    consultationDocument,
+  }) => ({
+    loading,
+    codetable,
+    visitRegistration,
+    clinicSettings: clinicSettings.settings || clinicSettings.default,
+    patient,
+    consultationDocument,
+  }),
+)
 @withFormik({
   displayName: 'PastMedication',
   validationSchema: Yup.object().shape({}),
@@ -351,7 +367,14 @@ class PastMedication extends PureComponent {
   }
 
   GetNewVaccination = () => {
-    const { getNextSequence, codetable, type } = this.props
+    const {
+      getNextSequence,
+      codetable,
+      type,
+      visitRegistration,
+      patient,
+      consultationDocument: { rows = [] },
+    } = this.props
     const {
       inventoryvaccination,
       ctvaccinationusage,
@@ -362,6 +385,19 @@ class PastMedication extends PureComponent {
     const vaccinations = this.state.addedItems
     let data = []
     let sequence = getNextSequence()
+    const { entity: visitEntity } = visitRegistration
+    const clinicianProfile = getClinicianProfile(codetable, visitEntity)
+    const { entity } = patient
+    const { name, patientAccountNo, genderFK, dob } = entity
+    const { ctgender = [] } = codetable
+    const gender = ctgender.find((o) => o.id === genderFK) || {}
+    const allDocs = rows.filter((s) => !s.isDeleted)
+    let nextSequence = 1
+    if (allDocs && allDocs.length > 0) {
+      const { sequence: documentSequence } = _.maxBy(allDocs, 'sequence')
+      nextSequence = documentSequence + 1
+    }
+    let showNoTemplate
     data = data.concat(
       vaccinations.map((item) => {
         let currentSequence = sequence
@@ -389,7 +425,7 @@ class PastMedication extends PureComponent {
 
         const totalPrice = newTotalQuantity * vaccination.sellingPrice
 
-        return {
+        let newVaccination = {
           type,
           inventoryVaccinationFK: item.inventoryVaccinationFK,
           vaccinationGivenDate: item.vaccinationGivenDate,
@@ -419,9 +455,49 @@ class PastMedication extends PureComponent {
           isDeleted: false,
           subject: vaccination.displayValue,
           caution: vaccination.caution,
+          isGenerateCertificate: vaccination.isAutoGenerateCertificate,
+        }
+        let newCORVaccinationCert = []
+        if (newVaccination.isGenerateCertificate) {
+          const { documenttemplate = [] } = codetable
+          const defaultTemplate = documenttemplate.find(
+            (dt) =>
+              dt.isDefaultTemplate === true && dt.documentTemplateTypeFK === 3,
+          )
+          if (defaultTemplate) {
+            newCORVaccinationCert = [
+              {
+                type: '3',
+                certificateDate: moment(),
+                issuedByUserFK: clinicianProfile.userProfileFK,
+                subject: `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
+                  ''}, ${Math.floor(
+                  moment.duration(moment().diff(dob)).asYears(),
+                )}`,
+                content: ReplaceCertificateTeplate(
+                  defaultTemplate.templateContent,
+                  newVaccination,
+                ),
+                sequence: nextSequence,
+              },
+            ]
+            nextSequence += 1
+          } else {
+            showNoTemplate = true
+          }
+        }
+        return {
+          ...newVaccination,
+          corVaccinationCert: newCORVaccinationCert,
         }
       }),
     )
+    if (showNoTemplate) {
+      notification.warning({
+        message:
+          'Any changes will not be reflected in the vaccination certificate.',
+      })
+    }
     return data
   }
 

@@ -7,7 +7,13 @@ import {
   navigateDirtyCheck,
   roundTo,
 } from '@/utils/utils'
-import { ProgressButton, Button, withFormikExtend, Tabs } from '@/components'
+import {
+  ProgressButton,
+  Button,
+  withFormikExtend,
+  Tabs,
+  notification,
+} from '@/components'
 import Yup from '@/utils/yup'
 import { getBizSession } from '@/services/queue'
 import Authorized from '@/utils/Authorized'
@@ -67,6 +73,12 @@ const Detail = ({
   }
 
   useEffect(() => {
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'documenttemplate',
+      },
+    })
     if (vaccinationDetail.currentId) {
       checkHasActiveSession()
       dispatch({
@@ -93,43 +105,25 @@ const Detail = ({
     }
   }, [])
 
+  const handelSave = () => {
+    const { values: { schemes = [] }, codetable } = props
+    const { documenttemplate = [] } = codetable
+    if (
+      schemes.find((s) => s === 'isAutoGenerateCertificate') &&
+      !documenttemplate.find(
+        (dt) =>
+          dt.isDefaultTemplate === true && dt.documentTemplateTypeFK === 3,
+      )
+    ) {
+      notification.warning({
+        message: 'No template found. Select a template in Document Template.',
+      })
+    }
+    handleSubmit()
+  }
+
   return (
     <React.Fragment>
-      {/* <NavPills
-        color='primary'
-        onChange={(event, active) => {
-          history.push(
-            getAppendUrl({
-              t: active,
-            }),
-          )
-        }}
-        contentStyle={{ margin: '0 -5px' }}
-        tabs={[
-          {
-            tabButton: 'General',
-            tabContent: <DetailPanel {...detailProps} />,
-          },
-          {
-            tabButton: 'Setting',
-            tabContent: <Setting {...detailProps} />,
-          },
-          {
-            tabButton: 'Pricing',
-            tabContent: <Pricing {...detailProps} />,
-          },
-          {
-            tabButton: 'Stock',
-            tabContent: (
-              <Stock
-                vaccinationDetail={vaccinationDetail}
-                values={props.values}
-                setFieldValue={setFieldValue}
-              />
-            ),
-          },
-        ]}
-      /> */}
       <Tabs
         style={{ marginTop: 20 }}
         defaultActiveKey='0'
@@ -147,7 +141,7 @@ const Detail = ({
         </Button>
         <ProgressButton
           submitKey='vaccinationDetail/submit'
-          onClick={handleSubmit}
+          onClick={handelSave}
         />
       </div>
     </React.Fragment>
@@ -155,9 +149,10 @@ const Detail = ({
 }
 export default compose(
   withStyles(styles, { withTheme: true }),
-  connect(({ vaccination, vaccinationDetail }) => ({
+  connect(({ vaccination, vaccinationDetail, codetable }) => ({
     vaccination,
     vaccinationDetail,
+    codetable,
   })),
   withFormikExtend({
     enableReinitialize: true,
@@ -167,7 +162,12 @@ export default compose(
         : vaccinationDetail.default
 
       let schemes = []
-      const { isChasAcuteClaimable, isChasChronicClaimable, isMedisaveClaimable } = returnValue
+      const {
+        isChasAcuteClaimable,
+        isChasChronicClaimable,
+        isMedisaveClaimable,
+        isAutoGenerateCertificate,
+      } = returnValue
       if (isChasAcuteClaimable) {
         schemes.push('isChasAcuteClaimable')
       }
@@ -176,6 +176,9 @@ export default compose(
       }
       if (isMedisaveClaimable) {
         schemes.push('isMedisaveClaimable')
+      }
+      if (isAutoGenerateCertificate) {
+        schemes.push('isAutoGenerateCertificate')
       }
 
       return {
@@ -219,13 +222,14 @@ export default compose(
         .min(0, 'Critical Threshold must between 0 and 999,999.9')
         .max(999999.9, 'Critical Threshold must between 0 and 999,999.9'),
 
-      inventoryVaccination_MedisaveVaccination: Yup.array().compact((v) => v.isDeleted).of(
-        Yup.object().shape({
-          medisaveVaccinationFK: Yup.number().required(),
-          isDefault: Yup.boolean(),
-        })
-        
-      ),
+      inventoryVaccination_MedisaveVaccination: Yup.array()
+        .compact((v) => v.isDeleted)
+        .of(
+          Yup.object().shape({
+            medisaveVaccinationFK: Yup.number().required(),
+            isDefault: Yup.boolean(),
+          }),
+        ),
     }),
     handleSubmit: (values, { props, resetForm }) => {
       const { dispatch, history } = props
@@ -245,6 +249,7 @@ export default compose(
         isChasAcuteClaimable: false,
         isChasChronicClaimable: false,
         isMedisaveClaimable: false,
+        isAutoGenerateCertificate: false,
       }
       values.schemes.forEach((o) => {
         if (o === 'isChasAcuteClaimable') {
@@ -252,6 +257,8 @@ export default compose(
         } else if (o === 'isChasChronicClaimable') {
           schemes[o] = true
         } else if (o === 'isMedisaveClaimable') {
+          schemes[o] = true
+        } else if (o === 'isAutoGenerateCertificate') {
           schemes[o] = true
         }
       })

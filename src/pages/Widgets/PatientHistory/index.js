@@ -159,7 +159,7 @@ class PatientHistory extends Component {
       type: 'codetable/fetchCodes',
       payload: { code: 'ctg6pd' },
     })
-    
+
     dispatch({
       type: 'patientHistory/initState',
       payload: {
@@ -824,9 +824,9 @@ class PatientHistory extends Component {
     if (current.referralRemarks) {
       referral += `\r\n\r\nRemarks: ${current.referralRemarks}`
     }
-    return {
+    return { 
       isShowReferral: true, 
-      referralContent: referral, 
+      referralContent: referral,  
     }
   }
 
@@ -1222,6 +1222,13 @@ class PatientHistory extends Component {
           }
         }
       })
+
+    // for resolve print nothing when not any data in sub table(such as consultationDocument, treatment, diagnosis...)
+    if (consultationDocument.length === 0) {
+      consultationDocument = [
+        { visitFK: '' },
+      ]
+    }
 
     const payload = {
       PatientInfo: this.getPatientInfo(),

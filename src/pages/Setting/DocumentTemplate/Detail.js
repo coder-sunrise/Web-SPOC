@@ -1,26 +1,21 @@
 import React, { PureComponent } from 'react'
-import _ from 'lodash'
-import { FormattedMessage } from 'umi/locale'
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
   FastField,
-  Button,
   GridContainer,
   GridItem,
   TextField,
   DateRangePicker,
-  OutlinedTextField,
   RichEditor,
   Field,
-  Select,
   SizeContainer,
   CodeSelect,
+  Checkbox,
+  Tooltip,
+  CommonModal,
 } from '@/components'
 import { tagList } from '@/utils/codes'
-import { htmlEncodeByRegExp, htmlDecodeByRegExp } from '@/utils/utils'
-
-const styles = (theme) => ({})
 
 @withFormikExtend({
   mapPropsToValues: ({ settingDocumentTemplate }) =>
@@ -30,20 +25,27 @@ const styles = (theme) => ({})
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
     templateContent: Yup.string().required(),
-    // .max(2000, 'Message should not exceed 2000 characters'),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
-    // console.log(restValues)
-
+    const { isDefaultTemplate, id } = restValues
+    let message
+    if (isDefaultTemplate) {
+      message = 'Default template saved successfully.'
+    } else if (id) {
+      message = 'Template saved successfully.'
+    } else {
+      message = 'Template created successfully.'
+    }
     dispatch({
       type: 'settingDocumentTemplate/upsert',
       payload: {
         ...restValues,
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
+        cfg: { message },
       },
     }).then((r) => {
       if (r) {
@@ -58,7 +60,23 @@ const styles = (theme) => ({})
   displayName: 'DocumentTemplateDetail',
 })
 class Detail extends PureComponent {
-  state = {}
+  state = { isShowSaveDefaultTemplate: false }
+
+  handelSaveDefaultTemplate = () => {
+    this.setState((preState) => {
+      return { isShowSaveDefaultTemplate: !preState.isShowSaveDefaultTemplate }
+    })
+  }
+
+  handelConfirm = () => {
+    const { values, handleSubmit } = this.props
+    const { isDefaultTemplate } = values
+    if (isDefaultTemplate) {
+      this.handelSaveDefaultTemplate()
+    } else {
+      handleSubmit()
+    }
+  }
 
   render () {
     const { props } = this
@@ -68,8 +86,9 @@ class Detail extends PureComponent {
       settingDocumentTemplate,
       setFieldValue,
       height,
+      values,
     } = props
-    // console.log(htmlDecodeByRegExp(props.values.templateContent))
+    const { documentTemplateTypeFK, displayValue } = values
     return (
       <SizeContainer size='sm'>
         <div style={{ margin: theme.spacing(1) }}>
@@ -82,6 +101,11 @@ class Detail extends PureComponent {
                     <CodeSelect
                       code='LTDocumentTemplateType'
                       label='Document Type'
+                      onChange={(v) => {
+                        if (v !== 3) {
+                          setFieldValue('isDefaultTemplate', false)
+                        }
+                      }}
                       {...args}
                     />
                   )
@@ -109,7 +133,7 @@ class Detail extends PureComponent {
                 render={(args) => <TextField label='Display Value' {...args} />}
               />
             </GridItem>
-            <GridItem md={12}>
+            <GridItem md={6}>
               <FastField
                 name='effectiveDates'
                 render={(args) => {
@@ -123,6 +147,32 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
+            <GridItem
+              md={6}
+              style={{
+                position: 'relative',
+              }}
+            >
+              {documentTemplateTypeFK === 3 && (
+                <Tooltip title='For auto generate vaccination certificate'>
+                  <FastField
+                    name='isDefaultTemplate'
+                    render={(args) => {
+                      return (
+                        <Checkbox
+                          label='Default Template'
+                          {...args}
+                          style={{
+                            position: 'absolute',
+                            bottom: 0,
+                          }}
+                        />
+                      )
+                    }}
+                  />
+                </Tooltip>
+              )}
+            </GridItem>
             <GridItem md={12}>
               <Field
                 name='templateContent'
@@ -133,25 +183,60 @@ class Detail extends PureComponent {
                   }
                   return (
                     <RichEditor
-                      // toolbarHidden={() => true}
                       label='Template Message'
-                      tagList={tagList}
+                      tagList={
+                        documentTemplateTypeFK === 3 ? (
+                          tagList.filter(
+                            (t) =>
+                              [
+                                'Order',
+                                'ExternalPrescription',
+                              ].indexOf(t.value) < 0,
+                          )
+                        ) : (
+                          tagList
+                        )
+                      }
                       {...cfg}
                       {...args}
-                      onBlur={(html, text) => {
-                        console.log(htmlDecodeByRegExp(html), text)
-                        // this.props.setFieldValue('templateContent', text)
-                      }}
                     />
                   )
                 }}
               />
             </GridItem>
           </GridContainer>
+          <CommonModal
+            title='Default Template'
+            maxWidth='sm'
+            open={this.state.isShowSaveDefaultTemplate}
+            onClose={this.handelSaveDefaultTemplate}
+            onConfirm={() => {
+              this.handelSaveDefaultTemplate()
+              props.handleSubmit()
+            }}
+            cancelText='Cancel'
+            showFooter
+          >
+            <div
+              style={{
+                marginLeft: 20,
+                marginRight: 20,
+                textAlign: 'center',
+              }}
+            >
+              <div
+                style={{
+                  marginTop: -20,
+                }}
+              >
+                <h3>{`Select ${displayValue || ''} as default template?`}</h3>
+              </div>
+            </div>
+          </CommonModal>
         </div>
         {footer &&
           footer({
-            onConfirm: props.handleSubmit,
+            onConfirm: this.handelConfirm,
             confirmBtnText: 'Save',
             confirmProps: {
               disabled: false,
