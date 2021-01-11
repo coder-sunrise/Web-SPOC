@@ -32,15 +32,15 @@ class ReferralSourceList extends PureComponent {
     const ReferralSourceListingColumnsExtensions = [
       { columnName: 'companyName', sortingEnabled: false, align: 'right' },
       { columnName: 'referralPerson', sortingEnabled: false },
-      { columnName: 'visitDate', sortingEnabled: false },
-      { columnName: 'patientReferenceNo', sortingEnabled: false, width: 180 },
+      { columnName: 'visitDate', width: 140, sortingEnabled: false },
+      { columnName: 'patientReferenceNo', sortingEnabled: false, width: 140 },
       { columnName: 'patientName', sortingEnabled: false },
       { columnName: 'doctor', sortingEnabled: false },
-      { columnName: 'nextApptDate', type: 'date', sortingEnabled: false },
-      { columnName: 'invoiceNo', sortingEnabled: false },
+      { columnName: 'nextApptDate', width: 140, type: 'date', sortingEnabled: false },
+      { columnName: 'invoiceNo', width: 140, sortingEnabled: false },
       {
         columnName: 'invoiceAmount',
-        type: 'currency', sortingEnabled: false,
+        type: 'currency', width: 140, sortingEnabled: false,
       },
     ]
 
