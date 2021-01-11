@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react'
+import { Badge } from 'antd'
 import htmlToText from 'html-to-text'
-import { CommonTableGrid, Button, Tooltip, CodeSelect } from '@/components'
-import { status } from '@/utils/codes'
+import { CommonTableGrid, Button, Tooltip } from '@/components'
+import { status, documentTemplateTypes } from '@/utils/codes'
 import { Edit, DescriptionOutlined } from '@material-ui/icons'
 import MouseOverPopover from './MouseOverPopover'
 
@@ -44,26 +45,24 @@ class Grid extends PureComponent {
             sortingEnabled: false,
             width: 240,
             render: (row) => {
+              const documentTemplateType =
+                documentTemplateTypes.find(
+                  (type) => type.value === row.documentTemplateTypeFK,
+                ) || {}
               return (
-                <div style={{ display: 'flex' }}>
+                <div style={{ marginTop: 1 }}>
+                  <span>{documentTemplateType.name || ''}</span>
                   {row.isDefaultTemplate && (
-                    <div style={{ height: 24 }}>
-                      <Tooltip title='Default vaccination template'>
-                        <DescriptionOutlined
-                          color='primary'
-                          style={{ height: 24, width: 24 }}
-                        />
-                      </Tooltip>
-                    </div>
-                  )}
-                  <div>
-                    <CodeSelect
-                      label=''
-                      text
-                      value={row.documentTemplateTypeFK}
-                      code='LTDocumentTemplateType'
+                    <Badge
+                      count='Default'
+                      title='Default vaccination template'
+                      style={{
+                        backgroundColor: 'Green',
+                        display: 'inline-Block',
+                        marginLeft: 2,
+                      }}
                     />
-                  </div>
+                  )}
                 </div>
               )
             },
