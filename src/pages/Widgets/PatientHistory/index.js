@@ -805,7 +805,9 @@ class PatientHistory extends Component {
       isShowReferral: true,
       referralBy: current.referralBy,
       referralInstitution: current.referralInstitution,
-      referralDate: current.referralDate,
+      referralDate: current.referralDate
+        ? moment(current.referralDate).format('DD MMM YYYY')
+        : '',
     }
   }
 
@@ -1197,6 +1199,13 @@ class PatientHistory extends Component {
           }
         }
       })
+
+    // for resolve print nothing when not any data in sub table(such as consultationDocument, treatment, diagnosis...)
+    if (consultationDocument.length === 0) {
+      consultationDocument = [
+        { visitFK: '' },
+      ]
+    }
 
     const payload = {
       PatientInfo: this.getPatientInfo(),
