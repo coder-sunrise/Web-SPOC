@@ -1885,6 +1885,25 @@ export const costPriceTypes = [
   },
 ]
 
+export const documentTemplateTypes = [
+  {
+    value: 1,
+    name: 'Referral Letter',
+  },
+  {
+    value: 2,
+    name: 'Memo',
+  },
+  {
+    value: 3,
+    name: 'Vaccination Certificate',
+  },
+  {
+    value: 4,
+    name: 'Others',
+  },
+]
+
 module.exports = {
   appointmentStatus,
   recurrenceTypes,
@@ -1923,5 +1942,6 @@ module.exports = {
   year,
   queueProcessorType,
   queueItemStatus,
+  documentTemplateTypes,
   ...module.exports,
 }
