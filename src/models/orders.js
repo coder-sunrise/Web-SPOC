@@ -5,7 +5,6 @@ import * as service from '@/pages/Inventory/InventoryAdjustment/services'
 import { getUniqueId, maxReducer, calculateAmount } from '@/utils/utils'
 
 const sharedMedicationValue = {
-  // quantity: 0,
   isMinus: true,
   adjValue: 0,
   isExactAmount: true,
@@ -17,12 +16,6 @@ const sharedMedicationValue = {
   ],
   corPrescriptionItemInstruction: [
     {
-      // usageMethodFK: 1,
-      // dosageFK: 1,
-      // prescribeUOMFK: 1,
-      // drugFrequencyFK: 1,
-      // dispenseUOMFK: 1,
-      // duration: 1,
       sequence: 0,
       stepdose: 'AND',
       unitPrice: 0,
@@ -52,6 +45,7 @@ const initialState = {
     isMinus: true,
     adjValue: 0,
     isExactAmount: true,
+    corVaccinationCert: [],
   },
   defaultConsumable: {
     quantity: 1,
@@ -73,17 +67,37 @@ export default createListViewModel({
   param: {
     service: {},
     state: { ...initialState },
-    subscriptions: ({ dispatch, history }) => {
-      // history.listen(async (loct, method) => {
-      //   const { pathname, search, query = {} } = loct
-      // })
-    },
+    subscriptions: ({ dispatch, history }) => {},
     effects: {
       *upsertRow ({ payload }, { select, call, put, delay }) {
         const upsert = yield put({
           type: 'upsertRowState',
           payload,
         })
+        const orders = yield select((st) => st.orders)
+        const consultationDocument = yield select(
+          (st) => st.consultationDocument,
+        )
+        const { rows } = consultationDocument
+        const { entity: { corVaccinationCert = [] } } = orders
+        const activeCORVaccinationCert = corVaccinationCert.find(
+          (vc) => !vc.isDeleted,
+        )
+        if (
+          activeCORVaccinationCert &&
+          !rows.find((cd) => cd.uid === activeCORVaccinationCert.uid)
+        ) {
+          yield put({
+            type: 'consultationDocument/updateState',
+            payload: {
+              rows: [
+                ...rows,
+                activeCORVaccinationCert,
+              ],
+            },
+          })
+        }
+
         yield put({
           type: 'calculateAmount',
         })
@@ -95,27 +109,74 @@ export default createListViewModel({
               entity: undefined,
             },
           })
-          // yield put({
-          //   type: 'global/incrementCommitCount',
-          // })
         }
       },
       *upsertRows ({ payload }, { select, call, put, delay }) {
-        const upsert = yield put({
-          type: 'upsertRowsState',
-          payload,
-        })
+        const orders = yield select((st) => st.orders)
+        const { rows } = orders
+        let newVaccinationCertificates = []
+        const getCertificate = (vaccination, uid) => {
+          const corVaccinationCert =
+            vaccination.type === '2'
+              ? vaccination.corVaccinationCert.map((vc) => {
+                  return {
+                    ...vc,
+                    vaccinationUFK: uid,
+                    uid: getUniqueId(),
+                  }
+                })
+              : []
+          newVaccinationCertificates = newVaccinationCertificates.concat(
+            corVaccinationCert,
+          )
+          return corVaccinationCert
+        }
+        const newVaccinations = [
+          ...rows,
+          ...payload.map((v) => {
+            const uid = getUniqueId()
+            return {
+              ...v,
+              uid,
+              corVaccinationCert: getCertificate(v, uid),
+            }
+          }),
+        ]
+
         yield put({
-          type: 'calculateAmount',
+          type: 'updateState',
+          payload: {
+            rows: newVaccinations,
+          },
         })
-        if (upsert) {
+
+        // insert generate certificate
+        if (newVaccinationCertificates.length > 0) {
+          const consultationDocument = yield select(
+            (st) => st.consultationDocument,
+          )
+          const { rows: documentRows } = consultationDocument
           yield put({
-            type: 'updateState',
+            type: 'consultationDocument/updateState',
             payload: {
-              entity: undefined,
+              rows: [
+                ...documentRows,
+                ...newVaccinationCertificates,
+              ],
             },
           })
         }
+
+        yield put({
+          type: 'calculateAmount',
+        })
+
+        yield put({
+          type: 'updateState',
+          payload: {
+            entity: undefined,
+          },
+        })
       },
       *addFinalAdjustment ({ payload }, { select, call, put, delay }) {
         yield put({
@@ -153,76 +214,67 @@ export default createListViewModel({
       *getStockDetails ({ payload }, { call, put }) {
         const result = yield call(service.queryStockDetails, payload)
         return result
-        // yield put({ type: 'saveStockDetails', payload: result })
-      },
-    },
-
-    reducers: {
-      reset () {
-        // console.log('order reset')
-        return { ...initialState }
-      },
-      upsertRowState (state, { payload }) {
-        let newRow
-        let { rows, type } = state
-        if (payload.type) {
-          type = payload.type
-        }
-        if (payload.uid) {
-          rows = rows.map((row) => {
-            const n =
-              row.uid === payload.uid
-                ? {
-                    ...row,
-                    ...payload,
-                  }
-                : row
-            return n
-          })
-        } else {
-          newRow = {
-            ...payload,
-            type,
-            uid: getUniqueId(),
-          }
-          rows.push(newRow)
-        }
-        return {
-          ...state,
-          rows,
-          entity: newRow,
-          // totalAfterAdj: undefined,
-        }
       },
 
-      upsertRowsState (state, { payload }) {
-        let { rows } = state
-        for (let index = 0; index < payload.length; index++) {
-          rows.push({
-            ...payload[index],
-            uid: getUniqueId(),
-          })
-        }
-        return {
-          ...state,
-          rows,
-          entity: { uid: getUniqueId(), orderSetItems: [] },
-          // totalAfterAdj: undefined,
-        }
-      },
-
-      deleteRow (state, { payload }) {
-        let { finalAdjustments, rows, isGSTInclusive, gstValue } = state
+      *deleteRow ({ payload }, { put, select }) {
+        const orders = yield select((st) => st.orders)
+        const consultationDocument = yield select(
+          (st) => st.consultationDocument,
+        )
+        let { finalAdjustments, rows, isGSTInclusive, gstValue } = orders
+        const { rows: documentRows } = consultationDocument
         let tempRows = [
           ...rows,
         ]
         if (payload) {
-          tempRows.map((a, index) => {
-            if (a.uid === payload.uid) {
-              a.isDeleted = true
+          const deleteRow = rows.find((o) => o.uid === payload.uid)
+          if (deleteRow) {
+            // delete auto generated certificate
+            if (deleteRow.type === '2') {
+              const activeCertificate = deleteRow.corVaccinationCert.find(
+                (vc) => !vc.isDeleted,
+              )
+              if (activeCertificate) {
+                let newDocumentRows
+                if (activeCertificate.id > 0) {
+                  newDocumentRows = documentRows.map((d) => {
+                    if (activeCertificate.uid === d.uid)
+                      return { ...d, isDeleted: true }
+                    return d
+                  })
+                } else {
+                  newDocumentRows = documentRows.filter(
+                    (d) => d.uid !== activeCertificate.uid,
+                  )
+                }
+                yield put({
+                  type: 'consultationDocument/updateState',
+                  payload: {
+                    rows: newDocumentRows,
+                  },
+                })
+              }
             }
-            return a
-          })
+
+            // delete order
+            if (deleteRow.id > 0) {
+              tempRows = rows.map((o) => {
+                if (!payload || o.uid === payload.uid) {
+                  o.isDeleted = true
+                  if (deleteRow.type === '2') {
+                    o.corVaccinationCert = o.corVaccinationCert
+                      .filter((vc) => vc.id > 0)
+                      .map((vc) => {
+                        return { ...vc, isDeleted: true }
+                      })
+                  }
+                }
+                return o
+              })
+            } else {
+              tempRows = rows.filter((o) => o.uid !== payload.uid)
+            }
+          }
         } else {
           tempRows = tempRows.map((o) => ({
             ...o,
@@ -238,18 +290,75 @@ export default createListViewModel({
           isGSTInclusive,
           gstValue,
         })
-        // console.log(tempRows, finalAdjustments, amount)
+
+        yield put({
+          type: 'updateState',
+          payload: {
+            ...amount,
+            rows: tempRows,
+            finalAdjustments,
+          },
+        })
+      },
+    },
+
+    reducers: {
+      reset () {
+        return { ...initialState }
+      },
+      upsertRowState (state, { payload }) {
+        let newRow
+        let { rows, type } = state
+        if (payload.type) {
+          type = payload.type
+        }
+        const getCertificate = (uid) => {
+          const corVaccinationCert =
+            type === '2'
+              ? payload.corVaccinationCert.map((vc) => {
+                  if (vc.uid) {
+                    return { ...vc, vaccinationUFK: uid }
+                  }
+                  return {
+                    ...vc,
+                    vaccinationUFK: uid,
+                    uid: getUniqueId(),
+                  }
+                })
+              : []
+          return corVaccinationCert
+        }
+        if (payload.uid) {
+          rows = rows.map((row) => {
+            const n =
+              row.uid === payload.uid
+                ? {
+                    ...row,
+                    ...payload,
+                    corVaccinationCert: getCertificate(row.uid),
+                  }
+                : row
+            return n
+          })
+        } else {
+          const uid = getUniqueId()
+          newRow = {
+            ...payload,
+            type,
+            uid,
+            corVaccinationCert: getCertificate(uid),
+          }
+          rows.push(newRow)
+        }
         return {
           ...state,
-          ...amount,
-          rows: tempRows,
-          finalAdjustments,
+          rows,
+          entity: newRow || rows.find((r) => r.uid === payload.uid),
         }
       },
 
       // used by each order component
       adjustAmount (state, { payload }) {
-        // console.log(payload)
         return {
           ...state,
           entity: {
@@ -308,9 +417,9 @@ export default createListViewModel({
             const n =
               row.uid === payload.uid
                 ? {
-                  ...row,
-                  ...payload,
-                }
+                    ...row,
+                    ...payload,
+                  }
                 : row
             return n
           })

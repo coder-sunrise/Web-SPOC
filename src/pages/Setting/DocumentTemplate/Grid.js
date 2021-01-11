@@ -1,16 +1,12 @@
 import React, { PureComponent } from 'react'
-
-import { CommonTableGrid, Button, Tooltip } from '@/components'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-import { status } from '@/utils/codes'
-import Delete from '@material-ui/icons/Delete'
-import Edit from '@material-ui/icons/Edit'
-import * as service from './services'
 import htmlToText from 'html-to-text'
+import { CommonTableGrid, Button, Tooltip, CodeSelect } from '@/components'
+import { status } from '@/utils/codes'
+import { Edit, DescriptionOutlined } from '@material-ui/icons'
 import MouseOverPopover from './MouseOverPopover'
 
 class Grid extends PureComponent {
-  editRow = (row, e) => {
+  editRow = (row) => {
     const { dispatch, settingDocumentTemplate } = this.props
 
     const { list } = settingDocumentTemplate
@@ -24,21 +20,10 @@ class Grid extends PureComponent {
     })
   }
 
-  // getTooltipTitle = () => {
-  //   const pathname = window.location.pathname.trim().toLowerCase()
-
-  //   const modalTitle =
-  //     pathname == '/setting/smstemplate'
-  //       ? 'SMS Template'
-  //       : 'Document Template'
-
-  //   return `Edit ${modalTitle}`
-  // }
-
   render () {
-    const { classes } = this.props
     return (
       <CommonTableGrid
+        forceRender
         style={{ margin: 0 }}
         type='settingDocumentTemplate'
         onRowDoubleClick={this.editRow}
@@ -48,32 +33,51 @@ class Grid extends PureComponent {
           { name: 'displayValue', title: 'Display Value' },
           { name: 'templateContent', title: 'Template Message' },
           { name: 'isActive', title: 'Status' },
-          // { name: 'effectiveStartDate', title: 'Effective Start Date' },
-          // { name: 'effectiveEndDate', title: 'Effective End Date' },
-
           {
             name: 'action',
             title: 'Action',
           },
         ]}
-        // FuncProps={{ pager: false }}
         columnExtensions={[
           {
             columnName: 'documentTemplateTypeFK',
             sortingEnabled: false,
-            type: 'codeSelect',
-            code: 'LTDocumentTemplateType',
+            width: 240,
+            render: (row) => {
+              return (
+                <div style={{ display: 'flex' }}>
+                  {row.isDefaultTemplate && (
+                    <div style={{ height: 24 }}>
+                      <Tooltip title='Default vaccination template'>
+                        <DescriptionOutlined
+                          color='primary'
+                          style={{ height: 24, width: 24 }}
+                        />
+                      </Tooltip>
+                    </div>
+                  )}
+                  <div>
+                    <CodeSelect
+                      label=''
+                      text
+                      value={row.documentTemplateTypeFK}
+                      code='LTDocumentTemplateType'
+                    />
+                  </div>
+                </div>
+              )
+            },
           },
           {
             columnName: 'isActive',
             sortingEnabled: false,
             type: 'select',
             options: status,
+            width: 100,
           },
           {
             columnName: 'templateContent',
             render: (row) => {
-              // return htmlToText.fromString(row.templateMessage)
               let e = document.createElement('div')
               e.innerHTML = row.templateContent
               let htmlData =

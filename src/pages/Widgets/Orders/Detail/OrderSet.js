@@ -13,6 +13,7 @@ import {
   serverDateTimeFormatFull,
   Field,
   NumberInput,
+  notification,
 } from '@/components'
 import Yup from '@/utils/yup'
 import { getUniqueId } from '@/utils/utils'
@@ -20,12 +21,30 @@ import config from '@/utils/config'
 import {
   openCautionAlertPrompt,
   GetOrderItemAccessRight,
+  ReplaceCertificateTeplate,
 } from '@/pages/Widgets/Orders/utils'
 import Authorized from '@/utils/Authorized'
+import { getClinicianProfile } from '../../ConsultationDocument/utils'
 
 const { qtyFormat } = config
 
-@connect(({ global, codetable, user }) => ({ global, codetable, user }))
+@connect(
+  ({
+    global,
+    codetable,
+    user,
+    consultationDocument,
+    visitRegistration,
+    patient,
+  }) => ({
+    global,
+    codetable,
+    user,
+    consultationDocument,
+    visitRegistration,
+    patient,
+  }),
+)
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type }) => {
     const v = {
@@ -39,8 +58,16 @@ const { qtyFormat } = config
     inventoryOrderSetFK: Yup.number().required(),
   }),
   handleSubmit: (values, { props, onConfirm, setValues }) => {
-    const { dispatch, orders, codetable, getNextSequence, user } = props
-    const { rows } = orders
+    const {
+      dispatch,
+      orders,
+      codetable,
+      getNextSequence,
+      user,
+      visitRegistration,
+      patient,
+      consultationDocument: { rows = [] },
+    } = props
     const {
       ctmedicationusage,
       ctmedicationunitofmeasurement,
@@ -49,6 +76,19 @@ const { qtyFormat } = config
       ctvaccinationunitofmeasurement,
       ctvaccinationusage,
     } = codetable
+    const { entity: visitEntity } = visitRegistration
+    const clinicianProfile = getClinicianProfile(codetable, visitEntity)
+    const { entity } = patient
+    const { name, patientAccountNo, genderFK, dob } = entity
+    const { ctgender = [] } = codetable
+    const gender = ctgender.find((o) => o.id === genderFK) || {}
+    const allDocs = rows.filter((s) => !s.isDeleted)
+    let nextDocumentSequence = 1
+    if (allDocs && allDocs.length > 0) {
+      const { sequence: documentSequence } = _.maxBy(allDocs, 'sequence')
+      nextDocumentSequence = documentSequence + 1
+    }
+    let showNoTemplate
 
     const getInstruction = (inventoryMedication) => {
       let instruction = ''
@@ -147,6 +187,7 @@ const { qtyFormat } = config
             ? medicationdispensingUOM.name
             : undefined,
           corPrescriptionItemPrecaution: currentMedicationPrecautions,
+          subject: inventoryMedication.displayValue,
           corPrescriptionItemInstruction: [
             {
               usageMethodFK: inventoryMedication.medicationUsageFK,
@@ -236,9 +277,42 @@ const { qtyFormat } = config
             ? isDefaultBatchNo.expiryDate
             : undefined,
           batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
+          type: orderSetItem.type,
+          subject: inventoryVaccination.displayValue,
+          isGenerateCertificate: inventoryVaccination.isAutoGenerateCertificate,
         }
       }
-      return item
+      console.log('item', item)
+      let newCORVaccinationCert = []
+      if (item.isGenerateCertificate) {
+        const { documenttemplate = [] } = codetable
+        const defaultTemplate = documenttemplate.find(
+          (dt) =>
+            dt.isDefaultTemplate === true && dt.documentTemplateTypeFK === 3,
+        )
+        if (defaultTemplate) {
+          newCORVaccinationCert = [
+            {
+              type: '3',
+              certificateDate: moment(),
+              issuedByUserFK: clinicianProfile.userProfileFK,
+              subject: `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
+                ''}, ${Math.floor(
+                moment.duration(moment().diff(dob)).asYears(),
+              )}`,
+              content: ReplaceCertificateTeplate(
+                defaultTemplate.templateContent,
+                item,
+              ),
+              sequence: nextDocumentSequence,
+            },
+          ]
+          nextDocumentSequence += 1
+        } else {
+          showNoTemplate = true
+        }
+      }
+      return { ...item, corVaccinationCert: newCORVaccinationCert }
     }
 
     const getOrderServiceCenterServiceFromOrderSet = (
@@ -268,6 +342,7 @@ const { qtyFormat } = config
           serviceName: service.displayValue,
           serviceFK: service.id,
           serviceCenterFK: serviceCenterService.serviceCenterFK,
+          subject: service.displayValue,
         }
       }
       return item
@@ -293,6 +368,7 @@ const { qtyFormat } = config
           orderSetCode,
           consumableCode: inventoryConsumable.code,
           consumableName: inventoryConsumable.displayValue,
+          subject: inventoryConsumable.displayValue,
         }
       }
 
@@ -336,6 +412,12 @@ const { qtyFormat } = config
         datas.push(data)
         nextSequence += 1
       }
+    }
+    if (showNoTemplate) {
+      notification.warning({
+        message:
+          'Any changes will not be reflected in the vaccination certificate.',
+      })
     }
     dispatch({
       type: 'orders/upsertRows',
