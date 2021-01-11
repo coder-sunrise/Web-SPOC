@@ -6,23 +6,30 @@ import {
   GridContainer,
   GridItem,
   TextField,
+  Field,
   DateRangePicker,
+  CodeSelect,
 } from '@/components'
 import { connect } from 'dva'
 import Contact from '@/pages/Setting/Company/Contact' 
 
+@connect(({ settingReferralPerson }) => ({
+  settingReferralPerson,
+}))
+
 @withFormikExtend({
-  mapPropsToValues: ({ settingReferralSource }) =>
-    settingReferralSource ? settingReferralSource.entity || settingReferralSource.default : {},
+  mapPropsToValues: ({ settingReferralPerson }) =>
+    settingReferralPerson.entity || settingReferralPerson.default,
   validationSchema: Yup.object().shape({
     name: Yup.string().required(),
+    referralSourceIds: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
     dispatch({
-      type: 'settingReferralSource/upsert',
+      type: 'settingReferralPerson/upsert',
       payload: {
         ...restValues,
         effectiveStartDate: effectiveDates[0],
@@ -33,19 +40,22 @@ import Contact from '@/pages/Setting/Company/Contact'
         resetForm()
         if (onConfirm) onConfirm()
         dispatch({
-          type: 'settingReferralSource/query',
+          type: 'settingReferralPerson/query',
+        })
+
+        dispatch({
+          type: 'settingReferralPerson/updateState',
+          payload: { entity: undefined },
         })
       }
     })
   },
-  displayName: 'ReferralSourceDetail',
+  displayName: 'ReferralPersonDetail',
 })
 class Detail extends PureComponent {
-  state = {}
-
   render () {
     const { props } = this
-    const { theme, footer, settingReferralSource } = props
+    const { theme, footer, settingReferralPerson, referralSource } = props
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
@@ -58,7 +68,22 @@ class Detail extends PureComponent {
                     label='Name'
                     autoFocus
                     {...args}
-                    disabled={settingReferralSource && !!settingReferralSource.entity}
+                    disabled={!!settingReferralPerson.entity}
+                  />
+                )}
+              />
+            </GridItem>
+
+            <GridItem md={6}>
+              <Field
+                name='referralSourceIds'
+                render={(args) => (
+                  <CodeSelect
+                    {...args}
+                    options={referralSource}
+                    labelField='name'
+                    mode='multiple'
+                    label='Company'
                   />
                 )}
               />
@@ -78,7 +103,7 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem md={12}>
+            <GridItem md={6}>
               <FastField
                 name='remarks'
                 render={(args) => (
@@ -86,7 +111,6 @@ class Detail extends PureComponent {
                 )}
               />
             </GridItem>
-
           </GridContainer>
           <Contact theme={theme} type='referral' />
         </div>

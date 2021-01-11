@@ -155,4 +155,10 @@ export const menuData = [
     url: '/report/diagnosistrending',
     authority: 'report.other.diagnosistrending',
   },
+  {
+    title: 'Other',
+    text: 'Referral Source Report ',
+    url: '/report/referralsourcereport',
+    authority: 'report.other.referralsource',
+  },
 ]

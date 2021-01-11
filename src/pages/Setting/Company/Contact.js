@@ -122,6 +122,14 @@ const Contact = (props) => {
                   />
                 </GridItem>
               )}
+              {isReferral && (
+                <GridItem md={12}>
+                  <FastField
+                    name='contact.contactWebsite.website'
+                    render={(args) => <TextField label='URL' {...args} />}
+                  />
+                </GridItem>
+              )}
             </Fragment>
           )}
         </GridContainer>
