@@ -721,9 +721,9 @@ const _routes = [
             path: '/report/referralsourcereport',
             name: 'referralsourcereport',
             component: './Report/ReferralSourceReport',
-            // authority: [
-            //   'report.diagnosistrendingreport',
-            // ],
+            authority: [
+              'report.other.referralsource',
+            ],
           },
           {
             path: '/report/sessionsummary',
