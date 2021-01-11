@@ -23,6 +23,7 @@ import {
 } from '@/components'
 import { AttachmentWithThumbnail } from '@/components/_medisys'
 import Search from '@material-ui/icons/Search'
+import Add from '@material-ui/icons/Add'
 import Call from '@material-ui/icons/Call'
 import Authorized from '@/utils/Authorized'
 import Detail from "@/pages/Setting/ReferralSource/Detail"
@@ -295,7 +296,7 @@ class ReferralCard extends PureComponent {
                       disabled={disabled}
                       size='sm'
                     >
-                      <Search /> New Company
+                      <Add /> New Company
                     </Button>
                   </Authorized>
                 </GridItem>
@@ -322,7 +323,7 @@ class ReferralCard extends PureComponent {
                       disabled={disabled}
                       size='sm'
                     >
-                      <Search /> New Referral Person
+                      <Add /> New Referral Person
                     </Button>
                   </Authorized>
                 </GridItem>
