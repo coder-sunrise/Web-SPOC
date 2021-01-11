@@ -96,6 +96,7 @@ const styles = (theme) => ({
     mcDays: Yup.number().required(),
     mcStartEndDate: Yup.array().of(Yup.date()).min(2).required(),
     unfitTypeFK: Yup.number().required(),
+    remarks: Yup.string().max(2000),
     otherUnfitTypeDescription: Yup.string().when('unfitTypeFK', {
       is: (val) => val && UNFIT_TYPE[val] === 'Others',
       then: Yup.string().required(),
@@ -329,7 +330,7 @@ class MedicalCertificate extends PureComponent {
               name='remarks'
               render={(args) => {
                 return (
-                  <TextField label='Remarks' multiline rowsMax='4' {...args} />
+                  <TextField label='Remarks' maxLength={2000} multiline rowsMax='4' {...args} />
                 )
               }}
             />
