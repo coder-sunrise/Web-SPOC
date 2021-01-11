@@ -156,6 +156,11 @@ class PatientHistory extends Component {
     const { dispatch } = this.props
 
     dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'ctg6pd' },
+    })
+    
+    dispatch({
       type: 'patientHistory/initState',
       payload: {
         queueID: Number(findGetParameter('qid')) || 0,
