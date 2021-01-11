@@ -7,7 +7,7 @@ import { connect } from 'dva'
 // material ui
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 // common components
-import { Accordion, GridContainer, GridItem } from '@/components'
+import { Accordion } from '@/components'
 import { AccordionTitle } from '@/components/_medisys'
 // sub components
 import FilterBar from './FilterBar'
@@ -77,8 +77,7 @@ class ReferralSource extends ReportBase {
   }
  
   renderFilterBar = (handleSubmit, isSubmitting) => {
-    let { values } = this.props
-    console.log(values.referralSourceIds)
+    let { values } = this.props 
     let { referralPersonData } = this.state
     let result = []
     if (values.referralSourceIds && values.referralSourceIds.length > 0) {
@@ -87,15 +86,7 @@ class ReferralSource extends ReportBase {
           result.push(person)
         }
       })
-    }
-    let selectedPersonIds = []
-    if (values.referralPersonIds) {
-      console.log(values.referralPersonIds)
-      let tempNewPersonIds = values.referralPersonIds.filter(t => result.findIndex(x => x.id === t) > -1)
-      if (values.referralPersonIds.length !== tempNewPersonIds.length) {
-        selectedPersonIds = tempNewPersonIds
-      }
-    }
+    } 
     result = result.map((m) => {
       return { name: m.name, value: m.id }
     })
@@ -112,8 +103,7 @@ class ReferralSource extends ReportBase {
       <Accordion
         defaultActive={[
           0,
-          1,
-          2,
+          1, 
         ]}
         mode='multiple'
         leftIcon

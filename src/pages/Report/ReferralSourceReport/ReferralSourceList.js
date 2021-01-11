@@ -1,9 +1,7 @@
 import React, { PureComponent } from 'react'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
-// common components
-import { DateFormatter } from '@/components'
-import moment from 'moment'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
+// common components 
+import moment from 'moment' 
 import { ReportDataGrid } from '@/components/_medisys'
 
 class ReferralSourceList extends PureComponent {

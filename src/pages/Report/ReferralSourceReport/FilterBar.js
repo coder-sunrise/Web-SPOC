@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 // formik
 import { FastField, Field } from 'formik'
 // common components
@@ -9,7 +9,6 @@ import {
   GridItem, Checkbox,
   SizeContainer,
 } from '@/components'
-// medisys components
 import ReportDateRangePicker from '../ReportDateRangePicker'
 
 const FilterBar = ({ handleSubmit, isSubmitting, referralList, referralPerson }) => {  

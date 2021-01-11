@@ -45,7 +45,13 @@ class SumList extends PureComponent {
         integrated: {
           calculator: (type, rows, getValue) => {
             if (type === 'visitGrandTotal') {
-              return rows.length
+              let count = 0
+              if (rows && rows.length > 0) {
+                for (let p of rows) {
+                  count += (p.totalVisit || 0)
+                }
+              }
+              return count
             }
             if (type === 'invoiceAmountGrandTotal') {
               let amountSum = 0
