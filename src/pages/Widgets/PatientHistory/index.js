@@ -622,9 +622,13 @@ class PatientHistory extends Component {
       ...history.patientHistoryDetail,
       visitAttachments: history.visitAttachments,
       visitRemarks: history.visitRemarks,
-      referralBy: history.referralBy,
-      referralInstitution: history.referralInstitution,
-      referralDate: history.referralDate,
+      referralSourceFK: history.referralSourceFK,
+      referralPersonFK: history.referralPersonFK,
+      referralPatientProfileFK: history.referralPatientProfileFK,
+      referralSource: history.referralSource,
+      referralPerson: history.referralPerson,
+      referralPatientName: history.referralPatientName, 
+      referralRemarks: history.referralRemarks,
     }
     let visitDetails = {
       visitDate: history.visitDate,
@@ -801,11 +805,23 @@ class PatientHistory extends Component {
   }
 
   getReferral = (current) => {
+    let referral = ''
+    console.log(current)
+    if (current.referralPatientProfileFK) {
+      referral = `Referred By Patient: ${current.referralPatientName}`
+    }
+    else if (current.referralSourceFK) {
+      referral = `Referred By: ${current.referralSource}`
+      if (current.referralPersonFK) {
+        referral = `Referred By: ${current.referralSource}        Referral Person: ${current.referralPerson}`
+      }
+    }
+    if (current.referralRemarks) {
+      referral += `\r\n\r\nRemarks: ${current.referralRemarks}`
+    }
     return {
-      isShowReferral: true,
-      referralBy: current.referralBy,
-      referralInstitution: current.referralInstitution,
-      referralDate: current.referralDate,
+      isShowReferral: true, 
+      referralContent: referral, 
     }
   }
 
@@ -912,9 +928,13 @@ class PatientHistory extends Component {
         let current = {
           ...visit.patientHistoryDetail,
           visitRemarks: visit.visitRemarks,
-          referralBy: visit.referralBy,
-          referralInstitution: visit.referralInstitution,
-          referralDate: visit.referralDate,
+          referralSourceFK: visit.referralSourceFK,
+          referralPersonFK: visit.referralPersonFK,
+          referralPatientProfileFK: visit.referralPatientProfileFK,
+          referralSource: visit.referralSource,
+          referralPerson: visit.referralPerson,
+          referralPatientName: visit.referralPatientName,
+          referralRemarks: visit.referralRemarks,  
           visitPurposeFK: visit.visitPurposeFK,
           currentId: visit.currentId,
           isNurseNote: visit.isNurseNote,
@@ -1211,7 +1231,7 @@ class PatientHistory extends Component {
       ConsultationDocument: consultationDocument,
       ReportContext: [],
     }
-
+    console.log(payload)
     const payload1 = [
       {
         ReportId: 68,
