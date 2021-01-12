@@ -811,7 +811,6 @@ class PatientHistory extends Component {
 
   getReferral = (current) => {
     let referral = ''
-    console.log(current)
     if (current.referralPatientProfileFK) {
       referral = `Referred By Patient: ${current.referralPatientName}`
     }
