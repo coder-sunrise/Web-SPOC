@@ -11,7 +11,7 @@ import {
 } from '@/components'
 import ReportDateRangePicker from '../ReportDateRangePicker'
 
-const FilterBar = ({ handleSubmit, isSubmitting, referralList, referralPerson }) => {  
+const FilterBar = ({ handleSubmit, isSubmitting, referralList, onReferralSourceChange, referralPerson }) => {  
   return (
     <SizeContainer size='sm'>
       <GridContainer>
@@ -25,6 +25,7 @@ const FilterBar = ({ handleSubmit, isSubmitting, referralList, referralPerson })
                   valueField='value'
                   label='Referral Source'
                   mode='multiple' 
+                  onChange={onReferralSourceChange}
                   disableAll
                 />
               )}
