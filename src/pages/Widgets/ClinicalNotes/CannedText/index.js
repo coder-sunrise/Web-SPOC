@@ -9,7 +9,7 @@ import {
   Button, CardContainer, DragableTableGrid, Tooltip,
 } from '@/components'
 import { CANNED_TEXT_TYPE } from '@/utils/constants'
-import { DeleteWithPopover } from '@/components/_medisys' 
+import { DeleteWithPopover } from '@/components/_medisys'
 import Filterbar from './Filterbar'
 import Editor from './Editor'
 // utils
@@ -138,15 +138,19 @@ const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
     const handleEditClick = () => onEditClick(row.id)
     return (
       <React.Fragment>
-        <Tooltip title='Edit'>
-          <Button justIcon color='primary' onClick={handleEditClick}>
-            <Edit />
-          </Button>
-        </Tooltip>
-        <DeleteWithPopover
-          onConfirmDelete={handleDeleteClick}
-          disabled={row.isEdit}
-        />
+        <span style={{ display: 'inlineBlock' }}>
+          <Tooltip title='Edit'>
+            <Button justIcon color='primary' onClick={handleEditClick}>
+              <Edit />
+            </Button>
+          </Tooltip>
+        </span>
+        <span style={{ display: 'inlineBlock' }}>
+          <DeleteWithPopover
+            onConfirmDelete={handleDeleteClick}
+            disabled={row.isEdit}
+          />
+        </span>
       </React.Fragment>
     )
   }
@@ -166,7 +170,7 @@ const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
         handleEditorConfirmClick={handleEditorConfirmClick}
         user={user}
         cannedTextTypeFK={selectedNote.cannedTextTypeFK}
-      />  
+      />
       <h5>Canned Text List</h5>
       <CardContainer hideHeader>
         <Filterbar
@@ -189,7 +193,7 @@ const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
             ...columnExtensions,
             {
               columnName: 'actions',
-              width: 80,
+              width: 90,
               render: ActionButtons,
               sortingEnabled: false,
             },
