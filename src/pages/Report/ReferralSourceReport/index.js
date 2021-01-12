@@ -75,9 +75,13 @@ class ReferralSource extends ReportBase {
       ...params,
     }
   }
- 
+
+  onReferralSourceChange = (v) => {
+    this.props.setFieldValue('referralPersonIds', undefined)
+  }
+
   renderFilterBar = (handleSubmit, isSubmitting) => {
-    let { values } = this.props 
+    let { values } = this.props
     let { referralPersonData } = this.state
     let result = []
     if (values.referralSourceIds && values.referralSourceIds.length > 0) {
@@ -86,7 +90,7 @@ class ReferralSource extends ReportBase {
           result.push(person)
         }
       })
-    } 
+    }
     result = result.map((m) => {
       return { name: m.name, value: m.id }
     })
@@ -103,7 +107,7 @@ class ReferralSource extends ReportBase {
       <Accordion
         defaultActive={[
           0,
-          1, 
+          1,
         ]}
         mode='multiple'
         leftIcon
