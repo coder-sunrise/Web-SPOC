@@ -191,7 +191,7 @@ export const notesTypes = [
   { value: WIDGETS_ID.VISITREMARKS, fieldName: 'visitRemarks' },
 ]
 
-export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
+export const widgets = (props, scribbleNoteUpdateState = () => { }) => [
   {
     id: WIDGETS_ID.ASSOCIATED_HISTORY,
     name: 'History',
@@ -624,11 +624,11 @@ export const showWidget = (current, widgetId) => {
     return false
   // check show visit referral
   if (widgetId === WIDGETS_ID.REFERRAL) {
-    const { referralBy, referralInstitution, referralDate } = current
+    const { referralSourceFK, referralPersonFK, referralPatientProfileFK } = current
     if (
-      (!referralBy || referralBy === '') &&
-      (!referralInstitution || referralInstitution === '') &&
-      !referralDate
+      !referralSourceFK &&
+      !referralPersonFK &&
+      !referralPatientProfileFK
     )
       return false
   }

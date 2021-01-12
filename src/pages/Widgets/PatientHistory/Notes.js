@@ -22,10 +22,27 @@ export default ({
     )
   }
   if (fieldName === 'visitReferral') {
-    const { referralBy = '', referralInstitution = '', referralDate } = current
-    const referral = `Referred By: ${referralBy}        Referral Date: ${referralDate
-      ? moment(referralDate).format('DD MMM YYYY')
-      : '-'}        Institution: ${referralInstitution}`
+    let referral = ''
+    if (current.referralPatientProfileFK)
+    {
+      referral = `Referred By Patient: ${current.referralPatientName}`
+    }
+    else if (current.referralSourceFK)
+    {
+      referral = `Referred By: ${current.referralSource}`
+      if (current.referralPersonFK)
+      {
+        referral = `Referred By: ${current.referralSource}        Referral Person: ${current.referralPerson}`
+      }
+    }
+    if (current.referralRemarks)
+    {
+      referral += `\r\n\r\nRemarks: ${current.referralRemarks}`
+    }
+    // const { referralBy = '', referralInstitution = '', referralDate } = current
+    // const referral = `Referred By: ${referralBy}        Referral Date: ${referralDate
+    //   ? moment(referralDate).format('DD MMM YYYY')
+    //   : '-'}        Institution: ${referralInstitution}`
     return (
       <TextField
         inputRootCustomClasses={tablestyles.historyText}
