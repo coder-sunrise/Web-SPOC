@@ -256,13 +256,16 @@ const loadFromCodesConfig = {
         if (!orders) return '-'
         const { rows = [] } = orders
         const { entity = {} } = consultationDocument
-
+        let insertRows = rows
+        let isGenerateCertificate = false
+        if (entity.vaccinationUFK) {
+          insertRows = rows.filter((vc) => vc.uid === entity.vaccinationUFK)
+          isGenerateCertificate = true
+        }
         const ordersHTML = [
           loadFromCodesConfig.InsertVaccination(
-            entity.vaccinationUFK
-              ? rows.filter((vc) => vc.uid === entity.vaccinationUFK)
-              : rows,
-            true,
+            insertRows,
+            isGenerateCertificate,
           ),
         ]
 

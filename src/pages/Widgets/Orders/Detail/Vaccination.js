@@ -156,7 +156,7 @@ let i = 0
               )}`,
               content: ReplaceCertificateTeplate(
                 defaultTemplate.templateContent,
-                values,
+                { ...values, subject: currentType.getSubject(values) },
               ),
               sequence: nextSequence,
             },
