@@ -632,7 +632,7 @@ class PatientHistory extends Component {
       referralPatientProfileFK: history.referralPatientProfileFK,
       referralSource: history.referralSource,
       referralPerson: history.referralPerson,
-      referralPatientName: history.referralPatientName, 
+      referralPatientName: history.referralPatientName,
       referralRemarks: history.referralRemarks,
     }
     let visitDetails = {
@@ -795,7 +795,8 @@ class PatientHistory extends Component {
     if (isNurseNote) return false
     if (visitPurposeFK === VISIT_TYPE.RETAIL) {
       return (
-        (widgetId === WidgetConfig.WIDGETS_ID.INVOICE ||
+        (widgetId === WidgetConfig.WIDGETS_ID.ORDERS ||
+          widgetId === WidgetConfig.WIDGETS_ID.INVOICE ||
           widgetId === WidgetConfig.WIDGETS_ID.VISITREMARKS ||
           widgetId === WidgetConfig.WIDGETS_ID.REFERRAL ||
           widgetId === WidgetConfig.WIDGETS_ID.ATTACHMENT) &&
@@ -813,8 +814,7 @@ class PatientHistory extends Component {
     let referral = ''
     if (current.referralPatientProfileFK) {
       referral = `Referred By Patient: ${current.referralPatientName}`
-    }
-    else if (current.referralSourceFK) {
+    } else if (current.referralSourceFK) {
       referral = `Referred By: ${current.referralSource}`
       if (current.referralPersonFK) {
         referral = `Referred By: ${current.referralSource}        Referral Person: ${current.referralPerson}`
@@ -823,9 +823,9 @@ class PatientHistory extends Component {
     if (current.referralRemarks) {
       referral += `\r\n\r\nRemarks: ${current.referralRemarks}`
     }
-    return { 
-      isShowReferral: true, 
-      referralContent: referral,  
+    return {
+      isShowReferral: true,
+      referralContent: referral,
     }
   }
 
@@ -938,7 +938,7 @@ class PatientHistory extends Component {
           referralSource: visit.referralSource,
           referralPerson: visit.referralPerson,
           referralPatientName: visit.referralPatientName,
-          referralRemarks: visit.referralRemarks,  
+          referralRemarks: visit.referralRemarks,
           visitPurposeFK: visit.visitPurposeFK,
           currentId: visit.currentId,
           isNurseNote: visit.isNurseNote,

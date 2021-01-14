@@ -13,7 +13,7 @@ const drugMixtureIndicator = (row) => {
   if (row.type !== 'Medication' || !row.isDrugMixture) return null
 
   return (
-    <div style={{ position: 'relative', top: 2 }}>
+    <div style={{ position: 'relative', top: 5 }}>
       <DrugMixtureInfo values={row.prescriptionDrugMixture} />
     </div>
   )

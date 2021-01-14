@@ -28,7 +28,7 @@ const drugMixtureIndicator = (row) => {
   if (row.itemType !== 'Medication' || !row.isDrugMixture) return null
 
   return (
-    <div style={{ position: 'relative', top: 2 }}>
+    <div style={{ position: 'relative', top: 5 }}>
       <DrugMixtureInfo values={row.prescriptionDrugMixture} />
     </div>
   )
@@ -57,7 +57,7 @@ const baseColumns = [
       return (
         <div style={{ position: 'relative' }}>
           <div style={wrapCellTextStyle}>
-            {row.itemType}
+            {row.isDrugMixture ? 'Drug Mixture' : row.itemType}
             {drugMixtureIndicator(row)}
           </div>
         </div>
