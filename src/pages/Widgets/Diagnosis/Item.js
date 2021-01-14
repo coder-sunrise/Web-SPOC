@@ -171,9 +171,16 @@ const DiagnosisItem = ({
                 }}
               />
             </div>
-            <div style={{ display: 'inline-Block', color: 'green' }}>
-              {favouriteDiagnosisCategoryMessage}
-            </div>
+            {favouriteDiagnosisCategoryMessage && (
+              <div
+                style={{
+                  color: 'green',
+                  marginLeft: 'auto',
+                }}
+              >
+                {favouriteDiagnosisCategoryMessage}
+              </div>
+            )}
             {!_.isEqual(
               favouriteDiagnosisCategory.sort(),
               currentSelectCategory.filter((c) => c !== 'all').sort(),
@@ -191,7 +198,7 @@ const DiagnosisItem = ({
                   )
                 }}
               >
-                save categories as favourite
+                Save categories as favourite
               </a>
             )}
           </div>

@@ -215,16 +215,21 @@ const DiagnosisSelect = ({
       selectDiagnosisCode && (
         <div style={{ ...filterStyle, height: 28, bottom: 0 }}>
           {favouriteDiagnosis.find((d) => d === selectDiagnosisCode) ? (
-            <Tooltip title='click to remove favourite'>
+            <Tooltip title='Click to remove favourite'>
               <Star
-                style={{ color: '#FFCC00', width: 28, height: 28 }}
+                style={{
+                  color: '#FFCC00',
+                  width: 28,
+                  height: 28,
+                  cursor: 'hand',
+                }}
                 onClick={handelSaveDiagnosisAsFavourite}
               />
             </Tooltip>
           ) : (
-            <Tooltip title='click to add to favourite'>
+            <Tooltip title='Click to add to favourite'>
               <StarBorder
-                style={{ color: 'gray', width: 28, height: 28 }}
+                style={{ color: 'gray', width: 28, height: 28, cursor: 'hand' }}
                 onClick={handelSaveDiagnosisAsFavourite}
               />
             </Tooltip>
