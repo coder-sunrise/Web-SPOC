@@ -1,4 +1,4 @@
-import React, { PureComponent, Fragment } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from "dva"
 import Yup from '@/utils/yup'
 import {
@@ -9,7 +9,6 @@ import {
   TextField,
   DateRangePicker,
   CodeSelect,
-  Select,
   Switch,
   Field,
   NumberInput,
@@ -18,9 +17,7 @@ import {
   CustomInput,
 } from '@/components'
 import AuthorizedContext from '@/components/Context/Authorized'
-import Authorized from '@/utils/Authorized'
 import Contact from './Contact'
-import { enableDisableOptions } from '@/utils/codes'
 
 @connect(
   ({
@@ -45,6 +42,15 @@ import { enableDisableOptions } from '@/utils/codes'
         100,
         'Contact Person must be at most 100 characters',
       ),
+      defaultStatementAdjustmentRemarks: Yup.string().when(['isAutoGenerateStatementEnabled', 'statementAdjustment'],
+        {
+          is: (isAutoGenerateStatementEnabled, statementAdjustment) => statementAdjustment > 0 && isAutoGenerateStatementEnabled,
+          then: Yup.string().required().max(
+            50,
+            'Default statement ajdustment remarks must be at most 50 characters',
+          ),
+          otherwise: Yup.string(),
+        }),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
       coPayerTypeFK: Yup.number().when('settingCompany', {
         is: () => settingCompany.companyType.id === 1,
@@ -139,6 +145,13 @@ import { enableDisableOptions } from '@/utils/codes'
 class Detail extends PureComponent {
   state = {}
 
+  updateDefaultRemarks = () => {
+    const { isAutoGenerateStatementEnabled, statementAdjustment } = this.props.values
+    if (!isAutoGenerateStatementEnabled || !statementAdjustment || statementAdjustment === 0) {
+      this.props.setFieldValue('defaultStatementAdjustmentRemarks', undefined)
+    }
+  }
+
   render () {
     const { props } = this
 
@@ -146,7 +159,7 @@ class Detail extends PureComponent {
     const { name } = route
     const isCopayer = name === 'copayer'
 
-    const { isUserMaintainable, isGSTEnabled } = values
+    const { isUserMaintainable, isGSTEnabled, isAutoGenerateStatementEnabled, statementAdjustment } = values
 
     let finalRights = isUserMaintainable ? 'enable' : 'disable'
     if (rights === 'disable') finalRights = 'disable'
@@ -279,6 +292,7 @@ class Detail extends PureComponent {
                               defaultValue='0.00'
                               precision={2}
                               min={0}
+                              onChange={this.updateDefaultRemarks}
                               {...args}
                             />
                           )
@@ -289,6 +303,7 @@ class Detail extends PureComponent {
                             label='Statement Adjustment'
                             defaultValue='0.00'
                             precision={2}
+                            onChange={this.updateDefaultRemarks}
                             min={0}
                             {...args}
                           />
@@ -408,29 +423,45 @@ class Detail extends PureComponent {
                       []
                     )}
                 </GridItem>
-              </React.Fragment> 
-              {isCopayer && isEnableAutoGenerateStatement && (
-                <GridItem md={12}>
+              </React.Fragment>
+            </GridContainer>
+
+            {isCopayer && isEnableAutoGenerateStatement && (
+              <GridContainer>
+                <GridItem md={6}>
                   <FastField
                     name='isAutoGenerateStatementEnabled'
                     render={(args) => {
                       return <Checkbox
+                        style={{ marginTop: '22px' }}
                         label='Auto Generate Statement'
                         {...args}
+                        onChange={this.updateDefaultRemarks}
                       />
                     }}
                   />
                 </GridItem>
-              )} 
-              {isCopayer && (
+                {isAutoGenerateStatementEnabled && (statementAdjustment && statementAdjustment > 0) &&
+                  <GridItem md={6}>
+                    <Field
+                      name='defaultStatementAdjustmentRemarks'
+                      render={(args) =>
+                        <TextField label='Default Statement Adjustment Remarks' maxLength={50} {...args} />}
+                    />
+                  </GridItem>
+                }
+              </GridContainer>
+            )}
+            {isCopayer && (
+              <GridContainer>
                 <GridItem md={12}>
                   <Field
                     name='remark'
                     render={(args) => <TextField label='Remarks' {...args} />}
                   />
                 </GridItem>
-              )}
-            </GridContainer>
+              </GridContainer>
+            )}
 
             <Contact theme={theme} type={name} />
           </div>
