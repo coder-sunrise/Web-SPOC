@@ -24,12 +24,12 @@ import {
   DateRangePicker,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
-import { download } from '@/utils/request'
 // utils
 import { findGetParameter, commonDataReaderTransform } from '@/utils/utils'
 import { VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
 import { DoctorProfileSelect } from '@/components/_medisys'
 import withWebSocket from '@/components/Decorator/withWebSocket'
+import { getReportContext } from '@/services/report'
 import * as WidgetConfig from './config'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 import HistoryDetails from './HistoryDetails'
@@ -632,7 +632,7 @@ class PatientHistory extends Component {
       referralPatientProfileFK: history.referralPatientProfileFK,
       referralSource: history.referralSource,
       referralPerson: history.referralPerson,
-      referralPatientName: history.referralPatientName, 
+      referralPatientName: history.referralPatientName,
       referralRemarks: history.referralRemarks,
     }
     let visitDetails = {
@@ -813,8 +813,7 @@ class PatientHistory extends Component {
     let referral = ''
     if (current.referralPatientProfileFK) {
       referral = `Referred By Patient: ${current.referralPatientName}`
-    }
-    else if (current.referralSourceFK) {
+    } else if (current.referralSourceFK) {
       referral = `Referred By: ${current.referralSource}`
       if (current.referralPersonFK) {
         referral = `Referred By: ${current.referralSource}        Referral Person: ${current.referralPerson}`
@@ -823,9 +822,9 @@ class PatientHistory extends Component {
     if (current.referralRemarks) {
       referral += `\r\n\r\nRemarks: ${current.referralRemarks}`
     }
-    return { 
-      isShowReferral: true, 
-      referralContent: referral,  
+    return {
+      isShowReferral: true,
+      referralContent: referral,
     }
   }
 
@@ -910,7 +909,12 @@ class PatientHistory extends Component {
     }
   }
 
-  printHandel = () => {
+  printHandel = async () => {
+    let reportContext = []
+    const result = await getReportContext(68)
+    if (result) {
+      reportContext = result
+    }
     const { loadVisits, selectItems } = this.state
     const {
       codetable: { ctcomplication = [] },
@@ -938,7 +942,7 @@ class PatientHistory extends Component {
           referralSource: visit.referralSource,
           referralPerson: visit.referralPerson,
           referralPatientName: visit.referralPatientName,
-          referralRemarks: visit.referralRemarks,  
+          referralRemarks: visit.referralRemarks,
           visitPurposeFK: visit.visitPurposeFK,
           currentId: visit.currentId,
           isNurseNote: visit.isNurseNote,
@@ -1240,7 +1244,7 @@ class PatientHistory extends Component {
       VitalSign: vitalSign,
       Orders: orders,
       ConsultationDocument: consultationDocument,
-      ReportContext: [],
+      ReportContext: reportContext,
     }
     console.log(payload)
     const payload1 = [
