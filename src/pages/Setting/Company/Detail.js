@@ -8,7 +8,7 @@ import {
   GridItem,
   TextField,
   DateRangePicker,
-  CodeSelect, 
+  CodeSelect,
   Switch,
   Field,
   NumberInput,
@@ -16,7 +16,7 @@ import {
   Checkbox,
   CustomInput,
 } from '@/components'
-import AuthorizedContext from '@/components/Context/Authorized' 
+import AuthorizedContext from '@/components/Context/Authorized'
 import Contact from './Contact'
 
 @connect(
@@ -42,10 +42,15 @@ import Contact from './Contact'
         100,
         'Contact Person must be at most 100 characters',
       ),
-      defaultStatementAdjustmentRemarks: Yup.string().max(
-        50,
-        'Default statement ajdustment remarks must be at most 50 characters',
-      ),
+      defaultStatementAdjustmentRemarks: Yup.string().when(['isAutoGenerateStatementEnabled', 'statementAdjustment'],
+        {
+          is: (isAutoGenerateStatementEnabled, statementAdjustment) => statementAdjustment > 0 && isAutoGenerateStatementEnabled,
+          then: Yup.string().required().max(
+            50,
+            'Default statement ajdustment remarks must be at most 50 characters',
+          ),
+          otherwise: Yup.string(),
+        }),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
       coPayerTypeFK: Yup.number().when('settingCompany', {
         is: () => settingCompany.companyType.id === 1,
@@ -139,6 +144,13 @@ import Contact from './Contact'
 })
 class Detail extends PureComponent {
   state = {}
+
+  updateDefaultRemarks = () => {
+    const { isAutoGenerateStatementEnabled, statementAdjustment } = this.props.values
+    if (!isAutoGenerateStatementEnabled || !statementAdjustment || statementAdjustment === 0) {
+      this.props.setFieldValue('defaultStatementAdjustmentRemarks', undefined)
+    }
+  }
 
   render () {
     const { props } = this
@@ -280,6 +292,7 @@ class Detail extends PureComponent {
                               defaultValue='0.00'
                               precision={2}
                               min={0}
+                              onChange={this.updateDefaultRemarks}
                               {...args}
                             />
                           )
@@ -290,6 +303,7 @@ class Detail extends PureComponent {
                             label='Statement Adjustment'
                             defaultValue='0.00'
                             precision={2}
+                            onChange={this.updateDefaultRemarks}
                             min={0}
                             {...args}
                           />
@@ -422,6 +436,7 @@ class Detail extends PureComponent {
                         style={{ marginTop: '22px' }}
                         label='Auto Generate Statement'
                         {...args}
+                        onChange={this.updateDefaultRemarks}
                       />
                     }}
                   />
