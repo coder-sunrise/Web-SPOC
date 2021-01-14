@@ -795,7 +795,8 @@ class PatientHistory extends Component {
     if (isNurseNote) return false
     if (visitPurposeFK === VISIT_TYPE.RETAIL) {
       return (
-        (widgetId === WidgetConfig.WIDGETS_ID.INVOICE ||
+        (widgetId === WidgetConfig.WIDGETS_ID.ORDERS ||
+          widgetId === WidgetConfig.WIDGETS_ID.INVOICE ||
           widgetId === WidgetConfig.WIDGETS_ID.VISITREMARKS ||
           widgetId === WidgetConfig.WIDGETS_ID.REFERRAL ||
           widgetId === WidgetConfig.WIDGETS_ID.ATTACHMENT) &&
