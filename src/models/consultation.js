@@ -463,18 +463,19 @@ export default createFormViewModel({
           },
         })
 
+        data.corDiagnosis = data.corDiagnosis.map((diagnosis) => {
+          return {
+            ...diagnosis,
+            defaultIsPersist: diagnosis.isPersist,
+            uid: getUniqueId(),
+          }
+        })
+
         yield put({
           type: 'diagnosis/updateState',
           payload: {
             rows: _.sortBy(data.corDiagnosis, 'sequence'),
           },
-        })
-
-        data.corDiagnosis = data.corDiagnosis.map((diagnosis) => {
-          return {
-            ...diagnosis,
-            defaultIsPersist: diagnosis.isPersist,
-          }
         })
 
         let newResponse = ParseEyeFormData(data)
