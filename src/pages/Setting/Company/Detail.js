@@ -1,4 +1,4 @@
-import React, { PureComponent, Fragment } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from "dva"
 import Yup from '@/utils/yup'
 import {
@@ -8,8 +8,7 @@ import {
   GridItem,
   TextField,
   DateRangePicker,
-  CodeSelect,
-  Select,
+  CodeSelect, 
   Switch,
   Field,
   NumberInput,
@@ -17,10 +16,8 @@ import {
   Checkbox,
   CustomInput,
 } from '@/components'
-import AuthorizedContext from '@/components/Context/Authorized'
-import Authorized from '@/utils/Authorized'
+import AuthorizedContext from '@/components/Context/Authorized' 
 import Contact from './Contact'
-import { enableDisableOptions } from '@/utils/codes'
 
 @connect(
   ({
@@ -44,6 +41,10 @@ import { enableDisableOptions } from '@/utils/codes'
       contactPerson: Yup.string().max(
         100,
         'Contact Person must be at most 100 characters',
+      ),
+      defaultStatementAdjustmentRemarks: Yup.string().max(
+        50,
+        'Default statement ajdustment remarks must be at most 50 characters',
       ),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
       coPayerTypeFK: Yup.number().when('settingCompany', {
@@ -146,7 +147,7 @@ class Detail extends PureComponent {
     const { name } = route
     const isCopayer = name === 'copayer'
 
-    const { isUserMaintainable, isGSTEnabled } = values
+    const { isUserMaintainable, isGSTEnabled, isAutoGenerateStatementEnabled, statementAdjustment } = values
 
     let finalRights = isUserMaintainable ? 'enable' : 'disable'
     if (rights === 'disable') finalRights = 'disable'
@@ -408,29 +409,44 @@ class Detail extends PureComponent {
                       []
                     )}
                 </GridItem>
-              </React.Fragment> 
-              {isCopayer && isEnableAutoGenerateStatement && (
-                <GridItem md={12}>
+              </React.Fragment>
+            </GridContainer>
+
+            {isCopayer && isEnableAutoGenerateStatement && (
+              <GridContainer>
+                <GridItem md={6}>
                   <FastField
                     name='isAutoGenerateStatementEnabled'
                     render={(args) => {
                       return <Checkbox
+                        style={{ marginTop: '22px' }}
                         label='Auto Generate Statement'
                         {...args}
                       />
                     }}
                   />
                 </GridItem>
-              )} 
-              {isCopayer && (
+                {isAutoGenerateStatementEnabled && (statementAdjustment && statementAdjustment > 0) &&
+                  <GridItem md={6}>
+                    <Field
+                      name='defaultStatementAdjustmentRemarks'
+                      render={(args) =>
+                        <TextField label='Default Statement Adjustment Remarks' maxLength={50} {...args} />}
+                    />
+                  </GridItem>
+                }
+              </GridContainer>
+            )}
+            {isCopayer && (
+              <GridContainer>
                 <GridItem md={12}>
                   <Field
                     name='remark'
                     render={(args) => <TextField label='Remarks' {...args} />}
                   />
                 </GridItem>
-              )}
-            </GridContainer>
+              </GridContainer>
+            )}
 
             <Contact theme={theme} type={name} />
           </div>
