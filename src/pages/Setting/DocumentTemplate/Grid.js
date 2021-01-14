@@ -60,6 +60,7 @@ class Grid extends PureComponent {
                         backgroundColor: 'Green',
                         display: 'inline-Block',
                         marginLeft: 2,
+                        fontSize: '0.75rem',
                       }}
                     />
                   )}

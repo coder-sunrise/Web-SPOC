@@ -909,16 +909,22 @@ const tagList = [
       const { rows = [] } = orders
       const { entity = {} } = consultationDocument
       let insertRows = rows
+      let isGenerateCertificate = false
       if (newVaccination) {
         insertRows = [
           newVaccination,
         ]
+        isGenerateCertificate = true
       } else if (entity.vaccinationUFK) {
         insertRows = rows.filter((vc) => vc.uid === entity.vaccinationUFK)
+        isGenerateCertificate = true
       }
 
       const ordersHTML = [
-        loadFromCodesConfig.InsertVaccination(insertRows, true),
+        loadFromCodesConfig.InsertVaccination(
+          insertRows,
+          isGenerateCertificate,
+        ),
       ]
 
       let htmls = ordersHTML.join('')

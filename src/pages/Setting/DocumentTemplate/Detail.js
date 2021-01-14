@@ -154,23 +154,25 @@ class Detail extends PureComponent {
               }}
             >
               {documentTemplateTypeFK === 3 && (
-                <Tooltip title='For auto generate vaccination certificate'>
-                  <FastField
-                    name='isDefaultTemplate'
-                    render={(args) => {
-                      return (
-                        <Checkbox
-                          label='Default Template'
-                          {...args}
-                          style={{
-                            position: 'absolute',
-                            bottom: 0,
-                          }}
-                        />
-                      )
-                    }}
-                  />
-                </Tooltip>
+                <FastField
+                  name='isDefaultTemplate'
+                  render={(args) => {
+                    return (
+                      <Checkbox
+                        label={
+                          <Tooltip title='For auto generate vaccination certificate'>
+                            <span>Default Template</span>
+                          </Tooltip>
+                        }
+                        {...args}
+                        style={{
+                          position: 'absolute',
+                          bottom: 0,
+                        }}
+                      />
+                    )
+                  }}
+                />
               )}
             </GridItem>
             <GridItem md={12}>
@@ -206,7 +208,7 @@ class Detail extends PureComponent {
             </GridItem>
           </GridContainer>
           <CommonModal
-            title='Default Template'
+            title='Save Template'
             maxWidth='sm'
             open={this.state.isShowSaveDefaultTemplate}
             onClose={this.handelSaveDefaultTemplate}
