@@ -11,7 +11,7 @@ import {
 } from '@/components'
 import ReportDateRangePicker from '../ReportDateRangePicker'
 
-const FilterBar = ({ handleSubmit, isSubmitting, referralList, onReferralSourceChange, referralPerson }) => {  
+const FilterBar = ({ handleSubmit, isSubmitting, referralList, onReferralSourceChange, referralPerson }) => {
   return (
     <SizeContainer size='sm'>
       <GridContainer>
@@ -24,7 +24,7 @@ const FilterBar = ({ handleSubmit, isSubmitting, referralList, onReferralSourceC
                   labelField='name'
                   valueField='value'
                   label='Referral Source'
-                  mode='multiple' 
+                  mode='multiple'
                   onChange={onReferralSourceChange}
                   disableAll
                 />
@@ -37,7 +37,7 @@ const FilterBar = ({ handleSubmit, isSubmitting, referralList, onReferralSourceC
               render={(args) => (
                 <CodeSelect {...args}
                   labelField='name'
-                  label='Ref. Person Name' 
+                  label='Ref. Person Name'
                   options={referralPerson}
                   valueField='value'
                   mode='multiple'
@@ -54,10 +54,9 @@ const FilterBar = ({ handleSubmit, isSubmitting, referralList, onReferralSourceC
           <GridItem md={1}>
             <FastField
               name='isAllDate'
-              render={(args) => <Checkbox {...args} label='All Date' />}
+              render={(args) => <Checkbox style={{ marginTop: '14px', marginBottom: 0 }} {...args} label='All Date' />}
             />
-          </GridItem>
-          <GridItem md={2} />
+          </GridItem> 
           <GridItem md={2}>
             <Button
               color='primary'
