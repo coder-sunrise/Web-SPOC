@@ -8,7 +8,6 @@ import {
   TextField,
   DateRangePicker,
 } from '@/components'
-import { connect } from 'dva'
 import Contact from '@/pages/Setting/Company/Contact' 
 
 @withFormikExtend({
@@ -88,7 +87,7 @@ class Detail extends PureComponent {
             </GridItem>
 
           </GridContainer>
-          <Contact theme={theme} type='referral' />
+          <Contact theme={theme} type='referralsource' />
         </div>
         {footer &&
           footer({

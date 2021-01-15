@@ -5,14 +5,14 @@ import {
   GridItem,
   TextField,
   CodeSelect,
-  NumberInput,
 } from '@/components'
 import { MobileNumberInput } from '@/components/_medisys'
 
 const Contact = (props) => {
   const { theme, type } = props
   const isCopayer = type === 'copayer'
-  const isReferral = type === 'referral'
+  const isReferralSource = type === 'referralsource'
+  const isReferralPerson = type === 'referralperson'
   return (
     <React.Fragment>
       <div
@@ -57,7 +57,7 @@ const Contact = (props) => {
             />
           </GridItem>
 
-          {!isReferral && (
+          {!isReferralSource && !isReferralPerson && (
             <GridItem md={6}>
               <FastField
                 name='contactPerson'
@@ -72,17 +72,9 @@ const Contact = (props) => {
             <FastField
               name='contact.mobileContactNumber.number'
               render={(args) => (
-                // <NumberInput
-                //   label='Contact Number'
-                //   maxLength='15'
-                //   min='0'
-                //   max='999999999999999'
-                //   precision={0}
-                //   {...args}
-                // />
                 <MobileNumberInput
                   {...args}
-                  label={isReferral ? 'Mobile Number' : 'Contact Number'}
+                  label={(isReferralSource || isReferralPerson) ? 'Mobile Number' : 'Contact Number'}
                 />
               )}
             />
@@ -106,7 +98,7 @@ const Contact = (props) => {
             />
           </GridItem>
 
-          {(isCopayer || isReferral) && (
+          {(isCopayer || isReferralSource || isReferralPerson) && (
             <Fragment>
               <GridItem md={6}>
                 <FastField
@@ -122,7 +114,7 @@ const Contact = (props) => {
                   />
                 </GridItem>
               )}
-              {isReferral && (
+              {isReferralSource && (
                 <GridItem md={12}>
                   <FastField
                     name='contact.contactWebsite.website'

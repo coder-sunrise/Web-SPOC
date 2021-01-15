@@ -132,10 +132,11 @@ class ReferralCard extends PureComponent {
       this.props.setFieldValue('referralSourceFK', undefined)
       this.props.setFieldValue('referralPersonFK', undefined)
       this.props.setFieldValue('referralPatientProfileFK', undefined)
+      this.props.setFieldValue('referralRemarks', undefined)
     }
   }
 
-  addNewReferralSource = () => { 
+  addNewReferralSource = () => {
     this.props.dispatch({
       type: 'settingReferralSource/updateState',
       payload: {
@@ -166,7 +167,7 @@ class ReferralCard extends PureComponent {
   }
 
   selectReferralPerson = (args) => {
-    const { values, classes } = this.props
+    const { classes, patient } = this.props
     const { disabled } = args
     return (
       <Select
@@ -215,7 +216,7 @@ class ReferralCard extends PureComponent {
           )
         }}
         onChange={(v) => {
-          if (v === values.id) {
+          if (v === patient.entity.id) {
             notification.error({
               message: 'Can not use this patient as referral person',
             })
