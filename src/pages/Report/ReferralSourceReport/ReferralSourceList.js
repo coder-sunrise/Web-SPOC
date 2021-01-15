@@ -36,11 +36,12 @@ class ReferralSourceList extends PureComponent {
       { columnName: 'patientReferenceNo', sortingEnabled: false, width: 140 },
       { columnName: 'patientName', sortingEnabled: false },
       { columnName: 'doctor', sortingEnabled: false },
-      { columnName: 'nextApptDate', width: 140, type: 'date', sortingEnabled: false },
-      { columnName: 'invoiceNo', width: 140, sortingEnabled: false },
+      { columnName: 'nextApptDate', width: 180, sortingEnabled: false },
+      { columnName: 'remarks', sortingEnabled: false  },
+      { columnName: 'invoiceNo', width: 110, sortingEnabled: false },
       {
         columnName: 'invoiceAmount',
-        type: 'currency', width: 140, sortingEnabled: false,
+        type: 'currency', width: 180, sortingEnabled: false,
       },
     ]
 
