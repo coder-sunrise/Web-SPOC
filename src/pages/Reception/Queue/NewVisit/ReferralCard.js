@@ -135,11 +135,23 @@ class ReferralCard extends PureComponent {
     }
   }
 
-  addNewReferralSource = () => {
+  addNewReferralSource = () => { 
+    this.props.dispatch({
+      type: 'settingReferralSource/updateState',
+      payload: {
+        entity: undefined,
+      },
+    })
     this.setState({ showAddReferralSource: true })
   }
 
   addNewReferralPerson = () => {
+    this.props.dispatch({
+      type: 'settingReferralPerson/updateState',
+      payload: {
+        entity: undefined,
+      },
+    })
     this.setState({ showAddReferralPerson: true })
   }
 
