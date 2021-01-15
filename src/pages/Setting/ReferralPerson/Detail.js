@@ -112,7 +112,7 @@ class Detail extends PureComponent {
               />
             </GridItem>
           </GridContainer>
-          <Contact theme={theme} type='referral' />
+          <Contact theme={theme} type='referralperson' />
         </div>
         {footer &&
           footer({
