@@ -161,6 +161,11 @@ class PatientHistory extends Component {
     })
 
     dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'ctcomplication' },
+    })
+
+    dispatch({
       type: 'patientHistory/initState',
       payload: {
         queueID: Number(findGetParameter('qid')) || 0,

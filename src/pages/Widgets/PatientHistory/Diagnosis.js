@@ -3,17 +3,19 @@ import { CommonTableGrid, DatePicker } from '@/components'
 export default ({ current, classes, theme, codetable }) => {
   const complicationData = (complicationList) => {
     const { ctcomplication = [] } = codetable
-    let complicationValue = ''
 
-    for (let i = 0; i < complicationList.length; i++) {
-      for (let b = 0; b < ctcomplication.length; b++) {
-        if (complicationList[i].complicationFK === ctcomplication[b].id) {
-          complicationValue += ctcomplication[b].name
-        }
+    let currentComplication = complicationList.map((c) => {
+      const selectItem = ctcomplication.find((cc) => cc.id === c.complicationFK)
+      return {
+        ...c,
+        name: selectItem ? selectItem.name : undefined,
       }
-    }
+    })
 
-    return complicationValue
+    return currentComplication
+      .filter((c) => c.name)
+      .map((c) => c.name)
+      .join(', ')
   }
 
   return (
