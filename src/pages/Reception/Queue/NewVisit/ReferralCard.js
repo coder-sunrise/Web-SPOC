@@ -1,7 +1,5 @@
 import React, { PureComponent } from 'react'
-import moment from 'moment'
 import { connect } from 'dva'
-import Yup from '@/utils/yup'
 // formik
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
@@ -22,20 +20,28 @@ import {
   RadioGroup,
 } from '@/components'
 import { AttachmentWithThumbnail } from '@/components/_medisys'
-import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
 import Call from '@material-ui/icons/Call'
 import Authorized from '@/utils/Authorized'
-import Detail from "@/pages/Setting/ReferralSource/Detail"
-import ReferralPersonDetail from "@/pages/Setting/ReferralPerson/Detail"
+import Detail from '@/pages/Setting/ReferralSource/Detail'
+import ReferralPersonDetail from '@/pages/Setting/ReferralPerson/Detail'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
 })
-@connect(({ settingReferralSource, settingReferralPerson, clinicSettings, patient }) => ({
-  settingReferralSource, settingReferralPerson, clinicSettings, patient,
-}))
-
+@connect(
+  ({
+    settingReferralSource,
+    settingReferralPerson,
+    clinicSettings,
+    patient,
+  }) => ({
+    settingReferralSource,
+    settingReferralPerson,
+    clinicSettings,
+    patient,
+  }),
+)
 class ReferralCard extends PureComponent {
   state = {
     referralData: [],
@@ -58,7 +64,7 @@ class ReferralCard extends PureComponent {
       })
       .then((response) => {
         if (response) {
-          let data = response.data.filter(t => t.isActive)
+          let data = response.data.filter((t) => t.isActive)
           let result = data.map((m) => {
             return { name: m.name, value: m.id }
           })
@@ -68,16 +74,20 @@ class ReferralCard extends PureComponent {
   }
 
   loadReferralPerson = () => {
-    this.props.dispatch({
-      type: 'settingReferralPerson/query',
-    })
+    this.props
+      .dispatch({
+        type: 'settingReferralPerson/query',
+      })
       .then((response) => {
         if (response) {
-          let data = response.data.filter(t => t.isActive)
+          let data = response.data.filter((t) => t.isActive)
           this.setState({ referralPersonData: data })
           const { referralSourceFK } = this.props.values
           if (referralSourceFK) {
-            data = data.filter(t => t.referralSourceIds && t.referralSourceIds.indexOf(referralSourceFK) > -1)
+            data = data.filter((t) =>
+              (t.referralSources || [])
+                .find((rs) => rs.id === referralSourceFK),
+            )
           }
           let result = data.map((m) => {
             return { name: m.name, value: m.id }
@@ -91,9 +101,13 @@ class ReferralCard extends PureComponent {
     let { values, setFieldValue } = this.props
     let { referralPersonData } = this.state
     if (value) {
-      referralPersonData = referralPersonData.filter((m) => m.referralSourceIds.indexOf(value) > -1,)
+      referralPersonData = referralPersonData.filter((m) =>
+        (m.referralSources || []).find((rs) => rs.id === value),
+      )
     }
-    if (referralPersonData.findIndex(t => t.id === values.referralPersonFK) < 0) {
+    if (
+      referralPersonData.findIndex((t) => t.id === values.referralPersonFK) < 0
+    ) {
       setFieldValue('referralPersonFK', null)
     }
     const result = referralPersonData.map((m) => {
@@ -106,12 +120,14 @@ class ReferralCard extends PureComponent {
     let { referralData } = this.state
     let { values, setFieldValue } = this.props
     if (value) {
-      const referralPerson = this.state.referralPersonData.find(t => t.id === value)
-      referralData = referralPerson.referralSourceIds.map((m) => {
-        return this.state.referralData.find(t => t.id === m)
+      const referralPerson = this.state.referralPersonData.find(
+        (t) => t.id === value,
+      )
+      referralData = (referralPerson.referralSources || []).map((m) => {
+        return this.state.referralData.find((t) => t.id === m.id)
       })
     }
-    if (referralData.findIndex(t => t.id === values.referralSourceFK) < 0) {
+    if (referralData.findIndex((t) => t.id === values.referralSourceFK) < 0) {
       setFieldValue('referralSourceFK', null)
     }
     const result = referralData.map((m) => {
@@ -123,12 +139,10 @@ class ReferralCard extends PureComponent {
   referralTypeChange = (e) => {
     if (e.target.value === 'Company') {
       this.props.setFieldValue('referralPatientProfileFK', undefined)
-    }
-    else if (e.target.value === 'Patient') {
+    } else if (e.target.value === 'Patient') {
       this.props.setFieldValue('referralSourceFK', undefined)
       this.props.setFieldValue('referralPersonFK', undefined)
-    }
-    else if (e.target.value === 'None') {
+    } else if (e.target.value === 'None') {
       this.props.setFieldValue('referralSourceFK', undefined)
       this.props.setFieldValue('referralPersonFK', undefined)
       this.props.setFieldValue('referralPatientProfileFK', undefined)
@@ -178,7 +192,7 @@ class ReferralCard extends PureComponent {
               searchValue: v,
               includeinactive: false,
             },
-          }) 
+          })
         }}
         valueField='id'
         label='Patient Name/Account No./Mobile No.'
@@ -213,8 +227,19 @@ class ReferralCard extends PureComponent {
   }
 
   render () {
-    const { attachments, values, handleUpdateAttachments, clinicSettings, isVisitReadonlyAfterSigned } = this.props
-    const { referralList, referralPersonList, showAddReferralSource, showAddReferralPerson } = this.state
+    const {
+      attachments,
+      values,
+      handleUpdateAttachments,
+      clinicSettings,
+      isVisitReadonlyAfterSigned,
+    } = this.props
+    const {
+      referralList,
+      referralPersonList,
+      showAddReferralSource,
+      showAddReferralPerson,
+    } = this.state
 
     let disabled = true
     if (values.visitStatus === 'WAITING' || !isVisitReadonlyAfterSigned) {
@@ -240,7 +265,9 @@ class ReferralCard extends PureComponent {
       },
     ]
     if (clinicSettings.settings.isVisitReferralSourceMandatory) {
-      referralTypeOptions = referralTypeOptions.filter(t => t.value !== 'None')
+      referralTypeOptions = referralTypeOptions.filter(
+        (t) => t.value !== 'None',
+      )
       if (values.referralByType === 'None') {
         this.props.setFieldValue('referralByType', 'Company')
       }
@@ -266,12 +293,14 @@ class ReferralCard extends PureComponent {
                 )}
               />
             </GridItem>
-            {values.referralByType === 'Company' &&
+            {values.referralByType === 'Company' && (
               <GridContainer>
                 <GridItem xs md={6}>
-                  <Field name='referralSourceFK'
+                  <Field
+                    name='referralSourceFK'
                     render={(args) => (
-                      <CodeSelect {...args}
+                      <CodeSelect
+                        {...args}
                         options={referralList}
                         labelField='name'
                         valueField='value'
@@ -286,7 +315,8 @@ class ReferralCard extends PureComponent {
                 </GridItem>
                 <GridItem xs md={6}>
                   <Authorized authority='settings.contact.referralsource'>
-                    <Button color='primary'
+                    <Button
+                      color='primary'
                       style={{ marginTop: '15px' }}
                       onClick={this.addNewReferralSource}
                       disabled={disabled}
@@ -297,9 +327,11 @@ class ReferralCard extends PureComponent {
                   </Authorized>
                 </GridItem>
                 <GridItem xs md={6}>
-                  <Field name='referralPersonFK'
+                  <Field
+                    name='referralPersonFK'
                     render={(args) => (
-                      <CodeSelect {...args}
+                      <CodeSelect
+                        {...args}
                         labelField='name'
                         disabled={disabled}
                         label='Ref. Person Name'
@@ -313,7 +345,8 @@ class ReferralCard extends PureComponent {
                 </GridItem>
                 <GridItem xs md={6}>
                   <Authorized authority='settings.contact.referralperson'>
-                    <Button color='primary'
+                    <Button
+                      color='primary'
                       style={{ marginTop: '15px' }}
                       onClick={this.addNewReferralPerson}
                       disabled={disabled}
@@ -327,7 +360,8 @@ class ReferralCard extends PureComponent {
                   <FastField
                     name='referralRemarks'
                     render={(args) => (
-                      <TextField label='Remarks'
+                      <TextField
+                        label='Remarks'
                         disabled={disabled}
                         multiline
                         maxLength={400}
@@ -337,10 +371,9 @@ class ReferralCard extends PureComponent {
                     )}
                   />
                 </GridItem>
-                {/* </Authorized> */}
               </GridContainer>
-            }
-            {values.referralByType === 'Patient' &&
+            )}
+            {values.referralByType === 'Patient' && (
               <GridContainer>
                 <GridItem xs md={6}>
                   <Field
@@ -353,12 +386,17 @@ class ReferralCard extends PureComponent {
                   <FastField
                     name='referralRemarks'
                     render={(args) => (
-                      <TextField label='Remarks' disabled={disabled} multiline {...args} />
+                      <TextField
+                        label='Remarks'
+                        disabled={disabled}
+                        multiline
+                        {...args}
+                      />
                     )}
                   />
                 </GridItem>
               </GridContainer>
-            }
+            )}
             <GridItem xs md={12}>
               <AttachmentWithThumbnail
                 label='Attachment'
@@ -391,7 +429,11 @@ class ReferralCard extends PureComponent {
           onClose={this.onAddReferralPersonClose}
           onConfirm={this.onAddReferralPersonClose}
         >
-          <ReferralPersonDetail {...cfg} {...this.props} referralSource={this.state.referralData} />
+          <ReferralPersonDetail
+            {...cfg}
+            {...this.props}
+            referralSource={this.state.referralData}
+          />
         </CommonModal>
       </div>
     )
