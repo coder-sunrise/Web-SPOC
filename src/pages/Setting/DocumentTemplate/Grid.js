@@ -55,7 +55,7 @@ class Grid extends PureComponent {
                   {row.isDefaultTemplate && (
                     <Badge
                       count='Default'
-                      title='Default vaccination template'
+                      title='Default vaccination certificate template'
                       style={{
                         backgroundColor: 'Green',
                         display: 'inline-Block',
