@@ -456,8 +456,9 @@ class Medication extends PureComponent {
       values.isExternalPrescription === undefined ||
       values.isExternalPrescription === false
     ) { 
-      setFieldValue('unitPrice', (currentMedication.sellingPrice || 0))
-      this.updateTotalPrice(currentMedication.sellingPrice * newTotalQuantity)
+      let unitprice = (currentMedication.sellingPrice || 0)
+      setFieldValue('unitPrice', unitprice)
+      this.updateTotalPrice(unitprice * newTotalQuantity)
     }
   }
 
