@@ -762,7 +762,6 @@ class Medication extends PureComponent {
         'adjType',
         isExactAmount ? 'ExactAmount' : 'Percentage',
       )
-      console.log(v)
       this.props.setFieldValue('totalPrice', v)
     } else {
       this.props.setFieldValue('totalPrice', v)
