@@ -1,10 +1,11 @@
 import React, { PureComponent, Fragment } from 'react'
 import { connect } from 'dva'
-
+import classNames from 'classnames'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 import Edit from '@material-ui/icons/Edit'
 import Print from '@material-ui/icons/Print'
-import { CommonTableGrid, Button, Tooltip } from '@/components'
+import { CommonTableGrid, Button, Tooltip, Popper } from '@/components'
+import { MenuItem, MenuList } from '@material-ui/core'
 import { status } from '@/utils/codes'
 import { getRawData } from '@/services/report'
 import { REPORT_ID } from '@/utils/constants'
@@ -12,14 +13,12 @@ import { REPORT_ID } from '@/utils/constants'
 @connect(({ clinicSettings }) => ({
   clinicSettings,
 }))
-
 class Grid extends PureComponent {
   editRow = (row, e) => {
     const { dispatch, settingReferralPerson } = this.props
 
     const { list } = settingReferralPerson
 
-    console.log(list.find((o) => o.id === row.id))
     dispatch({
       type: 'settingReferralPerson/updateState',
       payload: {
@@ -29,11 +28,7 @@ class Grid extends PureComponent {
     })
   }
 
-
-  handleClick = async (referralPersonId) => {
-    console.log(referralPersonId)
-    if (!Number.isInteger(referralPersonId)) return
-
+  handleClick = async (referralPersonId, referralSourceId) => {
     const { handlePrint, clinicSettings } = this.props
     const { labelPrinterSize } = clinicSettings.settings
 
@@ -46,9 +41,14 @@ class Grid extends PureComponent {
         .join('_')
     }
     const reportID =
-      REPORT_ID['REFERRAL_PERSON_LABEL_'.concat(sizeConverter(labelPrinterSize))]
+      REPORT_ID[
+        'REFERRAL_PERSON_LABEL_'.concat(sizeConverter(labelPrinterSize))
+      ]
 
-    const data = await getRawData(reportID, { referralPersonId })
+    const data = await getRawData(reportID, {
+      referralPersonId,
+      referralSourceId,
+    })
     const payload = [
       {
         ReportId: reportID,
@@ -58,9 +58,10 @@ class Grid extends PureComponent {
       },
     ]
     handlePrint(JSON.stringify(payload))
-  } 
+  }
 
   render () {
+    const { classes } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
@@ -136,14 +137,29 @@ class Grid extends PureComponent {
                     </Button>
                   </Tooltip>
                   <Tooltip title='Print Referral Person Label'>
-                    <Button
-                      size='sm'
-                      justIcon
-                      color='primary'
-                      onClick={() => this.handleClick(row.id)}
+                    <Popper
+                      className={classNames({
+                        [classes.pooperResponsive]: true,
+                        [classes.pooperNav]: true,
+                      })}
+                      overlay={
+                        <MenuList role='menu'>
+                          {(row.referralSources || []).map((rs) => {
+                            return (
+                              <MenuItem
+                                onClick={() => this.handleClick(row.id, rs.id)}
+                              >
+                                {rs.name}
+                              </MenuItem>
+                            )
+                          })}
+                        </MenuList>
+                      }
                     >
-                      <Print />
-                    </Button>
+                      <Button size='sm' justIcon color='primary'>
+                        <Print />
+                      </Button>
+                    </Popper>
                   </Tooltip>
                 </Fragment>
               )
