@@ -172,8 +172,8 @@ const getCautions = (
         newCorPrescriptionItemPrecaution.length > 0
           ? newCorPrescriptionItemPrecaution
           : [
-              {},
-            ],
+            {},
+          ],
       corPrescriptionItemDrugMixture:
         newCorPrescriptionItemDrugMixture.length > 0
           ? newCorPrescriptionItemDrugMixture
@@ -263,12 +263,12 @@ const getCautions = (
           instruction += `${item.usageMethodDisplayValue
             ? item.usageMethodDisplayValue
             : ''} ${item.dosageDisplayValue
-            ? item.dosageDisplayValue
-            : ''} ${item.prescribeUOMDisplayValue
-            ? item.prescribeUOMDisplayValue
-            : ''} ${item.drugFrequencyDisplayValue
-            ? item.drugFrequencyDisplayValue
-            : ''}${itemDuration}${nextStepdose}`
+              ? item.dosageDisplayValue
+              : ''} ${item.prescribeUOMDisplayValue
+                ? item.prescribeUOMDisplayValue
+                : ''} ${item.drugFrequencyDisplayValue
+                  ? item.drugFrequencyDisplayValue
+                  : ''}${itemDuration}${nextStepdose}`
         }
       }
       return instruction
@@ -455,14 +455,9 @@ class Medication extends PureComponent {
     if (
       values.isExternalPrescription === undefined ||
       values.isExternalPrescription === false
-    ) {
-      if (currentMedication.sellingPrice) {
-        setFieldValue('unitPrice', currentMedication.sellingPrice)
-        this.updateTotalPrice(currentMedication.sellingPrice * newTotalQuantity)
-      } else {
-        setFieldValue('unitPrice', undefined)
-        this.updateTotalPrice(undefined)
-      }
+    ) { 
+      setFieldValue('unitPrice', (currentMedication.sellingPrice || 0))
+      this.updateTotalPrice(currentMedication.sellingPrice * newTotalQuantity)
     }
   }
 
@@ -471,10 +466,8 @@ class Medication extends PureComponent {
     if (values.isDrugMixture) return
 
     if (disableEdit === false) {
-      if (values.unitPrice) {
-        const total = (values.quantity || 0) * values.unitPrice
-        this.updateTotalPrice(total)
-      }
+      const total = (values.quantity || 0) * (values.unitPrice || 0)
+      this.updateTotalPrice(total)
     }
   }
 
@@ -645,15 +638,15 @@ class Medication extends PureComponent {
     const isEdit = !!values.id
     const newPrescriptionInstruction = isEdit
       ? [
-          ...corPrescriptionItemInstruction.map((i) => ({
-            ...i,
-            isDeleted: true,
-          })),
-          defaultInstruction,
-        ]
+        ...corPrescriptionItemInstruction.map((i) => ({
+          ...i,
+          isDeleted: true,
+        })),
+        defaultInstruction,
+      ]
       : [
-          defaultInstruction,
-        ]
+        defaultInstruction,
+      ]
 
     setFieldValue('corPrescriptionItemInstruction', newPrescriptionInstruction)
 
@@ -696,15 +689,15 @@ class Medication extends PureComponent {
       }
       const newPrescriptionPrecaution = isEdit
         ? [
-            ...corPrescriptionItemPrecaution.map((i) => ({
-              ...i,
-              isDeleted: true,
-            })),
-            defaultPrecaution,
-          ]
+          ...corPrescriptionItemPrecaution.map((i) => ({
+            ...i,
+            isDeleted: true,
+          })),
+          defaultPrecaution,
+        ]
         : [
-            defaultPrecaution,
-          ]
+          defaultPrecaution,
+        ]
 
       setFieldValue(`corPrescriptionItemPrecaution`, newPrescriptionPrecaution)
     }
@@ -769,6 +762,7 @@ class Medication extends PureComponent {
         'adjType',
         isExactAmount ? 'ExactAmount' : 'Percentage',
       )
+      console.log(v)
       this.props.setFieldValue('totalPrice', v)
     } else {
       this.props.setFieldValue('totalPrice', v)
@@ -1251,8 +1245,8 @@ class Medication extends PureComponent {
                               values.isDrugMixture ? (
                                 'Drug Mixture'
                               ) : (
-                                'Open Prescription Name'
-                              )
+                                  'Open Prescription Name'
+                                )
                             }
                             disabled={!openPrescription && values.isDrugMixture}
                             {...args}
@@ -1263,32 +1257,32 @@ class Medication extends PureComponent {
                     }}
                   />
                 ) : (
-                  <Field
-                    name='inventoryMedicationFK'
-                    render={(args) => {
-                      return (
-                        <div
-                          id={`autofocus_${values.type}`}
-                          style={{ position: 'relative' }}
-                        >
-                          <CodeSelect
-                            temp
-                            label='Medication Name'
-                            labelField='combinDisplayValue'
-                            onChange={this.changeMedication}
-                            options={this.getMedicationOptions()}
-                            {...args}
-                            style={{ paddingRight: 20 }}
-                          />
-                          <LowStockInfo
-                            sourceType='medication'
-                            {...this.props}
-                          />
-                        </div>
-                      )
-                    }}
-                  />
-                )}
+                    <Field
+                      name='inventoryMedicationFK'
+                      render={(args) => {
+                        return (
+                          <div
+                            id={`autofocus_${values.type}`}
+                            style={{ position: 'relative' }}
+                          >
+                            <CodeSelect
+                              temp
+                              label='Medication Name'
+                              labelField='combinDisplayValue'
+                              onChange={this.changeMedication}
+                              options={this.getMedicationOptions()}
+                              {...args}
+                              style={{ paddingRight: 20 }}
+                            />
+                            <LowStockInfo
+                              sourceType='medication'
+                              {...this.props}
+                            />
+                          </div>
+                        )
+                      }}
+                    />
+                  )}
               </React.Fragment>
             </GridItem>
             <GridItem xs={2} style={{ marginTop: theme.spacing(2) }}>
@@ -1340,20 +1334,20 @@ class Medication extends PureComponent {
             </GridItem>
             <GridItem xs={4}>
               {!openPrescription &&
-              !isEditMedication && (
-                <Tooltip title='Add From Past'>
-                  <ProgressButton
-                    color='primary'
-                    icon={<Add />}
-                    style={{
-                      marginTop: theme.spacing(2),
-                    }}
-                    onClick={this.onSearchMedicationHistory}
-                  >
-                    Add From Past
+                !isEditMedication && (
+                  <Tooltip title='Add From Past'>
+                    <ProgressButton
+                      color='primary'
+                      icon={<Add />}
+                      style={{
+                        marginTop: theme.spacing(2),
+                      }}
+                      onClick={this.onSearchMedicationHistory}
+                    >
+                      Add From Past
                   </ProgressButton>
-                </Tooltip>
-              )}
+                  </Tooltip>
+                )}
             </GridItem>
           </GridContainer>
           {values.isDrugMixture && (
@@ -1455,7 +1449,7 @@ class Medication extends PureComponent {
                                       </span>
                                       <span>
                                         {`${o.message}${index <
-                                        cautions.length - 1
+                                          cautions.length - 1
                                           ? '; '
                                           : ''}`}
                                       </span>
@@ -1956,54 +1950,54 @@ class Medication extends PureComponent {
           <GridContainer>
             <GridItem xs={8} className={classes.editor}>
               {values.visitPurposeFK !== VISIT_TYPE.RETAIL &&
-              !values.isDrugMixture ? (
-                <FastField
-                  name='isExternalPrescription'
-                  render={(args) => {
-                    if (args.field.value) {
-                      setDisable(true)
-                    } else {
-                      setDisable(false)
-                    }
-                    return (
-                      <Checkbox
-                        label='External Prescription'
-                        {...args}
-                        onChange={(e) => {
-                          if (e.target.value) {
-                            this.props.setFieldValue('adjAmount', 0)
-                            this.props.setFieldValue(
-                              'totalAfterItemAdjustment',
-                              0,
-                            )
-                            this.props.setFieldValue('totalPrice', 0)
-                            this.props.setFieldValue('expiryDate', undefined)
-                            this.props.setFieldValue('batchNo', undefined)
-                            this.props.setFieldValue('isMinus', true)
-                            this.props.setFieldValue('isExactAmount', true)
-                            this.props.setFieldValue('adjValue', 0)
-                          } else {
-                            this.props.setFieldValue(
-                              'expiryDate',
-                              this.state.expiryDate,
-                            )
-                            this.props.setFieldValue(
-                              'batchNo',
-                              this.state.batchNo,
-                            )
-                            setTimeout(() => {
-                              this.calculateQuantity()
-                            }, 1)
-                          }
-                          setDisable(e.target.value)
-                        }}
-                      />
-                    )
-                  }}
-                />
-              ) : (
-                ''
-              )}
+                !values.isDrugMixture ? (
+                  <FastField
+                    name='isExternalPrescription'
+                    render={(args) => {
+                      if (args.field.value) {
+                        setDisable(true)
+                      } else {
+                        setDisable(false)
+                      }
+                      return (
+                        <Checkbox
+                          label='External Prescription'
+                          {...args}
+                          onChange={(e) => {
+                            if (e.target.value) {
+                              this.props.setFieldValue('adjAmount', 0)
+                              this.props.setFieldValue(
+                                'totalAfterItemAdjustment',
+                                0,
+                              )
+                              this.props.setFieldValue('totalPrice', 0)
+                              this.props.setFieldValue('expiryDate', undefined)
+                              this.props.setFieldValue('batchNo', undefined)
+                              this.props.setFieldValue('isMinus', true)
+                              this.props.setFieldValue('isExactAmount', true)
+                              this.props.setFieldValue('adjValue', 0)
+                            } else {
+                              this.props.setFieldValue(
+                                'expiryDate',
+                                this.state.expiryDate,
+                              )
+                              this.props.setFieldValue(
+                                'batchNo',
+                                this.state.batchNo,
+                              )
+                              setTimeout(() => {
+                                this.calculateQuantity()
+                              }, 1)
+                            }
+                            setDisable(e.target.value)
+                          }}
+                        />
+                      )
+                    }}
+                  />
+                ) : (
+                  ''
+                )}
               {values.isDrugMixture && (
                 <FastField
                   name='isClaimable'
