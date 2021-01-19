@@ -131,7 +131,7 @@ class Diagnosis extends PureComponent {
     } else {
       addNewFavorite = true
       newFavouriteDiagnosis = [
-        ...diagnosis.favouriteDiagnosis,
+        ...(diagnosis.favouriteDiagnosis || []),
         dignosisCode,
       ]
     }
