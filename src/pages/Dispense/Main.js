@@ -1,19 +1,19 @@
 import React, { Component } from 'react'
-import router from 'umi/router'
 // common component
 import { connect } from 'dva'
 import { formatMessage } from 'umi/locale'
-import { withFormikExtend, notification, CommonModal } from '@/components'
-// sub component
-// import DispenseDetails from './DispenseDetails'
-// import DispenseDetails from './DispenseDetails/PrintDrugLabelWrapper'
-// utils
+import {
+  withFormikExtend,
+  notification,
+  CommonModal,
+  Button,
+} from '@/components'
 import { calculateAmount, navigateDirtyCheck } from '@/utils/utils'
 import Yup from '@/utils/yup'
 import { VISIT_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
 import { openCautionAlertOnStartConsultation } from '@/pages/Widgets/Orders/utils'
-import DrugLabelSelection from './DispenseDetails/DrugLabelSelection'
+import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
 import AddOrder from './DispenseDetails/AddOrder'
 import DispenseDetails from './DispenseDetails/WebSocketWrapper'
 
@@ -59,7 +59,6 @@ const reloadDispense = (props, effect = 'query') => {
 
   dispatch({
     type: `dispense/${effect}`,
-    // payload: visitRegistration.entity.visit.id,
     payload: dispense.visitID,
   }).then((response) => {
     if (response) {
@@ -151,6 +150,7 @@ class Main extends Component {
     showDrugLabelSelection: false,
     selectedDrugs: [],
     showCautionAlert: false,
+    isShowOrderUpdated: false,
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
@@ -309,10 +309,6 @@ class Main extends Component {
     } else {
       navigateDirtyCheck({
         onProceed: this._editOrder,
-        // onConfirm: () => {
-        //   handleSubmit()
-        //   this._editOrder()
-        // },
       })(e)
     }
   }
@@ -469,6 +465,25 @@ class Main extends Component {
     this.props.dispatch({ type: 'global/incrementCommitCount' })
   }
 
+  showRefreshOrder = () => {
+    const { dispense } = this.props
+    const { shouldRefreshOrder } = dispense
+    if (shouldRefreshOrder) {
+      if (!this.state.isShowOrderUpdated) {
+        this.props.dispatch({
+          type: 'global/updateState',
+          payload: {
+            openAdjustment: false,
+          },
+        })
+        this.setState({
+          isShowOrderUpdated: true,
+          showDrugLabelSelection: false,
+        })
+      }
+    }
+  }
+
   render () {
     const { classes, handleSubmit, values, dispense, codetable } = this.props
     return (
@@ -502,6 +517,54 @@ class Main extends Component {
             }}
           />
         </CommonModal>
+        <ViewPatientHistory top='213px' />
+
+        <CommonModal
+          title='Orders Updated'
+          maxWidth='sm'
+          open={this.state.isShowOrderUpdated}
+          showFooter={false}
+        >
+          <div
+            style={{
+              marginLeft: 20,
+              marginRight: 20,
+            }}
+          >
+            <div
+              style={{
+                marginTop: -20,
+              }}
+            >
+              <h3>
+                Orders Has been updated by other user. Click OK to refresh
+                orders.
+              </h3>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <Button
+                color='primary'
+                icon={null}
+                onClick={() => {
+                  const { dispatch } = this.props
+                  dispatch({
+                    type: 'dispense/updateState',
+                    payload: {
+                      shouldRefreshOrder: false,
+                    },
+                  })
+                  this.setState({ isShowOrderUpdated: false })
+                  if (this.handleReloadClick) {
+                    this.handleReloadClick()
+                  }
+                }}
+              >
+                ok
+              </Button>
+            </div>
+          </div>
+        </CommonModal>
+        {this.showRefreshOrder()}
       </div>
     )
   }

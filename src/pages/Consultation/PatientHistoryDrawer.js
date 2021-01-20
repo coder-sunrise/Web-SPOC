@@ -26,7 +26,7 @@ const PatientHistoryDrawer = ({ classes, theme, onClose, ...restProps }) => {
         </Button>
       </Tooltip>
       <SizeContainer size='sm'>
-        <PatientHistory {...restProps} mode='integrated' />
+        <PatientHistory {...restProps} mode='integrated' fromModule='History' />
       </SizeContainer>
     </div>
   )

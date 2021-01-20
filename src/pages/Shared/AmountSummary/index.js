@@ -6,7 +6,6 @@ import Add from '@material-ui/icons/Add'
 import { connect } from 'dva'
 import numeral from 'numeral'
 
-import Adjustment from './Adjustment'
 import {
   GridContainer,
   GridItem,
@@ -20,6 +19,7 @@ import {
 } from '@/components'
 
 import { calculateAmount } from '@/utils/utils'
+import Adjustment from './Adjustment'
 
 const amountProps = {
   showZero: true,
@@ -123,9 +123,12 @@ class AmountSummary extends PureComponent {
           },
           showRemark: true,
           showAmountPreview: false,
+          config,
+          rows,
+          adjustments,
+          editAdj: undefined,
           defaultValues: {
-            // ...this.props.orders.entity,
-            initialAmout: nextInitialAmount,
+            initialAmout: total,
           },
         },
       },
@@ -147,6 +150,42 @@ class AmountSummary extends PureComponent {
         onValueChanged(this.state)
       },
     )
+  }
+
+  editAdjustment = (index) => {
+    const { adjustments, rows, summary } = this.state
+    const { config, onValueChanged } = this.props
+    const { total } = summary
+
+    this.props.dispatch({
+      type: 'global/updateState',
+      payload: {
+        openAdjustment: true,
+        openAdjustmentConfig: {
+          callbackMethod: (v) => {
+            adjustments.splice(index, 1, v)
+            this.setState(
+              {
+                ...calculateAmount(rows, adjustments, config),
+              },
+              () => onValueChanged(this.state),
+            )
+          },
+          showRemark: true,
+          showAmountPreview: false,
+          config,
+          rows,
+          adjustments,
+          editAdj: adjustments[index],
+          defaultValues: {
+            adjType: adjustments[index].adjType,
+            adjValue: adjustments[index].adjValue,
+            adjRemark: adjustments[index].adjRemark,
+            initialAmout: total,
+          },
+        },
+      },
+    })
   }
 
   render () {
@@ -211,7 +250,7 @@ class AmountSummary extends PureComponent {
         )}
         {showAdjustment && (
           <GridContainer style={{ marginBottom: 4 }}>
-            <GridItem xs={7}>
+            <GridItem xs={6}>
               <div
                 style={{
                   textAlign: 'right',
@@ -222,7 +261,7 @@ class AmountSummary extends PureComponent {
                 <span>Invoice Adjustment</span>
               </div>
             </GridItem>
-            <GridItem xs={1}>
+            <GridItem xs={2}>
               {showAddAdjustment && (
                 <Button
                   color='primary'
@@ -240,6 +279,7 @@ class AmountSummary extends PureComponent {
           </GridContainer>
         )}
         {adjustments.map((v, i) => {
+          console.log(amountProps)
           if (!v.isDeleted) {
             return (
               <Adjustment
@@ -248,6 +288,7 @@ class AmountSummary extends PureComponent {
                 type={v.adjType}
                 dispatch={dispatch}
                 onDelete={this.deleteAdjustment}
+                onEdit={this.editAdjustment}
                 amountProps={amountProps}
                 // calcPurchaseOrderSummary={calcPurchaseOrderSummary}
                 {...v}

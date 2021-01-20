@@ -49,7 +49,7 @@ class CHAS extends React.Component {
     const { claimSubmission, dispatch } = this.props
     const { entity } = claimSubmission
     dispatch({
-      type: 'claimSubmissionNew/upsert',
+      type: 'chasClaimSubmissionNew/upsert',
       payload: { ...entity },
     }).then((r) => {
       if (r) {
@@ -223,7 +223,7 @@ class CHAS extends React.Component {
           ]}
         /> */}
         <CommonModal
-          title='Claim Details 1'
+          title='Claim Details'
           open={showClaimDetails}
           onClose={this.closeClaimDetails}
           onConfirm={this.saveClaimDetails}

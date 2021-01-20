@@ -16,7 +16,7 @@ import {
 } from '@/components'
 // sub components
 import BaseSearchBar from '../../common/BaseSearchBar'
-import TableGrid from '../../common/TableGrid'
+import TableGrid from '../TableGrid'
 // variables
 import {
   SubmittedCHASColumnExtensions,
@@ -33,8 +33,8 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ claimSubmissionSubmitted }) => ({
-  claimSubmissionSubmitted,
+@connect(({ chasClaimSubmissionSubmitted }) => ({
+  chasClaimSubmissionSubmitted,
 }))
 @withFormik({
   mapPropsToValues: () => ({}),
@@ -57,7 +57,7 @@ class SubmittedCHAS extends React.Component {
 
   refreshDataGrid = () => {
     this.props.dispatch({
-      type: 'claimSubmissionSubmitted/query',
+      type: 'chasClaimSubmissionSubmitted/query',
     })
   }
 
@@ -67,7 +67,7 @@ class SubmittedCHAS extends React.Component {
       this.handleLoadingVisibility(true)
       this.props
         .dispatch({
-          type: 'claimSubmissionSubmitted/getSubmittedStatus',
+          type: 'chasClaimSubmissionSubmitted/getSubmittedStatus',
           payload: { claimIds: selectedRows },
         })
         .then((r) => {
@@ -85,13 +85,13 @@ class SubmittedCHAS extends React.Component {
   render () {
     const {
       classes,
-      claimSubmissionSubmitted,
+      chasClaimSubmissionSubmitted,
       handleContextMenuItemClick,
       dispatch,
       values,
     } = this.props
     const { isLoading, selectedRows } = this.state
-    const { list } = claimSubmissionSubmitted || []
+    const { list } = chasClaimSubmissionSubmitted || []
 
     return (
       <CardContainer
@@ -104,7 +104,7 @@ class SubmittedCHAS extends React.Component {
         <BaseSearchBar
           dispatch={dispatch}
           values={values}
-          modelsName='claimSubmissionSubmitted'
+          modelsName='chasClaimSubmissionSubmitted'
         />
         <LoadingWrapper linear loading={isLoading} text='Get status...'>
           <GridContainer>

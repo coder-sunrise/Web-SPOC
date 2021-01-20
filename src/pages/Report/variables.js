@@ -156,6 +156,12 @@ export const menuData = [
     authority: 'report.other.diagnosistrending',
   },
   {
+    title: 'Other',
+    text: 'Referral Source Report ',
+    url: '/report/referralsourcereport',
+    authority: 'report.other.referralsource',
+  },
+  {
     title: 'Finance',
     text: 'WIP Revenue Report',
     url: '/report/wiprevenue',

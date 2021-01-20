@@ -6,6 +6,7 @@ import {
   getRemovedUrl,
   getAppendUrl,
   getRefreshChasBalanceStatus,
+  getRefreshMedisaveBalanceStatus,
 } from '@/utils/utils'
 
 const defaultPatientEntity = {
@@ -14,6 +15,11 @@ const defaultPatientEntity = {
   patientAccountNo: '',
   patientEmergencyContact: [],
   patientAllergy: [],
+  patientMedicalHistory: {
+    medicalHistory: '',
+    socialHistory: '',
+    familyHistory: '',
+  },
   patientAllergyMetaData: [],
   patientMedicalAlert: [],
   patientScheme: [],
@@ -281,10 +287,31 @@ export default createFormViewModel({
 
         return result
       },
-      *queryDone ({ payload }, { select, put }) {
-        const codetable = yield select((state) => state.codetable)
-        const { copaymentscheme = [] } = codetable
+      *refreshMedisaveBalance ({ payload }, { call }) {
+        const {
+          patientAccountNo,
+          isSaveToDb = false,
+          patientProfileId,
+          schemePayer,
+        } = payload
+        const newPayload = {
+          patientNric: patientAccountNo,
+          year: moment().year(),
+          isSaveToDb,
+          patientProfileId,
+          schemePayers: schemePayer,
+        }
 
+        const response = yield call(service.requestMedisaveBalance, newPayload)
+        const { data } = response
+        if (data) {
+          const status = getRefreshMedisaveBalanceStatus(data)
+          return { ...data, ...status }
+        }
+        
+        return data
+      },
+      *queryDone ({ payload }, { put }) {
         const { data } = payload
         // console.log(payload)
         data.patientScheme.forEach((ps) => {
@@ -298,7 +325,8 @@ export default createFormViewModel({
           }
 
           ps.preSchemeTypeFK = ps.schemeTypeFK
-        })
+        }) 
+        data.patientMedicalHistory = data.patientMedicalHistory || defaultPatientEntity.patientMedicalHistory
         yield put({
           type: 'updateState',
           payload: {

@@ -13,7 +13,7 @@ const drugMixtureIndicator = (row) => {
   if (row.type !== 'Medication' || !row.isDrugMixture) return null
 
   return (
-    <div style={{ position: 'relative', top: 2 }}>
+    <div style={{ position: 'relative', top: 5 }}>
       <DrugMixtureInfo values={row.prescriptionDrugMixture} />
     </div>
   )
@@ -35,21 +35,56 @@ export default ({ current }) => {
               return (
                 <div style={{ position: 'relative' }}>
                   <div style={wrapCellTextStyle}>
-                    {row.type}
+                    {row.isDrugMixture ? 'Drug Mixture' : row.type}
                     {drugMixtureIndicator(row)}
                   </div>
                 </div>
               )
             },
           },
-          { dataIndex: 'name', title: 'Name' },
+          { dataIndex: 'name', title: 'Name', width: 300 },
           {
             dataIndex: 'description',
             title: 'Description',
             render: (text) => <div style={wrapCellTextStyle}>{text}</div>,
           },
           {
-            dataIndex: 'totalAmount',
+            dataIndex: 'quantity',
+            title: 'Quantity',
+            align: 'right',
+            width: 100,
+            render: (text, row) => (
+              <div
+                style={{
+                  color: 'darkBlue',
+                  fontWeight: 500,
+                }}
+              >
+                {`${numeral(row.quantity || 0).format('0,0.0')}`}
+              </div>
+            ),
+          },
+          { dataIndex: 'dispenseUOMDisplayValue', title: 'UOM', width: 100 },
+          {
+            dataIndex: 'adjAmt',
+            title: 'Adj.',
+            width: 120,
+            align: 'right',
+            render: (text, row) => (
+              <div
+                style={{
+                  color: 'darkBlue',
+                  fontWeight: 500,
+                }}
+              >
+                {`${currencySymbol}${numeral(row.adjAmt || 0).format(
+                  '0,0.00',
+                )}`}
+              </div>
+            ),
+          },
+          {
+            dataIndex: 'totalAfterItemAdjustment',
             title: 'Total',
             width: 120,
             align: 'right',
@@ -60,9 +95,9 @@ export default ({ current }) => {
                   fontWeight: 500,
                 }}
               >
-                {`${currencySymbol}${numeral(row.totalAmount || 0).format(
-                  '0,0.00',
-                )}`}
+                {`${currencySymbol}${numeral(
+                  row.totalAfterItemAdjustment || 0,
+                ).format('0,0.00')}`}
               </div>
             ),
           },

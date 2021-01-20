@@ -69,6 +69,7 @@ class Orders extends PureComponent {
       'ctMedicationFrequency',
       'ctVaccinationUsage',
       'ctVaccinationUnitOfMeasurement',
+      'documenttemplate',
     ]
     dispatch({
       type: 'codetable/batchFetch',

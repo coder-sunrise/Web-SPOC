@@ -41,7 +41,8 @@ export default createFormViewModel({
         const { pathname, search, query = {} } = loct
         if (
           pathname.indexOf('/finance/invoice/details') === 0 ||
-          pathname.indexOf('/claim-submission/chas/invoice/details') === 0
+          pathname.indexOf('/claim-submission/chas/invoice/details') === 0 ||
+          pathname.indexOf('/claim-submission/medisave/invoice/details') === 0
         ) {
           dispatch({
             type: 'updateState',
@@ -212,6 +213,20 @@ export default createFormViewModel({
         }
         return false
       },
+
+      *submitVoidInvoicePayerDeposit ({ payload }, { call }) {
+        const response = yield call(service.voidInvoicePayerDeposit, payload)
+        const { status } = response
+
+        if (status === '200') {
+          notification.success({
+            message: 'Saved',
+          })
+          return true
+        }
+
+        return false
+      },
     },
     reducers: {
       reset () {
@@ -228,6 +243,7 @@ export default createFormViewModel({
               invoicePayerWriteOff,
               creditNote,
               statementInvoice,
+              patientDepositTransaction,
             } = payment
 
             // Payment
@@ -273,6 +289,19 @@ export default createFormViewModel({
                   amount: z.totalAftGST,
                   reason: z.remark,
                   isCancelled: z.isCancelled,
+                }
+              }),
+            )
+
+            // Invoice PayerDepposit
+            paymentTxnList = (paymentTxnList || []).concat(
+              (patientDepositTransaction || []).map((z) => {
+                return {
+                  ...z,
+                  type: 'Deposit',
+                  itemID: z.depositTransactionNo,
+                  date: z.transactionDate,
+                  reason: z.remarks,
                 }
               }),
             )

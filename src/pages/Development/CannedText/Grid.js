@@ -43,15 +43,19 @@ const Grid = ({ dispatch, footer, handleAddCannedText }) => {
 
     return (
       <React.Fragment>
-        <Tooltip title='Edit'>
-          <Button justIcon color='primary' onClick={handleEditClick}>
-            <Edit />
-          </Button>
-        </Tooltip>
-        <DeleteWithPopover
-          onConfirmDelete={handleDeleteClick}
-          disabled={!!editEntity}
-        />
+        <span style={{ display: 'inlineBlock' }}>
+          <Tooltip title='Edit'>
+            <Button justIcon color='primary' onClick={handleEditClick}>
+              <Edit />
+            </Button>
+          </Tooltip>
+        </span>
+        <span style={{ display: 'inlineBlock' }}>
+          <DeleteWithPopover
+            onConfirmDelete={handleDeleteClick}
+            disabled={!!editEntity}
+          />
+        </span>
       </React.Fragment>
     )
   }

@@ -4,7 +4,8 @@ import { connect } from 'dva'
 import { isNumber } from 'util'
 import { withStyles } from '@material-ui/core'
 import Yup from '@/utils/yup'
-import { calculateAdjustAmount } from '@/utils/utils'
+import { calculateAdjustAmount, calculateAmount } from '@/utils/utils'
+import { Alert } from 'antd'
 
 import {
   Danger,
@@ -119,15 +120,42 @@ class Adjustment extends PureComponent {
   }
 
   getFinalAmount = ({ value } = {}) => {
-    const { values, setFieldValue } = this.props
-    const { isExactAmount, isMinus, adjustment, initialAmout = 0 } = values
+    const { values, setFieldValue, global } = this.props
+    const { isExactAmount, initialAmout = 0 } = values
+    const { rows = [], adjustments = [], editAdj, config = {} } =
+      global.openAdjustmentConfig || {}
     const finalAmount = calculateAdjustAmount(
       isExactAmount,
       initialAmout,
-      value || adjustment,
+      value,
     ).amount
 
-    if (finalAmount < 0) {
+    const result = calculateAmount(
+      rows,
+      editAdj
+        ? adjustments.map((o) => {
+            if (
+              (editAdj.uid && editAdj.uid === o.uid) ||
+              (!editAdj.uid && editAdj.index === o.index)
+            )
+              return {
+                ...o,
+                adjType: isExactAmount ? 'ExactAmount' : 'Percentage',
+                adjValue: value,
+              }
+            return o
+          })
+        : [
+            ...adjustments,
+            {
+              adjType: isExactAmount ? 'ExactAmount' : 'Percentage',
+              adjValue: value,
+            },
+          ],
+      config,
+    )
+
+    if (result.summary.totalAfterAdj < 0) {
       this.showError()
     } else {
       this.hideError()
@@ -282,13 +310,11 @@ class Adjustment extends PureComponent {
             <GridItem md={1} />
             <GridItem md={11}>
               {showError && (
-                <Danger>
-                  <p>
-                    <b>
-                      Adding this adjustment will result in overpaid invoice.
-                    </b>
-                  </p>
-                </Danger>
+                <Alert
+                  style={{ padding: '5px 15px 5px 37px' }}
+                  message='Adding this adjustment will make the total bill negative.'
+                  banner
+                />
               )}
             </GridItem>
             {showRemark && (
@@ -332,7 +358,7 @@ class Adjustment extends PureComponent {
           footer({
             onConfirm: props.handleSubmit,
             confirmProps: {
-              disabled: showError,
+              // disabled: showError,
             },
           })}
       </div>

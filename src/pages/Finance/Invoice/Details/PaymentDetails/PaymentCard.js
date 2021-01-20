@@ -33,14 +33,15 @@ const payerTypeToString = {
   // [PayerType.COPAYER]: 'Co-Payer',
   [INVOICE_PAYER_TYPE.PATIENT]: 'Patient',
   [INVOICE_PAYER_TYPE.SCHEME]: 'Co-Payer',
+  [INVOICE_PAYER_TYPE.PAYERACCOUNT]: 'Payer Account',
   [INVOICE_PAYER_TYPE.COMPANY]: 'Co-Payer',
   // [PayerType.GOVT_COPAYER]: 'Co-Payer',
 }
 
 const PaymentCard = ({
   classes,
-  // payerID = 'N/A',
-  // payerName = 'N/A',
+  payerID = 'N/A',
+  payerName = 'N/A',
   coPaymentSchemeFK = undefined,
   companyFK = undefined,
   companyName = '',
@@ -72,6 +73,13 @@ const PaymentCard = ({
         <span>
           {payerTypeToString[payerTypeFK]} ({companyName})
         </span>
+      </p>
+    )
+  }
+  if (payerTypeFK === INVOICE_PAYER_TYPE.PAYERACCOUNT) {
+    _payerName = (
+      <p className={classes.title}>
+        {payerTypeToString[payerTypeFK]} ({payerName})
       </p>
     )
   }

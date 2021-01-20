@@ -16,7 +16,7 @@ import {
 } from '@/components'
 // sub components
 import BaseSearchBar from '../../common/BaseSearchBar'
-import TableGrid from '../../common/TableGrid'
+import TableGrid from '../TableGrid'
 // variables
 import { DraftCHASColumnExtensions, DraftCHASColumns } from './variables'
 
@@ -30,8 +30,8 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ claimSubmissionDraft }) => ({
-  claimSubmissionDraft,
+@connect(({ chasClaimSubmissionDraft }) => ({
+  chasClaimSubmissionDraft,
 }))
 @withFormik({
   mapPropsToValues: () => ({}),
@@ -47,7 +47,7 @@ class DraftCHAS extends React.Component {
 
   refreshDataGrid = () => {
     this.props.dispatch({
-      type: 'claimSubmissionDraft/query',
+      type: 'chasClaimSubmissionDraft/query',
     })
   }
 
@@ -58,7 +58,7 @@ class DraftCHAS extends React.Component {
     const { selectedRows } = this.state
     this.props
       .dispatch({
-        type: 'claimSubmissionDraft/refreshPatientDetails',
+        type: 'chasClaimSubmissionDraft/refreshPatientDetails',
         payload: { claimIds: selectedRows },
       })
       .then((r) => {
@@ -78,12 +78,13 @@ class DraftCHAS extends React.Component {
     ]
     const {
       classes,
-      claimSubmissionDraft,
+      chasClaimSubmissionDraft,
       handleContextMenuItemClick,
       values,
       dispatch,
     } = this.props
-    const { list } = claimSubmissionDraft || []
+    const { list } = chasClaimSubmissionDraft || []
+    
     const { selectedRows } = this.state
     return (
       <CardContainer
@@ -97,7 +98,7 @@ class DraftCHAS extends React.Component {
           hideInvoiceDate
           dispatch={dispatch}
           values={values}
-          modelsName='claimSubmissionDraft'
+          modelsName='chasClaimSubmissionDraft'
         />
         <GridContainer>
           <GridItem md={12}>

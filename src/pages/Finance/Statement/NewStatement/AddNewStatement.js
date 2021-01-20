@@ -328,13 +328,18 @@ class AddNewStatement extends PureComponent {
     const {
       adminCharge,
       adminChargeType,
-      copayerAdjustment,
-      copayerAdjustmentType,
+      statementAdjustment,
+      statementAdjustmentType,
+      defaultStatementAdjustmentRemarks,
     } = op
     setFieldValue('adminChargeValue', adminCharge || 0)
     setFieldValue('adminChargeValueType', adminChargeType || 'Percentage')
-    setFieldValue('adjustmentValue', copayerAdjustment || 0)
-    setFieldValue('adjustmentValueType', copayerAdjustmentType || 'Percentage')
+    setFieldValue('adjustmentValue', statementAdjustment || 0)
+    setFieldValue('adjustmentValueType', statementAdjustmentType || 'Percentage')
+    if(statementAdjustment)
+    {
+      setFieldValue('adjustmentRemarks', defaultStatementAdjustmentRemarks)
+    }
     this.setState(() => {
       return {
         invoiceRows: [],

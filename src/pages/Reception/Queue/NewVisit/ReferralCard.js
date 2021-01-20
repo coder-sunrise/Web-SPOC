@@ -1,140 +1,443 @@
 import React, { PureComponent } from 'react'
-import moment from 'moment'
+import { connect } from 'dva'
 // formik
-import { Field } from 'formik'
+import { withStyles } from '@material-ui/core'
+import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
+import { Field, FastField } from 'formik'
+import { queryList } from '@/services/patient'
+
 // custom components
 import {
   CommonCard,
-  DatePicker,
   TextField,
   GridContainer,
   GridItem,
+  CodeSelect,
+  CommonModal,
+  notification,
+  Button,
   Select,
+  RadioGroup,
 } from '@/components'
-import { Attachment, AttachmentWithThumbnail } from '@/components/_medisys'
-import FormField from './formField'
+import { AttachmentWithThumbnail } from '@/components/_medisys'
+import Add from '@material-ui/icons/Add'
+import Call from '@material-ui/icons/Call'
+import Authorized from '@/utils/Authorized'
+import Detail from '@/pages/Setting/ReferralSource/Detail'
+import ReferralPersonDetail from '@/pages/Setting/ReferralPerson/Detail'
 
+const styles = (theme) => ({
+  ...basicStyle(theme),
+})
+@connect(
+  ({
+    settingReferralSource,
+    settingReferralPerson,
+    clinicSettings,
+    patient,
+  }) => ({
+    settingReferralSource,
+    settingReferralPerson,
+    clinicSettings,
+    patient,
+  }),
+)
 class ReferralCard extends PureComponent {
   state = {
     referralData: [],
     referralList: [],
+    referralPersonData: [],
+    referralPersonList: [],
+    showAddReferralSource: false,
+    showAddReferralPerson: false,
   }
 
   componentDidMount = () => {
+    this.loadReferralSource()
+    this.loadReferralPerson()
+  }
+
+  loadReferralSource = () => {
     this.props
       .dispatch({
-        type: 'visitRegistration/getReferralList',
+        type: 'settingReferralSource/query',
       })
       .then((response) => {
         if (response) {
-          const result = response.data.map((m) => {
-            return { name: m.name, value: m.name }
+          let data = response.data.filter((t) => t.isActive)
+          let result = data.map((m) => {
+            return { name: m.name, value: m.id }
           })
-          this.setState({ referralData: response.data, referralList: result })
+          this.setState({ referralData: data, referralList: result })
         }
       })
   }
 
-  onInstitutionChange = () => {
-    const { values, setFieldValue } = this.props
-    const { referralBy, referralInstitution, referralDate } = values
-    if (referralBy && referralInstitution && !referralDate) {
-      setFieldValue('referralDate', moment().formatUTC())
+  loadReferralPerson = () => {
+    this.props
+      .dispatch({
+        type: 'settingReferralPerson/query',
+      })
+      .then((response) => {
+        if (response) {
+          let data = response.data.filter((t) => t.isActive)
+          this.setState({ referralPersonData: data })
+          const { referralSourceFK } = this.props.values
+          if (referralSourceFK) {
+            data = data.filter((t) =>
+              (t.referralSources || [])
+                .find((rs) => rs.id === referralSourceFK),
+            )
+          }
+          let result = data.map((m) => {
+            return { name: m.name, value: m.id }
+          })
+          this.setState({ referralPersonList: result })
+        }
+      })
+  }
+
+  onReferralByChange = (value) => {
+    let { values, setFieldValue } = this.props
+    let { referralPersonData } = this.state
+    if (value) {
+      referralPersonData = referralPersonData.filter((m) =>
+        (m.referralSources || []).find((rs) => rs.id === value),
+      )
+    }
+    if (
+      referralPersonData.findIndex((t) => t.id === values.referralPersonFK) < 0
+    ) {
+      setFieldValue('referralPersonFK', null)
+    }
+    const result = referralPersonData.map((m) => {
+      return { name: m.name, value: m.id }
+    })
+    this.setState({ referralPersonList: result })
+  }
+
+  onReferralPersonChange = (value) => {
+    let { referralData } = this.state
+    let { values, setFieldValue } = this.props
+    if (value) {
+      const referralPerson = this.state.referralPersonData.find(
+        (t) => t.id === value,
+      )
+      referralData = (referralPerson.referralSources || []).map((m) => {
+        return this.state.referralData.find((t) => t.id === m.id)
+      })
+    }
+    if (referralData.findIndex((t) => t.id === values.referralSourceFK) < 0) {
+      setFieldValue('referralSourceFK', null)
+    }
+    const result = referralData.map((m) => {
+      return { name: m.name, value: m.id }
+    })
+    this.setState({ referralList: result })
+  }
+
+  referralTypeChange = (e) => {
+    if (e.target.value === 'Company') {
+      this.props.setFieldValue('referralPatientProfileFK', undefined)
+    } else if (e.target.value === 'Patient') {
+      this.props.setFieldValue('referralSourceFK', undefined)
+      this.props.setFieldValue('referralPersonFK', undefined)
+    } else if (e.target.value === 'None') {
+      this.props.setFieldValue('referralSourceFK', undefined)
+      this.props.setFieldValue('referralPersonFK', undefined)
+      this.props.setFieldValue('referralPatientProfileFK', undefined)
+      this.props.setFieldValue('referralRemarks', undefined)
     }
   }
 
-  onReferralByChange = (referralBy) => {
-    const { values, setFieldValue } = this.props
-    const { referralInstitution, referralDate } = values
-    let _referralInstitution = referralInstitution
+  addNewReferralSource = () => {
+    this.props.dispatch({
+      type: 'settingReferralSource/updateState',
+      payload: {
+        entity: undefined,
+      },
+    })
+    this.setState({ showAddReferralSource: true })
+  }
 
-    if (Array.isArray(referralBy) && referralBy.length > 0) {
-      const data = this.state.referralData.filter(
-        (m) => m.name === referralBy[0],
-      )
+  addNewReferralPerson = () => {
+    this.props.dispatch({
+      type: 'settingReferralPerson/updateState',
+      payload: {
+        entity: undefined,
+      },
+    })
+    this.setState({ showAddReferralPerson: true })
+  }
 
-      if (data.length > 0 && !!data[0].institution) {
-        _referralInstitution = data[0].institution
-        setFieldValue('referralInstitution', data[0].institution)
-      }
+  onAddReferralSourceClose = () => {
+    this.setState({ showAddReferralSource: false })
+    this.loadReferralSource()
+  }
 
-      // if have referralBy and referralInstitution, auto populate referralDate
-      if (_referralInstitution && !referralDate) {
-        setFieldValue('referralDate', moment().formatUTC())
-      }
-    }
+  onAddReferralPersonClose = () => {
+    this.setState({ showAddReferralPerson: false })
+    this.loadReferralPerson()
+  }
+
+  selectReferralPerson = (args) => {
+    const { classes, patient } = this.props
+    const { disabled } = args
+    return (
+      <Select
+        disabled={disabled}
+        query={(v) => {
+          return queryList({
+            apiCriteria: {
+              searchValue: v,
+              includeinactive: false,
+            },
+          })
+        }}
+        valueField='id'
+        label='Patient Name/Account No./Mobile No.'
+        renderDropdown={(p) => {
+          return (
+            <div>
+              <p>
+                {p.patientAccountNo} / {p.name}
+              </p>
+              <p>
+                Ref No. {p.patientReferenceNo}
+                <span style={{ float: 'right' }}>
+                  <Call className={classes.contactIcon} />
+                  {p.mobileNo || p.officeNo || p.homeNo}
+                </span>
+              </p>
+            </div>
+          )
+        }}
+        onChange={(v) => {
+          if (v === patient.entity.id) {
+            notification.error({
+              message: 'Can not use this patient as referral person',
+            })
+            return false
+          }
+          return true
+        }}
+        {...args}
+      />
+    )
   }
 
   render () {
-    const { attachments, handleUpdateAttachments, isReadOnly } = this.props
+    const {
+      attachments,
+      values,
+      handleUpdateAttachments,
+      clinicSettings,
+      isVisitReadonlyAfterSigned,
+    } = this.props
+    const {
+      referralList,
+      referralPersonList,
+      showAddReferralSource,
+      showAddReferralPerson,
+    } = this.state
+
+    let disabled = true
+    if (values.visitStatus === 'WAITING' || !isVisitReadonlyAfterSigned) {
+      disabled = false
+    }
+
+    const cfg = {
+      onAddReferralPersonClose: this.onAddReferralPersonClose,
+      onAddReferralSourceClose: this.onAddReferralSourceClose,
+    }
+    let referralTypeOptions = [
+      {
+        value: 'None',
+        label: 'None',
+      },
+      {
+        value: 'Company',
+        label: 'Company',
+      },
+      {
+        value: 'Patient',
+        label: 'Patient',
+      },
+    ]
+    if (clinicSettings.settings.isVisitReferralSourceMandatory) {
+      referralTypeOptions = referralTypeOptions.filter(
+        (t) => t.value !== 'None',
+      )
+      if (values.referralByType === 'None') {
+        this.props.setFieldValue('referralByType', 'Company')
+      }
+    }
 
     return (
-      <CommonCard title='Referral'>
-        <GridContainer>
-          <GridItem xs md={4}>
-            <Field
-              name={FormField['referral.referralPersonFK']}
-              render={(args) => (
-                // <TextField
-                //   {...args}
-                //   //disabled={isReadOnly}
-                //   label='Referred By'
-                // />
-                <Select
-                  {...args}
-                  label='Referred By'
-                  options={this.state.referralList}
-                  mode='tags'
-                  maxSelected={1}
-                  disableAll
-                  // disabled={isReadOnly}
-                  onChange={this.onReferralByChange}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs md={4}>
-            <Field
-              name={FormField['referral.referralDate']}
-              render={(args) => (
-                <DatePicker
-                  {...args}
-                  disabledDate={(d) => !d || d.isAfter(moment())}
-                  // disabled={isReadOnly}
-                  label='Referral Date'
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs md={4} />
-          <GridItem xs md={4}>
-            <Field
-              name={FormField['referral.referralCompanyFK']}
-              render={(args) => (
-                <TextField
-                  label='Institution'
-                  // //disabled={isReadOnly}
-                  onChange={this.onInstitutionChange}
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs md={8} />
-          <GridItem xs md={12}>
-            <AttachmentWithThumbnail
-              label='Attachment'
-              attachmentType='VisitReferral'
-              handleUpdateAttachments={handleUpdateAttachments}
-              attachments={attachments}
-              isReadOnly={isReadOnly}
-              fieldName='visitAttachment'
-            />
-          </GridItem>
-        </GridContainer>
-      </CommonCard>
+      <div>
+        <CommonCard title='Referral'>
+          <GridContainer>
+            <GridItem md={12}>
+              <FastField
+                name='referralByType'
+                render={(args) => (
+                  <RadioGroup
+                    {...args}
+                    label=''
+                    authority='none'
+                    disabled={disabled}
+                    simple
+                    onChange={this.referralTypeChange}
+                    options={referralTypeOptions}
+                  />
+                )}
+              />
+            </GridItem>
+            {values.referralByType === 'Company' && (
+              <GridContainer>
+                <GridItem xs md={6}>
+                  <Field
+                    name='referralSourceFK'
+                    render={(args) => (
+                      <CodeSelect
+                        {...args}
+                        options={referralList}
+                        labelField='name'
+                        valueField='value'
+                        disabled={disabled}
+                        label='Company Name'
+                        onChange={(v) => {
+                          this.onReferralByChange(v)
+                        }}
+                      />
+                    )}
+                  />
+                </GridItem>
+                <GridItem xs md={6}>
+                  <Authorized authority='settings.contact.referralsource'>
+                    <Button
+                      color='primary'
+                      style={{ marginTop: '15px' }}
+                      onClick={this.addNewReferralSource}
+                      disabled={disabled}
+                      size='sm'
+                    >
+                      <Add /> New Company
+                    </Button>
+                  </Authorized>
+                </GridItem>
+                <GridItem xs md={6}>
+                  <Field
+                    name='referralPersonFK'
+                    render={(args) => (
+                      <CodeSelect
+                        {...args}
+                        labelField='name'
+                        disabled={disabled}
+                        label='Ref. Person Name'
+                        options={referralPersonList}
+                        onChange={this.onReferralPersonChange}
+                        valueField='value'
+                        disableAll
+                      />
+                    )}
+                  />
+                </GridItem>
+                <GridItem xs md={6}>
+                  <Authorized authority='settings.contact.referralperson'>
+                    <Button
+                      color='primary'
+                      style={{ marginTop: '15px' }}
+                      onClick={this.addNewReferralPerson}
+                      disabled={disabled}
+                      size='sm'
+                    >
+                      <Add /> New Referral Person
+                    </Button>
+                  </Authorized>
+                </GridItem>
+                <GridItem xs md={12}>
+                  <FastField
+                    name='referralRemarks'
+                    render={(args) => (
+                      <TextField
+                        label='Remarks'
+                        disabled={disabled}
+                        multiline
+                        maxLength={400}
+                        inputProps={{ maxLength: 400 }}
+                        {...args}
+                      />
+                    )}
+                  />
+                </GridItem>
+              </GridContainer>
+            )}
+            {values.referralByType === 'Patient' && (
+              <GridContainer>
+                <GridItem xs md={6}>
+                  <Field
+                    disabled
+                    name='referralPatientProfileFK'
+                    render={this.selectReferralPerson}
+                  />
+                </GridItem>
+                <GridItem xs md={12}>
+                  <FastField
+                    name='referralRemarks'
+                    render={(args) => (
+                      <TextField
+                        label='Remarks'
+                        disabled={disabled}
+                        multiline
+                        {...args}
+                      />
+                    )}
+                  />
+                </GridItem>
+              </GridContainer>
+            )}
+            <GridItem xs md={12}>
+              <AttachmentWithThumbnail
+                label='Attachment'
+                attachmentType='VisitReferral'
+                handleUpdateAttachments={handleUpdateAttachments}
+                attachments={attachments}
+                disabled={disabled}
+                fieldName='visitAttachment'
+              />
+            </GridItem>
+          </GridContainer>
+        </CommonCard>
+
+        <CommonModal
+          open={showAddReferralSource}
+          title='New Referral Source'
+          cancelText='Cancel'
+          maxWidth='md'
+          observe='ReferralSourceDetail'
+          onClose={this.onAddReferralSourceClose}
+          onConfirm={this.onAddReferralSourceClose}
+        >
+          <Detail {...cfg} {...this.props} />
+        </CommonModal>
+        <CommonModal
+          open={showAddReferralPerson}
+          title='New Referral Person'
+          cancelText='Cancel'
+          maxWidth='md'
+          onClose={this.onAddReferralPersonClose}
+          onConfirm={this.onAddReferralPersonClose}
+        >
+          <ReferralPersonDetail
+            {...cfg}
+            {...this.props}
+            referralSource={this.state.referralData}
+          />
+        </CommonModal>
+      </div>
     )
   }
 }
 
-export default ReferralCard
+export default withStyles(styles, { withTheme: true })(ReferralCard)

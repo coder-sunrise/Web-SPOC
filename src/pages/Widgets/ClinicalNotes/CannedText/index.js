@@ -5,7 +5,10 @@ import _ from 'lodash'
 import { withStyles } from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
 // common components
-import { Button, CardContainer, DragableTableGrid, Tooltip } from '@/components'
+import {
+  Button, CardContainer, DragableTableGrid, Tooltip,
+} from '@/components'
+import { CANNED_TEXT_TYPE } from '@/utils/constants'
 import { DeleteWithPopover } from '@/components/_medisys'
 import Filterbar from './Filterbar'
 import Editor from './Editor'
@@ -25,7 +28,6 @@ const styles = (theme) => ({
 const defaultMaxHeight = 600
 const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
   const { selectedNote } = cannedText
-
   const list = cannedText[selectedNote.fieldName] || []
 
   const [
@@ -101,6 +103,7 @@ const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
         currentCannedTextId,
         targetCannedTextId,
         isInsertBefore,
+        cannedTextTypeFK: rows[newIndex - 1].cannedTextTypeFK,
       })
     }
   }
@@ -135,20 +138,28 @@ const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
     const handleEditClick = () => onEditClick(row.id)
     return (
       <React.Fragment>
-        <Tooltip title='Edit'>
-          <Button justIcon color='primary' onClick={handleEditClick}>
-            <Edit />
-          </Button>
-        </Tooltip>
-        <DeleteWithPopover
-          onConfirmDelete={handleDeleteClick}
-          disabled={row.isEdit}
-        />
+        <span style={{ display: 'inlineBlock' }}>
+          <Tooltip title='Edit'>
+            <Button justIcon color='primary' onClick={handleEditClick}>
+              <Edit />
+            </Button>
+          </Tooltip>
+        </span>
+        <span style={{ display: 'inlineBlock' }}>
+          <DeleteWithPopover
+            onConfirmDelete={handleDeleteClick}
+            disabled={row.isEdit}
+          />
+        </span>
       </React.Fragment>
     )
   }
 
   const maxHeight = height ? height - 150 : defaultMaxHeight
+  let newcolumns = columns
+  if (selectedNote.cannedTextTypeFK === CANNED_TEXT_TYPE.MEDICALCERTIFICATE) {
+    newcolumns = columns.filter((t) => t.name !== 'isShared')
+  }
   return (
     <div className={classes.root} style={{ maxHeight }}>
       <h5>{!editEntity ? 'New Canned Text' : 'Edit Canned Text'}</h5>
@@ -166,6 +177,7 @@ const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
           onSearchClick={handleSearch}
           showType={showType}
           setShowType={setShowType}
+          cannedTextTypeFK={selectedNote.cannedTextTypeFK}
         />
         <DragableTableGrid
           dataSource={applyFilter(
@@ -175,13 +187,13 @@ const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
             user.id,
             !_.isEmpty(editEntity),
           )}
-          columns={showType === 'Self' ? columns : columnsOthers}
+          columns={showType === 'Self' ? newcolumns : columnsOthers}
           disableDrag={editEntity}
           columnExtensions={[
             ...columnExtensions,
             {
               columnName: 'actions',
-              width: 80,
+              width: 90,
               render: ActionButtons,
               sortingEnabled: false,
             },

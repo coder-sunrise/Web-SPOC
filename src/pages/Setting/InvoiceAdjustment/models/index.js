@@ -1,12 +1,14 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import * as service from '../services'
-import { notification } from '@/components'
 
 export default createListViewModel({
-  namespace: 'settingReferralSource',
+  namespace: 'settingInvoiceAdjustment',
   config: {
-    queryOnLoad: false,
+    codetable: {
+      message: 'Invoice Adjustment updated',
+      code: 'ctroom',
+    },
   },
   param: {
     service,
@@ -18,22 +20,23 @@ export default createListViewModel({
           moment('2099-12-31T23:59:59').formatUTC(false),
         ],
         description: '',
+        adjType: 'ExactAmount',
+        adjValue: 0,
       },
-    },
-    subscriptions: ({ dispatch, history }) => {
-      history.listen(async (loct, method) => {
-        const { pathname, search, query = {} } = loct
-      })
-    },
-    effects: {
-      *deleteReferralSource ({ payload }, { call, put }) {
-        const result = yield call(service.delete, payload)
-        if (result === 204) {
-          notification.success({ message: 'Deleted' })
+    }, 
+    effects: {},
+    reducers: {
+      queryOneDone (st, { payload }) {
+        const { data } = payload
+        data.effectiveDates = [
+          data.effectiveStartDate,
+          data.effectiveEndDate,
+        ]
+        return {
+          ...st,
+          entity: data,
         }
       },
-    },
-    reducers: {
       queryDone (st, { payload }) {
         const { data } = payload
 

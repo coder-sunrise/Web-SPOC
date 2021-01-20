@@ -72,7 +72,7 @@ export default ({ current }) => {
             render: (text, row) => (
               <span>
                 {`${row.weightKG
-                  ? numeral(row.weightKG).format('0')
+                  ? numeral(row.weightKG).format('0.0')
                   : '-'} ${formatMessage({
                   id: 'reception.queue.visitRegistration.weight.suffix',
                 })}`}

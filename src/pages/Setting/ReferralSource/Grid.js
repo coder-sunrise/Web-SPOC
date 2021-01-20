@@ -1,10 +1,18 @@
 import React, { PureComponent, Fragment } from 'react'
-
+import { connect } from 'dva'
+import classNames from 'classnames'
 import Edit from '@material-ui/icons/Edit'
-import Delete from '@material-ui/icons/Delete'
-import { CommonTableGrid, Button, Tooltip } from '@/components'
+import Print from '@material-ui/icons/Print'
+import { MenuItem, MenuList } from '@material-ui/core'
+import withWebSocket from '@/components/Decorator/withWebSocket'
+import { CommonTableGrid, Button, Tooltip, Popper } from '@/components'
 import { status } from '@/utils/codes'
+import { REPORT_ID } from '@/utils/constants'
+import { getRawData } from '@/services/report'
 
+@connect(({ clinicSettings }) => ({
+  clinicSettings,
+}))
 class Grid extends PureComponent {
   editRow = (row, e) => {
     const { dispatch, settingReferralSource } = this.props
@@ -20,32 +28,40 @@ class Grid extends PureComponent {
     })
   }
 
-  deleteRow = async (row, e) => {
-    const { dispatch } = this.props
+  handleClick = async (referralSourceId, referralPersonId) => {
+    const { handlePrint, clinicSettings } = this.props
+    const { labelPrinterSize } = clinicSettings.settings
 
-    dispatch({
-      type: 'global/updateAppState',
-      payload: {
-        openConfirm: true,
-        openConfirmContent: `Delete referral source ${row.name}?`,
-        onConfirmSave: async () => {
-          await dispatch({
-            type: 'settingReferralSource/deleteReferralSource',
-            payload: {
-              ...row,
-              isDeleted: true,
-            },
-          }).then(() => {
-            dispatch({
-              type: 'settingReferralSource/query',
-            })
-          })
-        },
-      },
+    const sizeConverter = (sizeCM) => {
+      return sizeCM
+        .split('x')
+        .map((o) =>
+          (10 * parseFloat(o.replace('cm', ''))).toString().concat('MM'),
+        )
+        .join('_')
+    }
+    const reportID =
+      REPORT_ID[
+        'REFERRAL_SOURCE_LABEL_'.concat(sizeConverter(labelPrinterSize))
+      ]
+
+    const data = await getRawData(reportID, {
+      referralSourceId,
+      referralPersonId,
     })
+    const payload = [
+      {
+        ReportId: reportID,
+        ReportData: JSON.stringify({
+          ...data,
+        }),
+      },
+    ]
+    handlePrint(JSON.stringify(payload))
   }
 
   render () {
+    const { classes } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
@@ -53,11 +69,10 @@ class Grid extends PureComponent {
         onRowDoubleClick={this.editRow}
         columns={[
           { name: 'name', title: 'Name' },
-          { name: 'mobileNo', title: 'Mobile No.' },
-          { name: 'officeNo', title: 'Office No.' },
-          { name: 'institution', title: 'Institution' },
-          { name: 'department', title: 'Department' },
           { name: 'address', title: 'Address' },
+          { name: 'officeNo', title: 'Office No.' },
+          { name: 'website', title: 'Website' },
+          { name: 'faxNo', title: 'Fax' },
           { name: 'email', title: 'Email' },
           { name: 'remarks', title: 'Remarks' },
           { name: 'isActive', title: 'Status' },
@@ -68,10 +83,6 @@ class Grid extends PureComponent {
         ]}
         columnExtensions={[
           {
-            columnName: 'mobileNo',
-            sortingEnabled: false,
-          },
-          {
             columnName: 'officeNo',
             sortingEnabled: false,
           },
@@ -81,6 +92,18 @@ class Grid extends PureComponent {
           },
           {
             columnName: 'email',
+            sortingEnabled: false,
+          },
+          {
+            columnName: 'faxNo',
+            sortingEnabled: false,
+          },
+          {
+            columnName: 'remarks',
+            sortingEnabled: false,
+          },
+          {
+            columnName: 'website',
             sortingEnabled: false,
           },
           {
@@ -117,17 +140,45 @@ class Grid extends PureComponent {
                       <Edit />
                     </Button>
                   </Tooltip>
-                  <Tooltip title='Delete Referral Source'>
-                    <Button
-                      size='sm'
-                      onClick={() => {
-                        this.deleteRow(row)
-                      }}
-                      justIcon
-                      color='danger'
-                    >
-                      <Delete />
-                    </Button>
+                  <Tooltip title='Print Referral Source Label'>
+                    {!row.referralPersons || !row.referralPersons.length ? (
+                      <Button
+                        size='sm'
+                        justIcon
+                        color='primary'
+                        onClick={() => this.handleClick(row.id)}
+                      >
+                        <Print />
+                      </Button>
+                    ) : (
+                      <Popper
+                        className={classNames({
+                          [classes.pooperResponsive]: true,
+                          [classes.pooperNav]: true,
+                        })}
+                        overlay={
+                          <MenuList role='menu'>
+                            {[
+                              { name: 'Without Ref. Person' },
+                              ...(row.referralPersons || []),
+                            ].map((rp) => {
+                              return (
+                                <MenuItem
+                                  onClick={() =>
+                                    this.handleClick(row.id, rp.id)}
+                                >
+                                  {rp.name}
+                                </MenuItem>
+                              )
+                            })}
+                          </MenuList>
+                        }
+                      >
+                        <Button size='sm' justIcon color='primary'>
+                          <Print />
+                        </Button>
+                      </Popper>
+                    )}
                   </Tooltip>
                 </Fragment>
               )
@@ -139,4 +190,4 @@ class Grid extends PureComponent {
   }
 }
 
-export default Grid
+export default withWebSocket()(Grid)

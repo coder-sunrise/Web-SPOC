@@ -14,9 +14,9 @@ import {
   Tooltip,
   dateFormatLong,
   Popper,
+  NumberInput,
 } from '@/components'
 import styles from './styles'
-import { currencyFormatter } from '@/utils/utils'
 import PaymentDetails from './PaymentDetails'
 
 const PaymentRow = ({
@@ -107,6 +107,7 @@ const PaymentRow = ({
           ([
             'Credit Note',
             'Write Off',
+            'Deposit',
           ].includes(type) &&
             isCancelled) ? (
             <Popper
@@ -157,7 +158,7 @@ const PaymentRow = ({
         <GridItem md={6} container justify='flex-end' alignItems='center'>
           <GridItem>
             <span className={classes.currency}>
-              {amount ? currencyFormatter(amount) : 'N/A'}
+              {amount ? <NumberInput text currency value={amount} /> : 'N/A'}
             </span>
           </GridItem>
           <GridItem>
@@ -211,9 +212,13 @@ const PaymentRow = ({
           </GridItem>
           <GridItem md={6} container justify='flex-end' alignItems='center'>
             <GridItem>
-              <span className={classes.currency} style={{ paddingRight: 40 }}>
+              <span className={classes.currency} style={{ paddingRight: 48 }}>
                 {patientDepositTransaction.amount ? (
-                  currencyFormatter(patientDepositTransaction.amount)
+                  <NumberInput
+                    text
+                    currency
+                    value={patientDepositTransaction.amount}
+                  />
                 ) : (
                   'N/A'
                 )}

@@ -77,6 +77,23 @@ const widgets = [
     ),
   },
   {
+    id: '13',
+    name: 'Medical History',
+    accessRight: 'queue.consultation.widgets.medicalhistory',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/MedicalHistory'),
+      loading: Loading,
+    }),
+    model: 'patientMedicalHistory',
+    layoutConfig: {
+      h: 2,
+      w: 12,
+      style: {
+        padding: 5,
+      },
+    },
+  },
+  {
     id: '2',
     name: 'Diagnosis',
     accessRight: 'queue.consultation.widgets.diagnosis',
@@ -95,31 +112,6 @@ const widgets = [
         padding: 5,
       },
     },
-    // toolbarAddon: (
-    //   <AuthorizedContext>
-    //     {(r) => {
-    //       if (r.rights !== 'enable') return null
-    //       return (
-    //         <Tooltip title='Add Diagnosis'>
-    //           <IconButton
-    //             style={{ float: 'left' }}
-    //             className='non-dragable'
-    //             onClick={() => {
-    //               window.g_app._store.dispatch({
-    //                 type: 'diagnosis/updateState',
-    //                 payload: {
-    //                   shouldAddNew: true,
-    //                 },
-    //               })
-    //             }}
-    //           >
-    //             <Add />
-    //           </IconButton>
-    //         </Tooltip>
-    //       )
-    //     }}
-    //   </AuthorizedContext>
-    // ),
   },
   {
     id: '3',

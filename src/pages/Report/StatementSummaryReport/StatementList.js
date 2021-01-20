@@ -37,7 +37,7 @@ class StatementList extends PureComponent {
       { name: 'invoiceNo', title: 'Invoice No.' },
       { name: 'refNo', title: 'Ref. No.' },
       { name: 'companyName', title: 'Company Name' },
-      { name: 'invoiceAmt', title: 'Total Amt.' },
+      { name: 'invoiceAmt', title: 'Invoice Amt.' },
       { name: 'adjustments', title: 'Adjustments' },
       { name: 'osAmt', title: 'O/S Amt.' },
     ]

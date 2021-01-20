@@ -170,7 +170,7 @@ const styles = (theme) => ({
     const { dispatch, ctRole, currentUser, onConfirm } = props
     const { effectiveDates, role: roleFK, ...restValues } = values
     const role = ctRole.find((item) => item.id === roleFK)
-    const isDoctor = roleFK === 2 || roleFK === 3
+    const isDoctor = role && role.clinicalRoleName === 'Doctor'
     const doctorProfile = _.isEmpty(restValues.doctorProfile)
       ? undefined
       : {

@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import moment from 'moment'
 import { connect } from 'dva'
 import _ from 'lodash'
 import Add from '@material-ui/icons/Add'
@@ -18,25 +19,41 @@ import {
   ProgressButton,
   Tooltip,
   Switch,
+  Checkbox,
+  notification,
 } from '@/components'
+import Authorized from '@/utils/Authorized'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 import { currencySymbol } from '@/utils/config'
+import {
+  GetOrderItemAccessRight,
+  ReplaceCertificateTeplate,
+} from '@/pages/Widgets/Orders/utils'
 import LowStockInfo from './LowStockInfo'
 import AddFromPast from './AddMedicationFromPast'
+import { getClinicianProfile } from '../../ConsultationDocument/utils'
 import { DoctorProfileSelect } from '@/components/_medisys'
 
 let i = 0
-@connect(({ global, codetable, visitRegistration, user }) => ({
-  global,
-  codetable,
-  visitRegistration,
-  user,
-}))
+@connect(
+  ({
+    global,
+    codetable,
+    visitRegistration,
+    user,
+    patient,
+    consultationDocument,
+  }) => ({
+    global,
+    codetable,
+    visitRegistration,
+    user,
+    patient,
+    consultationDocument,
+  }),
+)
 @withFormikExtend({
-  authority: [
-    'queue.consultation.order.vaccination',
-  ],
   mapPropsToValues: ({ orders = {}, type, codetable, visitRegistration }) => {
     const newOrders = orders.entity || orders.defaultVaccination
 
@@ -76,7 +93,6 @@ let i = 0
 
   validationSchema: Yup.object().shape({
     inventoryVaccinationFK: Yup.number().required(),
-    // unitPrice: Yup.number().required(),
     totalPrice: Yup.number().required(),
     vaccinationGivenDate: Yup.date().required(),
     quantity: Yup.number().required(),
@@ -87,15 +103,80 @@ let i = 0
     performingUserFK: Yup.number().required(),
   }),
 
-  handleSubmit: (values, { props, onConfirm, resetForm, setValues }) => {
-    const { dispatch, orders, currentType, getNextSequence, user } = props
-    const { rows } = orders
+  handleSubmit: (values, { props, onConfirm, setValues }) => {
+    const {
+      dispatch,
+      orders,
+      currentType,
+      getNextSequence,
+      user,
+      codetable,
+      patient,
+      visitRegistration,
+      consultationDocument: { rows = [] },
+    } = props
     let { batchNo } = values
     if (batchNo instanceof Array) {
       if (batchNo && batchNo.length > 0) {
         batchNo = batchNo[0]
       }
     }
+
+    // create certificate when create vaccination that auto generate certificate checked
+    const { isGenerateCertificate, corVaccinationCert = [] } = values
+
+    let newCORVaccinationCert = corVaccinationCert
+    if (isGenerateCertificate) {
+      const { documenttemplate = [] } = codetable
+      if (corVaccinationCert.find((vc) => !vc.isDeleted)) {
+        notification.warning({
+          message:
+            'Any changes will not be reflected in the vaccination certificate.',
+        })
+      } else {
+        const defaultTemplate = documenttemplate.find(
+          (dt) =>
+            dt.isDefaultTemplate === true && dt.documentTemplateTypeFK === 3,
+        )
+        if (!defaultTemplate) {
+          notification.warning({
+            message:
+              'No template found. Select a template in Document Template.',
+          })
+        } else {
+          const { entity: visitEntity } = visitRegistration
+          const clinicianProfile = getClinicianProfile(codetable, visitEntity)
+          const { entity } = patient
+          const { name, patientAccountNo, genderFK, dob } = entity
+          const { ctgender = [] } = codetable
+          const gender = ctgender.find((o) => o.id === genderFK) || {}
+          const allDocs = rows.filter((s) => !s.isDeleted)
+          let nextSequence = 1
+          if (allDocs && allDocs.length > 0) {
+            const { sequence } = _.maxBy(allDocs, 'sequence')
+            nextSequence = sequence + 1
+          }
+          newCORVaccinationCert = [
+            ...corVaccinationCert,
+            {
+              type: '3',
+              certificateDate: moment(),
+              issuedByUserFK: clinicianProfile.userProfileFK,
+              subject: `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
+                ''}, ${Math.floor(
+                moment.duration(moment().diff(dob)).asYears(),
+              )}`,
+              content: ReplaceCertificateTeplate(
+                defaultTemplate.templateContent,
+                { ...values, subject: currentType.getSubject(values) },
+              ),
+              sequence: nextSequence,
+            },
+          ]
+        }
+      }
+    }
+
     const data = {
       isOrderedByDoctor:
         user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
@@ -108,6 +189,7 @@ let i = 0
         values.adjAmount < 0
           ? -Math.abs(values.adjValue)
           : Math.abs(values.adjValue),
+      corVaccinationCert: newCORVaccinationCert,
       packageGlobalId: values.packageGlobalId !== undefined ? values.packageGlobalId : '',
     }
     dispatch({
@@ -124,10 +206,6 @@ let i = 0
   displayName: 'OrderPage',
 })
 class Vaccination extends PureComponent {
-  // state = {
-
-  // }
-
   constructor (props) {
     super(props)
 
@@ -172,7 +250,7 @@ class Vaccination extends PureComponent {
   }
 
   changeVaccination = (v, op = {}) => {
-    const { setFieldValue, values, disableEdit } = this.props
+    const { setFieldValue, values, disableEdit, codetable } = this.props
     let defaultBatch
     if (op.vaccinationStock) {
       defaultBatch = op.vaccinationStock.find((o) => o.isDefault === true)
@@ -243,27 +321,36 @@ class Vaccination extends PureComponent {
         defaultBatch ? defaultBatch.expiryDate : undefined,
       )
     }
+    setFieldValue('isGenerateCertificate', op.isAutoGenerateCertificate)
     setTimeout(() => {
       this.calculateQuantity(op)
     }, 1)
   }
 
   calculateQuantity = (vaccination) => {
-    const { codetable, setFieldValue, values, disableEdit, dirty } = this.props
+    const { codetable, setFieldValue, values } = this.props
     if (values.isPackage) return
     const { minQuantity = 0 } = values
     let currentVaccination =
       vaccination && Object.values(vaccination).length ? vaccination : undefined
     if (!currentVaccination) currentVaccination = this.state.selectedVaccination
     let newTotalQuantity = 0
-    if (currentVaccination && currentVaccination.dispensingQuantity && !dirty) {
+    if (
+      vaccination &&
+      currentVaccination &&
+      currentVaccination.dispensingQuantity
+    ) {
       newTotalQuantity = currentVaccination.dispensingQuantity
-    } else if (currentVaccination.prescribingDosage) {
+    } else {
       const { ctmedicationdosage } = codetable
 
       const dosage = ctmedicationdosage.find(
         (o) =>
-          o.id === (values.dosageFK || currentVaccination.prescribingDosage.id),
+          o.id ===
+          (values.dosageFK ||
+            (currentVaccination && currentVaccination.prescribingDosage
+              ? currentVaccination.prescribingDosage.id
+              : undefined)),
       )
       if (dosage) {
         newTotalQuantity = Math.ceil(dosage.multiplier)
@@ -351,7 +438,7 @@ class Vaccination extends PureComponent {
     if (
       !!nextValues.id &&
       nextValues.id !== currentValues.id &&
-      nextValues.type === '2' // type === 'Medication'
+      nextValues.type === '2'
     ) {
       const { codetable } = this.props
       const { inventoryvaccination = [] } = codetable
@@ -374,21 +461,12 @@ class Vaccination extends PureComponent {
   }
 
   onSearchVaccinationHistory = async () => {
-    const { dispatch, values, visitRegistration } = this.props
-    const { patientProfileFK } = visitRegistration.entity.visit
-    await dispatch({
-      type: 'medicationHistory/queryMedicationHistory',
-      payload: { patientProfileId: patientProfileFK },
-    })
     this.toggleAddFromPastModal()
   }
 
   toggleAddFromPastModal = () => {
     const { showAddFromPastModal } = this.state
     this.setState({ showAddFromPastModal: !showAddFromPastModal })
-    if (showAddFromPastModal) {
-      this.resetVaccinationHistoryResult()
-    }
   }
 
   validateAndSubmitIfOk = async () => {
@@ -477,18 +555,29 @@ class Vaccination extends PureComponent {
       classes,
       disableEdit,
       getNextSequence,
+      from,
       ...reset
     } = this.props
     const { isEditVaccination } = values
     const { showAddFromPastModal } = this.state
     const caution = this.getCaution()
+    const totalPriceReadonly =
+      Authorized.check('queue.consultation.modifyorderitemtotalprice')
+        .rights !== 'enable'
+
     return (
-      <div>
-        <GridContainer>
-          <GridItem xs={8}>
-            <Field
-              name='inventoryVaccinationFK'
-              render={(args) => {
+      <Authorized
+        authority={GetOrderItemAccessRight(
+          from,
+          'queue.consultation.order.vaccination',
+        )}
+      >
+        <div>
+          <GridContainer>
+            <GridItem xs={8}>
+              <Field
+                name='inventoryVaccinationFK'
+                render={(args) => {
                 return (
                   <div
                     id={`autofocus_${values.type}`}
@@ -509,10 +598,10 @@ class Vaccination extends PureComponent {
                   </div>
                 )
               }}
-            />
-          </GridItem>
-          <GridItem xs={4}>
-            {!isEditVaccination && (
+              />
+            </GridItem>
+            <GridItem xs={4}>
+              {!isEditVaccination && (
               <Tooltip title='Add From Past'>
                 <ProgressButton
                   color='primary'
@@ -527,31 +616,31 @@ class Vaccination extends PureComponent {
                 </ProgressButton>
               </Tooltip>
             )}
-          </GridItem>
-        </GridContainer>
-        <GridContainer>
-          <GridItem xs={12}>
-            <div
-              style={{
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem xs={12}>
+              <div
+                style={{
                 position: 'relative',
                 paddingLeft: 90,
                 marginTop: 4,
                 fontSize: '0.85rem',
                 height: 26,
               }}
-            >
-              <div
-                style={{
+              >
+                <div
+                  style={{
                   position: 'absolute',
                   left: 0,
                   paddingTop: 3,
                   paddingBottom: 3,
                   lineHeight: '25px',
                 }}
-              >
+                >
                 Instructions
-              </div>
-              {caution && (
+                </div>
+                {caution && (
                 <Alert
                   message={
                     <Tooltip
@@ -580,12 +669,12 @@ class Vaccination extends PureComponent {
                   }}
                 />
               )}
-            </div>
-          </GridItem>
-          <GridItem xs={2}>
-            <Field
-              name='usageMethodFK'
-              render={(args) => {
+              </div>
+            </GridItem>
+            <GridItem xs={2}>
+              <Field
+                name='usageMethodFK'
+                render={(args) => {
                 return (
                   <CodeSelect
                     label='Usage'
@@ -602,12 +691,12 @@ class Vaccination extends PureComponent {
                   />
                 )
               }}
-            />
-          </GridItem>
-          <GridItem xs={2}>
-            <FastField
-              name='dosageFK'
-              render={(args) => {
+              />
+            </GridItem>
+            <GridItem xs={2}>
+              <FastField
+                name='dosageFK'
+                render={(args) => {
                 return (
                   <CodeSelect
                     label='Dosage'
@@ -627,12 +716,12 @@ class Vaccination extends PureComponent {
                   />
                 )
               }}
-            />
-          </GridItem>
-          <GridItem xs={2}>
-            <FastField
-              name='uomfk'
-              render={(args) => {
+              />
+            </GridItem>
+            <GridItem xs={2}>
+              <FastField
+                name='uomfk'
+                render={(args) => {
                 return (
                   <CodeSelect
                     label='UOM'
@@ -646,17 +735,17 @@ class Vaccination extends PureComponent {
                   />
                 )
               }}
-            />
-          </GridItem>
-          <GridItem xs={2}>
-            <FastField
-              name='vaccinationGivenDate'
-              render={(args) => {
+              />
+            </GridItem>
+            <GridItem xs={2}>
+              <FastField
+                name='vaccinationGivenDate'
+                render={(args) => {
                 return <DatePicker label='Date Given' {...args} />
               }}
-            />
-          </GridItem>
-          {values.isPackage && (
+              />
+            </GridItem>
+            {values.isPackage && (
             <React.Fragment>
               <GridItem xs={3}>
                 <Field
@@ -689,7 +778,6 @@ class Vaccination extends PureComponent {
                           marginTop: theme.spacing(3),
                         }}
                         formatter={(v) => `/ ${parseFloat(v).toFixed(1)}`}
-                        // prefix='/'
                         text
                         {...args}
                       />
@@ -699,7 +787,7 @@ class Vaccination extends PureComponent {
               </GridItem>
             </React.Fragment>
           )}
-          {!values.isPackage && (
+            {!values.isPackage && (
             <GridItem xs={3}>
               <Field
                 name='quantity'
@@ -727,12 +815,12 @@ class Vaccination extends PureComponent {
               />
             </GridItem>
           )}
-        </GridContainer>
-        <GridContainer>
-          <GridItem xs={4} className={classes.editor}>
-            <Field
-              name='batchNo'
-              render={(args) => {
+          </GridContainer>
+          <GridContainer>
+            <GridItem xs={4} className={classes.editor}>
+              <Field
+                name='batchNo'
+                render={(args) => {
                 return (
                   <CodeSelect
                     mode='tags'
@@ -755,12 +843,12 @@ class Vaccination extends PureComponent {
                   />
                 )
               }}
-            />
-          </GridItem>
-          <GridItem xs={4} className={classes.editor}>
-            <Field
-              name='expiryDate'
-              render={(args) => {
+              />
+            </GridItem>
+            <GridItem xs={4} className={classes.editor}>
+              <Field
+                name='expiryDate'
+                render={(args) => {
                 return (
                   <DatePicker
                     label='Expiry Date'
@@ -769,12 +857,12 @@ class Vaccination extends PureComponent {
                   />
                 )
               }}
-            />
-          </GridItem>
-          <GridItem xs={3} className={classes.editor}>
-            <Field
-              name='totalPrice'
-              render={(args) => {
+              />
+            </GridItem>
+            <GridItem xs={3} className={classes.editor}>
+              <Field
+                name='totalPrice'
+                render={(args) => {
                 return (
                   <NumberInput
                     label='Total'
@@ -787,35 +875,35 @@ class Vaccination extends PureComponent {
                       this.updateTotalPrice(e.target.value)
                     }}
                     min={0}
-                    disabled={values.isPackage}
+                    disabled={totalPriceReadonly || values.isPackage}
                     {...args}
                   />
                 )
               }}
-            />
-          </GridItem>
-        </GridContainer>
-        <GridContainer>
-          <GridItem xs={8} className={classes.editor}>
-            <Field
-              name='performingUserFK'
-              render={(args) => (
-                <DoctorProfileSelect
-                  label='Performed By'
-                  {...args}
-                  valueField='clinicianProfile.userProfileFK'
-                />
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem xs={8} className={classes.editor}>
+              <Field
+                name='performingUserFK'
+                render={(args) => (
+                  <DoctorProfileSelect
+                    label='Performed By'
+                    {...args}
+                    valueField='clinicianProfile.userProfileFK'
+                  />
               )}
-            />
-          </GridItem>          
-          <GridItem xs={3} className={classes.editor}>
-            <div style={{ position: 'relative' }}>
-              <div
-                style={{ marginTop: theme.spacing(2), position: 'absolute' }}
-              >
-                <Field
-                  name='isMinus'
-                  render={(args) => {
+              />
+            </GridItem>          
+            <GridItem xs={3} className={classes.editor}>
+              <div style={{ position: 'relative' }}>
+                <div
+                  style={{ marginTop: theme.spacing(2), position: 'absolute' }}
+                >
+                  <Field
+                    name='isMinus'
+                    render={(args) => {
                     return (
                       <Switch
                         checkedChildren='-'
@@ -826,16 +914,16 @@ class Vaccination extends PureComponent {
                             this.onAdjustmentConditionChange()
                           }, 1)
                         }}
-                        disabled={values.isPackage}
+                        disabled={totalPriceReadonly || values.isPackage}
                         {...args}
                       />
                     )
                   }}
-                />
-              </div>
-              <Field
-                name='adjValue'
-                render={(args) => {
+                  />
+                </div>
+                <Field
+                  name='adjValue'
+                  render={(args) => {
                   args.min = 0
                   if (values.isExactAmount) {
                     return (
@@ -851,7 +939,7 @@ class Vaccination extends PureComponent {
                             this.onAdjustmentConditionChange()
                           }, 1)
                         }}
-                        disabled={values.isPackage}
+                        disabled={totalPriceReadonly || values.isPackage}
                         {...args}
                       />
                     )
@@ -870,19 +958,19 @@ class Vaccination extends PureComponent {
                           this.onAdjustmentConditionChange()
                         }, 1)
                       }}
-                      disabled={values.isPackage}
+                      disabled={totalPriceReadonly || values.isPackage}
                       {...args}
                     />
                   )
                 }}
-              />
-            </div>
-          </GridItem>
-          <GridItem xs={1} className={classes.editor}>
-            <div style={{ marginTop: theme.spacing(2) }}>
-              <Field
-                name='isExactAmount'
-                render={(args) => {
+                />
+              </div>
+            </GridItem>
+            <GridItem xs={1} className={classes.editor}>
+              <div style={{ marginTop: theme.spacing(2) }}>
+                <Field
+                  name='isExactAmount'
+                  render={(args) => {
                   return (
                     <Switch
                       checkedChildren='$'
@@ -893,31 +981,30 @@ class Vaccination extends PureComponent {
                           this.onAdjustmentConditionChange()
                         }, 1)
                       }}
-                      disabled={values.isPackage}
+                      disabled={totalPriceReadonly || values.isPackage}
                       {...args}
                     />
                   )
                 }}
-              />
-            </div>
-          </GridItem>
-        </GridContainer>
-        <GridContainer>
-          <GridItem xs={8} className={classes.editor}>
-            <FastField
-              name='remarks'
-              render={(args) => {
-                // return <RichEditor placeholder='Remarks' {...args} />
+                />
+              </div>
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem xs={8} className={classes.editor}>
+              <FastField
+                name='remarks'
+                render={(args) => {
                 return (
                   <TextField multiline rowsMax='5' label='Remarks' {...args} />
                 )
               }}
-            />
-          </GridItem>
-          <GridItem xs={3} className={classes.editor} v>
-            <FastField
-              name='totalAfterItemAdjustment'
-              render={(args) => {
+              />
+            </GridItem>
+            <GridItem xs={3} className={classes.editor} v>
+              <FastField
+                name='totalAfterItemAdjustment'
+                render={(args) => {
                 return (
                   <NumberInput
                     label='Total After Adj'
@@ -931,26 +1018,51 @@ class Vaccination extends PureComponent {
                   />
                 )
               }}
-            />
-          </GridItem>
-        </GridContainer>
-        {footer({
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem
+              xs={8}
+              style={{
+                position: 'relative',
+              }}
+            >
+              <FastField
+                name='isGenerateCertificate'
+                render={(args) => {
+                  return (
+                    <Checkbox
+                      label='Generate Certificate'
+                      {...args}
+                      style={{
+                        position: 'absolute',
+                        bottom: 0,
+                      }}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+          </GridContainer>
+          {footer({
           onSave: this.validateAndSubmitIfOk,
           onReset: this.handleReset,
         })}
-        <CommonModal
-          open={showAddFromPastModal}
-          title='Add Vaccination From Past'
-          onClose={this.toggleAddFromPastModal}
-          onConfirm={this.toggleAddFromPastModal}
-          maxWidth='md'
-          showFooter={false}
-          overrideLoading
-          cancelText='Cancel'
-        >
-          <AddFromPast {...this.props} />
-        </CommonModal>
-      </div>
+          <CommonModal
+            open={showAddFromPastModal}
+            title='Add Vaccination From Past'
+            onClose={this.toggleAddFromPastModal}
+            onConfirm={this.toggleAddFromPastModal}
+            maxWidth='md'
+            showFooter={false}
+            overrideLoading
+            cancelText='Cancel'
+          >
+            <AddFromPast {...this.props} />
+          </CommonModal>
+        </div>
+      </Authorized>
     )
   }
 }

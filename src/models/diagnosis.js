@@ -1,7 +1,5 @@
 import { createFormViewModel } from 'medisys-model'
-// import * as service from '../services'
-import { getUniqueGUID } from 'utils'
-import moment from 'moment'
+import { getUserPreference, saveUserPreference } from '@/services/user'
 
 export default createFormViewModel({
   namespace: 'diagnosis',
@@ -13,12 +11,7 @@ export default createFormViewModel({
     state: {
       default: {
         corDiagnosis: [
-          {
-            // uid: getUniqueGUID(),
-            // onsetDate: moment(),
-            // isPersist: false,
-            // remarks: '',
-          },
+          {},
         ],
       },
     },
@@ -29,19 +22,55 @@ export default createFormViewModel({
     },
     effects: {
       *removeWidget ({ payload }, { call, put, select }) {
-        console.log(window)
         yield put({
           type: 'updateState',
           payload: {
             entity: false,
           },
         })
-        // yield put({
-        //   type: 'consuupdateState',
-        //   payload: {
-        //     entity: false,
-        //   },
-        // })
+      },
+      *saveUserPreference ({ payload }, { call, put, select }) {
+        const r = yield call(saveUserPreference, {
+          userPreferenceDetails: JSON.stringify(payload.userPreferenceDetails),
+          itemIdentifier: payload.itemIdentifier,
+          type: 6,
+        })
+
+        if (r === 204) return true
+
+        return false
+      },
+      *getUserPreference ({ payload }, { call, put }) {
+        const r = yield call(getUserPreference, 6)
+        const { status, data } = r
+
+        if (status === '200') {
+          if (data) {
+            const parsedFavouriteDiagnosisSetting = JSON.parse(data)
+            if (parsedFavouriteDiagnosisSetting.length > 0) {
+              const favouriteDiagnosis = parsedFavouriteDiagnosisSetting.find(
+                (o) => o.Identifier === 'FavouriteDiagnosis',
+              )
+              const favouriteDiagnosisCategory = parsedFavouriteDiagnosisSetting.find(
+                (o) => o.Identifier === 'FavouriteDiagnosisCategory',
+              )
+              const resultFavouriteDiagnosis = {
+                favouriteDiagnosis: favouriteDiagnosis
+                  ? favouriteDiagnosis.value
+                  : [],
+                favouriteDiagnosisCategory: favouriteDiagnosisCategory
+                  ? favouriteDiagnosisCategory.value
+                  : [],
+              }
+              yield put({
+                type: 'updateState',
+                payload: resultFavouriteDiagnosis,
+              })
+              return resultFavouriteDiagnosis
+            }
+          }
+        }
+        return null
       },
     },
     reducers: {},

@@ -18,7 +18,7 @@ import {
 // sub components
 import Authorized from '@/utils/Authorized'
 import BaseSearchBar from '../../common/BaseSearchBar'
-import TableGrid from '../../common/TableGrid'
+import TableGrid from '../TableGrid'
 // variables
 import { NewCHASColumnExtensions, NewCHASColumns } from './variables'
 
@@ -32,8 +32,8 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ claimSubmissionNew }) => ({
-  claimSubmissionNew,
+@connect(({ chasClaimSubmissionNew }) => ({
+  chasClaimSubmissionNew,
 }))
 @withFormik({
   mapPropsToValues: () => ({}),
@@ -47,7 +47,7 @@ class NewCHAS extends React.Component {
   componentWillMount () {
     // this.refreshDataGrid()
     this.props.dispatch({
-      type: 'claimSubmissionNew/query',
+      type: 'chasClaimSubmissionNew/query',
     })
   }
 
@@ -55,7 +55,7 @@ class NewCHAS extends React.Component {
     const { selectedRows } = this.state
     this.props
       .dispatch({
-        type: 'claimSubmissionNew/refreshPatientDetails',
+        type: 'chasClaimSubmissionNew/refreshPatientDetails',
         payload: { claimIds: selectedRows },
       })
       .then((r) => {
@@ -70,7 +70,7 @@ class NewCHAS extends React.Component {
 
   refreshDataGrid = () => {
     this.props.dispatch({
-      type: 'claimSubmissionNew/query',
+      type: 'chasClaimSubmissionNew/query',
     })
   }
 
@@ -83,7 +83,7 @@ class NewCHAS extends React.Component {
       this.handleLoadingVisibility(true)
       this.props
         .dispatch({
-          type: 'claimSubmissionNew/submitChasClaim',
+          type: 'chasClaimSubmissionNew/submitChasClaim',
           payload: { claimIds: selectedRows },
         })
         .then((r) => {
@@ -106,13 +106,13 @@ class NewCHAS extends React.Component {
   render () {
     const {
       classes,
-      claimSubmissionNew,
+      chasClaimSubmissionNew,
       handleContextMenuItemClick,
       dispatch,
       values,
     } = this.props
     const { isLoading, selectedRows } = this.state
-    const { list } = claimSubmissionNew || []
+    const { list } = chasClaimSubmissionNew || []
 
     return (
       <CardContainer
@@ -125,7 +125,7 @@ class NewCHAS extends React.Component {
         <BaseSearchBar
           dispatch={dispatch}
           values={values}
-          modelsName='claimSubmissionNew'
+          modelsName='chasClaimSubmissionNew'
         />
         <LoadingWrapper linear loading={isLoading} text='Submitting Claim...'>
           <GridContainer>
@@ -149,7 +149,7 @@ class NewCHAS extends React.Component {
               />
               {/* <CommonTableGrid
                 getRowId={(row) => row.id}
-                type='claimSubmissionNew'
+                type='chasClaimSubmissionNew'
                 // rows={data}
                 columns={NewCHASColumns}
                 columnExtensions={NewCHASColumnExtensions}

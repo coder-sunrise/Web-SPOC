@@ -1,18 +1,15 @@
-import React, { PureComponent } from 'react'
-import { withStyles } from '@material-ui/core'
+import React from 'react'
+import _ from 'lodash'
 import { Print, Delete } from '@material-ui/icons'
 import CommonTableGrid from '@/components/CommonTableGrid'
 import {
   Button,
   Tooltip,
-  Popconfirm,
   TextField,
-  CodeSelect,
   NumberInput,
   DatePicker,
   dateFormatLong,
 } from '@/components'
-import { IntegratedSummary } from '@devexpress/dx-react-grid'
 
 const DepositGrid = ({
   transactionList = [],
@@ -23,11 +20,24 @@ const DepositGrid = ({
 }) => {
   const getDeleteStyle = (row) => {
     return {
-      textDecorationLine: row.isCancelled ? 'line-through' : '',
+      textDecorationLine:
+        row.transactionTypeName !== 'Transfer' && row.isCancelled
+          ? 'line-through'
+          : '',
     }
   }
   const configs = {
-    rows: transactionList.map((o) => {
+    rows: _.orderBy(
+      transactionList,
+      [
+        'transactionDate',
+        'depositTransactionNo',
+      ],
+      [
+        'desc',
+        'desc',
+      ],
+    ).map((o) => {
       return { ...o, hasActiveSession }
     }),
     columns: [
@@ -126,7 +136,7 @@ const DepositGrid = ({
             refundableBalance,
             isCancelled,
           } = row
-          const isDeposit = transactionTypeFK === 1 //
+          const isDeposit = transactionTypeFK === 1
           const isRefund = transactionTypeFK === 2
           const isEnableDelete =
             isDeposit && refundableBalance >= amount && !isReadOnly

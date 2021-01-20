@@ -1,9 +1,8 @@
 import router from 'umi/router'
-import _ from 'lodash'
 import { createFormViewModel } from 'medisys-model'
-import * as service from '../services/dispense'
 import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import { notification } from '@/components'
+import * as service from '../services/dispense'
 
 export default createFormViewModel({
   namespace: 'dispense',
@@ -31,20 +30,6 @@ export default createFormViewModel({
       history.listen(async (loct, method) => {
         const { pathname, search, query = {} } = loct
 
-        // if (
-        //   pathname.indexOf('/reception/queue/dispense') === 0 &&
-        //   Number(query.vid) &&
-        //   query.md2 === 'dsps'
-        // ) {
-        //   dispatch({
-        //     type: 'initState',
-        //     payload: {
-        //       version: Number(query.v) || undefined,
-        //       visitID: Number(query.vid),
-        //       md2: query.md2,
-        //     },
-        //   })
-        // }
         if (pathname === '/reception/queue/dispense' && Number(query.vid)) {
           dispatch({
             type: 'initState',
@@ -53,7 +38,6 @@ export default createFormViewModel({
               visitID: Number(query.vid),
               pid: Number(query.pid),
               qid: Number(query.qid),
-              // md2: query.md2,
             },
           })
         }
@@ -179,13 +163,6 @@ export default createFormViewModel({
       },
       *closeModal ({ payload = { toBillingPage: false } }, { call, put }) {
         const { toBillingPage = false } = payload
-        // router.push(
-        //   getRemovedUrl([
-        //     'md2',
-        //     // 'cmt',
-        //     // 'vid',
-        //   ]),
-        // )
 
         yield put({
           type: 'global/updateAppState',
@@ -265,84 +242,21 @@ export default createFormViewModel({
         }
         return false
       },
-      // *queryDone ({ payload }, { call, put, select }) {
-      //   // console.log('queryDone', payload)
-      //   const { data } = payload
-      //   if (!data) return
-      //   let cdRows = []
-      //   dispenseDocumentTypes.forEach((p) => {
-      //     cdRows = cdRows.concat(
-      //       (data[p.prop] || []).map((o) => {
-      //         const d = {
-      //           uid: getUniqueId(),
-      //           type: p.value,
-      //           subject: p.getSubject ? p.getSubject(o) : '',
-      //           ...o,
-      //         }
-      //         return p.convert ? p.convert(d) : d
-      //       }),
-      //     )
-      //   })
-      //   yield put({
-      //     type: 'dispenseDocument/updateState',
-      //     payload: {
-      //       rows: _.sortBy(cdRows, 'sequence'),
-      //     },
-      //   })
 
-      //   let oRows = []
-      //   orderTypes.forEach((p) => {
-      //     const datas =
-      //       (p.filter ? data[p.prop].filter(p.filter) : data[p.prop]) || []
-      //     // console.log(oRows, data[p.prop])
-      //     oRows = oRows.concat(
-      //       datas.map((o) => {
-      //         const d = {
-      //           uid: getUniqueId(),
-      //           type: p.value,
-      //           subject: p.getSubject ? p.getSubject(o) : '',
-      //           ...o,
-      //         }
-      //         return p.convert ? p.convert(d) : d
-      //       }),
-      //     )
-      //   })
-      //   yield put({
-      //     type: 'orders/updateState',
-      //     payload: {
-      //       rows: _.sortBy(oRows, 'sequence'),
-      //       finalAdjustments: data.corOrderAdjustment.map((o) => ({
-      //         ...o,
-      //         uid: o.id,
-      //       })),
-      //     },
-      //   })
-      //   yield put({
-      //     type: 'orders/calculateAmount',
-      //   })
-
-      //   yield put({
-      //     type: 'diagnosis/updateState',
-      //     payload: {
-      //       rows: _.sortBy(data.corDiagnosis, 'sequence'),
-      //     },
-      //   })
-
-      //   // if (data.corDiagnosis && data.corDiagnosis.length > 0) {
-      //   //   data.corDiagnosis.forEach((cd) => {
-      //   //     cd.complication = cd.corComplication.map((o) => o.complicationFK)
-      //   //   })
-      //   // }
-      //   // if (data.corDiagnosis && data.corDiagnosis.length === 0) {
-      //   //   data.corDiagnosis.push({
-      //   //     onsetDate: moment(),
-      //   //     isPersist: false,
-      //   //     remarks: '',
-      //   //   })
-      //   // }
-      //   // console.log(payload)
-      //   return payload
-      // },
+      *updateShouldRefreshOrder ({ payload }, { put, select }) {
+        const user = yield select((state) => state.user)
+        const dispense = yield select((state) => state.dispense)
+        const { visitID, senderId } = payload
+        const { entity = {} } = dispense || {}
+        if (entity && entity.id === visitID && senderId !== user.data.id) {
+          yield put({
+            type: 'updateState',
+            payload: {
+              shouldRefreshOrder: true,
+            },
+          })
+        }
+      },
     },
     reducers: {
       incrementLoadCount (state) {

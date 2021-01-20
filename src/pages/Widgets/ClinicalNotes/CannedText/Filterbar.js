@@ -10,8 +10,19 @@ import {
   RadioGroup,
 } from '@/components'
 import Search from '@material-ui/icons/Search'
+import { CANNED_TEXT_TYPE } from '@/utils/constants'
 
-const Filterbar = ({ handleSubmit, showType, setShowType }) => {
+const Filterbar = ({ handleSubmit, showType, setShowType, cannedTextTypeFK }) => {
+  let options = []
+  if (cannedTextTypeFK !== CANNED_TEXT_TYPE.MEDICALCERTIFICATE) {
+    options = [{
+      value: 'Self',
+      label: 'My Canned Text',
+    }, {
+      value: 'Shared',
+      label: 'Shared From Others',
+    }]
+  }
   return (
     <GridContainer alignItems='center'>
       <GridItem md={4}>
@@ -36,16 +47,7 @@ const Filterbar = ({ handleSubmit, showType, setShowType }) => {
             <RadioGroup
               label=''
               simple
-              options={[
-                {
-                  value: 'Self',
-                  label: 'My Canned Text',
-                },
-                {
-                  value: 'Shared',
-                  label: 'Shared From Others',
-                },
-              ]}
+              options={options}
               value={showType}
               onChange={(v) => {
                 setShowType(v.target.value)

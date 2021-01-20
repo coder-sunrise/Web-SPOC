@@ -21,7 +21,7 @@ class ChasList extends PureComponent {
 
     const SalesDetailsCols = [
       { name: 'visitDate', title: 'Visit Date' },
-      { name: 'patientAccountNo', title: 'Patinet ID' },
+      { name: 'patientAccountNo', title: 'Patient ID' },
       { name: 'patientName', title: 'Patient Name' },
       { name: 'doctorName', title: 'Doctor Name' },
       { name: 'schemeName', title: 'Scheme Name' },

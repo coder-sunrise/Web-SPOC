@@ -35,6 +35,10 @@ const styles = (theme) => ({
     appliedSchemes,
     commitCount: global.commitCount,
     patient: patient.entity || patient.default,
+    ctcopayer: codetable.ctcopayer || [],
+    ctservice: codetable.ctservice || [],
+    inventoryvaccination: codetable.inventoryvaccination || [],
+    inventorymedication: codetable.inventorymedication || [],
     ctcopaymentscheme: codetable.copaymentscheme || [],
     ctschemetype: codetable.ctschemetype || [],
     loading: loading.effects['appliedSchemes/fetchInvoicePayers'],
@@ -78,7 +82,6 @@ const styles = (theme) => ({
         return values
       }
     } catch (error) {
-      console.log({ error })
     }
     return { ...appliedSchemes.default, visitId: appliedSchemes.visitID }
   },
@@ -204,8 +207,12 @@ class AppliedScheme extends Component {
       setFieldValue,
       setValues,
       patient,
+      ctcopayer,
       ctschemetype,
       ctcopaymentscheme,
+      ctservice,
+      inventoryvaccination,
+      inventorymedication,
       loading = false,
     } = this.props
     const { submitCount } = this.state
@@ -218,6 +225,10 @@ class AppliedScheme extends Component {
       patient,
       ctschemetype,
       ctcopaymentscheme,
+      ctcopayer,
+      ctservice,
+      inventoryvaccination,
+      inventorymedication,
     }
 
     return (
@@ -257,6 +268,11 @@ class AppliedScheme extends Component {
               submitCount={submitCount}
               dispatch={dispatch}
               commitCount={commitCount}
+              inventoryvaccination={inventoryvaccination}
+              inventorymedication={inventorymedication}
+              ctservice={ctservice}
+              patient={patient}
+              ctcopayer={ctcopayer}
               {...formikBag}
               {...commonProps}
               noExtraOptions

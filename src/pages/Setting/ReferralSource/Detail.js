@@ -7,16 +7,12 @@ import {
   GridItem,
   TextField,
   DateRangePicker,
-  NumberInput,
-  CodeSelect,
 } from '@/components'
-import Contact from '@/pages/Setting/Company/Contact'
-
-const styles = (theme) => ({})
+import Contact from '@/pages/Setting/Company/Contact' 
 
 @withFormikExtend({
   mapPropsToValues: ({ settingReferralSource }) =>
-    settingReferralSource.entity || settingReferralSource.default,
+    settingReferralSource ? settingReferralSource.entity || settingReferralSource.default : {},
   validationSchema: Yup.object().shape({
     name: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
@@ -61,25 +57,9 @@ class Detail extends PureComponent {
                     label='Name'
                     autoFocus
                     {...args}
-                    disabled={!!settingReferralSource.entity}
+                    disabled={settingReferralSource && !!settingReferralSource.entity}
                   />
                 )}
-              />
-            </GridItem>
-
-            <GridItem md={6}>
-              <FastField
-                name='institution'
-                render={(args) => <TextField label='Institution' {...args} />}
-              />
-            </GridItem>
-
-            <GridItem md={6}>
-              <FastField
-                name='department'
-                render={(args) => {
-                  return <TextField label='Department' {...args} />
-                }}
               />
             </GridItem>
 
@@ -97,7 +77,7 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem md={6}>
+            <GridItem md={12}>
               <FastField
                 name='remarks'
                 render={(args) => (
@@ -105,8 +85,9 @@ class Detail extends PureComponent {
                 )}
               />
             </GridItem>
+
           </GridContainer>
-          <Contact theme={theme} type='referral' />
+          <Contact theme={theme} type='referralsource' />
         </div>
         {footer &&
           footer({

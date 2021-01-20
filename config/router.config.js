@@ -718,6 +718,14 @@ const _routes = [
             ],
           },
           {
+            path: '/report/referralsourcereport',
+            name: 'referralsourcereport',
+            component: './Report/ReferralSourceReport',
+            authority: [
+              'report.other.referralsource',
+            ],
+          },
+          {
             path: '/report/sessionsummary',
             name: 'sessionsummary',
             component: './Report/SessionSummary',
@@ -1249,6 +1257,14 @@ const _routes = [
             ],
           },
           {
+            path: '/setting/referralperson',
+            name: 'referralperson',
+            component: './Setting/ReferralPerson',
+            authority: [
+              'settings.contact.referralperson',
+            ],
+          },
+          {
             path: '/setting/visitordertemplate',
             name: 'visitordertemplate',
             component: './Setting/VisitOrderTemplate',
@@ -1270,6 +1286,14 @@ const _routes = [
             component: './Setting/Package',
             authority: [
               'settings.clinicsetting.package',
+            ],
+          },
+          {
+            path: '/setting/invoiceadjustment',
+            name: 'invoiceadjustment',
+            component: './Setting/InvoiceAdjustment',
+            authority: [
+              'settings.clinicsetting.invoiceadjustment',
             ],
           },
         ],

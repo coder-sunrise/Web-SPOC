@@ -12,7 +12,7 @@ import {
 } from '@/components'
 // utils
 import { PAYMENT_MODE } from '@/utils/constants'
-import { currencyFormatter } from '@/utils/utils'
+import _ from 'lodash'
 
 const styles = (theme) => ({
   container: {
@@ -68,7 +68,7 @@ const PaymentDetailsPopover = ({ payment, classes }) => {
                 </GridItem>
                 <GridItem xs={3}>
                   <p className={classes.currency}>
-                    {amt ? currencyFormatter(amt) : 'N/A'}
+                    {amt ? <NumberInput text currency value={amt} /> : 'N/A'}
                   </p>
                 </GridItem>
                 <GridItem>

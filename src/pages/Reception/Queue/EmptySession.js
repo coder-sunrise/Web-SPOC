@@ -7,7 +7,7 @@ import { LinearProgress, withStyles } from '@material-ui/core'
 import PlayCircleOutline from '@material-ui/icons/PlayCircleOutline'
 // custom components
 import Replay from '@material-ui/icons/Replay'
-import { Button, Danger } from '@/components'
+import { ProgressButton } from '@/components'
 import Authorized from '@/utils/Authorized'
 import { getBizSession } from '@/services/queue'
 
@@ -89,17 +89,15 @@ class EmptySession extends PureComponent {
                 <FormattedMessage id='reception.queue.emptyState' />
               </h3>
               <Authorized authority='queue.startsession'>
-                <Button color='primary' onClick={this.onStartClick}>
-                  <PlayCircleOutline />
+                <ProgressButton color='primary' onClick={this.onStartClick} icon={<PlayCircleOutline />}>
                   <FormattedMessage id='reception.queue.startSession' />
-                </Button>
+                </ProgressButton>
               </Authorized>
               {isLastSessionClosed && (
                 <Authorized authority='queue.reopenlastsession'>
-                  <Button color='primary' onClick={this.onReopenClick}>
-                    <Replay />
+                  <ProgressButton color='primary' onClick={this.onReopenClick} icon={<Replay />}>
                     <FormattedMessage id='reception.queue.reopenLastSession' />
-                  </Button>
+                  </ProgressButton>
                 </Authorized>
               )}
             </React.Fragment>

@@ -1,39 +1,72 @@
 import React, { PureComponent } from 'react'
+import _ from 'lodash'
 import { connect } from 'dva'
+import * as Yup from 'yup'
+import moment from 'moment'
 // medisys components
 import { LoadingWrapper } from '@/components/_medisys'
 // custom component
-import {} from '@/components'
+import { notification } from '@/components'
+import { withFormik } from 'formik'
 // sub components
-import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
+import {
+  openCautionAlertPrompt,
+  ReplaceCertificateTeplate,
+} from '@/pages/Widgets/Orders/utils'
 import FitlerBar from './FilterBar'
 import Grid from './Grid'
+import { getClinicianProfile } from '../../../ConsultationDocument/utils'
 
-@connect(({ loading, medicationHistory, codetable }) => ({
-  loading,
-  medicationHistory,
-  codetable,
-}))
+const defaultValue = {
+  visitFromDate: moment(new Date()).startOf('day').toDate(),
+  visitToDate: moment(new Date()).endOf('day').toDate(),
+  searchName: '',
+  isAllDate: true,
+}
+
+@connect(
+  ({
+    loading,
+    codetable,
+    visitRegistration,
+    clinicSettings,
+    patient,
+    consultationDocument,
+  }) => ({
+    loading,
+    codetable,
+    visitRegistration,
+    clinicSettings: clinicSettings.settings || clinicSettings.default,
+    patient,
+    consultationDocument,
+  }),
+)
+@withFormik({
+  displayName: 'PastMedication',
+  validationSchema: Yup.object().shape({}),
+  mapPropsToValues: () => ({
+    ...defaultValue,
+  }),
+  handleSubmit: () => ({}),
+})
 class PastMedication extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      filterName: '',
-      frequecyType: 1,
       addedItems: [],
+      visitFromDate: moment(new Date()).startOf('day').toDate(),
+      visitToDate: moment(new Date()).endOf('day').toDate(),
+      searchName: '',
+      isAllDate: true,
+      pageIndex: 0,
+      loadVisits: [],
+      totalVisits: 0,
+      activeKey: [],
     }
   }
 
-  setFilterName = (v) => {
-    this.setState({
-      filterName: v,
-    })
-  }
-
-  setFrequecyType = (v) => {
-    this.setState({
-      frequecyType: v,
-    })
+  componentWillMount () {
+    this.searchHistory()
   }
 
   setAddedItems = (v) => {
@@ -347,7 +380,14 @@ class PastMedication extends PureComponent {
   }
 
   GetNewVaccination = () => {
-    const { getNextSequence, codetable, type } = this.props
+    const {
+      getNextSequence,
+      codetable,
+      type,
+      visitRegistration,
+      patient,
+      consultationDocument: { rows = [] },
+    } = this.props
     const {
       inventoryvaccination,
       ctvaccinationusage,
@@ -358,6 +398,19 @@ class PastMedication extends PureComponent {
     const vaccinations = this.state.addedItems
     let data = []
     let sequence = getNextSequence()
+    const { entity: visitEntity } = visitRegistration
+    const clinicianProfile = getClinicianProfile(codetable, visitEntity)
+    const { entity } = patient
+    const { name, patientAccountNo, genderFK, dob } = entity
+    const { ctgender = [] } = codetable
+    const gender = ctgender.find((o) => o.id === genderFK) || {}
+    const allDocs = rows.filter((s) => !s.isDeleted)
+    let nextSequence = 1
+    if (allDocs && allDocs.length > 0) {
+      const { sequence: documentSequence } = _.maxBy(allDocs, 'sequence')
+      nextSequence = documentSequence + 1
+    }
+    let showNoTemplate
     data = data.concat(
       vaccinations.map((item) => {
         let currentSequence = sequence
@@ -385,7 +438,7 @@ class PastMedication extends PureComponent {
 
         const totalPrice = newTotalQuantity * vaccination.sellingPrice
 
-        return {
+        let newVaccination = {
           type,
           inventoryVaccinationFK: item.inventoryVaccinationFK,
           vaccinationGivenDate: item.vaccinationGivenDate,
@@ -415,11 +468,51 @@ class PastMedication extends PureComponent {
           isDeleted: false,
           subject: vaccination.displayValue,
           caution: vaccination.caution,
+          isGenerateCertificate: vaccination.isAutoGenerateCertificate,
           performingUserFK: this.getVisitDoctorUserId(this.props),
           packageGlobalId: '',
         }
+        let newCORVaccinationCert = []
+        if (newVaccination.isGenerateCertificate) {
+          const { documenttemplate = [] } = codetable
+          const defaultTemplate = documenttemplate.find(
+            (dt) =>
+              dt.isDefaultTemplate === true && dt.documentTemplateTypeFK === 3,
+          )
+          if (defaultTemplate) {
+            newCORVaccinationCert = [
+              {
+                type: '3',
+                certificateDate: moment(),
+                issuedByUserFK: clinicianProfile.userProfileFK,
+                subject: `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
+                  ''}, ${Math.floor(
+                  moment.duration(moment().diff(dob)).asYears(),
+                )}`,
+                content: ReplaceCertificateTeplate(
+                  defaultTemplate.templateContent,
+                  newVaccination,
+                ),
+                sequence: nextSequence,
+              },
+            ]
+            nextSequence += 1
+          } else {
+            showNoTemplate = true
+          }
+        }
+        return {
+          ...newVaccination,
+          corVaccinationCert: newCORVaccinationCert,
+        }
       }),
     )
+    if (showNoTemplate) {
+      notification.warning({
+        message:
+          'Any changes will not be reflected in the vaccination certificate.',
+      })
+    }
     return data
   }
 
@@ -512,8 +605,100 @@ class PastMedication extends PureComponent {
     }
   }
 
+  handelSearch = () => {
+    const { values } = this.props
+    const { visitFromDate, visitToDate, searchName, isAllDate } = values
+    this.setState(
+      {
+        visitFromDate,
+        visitToDate,
+        searchName,
+        isAllDate,
+        pageIndex: 0,
+        loadVisits: [],
+        addedItems: [],
+        totalVisits: 0,
+        activeKey: [],
+      },
+      this.searchHistory,
+    )
+  }
+
+  handelLoadMore = () => {
+    this.searchHistory()
+  }
+
+  searchHistory = () => {
+    const {
+      visitFromDate,
+      visitToDate,
+      searchName,
+      isAllDate,
+      pageIndex,
+    } = this.state
+    const { dispatch, visitRegistration, clinicSettings, type } = this.props
+    const { patientProfileFK } = visitRegistration.entity.visit
+    const { viewVisitPageSize = 10 } = clinicSettings
+    dispatch({
+      type: 'medicationHistory/queryMedicationHistory',
+      payload: {
+        visitFromDate: visitFromDate
+          ? moment(visitFromDate).startOf('day').formatUTC()
+          : undefined,
+        visitToDate: visitToDate
+          ? moment(visitToDate).endOf('day').formatUTC(false)
+          : undefined,
+        searchName,
+        isAllDate,
+        pageIndex: pageIndex + 1,
+        pageSize: viewVisitPageSize,
+        patientProfileId: patientProfileFK,
+        IsSearchMedication: type === '1',
+      },
+    }).then((r) => {
+      if (r) {
+        this.setState((preState) => {
+          return {
+            ...preState,
+            loadVisits: [
+              ...preState.loadVisits,
+              ...r.list,
+            ],
+            totalVisits: r.totalVisits,
+            pageIndex: preState.pageIndex + 1,
+            activeKey: [
+              ...preState.activeKey,
+              ...r.list.map((o) => o.id),
+            ],
+          }
+        })
+      }
+    })
+  }
+
+  clickCollapseHeader = (visitID) => {
+    this.setState((preState) => {
+      if (preState.activeKey.find((key) => key === visitID)) {
+        return {
+          ...preState,
+          activeKey: preState.activeKey.filter((key) => key !== visitID),
+        }
+      }
+      return {
+        ...preState,
+        activeKey: [
+          ...preState.activeKey,
+          visitID,
+        ],
+      }
+    })
+  }
+
   render () {
-    const { loading, type, footer } = this.props
+    const { loading, type, footer, clinicSettings } = this.props
+    const { viewVisitPageSize = 10 } = clinicSettings
+    const { pageIndex, loadVisits, totalVisits, activeKey } = this.state
+    const moreData = totalVisits > pageIndex * viewVisitPageSize
     const show = loading.effects['medicationHistory/queryMedicationHistory']
     return (
       <LoadingWrapper
@@ -522,18 +707,20 @@ class PastMedication extends PureComponent {
       >
         <div>
           <FitlerBar
-            setFilterName={this.setFilterName}
-            setFrequecyType={this.setFrequecyType}
-            frequecyType={this.state.frequecyType}
             type={type}
             selectItemCount={this.state.addedItems.length}
+            handelSearch={this.handelSearch}
+            {...this.props}
           />
           <Grid
             onSelectMedication={this.onSelectMedication}
-            filterName={this.state.filterName}
-            frequecyType={this.state.frequecyType}
             onSelectItems={this.onSelectItems}
             addedItems={this.state.addedItems}
+            moreData={moreData}
+            handelLoadMore={this.handelLoadMore}
+            loadVisits={loadVisits}
+            activeKey={activeKey}
+            clickCollapseHeader={this.clickCollapseHeader}
             {...this.props}
           />
         </div>

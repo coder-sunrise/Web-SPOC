@@ -74,6 +74,14 @@ const History = (props) => {
         visitID: findGetParameter('visit'),
         patientID: Number(findGetParameter('pid')) || 0,
       },
+    }).then(() => {
+      dispatch({
+        type: 'patientHistory/queryPatientHistoy',
+        payload: {
+          version: Number(findGetParameter('v')) || undefined,
+          patientID: Number(findGetParameter('pid')) || 0,
+        },
+      })
     })
   }, [])
   useEffect(

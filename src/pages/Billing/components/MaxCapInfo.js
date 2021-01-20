@@ -40,7 +40,7 @@ const MaxCapInfo = ({ classes, claimableSchemes = [], copaymentSchemeFK }) => {
 
   const open = Boolean(anchorEl)
 
-  const scheme = claimableSchemes.find((item) => item.id === copaymentSchemeFK)
+  const scheme = claimableSchemes.find((item) => item.length > 0 && item[0].id === copaymentSchemeFK) // TODO: adjusting claimableSchemes input for medisave
 
   let patientMinPayable
   let categoriesMaxCap = []
@@ -61,7 +61,7 @@ const MaxCapInfo = ({ classes, claimableSchemes = [], copaymentSchemeFK }) => {
       serviceCoverageMaxCap,
       orderSetCoverageMaxCap,
       vaccinationCoverageMaxCap,
-    } = scheme
+    } = scheme[0]
 
     if (isMedicationCoverageMaxCapCheckRequired)
       categoriesMaxCap.push({

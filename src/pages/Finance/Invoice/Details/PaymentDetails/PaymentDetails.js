@@ -1,10 +1,9 @@
 import React, { Fragment } from 'react'
 import { withStyles } from '@material-ui/core'
 
-import { GridContainer, GridItem } from '@/components'
-import styles from './styles'
+import { GridContainer, GridItem, NumberInput } from '@/components'
 import { PAYMENT_MODE } from '@/utils/constants'
-import { currencyFormatter } from '@/utils/utils'
+import styles from './styles'
 
 const PaymentDetails = ({
   paymentModeDetails,
@@ -51,7 +50,7 @@ const PaymentDetails = ({
               </GridItem>
               <GridItem xs={4}>
                 <p className={classes.currency}>
-                  {mode.amt ? currencyFormatter(mode.amt) : 'N/A'}
+                  {mode.amt ? <NumberInput text currency value={mode.amt} /> : 'N/A'}
                 </p>
               </GridItem>
               <GridItem xs={12}>

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { formatMessage } from 'umi/locale'
 import _ from 'lodash'
 import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
@@ -12,10 +11,8 @@ import numeral from 'numeral'
 import {
   CommonTableGrid,
   Button,
-  Popconfirm,
   Tooltip,
   NumberInput,
-  Select,
   Checkbox,
 } from '@/components'
 import { orderTypes } from '@/pages/Consultation/utils'
@@ -23,8 +20,14 @@ import Authorized from '@/utils/Authorized'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import PackageDrawdownInfo from '@/pages/Widgets/Orders/Detail/PackageDrawdownInfo'
 
-// console.log(orderTypes)
-export default ({ orders, dispatch, classes, from, codetable, theme }) => {
+export default ({
+  orders,
+  dispatch,
+  classes,
+  from = 'Consultation',
+  codetable,
+  theme,
+}) => {
   const { rows, summary, finalAdjustments, isGSTInclusive, gstValue } = orders
   const { total, gst, totalWithGST, subTotal } = summary
   const [
@@ -80,26 +83,50 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
   )
 
   const adjustments = finalAdjustments.filter((o) => !o.isDeleted)
-  const editRow = (row) => {
-    if (!row.isActive && row.type !== '5' && !row.isDrugMixture) return
 
-    if (row.type === '7' && from !== 'ca') return
+  const OrderAccessRight = () => {
+    let editAccessRight = ''
+    if (from === 'EditOrder') {
+      editAccessRight = 'queue.dispense.editorder'
+    } else if (from === 'Consultation') {
+      editAccessRight = 'queue.consultation.widgets.order'
+    }
+    return editAccessRight
+  }
 
+  const OrderItemAccessRight = (row) => {
     let editAccessRight
     const orderType = orderTypes.find((item) => item.value === row.type) || {
       accessRight: '',
     }
     editAccessRight = orderType.accessRight
 
-    if (from && from === 'ca' && row.isOrderedByDoctor) {
-      const consultaionAccessRight = Authorized.check(editAccessRight)
-      if (
-        consultaionAccessRight &&
-        consultaionAccessRight.rights === 'enable'
-      ) {
-        editAccessRight = 'queue.dispense.editorder.modifydoctororder'
+    if (from === 'EditOrder') {
+      const EditOrderAccessRight = Authorized.check('queue.dispense.editorder')
+      if (!EditOrderAccessRight || EditOrderAccessRight.rights !== 'enable')
+        editAccessRight = 'queue.dispense.editorder'
+      else if (row.isOrderedByDoctor) {
+        const itemAccessRight = Authorized.check(editAccessRight)
+        if (itemAccessRight && itemAccessRight.rights === 'enable') {
+          editAccessRight = 'queue.dispense.editorder.modifydoctororder'
+        }
       }
+    } else if (from === 'Consultation') {
+      const consultaionAccessRight = Authorized.check(
+        'queue.consultation.widgets.order',
+      )
+      if (!consultaionAccessRight || consultaionAccessRight.rights !== 'enable')
+        editAccessRight = 'queue.consultation.widgets.order'
     }
+    return editAccessRight
+  }
+
+  const editRow = (row) => {
+    if (!row.isActive && row.type !== '5' && !row.isDrugMixture) return
+
+    if (row.type === '7' && from !== 'EditOrder') return
+
+    const editAccessRight = OrderItemAccessRight(row)
 
     const accessRight = Authorized.check(editAccessRight)
     if (!accessRight || accessRight.rights !== 'enable') return
@@ -109,11 +136,6 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
       payload: {
         entity: row,
         type: row.type,
-        // adjustment: {
-        //   adjValue: row.adjValue,
-        //   adjAmount: row.adjAmount,
-        //   adjType: row.adjType,
-        // },
       },
     })
     if (row.type === '7') {
@@ -130,13 +152,7 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
         },
       })
     }
-
-    // dispatch({
-    //   // force current edit row components to update
-    //   type: 'global/incrementCommitCount',
-    // })
   }
-  // console.log(total, summary)
   const addAdjustment = () => {
     dispatch({
       type: 'global/updateState',
@@ -149,8 +165,34 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
           },
           showRemark: true,
           showAmountPreview: false,
+          rows,
+          adjustments,
+          editAdj: undefined,
           defaultValues: {
-            // ...this.props.orders.entity,
+            initialAmout: total,
+          },
+        },
+      },
+    })
+  }
+
+  const editAdjustment = (adj) => {
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        openAdjustment: true,
+        openAdjustmentConfig: {
+          callbackConfig: {
+            model: 'orders',
+            reducer: 'editFinalAdjustment',
+          },
+          showRemark: true,
+          showAmountPreview: false,
+          rows,
+          adjustments,
+          editAdj: adj,
+          defaultValues: {
+            ...adj,
             initialAmout: total,
           },
         },
@@ -177,27 +219,29 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
           marginLeft: theme.spacing(1),
         }}
       >
-        <Checkbox
-          simple
-          label={`Inclusive GST (${numeral(gstValue).format('0.00')}%)`}
-          style={{
-            position: 'absolute',
-            marginTop: -1,
-          }}
-          controlStyle={{ fontWeight: 500 }}
-          checked={checkedStatusIncldGST}
-          onChange={(e) => {
-            dispatch({
-              type: 'orders/updateState',
-              payload: {
-                isGSTInclusive: e.target.value,
-              },
-            })
-            dispatch({
-              type: 'orders/calculateAmount',
-            })
-          }}
-        />
+        <Authorized authority={OrderAccessRight()}>
+          <Checkbox
+            simple
+            label={`Inclusive GST (${numeral(gstValue).format('0.00')}%)`}
+            style={{
+              position: 'absolute',
+              marginTop: -1,
+            }}
+            controlStyle={{ fontWeight: 500 }}
+            checked={checkedStatusIncldGST}
+            onChange={(e) => {
+              dispatch({
+                type: 'orders/updateState',
+                payload: {
+                  isGSTInclusive: e.target.value,
+                },
+              })
+              dispatch({
+                type: 'orders/calculateAmount',
+              })
+            }}
+          />
+        </Authorized>
       </div>
     )
   }
@@ -218,7 +262,7 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
             overflow: 'hidden',
             display: 'inline-block',
             textOverflow: 'ellipsis',
-            marginLeft: theme.spacing(2),
+            marginLeft: theme.spacing(-1),
             textAlign: 'right',
             position: 'absolute',
           }}
@@ -227,32 +271,45 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
             <span>{adj.adjRemark}</span>
           </Tooltip>
         </div>
-        <div
-          style={{
-            marginLeft: isExistPackage ? theme.spacing(34.5) : theme.spacing(39.5),
-            position: 'absolute',
-          }}
-        >
-          <Tooltip title='Delete Adjustment'>
-            <Button
-              justIcon
-              color='danger'
-              style={{
-                top: -1,
-              }}
-            >
-              <Delete
-                onClick={() =>
-                  dispatch({
-                    type: 'orders/deleteFinalAdjustment',
-                    payload: {
-                      uid: adj.uid,
-                    },
-                  })}
-              />
-            </Button>
-          </Tooltip>
-        </div>
+        <Authorized authority={OrderAccessRight()}>
+          <div
+            style={{
+              marginLeft: isExistPackage ? theme.spacing(34.5) : theme.spacing(36.5),
+              position: 'absolute',
+            }}
+          >
+            <Tooltip title='Edit Adjustment'>
+              <Button
+                justIcon
+                color='primary'
+                style={{
+                  top: -1,
+                }}
+              >
+                <Edit onClick={() => editAdjustment(adj)} />
+              </Button>
+            </Tooltip>
+            <Tooltip title='Delete Adjustment'>
+              <Button
+                justIcon
+                color='danger'
+                style={{
+                  top: -1,
+                }}
+              >
+                <Delete
+                  onClick={() =>
+                    dispatch({
+                      type: 'orders/deleteFinalAdjustment',
+                      payload: {
+                        uid: adj.uid,
+                      },
+                    })}
+                />
+              </Button>
+            </Tooltip>
+          </div>
+        </Authorized>
       </div>
     )
   })
@@ -371,7 +428,6 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
           },
           integrated: {
             calculator: (type, r, getValue) => {
-              // console.log(type, rows, getValue)
               if (type === 'subTotal') {
                 return (
                   <span style={{ float: 'right', paddingRight: 70 }}>
@@ -475,24 +531,29 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
                       >
                         <Divider />
                       </div>
-                      <div style={{ marginLeft: isExistPackage ? theme.spacing(18) : theme.spacing(23) }}>
+                      <div style={{ marginLeft: isExistPackage ? theme.spacing(18) : theme.spacing(20) }}>
                         <span>
                           Invoice Adjustment
                           <Tooltip title='Add Adjustment'>
-                            <Button
-                              justIcon
-                              color='primary'
-                              style={{ top: -1, marginLeft: theme.spacing(1) }}
-                              onClick={addAdjustment}
-                            >
-                              <Add />
-                            </Button>
+                            <Authorized authority={OrderAccessRight()}>
+                              <Button
+                                justIcon
+                                color='primary'
+                                style={{
+                                  top: -1,
+                                  marginLeft: theme.spacing(1),
+                                }}
+                                onClick={addAdjustment}
+                              >
+                                <Add />
+                              </Button>
+                            </Authorized>
                           </Tooltip>
                         </span>
                       </div>
                       {itemAdj}
                       {gstValue >= 0 && (
-                        <div style={{ marginLeft: isExistPackage ? theme.spacing(13) : theme.spacing(18) }}>
+                        <div style={{ marginLeft: isExistPackage ? theme.spacing(13) : theme.spacing(15) }}>
                           {itemGST}
                         </div>
                       )}
@@ -505,7 +566,7 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
                       >
                         <Divider />
                       </div>
-                      <div style={{ marginLeft: isExistPackage ? theme.spacing(29.5) : theme.spacing(34.5) }}>
+                      <div style={{ marginLeft: isExistPackage ? theme.spacing(29.5) : theme.spacing(31.5) }}>
                         {itemTotal}
                       </div>
                     </div>
@@ -598,15 +659,8 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
         },
         {
           columnName: 'totalAfterItemAdjustment',
-          // align: 'right',
           type: 'currency',
           width: 100,
-          // render: (r) => {
-          //   if (!r.totalAfterItemAdjustment) return ''
-          //   return (
-          //     <NumberInput text currency value={r.totalAfterItemAdjustment} />
-          //   )
-          // },
         },
 
         {
@@ -615,23 +669,10 @@ export default ({ orders, dispatch, classes, from, codetable, theme }) => {
           align: 'center',
           sortingEnabled: false,
           render: (row) => {
-            if (row.type === '7' && from !== 'ca') return null
-            let editAccessRight
+            if (row.type === '7' && from !== 'EditOrder') return null
 
-            const orderType = orderTypes.find(
-              (item) => item.value === row.type,
-            ) || { accessRight: '' }
-            editAccessRight = orderType.accessRight
+            const editAccessRight = OrderItemAccessRight(row)
 
-            if (from && from === 'ca' && row.isOrderedByDoctor) {
-              const consultaionAccessRight = Authorized.check(editAccessRight)
-              if (
-                consultaionAccessRight &&
-                consultaionAccessRight.rights === 'enable'
-              ) {
-                editAccessRight = 'queue.dispense.editorder.modifydoctororder'
-              }
-            }
             return (
               <Authorized authority={editAccessRight}>
                 <div>
