@@ -11,15 +11,18 @@ import {
   CodeSelect,
 } from '@/components'
 import { connect } from 'dva'
-import Contact from '@/pages/Setting/Company/Contact' 
+import Contact from '@/pages/Setting/Company/Contact'
 
 @connect(({ settingReferralPerson }) => ({
   settingReferralPerson,
 }))
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingReferralPerson }) =>
-    settingReferralPerson.entity || settingReferralPerson.default,
+  mapPropsToValues: ({ settingReferralPerson }) => {
+    let entity = settingReferralPerson.entity || settingReferralPerson.default
+    let referralSourceIds = (entity.referralSources || []).map(x => x.id)
+    return { ...entity, referralSourceIds }
+  },
   validationSchema: Yup.object().shape({
     name: Yup.string().required(),
     referralSourceIds: Yup.string().required(),
