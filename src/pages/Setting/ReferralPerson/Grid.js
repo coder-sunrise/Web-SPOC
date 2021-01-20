@@ -137,29 +137,42 @@ class Grid extends PureComponent {
                     </Button>
                   </Tooltip>
                   <Tooltip title='Print Referral Person Label'>
-                    <Popper
-                      className={classNames({
-                        [classes.pooperResponsive]: true,
-                        [classes.pooperNav]: true,
-                      })}
-                      overlay={
-                        <MenuList role='menu'>
-                          {(row.referralSources || []).map((rs) => {
-                            return (
-                              <MenuItem
-                                onClick={() => this.handleClick(row.id, rs.id)}
-                              >
-                                {rs.name}
-                              </MenuItem>
-                            )
-                          })}
-                        </MenuList>
-                      }
-                    >
-                      <Button size='sm' justIcon color='primary'>
+                    {row.referralSources.length === 1 ? (
+                      <Button
+                        size='sm'
+                        justIcon
+                        color='primary'
+                        onClick={() =>
+                          this.handleClick(row.id, row.referralSources[0].id)}
+                      >
                         <Print />
                       </Button>
-                    </Popper>
+                    ) : (
+                      <Popper
+                        className={classNames({
+                          [classes.pooperResponsive]: true,
+                          [classes.pooperNav]: true,
+                        })}
+                        overlay={
+                          <MenuList role='menu'>
+                            {(row.referralSources || []).map((rs) => {
+                              return (
+                                <MenuItem
+                                  onClick={() =>
+                                    this.handleClick(row.id, rs.id)}
+                                >
+                                  {rs.name}
+                                </MenuItem>
+                              )
+                            })}
+                          </MenuList>
+                        }
+                      >
+                        <Button size='sm' justIcon color='primary'>
+                          <Print />
+                        </Button>
+                      </Popper>
+                    )}
                   </Tooltip>
                 </Fragment>
               )
