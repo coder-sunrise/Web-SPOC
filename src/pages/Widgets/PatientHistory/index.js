@@ -784,10 +784,10 @@ class PatientHistory extends Component {
       {
         patientName: name,
         patientAccountNo,
-        patientNationality: nationality ? nationality.name : 'Unknown',
+        patientNationality: nationality ? nationality.name : '',
         patientAge: age,
-        patientSex: gender ? gender.name : 'Unknown',
-        patientG6PD: g6PD ? g6PD.name : 'Unknown',
+        patientSex: gender ? gender.name : '',
+        patientG6PD: g6PD ? g6PD.name : '',
         patientAllergy: allergies.map((o) => o.allergyName).join(', '),
         patientSocialHistory: socialHistory,
         patientFamilyHistory: familyHistory,
