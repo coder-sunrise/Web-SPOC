@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import _ from 'lodash'
@@ -10,6 +10,7 @@ import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 import { formatMessage } from 'umi/locale' // common component
+import Warining from '@material-ui/icons/Error'
 import {
   Button,
   ProgressButton,
@@ -28,7 +29,6 @@ import {
   NOTIFICATION_STATUS,
 } from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
-import Warining from '@material-ui/icons/Error'
 // sub components
 import TableData from './TableData'
 import VaccinationGrid from './VaccinationGrid'

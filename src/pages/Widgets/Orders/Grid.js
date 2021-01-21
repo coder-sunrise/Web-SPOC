@@ -274,7 +274,7 @@ export default ({
         <Authorized authority={OrderAccessRight()}>
           <div
             style={{
-              marginLeft: isExistPackage ? theme.spacing(34.5) : theme.spacing(36.5),
+              marginLeft: isExistPackage ? theme.spacing(31.5) : theme.spacing(36.5),
               position: 'absolute',
             }}
           >
@@ -519,7 +519,7 @@ export default ({
                     }}
                   >
                     <div>
-                      <div style={{ marginLeft: isExistPackage ? theme.spacing(26) : theme.spacing(31) }}>
+                      <div style={{ marginLeft: isExistPackage ? theme.spacing(23) : theme.spacing(31) }}>
                         {itemSubTotal}
                       </div>
                       <div
@@ -531,7 +531,7 @@ export default ({
                       >
                         <Divider />
                       </div>
-                      <div style={{ marginLeft: isExistPackage ? theme.spacing(18) : theme.spacing(20) }}>
+                      <div style={{ marginLeft: isExistPackage ? theme.spacing(15) : theme.spacing(20) }}>
                         <span>
                           Invoice Adjustment
                           <Tooltip title='Add Adjustment'>
@@ -553,7 +553,7 @@ export default ({
                       </div>
                       {itemAdj}
                       {gstValue >= 0 && (
-                        <div style={{ marginLeft: isExistPackage ? theme.spacing(13) : theme.spacing(15) }}>
+                        <div style={{ marginLeft: isExistPackage ? theme.spacing(10) : theme.spacing(15) }}>
                           {itemGST}
                         </div>
                       )}
@@ -566,7 +566,7 @@ export default ({
                       >
                         <Divider />
                       </div>
-                      <div style={{ marginLeft: isExistPackage ? theme.spacing(29.5) : theme.spacing(31.5) }}>
+                      <div style={{ marginLeft: isExistPackage ? theme.spacing(26.5) : theme.spacing(31.5) }}>
                         {itemTotal}
                       </div>
                     </div>

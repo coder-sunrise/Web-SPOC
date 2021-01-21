@@ -232,7 +232,37 @@ import { DURATION_UNIT } from '@/utils/constants'
           packageGlobalId,
         }
       }
-      return item
+
+      let newCORVaccinationCert = []
+      // if (item.isGenerateCertificate) {
+      //   const { documenttemplate = [] } = codetable
+      //   const defaultTemplate = documenttemplate.find(
+      //     (dt) =>
+      //       dt.isDefaultTemplate === true && dt.documentTemplateTypeFK === 3,
+      //   )
+      //   if (defaultTemplate) {
+      //     newCORVaccinationCert = [
+      //       {
+      //         type: '3',
+      //         certificateDate: moment(),
+      //         issuedByUserFK: clinicianProfile.userProfileFK,
+      //         subject: `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
+      //           ''}, ${Math.floor(
+      //           moment.duration(moment().diff(dob)).asYears(),
+      //         )}`,
+      //         content: ReplaceCertificateTeplate(
+      //           defaultTemplate.templateContent,
+      //           item,
+      //         ),
+      //         sequence: nextDocumentSequence,
+      //       },
+      //     ]
+      //     nextDocumentSequence += 1
+      //   } else {
+      //     showNoTemplate = true
+      //   }
+      // }
+      return { ...item, corVaccinationCert: newCORVaccinationCert }
     }
 
     const getOrderServiceCenterServiceFromPackage = (

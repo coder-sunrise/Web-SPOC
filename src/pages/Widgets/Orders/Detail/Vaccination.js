@@ -1001,7 +1001,7 @@ class Vaccination extends PureComponent {
               }}
               />
             </GridItem>
-            <GridItem xs={3} className={classes.editor} v>
+            <GridItem xs={3} className={classes.editor}>
               <FastField
                 name='totalAfterItemAdjustment'
                 render={(args) => {
@@ -1024,9 +1024,7 @@ class Vaccination extends PureComponent {
           <GridContainer>
             <GridItem
               xs={8}
-              style={{
-                position: 'relative',
-              }}
+              className={classes.editor}
             >
               <FastField
                 name='isGenerateCertificate'
@@ -1035,10 +1033,6 @@ class Vaccination extends PureComponent {
                     <Checkbox
                       label='Generate Certificate'
                       {...args}
-                      style={{
-                        position: 'absolute',
-                        bottom: 0,
-                      }}
                     />
                   )
                 }}
