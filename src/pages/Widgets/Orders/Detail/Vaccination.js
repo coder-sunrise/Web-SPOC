@@ -152,8 +152,8 @@ let i = 0
               issuedByUserFK: clinicianProfile.userProfileFK,
               subject: `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
                 ''}, ${Math.floor(
-                moment.duration(moment().diff(dob)).asYears(),
-              )}`,
+                  moment.duration(moment().diff(dob)).asYears(),
+                )}`,
               content: ReplaceCertificateTeplate(
                 defaultTemplate.templateContent,
                 { ...values, subject: currentType.getSubject(values) },
@@ -292,15 +292,12 @@ class Vaccination extends PureComponent {
     setFieldValue('isExactAmount', true)
     setFieldValue('adjValue', 0)
 
-    if (op.sellingPrice) {
-      setFieldValue('unitPrice', op.sellingPrice)
-      setFieldValue('totalPrice', op.sellingPrice * values.quantity)
-      this.updateTotalPrice(op.sellingPrice * values.quantity)
-    } else {
-      setFieldValue('unitPrice', undefined)
-      setFieldValue('totalPrice', undefined)
-      this.updateTotalPrice(undefined)
-    }
+    // 17882
+    let unitprice = op.sellingPrice || 0
+    setFieldValue('unitPrice', unitprice)
+    setFieldValue('totalPrice', unitprice * values.quantity)
+    this.updateTotalPrice(unitprice * values.quantity)
+
     if (disableEdit === false) {
       setFieldValue('batchNo', defaultBatch ? defaultBatch.batchNo : undefined)
       setFieldValue(
@@ -351,18 +348,12 @@ class Vaccination extends PureComponent {
       newTotalQuantity < minQuantity ? minQuantity : newTotalQuantity
 
     setFieldValue(`quantity`, newTotalQuantity)
-    if (currentVaccination.sellingPrice) {
-      setFieldValue('unitPrice', currentVaccination.sellingPrice)
-      setFieldValue(
-        'totalPrice',
-        currentVaccination.sellingPrice * newTotalQuantity,
-      )
-      this.updateTotalPrice(currentVaccination.sellingPrice * newTotalQuantity)
-    } else {
-      setFieldValue('unitPrice', undefined)
-      setFieldValue('totalPrice', undefined)
-      this.updateTotalPrice(undefined)
-    }
+
+    // 17882
+    let unitprice = currentVaccination.sellingPrice || 0
+    setFieldValue('unitPrice', unitprice)
+    setFieldValue('totalPrice', unitprice * newTotalQuantity)
+    this.updateTotalPrice(unitprice * newTotalQuantity) 
   }
 
   updateTotalPrice = (v) => {
