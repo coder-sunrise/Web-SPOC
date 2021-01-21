@@ -31,6 +31,7 @@ class PatientSearch extends PureComponent {
     columns: [
       { name: 'name', title: 'Patient Name' },
       { name: 'patientAccountNo', title: 'Acc. No.' },
+      { name: 'patientReferenceNo', title: 'Ref. No.' },
       { name: 'gender/age', title: 'Gender / Age' },
       { name: 'dob', title: 'DOB' },
       { name: 'mobileNo', title: 'Mobile No.' },
@@ -69,7 +70,8 @@ class PatientSearch extends PureComponent {
           )
         },
       },
-      { columnName: 'patientAccountNo', width: 140 },
+      { columnName: 'patientAccountNo', width: 120 },
+      { columnName: 'patientReferenceNo', width: 105 },
       { columnName: 'mobileNo', width: 140, sortingEnabled: false },
       {
         columnName: 'gender/age',
@@ -82,7 +84,7 @@ class PatientSearch extends PureComponent {
         columnName: 'dob',
         type: 'date',
         sortingEnabled: false,
-        width: 120,
+        width: 100,
       },
       {
         columnName: 'action',
