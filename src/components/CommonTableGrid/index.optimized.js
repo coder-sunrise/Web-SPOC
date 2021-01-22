@@ -880,6 +880,7 @@ class CommonTableGrid extends PureComponent {
       sortConfig,
       filter,
       columnSelectable = false,
+      fixedHiddenColumns = [],
       columnReorderable = false,
     } = {
       ...this.defaultFunctionConfig,
@@ -1242,6 +1243,11 @@ class CommonTableGrid extends PureComponent {
                     }
                     this.debouncedUploadGridSetting(gridSetting)
                   }}
+                />
+              )}
+              {fixedHiddenColumns.length > 0 && !columnSelectable && (
+                <TableColumnVisibility
+                  defaultHiddenColumnNames={fixedHiddenColumns}
                 />
               )}
               {columnSelectable && (

@@ -4,6 +4,7 @@ import router from 'umi/router'
 import { connect } from 'dva'
 import withStyles from '@material-ui/core/styles/withStyles'
 // common component
+import Warining from '@material-ui/icons/Error'
 import {
   GridContainer,
   GridItem,
@@ -25,7 +26,6 @@ import { widgets } from '@/utils/widgets'
 import Authorized from '@/utils/Authorized'
 import { sendNotification } from '@/utils/realtime'
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
-import Warining from '@material-ui/icons/Error'
 import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
 import ConsumePackage from '@/pages/Widgets/Orders/Detail/ConsumePackage'
 
@@ -55,7 +55,7 @@ const discardConsultation = async ({ dispatch, dispense }) => {
   }
 }
 const styles = () => ({})
-@connect(({ consultation }) => ({
+@connect(({ consultation, user }) => ({
   consultation,
   user,
 }))

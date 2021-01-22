@@ -56,7 +56,7 @@ export default ({
       const settings = JSON.parse(localStorage.getItem('clinicSettings'))
       const { isEnablePackage = false } = settings
 
-      const packageItems = rows.filter(item => item.isPackage)
+      const packageItems = rows.filter(item => item.isPackage && !item.isDeleted)
       const existPackage = isEnablePackage && packageItems.length > 0
       setIsExistPackage(existPackage)
 
@@ -375,22 +375,6 @@ export default ({
     )
   }
 
-  let newColumns = [        
-    { name: 'type', title: 'Type' },
-    { name: 'subject', title: 'Name' },
-    { name: 'description', title: 'Description' },
-    { name: 'adjAmount', title: 'Adj.' },
-    { name: 'totalAfterItemAdjustment', title: 'Total' },
-    { name: 'actions', title: 'Actions' },    
-  ]
-
-  if (isExistPackage) {
-    newColumns.push({
-      name: 'packageGlobalId',
-      title: 'Package',
-    })
-  }
-
   return (
     <CommonTableGrid
       size='sm'
@@ -399,13 +383,22 @@ export default ({
       rows={rows}
       onRowDoubleClick={editRow}
       getRowId={(r) => r.uid}
-      columns={newColumns}
+      columns={[        
+        { name: 'type', title: 'Type' },
+        { name: 'subject', title: 'Name' },
+        { name: 'description', title: 'Description' },
+        { name: 'adjAmount', title: 'Adj.' },
+        { name: 'totalAfterItemAdjustment', title: 'Total' },
+        { name: 'actions', title: 'Actions' },    
+        { name: 'packageGlobalId', title: 'Package' },    
+      ]}
       defaultSorting={[
         { columnName: 'packageGlobalId', direction: 'asc' },
         { columnName: 'sequence', direction: 'asc' },
       ]}
       FuncProps={{
         pager: false,
+        fixedHiddenColumns: ['packageGlobalId'],
         grouping: isExistPackage,
         groupingConfig: {
           state: {

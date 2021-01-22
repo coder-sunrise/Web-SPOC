@@ -266,7 +266,7 @@ class PatientDetail extends PureComponent {
         }),
       },
       {
-        id: '9',
+        id: '10',
         name: 'Package Drawdown',
         access: [
           'patientdatabase.newpatient',
@@ -290,15 +290,15 @@ class PatientDetail extends PureComponent {
         this.widgets = this.widgets.filter((t) => t.id !== '9')
       }
     }
+
+    const { clinicSettings } = this.props
+    if (!clinicSettings.isEnablePackage) {
+      this.widgets = this.widgets.filter(w => w.id !== '10')
+    }
   }
 
   componentDidMount () {
     this.checkHasActiveSession()
-
-    const { clinicSettings } = this.props
-    if (!clinicSettings.isEnablePackage) {
-      this.widgets = this.widgets.filter(w => w.id !== '9')
-    }
   }
 
   componentWillUnmount () {
@@ -596,7 +596,7 @@ class PatientDetail extends PureComponent {
                         onClick={this.registerVisit}
                       >
                         Register Visit
-                    </Button>
+                      </Button>
                     </Authorized>
                   )}
               </CardBody>
