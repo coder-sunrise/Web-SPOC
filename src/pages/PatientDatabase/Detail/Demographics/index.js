@@ -68,6 +68,7 @@ class Demographic extends PureComponent {
             },
           }) 
         }}
+        handleFilter={() => true}
         valueField='id'
         label='Patient Name/Account No./Mobile No.'
         renderDropdown={(p) => {
