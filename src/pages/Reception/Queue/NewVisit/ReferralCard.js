@@ -196,7 +196,7 @@ class ReferralCard extends PureComponent {
         }}
         handleFilter={() => true}
         valueField='id'
-        label='Patient Name/Account No./Mobile No.'
+        label='Patient Name/Account No./Mobile No./Ref. No.'
         renderDropdown={(p) => {
           return (
             <div>

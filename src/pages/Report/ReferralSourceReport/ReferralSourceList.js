@@ -98,7 +98,7 @@ class ReferralSourceList extends PureComponent {
         row: {
           contentComponent: (group) => {
             const { row } = group
-            if (row.value) {
+            if (row.compoundKey !== 'Patient As Referral' && row.key !== 'Patient As Referral' && row.value !== 'Patient As Referral') {
               return (
                 <span>
                   Company Name: {row.value}
