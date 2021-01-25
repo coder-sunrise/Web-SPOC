@@ -75,7 +75,7 @@ const Contact = (props) => {
                 render={(args) => (
                   <MobileNumberInput
                     {...args}
-                    label={(isReferralSource || isReferralPerson) ? 'Mobile Number' : 'Contact Number'}
+                    label={isReferralPerson ? 'Mobile Number' : 'Contact Number'}
                   />
                 )}
               />
