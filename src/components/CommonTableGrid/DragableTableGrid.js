@@ -28,6 +28,11 @@ const styles = () => ({
   },
   sortableContainer: {
     zIndex: 10000,
+    paddingLeft: 22,
+    paddingRight: 22,
+    paddingTop: 12,
+    paddingBottom: 12,
+    backgroundColor: '#cccccc',
   },
 })
 
@@ -72,6 +77,11 @@ const DragableTableGrid = ({
         {...restProps}
         onSortEnd={onSortEnd}
         useDragHandle
+        updateBeforeSortStart={(aa) => {
+          console.log('111', aa.node.innerHTML)
+          aa.node.innerHTML =
+            '<svg focusable="false" viewBox="0 0 24 19" aria-hidden="true" style="width:20"><path d="M3 15h18v-2H3v2zm0 4h18v-2H3v2zm0-8h18V9H3v2zm0-6v2h18V5H3z"></path></svg>&nbsp;&nbsp;Drag to re-order '
+        }}
         helperClass={classes.sortableContainer}
       />
     )
