@@ -49,7 +49,7 @@ class FilterBar extends PureComponent {
       <div className={classes.filterBar}>
         <GridContainer>
           <Authorized authority='patientdatabase/searchpatient'>
-            <GridItem md={12} lg={3} style={{ position: 'relative' }}>
+            <GridItem md={12} lg={5} style={{ position: 'relative' }}>
               <FastField
                 name='search'
                 render={(args) => {
@@ -66,7 +66,7 @@ class FilterBar extends PureComponent {
               />
             </GridItem>
           </Authorized>
-          <GridItem md={12} lg={9}>
+          <GridItem md={12} lg={7}>
             <div className={classes.filterBtn}>
               <Authorized authority='patientdatabase/searchpatient'>
                 <ProgressButton
