@@ -68,17 +68,19 @@ const Contact = (props) => {
             </GridItem>
           )}
 
-          <GridItem md={6}>
-            <FastField
-              name='contact.mobileContactNumber.number'
-              render={(args) => (
-                <MobileNumberInput
-                  {...args}
-                  label={(isReferralSource || isReferralPerson) ? 'Mobile Number' : 'Contact Number'}
-                />
-              )}
-            />
-          </GridItem>
+          {!isReferralSource &&
+            <GridItem md={6}>
+              <FastField
+                name='contact.mobileContactNumber.number'
+                render={(args) => (
+                  <MobileNumberInput
+                    {...args}
+                    label={isReferralPerson ? 'Mobile Number' : 'Contact Number'}
+                  />
+                )}
+              />
+            </GridItem>
+          }
 
           <GridItem md={6}>
             <FastField
@@ -100,28 +102,20 @@ const Contact = (props) => {
 
           {(isCopayer || isReferralSource || isReferralPerson) && (
             <Fragment>
-              <GridItem md={6}>
-                <FastField
-                  name='contact.contactEmailAddress.emailAddress'
-                  render={(args) => <TextField label='Email' {...args} />}
-                />
-              </GridItem>
-              {isCopayer && (
+              {(isCopayer || isReferralSource) && (
                 <GridItem md={6}>
                   <FastField
                     name='contact.contactWebsite.website'
                     render={(args) => <TextField label='URL' {...args} />}
                   />
                 </GridItem>
-              )}
-              {isReferralSource && (
-                <GridItem md={12}>
-                  <FastField
-                    name='contact.contactWebsite.website'
-                    render={(args) => <TextField label='URL' {...args} />}
-                  />
-                </GridItem>
-              )}
+              )} 
+              <GridItem md={6}>
+                <FastField
+                  name='contact.contactEmailAddress.emailAddress'
+                  render={(args) => <TextField label='Email' {...args} />}
+                />
+              </GridItem>
             </Fragment>
           )}
         </GridContainer>
