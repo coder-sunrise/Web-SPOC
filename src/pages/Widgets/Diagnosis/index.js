@@ -87,6 +87,40 @@ class Diagnosis extends PureComponent {
     this.addDiagnosis(index + 1)
   }
 
+  clearFavouriteDiagnosisMessage = (uid) => {
+    const { form } = this.arrayHelpers
+    const { values, setFieldValue } = form
+    setFieldValue(
+      'corDiagnosis',
+      (values.corDiagnosis || []).map((d) => {
+        if (d.uid === uid) {
+          return {
+            ...d,
+            favouriteDiagnosisMessage: undefined,
+          }
+        }
+        return d
+      }),
+    )
+  }
+
+  clearFavouriteDiagnosisCategoryMessage = (uid) => {
+    const { form } = this.arrayHelpers
+    const { values, setFieldValue } = form
+    setFieldValue(
+      'corDiagnosis',
+      (values.corDiagnosis || []).map((d) => {
+        if (d.uid === uid) {
+          return {
+            ...d,
+            favouriteDiagnosisCategoryMessage: undefined,
+          }
+        }
+        return d
+      }),
+    )
+  }
+
   saveDiagnosisAsFavourite = (dignosisCode, uid) => {
     const { dispatch, diagnosis } = this.props
     let newFavouriteDiagnosis
@@ -97,7 +131,7 @@ class Diagnosis extends PureComponent {
     } else {
       addNewFavorite = true
       newFavouriteDiagnosis = [
-        ...diagnosis.favouriteDiagnosis,
+        ...(diagnosis.favouriteDiagnosis || []),
         dignosisCode,
       ]
     }
@@ -135,18 +169,7 @@ class Diagnosis extends PureComponent {
             )
 
             setTimeout(() => {
-              setFieldValue(
-                'corDiagnosis',
-                (values.corDiagnosis || []).map((d) => {
-                  if (d.uid === uid) {
-                    return {
-                      ...d,
-                      favouriteDiagnosisMessage: undefined,
-                    }
-                  }
-                  return d
-                }),
-              )
+              this.clearFavouriteDiagnosisMessage(uid)
             }, 3000)
           }
         })
@@ -188,18 +211,7 @@ class Diagnosis extends PureComponent {
             )
 
             setTimeout(() => {
-              setFieldValue(
-                'corDiagnosis',
-                (values.corDiagnosis || []).map((d) => {
-                  if (d.uid === uid) {
-                    return {
-                      ...d,
-                      favouriteDiagnosisCategoryMessage: undefined,
-                    }
-                  }
-                  return d
-                }),
-              )
+              this.clearFavouriteDiagnosisCategoryMessage(uid)
             }, 3000)
           }
         })

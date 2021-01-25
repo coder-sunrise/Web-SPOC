@@ -61,19 +61,14 @@ class Demographic extends PureComponent {
     return (
       <Select
         query={(v) => {
-          const search = {}
-          if (typeof v === 'number') {
-            search.id = v // for default getter based on id
-          } else {
-            search.name = v
-            search.patientAccountNo = v
-            search['contactFkNavigation.contactNumber.number'] = v
-          }
           return queryList({
-            ...search,
-            combineCondition: 'or',
-          })
+            apiCriteria: {
+              searchValue: v,
+              includeinactive: false,
+            },
+          }) 
         }}
+        handleFilter={() => true}
         valueField='id'
         label='Patient Name/Account No./Mobile No.'
         renderDropdown={(p) => {
@@ -91,18 +86,6 @@ class Demographic extends PureComponent {
                 </span>
               </p>
             </div>
-          )
-        }}
-        filterOption={(input, option) => {
-          // console.log(input, option.props)
-          const { data } = option.props
-          const search = input.toLowerCase()
-          return (
-            (data.name || '').toLowerCase().indexOf(search) >= 0 ||
-            (data.patientAccountNo || '').toLowerCase().indexOf(search) >= 0 ||
-            (data.mobileNo || '').toLowerCase().indexOf(search) >= 0 ||
-            (data.officeNo || '').toLowerCase().indexOf(search) >= 0 ||
-            (data.homeNo || '').toLowerCase().indexOf(search) >= 0
           )
         }}
         onChange={(v) => {

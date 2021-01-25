@@ -44,7 +44,7 @@ const PatientInfoInput = ({
 
   return (
     <React.Fragment>
-      <GridItem xs md={3}>
+      <GridItem xs md={4}>
         <div className={classnames(classes.buttonGroup)}>
           <FastField
             name='search'
@@ -123,7 +123,7 @@ const PatientInfoInput = ({
           )}
         </div>
       </GridItem>
-      <GridItem ms md={4} />
+      <GridItem ms md={3} />
       <GridItem xs md={3}>
         {isEdit ? (
           <TextField value={values.patientName} label='Patient Name' disabled />

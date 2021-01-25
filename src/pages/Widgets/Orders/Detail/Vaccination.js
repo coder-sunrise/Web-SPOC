@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import moment from 'moment'
 import { connect } from 'dva'
 import _ from 'lodash'
 import Add from '@material-ui/icons/Add'
@@ -18,22 +19,39 @@ import {
   ProgressButton,
   Tooltip,
   Switch,
+  Checkbox,
+  notification,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 import { currencySymbol } from '@/utils/config'
-import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
+import {
+  GetOrderItemAccessRight,
+  ReplaceCertificateTeplate,
+} from '@/pages/Widgets/Orders/utils'
 import LowStockInfo from './LowStockInfo'
 import AddFromPast from './AddMedicationFromPast'
+import { getClinicianProfile } from '../../ConsultationDocument/utils'
 
 let i = 0
-@connect(({ global, codetable, visitRegistration, user }) => ({
-  global,
-  codetable,
-  visitRegistration,
-  user,
-}))
+@connect(
+  ({
+    global,
+    codetable,
+    visitRegistration,
+    user,
+    patient,
+    consultationDocument,
+  }) => ({
+    global,
+    codetable,
+    visitRegistration,
+    user,
+    patient,
+    consultationDocument,
+  }),
+)
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type }) => {
     const newOrders = orders.entity || orders.defaultVaccination
@@ -73,15 +91,80 @@ let i = 0
     ),
   }),
 
-  handleSubmit: (values, { props, onConfirm, resetForm, setValues }) => {
-    const { dispatch, orders, currentType, getNextSequence, user } = props
-    const { rows } = orders
+  handleSubmit: (values, { props, onConfirm, setValues }) => {
+    const {
+      dispatch,
+      orders,
+      currentType,
+      getNextSequence,
+      user,
+      codetable,
+      patient,
+      visitRegistration,
+      consultationDocument: { rows = [] },
+    } = props
     let { batchNo } = values
     if (batchNo instanceof Array) {
       if (batchNo && batchNo.length > 0) {
         batchNo = batchNo[0]
       }
     }
+
+    // create certificate when create vaccination that auto generate certificate checked
+    const { isGenerateCertificate, corVaccinationCert = [] } = values
+
+    let newCORVaccinationCert = corVaccinationCert
+    if (isGenerateCertificate) {
+      const { documenttemplate = [] } = codetable
+      if (corVaccinationCert.find((vc) => !vc.isDeleted)) {
+        notification.warning({
+          message:
+            'Any changes will not be reflected in the vaccination certificate.',
+        })
+      } else {
+        const defaultTemplate = documenttemplate.find(
+          (dt) =>
+            dt.isDefaultTemplate === true && dt.documentTemplateTypeFK === 3,
+        )
+        if (!defaultTemplate) {
+          notification.warning({
+            message:
+              'No template found. Select a template in Document Template.',
+          })
+        } else {
+          const { entity: visitEntity } = visitRegistration
+          const clinicianProfile = getClinicianProfile(codetable, visitEntity)
+          const { entity } = patient
+          const { name, patientAccountNo, genderFK, dob } = entity
+          const { ctgender = [] } = codetable
+          const gender = ctgender.find((o) => o.id === genderFK) || {}
+          const allDocs = rows.filter((s) => !s.isDeleted)
+          let nextSequence = 1
+          if (allDocs && allDocs.length > 0) {
+            const { sequence } = _.maxBy(allDocs, 'sequence')
+            nextSequence = sequence + 1
+          }
+          newCORVaccinationCert = [
+            ...corVaccinationCert,
+            {
+              type: '3',
+              certificateDate: moment(),
+              issuedByUserFK: clinicianProfile.userProfileFK,
+              subject: `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
+                ''}, ${Math.floor(
+                  moment.duration(moment().diff(dob)).asYears(),
+                )}`,
+              content: ReplaceCertificateTeplate(
+                defaultTemplate.templateContent,
+                { ...values, subject: currentType.getSubject(values) },
+              ),
+              sequence: nextSequence,
+            },
+          ]
+        }
+      }
+    }
+
     const data = {
       isOrderedByDoctor:
         user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
@@ -94,6 +177,7 @@ let i = 0
         values.adjAmount < 0
           ? -Math.abs(values.adjValue)
           : Math.abs(values.adjValue),
+      corVaccinationCert: newCORVaccinationCert,
     }
     dispatch({
       type: 'orders/upsertRow',
@@ -153,7 +237,7 @@ class Vaccination extends PureComponent {
   }
 
   changeVaccination = (v, op = {}) => {
-    const { setFieldValue, values, disableEdit } = this.props
+    const { setFieldValue, values, disableEdit, codetable } = this.props
     let defaultBatch
     if (op.vaccinationStock) {
       defaultBatch = op.vaccinationStock.find((o) => o.isDefault === true)
@@ -208,15 +292,12 @@ class Vaccination extends PureComponent {
     setFieldValue('isExactAmount', true)
     setFieldValue('adjValue', 0)
 
-    if (op.sellingPrice) {
-      setFieldValue('unitPrice', op.sellingPrice)
-      setFieldValue('totalPrice', op.sellingPrice * values.quantity)
-      this.updateTotalPrice(op.sellingPrice * values.quantity)
-    } else {
-      setFieldValue('unitPrice', undefined)
-      setFieldValue('totalPrice', undefined)
-      this.updateTotalPrice(undefined)
-    }
+    // 17882
+    let unitprice = op.sellingPrice || 0
+    setFieldValue('unitPrice', unitprice)
+    setFieldValue('totalPrice', unitprice * values.quantity)
+    this.updateTotalPrice(unitprice * values.quantity)
+
     if (disableEdit === false) {
       setFieldValue('batchNo', defaultBatch ? defaultBatch.batchNo : undefined)
       setFieldValue(
@@ -224,6 +305,7 @@ class Vaccination extends PureComponent {
         defaultBatch ? defaultBatch.expiryDate : undefined,
       )
     }
+    setFieldValue('isGenerateCertificate', op.isAutoGenerateCertificate)
     setTimeout(() => {
       this.calculateQuantity(op)
     }, 1)
@@ -266,18 +348,12 @@ class Vaccination extends PureComponent {
       newTotalQuantity < minQuantity ? minQuantity : newTotalQuantity
 
     setFieldValue(`quantity`, newTotalQuantity)
-    if (currentVaccination.sellingPrice) {
-      setFieldValue('unitPrice', currentVaccination.sellingPrice)
-      setFieldValue(
-        'totalPrice',
-        currentVaccination.sellingPrice * newTotalQuantity,
-      )
-      this.updateTotalPrice(currentVaccination.sellingPrice * newTotalQuantity)
-    } else {
-      setFieldValue('unitPrice', undefined)
-      setFieldValue('totalPrice', undefined)
-      this.updateTotalPrice(undefined)
-    }
+
+    // 17882
+    let unitprice = currentVaccination.sellingPrice || 0
+    setFieldValue('unitPrice', unitprice)
+    setFieldValue('totalPrice', unitprice * newTotalQuantity)
+    this.updateTotalPrice(unitprice * newTotalQuantity) 
   }
 
   updateTotalPrice = (v) => {
@@ -855,7 +931,28 @@ class Vaccination extends PureComponent {
             </GridItem>
           </GridContainer>
           <GridContainer>
-            <GridItem xs={8} />
+            <GridItem
+              xs={8}
+              style={{
+                position: 'relative',
+              }}
+            >
+              <FastField
+                name='isGenerateCertificate'
+                render={(args) => {
+                  return (
+                    <Checkbox
+                      label='Generate Certificate'
+                      {...args}
+                      style={{
+                        position: 'absolute',
+                        bottom: 0,
+                      }}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
             <GridItem xs={3}>
               <FastField
                 name='totalAfterItemAdjustment'

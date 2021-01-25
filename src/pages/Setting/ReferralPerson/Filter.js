@@ -10,33 +10,31 @@ import {
   Button,
   TextField,
   ProgressButton,
+  CodeSelect,
+  Field,
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingReferralSource }) =>
-    settingReferralSource.filter || {},
-  handleSubmit: (values, { props}) => {
-
-    const {  isActive, name, institution, department } = values
-
+  mapPropsToValues: ({ settingReferralPerson }) =>
+    settingReferralPerson.filter || {},
+  handleSubmit: (values, { props }) => {
+    const { name, referralSourceId } = values
     const payload = {
-      isActive,
       name,
-      institution,
-      department,
+      'ReferralSource_ReferralPerson.ReferralSourceFK': referralSourceId,
     }
 
     props.dispatch({
-      type: 'settingReferralSource/query',
+      type: 'settingReferralPerson/query',
       payload,
     })
   },
-  displayName: 'ReferralSourceFilter',
+  displayName: 'ReferralPersonFilter',
 })
 
 class Filter extends PureComponent {
   render () {
-    const { classes,handleSubmit } = this.props
+    const { classes, handleSubmit, referralSource } = this.props
     return (
       <div className={classes.filterBar}>
         <GridContainer>
@@ -47,7 +45,21 @@ class Filter extends PureComponent {
                 return <TextField label='Name' {...args} />
               }}
             />
-          </GridItem> 
+          </GridItem>
+          <GridItem xs={6} md={3}> 
+            <Field
+              name='referralSourceId'
+              render={(args) => (
+                <CodeSelect
+                  {...args}
+                  options={referralSource}
+                  labelField='name'
+                  mode='single'
+                  label='Referral Source'
+                />
+              )}
+            />
+          </GridItem>
         </GridContainer>
 
         <GridContainer>
@@ -65,7 +77,7 @@ class Filter extends PureComponent {
                 color='primary'
                 onClick={() => {
                   this.props.dispatch({
-                    type: 'settingReferralSource/updateState',
+                    type: 'settingReferralPerson/updateState',
                     payload: {
                       entity: undefined,
                     },

@@ -1,7 +1,7 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
-import * as service from '../services'
 import { notification } from '@/components'
+import * as service from '../services/referralSource'
 
 export default createListViewModel({
   namespace: 'settingReferralSource',

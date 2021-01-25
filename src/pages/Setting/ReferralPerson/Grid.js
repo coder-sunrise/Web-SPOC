@@ -1,26 +1,26 @@
 import React, { PureComponent, Fragment } from 'react'
 import { connect } from 'dva'
 import classNames from 'classnames'
+import withWebSocket from '@/components/Decorator/withWebSocket'
 import Edit from '@material-ui/icons/Edit'
 import Print from '@material-ui/icons/Print'
-import { MenuItem, MenuList } from '@material-ui/core'
-import withWebSocket from '@/components/Decorator/withWebSocket'
 import { CommonTableGrid, Button, Tooltip, Popper } from '@/components'
+import { MenuItem, MenuList } from '@material-ui/core'
 import { status } from '@/utils/codes'
-import { REPORT_ID } from '@/utils/constants'
 import { getRawData } from '@/services/report'
+import { REPORT_ID } from '@/utils/constants'
 
 @connect(({ clinicSettings }) => ({
   clinicSettings,
 }))
 class Grid extends PureComponent {
   editRow = (row, e) => {
-    const { dispatch, settingReferralSource } = this.props
+    const { dispatch, settingReferralPerson } = this.props
 
-    const { list } = settingReferralSource
+    const { list } = settingReferralPerson
 
     dispatch({
-      type: 'settingReferralSource/updateState',
+      type: 'settingReferralPerson/updateState',
       payload: {
         showModal: true,
         entity: list.find((o) => o.id === row.id),
@@ -28,7 +28,7 @@ class Grid extends PureComponent {
     })
   }
 
-  handleClick = async (referralSourceId, referralPersonId) => {
+  handleClick = async (referralPersonId, referralSourceId) => {
     const { handlePrint, clinicSettings } = this.props
     const { labelPrinterSize } = clinicSettings.settings
 
@@ -42,12 +42,12 @@ class Grid extends PureComponent {
     }
     const reportID =
       REPORT_ID[
-        'REFERRAL_SOURCE_LABEL_'.concat(sizeConverter(labelPrinterSize))
+        'REFERRAL_PERSON_LABEL_'.concat(sizeConverter(labelPrinterSize))
       ]
 
     const data = await getRawData(reportID, {
-      referralSourceId,
       referralPersonId,
+      referralSourceId,
     })
     const payload = [
       {
@@ -65,14 +65,14 @@ class Grid extends PureComponent {
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
-        type='settingReferralSource'
+        type='settingReferralPerson'
         onRowDoubleClick={this.editRow}
         columns={[
           { name: 'name', title: 'Name' },
-          { name: 'address', title: 'Address' },
+          { name: 'mobileNo', title: 'Mobile No.' },
           { name: 'officeNo', title: 'Office No.' },
-          { name: 'website', title: 'Website' },
-          { name: 'faxNo', title: 'Fax' },
+          { name: 'companyName', title: 'Company Name' },
+          { name: 'address', title: 'Address' },
           { name: 'email', title: 'Email' },
           { name: 'remarks', title: 'Remarks' },
           { name: 'isActive', title: 'Status' },
@@ -83,7 +83,15 @@ class Grid extends PureComponent {
         ]}
         columnExtensions={[
           {
+            columnName: 'mobileNo',
+            sortingEnabled: false,
+          },
+          {
             columnName: 'officeNo',
+            sortingEnabled: false,
+          },
+          {
+            columnName: 'companyName',
             sortingEnabled: false,
           },
           {
@@ -92,18 +100,6 @@ class Grid extends PureComponent {
           },
           {
             columnName: 'email',
-            sortingEnabled: false,
-          },
-          {
-            columnName: 'faxNo',
-            sortingEnabled: false,
-          },
-          {
-            columnName: 'remarks',
-            sortingEnabled: false,
-          },
-          {
-            columnName: 'website',
             sortingEnabled: false,
           },
           {
@@ -128,7 +124,7 @@ class Grid extends PureComponent {
             render: (row) => {
               return (
                 <Fragment>
-                  <Tooltip title='Edit Referral Source' placement='bottom'>
+                  <Tooltip title='Edit Referral Person' placement='bottom'>
                     <Button
                       size='sm'
                       onClick={() => {
@@ -140,13 +136,14 @@ class Grid extends PureComponent {
                       <Edit />
                     </Button>
                   </Tooltip>
-                  <Tooltip title='Print Referral Source Label'>
-                    {!row.referralPersons || !row.referralPersons.length ? (
+                  <Tooltip title='Print Referral Person Label'>
+                    {row.referralSources.length === 1 ? (
                       <Button
                         size='sm'
                         justIcon
                         color='primary'
-                        onClick={() => this.handleClick(row.id)}
+                        onClick={() =>
+                          this.handleClick(row.id, row.referralSources[0].id)}
                       >
                         <Print />
                       </Button>
@@ -158,16 +155,13 @@ class Grid extends PureComponent {
                         })}
                         overlay={
                           <MenuList role='menu'>
-                            {[
-                              { name: 'Without Ref. Person' },
-                              ...(row.referralPersons || []),
-                            ].map((rp) => {
+                            {(row.referralSources || []).map((rs) => {
                               return (
                                 <MenuItem
                                   onClick={() =>
-                                    this.handleClick(row.id, rp.id)}
+                                    this.handleClick(row.id, rs.id)}
                                 >
-                                  {rp.name}
+                                  {rs.name}
                                 </MenuItem>
                               )
                             })}

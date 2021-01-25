@@ -91,7 +91,7 @@ const getHeight = (propsHeight) => {
     visitRegistration,
     patientInfo: patient.entity,
     doctorProfiles: codetable.doctorprofile,
-      ctinvoiceadjustment: codetable.ctinvoiceadjustment,
+    ctinvoiceadjustment: codetable.ctinvoiceadjustment,
   }),
 )
 @withFormikExtend({
@@ -138,7 +138,7 @@ class NewVisit extends PureComponent {
         payload: {
           visitOrderTemplateOptions: templateOptions,
         },
-      }) 
+      })
     }
 
     const bizSession = await dispatch({
@@ -247,7 +247,7 @@ class NewVisit extends PureComponent {
       (registered, queue) =>
         !registered ? queue.patientProfileFK === patientInfo.id : registered,
       false,
-    )
+    ) 
 
     if (!values.id && alreadyRegisteredVisit)
       return dispatch({
@@ -334,8 +334,8 @@ class NewVisit extends PureComponent {
       patientInfo,
       ctinvoiceadjustment,
       codetable,
-    } = this.props 
- 
+    } = this.props
+
     if (expandRefractionForm) {
       let div = $(this.myRef.current).find('div[aria-expanded]:eq(1)')
       if (div.attr('aria-expanded') === 'false') div.click()
@@ -379,6 +379,22 @@ class NewVisit extends PureComponent {
     const params = locationQueryParameters()
     const vis = parseInt(params.vis, 10)
     const autoRefreshChas = !(params.md === 'visreg' && vis > 0)
+    let referralType = 'None'
+    // Edit visit
+    if (values.id) {
+      if (values.referralSourceFK || values.referralPersonFK) {
+        referralType = 'Company'
+      }
+      else if (values.referralPatientProfileFK) {
+        referralType = 'Patient'
+      }
+    }
+    else if (clinicSettings.settings.isVisitReferralSourceMandatory) {
+      referralType = 'Company'
+    }
+    if (!values.referralByType) {
+      this.props.setFieldValue('referralByType', referralType)
+    }
     return (
       <React.Fragment>
         <LoadingWrapper
@@ -435,6 +451,7 @@ class NewVisit extends PureComponent {
                         rights:
                           (rights === 'readwrite' || rights === 'enable') &&
                             (isReadOnly || isRetail)
+                            && isReadonlyAfterSigned
                             ? 'disable'
                             : rights,
                       }}
@@ -462,12 +479,14 @@ class NewVisit extends PureComponent {
                           )}
                         </Authorized>
                         <GridItem xs={12} className={classes.row}>
-                          <ReferralCard
-                            // isReadOnly={isRetail || isReadOnly}
+                          <ReferralCard 
+                            isVisitReadonlyAfterSigned={isReadonlyAfterSigned}
+                            isSigned={values.isLastClinicalObjectRecordSigned}
                             handleUpdateAttachments={this.updateAttachments}
                             attachments={values.visitAttachment}
                             dispatch={dispatch}
                             values={values}
+                            referralType={referralType}
                             setFieldValue={setFieldValue}
                           />
                         </GridItem>

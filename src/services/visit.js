@@ -48,6 +48,11 @@ export const queryReferralList = async () => {
   return response
 }
 
+export const queryReferralPersonList = async () => {
+  const response = await axiosRequest(`/api/ReferralPerson`)
+  return response
+}
+
 export const upsert = (payload) => service.upsert(queueApiUrl, payload)
 
 export const getBizSession = (params) =>

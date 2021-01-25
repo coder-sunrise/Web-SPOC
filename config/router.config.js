@@ -718,6 +718,14 @@ const _routes = [
             ],
           },
           {
+            path: '/report/referralsourcereport',
+            name: 'referralsourcereport',
+            component: './Report/ReferralSourceReport',
+            authority: [
+              'report.other.referralsource',
+            ],
+          },
+          {
             path: '/report/sessionsummary',
             name: 'sessionsummary',
             component: './Report/SessionSummary',
@@ -1239,6 +1247,14 @@ const _routes = [
             component: './Setting/ReferralSource',
             authority: [
               'settings.contact.referralsource',
+            ],
+          },
+          {
+            path: '/setting/referralperson',
+            name: 'referralperson',
+            component: './Setting/ReferralPerson',
+            authority: [
+              'settings.contact.referralperson',
             ],
           },
           {

@@ -13,7 +13,7 @@ import {
   Checkbox,
   Popover,
   Tooltip,
-  Select,
+  CodeSelect,
   CheckboxGroup,
 } from '@/components'
 import { DiagnosisSelect } from '@/components/_medisys'
@@ -171,9 +171,16 @@ const DiagnosisItem = ({
                 }}
               />
             </div>
-            <div style={{ display: 'inline-Block', color: 'green' }}>
-              {favouriteDiagnosisCategoryMessage}
-            </div>
+            {favouriteDiagnosisCategoryMessage && (
+              <div
+                style={{
+                  color: 'green',
+                  marginLeft: 'auto',
+                }}
+              >
+                {favouriteDiagnosisCategoryMessage}
+              </div>
+            )}
             {!_.isEqual(
               favouriteDiagnosisCategory.sort(),
               currentSelectCategory.filter((c) => c !== 'all').sort(),
@@ -191,7 +198,7 @@ const DiagnosisItem = ({
                   )
                 }}
               >
-                save categories as favourite
+                Save categories as favourite
               </a>
             )}
           </div>
@@ -330,42 +337,60 @@ const DiagnosisItem = ({
           </Popover>
         </GridItem>
         <GridItem xs={12}>
-          <Field
-            name={`corDiagnosis[${index}].complication`}
-            render={(args) => {
-              const { form: fm, field: fd } = args
+          <CodeSelect
+            label='Complication'
+            mode='multiple'
+            options={ctComplicationPairedWithDiag}
+            labelField='displayValue'
+            valueField='id'
+            maxTagCount={2}
+            value={_.uniqBy(
+              (form.values.corDiagnosis[index].corComplication || [])
+                .filter((c) => !c.isDeleted)
+                .map((o) => o.complicationFK),
+            )}
+            disableAll
+            onChange={(v, opts) => {
+              const { setFieldValue, values } = form
 
-              if (
-                !fd.value &&
-                fm.values.corDiagnosis &&
-                fm.values.corDiagnosis[index] &&
-                fm.values.corDiagnosis[index].corComplication
-              ) {
-                fd.value = fm.values.corDiagnosis[index].corComplication.map(
-                  (o) => o.complicationFK,
-                )
-              }
-              return (
-                <Select
-                  label='Complication'
-                  mode='multiple'
-                  options={ctComplicationPairedWithDiag}
-                  labelField='displayValue'
-                  valueField='id'
-                  maxTagCount={2}
-                  disableAll
-                  onChange={(v, opts) => {
-                    const { setFieldValue } = form
-                    setFieldValue(`corDiagnosis[${index}]corComplication`, [])
-                    opts.forEach((o, i) => {
-                      setFieldValue(
-                        `corDiagnosis[${index}]corComplication[${i}]complicationFK`,
-                        o.id,
-                      )
-                    })
-                  }}
-                  {...args}
-                />
+              let newcorComplication = (values.corDiagnosis[index]
+                .corComplication || [])
+                .map((c) => {
+                  if (
+                    !c.isDeleted &&
+                    !opts.find((o) => o.id === c.complicationFK)
+                  ) {
+                    c.isDeleted = true
+                  } else if (
+                    c.isDeleted &&
+                    opts.find((o) => o.id === c.complicationFK)
+                  ) {
+                    c.isDeleted = false
+                  }
+                  return c
+                })
+
+              newcorComplication = [
+                ...newcorComplication,
+                ...opts
+                  .filter(
+                    (o) =>
+                      !newcorComplication.find(
+                        (c) => c.complicationFK === o.id,
+                      ),
+                  )
+                  .map((o) => {
+                    return { complicationFK: o.id }
+                  }),
+              ]
+
+              // remove new delete data
+              newcorComplication = newcorComplication.filter(
+                (c) => !(!c.id && c.isDeleted),
+              )
+              setFieldValue(
+                `corDiagnosis[${index}]corComplication`,
+                newcorComplication,
               )
             }}
           />

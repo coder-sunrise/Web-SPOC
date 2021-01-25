@@ -95,7 +95,7 @@ const Editor = ({
                     label='Canned Text'
                     multiline
                     rowsMax={5}
-                    maxLength={9999999}
+                    maxLength={2000}
                     rows={5}
                     {...args}
                   />

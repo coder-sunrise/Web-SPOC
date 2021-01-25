@@ -24,12 +24,12 @@ import {
   DateRangePicker,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
-import { download } from '@/utils/request'
 // utils
 import { findGetParameter, commonDataReaderTransform } from '@/utils/utils'
 import { VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
 import { DoctorProfileSelect } from '@/components/_medisys'
 import withWebSocket from '@/components/Decorator/withWebSocket'
+import { getReportContext } from '@/services/report'
 import * as WidgetConfig from './config'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 import HistoryDetails from './HistoryDetails'
@@ -154,6 +154,16 @@ class PatientHistory extends Component {
 
   componentWillMount () {
     const { dispatch } = this.props
+
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'ctg6pd' },
+    })
+
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'ctcomplication' },
+    })
 
     dispatch({
       type: 'patientHistory/initState',
@@ -622,9 +632,13 @@ class PatientHistory extends Component {
       ...history.patientHistoryDetail,
       visitAttachments: history.visitAttachments,
       visitRemarks: history.visitRemarks,
-      referralBy: history.referralBy,
-      referralInstitution: history.referralInstitution,
-      referralDate: history.referralDate,
+      referralSourceFK: history.referralSourceFK,
+      referralPersonFK: history.referralPersonFK,
+      referralPatientProfileFK: history.referralPatientProfileFK,
+      referralSource: history.referralSource,
+      referralPerson: history.referralPerson,
+      referralPatientName: history.referralPatientName,
+      referralRemarks: history.referralRemarks,
     }
     let visitDetails = {
       visitDate: history.visitDate,
@@ -770,10 +784,10 @@ class PatientHistory extends Component {
       {
         patientName: name,
         patientAccountNo,
-        patientNationality: nationality ? nationality.name : 'Unknown',
+        patientNationality: nationality ? nationality.name : '',
         patientAge: age,
-        patientSex: gender ? gender.name : 'Unknown',
-        patientG6PD: g6PD ? g6PD.name : 'Unknown',
+        patientSex: gender ? gender.name : '',
+        patientG6PD: g6PD ? g6PD.name : '',
         patientAllergy: allergies.map((o) => o.allergyName).join(', '),
         patientSocialHistory: socialHistory,
         patientFamilyHistory: familyHistory,
@@ -786,7 +800,8 @@ class PatientHistory extends Component {
     if (isNurseNote) return false
     if (visitPurposeFK === VISIT_TYPE.RETAIL) {
       return (
-        (widgetId === WidgetConfig.WIDGETS_ID.INVOICE ||
+        (widgetId === WidgetConfig.WIDGETS_ID.ORDERS ||
+          widgetId === WidgetConfig.WIDGETS_ID.INVOICE ||
           widgetId === WidgetConfig.WIDGETS_ID.VISITREMARKS ||
           widgetId === WidgetConfig.WIDGETS_ID.REFERRAL ||
           widgetId === WidgetConfig.WIDGETS_ID.ATTACHMENT) &&
@@ -801,11 +816,21 @@ class PatientHistory extends Component {
   }
 
   getReferral = (current) => {
+    let referral = ''
+    if (current.referralPatientProfileFK) {
+      referral = `Referred By Patient: ${current.referralPatientName}`
+    } else if (current.referralSourceFK) {
+      referral = `Referred By: ${current.referralSource}`
+      if (current.referralPersonFK) {
+        referral = `Referred By: ${current.referralSource}        Referral Person: ${current.referralPerson}`
+      }
+    }
+    if (current.referralRemarks) {
+      referral += `\r\n\r\nRemarks: ${current.referralRemarks}`
+    }
     return {
       isShowReferral: true,
-      referralBy: current.referralBy,
-      referralInstitution: current.referralInstitution,
-      referralDate: current.referralDate,
+      referralContent: referral,
     }
   }
 
@@ -890,7 +915,12 @@ class PatientHistory extends Component {
     }
   }
 
-  printHandel = () => {
+  printHandel = async () => {
+    let reportContext = []
+    const result = await getReportContext(68)
+    if (result) {
+      reportContext = result
+    }
     const { loadVisits, selectItems } = this.state
     const {
       codetable: { ctcomplication = [] },
@@ -912,9 +942,13 @@ class PatientHistory extends Component {
         let current = {
           ...visit.patientHistoryDetail,
           visitRemarks: visit.visitRemarks,
-          referralBy: visit.referralBy,
-          referralInstitution: visit.referralInstitution,
-          referralDate: visit.referralDate,
+          referralSourceFK: visit.referralSourceFK,
+          referralPersonFK: visit.referralPersonFK,
+          referralPatientProfileFK: visit.referralPatientProfileFK,
+          referralSource: visit.referralSource,
+          referralPerson: visit.referralPerson,
+          referralPatientName: visit.referralPatientName,
+          referralRemarks: visit.referralRemarks,
           visitPurposeFK: visit.visitPurposeFK,
           currentId: visit.currentId,
           isNurseNote: visit.isNurseNote,
@@ -1198,6 +1232,13 @@ class PatientHistory extends Component {
         }
       })
 
+    // for resolve print nothing when not any data in sub table(such as consultationDocument, treatment, diagnosis...)
+    if (consultationDocument.length === 0) {
+      consultationDocument = [
+        { visitFK: '' },
+      ]
+    }
+
     const payload = {
       PatientInfo: this.getPatientInfo(),
       VisitListing: visitListing,
@@ -1209,9 +1250,9 @@ class PatientHistory extends Component {
       VitalSign: vitalSign,
       Orders: orders,
       ConsultationDocument: consultationDocument,
-      ReportContext: [],
+      ReportContext: reportContext,
     }
-
+    console.log(payload)
     const payload1 = [
       {
         ReportId: 68,
