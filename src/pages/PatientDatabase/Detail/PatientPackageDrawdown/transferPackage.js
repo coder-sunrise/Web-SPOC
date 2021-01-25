@@ -101,6 +101,7 @@ class TransferPackage extends Component {
     const {
       id,
       name,
+      patientAccountNo,
     } = patientProfile
     const { values, setValues, patientPackageDrawdown } = this.props
     const { list } = patientPackageDrawdown
@@ -116,7 +117,7 @@ class TransferPackage extends Component {
     await setValues({
       ...values,
       transferToPatientId: id,
-      transferToPatientName: name,
+      transferToPatientName: `${name} (${patientAccountNo})`,
     })
     if (!autoPopulate) this.toggleSearchPatientModal()
 

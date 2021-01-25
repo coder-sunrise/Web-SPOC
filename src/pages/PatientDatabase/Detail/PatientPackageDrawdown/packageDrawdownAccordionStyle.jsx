@@ -25,16 +25,16 @@ const accordionStyle = (theme) => ({
     // color: '#3C4858',
     '&:hover': {
       color: primaryColor,
-      background: '#D6E4FF', // color(primaryColor).lighten(0.7).hex(),
+      background: '#DAECF5', // color(primaryColor).lighten(0.7).hex(),
       boxShadow:
         '0 14px 26px -12px rgba(28, 26, 124, 0.42), 0 4px 23px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(28, 26, 124, 0.2)',
     },
     color: primaryColor,
-    background: '#D6E4FF', // color(primaryColor).lighten(0.9).hex(),
+    background: '#DAECF5', // color(primaryColor).lighten(0.9).hex(),
   },
   expansionPanelSummaryExpaned: {
     color: primaryColor,
-    background: '#D6E4FF', // color(primaryColor).lighten(0.7).hex(),
+    background: '#DAECF5', // color(primaryColor).lighten(0.7).hex(),
     '& $expansionPanelSummaryExpandIcon': {
       [theme.breakpoints.up('md')]: {
         top: 'auto !important',
