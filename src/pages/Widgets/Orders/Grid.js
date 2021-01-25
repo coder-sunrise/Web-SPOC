@@ -351,8 +351,13 @@ export default ({
   }
 
   const packageGroupCellContent = ({ row }) => {
-    if (row.value === undefined || row.value === '')
-      return null
+    if (row.value === undefined || row.value === '') {
+      return (
+        <span style={{ verticalAlign: 'middle', paddingRight: 8 }}>
+          <strong>Non-Package Items</strong>
+        </span>
+      )
+    }
 
     let label = 'Package'
     let totalPrice = 0

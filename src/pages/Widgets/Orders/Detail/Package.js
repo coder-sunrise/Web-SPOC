@@ -16,14 +16,17 @@ import {
 } from '@/components'
 import Yup from '@/utils/yup'
 import { getUniqueId, getUniqueGUID, roundTo } from '@/utils/utils'
-import { openCautionAlertPrompt } from '@/pages/Widgets/Orders/utils'
+import { openCautionAlertPrompt, ReplaceCertificateTeplate } from '@/pages/Widgets/Orders/utils'
 import { DURATION_UNIT } from '@/utils/constants'
+import { getClinicianProfile } from '../../ConsultationDocument/utils'
 
-@connect(({ global, codetable, user, visitRegistration }) => ({ 
+@connect(({ global, codetable, user, visitRegistration, consultationDocument, patient }) => ({ 
   global, 
   codetable, 
   user,
   visitRegistration,
+  consultationDocument,
+  patient,
 }))
 @withFormikExtend({
   authority: [
@@ -41,7 +44,16 @@ import { DURATION_UNIT } from '@/utils/constants'
     packageFK: Yup.number().required(),
   }),
   handleSubmit: (values, { props, onConfirm, setValues }) => {
-    const { dispatch, orders, codetable, getNextSequence, user, visitRegistration } = props
+    const { 
+      dispatch, 
+      orders, 
+      codetable, 
+      getNextSequence, 
+      user, 
+      visitRegistration,
+      patient,
+      consultationDocument: { rows = [] },
+    } = props
     const {
       inventorymedication = [],
       inventoryvaccination = [],
@@ -51,6 +63,20 @@ import { DURATION_UNIT } from '@/utils/constants'
 
     const { doctorProfileFK } = visitRegistration.entity.visit
     const visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK).clinicianProfile.userProfileFK
+
+    const { entity: visitEntity } = visitRegistration
+    const clinicianProfile = getClinicianProfile(codetable, visitEntity)
+    const { entity } = patient
+    const { name, patientAccountNo, genderFK, dob } = entity
+    const { ctgender = [] } = codetable
+    const gender = ctgender.find((o) => o.id === genderFK) || {}
+    const allDocs = rows.filter((s) => !s.isDeleted)
+    let nextDocumentSequence = 1
+    if (allDocs && allDocs.length > 0) {
+      const { sequence: documentSequence } = _.maxBy(allDocs, 'sequence')
+      nextDocumentSequence = documentSequence + 1
+    }
+    let showNoTemplate
 
     const packageGlobalId = getUniqueGUID()
 
@@ -230,38 +256,41 @@ import { DURATION_UNIT } from '@/utils/constants'
           remainingQuantity: packageItem.quantity,
           performingUserFK: visitDoctorUserId,
           packageGlobalId,
+          type: packageItem.type,
+          subject: vaccination.displayValue,
+          isGenerateCertificate: vaccination.isAutoGenerateCertificate,
         }
       }
 
       let newCORVaccinationCert = []
-      // if (item.isGenerateCertificate) {
-      //   const { documenttemplate = [] } = codetable
-      //   const defaultTemplate = documenttemplate.find(
-      //     (dt) =>
-      //       dt.isDefaultTemplate === true && dt.documentTemplateTypeFK === 3,
-      //   )
-      //   if (defaultTemplate) {
-      //     newCORVaccinationCert = [
-      //       {
-      //         type: '3',
-      //         certificateDate: moment(),
-      //         issuedByUserFK: clinicianProfile.userProfileFK,
-      //         subject: `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
-      //           ''}, ${Math.floor(
-      //           moment.duration(moment().diff(dob)).asYears(),
-      //         )}`,
-      //         content: ReplaceCertificateTeplate(
-      //           defaultTemplate.templateContent,
-      //           item,
-      //         ),
-      //         sequence: nextDocumentSequence,
-      //       },
-      //     ]
-      //     nextDocumentSequence += 1
-      //   } else {
-      //     showNoTemplate = true
-      //   }
-      // }
+      if (item.isGenerateCertificate) {
+        const { documenttemplate = [] } = codetable
+        const defaultTemplate = documenttemplate.find(
+          (dt) =>
+            dt.isDefaultTemplate === true && dt.documentTemplateTypeFK === 3,
+        )
+        if (defaultTemplate) {
+          newCORVaccinationCert = [
+            {
+              type: '3',
+              certificateDate: moment(),
+              issuedByUserFK: clinicianProfile.userProfileFK,
+              subject: `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
+                ''}, ${Math.floor(
+                moment.duration(moment().diff(dob)).asYears(),
+              )}`,
+              content: ReplaceCertificateTeplate(
+                defaultTemplate.templateContent,
+                item,
+              ),
+              sequence: nextDocumentSequence,
+            },
+          ]
+          nextDocumentSequence += 1
+        } else {
+          showNoTemplate = true
+        }
+      }
       return { ...item, corVaccinationCert: newCORVaccinationCert }
     }
 
@@ -377,6 +406,13 @@ import { DURATION_UNIT } from '@/utils/constants'
         datas.push(data)
         nextSequence += 1
       }
+    }
+
+    if (showNoTemplate) {
+      notification.warning({
+        message:
+          'Any changes will not be reflected in the vaccination certificate.',
+      })
     }
     
     dispatch({
