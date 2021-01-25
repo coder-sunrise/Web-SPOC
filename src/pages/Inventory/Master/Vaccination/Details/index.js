@@ -252,7 +252,7 @@ export default compose(
         } else if (o === 'isChasChronicClaimable') {
           schemes[o] = true
         } else if (o === 'isMedisaveClaimable') {
-          schemes[o] = true
+          schemes[o] = false
         }
       })
       dispatch({

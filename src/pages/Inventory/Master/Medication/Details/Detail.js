@@ -238,14 +238,14 @@ const Detail = ({
                         style: {},
                       },
                     },
-                    {
-                      id: 'isMedisaveClaimable',
-                      name: 'CDMP Claimable',
+                    // {
+                    //   id: 'isMedisaveClaimable',
+                    //   name: 'CDMP Claimable',
 
-                      layoutConfig: {
-                        style: {},
-                      },
-                    },
+                    //   layoutConfig: {
+                    //     style: {},
+                    //   },
+                    // },
                   ]}
                   onChange={(e, s) => {}}
                   {...args}

@@ -26,8 +26,8 @@ class ClaimSubmission extends PureComponent {
     const data = {
       'ClaimCountListDto[0].SchemeType': 'CHAS',
       'ClaimCountListDto[0].Status': 'New',
-      'ClaimCountListDto[1].SchemeType': 'Medisave',
-      'ClaimCountListDto[1].Status': 'New',
+      // 'ClaimCountListDto[1].SchemeType': 'Medisave', //TODO: Disable for PROD R1.5.2, Enable for UAT again
+      // 'ClaimCountListDto[1].Status': 'New',
     }
     this.props.dispatch({
       type: 'claimSubmission/getClaimCount',
