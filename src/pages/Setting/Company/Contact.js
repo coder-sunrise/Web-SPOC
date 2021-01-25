@@ -102,22 +102,14 @@ const Contact = (props) => {
 
           {(isCopayer || isReferralSource || isReferralPerson) && (
             <Fragment>
-              {isCopayer && (
+              {(isCopayer || isReferralSource) && (
                 <GridItem md={6}>
                   <FastField
                     name='contact.contactWebsite.website'
                     render={(args) => <TextField label='URL' {...args} />}
                   />
                 </GridItem>
-              )}
-              {isReferralSource && (
-                <GridItem md={6}>
-                  <FastField
-                    name='contact.contactWebsite.website'
-                    render={(args) => <TextField label='URL' {...args} />}
-                  />
-                </GridItem>
-              )}
+              )} 
               <GridItem md={6}>
                 <FastField
                   name='contact.contactEmailAddress.emailAddress'
