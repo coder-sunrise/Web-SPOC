@@ -59,6 +59,9 @@ class SchemesGrid extends PureComponent {
           type: 'codeSelect',
           code: 'ctSchemeType',
           sortingEnabled: false,
+          localFilter: (opt) => {
+            return !this.isMedisave(opt) // TODO: Disable for prod R1.5.2 only, enable when deploy UAT again
+          },
           onChange: ({ val, option, row, onValueChange }) => {
             let { rows } = this.props
             if (!row.id) {
@@ -308,10 +311,10 @@ class SchemesGrid extends PureComponent {
     return false
   }
 
-  isMedisaveOrPHPC = (row) => {
+  isMedisave = (row) => {
     const { codetable } = this.props
     const ctSchemeTypes = codetable[ctSchemeType.toLowerCase()] || []
-    const r = ctSchemeTypes.find((o) => o.id === row.schemeTypeFK)
+    const r = ctSchemeTypes.find((o) => o.id === row.id)
 
     if (!r) return false
     return (
@@ -319,7 +322,7 @@ class SchemesGrid extends PureComponent {
         'MEDIVISIT',
         'FLEXIMEDI',
         'OPSCAN',
-      ].indexOf(r.code) >= 0 || r.code.startsWith('PHPC')
+      ].indexOf(r.code) >= 0 // || r.code.startsWith('PHPC')
     )
   }
 
