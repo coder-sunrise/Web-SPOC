@@ -196,10 +196,10 @@ const InvoiceSummary = ({
               />
             </GridItem>
             <GridItem md={6}>
-              {totalCashRound > 0 && <span>Cash Rounding</span>}
+              {totalCashRound && <span>Cash Rounding</span>}
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
-              {totalCashRound > 0 && (
+              {totalCashRound && (
                 <NumberInput
                   currency
                   text
