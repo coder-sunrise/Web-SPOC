@@ -141,11 +141,7 @@ class PatientPackageDrawdown extends Component {
         let drawdowns = []
         values.forEach(p => {
           const { patientPackageDrawdown } = p
-          if (patientPackageDrawdown && patientPackageDrawdown.length > 0) {
-            patientPackageDrawdown.forEach(d => {
-              drawdowns.push(d.id)
-            })
-          }
+          drawdowns = drawdowns.concat(patientPackageDrawdown.map(o => o.id))
         })
 
         this.setState({ expandDrawdowns: drawdowns })
@@ -156,7 +152,7 @@ class PatientPackageDrawdown extends Component {
     }
   }
 
-  refreshPackageDrawdown = () => {
+  refreshPackageDrawdown = (isExpandAll = true) => {
     const { dispatch, patient } = this.props
     dispatch({
       type: 'patientPackageDrawdown/getPatientPackageDrawdown',
@@ -164,7 +160,7 @@ class PatientPackageDrawdown extends Component {
         patientId: patient.entity.id,
       },
     }).then((r) => {
-      if (r) {
+      if (r && isExpandAll) {
         this.setExpandAll(true)
       }
     })
@@ -320,18 +316,13 @@ class PatientPackageDrawdown extends Component {
               }
             }
 
-            let expandDrawdownId = []
-            drawdownIds.forEach(key => {
-              expandDrawdownId.push(key)
-            })
-
             return {
               ...preState,
               expandPackages: [
                 ...preState.expandPackages,
                 id,
               ],
-              expandDrawdowns: preState.expandDrawdowns.concat(expandDrawdownId),
+              expandDrawdowns: preState.expandDrawdowns.concat(drawdownIds),
             }            
           })          
         }}
@@ -429,7 +420,7 @@ class PatientPackageDrawdown extends Component {
       isShowPackageTransferModal: false,
     })
 
-    this.refreshPackageDrawdown()
+    this.refreshPackageDrawdown(false)
   }
 
   onCloseReport = () => {
