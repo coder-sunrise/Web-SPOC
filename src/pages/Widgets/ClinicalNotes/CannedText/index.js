@@ -5,9 +5,7 @@ import _ from 'lodash'
 import { withStyles } from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
 // common components
-import {
-  Button, CardContainer, DragableTableGrid, Tooltip,
-} from '@/components'
+import { Button, CardContainer, DragableTableGrid, Tooltip } from '@/components'
 import { CANNED_TEXT_TYPE } from '@/utils/constants'
 import { DeleteWithPopover } from '@/components/_medisys'
 import Filterbar from './Filterbar'
@@ -103,7 +101,7 @@ const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
         currentCannedTextId,
         targetCannedTextId,
         isInsertBefore,
-        cannedTextTypeFK: rows[newIndex - 1].cannedTextTypeFK,
+        cannedTextTypeFK: rows[newIndex].cannedTextTypeFK,
       })
     }
   }
