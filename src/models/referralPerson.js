@@ -27,7 +27,7 @@ export default createListViewModel({
     effects: {
       *getReferralSourceList ({ payload }, { call, put }) {
         try {
-          const response = yield call(service.queryReferralSourceList)
+          const response = yield call(service.queryReferralSourceList, payload)
           const { data } = response
           return data
         } catch (error) {
