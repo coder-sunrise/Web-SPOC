@@ -33,6 +33,9 @@ import Contact from '@/pages/Setting/Company/Contact'
         if (onConfirm) onConfirm()
         dispatch({
           type: 'settingReferralSource/query',
+          payload: {
+            pagesize: 9999,
+          },
         })
       }
     })
