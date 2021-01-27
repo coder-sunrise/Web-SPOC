@@ -33,6 +33,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
 import { currencySymbol } from '@/utils/config'
 import Authorized from '@/utils/Authorized'
 import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
+import moment from 'moment'
 import LowStockInfo from './LowStockInfo'
 import AddFromPast from './AddMedicationFromPast'
 
@@ -232,6 +233,9 @@ const getCautions = (
         return Yup.array().compact((v) => v.isDeleted)
       },
     ),
+    expiryDate:Yup.date().min(
+      moment(),
+    'The batch of medication is expired'),
   }),
 
   handleSubmit: (values, { props, onConfirm, setValues }) => {
