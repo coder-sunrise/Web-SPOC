@@ -137,7 +137,7 @@ class Grid extends PureComponent {
                     </Button>
                   </Tooltip>
                   <Tooltip title='Print Referral Person Label'>
-                    {row.referralSources.length === 1 ? (
+                    {row.referralSources && row.referralSources.length === 1 ? (
                       <Button
                         size='sm'
                         justIcon
