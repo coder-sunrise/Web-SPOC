@@ -537,7 +537,7 @@ class Main extends Component {
               }}
             >
               <h3>
-                Orders Has been updated by other user. Click OK to refresh
+                Orders has been updated by other user. Click OK to refresh
                 orders.
               </h3>
             </div>

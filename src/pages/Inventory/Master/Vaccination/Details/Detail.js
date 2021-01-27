@@ -177,14 +177,14 @@ const Detail = ({
                           style: {},
                         },
                       },
-                      {
-                        id: 'isMedisaveClaimable',
-                        name: 'CDMP Claimable',
+                      // {
+                      //   id: 'isMedisaveClaimable',
+                      //   name: 'CDMP Claimable',
 
-                        layoutConfig: {
-                          style: {},
-                        },
-                      },
+                      //   layoutConfig: {
+                      //     style: {},
+                      //   },
+                      // },
                     ]}
                     onChange={(e, s) => {
                       if (s.isMedisaveClaimable !== undefined)
@@ -299,10 +299,9 @@ const Detail = ({
             </GridItem>
             <GridItem xs={2} />
             <GridItem xs={10}>
-              <div
-                style={{
-                  display: values.isMedisaveClaimable ? '' : 'none',
-                }}
+              <div style={{ 
+                  display: 'none',// values.isMedisaveClaimable  ? '' : 'none',
+                  }}
               >
                 <h4 style={{ marginTop: 15, fontWeight: 400 }}>
                   <b>Medisave Vaccination</b>

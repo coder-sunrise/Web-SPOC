@@ -184,15 +184,11 @@ class Consumable extends PureComponent {
     setFieldValue('isExactAmount', true)
     setFieldValue('adjValue', 0)
 
-    if (op.sellingPrice) {
-      setFieldValue('unitPrice', op.sellingPrice)
-      setFieldValue('totalPrice', op.sellingPrice * values.quantity)
-      this.updateTotalPrice(op.sellingPrice * values.quantity)
-    } else {
-      setFieldValue('unitPrice', undefined)
-      setFieldValue('totalPrice', undefined)
-      this.updateTotalPrice(undefined)
-    }
+    // 17882
+    let unitprice = op.sellingPrice || 0
+    setFieldValue('unitPrice', unitprice)
+    setFieldValue('totalPrice', unitprice * values.quantity)
+    this.updateTotalPrice(unitprice * values.quantity)
   }
 
   updateTotalPrice = (v) => {

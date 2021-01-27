@@ -206,7 +206,7 @@ export default compose(
         .min(0, 'Markup Margin must between 0 and 999,999.9')
         .max(999999.9, 'Markup Margin must between 0 and 999,999.9'),
 
-      sellingPrice: Yup.number()
+      sellingPrice: Yup.number().required()
         .min(0, errMsg('Selling Price'))
         .max(999999.99, errMsg('Selling Price')),
 

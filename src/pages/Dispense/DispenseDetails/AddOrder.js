@@ -668,12 +668,6 @@ export default compose(
           payload,
         }).then((r) => {
           if (r) {
-            sendNotification('EditedConsultation', {
-              type: NOTIFICATION_TYPE.CONSULTAION,
-              status: NOTIFICATION_STATUS.OK,
-              message: 'Completed Consultation',
-              visitID: dispense.visitID,
-            })
             if (onConfirm) onConfirm()
             history.push({
               pathname: history.location.pathname,

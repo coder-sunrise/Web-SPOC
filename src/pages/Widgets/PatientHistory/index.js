@@ -784,10 +784,10 @@ class PatientHistory extends Component {
       {
         patientName: name,
         patientAccountNo,
-        patientNationality: nationality ? nationality.name : 'Unknown',
+        patientNationality: nationality ? nationality.name : '',
         patientAge: age,
-        patientSex: gender ? gender.name : 'Unknown',
-        patientG6PD: g6PD ? g6PD.name : 'Unknown',
+        patientSex: gender ? gender.name : '',
+        patientG6PD: g6PD ? g6PD.name : '',
         patientAllergy: allergies.map((o) => o.allergyName).join(', '),
         patientSocialHistory: socialHistory,
         patientFamilyHistory: familyHistory,
@@ -919,7 +919,30 @@ class PatientHistory extends Component {
     let reportContext = []
     const result = await getReportContext(68)
     if (result) {
-      reportContext = result
+      reportContext = result.map((o) => {
+        const {
+          customLetterHeadHeight = 0,
+          isDisplayCustomLetterHead = false,
+          standardHeaderInfoHeight = 0,
+          isDisplayStandardHeader = false,
+          footerInfoHeight = 0,
+          isDisplayFooterInfo = false,
+          footerDisclaimerHeight = 0,
+          isDisplayFooterInfoDisclaimer = false,
+          ...restProps
+        } = o
+        return {
+          customLetterHeadHeight,
+          isDisplayCustomLetterHead,
+          standardHeaderInfoHeight,
+          isDisplayStandardHeader,
+          footerInfoHeight,
+          isDisplayFooterInfo,
+          footerDisclaimerHeight,
+          isDisplayFooterInfoDisclaimer,
+          ...restProps,
+        }
+      })
     }
     const { loadVisits, selectItems } = this.state
     const {

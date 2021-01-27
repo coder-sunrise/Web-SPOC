@@ -86,8 +86,10 @@ class ReferralSource extends ReportBase {
     let result = []
     if (values.referralSourceIds && values.referralSourceIds.length > 0) {
       referralPersonData.forEach((person) => {
-        if (person.referralSourceIds.find(id => values.referralSourceIds.indexOf(id) > -1)) {
-          result.push(person)
+        if (person.referralSources) {
+          if (person.referralSources.find(source => values.referralSourceIds.indexOf(source.id) > -1)) {
+            result.push(person)
+          }
         }
       })
     }
