@@ -6,6 +6,6 @@ const url = '/api/referralperson'
 module.exports = {
   queryList: (params) => service.queryList(url, params),
   upsert: (params) => service.upsert(url, params),
-  queryReferralSourceList: async (params) => axiosRequest(`/api/ReferralSource`),
+  queryReferralSourceList: (params) => service.queryList(`/api/ReferralSource`, params),
 }
- 
+

@@ -61,6 +61,9 @@ class ReferralCard extends PureComponent {
     this.props
       .dispatch({
         type: 'settingReferralSource/query',
+        payload: {
+          pagesize: 9999,
+        },
       })
       .then((response) => {
         if (response) {
@@ -77,6 +80,9 @@ class ReferralCard extends PureComponent {
     this.props
       .dispatch({
         type: 'settingReferralPerson/query',
+        payload: {
+          pagesize: 9999,
+        },
       })
       .then((response) => {
         if (response) {
