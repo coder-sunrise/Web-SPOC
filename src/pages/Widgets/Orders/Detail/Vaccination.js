@@ -101,6 +101,9 @@ let i = 0
       'The amount should be more than 0.00',
     ),
     performingUserFK: Yup.number().required(),
+    expiryDate:Yup.date().min(
+      moment(),
+    'The batch of vaccination is expired'),
   }),
 
   handleSubmit: (values, { props, onConfirm, setValues }) => {

@@ -33,6 +33,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
 import { currencySymbol } from '@/utils/config'
 import Authorized from '@/utils/Authorized'
 import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
+import moment from 'moment'
 import LowStockInfo from './LowStockInfo'
 import AddFromPast from './AddMedicationFromPast'
 import { DoctorProfileSelect } from '@/components/_medisys'
@@ -255,6 +256,9 @@ const getVisitDoctorUserId = props => {
       },
     ),
     performingUserFK: Yup.number().required(),
+    expiryDate:Yup.date().min(
+      moment(),
+    'The batch of medication is expired'),
   }),
 
   handleSubmit: (values, { props, onConfirm, setValues }) => {
