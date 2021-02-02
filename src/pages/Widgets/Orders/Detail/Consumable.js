@@ -19,6 +19,7 @@ import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 import { currencySymbol } from '@/utils/config'
 import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
+import moment from 'moment'
 import LowStockInfo from './LowStockInfo'
 
 @connect(({ global, codetable, user }) => ({ global, codetable, user }))
@@ -48,6 +49,9 @@ import LowStockInfo from './LowStockInfo'
       0.0,
       'The amount should be more than 0.00',
     ),
+    expiryDate:Yup.date().min(
+      moment(),
+    'The batch of consumable is expired'),
   }),
 
   handleSubmit: (values, { props, onConfirm, setValues }) => {
@@ -264,6 +268,7 @@ class Consumable extends PureComponent {
       handleSubmit()
       return true
     }
+    handleSubmit()
     return false
   }
 

@@ -89,6 +89,9 @@ let i = 0
       0.0,
       'The amount should be more than 0.00',
     ),
+    expiryDate:Yup.date().min(
+      moment(),
+    'The batch of vaccination is expired'),
   }),
 
   handleSubmit: (values, { props, onConfirm, setValues }) => {
