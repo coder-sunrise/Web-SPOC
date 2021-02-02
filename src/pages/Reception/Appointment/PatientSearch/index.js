@@ -16,6 +16,7 @@ class PatientSearch extends PureComponent {
   state = {
     columns: [
       { name: 'name', title: 'Patient Name' },
+      { name: 'patientReferenceNo', title: 'Ref. No.' },
       { name: 'patientAccountNo', title: 'Acc. No.' },
       { name: 'gender/age', title: 'Gender / Age' },
       { name: 'dob', title: 'DOB' },
@@ -24,7 +25,8 @@ class PatientSearch extends PureComponent {
     ],
     columnExtensions: [
       // { columnName: 'name', width: 300 },
-      { columnName: 'patientAccountNo', width: 140 },
+      { columnName: 'patientAccountNo', width: 120 },
+      { columnName: 'patientReferenceNo', width: 120 },
       { columnName: 'mobileNo', width: 140, sortingEnabled: false },
       {
         columnName: 'gender/age',
@@ -37,11 +39,11 @@ class PatientSearch extends PureComponent {
         columnName: 'dob',
         type: 'date',
         sortingEnabled: false,
-        width: 120,
+        width: 100,
       },
       {
         columnName: 'action',
-        width: 145,
+        width: 150,
         align: 'center',
         render: (row) => this.ActionButton(row),
       },

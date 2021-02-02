@@ -44,7 +44,7 @@ export const ApplyClaimsColumnExtension = [
     type: 'currency',
     currency: true,
     disabled: true,
-    width: 150,
+    width: 160,
   },
 
   {

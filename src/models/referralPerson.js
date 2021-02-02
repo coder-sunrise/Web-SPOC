@@ -1,10 +1,9 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
-import * as service from '../services'
-import { notification } from '@/components'
+import * as service from '../services/referralPerson'
 
 export default createListViewModel({
-  namespace: 'settingReferralSource',
+  namespace: 'settingReferralPerson',
   config: {
     queryOnLoad: false,
   },
@@ -26,10 +25,19 @@ export default createListViewModel({
       })
     },
     effects: {
-      *deleteReferralSource ({ payload }, { call, put }) {
-        const result = yield call(service.delete, payload)
-        if (result === 204) {
-          notification.success({ message: 'Deleted' })
+      *getReferralSourceList ({ payload }, { call, put }) {
+        try {
+          const response = yield call(service.queryReferralSourceList, payload)
+          const { data } = response
+          return data
+        } catch (error) {
+          yield put({
+            type: 'updateErrorState',
+            payload: {
+              referralSourceInfo: 'Failed to retrieve referral person list',
+            },
+          })
+          return false
         }
       },
     },

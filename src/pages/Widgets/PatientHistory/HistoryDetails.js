@@ -204,9 +204,13 @@ class HistoryDetails extends PureComponent {
       ...patientHistory.entity,
       visitAttachments: selectHistory.visitAttachments,
       visitRemarks: selectHistory.visitRemarks,
-      referralBy: selectHistory.referralBy,
-      referralInstitution: selectHistory.referralInstitution,
-      referralDate: selectHistory.referralDate,
+      referralSourceFK: selectHistory.referralSourceFK,
+      referralPersonFK: selectHistory.referralPersonFK,
+      referralPatientProfileFK: selectHistory.referralPatientProfileFK, 
+      referralSource: selectHistory.referralSource,
+      referralPerson: selectHistory.referralPerson,
+      referralPatientName: selectHistory.referralPatientName,
+      referralRemarks: selectHistory.referralRemarks, 
     }
     const { visitPurposeFK } = selectHistory
     return (
@@ -223,10 +227,10 @@ class HistoryDetails extends PureComponent {
             if (visitPurposeFK === VISIT_TYPE.RETAIL) {
               return (
                 _widget.id === WidgetConfig.WIDGETS_ID.INVOICE &&
-                WidgetConfig.showWidget(current, _widget)
+                WidgetConfig.showWidget(current, _widget.id)
               )
             }
-            return WidgetConfig.showWidget(current, _widget)
+            return WidgetConfig.showWidget(current, _widget.id)
           })
           .map((o) => {
             const Widget = o.component

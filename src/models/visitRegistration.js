@@ -200,22 +200,7 @@ export default createFormViewModel({
           })
           return false
         }
-      },
-      *getReferralList ({ payload }, { call, put }) {
-        try {
-          const response = yield call(service.queryReferralList)
-          const { data } = response
-          return data
-        } catch (error) {
-          yield put({
-            type: 'updateErrorState',
-            payload: {
-              patientInfo: 'Failed to retrieve referral list',
-            },
-          })
-          return false
-        }
-      },
+      }, 
       *getBizSession ({ payload }, { call, put }) {
         const response = yield call(service.getBizSession, payload)
         const { data } = response

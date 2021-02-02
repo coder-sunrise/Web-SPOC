@@ -54,6 +54,7 @@ const styles = (theme) => ({
     ) {
       const {
         showConsultationVersioning,
+        isVisitReferralSourceMandatory,
         autoPrintDrugLabelOnFinalize,
         autoPrintOnSignOff,
         autoPrintOnCompletePayment,
@@ -61,9 +62,7 @@ const styles = (theme) => ({
         defaultVisitType,
         showTotalInvoiceAmtInConsultation,
         autoPrintReportsOnCompletePayment,
-        autoPrintReportsOnSignOff,
-        autoPrintDrugLabelOnCompletePayment,
-        autoPrintDrugLabelOnSignOff,
+        autoPrintReportsOnSignOff, 
       } = clinicSettings.entity
       return {
         ...clinicSettings.entity,
@@ -84,6 +83,10 @@ const styles = (theme) => ({
         showConsultationVersioning: {
           ...showConsultationVersioning,
           settingValue: showConsultationVersioning.settingValue === 'true',
+        },
+        isVisitReferralSourceMandatory: {
+          ...isVisitReferralSourceMandatory,
+          settingValue: isVisitReferralSourceMandatory.settingValue === 'true',
         },
         autoPrintOnSignOff: {
           ...autoPrintOnSignOff,
@@ -268,7 +271,7 @@ class GeneralSetting extends PureComponent {
             </GridItem>
           </GridContainer>
           <GridContainer>
-            <GridItem md={3}>
+            <GridItem md={3} sm={6} xs={12}>
               <Field
                 name='showConsultationVersioning.settingValue'
                 render={(args) => (
@@ -280,9 +283,7 @@ class GeneralSetting extends PureComponent {
                 )}
               />
             </GridItem>
-          </GridContainer>
-          <GridContainer>
-            <GridItem md={3}>
+            <GridItem md={3} sm={6} xs={12}>
               <Field
                 name='autoRefresh.settingValue'
                 render={(args) => (
@@ -294,7 +295,19 @@ class GeneralSetting extends PureComponent {
                 )}
               />
             </GridItem>
-          </GridContainer>
+            <GridItem md={3} sm={6} xs={12}>
+              <Field
+                name='isVisitReferralSourceMandatory.settingValue'
+                render={(args) => (
+                  <Switch
+                    label='Referral Source Mandatory'
+                    {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer> 
           <GridContainer>
             <GridItem md={2} style={{ margin: 0 }}>
               <Field

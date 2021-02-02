@@ -1,11 +1,11 @@
-import React, { PureComponent, useEffect, useState } from 'react'
-
+import React, { PureComponent } from 'react'
 import { withStyles } from '@material-ui/core'
 import { Button, CommonModal, GridContainer, GridItem } from '@/components'
 
-import SchemesGrid from './SchemesGrid'
 import CHASCardReplacement from '@/components/_medisys/SchemePopover/CHASCardReplacement'
 import { locationQueryParameters } from '@/utils/utils'
+import SchemesGrid from './SchemesGrid'
+import PayersGrid from './PayersGrid'
 
 const styles = () => ({})
 class Schemes extends PureComponent {
@@ -65,6 +65,12 @@ class Schemes extends PureComponent {
         },
       })
     }
+  }
+
+  isMedisave = (schemeTypeFK) => {
+    if(schemeTypeFK)
+      return [12,13,14].indexOf(schemeTypeFK) >= 0
+    return false
   }
 
   createNewScheme = (result, values) => {
@@ -245,21 +251,28 @@ class Schemes extends PureComponent {
             handleOnClose={() => this.handleReplacementModalVisibility(false)}
           />
         </CommonModal>
-        {/* TODO: hide medisave payer until feature is fully built */}
-        {/* <h4
+        <div
           style={{
-            marginTop: theme.spacing(2),
-          }}
+              display: values.patientScheme.filter((o) => this.isMedisave(o.schemeTypeFK) && !o.isDeleted).length > 0  ? '' : 'none',
+            }}
         >
-          Medisave Payer
-        </h4>
-        <PayersGrid
-          enableAdd={values.patientScheme ? values.patientScheme.find((o) => o.schemeTypeFK === 11): false} // TODO: check is medisave added
-          rows={values.schemePayer}
-          schema={schema.schemePayer._subType}
-          values={values}
-          {...restProps}
-        /> */}
+          <h4
+            style={{
+              marginTop: theme.spacing(2),
+              marginLeft: theme.spacing(1),
+            }}
+          >
+            Medisave Payer
+          </h4>
+          <PayersGrid
+            enableAdd={values.patientScheme ? values.patientScheme.find((o) => this.isMedisave(o.schemeTypeFK) && !o.isDeleted) : false}
+            rows={values.schemePayer}
+            schema={schema.schemePayer._subType}
+            values={values}
+            {...restProps}
+          />
+        </div>
+        
       </div>
     )
   }

@@ -10,6 +10,7 @@ export const CANNED_TEXT_TYPE_FIELD_NAME = {
   [CANNED_TEXT_TYPE.CHIEFCOMPLAINTS]: 'chiefComplaints',
   [CANNED_TEXT_TYPE.PLAN]: 'plan',
   [CANNED_TEXT_TYPE.HISTORY]: 'history',
+  [CANNED_TEXT_TYPE.MEDICALCERTIFICATE]: 'medicalcertificate',
 }
 
 export const columns = [

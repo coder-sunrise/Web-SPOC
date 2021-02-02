@@ -47,23 +47,7 @@ class Filter extends PureComponent {
                 return <TextField label='Name' {...args} />
               }}
             />
-          </GridItem>
-          <GridItem xs={6} md={3}>
-            <FastField
-              name='institution'
-              render={(args) => {
-                return <TextField label='Institution' {...args} />
-              }}
-            />
-          </GridItem>
-          <GridItem xs={6} md={3}>
-            <FastField
-              name='department'
-              render={(args) => {
-                return <TextField label='Department' {...args} />
-              }}
-            />
-          </GridItem>
+          </GridItem> 
         </GridContainer>
 
         <GridContainer>

@@ -29,7 +29,10 @@ const addContent = (type, claimSubmissionActionProps) => {
       )
     case 5:
       return (
-        <Rejected handleContextMenuItemClick={handleContextMenuItemClick} />
+        <Rejected 
+          handleSubmitClaimStatus={handleSubmitClaimStatus}
+          handleContextMenuItemClick={handleContextMenuItemClick}
+        />
       )
     default:
       return (

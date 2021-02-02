@@ -21,7 +21,7 @@ export default (theme) => ({
     fontWeight: 'bold',
   },
   paymentTypeContainer: {
-    maxHeight: '49vh',
+    maxHeight: '43vh',
     overflowX: 'hidden',
     overflowY: 'auto',
   },
@@ -53,11 +53,11 @@ export default (theme) => ({
     paddingLeft: '0px !important',
   },
   paymentModeContainer: {
-    maxHeight: '50vh',
+    maxHeight: '43vh',
     overflowX: 'auto',
     padding: theme.spacing(1),
   },
   paymentContent: {
-    marginTop: theme.spacing(2),
+    // marginTop: theme.spacing(2),
   },
 })

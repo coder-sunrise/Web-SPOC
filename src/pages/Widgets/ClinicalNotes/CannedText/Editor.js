@@ -12,8 +12,10 @@ import {
   GridItem,
   RichEditor,
   TextField,
+  OutlinedTextField,
   NumberInput,
 } from '@/components'
+import { CANNED_TEXT_TYPE } from '@/utils/constants'
 
 const defaultEntity = {
   title: undefined,
@@ -52,14 +54,15 @@ const Editor = ({
         </GridItem>
         <GridItem md={6}>
           <div>
-            <div style={{ display: 'inline-Block' }}>
-              <FastField
-                name='isShared'
-                render={(args) => (
-                  <Checkbox {...args} simple label='Is Shared' />
-                )}
-              />
-            </div>
+            {cannedTextTypeFK !== CANNED_TEXT_TYPE.MEDICALCERTIFICATE &&
+              <div style={{ display: 'inline-Block' }}>
+                <FastField
+                  name='isShared'
+                  render={(args) => (
+                    <Checkbox {...args} simple label='Is Shared' />
+                  )}
+                />
+              </div>}
             <div style={{ display: 'inline-Block', marginLeft: 10 }}>
               <FastField
                 name='sortOrder'
@@ -76,12 +79,30 @@ const Editor = ({
           </div>
         </GridItem>
         <GridItem md={12}>
-          <FastField
-            name='text'
-            render={(args) => (
-              <RichEditor strongLabel label='Canned Text' {...args} />
-            )}
-          />
+          {cannedTextTypeFK !== CANNED_TEXT_TYPE.MEDICALCERTIFICATE ?
+            <FastField
+              name='text'
+              render={(args) => (
+                <RichEditor strongLabel label='Canned Text' {...args} />
+              )}
+            />
+            :
+            <FastField
+              name='text'
+              render={(args) => {
+                return (
+                  <OutlinedTextField
+                    label='Canned Text'
+                    multiline
+                    rowsMax={5}
+                    maxLength={2000}
+                    rows={5}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          }
         </GridItem>
         <GridItem md={12} style={{ textAlign: 'right' }}>
           <Button color='danger' size='sm' onClick={handleCancelClick}>

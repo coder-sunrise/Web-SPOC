@@ -35,6 +35,7 @@ const LowStockInfo = ({ sourceType, values = {}, codetable }) => {
     stock = 0.0,
     isChasAcuteClaimable,
     isChasChronicClaimable,
+    isMedisaveClaimable,
     sellingPrice = 0,
   } = source
 
@@ -50,7 +51,7 @@ const LowStockInfo = ({ sourceType, values = {}, codetable }) => {
         <div
           style={{
             fontSize: 14,
-            height: 90,
+            height: 110,
           }}
         >
           <p>
@@ -67,6 +68,7 @@ const LowStockInfo = ({ sourceType, values = {}, codetable }) => {
           </p>
           <p>CHAS Acute Claimable: {isChasAcuteClaimable ? 'Yes' : 'No'}</p>
           <p>CHAS Chronic Claimable: {isChasChronicClaimable ? 'Yes' : 'No'}</p>
+          <p>Medisave Claimable: {isMedisaveClaimable ? 'Yes' : 'No'}</p>
         </div>
       }
     >

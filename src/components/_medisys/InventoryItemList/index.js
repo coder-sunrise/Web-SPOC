@@ -16,11 +16,12 @@ import {
   Switch,
   SizeContainer,
 } from '@/components'
-import { getUniqueId, currencyFormatter } from '@/utils/utils'
+import { getUniqueId } from '@/utils/utils'
 import { InventoryTypes, visitOrderTemplateItemTypes } from '@/utils/codes'
 import { ITEM_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
 import { currencySymbol } from '@/utils/config'
+import _ from 'lodash'
 
 const CPSwitch = (label) => (args) => {
   if (!args.field.value) {
@@ -641,7 +642,7 @@ class InventoryItemList extends React.Component {
                   fontWeight: 500,
                 }}
               >
-                {currencyFormatter(row.unitPrice * row.quantity)}
+                <NumberInput text currency value={_.round(row.unitPrice * row.quantity, 2)} />
               </p>
             )
           },

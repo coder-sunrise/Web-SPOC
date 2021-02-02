@@ -5,14 +5,14 @@ import {
   GridItem,
   TextField,
   CodeSelect,
-  NumberInput,
 } from '@/components'
 import { MobileNumberInput } from '@/components/_medisys'
 
 const Contact = (props) => {
   const { theme, type } = props
   const isCopayer = type === 'copayer'
-  const isReferral = type === 'referral'
+  const isReferralSource = type === 'referralsource'
+  const isReferralPerson = type === 'referralperson'
   return (
     <React.Fragment>
       <div
@@ -57,7 +57,7 @@ const Contact = (props) => {
             />
           </GridItem>
 
-          {!isReferral && (
+          {!isReferralSource && !isReferralPerson && (
             <GridItem md={6}>
               <FastField
                 name='contactPerson'
@@ -68,25 +68,19 @@ const Contact = (props) => {
             </GridItem>
           )}
 
-          <GridItem md={6}>
-            <FastField
-              name='contact.mobileContactNumber.number'
-              render={(args) => (
-                // <NumberInput
-                //   label='Contact Number'
-                //   maxLength='15'
-                //   min='0'
-                //   max='999999999999999'
-                //   precision={0}
-                //   {...args}
-                // />
-                <MobileNumberInput
-                  {...args}
-                  label={isReferral ? 'Mobile Number' : 'Contact Number'}
-                />
-              )}
-            />
-          </GridItem>
+          {!isReferralSource &&
+            <GridItem md={6}>
+              <FastField
+                name='contact.mobileContactNumber.number'
+                render={(args) => (
+                  <MobileNumberInput
+                    {...args}
+                    label={isReferralPerson ? 'Mobile Number' : 'Contact Number'}
+                  />
+                )}
+              />
+            </GridItem>
+          }
 
           <GridItem md={6}>
             <FastField
@@ -106,22 +100,22 @@ const Contact = (props) => {
             />
           </GridItem>
 
-          {(isCopayer || isReferral) && (
+          {(isCopayer || isReferralSource || isReferralPerson) && (
             <Fragment>
-              <GridItem md={6}>
-                <FastField
-                  name='contact.contactEmailAddress.emailAddress'
-                  render={(args) => <TextField label='Email' {...args} />}
-                />
-              </GridItem>
-              {isCopayer && (
+              {(isCopayer || isReferralSource) && (
                 <GridItem md={6}>
                   <FastField
                     name='contact.contactWebsite.website'
                     render={(args) => <TextField label='URL' {...args} />}
                   />
                 </GridItem>
-              )}
+              )} 
+              <GridItem md={6}>
+                <FastField
+                  name='contact.contactEmailAddress.emailAddress'
+                  render={(args) => <TextField label='Email' {...args} />}
+                />
+              </GridItem>
             </Fragment>
           )}
         </GridContainer>

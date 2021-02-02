@@ -1,9 +1,10 @@
 import moment from 'moment'
 import _ from 'lodash'
+import numeral from 'numeral'
 import Authorized from '@/utils/Authorized'
-import { currencySymbol } from '@/utils/config'
-import { dateFormatLong, dateFormatLongWithTime } from './format'
-import { UNFIT_TYPE, SCRIBBLE_NOTE_TYPE, REPORT_ID } from './constants'
+import { currencySymbol, qtyFormat } from '@/utils/config'
+import { dateFormatLong, dateFormatLongWithTime } from '@/components'
+import { UNFIT_TYPE, SCRIBBLE_NOTE_TYPE } from './constants'
 import { calculateAgeFromDOB } from './dateUtils'
 
 const status = [
@@ -331,8 +332,6 @@ const consultationDocumentTypes = [
       return {
         ...r,
         issueDate: moment(r.issueDate).format(dateFormatLong),
-        // attendanceStartTime: moment(r.attendanceStartTime).format('HH:mm'),
-        // attendanceEndTime: moment(r.attendanceEndTime).format('HH:mm'),
       }
     },
     downloadConfig: {
@@ -459,22 +458,6 @@ export const countryCodes = [
   { name: '+81 Japan', value: '81' },
 ]
 
-// const localCodes = {}
-// export async function getCodes (code) {
-//   if (!localCodes[code]) {
-//     const r = await request(`/api/CodeTable?ctnames=${code}`)
-
-//     if (r.status === '200') {
-//       // console.log(r)
-//       localCodes[code] = r.data[code] || []
-//     } else {
-//       localCodes[code] = []
-//     }
-//   }
-//   // console.log(localCodes[code])
-//   return localCodes[code]
-// }
-
 export const podoOrderType = [
   {
     value: 1,
@@ -546,6 +529,184 @@ export const rgType = [
     stockName: 'vaccinationStock',
   },
 ]
+
+const loadFromCodesConfig = {
+  mapPrescriptions: (rows, codetable, patient, isExtPrescription = false) => {
+    return rows.map((o) => {
+      const {
+        instruction,
+        corPrescriptionItemPrecaution: precaution = [],
+        remarks = '',
+        quantity = 0,
+        dispenseUOMDisplayValue = '',
+      } = o
+      const qtyFormatStr = numeral(quantity).format(qtyFormat)
+      const { ctmedicationprecaution = [] } = codetable
+      const subjectHtml = `<li> - ${o.subject} ${isExtPrescription
+        ? ' (Ext.)'
+        : ''}</li>`
+      const instHtml = instruction !== '' ? `<li>${instruction}</li>` : ''
+      const remarksHtml = remarks !== '' ? `<li>${remarks}</li>` : ''
+      const qtyHtml = `<li>Quantity: ${qtyFormatStr} ${dispenseUOMDisplayValue}</li>`
+      const precautionHtml = precaution
+        .map((i) => {
+          const codetablePrecaution = ctmedicationprecaution.find(
+            (c) => c.id === i.medicationPrecautionFK,
+          )
+          if (codetablePrecaution && codetablePrecaution.translationLink) {
+            const {
+              translationLink: { translationMasters = [] },
+            } = codetablePrecaution
+
+            const transHtml = translationMasters
+              .filter((t) => patient.translationLinkFK === t.languageFK)
+              .map((m) => {
+                return `<li>${m.displayValue}</li>`
+              })
+              .join('')
+
+            if (i.precaution !== '' && transHtml !== '') {
+              return `<li>${i.precaution}</li>
+                    ${transHtml}`
+            }
+          }
+          return ''
+        })
+        .join('')
+
+      return `<ul>${subjectHtml}<ul>${instHtml}${qtyHtml}${precautionHtml}${remarksHtml}</ul></ul>`
+    })
+  },
+  InsertMedication: (rows, codetable, patient, isExtPrescription = false) => {
+    const pRows = rows.filter(
+      (o) =>
+        !o.isDeleted &&
+        o.type === '1' &&
+        (o.isExternalPrescription || false) === isExtPrescription,
+    )
+    if (pRows && pRows.length > 0) {
+      const rowHTMLs = loadFromCodesConfig.mapPrescriptions(
+        pRows,
+        codetable,
+        patient,
+        isExtPrescription,
+      )
+      return `<ul>
+              <li><strong>${isExtPrescription
+                ? 'External Prescription'
+                : 'Medication'}</strong></li>
+               ${rowHTMLs.join('')}
+            </ul>`
+    }
+    return ''
+  },
+  InsertVaccination: (rows, isGenerateCertificate) => {
+    const vRows = (isGenerateCertificate
+      ? rows
+      : rows.filter((o) => !o.isDeleted && o.type === '2')).map((v) => {
+      const {
+        subject = '',
+        usageMethodDisplayValue: usage = '',
+        dosageDisplayValue: dosage = '',
+        uomDisplayValue: uom = '',
+        remarks = '',
+        quantity = 0,
+        uomDisplayValue = '',
+      } = v
+      const qtyFormatStr = numeral(quantity).format(qtyFormat)
+      const subjectHtml = `<li> - ${subject}</li>`
+      const precautionHtml =
+        usage + dosage + uom !== '' ? `<li>${usage} ${dosage} ${uom} </li>` : ''
+      const qtyHtml = `<li>Quantity: ${qtyFormatStr} ${uomDisplayValue}</li>`
+      const remarksHtml = remarks !== '' ? `<li>${remarks}</li>` : ''
+
+      return `<ul>${subjectHtml} <ul> ${precautionHtml}${qtyHtml}${remarksHtml}</ul></ul>`
+    })
+    if (vRows && vRows.length > 0)
+      return `<ul>
+              <li><strong>Vaccination</strong></li>
+              ${vRows.join('')}
+            </ul>`
+    return ''
+  },
+
+  InsertOpenPrescription: (
+    rows,
+    codetable,
+    patient,
+    isExtPrescription = false,
+  ) => {
+    const pRows = rows.filter(
+      (o) =>
+        !o.isDeleted &&
+        o.type === '5' &&
+        (o.isExternalPrescription || false) === isExtPrescription,
+    )
+    if (pRows && pRows.length > 0) {
+      const rowHTMLs = loadFromCodesConfig.mapPrescriptions(
+        pRows,
+        codetable,
+        patient,
+      )
+      return `<ul>
+              <li><strong>Open Prescription</strong></li>
+              ${rowHTMLs.join('')}
+           </ul>`
+    }
+    return ''
+  },
+
+  InsertConsumable: (rows) => {
+    const pRows = rows.filter((o) => !o.isDeleted && o.type === '4')
+    if (pRows && pRows.length > 0) {
+      const rowHTMLs = pRows.map((o) => {
+        const {
+          consumableName = '',
+          unitOfMeasurement = '',
+          quantity = 0,
+          remarks = '',
+        } = o
+
+        const qtyFormatStr = numeral(quantity).format(qtyFormat)
+        const subjectHtml = `<li> - ${consumableName}</li>`
+        const qtyHtml = `<li>Quantity: ${qtyFormatStr} ${unitOfMeasurement}</li>`
+        const remarksHtml = remarks !== '' ? `<li>${remarks}</li>` : ''
+
+        return `<ul>${subjectHtml} <ul>${qtyHtml}${remarksHtml}</ul></ul>`
+      })
+
+      return `<ul>
+              <li><strong>Consumable</strong></li>
+              ${rowHTMLs.join('')}
+           </ul>`
+    }
+    return ''
+  },
+
+  InsertPatientInfo: (codetable, patient) => {
+    let result
+    let patientGender = codetable.ctgender.find(
+      (x) => x.id === patient.genderFK,
+    )
+    let patientAllergy
+    for (let index = 0; index < patient.patientAllergy.length; index++) {
+      if (patient.patientAllergy[index].type === 'Allergy')
+        patientAllergy =
+          (patientAllergy ? `${patientAllergy}, ` : '') +
+          patient.patientAllergy[index].allergyName
+    }
+    result = `<p>Patient Name: ${patient.name}</p>`
+    result += `<p>Patient Ref. No.: ${patient.patientReferenceNo}</p>`
+    result += `<p>Patient Acc. No.: ${patient.patientAccountNo}</p>`
+    result += `<p>Gender/Age: ${patientGender.name.substring(
+      0,
+      1,
+    )}/${calculateAgeFromDOB(patient.dob)}</p>`
+
+    result += `<p>Drug Allergy: ${patientAllergy || 'N.A.'}</p>`
+    return result
+  },
+}
 
 export const InventoryTypes = [
   {
@@ -698,9 +859,99 @@ const tagList = [
           1,
         )}/${calculateAgeFromDOB(patient.entity.dob)}</p>`
 
-        result += `<p>Drug Allergy: ${patientAllergy || 'NA'}</p>`
+        result += `<p>Drug Allergy: ${patientAllergy || 'N.A.'}</p>`
       }
       return result || 'N.A.'
+    },
+  },
+  {
+    value: 'Order',
+    text: '<#Order#>',
+    url: '',
+    getter: (newVaccination) => {
+      const { orders, patient, codetable } = window.g_app._store.getState()
+      if (!orders) return '-'
+
+      const { rows = [] } = orders
+
+      let service = rows
+        .filter((o) => !o.isDeleted && o.type === '3')
+        .map((s) => `<p>- ${s.subject}</p>`)
+        .join('')
+
+      const ordersHTML = [
+        loadFromCodesConfig.InsertMedication(rows, codetable, patient, false),
+        loadFromCodesConfig.InsertVaccination(
+          newVaccination
+            ? [
+                ...rows,
+                newVaccination,
+              ]
+            : rows,
+          false,
+        ),
+        loadFromCodesConfig.InsertOpenPrescription(rows, codetable, patient),
+        loadFromCodesConfig.InsertConsumable(rows, codetable, patient),
+        service,
+      ]
+
+      let htmls = ordersHTML.join('')
+      return htmls
+    },
+  },
+  {
+    value: 'Vaccination',
+    text: '<#Vaccination#>',
+    url: '',
+    getter: (newVaccination) => {
+      const { orders, consultationDocument } = window.g_app._store.getState()
+      if (!orders) return '-'
+      const { rows = [] } = orders
+      const { entity = {} } = consultationDocument
+      let insertRows = rows
+      let isGenerateCertificate = false
+      if (newVaccination) {
+        insertRows = [
+          newVaccination,
+        ]
+        isGenerateCertificate = true
+      } else if (entity.vaccinationUFK) {
+        insertRows = rows.filter((vc) => vc.uid === entity.vaccinationUFK)
+        isGenerateCertificate = true
+      }
+
+      const ordersHTML = [
+        loadFromCodesConfig.InsertVaccination(
+          insertRows,
+          isGenerateCertificate,
+        ),
+      ]
+
+      let htmls = ordersHTML.join('')
+      return htmls
+    },
+  },
+  {
+    value: 'ExternalPrescription',
+    text: '<#ExternalPrescription#>',
+    url: '',
+    getter: () => {
+      const { orders, patient, codetable } = window.g_app._store.getState()
+      if (!orders) return '-'
+      const { rows = [] } = orders
+
+      const ordersHTML = [
+        loadFromCodesConfig.InsertMedication(rows, codetable, patient, true),
+        loadFromCodesConfig.InsertOpenPrescription(
+          rows,
+          codetable,
+          patient,
+          true,
+        ),
+      ]
+
+      let htmls = ordersHTML.join('')
+      return htmls
     },
   },
 ]
@@ -871,11 +1122,9 @@ export const getInventoryItemV2 = (
   }
 
   let newRows = rows.filter((x) => x.type === value && x.isDeleted === false)
-  // console.log({ newRows })
 
   const rowsGroupByFK = groupByFKFunc(newRows)
 
-  // console.log({ rowsGroupByFK })
   const newOutstandingItem = outstandingItem.map((o) => {
     const {
       quantityReceived,
@@ -886,7 +1135,6 @@ export const getInventoryItemV2 = (
     const activeItem = rowsGroupByFK.find(
       (i) => i[itemFKName] === o[itemFKName],
     )
-    // console.log({ activeItem })
     const remainingQuantityShouldReceive =
       orderQuantity - quantityReceivedFromOtherDOs
     let remainingQuantity = orderQuantity - quantityReceived
@@ -918,7 +1166,6 @@ export const getInventoryItemV2 = (
   })
 
   let fullyReceivedArray = []
-  // console.log({ newOutstandingItem })
 
   fullyReceivedArray = rowsGroupByFK.filter((o) => {
     const item = newOutstandingItem.find((i) => i[itemFKName] === o[itemFKName])
@@ -929,7 +1176,6 @@ export const getInventoryItemV2 = (
     }
     return null
   })
-  // console.log({ fullyReceivedArray })
 
   // get the fully received item
   newRows = newRows.filter((o) =>
@@ -938,13 +1184,11 @@ export const getInventoryItemV2 = (
 
   // get all the not fully received item based on the inventory item and current rows
   let inventoryItemList = _.differenceBy(list, newRows, itemFKName)
-  // console.log({ inventoryItemList })
 
   // get current inventory item outstanding item
   const filterOutstandingItem = newOutstandingItem.filter(
     (x) => x.type === value,
   )
-  // console.log({ filterOutstandingItem })
 
   // get the all the not fully received item based on outstanding item
   inventoryItemList = _.intersectionBy(
@@ -952,14 +1196,12 @@ export const getInventoryItemV2 = (
     filterOutstandingItem,
     itemFKName,
   )
-  // console.log({ inventoryItemList })
 
   inventoryItemList = inventoryItemList.map((o) => {
     const findSpecificOutstandingItem = newOutstandingItem.find(
       (i) => i[itemFKName] === o[itemFKName],
     )
 
-    // console.log({ findSpecificOutstandingItem })
     let remainingQty
     if (findSpecificOutstandingItem) {
       const { remainingQuantity } = findSpecificOutstandingItem
@@ -972,7 +1214,6 @@ export const getInventoryItemV2 = (
       remainingQty,
     }
   })
-  // console.log({ inventoryItemList })
   return {
     inventoryItemList,
   }
@@ -992,7 +1233,6 @@ export const inventoryItemListing = (
       value: x.id,
       name: displayValue,
       code,
-      // uom: prescribingUOM.id,
       stock: x[stockName],
       uom,
       sellingPrice: x.sellingPrice,
@@ -1017,16 +1257,6 @@ export const InvoicePayerType = [
     name: 'PATIENT',
     listName: 'patientPaymentTxn',
   },
-  // {
-  //   invoicePayerFK: 2,
-  //   name: 'COPAYER',
-  //   listName: 'coPayerPaymentTxn',
-  // },
-  // {
-  //   invoicePayerFK: 3,
-  //   name: 'GOVT_COPAYER',
-  //   listName: 'govCoPayerPaymentTxn',
-  // },
 ]
 export const recurrenceTypes = [
   {
@@ -1661,6 +1891,25 @@ export const costPriceTypes = [
   },
 ]
 
+export const documentTemplateTypes = [
+  {
+    value: 1,
+    name: 'Referral Letter',
+  },
+  {
+    value: 2,
+    name: 'Memo',
+  },
+  {
+    value: 3,
+    name: 'Vaccination Certificate',
+  },
+  {
+    value: 4,
+    name: 'Others',
+  },
+]
+
 module.exports = {
   appointmentStatus,
   recurrenceTypes,
@@ -1678,7 +1927,6 @@ module.exports = {
   appointmentStatusReception,
   messageStatus,
   smsStatus,
-  // country,
   sessionOptions,
   consultationDocumentTypes,
   tagList,
@@ -1700,5 +1948,6 @@ module.exports = {
   year,
   queueProcessorType,
   queueItemStatus,
+  documentTemplateTypes,
   ...module.exports,
 }

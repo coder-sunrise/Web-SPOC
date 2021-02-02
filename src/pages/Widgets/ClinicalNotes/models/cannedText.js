@@ -8,6 +8,7 @@ const defaultState = {
   note: [],
   plan: [],
   history: [],
+  medicalcertification: [],
   selectedNote: undefined,
   fields: [],
   cannedTextTypes: [],
@@ -97,7 +98,7 @@ export default createFormViewModel({
             ...rest,
           }
         }
-
+ 
         const result = data.reduce(splitByCannedTextType, { ...restState })
         return { ...state, ...result }
       },

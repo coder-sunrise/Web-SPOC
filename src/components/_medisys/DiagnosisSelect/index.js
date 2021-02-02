@@ -4,7 +4,9 @@ import { withStyles } from '@material-ui/core'
 import _ from 'lodash'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 import FilterList from '@material-ui/icons/FilterList'
-import { Select, ButtonSelect } from '@/components'
+import StarBorder from '@material-ui/icons/StarBorder'
+import Star from '@material-ui/icons/Star'
+import { Select, ButtonSelect, Tooltip } from '@/components'
 import { queryList } from '@/services/common'
 
 const styles = (theme) => ({
@@ -30,6 +32,10 @@ const filterOptions = [
     value: 'isHazeClaimable',
     name: 'Haze',
   },
+  {
+    value: 'isCdmpClaimable',
+    name: 'CDMP',
+  },
 ]
 
 const DiagnosisSelect = ({
@@ -41,6 +47,11 @@ const DiagnosisSelect = ({
   onDataSouceChange,
   filterStyle = { position: 'absolute', bottom: 8, right: 0 },
   clinicSettings,
+  from = 'report',
+  selectDiagnosisCode,
+  favouriteDiagnosis,
+  handelSaveDiagnosisAsFavourite,
+  currentSelectCategory,
   ...props
 }) => {
   let selectProps = props
@@ -73,20 +84,33 @@ const DiagnosisSelect = ({
   const onDiagnosisSearch = async (v) => {
     const search = {
       props:
-        'id,displayvalue,code,complication,isChasAcuteClaimable,isChasChronicClaimable,isHazeClaimable,iCD10AMFK,iCD10AMDiagnosisCode,iCD10AMDiagnosisName',
+        'id,displayvalue,code,complication,isChasAcuteClaimable,isChasChronicClaimable,isHazeClaimable,isCdmpClaimable,iCD10AMFK,iCD10AMDiagnosisCode,iCD10AMDiagnosisName',
       sorting: [
         { columnName: 'displayvalue', direction: 'asc' },
       ],
       pagesize: 30,
     }
+
+    let categoryFilter = []
+    let isOrderByFavourite = false
+    if (from === 'Consultaion') {
+      categoryFilter = currentSelectCategory
+      isOrderByFavourite = true
+    }
+
+    if (from === 'Report') {
+      categoryFilter = diagnosisFilter
+    }
+
     search.apiCriteria = {
       searchValue: v || undefined,
       diagnosisCategories:
-        diagnosisFilter.length === 0 ||
-        diagnosisFilter.length === filterOptions.length
+        categoryFilter.length === 0 ||
+        categoryFilter.length === filterOptions.length
           ? undefined
-          : diagnosisFilter.join(),
+          : categoryFilter.join(),
       id: typeof v === 'string' ? undefined : Number(v),
+      isOrderByFavourite,
     }
 
     const response = await queryList('/api/codetable/ctsnomeddiagnosis', search)
@@ -111,7 +135,8 @@ const DiagnosisSelect = ({
     showPrefix =
       selected.isChasAcuteClaimable ||
       selected.isChasChronicClaimable ||
-      selected.isHazeClaimable
+      selected.isHazeClaimable ||
+      selected.isCdmpClaimable
   }
 
   return (
@@ -123,21 +148,48 @@ const DiagnosisSelect = ({
         valueField='id'
         labelField='displayvalue'
         handleFilter={(input, opt) => true}
-        // autoComplete
         renderDropdown={(option) => {
           const {
             isChasAcuteClaimable,
             isChasChronicClaimable,
             isHazeClaimable,
+            isCdmpClaimable,
+            code,
           } = option
           return (
-            <span>
-              {(isChasAcuteClaimable ||
-                isChasChronicClaimable ||
-                isHazeClaimable) && <AttachMoney className={classes.money} />}
-
-              {option.displayvalue}
-            </span>
+            <div style={{ display: 'flex' }}>
+              <div
+                style={{
+                  width: '100%',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                }}
+              >
+                {(isChasAcuteClaimable ||
+                  isChasChronicClaimable ||
+                  isHazeClaimable ||
+                  isCdmpClaimable) && <AttachMoney className={classes.money} />}
+                {option.displayvalue}
+              </div>
+              {from === 'Consultaion' && (
+                <div
+                  style={{ marginLeft: 'auto', marginRight: -5, height: 20 }}
+                >
+                  {favouriteDiagnosis.find((d) => d === code) ? (
+                    <Star
+                      style={{
+                        color: '#FFCC00',
+                        width: 20,
+                        height: 20,
+                      }}
+                    />
+                  ) : (
+                    <div style={{ width: 20 }} />
+                  )}
+                </div>
+              )}
+            </div>
           )
         }}
         query={onDiagnosisSearch}
@@ -146,7 +198,6 @@ const DiagnosisSelect = ({
           if (onDataSouceChange) onDataSouceChange(data)
         }}
         onChange={(values, opts) => {
-          console.log('sdfsdfsdfsd')
           if (
             props.maxTagCount === undefined &&
             props.mode &&
@@ -160,21 +211,47 @@ const DiagnosisSelect = ({
         }}
         {...selectProps}
       />
-
-      <ButtonSelect
-        options={filterOptions}
-        mode='multiple'
-        textField='name'
-        valueField='value'
-        value={diagnosisFilter}
-        justIcon
-        style={filterStyle}
-        onChange={(v, option) => {
-          if (v !== diagnosisFilter) setDiagnosisFilter(v)
-        }}
-      >
-        <FilterList />
-      </ButtonSelect>
+      {from === 'Consultaion' &&
+      selectDiagnosisCode && (
+        <div style={{ ...filterStyle, height: 28, bottom: 0 }}>
+          {favouriteDiagnosis.find((d) => d === selectDiagnosisCode) ? (
+            <Tooltip title='Click to remove favourite'>
+              <Star
+                style={{
+                  color: '#FFCC00',
+                  width: 28,
+                  height: 28,
+                  cursor: 'hand',
+                }}
+                onClick={handelSaveDiagnosisAsFavourite}
+              />
+            </Tooltip>
+          ) : (
+            <Tooltip title='Click to add to favourite'>
+              <StarBorder
+                style={{ color: 'gray', width: 28, height: 28, cursor: 'hand' }}
+                onClick={handelSaveDiagnosisAsFavourite}
+              />
+            </Tooltip>
+          )}
+        </div>
+      )}
+      {from === 'report' && (
+        <ButtonSelect
+          options={filterOptions}
+          mode='multiple'
+          textField='name'
+          valueField='value'
+          value={diagnosisFilter}
+          justIcon
+          style={filterStyle}
+          onChange={(v) => {
+            if (v !== diagnosisFilter) setDiagnosisFilter(v)
+          }}
+        >
+          <FilterList />
+        </ButtonSelect>
+      )}
     </div>
   )
 }

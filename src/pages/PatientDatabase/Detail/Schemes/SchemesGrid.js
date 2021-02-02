@@ -45,7 +45,7 @@ class SchemesGrid extends PureComponent {
           },
           sortingEnabled: false,
           isDisabled: (row) => {
-            return this.isMedisaveOrPHPC(row)
+            return this.isPHPC(row)
           },
           // onChange: (date, moments, org, row) => {
           //   row.validFrom = date[0]
@@ -59,6 +59,9 @@ class SchemesGrid extends PureComponent {
           type: 'codeSelect',
           code: 'ctSchemeType',
           sortingEnabled: false,
+          localFilter: (opt) => {
+            return !this.isMedisave(opt) // TODO: Disable for prod R1.5.2 only, enable when deploy UAT again
+          },
           onChange: ({ val, option, row, onValueChange }) => {
             let { rows } = this.props
             if (!row.id) {
@@ -72,7 +75,7 @@ class SchemesGrid extends PureComponent {
             const st = ctSchemeTypes.find((o) => o.id === val)
             if (!st) return
             // console.log('schemesgrid', { rows, st })
-            if (this.isMedisaveOrPHPC(row)) {
+            if (this.isPHPC(row)) {
               row.validRange = []
               row.validFrom = undefined
               row.validTo = undefined
@@ -231,7 +234,7 @@ class SchemesGrid extends PureComponent {
       const newRows = this.getSortedRows(rows)
 
       newRows.forEach((r, i) => {
-        if (r.validRange && !this.isMedisaveOrPHPC(r)) {
+        if (r.validRange && !this.isPHPC(r)) {
           r.validFrom = r.validRange[0]
           r.validTo = r.validRange[1]
         } else {
@@ -308,21 +311,18 @@ class SchemesGrid extends PureComponent {
     return false
   }
 
-  isMedisaveOrPHPC = (row) => {
+  isMedisave = (row) => {
     const { codetable } = this.props
-    // const r = schemeTypes.find((o) => o.id === row.schemeTypeFK)
-
     const ctSchemeTypes = codetable[ctSchemeType.toLowerCase()] || []
-    const r = ctSchemeTypes.find((o) => o.id === row.schemeTypeFK)
+    const r = ctSchemeTypes.find((o) => o.id === row.id)
 
     if (!r) return false
     return (
       [
-        'MEDI500VISIT',
+        'MEDIVISIT',
         'FLEXIMEDI',
         'OPSCAN',
-        'MEDI500VACCINATION',
-      ].indexOf(r.code) >= 0 || r.code.startsWith('PHPC')
+      ].indexOf(r.code) >= 0 // || r.code.startsWith('PHPC')
     )
   }
 

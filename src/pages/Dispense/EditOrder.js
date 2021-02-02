@@ -4,6 +4,7 @@ import router from 'umi/router'
 import { connect } from 'dva'
 import withStyles from '@material-ui/core/styles/withStyles'
 // common component
+import Warining from '@material-ui/icons/Error'
 import {
   GridContainer,
   GridItem,
@@ -23,6 +24,9 @@ import { convertToConsultation } from '@/pages/Consultation/utils'
 import { getAppendUrl } from '@/utils/utils'
 import { widgets } from '@/utils/widgets'
 import Authorized from '@/utils/Authorized'
+import { sendNotification } from '@/utils/realtime'
+import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
+import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
 import ConsumePackage from '@/pages/Widgets/Orders/Detail/ConsumePackage'
 
 const discardConsultation = async ({ dispatch, dispense }) => {
@@ -51,7 +55,6 @@ const discardConsultation = async ({ dispatch, dispense }) => {
   }
 }
 const styles = () => ({})
-// @Authorized.Secured('queue.dispense.editorder')
 @connect(({ consultation, user }) => ({
   consultation,
   user,
@@ -193,6 +196,45 @@ class EditOrder extends Component {
       handleSubmit()
     } else {
       const { consultationDocument, orders, dispatch, dispense } = this.props
+      if (orders.summary.totalWithGST < 0) {
+        window.g_app._store.dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            openConfirm: true,
+            isInformType: true,
+            customWidth: 'md',
+            openConfirmContent: () => {
+              return (
+                <div>
+                  <Warining
+                    style={{
+                      width: '1.3rem',
+                      height: '1.3rem',
+                      marginLeft: '10px',
+                      color: 'red',
+                    }}
+                  />
+                  <h3 style={{ marginLeft: '10px', display: 'inline-block' }}>
+                    Unable to save, total amount cannot be{' '}
+                    <span style={{ fontWeight: 400 }}>negative</span>.
+                  </h3>
+                </div>
+              )
+            },
+            openConfirmText: 'OK',
+            onConfirmClose: () => {
+              window.g_app._store.dispatch({
+                type: 'global/updateAppState',
+                payload: {
+                  customWidth: undefined,
+                },
+              })
+            },
+          },
+        })
+        return
+      }
+
       const payload = convertToConsultation(values, {
         consultationDocument,
         orders,
@@ -204,6 +246,16 @@ class EditOrder extends Component {
         payload,
       })
       if (signResult) {
+        const { visitRegistration } = this.props
+        const { entity: visit = {} } = visitRegistration
+        const { id } = visit
+        sendNotification('EditedConsultation', {
+          type: NOTIFICATION_TYPE.CONSULTAION,
+          status: NOTIFICATION_STATUS.OK,
+          message: 'Completed Consultation',
+          visitID: id,
+        })
+
         notification.success({
           message: 'Order signed',
         })
@@ -216,6 +268,7 @@ class EditOrder extends Component {
           type: `dispense/updateState`,
           payload: {
             editingOrder: false,
+            shouldRefreshOrder: false,
           },
         })
       }
@@ -243,7 +296,7 @@ class EditOrder extends Component {
         <GridContainer>
           <GridItem xs={12} md={6}>
             <h5>Orders</h5>
-            <Order className={classes.orderPanel} status='' from='ca' />
+            <Order className={classes.orderPanel} status='' from='EditOrder' />
           </GridItem>
           <GridItem xs={12} md={6}>
             {formAccessRight &&
@@ -347,6 +400,7 @@ class EditOrder extends Component {
         >
           <ConsumePackage {...this.props} />
         </CommonModal>
+        <ViewPatientHistory top='170px' />
       </div>
     )
   }

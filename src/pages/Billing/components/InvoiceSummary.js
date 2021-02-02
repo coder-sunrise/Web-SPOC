@@ -1,5 +1,4 @@
 import React, { useState, useCallback } from 'react'
-import numeral from 'numeral'
 // material ui
 import { withStyles } from '@material-ui/core'
 // ant design
@@ -12,13 +11,10 @@ import {
   GridItem,
   NumberInput,
 } from '@/components'
-import Payments from './Payments'
 // utils
 import { roundTo } from '@/utils/utils'
-import config from '@/utils/config'
 import _ from 'lodash'
-
-const { currencyFormat } = config
+import Payments from './Payments'
 
 const styles = () => ({
   crossed: {
@@ -73,12 +69,15 @@ const InvoiceSummary = ({
     invoiceNo,
     isGstInclusive,
     outstandingBalance,
-  } = invoice 
-  
+  } = invoice
+
   let totalCashRound = 0
-  invoicePayment.filter(o => !o.isCancelled).forEach(o => {
-    totalCashRound += _.sumBy(o.invoicePaymentMode || [], (payment) => payment.cashRounding)
-  })  
+  invoicePayment.filter((o) => !o.isCancelled).forEach((o) => {
+    totalCashRound += _.sumBy(
+      o.invoicePaymentMode || [],
+      (payment) => payment.cashRounding,
+    )
+  })
 
   const handleConfirmDelete = useCallback(
     (id, toggleVisibleCallback) => {
@@ -197,10 +196,17 @@ const InvoiceSummary = ({
               />
             </GridItem>
             <GridItem md={6}>
-              Cash Rounding
+              {totalCashRound !== 0 && <span>Cash Rounding</span>}
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
-              <NumberInput currency text value={totalCashRound} style={{ padding: '0px 8px' }} />
+              {totalCashRound !== 0 && (
+                <NumberInput
+                  currency
+                  text
+                  value={totalCashRound}
+                  style={{ padding: '0px 8px' }}
+                />
+              )}
             </GridItem>
             <GridItem md={12}>
               <Divider

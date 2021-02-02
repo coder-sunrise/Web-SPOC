@@ -13,10 +13,12 @@ import {
   withFormikExtend,
   Switch,
 } from '@/components'
+import Authorized from '@/utils/Authorized'
 import Yup from '@/utils/yup'
 import { getServices } from '@/utils/codetable'
 import { calculateAdjustAmount } from '@/utils/utils'
 import { currencySymbol } from '@/utils/config'
+import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
 import { DoctorProfileSelect } from '@/components/_medisys'
 
 const getVisitDoctorUserId = props => {
@@ -32,9 +34,6 @@ const getVisitDoctorUserId = props => {
 
 @connect(({ codetable, global, user, visitRegistration }) => ({ codetable, global, user, visitRegistration }))
 @withFormikExtend({
-  authority: [
-    'queue.consultation.order.service',
-  ],
   mapPropsToValues: ({ orders = {}, type, codetable, visitRegistration }) => {
     const v = {
       ...(orders.entity || orders.defaultService),
@@ -156,19 +155,7 @@ class Service extends PureComponent {
         serviceCenters,
         serviceCenterServices,
       })
-      // this.setState((ps) => {
-      //   return {
-      //     pagination: {
-      //       ...ps.pagination,
-      //       ...payload,
-      //     },
-      //   }
-      // })
     })
-    // const v =
-    //   field.value !== undefined && field.value !== ''
-    //     ? field.value
-    //     : props.value || props.defaultValue
     this.state = {
       services: [],
       serviceCenters: [],
@@ -333,17 +320,26 @@ class Service extends PureComponent {
   }
 
   render () {
-    const { theme, classes, values = {}, footer, handleSubmit, setFieldValue } = this.props
+    const { theme, classes, values = {}, footer, from, setFieldValue } = this.props
     const { services, serviceCenters } = this.state
     const { serviceFK, serviceCenterFK } = values
+    const totalPriceReadonly =
+      Authorized.check('queue.consultation.modifyorderitemtotalprice')
+        .rights !== 'enable'
 
     return (
-      <div>
-        <GridContainer>
-          <GridItem xs={8}>
-            <Field
-              name='serviceFK'
-              render={(args) => {
+      <Authorized
+        authority={GetOrderItemAccessRight(
+          from,
+          'queue.consultation.order.service',
+        )}
+      >
+        <div>
+          <GridContainer>
+            <GridItem xs={8}>
+              <Field
+                name='serviceFK'
+                render={(args) => {
                 return (
                   <div id={`autofocus_${values.type}`}>
                     <Select
@@ -366,9 +362,9 @@ class Service extends PureComponent {
                   </div>
                 )
               }}
-            />
-          </GridItem>
-          {values.isPackage && (
+              />
+            </GridItem>
+            {values.isPackage && (
             <React.Fragment>
               <GridItem xs={3}>
                 <Field
@@ -401,7 +397,6 @@ class Service extends PureComponent {
                           marginTop: theme.spacing(3),
                         }}
                         formatter={(v) => `/ ${parseFloat(v).toFixed(1)}`}
-                        // prefix='/'
                         text
                         {...args}
                       />
@@ -411,7 +406,7 @@ class Service extends PureComponent {
               </GridItem>
             </React.Fragment>
           )}
-          {!values.isPackage && (
+            {!values.isPackage && (
             <GridItem xs={3}>
               <Field
                 name='quantity'
@@ -439,12 +434,12 @@ class Service extends PureComponent {
               />
             </GridItem>
           )}
-        </GridContainer>
-        <GridContainer>
-          <GridItem xs={8}>
-            <Field
-              name='serviceCenterFK'
-              render={(args) => {
+          </GridContainer>
+          <GridContainer>
+            <GridItem xs={8}>
+              <Field
+                name='serviceCenterFK'
+                render={(args) => {
                 return (
                   <Select
                     label='Service Center Name'
@@ -462,12 +457,12 @@ class Service extends PureComponent {
                   />
                 )
               }}
-            />
-          </GridItem>
-          <GridItem xs={3}>
-            <Field
-              name='total'
-              render={(args) => {
+              />
+            </GridItem>
+            <GridItem xs={3}>
+              <Field
+                name='total'
+                render={(args) => {
                 return (
                   <NumberInput
                     label='Total'
@@ -480,35 +475,35 @@ class Service extends PureComponent {
                     onChange={(e) => {
                       this.updateTotalPrice(e.target.value)
                     }}
-                    disabled={values.isPackage}
+                    disabled={totalPriceReadonly || values.isPackage}
                     {...args}
                   />
                 )
               }}
-            />
-          </GridItem>
-        </GridContainer>
-        <GridContainer>
-          <GridItem xs={8} className={classes.editor}>
-            <Field
-              name='performingUserFK'
-              render={(args) => (
-                <DoctorProfileSelect
-                  label='Performed By'
-                  {...args}
-                  valueField='clinicianProfile.userProfileFK'
-                />
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem xs={8} className={classes.editor}>
+              <Field
+                name='performingUserFK'
+                render={(args) => (
+                  <DoctorProfileSelect
+                    label='Performed By'
+                    {...args}
+                    valueField='clinicianProfile.userProfileFK'
+                  />
               )}
-            />
-          </GridItem>  
-          <GridItem xs={3} className={classes.editor}>
-            <div style={{ position: 'relative' }}>
-              <div
-                style={{ marginTop: theme.spacing(2), position: 'absolute' }}
-              >
-                <Field
-                  name='isMinus'
-                  render={(args) => {
+              />
+            </GridItem>  
+            <GridItem xs={3} className={classes.editor}>
+              <div style={{ position: 'relative' }}>
+                <div
+                  style={{ marginTop: theme.spacing(2), position: 'absolute' }}
+                >
+                  <Field
+                    name='isMinus'
+                    render={(args) => {
                     return (
                       <Switch
                         checkedChildren='-'
@@ -519,16 +514,16 @@ class Service extends PureComponent {
                             this.onAdjustmentConditionChange()
                           }, 1)
                         }}
-                        disabled={values.isPackage}
+                        disabled={totalPriceReadonly || values.isPackage}
                         {...args}
                       />
                     )
                   }}
-                />
-              </div>
-              <Field
-                name='adjValue'
-                render={(args) => {
+                  />
+                </div>
+                <Field
+                  name='adjValue'
+                  render={(args) => {
                   args.min = 0
                   if (values.isExactAmount) {
                     return (
@@ -544,7 +539,7 @@ class Service extends PureComponent {
                             this.onAdjustmentConditionChange()
                           }, 1)
                         }}
-                        disabled={values.isPackage}
+                        disabled={totalPriceReadonly || values.isPackage}
                         {...args}
                       />
                     )
@@ -563,19 +558,19 @@ class Service extends PureComponent {
                           this.onAdjustmentConditionChange()
                         }, 1)
                       }}
-                      disabled={values.isPackage}
+                      disabled={totalPriceReadonly || values.isPackage}
                       {...args}
                     />
                   )
                 }}
-              />
-            </div>
-          </GridItem>
-          <GridItem xs={1} className={classes.editor}>
-            <div style={{ marginTop: theme.spacing(2) }}>
-              <Field
-                name='isExactAmount'
-                render={(args) => {
+                />
+              </div>
+            </GridItem>
+            <GridItem xs={1} className={classes.editor}>
+              <div style={{ marginTop: theme.spacing(2) }}>
+                <Field
+                  name='isExactAmount'
+                  render={(args) => {
                   return (
                     <Switch
                       checkedChildren='$'
@@ -586,31 +581,30 @@ class Service extends PureComponent {
                           this.onAdjustmentConditionChange()
                         }, 1)
                       }}
-                      disabled={values.isPackage}
+                      disabled={totalPriceReadonly || values.isPackage}
                       {...args}
                     />
                   )
                 }}
-              />
-            </div>
-          </GridItem>
-        </GridContainer>
-        <GridContainer>
-          <GridItem xs={8} className={classes.editor}>
-            <FastField
-              name='remark'
-              render={(args) => {
-                // return <RichEditor placeholder='Remarks' {...args} />
+                />
+              </div>
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem xs={8} className={classes.editor}>
+              <FastField
+                name='remark'
+                render={(args) => {
                 return (
                   <TextField multiline rowsMax='5' label='Remarks' {...args} />
                 )
               }}
-            />
-          </GridItem>
-          <GridItem xs={3} className={classes.editor}>
-            <Field
-              name='totalAfterItemAdjustment'
-              render={(args) => {
+              />
+            </GridItem>
+            <GridItem xs={3} className={classes.editor}>
+              <Field
+                name='totalAfterItemAdjustment'
+                render={(args) => {
                 return (
                   <NumberInput
                     label='Total After Adj'
@@ -624,14 +618,15 @@ class Service extends PureComponent {
                   />
                 )
               }}
-            />
-          </GridItem>
-        </GridContainer>
-        {footer({
+              />
+            </GridItem>
+          </GridContainer>
+          {footer({
           onSave: this.validateAndSubmitIfOk,
           onReset: this.handleReset,
         })}
-      </div>
+        </div>
+      </Authorized>
     )
   }
 }

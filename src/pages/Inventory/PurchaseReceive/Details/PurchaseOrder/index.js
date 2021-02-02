@@ -30,6 +30,7 @@ import {
 } from '../../variables'
 import POGrid from './POGrid'
 import POForm from './POForm'
+import Warining from '@material-ui/icons/Error'
 
 const styles = (theme) => ({
   errorMsgStyle: {
@@ -163,6 +164,33 @@ class Index extends Component {
       this.props.handleSubmit()
     } else {
       const submit = () => {
+        if (action === poSubmitAction.FINALIZE && processedPayload.totalAfterAdj < 0) {
+          window.g_app._store.dispatch({
+            type: 'global/updateAppState',
+            payload: {
+              openConfirm: true,
+              isInformType: true,
+              customWidth: 'md',
+              openConfirmContent: () => {
+                return <div>
+                  <Warining style={{ width: '1.3rem', height: '1.3rem', marginLeft: '10px', color: 'red' }} />
+                  <h3 style={{ marginLeft: '10px', display: 'inline-block' }}>Unable to save, total amount cannot be <span style={{ fontWeight: 400 }}>negative</span>.</h3>
+                </div>
+              },
+              openConfirmText: 'OK',
+              onConfirmClose: () => {
+                window.g_app._store.dispatch({
+                  type: 'global/updateAppState',
+                  payload: {
+                    customWidth: undefined
+                  }
+                })
+              },
+            },
+          })
+          return
+          return
+        }
         dispatch({
           type: dispatchType,
           payload: {
@@ -587,9 +615,9 @@ class Index extends Component {
           }}
         >
           <GridContainer>
-            <GridItem xs={2} md={8} />
-            <GridItem xs={10} md={4}>
-              <div style={{ paddingRight: 22 }}>
+            <GridItem xs={2} md={6} />
+            <GridItem xs={10} md={6}>
+              <div style={{ paddingRight: 100 }}>
                 <AmountSummary
                   rows={rows}
                   adjustments={purchaseOrderAdjustment}

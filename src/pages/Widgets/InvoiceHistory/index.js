@@ -15,9 +15,9 @@ import {
   Button,
   CommonModal,
   WarningSnackbar,
+  NumberInput,
 } from '@/components'
 // utils
-import { currencyFormatter } from '@/utils/utils'
 import { ReportViewer } from '@/components/_medisys'
 import { getBizSession } from '@/services/queue'
 import PaymentDetails from './PaymentDetails'
@@ -139,17 +139,17 @@ const InvoiceHistory = ({
               Date: {moment(invoiceDate).format(dateFormatLong)}
             </p>
             <p className={classes.title}>
-              Invoice Amount: {currencyFormatter(invoiceTotalAftGST)}
+              Invoice Amount: <NumberInput text currency value={invoiceTotalAftGST} />
             </p>
             <p className={classes.title}>
-              Total Paid: {currencyFormatter(totalPayment)}
+              Total Paid: <NumberInput text currency value={totalPayment} />
             </p>
             <p
               className={
-                patientOutstanding > 0 ? classes.titleBold : classes.title
+                patientOutstanding !== 0 ? classes.titleBold : classes.title
               }
             >
-              Patient O/S Balance: {currencyFormatter(patientOutstanding)}
+              Patient O/S Balance: <NumberInput text currency value={patientOutstanding} />
             </p>
             <p className={classes.printButtonStyle}>
               <Button
@@ -191,7 +191,7 @@ const InvoiceHistory = ({
           ''
         )}
         <div className={classes.totalOSStyle}>
-          Total Patient O/S Balance: {currencyFormatter(getTotalPatientOS())}
+          Total Patient O/S Balance: <NumberInput text currency value={getTotalPatientOS()} />
         </div>
 
         <div className={classes.accordionStyle}>

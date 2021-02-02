@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
-import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
+import { Collapse } from 'antd'
 import moment from 'moment'
 import withStyles from '@material-ui/core/styles/withStyles'
 import BusinessCenterIcon from '@material-ui/icons/BusinessCenter'
@@ -9,51 +9,64 @@ import {
   GridItem,
   Button,
   withFormikExtend,
-  Accordion,
   DatePicker,
   dateFormatLong,
   SizeContainer,
   CommonModal,
 } from '@/components'
 import model from './models'
-import PackageDrawdownAccordion from './packageDrawdownAccordion'
 import TransferPackage from './transferPackage'
 import { ReportViewer } from '@/components/_medisys'
+import customstyles from './PatientPackageDrawdownStyle.less'
 
 window.g_app.replaceModel(model)
 
+const smallFontSize = '0.85rem'
 const styles = (theme) => ({
   titleContainer: {
     display: 'flex',
   },
+  packageTitle: {
+    fontWeight: 'bold',
+    fontSize: smallFontSize,
+  },
   titleBlack: {
     fontWeight: 'normal',
+    fontSize: smallFontSize,
     color: 'black',
   },
   noRecordsDiv: {
-    height: 'calc(100vh - 250px)',
+    height: 'calc(100vh - 270px)',
     paddingTop: 5,
     marginLeft: theme.spacing(1),
   },
   contentDiv: {
-    height: 'calc(100vh - 250px)',
+    height: 'calc(100vh - 270px)',
     overflow: 'scroll',
   },
   drawdownQuantity: {
     marginLeft: theme.spacing(4),
-    fontWeight: 'bold',
+    fontWeight: 500,
+    fontSize: smallFontSize,
+  },
+  drawdownTitle: {
+    fontWeight: 500,
+    fontSize: smallFontSize,
   },
   drawdownInfo: {
-    fontWeight: 'bold',
+    fontWeight: 500,
+    fontSize: smallFontSize,
   },
   drawdownRemarks: {
     marginLeft: theme.spacing(3),
+    fontSize: smallFontSize,
   },
   drawdownGrid: {
     marginTop: theme.spacing(1),
   },
   acknowledgeInfo: {
     marginLeft: theme.spacing(2),
+    fontSize: smallFontSize,
   },
   transferButton: {
     marginTop: -2,
@@ -101,6 +114,8 @@ class PatientPackageDrawdown extends Component {
       reportID: undefined,
       reportParameters: undefined,
     },
+    expandPackages: [],
+    expandDrawdowns: [],
   }
 
   componentDidMount () {
@@ -115,13 +130,39 @@ class PatientPackageDrawdown extends Component {
     })
   }
 
-  refreshPackageDrawdown = () => {
+  setExpandAll = (isExpandAll = false) => {
+    const { values } = this.props
+    if (isExpandAll) {
+      if (values && values.length > 0) {
+        this.setState({
+          expandPackages: values.map(o => o.id),
+        })
+
+        let drawdowns = []
+        values.forEach(p => {
+          const { patientPackageDrawdown } = p
+          drawdowns = drawdowns.concat(patientPackageDrawdown.map(o => o.id))
+        })
+
+        this.setState({ expandDrawdowns: drawdowns })
+      }
+    } else {
+      this.setState({ expandPackages: [] })
+      this.setState({ expandDrawdowns: [] })
+    }
+  }
+
+  refreshPackageDrawdown = (isExpandAll = true) => {
     const { dispatch, patient } = this.props
     dispatch({
       type: 'patientPackageDrawdown/getPatientPackageDrawdown',
       payload: {
         patientId: patient.entity.id,
       },
+    }).then((r) => {
+      if (r && isExpandAll) {
+        this.setExpandAll(true)
+      }
     })
   }
 
@@ -131,18 +172,43 @@ class PatientPackageDrawdown extends Component {
       itemName,
       remainingQuantity,
       totalQuantity,
+      id,
     } = row
 
     const totalDrawdownQuantity = totalQuantity - remainingQuantity
     const label = `${itemName} (drawdown to-date: ${parseToOneDecimalString(totalDrawdownQuantity)} / ${parseToOneDecimalString(totalQuantity)})`
 
     return (
-      <div className={classes.titleContainer}>
-        {remainingQuantity > 0 ? (
-          <p>{label}</p>
-        ) : (
-          <p><font color='black'>{label}</font></p>
-        )}
+      <div 
+        className={classes.titleContainer}
+        onClick={() => {
+          this.setState((preState) => {
+            if (preState.expandDrawdowns.find((key) => key === id)) {
+              return {
+                ...preState,
+                expandDrawdowns: preState.expandDrawdowns.filter(
+                  (key) => key !== id,
+                ),
+              }
+            }
+
+            return {
+              ...preState,
+              expandDrawdowns: [
+                ...preState.expandDrawdowns,
+                id,
+              ],
+            }            
+          })          
+        }}
+      >
+        <p className={classes.drawdownTitle}>
+          {remainingQuantity > 0 ? (
+            <font color='#4255BD'>{label}</font>
+          ) : (
+            <font color='black'>{label}</font>
+          )}
+        </p>
         {!isCompleted && !isExpired && remainingQuantity > 0 && (
           <Button className={classes.transferButton}
             size='sm'
@@ -227,19 +293,49 @@ class PatientPackageDrawdown extends Component {
       isCompleted,
       isExpired,
       id,
+      patientPackageDrawdown,
     } = row
 
     return (
-      <div className={classes.titleContainer}>
+      <div 
+        className={classes.titleContainer} 
+        onClick={() => {
+          this.setState((preState) => {
+            const drawdowns = patientPackageDrawdown.filter(d => d.patientPackageFK === id)
+            const drawdownIds = drawdowns.map(o => o.id)
+
+            if (preState.expandPackages.find((key) => key === id)) {
+              return {
+                ...preState,
+                expandPackages: preState.expandPackages.filter(
+                  (key) => key !== id,
+                ),
+                expandDrawdowns: preState.expandDrawdowns.filter(
+                  (key) => !drawdownIds.includes(key),
+                ),
+              }
+            }
+
+            return {
+              ...preState,
+              expandPackages: [
+                ...preState.expandPackages,
+                id,
+              ],
+              expandDrawdowns: preState.expandDrawdowns.concat(drawdownIds),
+            }            
+          })          
+        }}
+      >
         <GridContainer>
-          <GridItem md={8}>
-            {isCompleted ? (
-              <p>
+          <GridItem md={8}>            
+            <p className={classes.packageTitle}>
+              {isCompleted ? (
                 <font color='black'> {packageCode} - {packageName}</font>
-              </p>
               ) : (
-                <p>{packageCode} - {packageName}</p>
-            )}
+                <font color='#4255BD'> {packageCode} - {packageName}</font>
+              )}
+            </p>
           </GridItem>
           <GridItem md={2}>
             {isCompleted && (
@@ -261,13 +357,14 @@ class PatientPackageDrawdown extends Component {
                     label='Exp. Date' 
                     format={dateFormatLong} 
                     value={expiryDate} 
-                    onChange={value => {
-                      const changedPacakge = values.find(p => p.id === id)
-                      if (changedPacakge) {
-                        changedPacakge.expiryDate = value || undefined
-                      }
-                    }              
-                }
+                    onChange={
+                      value => {
+                        const changedPacakge = values.find(p => p.id === id)
+                        if (changedPacakge) {
+                          changedPacakge.expiryDate = value || undefined
+                        }
+                      }              
+                    }
                   />
                 </div>
               </SizeContainer>
@@ -295,22 +392,19 @@ class PatientPackageDrawdown extends Component {
 
     return (
       <div>
-        <PackageDrawdownAccordion
-          defaultActive={[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]}
-          leftIcon
-          expandIcon={<SolidExpandMore fontSize='large' />}
-          mode='multiple'
-          collapses={patientPackageDrawdown.map((o) => {
-            const returnValue = {
-              title: this.getDrawdownTitle(o, row.isCompleted, row.isExpired),
-              content: this.getDrawdownContent(o),
-            }
-            return {
-              ...returnValue,
-              row: o,
-            }
+        <Collapse activeKey={this.state.expandDrawdowns} expandIconPosition='left'>
+          {patientPackageDrawdown.map((o) => {
+            return (
+              <Collapse.Panel
+                header={this.getDrawdownTitle(o, row.isCompleted, row.isExpired)}
+                key={o.id}
+                className={customstyles.packageDrawdownPanel}
+              >
+                {this.getDrawdownContent(o)}
+              </Collapse.Panel>
+            )
           })}
-        />
+        </Collapse>
       </div>
     )
   }
@@ -326,7 +420,7 @@ class PatientPackageDrawdown extends Component {
       isShowPackageTransferModal: false,
     })
 
-    this.refreshPackageDrawdown()
+    this.refreshPackageDrawdown(false)
   }
 
   onCloseReport = () => {
@@ -363,20 +457,69 @@ class PatientPackageDrawdown extends Component {
         <div>
           <GridContainer>
             <GridItem md={12}>
+              <div style={{
+                textAlign: 'right',
+              }}
+              >
+                <span
+                  style={{
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => {
+                    this.setExpandAll(true)
+                  }}
+                >
+                  <span
+                    className='material-icons'
+                    style={{
+                      fontSize: '1.2rem',
+                    }}
+                  >
+                    unfold_more
+                  </span>
+                  <span style={{ position: 'relative', top: -5 }}>
+                    Expand All
+                  </span>
+                </span>
+                <span
+                  style={{
+                    cursor: 'pointer',
+                    marginLeft: 20,
+                    marginRight: 10,
+                  }}
+                  onClick={() => {
+                    this.setExpandAll(false)
+                  }}
+                >
+                  <span
+                    className='material-icons'
+                    style={{
+                      fontSize: '1.2rem',
+                    }}
+                  >
+                    unfold_less
+                  </span>
+                  <span style={{ position: 'relative', top: -5 }}>
+                    Collapse All
+                  </span>
+                </span>
+              </div>
+            </GridItem>
+            <GridItem md={12}>              
               <div className={classes.contentDiv}>
-                <Accordion
-                  mode='multiple'
-                  collapses={list.map((o) => {
-                  const returnValue = {
-                    title: this.getPackageTitle(o),
-                    content: this.getPackageContent(o),
-                  }
-                  return {
-                    ...returnValue,
-                    row: o,
-                  }
-                })}
-                />
+                <Collapse activeKey={this.state.expandPackages} expandIconPosition='right'>
+                  {list.map((o) => {
+                    return (
+                      <Collapse.Panel
+                        header={this.getPackageTitle(o)}
+                        key={o.id}
+                        className={customstyles.packagePanel}
+                      >
+                        {this.getPackageContent(o)}
+                      </Collapse.Panel>
+                    )
+                  })}
+                </Collapse>
               </div>
             </GridItem>
             <GridItem md={12}>

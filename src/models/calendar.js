@@ -383,6 +383,7 @@ export default createListViewModel({
       *getClinicBreakHourList (_, { call, put }) {
         const result = yield call(queryClinicBreakHour, {
           isActive: true,
+          pagesize: 999,
         })
 
         if (result.status === '200') {
@@ -397,6 +398,7 @@ export default createListViewModel({
       *getClinicOperationHourList (_, { call, put }) {
         const result = yield call(queryClinicOperationHour, {
           isActive: true,
+          pagesize: 999,
         })
 
         if (result.status === '200') {
@@ -410,6 +412,7 @@ export default createListViewModel({
         const result = yield call(queryPublicHolidays, {
           isActive: true,
           lgteql_startDate: payload.start,
+          pagesize: 999,
         })
 
         if (result.status === '200') {

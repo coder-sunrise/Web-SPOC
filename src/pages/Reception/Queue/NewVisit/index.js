@@ -91,6 +91,7 @@ const getHeight = (propsHeight) => {
     visitRegistration,
     patientInfo: patient.entity,
     doctorProfiles: codetable.doctorprofile,
+    ctinvoiceadjustment: codetable.ctinvoiceadjustment,
   }),
 )
 @withFormikExtend({
@@ -148,8 +149,22 @@ class NewVisit extends PureComponent {
     })
     const { data = [] } = bizSession
     this.setState({ hasActiveSession: data.length > 0 })
+    await this.getCodeTables()
   }
 
+  getCodeTables = async () => {
+    const { dispatch } = this.props
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctinvoiceadjustment',
+        force: true,
+        filter: {
+          isActive: true,
+        },
+      },
+    })
+  }
   componentWillUnmount () {
     // call file index API METHOD='DELETE'
     // for Attachments where fileStatus === 'Uploaded' but not 'Confirmed'
@@ -232,7 +247,7 @@ class NewVisit extends PureComponent {
       (registered, queue) =>
         !registered ? queue.patientProfileFK === patientInfo.id : registered,
       false,
-    )
+    ) 
 
     if (!values.id && alreadyRegisteredVisit)
       return dispatch({
@@ -256,7 +271,7 @@ class NewVisit extends PureComponent {
       if (accessRight) {
         const { rights } = accessRight
         return (rights === 'readwrite' || rights === 'enable') &&
-        (isReadOnly || isRetail)
+          (isReadOnly || isRetail)
           ? 'disable'
           : rights
       }
@@ -317,6 +332,8 @@ class NewVisit extends PureComponent {
       setFieldValue,
       clinicSettings,
       patientInfo,
+      ctinvoiceadjustment,
+      codetable,
     } = this.props
 
     if (expandRefractionForm) {
@@ -334,12 +351,12 @@ class NewVisit extends PureComponent {
       (queueNumbers, queue) =>
         queue.visitFK === values.id
           ? [
-              ...queueNumbers,
-            ]
+            ...queueNumbers,
+          ]
           : [
-              ...queueNumbers,
-              queue.queueNo,
-            ],
+            ...queueNumbers,
+            queue.queueNo,
+          ],
       [],
     )
     const isReadOnly =
@@ -348,7 +365,7 @@ class NewVisit extends PureComponent {
       (!patientInfo || !patientInfo.isActive)
     const isReadonlyAfterSigned =
       clinicSettings.settings.isVisitEditableAfterEndConsultation &&
-      values.isLastClinicalObjectRecordSigned
+        values.isLastClinicalObjectRecordSigned
         ? false
         : isReadOnly
     const isEdit = !!values.id
@@ -362,6 +379,22 @@ class NewVisit extends PureComponent {
     const params = locationQueryParameters()
     const vis = parseInt(params.vis, 10)
     const autoRefreshChas = !(params.md === 'visreg' && vis > 0)
+    let referralType = 'None'
+    // Edit visit
+    if (values.id) {
+      if (values.referralSourceFK || values.referralPersonFK) {
+        referralType = 'Company'
+      }
+      else if (values.referralPatientProfileFK) {
+        referralType = 'Patient'
+      }
+    }
+    else if (clinicSettings.settings.isVisitReferralSourceMandatory) {
+      referralType = 'Company'
+    }
+    if (!values.referralByType) {
+      this.props.setFieldValue('referralByType', referralType)
+    }
     return (
       <React.Fragment>
         <LoadingWrapper
@@ -392,7 +425,7 @@ class NewVisit extends PureComponent {
                       value={{
                         rights:
                           (rights === 'readwrite' || rights === 'enable') &&
-                          isReadOnly
+                            isReadOnly
                             ? 'disable'
                             : rights,
                       }}
@@ -401,7 +434,9 @@ class NewVisit extends PureComponent {
                         <VisitInfoCard
                           // isReadOnly={isReadOnly}
                           isVisitReadonlyAfterSigned={isReadonlyAfterSigned}
+                          isSigned={values.isLastClinicalObjectRecordSigned}
                           existingQNo={existingQNo}
+                          copaymentScheme={patientInfo?.patientScheme.filter(t => t.schemeTypeFK === 15)}
                           handleUpdateAttachments={this.updateAttachments}
                           attachments={values.visitAttachment}
                           visitType={values.visitPurposeFK}
@@ -415,7 +450,8 @@ class NewVisit extends PureComponent {
                       value={{
                         rights:
                           (rights === 'readwrite' || rights === 'enable') &&
-                          (isReadOnly || isRetail)
+                            (isReadOnly || isRetail)
+                            && isReadonlyAfterSigned
                             ? 'disable'
                             : rights,
                       }}
@@ -428,7 +464,7 @@ class NewVisit extends PureComponent {
                                 rights:
                                   (vitalAccessRight === 'readwrite' ||
                                     vitalAccessRight === 'enable') &&
-                                  isReadonlyAfterSigned
+                                    isReadonlyAfterSigned
                                     ? 'disable'
                                     : vitalAccessRight,
                               }}
@@ -443,12 +479,14 @@ class NewVisit extends PureComponent {
                           )}
                         </Authorized>
                         <GridItem xs={12} className={classes.row}>
-                          <ReferralCard
-                            // isReadOnly={isRetail || isReadOnly}
+                          <ReferralCard 
+                            isVisitReadonlyAfterSigned={isReadonlyAfterSigned}
+                            isSigned={values.isLastClinicalObjectRecordSigned}
                             handleUpdateAttachments={this.updateAttachments}
                             attachments={values.visitAttachment}
                             dispatch={dispatch}
                             values={values}
+                            referralType={referralType}
                             setFieldValue={setFieldValue}
                           />
                         </GridItem>

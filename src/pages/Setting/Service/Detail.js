@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { FastField, withFormik } from 'formik'
+import { FastField } from 'formik'
 import _ from 'lodash'
 import moment from 'moment'
 import { withStyles } from '@material-ui/core'
@@ -17,6 +17,7 @@ import {
   CodeSelect,
   withFormikExtend,
   notification,
+  Checkbox,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -168,8 +169,10 @@ const modalityItemSchema = Yup.object().shape({
 })
 class Detail extends PureComponent {
   state = {
-    ddlMedisaveHealthScreening: true,
-    ddlOutpatientScan: true,
+    ddlIsCdmpClaimable: this.props.initialValues.isCdmpClaimable,
+    ddlMedisaveHealthScreening: this.props.initialValues
+      .isMedisaveHealthScreening,
+    ddlOutpatientScan: this.props.initialValues.isOutpatientScan,
     serviceSettings: this.props.values.ctServiceCenter_ServiceNavigation,
     modalitySettings: this.props.values.ctService_Modality,
   }
@@ -279,20 +282,47 @@ class Detail extends PureComponent {
         ddlMedisaveHealthScreening:
           settingClinicService.entity.isMedisaveHealthScreening,
         ddlOutpatientScan: settingClinicService.entity.isOutpatientScan,
+        ddlIsCdmpClaimable: settingClinicService.entity.isCdmpClaimable,
       })
     }
   }
 
-  onChangeMedisaveHealthScreening = () => {
-    this.setState(({ ddlMedisaveHealthScreening }) => ({
-      ddlMedisaveHealthScreening: !ddlMedisaveHealthScreening,
-    }))
+  onChangeMedisaveHealthScreening = (e) => {
+    if (e) {
+      this.setState(() => ({
+        ddlMedisaveHealthScreening: e.target.value,
+      }))
+
+      const { values, setFieldValue } = this.props
+      setFieldValue('isMedisaveHealthScreening', e.target.value)
+      if (e.target.value === false)
+        values.medisaveHealthScreeningDiagnosisFK = null
+    }
   }
 
-  onChangeOutpatientScan = () => {
-    this.setState(({ ddlOutpatientScan }) => ({
-      ddlOutpatientScan: !ddlOutpatientScan,
-    }))
+  onChangeOutpatientScan = (e) => {
+    if (e) {
+      this.setState(() => ({
+        ddlOutpatientScan: e.target.value,
+      }))
+
+      const { values, setFieldValue } = this.props
+      setFieldValue('isOutpatientScan', e.target.value)
+      if (e.target.value === false) values.outPatientScanDiagnosisFK = null
+    }
+  }
+
+  onChangeCdmpClaimable = (e) => {
+    if (e) {
+      this.setState(() => ({
+        ddlIsCdmpClaimable: e.target.value,
+      }))
+    }
+
+    if (!e.target.value) {
+      this.onChangeMedisaveHealthScreening(e)
+      this.onChangeOutpatientScan(e)
+    }
   }
 
   checkIsServiceCenterUnique = ({ rows, changed }) => {
@@ -450,17 +480,12 @@ class Detail extends PureComponent {
       settingClinicService,
       errors,
     } = props
-    const { serviceSettings } = this.state
-    const medisaveSettingValue = {
-      MedisaveHealthScreeningValue: [
-        { value: 1, name: 'Mammogram' },
-        { value: 1, name: 'Mammogram' },
-      ],
-      OutpatientScanValue: [
-        { value: 1, name: 'CT' },
-        { value: 1, name: 'CT' },
-      ],
-    }
+    const {
+      serviceSettings,
+      ddlMedisaveHealthScreening,
+      ddlOutpatientScan,
+      ddlIsCdmpClaimable,
+    } = this.state
     const serviceSettingsErrMsg = errors.ctServiceCenter_ServiceNavigation
     const shoudDisableSaveButton =
       serviceSettings.filter((row) => !row.isDeleted).length === 0
@@ -584,8 +609,115 @@ class Detail extends PureComponent {
                     }}
                   />
                 </GridItem>
+                <GridItem xs={12}>
+                  <FastField
+                    name='isCdmpClaimable'
+                    render={(args) => {
+                      return (
+                        <span>
+                          <Checkbox
+                            disabled
+                            checked={ddlIsCdmpClaimable}
+                            // formControlProps={{ className: classes.medisaveCheck }}
+                            onChange={(e) => this.onChangeCdmpClaimable(e)}
+                            label='CDMP Claimable'
+                            {...args}
+                          />
+                        </span>
+                      )
+                    }}
+                  />
+                </GridItem>
               </GridContainer>
             </div>
+            {ddlIsCdmpClaimable && (
+              <div style={{ margin: theme.spacing(1, 2) }}>
+                <h4 style={{ fontWeight: 400 }}>
+                  <b>Medisave Settings</b>
+                </h4>
+                <div>
+                  <GridContainer>
+                    <GridItem
+                      xs={1}
+                      className={classes.detailHeaderContainer}
+                      style={{
+                        paddingLeft: 20,
+                        paddingTop: 10,
+                      }}
+                    >
+                      <FastField
+                        name='isMedisaveHealthScreening'
+                        render={(args) => {
+                          return (
+                            <Checkbox
+                              style={{ verticalAlign: 'bottom' }}
+                              checked={ddlMedisaveHealthScreening}
+                              // formControlProps={{ className: classes.medisaveCheck }}
+                              onChange={(e) =>
+                                this.onChangeMedisaveHealthScreening(e)}
+                              {...args}
+                            />
+                          )
+                        }}
+                      />
+                    </GridItem>
+                    <GridItem xs={8}>
+                      <FastField
+                        name='medisaveHealthScreeningDiagnosisFK'
+                        render={(args) => {
+                          return (
+                            <CodeSelect
+                              label='Medisave Health Screening'
+                              code='ctmedisavehealthscreeningdiagnosis'
+                              disabled={!ddlMedisaveHealthScreening}
+                              {...args}
+                            />
+                          )
+                        }}
+                      />
+                    </GridItem>
+                    <GridItem xs={3} />
+                    <GridItem
+                      xs={1}
+                      className={classes.detailHeaderContainer}
+                      style={{
+                        paddingLeft: 20,
+                        paddingTop: 10,
+                      }}
+                    >
+                      <FastField
+                        name='isOutpatientScan'
+                        render={(args) => {
+                          return (
+                            <Checkbox
+                              checked={ddlOutpatientScan}
+                              // formControlProps={{ className: classes.medisaveCheck }}
+                              onChange={(e) => this.onChangeOutpatientScan(e)}
+                            />
+                          )
+                        }}
+                      />
+                    </GridItem>
+                    <GridItem xs={8}>
+                      <FastField
+                        name='outPatientScanDiagnosisFK'
+                        render={(args) => {
+                          return (
+                            <CodeSelect
+                              label='Medisave Outpatient Scan'
+                              code='ctmedisaveoutpatientscandiagnosis'
+                              disabled={!ddlOutpatientScan}
+                              {...args}
+                            />
+                          )
+                        }}
+                      />
+                    </GridItem>
+                    <GridItem xs={3} />
+                  </GridContainer>
+                </div>
+              </div>
+            )}
             <h4 style={{ fontWeight: 400 }}>
               <b>Service Settings</b>
             </h4>
@@ -606,8 +738,8 @@ class Detail extends PureComponent {
                 showAddCommand: true,
                 onCommitChanges: this.commitChanges,
                 onAddedRowsChange: this.onAddedRowsChange,
-                isDeletable: () => {
-                  return !this.state.hasActiveSession
+                isDeletable: (row) => {
+                  return !this.state.hasActiveSession && !row.isUsedByOthers
                 },
               }}
               schema={itemSchema}

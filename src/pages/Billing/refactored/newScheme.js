@@ -18,6 +18,8 @@ import {
   CardContainer,
 } from '@/components'
 // sub components
+import PaymentSummary from '@/pages/Finance/Invoice/Details/PaymentDetails/PaymentSummary'
+import PaymentRow from '@/pages/Finance/Invoice/Details/PaymentDetails/PaymentRow'
 import MaxCap from './MaxCap'
 import BalanceLabel from './BalanceLabel'
 import DeleteWithPopover from '../components/DeleteWithPopover'
@@ -27,8 +29,6 @@ import {
   CompanyInvoicePayerColumn,
   ApplyClaimsColumnExtension,
 } from '../variables'
-import PaymentSummary from '@/pages/Finance/Invoice/Details/PaymentDetails/PaymentSummary'
-import PaymentRow from '@/pages/Finance/Invoice/Details/PaymentDetails/PaymentRow'
 
 const styles = (theme) => ({
   gridRow: {
@@ -97,8 +97,13 @@ const Scheme = ({
   onPrinterClick,
   onAddPaymentClick,
   fromBilling,
-  invoice,
+  patient,
+  ctschemetype,
+  ctcopaymentscheme,
+  tempInvoicePayer,
   clinicSettings = {},
+  isUpdatedAppliedInvoicePayerInfo,
+  showRefreshOrder,
 }) => {
   const {
     name,
@@ -118,17 +123,9 @@ const Scheme = ({
     payerDistributedAmt,
     payerOutstanding,
     invoicePayment = [],
+    schemePayerFK,
+    payerName,
   } = invoicePayer
-
-  const { invoiceItems = [] } = invoice
-  let existingOldPayerItem
-  if (
-    invoicePayerItem.find(
-      (ipi) => !invoiceItems.find((ii) => ii.id === ipi.invoiceItemFK),
-    )
-  ) {
-    existingOldPayerItem = true
-  }
 
   const handleSchemeChange = (value) => onSchemeChange(value, index)
   const handleCancelClick = () => onCancelClick(index)
@@ -142,13 +139,10 @@ const Scheme = ({
     }
 
     const statuses = chasClaimStatuses.map((status) => status.toLowerCase())
-    if (
-      hasPayments ||
-      // statuses.includes('draft') ||
-      statuses.includes('approved')
-    )
-      return true
-    return _isEditing ? false : hasOtherEditing
+    if (hasPayments || statuses.includes('approved')) return true
+    return _isEditing
+      ? false
+      : hasOtherEditing || isUpdatedAppliedInvoicePayerInfo || showRefreshOrder
   }
 
   const columnExtensions = [
@@ -159,13 +153,14 @@ const Scheme = ({
       type: 'currency',
       width: 150,
       currency: true,
-      isDisabled: (row) => _isConfirmed || !row.isClaimable,
+      isDisabled: (row) => _isConfirmed || !row.isClaimable, // latter is for drug mixture
     },
   ]
 
   const showGrid = companyFK || !_.isEmpty(schemeConfig)
   const disableEdit =
-    payerTypeFK === INVOICE_PAYER_TYPE.SCHEME &&
+    (payerTypeFK === INVOICE_PAYER_TYPE.SCHEME ||
+      payerTypeFK === INVOICE_PAYER_TYPE.PAYERACCOUNT) &&
     id !== undefined &&
     _.isEmpty(schemeConfig)
   const titleColor = disableEdit ? 'grey' : 'darkblue'
@@ -177,8 +172,37 @@ const Scheme = ({
     size: 'sm',
   }
 
-  const shoulddisable = () => {
+  const shouldDisable = () => {
     return _isEditing || hasOtherEditing
+  }
+
+  const getPayerList = (payerScheme) => {
+    // copayment scheme get scheme type fk, use it to find schemefk in schemepayer
+    const scheme = ctcopaymentscheme.find(
+      (a) => a.id === payerScheme.copaymentSchemeFK,
+    )
+    if (!scheme || scheme === undefined) return []
+    const schemeType =
+      ctschemetype.find((c) => c.name === scheme.schemeTypeName) || []
+    const addedSchemes =
+      tempInvoicePayer
+        .filter((r) => r.copaymentSchemeFK !== scheme.id)
+        .map((a) => {
+          return a.copaymentSchemeFK
+        }) || []
+    if (!schemeType) return []
+    return patient.schemePayer
+      .filter(
+        (b) =>
+          b.schemeFK === schemeType.id &&
+          addedSchemes.indexOf(payerScheme.copaymentSchemeFK) < 0,
+      )
+      .map((p) => {
+        return {
+          name: p.payerName,
+          id: p.id,
+        }
+      })
   }
 
   let payments = []
@@ -197,17 +221,26 @@ const Scheme = ({
     onPaymentVoidClick(index, payment)
   }
   const { isEnableAddPaymentInBilling = false } = clinicSettings
+
+  const isCHAS = schemeConfig && schemeConfig.copayerFK === 1
+  const isMedisave = payerTypeFK === INVOICE_PAYER_TYPE.PAYERACCOUNT
+
+  const payerList = getPayerList(invoicePayer)
+  const payer = payerList.find((p) => p.id === schemePayerFK)
+
   return (
     <Paper key={_key} elevation={4} className={classes.gridRow}>
       <GridContainer style={{ marginBottom: 16 }} alignItems='flex-start'>
-        <GridItem md={3} style={{ marginTop: 8, marginBottom: 16 }}>
-          <div
+        <GridItem md={6} style={{ marginTop: 8, marginBottom: 16 }}>
+          {/* Copayment Scheme [Only chas can select] */}
+          <span
             style={{
               width: '100%',
               display: 'flex',
               fontWeight: 500,
               fontSize: '1rem',
               color: titleColor,
+              marginRight: 20,
             }}
           >
             {disableEdit && <NotEditableInfo />}
@@ -230,28 +263,38 @@ const Scheme = ({
                 ]}
               />
             )}
+            {_isConfirmed && !payerName && !payer && <span>{name}</span>}
             {payerTypeFK === INVOICE_PAYER_TYPE.COMPANY &&
             _isEditing && <span>{name}</span>}
-
-            {_isConfirmed && <span>{name}</span>}
-          </div>
+            {payerTypeFK === INVOICE_PAYER_TYPE.PAYERACCOUNT && (
+              <span>
+                {name} - {payerName || payer.name}
+              </span>
+            )}
+          </span>
         </GridItem>
-        {schemeConfig &&
-        schemeConfig.copayerFK === 1 && (
+        {(isCHAS || isMedisave) && (
           <GridItem md={2} style={{ marginTop: 8, marginBottom: 8 }}>
             <BalanceLabel schemeConfig={schemeConfig} />
           </GridItem>
         )}
-        <GridItem md={2} style={{ marginTop: 8, marginBottom: 8 }}>
-          <MaxCap
-            payerTypeFK={payerTypeFK}
-            claimableSchemes={claimableSchemes}
-            copaymentSchemeFK={copaymentSchemeFK}
-            schemeConfig={schemeConfig}
-          />
-        </GridItem>
+        {!disableEdit && (
+          <GridItem md={2} style={{ marginTop: 8, marginBottom: 8 }}>
+            <MaxCap
+              payerTypeFK={payerTypeFK}
+              claimableSchemes={[
+                claimableSchemes,
+              ]}
+              copaymentSchemeFK={copaymentSchemeFK}
+              schemeConfig={schemeConfig}
+            />
+          </GridItem>
+        )}
+        {disableEdit && <GridItem md={2} />}
         <GridItem
-          md={schemeConfig && schemeConfig.copayerFK === 1 ? 5 : 7}
+          md={
+            (schemeConfig && schemeConfig.copayerFK === 1) || isMedisave ? 2 : 4
+          }
           style={{
             textAlign: 'right',
             marginTop: 8,
@@ -274,13 +317,18 @@ const Scheme = ({
                 EditingProps={{
                   showCommandColumn: false,
                   onCommitChanges,
-                  showCommandColumn: false,
                 }}
                 columns={
                   payerTypeFK === INVOICE_PAYER_TYPE.SCHEME ? (
-                    SchemeInvoicePayerColumn
+                    [
+                      ...SchemeInvoicePayerColumn,
+                      { name: 'error', title: ' ' },
+                    ]
                   ) : (
-                    CompanyInvoicePayerColumn
+                    [
+                      ...CompanyInvoicePayerColumn,
+                      { name: 'error', title: ' ' },
+                    ]
                   )
                 }
                 columnExtensions={columnExtensions}
@@ -311,8 +359,6 @@ const Scheme = ({
                   },
                 ]}
                 rows={invoicePayerItem}
-
-                // schema={validationSchema}
               />
             )}
           </GridItem>
@@ -354,7 +400,8 @@ const Scheme = ({
               disabled={
                 disableEdit ||
                 hasOtherEditing ||
-                (isEnableAddPaymentInBilling && existingOldPayerItem)
+                isUpdatedAppliedInvoicePayerInfo ||
+                showRefreshOrder
               }
             >
               Edit
@@ -373,8 +420,7 @@ const Scheme = ({
                       {...payment}
                       handleVoidClick={onPaymentDeleteClick}
                       handlePrinterClick={onPrinterClick}
-                      readOnly={shoulddisable()}
-                      printDisabled={existingOldPayerItem}
+                      readOnly={shouldDisable()}
                     />
                   ))}
               </CardContainer>
@@ -383,7 +429,11 @@ const Scheme = ({
               <div>
                 <Button
                   {...ButtonProps}
-                  disabled={shoulddisable() || existingOldPayerItem}
+                  disabled={
+                    shouldDisable() ||
+                    isUpdatedAppliedInvoicePayerInfo ||
+                    showRefreshOrder
+                  }
                   onClick={() => onAddPaymentClick(index)}
                 >
                   <Add />
@@ -391,7 +441,11 @@ const Scheme = ({
                 </Button>
                 <Button
                   {...ButtonProps}
-                  disabled={shoulddisable() || existingOldPayerItem}
+                  disabled={
+                    shouldDisable() ||
+                    isUpdatedAppliedInvoicePayerInfo ||
+                    showRefreshOrder
+                  }
                   onClick={() =>
                     onPrinterClick('TaxInvoice', undefined, companyFK)}
                 >

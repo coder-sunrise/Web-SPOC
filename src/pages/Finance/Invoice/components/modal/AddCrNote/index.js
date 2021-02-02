@@ -369,8 +369,13 @@ class AddCrNote extends Component {
     const { creditNoteItem, finalCredit, payerType } = values
 
     const packageGroupCellContent = ({ row }) => {
-      if (row.value === undefined || row.value === '')
-        return null
+      if (row.value === undefined || row.value === '') {
+        return (
+          <span style={{ verticalAlign: 'middle' }}>
+            <strong>Non-Package Items</strong>
+          </span>
+        )
+      }
   
       let label = 'Package'
       if (!creditNoteItem) return ''
