@@ -20,6 +20,7 @@ import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 import { currencySymbol } from '@/utils/config'
 import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
+import moment from 'moment'
 import LowStockInfo from './LowStockInfo'
 import { DoctorProfileSelect } from '@/components/_medisys'
 
@@ -72,6 +73,9 @@ const getVisitDoctorUserId = props => {
       'The amount should be more than 0.00',
     ),
     performingUserFK: Yup.number().required(),
+    expiryDate:Yup.date().min(
+      moment(),
+    'The batch of consumable is expired'),
   }),
 
   handleSubmit: (values, { props, onConfirm, setValues }) => {
@@ -292,6 +296,7 @@ class Consumable extends PureComponent {
       handleSubmit()
       return true
     }
+    handleSubmit()
     return false
   }
 
