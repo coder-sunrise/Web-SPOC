@@ -1,3 +1,4 @@
+import request from '@/utils/request'
 import React, { useRef } from 'react'
 // common component
 import { notification, CommonModal, Primary } from '@/components'
@@ -22,6 +23,7 @@ const WebSocketMessageType = {
   ScanCompleted: 3,
   RequestScanner: 4,
   Preview: 5,
+  AutoUpdate: 99,
 }
 
 const withWebSocket = () => (Component) => {
@@ -47,7 +49,7 @@ const withWebSocket = () => (Component) => {
       if (this.wsConnection && isWsConnected === true) this.wsConnection.close()
     }
 
-    prepareJobForWebSocket = async (content) => {
+    prepareJobForWebSocket = async (content, autoupdate) => {
       // reset port number state to retry all attempt and set job content
       // then initialize web socket connection
       const pendingJob = [
@@ -56,11 +58,12 @@ const withWebSocket = () => (Component) => {
       let sendSuccess = false
       this.setState({ pendingJob })
 
-      const { isWsConnected } = this.state
-      if (isWsConnected === true || (await this.tryConnectSocket())) {
+      if (!this.state.isWsConnected) { await this.tryConnectSocket() }
+      if (this.state.isWsConnected === true) {
         this.wsConnection.send(content)
+        console.log('message send to websocket')
         sendSuccess = true
-      } else {
+      } else if (!autoupdate) {
         notification.error({
           message: `Medicloud printing tool is not running, please start it.`,
         })
@@ -251,6 +254,38 @@ const withWebSocket = () => (Component) => {
       this.prepareJobForWebSocket(AESEncryptor.encrypt(jsonStr))
     }
 
+    versionCheck = async () => {
+      try {
+        const token = localStorage.getItem('token')
+        const response = await request(`/api/files/downloadlink?key=AutoUpdatePrintingToolDownloadLinkSection`, {
+          method: 'GET',
+        })
+        const { data, status } = response
+        if (status === '200') {
+          let payload =
+          {
+            Token: token,
+            BaseUrl: process.env.url,
+            SigningLink: data,
+          }
+          const result = await this.prepareJobForWebSocket(
+            AESEncryptor.encrypt(
+              JSON.stringify({
+                messageType: WebSocketMessageType.AutoUpdate,
+                message: JSON.stringify(payload),
+              }),
+            ), true
+          )
+          return result
+        }
+        return false
+
+      } catch (error) {
+        console.log(error)
+        return false
+      }
+    }
+
     render () {
       const {
         pendingJob = [],
@@ -266,6 +301,7 @@ const withWebSocket = () => (Component) => {
           <Component
             {...this.props}
             handlePrint={this.handlePrint}
+            versionCheck={this.versionCheck}
             handleOpenScanner={this.requestOpenScan}
             handlePreviewReport={this.handlePreviewReport}
             sendingJob={pendingJob.length > 0}
@@ -309,8 +345,8 @@ const withWebSocket = () => (Component) => {
                         },
                       }
                     ) : (
-                      { display: 'none' }
-                    )
+                        { display: 'none' }
+                      )
                   }
                 >
                   <CircularProgress />

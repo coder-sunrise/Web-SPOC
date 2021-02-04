@@ -25,6 +25,7 @@ import {
 } from '@/components'
 import { VALUE_KEYS } from '@/utils/constants'
 import Authorized, { reloadAuthorized } from '@/utils/Authorized'
+import withWebSocket from '@/components/Decorator/withWebSocket'
 
 // styles
 // import loginPageStyle from '@/assets/jss/material-dashboard-pro-react/views/loginPageStyle'
@@ -109,18 +110,15 @@ const submitKey = 'login/getToken'
   mapPropsToValues: () => {
     if (process.env.NODE_ENV === 'development')
       return {
-        // username: 'Administrator',
-        // password: 'admin1234567',
-        // clinicCode: '249991e76',
         username: '',
         password: '',
-        clinicCode: 'kikilala',
+        clinicCode: 'c1',
       }
     return { username: '', password: '', clinicCode: '' }
   },
   handleSubmit: (values, { props }) => {
     const { username, password, clinicCode } = values
-    const { dispatch, routing } = props
+    const { dispatch, routing, versionCheck } = props
     const { location } = routing
 
     const credential = { username, password, clinicCode }
@@ -160,7 +158,7 @@ const submitKey = 'login/getToken'
           })
 
           reloadAuthorized()
-
+          await versionCheck()
           router.push(loginDestination)
         }
       })
@@ -206,7 +204,7 @@ class NewLogin extends React.Component {
         <div className={classes.container}>
           {process.env.client_env === 'uat' && (
             <h2 className={classes.uatText}>
-               THIS IS TRIAL ENVIRONMENT. DO NOT USE REAL PATIENT DATA.
+              THIS IS TRIAL ENVIRONMENT. DO NOT USE REAL PATIENT DATA.
             </h2>
           )}
           <GridContainer justify='center'>
@@ -307,4 +305,4 @@ class NewLogin extends React.Component {
   }
 }
 
-export default withStyles(styles)(NewLogin)
+export default withWebSocket()(withStyles(styles)(NewLogin)) 
