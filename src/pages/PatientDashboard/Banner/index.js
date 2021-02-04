@@ -262,6 +262,7 @@ class Banner extends PureComponent {
     const { schemePayers } = entity
     const isSaveToDb = true
 
+    if(!schemePayers || schemePayers.length === 0) return
     dispatch({
       type: 'patient/refreshMedisaveBalance',
       payload: {
