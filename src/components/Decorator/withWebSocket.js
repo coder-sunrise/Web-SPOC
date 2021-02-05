@@ -58,10 +58,9 @@ const withWebSocket = () => (Component) => {
       let sendSuccess = false
       this.setState({ pendingJob })
 
-      if (!this.state.isWsConnected) { await this.tryConnectSocket() }
-      if (this.state.isWsConnected === true) {
+      const { isWsConnected } = this.state 
+      if (isWsConnected === true || (!autoupdate && (await this.tryConnectSocket()))) {
         this.wsConnection.send(content)
-        console.log('message send to websocket')
         sendSuccess = true
       } else if (!autoupdate) {
         notification.error({
