@@ -1,11 +1,11 @@
 import React, { PureComponent } from 'react'
 import { formatMessage } from 'umi/locale'
+import { GridContainer, CardContainer, GridItem, Button } from '@/components'
 import { downloadPrintingTool } from '../download'
 
-import { GridContainer, CardContainer, GridItem, Button } from '@/components'
 
 class PrintingTool extends PureComponent {
-  render() {
+  render () {
     return (
       <CardContainer hideHeader>
         <GridContainer>
@@ -20,7 +20,7 @@ class PrintingTool extends PureComponent {
               onClick={() => {
                 downloadPrintingTool(
                   'SEMRPrintingTool',
-                  'PrintingToolDownloadLinkSection',
+                  'AutoUpdatePrintingToolDownloadLinkSection',
                 )
               }}
               color='primary'
