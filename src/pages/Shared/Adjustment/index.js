@@ -84,15 +84,16 @@ const styles = (theme) => ({
     }
     const { dispatch, global } = props
     const { openAdjustmentConfig = {} } = global
-    const { callbackConfig, callbackMethod } = openAdjustmentConfig
+    const { callbackConfig, callbackMethod, editAdj } = openAdjustmentConfig
     const newVals = {
       ...values,
       adjValue: values.adjustment,
       adjAmount: values.finalAmount - values.initialAmout,
       adjType: values.isExactAmount ? 'ExactAmount' : 'Percentage',
       invoiceItemAdjustment: [],
+      id: editAdj ? editAdj.id : undefined,
+      concurrencyToken: editAdj ? editAdj.concurrencyToken : undefined,
     }
-    // console.log(newVals)
     dispatch({
       type: 'global/updateState',
       payload: {
@@ -134,24 +135,24 @@ class Adjustment extends PureComponent {
       rows,
       editAdj
         ? adjustments.map((o) => {
-            if (
-              (editAdj.uid && editAdj.uid === o.uid) ||
-              (!editAdj.uid && editAdj.index === o.index)
-            )
-              return {
-                ...o,
-                adjType: isExactAmount ? 'ExactAmount' : 'Percentage',
-                adjValue: value,
-              }
-            return o
-          })
-        : [
-            ...adjustments,
-            {
+          if (
+            (editAdj.uid && editAdj.uid === o.uid) ||
+            (!editAdj.uid && editAdj.index === o.index)
+          )
+            return {
+              ...o,
               adjType: isExactAmount ? 'ExactAmount' : 'Percentage',
               adjValue: value,
-            },
-          ],
+            }
+          return o
+        })
+        : [
+          ...adjustments,
+          {
+            adjType: isExactAmount ? 'ExactAmount' : 'Percentage',
+            adjValue: value,
+          },
+        ],
       config,
     )
 
@@ -210,13 +211,15 @@ class Adjustment extends PureComponent {
       showAmountPreview = true,
     } = openAdjustmentConfig
     const { showError } = this.state
+
+    console.log(openAdjustmentConfig)
     return (
       <div>
         <div style={{ margin: theme.spacing(1) }}>
           {errors &&
-          errors.finalAmount && (
-            <Snackbar variant='warning' message={errors.finalAmount} />
-          )}
+            errors.finalAmount && (
+              <Snackbar variant='warning' message={errors.finalAmount} />
+            )}
           <GridContainer>
             <GridItem xs={12}>
               <FastField
