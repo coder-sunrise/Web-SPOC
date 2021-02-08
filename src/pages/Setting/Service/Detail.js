@@ -616,7 +616,6 @@ class Detail extends PureComponent {
                       return (
                         <span>
                           <Checkbox
-                            disabled
                             checked={ddlIsCdmpClaimable}
                             // formControlProps={{ className: classes.medisaveCheck }}
                             onChange={(e) => this.onChangeCdmpClaimable(e)}
