@@ -175,12 +175,12 @@ class FormModuleGrid extends PureComponent {
             columnName: 'action',
             align: 'left',
             sortingEnabled: false,
+            width: 110,
             render: (row) => {
               const { classes, dispatch, user } = this.props
               const patientIsActive =
                 (row.patientIsActive || 'false').toUpperCase() === 'TRUE'
 
-              console.log(patientIsActive)
               return (
                 <React.Fragment>
                   <Tooltip title='Print'>
