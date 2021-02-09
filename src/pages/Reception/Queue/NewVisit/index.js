@@ -5,6 +5,7 @@ import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
 // custom component
 import {
+  CommonCard,
   GridContainer,
   GridItem,
   SizeContainer,
@@ -247,7 +248,7 @@ class NewVisit extends PureComponent {
       (registered, queue) =>
         !registered ? queue.patientProfileFK === patientInfo.id : registered,
       false,
-    ) 
+    )
 
     if (!values.id && alreadyRegisteredVisit)
       return dispatch({
@@ -392,8 +393,8 @@ class NewVisit extends PureComponent {
     else if (clinicSettings.settings.isVisitReferralSourceMandatory) {
       referralType = 'Company'
     }
-    if (!values.referralByType) {
-      this.props.setFieldValue('referralByType', referralType)
+    if (!values.referredBy) {
+      this.props.setFieldValue('referredBy', referralType)
     }
     return (
       <React.Fragment>
@@ -479,16 +480,19 @@ class NewVisit extends PureComponent {
                           )}
                         </Authorized>
                         <GridItem xs={12} className={classes.row}>
-                          <ReferralCard 
-                            isVisitReadonlyAfterSigned={isReadonlyAfterSigned}
-                            isSigned={values.isLastClinicalObjectRecordSigned}
-                            handleUpdateAttachments={this.updateAttachments}
-                            attachments={values.visitAttachment}
-                            dispatch={dispatch}
-                            values={values}
-                            referralType={referralType}
-                            setFieldValue={setFieldValue}
-                          />
+                          <CommonCard title='Referral'> 
+                            <ReferralCard
+                              mode='visitregistration'
+                              isVisitReadonlyAfterSigned={isReadonlyAfterSigned}
+                              isSigned={values.isLastClinicalObjectRecordSigned}
+                              handleUpdateAttachments={this.updateAttachments}
+                              attachments={values.visitAttachment}
+                              dispatch={dispatch}
+                              values={values}
+                              referralType={referralType}
+                              setFieldValue={setFieldValue}
+                            />
+                          </CommonCard>
                         </GridItem>
                         <GridItem xs={12} className={classes.row}>
                           <div ref={this.myRef}>

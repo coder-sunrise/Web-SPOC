@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import Call from '@material-ui/icons/Call'
 import Add from '@material-ui/icons/Add'
+import ReferralCard from '@/pages/Reception/Queue/NewVisit/ReferralCard'
 
 import { withStyles, Paper } from '@material-ui/core'
 import {
@@ -113,8 +114,22 @@ class Demographic extends PureComponent {
 
   render () {
     const { props } = this
-    const { values, theme, setFieldValue, classes } = props
+    const { values, theme, setFieldValue, classes, dispatch } = props
     const { isPatientNameAutoUpperCase } = props.clinicSettings
+
+    let referralType = 'None'
+    // Edit visit
+    if (values.id) {
+      if (values.referralSourceFK || values.referralPersonFK) {
+        referralType = 'Company'
+      }
+      else if (values.referralPatientProfileFK) {
+        referralType = 'Patient'
+      }
+    } 
+    if (!values.referredBy) {
+      this.props.setFieldValue('referredBy', referralType)
+    }
 
     return (
       <div>
@@ -462,66 +477,14 @@ class Demographic extends PureComponent {
                 />
               </GridItem>
               <GridItem xs={12}>
-                <FastField
-                  name='referredBy'
-                  render={(args) => (
-                    <RadioGroup
-                      label='Referral'
-                      options={[
-                        {
-                          value: '',
-                          label: 'None',
-                        },
-                        {
-                          value: 'Company',
-                          label: 'Company',
-                        },
-                        {
-                          value: 'Patient',
-                          label: 'Patient',
-                        },
-                      ]}
-                      onChange={this.onReferredByChange}
-                      {...args}
-                    />
-                  )}
-                />
-              </GridItem>
-              {values.referredBy === 'Patient' && (
-                <GridItem xs={12}>
-                  <Field
-                    name='referredByPatientFK'
-                    render={this.selectReferralPerson}
-                  />
-                </GridItem>
-              )}
-              {values.referredBy === 'Company' && (
-                <GridItem xs={12}>
-                  <Field
-                    name='referralCompanyReferenceNo'
-                    render={(args) => (
-                      <TextField label='Company Ref. No.' {...args} />
-                    )}
-                  />
-                </GridItem>
-              )}
-              {values.referredBy !== '' && (
-                <GridItem xs={12}>
-                  <Field
-                    name='referralRemarks'
-                    render={(args) => {
-                      return (
-                        <TextField
-                          label='Remarks'
-                          multiline
-                          rowsMax={4}
-                          {...args}
-                        />
-                      )
-                    }}
-                  />
-                </GridItem>
-              )}
+                <ReferralCard                   
+                  dispatch={dispatch}
+                  values={values}
+                  mode='patientprofile'
+                  referralType={referralType}
+                  setFieldValue={setFieldValue}
+                /> 
+              </GridItem> 
               <GridItem xs={12}>
                 <Field
                   name='translationLinkFK'

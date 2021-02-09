@@ -60,12 +60,12 @@ export default Yup.object().shape({
     .min(0, VitalSignMessage[FormField['vitalsign.heightCM']])
     .max(999, VitalSignMessage[FormField['vitalsign.heightCM']]),
   referralSourceFK: Yup.number() 
-    .when('referralByType', {
+    .when('referredBy', {
       is: (val) => val === 'Company',
       then: Yup.number().required(),
     }),
   referralPatientProfileFK: Yup.number()
-    .when('referralByType', {
+    .when('referredBy', {
       is: (val) => val === 'Patient',
       then: Yup.number().required(),
     }), 
