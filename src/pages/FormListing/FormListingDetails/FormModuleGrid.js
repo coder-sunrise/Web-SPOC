@@ -180,9 +180,8 @@ class FormModuleGrid extends PureComponent {
               const patientIsActive =
                 (row.patientIsActive || 'false').toUpperCase() === 'TRUE'
 
-              console.log(patientIsActive)
               return (
-                <React.Fragment>
+                <div>
                   <Tooltip title='Print'>
                     <Button
                       size='sm'
@@ -248,7 +247,7 @@ class FormModuleGrid extends PureComponent {
                       disabled={!patientIsActive}
                     />
                   )}
-                </React.Fragment>
+                </div>
               )
             },
           },
