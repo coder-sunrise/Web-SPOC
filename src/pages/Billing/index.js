@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import router from 'umi/router'
 import { connect } from 'dva'
+import _ from 'lodash'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
 import ArrowBack from '@material-ui/icons/ArrowBack'
@@ -415,7 +416,7 @@ class Billing extends Component {
       if (!payment.isCancelled) return totalAmtPaid + payment.totalAmtPaid
       return totalAmtPaid
     }, 0)
-    const newOutstandingBalance = roundTo(values.finalPayable - totalPaid)
+    const newOutstandingBalance = _.round(values.finalPayable - totalPaid, 2)
     await setFieldValue('invoice', {
       ...values.invoice,
       outstandingBalance: newOutstandingBalance,
