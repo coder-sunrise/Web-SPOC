@@ -97,8 +97,8 @@ String.prototype.format = function () {
 
 /* eslint-disable */
 export const roundTo = (amount, decimal = 2) => {
-  if (!amount && amount !== 0) return undefined
-  return Number(Math.round(amount + 'e' + decimal) + 'e-' + decimal)
+  if (amount === null || amount === undefined) return undefined
+  return _.round(amount, decimal)
 }
 
 export const roundUp = (num, decimal = 2) => {
