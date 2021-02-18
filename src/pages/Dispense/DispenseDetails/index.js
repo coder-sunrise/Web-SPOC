@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'dva'
 import { compose } from 'redux'
+import _ from 'lodash'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
 import Print from '@material-ui/icons/Print'
@@ -9,6 +10,7 @@ import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 import { formatMessage } from 'umi/locale' // common component
+import Warining from '@material-ui/icons/Error'
 import {
   Button,
   ProgressButton,
@@ -17,6 +19,7 @@ import {
   CommonTableGrid,
   TextField,
   CommonModal,
+  NumberInput,
 } from '@/components'
 import AmountSummary from '@/pages/Shared/AmountSummary'
 import Authorized from '@/utils/Authorized'
@@ -26,7 +29,6 @@ import {
   NOTIFICATION_STATUS,
 } from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
-import Warining from '@material-ui/icons/Error'
 // sub components
 import TableData from './TableData'
 import VaccinationGrid from './VaccinationGrid'
@@ -39,6 +41,8 @@ import {
   VaccinationColumnExtensions,
   OtherOrdersColumns,
   OtherOrdersColumnExtensions,
+  PackageColumns,
+  PackageColumnExtensions,
 } from '../variables'
 
 import CONSTANTS from './constants'
@@ -94,11 +98,13 @@ const DispenseDetails = ({
   onDrugLabelSelected,
   onDrugLabelNoChanged,
   selectedDrugs,
+  clinicSettings,
 }) => {
   const {
     prescription,
     vaccination,
     otherOrder,
+    packageItem,
     invoice,
     visitPurposeFK,
     visitRemarks,
@@ -113,6 +119,7 @@ const DispenseDetails = ({
   } = invoice
 
   const { inventorymedication, inventoryvaccination } = codetable
+  const { settings = [] } = clinicSettings
 
   const handleSelectedBatch = (e, op = {}, row) => {
     if (op && op.length > 0) {
@@ -253,6 +260,57 @@ const DispenseDetails = ({
       )
     })
   }
+
+  const [
+    expandedGroups,
+    setExpandedGroups,
+  ] = useState([])
+
+  const handleExpandedGroupsChange = (e) => {
+    setExpandedGroups(e)
+  }
+
+  useEffect(() => {
+    if (packageItem) {
+      const groups = packageItem.reduce(
+        (distinct, data) =>
+          distinct.includes(data.packageGlobalId)
+            ? [
+                ...distinct,
+              ]
+            : [
+                ...distinct,
+                data.packageGlobalId,
+              ],
+        [],
+      )
+
+      setExpandedGroups(groups)
+    }
+  }, [packageItem])
+
+  const packageGroupCellContent = ({ row }) => {
+    let label = 'Package'
+    let totalPrice = 0
+    if (!packageItem) return ''
+    const data = packageItem.filter(
+      (item) => item.packageGlobalId === row.value,
+    )
+    if (data.length > 0) {
+      totalPrice = _.sumBy(data, 'totalAfterItemAdjustment') || 0
+      label = `${data[0].packageCode} - ${data[0].packageName} (Total: `
+    }
+    return (
+      <span style={{ verticalAlign: 'middle', paddingRight: 8 }}>
+        <strong>
+          {label} 
+          <NumberInput text currency value={totalPrice} />
+          )        
+        </strong>
+      </span>
+    )
+  }
+
   return (
     <React.Fragment>
       <GridContainer>
@@ -443,6 +501,34 @@ const DispenseDetails = ({
               colExtensions={OtherOrdersColumnExtensions(viewOnly, onPrint)}
               data={otherOrder}
             />
+
+            {settings.isEnablePackage && visitPurposeFK !== VISIT_TYPE.RETAIL && (
+              <TableData
+                title='Package'
+                idPrefix='package'
+                columns={PackageColumns}
+                colExtensions={PackageColumnExtensions(onPrint)}
+                data={packageItem}
+                FuncProps={{
+                  pager: false,
+                  grouping: true,
+                  groupingConfig: {
+                    state: {
+                      grouping: [
+                        { columnName: 'packageGlobalId' },
+                      ],
+                      expandedGroups: [
+                        ...expandedGroups,
+                      ],
+                      onExpandedGroupsChange: handleExpandedGroupsChange,
+                    },
+                    row: {
+                      contentComponent: packageGroupCellContent,
+                    },
+                  },
+                }}
+              />
+            )}
           </Paper>
         </GridItem>
         <GridItem xs={7} md={7} style={{ marginTop: -14 }}>
@@ -596,7 +682,8 @@ const DispenseDetails = ({
 
 export default compose(
   withStyles(styles, { name: 'DispenseDetailsGrid' }),
-  connect(({ codetable }) => ({
+  connect(({ codetable, clinicSettings }) => ({
     codetable,
+    clinicSettings,
   })),
 )(DispenseDetails)

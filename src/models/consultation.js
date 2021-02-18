@@ -452,6 +452,7 @@ export default createFormViewModel({
             entity: undefined,
             isGSTInclusive: data.isGstInclusive,
             gstValue: data.gstValue,
+            corPackage: data.corPackage,
           },
         })
 

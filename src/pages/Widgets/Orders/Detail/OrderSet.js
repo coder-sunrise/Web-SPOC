@@ -75,6 +75,7 @@ const { qtyFormat } = config
       ctmedicationdosage,
       ctvaccinationunitofmeasurement,
       ctvaccinationusage,
+      doctorprofile,
     } = codetable
     const { entity: visitEntity } = visitRegistration
     const clinicianProfile = getClinicianProfile(codetable, visitEntity)
@@ -89,6 +90,9 @@ const { qtyFormat } = config
       nextDocumentSequence = documentSequence + 1
     }
     let showNoTemplate
+
+    const { doctorProfileFK } = visitRegistration.entity.visit
+    const visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK).clinicianProfile.userProfileFK
 
     const getInstruction = (inventoryMedication) => {
       let instruction = ''
@@ -168,6 +172,7 @@ const { qtyFormat } = config
           adjAmount: 0,
           adjType: 'ExactAmount',
           adjValue: 0,
+          isClaimable: true,
           totalAfterItemAdjustment:
             orderSetItem.unitPrice * orderSetItem.quantity,
           totalAfterOverallAdjustment:
@@ -221,6 +226,8 @@ const { qtyFormat } = config
               sequence: 0,
             },
           ],
+          performingUserFK: visitDoctorUserId,
+          packageGlobalId: '',
         }
       }
       return item
@@ -277,6 +284,8 @@ const { qtyFormat } = config
             ? isDefaultBatchNo.expiryDate
             : undefined,
           batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
+          performingUserFK: visitDoctorUserId,
+          packageGlobalId: '',
           type: orderSetItem.type,
           subject: inventoryVaccination.displayValue,
           isGenerateCertificate: inventoryVaccination.isAutoGenerateCertificate,
@@ -343,6 +352,8 @@ const { qtyFormat } = config
           serviceFK: service.id,
           serviceCenterFK: serviceCenterService.serviceCenterFK,
           subject: service.displayValue,
+          performingUserFK: visitDoctorUserId,
+          packageGlobalId: '',
         }
       }
       return item
@@ -350,6 +361,11 @@ const { qtyFormat } = config
 
     const getOrderConsumableFromOrderSet = (orderSetCode, orderSetItem) => {
       const { inventoryConsumable } = orderSetItem
+
+      const isDefaultBatchNo = inventoryConsumable.consumableStock.find(
+        (o) => o.isDefault === true,
+      )
+
       let item
       if (inventoryConsumable.isActive === true) {
         item = {
@@ -369,6 +385,12 @@ const { qtyFormat } = config
           consumableCode: inventoryConsumable.code,
           consumableName: inventoryConsumable.displayValue,
           subject: inventoryConsumable.displayValue,
+          expiryDate: isDefaultBatchNo
+            ? isDefaultBatchNo.expiryDate
+            : undefined,
+          batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
+          performingUserFK: visitDoctorUserId,
+          packageGlobalId: '',
         }
       }
 

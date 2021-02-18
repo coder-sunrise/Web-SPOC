@@ -54,6 +54,7 @@ import Layout from './Layout'
 import schema from './schema'
 import styles from './style'
 import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
+import ConsumePackage from '@/pages/Widgets/Orders/Detail/ConsumePackage'
 // window.g_app.replaceModel(model)
 
 const discardMessage = 'Discard consultation?'
@@ -500,6 +501,33 @@ class Main extends React.Component {
     setTimeout(() => {
       this.props.setFieldValue('fakeField', 'setdirty')
     }, 500)
+
+    const { consultation, dispatch } = this.props
+    const { pendingPackage } = consultation.entity
+
+    if (pendingPackage) {
+      const packages = pendingPackage.reduce(
+        (distinct, data) =>
+          distinct.includes(data.patientPackageFK)
+            ? [
+                ...distinct,
+              ]
+            : [
+                ...distinct,
+                data.patientPackageFK,
+              ],
+        [],
+      )
+
+      if (packages && packages.length > 1) {      
+        dispatch({
+          type: 'consultation/updateState',
+          payload: {
+            haveMultiplePendingPackages: true,
+          },
+        })      
+      }      
+    }
   }
 
   componentWillUnmount () {
@@ -551,6 +579,11 @@ class Main extends React.Component {
       this.props.orders.summary.totalWithGST
     )
       return true
+    
+    if (nextProps.consultation.haveMultiplePendingPackages !== this.props.consultation.haveMultiplePendingPackages) {
+      return true
+    }
+
     return false
   }
 
@@ -1050,6 +1083,16 @@ class Main extends React.Component {
     this.props.dispatch({ type: `consultation/closeSignOffModal` })
   }
 
+  closePackageSelectModal = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'consultation/updateState',
+      payload: {
+        haveMultiplePendingPackages: false,
+      },
+    })
+  }
+
   render () {
     const { props, state } = this
     const {
@@ -1110,6 +1153,17 @@ class Main extends React.Component {
             showInvoiceAmountNegativeWarning={showInvoiceAmountNegativeWarning}
             handleSubmit={onSignOffConfirm}
           />
+        </CommonModal>
+
+        <CommonModal
+          cancelText='Cancel'
+          maxWidth='lg'
+          title='Package Details'
+          onClose={this.closePackageSelectModal}
+          onConfirm={this.closePackageSelectModal}
+          open={consultation.haveMultiplePendingPackages || false}
+        >
+          <ConsumePackage {...this.props} />
         </CommonModal>
       </div>
     )

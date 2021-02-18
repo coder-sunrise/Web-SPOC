@@ -131,6 +131,7 @@ export default {
   'reception.queue.visitRegistration.room': 'Room',
   'reception.queue.visitRegistration.visitOrderTemplate': 'Visit Purpose',
   'reception.queue.visitRegistration.visitOrderTotalCharge': 'Total Charges',
+  'reception.queue.visitRegistration.salesPerson': 'Sales Person',
 
   'reception.queue.visitRegistration.vitalSign': 'Vital Sign',
   'reception.queue.visitRegistration.temperature': 'Temperature',

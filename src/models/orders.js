@@ -1,5 +1,6 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
+import _ from 'lodash'
 import * as service from '@/pages/Inventory/InventoryAdjustment/services'
 
 import { getUniqueId, maxReducer, calculateAmount } from '@/utils/utils'
@@ -58,6 +59,10 @@ const initialState = {
     orderSetItems: [],
   },
   defaultTreatment: {},
+  corPackage: [],
+  defaultPackage: {
+    packageItems: [],
+  },
 }
 export default createListViewModel({
   namespace: 'orders',
@@ -300,6 +305,20 @@ export default createListViewModel({
           },
         })
       },
+
+      *addPackage ({ payload }, { select, call, put, delay }) {
+        yield put({
+          type: 'addPackageState',
+          payload,
+        })
+      },
+
+      *deletePackageItem ({ payload }, { select, call, put, delay }) {
+        yield put({
+          type: 'deletePackageItemState',
+          payload,
+        })
+      },
     },
 
     reducers: {
@@ -446,6 +465,38 @@ export default createListViewModel({
             if (o.uid === payload.uid) o.isDeleted = true
             return o
           }),
+        }
+      },
+
+      addPackageState (state, { payload }) {
+        let { corPackage } = state
+        corPackage.push({
+          ...payload,
+          uid: getUniqueId(),
+        })
+        return {
+          ...state,
+          corPackage,
+        }
+      },
+
+      deletePackageItemState (state, { payload }) {
+        let { corPackage, rows } = state
+        
+        const activePackageItems = rows.filter(item => item.packageGlobalId === payload.packageGlobalId && item.isDeleted === false)
+        const toBeUpdatedPackage = corPackage.find(p => p.packageGlobalId === payload.packageGlobalId)
+        if (toBeUpdatedPackage) {
+          if (activePackageItems.length === 0) {          
+            toBeUpdatedPackage.isDeleted = true
+          }
+          else {
+            toBeUpdatedPackage.totalPrice = _.sumBy(activePackageItems, 'totalAfterItemAdjustment') || 0
+          }
+        }
+        
+        return {
+          ...state,
+          corPackage,
         }
       },
     },

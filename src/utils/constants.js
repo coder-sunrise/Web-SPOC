@@ -546,3 +546,16 @@ export const MEDISAVE_COPAYMENT_SCHEME = {
   MEDISAVEOPSCAN: 'MEDISAVEOPSCAN',
   MEDISAVEFLEXI: 'MEDISAVEFLEXI',
 }
+
+export const DURATION_UNIT = {
+  DAY: 1,
+  WEEK: 2,
+  MONTH: 3,
+  YEAR: 4,
+}
+
+export const PACKAGE_SIGNATURE_CHECK_OPTION = {
+  MANDATORY: 'Mandatory',
+  OPTIONAL: 'Optional',
+  IGNORE: 'Ignore',
+}

@@ -109,6 +109,17 @@ class PastMedication extends PureComponent {
     }
     return instruction
   }
+    
+  getVisitDoctorUserId = props => {
+    const { doctorprofile } = props.codetable
+    const { doctorProfileFK } = props.visitRegistration.entity.visit   
+    let visitDoctorUserId
+    if (doctorprofile && doctorProfileFK) {
+      visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK).clinicianProfile.userProfileFK
+    }
+  
+    return visitDoctorUserId
+  }
 
   GetNewMedication = () => {
     const { getNextSequence, codetable, type } = this.props
@@ -360,6 +371,8 @@ class PastMedication extends PureComponent {
           isDrugMixture: item.isDrugMixture,
           isClaimable: item.isClaimable,
           caution: itemDrugCaution,
+          performingUserFK: this.getVisitDoctorUserId(this.props),
+          packageGlobalId: '',
         }
       }),
     )
@@ -456,6 +469,8 @@ class PastMedication extends PureComponent {
           subject: vaccination.displayValue,
           caution: vaccination.caution,
           isGenerateCertificate: vaccination.isAutoGenerateCertificate,
+          performingUserFK: this.getVisitDoctorUserId(this.props),
+          packageGlobalId: '',
         }
         let newCORVaccinationCert = []
         if (newVaccination.isGenerateCertificate) {
