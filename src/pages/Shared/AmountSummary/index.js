@@ -279,7 +279,6 @@ class AmountSummary extends PureComponent {
           </GridContainer>
         )}
         {adjustments.map((v, i) => {
-          console.log(amountProps)
           if (!v.isDeleted) {
             return (
               <Adjustment

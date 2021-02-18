@@ -59,9 +59,6 @@ class SchemesGrid extends PureComponent {
           type: 'codeSelect',
           code: 'ctSchemeType',
           sortingEnabled: false,
-          localFilter: (opt) => {
-            return !this.isMedisave(opt) // TODO: Disable for prod R1.5.2 only, enable when deploy UAT again
-          },
           onChange: ({ val, option, row, onValueChange }) => {
             let { rows } = this.props
             if (!row.id) {

@@ -12,7 +12,7 @@ import {
   NOTIFICATION_STATUS,
   VALUE_KEYS,
 } from '@/utils/constants'
-import { notification, Button } from '@/components'
+import { notification, ProgressButton } from '@/components'
 
 const CallingQueueButton = ({
   classes,
@@ -195,7 +195,7 @@ const CallingQueueButton = ({
   }
 
   return (
-    <Button
+    <ProgressButton
       type='submit'
       round
       color={isCalled ? 'danger' : 'primary'}
@@ -203,9 +203,8 @@ const CallingQueueButton = ({
       justIcon
       style={{ marginRight: '0px' }}
       onClick={handleCallingQueue}
-    >
-      <VolumeUp />
-    </Button>
+      icon={<VolumeUp />}
+    />
   )
 }
 
