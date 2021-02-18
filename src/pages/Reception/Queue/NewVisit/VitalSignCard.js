@@ -37,6 +37,8 @@ class VitalSignCard extends PureComponent {
                   suffix={formatMessage({
                     id: 'reception.queue.visitRegistration.temperature.suffix',
                   })}
+                  min={0}
+                  max={200}
                 />
               )}
             />
@@ -52,6 +54,8 @@ class VitalSignCard extends PureComponent {
                   suffix={formatMessage({
                     id: 'reception.queue.visitRegistration.mmhg',
                   })}
+                  min={0}
+                  max={999}
                 />
               )}
             />
@@ -67,6 +71,8 @@ class VitalSignCard extends PureComponent {
                   suffix={formatMessage({
                     id: 'reception.queue.visitRegistration.mmhg',
                   })}
+                  min={0}
+                  max={999}
                 />
               )}
             />
@@ -84,6 +90,8 @@ class VitalSignCard extends PureComponent {
                   suffix={formatMessage({
                     id: 'reception.queue.visitRegistration.heartRate.suffix',
                   })}
+                  min={0}
+                  max={999}
                 />
               )}
             />
@@ -107,6 +115,8 @@ class VitalSignCard extends PureComponent {
                       handleCalculateBMI()
                     }, 1)
                   }}
+                  min={0}
+                  max={999}
                 />
               )}
             />
@@ -131,6 +141,8 @@ class VitalSignCard extends PureComponent {
                       handleCalculateBMI()
                     }, 1)
                   }}
+                  min={0}
+                  max={999}
                 />
               )}
             />
