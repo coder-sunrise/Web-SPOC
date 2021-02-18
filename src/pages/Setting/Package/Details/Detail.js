@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import { formatMessage } from 'umi/locale'
-import { FastField } from 'formik'
+import { FastField, Field } from 'formik'
 import { compose } from 'redux'
 
 import {
@@ -54,7 +54,7 @@ const Detail = () => {
       <GridItem xs={5} md={5}>
         <GridContainer gutter={0}>
           <GridItem xs={5} md={5}>
-            <FastField
+            <Field
               name='validDuration'
               render={(args) => {
                 return (
