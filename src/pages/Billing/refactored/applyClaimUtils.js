@@ -224,10 +224,10 @@ export const getInvoiceItemsWithClaimAmount = (
     } = getCoverageAmountAndType(schemeConfig, item)
 
     const { invoiceItemTypeFK } = item
-    const pastItemClaimedAmount = result.reduce(
+    const pastItemClaimedAmount = roundTo(result.reduce(
       (total, i) => total + i.claimAmount,
       0,
-    )
+    ))
 
     // get claim amount of items based on other schemes
     const payers = allPayers
@@ -247,7 +247,7 @@ export const getInvoiceItemsWithClaimAmount = (
     // get claim amount of items based on current scheme
     const pastSchemeClaimedAmount =
       payers.length > 0
-        ? payers.reduce((total, i) => total + i.claimAmount, 0)
+        ? roundTo(payers.reduce((total, i) => total + i.claimAmount, 0))
         : 0
 
     const remainingCoverageMaxCap = coverageMaxCap - pastItemClaimedAmount
