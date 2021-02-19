@@ -144,7 +144,7 @@ class Event extends React.PureComponent {
             </div>
             <div className={monthViewClass}>
               <span className={classes.title}>
-                {title} {accountNo}
+                {`${title || ''} ${subtitle ? `(${subtitle})` : ''}`}
               </span>
               {hasConflict && <ErrorOutline className={classes.icon} />}
               {isEnableRecurrence && <Cached />}

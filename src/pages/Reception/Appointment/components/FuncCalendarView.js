@@ -340,8 +340,11 @@ const CalendarView = ({
           const { appointment_Resources: apptResources = [] } = appointment
 
           // TODO: need to fix sortOrder calculation, should exclude deleted appointments when calculating sortOrder
-          const firstApptRes =
-            apptResources.length >= 1 ? apptResources[0] : undefined
+          const firstApptRes = apptResources.find(
+            (item) => item.isPrimaryClinician,
+          )
+
+          if (!firstApptRes) return events
 
           const firstClinicianFK =
             firstApptRes !== undefined ? firstApptRes.clinicianFK : undefined
