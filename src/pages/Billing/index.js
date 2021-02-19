@@ -924,7 +924,7 @@ class Billing extends Component {
           </GridContainer>
         </Paper>
         <GridContainer>
-          <GridItem md={isEnablePackage && this.state.isConsumedPackage ? 7 : 8}>
+          <GridItem md={isEnablePackage && this.state.isConsumedPackage ? 6 : 8}>
             <FastField
               name='invoice.invoiceRemark'
               render={(args) => {
@@ -945,7 +945,7 @@ class Billing extends Component {
               }}
             />
           </GridItem>
-          <GridItem md={isEnablePackage && this.state.isConsumedPackage ? 5 : 4} style={{ paddingRight: 0 }}>
+          <GridItem md={isEnablePackage && this.state.isConsumedPackage ? 6 : 4} style={{ paddingRight: 0 }}>
             <React.Fragment>              
               <div className={classes.paymentButton}>
                 {isEnablePackage && this.state.isConsumedPackage && (

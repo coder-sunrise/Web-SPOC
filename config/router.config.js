@@ -805,6 +805,14 @@ const _routes = [
               'report.finance.wiprevenuereport',
             ],
           },
+          {
+            path: '/report/saleslistingbyperformer',
+            name: 'saleslistingbyperformer',
+            component: './Report/SalesListingByPerformer',
+            authority: [
+              'report.finance.saleslistingbyperformerreport',
+            ],
+          },
         ],
       },
       // Report

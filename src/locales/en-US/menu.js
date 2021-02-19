@@ -178,6 +178,7 @@ export default {
   'menu.report.patientageingreport': 'Patient Ageing Report',
   'menu.report.statementsummaryreport': 'Statement Summary Report',
   'menu.report.wiprevenue': 'WIP Revenue Report',
+  'menu.report.saleslistingbyperformer': 'Sales Listing By Performer Report',
   'menu.report.viewreport': 'View Report',
   
   'menu.report.visitListingReport': 'Visit Listing Report',

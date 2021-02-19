@@ -10,12 +10,11 @@ import { Accordion } from '@/components'
 import { AccordionTitle } from '@/components/_medisys'
 import ReportBase from '../ReportBase'
 import FilterBar from './FilterBar'
-import Details from './Details'
-import Summary from './Summary'
+import SalesList from './SalesList'
 
-const reportId = 67
-const fileName = 'WIP Revenue Report'
-class WIPRevenue extends ReportBase {
+const reportId = 77
+const fileName = 'Sales Listing By Performer Report'
+class SalesListingByPerformer extends ReportBase {
   constructor (props) {
     super(props)
     this.state = {
@@ -30,30 +29,10 @@ class WIPRevenue extends ReportBase {
   }
 
   renderContent = (reportDatas) => {
-    return (
-      <Accordion
-        defaultActive={[
-          0,
-          1,
-        ]}
-        mode='multiple'
-        leftIcon
-        expandIcon={<SolidExpandMore fontSize='large' />}
-        collapses={[
-          {
-            title: <AccordionTitle title='Details' />,
-            content: <Details reportDatas={reportDatas} />,
-          },
-          {
-            title: <AccordionTitle title='Summary' />,
-            content: <Summary reportDatas={reportDatas} />,
-          },
-        ]}
-      />
-    )
+    return <SalesList reportDatas={reportDatas} />
   }
 }
-const WIPRevenueWithFormik = withFormik({
+const SalesListingByPerformerWithFormik = withFormik({
   validationSchema: Yup.object().shape({
     dateFrom: Yup.date().required(),
   }),
@@ -61,6 +40,6 @@ const WIPRevenueWithFormik = withFormik({
     dateFrom: moment(new Date()).startOf('month').toDate(),
     dateTo: moment(new Date()).endOf('month').toDate(),
   }),
-})(WIPRevenue)
+})(SalesListingByPerformer)
 
-export default WIPRevenueWithFormik
+export default SalesListingByPerformerWithFormik
