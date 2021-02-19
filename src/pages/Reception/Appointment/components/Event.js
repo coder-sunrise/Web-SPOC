@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'dva'
 import classnames from 'classnames'
+import moment from 'moment'
 // material ui
 import { withStyles } from '@material-ui/core'
 import ErrorOutline from '@material-ui/icons/ErrorOutline'
@@ -9,10 +10,10 @@ import Cached from '@material-ui/icons/Cached'
 import BigCalendar from 'react-big-calendar'
 // common components
 import { Popper } from '@/components'
-import ApptPopover from './ApptPopover'
-import DoctorBlockPopover from './DoctorBlockPopover'
 // assets
 import customDropdownStyle from '@/assets/jss/material-dashboard-pro-react/components/customDropdownStyle'
+import ApptPopover from './ApptPopover'
+import DoctorBlockPopover from './DoctorBlockPopover'
 
 const style = (theme) => ({
   ...customDropdownStyle(theme),
@@ -76,7 +77,14 @@ class Event extends React.PureComponent {
 
   render () {
     const { event, classes, calendarView } = this.props
-    const { doctor, hasConflict, isEnableRecurrence, patientProfile } = event
+    const {
+      doctor,
+      hasConflict,
+      isEnableRecurrence,
+      patientProfile,
+      start,
+      end,
+    } = event
     let { patientName, patientAccountNo, patientContactNo } = event
     if (patientProfile) {
       const { name, patientAccountNo: accNo, contactNumbers } = patientProfile
@@ -116,7 +124,6 @@ class Event extends React.PureComponent {
 
     if (event.isDoctorBlock)
       OverlayComponent = <DoctorBlockPopover popoverEvent={event} />
-
     return (
       <Popper
         stopOnClickPropagation
@@ -128,10 +135,19 @@ class Event extends React.PureComponent {
         overlay={OverlayComponent}
       >
         {calendarView === BigCalendar.Views.MONTH ? (
-          <div className={monthViewClass}>
-            <span>
-              {title} {accountNo}
-            </span>
+          <div style={{ padding: '1px 4px' }}>
+            <div className={classes.title}>
+              <span>
+                {`${moment(start).format('HH:mm')} - ${moment(end).format(
+                  'HH:mm',
+                )}`}
+              </span>
+            </div>
+            <div className={classes.title}>
+              <span>
+                {title} {accountNo}
+              </span>
+            </div>
             {hasConflict && <ErrorOutline className={classes.icon} />}
             {isEnableRecurrence && <Cached />}
           </div>

@@ -64,12 +64,18 @@ const maxTime = new Date(
   0,
 )
 
-const applyFilter = (filter, data) => {
-  const { filterByApptType, filterByDoctor, search = '' } = filter
+const applyFilter = (filter, data, isDayView) => {
+  const {
+    filterByApptType,
+    filterByDoctor,
+    search = '',
+    filterBySingleDoctor,
+  } = filter
   const viewOtherApptAccessRight = Authorized.check(
     'appointment.viewotherappointment',
   )
   if (
+    isDayView &&
     filterByDoctor.length <= 0 &&
     (!viewOtherApptAccessRight || viewOtherApptAccessRight.rights !== 'enable')
   ) {
@@ -109,12 +115,21 @@ const applyFilter = (filter, data) => {
     }
 
     // filter by doctor
-    if (filterByDoctor.length > 0 && filterByDoctor.indexOf(-99) !== 0) {
+    if (isDayView) {
+      if (filterByDoctor.length > 0 && filterByDoctor.indexOf(-99) !== 0) {
+        returnData = returnData.filter((eachData) => {
+          if (eachData.isDoctorBlock)
+            return filterByDoctor.includes(eachData.doctor.clinicianProfile.id)
+
+          return filterByDoctor.includes(eachData.clinicianFK)
+        })
+      }
+    } else {
       returnData = returnData.filter((eachData) => {
         if (eachData.isDoctorBlock)
-          return filterByDoctor.includes(eachData.doctor.clinicianProfile.id)
+          return filterBySingleDoctor === eachData.doctor.clinicianProfile.id
 
-        return filterByDoctor.includes(eachData.clinicianFK)
+        return filterBySingleDoctor === eachData.clinicianFK
       })
     }
 
@@ -340,10 +355,20 @@ const CalendarView = ({
             ...events,
             {
               ...appointment,
-              start: moment(appointment.appointmentDate).toDate(),
-              end: moment(appointment.appointmentDate).toDate(),
               appointmentTypeFK: firstAppointmentTypeFK,
               clinicianFK: firstClinicianFK,
+              resourceId: firstClinicianFK,
+              clinicianName: !firstApptRes
+                ? undefined
+                : firstApptRes.clinicianName,
+              start: moment(
+                `${appointment.appointmentDate} ${firstApptRes.startTime}`,
+                `${serverDateFormat} HH:mm`,
+              ).toDate(),
+              end: moment(
+                `${appointment.appointmentDate} ${firstApptRes.endTime}`,
+                `${serverDateFormat} HH:mm`,
+              ).toDate(),
             },
           ]
         }, [])
@@ -397,16 +422,20 @@ const CalendarView = ({
 
   const filtered = useMemo(
     () =>
-      applyFilter(filter, [
-        ...eventList,
-        ...doctorBlocks.map((item) => ({
-          ...item,
-          isDoctorBlock: true,
-          resourceId: item.doctor.clinicianProfile.id,
-          start: moment(item.startDateTime).toDate(),
-          end: moment(item.endDateTime).toDate(),
-        })),
-      ]),
+      applyFilter(
+        filter,
+        [
+          ...eventList,
+          ...doctorBlocks.map((item) => ({
+            ...item,
+            isDoctorBlock: true,
+            resourceId: item.doctor.clinicianProfile.id,
+            start: moment(item.startDateTime).toDate(),
+            end: moment(item.endDateTime).toDate(),
+          })),
+        ],
+        calendarView === BigCalendar.Views.DAY,
+      ),
     [
       calendarView,
       filter,
@@ -446,7 +475,9 @@ const CalendarView = ({
         tooltipAccessor={null}
         // #endregion --- functional props ---
         // #region --- resources ---
-        resources={resources}
+        resources={
+          calendarView === BigCalendar.Views.DAY ? resources : undefined
+        }
         resourceIdAccessor='clinicianFK'
         resourceTitleAccessor='doctorName'
         // #endregion --- resources ---

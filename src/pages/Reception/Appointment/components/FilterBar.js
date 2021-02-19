@@ -1,6 +1,6 @@
 import React, { memo, useState } from 'react'
-import moment from 'moment'
 import classnames from 'classnames'
+import BigCalendar from 'react-big-calendar'
 // formik
 import { withFormik, Field, FastField } from 'formik'
 // umi/locale
@@ -52,7 +52,6 @@ const styles = () => ({
 let count = 0
 const FilterBar = (props) => {
   const {
-    dispatch,
     loading,
     classes,
     onDoctorEventClick,
@@ -60,6 +59,7 @@ const FilterBar = (props) => {
     handleUpdateFilter,
     toggleSearchAppointmentModal,
     values,
+    calendarView,
   } = props
   const onFilterClick = () => handleUpdateFilter(values)
 
@@ -85,8 +85,11 @@ const FilterBar = (props) => {
       ...values,
       filterByApptType: appTypes,
       filterByDoctor: doctors,
+      filterBySingleDoctor: doctors && doctors.length ? doctors[0] : undefined,
     })
   }
+
+  const isDayView = calendarView === BigCalendar.Views.DAY
   return (
     <React.Fragment>
       <GridContainer alignItems='center'>
@@ -103,39 +106,64 @@ const FilterBar = (props) => {
             )}
           />
         </GridItem>
-        <GridItem xs md={2} style={{ minWidth: 220 }}>
-          <Field
-            name='filterByDoctor'
-            render={(args) => (
-              <Authorized authority='appointment.viewotherappointment'>
-                <CodeSelect
-                  {...args}
-                  disableAll
-                  allowClear={false}
-                  label='Filter by Doctor'
-                  mode='multiple'
-                  remoteFilter={{
-                    'clinicianProfile.isActive': true,
-                  }}
-                  localFilter={(option) => option.clinicianProfile.isActive}
-                  code='doctorprofile'
-                  labelField='clinicianProfile.name'
-                  valueField='clinicianProfile.id'
-                  maxTagCount={maxDoctorTagCount}
-                  maxSelected={5}
-                  maxTagPlaceholder='doctors'
-                  renderDropdown={renderDropdown}
-                  onChange={(v) => {
-                    sessionStorage.setItem(
-                      'appointmentDoctors',
-                      JSON.stringify(v),
-                    )
-                  }}
-                />
-              </Authorized>
-            )}
-          />
-        </GridItem>
+        {isDayView && (
+          <GridItem xs md={2} style={{ minWidth: 220 }}>
+            <Field
+              name='filterByDoctor'
+              render={(args) => (
+                <Authorized authority='appointment.viewotherappointment'>
+                  <CodeSelect
+                    {...args}
+                    disableAll
+                    allowClear={false}
+                    label='Filter by Doctor'
+                    mode='multiple'
+                    remoteFilter={{
+                      'clinicianProfile.isActive': true,
+                    }}
+                    localFilter={(option) => option.clinicianProfile.isActive}
+                    code='doctorprofile'
+                    labelField='clinicianProfile.name'
+                    valueField='clinicianProfile.id'
+                    maxTagCount={maxDoctorTagCount}
+                    maxTagPlaceholder='doctors'
+                    renderDropdown={renderDropdown}
+                    onChange={(v) => {
+                      sessionStorage.setItem(
+                        'appointmentDoctors',
+                        JSON.stringify(v),
+                      )
+                    }}
+                  />
+                </Authorized>
+              )}
+            />
+          </GridItem>
+        )}
+        {!isDayView && (
+          <GridItem xs md={2} style={{ minWidth: 220 }}>
+            <Field
+              name='filterBySingleDoctor'
+              render={(args) => (
+                <Authorized authority='appointment.viewotherappointment'>
+                  <CodeSelect
+                    {...args}
+                    allowClear={false}
+                    label='Filter by Doctor'
+                    remoteFilter={{
+                      'clinicianProfile.isActive': true,
+                    }}
+                    localFilter={(option) => option.clinicianProfile.isActive}
+                    code='doctorprofile'
+                    labelField='clinicianProfile.name'
+                    valueField='clinicianProfile.id'
+                    renderDropdown={renderDropdown}
+                  />
+                </Authorized>
+              )}
+            />
+          </GridItem>
+        )}
         <GridItem xs md={2} className={classnames(classes.selectorContainer)}>
           <div style={{ display: 'flex' }}>
             <Field
@@ -167,6 +195,7 @@ const FilterBar = (props) => {
                 />
               )}
             />
+
             <Popover
               icon={null}
               trigger='click'
@@ -177,7 +206,17 @@ const FilterBar = (props) => {
                 <Paper className={classes.container}>
                   <FilterTemplateTooltip
                     visible={showFilterTemplate}
-                    filterByDoctor={values.filterByDoctor}
+                    filterByDoctor={
+                      isDayView ? (
+                        values.filterByDoctor
+                      ) : values.filterBySingleDoctor ? (
+                        [
+                          values.filterBySingleDoctor,
+                        ]
+                      ) : (
+                        []
+                      )
+                    }
                     filterByApptType={values.filterByApptType}
                     handleFilterTemplate={handleFilterTemplate}
                     handleApplyTemplate={handleApplyTemplate}
@@ -253,18 +292,20 @@ const StyledFilterBar = withStyles(styles, { name: 'CalendarFilterBar' })(
 )
 
 export default compose(
-  connect(({ appointment }) => ({
+  connect(({ appointment, calendar }) => ({
     appointment,
+    calendarView: calendar.calendarView,
   })),
   withFormik({
     enableReinitialize: true,
-    mapPropsToValues: ({ filterByDoctor }) => {
+    mapPropsToValues: ({ filterByDoctor, filterBySingleDoctor }) => {
       count += 1
 
       return {
         filterByDoctor: [
           ...filterByDoctor,
         ],
+        filterBySingleDoctor,
         filterByApptType: [
           -99,
         ],
