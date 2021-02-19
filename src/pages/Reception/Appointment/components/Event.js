@@ -34,7 +34,6 @@ const style = (theme) => ({
     },
   },
   monthViewEvent: {
-    fontSize: '.85rem',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
@@ -135,21 +134,21 @@ class Event extends React.PureComponent {
         overlay={OverlayComponent}
       >
         {calendarView === BigCalendar.Views.MONTH ? (
-          <div style={{ padding: '1px 4px' }}>
-            <div className={classes.title}>
-              <span>
+          <div style={{ padding: '0px 4px' }}>
+            <div className={monthViewClass}>
+              <span className={classes.title}>
                 {`${moment(start).format('HH:mm')} - ${moment(end).format(
                   'HH:mm',
                 )}`}
               </span>
             </div>
-            <div className={classes.title}>
-              <span>
+            <div className={monthViewClass}>
+              <span className={classes.title}>
                 {title} {accountNo}
               </span>
+              {hasConflict && <ErrorOutline className={classes.icon} />}
+              {isEnableRecurrence && <Cached />}
             </div>
-            {hasConflict && <ErrorOutline className={classes.icon} />}
-            {isEnableRecurrence && <Cached />}
           </div>
         ) : (
           <div className={otherViewClass}>
