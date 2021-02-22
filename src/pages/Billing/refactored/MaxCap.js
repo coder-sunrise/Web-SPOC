@@ -9,8 +9,8 @@ const MaxCap = ({
   copaymentSchemeFK,
   schemeConfig,
 }) => {
-  if (payerTypeFK === INVOICE_PAYER_TYPE.SCHEME || 
-    payerTypeFK === INVOICE_PAYER_TYPE.PAYERACCOUNT) {
+  // if (payerTypeFK === INVOICE_PAYER_TYPE.SCHEME || 
+  //   payerTypeFK === INVOICE_PAYER_TYPE.PAYERACCOUNT) {
     if (schemeConfig && schemeConfig.isCoverageMaxCapCheckRequired)
       return (
         <NumberInput
@@ -38,8 +38,8 @@ const MaxCap = ({
         text
       />
     )
-  }
-  return null
+  // }
+  // return null
 }
 
 export default MaxCap

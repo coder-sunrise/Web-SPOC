@@ -770,10 +770,12 @@ const PackageItemListing = ({
       <GridContainer>
         <GridItem xs={12}>
           <div className={classes.displayDiv}>
-            <b>
+            <h4>
+              <b>
               Package Total Price:{' '}
-              <NumberInput text currency value={totalPrice} />
-            </b>
+                <NumberInput text currency value={totalPrice} />
+              </b>
+            </h4>
           </div>
         </GridItem>
       </GridContainer>

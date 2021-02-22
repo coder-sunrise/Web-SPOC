@@ -21,7 +21,7 @@ import {
 import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
 // common utils
 import { roundTo } from '@/utils/utils'
-import { INVOICE_PAYER_TYPE } from '@/utils/constants'
+import { INVOICE_PAYER_TYPE, PACKAGE_SIGNATURE_CHECK_OPTION } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
 // sub component
 import PatientBanner from '@/pages/PatientDashboard/Banner'
@@ -31,6 +31,8 @@ import { ReportsOnCompletePaymentOption } from '@/utils/codes'
 import ApplyClaims from './refactored/newApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 import SchemeValidationPrompt from './components/SchemeValidationPrompt'
+import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
+import Signature from '@/components/_medisys/Forms/Signature'
 // page utils
 import {
   constructPayload,
@@ -57,6 +59,8 @@ const styles = (theme) => ({
     paddingBottom: theme.spacing(2),
   },
 })
+
+const base64Prefix = 'data:image/jpeg;base64,'
 
 @connect(
   ({
@@ -152,6 +156,7 @@ class Billing extends Component {
     showDrugLabelSelection: false,
     selectedDrugs: [],
     isUpdatedAppliedInvoicePayerInfo: false,
+    isConsumedPackage: false,
   }
 
   componentWillUnmount () {
@@ -210,13 +215,26 @@ class Billing extends Component {
         code: 'inventorymedication',
       },
     })
-    if (query.vid)
+    if (query.vid) {
       await dispatch({
         type: 'billing/query',
         payload: {
           id: query.vid,
         },
+      }).then((response) => {
+        const { invoice } = response
+        const { invoiceItems } = invoice
+        
+        if (invoiceItems && invoiceItems.length > 0) {
+          const consumedItems = invoiceItems.filter(i => i.isPackage && i.packageConsumeQuantity > 0)
+          if (consumedItems.length > 0) {
+            this.setState({
+              isConsumedPackage: true,
+            })
+          }
+        }
       })
+    }
   }
 
   onPrintRef = (ref) => {
@@ -445,14 +463,51 @@ class Billing extends Component {
     return false
   }
 
-  onCompletePaymentClick = async () => {
+  checkPackageSignature = () => {
+    const { dispatch, values, clinicSettings } = this.props
+    const { packageRedeemAcknowledge } = values
+    const { isEnablePackage, isCheckPackageSignature } = clinicSettings
+    const isExistingPackageSignature = packageRedeemAcknowledge &&
+                                        packageRedeemAcknowledge.signature !== '' && 
+                                        packageRedeemAcknowledge.signature !== undefined
+
+    if (!isEnablePackage || !this.state.isConsumedPackage)
+      return this.checkInvoiceOutstanding()
+
+    if (isCheckPackageSignature.toLowerCase() === PACKAGE_SIGNATURE_CHECK_OPTION.IGNORE.toLowerCase() || isExistingPackageSignature) 
+      return this.checkInvoiceOutstanding()
+    
+    if (isCheckPackageSignature.toLowerCase() === PACKAGE_SIGNATURE_CHECK_OPTION.OPTIONAL.toLowerCase()) {
+      return dispatch({
+        type: 'global/updateState',
+        payload: {
+          openConfirm: true,
+          openConfirmTitle: '',
+          openConfirmText: 'Confirm',
+          openConfirmContent:
+            'Patient signature is not provided, confirm to complete billing?',
+          onConfirmSave: () => {
+            this.checkInvoiceOutstanding()
+          },
+        },
+      })
+    }
+    if (isCheckPackageSignature.toLowerCase() === PACKAGE_SIGNATURE_CHECK_OPTION.MANDATORY.toLowerCase()) {
+      notification.error({ message: 'Patient signature is mandatory for package acknowledgement' })
+      return false
+    }
+    return false
+  }
+
+  checkInvoiceOutstanding = async () => {
     const { dispatch, values, setFieldValue } = this.props
     await setFieldValue('mode', 'save')
     await setFieldValue('visitStatus', 'COMPLETED')
-
-    // check if invoice is OVERPAID and prompt user for confirmation
+    
     const { invoice, invoicePayer = [] } = values
     const { outstandingBalance = 0 } = invoice
+
+    // check if invoice is OVERPAID and prompt user for confirmation
     if (
       outstandingBalance < 0 ||
       invoicePayer.find((ip) => ip.payerOutstanding < 0)
@@ -470,6 +525,11 @@ class Billing extends Component {
       })
     }
     return this.upsertBilling()
+  }
+
+  onCompletePaymentClick = async () => {
+    // check package acknowledge 
+    this.checkPackageSignature()      
   }
 
   onPrintReceiptClick = (invoicePaymentID) => {
@@ -515,6 +575,7 @@ class Billing extends Component {
         InvoiceId: values.invoice ? values.invoice.id : '',
       }
     }
+    // console.log('parametrPaload', parametrPaload)
     if (modifiedOrNewAddedPayer.length > 0) {
       dispatch({
         type: 'global/updateState',
@@ -625,11 +686,27 @@ class Billing extends Component {
 
   handleDrugLabelClick = () => {
     const { dispense } = this.props
-    const { prescription = [] } = dispense.entity
+    const { prescription = [], packageItem = [] } = dispense.entity
+
+    let drugList = []
+
+    prescription.forEach(item => {
+      drugList.push(item)
+    })
+    packageItem.forEach(item => {
+      if (item.type === 'Medication') {
+        drugList.push({
+          ...item, 
+          name: item.description,
+          dispensedQuanity: item.packageConsumeQuantity,
+        })
+      }
+    })
+
     this.setState((prevState) => {
       return {
         showDrugLabelSelection: !prevState.showDrugLabelSelection,
-        selectedDrugs: prescription.map((x) => {
+        selectedDrugs: drugList.map((x) => {
           return { ...x, no: 1, selected: true }
         }),
       }
@@ -691,6 +768,21 @@ class Billing extends Component {
     return showRefreshOrder
   }
 
+  updateSignature = (signature) => {
+    const { dispatch, values, patient } = this.props
+    const { thumbnail } = signature
+
+    dispatch({
+      type: 'billing/savePackageAcknowledge',
+      payload: { 
+        visitId: values.visitId,
+        invoiceFK: values.invoice.id,
+        signatureName: patient.name,
+        signature: thumbnail,
+      },
+    })
+  }
+
   render () {
     const {
       showReport,
@@ -737,6 +829,16 @@ class Billing extends Component {
       inventorymedication,
       ctservice,
       ctcopayer,
+    }
+    const { isEnableAddPaymentInBilling = false, isEnablePackage = false } = clinicSettings
+
+    let src
+    if (
+      values.packageRedeemAcknowledge &&
+      values.packageRedeemAcknowledge.signature !== '' && 
+      values.packageRedeemAcknowledge.signature !== undefined
+    ) {
+      src = `${base64Prefix}${values.packageRedeemAcknowledge.signature}`
     }
 
     return (
@@ -822,7 +924,7 @@ class Billing extends Component {
           </GridContainer>
         </Paper>
         <GridContainer>
-          <GridItem md={8}>
+          <GridItem md={isEnablePackage && this.state.isConsumedPackage ? 7 : 8}>
             <FastField
               name='invoice.invoiceRemark'
               render={(args) => {
@@ -843,9 +945,22 @@ class Billing extends Component {
               }}
             />
           </GridItem>
-          <GridItem md={4} style={{ paddingRight: 0 }}>
-            <React.Fragment>
+          <GridItem md={isEnablePackage && this.state.isConsumedPackage ? 5 : 4} style={{ paddingRight: 0 }}>
+            <React.Fragment>              
               <div className={classes.paymentButton}>
+                {isEnablePackage && this.state.isConsumedPackage && (
+                  <Button
+                    color={src !== '' && src !== undefined ? 'success' : 'danger'}
+                    onClick={() => {
+                      this.setState({
+                        isShowAcknowledge: true,
+                      })
+                    }}
+                    disabled={this.state.isEditing || values.id === undefined}
+                  >
+                    Acknowledge
+                  </Button>
+                )}
                 <Button
                   color='info'
                   onClick={this.backToDispense}
@@ -930,6 +1045,23 @@ class Billing extends Component {
             showTopDivider={false}
             reportID={reportPayload.reportID}
             reportParameters={reportPayload.reportParameters}
+          />
+        </CommonModal>
+        <CommonModal
+          open={this.state.isShowAcknowledge}
+          title='Package Acknowledge'
+          observe='PackageAcknowledge'
+          onClose={() => {
+            this.setState({
+              isShowAcknowledge: false,
+            })
+          }}
+        >
+          <Signature
+            signatureName={patient.name}
+            updateSignature={this.updateSignature}
+            image={src}
+            isEditable={src === '' || src === undefined}
           />
         </CommonModal>
         <ViewPatientHistory top='239px' />

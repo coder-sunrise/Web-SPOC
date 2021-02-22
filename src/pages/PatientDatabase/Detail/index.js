@@ -265,6 +265,22 @@ class PatientDetail extends PureComponent {
           loading: Loading,
         }),
       },
+      {
+        id: '10',
+        name: 'Package Drawdown',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
+        component: Loadable({
+          loader: () => import('./PatientPackageDrawdown'),
+          render: (loaded, p) => {
+            let Cmpnet = loaded.default
+            return <Cmpnet {...p} />
+          },
+          loading: Loading,
+        }),
+      },
     ]
 
     const accessRight = Authorized.check('patientdatabase.patientprofiledetails.medicalhistory')
@@ -273,6 +289,11 @@ class PatientDetail extends PureComponent {
       if (hiddenMedicalHistoryByAccessRight) {
         this.widgets = this.widgets.filter((t) => t.id !== '9')
       }
+    }
+
+    const { clinicSettings } = this.props
+    if (!clinicSettings.isEnablePackage) {
+      this.widgets = this.widgets.filter(w => w.id !== '10')
     }
   }
 
@@ -575,7 +596,7 @@ class PatientDetail extends PureComponent {
                         onClick={this.registerVisit}
                       >
                         Register Visit
-                    </Button>
+                      </Button>
                     </Authorized>
                   )}
               </CardBody>

@@ -18,6 +18,7 @@ import {
 import { orderTypes } from '@/pages/Consultation/utils'
 import Authorized from '@/utils/Authorized'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
+import PackageDrawdownInfo from '@/pages/Widgets/Orders/Detail/PackageDrawdownInfo'
 
 export default ({
   orders,
@@ -34,9 +35,47 @@ export default ({
     setCheckedStatusIncldGST,
   ] = useState(isGSTInclusive)
 
+  const [
+    isExistPackage,
+    setIsExistPackage,
+  ] = useState(false)
+
+  const [
+    expandedGroups,
+    setExpandedGroups,
+  ] = useState([])
+
+  const handleExpandedGroupsChange = (e) => {
+    setExpandedGroups(e)
+  }
+
   useEffect(
     () => {
-      setCheckedStatusIncldGST(orders.isGSTInclusive)
+      setCheckedStatusIncldGST(orders.isGSTInclusive) 
+      
+      const settings = JSON.parse(localStorage.getItem('clinicSettings'))
+      const { isEnablePackage = false } = settings
+
+      const packageItems = rows.filter(item => item.isPackage && !item.isDeleted)
+      const existPackage = isEnablePackage && packageItems.length > 0
+      setIsExistPackage(existPackage)
+
+      if (existPackage && rows) {
+        const groups = rows.reduce(
+          (distinct, data) =>
+            distinct.includes(data.packageGlobalId)
+              ? [
+                  ...distinct,
+                ]
+              : [
+                  ...distinct,
+                  data.packageGlobalId,
+                ],
+          [],
+        )
+  
+        setExpandedGroups(groups)
+      }
     },
     [
       orders,
@@ -219,7 +258,7 @@ export default ({
       >
         <div
           style={{
-            width: '58%',
+            width: isExistPackage ? '54%' : '58%',
             overflow: 'hidden',
             display: 'inline-block',
             textOverflow: 'ellipsis',
@@ -235,7 +274,7 @@ export default ({
         <Authorized authority={OrderAccessRight()}>
           <div
             style={{
-              marginLeft: theme.spacing(36.5),
+              marginLeft: isExistPackage ? theme.spacing(31.5) : theme.spacing(36.5),
               position: 'absolute',
             }}
           >
@@ -298,6 +337,49 @@ export default ({
     )
   }
 
+  const packageDrawdownIndicator = (row) => {
+    if (!row.isPackage) return null
+
+    return (
+      <div style={{ position: 'relative' }}>
+        <PackageDrawdownInfo
+          drawdownData={row}
+          asAtDate={row.packageDrawdownAsAtDate}
+        />
+      </div>
+    )
+  }
+
+  const packageGroupCellContent = ({ row }) => {
+    if (row.value === undefined || row.value === '') {
+      return (
+        <span style={{ verticalAlign: 'middle', paddingRight: 8 }}>
+          <strong>Non-Package Items</strong>
+        </span>
+      )
+    }
+
+    let label = 'Package'
+    let totalPrice = 0
+    if (!rows) return ''
+    const data = rows.filter(
+      (item) => item.packageGlobalId === row.value,
+    )
+    if (data.length > 0) {
+      totalPrice = _.sumBy(data, 'totalAfterItemAdjustment') || 0
+      label = `${data[0].packageCode} - ${data[0].packageName} (Total: `
+    }
+    return (
+      <span style={{ verticalAlign: 'middle', paddingRight: 8 }}>
+        <strong>
+          {label} 
+          <NumberInput text currency value={totalPrice} />
+          )        
+        </strong>
+      </span>
+    )
+  }
+
   return (
     <CommonTableGrid
       size='sm'
@@ -306,16 +388,37 @@ export default ({
       rows={rows}
       onRowDoubleClick={editRow}
       getRowId={(r) => r.uid}
-      columns={[
+      columns={[        
         { name: 'type', title: 'Type' },
         { name: 'subject', title: 'Name' },
         { name: 'description', title: 'Description' },
         { name: 'adjAmount', title: 'Adj.' },
         { name: 'totalAfterItemAdjustment', title: 'Total' },
-        { name: 'actions', title: 'Actions' },
+        { name: 'actions', title: 'Actions' },    
+        { name: 'packageGlobalId', title: 'Package' },    
+      ]}
+      defaultSorting={[
+        { columnName: 'packageGlobalId', direction: 'asc' },
+        { columnName: 'sequence', direction: 'asc' },
       ]}
       FuncProps={{
         pager: false,
+        fixedHiddenColumns: ['packageGlobalId'],
+        grouping: isExistPackage,
+        groupingConfig: {
+          state: {
+            grouping: [
+              { columnName: 'packageGlobalId' },
+            ],
+            expandedGroups: [
+              ...expandedGroups,
+            ],
+            onExpandedGroupsChange: handleExpandedGroupsChange,
+          },
+          row: {
+            contentComponent: packageGroupCellContent,
+          },
+        },
         summary: true,
         summaryConfig: {
           state: {
@@ -360,15 +463,28 @@ export default ({
           },
           row: {
             messages,
-            totalRowComponent: (p) => {
-              const { children, ...restProps } = p
-              const newChildren = [
-                <Table.Cell colSpan={2} key={1} />,
-                React.cloneElement(children[4], {
-                  colSpan: 2,
-                  ...restProps,
-                }),
-              ]
+            totalRowComponent: (p) => {              
+              const { children, ...restProps } = p              
+              let newChildren = []
+              if (isExistPackage) {
+                newChildren = [
+                  <Table.Cell colSpan={3} key={1} />,
+                  React.cloneElement(children[5], {
+                    colSpan: 3,
+                    ...restProps,
+                  }),
+                ]
+              }
+              else {
+                newChildren = [
+                  <Table.Cell colSpan={2} key={1} />,
+                  React.cloneElement(children[4], {
+                    colSpan: 2,
+                    ...restProps,
+                  }),
+                ]
+              }
+              
               return <Table.Row>{newChildren}</Table.Row>
             },
             itemComponent: (p) => {
@@ -401,7 +517,7 @@ export default ({
                     }}
                   >
                     <div>
-                      <div style={{ marginLeft: theme.spacing(31) }}>
+                      <div style={{ marginLeft: isExistPackage ? theme.spacing(23) : theme.spacing(31) }}>
                         {itemSubTotal}
                       </div>
                       <div
@@ -413,7 +529,7 @@ export default ({
                       >
                         <Divider />
                       </div>
-                      <div style={{ marginLeft: theme.spacing(20) }}>
+                      <div style={{ marginLeft: isExistPackage ? theme.spacing(15) : theme.spacing(20) }}>
                         <span>
                           Invoice Adjustment
                           <Tooltip title='Add Adjustment'>
@@ -435,7 +551,7 @@ export default ({
                       </div>
                       {itemAdj}
                       {gstValue >= 0 && (
-                        <div style={{ marginLeft: theme.spacing(15) }}>
+                        <div style={{ marginLeft: isExistPackage ? theme.spacing(10) : theme.spacing(15) }}>
                           {itemGST}
                         </div>
                       )}
@@ -448,7 +564,7 @@ export default ({
                       >
                         <Divider />
                       </div>
-                      <div style={{ marginLeft: theme.spacing(31.5) }}>
+                      <div style={{ marginLeft: isExistPackage ? theme.spacing(26.5) : theme.spacing(31.5) }}>
                         {itemTotal}
                       </div>
                     </div>
@@ -498,20 +614,22 @@ export default ({
           columnName: 'subject',
           render: (row) => {
             return (
-              <div
-                style={{
-                  wordWrap: 'break-word',
-                  whiteSpace: 'pre-wrap',
-                }}
-              >
-                {row.subject}
+              <div style={wrapCellTextStyle}>
+                {packageDrawdownIndicator(row)}
+                <div style={{
+                    position: 'relative',
+                    left: row.isPackage ? 22 : 0,
+                  }}
+                >
+                  {row.subject}
+                </div>
               </div>
             )
           },
         },
         {
           columnName: 'description',
-          width: 260,
+          width: isExistPackage ? 220 : 260,
           observeFields: [
             'instruction',
             'remark',
@@ -590,6 +708,16 @@ export default ({
                               uid: row.uid,
                             },
                           })
+
+                          if (row.isPackage === true) {
+                            dispatch({
+                              type: 'orders/deletePackageItem',
+                              payload: {
+                                packageGlobalId: row.packageGlobalId,
+                              },
+                            })
+                          }
+
                           dispatch({
                             type: 'orders/updateState',
                             payload: {
@@ -612,7 +740,7 @@ export default ({
               </Authorized>
             )
           },
-        },
+        },        
       ]}
     />
   )

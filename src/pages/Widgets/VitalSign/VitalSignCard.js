@@ -45,6 +45,8 @@ export default ({
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.temperature.suffix',
                 })}
+                min={0}
+                max={200}
               />
             )}
           />
@@ -59,6 +61,8 @@ export default ({
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.mmhg',
                 })}
+                min={0}
+                max={999}
               />
             )}
           />
@@ -73,6 +77,8 @@ export default ({
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.mmhg',
                 })}
+                min={0}
+                max={999}
               />
             )}
           />
@@ -89,6 +95,8 @@ export default ({
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.heartRate.suffix',
                 })}
+                min={0}
+                max={999}
               />
             )}
           />
@@ -111,6 +119,8 @@ export default ({
                     handleCalculateBMI(index)
                   }, 1)
                 }}
+                min={0}
+                max={999}
               />
             )}
           />
@@ -134,6 +144,8 @@ export default ({
                     handleCalculateBMI(index)
                   }, 1)
                 }}
+                min={0}
+                max={999}
               />
             )}
           />

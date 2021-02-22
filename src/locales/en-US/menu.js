@@ -177,6 +177,7 @@ export default {
   'menu.report.sessionsummary': 'Session Summary Report',
   'menu.report.patientageingreport': 'Patient Ageing Report',
   'menu.report.statementsummaryreport': 'Statement Summary Report',
+  'menu.report.wiprevenue': 'WIP Revenue Report',
   'menu.report.viewreport': 'View Report',
   
   'menu.report.visitListingReport': 'Visit Listing Report',

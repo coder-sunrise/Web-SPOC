@@ -137,7 +137,7 @@ const constructSchemeList = (
         claimableSchemesFK: s.id,
         claimableSchemesIndex: index,
         nestedIndex,
-        disabled: currentClaims.includes(s.id) || allItemsClaimed,
+        disabled: currentClaims.some((item) => item.id === s.id) || allItemsClaimed,
         schemeName: s.coPaymentSchemeName,
       })),
     ]

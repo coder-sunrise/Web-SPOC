@@ -33,6 +33,7 @@ import {
 import LowStockInfo from './LowStockInfo'
 import AddFromPast from './AddMedicationFromPast'
 import { getClinicianProfile } from '../../ConsultationDocument/utils'
+import { DoctorProfileSelect } from '@/components/_medisys'
 
 let i = 0
 @connect(
@@ -53,7 +54,7 @@ let i = 0
   }),
 )
 @withFormikExtend({
-  mapPropsToValues: ({ orders = {}, type }) => {
+  mapPropsToValues: ({ orders = {}, type, codetable, visitRegistration }) => {
     const newOrders = orders.entity || orders.defaultVaccination
 
     if (newOrders.uid) {
@@ -65,6 +66,16 @@ let i = 0
       }
 
       newOrders.isExactAmount = newOrders.adjType !== 'Percentage'
+    }
+
+    if (_.isEmpty(orders.entity)) {
+      const { doctorprofile } = codetable
+      if(visitRegistration && visitRegistration.entity) {
+        const { doctorProfileFK } = visitRegistration.entity.visit      
+        if (doctorprofile && doctorProfileFK) {
+          newOrders.performingUserFK = doctorprofile.find(d => d.id === doctorProfileFK).clinicianProfile.userProfileFK
+        }
+      }
     }
 
     return {
@@ -89,6 +100,10 @@ let i = 0
       0.0,
       'The amount should be more than 0.00',
     ),
+    performingUserFK: Yup.number().required(),
+    expiryDate:Yup.date().min(
+      moment(),
+    'The batch of vaccination is expired'),
   }),
 
   handleSubmit: (values, { props, onConfirm, setValues }) => {
@@ -178,6 +193,7 @@ let i = 0
           ? -Math.abs(values.adjValue)
           : Math.abs(values.adjValue),
       corVaccinationCert: newCORVaccinationCert,
+      packageGlobalId: values.packageGlobalId !== undefined ? values.packageGlobalId : '',
     }
     dispatch({
       type: 'orders/upsertRow',
@@ -313,6 +329,7 @@ class Vaccination extends PureComponent {
 
   calculateQuantity = (vaccination) => {
     const { codetable, setFieldValue, values } = this.props
+    if (values.isPackage) return
     const { minQuantity = 0 } = values
     let currentVaccination =
       vaccination && Object.values(vaccination).length ? vaccination : undefined
@@ -358,7 +375,8 @@ class Vaccination extends PureComponent {
 
   updateTotalPrice = (v) => {
     if (v || v === 0) {
-      const { isExactAmount, isMinus, adjValue } = this.props.values
+      const { isExactAmount, isMinus, adjValue, isPackage } = this.props.values
+      if (isPackage) return
 
       let value = adjValue
       if (!isMinus) {
@@ -554,180 +572,218 @@ class Vaccination extends PureComponent {
               <Field
                 name='inventoryVaccinationFK'
                 render={(args) => {
-                  return (
-                    <div
-                      id={`autofocus_${values.type}`}
-                      style={{ position: 'relative' }}
-                    >
-                      <CodeSelect
-                        temp
-                        label='Vaccination Name'
-                        labelField='combinDisplayValue'
-                        code='inventoryvaccination'
-                        onChange={this.changeVaccination}
-                        options={this.getVaccinationOptions()}
-                        {...args}
-                        style={{ paddingRight: 20 }}
-                      />
-                      <LowStockInfo sourceType='vaccination' {...this.props} />
-                    </div>
-                  )
-                }}
+                return (
+                  <div
+                    id={`autofocus_${values.type}`}
+                    style={{ position: 'relative' }}
+                  >
+                    <CodeSelect
+                      temp
+                      label='Vaccination Name'
+                      labelField='combinDisplayValue'
+                      code='inventoryvaccination'
+                      onChange={this.changeVaccination}
+                      options={this.getVaccinationOptions()}
+                      {...args}
+                      style={{ paddingRight: 20 }}
+                      disabled={values.isPackage}
+                    />
+                    <LowStockInfo sourceType='vaccination' {...this.props} />
+                  </div>
+                )
+              }}
               />
             </GridItem>
             <GridItem xs={4}>
               {!isEditVaccination && (
-                <Tooltip title='Add From Past'>
-                  <ProgressButton
-                    color='primary'
-                    icon={<Add />}
-                    style={{
-                      marginTop: theme.spacing(2),
-                      marginLeft: theme.spacing(7),
-                    }}
-                    onClick={this.onSearchVaccinationHistory}
-                  >
-                    Add From Past
-                  </ProgressButton>
-                </Tooltip>
-              )}
+              <Tooltip title='Add From Past'>
+                <ProgressButton
+                  color='primary'
+                  icon={<Add />}
+                  style={{
+                    marginTop: theme.spacing(2),
+                    marginLeft: theme.spacing(7),
+                  }}
+                  onClick={this.onSearchVaccinationHistory}
+                >
+                  Add From Past
+                </ProgressButton>
+              </Tooltip>
+            )}
             </GridItem>
           </GridContainer>
           <GridContainer>
             <GridItem xs={12}>
               <div
                 style={{
-                  position: 'relative',
-                  paddingLeft: 90,
-                  marginTop: 4,
-                  fontSize: '0.85rem',
-                  height: 26,
-                }}
+                position: 'relative',
+                paddingLeft: 90,
+                marginTop: 4,
+                fontSize: '0.85rem',
+                height: 26,
+              }}
               >
                 <div
                   style={{
-                    position: 'absolute',
-                    left: 0,
+                  position: 'absolute',
+                  left: 0,
+                  paddingTop: 3,
+                  paddingBottom: 3,
+                  lineHeight: '25px',
+                }}
+                >
+                Instructions
+                </div>
+                {caution && (
+                <Alert
+                  message={
+                    <Tooltip
+                      useTooltip2
+                      title={
+                        <div>
+                          <div style={{ fontWeight: 500 }}>Caution:</div>
+                          <div style={{ marginLeft: 10 }}>{caution}</div>
+                        </div>
+                      }
+                    >
+                      <span>{caution}</span>
+                    </Tooltip>
+                  }
+                  banner
+                  style={{
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                    display: 'inline-block',
+                    width: '100%',
+                    overflow: 'hidden',
                     paddingTop: 3,
                     paddingBottom: 3,
                     lineHeight: '25px',
+                    fontSize: '0.85rem',
                   }}
-                >
-                  Instructions
-                </div>
-                {caution && (
-                  <Alert
-                    message={
-                      <Tooltip
-                        useTooltip2
-                        title={
-                          <div>
-                            <div style={{ fontWeight: 500 }}>Caution:</div>
-                            <div style={{ marginLeft: 10 }}>{caution}</div>
-                          </div>
-                        }
-                      >
-                        <span>{caution}</span>
-                      </Tooltip>
-                    }
-                    banner
-                    style={{
-                      whiteSpace: 'nowrap',
-                      textOverflow: 'ellipsis',
-                      display: 'inline-block',
-                      width: '100%',
-                      overflow: 'hidden',
-                      paddingTop: 3,
-                      paddingBottom: 3,
-                      lineHeight: '25px',
-                      fontSize: '0.85rem',
-                    }}
-                  />
-                )}
+                />
+              )}
               </div>
             </GridItem>
             <GridItem xs={2}>
               <Field
                 name='usageMethodFK'
                 render={(args) => {
-                  return (
-                    <CodeSelect
-                      label='Usage'
-                      allowClear={false}
-                      code='ctVaccinationUsage'
-                      onChange={(v, op = {}) => {
-                        setFieldValue(
-                          'usageMethodCode',
-                          op ? op.code : undefined,
-                        )
-                        setFieldValue(
-                          'usageMethodDisplayValue',
-                          op ? op.name : undefined,
-                        )
-                      }}
-                      {...args}
-                    />
-                  )
-                }}
+                return (
+                  <CodeSelect
+                    label='Usage'
+                    allowClear={false}
+                    code='ctVaccinationUsage'
+                    onChange={(v, op = {}) => {
+                      setFieldValue('usageMethodCode', op ? op.code : undefined)
+                      setFieldValue(
+                        'usageMethodDisplayValue',
+                        op ? op.name : undefined,
+                      )
+                    }}
+                    {...args}
+                  />
+                )
+              }}
               />
             </GridItem>
             <GridItem xs={2}>
               <FastField
                 name='dosageFK'
                 render={(args) => {
-                  return (
-                    <CodeSelect
-                      label='Dosage'
-                      labelField='displayValue'
-                      allowClear={false}
-                      code='ctmedicationdosage'
-                      onChange={(v, op = {}) => {
-                        setFieldValue('dosageCode', op ? op.code : undefined)
-                        setFieldValue(
-                          'dosageDisplayValue',
-                          op ? op.displayValue : undefined,
-                        )
-                        setTimeout(this.calculateQuantity, 1)
-                      }}
-                      valueFiled='id'
-                      {...args}
-                    />
-                  )
-                }}
+                return (
+                  <CodeSelect
+                    label='Dosage'
+                    labelField='displayValue'
+                    allowClear={false}
+                    code='ctmedicationdosage'
+                    onChange={(v, op = {}) => {
+                      setFieldValue('dosageCode', op ? op.code : undefined)
+                      setFieldValue(
+                        'dosageDisplayValue',
+                        op ? op.displayValue : undefined,
+                      )
+                      setTimeout(this.calculateQuantity, 1)
+                    }}
+                    valueFiled='id'
+                    {...args}
+                  />
+                )
+              }}
               />
             </GridItem>
             <GridItem xs={2}>
               <FastField
                 name='uomfk'
                 render={(args) => {
-                  return (
-                    <CodeSelect
-                      label='UOM'
-                      allowClear={false}
-                      code='ctvaccinationunitofmeasurement'
-                      onChange={(v, op = {}) => {
-                        setFieldValue('uomCode', op ? op.code : undefined)
-                        setFieldValue(
-                          'uomDisplayValue',
-                          op ? op.name : undefined,
-                        )
-                      }}
-                      {...args}
-                    />
-                  )
-                }}
+                return (
+                  <CodeSelect
+                    label='UOM'
+                    allowClear={false}
+                    code='ctvaccinationunitofmeasurement'
+                    onChange={(v, op = {}) => {
+                      setFieldValue('uomCode', op ? op.code : undefined)
+                      setFieldValue('uomDisplayValue', op ? op.name : undefined)
+                    }}
+                    {...args}
+                  />
+                )
+              }}
               />
             </GridItem>
             <GridItem xs={2}>
               <FastField
                 name='vaccinationGivenDate'
                 render={(args) => {
-                  return <DatePicker label='Date Given' {...args} />
-                }}
+                return <DatePicker label='Date Given' {...args} />
+              }}
               />
             </GridItem>
+            {values.isPackage && (
+            <React.Fragment>
+              <GridItem xs={3}>
+                <Field
+                  name='packageConsumeQuantity'
+                  render={(args) => {
+                    return (
+                      <NumberInput
+                        label='Consumed Quantity'
+                        style={{
+                          marginLeft: theme.spacing(7),
+                          paddingRight: theme.spacing(6),
+                        }}
+                        step={1}
+                        min={0}
+                        max={values.remainingQuantity}
+                        disabled={this.props.visitRegistration.entity.visit.isInvoiceFinalized}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+              <GridItem xs={1}>
+                <Field
+                  name='remainingQuantity'
+                  render={(args) => {
+                    return (
+                      <NumberInput
+                        style={{
+                          marginTop: theme.spacing(3),
+                        }}
+                        formatter={(v) => `/ ${parseFloat(v).toFixed(1)}`}
+                        text
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+            </React.Fragment>
+          )}
+            {!values.isPackage && (
             <GridItem xs={3}>
-              <FastField
+              <Field
                 name='quantity'
                 render={(args) => {
                   return (
@@ -752,72 +808,180 @@ class Vaccination extends PureComponent {
                 }}
               />
             </GridItem>
+          )}
           </GridContainer>
           <GridContainer>
             <GridItem xs={4} className={classes.editor}>
               <Field
                 name='batchNo'
                 render={(args) => {
-                  return (
-                    <CodeSelect
-                      mode='tags'
-                      maxSelected={1}
-                      disableAll
-                      label='Batch No.'
-                      labelField='batchNo'
-                      valueField='batchNo'
-                      options={this.state.selectedVaccination.vaccinationStock}
-                      onChange={(e, op = {}) => {
-                        if (op && op.length > 0) {
-                          const { expiryDate } = op[0]
-                          setFieldValue(`expiryDate`, expiryDate)
-                        } else {
-                          setFieldValue(`expiryDate`, undefined)
-                        }
-                      }}
-                      disabled={disableEdit}
-                      {...args}
-                    />
-                  )
-                }}
+                return (
+                  <CodeSelect
+                    mode='tags'
+                    maxSelected={1}
+                    disableAll
+                    label='Batch No.'
+                    labelField='batchNo'
+                    valueField='batchNo'
+                    options={this.state.selectedVaccination.vaccinationStock}
+                    onChange={(e, op = {}) => {
+                      if (op && op.length > 0) {
+                        const { expiryDate } = op[0]
+                        setFieldValue(`expiryDate`, expiryDate)
+                      } else {
+                        setFieldValue(`expiryDate`, undefined)
+                      }
+                    }}
+                    disabled={disableEdit}
+                    {...args}
+                  />
+                )
+              }}
               />
             </GridItem>
             <GridItem xs={4} className={classes.editor}>
               <Field
                 name='expiryDate'
                 render={(args) => {
-                  return (
-                    <DatePicker
-                      label='Expiry Date'
-                      disabled={disableEdit}
-                      {...args}
-                    />
-                  )
-                }}
+                return (
+                  <DatePicker
+                    label='Expiry Date'
+                    disabled={disableEdit}
+                    {...args}
+                  />
+                )
+              }}
               />
             </GridItem>
             <GridItem xs={3} className={classes.editor}>
-              <FastField
+              <Field
                 name='totalPrice'
                 render={(args) => {
+                return (
+                  <NumberInput
+                    label='Total'
+                    style={{
+                      marginLeft: theme.spacing(7),
+                      paddingRight: theme.spacing(6),
+                    }}
+                    currency
+                    onChange={(e) => {
+                      this.updateTotalPrice(e.target.value)
+                    }}
+                    min={0}
+                    disabled={totalPriceReadonly || values.isPackage}
+                    {...args}
+                  />
+                )
+              }}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem xs={8} className={classes.editor}>
+              <Field
+                name='performingUserFK'
+                render={(args) => (
+                  <DoctorProfileSelect
+                    label='Performed By'
+                    {...args}
+                    valueField='clinicianProfile.userProfileFK'
+                  />
+              )}
+              />
+            </GridItem>          
+            <GridItem xs={3} className={classes.editor}>
+              <div style={{ position: 'relative' }}>
+                <div
+                  style={{ marginTop: theme.spacing(2), position: 'absolute' }}
+                >
+                  <Field
+                    name='isMinus'
+                    render={(args) => {
+                    return (
+                      <Switch
+                        checkedChildren='-'
+                        unCheckedChildren='+'
+                        label=''
+                        onChange={() => {
+                          setTimeout(() => {
+                            this.onAdjustmentConditionChange()
+                          }, 1)
+                        }}
+                        disabled={totalPriceReadonly || values.isPackage}
+                        {...args}
+                      />
+                    )
+                  }}
+                  />
+                </div>
+                <Field
+                  name='adjValue'
+                  render={(args) => {
+                  args.min = 0
+                  if (values.isExactAmount) {
+                    return (
+                      <NumberInput
+                        style={{
+                          marginLeft: theme.spacing(7),
+                          paddingRight: theme.spacing(6),
+                        }}
+                        currency
+                        label='Adjustment'
+                        onChange={() => {
+                          setTimeout(() => {
+                            this.onAdjustmentConditionChange()
+                          }, 1)
+                        }}
+                        disabled={totalPriceReadonly || values.isPackage}
+                        {...args}
+                      />
+                    )
+                  }
                   return (
                     <NumberInput
-                      label='Total'
                       style={{
                         marginLeft: theme.spacing(7),
                         paddingRight: theme.spacing(6),
                       }}
-                      currency
-                      onChange={(e) => {
-                        this.updateTotalPrice(e.target.value)
+                      percentage
+                      max={100}
+                      label='Adjustment'
+                      onChange={() => {
+                        setTimeout(() => {
+                          this.onAdjustmentConditionChange()
+                        }, 1)
                       }}
-                      disabled={totalPriceReadonly}
-                      min={0}
+                      disabled={totalPriceReadonly || values.isPackage}
                       {...args}
                     />
                   )
                 }}
-              />
+                />
+              </div>
+            </GridItem>
+            <GridItem xs={1} className={classes.editor}>
+              <div style={{ marginTop: theme.spacing(2) }}>
+                <Field
+                  name='isExactAmount'
+                  render={(args) => {
+                  return (
+                    <Switch
+                      checkedChildren='$'
+                      unCheckedChildren='%'
+                      label=''
+                      onChange={() => {
+                        setTimeout(() => {
+                          this.onAdjustmentConditionChange()
+                        }, 1)
+                      }}
+                      disabled={totalPriceReadonly || values.isPackage}
+                      {...args}
+                    />
+                  )
+                }}
+                />
+              </div>
             </GridItem>
           </GridContainer>
           <GridContainer>
@@ -825,117 +989,36 @@ class Vaccination extends PureComponent {
               <FastField
                 name='remarks'
                 render={(args) => {
-                  return (
-                    <TextField
-                      multiline
-                      rowsMax='5'
-                      label='Remarks'
-                      {...args}
-                    />
-                  )
-                }}
+                return (
+                  <TextField multiline rowsMax='5' label='Remarks' {...args} />
+                )
+              }}
               />
             </GridItem>
             <GridItem xs={3} className={classes.editor}>
-              <div style={{ position: 'relative' }}>
-                <div
-                  style={{ marginTop: theme.spacing(2), position: 'absolute' }}
-                >
-                  <FastField
-                    name='isMinus'
-                    render={(args) => {
-                      return (
-                        <Switch
-                          checkedChildren='-'
-                          unCheckedChildren='+'
-                          label=''
-                          disabled={totalPriceReadonly}
-                          onChange={() => {
-                            setTimeout(() => {
-                              this.onAdjustmentConditionChange()
-                            }, 1)
-                          }}
-                          {...args}
-                        />
-                      )
+              <FastField
+                name='totalAfterItemAdjustment'
+                render={(args) => {
+                return (
+                  <NumberInput
+                    label='Total After Adj'
+                    style={{
+                      marginLeft: theme.spacing(7),
+                      paddingRight: theme.spacing(6),
                     }}
+                    currency
+                    disabled
+                    {...args}
                   />
-                </div>
-                <Field
-                  name='adjValue'
-                  render={(args) => {
-                    args.min = 0
-                    if (values.isExactAmount) {
-                      return (
-                        <NumberInput
-                          style={{
-                            marginLeft: theme.spacing(7),
-                            paddingRight: theme.spacing(6),
-                          }}
-                          currency
-                          disabled={totalPriceReadonly}
-                          label='Adjustment'
-                          onChange={() => {
-                            setTimeout(() => {
-                              this.onAdjustmentConditionChange()
-                            }, 1)
-                          }}
-                          {...args}
-                        />
-                      )
-                    }
-                    return (
-                      <NumberInput
-                        style={{
-                          marginLeft: theme.spacing(7),
-                          paddingRight: theme.spacing(6),
-                        }}
-                        disabled={totalPriceReadonly}
-                        percentage
-                        max={100}
-                        label='Adjustment'
-                        onChange={() => {
-                          setTimeout(() => {
-                            this.onAdjustmentConditionChange()
-                          }, 1)
-                        }}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </div>
-            </GridItem>
-            <GridItem xs={1} className={classes.editor}>
-              <div style={{ marginTop: theme.spacing(2) }}>
-                <FastField
-                  name='isExactAmount'
-                  render={(args) => {
-                    return (
-                      <Switch
-                        checkedChildren='$'
-                        unCheckedChildren='%'
-                        label=''
-                        disabled={totalPriceReadonly}
-                        onChange={() => {
-                          setTimeout(() => {
-                            this.onAdjustmentConditionChange()
-                          }, 1)
-                        }}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </div>
+                )
+              }}
+              />
             </GridItem>
           </GridContainer>
           <GridContainer>
             <GridItem
               xs={8}
-              style={{
-                position: 'relative',
-              }}
+              className={classes.editor}
             >
               <FastField
                 name='isGenerateCertificate'
@@ -944,29 +1027,6 @@ class Vaccination extends PureComponent {
                     <Checkbox
                       label='Generate Certificate'
                       {...args}
-                      style={{
-                        position: 'absolute',
-                        bottom: 0,
-                      }}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={3}>
-              <FastField
-                name='totalAfterItemAdjustment'
-                render={(args) => {
-                  return (
-                    <NumberInput
-                      label='Total After Adj'
-                      style={{
-                        marginLeft: theme.spacing(7),
-                        paddingRight: theme.spacing(6),
-                      }}
-                      currency
-                      disabled
-                      {...args}
                     />
                   )
                 }}
@@ -974,9 +1034,9 @@ class Vaccination extends PureComponent {
             </GridItem>
           </GridContainer>
           {footer({
-            onSave: this.validateAndSubmitIfOk,
-            onReset: this.handleReset,
-          })}
+          onSave: this.validateAndSubmitIfOk,
+          onReset: this.handleReset,
+        })}
           <CommonModal
             open={showAddFromPastModal}
             title='Add Vaccination From Past'

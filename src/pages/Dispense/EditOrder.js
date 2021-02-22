@@ -4,6 +4,7 @@ import router from 'umi/router'
 import { connect } from 'dva'
 import withStyles from '@material-ui/core/styles/withStyles'
 // common component
+import Warining from '@material-ui/icons/Error'
 import {
   GridContainer,
   GridItem,
@@ -15,6 +16,7 @@ import {
   Checkbox,
   Button,
   ProgressButton,
+  CommonModal,
 } from '@/components'
 import Yup from '@/utils/yup'
 import { convertToConsultation } from '@/pages/Consultation/utils'
@@ -24,8 +26,8 @@ import { widgets } from '@/utils/widgets'
 import Authorized from '@/utils/Authorized'
 import { sendNotification } from '@/utils/realtime'
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
-import Warining from '@material-ui/icons/Error'
 import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
+import ConsumePackage from '@/pages/Widgets/Orders/Detail/ConsumePackage'
 
 const discardConsultation = async ({ dispatch, dispense }) => {
   try {
@@ -53,8 +55,9 @@ const discardConsultation = async ({ dispatch, dispense }) => {
   }
 }
 const styles = () => ({})
-@connect(({ consultation }) => ({
+@connect(({ consultation, user }) => ({
   consultation,
+  user,
 }))
 @withFormikExtend({
   authority: [
@@ -87,13 +90,35 @@ const styles = () => ({})
 class EditOrder extends Component {
   state = {
     acknowledged: false,
+    isShowPackageSelectModal: false,
   }
 
   componentDidMount () {
-    const { setFieldValue } = this.props
+    const { setFieldValue, values } = this.props
     setTimeout(() => {
       setFieldValue('fakeField', 'setdirty')
     }, 500)
+
+    const { pendingPackage } = values
+
+    if (pendingPackage) {
+      const packages = pendingPackage.reduce(
+        (distinct, data) =>
+          distinct.includes(data.patientPackageFK)
+            ? [
+                ...distinct,
+              ]
+            : [
+                ...distinct,
+                data.patientPackageFK,
+              ],
+        [],
+      )
+
+      if (packages && packages.length > 1) {      
+        this.setState({ isShowPackageSelectModal: true })   
+      }      
+    }
   }
 
   componentWillUnmount () {
@@ -250,6 +275,10 @@ class EditOrder extends Component {
     }
   }
 
+  closePackageSelectModal = () => {
+    this.setState({ isShowPackageSelectModal: false }) 
+  }
+
   render () {
     const { classes, theme } = this.props
     const orderWidget = widgets.find((o) => o.id === '5')
@@ -360,6 +389,17 @@ class EditOrder extends Component {
             </GridItem>
           </GridItem>
         </GridContainer>
+
+        <CommonModal
+          cancelText='Cancel'
+          maxWidth='lg'
+          title='Package Details'
+          onClose={this.closePackageSelectModal}
+          onConfirm={this.closePackageSelectModal}
+          open={this.state.isShowPackageSelectModal}
+        >
+          <ConsumePackage {...this.props} />
+        </CommonModal>
         <ViewPatientHistory top='170px' />
       </div>
     )

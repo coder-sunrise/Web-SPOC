@@ -161,4 +161,10 @@ export const menuData = [
     url: '/report/referralsourcereport',
     authority: 'report.other.referralsource',
   },
+  {
+    title: 'Finance',
+    text: 'WIP Revenue Report',
+    url: '/report/wiprevenue',
+    authority: 'report.finance.wiprevenuereport',
+  },
 ]

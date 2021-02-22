@@ -91,6 +91,14 @@ const Content = ({
         )
     )
       return true
+
+    // If there are package items, can't edit invoice
+    if (entity && entity.invoiceItem) {
+      const packageItems = entity.invoiceItem.filter(i => i.isPackage)
+      if (packageItems.length > 0)
+        return true
+    }
+
     return false
   }
 

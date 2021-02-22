@@ -74,6 +74,7 @@ const WebSocketWrapper = ({
   const generateDrugLablesPrintSource = async (
     visitID,
     prescriptions = [],
+    packageItem = [],
     printAllDrugLabel = false,
   ) => {
     const drugLabelsDetails1 = await queryDrugLabelsDetails(visitID)
@@ -91,7 +92,9 @@ const WebSocketWrapper = ({
       newdata.map((o) => {
         let copy = selectedDrugs.find((x) => x.id === o.id).no
         for (let no = 0; no < copy; no++) {
-          const prescriptionItem = prescriptions.find((p) => p.id === o.id)
+          let prescriptionItem = prescriptions.find((p) => p.id === o.id)
+          if (prescriptionItem === undefined) 
+            prescriptionItem = packageItem.find((p) => p.id === o.id)
           drugLabelDetail.push(getDrugLabelDetails(o, prescriptionItem))
         }
       })
@@ -119,11 +122,12 @@ const WebSocketWrapper = ({
 
       if (type === CONSTANTS.ALL_DRUG_LABEL) {
         const { dispense, values } = restProps
-        const { prescription } = values
+        const { prescription, packageItem } = values
         const reportContext = await getReportContext(drugLabelReportID)
         const drugLabelList = await generateDrugLablesPrintSource(
           dispense ? dispense.visitID : values.id,
           prescription,
+          packageItem,
           printAllDrugLabel,
         )
         if (drugLabelList) {
