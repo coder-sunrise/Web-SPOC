@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import Call from '@material-ui/icons/Call'
 import Add from '@material-ui/icons/Add'
+import ReferralCard from '@/pages/Reception/Queue/NewVisit/ReferralCard'
 
 import { withStyles, Paper } from '@material-ui/core'
 import {
@@ -16,9 +17,7 @@ import {
   Select,
   CodeSelect,
   DatePicker,
-  RadioGroup,
   CheckboxGroup,
-  Switch,
 } from '@/components'
 import { getUniqueNumericId } from '@/utils/utils'
 import { queryList } from '@/services/patient'
@@ -42,7 +41,7 @@ const styles = () => ({
   streetAddress,
   clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
-
+ 
 class Demographic extends PureComponent {
   state = {}
 
@@ -66,7 +65,7 @@ class Demographic extends PureComponent {
               searchValue: v,
               includeinactive: false,
             },
-          }) 
+          })
         }}
         handleFilter={() => true}
         valueField='id'
@@ -113,7 +112,7 @@ class Demographic extends PureComponent {
 
   render () {
     const { props } = this
-    const { values, theme, setFieldValue, classes } = props
+    const { values, theme, setFieldValue, classes, dispatch } = props
     const { isPatientNameAutoUpperCase } = props.clinicSettings
 
     return (
@@ -462,66 +461,13 @@ class Demographic extends PureComponent {
                 />
               </GridItem>
               <GridItem xs={12}>
-                <FastField
-                  name='referredBy'
-                  render={(args) => (
-                    <RadioGroup
-                      label='Referral'
-                      options={[
-                        {
-                          value: '',
-                          label: 'None',
-                        },
-                        {
-                          value: 'Company',
-                          label: 'Company',
-                        },
-                        {
-                          value: 'Patient',
-                          label: 'Patient',
-                        },
-                      ]}
-                      onChange={this.onReferredByChange}
-                      {...args}
-                    />
-                  )}
+                <ReferralCard
+                  dispatch={dispatch}
+                  values={values}
+                  mode='patientprofile'
+                  setFieldValue={setFieldValue}
                 />
               </GridItem>
-              {values.referredBy === 'Patient' && (
-                <GridItem xs={12}>
-                  <Field
-                    name='referredByPatientFK'
-                    render={this.selectReferralPerson}
-                  />
-                </GridItem>
-              )}
-              {values.referredBy === 'Company' && (
-                <GridItem xs={12}>
-                  <Field
-                    name='referralCompanyReferenceNo'
-                    render={(args) => (
-                      <TextField label='Company Ref. No.' {...args} />
-                    )}
-                  />
-                </GridItem>
-              )}
-              {values.referredBy !== '' && (
-                <GridItem xs={12}>
-                  <Field
-                    name='referralRemarks'
-                    render={(args) => {
-                      return (
-                        <TextField
-                          label='Remarks'
-                          multiline
-                          rowsMax={4}
-                          {...args}
-                        />
-                      )
-                    }}
-                  />
-                </GridItem>
-              )}
               <GridItem xs={12}>
                 <Field
                   name='translationLinkFK'

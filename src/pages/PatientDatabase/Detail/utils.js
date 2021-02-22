@@ -7,18 +7,28 @@ const mapEntityToValues = (entity) => {
       (consents, item) =>
         item.isConsent
           ? [
-              ...consents,
-              item.pdpaConsentTypeFK,
-            ]
+            ...consents,
+            item.pdpaConsentTypeFK,
+          ]
           : [
-              ...consents,
-            ],
+            ...consents,
+          ],
       [],
     ),
+  }
+  let referralType = 'None'
+  if (entity.id) {
+    if (entity.referralSourceFK || entity.referralPersonFK) {
+      referralType = 'Company'
+    }
+    else if (entity.referralPatientProfileFK) {
+      referralType = 'Patient'
+    }
   }
   return {
     ...mappedValues,
     nationalityFK: entity.id ? entity.nationalityFK : 173,
+    referredBy: referralType,
   }
 }
 
