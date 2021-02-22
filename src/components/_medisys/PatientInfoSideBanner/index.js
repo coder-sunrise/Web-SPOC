@@ -287,6 +287,7 @@ class PatientInfoSideBanner extends PureComponent {
           balance: refreshData.finalBalance >= 0 ? refreshData.finalBalance : '-',
           patientCoPaymentSchemeFK: balanceData.patientCoPaymentSchemeFK,
           schemeTypeFK: refreshData.schemeTypeFK,
+          schemeType: schemePayer.schemeType,
           validFrom: schemeData.validFrom,
           validTo: schemeData.validTo,
           statusDescription: null,
@@ -304,6 +305,7 @@ class PatientInfoSideBanner extends PureComponent {
       balance: balanceData.balance >= 0 ? balanceData.balance : '-',
       patientCoPaymentSchemeFK: balanceData.patientCopaymentSchemeFK,
       schemeTypeFK: schemePayer.schemeFK,
+      schemeType: schemePayer.schemeType,
       validFrom: schemeData.validFrom,
       validTo: schemeData.validTo,
       statusDescription: errorData.statusDescription,
@@ -507,10 +509,10 @@ class PatientInfoSideBanner extends PureComponent {
                 .map((o) => {
                   const schemeData = this.getSchemePayerDetails(o)
                   return (
-                    <div style={{ marginBottom: theme.spacing(3) }}>
+                    <div style={{ marginBottom: theme.spacing(2) }}>
                       {o === entity.schemePayer[0] &&
-                        <p>
-                          Medisave                        
+                        <p style={{ marginBottom: theme.spacing(2) }}>
+                          Medisave
                           {entity.isActive && (
                           <IconButton>
                             <Refresh
@@ -522,6 +524,12 @@ class PatientInfoSideBanner extends PureComponent {
                           </IconButton>
                           )}
                         </p>}
+                      <div />
+                      <div>
+                        <p>
+                          {schemeData.schemeType}
+                        </p>
+                      </div>
                       <div>
                         <p>
                           Payer: {schemeData.payerName} ({schemeData.payerAccountNo})
