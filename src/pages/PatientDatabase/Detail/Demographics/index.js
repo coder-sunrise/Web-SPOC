@@ -116,9 +116,7 @@ class Demographic extends PureComponent {
     const { props } = this
     const { values, theme, setFieldValue, classes, dispatch } = props
     const { isPatientNameAutoUpperCase } = props.clinicSettings
-
     let referralType = 'None'
-    // Edit visit
     if (values.id) {
       if (values.referralSourceFK || values.referralPersonFK) {
         referralType = 'Company'

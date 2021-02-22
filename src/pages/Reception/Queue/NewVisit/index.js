@@ -110,7 +110,6 @@ class NewVisit extends PureComponent {
 
   constructor (props) {
     super(props)
-
     this.myRef = React.createRef()
   }
 
@@ -335,8 +334,7 @@ class NewVisit extends PureComponent {
       patientInfo,
       ctinvoiceadjustment,
       codetable,
-    } = this.props
-
+    } = this.props 
     if (expandRefractionForm) {
       let div = $(this.myRef.current).find('div[aria-expanded]:eq(1)')
       if (div.attr('aria-expanded') === 'false') div.click()
@@ -480,8 +478,9 @@ class NewVisit extends PureComponent {
                           )}
                         </Authorized>
                         <GridItem xs={12} className={classes.row}>
-                          <CommonCard title='Referral'> 
+                          <CommonCard title='Referral'>
                             <ReferralCard
+                              {...this.props}
                               mode='visitregistration'
                               isVisitReadonlyAfterSigned={isReadonlyAfterSigned}
                               isSigned={values.isLastClinicalObjectRecordSigned}

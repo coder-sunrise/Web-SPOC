@@ -112,6 +112,7 @@ export default createFormViewModel({
         try {
           const response = yield call(service.query, payload)
           const { data = {} } = response
+          console.log(response)
           const { visit: { patientProfileFK, visitEyeRefractionForm } } = data
 
           if (patientProfileFK) {
@@ -170,7 +171,6 @@ export default createFormViewModel({
         try {
           const response = yield call(queryPatient, payload)
           const { data } = response
-
           yield put({
             type: 'updateState',
             payload: {

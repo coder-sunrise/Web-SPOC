@@ -41,6 +41,7 @@ const styles = (theme) => ({
     patient,
   }),
 )
+
 class ReferralCard extends PureComponent {
   state = {
     referralData: [],
@@ -53,7 +54,7 @@ class ReferralCard extends PureComponent {
 
   componentDidMount = () => {
     this.loadReferralSource()
-    this.loadReferralPerson()
+    this.loadReferralPerson() 
   }
 
   loadReferralSource = () => {
@@ -132,6 +133,7 @@ class ReferralCard extends PureComponent {
         return this.state.referralData.find((t) => t.id === m.id)
       })
     }
+    referralData = referralData.filter(t => t !== undefined)
     if (referralData.findIndex((t) => t.id === values.referralSourceFK) < 0) {
       setFieldValue('referralSourceFK', null)
     }
@@ -150,20 +152,22 @@ class ReferralCard extends PureComponent {
         this.setState({
           referralList: referralData.map((m) => {
             return { name: m.name, value: m.id }
-          }) })
+          }),
+        })
       }
-      if (!values.referralSourceFK) { 
+      if (!values.referralSourceFK) {
         this.setState({
           referralPersonList: referralPersonData.map((m) => {
             return { name: m.name, value: m.id }
-          }) })
+          }),
+        })
       }
     } else if (e.target.value === 'Patient') {
       this.props.setFieldValue('referralSourceFK', undefined)
       this.props.setFieldValue('referralPersonFK', undefined)
     } else if (e.target.value === 'None') {
       this.props.setFieldValue('referralSourceFK', undefined)
-      this.props.setFieldValue('referralPersonFK', undefined) 
+      this.props.setFieldValue('referralPersonFK', undefined)
       this.props.setFieldValue((this.props.mode === 'patientprofile' ? 'referredByPatientFK' : 'referralPatientProfileFK'), undefined)
       this.props.setFieldValue('referralRemarks', undefined)
     }
@@ -253,6 +257,7 @@ class ReferralCard extends PureComponent {
       handleUpdateAttachments,
       clinicSettings,
       isVisitReadonlyAfterSigned,
+      patientInfo,
       mode,
     } = this.props
     const {
