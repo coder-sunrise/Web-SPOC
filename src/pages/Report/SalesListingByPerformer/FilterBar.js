@@ -63,6 +63,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                   code='ltinvoiceitemtype'
                   mode='multiple'
                   label='Category'
+                  localFilter={(item) => [ 1,2,3,4,6 ].includes(item.id)}
                 />
               )}
             />

@@ -35,11 +35,11 @@ class SalesList extends PureComponent {
     ]
     const SalesDetailsExtensions = [
       { columnName: 'date', type: 'date', sortingEnabled: false, width: 110 },
-      { columnName: 'invoiceNo', sortingEnabled: false, width: 100, wordWrapEnabled: true },
+      { columnName: 'invoiceNo', sortingEnabled: false, width: 120, wordWrapEnabled: true },
       { columnName: 'patientReferenceNo', sortingEnabled: false, width: 100, wordWrapEnabled: true },
       { columnName: 'patientAccountNo', sortingEnabled: false, width: 100, wordWrapEnabled: true },
-      { columnName: 'patientName', sortingEnabled: false, width: 160, wordWrapEnabled: true },
-      { columnName: 'itemType', sortingEnabled: false, wordWrapEnabled: true, width: 110 },
+      { columnName: 'patientName', sortingEnabled: false, width: 150, wordWrapEnabled: true },
+      { columnName: 'itemType', sortingEnabled: false, wordWrapEnabled: true, width: 100 },
       { columnName: 'invoiceItemName', sortingEnabled: false, wordWrapEnabled: true },
       { columnName: 'amount', type: 'currency', currency: true, sortingEnabled: false, width: 140, wordWrapEnabled: true },
       { columnName: 'adjAmt', type: 'currency', currency: true, sortingEnabled: false, width: 120, wordWrapEnabled: true },
