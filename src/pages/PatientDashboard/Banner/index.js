@@ -439,9 +439,10 @@ class Banner extends PureComponent {
         return {
           payerName: schemePayer.payerName,
           payerAccountNo: schemePayer.payerID,
-          balance: balanceData.balance ??  '',
+          balance: balanceData.balance >= 0 ? balanceData.balance : '-',
           patientCoPaymentSchemeFK: refreshData.finalBalance,
           schemeTypeFK: refreshData.schemeTypeFK,
+          schemeType: schemePayer.schemeType,
           validFrom: schemeData.validFrom,
           validTo: schemeData.validTo,
           statusDescription: refreshData.statusDescription,
@@ -459,9 +460,10 @@ class Banner extends PureComponent {
     return {
       payerName: schemePayer.payerName,
       payerAccountNo: schemePayer.payerID,
-      balance: balanceData.balance ??  '',
+      balance: balanceData.balance >= 0 ? balanceData.balance : '-',
       patientCoPaymentSchemeFK: balanceData.patientCopaymentSchemeFK,
       schemeTypeFK: schemePayer.schemeFK,
+      schemeType: schemePayer.schemeType,
       validFrom: schemeData.validFrom,
       validTo: schemeData.validTo,
       statusDescription: errorData.statusDescription || schemeData.statusDescription,
@@ -727,11 +729,17 @@ class Banner extends PureComponent {
                                   )}
                                 </span>
                               </div>
-                              {this.isMedisave(schemeData.schemeTypeFK) && 
-                                <div>
-                                  Payer: {schemeData.payerName} [{schemeData.payerAccountNo}]
+                              {schemeData.schemeType && 
+                                <div style={{ marginTop: 15 }}>
+                                  {schemeData.schemeType}
                                 </div>
                               }
+                              {this.isMedisave(schemeData.schemeTypeFK) && 
+                                <div>
+                                  Payer: {schemeData.payerName} ({schemeData.payerAccountNo})
+                                </div>
+                              }
+                              {schemeData.validFrom && 
                               <div>
                                 Validity:{' '}
                                 {schemeData.validFrom ? (
@@ -753,7 +761,7 @@ class Banner extends PureComponent {
                                 ) : (
                                   ''
                                 )}
-                              </div>
+                              </div>}
                               {schemeData.schemeTypeFK !== 15 ? (
                                 <div>
                                   Balance: {' '}
