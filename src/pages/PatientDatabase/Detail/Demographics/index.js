@@ -17,9 +17,7 @@ import {
   Select,
   CodeSelect,
   DatePicker,
-  RadioGroup,
   CheckboxGroup,
-  Switch,
 } from '@/components'
 import { getUniqueNumericId } from '@/utils/utils'
 import { queryList } from '@/services/patient'
@@ -43,7 +41,7 @@ const styles = () => ({
   streetAddress,
   clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
-
+ 
 class Demographic extends PureComponent {
   state = {}
 
@@ -67,7 +65,7 @@ class Demographic extends PureComponent {
               searchValue: v,
               includeinactive: false,
             },
-          }) 
+          })
         }}
         handleFilter={() => true}
         valueField='id'
@@ -116,18 +114,6 @@ class Demographic extends PureComponent {
     const { props } = this
     const { values, theme, setFieldValue, classes, dispatch } = props
     const { isPatientNameAutoUpperCase } = props.clinicSettings
-    let referralType = 'None'
-    if (values.id) {
-      if (values.referralSourceFK || values.referralPersonFK) {
-        referralType = 'Company'
-      }
-      else if (values.referralPatientProfileFK) {
-        referralType = 'Patient'
-      }
-    } 
-    if (!values.referredBy) {
-      this.props.setFieldValue('referredBy', referralType)
-    }
 
     return (
       <div>
@@ -475,14 +461,13 @@ class Demographic extends PureComponent {
                 />
               </GridItem>
               <GridItem xs={12}>
-                <ReferralCard                   
+                <ReferralCard
                   dispatch={dispatch}
                   values={values}
                   mode='patientprofile'
-                  referralType={referralType}
                   setFieldValue={setFieldValue}
-                /> 
-              </GridItem> 
+                />
+              </GridItem>
               <GridItem xs={12}>
                 <Field
                   name='translationLinkFK'

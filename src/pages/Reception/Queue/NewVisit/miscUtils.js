@@ -196,6 +196,20 @@ export const formikMapPropsToValues = ({
       else newFormData = visitEyeRefractionForm.formData
     }
 
+    let referralType = 'None'
+    // Edit visit
+    if (visitEntries.id) {
+      if (visitEntries.referralSourceFK || visitEntries.referralPersonFK) {
+        referralType = 'Company'
+      }
+      else if (visitEntries.referralPatientProfileFK) {
+        referralType = 'Patient'
+      }
+    }
+    else if (clinicSettings.settings.isVisitReferralSourceMandatory) {
+      referralType = 'Company'
+    } 
+    
     return {
       queueNo: qNo,
       visitPurposeFK,
@@ -211,6 +225,7 @@ export const formikMapPropsToValues = ({
         ...visitEyeRefractionForm,
         formData: newFormData,
       },
+      referredBy: referralType,
       referralRemarks: visitEntries.id ? visitEntries.referralRemarks : patientInfo.referralRemarks,
       referralSourceFK: visitEntries.id ? visitEntries.referralSourceFK : patientInfo.referralSourceFK,
       referralPersonFK: visitEntries.id ? visitEntries.referralPersonFK : patientInfo.referralPersonFK,

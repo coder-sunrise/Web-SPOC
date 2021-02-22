@@ -54,7 +54,7 @@ class ReferralCard extends PureComponent {
 
   componentDidMount = () => {
     this.loadReferralSource()
-    this.loadReferralPerson() 
+    this.loadReferralPerson()
   }
 
   loadReferralSource = () => {
@@ -257,7 +257,6 @@ class ReferralCard extends PureComponent {
       handleUpdateAttachments,
       clinicSettings,
       isVisitReadonlyAfterSigned,
-      patientInfo,
       mode,
     } = this.props
     const {
@@ -269,7 +268,7 @@ class ReferralCard extends PureComponent {
 
     const isPatientProfileEdit = (mode === 'patientprofile')
     let disabled = true
-    if (!isPatientProfileEdit && values.visitStatus === 'WAITING' || !isVisitReadonlyAfterSigned) {
+    if (isPatientProfileEdit || values.visitStatus === 'WAITING' || !isVisitReadonlyAfterSigned) {
       disabled = false
     }
 
@@ -304,7 +303,7 @@ class ReferralCard extends PureComponent {
       <div>
         <GridContainer>
           <GridItem md={12} style={padding}>
-            <FastField
+            <Field
               name='referredBy'
               render={(args) => (
                 <RadioGroup
