@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
-import { EditableTableGrid } from '@/components'
+import { EditableTableGrid, notification } from '@/components'
 
 @connect(({ codetable }) => ({ codetable }))
 class MedisaveVaccinations extends PureComponent {
@@ -30,7 +30,6 @@ class MedisaveVaccinations extends PureComponent {
           sortingEnabled: false,
           onChange: (row)=> {
             const { rows, setFieldValue } = this.props
-
             const newRows = rows.map((r) => {
               if (r.id === row.row.id) {
                 return {
@@ -42,7 +41,16 @@ class MedisaveVaccinations extends PureComponent {
                 ...r,
               }
             })
+
             setFieldValue('inventoryVaccination_MedisaveVaccination', newRows)
+            
+            const nonUnique = newRows.filter(u => newRows.filter(r => !r.isDeleted && r.medisaveVaccinationFK === u.medisaveVaccinationFK).length > 1)
+            if(nonUnique.length > 0) {
+              row.row.medisaveVaccinationFK = null
+              notification.error({
+                message: 'Medisave Vaccination already exists.',
+              })
+            }
           },
           render: (row) => {
             const { ctmedisavevaccination = [] } = this.props.codetable
@@ -65,6 +73,12 @@ class MedisaveVaccinations extends PureComponent {
             const { rows, setFieldValue } = this.props
 
             const newRows = rows.map((r) => {
+              if(rows.filter(vv => !vv.isDeleted).length === 1) {
+                return {
+                  ...r,
+                  isDefault: true,
+                }
+              }
               if (r.id === row.row.id) {
                 return {
                   ...r,
@@ -90,7 +104,7 @@ class MedisaveVaccinations extends PureComponent {
         return {
           ...row,
           isDefault: true,
-        } // won't update in dto, only in ui
+        } // for dto to db
       })
       : rows
       setFieldValue('inventoryVaccination_MedisaveVaccination', newRows)
@@ -132,23 +146,19 @@ class MedisaveVaccinations extends PureComponent {
       onCommitChanges: this.commitChanges,
     }
 
-    const newRows = rows && rows.filter(r => !r.isDeleted).length === 1 
-    ? rows.map(row => {
-      return {
-        ...row,
-        isDefault: true,
-      } // won't update in dto, only in ui
-    })
-    : rows
-
     return (
-      <EditableTableGrid
-        rows={newRows}
-        FuncProps={{ pager: false }}
-        EditingProps={EditingProps}
-        schema={schema}
-        {...this.tableParas}
-      />
+      <React.Fragment>
+        <h4 style={{ marginTop: 15, fontWeight: 400 }}>
+          <b>Medisave Vaccination</b>
+        </h4>
+        <EditableTableGrid
+          rows={rows}
+          FuncProps={{ pager: false }}
+          EditingProps={EditingProps}
+          schema={schema}
+          {...this.tableParas}
+        />
+      </React.Fragment>
     )
   }
 }
