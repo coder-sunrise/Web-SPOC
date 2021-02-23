@@ -8,7 +8,6 @@ import { queryList } from '@/services/patient'
 
 // custom components
 import {
-  CommonCard,
   TextField,
   GridContainer,
   GridItem,
@@ -42,6 +41,7 @@ const styles = (theme) => ({
     patient,
   }),
 )
+
 class ReferralCard extends PureComponent {
   state = {
     referralData: [],
@@ -133,6 +133,7 @@ class ReferralCard extends PureComponent {
         return this.state.referralData.find((t) => t.id === m.id)
       })
     }
+    referralData = referralData.filter(t => t !== undefined)
     if (referralData.findIndex((t) => t.id === values.referralSourceFK) < 0) {
       setFieldValue('referralSourceFK', null)
     }
@@ -144,14 +145,30 @@ class ReferralCard extends PureComponent {
 
   referralTypeChange = (e) => {
     if (e.target.value === 'Company') {
-      this.props.setFieldValue('referralPatientProfileFK', undefined)
+      this.props.setFieldValue((this.props.mode === 'patientprofile' ? 'referredByPatientFK' : 'referralPatientProfileFK'), undefined)
+      let { values } = this.props
+      let { referralPersonData, referralData } = this.state
+      if (!values.referralPersonFK) {
+        this.setState({
+          referralList: referralData.map((m) => {
+            return { name: m.name, value: m.id }
+          }),
+        })
+      }
+      if (!values.referralSourceFK) {
+        this.setState({
+          referralPersonList: referralPersonData.map((m) => {
+            return { name: m.name, value: m.id }
+          }),
+        })
+      }
     } else if (e.target.value === 'Patient') {
       this.props.setFieldValue('referralSourceFK', undefined)
       this.props.setFieldValue('referralPersonFK', undefined)
     } else if (e.target.value === 'None') {
       this.props.setFieldValue('referralSourceFK', undefined)
       this.props.setFieldValue('referralPersonFK', undefined)
-      this.props.setFieldValue('referralPatientProfileFK', undefined)
+      this.props.setFieldValue((this.props.mode === 'patientprofile' ? 'referredByPatientFK' : 'referralPatientProfileFK'), undefined)
       this.props.setFieldValue('referralRemarks', undefined)
     }
   }
@@ -240,6 +257,7 @@ class ReferralCard extends PureComponent {
       handleUpdateAttachments,
       clinicSettings,
       isVisitReadonlyAfterSigned,
+      mode,
     } = this.props
     const {
       referralList,
@@ -248,8 +266,9 @@ class ReferralCard extends PureComponent {
       showAddReferralPerson,
     } = this.state
 
+    const isPatientProfileEdit = (mode === 'patientprofile')
     let disabled = true
-    if (values.visitStatus === 'WAITING' || !isVisitReadonlyAfterSigned) {
+    if (isPatientProfileEdit || values.visitStatus === 'WAITING' || !isVisitReadonlyAfterSigned) {
       disabled = false
     }
 
@@ -271,140 +290,140 @@ class ReferralCard extends PureComponent {
         label: 'Patient',
       },
     ]
-    if (clinicSettings.settings.isVisitReferralSourceMandatory) {
+    if (clinicSettings.settings.isVisitReferralSourceMandatory && !isPatientProfileEdit) {
       referralTypeOptions = referralTypeOptions.filter(
         (t) => t.value !== 'None',
       )
-      if (values.referralByType === 'None') {
-        this.props.setFieldValue('referralByType', 'Company')
+      if (values.referredBy === 'None') {
+        this.props.setFieldValue('referredBy', 'Company')
       }
     }
-
+    let padding = isPatientProfileEdit ? { padding: 0 } : { padding: '0 8px' }
     return (
       <div>
-        <CommonCard title='Referral'>
-          <GridContainer>
-            <GridItem md={12}>
-              <FastField
-                name='referralByType'
-                render={(args) => (
-                  <RadioGroup
-                    {...args}
-                    label=''
-                    authority='none'
+        <GridContainer>
+          <GridItem md={12} style={padding}>
+            <Field
+              name='referredBy'
+              render={(args) => (
+                <RadioGroup
+                  {...args}
+                  label='Referral'
+                  authority='none'
+                  disabled={disabled}
+                  simple={!isPatientProfileEdit}
+                  onChange={this.referralTypeChange}
+                  options={referralTypeOptions}
+                />
+              )}
+            />
+          </GridItem>
+          {values.referredBy === 'Company' && (
+            <GridContainer>
+              <GridItem xs md={(isPatientProfileEdit ? 8 : 6)} style={padding}>
+                <Field
+                  name='referralSourceFK'
+                  render={(args) => (
+                    <CodeSelect
+                      {...args}
+                      options={referralList}
+                      labelField='name'
+                      valueField='value'
+                      disabled={disabled}
+                      label='Company Name'
+                      onChange={(v) => {
+                        this.onReferralByChange(v)
+                      }}
+                    />
+                  )}
+                />
+              </GridItem>
+              <GridItem xs md={(isPatientProfileEdit ? 4 : 6)}>
+                <Authorized authority='settings.contact.referralsource'>
+                  <Button
+                    color='primary'
+                    style={{ marginTop: '15px' }}
+                    onClick={this.addNewReferralSource}
                     disabled={disabled}
-                    simple
-                    onChange={this.referralTypeChange}
-                    options={referralTypeOptions}
-                  />
-                )}
-              />
-            </GridItem>
-            {values.referralByType === 'Company' && (
-              <GridContainer>
-                <GridItem xs md={6}>
-                  <Field
-                    name='referralSourceFK'
-                    render={(args) => (
-                      <CodeSelect
-                        {...args}
-                        options={referralList}
-                        labelField='name'
-                        valueField='value'
-                        disabled={disabled}
-                        label='Company Name'
-                        onChange={(v) => {
-                          this.onReferralByChange(v)
-                        }}
-                      />
-                    )}
-                  />
-                </GridItem>
-                <GridItem xs md={6}>
-                  <Authorized authority='settings.contact.referralsource'>
-                    <Button
-                      color='primary'
-                      style={{ marginTop: '15px' }}
-                      onClick={this.addNewReferralSource}
-                      disabled={disabled}
-                      size='sm'
-                    >
-                      <Add /> New Company
+                    size='sm'
+                  >
+                    <Add /> New Company
                     </Button>
-                  </Authorized>
-                </GridItem>
-                <GridItem xs md={6}>
-                  <Field
-                    name='referralPersonFK'
-                    render={(args) => (
-                      <CodeSelect
-                        {...args}
-                        labelField='name'
-                        disabled={disabled}
-                        label='Ref. Person Name'
-                        options={referralPersonList}
-                        onChange={this.onReferralPersonChange}
-                        valueField='value'
-                        disableAll
-                      />
-                    )}
-                  />
-                </GridItem>
-                <GridItem xs md={6}>
-                  <Authorized authority='settings.contact.referralperson'>
-                    <Button
-                      color='primary'
-                      style={{ marginTop: '15px' }}
-                      onClick={this.addNewReferralPerson}
+                </Authorized>
+              </GridItem>
+              <GridItem xs md={(isPatientProfileEdit ? 8 : 6)} style={padding}>
+                <Field
+                  name='referralPersonFK'
+                  render={(args) => (
+                    <CodeSelect
+                      {...args}
+                      labelField='name'
                       disabled={disabled}
-                      size='sm'
-                    >
-                      <Add /> New Referral Person
+                      label='Ref. Person Name'
+                      options={referralPersonList}
+                      onChange={this.onReferralPersonChange}
+                      valueField='value'
+                      disableAll
+                    />
+                  )}
+                />
+              </GridItem>
+              <GridItem xs md={(isPatientProfileEdit ? 4 : 6)}>
+                <Authorized authority='settings.contact.referralperson'>
+                  <Button
+                    color='primary'
+                    style={{ marginTop: '15px' }}
+                    onClick={this.addNewReferralPerson}
+                    disabled={disabled}
+                    size='sm'
+                  >
+                    <Add /> New Referral Person
                     </Button>
-                  </Authorized>
-                </GridItem>
-                <GridItem xs md={12}>
-                  <FastField
-                    name='referralRemarks'
-                    render={(args) => (
-                      <TextField
-                        label='Remarks'
-                        disabled={disabled}
-                        multiline
-                        maxLength={400}
-                        inputProps={{ maxLength: 400 }}
-                        {...args}
-                      />
-                    )}
-                  />
-                </GridItem>
-              </GridContainer>
-            )}
-            {values.referralByType === 'Patient' && (
-              <GridContainer>
-                <GridItem xs md={6}>
-                  <Field
-                    disabled
-                    name='referralPatientProfileFK'
-                    render={this.selectReferralPerson}
-                  />
-                </GridItem>
-                <GridItem xs md={12}>
-                  <FastField
-                    name='referralRemarks'
-                    render={(args) => (
-                      <TextField
-                        label='Remarks'
-                        disabled={disabled}
-                        multiline
-                        {...args}
-                      />
-                    )}
-                  />
-                </GridItem>
-              </GridContainer>
-            )}
-            <GridItem xs md={12}>
+                </Authorized>
+              </GridItem>
+              <GridItem xs md={12} style={padding}>
+                <FastField
+                  name='referralRemarks'
+                  render={(args) => (
+                    <TextField
+                      label='Remarks'
+                      disabled={disabled}
+                      multiline
+                      maxLength={400}
+                      inputProps={{ maxLength: 400 }}
+                      {...args}
+                    />
+                  )}
+                />
+              </GridItem>
+            </GridContainer>
+          )}
+          {values.referredBy === 'Patient' && (
+            <GridContainer>
+              <GridItem xs md={(isPatientProfileEdit ? 12 : 6)} style={padding}>
+                <Field
+                  disabled
+                  name={(isPatientProfileEdit ? 'referredByPatientFK' : 'referralPatientProfileFK')}
+                  render={this.selectReferralPerson}
+                />
+              </GridItem>
+              <GridItem xs md={12} style={padding}>
+                <FastField
+                  name='referralRemarks'
+                  render={(args) => (
+                    <TextField
+                      label='Remarks'
+                      disabled={disabled}
+                      multiline
+                      {...args}
+                    />
+                  )}
+                />
+              </GridItem>
+            </GridContainer>
+          )}
+          <GridItem xs md={12}>
+            {mode !== 'patientprofile' &&
               <AttachmentWithThumbnail
                 label='Attachment'
                 attachmentType='VisitReferral'
@@ -413,9 +432,9 @@ class ReferralCard extends PureComponent {
                 disabled={disabled}
                 fieldName='visitAttachment'
               />
-            </GridItem>
-          </GridContainer>
-        </CommonCard>
+            }
+          </GridItem>
+        </GridContainer>
 
         <CommonModal
           open={showAddReferralSource}

@@ -170,7 +170,7 @@ export default createFormViewModel({
         try {
           const response = yield call(queryPatient, payload)
           const { data } = response
-
+          
           yield put({
             type: 'updateState',
             payload: {

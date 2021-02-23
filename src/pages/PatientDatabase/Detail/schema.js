@@ -115,10 +115,10 @@ const schemaDemographic = {
   patientAccountNo: Yup.string().NRIC().required(),
   genderFK: Yup.number().required(),
   nationalityFK: Yup.number().required(),
-  referredBy: Yup.string(),
-  referralCompanyReferenceNo: Yup.string().when('referredBy', {
+  referredBy: Yup.string(), 
+  referralSourceFK: Yup.number().when('referredBy', {
     is: 'Company',
-    then: Yup.string().required(),
+    then: Yup.number().required(),
   }),
   referredByPatientFK: Yup.number().when('referredBy', {
     is: (value) => value === 'Patient',
