@@ -935,7 +935,7 @@ class Medication extends PureComponent {
         'drugName',
         (drugName === ''
           ? option.displayValue
-          : `${drugName}/${option.displayValue}`).substring(0, 200),
+          : `${drugName}/${option.displayValue}`).substring(0, 70),
       )
     }
 
@@ -1321,6 +1321,7 @@ class Medication extends PureComponent {
                             label='Drug Mixture'
                             {...args}
                             autocomplete='nope'
+                            maxLength={70}
                           />
                         </div>
                       )
@@ -1341,7 +1342,7 @@ class Medication extends PureComponent {
                         fontWeight: 500,
                       }}
                     >
-                      {`Characters left: ${200 -
+                      {`Characters left: ${70 -
                         (drugName ? drugName.length : 0)}`}
                     </span>
                   </div>
