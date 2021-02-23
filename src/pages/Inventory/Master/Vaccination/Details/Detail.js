@@ -64,17 +64,26 @@ const Detail = ({
         [field]: {
           ...values,
           isMedisaveClaimable: o.isMedisaveClaimable,
+          inventoryVaccination_MedisaveVaccination: [],
         },
       },
     })
   }
 
-  const medisaveSchema = Yup.object().shape({
+  const medisaveSchema = values.isMedisaveClaimable ? Yup.object().shape({
     medisaveVaccinationFK: Yup.number().required(),
     isDefault: Yup.boolean(),
-  })
-  
+  }) : Yup.object()
 
+  // const medisaveSchema = values.isMedisaveClaimable ? Yup.array()
+  // .compact((v) => v.isDeleted)
+  // .of(
+  //   Yup.object().shape({
+  //     medisaveVaccinationFK: Yup.number().required(),
+  //     isDefault: Yup.boolean(),
+  //   }),
+  // ) : Yup.object()
+  
   return (
     <CardContainer
       hideHeader

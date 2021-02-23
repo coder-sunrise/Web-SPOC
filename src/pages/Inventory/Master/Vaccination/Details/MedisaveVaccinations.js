@@ -28,13 +28,13 @@ class MedisaveVaccinations extends PureComponent {
           type: 'codeSelect',
           code: 'ctMedisaveVaccination',
           sortingEnabled: false,
-          onChange: (row)=> {
+          onChange: (e)=> {
             const { rows, setFieldValue } = this.props
             const newRows = rows.map((r) => {
-              if (r.id === row.row.id) {
+              if (r.id === e.row.id) {
                 return {
                   ...r,
-                  medisaveVaccinationFK: row.row.medisaveVaccinationFK,
+                  medisaveVaccinationFK: e.row.medisaveVaccinationFK,
                 }
               }
               return {
@@ -46,10 +46,11 @@ class MedisaveVaccinations extends PureComponent {
             
             const nonUnique = newRows.filter(u => newRows.filter(r => !r.isDeleted && r.medisaveVaccinationFK === u.medisaveVaccinationFK).length > 1)
             if(nonUnique.length > 0) {
-              row.row.medisaveVaccinationFK = null
+              e.row.medisaveVaccinationFK = undefined
               notification.error({
                 message: 'Medisave Vaccination already exists.',
               })
+              e.onValueChange()
             }
           },
           render: (row) => {
@@ -152,6 +153,7 @@ class MedisaveVaccinations extends PureComponent {
           <b>Medisave Vaccination</b>
         </h4>
         <EditableTableGrid
+          forceRender
           rows={rows}
           FuncProps={{ pager: false }}
           EditingProps={EditingProps}
