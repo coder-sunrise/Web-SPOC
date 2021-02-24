@@ -63,20 +63,39 @@ const PackageDrawdownInfo = ({ drawdownData = {}, asAtDate }) => {
       let totalQty = 0
       let balanceQty = 0
       let drawdownTransaction = []
-      let lastDrawdownTransaction
       const todayQuantity = drawdownData.packageConsumeQuantity
 
       const { packageDrawdown } = drawdownData
       if (packageDrawdown) {       
         if (packageDrawdown.packageDrawdownTransaction && packageDrawdown.packageDrawdownTransaction.length > 0) { 
           drawdownTransaction = packageDrawdown.packageDrawdownTransaction.filter(t => t.consumeDate < asAtDate && t.consumeQuantity > 0)
-          lastDrawdownTransaction = drawdownTransaction[0]
         }
 
-        totalQty = packageDrawdown.totalQuantity
-        balanceQty = lastDrawdownTransaction ? lastDrawdownTransaction.quantityAfterConsume : packageDrawdown.totalQuantity
-        totalDrawdown = totalQty - balanceQty
-        
+        // Transferred quantity
+        let transferredQty = 0
+        const { packageDrawdownTransfer } = packageDrawdown
+        if (packageDrawdownTransfer && packageDrawdownTransfer.length > 0) {
+          const drawdownTransfer = packageDrawdownTransfer.filter(t => t.transferDate < asAtDate)
+          drawdownTransfer.forEach(transfer => {
+            transferredQty += transfer.quantity
+          })
+        }
+
+        // Received (Transfer back) quantity
+        let receivedQty = 0
+        const { packageDrawdownReceive } = packageDrawdown
+        if (packageDrawdownReceive && packageDrawdownReceive.length > 0) {
+          const drawdownReceive = packageDrawdownReceive.filter(t => t.transferDate < asAtDate)
+          drawdownReceive.forEach(receive => {
+            receivedQty += receive.quantity
+          })
+        }
+
+        totalQty = packageDrawdown.totalQuantity - transferredQty + receivedQty
+        drawdownTransaction.forEach(txn => {
+          totalDrawdown += txn.consumeQuantity
+        })       
+        balanceQty = totalQty - totalDrawdown 
       }
       else {
         totalQty = drawdownData.quantity

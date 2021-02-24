@@ -167,4 +167,10 @@ export const menuData = [
     url: '/report/wiprevenue',
     authority: 'report.finance.wiprevenuereport',
   },
+  {
+    title: 'Finance',
+    text: 'Sales Listing By Performer Report',
+    url: '/report/saleslistingbyperformer',
+    authority: 'report.finance.saleslistingbyperformerreport',
+  },
 ]

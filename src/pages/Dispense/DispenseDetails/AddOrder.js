@@ -649,6 +649,7 @@ export default compose(
             totalAfterGST: roundTo(o.totalAfterGST),
             gstAmount: o.gstAmount,
             isDeleted: o.isDeleted,
+            performingUserFK: o.performingUserFK,
             ...obj,
             revenueCategoryFK: obj.itemRevenueCategoryFK || o.revenueCategoryFK,
           }

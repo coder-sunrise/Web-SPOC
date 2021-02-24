@@ -797,17 +797,40 @@ export const PackageColumnExtensions = (onPrint) => [
     render: (row) => {
       const { packageDrawdown } = row
       let drawdownTransaction = []
-      let lastDrawdownTransaction
       let balanceQty = row.quantity
       const todayQuantity = row.packageConsumeQuantity
 
       if (packageDrawdown) {       
         if (packageDrawdown.packageDrawdownTransaction && packageDrawdown.packageDrawdownTransaction.length > 0) { 
           drawdownTransaction = packageDrawdown.packageDrawdownTransaction.filter(t => t.consumeDate < row.packageDrawdownAsAtDate)
-          lastDrawdownTransaction = drawdownTransaction[0]
         }
 
-        balanceQty = lastDrawdownTransaction ? lastDrawdownTransaction.quantityAfterConsume : packageDrawdown.totalQuantity        
+         // Transferred quantity
+         let transferredQty = 0
+         const { packageDrawdownTransfer } = packageDrawdown
+         if (packageDrawdownTransfer && packageDrawdownTransfer.length > 0) {
+           const drawdownTransfer = packageDrawdownTransfer.filter(t => t.transferDate < row.packageDrawdownAsAtDate)
+           drawdownTransfer.forEach(transfer => {
+             transferredQty += transfer.quantity
+           })
+         }
+
+         // Received (Transfer back) quantity
+        let receivedQty = 0
+        const { packageDrawdownReceive } = packageDrawdown
+        if (packageDrawdownReceive && packageDrawdownReceive.length > 0) {
+          const drawdownReceive = packageDrawdownReceive.filter(t => t.transferDate < row.packageDrawdownAsAtDate)
+          drawdownReceive.forEach(receive => {
+            receivedQty += receive.quantity
+          })
+        }
+
+        const totalQty = packageDrawdown.totalQuantity - transferredQty + receivedQty
+        let totalDrawdown = 0
+        drawdownTransaction.forEach(txn => {
+          totalDrawdown += txn.consumeQuantity
+        })       
+        balanceQty = totalQty - totalDrawdown 
       }
 
       return <NumberInput text value={balanceQty - todayQuantity} />
