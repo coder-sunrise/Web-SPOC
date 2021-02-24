@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
 // material ui
-import { Popover, withStyles } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 // common component
 import { CardContainer, CommonModal } from '@/components'
 // sub component
@@ -12,8 +12,6 @@ import { getRemovedUrl } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import FilterBar from './components/FilterBar'
 import FuncCalendarView from './components/FuncCalendarView'
-import ApptPopover from './components/ApptPopover'
-import DoctorBlockPopover from './components/DoctorBlockPopover'
 import Form from './components/form'
 import DoctorBlockForm from './components/form/DoctorBlock'
 import SeriesConfirmation from './SeriesConfirmation'
@@ -157,6 +155,7 @@ class Appointment extends React.PureComponent {
 
     if (response) {
       let filterByDoctor = []
+      let filterBySingleDoctor
       let resources = []
       let primaryClinicianFK
 
@@ -207,12 +206,15 @@ class Appointment extends React.PureComponent {
             }))
         }
         filterByDoctor = resources.map((res) => res.clinicianFK)
+        filterBySingleDoctor =
+          resources && resources.length ? resources[0].clinicianFK : undefined
       }
 
       this.setState((preState) => ({
         filter: filter || {
           ...preState.filter,
           filterByDoctor,
+          filterBySingleDoctor,
         },
         primaryClinicianFK,
         resources,
@@ -615,6 +617,7 @@ class Appointment extends React.PureComponent {
           dispatch={dispatch}
           loading={calendarLoading}
           filterByDoctor={filter.filterByDoctor}
+          filterBySingleDoctor={filter.filterBySingleDoctor}
           filterByApptType={filter.filterByApptType}
           handleUpdateFilter={this.onFilterUpdate}
           onDoctorEventClick={this.handleDoctorEventClick}
