@@ -34,4 +34,13 @@ module.exports = {
   queryVisitHistory: (params) => {
     return service.query(`${url}/VisitHistory`, params)
   },
+  
+  queryReferralHistory: (params) => {
+    return service.query(`${url}/Referral`,params)
+  },
+
+  saveReferralHistory: (params) => {
+    return service.upsert(`${url}/Referral`,params)
+  },
+
 }
