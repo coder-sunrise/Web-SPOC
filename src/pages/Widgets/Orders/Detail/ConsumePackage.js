@@ -246,6 +246,7 @@ const getType = (typeId) => {
           remainingQuantity: packageItem.remainingQuantity,
           performingUserFK: packageItem.performingUserFK,
           packageGlobalId: packageItem.packageGlobalId,
+          corVaccinationCert: [],
         }
       }
       return item
