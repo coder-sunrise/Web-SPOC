@@ -2,60 +2,42 @@ import React, {Component} from 'react'
 import { withStyles } from '@material-ui/core'
 import { GridContainer,CardContainer,withFormikExtend,GridItem,Button } from '@/components'
 import { connect } from 'dva'
-import { queryReferralHistory } from '@/services/patientHistory'
-import { findGetParameter } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import ReferralGrid from './ReferralGrid'
 
 const styles = () =>({})
 
-@withFormikExtend({
-  mapPropsToValues: ({ patientHistory }) => {},
-
-handleSubmit: async (props) => {
-  const {referralPersonHistory,patientHistory,dispatch} = props
-  console.log('Dispatch',dispatch)
-  // console.log ('SubmitpatientHistory',patientHistory)
-  // console.log ('SubmitreferralPersonHistory',referralPersonHistory)
-  const response = await dispatch({
-    type: 'patientHistory/saveReferralHistory',
-    payload: { 
-      id: patientHistory.patientID,
-      referralPersonHistory,
-     
-     },
-  })
-},
-})
 @connect(({ patientHistory, clinicSettings, codetable, user }) => ({
   patientHistory,
   clinicSettings,
   codetable,
   user,
 }))
+@withFormikExtend({
+  mapPropsToValues: ({ patientHistory = {} }) => {
+    return {rows : patientHistory.PatientReferralHistory.entity.data}
+  },
 
+handleSubmit: async (values,{props}) => {
+  const {patientHistory,dispatch} = props
+  const response = await dispatch({
+    type: 'patientHistory/saveReferralHistory',
+    payload: { 
+      id: patientHistory.patientID,
+      referralPersonHistory: values.rows,
+     
+     },
+  })
+},
+})
 
 class PatientReferral extends Component {
   constructor (props) {
     super(props)
 
     this.myRef = React.createRef()
-
-    // this.widgets = WidgetConfig.widget(props).filter((o) => {
-    //   if(o.authority === undefined) return true
-    //   const accessRight = Authorized.check(o.authority)
-    //     return accessRight && accessRight.rights !== 'hidden'
-    // })
-
-    this.state = {
-      // pageIndex: 0,
-    }
-
+    this.state = {}
   }
-
-
-  
-
 
   componentWillMount () {
     const {dispatch,patientHistory,pageSize,pageIndex,values } =this.props
@@ -68,7 +50,7 @@ class PatientReferral extends Component {
         patientProfileId: patientHistory.patientID,
       },
     })
-
+    
   }
     
 
@@ -89,14 +71,6 @@ class PatientReferral extends Component {
           ...restProps
         } = this.props
 
-        const {PatientReferralHistory} = patientHistory
-        // console.log('referralEntityData',referralHistory.entity.data)
-        // console.log('props',this.props)
-        // const accessRight = Authorized.check(
-        //   'patientdatabase.patientprofiledetails.patienthistory.referralhistory',
-        // )
-    
-        // console.log(accessRight) 
         return (
           <Authorized authority='patientdatabase.patientprofiledetails.patienthistory.referralhistory'>
             {({ rights: referralhistoryAccessRight }) => (
@@ -113,11 +87,7 @@ class PatientReferral extends Component {
                   <CardContainer hideHeader size='sm'>
                     <GridContainer>
                       <ReferralGrid
-                        rows={PatientReferralHistory.entity.data}
-                        // schema={schema}
-                        dispatch={this.dispatch}
-                        values={this.props}
-                        {...restProps}
+                        {...this.props}
                       />
                     </GridContainer>
                   </CardContainer>

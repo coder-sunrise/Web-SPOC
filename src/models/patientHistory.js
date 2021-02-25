@@ -214,12 +214,9 @@ export default createListViewModel({
         const response = yield call(service.queryReferralHistory,payload)
         if (response.status==='200') {
           yield put ({
-            // type: 'updateState',
-            // referralHistory: response.data,
             type: 'getReferalHistory',
             payload:response,
           })
-          // return response.data
           return response
         }
         return false
