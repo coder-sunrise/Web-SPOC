@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core/styles'
 import { formatMessage } from 'umi/locale'
 import { FastField } from 'formik'
 import { compose } from 'redux'
+import Yup from '@/utils/yup'
 import {
   CommonModal,
   CardContainer,
@@ -63,11 +64,26 @@ const Detail = ({
         [field]: {
           ...values,
           isMedisaveClaimable: o.isMedisaveClaimable,
+          inventoryVaccination_MedisaveVaccination: [],
         },
       },
     })
   }
 
+  const medisaveSchema = values.isMedisaveClaimable ? Yup.object().shape({
+    medisaveVaccinationFK: Yup.number().required(),
+    isDefault: Yup.boolean(),
+  }) : Yup.object()
+
+  // const medisaveSchema = values.isMedisaveClaimable ? Yup.array()
+  // .compact((v) => v.isDeleted)
+  // .of(
+  //   Yup.object().shape({
+  //     medisaveVaccinationFK: Yup.number().required(),
+  //     isDefault: Yup.boolean(),
+  //   }),
+  // ) : Yup.object()
+  
   return (
     <CardContainer
       hideHeader
@@ -303,12 +319,9 @@ const Detail = ({
                   display: values.isMedisaveClaimable  ? '' : 'none',
                   }}
               >
-                <h4 style={{ marginTop: 15, fontWeight: 400 }}>
-                  <b>Medisave Vaccination</b>
-                </h4>
                 <MedisaveVaccinations
                   rows={values.inventoryVaccination_MedisaveVaccination}
-                  schema
+                  schema={medisaveSchema}
                   values={values}
                   {...props}
                 />
