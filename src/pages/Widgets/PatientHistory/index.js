@@ -759,8 +759,11 @@ class PatientHistory extends Component {
     const gender = ctgender.find((o) => o.id === genderFK)
     const nationality = ctnationality.find((o) => o.id === nationalityFK)
     let g6PD
-    if (patientAllergyMetaData.length > 0)
+    let patientNoAllergies
+    if (patientAllergyMetaData.length > 0) {
       g6PD = ctg6pd.find((o) => o.id === patientAllergyMetaData[0].g6PDFK)
+      patientNoAllergies = patientAllergyMetaData[0].noAllergies
+    }
 
     let age = '0'
     const years = Math.floor(moment.duration(moment().diff(dob)).asYears())
@@ -788,7 +791,9 @@ class PatientHistory extends Component {
         patientAge: age,
         patientSex: gender ? gender.name : '',
         patientG6PD: g6PD ? g6PD.name : '',
-        patientAllergy: allergies.map((o) => o.allergyName).join(', '),
+        patientAllergy: allergies.length
+          ? allergies.map((o) => o.allergyName).join(', ')
+          : patientNoAllergies ? 'NKDA' : '',
         patientSocialHistory: socialHistory,
         patientFamilyHistory: familyHistory,
         patientMajorInvestigation: medicalHistory,
