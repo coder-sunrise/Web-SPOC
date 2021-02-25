@@ -97,6 +97,7 @@ String.prototype.format = function () {
 
 /* eslint-disable */
 export const roundTo = (amount, decimal = 2) => {
+  if (isNaN(amount)) return undefined
   if (isNaN(parseFloat(amount))) return amount
   return _.round(amount, decimal)
 }
