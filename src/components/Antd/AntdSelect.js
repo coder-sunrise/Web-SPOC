@@ -501,6 +501,8 @@ class AntdSelect extends React.PureComponent {
       let data = []
       try {
         if (q instanceof Array) data = q
+        // this condition use for dropdown get option by selected id.
+        else if (q instanceof Object && q.data.id) data = [q.data]
         else data = q.data.data
       } catch (error) {
         data = []
