@@ -1062,6 +1062,7 @@ class Billing extends Component {
             updateSignature={this.updateSignature}
             image={src}
             isEditable={src === '' || src === undefined}
+            signatureNameLabel="Patient Name"
           />
         </CommonModal>
         <ViewPatientHistory top='239px' />
