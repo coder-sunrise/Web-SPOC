@@ -1,11 +1,11 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import { withStyles } from '@material-ui/core'
-import { GridContainer,CardContainer,withFormikExtend,GridItem,Button } from '@/components'
+import { GridContainer, CardContainer, withFormikExtend, GridItem, Button } from '@/components'
 import { connect } from 'dva'
 import Authorized from '@/utils/Authorized'
 import ReferralGrid from './ReferralGrid'
 
-const styles = () =>({})
+const styles = () => ({})
 
 @connect(({ patientHistory, clinicSettings, codetable, user }) => ({
   patientHistory,
@@ -15,22 +15,21 @@ const styles = () =>({})
 }))
 @withFormikExtend({
   mapPropsToValues: ({ patientHistory = {} }) => {
-    return {rows : patientHistory.PatientReferralHistory.entity.data}
+    return { rows: patientHistory.patientReferralHistory.entity.data }
   },
 
-handleSubmit: async (values,{props}) => {
-  const {patientHistory,dispatch} = props
-  const response = await dispatch({
-    type: 'patientHistory/saveReferralHistory',
-    payload: { 
-      id: patientHistory.patientID,
-      referralPersonHistory: values.rows,
-     
-     },
-  })
-},
+  handleSubmit: async (values, { props }) => {
+    const { patientHistory, dispatch } = props
+    await dispatch({
+      type: 'patientHistory/saveReferralHistory',
+      payload: {
+        id: patientHistory.patientID,
+        referralPersonHistory: values.rows,
+      },
+    })
+  },
+  enableReinitialize: true,
 })
-
 class PatientReferral extends Component {
   constructor (props) {
     super(props)
@@ -40,71 +39,47 @@ class PatientReferral extends Component {
   }
 
   componentWillMount () {
-    const {dispatch,patientHistory,pageSize,pageIndex,values } =this.props
+    const { dispatch, patientHistory } = this.props
 
     dispatch({
-      type :'patientHistory/queryReferralHistory',
+      type: 'patientHistory/queryReferralHistory',
       payload: {
-        pageIndex:  1,
+        pageIndex: 1,
         pageSize: 9999,
         patientProfileId: patientHistory.patientID,
       },
     })
-    
   }
-    
 
-    render () {
-        const {
-          classes,
-          dispatch,
-          patientHistory,
-          values,
-          schema,
-          entity,
-          user,
-          theme,
-          setValues,
-          global,
-          data,
-          dis,
-          ...restProps
-        } = this.props
-
-        return (
-          <Authorized authority='patientdatabase.patientprofiledetails.patienthistory.referralhistory'>
-            {({ rights: referralhistoryAccessRight }) => (
-              <Authorized.Context.Provider
-                value={{
-                rights:
-                referralhistoryAccessRight === 'readwrite' ||
-                referralhistoryAccessRight === 'enable'
-                    ? 'enable'
-                    : referralhistoryAccessRight,
-              }}
-              >
-                <React.Fragment>
-                  <CardContainer hideHeader size='sm'>
-                    <GridContainer>
-                      <ReferralGrid
-                        {...this.props}
-                      />
-                    </GridContainer>
-                  </CardContainer>
-                  <GridItem md={12} style={{ textAlign: 'end' }}>
-                    <Button color='primary' onClick={this.props.handleSubmit}>
-                      Save
-                    </Button>
-                  </GridItem>
-                </React.Fragment>
-              </Authorized.Context.Provider>
-            )}
-          </Authorized>
-         
-         
-        )
-
-    }
+  render () {
+    return (
+      <Authorized authority="patientdatabase.patientprofiledetails.patienthistory.referralhistory">
+        {({ rights: referralhistoryAccessRight }) => (
+          <Authorized.Context.Provider
+            value={{
+              rights:
+                referralhistoryAccessRight === 'readwrite' || referralhistoryAccessRight === 'enable'
+                  ? 'enable'
+                  : referralhistoryAccessRight,
+            }}
+          >
+            <React.Fragment>
+              <CardContainer hideHeader size="sm">
+                <GridContainer>
+                  <ReferralGrid {...this.props} />
+                </GridContainer>
+              </CardContainer>
+              <GridItem md={12} style={{ textAlign: 'end' }}>
+                <Button color="primary" onClick={this.props.handleSubmit}>
+                  Save
+                </Button>
+              </GridItem>
+            </React.Fragment>
+          </Authorized.Context.Provider>
+        )}
+      </Authorized>
+    )
+  }
 }
 
-export default withStyles(styles,{ withTheme:true })(PatientReferral)
+export default withStyles(styles, { withTheme: true })(PatientReferral)

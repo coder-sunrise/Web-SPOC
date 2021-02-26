@@ -42,8 +42,8 @@ export default createListViewModel({
       invoiceHistory: {
         list: [],
       },
-      PatientReferralHistory: {
-        entity: [],
+      patientReferralHistory: {
+        entity: {data: [] },
       },
     },
     subscriptions: ({ dispatch, history }) => {
@@ -292,7 +292,7 @@ export default createListViewModel({
         const { data } = payload
         return {
           ...st,
-          PatientReferralHistory: {
+          patientReferralHistory: {
             entity: data,
           },
         }
