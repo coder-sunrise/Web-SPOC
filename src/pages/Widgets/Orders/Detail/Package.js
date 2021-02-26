@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
+import { Table } from '@devexpress/dx-react-grid-material-ui'
 import moment from 'moment'
 import _ from 'lodash'
 import {
@@ -671,6 +672,34 @@ class Package extends PureComponent {
 
   render () {
     const { theme, values, footer, handleSubmit } = this.props
+
+    const SummaryRow = (p) => {
+      const { children } = p
+      let countCol = children.find((c) => {
+        if (!c.props.tableColumn.column) return false
+        return c.props.tableColumn.column.name === 'subTotal'
+      })
+
+      if (countCol) {
+        const newChildren = [
+          {
+            ...countCol,
+            props: {
+              ...countCol.props,
+              colSpan: 5,
+              tableColumn: {
+                ...countCol.props.tableColumn,
+                align: 'right',
+              },
+            },
+            key: 1111,
+          },
+        ]
+        return <Table.Row {...p}>{newChildren}</Table.Row>
+      }
+      return <Table.Row {...p}>{children}</Table.Row>
+    }
+
     return (
       <div>
         <GridContainer>
@@ -730,8 +759,9 @@ class Package extends PureComponent {
                     calculator: IntegratedSummary.defaultCalculator,
                   },
                   row: {
+                    totalRowComponent: SummaryRow,
                     messages: {
-                      sum: 'Total',
+                      sum: 'Sub Total',
                     },
                   },
                 },

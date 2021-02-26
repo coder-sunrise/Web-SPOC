@@ -113,7 +113,7 @@ export const getApplicableClaimAmount = (
     const itemRemainingAmount = payableBalance
 
     if (specificItem.itemValueType.toLowerCase() === 'percentage')
-      returnClaimAmount = _.floor(
+      returnClaimAmount = roundTo(
         itemRemainingAmount * (specificItem.itemValue / 100),
         2,
       )
@@ -129,7 +129,7 @@ export const getApplicableClaimAmount = (
     )
     const itemRemainingAmount = payableBalance
     if (itemCategory.groupValueType.toLowerCase() === 'percentage') {
-      returnClaimAmount = _.floor(
+      returnClaimAmount = roundTo(
         itemRemainingAmount * (itemCategory.itemGroupValue / 100),
         2,
       )
@@ -143,7 +143,7 @@ export const getApplicableClaimAmount = (
     const itemRemainingAmount = payableBalance
     const copaymentValue =
       overAllCoPaymentValueType.toLowerCase() === 'percentage'
-        ? _.floor(itemRemainingAmount * (overAllCoPaymentValue / 100), 2)
+        ? roundTo(itemRemainingAmount * (overAllCoPaymentValue / 100))
         : overAllCoPaymentValue
 
     returnClaimAmount =
@@ -263,7 +263,7 @@ export const getInvoiceItemsWithClaimAmount = (
       remainingCoverageMaxCap,
       remainingClaimableAmount,
     )
-
+    
     if (existedItem)
       return [
         ...result,

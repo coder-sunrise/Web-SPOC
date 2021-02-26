@@ -20,6 +20,7 @@ import {
 // sub components
 import PaymentSummary from '@/pages/Finance/Invoice/Details/PaymentDetails/PaymentSummary'
 import PaymentRow from '@/pages/Finance/Invoice/Details/PaymentDetails/PaymentRow'
+import roundTo from '@/utils/utils'
 import MaxCap from './MaxCap'
 import BalanceLabel from './BalanceLabel'
 import DeleteWithPopover from '../components/DeleteWithPopover'
@@ -69,10 +70,10 @@ const validationSchema = Yup.object().shape({
     ],
     (eligibleAmount, payableBalance) => {
       const _checkAmount = eligibleAmount || payableBalance
-
+      
       if (_checkAmount) {
         return Yup.number().max(
-          _checkAmount,
+          roundTo(_checkAmount),
           `Cannot claim more than $${_checkAmount.toFixed(2)}`,
         )
       }
