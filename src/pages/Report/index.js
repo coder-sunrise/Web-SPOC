@@ -36,7 +36,7 @@ const styles = (theme) => ({
 const filterByAccessRight = (m) => {
   const settings = JSON.parse(localStorage.getItem('clinicSettings'))
   const { isEnablePackage = false } = settings
-  if (m.url === '/report/wiprevenue' && !isEnablePackage)
+  if ((m.url === '/report/wiprevenue' || m.url === '/report/packageexpiry') && !isEnablePackage)
     return false
 
   const accessRight = Authorized.check(m.authority)
