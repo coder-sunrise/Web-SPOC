@@ -62,6 +62,7 @@ const Detail = () => {
                     label='Valid Duration'
                     step={1}
                     min={0}
+                    max={100}
                     precision={0}
                     {...args}
                   />

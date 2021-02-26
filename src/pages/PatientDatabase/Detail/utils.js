@@ -21,7 +21,7 @@ const mapEntityToValues = (entity) => {
     if (entity.referralSourceFK || entity.referralPersonFK) {
       referralType = 'Company'
     }
-    else if (entity.referralPatientProfileFK) {
+    else if (entity.referredByPatientFK) {
       referralType = 'Patient'
     }
   }

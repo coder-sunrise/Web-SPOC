@@ -158,26 +158,26 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           corPrescriptionItemPrecaution: currentMedicationPrecautions,
           corPrescriptionItemInstruction: [
             {
-              usageMethodFK: medication.medicationUsage.id,
+              usageMethodFK: medicationusage ? medicationusage.id : undefined,
               usageMethodCode: medicationusage
                 ? medicationusage.code
                 : undefined,
               usageMethodDisplayValue: medicationusage
                 ? medicationusage.name
                 : undefined,
-              dosageFK: medication.prescribingDosage.id,
+              dosageFK: medication.prescribingDosage ? medication.prescribingDosage.id : undefined,
               dosageCode: medicationdosage ? medicationdosage.code : undefined,
               dosageDisplayValue: medicationdosage
                 ? medicationdosage.name
                 : undefined,
-              prescribeUOMFK: medication.prescribingUOM.id,
+              prescribeUOMFK: medicationprescribingUOM ? medicationprescribingUOM.id : undefined,
               prescribeUOMCode: medicationprescribingUOM
                 ? medicationprescribingUOM.code
                 : undefined,
               prescribeUOMDisplayValue: medicationprescribingUOM
                 ? medicationprescribingUOM.name
                 : undefined,
-              drugFrequencyFK: medication.medicationFrequency.id,
+              drugFrequencyFK: medicationfrequency ? medicationfrequency.id : undefined,
               drugFrequencyCode: medicationfrequency
                 ? medicationfrequency.code
                 : undefined,
@@ -616,7 +616,10 @@ class Package extends PureComponent {
         )
       }
 
-      const untilDate = calculateExpiryDate(op.validDuration, op.durationUnitFK)   
+      let untilDate
+      if (op)
+        untilDate= calculateExpiryDate(op.validDuration, op.durationUnitFK)   
+
       setValues({
         ...values,
         packageItems: rows,

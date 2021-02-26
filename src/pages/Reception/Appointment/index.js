@@ -6,6 +6,7 @@ import { withStyles } from '@material-ui/core'
 // common component
 import { CardContainer, CommonModal } from '@/components'
 // sub component
+import BigCalendar from 'react-big-calendar'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { getRemovedUrl } from '@/utils/utils'
@@ -140,6 +141,10 @@ class Appointment extends React.PureComponent {
         filter = {
           filterByDoctor,
           filterByApptType,
+          filterBySingleDoctor:
+            filterByDoctor && filterByDoctor.length
+              ? filterByDoctor[0]
+              : undefined,
         }
       }
     }
@@ -159,60 +164,58 @@ class Appointment extends React.PureComponent {
       let resources = []
       let primaryClinicianFK
 
-      if (response) {
-        const viewOtherApptAccessRight = Authorized.check(
-          'appointment.viewotherappointment',
+      const viewOtherApptAccessRight = Authorized.check(
+        'appointment.viewotherappointment',
+      )
+      if (
+        viewOtherApptAccessRight &&
+        viewOtherApptAccessRight.rights === 'enable'
+      ) {
+        const favDoctors = filter ? filter.filterByDoctor || [] : []
+        const lastSelected = JSON.parse(
+          sessionStorage.getItem('appointmentDoctors') || '[]',
         )
-        if (
-          viewOtherApptAccessRight &&
-          viewOtherApptAccessRight.rights === 'enable'
-        ) {
-          const favDoctors = filter ? filter.filterByDoctor || [] : []
-          const lastSelected = JSON.parse(
-            sessionStorage.getItem('appointmentDoctors') || '[]',
-          )
-          let filterDoctors = []
-          if (favDoctors.length > 0) {
-            filterDoctors = favDoctors
-          } else if (lastSelected.length > 0) {
-            filterDoctors = lastSelected
-          }
-
-          resources = response
-            .filter((clinician) => clinician.clinicianProfile.isActive)
-            .filter(
-              (_, index) =>
-                filterDoctors.length > 0
-                  ? filterDoctors.includes(_.clinicianProfile.id)
-                  : index < 5,
-            )
-            .map((clinician) => ({
-              clinicianFK: clinician.clinicianProfile.id,
-              doctorName: clinician.clinicianProfile.name,
-            }))
-        } else {
-          resources = response
-            .filter((clinician) => clinician.clinicianProfile.isActive)
-            .filter((activeclinician) => {
-              const { user } = this.props
-              return (
-                activeclinician.clinicianProfile.id ===
-                user.data.clinicianProfile.id
-              )
-            })
-            .map((clinician) => ({
-              clinicianFK: clinician.clinicianProfile.id,
-              doctorName: clinician.clinicianProfile.name,
-            }))
+        let filterDoctors = []
+        if (favDoctors.length > 0) {
+          filterDoctors = favDoctors
+        } else if (lastSelected.length > 0) {
+          filterDoctors = lastSelected
         }
-        filterByDoctor = resources.map((res) => res.clinicianFK)
-        filterBySingleDoctor =
-          resources && resources.length ? resources[0].clinicianFK : undefined
+
+        resources = response
+          .filter((clinician) => clinician.clinicianProfile.isActive)
+          .filter(
+            (_, index) =>
+              filterDoctors.length > 0
+                ? filterDoctors.includes(_.clinicianProfile.id)
+                : index < 5,
+          )
+          .map((clinician) => ({
+            clinicianFK: clinician.clinicianProfile.id,
+            doctorName: clinician.clinicianProfile.name,
+          }))
+      } else {
+        resources = response
+          .filter((clinician) => clinician.clinicianProfile.isActive)
+          .filter((activeclinician) => {
+            const { user } = this.props
+            return (
+              activeclinician.clinicianProfile.id ===
+              user.data.clinicianProfile.id
+            )
+          })
+          .map((clinician) => ({
+            clinicianFK: clinician.clinicianProfile.id,
+            doctorName: clinician.clinicianProfile.name,
+          }))
       }
+      filterByDoctor = resources.map((res) => res.clinicianFK)
+      filterBySingleDoctor =
+        resources && resources.length ? resources[0].clinicianFK : undefined
 
       this.setState((preState) => ({
-        filter: filter || {
-          ...preState.filter,
+        filter: {
+          ...(filter || preState.filter),
           filterByDoctor,
           filterBySingleDoctor,
         },
@@ -654,7 +657,13 @@ class Appointment extends React.PureComponent {
               history={this.props.history}
               resources={resources}
               selectedAppointmentID={selectedAppointmentFK}
-              selectedSlot={selectedSlot}
+              selectedSlot={{
+                ...selectedSlot,
+                resourceId:
+                  calendarView === BigCalendar.Views.DAY
+                    ? selectedSlot.resourceId
+                    : filter.filterBySingleDoctor,
+              }}
               onHistoryRowSelected={this.onSelectEvent}
               // calendarEvents={calendarEvents}
             />
