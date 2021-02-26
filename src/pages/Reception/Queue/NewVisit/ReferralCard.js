@@ -4,7 +4,7 @@ import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 import { Field, FastField } from 'formik'
-import { queryList } from '@/services/patient'
+import { queryList, query } from '@/services/patient'
 
 // custom components
 import {
@@ -209,7 +209,10 @@ class ReferralCard extends PureComponent {
     return (
       <Select
         disabled={disabled}
-        query={(v) => {
+        query={(v) => { 
+          if (typeof v === "number") {
+            return query({ id: v })
+          }
           return queryList({
             apiCriteria: {
               searchValue: v,
@@ -237,7 +240,7 @@ class ReferralCard extends PureComponent {
           )
         }}
         onChange={(v) => {
-          if (v === patient.entity.id) {
+          if (patient.entity && v === patient.entity.id) {
             notification.error({
               message: 'Can not use this patient as referral person',
             })
