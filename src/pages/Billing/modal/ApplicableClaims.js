@@ -79,9 +79,9 @@ const constructSchemeList = (
       ]
     }
     // medisave
-    const medisavescheme = ctcopaymentscheme.find((p) => p.id === scheme[0].id)
-    if (medisavescheme && medisavescheme.coPayerType === 'Government') {
-      const schemeType = ctschemetype.find((item) => item.name === medisavescheme.schemeTypeName)
+    const medisaveScheme = ctcopaymentscheme.find((p) => p.id === scheme[0].id)
+    if (medisaveScheme && medisaveScheme.coPayerType === 'Government') {
+      const schemeType = ctschemetype.find((item) => item.name === medisaveScheme.schemeTypeName)
       const currentMediSchemeTypes = currentClaims.map(cc => {
         const mScheme = ctcopaymentscheme.find(c1 => cc.id === c1.id && c1.coPayerName === 'MEDISAVE')
         if(!mScheme) return {}
@@ -93,11 +93,13 @@ const constructSchemeList = (
           }
         return {}
       })
-      const isClaimedScheme = currentClaims.filter((item) => scheme[0].id === item.id && scheme[0].schemePayerFK === item.payerFK).length > 0// && scheme[0].schemePayerFK === item.payerFK).length > 0
+
+      // to disable
+      const isClaimedScheme = currentClaims.filter((item) => scheme[0].id === item.id).length > 0// && scheme[0].schemePayerFK === item.payerFK).length > 0?
       const isMedisaveConflict = checkCombinationByPayer(currentMediSchemeTypes, schemeType.id, scheme[0].schemePayerFK)
       const isMedisaveItemFullyClaimed = invoiceItems.filter((v) => {
         const fullyClaimed = v._claimedAmount && v._claimedAmount >= v.totalAfterGst
-        /* if(medisavescheme.code === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500CDMP || medisavescheme.code === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE700CDMP)
+        /* if(medisaveScheme.code === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500CDMP || medisaveScheme.code === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE700CDMP)
           // return v.invoiceItemTypeFK === 1 && 
           return !fullyClaimed && // medisaveMedications.find(m => m.code === v.itemCode)
           (
@@ -105,21 +107,29 @@ const constructSchemeList = (
             medisaveVaccinations.find(m => m.code === v.itemCode) || 
             medisaveServices.find(m => m.code === v.itemCode)
           ) */
-        if(medisavescheme.code === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500VACC)
+        if(medisaveScheme.code === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500VACC)
           return v.invoiceItemTypeFK === 3 && !fullyClaimed && medisaveVaccinations.find(m => m.code === v.itemCode)
-        if(medisavescheme.code === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500HS)
+        if(medisaveScheme.code === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500HS)
           return v.invoiceItemTypeFK === 4 && !fullyClaimed && healthScreenings.find(m => m.code === v.itemCode)
-        if(medisavescheme.code === MEDISAVE_COPAYMENT_SCHEME.MEDISAVEOPSCAN)
+        if(medisaveScheme.code === MEDISAVE_COPAYMENT_SCHEME.MEDISAVEOPSCAN)
           return v.invoiceItemTypeFK === 4 && !fullyClaimed && outpatientScans.find(m => m.code === v.itemCode)
         return !fullyClaimed
       }).length === 0
       const disabled = allItemsClaimed || isClaimedScheme || isMedisaveConflict || isMedisaveItemFullyClaimed
 
+      // to hide
+      const hasVacc = invoiceItems.filter((v) => v.invoiceItemTypeFK === 3 && medisaveVaccinations.find(m => m.code === v.itemCode)).length > 0
+      const hasHS = invoiceItems.filter((v) => v.invoiceItemTypeFK === 4 && healthScreenings.find(m => m.code === v.itemCode)).length > 0
+      const notApplicable = (medisaveScheme.code === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500HS && !hasHS) || 
+                            (medisaveScheme.code === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500VACC && !hasVacc)
+      if(notApplicable)
+        return _result
+
       const newPayer = payers.find(p => p.id === scheme[0].schemePayerFK)
       return [
         ..._result,
         {
-          claimableSchemesFK: medisavescheme.id,
+          claimableSchemesFK: medisaveScheme.id,
           claimableSchemesIndex: index,
           nestedIndex: 0,
           disabled,
