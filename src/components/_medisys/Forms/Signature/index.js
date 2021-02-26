@@ -61,12 +61,12 @@ class Signature extends React.Component {
   }
 
   render () {
-    const { classes, signatureName, isEditable = true } = this.props
+    const { classes, signatureName, isEditable = true, signatureNameLabel = 'Signature Name' } = this.props
     return (
       <div>
         <GridContainer>
           <GridItem xs={12} md={12}>
-            <TextField label='Signature Name' disabled value={signatureName} />
+            <TextField label={signatureNameLabel} disabled value={signatureName} />
           </GridItem>
           <GridItem xs={12} md={12}>
             <SketchField
