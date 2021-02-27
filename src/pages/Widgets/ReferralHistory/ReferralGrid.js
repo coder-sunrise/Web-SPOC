@@ -190,7 +190,7 @@ class ReferralGrid extends PureComponent {
         }}
         EditingProps={{
           showEditCommand: false,
-          showDeleteCommand: false,
+          showCommandColumn:false,
           onCommitChanges: this.commitChanges,
         }}
         {...this.tableParas}
