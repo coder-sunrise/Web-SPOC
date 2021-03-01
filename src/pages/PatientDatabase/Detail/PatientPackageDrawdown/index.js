@@ -29,6 +29,7 @@ const styles = (theme) => ({
   packageTitle: {
     fontWeight: 'bold',
     fontSize: smallFontSize,
+    marginLeft: 6,
   },
   titleBlack: {
     fontWeight: 'normal',
@@ -52,6 +53,7 @@ const styles = (theme) => ({
   drawdownTitle: {
     fontWeight: 500,
     fontSize: smallFontSize,
+    marginLeft: 5,
   },
   drawdownInfo: {
     fontWeight: 500,
@@ -202,6 +204,21 @@ class PatientPackageDrawdown extends Component {
           })          
         }}
       >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            marginLeft: 10,
+          }}
+        >
+          <span className='material-icons'>
+            {this.state.expandDrawdowns.find((key) => key === id) ? (
+              'expand_more'
+            ) : (
+              'navigate_next'
+            )}
+          </span>
+        </div>
         <p className={classes.drawdownTitle}>
           {remainingQuantity > 0 ? (
             <font color='#4255BD'>{label}</font>
@@ -381,6 +398,21 @@ class PatientPackageDrawdown extends Component {
             <p className={classes.titleBlack}>Purchased on: {moment(purchaseDate).format(dateFormatLong)}</p>
           </GridItem>
         </GridContainer>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            marginLeft: 10,
+          }}
+        >
+          <span className='material-icons'>
+            {this.state.expandPackages.find((key) => key === id) ? (
+              'expand_more'
+            ) : (
+              'navigate_next'
+            )}
+          </span>
+        </div>
       </div>
     )
   }
@@ -392,7 +424,7 @@ class PatientPackageDrawdown extends Component {
 
     return (
       <div>
-        <Collapse activeKey={this.state.expandDrawdowns} expandIconPosition='left'>
+        <Collapse activeKey={this.state.expandDrawdowns} expandIconPosition={null}>
           {patientPackageDrawdown.map((o) => {
             return (
               <Collapse.Panel
@@ -507,7 +539,7 @@ class PatientPackageDrawdown extends Component {
             </GridItem>
             <GridItem md={12}>              
               <div className={classes.contentDiv}>
-                <Collapse activeKey={this.state.expandPackages} expandIconPosition='right'>
+                <Collapse activeKey={this.state.expandPackages} expandIconPosition={null}>
                   {list.map((o) => {
                     return (
                       <Collapse.Panel
