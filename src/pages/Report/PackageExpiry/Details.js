@@ -91,7 +91,8 @@ class Details extends PureComponent {
       summary: true,
       summaryConfig: {
         state: {
-          totalItems: [
+          totalItems: [],
+          groupItems: [
             { columnName: 'packageAmtBeforeAdj', type: 'sum' },
             { columnName: 'adj', type: 'sum' },
             { columnName: 'packageAmtAfterAdj', type: 'sum' },

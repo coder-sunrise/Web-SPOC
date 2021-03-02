@@ -35,6 +35,42 @@ const Summary = ({ reportDatas }) => {
           rightAlign
         />
       </GridItem>
+      <GridItem md={12}>
+        <NumberInput
+          prefix='Total Package Amount (After Adj.)'
+          currency
+          disabled
+          value={summaryData.totalAmountAfterAdj}
+          rightAlign
+        />
+      </GridItem>
+      <GridItem md={12}>
+        <NumberInput
+          prefix='Total Consumed'
+          currency
+          disabled
+          value={summaryData.consumedAmount}
+          rightAlign
+        />
+      </GridItem>
+      <GridItem md={12}>
+        <NumberInput
+          prefix='Total Expired'
+          currency
+          disabled
+          value={summaryData.expiredAmount}
+          rightAlign
+        />
+      </GridItem>
+      <GridItem md={12}>
+        <NumberInput
+          prefix='Total Balance'
+          currency
+          disabled
+          value={summaryData.balanceAmount}
+          rightAlign
+        />
+      </GridItem>
     </GridContainer>
   )
 }
