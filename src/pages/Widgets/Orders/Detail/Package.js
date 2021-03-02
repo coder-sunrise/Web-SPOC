@@ -224,17 +224,17 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           vaccinationGivenDate: moment().format(serverDateTimeFormatFull),
           vaccinationCode: vaccination.code,
           vaccinationName: vaccination.displayValue,
-          usageMethodFK: vaccination.vaccinationUsage.id,
+          usageMethodFK: vaccinationusage ? vaccinationusage.id : undefined,
           usageMethodCode: vaccinationusage ? vaccinationusage.code : undefined,
           usageMethodDisplayValue: vaccinationusage
             ? vaccinationusage.name
             : undefined,
-          dosageFK: vaccination.prescribingDosage.id,
+          dosageFK: vaccinationdosage ? vaccinationdosage.id : undefined,
           dosageCode: vaccinationdosage ? vaccinationdosage.code : undefined,
           dosageDisplayValue: vaccinationdosage
             ? vaccinationdosage.name
             : undefined,
-          uomfk: vaccination.prescribingUOM.id,
+          uomfk: vaccinationUOM ? vaccinationUOM.id : undefined,
           uomCode: vaccinationUOM ? vaccinationUOM.code : undefined,
           uomDisplayValue: vaccinationUOM ? vaccinationUOM.name : undefined,
           quantity: packageItem.quantity,
