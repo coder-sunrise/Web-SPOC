@@ -5,6 +5,9 @@ import { GridContainer, GridItem, NumberInput } from '@/components'
 import PaymentCollections from './PaymentCollections'
 import PaymentSummary from './PaymentSummary'
 import SessionDetails from './SessionDetails'
+import VisitListing from './VisitListing'
+import InvoicePayer from "./InvoicePayer"
+import PatientDeposit from "./PatientDeposit"
 import ReportBase from '../../ReportBase'
 
 const reportId = 5
@@ -64,7 +67,16 @@ class SessionSummary extends ReportBase {
               </GridItem>
               <GridItem md={12}>
                 <span style={{ display: 'inline-block', textAlign: 'left', fontWeight: '500', width: '160px' }}>Company Payable Amt.:</span>
-                <NumberInput currency text value={reportDatas.CompanyDetails[0].totalCompanyAmount || 0} style={{ padding: '0px 8px', width: '100px', textAlign: 'right' }} />
+                <NumberInput
+                  currency
+                  text
+                  value={reportDatas.CompanyDetails.reduce((pre, cur) => {
+                    return pre + cur.totalCompanyAmount
+                  }, 0)}
+                  style={{ padding: '0px 8px', width: '100px', textAlign: 'right' }} />
+              </GridItem>
+              <GridItem md={6} style={{marginTop: '10px'}}>
+                <InvoicePayer reportDatas={reportDatas} />
               </GridItem>
             </Collapse.Panel>
           </Collapse>
@@ -72,6 +84,12 @@ class SessionSummary extends ReportBase {
         <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
           <Collapse style={{ fontSize: 'inherit', padding: 5 }} expandIconPosition='right' defaultActiveKey={['0']}>
             <Collapse.Panel header={<div style={{ fontWeight: 500 }}>Details</div>} key={0}>
+              <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
+                <h5>Session Listing</h5>
+              </GridItem>
+              <GridItem md={12} >
+                <VisitListing reportDatas={reportDatas} />
+              </GridItem>
               <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
                 <h5>Payment Collections</h5>
               </GridItem>
@@ -100,6 +118,18 @@ class SessionSummary extends ReportBase {
                   PaymentCollectionsDetails={reportDatas.PrivatePastPaymentCollections}
                   TotalDetails={reportDatas.PrivatePastPaymentTotal}
                 />
+              </GridItem>
+              <GridItem md={12} style={{ marginBottom: 8, marginTop: 18 }}>
+                <h5>Patient Deposit</h5>
+              </GridItem>
+              <GridItem md={12}>
+                <PatientDeposit DepositDatas={reportDatas.PatientDeposit} />
+              </GridItem>
+              <GridItem md={12} style={{ marginBottom: 8, marginTop: 18 }}>
+                <h5>Patient Refund</h5>
+              </GridItem>
+              <GridItem md={12}>
+                <PatientDeposit DepositDatas={reportDatas.PatientRefund} />
               </GridItem>
             </Collapse.Panel>
           </Collapse>

@@ -61,26 +61,41 @@ const PaymentCollections = ({
   }
 
   let invoiceNoTitle = 'Invoice No.'
+  let invoiceDateTitle = 'Invoice Date'
+  let doctorTitle = 'Doctor'
   if (isCompanyPaymentCollectionsForPast) {
     invoiceNoTitle = (
       <div><span style={{ display: 'block' }}>Statement No.</span>
         <span style={{ display: 'block' }}>/ Invoice No.</span>
       </div>
     )
+
+    invoiceDateTitle = (
+      <div><span style={{ display: 'block' }}>Statement Date</span>
+        <span style={{ display: 'block' }}>/ Invoice Date</span>
+      </div>
+    )
+
+    doctorTitle = 'Payer Code'
   }
   let totalAmtTitle = isCurrentSessionPayment ? 'Total Amount' : 'Total Payable Amt.'
 
   let PaymentCollectionsColumns = [
     { name: 'invoiceNo', title: invoiceNoTitle },
+    { name: 'invoiceDate', title: invoiceDateTitle },
+    { name: 'doctorName', title: doctorTitle},
     { name: 'totalAftAdj', title: totalAmtTitle },
     { name: 'gstAmt', title: 'GST' },
     { name: 'payerName', title: 'Payer Name' },
     { name: 'receiptNo', title: 'Receipt No.' },
+    { name: 'paymentMode', title: 'Payment Mode' },
     { name: 'totalAmtPaid', title: 'Payment' },
   ]
 
   let PaymentCollectionsColumnExtension = [
     { columnName: 'invoiceNo', width: 130, sortingEnabled: false },
+    { columnName: 'invoiceDate', type: 'date', sortingEnabled: false, width:110 },
+    { columnName: 'doctorName', sortingEnabled: false, wordWrapEnabled: true },
     {
       columnName: 'totalAftAdj',
       type: 'currency',
@@ -101,9 +116,10 @@ const PaymentCollections = ({
       type: 'currency',
       currency: true,
       sortingEnabled: false,
-      width: 140,
+      width: 120,
     },
     { columnName: 'receiptNo', sortingEnabled: false, width: 100 },
+    { columnName: 'paymentMode', sortingEnabled: false, width: 110 },
   ]
 
   let totalItems = [
@@ -112,14 +128,14 @@ const PaymentCollections = ({
     { columnName: 'totalAmtPaid', type: 'totalAmtPaid' },
   ]
   if (!TotalDetails[0].isDisplayGST) {
-    PaymentCollectionsColumns.splice(2, 1)
-    PaymentCollectionsColumnExtension.splice(2, 1)
+    PaymentCollectionsColumns.splice(4, 1)
+    PaymentCollectionsColumnExtension.splice(4, 1)
     totalItems.splice(1, 1)
-  } 
+  }
   const PaymentCollectionsRow = (p) => {
     const { row, children } = p
     let newchildren = []
-    const payerNameColIndex = TotalDetails[0].isDisplayGST ? 3 : 2
+    const payerNameColIndex = TotalDetails[0].isDisplayGST ? 5 : 4
     if (row.countNumber === 1) {
       newchildren.push(
         children
@@ -147,6 +163,7 @@ const PaymentCollections = ({
       )
     }
     newchildren.push([
+      children[children.length - 3],
       children[children.length - 2],
       children[children.length - 1],
     ])
