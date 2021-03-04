@@ -454,19 +454,6 @@ export default compose(
           return returnedDrugMixturesArray
         }
 
-        const getDrugMixtureName = (corPrescriptionItemDrugMixture) => {
-          let drugMixtureName = ''
-          const activeDrugMixtureItems = corPrescriptionItemDrugMixture.filter(
-            (item) => !item.isDeleted,
-          )
-
-          activeDrugMixtureItems.forEach((item, index) => {
-            drugMixtureName += index === 0 ? item.drugName : `/${item.drugName}`
-          })
-
-          return drugMixtureName
-        }
-
         const getDrugMixtureRevenueCategory = (
           corPrescriptionItemDrugMixture,
         ) => {
@@ -513,9 +500,7 @@ export default compose(
                 adjType: o.adjType,
                 adjValue: o.adjValue,
                 itemCode: o.drugCode,
-                itemName: o.isDrugMixture
-                  ? getDrugMixtureName(o.corPrescriptionItemDrugMixture)
-                  : o.drugName,
+                itemName: o.drugName,
                 invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.MEDICATION,
                 unitPrice: o.isDrugMixture
                   ? _.round((o.totalPrice || 0) / (o.quantity || 1), 2)
@@ -541,9 +526,7 @@ export default compose(
                   isDeleted: o.isDeleted,
                   retailPrescriptionItem: {
                     ...restO,
-                    drugName: o.isDrugMixture
-                      ? getDrugMixtureName(o.corPrescriptionItemDrugMixture)
-                      : o.drugName,
+                    drugName: o.drugName,
                     isDeleted: o.isDeleted,
                     unitPrice: roundTo(o.totalPrice / o.quantity),
                     retailPrescriptionItemInstruction: medicationInstructionsArray(
