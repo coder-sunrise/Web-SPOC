@@ -13,6 +13,7 @@ const ReportDateRangePicker = ({
   toDateFieldName = 'dateTo',
   limit = { number: 1, type: 'year' },
   onChange,
+  disabled = false,
 }) => {
   const onDateChange = (value) => {
     if (onChange) onChange(value)
@@ -39,6 +40,7 @@ const ReportDateRangePicker = ({
               <DatePicker
                 {...args}
                 label={fromDateLabel}
+                disabled={disabled}
                 onChange={_onChange}
               />
             )
@@ -51,6 +53,7 @@ const ReportDateRangePicker = ({
           fieldName={toDateFieldName}
           startDateFieldName={fromDateFieldName}
           limit={limit}
+          disabled={disabled}
         />
       </GridItem>
     </React.Fragment>
