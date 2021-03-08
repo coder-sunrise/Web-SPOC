@@ -58,7 +58,7 @@ const withWebSocket = () => (Component) => {
       let sendSuccess = false
       this.setState({ pendingJob })
 
-      const { isWsConnected } = this.state 
+      const { isWsConnected } = this.state
       if (isWsConnected === true || (!autoupdate && (await this.tryConnectSocket()))) {
         this.wsConnection.send(content)
         sendSuccess = true
@@ -74,6 +74,8 @@ const withWebSocket = () => (Component) => {
     tryConnectSocket = async () => {
       let connected = false
       const settings = JSON.parse(localStorage.getItem('clinicSettings'))
+      // prevent to connect websocket before login.
+      if (!settings) { return false }
       const { printToolSocketURL = '' } = settings
       const [
         prefix = '',
