@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
 import { withStyles } from '@material-ui/core'
-import { GridContainer, CardContainer, withFormikExtend, GridItem, Button } from '@/components'
+import { GridContainer, CardContainer, withFormikExtend, CommonModal } from '@/components'
 import { connect } from 'dva'
 import Authorized from '@/utils/Authorized'
 import ReferralGrid from './ReferralGrid'
+import ReferralDetails from './ReferralDetails'
 
 const styles = () => ({})
 
@@ -18,24 +19,12 @@ const styles = () => ({})
     return { rows: patientHistory.patientReferralHistory.entity.data }
   },
 
-  handleSubmit: async (values, { props }) => {
-    const { patientHistory, dispatch } = props
-    await dispatch({
-      type: 'patientHistory/saveReferralHistory',
-      payload: {
-        id: patientHistory.patientID,
-        referralPersonHistory: values.rows,
-      },
-    })
-  },
   enableReinitialize: true,
 })
 class PatientReferral extends Component {
-  constructor (props) {
-    super(props)
-
-    this.myRef = React.createRef()
-    this.state = {}
+  state = {
+    showReferralHistoryDetails: false,
+    onClickedRowData: {},
   }
 
   componentWillMount () {
@@ -51,7 +40,17 @@ class PatientReferral extends Component {
     })
   }
 
+  onEditReferralHistoryClicked = async (row) => {
+    this.setState({ showReferralHistoryDetails: true, onClickedRowData: row })
+  }
+
+  closeReferralHistoryDetailsModal = () => {
+    this.setState({ showReferralHistoryDetails: false })
+  }
+
   render () {
+    const { showReferralHistoryDetails, onClickedRowData } = this.state
+    const { referralBy } = onClickedRowData
     return (
       <Authorized authority="patientdatabase.patientprofiledetails.patienthistory.referralhistory">
         {({ rights: referralhistoryAccessRight }) => (
@@ -66,14 +65,20 @@ class PatientReferral extends Component {
             <React.Fragment>
               <CardContainer hideHeader size="sm">
                 <GridContainer>
-                  <ReferralGrid {...this.props} />
+                  <ReferralGrid onEditReferralHistoryClicked={this.onEditReferralHistoryClicked} {...this.props} />
+                  <CommonModal
+                    open={showReferralHistoryDetails}
+                    title="Referral History"
+                    maxWidth="sm"
+                    bodyNoPadding
+                    onConfirm={this.closeReferralHistoryDetailsModal}
+                    onClose={this.closeReferralHistoryDetailsModal}
+                    observe="patientReferralHistoryDetails"
+                  >
+                    <ReferralDetails onClickedRowData={onClickedRowData} referralType={referralBy} {...this.props} />
+                  </CommonModal>
                 </GridContainer>
               </CardContainer>
-              <GridItem md={12} style={{ textAlign: 'end' }}>
-                <Button color="primary" onClick={this.props.handleSubmit}>
-                  Save
-                </Button>
-              </GridItem>
             </React.Fragment>
           </Authorized.Context.Provider>
         )}

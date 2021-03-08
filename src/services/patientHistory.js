@@ -2,6 +2,7 @@ import * as service from '@/services/common'
 
 const url = '/api/PatientHistory'
 const invoiceHistoryUrl = '/api/invoice'
+const queueUrl = '/api/queue'
 
 module.exports = {
   // remove: (params) => service.remove(url, params),
@@ -40,7 +41,7 @@ module.exports = {
   },
 
   saveReferralHistory: (params) => {
-    return service.upsert(`${url}/Referral`,params)
+    return service.upsert(`${queueUrl}/ReferralHistory`,params)
   },
 
 }
