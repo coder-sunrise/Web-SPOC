@@ -42,6 +42,9 @@ export default createListViewModel({
       invoiceHistory: {
         list: [],
       },
+      patientReferralHistory: {
+        entity: {data: [] },
+      },
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -206,6 +209,26 @@ export default createListViewModel({
         }
         return null
       },
+
+      *queryReferralHistory ({payload},{call,put}){
+        const response = yield call(service.queryReferralHistory,payload)
+        if (response.status==='200') {
+          yield put ({
+            type: 'getReferalHistory',
+            payload:response,
+          })
+          return response
+        }
+        return false
+      },
+
+      *saveReferralHistory ({payload},{call,put,select}){
+        const r = yield call(service.saveReferralHistory,payload)
+        if (r === 204) return true
+
+        return false
+      },
+
     },
     reducers: {
       queryDone (st, { payload }) {
@@ -263,6 +286,15 @@ export default createListViewModel({
         return {
           ...st,
           entity: data,
+        }
+      },
+      getReferalHistory (st, { payload }) {
+        const { data } = payload
+        return {
+          ...st,
+          patientReferralHistory: {
+            entity: data,
+          },
         }
       },
       getInvoiceHistory (st, { payload }) {

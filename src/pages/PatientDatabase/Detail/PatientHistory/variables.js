@@ -7,6 +7,7 @@ import InvoiceHistory from '@/pages/Widgets/InvoiceHistory'
 import PatientNurseNotes from '@/pages/PatientDatabase/Detail/PatientNurseNotes'
 import ViewPatientNurseNotes from '@/pages/Widgets/PatientNurseNotes'
 import PatientDeposit from '@/pages/Finance/Deposit/PatientDeposit'
+import PatientReferral from '@/pages/Widgets/ReferralHistory'
 
 const addContent = (type, props) => {
   const { patient: { entity } } = props
@@ -36,6 +37,8 @@ const addContent = (type, props) => {
       return <PatientNurseNotes {...props} />
     case PATIENT_HISTORY_TABS.DEPOSIT:
       return <PatientDeposit {...props} />
+    case PATIENT_HISTORY_TABS.REFERRAL:
+      return <PatientReferral mode='integrated' {...props} />
     default:
       return <PatientHistory fromModule='PatientHistory' {...props} />
   }
@@ -91,6 +94,14 @@ export const PatientHistoryTabOption = (props) => {
         'patientdatabase.patientprofiledetails.patienthistory.deposit',
       ],
       content: addContent(PATIENT_HISTORY_TABS.DEPOSIT, props),
+    },
+    {
+      id: PATIENT_HISTORY_TABS.REFERRAL,
+      name:'Referral',
+      authority: [
+        'patientdatabase.patientprofiledetails.patienthistory.referralhistory',
+      ],
+      content: addContent(PATIENT_HISTORY_TABS.REFERRAL,props),
     },
   ]
   return Tabs.filter((f) => checkAccessRight(f.authority))

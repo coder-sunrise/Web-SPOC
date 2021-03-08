@@ -2,6 +2,7 @@ import * as service from '@/services/common'
 
 const url = '/api/PatientHistory'
 const invoiceHistoryUrl = '/api/invoice'
+const queueUrl = '/api/queue'
 
 module.exports = {
   // remove: (params) => service.remove(url, params),
@@ -34,4 +35,13 @@ module.exports = {
   queryVisitHistory: (params) => {
     return service.query(`${url}/VisitHistory`, params)
   },
+  
+  queryReferralHistory: (params) => {
+    return service.query(`${url}/Referral`,params)
+  },
+
+  saveReferralHistory: (params) => {
+    return service.upsert(`${queueUrl}/ReferralHistory`,params)
+  },
+
 }
