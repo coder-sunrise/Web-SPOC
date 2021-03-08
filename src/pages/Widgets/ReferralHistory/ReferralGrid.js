@@ -20,14 +20,13 @@ class ReferralGrid extends PureComponent {
   }
 
   render () {
-    const { values } = this.props
-    const { rows = [] } = values
+    const { patientHistory } = this.props
 
     return (
       <CommonTableGrid
         getRowId={(r) => r.id}
         forceRender
-        rows={rows}
+        rows={patientHistory.patientReferralHistory.entity.data}
         columns={[
             { name: 'visitDate', title: 'Visit Date' },
             { name: 'doctorName', title: 'Doctor' },

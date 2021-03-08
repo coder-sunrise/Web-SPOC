@@ -14,13 +14,7 @@ const styles = () => ({})
   codetable,
   user,
 }))
-@withFormikExtend({
-  mapPropsToValues: ({ patientHistory = {} }) => {
-    return { rows: patientHistory.patientReferralHistory.entity.data }
-  },
 
-  enableReinitialize: true,
-})
 class PatientReferral extends Component {
   state = {
     showReferralHistoryDetails: false,
@@ -68,14 +62,14 @@ class PatientReferral extends Component {
                   <ReferralGrid onEditReferralHistoryClicked={this.onEditReferralHistoryClicked} {...this.props} />
                   <CommonModal
                     open={showReferralHistoryDetails}
-                    title="Referral History"
+                    title="Edit Visit Referral"
                     maxWidth="sm"
                     bodyNoPadding
                     onConfirm={this.closeReferralHistoryDetailsModal}
                     onClose={this.closeReferralHistoryDetailsModal}
                     observe="patientReferralHistoryDetails"
                   >
-                    <ReferralDetails onClickedRowData={onClickedRowData} referralType={referralBy} {...this.props} />
+                    <ReferralDetails onClickedRowData={onClickedRowData} {...this.props} />
                   </CommonModal>
                 </GridContainer>
               </CardContainer>
