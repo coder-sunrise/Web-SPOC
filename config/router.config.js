@@ -813,6 +813,14 @@ const _routes = [
               'report.finance.saleslistingbyperformerreport',
             ],
           },
+          {
+            path: '/report/packageexpiry',
+            name: 'packageexpiry',
+            component: './Report/PackageExpiry',
+            authority: [
+              'report.finance.packageexpiryreport',
+            ],
+          },
         ],
       },
       // Report

@@ -173,4 +173,10 @@ export const menuData = [
     url: '/report/saleslistingbyperformer',
     authority: 'report.finance.saleslistingbyperformerreport',
   },
+  {
+    title: 'Finance',
+    text: 'Package Expiry Report',
+    url: '/report/packageexpiry',
+    authority: 'report.finance.packageexpiryreport',
+  },
 ]

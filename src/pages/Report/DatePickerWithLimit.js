@@ -10,6 +10,7 @@ const DatePickerWithLimit = ({
   fieldName = 'dateTo',
   startDateFieldName = 'dateFrom',
   limit = { number: 1, type: 'year' }, // default limit is 1 year
+  disabled = false,
 }) => {
   return (
     <Field
@@ -24,6 +25,7 @@ const DatePickerWithLimit = ({
             {...args}
             label={label}
             disabledDate={(date) => date.isAfter(maximumDateLimit)}
+            disabled={disabled}
           />
         )
       }}
