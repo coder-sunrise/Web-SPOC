@@ -1368,12 +1368,16 @@ const _routes = [
       // Support
       //
       {
+        hideInMenu: true,
+        name: 'not-found',
+        path: '/not-found',
         component: '404',
       },
       {
         hideInMenu: true,
-        path: '/not-found',
-        component: '404',
+        name: 'forbidden',
+        path: '/forbidden',
+        component: './Exception/403.js',
       },
     ],
   },

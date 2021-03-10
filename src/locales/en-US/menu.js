@@ -181,7 +181,7 @@ export default {
   'menu.report.saleslistingbyperformer': 'Sales Listing By Performer Report',
   'menu.report.packageexpiry': 'Package Expiry Report',
   'menu.report.viewreport': 'View Report',
-  
+
   'menu.report.visitListingReport': 'Visit Listing Report',
 
   'menu.support': 'Support',
@@ -192,4 +192,7 @@ export default {
 
   'menu.wardmanagement': 'Ward Management',
   'menu.patient-monitoring': 'Patient Monitoring',
+
+  'menu.not-found': 'Not Found',
+  'menu.forbidden': 'Forbidden',
 }
