@@ -13,6 +13,8 @@ import { notification } from '@/components'
 import { sendNotification } from '@/utils/realtime'
 import { getUniqueGUID } from '@/utils/utils'
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
+import Authorized from '@/utils/Authorized'
+import RouterConfig from '../../../config/router.config'
 
 const { prefix, openPages } = cfg
 
@@ -41,36 +43,29 @@ export default class BaseCRUDViewModel {
 
   subscriptions ({ dispatch, history }) {
     history.listen((location) => {
-      // if (lastLocation && lastLocation.key === location.key) return
-      // lastLocation = location
-      // // console.log(location)
-      // let bread
-      // if (location.search) {
-      //   const search = decrypt(location.search.substring(1))
-      //   // console.log(search)
-      //   if (search.resethistory) {
-      //     dispatch({
-      //       type: 'resetBreadHistory',
-      //       payload: { location },
-      //     })
-      //   }
-      //   bread = search.bread
-      // }
-      // // console.log(location)
-      // const page = openPages.find((o) => location.pathname.toLowerCase() === o)
-      // if (!localStorage.getItem('accessToken') && !page) {
-      //   return
-      // }
-      // if (page) {
-      //   return
-      // }
-      // dispatch({
-      //   type: 'addBread',
-      //   payload: {
-      //     location,
-      //     bread,
-      //   },
-      // })
+      const { pathname } = location
+      const getAuthoritys = (routes = []) => {
+        for (let index = 0; index < routes.length; index++) {
+          if (routes[index].path === pathname) {
+            return routes[index].authority
+          }
+          if (routes[index].routes) {
+            let authority = getAuthoritys(routes[index].routes)
+            if (authority) {
+              return authority
+            }
+          }
+        }
+      }
+      let authoritys = getAuthoritys(RouterConfig)
+      if (authoritys) {
+        authoritys.forEach((authority) => {
+          const accessRight = Authorized.check(authority)
+          if (!accessRight || accessRight.rights === 'hidden') {
+            history.push('/forbidden')
+          }
+        })
+      }
     })
   }
 
