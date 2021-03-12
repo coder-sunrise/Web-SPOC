@@ -18,6 +18,7 @@ import cx from 'classnames'
 import pathToRegexp from 'path-to-regexp'
 import Media from 'react-media'
 import { formatMessage } from 'umi/locale'
+import { checkAuthoritys } from '@/utils/utils'
 
 // import { ToastComponent } from '@syncfusion/ej2-react-notifications'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
@@ -335,7 +336,12 @@ class BasicLayout extends React.PureComponent {
   }
 
   initUserData = async () => {
-    const { dispatch, route: { routes, authority }, location } = this.props
+    const {
+      dispatch,
+      route: { routes, authority },
+      location,
+      history,
+    } = this.props
     const shouldProceed = await this.checkShouldProceedRender()
     if (!shouldProceed) {
       // system version is lower than db, should do a refresh
@@ -371,6 +377,9 @@ class BasicLayout extends React.PureComponent {
     this.setState({
       authorized: true,
     })
+
+    const { pathname } = location
+    checkAuthoritys(pathname, history)
   }
 
   matchParamsPath = (pathname) => {
