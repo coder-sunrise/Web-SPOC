@@ -37,7 +37,7 @@ module.exports = {
   },
   
   queryReferralHistory: (params) => {
-    return service.query(`${url}/Referral`,params)
+    return service.queryList(`${url}/Referral`,params)
   },
 
   saveReferralHistory: (params) => {

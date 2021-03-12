@@ -48,9 +48,8 @@ import {
         dispatch({
           type: 'patientHistory/queryReferralHistory',
           payload: {
-            pageIndex: 1,
-            pageSize: 9999,
-            patientProfileId: patientHistory.patientID,
+            pagesize: 999,
+            patientProfileFK: patientHistory.patientID,
           },
         })
         notification.success({ message: 'Saved' })
