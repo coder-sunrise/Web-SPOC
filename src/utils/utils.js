@@ -10,6 +10,7 @@ import { parse, stringify } from 'qs'
 import $ from 'jquery'
 import numeral from 'numeral'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
+import Authorized from '@/utils/Authorized'
 
 import * as cdrssUtil from 'medisys-util'
 import {
@@ -20,6 +21,7 @@ import {
   notification,
 } from '@/components'
 import config from './config'
+import RouterConfig from '../../config/router.config'
 
 window.addEventListener('unhandledrejection', (event) => {
   console.log(event)
@@ -1365,6 +1367,33 @@ const stringToBytesFaster = (str) => {
   return re
 }
 
+const checkAuthoritys = (pathname, history) => {
+  if (sessionStorage.getItem('user')) {
+    const getAuthoritys = (routes = []) => {
+      for (let index = 0; index < routes.length; index++) {
+        if (routes[index].path === pathname) {
+          return routes[index].authority
+        }
+        if (routes[index].routes) {
+          let authority = getAuthoritys(routes[index].routes)
+          if (authority) {
+            return authority
+          }
+        }
+      }
+    }
+    let authoritys = getAuthoritys(RouterConfig)
+    if (authoritys) {
+      authoritys.forEach((authority) => {
+        const accessRight = Authorized.check(authority)
+        if (!accessRight || accessRight.rights === 'hidden') {
+          history.push('/forbidden')
+        }
+      })
+    }
+  }
+}
+
 module.exports = {
   ...cdrssUtil,
   ...module.exports,
@@ -1401,6 +1430,7 @@ module.exports = {
   roundTo,
   roundUp,
   stringToBytesFaster,
+  checkAuthoritys,
   // toUTC,
   // toLocal,
 }

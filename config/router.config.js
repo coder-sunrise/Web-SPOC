@@ -578,7 +578,7 @@ const _routes = [
             name: 'queueListingReport',
             component: './Report/QueueListing',
             authority: [
-              'report.queuelistingreport',
+              'report.finance.queuelisting',
             ],
           },
           {
@@ -730,7 +730,7 @@ const _routes = [
             name: 'sessionsummary',
             component: './Report/SessionSummary',
             authority: [
-              'report.sessionsummaryreport',
+              'report.admin.sessionsummary',
             ],
           },
           {

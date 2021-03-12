@@ -11,10 +11,8 @@ import {
 import update from 'immutability-helper'
 import { notification } from '@/components'
 import { sendNotification } from '@/utils/realtime'
-import { getUniqueGUID } from '@/utils/utils'
+import { getUniqueGUID, checkAuthoritys } from '@/utils/utils'
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
-import Authorized from '@/utils/Authorized'
-import RouterConfig from '../../../config/router.config'
 
 const { prefix, openPages } = cfg
 
@@ -44,28 +42,7 @@ export default class BaseCRUDViewModel {
   subscriptions ({ dispatch, history }) {
     history.listen((location) => {
       const { pathname } = location
-      const getAuthoritys = (routes = []) => {
-        for (let index = 0; index < routes.length; index++) {
-          if (routes[index].path === pathname) {
-            return routes[index].authority
-          }
-          if (routes[index].routes) {
-            let authority = getAuthoritys(routes[index].routes)
-            if (authority) {
-              return authority
-            }
-          }
-        }
-      }
-      let authoritys = getAuthoritys(RouterConfig)
-      if (authoritys) {
-        authoritys.forEach((authority) => {
-          const accessRight = Authorized.check(authority)
-          if (!accessRight || accessRight.rights === 'hidden') {
-            history.push('/forbidden')
-          }
-        })
-      }
+      checkAuthoritys(pathname, history)
     })
   }
 
