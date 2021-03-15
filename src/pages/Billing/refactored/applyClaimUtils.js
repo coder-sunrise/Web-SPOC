@@ -94,7 +94,7 @@ export const getApplicableClaimAmount = (
   } = scheme
   let returnClaimAmount = 0
   const payableBalance =
-    invoicePayerItem.totalAfterGst - (invoicePayerItem._claimedAmount || 0)
+    roundTo(invoicePayerItem.totalAfterGst - (invoicePayerItem._claimedAmount || 0))
 
   if (payableBalance <= 0 || !scheme) return returnClaimAmount
 
@@ -141,11 +141,13 @@ export const getApplicableClaimAmount = (
     }
   } else {
     const itemRemainingAmount = payableBalance
+    // console.log('itemRemainingAmount', itemRemainingAmount, overAllCoPaymentValue)
     const copaymentValue =
       overAllCoPaymentValueType.toLowerCase() === 'percentage'
         ? roundTo(itemRemainingAmount * (overAllCoPaymentValue / 100))
         : overAllCoPaymentValue
 
+    // console.log('copaymentValue', copaymentValue)
     returnClaimAmount =
       copaymentValue > itemRemainingAmount
         ? itemRemainingAmount
@@ -167,12 +169,17 @@ export const getApplicableClaimAmount = (
   if (returnClaimAmount > totalClaimableAmount)
     returnClaimAmount = totalClaimableAmount
 
+  // console.log('payableBalance', payableBalance, totalClaimableAmount)
+  // special case for cdmp
+  // if(scheme.code === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500CDMP || scheme.code === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE700CDMP)
+  //   returnClaimAmount *= 0.85
+
   return roundTo(returnClaimAmount, 4)
 }
 
 export const getInvoiceItemsWithClaimAmount = (
   schemeConfig,
-  originalInvoiceItems = [],
+  originalInvoiceItems = [], // for medisave it's not all items, only items within scheme type
   currentInvoiceItems = [],
   shouldGenerateDummyID = false,
   allPayers,
@@ -200,6 +207,7 @@ export const getInvoiceItemsWithClaimAmount = (
       ? patientMinCoPaymentAmount
       : roundTo(totalInvoiceAmount * (patientMinCoPaymentAmount / 100))
 
+  // console.log('patientMinCoPaymentExactAmount',totalInvoiceAmount, patientMinCoPaymentExactAmount)
   const totalClaimableAmount =
     totalInvoiceAmount < patientMinCoPaymentExactAmount
       ? 0
@@ -235,7 +243,7 @@ export const getInvoiceItemsWithClaimAmount = (
           .filter(
             (a) =>
               !a.isCancelled &&
-              a.medisaveVisitType === 'CDMP' &&
+              ['CDMP','Vaccination','Health Screening'].indexOf(a.medisaveVisitType) >= 0 &&
               a.invoicePayerItem.length > 0,
           )
           .reduce((items, p) => {
@@ -249,13 +257,16 @@ export const getInvoiceItemsWithClaimAmount = (
       payers.length > 0
         ? roundTo(payers.reduce((total, i) => total + i.claimAmount, 0))
         : 0
+    // console.log('pastSchemeClaimedAmount',payers)
 
     const remainingCoverageMaxCap = coverageMaxCap - pastItemClaimedAmount
     const remainingClaimableAmount =
       totalClaimableAmount - pastItemClaimedAmount - pastSchemeClaimedAmount <=
       0
         ? 0
-        : totalClaimableAmount - pastItemClaimedAmount - pastSchemeClaimedAmount
+        : roundTo(totalClaimableAmount - pastItemClaimedAmount - pastSchemeClaimedAmount)
+        
+    // console.log('remainingClaimableAmount',totalClaimableAmount, pastItemClaimedAmount, pastSchemeClaimedAmount, remainingClaimableAmount)
 
     const _claimAmount = getApplicableClaimAmount(
       item,
@@ -263,6 +274,7 @@ export const getInvoiceItemsWithClaimAmount = (
       remainingCoverageMaxCap,
       remainingClaimableAmount,
     )
+    // console.log('getApplicableClaimAmount',item, remainingCoverageMaxCap, remainingClaimableAmount, _claimAmount)
     
     if (existedItem)
       return [
@@ -413,10 +425,24 @@ const calculateTotalPaybable = (total, item) => {
   return total + item.payableBalance
 }
 
-export const validateClaimAmount = (schemeRow) => {
+export const getMedisaveVisitClaimableAmount = (items, medisaveItems) => {
+  const {medisaveMedications, medisaveServices, medisaveVaccinations, healthScreenings } = medisaveItems
+  const claimableTotal = items.reduce((total, v) => {
+    if(medisaveVaccinations.find(m => m.code === v.itemCode) || 
+        healthScreenings.find(m => m.code === v.itemCode) ||
+        medisaveServices.find(m => m.code === v.itemCode) ||
+        medisaveMedications.find(m => m.code === v.itemCode)
+        )
+      return total + v.totalAfterGst - v._chasAmount
+    return total
+  },0)
+  return roundTo(claimableTotal * 15 / 100) // do not fix it
+}
+
+export const validateClaimAmount = (schemeRow, tempInvoicePayers, medisaveItems = []) => {
   let invalidMessage = []
 
-  const { schemeConfig, invoicePayerItem, payerTypeFK } = schemeRow
+  const { schemeConfig, invoicePayerItem, payerTypeFK, medisaveVisitType } = schemeRow
   if (payerTypeFK === INVOICE_PAYER_TYPE.COMPANY || !schemeConfig) return []
 
   const {
@@ -437,6 +463,8 @@ export const validateClaimAmount = (schemeRow) => {
     isVaccinationCoverageMaxCapCheckRequired,
     isServiceCoverageMaxCapCheckRequired,
     isOrderSetCoverageMaxCapCheckRequired,
+
+    schemePayerFK,
   } = schemeConfig
 
   const listOfLimits = []
@@ -454,6 +482,7 @@ export const validateClaimAmount = (schemeRow) => {
   const totalPayable = roundTo(
     invoicePayerItem.reduce(calculateTotalPaybable, 0),
   )
+  console.log('totalClaimAmount',totalClaimAmount, totalPayable)
 
   const patientMinCoPaymentExactAmount =
     patientMinCoPaymentAmountType === 'ExactAmount'
@@ -465,8 +494,50 @@ export const validateClaimAmount = (schemeRow) => {
       ? roundTo(totalPayable - totalClaimAmount)
       : totalPayable
 
+  console.log('schemeRow',schemeRow)
   if (patientMinCoPaymentExactAmount > 0) {
-    if (patientDistributedAmount < patientMinCoPaymentExactAmount) {
+    if(schemePayerFK && medisaveVisitType === 'CDMP')// for medisave
+    {
+      const {medisaveMedications, medisaveServices, medisaveVaccinations, healthScreenings, outpatientScans } = medisaveItems
+      const allClaimables = tempInvoicePayers.map(t => t.invoicePayerItem) // only latest applied is current
+      console.log('allClaimables', allClaimables, invoicePayerItem)
+      const invoiceTotal = invoicePayerItem.reduce((total, v) => {
+        if(medisaveVaccinations.find(m => m.code === v.itemCode) || 
+        healthScreenings.find(m => m.code === v.itemCode) ||
+        medisaveServices.find(m => m.code === v.itemCode) ||
+        medisaveMedications.find(m => m.code === v.itemCode))
+          return total + v.totalAfterGst - v._chasAmount
+        return total
+      },0)
+      const claimedTotal = invoicePayerItem.reduce((total, v) => {
+        if(medisaveVaccinations.find(m => m.code === v.itemCode) || 
+        healthScreenings.find(m => m.code === v.itemCode) ||
+        medisaveServices.find(m => m.code === v.itemCode) ||
+        medisaveMedications.find(m => m.code === v.itemCode))
+          return total + v._claimedAmount - v._chasAmount
+        return total
+      },0)
+
+      const cdmpMinCopay = getMedisaveVisitClaimableAmount(invoicePayerItem, medisaveItems)
+      // 15% of all medisave items
+      console.log('validateClaimAmount', claimedTotal,invoiceTotal, cdmpMinCopay, [patientDistributedAmount])
+      // invoiceTotal - claimedTotal - (Claim Amount) > cdmpMinCopay => error
+
+      const maxClaim = roundTo(invoiceTotal - claimedTotal - cdmpMinCopay)
+      if(totalClaimAmount > maxClaim) {
+        invalidMessage.push(
+          `Current Claim Amount is: $${totalClaimAmount.toFixed(
+            2,
+          )}`,
+        )
+        invalidMessage.push(
+          `Total Claim Amount under Medisave 500/700 Visit is at most: $${maxClaim.toFixed(
+            2,
+          )}`,
+        )
+      }
+    }
+    else if (patientDistributedAmount < patientMinCoPaymentExactAmount) {
       invalidMessage.push(
         `Current Patient Min. Payment Amount is: $${patientDistributedAmount.toFixed(
           2,
@@ -533,7 +604,7 @@ export const validateClaimAmount = (schemeRow) => {
       orderSetTotalClaim
 
     if (total <= 0)
-      invalidMessage.push('Total Claim Amount must be at least $0.01')
+      invalidMessage.push('Total Claim Amount must be at least $0.01')   
   }
 
   const maximumLimit = listOfLimits.reduce(
