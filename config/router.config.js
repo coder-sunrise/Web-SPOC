@@ -821,6 +821,14 @@ const _routes = [
               'report.finance.packageexpiryreport',
             ],
           },
+          {
+            path: '/report/xeroinvoicesreport',
+            name: 'xeroinvoicesreport',
+            component: './Report/XeroInvoicesReport',
+            authority: [
+              'report.finance.xeroinvoicesreport',
+            ],
+          },
         ],
       },
       // Report

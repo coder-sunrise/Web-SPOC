@@ -102,6 +102,12 @@ export const menuData = [
     authority: 'report.finance.patientageingreport',
   },
   {
+    title: 'Finance',
+    text: 'Xero Invoices Report',
+    url: '/report/xeroinvoicesreport',
+    authority: 'report.finance.xeroinvoicesreport',
+  },
+  {
     title: 'Inventory',
     text: 'Medication Movement Report',
     url: '/report/medicationmovementreport',

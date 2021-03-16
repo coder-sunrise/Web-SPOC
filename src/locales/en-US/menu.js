@@ -99,6 +99,7 @@ export default {
   'menu.report.inventorylistingreport': 'Inventory Listing Report',
   'menu.report.inventorystockcountreport': 'Inventory Stock Count Report',
   'menu.report.purchasereceivinglistingreport': 'Purchase & Receiving Report',
+  'menu.report.xeroinvoicesreport': 'Xero Invoices Report',
   'menu.communication': 'Communication',
   'menu.communication.sms': 'SMS',
   'menu.queue': 'Queue',
