@@ -33,17 +33,9 @@ class Grid extends PureComponent {
     const { labelPrinterSize } = clinicSettings.settings
 
     const sizeConverter = (sizeCM) => {
-      return sizeCM
-        .split('x')
-        .map((o) =>
-          (10 * parseFloat(o.replace('cm', ''))).toString().concat('MM'),
-        )
-        .join('_')
+      return sizeCM.split('x').map((o) => (10 * parseFloat(o.replace('cm', ''))).toString().concat('MM')).join('_')
     }
-    const reportID =
-      REPORT_ID[
-        'REFERRAL_PERSON_LABEL_'.concat(sizeConverter(labelPrinterSize))
-      ]
+    const reportID = REPORT_ID['REFERRAL_PERSON_LABEL_'.concat(sizeConverter(labelPrinterSize))]
 
     const data = await getRawData(reportID, {
       referralPersonId,
@@ -66,7 +58,7 @@ class Grid extends PureComponent {
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
-        type='settingReferralPerson'
+        type="settingReferralPerson"
         onRowDoubleClick={this.editRow}
         TableProps={{
           height,
@@ -75,7 +67,7 @@ class Grid extends PureComponent {
           { name: 'name', title: 'Name' },
           { name: 'mobileNo', title: 'Mobile No.' },
           { name: 'officeNo', title: 'Office No.' },
-          { name: 'companyName', title: 'Company Name' },
+          { name: 'companyName', title: 'Referral Source' },
           { name: 'address', title: 'Address' },
           { name: 'email', title: 'Email' },
           { name: 'remarks', title: 'Remarks' },
@@ -128,26 +120,25 @@ class Grid extends PureComponent {
             render: (row) => {
               return (
                 <Fragment>
-                  <Tooltip title='Edit Referral Person' placement='bottom'>
+                  <Tooltip title="Edit Referral Person" placement="bottom">
                     <Button
-                      size='sm'
+                      size="sm"
                       onClick={() => {
                         this.editRow(row)
                       }}
                       justIcon
-                      color='primary'
+                      color="primary"
                     >
                       <Edit />
                     </Button>
                   </Tooltip>
-                  <Tooltip title='Print Referral Person Label'>
+                  <Tooltip title="Print Referral Person Label">
                     {row.referralSources && row.referralSources.length === 1 ? (
                       <Button
-                        size='sm'
+                        size="sm"
                         justIcon
-                        color='primary'
-                        onClick={() =>
-                          this.handleClick(row.id, row.referralSources[0].id)}
+                        color="primary"
+                        onClick={() => this.handleClick(row.id, row.referralSources[0].id)}
                       >
                         <Print />
                       </Button>
@@ -158,21 +149,14 @@ class Grid extends PureComponent {
                           [classes.pooperNav]: true,
                         })}
                         overlay={
-                          <MenuList role='menu'>
+                          <MenuList role="menu">
                             {(row.referralSources || []).map((rs) => {
-                              return (
-                                <MenuItem
-                                  onClick={() =>
-                                    this.handleClick(row.id, rs.id)}
-                                >
-                                  {rs.name}
-                                </MenuItem>
-                              )
+                              return <MenuItem onClick={() => this.handleClick(row.id, rs.id)}>{rs.name}</MenuItem>
                             })}
                           </MenuList>
                         }
                       >
-                        <Button size='sm' justIcon color='primary'>
+                        <Button size="sm" justIcon color="primary">
                           <Print />
                         </Button>
                       </Popper>

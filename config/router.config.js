@@ -674,7 +674,7 @@ const _routes = [
             name: 'patientListingReport',
             component: './Report/PatientListing',
             authority: [
-              'report.patientlistingreport',
+              'report.finance.patientlisting',
             ],
           },
           {

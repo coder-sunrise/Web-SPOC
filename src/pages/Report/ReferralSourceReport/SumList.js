@@ -14,7 +14,7 @@ class SumList extends PureComponent {
       }))
     }
     const sumCols = [
-      { name: 'companyName', title: 'Referral Company' },
+      { name: 'companyName', title: 'Referral Source' },
       { name: 'referralPerson', title: 'Referral Person' },
       { name: 'totalVisit', title: 'Total Visit' },
       { name: 'totalInvoiceAmount', title: 'Total Invoice Amount' },
@@ -48,7 +48,7 @@ class SumList extends PureComponent {
               let count = 0
               if (rows && rows.length > 0) {
                 for (let p of rows) {
-                  count += (p.totalVisit || 0)
+                  count += p.totalVisit || 0
                 }
               }
               return count
