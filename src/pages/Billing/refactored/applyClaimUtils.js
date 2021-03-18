@@ -169,11 +169,6 @@ export const getApplicableClaimAmount = (
   if (returnClaimAmount > totalClaimableAmount)
     returnClaimAmount = totalClaimableAmount
 
-  // console.log('payableBalance', payableBalance, totalClaimableAmount)
-  // special case for cdmp
-  // if(scheme.code === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500CDMP || scheme.code === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE700CDMP)
-  //   returnClaimAmount *= 0.85
-
   return roundTo(returnClaimAmount, 4)
 }
 
@@ -482,7 +477,6 @@ export const validateClaimAmount = (schemeRow, tempInvoicePayers, medisaveItems 
   const totalPayable = roundTo(
     invoicePayerItem.reduce(calculateTotalPaybable, 0),
   )
-  console.log('totalClaimAmount',totalClaimAmount, totalPayable)
 
   const patientMinCoPaymentExactAmount =
     patientMinCoPaymentAmountType === 'ExactAmount'
@@ -494,13 +488,11 @@ export const validateClaimAmount = (schemeRow, tempInvoicePayers, medisaveItems 
       ? roundTo(totalPayable - totalClaimAmount)
       : totalPayable
 
-  console.log('schemeRow',schemeRow)
   if (patientMinCoPaymentExactAmount > 0) {
     if(schemePayerFK && medisaveVisitType === 'CDMP')// for medisave
     {
-      const {medisaveMedications, medisaveServices, medisaveVaccinations, healthScreenings, outpatientScans } = medisaveItems
-      const allClaimables = tempInvoicePayers.map(t => t.invoicePayerItem) // only latest applied is current
-      console.log('allClaimables', allClaimables, invoicePayerItem)
+      const {medisaveMedications, medisaveServices, medisaveVaccinations, healthScreenings } = medisaveItems
+
       const invoiceTotal = invoicePayerItem.reduce((total, v) => {
         if(medisaveVaccinations.find(m => m.code === v.itemCode) || 
         healthScreenings.find(m => m.code === v.itemCode) ||
@@ -518,10 +510,8 @@ export const validateClaimAmount = (schemeRow, tempInvoicePayers, medisaveItems 
         return total
       },0)
 
-      const cdmpMinCopay = getMedisaveVisitClaimableAmount(invoicePayerItem, medisaveItems)
       // 15% of all medisave items
-      console.log('validateClaimAmount', claimedTotal,invoiceTotal, cdmpMinCopay, [patientDistributedAmount])
-      // invoiceTotal - claimedTotal - (Claim Amount) > cdmpMinCopay => error
+      const cdmpMinCopay = getMedisaveVisitClaimableAmount(invoicePayerItem, medisaveItems)
 
       const maxClaim = roundTo(invoiceTotal - claimedTotal - cdmpMinCopay)
       if(totalClaimAmount > maxClaim) {
