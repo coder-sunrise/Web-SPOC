@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
-// common components 
-import moment from 'moment' 
+// common components
+import moment from 'moment'
 import { ReportDataGrid } from '@/components/_medisys'
 
 class ReferralSourceList extends PureComponent {
@@ -15,9 +15,9 @@ class ReferralSourceList extends PureComponent {
         visitDate: moment(item.visitDate).format('DD MMM YYYY'),
         id: `ReferralSourceList-${index}-${item.patientReferenceNo}`,
       }))
-    } 
+    }
     const ReferralSourceListingColumns = [
-      { name: 'companyName', title: 'Company Name' },
+      { name: 'companyName', title: 'Referral Source' },
       { name: 'referralPerson', title: 'Referral Person' },
       { name: 'visitDate', title: 'Visit Date' },
       { name: 'patientReferenceNo', title: 'Patient ID' },
@@ -37,11 +37,13 @@ class ReferralSourceList extends PureComponent {
       { columnName: 'patientName', sortingEnabled: false },
       { columnName: 'doctor', sortingEnabled: false },
       { columnName: 'nextApptDate', width: 180, sortingEnabled: false },
-      { columnName: 'remarks', sortingEnabled: false  },
+      { columnName: 'remarks', sortingEnabled: false },
       { columnName: 'invoiceNo', width: 110, sortingEnabled: false },
       {
         columnName: 'invoiceAmount',
-        type: 'currency', width: 180, sortingEnabled: false,
+        type: 'currency',
+        width: 180,
+        sortingEnabled: false,
       },
     ]
 
@@ -91,25 +93,19 @@ class ReferralSourceList extends PureComponent {
       grouping: true,
       groupingConfig: {
         state: {
-          grouping: [
-            { columnName: 'companyName' },
-          ],
+          grouping: [ { columnName: 'companyName' } ],
         },
         row: {
           contentComponent: (group) => {
             const { row } = group
-            if (row.compoundKey !== 'Patient As Referral' && row.key !== 'Patient As Referral' && row.value !== 'Patient As Referral') {
-              return (
-                <span>
-                  Company Name: {row.value}
-                </span>
-              )
+            if (
+              row.compoundKey !== 'Patient As Referral' &&
+              row.key !== 'Patient As Referral' &&
+              row.value !== 'Patient As Referral'
+            ) {
+              return <span>Referral Source: {row.value}</span>
             }
-            return (
-              <span>
-                Patient As Referral
-              </span>
-            )
+            return <span>Patient As Referral</span>
           },
         },
       },

@@ -16,11 +16,10 @@ import Contact from '@/pages/Setting/Company/Contact'
 @connect(({ settingReferralPerson }) => ({
   settingReferralPerson,
 }))
-
 @withFormikExtend({
   mapPropsToValues: ({ settingReferralPerson }) => {
     let entity = settingReferralPerson.entity || settingReferralPerson.default
-    let referralSourceIds = (entity.referralSources || []).map(x => x.id)
+    let referralSourceIds = (entity.referralSources || []).map((x) => x.id)
     return { ...entity, referralSourceIds }
   },
   validationSchema: Yup.object().shape({
@@ -65,28 +64,23 @@ class Detail extends PureComponent {
           <GridContainer>
             <GridItem md={6}>
               <FastField
-                name='name'
+                name="name"
                 render={(args) => (
-                  <TextField
-                    label='Name'
-                    autoFocus
-                    {...args}
-                    disabled={!!settingReferralPerson.entity}
-                  />
+                  <TextField label="Name" autoFocus {...args} disabled={!!settingReferralPerson.entity} />
                 )}
               />
             </GridItem>
 
             <GridItem md={6}>
               <Field
-                name='referralSourceIds'
+                name="referralSourceIds"
                 render={(args) => (
                   <CodeSelect
                     {...args}
                     options={referralSource}
-                    labelField='name'
-                    mode='multiple'
-                    label='Company'
+                    labelField="name"
+                    mode="multiple"
+                    label="Referral Source"
                   />
                 )}
               />
@@ -94,28 +88,17 @@ class Detail extends PureComponent {
 
             <GridItem md={6}>
               <FastField
-                name='effectiveDates'
+                name="effectiveDates"
                 render={(args) => {
-                  return (
-                    <DateRangePicker
-                      label='Effective Start Date'
-                      label2='End Date'
-                      {...args}
-                    />
-                  )
+                  return <DateRangePicker label="Effective Start Date" label2="End Date" {...args} />
                 }}
               />
             </GridItem>
             <GridItem md={6}>
-              <FastField
-                name='remarks'
-                render={(args) => (
-                  <TextField label='Remarks' multiline {...args} />
-                )}
-              />
+              <FastField name="remarks" render={(args) => <TextField label="Remarks" multiline {...args} />} />
             </GridItem>
           </GridContainer>
-          <Contact theme={theme} type='referralperson' />
+          <Contact theme={theme} type="referralperson" />
         </div>
         {footer &&
           footer({
