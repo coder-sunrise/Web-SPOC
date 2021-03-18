@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
-import { withStyles } from '@material-ui/core'
-import { Edit, Print } from '@material-ui/icons'
+import { Edit } from '@material-ui/icons'
 import CommonTableGrid from '@/components/CommonTableGrid'
 import { Button, Tooltip } from '@/components'
 import PatientResultButton from './PatientResultPrintBtn'
@@ -83,10 +82,14 @@ class PatientGrid extends PureComponent {
   }
 
   render () {
+    const { height } = this.props
     return (
       <CommonTableGrid
         type='labTrackingDetails'
         onRowDoubleClick={this.editRow}
+        TableProps={{
+          height,
+        }}
         {...this.configs}
       />
     )

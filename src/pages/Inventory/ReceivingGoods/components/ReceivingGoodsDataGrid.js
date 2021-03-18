@@ -16,6 +16,7 @@ const ReceivingGoodsDataGrid = ({
     handleOnSelectionChange,
     handlePrintRGReport,
   },
+  height,
 }) => {
   const onContextButtonClick = (row, id) => {
     switch (id) {
@@ -40,6 +41,9 @@ const ReceivingGoodsDataGrid = ({
       style={{ margin: 0 }}
       type='receivingGoodsList'
       selection={selectedRows}
+      TableProps={{
+        height,
+      }}
       forceRender
       onSelectionChange={handleOnSelectionChange}
       columns={ReceivingGoodsGridCol}

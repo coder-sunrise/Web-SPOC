@@ -31,7 +31,6 @@ import {
   },
   displayName: 'ReferralPersonFilter',
 })
-
 class Filter extends PureComponent {
   render () {
     const { classes, handleSubmit, referralSource } = this.props
@@ -46,7 +45,7 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={6} md={3}> 
+          <GridItem xs={6} md={3}>
             <Field
               name='referralSourceId'
               render={(args) => (
@@ -63,7 +62,7 @@ class Filter extends PureComponent {
         </GridContainer>
 
         <GridContainer>
-          <GridItem xs={6} md={3}>
+          <GridItem>
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'

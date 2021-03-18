@@ -17,6 +17,7 @@ const DepositGrid = ({
   handleDeleteRow,
   hasActiveSession,
   isReadOnly,
+  height,
 }) => {
   const getDeleteStyle = (row) => {
     return {
@@ -203,7 +204,9 @@ const DepositGrid = ({
   return (
     <CommonTableGrid
       {...configs}
-      style={{ height: window.innerHeight - 430, overflow: 'auto' }}
+      TableProps={{
+        height,
+      }}
     />
   )
 }

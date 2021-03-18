@@ -1,5 +1,4 @@
-import React, { useMemo } from 'react'
-import { connect } from 'dva'
+import React from 'react'
 // material ui
 import Edit from '@material-ui/icons/Edit'
 // common component
@@ -72,12 +71,16 @@ class Grid extends React.PureComponent {
   }
 
   render () {
+    const { height } = this.props
     return (
       <CommonTableGrid
         type='settingAppointmentType'
         onRowDoubleClick={this.editRow}
         columns={columns}
         columnExtensions={this.state.columnExtensions}
+        TableProps={{
+          height,
+        }}
       />
     )
   }

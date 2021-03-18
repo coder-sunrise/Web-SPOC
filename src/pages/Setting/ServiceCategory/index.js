@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-
+import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
@@ -17,6 +17,7 @@ const styles = (theme) => ({
 @connect(({ settingServiceCategory, global }) => ({
   settingServiceCategory,
   global,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withSettingBase({ modelName: 'settingServiceCategory' })
 class ServiceCategory extends PureComponent {
@@ -38,14 +39,18 @@ class ServiceCategory extends PureComponent {
   }
 
   render () {
-    const { settingServiceCategory } = this.props
+    const { settingServiceCategory, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
+    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <Filter {...cfg} {...this.props} />
-        <Grid {...cfg} {...this.props} />
+        <div className='filterBar'>
+          <Filter {...cfg} {...this.props} />
+        </div>
+        <Grid {...cfg} {...this.props} height={height} />
         <CommonModal
           open={settingServiceCategory.showModal}
           observe='ServiceCategoryDetail'

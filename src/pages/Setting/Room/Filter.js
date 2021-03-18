@@ -25,14 +25,6 @@ class Filter extends PureComponent {
     return (
       <div className={classes.filterBar}>
         <GridContainer>
-          {/* <GridItem xs={6} md={3}>
-            <FastField
-              name='code'
-              render={(args) => {
-                return <TextField label='Code' {...args} />
-              }}
-            />
-          </GridItem> */}
           <GridItem xs={6} md={3}>
             <FastField
               name='codeDisplayValue'
@@ -52,7 +44,7 @@ class Filter extends PureComponent {
         </GridContainer>
 
         <GridContainer>
-          <GridItem xs={6} md={3}>
+          <GridItem>
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'

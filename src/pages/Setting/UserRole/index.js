@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 import classNames from 'classnames'
 // formik
 import { withFormik, FastField, Field } from 'formik'
@@ -14,8 +15,6 @@ import Edit from '@material-ui/icons/Edit'
 import { FormattedMessage } from 'umi/locale'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
-// devexpress react grid
-import { Table } from '@devexpress/dx-react-grid-material-ui'
 // common component
 import {
   Button,
@@ -44,7 +43,10 @@ const styles = (theme) => ({
     marginBottom: theme.spacing(2),
   },
 })
-@connect(({ settingUserRole }) => ({ settingUserRole }))
+@connect(({ settingUserRole, global }) => ({
+  settingUserRole,
+  mainDivHeight: global.mainDivHeight,
+}))
 @withSettingBase({ modelName: 'settingUserRole' })
 @withFormik({
   mapPropsToValues: () => ({
@@ -165,89 +167,97 @@ class UserRole extends React.Component {
   }
 
   render () {
-    const { classes } = this.props
+    const { classes, mainDivHeight = 700 } = this.props
     const { showUserProfileForm, openPopper } = this.state
-
+    let height = mainDivHeight - 100 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <GridContainer>
-          <GridItem md={4}>
-            <FastField
-              name='codeDisplayValue'
-              render={(args) => {
-                return <TextField label='Code / Name' {...args} />
-              }}
-            />
-          </GridItem>
-          <GridItem md={2}>
-            <Field
-              name='clinicalRole'
-              render={(args) => (
-                <CodeSelect
-                  {...args}
-                  label='Clinical Role'
-                  code='ltclinicalrole'
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem md={2}>
-            <FastField
-              name='status'
-              render={(args) => (
-                <Select
-                  {...args}
-                  label='Status'
-                  options={[
-                    { name: 'Active', value: true },
-                    { name: 'Inactive', value: false },
-                  ]}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem md={12} className={classes.verticalSpacing}>
-            <ProgressButton
-              icon={<Search />}
-              color='primary'
-              onClick={this.handleSearchClick}
-            >
-              <FormattedMessage id='form.search' />
-            </ProgressButton>
-            <Authorized authority='settings.role.addrole'>
-              <Popper
-                open={openPopper}
-                transition
-                className={classNames({
-                  [classes.pooperResponsive]: true,
-                  [classes.pooperNav]: true,
-                })}
-                overlay={
-                  <ClickAwayListener onClickAway={this.closePopper}>
-                    <MenuList role='menu'>
-                      <MenuItem onClick={() => this.handleClickPopper(1)}>
-                        Add New
-                      </MenuItem>
-                      <MenuItem onClick={() => this.handleClickPopper(2)}>
-                        Add From Existing
-                      </MenuItem>
-                    </MenuList>
-                  </ClickAwayListener>
-                }
+        <div className='filterBar'>
+          <GridContainer>
+            <GridItem md={4}>
+              <FastField
+                name='codeDisplayValue'
+                render={(args) => {
+                  return <TextField label='Code / Name' {...args} />
+                }}
+              />
+            </GridItem>
+            <GridItem md={2}>
+              <Field
+                name='clinicalRole'
+                render={(args) => (
+                  <CodeSelect
+                    {...args}
+                    label='Clinical Role'
+                    code='ltclinicalrole'
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={2}>
+              <FastField
+                name='status'
+                render={(args) => (
+                  <Select
+                    {...args}
+                    label='Status'
+                    options={[
+                      { name: 'Active', value: true },
+                      { name: 'Inactive', value: false },
+                    ]}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={12} className={classes.verticalSpacing}>
+              <ProgressButton
+                icon={<Search />}
+                color='primary'
+                onClick={this.handleSearchClick}
               >
-                <Button color='primary' onClick={this.handleAddNew}>
-                  <Add />
-                  Add New
-                </Button>
-              </Popper>
-            </Authorized>
-          </GridItem>
+                <FormattedMessage id='form.search' />
+              </ProgressButton>
+              <Authorized authority='settings.role.addrole'>
+                <Popper
+                  open={openPopper}
+                  transition
+                  className={classNames({
+                    [classes.pooperResponsive]: true,
+                    [classes.pooperNav]: true,
+                  })}
+                  overlay={
+                    <ClickAwayListener onClickAway={this.closePopper}>
+                      <MenuList role='menu'>
+                        <MenuItem onClick={() => this.handleClickPopper(1)}>
+                          Add New
+                        </MenuItem>
+                        <MenuItem onClick={() => this.handleClickPopper(2)}>
+                          Add From Existing
+                        </MenuItem>
+                      </MenuList>
+                    </ClickAwayListener>
+                  }
+                >
+                  <Button color='primary' onClick={this.handleAddNew}>
+                    <Add />
+                    Add New
+                  </Button>
+                </Popper>
+              </Authorized>
+            </GridItem>
+          </GridContainer>
+        </div>
+        <GridContainer>
           <GridItem md={12}>
             <CommonTableGrid
               type='settingUserRole'
               {...this.state.gridConfig}
               onRowDoubleClick={this.handleDoubleClick}
               FuncProps={{ pager: true }}
+              TableProps={{
+                height,
+              }}
             />
           </GridItem>
           <CommonModal

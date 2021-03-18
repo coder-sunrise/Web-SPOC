@@ -5,7 +5,6 @@ import { FastField } from 'formik'
 import { compose } from 'redux'
 import {
   CodeSelect,
-  CardContainer,
   TextField,
   GridContainer,
   GridItem,
@@ -53,8 +52,8 @@ const Detail = ({
         hideHeader
         style={{
           margin: theme.spacing(1),
-          minHeight: 700,
-          maxHeight: 700,
+          minHeight: 670,
+          maxHeight: 670,
         }}
       >
         <GridContainer gutter={0}>
@@ -298,8 +297,6 @@ const Detail = ({
           </GridItem>
         </GridContainer>
 
-        {/* <Divider style={{ margin: '40px 0 20px 0' }} /> */}
-
         <CommonModal
           open={toggle}
           observe='MedicationDetail'
@@ -320,10 +317,6 @@ const Detail = ({
     </SharedContainer>
   )
 }
-export default compose(
-  withStyles(styles, { withTheme: true }),
-  React.memo,
-  // connect(({ sddDetail }) => ({
-  //   sddDetail,
-  // })),
-)(Detail)
+export default compose(withStyles(styles, { withTheme: true }), React.memo)(
+  Detail,
+)

@@ -1,5 +1,6 @@
 import React from 'react'
 import _ from 'lodash'
+import $ from 'jquery'
 import * as Yup from 'yup'
 import { connect } from 'dva'
 import { withRouter } from 'react-router'
@@ -41,7 +42,6 @@ const styles = (theme) => ({
     '& > h4': {
       fontWeight: 500,
     },
-    // marginBottom: theme.spacing(1),
   },
   indent: {
     paddingLeft: theme.spacing(2),
@@ -52,9 +52,10 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ settingUserRole }) => ({
+@connect(({ settingUserRole, global }) => ({
   settingUserRole,
   userRole: settingUserRole.currentSelectedUserRole,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withFormikExtend({
   enableReinitialize: true,
@@ -192,17 +193,14 @@ class Main extends React.Component {
       .sort(this.compare)
 
     result.filteredAccessRight = result.roleClientAccessRight
-      .filter(
-        (m) => {
-          if (e) {
-            let index = values.clinicRoleFK
-            if (typeof e === 'number') index = e
-            return !index || m.clinicRoleBitValue >= 2 ** (index - 1)
-          }
-          return true
-        },
-        // typeof e !== 'number' || m.clinicRoleBitValue >= 2 ** (e - 1),
-      )
+      .filter((m) => {
+        if (e) {
+          let index = values.clinicRoleFK
+          if (typeof e === 'number') index = e
+          return !index || m.clinicRoleBitValue >= 2 ** (index - 1)
+        }
+        return true
+      })
       .filter((m) => {
         return !module || m.module === module
       })
@@ -382,7 +380,7 @@ class Main extends React.Component {
   }
 
   render () {
-    const { classes, values, footer } = this.props
+    const { classes, values, mainDivHeight = 700 } = this.props
     const {
       filter,
       hasUser,
@@ -399,7 +397,8 @@ class Main extends React.Component {
     } = values
 
     const isEdit = !!id
-
+    let height = mainDivHeight - 500
+    if (height < 300) height = 300
     return (
       <React.Fragment>
         <GridContainer
@@ -556,6 +555,9 @@ class Main extends React.Component {
                   onConfirmChangeRight: this.onConfirmChangeRight,
                 })}
                 FuncProps={{ pager: true }}
+                TableProps={{
+                  height,
+                }}
               />
             </SizeContainer>
             <CommonModal

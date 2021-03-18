@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react'
 
 import { CommonTableGrid, Button, Tooltip } from '@/components'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { status } from '@/utils/codes'
 import Edit from '@material-ui/icons/Edit'
 
@@ -21,22 +20,19 @@ class Grid extends PureComponent {
   }
 
   render () {
-    const {
-      dispatch,
-      classes,
-      settingMedicationDosage,
-      toggleModal,
-    } = this.props
+    const { height } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
         type='settingMedicationDosage'
         onRowDoubleClick={this.editRow}
+        TableProps={{
+          height,
+        }}
         columns={[
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },
           { name: 'description', title: 'Description' },
-          // { name: 'shortcutKey', title: 'Shortcut Key' },
           { name: 'multiplier', title: 'Multiplier' },
           { name: 'sortOrder', title: 'Sort Order' },
           { name: 'isActive', title: 'Status' },
@@ -45,7 +41,6 @@ class Grid extends PureComponent {
             title: 'Action',
           },
         ]}
-        // FuncProps={{ pager: false }}
         columnExtensions={[
           {
             columnName: 'sortOrder',
@@ -53,10 +48,6 @@ class Grid extends PureComponent {
               return <p>{row.sortOrder === null ? '-' : row.sortOrder}</p>
             },
           },
-          // {
-          //   columnName: 'shortcutKey',
-          //   sortingEnabled: false,
-          // },
           {
             columnName: 'isActive',
             sortingEnabled: false,

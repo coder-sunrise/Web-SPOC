@@ -34,11 +34,6 @@ const styles = (theme) => ({
   },
 })
 
-// @withFormik({
-// 	handleSubmit: () => {},
-// 	displayName: 'ClinicBreakHourFilter'
-// })
-
 @withFormikExtend({
   mapPropsToValues: ({ settingClinicOperationHour }) =>
     settingClinicOperationHour.filter || {},
@@ -72,7 +67,7 @@ class Filter extends PureComponent {
         </GridContainer>
 
         <GridContainer>
-          <GridItem xs={6} md={4}>
+          <GridItem>
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'

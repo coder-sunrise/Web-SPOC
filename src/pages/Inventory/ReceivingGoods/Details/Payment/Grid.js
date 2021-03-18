@@ -29,6 +29,7 @@ const Grid = ({
   setFieldValue,
   getTotalPaid,
   receivingGoodsDetails: { receivingGoods: { totalAftGST } },
+  height,
 }) => {
   const [
     creditCardTypeList,
@@ -356,6 +357,9 @@ const Grid = ({
           isDeletable: (row) => !row.isCancelled,
         }}
         {...tableParas}
+        TableProps={{
+          height,
+        }}
       />
       <CommonModal
         open={showDeleteConfirmation}

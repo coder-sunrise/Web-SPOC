@@ -3,9 +3,9 @@ import { connect } from 'dva'
 import { compose } from 'redux'
 import { withStyles } from '@material-ui/core/styles'
 import { CardContainer } from '@/components'
+import { status } from '@/utils/codes'
 import FilterBar from './FilterBar'
 import Grid from '../Grid'
-import { status } from '@/utils/codes'
 
 const styles = () => ({})
 
@@ -108,12 +108,6 @@ const Medication = ({ dispatch, history, medication, values }) => {
         ],
       },
     })
-    // dispatch({
-    //   type: 'inventoryMaster/updateState',
-    //   payload: {
-    //     currentTab: '0',
-    //   },
-    // })
   }, [])
 
   return (
@@ -124,7 +118,9 @@ const Medication = ({ dispatch, history, medication, values }) => {
         marginRight: 5,
       }}
     >
-      <FilterBar {...filterProps} />
+      <div className='filterBar'>
+        <FilterBar {...filterProps} />
+      </div>
       <Grid {...gridProps} />
     </CardContainer>
   )

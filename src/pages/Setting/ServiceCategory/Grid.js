@@ -9,14 +9,6 @@ class Grid extends PureComponent {
       const { dispatch, settingServiceCategory } = this.props
 
       const { list } = settingServiceCategory
-      // For complex object retrieve from server
-      // dispatch({
-      //   type: 'settingRoom/queryOne',
-      //   payload: {
-      //     id: row.id,
-      //   },
-      // }).then(toggleModal)
-      // console.log(settingRoom, row.id, e)
       dispatch({
         type: 'settingServiceCategory/updateState',
         payload: {
@@ -28,11 +20,15 @@ class Grid extends PureComponent {
   }
 
   render () {
+    const { height } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
         type='settingServiceCategory'
         onRowDoubleClick={this.editRow}
+        TableProps={{
+          height,
+        }}
         columns={[
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },
@@ -43,7 +39,6 @@ class Grid extends PureComponent {
             title: 'Action',
           },
         ]}
-        // FuncProps={{ pager: false }}
         columnExtensions={[
           {
             columnName: 'isActive',

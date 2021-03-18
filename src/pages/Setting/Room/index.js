@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-
+import $ from 'jquery'
 import { withStyles, Divider } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
@@ -14,8 +14,9 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingRoom }) => ({
+@connect(({ settingRoom, global }) => ({
   settingRoom,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withSettingBase({ modelName: 'settingRoom' })
 class Room extends PureComponent {
@@ -37,15 +38,18 @@ class Room extends PureComponent {
   }
 
   render () {
-    const { classes, settingRoom, dispatch, theme, ...restProps } = this.props
+    const { settingRoom, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-
+    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <Filter {...cfg} {...this.props} />
-        <Grid {...this.props} />
+        <div className='filterBar'>
+          <Filter {...cfg} {...this.props} />
+        </div>
+        <Grid {...this.props} height={height} />
         <CommonModal
           open={settingRoom.showModal}
           observe='RoomDetail'

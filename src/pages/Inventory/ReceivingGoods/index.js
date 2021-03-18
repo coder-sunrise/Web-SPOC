@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 import {
@@ -25,8 +26,9 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ receivingGoodsList }) => ({
+@connect(({ receivingGoodsList, global }) => ({
   receivingGoodsList,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withFormik({
   name: 'receivingGoodsList1',
@@ -146,7 +148,7 @@ class ReceivingGoods extends Component {
   }
 
   render () {
-    const { classes, dispatch } = this.props
+    const { classes, dispatch, mainDivHeight = 700 } = this.props
     const actionProps = {
       handleWriteOff: this.onWriteOffClick,
       handleDuplicateRG: this.onDuplicateRGClick,
@@ -155,18 +157,22 @@ class ReceivingGoods extends Component {
       handlePrintRGReport: this.printRGReport,
     }
     const { showWriteOff, showDuplicateRG, selectedRows } = this.state
-
+    let height = mainDivHeight - 170 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <FilterBar
-          actions={actionProps}
-          dispatch={dispatch}
-          classes={classes}
-        />
+        <div className='filterBar'>
+          <FilterBar
+            actions={actionProps}
+            dispatch={dispatch}
+            classes={classes}
+          />
+        </div>
         <ReceivingGoodsDataGrid
           selectedRows={selectedRows}
           actions={actionProps}
           {...this.props}
+          height={height}
         />
 
         <CommonModal

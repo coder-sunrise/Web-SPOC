@@ -1,11 +1,7 @@
 import React, { PureComponent } from 'react'
-
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 import { status } from '@/utils/codes'
 import { CommonTableGrid, Button, Tooltip } from '@/components'
-import * as service from './services'
 import Legend from '@/pages/Widgets/DentalChart/Setup/Legend'
 
 class Grid extends PureComponent {
@@ -112,49 +108,12 @@ class Grid extends PureComponent {
           )
         },
       },
-      // { columnName: 'code', width: 200 },
-      // {
-      //   columnName: 'isActive',
-      //   sortingEnabled: false,
-      //   type: 'select',
-      //   options: status,
-      //   align: 'center',
-      //   width: 100,
-      // },
-      // {
-      //   columnName: 'action',
-      //   align: 'center',
-      //   render: (row) => {
-      //     return (
-      //       <Tooltip title='Edit Treatment'>
-      //         <Button
-      //           size='sm'
-      //           onClick={() => {
-      //             this.editRow(row)
-      //           }}
-      //           justIcon
-      //           color='primary'
-      //         >
-      //           <Edit />
-      //         </Button>
-      //       </Tooltip>
-      //     )
-      //   },
-      // },
     ],
   }
 
   editRow = (row, e) => {
     const { dispatch, settingTreatment } = this.props
     const { list } = settingTreatment
-    // For complex object retrieve from server
-    // dispatch({
-    //   type: 'settingTreatment/queryOne',
-    //   payload: {
-    //     id: row.id,
-    //   },
-    // }).then(toggleModal)
-    // console.log(settingTreatment, row.id, e)
     dispatch({
       type: 'settingTreatment/updateState',
       payload: {
@@ -165,13 +124,15 @@ class Grid extends PureComponent {
   }
 
   render () {
-    const { dispatch, classes, settingTreatment, toggleModal } = this.props
-
+    const { height } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
         type='settingTreatment'
         onRowDoubleClick={this.editRow}
+        TableProps={{
+          height,
+        }}
         {...this.configs}
       />
     )

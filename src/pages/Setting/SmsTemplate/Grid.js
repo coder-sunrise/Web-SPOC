@@ -21,23 +21,16 @@ class Grid extends PureComponent {
     })
   }
 
-  // getTooltipTitle = () => {
-  //   const pathname = window.location.pathname.trim().toLowerCase()
-
-  //   const modalTitle =
-  //     pathname == '/setting/smstemplate'
-  //       ? 'SMS Template'
-  //       : 'Document Template'
-
-  //   return `Edit ${modalTitle}`
-  // }
-
   render () {
+    const { height } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
         type='settingSmsTemplate'
         onRowDoubleClick={this.editRow}
+        TableProps={{
+          height,
+        }}
         columns={[
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },
@@ -48,7 +41,6 @@ class Grid extends PureComponent {
             title: 'Action',
           },
         ]}
-        // FuncProps={{ pager: false }}
         columnExtensions={[
           {
             columnName: 'isActive',

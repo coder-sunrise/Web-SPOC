@@ -6,9 +6,7 @@ import { formatMessage } from 'umi/locale'
 import moment from 'moment'
 import { Radio } from 'antd'
 import Delete from '@material-ui/icons/Delete'
-import SharedContainer from './SharedContainer'
 import {
-  CardContainer,
   GridContainer,
   GridItem,
   NumberInput,
@@ -20,6 +18,7 @@ import {
   dateFormatLong,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
+import SharedContainer from './SharedContainer'
 
 const styles = (theme) => ({
   infoPanl: {
@@ -152,7 +151,6 @@ const Stock = ({
 
   const [
     tableParas,
-    setTableParas,
   ] = useState({
     columns: [
       { name: 'batchNo', title: 'Batch No.' },
@@ -240,8 +238,8 @@ const Stock = ({
         hideHeader
         style={{
           margin: theme.spacing(1),
-          minHeight: 700,
-          maxHeight: 700,
+          minHeight: 670,
+          maxHeight: 670,
         }}
       >
         <h4 style={{ fontWeight: 400 }}>
@@ -251,7 +249,6 @@ const Stock = ({
           <GridItem xs={12} md={4}>
             <Field
               name={`${objectType().stockProp}`}
-              // name={`${objectType()}.length`}
               render={(args) => {
                 return (
                   <NumberInput
@@ -299,7 +296,6 @@ const Stock = ({
           </GridItem>
         </GridContainer>
         <CommonTableGrid rows={stock} showIsDeleted {...tableParas} />
-        {/* <Divider style={{ margin: '40px 0 20px 0' }} /> */}
       </div>
     </SharedContainer>
   )

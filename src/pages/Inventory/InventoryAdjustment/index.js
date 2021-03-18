@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-
-import { withStyles, Divider } from '@material-ui/core'
+import $ from 'jquery'
+import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
 import { CardContainer, CommonModal } from '@/components'
@@ -14,12 +14,12 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ inventoryAdjustment }) => ({
+@connect(({ inventoryAdjustment, global }) => ({
   inventoryAdjustment,
+  mainDivHeight: global.mainDivHeight,
 }))
 class InventoryAdjustment extends PureComponent {
   state = {
-    // runningNo: '',
     open: false,
   }
 
@@ -38,24 +38,10 @@ class InventoryAdjustment extends PureComponent {
         ],
       },
     })
-    // this.props
-    //   .dispatch({
-    //     type: 'inventoryAdjustment/generateRunningNo',
-    //   })
-    //   .then((v) => {
-    //     const { data } = v
-    //     this.setState({ runningNo: data })
-    //   })
   }
 
   toggleModal = async () => {
-    const { dispatch, inventoryAdjustment } = this.props
-    // await dispatch({
-    //   type: 'inventoryAdjustment/updateState',
-    //   payload: {
-    //     showModal: !inventoryAdjustment.showModal,
-    //   },
-    // })
+    const { dispatch } = this.props
     this.setState((prevState) => {
       return {
         open: !prevState.open,
@@ -72,32 +58,22 @@ class InventoryAdjustment extends PureComponent {
     }
   }
 
-  // getRunningNo = () => {
-  //   this.props
-  //     .dispatch({
-  //       type: 'inventoryAdjustment/generateRunningNo',
-  //     })
-  //     .then((v) => {
-  //       const { data } = v
-  //       this.setState({ runningNo: data })
-  //     })
-  // }
-
   render () {
-    const {
-      classes,
-      inventoryAdjustment,
-      dispatch,
-      theme,
-      ...restProps
-    } = this.props
+    const { inventoryAdjustment, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
+    let height =
+      mainDivHeight - 110 - $('.filterBar').height() ||
+      0 - $('.footerBar').height() ||
+      0
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <Filter {...cfg} {...this.props} toggleModel={this.toggleModal} />
-        <Grid {...cfg} {...this.props} />
+        <div className='filterBar'>
+          <Filter {...cfg} {...this.props} toggleModel={this.toggleModal} />
+        </div>
+        <Grid {...cfg} {...this.props} height={height} />
         <CommonModal
           open={this.state.open}
           observe='InventoryAdjustment'
@@ -113,12 +89,7 @@ class InventoryAdjustment extends PureComponent {
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
         >
-          <Detail
-            {...cfg}
-            {...this.props}
-            // runningNo={this.state.runningNo}
-            // getRunningNo={this.getRunningNo}
-          />
+          <Detail {...cfg} {...this.props} />
         </CommonModal>
       </CardContainer>
     )

@@ -1,13 +1,11 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { GridContextMenuButton as GridButton } from 'medisys-components'
-import { formatMessage } from 'umi/locale'
-import { CommonTableGrid, Tooltip, notification } from '@/components'
-import Authorized from '@/utils/Authorized'
-import { ContextMenuOptions, PurchaseReceiveGridCol } from '../variables'
+import { CommonTableGrid, Tooltip } from '@/components'
 import {
   PURCHASE_ORDER_STATUS_TEXT,
   INVOICE_STATUS_TEXT,
 } from '@/utils/constants'
+import { ContextMenuOptions, PurchaseReceiveGridCol } from '../variables'
 
 const enabledSelectPOStatus = [
   PURCHASE_ORDER_STATUS_TEXT.FINALIZED,
@@ -23,12 +21,8 @@ const PurchaseReceiveDataGrid = ({
     handleOnSelectionChange,
     handlePrintPOReport,
   },
+  height,
 }) => {
-  // const [
-  //   selectedRows,
-  //   setSelectedRows,
-  // ] = useState([])
-
   const onContextButtonClick = (row, id) => {
     switch (id) {
       case '0':
@@ -51,11 +45,12 @@ const PurchaseReceiveDataGrid = ({
       type='purchaseReceiveList'
       selection={selectedRows}
       forceRender
-      // onSelectionChange={(selection) => setSelectedRows(selection)}
       onSelectionChange={handleOnSelectionChange}
       columns={PurchaseReceiveGridCol}
       onRowDoubleClick={(row) => handleNavigate('edit', row.id)}
-      // onRowDoubleClick={(row) => console.log(row)}
+      TableProps={{
+        height,
+      }}
       columnExtensions={[
         {
           columnName: 'invoiceStatus',

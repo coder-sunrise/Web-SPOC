@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 import { formatMessage } from 'umi/locale'
 // formik
 import { withFormik } from 'formik'
@@ -32,8 +33,9 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ chasClaimSubmissionRejected }) => ({
+@connect(({ chasClaimSubmissionRejected, global }) => ({
   chasClaimSubmissionRejected,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withFormik({
   mapPropsToValues: () => ({}),
@@ -108,10 +110,15 @@ class RejectedCHAS extends React.Component {
       handleContextMenuItemClick,
       dispatch,
       values,
+      mainDivHeight = 700,
     } = this.props
     const { isLoading, selectedRows } = this.state
     const { list } = chasClaimSubmissionRejected || []
-
+    let height =
+      mainDivHeight - 230 - $('.filterBar').height() ||
+      0 - $('.footerBar').height() ||
+      0
+    if (height < 300) height = 300
     return (
       <CardContainer
         hideHeader
@@ -120,11 +127,13 @@ class RejectedCHAS extends React.Component {
           marginRight: 5,
         }}
       >
-        <BaseSearchBar
-          dispatch={dispatch}
-          values={values}
-          modelsName='chasClaimSubmissionRejected'
-        />
+        <div className='filterBar'>
+          <BaseSearchBar
+            dispatch={dispatch}
+            values={values}
+            modelsName='chasClaimSubmissionRejected'
+          />
+        </div>
         <LoadingWrapper
           linear
           loading={isLoading}
@@ -136,7 +145,6 @@ class RejectedCHAS extends React.Component {
                 data={list}
                 columnExtensions={RejectedCHASColumnExtensions}
                 columns={RejectedCHASColumns}
-                // tableConfig={TableConfig}
                 FuncProps={{
                   selectable: true,
                   selectConfig: {
@@ -149,44 +157,48 @@ class RejectedCHAS extends React.Component {
                 onContextMenuItemClick={(row, id) =>
                   handleContextMenuItemClick(row, id, true)}
                 type='rejected'
+                height={height}
               />
             </GridItem>
-
-            <GridItem md={4} className={classes.buttonGroup}>
-              <Tooltip
-                placement='bottom-start'
-                title={formatMessage({
-                  id:
-                    'claimsubmission.invoiceClaim.refreshPatientDetail.tooltips',
-                })}
-              >
-                <div style={{ display: 'inline-block' }}>
+          </GridContainer>
+          <div className='footerBar'>
+            <GridContainer>
+              <GridItem md={12} className={classes.buttonGroup}>
+                <Tooltip
+                  placement='bottom-start'
+                  title={formatMessage({
+                    id:
+                      'claimsubmission.invoiceClaim.refreshPatientDetail.tooltips',
+                  })}
+                >
+                  <div style={{ display: 'inline-block' }}>
+                    <ProgressButton
+                      icon={null}
+                      color='info'
+                      disabled={selectedRows.length <= 0}
+                      onClick={this.onRefreshClicked}
+                    >
+                      {formatMessage({
+                        id: 'claimsubmission.invoiceClaim.refreshPatientDetail',
+                      })}
+                    </ProgressButton>
+                  </div>
+                </Tooltip>
+                <Authorized authority='claimsubmission.submitclaim'>
                   <ProgressButton
                     icon={null}
-                    color='info'
+                    color='primary'
                     disabled={selectedRows.length <= 0}
-                    onClick={this.onRefreshClicked}
+                    onClick={this.onReSubmitClaimClicked}
                   >
                     {formatMessage({
-                      id: 'claimsubmission.invoiceClaim.refreshPatientDetail',
+                      id: 'claimsubmission.invoiceClaim.ResubmitClaim',
                     })}
                   </ProgressButton>
-                </div>
-              </Tooltip>
-              <Authorized authority='claimsubmission.submitclaim'>
-                <ProgressButton
-                  icon={null}
-                  color='primary'
-                  disabled={selectedRows.length <= 0}
-                  onClick={this.onReSubmitClaimClicked}
-                >
-                  {formatMessage({
-                    id: 'claimsubmission.invoiceClaim.ResubmitClaim',
-                  })}
-                </ProgressButton>
-              </Authorized>
-            </GridItem>
-          </GridContainer>
+                </Authorized>
+              </GridItem>
+            </GridContainer>
+          </div>
         </LoadingWrapper>
       </CardContainer>
     )

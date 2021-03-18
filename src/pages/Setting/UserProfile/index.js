@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 import router from 'umi/router'
 import { FormattedMessage } from 'umi/locale'
 import Search from '@material-ui/icons/Search'
@@ -31,7 +32,10 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ settingUserProfile }) => ({ settingUserProfile }))
+@connect(({ settingUserProfile, global }) => ({
+  settingUserProfile,
+  mainDivHeight: global.mainDivHeight,
+}))
 @withSettingBase({ modelName: 'settingUserProfile' })
 @withFormik({
   mapPropsToValues: () => ({
@@ -140,54 +144,63 @@ class UserProfile extends React.Component {
   }
 
   render () {
-    const { classes } = this.props
+    const { classes, mainDivHeight = 700 } = this.props
+    let height = mainDivHeight - 100 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
+        <div className='filterBar'>
+          <GridContainer>
+            <GridItem md={4}>
+              <FastField
+                name='searchQuery'
+                render={(args) => (
+                  <TextField
+                    {...args}
+                    label='Login Account / Name'
+                    autocomplete='off'
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={2}>
+              <FastField
+                name='status'
+                render={(args) => (
+                  <Select
+                    {...args}
+                    label='Status'
+                    options={[
+                      { name: 'Active', value: true },
+                      { name: 'Inactive', value: false },
+                    ]}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={12} className={classes.verticalSpacing}>
+              <ProgressButton
+                color='primary'
+                onClick={this.handleSearchClick}
+                icon={<Search />}
+              >
+                <FormattedMessage id='form.search' />
+              </ProgressButton>
+              <Button color='primary' onClick={this.openModal}>
+                <Add />
+                Add New
+              </Button>
+            </GridItem>
+          </GridContainer>
+        </div>
         <GridContainer>
-          <GridItem md={4}>
-            <FastField
-              name='searchQuery'
-              render={(args) => (
-                <TextField
-                  {...args}
-                  label='Login Account / Name'
-                  autocomplete='off'
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem md={2}>
-            <FastField
-              name='status'
-              render={(args) => (
-                <Select
-                  {...args}
-                  label='Status'
-                  options={[
-                    { name: 'Active', value: true },
-                    { name: 'Inactive', value: false },
-                  ]}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem md={12} className={classes.verticalSpacing}>
-            <ProgressButton
-              color='primary'
-              onClick={this.handleSearchClick}
-              icon={<Search />}
-            >
-              <FormattedMessage id='form.search' />
-            </ProgressButton>
-            <Button color='primary' onClick={this.openModal}>
-              <Add />
-              Add New
-            </Button>
-          </GridItem>
           <GridItem md={12}>
             <CommonTableGrid
               type='settingUserProfile'
               {...this.state.gridConfig}
+              TableProps={{
+                height,
+              }}
               forceRender
               onRowDoubleClick={this.handleDoubleClick}
             />

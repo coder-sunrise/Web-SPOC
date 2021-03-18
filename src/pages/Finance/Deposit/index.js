@@ -1,11 +1,11 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 import { withStyles } from '@material-ui/core/styles'
 import moment from 'moment'
 import { compare } from '@/layouts'
 import { getBizSession } from '@/services/queue'
 import { CardContainer, WarningSnackbar } from '@/components'
-import Authorized from '@/utils/Authorized'
 import FilterBar from './FilterBar'
 import Grid from './Grid'
 
@@ -15,11 +15,13 @@ const styles = () => ({
     color: 'black',
   },
 })
-@connect(({ deposit }) => ({
-  deposit,
-}))
+
 @compare('deposit')
-class Deposit extends PureComponent {
+@connect(({ deposit, global }) => ({
+  deposit,
+  mainDivHeight: global.mainDivHeight,
+}))
+class Deposit extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -59,25 +61,34 @@ class Deposit extends PureComponent {
 
   render () {
     const { props } = this
-    const { classes, ...restProps } = props
+    const { classes, mainDivHeight = 700, ...restProps } = props
+
+    let height = mainDivHeight - 100 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        {!this.state.hasActiveSession ? (
-          <div style={{ paddingTop: 5 }}>
-            <WarningSnackbar
-              variant='warning'
-              className={classes.margin}
-              message='Action(s) is not allowed due to no active session was found.'
-            />
-          </div>
-        ) : (
-          ''
-        )}
-        <FilterBar
-          queryDepositListing={this.queryDepositListing}
+        <div className='filterBar'>
+          {!this.state.hasActiveSession ? (
+            <div style={{ paddingTop: 5 }}>
+              <WarningSnackbar
+                variant='warning'
+                className={classes.margin}
+                message='Action(s) is not allowed due to no active session was found.'
+              />
+            </div>
+          ) : (
+            ''
+          )}
+          <FilterBar
+            queryDepositListing={this.queryDepositListing}
+            {...restProps}
+          />
+        </div>
+        <Grid
           {...restProps}
+          hasActiveSession={this.state.hasActiveSession}
+          height={height}
         />
-        <Grid {...restProps} hasActiveSession={this.state.hasActiveSession} />
       </CardContainer>
     )
   }

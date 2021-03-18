@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-
+import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
@@ -17,12 +17,13 @@ const styles = (theme) => ({
 @connect(({ settingTreatmentCategory, global }) => ({
   settingTreatmentCategory,
   global,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withSettingBase({ modelName: 'settingTreatmentCategory' })
 class TreatmentCategory extends PureComponent {
   state = {}
 
-  componentDidMount() {
+  componentDidMount () {
     this.props.dispatch({
       type: 'settingTreatmentCategory/query',
     })
@@ -37,15 +38,19 @@ class TreatmentCategory extends PureComponent {
     })
   }
 
-  render() {
-    const { settingTreatmentCategory } = this.props
+  render () {
+    const { settingTreatmentCategory, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
+    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <Filter {...cfg} {...this.props} />
-        <Grid {...cfg} {...this.props} />
+        <div className='filterBar'>
+          <Filter {...cfg} {...this.props} />
+        </div>
+        <Grid {...cfg} {...this.props} height={height} />
         <CommonModal
           open={settingTreatmentCategory.showModal}
           observe='TreatmentCategoryDetail'
@@ -53,8 +58,8 @@ class TreatmentCategory extends PureComponent {
             settingTreatmentCategory.entity ? (
               'Edit Treatment Category'
             ) : (
-                'Add Treatment Category'
-              )
+              'Add Treatment Category'
+            )
           }
           maxWidth='md'
           bodyNoPadding

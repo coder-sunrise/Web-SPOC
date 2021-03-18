@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 import { formatMessage } from 'umi/locale'
 // formik
 import { withFormik } from 'formik'
@@ -20,7 +21,10 @@ import Authorized from '@/utils/Authorized'
 import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../TableGrid'
 // variables
-import { RejectedMedisaveColumnExtensions, RejectedMedisaveColumns } from './variables'
+import {
+  RejectedMedisaveColumnExtensions,
+  RejectedMedisaveColumns,
+} from './variables'
 
 const styles = (theme) => ({
   cardContainer: {
@@ -32,8 +36,9 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ medisaveClaimSubmissionRejected }) => ({
+@connect(({ medisaveClaimSubmissionRejected, global }) => ({
   medisaveClaimSubmissionRejected,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withFormik({
   mapPropsToValues: () => ({}),
@@ -56,12 +61,11 @@ class RejectedMedisave extends React.Component {
         payload: { claimIds: selectedRows },
       })
       .then((r) => {
-        console.log('onRefreshClicked',r)
         if (!r) {
           this.refreshDataGrid()
-            notification.success({
-              message: 'Patient Info Updated.',
-            })
+          notification.success({
+            message: 'Patient Info Updated.',
+          })
         }
       })
   }
@@ -90,15 +94,14 @@ class RejectedMedisave extends React.Component {
         .then((r) => {
           this.handleLoadingVisibility(false)
           if (r) {
-            const failedCount = r.filter(t => t.status !== 'SUCCESS').length          
-            if(failedCount === 0){ 
+            const failedCount = r.filter((t) => t.status !== 'SUCCESS').length
+            if (failedCount === 0) {
               notification.success({
                 message: 'Claim Re-Submission Success.',
               })
-            }
-            else {
+            } else {
               this.props.handleSubmitClaimStatus(failedCount)
-            } 
+            }
 
             this.refreshDataGrid()
           }
@@ -113,10 +116,15 @@ class RejectedMedisave extends React.Component {
       handleContextMenuItemClick,
       dispatch,
       values,
+      mainDivHeight = 700,
     } = this.props
     const { isLoading, selectedRows } = this.state
     const { list } = medisaveClaimSubmissionRejected || []
-
+    let height =
+      mainDivHeight - 230 - $('.filterBar').height() ||
+      0 - $('.footerBar').height() ||
+      0
+    if (height < 300) height = 300
     return (
       <CardContainer
         hideHeader
@@ -125,11 +133,13 @@ class RejectedMedisave extends React.Component {
           marginRight: 5,
         }}
       >
-        <BaseSearchBar
-          dispatch={dispatch}
-          values={values}
-          modelsName='medisaveClaimSubmissionRejected'
-        />
+        <div className='filterBar'>
+          <BaseSearchBar
+            dispatch={dispatch}
+            values={values}
+            modelsName='medisaveClaimSubmissionRejected'
+          />
+        </div>
         <LoadingWrapper
           linear
           loading={isLoading}
@@ -141,7 +151,6 @@ class RejectedMedisave extends React.Component {
                 data={list}
                 columnExtensions={RejectedMedisaveColumnExtensions}
                 columns={RejectedMedisaveColumns}
-                // tableConfig={TableConfig}
                 FuncProps={{
                   selectable: true,
                   selectConfig: {
@@ -154,48 +163,54 @@ class RejectedMedisave extends React.Component {
                 onContextMenuItemClick={(row, id) =>
                   handleContextMenuItemClick(row, id, true)}
                 type='rejected'
+                height={height}
               />
             </GridItem>
-
-            <GridItem md={4} className={classes.buttonGroup}>
-              <Tooltip
-                placement='bottom-start'
-                title={formatMessage({
-                  id:
-                    'claimsubmission.invoiceClaim.refreshPatientDetail.tooltips',
-                })}
-              >
-                <div style={{ display: 'inline-block' }}>
+          </GridContainer>
+          <div className='footerBar'>
+            <GridContainer>
+              <GridItem md={12} className={classes.buttonGroup}>
+                <Tooltip
+                  placement='bottom-start'
+                  title={formatMessage({
+                    id:
+                      'claimsubmission.invoiceClaim.refreshPatientDetail.tooltips',
+                  })}
+                >
+                  <div style={{ display: 'inline-block' }}>
+                    <ProgressButton
+                      icon={null}
+                      color='info'
+                      disabled={selectedRows.length <= 0}
+                      onClick={this.onRefreshClicked}
+                    >
+                      {formatMessage({
+                        id: 'claimsubmission.invoiceClaim.refreshPatientDetail',
+                      })}
+                    </ProgressButton>
+                  </div>
+                </Tooltip>
+                <Authorized authority='claimsubmission.submitclaim'>
                   <ProgressButton
                     icon={null}
-                    color='info'
+                    color='primary'
                     disabled={selectedRows.length <= 0}
-                    onClick={this.onRefreshClicked}
+                    onClick={this.onReSubmitClaimClicked}
                   >
                     {formatMessage({
-                      id: 'claimsubmission.invoiceClaim.refreshPatientDetail',
+                      id: 'claimsubmission.invoiceClaim.ResubmitClaim',
                     })}
                   </ProgressButton>
-                </div>
-              </Tooltip>
-              <Authorized authority='claimsubmission.submitclaim'>
-                <ProgressButton
-                  icon={null}
-                  color='primary'
-                  disabled={selectedRows.length <= 0}
-                  onClick={this.onReSubmitClaimClicked}
-                >
-                  {formatMessage({
-                    id: 'claimsubmission.invoiceClaim.ResubmitClaim',
-                  })}
-                </ProgressButton>
-              </Authorized>
-            </GridItem>
-          </GridContainer>
+                </Authorized>
+              </GridItem>
+            </GridContainer>
+          </div>
         </LoadingWrapper>
       </CardContainer>
     )
   }
 }
 
-export default withStyles(styles, { name: 'RejectedMedisave' })(RejectedMedisave)
+export default withStyles(styles, { name: 'RejectedMedisave' })(
+  RejectedMedisave,
+)

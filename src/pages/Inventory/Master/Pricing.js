@@ -1,17 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import { Divider } from '@material-ui/core'
 import { FastField } from 'formik'
 import { formatMessage } from 'umi/locale'
+import { GridContainer, GridItem, NumberInput, Field } from '@/components'
 import SharedContainer from './SharedContainer'
-
-import {
-  CardContainer,
-  GridContainer,
-  GridItem,
-  NumberInput,
-  Field,
-} from '@/components'
 
 const styles = () => ({})
 
@@ -21,7 +13,6 @@ const Pricing = ({
   medicationDetail,
   vaccinationDetail,
   consumableDetail,
-  setValues,
   theme,
 }) => {
   const [
@@ -38,20 +29,6 @@ const Pricing = ({
       parseFloat(acp) * (1 + parseFloat(markupMargin) / 100)
     setFieldValue('suggestSellingPrice', suggestedSellingPrice)
   }
-
-  // useEffect(() => {
-  //   if (medicationDetail) {
-  //     return setFieldValue('averageCostPrice', 0.0)
-  //   }
-  //   if (vaccinationDetail) {
-  //     return setFieldValue('averageCostPrice', 0.0)
-  //   }
-
-  //   if (consumableDetail) {
-  //     return setFieldValue('averageCostPrice', 0.0)
-  //   }
-  //   return undefined
-  // }, [])
 
   const isEditMode = () => {
     if (medicationDetail && medicationDetail.entity) {
@@ -84,8 +61,8 @@ const Pricing = ({
         hideHeader
         style={{
           margin: theme.spacing(1),
-          minHeight: 700,
-          maxHeight: 700,
+          minHeight: 670,
+          maxHeight: 670,
         }}
       >
         <h4 style={{ fontWeight: 400 }}>
@@ -220,7 +197,6 @@ const Pricing = ({
             </GridContainer>
           </GridItem>
         </GridContainer>
-        {/* <Divider style={{ margin: '40px 0 20px 0' }} /> */}
       </div>
     </SharedContainer>
   )

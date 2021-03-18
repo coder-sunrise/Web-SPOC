@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 import { withStyles } from '@material-ui/core/styles'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 import { CardContainer, CommonModal, withSettingBase } from '@/components'
@@ -11,8 +12,9 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingPackage }) => ({
+@connect(({ settingPackage, global }) => ({
   settingPackage,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withSettingBase({ modelName: 'settingPackage' })
 class Package extends PureComponent {
@@ -21,10 +23,6 @@ class Package extends PureComponent {
       type: 'settingPackage/query',
       payload: {
         isUserMaintainable: true,
-        // sorting: [
-        //   { columnName: 'effectiveEndDate', direction: 'desc' },
-        //   { columnName: 'displayValue', direction: 'asc' },
-        // ],
       },
     })
   }
@@ -39,15 +37,18 @@ class Package extends PureComponent {
   }
 
   render () {
-    const { settingPackage } = this.props
+    const { settingPackage, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-
+    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <Filter {...cfg} {...this.props} />
-        <Grid {...cfg} {...this.props} toggleModal={this.toggleModal} />
+        <div className='filterBar'>
+          <Filter {...cfg} {...this.props} />
+        </div>
+        <Grid {...cfg} {...this.props} height={height} />
         <CommonModal
           open={settingPackage.showModal}
           observe='PackageDetail'

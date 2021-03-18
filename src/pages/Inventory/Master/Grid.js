@@ -1,12 +1,14 @@
-import React, { useEffect, Fragment } from 'react'
+import React, { Fragment } from 'react'
+import $ from 'jquery'
+import { connect } from 'dva'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import Edit from '@material-ui/icons/Edit'
-
 import { Button, CommonTableGrid, Tooltip, notification } from '@/components'
 import Authorized from '@/utils/Authorized'
 
-// const { Secured } = Authorized
-// @Secured('inventorymaster.inventoryitemdetails')
+@connect(({ global }) => ({
+  mainDivHeight: global.mainDivHeight,
+}))
 class Grid extends React.Component {
   render () {
     const {
@@ -18,8 +20,9 @@ class Grid extends React.Component {
       columnWidths,
       list,
       disabled,
+      mainDivHeight,
     } = this.props
-    const showDetail = (row, vmode) => () =>
+    const showDetail = (row) => () =>
       history.push(`/inventory/master/edit${namespace}?uid=${row.id}`)
     const handleDoubleClick = (row) => {
       const accessRight = Authorized.check(
@@ -66,7 +69,8 @@ class Grid extends React.Component {
     const TableCell = (p) => Cell({ ...p, dispatch })
 
     const ActionProps = { TableCellComponent: TableCell }
-
+    let height = mainDivHeight - 180 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CommonTableGrid
         type={`${namespace}`}
@@ -77,6 +81,9 @@ class Grid extends React.Component {
         ActionProps={ActionProps}
         FuncProps={{ pager: true }}
         {...tableParas}
+        TableProps={{
+          height,
+        }}
       />
     )
   }

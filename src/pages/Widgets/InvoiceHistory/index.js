@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 import { compose } from 'redux'
 import moment from 'moment'
 // material ui
@@ -29,9 +30,6 @@ const styles = () => ({
     marginTop: 10,
     marginBottom: 10,
   },
-  accordionStyle: {
-    marginTop: 50,
-  },
   titleContainer: {
     display: 'flex',
   },
@@ -56,6 +54,7 @@ const InvoiceHistory = ({
   patient,
   invoiceHistory: { list },
   classes,
+  mainDivHeight = 700,
 }) => {
   const refreshInvoiceList = () => {
     const { id } = patient.entity
@@ -139,7 +138,8 @@ const InvoiceHistory = ({
               Date: {moment(invoiceDate).format(dateFormatLong)}
             </p>
             <p className={classes.title}>
-              Invoice Amount: <NumberInput text currency value={invoiceTotalAftGST} />
+              Invoice Amount:{' '}
+              <NumberInput text currency value={invoiceTotalAftGST} />
             </p>
             <p className={classes.title}>
               Total Paid: <NumberInput text currency value={totalPayment} />
@@ -149,7 +149,8 @@ const InvoiceHistory = ({
                 patientOutstanding !== 0 ? classes.titleBold : classes.title
               }
             >
-              Patient O/S Balance: <NumberInput text currency value={patientOutstanding} />
+              Patient O/S Balance:{' '}
+              <NumberInput text currency value={patientOutstanding} />
             </p>
             <p className={classes.printButtonStyle}>
               <Button
@@ -176,25 +177,29 @@ const InvoiceHistory = ({
     }, 0)
   }
 
+  let height = mainDivHeight - 230 - ($('.filterBar').height() || 0)
+  if (height < 300) height = 300
   return (
     <div>
       <CardContainer hideHeader size='sm'>
-        {!hasActiveSession ? (
-          <div style={{ paddingTop: 5 }}>
-            <WarningSnackbar
-              variant='warning'
-              className={classes.margin}
-              message='Action(s) is not allowed due to no active session was found.'
-            />
+        <div className='filterBar'>
+          {!hasActiveSession ? (
+            <div style={{ paddingTop: 5 }}>
+              <WarningSnackbar
+                variant='warning'
+                className={classes.margin}
+                message='Action(s) is not allowed due to no active session was found.'
+              />
+            </div>
+          ) : (
+            ''
+          )}
+          <div className={classes.totalOSStyle}>
+            Total Patient O/S Balance:
+            <NumberInput text currency value={getTotalPatientOS()} />
           </div>
-        ) : (
-          ''
-        )}
-        <div className={classes.totalOSStyle}>
-          Total Patient O/S Balance: <NumberInput text currency value={getTotalPatientOS()} />
         </div>
-
-        <div className={classes.accordionStyle}>
+        <div style={{ height, marginTop: 50, overflow: 'auto' }}>
           <Accordion
             mode='multiple'
             collapses={list.map((o) => {
@@ -228,8 +233,9 @@ const InvoiceHistory = ({
 
 export default compose(
   withStyles(styles),
-  connect(({ patient, patientHistory }) => ({
+  connect(({ patient, patientHistory, global }) => ({
     patient,
     invoiceHistory: patientHistory.invoiceHistory,
+    mainDivHeight: global.mainDivHeight,
   })),
 )(InvoiceHistory)

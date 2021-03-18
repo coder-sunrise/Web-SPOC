@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-
+import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
@@ -11,61 +11,60 @@ import Grid from './Grid'
 import Detail from './Detail'
 
 const styles = (theme) => ({
-    ...basicStyle(theme),
+  ...basicStyle(theme),
 })
 
 @connect(({ settingCaseType, global }) => ({
-    settingCaseType,
-    global,
+  settingCaseType,
+  global,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withSettingBase({ modelName: 'settingCaseType' })
 class CaseType extends PureComponent {
-    state = {}
+  state = {}
 
-    componentDidMount() {
-        this.props.dispatch({
-            type: 'settingCaseType/query',
-        })
-    }
+  componentDidMount () {
+    this.props.dispatch({
+      type: 'settingCaseType/query',
+    })
+  }
 
-    toggleModal = () => {
-        this.props.dispatch({
-            type: 'settingCaseType/updateState',
-            payload: {
-                showModal: !this.props.settingCaseType.showModal,
-            },
-        })
-    }
+  toggleModal = () => {
+    this.props.dispatch({
+      type: 'settingCaseType/updateState',
+      payload: {
+        showModal: !this.props.settingCaseType.showModal,
+      },
+    })
+  }
 
-    render() {
-        const { settingCaseType } = this.props
-        const cfg = {
-            toggleModal: this.toggleModal,
-        }
-        return (
-            <CardContainer hideHeader>
-                <Filter {...cfg} {...this.props} />
-                <Grid {...cfg} {...this.props} />
-                <CommonModal
-                    open={settingCaseType.showModal}
-                    observe='CaseTypeDetail'
-                    title={
-                        settingCaseType.entity ? (
-                            'Edit Case Type'
-                        ) : (
-                                'Add Case Type'
-                            )
-                    }
-                    maxWidth='md'
-                    bodyNoPadding
-                    onClose={this.toggleModal}
-                    onConfirm={this.toggleModal}
-                >
-                <Detail {...cfg} {...this.props} />
-                </CommonModal>
-            </CardContainer>
-        )
+  render () {
+    const { settingCaseType, mainDivHeight = 700 } = this.props
+    const cfg = {
+      toggleModal: this.toggleModal,
     }
+    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
+    return (
+      <CardContainer hideHeader>
+        <div className='filterBar'>
+          <Filter {...cfg} {...this.props} />
+        </div>
+        <Grid {...cfg} {...this.props} height={height} />
+        <CommonModal
+          open={settingCaseType.showModal}
+          observe='CaseTypeDetail'
+          title={settingCaseType.entity ? 'Edit Case Type' : 'Add Case Type'}
+          maxWidth='md'
+          bodyNoPadding
+          onClose={this.toggleModal}
+          onConfirm={this.toggleModal}
+        >
+          <Detail {...cfg} {...this.props} />
+        </CommonModal>
+      </CardContainer>
+    )
+  }
 }
 
 export default withStyles(styles, { withTheme: true })(CaseType)

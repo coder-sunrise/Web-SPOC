@@ -1,17 +1,18 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 import * as Yup from 'yup'
 // material ui
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 // common component
 import { CardContainer, CommonModal, withSettingBase } from '@/components'
+import DoctorBlockForm from '@/pages/Reception/Appointment/components/form/DoctorBlock'
 // medisys component
 import { LoadingWrapper } from '@/components/_medisys'
 // sub component
 import Filter from './Filter'
 import Grid from './Grid'
-import DoctorBlockForm from '@/pages/Reception/Appointment/components/form/DoctorBlock'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -25,9 +26,10 @@ const DoctorFormValidation = Yup.object().shape({
   eventTime: Yup.string().required(),
 })
 
-@connect(({ doctorBlock, loading }) => ({
+@connect(({ doctorBlock, loading, global }) => ({
   doctorBlock,
   loading: loading.effects['doctorBlock/query'],
+  mainDivHeight: global.mainDivHeight,
 }))
 @withSettingBase({ modelName: 'doctorBlock' })
 class DoctorBlock extends PureComponent {
@@ -92,16 +94,20 @@ class DoctorBlock extends PureComponent {
 
   render () {
     const { showModal } = this.state
-    const { doctorBlock, loading, dispatch } = this.props
-
+    const { doctorBlock, loading, dispatch, mainDivHeight = 700 } = this.props
+    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <Filter toggleModal={this.toggleModal} dispatch={dispatch} />
+        <div className='filterBar'>
+          <Filter toggleModal={this.toggleModal} dispatch={dispatch} />
+        </div>
         <LoadingWrapper loading={loading} text='Refreshing list...'>
           <Grid
             onEditClick={this.handleEdit}
             onDeleteClick={this.handleDelete}
             dataSource={doctorBlock.list}
+            height={height}
           />
         </LoadingWrapper>
         <CommonModal

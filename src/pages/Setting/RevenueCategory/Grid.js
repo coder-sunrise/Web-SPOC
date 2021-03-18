@@ -1,25 +1,14 @@
 import React, { PureComponent } from 'react'
 
 import { CommonTableGrid, Button, Tooltip } from '@/components'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { status } from '@/utils/codes'
-import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
-import * as service from './services'
 
 class Grid extends PureComponent {
   editRow = (row, e) => {
     const { dispatch, settingRevenue } = this.props
 
     const { list } = settingRevenue
-    // For complex object retrieve from server
-    // dispatch({
-    //   type: 'settingRevenue/queryOne',
-    //   payload: {
-    //     id: row.id,
-    //   },
-    // }).then(toggleModal)
-    // console.log(settingRevenue, row.id, e)
     dispatch({
       type: 'settingRevenue/updateState',
       payload: {
@@ -30,12 +19,15 @@ class Grid extends PureComponent {
   }
 
   render () {
-    const { dispatch, classes, settingRevenue, toggleModal } = this.props
+    const { height } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
         type='settingRevenue'
         onRowDoubleClick={this.editRow}
+        TableProps={{
+          height,
+        }}
         columns={[
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },
@@ -46,7 +38,6 @@ class Grid extends PureComponent {
             title: 'Action',
           },
         ]}
-        // FuncProps={{ pager: false }}
         columnExtensions={[
           {
             columnName: 'isActive',

@@ -71,8 +71,10 @@ export const ApprovedCHASColumns = [
 ]
 
 export const ApprovedCHASColumnExtensions = [
-  { columnName: 'visitDate', type: 'date' },
-  { columnName: 'invoiceDate', type: 'date' },
+  { columnName: 'visitDate', type: 'date', width: 100 },
+  { columnName: 'invoiceDate', type: 'date', width: 100 },
+  { columnName: 'submissionDate', type: 'date', width: 120 },
+  { columnName: 'invoiceNo', width: 90 },
   {
     columnName: 'visitDoctorName',
     sortBy: 'DoctorProfileFKNavigation.ClinicianProfile.Name',

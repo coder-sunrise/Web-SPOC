@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
 import AccountCircle from '@material-ui/icons/AccountCircle'
 import { getAppendUrl } from '@/utils/utils'
@@ -12,17 +13,15 @@ import Grid from './Grid'
 const styles = () => ({})
 
 const { Secured } = Authorized
-@connect(({ patientSearch }) => ({
+@connect(({ patientSearch, global }) => ({
   patientSearch,
+  mainDivHeight: global.mainDivHeight,
 }))
 @compare('patientSearch')
 @Secured('patientdatabase/searchpatient')
 class PatientSearch extends PureComponent {
   constructor (props) {
     super(props)
-    // console.log(this)
-
-    // double click to view patient profile
     const showPatient = (row) => {
       const viewPatProfileAccessRight = Authorized.check(
         'patientdatabase.patientprofiledetails',
@@ -67,10 +66,6 @@ class PatientSearch extends PureComponent {
       </Tooltip>
     )
     this.defaultOnDblClick = showPatient
-    // props.dispatch({
-    //   type: 'patientSearch/query',
-    // })
-    // console.log('c PatientSearch')
   }
 
   componentDidMount () {
@@ -82,7 +77,6 @@ class PatientSearch extends PureComponent {
             includeinactive: window.location.pathname.includes('patientdb'),
           },
           sorting: [
-            // { columnName: 'isActive', direction: 'asc' },
             { columnName: 'name', direction: 'asc' },
           ],
         },
@@ -94,7 +88,6 @@ class PatientSearch extends PureComponent {
     this.props.dispatch({
       type: 'patientSearch/updateState',
       payload: {
-        // list: [],
         filter: {},
       },
     })
@@ -102,22 +95,33 @@ class PatientSearch extends PureComponent {
 
   render () {
     const { props } = this
-    // console.log(props)
     const {
       classes,
       renderActionFn = this.defaultAction,
       onRowDblClick = this.defaultOnDblClick,
       simple,
+      mainDivHeight = 700,
       ...restProps
     } = props
+
+    let height = 0
+    if (simple) {
+      height = mainDivHeight - 330 - ($('.filterBar').height() || 0)
+    } else {
+      height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    }
+    if (height < 300) height = 300
     const newChildren = (
       <React.Fragment>
-        <FilterBar {...restProps} simple={simple} />
+        <div className='filterBar'>
+          <FilterBar {...restProps} simple={simple} />
+        </div>
         <Grid
           simple={simple}
           renderActionFn={renderActionFn}
           onRowDblClick={onRowDblClick}
           {...restProps}
+          height={height}
         />
       </React.Fragment>
     )
