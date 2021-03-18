@@ -591,7 +591,6 @@ const ApplyClaims = ({
       (m) => m.code === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500HS,
     )
 
-    // console.log('claimableSchemesList',claimableSchemesList)
     claimableSchemesList.forEach((s, index) => {
       const invoicePayer = {
         ...defaultInvoicePayer,
@@ -896,7 +895,6 @@ const ApplyClaims = ({
         _isDeleted: true,
         isCancelled: true,
       }
-      console.log('updatedPayer',updatedPayer)
       updateTempInvoicePayer(updatedPayer, index)
     },
     [
