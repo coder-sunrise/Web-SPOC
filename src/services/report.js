@@ -71,6 +71,23 @@ export const getExcel = async (reportID, payload) => {
   })
 }
 
+export const getCsv = async (reportID, payload, tableName) => {
+  const baseURL = '/api/reports'
+  return request(`${baseURL}/${reportID}`, {
+    method: 'GET',
+    xhrFields: {
+      responseType: 'arraybuffer',
+    },
+    body: stringify({
+      reportFormat: 'CSV',
+      reportParameters: JSON.stringify({
+        ...commonDataWriterTransform(payload),
+      }),
+      tableName,
+    }),
+  })
+}
+
 export const exportPdfReport = async (reportID, payload, subject) => {
   const baseURL = '/api/reports'
   const _subject = subject || REPORT_TYPE[reportID]
