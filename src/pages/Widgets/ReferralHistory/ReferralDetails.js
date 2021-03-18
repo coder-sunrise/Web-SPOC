@@ -33,18 +33,17 @@ import {
   },
   enableReinitialize: true,
   displayName: 'patientReferralHistoryDetails',
-  
+
   handleSubmit: async (values, { props }) => {
-    const { dispatch,onConfirm,patientHistory } = props
+    const { dispatch, onConfirm, patientHistory } = props
     await dispatch({
       type: 'patientHistory/saveReferralHistory',
       payload: {
         ...values,
-        
       },
-    }).then ((r)=>{
-      if(r) {
-        if(onConfirm) onConfirm()
+    }).then((r) => {
+      if (r) {
+        if (onConfirm) onConfirm()
         dispatch({
           type: 'patientHistory/queryReferralHistory',
           payload: {
@@ -108,11 +107,10 @@ class ReferralDetails extends PureComponent {
             data = data.filter((t) => (t.referralSources || []).find((rs) => rs.id === referralSourceFK))
           }
           let result = data.map((m) => {
-            return { name: m.name, value: m.id}
+            return { name: m.name, value: m.id }
           })
           this.setState({ referralPersonList: result })
         }
-        
       })
   }
 
@@ -152,13 +150,13 @@ class ReferralDetails extends PureComponent {
 
   referralTypeChange = (e) => {
     if (e.target.value === 'Company') {
-      this.props.setFieldValue('referralPatientProfileFK',undefined)
+      this.props.setFieldValue('referralPatientProfileFK', undefined)
       let { values } = this.props
       let { referralPersonData, referralData } = this.state
       if (!values.referralPersonFK) {
         this.setState({
           referralList: referralData.map((m) => {
-            return { name: m.name, value: m.id}
+            return { name: m.name, value: m.id }
           }),
         })
       }
@@ -175,7 +173,7 @@ class ReferralDetails extends PureComponent {
     } else if (e.target.value === 'None') {
       this.props.setFieldValue('referralSourceFK', undefined)
       this.props.setFieldValue('referralPersonFK', undefined)
-      this.props.setFieldValue('referralPatientProfileFK',undefined)
+      this.props.setFieldValue('referralPatientProfileFK', undefined)
       this.props.setFieldValue('referralRemarks', undefined)
     }
   }
@@ -260,7 +258,7 @@ class ReferralDetails extends PureComponent {
   }
 
   render () {
-    const { values,footer} = this.props
+    const { values, footer } = this.props
 
     const { referralList, referralPersonList, showAddReferralPerson, showAddReferralSource } = this.state
 
@@ -276,7 +274,7 @@ class ReferralDetails extends PureComponent {
       },
       {
         value: 'Company',
-        label: 'Company',
+        label: 'Referral Source',
       },
       {
         value: 'Patient',
@@ -289,21 +287,21 @@ class ReferralDetails extends PureComponent {
         <GridContainer>
           <GridItem md={12}>
             <Field
-              name='referralBy'
+              name="referralBy"
               render={(args) => (
                 <RadioGroup
                   {...args}
-                  label='Referral'
-                  authority='none'
+                  label="Referral"
+                  authority="none"
                   onChange={this.referralTypeChange}
                   options={referralTypeOptions}
                 />
               )}
             />
           </GridItem>
-          {values.referralBy === 'Company'  && (
+          {values.referralBy === 'Company' && (
             <GridContainer>
-              <GridItem xs md={(8)}>
+              <GridItem xs md={8}>
                 <Field
                   name="referralSourceFK"
                   render={(args) => (
@@ -312,7 +310,7 @@ class ReferralDetails extends PureComponent {
                       options={referralList}
                       labelField="name"
                       valueField="value"
-                      label="Company Name"
+                      label="Referral Source"
                       onChange={(v) => {
                         this.onReferralByChange(v)
                       }}
@@ -320,76 +318,51 @@ class ReferralDetails extends PureComponent {
                   )}
                 />
               </GridItem>
-              <GridItem xs md={(4)}>
-                <Button
-                  color='primary'
-                  style={{ marginTop: '15px' }}
-                  onClick={this.addNewReferralSource}
-                  size='sm'
-                >
-                  <Add /> New Company
+              <GridItem xs md={4}>
+                <Button color="primary" style={{ marginTop: '15px' }} onClick={this.addNewReferralSource} size="sm">
+                  <Add /> New Referral Source
                 </Button>
               </GridItem>
-              <GridItem xs md={(8)}>
+              <GridItem xs md={8}>
                 <Field
-                  name='referralPersonFK'
+                  name="referralPersonFK"
                   render={(args) => (
                     <CodeSelect
                       {...args}
-                      labelField='name'
-                      label='Ref. Person Name'
+                      labelField="name"
+                      label="Ref. Person Name"
                       options={referralPersonList}
                       onChange={this.onReferralPersonChange}
-                      valueField='value'
+                      valueField="value"
                       disableAll
                     />
                   )}
                 />
               </GridItem>
-              <GridItem xs md={(4)}>
-                <Button
-                  color='primary'
-                  style={{ marginTop: '15px' }}
-                  onClick={this.addNewReferralPerson}
-                  size='sm'
-                >
+              <GridItem xs md={4}>
+                <Button color="primary" style={{ marginTop: '15px' }} onClick={this.addNewReferralPerson} size="sm">
                   <Add /> New Referral Person
                 </Button>
               </GridItem>
               <GridItem xs md={12}>
                 <FastField
-                  name='referralRemarks'
+                  name="referralRemarks"
                   render={(args) => (
-                    <TextField
-                      label='Remarks'
-                      multiline
-                      maxLength={400}
-                      inputProps={{ maxLength: 400 }}
-                      {...args}
-                    />
-                )}
+                    <TextField label="Remarks" multiline maxLength={400} inputProps={{ maxLength: 400 }} {...args} />
+                  )}
                 />
               </GridItem>
             </GridContainer>
           )}
-          {values.referralBy === 'Patient'  && (
+          {values.referralBy === 'Patient' && (
             <GridContainer>
-              <GridItem xs md={(12)}>
-                <Field
-                  name="referralPatientProfileFK"
-                  render={this.selectReferralPerson}
-                />
+              <GridItem xs md={12}>
+                <Field name="referralPatientProfileFK" render={this.selectReferralPerson} />
               </GridItem>
               <GridItem xs md={12}>
                 <FastField
-                  name='referralRemarks'
-                  render={(args) => (
-                    <TextField
-                      label='Remarks'
-                      multiline
-                      {...args}
-                    />
-                  )}
+                  name="referralRemarks"
+                  render={(args) => <TextField label="Remarks" multiline {...args} />}
                 />
               </GridItem>
             </GridContainer>
@@ -397,10 +370,10 @@ class ReferralDetails extends PureComponent {
         </GridContainer>
         <CommonModal
           open={showAddReferralSource}
-          title='New Referral Source'
-          cancelText='Cancel'
-          maxWidth='md'
-          observe='ReferralSourceDetail'
+          title="New Referral Source"
+          cancelText="Cancel"
+          maxWidth="md"
+          observe="ReferralSourceDetail"
           onClose={this.onAddReferralSourceClose}
           onConfirm={this.onAddReferralSourceClose}
         >
@@ -408,17 +381,13 @@ class ReferralDetails extends PureComponent {
         </CommonModal>
         <CommonModal
           open={showAddReferralPerson}
-          title='New Referral Person'
-          cancelText='Cancel'
-          maxWidth='md'
+          title="New Referral Person"
+          cancelText="Cancel"
+          maxWidth="md"
           onClose={this.onAddReferralPersonClose}
           onConfirm={this.onAddReferralPersonClose}
         >
-          <ReferralPersonDetail
-            {...cfg}
-            {...this.props}
-            referralSource={this.state.referralData}
-          />
+          <ReferralPersonDetail {...cfg} {...this.props} referralSource={this.state.referralData} />
         </CommonModal>
         {footer &&
           footer({
@@ -427,7 +396,6 @@ class ReferralDetails extends PureComponent {
             confirmBtnText: 'Save',
           })}
       </div>
-      
     )
   }
 }
