@@ -341,6 +341,7 @@ const ApplyClaims = ({
       mediInvoiceItems = cdmpScans
     }
 
+    // console.log(mediInvoiceItems , invoiceItems , updatedInvoiceItems)
     const payerInvoiceItems = getInvoiceItemsWithClaimAmount(
       { ...schemeConfig, claimType: payer.claimType },
       mediInvoiceItems || invoiceItems || updatedInvoiceItems,
@@ -693,8 +694,11 @@ const ApplyClaims = ({
       invoicePayment.filter((o) => !o.isCancelled).length === 0
     ) {
       if (claimableSchemes.length > 0) {
+        const hasMedisave = claimableSchemes.some((c) => c[0].schemePayerFK)
         const invoicePayerList = constructAvailableClaims(
-          claimableSchemes.filter((c) => !c[0].schemePayerFK),
+          hasMedisave 
+          ? claimableSchemes.filter((c) => !c[0].schemePayerFK && c[0].schemeCategoryFK !== 5) 
+          : claimableSchemes.filter((c) => !c[0].schemePayerFK),
         )
         const newInvoicePayers = processAvailableClaims([], invoicePayerList)
         setInitialState(newInvoicePayers)
@@ -858,7 +862,14 @@ const ApplyClaims = ({
         incrementCommitCount()
         return false
       }
-      const invalidMessages = validateClaimAmount(updatedPayer)
+      const invalidMessages = validateClaimAmount(updatedPayer,tempInvoicePayer,{
+        medisaveMedications,
+        medisaveVaccinations,
+        medisaveServices,
+        healthScreenings,
+        outpatientScans,
+      }
+        )
 
       if (invalidMessages.length <= 0) {
         setCurEditInvoicePayerBackup(undefined)
