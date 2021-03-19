@@ -26,7 +26,7 @@ import { DoctorProfileSelect } from '@/components/_medisys'
 
 const getVisitDoctorUserId = props => {
   const { doctorprofile } = props.codetable
-  const { doctorProfileFK } = props.visitRegistration.entity.visit   
+  const { doctorProfileFK } = props.visitRegistration.entity.visit
   let visitDoctorUserId
   if (doctorprofile && doctorProfileFK) {
     visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK).clinicianProfile.userProfileFK
@@ -53,8 +53,8 @@ const getVisitDoctorUserId = props => {
 
     if (_.isEmpty(orders.entity)) {
       const { doctorprofile } = codetable
-      if(visitRegistration && visitRegistration.entity) {
-        const { doctorProfileFK } = visitRegistration.entity.visit              
+      if (visitRegistration && visitRegistration.entity) {
+        const { doctorProfileFK } = visitRegistration.entity.visit
         if (doctorprofile && doctorProfileFK) {
           v.performingUserFK = doctorprofile.find(d => d.id === doctorProfileFK).clinicianProfile.userProfileFK
         }
@@ -73,9 +73,9 @@ const getVisitDoctorUserId = props => {
       'The amount should be more than 0.00',
     ),
     performingUserFK: Yup.number().required(),
-    expiryDate:Yup.date().min(
+    expiryDate: Yup.date().min(
       moment(),
-    'The batch of consumable is expired'),
+      'EXPIRED!'),
   }),
 
   handleSubmit: (values, { props, onConfirm, setValues }) => {
@@ -193,6 +193,7 @@ class Consumable extends PureComponent {
     setFieldValue('unitPrice', unitprice)
     setFieldValue('totalPrice', unitprice * values.quantity)
     this.updateTotalPrice(unitprice * values.quantity)
+    this.onExpiryDateChange()
   }
 
   updateTotalPrice = (v) => {
@@ -335,6 +336,15 @@ class Consumable extends PureComponent {
     setFieldValue('adjType', isExactAmount ? 'ExactAmount' : 'Percentage')
   }
 
+  onExpiryDateChange = () => {
+    window.setTimeout(async () => {
+      const { handleSubmit, validateForm } = this.props
+      const validateResult = await validateForm()
+      const isFormValid = _.isEmpty(validateResult)
+      if (!isFormValid) { handleSubmit() }
+    }, 300)
+  }
+
   render () {
     const {
       theme,
@@ -350,323 +360,325 @@ class Consumable extends PureComponent {
       Authorized.check('queue.consultation.modifyorderitemtotalprice')
         .rights !== 'enable'
 
-      return (
-        <Authorized
-          authority={GetOrderItemAccessRight(
-              from,
-              'queue.consultation.order.consumable',
-          )}
-        >
-          <div>
-            <GridContainer>
-              <GridItem xs={8}>
-                <Field
-                  name='inventoryConsumableFK'
-                  render={(args) => {
-                    return (
-                      <div
-                        id={`autofocus_${values.type}`}
-                        style={{ position: 'relative' }}
-                      >
-                        <CodeSelect
-                          temp
-                          label='Consumable Name'
-                          labelField='combinDisplayValue'
-                          onChange={this.changeConsumable}
-                          options={this.getConsumableOptions()}
-                          {...args}
-                          style={{ paddingRight: 20 }}
-                          disabled={values.isPackage}
-                        />
-                        <LowStockInfo sourceType='consumable' {...this.props} />
-                      </div>
-                    )
-                    }}
-                />
-              </GridItem>
-              {values.isPackage && (
-                <React.Fragment>
-                  <GridItem xs={3}>
-                    <Field
-                      name='packageConsumeQuantity'
-                      render={(args) => {
-                        return (
-                          <NumberInput
-                            label='Consumed Quantity'
-                            style={{
-                                marginLeft: theme.spacing(7),
-                                paddingRight: theme.spacing(6),
-                            }}
-                            step={1}
-                            min={0}
-                            max={values.remainingQuantity}
-                            disabled={this.props.visitRegistration.entity.visit.isInvoiceFinalized}
-                            {...args}
-                          />
-                        )
-                        }}
-                    />
-                  </GridItem>
-                  <GridItem xs={1}>
-                    <Field
-                      name='remainingQuantity'
-                      render={(args) => {
-                        return (
-                          <NumberInput
-                            style={{
-                                marginTop: theme.spacing(3),
-                            }}
-                            formatter={(v) => `/ ${parseFloat(v).toFixed(1)}`}
-                            text
-                            {...args}
-                          />
-                        )
-                        }}
-                    />
-                  </GridItem>
-                </React.Fragment>
-                )}
-              {!values.isPackage && (
+    return (
+      <Authorized
+        authority={GetOrderItemAccessRight(
+          from,
+          'queue.consultation.order.consumable',
+        )}
+      >
+        <div>
+          <GridContainer>
+            <GridItem xs={8}>
+              <Field
+                name='inventoryConsumableFK'
+                render={(args) => {
+                  return (
+                    <div
+                      id={`autofocus_${values.type}`}
+                      style={{ position: 'relative' }}
+                    >
+                      <CodeSelect
+                        temp
+                        label='Consumable Name'
+                        labelField='combinDisplayValue'
+                        onChange={this.changeConsumable}
+                        options={this.getConsumableOptions()}
+                        {...args}
+                        style={{ paddingRight: 20 }}
+                        disabled={values.isPackage}
+                      />
+                      <LowStockInfo sourceType='consumable' {...this.props} />
+                    </div>
+                  )
+                }}
+              />
+            </GridItem>
+            {values.isPackage && (
+              <React.Fragment>
                 <GridItem xs={3}>
-                  <FastField
-                    name='quantity'
+                  <Field
+                    name='packageConsumeQuantity'
                     render={(args) => {
-                        return (
-                          <NumberInput
-                            label='Quantity'
-                            style={{
+                      return (
+                        <NumberInput
+                          label='Consumed Quantity'
+                          style={{
                             marginLeft: theme.spacing(7),
                             paddingRight: theme.spacing(6),
-                            }}
-                            step={1}
-                            min={1}
-                            onChange={(e) => {
-                            if (values.unitPrice) {
-                                const total = e.target.value * values.unitPrice
-                                setFieldValue('totalPrice', total)
-                                this.updateTotalPrice(total)
-                            }
-                            }}
-                            {...args}
-                          />
-                        )
+                          }}
+                          step={1}
+                          min={0}
+                          max={values.remainingQuantity}
+                          disabled={this.props.visitRegistration.entity.visit.isInvoiceFinalized}
+                          {...args}
+                        />
+                      )
                     }}
                   />
                 </GridItem>
-                )}
-            </GridContainer>
-
-            <GridContainer>
-              <GridItem xs={4} className={classes.editor}>
-                <Field
-                  name='batchNo'
-                  render={(args) => {
-                    return (
-                      <CodeSelect
-                        mode='tags'
-                        maxSelected={1}
-                        disableAll
-                        label='Batch No.'
-                        labelField='batchNo'
-                        valueField='batchNo'
-                        options={this.state.selectedConsumable.consumableStock}
-                        onChange={(e, op = {}) => {
-                            if (op && op.length > 0) {
-                            const { expiryDate } = op[0]
-                            setFieldValue(`expiryDate`, expiryDate)
-                            } else {
-                            setFieldValue(`expiryDate`, undefined)
-                            }
-                        }}
-                        disabled={disableEdit}
-                        {...args}
-                      />
-                    )
+                <GridItem xs={1}>
+                  <Field
+                    name='remainingQuantity'
+                    render={(args) => {
+                      return (
+                        <NumberInput
+                          style={{
+                            marginTop: theme.spacing(3),
+                          }}
+                          formatter={(v) => `/ ${parseFloat(v).toFixed(1)}`}
+                          text
+                          {...args}
+                        />
+                      )
                     }}
-                />
-              </GridItem>
-              <GridItem xs={4} className={classes.editor}>
-                <Field
-                  name='expiryDate'
-                  render={(args) => {
-                    return (
-                      <DatePicker
-                        label='Expiry Date'
-                        disabled={disableEdit}
-                        {...args}
-                      />
-                    )
-                    }}
-                />
-              </GridItem>
-              <GridItem xs={3} className={classes.editor}>
-                <Field
-                  name='totalPrice'
+                  />
+                </GridItem>
+              </React.Fragment>
+            )}
+            {!values.isPackage && (
+              <GridItem xs={3}>
+                <FastField
+                  name='quantity'
                   render={(args) => {
                     return (
                       <NumberInput
-                        label='Total'
+                        label='Quantity'
                         style={{
+                          marginLeft: theme.spacing(7),
+                          paddingRight: theme.spacing(6),
+                        }}
+                        step={1}
+                        min={1}
+                        onChange={(e) => {
+                          if (values.unitPrice) {
+                            const total = e.target.value * values.unitPrice
+                            setFieldValue('totalPrice', total)
+                            this.updateTotalPrice(total)
+                          }
+                        }}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+            )}
+          </GridContainer>
+
+          <GridContainer>
+            <GridItem xs={4} className={classes.editor}>
+              <Field
+                name='batchNo'
+                render={(args) => {
+                  return (
+                    <CodeSelect
+                      mode='tags'
+                      maxSelected={1}
+                      disableAll
+                      label='Batch No.'
+                      labelField='batchNo'
+                      valueField='batchNo'
+                      options={this.state.selectedConsumable.consumableStock}
+                      onChange={(e, op = {}) => {
+                        if (op && op.length > 0) {
+                          const { expiryDate } = op[0]
+                          setFieldValue(`expiryDate`, expiryDate)
+                        } else {
+                          setFieldValue(`expiryDate`, undefined)
+                        }
+                        this.onExpiryDateChange()
+                      }}
+                      disabled={disableEdit}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={4} className={classes.editor}>
+              <FastField
+                name='expiryDate'
+                render={(args) => {
+                  return (
+                    <DatePicker
+                      label='Expiry Date'
+                      onChange={() => { this.onExpiryDateChange() }}
+                      disabled={disableEdit}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={3} className={classes.editor}>
+              <Field
+                name='totalPrice'
+                render={(args) => {
+                  return (
+                    <NumberInput
+                      label='Total'
+                      style={{
+                        marginLeft: theme.spacing(7),
+                        paddingRight: theme.spacing(6),
+                      }}
+                      currency
+                      onChange={(e) => {
+                        this.updateTotalPrice(e.target.value)
+                      }}
+                      min={0}
+                      disabled={totalPriceReadonly || values.isPackage}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem xs={8} className={classes.editor}>
+              <Field
+                name='performingUserFK'
+                render={(args) => (
+                  <DoctorProfileSelect
+                    label='Performed By'
+                    {...args}
+                    valueField='clinicianProfile.userProfileFK'
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem xs={3} className={classes.editor}>
+              <div style={{ position: 'relative' }}>
+                <div
+                  style={{ marginTop: theme.spacing(2), position: 'absolute' }}
+                >
+                  <Field
+                    name='isMinus'
+                    render={(args) => {
+                      return (
+                        <Switch
+                          checkedChildren='-'
+                          unCheckedChildren='+'
+                          label=''
+                          onChange={() => {
+                            setTimeout(() => {
+                              this.onAdjustmentConditionChange()
+                            }, 1)
+                          }}
+                          disabled={totalPriceReadonly || values.isPackage}
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </div>
+                <Field
+                  name='adjValue'
+                  render={(args) => {
+                    args.min = 0
+                    if (values.isExactAmount) {
+                      return (
+                        <NumberInput
+                          style={{
                             marginLeft: theme.spacing(7),
                             paddingRight: theme.spacing(6),
+                          }}
+                          currency
+                          label='Adjustment'
+                          onChange={() => {
+                            setTimeout(() => {
+                              this.onAdjustmentConditionChange()
+                            }, 1)
+                          }}
+                          disabled={totalPriceReadonly || values.isPackage}
+                          {...args}
+                        />
+                      )
+                    }
+                    return (
+                      <NumberInput
+                        style={{
+                          marginLeft: theme.spacing(7),
+                          paddingRight: theme.spacing(6),
                         }}
-                        currency
-                        onChange={(e) => {
-                            this.updateTotalPrice(e.target.value)
+                        percentage
+                        max={100}
+                        label='Adjustment'
+                        onChange={() => {
+                          setTimeout(() => {
+                            this.onAdjustmentConditionChange()
+                          }, 1)
                         }}
-                        min={0}
                         disabled={totalPriceReadonly || values.isPackage}
                         {...args}
                       />
                     )
-                    }}
+                  }}
                 />
-              </GridItem>
-            </GridContainer>
-            <GridContainer>
-              <GridItem xs={8} className={classes.editor}>
+              </div>
+            </GridItem>
+            <GridItem xs={1} className={classes.editor}>
+              <div style={{ marginTop: theme.spacing(2) }}>
                 <Field
-                  name='performingUserFK'
-                  render={(args) => (
-                    <DoctorProfileSelect
-                      label='Performed By'
-                      {...args}
-                      valueField='clinicianProfile.userProfileFK'
-                    />
-                    )}
-                />
-              </GridItem>           
-              <GridItem xs={3} className={classes.editor}>
-                <div style={{ position: 'relative' }}>
-                  <div
-                    style={{ marginTop: theme.spacing(2), position: 'absolute' }}
-                  >
-                    <Field
-                      name='isMinus'
-                      render={(args) => {
-                        return (
-                          <Switch
-                            checkedChildren='-'
-                            unCheckedChildren='+'
-                            label=''
-                            onChange={() => {
-                                setTimeout(() => {
-                                this.onAdjustmentConditionChange()
-                                }, 1)
-                            }}
-                            disabled={totalPriceReadonly || values.isPackage}
-                            {...args}
-                          />
-                        )
-                        }}
-                    />
-                  </div>
-                  <Field
-                    name='adjValue'
-                    render={(args) => {
-                        args.min = 0
-                        if (values.isExactAmount) {
-                        return (
-                          <NumberInput
-                            style={{
-                                marginLeft: theme.spacing(7),
-                                paddingRight: theme.spacing(6),
-                            }}
-                            currency
-                            label='Adjustment'
-                            onChange={() => {
-                                setTimeout(() => {
-                                this.onAdjustmentConditionChange()
-                                }, 1)
-                            }}
-                            disabled={totalPriceReadonly || values.isPackage}
-                            {...args}
-                          />
-                        )
-                        }
-                        return (
-                          <NumberInput
-                            style={{
-                            marginLeft: theme.spacing(7),
-                            paddingRight: theme.spacing(6),
-                            }}
-                            percentage
-                            max={100}
-                            label='Adjustment'
-                            onChange={() => {
-                            setTimeout(() => {
-                                this.onAdjustmentConditionChange()
-                            }, 1)
-                            }}
-                            disabled={totalPriceReadonly || values.isPackage}
-                            {...args}
-                          />
-                        )
-                    }}
-                  />
-                </div>
-              </GridItem>
-              <GridItem xs={1} className={classes.editor}>
-                <div style={{ marginTop: theme.spacing(2) }}>
-                  <Field
-                    name='isExactAmount'
-                    render={(args) => {
-                        return (
-                          <Switch
-                            checkedChildren='$'
-                            unCheckedChildren='%'
-                            label=''
-                            onChange={() => {
-                            setTimeout(() => {
-                                this.onAdjustmentConditionChange()
-                            }, 1)
-                            }}
-                            disabled={totalPriceReadonly || values.isPackage}
-                            {...args}
-                          />
-                        )
-                    }}
-                  />
-                </div>
-              </GridItem>
-            </GridContainer>
-            <GridContainer>
-              <GridItem xs={8} className={classes.editor}>
-                <FastField
-                  name='remark'
+                  name='isExactAmount'
                   render={(args) => {
                     return (
-                      <TextField multiline rowsMax='5' label='Remarks' {...args} />
-                    )
-                    }}
-                />
-              </GridItem>
-              <GridItem xs={3} className={classes.editor}>
-                <FastField
-                  name='totalAfterItemAdjustment'
-                  render={(args) => {
-                    return (
-                      <NumberInput
-                        label='Total After Adj'
-                        style={{
-                            marginLeft: theme.spacing(7),
-                            paddingRight: theme.spacing(6),
+                      <Switch
+                        checkedChildren='$'
+                        unCheckedChildren='%'
+                        label=''
+                        onChange={() => {
+                          setTimeout(() => {
+                            this.onAdjustmentConditionChange()
+                          }, 1)
                         }}
-                        currency
-                        disabled
+                        disabled={totalPriceReadonly || values.isPackage}
                         {...args}
                       />
                     )
-                    }}
+                  }}
                 />
-              </GridItem>
-            </GridContainer>
-            {footer({
-                onSave: this.validateAndSubmitIfOk,
-                onReset: this.handleReset,
-            })}
-          </div>
-        </Authorized>
+              </div>
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem xs={8} className={classes.editor}>
+              <FastField
+                name='remark'
+                render={(args) => {
+                  return (
+                    <TextField multiline rowsMax='5' label='Remarks' {...args} />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={3} className={classes.editor}>
+              <FastField
+                name='totalAfterItemAdjustment'
+                render={(args) => {
+                  return (
+                    <NumberInput
+                      label='Total After Adj'
+                      style={{
+                        marginLeft: theme.spacing(7),
+                        paddingRight: theme.spacing(6),
+                      }}
+                      currency
+                      disabled
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+          </GridContainer>
+          {footer({
+            onSave: this.validateAndSubmitIfOk,
+            onReset: this.handleReset,
+          })}
+        </div>
+      </Authorized>
     )
   }
 }
