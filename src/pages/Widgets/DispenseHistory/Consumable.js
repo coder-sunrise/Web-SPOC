@@ -41,6 +41,7 @@ export default ({ classes, current, fieldName = '' }) => {
         </div>
       ),
     },
+    { dataIndex: 'dispenseUOM', title: 'UOM', width: 90 },
     {
       dataIndex: 'totalPrice',
       title: 'Subtotal',
