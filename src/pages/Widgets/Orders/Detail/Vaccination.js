@@ -103,7 +103,7 @@ let i = 0
     performingUserFK: Yup.number().required(),
     expiryDate:Yup.date().min(
       moment(),
-    'The batch of vaccination is expired'),
+    'EXPIRED!'),
   }),
 
   handleSubmit: (values, { props, onConfirm, setValues }) => {
@@ -325,6 +325,7 @@ class Vaccination extends PureComponent {
     setTimeout(() => {
       this.calculateQuantity(op)
     }, 1)
+    this.onExpiryDateChange()
   }
 
   calculateQuantity = (vaccination) => {
@@ -537,6 +538,16 @@ class Vaccination extends PureComponent {
       cautions = selectVaccination.caution
     }
     return cautions
+  }
+
+  onExpiryDateChange = async () => {
+    window.setTimeout(async () => {
+      const { handleSubmit, validateForm } = this.props
+      const validateResult = await validateForm()
+      const isFormValid = _.isEmpty(validateResult)
+      console.log(validateResult)
+      if (!isFormValid) { handleSubmit() }
+    }, 300)
   }
 
   render () {
@@ -831,6 +842,7 @@ class Vaccination extends PureComponent {
                       } else {
                         setFieldValue(`expiryDate`, undefined)
                       }
+                      this.onExpiryDateChange()
                     }}
                     disabled={disableEdit}
                     {...args}
@@ -840,12 +852,13 @@ class Vaccination extends PureComponent {
               />
             </GridItem>
             <GridItem xs={4} className={classes.editor}>
-              <Field
+              <FastField
                 name='expiryDate'
                 render={(args) => {
                 return (
                   <DatePicker
                     label='Expiry Date'
+                    onChange={() => { this.onExpiryDateChange()}}
                     disabled={disableEdit}
                     {...args}
                   />
