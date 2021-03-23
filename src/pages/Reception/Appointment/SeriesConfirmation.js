@@ -19,7 +19,7 @@ const styles = (theme) => ({
   },
 })
 
-const SeriesConfirmation = ({ classes, footer, onConfirmClick }) => {
+const SeriesConfirmation = ({ classes, footer, onConfirmClick, eventType }) => {
   const [
     editEntire,
     setEditEntire,
@@ -31,8 +31,8 @@ const SeriesConfirmation = ({ classes, footer, onConfirmClick }) => {
   }
 
   const handleConfirm = () => {
-    const editSingleAppointment = editEntire === '1'
-    onConfirmClick(editSingleAppointment)
+    const editSingle = editEntire === '1'
+    onConfirmClick(editSingle)
   }
 
   return (
@@ -42,7 +42,9 @@ const SeriesConfirmation = ({ classes, footer, onConfirmClick }) => {
           <div className={classes.title}>
             <Warning fontSize='large' className={classes.warningIcon} />
             <h4 style={{ textAlign: 'left' }}>
-              This is an appointment in a series. What do you want to open?
+              {`This is ${eventType === 'Appointment'
+                ? 'an appointment'
+                : 'a Doctor Block'} in a series. What do you want to open?`}
             </h4>
           </div>
         </GridItem>

@@ -1,13 +1,9 @@
 import React, { useState } from 'react'
-// formik
-import { withFormik } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 import Warning from '@material-ui/icons/Warning'
 // common components
 import { Danger, GridContainer, GridItem, RadioGroup } from '@/components'
-// utils
-import { APPOINTMENT_STATUS } from '@/utils/constants'
 
 const styles = (theme) => ({
   title: {
@@ -26,7 +22,12 @@ const styles = (theme) => ({
   },
 })
 
-const SeriesUpdateConfirmation = ({ classes, footer, handleConfirm }) => {
+const SeriesUpdateConfirmation = ({
+  classes,
+  footer,
+  handleConfirm,
+  eventType = 'Appointment',
+}) => {
   const [
     type,
     setType,
@@ -37,7 +38,7 @@ const SeriesUpdateConfirmation = ({ classes, footer, handleConfirm }) => {
     setError,
   ] = useState()
 
-  const onChange = (event, value) => {
+  const onChange = (event) => {
     const { target } = event
     setType(target.value)
     setError('')
@@ -58,7 +59,9 @@ const SeriesUpdateConfirmation = ({ classes, footer, handleConfirm }) => {
           <div className={classes.title}>
             <Warning fontSize='large' className={classes.warningIcon} />
             <h4 style={{ textAlign: 'left' }}>
-              Update appointments match the series
+              {`Update ${eventType === 'Appointment'
+                ? 'appointments'
+                : 'doctor blocks'} match the series`}
             </h4>
           </div>
         </GridItem>
@@ -73,11 +76,15 @@ const SeriesUpdateConfirmation = ({ classes, footer, handleConfirm }) => {
             options={[
               {
                 value: '1',
-                label: 'Only appointment that has not been modified',
+                label: `Only ${eventType === 'Appointment'
+                  ? 'appointments'
+                  : 'doctor block'} that has not been modified`,
               },
               {
                 value: '2',
-                label: 'All appointment',
+                label: `All ${eventType === 'Appointment'
+                  ? 'appointments'
+                  : 'doctor blocks'}`,
               },
             ]}
           />

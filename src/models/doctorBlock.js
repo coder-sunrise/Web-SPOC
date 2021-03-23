@@ -13,6 +13,8 @@ export default createListViewModel({
     service,
     state: {
       currentViewDoctorBlock: {},
+      isEditedAsSingleDoctorBlock: false,
+      mode: 'single',
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (location) => {
@@ -32,27 +34,6 @@ export default createListViewModel({
       })
     },
     effects: {
-      // *upsertDoctorBlock ({ payload }, { call, put }) {
-      //   const result = yield call(service.upsert, payload)
-      //   if (result) {
-      //     yield put({ type: 'refresh' })
-      //     notification.success({ message: 'Doctor Block(s) updated' })
-      //     return true
-      //   }
-      //   return false
-      // },
-      // *queryAll ({ payload }, { call, put }) {
-      //   const response = yield call(service.getAllList, payload)
-      //   const { status, data } = response
-      //   if (parseInt(status, 10) === 200) {
-      //     yield put({
-      //       type: 'updateState',
-      //       payload: {
-      //         list: data.data,
-      //       },
-      //     })
-      //   }
-      // },
       *refresh (_, { call, put }) {
         yield put({
           type: 'queryAll',
@@ -66,10 +47,32 @@ export default createListViewModel({
         }
         return false
       },
+      *getDoctorBlockDetails ({ payload }, { call, put }) {
+        const result = yield call(service.query, payload)
+        const { status, data } = result
+        if (parseInt(status, 10) === 200) {
+          yield put({
+            type: 'setDoctorBlockView',
+            payload: data,
+          })
+          yield put({
+            type: 'setEditType',
+            payload: payload.mode,
+          })
+          return true
+        }
+        return false
+      },
     },
     reducers: {
       queryOneDone (state, { payload }) {
         return { ...state, currentViewDoctorBlock: payload.data }
+      },
+      setDoctorBlockView (state, { payload }) {
+        return { ...state, currentViewDoctorBlock: payload }
+      },
+      setEditType (state, { payload }) {
+        return { ...state, mode: payload }
       },
     },
   },
