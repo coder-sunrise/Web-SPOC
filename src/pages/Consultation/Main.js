@@ -28,6 +28,7 @@ import {
   commonDataReaderTransform,
 } from '@/utils/utils'
 import {
+  cleanConsultation,
   convertToConsultation,
   convertConsultationDocument,
 } from '@/pages/Consultation/utils'
@@ -44,6 +45,7 @@ import {
   consultationDocumentTypes,
   ReportsOnSignOffOption,
 } from '@/utils/codes'
+import ConsumePackage from '@/pages/Widgets/Orders/Detail/ConsumePackage'
 import AutoPrintSelection from './autoPrintSelection'
 
 // import PatientSearch from '@/pages/PatientDatabase/Search'
@@ -54,7 +56,6 @@ import Layout from './Layout'
 import schema from './schema'
 import styles from './style'
 import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
-import ConsumePackage from '@/pages/Widgets/Orders/Detail/ConsumePackage'
 // window.g_app.replaceModel(model)
 
 const discardMessage = 'Discard consultation?'
@@ -217,7 +218,7 @@ const saveConsultation = ({
     }
     dispatch({
       type: `consultation/${action}`,
-      payload: newValues,
+      payload: cleanConsultation(newValues),
     }).then((r) => {
       if (r) {
         if (successMessage) {
@@ -262,8 +263,8 @@ const saveConsultation = ({
 const discardConsultation = ({ dispatch, values }) => {
   if (values.id) {
     dispatch({
-      type: 'consultation/discard',
-      payload: values.id,
+      type: `consultation/discardDetails`,
+      payload: cleanConsultation(values),
     })
   } else {
     dispatch({
@@ -612,14 +613,14 @@ class Main extends React.Component {
     })
   }
 
-  discardConsultation = () => {
-    const { dispatch, values } = this.props
-    dispatch({
-      type: 'consultation/discard',
-      payload: values.id,
-    })
-    router.push('/reception/queue')
-  }
+  // discardConsultation = () => {
+  //   const { dispatch, values } = this.props
+  //   dispatch({
+  //     type: 'consultation/discard',
+  //     payload: values.id,
+  //   })
+  //   router.push('/reception/queue')
+  // }
 
   resumeConsultation = () => {
     const {
@@ -944,14 +945,14 @@ class Main extends React.Component {
                     'IN CONS',
                     'WAITING',
                   ].includes(visit.visitStatus) && (
-                      <ProgressButton
-                        onClick={this.pauseConsultation}
-                        color='info'
-                        icon={null}
-                      >
-                        Pause
-                      </ProgressButton>
-                    )}
+                  <ProgressButton
+                    onClick={this.pauseConsultation}
+                    color='info'
+                    icon={null}
+                  >
+                    Pause
+                  </ProgressButton>
+                )}
                   {visit.visitStatus === 'PAUSED' && (
                     <ProgressButton
                       onClick={this.resumeConsultation}

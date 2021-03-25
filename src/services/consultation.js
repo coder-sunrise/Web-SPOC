@@ -17,8 +17,14 @@ module.exports = {
     })
     return r
   },
+  discardDetails: async (params) => {
+    const r = await request(`${url}/${params.id}`, {
+      method: 'DELETE',
+      body: params,
+    })
+    return r
+  },
   pause: async (params) => {
-    // console.log(params)
     const r = await request(`${url}/pause/${params.id}`, {
       method: 'PUT',
       body: params,
