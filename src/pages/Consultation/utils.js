@@ -277,9 +277,34 @@ const convertToConsultation = (
   }
 }
 
+const cleanConsultation = ( values ) => {
+  // remove irrelevant to api values
+  const {
+    visitConsultationTemplate, 
+    corPrescriptionItem,
+    corDoctorNote,
+    ...rest
+  } = values
+
+  const prescriptionWithoutSelect = corPrescriptionItem.map(pi => {
+    return {
+      selectedMedication: {},
+      ...pi,
+    }
+  })
+
+  // ordering
+  return {
+    corDoctorNote,
+    corPrescriptionItem: prescriptionWithoutSelect,
+    ...rest,
+  }
+}
+
 module.exports = {
   ...module.exports,
   orderTypes,
+  cleanConsultation,
   convertToConsultation,
   convertConsultationDocument,
   cleanFields,

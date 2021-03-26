@@ -261,7 +261,7 @@ export default createFormViewModel({
         )
         const { entity } = visitRegistration
 
-        const response = yield call(service.remove, payload)
+        const response = yield call(service.discardDetails, payload)
 
         if (response) {
           sendQueueNotification({
