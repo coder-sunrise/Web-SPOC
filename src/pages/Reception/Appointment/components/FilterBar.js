@@ -298,7 +298,11 @@ export default compose(
   })),
   withFormik({
     enableReinitialize: true,
-    mapPropsToValues: ({ filterByDoctor, filterBySingleDoctor }) => {
+    mapPropsToValues: ({
+      filterByDoctor,
+      filterBySingleDoctor,
+      filterByApptType,
+    }) => {
       count += 1
 
       return {
@@ -306,7 +310,7 @@ export default compose(
           ...filterByDoctor,
         ],
         filterBySingleDoctor,
-        filterByApptType: [
+        filterByApptType: filterByApptType || [
           -99,
         ],
         count,
