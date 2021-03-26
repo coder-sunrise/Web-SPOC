@@ -263,7 +263,7 @@ const saveConsultation = ({
 const discardConsultation = ({ dispatch, values }) => {
   if (values.id) {
     dispatch({
-      type: `consultation/discardDetails`,
+      type: `consultation/discard`,
       payload: cleanConsultation(values),
     })
   } else {
