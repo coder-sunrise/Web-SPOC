@@ -17,7 +17,10 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
     <SizeContainer size='sm'>
       <React.Fragment>
         <GridContainer alignItems='flex-end'>
-          <ReportDateRangePicker />
+          <ReportDateRangePicker
+            fromDateLabel='Void Date From'
+            toDateLabel='Void Date To'
+          />
 
           <GridItem md={2}>
             <FastField
