@@ -51,7 +51,7 @@ const SessionDetails = ({ sessionDetails, companyDetails }) => {
       </GridItem>
       <GridItem md={3} style={{ marginBottom: 16 }}>
         <NumberInput
-          label='Total O/S Bal.'
+          label='Total Patient O/S Bal.'
           disabled
           currency
           value={sessionDetails.totalSessionOutstandingBalance}
