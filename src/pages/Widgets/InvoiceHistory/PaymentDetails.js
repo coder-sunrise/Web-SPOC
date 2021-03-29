@@ -166,7 +166,7 @@ class PaymentDetails extends Component {
     this.setState({ showAddCrNote: true })
   }
 
-  onPrinterClick = (type, itemID, copayerID) => {
+  onPrinterClick = (type, itemID, copayerID, invoicePayerid) => {
     const { invoiceDetail } = this.props
 
     switch (type) {
@@ -182,6 +182,7 @@ class PaymentDetails extends Component {
           {
             InvoiceId: invoiceDetail.id,
             CopayerId: copayerID,
+            InvoicePayerid: invoicePayerid,
           },
           'Invoice',
         )
