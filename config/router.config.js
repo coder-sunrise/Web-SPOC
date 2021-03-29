@@ -36,9 +36,7 @@ const _routes = [
   {
     path: '/',
     component: '../layouts/BasicLayout',
-    authority: [
-      'reception/queue',
-    ],
+    authority: [ 'reception/queue' ],
     // Routes: [
     //   'src/pages/Authorized',
     // ],
@@ -56,13 +54,8 @@ const _routes = [
         path: '/reception',
         icon: 'local_hospital',
         name: 'reception',
-        authority: [
-          'reception',
-        ],
-        specialist: [
-          'GP',
-          'Dental',
-        ],
+        authority: [ 'reception' ],
+        specialist: [ 'GP', 'Dental' ],
         routes: [
           {
             path: '/reception/queue',
@@ -70,9 +63,7 @@ const _routes = [
             component: './Reception/Queue',
             mini: 'QE',
             exact: true,
-            authority: [
-              'reception/queue',
-            ],
+            authority: [ 'reception/queue' ],
           },
           {
             path: '/reception/appointment',
@@ -91,9 +82,7 @@ const _routes = [
             hideInMenu: true,
             exact: true,
             component: './Consultation',
-            authority: [
-              'reception/queue',
-            ],
+            authority: [ 'reception/queue' ],
           },
           {
             path: '/reception/queue/dispense',
@@ -102,9 +91,7 @@ const _routes = [
             hideInMenu: true,
             exact: true,
             component: './Dispense',
-            authority: [
-              'queue.dispense',
-            ],
+            authority: [ 'queue.dispense' ],
           },
           {
             path: '/reception/queue/billing',
@@ -112,18 +99,14 @@ const _routes = [
             hideInMenu: true,
             exact: true,
             component: './Billing',
-            authority: [
-              'reception/queue',
-            ],
+            authority: [ 'reception/queue' ],
           },
           {
             hideInMenu: true,
             path: '/reception/queue/patientdashboard',
             name: 'patientdashboard',
             component: './PatientDashboard',
-            authority: [
-              'patientdashboard',
-            ],
+            authority: [ 'patientdashboard' ],
           },
           {
             path: '/reception/labtracking',
@@ -131,9 +114,7 @@ const _routes = [
             component: './Reception/LabTracking',
             mini: 'LT',
             exact: true,
-            authority: [
-              'reception/labtracking',
-            ],
+            authority: [ 'reception/labtracking' ],
           },
           // {
           //   path: '/reception/queue/patientdashboard/consultation/:id?',
@@ -149,13 +130,8 @@ const _routes = [
         path: '/patientdb',
         icon: 'group',
         name: 'patient',
-        authority: [
-          'patientdatabase',
-        ],
-        specialist: [
-          'GP',
-          'Dental',
-        ],
+        authority: [ 'patientdatabase' ],
+        specialist: [ 'GP', 'Dental' ],
         component: './PatientDatabase/Search',
         // routes: [
         //   // {
@@ -205,20 +181,14 @@ const _routes = [
         icon: 'sms',
         name: 'communication',
         system: 'CMS',
-        authority: [
-          'communication',
-        ],
-        specialist: [
-          'GP',
-        ],
+        authority: [ 'communication' ],
+        specialist: [ 'GP' ],
         routes: [
           {
             path: '/communication/sms',
             name: 'sms',
             component: './sms',
-            authority: [
-              'communication/sms',
-            ],
+            authority: [ 'communication/sms' ],
           },
           // {
           //   path: '/sms/adhoc',
@@ -234,20 +204,14 @@ const _routes = [
         icon: 'kitchen',
         name: 'inventory',
         // component: './inventory',
-        authority: [
-          'inventory',
-        ],
-        specialist: [
-          'GP',
-        ],
+        authority: [ 'inventory' ],
+        specialist: [ 'GP' ],
         routes: [
           {
             path: '/inventory/master',
             name: 'master',
             component: './Inventory/Master',
-            authority: [
-              'inventory/inventorymaster',
-            ],
+            authority: [ 'inventory/inventorymaster' ],
             mini: 'IM',
           },
           {
@@ -255,72 +219,56 @@ const _routes = [
             name: 'consumable.consumable',
             hideInMenu: true,
             component: './Inventory/Master/Consumable/Details',
-            authority: [
-              'inventory/inventorymaster',
-            ],
+            authority: [ 'inventory/inventorymaster' ],
           },
           {
             path: '/inventory/master/editconsumable',
             name: 'consumable.editconsumable',
             hideInMenu: true,
             component: './Inventory/Master/Consumable/Details',
-            authority: [
-              'inventory/inventorymaster',
-            ],
+            authority: [ 'inventory/inventorymaster' ],
           },
           {
             path: '/inventory/master/medication',
             name: 'medication.medication',
             hideInMenu: true,
             component: './Inventory/Master/Medication/Details',
-            authority: [
-              'inventory/inventorymaster',
-            ],
+            authority: [ 'inventory/inventorymaster' ],
           },
           {
             path: '/inventory/master/editmedication',
             name: 'medication.editmedication',
             hideInMenu: true,
             component: './Inventory/Master/Medication/Details',
-            authority: [
-              'inventory/inventorymaster',
-            ],
+            authority: [ 'inventory/inventorymaster' ],
           },
           {
             path: '/inventory/master/vaccination',
             name: 'vaccination.vaccination',
             hideInMenu: true,
             component: './Inventory/Master/Vaccination/Details',
-            authority: [
-              'inventory/inventorymaster',
-            ],
+            authority: [ 'inventory/inventorymaster' ],
           },
           {
             path: '/inventory/master/editvaccination',
             name: 'vaccination.editvaccination',
             hideInMenu: true,
             component: './Inventory/Master/Vaccination/Details',
-            authority: [
-              'inventory/inventorymaster',
-            ],
+            authority: [ 'inventory/inventorymaster' ],
           },
           {
             path: '/inventory/master/orderset',
             name: 'orderset.orderset',
             hideInMenu: true,
             component: './Inventory/Master/OrderSet/Details',
-            authority: [
-              'inventory/inventorymaster',
-            ],
+            authority: [ 'inventory/inventorymaster' ],
           },
           {
             path: '/inventory/master/editorderset',
             name: 'orderset.editorderset',
             hideInMenu: true,
             component: './Inventory/Master/OrderSet/Details',
-            authority: [
-              'inventory/inventorymaster',
-            ],
+            authority: [ 'inventory/inventorymaster' ],
           },
           // {
           //   path: '/inventory/pd',
@@ -338,9 +286,7 @@ const _routes = [
             path: '/inventory/pr',
             name: 'pd',
             component: './Inventory/PurchaseReceive',
-            authority: [
-              'inventory/purchasingandreceiving',
-            ],
+            authority: [ 'inventory/purchasingandreceiving' ],
             mini: 'PR',
           },
           {
@@ -348,17 +294,13 @@ const _routes = [
             name: 'pd.detail',
             hideInMenu: true,
             component: './Inventory/PurchaseReceive/Details',
-            authority: [
-              'inventory/purchasingandreceiving',
-            ],
+            authority: [ 'inventory/purchasingandreceiving' ],
           },
           {
             path: '/inventory/rg',
             name: 'rg',
             component: './Inventory/ReceivingGoods',
-            authority: [
-              'inventory/receivinggoods',
-            ],
+            authority: [ 'inventory/receivinggoods' ],
             mini: 'RG',
           },
           {
@@ -366,17 +308,13 @@ const _routes = [
             name: 'rg.detail',
             hideInMenu: true,
             component: './Inventory/ReceivingGoods/Details',
-            authority: [
-              'inventory/receivinggoods',
-            ],
+            authority: [ 'inventory/receivinggoods' ],
           },
           {
             path: '/inventory/inventoryadjustment',
             name: 'inventoryadjustment',
             component: './Inventory/InventoryAdjustment',
-            authority: [
-              'inventory/inventoryadjustment',
-            ],
+            authority: [ 'inventory/inventoryadjustment' ],
             mini: 'IA',
           },
         ],
@@ -390,12 +328,8 @@ const _routes = [
         path: '/finance',
         icon: 'attach_money',
         name: 'finance',
-        authority: [
-          'finance',
-        ],
-        specialist: [
-          'GP',
-        ],
+        authority: [ 'finance' ],
+        specialist: [ 'GP' ],
         routes: [
           {
             path: '/finance/invoice',
@@ -403,26 +337,20 @@ const _routes = [
             component: './Finance/Invoice',
             mini: 'IP',
             exact: true,
-            authority: [
-              'finance/invoicepayment',
-            ],
+            authority: [ 'finance/invoicepayment' ],
           },
           {
             path: '/finance/invoice/details',
             name: 'invoice/detail',
             hideInMenu: true,
             component: './Finance/Invoice/Details',
-            authority: [
-              'finance/invoicepayment',
-            ],
+            authority: [ 'finance/invoicepayment' ],
           },
           {
             path: '/finance/note',
             name: 'credit/debitnote',
             hideInMenu: true,
-            authority: [
-              'finance/invoicepayment',
-            ],
+            authority: [ 'finance/invoicepayment' ],
             // component: './Finance/CreditDebitNote',
             mini: 'CD',
           },
@@ -437,9 +365,7 @@ const _routes = [
             path: '/finance/billing/:companyName',
             name: 'corporate-billing/detail',
             hideInMenu: true,
-            authority: [
-              'finance/corporatebilling',
-            ],
+            authority: [ 'finance/corporatebilling' ],
             // component:
             //   './Finance/CorporateBilling/Detail/CorporateBillingDetail',
           },
@@ -448,63 +374,49 @@ const _routes = [
             name: 'deposit',
             mini: 'DP',
             component: './Finance/Deposit',
-            authority: [
-              'finance/deposit',
-            ],
+            authority: [ 'finance/deposit' ],
           },
           {
             path: '/finance/deposit/:depositNo',
             name: 'invoice/detail',
             hideInMenu: true,
             component: './Finance/Deposit/Detail/index.js',
-            authority: [
-              'finance/deposit',
-            ],
+            authority: [ 'finance/deposit' ],
           },
           {
             path: '/finance/statement',
             name: 'statement',
             mini: 'ST',
             component: './Finance/Statement',
-            authority: [
-              'finance/statement',
-            ],
+            authority: [ 'finance/statement' ],
           },
           {
             path: '/finance/statement/newstatement',
             name: 'statement/newstatement',
             hideInMenu: true,
             component: './Finance/Statement/NewStatement/AddNewStatement',
-            authority: [
-              'finance/statement',
-            ],
+            authority: [ 'finance/statement' ],
           },
           {
             path: '/finance/statement/editstatement/:id',
             name: 'statement/editstatement',
             hideInMenu: true,
             component: './Finance/Statement/NewStatement/AddNewStatement',
-            authority: [
-              'finance/statement',
-            ],
+            authority: [ 'finance/statement' ],
           },
           {
             path: '/finance/statement/details/:id',
             name: 'statement/detail',
             hideInMenu: true,
             component: './Finance/Statement/Details',
-            authority: [
-              'finance/statement',
-            ],
+            authority: [ 'finance/statement' ],
           },
           {
             path: '/finance/statement/statementpayment/:id',
             name: 'statement/statementpayment',
             hideInMenu: true,
             component: './Finance/Statement/StatementPayment',
-            authority: [
-              'finance/statement',
-            ],
+            authority: [ 'finance/statement' ],
           },
           // {
           //   path: '/finance/expense',
@@ -518,27 +430,21 @@ const _routes = [
             name: 'scheme',
             mini: 'SC',
             component: './Finance/Scheme',
-            authority: [
-              'finance/scheme',
-            ],
+            authority: [ 'finance/scheme' ],
           },
           {
             path: '/finance/scheme/details',
             name: 'scheme/detail',
             hideInMenu: true,
             component: './Finance/Scheme/Details',
-            authority: [
-              'finance/scheme',
-            ],
+            authority: [ 'finance/scheme' ],
           },
           {
             path: '/finance/copayer',
             name: 'copayer',
             mini: 'CP',
             component: './Setting/Company',
-            authority: [
-              'finance/copayer',
-            ],
+            authority: [ 'finance/copayer' ],
           },
         ],
       },
@@ -558,268 +464,194 @@ const _routes = [
         icon: 'library_books',
         name: 'report',
         hideChildrenInMenu: true,
-        authority: [
-          'report',
-        ],
-        specialist: [
-          'GP',
-        ],
+        authority: [ 'report' ],
+        specialist: [ 'GP' ],
         routes: [
           {
             path: '/report',
             name: 'report',
             component: './Report',
-            authority: [
-              'report',
-            ],
+            authority: [ 'report' ],
           },
           {
             path: '/report/queuelisting',
             name: 'queueListingReport',
             component: './Report/QueueListing',
-            authority: [
-              'report.finance.queuelisting',
-            ],
+            authority: [ 'report.finance.queuelisting' ],
           },
           {
             path: '/report/gstreport',
             name: 'gstReport',
             component: './Report/GSTReport',
-            authority: [
-              'report.finance.gst',
-            ],
+            authority: [ 'report.finance.gst' ],
           },
           {
             path: '/report/medicationmovementreport',
             name: 'medicationMovementReport',
             component: './Report/MedicationMovementReport',
-            authority: [
-              'report.inventory.medicationmovement',
-            ],
+            authority: [ 'report.inventory.medicationmovement' ],
           },
           {
             path: '/report/deposittransactionreport',
             name: 'depositTransactionReport',
             component: './Report/DepositTransactionReport',
-            authority: [
-              'report.finance.deposittransaction',
-            ],
+            authority: [ 'report.finance.deposittransaction' ],
           },
           {
             path: '/report/consumablemovementreport',
             name: 'consumableMovementReport',
             component: './Report/ConsumableMovementReport',
-            authority: [
-              'report.inventory.consumablemovement',
-            ],
+            authority: [ 'report.inventory.consumablemovement' ],
           },
           {
             path: '/report/voidcreditnotereport',
             name: 'voidCreditNoteReport',
             component: './Report/VoidCreditNoteReport',
-            authority: [
-              'report.finance.voidcreditnoteandpayment',
-            ],
+            authority: [ 'report.finance.voidcreditnoteandpayment' ],
           },
           {
             path: '/report/saleslistingreport',
             name: 'salesListingReport',
             component: './Report/SalesListingReport',
-            authority: [
-              'report.finance.saleslisting',
-            ],
+            authority: [ 'report.finance.saleslisting' ],
           },
           {
             path: '/report/invoicelistingreport',
             name: 'invoiceListingReport',
             component: './Report/InvoiceListingReport',
-            authority: [
-              'report.finance.invoicelisting',
-            ],
+            authority: [ 'report.finance.invoicelisting' ],
           },
           {
-            path: '/report/lowstockconsumablesreport',
-            name: 'lowStockConsumablesReport',
-            component: './Report/LowStockConsumablesReport',
-            authority: [
-              'report.inventory.lowstockconsumables',
-            ],
-          },
-          {
-            path: '/report/lowstockmedicationreport',
-            name: 'lowStockMedicationReport',
-            component: './Report/LowStockMedicationReport',
-            authority: [
-              'report.inventory.lowstockmedication',
-            ],
+            path: '/report/lowstockreport',
+            name: 'lowStockReport',
+            component: './Report/LowStockReport',
+            authority: [ 'report.inventory.lowstock' ],
           },
           {
             path: '/report/chasclaimreport',
             name: 'chasClaimReport',
             component: './Report/ChasClaimReport',
-            authority: [
-              'report.finance.chasclaim',
-            ],
+            authority: [ 'report.finance.chasclaim' ],
           },
           {
             path: '/report/creditnotelistingreport',
             name: 'creditNoteListingReport',
             component: './Report/CreditNoteListingReport',
-            authority: [
-              'report.finance.creditnotelisting',
-            ],
+            authority: [ 'report.finance.creditnotelisting' ],
           },
           {
             path: '/report/patientlisting',
             name: 'patientListingReport',
             component: './Report/PatientListing',
-            authority: [
-              'report.finance.patientlisting',
-            ],
+            authority: [ 'report.finance.patientlisting' ],
           },
           {
             path: '/report/paymentcollection',
             name: 'paymentCollection',
             component: './Report/PaymentCollection',
-            authority: [
-              'report.finance.paymentcollection',
-            ],
+            authority: [ 'report.finance.paymentcollection' ],
           },
           {
             path: '/report/outstandingpaymentreport',
             name: 'outstandingPaymentReport',
             component: './Report/OutstandingPaymentReport',
-            authority: [
-              'report.finance.outstandingpayment',
-            ],
+            authority: [ 'report.finance.outstandingpayment' ],
           },
           {
             path: '/report/salesummary',
             name: 'salessummary',
             component: './Report/SalesSummary',
-            authority: [
-              'report.finance.salessummary',
-            ],
+            authority: [ 'report.finance.salessummary' ],
           },
           {
             path: '/report/visitlistingreport',
             name: 'visitListingReport',
             component: './Report/VisitListingReport',
-            authority: [
-              'report.admin.visitlistingreport',
-            ],
+            authority: [ 'report.admin.visitlistingreport' ],
           },
           {
             path: '/report/diagnosistrending',
             name: 'diagnosistrending',
             component: './Report/DiagnosisTrending',
-            authority: [
-              'report.diagnosistrendingreport',
-            ],
+            authority: [ 'report.diagnosistrendingreport' ],
           },
           {
             path: '/report/referralsourcereport',
             name: 'referralsourcereport',
             component: './Report/ReferralSourceReport',
-            authority: [
-              'report.other.referralsource',
-            ],
+            authority: [ 'report.other.referralsource' ],
           },
           {
             path: '/report/sessionsummary',
             name: 'sessionsummary',
             component: './Report/SessionSummary',
-            authority: [
-              'report.admin.sessionsummary',
-            ],
+            authority: [ 'report.admin.sessionsummary' ],
           },
           {
             path: '/report/sessionsummary/:id',
             name: 'viewreport',
             component: './Report/SessionSummary/Details',
-            authority: [
-              'report.admin.sessionsummary',
-            ],
+            authority: [ 'report.admin.sessionsummary' ],
           },
           {
             path: '/report/inventorytrendingreport',
             name: 'inventorytrendingreport',
             component: './Report/InventoryTrendingReport',
-            authority: [
-              'report.inventory.inventorytrendingreport',
-            ],
+            authority: [ 'report.inventory.inventorytrendingreport' ],
           },
           {
             path: '/report/inventorystockcountreport',
             name: 'inventorystockcountreport',
             component: './Report/InventoryStockCountReport',
-            authority: [
-              'report.inventory.inventorystockcountreport',
-            ],
+            authority: [ 'report.inventory.inventorystockcountreport' ],
           },
           {
             path: '/report/inventorylistingreport',
             name: 'inventorylistingreport',
             component: './Report/InventoryListingReport',
-            authority: [
-              'report.inventory.inventorylistingreport',
-            ],
+            authority: [ 'report.inventory.inventorylistingreport' ],
           },
           {
             path: '/report/patientageingreport',
             name: 'patientageingreport',
             component: './Report/PatientAgeingReport',
-            authority: [
-              'report.finance.patientageingreport',
-            ],
+            authority: [ 'report.finance.patientageingreport' ],
           },
           {
             path: '/report/purchasereceivinglistingreport',
             name: 'purchasereceivinglistingreport',
             component: './Report/purchasereceivinglistingreport',
-            authority: [
-              'report.inventory.purchasereceivinglistingreport',
-            ],
+            authority: [ 'report.inventory.purchasereceivinglistingreport' ],
           },
           {
             path: '/report/statementsummaryreport',
             name: 'statementsummaryreport',
             component: './Report/StatementSummaryReport',
-            authority: [
-              'report.finance.statementsummaryreport',
-            ],
+            authority: [ 'report.finance.statementsummaryreport' ],
           },
           {
             path: '/report/paymentcollectionsummary',
             name: 'paymentcollectionsummary',
             component: './Report/PaymentCollectionSummary',
-            authority: [
-              'report.finance.paymentcollectionsummary',
-            ],
+            authority: [ 'report.finance.paymentcollectionsummary' ],
           },
           {
             path: '/report/wiprevenue',
             name: 'wiprevenue',
             component: './Report/WIPRevenue',
-            authority: [
-              'report.finance.wiprevenuereport',
-            ],
+            authority: [ 'report.finance.wiprevenuereport' ],
           },
           {
             path: '/report/saleslistingbyperformer',
             name: 'saleslistingbyperformer',
             component: './Report/SalesListingByPerformer',
-            authority: [
-              'report.finance.saleslistingbyperformerreport',
-            ],
+            authority: [ 'report.finance.saleslistingbyperformerreport' ],
           },
           {
             path: '/report/packageexpiry',
             name: 'packageexpiry',
             component: './Report/PackageExpiry',
-            authority: [
-              'report.finance.packageexpiryreport',
-            ],
+            authority: [ 'report.finance.packageexpiryreport' ],
           },
         ],
       },
@@ -841,54 +673,40 @@ const _routes = [
         icon: 'receipt',
         name: 'claimSubmission',
         hideChildrenInMenu: true,
-        authority: [
-          'claimsubmission',
-        ],
-        specialist: [
-          'GP',
-        ],
+        authority: [ 'claimsubmission' ],
+        specialist: [ 'GP' ],
         routes: [
           {
             path: '/claim-submission',
             name: 'chas',
             component: './ClaimSubmission',
-            authority: [
-              'claimsubmission',
-            ],
+            authority: [ 'claimsubmission' ],
           },
           {
             path: '/claim-submission/chas',
             name: 'chas',
             component: './ClaimSubmission/chas',
-            authority: [
-              'claimsubmission',
-            ],
+            authority: [ 'claimsubmission' ],
           },
           {
             path: '/claim-submission/chas/invoice/:invoiceNo',
             name: 'patientInvoice',
             hideInMenu: true,
             component: './Finance/Invoice/Details',
-            authority: [
-              'claimsubmission',
-            ],
+            authority: [ 'claimsubmission' ],
           },
           {
             path: '/claim-submission/medisave',
             name: 'medisave',
             component: './ClaimSubmission/medisave',
-            authority: [
-              'claimsubmission',
-            ],
+            authority: [ 'claimsubmission' ],
           },
           {
             path: '/claim-submission/medisave/invoice/:invoiceNo',
             name: 'patientInvoice',
             hideInMenu: true,
             component: './Finance/Invoice/Details',
-            authority: [
-              'claimsubmission',
-            ],
+            authority: [ 'claimsubmission' ],
           },
         ],
       },
@@ -900,9 +718,7 @@ const _routes = [
         icon: 'description',
         name: 'forms',
         component: './FormListing',
-        authority: [
-          'forms',
-        ],
+        authority: [ 'forms' ],
       },
       // Forms
       //
@@ -911,13 +727,8 @@ const _routes = [
         path: '/setting',
         icon: 'settings',
         name: 'setting',
-        authority: [
-          'settings',
-        ],
-        specialist: [
-          'GP',
-          'Dental',
-        ],
+        authority: [ 'settings' ],
+        specialist: [ 'GP', 'Dental' ],
         hideChildrenInMenu: true,
         routes: [
           {
@@ -925,17 +736,13 @@ const _routes = [
             name: 'setting',
             component: './Setting',
             // hideInMenu: true,
-            authority: [
-              'settings',
-            ],
+            authority: [ 'settings' ],
           },
           {
             path: '/setting/clinicinfo',
             name: 'clinicinfo',
             component: './Setting/ClinicInfo',
-            authority: [
-              'settings.mastersetting.clinicinformation',
-            ],
+            authority: [ 'settings.mastersetting.clinicinformation' ],
           },
           {
             path: '/setting/queuedisplaysetup',
@@ -946,209 +753,157 @@ const _routes = [
             path: '/setting/service',
             name: 'service',
             component: './Setting/Service',
-            authority: [
-              'settings.clinicsetting.service',
-            ],
+            authority: [ 'settings.clinicsetting.service' ],
           },
           {
             path: '/setting/treatment',
             name: 'treatment',
             component: './Setting/Treatment',
-            authority: [
-              'settings',
-            ],
+            authority: [ 'settings' ],
           },
           {
             path: '/setting/treatmentcategory',
             name: 'treatmentcategory',
             component: './Setting/TreatmentCategory',
-            authority: [
-              'settings',
-            ],
+            authority: [ 'settings' ],
           },
           {
             path: '/setting/room',
             name: 'room',
             component: './Setting/Room',
-            authority: [
-              'settings.clinicsetting.room',
-            ],
+            authority: [ 'settings.clinicsetting.room' ],
           },
           {
             path: '/setting/roomassignment',
             name: 'roomassignment',
             component: './Setting/RoomAssignment',
-            authority: [
-              'settings.clinicsetting.roomassignment',
-            ],
+            authority: [ 'settings.clinicsetting.roomassignment' ],
           },
           {
             path: '/setting/clinicbreakhour',
             name: 'clinicbreakhour',
             component: './Setting/ClinicBreakHour',
-            authority: [
-              'settings.clinicsetting.clinicbreakhour',
-            ],
+            authority: [ 'settings.clinicsetting.clinicbreakhour' ],
           },
           {
             path: '/setting/publicholiday',
             name: 'publicholiday',
             component: './Setting/PublicHoliday',
-            authority: [
-              'settings.clinicsetting.publicholiday',
-            ],
+            authority: [ 'settings.clinicsetting.publicholiday' ],
           },
           {
             path: '/setting/participantrole',
             name: 'participantrole',
             component: './Setting/ParticipantRole',
-            authority: [
-              'settings',
-            ],
+            authority: [ 'settings' ],
           },
           {
             path: '/setting/roomblock',
             name: 'roomblock',
             component: './Setting/RoomBlock',
-            authority: [
-              'settings.clinicsetting.roomblock',
-            ],
+            authority: [ 'settings.clinicsetting.roomblock' ],
           },
           {
             path: '/setting/doctorblock',
             name: 'doctorblock',
             component: './Setting/DoctorBlock',
-            authority: [
-              'settings.clinicsetting.doctorblock',
-            ],
+            authority: [ 'settings.clinicsetting.doctorblock' ],
           },
           {
             path: '/setting/userprofile',
             name: 'userprofile',
             component: './Setting/UserProfile',
-            authority: [
-              'settings',
-            ],
+            authority: [ 'settings' ],
           },
           {
             path: '/setting/userprofile/new',
             name: 'newuserprofile',
             component: './Setting/UserProfile/Details',
-            authority: [
-              'settings',
-            ],
+            authority: [ 'settings' ],
           },
           {
             path: '/setting/userprofile/:id',
             name: 'edituserprofile',
             component: './Setting/UserProfile/Details',
-            authority: [
-              'settings',
-            ],
+            authority: [ 'settings' ],
           },
           {
             path: '/setting/userrole',
             name: 'userrole',
             component: './Setting/UserRole',
-            authority: [
-              'settings.role',
-            ],
+            authority: [ 'settings.role' ],
           },
           {
             path: '/setting/userrole/new',
             name: 'newuserrole',
             component: './Setting/UserRole/Details',
-            authority: [
-              'settings.role.addrole',
-            ],
+            authority: [ 'settings.role.addrole' ],
           },
           {
             path: '/setting/userrole/:id',
             name: 'edituserrole',
             component: './Setting/UserRole/Details',
-            authority: [
-              'settings.role.editrole',
-            ],
+            authority: [ 'settings.role.editrole' ],
           },
           {
             path: '/setting/revenuecategory',
             name: 'revenuecategory',
             component: './Setting/RevenueCategory',
-            authority: [
-              'settings.clinicsetting.revenuecategory',
-            ],
+            authority: [ 'settings.clinicsetting.revenuecategory' ],
           },
           {
             path: '/setting/consumableuom',
             name: 'consumableuom',
             component: './Setting/ConsumableUOM',
-            authority: [
-              'settings.clinicsetting.consumableuom',
-            ],
+            authority: [ 'settings.clinicsetting.consumableuom' ],
           },
           {
             path: '/setting/medicationUOM',
             name: 'medicationUOM',
             component: './Setting/MedicationUOM',
-            authority: [
-              'settings.clinicsetting.medicationuom',
-            ],
+            authority: [ 'settings.clinicsetting.medicationuom' ],
           },
           {
             path: '/setting/medicationgroup',
             name: 'medicationgroup',
             component: './Setting/MedicationGroup',
-            authority: [
-              'settings.clinicsetting.medicationgroup',
-            ],
+            authority: [ 'settings.clinicsetting.medicationgroup' ],
           },
           {
             path: '/setting/consumablegroup',
             name: 'consumablegroup',
             component: './Setting/ConsumableGroup',
-            authority: [
-              'settings.clinicsetting.consumablecategory',
-            ],
+            authority: [ 'settings.clinicsetting.consumablecategory' ],
           },
           {
             path: '/setting/medicationdosage',
             name: 'medicationdosage',
             component: './Setting/MedicationDosage',
-            authority: [
-              'settings.clinicsetting.medicationdosage',
-            ],
+            authority: [ 'settings.clinicsetting.medicationdosage' ],
           },
           {
             path: '/setting/clinicoperationhour',
             name: 'clinicoperationhour',
             component: './Setting/ClinicOperationHour',
-            authority: [
-              'settings.clinicsetting.clinicoperationhour',
-            ],
+            authority: [ 'settings.clinicsetting.clinicoperationhour' ],
           },
           {
             path: '/setting/gstsetup',
             name: 'gstsetup',
             component: './Setting/GST',
-            authority: [
-              'settings.mastersetting.gstsetup',
-            ],
+            authority: [ 'settings.mastersetting.gstsetup' ],
           },
           {
             path: '/setting/generalsetting',
             name: 'generalsetting',
             component: './Setting/GeneralSetting',
-            authority: [
-              'settings.mastersetting.generalsetting',
-            ],
+            authority: [ 'settings.mastersetting.generalsetting' ],
           },
           {
             path: '/setting/printoutsetting',
             name: 'printoutsetting',
             component: './Setting/PrintoutSetting',
-            authority: [
-              'settings.printsetup.printoutsetting',
-            ],
+            authority: [ 'settings.printsetup.printoutsetting' ],
           },
           {
             path: '/setting/masterprintoutsetting',
@@ -1164,153 +919,115 @@ const _routes = [
             path: '/setting/company/2',
             name: 'supplier',
             component: './Setting/Company',
-            authority: [
-              'settings.contact.supplier',
-            ],
+            authority: [ 'settings.contact.supplier' ],
           },
           {
             path: '/setting/servicecenter',
             name: 'servicecenter',
             component: './Setting/serviceCenter',
-            authority: [
-              'settings.clinicsetting.servicecenter',
-            ],
+            authority: [ 'settings.clinicsetting.servicecenter' ],
           },
           {
             path: '/setting/servicecentercategory',
             name: 'servicecentercategory',
             component: './Setting/serviceCenterCategory',
-            authority: [
-              'settings.clinicsetting.servicecentercategory',
-            ],
+            authority: [ 'settings.clinicsetting.servicecentercategory' ],
           },
           {
             path: '/setting/servicecategory',
             name: 'servicecategory',
             component: './Setting/serviceCategory',
-            authority: [
-              'settings.clinicsetting.servicecategory',
-            ],
+            authority: [ 'settings.clinicsetting.servicecategory' ],
           },
           {
             path: '/setting/medicationfrequency',
             name: 'medicationfrequency',
             component: './Setting/medicationFrequency',
-            authority: [
-              'settings.clinicsetting.medicationfrequency',
-            ],
+            authority: [ 'settings.clinicsetting.medicationfrequency' ],
           },
           {
             path: '/setting/medicationprecautions',
             name: 'medicationprecautions',
             component: './Setting/medicationPrecautions',
-            authority: [
-              'settings.clinicsetting.medicationprecaution',
-            ],
+            authority: [ 'settings.clinicsetting.medicationprecaution' ],
           },
           {
             path: '/setting/medicationconsumptionmethod',
             name: 'medicationconsumptionmethod',
             component: './Setting/medicationConsumptionMethod',
-            authority: [
-              'settings.clinicsetting.medicationconsumptionmethod',
-            ],
+            authority: [ 'settings.clinicsetting.medicationconsumptionmethod' ],
           },
           {
             path: '/setting/smstemplate',
             name: 'smstemplate',
             component: './Setting/SMSTemplate',
-            authority: [
-              'settings.templates.smstemplate',
-            ],
+            authority: [ 'settings.templates.smstemplate' ],
           },
           {
             path: '/setting/documenttemplate',
             name: 'documenttemplate',
             component: './Setting/DocumentTemplate',
-            authority: [
-              'settings.templates.documenttemplate',
-            ],
+            authority: [ 'settings.templates.documenttemplate' ],
           },
           {
             path: '/setting/paymentmode',
             name: 'paymentmode',
             component: './Setting/PaymentMode',
-            authority: [
-              'settings.clinicsetting.paymentmode',
-            ],
+            authority: [ 'settings.clinicsetting.paymentmode' ],
           },
           {
             path: '/setting/appointmenttype',
             name: 'appointmenttype',
             component: './Setting/AppointmentType',
-            authority: [
-              'settings.clinicsetting.appointmenttype',
-            ],
+            authority: [ 'settings.clinicsetting.appointmenttype' ],
           },
           {
             path: '/setting/casetype',
             name: 'casetype',
             component: './Setting/CaseType',
-            authority: [
-              'settings.clinicsetting.casetype',
-            ],
+            authority: [ 'settings.clinicsetting.casetype' ],
           },
           {
             path: '/setting/casedescription',
             name: 'casedescription',
             component: './Setting/CaseDescription',
-            authority: [
-              'settings.clinicsetting.casedescription',
-            ],
+            authority: [ 'settings.clinicsetting.casedescription' ],
           },
           {
             path: '/setting/referralsource',
             name: 'referralsource',
             component: './Setting/ReferralSource',
-            authority: [
-              'settings.contact.referralsource',
-            ],
+            authority: [ 'settings.contact.referralsource' ],
           },
           {
             path: '/setting/referralperson',
             name: 'referralperson',
             component: './Setting/ReferralPerson',
-            authority: [
-              'settings.contact.referralperson',
-            ],
+            authority: [ 'settings.contact.referralperson' ],
           },
           {
             path: '/setting/visitordertemplate',
             name: 'visitordertemplate',
             component: './Setting/VisitOrderTemplate',
-            authority: [
-              'settings.templates.visitordertemplate',
-            ],
+            authority: [ 'settings.templates.visitordertemplate' ],
           },
           {
             path: '/setting/refractiontesttype',
             name: 'refractiontesttype',
             component: './Setting/RefractionTestType',
-            authority: [
-              'settings.clinicsetting.refractiontesttype',
-            ],
+            authority: [ 'settings.clinicsetting.refractiontesttype' ],
           },
           {
             path: '/setting/package',
             name: 'package',
             component: './Setting/Package',
-            authority: [
-              'settings.clinicsetting.package',
-            ],
+            authority: [ 'settings.clinicsetting.package' ],
           },
           {
             path: '/setting/invoiceadjustment',
             name: 'invoiceadjustment',
             component: './Setting/InvoiceAdjustment',
-            authority: [
-              'settings.clinicsetting.invoiceadjustment',
-            ],
+            authority: [ 'settings.clinicsetting.invoiceadjustment' ],
           },
         ],
       },
@@ -1338,10 +1055,7 @@ const _routes = [
         icon: 'local_phone',
         name: 'support',
         hideChildrenInMenu: true,
-        specialist: [
-          'GP',
-          'Dental',
-        ],
+        specialist: [ 'GP', 'Dental' ],
         routes: [
           {
             path: '/support',
@@ -1392,10 +1106,7 @@ const routes =
         if (index === 1) {
           return {
             ...r,
-            routes: [
-              devRoutes,
-              ...r.routes,
-            ],
+            routes: [ devRoutes, ...r.routes ],
           }
         }
         return r
