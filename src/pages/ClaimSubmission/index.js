@@ -23,15 +23,18 @@ const styles = (theme) => ({
 }))
 class ClaimSubmission extends PureComponent {
   componentDidMount () {
-    const data = {
-      'ClaimCountListDto[0].SchemeType': 'CHAS',
-      'ClaimCountListDto[0].Status': 'New',
-      'ClaimCountListDto[1].SchemeType': 'Medisave',
-      'ClaimCountListDto[1].Status': 'New',
-    }
+    const isMedisaveEnable = false
     this.props.dispatch({
       type: 'claimSubmission/getClaimCount',
-      payload: data,
+      payload: isMedisaveEnable ? {
+        'ClaimCountListDto[0].SchemeType': 'CHAS',
+        'ClaimCountListDto[0].Status': 'New',
+        'ClaimCountListDto[1].SchemeType': 'Medisave',
+        'ClaimCountListDto[1].Status': 'New',
+      } : {
+        'ClaimCountListDto[0].SchemeType': 'CHAS',
+        'ClaimCountListDto[0].Status': 'New',
+      },
     })
   }
 
