@@ -20,6 +20,8 @@ import {
   Checkbox,
 } from '@/components'
 
+const isMedisaveEnable = false
+
 const styles = (theme) => ({
   sectionHeader: {
     fontWeight: 400,
@@ -609,6 +611,7 @@ class Detail extends PureComponent {
                     }}
                   />
                 </GridItem>
+                {isMedisaveEnable && 
                 <GridItem xs={12}>
                   <FastField
                     name='isCdmpClaimable'
@@ -626,10 +629,10 @@ class Detail extends PureComponent {
                       )
                     }}
                   />
-                </GridItem>
+                </GridItem>}
               </GridContainer>
             </div>
-            {ddlIsCdmpClaimable && (
+            {isMedisaveEnable && ddlIsCdmpClaimable && (
               <div style={{ margin: theme.spacing(1, 2) }}>
                 <h4 style={{ fontWeight: 400 }}>
                   <b>Medisave Settings</b>

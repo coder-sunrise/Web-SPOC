@@ -20,6 +20,8 @@ import {
 import MedisaveVaccinations from './MedisaveVaccinations'
 import Sdd from '../../Sdd'
 
+const isMedisaveEnable = false
+
 const styles = () => ({})
 
 const Detail = ({
@@ -168,7 +170,7 @@ const Detail = ({
                     simple
                     valueField='id'
                     textField='name'
-                    options={[
+                    options={isMedisaveEnable ? [
                       {
                         id: 'isAutoGenerateCertificate',
                         name: 'Auto Generate Certificate',
@@ -196,6 +198,31 @@ const Detail = ({
                       {
                         id: 'isMedisaveClaimable',
                         name: 'CDMP Claimable',
+
+                        layoutConfig: {
+                          style: {},
+                        },
+                      },
+                    ] : [
+                      {
+                        id: 'isAutoGenerateCertificate',
+                        name: 'Auto Generate Certificate',
+
+                        layoutConfig: {
+                          style: {},
+                        },
+                      },
+                      {
+                        id: 'isChasAcuteClaimable',
+                        name: 'CHAS Acute Claimable',
+
+                        layoutConfig: {
+                          style: {},
+                        },
+                      },
+                      {
+                        id: 'isChasChronicClaimable',
+                        name: 'CHAS Chronic Claimable',
 
                         layoutConfig: {
                           style: {},
@@ -316,7 +343,7 @@ const Detail = ({
             <GridItem xs={2} />
             <GridItem xs={10}>
               <div style={{ 
-                  display: values.isMedisaveClaimable  ? '' : 'none',
+                  display: isMedisaveEnable && values.isMedisaveClaimable ? '' : 'none',
                   }}
               >
                 <MedisaveVaccinations
