@@ -21,18 +21,21 @@ import {
 import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
 // common utils
 import { roundTo } from '@/utils/utils'
-import { INVOICE_PAYER_TYPE, PACKAGE_SIGNATURE_CHECK_OPTION } from '@/utils/constants'
+import {
+  INVOICE_PAYER_TYPE,
+  PACKAGE_SIGNATURE_CHECK_OPTION,
+} from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
 // sub component
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 import DispenseDetails from '@/pages/Dispense/DispenseDetails/WebSocketWrapper'
 import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
 import { ReportsOnCompletePaymentOption } from '@/utils/codes'
+import Signature from '@/components/_medisys/Forms/Signature'
 import ApplyClaims from './refactored/newApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 import SchemeValidationPrompt from './components/SchemeValidationPrompt'
 import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
-import Signature from '@/components/_medisys/Forms/Signature'
 // page utils
 import {
   constructPayload,
@@ -224,9 +227,11 @@ class Billing extends Component {
       }).then((response) => {
         const { invoice } = response
         const { invoiceItems } = invoice
-        
+
         if (invoiceItems && invoiceItems.length > 0) {
-          const consumedItems = invoiceItems.filter(i => i.isPackage && i.packageConsumeQuantity > 0)
+          const consumedItems = invoiceItems.filter(
+            (i) => i.isPackage && i.packageConsumeQuantity > 0,
+          )
           if (consumedItems.length > 0) {
             this.setState({
               isConsumedPackage: true,
@@ -467,17 +472,25 @@ class Billing extends Component {
     const { dispatch, values, clinicSettings } = this.props
     const { packageRedeemAcknowledge } = values
     const { isEnablePackage, isCheckPackageSignature } = clinicSettings
-    const isExistingPackageSignature = packageRedeemAcknowledge &&
-                                        packageRedeemAcknowledge.signature !== '' && 
-                                        packageRedeemAcknowledge.signature !== undefined
+    const isExistingPackageSignature =
+      packageRedeemAcknowledge &&
+      packageRedeemAcknowledge.signature !== '' &&
+      packageRedeemAcknowledge.signature !== undefined
 
     if (!isEnablePackage || !this.state.isConsumedPackage)
       return this.checkInvoiceOutstanding()
 
-    if (isCheckPackageSignature.toLowerCase() === PACKAGE_SIGNATURE_CHECK_OPTION.IGNORE.toLowerCase() || isExistingPackageSignature) 
+    if (
+      isCheckPackageSignature.toLowerCase() ===
+        PACKAGE_SIGNATURE_CHECK_OPTION.IGNORE.toLowerCase() ||
+      isExistingPackageSignature
+    )
       return this.checkInvoiceOutstanding()
-    
-    if (isCheckPackageSignature.toLowerCase() === PACKAGE_SIGNATURE_CHECK_OPTION.OPTIONAL.toLowerCase()) {
+
+    if (
+      isCheckPackageSignature.toLowerCase() ===
+      PACKAGE_SIGNATURE_CHECK_OPTION.OPTIONAL.toLowerCase()
+    ) {
       return dispatch({
         type: 'global/updateState',
         payload: {
@@ -492,8 +505,13 @@ class Billing extends Component {
         },
       })
     }
-    if (isCheckPackageSignature.toLowerCase() === PACKAGE_SIGNATURE_CHECK_OPTION.MANDATORY.toLowerCase()) {
-      notification.error({ message: 'Patient signature is mandatory for package acknowledgement' })
+    if (
+      isCheckPackageSignature.toLowerCase() ===
+      PACKAGE_SIGNATURE_CHECK_OPTION.MANDATORY.toLowerCase()
+    ) {
+      notification.error({
+        message: 'Patient signature is mandatory for package acknowledgement',
+      })
       return false
     }
     return false
@@ -503,7 +521,7 @@ class Billing extends Component {
     const { dispatch, values, setFieldValue } = this.props
     await setFieldValue('mode', 'save')
     await setFieldValue('visitStatus', 'COMPLETED')
-    
+
     const { invoice, invoicePayer = [] } = values
     const { outstandingBalance = 0 } = invoice
 
@@ -528,8 +546,8 @@ class Billing extends Component {
   }
 
   onCompletePaymentClick = async () => {
-    // check package acknowledge 
-    this.checkPackageSignature()      
+    // check package acknowledge
+    this.checkPackageSignature()
   }
 
   onPrintReceiptClick = (invoicePaymentID) => {
@@ -543,20 +561,20 @@ class Billing extends Component {
     })
   }
 
-  onPrinterClick = (type, itemID, copayerID) => {
+  onPrinterClick = (type, itemID, copayerID, invoicePayerid, index) => {
     switch (type) {
       case 'Payment':
         this.onShowReport(29, { InvoicePaymentId: itemID })
         break
       case 'TaxInvoice':
-        this.onPrintInvoice(copayerID)
+        this.onPrintInvoice(copayerID, invoicePayerid, index)
         break
       default:
         break
     }
   }
 
-  onPrintInvoice = (copayerID) => {
+  onPrintInvoice = (copayerID, invoicePayerid, index) => {
     const { values, dispatch } = this.props
     const { invoicePayer } = values
     const modifiedOrNewAddedPayer = invoicePayer.filter((payer) => {
@@ -569,13 +587,14 @@ class Billing extends Component {
       parametrPaload = {
         InvoiceId: values.invoice ? values.invoice.id : '',
         CopayerId: copayerID,
+        InvoicePayerid: invoicePayerid,
+        printIndex: index,
       }
     } else {
       parametrPaload = {
         InvoiceId: values.invoice ? values.invoice.id : '',
       }
     }
-    // console.log('parametrPaload', parametrPaload)
     if (modifiedOrNewAddedPayer.length > 0) {
       dispatch({
         type: 'global/updateState',
@@ -585,10 +604,28 @@ class Billing extends Component {
           openConfirmText: 'Confirm',
           openConfirmContent: `Save changes and print invoice?`,
           onConfirmSave: () => {
+            let currentPrintIndex
+            if (parametrPaload.printIndex !== undefined) {
+              const { printIndex, ...other } = parametrPaload
+              parametrPaload = {
+                ...other,
+              }
+              currentPrintIndex = invoicePayer.filter(
+                (item, i) => !item.isCancelled && i < printIndex,
+              ).length
+            }
+
             const callback = () => {
               this.setState((preState) => ({
                 submitCount: preState.submitCount + 1,
               }))
+              if (currentPrintIndex !== undefined) {
+                const { billing: { entity = {} } } = this.props
+                parametrPaload = {
+                  ...parametrPaload,
+                  InvoicePayerid: entity.invoicePayer[currentPrintIndex].id,
+                }
+              }
 
               this.onShowReport(15, parametrPaload)
             }
@@ -690,13 +727,13 @@ class Billing extends Component {
 
     let drugList = []
 
-    prescription.forEach(item => {
+    prescription.forEach((item) => {
       drugList.push(item)
     })
-    packageItem.forEach(item => {
+    packageItem.forEach((item) => {
       if (item.type === 'Medication') {
         drugList.push({
-          ...item, 
+          ...item,
           name: item.description,
           dispensedQuanity: item.packageConsumeQuantity,
         })
@@ -774,7 +811,7 @@ class Billing extends Component {
 
     dispatch({
       type: 'billing/savePackageAcknowledge',
-      payload: { 
+      payload: {
         visitId: values.visitId,
         invoiceFK: values.invoice.id,
         signatureName: patient.name,
@@ -830,12 +867,15 @@ class Billing extends Component {
       ctservice,
       ctcopayer,
     }
-    const { isEnableAddPaymentInBilling = false, isEnablePackage = false } = clinicSettings
+    const {
+      isEnableAddPaymentInBilling = false,
+      isEnablePackage = false,
+    } = clinicSettings
 
     let src
     if (
       values.packageRedeemAcknowledge &&
-      values.packageRedeemAcknowledge.signature !== '' && 
+      values.packageRedeemAcknowledge.signature !== '' &&
       values.packageRedeemAcknowledge.signature !== undefined
     ) {
       src = `${base64Prefix}${values.packageRedeemAcknowledge.signature}`
@@ -924,7 +964,9 @@ class Billing extends Component {
           </GridContainer>
         </Paper>
         <GridContainer>
-          <GridItem md={isEnablePackage && this.state.isConsumedPackage ? 6 : 8}>
+          <GridItem
+            md={isEnablePackage && this.state.isConsumedPackage ? 6 : 8}
+          >
             <FastField
               name='invoice.invoiceRemark'
               render={(args) => {
@@ -945,12 +987,18 @@ class Billing extends Component {
               }}
             />
           </GridItem>
-          <GridItem md={isEnablePackage && this.state.isConsumedPackage ? 6 : 4} style={{ paddingRight: 0 }}>
-            <React.Fragment>              
+          <GridItem
+            md={isEnablePackage && this.state.isConsumedPackage ? 6 : 4}
+            style={{ paddingRight: 0 }}
+          >
+            <React.Fragment>
               <div className={classes.paymentButton}>
-                {isEnablePackage && this.state.isConsumedPackage && (
+                {isEnablePackage &&
+                this.state.isConsumedPackage && (
                   <Button
-                    color={src !== '' && src !== undefined ? 'success' : 'danger'}
+                    color={
+                      src !== '' && src !== undefined ? 'success' : 'danger'
+                    }
                     onClick={() => {
                       this.setState({
                         isShowAcknowledge: true,
@@ -1062,7 +1110,7 @@ class Billing extends Component {
             updateSignature={this.updateSignature}
             image={src}
             isEditable={src === '' || src === undefined}
-            signatureNameLabel="Patient Name"
+            signatureNameLabel='Patient Name'
           />
         </CommonModal>
         <ViewPatientHistory top='239px' />

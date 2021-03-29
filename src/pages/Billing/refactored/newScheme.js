@@ -70,7 +70,7 @@ const validationSchema = Yup.object().shape({
     ],
     (eligibleAmount, payableBalance) => {
       const _checkAmount = eligibleAmount || payableBalance
-      
+
       if (_checkAmount) {
         return Yup.number().max(
           roundTo(_checkAmount),
@@ -448,7 +448,13 @@ const Scheme = ({
                     showRefreshOrder
                   }
                   onClick={() =>
-                    onPrinterClick('TaxInvoice', undefined, companyFK)}
+                    onPrinterClick(
+                      'TaxInvoice',
+                      undefined,
+                      companyFK,
+                      id,
+                      index,
+                    )}
                 >
                   <Print />
                   Print Invoice

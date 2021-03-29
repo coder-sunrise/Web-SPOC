@@ -15,12 +15,23 @@ export const constructPayload = (values) => {
   } = values
 
   const { invoiceItems, ...restInvoice } = invoice
-  const _invoicePayer = invoicePayer
-    .map((item, index) => ({ ...item, sequence: index }))
-    .filter((payer) => {
-      if (payer.id === undefined && payer.isCancelled) return false
-      return true
-    })
+
+  let _invoicePayer = invoicePayer.filter((payer) => {
+    if (payer.id === undefined && payer.isCancelled) return false
+    return true
+  })
+
+  let newsequence = -1
+  for (let index = 0; index < _invoicePayer.length; index++) {
+    if (_invoicePayer[index].id) {
+      newsequence = _invoicePayer[index].sequence
+    } else {
+      newsequence += 1
+      _invoicePayer[index].sequence = newsequence
+    }
+  }
+
+  _invoicePayer = _invoicePayer
     .filter((payer) => (payer.id ? payer.isModified : true))
     .map((payer) => {
       const {
