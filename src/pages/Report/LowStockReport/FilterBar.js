@@ -18,7 +18,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                 return (
                   <Select
                     {...args}
-                    label="inventoryType"
+                    label="Inventory Type"
                     options={[
                       { name: 'Medication', value: 'MEDICATION' },
                       { name: 'Consumable', value: 'CONSUMABLE' },
@@ -64,10 +64,30 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           </GridItem>
           <GridItem md={3}>
             <FastField
-              name="IsActive"
-              render={(args) => {
-                return <Select label="Status" {...args} options={status} />
-              }}
+              name="Status"
+              render={(args) => (
+                <Select
+                  {...args}
+                  label="Status"
+                  options={[
+                    {
+                      name: 'All',
+                      value: 'all',
+                    },
+                    {
+                      name: 'Active',
+                      value: 'active',
+                    },
+                    {
+                      name: 'Inactive',
+                      value: 'inactive',
+                    },
+                  ]}
+                  allowClear={false}
+                  labelField="name"
+                  valueField="value"
+                />
+              )}
             />
           </GridItem>
           <GridItem md={3}>

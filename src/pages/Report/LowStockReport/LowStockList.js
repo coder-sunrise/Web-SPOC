@@ -20,6 +20,7 @@ class LowStockList extends PureComponent {
       { name: 'stock', title: 'Current Stock' },
       { name: 'threshold', title: 'Threshold' },
       { name: 'uom', title: 'UOM' },
+      { name: 'status', title: 'Status' },
       { name: 'supplier', title: 'Supplier' },
     ]
     const LowStockDetailsExtensions = [
@@ -29,6 +30,7 @@ class LowStockList extends PureComponent {
       { columnName: 'name', sortingEnabled: false },
       { columnName: 'threshold', type: 'number', sortingEnabled: false },
       { columnName: 'uom', sortingEnabled: false },
+      { columnName: 'status', sortingEnabled: false },
       { columnName: 'supplier', sortingEnabled: false },
     ]
 

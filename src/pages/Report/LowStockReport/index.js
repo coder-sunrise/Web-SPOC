@@ -31,6 +31,7 @@ const LowStockReportWithFormik = withFormik({
   validationSchema: Yup.object().shape({}),
   mapPropsToValues: () => ({
     inventoryType: 'MEDICATION',
+    Status: 'active',
   }),
 })(LowStockReport)
 
