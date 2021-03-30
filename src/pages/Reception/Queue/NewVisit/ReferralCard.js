@@ -213,13 +213,11 @@ class ReferralCard extends PureComponent {
         valueField="id"
         label="Patient Name/Account No./Mobile No./Ref. No."
         renderDropdown={(p) => {
-          const { contact } = p
-          if (contact !== undefined) {
-            const { mobileContactNumber, officeContactNumber, homeContactNumber } = contact
-            p.mobileNo = mobileContactNumber.number
-            p.officeNo = officeContactNumber.number
-            p.homeNo = homeContactNumber.number
-          }
+          const { contact = {} } = p
+          const { mobileContactNumber = {}, officeContactNumber = {}, homeContactNumber = {} } = contact
+          p.mobileNo = mobileContactNumber.number || p.mobileNo
+          p.officeNo = officeContactNumber.number || p.officeNo
+          p.homeNo = homeContactNumber.number || p.homeNo
           return (
             <div>
               <p>
