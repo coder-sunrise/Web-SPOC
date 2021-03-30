@@ -332,6 +332,16 @@ const getVisitDoctorUserId = (props) => {
         batchNo = batchNo[0]
       }
     }
+ 
+    if (values.corPrescriptionItemDrugMixture) {
+      const activeDrugMixtureItems = values.corPrescriptionItemDrugMixture.filter(
+        (item) => !item.isDeleted,
+      )
+      // reorder and overwrite sequence, get combined drug name
+      activeDrugMixtureItems.forEach((item, index) => { 
+        if (item.isNew && item.id < 0) item.id = undefined
+      })
+    }
 
     const data = {
       isOrderedByDoctor:
