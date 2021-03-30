@@ -25,27 +25,27 @@ const mapAttachmentToUploadInput = (
 ) =>
   !fileIndexFK
     ? {
-      // file status === uploaded, only 4 info needed for API
-      fileIndexFK: rest.id,
-      thumbnailIndexFK: thumbnail ? thumbnail.id : undefined,
-      sortOrder: index,
-      fileName,
-      attachmentType,
-      attachmentTypeFK,
-      isDeleted,
-      remarks: rest.remarks,
-    }
+        // file status === uploaded, only 4 info needed for API
+        fileIndexFK: rest.id,
+        thumbnailIndexFK: thumbnail ? thumbnail.id : undefined,
+        sortOrder: index,
+        fileName,
+        attachmentType,
+        attachmentTypeFK,
+        isDeleted,
+        remarks: rest.remarks,
+      }
     : {
-      // file status === confirmed, need to provide full object for API
-      ...rest,
-      fileIndexFK,
-      thumbnailIndexFK: thumbnail ? thumbnail.id : undefined,
-      fileName,
-      attachmentType,
-      attachmentTypeFK,
-      isDeleted,
-      sortOrder: index,
-    }
+        // file status === confirmed, need to provide full object for API
+        ...rest,
+        fileIndexFK,
+        thumbnailIndexFK: thumbnail ? thumbnail.id : undefined,
+        fileName,
+        attachmentType,
+        attachmentTypeFK,
+        isDeleted,
+        sortOrder: index,
+      }
 
 const convertEyeForms = (values) => {
   let { visitEyeRefractionForm = {}, visitEyeVisualAcuityTest } = values
@@ -201,15 +201,18 @@ export const formikMapPropsToValues = ({
     if (visitEntries.id) {
       if (visitEntries.referralSourceFK || visitEntries.referralPersonFK) {
         referralType = 'Company'
-      }
-      else if (visitEntries.referralPatientProfileFK) {
+      } else if (visitEntries.referralPatientProfileFK) {
         referralType = 'Patient'
       }
-    }
-    else if (clinicSettings.settings.isVisitReferralSourceMandatory) {
+    } else if (
+      patientInfo.referredBy === 'Company' ||
+      patientInfo.referredBy === 'Patient'
+    ) {
+      referralType = patientInfo.referredBy
+    } else if (clinicSettings.settings.isVisitReferralSourceMandatory) {
       referralType = 'Company'
-    } 
-    
+    }
+
     return {
       queueNo: qNo,
       visitPurposeFK,
@@ -226,9 +229,18 @@ export const formikMapPropsToValues = ({
         formData: newFormData,
       },
       referredBy: referralType,
-      referralRemarks: visitEntries.id ? visitEntries.referralRemarks : patientInfo.referralRemarks,
-      referralSourceFK: visitEntries.id ? visitEntries.referralSourceFK : patientInfo.referralSourceFK,
-      referralPersonFK: visitEntries.id ? visitEntries.referralPersonFK : patientInfo.referralPersonFK,
+      referralRemarks: visitEntries.id
+        ? visitEntries.referralRemarks
+        : patientInfo.referralRemarks,
+      referralSourceFK: visitEntries.id
+        ? visitEntries.referralSourceFK
+        : patientInfo.referralSourceFK,
+      referralPersonFK: visitEntries.id
+        ? visitEntries.referralPersonFK
+        : patientInfo.referralPersonFK,
+      referralPatientProfileFK: visitEntries.id
+        ? visitEntries.referralPatientProfileFK
+        : patientInfo.referredByPatientFK,
     }
   } catch (error) {
     console.log({ error })
