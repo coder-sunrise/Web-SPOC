@@ -228,6 +228,13 @@ class ReferralDetails extends PureComponent {
         labelField="name"
         label="Patient Name/Account No./Mobile No./Ref. No."
         renderDropdown={(p) => {
+          const { contact } = p
+          if (contact !== undefined) {
+            const { mobileContactNumber, officeContactNumber, homeContactNumber } = contact
+            p.mobileNo = mobileContactNumber.number
+            p.officeNo = officeContactNumber.number
+            p.homeNo = homeContactNumber.number
+          }
           return (
             <div>
               <p>
