@@ -11,7 +11,7 @@ import { SCHEME_TYPE } from '@/utils/constants'
 //   schemeTypes = codetableData
 // })
 
-const isMedisaveEnable = true
+const isMedisaveEnable = false
 const ctSchemeType = 'ctSchemeType'
 let commitCount = 1000 // uniqueNumber
 @connect(({ codetable }) => ({ codetable }))

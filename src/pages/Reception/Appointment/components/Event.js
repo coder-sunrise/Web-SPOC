@@ -137,8 +137,8 @@ class Event extends React.PureComponent {
           <div style={{ padding: '0px 4px' }}>
             <div className={monthViewClass}>
               <span className={classes.title}>
-                {`${moment(start).format('HH:mm')} - ${moment(end).format(
-                  'HH:mm',
+                {`${moment(start).format('h:mm A')} - ${moment(end).format(
+                  'h:mm A',
                 )}`}
               </span>
             </div>
