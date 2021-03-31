@@ -33,7 +33,9 @@ const discardConsultation = async ({ dispatch, dispense }) => {
   try {
     const consultationResult = await dispatch({
       type: 'consultation/discard',
-      payload: dispense.entity.clinicalObjectRecordFK,
+      payload: {
+        id: dispense.entity.clinicalObjectRecordFK,
+      },
     })
     if (consultationResult) {
       await dispatch({
