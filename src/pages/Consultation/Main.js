@@ -1054,6 +1054,7 @@ class Main extends React.Component {
       consultationDocument,
       forms,
     })
+    exist.isGstInclusive = currentValue.isGSTInclusive
     mergeArrayProps.forEach((p) => {
       exist[p] = [
         ...currentValue[p],
