@@ -1,12 +1,14 @@
 import React from 'react'
 import _ from 'lodash'
 import * as Yup from 'yup'
+import $ from 'jquery'
+import { Radio } from 'antd'
 import { connect } from 'dva'
 import { withRouter } from 'react-router'
 // formik
 import { Field } from 'formik'
 // material ui
-import { withStyles } from '@material-ui/core'
+import { withStyles, List, ListItem, ListItemText } from '@material-ui/core'
 import { FormattedMessage } from 'umi/locale'
 import Search from '@material-ui/icons/Search'
 import moment from 'moment'
@@ -24,6 +26,8 @@ import {
   SizeContainer,
   DatePicker,
   CommonModal,
+  Tabs,
+  CardContainer,
 } from '@/components'
 
 // utils
@@ -50,16 +54,34 @@ const styles = (theme) => ({
     fontSize: '0.9rem',
     fontStyle: 'italic',
   },
+  radioButton: {
+    width: 90,
+    textAlign: 'center',
+    fontSize: '0.85rem',
+  },
+  tabContent: {
+    height: 550,
+    overflow: 'auto',
+    borderRadius: 0,
+    marginTop: 1,
+    marginBottom: 1,
+    paddingLeft: 10,
+  },
+  accessType: {
+    fontWeight: 500,
+  },
 })
 
-@connect(({ settingUserRole }) => ({
+@connect(({ settingUserRole, global }) => ({
   settingUserRole,
   userRole: settingUserRole.currentSelectedUserRole,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withFormikExtend({
   enableReinitialize: true,
   mapPropsToValues: (props) => {
     const { userRole } = props
+    console.log('userRole', userRole)
     return {
       ...userRole,
     }
@@ -382,7 +404,7 @@ class Main extends React.Component {
   }
 
   render () {
-    const { classes, values, footer } = this.props
+    const { classes, values, mainDivHeight = 700 } = this.props
     const {
       filter,
       hasUser,
@@ -396,10 +418,24 @@ class Main extends React.Component {
       effectiveStartDate,
       effectiveEndDate,
       filteredAccessRight,
+      roleClientAccessRight = [],
     } = values
 
     const isEdit = !!id
+    let height = mainDivHeight - 350
 
+    const currentRoleClientAccessRight = roleClientAccessRight
+      .filter(
+        (m) =>
+          !values.clinicRoleFK ||
+          m.clinicRoleBitValue >= 2 ** (values.clinicRoleFK - 1),
+      )
+      .map((r) => {
+        const data = filteredAccessRight.filter((m) => {
+          return m.clientAccessRightFK === r.clientAccessRightFK
+        })
+        return data.length === 0 ? r : data[0]
+      })
     return (
       <React.Fragment>
         <GridContainer
@@ -419,6 +455,31 @@ class Main extends React.Component {
                 }}
               />
             </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='name'
+                render={(args) => (
+                  <TextField
+                    label='Name'
+                    {...args}
+                    disabled={isEdit && !isUserMaintainable}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='description'
+                render={(args) => (
+                  <TextField
+                    label='Description'
+                    {...args}
+                    disabled={isEdit && !isUserMaintainable}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={3} />
             <GridItem md={3}>
               <Field
                 name='effectiveStartDate'
@@ -460,39 +521,6 @@ class Main extends React.Component {
                 )}
               />
             </GridItem>
-          </GridContainer>
-
-          <GridContainer className={classes.indent} alignItems='center'>
-            <GridItem md={3}>
-              <Field
-                name='name'
-                render={(args) => (
-                  <TextField
-                    label='Name'
-                    {...args}
-                    disabled={isEdit && !isUserMaintainable}
-                  />
-                )}
-              />
-            </GridItem>
-          </GridContainer>
-
-          <GridContainer className={classes.indent} alignItems='center'>
-            <GridItem md={3}>
-              <Field
-                name='description'
-                render={(args) => (
-                  <TextField
-                    label='Description'
-                    {...args}
-                    disabled={isEdit && !isUserMaintainable}
-                  />
-                )}
-              />
-            </GridItem>
-          </GridContainer>
-
-          <GridContainer className={classes.indent} alignItems='center'>
             <GridItem md={3}>
               <Field
                 name='clinicRoleFK'
@@ -507,67 +535,305 @@ class Main extends React.Component {
                 )}
               />
             </GridItem>
-            <GridItem md={8}>
+            <GridItem md={3}>
               <p className={classes.note}>
                 You are not allowed to change clinical role after save.
               </p>
             </GridItem>
           </GridContainer>
-
-          <GridItem md={12} className={classes.verticalSpacing}>
+          <GridItem md={6} className={classes.verticalSpacing}>
             <h4>Access Right</h4>
           </GridItem>
-          <GridContainer className={classes.indent} alignItems='center'>
-            <GridItem md={2}>
-              <Select
-                value={filter.module}
-                label='Module'
-                options={this.moduleList()}
-                onChange={this.onSelectModule}
-              />
-            </GridItem>
-            <GridItem md={2}>
-              <Select
-                value={filter.displayValue}
-                label='Function Access'
-                options={this.displayValueList()}
-                dropdownMatchSelectWidth={false}
-                onChange={this.onSelectDisplayValue}
-              />
-            </GridItem>
+          <GridItem md={6} className={classes.verticalSpacing}>
+            <TextField label='Filter Access Right' />
+          </GridItem>
+          <Tabs
+            tabPosition='left'
+            options={this.moduleList().map((m, index) => {
+              return {
+                id: index,
+                name: m.name,
+                content: (
+                  <CardContainer hideHeader className={classes.tabContent}>
+                    <div>
+                      <div
+                        style={{
+                          display: 'flex',
+                        }}
+                      >
+                        <div className={classes.accessType}>Module</div>
+                        <div
+                          style={{
+                            marginLeft: 'auto',
+                            display: 'flex',
+                          }}
+                        >
+                          <Button
+                            style={{ display: 'inline-block' }}
+                            color='primary'
+                            size='sm'
+                          >
+                            All Read Write
+                          </Button>
+                          <Button
+                            style={{ display: 'inline-block', marginLeft: 10 }}
+                            color='primary'
+                            size='sm'
+                          >
+                            All Read Only
+                          </Button>
+                          <Button
+                            style={{ display: 'inline-block', marginLeft: 10 }}
+                            color='primary'
+                            size='sm'
+                          >
+                            All Hidden
+                          </Button>
+                        </div>
+                      </div>
+                      <GridContainer
+                        style={{
+                          margiBottom: 10,
+                        }}
+                      >
+                        {currentRoleClientAccessRight
+                          .filter(
+                            (t) => t.module === m.value && t.type === 'Module',
+                          )
+                          .map((t) => {
+                            return (
+                              <GridItem md={6}>
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    marginRight: 20,
+                                    marginTop: 5,
+                                    marginBottom: 5,
+                                  }}
+                                >
+                                  <span>{t.displayValue}</span>
+                                  <div
+                                    style={{
+                                      marginLeft: 'auto',
+                                      display: 'flex',
+                                    }}
+                                  >
+                                    <Radio.Group size='small'>
+                                      <Radio.Button
+                                        value='ReadWrite'
+                                        className={classes.radioButton}
+                                      >
+                                        Read Write
+                                      </Radio.Button>
+                                      <Radio.Button
+                                        value='ReadOnly'
+                                        className={classes.radioButton}
+                                      >
+                                        Read Only
+                                      </Radio.Button>
+                                      <Radio.Button
+                                        value='Hidden'
+                                        className={classes.radioButton}
+                                      >
+                                        Hidden
+                                      </Radio.Button>
+                                    </Radio.Group>
+                                  </div>
+                                </div>
+                              </GridItem>
+                            )
+                          })}
+                      </GridContainer>
+                      <div
+                        style={{
+                          display: 'flex',
+                        }}
+                      >
+                        <div className={classes.accessType}>Action</div>
+                        <div
+                          style={{
+                            marginLeft: 'auto',
+                            display: 'flex',
+                          }}
+                        >
+                          <Button
+                            style={{ display: 'inline-block' }}
+                            color='primary'
+                            size='sm'
+                          >
+                            All Enable
+                          </Button>
+                          <Button
+                            style={{ display: 'inline-block', marginLeft: 10 }}
+                            color='primary'
+                            size='sm'
+                          >
+                            All Disable
+                          </Button>
+                          <Button
+                            style={{ display: 'inline-block', marginLeft: 10 }}
+                            color='primary'
+                            size='sm'
+                          >
+                            All Hidden
+                          </Button>
+                        </div>
+                      </div>
+                      <GridContainer style={{ marginBottom: 10 }}>
+                        {currentRoleClientAccessRight
+                          .filter(
+                            (t) => t.module === m.value && t.type === 'Action',
+                          )
+                          .map((t) => {
+                            return (
+                              <GridItem md={6}>
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    marginRight: 20,
+                                    marginTop: 5,
+                                    marginBottom: 5,
+                                  }}
+                                >
+                                  <span>{t.displayValue}</span>
+                                  <div
+                                    style={{
+                                      marginLeft: 'auto',
+                                      display: 'flex',
+                                    }}
+                                  >
+                                    <Radio.Group size='small'>
+                                      <Radio.Button
+                                        value='Enable'
+                                        className={classes.radioButton}
+                                      >
+                                        Enable
+                                      </Radio.Button>
+                                      <Radio.Button
+                                        value='Disable'
+                                        className={classes.radioButton}
+                                      >
+                                        Disable
+                                      </Radio.Button>
+                                      <Radio.Button
+                                        value='Hidden'
+                                        className={classes.radioButton}
+                                      >
+                                        Hidden
+                                      </Radio.Button>
+                                    </Radio.Group>
+                                  </div>
+                                </div>
+                              </GridItem>
+                            )
+                          })}
+                      </GridContainer>
+                      <div
+                        style={{
+                          display: 'flex',
+                        }}
+                      >
+                        <div className={classes.accessType}>Field</div>
+                        <div
+                          style={{
+                            marginLeft: 'auto',
+                            display: 'flex',
+                          }}
+                        >
+                          <Button
+                            style={{ display: 'inline-block' }}
+                            color='primary'
+                            size='sm'
+                          >
+                            All Enable
+                          </Button>
+                          <Button
+                            style={{ display: 'inline-block', marginLeft: 10 }}
+                            color='primary'
+                            size='sm'
+                          >
+                            All Disable
+                          </Button>
+                          <Button
+                            style={{ display: 'inline-block', marginLeft: 10 }}
+                            color='primary'
+                            size='sm'
+                          >
+                            All Hidden
+                          </Button>
+                        </div>
+                      </div>
+                      <GridContainer style={{ marginBottom: 10 }}>
+                        {currentRoleClientAccessRight
+                          .filter(
+                            (t) => t.module === m.value && t.type === 'Field',
+                          )
+                          .map((t) => {
+                            return (
+                              <GridItem md={6}>
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    marginRight: 20,
+                                    marginTop: 5,
+                                    marginBottom: 5,
+                                  }}
+                                >
+                                  <span>{t.displayValue}</span>
+                                  <div
+                                    style={{
+                                      marginLeft: 'auto',
+                                      display: 'flex',
+                                    }}
+                                  >
+                                    <Radio.Group size='small'>
+                                      <Radio.Button
+                                        value='Enable'
+                                        className={classes.radioButton}
+                                      >
+                                        Enable
+                                      </Radio.Button>
+                                      <Radio.Button
+                                        value='Disable'
+                                        className={classes.radioButton}
+                                      >
+                                        Disable
+                                      </Radio.Button>
+                                      <Radio.Button
+                                        value='Hidden'
+                                        className={classes.radioButton}
+                                      >
+                                        Hidden
+                                      </Radio.Button>
+                                    </Radio.Group>
+                                  </div>
+                                </div>
+                              </GridItem>
+                            )
+                          })}
+                      </GridContainer>
+                    </div>
+                  </CardContainer>
+                ),
+              }
+            })}
+            tabStyle={{
+              marginRight: 8,
+              marginLeft: -24,
+            }}
+            tabBarStyle={{ marginLeft: 10 }}
+            tabBarGutter={0}
+          />
 
-            <GridItem md={2}>
-              <ProgressButton
-                icon={<Search />}
-                color='primary'
-                onClick={this.handleSearch}
-              >
-                <FormattedMessage id='form.search' />
-              </ProgressButton>
-            </GridItem>
-
-            <SizeContainer size='sm'>
-              <CommonTableGrid
-                forceRender
-                rows={filteredAccessRight}
-                {...AccessRightConfig({
-                  isEdit,
-                  isUserMaintainable,
-                  onConfirmChangeRight: this.onConfirmChangeRight,
-                })}
-                FuncProps={{ pager: true }}
-              />
-            </SizeContainer>
-            <CommonModal
-              open={showModal}
-              maxWidth='md'
-              title='Confirm to change access right'
-              onClose={this.onCancel}
-              onConfirm={this.onCancel}
-            >
-              <Prompt updateSelectedValues={this.updateSelectedValues} />
-            </CommonModal>
-          </GridContainer>
+          <CommonModal
+            open={showModal}
+            maxWidth='md'
+            title='Confirm to change access right'
+            onClose={this.onCancel}
+            onConfirm={this.onCancel}
+          >
+            <Prompt updateSelectedValues={this.updateSelectedValues} />
+          </CommonModal>
         </GridContainer>
         <GridItem
           container

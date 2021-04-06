@@ -635,6 +635,10 @@ html {
   // margin-left: -1px;
 }
 
+.ant-tabs .ant-tabs-left-bar .ant-tabs-tab {
+  text-align: left;
+}
+
 tr[class^='TableSelectRow-selected-'],
 tr[class*='TableSelectRow-selected-'] {
   background-color: #c8dafd !important;
