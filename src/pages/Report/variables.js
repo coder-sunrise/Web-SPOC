@@ -121,15 +121,9 @@ export const menuData = [
   },
   {
     title: 'Inventory',
-    text: 'Low Stock Medication Report',
-    url: '/report/lowstockmedicationreport',
-    authority: 'report.inventory.lowstockmedication',
-  },
-  {
-    title: 'Inventory',
-    text: 'Low Stock Consumables Report',
-    url: '/report/lowstockconsumablesreport',
-    authority: 'report.inventory.lowstockconsumables',
+    text: 'Low Stock Report',
+    url: '/report/lowstockreport',
+    authority: 'report.inventory.lowstock',
   },
   {
     title: 'Inventory',
