@@ -6,6 +6,7 @@ import { compose } from 'redux'
 import Yup from '@/utils/yup'
 import {
   CommonModal,
+  CardContainer,
   TextField,
   GridContainer,
   GridItem,
@@ -19,6 +20,8 @@ import {
 import MedisaveVaccinations from './MedisaveVaccinations'
 import Sdd from '../../Sdd'
 import SharedContainer from '../../SharedContainer'
+
+const isMedisaveEnable = false
 
 const styles = () => ({})
 
@@ -76,6 +79,15 @@ const Detail = ({
         isDefault: Yup.boolean(),
       })
     : Yup.object()
+
+  // const medisaveSchema = values.isMedisaveClaimable ? Yup.array()
+  // .compact((v) => v.isDeleted)
+  // .of(
+  //   Yup.object().shape({
+  //     medisaveVaccinationFK: Yup.number().required(),
+  //     isDefault: Yup.boolean(),
+  //   }),
+  // ) : Yup.object()
 
   return (
     <SharedContainer hideHeader>
@@ -161,40 +173,71 @@ const Detail = ({
                       simple
                       valueField='id'
                       textField='name'
-                      options={[
-                        {
-                          id: 'isAutoGenerateCertificate',
-                          name: 'Auto Generate Certificate',
+                      options={
+                        isMedisaveEnable ? (
+                          [
+                            {
+                              id: 'isAutoGenerateCertificate',
+                              name: 'Auto Generate Certificate',
 
-                          layoutConfig: {
-                            style: {},
-                          },
-                        },
-                        {
-                          id: 'isChasAcuteClaimable',
-                          name: 'CHAS Acute Claimable',
+                              layoutConfig: {
+                                style: {},
+                              },
+                            },
+                            {
+                              id: 'isChasAcuteClaimable',
+                              name: 'CHAS Acute Claimable',
 
-                          layoutConfig: {
-                            style: {},
-                          },
-                        },
-                        {
-                          id: 'isChasChronicClaimable',
-                          name: 'CHAS Chronic Claimable',
+                              layoutConfig: {
+                                style: {},
+                              },
+                            },
+                            {
+                              id: 'isChasChronicClaimable',
+                              name: 'CHAS Chronic Claimable',
 
-                          layoutConfig: {
-                            style: {},
-                          },
-                        },
-                        {
-                          id: 'isMedisaveClaimable',
-                          name: 'CDMP Claimable',
+                              layoutConfig: {
+                                style: {},
+                              },
+                            },
+                            {
+                              id: 'isMedisaveClaimable',
+                              name: 'CDMP Claimable',
 
-                          layoutConfig: {
-                            style: {},
-                          },
-                        },
-                      ]}
+                              layoutConfig: {
+                                style: {},
+                              },
+                            },
+                          ]
+                        ) : (
+                          [
+                            {
+                              id: 'isAutoGenerateCertificate',
+                              name: 'Auto Generate Certificate',
+
+                              layoutConfig: {
+                                style: {},
+                              },
+                            },
+                            {
+                              id: 'isChasAcuteClaimable',
+                              name: 'CHAS Acute Claimable',
+
+                              layoutConfig: {
+                                style: {},
+                              },
+                            },
+                            {
+                              id: 'isChasChronicClaimable',
+                              name: 'CHAS Chronic Claimable',
+
+                              layoutConfig: {
+                                style: {},
+                              },
+                            },
+                          ]
+                        )
+                      }
                       onChange={(e, s) => {
                         if (s.isMedisaveClaimable !== undefined)
                           toggleMedisaveVaccination(s)
@@ -312,7 +355,10 @@ const Detail = ({
               <GridItem xs={10}>
                 <div
                   style={{
-                    display: values.isMedisaveClaimable ? '' : 'none',
+                    display:
+                      isMedisaveEnable && values.isMedisaveClaimable
+                        ? ''
+                        : 'none',
                   }}
                 >
                   <MedisaveVaccinations
@@ -326,6 +372,7 @@ const Detail = ({
             </GridContainer>
           </GridItem>
         </GridContainer>
+        {/* <Divider style={{ margin: '40px 0 20px 0' }} /> */}
         <CommonModal
           open={toggle}
           observe='VaccinationDetail'
