@@ -697,13 +697,19 @@ export default ({
           render: (row) => {
             let qty
             if (row.type === '1' || row.type === '5') {
-              qty = `${row.quantity} ${row.dispenseUOMDisplayValue}`
+              qty = `${numeral(row.quantity || 0).format(
+                '0,0.0',
+              )} ${row.dispenseUOMDisplayValue}`
             } else if (row.type === '2') {
-              qty = `${row.quantity} ${row.uomDisplayValue}`
+              qty = `${numeral(row.quantity || 0).format(
+                '0,0.0',
+              )} ${row.uomDisplayValue}`
             } else if (row.type === '3' || row.type === '7') {
-              qty = `${row.quantity}`
+              qty = `${numeral(row.quantity || 0).format('0,0.0')}`
             } else if (row.type === '4') {
-              qty = `${row.quantity} ${row.unitOfMeasurement}`
+              qty = `${numeral(row.quantity || 0).format(
+                '0,0.0',
+              )} ${row.unitOfMeasurement}`
             }
             return <p>{qty}</p>
           },

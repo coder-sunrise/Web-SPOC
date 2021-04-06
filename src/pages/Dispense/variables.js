@@ -165,7 +165,7 @@ export const PrescriptionColumnExtensions = (
     render: (row) => {
       return (
         <p>
-          {row.dispensedQuanity} {row.dispenseUOM}
+          {numeral(row.dispensedQuanity || 0).format('0,0.0')} {row.dispenseUOM}
         </p>
       )
     },
@@ -177,7 +177,7 @@ export const PrescriptionColumnExtensions = (
     render: (row) => {
       return (
         <p>
-          {row.orderedQuantity} {row.orderUOM}
+          {numeral(row.orderedQuantity || 0).format('0,0.0')} {row.orderUOM}
         </p>
       )
     },
@@ -333,7 +333,7 @@ export const VaccinationColumnExtensions = (
     render: (row) => {
       return (
         <p>
-          {row.dispensedQuanity} {row.dispenseUOM}
+          {numeral(row.dispensedQuanity || 0).format('0,0.0')} {row.dispenseUOM}
         </p>
       )
     },
@@ -507,7 +507,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     render: (row) => {
       return (
         <p>
-          {row.quantity} {row.dispenseUOM}
+          {numeral(row.quantity || 0).format('0,0.0')} {row.dispenseUOM}
         </p>
       )
     },
