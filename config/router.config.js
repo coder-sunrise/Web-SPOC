@@ -486,22 +486,16 @@ const _routes = [
             authority: [ 'report.finance.gst' ],
           },
           {
-            path: '/report/medicationmovementreport',
-            name: 'medicationMovementReport',
-            component: './Report/MedicationMovementReport',
-            authority: [ 'report.inventory.medicationmovement' ],
+            path: '/report/inventorymovementreport',
+            name: 'inventoryMovementReport',
+            component: './Report/InventoryMovementReport',
+            authority: [ 'report.inventory.inventorymovement' ],
           },
           {
             path: '/report/deposittransactionreport',
             name: 'depositTransactionReport',
             component: './Report/DepositTransactionReport',
             authority: [ 'report.finance.deposittransaction' ],
-          },
-          {
-            path: '/report/consumablemovementreport',
-            name: 'consumableMovementReport',
-            component: './Report/ConsumableMovementReport',
-            authority: [ 'report.inventory.consumablemovement' ],
           },
           {
             path: '/report/voidcreditnotereport',
@@ -657,9 +651,7 @@ const _routes = [
             path: '/report/xeroinvoicesreport',
             name: 'xeroinvoicesreport',
             component: './Report/XeroInvoicesReport',
-            authority: [
-              'report.finance.xeroinvoicesreport',
-            ],
+            authority: [ 'report.finance.xeroinvoicesreport' ],
           },
         ],
       },
