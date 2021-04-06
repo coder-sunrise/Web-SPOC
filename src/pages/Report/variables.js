@@ -109,27 +109,15 @@ export const menuData = [
   },
   {
     title: 'Inventory',
-    text: 'Medication Movement Report',
-    url: '/report/medicationmovementreport',
-    authority: 'report.inventory.medicationmovement',
+    text: 'Inventory Movement Report',
+    url: '/report/inventorymovementreport',
+    authority: 'report.inventory.inventorymovement',
   },
   {
     title: 'Inventory',
-    text: 'Consumable Movement Report',
-    url: '/report/consumablemovementreport',
-    authority: 'report.inventory.consumablemovement',
-  },
-  {
-    title: 'Inventory',
-    text: 'Low Stock Medication Report',
-    url: '/report/lowstockmedicationreport',
-    authority: 'report.inventory.lowstockmedication',
-  },
-  {
-    title: 'Inventory',
-    text: 'Low Stock Consumables Report',
-    url: '/report/lowstockconsumablesreport',
-    authority: 'report.inventory.lowstockconsumables',
+    text: 'Low Stock Report',
+    url: '/report/lowstockreport',
+    authority: 'report.inventory.lowstock',
   },
   {
     title: 'Inventory',

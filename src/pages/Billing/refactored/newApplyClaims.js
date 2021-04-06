@@ -348,7 +348,7 @@ const ApplyClaims = ({
       payer.invoicePayerItem,
       payer.id === undefined,
       copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE500CDMP ||
-      copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE700CDMP
+        copaymentSchemeCode === MEDISAVE_COPAYMENT_SCHEME.MEDISAVE700CDMP
         ? invoicePayerList || tempInvoicePayer
         : null,
     )
@@ -359,20 +359,20 @@ const ApplyClaims = ({
     const updatedPayer =
       payerInvoiceItems.length > 0 && totalClaimed > 0
         ? {
-            ...midPayer,
-            schemeConfig,
-            invoicePayerItem: payerInvoiceItems,
-            medisaveVisitType: newVisitType || payer.medisaveVisitType,
-          }
+          ...midPayer,
+          schemeConfig,
+          invoicePayerItem: payerInvoiceItems,
+          medisaveVisitType: newVisitType || payer.medisaveVisitType,
+        }
         : null
     const newInvoicePayer = updatedPayer
       ? updateTempInvoicePayer(
-          updatedPayer,
-          index,
-          invoicePayerList || null,
-          autoApply,
-          newInvoicePayers,
-        )
+        updatedPayer,
+        index,
+        invoicePayerList || null,
+        autoApply,
+        newInvoicePayers,
+      )
       : null
 
     return newInvoicePayer || newInvoicePayers
@@ -539,11 +539,11 @@ const ApplyClaims = ({
         const newItems = getInvoiceItemsForClaim(newInvoicePayers)
         const medisaveVisits = newInvoicePayers
           ? newInvoicePayers.filter((n) => {
-              return (
-                invoicePayer.claimableSchemes[0].schemeCategoryFK === 8 &&
-                setMedisaveVisitType(n.copaymentSchemeFK) !== ''
-              )
-            })
+            return (
+              invoicePayer.claimableSchemes[0].schemeCategoryFK === 8 &&
+              setMedisaveVisitType(n.copaymentSchemeFK) !== ''
+            )
+          })
           : []
 
         // if outpatient and detect medisave visit, skip
@@ -696,9 +696,9 @@ const ApplyClaims = ({
       if (claimableSchemes.length > 0) {
         const hasMedisave = claimableSchemes.some((c) => c[0].schemePayerFK)
         const invoicePayerList = constructAvailableClaims(
-          hasMedisave 
-          ? claimableSchemes.filter((c) => !c[0].schemePayerFK && c[0].schemeCategoryFK !== 5) 
-          : claimableSchemes.filter((c) => !c[0].schemePayerFK),
+          hasMedisave
+            ? claimableSchemes.filter((c) => !c[0].schemePayerFK && c[0].schemeCategoryFK !== 5)
+            : claimableSchemes.filter((c) => !c[0].schemePayerFK),
         )
         const newInvoicePayers = processAvailableClaims([], invoicePayerList)
         setInitialState(newInvoicePayers)
@@ -862,14 +862,14 @@ const ApplyClaims = ({
         incrementCommitCount()
         return false
       }
-      const invalidMessages = validateClaimAmount(updatedPayer,tempInvoicePayer,{
+      const invalidMessages = validateClaimAmount(updatedPayer, tempInvoicePayer, {
         medisaveMedications,
         medisaveVaccinations,
         medisaveServices,
         healthScreenings,
         outpatientScans,
       }
-        )
+      )
 
       if (invalidMessages.length <= 0) {
         setCurEditInvoicePayerBackup(undefined)
@@ -1126,7 +1126,7 @@ const ApplyClaims = ({
   ) {
     cancelEdittingInvoicePayer()
   }
-
+  
   return (
     <Fragment>
       {checkUpdatedAppliedInvoicePayerInfo() && (
@@ -1273,7 +1273,8 @@ const ApplyClaims = ({
             .filter(
               (payer) =>
                 !payer.isCancelled &&
-                payer.payerTypeFK === INVOICE_PAYER_TYPE.COMPANY,
+                payer.payerTypeFK === INVOICE_PAYER_TYPE.COMPANY &&
+                !payer.copaymentSchemeFK,
             )
             .map((i) => i.companyFK)}
           invoiceItems={updatedInvoiceItems.map((invoiceItem) => ({

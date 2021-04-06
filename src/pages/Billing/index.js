@@ -573,20 +573,20 @@ class Billing extends Component {
     })
   }
 
-  onPrinterClick = (type, itemID, copayerID) => {
+  onPrinterClick = (type, itemID, copayerID, invoicePayerid, index) => {
     switch (type) {
       case 'Payment':
         this.onShowReport(29, { InvoicePaymentId: itemID })
         break
       case 'TaxInvoice':
-        this.onPrintInvoice(copayerID)
+        this.onPrintInvoice(copayerID, invoicePayerid, index)
         break
       default:
         break
     }
   }
 
-  onPrintInvoice = (copayerID) => {
+  onPrintInvoice = (copayerID, invoicePayerid, index) => {
     const { values, dispatch } = this.props
     const { invoicePayer } = values
     const modifiedOrNewAddedPayer = invoicePayer.filter((payer) => {
@@ -599,6 +599,8 @@ class Billing extends Component {
       parametrPaload = {
         InvoiceId: values.invoice ? values.invoice.id : '',
         CopayerId: copayerID,
+        InvoicePayerid: invoicePayerid,
+        printIndex: index,
       }
     } else {
       parametrPaload = {
@@ -614,10 +616,28 @@ class Billing extends Component {
           openConfirmText: 'Confirm',
           openConfirmContent: `Save changes and print invoice?`,
           onConfirmSave: () => {
+            let currentPrintIndex
+            if (parametrPaload.printIndex !== undefined) {
+              const { printIndex, ...other } = parametrPaload
+              parametrPaload = {
+                ...other,
+              }
+              currentPrintIndex = invoicePayer.filter(
+                (item, i) => !item.isCancelled && i < printIndex,
+              ).length
+            }
+
             const callback = () => {
               this.setState((preState) => ({
                 submitCount: preState.submitCount + 1,
               }))
+              if (currentPrintIndex !== undefined) {
+                const { billing: { entity = {} } } = this.props
+                parametrPaload = {
+                  ...parametrPaload,
+                  InvoicePayerid: entity.invoicePayer[currentPrintIndex].id,
+                }
+              }
 
               this.onShowReport(15, parametrPaload)
             }

@@ -19,6 +19,8 @@ import {
 import SharedContainer from '../../SharedContainer'
 import Sdd from '../../Sdd'
 
+const isMedisaveEnable = false
+
 const styles = () => ({})
 
 const Detail = ({
@@ -221,11 +223,10 @@ const Detail = ({
                   simple
                   valueField='id'
                   textField='name'
-                  options={[
+                  options={isMedisaveEnable ? [
                     {
                       id: 'isChasAcuteClaimable',
                       name: 'CHAS Acute Claimable',
-
                       layoutConfig: {
                         style: {},
                       },
@@ -233,7 +234,6 @@ const Detail = ({
                     {
                       id: 'isChasChronicClaimable',
                       name: 'CHAS Chronic Claimable',
-
                       layoutConfig: {
                         style: {},
                       },
@@ -241,7 +241,21 @@ const Detail = ({
                     {
                       id: 'isMedisaveClaimable',
                       name: 'CDMP Claimable',
-
+                      layoutConfig: {
+                        style: {},
+                      },
+                    },
+                  ] : [
+                    {
+                      id: 'isChasAcuteClaimable',
+                      name: 'CHAS Acute Claimable',
+                      layoutConfig: {
+                        style: {},
+                      },
+                    },
+                    {
+                      id: 'isChasChronicClaimable',
+                      name: 'CHAS Chronic Claimable',
                       layoutConfig: {
                         style: {},
                       },

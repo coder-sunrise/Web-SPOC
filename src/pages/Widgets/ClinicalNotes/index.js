@@ -5,23 +5,20 @@ import withStyles from '@material-ui/core/styles/withStyles'
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 import {
   Accordion,
-  Button,
-  RichEditor,
   CommonModal,
   Field,
   GridContainer,
   GridItem,
-  ScribbleNoteItem,
   TextField,
 } from '@/components'
+import { navigateDirtyCheck } from '@/utils/utils'
+import Authorized from '@/utils/Authorized'
 import CannedText from './CannedText'
-import CannedTextButton from './CannedText/CannedTextButton'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 import model from './models'
 import cannedTextModel from './models/cannedText'
-import { navigateDirtyCheck } from '@/utils/utils'
 import { getDefaultActivePanel, getConfig, getContent } from './utils'
-import Authorized from '@/utils/Authorized'
+import NoteDetails from './noteDetails'
 
 const styles = (theme) => ({
   editor: {
@@ -60,36 +57,6 @@ const styles = (theme) => ({
 
 window.g_app.replaceModel(model)
 window.g_app.replaceModel(cannedTextModel)
-
-// @withFormikExtend({
-//   mapPropsToValues: ({ clinicalnotes }) => {
-//     return clinicalnotes.entity || clinicalnotes.default
-//   },
-//   validationSchema: Yup.object().shape({
-//     type: Yup.string().re  quired(),
-//     to: Yup.string().when('type', {
-//       is: (val) => val !== '2',
-//       then: Yup.string().required(),
-//     }),
-//     from: Yup.string().required(),
-//     date: Yup.date().required(),
-//     subject: Yup.string().required(),
-
-//     // 3->MC
-
-//     days: Yup.number().when('type', {
-//       is: (val) => val === '3',
-//       then: Yup.number().required(),
-//     }),
-//     fromto: Yup.array().when('type', {
-//       is: (val) => val === '3',
-//       then: Yup.array().of(Yup.date()).min(2).required(),
-//     }),
-//   }),
-
-//   handleSubmit: () => {},
-//   displayName: 'WidgetClinicalNotes',
-// })
 
 @connect(
   ({
@@ -313,7 +280,6 @@ class ClinicalNotes extends Component {
   }
 
   updateAttachments = (args) => ({ added, deleted }) => {
-    // console.log({ added, deleted }, args)
     const { form, field } = args
 
     let updated = [
@@ -436,7 +402,6 @@ class ClinicalNotes extends Component {
     const { entity } = consultation
     const { text } = cannedText
 
-    // const { corDoctorNote = [] } = entity
     const note = entity[prefix] || []
     const prevData = note.length > 0 ? note[0][cannedTextRow.fieldName] : ''
 
@@ -455,7 +420,6 @@ class ClinicalNotes extends Component {
     const { entity } = consultation
     const contents = `<img src=${dataUrl} alt='scribbleNote' />`
 
-    // const { corDoctorNote = [] } = entity
     const note = entity[prefix] || []
     const scribbleNoteField = fields.find(
       (field) => field.scribbleNoteTypeFK === selectedData.scribbleNoteTypeFK,
@@ -485,10 +449,15 @@ class ClinicalNotes extends Component {
       dispatch,
       consultation,
       clinicInfo,
-      loading,
     } = this.props
 
-    const { config, contents, showCannedText } = this.state
+    const {
+      config,
+      contents,
+      showCannedText,
+      width,
+      cannedTextRow,
+    } = this.state
     const { entity = {} } = consultation
     const { fields } = config
     const panels = contents.filter((item) => {
@@ -558,8 +527,6 @@ class ClinicalNotes extends Component {
             const onCannedTextClick = () =>
               this.handleCannedTextButtonClick(item)
             const onSettingClick = () => this.openCannedText(item)
-            const onPrevDoctorNoteClick = (cannedTextTypeFK) =>
-              this.insertPrevDoctorNotes(cannedTextTypeFK)
             return {
               title: item.fieldTitle,
               content: (
@@ -569,55 +536,22 @@ class ClinicalNotes extends Component {
                     render={(args) => {
                       return (
                         <Authorized authority={item.authority}>
-                          <div>
-                            <div
-                              style={{
-                                position: 'absolute',
-                                zIndex: 1,
-                                left: 305,
-                                right: 0,
-                                top: 10,
-                              }}
-                            >
-                              <ScribbleNoteItem
-                                scribbleNoteUpdateState={
-                                  this.scribbleNoteUpdateState
-                                }
-                                category={item.category}
-                                arrayName={item.scribbleField}
-                                categoryIndex={item.scribbleNoteTypeFK}
-                                scribbleNoteArray={
-                                  scriblenotes[item.category][
-                                    item.scribbleField
-                                  ]
-                                }
-                                gridItemWidth={this.state.width}
-                              />
-
-                              <Authorized authority='settings.cannedtext'>
-                                <CannedTextButton
-                                  onSettingClick={onSettingClick}
-                                  onPrevDoctorNoteClick={onPrevDoctorNoteClick}
-                                  onCannedTextClick={onCannedTextClick}
-                                  cannedTextTypeFK={item.cannedTextTypeFK}
-                                  handleSelectCannedText={
-                                    this.handleAddCannedText
-                                  }
-                                />
-                              </Authorized>
-                            </div>
-
-                            <RichEditor
-                              autoFocus={index === 0}
-                              disabled={loading.global}
-                              style={{ marginBottom: 0 }}
-                              strongLabel
-                              onBlur={this.onEditorChange(item.fieldName)}
-                              // label='Chief Complaints'
-                              height={item.height}
-                              {...args}
-                            />
-                          </div>
+                          <NoteDetails
+                            width={width}
+                            item={item}
+                            args={args}
+                            index={index}
+                            cannedTextRow={cannedTextRow}
+                            scribbleNoteUpdateState={
+                              this.scribbleNoteUpdateState
+                            }
+                            onSettingClick={onSettingClick}
+                            onCannedTextClick={onCannedTextClick}
+                            onRichEditorBlur={this.onEditorChange(
+                              item.fieldName,
+                            )}
+                            {...this.props}
+                          />
                         </Authorized>
                       )
                     }}
@@ -648,15 +582,6 @@ class ClinicalNotes extends Component {
             </GridItem>
           </GridContainer>
         </div>
-        {/* <CommonModal
-          open={clinicalnotes.showAttachmentModal}
-          title='Upload Attachment'
-          maxWidth='sm'
-          bodyNoPadding
-          onClose={() => this.toggleAttachmentModal()}
-        >
-          <UploadAttachment updateAttachments={this.updateAttachments} />
-        </CommonModal> */}
 
         <CommonModal
           open={showCannedText}
@@ -692,4 +617,3 @@ class ClinicalNotes extends Component {
   }
 }
 export default withStyles(styles, { withTheme: true })(ClinicalNotes)
-// export default ClinicalNotes

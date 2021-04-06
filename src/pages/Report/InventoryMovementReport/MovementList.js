@@ -12,17 +12,18 @@ class MovementList extends PureComponent {
     let incomeData = []
     const { reportDatas } = this.props
     if (!reportDatas) return null
-    if (reportDatas && reportDatas.MedicationStockDetails) {
-      incomeData = reportDatas.MedicationStockDetails.map((item, index) => ({
+    if (reportDatas && reportDatas.InventoryStockDetails) {
+      incomeData = reportDatas.InventoryStockDetails.map((item, index) => ({
         ...item,
-        id: `medicationMovement-${index}-${item.medicationCode}`,
+        id: `inventoryMovement-${index}-${item.InventoryCode}`,
       }))
     }
 
-    const MedicationStockDetailsCols = [
+    const InventoryStockDetailsCols = [
+      { name: 'inventoryType', title: 'Inventory Type' },
       { name: 'transactionDate', title: 'Date' },
-      { name: 'medicationCode', title: 'Code' },
-      { name: 'medicationName', title: 'Name' },
+      { name: 'inventoryCode', title: 'Code' },
+      { name: 'inventoryName', title: 'Name' },
       { name: 'transactionCategory', title: 'Transaction' },
       { name: 'transactionQuantity', title: 'Qty' },
       { name: 'uom', title: 'UOM' },
@@ -30,15 +31,16 @@ class MovementList extends PureComponent {
       { name: 'patientAccountNo', title: 'Acc. No.' },
       { name: 'patientName', title: 'Patient Name' },
     ]
-    const MedicationStockDetailsExtensions = [
+    const InventoryStockDetailsExtensions = [
+      { columnName: 'inventoryType', sortingEnabled: false },
       { columnName: 'transactionDate', type: 'date', sortingEnabled: false },
       {
         columnName: 'transactionQuantity',
         type: 'number',
         sortingEnabled: false,
       },
-      { columnName: 'medicationCode', sortingEnabled: false },
-      { columnName: 'medicationName', sortingEnabled: false },
+      { columnName: 'inventoryCode', sortingEnabled: false },
+      { columnName: 'inventoryName', sortingEnabled: false },
       { columnName: 'transactionCategory', sortingEnabled: false },
       { columnName: 'uom', sortingEnabled: false },
       { columnName: 'remark', sortingEnabled: false },
@@ -49,8 +51,8 @@ class MovementList extends PureComponent {
     return (
       <ReportDataGrid
         data={incomeData}
-        columns={MedicationStockDetailsCols}
-        columnExtensions={MedicationStockDetailsExtensions}
+        columns={InventoryStockDetailsCols}
+        columnExtensions={InventoryStockDetailsExtensions}
       />
     )
   }

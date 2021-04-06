@@ -73,7 +73,10 @@ const createPayload = (values, viewOtherApptAccessRight, isActiveDoctor) => {
       doctor: selectedDoctor.length > 0 ? selectedDoctor : undefined,
       room: filterByRoomBlockGroup > 0 ? filterByRoomBlockGroup : undefined,
       SearchText: searchValue || undefined,
-      ApptType: filterByApptType.length > 0 ? filterByApptType : undefined,
+      ApptType:
+        filterByApptType.length > 0 && filterByApptType.indexOf(-99) < 0
+          ? filterByApptType
+          : undefined,
       ApptStatus:
         filterByAppointmentStatus.length > 0
           ? filterByAppointmentStatus
@@ -87,7 +90,8 @@ const createPayload = (values, viewOtherApptAccessRight, isActiveDoctor) => {
     doctor: selectedDoctor.join() || undefined,
     room: filterByRoomBlockGroup.join() || undefined,
     searchValue: searchValue || undefined,
-    appType: filterByApptType.join() || undefined,
+    appType:
+      filterByApptType.indexOf(-99) >= 0 ? undefined : filterByApptType.join(),
     appStatus: filterByAppointmentStatus.join() || undefined,
     isIncludeRescheduledByClinic: true,
     isIncludeHistory: true,

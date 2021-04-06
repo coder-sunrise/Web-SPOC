@@ -121,6 +121,7 @@ class Details extends PureComponent {
         reportParameters: {
           InvoiceId: row.invoiceFK,
           CopayerId: undefined,
+          InvoicePayerid: undefined,
           isSaved: true,
         },
       },
