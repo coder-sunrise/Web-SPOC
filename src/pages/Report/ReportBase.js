@@ -1,8 +1,8 @@
 import React from 'react'
-import { GridContainer, GridItem, Button, Card } from '@/components'
+import { GridContainer, GridItem, Button, Card, notification } from '@/components'
+import { getRawData, getCsv } from '@/services/report'
+import { downloadFile } from '@/services/file'
 import ReportLayoutWrapper from './ReportLayout'
-// services
-import { getRawData } from '@/services/report'
 
 const defaultState = {
   loaded: false,
@@ -48,10 +48,32 @@ export default class ReportBase extends React.Component {
 
   getReportDatas = (params) => getRawData(this.state.reportId, { ...params })
 
+  onExportCsvClick = async () => {
+    if (this.props.validateForm) {
+      const errors = await this.props.validateForm()
+      if (Object.keys(errors).length > 0) {
+        notification.error({ message: 'Required fields not entered.' })
+        return
+      }
+    }
+    const result = await getCsv(
+      this.state.reportId, 
+      this.props.values, 
+      this.state.tableName,
+      )
+    if (result) {
+      const fileExtensions = '.csv'
+      downloadFile(result, `${this.state.fileName}${fileExtensions}`)
+    }
+  }
+
   onSubmitClick = async () => {
     if (this.props.validateForm) {
       const errors = await this.props.validateForm()
-      if (Object.keys(errors).length > 0) return
+      if (Object.keys(errors).length > 0) {
+        notification.error({ message: 'Required fields not entered.' })
+        return
+      }
     }
     this.setState((state) => ({
       ...state,
@@ -114,6 +136,7 @@ export default class ReportBase extends React.Component {
             {this.renderFilterBar(
               this.onSubmitClick,
               this.state.isSubmitting,
+              this.onExportCsvClick,
               formikProps,
             )}
           </GridItem>
@@ -126,6 +149,7 @@ export default class ReportBase extends React.Component {
                 reportParameters={this.formatReportParams(this.props.values)}
                 loaded={this.state.loaded}
                 fileName={this.state.fileName}
+                tableName={this.state.tableName}
               >
                 {this.renderContent(this.state.reportDatas)}
               </ReportLayoutWrapper>

@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import moment from 'moment'
+import { connect } from 'dva'
 // react dev grid
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 // material ui
@@ -12,6 +13,7 @@ import {
 } from '@/components'
 // utils
 import Authorized from '@/utils/Authorized'
+import { AppointmentTypeLabel } from '@/components/_medisys'
 
 const styles = (theme) => ({
   subRow: {
@@ -20,12 +22,16 @@ const styles = (theme) => ({
     },
   },
 })
+
+@connect(({ codetable }) => ({
+  appointmentTypes: codetable.ctappointmenttype,
+}))
 class Grid extends PureComponent {
   appointmentRow = (p) => {
     const { classes, handleSelectEvent } = this.props
     const { row, children, tableRow } = p
     let newchildren = []
-    const middleColumns = children.slice(3, 8)
+    const middleColumns = children.slice(3, 9)
 
     if (row.countNumber === 1) {
       newchildren.push(
@@ -41,7 +47,7 @@ class Grid extends PureComponent {
       newchildren.push(middleColumns)
 
       newchildren.push(
-        children.filter((value, index) => index > 7).map((item) => ({
+        children.filter((value, index) => index > 8).map((item) => ({
           ...item,
           props: {
             ...item.props,
@@ -95,6 +101,7 @@ class Grid extends PureComponent {
           { name: 'appointmentDate', title: 'Appt Date' },
           { name: 'apptTime', title: 'Appt Time' },
           { name: 'doctor', title: 'Doctor' },
+          { name: 'appointmentTypeFK', title: 'Appt Type' },
           { name: 'roomFk', title: 'Room' },
           { name: 'duration', title: 'Duration' },
           { name: 'appointmentRemarks', title: 'Remarks' },
@@ -134,6 +141,25 @@ class Grid extends PureComponent {
           {
             columnName: 'doctor',
             sortingEnabled: false,
+          },
+          {
+            columnName: 'appointmentTypeFK',
+            sortingEnabled: false,
+            render: (row) => {
+              const { appointmentTypeFK } = row
+              const { appointmentTypes = [] } = this.props
+              const appointmentType = appointmentTypes.find(
+                (item) => item.id === appointmentTypeFK,
+              )
+
+              if (!appointmentType) return null
+              return (
+                <AppointmentTypeLabel
+                  color={appointmentType.tagColorHex}
+                  label={appointmentType.displayValue}
+                />
+              )
+            },
           },
           {
             columnName: 'roomFk',

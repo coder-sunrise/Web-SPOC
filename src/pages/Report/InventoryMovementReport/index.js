@@ -5,15 +5,13 @@ import moment from 'moment'
 import { withFormik } from 'formik'
 // sub components
 import FilterBar from './FilterBar'
-
 import MovementList from './MovementList'
 import ReportBase from '../ReportBase'
 
-const reportId = 21
-const fileName = 'Consumable Movement Report'
-
-class ConsumableMovementReport extends ReportBase {
-  constructor(props) {
+const reportId = 22
+const fileName = 'Inventory Movement Report'
+class InventoryMovementReport extends ReportBase {
+  constructor (props) {
     super(props)
     this.state = {
       ...this.state,
@@ -31,14 +29,15 @@ class ConsumableMovementReport extends ReportBase {
   }
 }
 
-const ConsumableMovementReportWithFormik = withFormik({
+const InventoryMovementReportWithFormik = withFormik({
   validationSchema: Yup.object().shape({
     dateFrom: Yup.date().required(),
   }),
   mapPropsToValues: () => ({
     dateFrom: moment(new Date()).startOf('month').toDate(),
     dateTo: moment(new Date()).endOf('month').toDate(),
+    inventoryType: 'MEDICATION',
   }),
-})(ConsumableMovementReport)
+})(InventoryMovementReport)
 
-export default ConsumableMovementReportWithFormik
+export default InventoryMovementReportWithFormik

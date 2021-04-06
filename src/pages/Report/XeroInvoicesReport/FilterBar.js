@@ -1,24 +1,21 @@
 import React from 'react'
-// formik
-import { FastField } from 'formik'
 // common components
 import {
   Button,
-  DatePicker,
   GridContainer,
   GridItem,
   SizeContainer,
-  CodeSelect,
 } from '@/components'
 import ReportDateRangePicker from '../ReportDateRangePicker'
 
-const FilterBar = ({ handleSubmit, isSubmitting }) => {
+const FilterBar = ({ handleSubmit, isSubmitting, exportCSV }) => {
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
         <GridContainer alignItems='flex-end'>
           <ReportDateRangePicker />
-          <GridItem md={3}>
+
+          {/* <GridItem md={2}>
             <Button
               color='primary'
               onClick={handleSubmit}
@@ -26,22 +23,16 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
             >
               Generate Report
             </Button>
-          </GridItem>
-          <GridItem md={5} />
-          <GridItem md={4}>
-            <FastField
-              name='consumableIDs'
-              render={(args) => (
-                <CodeSelect
-                  {...args}
-                  label='Consumable'
-                  mode='multiple'
-                  temp
-                  code='inventoryConsumable'
-                  labelField='displayValue'
-                />
-              )}
-            />
+          </GridItem> */}
+
+          <GridItem md={2}>
+            <Button
+              color='primary'
+              onClick={exportCSV}
+              disabled={isSubmitting}
+            >
+              Export CSV
+            </Button>
           </GridItem>
         </GridContainer>
       </React.Fragment>

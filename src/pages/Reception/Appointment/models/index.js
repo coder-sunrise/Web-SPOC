@@ -37,6 +37,7 @@ const splitApptResource = (data) => {
         appointmentFK,
         clinicianName,
         clinicianTitle,
+        appointmentTypeFK,
       } = appt
 
       const commonValues = {
@@ -49,6 +50,7 @@ const splitApptResource = (data) => {
         doctor: `${clinicianTitle || ''} ${clinicianName}`,
         duration: calculateDuration(startTime, endTime),
         patientName: `${restValues.salutation || ''} ${restValues.patientName}`,
+        appointmentTypeFK,
       }
 
       if (idx === 0) {

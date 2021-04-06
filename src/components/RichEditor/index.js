@@ -272,8 +272,8 @@ class RichEditor extends React.PureComponent {
           textEditorValue === ''
             ? ''
             : htmlEncodeByRegExp(
-              draftToHtml(convertToRaw(this.state.value.getCurrentContent())),
-            ),
+                draftToHtml(convertToRaw(this.state.value.getCurrentContent())),
+              ),
         // name: props.field.name,
       },
     }
@@ -433,7 +433,11 @@ class RichEditor extends React.PureComponent {
       shrink: true,
     }
 
-    if (this.props.autoFocus && !this.props.disabled && !this.state.focusedOnce) {
+    if (
+      this.props.autoFocus &&
+      !this.props.disabled &&
+      !this.state.focusedOnce
+    ) {
       setTimeout(() => {
         this.setState(() => ({
           isEditorFocused: true,
@@ -484,25 +488,25 @@ RichEditor.insertBlock = (editorState, blocks, isBefore) => {
     .rest()
   let newBlocks = isBefore
     ? [
-      ...blocks.map((o) => [
-        o.getKey(),
-        o,
-      ]),
-      [
-        currentBlock.getKey(),
-        currentBlock,
-      ],
-    ]
+        ...blocks.map((o) => [
+          o.getKey(),
+          o,
+        ]),
+        [
+          currentBlock.getKey(),
+          currentBlock,
+        ],
+      ]
     : [
-      [
-        currentBlock.getKey(),
-        currentBlock,
-      ],
-      ...blocks.map((o) => [
-        o.getKey(),
-        o,
-      ]),
-    ]
+        [
+          currentBlock.getKey(),
+          currentBlock,
+        ],
+        ...blocks.map((o) => [
+          o.getKey(),
+          o,
+        ]),
+      ]
   const newBlockMap = blocksBefore.concat(newBlocks, blocksAfter).toOrderedMap()
 
   const newContentState = contentState.merge({
@@ -511,6 +515,20 @@ RichEditor.insertBlock = (editorState, blocks, isBefore) => {
     selectionAfter: currentEditorSelection,
   })
   return EditorState.push(editorState, newContentState, 'insert-fragment')
+}
+
+RichEditor.insertHtml = (editorState, htmlValue) => {
+  if (!htmlValue) return editorState
+  const currentEditorSelection = editorState.getSelection()
+  const currentContentState = editorState.getCurrentContent()
+
+  let { contentBlocks, entityMap } = htmlToDraft(htmlDecodeByRegExp(htmlValue))
+  let contentState = Modifier.replaceWithFragment(
+    currentContentState,
+    currentEditorSelection,
+    ContentState.createFromBlockArray(contentBlocks, entityMap).getBlockMap(),
+  )
+  return EditorState.push(editorState, contentState, 'insert-fragment')
 }
 
 export default withStyles(STYLES, { name: 'RichEditor', withTheme: true })(

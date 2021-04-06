@@ -496,6 +496,7 @@ export default compose(
               if (_.round(o.unitPrice * o.quantity, 2) !== o.totalPrice) {
                 actualUnitPrice = _.round(o.totalPrice / o.quantity, 2)
               }
+              actualUnitPrice = actualUnitPrice || 0
               obj = {
                 adjType: o.adjType,
                 adjValue: o.adjValue,
@@ -503,7 +504,7 @@ export default compose(
                 itemName: o.drugName,
                 invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.MEDICATION,
                 unitPrice: o.isDrugMixture
-                  ? _.round((o.totalPrice || 0) / (o.quantity || 1), 2)
+                  ? (_.round((o.totalPrice || 0) / (o.quantity || 1), 2)) || 0
                   : actualUnitPrice,
                 quantity: o.quantity,
                 subTotal: roundTo(o.totalPrice),
@@ -528,7 +529,7 @@ export default compose(
                     ...restO,
                     drugName: o.drugName,
                     isDeleted: o.isDeleted,
-                    unitPrice: roundTo(o.totalPrice / o.quantity),
+                    unitPrice: roundTo(o.totalPrice / o.quantity) || 0,
                     retailPrescriptionItemInstruction: medicationInstructionsArray(
                       corPrescriptionItemInstruction,
                       retailPrescriptionItemInstruction,
@@ -562,7 +563,7 @@ export default compose(
                 itemName: o.serviceName,
                 subTotal: roundTo(o.total),
                 invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.SERVICE,
-                unitPrice: roundTo(o.total),
+                unitPrice: roundTo(o.total) || 0,
                 quantity: o.quantity,
                 itemRevenueCategoryFK: revenueCategoryFK,
                 isDrugMixture: false,
@@ -573,7 +574,7 @@ export default compose(
                   serviceCenterServiceFK: o.serviceCenterServiceFK,
                   isDeleted: restValues.isDeleted,
                   retailService: {
-                    unitPrice: roundTo(o.total),
+                    unitPrice: roundTo(o.total) || 0,
                     ...restValues,
                   },
                 },
@@ -585,10 +586,11 @@ export default compose(
                 (c) => c.id === o.inventoryConsumableFK,
               )
               const { retailConsumable, ...restValues } = o
-              let actualUnitPrice = o.unitPrice
+              let actualUnitPrice = o.unitPrice || 0
               if (_.round(o.unitPrice * o.quantity, 2) !== o.totalPrice) {
                 actualUnitPrice = _.round(o.totalPrice / o.quantity, 4)
               }
+              actualUnitPrice = actualUnitPrice || 0
               obj = {
                 invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.CONSUMABLE,
                 adjType: o.adjType,

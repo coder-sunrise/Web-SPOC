@@ -12,6 +12,7 @@ import {
   GridItem,
   RadioGroup,
   FieldSet,
+  Field,
   NumberInput,
   DatePicker,
 } from '@/components'
@@ -56,13 +57,14 @@ const Recurrence = ({
   recurrenceDto = RecurrenceDTO,
   handleRecurrencePatternChange = (f) => f,
 }) => {
-  const { isEnableRecurrence, currentAppointment = {} } = formValues
+  const { isEnableRecurrence, currentAppointment, eventDate } = formValues
   const { recurrencePatternFK, recurrenceRange } = recurrenceDto
-  const { appointmentDate } = currentAppointment
   const _labelSize = labelSize[size]
   const blockSize = (12 - _labelSize) / 2
   const _inputSize = block ? blockSize : inputSize[size]
-
+  let selectEventDate
+  if (currentAppointment) selectEventDate = currentAppointment.appointmentDate
+  else selectEventDate = eventDate
   return (
     <Fragment>
       <FastField
@@ -165,12 +167,12 @@ const Recurrence = ({
                   />
                 )}
                 {recurrenceRange === RECURRENCE_RANGE.BY && (
-                  <FastField
+                  <Field
                     name='recurrenceDto.recurrenceEndDate'
                     render={(args) => (
                       <DatePicker
                         disabled={disabled}
-                        recurrenceRestrict={appointmentDate}
+                        recurrenceRestrict={selectEventDate}
                         {...args}
                       />
                     )}
@@ -185,7 +187,7 @@ const Recurrence = ({
               <GridItem className={classes.recurrenceListLabel}>
                 {isEnableRecurrence && (
                   <ResultLabel
-                    date={appointmentDate}
+                    date={selectEventDate}
                     recurrenceDto={recurrenceDto}
                   />
                 )}

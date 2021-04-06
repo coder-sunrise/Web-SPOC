@@ -11,6 +11,7 @@ import { SCHEME_TYPE } from '@/utils/constants'
 //   schemeTypes = codetableData
 // })
 
+const isMedisaveEnable = false
 const ctSchemeType = 'ctSchemeType'
 let commitCount = 1000 // uniqueNumber
 @connect(({ codetable }) => ({ codetable }))
@@ -59,6 +60,9 @@ class SchemesGrid extends PureComponent {
           type: 'codeSelect',
           code: 'ctSchemeType',
           sortingEnabled: false,
+          localFilter: (opt) => {
+            return isMedisaveEnable ? opt : !this.isMedisave(opt) // TODO: Disable for prod R1.5.3 only, enable when deploy UAT again
+          },
           onChange: ({ val, option, row, onValueChange }) => {
             let { rows } = this.props
             if (!row.id) {
