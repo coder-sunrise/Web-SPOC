@@ -33,7 +33,6 @@ const styles = (theme) => ({
     padding: theme.spacing.unit,
   },
   dateButton: {
-    // marginTop: theme.spacing.unit,
     fontSize: '1.5rem',
     paddingBottom: '8px !important',
   },
@@ -63,15 +62,6 @@ export const flattenAppointmentDateToCalendarEvents = (massaged, event) =>
             [],
           ),
         },
-        // ...event.appointment_Resources.map((appointment) => {
-        //   const { appointmentResources, ...restEvent } = event
-        //   return {
-        //     ...restEvent,
-        //     ...appointment,
-        //     visitStatus: VISIT_STATUS.UPCOMING_APPT,
-        //     id: event.id,
-        //   }
-        // }),
       ]
 
 @connect(({ calendar, codetable, clinicInfo, loading, user }) => ({
@@ -84,15 +74,10 @@ export const flattenAppointmentDateToCalendarEvents = (massaged, event) =>
 }))
 class Appointment extends React.PureComponent {
   state = {
-    primaryClinicianFK: undefined,
-    showPopup: false,
     showAppointmentForm: false,
     showDoctorEventModal: false,
     showSearchAppointmentModal: false,
-    popupAnchor: null,
-    popoverEvent: { ...InitialPopoverEvent },
     resources: null,
-    // calendarEvents: dndEvents,
     selectedSlot: {},
     filter: {
       search: '',
@@ -101,6 +86,7 @@ class Appointment extends React.PureComponent {
     },
     isDragging: false,
     selectedAppointmentFK: -1,
+    selectedDoctorEventFK: -1,
   }
 
   async componentWillMount () {
@@ -331,15 +317,13 @@ class Appointment extends React.PureComponent {
     const {
       id,
       appointmentFK,
-      doctor,
       isEditedAsSingleAppointment,
+      isEditedAsSingleDoctorBlock,
       isEnableRecurrence,
       appointmentStatusFk,
       isHistory,
+      isDoctorBlock,
     } = selectedEvent
-
-    const isDoctorBlock = doctor && doctor.id > 0
-
     if (
       isHistory &&
       ![
@@ -367,21 +351,46 @@ class Appointment extends React.PureComponent {
       return
 
     if (isDoctorBlock) {
-      this.props
-        .dispatch({
-          type: 'doctorBlock/queryOne',
-          payload: {
-            id,
-          },
+      let shouldShowDoctorBlockForm = true
+
+      if (this.state.showDoctorEventModal) {
+        this.setState({
+          selectedDoctorEventFK: undefined,
+          showDoctorEventModal: false,
+          isDragging: false,
         })
-        .then((response) => {
-          if (response) {
-            this.setState({
-              showDoctorEventModal: true,
-              isDragging: false,
-            })
-          }
-        })
+      }
+
+      if (isEnableRecurrence) {
+        if (!isEditedAsSingleDoctorBlock) {
+          shouldShowDoctorBlockForm = false
+          this.setState({
+            selectedDoctorEventFK: id,
+            showSeriesConfirmation: true,
+            eventType: 'DoctorBlock',
+            isDragging: false,
+          })
+        }
+      }
+      if (shouldShowDoctorBlockForm) {
+        this.props
+          .dispatch({
+            type: 'doctorBlock/getDoctorBlockDetails',
+            payload: {
+              id,
+              mode: 'single',
+            },
+          })
+          .then((response) => {
+            if (response) {
+              this.setState({
+                selectedDoctorEventFK: id,
+                showDoctorEventModal: true,
+                isDragging: false,
+              })
+            }
+          })
+      }
     } else {
       const selectedAppointmentID =
         appointmentFK === undefined ? id : appointmentFK
@@ -401,6 +410,7 @@ class Appointment extends React.PureComponent {
           this.setState({
             selectedAppointmentFK: selectedAppointmentID,
             showSeriesConfirmation: true,
+            eventType: 'Appointment',
             isDragging: false,
           })
         }
@@ -411,9 +421,6 @@ class Appointment extends React.PureComponent {
             type: 'calendar/getAppointmentDetails',
             payload: {
               id: selectedAppointmentID,
-              // isEditedAsSingleAppointment: isEnableRecurrence
-              //   ? false
-              //   : isEditedAsSingleAppointment,
               mode: 'single',
             },
           })
@@ -484,9 +491,6 @@ class Appointment extends React.PureComponent {
       filter: { ...preState.filter, ...filter },
       resources: newResources.length > 0 ? newResources : null,
     }))
-    // this.setState({
-    //   filter: { ...newFilter },
-    // })
   }
 
   handleAddAppointmentClick = () => {
@@ -510,6 +514,7 @@ class Appointment extends React.PureComponent {
       type: 'doctorBlock/updateState',
       payload: {
         currentViewDoctorBlock: {},
+        isEditedAsSingleDoctorBlock: false,
       },
     })
   }
@@ -519,27 +524,37 @@ class Appointment extends React.PureComponent {
       type: 'calendar/setViewAppointment',
       data: { appointments: [] },
     })
-    this.setState({ showSeriesConfirmation: false })
+    this.setState({ showSeriesConfirmation: false, eventType: '' })
   }
 
-  editSeriesConfirmation = (isEditedAsSingleAppointment = false) => {
+  editSeriesConfirmation = (isEditedAsSingle = false) => {
     const { dispatch } = this.props
-    const { selectedAppointmentFK } = this.state
+    const {
+      selectedAppointmentFK,
+      eventType,
+      selectedDoctorEventFK,
+    } = this.state
     dispatch({
-      type: 'calendar/getAppointmentDetails',
+      type:
+        eventType === 'Appointment'
+          ? 'calendar/getAppointmentDetails'
+          : 'doctorBlock/getDoctorBlockDetails',
       payload: {
-        id: selectedAppointmentFK,
+        id:
+          eventType === 'Appointment'
+            ? selectedAppointmentFK
+            : selectedDoctorEventFK,
         // isEditedAsSingleAppointment,
-        mode: isEditedAsSingleAppointment ? 'single' : 'series',
+        mode: isEditedAsSingle ? 'single' : 'series',
       },
     }).then((response) => {
       if (response)
         this.setState({
-          showPopup: false,
           isDragging: false,
-          popupAnchor: null,
           showSeriesConfirmation: false,
-          showAppointmentForm: true,
+          eventType: '',
+          showAppointmentForm: eventType === 'Appointment',
+          showDoctorEventModal: eventType === 'DoctorBlock',
         })
     })
   }
@@ -581,25 +596,19 @@ class Appointment extends React.PureComponent {
   render () {
     const {
       calendar: CalendarModel,
-      classes,
       calendarLoading,
       dispatch,
       user,
       doctorprofile,
     } = this.props
     const {
-      showPopup,
-      popupAnchor,
       showAppointmentForm,
       showDoctorEventModal,
       showSeriesConfirmation,
-      // calendarEvents,
       selectedSlot,
       resources,
-      popoverEvent,
       filter,
       selectedAppointmentFK,
-      primaryClinicianFK,
       showSearchAppointmentModal,
     } = this.state
 
@@ -634,7 +643,6 @@ class Appointment extends React.PureComponent {
               filter={filter}
               handleSelectSlot={this.onSelectSlot}
               handleSelectEvent={this.onSelectEvent}
-              // handleDoubleClick={this.onSelectEvent}
               handleMoveEvent={this.moveEvent}
               handleEventMouseOver={this.onEventMouseOver}
               handleOnDragStart={this.handleOnDragStart}
@@ -665,7 +673,6 @@ class Appointment extends React.PureComponent {
                     : filter.filterBySingleDoctor,
               }}
               onHistoryRowSelected={this.onSelectEvent}
-              // calendarEvents={calendarEvents}
             />
           )}
         </CommonModal>
