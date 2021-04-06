@@ -109,15 +109,9 @@ export const menuData = [
   },
   {
     title: 'Inventory',
-    text: 'Medication Movement Report',
-    url: '/report/medicationmovementreport',
-    authority: 'report.inventory.medicationmovement',
-  },
-  {
-    title: 'Inventory',
-    text: 'Consumable Movement Report',
-    url: '/report/consumablemovementreport',
-    authority: 'report.inventory.consumablemovement',
+    text: 'Inventory Movement Report',
+    url: '/report/inventorymovementreport',
+    authority: 'report.inventory.inventorymovement',
   },
   {
     title: 'Inventory',
