@@ -642,6 +642,15 @@ class Billing extends Component {
     this.onPrintInvoice(undefined)
   }
 
+  onPrintVisitInvoiceClick = () => {
+    const { values } = this.props
+    const parametrPaload = {
+      InvoiceId: values.invoice ? values.invoice.id : '',
+    }
+
+    this.onShowReport(80, parametrPaload)
+  }
+
   handleAddPayment = async (payment) => {
     const { values, setValues } = this.props
     const { outstandingBalance, ...rest } = payment
@@ -870,6 +879,7 @@ class Billing extends Component {
     const {
       isEnableAddPaymentInBilling = false,
       isEnablePackage = false,
+      isEnableVisitationInvoiceReport = false,
     } = clinicSettings
 
     let src
@@ -959,6 +969,8 @@ class Billing extends Component {
                 handlePrintInvoiceClick={this.onPrintInvoiceClick}
                 handlePrintReceiptClick={this.onPrintReceiptClick}
                 {...formikBag}
+                isEnableVisitationInvoiceReport={isEnableVisitationInvoiceReport}
+                handlePrintVisitInvoiceClick={this.onPrintVisitInvoiceClick}
               />
             </GridContainer>
           </GridContainer>

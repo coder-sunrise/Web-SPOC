@@ -56,6 +56,7 @@ const InvoiceHistory = ({
   patient,
   invoiceHistory: { list },
   classes,
+  clinicSettings,
 }) => {
   const refreshInvoiceList = () => {
     const { id } = patient.entity
@@ -67,6 +68,9 @@ const InvoiceHistory = ({
       },
     })
   }
+
+  const { settings = [] } = clinicSettings
+  const { isEnableVisitationInvoiceReport = false } = settings
 
   const [
     hasActiveSession,
@@ -102,6 +106,21 @@ const InvoiceHistory = ({
       ...showReport,
       show: setShowValue,
       invoiceId: setShowValue ? row.id : null,
+    })
+  }
+
+  const [
+    showVisitInvoiceReport,
+    setShowVisitInvoiceReport,
+  ] = useState({ showVisitInvoice: false, invoiceId: null })
+  const { showVisitInvoice, invId } = showVisitInvoiceReport
+
+  const toggleVisitInvoiceReport = (row) => {
+    const setShowVisitInvoiceValue = !showVisitInvoice
+    setShowVisitInvoiceReport({
+      ...showVisitInvoiceReport,
+      showVisitInvoice: setShowVisitInvoiceValue,
+      invId: setShowVisitInvoiceValue ? row.id : null,
     })
   }
 
@@ -163,6 +182,19 @@ const InvoiceHistory = ({
               >
                 <Printer />Print Invoice
               </Button>
+              {isEnableVisitationInvoiceReport && (
+                <Button
+                  size='sm'
+                  color='primary'
+                  icon
+                  onClick={(event) => {
+                    toggleVisitInvoiceReport(row)
+                    event.stopPropagation()
+                  }}
+                >
+                  <Printer />Print Visit Invoice
+                </Button>
+              )}
             </p>
           </div>
         </GridItem>
@@ -221,6 +253,17 @@ const InvoiceHistory = ({
             reportParameters={{ InvoiceID: invoiceId || '' }}
           />
         </CommonModal>
+        <CommonModal
+          open={showVisitInvoice}
+          onClose={toggleVisitInvoiceReport}
+          title='Visitation Invoice'
+          maxWidth='lg'
+        >
+          <ReportViewer
+            reportID={80}
+            reportParameters={{ InvoiceID: invId || '' }}
+          />
+        </CommonModal>
       </CardContainer>
     </div>
   )
@@ -228,8 +271,9 @@ const InvoiceHistory = ({
 
 export default compose(
   withStyles(styles),
-  connect(({ patient, patientHistory }) => ({
+  connect(({ patient, patientHistory, clinicSettings }) => ({
     patient,
     invoiceHistory: patientHistory.invoiceHistory,
+    clinicSettings,
   })),
 )(InvoiceHistory)
