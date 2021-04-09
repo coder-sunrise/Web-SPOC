@@ -1098,7 +1098,7 @@ class Billing extends Component {
         <CommonModal
           open={showReport}
           onClose={this.onCloseReport}
-          title='Invoice'
+          title={reportPayload.reportID === 15 ? 'Invoice' : 'Visitation Invoice'}
           maxWidth='lg'
         >
           <ReportViewer

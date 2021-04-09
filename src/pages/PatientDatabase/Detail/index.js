@@ -291,6 +291,14 @@ class PatientDetail extends PureComponent {
       }
     }
 
+    const SchemeAccessRight = Authorized.check('scheme.schemedetails')
+    if (SchemeAccessRight) {
+      const hiddenSchemeByAccessRight = SchemeAccessRight.rights === 'hidden'
+      if (hiddenSchemeByAccessRight) {
+        this.widgets = this.widgets.filter((t) => t.id !== '4')
+      }
+    }
+
     const { clinicSettings } = this.props
     if (!clinicSettings.isEnablePackage) {
       this.widgets = this.widgets.filter(w => w.id !== '10')
