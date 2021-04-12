@@ -56,6 +56,7 @@ const _routes = [
         path: '/reception',
         icon: 'local_hospital',
         name: 'reception',
+        moduleName: 'Reception',
         authority: [
           'reception',
         ],
@@ -149,6 +150,7 @@ const _routes = [
         path: '/patientdb',
         icon: 'group',
         name: 'patient',
+        moduleName: 'PatientDataBase',
         authority: [
           'patientdatabase',
         ],
@@ -204,6 +206,7 @@ const _routes = [
         path: '/communication',
         icon: 'sms',
         name: 'communication',
+        moduleName: 'Communication',
         system: 'CMS',
         authority: [
           'communication',
@@ -233,6 +236,7 @@ const _routes = [
         path: '/inventory',
         icon: 'kitchen',
         name: 'inventory',
+        moduleName: 'Inventory',
         // component: './inventory',
         authority: [
           'inventory',
@@ -390,6 +394,7 @@ const _routes = [
         path: '/finance',
         icon: 'attach_money',
         name: 'finance',
+        moduleName: 'Finance',
         authority: [
           'finance',
         ],
@@ -557,6 +562,7 @@ const _routes = [
         path: '/report',
         icon: 'library_books',
         name: 'report',
+        moduleName: 'Report',
         hideChildrenInMenu: true,
         authority: [
           'report',
@@ -848,6 +854,7 @@ const _routes = [
         path: '/claim-submission',
         icon: 'receipt',
         name: 'claimSubmission',
+        moduleName: 'Claim Submission',
         hideChildrenInMenu: true,
         authority: [
           'claimsubmission',
@@ -907,6 +914,7 @@ const _routes = [
         path: '/forms',
         icon: 'description',
         name: 'forms',
+        moduleName: 'Forms',
         component: './FormListing',
         authority: [
           'forms',
@@ -919,6 +927,7 @@ const _routes = [
         path: '/setting',
         icon: 'settings',
         name: 'setting',
+        moduleName: 'Settings',
         authority: [
           'settings',
         ],
@@ -1345,6 +1354,7 @@ const _routes = [
         path: '/support',
         icon: 'local_phone',
         name: 'support',
+        moduleName: 'Support',
         hideChildrenInMenu: true,
         specialist: [
           'GP',

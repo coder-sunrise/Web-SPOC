@@ -23,7 +23,6 @@ export default createListViewModel({
     state: {
       list: [],
       currentSelectedUserRole: {
-        filteredAccessRight: [],
         ...defaultDates,
       },
     },
@@ -90,13 +89,6 @@ export default createListViewModel({
           ...state,
           currentSelectedUserRole: {
             ...data,
-            filteredAccessRight: data.roleClientAccessRight
-              .filter(
-                (m) =>
-                  !data.clinicRoleFK ||
-                  m.clinicRoleBitValue >= 2 ** (data.clinicRoleFK - 1),
-              )
-              .sort(compare),
           },
         }
       },
@@ -105,7 +97,6 @@ export default createListViewModel({
           ...state,
           currentSelectedUserRole: {
             isUserMaintainable: true,
-            filteredAccessRight: data.sort(compare),
             roleClientAccessRight: data.sort(compare),
             ...defaultDates,
           },

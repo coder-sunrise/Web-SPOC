@@ -639,6 +639,10 @@ html {
   text-align: left;
 }
 
+.ant-radio-group-small .ant-radio-button-wrapper {
+  padding: 0 !important;
+}
+
 tr[class^='TableSelectRow-selected-'],
 tr[class*='TableSelectRow-selected-'] {
   background-color: #c8dafd !important;
