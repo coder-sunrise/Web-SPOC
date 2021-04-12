@@ -13,26 +13,30 @@ const getSequence = (sequence, maxSeq) => {
 }
 
 const ParseEyeFormData = (response) => {
-  const { corEyeRefractionForm = {}, corEyeExaminationForm = {} } = response
+  const { corEyeRefractionForm, corEyeExaminationForm } = response
   let refractionFormData = {}
   let examinationFormData = {}
-  if (corEyeRefractionForm.formData) {
+  if (corEyeRefractionForm && corEyeRefractionForm.formData) {
     refractionFormData = JSON.parse(corEyeRefractionForm.formData)
   }
-  if (corEyeExaminationForm.formData) {
+  if (corEyeExaminationForm && corEyeExaminationForm.formData) {
     examinationFormData = JSON.parse(corEyeExaminationForm.formData)
   }
 
   const newResponse = {
     ...response,
-    corEyeRefractionForm: {
-      ...corEyeRefractionForm,
-      formData: refractionFormData,
-    },
-    corEyeExaminationForm: {
-      ...corEyeExaminationForm,
-      formData: examinationFormData,
-    },
+    corEyeRefractionForm: corEyeRefractionForm
+      ? {
+          ...corEyeRefractionForm,
+          formData: refractionFormData,
+        }
+      : undefined,
+    corEyeExaminationForm: corEyeExaminationForm
+      ? {
+          ...corEyeExaminationForm,
+          formData: examinationFormData,
+        }
+      : undefined,
   }
   return newResponse
 }

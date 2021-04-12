@@ -387,6 +387,7 @@ const CalendarView = ({
           appointmentStatusFk,
           bookedByUser,
           createDate,
+          isEditedAsSingleAppointment,
         } = appointment
 
         const apptEvents = apptResources.map((item) => ({
@@ -401,6 +402,7 @@ const CalendarView = ({
           appointmentStatusFk,
           bookedByUser,
           createDate,
+          isEditedAsSingleAppointment,
           start: moment(
             `${appointmentDate} ${item.startTime}`,
             `${serverDateFormat} HH:mm`,

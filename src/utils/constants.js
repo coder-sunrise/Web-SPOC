@@ -206,8 +206,7 @@ export const REPORT_TYPE = {
   16: 'Oustanding Payment',
   17: 'Sales Listing',
   18: 'Credit Note',
-  19: 'Low Stock Consumables',
-  20: 'Low Stock Medication',
+  20: 'Low Stock',
   21: 'Consumable Movement Report',
   22: 'Medication Movement',
   23: 'Deposit Transaction',
@@ -387,7 +386,7 @@ export const PATIENT_HISTORY_TABS = {
   INVOICE: 4,
   NURSENOTES: 5,
   DEPOSIT: 6,
-  REFERRAL:7,
+  REFERRAL: 7,
 }
 
 export const FILE_STATUS = {
