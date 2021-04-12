@@ -22,8 +22,14 @@ class XeroInvoicesReport extends ReportBase {
     }
   }
 
-  renderFilterBar = (handleSubmit, isSubmitting, exportCSV) => {
-    return <FilterBar handleSubmit={handleSubmit} isSubmitting={isSubmitting} exportCSV={exportCSV} />
+  renderFilterBar = (handleSubmit, isSubmitting, formikProps, exportCSV) => {
+    return (
+      <FilterBar
+        handleSubmit={handleSubmit}
+        isSubmitting={isSubmitting}
+        exportCSV={exportCSV}
+      />
+    )
   }
 }
 
