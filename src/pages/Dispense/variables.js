@@ -165,7 +165,7 @@ export const PrescriptionColumnExtensions = (
     render: (row) => {
       return (
         <p>
-          {row.dispensedQuanity} {row.dispenseUOM}
+          {numeral(row.dispensedQuanity || 0).format('0,0.0')} {row.dispenseUOM}
         </p>
       )
     },
@@ -177,7 +177,7 @@ export const PrescriptionColumnExtensions = (
     render: (row) => {
       return (
         <p>
-          {row.orderedQuantity} {row.orderUOM}
+          {numeral(row.orderedQuantity || 0).format('0,0.0')} {row.orderUOM}
         </p>
       )
     },
@@ -333,7 +333,7 @@ export const VaccinationColumnExtensions = (
     render: (row) => {
       return (
         <p>
-          {row.dispensedQuanity} {row.dispenseUOM}
+          {numeral(row.dispensedQuanity || 0).format('0,0.0')} {row.dispenseUOM}
         </p>
       )
     },
@@ -434,6 +434,10 @@ export const OtherOrdersColumns = [
     title: 'Description',
   },
   {
+    name: 'quantity',
+    title: 'Quantity',
+  },
+  {
     name: 'unitPrice',
     title: 'Unit Price ($)',
   },
@@ -493,6 +497,18 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
             </div>
           </div>
         </Tooltip>
+      )
+    },
+  },
+  {
+    columnName: 'quantity',
+    type: 'number',
+    width: columnWidth,
+    render: (row) => {
+      return (
+        <p>
+          {numeral(row.quantity || 0).format('0,0.0')} {row.dispenseUOM}
+        </p>
       )
     },
   },
@@ -759,20 +775,21 @@ export const PackageColumnExtensions = (onPrint) => [
         unitPrice,
       ).format(currencyFormat)})`
       return (
-        <Tooltip title={title}>          
+        <Tooltip title={title}>
           <div
             style={{
-                wordWrap: 'break-word',
-                whiteSpace: 'pre-wrap',
-              }}
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+            }}
           >
             {packageDrawdownIndicator(row)}
-            <div style={{
+            <div
+              style={{
                 position: 'relative',
                 left: 22,
               }}
             >
-              {row.description}              
+              {row.description}
             </div>
             {lowStockIndicator(row, 'itemFK')}
           </div>
@@ -800,37 +817,47 @@ export const PackageColumnExtensions = (onPrint) => [
       let balanceQty = row.quantity
       const todayQuantity = row.packageConsumeQuantity
 
-      if (packageDrawdown) {       
-        if (packageDrawdown.packageDrawdownTransaction && packageDrawdown.packageDrawdownTransaction.length > 0) { 
-          drawdownTransaction = packageDrawdown.packageDrawdownTransaction.filter(t => t.consumeDate < row.packageDrawdownAsAtDate)
+      if (packageDrawdown) {
+        if (
+          packageDrawdown.packageDrawdownTransaction &&
+          packageDrawdown.packageDrawdownTransaction.length > 0
+        ) {
+          drawdownTransaction = packageDrawdown.packageDrawdownTransaction.filter(
+            (t) => t.consumeDate < row.packageDrawdownAsAtDate,
+          )
         }
 
-         // Transferred quantity
-         let transferredQty = 0
-         const { packageDrawdownTransfer } = packageDrawdown
-         if (packageDrawdownTransfer && packageDrawdownTransfer.length > 0) {
-           const drawdownTransfer = packageDrawdownTransfer.filter(t => t.transferDate < row.packageDrawdownAsAtDate)
-           drawdownTransfer.forEach(transfer => {
-             transferredQty += transfer.quantity
-           })
-         }
+        // Transferred quantity
+        let transferredQty = 0
+        const { packageDrawdownTransfer } = packageDrawdown
+        if (packageDrawdownTransfer && packageDrawdownTransfer.length > 0) {
+          const drawdownTransfer = packageDrawdownTransfer.filter(
+            (t) => t.transferDate < row.packageDrawdownAsAtDate,
+          )
+          drawdownTransfer.forEach((transfer) => {
+            transferredQty += transfer.quantity
+          })
+        }
 
-         // Received (Transfer back) quantity
+        // Received (Transfer back) quantity
         let receivedQty = 0
         const { packageDrawdownReceive } = packageDrawdown
         if (packageDrawdownReceive && packageDrawdownReceive.length > 0) {
-          const drawdownReceive = packageDrawdownReceive.filter(t => t.transferDate < row.packageDrawdownAsAtDate)
-          drawdownReceive.forEach(receive => {
+          const drawdownReceive = packageDrawdownReceive.filter(
+            (t) => t.transferDate < row.packageDrawdownAsAtDate,
+          )
+          drawdownReceive.forEach((receive) => {
             receivedQty += receive.quantity
           })
         }
 
-        const totalQty = packageDrawdown.totalQuantity - transferredQty + receivedQty
+        const totalQty =
+          packageDrawdown.totalQuantity - transferredQty + receivedQty
         let totalDrawdown = 0
-        drawdownTransaction.forEach(txn => {
+        drawdownTransaction.forEach((txn) => {
           totalDrawdown += txn.consumeQuantity
-        })       
-        balanceQty = totalQty - totalDrawdown 
+        })
+        balanceQty = totalQty - totalDrawdown
       }
 
       return <NumberInput text value={balanceQty - todayQuantity} />
@@ -863,9 +890,10 @@ export const PackageColumnExtensions = (onPrint) => [
       if (type === 'Service' || type === 'Consumable' || type === 'Vaccination')
         return null
       return (
-        <Tooltip title={
-          <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
-        }
+        <Tooltip
+          title={
+            <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
+          }
         >
           <Button
             color='primary'
