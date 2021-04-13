@@ -173,7 +173,7 @@ export const PrescriptionColumnExtensions = (
     render: (row) => {
       return (
         <p>
-          {row.dispensedQuanity} {row.dispenseUOM}
+          {numeral(row.dispensedQuanity || 0).format('0,0.0')} {row.dispenseUOM}
         </p>
       )
     },
@@ -185,7 +185,7 @@ export const PrescriptionColumnExtensions = (
     render: (row) => {
       return (
         <p>
-          {row.orderedQuantity} {row.orderUOM}
+          {numeral(row.orderedQuantity || 0).format('0,0.0')} {row.orderUOM}
         </p>
       )
     },
@@ -349,7 +349,7 @@ export const VaccinationColumnExtensions = (
     render: (row) => {
       return (
         <p>
-          {row.dispensedQuanity} {row.dispenseUOM}
+          {numeral(row.dispensedQuanity || 0).format('0,0.0')} {row.dispenseUOM}
         </p>
       )
     },
@@ -454,6 +454,10 @@ export const OtherOrdersColumns = [
     title: 'Remarks',
   },
   {
+    name: 'quantity',
+    title: 'Quantity',
+  },
+  {
     name: 'unitPrice',
     title: 'Unit Price ($)',
   },
@@ -519,6 +523,18 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
   {
     columnName: 'remarks',
     width: 200,
+  },
+  {
+    columnName: 'quantity',
+    type: 'number',
+    width: 120,
+    render: (row) => {
+      return (
+        <p>
+          {numeral(row.quantity || 0).format('0,0.0')} {row.dispenseUOM}
+        </p>
+      )
+    },
   },
   {
     columnName: 'unitPrice',

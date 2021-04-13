@@ -37,10 +37,11 @@ export default ({ classes, current, fieldName = '' }) => {
       width: 80,
       render: (text, row) => (
         <div className={classes.numberstyle}>
-          {`${numeral(row.quantity || 0).format('0,0.00')}`}
+          {`${numeral(row.quantity || 0).format('0,0.0')}`}
         </div>
       ),
     },
+    { dataIndex: 'dispenseUOM', title: 'UOM', width: 90 },
     {
       dataIndex: 'totalPrice',
       title: 'Subtotal',
