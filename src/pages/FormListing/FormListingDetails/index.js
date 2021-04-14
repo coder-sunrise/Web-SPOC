@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import moment from 'moment'
 import { connect } from 'dva'
+import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
 import { CardContainer, CommonModal, notification } from '@/components'
 import { FORM_CATEGORY, FORM_FROM } from '@/utils/constants'
@@ -80,10 +81,11 @@ export const viewReport = (row, props) => {
 
 const styles = () => ({})
 
-@connect(({ formListing, codetable, user }) => ({
+@connect(({ formListing, codetable, user, global }) => ({
   formListing,
   codetable,
   user,
+  mainDivHeight: global.mainDivHeight,
 }))
 class FormListingDetails extends PureComponent {
   componentDidMount () {
@@ -143,20 +145,28 @@ class FormListingDetails extends PureComponent {
   }
 
   render () {
-    const { formFrom, formListing, user } = this.props
+    const { formFrom, formListing, user, mainDivHeight = 700 } = this.props
 
     const { showModal } = formListing
+    let height =
+      mainDivHeight - 110 - $('.filterBar').height() ||
+      0 - $('.footerBar').height() ||
+      0
+    if (height < 300) height = 300
     return (
       <div>
         {formFrom === FORM_FROM.FORMMODULE && (
           <CardContainer hideHeader>
             <React.Fragment>
-              <FilterBar {...this.props} />
+              <div className='filterBar'>
+                <FilterBar {...this.props} />
+              </div>
               <FormModuleGrid
                 {...this.props}
                 printRow={printRow}
                 editRow={this.editRow}
                 queryFormListing={this.queryFormListing}
+                height={height}
               />
             </React.Fragment>
           </CardContainer>

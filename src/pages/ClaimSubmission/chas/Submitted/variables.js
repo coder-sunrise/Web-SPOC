@@ -56,7 +56,10 @@ export const SubmittedCHASColumns = [
 ]
 
 export const SubmittedCHASColumnExtensions = [
-  { columnName: 'submissionDate', type: 'date', width: 140 },
+  { columnName: 'visitDate', type: 'date', width: 100 },
+  { columnName: 'invoiceDate', type: 'date', width: 100 },
+  { columnName: 'submissionDate', type: 'date', width: 120 },
+  { columnName: 'invoiceNo', width: 90 },
   {
     columnName: 'visitDoctorName',
     sortBy: 'DoctorProfileFKNavigation.ClinicianProfile.Name',

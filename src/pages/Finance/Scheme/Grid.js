@@ -7,7 +7,7 @@ import { Button, CommonTableGrid, Tooltip, notification } from '@/components'
 
 const viewSchemDetailAuthority = 'scheme.schemedetails'
 
-const Grid = ({ history }) => {
+const Grid = ({ history, height }) => {
   const [
     tableParas,
   ] = useState({
@@ -81,7 +81,9 @@ const Grid = ({ history }) => {
         type='copaymentScheme'
         columnExtensions={colExtenstions}
         onRowDoubleClick={editRow}
-        // FuncProps={{ pager: true }}
+        TableProps={{
+          height,
+        }}
         {...tableParas}
       />
     </React.Fragment>

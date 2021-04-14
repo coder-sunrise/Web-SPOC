@@ -4,16 +4,14 @@ import { FastField } from 'formik'
 import { compose } from 'redux'
 import { formatMessage } from 'umi/locale'
 import { connect } from 'dva'
-import SharedContainer from './SharedContainer'
-
 import {
   GridContainer,
   GridItem,
   Transfer,
   CodeSelect,
-  CardContainer,
   NumberInput,
 } from '@/components'
+import SharedContainer from './SharedContainer'
 
 const styles = () => ({})
 const Setting = ({
@@ -24,7 +22,7 @@ const Setting = ({
   global,
   ...props
 }) => {
-  const { medicationDetail, vaccinationDetail, theme, values } = props
+  const { medicationDetail, vaccinationDetail, theme } = props
   const optionLabelLength = 40
 
   const { ctmedicationprecaution, entity, config = {} } =
@@ -63,10 +61,9 @@ const Setting = ({
         hideHeader
         style={{
           margin: theme.spacing(1),
-          minHeight: 700,
-          maxHeight: 700,
+          minHeight: 670,
+          maxHeight: 670,
 
-          // overflow: showTransfer ? 'auto' : 'hidden',
           overflow: 'hidden',
         }}
       >
@@ -199,13 +196,6 @@ const Setting = ({
                   label={formatMessage({
                     id: 'inventory.master.setting.uom',
                   })}
-                  // code={
-                  //   showTransfer ? (
-                  //     'ctmedicationunitofmeasurement'
-                  //   ) : (
-                  //     'ctvaccinationunitofmeasurement'
-                  //   )
-                  // }
                   // Fix work item ID: 10993
                   labelField='name'
                   code='ctmedicationunitofmeasurement'

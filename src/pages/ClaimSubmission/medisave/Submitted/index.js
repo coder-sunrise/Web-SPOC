@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 import { formatMessage } from 'umi/locale'
 // formik
 import { withFormik } from 'formik'
@@ -33,8 +34,9 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ medisaveClaimSubmissionSubmitted }) => ({
+@connect(({ medisaveClaimSubmissionSubmitted, global }) => ({
   medisaveClaimSubmissionSubmitted,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withFormik({
   mapPropsToValues: () => ({}),
@@ -89,10 +91,15 @@ class SubmittedMedisave extends React.Component {
       handleContextMenuItemClick,
       dispatch,
       values,
+      mainDivHeight = 700,
     } = this.props
     const { isLoading, selectedRows } = this.state
     const { list } = medisaveClaimSubmissionSubmitted || []
-
+    let height =
+      mainDivHeight - 230 - $('.filterBar').height() ||
+      0 - $('.footerBar').height() ||
+      0
+    if (height < 300) height = 300
     return (
       <CardContainer
         hideHeader
@@ -101,11 +108,13 @@ class SubmittedMedisave extends React.Component {
           marginRight: 5,
         }}
       >
-        <BaseSearchBar
-          dispatch={dispatch}
-          values={values}
-          modelsName='medisaveClaimSubmissionSubmitted'
-        />
+        <div className='filterBar'>
+          <BaseSearchBar
+            dispatch={dispatch}
+            values={values}
+            modelsName='medisaveClaimSubmissionSubmitted'
+          />
+        </div>
         <LoadingWrapper linear loading={isLoading} text='Get status...'>
           <GridContainer>
             <GridItem md={12}>
@@ -113,37 +122,43 @@ class SubmittedMedisave extends React.Component {
                 data={list}
                 columnExtensions={SubmittedMedisaveColumnExtensions}
                 columns={SubmittedMedisaveColumns}
-                // tableConfig={TableConfig}
                 FuncProps={{
-                 selectable: true,
-                 selectConfig: {
-                   showSelectAll: true,
-                   rowSelectionEnabled: () => true,
-                 },
+                  selectable: true,
+                  selectConfig: {
+                    showSelectAll: true,
+                    rowSelectionEnabled: () => true,
+                  },
                 }}
                 selection={this.state.selectedRows}
                 onSelectionChange={this.handleSelectionChange}
                 onContextMenuItemClick={handleContextMenuItemClick}
                 type='submitted'
+                height={height}
               />
             </GridItem>
-            <GridItem md={4} className={classes.buttonGroup}>
-              <ProgressButton
-                icon={null}
-                color='primary'
-                disabled={selectedRows.length <= 0}
-                onClick={this.handleGetStatusClicked}
-              >
-                {formatMessage({
-                  id: 'claimsubmission.invoiceClaim.GetStatus',
-                })}
-              </ProgressButton>
-            </GridItem>
           </GridContainer>
+          <div className='footerBar'>
+            <GridContainer>
+              <GridItem md={12} className={classes.buttonGroup}>
+                <ProgressButton
+                  icon={null}
+                  color='primary'
+                  disabled={selectedRows.length <= 0}
+                  onClick={this.handleGetStatusClicked}
+                >
+                  {formatMessage({
+                    id: 'claimsubmission.invoiceClaim.GetStatus',
+                  })}
+                </ProgressButton>
+              </GridItem>
+            </GridContainer>
+          </div>
         </LoadingWrapper>
       </CardContainer>
     )
   }
 }
 
-export default withStyles(styles, { name: 'SubmittedMedisave' })(SubmittedMedisave)
+export default withStyles(styles, { name: 'SubmittedMedisave' })(
+  SubmittedMedisave,
+)

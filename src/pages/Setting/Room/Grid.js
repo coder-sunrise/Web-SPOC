@@ -1,11 +1,7 @@
 import React, { PureComponent } from 'react'
-
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 import { status } from '@/utils/codes'
 import { CommonTableGrid, Button, Tooltip } from '@/components'
-import * as service from './services'
 
 class Grid extends PureComponent {
   configs = {
@@ -55,14 +51,6 @@ class Grid extends PureComponent {
   editRow = (row, e) => {
     const { dispatch, settingRoom } = this.props
     const { list } = settingRoom
-    // For complex object retrieve from server
-    // dispatch({
-    //   type: 'settingRoom/queryOne',
-    //   payload: {
-    //     id: row.id,
-    //   },
-    // }).then(toggleModal)
-    // console.log(settingRoom, row.id, e)
     dispatch({
       type: 'settingRoom/updateState',
       payload: {
@@ -73,13 +61,15 @@ class Grid extends PureComponent {
   }
 
   render () {
-    const { dispatch, classes, settingRoom, toggleModal } = this.props
-
+    const { height } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
         type='settingRoom'
         onRowDoubleClick={this.editRow}
+        TableProps={{
+          height,
+        }}
         {...this.configs}
       />
     )

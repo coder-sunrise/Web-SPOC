@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
-import moment from 'moment'
 import {
   CardContainer,
   withFormik,
@@ -26,14 +26,14 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ purchaseReceiveList }) => ({
+@connect(({ purchaseReceiveList, global }) => ({
   purchaseReceiveList,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withFormik({
   name: 'purchaseReceiveList',
   enableReinitialize: true,
   mapPropsToValues: ({ purchaseReceiveList }) => {
-    // console.log('purchaseReceiveList', purchaseReceiveList)
     return purchaseReceiveList
   },
 })
@@ -182,7 +182,7 @@ class PurchaseReceive extends Component {
   }
 
   render () {
-    const { classes, dispatch } = this.props
+    const { classes, dispatch, mainDivHeight = 700 } = this.props
     const actionProps = {
       handleWriteOff: this.onWriteOffClick,
       handleDuplicatePO: this.onDuplicatePOClick,
@@ -196,7 +196,8 @@ class PurchaseReceive extends Component {
       selectedRows,
       isLoading,
     } = this.state
-
+    let height = mainDivHeight - 170 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
         <LoadingWrapper
@@ -204,15 +205,18 @@ class PurchaseReceive extends Component {
           loading={isLoading}
           text='Processing Write-Off...'
         >
-          <FilterBar
-            actions={actionProps}
-            dispatch={dispatch}
-            classes={classes}
-          />
+          <div className='filterBar'>
+            <FilterBar
+              actions={actionProps}
+              dispatch={dispatch}
+              classes={classes}
+            />
+          </div>
           <PurchaseReceiveDataGrid
             selectedRows={selectedRows}
             actions={actionProps}
             {...this.props}
+            height={height}
           />
 
           <CommonModal
@@ -234,6 +238,7 @@ class PurchaseReceive extends Component {
           >
             <DuplicatePO actions={actionProps} {...this.props} />
           </CommonModal>
+
           <GridItem md={4} className={classes.buttonGroup}>
             <Button
               color='primary'

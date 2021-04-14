@@ -62,11 +62,15 @@ class Grid extends PureComponent {
 
   render () {
     const { classes } = this.props
+    const { height } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
         type='settingReferralSource'
         onRowDoubleClick={this.editRow}
+        TableProps={{
+          height,
+        }}
         columns={[
           { name: 'name', title: 'Name' },
           { name: 'address', title: 'Address' },

@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-
+import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
@@ -13,9 +13,10 @@ import Detail from './Detail'
 const styles = (theme) => ({
   ...basicStyle(theme),
 })
- 
-@connect(({ settingReferralSource }) => ({
+
+@connect(({ settingReferralSource, global }) => ({
   settingReferralSource,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withSettingBase({
   modelName: 'settingReferralSource',
@@ -39,15 +40,18 @@ class ReferralSource extends PureComponent {
   }
 
   render () {
-    const { settingReferralSource } = this.props
+    const { settingReferralSource, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-
+    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <Filter {...cfg} {...this.props} />
-        <Grid {...cfg} {...this.props} />
+        <div className='filterBar'>
+          <Filter {...cfg} {...this.props} />
+        </div>
+        <Grid {...cfg} {...this.props} height={height} />
 
         <CommonModal
           open={settingReferralSource.showModal}

@@ -1,11 +1,8 @@
 import React, { PureComponent } from 'react'
 
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 import { status } from '@/utils/codes'
 import { CommonTableGrid, Button, Tooltip } from '@/components'
-import * as service from './services'
 
 class Grid extends PureComponent {
   editRow = (row, e) => {
@@ -22,11 +19,15 @@ class Grid extends PureComponent {
   }
 
   render () {
+    const { height } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
         type='settingServiceCenter'
         onRowDoubleClick={this.editRow}
+        TableProps={{
+          height,
+        }}
         columns={[
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },

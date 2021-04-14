@@ -1,6 +1,11 @@
 import React, { Component } from 'react'
 import { withStyles } from '@material-ui/core'
-import { GridContainer, CardContainer, withFormikExtend, CommonModal } from '@/components'
+import {
+  GridContainer,
+  CardContainer,
+  GridItem,
+  CommonModal,
+} from '@/components'
 import { connect } from 'dva'
 import Authorized from '@/utils/Authorized'
 import ReferralGrid from './ReferralGrid'
@@ -14,7 +19,6 @@ const styles = () => ({})
   codetable,
   user,
 }))
-
 class PatientReferral extends Component {
   state = {
     showReferralHistoryDetails: false,
@@ -43,32 +47,42 @@ class PatientReferral extends Component {
 
   render () {
     const { showReferralHistoryDetails, onClickedRowData } = this.state
-    const { referralBy } = onClickedRowData
     return (
-      <Authorized authority="patientdatabase.patientprofiledetails.patienthistory.referralhistory">
+      <Authorized authority='patientdatabase.patientprofiledetails.patienthistory.referralhistory'>
         {({ rights: referralhistoryAccessRight }) => (
           <Authorized.Context.Provider
             value={{
               rights:
-                referralhistoryAccessRight === 'readwrite' || referralhistoryAccessRight === 'enable'
+                referralhistoryAccessRight === 'readwrite' ||
+                referralhistoryAccessRight === 'enable'
                   ? 'enable'
                   : referralhistoryAccessRight,
             }}
           >
             <React.Fragment>
-              <CardContainer hideHeader size="sm">
+              <CardContainer hideHeader size='sm'>
                 <GridContainer>
-                  <ReferralGrid onEditReferralHistoryClicked={this.onEditReferralHistoryClicked} {...this.props} />
+                  <GridItem md={12}>
+                    <ReferralGrid
+                      onEditReferralHistoryClicked={
+                        this.onEditReferralHistoryClicked
+                      }
+                      {...this.props}
+                    />
+                  </GridItem>
                   <CommonModal
                     open={showReferralHistoryDetails}
-                    title="Edit Visit Referral"
-                    maxWidth="sm"
+                    title='Edit Visit Referral'
+                    maxWidth='sm'
                     bodyNoPadding
                     onConfirm={this.closeReferralHistoryDetailsModal}
                     onClose={this.closeReferralHistoryDetailsModal}
-                    observe="patientReferralHistoryDetails"
+                    observe='patientReferralHistoryDetails'
                   >
-                    <ReferralDetails onClickedRowData={onClickedRowData} {...this.props} />
+                    <ReferralDetails
+                      onClickedRowData={onClickedRowData}
+                      {...this.props}
+                    />
                   </CommonModal>
                 </GridContainer>
               </CardContainer>

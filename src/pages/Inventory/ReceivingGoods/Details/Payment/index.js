@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 import _ from 'lodash'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
@@ -23,9 +24,10 @@ const styles = (theme) => ({
 
 const { Secured } = Authorized
 @Secured('receivinggoods.receivinggoodsdetails')
-@connect(({ rgPayment, receivingGoodsDetails }) => ({
+@connect(({ rgPayment, receivingGoodsDetails, global }) => ({
   rgPayment,
   receivingGoodsDetails,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withFormikExtend({
   displayName: 'rgPayment',
@@ -166,6 +168,7 @@ class index extends PureComponent {
       receivingGoodsDetails,
       rights,
       values: { currentBizSessionInfo },
+      mainDivHeight = 700,
     } = this.props
     const { receivingGoods: rg } = receivingGoodsDetails
     const isWriteOff = rg
@@ -173,23 +176,32 @@ class index extends PureComponent {
       : false
     const hasActiveSession =
       currentBizSessionInfo && currentBizSessionInfo.id > 0
+
+    let height = mainDivHeight - 170 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <AuthorizedContext.Provider
         value={{
           rights: isWriteOff === true || !hasActiveSession ? 'disable' : rights,
         }}
       >
-        {!hasActiveSession && (
-          <div style={{ paddingTop: 5 }}>
-            <WarningSnackbar
-              variant='warning'
-              message='Action(s) is not allowed due to no active session was found.'
-            />
-          </div>
-        )}
-        <GridContainer>
+        <div className='filterBar'>
+          {!hasActiveSession && (
+            <div style={{ paddingTop: 5 }}>
+              <WarningSnackbar
+                variant='warning'
+                message='Action(s) is not allowed due to no active session was found.'
+              />
+            </div>
+          )}
           <Header {...this.props} getTotalPaid={this.getTotalPaid} />
-          <Grid {...this.props} getTotalPaid={this.getTotalPaid} />
+        </div>
+        <GridContainer>
+          <Grid
+            {...this.props}
+            getTotalPaid={this.getTotalPaid}
+            height={height}
+          />
         </GridContainer>
 
         {this.isPaymentUpdated() && (

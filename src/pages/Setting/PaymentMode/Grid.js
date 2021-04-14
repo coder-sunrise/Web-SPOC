@@ -20,7 +20,6 @@ class Grid extends PureComponent {
     columnExtensions: [
       {
         columnName: 'paymentCharges',
-        // type: 'number',
         width: 200,
       },
       {
@@ -75,12 +74,15 @@ class Grid extends PureComponent {
   }
 
   render () {
-    const { dispatch, classes, settingPaymentMode, toggleModal } = this.props
+    const { height } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
         type='settingPaymentMode'
         onRowDoubleClick={this.editRow}
+        TableProps={{
+          height,
+        }}
         {...this.configs}
       />
     )

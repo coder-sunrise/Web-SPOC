@@ -109,12 +109,16 @@ class FormModuleGrid extends PureComponent {
   }
 
   render () {
+    const { height } = this.props
     return (
       <CommonTableGrid
         getRowId={(r) => r.id}
         forceRender
         type='formListing'
         onRowDoubleClick={this.editRow}
+        TableProps={{
+          height,
+        }}
         columns={[
           { name: 'type', title: 'Type' },
           { name: 'visitDate', title: 'Visit Date' },

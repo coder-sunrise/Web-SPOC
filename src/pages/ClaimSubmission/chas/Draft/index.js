@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 // formik
 import { withFormik } from 'formik'
 import { formatMessage } from 'umi/locale'
@@ -30,8 +31,9 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ chasClaimSubmissionDraft }) => ({
+@connect(({ chasClaimSubmissionDraft, global }) => ({
   chasClaimSubmissionDraft,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withFormik({
   mapPropsToValues: () => ({}),
@@ -82,10 +84,16 @@ class DraftCHAS extends React.Component {
       handleContextMenuItemClick,
       values,
       dispatch,
+      mainDivHeight = 700,
     } = this.props
     const { list } = chasClaimSubmissionDraft || []
-    
+
     const { selectedRows } = this.state
+    let height =
+      mainDivHeight - 230 - $('.filterBar').height() ||
+      0 - $('.footerBar').height() ||
+      0
+    if (height < 300) height = 300
     return (
       <CardContainer
         hideHeader
@@ -94,12 +102,14 @@ class DraftCHAS extends React.Component {
           marginRight: 5,
         }}
       >
-        <BaseSearchBar
-          hideInvoiceDate
-          dispatch={dispatch}
-          values={values}
-          modelsName='chasClaimSubmissionDraft'
-        />
+        <div className='filterBar'>
+          <BaseSearchBar
+            hideInvoiceDate
+            dispatch={dispatch}
+            values={values}
+            modelsName='chasClaimSubmissionDraft'
+          />
+        </div>
         <GridContainer>
           <GridItem md={12}>
             <TableGrid
@@ -120,31 +130,36 @@ class DraftCHAS extends React.Component {
               contextMenuOptions={overrideContextMenuOptions}
               isDraft
               type='draft'
+              height={height}
             />
           </GridItem>
-          <GridItem md={4} className={classes.buttonGroup}>
-            <Tooltip
-              placement='bottom-start'
-              title={formatMessage({
-                id:
-                  'claimsubmission.invoiceClaim.refreshPatientDetail.tooltips',
-              })}
-            >
-              <div style={{ display: 'inline-block' }}>
-                <ProgressButton
-                  icon={null}
-                  color='info'
-                  disabled={selectedRows.length <= 0}
-                  onClick={this.onRefreshClicked}
-                >
-                  {formatMessage({
-                    id: 'claimsubmission.invoiceClaim.refreshPatientDetail',
-                  })}
-                </ProgressButton>
-              </div>
-            </Tooltip>
-          </GridItem>
         </GridContainer>
+        <div className='footerBar'>
+          <GridContainer>
+            <GridItem md={12} className={classes.buttonGroup}>
+              <Tooltip
+                placement='bottom-start'
+                title={formatMessage({
+                  id:
+                    'claimsubmission.invoiceClaim.refreshPatientDetail.tooltips',
+                })}
+              >
+                <div style={{ display: 'inline-block' }}>
+                  <ProgressButton
+                    icon={null}
+                    color='info'
+                    disabled={selectedRows.length <= 0}
+                    onClick={this.onRefreshClicked}
+                  >
+                    {formatMessage({
+                      id: 'claimsubmission.invoiceClaim.refreshPatientDetail',
+                    })}
+                  </ProgressButton>
+                </div>
+              </Tooltip>
+            </GridItem>
+          </GridContainer>
+        </div>
       </CardContainer>
     )
   }

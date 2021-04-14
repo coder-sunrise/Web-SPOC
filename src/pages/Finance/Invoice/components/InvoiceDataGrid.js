@@ -8,14 +8,16 @@ import {
   TableConfig,
 } from '../variables'
 
-const InvoiceDataGrid = ({ handleRowDoubleClick }) => {
+const InvoiceDataGrid = ({ handleRowDoubleClick, height }) => {
   return (
     <CommonTableGrid
-      // height={600}
       type='invoiceList'
       columns={InvoiceGridColumns}
       columnExtensions={InvoiceGridColExtensions}
       onRowDoubleClick={handleRowDoubleClick}
+      TableProps={{
+        height,
+      }}
       {...TableConfig}
     />
   )

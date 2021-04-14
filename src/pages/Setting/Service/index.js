@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
-import Yup from '@/utils/yup'
 import { CardContainer, CommonModal, withSettingBase } from '@/components'
 import Filter from './Filter'
 import Grid from './Grid'
@@ -24,6 +24,7 @@ const styles = (theme) => ({
 @connect(({ settingClinicService, global }) => ({
   settingClinicService,
   global,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withSettingBase({ modelName: 'settingClinicService' })
 class Service extends PureComponent {
@@ -38,12 +39,6 @@ class Service extends PureComponent {
 
   toggleModal = () => {
     const { dispatch } = this.props
-    // dispatch({
-    //   type: 'settingClinicService/updateState',
-    //   payload: {
-    //     showModal: !this.props.settingClinicService.showModal,
-    //   },
-    // })
 
     this.setState((prevState) => {
       return { open: !prevState.open }
@@ -60,16 +55,24 @@ class Service extends PureComponent {
   }
 
   render () {
-    const { settingClinicService } = this.props
+    const { settingClinicService, mainDivHeight = 700 } = this.props
     const { open } = this.state
     const cfg = {
       toggleModal: this.toggleModal,
     }
-
+    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <Filter {...cfg} {...this.props} />
-        <Grid {...cfg} {...this.props} toggleModal={this.toggleModal} />
+        <div className='filterBar'>
+          <Filter {...cfg} {...this.props} />
+        </div>
+        <Grid
+          {...cfg}
+          {...this.props}
+          toggleModal={this.toggleModal}
+          height={height}
+        />
         <CommonModal
           open={open}
           observe='ServiceModal'

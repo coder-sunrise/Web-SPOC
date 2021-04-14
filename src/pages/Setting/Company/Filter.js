@@ -18,9 +18,8 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  // authority: 'finance/scheme',
   mapPropsToValues: ({ settingCompany }) => settingCompany.filter || {},
-  handleSubmit: () => { },
+  handleSubmit: () => {},
   displayName: 'CompanyFilter',
 })
 class Filter extends PureComponent {
@@ -28,13 +27,13 @@ class Filter extends PureComponent {
     isCopayer: undefined,
   }
 
-  checkIsCopayer(name) {
+  checkIsCopayer (name) {
     this.setState({
       isCopayer: name === 'copayer',
     })
   }
 
-  render() {
+  render () {
     const { classes, route, settingCompany } = this.props
     const { name } = route
     const { companyType } = settingCompany
@@ -73,8 +72,8 @@ class Filter extends PureComponent {
                 }}
               />
             ) : (
-                []
-              )}
+              []
+            )}
           </GridItem>
           <GridItem xs={6} md={3}>
             <FastField
@@ -85,7 +84,7 @@ class Filter extends PureComponent {
             />
           </GridItem>
           <GridContainer>
-            <GridItem xs={6} md={3}>
+            <GridItem>
               <div className={classes.filterBtn}>
                 <ProgressButton
                   color='primary'
@@ -115,7 +114,7 @@ class Filter extends PureComponent {
                 >
                   <FormattedMessage id='form.search' />
                 </ProgressButton>
-                {isCopayer ?
+                {isCopayer ? (
                   <Authorized authority='copayer.newcopayer'>
                     <Button
                       color='primary'
@@ -132,7 +131,8 @@ class Filter extends PureComponent {
                       <Add />
                       Add New
                     </Button>
-                  </Authorized> :
+                  </Authorized>
+                ) : (
                   <Authorized authority='settings.supplier.newsupplier'>
                     <Button
                       color='primary'
@@ -150,8 +150,7 @@ class Filter extends PureComponent {
                       Add New
                     </Button>
                   </Authorized>
-                  }
-
+                )}
               </div>
             </GridItem>
           </GridContainer>

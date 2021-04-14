@@ -1,13 +1,9 @@
 import React, { PureComponent } from 'react'
-import { connect } from 'dva'
 import { statusString } from '@/utils/codes'
 import { CommonTableGrid } from '@/components'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import Authorized from '@/utils/Authorized'
 
-@connect(({ global }) => ({
-  mainDivHeight: global.mainDivHeight,
-}))
 class Grid extends PureComponent {
   state = {}
 
@@ -42,7 +38,6 @@ class Grid extends PureComponent {
           render: (row) =>
             `${row.gender.substring(0, 1)}/${calculateAgeFromDOB(row.dob)}`,
           sortingEnabled: false,
-          // sortBy: 'genderFkNavigation.displayValue',
         },
         {
           columnName: 'dob',
@@ -52,7 +47,6 @@ class Grid extends PureComponent {
         {
           columnName: 'race',
           sortingEnabled: false,
-          // sortBy: 'raceFkNavigation.displayValue',
         },
         {
           columnName: 'action',
@@ -74,10 +68,10 @@ class Grid extends PureComponent {
           sortingEnabled: false,
           options: statusString,
           align: 'center',
+          width: 90,
         },
         {
           columnName: 'nationality',
-          // sortBy: 'nationalityFkNavigation.displayValue',
           sortingEnabled: false,
         },
         { columnName: 'mobileNo', sortingEnabled: false },
@@ -93,8 +87,6 @@ class Grid extends PureComponent {
       FuncProps: {
         pager: true,
         filter: true,
-        // columnSelectable: false,
-        // columnReorderable: false,
       },
     }
   }
@@ -104,8 +96,7 @@ class Grid extends PureComponent {
       patientSearch,
       onRowDblClick,
       overrideTableParas = {},
-      mainDivHeight = 700,
-      simple,
+      height,
     } = this.props
     return (
       <React.Fragment>
@@ -113,7 +104,7 @@ class Grid extends PureComponent {
           type='patientSearch'
           entity={patientSearch}
           forceRender
-          TableProps={{ height: simple ? mainDivHeight - 425 : undefined }}
+          TableProps={{ height }}
           onRowDoubleClick={onRowDblClick}
           {...this.tableParas}
           {...overrideTableParas}

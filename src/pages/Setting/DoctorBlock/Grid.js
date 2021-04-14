@@ -15,7 +15,6 @@ import { DoctorLabel } from '@/components/_medisys'
 
 const TableParams = {
   FuncProps: {
-    pager: false,
     grouping: true,
   },
   columns: [
@@ -30,7 +29,7 @@ const TableParams = {
   ],
 }
 
-export default ({ dataSource, onEditClick, onDeleteClick }) => {
+export default ({ dataSource, onEditClick, onDeleteClick, height }) => {
   const GroupCellContent = ({ row }) => {
     let label = 'Doctor'
     if (!dataSource) return ''
@@ -166,7 +165,9 @@ export default ({ dataSource, onEditClick, onDeleteClick }) => {
       rows={dataSource}
       onRowDoubleClick={handleDoubleClick}
       columnExtensions={columnExtensions}
-      // {...tableConfig}
+      TableProps={{
+        height,
+      }}
       {...TableParams}
       FuncProps={{
         ...TableParams.FuncProps,

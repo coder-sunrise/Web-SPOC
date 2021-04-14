@@ -1,14 +1,13 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-
-import { withStyles, Divider } from '@material-ui/core'
+import $ from 'jquery'
+import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
-import { CardContainer, CommonModal, withSettingBase } from '@/components'
+import { CardContainer, withSettingBase } from '@/components'
 
 import Filter from './Filter'
 import Grid from './Grid'
-//import Detail from './Detail'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -17,6 +16,7 @@ const styles = (theme) => ({
 @connect(({ settingServiceCenterCategory, global }) => ({
   settingServiceCenterCategory,
   global,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withSettingBase({ modelName: 'settingServiceCenterCategory' })
 class ServiceCenterCategory extends PureComponent {
@@ -29,10 +29,15 @@ class ServiceCenterCategory extends PureComponent {
   }
 
   render () {
+    const { mainDivHeight = 700 } = this.props
+    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <Filter {...this.props} />
-        <Grid {...this.props} />
+        <div className='filterBar'>
+          <Filter {...this.props} />
+        </div>
+        <Grid {...this.props} height={height} />
       </CardContainer>
     )
   }

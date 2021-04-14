@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect } from 'react'
 import { connect } from 'dva'
-
+import $ from 'jquery'
 import Authorized from '@/utils/Authorized'
 import FitlerBar from './FilterBar'
 import Grid from './Grid'
@@ -12,6 +12,7 @@ const AppointmentSearch = ({
   appointment,
   currentUser,
   doctorprofile = [],
+  mainDivHeight = 700,
 }) => {
   const viewOtherApptAccessRight = Authorized.check(
     'appointment.viewotherappointment',
@@ -64,35 +65,41 @@ const AppointmentSearch = ({
     }
   }, [])
 
+  let height = mainDivHeight - 150 - ($('.filterBar').height() || 0)
+  if (height < 300) height = 300
   return (
     <Fragment>
-      <FitlerBar
-        dispatch={dispatch}
-        handleAddAppointmentClick={handleAddAppointmentClick}
-        appointment={appointment}
-        filterByDoctor={
-          (!viewOtherApptAccessRight ||
-            viewOtherApptAccessRight.rights !== 'enable') &&
-          isActiveDoctor ? (
-            [
-              currentUser,
-            ]
-          ) : (
-            []
-          )
-        }
-        viewOtherApptAccessRight={viewOtherApptAccessRight}
-        isActiveDoctor={isActiveDoctor}
-      />
+      <div className='filterBar'>
+        <FitlerBar
+          dispatch={dispatch}
+          handleAddAppointmentClick={handleAddAppointmentClick}
+          appointment={appointment}
+          filterByDoctor={
+            (!viewOtherApptAccessRight ||
+              viewOtherApptAccessRight.rights !== 'enable') &&
+            isActiveDoctor ? (
+              [
+                currentUser,
+              ]
+            ) : (
+              []
+            )
+          }
+          viewOtherApptAccessRight={viewOtherApptAccessRight}
+          isActiveDoctor={isActiveDoctor}
+        />
+      </div>
       <Grid
         handleSelectEvent={(data) => {
           handleSelectEvent({ ...data, isHistory: true })
         }}
+        height={height}
       />
     </Fragment>
   )
 }
 
-export default connect(({ appointment }) => ({ appointment }))(
-  AppointmentSearch,
-)
+export default connect(({ appointment, global }) => ({
+  appointment,
+  mainDivHeight: global.mainDivHeight,
+}))(AppointmentSearch)

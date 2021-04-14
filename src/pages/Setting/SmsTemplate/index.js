@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-
+import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
@@ -14,11 +14,12 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingSmsTemplate }) => ({
+@connect(({ settingSmsTemplate, global }) => ({
   settingSmsTemplate,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withSettingBase({ modelName: 'settingSmsTemplate' })
-class ServiceCenter extends PureComponent {
+class SMSTemplate extends PureComponent {
   state = {}
 
   componentDidMount () {
@@ -36,30 +37,22 @@ class ServiceCenter extends PureComponent {
     })
   }
 
-  // getModalTitle = (isEntityEmpty) => {
-  //   const pathname = window.location.pathname.trim().toLowerCase()
-
-  //   const modalTitle =
-  //     pathname == '/setting/smstemplate'
-  //       ? 'SMS Template'
-  //       : 'Document Template'
-
-  //   return (isEntityEmpty ? 'Edit ' : 'Add ') + modalTitle
-  // }
-
   render () {
-    const { settingSmsTemplate } = this.props
+    const { settingSmsTemplate, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
+    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <Filter {...cfg} {...this.props} />
-        <Grid {...cfg} {...this.props} />
+        <div className='filterBar'>
+          <Filter {...cfg} {...this.props} />
+        </div>
+        <Grid {...cfg} {...this.props} height={height} />
         <CommonModal
           open={settingSmsTemplate.showModal}
           observe='TemplateMessageDetail'
-          // title={this.getModalTitle(settingSmsTemplate.entity)}
           title={`${settingSmsTemplate.entity ? 'Edit ' : 'Add '}SMS Template`}
           maxWidth='md'
           bodyNoPadding
@@ -73,4 +66,4 @@ class ServiceCenter extends PureComponent {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(ServiceCenter)
+export default withStyles(styles, { withTheme: true })(SMSTemplate)

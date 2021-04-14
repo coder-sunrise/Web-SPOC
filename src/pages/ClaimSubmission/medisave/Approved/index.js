@@ -1,9 +1,10 @@
 import React from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 import moment from 'moment'
 import { formatMessage } from 'umi/locale'
 // formik
-import { withFormik, FastField } from 'formik'
+import { withFormik } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
@@ -12,33 +13,35 @@ import {
   ProgressButton,
   GridContainer,
   GridItem,
-  Select,
   notification,
   CardContainer,
   CommonModal,
 } from '@/components'
 // sub components
-import { approvedStatus } from '@/utils/codes'
 import { PAYMENT_MODE } from '@/utils/constants'
 import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../TableGrid'
 import CollectPaymentModal from '../../common/CollectPaymentModal'
 // variables
-import { ApprovedMedisaveColumnExtensions, ApprovedMedisaveColumns } from './variables'
+import {
+  ApprovedMedisaveColumnExtensions,
+  ApprovedMedisaveColumns,
+} from './variables'
 
 const styles = (theme) => ({
   cardContainer: {
     margin: 1,
   },
   buttonGroup: {
-    marginTop: theme.spacing(2),
+    marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
   },
 })
 
-@connect(({ claimSubmission, medisaveClaimSubmissionApproved }) => ({
+@connect(({ claimSubmission, medisaveClaimSubmissionApproved, global }) => ({
   claimSubmission,
   medisaveClaimSubmissionApproved,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withFormik({
   mapPropsToValues: () => ({}),
@@ -91,11 +94,11 @@ class ApprovedMedisave extends React.Component {
   }
 
   collectPaymentIsDisabled = (selectedRows, list) => {
-    if(!list || list.length === 0) return true
+    if (!list || list.length === 0) return true
     const invoiceList = list.reduce((invoices, i) => {
-      if(invoices.indexOf(i.invoiceNo) < 0) invoices.push(i.invoiceNo)
+      if (invoices.indexOf(i.invoiceNo) < 0) invoices.push(i.invoiceNo)
       return invoices
-    },[])
+    }, [])
     return selectedRows.length === 0 || invoiceList.length < selectedRows.length
   }
 
@@ -141,12 +144,17 @@ class ApprovedMedisave extends React.Component {
       handleContextMenuItemClick,
       dispatch,
       values,
+      mainDivHeight = 700,
     } = this.props
     const { isLoading } = this.state
     const { list } = medisaveClaimSubmissionApproved || []
     const { showCollectPayment } = this.state
     const { selectedRows } = this.state
-    
+    let height =
+      mainDivHeight - 256 - $('.filterBar').height() ||
+      0 - $('.footerBar').height() ||
+      0
+    if (height < 300) height = 300
     return (
       <CardContainer
         hideHeader
@@ -155,11 +163,13 @@ class ApprovedMedisave extends React.Component {
           marginRight: 5,
         }}
       >
-        <BaseSearchBar
-          dispatch={dispatch}
-          values={values}
-          modelsName='medisaveClaimSubmissionApproved'
-        />{' '}
+        <div className='filterBar'>
+          <BaseSearchBar
+            dispatch={dispatch}
+            values={values}
+            modelsName='medisaveClaimSubmissionApproved'
+          />
+        </div>
         <LoadingWrapper linear loading={isLoading} text='Get status...'>
           <GridContainer>
             <GridItem md={12}>
@@ -167,52 +177,54 @@ class ApprovedMedisave extends React.Component {
                 data={list}
                 columnExtensions={ApprovedMedisaveColumnExtensions}
                 columns={ApprovedMedisaveColumns}
-                // tableConfig={TableConfig}
                 FuncProps={{
                   selectable: true,
                   selectConfig: {
                     showSelectAll: true,
                     rowSelectionEnabled: (row) =>
                       row.patientIsActive &&
-                      !(
-                        row.approvedAmount === row.collectedPayment
-                      ),
+                      !(row.approvedAmount === row.collectedPayment),
                   },
                 }}
                 selection={this.state.selectedRows}
                 onSelectionChange={this.handleSelectionChange}
                 onContextMenuItemClick={handleContextMenuItemClick}
                 type='approved'
+                height={height}
               />
             </GridItem>
-            <GridItem md={12} style={{ marginTop: 12 }}>
+            <GridItem md={12} style={{ marginTop: 10 }}>
               <p className={classes.footerNote}>
                 Approved Amt. only available for Paid claim status.
               </p>
             </GridItem>
-            <GridItem md={4} className={classes.buttonGroup}>
-              <ProgressButton
-                icon={null}
-                color='primary'
-                disabled={selectedRows.length <= 0}
-                onClick={this.handleGetStatusClicked}
-              >
-                {formatMessage({
-                  id: 'claimsubmission.invoiceClaim.GetStatus',
-                })}
-              </ProgressButton>
-              <ProgressButton
-                icon={null}
-                color='success'
-                onClick={this.onClickCollectPayment}
-                disabled={this.collectPaymentIsDisabled(selectedRows, list)}
-              >
-                {formatMessage({
-                  id: 'claimsubmission.invoiceClaim.CollectPayment',
-                })}
-              </ProgressButton>
-            </GridItem>
           </GridContainer>
+          <div className='footerBar'>
+            <GridContainer>
+              <GridItem md={12} className={classes.buttonGroup}>
+                <ProgressButton
+                  icon={null}
+                  color='primary'
+                  disabled={selectedRows.length <= 0}
+                  onClick={this.handleGetStatusClicked}
+                >
+                  {formatMessage({
+                    id: 'claimsubmission.invoiceClaim.GetStatus',
+                  })}
+                </ProgressButton>
+                <ProgressButton
+                  icon={null}
+                  color='success'
+                  onClick={this.onClickCollectPayment}
+                  disabled={this.collectPaymentIsDisabled(selectedRows, list)}
+                >
+                  {formatMessage({
+                    id: 'claimsubmission.invoiceClaim.CollectPayment',
+                  })}
+                </ProgressButton>
+              </GridItem>
+            </GridContainer>
+          </div>
         </LoadingWrapper>
         <CommonModal
           title='Collect Payment'
@@ -228,4 +240,6 @@ class ApprovedMedisave extends React.Component {
   }
 }
 
-export default withStyles(styles, { name: 'ApprovedMedisave' })(ApprovedMedisave)
+export default withStyles(styles, { name: 'ApprovedMedisave' })(
+  ApprovedMedisave,
+)

@@ -47,7 +47,7 @@ class Grid extends PureComponent {
   }
 
   editRow = (row, e) => {
-    const { dispatch, settingPackage } = this.props
+    const { dispatch } = this.props
 
     dispatch({
       type: 'settingPackage/queryOne',
@@ -67,11 +67,15 @@ class Grid extends PureComponent {
   }
 
   render () {
+    const { height } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
         type='settingPackage'
         onRowDoubleClick={this.editRow}
+        TableProps={{
+          height,
+        }}
         {...this.configs}
       />
     )

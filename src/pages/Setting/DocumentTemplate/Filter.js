@@ -60,7 +60,7 @@ class Filter extends PureComponent {
         </GridContainer>
 
         <GridContainer>
-          <GridItem xs={6} md={3}>
+          <GridItem>
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'

@@ -1,23 +1,18 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 import { formatMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 import Add from '@material-ui/icons/Add'
-import {
-  GridContainer,
-  GridItem,
-  Button,
-  CommonModal,
-  withFormikExtend,
-} from '@/components'
-import DOGrid from './DOGrid'
-import DODetails from './DODetails'
-import { isPOStatusFulfilled, getAccessRight } from '../../variables'
+import { GridContainer, GridItem, Button, CommonModal } from '@/components'
 import AuthorizedContext from '@/components/Context/Authorized'
 import { INVOICE_STATUS } from '@/utils/constants'
 import { podoOrderType, inventoryItemListing } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
+import DOGrid from './DOGrid'
+import DODetails from './DODetails'
+import { isPOStatusFulfilled, getAccessRight } from '../../variables'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -33,18 +28,12 @@ const styles = (theme) => ({
   },
 })
 
-// @withFormikExtend({
-//   displayName: 'deliveryOrderDetails',
-//   enableReinitialize: true,
-//   mapPropsToValues: ({ deliveryOrderDetails }) => {
-//     return deliveryOrderDetails
-//   },
-// })
 const { Secured } = Authorized
 @Secured('purchasingandreceiving.purchasingandreceivingdetails')
-@connect(({ purchaseOrderDetails, deliveryOrderDetails }) => ({
+@connect(({ purchaseOrderDetails, deliveryOrderDetails, global }) => ({
   purchaseOrderDetails,
   deliveryOrderDetails,
+  mainDivHeight: global.mainDivHeight,
 }))
 class index extends Component {
   state = {
@@ -116,7 +105,7 @@ class index extends Component {
     this.setState({ showDeliveryOrderDetails: false, mode: '' })
 
   render () {
-    const { purchaseOrderDetails, theme, rights } = this.props
+    const { purchaseOrderDetails, rights, mainDivHeight = 700 } = this.props
     const { purchaseOrder } = purchaseOrderDetails
     const poStatus = purchaseOrder ? purchaseOrder.purchaseOrderStatusFK : 1
     const isWriteOff = purchaseOrder
@@ -128,11 +117,12 @@ class index extends Component {
       if (isWriteOff) return false
       return true
     }
+    let height = mainDivHeight - 120
+    if (height < 300) height = 300
     return (
       <AuthorizedContext.Provider
         value={{
           rights: isEditable() === false ? 'disable' : rights,
-          // rights: 'disable',
         }}
       >
         <GridContainer>
@@ -146,6 +136,7 @@ class index extends Component {
           <DOGrid
             onEditDeliveryOrderClicked={this.onEditDeliveryOrderClicked}
             {...this.props}
+            height={height}
           />
           <CommonModal
             open={showDeliveryOrderDetails}

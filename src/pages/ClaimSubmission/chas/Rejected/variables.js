@@ -65,10 +65,11 @@ export const RejectedCHASColumns = [
 ]
 
 export const RejectedCHASColumnExtensions = [
-  { columnName: 'visitDate', type: 'date' },
-  { columnName: 'invoiceDate', type: 'date' },
-  { columnName: 'rejectionDate', type: 'date', width: 130 },
-  { columnName: 'submissionDate', type: 'date', width: 140 },
+  { columnName: 'visitDate', type: 'date', width: 100 },
+  { columnName: 'invoiceDate', type: 'date', width: 100 },
+  { columnName: 'rejectionDate', type: 'date', width: 110 },
+  { columnName: 'submissionDate', type: 'date', width: 120 },
+  { columnName: 'invoiceNo', width: 90 },
   {
     columnName: 'patientName',
     render: (row) => {

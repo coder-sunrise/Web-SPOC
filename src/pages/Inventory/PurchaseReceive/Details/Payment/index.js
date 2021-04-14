@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 import _ from 'lodash'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
@@ -22,9 +23,10 @@ const styles = (theme) => ({
 
 const { Secured } = Authorized
 @Secured('purchasingandreceiving.purchasingandreceivingdetails')
-@connect(({ podoPayment, purchaseOrderDetails }) => ({
+@connect(({ podoPayment, purchaseOrderDetails, global }) => ({
   podoPayment,
   purchaseOrderDetails,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withFormikExtend({
   displayName: 'podoPayment',
@@ -64,7 +66,7 @@ const { Secured } = Authorized
     }
   },
   handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, history } = props
+    const { dispatch, onConfirm } = props
     const { purchaseOrderPayment, currentBizSessionInfo } = values
 
     let paymentData = purchaseOrderPayment.map((x, index) => {
@@ -171,6 +173,7 @@ class index extends PureComponent {
       purchaseOrderDetails,
       rights,
       values: { currentBizSessionInfo },
+      mainDivHeight = 700,
     } = this.props
     const { purchaseOrder: po } = purchaseOrderDetails
     const isWriteOff = po
@@ -178,27 +181,37 @@ class index extends PureComponent {
       : false
     const hasActiveSession =
       currentBizSessionInfo && currentBizSessionInfo.id > 0
+
+    let height =
+      mainDivHeight - 170 - $('.filterBar').height() ||
+      0 - $('.footerBar').height() ||
+      0
+    if (height < 300) height = 300
     return (
       <AuthorizedContext.Provider
         value={{
           rights: isWriteOff === true || !hasActiveSession ? 'disable' : rights,
         }}
       >
-        {!hasActiveSession && (
-          <div style={{ paddingTop: 5 }}>
-            <WarningSnackbar
-              variant='warning'
-              // className={classes.margin}
-              message='Action(s) is not allowed due to no active session was found.'
-            />
-          </div>
-        )}
-        <GridContainer>
+        <div className='filterBar'>
+          {!hasActiveSession && (
+            <div style={{ paddingTop: 5 }}>
+              <WarningSnackbar
+                variant='warning'
+                message='Action(s) is not allowed due to no active session was found.'
+              />
+            </div>
+          )}
           <Header {...this.props} />
-          <Grid {...this.props} getTotalPaid={this.getTotalPaid} />
+        </div>
+        <GridContainer>
+          <Grid
+            {...this.props}
+            getTotalPaid={this.getTotalPaid}
+            height={height}
+          />
         </GridContainer>
-
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center' }} className='footerBar'>
           <ProgressButton
             color='danger'
             icon={null}
