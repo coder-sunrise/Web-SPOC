@@ -695,7 +695,7 @@ export default ({
           type: 'number',
           width: 100,
           render: (row) => {
-            let qty
+            let qty = '0.0'
             if (row.type === '1' || row.type === '5') {
               qty = `${numeral(row.quantity || 0).format(
                 '0,0.0',

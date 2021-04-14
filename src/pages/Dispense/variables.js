@@ -74,6 +74,10 @@ export const PrescriptionColumns = [
     title: 'Instructions',
   },
   {
+    name: 'remarks',
+    title: 'Remarks',
+  },
+  {
     name: 'batchNo',
     title: 'Batch #',
   },
@@ -113,7 +117,7 @@ export const PrescriptionColumnExtensions = (
   inventorymedication = [],
   handleSelectedBatch,
 ) => [
-  { columnName: 'unitPrice', width: columnWidth, type: 'currency' },
+  { columnName: 'unitPrice', width: 100, type: 'currency' },
   {
     columnName: 'name',
     width: columnWidth,
@@ -149,19 +153,23 @@ export const PrescriptionColumnExtensions = (
     },
   },
   {
+    columnName: 'remarks',
+    width: 200,
+  },
+  {
     columnName: 'totalAfterItemAdjustment',
-    width: columnWidth,
+    width: 110,
     type: 'currency',
   },
   {
     columnName: 'adjAmt',
-    width: columnWidth,
+    width: 100,
     type: 'currency',
   },
   {
     columnName: 'dispensedQuanity',
     type: 'number',
-    width: columnWidth,
+    width: 130,
     render: (row) => {
       return (
         <p>
@@ -173,7 +181,7 @@ export const PrescriptionColumnExtensions = (
   {
     columnName: 'orderedQuantity',
     type: 'number',
-    width: columnWidth,
+    width: 130,
     render: (row) => {
       return (
         <p>
@@ -274,6 +282,10 @@ export const VaccinationColumn = [
     title: 'Name',
   },
   {
+    name: 'remarks',
+    title: 'Remarks',
+  },
+  {
     name: 'batchNo',
     title: 'Batch #',
   },
@@ -327,9 +339,13 @@ export const VaccinationColumnExtensions = (
     },
   },
   {
+    columnName: 'remarks',
+    width: 200,
+  },
+  {
     columnName: 'dispensedQuanity',
     type: 'number',
-    width: columnWidth,
+    width: 130,
     render: (row) => {
       return (
         <p>
@@ -338,15 +354,15 @@ export const VaccinationColumnExtensions = (
       )
     },
   },
-  { columnName: 'unitPrice', width: columnWidth, type: 'currency' },
+  { columnName: 'unitPrice', width: 100, type: 'currency' },
   {
     columnName: 'totalAfterItemAdjustment',
-    width: columnWidth,
+    width: 110,
     type: 'currency',
   },
   {
     columnName: 'adjAmt',
-    width: columnWidth,
+    width: 100,
     type: 'currency',
   },
   {
@@ -434,6 +450,10 @@ export const OtherOrdersColumns = [
     title: 'Description',
   },
   {
+    name: 'remarks',
+    title: 'Remarks',
+  },
+  {
     name: 'quantity',
     title: 'Quantity',
   },
@@ -501,9 +521,13 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     },
   },
   {
+    columnName: 'remarks',
+    width: 200,
+  },
+  {
     columnName: 'quantity',
     type: 'number',
-    width: columnWidth,
+    width: 130,
     render: (row) => {
       return (
         <p>
@@ -516,7 +540,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     columnName: 'unitPrice',
     // type: 'currency',
     align: 'right',
-    width: columnWidth,
+    width: 100,
     render: (row) => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
@@ -528,7 +552,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     columnName: 'adjAmt',
     // type: 'currency',
     align: 'right',
-    width: columnWidth,
+    width: 100,
     render: (row) => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
@@ -540,7 +564,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     columnName: 'totalAfterItemAdjustment',
     // type: 'currency',
     align: 'right',
-    width: columnWidth,
+    width: 110,
     render: (row) => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
@@ -725,6 +749,10 @@ export const PackageColumns = [
     title: 'Description',
   },
   {
+    name: 'remarks',
+    title: 'Remarks',
+  },
+  {
     name: 'packageConsumeQuantity',
     title: 'Consumed',
   },
@@ -798,18 +826,27 @@ export const PackageColumnExtensions = (onPrint) => [
     },
   },
   {
+    columnName: 'remarks',
+    width: 200,
+  },
+  {
     columnName: 'packageConsumeQuantity',
     align: 'right',
-    width: columnWidth,
+    width: 130,
     sortingEnabled: false,
     render: (row) => {
-      return <NumberInput text value={row.packageConsumeQuantity} />
+      return (
+        <p>
+          {numeral(row.packageConsumeQuantity || 0).format('0,0.0')}{' '}
+          {row.dispenseUOM}
+        </p>
+      )
     },
   },
   {
     columnName: 'packageRemainingQuantity',
     align: 'right',
-    width: columnWidth,
+    width: 130,
     sortingEnabled: false,
     render: (row) => {
       const { packageDrawdown } = row
@@ -859,14 +896,20 @@ export const PackageColumnExtensions = (onPrint) => [
         })
         balanceQty = totalQty - totalDrawdown
       }
-
-      return <NumberInput text value={balanceQty - todayQuantity} />
+      return (
+        <p>
+          {numeral((balanceQty || 0) - (todayQuantity || 0)).format(
+            '0,0.0',
+          )}{' '}
+          {row.dispenseUOM}
+        </p>
+      )
     },
   },
   {
     columnName: 'totalAfterItemAdjustment',
     align: 'right',
-    width: columnWidth,
+    width: 110,
     sortingEnabled: false,
     render: (row) => {
       return (
