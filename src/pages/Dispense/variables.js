@@ -169,7 +169,7 @@ export const PrescriptionColumnExtensions = (
   {
     columnName: 'dispensedQuanity',
     type: 'number',
-    width: 120,
+    width: 130,
     render: (row) => {
       return (
         <p>
@@ -181,7 +181,7 @@ export const PrescriptionColumnExtensions = (
   {
     columnName: 'orderedQuantity',
     type: 'number',
-    width: 120,
+    width: 130,
     render: (row) => {
       return (
         <p>
@@ -345,7 +345,7 @@ export const VaccinationColumnExtensions = (
   {
     columnName: 'dispensedQuanity',
     type: 'number',
-    width: 120,
+    width: 130,
     render: (row) => {
       return (
         <p>
@@ -527,7 +527,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
   {
     columnName: 'quantity',
     type: 'number',
-    width: 120,
+    width: 130,
     render: (row) => {
       return (
         <p>
@@ -832,18 +832,21 @@ export const PackageColumnExtensions = (onPrint) => [
   {
     columnName: 'packageConsumeQuantity',
     align: 'right',
-    width: 120,
+    width: 130,
     sortingEnabled: false,
     render: (row) => {
       return (
-        <NumberInput text value={row.packageConsumeQuantity} precision={1} />
+        <p>
+          {numeral(row.packageConsumeQuantity || 0).format('0,0.0')}{' '}
+          {row.dispenseUOM}
+        </p>
       )
     },
   },
   {
     columnName: 'packageRemainingQuantity',
     align: 'right',
-    width: 120,
+    width: 130,
     sortingEnabled: false,
     render: (row) => {
       const { packageDrawdown } = row
@@ -893,9 +896,13 @@ export const PackageColumnExtensions = (onPrint) => [
         })
         balanceQty = totalQty - totalDrawdown
       }
-
       return (
-        <NumberInput text value={balanceQty - todayQuantity} precision={1} />
+        <p>
+          {numeral((balanceQty || 0) - (todayQuantity || 0)).format(
+            '0,0.0',
+          )}{' '}
+          {row.dispenseUOM}
+        </p>
       )
     },
   },

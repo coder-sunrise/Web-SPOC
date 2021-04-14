@@ -17,18 +17,30 @@ import {
 } from '@/components'
 import Yup from '@/utils/yup'
 import { getUniqueId, getUniqueGUID, roundTo } from '@/utils/utils'
-import { openCautionAlertPrompt, ReplaceCertificateTeplate } from '@/pages/Widgets/Orders/utils'
+import {
+  openCautionAlertPrompt,
+  ReplaceCertificateTeplate,
+} from '@/pages/Widgets/Orders/utils'
 import { DURATION_UNIT } from '@/utils/constants'
 import { getClinicianProfile } from '../../ConsultationDocument/utils'
 
-@connect(({ global, codetable, user, visitRegistration, consultationDocument, patient }) => ({ 
-  global, 
-  codetable, 
-  user,
-  visitRegistration,
-  consultationDocument,
-  patient,
-}))
+@connect(
+  ({
+    global,
+    codetable,
+    user,
+    visitRegistration,
+    consultationDocument,
+    patient,
+  }) => ({
+    global,
+    codetable,
+    user,
+    visitRegistration,
+    consultationDocument,
+    patient,
+  }),
+)
 @withFormikExtend({
   authority: [
     'queue.consultation.order.package',
@@ -45,12 +57,12 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
     packageFK: Yup.number().required(),
   }),
   handleSubmit: (values, { props, onConfirm, setValues }) => {
-    const { 
-      dispatch, 
-      orders, 
-      codetable, 
-      getNextSequence, 
-      user, 
+    const {
+      dispatch,
+      orders,
+      codetable,
+      getNextSequence,
+      user,
       visitRegistration,
       patient,
       consultationDocument: { rows = [] },
@@ -60,10 +72,12 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       inventoryvaccination = [],
       inventoryconsumable = [],
       doctorprofile,
-    } = codetable    
+    } = codetable
 
     const { doctorProfileFK } = visitRegistration.entity.visit
-    const visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK).clinicianProfile.userProfileFK
+    const visitDoctorUserId = doctorprofile.find(
+      (d) => d.id === doctorProfileFK,
+    ).clinicianProfile.userProfileFK
 
     const { entity: visitEntity } = visitRegistration
     const clinicianProfile = getClinicianProfile(codetable, visitEntity)
@@ -92,16 +106,19 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       const drugFrequency = medication.medicationFrequency
       instruction += `${drugFrequency ? drugFrequency.name : ''}`
       const itemDuration = medication.duration
-          ? ` For ${medication.duration} day(s)`
-          : ''
-          instruction += itemDuration
+        ? ` For ${medication.duration} day(s)`
+        : ''
+      instruction += itemDuration
       return instruction
     }
 
-    const getOrderMedicationFromPackage = (packageCode, packageName, packageItem) => {
+    const getOrderMedicationFromPackage = (
+      packageCode,
+      packageName,
+      packageItem,
+    ) => {
       const medication = inventorymedication.find(
-        (item) =>
-          item.id === packageItem.inventoryMedicationFK,
+        (item) => item.id === packageItem.inventoryMedicationFK,
       )
 
       let item
@@ -112,7 +129,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
         const medicationdosage = medication.prescribingDosage
         const medicationprescribingUOM = medication.prescribingUOM
         const medicationPrecautions =
-        medication.inventoryMedication_MedicationPrecaution
+          medication.inventoryMedication_MedicationPrecaution
         const isDefaultBatchNo = medication.medicationStock.find(
           (o) => o.isDefault === true,
         )
@@ -142,7 +159,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           adjValue: 0,
           isClaimable: true,
           totalAfterItemAdjustment: packageItem.subTotal,
-          totalAfterOverallAdjustment: packageItem.subTotal,          
+          totalAfterOverallAdjustment: packageItem.subTotal,
           expiryDate: isDefaultBatchNo
             ? isDefaultBatchNo.expiryDate
             : undefined,
@@ -166,19 +183,25 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
               usageMethodDisplayValue: medicationusage
                 ? medicationusage.name
                 : undefined,
-              dosageFK: medication.prescribingDosage ? medication.prescribingDosage.id : undefined,
+              dosageFK: medication.prescribingDosage
+                ? medication.prescribingDosage.id
+                : undefined,
               dosageCode: medicationdosage ? medicationdosage.code : undefined,
               dosageDisplayValue: medicationdosage
                 ? medicationdosage.name
                 : undefined,
-              prescribeUOMFK: medicationprescribingUOM ? medicationprescribingUOM.id : undefined,
+              prescribeUOMFK: medicationprescribingUOM
+                ? medicationprescribingUOM.id
+                : undefined,
               prescribeUOMCode: medicationprescribingUOM
                 ? medicationprescribingUOM.code
                 : undefined,
               prescribeUOMDisplayValue: medicationprescribingUOM
                 ? medicationprescribingUOM.name
                 : undefined,
-              drugFrequencyFK: medicationfrequency ? medicationfrequency.id : undefined,
+              drugFrequencyFK: medicationfrequency
+                ? medicationfrequency.id
+                : undefined,
               drugFrequencyCode: medicationfrequency
                 ? medicationfrequency.code
                 : undefined,
@@ -203,10 +226,13 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       return item
     }
 
-    const getOrderVaccinationFromPackage = (packageCode, packageName, packageItem) => {
+    const getOrderVaccinationFromPackage = (
+      packageCode,
+      packageName,
+      packageItem,
+    ) => {
       const vaccination = inventoryvaccination.find(
-        (item) =>
-          item.id === packageItem.inventoryVaccinationFK,
+        (item) => item.id === packageItem.inventoryVaccinationFK,
       )
 
       let item
@@ -322,25 +348,33 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
         defaultConsumeQuantity: packageItem.defaultConsumeQuantity,
         packageConsumeQuantity: packageItem.consumeQuantity,
         remainingQuantity: packageItem.quantity,
-        performingUserFK: visitDoctorUserId,   
-        packageGlobalId,   
+        performingUserFK: visitDoctorUserId,
+        packageGlobalId,
       }
       return item
     }
 
-    const getOrderConsumableFromPackage = (packageCode, packageName, packageItem) => {
+    const getOrderConsumableFromPackage = (
+      packageCode,
+      packageName,
+      packageItem,
+    ) => {
       const consumable = inventoryconsumable.find(
-        (item) =>
-          item.id === packageItem.inventoryConsumableFK,
+        (item) => item.id === packageItem.inventoryConsumableFK,
       )
 
       let item
       let isDefaultBatchNo
+      let unitOfMeasurement
       if (consumable) {
         isDefaultBatchNo = consumable.consumableStock.find(
           (o) => o.isDefault === true,
         )
+
+        unitOfMeasurement = consumable.uom ? consumable.uom.name : undefined
       }
+
+      console.log('consumable', consumable)
 
       item = {
         inventoryConsumableFK: packageItem.inventoryConsumableFK,
@@ -355,9 +389,8 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
         totalAfterOverallAdjustment: packageItem.subTotal,
         consumableCode: packageItem.consumableCode,
         consumableName: packageItem.consumableName,
-        expiryDate: isDefaultBatchNo
-          ? isDefaultBatchNo.expiryDate
-          : undefined,
+        unitOfMeasurement,
+        expiryDate: isDefaultBatchNo ? isDefaultBatchNo.expiryDate : undefined,
         batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
         isPackage: true,
         packageCode,
@@ -375,16 +408,32 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
     const getOrderFromPackage = (packageCode, packageName, packageItem) => {
       let item
       if (packageItem.type === '1') {
-        item = getOrderMedicationFromPackage(packageCode, packageName, packageItem)
+        item = getOrderMedicationFromPackage(
+          packageCode,
+          packageName,
+          packageItem,
+        )
       }
       if (packageItem.type === '2') {
-        item = getOrderVaccinationFromPackage(packageCode, packageName, packageItem)
+        item = getOrderVaccinationFromPackage(
+          packageCode,
+          packageName,
+          packageItem,
+        )
       }
       if (packageItem.type === '3') {
-        item = getOrderServiceCenterServiceFromPackage(packageCode, packageName, packageItem)
+        item = getOrderServiceCenterServiceFromPackage(
+          packageCode,
+          packageName,
+          packageItem,
+        )
       }
       if (packageItem.type === '4') {
-        item = getOrderConsumableFromPackage(packageCode, packageName, packageItem)
+        item = getOrderConsumableFromPackage(
+          packageCode,
+          packageName,
+          packageItem,
+        )
       }
       return item
     }
@@ -393,7 +442,11 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
     let datas = []
     let nextSequence = getNextSequence()
     for (let index = 0; index < packageItems.length; index++) {
-      const newOrder = getOrderFromPackage(selectedPackage.code, selectedPackage.displayValue, packageItems[index])
+      const newOrder = getOrderFromPackage(
+        selectedPackage.code,
+        selectedPackage.displayValue,
+        packageItems[index],
+      )
       if (newOrder) {
         const data = {
           isOrderedByDoctor:
@@ -415,7 +468,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           'Any changes will not be reflected in the vaccination certificate.',
       })
     }
-    
+
     dispatch({
       type: 'orders/upsertRows',
       payload: datas,
@@ -458,7 +511,8 @@ class Package extends PureComponent {
 
     this.packageItemSchema = Yup.object().shape({
       quantity: Yup.number().required().min(1),
-      consumeQuantity: Yup.number().required()
+      consumeQuantity: Yup.number()
+        .required()
         .min(0, 'Consumed quantity must be greater than or equal to 0')
         .max(Yup.ref('quantity'), 'Consumed quantity cannot exceed Quantity'),
       subTotal: Yup.number().required().min(0),
@@ -538,7 +592,11 @@ class Package extends PureComponent {
         }
 
         untilDate = new Date(
-          Date.UTC(untilDate.getUTCFullYear(), untilDate.getUTCMonth(), untilDate.getUTCDate())
+          Date.UTC(
+            untilDate.getUTCFullYear(),
+            untilDate.getUTCMonth(),
+            untilDate.getUTCDate(),
+          ),
         )
       }
 
@@ -619,7 +677,7 @@ class Package extends PureComponent {
 
       let untilDate
       if (op)
-        untilDate= calculateExpiryDate(op.validDuration, op.durationUnitFK)   
+        untilDate = calculateExpiryDate(op.validDuration, op.durationUnitFK)
 
       setValues({
         ...values,
@@ -657,7 +715,7 @@ class Package extends PureComponent {
       const inactivePackageItems = packageItems.filter(
         (f) => f.isActive !== true,
       )
-      if(inactivePackageItems.length > 0) {
+      if (inactivePackageItems.length > 0) {
         notification.error({
           message: 'One or more items in the package are inactive.',
         })
@@ -665,7 +723,7 @@ class Package extends PureComponent {
       }
 
       handleSubmit()
-      return true      
+      return true
     }
     return false
   }
@@ -726,13 +784,8 @@ class Package extends PureComponent {
             <Field
               name='expiryDate'
               render={(args) => {
-                  return (
-                    <DatePicker
-                      label='Expiry Date'
-                      {...args}
-                    />
-                  )
-                }}
+                return <DatePicker label='Expiry Date' {...args} />
+              }}
             />
           </GridItem>
           <GridItem xs={12}>
