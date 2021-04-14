@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-
+import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
@@ -14,8 +14,9 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingVisitOrderTemplate }) => ({
+@connect(({ settingVisitOrderTemplate, global }) => ({
   settingVisitOrderTemplate,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withSettingBase({ modelName: 'settingVisitOrderTemplate' })
 class VisitOrderTemplate extends PureComponent {
@@ -37,15 +38,18 @@ class VisitOrderTemplate extends PureComponent {
   }
 
   render () {
-    const { settingVisitOrderTemplate } = this.props
+    const { settingVisitOrderTemplate, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-
+    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <Filter {...cfg} {...this.props} />
-        <Grid {...this.props} />
+        <div className='filterBar'>
+          <Filter {...cfg} {...this.props} />
+        </div>
+        <Grid {...this.props} height={height} />
         <CommonModal
           open={settingVisitOrderTemplate.showModal}
           observe='VisitOrderTemplateDetail'

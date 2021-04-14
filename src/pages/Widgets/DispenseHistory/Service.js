@@ -32,6 +32,17 @@ export default ({ classes, current, fieldName = '' }) => {
     { dataIndex: 'description', title: 'Name', width: 250 },
     { dataIndex: 'serviceCenter', title: 'Service Center', width: 120 },
     {
+      dataIndex: 'quantity',
+      title: 'Qty.',
+      align: 'right',
+      width: 80,
+      render: (text, row) => (
+        <div className={classes.numberstyle}>
+          {`${numeral(row.quantity || 0).format('0,0.0')}`}
+        </div>
+      ),
+    },
+    {
       dataIndex: 'totalPrice',
       title: 'Subtotal',
       align: 'right',

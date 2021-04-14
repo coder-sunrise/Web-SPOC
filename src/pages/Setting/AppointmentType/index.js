@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 // material ui
 import { withStyles } from '@material-ui/core'
 // styles
@@ -25,6 +26,7 @@ const styles = (theme) => ({
 const AppointmentType = ({
   settingAppointmentType,
   dispatch,
+  mainDivHeight = 700,
   ...restProps
 }) => {
   useEffect(() => {
@@ -46,19 +48,25 @@ const AppointmentType = ({
   }
   const formTitlePrefix =
     settingAppointmentType.entity === null ? 'Add' : 'Edit'
+
+  let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+  if (height < 300) height = 300
   return (
     <CardContainer hideHeader>
-      <Filter
-        toggleModal={toggleModal}
-        {...restProps}
-        dispatch={dispatch}
-        settingAppointmentType={settingAppointmentType}
-      />
+      <div className='filterBar'>
+        <Filter
+          toggleModal={toggleModal}
+          {...restProps}
+          dispatch={dispatch}
+          settingAppointmentType={settingAppointmentType}
+        />
+      </div>
       <Grid
         toggleModal={toggleModal}
         {...restProps}
         dispatch={dispatch}
         settingAppointmentType={settingAppointmentType}
+        height={height}
       />
       <CommonModal
         open={settingAppointmentType.showModal}
@@ -84,9 +92,12 @@ const AppointmentTypeSettingBase = withSettingBase({
   modeName: 'settingAppointmentType',
 })(AppointmentType)
 
-const ConnectedAppointmentType = connect(({ settingAppointmentType }) => ({
-  settingAppointmentType,
-}))(AppointmentTypeSettingBase)
+const ConnectedAppointmentType = connect(
+  ({ settingAppointmentType, global }) => ({
+    settingAppointmentType,
+    mainDivHeight: global.mainDivHeight,
+  }),
+)(AppointmentTypeSettingBase)
 
 export default withStyles(styles, { name: 'AppointmentTypeSetting' })(
   ConnectedAppointmentType,

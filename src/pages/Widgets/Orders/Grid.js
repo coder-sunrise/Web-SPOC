@@ -27,6 +27,7 @@ export default ({
   from = 'Consultation',
   codetable,
   theme,
+  isFullScreen = false,
 }) => {
   const { rows, summary, finalAdjustments, isGSTInclusive, gstValue } = orders
   const { total, gst, totalWithGST, subTotal } = summary
@@ -51,12 +52,14 @@ export default ({
 
   useEffect(
     () => {
-      setCheckedStatusIncldGST(orders.isGSTInclusive) 
-      
+      setCheckedStatusIncldGST(orders.isGSTInclusive)
+
       const settings = JSON.parse(localStorage.getItem('clinicSettings'))
       const { isEnablePackage = false } = settings
 
-      const packageItems = rows.filter(item => item.isPackage && !item.isDeleted)
+      const packageItems = rows.filter(
+        (item) => item.isPackage && !item.isDeleted,
+      )
       const existPackage = isEnablePackage && packageItems.length > 0
       setIsExistPackage(existPackage)
 
@@ -73,7 +76,7 @@ export default ({
                 ],
           [],
         )
-  
+
         setExpandedGroups(groups)
       }
     },
@@ -274,7 +277,9 @@ export default ({
         <Authorized authority={OrderAccessRight()}>
           <div
             style={{
-              marginLeft: isExistPackage ? theme.spacing(31.5) : theme.spacing(36.5),
+              marginLeft: isExistPackage
+                ? theme.spacing(31.5)
+                : theme.spacing(36.5),
               position: 'absolute',
             }}
           >
@@ -362,9 +367,7 @@ export default ({
     let label = 'Package'
     let totalPrice = 0
     if (!rows) return ''
-    const data = rows.filter(
-      (item) => item.packageGlobalId === row.value,
-    )
+    const data = rows.filter((item) => item.packageGlobalId === row.value)
     if (data.length > 0) {
       totalPrice = _.sumBy(data, 'totalAfterItemAdjustment') || 0
       label = `${data[0].packageCode} - ${data[0].packageName} (Total: `
@@ -372,9 +375,9 @@ export default ({
     return (
       <span style={{ verticalAlign: 'middle', paddingRight: 8 }}>
         <strong>
-          {label} 
+          {label}
           <NumberInput text currency value={totalPrice} />
-          )        
+          )
         </strong>
       </span>
     )
@@ -388,14 +391,15 @@ export default ({
       rows={rows}
       onRowDoubleClick={editRow}
       getRowId={(r) => r.uid}
-      columns={[        
+      columns={[
         { name: 'type', title: 'Type' },
         { name: 'subject', title: 'Name' },
         { name: 'description', title: 'Description' },
+        { name: 'quantity', title: 'Quantity' },
         { name: 'adjAmount', title: 'Adj.' },
         { name: 'totalAfterItemAdjustment', title: 'Total' },
-        { name: 'actions', title: 'Actions' },    
-        { name: 'packageGlobalId', title: 'Package' },    
+        { name: 'actions', title: 'Actions' },
+        { name: 'packageGlobalId', title: 'Package' },
       ]}
       defaultSorting={[
         { columnName: 'packageGlobalId', direction: 'asc' },
@@ -403,7 +407,9 @@ export default ({
       ]}
       FuncProps={{
         pager: false,
-        fixedHiddenColumns: ['packageGlobalId'],
+        fixedHiddenColumns: [
+          'packageGlobalId',
+        ],
         grouping: isExistPackage,
         groupingConfig: {
           state: {
@@ -463,8 +469,8 @@ export default ({
           },
           row: {
             messages,
-            totalRowComponent: (p) => {              
-              const { children, ...restProps } = p              
+            totalRowComponent: (p) => {
+              const { children, ...restProps } = p
               let newChildren = []
               if (isExistPackage) {
                 newChildren = [
@@ -474,8 +480,7 @@ export default ({
                     ...restProps,
                   }),
                 ]
-              }
-              else {
+              } else {
                 newChildren = [
                   <Table.Cell colSpan={2} key={1} />,
                   React.cloneElement(children[4], {
@@ -484,7 +489,7 @@ export default ({
                   }),
                 ]
               }
-              
+
               return <Table.Row>{newChildren}</Table.Row>
             },
             itemComponent: (p) => {
@@ -517,7 +522,13 @@ export default ({
                     }}
                   >
                     <div>
-                      <div style={{ marginLeft: isExistPackage ? theme.spacing(23) : theme.spacing(31) }}>
+                      <div
+                        style={{
+                          marginLeft: isExistPackage
+                            ? theme.spacing(23)
+                            : theme.spacing(31),
+                        }}
+                      >
                         {itemSubTotal}
                       </div>
                       <div
@@ -529,7 +540,13 @@ export default ({
                       >
                         <Divider />
                       </div>
-                      <div style={{ marginLeft: isExistPackage ? theme.spacing(15) : theme.spacing(20) }}>
+                      <div
+                        style={{
+                          marginLeft: isExistPackage
+                            ? theme.spacing(15)
+                            : theme.spacing(20),
+                        }}
+                      >
                         <span>
                           Invoice Adjustment
                           <Tooltip title='Add Adjustment'>
@@ -551,7 +568,13 @@ export default ({
                       </div>
                       {itemAdj}
                       {gstValue >= 0 && (
-                        <div style={{ marginLeft: isExistPackage ? theme.spacing(10) : theme.spacing(15) }}>
+                        <div
+                          style={{
+                            marginLeft: isExistPackage
+                              ? theme.spacing(10)
+                              : theme.spacing(15),
+                          }}
+                        >
                           {itemGST}
                         </div>
                       )}
@@ -564,7 +587,13 @@ export default ({
                       >
                         <Divider />
                       </div>
-                      <div style={{ marginLeft: isExistPackage ? theme.spacing(26.5) : theme.spacing(31.5) }}>
+                      <div
+                        style={{
+                          marginLeft: isExistPackage
+                            ? theme.spacing(26.5)
+                            : theme.spacing(31.5),
+                        }}
+                      >
                         {itemTotal}
                       </div>
                     </div>
@@ -616,7 +645,8 @@ export default ({
             return (
               <div style={wrapCellTextStyle}>
                 {packageDrawdownIndicator(row)}
-                <div style={{
+                <div
+                  style={{
                     position: 'relative',
                     left: row.isPackage ? 22 : 0,
                   }}
@@ -629,7 +659,7 @@ export default ({
         },
         {
           columnName: 'description',
-          width: isExistPackage ? 220 : 260,
+          width: isFullScreen ? 300 : isExistPackage ? 120 : 160,
           observeFields: [
             'instruction',
             'remark',
@@ -660,7 +690,30 @@ export default ({
           type: 'currency',
           width: 100,
         },
-
+        {
+          columnName: 'quantity',
+          type: 'number',
+          width: 100,
+          render: (row) => {
+            let qty = '0.0'
+            if (row.type === '1' || row.type === '5') {
+              qty = `${numeral(row.quantity || 0).format(
+                '0,0.0',
+              )} ${row.dispenseUOMDisplayValue}`
+            } else if (row.type === '2') {
+              qty = `${numeral(row.quantity || 0).format(
+                '0,0.0',
+              )} ${row.uomDisplayValue}`
+            } else if (row.type === '3' || row.type === '7') {
+              qty = `${numeral(row.quantity || 0).format('0,0.0')}`
+            } else if (row.type === '4') {
+              qty = `${numeral(row.quantity || 0).format(
+                '0,0.0',
+              )} ${row.unitOfMeasurement}`
+            }
+            return <p>{qty}</p>
+          },
+        },
         {
           columnName: 'actions',
           width: 70,
@@ -740,7 +793,7 @@ export default ({
               </Authorized>
             )
           },
-        },        
+        },
       ]}
     />
   )

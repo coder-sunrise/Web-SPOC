@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import moment from 'moment'
 import { connect } from 'dva'
+import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
 import {
   CardContainer,
@@ -26,31 +27,24 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ patient, user }) => ({
+@connect(({ patient, user, global }) => ({
   patient: patient.entity || {},
   user,
+  mainDivHeight: global.mainDivHeight,
 }))
 class AppointmentHistory extends PureComponent {
   state = {
-    height: 100,
     previousAppt: [],
     patientProfileFK: undefined,
   }
 
   componentDidMount () {
-    this.resize()
-    window.addEventListener('resize', this.resize.bind(this))
     if (this.props.patient && this.props.patient.id > 0) {
       this.getAppts(this.props.patient.id, false)
     }
   }
 
-  componentWillUnmount () {
-    window.removeEventListener('resize', this.resize.bind(this))
-  }
-
   async getAppts (patientId, showRecheduledByClinic) {
-    // console.log('getAppts', patientId)
     const { user, dispatch } = this.props
     const commonParams = {
       combineCondition: 'and',
@@ -115,15 +109,6 @@ class AppointmentHistory extends PureComponent {
     }
   }
 
-  resize () {
-    if (this.divElement) {
-      const height = this.divElement.clientHeight
-      if (height > 0) {
-        this.setState({ height: height > 0 ? height / 2 - 144 : 300 })
-      }
-    }
-  }
-
   reBuildApptDatas (data) {
     return data.map((o) => {
       const firstAppointment = o.appointment_Resources.find(
@@ -166,6 +151,9 @@ class AppointmentHistory extends PureComponent {
 
   render () {
     const { previousAppt } = this.state
+    const { mainDivHeight = 700 } = this.props
+    let height = mainDivHeight - 300
+    if (height < 300) height = 300
 
     return (
       <CardContainer hideHeader size='sm'>
@@ -180,6 +168,9 @@ class AppointmentHistory extends PureComponent {
           <GridItem xs={12}>
             <CommonTableGrid
               size='sm'
+              TableProps={{
+                height,
+              }}
               rows={previousAppt}
               {...previousApptTableParams}
             />

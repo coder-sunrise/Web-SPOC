@@ -74,6 +74,10 @@ export const PrescriptionColumns = [
     title: 'Instructions',
   },
   {
+    name: 'remarks',
+    title: 'Remarks',
+  },
+  {
     name: 'batchNo',
     title: 'Batch #',
   },
@@ -113,7 +117,7 @@ export const PrescriptionColumnExtensions = (
   inventorymedication = [],
   handleSelectedBatch,
 ) => [
-  { columnName: 'unitPrice', width: columnWidth, type: 'currency' },
+  { columnName: 'unitPrice', width: 100, type: 'currency' },
   {
     columnName: 'name',
     width: columnWidth,
@@ -149,23 +153,27 @@ export const PrescriptionColumnExtensions = (
     },
   },
   {
+    columnName: 'remarks',
+    width: 200,
+  },
+  {
     columnName: 'totalAfterItemAdjustment',
-    width: columnWidth,
+    width: 110,
     type: 'currency',
   },
   {
     columnName: 'adjAmt',
-    width: columnWidth,
+    width: 100,
     type: 'currency',
   },
   {
     columnName: 'dispensedQuanity',
     type: 'number',
-    width: columnWidth,
+    width: 130,
     render: (row) => {
       return (
         <p>
-          {row.dispensedQuanity} {row.dispenseUOM}
+          {numeral(row.dispensedQuanity || 0).format('0,0.0')} {row.dispenseUOM}
         </p>
       )
     },
@@ -173,11 +181,11 @@ export const PrescriptionColumnExtensions = (
   {
     columnName: 'orderedQuantity',
     type: 'number',
-    width: columnWidth,
+    width: 130,
     render: (row) => {
       return (
         <p>
-          {row.orderedQuantity} {row.orderUOM}
+          {numeral(row.orderedQuantity || 0).format('0,0.0')} {row.orderUOM}
         </p>
       )
     },
@@ -274,6 +282,10 @@ export const VaccinationColumn = [
     title: 'Name',
   },
   {
+    name: 'remarks',
+    title: 'Remarks',
+  },
+  {
     name: 'batchNo',
     title: 'Batch #',
   },
@@ -327,26 +339,30 @@ export const VaccinationColumnExtensions = (
     },
   },
   {
+    columnName: 'remarks',
+    width: 200,
+  },
+  {
     columnName: 'dispensedQuanity',
     type: 'number',
-    width: columnWidth,
+    width: 130,
     render: (row) => {
       return (
         <p>
-          {row.dispensedQuanity} {row.dispenseUOM}
+          {numeral(row.dispensedQuanity || 0).format('0,0.0')} {row.dispenseUOM}
         </p>
       )
     },
   },
-  { columnName: 'unitPrice', width: columnWidth, type: 'currency' },
+  { columnName: 'unitPrice', width: 100, type: 'currency' },
   {
     columnName: 'totalAfterItemAdjustment',
-    width: columnWidth,
+    width: 110,
     type: 'currency',
   },
   {
     columnName: 'adjAmt',
-    width: columnWidth,
+    width: 100,
     type: 'currency',
   },
   {
@@ -434,6 +450,14 @@ export const OtherOrdersColumns = [
     title: 'Description',
   },
   {
+    name: 'remarks',
+    title: 'Remarks',
+  },
+  {
+    name: 'quantity',
+    title: 'Quantity',
+  },
+  {
     name: 'unitPrice',
     title: 'Unit Price ($)',
   },
@@ -497,10 +521,26 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     },
   },
   {
+    columnName: 'remarks',
+    width: 200,
+  },
+  {
+    columnName: 'quantity',
+    type: 'number',
+    width: 130,
+    render: (row) => {
+      return (
+        <p>
+          {numeral(row.quantity || 0).format('0,0.0')} {row.dispenseUOM}
+        </p>
+      )
+    },
+  },
+  {
     columnName: 'unitPrice',
     // type: 'currency',
     align: 'right',
-    width: columnWidth,
+    width: 100,
     render: (row) => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
@@ -512,7 +552,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     columnName: 'adjAmt',
     // type: 'currency',
     align: 'right',
-    width: columnWidth,
+    width: 100,
     render: (row) => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
@@ -524,7 +564,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     columnName: 'totalAfterItemAdjustment',
     // type: 'currency',
     align: 'right',
-    width: columnWidth,
+    width: 110,
     render: (row) => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
@@ -709,6 +749,10 @@ export const PackageColumns = [
     title: 'Description',
   },
   {
+    name: 'remarks',
+    title: 'Remarks',
+  },
+  {
     name: 'packageConsumeQuantity',
     title: 'Consumed',
   },
@@ -759,20 +803,21 @@ export const PackageColumnExtensions = (onPrint) => [
         unitPrice,
       ).format(currencyFormat)})`
       return (
-        <Tooltip title={title}>          
+        <Tooltip title={title}>
           <div
             style={{
-                wordWrap: 'break-word',
-                whiteSpace: 'pre-wrap',
-              }}
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+            }}
           >
             {packageDrawdownIndicator(row)}
-            <div style={{
+            <div
+              style={{
                 position: 'relative',
                 left: 22,
               }}
             >
-              {row.description}              
+              {row.description}
             </div>
             {lowStockIndicator(row, 'itemFK')}
           </div>
@@ -781,18 +826,27 @@ export const PackageColumnExtensions = (onPrint) => [
     },
   },
   {
+    columnName: 'remarks',
+    width: 200,
+  },
+  {
     columnName: 'packageConsumeQuantity',
     align: 'right',
-    width: columnWidth,
+    width: 130,
     sortingEnabled: false,
     render: (row) => {
-      return <NumberInput text value={row.packageConsumeQuantity} />
+      return (
+        <p>
+          {numeral(row.packageConsumeQuantity || 0).format('0,0.0')}{' '}
+          {row.dispenseUOM}
+        </p>
+      )
     },
   },
   {
     columnName: 'packageRemainingQuantity',
     align: 'right',
-    width: columnWidth,
+    width: 130,
     sortingEnabled: false,
     render: (row) => {
       const { packageDrawdown } = row
@@ -800,46 +854,62 @@ export const PackageColumnExtensions = (onPrint) => [
       let balanceQty = row.quantity
       const todayQuantity = row.packageConsumeQuantity
 
-      if (packageDrawdown) {       
-        if (packageDrawdown.packageDrawdownTransaction && packageDrawdown.packageDrawdownTransaction.length > 0) { 
-          drawdownTransaction = packageDrawdown.packageDrawdownTransaction.filter(t => t.consumeDate < row.packageDrawdownAsAtDate)
+      if (packageDrawdown) {
+        if (
+          packageDrawdown.packageDrawdownTransaction &&
+          packageDrawdown.packageDrawdownTransaction.length > 0
+        ) {
+          drawdownTransaction = packageDrawdown.packageDrawdownTransaction.filter(
+            (t) => t.consumeDate < row.packageDrawdownAsAtDate,
+          )
         }
 
-         // Transferred quantity
-         let transferredQty = 0
-         const { packageDrawdownTransfer } = packageDrawdown
-         if (packageDrawdownTransfer && packageDrawdownTransfer.length > 0) {
-           const drawdownTransfer = packageDrawdownTransfer.filter(t => t.transferDate < row.packageDrawdownAsAtDate)
-           drawdownTransfer.forEach(transfer => {
-             transferredQty += transfer.quantity
-           })
-         }
+        // Transferred quantity
+        let transferredQty = 0
+        const { packageDrawdownTransfer } = packageDrawdown
+        if (packageDrawdownTransfer && packageDrawdownTransfer.length > 0) {
+          const drawdownTransfer = packageDrawdownTransfer.filter(
+            (t) => t.transferDate < row.packageDrawdownAsAtDate,
+          )
+          drawdownTransfer.forEach((transfer) => {
+            transferredQty += transfer.quantity
+          })
+        }
 
-         // Received (Transfer back) quantity
+        // Received (Transfer back) quantity
         let receivedQty = 0
         const { packageDrawdownReceive } = packageDrawdown
         if (packageDrawdownReceive && packageDrawdownReceive.length > 0) {
-          const drawdownReceive = packageDrawdownReceive.filter(t => t.transferDate < row.packageDrawdownAsAtDate)
-          drawdownReceive.forEach(receive => {
+          const drawdownReceive = packageDrawdownReceive.filter(
+            (t) => t.transferDate < row.packageDrawdownAsAtDate,
+          )
+          drawdownReceive.forEach((receive) => {
             receivedQty += receive.quantity
           })
         }
 
-        const totalQty = packageDrawdown.totalQuantity - transferredQty + receivedQty
+        const totalQty =
+          packageDrawdown.totalQuantity - transferredQty + receivedQty
         let totalDrawdown = 0
-        drawdownTransaction.forEach(txn => {
+        drawdownTransaction.forEach((txn) => {
           totalDrawdown += txn.consumeQuantity
-        })       
-        balanceQty = totalQty - totalDrawdown 
+        })
+        balanceQty = totalQty - totalDrawdown
       }
-
-      return <NumberInput text value={balanceQty - todayQuantity} />
+      return (
+        <p>
+          {numeral((balanceQty || 0) - (todayQuantity || 0)).format(
+            '0,0.0',
+          )}{' '}
+          {row.dispenseUOM}
+        </p>
+      )
     },
   },
   {
     columnName: 'totalAfterItemAdjustment',
     align: 'right',
-    width: columnWidth,
+    width: 110,
     sortingEnabled: false,
     render: (row) => {
       return (
@@ -863,9 +933,10 @@ export const PackageColumnExtensions = (onPrint) => [
       if (type === 'Service' || type === 'Consumable' || type === 'Vaccination')
         return null
       return (
-        <Tooltip title={
-          <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
-        }
+        <Tooltip
+          title={
+            <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
+          }
         >
           <Button
             color='primary'

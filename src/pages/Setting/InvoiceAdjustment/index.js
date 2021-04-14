@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-
+import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
@@ -14,8 +14,9 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingInvoiceAdjustment }) => ({
+@connect(({ settingInvoiceAdjustment, global }) => ({
   settingInvoiceAdjustment,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withSettingBase({ modelName: 'settingInvoiceAdjustment' })
 class InvoiceAdjustment extends PureComponent {
@@ -37,19 +38,28 @@ class InvoiceAdjustment extends PureComponent {
   }
 
   render () {
-    const { classes, settingInvoiceAdjustment, dispatch, theme, ...restProps } = this.props
+    const { settingInvoiceAdjustment, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-
+    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <Filter {...cfg} {...this.props} />
-        <Grid {...this.props} />
+        <div className='filterBar'>
+          <Filter {...cfg} {...this.props} />
+        </div>
+        <Grid {...this.props} height={height} />
         <CommonModal
           open={settingInvoiceAdjustment.showModal}
           observe='InvoiceAdjustmentDetail'
-          title={settingInvoiceAdjustment.entity ? 'Edit Invoice Adjustment' : 'Add Invoice Adjustment'}
+          title={
+            settingInvoiceAdjustment.entity ? (
+              'Edit Invoice Adjustment'
+            ) : (
+              'Add Invoice Adjustment'
+            )
+          }
           maxWidth='md'
           bodyNoPadding
           onClose={this.toggleModal}

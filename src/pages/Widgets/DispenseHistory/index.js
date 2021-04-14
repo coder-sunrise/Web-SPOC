@@ -80,11 +80,12 @@ const styles = (theme) => ({
 @withFormikExtend({
   mapPropsToValues: ({ patientHistory }) => {},
 })
-@connect(({ patientHistory, clinicSettings, codetable, user }) => ({
+@connect(({ patientHistory, clinicSettings, codetable, user, global }) => ({
   patientHistory,
   clinicSettings,
   codetable,
   user,
+  mainDivHeight: global.mainDivHeight,
 }))
 class DispenseHistory extends Component {
   constructor (props) {
@@ -139,7 +140,14 @@ class DispenseHistory extends Component {
   }
 
   render () {
-    const { style, classes, override = {}, widget, mode } = this.props
+    const {
+      style,
+      classes,
+      override = {},
+      widget,
+      mode,
+      mainDivHeight = 700,
+    } = this.props
     const cfg = {}
 
     if (mode === 'split') {
@@ -147,6 +155,9 @@ class DispenseHistory extends Component {
     } else if (mode === 'integrated') {
       cfg.style = {}
     }
+
+    let height = mainDivHeight - 240
+    if (height < 300) height = 300
     return (
       <div {...cfg}>
         <CardContainer
@@ -158,36 +169,43 @@ class DispenseHistory extends Component {
             [override.leftPanel]: !widget,
           })}
         >
-          {this.widgets.map((o) => {
-            return (
-              <div ref={this.myRef}>
-                <Accordion
-                  mode='multiple'
-                  defaultActive={[
-                    0,
-                  ]}
-                  onChange={(event, p, expanded) => {
-                    if (expanded) {
-                      setTimeout(() => {
-                        $(this.myRef.current)
-                          .find('div[aria-expanded=true]')
-                          .next()
-                          .find('div[role="button"]:eq(0)')
-                          .trigger('click')
-                      }, 1)
-                    }
-                  }}
-                  collapses={[
-                    {
-                      title: this.getTitle(o),
-                      hideExpendIcon: false,
-                      content: this.getContent(o),
-                    },
-                  ]}
-                />
-              </div>
-            )
-          })}
+          <div
+            style={{
+              overflow: 'auto',
+              height,
+            }}
+          >
+            {this.widgets.map((o) => {
+              return (
+                <div ref={this.myRef}>
+                  <Accordion
+                    mode='multiple'
+                    defaultActive={[
+                      0,
+                    ]}
+                    onChange={(event, p, expanded) => {
+                      if (expanded) {
+                        setTimeout(() => {
+                          $(this.myRef.current)
+                            .find('div[aria-expanded=true]')
+                            .next()
+                            .find('div[role="button"]:eq(0)')
+                            .trigger('click')
+                        }, 1)
+                      }
+                    }}
+                    collapses={[
+                      {
+                        title: this.getTitle(o),
+                        hideExpendIcon: false,
+                        content: this.getContent(o),
+                      },
+                    ]}
+                  />
+                </div>
+              )
+            })}
+          </div>
         </CardContainer>
       </div>
     )

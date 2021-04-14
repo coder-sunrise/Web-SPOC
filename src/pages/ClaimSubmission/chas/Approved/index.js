@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 import moment from 'moment'
 import { formatMessage } from 'umi/locale'
 // formik
@@ -31,14 +32,15 @@ const styles = (theme) => ({
     margin: 1,
   },
   buttonGroup: {
-    marginTop: theme.spacing(2),
+    marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
   },
 })
 
-@connect(({ claimSubmission, chasClaimSubmissionApproved }) => ({
+@connect(({ claimSubmission, chasClaimSubmissionApproved, global }) => ({
   claimSubmission,
   chasClaimSubmissionApproved,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withFormik({
   mapPropsToValues: () => ({}),
@@ -132,12 +134,17 @@ class ApprovedCHAS extends React.Component {
       handleContextMenuItemClick,
       dispatch,
       values,
+      mainDivHeight = 700,
     } = this.props
     const { isLoading } = this.state
     const { list } = claimSubmissionApproved || []
     const { showCollectPayment } = this.state
     const { selectedRows } = this.state
-
+    let height =
+      mainDivHeight - 256 - $('.filterBar').height() ||
+      0 - $('.footerBar').height() ||
+      0
+    if (height < 300) height = 300
     return (
       <CardContainer
         hideHeader
@@ -146,28 +153,30 @@ class ApprovedCHAS extends React.Component {
           marginRight: 5,
         }}
       >
-        <BaseSearchBar
-          dispatch={dispatch}
-          values={values}
-          modelsName='chasClaimSubmissionApproved'
-        >
-          <GridItem md={12}>
-            <FastField
-              name='chasClaimStatusCode'
-              render={(args) => {
-                return (
-                  <Select
-                    label={formatMessage({
-                      id: 'claimsubmission.invoiceClaim.claimStatus',
-                    })}
-                    options={approvedStatus}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-        </BaseSearchBar>{' '}
+        <div className='filterBar'>
+          <BaseSearchBar
+            dispatch={dispatch}
+            values={values}
+            modelsName='chasClaimSubmissionApproved'
+          >
+            <GridItem md={12}>
+              <FastField
+                name='chasClaimStatusCode'
+                render={(args) => {
+                  return (
+                    <Select
+                      label={formatMessage({
+                        id: 'claimsubmission.invoiceClaim.claimStatus',
+                      })}
+                      options={approvedStatus}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+          </BaseSearchBar>{' '}
+        </div>
         <LoadingWrapper linear loading={isLoading} text='Get status...'>
           <GridContainer>
             <GridItem md={12}>
@@ -175,7 +184,6 @@ class ApprovedCHAS extends React.Component {
                 data={list}
                 columnExtensions={ApprovedCHASColumnExtensions}
                 columns={ApprovedCHASColumns}
-                // tableConfig={TableConfig}
                 FuncProps={{
                   selectable: true,
                   selectConfig: {
@@ -192,14 +200,19 @@ class ApprovedCHAS extends React.Component {
                 onSelectionChange={this.handleSelectionChange}
                 onContextMenuItemClick={handleContextMenuItemClick}
                 type='approved'
+                height={height}
               />
             </GridItem>
-            <GridItem md={12} style={{ marginTop: 12 }}>
+          </GridContainer>
+        </LoadingWrapper>
+        <div className='footerBar'>
+          <GridContainer>
+            <GridItem md={12} style={{ marginTop: 10 }}>
               <p className={classes.footerNote}>
                 Approved Amt. only available for Paid claim status.
               </p>
             </GridItem>
-            <GridItem md={4} className={classes.buttonGroup}>
+            <GridItem md={12} className={classes.buttonGroup}>
               <ProgressButton
                 icon={null}
                 color='primary'
@@ -222,7 +235,7 @@ class ApprovedCHAS extends React.Component {
               </ProgressButton>
             </GridItem>
           </GridContainer>
-        </LoadingWrapper>
+        </div>
         <CommonModal
           title='Collect Payment'
           maxWidth='lg'

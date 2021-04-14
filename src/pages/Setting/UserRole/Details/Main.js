@@ -1,5 +1,6 @@
 import React from 'react'
 import _ from 'lodash'
+import $ from 'jquery'
 import * as Yup from 'yup'
 import { Radio } from 'antd'
 import { connect } from 'dva'
@@ -85,9 +86,10 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ settingUserRole }) => ({
+@connect(({ settingUserRole, global }) => ({
   settingUserRole,
   userRole: settingUserRole.currentSelectedUserRole,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withFormikExtend({
   enableReinitialize: true,

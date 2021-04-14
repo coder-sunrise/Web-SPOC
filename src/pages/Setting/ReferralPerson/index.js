@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-
+import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
@@ -10,13 +10,13 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-
 const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingReferralPerson }) => ({
+@connect(({ settingReferralPerson, global }) => ({
   settingReferralPerson,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withSettingBase({
   modelName: 'settingReferralPerson',
@@ -31,12 +31,13 @@ class ReferralPerson extends PureComponent {
       type: 'settingReferralPerson/query',
     })
 
-    this.props.dispatch({
-      type: 'settingReferralPerson/getReferralSourceList',
-      payload: {
-        pagesize: 9999,
-      },
-    })
+    this.props
+      .dispatch({
+        type: 'settingReferralPerson/getReferralSourceList',
+        payload: {
+          pagesize: 9999,
+        },
+      })
       .then((response) => {
         const { data } = response || []
         const templateOptions = data
@@ -62,16 +63,19 @@ class ReferralPerson extends PureComponent {
   }
 
   render () {
-    const { settingReferralPerson } = this.props
+    const { settingReferralPerson, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
       referralSource: this.state.referralSource,
     }
-
+    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <Filter {...cfg} {...this.props} />
-        <Grid {...cfg} {...this.props} />
+        <div className='filterBar'>
+          <Filter {...cfg} {...this.props} />
+        </div>
+        <Grid {...cfg} {...this.props} height={height} />
 
         <CommonModal
           open={settingReferralPerson.showModal}
@@ -80,8 +84,8 @@ class ReferralPerson extends PureComponent {
             settingReferralPerson.entity ? (
               'Edit Referral Person'
             ) : (
-                'Add Referral Person'
-              )
+              'Add Referral Person'
+            )
           }
           maxWidth='md'
           bodyNoPadding

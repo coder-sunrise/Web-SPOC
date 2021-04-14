@@ -52,8 +52,9 @@ export const DraftCHASColumns = [
 ]
 
 export const DraftCHASColumnExtensions = [
-  { columnName: 'visitDate', type: 'date' },
-  { columnName: 'invoiceDate', type: 'date' },
+  { columnName: 'visitDate', type: 'date', width: 100 },
+  { columnName: 'invoiceDate', type: 'date', width: 100 },
+  { columnName: 'invoiceNo', width: 90 },
   {
     columnName: 'schemeCategoryDisplayValue',
     width: 145,
@@ -83,7 +84,7 @@ export const DraftCHASColumnExtensions = [
     columnName: 'diagnosis',
     sortingEnabled: false,
     render: (row) => {
-      let diagnoisisList = row.diagnosis.join(", ")
+      let diagnoisisList = row.diagnosis.join(', ')
       return (
         <Tooltip title={diagnoisisList}>
           <span className title={diagnoisisList}>

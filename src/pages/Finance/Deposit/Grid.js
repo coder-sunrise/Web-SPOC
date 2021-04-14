@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import numeral from 'numeral'
-import { Tooltip, withStyles } from '@material-ui/core'
+import { Tooltip } from '@material-ui/core'
 
 import Authorized from '@/utils/Authorized'
 import {
@@ -64,27 +64,6 @@ class Grid extends PureComponent {
         align: 'center',
         sortingEnabled: false,
       },
-      // {
-      //   columnName: 'action',
-      //   align: 'center',
-      //   width: 500,
-      //   sortingEnabled: false,
-      //   render: (row) => {
-      //     return (
-      //       <Tooltip title='Edit Room'>
-      //         <Button
-      //           size='sm'
-      //           onClick={() => {
-      //             this.editRow(row)
-      //           }}
-      //           color='primary'
-      //         >
-      //           Deposit
-      //         </Button>
-      //       </Tooltip>
-      //     )
-      //   },
-      // },
     ],
     ActionProps: {
       TableCellComponent: ({ column, row, dispatch, classes, ...props }) => {
@@ -194,6 +173,7 @@ class Grid extends PureComponent {
 
   render () {
     const { isDeposit, showDepositRefundModal, showPatientDeposit } = this.state
+    const { height } = this.props
     return (
       <Authorized authority='finance/deposit'>
         <React.Fragment>
@@ -201,6 +181,9 @@ class Grid extends PureComponent {
             type='deposit'
             onRowDoubleClick={this.rowDoubleClick}
             {...this.tableParas}
+            TableProps={{
+              height,
+            }}
           />
           <CommonModal
             open={showDepositRefundModal}

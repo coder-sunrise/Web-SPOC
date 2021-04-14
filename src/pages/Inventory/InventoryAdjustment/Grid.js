@@ -84,7 +84,7 @@ class Grid extends PureComponent {
   }
 
   editRow = async (row) => {
-    const { dispatch, inventoryAdjustment, toggleModal } = this.props
+    const { toggleModal } = this.props
     const accessRight = Authorized.check(viewAdjustmentDetailAuthority)
     if (!accessRight || accessRight.rights !== 'enable') {
       notification.error({
@@ -102,12 +102,6 @@ class Grid extends PureComponent {
       })
       .then(() => {
         toggleModal()
-        // dispatch({
-        //   type: 'inventoryAdjustment/updateState',
-        //   payload: {
-        //     showModal: true,
-        //   },
-        // })
       })
   }
 
@@ -127,12 +121,15 @@ class Grid extends PureComponent {
   }
 
   render () {
-    const { dispatch, classes, inventoryAdjustment, toggleModal } = this.props
+    const { height } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
         type='inventoryAdjustment'
         onRowDoubleClick={this.editRow}
+        TableProps={{
+          height,
+        }}
         {...this.configs}
       />
     )

@@ -20,12 +20,16 @@ export default class Grid extends PureComponent {
   }
 
   render () {
+    const { height } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
         type='settingClinicBreakHour'
         forceRender
         onRowDoubleClick={this.editRow}
+        TableProps={{
+          height,
+        }}
         columns={[
           { name: 'displayValue', title: 'Display Value' },
           { name: 'code', title: 'Code' },
@@ -39,7 +43,6 @@ export default class Grid extends PureComponent {
           { name: 'sunFromBreak', title: 'Sunday' },
           { name: 'action', title: 'Action' },
         ]}
-        // FuncProps={{ pager: false }}
         columnExtensions={[
           {
             columnName: 'isActive',

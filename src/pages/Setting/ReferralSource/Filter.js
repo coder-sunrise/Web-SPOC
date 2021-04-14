@@ -15,9 +15,8 @@ import {
 @withFormikExtend({
   mapPropsToValues: ({ settingReferralSource }) =>
     settingReferralSource.filter || {},
-  handleSubmit: (values, { props}) => {
-
-    const {  isActive, name, institution, department } = values
+  handleSubmit: (values, { props }) => {
+    const { isActive, name, institution, department } = values
 
     const payload = {
       isActive,
@@ -33,10 +32,9 @@ import {
   },
   displayName: 'ReferralSourceFilter',
 })
-
 class Filter extends PureComponent {
   render () {
-    const { classes,handleSubmit } = this.props
+    const { classes, handleSubmit } = this.props
     return (
       <div className={classes.filterBar}>
         <GridContainer>
@@ -47,11 +45,11 @@ class Filter extends PureComponent {
                 return <TextField label='Name' {...args} />
               }}
             />
-          </GridItem> 
+          </GridItem>
         </GridContainer>
 
         <GridContainer>
-          <GridItem xs={6} md={3}>
+          <GridItem>
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'

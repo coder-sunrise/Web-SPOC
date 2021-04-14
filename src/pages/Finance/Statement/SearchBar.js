@@ -35,7 +35,6 @@ const styles = () => ({
 @connect(({ clinicSettings }) => ({
   clinicSettings,
 }))
-
 @withFormik({
   mapPropsToValues: () => ({
     copayerFK: 'All Company',
@@ -43,23 +42,13 @@ const styles = () => ({
     statementEndDate: moment().endOf('month'),
     dueStartDate: moment().subtract(1, 'months').startOf('month'),
     dueEndDate: moment().add(3, 'months').endOf('month'),
-    // statementDates: [
-    //   moment().subtract(1, 'months').startOf('month'),
-    //   moment().endOf('month'),
-    // ],
-    // statementDueDates: [
-    //   moment().subtract(1, 'months').startOf('month'),
-    //   moment().add(3, 'months').endOf('month'),
-    // ],
   }),
-  handleSubmit: (values, { setSubmitting, props }) => {
+  handleSubmit: (values, { props }) => {
     const {
       statementNo,
       copayerFK,
       isAllDateChecked,
       isAllDueDateChecked,
-      // statementDates,
-      // statementDueDates,
       statementStartDate,
       statementEndDate,
       dueStartDate,
@@ -71,19 +60,11 @@ const styles = () => ({
     let statementDueDateTo
 
     if (!isAllDateChecked && statementStartDate && statementEndDate) {
-      // const [
-      //   fromDate,
-      //   toDate,
-      // ] = statementDates
       statementDateFrom = statementStartDate
       statementDateTo = statementEndDate
     }
 
     if (!isAllDueDateChecked && dueStartDate && dueEndDate) {
-      // const [
-      //   from,
-      //   to,
-      // ] = statementDueDates
       statementDueDateFrom = dueStartDate
       statementDueDateTo = dueEndDate
     }
@@ -137,7 +118,15 @@ class SearchBar extends PureComponent {
   }
 
   render () {
-    const { classes, history, dispatch, values, handleSubmit, showGenerateStatement, clinicSettings } = this.props
+    const {
+      classes,
+      history,
+      dispatch,
+      values,
+      handleSubmit,
+      showGenerateStatement,
+      clinicSettings,
+    } = this.props
     const { isEnableAutoGenerateStatement } = clinicSettings.settings
     const {
       statementStartDate,
@@ -193,7 +182,7 @@ class SearchBar extends PureComponent {
               />
             </GridItem>
 
-            <GridItem xs sm={1} md={1} style={{ marginTop: 13 }}>
+            <GridItem xs sm={3} md={3} style={{ marginTop: 13 }}>
               <FastField
                 name='isAllDateChecked'
                 render={(args) => {
@@ -202,6 +191,8 @@ class SearchBar extends PureComponent {
               />
             </GridItem>
           </GridItem>
+        </GridContainer>
+        <GridContainer className={classes.container}>
           <GridItem container xs md={12}>
             <GridItem xs sm={3} md={3} style={{ position: 'relative' }}>
               <FastField
@@ -228,7 +219,10 @@ class SearchBar extends PureComponent {
                     args={args}
                     label='Statement Due From Date'
                     disabled={isAllDueDateChecked}
-                    formValues={{ startDate: dueStartDate, endDate: dueEndDate }}
+                    formValues={{
+                      startDate: dueStartDate,
+                      endDate: dueEndDate,
+                    }}
                   />
                 )}
               />
@@ -243,13 +237,16 @@ class SearchBar extends PureComponent {
                     noTodayLimit
                     args={args}
                     disabled={isAllDueDateChecked}
-                    formValues={{ startDate: dueStartDate, endDate: dueEndDate }}
+                    formValues={{
+                      startDate: dueStartDate,
+                      endDate: dueEndDate,
+                    }}
                   />
                 )}
               />
             </GridItem>
 
-            <GridItem xs sm={1} md={1} style={{ marginTop: 13 }}>
+            <GridItem xs sm={3} md={3} style={{ marginTop: 13 }}>
               <FastField
                 name='isAllDueDateChecked'
                 render={(args) => {
@@ -257,45 +254,46 @@ class SearchBar extends PureComponent {
                 }}
               />
             </GridItem>
-
-            <GridItem xs sm={6} md={6} lg={8}>
-              <ProgressButton
+          </GridItem>
+        </GridContainer>
+        <GridContainer className={classes.container}>
+          <GridItem xs sm={12} md={12} lg={12}>
+            <ProgressButton
+              color='primary'
+              icon={<Search />}
+              onClick={handleSubmit}
+            >
+              <FormattedMessage id='form.search' />
+            </ProgressButton>
+            <Authorized authority='finance/statement'>
+              <Button
+                variant='contained'
                 color='primary'
-                icon={<Search />}
-                onClick={handleSubmit}
+                onClick={() => {
+                  dispatch({
+                    type: 'statement/updateState',
+                    payload: {
+                      entity: undefined,
+                    },
+                  })
+                  history.push('/finance/statement/newstatement')
+                }}
               >
-                <FormattedMessage id='form.search' />
-              </ProgressButton>
-              <Authorized authority='finance/statement'>
+                <Add />
+                New Statement
+              </Button>
+            </Authorized>
+            {isEnableAutoGenerateStatement && (
+              <Authorized authority='finance.statement.autogeneratestatement'>
                 <Button
                   variant='contained'
                   color='primary'
-                  onClick={() => {
-                    dispatch({
-                      type: 'statement/updateState',
-                      payload: {
-                        entity: undefined,
-                      },
-                    })
-                    history.push('/finance/statement/newstatement')
-                  }}
+                  onClick={showGenerateStatement}
                 >
-                  <Add />
-                New Statement
+                  Generate Statements
                 </Button>
               </Authorized>
-              {isEnableAutoGenerateStatement &&
-                <Authorized authority='finance.statement.autogeneratestatement'>
-                  <Button
-                    variant='contained'
-                    color='primary'
-                    onClick={showGenerateStatement}
-                  >
-                    Generate Statements
-                  </Button>
-                </Authorized>
-              }
-            </GridItem>
+            )}
           </GridItem>
         </GridContainer>
       </div>

@@ -12,7 +12,7 @@ import { CommonTableGrid, Button, Skeleton } from '@/components'
 // sub component
 // utils
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
-import { APPOINTMENT_STATUS, VISIT_TYPE } from '@/utils/constants'
+import { VISIT_TYPE } from '@/utils/constants'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import {
   FuncConfig,
@@ -22,10 +22,6 @@ import {
   ApptColumnExtensions,
 } from './variables'
 import { filterData } from '../utils'
-// import ContextMenu from './ContextMenu'
-// import ActionButton from './ActionButton'
-// import { formikHandleSubmit } from '../NewVisit/miscUtils'
-// import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import { StatusIndicator } from '../variables'
 
 class Grid extends React.Component {
@@ -38,7 +34,6 @@ class Grid extends React.Component {
   }
 
   shouldComponentUpdate (nextProps) {
-    // console.log(nextProps, this.props)
     if (this.props.loading !== nextProps.loading) return true
     if (this.props.selfOnly !== nextProps.selfOnly) return true
     if (this.props.filter !== nextProps.filter) return true
@@ -190,12 +185,15 @@ class Grid extends React.Component {
     } = this.props
 
     const queueListingData = this.computeQueueListingData()
-    // console.log(mainDivHeight)
 
     const isLoading = showingVisitRegistration ? false : loading
     let loadingText = 'Refreshing queue...'
     if (!loading && queryingFormData) loadingText = ''
-    let height = mainDivHeight - 150 - $('.div-reception-header').height() || 0
+    let height =
+      mainDivHeight -
+      50 -
+      ($('.filterBar').height() || 0) -
+      ($('.queueHeader').height() || 0)
     if (height < 500) height = 500
     const TableProps = { height }
     if (!height) return <Skeleton variant='rect' height={500} />

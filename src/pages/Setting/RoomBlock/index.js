@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import * as Yup from 'yup'
+import $ from 'jquery'
 // material ui
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
@@ -17,9 +17,10 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ roomBlock, loading }) => ({
+@connect(({ roomBlock, loading, global }) => ({
   roomBlock,
   loading: loading.models.roomBlock,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withSettingBase({ modelName: 'roomBlock' })
 class RoomBlock extends PureComponent {
@@ -78,18 +79,23 @@ class RoomBlock extends PureComponent {
 
   render () {
     const { showModal } = this.state
-    const { roomBlock, loading, dispatch } = this.props
+    const { roomBlock, loading, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
+    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <Filter toggleModal={this.toggleModal} dispatch={dispatch} />
+        <div className='filterBar'>
+          <Filter {...cfg} {...this.props} />
+        </div>
         <LoadingWrapper loading={loading} text='Refreshing list...'>
           <Grid
             onEditClick={this.handleEdit}
             onDeleteClick={this.handleDelete}
             dataSource={roomBlock.list}
+            height={height}
           />
         </LoadingWrapper>
         <CommonModal

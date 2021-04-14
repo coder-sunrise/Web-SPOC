@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 // formik
 import { withFormik } from 'formik'
 // material ui
@@ -32,8 +33,9 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ chasClaimSubmissionNew }) => ({
+@connect(({ chasClaimSubmissionNew, global }) => ({
   chasClaimSubmissionNew,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withFormik({
   mapPropsToValues: () => ({}),
@@ -45,7 +47,6 @@ class NewCHAS extends React.Component {
   }
 
   componentWillMount () {
-    // this.refreshDataGrid()
     this.props.dispatch({
       type: 'chasClaimSubmissionNew/query',
     })
@@ -110,10 +111,15 @@ class NewCHAS extends React.Component {
       handleContextMenuItemClick,
       dispatch,
       values,
+      mainDivHeight = 700,
     } = this.props
     const { isLoading, selectedRows } = this.state
     const { list } = chasClaimSubmissionNew || []
-
+    let height =
+      mainDivHeight - 230 - $('.filterBar').height() ||
+      0 - $('.footerBar').height() ||
+      0
+    if (height < 300) height = 300
     return (
       <CardContainer
         hideHeader
@@ -122,11 +128,13 @@ class NewCHAS extends React.Component {
           marginRight: 5,
         }}
       >
-        <BaseSearchBar
-          dispatch={dispatch}
-          values={values}
-          modelsName='chasClaimSubmissionNew'
-        />
+        <div className='filterBar'>
+          <BaseSearchBar
+            dispatch={dispatch}
+            values={values}
+            modelsName='chasClaimSubmissionNew'
+          />
+        </div>
         <LoadingWrapper linear loading={isLoading} text='Submitting Claim...'>
           <GridContainer>
             <GridItem md={12}>
@@ -146,55 +154,48 @@ class NewCHAS extends React.Component {
                 onContextMenuItemClick={(row, id) =>
                   handleContextMenuItemClick(row, id, true)}
                 type='new'
+                height={height}
               />
-              {/* <CommonTableGrid
-                getRowId={(row) => row.id}
-                type='chasClaimSubmissionNew'
-                // rows={data}
-                columns={NewCHASColumns}
-                columnExtensions={NewCHASColumnExtensions}
-                // {...TableConfig}
-                // selection={selection}
-                // onSelectionChange={onSelectionChange}
-                // ActionProps={{ TableCellComponent: Cell }}
-              /> */}
-            </GridItem>
-
-            <GridItem md={4} className={classes.buttonGroup}>
-              <Tooltip
-                placement='bottom-start'
-                title={formatMessage({
-                  id:
-                    'claimsubmission.invoiceClaim.refreshPatientDetail.tooltips',
-                })}
-              >
-                <div style={{ display: 'inline-block' }}>
-                  <ProgressButton
-                    icon={null}
-                    color='info'
-                    disabled={selectedRows.length <= 0}
-                    onClick={this.onRefreshClicked}
-                  >
-                    {formatMessage({
-                      id: 'claimsubmission.invoiceClaim.refreshPatientDetail',
-                    })}
-                  </ProgressButton>
-                </div>
-              </Tooltip>
-              <Authorized authority='claimsubmission.submitclaim'>
-                <ProgressButton
-                  icon={null}
-                  color='primary'
-                  disabled={selectedRows.length <= 0}
-                  onClick={this.onSubmitClaimClicked}
-                >
-                  {formatMessage({
-                    id: 'claimsubmission.invoiceClaim.SubmitClaim',
-                  })}
-                </ProgressButton>
-              </Authorized>
             </GridItem>
           </GridContainer>
+          <div className='footerBar'>
+            <GridContainer>
+              <GridItem md={12} className={classes.buttonGroup}>
+                <Tooltip
+                  placement='bottom-start'
+                  title={formatMessage({
+                    id:
+                      'claimsubmission.invoiceClaim.refreshPatientDetail.tooltips',
+                  })}
+                >
+                  <div style={{ display: 'inline-block' }}>
+                    <ProgressButton
+                      icon={null}
+                      color='info'
+                      disabled={selectedRows.length <= 0}
+                      onClick={this.onRefreshClicked}
+                    >
+                      {formatMessage({
+                        id: 'claimsubmission.invoiceClaim.refreshPatientDetail',
+                      })}
+                    </ProgressButton>
+                  </div>
+                </Tooltip>
+                <Authorized authority='claimsubmission.submitclaim'>
+                  <ProgressButton
+                    icon={null}
+                    color='primary'
+                    disabled={selectedRows.length <= 0}
+                    onClick={this.onSubmitClaimClicked}
+                  >
+                    {formatMessage({
+                      id: 'claimsubmission.invoiceClaim.SubmitClaim',
+                    })}
+                  </ProgressButton>
+                </Authorized>
+              </GridItem>
+            </GridContainer>
+          </div>
         </LoadingWrapper>
       </CardContainer>
     )

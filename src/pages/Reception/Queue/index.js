@@ -4,8 +4,6 @@ import { connect } from 'dva'
 // umi locale
 import { FormattedMessage, formatMessage } from 'umi/locale'
 import router from 'umi/router'
-// formik
-import { withFormik } from 'formik'
 // class names
 import classNames from 'classnames'
 // material ui
@@ -22,7 +20,6 @@ import {
   CardBody,
   CommonModal,
   PageHeaderWrapper,
-  Button,
   ProgressButton,
   notification,
 } from '@/components'
@@ -30,7 +27,6 @@ import {
 import EndSessionSummary from '@/pages/Report/SessionSummary/Details/index'
 // utils
 import { getAppendUrl, getRemovedUrl } from '@/utils/utils'
-import { SendNotification } from '@/utils/notification'
 import Authorized from '@/utils/Authorized'
 import { QueueDashboardButton } from '@/components/_medisys'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
@@ -85,10 +81,6 @@ const styles = (theme) => ({
     float: 'right',
     paddingTop: 5,
   },
-  // icon: {
-  //   paddingTop: '0.5px',
-  //   paddingBottom: '0.5px',
-  // },
   cardIconTitle: {
     color: 'black',
   },
@@ -147,20 +139,6 @@ class Queue extends React.Component {
 
     initRoomAssignment()
 
-    // dispatch({
-    //   type: 'calendar/updateState',
-    //   payload: {
-    //     list: [],
-    //   },
-    // })
-
-    // if (sessionInfo.id === '') {
-    //   dispatch({
-    //     type: `${modelKey}getSessionInfo`,
-    //   })
-    // } else {
-
-    // }
     this._timer = setInterval(() => {
       dispatch({ type: `${modelKey}refresh` })
     }, 900000)
@@ -406,15 +384,6 @@ class Queue extends React.Component {
     await dispatch({
       type: 'patientSearch/query',
       payload: {
-        // group: [
-        //   {
-        //     [`${prefix}name`]: searchQuery,
-        //     [`${prefix}patientAccountNo`]: searchQuery,
-        //     [`${prefix}patientReferenceNo`]: searchQuery,
-        //     [`${prefix}contactFkNavigation.contactNumber.number`]: searchQuery,
-        //     combineCondition: 'or',
-        //   },
-        // ],
         apiCriteria: {
           searchValue: searchQuery,
         },
@@ -828,72 +797,74 @@ class Queue extends React.Component {
         content={<FormattedMessage id='app.forms.basic.description' />}
       >
         <Card>
-          <CardHeader icon>
-            <h3 className={classNames(classes.sessionNo)}>
-              {`Session No.: ${sessionNo}`}
-            </h3>
+          <div className='queueHeader'>
+            <CardHeader icon>
+              <h3 className={classNames(classes.sessionNo)}>
+                {`Session No.: ${sessionNo}`}
+              </h3>
 
-            <Authorized authority='openqueuedisplay'>
-              {tracker && tracker.qNo ? (
-                <h4
-                  className={classNames(classes.sessionNo)}
-                  style={{
-                    fontSize: 16,
-                    marginTop: 10,
-                    marginLeft: 10,
-                    fontWeight: 'Bold',
-                  }}
-                >
-                  <font color='red'>
-                    NOW SERVING:{' '}
-                    {tracker.qNo.includes('.') ? (
-                      tracker.qNo
-                    ) : (
-                      `${tracker.qNo}.0`
-                    )}
-                  </font>
-                </h4>
-              ) : (
-                ''
-              )}
-            </Authorized>
+              <Authorized authority='openqueuedisplay'>
+                {tracker && tracker.qNo ? (
+                  <h4
+                    className={classNames(classes.sessionNo)}
+                    style={{
+                      fontSize: 16,
+                      marginTop: 10,
+                      marginLeft: 10,
+                      fontWeight: 'Bold',
+                    }}
+                  >
+                    <font color='red'>
+                      NOW SERVING:{' '}
+                      {tracker.qNo.includes('.') ? (
+                        tracker.qNo
+                      ) : (
+                        `${tracker.qNo}.0`
+                      )}
+                    </font>
+                  </h4>
+                ) : (
+                  ''
+                )}
+              </Authorized>
 
-            {!isClinicSessionClosed && (
-              <div className={classNames(classes.toolBtns)}>
-                <Authorized authority='queue.endsession'>
+              {!isClinicSessionClosed && (
+                <div className={classNames(classes.toolBtns)}>
+                  <Authorized authority='queue.endsession'>
+                    <ProgressButton
+                      icon={<EventNote />}
+                      color='info'
+                      size='sm'
+                      onClick={this.onSessionSummaryClick}
+                    >
+                      <FormattedMessage id='reception.queue.sessionSummary' />
+                    </ProgressButton>
+                  </Authorized>
+                  <QueueDashboardButton size='sm' />
                   <ProgressButton
-                    icon={<EventNote />}
                     color='info'
                     size='sm'
-                    onClick={this.onSessionSummaryClick}
+                    onClick={this.onRefreshClick}
+                    submitKey={`${modelKey}refresh`}
+                    icon={<Refresh />}
                   >
-                    <FormattedMessage id='reception.queue.sessionSummary' />
+                    Refresh
                   </ProgressButton>
-                </Authorized>
-                <QueueDashboardButton size='sm' />
-                <ProgressButton
-                  color='info'
-                  size='sm'
-                  onClick={this.onRefreshClick}
-                  submitKey={`${modelKey}refresh`}
-                  icon={<Refresh />}
-                >
-                  Refresh
-                </ProgressButton>
 
-                <Authorized authority='queue.endsession'>
-                  <ProgressButton
-                    icon={<Stop />}
-                    color='danger'
-                    size='sm'
-                    onClick={this.onEndSessionClick}
-                  >
-                    <FormattedMessage id='reception.queue.endSession' />
-                  </ProgressButton>
-                </Authorized>
-              </div>
-            )}
-          </CardHeader>
+                  <Authorized authority='queue.endsession'>
+                    <ProgressButton
+                      icon={<Stop />}
+                      color='danger'
+                      size='sm'
+                      onClick={this.onEndSessionClick}
+                    >
+                      <FormattedMessage id='reception.queue.endSession' />
+                    </ProgressButton>
+                  </Authorized>
+                </div>
+              )}
+            </CardHeader>
+          </div>
 
           <Divider />
           <CardBody>
@@ -907,13 +878,15 @@ class Queue extends React.Component {
               />
             ) : (
               <div>
-                <DetailsActionBar
-                  // selfOnly={queueLog.selfOnly}
-                  // onSwitchClick={this.toggleFilterSelfOnly}
-                  onRegisterVisitEnterPressed={this.onEnterPressed}
-                  toggleNewPatient={this.toggleRegisterNewPatient}
-                  setSearch={this.setSearch}
-                />
+                <div className='filterBar'>
+                  <DetailsActionBar
+                    // selfOnly={queueLog.selfOnly}
+                    // onSwitchClick={this.toggleFilterSelfOnly}
+                    onRegisterVisitEnterPressed={this.onEnterPressed}
+                    toggleNewPatient={this.toggleRegisterNewPatient}
+                    setSearch={this.setSearch}
+                  />
+                </div>
                 <DetailsGrid
                   // onViewPatientProfileClick={this.onViewPatientProfileClick}
                   // onViewDispenseClick={this.toggleDispense}

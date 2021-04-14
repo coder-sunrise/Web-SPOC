@@ -3,7 +3,7 @@ import { Badge } from 'antd'
 import htmlToText from 'html-to-text'
 import { CommonTableGrid, Button, Tooltip } from '@/components'
 import { status, documentTemplateTypes } from '@/utils/codes'
-import { Edit, DescriptionOutlined } from '@material-ui/icons'
+import { Edit } from '@material-ui/icons'
 import MouseOverPopover from './MouseOverPopover'
 
 class Grid extends PureComponent {
@@ -22,12 +22,16 @@ class Grid extends PureComponent {
   }
 
   render () {
+    const { height } = this.props
     return (
       <CommonTableGrid
         forceRender
         style={{ margin: 0 }}
         type='settingDocumentTemplate'
         onRowDoubleClick={this.editRow}
+        TableProps={{
+          height,
+        }}
         columns={[
           { name: 'documentTemplateTypeFK', title: 'Document Type' },
           { name: 'code', title: 'Code' },

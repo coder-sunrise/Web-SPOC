@@ -20,10 +20,14 @@ export default class Grid extends PureComponent {
   }
 
   render () {
+    const { height } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
         onRowDoubleClick={this.editRow}
+        TableProps={{
+          height,
+        }}
         forceRender
         type='settingClinicOperationHour'
         columns={[
