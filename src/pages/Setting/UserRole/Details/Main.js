@@ -2,14 +2,13 @@ import React from 'react'
 import _ from 'lodash'
 import $ from 'jquery'
 import * as Yup from 'yup'
+import { Radio } from 'antd'
 import { connect } from 'dva'
 import { withRouter } from 'react-router'
 // formik
 import { Field } from 'formik'
 // material ui
-import { withStyles } from '@material-ui/core'
-import { FormattedMessage } from 'umi/locale'
-import Search from '@material-ui/icons/Search'
+import { withStyles, List, ListItem } from '@material-ui/core'
 import moment from 'moment'
 // common component
 import {
@@ -18,27 +17,27 @@ import {
   GridItem,
   TextField,
   withFormikExtend,
-  Select,
-  CommonTableGrid,
   ProgressButton,
   CodeSelect,
-  SizeContainer,
   DatePicker,
-  CommonModal,
+  Tabs,
+  CommonTableGrid,
 } from '@/components'
 
 // utils
 import { getBizSession } from '@/services/queue'
-import { navigateDirtyCheck } from '@/utils/utils'
-import { AccessRightConfig } from './Const'
-import Prompt from './Prompt'
+import { navigateDirtyCheck, getModuleSequence } from '@/utils/utils'
+
+const isMatchRole = (clinicRoleFK, clinicRoleBitValue) => {
+  return !clinicRoleFK || clinicRoleBitValue >= 2 ** (clinicRoleFK - 1)
+}
 
 const styles = (theme) => ({
   container: {
     marginBottom: theme.spacing(2),
   },
   verticalSpacing: {
-    marginTop: theme.spacing(3),
+    marginTop: theme.spacing(2),
     '& > h4': {
       fontWeight: 500,
     },
@@ -49,6 +48,41 @@ const styles = (theme) => ({
   note: {
     fontSize: '0.9rem',
     fontStyle: 'italic',
+  },
+  radioButton: {
+    width: 70,
+    textAlign: 'center',
+    fontSize: '0.75rem',
+  },
+  tabContent: {
+    borderRadius: 0,
+    marginBottom: 1,
+    border: '1px solid #d9d9d9',
+    borderStyle: 'solid solid solid none',
+    backgroundColor: 'white',
+  },
+  accessType: {
+    fontWeight: 500,
+    fontSize: '1rem',
+  },
+  allButton: {
+    cursor: 'pointer',
+    width: 70,
+    textAlign: 'center',
+  },
+  moduleContent: {
+    height: 510,
+    overflow: 'auto',
+    paddingRight: 5,
+  },
+  listRoot: {
+    width: '100%',
+  },
+  listItemRoot: {
+    paddingTop: 0,
+    paddingBottom: 0,
+    paddingLeft: '5px !important',
+    paddingRight: '4px !important',
   },
 })
 
@@ -75,20 +109,11 @@ const styles = (theme) => ({
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch, onConfirm, history } = props
-    const { roleClientAccessRight, filteredAccessRight, ...restValues } = values
+    const { roleClientAccessRight, ...restValues } = values
     let result = _.cloneDeep(restValues)
-    result.roleClientAccessRight = roleClientAccessRight
-      .filter(
-        (m) =>
-          !values.clinicRoleFK ||
-          m.clinicRoleBitValue >= 2 ** (values.clinicRoleFK - 1),
-      )
-      .map((r) => {
-        const data = filteredAccessRight.filter((m) => {
-          return m.clientAccessRightFK === r.clientAccessRightFK
-        })
-        return data.length === 0 ? r : data[0]
-      })
+    result.roleClientAccessRight = roleClientAccessRight.filter((m) =>
+      isMatchRole(values.clinicRoleFK, m.clinicRoleBitValue),
+    )
     if (!values.id) {
       result.roleClientAccessRight = roleClientAccessRight.map((d) => {
         const { id, ...data } = d
@@ -114,17 +139,23 @@ const styles = (theme) => ({
 })
 class Main extends React.Component {
   state = {
-    filter: {
-      module: undefined,
-      displayValue: undefined,
-    },
     hasUser: true,
     hasActiveSession: true,
     isActive: false,
-    showModal: false,
-    currSelectedValue: undefined,
-    currSelectedRow: undefined,
+    selectAccessRight: undefined,
+    filterAccessRight: undefined,
   }
+
+  debouncedAction = _.debounce(
+    (e) => {
+      this.setFilterAccessRight(e)
+    },
+    100,
+    {
+      leading: true,
+      trailing: false,
+    },
+  )
 
   componentDidMount = () => {
     this.setIsActive()
@@ -178,36 +209,10 @@ class Main extends React.Component {
   }
 
   handleSearch = async (e) => {
-    const { filter } = this.state
-    const { module, displayValue } = filter
     const { values } = this.props
-    const { roleClientAccessRight, filteredAccessRight, ...restValues } = values
+    const { roleClientAccessRight, ...restValues } = values
     let result = _.cloneDeep(restValues)
     result.roleClientAccessRight = roleClientAccessRight
-      .map((d) => {
-        const data = filteredAccessRight.filter((m) => {
-          return m.clientAccessRightFK === d.clientAccessRightFK
-        })
-        return data.length === 0 ? d : data[0]
-      })
-      .sort(this.compare)
-
-    result.filteredAccessRight = result.roleClientAccessRight
-      .filter((m) => {
-        if (e) {
-          let index = values.clinicRoleFK
-          if (typeof e === 'number') index = e
-          return !index || m.clinicRoleBitValue >= 2 ** (index - 1)
-        }
-        return true
-      })
-      .filter((m) => {
-        return !module || m.module === module
-      })
-      .filter((m) => {
-        return !displayValue || m.displayValue === displayValue
-      })
-      .sort(this.compare)
 
     if (typeof e === 'number') {
       result.clinicRoleFK = e
@@ -224,62 +229,43 @@ class Main extends React.Component {
   moduleList = () => {
     const { userRole } = this.props
     const { roleClientAccessRight } = userRole
-    const { displayValue } = this.state.filter
     let filteredList = roleClientAccessRight || []
-    if (displayValue) {
-      filteredList = roleClientAccessRight.filter(
-        (r) => r.displayValue === displayValue,
-      )
-    }
 
     let result = Array.from(
       new Set(filteredList.map((f) => f.module)),
     ).map((m) => {
       const item = filteredList.find((f) => f.module === m)
-      return { name: item.module, value: item.module }
+      return {
+        name: item.module,
+        value: item.module,
+        sequence: getModuleSequence(item.module),
+      }
     })
-    return result
-  }
 
-  displayValueList = () => {
-    const { userRole } = this.props
-    const { roleClientAccessRight } = userRole
-    const { module } = this.state.filter
-    let filteredList = roleClientAccessRight || []
-    if (module) {
-      filteredList = roleClientAccessRight.filter((r) => r.module === module)
+    const receptionModule = result.find((r) => r.value === 'Reception')
+    const consultationModule = result.find((r) => r.value === 'Consultation')
+    const patientDashboardModule = result.find(
+      (r) => r.value === 'Patient Dashboard',
+    )
+
+    if (receptionModule && consultationModule) {
+      consultationModule.sequence = receptionModule.sequence + 0.1
     }
 
-    let result = Array.from(
-      new Set(filteredList.map((f) => f.displayValue)),
-    ).map((m) => {
-      const item = filteredList.find((f) => f.displayValue === m)
-      return { name: item.displayValue, value: item.displayValue }
-    })
-    return result
+    if (receptionModule && patientDashboardModule) {
+      patientDashboardModule.sequence = receptionModule.sequence + 0.2
+    }
+
+    return _.orderBy(
+      result,
+      [
+        'sequence',
+      ],
+      [
+        'asc',
+      ],
+    )
   }
-
-  onSelectModule = (e) =>
-    this.setState((prev) => {
-      return {
-        ...prev,
-        filter: {
-          ...prev.filter,
-          module: e,
-        },
-      }
-    })
-
-  onSelectDisplayValue = (e) =>
-    this.setState((prev) => {
-      return {
-        ...prev,
-        filter: {
-          ...prev.filter,
-          displayValue: e,
-        },
-      }
-    })
 
   goBackToPreviousPage = () => {
     const { history, resetForm } = this.props
@@ -287,118 +273,410 @@ class Main extends React.Component {
     history.goBack()
   }
 
-  updateSelectedValues = async () => {
-    const { values } = this.props
-    const { currSelectedValue, currSelectedRow } = this.state
-    const { roleClientAccessRight, filteredAccessRight, ...restValues } = values
-    const result = _.cloneDeep(restValues)
-    result.roleClientAccessRight = roleClientAccessRight
-      .map((r) => {
-        if (r.module === currSelectedRow.module) {
-          r.permission = currSelectedValue
-          if (currSelectedValue === 'ReadOnly' && r.type === 'Action') {
-            r.permission = 'Disable'
-          }
-        }
-        return r
-      })
-      .sort(this.compare)
-    result.filteredAccessRight = filteredAccessRight
-      .map((r) => {
-        if (r.module === currSelectedRow.module) {
-          r.permission = currSelectedValue
-          if (currSelectedValue === 'ReadOnly' && r.type === 'Action') {
-            r.permission = 'Disable'
-          }
-        }
-        return r
-      })
-      .sort(this.compare)
-    await this.props.dispatch({
-      type: 'settingUserRole/updateState',
-      payload: {
-        currentSelectedUserRole: result,
-      },
-    })
+  onClickAll = (type, newValue, moduleName) => {
+    const { values, setFieldValue } = this.props
+    let { roleClientAccessRight = [], clinicRoleFK } = values
 
-    this.toggleModal()
-  }
-
-  onConfirmChangeRight = (value, row) => {
-    if (
-      row.type === 'Module' &&
-      row.sortOrder === 1 &&
-      value !== 'ReadWrite' &&
-      row.module !== 'Consultation'
+    roleClientAccessRight = _.orderBy(
+      roleClientAccessRight,
+      [
+        'sortOrder',
+      ],
+      [
+        'asc',
+      ],
     )
-      this.setState({ currSelectedValue: value, currSelectedRow: row }, () => {
-        this.toggleModal()
-      })
-  }
 
-  onCancel = async () => {
-    const { values } = this.props
-    const { currSelectedRow } = this.state
-    const { roleClientAccessRight, filteredAccessRight, ...restValues } = values
-    const result = _.cloneDeep(restValues)
-    result.roleClientAccessRight = roleClientAccessRight
-      .map((r) => {
-        if (r.clientAccessRightFK === currSelectedRow.clientAccessRightFK) {
-          r.permission = currSelectedRow.permission
-        }
-        return r
-      })
-      .sort(this.compare)
-    result.filteredAccessRight = filteredAccessRight
-      .map((r) => {
-        if (r.clientAccessRightFK === currSelectedRow.clientAccessRightFK) {
-          r.permission = currSelectedRow.permission
-        }
-        return r
-      })
-      .sort(this.compare)
+    const updateRoleClientAccessRight = roleClientAccessRight.filter(
+      (m) =>
+        isMatchRole(clinicRoleFK, m.clinicRoleBitValue) &&
+        m.module === moduleName &&
+        m.type === type,
+    )
 
-    await this.props.dispatch({
-      type: 'settingUserRole/updateState',
-      payload: {
-        currentSelectedUserRole: result,
-      },
+    const updateChildrenAccessRight = (clientAccessRightFK) => {
+      let currenAccessRight = roleClientAccessRight.filter((accessRight) => {
+        return (
+          isMatchRole(clinicRoleFK, accessRight.clinicRoleBitValue) &&
+          accessRight.parentClientAccessRightFK === clientAccessRightFK
+        )
+      })
+      currenAccessRight.forEach((r) => {
+        if (newValue === 'Hidden' && r.permission !== 'Hidden') {
+          r.permission = newValue
+          updateChildrenAccessRight(r.clientAccessRightFK)
+        } else if (
+          [
+            'Enable',
+            'ReadWrite',
+          ].indexOf(r.permission) >= 0
+        ) {
+          if (r.type === 'Module') {
+            r.permission = 'ReadOnly'
+          }
+          if (r.type === 'Action') r.permission = 'Disable'
+          if (r.type === 'Field') r.permission = 'ReadOnly'
+          updateChildrenAccessRight(r.clientAccessRightFK)
+        }
+      })
+    }
+
+    updateRoleClientAccessRight.forEach((r) => {
+      if (r.permission !== newValue) {
+        if (
+          !this.isOverParentAccessRight(
+            values.clinicRoleFK,
+            r,
+            newValue,
+            roleClientAccessRight,
+          )
+        ) {
+          r.permission = newValue
+          updateChildrenAccessRight(r.clientAccessRightFK)
+        }
+      }
     })
 
-    this.toggleModal()
+    setFieldValue('roleClientAccessRight', [
+      ...roleClientAccessRight,
+    ])
   }
 
-  toggleModal = () => {
-    const { showModal } = this.state
-    this.setState({ showModal: !showModal })
+  isParentSelect = (clientAccessRightFK, moduleName) => {
+    if (!this.state.selectAccessRight) return false
+    if (this.state.selectAccessRight.module !== moduleName) return false
+    if (
+      clientAccessRightFK === this.state.selectAccessRight.clientAccessRightFK
+    )
+      return true
+    const { values } = this.props
+    const { roleClientAccessRight = [] } = values
+    const currentRoleClientAccessRight = roleClientAccessRight.filter((m) =>
+      isMatchRole(values.clinicRoleFK, m.clinicRoleBitValue),
+    )
+
+    const checkParentSelect = (currentClientAccessRightId) => {
+      if (
+        currentClientAccessRightId ===
+        this.state.selectAccessRight.clientAccessRightFK
+      )
+        return true
+
+      const currenClientAccessRight = currentRoleClientAccessRight.find(
+        (r) => r.clientAccessRightFK === currentClientAccessRightId,
+      )
+
+      if (
+        !currenClientAccessRight ||
+        !currenClientAccessRight.parentClientAccessRightFK
+      )
+        return false
+
+      return checkParentSelect(
+        currenClientAccessRight.parentClientAccessRightFK,
+      )
+    }
+
+    return checkParentSelect(clientAccessRightFK)
   }
 
-  compare = (a, b) => {
-    const f = a.module.localeCompare(b.module)
-    if (f !== 0) return f
-    return a.sortOrder - b.sortOrder
+  getModuleItems = (mudule, type) => {
+    const { values } = this.props
+    const { roleClientAccessRight = [] } = values
+    const currentRoleClientAccessRight = roleClientAccessRight.filter(
+      (m) =>
+        isMatchRole(values.clinicRoleFK, m.clinicRoleBitValue) &&
+        m.module === mudule &&
+        m.type === type &&
+        m.displayValue
+          .toUpperCase()
+          .indexOf((this.state.filterAccessRight || '').toUpperCase()) >= 0,
+    )
+
+    return _.orderBy(
+      currentRoleClientAccessRight,
+      [
+        'sortOrder',
+      ],
+      [
+        'asc',
+      ],
+    )
+  }
+
+  setFilterAccessRight = (e) => {
+    this.setState({ filterAccessRight: e.target.value })
+  }
+
+  accessRightChange = (item, newValue) => {
+    if (item.permission === newValue) return
+    const { values, setFieldValue } = this.props
+    let { roleClientAccessRight = [], clinicRoleFK } = values
+
+    const updateChildrenAccessRight = (clientAccessRightFK) => {
+      let currenAccessRight = roleClientAccessRight.filter((accessRight) => {
+        return (
+          isMatchRole(clinicRoleFK, accessRight.clinicRoleBitValue) &&
+          accessRight.parentClientAccessRightFK === clientAccessRightFK
+        )
+      })
+      currenAccessRight.forEach((r) => {
+        if (newValue === 'Hidden' && r.permission !== 'Hidden') {
+          r.permission = newValue
+          updateChildrenAccessRight(r.clientAccessRightFK)
+        } else if (
+          [
+            'Enable',
+            'ReadWrite',
+          ].indexOf(r.permission) >= 0
+        ) {
+          if (r.type === 'Module') {
+            r.permission = 'ReadOnly'
+          }
+          if (r.type === 'Action') r.permission = 'Disable'
+          if (r.type === 'Field') r.permission = 'ReadOnly'
+          updateChildrenAccessRight(r.clientAccessRightFK)
+        }
+      })
+    }
+
+    let selectAccessRight = roleClientAccessRight.find((accessRight) => {
+      return (
+        isMatchRole(clinicRoleFK, accessRight.clinicRoleBitValue) &&
+        accessRight.clientAccessRightFK === item.clientAccessRightFK
+      )
+    })
+    selectAccessRight.permission = newValue
+
+    if (
+      [
+        'Enable',
+        'ReadWrite',
+      ].indexOf(newValue) < 0
+    ) {
+      updateChildrenAccessRight(item.clientAccessRightFK)
+    }
+
+    setFieldValue('roleClientAccessRight', [
+      ...roleClientAccessRight,
+    ])
+  }
+
+  isOverParentAccessRight = (
+    clinicRoleFK,
+    accessRight,
+    accessValue,
+    roleClientAccessRight,
+  ) => {
+    if (!accessRight.parentClientAccessRightFK) return false
+
+    const parentRoleClientAccessRight = roleClientAccessRight.find(
+      (m) =>
+        isMatchRole(clinicRoleFK, m.clinicRoleBitValue) &&
+        m.clientAccessRightFK === accessRight.parentClientAccessRightFK,
+    )
+    if (parentRoleClientAccessRight) {
+      if (
+        [
+          'Enable',
+          'ReadWrite',
+        ].indexOf(accessValue) >= 0
+      ) {
+        return (
+          [
+            'Enable',
+            'ReadWrite',
+          ].indexOf(parentRoleClientAccessRight.permission) < 0
+        )
+      }
+      return parentRoleClientAccessRight.permission === 'Hidden'
+    }
+    return false
+  }
+
+  isDisable = (accessRight, accessValue) => {
+    const { values } = this.props
+    let { roleClientAccessRight = [] } = values
+    if (accessValue === 'Hidden') return false
+    return this.isOverParentAccessRight(
+      values.clinicRoleFK,
+      accessRight,
+      accessValue,
+      roleClientAccessRight,
+    )
+  }
+
+  renderItems = (moduleName, type) => {
+    const { classes } = this.props
+    const items = this.getModuleItems(moduleName, type)
+    return (
+      <GridItem
+        md={4}
+        container
+        style={{
+          border: '1px solid #d9d9d9',
+          borderStyle: type === 'Field' ? 'none' : 'none solid none none',
+          padding: 0,
+        }}
+      >
+        <GridItem md={12} style={{ marginTop: 8, marginBottom: 4 }}>
+          <div
+            style={{
+              display: 'flex',
+            }}
+          >
+            <div className={classes.accessType}>{type}</div>
+            <div
+              style={{
+                marginLeft: 'auto',
+                display: 'flex',
+              }}
+            >
+              <Radio.Group
+                size='small'
+                value=''
+                onChange={(e) => {
+                  this.onClickAll(type, e.target.value, moduleName)
+                }}
+              >
+                <Radio.Button
+                  value={type === 'Action' ? 'Enable' : 'ReadWrite'}
+                  className={classes.radioButton}
+                >
+                  All
+                </Radio.Button>
+                <Radio.Button
+                  value={type === 'Action' ? 'Disable' : 'ReadOnly'}
+                  className={classes.radioButton}
+                >
+                  All
+                </Radio.Button>
+                <Radio.Button value='Hidden' className={classes.radioButton}>
+                  All
+                </Radio.Button>
+              </Radio.Group>
+            </div>
+          </div>
+        </GridItem>
+        <GridItem
+          md={12}
+          style={{ marginBottom: 8, paddingRight: 0, paddingLeft: 8 }}
+        >
+          <div className={classes.moduleContent}>
+            <List
+              component='nav'
+              classes={{
+                root: classes.listRoot,
+              }}
+              disablePadding
+              onClick={() => {}}
+            >
+              {items.map((item) => {
+                return (
+                  <ListItem
+                    alignItems='flex-start'
+                    classes={{
+                      root: classes.listItemRoot,
+                    }}
+                    selected={
+                      this.state.selectAccessRight &&
+                      this.state.selectAccessRight.clientAccessRightFK ===
+                        item.clientAccessRightFK
+                    }
+                    divider
+                    disableGutters
+                    button
+                    onClick={() => {
+                      if (
+                        !this.state.selectAccessRight ||
+                        this.state.selectAccessRight.clientAccessRightFK !==
+                          item.clientAccessRightFK
+                      )
+                        this.setState({
+                          selectAccessRight: item,
+                        })
+                    }}
+                  >
+                    <div
+                      style={{
+                        marginTop: 5,
+                        marginLeft: item.level > 1 ? 10 * (item.level - 1) : 0,
+                        color: this.isParentSelect(
+                          item.clientAccessRightFK,
+                          item.module,
+                        )
+                          ? '#4255bd'
+                          : 'black',
+                        fontSize: '0.85rem',
+                      }}
+                    >
+                      {item.displayValue}
+                    </div>
+                    <div
+                      style={{
+                        marginLeft: 'auto',
+                        display: 'flex',
+                        marginTop: 3,
+                        marginBottom: 4,
+                      }}
+                    >
+                      <Radio.Group
+                        size='small'
+                        value={item.permission}
+                        onChange={(e) => {
+                          this.accessRightChange(item, e.target.value)
+                        }}
+                      >
+                        <Radio.Button
+                          disabled={this.isDisable(
+                            item,
+                            type === 'Action' ? 'Enable' : 'ReadWrite',
+                          )}
+                          value={type === 'Action' ? 'Enable' : 'ReadWrite'}
+                          className={classes.radioButton}
+                        >
+                          {type === 'Action' ? 'Enable' : 'Read Write'}
+                        </Radio.Button>
+                        <Radio.Button
+                          disabled={this.isDisable(
+                            item,
+                            type === 'Action' ? 'Disable' : 'ReadOnly',
+                          )}
+                          value={type === 'Action' ? 'Disable' : 'ReadOnly'}
+                          className={classes.radioButton}
+                        >
+                          {type === 'Action' ? 'Disable' : 'Read Only'}
+                        </Radio.Button>
+                        <Radio.Button
+                          value='Hidden'
+                          className={classes.radioButton}
+                          disabled={this.isDisable(item, 'Hidden')}
+                        >
+                          Hidden
+                        </Radio.Button>
+                      </Radio.Group>
+                    </div>
+                  </ListItem>
+                )
+              })}
+            </List>
+          </div>
+        </GridItem>
+      </GridItem>
+    )
   }
 
   render () {
-    const { classes, values, mainDivHeight = 700 } = this.props
-    const {
-      filter,
-      hasUser,
-      hasActiveSession,
-      isActive,
-      showModal,
-    } = this.state
+    const { classes, values } = this.props
+    const { hasUser, hasActiveSession, isActive } = this.state
     const {
       id,
       isUserMaintainable,
       effectiveStartDate,
       effectiveEndDate,
-      filteredAccessRight,
     } = values
 
     const isEdit = !!id
-    let height = mainDivHeight - 500
-    if (height < 300) height = 300
     return (
       <React.Fragment>
         <GridContainer
@@ -418,6 +696,31 @@ class Main extends React.Component {
                 }}
               />
             </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='name'
+                render={(args) => (
+                  <TextField
+                    label='Name'
+                    {...args}
+                    disabled={isEdit && !isUserMaintainable}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='description'
+                render={(args) => (
+                  <TextField
+                    label='Description'
+                    {...args}
+                    disabled={isEdit && !isUserMaintainable}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={3} />
             <GridItem md={3}>
               <Field
                 name='effectiveStartDate'
@@ -459,39 +762,6 @@ class Main extends React.Component {
                 )}
               />
             </GridItem>
-          </GridContainer>
-
-          <GridContainer className={classes.indent} alignItems='center'>
-            <GridItem md={3}>
-              <Field
-                name='name'
-                render={(args) => (
-                  <TextField
-                    label='Name'
-                    {...args}
-                    disabled={isEdit && !isUserMaintainable}
-                  />
-                )}
-              />
-            </GridItem>
-          </GridContainer>
-
-          <GridContainer className={classes.indent} alignItems='center'>
-            <GridItem md={3}>
-              <Field
-                name='description'
-                render={(args) => (
-                  <TextField
-                    label='Description'
-                    {...args}
-                    disabled={isEdit && !isUserMaintainable}
-                  />
-                )}
-              />
-            </GridItem>
-          </GridContainer>
-
-          <GridContainer className={classes.indent} alignItems='center'>
             <GridItem md={3}>
               <Field
                 name='clinicRoleFK'
@@ -506,70 +776,54 @@ class Main extends React.Component {
                 )}
               />
             </GridItem>
-            <GridItem md={8}>
+            <GridItem md={3}>
               <p className={classes.note}>
                 You are not allowed to change clinical role after save.
               </p>
             </GridItem>
           </GridContainer>
-
-          <GridItem md={12} className={classes.verticalSpacing}>
+          <GridItem md={9} className={classes.verticalSpacing}>
             <h4>Access Right</h4>
           </GridItem>
-          <GridContainer className={classes.indent} alignItems='center'>
-            <GridItem md={2}>
-              <Select
-                value={filter.module}
-                label='Module'
-                options={this.moduleList()}
-                onChange={this.onSelectModule}
-              />
-            </GridItem>
-            <GridItem md={2}>
-              <Select
-                value={filter.displayValue}
-                label='Function Access'
-                options={this.displayValueList()}
-                dropdownMatchSelectWidth={false}
-                onChange={this.onSelectDisplayValue}
-              />
-            </GridItem>
-
-            <GridItem md={2}>
-              <ProgressButton
-                icon={<Search />}
-                color='primary'
-                onClick={this.handleSearch}
-              >
-                <FormattedMessage id='form.search' />
-              </ProgressButton>
-            </GridItem>
-
-            <SizeContainer size='sm'>
-              <CommonTableGrid
-                forceRender
-                rows={filteredAccessRight}
-                {...AccessRightConfig({
-                  isEdit,
-                  isUserMaintainable,
-                  onConfirmChangeRight: this.onConfirmChangeRight,
-                })}
-                FuncProps={{ pager: true }}
-                TableProps={{
-                  height,
-                }}
-              />
-            </SizeContainer>
-            <CommonModal
-              open={showModal}
-              maxWidth='md'
-              title='Confirm to change access right'
-              onClose={this.onCancel}
-              onConfirm={this.onCancel}
-            >
-              <Prompt updateSelectedValues={this.updateSelectedValues} />
-            </CommonModal>
-          </GridContainer>
+          <GridItem md={3} className={classes.verticalSpacing}>
+            <TextField
+              label='Filter Access Right'
+              onChange={(e) => {
+                this.debouncedAction(e)
+              }}
+            />
+          </GridItem>
+          <Tabs
+            md={12}
+            tabPosition='left'
+            options={this.moduleList().map((m, index) => {
+              return {
+                id: index,
+                name: m.name,
+                content: (
+                  <div className={classes.tabContent}>
+                    <GridContainer style={{ padding: 0 }}>
+                      {this.renderItems(m.name, 'Module')}
+                      {this.renderItems(m.name, 'Action')}
+                      {this.renderItems(m.name, 'Field')}
+                    </GridContainer>
+                    <CommonTableGrid
+                      FuncProps={{
+                        pager: false,
+                      }}
+                      style={{ height: 0 }}
+                    />
+                  </div>
+                ),
+              }
+            })}
+            tabStyle={{
+              marginRight: 8,
+              marginLeft: -24,
+            }}
+            tabBarStyle={{ marginLeft: 10 }}
+            tabBarGutter={0}
+          />
         </GridContainer>
         <GridItem
           container
@@ -590,7 +844,14 @@ class Main extends React.Component {
           <ProgressButton
             color='primary'
             onClick={() => {
-              this.props.handleSubmit()
+              this.props.dispatch({
+                type: 'global/updateAppState',
+                payload: {
+                  openConfirm: true,
+                  openConfirmContent: `Save Role & Access Right?`,
+                  onConfirmSave: this.props.handleSubmit,
+                },
+              })
             }}
             disabled={isEdit && !isUserMaintainable}
           >

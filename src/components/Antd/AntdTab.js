@@ -9,18 +9,20 @@ const STYLES = (theme) => {
     main: {},
   }
 }
-const AntdTab = ({ classes, options, tabStyle, ...props }) => {
+const AntdTab = ({ classes, options, tabStyle, tabBarStyle, ...props }) => {
   return (
     <Tabs
       type='card'
       // animated={false}
       className={classes.main}
-      tabBarStyle={{
-        paddingLeft: 8,
-        top: 1,
-        position: 'relative',
-        margin: 0,
-      }}
+      tabBarStyle={
+        tabBarStyle || {
+          paddingLeft: 8,
+          top: 1,
+          position: 'relative',
+          margin: 0,
+        }
+      }
       {...props}
     >
       {options.map((o) => {

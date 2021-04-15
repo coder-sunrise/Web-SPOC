@@ -1394,6 +1394,15 @@ const checkAuthoritys = (pathname, history) => {
   }
 }
 
+const getModuleSequence = (moduleName) => {
+  const sequence = RouterConfig[2].routes
+    .filter((r) => r.moduleName)
+    .map((r) => r.moduleName.toUpperCase())
+    .indexOf(moduleName.toUpperCase())
+  if (sequence >= 0) return sequence
+  else return 1000
+}
+
 module.exports = {
   ...cdrssUtil,
   ...module.exports,
@@ -1431,6 +1440,7 @@ module.exports = {
   roundUp,
   stringToBytesFaster,
   checkAuthoritys,
+  getModuleSequence,
   // toUTC,
   // toLocal,
 }

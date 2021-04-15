@@ -54,8 +54,14 @@ const _routes = [
         path: '/reception',
         icon: 'local_hospital',
         name: 'reception',
-        authority: [ 'reception' ],
-        specialist: [ 'GP', 'Dental' ],
+        moduleName: 'Reception',
+        authority: [
+          'reception',
+        ],
+        specialist: [
+          'GP',
+          'Dental',
+        ],
         routes: [
           {
             path: '/reception/queue',
@@ -130,8 +136,14 @@ const _routes = [
         path: '/patientdb',
         icon: 'group',
         name: 'patient',
-        authority: [ 'patientdatabase' ],
-        specialist: [ 'GP', 'Dental' ],
+        moduleName: 'PatientDataBase',
+        authority: [
+          'patientdatabase',
+        ],
+        specialist: [
+          'GP',
+          'Dental',
+        ],
         component: './PatientDatabase/Search',
         // routes: [
         //   // {
@@ -180,6 +192,7 @@ const _routes = [
         path: '/communication',
         icon: 'sms',
         name: 'communication',
+        moduleName: 'Communication',
         system: 'CMS',
         authority: [ 'communication' ],
         specialist: [ 'GP' ],
@@ -203,6 +216,7 @@ const _routes = [
         path: '/inventory',
         icon: 'kitchen',
         name: 'inventory',
+        moduleName: 'Inventory',
         // component: './inventory',
         authority: [ 'inventory' ],
         specialist: [ 'GP' ],
@@ -328,8 +342,13 @@ const _routes = [
         path: '/finance',
         icon: 'attach_money',
         name: 'finance',
-        authority: [ 'finance' ],
-        specialist: [ 'GP' ],
+        moduleName: 'Finance',
+        authority: [
+          'finance',
+        ],
+        specialist: [
+          'GP',
+        ],
         routes: [
           {
             path: '/finance/invoice',
@@ -463,6 +482,7 @@ const _routes = [
         path: '/report',
         icon: 'library_books',
         name: 'report',
+        moduleName: 'Report',
         hideChildrenInMenu: true,
         authority: [ 'report' ],
         specialist: [ 'GP' ],
@@ -672,6 +692,7 @@ const _routes = [
         path: '/claim-submission',
         icon: 'receipt',
         name: 'claimSubmission',
+        moduleName: 'Claim Submission',
         hideChildrenInMenu: true,
         authority: [ 'claimsubmission' ],
         specialist: [ 'GP' ],
@@ -717,6 +738,7 @@ const _routes = [
         path: '/forms',
         icon: 'description',
         name: 'forms',
+        moduleName: 'Forms',
         component: './FormListing',
         authority: [ 'forms' ],
       },
@@ -727,8 +749,14 @@ const _routes = [
         path: '/setting',
         icon: 'settings',
         name: 'setting',
-        authority: [ 'settings' ],
-        specialist: [ 'GP', 'Dental' ],
+        moduleName: 'Settings',
+        authority: [
+          'settings',
+        ],
+        specialist: [
+          'GP',
+          'Dental',
+        ],
         hideChildrenInMenu: true,
         routes: [
           {
@@ -1054,6 +1082,7 @@ const _routes = [
         path: '/support',
         icon: 'local_phone',
         name: 'support',
+        moduleName: 'Support',
         hideChildrenInMenu: true,
         specialist: [ 'GP', 'Dental' ],
         routes: [
