@@ -4,6 +4,7 @@ import { withStyles } from '@material-ui/core'
 // ant design
 import { Divider } from 'antd'
 // common components
+import _ from 'lodash'
 import {
   Button,
   CardContainer,
@@ -13,7 +14,6 @@ import {
 } from '@/components'
 // utils
 import { roundTo } from '@/utils/utils'
-import _ from 'lodash'
 import Payments from './Payments'
 
 const styles = () => ({
@@ -53,6 +53,8 @@ const InvoiceSummary = ({
   disabled,
   values,
   setFieldValue,
+  isEnableVisitationInvoiceReport,
+  handlePrintVisitInvoiceClick,
 }) => {
   const errorMessage = 'Cancel reason is required'
 
@@ -217,7 +219,7 @@ const InvoiceSummary = ({
                 }}
               />
             </GridItem>
-            <GridItem md={6}>
+            <GridItem md={3}>
               <Button
                 color='primary'
                 simple
@@ -229,7 +231,21 @@ const InvoiceSummary = ({
                 Print Invoice
               </Button>
             </GridItem>
-            <GridItem md={6} className={classes.rightAlign}>
+            {isEnableVisitationInvoiceReport && (
+              <GridItem md={6}>
+                <Button
+                  color='primary'
+                  simple
+                  size='sm'
+                  className={classes.invoiceButton}
+                  onClick={handlePrintVisitInvoiceClick}
+                  disabled={disabled}
+                >
+                  Print Visit Invoice
+                </Button>
+              </GridItem>
+            )}
+            <GridItem md={3} className={classes.rightAlign}>
               <Button
                 color='primary'
                 simple

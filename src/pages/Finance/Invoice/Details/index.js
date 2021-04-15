@@ -11,11 +11,12 @@ import { INVOICE_VIEW_MODE } from '@/utils/constants'
 import InvoiceBanner from './InvoiceBanner'
 import InvoiceContent from './Content'
 
-@connect(({ invoiceDetail, invoicePayment, patient, loading }) => ({
+@connect(({ invoiceDetail, invoicePayment, patient, loading, clinicSettings }) => ({
   invoiceDetail,
   invoicePayment,
   patient,
   loading: loading.models.invoiceDetail || loading.models.invoicePayment,
+  clinicSettings,
 }))
 @withFormik({
   name: 'invoiceDetail',
@@ -125,6 +126,7 @@ class InvoiceDetails extends Component {
       loading,
       patient,
       history,
+      clinicSettings,
     } = this.props
     const invoiceContentProps = {
       dispatch,
@@ -133,6 +135,7 @@ class InvoiceDetails extends Component {
       invoicePayment,
       patient,
       history,
+      clinicSettings,
     }
     const bannerProps = {
       values,
