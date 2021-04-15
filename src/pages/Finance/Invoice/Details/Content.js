@@ -33,6 +33,9 @@ const Content = ({
   const invoiceBizSessionFK = entity ? entity.bizSessionFK : undefined
   const patientIsActive = patientProfile && patientProfile.isActive
 
+  const { settings = [] } = clinicSettings
+  const { isEnableVisitationInvoiceReport = false } = settings
+
   const [
     active,
     setActive,
@@ -106,7 +109,13 @@ const Content = ({
     {
       id: 1,
       name: 'Invoice',
-      content: <InvoiceDetails values={values} dispatch={dispatch} />,
+      content: (
+        <InvoiceDetails 
+          values={values} 
+          dispatch={dispatch} 
+          isEnableVisitationInvoiceReport={isEnableVisitationInvoiceReport}
+        />
+      ),
     },
     {
       id: 2,
