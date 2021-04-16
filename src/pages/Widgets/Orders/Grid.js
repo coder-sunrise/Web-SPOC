@@ -711,7 +711,11 @@ export default ({
                 '0,0.0',
               )} ${row.unitOfMeasurement}`
             }
-            return <p>{qty}</p>
+            return (
+              <Tooltip title={qty}>
+                <span>{qty}</span>
+              </Tooltip>
+            )
           },
         },
         {
