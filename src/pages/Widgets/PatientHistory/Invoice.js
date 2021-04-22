@@ -52,7 +52,7 @@ const baseColumns = [
   {
     dataIndex: 'itemType',
     title: 'Type',
-    width: 150,
+    width: 140,
     render: (text, row) => {
       return (
         <div style={{ position: 'relative' }}>
@@ -64,34 +64,34 @@ const baseColumns = [
       )
     },
   },
-  { dataIndex: 'itemName', title: 'Name', width: 300 },
+  { dataIndex: 'itemName', title: 'Name', width: 250 },
   {
     dataIndex: 'description',
-    title: 'Description',
+    title: 'Instructions',
   },
   {
     dataIndex: 'quantity',
-    title: 'Quantity',
+    title: 'Qty.',
     align: 'right',
-    width: 100,
+    width: 80,
     render: (text, row) => (
       <div style={numberstyle}>
         {`${numeral(row.quantity || 0).format('0,0.0')}`}
       </div>
     ),
   },
-  { dataIndex: 'dispenseUOMDisplayValue', title: 'UOM', width: 100 },
+  { dataIndex: 'dispenseUOMDisplayValue', title: 'UOM', width: 80 },
   {
     dataIndex: 'adjAmt',
     title: 'Adj.',
-    width: 120,
+    width: 100,
     align: 'right',
     render: (text, row) => showCurrency(row.adjAmt),
   },
   {
     dataIndex: 'totalAfterItemAdjustment',
     title: 'Total',
-    width: 120,
+    width: 100,
     align: 'right',
     render: (text, row) => showCurrency(row.totalAfterItemAdjustment),
   },
