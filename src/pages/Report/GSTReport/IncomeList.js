@@ -24,11 +24,34 @@ class IncomeList extends PureComponent {
       { name: 'incomeTotal', title: 'Final Amount' },
     ]
     const InComeGstDetailsExtensions = [
-      { columnName: 'incomeDate', type: 'date', sortingEnabled: false },
-      { columnName: 'incomeAmount', type: 'currency', currency: true, sortingEnabled: false },
-      { columnName: 'incomeGst', type: 'currency', currency: true, sortingEnabled: false },
-      { columnName: 'incomeTotal', type: 'currency', currency: true, sortingEnabled: false },
-      { columnName: 'invoiceNo', sortingEnabled: false },
+      {
+        columnName: 'incomeDate',
+        type: 'date',
+        sortingEnabled: false,
+        width: 120,
+      },
+      {
+        columnName: 'incomeAmount',
+        type: 'currency',
+        currency: true,
+        sortingEnabled: false,
+        width: 180,
+      },
+      {
+        columnName: 'incomeGst',
+        type: 'currency',
+        currency: true,
+        sortingEnabled: false,
+        width: 180,
+      },
+      {
+        columnName: 'incomeTotal',
+        type: 'currency',
+        currency: true,
+        sortingEnabled: false,
+        width: 180,
+      },
+      { columnName: 'invoiceNo', sortingEnabled: false, width: 200 },
       { columnName: 'patientName', sortingEnabled: false },
     ]
 
@@ -58,7 +81,7 @@ class IncomeList extends PureComponent {
         row: {
           messages: {
             sum: 'Total',
-            grandTotal: 'Grand Total',
+            grandTotal: 'Total',
           },
         },
       },
