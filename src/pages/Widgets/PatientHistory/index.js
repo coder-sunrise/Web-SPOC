@@ -1238,6 +1238,7 @@ class PatientHistory extends Component {
                   isDrugMixture: o.isDrugMixture,
                   name: o.name,
                   description: o.description,
+                  remarks: o.remarks,
                   quantity: o.quantity,
                   uom: o.dispenseUOMDisplayValue,
                 }

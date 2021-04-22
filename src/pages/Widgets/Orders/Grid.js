@@ -394,8 +394,8 @@ export default ({
       columns={[
         { name: 'type', title: 'Type' },
         { name: 'subject', title: 'Name' },
-        { name: 'description', title: 'Description' },
-        { name: 'quantity', title: 'Quantity' },
+        { name: 'description', title: 'Instructions' },
+        { name: 'quantity', title: 'Qty.' },
         { name: 'adjAmount', title: 'Adj.' },
         { name: 'totalAfterItemAdjustment', title: 'Total' },
         { name: 'actions', title: 'Actions' },
@@ -608,7 +608,7 @@ export default ({
       columnExtensions={[
         {
           columnName: 'type',
-          width: 150,
+          width: 140,
           render: (row) => {
             const otype = orderTypes.find((o) => o.value === row.type)
             let texts = []
@@ -674,7 +674,7 @@ export default ({
                     whiteSpace: 'pre-wrap',
                   }}
                 >
-                  {row.instruction || row.remark || row.remarks || ''}
+                  {row.instruction || ''}
                 </div>
               </Tooltip>
             )
@@ -683,7 +683,7 @@ export default ({
         {
           columnName: 'adjAmount',
           type: 'currency',
-          width: 90,
+          width: 80,
         },
         {
           columnName: 'totalAfterItemAdjustment',
