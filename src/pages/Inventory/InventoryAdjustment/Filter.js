@@ -200,7 +200,7 @@ class Filter extends PureComponent {
                 disablePortal
                 placement='bottom-end'
                 style={{
-                  zIndex: 1,
+                  zIndex: 999,
                   width: 185,
                   left: -63,
                 }}
