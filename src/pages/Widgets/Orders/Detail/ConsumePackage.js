@@ -567,13 +567,15 @@ class ConsumePackage extends Component {
         (item) => item.patientPackageFK === row.value,
       )
       if (data.length > 0) {
-        label = `${data[0].packageCode} - ${data[0].packageName}`
+        label = `${data[0].packageCode} - ${data[0].packageName} (Total: `
         expiryDateLabel = `Exp. Date: ${data[0].expiryDate ? moment(data[0].expiryDate).format('DD MMM YYYY') : '-'}`
       }
       return (
         <span style={{ verticalAlign: 'middle' }}>
           <strong>
-            {label}             
+            {label}
+            <NumberInput text currency value={data[0].packageTotalPrice} />
+            )              
           </strong>
           <span style={{ marginLeft: theme.spacing(5) }}>
             {expiryDateLabel}
