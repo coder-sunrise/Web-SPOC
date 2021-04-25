@@ -8,6 +8,7 @@ import {
   Tooltip,
   NumberInput,
 } from '@/components'
+import { roundTo } from '@/utils/utils'
 import Yup from '@/utils/yup'
 import DeleteConfirmation from '@/pages/Finance/Invoice/components/modal/DeleteConfirmation'
 
@@ -331,8 +332,8 @@ const Grid = ({
     const outstandingAmt = totalAftGST - getTotalPaid()
     return addedRows.map((row) => ({
       paymentDate: moment(),
-      outstandingAmt,
-      paymentAmount: outstandingAmt,
+      outstandingAmt: roundTo(outstandingAmt),
+      paymentAmount: roundTo(outstandingAmt),
       isCancelled: false,
       ...row,
     }))
