@@ -117,7 +117,7 @@ class index extends Component {
       if (isWriteOff) return false
       return true
     }
-    let height = mainDivHeight - 120
+    let height = mainDivHeight - 160
     if (height < 300) height = 300
     return (
       <AuthorizedContext.Provider
