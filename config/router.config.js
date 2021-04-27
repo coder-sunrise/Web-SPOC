@@ -55,13 +55,8 @@ const _routes = [
         icon: 'local_hospital',
         name: 'reception',
         moduleName: 'Reception',
-        authority: [
-          'reception',
-        ],
-        specialist: [
-          'GP',
-          'Dental',
-        ],
+        authority: [ 'reception' ],
+        specialist: [ 'GP', 'Dental' ],
         routes: [
           {
             path: '/reception/queue',
@@ -137,13 +132,8 @@ const _routes = [
         icon: 'group',
         name: 'patient',
         moduleName: 'PatientDataBase',
-        authority: [
-          'patientdatabase',
-        ],
-        specialist: [
-          'GP',
-          'Dental',
-        ],
+        authority: [ 'patientdatabase' ],
+        specialist: [ 'GP', 'Dental' ],
         component: './PatientDatabase/Search',
         // routes: [
         //   // {
@@ -343,12 +333,8 @@ const _routes = [
         icon: 'attach_money',
         name: 'finance',
         moduleName: 'Finance',
-        authority: [
-          'finance',
-        ],
-        specialist: [
-          'GP',
-        ],
+        authority: [ 'finance' ],
+        specialist: [ 'GP' ],
         routes: [
           {
             path: '/finance/invoice',
@@ -673,6 +659,12 @@ const _routes = [
             component: './Report/XeroInvoicesReport',
             authority: [ 'report.finance.xeroinvoicesreport' ],
           },
+          {
+            path: '/report/expiringstockreport',
+            name: 'expiringstockreport',
+            component: './Report/expiringstockreport',
+            authority: [ 'report.inventory.expiringstockreport' ],
+          },
         ],
       },
       // Report
@@ -750,13 +742,8 @@ const _routes = [
         icon: 'settings',
         name: 'setting',
         moduleName: 'Settings',
-        authority: [
-          'settings',
-        ],
-        specialist: [
-          'GP',
-          'Dental',
-        ],
+        authority: [ 'settings' ],
+        specialist: [ 'GP', 'Dental' ],
         hideChildrenInMenu: true,
         routes: [
           {
