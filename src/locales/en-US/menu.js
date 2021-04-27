@@ -180,6 +180,7 @@ export default {
   'menu.report.saleslistingbyperformer': 'Sales Listing By Performer Report',
   'menu.report.packageexpiry': 'Package Expiry Report',
   'menu.report.viewreport': 'View Report',
+  'menu.report.expiringstockreport': 'Expiring Stock Report',
 
   'menu.report.visitListingReport': 'Visit Listing Report',
 
