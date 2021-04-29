@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 // formik
 import { withFormik } from 'formik'
 import { formatMessage } from 'umi/locale'
@@ -19,7 +20,10 @@ import {
 import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../TableGrid'
 // variables
-import { DraftMedisaveColumnExtensions, DraftMedisaveColumns } from './variables'
+import {
+  DraftMedisaveColumnExtensions,
+  DraftMedisaveColumns,
+} from './variables'
 
 const styles = (theme) => ({
   cardContainer: {
@@ -31,8 +35,9 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ medisaveClaimSubmissionDraft }) => ({
+@connect(({ medisaveClaimSubmissionDraft, global }) => ({
   medisaveClaimSubmissionDraft,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withFormik({
   mapPropsToValues: () => ({}),
@@ -65,9 +70,9 @@ class DraftMedisave extends React.Component {
       .then((r) => {
         if (!r) {
           this.refreshDataGrid()
-            notification.success({
-              message: 'Patient Info Updated.',
-            })
+          notification.success({
+            message: 'Patient Info Updated.',
+          })
         }
       })
   }
@@ -86,10 +91,16 @@ class DraftMedisave extends React.Component {
       handleContextMenuItemClick,
       values,
       dispatch,
+      mainDivHeight = 700,
     } = this.props
     const { list } = medisaveClaimSubmissionDraft || []
-    
+
     const { selectedRows } = this.state
+    let height =
+      mainDivHeight - 230 - $('.filterBar').height() ||
+      0 - $('.footerBar').height() ||
+      0
+    if (height < 300) height = 300
     return (
       <CardContainer
         hideHeader
@@ -98,19 +109,20 @@ class DraftMedisave extends React.Component {
           marginRight: 5,
         }}
       >
-        <BaseSearchBar
-          hideInvoiceDate
-          dispatch={dispatch}
-          values={values}
-          modelsName='medisaveClaimSubmissionDraft'
-        />
+        <div className='filterBar'>
+          <BaseSearchBar
+            hideInvoiceDate
+            dispatch={dispatch}
+            values={values}
+            modelsName='medisaveClaimSubmissionDraft'
+          />
+        </div>
         <GridContainer>
           <GridItem md={12}>
             <TableGrid
               data={list}
               columnExtensions={DraftMedisaveColumnExtensions}
               columns={DraftMedisaveColumns}
-              // tableConfig={TableConfig}
               FuncProps={{
                 selectable: true,
                 selectConfig: {
@@ -124,31 +136,36 @@ class DraftMedisave extends React.Component {
               contextMenuOptions={overrideContextMenuOptions}
               isDraft
               type='draft'
+              height={height}
             />
           </GridItem>
-          <GridItem md={4} className={classes.buttonGroup}>
-            <Tooltip
-              placement='bottom-start'
-              title={formatMessage({
-                id:
-                  'claimsubmission.invoiceClaim.refreshPatientDetail.tooltips',
-              })}
-            >
-              <div style={{ display: 'inline-block' }}>
-                <ProgressButton
-                  icon={null}
-                  color='info'
-                  disabled={selectedRows.length <= 0}
-                  onClick={this.onRefreshClicked}
-                >
-                  {formatMessage({
-                    id: 'claimsubmission.invoiceClaim.refreshPatientDetail',
-                  })}
-                </ProgressButton>
-              </div>
-            </Tooltip>
-          </GridItem>
         </GridContainer>
+        <div className='footerBar'>
+          <GridContainer>
+            <GridItem md={12} className={classes.buttonGroup}>
+              <Tooltip
+                placement='bottom-start'
+                title={formatMessage({
+                  id:
+                    'claimsubmission.invoiceClaim.refreshPatientDetail.tooltips',
+                })}
+              >
+                <div style={{ display: 'inline-block' }}>
+                  <ProgressButton
+                    icon={null}
+                    color='info'
+                    disabled={selectedRows.length <= 0}
+                    onClick={this.onRefreshClicked}
+                  >
+                    {formatMessage({
+                      id: 'claimsubmission.invoiceClaim.refreshPatientDetail',
+                    })}
+                  </ProgressButton>
+                </div>
+              </Tooltip>
+            </GridItem>
+          </GridContainer>
+        </div>
       </CardContainer>
     )
   }

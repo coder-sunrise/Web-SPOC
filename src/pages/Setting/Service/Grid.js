@@ -5,12 +5,7 @@ import { CommonTableGrid, Button, Tooltip } from '@/components'
 
 class Grid extends PureComponent {
   editRow = async (row) => {
-    const { dispatch, settingClinicService } = this.props
-
-    // const queryServiceDetails = async () => {
-    //   return await queryOne(row.serviceId)
-    // }
-    // console.log({ row })
+    const { dispatch } = this.props
     const serviceList = await dispatch({
       type: 'settingClinicService/queryOne',
       payload: {
@@ -18,15 +13,11 @@ class Grid extends PureComponent {
       },
     })
 
-    // const serviceList = await queryServiceDetails()
-
     if (serviceList) {
       let serviceInfo = serviceList
-      // console.log(serviceInfo)
       serviceInfo.ctServiceCenter_ServiceNavigation.map((x) => {
         delete x.serviceCenterFKNavigation
       })
-      // console.log('test', serviceInfo)
 
       serviceInfo = {
         ...serviceInfo,
@@ -39,7 +30,6 @@ class Grid extends PureComponent {
       dispatch({
         type: 'settingClinicService/updateState',
         payload: {
-          // showModal: true,
           entity: serviceInfo,
         },
       })
@@ -49,13 +39,16 @@ class Grid extends PureComponent {
   }
 
   render () {
+    const { height } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
         getRowId={(r) => r.serviceCenter_ServiceId}
         type='settingClinicService'
         onRowDoubleClick={this.editRow}
-        // getRowId={(row) => row.serviceId}
+        TableProps={{
+          height,
+        }}
         columns={[
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },

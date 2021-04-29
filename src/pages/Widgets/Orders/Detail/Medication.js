@@ -196,8 +196,8 @@ const getVisitDoctorUserId = (props) => {
         newCorPrescriptionItemPrecaution.length > 0
           ? newCorPrescriptionItemPrecaution
           : [
-            {},
-          ],
+              {},
+            ],
       corPrescriptionItemDrugMixture:
         newCorPrescriptionItemDrugMixture.length > 0
           ? newCorPrescriptionItemDrugMixture
@@ -296,12 +296,12 @@ const getVisitDoctorUserId = (props) => {
           instruction += `${item.usageMethodDisplayValue
             ? item.usageMethodDisplayValue
             : ''} ${item.dosageDisplayValue
-              ? item.dosageDisplayValue
-              : ''} ${item.prescribeUOMDisplayValue
-                ? item.prescribeUOMDisplayValue
-                : ''} ${item.drugFrequencyDisplayValue
-                  ? item.drugFrequencyDisplayValue
-                  : ''}${itemDuration}${nextStepdose}`
+            ? item.dosageDisplayValue
+            : ''} ${item.prescribeUOMDisplayValue
+            ? item.prescribeUOMDisplayValue
+            : ''} ${item.drugFrequencyDisplayValue
+            ? item.drugFrequencyDisplayValue
+            : ''}${itemDuration}${nextStepdose}`
         }
       }
       return instruction
@@ -332,13 +332,13 @@ const getVisitDoctorUserId = (props) => {
         batchNo = batchNo[0]
       }
     }
- 
+
     if (values.corPrescriptionItemDrugMixture) {
       const activeDrugMixtureItems = values.corPrescriptionItemDrugMixture.filter(
         (item) => !item.isDeleted,
       )
       // reorder and overwrite sequence, get combined drug name
-      activeDrugMixtureItems.forEach((item, index) => { 
+      activeDrugMixtureItems.forEach((item, index) => {
         if (item.isNew && item.id < 0) item.id = undefined
       })
     }
@@ -670,15 +670,15 @@ class Medication extends PureComponent {
     const isEdit = !!values.id
     const newPrescriptionInstruction = isEdit
       ? [
-        ...corPrescriptionItemInstruction.map((i) => ({
-          ...i,
-          isDeleted: true,
-        })),
-        defaultInstruction,
-      ]
+          ...corPrescriptionItemInstruction.map((i) => ({
+            ...i,
+            isDeleted: true,
+          })),
+          defaultInstruction,
+        ]
       : [
-        defaultInstruction,
-      ]
+          defaultInstruction,
+        ]
 
     setFieldValue('corPrescriptionItemInstruction', newPrescriptionInstruction)
 
@@ -721,15 +721,15 @@ class Medication extends PureComponent {
       }
       const newPrescriptionPrecaution = isEdit
         ? [
-          ...corPrescriptionItemPrecaution.map((i) => ({
-            ...i,
-            isDeleted: true,
-          })),
-          defaultPrecaution,
-        ]
+            ...corPrescriptionItemPrecaution.map((i) => ({
+              ...i,
+              isDeleted: true,
+            })),
+            defaultPrecaution,
+          ]
         : [
-          defaultPrecaution,
-        ]
+            defaultPrecaution,
+          ]
 
       setFieldValue(`corPrescriptionItemPrecaution`, newPrescriptionPrecaution)
     }
@@ -947,7 +947,7 @@ class Medication extends PureComponent {
         'drugName',
         (drugName === ''
           ? option.displayValue
-          : `${drugName}/${option.displayValue}`).substring(0, 70),
+          : `${drugName}/${option.displayValue}`).substring(0, 60),
       )
     }
 
@@ -1251,7 +1251,9 @@ class Medication extends PureComponent {
       const { handleSubmit, validateForm } = this.props
       const validateResult = await validateForm()
       const isFormValid = _.isEmpty(validateResult)
-      if (!isFormValid) { handleSubmit() }
+      if (!isFormValid) {
+        handleSubmit()
+      }
     }, 300)
   }
 
@@ -1287,33 +1289,33 @@ class Medication extends PureComponent {
         <div>
           <GridContainer>
             {!openPrescription &&
-              !values.isDrugMixture && (
-                <GridItem xs={6}>
-                  <Field
-                    name='inventoryMedicationFK'
-                    render={(args) => {
-                      return (
-                        <div
-                          id={`autofocus_${values.type}`}
-                          style={{ position: 'relative' }}
-                        >
-                          <CodeSelect
-                            temp
-                            label='Medication Name'
-                            labelField='combinDisplayValue'
-                            onChange={this.changeMedication}
-                            options={this.getMedicationOptions()}
-                            {...args}
-                            style={{ paddingRight: 20 }}
-                            disabled={values.isPackage}
-                          />
-                          <LowStockInfo sourceType='medication' {...this.props} />
-                        </div>
-                      )
-                    }}
-                  />
-                </GridItem>
-              )}
+            !values.isDrugMixture && (
+              <GridItem xs={6}>
+                <Field
+                  name='inventoryMedicationFK'
+                  render={(args) => {
+                    return (
+                      <div
+                        id={`autofocus_${values.type}`}
+                        style={{ position: 'relative' }}
+                      >
+                        <CodeSelect
+                          temp
+                          label='Medication Name'
+                          labelField='combinDisplayValue'
+                          onChange={this.changeMedication}
+                          options={this.getMedicationOptions()}
+                          {...args}
+                          style={{ paddingRight: 20 }}
+                          disabled={values.isPackage}
+                        />
+                        <LowStockInfo sourceType='medication' {...this.props} />
+                      </div>
+                    )
+                  }}
+                />
+              </GridItem>
+            )}
             {openPrescription && (
               <GridItem xs={6}>
                 <FastField
@@ -1344,7 +1346,7 @@ class Medication extends PureComponent {
                             label='Drug Mixture'
                             {...args}
                             autocomplete='nope'
-                            maxLength={70}
+                            maxLength={60}
                           />
                         </div>
                       )
@@ -1365,7 +1367,7 @@ class Medication extends PureComponent {
                         fontWeight: 500,
                       }}
                     >
-                      {`Characters left: ${70 -
+                      {`Characters left: ${60 -
                         (drugName ? drugName.length : 0)}`}
                     </span>
                   </div>
@@ -1422,20 +1424,20 @@ class Medication extends PureComponent {
             </GridItem>
             <GridItem xs={4}>
               {!openPrescription &&
-                !isEditMedication && (
-                  <Tooltip title='Add From Past'>
-                    <ProgressButton
-                      color='primary'
-                      icon={<Add />}
-                      style={{
-                        marginTop: theme.spacing(2),
-                      }}
-                      onClick={this.onSearchMedicationHistory}
-                    >
-                      Add From Past
+              !isEditMedication && (
+                <Tooltip title='Add From Past'>
+                  <ProgressButton
+                    color='primary'
+                    icon={<Add />}
+                    style={{
+                      marginTop: theme.spacing(2),
+                    }}
+                    onClick={this.onSearchMedicationHistory}
+                  >
+                    Add From Past
                   </ProgressButton>
-                  </Tooltip>
-                )}
+                </Tooltip>
+              )}
             </GridItem>
           </GridContainer>
           {values.isDrugMixture && (
@@ -1537,7 +1539,7 @@ class Medication extends PureComponent {
                                       </span>
                                       <span>
                                         {`${o.message}${index <
-                                          cautions.length - 1
+                                        cautions.length - 1
                                           ? '; '
                                           : ''}`}
                                       </span>
@@ -1961,7 +1963,9 @@ class Medication extends PureComponent {
                   return (
                     <DatePicker
                       label='Expiry Date'
-                      onChange={() => { this.onExpiryDateChange() }}
+                      onChange={() => {
+                        this.onExpiryDateChange()
+                      }}
                       disabled={values.isExternalPrescription}
                       {...args}
                     />
@@ -2211,8 +2215,8 @@ class Medication extends PureComponent {
           <GridContainer>
             <GridItem xs={8} className={classes.editor}>
               {values.visitPurposeFK !== VISIT_TYPE.RETAIL &&
-                !values.isDrugMixture &&
-                !values.isPackage ? (
+              !values.isDrugMixture &&
+              !values.isPackage ? (
                 <FastField
                   name='isExternalPrescription'
                   render={(args) => {

@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-
+import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
@@ -11,61 +11,66 @@ import Grid from './Grid'
 import Detail from './Detail'
 
 const styles = (theme) => ({
-    ...basicStyle(theme),
+  ...basicStyle(theme),
 })
 
 @connect(({ settingCaseDescription, global }) => ({
-    settingCaseDescription,
-    global,
+  settingCaseDescription,
+  global,
+  mainDivHeight: global.mainDivHeight,
 }))
-    @withSettingBase({ modelName: 'settingCaseDescription' })
+@withSettingBase({ modelName: 'settingCaseDescription' })
 class CaseDescription extends PureComponent {
-    state = {}
+  state = {}
 
-    componentDidMount() {
-        this.props.dispatch({
-            type: 'settingCaseDescription/query',
-        })
-    }
+  componentDidMount () {
+    this.props.dispatch({
+      type: 'settingCaseDescription/query',
+    })
+  }
 
-    toggleModal = () => {
-        this.props.dispatch({
-            type: 'settingCaseDescription/updateState',
-            payload: {
-                showModal: !this.props.settingCaseDescription.showModal,
-            },
-        })
-    }
+  toggleModal = () => {
+    this.props.dispatch({
+      type: 'settingCaseDescription/updateState',
+      payload: {
+        showModal: !this.props.settingCaseDescription.showModal,
+      },
+    })
+  }
 
-    render() {
-        const { settingCaseDescription } = this.props
-        const cfg = {
-            toggleModal: this.toggleModal,
-        }
-        return (
-            <CardContainer hideHeader>
-                <Filter {...cfg} {...this.props} />
-                <Grid {...cfg} {...this.props} />
-                <CommonModal
-                    open={settingCaseDescription.showModal}
-                    observe='CaseDescriptionDetail'
-                    title={
-                        settingCaseDescription.entity ? (
-                            'Edit Case Description'
-                        ) : (
-                                'Add Case Description'
-                            )
-                    }
-                    maxWidth='md'
-                    bodyNoPadding
-                    onClose={this.toggleModal}
-                    onConfirm={this.toggleModal}
-                >
-                <Detail {...cfg} {...this.props} />
-                </CommonModal>
-            </CardContainer>
-        )
+  render () {
+    const { settingCaseDescription, mainDivHeight = 700 } = this.props
+    const cfg = {
+      toggleModal: this.toggleModal,
     }
+    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
+    return (
+      <CardContainer hideHeader>
+        <div className='filterBar'>
+          <Filter {...cfg} {...this.props} />
+        </div>
+        <Grid {...cfg} {...this.props} height={height} />
+        <CommonModal
+          open={settingCaseDescription.showModal}
+          observe='CaseDescriptionDetail'
+          title={
+            settingCaseDescription.entity ? (
+              'Edit Case Description'
+            ) : (
+              'Add Case Description'
+            )
+          }
+          maxWidth='md'
+          bodyNoPadding
+          onClose={this.toggleModal}
+          onConfirm={this.toggleModal}
+        >
+          <Detail {...cfg} {...this.props} />
+        </CommonModal>
+      </CardContainer>
+    )
+  }
 }
 
 export default withStyles(styles, { withTheme: true })(CaseDescription)

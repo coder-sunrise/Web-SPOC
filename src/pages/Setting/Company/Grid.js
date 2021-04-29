@@ -2,16 +2,9 @@ import React, { PureComponent, Fragment } from 'react'
 import Edit from '@material-ui/icons/Edit'
 import Print from '@material-ui/icons/Print'
 import { connect } from 'dva'
-import {
-  CommonTableGrid,
-  Button,
-  Tooltip,
-  notification,
-  CommonModal,
-} from '@/components'
+import { CommonTableGrid, Button, Tooltip, notification } from '@/components'
 import { status, gstEnabled } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
-import { ReportViewer } from '@/components/_medisys'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 import { getRawData } from '@/services/report'
 import { REPORT_ID } from '@/utils/constants'
@@ -20,11 +13,6 @@ import { REPORT_ID } from '@/utils/constants'
   clinicSettings,
 }))
 class Grid extends PureComponent {
-  state = {
-    showReport: false,
-    selectedPrintCopayerId: null,
-  }
-
   FuncConfig = {
     sort: true,
     sortConfig: {
@@ -38,7 +26,10 @@ class Grid extends PureComponent {
   editRow = (row, e) => {
     const { dispatch, settingCompany, route } = this.props
     const { name } = route
-    const accessRight = name === 'copayer' ? Authorized.check('copayer.copayerdetails') : Authorized.check('settings.supplier.supplierdetails')
+    const accessRight =
+      name === 'copayer'
+        ? Authorized.check('copayer.copayerdetails')
+        : Authorized.check('settings.supplier.supplierdetails')
 
     if (accessRight && accessRight.rights !== 'enable') {
       notification.error({
@@ -73,10 +64,17 @@ class Grid extends PureComponent {
         .join('_')
     }
     const { route } = this.props
-    const reportID = 
-      REPORT_ID[(route.name === 'copayer' ? 'COPAYER_ADDRESS_LABEL_' : 'SUPPLIER_ADDRESS_LABEL_').concat(sizeConverter(labelPrinterSize))]
+    const reportID =
+      REPORT_ID[
+        (route.name === 'copayer'
+          ? 'COPAYER_ADDRESS_LABEL_'
+          : 'SUPPLIER_ADDRESS_LABEL_').concat(sizeConverter(labelPrinterSize))
+      ]
 
-    const data = await getRawData(reportID, route.name === 'copayer' ? { copayerId } : { supplierId: copayerId })
+    const data = await getRawData(
+      reportID,
+      route.name === 'copayer' ? { copayerId } : { supplierId: copayerId },
+    )
     const payload = [
       {
         ReportId: reportID,
@@ -88,18 +86,18 @@ class Grid extends PureComponent {
     handlePrint(JSON.stringify(payload))
   }
 
-  render() {
-    const { settingCompany, route } = this.props
+  render () {
+    const { route, height } = this.props
     const { name } = route
-    const { companyType } = settingCompany
-    const { showReport, selectedPrintCopayerId } = this.state
-
     return (
       <Fragment>
         <CommonTableGrid
           style={{ margin: 0 }}
           type='settingCompany'
           onRowDoubleClick={this.editRow}
+          TableProps={{
+            height,
+          }}
           FuncProps={this.FuncConfig}
           forceRender
           columns={
@@ -128,30 +126,29 @@ class Grid extends PureComponent {
                 { name: 'action', title: 'Action' },
               ]
             ) : (
-                [
-                  {
-                    name: 'code',
-                    title: 'Company Code',
-                  },
+              [
+                {
+                  name: 'code',
+                  title: 'Company Code',
+                },
 
-                  {
-                    name: 'displayValue',
-                    title: 'Company Name',
-                  },
+                {
+                  name: 'displayValue',
+                  title: 'Company Name',
+                },
 
-                  { name: 'contactPerson', title: 'Contact Person' },
-                  { name: 'contactNo', title: 'Contact No.' },
+                { name: 'contactPerson', title: 'Contact Person' },
+                { name: 'contactNo', title: 'Contact No.' },
 
-                  { name: 'officeNum', title: 'Office Number' },
+                { name: 'officeNum', title: 'Office Number' },
 
-                  { name: 'faxNo', title: 'Fax Number' },
-                  { name: 'isGSTEnabled', title: 'GST Enable' },
-                  { name: 'isActive', title: 'Status' },
-                  { name: 'action', title: 'Action' },
-                ]
-              )
+                { name: 'faxNo', title: 'Fax Number' },
+                { name: 'isGSTEnabled', title: 'GST Enable' },
+                { name: 'isActive', title: 'Status' },
+                { name: 'action', title: 'Action' },
+              ]
+            )
           }
-          // FuncProps={{ pager: false }}
           columnExtensions={[
             {
               columnName: 'url',
@@ -164,21 +161,21 @@ class Grid extends PureComponent {
                     target='_blank'
                     href={
                       row.contact &&
-                        row.contact.contactWebsite &&
-                        row.contact.contactWebsite.website !== '' ? (
-                          row.contact.contactWebsite.website
-                        ) : (
-                          '-'
-                        )
-                    }
-                  >
-                    {row.contact &&
                       row.contact.contactWebsite &&
                       row.contact.contactWebsite.website !== '' ? (
                         row.contact.contactWebsite.website
                       ) : (
                         '-'
-                      )}
+                      )
+                    }
+                  >
+                    {row.contact &&
+                    row.contact.contactWebsite &&
+                    row.contact.contactWebsite.website !== '' ? (
+                      row.contact.contactWebsite.website
+                    ) : (
+                      '-'
+                    )}
                   </a>
                 )
               },
@@ -195,12 +192,12 @@ class Grid extends PureComponent {
               render: (row) => (
                 <span>
                   {row.contact &&
-                    row.contact.officeContactNumber &&
-                    row.contact.officeContactNumber.number !== '' ? (
-                      row.contact.officeContactNumber.number
-                    ) : (
-                      '-'
-                    )}
+                  row.contact.officeContactNumber &&
+                  row.contact.officeContactNumber.number !== '' ? (
+                    row.contact.officeContactNumber.number
+                  ) : (
+                    '-'
+                  )}
                 </span>
               ),
             },
@@ -217,12 +214,12 @@ class Grid extends PureComponent {
               render: (row) => (
                 <span>
                   {row.contact &&
-                    row.contact.faxContactNumber &&
-                    row.contact.faxContactNumber.number !== '' ? (
-                      row.contact.faxContactNumber.number
-                    ) : (
-                      '-'
-                    )}
+                  row.contact.faxContactNumber &&
+                  row.contact.faxContactNumber.number !== '' ? (
+                    row.contact.faxContactNumber.number
+                  ) : (
+                    '-'
+                  )}
                 </span>
               ),
             },
@@ -238,12 +235,12 @@ class Grid extends PureComponent {
               render: (row) => (
                 <span>
                   {row.contact &&
-                    row.contact.mobileContactNumber &&
-                    row.contact.mobileContactNumber.number !== '' ? (
-                      row.contact.mobileContactNumber.number
-                    ) : (
-                      '-'
-                    )}
+                  row.contact.mobileContactNumber &&
+                  row.contact.mobileContactNumber.number !== '' ? (
+                    row.contact.mobileContactNumber.number
+                  ) : (
+                    '-'
+                  )}
                 </span>
               ),
             },
@@ -267,67 +264,60 @@ class Grid extends PureComponent {
               align: 'center',
               width: 100,
               render: (row) => {
-                return (
-                  name === 'copayer' ?
-                    <Authorized authority='copayer.copayerdetails'>
-                      <Fragment>
-                        <Tooltip
-                          title='Edit Co-Payer'
-                          placement='bottom'
+                return name === 'copayer' ? (
+                  <Authorized authority='copayer.copayerdetails'>
+                    <Fragment>
+                      <Tooltip title='Edit Co-Payer' placement='bottom'>
+                        <Button
+                          size='sm'
+                          onClick={() => {
+                            this.editRow(row)
+                          }}
+                          justIcon
+                          color='primary'
                         >
-                          <Button
-                            size='sm'
-                            onClick={() => {
-                              this.editRow(row)
-                            }}
-                            justIcon
-                            color='primary'
-                          >
-                            <Edit />
-                          </Button>
-                        </Tooltip>
-                        <Tooltip title='Print Copayer Label' placement='bottom'>
-                          <Button
-                            size='sm'
-                            justIcon
-                            color='primary'
-                            onClick={() => this.handleClick(row.id)}
-                          >
-                            <Print />
-                          </Button>
-                        </Tooltip>
-                      </Fragment>
-                    </Authorized>
-                    :
-                    <Authorized authority='settings.supplier.supplierdetails'>
-                      <Fragment>
-                        <Tooltip
-                          title="Edit Supplier"
-                          placement='bottom'
+                          <Edit />
+                        </Button>
+                      </Tooltip>
+                      <Tooltip title='Print Copayer Label' placement='bottom'>
+                        <Button
+                          size='sm'
+                          justIcon
+                          color='primary'
+                          onClick={() => this.handleClick(row.id)}
                         >
-                          <Button
-                            size='sm'
-                            onClick={() => {
-                              this.editRow(row)
-                            }}
-                            justIcon
-                            color='primary'
-                          >
-                            <Edit />
-                          </Button>
-                        </Tooltip>
-                        <Tooltip title='Print Supplier Label' placement='bottom'>
-                          <Button
-                            size='sm'
-                            justIcon
-                            color='primary'
-                            onClick={() => this.handleClick(row.id)}
-                          >
-                            <Print />
-                          </Button>
-                        </Tooltip>
-                      </Fragment>
-                    </Authorized>
+                          <Print />
+                        </Button>
+                      </Tooltip>
+                    </Fragment>
+                  </Authorized>
+                ) : (
+                  <Authorized authority='settings.supplier.supplierdetails'>
+                    <Fragment>
+                      <Tooltip title='Edit Supplier' placement='bottom'>
+                        <Button
+                          size='sm'
+                          onClick={() => {
+                            this.editRow(row)
+                          }}
+                          justIcon
+                          color='primary'
+                        >
+                          <Edit />
+                        </Button>
+                      </Tooltip>
+                      <Tooltip title='Print Supplier Label' placement='bottom'>
+                        <Button
+                          size='sm'
+                          justIcon
+                          color='primary'
+                          onClick={() => this.handleClick(row.id)}
+                        >
+                          <Print />
+                        </Button>
+                      </Tooltip>
+                    </Fragment>
+                  </Authorized>
                 )
               },
             },

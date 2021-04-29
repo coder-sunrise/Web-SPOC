@@ -9,20 +9,18 @@ import { CommonTableGrid, Tooltip } from '@/components'
 // sub component
 
 const TableGrid = ({
-  data,
   columns,
   columnExtensions,
-  tableConfig,
   FuncProps,
   selection,
   onSelectionChange,
   onContextMenuItemClick,
   contextMenuOptions = undefined,
   type,
+  height,
 }) => {
   const Cell = React.memo(({ ...tableProps }) => {
     const handleMenuItemClick = (row, id) => {
-      // onContextMenuItemClick(event.currentTarget, tableProps.row)
       onContextMenuItemClick(row, id)
     }
 
@@ -100,6 +98,9 @@ const TableGrid = ({
       selection={selection}
       onSelectionChange={onSelectionChange}
       ActionProps={{ TableCellComponent: Cell }}
+      TableProps={{
+        height,
+      }}
     />
   )
 }

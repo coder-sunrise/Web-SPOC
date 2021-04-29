@@ -77,7 +77,6 @@ const recurrenceTypes = [
     props.dispatch({
       type: 'doctorBlock/query',
       payload: {
-        // [`${prefix}name`]: values.doctorName,
         [`${prefix}DoctorBlockGroupFKNavigation.DoctorBlockUserFkNavigation.ClinicianProfile.DoctorProfileFkNavigation.Id`]: doctorIDs,
         lgteql_startDateTime: values.dateFrom
           ? moment(values.dateFrom).formatUTC()
@@ -103,7 +102,6 @@ class Filter extends PureComponent {
 
   render () {
     const { classes, values, handleSubmit } = this.props
-    // console.log({ values })
     return (
       <div className={classes.filterBar}>
         <GridContainer>
@@ -170,7 +168,7 @@ class Filter extends PureComponent {
         </GridContainer>
 
         <GridContainer>
-          <GridItem xs={6} md={4}>
+          <GridItem>
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'

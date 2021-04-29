@@ -1,10 +1,9 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-
-import { withStyles, Divider } from '@material-ui/core'
+import $ from 'jquery'
+import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 import { CardContainer, CommonModal, withSettingBase } from '@/components'
-import Authorized from '@/utils/Authorized'
 import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
@@ -13,8 +12,9 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingCompany }) => ({
+@connect(({ settingCompany, global }) => ({
   settingCompany,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withSettingBase({ modelName: 'settingCompany' })
 class Supplier extends PureComponent {
@@ -51,23 +51,20 @@ class Supplier extends PureComponent {
   }
 
   render () {
-    const {
-      classes,
-      settingCompany,
-      dispatch,
-      theme,
-      route,
-      ...restProps
-    } = this.props
+    const { settingCompany, route, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
     const { name } = route
     const companyType = name === 'copayer' ? 'Co-Payer' : 'Supplier'
+    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <Filter {...cfg} {...this.props} />
-        <Grid {...cfg} {...this.props} />
+        <div className='filterBar'>
+          <Filter {...cfg} {...this.props} />
+        </div>
+        <Grid {...cfg} {...this.props} height={height} />
 
         <CommonModal
           open={settingCompany.showModal}

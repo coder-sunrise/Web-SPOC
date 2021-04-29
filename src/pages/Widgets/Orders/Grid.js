@@ -394,8 +394,8 @@ export default ({
       columns={[
         { name: 'type', title: 'Type' },
         { name: 'subject', title: 'Name' },
-        { name: 'description', title: 'Description' },
-        { name: 'quantity', title: 'Quantity' },
+        { name: 'description', title: 'Instructions' },
+        { name: 'quantity', title: 'Qty.' },
         { name: 'adjAmount', title: 'Adj.' },
         { name: 'totalAfterItemAdjustment', title: 'Total' },
         { name: 'actions', title: 'Actions' },
@@ -475,7 +475,7 @@ export default ({
               if (isExistPackage) {
                 newChildren = [
                   <Table.Cell colSpan={3} key={1} />,
-                  React.cloneElement(children[5], {
+                  React.cloneElement(children[6], {
                     colSpan: 3,
                     ...restProps,
                   }),
@@ -483,7 +483,7 @@ export default ({
               } else {
                 newChildren = [
                   <Table.Cell colSpan={2} key={1} />,
-                  React.cloneElement(children[4], {
+                  React.cloneElement(children[5], {
                     colSpan: 2,
                     ...restProps,
                   }),
@@ -513,7 +513,7 @@ export default ({
                 const itemSubTotal = items.splice(items.length - 1)
                 return (
                   <Table.Cell
-                    colSpan={4}
+                    colSpan={5}
                     style={{
                       fontSize: 'inherit',
                       color: 'inherit',
@@ -526,7 +526,7 @@ export default ({
                         style={{
                           marginLeft: isExistPackage
                             ? theme.spacing(23)
-                            : theme.spacing(31),
+                            : theme.spacing(28),
                         }}
                       >
                         {itemSubTotal}
@@ -608,7 +608,7 @@ export default ({
       columnExtensions={[
         {
           columnName: 'type',
-          width: 150,
+          width: 140,
           render: (row) => {
             const otype = orderTypes.find((o) => o.value === row.type)
             let texts = []
@@ -674,7 +674,7 @@ export default ({
                     whiteSpace: 'pre-wrap',
                   }}
                 >
-                  {row.instruction || row.remark || row.remarks || ''}
+                  {row.instruction || ''}
                 </div>
               </Tooltip>
             )
@@ -683,7 +683,7 @@ export default ({
         {
           columnName: 'adjAmount',
           type: 'currency',
-          width: 90,
+          width: 80,
         },
         {
           columnName: 'totalAfterItemAdjustment',
@@ -695,7 +695,7 @@ export default ({
           type: 'number',
           width: 100,
           render: (row) => {
-            let qty
+            let qty = '0.0'
             if (row.type === '1' || row.type === '5') {
               qty = `${numeral(row.quantity || 0).format(
                 '0,0.0',
@@ -711,7 +711,11 @@ export default ({
                 '0,0.0',
               )} ${row.unitOfMeasurement}`
             }
-            return <p>{qty}</p>
+            return (
+              <Tooltip title={qty}>
+                <span>{qty}</span>
+              </Tooltip>
+            )
           },
         },
         {

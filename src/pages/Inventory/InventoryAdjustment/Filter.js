@@ -57,7 +57,6 @@ class Filter extends PureComponent {
       type: 'inventoryAdjustment/updateState',
       payload: {
         entity: undefined,
-        // showModal: !inventoryAdjustment.showModal,
         default: {
           ...inventoryAdjustment.default,
           stockList: result.data,
@@ -122,7 +121,7 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={6} md={6}>
+          <GridItem xs={12} md={12}>
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'
@@ -201,12 +200,12 @@ class Filter extends PureComponent {
                 disablePortal
                 placement='bottom-end'
                 style={{
-                  zIndex: 1,
+                  zIndex: 999,
                   width: 185,
                   left: -63,
                 }}
               >
-                {({ TransitionProps, placement }) => (
+                {({ TransitionProps }) => (
                   <Grow
                     {...TransitionProps}
                     id='menu-list'

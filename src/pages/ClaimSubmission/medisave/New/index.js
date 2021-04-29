@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 // formik
 import { withFormik } from 'formik'
 // material ui
@@ -32,8 +33,9 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ medisaveClaimSubmissionNew }) => ({
+@connect(({ medisaveClaimSubmissionNew, global }) => ({
   medisaveClaimSubmissionNew,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withFormik({
   mapPropsToValues: () => ({}),
@@ -45,7 +47,6 @@ class NewMedisave extends React.Component {
   }
 
   componentWillMount () {
-    // this.refreshDataGrid()
     this.props.dispatch({
       type: 'medisaveClaimSubmissionNew/query',
     })
@@ -61,9 +62,9 @@ class NewMedisave extends React.Component {
       .then((r) => {
         if (!r) {
           this.refreshDataGrid()
-            notification.success({
-              message: 'Patient Info Updated.',
-            })
+          notification.success({
+            message: 'Patient Info Updated.',
+          })
         }
       })
   }
@@ -92,15 +93,14 @@ class NewMedisave extends React.Component {
         .then((r) => {
           this.handleLoadingVisibility(false)
           if (r) {
-            const failedCount = r.filter(t => t.status !== 'SUCCESS').length
-            if(failedCount === 0){ 
+            const failedCount = r.filter((t) => t.status !== 'SUCCESS').length
+            if (failedCount === 0) {
               notification.success({
                 message: 'Claim Submission Success.',
               })
-            }
-            else {
+            } else {
               this.props.handleSubmitClaimStatus(failedCount)
-            } 
+            }
 
             this.refreshDataGrid()
           }
@@ -115,10 +115,15 @@ class NewMedisave extends React.Component {
       handleContextMenuItemClick,
       dispatch,
       values,
+      mainDivHeight = 700,
     } = this.props
     const { isLoading, selectedRows } = this.state
     const { list } = medisaveClaimSubmissionNew || []
-
+    let height =
+      mainDivHeight - 230 - $('.filterBar').height() ||
+      0 - $('.footerBar').height() ||
+      0
+    if (height < 300) height = 300
     return (
       <CardContainer
         hideHeader
@@ -127,11 +132,13 @@ class NewMedisave extends React.Component {
           marginRight: 5,
         }}
       >
-        <BaseSearchBar
-          dispatch={dispatch}
-          values={values}
-          modelsName='medisaveClaimSubmissionNew'
-        />
+        <div className='filterBar'>
+          <BaseSearchBar
+            dispatch={dispatch}
+            values={values}
+            modelsName='medisaveClaimSubmissionNew'
+          />
+        </div>
         <LoadingWrapper linear loading={isLoading} text='Submitting Claim...'>
           <GridContainer>
             <GridItem md={12}>
@@ -151,55 +158,48 @@ class NewMedisave extends React.Component {
                 onContextMenuItemClick={(row, id) =>
                   handleContextMenuItemClick(row, id, true)}
                 type='new'
+                height={height}
               />
-              {/* <CommonTableGrid
-                getRowId={(row) => row.id}
-                type='medisaveClaimSubmissionNew'
-                // rows={data}
-                columns={NewMedisaveColumns}
-                columnExtensions={NewMedisaveColumnExtensions}
-                // {...TableConfig}
-                // selection={selection}
-                // onSelectionChange={onSelectionChange}
-                // ActionProps={{ TableCellComponent: Cell }}
-              /> */}
-            </GridItem>
-
-            <GridItem md={4} className={classes.buttonGroup}>
-              <Tooltip
-                placement='bottom-start'
-                title={formatMessage({
-                  id:
-                    'claimsubmission.invoiceClaim.refreshPatientDetail.tooltips',
-                })}
-              >
-                <div style={{ display: 'inline-block' }}>
-                  <ProgressButton
-                    icon={null}
-                    color='info'
-                    disabled={selectedRows.length <= 0}
-                    onClick={this.onRefreshClicked}
-                  >
-                    {formatMessage({
-                      id: 'claimsubmission.invoiceClaim.refreshPatientDetail',
-                    })}
-                  </ProgressButton>
-                </div>
-              </Tooltip>
-              <Authorized authority='claimsubmission.submitclaim'>
-                <ProgressButton
-                  icon={null}
-                  color='primary'
-                  disabled={selectedRows.length <= 0}
-                  onClick={this.onSubmitClaimClicked}
-                >
-                  {formatMessage({
-                    id: 'claimsubmission.invoiceClaim.SubmitClaim',
-                  })}
-                </ProgressButton>
-              </Authorized>
             </GridItem>
           </GridContainer>
+          <div className='footerBar'>
+            <GridContainer>
+              <GridItem md={12} className={classes.buttonGroup}>
+                <Tooltip
+                  placement='bottom-start'
+                  title={formatMessage({
+                    id:
+                      'claimsubmission.invoiceClaim.refreshPatientDetail.tooltips',
+                  })}
+                >
+                  <div style={{ display: 'inline-block' }}>
+                    <ProgressButton
+                      icon={null}
+                      color='info'
+                      disabled={selectedRows.length <= 0}
+                      onClick={this.onRefreshClicked}
+                    >
+                      {formatMessage({
+                        id: 'claimsubmission.invoiceClaim.refreshPatientDetail',
+                      })}
+                    </ProgressButton>
+                  </div>
+                </Tooltip>
+                <Authorized authority='claimsubmission.submitclaim'>
+                  <ProgressButton
+                    icon={null}
+                    color='primary'
+                    disabled={selectedRows.length <= 0}
+                    onClick={this.onSubmitClaimClicked}
+                  >
+                    {formatMessage({
+                      id: 'claimsubmission.invoiceClaim.SubmitClaim',
+                    })}
+                  </ProgressButton>
+                </Authorized>
+              </GridItem>
+            </GridContainer>
+          </div>
         </LoadingWrapper>
       </CardContainer>
     )

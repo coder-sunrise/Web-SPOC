@@ -22,7 +22,7 @@ const purchaseOrderPaymentSchema = Yup.object().shape({
 })
 
 let commitCount = 1000 // uniqueNumber
-const Grid = ({ dispatch, values, setFieldValue, getTotalPaid }) => {
+const Grid = ({ dispatch, values, setFieldValue, getTotalPaid, height }) => {
   const [
     creditCardTypeList,
     setCreditCardTypeList,
@@ -279,6 +279,9 @@ const Grid = ({ dispatch, values, setFieldValue, getTotalPaid }) => {
           onAddedRowsChange,
         }}
         {...tableParas}
+        TableProps={{
+          height,
+        }}
       />
       <CommonModal
         open={showDeleteConfirmation}

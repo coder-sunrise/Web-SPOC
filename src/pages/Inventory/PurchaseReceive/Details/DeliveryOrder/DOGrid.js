@@ -1,8 +1,12 @@
 import React from 'react'
 import Edit from '@material-ui/icons/Edit'
-import { CardContainer, CommonTableGrid, Button } from '@/components'
+import { CommonTableGrid, Button } from '@/components'
 
-const DOGrid = ({ onEditDeliveryOrderClicked, deliveryOrderDetails }) => {
+const DOGrid = ({
+  onEditDeliveryOrderClicked,
+  deliveryOrderDetails,
+  height,
+}) => {
   const { list } = deliveryOrderDetails
   const editRow = (row, e) => {
     onEditDeliveryOrderClicked(row)
@@ -15,8 +19,6 @@ const DOGrid = ({ onEditDeliveryOrderClicked, deliveryOrderDetails }) => {
       columns={[
         { name: 'deliveryOrderDate', title: 'Delivery Order Date' },
         { name: 'deliveryOrderNo', title: 'Delivery Order No.' },
-        // { name: 'totalQty', title: 'Total Qty Received' },
-        // { name: 'outstanding', title: 'Outstanding Qty' },
         { name: 'remark', title: 'Remarks' },
         {
           name: 'action',
@@ -28,14 +30,6 @@ const DOGrid = ({ onEditDeliveryOrderClicked, deliveryOrderDetails }) => {
           columnName: 'deliveryOrderDate',
           type: 'date',
         },
-        // {
-        //   columnName: 'totalQty',
-        //   type: 'number',
-        // },
-        // {
-        //   columnName: 'outstanding',
-        //   type: 'number',
-        // },
         {
           columnName: 'action',
           sortingEnabled: false,
@@ -59,6 +53,9 @@ const DOGrid = ({ onEditDeliveryOrderClicked, deliveryOrderDetails }) => {
       ]}
       FuncProps={{
         pager: false,
+      }}
+      TableProps={{
+        height,
       }}
     />
   )

@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 import Authorized from '@/utils/Authorized'
-import { findGetParameter, roundTo } from '@/utils/utils'
+import { roundTo } from '@/utils/utils'
 import { ReportViewer } from '@/components/_medisys'
 import { getBizSession } from '@/services/queue'
 import {
@@ -12,7 +13,7 @@ import {
   CommonModal,
   WarningSnackbar,
 } from '@/components'
-import { withStyles, TextField } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 import DeleteConfirm from './DeleteConfirm'
 import DepositGrid from './DepositGrid'
@@ -35,9 +36,10 @@ const styles = () => ({
   },
 })
 
-@connect(({ patient, user }) => ({
+@connect(({ patient, user, global }) => ({
   patient,
   user,
+  mainDivHeight: global.mainDivHeight,
 }))
 class PatientDeposit extends PureComponent {
   constructor (props) {
@@ -48,7 +50,6 @@ class PatientDeposit extends PureComponent {
       reportViewerOpen: false,
       reportID: undefined,
       reportParameters: {},
-      depositTransactionType: [],
       selectedTypeIds: [
         -99,
       ],
@@ -116,8 +117,6 @@ class PatientDeposit extends PureComponent {
   }
 
   handlePrintReceipt = (row) => {
-    // const { transactionTypeFK } = row
-    // const isDeposit = transactionTypeFK === 1 //
     const reportID = 58
     this.toggleReportViewer(reportID, { transactionId: row.id })
   }
@@ -158,7 +157,11 @@ class PatientDeposit extends PureComponent {
   }
 
   render () {
-    const { dispatch, user, patient: { entity, deposit }, classes } = this.props
+    const {
+      patient: { entity, deposit },
+      classes,
+      mainDivHeight = 700,
+    } = this.props
     const { selectedTypeIds, showDeleteConfirmation } = this.state
     const patientIsActive = entity && entity.isActive
 
@@ -193,6 +196,12 @@ class PatientDeposit extends PureComponent {
       text: true,
       fullWidth: false,
     }
+
+    let height =
+      mainDivHeight - 310 - $('.filterBar').height() ||
+      0 - $('.footerBar').height() ||
+      0
+    if (height < 300) height = 300
     return (
       <Authorized authority='patientdatabase.patientprofiledetails.patienthistory.deposit'>
         {({ rights: depositAccessRight }) => (
@@ -207,30 +216,33 @@ class PatientDeposit extends PureComponent {
           >
             <React.Fragment>
               <CardContainer hideHeader size='sm'>
-                {!this.state.hasActiveSession ? (
-                  <div style={{ paddingTop: 5 }}>
-                    <WarningSnackbar
-                      variant='warning'
-                      className={classes.margin}
-                      message='Action(s) is not allowed due to no active session was found.'
+                <div className='filterBar'>
+                  {!this.state.hasActiveSession ? (
+                    <div style={{ paddingTop: 5 }}>
+                      <WarningSnackbar
+                        variant='warning'
+                        className={classes.margin}
+                        message='Action(s) is not allowed due to no active session was found.'
+                      />
+                    </div>
+                  ) : (
+                    ''
+                  )}
+
+                  <GridContainer>
+                    <FilterBar
+                      {...this.props}
+                      selectedTypeIds={selectedTypeIds}
+                      disabled={
+                        depositAccessRight !== 'enable' || !patientIsActive
+                      }
+                      refundableAmount={refundableAmount}
+                      refresh={this.searchResult}
+                      handleTypeChange={this.handleTypeChange}
+                      hasActiveSession={this.state.hasActiveSession}
                     />
-                  </div>
-                ) : (
-                  ''
-                )}
-                <GridContainer>
-                  <FilterBar
-                    {...this.props}
-                    selectedTypeIds={selectedTypeIds}
-                    disabled={
-                      depositAccessRight !== 'enable' || !patientIsActive
-                    }
-                    refundableAmount={refundableAmount}
-                    refresh={this.searchResult}
-                    handleTypeChange={this.handleTypeChange}
-                    hasActiveSession={this.state.hasActiveSession}
-                  />
-                </GridContainer>
+                  </GridContainer>
+                </div>
                 <GridContainer style={{ marginTop: 20 }}>
                   <GridItem md={12}>
                     <DepositGrid
@@ -239,33 +251,37 @@ class PatientDeposit extends PureComponent {
                       handleDeleteRow={this.handleDeleteRow}
                       hasActiveSession={this.state.hasActiveSession}
                       isReadOnly={!patientIsActive}
+                      height={height}
                     />
                   </GridItem>
-
-                  <GridItem md={2} />
-                  <GridItem md={10} style={{ marginTop: 20 }}>
-                    <GridContainer>
-                      <GridItem md={12} style={{ textAlign: 'right' }}>
-                        <span className={classes.summaryText}>Balance:</span>
-                        <NumberInput
-                          {...amountProps}
-                          style={{ width: 100 }}
-                          value={totalAmount}
-                        />
-                      </GridItem>
-                      <GridItem md={12} style={{ textAlign: 'right' }}>
-                        <span className={classes.summaryText}>
-                          Refundable Balance:
-                        </span>
-                        <NumberInput
-                          {...amountProps}
-                          style={{ width: 100 }}
-                          value={refundableAmount}
-                        />
-                      </GridItem>
-                    </GridContainer>
-                  </GridItem>
                 </GridContainer>
+                <div className='footerBar'>
+                  <GridContainer>
+                    <GridItem md={2} />
+                    <GridItem md={10} style={{ marginTop: 10 }}>
+                      <GridContainer>
+                        <GridItem md={12} style={{ textAlign: 'right' }}>
+                          <span className={classes.summaryText}>Balance:</span>
+                          <NumberInput
+                            {...amountProps}
+                            style={{ width: 100 }}
+                            value={totalAmount}
+                          />
+                        </GridItem>
+                        <GridItem md={12} style={{ textAlign: 'right' }}>
+                          <span className={classes.summaryText}>
+                            Refundable Balance:
+                          </span>
+                          <NumberInput
+                            {...amountProps}
+                            style={{ width: 100 }}
+                            value={refundableAmount}
+                          />
+                        </GridItem>
+                      </GridContainer>
+                    </GridItem>
+                  </GridContainer>
+                </div>
               </CardContainer>
 
               <CommonModal

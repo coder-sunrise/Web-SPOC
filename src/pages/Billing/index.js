@@ -17,6 +17,8 @@ import {
   FastField,
   OutlinedTextField,
   WarningSnackbar,
+  Field,
+  CheckboxGroup,
 } from '@/components'
 import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
 // common utils
@@ -30,7 +32,10 @@ import Authorized from '@/utils/Authorized'
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 import DispenseDetails from '@/pages/Dispense/DispenseDetails/WebSocketWrapper'
 import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
-import { ReportsOnCompletePaymentOption } from '@/utils/codes'
+import {
+  ReportsOnCompletePaymentOption,
+  ReportsOnCompletePayment,
+} from '@/utils/codes'
 import Signature from '@/components/_medisys/Forms/Signature'
 import ApplyClaims from './refactored/newApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
@@ -98,7 +103,8 @@ const base64Prefix = 'data:image/jpeg;base64,'
   notDirtyDuration: 3,
   displayName: 'BillingForm',
   enableReinitialize: true,
-  mapPropsToValues: ({ billing }) => {
+  mapPropsToValues: ({ billing, clinicSettings }) => {
+    const { autoPrintReportsOnCompletePayment = '' } = clinicSettings
     try {
       if (billing.entity) {
         const { invoicePayer = [], visitPurposeFK } = billing.entity
@@ -125,6 +131,9 @@ const base64Prefix = 'data:image/jpeg;base64,'
           finalPayable,
           visitId: billing.visitID,
           visitPurposeFK,
+          autoPrintReportsOnCompletePayment: autoPrintReportsOnCompletePayment.split(
+            ',',
+          ),
         }
 
         return values
@@ -132,7 +141,13 @@ const base64Prefix = 'data:image/jpeg;base64,'
     } catch (error) {
       console.log({ error })
     }
-    return { ...billing.default, visitId: billing.visitID }
+    return {
+      ...billing.default,
+      visitId: billing.visitID,
+      autoPrintReportsOnCompletePayment: autoPrintReportsOnCompletePayment.split(
+        ',',
+      ),
+    }
   },
 })
 @Authorized.Secured('queue.dispense.makepayment')
@@ -263,12 +278,9 @@ class Billing extends Component {
     this.toggleSchemeValidationPrompt()
   }
 
-  printAfterComplete = async () => {
+  printAfterComplete = async (autoPrintReportsOnCompletePayment = []) => {
     let settings = JSON.parse(localStorage.getItem('clinicSettings'))
-    const {
-      autoPrintOnCompletePayment,
-      autoPrintReportsOnCompletePayment,
-    } = settings
+    const { autoPrintOnCompletePayment } = settings
     if (autoPrintOnCompletePayment) {
       await this.onExpandDispenseDetails()
 
@@ -280,11 +292,8 @@ class Billing extends Component {
           return { ...x, no: 1, selected: true }
         }),
       })
-      let reportsOnCompletePayment = autoPrintReportsOnCompletePayment.split(
-        ',',
-      )
+      let reportsOnCompletePayment = autoPrintReportsOnCompletePayment
       let printData = []
-
       if (
         reportsOnCompletePayment.indexOf(
           ReportsOnCompletePaymentOption.Invoice,
@@ -352,8 +361,11 @@ class Billing extends Component {
 
   upsertBilling = async (callback = null, noValidation = false) => {
     const { dispatch, values, resetForm, patient } = this.props
-    const { visitStatus, invoicePayer = [] } = values
-
+    const {
+      visitStatus,
+      invoicePayer = [],
+      autoPrintReportsOnCompletePayment = [],
+    } = values
     try {
       const isSchemesValid = noValidation
         ? true
@@ -365,7 +377,7 @@ class Billing extends Component {
             notification.success({
               message: 'Billing Completed',
             })
-            await this.printAfterComplete()
+            await this.printAfterComplete(autoPrintReportsOnCompletePayment)
 
             router.push('/reception/queue')
           } else {
@@ -642,6 +654,15 @@ class Billing extends Component {
     this.onPrintInvoice(undefined)
   }
 
+  onPrintVisitInvoiceClick = () => {
+    const { values } = this.props
+    const parametrPaload = {
+      InvoiceId: values.invoice ? values.invoice.id : '',
+    }
+
+    this.onShowReport(80, parametrPaload)
+  }
+
   handleAddPayment = async (payment) => {
     const { values, setValues } = this.props
     const { outstandingBalance, ...rest } = payment
@@ -870,8 +891,9 @@ class Billing extends Component {
     const {
       isEnableAddPaymentInBilling = false,
       isEnablePackage = false,
+      isEnableVisitationInvoiceReport = false,
+      autoPrintOnCompletePayment = false,
     } = clinicSettings
-
     let src
     if (
       values.packageRedeemAcknowledge &&
@@ -959,6 +981,8 @@ class Billing extends Component {
                 handlePrintInvoiceClick={this.onPrintInvoiceClick}
                 handlePrintReceiptClick={this.onPrintReceiptClick}
                 {...formikBag}
+                isEnableVisitationInvoiceReport={isEnableVisitationInvoiceReport}
+                handlePrintVisitInvoiceClick={this.onPrintVisitInvoiceClick}
               />
             </GridContainer>
           </GridContainer>
@@ -967,25 +991,66 @@ class Billing extends Component {
           <GridItem
             md={isEnablePackage && this.state.isConsumedPackage ? 6 : 8}
           >
-            <FastField
-              name='invoice.invoiceRemark'
-              render={(args) => {
-                return (
-                  <OutlinedTextField
-                    label='Invoice Remarks'
-                    multiline
-                    maxLength={2000}
-                    rowsMax={5}
-                    rows={2}
-                    disabled={
-                      this.state.isUpdatedAppliedInvoicePayerInfo ||
-                      this.showRefreshOrder()
-                    }
-                    {...args}
-                  />
-                )
+            <div
+              style={{
+                display: 'flex',
               }}
-            />
+            >
+              <FastField
+                name='invoice.invoiceRemark'
+                render={(args) => {
+                  return (
+                    <OutlinedTextField
+                      label='Invoice Remarks'
+                      multiline
+                      maxLength={2000}
+                      rowsMax={5}
+                      rows={2}
+                      disabled={
+                        this.state.isUpdatedAppliedInvoicePayerInfo ||
+                        this.showRefreshOrder()
+                      }
+                      {...args}
+                    />
+                  )
+                }}
+              />
+              {autoPrintOnCompletePayment === true && (
+                <div
+                  style={{
+                    marginLeft: 10,
+                  }}
+                >
+                  <h5
+                    style={{
+                      width: 400,
+                    }}
+                  >
+                    Auto print below documents after Complete Payment
+                  </h5>
+                  <Field
+                    name='autoPrintReportsOnCompletePayment'
+                    render={(args) => {
+                      return (
+                        <CheckboxGroup
+                          disabled={
+                            this.state.isEditing ||
+                            values.id === undefined ||
+                            this.state.isUpdatedAppliedInvoicePayerInfo ||
+                            this.showRefreshOrder()
+                          }
+                          valueField='code'
+                          textField='description'
+                          options={ReportsOnCompletePayment}
+                          noUnderline
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </div>
+              )}
+            </div>
           </GridItem>
           <GridItem
             md={isEnablePackage && this.state.isConsumedPackage ? 6 : 4}
@@ -1086,7 +1151,7 @@ class Billing extends Component {
         <CommonModal
           open={showReport}
           onClose={this.onCloseReport}
-          title='Invoice'
+          title={reportPayload.reportID === 15 ? 'Invoice' : 'Visitation Invoice'}
           maxWidth='lg'
         >
           <ReportViewer

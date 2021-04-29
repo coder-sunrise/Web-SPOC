@@ -39,51 +39,6 @@ const permissionOption = ({ type, permission }) => {
   return result
 }
 
-export const AccessRightConfig = ({
-  isEdit,
-  isUserMaintainable = false,
-  onConfirmChangeRight,
-}) => {
-  return {
-    columns: [
-      { name: 'module', title: 'Module' },
-      { name: 'displayValue', title: 'Function Access' },
-      { name: 'permission', title: 'Accessbility' },
-    ],
-    columnExtensions: [
-      {
-        columnName: 'permission',
-        type: 'select',
-        align: 'center',
-        width: 250,
-        sortingEnabled: false,
-        render: (row) => {
-          return (
-            <GridContainer style={{ justifyContent: 'center' }}>
-              <GridItem md={8}>
-                <Field
-                  name={`filteredAccessRight[${row.rowIndex}].permission`}
-                  render={(args) => (
-                    <Select
-                      // value={row.permission}
-                      {...args}
-                      options={permissionOption(row)}
-                      disabled={isEdit && !isUserMaintainable}
-                      onChange={(e) => onConfirmChangeRight(e, row)}
-                    />
-                  )}
-                />
-              </GridItem>
-            </GridContainer>
-          )
-        },
-      },
-    ],
-    FuncProps: {
-      pager: false,
-    },
-  }
-}
 const generateDummyData = () => {
   let data = []
   for (let i = 0; i < 5; i++) {

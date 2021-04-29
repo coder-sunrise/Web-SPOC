@@ -1,5 +1,6 @@
 import React, { PureComponent, Fragment } from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 import moment from 'moment'
 // material ui
 import Delete from '@material-ui/icons/Delete'
@@ -26,8 +27,9 @@ import GenerateStatements from './GenerateStatements'
 
 const styles = () => ({})
 
-@connect(({ statement }) => ({
+@connect(({ statement, global }) => ({
   statement,
+  mainDivHeight: global.mainDivHeight,
 }))
 class Statement extends PureComponent {
   state = {
@@ -125,27 +127,31 @@ class Statement extends PureComponent {
   }
 
   render () {
-    const { history, dispatch } = this.props
+    const { history, dispatch, mainDivHeight = 700 } = this.props
     const { rows, columns, showGenerateStatement } = this.state
+    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <SearchBar
-          history={history}
-          handleSearch={this.handleSearch}
-          handleAddNew={this.toggleAddNewStatementModal}
-          dispatch={dispatch}
-          selectedRows={this.state.selectedRows}
-          showGenerateStatement={this.toggleGenerateStatement}
-        />
+        <div className='filterBar'>
+          <SearchBar
+            history={history}
+            handleSearch={this.handleSearch}
+            handleAddNew={this.toggleAddNewStatementModal}
+            dispatch={dispatch}
+            selectedRows={this.state.selectedRows}
+            showGenerateStatement={this.toggleGenerateStatement}
+          />
+        </div>
         <CommonTableGrid
           style={{ margin: 0 }}
           type='statement'
-          // selection={this.state.selectedRows}
-          // onSelectionChange={this.handleSelectionChange}
           onRowDoubleClick={this.editRow}
           rows={rows}
           columns={columns}
-          // FuncProps={{ selectable: true }}
+          TableProps={{
+            height,
+          }}
           columnExtensions={[
             {
               columnName: 'statementNo',

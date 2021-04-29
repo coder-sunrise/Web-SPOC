@@ -1,8 +1,5 @@
 import React, { PureComponent } from 'react'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
-import moment from 'moment'
 import { CommonTableGrid, Button, dateFormatLong, Tooltip } from '@/components'
 import { status } from '@/utils/codes'
 
@@ -22,13 +19,15 @@ export default class Grid extends PureComponent {
   }
 
   render () {
-    const { dispatch, classes, settingPublicHoliday, toggleModal } = this.props
-
+    const { height } = this.props
     return (
       <CommonTableGrid
         onRowDoubleClick={this.editRow}
         style={{ margin: 0 }}
         type='settingPublicHoliday'
+        TableProps={{
+          height,
+        }}
         columns={[
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },
@@ -38,7 +37,6 @@ export default class Grid extends PureComponent {
           { name: 'isActive', title: 'Status' },
           { name: 'action', title: 'Action' },
         ]}
-        // FuncProps={{ pager: false }}
         columnExtensions={[
           {
             columnName: 'displayValue',

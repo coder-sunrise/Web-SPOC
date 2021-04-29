@@ -29,6 +29,7 @@ import {
 class InvoiceDetails extends Component {
   state = {
     showReport: false,
+    showVisitInvoiceReport: false,
     isExistPackage: false,
     expandedGroups: [],
   }
@@ -70,8 +71,12 @@ class InvoiceDetails extends Component {
     this.setState((preState) => ({ showReport: !preState.showReport }))
   }
 
+  toggleVisitInvoiceReport = () => {
+    this.setState((preState) => ({ showVisitInvoiceReport: !preState.showVisitInvoiceReport }))
+  }
+
   render () {
-    const { classes, values } = this.props
+    const { classes, values, isEnableVisitationInvoiceReport } = this.props
 
     const handleExpandedGroupsChange = (e) => {
       this.setState({
@@ -136,6 +141,11 @@ class InvoiceDetails extends Component {
           <Button size='sm' color='primary' icon onClick={this.toggleReport}>
             <Printer />Print Invoice
           </Button>
+          {isEnableVisitationInvoiceReport && (
+            <Button size='sm' color='primary' icon onClick={this.toggleVisitInvoiceReport}>
+              <Printer />Print Visit Invoice
+            </Button>
+          )}
         </div>
         <CommonTableGrid
           size='sm'
@@ -194,6 +204,17 @@ class InvoiceDetails extends Component {
         >
           <ReportViewer
             reportID={15}
+            reportParameters={{ InvoiceID: values ? values.id : '' }}
+          />
+        </CommonModal>
+        <CommonModal
+          open={this.state.showVisitInvoiceReport}
+          onClose={this.toggleVisitInvoiceReport}
+          title='Visitation Invoice'
+          maxWidth='lg'
+        >
+          <ReportViewer
+            reportID={80}
             reportParameters={{ InvoiceID: values ? values.id : '' }}
           />
         </CommonModal>

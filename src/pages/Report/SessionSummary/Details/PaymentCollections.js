@@ -27,7 +27,7 @@ const PaymentCollections = ({
     let payerCount = 0
     for (let i = PaymentCollectionsDetails.length - 1; i >= 0; i--) {
       let item = PaymentCollectionsDetails[i]
-      item.id = `${item.invoiceNo}-${item.receiptNo}`
+      item.id = `${item.invoiceNo}-${item.receiptNo}-${paymentCount}`
       paymentCount += 1
       payerCount += 1
       if (i === 0) {

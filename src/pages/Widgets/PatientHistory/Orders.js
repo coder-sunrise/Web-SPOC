@@ -30,7 +30,7 @@ export default ({ current }) => {
           {
             dataIndex: 'type',
             title: 'Type',
-            width: 150,
+            width: 140,
             render: (text, row) => {
               return (
                 <div style={{ position: 'relative' }}>
@@ -42,17 +42,23 @@ export default ({ current }) => {
               )
             },
           },
-          { dataIndex: 'name', title: 'Name', width: 300 },
+          { dataIndex: 'name', title: 'Name', width: 250 },
           {
             dataIndex: 'description',
-            title: 'Description',
+            title: 'Instructions',
+            render: (text) => <div style={wrapCellTextStyle}>{text}</div>,
+            width: 250,
+          },
+          {
+            dataIndex: 'remarks',
+            title: 'Remarks',
             render: (text) => <div style={wrapCellTextStyle}>{text}</div>,
           },
           {
             dataIndex: 'quantity',
-            title: 'Quantity',
+            title: 'Qty.',
             align: 'right',
-            width: 100,
+            width: 80,
             render: (text, row) => (
               <div
                 style={{
@@ -64,11 +70,11 @@ export default ({ current }) => {
               </div>
             ),
           },
-          { dataIndex: 'dispenseUOMDisplayValue', title: 'UOM', width: 100 },
+          { dataIndex: 'dispenseUOMDisplayValue', title: 'UOM', width: 80 },
           {
             dataIndex: 'adjAmt',
             title: 'Adj.',
-            width: 120,
+            width: 100,
             align: 'right',
             render: (text, row) => (
               <div
@@ -86,7 +92,7 @@ export default ({ current }) => {
           {
             dataIndex: 'totalAfterItemAdjustment',
             title: 'Total',
-            width: 120,
+            width: 100,
             align: 'right',
             render: (text, row) => (
               <div

@@ -1,5 +1,6 @@
-import React, { Fragment, PureComponent } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
 import { PATIENT_LAB, REPORT_ID } from '@/utils/constants'
 import { CommonModal } from '@/components'
@@ -26,23 +27,14 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ labTrackingDetails, clinicSettings }) => ({
+@connect(({ labTrackingDetails, clinicSettings, global }) => ({
   labTrackingDetails,
   clinicSettings: clinicSettings.settings,
+  mainDivHeight: global.mainDivHeight,
 }))
 class LabTrackingDetails extends PureComponent {
-  state = {
-    height: 100,
-  }
-
   componentDidMount () {
-    this.resize()
-    window.addEventListener('resize', this.resize.bind(this))
-
-    const { dispatch, patientId, resultType } = this.props
-
-    const IsOverallGrid = resultType === PATIENT_LAB.LAB_TRACKING
-    let patientID = patientId || Number(findGetParameter('pid')) || undefined
+    const { dispatch } = this.props
 
     dispatch({
       type: 'codetable/fetchCodes',
@@ -56,10 +48,6 @@ class LabTrackingDetails extends PureComponent {
         code: 'ctcasetype',
       },
     })
-  }
-
-  componentWillUnmount () {
-    window.removeEventListener('resize', this.resize.bind(this))
   }
 
   toggleModal = () => {
@@ -96,15 +84,6 @@ class LabTrackingDetails extends PureComponent {
     handlePrint(JSON.stringify(payload))
   }
 
-  resize () {
-    if (this.divElement) {
-      const height = this.divElement.clientHeight
-      if (height > 0) {
-        this.setState({ height: height > 0 ? height / 2 - 144 : 300 })
-      }
-    }
-  }
-
   render () {
     const {
       resultType,
@@ -112,23 +91,38 @@ class LabTrackingDetails extends PureComponent {
       labTrackingDetails,
       patientId,
       isPatientInactive,
+      mainDivHeight = 700,
     } = this.props
     const IsOverallGrid = resultType === PATIENT_LAB.LAB_TRACKING
 
     let patientID = patientId || Number(findGetParameter('pid')) || undefined
 
+    let height
+    if (resultType === PATIENT_LAB.LAB_TRACKING) {
+      height = mainDivHeight - 120 - ($('.filterBar').height() || 0)
+    } else if (resultType === PATIENT_LAB.CONSULTATION) {
+      height = mainDivHeight - 80 - ($('.filterBar').height() || 0)
+    } else {
+      height = mainDivHeight - 280 - ($('.filterBar').height() || 0)
+    }
+
+    if (height < 300) height = 300
+
     const cfg = {
       toggleModal: this.toggleModal,
       handlePrintClick: this.handlePrintClick,
+      height,
     }
 
     return (
       <div>
-        <FilterBar
-          dispatch={dispatch}
-          IsOverallGrid={IsOverallGrid}
-          patientId={patientID}
-        />
+        <div className='filterBar'>
+          <FilterBar
+            dispatch={dispatch}
+            IsOverallGrid={IsOverallGrid}
+            patientId={patientID}
+          />
+        </div>
 
         <div style={{ margin: 10 }}>
           {IsOverallGrid ? (

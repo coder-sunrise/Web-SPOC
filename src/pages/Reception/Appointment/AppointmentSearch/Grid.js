@@ -88,6 +88,7 @@ class Grid extends PureComponent {
   }
 
   render () {
+    const { height } = this.props
     return (
       <CommonTableGrid
         style={{ marginTop: 10 }}
@@ -111,16 +112,17 @@ class Grid extends PureComponent {
         columnExtensions={[
           {
             columnName: 'patientName',
-            // sortBy: 'name',
             sortingEnabled: false,
           },
           {
             columnName: 'patientAccountNo',
             sortBy: 'patientAccountNo',
+            width: 130,
           },
           {
             columnName: 'patientContactNo',
             sortBy: 'contactNumber',
+            width: 130,
           },
           {
             columnName: 'appointmentDate',
@@ -168,7 +170,7 @@ class Grid extends PureComponent {
           {
             columnName: 'duration',
             sortingEnabled: false,
-            width: 115,
+            width: 120,
           },
           {
             columnName: 'appointmentRemarks',
@@ -179,6 +181,7 @@ class Grid extends PureComponent {
             type: 'codeSelect',
             code: 'ltappointmentstatus',
             sortBy: 'status',
+            width: 130,
           },
           {
             columnName: 'bookedByUser',
@@ -190,7 +193,7 @@ class Grid extends PureComponent {
             width: 100,
           },
         ]}
-        TableProps={{ rowComponent: this.appointmentRow }}
+        TableProps={{ rowComponent: this.appointmentRow, height }}
       />
     )
   }

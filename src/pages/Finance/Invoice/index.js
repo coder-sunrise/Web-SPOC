@@ -1,33 +1,21 @@
 import React from 'react'
 import { connect } from 'dva'
+import $ from 'jquery'
 // material ui
 import { withStyles } from '@material-ui/core'
 import moment from 'moment'
 // common components
-import { CardContainer, withFormikExtend } from '@/components'
+import { CardContainer } from '@/components'
 // sub components
 import FilterBar from './components/FilterBar'
 import InvoiceDataGrid from './components/InvoiceDataGrid'
 // styles
 import styles from './styles'
-import Authorized from '@/utils/Authorized'
 
-// @withFormikExtend({
-//   mapPropsToValues: () => {
-//     return {
-//       invoiceDates: [
-//         moment().add(-1, 'month'),
-//         moment(),
-//       ],
-//       isIncludePatientOS: true,
-//       isIncludeGovtOS: true,
-//       isIncludeCorporateOS: true,
-//     }
-//   },
-// })
 @connect(({ invoiceList, global }) => ({
   invoiceList,
   global,
+  mainDivHeight: global.mainDivHeight,
 }))
 class Invoice extends React.Component {
   componentDidMount () {
@@ -41,22 +29,32 @@ class Invoice extends React.Component {
   }
 
   onRowDoubleClick = (row) => {
-    // this.props.history.push(`/finance/invoice/details?id=${row.invoiceNo}`)
     this.props.history.push(`/finance/invoice/details?id=${row.id}`)
   }
 
   render () {
-    const { classes } = this.props
+    const { classes, mainDivHeight = 700 } = this.props
+    let height =
+      mainDivHeight -
+      140 -
+      ($('.filterBar').height() || 0) -
+      ($('.footerBar').height() || 0)
+    if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <FilterBar {...this.props} />
+        <div className='filterBar'>
+          <FilterBar {...this.props} />
+        </div>
         <InvoiceDataGrid
           handleRowDoubleClick={this.onRowDoubleClick}
           {...this.props}
+          height={height}
         />
-        <p className={classes.footerNote}>
-          Note: Total Payment is the sum total of the payment amount of payers
-        </p>
+        <div className='footerBar'>
+          <p className={classes.footerNote}>
+            Note: Total Payment is the sum total of the payment amount of payers
+          </p>
+        </div>
       </CardContainer>
     )
   }

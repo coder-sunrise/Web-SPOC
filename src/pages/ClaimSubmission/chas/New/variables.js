@@ -56,8 +56,9 @@ export const NewCHASColumns = [
 ]
 
 export const NewCHASColumnExtensions = [
-  { columnName: 'visitDate', type: 'date' },
-  { columnName: 'invoiceDate', type: 'date' },
+  { columnName: 'visitDate', type: 'date', width: 100 },
+  { columnName: 'invoiceDate', type: 'date', width: 100 },
+  { columnName: 'invoiceNo', width: 90 },
   {
     columnName: 'rejectionReason',
     width: 400,
@@ -88,7 +89,7 @@ export const NewCHASColumnExtensions = [
     columnName: 'diagnosis',
     sortingEnabled: false,
     render: (row) => {
-      let diagnoisisList = row.diagnosis.join(", ")
+      let diagnoisisList = row.diagnosis.join(', ')
       return (
         <Tooltip title={diagnoisisList}>
           <span className title={diagnoisisList}>

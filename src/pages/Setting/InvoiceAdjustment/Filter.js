@@ -15,8 +15,9 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingInvoiceAdjustment }) => settingInvoiceAdjustment.filter || {},
-  handleSubmit: () => { },
+  mapPropsToValues: ({ settingInvoiceAdjustment }) =>
+    settingInvoiceAdjustment.filter || {},
+  handleSubmit: () => {},
   displayName: 'InvoiceAdjustmentFilter',
 })
 class Filter extends PureComponent {
@@ -24,7 +25,7 @@ class Filter extends PureComponent {
     const { classes } = this.props
     return (
       <div className={classes.filterBar}>
-        <GridContainer> 
+        <GridContainer>
           <GridItem xs={6} md={3}>
             <FastField
               name='codeDisplayValue'
@@ -44,7 +45,7 @@ class Filter extends PureComponent {
         </GridContainer>
 
         <GridContainer>
-          <GridItem xs={6} md={3}>
+          <GridItem>
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'

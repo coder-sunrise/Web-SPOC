@@ -74,6 +74,10 @@ export const PrescriptionColumns = [
     title: 'Instructions',
   },
   {
+    name: 'remarks',
+    title: 'Remarks',
+  },
+  {
     name: 'batchNo',
     title: 'Batch #',
   },
@@ -83,11 +87,11 @@ export const PrescriptionColumns = [
   },
   {
     name: 'orderedQuantity',
-    title: 'Qty Ordered',
+    title: 'Qty. Ordered',
   },
   {
     name: 'dispensedQuanity',
-    title: 'Qty Dispensed',
+    title: 'Qty. Dispensed',
   },
   {
     name: 'unitPrice',
@@ -95,7 +99,7 @@ export const PrescriptionColumns = [
   },
   {
     name: 'adjAmt',
-    title: 'Item Adj ($)',
+    title: 'Item Adj. ($)',
   },
   {
     name: 'totalAfterItemAdjustment',
@@ -113,10 +117,10 @@ export const PrescriptionColumnExtensions = (
   inventorymedication = [],
   handleSelectedBatch,
 ) => [
-  { columnName: 'unitPrice', width: columnWidth, type: 'currency' },
+  { columnName: 'unitPrice', width: 100, type: 'currency' },
   {
     columnName: 'name',
-    width: columnWidth,
+    width: '30%',
     render: (row) => {
       return (
         <div style={{ position: 'relative' }}>
@@ -135,6 +139,7 @@ export const PrescriptionColumnExtensions = (
   },
   {
     columnName: 'instruction',
+    width: '40%',
     render: (row) => {
       return (
         <div
@@ -149,36 +154,46 @@ export const PrescriptionColumnExtensions = (
     },
   },
   {
+    columnName: 'remarks',
+    width: '30%',
+  },
+  {
     columnName: 'totalAfterItemAdjustment',
-    width: columnWidth,
+    width: 110,
     type: 'currency',
   },
   {
     columnName: 'adjAmt',
-    width: columnWidth,
+    width: 100,
     type: 'currency',
   },
   {
     columnName: 'dispensedQuanity',
     type: 'number',
-    width: columnWidth,
+    width: 130,
     render: (row) => {
+      let qty = `${numeral(row.dispensedQuanity || 0).format(
+        '0,0.0',
+      )} ${row.dispenseUOM || ''}`
       return (
-        <p>
-          {numeral(row.dispensedQuanity || 0).format('0,0.0')} {row.dispenseUOM}
-        </p>
+        <Tooltip title={qty}>
+          <span>{qty}</span>
+        </Tooltip>
       )
     },
   },
   {
     columnName: 'orderedQuantity',
     type: 'number',
-    width: columnWidth,
+    width: 130,
     render: (row) => {
+      let qty = `${numeral(row.orderedQuantity || 0).format(
+        '0,0.0',
+      )} ${row.orderUOM || ''}`
       return (
-        <p>
-          {numeral(row.orderedQuantity || 0).format('0,0.0')} {row.orderUOM}
-        </p>
+        <Tooltip title={qty}>
+          <span>{qty}</span>
+        </Tooltip>
       )
     },
   },
@@ -245,7 +260,7 @@ export const PrescriptionColumnExtensions = (
   {
     columnName: 'action',
     align: 'center',
-    width: 80,
+    width: 60,
     render: (row) => {
       return (
         <Tooltip
@@ -274,6 +289,10 @@ export const VaccinationColumn = [
     title: 'Name',
   },
   {
+    name: 'remarks',
+    title: 'Remarks',
+  },
+  {
     name: 'batchNo',
     title: 'Batch #',
   },
@@ -283,7 +302,7 @@ export const VaccinationColumn = [
   },
   {
     name: 'dispensedQuanity',
-    title: 'Qty Dispensed',
+    title: 'Qty. Dispensed',
   },
   {
     name: 'unitPrice',
@@ -291,7 +310,7 @@ export const VaccinationColumn = [
   },
   {
     name: 'adjAmt',
-    title: 'Item Adj ($)',
+    title: 'Item Adj. ($)',
   },
   {
     name: 'totalAfterItemAdjustment',
@@ -310,6 +329,7 @@ export const VaccinationColumnExtensions = (
 ) => [
   {
     columnName: 'name',
+    width: '60%',
     render: (row) => {
       return (
         <div style={{ position: 'relative' }}>
@@ -327,26 +347,33 @@ export const VaccinationColumnExtensions = (
     },
   },
   {
+    columnName: 'remarks',
+    width: '40%',
+  },
+  {
     columnName: 'dispensedQuanity',
     type: 'number',
-    width: columnWidth,
+    width: 130,
     render: (row) => {
+      let qty = `${numeral(row.dispensedQuanity || 0).format(
+        '0,0.0',
+      )} ${row.dispenseUOM || ''}`
       return (
-        <p>
-          {numeral(row.dispensedQuanity || 0).format('0,0.0')} {row.dispenseUOM}
-        </p>
+        <Tooltip title={qty}>
+          <span>{qty}</span>
+        </Tooltip>
       )
     },
   },
-  { columnName: 'unitPrice', width: columnWidth, type: 'currency' },
+  { columnName: 'unitPrice', width: 100, type: 'currency' },
   {
     columnName: 'totalAfterItemAdjustment',
-    width: columnWidth,
+    width: 110,
     type: 'currency',
   },
   {
     columnName: 'adjAmt',
-    width: columnWidth,
+    width: 100,
     type: 'currency',
   },
   {
@@ -419,7 +446,7 @@ export const VaccinationColumnExtensions = (
   },
   {
     columnName: 'action',
-    width: 80,
+    width: 60,
     render: () => <div />,
   },
 ]
@@ -434,8 +461,12 @@ export const OtherOrdersColumns = [
     title: 'Description',
   },
   {
+    name: 'remarks',
+    title: 'Remarks',
+  },
+  {
     name: 'quantity',
-    title: 'Quantity',
+    title: 'Qty.',
   },
   {
     name: 'unitPrice',
@@ -443,7 +474,7 @@ export const OtherOrdersColumns = [
   },
   {
     name: 'adjAmt',
-    title: 'Item Adj ($)',
+    title: 'Item Adj. ($)',
   },
   {
     name: 'totalAfterItemAdjustment',
@@ -478,6 +509,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
   {
     columnName: 'description',
     compare: compareString,
+    width: '60%',
     render: (row) => {
       const { code = '', description = '', unitPrice = 0 } = row
       const title = `${description} - ${code} (${currencySymbol}${numeral(
@@ -501,14 +533,21 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     },
   },
   {
+    columnName: 'remarks',
+    width: '40%',
+  },
+  {
     columnName: 'quantity',
     type: 'number',
-    width: columnWidth,
+    width: 130,
     render: (row) => {
+      let qty = `${numeral(row.quantity || 0).format(
+        '0,0.0',
+      )} ${row.dispenseUOM || ''}`
       return (
-        <p>
-          {numeral(row.quantity || 0).format('0,0.0')} {row.dispenseUOM}
-        </p>
+        <Tooltip title={qty}>
+          <span>{qty}</span>
+        </Tooltip>
       )
     },
   },
@@ -516,7 +555,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     columnName: 'unitPrice',
     // type: 'currency',
     align: 'right',
-    width: columnWidth,
+    width: 100,
     render: (row) => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
@@ -528,7 +567,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     columnName: 'adjAmt',
     // type: 'currency',
     align: 'right',
-    width: columnWidth,
+    width: 100,
     render: (row) => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
@@ -540,7 +579,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     columnName: 'totalAfterItemAdjustment',
     // type: 'currency',
     align: 'right',
-    width: columnWidth,
+    width: 110,
     render: (row) => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
@@ -558,7 +597,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
   {
     columnName: 'action',
     align: 'center',
-    width: 80,
+    width: 60,
     render: (r) => {
       const { type } = r
 
@@ -596,7 +635,7 @@ export const DrugLabelSelectionColumns = [
   },
   {
     name: 'dispensedQuanity',
-    title: 'Qty Dispensed',
+    title: 'Qty. Dispensed',
   },
   {
     name: 'no',
@@ -670,9 +709,9 @@ export const DrugLabelSelectionColumnExtensions = (
     width: 100,
     render: (row) => {
       return (
-        <p>
+        <span>
           {row.dispensedQuanity} {row.dispenseUOM}
-        </p>
+        </span>
       )
     },
   },
@@ -725,6 +764,10 @@ export const PackageColumns = [
     title: 'Description',
   },
   {
+    name: 'remarks',
+    title: 'Remarks',
+  },
+  {
     name: 'packageConsumeQuantity',
     title: 'Consumed',
   },
@@ -769,6 +812,7 @@ export const PackageColumnExtensions = (onPrint) => [
     columnName: 'description',
     compare: compareString,
     sortingEnabled: false,
+    width: '60%',
     render: (row) => {
       const { code = '', description = '', unitPrice = 0 } = row
       const title = `${description} - ${code} (${currencySymbol}${numeral(
@@ -798,18 +842,29 @@ export const PackageColumnExtensions = (onPrint) => [
     },
   },
   {
+    columnName: 'remarks',
+    width: '40%',
+  },
+  {
     columnName: 'packageConsumeQuantity',
     align: 'right',
-    width: columnWidth,
+    width: 130,
     sortingEnabled: false,
     render: (row) => {
-      return <NumberInput text value={row.packageConsumeQuantity} />
+      let qty = `${numeral(row.packageConsumeQuantity || 0).format(
+        '0,0.0',
+      )} ${row.dispenseUOM || ''}`
+      return (
+        <Tooltip title={qty}>
+          <span>{qty}</span>
+        </Tooltip>
+      )
     },
   },
   {
     columnName: 'packageRemainingQuantity',
     align: 'right',
-    width: columnWidth,
+    width: 130,
     sortingEnabled: false,
     render: (row) => {
       const { packageDrawdown } = row
@@ -860,13 +915,20 @@ export const PackageColumnExtensions = (onPrint) => [
         balanceQty = totalQty - totalDrawdown
       }
 
-      return <NumberInput text value={balanceQty - todayQuantity} />
+      let qty = `${numeral((balanceQty || 0) - (todayQuantity || 0)).format(
+        '0,0.0',
+      )} ${row.dispenseUOM || ''}`
+      return (
+        <Tooltip title={qty}>
+          <span>{qty}</span>
+        </Tooltip>
+      )
     },
   },
   {
     columnName: 'totalAfterItemAdjustment',
     align: 'right',
-    width: columnWidth,
+    width: 110,
     sortingEnabled: false,
     render: (row) => {
       return (
@@ -882,7 +944,7 @@ export const PackageColumnExtensions = (onPrint) => [
   {
     columnName: 'action',
     align: 'center',
-    width: 80,
+    width: 60,
     sortingEnabled: false,
     render: (r) => {
       const { type } = r

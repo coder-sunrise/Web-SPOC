@@ -3,7 +3,6 @@ import React, { PureComponent } from 'react'
 import Edit from '@material-ui/icons/Edit'
 import { status } from '@/utils/codes'
 import { CommonTableGrid, Button, Tooltip, NumberInput } from '@/components'
-import { roundTo } from '@/utils/utils'
 import numeral from 'numeral'
 
 const amountProps = {
@@ -37,20 +36,35 @@ class Grid extends PureComponent {
       { columnName: 'sortOrder', width: 110 },
       { columnName: 'displayValue', width: 300 },
       {
-        columnName: 'adjustment', width: 150, align: 'right', sortingEnabled: false,
+        columnName: 'adjustment',
+        width: 150,
+        align: 'right',
+        sortingEnabled: false,
         render: (row) => {
           if (row.adjType === 'ExactAmount')
-            return (<NumberInput {...amountProps} value={row.adjValue} />)
+            return <NumberInput {...amountProps} value={row.adjValue} />
           if (row.adjValue > 0)
             return (
               <span style={{ display: 'inline-block' }}>
-                <span style={{ fontWeight: '500', color: 'darkblue', fontSize: '14px' }}>{numeral(row.adjValue).format('0.00')}%</span>
-              </span>)
+                <span
+                  style={{
+                    fontWeight: '500',
+                    color: 'darkblue',
+                    fontSize: '14px',
+                  }}
+                >
+                  {numeral(row.adjValue).format('0.00')}%
+                </span>
+              </span>
+            )
 
           return (
-            <div style={{ color: 'red', fontWeight: '500', textAlign: 'right' }}>
+            <div
+              style={{ color: 'red', fontWeight: '500', textAlign: 'right' }}
+            >
               <span>({numeral(Math.abs(row.adjValue)).format('0.00')}%)</span>
-            </div>) 
+            </div>
+          )
         },
       },
       {
@@ -97,14 +111,16 @@ class Grid extends PureComponent {
   }
 
   render () {
-    const { dispatch, classes, settingInvoiceAdjustment, toggleModal } = this.props
-
+    const { height } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
         forceRender
         type='settingInvoiceAdjustment'
         onRowDoubleClick={this.editRow}
+        TableProps={{
+          height,
+        }}
         {...this.configs}
       />
     )

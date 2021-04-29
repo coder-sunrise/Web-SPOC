@@ -1,9 +1,7 @@
 import React, { PureComponent } from 'react'
 
 import { CommonTableGrid, Button, Tooltip } from '@/components'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { status } from '@/utils/codes'
-import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 
 class Grid extends PureComponent {
@@ -22,12 +20,15 @@ class Grid extends PureComponent {
   }
 
   render () {
-    const { dispatch, classes, settingMedicationUOM, toggleModal } = this.props
+    const { height } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
         type='settingMedicationUOM'
         onRowDoubleClick={this.editRow}
+        TableProps={{
+          height,
+        }}
         columns={[
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },

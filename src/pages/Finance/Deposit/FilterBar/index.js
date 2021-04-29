@@ -21,11 +21,7 @@ import { FilterBarDate } from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
-  filterBar: {
-    marginBottom: '10px',
-  },
   filterBtn: {
-    // paddingTop: '13px',
     lineHeight: standardRowHeight,
     textAlign: 'left',
     '& > button': {
@@ -63,7 +59,7 @@ class FilterBar extends PureComponent {
     const { classes, queryDepositListing, values } = this.props
     const { transactionStartDate, transactionEndDate } = values
     return (
-      <div className={classes.filterBar}>
+      <div>
         <GridContainer>
           <GridItem xs sm={12} md={4}>
             <FastField
