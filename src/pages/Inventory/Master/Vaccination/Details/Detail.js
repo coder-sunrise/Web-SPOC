@@ -390,7 +390,7 @@ const Detail = ({
             dispatch={dispatch}
             handleSelectSdd={handleSelectSdd}
             theme={theme}
-            {...props}
+            {...sddProps}
           />
         </CommonModal>
       </div>
