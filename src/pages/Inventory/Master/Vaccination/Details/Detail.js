@@ -20,8 +20,6 @@ import {
 import MedisaveVaccinations from './MedisaveVaccinations'
 import Sdd from '../../Sdd'
 
-const isMedisaveEnable = false
-
 const styles = () => ({})
 
 const Detail = ({
@@ -31,6 +29,7 @@ const Detail = ({
   hasActiveSession,
   values,
   schema,
+  clinicSettings,
   ...props
 }) => {
   const field = vaccinationDetail.entity ? 'entity' : 'default'
@@ -85,6 +84,11 @@ const Detail = ({
   //     isDefault: Yup.boolean(),
   //   }),
   // ) : Yup.object()
+
+  const sddProps = !props.values ? {
+    ...props,
+    values,
+  } : {...props}
   
   return (
     <CardContainer
@@ -170,7 +174,7 @@ const Detail = ({
                     simple
                     valueField='id'
                     textField='name'
-                    options={isMedisaveEnable ? [
+                    options={clinicSettings.isEnableMedisave ? [
                       {
                         id: 'isAutoGenerateCertificate',
                         name: 'Auto Generate Certificate',
@@ -343,7 +347,7 @@ const Detail = ({
             <GridItem xs={2} />
             <GridItem xs={10}>
               <div style={{ 
-                  display: isMedisaveEnable && values.isMedisaveClaimable ? '' : 'none',
+                  display: clinicSettings.isEnableMedisave && values.isMedisaveClaimable ? '' : 'none',
                   }}
               >
                 <MedisaveVaccinations
@@ -371,7 +375,7 @@ const Detail = ({
           dispatch={dispatch}
           handleSelectSdd={handleSelectSdd}
           theme={theme}
-          {...props}
+          {...sddProps}
         />
       </CommonModal>
     </CardContainer>

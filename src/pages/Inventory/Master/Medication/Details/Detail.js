@@ -19,7 +19,6 @@ import {
 import SharedContainer from '../../SharedContainer'
 import Sdd from '../../Sdd'
 
-const isMedisaveEnable = false
 
 const styles = () => ({})
 
@@ -30,6 +29,7 @@ const Detail = ({
   sddDetail,
   theme,
   hasActiveSession,
+  clinicSettings,
   ...props
 }) => {
   const [
@@ -223,7 +223,7 @@ const Detail = ({
                   simple
                   valueField='id'
                   textField='name'
-                  options={isMedisaveEnable ? [
+                  options={clinicSettings.isEnableMedisave ? [
                     {
                       id: 'isChasAcuteClaimable',
                       name: 'CHAS Acute Claimable',
