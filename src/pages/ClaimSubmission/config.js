@@ -5,6 +5,6 @@ export const authorityConfig = [
   },
   {
     type: 'Medisave',
-    accessRight: 'claimsubmission.submitclaim',
+    accessRight: 'claimsubmission.submitmedisaveclaim', // permission to claim
   },
 ]

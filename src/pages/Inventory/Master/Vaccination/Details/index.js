@@ -90,15 +90,15 @@ const Detail = ({
         const { sddfk } = vac
         if (sddfk) {
           dispatch({
-            type: 'sddDetail/query',
+            type: 'sddDetail/queryOne',
             payload: {
               id: sddfk,
             },
           }).then((sdd) => {
-            const { data } = sdd
-            const { code, name } = data[0]
-            setFieldValue('sddCode', code)
-            setFieldValue('sddDescription', name)
+            // const { data } = sdd
+            // const { code, name } = data[0]
+            // setFieldValue('sddCode', code)
+            // setFieldValue('sddDescription', name)
           })
         }
       })
@@ -149,14 +149,15 @@ const Detail = ({
 }
 export default compose(
   withStyles(styles, { withTheme: true }),
-  connect(({ vaccination, vaccinationDetail, codetable }) => ({
+  connect(({ vaccination, vaccinationDetail, codetable, clinicSettings }) => ({
     vaccination,
     vaccinationDetail,
     codetable,
+    clinicSettings: clinicSettings.settings,
   })),
   withFormikExtend({
     enableReinitialize: true,
-    mapPropsToValues: ({ vaccinationDetail }) => {
+    mapPropsToValues: ({ vaccinationDetail, clinicSettings }) => {
       const returnValue = vaccinationDetail.entity
         ? vaccinationDetail.entity
         : vaccinationDetail.default
@@ -184,6 +185,7 @@ export default compose(
       return {
         ...returnValue,
         schemes,
+        clinicSettings: clinicSettings.settings,
       }
     },
 

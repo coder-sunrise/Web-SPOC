@@ -18,12 +18,14 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ claimSubmission }) => ({
+@connect(({ claimSubmission, clinicSettings }) => ({
   claimSubmission,
+  clinicSettings,
 }))
 class ClaimSubmission extends PureComponent {
   componentDidMount () {
-    const isMedisaveEnable = false
+    const { clinicSettings } = this.props
+    const isMedisaveEnable = clinicSettings.settings.isEnableMedisave // global medisave
     this.props.dispatch({
       type: 'claimSubmission/getClaimCount',
       payload: isMedisaveEnable ? {
