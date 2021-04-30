@@ -267,9 +267,10 @@ class Detail extends PureComponent {
       { name: 'uomDisplayValue', title: 'UOM' },
       { name: 'batchNo', title: 'Batch #' },
       { name: 'expiryDate', title: 'Expiry Date' },
-      { name: 'stock', title: 'Current Stock' },
+      { name: 'totalStock', title: 'Total Stock' },
+      { name: 'stock', title: 'Batch Stock' },
       { name: 'adjustmentQty', title: 'Adjustment Qty' },
-      { name: 'physicalStock', title: 'Physical Stock' },
+      { name: 'physicalStock', title: 'Batch Physical Stock' },
     ],
     columnExtensions: [
       {
@@ -342,6 +343,13 @@ class Detail extends PureComponent {
         type: 'date',
         isDisabled: (row) => this.isDisabled(row),
         width: 150,
+      },
+      {
+        columnName: 'totalStock',
+        type: 'number',
+        format: '0.0',
+        disabled: true,
+        qty: true,
       },
       {
         columnName: 'stock',
