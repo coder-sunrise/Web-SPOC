@@ -350,11 +350,6 @@ class Detail extends PureComponent {
         format: '0.0',
         disabled: true,
         qty: true,
-        render: (row) => {
-          if(this.props.values.inventoryAdjustmentStatusFK !== INVENTORY_ADJUSTMENT_STATUS.FINALIZED)
-            return row.totalStock
-          return '-'
-        },
       },
       {
         columnName: 'stock',
@@ -858,6 +853,8 @@ class Detail extends PureComponent {
     if (!isEditable) {
       cfg.onRowDoubleClick = undefined
     }
+    if(values.inventoryAdjustmentStatusFK === INVENTORY_ADJUSTMENT_STATUS.FINALIZED)
+      this.tableParas.columns = this.tableParas.columns.filter((col) => col.name !== 'totalStock')
     return (
       <React.Fragment>
         <AuthorizedContext.Provider
