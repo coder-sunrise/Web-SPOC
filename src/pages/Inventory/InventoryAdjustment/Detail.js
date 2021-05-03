@@ -350,6 +350,11 @@ class Detail extends PureComponent {
         format: '0.0',
         disabled: true,
         qty: true,
+        render: (row) => {
+          if(this.props.values.inventoryAdjustmentStatusFK !== INVENTORY_ADJUSTMENT_STATUS.FINALIZED)
+            return row.totalStock
+          return '-'
+        },
       },
       {
         columnName: 'stock',
