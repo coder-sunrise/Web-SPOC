@@ -97,7 +97,6 @@ const getHeight = (propsHeight) => {
 )
 @withFormikExtend({
   displayName: 'VisitRegistration',
-  authority: 'queue.visitregistrationdetails',
   enableReinitialize: true,
   validationSchema: VisitValidationSchema,
   mapPropsToValues: formikMapPropsToValues,
