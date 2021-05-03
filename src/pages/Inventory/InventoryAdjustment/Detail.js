@@ -701,6 +701,9 @@ class Detail extends PureComponent {
       row.adjustmentQty = undefined
       row.stockList = stock
       row.itemFK = value
+      row.totalStock = stock.reduce((stockCount,s) => {
+        return stockCount + s.stock
+      },0)
       this.setState({ selectedItem: e })
       this.setState({ selectedBatch: undefined })
       if (row.inventoryTypeFK && row.code && !row.batchNo) {
