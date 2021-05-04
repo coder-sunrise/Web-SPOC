@@ -2050,14 +2050,7 @@ class Medication extends PureComponent {
               <FastField
                 name='remarks'
                 render={(args) => {
-                  return (
-                    <TextField
-                      multiline
-                      rowsMax='5'
-                      label='Remarks'
-                      {...args}
-                    />
-                  )
+                  return <TextField rowsMax='5' label='Remarks' {...args} />
                 }}
               />
             </GridItem>
@@ -2091,16 +2084,76 @@ class Medication extends PureComponent {
           </GridContainer>
           <GridContainer>
             <GridItem xs={8} className={classes.editor}>
-              <Field
-                name='performingUserFK'
-                render={(args) => (
-                  <DoctorProfileSelect
-                    label='Performed By'
-                    {...args}
-                    valueField='clinicianProfile.userProfileFK'
-                  />
-                )}
-              />
+              {values.visitPurposeFK !== VISIT_TYPE.RETAIL &&
+              !values.isDrugMixture &&
+              !values.isPackage ? (
+                <FastField
+                  name='isExternalPrescription'
+                  render={(args) => {
+                    if (args.field.value) {
+                      setDisable(true)
+                    } else {
+                      setDisable(false)
+                    }
+                    return (
+                      <Checkbox
+                        label='External Prescription'
+                        {...args}
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            this.props.setFieldValue('adjAmount', 0)
+                            this.props.setFieldValue(
+                              'totalAfterItemAdjustment',
+                              0,
+                            )
+                            this.props.setFieldValue('totalPrice', 0)
+                            this.props.setFieldValue('expiryDate', undefined)
+                            this.props.setFieldValue('batchNo', undefined)
+                            this.props.setFieldValue('isMinus', true)
+                            this.props.setFieldValue('isExactAmount', true)
+                            this.props.setFieldValue('adjValue', 0)
+                          } else {
+                            this.props.setFieldValue(
+                              'expiryDate',
+                              this.state.expiryDate,
+                            )
+                            this.props.setFieldValue(
+                              'batchNo',
+                              this.state.batchNo,
+                            )
+                            setTimeout(() => {
+                              this.calculateQuantity()
+                            }, 1)
+                          }
+                          setDisable(e.target.value)
+                        }}
+                      />
+                    )
+                  }}
+                />
+              ) : (
+                ''
+              )}
+              {values.isDrugMixture && (
+                <FastField
+                  name='isClaimable'
+                  render={(args) => {
+                    return <Checkbox label='Claimable' {...args} />
+                  }}
+                />
+              )}
+              {values.isPackage && (
+                <Field
+                  name='performingUserFK'
+                  render={(args) => (
+                    <DoctorProfileSelect
+                      label='Performed By'
+                      {...args}
+                      valueField='clinicianProfile.userProfileFK'
+                    />
+                  )}
+                />
+              )}
             </GridItem>
             <GridItem xs={3} className={classes.editor}>
               <div style={{ position: 'relative' }}>
@@ -2213,66 +2266,7 @@ class Medication extends PureComponent {
             </GridItem>
           </GridContainer>
           <GridContainer>
-            <GridItem xs={8} className={classes.editor}>
-              {values.visitPurposeFK !== VISIT_TYPE.RETAIL &&
-              !values.isDrugMixture &&
-              !values.isPackage ? (
-                <FastField
-                  name='isExternalPrescription'
-                  render={(args) => {
-                    if (args.field.value) {
-                      setDisable(true)
-                    } else {
-                      setDisable(false)
-                    }
-                    return (
-                      <Checkbox
-                        label='External Prescription'
-                        {...args}
-                        onChange={(e) => {
-                          if (e.target.value) {
-                            this.props.setFieldValue('adjAmount', 0)
-                            this.props.setFieldValue(
-                              'totalAfterItemAdjustment',
-                              0,
-                            )
-                            this.props.setFieldValue('totalPrice', 0)
-                            this.props.setFieldValue('expiryDate', undefined)
-                            this.props.setFieldValue('batchNo', undefined)
-                            this.props.setFieldValue('isMinus', true)
-                            this.props.setFieldValue('isExactAmount', true)
-                            this.props.setFieldValue('adjValue', 0)
-                          } else {
-                            this.props.setFieldValue(
-                              'expiryDate',
-                              this.state.expiryDate,
-                            )
-                            this.props.setFieldValue(
-                              'batchNo',
-                              this.state.batchNo,
-                            )
-                            setTimeout(() => {
-                              this.calculateQuantity()
-                            }, 1)
-                          }
-                          setDisable(e.target.value)
-                        }}
-                      />
-                    )
-                  }}
-                />
-              ) : (
-                ''
-              )}
-              {values.isDrugMixture && (
-                <FastField
-                  name='isClaimable'
-                  render={(args) => {
-                    return <Checkbox label='Claimable' {...args} />
-                  }}
-                />
-              )}
-            </GridItem>
+            <GridItem xs={8} className={classes.editor} />
             <GridItem xs={3}>
               <Field
                 name='totalAfterItemAdjustment'

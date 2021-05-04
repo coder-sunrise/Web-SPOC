@@ -21,18 +21,24 @@ import { currencySymbol } from '@/utils/config'
 import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
 import { DoctorProfileSelect } from '@/components/_medisys'
 
-const getVisitDoctorUserId = props => {
+const getVisitDoctorUserId = (props) => {
   const { doctorprofile } = props.codetable
-  const { doctorProfileFK } = props.visitRegistration.entity.visit   
+  const { doctorProfileFK } = props.visitRegistration.entity.visit
   let visitDoctorUserId
   if (doctorprofile && doctorProfileFK) {
-    visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK).clinicianProfile.userProfileFK
+    visitDoctorUserId = doctorprofile.find((d) => d.id === doctorProfileFK)
+      .clinicianProfile.userProfileFK
   }
 
   return visitDoctorUserId
 }
 
-@connect(({ codetable, global, user, visitRegistration }) => ({ codetable, global, user, visitRegistration }))
+@connect(({ codetable, global, user, visitRegistration }) => ({
+  codetable,
+  global,
+  user,
+  visitRegistration,
+}))
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type, codetable, visitRegistration }) => {
     const v = {
@@ -52,10 +58,12 @@ const getVisitDoctorUserId = props => {
 
     if (_.isEmpty(orders.entity)) {
       const { doctorprofile } = codetable
-      if(visitRegistration && visitRegistration.entity) {
-        const { doctorProfileFK } = visitRegistration.entity.visit              
+      if (visitRegistration && visitRegistration.entity) {
+        const { doctorProfileFK } = visitRegistration.entity.visit
         if (doctorprofile && doctorProfileFK) {
-          v.performingUserFK = doctorprofile.find(d => d.id === doctorProfileFK).clinicianProfile.userProfileFK
+          v.performingUserFK = doctorprofile.find(
+            (d) => d.id === doctorProfileFK,
+          ).clinicianProfile.userProfileFK
         }
       }
     }
@@ -89,7 +97,8 @@ const getVisitDoctorUserId = props => {
         values.adjAmount < 0
           ? -Math.abs(values.adjValue)
           : Math.abs(values.adjValue),
-      packageGlobalId: values.packageGlobalId !== undefined ? values.packageGlobalId : '',
+      packageGlobalId:
+        values.packageGlobalId !== undefined ? values.packageGlobalId : '',
     }
 
     dispatch({
@@ -320,7 +329,14 @@ class Service extends PureComponent {
   }
 
   render () {
-    const { theme, classes, values = {}, footer, from, setFieldValue } = this.props
+    const {
+      theme,
+      classes,
+      values = {},
+      footer,
+      from,
+      setFieldValue,
+    } = this.props
     const { services, serviceCenters } = this.state
     const { serviceFK, serviceCenterFK } = values
     const totalPriceReadonly =
@@ -340,17 +356,116 @@ class Service extends PureComponent {
               <Field
                 name='serviceFK'
                 render={(args) => {
-                return (
-                  <div id={`autofocus_${values.type}`}>
+                  return (
+                    <div id={`autofocus_${values.type}`}>
+                      <Select
+                        label='Service Name'
+                        labelField='combinDisplayValue'
+                        options={services.filter(
+                          (o) =>
+                            !serviceCenterFK ||
+                            o.serviceCenters.find(
+                              (m) => m.value === serviceCenterFK,
+                            ),
+                        )}
+                        onChange={() =>
+                          setTimeout(() => {
+                            this.getServiceCenterService()
+                          }, 1)}
+                        disabled={values.isPackage}
+                        {...args}
+                      />
+                    </div>
+                  )
+                }}
+              />
+            </GridItem>
+            {values.isPackage && (
+              <React.Fragment>
+                <GridItem xs={3}>
+                  <Field
+                    name='packageConsumeQuantity'
+                    render={(args) => {
+                      return (
+                        <NumberInput
+                          label='Consumed Quantity'
+                          style={{
+                            marginLeft: theme.spacing(7),
+                            paddingRight: theme.spacing(6),
+                          }}
+                          step={1}
+                          min={0}
+                          max={values.remainingQuantity}
+                          disabled={
+                            this.props.visitRegistration.entity.visit
+                              .isInvoiceFinalized
+                          }
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+                <GridItem xs={1}>
+                  <Field
+                    name='remainingQuantity'
+                    render={(args) => {
+                      return (
+                        <NumberInput
+                          style={{
+                            marginTop: theme.spacing(3),
+                          }}
+                          formatter={(v) => `/ ${parseFloat(v).toFixed(1)}`}
+                          text
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+              </React.Fragment>
+            )}
+            {!values.isPackage && (
+              <GridItem xs={3}>
+                <Field
+                  name='quantity'
+                  render={(args) => {
+                    return (
+                      <NumberInput
+                        label='Quantity'
+                        style={{
+                          marginLeft: theme.spacing(7),
+                          paddingRight: theme.spacing(6),
+                        }}
+                        step={1}
+                        min={values.minQuantity}
+                        onChange={(e) => {
+                          if (values.unitPrice) {
+                            const total = e.target.value * values.unitPrice
+                            setFieldValue('total', total)
+                            this.updateTotalPrice(total)
+                          }
+                        }}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+            )}
+          </GridContainer>
+          <GridContainer>
+            <GridItem xs={8}>
+              <Field
+                name='serviceCenterFK'
+                render={(args) => {
+                  return (
                     <Select
-                      label='Service Name'
-                      labelField='combinDisplayValue'
-                      options={services.filter(
+                      label='Service Center Name'
+                      options={serviceCenters.filter(
                         (o) =>
-                          !serviceCenterFK ||
-                          o.serviceCenters.find(
-                            (m) => m.value === serviceCenterFK,
-                          ),
+                          !serviceFK ||
+                          o.services.find((m) => m.value === serviceFK),
                       )}
                       onChange={() =>
                         setTimeout(() => {
@@ -359,143 +474,43 @@ class Service extends PureComponent {
                       disabled={values.isPackage}
                       {...args}
                     />
-                  </div>
-                )
-              }}
-              />
-            </GridItem>
-            {values.isPackage && (
-            <React.Fragment>
-              <GridItem xs={3}>
-                <Field
-                  name='packageConsumeQuantity'
-                  render={(args) => {
-                    return (
-                      <NumberInput
-                        label='Consumed Quantity'
-                        style={{
-                          marginLeft: theme.spacing(7),
-                          paddingRight: theme.spacing(6),
-                        }}
-                        step={1}
-                        min={0}
-                        max={values.remainingQuantity}
-                        disabled={this.props.visitRegistration.entity.visit.isInvoiceFinalized}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-              <GridItem xs={1}>
-                <Field
-                  name='remainingQuantity'
-                  render={(args) => {
-                    return (
-                      <NumberInput
-                        style={{
-                          marginTop: theme.spacing(3),
-                        }}
-                        formatter={(v) => `/ ${parseFloat(v).toFixed(1)}`}
-                        text
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-            </React.Fragment>
-          )}
-            {!values.isPackage && (
-            <GridItem xs={3}>
-              <Field
-                name='quantity'
-                render={(args) => {
-                  return (
-                    <NumberInput
-                      label='Quantity'
-                      style={{
-                        marginLeft: theme.spacing(7),
-                        paddingRight: theme.spacing(6),
-                      }}
-                      step={1}
-                      min={values.minQuantity}
-                      onChange={(e) => {
-                        if (values.unitPrice) {
-                          const total = e.target.value * values.unitPrice
-                          setFieldValue('total', total)
-                          this.updateTotalPrice(total)
-                        }
-                      }}
-                      {...args}
-                    />
                   )
                 }}
-              />
-            </GridItem>
-          )}
-          </GridContainer>
-          <GridContainer>
-            <GridItem xs={8}>
-              <Field
-                name='serviceCenterFK'
-                render={(args) => {
-                return (
-                  <Select
-                    label='Service Center Name'
-                    options={serviceCenters.filter(
-                      (o) =>
-                        !serviceFK ||
-                        o.services.find((m) => m.value === serviceFK),
-                    )}
-                    onChange={() =>
-                      setTimeout(() => {
-                        this.getServiceCenterService()
-                      }, 1)}
-                    disabled={values.isPackage}
-                    {...args}
-                  />
-                )
-              }}
               />
             </GridItem>
             <GridItem xs={3}>
               <Field
                 name='total'
                 render={(args) => {
-                return (
-                  <NumberInput
-                    label='Total'
-                    style={{
-                      marginLeft: theme.spacing(7),
-                      paddingRight: theme.spacing(6),
-                    }}
-                    min={0}
-                    currency
-                    onChange={(e) => {
-                      this.updateTotalPrice(e.target.value)
-                    }}
-                    disabled={totalPriceReadonly || values.isPackage}
-                    {...args}
-                  />
-                )
-              }}
+                  return (
+                    <NumberInput
+                      label='Total'
+                      style={{
+                        marginLeft: theme.spacing(7),
+                        paddingRight: theme.spacing(6),
+                      }}
+                      min={0}
+                      currency
+                      onChange={(e) => {
+                        this.updateTotalPrice(e.target.value)
+                      }}
+                      disabled={totalPriceReadonly || values.isPackage}
+                      {...args}
+                    />
+                  )
+                }}
               />
             </GridItem>
           </GridContainer>
           <GridContainer>
             <GridItem xs={8} className={classes.editor}>
-              <Field
-                name='performingUserFK'
-                render={(args) => (
-                  <DoctorProfileSelect
-                    label='Performed By'
-                    {...args}
-                    valueField='clinicianProfile.userProfileFK'
-                  />
-              )}
+              <FastField
+                name='remark'
+                render={(args) => {
+                  return <TextField rowsMax='5' label='Remarks' {...args} />
+                }}
               />
-            </GridItem>  
+            </GridItem>
             <GridItem xs={3} className={classes.editor}>
               <div style={{ position: 'relative' }}>
                 <div
@@ -504,10 +519,77 @@ class Service extends PureComponent {
                   <Field
                     name='isMinus'
                     render={(args) => {
+                      return (
+                        <Switch
+                          checkedChildren='-'
+                          unCheckedChildren='+'
+                          label=''
+                          onChange={() => {
+                            setTimeout(() => {
+                              this.onAdjustmentConditionChange()
+                            }, 1)
+                          }}
+                          disabled={totalPriceReadonly || values.isPackage}
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </div>
+                <Field
+                  name='adjValue'
+                  render={(args) => {
+                    args.min = 0
+                    if (values.isExactAmount) {
+                      return (
+                        <NumberInput
+                          style={{
+                            marginLeft: theme.spacing(7),
+                            paddingRight: theme.spacing(6),
+                          }}
+                          currency
+                          label='Adjustment'
+                          onChange={() => {
+                            setTimeout(() => {
+                              this.onAdjustmentConditionChange()
+                            }, 1)
+                          }}
+                          disabled={totalPriceReadonly || values.isPackage}
+                          {...args}
+                        />
+                      )
+                    }
+                    return (
+                      <NumberInput
+                        style={{
+                          marginLeft: theme.spacing(7),
+                          paddingRight: theme.spacing(6),
+                        }}
+                        percentage
+                        max={100}
+                        label='Adjustment'
+                        onChange={() => {
+                          setTimeout(() => {
+                            this.onAdjustmentConditionChange()
+                          }, 1)
+                        }}
+                        disabled={totalPriceReadonly || values.isPackage}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </div>
+            </GridItem>
+            <GridItem xs={1} className={classes.editor}>
+              <div style={{ marginTop: theme.spacing(2) }}>
+                <Field
+                  name='isExactAmount'
+                  render={(args) => {
                     return (
                       <Switch
-                        checkedChildren='-'
-                        unCheckedChildren='+'
+                        checkedChildren='$'
+                        unCheckedChildren='%'
                         label=''
                         onChange={() => {
                           setTimeout(() => {
@@ -519,112 +601,49 @@ class Service extends PureComponent {
                       />
                     )
                   }}
-                  />
-                </div>
-                <Field
-                  name='adjValue'
-                  render={(args) => {
-                  args.min = 0
-                  if (values.isExactAmount) {
-                    return (
-                      <NumberInput
-                        style={{
-                          marginLeft: theme.spacing(7),
-                          paddingRight: theme.spacing(6),
-                        }}
-                        currency
-                        label='Adjustment'
-                        onChange={() => {
-                          setTimeout(() => {
-                            this.onAdjustmentConditionChange()
-                          }, 1)
-                        }}
-                        disabled={totalPriceReadonly || values.isPackage}
-                        {...args}
-                      />
-                    )
-                  }
-                  return (
-                    <NumberInput
-                      style={{
-                        marginLeft: theme.spacing(7),
-                        paddingRight: theme.spacing(6),
-                      }}
-                      percentage
-                      max={100}
-                      label='Adjustment'
-                      onChange={() => {
-                        setTimeout(() => {
-                          this.onAdjustmentConditionChange()
-                        }, 1)
-                      }}
-                      disabled={totalPriceReadonly || values.isPackage}
-                      {...args}
-                    />
-                  )
-                }}
-                />
-              </div>
-            </GridItem>
-            <GridItem xs={1} className={classes.editor}>
-              <div style={{ marginTop: theme.spacing(2) }}>
-                <Field
-                  name='isExactAmount'
-                  render={(args) => {
-                  return (
-                    <Switch
-                      checkedChildren='$'
-                      unCheckedChildren='%'
-                      label=''
-                      onChange={() => {
-                        setTimeout(() => {
-                          this.onAdjustmentConditionChange()
-                        }, 1)
-                      }}
-                      disabled={totalPriceReadonly || values.isPackage}
-                      {...args}
-                    />
-                  )
-                }}
                 />
               </div>
             </GridItem>
           </GridContainer>
           <GridContainer>
             <GridItem xs={8} className={classes.editor}>
-              <FastField
-                name='remark'
-                render={(args) => {
-                return (
-                  <TextField multiline rowsMax='5' label='Remarks' {...args} />
-                )
-              }}
-              />
+              {values.isPackage && (
+                <Field
+                  name='performingUserFK'
+                  render={(args) => (
+                    <DoctorProfileSelect
+                      label='Performed By'
+                      {...args}
+                      valueField='clinicianProfile.userProfileFK'
+                    />
+                  )}
+                />
+              )}
             </GridItem>
             <GridItem xs={3} className={classes.editor}>
               <Field
                 name='totalAfterItemAdjustment'
                 render={(args) => {
-                return (
-                  <NumberInput
-                    label='Total After Adj'
-                    style={{
-                      marginLeft: theme.spacing(7),
-                      paddingRight: theme.spacing(6),
-                    }}
-                    currency
-                    disabled
-                    {...args}
-                  />
-                )
-              }}
+                  return (
+                    <NumberInput
+                      label='Total After Adj'
+                      style={{
+                        marginLeft: theme.spacing(7),
+                        paddingRight: theme.spacing(6),
+                      }}
+                      currency
+                      disabled
+                      {...args}
+                    />
+                  )
+                }}
               />
             </GridItem>
           </GridContainer>
           {footer({
-          onSave: this.validateAndSubmitIfOk,
-          onReset: this.handleReset,
-        })}
+            onSave: this.validateAndSubmitIfOk,
+            onReset: this.handleReset,
+          })}
         </div>
       </Authorized>
     )
