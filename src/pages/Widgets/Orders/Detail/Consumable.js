@@ -24,18 +24,24 @@ import moment from 'moment'
 import LowStockInfo from './LowStockInfo'
 import { DoctorProfileSelect } from '@/components/_medisys'
 
-const getVisitDoctorUserId = props => {
+const getVisitDoctorUserId = (props) => {
   const { doctorprofile } = props.codetable
   const { doctorProfileFK } = props.visitRegistration.entity.visit
   let visitDoctorUserId
   if (doctorprofile && doctorProfileFK) {
-    visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK).clinicianProfile.userProfileFK
+    visitDoctorUserId = doctorprofile.find((d) => d.id === doctorProfileFK)
+      .clinicianProfile.userProfileFK
   }
 
   return visitDoctorUserId
 }
 
-@connect(({ global, codetable, user, visitRegistration }) => ({ global, codetable, user, visitRegistration }))
+@connect(({ global, codetable, user, visitRegistration }) => ({
+  global,
+  codetable,
+  user,
+  visitRegistration,
+}))
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type, codetable, visitRegistration }) => {
     const v = { ...(orders.entity || orders.defaultConsumable) }
@@ -56,7 +62,9 @@ const getVisitDoctorUserId = props => {
       if (visitRegistration && visitRegistration.entity) {
         const { doctorProfileFK } = visitRegistration.entity.visit
         if (doctorprofile && doctorProfileFK) {
-          v.performingUserFK = doctorprofile.find(d => d.id === doctorProfileFK).clinicianProfile.userProfileFK
+          v.performingUserFK = doctorprofile.find(
+            (d) => d.id === doctorProfileFK,
+          ).clinicianProfile.userProfileFK
         }
       }
     }
@@ -73,9 +81,7 @@ const getVisitDoctorUserId = props => {
       'The amount should be more than 0.00',
     ),
     performingUserFK: Yup.number().required(),
-    expiryDate: Yup.date().min(
-      moment(),
-      'EXPIRED!'),
+    expiryDate: Yup.date().min(moment(), 'EXPIRED!'),
   }),
 
   handleSubmit: (values, { props, onConfirm, setValues }) => {
@@ -99,7 +105,8 @@ const getVisitDoctorUserId = props => {
         values.adjAmount < 0
           ? -Math.abs(values.adjValue)
           : Math.abs(values.adjValue),
-      packageGlobalId: values.packageGlobalId !== undefined ? values.packageGlobalId : '',
+      packageGlobalId:
+        values.packageGlobalId !== undefined ? values.packageGlobalId : '',
     }
     dispatch({
       type: 'orders/upsertRow',
@@ -341,7 +348,9 @@ class Consumable extends PureComponent {
       const { handleSubmit, validateForm } = this.props
       const validateResult = await validateForm()
       const isFormValid = _.isEmpty(validateResult)
-      if (!isFormValid) { handleSubmit() }
+      if (!isFormValid) {
+        handleSubmit()
+      }
     }, 300)
   }
 
@@ -410,7 +419,10 @@ class Consumable extends PureComponent {
                           step={1}
                           min={0}
                           max={values.remainingQuantity}
-                          disabled={this.props.visitRegistration.entity.visit.isInvoiceFinalized}
+                          disabled={
+                            this.props.visitRegistration.entity.visit
+                              .isInvoiceFinalized
+                          }
                           {...args}
                         />
                       )
@@ -503,7 +515,9 @@ class Consumable extends PureComponent {
                   return (
                     <DatePicker
                       label='Expiry Date'
-                      onChange={() => { this.onExpiryDateChange() }}
+                      onChange={() => {
+                        this.onExpiryDateChange()
+                      }}
                       disabled={disableEdit}
                       {...args}
                     />
@@ -537,15 +551,11 @@ class Consumable extends PureComponent {
           </GridContainer>
           <GridContainer>
             <GridItem xs={8} className={classes.editor}>
-              <Field
-                name='performingUserFK'
-                render={(args) => (
-                  <DoctorProfileSelect
-                    label='Performed By'
-                    {...args}
-                    valueField='clinicianProfile.userProfileFK'
-                  />
-                )}
+              <FastField
+                name='remark'
+                render={(args) => {
+                  return <TextField rowsMax='5' label='Remarks' {...args} />
+                }}
               />
             </GridItem>
             <GridItem xs={3} className={classes.editor}>
@@ -644,14 +654,18 @@ class Consumable extends PureComponent {
           </GridContainer>
           <GridContainer>
             <GridItem xs={8} className={classes.editor}>
-              <FastField
-                name='remark'
-                render={(args) => {
-                  return (
-                    <TextField multiline rowsMax='5' label='Remarks' {...args} />
-                  )
-                }}
-              />
+              {values.isPackage && (
+                <Field
+                  name='performingUserFK'
+                  render={(args) => (
+                    <DoctorProfileSelect
+                      label='Performed By'
+                      {...args}
+                      valueField='clinicianProfile.userProfileFK'
+                    />
+                  )}
+                />
+              )}
             </GridItem>
             <GridItem xs={3} className={classes.editor}>
               <FastField
