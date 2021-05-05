@@ -791,6 +791,7 @@ class Queue extends React.Component {
     const { sessionNo, isClinicSessionClosed } = sessionInfo
     const { tracker } = queueCalling
 
+    const openQueueDisplayAccessRight = Authorized.check('openqueuedisplay')
     return (
       <PageHeaderWrapper
         title={<FormattedMessage id='app.forms.basic.title' />}
@@ -803,8 +804,7 @@ class Queue extends React.Component {
                 {`Session No.: ${sessionNo}`}
               </h3>
 
-              <Authorized authority='openqueuedisplay'>
-                {tracker && tracker.qNo ? (
+                {openQueueDisplayAccessRight && openQueueDisplayAccessRight.rights !== 'hidden' && tracker && tracker.qNo ? (
                   <h4
                     className={classNames(classes.sessionNo)}
                     style={{
@@ -826,7 +826,6 @@ class Queue extends React.Component {
                 ) : (
                   ''
                 )}
-              </Authorized>
 
               {!isClinicSessionClosed && (
                 <div className={classNames(classes.toolBtns)}>

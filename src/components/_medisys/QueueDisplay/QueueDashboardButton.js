@@ -26,43 +26,42 @@ const QueueDashboardButton = ({
 }) => {
   return (
     <Authorized authority='openqueuedisplay'>
-      <ProgressButton
-        icon={<Dashboard />}
-        size={size}
-        color='info'
-        className={classes.queueDashboardButton}
-        onClick={() => window.open('/queuedisplay/dashboard')}
-      >
-        Open Queue Display
-      </ProgressButton>
-      {showClear ? (
+      <div style={{ display: 'inline-Block' }}>
         <ProgressButton
+          icon={<Dashboard />}
           size={size}
-          icon={<ClearAll />}
+          color='info'
           className={classes.queueDashboardButton}
-          onClick={() => {
-            dispatch({
-              type: 'queueCalling/claearAll',
-              payload: {
-                key: VALUE_KEYS.QUEUECALLING,
-              },
-            }).then((res) => {
-              if (res) {
-                notification.success({ message: 'Cleared' })
-                sendNotification('QueueClear', {
-                  type: NOTIFICATION_TYPE.QUEUECALL,
-                  status: NOTIFICATION_STATUS.OK,
-                  message: 'Queue Clear',
-                })
-              }
-            })
-          }}
+          onClick={() => window.open('/queuedisplay/dashboard')}
         >
-          clear
-        </ProgressButton>
-      ) : (
-        ''
-      )}
+          Open Queue Display
+      </ProgressButton>
+        {showClear && (
+          <ProgressButton
+            size={size}
+            icon={<ClearAll />}
+            className={classes.queueDashboardButton}
+            onClick={() => {
+              dispatch({
+                type: 'queueCalling/claearAll',
+                payload: {
+                  key: VALUE_KEYS.QUEUECALLING,
+                },
+              }).then((res) => {
+                if (res) {
+                  notification.success({ message: 'Cleared' })
+                  sendNotification('QueueClear', {
+                    type: NOTIFICATION_TYPE.QUEUECALL,
+                    status: NOTIFICATION_STATUS.OK,
+                    message: 'Queue Clear',
+                  })
+                }
+              })
+            }}
+          >
+            clear
+          </ProgressButton>
+        )}</div>
     </Authorized>
   )
 }
