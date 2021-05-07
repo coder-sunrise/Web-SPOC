@@ -1,6 +1,6 @@
 import React from 'react'
 // formik
-import { FastField } from 'formik'
+import { FastField, Field } from 'formik'
 // common components
 import {
   Button,
@@ -9,21 +9,77 @@ import {
   GridItem,
   RadioGroup,
   SizeContainer,
+  Select
 } from '@/components'
 // medisys components
 import { DoctorProfileSelect } from '@/components/_medisys'
+import { queryList, query } from '@/services/patient'
+import Call from '@material-ui/icons/Call'
 import ReportDateRangePicker from '../ReportDateRangePicker'
 
 const FilterBar = ({
   handleSubmit,
   isSubmitting,
   visitOrderTemplateOptions = [],
+  classes,
 }) => {
+
+  const selectPatientProfile = (args) => {
+    const { disabled } = args
+    return (
+      <Select
+        disabled={disabled}
+        query={(v) => {
+          if (typeof v === 'number') {
+            return query({ id: v })
+          }
+          return queryList({
+            apiCriteria: {
+              searchValue: v,
+              includeinactive: false,
+            },
+          })
+        }}
+        handleFilter={() => true}
+        valueField="id"
+        label="Patient Name/Account No./Mobile No./Ref. No."
+        renderDropdown={(p) => {
+          const { contact = {} } = p
+          const { mobileContactNumber = {}, officeContactNumber = {}, homeContactNumber = {} } = contact
+          p.mobileNo = mobileContactNumber.number || p.mobileNo
+          p.officeNo = officeContactNumber.number || p.officeNo
+          p.homeNo = homeContactNumber.number || p.homeNo
+          return (
+            <div>
+              <p>
+                {p.patientAccountNo} / {p.name}
+              </p>
+              <p>
+                Ref No. {p.patientReferenceNo}
+                <span style={{ float: 'right' }}>
+                  <Call className={classes.contactIcon} />
+                  {p.mobileNo || p.officeNo || p.homeNo}
+                </span>
+              </p>
+            </div>
+          )
+        }}
+        {...args}
+      />
+    )
+  }
+
   return (
     <SizeContainer size='sm'>
       <GridContainer>
         <GridContainer alignItems='center'>
-          {/* 1st row  */}
+          <GridItem xs md={4} >
+            <Field
+              disabled
+              name='patientProfileID'
+              render={selectPatientProfile}
+            />
+          </GridItem>
           <ReportDateRangePicker />
           <GridItem md={2}>
             <Button
