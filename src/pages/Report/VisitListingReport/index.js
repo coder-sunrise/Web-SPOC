@@ -3,6 +3,7 @@ import moment from 'moment'
 import { connect } from 'dva'
 // formik
 import { withFormik } from 'formik'
+import { withStyles } from '@material-ui/core'
 // sub components
 import FilterBar from './FilterBar'
 import VisitList from './VisitList'
@@ -11,11 +12,20 @@ import ReportBase from '../ReportBase'
 const reportId = 63
 const fileName = 'Visit Listing Report'
 
+const styles = () => ({
+  contactIcon: {
+    width: 15,
+    height: 15,
+    position: 'relative',
+    top: 3,
+  },
+})
+
 @connect(({ visitRegistration }) => ({
-  visitRegistration,
+  visitRegistration
 }))
 class VisitListing extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       ...this.state,
@@ -62,12 +72,13 @@ class VisitListing extends ReportBase {
   }
 
   renderFilterBar = (handleSubmit, isSubmitting) => {
-    const { visitRegistration: { visitOrderTemplateOptions = [] } } = this.props
+    const { visitRegistration: { visitOrderTemplateOptions = [] }, classes } = this.props
     return (
       <FilterBar
         handleSubmit={handleSubmit}
         isSubmitting={isSubmitting}
         visitOrderTemplateOptions={visitOrderTemplateOptions}
+        classes={classes}
       />
     )
   }
@@ -85,4 +96,4 @@ const VisitListingWithFormik = withFormik({
   }),
 })(VisitListing)
 
-export default VisitListingWithFormik
+export default withStyles(styles, { withTheme: true })(VisitListingWithFormik)
