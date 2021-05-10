@@ -368,7 +368,6 @@ class PatientDetail extends PureComponent {
       patientAccountNo: values.patientAccountNo,
       name: values.name,
       dob: values.dob
-
     })
 
     const { data } = response
