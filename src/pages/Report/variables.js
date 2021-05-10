@@ -144,6 +144,12 @@ export const menuData = [
     authority: 'report.inventory.purchasereceivinglistingreport',
   },
   {
+    title: 'Inventory',
+    text: 'Expiring Stock Report',
+    url: '/report/expiringstockreport',
+    authority: 'report.inventory.expiringstockreport',
+  },
+  {
     title: 'Other',
     text: 'Diagnosis Trending Report',
     url: '/report/diagnosistrending',

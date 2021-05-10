@@ -12,7 +12,7 @@ import { PATIENT_LAB } from '@/utils/constants'
 const LabTrackingDrawer = ({ classes, theme, onClose, ...restProps }) => {
   return (
     <div style={{ width: '67vw', padding: theme.spacing(2) }}>
-      <h4 style={{ display: 'inline-block' }}>Patient History</h4>
+      <h4 style={{ display: 'inline-block' }}>Results</h4>
       <Tooltip title='Close Lab Tracking'>
         <Button
           justIcon

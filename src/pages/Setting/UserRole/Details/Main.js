@@ -511,7 +511,10 @@ class Main extends React.Component {
     const items = this.getModuleItems(moduleName, type)
     return (
       <GridItem
+        xs={12}
+        sm={12}
         md={4}
+        lg={4}
         container
         style={{
           border: '1px solid #d9d9d9',
@@ -519,7 +522,12 @@ class Main extends React.Component {
           padding: 0,
         }}
       >
-        <GridItem md={12} style={{ marginTop: 8, marginBottom: 4 }}>
+        <GridItem
+          xs={12}
+          sm={12}
+          md={12}
+          style={{ marginTop: 8, marginBottom: 4 }}
+        >
           <div
             style={{
               display: 'flex',
@@ -533,6 +541,7 @@ class Main extends React.Component {
               }}
             >
               <Radio.Group
+                style={{ width: 210 }}
                 size='small'
                 value=''
                 onChange={(e) => {
@@ -559,6 +568,8 @@ class Main extends React.Component {
           </div>
         </GridItem>
         <GridItem
+          xs={12}
+          sm={12}
           md={12}
           style={{ marginBottom: 8, paddingRight: 0, paddingLeft: 8 }}
         >
@@ -621,6 +632,9 @@ class Main extends React.Component {
                       }}
                     >
                       <Radio.Group
+                        style={{
+                          width: 210,
+                        }}
                         size='small'
                         value={item.permission}
                         onChange={(e) => {

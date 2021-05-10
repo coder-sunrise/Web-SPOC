@@ -267,9 +267,10 @@ class Detail extends PureComponent {
       { name: 'uomDisplayValue', title: 'UOM' },
       { name: 'batchNo', title: 'Batch #' },
       { name: 'expiryDate', title: 'Expiry Date' },
-      { name: 'stock', title: 'Current Stock' },
+      { name: 'totalStock', title: 'Total Stock' },
+      { name: 'stock', title: 'Batch Stock' },
       { name: 'adjustmentQty', title: 'Adjustment Qty' },
-      { name: 'physicalStock', title: 'Physical Stock' },
+      { name: 'physicalStock', title: 'Batch Physical Stock' },
     ],
     columnExtensions: [
       {
@@ -342,6 +343,13 @@ class Detail extends PureComponent {
         type: 'date',
         isDisabled: (row) => this.isDisabled(row),
         width: 150,
+      },
+      {
+        columnName: 'totalStock',
+        type: 'number',
+        format: '0.0',
+        disabled: true,
+        qty: true,
       },
       {
         columnName: 'stock',
@@ -693,6 +701,9 @@ class Detail extends PureComponent {
       row.adjustmentQty = undefined
       row.stockList = stock
       row.itemFK = value
+      row.totalStock = stock.reduce((stockCount,s) => {
+        return stockCount + s.stock
+      },0)
       this.setState({ selectedItem: e })
       this.setState({ selectedBatch: undefined })
       if (row.inventoryTypeFK && row.code && !row.batchNo) {
@@ -845,6 +856,8 @@ class Detail extends PureComponent {
     if (!isEditable) {
       cfg.onRowDoubleClick = undefined
     }
+    if(values.inventoryAdjustmentStatusFK === INVENTORY_ADJUSTMENT_STATUS.FINALIZED)
+      this.tableParas.columns = this.tableParas.columns.filter((col) => col.name !== 'totalStock')
     return (
       <React.Fragment>
         <AuthorizedContext.Provider

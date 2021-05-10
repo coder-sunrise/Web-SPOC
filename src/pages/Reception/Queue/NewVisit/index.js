@@ -97,7 +97,6 @@ const getHeight = (propsHeight) => {
 )
 @withFormikExtend({
   displayName: 'VisitRegistration',
-  authority: 'queue.visitregistrationdetails',
   enableReinitialize: true,
   validationSchema: VisitValidationSchema,
   mapPropsToValues: formikMapPropsToValues,
@@ -328,7 +327,6 @@ class NewVisit extends PureComponent {
       values,
       isSubmitting,
       dispatch,
-      rights,
       setFieldValue,
       clinicSettings,
       patientInfo,
@@ -339,7 +337,7 @@ class NewVisit extends PureComponent {
       let div = $(this.myRef.current).find('div[aria-expanded]:eq(1)')
       if (div.attr('aria-expanded') === 'false') div.click()
     }
-
+    
     const defaultActive = []
     if (expandRefractionForm) {
       defaultActive.push(1)
@@ -422,11 +420,7 @@ class NewVisit extends PureComponent {
                   <React.Fragment>
                     <Authorized.Context.Provider
                       value={{
-                        rights:
-                          (rights === 'readwrite' || rights === 'enable') &&
-                            isReadOnly
-                            ? 'disable'
-                            : rights,
+                        rights: isReadOnly ? 'disable' : 'enable',
                       }}
                     >
                       <GridItem xs={12} className={classes.row}>
@@ -447,12 +441,7 @@ class NewVisit extends PureComponent {
                     </Authorized.Context.Provider>
                     <Authorized.Context.Provider
                       value={{
-                        rights:
-                          (rights === 'readwrite' || rights === 'enable') &&
-                            (isReadOnly || isRetail)
-                            && isReadonlyAfterSigned
-                            ? 'disable'
-                            : rights,
+                        rights: (isReadOnly || isRetail) && isReadonlyAfterSigned ? 'disable' : 'enable',
                       }}
                     >
                       <React.Fragment>

@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
 import { CodeSelect, EditableTableGrid, notification } from '@/components'
+import Authorized from '@/utils/Authorized'
 
 import { getCodes } from '@/utils/codetable'
 import { SCHEME_TYPE } from '@/utils/constants'
@@ -11,10 +12,9 @@ import { SCHEME_TYPE } from '@/utils/constants'
 //   schemeTypes = codetableData
 // })
 
-const isMedisaveEnable = false
 const ctSchemeType = 'ctSchemeType'
-let commitCount = 1000 // uniqueNumber
-@connect(({ codetable }) => ({ codetable }))
+// let commitCount = 1000 // uniqueNumber
+@connect(({ codetable, clinicSettings }) => ({ codetable, clinicSettings }))
 class SchemesGrid extends PureComponent {
   state = {
     editingRowIds: [],
@@ -24,8 +24,9 @@ class SchemesGrid extends PureComponent {
   constructor (props) {
     super(props)
 
-    const { title, titleChildren, dispatch, type } = props
+    const { title, titleChildren, dispatch, type, clinicSettings } = props
     const { state } = this
+    const isMedisaveEnable = clinicSettings.settings.isEnableMedisave
 
     this.tableParas = {
       columns: [
@@ -61,7 +62,7 @@ class SchemesGrid extends PureComponent {
           code: 'ctSchemeType',
           sortingEnabled: false,
           localFilter: (opt) => {
-            return isMedisaveEnable ? opt : !this.isMedisave(opt) // TODO: Disable for prod R1.5.3 only, enable when deploy UAT again
+            return isMedisaveEnable ? opt : !this.isMedisave(opt)
           },
           onChange: ({ val, option, row, onValueChange }) => {
             let { rows } = this.props

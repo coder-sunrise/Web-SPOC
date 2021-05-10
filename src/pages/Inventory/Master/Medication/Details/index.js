@@ -182,9 +182,10 @@ const Detail = ({
 }
 export default compose(
   withStyles(styles, { withTheme: true }),
-  connect(({ medication, medicationDetail }) => ({
+  connect(({ medication, medicationDetail, clinicSettings }) => ({
     medication,
     medicationDetail,
+    clinicSettings: clinicSettings.settings,
   })),
   withFormikExtend({
     enableReinitialize: true,

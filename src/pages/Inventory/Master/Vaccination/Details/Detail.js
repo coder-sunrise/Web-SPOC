@@ -21,8 +21,6 @@ import MedisaveVaccinations from './MedisaveVaccinations'
 import Sdd from '../../Sdd'
 import SharedContainer from '../../SharedContainer'
 
-const isMedisaveEnable = false
-
 const styles = () => ({})
 
 const Detail = ({
@@ -32,6 +30,7 @@ const Detail = ({
   hasActiveSession,
   values,
   schema,
+  clinicSettings,
   ...props
 }) => {
   const field = vaccinationDetail.entity ? 'entity' : 'default'
@@ -89,6 +88,11 @@ const Detail = ({
   //   }),
   // ) : Yup.object()
 
+  const sddProps = !props.values ? {
+    ...props,
+    values,
+  } : {...props}
+  
   return (
     <SharedContainer hideHeader>
       <div
@@ -174,7 +178,7 @@ const Detail = ({
                       valueField='id'
                       textField='name'
                       options={
-                        isMedisaveEnable ? (
+                        clinicSettings.isMedisaveEnable ? (
                           [
                             {
                               id: 'isAutoGenerateCertificate',
@@ -356,7 +360,7 @@ const Detail = ({
                 <div
                   style={{
                     display:
-                      isMedisaveEnable && values.isMedisaveClaimable
+                    clinicSettings.isMedisaveEnable && values.isMedisaveClaimable
                         ? ''
                         : 'none',
                   }}
@@ -386,7 +390,7 @@ const Detail = ({
             dispatch={dispatch}
             handleSelectSdd={handleSelectSdd}
             theme={theme}
-            {...props}
+            {...sddProps}
           />
         </CommonModal>
       </div>

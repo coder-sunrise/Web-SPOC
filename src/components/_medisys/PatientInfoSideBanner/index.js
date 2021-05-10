@@ -21,6 +21,7 @@ import {
   Tooltip,
 } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
+import Authorized from '@/utils/Authorized'
 import PrintLabLabelButton from './PatientLabelBtn'
 // assets
 import styles from './styles.js'
@@ -332,6 +333,10 @@ class PatientInfoSideBanner extends PureComponent {
       [classes.isInActive]: !entity || !entity.isActive,
     })
 
+    const medisaveAccessRight = Authorized.check('patientdatabase.checkmedisavebalance')
+    const isMedisaveEnable = clinicSettings.isEnableMedisave && medisaveAccessRight.rights !== 'hidden'
+    // console.log('isMedisaveEnable',clinicSettings, medisaveAccessRight)
+
     return entity && entity.id ? (
       <React.Fragment>
         <h4 className={entityNameClass}>
@@ -498,7 +503,7 @@ class PatientInfoSideBanner extends PureComponent {
           {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6).length > 0 && (
             <Divider light />
           )}
-          {entity.schemePayer.length > 0 && (
+          {isMedisaveEnable && entity.schemePayer.length > 0 && (
             // == MEDISAVE == //
             <div
               className={classes.schemeContainer}
@@ -575,7 +580,7 @@ class PatientInfoSideBanner extends PureComponent {
             </div>
           )}
         </LoadingWrapper>
-        {entity.patientScheme.filter((o) => this.isMedisave(o.schemeTypeFK)).length > 0 && (
+        {isMedisaveEnable && entity.patientScheme.filter((o) => this.isMedisave(o.schemeTypeFK)).length > 0 && (
           <Divider light />
         )}
       </React.Fragment>

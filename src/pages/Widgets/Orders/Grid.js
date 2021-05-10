@@ -475,7 +475,7 @@ export default ({
               if (isExistPackage) {
                 newChildren = [
                   <Table.Cell colSpan={3} key={1} />,
-                  React.cloneElement(children[5], {
+                  React.cloneElement(children[6], {
                     colSpan: 3,
                     ...restProps,
                   }),
@@ -483,7 +483,7 @@ export default ({
               } else {
                 newChildren = [
                   <Table.Cell colSpan={2} key={1} />,
-                  React.cloneElement(children[4], {
+                  React.cloneElement(children[5], {
                     colSpan: 2,
                     ...restProps,
                   }),
@@ -513,7 +513,7 @@ export default ({
                 const itemSubTotal = items.splice(items.length - 1)
                 return (
                   <Table.Cell
-                    colSpan={4}
+                    colSpan={5}
                     style={{
                       fontSize: 'inherit',
                       color: 'inherit',
@@ -526,7 +526,7 @@ export default ({
                         style={{
                           marginLeft: isExistPackage
                             ? theme.spacing(23)
-                            : theme.spacing(31),
+                            : theme.spacing(28),
                         }}
                       >
                         {itemSubTotal}

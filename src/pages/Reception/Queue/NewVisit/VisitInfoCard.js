@@ -54,7 +54,7 @@ const amountProps = {
   currency: true,
   disabled: true,
   normalText: true,
-  showZero: true, 
+  showZero: true,
   fullWidth: false,
 }
 
@@ -70,9 +70,9 @@ const VisitInfoCard = ({
   ctinvoiceadjustment,
   copaymentScheme,
   patientInfo,
+  clinicSettings,
   ...restProps
 }) => {
-
   const validateQNo = (value) => {
     const qNo = parseFloat(value).toFixed(1)
     if (existingQNo.includes(qNo))
@@ -150,8 +150,12 @@ const VisitInfoCard = ({
     )
     totalTempCharge = getVisitOrderTemplateTotal(visitType, template)
   }
-  let showNotApplyAdjustment = totalTempCharge !== (values.visitOrderTemplateTotal || 0)
-  let showAdjusment = values.visitStatus === 'WAITING' || values.visitStatus === 'UPCOMING APPT.'
+  let showNotApplyAdjustment =
+    totalTempCharge !== (values.visitOrderTemplateTotal || 0)
+  let showAdjusment =
+    values.visitStatus === 'WAITING' || values.visitStatus === 'UPCOMING APPT.'
+
+  const { isEnablePackage = false } = clinicSettings.settings
   return (
     <CommonCard title='Visit Information'>
       <GridContainer alignItems='center'>
@@ -185,10 +189,10 @@ const VisitInfoCard = ({
                       id: 'reception.queue.visitRegistration.attendantDoctor',
                     })
                   ) : (
-                      formatMessage({
-                        id: 'reception.queue.visitRegistration.doctor',
-                      })
-                    )
+                    formatMessage({
+                      id: 'reception.queue.visitRegistration.doctor',
+                    })
+                  )
                 }
                 {...args}
               />
@@ -268,7 +272,8 @@ const VisitInfoCard = ({
                     id:
                       'reception.queue.visitRegistration.visitOrderTotalCharge',
                   })}
-                />)
+                />
+              )
             }}
           />
         </GridItem>
@@ -291,80 +296,175 @@ const VisitInfoCard = ({
           />
         </GridItem>
         <GridItem xs md={4}>
-          <Field
-            name={FormField['visit.salesPersonUserFK']}
-            render={(args) => (
-              <ClinicianSelect
-                label={formatMessage({
-                  id: 'reception.queue.visitRegistration.salesPerson',
-                })}
-                disabled={isVisitReadonlyAfterSigned}
-                authority='none'
-                noDefaultValue
-                {...args}
-              />
-            )}
-          />
+          {isEnablePackage && (
+            <Field
+              name={FormField['visit.salesPersonUserFK']}
+              render={(args) => (
+                <ClinicianSelect
+                  label={formatMessage({
+                    id: 'reception.queue.visitRegistration.salesPerson',
+                  })}
+                  disabled={isVisitReadonlyAfterSigned}
+                  authority='none'
+                  noDefaultValue
+                  {...args}
+                />
+              )}
+            />
+          )}
         </GridItem>
-        {
-          (showAdjusment && ((ctinvoiceadjustment || []).length > 0 || (copaymentScheme || []).length > 0)) ?
-            <GridItem xs md={12}>
-              <div style={{ marginTop: '5px' }}>
-                <p>Below invoice adjustment(s) will {showNotApplyAdjustment ? <span style={{ fontWeight: 500, color: 'red' }}>NOT</span> : undefined} be applied to the total bill:</p>
-                {(ctinvoiceadjustment || []).map((t => {
-                  if (t.adjType === 'ExactAmount') {
-                    return <span style={{ display: 'inline-block', marginRight: '20px' }}><span style={{ fontWeight: '500' }}>{t.displayValue}:</span> <NumberInput text {...amountProps} style={{ display: 'inline-block' }} value={t.adjValue} />; </span>
-                  }
-
-                  if (t.adjValue > 0) {
-                    return (
-                      <span style={{ display: 'inline-block', marginRight: '20px' }}>
-                        <span style={{ fontWeight: '500', fontSize: '14px' }}>{t.displayValue}: <span style={{ color: 'darkblue' }}>{numeral(t.adjValue).format('0.00')}%;</span></span>
-                      </span>)
-                  }
-
+        {showAdjusment &&
+        ((ctinvoiceadjustment || []).length > 0 ||
+          (copaymentScheme || []).length > 0) ? (
+          <GridItem xs md={12}>
+            <div style={{ marginTop: '5px' }}>
+              <p>
+                Below invoice adjustment(s) will{' '}
+                {showNotApplyAdjustment ? (
+                  <span style={{ fontWeight: 500, color: 'red' }}>NOT</span>
+                ) : (
+                  undefined
+                )}{' '}
+                be applied to the total bill:
+              </p>
+              {(ctinvoiceadjustment || []).map((t) => {
+                if (t.adjType === 'ExactAmount') {
                   return (
-                    <span style={{ display: 'inline-block', marginRight: '20px' }}>
-                      <span style={{ fontWeight: '500' }}>{t.displayValue}: </span>
-                      <span style={{
-                        color: 'red', display: 'inline-block', fontWeight: '500',
+                    <span
+                      style={{ display: 'inline-block', marginRight: '20px' }}
+                    >
+                      <span style={{ fontWeight: '500' }}>
+                        {t.displayValue}:
+                      </span>{' '}
+                      <NumberInput
+                        text
+                        {...amountProps}
+                        style={{ display: 'inline-block' }}
+                        value={t.adjValue}
+                      />;{' '}
+                    </span>
+                  )
+                }
+
+                if (t.adjValue > 0) {
+                  return (
+                    <span
+                      style={{ display: 'inline-block', marginRight: '20px' }}
+                    >
+                      <span style={{ fontWeight: '500', fontSize: '14px' }}>
+                        {t.displayValue}:{' '}
+                        <span style={{ color: 'darkblue' }}>
+                          {numeral(t.adjValue).format('0.00')}%;
+                        </span>
+                      </span>
+                    </span>
+                  )
+                }
+
+                return (
+                  <span
+                    style={{ display: 'inline-block', marginRight: '20px' }}
+                  >
+                    <span style={{ fontWeight: '500' }}>
+                      {t.displayValue}:{' '}
+                    </span>
+                    <span
+                      style={{
+                        color: 'red',
+                        display: 'inline-block',
+                        fontWeight: '500',
                       }}
-                      >
-                        <span>({numeral(Math.abs(t.adjValue)).format('0.00')}%)</span>
-                      </span>;
-                    </span>) 
-                }))}
-                {(copaymentScheme || []).filter((t) => t.copayerInvoiceAdjustmentValue !== 0).length > 0 ?
-                  <p>
-                    {(copaymentScheme || []).filter((t) => t.copayerInvoiceAdjustmentValue !== 0).map((t => {
+                    >
+                      <span>
+                        ({numeral(Math.abs(t.adjValue)).format('0.00')}%)
+                      </span>
+                    </span>;
+                  </span>
+                )
+              })}
+              {(copaymentScheme || [])
+                .filter((t) => t.copayerInvoiceAdjustmentValue !== 0).length >
+              0 ? (
+                <p>
+                  {(copaymentScheme || [])
+                    .filter((t) => t.copayerInvoiceAdjustmentValue !== 0)
+                    .map((t) => {
                       if (t.copayerInvoiceAdjustmentType === 'ExactAmount') {
-                        return <span style={{ display: 'inline-block', marginRight: '20px' }}><span style={{ fontWeight: '500' }}>{t.coPayerName}</span>: <NumberInput text {...amountProps} style={{ display: 'inline-block' }} value={t.copayerInvoiceAdjustmentValue} />; </span>
+                        return (
+                          <span
+                            style={{
+                              display: 'inline-block',
+                              marginRight: '20px',
+                            }}
+                          >
+                            <span style={{ fontWeight: '500' }}>
+                              {t.coPayerName}
+                            </span>:{' '}
+                            <NumberInput
+                              text
+                              {...amountProps}
+                              style={{ display: 'inline-block' }}
+                              value={t.copayerInvoiceAdjustmentValue}
+                            />;{' '}
+                          </span>
+                        )
                       }
 
                       if (t.copayerInvoiceAdjustmentValue > 0) {
                         return (
-                          <span style={{ display: 'inline-block', marginRight: '20px' }}>
-                            <span style={{ fontWeight: '500' }}>{t.coPayerName}: <span style={{ color: 'darkblue' }}>{numeral(t.copayerInvoiceAdjustmentValue).format('0.00')}%;</span></span>
-                          </span>)
+                          <span
+                            style={{
+                              display: 'inline-block',
+                              marginRight: '20px',
+                            }}
+                          >
+                            <span style={{ fontWeight: '500' }}>
+                              {t.coPayerName}:{' '}
+                              <span style={{ color: 'darkblue' }}>
+                                {numeral(
+                                  t.copayerInvoiceAdjustmentValue,
+                                ).format('0.00')}%;
+                              </span>
+                            </span>
+                          </span>
+                        )
                       }
 
                       return (
-                        <span style={{ display: 'inline-block', marginRight: '20px' }}>
-                          <span style={{ fontWeight: '500' }}>{t.coPayerName}: </span>
-                          <span style={{
-                            color: 'red', display: 'inline-block', fontWeight: '500',
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            marginRight: '20px',
                           }}
+                        >
+                          <span style={{ fontWeight: '500' }}>
+                            {t.coPayerName}:{' '}
+                          </span>
+                          <span
+                            style={{
+                              color: 'red',
+                              display: 'inline-block',
+                              fontWeight: '500',
+                            }}
                           >
-                            <span>({numeral(Math.abs(t.copayerInvoiceAdjustmentValue)).format('0.00')}%)</span>
+                            <span>
+                              ({numeral(
+                                Math.abs(t.copayerInvoiceAdjustmentValue),
+                              ).format('0.00')}%)
+                            </span>
                           </span>;
-                        </span>) 
-                    }))}
-                  </p> : undefined
-                }
-              </div>
-            </GridItem>
-            : undefined
-        }
+                        </span>
+                      )
+                    })}
+                </p>
+              ) : (
+                undefined
+              )}
+            </div>
+          </GridItem>
+        ) : (
+          undefined
+        )}
         <GridItem xs md={12}>
           <AttachmentWithThumbnail
             label='Attachment'
