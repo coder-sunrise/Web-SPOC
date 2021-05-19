@@ -12,7 +12,7 @@ const styles = (theme) => ({
   },
 })
 class StatementList extends PureComponent {
-  render () {
+  render() {
     let listData = []
     const { reportDatas } = this.props
     if (!reportDatas) return null
@@ -22,7 +22,7 @@ class StatementList extends PureComponent {
         i >= 0;
         i--
       ) {
-        const item = reportDatas.StatementSummaryDetails[i]
+        const item = reportDatas.StatementSummaryDetails[ i ]
         listData.splice(0, 0, {
           ...item,
           id: `StatementList-${item.invoiceno}-${i}`,
@@ -37,6 +37,7 @@ class StatementList extends PureComponent {
       { name: 'invoiceNo', title: 'Invoice No.' },
       { name: 'refNo', title: 'Ref. No.' },
       { name: 'companyName', title: 'Company Name' },
+      { name: 'dueDate', title: 'Due Date' },
       { name: 'invoiceAmt', title: 'Invoice Amt.' },
       { name: 'adjustments', title: 'Adjustments' },
       { name: 'osAmt', title: 'O/S Amt.' },
@@ -45,7 +46,7 @@ class StatementList extends PureComponent {
       {
         columnName: 'invoiceDate',
         type: 'date',
-        width: 150,
+        width: 110,
         sortingEnabled: false,
       },
       { columnName: 'invoiceNo', sortingEnabled: false },
@@ -67,6 +68,12 @@ class StatementList extends PureComponent {
         columnName: 'osAmt',
         type: 'currency',
         currency: true,
+        sortingEnabled: false,
+      },
+      {
+        columnName: 'dueDate',
+        type: 'date',
+        width: 110,
         sortingEnabled: false,
       },
     ]
@@ -101,7 +108,7 @@ class StatementList extends PureComponent {
       },
     }
 
-    if (reportDatas.ListingDetails[0].groupByCompany) {
+    if (reportDatas.ListingDetails[ 0 ].groupByCompany) {
       StatementListCols.splice(2, 1)
       StatementListColsExtension.splice(2, 1)
       FuncProps = {
