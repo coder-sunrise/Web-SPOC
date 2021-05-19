@@ -90,7 +90,7 @@ class SearchBar extends PureComponent {
     showReportSelection: false,
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.unmount()
   }
 
@@ -103,7 +103,7 @@ class SearchBar extends PureComponent {
     })
 
   handleOnChange = (name, checked) => (event) => {
-    this.setState({ [name]: !checked })
+    this.setState({ [ name ]: !checked })
     // if AllDate is checked, set datetime to max range
   }
 
@@ -117,7 +117,7 @@ class SearchBar extends PureComponent {
     }))
   }
 
-  render () {
+  render() {
     const {
       classes,
       history,
@@ -126,6 +126,7 @@ class SearchBar extends PureComponent {
       handleSubmit,
       showGenerateStatement,
       clinicSettings,
+      batchPrintStatements,
     } = this.props
     const { isEnableAutoGenerateStatement } = clinicSettings.settings
     const {
@@ -294,6 +295,13 @@ class SearchBar extends PureComponent {
                 </Button>
               </Authorized>
             )}
+            <Button
+              variant='contained'
+              color='primary'
+              onClick={batchPrintStatements}
+            >
+              Batch Print
+            </Button>
           </GridItem>
         </GridContainer>
       </div>
