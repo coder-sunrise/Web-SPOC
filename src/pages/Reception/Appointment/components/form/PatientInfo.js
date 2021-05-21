@@ -1,6 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 // formik
 import { FastField, Field } from 'formik'
 // material ui
@@ -48,7 +48,7 @@ const PatientInfoInput = ({
         <div className={classnames(classes.buttonGroup)}>
           <FastField
             name='search'
-            render={(args) => {
+            render={args => {
               return (
                 <TextField
                   {...args}
@@ -130,7 +130,7 @@ const PatientInfoInput = ({
         ) : (
           <FastField
             name='patientName'
-            render={(args) => {
+            render={args => {
               return (
                 <TextField
                   {...args}
@@ -147,7 +147,7 @@ const PatientInfoInput = ({
       <GridItem xs md={3}>
         <Field
           name='countryCodeFK'
-          render={(args) => (
+          render={args => (
             <CodeSelect
               allowClear={false}
               label='Country Code'
@@ -161,7 +161,7 @@ const PatientInfoInput = ({
       <GridItem xs md={3}>
         <Field
           name='patientContactNo'
-          render={(args) => (
+          render={args => (
             <MobileNumberInput
               {...args}
               disabled={isRegisteredPatient || disabled || isEdit}

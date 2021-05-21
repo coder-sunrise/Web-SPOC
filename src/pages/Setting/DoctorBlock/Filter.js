@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
 import { withStyles } from '@material-ui/core'
@@ -18,7 +18,7 @@ import {
 // medisys components
 import { DoctorProfileSelect } from '@/components/_medisys'
 
-const styles = (theme) => ({
+const styles = theme => ({
   filterBar: {
     marginBottom: '10px',
   },
@@ -82,7 +82,9 @@ const recurrenceTypes = [
           ? moment(values.dateFrom).formatUTC()
           : undefined,
         lsteql_endDateTime: values.dateTo
-          ? moment(values.dateTo).endOf('day').formatUTC(false)
+          ? moment(values.dateTo)
+              .endOf('day')
+              .formatUTC(false)
           : undefined,
         'DoctorBlockGroupFKNavigation.DoctorBlockRecurrenceFKNavigation.RecurrencePatternFKNavigation.Id':
           values.recurrence,
@@ -92,7 +94,7 @@ const recurrenceTypes = [
   },
 })
 class Filter extends PureComponent {
-  setDateTo = (v) => {
+  setDateTo = v => {
     if (v) {
       this.props.setFieldValue('dateTo', moment(v).add(6, 'months'))
     } else {
@@ -100,7 +102,7 @@ class Filter extends PureComponent {
     }
   }
 
-  render () {
+  render() {
     const { classes, values, handleSubmit } = this.props
     return (
       <div className={classes.filterBar}>
@@ -108,7 +110,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={4}>
             <FastField
               name='doctorName'
-              render={(args) => (
+              render={args => (
                 <DoctorProfileSelect
                   mode='multiple'
                   {...args}
@@ -129,12 +131,12 @@ class Filter extends PureComponent {
           <GridItem xs={2} md={2}>
             <FastField
               name='dateFrom'
-              render={(args) => {
+              render={args => {
                 return (
                   <DatePicker
                     timeFormat={false}
                     label='From date'
-                    onChange={(v) => this.setDateTo(v)}
+                    onChange={v => this.setDateTo(v)}
                     {...args}
                   />
                 )
@@ -144,7 +146,7 @@ class Filter extends PureComponent {
           <GridItem xs={2} md={2}>
             <FastField
               name='dateTo'
-              render={(args) => {
+              render={args => {
                 return (
                   <DatePicker timeFormat={false} label='To date' {...args} />
                 )
@@ -154,7 +156,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={2}>
             <FastField
               name='recurrence'
-              render={(args) => {
+              render={args => {
                 return (
                   <CodeSelect
                     label='Recurrence Type'

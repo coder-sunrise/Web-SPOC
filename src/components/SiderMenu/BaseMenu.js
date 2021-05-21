@@ -1,11 +1,10 @@
 import React, { PureComponent } from 'react'
 import { Menu } from 'antd'
-import Link from 'umi'
+import Link, { formatMessage, setLocale, getLocale } from 'umi'
 import isEqual from 'lodash/isEqual'
 import memoizeOne from 'memoize-one'
 import router from 'umi/router'
 import _ from 'lodash'
-import { formatMessage, setLocale, getLocale } from 'umi/locale'
 
 import { NavLink } from 'react-router-dom'
 import PropTypes from 'prop-types'

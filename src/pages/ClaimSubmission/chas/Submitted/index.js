@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'dva'
 import $ from 'jquery'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 // formik
 import { withFormik } from 'formik'
 // material ui
@@ -24,7 +24,7 @@ import {
   SubmittedCHASColumns,
 } from './variables'
 
-const styles = (theme) => ({
+const styles = theme => ({
   cardContainer: {
     margin: 1,
   },
@@ -47,14 +47,14 @@ class SubmittedCHAS extends React.Component {
     isLoading: false,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.refreshDataGrid()
   }
 
   handleLoadingVisibility = (visibility = false) =>
     this.setState({ isLoading: visibility })
 
-  handleSelectionChange = (selection) =>
+  handleSelectionChange = selection =>
     this.setState({ selectedRows: selection })
 
   refreshDataGrid = () => {
@@ -72,7 +72,7 @@ class SubmittedCHAS extends React.Component {
           type: 'chasClaimSubmissionSubmitted/getSubmittedStatus',
           payload: { claimIds: selectedRows },
         })
-        .then((r) => {
+        .then(r => {
           this.handleLoadingVisibility(false)
           if (r) {
             notification.success({
@@ -84,7 +84,7 @@ class SubmittedCHAS extends React.Component {
     }
   }
 
-  render () {
+  render() {
     const {
       classes,
       chasClaimSubmissionSubmitted,

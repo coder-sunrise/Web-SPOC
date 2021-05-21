@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'dva'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 import PageHeaderWrapper from '@/components/PageHeaderWrapper'
 import PatientDetail from '../Detail'
 
@@ -8,7 +8,7 @@ import PatientDetail from '../Detail'
   patient,
 }))
 class New extends Component {
-  render () {
+  render() {
     const { history } = this.props
 
     return (

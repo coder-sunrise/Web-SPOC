@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 // umi
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 // material ui
 import { Divider, withStyles } from '@material-ui/core'
 // custom components
@@ -17,7 +17,7 @@ const rowData = [
   },
 ]
 
-const styles = (theme) => ({
+const styles = theme => ({
   divider: {
     margin: '10px 0px',
   },
@@ -55,7 +55,7 @@ class EndSessionSummary extends PureComponent {
     },
   }
 
-  render () {
+  render() {
     const { summaryTableProps, paymentCollectedTableProps } = this.state
     const { classes } = this.props
     return (

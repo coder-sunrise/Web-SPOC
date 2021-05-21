@@ -1,5 +1,5 @@
 import React, { PureComponent, memo } from 'react'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import { findGetParameter } from '@/utils/utils'
 import moment from 'moment'
@@ -24,7 +24,7 @@ import {
   Checkbox,
 } from '@/components'
 
-const styles = (theme) => ({
+const styles = theme => ({
   filterBar: {
     marginBottom: '20px',
   },
@@ -51,45 +51,45 @@ const searchResult = (values, props) => {
   const visitStartDate =
     visitDate && visitDate.length > 0
       ? moment(visitDate[0])
-        .set({ hour: 0, minute: 0, second: 0 })
-        .formatUTC(false)
+          .set({ hour: 0, minute: 0, second: 0 })
+          .formatUTC(false)
       : undefined
   const visitEndDate =
     visitDate && visitDate.length > 1
       ? moment(visitDate[1])
-        .set({ hour: 23, minute: 59, second: 59 })
-        .formatUTC(false)
+          .set({ hour: 23, minute: 59, second: 59 })
+          .formatUTC(false)
       : undefined
 
   const payload = IsOverallGrid
     ? {
-      visitFKNavigation: undefined,
-      lgteql_visitDate: isAllDateChecked
-        ? undefined
-        : visitStartDate || undefined,
-      lsteql_visitDate: isAllDateChecked
-        ? undefined
-        : visitEndDate || undefined,
-      labTrackingStatusFK: labTrackingStatusFK || undefined,
-      apiCriteria: searchValue ? { searchValue } : undefined,
-      serviceName: serviceName || undefined,
-    }
+        visitFKNavigation: undefined,
+        lgteql_visitDate: isAllDateChecked
+          ? undefined
+          : visitStartDate || undefined,
+        lsteql_visitDate: isAllDateChecked
+          ? undefined
+          : visitEndDate || undefined,
+        labTrackingStatusFK: labTrackingStatusFK || undefined,
+        apiCriteria: searchValue ? { searchValue } : undefined,
+        serviceName: serviceName || undefined,
+      }
     : {
-      visitFKNavigation: patientID
-        ? {
-          patientProfileFK: patientID,
-        }
-        : undefined,
-      lgteql_visitDate: isAllDateChecked
-        ? undefined
-        : visitStartDate || undefined,
-      lsteql_visitDate: isAllDateChecked
-        ? undefined
-        : visitEndDate || undefined,
-      labTrackingStatusFK: labTrackingStatusFK || undefined,
-      serviceName: serviceName || undefined,
-      apiCriteria: searchValue ? { searchValue } : undefined,
-    }
+        visitFKNavigation: patientID
+          ? {
+              patientProfileFK: patientID,
+            }
+          : undefined,
+        lgteql_visitDate: isAllDateChecked
+          ? undefined
+          : visitStartDate || undefined,
+        lsteql_visitDate: isAllDateChecked
+          ? undefined
+          : visitEndDate || undefined,
+        labTrackingStatusFK: labTrackingStatusFK || undefined,
+        serviceName: serviceName || undefined,
+        apiCriteria: searchValue ? { searchValue } : undefined,
+      }
 
   dispatch({
     type: 'labTrackingDetails/query',
@@ -98,14 +98,18 @@ const searchResult = (values, props) => {
 }
 
 class FilterBar extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
-    const { setFieldValue } = props  
+    const { setFieldValue } = props
 
     setTimeout(() => {
       setFieldValue('visitDate', [
-        moment().add(-1, 'd').toDate(),
-        moment().add(-1, 'd').toDate(),
+        moment()
+          .add(-1, 'd')
+          .toDate(),
+        moment()
+          .add(-1, 'd')
+          .toDate(),
       ])
     }, 1)
   }
@@ -115,9 +119,9 @@ class FilterBar extends PureComponent {
       const { values } = this.props
       searchResult(values, this.props)
     }, 100)
-  } 
+  }
 
-  render () {
+  render() {
     const { handleSubmit, IsOverallGrid, values } = this.props
     return (
       <div>
@@ -126,7 +130,7 @@ class FilterBar extends PureComponent {
             {IsOverallGrid ? (
               <FastField
                 name='searchValue'
-                render={(args) => (
+                render={args => (
                   <TextField
                     {...args}
                     label={formatMessage({
@@ -137,33 +141,38 @@ class FilterBar extends PureComponent {
                 )}
               />
             ) : (
-                <FastField
-                  name='serviceName'
-                  render={(args) => (
-                    <TextField
-                      {...args}
-                      label={formatMessage({
-                        id: 'patient.patientresult.serviceName',
-                      })}
-                      autoFocus
-                    />
-                  )}
-                />
-              )}
+              <FastField
+                name='serviceName'
+                render={args => (
+                  <TextField
+                    {...args}
+                    label={formatMessage({
+                      id: 'patient.patientresult.serviceName',
+                    })}
+                    autoFocus
+                  />
+                )}
+              />
+            )}
           </GridItem>
           <GridItem md={1} />
           <GridItem md={3}>
             <Field
               name='visitDate'
-              render={(args) => (
-                <DateRangePicker label='Visit Date' label2='To' {...args} disabled={values.isAllDateChecked} />
+              render={args => (
+                <DateRangePicker
+                  label='Visit Date'
+                  label2='To'
+                  {...args}
+                  disabled={values.isAllDateChecked}
+                />
               )}
             />
           </GridItem>
           <GridItem xs sm={4} md={1}>
             <FastField
               name='isAllDateChecked'
-              render={(args) => {
+              render={args => {
                 return (
                   <Tooltip
                     title={formatMessage({
@@ -187,7 +196,7 @@ class FilterBar extends PureComponent {
           <GridItem md={3}>
             <FastField
               name='labTrackingStatusFK'
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   label='Status'
                   {...args}

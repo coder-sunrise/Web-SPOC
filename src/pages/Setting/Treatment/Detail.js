@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import _ from 'lodash'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -14,7 +14,7 @@ import {
 } from '@/components'
 import Legend from '@/pages/Widgets/DentalChart/Setup/Legend'
 
-const styles = (theme) => ({})
+const styles = theme => ({})
 
 @withFormikExtend({
   mapPropsToValues: ({ settingTreatment }) =>
@@ -22,7 +22,10 @@ const styles = (theme) => ({})
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
-    effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+    effectiveDates: Yup.array()
+      .of(Yup.date())
+      .min(2)
+      .required(),
     treatmentCategoryFK: Yup.number().required(),
     revenueCategoryFK: Yup.number().required(),
   }),
@@ -43,7 +46,7 @@ const styles = (theme) => ({})
         effectiveEndDate: effectiveDates[1],
         roomStatusFK: 1,
       },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         if (onConfirm) onConfirm()
         dispatch({
@@ -55,12 +58,12 @@ const styles = (theme) => ({})
   displayName: 'TreatmentDetail',
 })
 class Detail extends PureComponent {
-  render () {
+  render() {
     const { props } = this
     let { classes, theme, footer, values, codetable } = props
     const { ctchartmethod } = codetable
     // console.log('detail', props)
-    const row = ctchartmethod.find((o) => o.id === values.chartMethodFK)
+    const row = ctchartmethod.find(o => o.id === values.chartMethodFK)
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
@@ -68,7 +71,7 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='code'
-                render={(args) => {
+                render={args => {
                   return (
                     <TextField
                       label='Code'
@@ -83,7 +86,7 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='displayValue'
-                render={(args) => {
+                render={args => {
                   return <TextField label='Display Value' {...args} />
                 }}
               />
@@ -91,7 +94,7 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='effectiveDates'
-                render={(args) => {
+                render={args => {
                   return (
                     <DateRangePicker
                       // showTime
@@ -119,14 +122,14 @@ class Detail extends PureComponent {
             <GridItem xs={6}>
               <FastField
                 name='chartMethodFK'
-                render={(args) => {
+                render={args => {
                   return (
                     <CodeSelect
                       label='Chart Method'
                       code='ctchartmethod'
                       prefix={row ? <Legend row={row} viewOnly /> : null}
                       labelField='displayValue'
-                      renderDropdown={(option) => {
+                      renderDropdown={option => {
                         const { displayValue } = option
                         return (
                           <p style={{ lineHeight: '24px' }}>
@@ -146,7 +149,7 @@ class Detail extends PureComponent {
             <GridItem xs={6}>
               <FastField
                 name='treatmentCategoryFK'
-                render={(args) => {
+                render={args => {
                   return (
                     <CodeSelect
                       label='Treatment Category'
@@ -160,7 +163,7 @@ class Detail extends PureComponent {
             <GridItem xs={6}>
               <FastField
                 name='revenueCategoryFK'
-                render={(args) => {
+                render={args => {
                   return (
                     <CodeSelect
                       label='Revenue Category'
@@ -174,7 +177,7 @@ class Detail extends PureComponent {
             <GridItem xs={6}>
               <FastField
                 name='costPrice'
-                render={(args) => {
+                render={args => {
                   return <NumberInput currency label='Cost' {...args} />
                 }}
               />
@@ -182,7 +185,7 @@ class Detail extends PureComponent {
             <GridItem xs={6}>
               <FastField
                 name='sellingPrice'
-                render={(args) => {
+                render={args => {
                   return (
                     <NumberInput
                       currency
@@ -196,7 +199,7 @@ class Detail extends PureComponent {
             <GridItem md={12}>
               <FastField
                 name='description'
-                render={(args) => {
+                render={args => {
                   return (
                     <TextField
                       label='Description'

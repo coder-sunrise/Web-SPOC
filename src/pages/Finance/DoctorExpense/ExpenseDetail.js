@@ -1,13 +1,13 @@
 import React, { PureComponent } from 'react'
 import { withFormik, FastField } from 'formik'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 
 import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import { GridContainer, GridItem } from 'mui-pro-components'
 import { DatePicker, Select, NumberInput, TextField } from '@/components'
 
-const styles = (theme) => ({
+const styles = theme => ({
   formContainer: {
     margin: '0 20px 20px 20px',
     textAlign: 'left',
@@ -25,7 +25,7 @@ const styles = (theme) => ({
   mapPropsToValues: () => {},
 })
 class ExpenseDetail extends PureComponent {
-  render () {
+  render() {
     const { footer, onConfirm, classes } = this.props
 
     return (
@@ -35,7 +35,7 @@ class ExpenseDetail extends PureComponent {
             <GridItem xs sm={12} md={12}>
               <FastField
                 name='Date'
-                render={(args) => (
+                render={args => (
                   <DatePicker
                     label={formatMessage({ id: 'finance.doctor-expense.date' })}
                     timeFormat={false}
@@ -48,7 +48,7 @@ class ExpenseDetail extends PureComponent {
             <GridItem xs sm={12} md={12}>
               <FastField
                 name='ExpenseType'
-                render={(args) => {
+                render={args => {
                   return (
                     <Select
                       label={formatMessage({
@@ -71,7 +71,7 @@ class ExpenseDetail extends PureComponent {
             <GridItem xs sm={12} md={12}>
               <FastField
                 name='ExpenseType'
-                render={(args) => {
+                render={args => {
                   return (
                     <Select
                       label={formatMessage({
@@ -94,7 +94,7 @@ class ExpenseDetail extends PureComponent {
             <GridItem xs sm={12} md={12}>
               <FastField
                 name='Invoice Date'
-                render={(args) => (
+                render={args => (
                   <DatePicker
                     label={formatMessage({
                       id: 'finance.doctor-expense.invoiceDate',
@@ -108,7 +108,7 @@ class ExpenseDetail extends PureComponent {
             <GridItem xs sm={12} md={12}>
               <FastField
                 name='Amount'
-                render={(args) => (
+                render={args => (
                   <NumberInput
                     className={classes.amountButton}
                     prefix='Amount'
@@ -122,7 +122,7 @@ class ExpenseDetail extends PureComponent {
             <GridItem xs sm={12} md={12}>
               <FastField
                 name='Description'
-                render={(args) => (
+                render={args => (
                   <TextField
                     label={formatMessage({
                       id: 'finance.doctor-expense.description',
@@ -136,7 +136,7 @@ class ExpenseDetail extends PureComponent {
             <GridItem xs sm={12} md={12}>
               <FastField
                 name='Patient'
-                render={(args) => {
+                render={args => {
                   return (
                     <Select
                       label={formatMessage({

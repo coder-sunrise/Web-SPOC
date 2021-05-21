@@ -1,5 +1,5 @@
 ﻿import numeral from 'numeral'
-import { formatMessage, setLocale, getLocale } from 'umi/locale'
+import { formatMessage, setLocale, getLocale } from 'umi'
 // import my from 'moment/locale/my'
 import moment from 'moment'
 import 'moment/locale/ms-my'
@@ -16,11 +16,17 @@ const defaultNumberalConfig = {
     billion: 'b',
     trillion: 't',
   },
-  ordinal (number) {
+  ordinal(number) {
     let b = number % 10
     return ~~((number % 100) / 10) === 1
       ? 'th'
-      : b === 1 ? 'st' : b === 2 ? 'nd' : b === 3 ? 'rd' : 'th'
+      : b === 1
+      ? 'st'
+      : b === 2
+      ? 'nd'
+      : b === 3
+      ? 'rd'
+      : 'th'
   },
   currency: {
     symbol: '$',
@@ -85,7 +91,7 @@ let clinicSettings
 const initClinicSettings = () => {
   clinicSettings = JSON.parse(localStorage.getItem('clinicSettings')) || {}
   countrySetting =
-    countrySettings.find((o) => o.value === clinicSettings.locale) || {}
+    countrySettings.find(o => o.value === clinicSettings.locale) || {}
   // console.log(countrySettings, clinicSettings.applicationLocale)
   if (countrySetting.code) {
     if (countrySetting.numberal) {

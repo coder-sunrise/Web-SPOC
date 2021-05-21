@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import _ from 'lodash'
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 import Yup from '@/utils/yup'
 import { tagList } from '@/utils/codes'
 import {
@@ -14,14 +14,14 @@ import {
   Field,
 } from '@/components'
 
-const styles = (theme) => ({})
+const styles = theme => ({})
 
 @withFormikExtend({
   mapPropsToValues: ({ settingSmsTemplate }) => {
     if (settingSmsTemplate.entity) {
       let newMessage = settingSmsTemplate.entity.templateMessage || ''
-      const smsTaglist = tagList.filter((f) => f.value !== 'PatientInfo')
-      smsTaglist.forEach((item) => {
+      const smsTaglist = tagList.filter(f => f.value !== 'PatientInfo')
+      smsTaglist.forEach(item => {
         if (item.value && item.value !== '') {
           newMessage = newMessage.replaceAll(
             `@${item.value}`,
@@ -44,7 +44,10 @@ const styles = (theme) => ({})
     templateMessage: Yup.string()
       .required()
       .max(1500, 'Message should not exceed 1500 characters'),
-    effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+    effectiveDates: Yup.array()
+      .of(Yup.date())
+      .min(2)
+      .required(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
@@ -57,7 +60,7 @@ const styles = (theme) => ({})
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
       },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         resetForm()
         if (onConfirm) onConfirm()
@@ -72,11 +75,11 @@ const styles = (theme) => ({})
 class Detail extends PureComponent {
   state = { focused: false }
 
-  setEditorReference = (ref) => {
+  setEditorReference = ref => {
     this.setState({ editorReferece: ref })
   }
 
-  setTemplateFoucus () {
+  setTemplateFoucus() {
     if (
       !this.state.focused &&
       this.props.values.isEditTemplate &&
@@ -87,10 +90,10 @@ class Detail extends PureComponent {
     }
   }
 
-  render () {
+  render() {
     const { props } = this
     const { theme, footer, settingSmsTemplate, height } = props
-    const smsTaglist = tagList.filter((f) => f.value !== 'PatientInfo')
+    const smsTaglist = tagList.filter(f => f.value !== 'PatientInfo')
 
     return (
       <React.Fragment>
@@ -99,7 +102,7 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='code'
-                render={(args) => (
+                render={args => (
                   <TextField
                     label='Code'
                     autoFocus
@@ -112,13 +115,13 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='displayValue'
-                render={(args) => <TextField label='Display Value' {...args} />}
+                render={args => <TextField label='Display Value' {...args} />}
               />
             </GridItem>
             <GridItem md={12}>
               <FastField
                 name='effectiveDates'
-                render={(args) => {
+                render={args => {
                   return (
                     <DateRangePicker
                       label='Effective Start Date'
@@ -133,7 +136,7 @@ class Detail extends PureComponent {
               {this.setTemplateFoucus()}
               <Field
                 name='templateMessage'
-                render={(args) => {
+                render={args => {
                   const cfg = {}
                   if (height && height > 538) {
                     cfg.height = height - 330

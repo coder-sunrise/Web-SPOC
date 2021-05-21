@@ -1,5 +1,5 @@
 import React, { memo } from 'react'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import {
   Field,
   FastField,
@@ -11,7 +11,7 @@ import {
 
 const CoverageCap = ({ values, theme, classes, setFieldValue }) => {
   // console.log({ values })
-  const onRadioButtonChange = (event) => {
+  const onRadioButtonChange = event => {
     const { target } = event
 
     if (target.value === 'sub') {
@@ -73,7 +73,7 @@ const CoverageCap = ({ values, theme, classes, setFieldValue }) => {
       <GridItem xs={1}>
         <FastField
           name='itemGroupMaxCapacityDtoRdoValue'
-          render={(args) => (
+          render={args => (
             <RadioGroup
               label=''
               inputClass={classes.rdoInput}
@@ -96,7 +96,7 @@ const CoverageCap = ({ values, theme, classes, setFieldValue }) => {
       <GridItem xs={11}>
         <Field
           name='coverageMaxCap'
-          render={(args) => (
+          render={args => (
             <NumberInput
               {...args}
               disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'all'}
@@ -110,7 +110,7 @@ const CoverageCap = ({ values, theme, classes, setFieldValue }) => {
         />
         <Field
           name='itemGroupMaxCapacityDto.consumableMaxCapacity.maxCapValue'
-          render={(args) => (
+          render={args => (
             <NumberInput
               disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
               label={formatMessage({
@@ -124,7 +124,7 @@ const CoverageCap = ({ values, theme, classes, setFieldValue }) => {
         />
         <Field
           name='itemGroupMaxCapacityDto.medicationMaxCapacity.maxCapValue'
-          render={(args) => (
+          render={args => (
             <NumberInput
               disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
               label={formatMessage({
@@ -138,7 +138,7 @@ const CoverageCap = ({ values, theme, classes, setFieldValue }) => {
         />
         <Field
           name='itemGroupMaxCapacityDto.vaccinationMaxCapacity.maxCapValue'
-          render={(args) => (
+          render={args => (
             <NumberInput
               disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
               label={formatMessage({
@@ -152,7 +152,7 @@ const CoverageCap = ({ values, theme, classes, setFieldValue }) => {
         />
         <Field
           name='itemGroupMaxCapacityDto.serviceMaxCapacity.maxCapValue'
-          render={(args) => (
+          render={args => (
             <NumberInput
               disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
               label={formatMessage({

@@ -1,7 +1,7 @@
 import React, { memo } from 'react'
 import { connect } from 'dva'
 // umi locale
-import { FormattedMessage, formatMessage } from 'umi/locale'
+import { FormattedMessage, formatMessage } from 'umi'
 // formik
 import { FastField, withFormik } from 'formik'
 // material ui
@@ -18,15 +18,15 @@ import {
   ProgressButton,
 } from '@/components'
 // sub component
-import StatusFilterButton from './StatusFilterButton'
 import Authorized from '@/utils/Authorized'
+import StatusFilterButton from './StatusFilterButton'
 
 const styles = () => ({
   actionBar: { marginBottom: '10px' },
   switch: { display: 'inline-block', minWidth: '200px' },
 })
 
-const Filterbar = (props) => {
+const Filterbar = props => {
   const {
     classes,
     dispatch,
@@ -40,7 +40,7 @@ const Filterbar = (props) => {
     loading,
   } = props
   const onSwitchClick = () => dispatch({ type: 'queueLog/toggleSelfOnly' })
- 
+
   return (
     <div className='div-reception-header'>
       <GridContainer
@@ -51,7 +51,7 @@ const Filterbar = (props) => {
         <GridItem xs={3} sm={3} md={3} lg={3}>
           <FastField
             name='search'
-            render={(args) => (
+            render={args => (
               <TextField
                 {...args}
                 autocomplete='off'
@@ -61,7 +61,7 @@ const Filterbar = (props) => {
                 label={formatMessage({
                   id: 'reception.queue.patientSearchPlaceholder',
                 })}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={e => setSearch(e.target.value)}
                 bind='patientSearch/query'
                 useLeading={false}
                 debounceDuration={500}
@@ -85,8 +85,7 @@ const Filterbar = (props) => {
                   setFieldValue('search', '')
                   setSearch('')
                 }, 1000)
-              }
-              }
+              }}
               size='sm'
               submitKey='patientSearch/query'
             >
@@ -102,8 +101,7 @@ const Filterbar = (props) => {
                 toggleNewPatient()
                 setFieldValue('search', '')
                 setSearch('')
-              }
-              }
+              }}
               disabled={loading.global}
             >
               <Hidden mdDown>
@@ -112,15 +110,16 @@ const Filterbar = (props) => {
               <FormattedMessage id='reception.queue.createPatient' />
             </Button>
           </Authorized>
-          {user.clinicianProfile.userProfile.role.clinicRoleFK === 1 && !hideSelfOnlyFilter && (
-            <div className={classes.switch}>
-              <Checkbox
-                label='Visit assign to me only'
-                onChange={onSwitchClick}
-                checked={selfOnly}
-              />
-            </div>
-          )}          
+          {user.clinicianProfile.userProfile.role.clinicRoleFK === 1 &&
+            !hideSelfOnlyFilter && (
+              <div className={classes.switch}>
+                <Checkbox
+                  label='Visit assign to me only'
+                  onChange={onSwitchClick}
+                  checked={selfOnly}
+                />
+              </div>
+            )}
         </GridItem>
 
         <GridItem

@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 import { FastField, withFormik } from 'formik'
 import { withStyles, Paper } from '@material-ui/core'
 
@@ -19,7 +19,7 @@ const styles = () => ({
 
 @withFormik({ mapPropsToValues: () => {} })
 class FilterBar extends PureComponent {
-  render () {
+  render() {
     const { classes } = this.props
 
     return (
@@ -28,7 +28,7 @@ class FilterBar extends PureComponent {
           <GridItem xs sm={12} md={3}>
             <FastField
               name='StartDate'
-              render={(args) => (
+              render={args => (
                 <DatePicker
                   label={formatMessage({
                     id: 'form.date.placeholder.start',
@@ -42,7 +42,7 @@ class FilterBar extends PureComponent {
           <GridItem xs sm={12} md={3}>
             <FastField
               name='EndDate'
-              render={(args) => (
+              render={args => (
                 <DatePicker
                   label={formatMessage({
                     id: 'form.date.placeholder.end',

@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 // import { TextBoxComponent } from '@syncfusion/ej2-react-inputs'
 // import { TooltipComponent } from '@syncfusion/ej2-react-popups'
 // import {TextBox as TextBoxComponent , TextArea,RadioButtonGroup} from '@/components'
@@ -71,7 +71,7 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper'
 const { Option } = Select
 const { RangePicker } = DatePicker
 // const { TextArea } = Input
-const styles = (theme) => ({
+const styles = theme => ({
   root: {
     padding: theme.spacing.unit * 2,
     margin: 'auto',
@@ -152,7 +152,7 @@ class SfuBasicForm extends PureComponent {
   //   })
   // };
 
-  render () {
+  render() {
     const { submitting } = this.props
     // const {
     //   form: { getFieldDecorator, getFieldValue },
@@ -239,7 +239,7 @@ class SfuBasicForm extends PureComponent {
                 <Grid item xs>
                   <FastField
                     name='Title'
-                    render={(args) => {
+                    render={args => {
                       return (
                         <CustomInput
                           label={formatMessage({ id: 'form.title.label' })}
@@ -255,7 +255,7 @@ class SfuBasicForm extends PureComponent {
                 <Grid item xs>
                   <FastField
                     name='Start'
-                    render={(args) => (
+                    render={args => (
                       <DatePicker
                         label={formatMessage({
                           id: 'form.date.placeholder.start',
@@ -269,7 +269,7 @@ class SfuBasicForm extends PureComponent {
                 <Grid item xs>
                   <FastField
                     name='End'
-                    render={(args) => (
+                    render={args => (
                       <DatePicker
                         label={formatMessage({
                           id: 'form.date.placeholder.end',
@@ -285,7 +285,7 @@ class SfuBasicForm extends PureComponent {
                 <Grid item xs>
                   <FastField
                     name='Goal'
-                    render={(args) => (
+                    render={args => (
                       <CustomInput
                         label={formatMessage({ id: 'form.goal.label' })}
                         multiline
@@ -300,7 +300,7 @@ class SfuBasicForm extends PureComponent {
                 <Grid item xs>
                   <FastField
                     name='Standard'
-                    render={(args) => (
+                    render={args => (
                       <CustomInput
                         label={formatMessage({ id: 'form.standard.label' })}
                         multiline
@@ -316,7 +316,7 @@ class SfuBasicForm extends PureComponent {
                 <Grid item xs>
                   <FastField
                     name='Client'
-                    render={(args) => (
+                    render={args => (
                       <CustomInput
                         label={formatMessage({ id: 'form.client.label' })}
                         inputProps={{
@@ -342,7 +342,7 @@ class SfuBasicForm extends PureComponent {
                 <Grid item xs>
                   <FastField
                     name='Invites'
-                    render={(args) => (
+                    render={args => (
                       <CustomInput
                         label={`${formatMessage({
                           id: 'form.invites.label',
@@ -357,7 +357,7 @@ class SfuBasicForm extends PureComponent {
                 <Grid item xs>
                   <FastField
                     name='Weight'
-                    render={(args) => (
+                    render={args => (
                       <CustomInput
                         label={`${formatMessage({
                           id: 'form.weight.label',
@@ -378,7 +378,7 @@ class SfuBasicForm extends PureComponent {
                 <Grid item xs>
                   <FastField
                     name='TargetDisclosure'
-                    render={(args) => (
+                    render={args => (
                       <RadioButtonGroup
                         label={formatMessage({ id: 'form.public.label' })}
                         tipText={

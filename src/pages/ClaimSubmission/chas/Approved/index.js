@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'dva'
 import $ from 'jquery'
 import moment from 'moment'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 // formik
 import { withFormik, FastField } from 'formik'
 // material ui
@@ -27,7 +27,7 @@ import CollectPaymentModal from '../../common/CollectPaymentModal'
 // variables
 import { ApprovedCHASColumnExtensions, ApprovedCHASColumns } from './variables'
 
-const styles = (theme) => ({
+const styles = theme => ({
   cardContainer: {
     margin: 1,
   },
@@ -52,14 +52,14 @@ class ApprovedCHAS extends React.Component {
     showCollectPayment: false,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.refreshDataGrid()
   }
 
   handleLoadingVisibility = (visibility = false) =>
     this.setState({ isLoading: visibility })
 
-  handleSelectionChange = (selection) => {
+  handleSelectionChange = selection => {
     this.setState({
       selectedRows: selection,
     })
@@ -80,7 +80,7 @@ class ApprovedCHAS extends React.Component {
           type: 'chasClaimSubmissionApproved/getApprovedStatus',
           payload: { claimIds: selectedRows },
         })
-        .then((r) => {
+        .then(r => {
           this.handleLoadingVisibility(false)
           if (r) {
             notification.success({
@@ -96,13 +96,12 @@ class ApprovedCHAS extends React.Component {
     const { dispatch, chasClaimSubmissionApproved } = this.props
     const { selectedRows } = this.state
     const { list } = chasClaimSubmissionApproved || []
-    const rows = list.filter((i) => selectedRows.includes(i.id))
+    const rows = list.filter(i => selectedRows.includes(i.id))
     const outstandingPayment = rows
       .filter(
-        (x) =>
-          x.approvedAmount > 0 || x.approvedAmount - x.collectedPayment > 0,
+        x => x.approvedAmount > 0 || x.approvedAmount - x.collectedPayment > 0,
       )
-      .map((x) => {
+      .map(x => {
         x.amountReceived = x.approvedAmount - x.collectedPayment
         return x
       })
@@ -127,7 +126,7 @@ class ApprovedCHAS extends React.Component {
     this.onCloseCollectPayment()
   }
 
-  render () {
+  render() {
     const {
       classes,
       claimSubmissionApproved,
@@ -162,7 +161,7 @@ class ApprovedCHAS extends React.Component {
             <GridItem md={12}>
               <FastField
                 name='chasClaimStatusCode'
-                render={(args) => {
+                render={args => {
                   return (
                     <Select
                       label={formatMessage({
@@ -188,7 +187,7 @@ class ApprovedCHAS extends React.Component {
                   selectable: true,
                   selectConfig: {
                     showSelectAll: true,
-                    rowSelectionEnabled: (row) =>
+                    rowSelectionEnabled: row =>
                       row.patientIsActive &&
                       !(
                         row.chasClaimStatusCode.toLowerCase() === 'pd' &&

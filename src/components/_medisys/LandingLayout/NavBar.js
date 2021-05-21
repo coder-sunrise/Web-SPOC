@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { NavLink } from 'react-router-dom'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 import {
   List,
   ListItem,
@@ -23,19 +23,19 @@ import { Button } from '@/components'
 
 import authNavBarStyle from '@/assets/jss/material-dashboard-pro-react/components/authNavbarStyle'
 
-const styles = (theme) => ({ ...authNavBarStyle(theme) })
+const styles = theme => ({ ...authNavBarStyle(theme) })
 
 class NavBar extends PureComponent {
   state = {
     open: false,
   }
 
-  activeRoute = (routeName) => {
+  activeRoute = routeName => {
     // const { route } = this.props
     // return route.path === routeName
   }
 
-  render () {
+  render() {
     const { classes, color } = this.props
 
     const { open } = this.state

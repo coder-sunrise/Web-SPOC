@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import moment from 'moment'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { Paper, withStyles } from '@material-ui/core'
 import { connect } from 'dva'
 import {
@@ -17,7 +17,7 @@ import {
   FastField,
 } from '@/components'
 
-const styles = (theme) => ({
+const styles = theme => ({
   root: {
     padding: '10px',
     marginBottom: '10px',
@@ -45,7 +45,7 @@ const amountProps = {
 }
 
 class DetailsHeader extends PureComponent {
-  render () {
+  render() {
     const { classes, history, values, theme } = this.props
     const cfg = {
       prefixProps: {
@@ -64,7 +64,7 @@ class DetailsHeader extends PureComponent {
           <GridItem md={3} xs={12} className={classes.gridItem}>
             <Field
               name='statementNo'
-              render={(args) => (
+              render={args => (
                 <TextField prefix='Statement No.:' {...cfg} {...args} />
               )}
             />
@@ -72,7 +72,7 @@ class DetailsHeader extends PureComponent {
           <GridItem md={3} xs={12} className={classes.gridItem}>
             <FastField
               name='statementDate'
-              render={(args) => (
+              render={args => (
                 <DatePicker prefix='Statement Date:' {...cfg} {...args} />
               )}
             />
@@ -80,7 +80,7 @@ class DetailsHeader extends PureComponent {
           <GridItem md={3} xs={12} className={classes.gridItem}>
             <Field
               name='copayerFK'
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   code='ctcopayer'
                   prefix='Co-Payer:'
@@ -96,7 +96,7 @@ class DetailsHeader extends PureComponent {
           <GridItem md={3} xs={12} className={classes.gridItem}>
             <Field
               name='paymentTerm'
-              render={(args) => (
+              render={args => (
                 <TextField
                   prefix='Payment Term:'
                   suffix='Day(s)'
@@ -111,7 +111,7 @@ class DetailsHeader extends PureComponent {
           <GridItem md={3} xs={12} className={classes.gridItem}>
             <FastField
               name='adjustmentValueField'
-              render={(args) => (
+              render={args => (
                 <NumberInput
                   prefix='Statement Adjustment: '
                   {...cfg}
@@ -124,7 +124,7 @@ class DetailsHeader extends PureComponent {
           <GridItem md={3} xs={12} className={classes.gridItem}>
             <Field
               name='adminChargeValueField'
-              render={(args) => {
+              render={args => {
                 return (
                   <NumberInput
                     prefix='Corporate Charge:'
@@ -139,7 +139,7 @@ class DetailsHeader extends PureComponent {
           <GridItem md={3} xs={12} className={classes.gridItem}>
             <FastField
               name='totalPayableAmount'
-              render={(args) => (
+              render={args => (
                 <NumberInput
                   prefix='Total Payable Amount:'
                   {...cfg}
@@ -152,7 +152,7 @@ class DetailsHeader extends PureComponent {
           <GridItem md={3} xs={12} className={classes.gridItem}>
             <FastField
               name='outstandingBalance'
-              render={(args) => (
+              render={args => (
                 <NumberInput
                   prefix='O/S Balance:'
                   {...cfg}

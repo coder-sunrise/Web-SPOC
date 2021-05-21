@@ -1,8 +1,8 @@
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import ReceivingGoods from './Details/ReceivingGoods'
 import Payment from './Details/Payment'
 
-export const tabbedPaneAvailability = (status) => {
+export const tabbedPaneAvailability = status => {
   const allowedStatus = [
     // 'Draft',
     1,

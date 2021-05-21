@@ -1,5 +1,5 @@
 import React from 'react'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { withStyles } from '@material-ui/core/styles'
 import { FastField } from 'formik'
 import { compose } from 'redux'
@@ -24,7 +24,7 @@ const Detail = ({ height, ...props }) => {
     const { ctcopayer = [] } = codetable
     if (copayerTypeFK === 2) return ctcopayer
     const options = ctcopayer.filter(
-      (copayerList) => copayerList.coPayerTypeFK === 1,
+      copayerList => copayerList.coPayerTypeFK === 1,
     )
     return options
   }
@@ -42,7 +42,7 @@ const Detail = ({ height, ...props }) => {
           <GridItem xs={9}>
             <FastField
               name='code'
-              render={(args) => {
+              render={args => {
                 return (
                   <TextField
                     label={formatMessage({
@@ -57,7 +57,7 @@ const Detail = ({ height, ...props }) => {
           <GridItem xs={9}>
             <FastField
               name='name'
-              render={(args) => {
+              render={args => {
                 return (
                   <TextField
                     label={formatMessage({
@@ -72,7 +72,7 @@ const Detail = ({ height, ...props }) => {
           <GridItem xs={9}>
             <FastField
               name='description'
-              render={(args) => {
+              render={args => {
                 return (
                   <TextField
                     label={formatMessage({
@@ -87,7 +87,7 @@ const Detail = ({ height, ...props }) => {
           <GridItem xs={9}>
             <FastField
               name='remarks'
-              render={(args) => {
+              render={args => {
                 return (
                   <TextField
                     label={formatMessage({
@@ -106,7 +106,7 @@ const Detail = ({ height, ...props }) => {
           <GridItem xs={9}>
             <FastField
               name='schemeTypeFK'
-              render={(args) => {
+              render={args => {
                 return (
                   <CodeSelect
                     label={formatMessage({
@@ -124,7 +124,7 @@ const Detail = ({ height, ...props }) => {
           <GridItem xs={9}>
             <FastField
               name='schemeCategoryFK'
-              render={(args) => {
+              render={args => {
                 return (
                   <CodeSelect
                     label={formatMessage({
@@ -141,7 +141,7 @@ const Detail = ({ height, ...props }) => {
           <GridItem xs={9}>
             <FastField
               name='copayerFK'
-              render={(args) => (
+              render={args => (
                 <Select
                   label={formatMessage({
                     id: 'finance.scheme.detail.coPayer',
@@ -158,7 +158,7 @@ const Detail = ({ height, ...props }) => {
           <GridItem xs={9}>
             <FastField
               name='effectiveDates'
-              render={(args) => {
+              render={args => {
                 return (
                   <DateRangePicker
                     label='Effective Start Date'
@@ -175,6 +175,7 @@ const Detail = ({ height, ...props }) => {
     </CardContainer>
   )
 }
-export default compose(withStyles(styles, { withTheme: true }), React.memo)(
-  Detail,
-)
+export default compose(
+  withStyles(styles, { withTheme: true }),
+  React.memo,
+)(Detail)

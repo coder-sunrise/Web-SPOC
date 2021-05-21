@@ -1,6 +1,6 @@
 import React from 'react'
 import { FastField, withFormik } from 'formik'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
 import { withStyles } from '@material-ui/core'
@@ -18,7 +18,7 @@ import {
   ProgressButton,
 } from '@/components'
 
-const styles = (theme) => ({
+const styles = theme => ({
   filterBar: {
     marginBottom: '10px',
   },
@@ -32,7 +32,7 @@ const styles = (theme) => ({
   },
 })
 
-const FilterBar = (props) => {
+const FilterBar = props => {
   const onDateRangeChange = (name, value) => {
     const { setFieldValue } = props
     setFieldValue(name, value)
@@ -44,7 +44,7 @@ const FilterBar = (props) => {
         <GridItem xs={6} md={6}>
           <FastField
             name='PONo'
-            render={(args) => {
+            render={args => {
               return (
                 <TextField
                   label={formatMessage({
@@ -67,7 +67,7 @@ const FilterBar = (props) => {
         <GridItem xs={6} md={6}>
           <FastField
             name='Supplier'
-            render={(args) => {
+            render={args => {
               return (
                 <TextField
                   label={formatMessage({
@@ -82,7 +82,7 @@ const FilterBar = (props) => {
         <GridItem xs={6} md={6}>
           <FastField
             name='Status'
-            render={(args) => {
+            render={args => {
               return (
                 <Select
                   label={formatMessage({

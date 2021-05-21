@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { withStyles } from '@material-ui/core/styles'
 import { FastField } from 'formik'
 import { compose } from 'redux'
@@ -18,7 +18,6 @@ import {
 import SharedContainer from '../../SharedContainer'
 import Sdd from '../../Sdd'
 
-
 const styles = () => ({})
 
 const Detail = ({
@@ -31,15 +30,12 @@ const Detail = ({
   clinicSettings,
   ...props
 }) => {
-  const [
-    toggle,
-    setToggle,
-  ] = useState(false)
+  const [toggle, setToggle] = useState(false)
 
   const toggleModal = () => {
     setToggle(!toggle)
   }
-  const handleSelectSdd = (row) => {
+  const handleSelectSdd = row => {
     const { id, code, name } = row
     setToggle(!toggle)
 
@@ -64,7 +60,7 @@ const Detail = ({
               <GridItem xs={12}>
                 <Field
                   name='code'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <TextField
                         label={formatMessage({
@@ -80,7 +76,7 @@ const Detail = ({
               <GridItem xs={12}>
                 <FastField
                   name='displayValue'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <TextField
                         label={formatMessage({
@@ -96,7 +92,7 @@ const Detail = ({
               <GridItem xs={12}>
                 <FastField
                   name='description'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <TextField
                         label={formatMessage({
@@ -111,7 +107,7 @@ const Detail = ({
               <GridItem xs={12}>
                 <FastField
                   name='caution'
-                  render={(args) => (
+                  render={args => (
                     <TextField
                       label={formatMessage({
                         id: 'inventory.master.medication.caution',
@@ -130,7 +126,7 @@ const Detail = ({
               <GridItem xs={12}>
                 <FastField
                   name='favouriteSupplierFK'
-                  render={(args) => (
+                  render={args => (
                     <CodeSelect
                       label={formatMessage({
                         id: 'inventory.master.medication.supplier',
@@ -146,7 +142,7 @@ const Detail = ({
               <GridItem xs={12}>
                 <FastField
                   name='medicationGroupFK'
-                  render={(args) => (
+                  render={args => (
                     <CodeSelect
                       label={formatMessage({
                         id: 'inventory.master.medication.medicationGroup',
@@ -160,7 +156,7 @@ const Detail = ({
               <GridItem xs={12}>
                 <FastField
                   name='revenueCategoryFK'
-                  render={(args) => (
+                  render={args => (
                     <CodeSelect
                       label={formatMessage({
                         id: 'inventory.master.medication.revenueCategory',
@@ -174,7 +170,7 @@ const Detail = ({
               <GridItem xs={12}>
                 <Field
                   name='effectiveDates'
-                  render={(args) => (
+                  render={args => (
                     <DateRangePicker
                       format={dateFormatLong}
                       label='Effective Start Date'
@@ -192,7 +188,7 @@ const Detail = ({
               <GridItem xs={12}>
                 <FastField
                   name='remarks'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <TextField
                         label={formatMessage({
@@ -213,7 +209,7 @@ const Detail = ({
           <GridItem>
             <FastField
               name='chas'
-              render={(args) => (
+              render={args => (
                 <CheckboxGroup
                   style={{
                     margin: theme.spacing(1),
@@ -222,44 +218,48 @@ const Detail = ({
                   simple
                   valueField='id'
                   textField='name'
-                  options={clinicSettings.isEnableMedisave ? [
-                    {
-                      id: 'isChasAcuteClaimable',
-                      name: 'CHAS Acute Claimable',
-                      layoutConfig: {
-                        style: {},
-                      },
-                    },
-                    {
-                      id: 'isChasChronicClaimable',
-                      name: 'CHAS Chronic Claimable',
-                      layoutConfig: {
-                        style: {},
-                      },
-                    },
-                    {
-                      id: 'isMedisaveClaimable',
-                      name: 'CDMP Claimable',
-                      layoutConfig: {
-                        style: {},
-                      },
-                    },
-                  ] : [
-                    {
-                      id: 'isChasAcuteClaimable',
-                      name: 'CHAS Acute Claimable',
-                      layoutConfig: {
-                        style: {},
-                      },
-                    },
-                    {
-                      id: 'isChasChronicClaimable',
-                      name: 'CHAS Chronic Claimable',
-                      layoutConfig: {
-                        style: {},
-                      },
-                    },
-                  ]}
+                  options={
+                    clinicSettings.isEnableMedisave
+                      ? [
+                          {
+                            id: 'isChasAcuteClaimable',
+                            name: 'CHAS Acute Claimable',
+                            layoutConfig: {
+                              style: {},
+                            },
+                          },
+                          {
+                            id: 'isChasChronicClaimable',
+                            name: 'CHAS Chronic Claimable',
+                            layoutConfig: {
+                              style: {},
+                            },
+                          },
+                          {
+                            id: 'isMedisaveClaimable',
+                            name: 'CDMP Claimable',
+                            layoutConfig: {
+                              style: {},
+                            },
+                          },
+                        ]
+                      : [
+                          {
+                            id: 'isChasAcuteClaimable',
+                            name: 'CHAS Acute Claimable',
+                            layoutConfig: {
+                              style: {},
+                            },
+                          },
+                          {
+                            id: 'isChasChronicClaimable',
+                            name: 'CHAS Chronic Claimable',
+                            layoutConfig: {
+                              style: {},
+                            },
+                          },
+                        ]
+                  }
                   onChange={(e, s) => {}}
                   {...args}
                 />
@@ -275,7 +275,7 @@ const Detail = ({
           <GridItem xs={5}>
             <Field
               name='sddCode'
-              render={(args) => {
+              render={args => {
                 return (
                   <TextField
                     label={formatMessage({
@@ -296,7 +296,7 @@ const Detail = ({
           <GridItem xs={5}>
             <Field
               name='sddDescription'
-              render={(args) => {
+              render={args => {
                 return (
                   <TextField
                     label={formatMessage({
@@ -331,6 +331,7 @@ const Detail = ({
     </SharedContainer>
   )
 }
-export default compose(withStyles(styles, { withTheme: true }), React.memo)(
-  Detail,
-)
+export default compose(
+  withStyles(styles, { withTheme: true }),
+  React.memo,
+)(Detail)

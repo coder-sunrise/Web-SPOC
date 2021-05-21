@@ -1,5 +1,5 @@
 import { Modal, message } from 'antd'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 
 // Notify user if offline now
 window.addEventListener('sw.offline', () => {
@@ -7,7 +7,7 @@ window.addEventListener('sw.offline', () => {
 })
 
 // Pop up a prompt on the page asking the user if they want to use the latest version
-window.addEventListener('sw.updated', (e) => {
+window.addEventListener('sw.updated', e => {
   // console.log(e)
   // if (!e) return
   Modal.confirm({
@@ -24,7 +24,7 @@ window.addEventListener('sw.updated', (e) => {
       // Send skip-waiting event to waiting SW with MessageChannel
       await new Promise((resolve, reject) => {
         const channel = new MessageChannel()
-        channel.port1.onmessage = (event) => {
+        channel.port1.onmessage = event => {
           console.log(event)
           if (event.data.error) {
             reject(event.data.error)
@@ -32,9 +32,7 @@ window.addEventListener('sw.updated', (e) => {
             resolve(event.data)
           }
         }
-        worker.postMessage({ type: 'skip-waiting' }, [
-          channel.port2,
-        ])
+        worker.postMessage({ type: 'skip-waiting' }, [channel.port2])
       })
       // Refresh current page to use the updated HTML and other assets after SW has skiped waiting
       window.location.reload(true)

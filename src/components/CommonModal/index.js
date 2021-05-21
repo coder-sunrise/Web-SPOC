@@ -2,7 +2,7 @@ import React, { Fragment } from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 import Dialog from '@material-ui/core/Dialog'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogContent from '@material-ui/core/DialogContent'
@@ -19,10 +19,10 @@ import { SizeContainer, ProgressButton, Tooltip, TextField } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
 import { confirmBeforeReload } from '@/utils/utils'
 
-function Transition (props) {
+function Transition(props) {
   return <Fade {...props} />
 }
-function getContainerHeight (props) {
+function getContainerHeight(props) {
   return (
     window.innerHeight -
     58 -
@@ -51,21 +51,17 @@ class CommonModal extends React.PureComponent {
     // onConfirm: PropTypes.func.isRequired,
 
     title: PropTypes.string,
-    maxWidth: PropTypes.oneOf([
-      'sm',
-      'lg',
-      'md',
-    ]),
+    maxWidth: PropTypes.oneOf(['sm', 'lg', 'md']),
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     // console.log(this.state, props)
     // const { loading, classes, theme } = props
     this.myRef = React.createRef()
   }
 
-  static getDerivedStateFromProps (nextProps) {
+  static getDerivedStateFromProps(nextProps) {
     const { open } = nextProps
     return {
       height: getContainerHeight(nextProps),
@@ -73,7 +69,7 @@ class CommonModal extends React.PureComponent {
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.resize()
     window.addEventListener('resize', this.resize.bind(this))
   }
@@ -181,7 +177,7 @@ class CommonModal extends React.PureComponent {
     )
   }
 
-  onClose = (force) => {
+  onClose = force => {
     if (this.props.global.disableSave) {
       if (force === true) {
         this.props.dispatch({
@@ -200,9 +196,7 @@ class CommonModal extends React.PureComponent {
     }
     const obs = Array.isArray(this.props.observe)
       ? this.props.observe
-      : [
-          this.props.observe,
-        ]
+      : [this.props.observe]
     // console.log({ obs })
     for (let i = 0; i < obs.length; i++) {
       const o = obs[i]
@@ -238,7 +232,7 @@ class CommonModal extends React.PureComponent {
 
   onMinimize = () => {}
 
-  onConfirm = (cb) => {
+  onConfirm = cb => {
     // console.log('onConfirm')
     // window.beforeReloadHandlerAdded = false
     // window.removeEventListener('beforeunload', confirmBeforeReload)
@@ -254,7 +248,7 @@ class CommonModal extends React.PureComponent {
     if (typeof cb === 'function') cb()
   }
 
-  handleMaxWidthChange = (event) => {
+  handleMaxWidthChange = event => {
     this.setState({ maxWidth: event.target.value })
   }
 
@@ -265,14 +259,14 @@ class CommonModal extends React.PureComponent {
     })
   }
 
-  onEntered = (el) => {
+  onEntered = el => {
     if (this.props.autoFocus) {
       if (el.setActive) el.setActive()
       if (el.focus) el.focus()
     }
   }
 
-  render () {
+  render() {
     const {
       classes,
       open = false,
@@ -306,7 +300,7 @@ class CommonModal extends React.PureComponent {
     //   })
     // }
 
-    const childrenWithProps = React.Children.map(children, (child) =>
+    const childrenWithProps = React.Children.map(children, child =>
       React.cloneElement(child, {
         onConfirm: this.onConfirm,
         onClose: this.onClose,
@@ -386,9 +380,11 @@ class CommonModal extends React.PureComponent {
           >
             <DialogContent
               // id="classic-modal-slide-description"
-              className={`${classes.modalBody} ${bodyNoPadding
-                ? classes.modalBodyNoPadding
-                : classes.modalBodyPadding}`}
+              className={`${classes.modalBody} ${
+                bodyNoPadding
+                  ? classes.modalBodyNoPadding
+                  : classes.modalBodyPadding
+              }`}
               style={{ maxHeight: this.footer ? 'auto' : this.state.height }}
             >
               {/* !overrideLoading && loading.global ? (

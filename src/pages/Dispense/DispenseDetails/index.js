@@ -9,7 +9,7 @@ import Refresh from '@material-ui/icons/Refresh'
 import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
-import { formatMessage } from 'umi/locale' // common component
+import { formatMessage } from 'umi' // common component
 import Warining from '@material-ui/icons/Error'
 import {
   Button,
@@ -47,7 +47,7 @@ import {
 
 import CONSTANTS from './constants'
 
-const styles = (theme) => ({
+const styles = theme => ({
   paper: {
     marginTop: theme.spacing(2),
     marginBottom: theme.spacing(2),
@@ -139,7 +139,7 @@ const DispenseDetails = ({
     }
   }
 
-  const discardCallback = (r) => {
+  const discardCallback = r => {
     if (r) {
       history.push('/reception/queue')
     }
@@ -152,7 +152,7 @@ const DispenseDetails = ({
       payload: {
         id,
       },
-    }).then((r) => {
+    }).then(r => {
       sendNotification('EditedConsultation', {
         type: NOTIFICATION_TYPE.CONSULTAION,
         status: NOTIFICATION_STATUS.OK,
@@ -185,7 +185,7 @@ const DispenseDetails = ({
     })
   }
 
-  const updateInvoiceData = (v) => {
+  const updateInvoiceData = v => {
     const newInvoice = {
       ...values.invoice,
       invoiceTotal: v.summary.total,
@@ -212,12 +212,12 @@ const DispenseDetails = ({
 
   const checkUpdatedAppliedInvoicePayerInfo = () => {
     let isUpdatedAppliedInvoicePayerInfo
-    const activeInvoicePayer = coPayer.filter((tip) => !tip.isCancelled)
-    invoiceItem.forEach((item) => {
+    const activeInvoicePayer = coPayer.filter(tip => !tip.isCancelled)
+    invoiceItem.forEach(item => {
       for (let index = 0; index < activeInvoicePayer.length; index++) {
         const { invoicePayerItem = [] } = activeInvoicePayer[index]
         const payerItem = invoicePayerItem.find(
-          (ipi) => item.id === ipi.invoiceItemFK,
+          ipi => item.id === ipi.invoiceItemFK,
         )
         if (payerItem) {
           if (item.totalAfterGST !== payerItem.payableBalance) {
@@ -238,35 +238,28 @@ const DispenseDetails = ({
   const isBillFirstVisit = visitPurposeFK === VISIT_TYPE.BILL_FIRST
   const disableRefreshOrder = isBillFirstVisit && !clinicalObjectRecordFK
   const disableDiscard = totalPayment > 0 || !!clinicalObjectRecordFK
-  const [
-    showRemovePayment,
-    setShowRemovePayment,
-  ] = useState(false)
+  const [showRemovePayment, setShowRemovePayment] = useState(false)
 
-  const [
-    voidReason,
-    setVoidReason,
-  ] = useState('')
+  const [voidReason, setVoidReason] = useState('')
 
   let coPayerPayments = []
   if (checkUpdatedAppliedInvoicePayerInfo()) {
-    coPayer.forEach((ip) => {
+    coPayer.forEach(ip => {
       const { invoicePayment = [], name } = ip
       coPayerPayments = coPayerPayments.concat(
-        invoicePayment.filter((o) => !o.isCancelled).map((o) => ({
-          ...o,
-          payerName: name,
-        })),
+        invoicePayment
+          .filter(o => !o.isCancelled)
+          .map(o => ({
+            ...o,
+            payerName: name,
+          })),
       )
     })
   }
 
-  const [
-    expandedGroups,
-    setExpandedGroups,
-  ] = useState([])
+  const [expandedGroups, setExpandedGroups] = useState([])
 
-  const handleExpandedGroupsChange = (e) => {
+  const handleExpandedGroupsChange = e => {
     setExpandedGroups(e)
   }
 
@@ -275,13 +268,8 @@ const DispenseDetails = ({
       const groups = packageItem.reduce(
         (distinct, data) =>
           distinct.includes(data.packageGlobalId)
-            ? [
-                ...distinct,
-              ]
-            : [
-                ...distinct,
-                data.packageGlobalId,
-              ],
+            ? [...distinct]
+            : [...distinct, data.packageGlobalId],
         [],
       )
 
@@ -293,9 +281,7 @@ const DispenseDetails = ({
     let label = 'Package'
     let totalPrice = 0
     if (!packageItem) return ''
-    const data = packageItem.filter(
-      (item) => item.packageGlobalId === row.value,
-    )
+    const data = packageItem.filter(item => item.packageGlobalId === row.value)
     if (data.length > 0) {
       totalPrice = _.sumBy(data, 'totalAfterItemAdjustment') || 0
       label = `${data[0].packageCode} - ${data[0].packageName} (Total: `
@@ -303,9 +289,8 @@ const DispenseDetails = ({
     return (
       <span style={{ verticalAlign: 'middle', paddingRight: 8 }}>
         <strong>
-          {label} 
-          <NumberInput text currency value={totalPrice} />
-          )        
+          {label}
+          <NumberInput text currency value={totalPrice} />)
         </strong>
       </span>
     )
@@ -315,8 +300,7 @@ const DispenseDetails = ({
     <React.Fragment>
       <GridContainer>
         <GridItem justify='flex-start' md={6} className={classes.actionButtons}>
-          {!viewOnly &&
-          !isRetailVisit && (
+          {!viewOnly && !isRetailVisit && (
             <Button
               color='info'
               size='sm'
@@ -438,7 +422,8 @@ const DispenseDetails = ({
                                 Unable to finalize, total amount cannot be{' '}
                                 <span style={{ fontWeight: 400 }}>
                                   negative
-                                </span>.
+                                </span>
+                                .
                               </h3>
                             </div>
                           )
@@ -514,12 +499,8 @@ const DispenseDetails = ({
                   grouping: true,
                   groupingConfig: {
                     state: {
-                      grouping: [
-                        { columnName: 'packageGlobalId' },
-                      ],
-                      expandedGroups: [
-                        ...expandedGroups,
-                      ],
+                      grouping: [{ columnName: 'packageGlobalId' }],
+                      expandedGroups: [...expandedGroups],
                       onExpandedGroupsChange: handleExpandedGroupsChange,
                     },
                     row: {
@@ -635,7 +616,7 @@ const DispenseDetails = ({
               rowsMax='5'
               value={voidReason}
               maxLegth={200}
-              onChange={(e) => {
+              onChange={e => {
                 setVoidReason(e.target.value)
               }}
             />

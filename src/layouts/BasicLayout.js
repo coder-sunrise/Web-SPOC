@@ -17,7 +17,7 @@ import { ContainerQuery } from 'react-container-query'
 import cx from 'classnames'
 import pathToRegexp from 'path-to-regexp'
 import Media from 'react-media'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { checkAuthoritys } from '@/utils/utils'
 
 // import { ToastComponent } from '@syncfusion/ej2-react-notifications'
@@ -120,7 +120,7 @@ const sessionTimeoutTimer = 30 * 60 * 1000
 // const sessionTimeoutTimer = 2500
 
 class BasicLayout extends React.PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       mobileOpen: false,
@@ -140,7 +140,7 @@ class BasicLayout extends React.PureComponent {
     let sessionTimeOutInterval = null
     this.refreshTokenInterval = null
 
-    const resetSessionTimeOut = (e) => {
+    const resetSessionTimeOut = e => {
       // console.log(e)
       clearTimeout(sessionTimeOutInterval)
       const now = Date.now()
@@ -175,12 +175,12 @@ class BasicLayout extends React.PureComponent {
     this.refreshToken()
   }
 
-  componentDidMount () {
+  componentDidMount() {
     window.addEventListener('resize', this.resize)
     this.resize()
   }
 
-  componentDidUpdate (e) {
+  componentDidUpdate(e) {
     if (e.history.location.pathname !== e.location.pathname) {
       if (window.mainPanel) window.mainPanel.scrollTop = 0
       if (this.state.mobileOpen) {
@@ -189,12 +189,12 @@ class BasicLayout extends React.PureComponent {
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.removeEventListener('resize', this.resize)
     clearInterval(this.refreshTokenInterval)
   }
 
-  getContext () {
+  getContext() {
     const { location } = this.props
     return {
       location,
@@ -206,11 +206,11 @@ class BasicLayout extends React.PureComponent {
    * 获取面包屑映射
    * @param {Object} menuData 菜单配置
    */
-  getBreadcrumbNameMap (menus) {
+  getBreadcrumbNameMap(menus) {
     // console.log('getBreadcrumbNameMap')
     const routerMap = {}
-    const flattenMenuData = (data) => {
-      data.forEach((menuItem) => {
+    const flattenMenuData = data => {
+      data.forEach(menuItem => {
         if (menuItem.children) {
           flattenMenuData(menuItem.children)
         }
@@ -246,10 +246,10 @@ class BasicLayout extends React.PureComponent {
 
       const currentUIVersion = currentSystemVersion['semr2-frontend']
         .split('.')
-        .map((item) => parseInt(item, 10))
+        .map(item => parseInt(item, 10))
       const latestUIVersion = latestSystemVersion['semr2-frontend']
         .split('.')
-        .map((item) => parseInt(item, 10))
+        .map(item => parseInt(item, 10))
 
       const shouldRefresh = latestUIVersion.reduce(
         (refresh, version, index) => {
@@ -273,7 +273,7 @@ class BasicLayout extends React.PureComponent {
     const isAccessible = _cloned.reduce((canAccess, _menu) => {
       const { children, path } = _menu
       if (Array.isArray(children) && children.length > 0) {
-        const valid = children.find((child) => {
+        const valid = children.find(child => {
           return pathToRegexp(child.path).test(pathname)
         })
 
@@ -283,16 +283,12 @@ class BasicLayout extends React.PureComponent {
     }, false)
 
     if (isAccessible) return true
-    const [
-      firstMenu,
-    ] = _cloned
+    const [firstMenu] = _cloned
 
     // check if menu has any sub menu
     // redirect to first accessible sub menu
     if (firstMenu.children && Array.isArray(firstMenu.children)) {
-      const [
-        firstChildren,
-      ] = firstMenu.children
+      const [firstChildren] = firstMenu.children
       if (firstChildren && typeof firstChildren.path === 'string') {
         return this.props.history.push(firstChildren.path)
       }
@@ -382,16 +378,16 @@ class BasicLayout extends React.PureComponent {
     checkAuthoritys(pathname, history)
   }
 
-  matchParamsPath = (pathname) => {
+  matchParamsPath = pathname => {
     if (!this.breadcrumbNameMap) return null
     // console.log('matchParamsPath', pathname, this.breadcrumbNameMap)
-    const pathKey = Object.keys(this.breadcrumbNameMap).find((key) =>
+    const pathKey = Object.keys(this.breadcrumbNameMap).find(key =>
       pathToRegexp(key).test(pathname),
     )
     return this.breadcrumbNameMap[pathKey]
   }
 
-  getPageTitle = (pathname) => {
+  getPageTitle = pathname => {
     const currRouterData = this.matchParamsPath(pathname)
     if (!currRouterData) {
       return defaultSettings.appTitle
@@ -460,12 +456,12 @@ class BasicLayout extends React.PureComponent {
   }
 
   handleDrawerToggle = () => {
-    this.setState((preState) => ({
+    this.setState(preState => ({
       mobileOpen: !preState.mobileOpen,
     }))
   }
 
-  triggerResizeEvent () {
+  triggerResizeEvent() {
     // eslint-disable-line
     const event = document.createEvent('HTMLEvents')
     event.initEvent('resize', true, false)
@@ -490,7 +486,7 @@ class BasicLayout extends React.PureComponent {
     return children
   }
 
-  render () {
+  render() {
     const { classes, loading, theme, ...props } = this.props
     // console.log(props.collapsed)
     NProgress.start()
@@ -522,7 +518,7 @@ class BasicLayout extends React.PureComponent {
           <CssBaseline />
           <DocumentTitle title={this.getPageTitle(pathname)}>
             <ContainerQuery query={query}>
-              {(params) => (
+              {params => (
                 <Context.Provider value={this.getContext()}>
                   <ErrorBoundary>
                     <div id='main-page' className={cx(params)}>
@@ -561,7 +557,7 @@ class BasicLayout extends React.PureComponent {
                           <div
                             id='mainPanel-root'
                             className={mainPanel}
-                            ref={(node) => {
+                            ref={node => {
                               // this.mainPanel = node
                               window.mainPanel = node
                             }}
@@ -619,9 +615,9 @@ export default withStyles(appStyle)(
     menuData: menu.menuData,
     ...setting,
     loading,
-  }))((props) => (
+  }))(props => (
     <Media query='(max-width: 599px)'>
-      {(isMobile) => <BasicLayout {...props} isMobile={isMobile} />}
+      {isMobile => <BasicLayout {...props} isMobile={isMobile} />}
     </Media>
   )),
 )

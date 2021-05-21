@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import * as Yup from 'yup'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { Search, Replay } from '@material-ui/icons'
 import {
   CardContainer,
@@ -19,12 +19,12 @@ import {
 } from '@/components'
 import PatientSearchModal from './PatientSearch'
 
-const styles = (theme) => ({
+const styles = theme => ({
   gridItemLabel: {
-    paddingTop: theme.spacing(3), 
+    paddingTop: theme.spacing(3),
   },
   gridItemButton: {
-    paddingTop: theme.spacing(2), 
+    paddingTop: theme.spacing(2),
   },
 })
 
@@ -34,7 +34,7 @@ const parseToOneDecimalString = (value = 0.0) => value.toFixed(1)
   patientSearchResult: patientSearch.list,
 }))
 @withFormikExtend({
-  mapPropsToValues: ({selectedPackageDrawdown}) => ({
+  mapPropsToValues: ({ selectedPackageDrawdown }) => ({
     remainingQuantity: selectedPackageDrawdown.remainingQuantity,
     fromPackageDrawdownFK: selectedPackageDrawdown.id,
     transferQuantity: undefined,
@@ -43,12 +43,16 @@ const parseToOneDecimalString = (value = 0.0) => value.toFixed(1)
     patientSearchValue: '',
   }),
   validationSchema: Yup.object().shape({
-    transferQuantity: Yup.number().required()
-        .min(1, 'Transfer quantity must be greater than or equal to 1')
-        .max(Yup.ref('remainingQuantity'), 'Transfer quantity cannot exceed Remaining Quantity'),
+    transferQuantity: Yup.number()
+      .required()
+      .min(1, 'Transfer quantity must be greater than or equal to 1')
+      .max(
+        Yup.ref('remainingQuantity'),
+        'Transfer quantity cannot exceed Remaining Quantity',
+      ),
     transferToPatientId: Yup.number().required(),
   }),
-  handleSubmit: (values, {props}) => {
+  handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm } = props
 
     dispatch({
@@ -62,7 +66,6 @@ const parseToOneDecimalString = (value = 0.0) => value.toFixed(1)
   },
   displayName: 'TransferPackage',
 })
-
 class TransferPackage extends Component {
   state = {
     showSearchPatientModal: false,
@@ -81,8 +84,7 @@ class TransferPackage extends Component {
     this.showSearchResult()
   }
 
-  checkShouldPopulate = (patientSearchResult) =>
-    patientSearchResult.length === 1
+  checkShouldPopulate = patientSearchResult => patientSearchResult.length === 1
 
   showSearchResult = () => {
     const { patientSearchResult } = this.props
@@ -98,17 +100,15 @@ class TransferPackage extends Component {
   }
 
   onSelectPatientClick = async (patientProfile, autoPopulate = false) => {
-    const {
-      id,
-      name,
-      patientAccountNo,
-    } = patientProfile
+    const { id, name, patientAccountNo } = patientProfile
     const { values, setValues, patientPackageDrawdown } = this.props
     const { list } = patientPackageDrawdown
     const fromPatientId = list[0].patientProfileFK
 
     if (fromPatientId === id) {
-      notification.error({ message: 'Transfer to patient cannot as same as from patient' })
+      notification.error({
+        message: 'Transfer to patient cannot as same as from patient',
+      })
       this.resetPatientSearchResult()
       this.toggleSearchPatientModal()
       return false
@@ -150,31 +150,51 @@ class TransferPackage extends Component {
       },
     })
   }
-  
-  render () {
-    const { footer, selectedPackageDrawdown, patientPackageDrawdown, classes, values } = this.props
+
+  render() {
+    const {
+      footer,
+      selectedPackageDrawdown,
+      patientPackageDrawdown,
+      classes,
+      values,
+    } = this.props
     const { list } = patientPackageDrawdown
-    const fromPackage = list.find(p => p.id === selectedPackageDrawdown.patientPackageFK)
+    const fromPackage = list.find(
+      p => p.id === selectedPackageDrawdown.patientPackageFK,
+    )
     const fromPackageLabel = `${fromPackage.packageCode} - ${fromPackage.packageName}`
 
     return (
       <CardContainer hideHeader>
-        <SizeContainer size='sm'>    
+        <SizeContainer size='sm'>
           <React.Fragment>
             <GridContainer>
               <GridItem xs={12}>
-                <TextField label='From Package' disabled value={fromPackageLabel} />
+                <TextField
+                  label='From Package'
+                  disabled
+                  value={fromPackageLabel}
+                />
               </GridItem>
               <GridItem xs={12}>
-                <TextField label='Item Code' disabled value={selectedPackageDrawdown.itemCode} />
+                <TextField
+                  label='Item Code'
+                  disabled
+                  value={selectedPackageDrawdown.itemCode}
+                />
               </GridItem>
               <GridItem xs={12}>
-                <TextField label='Item Name' disabled value={selectedPackageDrawdown.itemName} />
+                <TextField
+                  label='Item Name'
+                  disabled
+                  value={selectedPackageDrawdown.itemName}
+                />
               </GridItem>
               <GridItem xs={3}>
                 <FastField
                   name='transferQuantity'
-                  render={(args) => (
+                  render={args => (
                     <NumberInput
                       {...args}
                       label='Transfer Quantity'
@@ -182,15 +202,21 @@ class TransferPackage extends Component {
                       max={selectedPackageDrawdown.remainingQuantity}
                       precision={1}
                     />
-                    )}
+                  )}
                 />
               </GridItem>
               <GridItem xs={9}>
-                <p className={classes.gridItemLabel}>(Remaining: {parseToOneDecimalString(selectedPackageDrawdown.remainingQuantity)})</p>
+                <p className={classes.gridItemLabel}>
+                  (Remaining:{' '}
+                  {parseToOneDecimalString(
+                    selectedPackageDrawdown.remainingQuantity,
+                  )}
+                  )
+                </p>
               </GridItem>
               <GridItem xs={3}>
                 <p className={classes.gridItemLabel}>
-                  Transfer To: 
+                  Transfer To:
                   {values.transferToPatientId === undefined && (
                     <font color='red'> *</font>
                   )}
@@ -201,7 +227,7 @@ class TransferPackage extends Component {
                   {values.transferToPatientId === undefined && (
                     <FastField
                       name='patientSearchValue'
-                      render={(args) => {
+                      render={args => {
                         return (
                           <TextField
                             {...args}
@@ -215,7 +241,7 @@ class TransferPackage extends Component {
                     />
                   )}
                   {values.transferToPatientId !== undefined && (
-                    <TextField 
+                    <TextField
                       label='Selected Patient'
                       disabled
                       value={values.transferToPatientName}
@@ -226,23 +252,23 @@ class TransferPackage extends Component {
               <GridItem xs={2}>
                 <div className={classes.gridItemButton}>
                   {values.transferToPatientId === undefined && (
-                    <ProgressButton                  
+                    <ProgressButton
                       size='sm'
                       color='primary'
                       onClick={this.onSearchPatientClick}
                       icon={<Search />}
                     >
-                    Search
+                      Search
                     </ProgressButton>
                   )}
                   {values.transferToPatientId !== undefined && (
-                    <ProgressButton                  
+                    <ProgressButton
                       size='sm'
                       color='danger'
                       onClick={this.onResetPatientClick}
                       icon={<Replay />}
                     >
-                    Reset
+                      Reset
                     </ProgressButton>
                   )}
                 </div>
@@ -263,9 +289,10 @@ class TransferPackage extends Component {
                 handleSelectClick={this.onSelectPatientClick}
               />
             </CommonModal>
-          </React.Fragment>  
+          </React.Fragment>
         </SizeContainer>
-        {footer && footer({
+        {footer &&
+          footer({
             onConfirm: this.props.handleSubmit,
             confirmBtnText: 'Transfer',
           })}

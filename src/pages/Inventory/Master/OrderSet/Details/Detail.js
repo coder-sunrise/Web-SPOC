@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import { Divider } from '@material-ui/core'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { FastField } from 'formik'
 import { compose } from 'redux'
 
@@ -46,7 +46,7 @@ const Detail = ({ orderSetDetail, dispatch, values, theme }) => {
             <GridItem xs={12}>
               <FastField
                 name='code'
-                render={(args) => {
+                render={args => {
                   return (
                     <TextField
                       label={formatMessage({
@@ -61,7 +61,7 @@ const Detail = ({ orderSetDetail, dispatch, values, theme }) => {
             <GridItem xs={12}>
               <FastField
                 name='displayValue'
-                render={(args) => {
+                render={args => {
                   return (
                     <TextField
                       label={formatMessage({
@@ -76,7 +76,7 @@ const Detail = ({ orderSetDetail, dispatch, values, theme }) => {
             <GridItem xs={12}>
               <FastField
                 name='description'
-                render={(args) => {
+                render={args => {
                   return (
                     <TextField
                       label={formatMessage({
@@ -91,7 +91,7 @@ const Detail = ({ orderSetDetail, dispatch, values, theme }) => {
             <GridItem xs={12}>
               <FastField
                 name='remarks'
-                render={(args) => {
+                render={args => {
                   return (
                     <TextField
                       label={formatMessage({
@@ -113,7 +113,7 @@ const Detail = ({ orderSetDetail, dispatch, values, theme }) => {
             <GridItem xs={12}>
               <FastField
                 name='effectiveDates'
-                render={(args) => (
+                render={args => (
                   <DateRangePicker
                     format={dateFormatLong}
                     label='Effective Start Date'

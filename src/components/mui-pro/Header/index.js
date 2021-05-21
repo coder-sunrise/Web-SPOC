@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
-import { FormattedMessage } from 'umi/locale'
+import Link, { FormattedMessage } from 'umi'
 
 // @material-ui/core components
 import withStyles from '@material-ui/core/styles/withStyles'
@@ -18,11 +18,10 @@ import ViewList from '@material-ui/icons/ViewList'
 import Button from 'mui-pro-components/CustomButtons'
 
 import headerStyle from 'mui-pro-jss/material-dashboard-pro-react/components/headerStyle.jsx'
-import Link from 'umi'
-import HeaderLinks from './HeaderLinks'
 
 import PageHeader from '@/components/PageHeader'
 import MenuContext from '@/layouts/MenuContext'
+import HeaderLinks from './HeaderLinks'
 
 function Header({ isMobile, collapsed, setting, ...props }) {
   // function makeBrand () {

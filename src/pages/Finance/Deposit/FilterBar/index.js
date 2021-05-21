@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import moment from 'moment'
 import { FastField, Field, withFormik } from 'formik'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 // matetrial ui
 import PersonAdd from '@material-ui/icons/PersonAdd'
 import Search from '@material-ui/icons/Search'
@@ -20,7 +20,7 @@ import {
 import { FilterBarDate } from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
 
-const styles = (theme) => ({
+const styles = theme => ({
   filterBtn: {
     lineHeight: standardRowHeight,
     textAlign: 'left',
@@ -43,7 +43,7 @@ const styles = (theme) => ({
   }),
 })
 class FilterBar extends PureComponent {
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.unmount()
   }
 
@@ -55,7 +55,7 @@ class FilterBar extends PureComponent {
       },
     })
 
-  render () {
+  render() {
     const { classes, queryDepositListing, values } = this.props
     const { transactionStartDate, transactionEndDate } = values
     return (
@@ -64,7 +64,7 @@ class FilterBar extends PureComponent {
           <GridItem xs sm={12} md={4}>
             <FastField
               name='patientSearchValue'
-              render={(args) => {
+              render={args => {
                 return (
                   <TextField
                     label={formatMessage({
@@ -79,7 +79,7 @@ class FilterBar extends PureComponent {
           <GridItem md={2}>
             <Field
               name='transactionStartDate'
-              render={(args) => (
+              render={args => (
                 <FilterBarDate
                   args={args}
                   label='Transaction Date From'
@@ -94,7 +94,7 @@ class FilterBar extends PureComponent {
           <GridItem md={2}>
             <Field
               name='transactionEndDate'
-              render={(args) => (
+              render={args => (
                 <FilterBarDate
                   isEndDate
                   args={args}
@@ -113,7 +113,7 @@ class FilterBar extends PureComponent {
           <GridItem xs sm={6} md={4}>
             <FastField
               name='transactionOnly'
-              render={(args) => {
+              render={args => {
                 return (
                   <Tooltip
                     title={formatMessage({

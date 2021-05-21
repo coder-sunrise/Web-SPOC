@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
 import { status } from '@/utils/codes'
@@ -22,7 +22,7 @@ import {
   displayName: 'DocumentTemplateFilter',
 })
 class Filter extends PureComponent {
-  render () {
+  render() {
     const { classes } = this.props
     return (
       <div className={classes.filterBar}>
@@ -30,7 +30,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={3}>
             <FastField
               name='codeDisplayValue'
-              render={(args) => {
+              render={args => {
                 return <TextField label='Code / Display Value' {...args} />
               }}
             />
@@ -38,7 +38,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={3}>
             <FastField
               name='documentTemplateTypeFK'
-              render={(args) => {
+              render={args => {
                 return (
                   <CodeSelect
                     code='LTDocumentTemplateType'
@@ -52,7 +52,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={2}>
             <FastField
               name='isActive'
-              render={(args) => {
+              render={args => {
                 return <Select label='Status' options={status} {...args} />
               }}
             />

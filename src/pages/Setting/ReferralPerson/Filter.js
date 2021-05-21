@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
 import {
@@ -32,7 +32,7 @@ import {
   displayName: 'ReferralPersonFilter',
 })
 class Filter extends PureComponent {
-  render () {
+  render() {
     const { classes, handleSubmit, referralSource } = this.props
     return (
       <div className={classes.filterBar}>
@@ -40,7 +40,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={3}>
             <FastField
               name='name'
-              render={(args) => {
+              render={args => {
                 return <TextField label='Name' {...args} />
               }}
             />
@@ -48,7 +48,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={3}>
             <Field
               name='referralSourceId'
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   {...args}
                   options={referralSource}

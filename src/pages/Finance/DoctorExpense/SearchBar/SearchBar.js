@@ -8,7 +8,7 @@ import Search from '@material-ui/icons/Search'
 import Replay from '@material-ui/icons/Replay'
 import AddBox from '@material-ui/icons/AddBox'
 
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 import { withFormik, FastField } from 'formik'
 
 import { DatePicker, Select, ProgressButton } from '@/components'
@@ -37,9 +37,7 @@ const styles = {
   handleSubmit: (values, { setSubmitting, props }) => {
     props.dispatch({
       type: 'doctorExpense/fetchList',
-      payload: [
-        ...values.DoctorNames,
-      ],
+      payload: [...values.DoctorNames],
     })
     setTimeout(() => {
       alert(JSON.stringify(values, null, 2))
@@ -50,7 +48,7 @@ const styles = {
 class SearchBar extends PureComponent {
   state = {}
 
-  render () {
+  render() {
     const {
       values,
       handleSubmit,
@@ -64,7 +62,7 @@ class SearchBar extends PureComponent {
         <GridItem xs={12} sm={12} md={6}>
           <FastField
             name='DoctorNames'
-            render={(args) => {
+            render={args => {
               return (
                 <Select
                   mode='multiple'
@@ -89,7 +87,7 @@ class SearchBar extends PureComponent {
         <GridItem xs={12} sm={12} md={3}>
           <FastField
             name='Start'
-            render={(args) => (
+            render={args => (
               <DatePicker
                 label={formatMessage({ id: 'finance.invoice.search.start' })}
                 timeFormat={false}
@@ -101,7 +99,7 @@ class SearchBar extends PureComponent {
         <GridItem xs={12} sm={12} md={3}>
           <FastField
             name='End'
-            render={(args) => (
+            render={args => (
               <DatePicker
                 label={formatMessage({ id: 'finance.invoice.search.end' })}
                 timeFormat={false}

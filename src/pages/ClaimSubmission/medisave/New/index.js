@@ -6,7 +6,7 @@ import { withFormik } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { LoadingWrapper } from '@/components/_medisys'
 import {
   ProgressButton,
@@ -23,7 +23,7 @@ import TableGrid from '../TableGrid'
 // variables
 import { NewMedisaveColumnExtensions, NewMedisaveColumns } from './variables'
 
-const styles = (theme) => ({
+const styles = theme => ({
   cardContainer: {
     margin: 1,
   },
@@ -46,7 +46,7 @@ class NewMedisave extends React.Component {
     isLoading: false,
   }
 
-  componentWillMount () {
+  componentWillMount() {
     this.props.dispatch({
       type: 'medisaveClaimSubmissionNew/query',
     })
@@ -59,7 +59,7 @@ class NewMedisave extends React.Component {
         type: 'medisaveClaimSubmissionNew/refreshPatientDetails',
         payload: { claimIds: selectedRows },
       })
-      .then((r) => {
+      .then(r => {
         if (!r) {
           this.refreshDataGrid()
           notification.success({
@@ -69,7 +69,7 @@ class NewMedisave extends React.Component {
       })
   }
 
-  handleSelectionChange = (selection) =>
+  handleSelectionChange = selection =>
     this.setState({ selectedRows: selection })
 
   refreshDataGrid = () => {
@@ -90,10 +90,10 @@ class NewMedisave extends React.Component {
           type: 'medisaveClaimSubmissionNew/submitMedisaveClaim',
           payload: { claimIds: selectedRows },
         })
-        .then((r) => {
+        .then(r => {
           this.handleLoadingVisibility(false)
           if (r) {
-            const failedCount = r.filter((t) => t.status !== 'SUCCESS').length
+            const failedCount = r.filter(t => t.status !== 'SUCCESS').length
             if (failedCount === 0) {
               notification.success({
                 message: 'Claim Submission Success.',
@@ -108,7 +108,7 @@ class NewMedisave extends React.Component {
     }
   }
 
-  render () {
+  render() {
     const {
       classes,
       medisaveClaimSubmissionNew,
@@ -150,13 +150,14 @@ class NewMedisave extends React.Component {
                   selectable: true,
                   selectConfig: {
                     showSelectAll: true,
-                    rowSelectionEnabled: (row) => row.patientIsActive,
+                    rowSelectionEnabled: row => row.patientIsActive,
                   },
                 }}
                 selection={this.state.selectedRows}
                 onSelectionChange={this.handleSelectionChange}
                 onContextMenuItemClick={(row, id) =>
-                  handleContextMenuItemClick(row, id, true)}
+                  handleContextMenuItemClick(row, id, true)
+                }
                 type='new'
                 height={height}
               />

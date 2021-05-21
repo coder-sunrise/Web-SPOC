@@ -2,7 +2,7 @@ import React from 'react'
 // dva
 import { connect } from 'dva'
 // umi locale
-import { FormattedMessage, formatMessage } from 'umi/locale'
+import { FormattedMessage, formatMessage } from 'umi'
 import router from 'umi/router'
 // class names
 import classNames from 'classnames'
@@ -53,7 +53,7 @@ import RightClickContextMenu from './Grid/RightClickContextMenu'
 
 const drawerWidth = 400
 
-const styles = (theme) => ({
+const styles = theme => ({
   hide: {
     display: 'none',
   },
@@ -122,7 +122,9 @@ class Queue extends React.Component {
 
   componentWillMount = () => {
     const { dispatch, queueLog, history } = this.props
-    const { location: { query } } = history
+    const {
+      location: { query },
+    } = history
     const { sessionInfo } = queueLog
     dispatch({
       type: `${modelKey}initState`,
@@ -214,7 +216,7 @@ class Queue extends React.Component {
         id: row.id,
         patientProfileFK,
       },
-    }).then((response) => {
+    }).then(response => {
       if (response) {
         dispatch({
           type: 'queueLog/refresh',
@@ -244,7 +246,7 @@ class Queue extends React.Component {
     this.props.dispatch({
       type: 'patient/openPatientModal',
       payload: {
-        callback: (patientProfileFK) => {
+        callback: patientProfileFK => {
           this.props.dispatch({
             type: 'patient/closePatientModal',
           })
@@ -255,7 +257,7 @@ class Queue extends React.Component {
     })
   }
 
-  togglePatientSearch = (override) => {
+  togglePatientSearch = override => {
     const { showPatientSearch } = this.state
     const target = !showPatientSearch
     this.setState({
@@ -280,11 +282,7 @@ class Queue extends React.Component {
         },
       })
     }
-    this.props.history.push(
-      getRemovedUrl([
-        'v',
-      ]),
-    )
+    this.props.history.push(getRemovedUrl(['v']))
   }
 
   resetPatientSearchResult = () => {
@@ -345,7 +343,7 @@ class Queue extends React.Component {
     dispatch({
       type: `queueLog/endSession`,
       sessionID: queueLog.sessionInfo.id,
-    }).then(async (response) => {
+    }).then(async response => {
       if (response) {
         this.clearQueueCall()
         this.setState({
@@ -363,7 +361,7 @@ class Queue extends React.Component {
           key: VALUE_KEYS.QUEUECALLING,
         },
       })
-      .then((res) => {
+      .then(res => {
         if (res) {
           sendNotification('QueueClear', {
             type: NOTIFICATION_TYPE.QUEUECALL,
@@ -378,7 +376,7 @@ class Queue extends React.Component {
     this.setState({ showEndSessionSummary: false })
   }
 
-  onEnterPressed = async (searchQuery) => {
+  onEnterPressed = async searchQuery => {
     const { dispatch } = this.props
     const prefix = 'like_'
     await dispatch({
@@ -404,7 +402,7 @@ class Queue extends React.Component {
     })
   }
 
-  onHideContextMenu = (e) => {
+  onHideContextMenu = e => {
     if (
       e &&
       e.target &&
@@ -417,7 +415,7 @@ class Queue extends React.Component {
     })
   }
 
-  deleteQueueConfirmation = (row) => {
+  deleteQueueConfirmation = row => {
     const { queueNo, id } = row
     const { dispatch } = this.props
     dispatch({
@@ -440,10 +438,15 @@ class Queue extends React.Component {
     })
   }
 
-  isAssignedDoctor = (row) => {
+  isAssignedDoctor = row => {
     if (!row.doctor) return false
-    const { doctor: { id }, visitStatus } = row
-    const { clinicianProfile: { doctorProfile } } = this.props.user
+    const {
+      doctor: { id },
+      visitStatus,
+    } = row
+    const {
+      clinicianProfile: { doctorProfile },
+    } = this.props.user
 
     if (!doctorProfile) {
       notification.error({
@@ -463,12 +466,9 @@ class Queue extends React.Component {
     return true
   }
 
-  canAccess = (id) => {
-    const apptsActionID = [
-      '8',
-      '9',
-    ]
-    const findMatch = (item) => item.id === parseFloat(id, 10)
+  canAccess = id => {
+    const apptsActionID = ['8', '9']
+    const findMatch = item => item.id === parseFloat(id, 10)
 
     let menuOpt = ContextMenuOptions.find(findMatch)
 
@@ -526,7 +526,7 @@ class Queue extends React.Component {
             qid: row.id,
             queueNo: row.queueNo,
           },
-        }).then((o) => {
+        }).then(o => {
           if (o)
             router.push(
               `/reception/queue/dispense?isInitialLoading=${isInitialLoading}&qid=${row.id}&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
@@ -572,7 +572,7 @@ class Queue extends React.Component {
               qid: row.id,
               queueNo: row.queueNo,
             },
-          }).then((o) => {
+          }).then(o => {
             if (o) {
               router.push(
                 `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
@@ -596,7 +596,7 @@ class Queue extends React.Component {
                 id: row.visitFK,
                 version,
               },
-            }).then((o) => {
+            }).then(o => {
               if (o)
                 router.push(
                   `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
@@ -620,12 +620,12 @@ class Queue extends React.Component {
             id: row.visitFK,
             version,
           },
-        }).then((o) => {
+        }).then(o => {
           if (o)
             if (o.updateByUserFK !== this.props.user.id) {
               const { clinicianprofile = [] } = this.props.codetable
               const editingUser = clinicianprofile.find(
-                (m) => m.userProfileFK === o.updateByUserFK,
+                m => m.userProfileFK === o.updateByUserFK,
               ) || {
                 name: 'Someone',
               }
@@ -641,7 +641,7 @@ class Queue extends React.Component {
                         id: row.visitFK,
                         version,
                       },
-                    }).then((c) => {
+                    }).then(c => {
                       router.push(
                         `/reception/queue/consultation?qid=${row.id}&cid=${c.id}&pid=${row.patientProfileFK}&v=${version}`,
                       )
@@ -660,7 +660,7 @@ class Queue extends React.Component {
       case '8': {
         const { clinicianprofile = [] } = this.props.codetable
         const doctorProfile = clinicianprofile.find(
-          (item) => item.id === row.clinicianProfileFk,
+          item => item.id === row.clinicianProfileFk,
         )
         this.handleActualizeAppointment({
           patientID: row.patientProfileFk,
@@ -695,7 +695,7 @@ class Queue extends React.Component {
 
     if (totalRecords === 1 && hasSearchQuery)
       return this.showVisitRegistration({
-        patientID: patientSearchResult[ 0 ].id,
+        patientID: patientSearchResult[0].id,
       })
     if (totalRecords >= 1) {
       return this.togglePatientSearch()
@@ -722,7 +722,7 @@ class Queue extends React.Component {
     )
   }
 
-  setSearch = (v) => {
+  setSearch = v => {
     this.setState({
       search: v,
     })
@@ -749,7 +749,7 @@ class Queue extends React.Component {
     })
   }
 
-  showVisitForms = async (row) => {
+  showVisitForms = async row => {
     const { id, visitStatus, doctor, patientAccountNo, patientName } = row
     await this.props.dispatch({
       type: 'formListing/updateState',
@@ -803,7 +803,10 @@ class Queue extends React.Component {
                 {`Session No.: ${sessionNo}`}
               </h3>
 
-              {openQueueDisplayAccessRight && openQueueDisplayAccessRight.rights !== 'hidden' && tracker && tracker.qNo ? (
+              {openQueueDisplayAccessRight &&
+              openQueueDisplayAccessRight.rights !== 'hidden' &&
+              tracker &&
+              tracker.qNo ? (
                 <h4
                   className={classNames(classes.sessionNo)}
                   style={{
@@ -815,11 +818,9 @@ class Queue extends React.Component {
                 >
                   <font color='red'>
                     NOW SERVING:{' '}
-                    {tracker.qNo.includes('.') ? (
-                      tracker.qNo
-                    ) : (
-                      `${tracker.qNo}.0`
-                    )}
+                    {tracker.qNo.includes('.')
+                      ? tracker.qNo
+                      : `${tracker.qNo}.0`}
                   </font>
                 </h4>
               ) : (
@@ -932,11 +933,9 @@ class Queue extends React.Component {
             <CommonModal
               open={showForms}
               title={
-                this.state.formCategory === FORM_CATEGORY.VisitForms ? (
-                  'Visit Forms'
-                ) : (
-                  'Forms'
-                )
+                this.state.formCategory === FORM_CATEGORY.VisitForms
+                  ? 'Visit Forms'
+                  : 'Forms'
               }
               onClose={this.toggleForms}
               onConfirm={this.toggleForms}

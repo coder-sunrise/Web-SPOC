@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { FastField, withFormik } from 'formik'
 import { Paper, withStyles } from '@material-ui/core'
 import {
@@ -32,7 +32,7 @@ const PaymentComponentBase = ({
         <GridItem xs sm={12} md={6} lg={12}>
           <FastField
             name='CreditCardType'
-            render={(args) => (
+            render={args => (
               <Select
                 label={formatMessage({
                   id: 'finance.collectPayment.cardType',
@@ -54,7 +54,7 @@ const PaymentComponentBase = ({
         <GridItem xs sm={12} md={6} lg={12}>
           <FastField
             name='CardNo'
-            render={(args) => (
+            render={args => (
               <TextField
                 label={formatMessage({
                   id: 'finance.collectPayment.cardNo',
@@ -70,7 +70,7 @@ const PaymentComponentBase = ({
         <GridItem xs sm={12} md={6} lg={12}>
           <FastField
             name='ReferenceNo'
-            render={(args) => (
+            render={args => (
               <TextField
                 label={formatMessage({
                   id: 'finance.collectPayment.referenceNo',
@@ -85,7 +85,7 @@ const PaymentComponentBase = ({
         <GridItem xs sm={12} md={6} lg={12}>
           <FastField
             name='ChequeNo'
-            render={(args) => (
+            render={args => (
               <TextField
                 label={formatMessage({
                   id: 'finance.collectPayment.chequeNo',
@@ -101,7 +101,7 @@ const PaymentComponentBase = ({
         <GridItem xs sm={12} md={6} lg={12}>
           <FastField
             name='Remark'
-            render={(args) => (
+            render={args => (
               <TextField
                 label={formatMessage({
                   id: 'finance.collectPayment.remarks',
@@ -145,7 +145,7 @@ const PaymentComponent = ({ paymentMode }) => {
     onSubmit !== undefined && onSubmit(values),
 })
 class CollectPayment extends PureComponent {
-  render () {
+  render() {
     const { values, classes } = this.props
 
     return (
@@ -175,7 +175,7 @@ class CollectPayment extends PureComponent {
             <GridItem lg={12}>
               <FastField
                 name='amount'
-                render={(args) => (
+                render={args => (
                   <NumberInput
                     currency
                     {...args}
@@ -189,7 +189,7 @@ class CollectPayment extends PureComponent {
             <GridItem xs sm={12} md={6} lg={12}>
               <FastField
                 name='PaymentMode'
-                render={(args) => {
+                render={args => {
                   return (
                     <Select
                       fullWidth

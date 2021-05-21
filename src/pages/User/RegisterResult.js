@@ -1,7 +1,7 @@
 import React from 'react'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import Link, { formatMessage, FormattedMessage } from 'umi'
 import { Button } from 'antd'
-import Link from 'umi'
+
 import Result from '@/components/Result'
 import styles from './RegisterResult.less'
 

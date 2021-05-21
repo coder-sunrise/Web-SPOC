@@ -2,7 +2,7 @@ import React, { PureComponent, useState } from 'react'
 // formik
 import { FastField } from 'formik'
 // umi
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 // common components
 import DeleteIcon from '@material-ui/icons/Delete'
 import { withStyles, Divider, Paper } from '@material-ui/core'
@@ -24,10 +24,7 @@ export default ({
   handleCalculateBMI,
   ...props
 }) => {
-  const [
-    show,
-    setShow,
-  ] = useState(false)
+  const [show, setShow] = useState(false)
 
   return (
     <React.Fragment>
@@ -35,7 +32,7 @@ export default ({
         <GridItem xs={12} sm={4} md={3}>
           <FastField
             name={`corPatientNoteVitalSign[${index}].temperatureC`}
-            render={(args) => (
+            render={args => (
               <NumberInput
                 {...args}
                 label={formatMessage({
@@ -54,7 +51,7 @@ export default ({
         <GridItem xs={12} sm={4} md={3}>
           <FastField
             name={`corPatientNoteVitalSign[${index}].bpSysMMHG`}
-            render={(args) => (
+            render={args => (
               <NumberInput
                 {...args}
                 label='Blood Pressure SYS'
@@ -70,7 +67,7 @@ export default ({
         <GridItem xs={12} sm={4} md={3}>
           <FastField
             name={`corPatientNoteVitalSign[${index}].bpDiaMMHG`}
-            render={(args) => (
+            render={args => (
               <NumberInput
                 {...args}
                 label='Blood Pressure DIA'
@@ -86,7 +83,7 @@ export default ({
         <GridItem xs={12} sm={4} md={3}>
           <FastField
             name={`corPatientNoteVitalSign[${index}].pulseRateBPM`}
-            render={(args) => (
+            render={args => (
               <NumberInput
                 {...args}
                 label={formatMessage({
@@ -104,7 +101,7 @@ export default ({
         <GridItem xs={12} sm={4} md={3}>
           <FastField
             name={`corPatientNoteVitalSign[${index}].weightKG`}
-            render={(args) => (
+            render={args => (
               <NumberInput
                 {...args}
                 format='0.0'
@@ -114,7 +111,7 @@ export default ({
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.weight.suffix',
                 })}
-                onChange={(e) => {
+                onChange={e => {
                   setTimeout(() => {
                     handleCalculateBMI(index)
                   }, 1)
@@ -128,7 +125,7 @@ export default ({
         <GridItem xs={12} sm={4} md={3}>
           <FastField
             name={`corPatientNoteVitalSign[${index}].heightCM`}
-            render={(args) => (
+            render={args => (
               <NumberInput
                 {...args}
                 precision={0}
@@ -139,7 +136,7 @@ export default ({
                   id: 'reception.queue.visitRegistration.height.suffix',
                 })}
                 // formatter={(value) => Math.floor(value)}
-                onChange={(e) => {
+                onChange={e => {
                   setTimeout(() => {
                     handleCalculateBMI(index)
                   }, 1)
@@ -153,7 +150,7 @@ export default ({
         <GridItem xs={11} sm={4} md={3}>
           <FastField
             name={`corPatientNoteVitalSign[${index}].bmi`}
-            render={(args) => (
+            render={args => (
               <NumberInput
                 {...args}
                 label={formatMessage({

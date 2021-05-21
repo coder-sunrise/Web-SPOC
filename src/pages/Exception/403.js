@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import Link from 'umi'
 import Exception from '@/components/Exception'
 import { Button } from '@/components'

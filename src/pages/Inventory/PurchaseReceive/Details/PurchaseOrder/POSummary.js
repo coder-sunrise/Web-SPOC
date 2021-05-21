@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { Divider } from '@material-ui/core'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import Add from '@material-ui/icons/Add'
 import { amountProps } from '../../variables'
 import POAdjustment from './POAdjustment'
@@ -24,7 +24,7 @@ class POSummary extends PureComponent {
     settingGSTPercentage: 0,
   }
 
-  static getDerivedStateFromProps (props, state) {
+  static getDerivedStateFromProps(props, state) {
     const { clinicSettings } = props
     const { settings } = clinicSettings
 
@@ -53,7 +53,7 @@ class POSummary extends PureComponent {
     setTimeout(() => calcPurchaseOrderSummary(), 1)
   }
 
-  render () {
+  render() {
     const { settingGSTEnable, settingGSTPercentage } = this.state
     const {
       values,
@@ -88,7 +88,7 @@ class POSummary extends PureComponent {
 
         <FieldArray
           name='purchaseOrderAdjustment'
-          render={(arrayHelpers) => {
+          render={arrayHelpers => {
             this.arrayHelpers = arrayHelpers
             if (!purchaseOrderAdjustment) return null
             return purchaseOrderAdjustment.map((v, i) => {
@@ -116,7 +116,7 @@ class POSummary extends PureComponent {
               <span> {`(${settingGSTPercentage}%) GST: `}</span>
               <FastField
                 name={`${poPrefix}.IsGSTEnabled`}
-                render={(args) => (
+                render={args => (
                   <Switch
                     label={undefined}
                     fullWidth={false}
@@ -130,7 +130,7 @@ class POSummary extends PureComponent {
             <GridItem xs={6} md={1}>
               <FastField
                 name={`${poPrefix}.gstAmount`}
-                render={(args) => {
+                render={args => {
                   return <NumberInput {...amountProps} {...args} />
                 }}
               />
@@ -140,7 +140,7 @@ class POSummary extends PureComponent {
               <GridItem xs={10} md={3} style={{ paddingLeft: 28 }}>
                 <FastField
                   name={`${poPrefix}.IsGSTInclusive`}
-                  render={(args) => {
+                  render={args => {
                     return (
                       <Tooltip
                         title={formatMessage({
@@ -177,7 +177,7 @@ class POSummary extends PureComponent {
           <GridItem xs={10} md={3}>
             <FastField
               name={`${poPrefix}.totalAmount`}
-              render={(args) => {
+              render={args => {
                 return (
                   <NumberInput
                     prefix={formatMessage({

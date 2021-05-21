@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 // common component
 import { connect } from 'dva'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import {
   withFormikExtend,
   notification,
@@ -17,7 +17,7 @@ import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
 import AddOrder from './DispenseDetails/AddOrder'
 import DispenseDetails from './DispenseDetails/WebSocketWrapper'
 
-const calculateInvoiceAmounts = (entity) => {
+const calculateInvoiceAmounts = entity => {
   const obj = { ...entity }
   const output = calculateAmount(
     obj.invoice.invoiceItem,
@@ -60,7 +60,7 @@ const reloadDispense = (props, effect = 'query') => {
   dispatch({
     type: `dispense/${effect}`,
     payload: dispense.visitID,
-  }).then((response) => {
+  }).then(response => {
     if (response) {
       const result = calculateInvoiceAmounts(response)
       resetForm(result)
@@ -68,15 +68,13 @@ const reloadDispense = (props, effect = 'query') => {
   })
 }
 
-const ConvertBatchNoArrayToText = (array) => {
+const ConvertBatchNoArrayToText = array => {
   if (array) {
-    return array.map((o) => {
+    return array.map(o => {
       const item = { ...o }
       if (item.batchNo instanceof Array) {
         if (item.batchNo && item.batchNo.length > 0) {
-          const [
-            firstIndex,
-          ] = item.batchNo
+          const [firstIndex] = item.batchNo
           item.batchNo = firstIndex
         }
       }
@@ -87,7 +85,7 @@ const ConvertBatchNoArrayToText = (array) => {
   return array
 }
 
-const constructPayload = (values) => {
+const constructPayload = values => {
   const _values = {
     ...values,
     prescription: ConvertBatchNoArrayToText(values.prescription),
@@ -100,7 +98,7 @@ const constructPayload = (values) => {
   authority: 'queue.dispense',
   enableReinitialize: true,
   notDirtyDuration: 3,
-  mapPropsToValues: (pops) => {
+  mapPropsToValues: pops => {
     const { dispense = {} } = pops
     const obj = dispense.entity || dispense.default
     const result = calculateInvoiceAmounts(obj)
@@ -125,7 +123,7 @@ const constructPayload = (values) => {
         id: vid,
         values: _values,
       },
-    }).then((o) => {
+    }).then(o => {
       if (o) {
         notification.success({
           message: 'Dispense saved',
@@ -153,7 +151,7 @@ class Main extends Component {
     isShowOrderUpdated: false,
   }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { prescription = [], packageItem = [] } = nextProps.values
 
     let drugList = []
@@ -163,7 +161,7 @@ class Main extends Component {
     packageItem.forEach(item => {
       if (item.type === 'Medication') {
         drugList.push({
-          ...item, 
+          ...item,
           name: item.description,
           dispensedQuanity: item.packageConsumeQuantity,
         })
@@ -172,7 +170,7 @@ class Main extends Component {
 
     this.setState(() => {
       return {
-        selectedDrugs: drugList.map((x) => {
+        selectedDrugs: drugList.map(x => {
           return { ...x, no: 1, selected: true }
         }),
       }
@@ -181,7 +179,12 @@ class Main extends Component {
 
   componentDidMount = async () => {
     const { dispatch, values, dispense } = this.props
-    const { otherOrder = [], prescription = [], packageItem = [], visitPurposeFK } = values
+    const {
+      otherOrder = [],
+      prescription = [],
+      packageItem = [],
+      visitPurposeFK,
+    } = values
     dispatch({
       type: 'dispense/incrementLoadCount',
     })
@@ -192,7 +195,7 @@ class Main extends Component {
 
     if (visitPurposeFK === VISIT_TYPE.RETAIL && isEmptyDispense) {
       this.setState(
-        (prevState) => {
+        prevState => {
           return {
             showOrderModal: !prevState.showOrderModal,
             isFirstAddOrder: true,
@@ -224,7 +227,7 @@ class Main extends Component {
     packageItem.forEach(item => {
       if (item.type === 'Medication') {
         drugList.push({
-          ...item, 
+          ...item,
           name: item.description,
           dispensedQuanity: item.packageConsumeQuantity,
         })
@@ -233,7 +236,7 @@ class Main extends Component {
 
     this.setState(() => {
       return {
-        selectedDrugs: drugList.map((x) => {
+        selectedDrugs: drugList.map(x => {
           return { ...x, no: 1, selected: true }
         }),
       }
@@ -265,9 +268,7 @@ class Main extends Component {
     const { location } = history
     const { query } = location
     const { visitPurposeFK } = values
-    const addOrderList = [
-      VISIT_TYPE.RETAIL,
-    ]
+    const addOrderList = [VISIT_TYPE.RETAIL]
     const shouldShowAddOrderModal = addOrderList.includes(visitPurposeFK)
 
     if (shouldShowAddOrderModal) {
@@ -281,7 +282,7 @@ class Main extends Component {
           queueID: query.qid,
           version: dispense.version,
         },
-      }).then((o) => {
+      }).then(o => {
         if (o) {
           dispatch({
             type: `dispense/updateState`,
@@ -300,7 +301,7 @@ class Main extends Component {
     }
   }
 
-  editOrder = (e) => {
+  editOrder = e => {
     const { values } = this.props
     const { visitPurposeFK } = values
 
@@ -339,7 +340,7 @@ class Main extends Component {
     })
 
     this.setState(
-      (prevState) => {
+      prevState => {
         return {
           showOrderModal: !prevState.showOrderModal,
           isFirstAddOrder: false,
@@ -387,7 +388,7 @@ class Main extends Component {
       formik,
     } = this.props
     const { visitPurposeFK } = values
-    const newOrderRows = rows.filter((row) => !row.id && !row.isDeleted)
+    const newOrderRows = rows.filter(row => !row.id && !row.isDeleted)
     if (formik.OrderPage && !formik.OrderPage.dirty && newOrderRows.length > 0)
       this.showConfirmationBox()
     else if (visitPurposeFK === VISIT_TYPE.BILL_FIRST) {
@@ -396,7 +397,7 @@ class Main extends Component {
         payload: {
           id: consultation.entity.id,
         },
-      }).then((response) => {
+      }).then(response => {
         dispatch({
           type: 'dispense/query',
           payload: {
@@ -422,17 +423,17 @@ class Main extends Component {
     packageItem.forEach(item => {
       if (item.type === 'Medication') {
         drugList.push({
-          ...item, 
+          ...item,
           name: item.description,
           dispensedQuanity: item.packageConsumeQuantity,
         })
       }
     })
-    
-    this.setState((prevState) => {
+
+    this.setState(prevState => {
       return {
         showDrugLabelSelection: !prevState.showDrugLabelSelection,
-        selectedDrugs: drugList.map((x) => {
+        selectedDrugs: drugList.map(x => {
           return { ...x, no: 1, selected: true }
         }),
       }
@@ -440,7 +441,7 @@ class Main extends Component {
   }
 
   handleDrugLabelSelectionClose = () => {
-    this.setState((prevState) => {
+    this.setState(prevState => {
       return {
         showDrugLabelSelection: !prevState.showDrugLabelSelection,
       }
@@ -448,18 +449,18 @@ class Main extends Component {
   }
 
   handleDrugLabelSelected = (itemId, selected) => {
-    this.setState((prevState) => ({
-      selectedDrugs: prevState.selectedDrugs.map(
-        (drug) => (drug.id === itemId ? { ...drug, selected } : { ...drug }),
+    this.setState(prevState => ({
+      selectedDrugs: prevState.selectedDrugs.map(drug =>
+        drug.id === itemId ? { ...drug, selected } : { ...drug },
       ),
     }))
     this.props.dispatch({ type: 'global/incrementCommitCount' })
   }
 
   handleDrugLabelNoChanged = (itemId, no) => {
-    this.setState((prevState) => ({
-      selectedDrugs: prevState.selectedDrugs.map(
-        (drug) => (drug.id === itemId ? { ...drug, no } : { ...drug }),
+    this.setState(prevState => ({
+      selectedDrugs: prevState.selectedDrugs.map(drug =>
+        drug.id === itemId ? { ...drug, no } : { ...drug },
       ),
     }))
     this.props.dispatch({ type: 'global/incrementCommitCount' })
@@ -484,7 +485,7 @@ class Main extends Component {
     }
   }
 
-  render () {
+  render() {
     const { classes, handleSubmit, values, dispense, codetable } = this.props
     return (
       <div className={classes.root}>

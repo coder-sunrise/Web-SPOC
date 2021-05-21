@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 import { withStyles } from '@material-ui/core/styles'
 
 import { Card, CardHeader, CardIcon, CardBody } from 'mui-pro-components'
@@ -10,7 +10,7 @@ import DoctorExpenseGrid from './DoctorExpenseGrid'
 import { SimpleModal, CommonModal, PageHeaderWrapper } from '@/components'
 import ExpenseDetail from './ExpenseDetail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   root: {
     // padding: theme.spacing.unit * 2,
     // margin: 'auto',
@@ -56,7 +56,7 @@ class DoctorExpense extends PureComponent {
     this.setState({ showConfirmDelete: !showConfirmDelete })
   }
 
-  render () {
+  render() {
     const { classes } = this.props
     const { showAddExpense, showExpenseDetail, showConfirmDelete } = this.state
     return (

@@ -1,7 +1,7 @@
 import React from 'react'
 import { compose } from 'redux'
 // umi
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 // formik
 import { withFormik } from 'formik'
 import { connect } from 'dva'
@@ -21,7 +21,7 @@ import FilterByAppointment from './FilterByAppointment'
 import FilterByPatient from './FilterByPatient'
 import PostCardLabelBtn from './PostCardLabelBtn'
 
-const styles = (theme) => ({
+const styles = theme => ({
   filterBar: {
     marginBottom: '20px',
   },
@@ -90,7 +90,7 @@ export default compose(
       )
 
       const isActiveDoctor = doctorprofile.find(
-        (doctor) =>
+        doctor =>
           doctor.clinicianProfile.isActive &&
           doctor.clinicianProfile.id === currentUser,
       )
@@ -100,22 +100,13 @@ export default compose(
           viewOtherApptAccessRight.rights !== 'enable') &&
         isActiveDoctor
       ) {
-        doctor = [
-          currentUser,
-        ]
+        doctor = [currentUser]
       }
       return {
-        upcomingAppointmentDate: [
-          moment(),
-          moment().add(1, 'months'),
-        ],
+        upcomingAppointmentDate: [moment(), moment().add(1, 'months')],
         appointmentType: [],
         doctor,
-        pdpaConsent: [
-          '1',
-          '2',
-          '3',
-        ],
+        pdpaConsent: ['1', '2', '3'],
       }
     },
 
@@ -157,10 +148,7 @@ export default compose(
           SMS_STATUS.SENDING,
         ]
       } else if (lastSMSSendStatus === SMS_STATUS.FAILED) {
-        smsStatusPayload = [
-          SMS_STATUS.FAILED,
-          SMS_STATUS.UNDELIVERED,
-        ]
+        smsStatusPayload = [SMS_STATUS.FAILED, SMS_STATUS.UNDELIVERED]
       }
 
       if (type === 'Appointment') {
@@ -177,7 +165,7 @@ export default compose(
           )
 
           const isActiveDoctor = doctorprofile.find(
-            (clinician) =>
+            clinician =>
               clinician.clinicianProfile.isActive &&
               clinician.clinicianProfile.id === currentUser,
           )
@@ -266,7 +254,7 @@ export default compose(
           ...payload,
           smsType: type,
         },
-      }).then((r) => {
+      }).then(r => {
         if (r) setSelectedRows([])
       })
     },

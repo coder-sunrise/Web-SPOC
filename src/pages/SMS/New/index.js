@@ -5,7 +5,7 @@ import moment from 'moment'
 import { compose } from 'redux'
 import lodash from 'lodash'
 import { Badge } from '@material-ui/core'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import Authorized from '@/utils/Authorized'
 import {
   GridContainer,
@@ -42,7 +42,7 @@ const templateTags = [
   },
   {
     name: '@NewLine',
-    replace: (contents) => {
+    replace: contents => {
       return contents.replaceAll(/@NewLine/g, '\n')
     },
   },
@@ -92,7 +92,7 @@ const New = ({
           <GridItem md={9}>
             <Field
               name='template'
-              render={(args) => {
+              render={args => {
                 return (
                   <CodeSelect
                     label={formatMessage({
@@ -131,7 +131,7 @@ const New = ({
           <GridItem md={12}>
             <FastField
               name='content'
-              render={(args) => {
+              render={args => {
                 return (
                   <OutlinedTextField
                     rows='4'
@@ -213,7 +213,7 @@ export default compose(
           appointmentFK = undefined
         }
         let formattedContent = content
-        templateTags.map((m) => {
+        templateTags.map(m => {
           formattedContent = m.replace(formattedContent, {
             ...selectedItem,
             appointmentDateTime,
@@ -242,10 +242,10 @@ export default compose(
         const { id } = recipient
         createPayload(recipient, id)
       } else {
-        selectedRows.forEach((o) => {
+        selectedRows.forEach(o => {
           const selectedItem =
-            smsAppointment.list.find((r) => r.id === o) ||
-            smsPatient.list.find((r) => r.id === o)
+            smsAppointment.list.find(r => r.id === o) ||
+            smsPatient.list.find(r => r.id === o)
           createPayload(selectedItem, o)
         })
       }
@@ -253,7 +253,7 @@ export default compose(
       dispatch({
         type: 'sms/sendSms',
         payload,
-      }).then((r) => {
+      }).then(r => {
         if (r) {
           if (setSelectedRows) {
             setSelectedRows([])

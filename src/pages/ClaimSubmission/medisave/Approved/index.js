@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'dva'
 import $ from 'jquery'
 import moment from 'moment'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 // formik
 import { withFormik } from 'formik'
 // material ui
@@ -28,7 +28,7 @@ import {
   ApprovedMedisaveColumns,
 } from './variables'
 
-const styles = (theme) => ({
+const styles = theme => ({
   cardContainer: {
     margin: 1,
   },
@@ -53,14 +53,14 @@ class ApprovedMedisave extends React.Component {
     showCollectPayment: false,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.refreshDataGrid()
   }
 
   handleLoadingVisibility = (visibility = false) =>
     this.setState({ isLoading: visibility })
 
-  handleSelectionChange = (selection) => {
+  handleSelectionChange = selection => {
     this.setState({
       selectedRows: selection,
     })
@@ -81,7 +81,7 @@ class ApprovedMedisave extends React.Component {
           type: 'medisaveClaimSubmissionApproved/getApprovedStatus',
           payload: { claimIds: selectedRows },
         })
-        .then((r) => {
+        .then(r => {
           this.handleLoadingVisibility(false)
           if (r) {
             notification.success({
@@ -106,13 +106,12 @@ class ApprovedMedisave extends React.Component {
     const { dispatch, medisaveClaimSubmissionApproved } = this.props
     const { selectedRows } = this.state
     const { list } = medisaveClaimSubmissionApproved || []
-    const rows = list.filter((i) => selectedRows.includes(i.id))
+    const rows = list.filter(i => selectedRows.includes(i.id))
     const outstandingPayment = rows
       .filter(
-        (x) =>
-          x.approvedAmount > 0 || x.approvedAmount - x.collectedPayment > 0,
+        x => x.approvedAmount > 0 || x.approvedAmount - x.collectedPayment > 0,
       )
-      .map((x) => {
+      .map(x => {
         x.amountReceived = x.approvedAmount - x.collectedPayment
         return x
       })
@@ -137,7 +136,7 @@ class ApprovedMedisave extends React.Component {
     this.onCloseCollectPayment()
   }
 
-  render () {
+  render() {
     const {
       classes,
       medisaveClaimSubmissionApproved,
@@ -181,7 +180,7 @@ class ApprovedMedisave extends React.Component {
                   selectable: true,
                   selectConfig: {
                     showSelectAll: true,
-                    rowSelectionEnabled: (row) =>
+                    rowSelectionEnabled: row =>
                       row.patientIsActive &&
                       !(row.approvedAmount === row.collectedPayment),
                   },

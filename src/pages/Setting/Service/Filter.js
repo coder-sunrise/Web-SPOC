@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 import { Search, Add, ImportExport, AttachFile } from '@material-ui/icons'
 import { standardRowHeight } from 'mui-pro-jss'
 import { status } from '@/utils/codes'
@@ -21,7 +21,7 @@ import {
 
 const allowedFiles = '.xlsx'
 
-const styles = (theme) => ({
+const styles = theme => ({
   filterBar: {
     marginBottom: '10px',
   },
@@ -40,11 +40,11 @@ const styles = (theme) => ({
   },
 })
 
-const clearValue = (e) => {
+const clearValue = e => {
   e.target.value = null
 }
 
-const mapToFileDto = async (file) => {
+const mapToFileDto = async file => {
   const base64 = await convertToBase64(file)
   const originalFile = {
     content: base64,
@@ -58,7 +58,7 @@ const mapToFileDto = async (file) => {
   displayName: 'ServiceFilter',
 })
 class Filter extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.uploadInput = React.createRef()
   }
@@ -100,7 +100,7 @@ class Filter extends PureComponent {
       .dispatch({
         type: 'settingClinicService/export',
       })
-      .then((result) => {
+      .then(result => {
         if (result) {
           downloadFile(result, 'Service.xlsx')
         }
@@ -113,12 +113,12 @@ class Filter extends PureComponent {
     this.uploadInput.current.click()
   }
 
-  onFileChange = async (event) => {
+  onFileChange = async event => {
     try {
       const { files } = event.target
 
       const selectedFiles = await Promise.all(
-        Object.keys(files).map((key) => mapToFileDto(files[key])),
+        Object.keys(files).map(key => mapToFileDto(files[key])),
       )
 
       if (selectedFiles.length > 0) {
@@ -130,7 +130,7 @@ class Filter extends PureComponent {
               ...selectedFiles[0],
             },
           })
-          .then((result) => {
+          .then(result => {
             if (result && result.byteLength === 0) {
               notification.success({
                 message: 'Import success',
@@ -157,7 +157,7 @@ class Filter extends PureComponent {
     }
   }
 
-  render () {
+  render() {
     const { classes } = this.props
 
     return (
@@ -166,7 +166,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={3}>
             <FastField
               name='codeDisplayValue'
-              render={(args) => {
+              render={args => {
                 return <TextField label='Code / DisplayValue' {...args} />
               }}
             />
@@ -174,7 +174,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={3}>
             <FastField
               name='serviceCenterFK'
-              render={(args) => {
+              render={args => {
                 return (
                   <CodeSelect
                     code='ctServiceCenter'
@@ -188,7 +188,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={2}>
             <FastField
               name='isActive'
-              render={(args) => {
+              render={args => {
                 return <Select label='Status' options={status} {...args} />
               }}
             />

@@ -1,7 +1,7 @@
 // import React, { PureComponent } from 'react'
 // import Yup from '@/utils/yup'
 // import _ from 'lodash'
-// import { formatMessage, FormattedMessage } from 'umi/locale'
+// import { formatMessage, FormattedMessage } from 'umi'
 // import {
 //   withFormikExtend,
 //   FastField,

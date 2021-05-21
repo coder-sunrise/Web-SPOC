@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 // umi
-import { FormattedMessage, formatMessage } from 'umi/locale'
+import { FormattedMessage, formatMessage } from 'umi'
 // formik
 import { FastField, withFormik } from 'formik'
 // material ui
@@ -35,7 +35,7 @@ class ActionBar extends PureComponent {
     setFieldValue(name, value)
   }
 
-  render () {
+  render() {
     const { classes, values } = this.props
     return (
       <GridContainer className={classnames(classes.actionBarContainer)}>
@@ -43,7 +43,7 @@ class ActionBar extends PureComponent {
           <GridItem xs md={3}>
             <FastField
               name='invoiceNo'
-              render={(args) => (
+              render={args => (
                 <TextField
                   {...args}
                   label={formatMessage({ id: 'finance.cdNote.invoiceNo' })}
@@ -78,7 +78,7 @@ class ActionBar extends PureComponent {
           <GridItem xs md={3}>
             <FastField
               name='noteNo'
-              render={(args) => (
+              render={args => (
                 <TextField
                   {...args}
                   label={formatMessage({ id: 'finance.cdNote.noteNo' })}
@@ -91,7 +91,7 @@ class ActionBar extends PureComponent {
           <GridItem xs md={3}>
             <FastField
               name='patientID'
-              render={(args) => (
+              render={args => (
                 <TextField
                   {...args}
                   label={formatMessage({ id: 'finance.cdNote.patientID' })}
@@ -102,7 +102,7 @@ class ActionBar extends PureComponent {
           <GridItem xs md={3}>
             <FastField
               name='name'
-              render={(args) => (
+              render={args => (
                 <TextField
                   {...args}
                   label={formatMessage({ id: 'finance.cdNote.patientName' })}

@@ -1,6 +1,6 @@
 import React from 'react'
 // umi locale
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
 // formik
@@ -35,7 +35,7 @@ const Filter = ({ classes, dispatch, values, toggleModal }) => {
         <GridItem xs={6} md={3}>
           <FastField
             name='codeDisplayValue'
-            render={(args) => {
+            render={args => {
               return <TextField label='Code / Display Value' {...args} />
             }}
           />
@@ -43,7 +43,7 @@ const Filter = ({ classes, dispatch, values, toggleModal }) => {
         <GridItem xs={6} md={2}>
           <FastField
             name='isActive'
-            render={(args) => {
+            render={args => {
               return <Select label='Status' options={status} {...args} />
             }}
           />

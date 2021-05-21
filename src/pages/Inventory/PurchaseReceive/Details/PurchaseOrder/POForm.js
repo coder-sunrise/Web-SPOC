@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import moment from 'moment'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { Divider } from '@material-ui/core'
 import {
   GridContainer,
@@ -24,7 +24,7 @@ const POForm = ({
   isFinalize,
   isCompletedOrCancelled,
 }) => {
-  const setSupplierDetails = (opts) => {
+  const setSupplierDetails = opts => {
     let conPerson
     let faxNo
     let contactNo
@@ -62,7 +62,7 @@ const POForm = ({
             <GridItem xs={12}>
               <FastField
                 name={`${prefix}.purchaseOrderNo`}
-                render={(args) => {
+                render={args => {
                   return (
                     <TextField
                       label={formatMessage({
@@ -78,7 +78,7 @@ const POForm = ({
             <GridItem xs={12}>
               <FastField
                 name={`${prefix}.purchaseOrderStatusFK`}
-                render={(args) => {
+                render={args => {
                   return (
                     // <TextField
                     //   label={formatMessage({
@@ -103,15 +103,16 @@ const POForm = ({
             <GridItem xs={12}>
               <Field
                 name={`${prefix}.exceptedDeliveryDate`}
-                render={(args) => {
+                render={args => {
                   return (
                     <DatePicker
                       disabled={isCompletedOrCancelled}
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.expectedDeliveryDate',
                       })}
-                      disabledDate={(d) =>
-                        !d || d.isBefore(moment().add('days', -1))}
+                      disabledDate={d =>
+                        !d || d.isBefore(moment().add('days', -1))
+                      }
                       {...args}
                     />
                   )
@@ -121,7 +122,7 @@ const POForm = ({
             <GridItem xs={12}>
               <Field
                 name={`${prefix}.invoiceDate`}
-                render={(args) => {
+                render={args => {
                   return (
                     <DatePicker
                       label={formatMessage({
@@ -137,7 +138,7 @@ const POForm = ({
             <GridItem xs={12}>
               <Field
                 name={`${prefix}.remark`}
-                render={(args) => {
+                render={args => {
                   return (
                     <TextField
                       label={formatMessage({
@@ -163,14 +164,14 @@ const POForm = ({
             <GridItem xs={12}>
               <Field
                 name={`${prefix}.purchaseOrderDate`}
-                render={(args) => {
+                render={args => {
                   return (
                     <DatePicker
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.poDate',
                       })}
                       allowClear={false}
-                      onChange={(e) => {
+                      onChange={e => {
                         if (e === '') {
                           setFieldValue(
                             'purchaseOrder.purchaseOrderDate',
@@ -188,7 +189,7 @@ const POForm = ({
             <GridItem xs={12}>
               <Field
                 name={`${prefix}.shippingAddress`}
-                render={(args) => {
+                render={args => {
                   return (
                     <OutlinedTextField
                       label={formatMessage({
@@ -211,7 +212,7 @@ const POForm = ({
             <GridItem xs={12}>
               <Field
                 name={`${prefix}.invoiceNo`}
-                render={(args) => {
+                render={args => {
                   return (
                     <TextField
                       label={formatMessage({
@@ -249,7 +250,7 @@ const POForm = ({
               <GridItem xs={12}>
                 <FastField
                   name={`${prefix}.supplierFK`}
-                  render={(args) => {
+                  render={args => {
                     return (
                       <CodeSelect
                         label={formatMessage({
@@ -269,7 +270,7 @@ const POForm = ({
               <GridItem xs={12}>
                 <FastField
                   name={`${prefix}.contactPerson`}
-                  render={(args) => {
+                  render={args => {
                     return (
                       <TextField
                         label={formatMessage({
@@ -284,7 +285,7 @@ const POForm = ({
               <GridItem xs={12}>
                 <FastField
                   name={`${prefix}.supplierAddress`}
-                  render={(args) => {
+                  render={args => {
                     return (
                       <OutlinedTextField
                         label={formatMessage({
@@ -309,7 +310,7 @@ const POForm = ({
               <GridItem xs={12}>
                 <FastField
                   name={`${prefix}.contactNo`}
-                  render={(args) => (
+                  render={args => (
                     <MobileNumberInput
                       {...args}
                       label={formatMessage({
@@ -322,7 +323,7 @@ const POForm = ({
               <GridItem xs={12}>
                 <FastField
                   name={`${prefix}.faxNo`}
-                  render={(args) => (
+                  render={args => (
                     <MobileNumberInput
                       {...args}
                       label={formatMessage({

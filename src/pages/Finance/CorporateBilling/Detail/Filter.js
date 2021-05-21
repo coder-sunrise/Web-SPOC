@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 import { withStyles, Paper, Typography, Divider } from '@material-ui/core'
 import FilterList from '@material-ui/icons/FilterList'
 import {
@@ -18,7 +18,7 @@ import {
 // assets
 import { cardTitle } from 'assets/jss'
 
-const styles = (theme) => ({
+const styles = theme => ({
   root: {
     padding: '10px',
   },
@@ -46,7 +46,7 @@ const styles = (theme) => ({
   mapPropsToValues: () => {},
 })
 class Filter extends PureComponent {
-  render () {
+  render() {
     const { classes } = this.props
 
     return (
@@ -57,7 +57,7 @@ class Filter extends PureComponent {
               <GridItem xs sm={5} md={2}>
                 <FastField
                   name='OutstandingBalance'
-                  render={(args) => (
+                  render={args => (
                     <Checkbox {...args} label='Outstanding Invoice' />
                   )}
                 />
@@ -65,7 +65,7 @@ class Filter extends PureComponent {
               <GridItem xs sm={4} md={2}>
                 <FastField
                   name='OverpayInvoice'
-                  render={(args) => (
+                  render={args => (
                     <Checkbox {...args} label='Overpay Invoice' />
                   )}
                 />
@@ -73,7 +73,7 @@ class Filter extends PureComponent {
               <GridItem xs sm={4} md={2}>
                 <FastField
                   name='InvoiceDate'
-                  render={(args) => <Checkbox {...args} label='Invoice Date' />}
+                  render={args => <Checkbox {...args} label='Invoice Date' />}
                 />
               </GridItem>
             </GridContainer>
@@ -81,7 +81,7 @@ class Filter extends PureComponent {
               <GridItem xs sm={4} md={3}>
                 <FastField
                   name='StartDate'
-                  render={(args) => (
+                  render={args => (
                     <DatePicker
                       label={formatMessage({
                         id: 'form.date.placeholder.start',
@@ -95,7 +95,7 @@ class Filter extends PureComponent {
               <GridItem xs sm={4} md={3}>
                 <FastField
                   name='EndDate'
-                  render={(args) => (
+                  render={args => (
                     <DatePicker
                       label={formatMessage({ id: 'form.date.placeholder.end' })}
                       timeFormat={false}
@@ -109,7 +109,7 @@ class Filter extends PureComponent {
               <GridItem xs sm={4} md={3}>
                 <FastField
                   name='Patient'
-                  render={(args) => (
+                  render={args => (
                     <TextField
                       label={formatMessage({
                         id: 'finance.doctor-expense.patient',
@@ -122,7 +122,7 @@ class Filter extends PureComponent {
               <GridItem xs sm={4} md={3}>
                 <FastField
                   name='InvoiceNo'
-                  render={(args) => (
+                  render={args => (
                     <TextField
                       label={formatMessage({
                         id: 'finance.corporate-billing.invoiceNo',

@@ -1,5 +1,5 @@
 import React from 'react'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 import classNames from 'classnames'
 import ModalWrapper from '@/components/ModalWrapper'
 import { SweetAlert } from '@/components'
@@ -8,11 +8,11 @@ import CircularProgress from '@material-ui/core/CircularProgress'
 import { withStyles } from '@material-ui/core/styles'
 import sweetAlertStyle from 'mui-pro-jss/material-dashboard-pro-react/views/sweetAlertStyle.jsx'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...sweetAlertStyle,
 })
 class SimpleModal extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       done: false,
@@ -24,7 +24,7 @@ class SimpleModal extends React.Component {
     }
   }
 
-  static getDerivedStateFromProps (nextProps, preState) {
+  static getDerivedStateFromProps(nextProps, preState) {
     // console.log(nextProps, preState)
     if (
       nextProps.status &&
@@ -46,7 +46,7 @@ class SimpleModal extends React.Component {
 
   onConfirm = () => {
     if (this.props.onAsyncOk) {
-      this.props.onAsyncOk((r) => {
+      this.props.onAsyncOk(r => {
         // console.log(r, 's')
         if (r) {
           this.setState({
@@ -82,7 +82,7 @@ class SimpleModal extends React.Component {
     )
   }
 
-  render () {
+  render() {
     const { status, classes } = this.props
     const submitting = status && status.submissionStatus === 'pending'
     const { onCancel, onOk, ...resetProps } = this.props
@@ -132,9 +132,9 @@ class SimpleModal extends React.Component {
           onConfirm={this.onConfirm}
           onCancel={this.hideAlert}
           cancelBtnCssClass={`${classes.button} ${classes.contained} ${classes.danger} ${classes.containeddanger}`}
-          confirmBtnCssClass={`${classes.button} ${classes.contained} ${submitting
-            ? classes.default
-            : classes.primary} ${classes.containedprimary}`}
+          confirmBtnCssClass={`${classes.button} ${classes.contained} ${
+            submitting ? classes.default : classes.primary
+          } ${classes.containedprimary}`}
           {...resetProps}
         >
           {this.props.children}

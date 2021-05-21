@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import _ from 'lodash'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -13,7 +13,7 @@ import {
   dateFormatLong,
 } from '@/components'
 
-const styles = (theme) => ({})
+const styles = theme => ({})
 
 @withFormikExtend({
   mapPropsToValues: ({ settingConsumableUOM }) =>
@@ -21,7 +21,10 @@ const styles = (theme) => ({})
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
-    effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+    effectiveDates: Yup.array()
+      .of(Yup.date())
+      .min(2)
+      .required(),
     sortOrder: Yup.number()
       .min(
         -2147483648,
@@ -43,7 +46,7 @@ const styles = (theme) => ({})
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
       },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         resetForm()
         if (onConfirm) onConfirm()
@@ -58,7 +61,7 @@ const styles = (theme) => ({})
 class Detail extends PureComponent {
   state = {}
 
-  render () {
+  render() {
     const { props } = this
     const { classes, theme, footer, values, settingConsumableUOM } = props
     return (
@@ -68,7 +71,7 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='code'
-                render={(args) => (
+                render={args => (
                   <TextField
                     label='Code'
                     autoFocus
@@ -81,13 +84,13 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='displayValue'
-                render={(args) => <TextField label='Display Value' {...args} />}
+                render={args => <TextField label='Display Value' {...args} />}
               />
             </GridItem>
             <GridItem md={6}>
               <FastField
                 name='effectiveDates'
-                render={(args) => {
+                render={args => {
                   return (
                     <DateRangePicker
                       format={dateFormatLong}
@@ -102,7 +105,7 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='sortOrder'
-                render={(args) => {
+                render={args => {
                   return (
                     <NumberInput label='Sort Order' rowsMax={4} {...args} />
                   )
@@ -112,7 +115,7 @@ class Detail extends PureComponent {
             <GridItem md={12}>
               <FastField
                 name='description'
-                render={(args) => {
+                render={args => {
                   return (
                     <TextField
                       label='Description'

@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { FastField, withFormik } from 'formik'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 import Replay from '@material-ui/icons/Replay'
 
 import { withStyles } from '@material-ui/core'
@@ -29,7 +29,7 @@ class FilterBar extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { classes } = this.props
     return (
       <div className={classes.filterBar}>
@@ -37,7 +37,7 @@ class FilterBar extends PureComponent {
           <GridItem xs sm={12} md={3}>
             <FastField
               name='ExpenseType'
-              render={(args) => {
+              render={args => {
                 return (
                   <Select
                     label={formatMessage({
@@ -60,7 +60,7 @@ class FilterBar extends PureComponent {
           <GridItem xs sm={12} md={3}>
             <FastField
               name='ExpenseType'
-              render={(args) => {
+              render={args => {
                 return (
                   <Select
                     label={formatMessage({

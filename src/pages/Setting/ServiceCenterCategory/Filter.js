@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import {
   withFormikExtend,
@@ -17,7 +17,7 @@ import {
   displayName: 'ServiceCenterFilter',
 })
 class Filter extends PureComponent {
-  render () {
+  render() {
     // console.log({ props: this.props.values })
     const { classes } = this.props
     return (
@@ -26,7 +26,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={3}>
             <FastField
               name='codeDisplayValue'
-              render={(args) => {
+              render={args => {
                 return <TextField label='Code / Display Value' {...args} />
               }}
             />

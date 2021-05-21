@@ -1,5 +1,5 @@
 import React from 'react'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import moment from 'moment'
 import { Button } from '@/components'
 import Edit from '@material-ui/icons/Edit'

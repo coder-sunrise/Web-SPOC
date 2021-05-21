@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import router from 'umi/router'
 
 import { withStyles } from '@material-ui/core'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 
 import Card from '@material-ui/core/Card'
 import CardActions from '@material-ui/core/CardActions'
@@ -56,7 +56,7 @@ const styles = () => ({
   },
 })
 class Dashboard extends Component {
-  render () {
+  render() {
     const { history, classes } = this.props
     const card = ({ number1, number2, number3, type }) => {
       return (

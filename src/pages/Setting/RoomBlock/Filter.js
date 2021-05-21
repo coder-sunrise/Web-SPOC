@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
 import { withStyles } from '@material-ui/core'
@@ -18,7 +18,7 @@ import {
 } from '@/components'
 // medisys components
 
-const styles = (theme) => ({
+const styles = theme => ({
   filterBar: {
     marginBottom: '10px',
   },
@@ -80,7 +80,9 @@ const styles = (theme) => ({
           ? moment(dateFrom).formatUTC()
           : undefined,
         lsteql_endDateTime: dateTo
-          ? moment(dateTo).endOf('day').formatUTC(false)
+          ? moment(dateTo)
+              .endOf('day')
+              .formatUTC(false)
           : undefined,
         pagesize: 999,
       },
@@ -88,7 +90,7 @@ const styles = (theme) => ({
   },
 })
 class Filter extends PureComponent {
-  setDateTo = (v) => {
+  setDateTo = v => {
     if (v) {
       this.props.setFieldValue('dateTo', moment(v).add(6, 'months'))
     } else {
@@ -96,7 +98,7 @@ class Filter extends PureComponent {
     }
   }
 
-  render () {
+  render() {
     const { classes, values, handleSubmit } = this.props
 
     return (
@@ -105,7 +107,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={3}>
             <FastField
               name='roomBlockGroupFK'
-              render={(args) => {
+              render={args => {
                 return (
                   <CodeSelect
                     label='Room'
@@ -122,11 +124,11 @@ class Filter extends PureComponent {
           <GridItem xs={2} md={2}>
             <Field
               name='dateFrom'
-              render={(args) => {
+              render={args => {
                 return (
                   <DatePicker
                     label='From date'
-                    onChange={(v) => this.setDateTo(v)}
+                    onChange={v => this.setDateTo(v)}
                     timeFormat={false}
                     {...args}
                   />
@@ -137,7 +139,7 @@ class Filter extends PureComponent {
           <GridItem xs={2} md={2}>
             <Field
               name='dateTo'
-              render={(args) => {
+              render={args => {
                 return (
                   <DatePicker label='To date' timeFormat={false} {...args} />
                 )
@@ -147,7 +149,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={2}>
             <FastField
               name='roomBlockRecurrenceFK'
-              render={(args) => {
+              render={args => {
                 return (
                   <CodeSelect
                     label='Recurrence Type'

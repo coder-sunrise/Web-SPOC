@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import { FormattedMessage, formatMessage } from 'umi/locale'
+import { FormattedMessage, formatMessage } from 'umi'
 import { withStyles } from '@material-ui/core/styles'
 import { Paper, Divider } from '@material-ui/core'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
@@ -31,7 +31,7 @@ import {
 import Grid from './Grid'
 
 const submitKey = 'schemeReferralPerson/submitDetail'
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 @connect(({ schemeReferralPerson }) => ({
@@ -60,7 +60,7 @@ const styles = (theme) => ({
         type: submitKey,
         payload: values,
       })
-      .then((r) => {
+      .then(r => {
         if (r.message === 'Ok') {
           // toast.success('test')
           notification.success({
@@ -80,7 +80,7 @@ class ReferralPerson extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     // console.log(this)
     const { props } = this
     const { classes, theme, ...restProps } = props
@@ -97,13 +97,13 @@ class ReferralPerson extends PureComponent {
             <GridItem xs={4}>
               <FastField
                 name='name'
-                render={(args) => <TextField label='Name' {...args} />}
+                render={args => <TextField label='Name' {...args} />}
               />
             </GridItem>
             <GridItem xs={4}>
               <FastField
                 name='company'
-                render={(args) => <TextField label='Company' {...args} />}
+                render={args => <TextField label='Company' {...args} />}
               />
             </GridItem>
             <GridItem xs={3}>

@@ -1,26 +1,26 @@
-import React, { PureComponent } from 'react';
-import { connect } from 'dva';
-import { formatMessage, FormattedMessage } from 'umi/locale';
-import { Row, Col, Card, Tooltip } from 'antd';
-import { Pie, WaterWave, Gauge, TagCloud } from '@/components/Charts';
-import NumberInfo from '@/components/NumberInfo';
-import CountDown from '@/components/CountDown';
-import ActiveChart from '@/components/ActiveChart';
-import numeral from 'numeral';
-import GridContent from '@/components/PageHeaderWrapper/GridContent';
+import React, { PureComponent } from 'react'
+import { connect } from 'dva'
+import { formatMessage, FormattedMessage } from 'umi'
+import { Row, Col, Card, Tooltip } from 'antd'
+import { Pie, WaterWave, Gauge, TagCloud } from '@/components/Charts'
+import NumberInfo from '@/components/NumberInfo'
+import CountDown from '@/components/CountDown'
+import ActiveChart from '@/components/ActiveChart'
+import numeral from 'numeral'
+import GridContent from '@/components/PageHeaderWrapper/GridContent'
 
-import Authorized from '@/utils/Authorized';
-import styles from './Monitor.less';
+import Authorized from '@/utils/Authorized'
+import styles from './Monitor.less'
 
-const { Secured } = Authorized;
+const { Secured } = Authorized
 
-const targetTime = new Date().getTime() + 3900000;
+const targetTime = new Date().getTime() + 3900000
 
 // use permission as a parameter
 const havePermissionAsync = new Promise(resolve => {
   // Call resolve on behalf of passed
-  setTimeout(() => resolve(), 300);
-});
+  setTimeout(() => resolve(), 300)
+})
 
 @Secured(havePermissionAsync)
 @connect(({ monitor, loading }) => ({
@@ -29,25 +29,32 @@ const havePermissionAsync = new Promise(resolve => {
 }))
 class Monitor extends PureComponent {
   componentDidMount() {
-    const { dispatch } = this.props;
+    const { dispatch } = this.props
     dispatch({
       type: 'monitor/fetchTags',
-    });
+    })
   }
 
   render() {
-    const { monitor, loading } = this.props;
-    const { tags } = monitor;
+    const { monitor, loading } = this.props
+    const { tags } = monitor
 
     return (
       <GridContent>
         <Row gutter={24}>
-          <Col xl={18} lg={24} md={24} sm={24} xs={24} style={{ marginBottom: 24 }}>
+          <Col
+            xl={18}
+            lg={24}
+            md={24}
+            sm={24}
+            xs={24}
+            style={{ marginBottom: 24 }}
+          >
             <Card
               title={
                 <FormattedMessage
-                  id="app.monitor.trading-activity"
-                  defaultMessage="Real-Time Trading Activity"
+                  id='app.monitor.trading-activity'
+                  defaultMessage='Real-Time Trading Activity'
                 />
               }
               bordered={false}
@@ -57,11 +64,11 @@ class Monitor extends PureComponent {
                   <NumberInfo
                     subTitle={
                       <FormattedMessage
-                        id="app.monitor.total-transactions"
-                        defaultMessage="Total transactions today"
+                        id='app.monitor.total-transactions'
+                        defaultMessage='Total transactions today'
                       />
                     }
-                    suffix="元"
+                    suffix='元'
                     total={numeral(124543233).format('0,0')}
                   />
                 </Col>
@@ -69,19 +76,19 @@ class Monitor extends PureComponent {
                   <NumberInfo
                     subTitle={
                       <FormattedMessage
-                        id="app.monitor.sales-target"
-                        defaultMessage="Sales target completion rate"
+                        id='app.monitor.sales-target'
+                        defaultMessage='Sales target completion rate'
                       />
                     }
-                    total="92%"
+                    total='92%'
                   />
                 </Col>
                 <Col md={6} sm={12} xs={24}>
                   <NumberInfo
                     subTitle={
                       <FormattedMessage
-                        id="app.monitor.remaining-time"
-                        defaultMessage="Remaining time of activity"
+                        id='app.monitor.remaining-time'
+                        defaultMessage='Remaining time of activity'
                       />
                     }
                     total={<CountDown target={targetTime} />}
@@ -91,11 +98,11 @@ class Monitor extends PureComponent {
                   <NumberInfo
                     subTitle={
                       <FormattedMessage
-                        id="app.monitor.total-transactions-per-second"
-                        defaultMessage="Total transactions per second"
+                        id='app.monitor.total-transactions-per-second'
+                        defaultMessage='Total transactions per second'
                       />
                     }
-                    suffix="元"
+                    suffix='元'
                     total={numeral(234).format('0,0')}
                   />
                 </Col>
@@ -104,14 +111,14 @@ class Monitor extends PureComponent {
                 <Tooltip
                   title={
                     <FormattedMessage
-                      id="app.monitor.waiting-for-implementation"
-                      defaultMessage="Waiting for implementation"
+                      id='app.monitor.waiting-for-implementation'
+                      defaultMessage='Waiting for implementation'
                     />
                   }
                 >
                   <img
-                    src="https://gw.alipayobjects.com/zos/rmsportal/HBWnDEUXCnGnGrRfrpKa.png"
-                    alt="map"
+                    src='https://gw.alipayobjects.com/zos/rmsportal/HBWnDEUXCnGnGrRfrpKa.png'
+                    alt='map'
                   />
                 </Tooltip>
               </div>
@@ -121,8 +128,8 @@ class Monitor extends PureComponent {
             <Card
               title={
                 <FormattedMessage
-                  id="app.monitor.activity-forecast"
-                  defaultMessage="Activity forecast"
+                  id='app.monitor.activity-forecast'
+                  defaultMessage='Activity forecast'
                 />
               }
               style={{ marginBottom: 24 }}
@@ -131,13 +138,21 @@ class Monitor extends PureComponent {
               <ActiveChart />
             </Card>
             <Card
-              title={<FormattedMessage id="app.monitor.efficiency" defaultMessage="Efficiency" />}
+              title={
+                <FormattedMessage
+                  id='app.monitor.efficiency'
+                  defaultMessage='Efficiency'
+                />
+              }
               style={{ marginBottom: 24 }}
               bodyStyle={{ textAlign: 'center' }}
               bordered={false}
             >
               <Gauge
-                title={formatMessage({ id: 'app.monitor.ratio', defaultMessage: 'Ratio' })}
+                title={formatMessage({
+                  id: 'app.monitor.ratio',
+                  defaultMessage: 'Ratio',
+                })}
                 height={180}
                 percent={87}
               />
@@ -149,8 +164,8 @@ class Monitor extends PureComponent {
             <Card
               title={
                 <FormattedMessage
-                  id="app.monitor.proportion-per-category"
-                  defaultMessage="Proportion Per Category"
+                  id='app.monitor.proportion-per-category'
+                  defaultMessage='Proportion Per Category'
                 />
               }
               bordered={false}
@@ -162,9 +177,12 @@ class Monitor extends PureComponent {
                     animate={false}
                     percent={28}
                     subTitle={
-                      <FormattedMessage id="app.monitor.fast-food" defaultMessage="Fast food" />
+                      <FormattedMessage
+                        id='app.monitor.fast-food'
+                        defaultMessage='Fast food'
+                      />
                     }
-                    total="28%"
+                    total='28%'
                     height={128}
                     lineWidth={2}
                   />
@@ -172,15 +190,15 @@ class Monitor extends PureComponent {
                 <Col span={8}>
                   <Pie
                     animate={false}
-                    color="#5DDECF"
+                    color='#5DDECF'
                     percent={22}
                     subTitle={
                       <FormattedMessage
-                        id="app.monitor.western-food"
-                        defaultMessage="Western food"
+                        id='app.monitor.western-food'
+                        defaultMessage='Western food'
                       />
                     }
-                    total="22%"
+                    total='22%'
                     height={128}
                     lineWidth={2}
                   />
@@ -188,12 +206,15 @@ class Monitor extends PureComponent {
                 <Col span={8}>
                   <Pie
                     animate={false}
-                    color="#2FC25B"
+                    color='#2FC25B'
                     percent={32}
                     subTitle={
-                      <FormattedMessage id="app.monitor.hot-pot" defaultMessage="Hot pot" />
+                      <FormattedMessage
+                        id='app.monitor.hot-pot'
+                        defaultMessage='Hot pot'
+                      />
                     }
-                    total="32%"
+                    total='32%'
                     height={128}
                     lineWidth={2}
                   />
@@ -205,8 +226,8 @@ class Monitor extends PureComponent {
             <Card
               title={
                 <FormattedMessage
-                  id="app.monitor.popular-searches"
-                  defaultMessage="Popular Searches"
+                  id='app.monitor.popular-searches'
+                  defaultMessage='Popular Searches'
                 />
               }
               loading={loading}
@@ -220,8 +241,8 @@ class Monitor extends PureComponent {
             <Card
               title={
                 <FormattedMessage
-                  id="app.monitor.resource-surplus"
-                  defaultMessage="Resource Surplus"
+                  id='app.monitor.resource-surplus'
+                  defaultMessage='Resource Surplus'
                 />
               }
               bodyStyle={{ textAlign: 'center', fontSize: 0 }}
@@ -230,7 +251,10 @@ class Monitor extends PureComponent {
               <WaterWave
                 height={161}
                 title={
-                  <FormattedMessage id="app.monitor.fund-surplus" defaultMessage="Fund Surplus" />
+                  <FormattedMessage
+                    id='app.monitor.fund-surplus'
+                    defaultMessage='Fund Surplus'
+                  />
                 }
                 percent={34}
               />
@@ -238,8 +262,8 @@ class Monitor extends PureComponent {
           </Col>
         </Row>
       </GridContent>
-    );
+    )
   }
 }
 
-export default Monitor;
+export default Monitor

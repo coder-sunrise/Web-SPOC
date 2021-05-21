@@ -1,7 +1,7 @@
 import React from 'react'
 // formik
 import { FastField } from 'formik'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
@@ -18,7 +18,7 @@ import {
 } from '@/components'
 import { smsStatus, messageStatus } from '@/utils/codes'
 
-const styles = (theme) => ({
+const styles = theme => ({
   checkbox: {
     paddingTop: `${theme.spacing(2)}px !important`,
   },
@@ -30,7 +30,7 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
       <GridItem md={4}>
         <FastField
           name='patientName'
-          render={(args) => (
+          render={args => (
             <TextField
               {...args}
               label={formatMessage({
@@ -43,7 +43,7 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
       <GridItem md={4}>
         <FastField
           name='visitDate'
-          render={(args) => (
+          render={args => (
             <DateRangePicker {...args} label='Visit Date From' label2='To' />
           )}
         />
@@ -53,7 +53,7 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
       <GridItem md={2}>
         <FastField
           name='nationality'
-          render={(args) => (
+          render={args => (
             <CodeSelect {...args} label='Nationlity' code='ctnationality' />
           )}
         />
@@ -62,7 +62,7 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
       <GridItem xs={8}>
         <FastField
           name='pdpaConsent'
-          render={(args) => (
+          render={args => (
             <CheckboxGroup
               label='PDPA Consent - Agree to receive marketing material via:'
               horizontal
@@ -100,7 +100,7 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
       <GridItem md={4}>
         <FastField
           name='noVisitDate'
-          render={(args) => (
+          render={args => (
             <DateRangePicker
               {...args}
               label='No Visit Since From'
@@ -112,7 +112,7 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
       <GridItem md={4}>
         <FastField
           name='dob'
-          render={(args) => (
+          render={args => (
             <DateRangePicker {...args} label='Birthday From' label2='To' />
           )}
         />
@@ -120,7 +120,7 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
       <GridItem md={2}>
         <FastField
           name='ageFrom'
-          render={(args) => (
+          render={args => (
             <NumberInput {...args} label='Age From' precision={0} />
           )}
         />
@@ -129,7 +129,7 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
       <GridItem md={2}>
         <FastField
           name='ageTo'
-          render={(args) => (
+          render={args => (
             <NumberInput {...args} label='Age To' precision={0} />
           )}
         />
@@ -146,7 +146,7 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
       <GridItem md={2}>
         <FastField
           name='lastSMSSendStatus'
-          render={(args) => (
+          render={args => (
             <Select {...args} label='SMS Status' options={smsStatus} />
           )}
         />

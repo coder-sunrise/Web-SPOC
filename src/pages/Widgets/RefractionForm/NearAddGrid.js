@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import _ from 'lodash'
 import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'

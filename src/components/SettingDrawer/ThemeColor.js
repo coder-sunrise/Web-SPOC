@@ -1,7 +1,7 @@
-import React from 'react';
-import { Tooltip, Icon } from 'antd';
-import { formatMessage } from 'umi/locale';
-import styles from './ThemeColor.less';
+import React from 'react'
+import { Tooltip, Icon } from 'antd'
+import { formatMessage } from 'umi'
+import styles from './ThemeColor.less'
 
 const Tag = ({ color, check, ...rest }) => (
   <div
@@ -10,12 +10,12 @@ const Tag = ({ color, check, ...rest }) => (
       backgroundColor: color,
     }}
   >
-    {check ? <Icon type="check" /> : ''}
+    {check ? <Icon type='check' /> : ''}
   </div>
-);
+)
 
 const ThemeColor = ({ colors, title, value, onChange }) => {
-  let colorList = colors;
+  let colorList = colors
   if (!colors) {
     colorList = [
       {
@@ -50,14 +50,17 @@ const ThemeColor = ({ colors, title, value, onChange }) => {
         key: 'purple',
         color: '#722ED1',
       },
-    ];
+    ]
   }
   return (
     <div className={styles.themeColor}>
       <h3 className={styles.title}>{title}</h3>
       <div className={styles.content}>
         {colorList.map(({ key, color }) => (
-          <Tooltip key={color} title={formatMessage({ id: `app.setting.themecolor.${key}` })}>
+          <Tooltip
+            key={color}
+            title={formatMessage({ id: `app.setting.themecolor.${key}` })}
+          >
             <Tag
               className={styles.colorBlock}
               color={color}
@@ -68,7 +71,7 @@ const ThemeColor = ({ colors, title, value, onChange }) => {
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ThemeColor;
+export default ThemeColor

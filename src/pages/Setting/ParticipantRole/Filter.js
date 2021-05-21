@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
 import { standardRowHeight } from 'mui-pro-jss'
@@ -15,7 +15,7 @@ import {
   ProgressButton,
 } from '@/components'
 
-const styles = (theme) => ({
+const styles = theme => ({
   filterBar: {
     marginBottom: '10px',
   },
@@ -39,7 +39,7 @@ const styles = (theme) => ({
   displayName: 'ParticipantRoleFilter',
 })
 class Filter extends PureComponent {
-  render () {
+  render() {
     const { classes } = this.props
 
     return (
@@ -48,7 +48,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={4}>
             <FastField
               name='codeDisplayValue'
-              render={(args) => {
+              render={args => {
                 return <TextField label='Code / Display Value' {...args} />
               }}
             />
@@ -56,7 +56,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={4}>
             <FastField
               name='isActive'
-              render={(args) => {
+              render={args => {
                 return <Select label='Status' options={status} {...args} />
               }}
             />

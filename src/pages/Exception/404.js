@@ -1,6 +1,6 @@
 import React from 'react'
-import { formatMessage } from 'umi/locale'
-import Link from 'umi'
+import Link, { formatMessage } from 'umi'
+
 import Exception from '@/components/Exception'
 
 const Exception404 = () => (

@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import {
   GridContainer,
   GridItem,
@@ -12,14 +12,14 @@ import {
 const poPrefix = 'purchaseOrderDetails'
 
 class Header extends PureComponent {
-  render () {
+  render() {
     return (
       <React.Fragment>
         <GridContainer>
           <GridItem xs>
             <FastField
               name={`${poPrefix}.purchaseOrderNo`}
-              render={(args) => (
+              render={args => (
                 <TextField
                   disabled
                   label={formatMessage({
@@ -33,7 +33,7 @@ class Header extends PureComponent {
           <GridItem xs>
             <FastField
               name={`${poPrefix}.purchaseOrderDate`}
-              render={(args) => (
+              render={args => (
                 <DatePicker
                   disabled
                   label={formatMessage({
@@ -49,7 +49,7 @@ class Header extends PureComponent {
           <GridItem xs>
             <FastField
               name={`${poPrefix}.totalAftGst`}
-              render={(args) => (
+              render={args => (
                 <NumberInput
                   disabled
                   currency
@@ -64,7 +64,7 @@ class Header extends PureComponent {
           <GridItem xs>
             <FastField
               name={`${poPrefix}.outstandingAmount`}
-              render={(args) => (
+              render={args => (
                 <NumberInput
                   disabled
                   currency

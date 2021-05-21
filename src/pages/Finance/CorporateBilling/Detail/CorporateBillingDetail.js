@@ -5,7 +5,7 @@ import FilterList from '@material-ui/icons/FilterList'
 
 import { withStyles } from '@material-ui/core'
 import { Affix } from 'antd'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 
 import { Button, CommonHeader, CommonModal, NavPills } from '@/components'
 import Filter from './Filter'
@@ -36,9 +36,9 @@ class CorporateBillingDetail extends PureComponent {
     ],
   }
 
-  filterList = (item) => {
+  filterList = item => {
     const { columns } = this.state
-    const cols = columns.map((col) => col.name)
+    const cols = columns.map(col => col.name)
     const list = Object.keys(item).reduce((filtered, key) => {
       return cols.includes(key)
         ? { ...filtered, [key]: item[key] }
@@ -49,7 +49,10 @@ class CorporateBillingDetail extends PureComponent {
 
   toggleCollectPayment = () => {
     const { showCollectPayment, columns } = this.state
-    const { corporateBilling: { list }, dispatch } = this.props
+    const {
+      corporateBilling: { list },
+      dispatch,
+    } = this.props
 
     // opening showCollectPayment
     if (!showCollectPayment) {
@@ -62,7 +65,7 @@ class CorporateBillingDetail extends PureComponent {
     this.setState({ showCollectPayment: !showCollectPayment })
   }
 
-  render () {
+  render() {
     const { theme, classes } = this.props
     const { showCollectPayment } = this.state
     return (

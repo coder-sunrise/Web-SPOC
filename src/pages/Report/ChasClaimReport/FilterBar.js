@@ -2,7 +2,7 @@ import React from 'react'
 // formik
 import { FastField } from 'formik'
 // common components
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import {
   Button,
   DatePicker,
@@ -29,7 +29,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={4}>
             <FastField
               name='claimStatus'
-              render={(args) => {
+              render={args => {
                 return (
                   <CodeSelect
                     label={formatMessage({
@@ -48,7 +48,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={4}>
             <FastField
               name='schemeTypes'
-              render={(args) => {
+              render={args => {
                 return (
                   <CodeSelect
                     label='Scheme Type'
@@ -65,7 +65,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={2}>
             <FastField
               name='isGroup'
-              render={(args) => (
+              render={args => (
                 <Checkbox {...args} label='Group By Sheme Type' />
               )}
             />

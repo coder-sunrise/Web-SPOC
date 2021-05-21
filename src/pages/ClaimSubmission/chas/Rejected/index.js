@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'dva'
 import $ from 'jquery'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 // formik
 import { withFormik } from 'formik'
 // material ui
@@ -23,7 +23,7 @@ import TableGrid from '../TableGrid'
 // variables
 import { RejectedCHASColumnExtensions, RejectedCHASColumns } from './variables'
 
-const styles = (theme) => ({
+const styles = theme => ({
   cardContainer: {
     margin: 1,
   },
@@ -46,7 +46,7 @@ class RejectedCHAS extends React.Component {
     isLoading: false,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.refreshDataGrid()
   }
 
@@ -57,7 +57,7 @@ class RejectedCHAS extends React.Component {
         type: 'chasClaimSubmissionRejected/refreshPatientDetails',
         payload: { claimIds: selectedRows },
       })
-      .then((r) => {
+      .then(r => {
         if (!r) {
           this.refreshDataGrid()
         }
@@ -70,7 +70,7 @@ class RejectedCHAS extends React.Component {
     })
   }
 
-  handleSelectionChange = (selection) =>
+  handleSelectionChange = selection =>
     this.setState({ selectedRows: selection })
 
   handleLoadingVisibility = (visibility = false) =>
@@ -85,7 +85,7 @@ class RejectedCHAS extends React.Component {
           type: 'chasClaimSubmissionRejected/reSubmitChasClaim',
           payload: { claimIds: selectedRows },
         })
-        .then((r) => {
+        .then(r => {
           this.handleLoadingVisibility(false)
           if (r) {
             if (r.failedCount !== 0) {
@@ -103,7 +103,7 @@ class RejectedCHAS extends React.Component {
     }
   }
 
-  render () {
+  render() {
     const {
       classes,
       chasClaimSubmissionRejected,
@@ -149,13 +149,14 @@ class RejectedCHAS extends React.Component {
                   selectable: true,
                   selectConfig: {
                     showSelectAll: true,
-                    rowSelectionEnabled: (row) => row.patientIsActive,
+                    rowSelectionEnabled: row => row.patientIsActive,
                   },
                 }}
                 selection={this.state.selectedRows}
                 onSelectionChange={this.handleSelectionChange}
                 onContextMenuItemClick={(row, id) =>
-                  handleContextMenuItemClick(row, id, true)}
+                  handleContextMenuItemClick(row, id, true)
+                }
                 type='rejected'
                 height={height}
               />

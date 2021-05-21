@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import { compose } from 'redux'
 import { connect } from 'dva'
@@ -20,11 +20,9 @@ const Sdd = ({ dispatch, handleSelectSdd, theme, ...props }) => {
       type: 'sddDetail/query',
       payload: {
         // keepFilter: true,
-        sorting: [
-          { columnName: 'displayValue', direction: 'asc' },
-        ],
+        sorting: [{ columnName: 'displayValue', direction: 'asc' }],
       },
-    }).then((response) => {})
+    }).then(response => {})
   }, [])
 
   const selectRow = (row, e) => {
@@ -55,7 +53,7 @@ const Sdd = ({ dispatch, handleSelectSdd, theme, ...props }) => {
         sortingEnabled: false,
         align: 'center',
         width: 100,
-        render: (row) => {
+        render: row => {
           return (
             <Button
               size='sm'
@@ -79,7 +77,7 @@ const Sdd = ({ dispatch, handleSelectSdd, theme, ...props }) => {
         <GridItem xs={5}>
           <FastField
             name='sddIdName'
-            render={(args) => {
+            render={args => {
               return (
                 <TextField label='SDD ID/Description' autoFocus {...args} />
               )

@@ -7,7 +7,7 @@ import * as Yup from 'yup'
 import { FastField, withFormik } from 'formik'
 // umi
 import router from 'umi/router'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 // material ui
 import { withStyles } from '@material-ui/core'
 import LockOpen from '@material-ui/icons/LockOpen'
@@ -32,7 +32,7 @@ import withWebSocket from '@/components/Decorator/withWebSocket'
 import logo from '@/assets/img/logo/logo_white_with_text.png'
 import { container } from '@/assets/jss'
 
-const styles = (theme) => ({
+const styles = theme => ({
   // ...loginPageStyle(theme),
   uatText: {
     width: '100%',
@@ -86,7 +86,9 @@ const styles = (theme) => ({
   forgotPasswordAnchor: {
     color: '#0093f1',
     '&:hover': {
-      color: color('#0093f1').darken(0.2).hex(),
+      color: color('#0093f1')
+        .darken(0.2)
+        .hex(),
       textDecoration: 'underline',
     },
   },
@@ -98,9 +100,15 @@ const styles = (theme) => ({
 const cardAnimationDuration = 350
 
 const LoginSchema = Yup.object().shape({
-  username: Yup.string().trim().required('Please enter Username'),
-  password: Yup.string().trim().required('Please enter Password'),
-  clinicCode: Yup.string().trim().required('Please enter Clinic Code'),
+  username: Yup.string()
+    .trim()
+    .required('Please enter Username'),
+  password: Yup.string()
+    .trim()
+    .required('Please enter Password'),
+  clinicCode: Yup.string()
+    .trim()
+    .required('Please enter Clinic Code'),
 })
 
 const submitKey = 'login/getToken'
@@ -132,7 +140,7 @@ const submitKey = 'login/getToken'
       type: 'login/getToken',
       credentialPayload: credential,
     })
-      .then(async (result) => {
+      .then(async result => {
         const { payload } = result
         const validLogin = payload.access_token !== undefined
 
@@ -162,7 +170,7 @@ const submitKey = 'login/getToken'
           router.push(loginDestination)
         }
       })
-      .catch((error) => {
+      .catch(error => {
         console.log('error', error)
       })
   },
@@ -173,14 +181,14 @@ class NewLogin extends React.Component {
     cardAnimation: 'cardHidden',
   }
 
-  componentDidMount () {
+  componentDidMount() {
     // add a hidden class to the card and after 700 ms we delete it and the transition appears
     this.timeOutFunction = setTimeout(() => {
       this.setState({ cardAnimation: '' })
     }, cardAnimationDuration)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     clearTimeout(this.timeOutFunction)
     this.timeOutFunction = null
   }
@@ -195,7 +203,7 @@ class NewLogin extends React.Component {
     router.push('/user/forgotpassword')
   }
 
-  render () {
+  render() {
     const { classes, login = { isInvalidLogin: false } } = this.props
     const { isInvalidLogin } = login
     const { cardAnimation } = this.state
@@ -238,7 +246,7 @@ class NewLogin extends React.Component {
                   )}
                   <FastField
                     name='username'
-                    render={(args) => (
+                    render={args => (
                       <TextField
                         {...args}
                         autoFocus
@@ -248,7 +256,7 @@ class NewLogin extends React.Component {
                   />
                   <FastField
                     name='password'
-                    render={(args) => (
+                    render={args => (
                       <TextField
                         {...args}
                         type='password'
@@ -258,7 +266,7 @@ class NewLogin extends React.Component {
                   />
                   <FastField
                     name='clinicCode'
-                    render={(args) => (
+                    render={args => (
                       <TextField
                         {...args}
                         label={formatMessage({ id: 'app.login.clinicCode' })}
@@ -305,4 +313,4 @@ class NewLogin extends React.Component {
   }
 }
 
-export default withWebSocket()(withStyles(styles)(NewLogin)) 
+export default withWebSocket()(withStyles(styles)(NewLogin))

@@ -1,6 +1,6 @@
 import memoizeOne from 'memoize-one'
 import isEqual from 'lodash/isEqual'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import update from 'immutability-helper'
 import Authorized from '@/utils/Authorized'
 import { CLINIC_TYPE } from '@/utils/constants'
@@ -8,9 +8,9 @@ import { CLINIC_TYPE } from '@/utils/constants'
 const { check } = Authorized
 
 // Conversion router to menu.
-function formatter (data, parentAuthority, parentName) {
+function formatter(data, parentAuthority, parentName) {
   return data
-    .map((item) => {
+    .map(item => {
       if (!item.name || !item.path) {
         return null
       }
@@ -36,7 +36,7 @@ function formatter (data, parentAuthority, parentName) {
       delete result.routes
       return result
     })
-    .filter((item) => item)
+    .filter(item => item)
 }
 
 const memoizeOneFormatter = memoizeOne(formatter, isEqual)
@@ -44,12 +44,12 @@ const memoizeOneFormatter = memoizeOne(formatter, isEqual)
 /**
  * get SubMenu or Item
  */
-const getSubMenu = (item) => {
+const getSubMenu = item => {
   // doc: add hideChildrenInMenu
   if (
     item.children &&
     !item.hideChildrenInMenu &&
-    item.children.some((child) => child.name)
+    item.children.some(child => child.name)
   ) {
     return {
       ...item,
@@ -62,13 +62,13 @@ const getSubMenu = (item) => {
 /**
  * filter menuData
  */
-const filterMenuData = (menuData) => {
+const filterMenuData = menuData => {
   if (!menuData) {
     return []
   }
   const filtered = menuData
-    .filter((item) => item.name) // && !item.hideInMenu)
-    .map((item) => {
+    .filter(item => item.name) // && !item.hideInMenu)
+    .map(item => {
       // make dom
       // console.log(item)
       const ItemDom = getSubMenu(item)
@@ -76,14 +76,14 @@ const filterMenuData = (menuData) => {
       const data = check(item.authority, ItemDom)
       return data
     })
-    .filter((item) => item)
+    .filter(item => item)
   // console.log(filtered)
   return filtered
 }
 
 const filterBySpecialist = (specialist = CLINIC_TYPE.GP, menus) => {
   return menus.filter(
-    (menu) => menu.specialist && menu.specialist.includes(specialist),
+    menu => menu.specialist && menu.specialist.includes(specialist),
   )
 }
 
@@ -96,9 +96,9 @@ export default {
   },
 
   effects: {
-    *getMenuData ({ payload }, { put, select }) {
+    *getMenuData({ payload }, { put, select }) {
       const { routes, authority } = payload
-      const clinicInfo = yield select((st) => st.clinicInfo)
+      const clinicInfo = yield select(st => st.clinicInfo)
       const { clinicTypeFK = CLINIC_TYPE.DENTAL } = clinicInfo
       const menus = filterMenuData(memoizeOneFormatter(routes, authority))
       // const clinicMenus = filterBySpecialist(clinicTypeFK, menus)
@@ -112,7 +112,7 @@ export default {
   },
 
   reducers: {
-    updateBreadcrumb (state, action) {
+    updateBreadcrumb(state, action) {
       const { breadcrumb } = state
       breadcrumb[action.payload.href] = action.payload.name
       sessionStorage.setItem(action.payload.href, action.payload.name)
@@ -121,7 +121,7 @@ export default {
         breadcrumb,
       }
     },
-    save (state, action) {
+    save(state, action) {
       return {
         ...state,
         menuData: action.payload,

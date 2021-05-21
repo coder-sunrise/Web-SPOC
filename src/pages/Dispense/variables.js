@@ -1,6 +1,6 @@
 import moment from 'moment'
 import Print from '@material-ui/icons/Print'
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 import numeral from 'numeral'
 import { currencySymbol, currencyFormat } from '@/utils/config'
 import {
@@ -26,7 +26,7 @@ export const tableConfig = {
 const columnWidth = '10%'
 
 const lowStockIndicator = (row, itemIdFieldName) => {
-  const currentType = InventoryTypes.find((type) => type.name === row.type)
+  const currentType = InventoryTypes.find(type => type.name === row.type)
   if (!currentType) return null
 
   const values = {
@@ -50,7 +50,7 @@ const lowStockIndicator = (row, itemIdFieldName) => {
   )
 }
 
-const packageDrawdownIndicator = (row) => {
+const packageDrawdownIndicator = row => {
   if (!row.isPackage) return null
 
   return (
@@ -121,7 +121,7 @@ export const PrescriptionColumnExtensions = (
   {
     columnName: 'name',
     width: '30%',
-    render: (row) => {
+    render: row => {
       return (
         <div style={{ position: 'relative' }}>
           <div
@@ -140,7 +140,7 @@ export const PrescriptionColumnExtensions = (
   {
     columnName: 'instruction',
     width: '40%',
-    render: (row) => {
+    render: row => {
       return (
         <div
           style={{
@@ -171,7 +171,7 @@ export const PrescriptionColumnExtensions = (
     columnName: 'dispensedQuanity',
     type: 'number',
     width: 130,
-    render: (row) => {
+    render: row => {
       let qty = `${numeral(row.dispensedQuanity || 0).format(
         '0,0.0',
       )} ${row.dispenseUOM || ''}`
@@ -186,7 +186,7 @@ export const PrescriptionColumnExtensions = (
     columnName: 'orderedQuantity',
     type: 'number',
     width: 130,
-    render: (row) => {
+    render: row => {
       let qty = `${numeral(row.orderedQuantity || 0).format(
         '0,0.0',
       )} ${row.orderUOM || ''}`
@@ -200,9 +200,9 @@ export const PrescriptionColumnExtensions = (
   {
     columnName: 'batchNo',
     width: 150,
-    render: (row) => {
+    render: row => {
       const currentItem = inventorymedication.find(
-        (o) => o.id === row.inventoryMedicationFK,
+        o => o.id === row.inventoryMedicationFK,
       )
       let batchNoOptions = []
       if (currentItem) {
@@ -211,7 +211,7 @@ export const PrescriptionColumnExtensions = (
       return (
         <FastField
           name={`prescription[${row.rowIndex}]batchNo`}
-          render={(args) => {
+          render={args => {
             const restProps = viewOnly ? { value: row.batchNo } : { ...args }
             return (
               <Select
@@ -236,18 +236,18 @@ export const PrescriptionColumnExtensions = (
   {
     columnName: 'expiryDate',
     width: 130,
-    render: (row) => {
+    render: row => {
       return (
         <FastField
           name={`prescription[${row.rowIndex}]expiryDate`}
-          render={(args) => {
+          render={args => {
             const restProps = viewOnly ? { value: row.expiryDate } : { ...args }
 
             return (
               <DatePicker
                 text={viewOnly}
                 disabled={viewOnly}
-                disabledDate={(d) => !d || d.isBefore(moment().add('days', -1))}
+                disabledDate={d => !d || d.isBefore(moment().add('days', -1))}
                 simple
                 {...restProps}
               />
@@ -261,7 +261,7 @@ export const PrescriptionColumnExtensions = (
     columnName: 'action',
     align: 'center',
     width: 60,
-    render: (row) => {
+    render: row => {
       return (
         <Tooltip
           title={
@@ -330,7 +330,7 @@ export const VaccinationColumnExtensions = (
   {
     columnName: 'name',
     width: '60%',
-    render: (row) => {
+    render: row => {
       return (
         <div style={{ position: 'relative' }}>
           <div
@@ -354,7 +354,7 @@ export const VaccinationColumnExtensions = (
     columnName: 'dispensedQuanity',
     type: 'number',
     width: 130,
-    render: (row) => {
+    render: row => {
       let qty = `${numeral(row.dispensedQuanity || 0).format(
         '0,0.0',
       )} ${row.dispenseUOM || ''}`
@@ -379,9 +379,9 @@ export const VaccinationColumnExtensions = (
   {
     columnName: 'batchNo',
     width: 150,
-    render: (row) => {
+    render: row => {
       const currentItem = inventoryvaccination.find(
-        (o) => o.id === row.inventoryVaccinationFK,
+        o => o.id === row.inventoryVaccinationFK,
       )
       let batchNoOptions = []
       if (currentItem) {
@@ -391,7 +391,7 @@ export const VaccinationColumnExtensions = (
       return (
         <FastField
           name={`vaccination[${row.rowIndex}]batchNo`}
-          render={(args) => {
+          render={args => {
             const restProps = viewOnly ? { value: row.batchNo } : { ...args }
             return (
               <Select
@@ -424,15 +424,15 @@ export const VaccinationColumnExtensions = (
   {
     columnName: 'expiryDate',
     width: 130,
-    render: (row) => {
+    render: row => {
       return (
         <FastField
           name={`vaccination[${row.rowIndex}]expiryDate`}
-          render={(args) => {
+          render={args => {
             const restProps = viewOnly ? { value: row.expiryDate } : { ...args }
             return (
               <DatePicker
-                disabledDate={(d) => !d || d.isBefore(moment().add('days', -1))}
+                disabledDate={d => !d || d.isBefore(moment().add('days', -1))}
                 text={viewOnly}
                 disabled={viewOnly}
                 simple
@@ -493,7 +493,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     columnName: 'type',
     compare: compareString,
     width: 160,
-    render: (row) => {
+    render: row => {
       return (
         <div
           style={{
@@ -510,7 +510,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     columnName: 'description',
     compare: compareString,
     width: '60%',
-    render: (row) => {
+    render: row => {
       const { code = '', description = '', unitPrice = 0 } = row
       const title = `${description} - ${code} (${currencySymbol}${numeral(
         unitPrice,
@@ -540,7 +540,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     columnName: 'quantity',
     type: 'number',
     width: 130,
-    render: (row) => {
+    render: row => {
       let qty = `${numeral(row.quantity || 0).format(
         '0,0.0',
       )} ${row.dispenseUOM || ''}`
@@ -556,7 +556,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     // type: 'currency',
     align: 'right',
     width: 100,
-    render: (row) => {
+    render: row => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
         return 'N/A'
@@ -568,7 +568,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     // type: 'currency',
     align: 'right',
     width: 100,
-    render: (row) => {
+    render: row => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
         return 'N/A'
@@ -580,7 +580,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     // type: 'currency',
     align: 'right',
     width: 110,
-    render: (row) => {
+    render: row => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
         return 'N/A'
@@ -598,7 +598,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     columnName: 'action',
     align: 'center',
     width: 60,
-    render: (r) => {
+    render: r => {
       const { type } = r
 
       if (type === 'Service' || type === 'Consumable' || type === 'Treatment')
@@ -654,7 +654,7 @@ export const DrugLabelSelectionColumnExtensions = (
   {
     columnName: 'code',
     width: 150,
-    render: (row) => {
+    render: row => {
       return (
         <div style={{ position: 'relative' }}>
           <div
@@ -672,7 +672,7 @@ export const DrugLabelSelectionColumnExtensions = (
   {
     columnName: 'name',
     width: 210,
-    render: (row) => {
+    render: row => {
       return (
         <div style={{ position: 'relative' }}>
           <div
@@ -690,7 +690,7 @@ export const DrugLabelSelectionColumnExtensions = (
   {
     columnName: 'instruction',
     width: 260,
-    render: (row) => {
+    render: row => {
       return (
         <div
           style={{
@@ -707,7 +707,7 @@ export const DrugLabelSelectionColumnExtensions = (
     columnName: 'dispensedQuanity',
     type: 'number',
     width: 100,
-    render: (row) => {
+    render: row => {
       return (
         <span>
           {row.dispensedQuanity} {row.dispenseUOM}
@@ -719,7 +719,7 @@ export const DrugLabelSelectionColumnExtensions = (
     columnName: 'no',
     type: 'number',
     width: 100,
-    render: (row) => {
+    render: row => {
       return (
         <p>
           <NumberInput
@@ -728,7 +728,7 @@ export const DrugLabelSelectionColumnExtensions = (
             min={1}
             value={row.no}
             defaultValue={1}
-            onChange={(obj) => {
+            onChange={obj => {
               handleDrugLabelNoChanged(row.id, obj.target.value)
             }}
           />
@@ -740,10 +740,10 @@ export const DrugLabelSelectionColumnExtensions = (
     columnName: 'print',
     align: 'center',
     width: 80,
-    render: (row) => {
+    render: row => {
       return (
         <Checkbox
-          onChange={(obj) => {
+          onChange={obj => {
             handleDrugLabelSelected(row.id, obj.target.value)
           }}
           checked={row.selected}
@@ -789,13 +789,13 @@ export const PackageColumns = [
   },
 ]
 
-export const PackageColumnExtensions = (onPrint) => [
+export const PackageColumnExtensions = onPrint => [
   {
     columnName: 'type',
     compare: compareString,
     width: 160,
     sortingEnabled: false,
-    render: (row) => {
+    render: row => {
       return (
         <div
           style={{
@@ -813,7 +813,7 @@ export const PackageColumnExtensions = (onPrint) => [
     compare: compareString,
     sortingEnabled: false,
     width: '60%',
-    render: (row) => {
+    render: row => {
       const { code = '', description = '', unitPrice = 0 } = row
       const title = `${description} - ${code} (${currencySymbol}${numeral(
         unitPrice,
@@ -850,7 +850,7 @@ export const PackageColumnExtensions = (onPrint) => [
     align: 'right',
     width: 130,
     sortingEnabled: false,
-    render: (row) => {
+    render: row => {
       let qty = `${numeral(row.packageConsumeQuantity || 0).format(
         '0,0.0',
       )} ${row.dispenseUOM || ''}`
@@ -866,7 +866,7 @@ export const PackageColumnExtensions = (onPrint) => [
     align: 'right',
     width: 130,
     sortingEnabled: false,
-    render: (row) => {
+    render: row => {
       const { packageDrawdown } = row
       let drawdownTransaction = []
       let balanceQty = row.quantity
@@ -878,7 +878,7 @@ export const PackageColumnExtensions = (onPrint) => [
           packageDrawdown.packageDrawdownTransaction.length > 0
         ) {
           drawdownTransaction = packageDrawdown.packageDrawdownTransaction.filter(
-            (t) => t.consumeDate < row.packageDrawdownAsAtDate,
+            t => t.consumeDate < row.packageDrawdownAsAtDate,
           )
         }
 
@@ -887,9 +887,9 @@ export const PackageColumnExtensions = (onPrint) => [
         const { packageDrawdownTransfer } = packageDrawdown
         if (packageDrawdownTransfer && packageDrawdownTransfer.length > 0) {
           const drawdownTransfer = packageDrawdownTransfer.filter(
-            (t) => t.transferDate < row.packageDrawdownAsAtDate,
+            t => t.transferDate < row.packageDrawdownAsAtDate,
           )
-          drawdownTransfer.forEach((transfer) => {
+          drawdownTransfer.forEach(transfer => {
             transferredQty += transfer.quantity
           })
         }
@@ -899,9 +899,9 @@ export const PackageColumnExtensions = (onPrint) => [
         const { packageDrawdownReceive } = packageDrawdown
         if (packageDrawdownReceive && packageDrawdownReceive.length > 0) {
           const drawdownReceive = packageDrawdownReceive.filter(
-            (t) => t.transferDate < row.packageDrawdownAsAtDate,
+            t => t.transferDate < row.packageDrawdownAsAtDate,
           )
-          drawdownReceive.forEach((receive) => {
+          drawdownReceive.forEach(receive => {
             receivedQty += receive.quantity
           })
         }
@@ -909,7 +909,7 @@ export const PackageColumnExtensions = (onPrint) => [
         const totalQty =
           packageDrawdown.totalQuantity - transferredQty + receivedQty
         let totalDrawdown = 0
-        drawdownTransaction.forEach((txn) => {
+        drawdownTransaction.forEach(txn => {
           totalDrawdown += txn.consumeQuantity
         })
         balanceQty = totalQty - totalDrawdown
@@ -930,7 +930,7 @@ export const PackageColumnExtensions = (onPrint) => [
     align: 'right',
     width: 110,
     sortingEnabled: false,
-    render: (row) => {
+    render: row => {
       return (
         <NumberInput
           text
@@ -946,7 +946,7 @@ export const PackageColumnExtensions = (onPrint) => [
     align: 'center',
     width: 60,
     sortingEnabled: false,
-    render: (r) => {
+    render: r => {
       const { type } = r
 
       if (type === 'Service' || type === 'Consumable' || type === 'Vaccination')

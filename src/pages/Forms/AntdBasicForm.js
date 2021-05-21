@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 import {
   Form,
   Input,
@@ -37,9 +37,9 @@ class AntdBasicForm extends PureComponent {
         })
       }
     })
-  };
+  }
 
-  render () {
+  render() {
     const { submitting } = this.props
     const {
       form: { getFieldDecorator, getFieldValue },
@@ -66,12 +66,19 @@ class AntdBasicForm extends PureComponent {
 
     return (
       <PageHeaderWrapper
-        title={<FormattedMessage id="app.forms.basic.title" />}
-        content={<FormattedMessage id="app.forms.basic.description" />}
+        title={<FormattedMessage id='app.forms.basic.title' />}
+        content={<FormattedMessage id='app.forms.basic.description' />}
       >
         <Card bordered={false}>
-          <Form onSubmit={this.handleSubmit} hideRequiredMark style={{ marginTop: 8 }}>
-            <FormItem {...formItemLayout} label={<FormattedMessage id="form.title.label" />}>
+          <Form
+            onSubmit={this.handleSubmit}
+            hideRequiredMark
+            style={{ marginTop: 8 }}
+          >
+            <FormItem
+              {...formItemLayout}
+              label={<FormattedMessage id='form.title.label' />}
+            >
               {getFieldDecorator('title', {
                 rules: [
                   {
@@ -79,9 +86,16 @@ class AntdBasicForm extends PureComponent {
                     message: formatMessage({ id: 'validation.title.required' }),
                   },
                 ],
-              })(<Input placeholder={formatMessage({ id: 'form.title.placeholder' })} />)}
+              })(
+                <Input
+                  placeholder={formatMessage({ id: 'form.title.placeholder' })}
+                />,
+              )}
             </FormItem>
-            <FormItem {...formItemLayout} label={<FormattedMessage id="form.date.label" />}>
+            <FormItem
+              {...formItemLayout}
+              label={<FormattedMessage id='form.date.label' />}
+            >
               {getFieldDecorator('date', {
                 rules: [
                   {
@@ -96,10 +110,13 @@ class AntdBasicForm extends PureComponent {
                     formatMessage({ id: 'form.date.placeholder.start' }),
                     formatMessage({ id: 'form.date.placeholder.end' }),
                   ]}
-                />
+                />,
               )}
             </FormItem>
-            <FormItem {...formItemLayout} label={<FormattedMessage id="form.goal.label" />}>
+            <FormItem
+              {...formItemLayout}
+              label={<FormattedMessage id='form.goal.label' />}
+            >
               {getFieldDecorator('goal', {
                 rules: [
                   {
@@ -112,65 +129,82 @@ class AntdBasicForm extends PureComponent {
                   style={{ minHeight: 32 }}
                   placeholder={formatMessage({ id: 'form.goal.placeholder' })}
                   rows={4}
-                />
+                />,
               )}
             </FormItem>
-            <FormItem {...formItemLayout} label={<FormattedMessage id="form.standard.label" />}>
+            <FormItem
+              {...formItemLayout}
+              label={<FormattedMessage id='form.standard.label' />}
+            >
               {getFieldDecorator('standard', {
                 rules: [
                   {
                     required: true,
-                    message: formatMessage({ id: 'validation.standard.required' }),
+                    message: formatMessage({
+                      id: 'validation.standard.required',
+                    }),
                   },
                 ],
               })(
                 <TextArea
                   style={{ minHeight: 32 }}
-                  placeholder={formatMessage({ id: 'form.standard.placeholder' })}
+                  placeholder={formatMessage({
+                    id: 'form.standard.placeholder',
+                  })}
                   rows={4}
-                />
+                />,
               )}
             </FormItem>
             <FormItem
               {...formItemLayout}
               label={
                 <span>
-                  <FormattedMessage id="form.client.label" />
+                  <FormattedMessage id='form.client.label' />
                   <em className={styles.optional}>
-                    <FormattedMessage id="form.optional" />
-                    <Tooltip title={<FormattedMessage id="form.client.label.tooltip" />}>
-                      <Icon type="info-circle-o" style={{ marginRight: 4 }} />
+                    <FormattedMessage id='form.optional' />
+                    <Tooltip
+                      title={
+                        <FormattedMessage id='form.client.label.tooltip' />
+                      }
+                    >
+                      <Icon type='info-circle-o' style={{ marginRight: 4 }} />
                     </Tooltip>
                   </em>
                 </span>
               }
             >
               {getFieldDecorator('client')(
-                <Input placeholder={formatMessage({ id: 'form.client.placeholder' })} />
+                <Input
+                  placeholder={formatMessage({ id: 'form.client.placeholder' })}
+                />,
               )}
             </FormItem>
             <FormItem
               {...formItemLayout}
               label={
                 <span>
-                  <FormattedMessage id="form.invites.label" />
+                  <FormattedMessage id='form.invites.label' />
                   <em className={styles.optional}>
-                    <FormattedMessage id="form.optional" />
+                    <FormattedMessage id='form.optional' />
                   </em>
                 </span>
               }
             >
               {getFieldDecorator('invites')(
-                <Input placeholder={formatMessage({ id: 'form.invites.placeholder' })} />
+                <Input
+                  placeholder={formatMessage({
+                    id: 'form.invites.placeholder',
+                  })}
+                />,
               )}
             </FormItem>
             <FormItem
               {...formItemLayout}
               label={
                 <span>
-                  <FormattedMessage id="form.weight.label" />
+                  <FormattedMessage id='form.weight.label' />
                   <em className={styles.optional}>
-                    <FormattedMessage id="form.optional" />
+                    <FormattedMessage id='form.optional' />
                   </em>
                 </span>
               }
@@ -180,61 +214,64 @@ class AntdBasicForm extends PureComponent {
                   placeholder={formatMessage({ id: 'form.weight.placeholder' })}
                   min={0}
                   max={100}
-                />
+                />,
               )}
-              <span className="ant-form-text">%</span>
+              <span className='ant-form-text'>%</span>
             </FormItem>
             <FormItem
               {...formItemLayout}
-              label={<FormattedMessage id="form.public.label" />}
-              help={<FormattedMessage id="form.public.label.help" />}
+              label={<FormattedMessage id='form.public.label' />}
+              help={<FormattedMessage id='form.public.label.help' />}
             >
               <div>
                 {getFieldDecorator('public', {
                   initialValue: '1',
                 })(
                   <Radio.Group>
-                    <Radio value="1">
-                      <FormattedMessage id="form.public.radio.public" />
+                    <Radio value='1'>
+                      <FormattedMessage id='form.public.radio.public' />
                     </Radio>
-                    <Radio value="2">
-                      <FormattedMessage id="form.public.radio.partially-public" />
+                    <Radio value='2'>
+                      <FormattedMessage id='form.public.radio.partially-public' />
                     </Radio>
-                    <Radio value="3">
-                      <FormattedMessage id="form.public.radio.private" />
+                    <Radio value='3'>
+                      <FormattedMessage id='form.public.radio.private' />
                     </Radio>
-                  </Radio.Group>
+                  </Radio.Group>,
                 )}
                 <FormItem style={{ marginBottom: 0 }}>
                   {getFieldDecorator('publicUsers')(
                     <Select
-                      mode="multiple"
-                      placeholder={formatMessage({ id: 'form.publicUsers.placeholder' })}
+                      mode='multiple'
+                      placeholder={formatMessage({
+                        id: 'form.publicUsers.placeholder',
+                      })}
                       style={{
                         margin: '8px 0',
-                        display: getFieldValue('public') === '2' ? 'block' : 'none',
+                        display:
+                          getFieldValue('public') === '2' ? 'block' : 'none',
                       }}
                     >
-                      <Option value="1">
-                        <FormattedMessage id="form.publicUsers.option.A" />
+                      <Option value='1'>
+                        <FormattedMessage id='form.publicUsers.option.A' />
                       </Option>
-                      <Option value="2">
-                        <FormattedMessage id="form.publicUsers.option.B" />
+                      <Option value='2'>
+                        <FormattedMessage id='form.publicUsers.option.B' />
                       </Option>
-                      <Option value="3">
-                        <FormattedMessage id="form.publicUsers.option.C" />
+                      <Option value='3'>
+                        <FormattedMessage id='form.publicUsers.option.C' />
                       </Option>
-                    </Select>
+                    </Select>,
                   )}
                 </FormItem>
               </div>
             </FormItem>
             <FormItem {...submitFormLayout} style={{ marginTop: 32 }}>
-              <Button type="primary" htmlType="submit" loading={submitting}>
-                <FormattedMessage id="form.submit" />
+              <Button type='primary' htmlType='submit' loading={submitting}>
+                <FormattedMessage id='form.submit' />
               </Button>
               <Button style={{ marginLeft: 8 }}>
-                <FormattedMessage id="form.save" />
+                <FormattedMessage id='form.save' />
               </Button>
             </FormItem>
           </Form>

@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import moment from 'moment'
 // umi
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 // formik
 import { FastField, withFormik } from 'formik'
 // material ui
@@ -25,14 +25,18 @@ import { LTInvoiceStatus, LTReceivingGoodsStatus } from '../variables'
 
 @withFormik({
   mapPropsToValues: () => ({
-    transactionStartDate: moment().startOf('month').formatUTC(),
-    transactionEndDate: moment().endOf('day').formatUTC(false),
+    transactionStartDate: moment()
+      .startOf('month')
+      .formatUTC(),
+    transactionEndDate: moment()
+      .endOf('day')
+      .formatUTC(false),
   }),
   handleSubmit: () => {},
   displayName: 'ReceivingGoodsFilter',
 })
 class FilterBar extends PureComponent {
-  render () {
+  render() {
     const {
       classes,
       dispatch,
@@ -51,7 +55,7 @@ class FilterBar extends PureComponent {
         <GridItem xs={6} md={3}>
           <FastField
             name='searchNo'
-            render={(args) => {
+            render={args => {
               return (
                 <TextField
                   label={formatMessage({
@@ -66,7 +70,7 @@ class FilterBar extends PureComponent {
         <GridItem md={3}>
           <Field
             name='transactionStartDate'
-            render={(args) => (
+            render={args => (
               <FilterBarDate
                 noTodayLimit
                 args={args}
@@ -83,7 +87,7 @@ class FilterBar extends PureComponent {
         <GridItem md={3}>
           <Field
             name='transactionEndDate'
-            render={(args) => (
+            render={args => (
               <FilterBarDate
                 noTodayLimit
                 isEndDate
@@ -101,7 +105,7 @@ class FilterBar extends PureComponent {
         <GridItem xs sm={6} md={3}>
           <FastField
             name='isAllDateChecked'
-            render={(args) => {
+            render={args => {
               return (
                 <Tooltip
                   title={formatMessage({
@@ -124,12 +128,10 @@ class FilterBar extends PureComponent {
         <GridItem xs={6} md={3}>
           <FastField
             name='invoiceStatusFK'
-            render={(args) => {
+            render={args => {
               return (
                 <CodeSelect
-                  options={LTInvoiceStatus.filter(
-                    (is) => is.code !== 'OVERPAID',
-                  )}
+                  options={LTInvoiceStatus.filter(is => is.code !== 'OVERPAID')}
                   labelField='name'
                   label={formatMessage({
                     id: 'inventory.rg.invoiceStatus',
@@ -143,7 +145,7 @@ class FilterBar extends PureComponent {
         <GridItem xs={6} md={3}>
           <FastField
             name='supplierFK'
-            render={(args) => {
+            render={args => {
               return (
                 <CodeSelect
                   label={formatMessage({
@@ -160,7 +162,7 @@ class FilterBar extends PureComponent {
         <GridItem xs={6} md={3}>
           <FastField
             name='receivingGoodsStatusFK'
-            render={(args) => {
+            render={args => {
               return (
                 <CodeSelect
                   options={LTReceivingGoodsStatus}

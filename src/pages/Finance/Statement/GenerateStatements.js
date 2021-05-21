@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { FastField } from 'formik'
 import moment from 'moment'
 import { withStyles } from '@material-ui/core'
@@ -29,8 +29,12 @@ const generateStatementSchema = Yup.object().shape({
 @withFormikExtend({
   mapPropsToValues: () => ({
     statementDate: moment(),
-    invoiceDateFrom: moment().subtract(1, 'months').startOf('month'),
-    invoiceDateTo: moment().subtract(1, 'months').endOf('month'),
+    invoiceDateFrom: moment()
+      .subtract(1, 'months')
+      .startOf('month'),
+    invoiceDateTo: moment()
+      .subtract(1, 'months')
+      .endOf('month'),
   }),
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm } = props
@@ -38,21 +42,28 @@ const generateStatementSchema = Yup.object().shape({
       statementDate,
       paymentTerms,
       invoiceDateFrom,
-      invoiceDateTo } = values
+      invoiceDateTo,
+    } = values
     dispatch({
       type: 'statement/autoGenerateStatement',
       payload: {
         statementDate,
         paymentTerms,
         invoiceDateFrom,
-        invoiceDateTo: invoiceDateTo ? moment(invoiceDateTo).endOf('day').formatUTC(false) : undefined,
+        invoiceDateTo: invoiceDateTo
+          ? moment(invoiceDateTo)
+              .endOf('day')
+              .formatUTC(false)
+          : undefined,
       },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         if (onConfirm) {
           onConfirm()
         }
-        notification.success({ message: 'Auto generate statement has been queued.' })
+        notification.success({
+          message: 'Auto generate statement has been queued.',
+        })
       }
     })
   },
@@ -67,8 +78,7 @@ class GenerateStatements extends PureComponent {
     setFieldValue('rows', rows)
   }
 
-  componentDidMount = () => {
-  }
+  componentDidMount = () => {}
 
   generateStatement = async () => {
     const { validateForm } = this.props
@@ -83,19 +93,16 @@ class GenerateStatements extends PureComponent {
     return validation
   }
 
-  render () {
+  render() {
     const { props } = this
-    const {
-      footer,
-      handleSubmit,
-    } = props
+    const { footer, handleSubmit } = props
     return (
       <React.Fragment>
         <GridContainer>
           <GridItem md={6}>
             <FastField
               name='statementDate'
-              render={(args) => (
+              render={args => (
                 <DatePicker value={moment()} label='Statement Date' {...args} />
               )}
             />
@@ -103,7 +110,7 @@ class GenerateStatements extends PureComponent {
           <GridItem md={6}>
             <FastField
               name='paymentTerms'
-              render={(args) => (
+              render={args => (
                 <NumberInput
                   suffix='Days'
                   qty
@@ -122,7 +129,7 @@ class GenerateStatements extends PureComponent {
           <GridItem md={6}>
             <FastField
               name='invoiceDateFrom'
-              render={(args) => (
+              render={args => (
                 <DatePicker label='Invoice From Date' {...args} />
               )}
             />
@@ -130,9 +137,7 @@ class GenerateStatements extends PureComponent {
           <GridItem md={6}>
             <FastField
               name='invoiceDateTo'
-              render={(args) => (
-                <DatePicker label='Invoice To Date' {...args} />
-              )}
+              render={args => <DatePicker label='Invoice To Date' {...args} />}
             />
           </GridItem>
         </GridContainer>

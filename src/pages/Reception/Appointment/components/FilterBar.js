@@ -3,8 +3,8 @@ import classnames from 'classnames'
 import BigCalendar from 'react-big-calendar'
 // formik
 import { withFormik, Field, FastField } from 'formik'
-// umi/locale
-import { formatMessage } from 'umi/locale'
+// umi
+import { formatMessage } from 'umi'
 // material ui
 import { withStyles, Fab, Paper } from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add'
@@ -50,7 +50,7 @@ const styles = () => ({
   },
 })
 let count = 0
-const FilterBar = (props) => {
+const FilterBar = props => {
   const {
     loading,
     classes,
@@ -63,19 +63,16 @@ const FilterBar = (props) => {
   } = props
   const onFilterClick = () => handleUpdateFilter(values)
 
-  const renderDropdown = (option) => <DoctorLabel doctor={option} />
+  const renderDropdown = option => <DoctorLabel doctor={option} />
 
   const { filterByDoctor = [] } = values
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
-  const [
-    showFilterTemplate,
-    setShowFilterTemplate,
-  ] = useState(false)
+  const [showFilterTemplate, setShowFilterTemplate] = useState(false)
 
   const handleFilterTemplate = () => {
     setShowFilterTemplate(!showFilterTemplate)
   }
-  const handleApplyTemplate = (selectedTemplate) => {
+  const handleApplyTemplate = selectedTemplate => {
     const {
       filterByApptType: appTypes,
       filterByDoctor: doctors,
@@ -96,7 +93,7 @@ const FilterBar = (props) => {
         <GridItem xs md={3}>
           <FastField
             name='search'
-            render={(args) => (
+            render={args => (
               <TextField
                 {...args}
                 label={formatMessage({
@@ -110,7 +107,7 @@ const FilterBar = (props) => {
           <GridItem xs md={2} style={{ minWidth: 220 }}>
             <Field
               name='filterByDoctor'
-              render={(args) => (
+              render={args => (
                 <Authorized authority='appointment.viewotherappointment'>
                   <CodeSelect
                     {...args}
@@ -121,14 +118,14 @@ const FilterBar = (props) => {
                     remoteFilter={{
                       'clinicianProfile.isActive': true,
                     }}
-                    localFilter={(option) => option.clinicianProfile.isActive}
+                    localFilter={option => option.clinicianProfile.isActive}
                     code='doctorprofile'
                     labelField='clinicianProfile.name'
                     valueField='clinicianProfile.id'
                     maxTagCount={maxDoctorTagCount}
                     maxTagPlaceholder='doctors'
                     renderDropdown={renderDropdown}
-                    onChange={(v) => {
+                    onChange={v => {
                       sessionStorage.setItem(
                         'appointmentDoctors',
                         JSON.stringify(v),
@@ -144,7 +141,7 @@ const FilterBar = (props) => {
           <GridItem xs md={2} style={{ minWidth: 220 }}>
             <Field
               name='filterBySingleDoctor'
-              render={(args) => (
+              render={args => (
                 <Authorized authority='appointment.viewotherappointment'>
                   <CodeSelect
                     {...args}
@@ -153,7 +150,7 @@ const FilterBar = (props) => {
                     remoteFilter={{
                       'clinicianProfile.isActive': true,
                     }}
-                    localFilter={(option) => option.clinicianProfile.isActive}
+                    localFilter={option => option.clinicianProfile.isActive}
                     code='doctorprofile'
                     labelField='clinicianProfile.name'
                     valueField='clinicianProfile.id'
@@ -168,7 +165,7 @@ const FilterBar = (props) => {
           <div style={{ display: 'flex' }}>
             <Field
               name='filterByApptType'
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   {...args}
                   mode='multiple'
@@ -177,7 +174,7 @@ const FilterBar = (props) => {
                   label='Filter by Appointment Type'
                   code='ctappointmenttype'
                   labelField='displayValue'
-                  renderDropdown={(option) => (
+                  renderDropdown={option => (
                     <AppointmentTypeLabel
                       color={option.tagColorHex}
                       label={option.displayValue}
@@ -207,15 +204,11 @@ const FilterBar = (props) => {
                   <FilterTemplateTooltip
                     visible={showFilterTemplate}
                     filterByDoctor={
-                      isDayView ? (
-                        values.filterByDoctor
-                      ) : values.filterBySingleDoctor ? (
-                        [
-                          values.filterBySingleDoctor,
-                        ]
-                      ) : (
-                        []
-                      )
+                      isDayView
+                        ? values.filterByDoctor
+                        : values.filterBySingleDoctor
+                        ? [values.filterBySingleDoctor]
+                        : []
                     }
                     filterByApptType={values.filterByApptType}
                     handleFilterTemplate={handleFilterTemplate}
@@ -306,13 +299,9 @@ export default compose(
       count += 1
 
       return {
-        filterByDoctor: [
-          ...filterByDoctor,
-        ],
+        filterByDoctor: [...filterByDoctor],
         filterBySingleDoctor,
-        filterByApptType: filterByApptType || [
-          -99,
-        ],
+        filterByApptType: filterByApptType || [-99],
         count,
       }
     },

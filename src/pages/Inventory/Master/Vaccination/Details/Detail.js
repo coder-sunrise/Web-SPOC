@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { FastField } from 'formik'
 import { compose } from 'redux'
 import Yup from '@/utils/yup'
@@ -35,15 +35,12 @@ const Detail = ({
 }) => {
   const field = vaccinationDetail.entity ? 'entity' : 'default'
 
-  const [
-    toggle,
-    setToggle,
-  ] = useState(false)
+  const [toggle, setToggle] = useState(false)
 
   const toggleModal = () => {
     setToggle(!toggle)
   }
-  const handleSelectSdd = (row) => {
+  const handleSelectSdd = row => {
     const { id, code, name } = row
     setToggle(!toggle)
     dispatch({
@@ -59,7 +56,7 @@ const Detail = ({
     })
   }
 
-  const toggleMedisaveVaccination = (o) => {
+  const toggleMedisaveVaccination = o => {
     dispatch({
       type: 'vaccinationDetail/updateState',
       payload: {
@@ -88,11 +85,13 @@ const Detail = ({
   //   }),
   // ) : Yup.object()
 
-  const sddProps = !props.values ? {
-    ...props,
-    values,
-  } : {...props}
-  
+  const sddProps = !props.values
+    ? {
+        ...props,
+        values,
+      }
+    : { ...props }
+
   return (
     <SharedContainer hideHeader>
       <div
@@ -108,7 +107,7 @@ const Detail = ({
               <GridItem xs={12}>
                 <FastField
                   name='code'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <TextField
                         label={formatMessage({
@@ -123,7 +122,7 @@ const Detail = ({
               <GridItem xs={12}>
                 <FastField
                   name='displayValue'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <TextField
                         label={formatMessage({
@@ -139,7 +138,7 @@ const Detail = ({
               <GridItem xs={12}>
                 <FastField
                   name='description'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <TextField
                         label={formatMessage({
@@ -154,7 +153,7 @@ const Detail = ({
               <GridItem xs={12}>
                 <FastField
                   name='caution'
-                  render={(args) => (
+                  render={args => (
                     <TextField
                       label={formatMessage({
                         id: 'inventory.master.vaccination.caution',
@@ -168,7 +167,7 @@ const Detail = ({
               <GridItem>
                 <FastField
                   name='schemes'
-                  render={(args) => (
+                  render={args => (
                     <CheckboxGroup
                       style={{
                         marginTop: theme.spacing(1),
@@ -178,69 +177,67 @@ const Detail = ({
                       valueField='id'
                       textField='name'
                       options={
-                        clinicSettings.isMedisaveEnable ? (
-                          [
-                            {
-                              id: 'isAutoGenerateCertificate',
-                              name: 'Auto Generate Certificate',
+                        clinicSettings.isMedisaveEnable
+                          ? [
+                              {
+                                id: 'isAutoGenerateCertificate',
+                                name: 'Auto Generate Certificate',
 
-                              layoutConfig: {
-                                style: {},
+                                layoutConfig: {
+                                  style: {},
+                                },
                               },
-                            },
-                            {
-                              id: 'isChasAcuteClaimable',
-                              name: 'CHAS Acute Claimable',
+                              {
+                                id: 'isChasAcuteClaimable',
+                                name: 'CHAS Acute Claimable',
 
-                              layoutConfig: {
-                                style: {},
+                                layoutConfig: {
+                                  style: {},
+                                },
                               },
-                            },
-                            {
-                              id: 'isChasChronicClaimable',
-                              name: 'CHAS Chronic Claimable',
+                              {
+                                id: 'isChasChronicClaimable',
+                                name: 'CHAS Chronic Claimable',
 
-                              layoutConfig: {
-                                style: {},
+                                layoutConfig: {
+                                  style: {},
+                                },
                               },
-                            },
-                            {
-                              id: 'isMedisaveClaimable',
-                              name: 'CDMP Claimable',
+                              {
+                                id: 'isMedisaveClaimable',
+                                name: 'CDMP Claimable',
 
-                              layoutConfig: {
-                                style: {},
+                                layoutConfig: {
+                                  style: {},
+                                },
                               },
-                            },
-                          ]
-                        ) : (
-                          [
-                            {
-                              id: 'isAutoGenerateCertificate',
-                              name: 'Auto Generate Certificate',
+                            ]
+                          : [
+                              {
+                                id: 'isAutoGenerateCertificate',
+                                name: 'Auto Generate Certificate',
 
-                              layoutConfig: {
-                                style: {},
+                                layoutConfig: {
+                                  style: {},
+                                },
                               },
-                            },
-                            {
-                              id: 'isChasAcuteClaimable',
-                              name: 'CHAS Acute Claimable',
+                              {
+                                id: 'isChasAcuteClaimable',
+                                name: 'CHAS Acute Claimable',
 
-                              layoutConfig: {
-                                style: {},
+                                layoutConfig: {
+                                  style: {},
+                                },
                               },
-                            },
-                            {
-                              id: 'isChasChronicClaimable',
-                              name: 'CHAS Chronic Claimable',
+                              {
+                                id: 'isChasChronicClaimable',
+                                name: 'CHAS Chronic Claimable',
 
-                              layoutConfig: {
-                                style: {},
+                                layoutConfig: {
+                                  style: {},
+                                },
                               },
-                            },
-                          ]
-                        )
+                            ]
                       }
                       onChange={(e, s) => {
                         if (s.isMedisaveClaimable !== undefined)
@@ -260,7 +257,7 @@ const Detail = ({
                   <GridItem xs={10}>
                     <FastField
                       name='sddCode'
-                      render={(args) => {
+                      render={args => {
                         return (
                           <TextField
                             label={formatMessage({
@@ -285,7 +282,7 @@ const Detail = ({
                   <GridItem xs={12}>
                     <FastField
                       name='sddDescription'
-                      render={(args) => {
+                      render={args => {
                         return (
                           <TextField
                             label={formatMessage({
@@ -311,7 +308,7 @@ const Detail = ({
               <GridItem xs={10}>
                 <FastField
                   name='favouriteSupplierFK'
-                  render={(args) => (
+                  render={args => (
                     <CodeSelect
                       label={formatMessage({
                         id: 'inventory.master.vaccination.supplier',
@@ -327,7 +324,7 @@ const Detail = ({
               <GridItem xs={10}>
                 <FastField
                   name='revenueCategoryFK'
-                  render={(args) => (
+                  render={args => (
                     <CodeSelect
                       label={formatMessage({
                         id: 'inventory.master.medication.revenueCategory',
@@ -342,7 +339,7 @@ const Detail = ({
               <GridItem xs={10}>
                 <Field
                   name='effectiveDates'
-                  render={(args) => (
+                  render={args => (
                     <DateRangePicker
                       format={dateFormatLong}
                       label='Effective Start Date'
@@ -360,7 +357,8 @@ const Detail = ({
                 <div
                   style={{
                     display:
-                    clinicSettings.isMedisaveEnable && values.isMedisaveClaimable
+                      clinicSettings.isMedisaveEnable &&
+                      values.isMedisaveClaimable
                         ? ''
                         : 'none',
                   }}
@@ -398,6 +396,7 @@ const Detail = ({
   )
 }
 
-export default compose(withStyles(styles, { withTheme: true }), React.memo)(
-  Detail,
-)
+export default compose(
+  withStyles(styles, { withTheme: true }),
+  React.memo,
+)(Detail)

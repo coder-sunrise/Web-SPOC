@@ -1,5 +1,5 @@
 import React, { memo, Fragment, useState, useRef } from 'react'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import Print from '@material-ui/icons/Print'
 import Add from '@material-ui/icons/Add'
@@ -62,9 +62,7 @@ const createPayload = (values, viewOtherApptAccessRight, isActiveDoctor) => {
       viewOtherApptAccessRight.rights !== 'enable') &&
     !isActiveDoctor
   ) {
-    selectedDoctor = [
-      -1,
-    ]
+    selectedDoctor = [-1]
   }
   if (isPrint) {
     return {
@@ -114,17 +112,14 @@ const FilterBar = ({
 
   const { viewOtherApptAccessRight, isActiveDoctor } = restValues
 
-  const [
-    showReport,
-    setShowReport,
-  ] = useState(false)
+  const [showReport, setShowReport] = useState(false)
 
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
   const maxApptTypeTagCount = filterByApptType.length <= 1 ? 1 : 0
   const maxRoomBlockGroupTagCount = filterByRoomBlockGroup.length <= 1 ? 1 : 0
   const maxAppointmentStatusTagCount =
     filterByAppointmentStatus.length <= 1 ? 1 : 0
-  const renderDropdown = (option) => <DoctorLabel doctor={option} />
+  const renderDropdown = option => <DoctorLabel doctor={option} />
 
   const toggleReport = () => {
     if (!values.searchValue) return
@@ -137,7 +132,7 @@ const FilterBar = ({
         <GridItem md={6}>
           <FastField
             name='searchValue'
-            render={(args) => (
+            render={args => (
               <TextField
                 {...args}
                 label={formatMessage({
@@ -151,7 +146,7 @@ const FilterBar = ({
         <GridItem md={6}>
           <Field
             name='filterByDoctor'
-            render={(args) => (
+            render={args => (
               <Authorized authority='appointment.viewotherappointment'>
                 <CodeSelect
                   {...args}
@@ -187,7 +182,7 @@ const FilterBar = ({
         <GridItem md={6}>
           <FastField
             name='apptDate'
-            render={(args) => (
+            render={args => (
               <DateRangePicker label='Appt Date From' label2='To' {...args} />
             )}
           />
@@ -195,7 +190,7 @@ const FilterBar = ({
         <GridItem md={6}>
           <FastField
             name='filterByRoomBlockGroup'
-            render={(args) => {
+            render={args => {
               return (
                 <CodeSelect
                   label='Room'
@@ -212,7 +207,7 @@ const FilterBar = ({
         <GridItem md={6}>
           <Field
             name='bookBy'
-            render={(args) => {
+            render={args => {
               return (
                 <ClinicianSelect
                   label='Book By'
@@ -229,7 +224,7 @@ const FilterBar = ({
         <GridItem md={6}>
           <Field
             name='filterByApptType'
-            render={(args) => (
+            render={args => (
               <CodeSelect
                 {...args}
                 mode='multiple'
@@ -238,7 +233,7 @@ const FilterBar = ({
                 label='Appt Type'
                 code='ctappointmenttype'
                 labelField='displayValue'
-                renderDropdown={(option) => (
+                renderDropdown={option => (
                   <AppointmentTypeLabel
                     color={option.tagColorHex}
                     label={option.displayValue}
@@ -260,13 +255,13 @@ const FilterBar = ({
         <GridItem md={6}>
           <FastField
             name='bookOn'
-            render={(args) => <DatePicker label='Book On' {...args} />}
+            render={args => <DatePicker label='Book On' {...args} />}
           />
         </GridItem>
         <GridItem md={6}>
           <FastField
             name='filterByAppointmentStatus'
-            render={(args) => {
+            render={args => {
               return (
                 <CodeSelect
                   mode='multiple'
@@ -341,7 +336,7 @@ export default memo(
   withFormikExtend({
     validationSchema: Yup.object().shape({
       searchValue: Yup.string().when('isPrint', {
-        is: (v) => v === true,
+        is: v => v === true,
         then: Yup.string().required(),
       }),
     }),

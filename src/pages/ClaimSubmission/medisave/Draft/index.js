@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import $ from 'jquery'
 // formik
 import { withFormik } from 'formik'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components1
@@ -25,7 +25,7 @@ import {
   DraftMedisaveColumns,
 } from './variables'
 
-const styles = (theme) => ({
+const styles = theme => ({
   cardContainer: {
     margin: 1,
   },
@@ -47,7 +47,7 @@ class DraftMedisave extends React.Component {
     selectedRows: [],
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.refreshDataGrid()
   }
 
@@ -57,7 +57,7 @@ class DraftMedisave extends React.Component {
     })
   }
 
-  handleSelectionChange = (selection) =>
+  handleSelectionChange = selection =>
     this.setState({ selectedRows: selection })
 
   onRefreshClicked = () => {
@@ -67,7 +67,7 @@ class DraftMedisave extends React.Component {
         type: 'medisaveClaimSubmissionDraft/refreshPatientDetails',
         payload: { claimIds: selectedRows },
       })
-      .then((r) => {
+      .then(r => {
         if (!r) {
           this.refreshDataGrid()
           notification.success({
@@ -77,7 +77,7 @@ class DraftMedisave extends React.Component {
       })
   }
 
-  render () {
+  render() {
     const overrideContextMenuOptions = [
       {
         id: 0,
@@ -127,7 +127,7 @@ class DraftMedisave extends React.Component {
                 selectable: true,
                 selectConfig: {
                   showSelectAll: true,
-                  rowSelectionEnabled: (row) => row.patientIsActive,
+                  rowSelectionEnabled: row => row.patientIsActive,
                 },
               }}
               selection={this.state.selectedRows}
