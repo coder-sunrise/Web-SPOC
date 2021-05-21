@@ -18,13 +18,13 @@ import ViewList from '@material-ui/icons/ViewList'
 import Button from 'mui-pro-components/CustomButtons'
 
 import headerStyle from 'mui-pro-jss/material-dashboard-pro-react/components/headerStyle.jsx'
-import Link from 'umi/link'
+import Link from 'umi'
 import HeaderLinks from './HeaderLinks'
 
 import PageHeader from '@/components/PageHeader'
 import MenuContext from '@/layouts/MenuContext'
 
-function Header ({ isMobile, collapsed, setting, ...props }) {
+function Header({ isMobile, collapsed, setting, ...props }) {
   // function makeBrand () {
   //   let name
   //   props.menuData.map((prop, key) => {
@@ -97,7 +97,7 @@ function Header ({ isMobile, collapsed, setting, ...props }) {
           </Button> */}
 
           <MenuContext.Consumer>
-            {(value) => (
+            {value => (
               <PageHeader
                 wide={contentWidth === 'Fixed'}
                 // home={<FormattedMessage id='menu.home' defaultMessage='Home' />}
@@ -144,13 +144,7 @@ function Header ({ isMobile, collapsed, setting, ...props }) {
 
 Header.propTypes = {
   classes: PropTypes.object.isRequired,
-  color: PropTypes.oneOf([
-    'primary',
-    'info',
-    'success',
-    'warning',
-    'danger',
-  ]),
+  color: PropTypes.oneOf(['primary', 'info', 'success', 'warning', 'danger']),
   rtlActive: PropTypes.bool,
 }
 

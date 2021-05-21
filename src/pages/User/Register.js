@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import Link from 'umi/link'
+import Link from 'umi'
 import router from 'umi/router'
 import { Form, Input, Button, Select, Row, Col, Popover, Progress } from 'antd'
 import styles from './Register.less'
@@ -48,7 +48,7 @@ class Register extends Component {
     prefix: '86',
   }
 
-  componentDidUpdate () {
+  componentDidUpdate() {
     const { form, register } = this.props
     const account = form.getFieldValue('mail')
     if (register.status === 'ok') {
@@ -61,7 +61,7 @@ class Register extends Component {
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     clearInterval(this.interval)
   }
 
@@ -89,7 +89,7 @@ class Register extends Component {
     return 'poor'
   }
 
-  handleSubmit = (e) => {
+  handleSubmit = e => {
     e.preventDefault()
     const { form, dispatch } = this.props
     form.validateFields({ force: true }, (err, values) => {
@@ -106,7 +106,7 @@ class Register extends Component {
     })
   }
 
-  handleConfirmBlur = (e) => {
+  handleConfirmBlur = e => {
     const { value } = e.target
     const { confirmDirty } = this.state
     this.setState({ confirmDirty: confirmDirty || !!value })
@@ -143,19 +143,14 @@ class Register extends Component {
       } else {
         const { form } = this.props
         if (value && confirmDirty) {
-          form.validateFields(
-            [
-              'confirm',
-            ],
-            { force: true },
-          )
+          form.validateFields(['confirm'], { force: true })
         }
         callback()
       }
     }
   }
 
-  changePrefix = (value) => {
+  changePrefix = value => {
     this.setState({
       prefix: value,
     })
@@ -178,7 +173,7 @@ class Register extends Component {
     ) : null
   }
 
-  render () {
+  render() {
     const { form, submitting } = this.props
     const { getFieldDecorator } = form
     const { count, prefix, help, visible } = this.state
@@ -211,7 +206,7 @@ class Register extends Component {
           </FormItem>
           <FormItem help={help}>
             <Popover
-              getPopupContainer={(node) => node.parentNode}
+              getPopupContainer={node => node.parentNode}
               content={
                 <div style={{ padding: '4px 0' }}>
                   {passwordStatusMap[this.getPasswordStatus()]}
@@ -330,11 +325,11 @@ class Register extends Component {
                   className={styles.getCaptcha}
                   onClick={this.onGetCaptcha}
                 >
-                  {count ? (
-                    `${count} s`
-                  ) : (
-                    formatMessage({ id: 'app.register.get-verification-code' })
-                  )}
+                  {count
+                    ? `${count} s`
+                    : formatMessage({
+                        id: 'app.register.get-verification-code',
+                      })}
                 </Button>
               </Col>
             </Row>

@@ -7,7 +7,7 @@ import Breadcrumbs from '@material-ui/core/Breadcrumbs'
 import NavigateNextIcon from '@material-ui/icons/NavigateNext'
 import headerStyle from 'mui-pro-jss/material-dashboard-pro-react/components/headerStyle.jsx'
 import Button from 'mui-pro-components/CustomButtons'
-import Link from 'umi/link'
+import Link from 'umi'
 import styles from './index.less'
 import { urlToList } from '../_utils/pathTools'
 
@@ -16,7 +16,7 @@ import { navigateDirtyCheck } from '@/utils/utils'
 export const getBreadcrumb = (breadcrumbNameMap = [], url) => {
   let breadcrumb = breadcrumbNameMap[url]
   if (!breadcrumb) {
-    Object.keys(breadcrumbNameMap).forEach((item) => {
+    Object.keys(breadcrumbNameMap).forEach(item => {
       if (pathToRegexp(item).test(url)) {
         breadcrumb = breadcrumbNameMap[item]
       }
@@ -25,7 +25,7 @@ export const getBreadcrumb = (breadcrumbNameMap = [], url) => {
   return breadcrumb || {}
 }
 
-const conversionBreadcrumbList = (nextProps) => {
+const conversionBreadcrumbList = nextProps => {
   const {
     breadcrumbList,
     breadcrumbSeparator,
@@ -37,8 +37,7 @@ const conversionBreadcrumbList = (nextProps) => {
     linkElement = Link,
     home,
     route,
-  } =
-    nextProps || this.props
+  } = nextProps || this.props
 
   if (breadcrumbList && breadcrumbList.length) {
     return (
@@ -55,13 +54,13 @@ const conversionBreadcrumbList = (nextProps) => {
           //   location.href,
           // )
           return !item.active &&
-          item.href &&
-          !location.href.toLowerCase().endsWith(item.href) ? (
+            item.href &&
+            !location.href.toLowerCase().endsWith(item.href) ? (
             <Link
               key={index}
               to={item.href}
               disabled={item.disabled}
-              onClick={(e) => {
+              onClick={e => {
                 navigateDirtyCheck({
                   redirectUrl: item.href,
                   displayName: item.observe,
@@ -120,32 +119,33 @@ const conversionBreadcrumbList = (nextProps) => {
       // console.log(url, targetUrl)
       // console.log(location)
       // eslint-disable-next-line no-nested-ternary
-      return currentBreadcrumb.name &&
-      !currentBreadcrumb.hideInBreadcrumb ? location.pathname === targetUrl ? (
-        <Typography key={index} color='textPrimary'>
-          {name}
-        </Typography>
-      ) : (
-        <Link
-          key={index}
-          to={targetUrl}
-          onClick={(e) => {
-            const rt =
-              route.routes
-                .map((o) => o.routes || [])
-                .reduce((a, b) => {
-                  return a.concat(b)
-                }, [])
-                .find((o) => location.pathname === o.path) || {}
+      return currentBreadcrumb.name && !currentBreadcrumb.hideInBreadcrumb ? (
+        location.pathname === targetUrl ? (
+          <Typography key={index} color='textPrimary'>
+            {name}
+          </Typography>
+        ) : (
+          <Link
+            key={index}
+            to={targetUrl}
+            onClick={e => {
+              const rt =
+                route.routes
+                  .map(o => o.routes || [])
+                  .reduce((a, b) => {
+                    return a.concat(b)
+                  }, [])
+                  .find(o => location.pathname === o.path) || {}
 
-            navigateDirtyCheck({
-              redirectUrl: targetUrl,
-              displayName: rt.observe,
-            })(e)
-          }}
-        >
-          {name}
-        </Link>
+              navigateDirtyCheck({
+                redirectUrl: targetUrl,
+                displayName: rt.observe,
+              })(e)
+            }}
+          >
+            {name}
+          </Link>
+        )
       ) : null
     })
     return (
@@ -171,7 +171,7 @@ class BreadcrumbView extends PureComponent {
     breadcrumbSeparator: <NavigateNextIcon />,
   }
 
-  static getDerivedStateFromProps (nextProps, preState) {
+  static getDerivedStateFromProps(nextProps, preState) {
     const { breadcrumbList } = nextProps
     // console.log(
     //   breadcrumbList,
@@ -189,11 +189,11 @@ class BreadcrumbView extends PureComponent {
     return null
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.getBreadcrumbDom()
   }
 
-  componentDidUpdate (preProps) {
+  componentDidUpdate(preProps) {
     const { location, breadcrumbNameMap = [] } = this.props
     if (!location || !preProps.location) {
       return
@@ -234,13 +234,13 @@ class BreadcrumbView extends PureComponent {
         {breadcrumbList.map((item, index) => {
           const title = itemRender ? itemRender(item) : item.title
           return !item.active &&
-          item.href &&
-          !location.href.endsWith(item.href) ? (
+            item.href &&
+            !location.href.endsWith(item.href) ? (
             <Link
               key={index}
               to={item.href}
               disabled={item.disabled}
-              onClick={(e) => {
+              onClick={e => {
                 navigateDirtyCheck({
                   redirectUrl: item.href,
                   displayName: item.observe,
@@ -278,7 +278,7 @@ class BreadcrumbView extends PureComponent {
     )
   }
 
-  render () {
+  render() {
     const { breadcrumb } = this.state
     return breadcrumb
   }

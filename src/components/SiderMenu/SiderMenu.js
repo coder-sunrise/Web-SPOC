@@ -1,7 +1,7 @@
 import React, { PureComponent, Suspense } from 'react'
 import { Layout } from 'antd'
 // import { compose } from 'recompose'
-import Link from 'umi/link'
+import Link from 'umi'
 import cx from 'classnames'
 import withStyles from '@material-ui/core/styles/withStyles'
 import Drawer from '@material-ui/core/Drawer'
@@ -22,7 +22,7 @@ import styles from './index.less'
 const BaseMenu = React.lazy(() => import('./BaseMenu'))
 const { Sider } = Layout
 class SiderMenu extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       openKeys: getDefaultCollapsedSubMenus(props),
@@ -57,7 +57,7 @@ class SiderMenu extends PureComponent {
   //   })
   // };
 
-  render () {
+  render() {
     let {
       width,
       collapsed,

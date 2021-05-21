@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import Link from 'umi/link'
+import Link from 'umi'
 import RightContent from '../GlobalHeader/RightContent'
 import BaseMenu from '../SiderMenu/BaseMenu'
 import { getFlatMenuKeys } from '../SiderMenu/SiderMenuUtils'
@@ -11,7 +11,7 @@ export default class TopNavHeader extends PureComponent {
     maxWidth: undefined,
   }
 
-  static getDerivedStateFromProps (props) {
+  static getDerivedStateFromProps(props) {
     return {
       maxWidth:
         (props.contentWidth === 'Fixed' ? 1200 : window.innerWidth) -
@@ -21,7 +21,7 @@ export default class TopNavHeader extends PureComponent {
     }
   }
 
-  render () {
+  render() {
     const { theme, contentWidth, menuData, logo } = this.props
     const { maxWidth } = this.state
     const flatMenuKeys = getFlatMenuKeys(menuData)
@@ -30,12 +30,12 @@ export default class TopNavHeader extends PureComponent {
         className={`${styles.head} ${theme === 'light' ? styles.light : ''}`}
       >
         <div
-          ref={(ref) => {
+          ref={ref => {
             this.maim = ref
           }}
-          className={`${styles.main} ${contentWidth === 'Fixed'
-            ? styles.wide
-            : ''}`}
+          className={`${styles.main} ${
+            contentWidth === 'Fixed' ? styles.wide : ''
+          }`}
         >
           <div className={styles.left}>
             <div className={styles.logo} key='logo' id='logo'>

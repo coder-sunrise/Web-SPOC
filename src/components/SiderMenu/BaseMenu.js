@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { Menu } from 'antd'
-import Link from 'umi/link'
+import Link from 'umi'
 import isEqual from 'lodash/isEqual'
 import memoizeOne from 'memoize-one'
 import router from 'umi/router'
@@ -25,7 +25,12 @@ import StarBorder from '@material-ui/icons/StarBorder'
 import Icon from '@material-ui/core/Icon'
 import sidebarStyle from 'mui-pro-jss/material-dashboard-pro-react/components/sidebarStyle.jsx'
 import cx from 'classnames'
-import { isUrl, confirmBeforeReload, navigateDirtyCheck,difference } from '@/utils/utils'
+import {
+  isUrl,
+  confirmBeforeReload,
+  navigateDirtyCheck,
+  difference,
+} from '@/utils/utils'
 import styles from './index.less'
 import { getMenuMatches } from './SiderMenuUtils'
 import { urlToList } from '../_utils/pathTools'
@@ -36,7 +41,7 @@ const { SubMenu } = Menu
 //   icon: 'setting',
 //   icon: 'http://demo.com/icon.png',
 //   icon: <Icon type="setting" />,
-const getIcon = (icon) => {
+const getIcon = icon => {
   if (typeof icon === 'string' && isUrl(icon)) {
     return <img src={icon} alt='icon' className={styles.icon} />
   }
@@ -47,21 +52,22 @@ const getIcon = (icon) => {
 }
 const getSelectedMenuKeys = (pathname, props) => {
   const { flatMenuKeys } = props
-  return urlToList(pathname).map((itemPath) =>
+  return urlToList(pathname).map(itemPath =>
     getMenuMatches(flatMenuKeys, itemPath).pop(),
   )
 }
 class BaseMenu extends React.Component {
   state = {}
 
-  static getDerivedStateFromProps (nextProps, prevState) {
-    const { openKeys, location: { pathname } } = nextProps
+  static getDerivedStateFromProps(nextProps, prevState) {
+    const {
+      openKeys,
+      location: { pathname },
+    } = nextProps
     // console.log(this)
     let selectedKey = getSelectedMenuKeys(pathname, nextProps)
     if (!selectedKey.length && openKeys) {
-      selectedKey = [
-        openKeys[openKeys.length - 1],
-      ]
+      selectedKey = [openKeys[openKeys.length - 1]]
     }
     if (!isEqual(prevState.selectedKey, selectedKey)) {
       return {
@@ -72,14 +78,14 @@ class BaseMenu extends React.Component {
     return null
   }
 
-  shouldComponentUpdate=(nextProps,nextStates)=>{
+  shouldComponentUpdate = (nextProps, nextStates) => {
     // console.log(nextProps, this.props)
     // console.log(difference(nextStates,this.state))
     // console.log(difference(nextProps, this.props))
-    if(!_.isEqual(nextStates,this.state))return true
-    if(nextProps.collapsed!==this.props.collapsed)return true
-      return false
-    }
+    if (!_.isEqual(nextStates, this.state)) return true
+    if (nextProps.collapsed !== this.props.collapsed) return true
+    return false
+  }
 
   /**
    * 获得菜单子节点
@@ -91,12 +97,12 @@ class BaseMenu extends React.Component {
       return []
     }
     return menusData
-      .filter((item) => item.name && !item.hideInMenu)
+      .filter(item => item.name && !item.hideInMenu)
       .map((item, i) => this.getSubMenuOrItem(item, level))
-      .filter((item) => item)
+      .filter(item => item)
   }
 
-  openCollapse = (collapse) => {
+  openCollapse = collapse => {
     let st = {}
     if (this.state.selectedList === collapse) {
       st.selectedList = ''
@@ -128,7 +134,7 @@ class BaseMenu extends React.Component {
     if (
       item.children &&
       !item.hideChildrenInMenu &&
-      item.children.some((child) => child.name)
+      item.children.some(child => child.name)
     ) {
       const { name } = item
       const navLinkClasses = `${classes.itemLink} ${cx({
@@ -152,7 +158,7 @@ class BaseMenu extends React.Component {
             to='#' // "{item.path}"
             target={item.target}
             replace={item.path === location.pathname}
-            onClick={(e) => {
+            onClick={e => {
               this.openCollapse(key)
               e.preventDefault()
               return false
@@ -229,9 +235,7 @@ class BaseMenu extends React.Component {
     })}`
 
     const navLinkClasses = `${classes.itemLink} ${cx({
-      [` ${classes[color]}`]: this.state.selectedKey.find(
-        (o) => o === item.path,
-      ),
+      [` ${classes[color]}`]: this.state.selectedKey.find(o => o === item.path),
     })}`
     // console.log(item)
     return (
@@ -241,21 +245,27 @@ class BaseMenu extends React.Component {
           target={target}
           replace={itemPath === location.pathname}
           onClick={
-            isMobile ? (
-              () => {
-                onCollapse(true)
-              }
-            ) : (e)=>{
-              const {  route: { routes } } = this.props
-              const rt = routes.map(o=>o.routes || []).reduce((a,b)=>{
-                  return a.concat(b)
-              },[]).find(o=>location.pathname===o.path) ||{}
+            isMobile
+              ? () => {
+                  onCollapse(true)
+                }
+              : e => {
+                  const {
+                    route: { routes },
+                  } = this.props
+                  const rt =
+                    routes
+                      .map(o => o.routes || [])
+                      .reduce((a, b) => {
+                        return a.concat(b)
+                      }, [])
+                      .find(o => location.pathname === o.path) || {}
 
-              navigateDirtyCheck({
-                redirectUrl: itemPath,
-                displayName:rt.observe,
-              })(e)
-            }
+                  navigateDirtyCheck({
+                    redirectUrl: itemPath,
+                    displayName: rt.observe,
+                  })(e)
+                }
           }
           className={navLinkClasses}
         >
@@ -279,15 +289,20 @@ class BaseMenu extends React.Component {
     )
   }
 
-  conversionPath = (path) => {
+  conversionPath = path => {
     if (path && path.indexOf('http') === 0) {
       return path
     }
     return `/${path || ''}`.replace(/\/+/g, '/')
   }
 
-  render () {
-    const { openKeys, theme, mode, location: { pathname } } = this.props
+  render() {
+    const {
+      openKeys,
+      theme,
+      mode,
+      location: { pathname },
+    } = this.props
 
     const { handleOpenChange, style, menuData, classes } = this.props
     // console.log(selectedKey)

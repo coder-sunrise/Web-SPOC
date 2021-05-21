@@ -1,7 +1,7 @@
 import React, { PureComponent, Suspense } from 'react'
 import { Layout } from 'antd'
 import classNames from 'classnames'
-import Link from 'umi/link'
+import Link from 'umi'
 import styles from './index.less'
 import PageLoading from '../PageLoading'
 import { getDefaultCollapsedSubMenus } from './SiderMenuUtils'
@@ -10,14 +10,14 @@ const BaseMenu = React.lazy(() => import('./BaseMenu'))
 const { Sider } = Layout
 
 export default class SiderMenu extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       openKeys: getDefaultCollapsedSubMenus(props),
     }
   }
 
-  static getDerivedStateFromProps (props, state) {
+  static getDerivedStateFromProps(props, state) {
     const { pathname } = state
     if (props.location.pathname !== pathname) {
       return {
@@ -36,16 +36,17 @@ export default class SiderMenu extends PureComponent {
       }
       return false
     })
-  };
+  }
 
   handleOpenChange = openKeys => {
-    const moreThanOne = openKeys.filter(openKey => this.isMainMenu(openKey)).length > 1
+    const moreThanOne =
+      openKeys.filter(openKey => this.isMainMenu(openKey)).length > 1
     this.setState({
       openKeys: moreThanOne ? [openKeys.pop()] : [...openKeys],
     })
-  };
+  }
 
-  render () {
+  render() {
     const { logo, collapsed, onCollapse, fixSiderbar, theme } = this.props
     const { openKeys } = this.state
     const defaultProps = collapsed ? {} : { openKeys }
@@ -59,22 +60,22 @@ export default class SiderMenu extends PureComponent {
         trigger={null}
         collapsible
         collapsed={collapsed}
-        breakpoint="lg"
+        breakpoint='lg'
         onCollapse={onCollapse}
         width={256}
         theme={theme}
         className={siderClassName}
       >
-        <div className={styles.logo} id="logo">
-          <Link to="/">
-            <img src={logo} alt="logo" />
+        <div className={styles.logo} id='logo'>
+          <Link to='/'>
+            <img src={logo} alt='logo' />
             <h1>SEMR V2</h1>
           </Link>
         </div>
         <Suspense fallback={<PageLoading />}>
           <BaseMenu
             {...this.props}
-            mode="inline"
+            mode='inline'
             handleOpenChange={this.handleOpenChange}
             onOpenChange={this.handleOpenChange}
             style={{ padding: '16px 0', width: '100%' }}

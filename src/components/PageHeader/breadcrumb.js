@@ -7,7 +7,7 @@ import Breadcrumbs from '@material-ui/core/Breadcrumbs'
 import NavigateNextIcon from '@material-ui/icons/NavigateNext'
 import headerStyle from 'mui-pro-jss/material-dashboard-pro-react/components/headerStyle.jsx'
 import Button from 'mui-pro-components/CustomButtons'
-import Link from 'umi/link'
+import Link from 'umi'
 import styles from './index.less'
 import { urlToList } from '../_utils/pathTools'
 
@@ -16,7 +16,7 @@ import { navigateDirtyCheck } from '@/utils/utils'
 export const getBreadcrumb = (breadcrumbNameMap = [], url) => {
   let breadcrumb = breadcrumbNameMap[url]
   if (!breadcrumb) {
-    Object.keys(breadcrumbNameMap).forEach((item) => {
+    Object.keys(breadcrumbNameMap).forEach(item => {
       if (pathToRegexp(item).test(url)) {
         breadcrumb = breadcrumbNameMap[item]
       }
@@ -30,11 +30,11 @@ class BreadcrumbView extends PureComponent {
     breadcrumb: null,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.getBreadcrumbDom()
   }
 
-  componentDidUpdate (preProps) {
+  componentDidUpdate(preProps) {
     const { location, breadcrumbNameMap = [] } = this.props
     if (!location || !preProps.location) {
       return
@@ -78,21 +78,19 @@ class BreadcrumbView extends PureComponent {
     } = this.props
     return (
       <Breadcrumb className={styles.breadcrumb} separator={breadcrumbSeparator}>
-        {breadcrumbList.map((item) => {
+        {breadcrumbList.map(item => {
           const title = itemRender ? itemRender(item) : item.title
           return (
             <Breadcrumb.Item key={item.title}>
-              {item.href ? (
-                createElement(
-                  linkElement,
-                  {
-                    [linkElement === 'a' ? 'href' : 'to']: item.href,
-                  },
-                  title,
-                )
-              ) : (
-                title
-              )}
+              {item.href
+                ? createElement(
+                    linkElement,
+                    {
+                      [linkElement === 'a' ? 'href' : 'to']: item.href,
+                    },
+                    title,
+                  )
+                : title}
             </Breadcrumb.Item>
           )
         })}
@@ -130,33 +128,36 @@ class BreadcrumbView extends PureComponent {
       // console.log(url, targetUrl)
       // console.log(location)
       // eslint-disable-next-line no-nested-ternary
-      return currentBreadcrumb.name &&
-      !currentBreadcrumb.hideInBreadcrumb ? location.pathname === targetUrl ? (
-        <Typography key={index} color='textPrimary'>
-          {name}
-        </Typography>
-      ) : (
-        <Link
-          key={index}
-          to={targetUrl}
-          onClick={(e) => {
-            const { route: { routes } } = this.props
-            const rt =
-              routes
-                .map((o) => o.routes || [])
-                .reduce((a, b) => {
-                  return a.concat(b)
-                }, [])
-                .find((o) => location.pathname === o.path) || {}
+      return currentBreadcrumb.name && !currentBreadcrumb.hideInBreadcrumb ? (
+        location.pathname === targetUrl ? (
+          <Typography key={index} color='textPrimary'>
+            {name}
+          </Typography>
+        ) : (
+          <Link
+            key={index}
+            to={targetUrl}
+            onClick={e => {
+              const {
+                route: { routes },
+              } = this.props
+              const rt =
+                routes
+                  .map(o => o.routes || [])
+                  .reduce((a, b) => {
+                    return a.concat(b)
+                  }, [])
+                  .find(o => location.pathname === o.path) || {}
 
-            navigateDirtyCheck({
-              redirectUrl: targetUrl,
-              displayName: rt.observe,
-            })(e)
-          }}
-        >
-          {name}
-        </Link>
+              navigateDirtyCheck({
+                redirectUrl: targetUrl,
+                displayName: rt.observe,
+              })(e)
+            }}
+          >
+            {name}
+          </Link>
+        )
       ) : null
     })
     // Add home breadcrumbs to your head
@@ -208,7 +209,7 @@ class BreadcrumbView extends PureComponent {
       return (
         <Breadcrumb
           className={classes.breadcrumb}
-          routes={routes.filter((route) => route.breadcrumbName)}
+          routes={routes.filter(route => route.breadcrumbName)}
           params={params}
           itemRender={this.itemRender}
           separator={breadcrumbSeparator}
@@ -242,7 +243,7 @@ class BreadcrumbView extends PureComponent {
     )
   }
 
-  render () {
+  render() {
     const { breadcrumb } = this.state
     return breadcrumb
   }

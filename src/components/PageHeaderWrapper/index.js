@@ -1,6 +1,6 @@
 import React from 'react'
 import { FormattedMessage } from 'umi/locale'
-import Link from 'umi/link'
+import Link from 'umi'
 import { connect } from 'dva'
 import Paper from '@material-ui/core/Paper'
 import PageHeader from '@/components/PageHeader'

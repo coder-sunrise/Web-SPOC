@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import Link from 'umi/link'
+import Link from 'umi'
 import router from 'umi/router'
 import { Card, Row, Col, Icon, Avatar, Tag, Divider, Spin, Input } from 'antd'
 import GridContent from '@/components/PageHeaderWrapper/GridContent'
@@ -20,7 +20,7 @@ class Center extends PureComponent {
     inputValue: '',
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props
     // dispatch({
     //   type: 'user/fetchCurrent',
@@ -36,7 +36,7 @@ class Center extends PureComponent {
     })
   }
 
-  onTabChange = (key) => {
+  onTabChange = key => {
     const { match } = this.props
     switch (key) {
       case 'articles':
@@ -57,11 +57,11 @@ class Center extends PureComponent {
     this.setState({ inputVisible: true }, () => this.input.focus())
   }
 
-  saveInputRef = (input) => {
+  saveInputRef = input => {
     this.input = input
   }
 
-  handleInputChange = (e) => {
+  handleInputChange = e => {
     this.setState({ inputValue: e.target.value })
   }
 
@@ -71,7 +71,7 @@ class Center extends PureComponent {
     let { newTags } = state
     if (
       inputValue &&
-      newTags.filter((tag) => tag.label === inputValue).length === 0
+      newTags.filter(tag => tag.label === inputValue).length === 0
     ) {
       newTags = [
         ...newTags,
@@ -85,7 +85,7 @@ class Center extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { newTags, inputVisible, inputValue } = this.state
     const {
       listLoading,
@@ -159,9 +159,9 @@ class Center extends PureComponent {
                   <Divider dashed />
                   <div className={styles.tags}>
                     <div className={styles.tagsTitle}>标签</div>
-                    {currentUser.tags
-                      .concat(newTags)
-                      .map((item) => <Tag key={item.key}>{item.label}</Tag>)}
+                    {currentUser.tags.concat(newTags).map(item => (
+                      <Tag key={item.key}>{item.label}</Tag>
+                    ))}
                     {inputVisible && (
                       <Input
                         ref={this.saveInputRef}
@@ -188,7 +188,7 @@ class Center extends PureComponent {
                     <div className={styles.teamTitle}>团队</div>
                     <Spin spinning={projectLoading}>
                       <Row gutter={36}>
-                        {notice.map((item) => (
+                        {notice.map(item => (
                           <Col key={item.id} lg={24} xl={12}>
                             <Link to={item.href}>
                               <Avatar size='small' src={item.logo} />
