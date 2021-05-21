@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'dva'
-import router from 'umi/router'
+import { history } from 'umi'
 import _ from 'lodash'
 import numeral from 'numeral'
 import Timer from 'react-compound-timer'
@@ -56,7 +56,6 @@ import Layout from './Layout'
 import schema from './schema'
 import styles from './style'
 import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
-// window.g_app.replaceModel(model)
 
 const discardMessage = 'Discard consultation?'
 const onPageLeaveMessage = 'Do you want to save consultation notes?'
@@ -96,26 +95,28 @@ const generatePrintData = async (
     let getPrintData = (type, list) => {
       if (list && list.length > 0) {
         const documentType = consultationDocumentTypes.find(
-          (o) => o.name === type,
+          o => o.name === type,
         )
-        return list.filter((item) => !item.isDeleted).map((item) => ({
-          item: type,
-          description: `  ${item.subject || ''}`,
-          Copies: 1,
-          print: true,
-          ReportId: documentType.downloadConfig.id,
-          ReportData: `${JSON.stringify(
-            commonDataReaderTransform(
-              documentType.downloadConfig.draft({
-                ...item,
-                doctorName,
-                doctorMCRNo,
-                patientName,
-                patientAccountNo,
-              }),
-            ),
-          )}`,
-        }))
+        return list
+          .filter(item => !item.isDeleted)
+          .map(item => ({
+            item: type,
+            description: `  ${item.subject || ''}`,
+            Copies: 1,
+            print: true,
+            ReportId: documentType.downloadConfig.id,
+            ReportData: `${JSON.stringify(
+              commonDataReaderTransform(
+                documentType.downloadConfig.draft({
+                  ...item,
+                  doctorName,
+                  doctorMCRNo,
+                  patientName,
+                  patientAccountNo,
+                }),
+              ),
+            )}`,
+          }))
       }
       return []
     }
@@ -126,7 +127,7 @@ const generatePrintData = async (
         const { rows = [] } = orders
         // prescriptionItems
         const prescriptionItems = rows.filter(
-          (f) => f.type === '1' && !f.isDeleted,
+          f => f.type === '1' && !f.isDeleted,
         )
         let drugLabelData = await getDrugLabelPrintData(
           settings,
@@ -193,7 +194,7 @@ const saveConsultation = ({
         ...values,
         corDiagnosis: [
           ...values.corDiagnosis.filter(
-            (diagnosis) => diagnosis.diagnosisFK !== undefined,
+            diagnosis => diagnosis.diagnosisFK !== undefined,
           ),
         ],
       },
@@ -222,7 +223,7 @@ const saveConsultation = ({
     dispatch({
       type: `consultation/${action}`,
       payload: cleanConsultation(newValues),
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         if (successMessage) {
           notification.success({
@@ -296,7 +297,7 @@ const pauseConsultation = ({
       ...values,
       corDiagnosis: [
         ...values.corDiagnosis.filter(
-          (diagnosis) => diagnosis.diagnosisFK !== undefined,
+          diagnosis => diagnosis.diagnosisFK !== undefined,
         ),
       ],
     },
@@ -324,7 +325,7 @@ const pauseConsultation = ({
   dispatch({
     type: `consultation/pause`,
     payload: newValues,
-  }).then((r) => {
+  }).then(r => {
     if (r) {
       sessionStorage.removeItem(`${values.id}_consultationTimer`)
       notification.success({
@@ -442,7 +443,7 @@ const pauseConsultation = ({
           showSignOffModal: true,
           printData,
           showInvoiceAmountNegativeWarning: summary && summary.totalWithGST < 0,
-          onSignOffConfirm: (result) => {
+          onSignOffConfirm: result => {
             saveConsultation({
               props: {
                 values,
@@ -456,7 +457,7 @@ const pauseConsultation = ({
                   let printedData = result
                   if (printedData && printedData.length > 0) {
                     const token = localStorage.getItem('token')
-                    printedData = printedData.map((item) => ({
+                    printedData = printedData.map(item => ({
                       ReportId: item.ReportId,
                       DocumentName: `${item.item}(${item.description})`,
                       ReportData: item.ReportData,
@@ -507,7 +508,7 @@ class Main extends React.Component {
     recording: true,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     // console.log('Main')
     initRoomAssignment()
     setTimeout(() => {
@@ -521,13 +522,8 @@ class Main extends React.Component {
       const packages = pendingPackage.reduce(
         (distinct, data) =>
           distinct.includes(data.patientPackageFK)
-            ? [
-                ...distinct,
-              ]
-            : [
-                ...distinct,
-                data.patientPackageFK,
-              ],
+            ? [...distinct]
+            : [...distinct, data.patientPackageFK],
         [],
       )
 
@@ -542,7 +538,7 @@ class Main extends React.Component {
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.dispatch({
       type: 'consultation/updateState',
       payload: {
@@ -564,7 +560,7 @@ class Main extends React.Component {
     })
   }
 
-  shouldComponentUpdate = (nextProps) => {
+  shouldComponentUpdate = nextProps => {
     if (nextProps.values.id !== this.props.values.id) return true
     if (nextProps.consultation.version !== this.props.consultation.version)
       return true
@@ -633,7 +629,7 @@ class Main extends React.Component {
   //     type: 'consultation/discard',
   //     payload: values.id,
   //   })
-  //   router.push('/reception/queue')
+  //   history.push('/reception/queue')
   // }
 
   resumeConsultation = () => {
@@ -651,13 +647,13 @@ class Main extends React.Component {
         id: visitRegistration.entity.visit.id,
         // version: Date.now(),
       },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         notification.success({
           message: 'Consultation resumed',
         })
         resetForm(r)
-        router.push(
+        history.push(
           getAppendUrl({
             v: Date.now(),
           }),
@@ -766,10 +762,10 @@ class Main extends React.Component {
     } = visit
 
     const isModifiedOrder = _.isEqual(
-      rows.filter((i) => !(i.id === undefined && i.isDeleted)),
+      rows.filter(i => !(i.id === undefined && i.isDeleted)),
       _originalRows,
     )
-    if (forms.rows.filter((o) => o.statusFK === 1 && !o.isDeleted).length > 0) {
+    if (forms.rows.filter(o => o.statusFK === 1 && !o.isDeleted).length > 0) {
       notification.warning({
         message: `Draft forms found, please finalize it before sign off.`,
       })
@@ -856,11 +852,8 @@ class Main extends React.Component {
               {({ rights }) => {
                 //
                 return rights === 'enable' &&
-                [
-                  'IN CONS',
-                  'WAITING',
-                ].includes(visit.visitStatus) &&
-                values.id ? (
+                  ['IN CONS', 'WAITING'].includes(visit.visitStatus) &&
+                  values.id ? (
                   <GridItem>
                     <h5 style={{ marginTop: -3, fontWeight: 'bold' }}>
                       <Timer
@@ -900,16 +893,19 @@ class Main extends React.Component {
                                 }}
                               />
                               <Timer.Hours
-                                formatValue={(value) =>
-                                  `${numeral(value).format('00')} : `}
+                                formatValue={value =>
+                                  `${numeral(value).format('00')} : `
+                                }
                               />
                               <Timer.Minutes
-                                formatValue={(value) =>
-                                  `${numeral(value).format('00')} : `}
+                                formatValue={value =>
+                                  `${numeral(value).format('00')} : `
+                                }
                               />
                               <Timer.Seconds
-                                formatValue={(value) =>
-                                  `${numeral(value).format('00')}`}
+                                formatValue={value =>
+                                  `${numeral(value).format('00')}`
+                                }
                               />
                             </React.Fragment>
                           )
@@ -980,10 +976,7 @@ class Main extends React.Component {
               )}
               <Authorized authority='patientdashboard.startresumeconsultation'>
                 <React.Fragment>
-                  {[
-                    'IN CONS',
-                    'WAITING',
-                  ].includes(visit.visitStatus) && (
+                  {['IN CONS', 'WAITING'].includes(visit.visitStatus) && (
                     <ProgressButton
                       onClick={this.pauseConsultation}
                       color='info'
@@ -1018,13 +1011,13 @@ class Main extends React.Component {
     )
   }
 
-  saveLayout = (layout) => {
+  saveLayout = layout => {
     this.props
       .dispatch({
         type: 'consultation/saveLayout',
         payload: layout,
       })
-      .then((o) => {
+      .then(o => {
         if (o)
           notification.success({
             message: 'My favourite widget layout saved',
@@ -1032,7 +1025,7 @@ class Main extends React.Component {
       })
   }
 
-  loadTemplate = (v) => {
+  loadTemplate = v => {
     const exist = this.props.values
     const { consultationDocument = {}, orders = {}, forms = {} } = this.props
     const mergeArrayProps = [
@@ -1055,11 +1048,8 @@ class Main extends React.Component {
       forms,
     })
     exist.isGstInclusive = currentValue.isGSTInclusive
-    mergeArrayProps.forEach((p) => {
-      exist[p] = [
-        ...currentValue[p],
-        ...v[p],
-      ]
+    mergeArrayProps.forEach(p => {
+      exist[p] = [...currentValue[p], ...v[p]]
     })
     if (v.corDoctorNote && v.corDoctorNote.length > 0) {
       if (exist.corDoctorNote && exist.corDoctorNote.length > 0) {
@@ -1070,15 +1060,13 @@ class Main extends React.Component {
         } = exist.corDoctorNote[0]
 
         if (chiefComplaints)
-          exist.corDoctorNote[0].chiefComplaints = `${chiefComplaints}<br/>${v
-            .corDoctorNote[0].chiefComplaints}`
+          exist.corDoctorNote[0].chiefComplaints = `${chiefComplaints}<br/>${v.corDoctorNote[0].chiefComplaints}`
         else
           exist.corDoctorNote[0].chiefComplaints =
             v.corDoctorNote[0].chiefComplaints
 
         if (clinicianNote)
-          exist.corDoctorNote[0].clinicianNote = `${clinicianNote}<br/>${v
-            .corDoctorNote[0].clinicianNote}`
+          exist.corDoctorNote[0].clinicianNote = `${clinicianNote}<br/>${v.corDoctorNote[0].clinicianNote}`
         else
           exist.corDoctorNote[0].clinicianNote =
             v.corDoctorNote[0].clinicianNote
@@ -1087,9 +1075,7 @@ class Main extends React.Component {
           exist.corDoctorNote[0].plan = `${plan}<br/>${v.corDoctorNote[0].plan}`
         else exist.corDoctorNote[0].plan = v.corDoctorNote[0].plan
       } else {
-        exist.corDoctorNote = [
-          ...v.corDoctorNote,
-        ]
+        exist.corDoctorNote = [...v.corDoctorNote]
       }
     }
     // console.log(exist)
@@ -1137,7 +1123,7 @@ class Main extends React.Component {
     })
   }
 
-  render () {
+  render() {
     const { props, state } = this
     const {
       classes,
