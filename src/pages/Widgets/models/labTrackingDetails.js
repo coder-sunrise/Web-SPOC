@@ -1,10 +1,10 @@
 import { createListViewModel } from 'medisys-model'
-import * as service from '../services'
+import service from '../LabTrackingDetails/services'
 
 export default createListViewModel({
   namespace: 'labTrackingDetails',
   config: {
-   queryOnLoad:false,
+    queryOnLoad: false,
   },
   param: {
     service,
@@ -20,7 +20,7 @@ export default createListViewModel({
     },
     effects: {},
     reducers: {
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         const { data } = payload
         return {
           ...st,

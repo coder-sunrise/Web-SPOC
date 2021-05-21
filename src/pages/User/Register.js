@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'dva'
 import Link, { formatMessage, FormattedMessage } from 'umi'
 
-import router from 'umi/router'
+import router from 'umi'
 import { Form, Input, Button, Select, Row, Col, Popover, Progress } from 'antd'
 import styles from './Register.less'
 
@@ -52,7 +52,7 @@ class Register extends Component {
     const { form, register } = this.props
     const account = form.getFieldValue('mail')
     if (register.status === 'ok') {
-      router.push({
+      history.push({
         pathname: '/user/register-result',
         state: {
           account,

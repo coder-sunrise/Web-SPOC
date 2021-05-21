@@ -1,8 +1,8 @@
-import router from 'umi/router'
+import { history } from 'umi'
 import { createFormViewModel } from 'medisys-model'
 import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import { notification } from '@/components'
-import * as service from '../services/dispense'
+import service from '../services/dispense'
 
 export default createFormViewModel({
   namespace: 'dispense',
@@ -22,9 +22,7 @@ export default createFormViewModel({
           invoiceItem: [],
         },
       },
-      selectedWidgets: [
-        '1',
-      ],
+      selectedWidgets: ['1'],
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -44,9 +42,9 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *initState ({ payload }, { all, put, select, take }) {
+      *initState({ payload }, { all, put, select, take }) {
         const { version, visitID, md2, qid } = payload
-        const patientState = yield select((st) => st.patient)
+        const patientState = yield select(st => st.patient)
 
         yield put({
           type: 'updateState',
@@ -85,7 +83,7 @@ export default createFormViewModel({
         yield take('query/@@end')
       },
 
-      *start ({ payload }, { call, put }) {
+      *start({ payload }, { call, put }) {
         const response = yield call(service.create, payload.id)
         const { id } = response
         if (id) {
@@ -104,7 +102,7 @@ export default createFormViewModel({
         }
         return response
       },
-      *refresh ({ payload }, { call, put }) {
+      *refresh({ payload }, { call, put }) {
         const response = yield call(service.refresh, payload)
         if (response) {
           yield put({
@@ -118,14 +116,12 @@ export default createFormViewModel({
         return response
       },
 
-      *save ({ payload }, { call }) {
+      *save({ payload }, { call }) {
         const response = yield call(service.save, payload)
         return response
       },
-      *discard ({ payload }, { call, select }) {
-        const visitRegistration = yield select(
-          (state) => state.visitRegistration,
-        )
+      *discard({ payload }, { call, select }) {
+        const visitRegistration = yield select(state => state.visitRegistration)
         const { entity } = visitRegistration
 
         const response = yield call(service.remove, payload)
@@ -137,10 +133,8 @@ export default createFormViewModel({
         }
         return response
       },
-      *finalize ({ payload }, { call, put, select }) {
-        const visitRegistration = yield select(
-          (state) => state.visitRegistration,
-        )
+      *finalize({ payload }, { call, put, select }) {
+        const visitRegistration = yield select(state => state.visitRegistration)
         const { entity } = visitRegistration
 
         const response = yield call(service.finalize, payload)
@@ -157,11 +151,11 @@ export default createFormViewModel({
         })
         return response
       },
-      *unlock ({ payload }, { call }) {
+      *unlock({ payload }, { call }) {
         const response = yield call(service.unlock, payload)
         return response
       },
-      *closeModal ({ payload = { toBillingPage: false } }, { call, put }) {
+      *closeModal({ payload = { toBillingPage: false } }, { call, put }) {
         const { toBillingPage = false } = payload
 
         yield put({
@@ -179,11 +173,11 @@ export default createFormViewModel({
               entity: undefined,
             },
           })
-          router.push('/reception/queue')
+          history.push('/reception/queue')
         }
       },
 
-      *queryAddOrderDetails ({ payload }, { call, put }) {
+      *queryAddOrderDetails({ payload }, { call, put }) {
         const response = yield call(service.queryAddOrderDetails, {
           invoiceId: payload.invoiceId,
           isInitialLoading: payload.isInitialLoading,
@@ -199,7 +193,7 @@ export default createFormViewModel({
         return false
       },
 
-      *saveAddOrderDetails ({ payload }, { call }) {
+      *saveAddOrderDetails({ payload }, { call }) {
         const response = yield call(service.saveAddOrderDetails, payload)
         if (response === 204) {
           notification.success({ message: 'Saved' })
@@ -208,10 +202,8 @@ export default createFormViewModel({
         return false
       },
 
-      *removeAddOrderDetails ({ payload }, { call, select }) {
-        const visitRegistration = yield select(
-          (state) => state.visitRegistration,
-        )
+      *removeAddOrderDetails({ payload }, { call, select }) {
+        const visitRegistration = yield select(state => state.visitRegistration)
         const { entity } = visitRegistration
 
         const response = yield call(service.removeAddOrderDetails, payload)
@@ -225,10 +217,8 @@ export default createFormViewModel({
         }
         return false
       },
-      *discardBillOrder ({ payload }, { call, select }) {
-        const visitRegistration = yield select(
-          (state) => state.visitRegistration,
-        )
+      *discardBillOrder({ payload }, { call, select }) {
+        const visitRegistration = yield select(state => state.visitRegistration)
         const { entity } = visitRegistration
 
         const response = yield call(service.removeBillFirstVisit, payload)
@@ -243,9 +233,9 @@ export default createFormViewModel({
         return false
       },
 
-      *updateShouldRefreshOrder ({ payload }, { put, select }) {
-        const user = yield select((state) => state.user)
-        const dispense = yield select((state) => state.dispense)
+      *updateShouldRefreshOrder({ payload }, { put, select }) {
+        const user = yield select(state => state.user)
+        const dispense = yield select(state => state.dispense)
         const { visitID, senderId } = payload
         const { entity = {} } = dispense || {}
         if (entity && entity.id === visitID && senderId !== user.data.id) {
@@ -259,10 +249,10 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      incrementLoadCount (state) {
+      incrementLoadCount(state) {
         return { ...state, loadCount: state.loadCount + 1 }
       },
-      getAddOrderDetails (state, { payload }) {
+      getAddOrderDetails(state, { payload }) {
         const { data } = payload
         return {
           ...state,

@@ -2,19 +2,18 @@ import React, { PureComponent } from 'react'
 import { FieldArray, withFormik } from 'formik'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
-import VisitValidationSchema from './validationScheme'
-import model from './models'
+// import model from './models'
 import VitalSignCard from './VitalSignCard'
 
-window.g_app.replaceModel(model)
+// window.g_app.replaceModel(model)
 
-const styles = (theme) => ({})
+const styles = theme => ({})
 
 @connect(({ patientVitalSign }) => ({
   patientVitalSign,
 }))
 class index extends PureComponent {
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (
       !this.props.patientVitalSign.shouldAddNew &&
       nextProps.patientVitalSign.shouldAddNew
@@ -41,7 +40,7 @@ class index extends PureComponent {
     })
   }
 
-  handleCalculateBMI = (i) => {
+  handleCalculateBMI = i => {
     const { form } = this.arrayHelpers
     const { heightCM, weightKG } = form.values.corPatientNoteVitalSign[i]
     const { setFieldValue, setFieldTouched } = form
@@ -55,16 +54,16 @@ class index extends PureComponent {
     }
   }
 
-  render () {
+  render() {
     const { theme, values } = this.props
     return (
       <div>
         <FieldArray
           name='corPatientNoteVitalSign'
-          render={(arrayHelpers) => {
+          render={arrayHelpers => {
             this.arrayHelpers = arrayHelpers
-            return (arrayHelpers.form.values.corPatientNoteVitalSign || [])
-              .map((v, i) => {
+            return (arrayHelpers.form.values.corPatientNoteVitalSign || []).map(
+              (v, i) => {
                 if (v.isDeleted === true) return null
                 return (
                   <div key={i}>
@@ -76,7 +75,8 @@ class index extends PureComponent {
                     />
                   </div>
                 )
-              })
+              },
+            )
           }}
         />
       </div>

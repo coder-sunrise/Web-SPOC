@@ -7,11 +7,10 @@ import Breadcrumbs from '@material-ui/core/Breadcrumbs'
 import NavigateNextIcon from '@material-ui/icons/NavigateNext'
 import headerStyle from 'mui-pro-jss/material-dashboard-pro-react/components/headerStyle.jsx'
 import Button from 'mui-pro-components/CustomButtons'
-import Link from 'umi'
+import { Link } from 'umi'
+import { navigateDirtyCheck } from '@/utils/utils'
 import styles from './index.less'
 import { urlToList } from '../_utils/pathTools'
-
-import { navigateDirtyCheck } from '@/utils/utils'
 
 export const getBreadcrumb = (breadcrumbNameMap = [], url) => {
   let breadcrumb = breadcrumbNameMap[url]

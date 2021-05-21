@@ -1,7 +1,7 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import { notification } from '@/components'
-import * as service from '../services/folder'
+import service from '../services/folder'
 
 export default createListViewModel({
   namespace: 'folder',
@@ -27,25 +27,22 @@ export default createListViewModel({
       })
     },
     effects: {
-      *upsertList ({ payload }, { call, put }) {
+      *upsertList({ payload }, { call, put }) {
         const response = yield call(service.upsertList, payload)
         if (response) notification.success({ message: 'Updated.' })
         return response
       },
     },
     reducers: {
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         const { data } = payload
 
         return {
           ...st,
-          list: data.data.map((o) => {
+          list: data.data.map(o => {
             return {
               ...o,
-              effectiveDates: [
-                o.effectiveStartDate,
-                o.effectiveEndDate,
-              ],
+              effectiveDates: [o.effectiveStartDate, o.effectiveEndDate],
             }
           }),
         }

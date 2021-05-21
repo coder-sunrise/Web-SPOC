@@ -1,7 +1,7 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import { notification } from '@/components'
-import * as service from '../services'
+import service from '../services'
 
 export default createListViewModel({
   namespace: 'medisaveClaimSubmissionApproved',
@@ -24,7 +24,7 @@ export default createListViewModel({
       })
     },
     effects: {
-      *getCurrentBizSession (_, { put, call }) {
+      *getCurrentBizSession(_, { put, call }) {
         const bizSessionPayload = {
           IsClinicSessionClosed: false,
         }
@@ -43,14 +43,14 @@ export default createListViewModel({
         }
         return false
       },
-      *getAllBizSession ({ payload }, { put, call }) {
+      *getAllBizSession({ payload }, { put, call }) {
         const response = yield call(service.getBizSession, payload)
         yield put({
           type: 'setAllBizSession',
           payload: response.status === '200' ? response.data : {},
         })
       },
-      *getApprovedStatus ({ payload }, { put, call }) {
+      *getApprovedStatus({ payload }, { put, call }) {
         const response = yield call(service.getMedisaveStatus, payload)
         const { data, status } = response
         if (status === '200') {
@@ -58,10 +58,10 @@ export default createListViewModel({
         }
         return false
       },
-      *submitAddPayment ({ payload }, { call, put, select }) {
-        const userState = yield select((state) => state.user.data)
+      *submitAddPayment({ payload }, { call, put, select }) {
+        const userState = yield select(state => state.user.data)
         const bizSessionState = yield select(
-          (state) => state.invoicePayment.currentBizSessionInfo,
+          state => state.invoicePayment.currentBizSessionInfo,
         )
 
         let addPaymentPayload = {}
@@ -91,19 +91,19 @@ export default createListViewModel({
         return false
       },
 
-      *submitInvoicePayment ({ payload }, { put, call }) {
+      *submitInvoicePayment({ payload }, { put, call }) {
         const response = yield call(service.postInvoicePayment, payload)
         return response !== false
         // const { data, status } = response
         // if (status === '200') {
-          // notification.success({ message: 'Collected' })
+        // notification.success({ message: 'Collected' })
         //   return true
         // }
         // return false
       },
     },
     reducers: {
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         const { data } = payload
 
         return {
@@ -111,7 +111,7 @@ export default createListViewModel({
           list: data.data,
         }
       },
-      setCurrentBizSession (state, { payload }) {
+      setCurrentBizSession(state, { payload }) {
         return {
           ...state,
           currentBizSessionInfo: {
@@ -120,11 +120,11 @@ export default createListViewModel({
         }
       },
 
-      setAllBizSession (state, { payload }) {
+      setAllBizSession(state, { payload }) {
         const { data } = payload
         return {
           ...state,
-          bizSessionList: data.map((x) => {
+          bizSessionList: data.map(x => {
             return {
               value: x.id,
               name: x.sessionNo,

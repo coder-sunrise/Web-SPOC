@@ -1,8 +1,8 @@
 import { createListViewModel } from 'medisys-model'
-import router from 'umi/router'
+import router from 'umi'
 import _ from 'lodash'
-import * as service from '../services/cestemplate'
 import { sleep, removeFields } from '@/utils/utils'
+import service from '../services/cestemplate'
 
 export default createListViewModel({
   namespace: 'cestemplate',
@@ -14,8 +14,8 @@ export default createListViewModel({
     },
     subscriptions: ({ dispatch, history, ...restProps }) => {},
     effects: {
-      *query ({ payload }, { call, put, select, take }) {
-        const user = yield select((st) => st.user)
+      *query({ payload }, { call, put, select, take }) {
+        const user = yield select(st => st.user)
         const response = yield call(service.queryList, user.data.id)
         if (response.data) {
           yield put({
@@ -28,7 +28,7 @@ export default createListViewModel({
         return response.data
       },
 
-      *queryOne ({ payload }, { call, put, select, take }) {
+      *queryOne({ payload }, { call, put, select, take }) {
         const response = yield call(service.queryOne, Number(payload))
         if (response.data) {
           const entity = response.data
@@ -42,9 +42,9 @@ export default createListViewModel({
         return null
       },
 
-      *create ({ payload }, { call, put, select, take }) {
+      *create({ payload }, { call, put, select, take }) {
         const { name } = payload
-        const consultation = yield select((st) => st.consultation)
+        const consultation = yield select(st => st.consultation)
         const { entity } = consultation
         const cloneEntity = _.cloneDeep(entity)
         delete cloneEntity.corPatientNoteVitalSign
@@ -59,8 +59,8 @@ export default createListViewModel({
 
         return yield call(service.create, name, cloneEntity)
       },
-      *update ({ payload }, { call, put, select, take }) {
-        const consultation = yield select((st) => st.consultation)
+      *update({ payload }, { call, put, select, take }) {
+        const consultation = yield select(st => st.consultation)
         const { entity } = consultation
         const cloneEntity = _.cloneDeep(entity)
         delete cloneEntity.corPatientNoteVitalSign
@@ -75,7 +75,7 @@ export default createListViewModel({
 
         return yield call(service.update, Number(payload), cloneEntity)
       },
-      *delete ({ payload }, { call, put, select, take }) {
+      *delete({ payload }, { call, put, select, take }) {
         return yield call(service.delete, payload)
       },
     },

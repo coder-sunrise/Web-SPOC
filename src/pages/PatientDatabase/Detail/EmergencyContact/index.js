@@ -10,9 +10,10 @@ import {
   Tooltip,
 } from '@/components'
 import Loading from '@/components/PageLoading/index'
-import { query } from '@/services/patient'
+import service from '@/services/patient'
 import { getUniqueId } from '@/utils/utils'
 
+const { query } = service
 class EmergencyContact extends PureComponent {
   state = {
     editingRowIds: [],
@@ -37,12 +38,12 @@ class EmergencyContact extends PureComponent {
     columnExtensions: [
       {
         columnName: 'name',
-        isDisabled: (row) => !!row.emergencyContactFK,
+        isDisabled: row => !!row.emergencyContactFK,
       },
       {
         columnName: 'accountNo',
         maxLength: 20,
-        isDisabled: (row) => !!row.emergencyContactFK,
+        isDisabled: row => !!row.emergencyContactFK,
       },
       {
         columnName: 'relationshipFK',
@@ -56,14 +57,14 @@ class EmergencyContact extends PureComponent {
         columnName: 'accountNoTypeFK',
         type: 'codeSelect',
         code: 'ctPatientAccountNoType',
-        isDisabled: (row) => {
+        isDisabled: row => {
           return !!row.emergencyContactFK
         },
         dropdownMatchSelectWidth: false,
       },
       {
         columnName: 'address',
-        isDisabled: (row) => !!row.emergencyContactFK,
+        isDisabled: row => !!row.emergencyContactFK,
       },
       {
         columnName: 'salutationFK',
@@ -71,7 +72,7 @@ class EmergencyContact extends PureComponent {
         type: 'codeSelect',
         code: 'ctSalutation',
         // sortingEnabled: false,
-        isDisabled: (row) => !!row.emergencyContactFK,
+        isDisabled: row => !!row.emergencyContactFK,
       },
       {
         columnName: 'isPrimaryContact',
@@ -86,10 +87,10 @@ class EmergencyContact extends PureComponent {
             const patientEmergencyContact = _.cloneDeep(
               values.patientEmergencyContact,
             )
-            patientEmergencyContact.forEach((pec) => {
+            patientEmergencyContact.forEach(pec => {
               pec.isPrimaryContact = false
             })
-            const r = patientEmergencyContact.find((o) => o.id === row.id)
+            const r = patientEmergencyContact.find(o => o.id === row.id)
             if (r) {
               r.isPrimaryContact = true
             }
@@ -122,23 +123,21 @@ class EmergencyContact extends PureComponent {
     },
   })
 
-  onRowDoubleClick = (row) => {
-    if (!this.state.editingRowIds.find((o) => o === row.id)) {
-      this.setState((prevState) => ({
-        editingRowIds: prevState.editingRowIds.concat([
-          row.id,
-        ]),
+  onRowDoubleClick = row => {
+    if (!this.state.editingRowIds.find(o => o === row.id)) {
+      this.setState(prevState => ({
+        editingRowIds: prevState.editingRowIds.concat([row.id]),
       }))
     }
   }
 
   toggleModal = () => {
-    this.setState((prevState) => ({
+    this.setState(prevState => ({
       showModal: !prevState.showModal,
     }))
   }
 
-  onEditingRowIdsChange = (ids) => {
+  onEditingRowIdsChange = ids => {
     this.setState({
       editingRowIds: ids,
     })
@@ -151,7 +150,7 @@ class EmergencyContact extends PureComponent {
     setFieldValue('patientEmergencyContact', rows)
   }
 
-  onAddExistPatient = async (row) => {
+  onAddExistPatient = async row => {
     const { props } = this
     const { values, setFieldValue, dispatch } = props
     if (!row || !row.id) return
@@ -160,7 +159,7 @@ class EmergencyContact extends PureComponent {
     const patientEmergencyContact = _.cloneDeep(values.patientEmergencyContact)
     if (
       patientEmergencyContact.find(
-        (m) => m.emergencyContactFK === o.id && !m.isDeleted,
+        m => m.emergencyContactFK === o.id && !m.isDeleted,
       )
     ) {
       notification.warn({
@@ -174,8 +173,7 @@ class EmergencyContact extends PureComponent {
       })
       return
     }
-    const primaryAddress =
-      o.contact.contactAddress.find((m) => m.isPrimary) || {}
+    const primaryAddress = o.contact.contactAddress.find(m => m.isPrimary) || {}
     const newId = getUniqueId()
     patientEmergencyContact.push({
       id: newId,
@@ -210,7 +208,7 @@ class EmergencyContact extends PureComponent {
     this.toggleModal()
   }
 
-  renderActionFn = (row) => {
+  renderActionFn = row => {
     return (
       <Tooltip title='Add' placement='bottom'>
         <Button
@@ -229,9 +227,9 @@ class EmergencyContact extends PureComponent {
     )
   }
 
-  render () {
+  render() {
     const { values, schema } = this.props
-    const { SearchPatient = (f) => f } = this
+    const { SearchPatient = f => f } = this
 
     return (
       <div>
@@ -249,7 +247,8 @@ class EmergencyContact extends PureComponent {
                   color='info'
                   link
                 >
-                  <Add />Add From Existing Patient
+                  <Add />
+                  Add From Existing Patient
                 </Button>
               ),
             },
@@ -272,8 +271,8 @@ class EmergencyContact extends PureComponent {
             //     ...o,
             //   }))
             // },
-            onAddedRowsChange: (rows) => {
-              return rows.map((o) => {
+            onAddedRowsChange: rows => {
+              return rows.map(o => {
                 return { primaryContactNo: '', ...o }
               })
             },

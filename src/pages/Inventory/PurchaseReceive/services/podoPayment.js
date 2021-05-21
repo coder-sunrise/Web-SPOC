@@ -4,9 +4,9 @@ import request from '@/utils/request'
 const bizSessionAPIURL = '/api/bizsession'
 const url = '/api/PurchaseOrder/PurchaseOrderPayment'
 
-module.exports = {
-  getBizSession: (params) => service.queryList(bizSessionAPIURL, params),
-  updatePodoPayment: async (params) => {
+const fns = {
+  getBizSession: params => service.queryList(bizSessionAPIURL, params),
+  updatePodoPayment: async params => {
     let r
     if (params.purchaseOrderId) {
       r = await request(`${url}/${params.purchaseOrderId}`, {
@@ -17,3 +17,5 @@ module.exports = {
     return r
   },
 }
+
+export default fns

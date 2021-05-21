@@ -6,10 +6,10 @@ const appointmentUrl = '/api/SMSReminder/appointment'
 const patientUrl = '/api/SMSReminder/patient'
 const smsHistoryUrl = '/api/SMSReminder/smshistory'
 
-module.exports = {
-  querySMSHistory: (params) => service.queryList(smsHistoryUrl, params),
+const fns = {
+  querySMSHistory: params => service.queryList(smsHistoryUrl, params),
 
-  queryList: (params) => {
+  queryList: params => {
     const { smsType, ...restParams } = params
     return service.queryList(
       smsType === 'Appointment' ? appointmentUrl : patientUrl,
@@ -17,13 +17,13 @@ module.exports = {
     )
   },
 
-  upsert: async (params) => {
+  upsert: async params => {
     const r = await request(url, {
       method: 'POST',
-      body: [
-        ...params,
-      ],
+      body: [...params],
     })
     return r
   },
 }
+
+export default fns

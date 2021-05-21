@@ -1,6 +1,5 @@
 import { createFormViewModel } from 'medisys-model'
 import { queryFakeList, fakeSubmitForm } from '@/services/api'
-// import * as service from '../services'
 
 export default createFormViewModel({
   namespace: 'inventoryMaster',
@@ -27,7 +26,7 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *fetchList ({ payload }, { call, put }) {
+      *fetchList({ payload }, { call, put }) {
         const response = yield call(queryFakeList)
         yield put({
           type: 'updateState',
@@ -36,17 +35,15 @@ export default createFormViewModel({
           },
         })
       },
-      *submit ({ payload }, { call }) {
+      *submit({ payload }, { call }) {
         return yield call(fakeSubmitForm, payload)
       },
     },
     reducers: {
-      updateCollectPaymentList (state, { payload }) {
+      updateCollectPaymentList(state, { payload }) {
         return {
           ...state,
-          collectPaymentList: [
-            ...payload,
-          ],
+          collectPaymentList: [...payload],
         }
       },
     },

@@ -1,6 +1,6 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
-import * as service from '../services/referralPerson'
+import service from '../services/referralPerson'
 
 export default createListViewModel({
   namespace: 'settingReferralPerson',
@@ -25,7 +25,7 @@ export default createListViewModel({
       })
     },
     effects: {
-      *getReferralSourceList ({ payload }, { call, put }) {
+      *getReferralSourceList({ payload }, { call, put }) {
         try {
           const response = yield call(service.queryReferralSourceList, payload)
           const { data } = response
@@ -42,18 +42,15 @@ export default createListViewModel({
       },
     },
     reducers: {
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         const { data } = payload
 
         return {
           ...st,
-          list: data.data.map((o) => {
+          list: data.data.map(o => {
             return {
               ...o,
-              effectiveDates: [
-                o.effectiveStartDate,
-                o.effectiveEndDate,
-              ],
+              effectiveDates: [o.effectiveStartDate, o.effectiveEndDate],
             }
           }),
         }

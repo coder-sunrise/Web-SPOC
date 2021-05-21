@@ -14,12 +14,12 @@ import {
 import AuthorizedContext from '@/components/Context/Authorized'
 
 import Yup from '@/utils/yup'
+import { InventoryTypes } from '@/utils/codes'
 import DetailPanel from './Detail'
 import Setting from './Setting'
-import { InventoryTypes } from '@/utils/codes'
 import { SchemeDetailOption } from './variables'
 
-const styles = (theme) => ({
+const styles = theme => ({
   actionDiv: {
     margin: theme.spacing(1),
     textAlign: 'center',
@@ -34,41 +34,30 @@ const styles = (theme) => ({
   },
 })
 
-const Detail = (props) => {
-  const [
-    editable,
-    setEditable,
-  ] = useState(true)
+const Detail = props => {
+  const [editable, setEditable] = useState(true)
 
-  const [
-    data,
-    setData,
-  ] = useState()
+  const [data, setData] = useState()
 
-  useEffect(
-    () => {
-      const { dispatch, schemeDetail } = props
-      const { entity } = schemeDetail
-      if (entity) {
-        setEditable(entity.isUserMaintainable)
-      } else setEditable(props.schemeDetail.default.isUserMaintainable)
+  useEffect(() => {
+    const { dispatch, schemeDetail } = props
+    const { entity } = schemeDetail
+    if (entity) {
+      setEditable(entity.isUserMaintainable)
+    } else setEditable(props.schemeDetail.default.isUserMaintainable)
 
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'ctcopayer',
-        },
-      })
-      dispatch({
-        type: 'global/incrementCommitCount',
-      })
-    },
-    [
-      data,
-    ],
-  )
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctcopayer',
+      },
+    })
+    dispatch({
+      type: 'global/incrementCommitCount',
+    })
+  }, [data])
 
-  const getSchemeDetails = async (prop) => {
+  const getSchemeDetails = async prop => {
     if (prop.schemeDetail.currentId) {
       await prop.dispatch({
         type: 'schemeDetail/querySchemeDetails',
@@ -131,17 +120,24 @@ export default compose(
       return schemeDetail.entity ? schemeDetail.entity : schemeDetail.default
     },
     validationSchema: Yup.object().shape({
-      code: Yup.string().required().max(30),
-      name: Yup.string().required().max(100),
+      code: Yup.string()
+        .required()
+        .max(30),
+      name: Yup.string()
+        .required()
+        .max(100),
       schemeCategoryFK: Yup.number().required(),
       copayerFK: Yup.number().required(),
       // coverageMaxCap: Yup.number().required(),
-      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+      effectiveDates: Yup.array()
+        .of(Yup.date())
+        .min(2)
+        .required(),
     }),
     enableReinitialize: true,
     handleSubmit: (values, { props }) => {
-      InventoryTypes.forEach((p) => {
-        values[p.prop] = values.rows.filter((o) => o.type === p.value)
+      InventoryTypes.forEach(p => {
+        values[p.prop] = values.rows.filter(o => o.type === p.value)
       })
 
       const { effectiveDates, ...restValues } = values
@@ -154,7 +150,7 @@ export default compose(
           effectiveStartDate: effectiveDates[0],
           effectiveEndDate: effectiveDates[1],
         },
-      }).then((r) => {
+      }).then(r => {
         if (r) {
           if (onConfirm) onConfirm()
           dispatch({

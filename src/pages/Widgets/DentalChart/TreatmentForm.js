@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import router from 'umi/router'
+import router from 'umi'
 import { Paper, Divider, Chip } from '@material-ui/core'
 
 import { isNumber } from 'util'
@@ -35,7 +35,7 @@ import Authorized from '@/utils/Authorized'
 import TreatmentGrid from './TreatmentGrid'
 
 class TreatmentForm extends PureComponent {
-  render () {
+  render() {
     const {
       classes,
       dispense,
@@ -60,7 +60,7 @@ class TreatmentForm extends PureComponent {
           <Form
             singleMode='7'
             from='doctor'
-            currentType={orderTypes.find((o) => o.value === '7')}
+            currentType={orderTypes.find(o => o.value === '7')}
             codetable={codetable}
             dentalChartComponent={dentalChartComponent}
             global={global}

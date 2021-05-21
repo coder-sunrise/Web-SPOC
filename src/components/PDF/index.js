@@ -250,7 +250,8 @@ const MyDocument = () => (
         <Text
           style={styles.pageNumber}
           render={({ pageNumber, totalPages }) =>
-            `${pageNumber} / ${totalPages}`}
+            `${pageNumber} / ${totalPages}`
+          }
           fixed
         />
       </Page>
@@ -261,12 +262,9 @@ const MyDocument = () => (
 const DownloadPDF = () => (
   <PDFDownloadLink document={MyDocument} fileName='somename.pdf'>
     {({ blob, url, loading, error }) =>
-      loading ? 'Loading document...' : 'Download now!'}
+      loading ? 'Loading document...' : 'Download now!'
+    }
   </PDFDownloadLink>
 )
 
-module.exports = {
-  MyDocument,
-  DownloadPDF,
-  ...module.exports,
-}
+export { MyDocument, DownloadPDF }

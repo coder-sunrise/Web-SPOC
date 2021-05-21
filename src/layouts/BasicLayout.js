@@ -7,7 +7,7 @@ import { headerHeight } from 'mui-pro-jss'
 
 // import { renderWhenReady} from '@sencha/ext-react'
 // import { Panel } from '@sencha/ext-modern'
-import router from 'umi/router'
+import { history } from 'umi'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import DocumentTitle from 'react-document-title'
 import isEqual from 'lodash/isEqual'

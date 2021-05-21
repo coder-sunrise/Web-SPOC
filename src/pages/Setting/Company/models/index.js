@@ -2,7 +2,7 @@ import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import { notification } from '@/components'
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
-import * as service from '../services'
+import service from '../services'
 
 let companyTypes = [
   { id: 1, name: 'copayer' },
@@ -76,7 +76,7 @@ export default createListViewModel({
         const { pathname, search, query = {} } = loct
         if (pathname.toLowerCase().indexOf('/setting/company/') === 0) {
           const companyType = companyTypes.find(
-            (o) =>
+            o =>
               o.id ===
               Number(pathname.toLowerCase().replace('/setting/company/', '')),
           )
@@ -92,7 +92,7 @@ export default createListViewModel({
         }
 
         if (pathname === '/finance/copayer') {
-          const companyType = companyTypes.find((o) => o.id === 1)
+          const companyType = companyTypes.find(o => o.id === 1)
           dispatch({
             type: 'updateState',
             payload: {
@@ -106,7 +106,7 @@ export default createListViewModel({
       })
     },
     effects: {
-      *upsertCopayer ({ payload }, { call, put }) {
+      *upsertCopayer({ payload }, { call, put }) {
         const r = yield call(service.upsertCop, payload)
         if (r.id) {
           notification.success({ message: 'Created' })
@@ -119,7 +119,7 @@ export default createListViewModel({
         return r
       },
 
-      *upsertSupplier ({ payload }, { call, put }) {
+      *upsertSupplier({ payload }, { call, put }) {
         const r = yield call(service.upsertSup, payload)
         if (r.id) {
           notification.success({ message: 'Created' })
@@ -134,18 +134,15 @@ export default createListViewModel({
     },
 
     reducers: {
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         const { data } = payload
 
         return {
           ...st,
-          list: data.data.map((o) => {
+          list: data.data.map(o => {
             return {
               ...o,
-              effectiveDates: [
-                o.effectiveStartDate,
-                o.effectiveEndDate,
-              ],
+              effectiveDates: [o.effectiveStartDate, o.effectiveEndDate],
             }
           }),
         }

@@ -1,6 +1,6 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
-import * as service from '../services'
+import service from '../services'
 
 export default createListViewModel({
   namespace: 'settingPackage',
@@ -27,7 +27,7 @@ export default createListViewModel({
     },
     effects: {},
     reducers: {
-      reset (st) {
+      reset(st) {
         return {
           ...st,
           default: {
@@ -36,7 +36,7 @@ export default createListViewModel({
           },
         }
       },
-      queryOneDone (st, { payload }) {
+      queryOneDone(st, { payload }) {
         const {
           effectiveStartDate,
           effectiveEndDate,
@@ -47,25 +47,19 @@ export default createListViewModel({
           ...st,
           entity: {
             ...restValues,
-            effectiveDates: [
-              effectiveStartDate,
-              effectiveEndDate,
-            ],
+            effectiveDates: [effectiveStartDate, effectiveEndDate],
           },
         }
       },
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         const { data } = payload
 
         return {
           ...st,
-          list: data.data.map((o) => {
+          list: data.data.map(o => {
             return {
               ...o,
-              effectiveDates: [
-                o.effectiveStartDate,
-                o.effectiveEndDate,
-              ],
+              effectiveDates: [o.effectiveStartDate, o.effectiveEndDate],
             }
           }),
         }

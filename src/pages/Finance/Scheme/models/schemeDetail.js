@@ -1,8 +1,8 @@
 import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
-import * as service from '../services'
 import { InventoryTypes } from '@/utils/codes'
 import { getUniqueId } from '@/utils/utils'
+import service from '../services'
 
 const { upsert } = service
 const { queryOne } = service
@@ -90,7 +90,7 @@ export default createFormViewModel({
       },
     },
     subscriptions: ({ dispatch, history }) => {
-      history.listen((loct) => {
+      history.listen(loct => {
         const { pathname, search, query = {} } = loct
         if (pathname.indexOf('/finance/scheme/') === 0) {
           dispatch({
@@ -104,10 +104,10 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *submit ({ payload }, { call }) {
+      *submit({ payload }, { call }) {
         return yield call(upsert, payload)
       },
-      *querySchemeDetails ({ payload }, { call, put }) {
+      *querySchemeDetails({ payload }, { call, put }) {
         const response = yield call(queryOne, payload)
         yield put({
           type: 'schemeDetailsResult',
@@ -116,12 +116,12 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      schemeDetailsResult (state, { payload }) {
+      schemeDetailsResult(state, { payload }) {
         const data = payload
         let itemRows = []
-        InventoryTypes.forEach((x) => {
+        InventoryTypes.forEach(x => {
           itemRows = itemRows.concat(
-            (data[x.prop] || []).map((y) => {
+            (data[x.prop] || []).map(y => {
               const d = {
                 uid: getUniqueId(),
                 type: x.value,
@@ -136,10 +136,7 @@ export default createFormViewModel({
           ...state,
           entity: {
             ...data,
-            effectiveDates: [
-              data.effectiveStartDate,
-              data.effectiveEndDate,
-            ],
+            effectiveDates: [data.effectiveStartDate, data.effectiveEndDate],
             itemGroupMaxCapacityDtoRdoValue: !data.coverageMaxCap
               ? 'sub'
               : 'all',
@@ -149,14 +146,14 @@ export default createFormViewModel({
         }
       },
 
-      deleteRow (state, { payload }) {
+      deleteRow(state, { payload }) {
         const { rows } = state.entity
 
         return {
           ...state,
           entity: {
             ...state.entity,
-            rows: rows.filter((o) => o.uid !== payload.id),
+            rows: rows.filter(o => o.uid !== payload.id),
           },
         }
       },

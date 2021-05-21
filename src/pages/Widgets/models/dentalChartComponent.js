@@ -1,10 +1,8 @@
 import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
 import _ from 'lodash'
-import * as service from '../services'
-import { getUniqueId } from '@/utils/utils'
 import { dateFormatLong } from '@/components'
-import { isToothCrossed } from '../variables'
+import service from '../DentalChart/services'
 
 const updateData = (data, payload) => {
   const {
@@ -19,25 +17,24 @@ const updateData = (data, payload) => {
     remark,
   } = payload
   const exist = data.find(
-    (o) =>
+    o =>
       o.toothNo === toothNo &&
       o.id === id &&
       target === o.target &&
       o.subTarget === subTarget &&
       o.name === name,
   )
-  if (action.code === 'SYS01')
-    return _.reject(data, (o) => o.toothNo === toothNo)
+  if (action.code === 'SYS01') return _.reject(data, o => o.toothNo === toothNo)
 
   if (deleted) {
-    return _.reject(data, (o) => o.toothNo === toothNo && o.id === id)
+    return _.reject(data, o => o.toothNo === toothNo && o.id === id)
   }
   if (exist) {
     if (remark) {
       exist.remark = payload.remark
     } else if (
       data.find(
-        (o) =>
+        o =>
           o.toothNo === toothNo &&
           o.target === target &&
           o.subTarget === subTarget &&
@@ -49,7 +46,7 @@ const updateData = (data, payload) => {
     } else {
       data = _.reject(
         data,
-        (o) =>
+        o =>
           o.toothNo === toothNo &&
           o.id === id &&
           target === o.target &&
@@ -91,18 +88,18 @@ export default createFormViewModel({
     subscriptions: ({ dispatch, history }) => {},
     effects: {},
     reducers: {
-      clean (state, { payload }) {
+      clean(state, { payload }) {
         let data = _.cloneDeep(state.data)
 
         return {
           ...state,
-          data: _.reject(data, (o) => o.toothNo === payload.toothNo),
+          data: _.reject(data, o => o.toothNo === payload.toothNo),
         }
       },
 
-      toggleMultiSelect (state, { payload = [] }) {
+      toggleMultiSelect(state, { payload = [] }) {
         let data = _.cloneDeep(state.data)
-        payload.map((o) => {
+        payload.map(o => {
           data = updateData(data, o)
         })
 
@@ -111,10 +108,10 @@ export default createFormViewModel({
           data,
         }
       },
-      toggleSelect (state, { payload }) {
+      toggleSelect(state, { payload }) {
         // console.log(payload)
         const data = updateData(_.cloneDeep(state.data), payload)
-        const selected = data.find((o) => o.key === payload.id + payload.target)
+        const selected = data.find(o => o.key === payload.id + payload.target)
         // console.log(selected)
         return {
           ...state,
@@ -123,12 +120,12 @@ export default createFormViewModel({
           lastClicked: selected ? payload.id + payload.target : undefined,
         }
       },
-      deleteTreatment (state, { payload }) {
+      deleteTreatment(state, { payload }) {
         const { itemNotes, treatmentFK } = payload
 
         return {
           ...state,
-          data: state.data.filter((o) => {
+          data: state.data.filter(o => {
             if (!o.action) return false
             if (o.action.dentalTreatmentFK !== treatmentFK) return true
 
@@ -144,13 +141,13 @@ export default createFormViewModel({
           }),
         }
       },
-      sortItems (state, { payload }) {
+      sortItems(state, { payload }) {
         const { index, oldIndex, currentItems, items } = payload
         return {
           ...state,
           data: [
             ...state.data.filter(
-              (o) =>
+              o =>
                 (o.toothNo === Number(index) && o.key !== items[oldIndex]) ||
                 o.toothNo !== Number(index),
             ),

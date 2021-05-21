@@ -1,9 +1,9 @@
 import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
 import _ from 'lodash'
-import * as service from '../services/deliveryOrder'
 import { podoOrderType, groupByFKFunc } from '@/utils/codes'
 import { getUniqueId } from '@/utils/utils'
+import service from '../services/deliveryOrder'
 
 const InitialPurchaseOrder = {
   purchaseOrder: {
@@ -49,13 +49,13 @@ export default createFormViewModel({
     },
 
     effects: {
-      *queryDeliveryOrder ({ payload }, { call, put }) {
+      *queryDeliveryOrder({ payload }, { call, put }) {
         const response = yield call(service.queryById, payload)
 
         if (response.status === '200') {
           const { data } = response
           if (data.deliveryOrderItem) {
-            data.deliveryOrderItem = data.deliveryOrderItem.map((x) => ({
+            data.deliveryOrderItem = data.deliveryOrderItem.map(x => ({
               ...x,
             }))
           }
@@ -67,14 +67,14 @@ export default createFormViewModel({
 
         return false
       },
-      *getOutstandingPOItem ({ payload }, { call, put }) {
+      *getOutstandingPOItem({ payload }, { call, put }) {
         const { rows, purchaseOrder } = payload
         let outstandingItem = []
         const tempList = rows.filter(
-          (x) => x.orderQuantity - x.quantityReceived > 0 && !x.isDeleted,
+          x => x.orderQuantity - x.quantityReceived > 0 && !x.isDeleted,
         )
         if (!_.isEmpty(tempList)) {
-          outstandingItem = tempList.map((x) => {
+          outstandingItem = tempList.map(x => {
             return {
               ...x,
               orderQuantity: x.orderQuantity,
@@ -95,7 +95,7 @@ export default createFormViewModel({
         })
       },
 
-      *addNewDeliveryOrder ({ payload }, { call, put }) {
+      *addNewDeliveryOrder({ payload }, { call, put }) {
         // Call API to query DeliveryOrder#
         // const runningNumberResponse = yield call(service.queryRunningNumber, {
         //   prefix: 'DO',
@@ -109,7 +109,7 @@ export default createFormViewModel({
     },
 
     reducers: {
-      setAddNewDeliveryOrder (state, { payload }) {
+      setAddNewDeliveryOrder(state, { payload }) {
         // const { deliveryOrderNo } = payload
         const {
           purchaseOrderDetails,
@@ -122,16 +122,16 @@ export default createFormViewModel({
           purchaseOrderOutstandingItem,
         } = purchaseOrderDetails
 
-        const newOSItem = purchaseOrderOutstandingItem.map((o) => {
+        const newOSItem = purchaseOrderOutstandingItem.map(o => {
           if (MedicationItemList.length > 0 && o.type === 1) {
             const m = MedicationItemList.find(
-              (f) =>
+              f =>
                 f.inventoryMedicationFK === o.inventoryMedicationFK &&
                 f.stock &&
                 f.stock.length > 0,
             )
             const { id, batchNo, expiryDate } = m.stock.find(
-              (s) => s.isDefault === true,
+              s => s.isDefault === true,
             )
 
             return {
@@ -144,14 +144,14 @@ export default createFormViewModel({
           }
           if (ConsumableItemList.length > 0 && o.type === 2) {
             const m = ConsumableItemList.find(
-              (f) =>
+              f =>
                 f.inventoryConsumableFK === o.inventoryConsumableFK &&
                 f.stock &&
                 f.stock.length > 0,
             )
 
             const { id, batchNo, expiryDate } = m.stock.find(
-              (s) => s.isDefault === true,
+              s => s.isDefault === true,
             )
 
             return {
@@ -164,13 +164,13 @@ export default createFormViewModel({
           }
           if (VaccinationItemList.length > 0 && o.type === 3) {
             const m = VaccinationItemList.find(
-              (f) =>
+              f =>
                 f.inventoryVaccinationFK === o.inventoryVaccinationFK &&
                 f.stock &&
                 f.stock.length > 0,
             )
             const { id, batchNo, expiryDate } = m.stock.find(
-              (s) => s.isDefault === true,
+              s => s.isDefault === true,
             )
 
             return {
@@ -190,7 +190,7 @@ export default createFormViewModel({
             // deliveryOrderNo,
             deliveryOrderDate: moment(),
             remark: '',
-            rows: newOSItem.map((o) => ({
+            rows: newOSItem.map(o => ({
               currentReceivingBonusQty: 0,
               expiryDate: undefined,
               ...o,
@@ -199,15 +199,15 @@ export default createFormViewModel({
         }
       },
 
-      setDeliveryOrder (state, { payload }) {
+      setDeliveryOrder(state, { payload }) {
         const { purchaseOrderDetails } = state
         const { purchaseOrderItem } = purchaseOrderDetails
         const { data } = payload
         const { deliveryOrderItem } = data
 
-        const itemRows = deliveryOrderItem.map((x) => {
+        const itemRows = deliveryOrderItem.map(x => {
           const inventoryType = podoOrderType.find(
-            (o) => o.value === x.inventoryTypeFK,
+            o => o.value === x.inventoryTypeFK,
           )
           return {
             ...x,
@@ -225,18 +225,16 @@ export default createFormViewModel({
             currentReceivingBonusQty: x.bonusQuantity,
             maxCurrentReceivingQty: x.recevingQuantity,
             maxCurrentReceivingBonusQty: x.bonusQuantity,
-            batchNo: [
-              x.batchNo,
-            ],
+            batchNo: [x.batchNo],
             // expiryDate: null,
           }
         })
 
         const itemRowsGroupByItemFK = groupByFKFunc(itemRows)
 
-        const newPurchaseOrderItem = purchaseOrderItem.map((o) => {
+        const newPurchaseOrderItem = purchaseOrderItem.map(o => {
           const currentItem = itemRowsGroupByItemFK.find(
-            (i) => i.itemFK === o.itemFK,
+            i => i.itemFK === o.itemFK,
           )
           let quantityReceivedFromOtherDOs = 0
           if (currentItem) {
@@ -262,12 +260,12 @@ export default createFormViewModel({
         }
       },
 
-      setOutstandingPOItem (state, { payload }) {
+      setOutstandingPOItem(state, { payload }) {
         const { outstandingItem, rows, purchaseOrder } = payload
         const { deliveryOrder } = purchaseOrder
-        let newDeliveryOrder = deliveryOrder.map((x) => {
+        let newDeliveryOrder = deliveryOrder.map(x => {
           let totalQty = 0
-          x.deliveryOrderItem.map((y) => {
+          x.deliveryOrderItem.map(y => {
             totalQty += y.recevingQuantity + y.bonusQuantity
           })
 
@@ -288,14 +286,14 @@ export default createFormViewModel({
         }
       },
 
-      upsertRow (state, { payload }) {
+      upsertRow(state, { payload }) {
         let rows = _.cloneDeep(state.entity.rows)
         const { gridRows, gridRow, remark } = payload
 
         if (payload.uid) {
-          rows = gridRows.map((o) => {
+          rows = gridRows.map(o => {
             let itemFK
-            const item = podoOrderType.filter((x) => x.value === o.type)
+            const item = podoOrderType.filter(x => x.value === o.type)
             if (item.length > 0) {
               const { itemFKName } = item[0]
               itemFK = itemFKName
@@ -307,7 +305,7 @@ export default createFormViewModel({
           })
         } else if (gridRow) {
           let itemFK
-          const item = podoOrderType.filter((x) => x.value === gridRow.type)
+          const item = podoOrderType.filter(x => x.value === gridRow.type)
           if (item.length > 0) {
             const { itemFKName } = item[0]
             itemFK = itemFKName
@@ -331,10 +329,10 @@ export default createFormViewModel({
         }
       },
 
-      deleteRow (state, { payload }) {
+      deleteRow(state, { payload }) {
         const { rows } = state.entity
         // rows.find((v) => v.uid === payload).isDeleted = true
-        const deletedRow = rows.find((v) => v.uid === payload)
+        const deletedRow = rows.find(v => v.uid === payload)
         if (deletedRow) deletedRow.isDeleted = true
 
         // let newRows = rows.filter((v) => v.uid !== payload)
@@ -342,7 +340,7 @@ export default createFormViewModel({
         return { ...state, entity: { ...state.entity, rows } }
       },
 
-      reset (state, { payload }) {
+      reset(state, { payload }) {
         return {
           ...state,
           entity: {

@@ -1,5 +1,4 @@
 import { createListViewModel } from 'medisys-model'
-import { notification } from '@/components'
 import * as service from '../services'
 
 export default createListViewModel({
@@ -24,11 +23,11 @@ export default createListViewModel({
       // },
     },
     reducers: {
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         const { data } = payload
         return {
           ...st,
-          list: data.data.map((o) => {
+          list: data.data.map(o => {
             return {
               ...o,
             }

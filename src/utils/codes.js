@@ -287,25 +287,22 @@ const consultationDocumentTypes = [
     value: '5',
     name: 'Medical Certificate',
     prop: 'corMedicalCertificate',
-    getSubject: (r) => {
+    getSubject: r => {
       return `${moment(r.mcStartDate).format(dateFormatLong)} - ${moment(
         r.mcEndDate,
       ).format(dateFormatLong)} - ${r.mcDays} Day${r.mcDays > 1 ? 's' : ''}`
     },
-    convert: (r) => {
+    convert: r => {
       return {
         ...r,
-        mcStartEndDate: [
-          moment(r.mcStartDate),
-          moment(r.mcEndDate),
-        ],
+        mcStartEndDate: [moment(r.mcStartDate), moment(r.mcEndDate)],
       }
     },
     downloadConfig: {
       id: 7,
       key: 'MedicalCertificateId',
       subject: 'Medical Certificate',
-      draft: (row) => {
+      draft: row => {
         return {
           MedicalCertificateDetails: [
             {
@@ -325,10 +322,10 @@ const consultationDocumentTypes = [
     value: '6',
     name: 'Certificate of Attendance',
     prop: 'corCertificateOfAttendance',
-    getSubject: (r) => {
+    getSubject: r => {
       return `Certificate of Attendance ${r.accompaniedBy}`
     },
-    convert: (r) => {
+    convert: r => {
       return {
         ...r,
         issueDate: moment(r.issueDate).format(dateFormatLong),
@@ -338,7 +335,7 @@ const consultationDocumentTypes = [
       id: 8,
       key: 'CertificateOfAttendanceId',
       subject: 'Certificate Of Attendance',
-      draft: (row) => {
+      draft: row => {
         return {
           CertificateOfAttendanceDetails: [
             {
@@ -364,7 +361,7 @@ const consultationDocumentTypes = [
       id: 9,
       key: 'ReferralLetterId',
       subject: 'Referral Letter',
-      draft: (row) => {
+      draft: row => {
         return {
           ReferralLetterDetails: [
             {
@@ -384,7 +381,7 @@ const consultationDocumentTypes = [
       id: 11,
       key: 'memoid',
       subject: 'Memo',
-      draft: (row) => {
+      draft: row => {
         return {
           MemoDetails: [
             {
@@ -406,7 +403,7 @@ const consultationDocumentTypes = [
       id: 10,
       key: 'vaccinationcertificateid',
       subject: 'Vaccination Certificate',
-      draft: (row) => {
+      draft: row => {
         return {
           VaccinationCertificateDetails: [
             {
@@ -429,7 +426,7 @@ const consultationDocumentTypes = [
       id: 12,
       key: 'documentid',
       subject: 'Other Documents',
-      draft: (row) => {
+      draft: row => {
         return {
           DocumentDetails: [
             {
@@ -443,11 +440,7 @@ const consultationDocumentTypes = [
   },
 ]
 
-const buttonTypes = [
-  'RegularButton',
-  'IconButton',
-  'Fab',
-]
+const buttonTypes = ['RegularButton', 'IconButton', 'Fab']
 
 export const countryCodes = [
   { name: '+65 Singapore', value: '65' },
@@ -532,7 +525,7 @@ export const rgType = [
 
 const loadFromCodesConfig = {
   mapPrescriptions: (rows, codetable, patient, isExtPrescription = false) => {
-    return rows.map((o) => {
+    return rows.map(o => {
       const {
         instruction,
         corPrescriptionItemPrecaution: precaution = [],
@@ -542,16 +535,16 @@ const loadFromCodesConfig = {
       } = o
       const qtyFormatStr = numeral(quantity).format(qtyFormat)
       const { ctmedicationprecaution = [] } = codetable
-      const subjectHtml = `<li> - ${o.subject} ${isExtPrescription
-        ? ' (Ext.)'
-        : ''}</li>`
+      const subjectHtml = `<li> - ${o.subject} ${
+        isExtPrescription ? ' (Ext.)' : ''
+      }</li>`
       const instHtml = instruction !== '' ? `<li>${instruction}</li>` : ''
       const remarksHtml = remarks !== '' ? `<li>${remarks}</li>` : ''
       const qtyHtml = `<li>Quantity: ${qtyFormatStr} ${dispenseUOMDisplayValue}</li>`
       const precautionHtml = precaution
-        .map((i) => {
+        .map(i => {
           const codetablePrecaution = ctmedicationprecaution.find(
-            (c) => c.id === i.medicationPrecautionFK,
+            c => c.id === i.medicationPrecautionFK,
           )
           if (codetablePrecaution && codetablePrecaution.translationLink) {
             const {
@@ -559,8 +552,8 @@ const loadFromCodesConfig = {
             } = codetablePrecaution
 
             const transHtml = translationMasters
-              .filter((t) => patient.translationLinkFK === t.languageFK)
-              .map((m) => {
+              .filter(t => patient.translationLinkFK === t.languageFK)
+              .map(m => {
                 return `<li>${m.displayValue}</li>`
               })
               .join('')
@@ -579,7 +572,7 @@ const loadFromCodesConfig = {
   },
   InsertMedication: (rows, codetable, patient, isExtPrescription = false) => {
     const pRows = rows.filter(
-      (o) =>
+      o =>
         !o.isDeleted &&
         o.type === '1' &&
         (o.isExternalPrescription || false) === isExtPrescription,
@@ -592,9 +585,9 @@ const loadFromCodesConfig = {
         isExtPrescription,
       )
       return `<ul>
-              <li><strong>${isExtPrescription
-                ? 'External Prescription'
-                : 'Medication'}</strong></li>
+              <li><strong>${
+                isExtPrescription ? 'External Prescription' : 'Medication'
+              }</strong></li>
                ${rowHTMLs.join('')}
             </ul>`
     }
@@ -603,7 +596,8 @@ const loadFromCodesConfig = {
   InsertVaccination: (rows, isGenerateCertificate) => {
     const vRows = (isGenerateCertificate
       ? rows
-      : rows.filter((o) => !o.isDeleted && o.type === '2')).map((v) => {
+      : rows.filter(o => !o.isDeleted && o.type === '2')
+    ).map(v => {
       const {
         subject = '',
         usageMethodDisplayValue: usage = '',
@@ -637,7 +631,7 @@ const loadFromCodesConfig = {
     isExtPrescription = false,
   ) => {
     const pRows = rows.filter(
-      (o) =>
+      o =>
         !o.isDeleted &&
         o.type === '5' &&
         (o.isExternalPrescription || false) === isExtPrescription,
@@ -656,10 +650,10 @@ const loadFromCodesConfig = {
     return ''
   },
 
-  InsertConsumable: (rows) => {
-    const pRows = rows.filter((o) => !o.isDeleted && o.type === '4')
+  InsertConsumable: rows => {
+    const pRows = rows.filter(o => !o.isDeleted && o.type === '4')
     if (pRows && pRows.length > 0) {
-      const rowHTMLs = pRows.map((o) => {
+      const rowHTMLs = pRows.map(o => {
         const {
           consumableName = '',
           unitOfMeasurement = '',
@@ -685,9 +679,7 @@ const loadFromCodesConfig = {
 
   InsertPatientInfo: (codetable, patient) => {
     let result
-    let patientGender = codetable.ctgender.find(
-      (x) => x.id === patient.genderFK,
-    )
+    let patientGender = codetable.ctgender.find(x => x.id === patient.genderFK)
     let patientAllergy
     for (let index = 0; index < patient.patientAllergy.length; index++) {
       if (patient.patientAllergy[index].type === 'Allergy')
@@ -837,7 +829,7 @@ const tagList = [
       let result
       if (patient && patient.entity) {
         let patientGender = codetable.ctgender.find(
-          (x) => x.id === patient.entity.genderFK,
+          x => x.id === patient.entity.genderFK,
         )
         let patientAllergy
         for (
@@ -851,8 +843,7 @@ const tagList = [
               patient.entity.patientAllergy[index].allergyName
         }
         result = `<p>Patient Name: ${patient.entity.name}</p>`
-        result += `<p>Patient Ref. No.: ${patient.entity
-          .patientReferenceNo}</p>`
+        result += `<p>Patient Ref. No.: ${patient.entity.patientReferenceNo}</p>`
         result += `<p>Patient Acc. No.: ${patient.entity.patientAccountNo}</p>`
         result += `<p>Gender/Age: ${patientGender.name.substring(
           0,
@@ -868,26 +859,21 @@ const tagList = [
     value: 'Order',
     text: '<#Order#>',
     url: '',
-    getter: (newVaccination) => {
+    getter: newVaccination => {
       const { orders, patient, codetable } = window.g_app._store.getState()
       if (!orders) return '-'
 
       const { rows = [] } = orders
 
       let service = rows
-        .filter((o) => !o.isDeleted && o.type === '3')
-        .map((s) => `<p>- ${s.subject}</p>`)
+        .filter(o => !o.isDeleted && o.type === '3')
+        .map(s => `<p>- ${s.subject}</p>`)
         .join('')
 
       const ordersHTML = [
         loadFromCodesConfig.InsertMedication(rows, codetable, patient, false),
         loadFromCodesConfig.InsertVaccination(
-          newVaccination
-            ? [
-                ...rows,
-                newVaccination,
-              ]
-            : rows,
+          newVaccination ? [...rows, newVaccination] : rows,
           false,
         ),
         loadFromCodesConfig.InsertOpenPrescription(rows, codetable, patient),
@@ -903,7 +889,7 @@ const tagList = [
     value: 'Vaccination',
     text: '<#Vaccination#>',
     url: '',
-    getter: (newVaccination) => {
+    getter: newVaccination => {
       const { orders, consultationDocument } = window.g_app._store.getState()
       if (!orders) return '-'
       const { rows = [] } = orders
@@ -911,12 +897,10 @@ const tagList = [
       let insertRows = rows
       let isGenerateCertificate = false
       if (newVaccination) {
-        insertRows = [
-          newVaccination,
-        ]
+        insertRows = [newVaccination]
         isGenerateCertificate = true
       } else if (entity.vaccinationUFK) {
-        insertRows = rows.filter((vc) => vc.uid === entity.vaccinationUFK)
+        insertRows = rows.filter(vc => vc.uid === entity.vaccinationUFK)
         isGenerateCertificate = true
       }
 
@@ -1032,9 +1016,9 @@ export const getInventoryItem = (
   rows = [],
   outstandingItem = undefined,
 ) => {
-  let newRows = rows.filter((x) => x.type === value && x.isDeleted === false)
+  let newRows = rows.filter(x => x.type === value && x.isDeleted === false)
   const groupByFKArray = _(newRows)
-    .groupBy((x) => x[itemFKName])
+    .groupBy(x => x[itemFKName])
     .map((v, key) => ({
       [itemFKName]: parseInt(key, 10),
       totalCurrentReceivingQty: _.sumBy(v, 'currentReceivingQty'),
@@ -1043,8 +1027,8 @@ export const getInventoryItem = (
 
   let fullyReceivedArray = []
   if (outstandingItem) {
-    fullyReceivedArray = groupByFKArray.filter((o) => {
-      const item = outstandingItem.find((i) => i[itemFKName] === o[itemFKName])
+    fullyReceivedArray = groupByFKArray.filter(o => {
+      const item = outstandingItem.find(i => i[itemFKName] === o[itemFKName])
       if (
         item &&
         item.orderQuantity - item.quantityReceived ===
@@ -1058,16 +1042,14 @@ export const getInventoryItem = (
     })
   }
 
-  newRows = newRows.filter((o) =>
-    fullyReceivedArray.find((i) => i[itemFKName] === o[itemFKName]),
+  newRows = newRows.filter(o =>
+    fullyReceivedArray.find(i => i[itemFKName] === o[itemFKName]),
   )
 
   let inventoryItemList = _.differenceBy(list, newRows, itemFKName)
 
   if (outstandingItem) {
-    const filterOutstandingItem = outstandingItem.filter(
-      (x) => x.type === value,
-    )
+    const filterOutstandingItem = outstandingItem.filter(x => x.type === value)
 
     inventoryItemList = _.intersectionBy(
       inventoryItemList,
@@ -1077,14 +1059,14 @@ export const getInventoryItem = (
   }
 
   if (outstandingItem) {
-    inventoryItemList = inventoryItemList.map((o) => {
+    inventoryItemList = inventoryItemList.map(o => {
       const findSpecificOutstandingItem = outstandingItem.find(
-        (i) => i[itemFKName] === o[itemFKName],
+        i => i[itemFKName] === o[itemFKName],
       )
       let remainingQty
       if (findSpecificOutstandingItem) {
         const { orderQuantity, quantityReceived } = findSpecificOutstandingItem
-        const item = groupByFKArray.find((i) => i[itemFKName] === o[itemFKName])
+        const item = groupByFKArray.find(i => i[itemFKName] === o[itemFKName])
         if (item) {
           remainingQty =
             orderQuantity - quantityReceived - item.totalCurrentReceivingQty
@@ -1111,9 +1093,9 @@ export const getInventoryItemV2 = (
   outstandingItem = undefined,
   existingData = false,
 ) => {
-  const groupByFKFunc = (array) => {
+  const groupByFKFunc = array => {
     return _(array)
-      .groupBy((x) => x[itemFKName])
+      .groupBy(x => x[itemFKName])
       .map((v, key) => ({
         [itemFKName]: parseInt(key, 10),
         totalCurrentReceivingQty: _.sumBy(v, 'currentReceivingQty'),
@@ -1121,20 +1103,18 @@ export const getInventoryItemV2 = (
       .value()
   }
 
-  let newRows = rows.filter((x) => x.type === value && x.isDeleted === false)
+  let newRows = rows.filter(x => x.type === value && x.isDeleted === false)
 
   const rowsGroupByFK = groupByFKFunc(newRows)
 
-  const newOutstandingItem = outstandingItem.map((o) => {
+  const newOutstandingItem = outstandingItem.map(o => {
     const {
       quantityReceived,
       orderQuantity,
       quantityReceivedFromOtherDOs = 0,
     } = o
 
-    const activeItem = rowsGroupByFK.find(
-      (i) => i[itemFKName] === o[itemFKName],
-    )
+    const activeItem = rowsGroupByFK.find(i => i[itemFKName] === o[itemFKName])
     const remainingQuantityShouldReceive =
       orderQuantity - quantityReceivedFromOtherDOs
     let remainingQuantity = orderQuantity - quantityReceived
@@ -1167,8 +1147,8 @@ export const getInventoryItemV2 = (
 
   let fullyReceivedArray = []
 
-  fullyReceivedArray = rowsGroupByFK.filter((o) => {
-    const item = newOutstandingItem.find((i) => i[itemFKName] === o[itemFKName])
+  fullyReceivedArray = rowsGroupByFK.filter(o => {
+    const item = newOutstandingItem.find(i => i[itemFKName] === o[itemFKName])
     if (item && item.remainingQuantity <= 0) {
       return {
         ...o,
@@ -1178,17 +1158,15 @@ export const getInventoryItemV2 = (
   })
 
   // get the fully received item
-  newRows = newRows.filter((o) =>
-    fullyReceivedArray.find((i) => i[itemFKName] === o[itemFKName]),
+  newRows = newRows.filter(o =>
+    fullyReceivedArray.find(i => i[itemFKName] === o[itemFKName]),
   )
 
   // get all the not fully received item based on the inventory item and current rows
   let inventoryItemList = _.differenceBy(list, newRows, itemFKName)
 
   // get current inventory item outstanding item
-  const filterOutstandingItem = newOutstandingItem.filter(
-    (x) => x.type === value,
-  )
+  const filterOutstandingItem = newOutstandingItem.filter(x => x.type === value)
 
   // get the all the not fully received item based on outstanding item
   inventoryItemList = _.intersectionBy(
@@ -1197,9 +1175,9 @@ export const getInventoryItemV2 = (
     itemFKName,
   )
 
-  inventoryItemList = inventoryItemList.map((o) => {
+  inventoryItemList = inventoryItemList.map(o => {
     const findSpecificOutstandingItem = newOutstandingItem.find(
-      (i) => i[itemFKName] === o[itemFKName],
+      i => i[itemFKName] === o[itemFKName],
     )
 
     let remainingQty
@@ -1225,7 +1203,7 @@ export const inventoryItemListing = (
   stateName = undefined,
   stockName = undefined,
 ) => {
-  let inventoryItemList = list.map((x) => {
+  let inventoryItemList = list.map(x => {
     const { code, displayValue, sellingPrice = 0 } = x
     const uom = x.dispensingUOM ? x.dispensingUOM.name : x.uom.name
 
@@ -1296,12 +1274,12 @@ export const shortcutKeys = [
 
 export const roundToPrecision = (x, precision) => {
   const y = +x + (precision === undefined ? 0.5 : precision / 2)
-  return y - y % (precision === undefined ? 1 : +precision)
+  return y - (y % (precision === undefined ? 1 : +precision))
 }
 
-export const groupByFKFunc = (array) => {
+export const groupByFKFunc = array => {
   return _(array)
-    .groupBy((x) => x.itemFK)
+    .groupBy(x => x.itemFK)
     .map((v, key) => ({
       itemFK: parseInt(key, 10),
       totalCurrentReceivingQty: _.sumBy(v, 'currentReceivingQty'),
@@ -1442,91 +1420,95 @@ const formTypes = [
       id: 55,
       key: 'LetterofCertificationId',
       subject: 'Letter of Certification',
-      draft: (row) => {
+      draft: row => {
         const { formData, statusFK } = row
 
         let LCFormSurgicalCharges = []
-        formData.procuderes.filter((p) => p.index <= 3).forEach((element) => {
-          for (let index = 0; index < 3; index++) {
-            LCFormSurgicalCharges.push({
-              index: element.index,
-              ProcedureDate: element.procedureDate,
-              StartTime: element.procedureStartTime,
-              EndTime: element.procedureEndTime,
-              NatureOperation: element.natureOfOpertation,
-              SurgicalCode: element.surgicalProcedureCode,
-              SurgicalDescription: element.surgicalProcedureName,
-              SurgicalTable: element.surgicalProcedureTable,
-              DoctorMCRNo: element.surgicalCharges[index]
-                ? element.surgicalCharges[index].surgicalSurgeonMCRNo
-                : '',
-              DoctorName: element.surgicalCharges[index]
-                ? element.surgicalCharges[index].surgicalSurgeonName
-                : '',
-              SurgeonRoleDisplayValue: element.surgicalCharges[index]
-                ? element.surgicalCharges[index].surgicalRoleName
-                : '',
-              SurgeonFees: element.surgicalCharges[index]
-                ? element.surgicalCharges[index].surgeonFees
-                : 0,
-              ImplantFees: element.surgicalCharges[index]
-                ? element.surgicalCharges[index].implantFees
-                : 0,
-              OtherFees: element.surgicalCharges[index]
-                ? element.surgicalCharges[index].otherFees
-                : 0,
-              TotalSurgicalFees: element.surgicalCharges[index]
-                ? element.surgicalCharges[index].totalSurgicalFees
-                : 0,
-              GSTChargedDisplayValue: element.surgicalCharges[index]
-                ? element.surgicalCharges[index].gSTChargedName
-                : '',
-            })
-          }
-        })
+        formData.procuderes
+          .filter(p => p.index <= 3)
+          .forEach(element => {
+            for (let index = 0; index < 3; index++) {
+              LCFormSurgicalCharges.push({
+                index: element.index,
+                ProcedureDate: element.procedureDate,
+                StartTime: element.procedureStartTime,
+                EndTime: element.procedureEndTime,
+                NatureOperation: element.natureOfOpertation,
+                SurgicalCode: element.surgicalProcedureCode,
+                SurgicalDescription: element.surgicalProcedureName,
+                SurgicalTable: element.surgicalProcedureTable,
+                DoctorMCRNo: element.surgicalCharges[index]
+                  ? element.surgicalCharges[index].surgicalSurgeonMCRNo
+                  : '',
+                DoctorName: element.surgicalCharges[index]
+                  ? element.surgicalCharges[index].surgicalSurgeonName
+                  : '',
+                SurgeonRoleDisplayValue: element.surgicalCharges[index]
+                  ? element.surgicalCharges[index].surgicalRoleName
+                  : '',
+                SurgeonFees: element.surgicalCharges[index]
+                  ? element.surgicalCharges[index].surgeonFees
+                  : 0,
+                ImplantFees: element.surgicalCharges[index]
+                  ? element.surgicalCharges[index].implantFees
+                  : 0,
+                OtherFees: element.surgicalCharges[index]
+                  ? element.surgicalCharges[index].otherFees
+                  : 0,
+                TotalSurgicalFees: element.surgicalCharges[index]
+                  ? element.surgicalCharges[index].totalSurgicalFees
+                  : 0,
+                GSTChargedDisplayValue: element.surgicalCharges[index]
+                  ? element.surgicalCharges[index].gSTChargedName
+                  : '',
+              })
+            }
+          })
 
         let LCFormSurgicalChargesAnnex = []
-        formData.procuderes.filter((p) => p.index > 3).forEach((element) => {
-          for (let index = 0; index < 5; index++) {
-            LCFormSurgicalChargesAnnex.push({
-              index: element.index,
-              ProcedureDate: element.procedureDate,
-              StartTime: element.procedureStartTime,
-              EndTime: element.procedureEndTime,
-              NatureOperation: element.natureOfOpertation,
-              SurgicalCode: element.surgicalProcedureCode,
-              SurgicalDescription: element.surgicalProcedureName,
-              SurgicalTable: element.surgicalProcedureTable,
-              PatientName: formData.patientName,
-              PatientAccountNo: formData.patientAccountNo,
-              DateOfAdmission: formData.admissionDate,
-              DoctorMCRNo: element.surgicalCharges[index]
-                ? element.surgicalCharges[index].surgicalSurgeonMCRNo
-                : '',
-              DoctorName: element.surgicalCharges[index]
-                ? element.surgicalCharges[index].surgicalSurgeonName
-                : '',
-              SurgeonRoleDisplayValue: element.surgicalCharges[index]
-                ? element.surgicalCharges[index].surgicalRoleName
-                : '',
-              SurgeonFees: element.surgicalCharges[index]
-                ? element.surgicalCharges[index].surgeonFees
-                : 0,
-              ImplantFees: element.surgicalCharges[index]
-                ? element.surgicalCharges[index].implantFees
-                : 0,
-              OtherFees: element.surgicalCharges[index]
-                ? element.surgicalCharges[index].otherFees
-                : 0,
-              TotalSurgicalFees: element.surgicalCharges[index]
-                ? element.surgicalCharges[index].totalSurgicalFees
-                : 0,
-              GSTChargedDisplayValue: element.surgicalCharges[index]
-                ? element.surgicalCharges[index].gSTChargedName
-                : '',
-            })
-          }
-        })
+        formData.procuderes
+          .filter(p => p.index > 3)
+          .forEach(element => {
+            for (let index = 0; index < 5; index++) {
+              LCFormSurgicalChargesAnnex.push({
+                index: element.index,
+                ProcedureDate: element.procedureDate,
+                StartTime: element.procedureStartTime,
+                EndTime: element.procedureEndTime,
+                NatureOperation: element.natureOfOpertation,
+                SurgicalCode: element.surgicalProcedureCode,
+                SurgicalDescription: element.surgicalProcedureName,
+                SurgicalTable: element.surgicalProcedureTable,
+                PatientName: formData.patientName,
+                PatientAccountNo: formData.patientAccountNo,
+                DateOfAdmission: formData.admissionDate,
+                DoctorMCRNo: element.surgicalCharges[index]
+                  ? element.surgicalCharges[index].surgicalSurgeonMCRNo
+                  : '',
+                DoctorName: element.surgicalCharges[index]
+                  ? element.surgicalCharges[index].surgicalSurgeonName
+                  : '',
+                SurgeonRoleDisplayValue: element.surgicalCharges[index]
+                  ? element.surgicalCharges[index].surgicalRoleName
+                  : '',
+                SurgeonFees: element.surgicalCharges[index]
+                  ? element.surgicalCharges[index].surgeonFees
+                  : 0,
+                ImplantFees: element.surgicalCharges[index]
+                  ? element.surgicalCharges[index].implantFees
+                  : 0,
+                OtherFees: element.surgicalCharges[index]
+                  ? element.surgicalCharges[index].otherFees
+                  : 0,
+                TotalSurgicalFees: element.surgicalCharges[index]
+                  ? element.surgicalCharges[index].totalSurgicalFees
+                  : 0,
+                GSTChargedDisplayValue: element.surgicalCharges[index]
+                  ? element.surgicalCharges[index].gSTChargedName
+                  : '',
+              })
+            }
+          })
 
         let LCFormNonSurgicalCharges = []
         for (let index = 0; index < 7; index++) {
@@ -1539,7 +1521,9 @@ const formTypes = [
               : '',
             SurgeonRoleDisplayValue: formData.nonSurgicalCharges[index]
               ? formData.nonSurgicalCharges[index].surgicalRoleName
-              : index === 0 ? 'Principal Surgeon' : '',
+              : index === 0
+              ? 'Principal Surgeon'
+              : '',
             AttendanceFee: formData.nonSurgicalCharges[index]
               ? formData.nonSurgicalCharges[index].inpatientAttendanceFees
               : 0,
@@ -1574,7 +1558,7 @@ const formTypes = [
               SecondaryDiagnosisCode2: formData.secondDiagnosisBCode,
               SecondaryDiagnosisDescription2: formData.secondDiagnosisBName,
               OtherDiagnosis: formData.otherDiagnosis
-                .map((o) => `${o.diagnosisCode} - ${o.diagnosisName}`)
+                .map(o => `${o.diagnosisCode} - ${o.diagnosisName}`)
                 .join('|'),
             },
           ],
@@ -1910,9 +1894,8 @@ export const documentTemplateTypes = [
   },
 ]
 
-module.exports = {
+export {
   appointmentStatus,
-  recurrenceTypes,
   status,
   approvedStatus,
   chasSchemeTypes,
@@ -1932,11 +1915,7 @@ module.exports = {
   tagList,
   osBalanceStatus,
   buttonTypes,
-  inventoryAdjustmentStatus,
-  shortcutKeys,
-  roundToPrecision,
   gstEnabled,
-  groupByFKFunc,
   initRoomAssignment,
   scribbleTypes,
   formTypes,
@@ -1948,6 +1927,4 @@ module.exports = {
   year,
   queueProcessorType,
   queueItemStatus,
-  documentTemplateTypes,
-  ...module.exports,
 }

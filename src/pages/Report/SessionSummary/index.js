@@ -1,18 +1,18 @@
 import React from 'react'
 import * as Yup from 'yup'
 import moment from 'moment'
-import router from 'umi/router'
+import { router } from 'umi'
 // formik
 import { withFormik } from 'formik'
 // material ui
 import PageView from '@material-ui/icons/Pageview'
-import ReportBase from '../ReportBase'
 // common components
 import { dateFormatLongWithTimeNoSec12h, Button, Tooltip } from '@/components'
 // sub components
 import { ReportDataGrid } from '@/components/_medisys'
 // services
 import { getBizSession } from '@/pages/Reception/Queue/services/index'
+import ReportBase from '../ReportBase'
 import FilterBar from './FilterBar'
 
 const SessionColumns = [
@@ -33,18 +33,16 @@ class SessionSummary extends ReportBase {
     console.log('super.defaultState', this.xx)
   }
 
-  viewSessionSummaryReport = (row) => {
-    router.push(`/report/sessionsummary/${row.id}`)
+  viewSessionSummaryReport = row => {
+    history.push(`/report/sessionsummary/${row.id}`)
   }
 
-  getReportDatas = async (params) => {
+  getReportDatas = async params => {
     try {
       let criteria = {
         pagesize: 99999,
         lgteql_sessionStartDate: params.dateFrom,
-        sorting: [
-          { columnName: 'sessionStartDate', direction: 'desc' },
-        ],
+        sorting: [{ columnName: 'sessionStartDate', direction: 'desc' }],
       }
       if (params.dateTo) {
         criteria.lst_sessionCloseDate = moment(params.dateTo)
@@ -66,13 +64,13 @@ class SessionSummary extends ReportBase {
     return <FilterBar handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
   }
 
-  renderContent = (reportDatas) => {
+  renderContent = reportDatas => {
     if (!reportDatas) return null
     const columnExtensions = [
       {
         columnName: 'isClinicSessionClosed',
         sortingEnabled: false,
-        render: (row) => (row.isClinicSessionClosed ? 'Closed' : 'Ongoing'),
+        render: row => (row.isClinicSessionClosed ? 'Closed' : 'Ongoing'),
       },
       {
         columnName: 'sessionStartDate',
@@ -92,7 +90,7 @@ class SessionSummary extends ReportBase {
         align: 'center',
         columnName: 'action',
         // width: 240,
-        render: (row) => (
+        render: row => (
           <Tooltip title='View Session Summary Report'>
             <Button
               className='noPadding'

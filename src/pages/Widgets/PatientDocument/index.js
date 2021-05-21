@@ -24,13 +24,13 @@ import {
 } from '@material-ui/icons'
 
 // models
-import model from './models'
+// import model from './models'
 import FolderList from './FolderList/index'
 import FolderContainer from './FolderContainer/index'
 
-window.g_app.replaceModel(model)
+// window.g_app.replaceModel(model)
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -45,15 +45,13 @@ class PatientDocument extends Component {
     zoom: 4,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch, values } = this.props
     dispatch({
       type: 'folder/query',
       payload: {
         pagesize: 999,
-        sorting: [
-          { columnName: 'sortOrder', direction: 'asc' },
-        ],
+        sorting: [{ columnName: 'sortOrder', direction: 'asc' }],
       },
     }).then(this.refreshDocuments)
   }
@@ -69,7 +67,7 @@ class PatientDocument extends Component {
     })
   }
 
-  updateAttachments = (args) => ({ added, deleted }) => {
+  updateAttachments = args => ({ added, deleted }) => {
     const { dispatch, patientAttachment = [] } = this.props
     const { list = [] } = patientAttachment
     const { field } = args
@@ -77,11 +75,9 @@ class PatientDocument extends Component {
     const getLargestSortOrder = (largestIndex, attachment) =>
       attachment.sortOrder > largestIndex ? attachment.sortOrder : largestIndex
 
-    let updated = [
-      ...(field.value || []),
-    ]
+    let updated = [...(field.value || [])]
     if (added) {
-      const addedFiles = added.map((file) => {
+      const addedFiles = added.map(file => {
         const { 0: fileDetails, attachmentType } = file
         return {
           ...fileDetails,
@@ -89,10 +85,7 @@ class PatientDocument extends Component {
           attachmentType,
         }
       })
-      updated = [
-        ...updated,
-        ...addedFiles,
-      ]
+      updated = [...updated, ...addedFiles]
       // this.setState({ showTagModal: true, tagList: addedFiles })
     }
 
@@ -102,15 +95,9 @@ class PatientDocument extends Component {
           (item.fileIndexFK !== undefined && item.fileIndexFK === deleted) ||
           (item.fileIndexFK === undefined && item.id === deleted)
         )
-          return [
-            ...attachments,
-            { ...item, isDeleted: true },
-          ]
+          return [...attachments, { ...item, isDeleted: true }]
 
-        return [
-          ...attachments,
-          { ...item },
-        ]
+        return [...attachments, { ...item }]
       }, [])
     const sorted = updated.sort((a, b) => {
       if (a.id > b.id) return 1
@@ -135,21 +122,25 @@ class PatientDocument extends Component {
       ),
     )
       .then(this.refreshDocuments)
-      .catch((error) => {
+      .catch(error => {
         console.error({ error })
       })
   }
 
-  render () {
-    const { patient: { entity }, patientAttachment, folder } = this.props
+  render() {
+    const {
+      patient: { entity },
+      patientAttachment,
+      folder,
+    } = this.props
     const { viewMode, selectedFolderFK, zoom } = this.state
     const patientIsActive = entity && entity.isActive
     const { list = [] } = patientAttachment
 
-    let folderList = (folder.list || []).map((l) => {
+    let folderList = (folder.list || []).map(l => {
       return {
         ...l,
-        fileCount: list.filter((f) => f.folderFKs.includes(l.id)).length,
+        fileCount: list.filter(f => f.folderFKs.includes(l.id)).length,
       }
     })
     folderList = [
@@ -168,7 +159,7 @@ class PatientDocument extends Component {
               folderList={folderList}
               selectedFolderFK={selectedFolderFK}
               updateAttachments={this.updateAttachments}
-              onSelectionChange={(f) => {
+              onSelectionChange={f => {
                 this.setState({ selectedFolderFK: f.id })
               }}
               {...this.props}

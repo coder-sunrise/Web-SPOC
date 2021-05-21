@@ -1,17 +1,15 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { Scribble, Button } from '@/components'
-import model from './models'
+// import model from './models'
 
-window.g_app.replaceModel(model)
+// window.g_app.replaceModel(model)
 
-@connect(({ scriblenotes}) => ({
-   scriblenotes,
+@connect(({ scriblenotes }) => ({
+  scriblenotes,
 }))
-
 class ScribbleNote extends PureComponent {
-  
-  render () {
+  render() {
     return (
       <div>
         <Scribble {...this.props} />

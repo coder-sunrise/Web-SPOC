@@ -8,17 +8,17 @@ import { FORM_CATEGORY, FORM_FROM } from '@/utils/constants'
 import { commonDataReaderTransform } from '@/utils/utils'
 import { formTypes } from '@/utils/codes'
 import { download } from '@/utils/request'
-import model from './models'
+// import model from './models'
 import AddForm from './FormDetail/AddForm'
 import FilterBar from './FilterBar'
 import FormModuleGrid from './FormModuleGrid'
 import VisitFormGrid from './VisitFormGrid'
 
-window.g_app.replaceModel(model)
+// window.g_app.replaceModel(model)
 
 export const printRow = async (row, formCategory = '2') => {
   const type = formTypes.find(
-    (o) => o.value === row.type || o.name === row.type || o.code === row.type,
+    o => o.value === row.type || o.name === row.type || o.code === row.type,
   )
   const { downloadConfig } = type
   if (!downloadConfig) {
@@ -26,10 +26,11 @@ export const printRow = async (row, formCategory = '2') => {
     return
   }
   download(
-    `/api/Reports/${downloadConfig.id}?ReportFormat=pdf&ReportParameters={${downloadConfig.key}:${row.id},FormCategory:"${formCategory ===
-    FORM_CATEGORY.VISITFORM
-      ? 'VisitForm'
-      : 'CORForm'}"}`,
+    `/api/Reports/${downloadConfig.id}?ReportFormat=pdf&ReportParameters={${
+      downloadConfig.key
+    }:${row.id},FormCategory:"${
+      formCategory === FORM_CATEGORY.VISITFORM ? 'VisitForm' : 'CORForm'
+    }"}`,
     {
       type: 'pdf',
     },
@@ -38,7 +39,7 @@ export const printRow = async (row, formCategory = '2') => {
 
 export const viewReport = (row, props) => {
   const type = formTypes.find(
-    (o) => o.value === row.type || o.name === row.type || o.code === row.type,
+    o => o.value === row.type || o.name === row.type || o.code === row.type,
   )
   const { downloadConfig } = type
   if (!downloadConfig) {
@@ -50,7 +51,7 @@ export const viewReport = (row, props) => {
   const { clinicianprofile = [] } = codetable
   const obj =
     clinicianprofile.find(
-      (o) =>
+      o =>
         o.userProfileFK ===
         (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
     ) || {}
@@ -88,11 +89,11 @@ const styles = () => ({})
   mainDivHeight: global.mainDivHeight,
 }))
 class FormListingDetails extends PureComponent {
-  componentDidMount () {
+  componentDidMount() {
     this.queryFormListing()
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.dispatch({
       type: 'formListing/updateState',
       payload: {
@@ -109,8 +110,12 @@ class FormListingDetails extends PureComponent {
         type: 'formListing/query',
         payload: {
           apiCriteria: {
-            visitDateFrom: moment().add(-1, 'month').formatUTC(),
-            visitDateTo: moment().endOf('day').formatUTC(false),
+            visitDateFrom: moment()
+              .add(-1, 'month')
+              .formatUTC(),
+            visitDateTo: moment()
+              .endOf('day')
+              .formatUTC(false),
           },
         },
       })
@@ -144,7 +149,7 @@ class FormListingDetails extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { formFrom, formListing, user, mainDivHeight = 700 } = this.props
 
     const { showModal } = formListing

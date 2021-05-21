@@ -26,10 +26,10 @@ class CHAS extends React.Component {
     allowEdit: false,
   }
 
-  openClaimDetails = (allowEdit) =>
+  openClaimDetails = allowEdit =>
     this.setState({ showClaimDetails: true, allowEdit })
 
-  openSubmitClaimStatus = (count) =>
+  openSubmitClaimStatus = count =>
     this.setState({ showSubmitClaimStatus: true, failedCount: count })
 
   closeClaimDetailsModal = () => {
@@ -51,7 +51,7 @@ class CHAS extends React.Component {
     dispatch({
       type: 'chasClaimSubmissionNew/upsert',
       payload: { ...entity },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         this.closeClaimDetailsModal()
       }
@@ -62,7 +62,7 @@ class CHAS extends React.Component {
   closeSubmitClaimStatus = () =>
     this.setState({ showSubmitClaimStatus: false, failedCount: 0 })
 
-  navigateToInvoiceDetails = (row) => {
+  navigateToInvoiceDetails = row => {
     const { history } = this.props
     const { invoiceFK } = row
     history.push(`/claim-submission/chas/invoice/details?id=${invoiceFK}`)
@@ -77,7 +77,7 @@ class CHAS extends React.Component {
           payload: {
             id: row.id,
           },
-        }).then((r) => {
+        }).then(r => {
           if (r) {
             const { patientDetail = {} } = r
             this.openClaimDetails(allowEdit && !!patientDetail.isActive)
@@ -91,7 +91,7 @@ class CHAS extends React.Component {
           payload: {
             id: row.id,
           },
-        }).then((r) => {
+        }).then(r => {
           if (r) this.navigateToInvoiceDetails(r)
         })
         break
@@ -100,11 +100,11 @@ class CHAS extends React.Component {
     }
   }
 
-  onChangeTab = (e) => {
+  onChangeTab = e => {
     this.setState({ activeTab: e })
   }
 
-  render () {
+  render() {
     const {
       showClaimDetails,
       showSubmitClaimStatus,

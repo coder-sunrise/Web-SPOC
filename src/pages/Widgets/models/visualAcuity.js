@@ -1,15 +1,18 @@
 import { createListViewModel } from 'medisys-model'
-// import * as service from '../services'
 
 export default createListViewModel({
-  namespace: 'testWidget',
+  namespace: 'visualAcuity',
   config: {
     queryOnLoad: false,
   },
   param: {
     service: {},
     state: {
-      default: {},
+      default: {
+        corEyeVisualAcuityTest: {
+          eyeVisualAcuityTestForms: [{}],
+        },
+      },
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {

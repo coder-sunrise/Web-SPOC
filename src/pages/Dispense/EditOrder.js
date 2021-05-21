@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import _ from 'lodash'
-import router from 'umi/router'
+import router from 'umi'
 import { connect } from 'dva'
 import withStyles from '@material-ui/core/styles/withStyles'
 // common component
@@ -62,9 +62,7 @@ const styles = () => ({})
   user,
 }))
 @withFormikExtend({
-  authority: [
-    'queue.dispense.editorder',
-  ],
+  authority: ['queue.dispense.editorder'],
   notDirtyDuration: 0, // this page should alwasy show warning message when leave
   mapPropsToValues: ({ consultation }) => {
     return {
@@ -79,7 +77,7 @@ const styles = () => ({})
     dispenseAcknowledgement: Yup.object().shape({
       editDispenseReasonFK: Yup.number().required(),
       remarks: Yup.string().when('editDispenseReasonFK', {
-        is: (val) => val === 2,
+        is: val => val === 2,
         then: Yup.string().required(),
       }),
     }),
@@ -95,7 +93,7 @@ class EditOrder extends Component {
     isShowPackageSelectModal: false,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { setFieldValue, values } = this.props
     setTimeout(() => {
       setFieldValue('fakeField', 'setdirty')
@@ -107,23 +105,18 @@ class EditOrder extends Component {
       const packages = pendingPackage.reduce(
         (distinct, data) =>
           distinct.includes(data.patientPackageFK)
-            ? [
-                ...distinct,
-              ]
-            : [
-                ...distinct,
-                data.patientPackageFK,
-              ],
+            ? [...distinct]
+            : [...distinct, data.patientPackageFK],
         [],
       )
 
-      if (packages && packages.length > 1) {      
-        this.setState({ isShowPackageSelectModal: true })   
-      }      
+      if (packages && packages.length > 1) {
+        this.setState({ isShowPackageSelectModal: true })
+      }
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.dispatch({
       type: `dispense/updateState`,
       payload: {
@@ -142,7 +135,7 @@ class EditOrder extends Component {
       pid: patientInfo.id,
       vid: dispense.visitID,
     }
-    router.push(getAppendUrl(parameters, '/reception/queue/billing'))
+    history.push(getAppendUrl(parameters, '/reception/queue/billing'))
   }
 
   editOrder = () => {
@@ -156,7 +149,7 @@ class EditOrder extends Component {
         queueID: query.qid,
         version: dispense.version,
       },
-    }).then((o) => {
+    }).then(o => {
       if (o) {
         dispatch({
           type: `dispense/updateState`,
@@ -187,7 +180,7 @@ class EditOrder extends Component {
 
   signOrder = async () => {
     const { values, validateForm, handleSubmit, forms } = this.props
-    if (forms.rows.filter((o) => o.statusFK === 1 && !o.isDeleted).length > 0) {
+    if (forms.rows.filter(o => o.statusFK === 1 && !o.isDeleted).length > 0) {
       notification.warning({
         message: `Draft forms found, please finalize it before save.`,
       })
@@ -278,14 +271,14 @@ class EditOrder extends Component {
   }
 
   closePackageSelectModal = () => {
-    this.setState({ isShowPackageSelectModal: false }) 
+    this.setState({ isShowPackageSelectModal: false })
   }
 
-  render () {
+  render() {
     const { classes, theme } = this.props
-    const orderWidget = widgets.find((o) => o.id === '5')
-    const cdWidget = widgets.find((o) => o.id === '3')
-    const formsWidget = widgets.find((o) => o.id === '12')
+    const orderWidget = widgets.find(o => o.id === '5')
+    const cdWidget = widgets.find(o => o.id === '3')
+    const formsWidget = widgets.find(o => o.id === '12')
     const Order = orderWidget.component
     const ConsultationDocument = cdWidget.component
     const consultationDocumentAccessRight = Authorized.check(
@@ -301,8 +294,7 @@ class EditOrder extends Component {
             <Order className={classes.orderPanel} status='' from='EditOrder' />
           </GridItem>
           <GridItem xs={12} md={6}>
-            {formAccessRight &&
-            formAccessRight.rights !== 'hidden' && (
+            {formAccessRight && formAccessRight.rights !== 'hidden' && (
               <div>
                 <h5>
                   <span style={{ display: 'inline-block' }}>Forms</span>
@@ -314,23 +306,23 @@ class EditOrder extends Component {
               </div>
             )}
             {consultationDocumentAccessRight &&
-            consultationDocumentAccessRight.rights !== 'hidden' && (
-              <div>
-                <h5>
-                  <span style={{ display: 'inline-block' }}>
-                    Consultation Document
-                  </span>
-                  <span className={classes.cdAddButton}>
-                    {cdWidget.toolbarAddon}
-                  </span>
-                </h5>
-                <ConsultationDocument forDispense />
-              </div>
-            )}
+              consultationDocumentAccessRight.rights !== 'hidden' && (
+                <div>
+                  <h5>
+                    <span style={{ display: 'inline-block' }}>
+                      Consultation Document
+                    </span>
+                    <span className={classes.cdAddButton}>
+                      {cdWidget.toolbarAddon}
+                    </span>
+                  </h5>
+                  <ConsultationDocument forDispense />
+                </div>
+              )}
             <GridItem xs={12} md={6}>
               <FastField
                 name='dispenseAcknowledgement.editDispenseReasonFK'
-                render={(args) => {
+                render={args => {
                   return (
                     <CodeSelect
                       label='Reason'
@@ -344,7 +336,7 @@ class EditOrder extends Component {
             <GridItem xs={12}>
               <FastField
                 name='dispenseAcknowledgement.remarks'
-                render={(args) => {
+                render={args => {
                   return (
                     <TextField
                       multiline
@@ -359,10 +351,10 @@ class EditOrder extends Component {
             <GridItem xs={12}>
               <FastField
                 name='acknowledged'
-                render={(args) => {
+                render={args => {
                   return (
                     <Checkbox
-                      onChange={(e) => {
+                      onChange={e => {
                         this.setState({
                           acknowledged: e.target.value,
                         })

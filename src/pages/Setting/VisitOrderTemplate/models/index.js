@@ -1,9 +1,9 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import _ from 'lodash'
-import * as service from '../services'
 import { visitOrderTemplateItemTypes } from '@/utils/codes'
 import { getUniqueId } from '@/utils/utils'
+import service from '../services'
 
 export default createListViewModel({
   namespace: 'settingVisitOrderTemplate',
@@ -25,7 +25,7 @@ export default createListViewModel({
     },
     effects: {},
     reducers: {
-      reset (st) {
+      reset(st) {
         return {
           ...st,
           default: {
@@ -34,7 +34,7 @@ export default createListViewModel({
           },
         }
       },
-      queryOneDone (st, { payload }) {
+      queryOneDone(st, { payload }) {
         const {
           effectiveStartDate,
           effectiveEndDate,
@@ -43,13 +43,13 @@ export default createListViewModel({
         } = payload.data
 
         let itemTypesRows = []
-        visitOrderTemplateItemTypes.forEach((type) => {
+        visitOrderTemplateItemTypes.forEach(type => {
           const currentTypeItems = visitOrderTemplateItemDtos.filter(
-            (itemType) => itemType.inventoryItemTypeFK === type.id,
+            itemType => itemType.inventoryItemTypeFK === type.id,
           )
           itemTypesRows = [
             ...itemTypesRows,
-            ...currentTypeItems.map((item) => {
+            ...currentTypeItems.map(item => {
               return {
                 uid: getUniqueId(),
                 type: item.inventoryItemTypeFK,
@@ -68,25 +68,19 @@ export default createListViewModel({
           entity: {
             ...restValues,
             rows: _.sortBy(itemTypesRows, 'sortOrder'),
-            effectiveDates: [
-              effectiveStartDate,
-              effectiveEndDate,
-            ],
+            effectiveDates: [effectiveStartDate, effectiveEndDate],
           },
         }
       },
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         const { data } = payload
 
         return {
           ...st,
-          list: data.data.map((o) => {
+          list: data.data.map(o => {
             return {
               ...o,
-              effectiveDates: [
-                o.effectiveStartDate,
-                o.effectiveEndDate,
-              ],
+              effectiveDates: [o.effectiveStartDate, o.effectiveEndDate],
             }
           }),
         }

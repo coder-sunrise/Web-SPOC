@@ -3,16 +3,16 @@ import * as service from '@/services/common'
 
 const url = '/api/cestemplate'
 
-module.exports = {
-  queryList: (userId) => {
+const fns = {
+  queryList: userId => {
     return request(`${url}/list`, {
       method: 'GET',
     })
   },
-  queryOne: (params) => {
+  queryOne: params => {
     return service.query(url, params)
   },
-  remove: (params) => service.remove(url, params),
+  remove: params => service.remove(url, params),
 
   create: (name, params) => {
     return request(`${url}?name=${name}`, {
@@ -32,3 +32,5 @@ module.exports = {
     })
   },
 }
+
+export default fns

@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import moment from 'moment'
-import router from 'umi/router'
+import { history, formatMessage } from 'umi'
 import _ from 'lodash'
 import { withStyles } from '@material-ui/core'
-import { formatMessage } from 'umi'
+
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -95,7 +95,9 @@ class Index extends Component {
       // Duplicate order
       case 'dup':
         if (createdId) {
-          router.push(`/inventory/rg/rgdetails?id=${createdId}&&type=${'edit'}`)
+          history.push(
+            `/inventory/rg/rgdetails?id=${createdId}&&type=${'edit'}`,
+          )
           this.props.dispatch({
             type: 'receivingGoodsDetails/queryReceivingGoods',
             payload: { id: createdId, type: 'edit' },
@@ -117,7 +119,9 @@ class Index extends Component {
       // Create new order
       default:
         if (createdId && type === 'new') {
-          router.push(`/inventory/rg/rgdetails?id=${createdId}&&type=${'edit'}`)
+          history.push(
+            `/inventory/rg/rgdetails?id=${createdId}&&type=${'edit'}`,
+          )
           this.props.dispatch({
             type: 'receivingGoodsDetails/queryReceivingGoods',
             payload: { id: createdId, type: 'edit' },
@@ -173,7 +177,7 @@ class Index extends Component {
               const { id } = r
               this.getrgata(id)
             } else {
-              router.push('/inventory/rg')
+              history.push('/inventory/rg')
             }
           }
         })

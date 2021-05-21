@@ -13,16 +13,16 @@ import {
 import Authorized from '@/utils/Authorized'
 
 import PatientNurseNotesContent from '@/pages/PatientDatabase/Detail/PatientNurseNotes/content'
-import model from '@/pages/PatientDatabase/Detail/PatientNurseNotes/models'
+// import model from '@/pages/PatientDatabase/Detail/PatientNurseNotes/models'
 
-window.g_app.replaceModel(model)
+// window.g_app.replaceModel(model)
 
 @connect(({ patient, patientNurseNotes }) => ({
   patient,
   patientNurseNotes,
 }))
 class PatientNurseNotes extends Component {
-  componentDidMount () {
+  componentDidMount() {
     this.refreshNurseNotes()
   }
 
@@ -32,9 +32,7 @@ class PatientNurseNotes extends Component {
       PatientProfileFK: patient.entity.id,
       pagesize: 999,
       version: Date.now(),
-      sorting: [
-        { columnName: 'createDate', direction: 'desc' },
-      ],
+      sorting: [{ columnName: 'createDate', direction: 'desc' }],
     }
 
     dispatch({
@@ -43,13 +41,13 @@ class PatientNurseNotes extends Component {
     })
   }
 
-  render () {
+  render() {
     const { dispatch, patientNurseNotes = {} } = this.props
     const { list = [] } = patientNurseNotes
     return (
       <GridContainer>
         <GridItem md={12}>
-          {list.map((i) => (
+          {list.map(i => (
             <PatientNurseNotesContent
               entity={i}
               dispatch={dispatch}

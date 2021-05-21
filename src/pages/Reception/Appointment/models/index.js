@@ -2,7 +2,7 @@ import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import { timeFormat } from '@/components'
 import { getUniqueId } from '@/utils/utils'
-import * as service from '../services'
+import service from '../services'
 
 const calculateDuration = (startTime, endTime) => {
   const duration = moment.duration(
@@ -25,7 +25,7 @@ const calculateDuration = (startTime, endTime) => {
   if (hours === 0 && mins === 0) string = '0 MIN'
   return string
 }
-const splitApptResource = (data) => {
+const splitApptResource = data => {
   let formattedList = []
   for (let i = 0; i < data.length; i++) {
     const { appointment_Resources, ...restValues } = data[i]
@@ -67,10 +67,7 @@ const splitApptResource = (data) => {
       }
     })
 
-    formattedList = [
-      ...formattedList,
-      ...currentPatientAppts,
-    ]
+    formattedList = [...formattedList, ...currentPatientAppts]
   }
   return formattedList
 }
@@ -86,8 +83,8 @@ export default createListViewModel({
       filterTemplates: [],
     },
     effects: {
-      *saveFilterTemplate ({ payload }, { call, put, select }) {
-        const user = yield select((st) => st.user)
+      *saveFilterTemplate({ payload }, { call, put, select }) {
+        const user = yield select(st => st.user)
         const r = yield call(service.saveFilterTemplate, user.data.id, {
           userPreferenceDetails: JSON.stringify(payload),
         })
@@ -96,7 +93,7 @@ export default createListViewModel({
 
         return false
       },
-      *getFilterTemplate ({ payload }, { call, put }) {
+      *getFilterTemplate({ payload }, { call, put }) {
         const r = yield call(service.getFilterTemplate, payload)
         const { status, data } = r
 
@@ -105,7 +102,7 @@ export default createListViewModel({
             const parsedFilterTemplate = JSON.parse(data.userPreferenceDetails)
 
             const favFilterTemplate = parsedFilterTemplate.find(
-              (template) => template.isFavorite,
+              template => template.isFavorite,
             )
             const filterTemplate = {
               filterTemplates: parsedFilterTemplate,
@@ -122,18 +119,15 @@ export default createListViewModel({
       },
     },
     reducers: {
-      queryOneDone (st, { payload }) {
+      queryOneDone(st, { payload }) {
         const { data } = payload
-        data.effectiveDates = [
-          data.effectiveStartDate,
-          data.effectiveEndDate,
-        ]
+        data.effectiveDates = [data.effectiveStartDate, data.effectiveEndDate]
         return {
           ...st,
           entity: data,
         }
       },
-      querySuccess (st, { payload }) {
+      querySuccess(st, { payload }) {
         const { data, filter = {}, version, keepFilter = true } = payload
         const list = splitApptResource(
           data.entities ? data.entities : data.data,
@@ -158,7 +152,7 @@ export default createListViewModel({
         }
       },
 
-      setFilterTemplate (st, { payload }) {
+      setFilterTemplate(st, { payload }) {
         const { filterTemplates, currentFilterTemplate } = payload
         return {
           ...st,
@@ -166,13 +160,13 @@ export default createListViewModel({
           currentFilterTemplate,
         }
       },
-      setCurrentFilterTemplate (st, { payload }) {
+      setCurrentFilterTemplate(st, { payload }) {
         const { id } = payload
         const { filterTemplates } = st
 
         if (id) {
           const { filterByDoctor, filterByApptType } = filterTemplates.find(
-            (template) => template.id === id,
+            template => template.id === id,
           )
           return {
             ...st,

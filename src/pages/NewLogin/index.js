@@ -6,8 +6,7 @@ import * as Yup from 'yup'
 // formik
 import { FastField, withFormik } from 'formik'
 // umi
-import router from 'umi/router'
-import { formatMessage, FormattedMessage } from 'umi'
+import { formatMessage, FormattedMessage, history } from 'umi'
 // material ui
 import { withStyles } from '@material-ui/core'
 import LockOpen from '@material-ui/icons/LockOpen'
@@ -126,8 +125,7 @@ const submitKey = 'login/getToken'
   },
   handleSubmit: (values, { props }) => {
     const { username, password, clinicCode } = values
-    const { dispatch, routing, versionCheck } = props
-    const { location } = routing
+    const { dispatch, versionCheck } = props
 
     const credential = { username, password, clinicCode }
     const loginDestination = '/reception/queue' // always land at reception/queue
@@ -167,7 +165,7 @@ const submitKey = 'login/getToken'
 
           reloadAuthorized()
           await versionCheck()
-          router.push(loginDestination)
+          history.push(loginDestination)
         }
       })
       .catch(error => {
@@ -200,7 +198,7 @@ class NewLogin extends React.Component {
   }
 
   onForgotPasswordClick = () => {
-    router.push('/user/forgotpassword')
+    history.push('/user/forgotpassword')
   }
 
   render() {

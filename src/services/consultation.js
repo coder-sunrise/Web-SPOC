@@ -5,51 +5,51 @@ import * as service from '@/services/common'
 const url = '/api/consultation'
 const billingUrl = '/api/billing'
 
-module.exports = {
-  remove: (params) => service.remove(url, params),
-  query: (params) => {
+const fns = {
+  remove: params => service.remove(url, params),
+  query: params => {
     // console.log(url, params)
     return service.query(url, params)
   },
-  create: async (visitFK) => {
+  create: async visitFK => {
     const r = await request(`${url}/${visitFK}`, {
       method: 'POST',
     })
     return r
   },
-  discardDetails: async (params) => {
+  discardDetails: async params => {
     const r = await request(`${url}/${params.id}`, {
       method: 'DELETE',
       body: params,
     })
     return r
   },
-  pause: async (params) => {
+  pause: async params => {
     const r = await request(`${url}/pause/${params.id}`, {
       method: 'PUT',
       body: params,
     })
     return r
   },
-  resume: async (id) => {
+  resume: async id => {
     const r = await request(`${url}/resume/${id}`, {
       method: 'PUT',
     })
     return r
   },
-  edit: async (id) => {
+  edit: async id => {
     const r = await request(`${url}/edit/${id}`, {
       method: 'PUT',
     })
     return r
   },
-  overwrite: async (id) => {
+  overwrite: async id => {
     const r = await request(`${url}/overwrite/${id}`, {
       method: 'PUT',
     })
     return r
   },
-  sign: async (params) => {
+  sign: async params => {
     const r = await request(`${url}/sign/${params.id}`, {
       method: 'PUT',
       body: params,
@@ -57,20 +57,20 @@ module.exports = {
 
     return r
   },
-  editOrder: async (id) => {
+  editOrder: async id => {
     const r = await request(`${url}/editorder/${id}`, {
       method: 'PUT',
     })
     return r
   },
-  signOrder: async (params) => {
+  signOrder: async params => {
     const r = await request(`${url}/signorder/${params.id}`, {
       method: 'PUT',
       body: params,
     })
     return r
   },
-  completeOrder: async (params) => {
+  completeOrder: async params => {
     const r = await request(`${billingUrl}/complete/${params.id}`, {
       method: 'PUT',
       body: params,
@@ -85,3 +85,5 @@ module.exports = {
     return r
   },
 }
+
+export default fns

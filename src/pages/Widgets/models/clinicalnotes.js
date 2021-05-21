@@ -1,15 +1,16 @@
-import { createListViewModel } from 'medisys-model'
-// import * as service from '../services'
+import { createFormViewModel } from 'medisys-model'
 
-export default createListViewModel({
-  namespace: 'testWidget',
+export default createFormViewModel({
+  namespace: 'clinicalnotes',
   config: {
     queryOnLoad: false,
   },
   param: {
     service: {},
     state: {
-      default: {},
+      default: {
+        clinicalNotes: 'Test notes',
+      },
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {

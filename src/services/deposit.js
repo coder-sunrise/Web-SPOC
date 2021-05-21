@@ -5,9 +5,9 @@ const url = '/api/deposit'
 const bizSessionUrl = '/api/bizSession'
 const depositUrl = '/api/Patient/IncludeDepositDetails'
 
-module.exports = {
-  queryList: (params) => service.queryList(depositUrl, params),
-  upsertDeposit: async (params) => {
+const fns = {
+  queryList: params => service.queryList(depositUrl, params),
+  upsertDeposit: async params => {
     const r = await request(`${url}`, {
       method: 'POST',
       body: {
@@ -16,7 +16,7 @@ module.exports = {
     })
     return r
   },
-  deleteTransaction: async (params) => {
+  deleteTransaction: async params => {
     const r = await request(`${url}/transaction/${params.id}`, {
       method: 'DELETE',
       body: params.reason,
@@ -24,6 +24,7 @@ module.exports = {
     return r
   },
 
-  query: (params) => service.query(url, params),
-  queryBizSession: (params) => service.queryList(bizSessionUrl, params),
+  query: params => service.query(url, params),
+  queryBizSession: params => service.queryList(bizSessionUrl, params),
 }
+export default fns

@@ -13,10 +13,10 @@ export default createBasicModel({
     subscriptions: ({ dispatch, history }) => {},
     effects: {},
     reducers: {
-      clearNotification (state, { payload = {} }) {
+      clearNotification(state, { payload = {} }) {
         const { notification = {}, type } = payload
         const { timestamp } = notification
-        const list = state.notifications.filter((o) => {
+        const list = state.notifications.filter(o => {
           return !timestamp && !type
             ? false
             : timestamp !== o.timestamp && type !== o.type
@@ -25,10 +25,10 @@ export default createBasicModel({
 
         return { ...state, notifications: list }
       },
-      readNotification (state, { payload = {} }) {
+      readNotification(state, { payload = {} }) {
         const { notification = {}, type } = payload
         const { timestamp } = notification
-        const list = state.notifications.map((o) => ({
+        const list = state.notifications.map(o => ({
           ...o,
           read:
             o.read || (!timestamp && !type)
@@ -42,13 +42,10 @@ export default createBasicModel({
           notifications: list,
         }
       },
-      appendNotification (state, { payload = {} }) {
+      appendNotification(state, { payload = {} }) {
         return {
           ...state,
-          notifications: [
-            ...state.notifications,
-            payload,
-          ],
+          notifications: [...state.notifications, payload],
         }
       },
     },

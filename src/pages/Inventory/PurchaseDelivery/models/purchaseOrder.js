@@ -1,6 +1,4 @@
-import { queryFakeList, fakeSubmitForm } from '@/services/api'
 import { createFormViewModel } from 'medisys-model'
-// import * as service from '../services'
 
 export default createFormViewModel({
   namespace: 'purchaseOrder',

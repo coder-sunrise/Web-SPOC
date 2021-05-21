@@ -1,5 +1,5 @@
 import React from 'react'
-import Link, { formatMessage } from 'umi'
+import { Link, formatMessage } from 'umi'
 
 import Exception from '@/components/Exception'
 

@@ -3,13 +3,13 @@ import request from '@/utils/request'
 
 const url = '/api/InventoryVaccination'
 
-module.exports = {
-  queryList: (params) => service.queryList(url, params),
-  remove: (params) => service.remove(url, params),
-  query: (params) => {
+const fns = {
+  queryList: params => service.queryList(url, params),
+  remove: params => service.remove(url, params),
+  query: params => {
     return service.query(url, params)
   },
-  upsert: (params) => {
+  upsert: params => {
     return service.upsert(url, params)
   },
 
@@ -22,7 +22,7 @@ module.exports = {
     })
   },
 
-  import: (params) => {
+  import: params => {
     return request(`${url}/import`, {
       method: 'POST',
       body: params,
@@ -32,3 +32,4 @@ module.exports = {
     })
   },
 }
+export default fns

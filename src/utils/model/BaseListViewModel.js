@@ -1,26 +1,19 @@
 ﻿import lodash from 'lodash'
-import cryptoJS from 'crypto-js'
-import {
-  getUniqueId,
-  commonDataReaderTransform,
-  decrypt,
-  decryptToString,
-} from 'medisys-util'
 import BaseCRUDViewModel from './BaseCRUDViewModel'
 
 export default class BaseListViewModel extends BaseCRUDViewModel {
-  constructor (options) {
+  constructor(options) {
     super(options)
     this.options = options
   }
 
-  effects () {
+  effects() {
     const { namespace, param } = this.options
     const { service, effects } = param
     return {
       ...super.effects({ queryFnName: 'queryList' }),
 
-      *queryOne (
+      *queryOne(
         { payload = { keepFilter: true, defaultQuery: false }, history },
         { call, put, select },
       ) {
@@ -46,8 +39,8 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
         // }
       },
 
-      *create ({ payload }, { select, call, put }) {
-        const state = yield select((st) => st[namespace])
+      *create({ payload }, { select, call, put }) {
+        const state = yield select(st => st[namespace])
         const newObj = state.currentItem
         const newEntity = payload || newObj
         const response = yield call(service.create, newEntity)
@@ -68,8 +61,8 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
         throw response
       },
 
-      *update ({ payload }, { select, call, put }) {
-        const data = yield select((st) => st[namespace].currentItem)
+      *update({ payload }, { select, call, put }) {
+        const data = yield select(st => st[namespace].currentItem)
         if (data) {
           const { id } = data
           const newEntity = payload ? { ...payload, id } : data
@@ -84,7 +77,7 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
         }
       },
 
-      *lock ({ payload }, { call, put }) {
+      *lock({ payload }, { call, put }) {
         const response = yield call(service.lock, payload)
         if (response.success) {
           yield put({ type: 'hideModal' })
@@ -94,7 +87,7 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
         }
       },
 
-      *unlock ({ payload }, { call, put }) {
+      *unlock({ payload }, { call, put }) {
         const response = yield call(service.unlock, payload)
         if (response.success) {
           yield put({ type: 'hideModal' })
@@ -108,12 +101,12 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
     }
   }
 
-  reducers () {
+  reducers() {
     const { param } = this.options
     const { reducers } = param
     return {
       ...super.reducers(),
-      querySuccess (st, { payload = {} }) {
+      querySuccess(st, { payload = {} }) {
         // console.log(st)
         const { data, filter = {}, version, keepFilter = true } = payload
         // const { entities, filter } = data
@@ -143,7 +136,7 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
         }
       },
 
-      querySingleSuccess (st, { payload }) {
+      querySingleSuccess(st, { payload }) {
         // console.log(payload)
         const { data } = payload
         // console.log('commonDataReaderTransform', 2)
@@ -156,7 +149,7 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
         }
       },
 
-      add (st, { payload }) {
+      add(st, { payload }) {
         const { data } = payload
         let { id } = data
         if (!id) {
@@ -169,9 +162,9 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
           list,
         }
       },
-      addMany (st, { payload }) {
+      addMany(st, { payload }) {
         const { list: newList = [] } = payload
-        newList.forEach((element) => {
+        newList.forEach(element => {
           let { id } = element
           if (!id) {
             id = getUniqueId()
@@ -180,16 +173,13 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
         }, this)
 
         const { list } = st
-        const listUpdated = [
-          ...list,
-          ...newList,
-        ]
+        const listUpdated = [...list, ...newList]
         return {
           ...st,
           list: listUpdated,
         }
       },
-      save (st, { payload }) {
+      save(st, { payload }) {
         const { data } = payload
         const { id } = data
         const { list } = st
@@ -200,7 +190,7 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
           list,
         }
       },
-      remove (st, { payload }) {
+      remove(st, { payload }) {
         const { data } = payload
         const { id } = data
         const { list } = st
@@ -216,7 +206,7 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
     }
   }
 
-  create () {
+  create() {
     const _this = this
     const { namespace, param, config = {} } = this.options
     const { queryOnLoad = false } = config
@@ -243,9 +233,9 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
       state: combinedState,
 
       subscriptions: {
-        setup ({ dispatch, history }) {
+        setup({ dispatch, history }) {
           superSubscription.call(_this, { dispatch, history })
-          history.listen((location) => {
+          history.listen(location => {
             // // console.log(location.pathname.toLowerCase() , `/${namespace.replace('_', '/').toLowerCase()}`)
             // if (queryOnLoad) {
             //   const query = decrypt(location.search.substring(1))

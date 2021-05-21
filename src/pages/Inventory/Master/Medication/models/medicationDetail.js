@@ -1,8 +1,6 @@
 import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
-import * as service from '../services'
-import { queryMedicPrecaution } from '../services'
-import { getUniqueGUID } from '@/utils/cdrss'
+import service from '../services'
 
 const { upsert } = service
 
@@ -36,7 +34,7 @@ export default createFormViewModel({
       },
     },
     subscriptions: ({ dispatch, history }) => {
-      history.listen((loct) => {
+      history.listen(loct => {
         const { pathname, query = {} } = loct
         if (query.uid) {
           dispatch({
@@ -61,11 +59,11 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *submit ({ payload }, { call }) {
+      *submit({ payload }, { call }) {
         return yield call(upsert, payload)
       },
-      *medicPrecautionList ({ payload }, { call, put }) {
-        const response = yield call(queryMedicPrecaution, payload)
+      *medicPrecautionList({ payload }, { call, put }) {
+        const response = yield call(service.queryMedicPrecaution, payload)
         yield put({
           type: 'getMedicPrecautionList',
           payload: response.status === '200' ? response.data : {},
@@ -73,11 +71,11 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      getMedicPrecautionList (state, { payload }) {
+      getMedicPrecautionList(state, { payload }) {
         const { data } = payload
         return {
           ...state,
-          ctmedicationprecaution: data.map((x) => {
+          ctmedicationprecaution: data.map(x => {
             return {
               medicationPrecautionFK: x.id,
               value: x.displayValue,
@@ -86,16 +84,13 @@ export default createFormViewModel({
         }
       },
 
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         const { data } = payload
         return {
           ...st,
           entity: {
             ...data,
-            effectiveDates: [
-              data.effectiveStartDate,
-              data.effectiveEndDate,
-            ],
+            effectiveDates: [data.effectiveStartDate, data.effectiveEndDate],
           },
         }
       },

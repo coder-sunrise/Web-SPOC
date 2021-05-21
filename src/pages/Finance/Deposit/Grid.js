@@ -11,11 +11,9 @@ import {
   dateFormatLong,
   CustomInput,
 } from '@/components'
-import config from '@/utils/config'
+import { currencyFormat, currencySymbol } from '@/utils/config'
 import PatientDeposit from './PatientDeposit'
 import Modal from './Modal'
-
-const { currencyFormat, currencySymbol } = config
 
 class Grid extends PureComponent {
   state = {
@@ -36,17 +34,15 @@ class Grid extends PureComponent {
         columnName: 'balance',
         sortBy: 'PatientDeposit.balance',
         align: 'right',
-        render: (row) => {
+        render: row => {
           return (
             <CustomInput
               text
               currency
               value={
-                row.balance || row.balance === 0 ? (
-                  currencySymbol + numeral(row.balance).format(currencyFormat)
-                ) : (
-                  undefined
-                )
+                row.balance || row.balance === 0
+                  ? currencySymbol + numeral(row.balance).format(currencyFormat)
+                  : undefined
               }
             />
           )
@@ -135,7 +131,7 @@ class Grid extends PureComponent {
         type: 'deposit/updateState',
         payload: {
           showModal: true,
-          entity: list.find((o) => o.id === row.id),
+          entity: list.find(o => o.id === row.id),
         },
       })
     }
@@ -147,18 +143,18 @@ class Grid extends PureComponent {
   }
 
   toggleModal = () => {
-    this.setState((prevState) => ({
+    this.setState(prevState => ({
       showDepositRefundModal: !prevState.showDepositRefundModal,
     }))
   }
 
   togglePatientDepositModal = () => {
-    this.setState((prevState) => ({
+    this.setState(prevState => ({
       showPatientDeposit: !prevState.showPatientDeposit,
     }))
   }
 
-  rowDoubleClick = (row) => {
+  rowDoubleClick = row => {
     const { dispatch } = this.props
     const { patientProfileFK } = row
     dispatch({
@@ -171,7 +167,7 @@ class Grid extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { isDeposit, showDepositRefundModal, showPatientDeposit } = this.state
     const { height } = this.props
     return (

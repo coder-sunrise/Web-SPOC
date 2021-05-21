@@ -1,7 +1,7 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
-import * as service from '../services'
 import { notification } from '@/components'
+import service from '../services'
 
 export default createListViewModel({
   namespace: 'inventoryAdjustment',
@@ -30,13 +30,13 @@ export default createListViewModel({
       //   return yield call(service.getRunningNo)
       // },
 
-      *getStockDetails ({ payload }, { call, put }) {
+      *getStockDetails({ payload }, { call, put }) {
         const result = yield call(service.queryStockDetails, payload)
         return result
         // yield put({ type: 'saveStockDetails', payload: result })
       },
 
-      *removeRow ({ payload }, { call, put }) {
+      *removeRow({ payload }, { call, put }) {
         const result = yield call(service.remove, payload)
         if (result === 204) {
           notification.success({ message: 'Deleted' })
@@ -44,12 +44,12 @@ export default createListViewModel({
       },
     },
     reducers: {
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         const { data } = payload
         return {
           ...st,
           entity: {
-            list: data.data.map((o) => {
+            list: data.data.map(o => {
               return {
                 ...o,
               }
@@ -58,13 +58,13 @@ export default createListViewModel({
         }
       },
 
-      queryOneDone (st, { payload }) {
+      queryOneDone(st, { payload }) {
         const { data } = payload
         return {
           ...st,
           entity: {
             ...data,
-            inventoryAdjustmentItems: data.inventoryAdjustmentItems.map((o) => {
+            inventoryAdjustmentItems: data.inventoryAdjustmentItems.map(o => {
               return {
                 ...o,
                 preInventoryTypeFK: o.inventoryTypeFK,

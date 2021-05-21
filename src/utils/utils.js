@@ -1,26 +1,17 @@
 import moment from 'moment'
 import React from 'react'
 import _ from 'lodash'
-import { isNumber } from 'util'
+import { camelizeKeys, pascalizeKeys } from 'humps'
 
 import nzh from 'nzh/cn'
-import router from 'umi/router'
-import { formatMessage, setLocale, getLocale } from 'umi'
+import { formatMessage, setLocale, getLocale, history } from 'umi'
+
 import { parse, stringify } from 'qs'
-import $ from 'jquery'
 import numeral from 'numeral'
-import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import Authorized from '@/utils/Authorized'
 
-import * as cdrssUtil from 'medisys-util'
-import {
-  NumberInput,
-  CustomInput,
-  serverDateTimeFormatFull,
-  serverDateFormat,
-  notification,
-} from '@/components'
-import config from './config'
+import { serverDateTimeFormatFull, serverDateFormat } from '@/components'
+import * as config from './config'
 import RouterConfig from '../../config/router.config'
 
 window.addEventListener('unhandledrejection', event => {
@@ -412,6 +403,25 @@ const findGetParameter = parameterName => {
   return result
 }
 
+let runningId = 0
+export const getUniqueId = (prefix = 'sys-gen-') => {
+  runningId -= 1
+  return `${prefix}${runningId}`
+}
+export const getUniqueGUID = () => {
+  let d = new Date().getTime()
+  let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    let r = (d + Math.random() * 16) % 16 | 0
+    d = Math.floor(d / 16)
+    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16)
+  })
+  return uuid
+}
+export const getUniqueNumericId = () => {
+  runningId -= 1
+  return runningId
+}
+
 const convertToQuery = (query = {}, convertExcludeFields = ['create']) => {
   // //console.log(query)
   const {
@@ -706,7 +716,7 @@ const _checkCb = ({ redirectUrl, onProceed }, e) => {
     onProceed(e)
   }
   if (redirectUrl) {
-    router.push(redirectUrl)
+    history.push(redirectUrl)
   }
 }
 
@@ -1386,20 +1396,87 @@ const getModuleSequence = moduleName => {
   else return 1000
 }
 
-module.exports = {
-  ...cdrssUtil,
-  ...module.exports,
+export const formatUrlPath = (url, data) => {
+  const newData = camelizeKeys({
+    ...data,
+  })
+  let newUrl = url
+  try {
+    let domin = ''
+    if (newUrl.match(/[a-zA-z]+:\/\/[^/]*/)) {
+      domin = newUrl.match(/[a-zA-z]+:\/\/[^/]*/)[0]
+      newUrl = newUrl.slice(domin.length)
+    }
+    const match = pathToRegexp.parse(newUrl)
+    if (match.length > 1) {
+      for (let index = 1; index < match.length; index++) {
+        let element = match[index]
+        if (!newData[element.name]) {
+          newUrl = newUrl.replace(`:${element.name}`, '')
+        }
+      }
+      newUrl = pathToRegexp.compile(newUrl)(newData)
+      const index = newUrl.indexOf('?')
+      if (index >= 0) {
+        const subUrl = newUrl.substring(index + 1)
+        const para = queryString.parse(subUrl)
+        newUrl = `${newUrl.substring(0, index + 1)}${encrypt(para)}`
+      }
+      // for (let item of match) {
+      //   if (item instanceof Object && item.name in newData) {
+      //     delete data[item.name]
+      //   }
+      // }
+    }
+
+    return domin + newUrl
+  } catch (e) {
+    message.error(e.message)
+    return url
+  }
+}
+
+export const cleanFieldValue = data => {
+  // console.log(data, fieldName)
+  if (data === undefined || data === null) return data
+  if (typeof data === 'object') {
+    if (Array.isArray(data)) {
+      data.forEach(element => {
+        cleanFieldValue(element)
+      })
+    } else {
+      if (data.isNew) {
+        delete data.id
+      }
+      for (let field in data) {
+        if (Object.prototype.hasOwnProperty.call(data, field)) {
+          if (Array.isArray(data[field])) {
+            // data[field] = lodash.sortBy(data[field], [
+            //   (o) => o[fieldName],
+            // ])
+            for (let subfield in data[field]) {
+              if (Object.prototype.hasOwnProperty.call(data[field], subfield)) {
+                cleanFieldValue(data[field][subfield])
+              }
+            }
+          }
+          if (typeof data[field] === 'object') {
+            cleanFieldValue(data[field])
+          }
+        }
+      }
+    }
+  }
+  return data
+}
+
+export {
   sleep,
   sumReducer,
   maxReducer,
   getAppendUrl,
   getRemovedUrl,
   convertToQuery,
-  updateLoadingState,
-  updateGlobalVariable,
-  getGlobalVariable,
-  updateCellValue,
-  watchForElementChange,
   confirmBeforeReload,
   navigateDirtyCheck,
   calculateAdjustAmount,
@@ -1419,8 +1496,6 @@ module.exports = {
   locationQueryParameters,
   enableTableForceRender,
   generateHashCode,
-  roundTo,
-  roundUp,
   stringToBytesFaster,
   checkAuthoritys,
   getModuleSequence,

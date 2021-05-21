@@ -1,18 +1,10 @@
 /* eslint-disable react/no-multi-comp */
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import { isNumber } from 'util'
 import numeral from 'numeral'
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
 
 import { NumberInput } from '@/components'
-
-import config from '@/utils/config'
-import {
-  updateGlobalVariable,
-  updateCellValue,
-  difference,
-} from '@/utils/utils'
 
 import {
   onComponentDidMount,
@@ -40,11 +32,11 @@ import {
 class NumberEditor extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     onComponentDidMount.call(this)
   }
 
-  _onChange = (e) => {
+  _onChange = e => {
     onComponentChange.call(this, {
       value:
         e.target.value === undefined
@@ -80,7 +72,7 @@ class NumberEditor extends PureComponent {
     return <NumberInput {...commonCfg} />
   }
 
-  render () {
+  render() {
     return getCommonRender.bind(this)(this.renderComponent)
   }
 }
@@ -90,9 +82,9 @@ class NumberTypeProvider extends React.Component {
     columnExtensions: PropTypes.array,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
-    this.NumberEditor = (ces, text) => (editorProps) => {
+    this.NumberEditor = (ces, text) => editorProps => {
       return (
         <NumberEditor
           editMode={!text}
@@ -107,19 +99,13 @@ class NumberTypeProvider extends React.Component {
     this.props.editingRowIds !== nextProps.editingRowIds ||
     this.props.commitCount !== nextProps.commitCount
 
-  render () {
+  render() {
     const { columnExtensions } = this.props
     return (
       <DataTypeProvider
         for={columnExtensions
-          .filter(
-            (o) =>
-              [
-                'number',
-                'currency',
-              ].indexOf(o.type) >= 0,
-          )
-          .map((o) => o.columnName)}
+          .filter(o => ['number', 'currency'].indexOf(o.type) >= 0)
+          .map(o => o.columnName)}
         formatterComponent={this.NumberEditor(columnExtensions, true)}
         editorComponent={this.NumberEditor(columnExtensions)}
       />

@@ -11,24 +11,22 @@ const medisaveClaimStatusUrl = '/api/InvoiceClaim/RefreshMedisaveStatus'
 const bizSessionAPIURL = '/api/bizsession'
 const invoicePayment = '/api/InvoicePayment'
 
-module.exports = {
+const exportFns = {
   // remove: (params) => service.remove(url, params),
-  queryById: (params) => service.query(url, params),
-  queryList: (params) => service.queryList(url, params),
-  upsert: (params) => service.upsert(url, params),
-  queryBadgeCount: (params) => service.query(countUrl, params),
-  submitChasClaim: (params) => service.upsert(chasClaimUrl, params),
-  submitMedisaveClaim: (params) => service.upsert(medisaveClaimUrl, params),
-  postInvoicePayment: async (params) => {
+  queryById: params => service.query(url, params),
+  queryList: params => service.queryList(url, params),
+  upsert: params => service.upsert(url, params),
+  queryBadgeCount: params => service.query(countUrl, params),
+  submitChasClaim: params => service.upsert(chasClaimUrl, params),
+  submitMedisaveClaim: params => service.upsert(medisaveClaimUrl, params),
+  postInvoicePayment: async params => {
     const r = await request(`${invoicePayment}`, {
       method: 'POST',
-      body: [
-        params,
-      ],
+      body: [params],
     })
     return r
   },
-  getStatus: async (params) => {
+  getStatus: async params => {
     let r
     r = await request(chasClaimStatusUrl, {
       method: 'PUT',
@@ -36,7 +34,7 @@ module.exports = {
     })
     return r
   },
-  getMedisaveStatus: async (params) => {
+  getMedisaveStatus: async params => {
     let r
     r = await request(medisaveClaimStatusUrl, {
       method: 'PUT',
@@ -44,7 +42,7 @@ module.exports = {
     })
     return r
   },
-  refreshPatientDetails: async (params) => {
+  refreshPatientDetails: async params => {
     let r
     r = await request(refreshPatientUrl, {
       method: 'PUT',
@@ -52,5 +50,7 @@ module.exports = {
     })
     return r
   },
-  getBizSession: (params) => service.queryList(bizSessionAPIURL, params),
+  getBizSession: params => service.queryList(bizSessionAPIURL, params),
 }
+
+export default exportFns

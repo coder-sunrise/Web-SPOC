@@ -1,7 +1,7 @@
 import { createFormViewModel } from 'medisys-model'
 import humps from 'humps'
-import * as service from '../services/clinicSettings'
 import { initClinicSettings } from '@/utils/config'
+import service from '../services/clinicSettings'
 
 export default createFormViewModel({
   namespace: 'clinicSettings',
@@ -14,18 +14,18 @@ export default createFormViewModel({
       settings: JSON.parse(localStorage.getItem('clinicSettings') || '{}'),
     },
     subscriptions: ({ dispatch, history, searchField }) => {
-      history.listen((loct) => {
+      history.listen(loct => {
         const { pathname } = loct
       })
     },
 
     effects: {},
     reducers: {
-      queryDone (state, { payload }) {
+      queryDone(state, { payload }) {
         const { data } = payload
         const settings = {}
         let entity = {}
-        data.forEach((p) => {
+        data.forEach(p => {
           entity[humps.camelize(p.settingKey)] = {
             ...p,
           }

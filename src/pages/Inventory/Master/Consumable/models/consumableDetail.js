@@ -1,7 +1,6 @@
 import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
-import * as service from '../services'
-import { getUniqueGUID } from '@/utils/cdrss'
+import service from '../services'
 
 const { upsert } = service
 
@@ -34,7 +33,7 @@ export default createFormViewModel({
       },
     },
     subscriptions: ({ dispatch, history }) => {
-      history.listen((loct) => {
+      history.listen(loct => {
         const { query = {} } = loct
         if (query.uid) {
           dispatch({
@@ -47,21 +46,18 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *submit ({ payload }, { call }) {
+      *submit({ payload }, { call }) {
         return yield call(upsert, payload)
       },
     },
     reducers: {
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         const { data } = payload
         return {
           ...st,
           entity: {
             ...data,
-            effectiveDates: [
-              data.effectiveStartDate,
-              data.effectiveEndDate,
-            ],
+            effectiveDates: [data.effectiveStartDate, data.effectiveEndDate],
           },
         }
       },

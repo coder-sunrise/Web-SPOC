@@ -1,10 +1,10 @@
 import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
 import _ from 'lodash'
-import * as service from '../services'
 import { notification } from '@/components'
 import { podoOrderType } from '@/utils/codes'
 import { getUniqueId } from '@/utils/utils'
+import service from '../services'
 import { getPurchaseOrderStatusFK, getInvoiceStatusFK } from '../variables'
 
 export default createFormViewModel({
@@ -53,13 +53,13 @@ export default createFormViewModel({
     },
 
     effects: {
-      *refresh ({ payload }, { put }) {
+      *refresh({ payload }, { put }) {
         yield put({
           type: 'queryPurchaseOrder',
           payload: { id: payload.id },
         })
       },
-      *initializePurchaseOrder (_, { call, put, select }) {
+      *initializePurchaseOrder(_, { call, put, select }) {
         // Call API to get new PurchaseOrder#
         // const runningNumberResponse = yield call(service.queryRunningNumber, {
         //   prefix: 'PO',
@@ -69,7 +69,7 @@ export default createFormViewModel({
         // Access clinicInfo from store
         let clinicAddress = ''
         let tempClinicAddress = []
-        const clinicInfo = yield select((state) => state.clinicInfo)
+        const clinicInfo = yield select(state => state.clinicInfo)
         const { contact } = clinicInfo
         if (contact) {
           const {
@@ -106,7 +106,7 @@ export default createFormViewModel({
           payload: { purchaseOrder },
         })
       },
-      *duplicatePurchaseOrder ({ payload }, { call, put }) {
+      *duplicatePurchaseOrder({ payload }, { call, put }) {
         // Call API to query selected Purchase Order
         const response = yield call(service.queryById, payload.id)
         // Call API to get new PurchaseOrder#
@@ -135,7 +135,7 @@ export default createFormViewModel({
             deliveryOrder: [],
             purchaseOrderPayment: [],
             purchaseOrderItem: data.purchaseOrderItem
-              ? data.purchaseOrderItem.map((o) => {
+              ? data.purchaseOrderItem.map(o => {
                   return {
                     ...o,
                     bonusQuantity: 0,
@@ -148,7 +148,7 @@ export default createFormViewModel({
           },
         })
       },
-      *queryPurchaseOrder ({ payload }, { call, put }) {
+      *queryPurchaseOrder({ payload }, { call, put }) {
         const response = yield call(service.queryById, payload.id)
         const { data } = response
         if (data && data.id) {
@@ -159,14 +159,12 @@ export default createFormViewModel({
         }
 
         // If status != 200, handle error
-        return yield put(
-          {
-            // type: 'setPurchaseOrder',
-            // payload: { ...data },
-          },
-        )
+        return yield put({
+          // type: 'setPurchaseOrder',
+          // payload: { ...data },
+        })
       },
-      *upsertWithStatusCode ({ payload }, { call }) {
+      *upsertWithStatusCode({ payload }, { call }) {
         const r = yield call(service.upsertWithStatusCode, payload)
         let message = r ? 'Saved' : ''
         if (r) {
@@ -181,7 +179,7 @@ export default createFormViewModel({
         // }
         return r
       },
-      *savePO ({ payload }, { call }) {
+      *savePO({ payload }, { call }) {
         const r = yield call(service.upsert, payload)
         if (r) {
           return r
@@ -190,7 +188,7 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      setNewPurchaseOrder (state, { payload }) {
+      setNewPurchaseOrder(state, { payload }) {
         return {
           ...state,
           ...state.default,
@@ -203,11 +201,11 @@ export default createFormViewModel({
         }
       },
 
-      setPurchaseOrder (state, { payload }) {
+      setPurchaseOrder(state, { payload }) {
         const { purchaseOrderAdjustment = [], purchaseOrderItem } = payload
-        const itemRows = purchaseOrderItem.map((x) => {
+        const itemRows = purchaseOrderItem.map(x => {
           const itemType = podoOrderType.find(
-            (y) => y.value === x.inventoryItemTypeFK,
+            y => y.value === x.inventoryItemTypeFK,
           )
 
           return {
@@ -234,14 +232,14 @@ export default createFormViewModel({
               payload.purchaseOrderStatus,
             ).id,
           },
-          purchaseOrderAdjustment: _.sortBy(purchaseOrderAdjustment, (s) => {
+          purchaseOrderAdjustment: _.sortBy(purchaseOrderAdjustment, s => {
             return s.sequence || 0
           }),
           rows: itemRows || [],
         }
       },
 
-      upsertRow (state, { payload }) {
+      upsertRow(state, { payload }) {
         const { purchaseOrder, rows, purchaseOrderAdjustment } = payload
 
         // if (rows.uid) {
@@ -257,8 +255,8 @@ export default createFormViewModel({
         //   })
         // } else {
 
-        const newRows = rows.map((o) => {
-          const item = podoOrderType.find((x) => x.value === o.type)
+        const newRows = rows.map(o => {
+          const item = podoOrderType.find(x => x.value === o.type)
           let itemFK
           if (item) {
             const { itemFKName } = item
@@ -284,13 +282,13 @@ export default createFormViewModel({
         return { ...returnValue }
       },
 
-      deleteRow (state, { payload }) {
+      deleteRow(state, { payload }) {
         const { rows } = state
-        rows.find((v) => v.uid === payload).isDeleted = true
+        rows.find(v => v.uid === payload).isDeleted = true
         return { ...state, rows }
       },
 
-      addAdjustment (state, { payload }) {
+      addAdjustment(state, { payload }) {
         let { purchaseOrderAdjustment } = state
 
         const payloadData = {
@@ -314,7 +312,7 @@ export default createFormViewModel({
         }
       },
 
-      deleteAdjustment (state, { payload }) {
+      deleteAdjustment(state, { payload }) {
         return { ...state, ...payload }
       },
     },

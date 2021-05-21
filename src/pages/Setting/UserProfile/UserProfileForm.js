@@ -31,13 +31,11 @@ import {
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
 import * as queueServices from '@/services/queue'
-import * as clinicServices from '@/services/clinicInfo'
-import request from '@/utils/request'
-import { convertToQuery } from '@/utils/utils'
+import clinicServices from '@/services/clinicInfo'
 import { constructUserProfile } from './utils'
 import PrimaryClinicianChanges from './PrimaryClinicianChanges'
 
-const styles = (theme) => ({
+const styles = theme => ({
   container: {
     marginBottom: theme.spacing(2),
   },
@@ -66,7 +64,7 @@ const styles = (theme) => ({
 @withFormikExtend({
   displayName: 'UserProfile',
   enableReinitialize: true,
-  validationSchema: (props) => {
+  validationSchema: props => {
     const { settingUserProfile, currentUser, ctRole } = props
     const { currentSelectedUser } = settingUserProfile
     const isEdit =
@@ -85,14 +83,22 @@ const styles = (theme) => ({
         'User Account No. is a required field',
       ),
       email: Yup.string().email('Invalid email'),
-      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+      effectiveDates: Yup.array()
+        .of(Yup.date())
+        .min(2)
+        .required(),
       role: Yup.string().required('Role is a required field'),
       doctorProfile: Yup.object()
-        .transform((value) => (value === null ? {} : value))
+        .transform(value => (value === null ? {} : value))
         .when('role', {
-          is (val) {
+          is(val) {
             if (val === undefined) return false
-            return ctRole.find((item) => item.id === parseInt(val, 10)).clinicalRoleName === 'Doctor' || ctRole.find((item) => item.id === parseInt(val, 10)).clinicalRoleName === 'Doctor Owner'
+            return (
+              ctRole.find(item => item.id === parseInt(val, 10))
+                .clinicalRoleName === 'Doctor' ||
+              ctRole.find(item => item.id === parseInt(val, 10))
+                .clinicalRoleName === 'Doctor Owner'
+            )
           },
           then: Yup.object().shape({
             doctorMCRNo: Yup.string().required(),
@@ -102,19 +108,19 @@ const styles = (theme) => ({
     return isEdit
       ? Yup.object().shape(baseValidationRule)
       : Yup.object().shape({
-        ...baseValidationRule,
-        userProfile: Yup.object().shape({
-          userName: Yup.string()
-            .matches(
-              /(^[a-zA-Z][a-zA-Z0-9]+$)/,
-              'Must have at least 2 letter, start with alphabet and do not contains whitespace and special characters.',
-            )
-            .required('Login ID is a required field'),
-          password: Yup.string().required('Password is a required field'),
-        }),
-      })
+          ...baseValidationRule,
+          userProfile: Yup.object().shape({
+            userName: Yup.string()
+              .matches(
+                /(^[a-zA-Z][a-zA-Z0-9]+$)/,
+                'Must have at least 2 letter, start with alphabet and do not contains whitespace and special characters.',
+              )
+              .required('Login ID is a required field'),
+            password: Yup.string().required('Password is a required field'),
+          }),
+        })
   },
-  mapPropsToValues: (props) => {
+  mapPropsToValues: props => {
     const { settingUserProfile, currentUser } = props
 
     if (currentUser) {
@@ -145,13 +151,13 @@ const styles = (theme) => ({
         effectiveDates:
           Object.entries(currentSelectedUser).length <= 0
             ? [
-              moment().formatUTC(),
-              moment('2099-12-31T23:59:59').formatUTC(false),
-            ]
+                moment().formatUTC(),
+                moment('2099-12-31T23:59:59').formatUTC(false),
+              ]
             : [
-              currentSelectedUser.effectiveStartDate,
-              currentSelectedUser.effectiveEndDate,
-            ],
+                currentSelectedUser.effectiveStartDate,
+                currentSelectedUser.effectiveEndDate,
+              ],
         role: currentSelectedUser.userProfile
           ? currentSelectedUser.userProfile.role.id
           : undefined,
@@ -169,14 +175,14 @@ const styles = (theme) => ({
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch, ctRole, currentUser, onConfirm } = props
     const { effectiveDates, role: roleFK, ...restValues } = values
-    const role = ctRole.find((item) => item.id === roleFK)
+    const role = ctRole.find(item => item.id === roleFK)
     const isDoctor = role && role.clinicalRoleName === 'Doctor'
     const doctorProfile = _.isEmpty(restValues.doctorProfile)
       ? undefined
       : {
-        ...restValues.doctorProfile,
-        isDeleted: !isDoctor,
-      }
+          ...restValues.doctorProfile,
+          isDeleted: !isDoctor,
+        }
 
     const userProfile = constructUserProfile(values, role)
 
@@ -191,7 +197,7 @@ const styles = (theme) => ({
     dispatch({
       type: 'settingUserProfile/upsert',
       payload,
-    }).then((response) => {
+    }).then(response => {
       if (response) {
         sendNotification('CodetableUpdated', {
           message: 'User profiles updated',
@@ -226,34 +232,37 @@ class UserProfileForm extends React.PureComponent {
   }
 
   toggleChangePasswordModal = () => {
-    this.setState((preState) => ({
+    this.setState(preState => ({
       showChangePassword: !preState.showChangePassword,
     }))
   }
 
   togglePrimaryClinicianChangesModal = () => {
-    this.setState((preState) => ({
+    this.setState(preState => ({
       showPrimaryClinicianChanges: !preState.showPrimaryClinicianChanges,
     }))
   }
 
-  onRoleChange = (value) => {
+  onRoleChange = value => {
     const { ctRole, setFieldValue } = this.props
-    const role = ctRole.find((item) => item.id === value)
+    const role = ctRole.find(item => item.id === value)
 
     this.setState({
-      canEditDoctorMCR: role !== undefined && (role.clinicalRoleName === 'Doctor' || role.clinicalRoleName === 'Doctor Owner'),
+      canEditDoctorMCR:
+        role !== undefined &&
+        (role.clinicalRoleName === 'Doctor' ||
+          role.clinicalRoleName === 'Doctor Owner'),
     })
   }
 
-  promptPrimaryClinicianChanges = (currentPrimaryRegisteredDoctorFK) => {
+  promptPrimaryClinicianChanges = currentPrimaryRegisteredDoctorFK => {
     this.setState({
       currentPrimaryRegisteredDoctorFK,
       showPrimaryClinicianChanges: true,
     })
   }
 
-  handleConfirmChangePrimaryClinician = (newPrimaryRegisteredDoctorFK) => {
+  handleConfirmChangePrimaryClinician = newPrimaryRegisteredDoctorFK => {
     const { setFieldValue, handleSubmit } = this.props
     this.togglePrimaryClinicianChangesModal()
     setFieldValue('newPrimaryDoctorProfileFK', newPrimaryRegisteredDoctorFK)
@@ -272,7 +281,7 @@ class UserProfileForm extends React.PureComponent {
   }
 
   toggleValidating = () => {
-    this.setState((preState) => ({ isValidating: !preState.isValidating }))
+    this.setState(preState => ({ isValidating: !preState.isValidating }))
   }
 
   validateBeforeSubmit = async () => {
@@ -286,8 +295,8 @@ class UserProfileForm extends React.PureComponent {
     }
 
     try {
-      const oldRole = ctRole.find((item) => item.id === _oldRole)
-      const currentSelectedRole = ctRole.find((item) => item.id === role)
+      const oldRole = ctRole.find(item => item.id === _oldRole)
+      const currentSelectedRole = ctRole.find(item => item.id === role)
       if (
         oldRole.clinicalRoleName === 'Doctor' &&
         currentSelectedRole.clinicalRoleName !== 'Doctor'
@@ -300,10 +309,7 @@ class UserProfileForm extends React.PureComponent {
       }
 
       this.toggleValidating()
-      const [
-        clinicInfoResponse,
-        bizSessionResponse,
-      ] = await Promise.all([
+      const [clinicInfoResponse, bizSessionResponse] = await Promise.all([
         clinicServices.query({ clinicCode }),
         queueServices.getBizSession({
           IsClinicSessionClosed: false,
@@ -330,7 +336,7 @@ class UserProfileForm extends React.PureComponent {
         const isPrimaryClinician =
           currentSelectedRole.clinicalRoleName === 'Doctor'
             ? parseInt(doctorProfile.id, 10) ===
-            parseInt(primaryRegisteredDoctorFK, 10)
+              parseInt(primaryRegisteredDoctorFK, 10)
             : false
 
         if (deactivating && isPrimaryClinician) {
@@ -350,7 +356,7 @@ class UserProfileForm extends React.PureComponent {
     return true
   }
 
-  render () {
+  render() {
     const {
       classes,
       footer,
@@ -409,25 +415,25 @@ class UserProfileForm extends React.PureComponent {
                       disabled
                     />
                   ) : (
-                      <FastField
-                        name='userProfile.userName'
-                        render={(args) => (
-                          <TextField
-                            {...args}
-                            label='Username'
-                            autocomplete='off'
-                            autoFocus
-                          />
-                        )}
-                      />
-                    )}
+                    <FastField
+                      name='userProfile.userName'
+                      render={args => (
+                        <TextField
+                          {...args}
+                          label='Username'
+                          autocomplete='off'
+                          autoFocus
+                        />
+                      )}
+                    />
+                  )}
                 </GridItem>
                 {!isEdit ? (
                   <React.Fragment>
                     <GridItem md={6}>
                       <FastField
                         name='userProfile.password'
-                        render={(args) => (
+                        render={args => (
                           <TextField
                             {...args}
                             label='Password'
@@ -455,15 +461,16 @@ class UserProfileForm extends React.PureComponent {
                     </GridItem>
                   </React.Fragment>
                 ) : (
-                    <GridItem md={6}>
-                      <Button
-                        color='primary'
-                        onClick={this.toggleChangePasswordModal}
-                      >
-                        <Key />Change Password
+                  <GridItem md={6}>
+                    <Button
+                      color='primary'
+                      onClick={this.toggleChangePasswordModal}
+                    >
+                      <Key />
+                      Change Password
                     </Button>
-                    </GridItem>
-                  )}
+                  </GridItem>
+                )}
               </GridContainer>
 
               <GridItem md={12} className={classes.verticalSpacing}>
@@ -473,7 +480,7 @@ class UserProfileForm extends React.PureComponent {
                 <GridItem md={6}>
                   <Field
                     name='role'
-                    render={(args) => (
+                    render={args => (
                       <CodeSelect
                         {...args}
                         label='Role'
@@ -493,7 +500,7 @@ class UserProfileForm extends React.PureComponent {
                 <GridItem md={6}>
                   <FastField
                     name='name'
-                    render={(args) => (
+                    render={args => (
                       <TextField {...args} label='Name' disabled={isEdit} />
                     )}
                   />
@@ -501,7 +508,7 @@ class UserProfileForm extends React.PureComponent {
                 <GridItem md={6}>
                   <FastField
                     name='title'
-                    render={(args) => (
+                    render={args => (
                       <CodeSelect
                         {...args}
                         code='ctsalutation'
@@ -515,7 +522,7 @@ class UserProfileForm extends React.PureComponent {
                 <GridItem md={6}>
                   <FastField
                     name='userAccountNo'
-                    render={(args) => (
+                    render={args => (
                       <TextField
                         {...args}
                         label='User Account No.'
@@ -527,7 +534,7 @@ class UserProfileForm extends React.PureComponent {
                 <GridItem md={6}>
                   <Field
                     name='doctorProfile.doctorMCRNo'
-                    render={(args) => (
+                    render={args => (
                       <TextField
                         {...args}
                         label='Doctor MCR No.'
@@ -539,7 +546,7 @@ class UserProfileForm extends React.PureComponent {
                 <GridItem md={2}>
                   <FastField
                     name='userProfile.countryCodeFK'
-                    render={(args) => (
+                    render={args => (
                       <CodeSelect
                         allowClear={false}
                         label='Country Code'
@@ -552,7 +559,7 @@ class UserProfileForm extends React.PureComponent {
                 <GridItem md={4}>
                   <FastField
                     name='phoneNumber'
-                    render={(args) => (
+                    render={args => (
                       // <NumberInput
                       //   {...args}
                       //   label='Contact No.'
@@ -566,7 +573,7 @@ class UserProfileForm extends React.PureComponent {
                 <GridItem md={6}>
                   <FastField
                     name='genderFK'
-                    render={(args) => (
+                    render={args => (
                       <CodeSelect {...args} label='Gender' code='ctgender' />
                     )}
                   />
@@ -575,23 +582,21 @@ class UserProfileForm extends React.PureComponent {
                 <GridItem md={6}>
                   <FastField
                     name='email'
-                    render={(args) => <TextField {...args} label='Email' />}
+                    render={args => <TextField {...args} label='Email' />}
                   />
                 </GridItem>
 
                 <GridItem md={6}>
                   <FastField
                     name='designation'
-                    render={(args) => (
-                      <TextField {...args} label='Designation' />
-                    )}
+                    render={args => <TextField {...args} label='Designation' />}
                   />
                 </GridItem>
 
                 <GridItem md={6}>
                   <FastField
                     name='dob'
-                    render={(args) => (
+                    render={args => (
                       <DatePicker {...args} dobRestrict label='Date Of Birth' />
                     )}
                   />
@@ -602,7 +607,7 @@ class UserProfileForm extends React.PureComponent {
                 <GridItem md={12}>
                   <FastField
                     name='effectiveDates'
-                    render={(args) => (
+                    render={args => (
                       <DateRangePicker
                         {...args}
                         label='Effective Start Date'

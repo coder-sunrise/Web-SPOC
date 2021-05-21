@@ -1,6 +1,6 @@
 import React, { Component, useState } from 'react'
 import numeral from 'numeral'
-import config from '@/utils/config'
+import { qtyFormat } from '@/utils/config'
 // dva
 import { connect } from 'dva'
 import Yup from '@/utils/yup'
@@ -32,7 +32,7 @@ import {
 import AmountSummary from '@/pages/Shared/AmountSummary'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 
-const styles = (theme) => ({
+const styles = theme => ({
   cardContainer: {
     margin: theme.spacing(1),
     marginTop: 20,
@@ -50,8 +50,12 @@ const styles = (theme) => ({
 })
 
 const itemSchema = Yup.object().shape({
-  unitPrice: Yup.number().min(0, '').required(),
-  subTotal: Yup.number().min(0, '').required(),
+  unitPrice: Yup.number()
+    .min(0, '')
+    .required(),
+  subTotal: Yup.number()
+    .min(0, '')
+    .required(),
 })
 
 @connect(({ invoiceDetail }) => ({
@@ -64,16 +68,15 @@ const itemSchema = Yup.object().shape({
   mapPropsToValues: ({ invoiceDetail }) => {
     return {
       ...invoiceDetail.entity,
-      invoiceItem: invoiceDetail.entity.invoiceItem.map((item) => {
+      invoiceItem: invoiceDetail.entity.invoiceItem.map(item => {
         return {
           ...item,
           adjValue:
             item.adjValue && item.adjValue < 0
               ? -1 * item.adjValue
               : item.adjValue || 0,
-          isMinus: item.adjValue && item.adjValue < 0 ? true : false,
-          isExactAmount:
-            item.adjType && item.adjType === 'ExactAmount' ? true : false,
+          isMinus: !!(item.adjValue && item.adjValue < 0),
+          isExactAmount: !!(item.adjType && item.adjType === 'ExactAmount'),
         }
       }),
     }
@@ -93,7 +96,7 @@ class EditInvoice extends Component {
     const { dispatch, values, history } = this.props
     const payload = {
       ...values,
-      invoiceItem: values.invoiceItem.map((item) => {
+      invoiceItem: values.invoiceItem.map(item => {
         return {
           ...item,
           adjValue: item.isMinus ? -1 * item.adjValue : item.adjValue,
@@ -105,7 +108,7 @@ class EditInvoice extends Component {
     dispatch({
       type: 'invoiceDetail/saveEditInvoice',
       payload,
-    }).then((response) => {
+    }).then(response => {
       if (response) {
         const { id } = response
         history.replace(`/finance/invoice/details?id=${id}`)
@@ -118,7 +121,7 @@ class EditInvoice extends Component {
     setFieldValue('invoiceItem', rows)
   }
 
-  updateInvoiceData = (v) => {
+  updateInvoiceData = v => {
     const { values, setValues } = this.props
     const newInvoice = {
       ...values,
@@ -136,7 +139,7 @@ class EditInvoice extends Component {
     })
   }
 
-  updateTotal = (row) => {
+  updateTotal = row => {
     const {
       totalAfterItemAdjustment = 0,
       quantity = 0,
@@ -154,14 +157,14 @@ class EditInvoice extends Component {
       row.subTotal = totalAfterItemAdjustment - value
     } else {
       row.adjAmt = roundTo(
-        totalAfterItemAdjustment / (1 + value / 100) * (value / 100),
+        (totalAfterItemAdjustment / (1 + value / 100)) * (value / 100),
       )
       row.subTotal = totalAfterItemAdjustment - row.adjAmt
     }
     row.unitPrice = quantity > 0 ? row.subTotal / quantity : 0
   }
 
-  updateUnitPrice = (row) => {
+  updateUnitPrice = row => {
     const {
       unitPrice = 0,
       quantity = 0,
@@ -185,7 +188,7 @@ class EditInvoice extends Component {
     row.adjAmt = finalAmount.adjAmount
   }
 
-  onAdjustmentConditionChange = (index) => {
+  onAdjustmentConditionChange = index => {
     const { setFieldValue, values } = this.props
     const { invoiceItem = [] } = values
     const { isMinus, adjValue, isExactAmount } = invoiceItem[index]
@@ -221,7 +224,7 @@ class EditInvoice extends Component {
     setFieldValue(`invoiceItem[${index}].adjAmt`, finalAmount.adjAmount)
   }
 
-  drugMixtureIndicator = (row) => {
+  drugMixtureIndicator = row => {
     if (row.itemType !== 'Medication' || !row.isDrugMixture) return null
 
     return (
@@ -231,7 +234,7 @@ class EditInvoice extends Component {
     )
   }
 
-  render () {
+  render() {
     const { classes, values } = this.props
     const {
       invoiceItem = [],
@@ -262,7 +265,7 @@ class EditInvoice extends Component {
             onClick={this.handleSaveClick}
             disabled={
               values.invoiceTotalAftGST < 0 ||
-              invoiceItem.find((item) => item.totalAfterItemAdjustment < 0)
+              invoiceItem.find(item => item.totalAfterItemAdjustment < 0)
             }
           >
             Save Changes
@@ -287,7 +290,7 @@ class EditInvoice extends Component {
                 columnName: 'itemType',
                 width: 300,
                 disabled: true,
-                render: (row) => {
+                render: row => {
                   return (
                     <div style={{ position: 'relative' }}>
                       <div className={classes.wrapCellTextStyle}>
@@ -308,7 +311,7 @@ class EditInvoice extends Component {
                 currency: true,
                 sortingEnabled: false,
                 width: 120,
-                onChange: (e) => {
+                onChange: e => {
                   this.updateUnitPrice(e.row)
                 },
               },
@@ -318,8 +321,7 @@ class EditInvoice extends Component {
                 width: 160,
                 disabled: true,
                 sortingEnabled: false,
-                render: (row) => {
-                  const { qtyFormat } = config
+                render: row => {
                   const { quantity, dispenseUOMDisplayValue = '' } = row
                   return `${numeral(quantity).format(
                     qtyFormat,
@@ -331,18 +333,15 @@ class EditInvoice extends Component {
                 width: 200,
                 isReactComponent: true,
                 sortingEnabled: false,
-                render: (currentrow) => {
-                  const [
-                    focused,
-                    setFocused,
-                  ] = useState(false)
+                render: currentrow => {
+                  const [focused, setFocused] = useState(false)
                   const { row } = currentrow
-                  const index = invoiceItem.map((i) => i.id).indexOf(row.id)
+                  const index = invoiceItem.map(i => i.id).indexOf(row.id)
                   return (
                     <div style={{ display: 'flex' }}>
                       <Field
                         name={`invoiceItem[${index}].isMinus`}
-                        render={(args) => (
+                        render={args => (
                           <Switch
                             style={{ margin: 0 }}
                             checkedChildren='-'
@@ -355,7 +354,7 @@ class EditInvoice extends Component {
                             }}
                             {...args}
                             inputProps={{
-                              onMouseUp: (e) => {
+                              onMouseUp: e => {
                                 if (!focused) {
                                   setFocused(true)
                                   e.target.click()
@@ -374,7 +373,7 @@ class EditInvoice extends Component {
                         {row.isExactAmount ? (
                           <Field
                             name={`invoiceItem[${index}].adjValue`}
-                            render={(args) => (
+                            render={args => (
                               <NumberInput
                                 style={{
                                   marginBottom: 0,
@@ -391,7 +390,7 @@ class EditInvoice extends Component {
                                 precision={2}
                                 {...args}
                                 inputProps={{
-                                  onMouseUp: (e) => {
+                                  onMouseUp: e => {
                                     if (!focused) {
                                       setFocused(true)
                                       e.target.focus()
@@ -404,7 +403,7 @@ class EditInvoice extends Component {
                         ) : (
                           <Field
                             name={`invoiceItem[${index}].adjValue`}
-                            render={(args) => (
+                            render={args => (
                               <NumberInput
                                 style={{
                                   marginBottom: 0,
@@ -422,7 +421,7 @@ class EditInvoice extends Component {
                                 precision={2}
                                 {...args}
                                 inputProps={{
-                                  onMouseUp: (e) => {
+                                  onMouseUp: e => {
                                     if (!focused) {
                                       setFocused(true)
                                       e.target.focus()
@@ -436,7 +435,7 @@ class EditInvoice extends Component {
                       </div>
                       <Field
                         name={`invoiceItem[${index}].isExactAmount`}
-                        render={(args) => (
+                        render={args => (
                           <Switch
                             style={{
                               marginRight: -30,
@@ -453,7 +452,7 @@ class EditInvoice extends Component {
                             }}
                             {...args}
                             inputProps={{
-                              onMouseUp: (e) => {
+                              onMouseUp: e => {
                                 if (!focused) {
                                   setFocused(true)
                                   e.target.click()
@@ -473,7 +472,7 @@ class EditInvoice extends Component {
                 currency: true,
                 sortingEnabled: false,
                 width: 120,
-                onChange: (e) => {
+                onChange: e => {
                   this.updateTotal(e.row)
                 },
               },
@@ -488,7 +487,7 @@ class EditInvoice extends Component {
           <GridItem xs={7} md={7}>
             <FastField
               name='remark'
-              render={(args) => {
+              render={args => {
                 return (
                   <OutlinedTextField
                     label='Invoice Remarks'

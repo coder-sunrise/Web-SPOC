@@ -1,10 +1,7 @@
 import React, { PureComponent } from 'react'
 import { CommonTableGrid, Button } from '@/components'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { status } from '@/utils/codes'
-import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
-import * as service from './services'
 
 class Grid extends PureComponent {
   editRow = (row, e) => {
@@ -23,12 +20,12 @@ class Grid extends PureComponent {
       type: 'settingParticipantRole/updateState',
       payload: {
         showModal: true,
-        entity: list.find((o) => o.id === row.id),
+        entity: list.find(o => o.id === row.id),
       },
     })
   }
 
-  render () {
+  render() {
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
@@ -56,7 +53,7 @@ class Grid extends PureComponent {
             columnName: 'action',
             sortingEnabled: false,
             align: 'center',
-            render: (row) => {
+            render: row => {
               return (
                 <Button
                   size='sm'

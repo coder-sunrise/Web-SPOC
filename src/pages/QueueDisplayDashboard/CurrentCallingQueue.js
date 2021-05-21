@@ -62,7 +62,9 @@ const CurrentCallingQueue = ({ classes, callingQueue }) => {
           {callingQueue.roomNo}
         </p>
         <p style={{ fontWeight: 'bold', height: '50%', fontSize: '30vw' }}>
-          {callingQueue.qNo === parseInt(callingQueue.qNo, 10) ? callingQueue.qNo : callingQueue.qNo.padStart(3, '0')}
+          {callingQueue.qNo === parseInt(callingQueue.qNo, 10)
+            ? callingQueue.qNo
+            : callingQueue.qNo.padStart(3, '0')}
         </p>
       </Fragment>
     </div>

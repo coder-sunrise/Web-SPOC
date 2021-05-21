@@ -1,28 +1,24 @@
 ﻿/* eslint-disable consistent-return */
 import _ from 'lodash'
 
-import {
-  config as cfg,
-  formatUrlPath,
-  immutaeMerge,
-  decrypt,
-  cleanFieldValue,
-} from 'medisys-util'
 import update from 'immutability-helper'
 import { notification } from '@/components'
 import { sendNotification } from '@/utils/realtime'
-import { getUniqueGUID, checkAuthoritys } from '@/utils/utils'
+import {
+  getUniqueGUID,
+  checkAuthoritys,
+  formatUrlPath,
+  cleanFieldValue,
+} from '@/utils/utils'
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
-
-const { prefix, openPages } = cfg
 
 let lastLocation = null
 export default class BaseCRUDViewModel {
-  constructor (options) {
+  constructor(options) {
     this.options = options
   }
 
-  create () {
+  create() {
     const { namespace, param, setting = {} } = this.options
     const { service, state, subscriptions, effects, reducers } = param
     return {
@@ -39,14 +35,14 @@ export default class BaseCRUDViewModel {
     }
   }
 
-  subscriptions ({ dispatch, history }) {
-    history.listen((location) => {
+  subscriptions({ dispatch, history }) {
+    history.listen(location => {
       const { pathname } = location
       checkAuthoritys(pathname, history)
     })
   }
 
-  state () {
+  state() {
     return {
       // isTouched: false,
       // entity: null,
@@ -55,7 +51,7 @@ export default class BaseCRUDViewModel {
     }
   }
 
-  effects ({ queryFnName = '' }) {
+  effects({ queryFnName = '' }) {
     const { namespace, param, setting = {}, config = {} } = this.options
     const { service } = param
     const { detailPath = '' } = setting
@@ -64,7 +60,7 @@ export default class BaseCRUDViewModel {
 
     return {
       query: [
-        function* (
+        function*(
           { payload = { keepFilter: true }, history },
           { call, put, select },
         ) {
@@ -78,7 +74,7 @@ export default class BaseCRUDViewModel {
             version,
             list,
             pagination,
-          } = yield select((st) => st[namespace])
+          } = yield select(st => st[namespace])
           // const disableAutoQuery = yield select(st => st[namespace].disableAutoQuery)
           // if (!disableAutoQuery) {
           // console.log(namespace, version, payload.version)
@@ -214,7 +210,7 @@ export default class BaseCRUDViewModel {
       //   return r
       // },
 
-      *upsert ({ payload, history }, { select, call, put }) {
+      *upsert({ payload, history }, { select, call, put }) {
         // console.log('upsert', payload, namespace, config)
         const { cfg = {} } = payload
         const newPayload = cleanFieldValue(_.cloneDeep(payload))
@@ -246,7 +242,7 @@ export default class BaseCRUDViewModel {
 
         return r
       },
-      *delete ({ payload }, { call, put }) {
+      *delete({ payload }, { call, put }) {
         const { cfg = {} } = payload
         const response = yield call(service.remove, payload)
         // console.log(response)
@@ -260,15 +256,15 @@ export default class BaseCRUDViewModel {
         return response
       },
 
-      *lock ({ payload, history }, { call, put, select, take }) {
-        const s = yield select((st) => st[namespace])
+      *lock({ payload, history }, { call, put, select, take }) {
+        const s = yield select(st => st[namespace])
         const { currentItem, newDetailPath } = s
         let data = currentItem
         if (data) {
           if (data.id === '00000000-0000-0000-0000-000000000000') {
             yield put({ type: 'create', payload })
             yield take('create/@@end')
-            data = yield select((st) => st[namespace].currentItem)
+            data = yield select(st => st[namespace].currentItem)
             // console.log(data)
           } else {
             yield put({ type: 'update', payload })
@@ -301,7 +297,7 @@ export default class BaseCRUDViewModel {
         }
       },
 
-      *unlock ({ payload, history }, { call, put }) {
+      *unlock({ payload, history }, { call, put }) {
         const response = yield call(service.unlock, payload)
         const { data, success } = response
         if (success) {
@@ -316,7 +312,7 @@ export default class BaseCRUDViewModel {
         }
       },
 
-      *updateAppState ({ payload }, { call, put }) {
+      *updateAppState({ payload }, { call, put }) {
         yield put({
           type: 'updateState',
           payload: {
@@ -326,14 +322,14 @@ export default class BaseCRUDViewModel {
         })
       },
 
-      *localAdd ({ payload }, { put, select }) {
-        let st = yield select((s) => s[namespace])
+      *localAdd({ payload }, { put, select }) {
+        let st = yield select(s => s[namespace])
         if (payload.length) {
           yield put({
             type: 'updateState',
             payload: update(st, {
               items: {
-                $unshift: payload.map((o) => {
+                $unshift: payload.map(o => {
                   return {
                     id: getUniqueGUID(),
                     ...o,
@@ -343,13 +339,13 @@ export default class BaseCRUDViewModel {
             }),
           })
         }
-        st = yield select((s) => s[namespace])
+        st = yield select(s => s[namespace])
         return st.items
       },
-      *localChange ({ payload }, { put, select }) {
-        let st = yield select((s) => s[namespace])
+      *localChange({ payload }, { put, select }) {
+        let st = yield select(s => s[namespace])
         let { items } = st
-        const newItems = items.map((row) => {
+        const newItems = items.map(row => {
           const n = payload[row.id] ? { ...row, ...payload[row.id] } : row
           return n
         })
@@ -359,29 +355,27 @@ export default class BaseCRUDViewModel {
             items: { $set: newItems },
           }),
         })
-        st = yield select((s) => s[namespace])
+        st = yield select(s => s[namespace])
         return st.items
       },
-      *localDelete ({ payload }, { put, select }) {
-        let st = yield select((s) => s[namespace])
+      *localDelete({ payload }, { put, select }) {
+        let st = yield select(s => s[namespace])
         let { items } = st
         // console.log(items)
-        const newItems = items.filter(
-          (row) => !payload.find((o) => o === row.id),
-        )
+        const newItems = items.filter(row => !payload.find(o => o === row.id))
         yield put({
           type: 'updateState',
           payload: update(st, {
             items: { $set: newItems },
           }),
         })
-        st = yield select((s) => s[namespace])
+        st = yield select(s => s[namespace])
         return st.items
       },
     }
   }
 
-  reducers () {
+  reducers() {
     // update.extend('$auto', (value, object) => {
     //   return object ?
     //     update(object, value) :
@@ -397,7 +391,7 @@ export default class BaseCRUDViewModel {
     // console.log(this.options)
     return {
       // Used for simple state update
-      updateState (st, { payload }) {
+      updateState(st, { payload }) {
         // console.log(payload)
         // const newVal = updateInner(payload, st)
         // return newVal
@@ -406,7 +400,7 @@ export default class BaseCRUDViewModel {
           ...payload,
         }
       },
-      updateFilter (st, { payload }) {
+      updateFilter(st, { payload }) {
         return {
           ...st,
           filter: {
@@ -415,38 +409,22 @@ export default class BaseCRUDViewModel {
           },
         }
       },
-      replaceState (st, { payload }) {
+      replaceState(st, { payload }) {
         return payload
       },
-      // Used for complex state update, nested object update
-      mergeState (st, { payload }) {
-        // console.log(payload)
-        // console.log('--------------------------------------------------------')
-        // console.time('t')
-        const newSt = immutaeMerge(payload, st)
-        // console.timeEnd('t')
 
-        // //console.log(newSt)
-        // //console.log(st === newSt)
-        return newSt
-      },
-
-      mergeStateWithImmutateData (st, { payload }) {
-        return update(st, payload)
-      },
-
-      switchIsMotion (st) {
+      switchIsMotion(st) {
         return { ...st, isMotion: !st.isMotion }
       },
 
-      queryBegin (st, { payload }) {
+      queryBegin(st, { payload }) {
         const { filter } = payload
         return {
           ...st,
           filter,
         }
       },
-      save (st, { payload }) {
+      save(st, { payload }) {
         const { data } = payload
         return {
           ...st,
@@ -454,19 +432,19 @@ export default class BaseCRUDViewModel {
         }
       },
 
-      reset (st, { payload }) {
+      reset(st, { payload }) {
         return state || {}
       },
 
-      showModal (st, { payload }) {
+      showModal(st, { payload }) {
         return { ...st, ...payload, modalVisible: true }
       },
 
-      hideModal (st) {
+      hideModal(st) {
         return { ...st, modalVisible: false }
       },
 
-      created (st, { payload }) {
+      created(st, { payload }) {
         // //console.log(payload)
         return {
           ...st,

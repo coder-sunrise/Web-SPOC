@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'dva'
 import $ from 'jquery'
-import router from 'umi/router'
-import { FormattedMessage } from 'umi'
+import router, { FormattedMessage } from 'umi'
+
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
 // formik
@@ -126,7 +126,7 @@ class UserProfile extends React.Component {
   }
 
   onAddNewClick = () => {
-    router.push('/setting/userprofile/new')
+    history.push('/setting/userprofile/new')
   }
 
   openModal = () => {

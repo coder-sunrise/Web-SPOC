@@ -1,5 +1,5 @@
 import { createListViewModel } from 'medisys-model'
-import * as service from '../services/sddDetailService'
+import service from '../services/sddDetailService'
 
 export default createListViewModel({
   namespace: 'sddDetail',
@@ -16,11 +16,11 @@ export default createListViewModel({
     },
     effects: {},
     reducers: {
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         const { data } = payload
         return {
           ...st,
-          list: data.data.map((o) => {
+          list: data.data.map(o => {
             return {
               ...o,
             }

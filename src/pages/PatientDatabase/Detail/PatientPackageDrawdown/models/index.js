@@ -1,6 +1,6 @@
 import { createListViewModel } from 'medisys-model'
-import * as service from '../services'
 import { notification } from '@/components'
+import * as service from '../services'
 
 export default createListViewModel({
   namespace: 'patientPackageDrawdown',
@@ -11,13 +11,15 @@ export default createListViewModel({
       default: {},
     },
     subscriptions: ({ dispatch, history }) => {
-      history.listen(async (loct, method) => {
-      })
+      history.listen(async (loct, method) => {})
     },
     effects: {
-      *getPatientPackageDrawdown ({ payload }, { put, call }) {
+      *getPatientPackageDrawdown({ payload }, { put, call }) {
         const { patientId } = payload
-        const response = yield call(service.getPatientPackageDrawdown, patientId)
+        const response = yield call(
+          service.getPatientPackageDrawdown,
+          patientId,
+        )
 
         const { data, status } = response
         if (status === '200') {
@@ -29,7 +31,7 @@ export default createListViewModel({
         }
         return false
       },
-      *savePatientPackage ({ payload }, { call, put, take }) {
+      *savePatientPackage({ payload }, { call, put, take }) {
         const response = yield call(service.savePatientPackage, payload)
         if (response) {
           notification.success({ message: 'Patient package saved' })
@@ -40,21 +42,21 @@ export default createListViewModel({
             },
           })
           yield take('patientPackageDrawdown/getPatientPackageDrawdown/@@end')
-          
+
           return response
         }
         return false
       },
-      *transferPatientPackage ({ payload }, { call }) {
+      *transferPatientPackage({ payload }, { call }) {
         const response = yield call(service.transferPatientPackage, payload)
         return response
       },
     },
     reducers: {
-      setPatientPackageDrawdown (state, { payload }) {
+      setPatientPackageDrawdown(state, { payload }) {
         return {
           ...state,
-          list: payload.map((o) => {
+          list: payload.map(o => {
             return {
               ...o,
             }

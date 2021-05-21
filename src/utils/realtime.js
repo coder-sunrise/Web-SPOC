@@ -22,7 +22,7 @@ const setSignalRConnectedState = (state = false) => {
 }
 
 const automaticReconnectConfig = {
-  nextRetryDelayInMilliseconds: (retryContext) => {
+  nextRetryDelayInMilliseconds: retryContext => {
     const { previousRetryCount, elapsedMilliseconds } = retryContext
 
     if (elapsedMilliseconds < tenMinutesInMillisecond) {
@@ -100,25 +100,28 @@ const initStream = () => {
     if (connection) {
       if (connection.connectionState === CONNECTION_STATE.DISCONNECTED)
         // starting the connection
-        connection.start().then(updateSignalRState).catch((err) => {
-          updateSignalRState()
-          if (connection.connectionState === CONNECTION_STATE.DISCONNECTED) {
-            retryAttempt += 1
-            const interval = retryAttempt * retryIntervalInMillisecond
+        connection
+          .start()
+          .then(updateSignalRState)
+          .catch(err => {
+            updateSignalRState()
+            if (connection.connectionState === CONNECTION_STATE.DISCONNECTED) {
+              retryAttempt += 1
+              const interval = retryAttempt * retryIntervalInMillisecond
 
-            if (retryAttempt > 4) {
-              return console.log(err)
+              if (retryAttempt > 4) {
+                return console.log(err)
+              }
+
+              setTimeout(() => {
+                console.log(
+                  `Retry attempt: ${retryAttempt}, next retry in: ${interval}ms`,
+                )
+                startConnection()
+              }, interval)
             }
-
-            setTimeout(() => {
-              console.log(
-                `Retry attempt: ${retryAttempt}, next retry in: ${interval}ms`,
-              )
-              startConnection()
-            }, interval)
-          }
-          return console.log(err)
-        })
+            return console.log(err)
+          })
       else if (connection.connectionState === CONNECTION_STATE.CONNECTED)
         updateSignalRState()
     }
@@ -127,7 +130,7 @@ const initStream = () => {
   startConnection()
 }
 
-const sendNotification = (type, data) => {
+const _sendNotification = (type, data) => {
   // console.log(payload)
   // console.log({ connection })
   const { dispatch, getState } = window.g_app._store
@@ -145,13 +148,13 @@ const sendNotification = (type, data) => {
   data.timestamp = Date.now()
 
   if (connection) {
-    connection.invoke('SendNotification', type, data).catch((err) => {
+    connection.invoke('SendNotification', type, data).catch(err => {
       return console.error(err)
     })
   }
 }
 
-const debouncedSendNotification = _.debounce(sendNotification, 500, {
+const sendNotification = _.debounce(_sendNotification, 500, {
   leading: true,
 })
 
@@ -160,8 +163,4 @@ const subscribeNotification = (type, payload) => {
   connectionObserver[type] = callback
 }
 
-module.exports = {
-  initStream,
-  sendNotification: debouncedSendNotification,
-  subscribeNotification,
-}
+export { initStream, sendNotification, subscribeNotification }

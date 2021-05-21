@@ -26,26 +26,23 @@ export default createListViewModel({
       })
     },
     effects: {
-      *deleteReferralSource ({ payload }, { call, put }) {
-        const result = yield call(service.delete, payload)
+      *deleteReferralSource({ payload }, { call, put }) {
+        const result = yield call(service.remove, payload)
         if (result === 204) {
           notification.success({ message: 'Deleted' })
         }
       },
     },
     reducers: {
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         const { data } = payload
 
         return {
           ...st,
-          list: data.data.map((o) => {
+          list: data.data.map(o => {
             return {
               ...o,
-              effectiveDates: [
-                o.effectiveStartDate,
-                o.effectiveEndDate,
-              ],
+              effectiveDates: [o.effectiveStartDate, o.effectiveEndDate],
             }
           }),
         }

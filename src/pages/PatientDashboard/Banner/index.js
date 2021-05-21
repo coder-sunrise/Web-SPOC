@@ -1,11 +1,11 @@
 import React, { PureComponent } from 'react'
-import Link from 'umi'
+import { Link } from 'umi'
 import { connect } from 'dva'
 import _ from 'lodash'
 import moment from 'moment'
 import { Paper } from '@material-ui/core'
 import { headerHeight } from 'mui-pro-jss'
-import Warining from '@material-ui/icons/Error'
+import Warning from '@material-ui/icons/Error'
 import Edit from '@material-ui/icons/Edit'
 import Refresh from '@material-ui/icons/Sync'
 import { getAppendUrl } from '@/utils/utils'
@@ -644,7 +644,7 @@ class Banner extends PureComponent {
                   }}
                 >
                   {this.state.showWarning && (
-                    <Warining style={{ position: 'absolute' }} color='error' />
+                    <Warning style={{ position: 'absolute' }} color='error' />
                   )}
                   <span
                     style={{
@@ -864,7 +864,7 @@ class Banner extends PureComponent {
                                     <Tooltip
                                       title={schemeData.statusDescription}
                                     >
-                                      <Warining
+                                      <Warning
                                         color='error'
                                         style={{ position: 'absolute' }}
                                       />

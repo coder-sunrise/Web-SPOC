@@ -1,6 +1,6 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
-import * as service from '../services'
+import service from '../services'
 
 export default createListViewModel({
   namespace: 'settingClinicService',
@@ -25,35 +25,32 @@ export default createListViewModel({
       })
     },
     effects: {
-      *export (_, { call }) {
+      *export(_, { call }) {
         const result = yield call(service.export)
         return result
       },
 
-      *import ({ payload }, { call }) {
+      *import({ payload }, { call }) {
         const result = yield call(service.import, { content: payload.content })
         if (result === false) return false
         return result
       },
     },
     reducers: {
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         const { data } = payload
         return {
           ...st,
           // filter: {},
-          list: data.data.map((o) => {
+          list: data.data.map(o => {
             return {
               ...o,
-              effectiveDates: [
-                o.effectiveStartDate,
-                o.effectiveEndDate,
-              ],
+              effectiveDates: [o.effectiveStartDate, o.effectiveEndDate],
             }
           }),
         }
       },
-      queryOneDone (st, { payload }) {
+      queryOneDone(st, { payload }) {
         const { data } = payload
         // console.log('single', data)
         return {

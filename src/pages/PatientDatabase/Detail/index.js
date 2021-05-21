@@ -3,7 +3,7 @@ import Loadable from 'react-loadable'
 import { connect } from 'dva'
 import moment from 'moment'
 import _ from 'lodash'
-import router from 'umi/router'
+import { history } from 'umi'
 import $ from 'jquery'
 
 // medisys-components
@@ -40,11 +40,12 @@ import {
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 
-import { duplicateCheck } from '@/services/patient'
+import services from '@/services/patient'
 import { getBizSession } from '@/services/queue'
 import schema from './schema'
 import { mapEntityToValues, upsertPatient } from './utils'
 
+const { duplicateCheck } = services
 // moment.updateLocale('en', {
 //   relativeTime: {
 //     past: '%s',
@@ -238,9 +239,11 @@ class PatientDetail extends PureComponent {
             return (
               <Cmpnet
                 {...p}
-                onClose={(e) => {
+                onClose={e => {
                   const { preSelectedMenu } = this.state
-                  $('input').eq(0).focus()
+                  $('input')
+                    .eq(0)
+                    .focus()
                   this.setState({
                     selectedMenu: preSelectedMenu,
                     preSelectedMenu: undefined,
@@ -283,11 +286,13 @@ class PatientDetail extends PureComponent {
       },
     ]
 
-    const accessRight = Authorized.check('patientdatabase.patientprofiledetails.medicalhistory')
+    const accessRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.medicalhistory',
+    )
     if (accessRight) {
       const hiddenMedicalHistoryByAccessRight = accessRight.rights === 'hidden'
       if (hiddenMedicalHistoryByAccessRight) {
-        this.widgets = this.widgets.filter((t) => t.id !== '9')
+        this.widgets = this.widgets.filter(t => t.id !== '9')
       }
     }
 
@@ -295,7 +300,7 @@ class PatientDetail extends PureComponent {
     if (SchemeAccessRight) {
       const hiddenSchemeByAccessRight = SchemeAccessRight.rights === 'hidden'
       if (hiddenSchemeByAccessRight) {
-        this.widgets = this.widgets.filter((t) => t.id !== '4')
+        this.widgets = this.widgets.filter(t => t.id !== '4')
       }
     }
 
@@ -320,7 +325,7 @@ class PatientDetail extends PureComponent {
     })
   }
 
-  registerVisit = (e) => {
+  registerVisit = e => {
     navigateDirtyCheck({
       onProceed: () => {
         this.props
@@ -328,7 +333,7 @@ class PatientDetail extends PureComponent {
             type: 'patient/closePatientModal',
           })
           .then(() => {
-            router.push(
+            history.push(
               `/reception/queue?md=visreg&pid=${this.props.patient.entity.id}`,
             )
           })
@@ -367,8 +372,7 @@ class PatientDetail extends PureComponent {
       id: values.id,
       patientAccountNo: values.patientAccountNo,
       name: values.name,
-      dob: values.dob
-
+      dob: values.dob,
     })
 
     const { data } = response
@@ -376,16 +380,18 @@ class PatientDetail extends PureComponent {
     let shouldPromptSaveConfirmation = false
     let content
     if (data) {
-      const { isDuplicateAccountNo = false, isDuplicateNameAndDOB = false } = data
-      shouldPromptSaveConfirmation = isDuplicateAccountNo || isDuplicateNameAndDOB
+      const {
+        isDuplicateAccountNo = false,
+        isDuplicateNameAndDOB = false,
+      } = data
+      shouldPromptSaveConfirmation =
+        isDuplicateAccountNo || isDuplicateNameAndDOB
 
       if (isDuplicateAccountNo && isDuplicateNameAndDOB) {
         content = 'Duplicated Account No., Patient Name and DOB found.'
-      }
-      else if (isDuplicateAccountNo) {
+      } else if (isDuplicateAccountNo) {
         content = 'Duplicated Account No. found.'
-      }
-      else if (isDuplicateNameAndDOB) {
+      } else if (isDuplicateNameAndDOB) {
         content = 'Duplicated Patient Name and DOB found.'
       }
     }
@@ -402,9 +408,17 @@ class PatientDetail extends PureComponent {
           openConfirm: true,
           openConfirmTitle: '',
           openConfirmText: 'OK',
-          openConfirmContent: () => { return <div style={{ fontSize: '1.4rem', fontWeight: 300 }}>{content}</div> },
+          openConfirmContent: () => {
+            return (
+              <div style={{ fontSize: '1.4rem', fontWeight: 300 }}>
+                {content}
+              </div>
+            )
+          },
           additionalInfo: (
-            <div style={{ marginTop: 0, fontSize: '1.4rem', fontWeight: 300 }}>Do you wish to proceed?</div>
+            <div style={{ marginTop: 0, fontSize: '1.4rem', fontWeight: 300 }}>
+              Do you wish to proceed?
+            </div>
           ),
           onConfirmSave: handleSubmit,
         },
@@ -436,7 +450,7 @@ class PatientDetail extends PureComponent {
     })
   }
 
-  onActiveStatusChanged = async (status) => {
+  onActiveStatusChanged = async status => {
     const { setFieldValue, dispatch, values } = this.props
     const { effectiveStartDate, effectiveEndDate } = values
 
@@ -471,15 +485,15 @@ class PatientDetail extends PureComponent {
     //   console.log(o)
     // })
     const menuErrors = {}
-    Object.keys(errors).forEach((k) => {
-      this.widgets.forEach((w) => {
-        menuErrors[ w.id ] = !!(w.schema && w.schema[ k ])
+    Object.keys(errors).forEach(k => {
+      this.widgets.forEach(w => {
+        menuErrors[w.id] = !!(w.schema && w.schema[k])
       })
     })
     if (!_.isEqual(patient.menuErrors, menuErrors)) {
       const { currentComponent, currentId, entity } = patient
       const currentMenu =
-        this.widgets.find((o) => o.id === currentComponent) || {}
+        this.widgets.find(o => o.id === currentComponent) || {}
       dispatch({
         type: 'patient/updateState',
         payload: {
@@ -494,7 +508,7 @@ class PatientDetail extends PureComponent {
       theme,
       classes,
       height,
-      onMenuClick = (p) => p,
+      onMenuClick = p => p,
       footer,
       ...resetProps
     } = this.props
@@ -511,16 +525,12 @@ class PatientDetail extends PureComponent {
 
     const currentMenu =
       this.widgets.find(
-        (o) => o.id === (this.state.selectedMenu || currentComponent),
+        o => o.id === (this.state.selectedMenu || currentComponent),
       ) || {}
     const CurrentComponent = currentMenu.component
     const currentItemDisabled =
-      [
-        '1',
-        '2',
-        '3',
-        '4',
-      ].includes(currentMenu.id) && !patientIsActiveOrCreating
+      ['1', '2', '3', '4'].includes(currentMenu.id) &&
+      !patientIsActiveOrCreating
 
     return (
       <Authorized
@@ -542,11 +552,12 @@ class PatientDetail extends PureComponent {
                 <MenuList>
                   {this.widgets
                     .filter(
-                      (o) =>
+                      o =>
                         (!!patient.entity && !!patient.entity.id) ||
-                        Number(o.id) <= 4 || Number(o.id) === 9,
+                        Number(o.id) <= 4 ||
+                        Number(o.id) === 9,
                     )
-                    .map((o) => (
+                    .map(o => (
                       <Authorized authority={o.access}>
                         <MenuItem
                           key={o.name}
@@ -555,7 +566,7 @@ class PatientDetail extends PureComponent {
                           disabled={
                             global.disableSave && currentMenu.name !== o.name
                           }
-                          onClick={(e) => {
+                          onClick={e => {
                             onMenuClick(e, o)
                             dispatch({
                               type: 'patient/updateState',
@@ -563,7 +574,7 @@ class PatientDetail extends PureComponent {
                                 entity: entity || undefined,
                               },
                             })
-                            this.setState((pre) => ({
+                            this.setState(pre => ({
                               selectedMenu: o.id,
                               preSelectedMenu: pre.selectedMenu,
                             }))
@@ -576,11 +587,11 @@ class PatientDetail extends PureComponent {
                             primary={
                               <span
                                 style={{
-                                  color: menuErrors[ o.id ] ? 'red' : 'inherit',
+                                  color: menuErrors[o.id] ? 'red' : 'inherit',
                                 }}
                               >
                                 {o.name}
-                                {menuErrors[ o.id ] ? (
+                                {menuErrors[o.id] ? (
                                   <Error
                                     style={{
                                       position: 'absolute',
@@ -597,18 +608,17 @@ class PatientDetail extends PureComponent {
                     ))}
                 </MenuList>
                 {isCreatingPatient && <Divider light />}
-                {hasActiveSession &&
-                  isCreatingPatient && (
-                    <Authorized authority='queue.registervisit'>
-                      <Button
-                        color='primary'
-                        style={{ marginTop: theme.spacing(1) }}
-                        onClick={this.registerVisit}
-                      >
-                        Register Visit
-                      </Button>
-                    </Authorized>
-                  )}
+                {hasActiveSession && isCreatingPatient && (
+                  <Authorized authority='queue.registervisit'>
+                    <Button
+                      color='primary'
+                      style={{ marginTop: theme.spacing(1) }}
+                      onClick={this.registerVisit}
+                    >
+                      Register Visit
+                    </Button>
+                  </Authorized>
+                )}
               </CardBody>
             </Card>
           </GridItem>
@@ -616,16 +626,14 @@ class PatientDetail extends PureComponent {
             <CardContainer hideHeader title={currentMenu.name}>
               <div
                 style={
-                  height > 0 ? (
-                    {
-                      height: height - 95 - 20,
-                      overflow: 'auto',
-                      padding: 4,
-                      paddingTop: 20,
-                    }
-                  ) : (
-                    { padding: 4, paddingTop: 20 }
-                  )
+                  height > 0
+                    ? {
+                        height: height - 95 - 20,
+                        overflow: 'auto',
+                        padding: 4,
+                        paddingTop: 20,
+                      }
+                    : { padding: 4, paddingTop: 20 }
                 }
               >
                 <Authorized.Context.Provider

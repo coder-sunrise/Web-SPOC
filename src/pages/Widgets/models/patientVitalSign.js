@@ -1,7 +1,4 @@
 import { createFormViewModel } from 'medisys-model'
-// import * as service from '../services'
-import { getUniqueGUID } from 'utils'
-import moment from 'moment'
 
 export default createFormViewModel({
   namespace: 'patientVitalSign',

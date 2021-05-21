@@ -1,9 +1,8 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'dva'
-import router from 'umi/router'
+import router, { formatMessage, FormattedMessage } from 'umi'
 
 import { withStyles } from '@material-ui/core'
-import { formatMessage, FormattedMessage } from 'umi'
 
 import Card from '@material-ui/core/Card'
 import CardActions from '@material-ui/core/CardActions'
@@ -117,7 +116,7 @@ class Dashboard extends Component {
               color='primary'
               style={{ marginBottom: 8 }}
               onClick={() => {
-                router.push('/wardmanagement/wardoccupancy')
+                history.push('/wardmanagement/wardoccupancy')
               }}
             >
               View

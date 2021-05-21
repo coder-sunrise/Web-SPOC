@@ -4,44 +4,44 @@ const url = '/api/PatientHistory'
 const invoiceHistoryUrl = '/api/invoice'
 const queueUrl = '/api/queue'
 
-module.exports = {
+const fns = {
   // remove: (params) => service.remove(url, params),
-  queryList: (params) => {
+  queryList: params => {
     return service.queryList(url, { ...params, pagesize: 9999 })
   },
-  query: (params) => {
+  query: params => {
     return service.query(url, params)
   },
 
-  queryRetailHistory: (params) => {
+  queryRetailHistory: params => {
     return service.query(`${url}/Retail`, params)
   },
-  queryDispenseHistory: (params) => {
+  queryDispenseHistory: params => {
     return service.query(`${url}/Dispense`, params)
   },
-  queryInvoiceHistory: (params) => {
+  queryInvoiceHistory: params => {
     return service.queryList(invoiceHistoryUrl, params)
   },
-  queryPrevDoctorNotes: (params) => {
+  queryPrevDoctorNotes: params => {
     return service.query(`${url}/PreviousDoctorNote/${params.visitId}`, params)
   },
   // upsert: (params) => {
   //   return service.upsert(url, params)
   // },
 
-  queryMedicationHistory: (params) => {
+  queryMedicationHistory: params => {
     return service.query(`${url}/MedicationHistory`, params)
   },
-  queryVisitHistory: (params) => {
+  queryVisitHistory: params => {
     return service.query(`${url}/VisitHistory`, params)
   },
-  
-  queryReferralHistory: (params) => {
-    return service.queryList(`${url}/Referral`,params)
+
+  queryReferralHistory: params => {
+    return service.queryList(`${url}/Referral`, params)
   },
 
-  saveReferralHistory: (params) => {
-    return service.upsert(`${queueUrl}/ReferralHistory`,params)
+  saveReferralHistory: params => {
+    return service.upsert(`${queueUrl}/ReferralHistory`, params)
   },
-
 }
+export default fns

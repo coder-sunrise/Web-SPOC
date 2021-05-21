@@ -1,6 +1,6 @@
 import { createFormViewModel } from 'medisys-model'
-import * as service from '../services/streetAddress'
 import { notification } from '@/components'
+import service from '../services/streetAddress'
 
 export default createFormViewModel({
   namespace: 'streetAddress',
@@ -25,7 +25,7 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *fetchAddress ({ payload }, { call, put }) {
+      *fetchAddress({ payload }, { call, put }) {
         const response = yield call(service.queryList, payload)
         if (response.data.data.length === 0)
           return (

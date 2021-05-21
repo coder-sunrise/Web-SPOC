@@ -32,23 +32,17 @@ import {
 import Filter from './Filter'
 import Grid from './Grid'
 // models
-import model from './models'
+// import model from './models'
 import ImagePreviewer from './ImagePreviewer'
 import TagSetter from './tagSetter'
 
-window.g_app.replaceModel(model)
+// window.g_app.replaceModel(model)
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
-const imageExt = [
-  'JPG',
-  'JPEG',
-  'PNG',
-  'BMP',
-  'GIF',
-]
+const imageExt = ['JPG', 'JPEG', 'PNG', 'BMP', 'GIF']
 
 const getLargestSortOrder = (largestIndex, attachment) =>
   attachment.sortOrder > largestIndex ? attachment.sortOrder : largestIndex
@@ -61,7 +55,7 @@ class PatientDocument extends Component {
     showImagePreview: false,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch, values } = this.props
     dispatch({
       type: 'patientAttachment/query',
@@ -71,16 +65,14 @@ class PatientDocument extends Component {
     })
   }
 
-  updateAttachments = (args) => ({ added, deleted }) => {
+  updateAttachments = args => ({ added, deleted }) => {
     const { dispatch, patientAttachment = [] } = this.props
     const { list = [] } = patientAttachment
     const { field } = args
 
-    let updated = [
-      ...(field.value || []),
-    ]
+    let updated = [...(field.value || [])]
     if (added) {
-      const addedFiles = added.map((file) => {
+      const addedFiles = added.map(file => {
         const { 0: fileDetails, attachmentType } = file
         return {
           ...fileDetails,
@@ -88,10 +80,7 @@ class PatientDocument extends Component {
           attachmentType,
         }
       })
-      updated = [
-        ...updated,
-        ...addedFiles,
-      ]
+      updated = [...updated, ...addedFiles]
       this.setState({ showTagModal: true, tagList: addedFiles })
     }
 
@@ -101,15 +90,9 @@ class PatientDocument extends Component {
           (item.fileIndexFK !== undefined && item.fileIndexFK === deleted) ||
           (item.fileIndexFK === undefined && item.id === deleted)
         )
-          return [
-            ...attachments,
-            { ...item, isDeleted: true },
-          ]
+          return [...attachments, { ...item, isDeleted: true }]
 
-        return [
-          ...attachments,
-          { ...item },
-        ]
+        return [...attachments, { ...item }]
       }, [])
     const sorted = updated.sort((a, b) => {
       if (a.id > b.id) return 1
@@ -136,12 +119,12 @@ class PatientDocument extends Component {
           type: 'patientAttachment/query',
         })
       })
-      .catch((error) => {
+      .catch(error => {
         console.error({ error })
       })
   }
 
-  onPreview = (file) => {
+  onPreview = file => {
     const fileExtension = (file.fileExtension || '').toUpperCase()
 
     // this.setState({
@@ -153,7 +136,7 @@ class PatientDocument extends Component {
     // return
 
     if (fileExtension === 'PDF') {
-      getFileByFileID(file.fileIndexFK).then((response) => {
+      getFileByFileID(file.fileIndexFK).then(response => {
         const { data } = response
         const base64Result = arrayBufferToBase64(data)
         printJS({ printable: base64Result, type: 'pdf', base64: true })
@@ -166,8 +149,11 @@ class PatientDocument extends Component {
     }
   }
 
-  render () {
-    const { patient: { entity }, patientAttachment } = this.props
+  render() {
+    const {
+      patient: { entity },
+      patientAttachment,
+    } = this.props
     const {
       showImagePreview,
       selectedFileId,
@@ -186,7 +172,7 @@ class PatientDocument extends Component {
           <div style={{ float: 'left' }}>
             <FastField
               name='patientAttachment'
-              render={(args) => {
+              render={args => {
                 this.form = args.form
 
                 return (
@@ -210,7 +196,7 @@ class PatientDocument extends Component {
         >
           <ImagePreviewer
             selectedFileId={selectedFileId}
-            files={list.filter((f) =>
+            files={list.filter(f =>
               imageExt.includes(f.fileExtension.toUpperCase()),
             )}
           />

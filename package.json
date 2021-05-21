@@ -57,7 +57,6 @@
     "draft-js": "^0.10.5",
     "draft-js-import-html": "^1.4.1",
     "draftjs-to-html": "^0.8.4",
-    "dva": "2.4.1",
     "enquire-js": "^0.2.1",
     "fabric": "3.5.1",
     "file-saver": "^2.0.2",
@@ -74,7 +73,7 @@
     "lodash-decorators": "^6.0.0",
     "memoize-one": "^4.1.0",
     "moment": "2.23.0",
-    "node-sass": "4.14.1",
+    "node-sass": "^4.14.1",
     "nprogress": "0.2.0",
     "numeral": "2.0.6",
     "nzh": "^1.0.4",
@@ -135,16 +134,17 @@
     "sharp": "^0.23.0",
     "slick-carousel": "1.8.1",
     "styled-jss": "^2.2.3",
-    "universal-cookie": "^4.0.2",
-    "yup": "0.26.10",
     "umi": "^3.4.0",
-    "umi-request": "^1.0.8"
+    "umi-request": "^1.0.8",
+    "universal-cookie": "^4.0.2",
+    "yup": "0.26.10"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.3.4",
     "@babel/preset-react": "^7.0.0",
     "@types/react": "^16.7.17",
     "@types/react-dom": "^16.0.10",
+    "@umijs/plugin-sass": "^1.1.1",
     "@umijs/preset-react": "^1.8.8",
     "antd-pro-merge-less": "^0.2.0",
     "antd-scss-theme-plugin": "^1.0.7",
@@ -166,6 +166,7 @@
     "eslint-plugin-react": "^7.16.0",
     "eslint-plugin-react-hooks": "0.0.0-5faf377df",
     "extract-text-webpack-plugin": "^3.0.2",
+    "file-loader": "^6.2.0",
     "gh-pages": "^2.0.1",
     "husky": "^1.2.0",
     "jest": "^24.1.0",
@@ -184,9 +185,6 @@
     "tslint-react": "^3.6.0",
     "typescript": "^3.3.3333",
     "webpack": "^4.41.2"
-  },
-  "optionalDependencies": {
-    "puppeteer": "^1.10.0"
   },
   "lint-staged": {
     "**/*.{js,ts,tsx,json,jsx,less}": [

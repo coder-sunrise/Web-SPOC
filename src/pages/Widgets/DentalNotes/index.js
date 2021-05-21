@@ -15,15 +15,15 @@ import {
   ScribbleNoteItem,
   TextField,
 } from '@/components'
-import UploadAttachment from './UploadAttachment'
-import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
-import model from './models'
 import {
   errMsgForOutOfRange as errMsg,
   navigateDirtyCheck,
 } from '@/utils/utils'
+import UploadAttachment from './UploadAttachment'
+import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
+// import model from './models'
 
-const styles = (theme) => ({
+const styles = theme => ({
   editor: {
     width: '100%',
     marginTop: theme.spacing(1),
@@ -58,7 +58,7 @@ const styles = (theme) => ({
   },
 })
 
-window.g_app.replaceModel(model)
+// window.g_app.replaceModel(model)
 
 // @withFormikExtend({
 //   mapPropsToValues: ({ clinicalnotes }) => {
@@ -108,7 +108,7 @@ class DentalNotes extends Component {
     width: 0,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'scriblenotes/updateState',
       payload: {
@@ -152,9 +152,7 @@ class DentalNotes extends Component {
     let planArray = scriblenotes.Plan.planScribbleArray
 
     if (scriblenotes.editEnable) {
-      const newArrayItems = [
-        ...scriblenotes[category][arrayName],
-      ]
+      const newArrayItems = [...scriblenotes[category][arrayName]]
       // newArrayItems[scriblenotes.selectedIndex] = {
       //   scribbleNoteTypeFK: categoryIndex,
       //   scribbleNoteTypeName: category,
@@ -233,9 +231,7 @@ class DentalNotes extends Component {
     // let chiefComplaintsArray =
     //   scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray
     // let planArray = scriblenotes.Plan.planScribbleArray
-    const tempArrayItems = [
-      ...scriblenotes[category][arrayName],
-    ]
+    const tempArrayItems = [...scriblenotes[category][arrayName]]
     const newArrayItems = []
     const deleteItem = tempArrayItems[scriblenotes.selectedIndex]
 
@@ -337,17 +333,15 @@ class DentalNotes extends Component {
     })
   }
 
-  updateAttachments = (args) => ({ added, deleted }) => {
+  updateAttachments = args => ({ added, deleted }) => {
     // console.log({ added, deleted }, args)
     const { form, field } = args
 
-    let updated = [
-      ...(field.value || []),
-    ]
+    let updated = [...(field.value || [])]
     if (added)
       updated = [
         ...updated,
-        ...added.map((o) => {
+        ...added.map(o => {
           const { id, ...resetProps } = o
           return {
             ...resetProps,
@@ -362,21 +356,15 @@ class DentalNotes extends Component {
           (item.fileIndexFK !== undefined && item.fileIndexFK === deleted) ||
           (item.fileIndexFK === undefined && item.id === deleted)
         )
-          return [
-            ...attachments,
-            { ...item, isDeleted: true },
-          ]
+          return [...attachments, { ...item, isDeleted: true }]
 
-        return [
-          ...attachments,
-          { ...item },
-        ]
+        return [...attachments, { ...item }]
       }, [])
 
     form.setFieldValue('corAttachment', updated)
   }
 
-  onEditorChange = (type) => (v) => {
+  onEditorChange = type => v => {
     const { entity } = this.props.consultation
     entity.corDoctorNote = [
       {
@@ -392,7 +380,7 @@ class DentalNotes extends Component {
     })
   }
 
-  render () {
+  render() {
     const {
       prefix = 'corDoctorNote[0].',
       clinicalnotes,
@@ -410,11 +398,7 @@ class DentalNotes extends Component {
         <Accordion
           leftIcon
           expandIcon={<SolidExpandMore fontSize='large' />}
-          defaultActive={[
-            0,
-            1,
-            2,
-          ]}
+          defaultActive={[0, 1, 2]}
           mode='multiple'
           collapses={[
             {
@@ -425,20 +409,20 @@ class DentalNotes extends Component {
 
                   <FieldArray
                     name='corScribbleNotes'
-                    render={(arrayHelpers) => {
+                    render={arrayHelpers => {
                       const { form } = arrayHelpers
                       this.form = form
                       const { values } = form
 
                       if (!values || !values.corScribbleNotes) return null
                       let chiefComplaints = values.corScribbleNotes.filter(
-                        (o) => o.scribbleNoteTypeFK === 1,
+                        o => o.scribbleNoteTypeFK === 1,
                       )
                       let clinicianNote = values.corScribbleNotes.filter(
-                        (o) => o.scribbleNoteTypeFK === 2,
+                        o => o.scribbleNoteTypeFK === 2,
                       )
                       let plan = values.corScribbleNotes.filter(
-                        (o) => o.scribbleNoteTypeFK === 3,
+                        o => o.scribbleNoteTypeFK === 3,
                       )
 
                       if (this.state.runOnce === false) {
@@ -471,7 +455,7 @@ class DentalNotes extends Component {
 
                   <Field
                     name={`${prefix}clinicianNote`}
-                    render={(args) => {
+                    render={args => {
                       return (
                         <div>
                           <ScribbleNoteItem
@@ -508,7 +492,7 @@ class DentalNotes extends Component {
                   {/* <h6>Clinical Notes</h6> */}
                   <Field
                     name={`${prefix}chiefComplaints`}
-                    render={(args) => {
+                    render={args => {
                       return (
                         <div>
                           <ScribbleNoteItem
@@ -546,7 +530,7 @@ class DentalNotes extends Component {
 
                   <Field
                     name={`${prefix}plan`}
-                    render={(args) => {
+                    render={args => {
                       return (
                         <div>
                           <ScribbleNoteItem
@@ -620,7 +604,8 @@ class DentalNotes extends Component {
           onClose={() =>
             navigateDirtyCheck({
               onProceed: this.toggleScribbleModal(),
-            })}
+            })
+          }
         >
           <ScribbleNote
             {...this.props}

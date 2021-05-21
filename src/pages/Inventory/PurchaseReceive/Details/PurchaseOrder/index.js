@@ -1,9 +1,8 @@
 import React, { Component, Fragment } from 'react'
 // import { connect } from 'dva'
-import router from 'umi/router'
+import { history, formatMessage } from 'umi'
 import _ from 'lodash'
 import { withStyles } from '@material-ui/core'
-import { formatMessage } from 'umi'
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -19,6 +18,7 @@ import { podoOrderType } from '@/utils/codes'
 import { INVOICE_STATUS, PURCHASE_ORDER_STATUS } from '@/utils/constants'
 import AuthorizedContext from '@/components/Context/Authorized'
 import AmountSummary from '@/pages/Shared/AmountSummary'
+import Warining from '@material-ui/icons/Error'
 import {
   isPOStatusDraft,
   poSubmitAction,
@@ -30,7 +30,6 @@ import {
 } from '../../variables'
 import POGrid from './POGrid'
 import POForm from './POForm'
-import Warining from '@material-ui/icons/Error'
 
 const styles = theme => ({
   errorMsgStyle: {
@@ -90,7 +89,7 @@ class Index extends Component {
       // Duplicate order
       case 'dup':
         if (createdId) {
-          router.push(
+          history.push(
             `/inventory/pr/pdodetails?id=${createdId}&&type=${'edit'}`,
           )
           this.props.dispatch({
@@ -114,7 +113,7 @@ class Index extends Component {
       // Create new order
       default:
         if (createdId && type === 'new') {
-          router.push(
+          history.push(
             `/inventory/pr/pdodetails?id=${createdId}&&type=${'edit'}`,
           )
           this.props.dispatch({
@@ -204,7 +203,6 @@ class Index extends Component {
             },
           })
           return
-          return
         }
         dispatch({
           type: dispatchType,
@@ -230,7 +228,7 @@ class Index extends Component {
               const { id } = r
               this.getPOdata(id)
             } else {
-              router.push('/inventory/pr')
+              history.push('/inventory/pr')
             }
           }
         })

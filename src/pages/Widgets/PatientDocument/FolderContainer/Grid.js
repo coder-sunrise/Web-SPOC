@@ -20,13 +20,12 @@ import {
 import _ from 'lodash'
 import { NavLink } from 'react-router-dom'
 import { Chip } from '@material-ui/core'
-// import * as service from './services'
 
 import { downloadAttachment } from '@/services/file'
 import SetFolderWithPopover from './SetFolderWithPopover'
 
 class Grid extends PureComponent {
-  downloadFile = (row) => {
+  downloadFile = row => {
     const { fileName } = row
     const splits = fileName.split('.')
     const ext = splits[splits.length - 1]
@@ -39,7 +38,7 @@ class Grid extends PureComponent {
     } else downloadAttachment(row)
   }
 
-  render () {
+  render() {
     const {
       dispatch,
       onPreview,
@@ -60,11 +59,11 @@ class Grid extends PureComponent {
         forceRender
         rows={attachmentList
           .filter(
-            (f) =>
+            f =>
               selectedFolderFK === -99 ||
               f.folderFKs.includes(selectedFolderFK),
           )
-          .map((a) => {
+          .map(a => {
             return { ...a, folderList: _.sortBy(folderList, 'sortOrder') }
           })}
         FuncProps={{
@@ -81,7 +80,7 @@ class Grid extends PureComponent {
           {
             columnName: 'fileName',
             width: 400,
-            render: (row) => {
+            render: row => {
               return (
                 <div style={{ marginRight: 20 }}>
                   <Tooltip title={row.fileName}>
@@ -127,12 +126,12 @@ class Grid extends PureComponent {
           {
             columnName: 'folderFKs',
             disabled: true,
-            render: (row) => {
+            render: row => {
               return (
                 <div style={{ whiteSpace: 'pre-wrap' }}>
                   {row.folderList
-                    .filter((f) => row.folderFKs.includes(f.id))
-                    .map((item) => (
+                    .filter(f => row.folderFKs.includes(f.id))
+                    .map(item => (
                       <Chip
                         style={{
                           margin: '0px 0px 5px 5px',
@@ -165,7 +164,7 @@ class Grid extends PureComponent {
             sortingEnabled: false,
             disabled: true,
             width: 110,
-            render: (row) => {
+            render: row => {
               return (
                 <React.Fragment>
                   <Tooltip title='Download'>
@@ -186,7 +185,7 @@ class Grid extends PureComponent {
                       key={row.id}
                       folderList={row.folderList}
                       selectedFolderFKs={row.folderFKs || []}
-                      onClose={(selectedFolder) => {
+                      onClose={selectedFolder => {
                         const originalFolders = _.sortedUniq(
                           row.folderFKs || [],
                         )

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
-import router from 'umi/router'
-import { FormattedMessage } from 'umi'
+import { history, FormattedMessage } from 'umi'
+
 import { Menu } from 'antd'
 import GridContent from '@/components/PageHeaderWrapper/GridContent'
 import styles from './Info.less'
@@ -81,7 +81,7 @@ class Info extends Component {
   }
 
   selectKey = ({ key }) => {
-    router.push(`/account/settings/${key}`)
+    history.push(`/account/settings/${key}`)
     this.setState({
       selectKey: key,
     })

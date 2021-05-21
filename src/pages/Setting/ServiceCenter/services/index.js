@@ -3,12 +3,12 @@ import request from '@/utils/request'
 
 const url = '/api/ctservicecenter'
 
-module.exports = {
+const fns = {
   // remove: (params) => service.remove(url, params),
   // query: (params) => service.query(url, params),
-  queryList: (params) => service.queryList(url, params),
+  queryList: params => service.queryList(url, params),
   // upsert: (params) => service.upsert(url, params),
-  upsertServiceCenter: async (params) => {
+  upsertServiceCenter: async params => {
     let r
     if (params.id) {
       r = await request(`${url}/${params.id}`, {
@@ -27,3 +27,5 @@ module.exports = {
     return r
   },
 }
+
+export default fns

@@ -1,19 +1,19 @@
 import fetch from 'dva/fetch'
 import axios from 'axios'
-import router from 'umi/router'
+import router from 'umi'
 import hash from 'hash.js'
 import queryString from 'query-string'
 import $ from 'jquery'
 import { notification } from '@/components'
+import { checkIsCodetableAPI, refreshCodetable } from '@/utils/codetable'
+import { sendNotification } from '@/utils/realtime'
+import { NOTIFICATION_STATUS, NOTIFICATION_TYPE } from '@/utils/constants'
 import {
   isAntdPro,
   updateLoadingState,
   commonDataWriterTransform,
   commonDataReaderTransform,
 } from './utils'
-import { checkIsCodetableAPI, refreshCodetable } from '@/utils/codetable'
-import { sendNotification } from '@/utils/realtime'
-import { NOTIFICATION_STATUS, NOTIFICATION_TYPE } from '@/utils/constants'
 
 // export const baseUrl = 'http://localhost:9300'
 // export const baseUrl = 'http://localhost/SEMR_V2'
@@ -67,7 +67,7 @@ const _errorMessageMapping = {
   V00031: 'Invalid new password format',
 }
 
-export function updateAPIType (type) {
+export function updateAPIType(type) {
   if (type === 'PROD') {
     dynamicURL = baseUrl
   } else {
@@ -112,7 +112,7 @@ export const axiosRequest = async (
       url: apiUrl,
       ...option,
       ...headerConfig,
-    }).then((response) => {
+    }).then(response => {
       const { data, status } = response
 
       if (status >= 200 && status < 300) {
@@ -214,7 +214,10 @@ const request = (
    * Maybe url has the same parameters
    */
   const fingerprint = url + (options.body ? JSON.stringify(options.body) : '')
-  const hashcode = hash.sha256().update(fingerprint).digest('hex')
+  const hashcode = hash
+    .sha256()
+    .update(fingerprint)
+    .digest('hex')
   let newUrl = url
 
   // const token = 'CfDJ8NIVLAbYTRpOk2IDmBBb9nQ09BNeoyGSs_wHHE4tfcY_d_w5lgvxw6gKmNhohjJ3vpZohASGm5XG997uWe1fXzuzLYtRzoDTmq7d40T-VSaQkUc2beqjFQNqL4D2xhgJC5-cPIGRGpuCXu1BbmEYThuk89P4aHiKA5WoZy4TNUVaUchuNHfi69qaqgCqWPhi1AMYpRf2isqFAt-dIkk0Z-yXcdFLNoylnQSVPjMtF5ahmWD0_ix-qkM3U15klptxPENvmB9-7gVCp5n-bS9YibPT-rWgudAmgVv5_LzG8OKtUKWHY_CNvoGeqgEKq4GojzGMFzHTl5DHeIlq6bb6YLple9unPtWJylgOgq9SdmiIzHAa5zkNCVaXTpEvNVrA0rFdB4zgWJOy-uDwb6qTGAhG_qqmICwITsTKe6DA7KYcZUP1kUERGoPAK3AtzsUl30aRaVzUo1VtfRy1hWe7lBE0K_7EQxrga7I871jO8s2vmdWIdUEw807vjxvuf7s0km5xbmEn-Watlpqbuken-ZzMGkXJju65mYB2_jm6NfqHDvSRmUB6Sc3SLWTukH3xsC8xIFw71bwT8KLy8UyAVCC7KGI1lhPg3MnIXVeeyhL2AT_-CWsg26h7IKfUmw_HP591Tr046-sDNukuqJwmjUpky2eU8kF6AeHxBm9fPtWQ79WFvO4vi2bxrmz29e-9NmbRd3WwLzivRIFSYRNIJhGyY5EPlJ01Cn2WbWr-hAKhqmucB66KxTtDcnMuxFeJ2EnxQhLtUEgGprgQ8LSqoJGV9BPEbkDcn_4XyYqWoqLAILE1Z2jNCo5rU-e0o9ya9Pwwhq0sgrQkiXAMAVsCvBiNPSBkSq-AJbejB3YXB3EY3Z_FmdFwO_1fgpJeoWkTKD4dYBEDHHgxHBOEGJRc9-chkYJfeFSX93iqD2VG6K68'
@@ -280,11 +283,9 @@ const request = (
   // if (isProd) url = `/prod${url}`
   // if (options.uat) console.log(url)
   if (
-    [
-      '/api/fake_chart_data',
-      '/api/fake_list?',
-      '/api/currentUser',
-    ].indexOf(url) < 0
+    ['/api/fake_chart_data', '/api/fake_list?', '/api/currentUser'].indexOf(
+      url,
+    ) < 0
   ) {
     newUrl = dynamicURL + newUrl
   }
@@ -521,15 +522,15 @@ const request = (
     //     }
     //     // environment should not be used
     //     if (status === 403) {
-    //       router.push('/exception/403')
+    //       history.push('/exception/403')
     //       return
     //     }
     //     if (status <= 504 && status >= 500) {
-    //       router.push('/exception/500')
+    //       history.push('/exception/500')
     //       return
     //     }
     //     if (status >= 404 && status < 422) {
-    //       router.push('/exception/404')
+    //       history.push('/exception/404')
     //     }
     //   }
     // })

@@ -1,8 +1,7 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import _ from 'lodash'
-import * as service from '../services/setup'
-import { getUniqueId } from '@/utils/utils'
+import service from '../DentalChart/services/setup'
 
 export default createListViewModel({
   namespace: 'dentalChartSetup',
@@ -14,10 +13,10 @@ export default createListViewModel({
     },
     subscriptions: ({ dispatch, history }) => {},
     effects: {
-      *post ({ payload }, { call, put }) {
+      *post({ payload }, { call, put }) {
         const r = yield call(
           service.post,
-          payload.map((o) => ({
+          payload.map(o => ({
             chartMethodColorBlock: '',
             chartMethodText: '',
             chartMethodColorText: '',

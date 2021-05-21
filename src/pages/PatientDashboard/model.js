@@ -1,7 +1,5 @@
 import { createFormViewModel } from 'medisys-model'
-import router from 'umi/router'
-import * as service from '../services'
-import { sleep, getRemovedUrl } from '@/utils/utils'
+import service from './services'
 
 export default createFormViewModel({
   namespace: 'patientDashboard',
@@ -59,14 +57,14 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *initState ({ payload }, { call, put, select, take }) {
+      *initState({ payload }, { call, put, select, take }) {
         const { queueID, version } = payload
         yield put({
           type: 'visitRegistration/query',
           payload: { id: queueID, version },
         })
         yield take('visitRegistration/query/@@end')
-        const visitRegistration = yield select((st) => st.visitRegistration)
+        const visitRegistration = yield select(st => st.visitRegistration)
         const { visit } = visitRegistration.entity
 
         // console.log(visitRegistration, visit)

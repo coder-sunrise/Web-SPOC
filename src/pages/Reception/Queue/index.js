@@ -3,7 +3,7 @@ import React from 'react'
 import { connect } from 'dva'
 // umi locale
 import { FormattedMessage, formatMessage } from 'umi'
-import router from 'umi/router'
+import router from 'umi'
 // class names
 import classNames from 'classnames'
 // material ui
@@ -528,7 +528,7 @@ class Queue extends React.Component {
           },
         }).then(o => {
           if (o)
-            router.push(
+            history.push(
               `/reception/queue/dispense?isInitialLoading=${isInitialLoading}&qid=${row.id}&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
             )
         })
@@ -544,7 +544,7 @@ class Queue extends React.Component {
           qid: row.id,
           v: version,
         }
-        router.push(getAppendUrl(parameters, '/reception/queue/billing'))
+        history.push(getAppendUrl(parameters, '/reception/queue/billing'))
         break
       }
       case '2': // delete visit
@@ -554,7 +554,7 @@ class Queue extends React.Component {
         this.onViewPatientProfileClick(row.patientProfileFK, row.id)
         break
       case '4': // patient dashboard
-        router.push(
+        history.push(
           `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}`,
         )
         break
@@ -574,7 +574,7 @@ class Queue extends React.Component {
             },
           }).then(o => {
             if (o) {
-              router.push(
+              history.push(
                 `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
               )
               openCautionAlertOnStartConsultation(o)
@@ -598,12 +598,12 @@ class Queue extends React.Component {
               },
             }).then(o => {
               if (o)
-                router.push(
+                history.push(
                   `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
                 )
             })
           } else {
-            router.push(
+            history.push(
               `/reception/queue/consultation?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&pid=${row.patientProfileFK}&v=${version}`,
             )
           }
@@ -642,7 +642,7 @@ class Queue extends React.Component {
                         version,
                       },
                     }).then(c => {
-                      router.push(
+                      history.push(
                         `/reception/queue/consultation?qid=${row.id}&cid=${c.id}&pid=${row.patientProfileFK}&v=${version}`,
                       )
                     })
@@ -650,7 +650,7 @@ class Queue extends React.Component {
                 },
               })
             } else {
-              router.push(
+              history.push(
                 `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
               )
             }

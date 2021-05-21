@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import router from 'umi/router'
+import { history } from 'umi'
 import { connect } from 'dva'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
@@ -47,7 +47,7 @@ import {
   validateApplySchemesWithPatientSchemes,
 } from './utils'
 
-const styles = (theme) => ({
+const styles = theme => ({
   accordionContainer: {
     paddingTop: theme.spacing(1.5),
     paddingLeft: theme.spacing(1),
@@ -152,7 +152,7 @@ const base64Prefix = 'data:image/jpeg;base64,'
 })
 @Authorized.Secured('queue.dispense.makepayment')
 class Billing extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.fetchCodeTables()
   }
@@ -177,7 +177,7 @@ class Billing extends Component {
     isConsumedPackage: false,
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.dispatch({
       type: 'billing/updateState',
       payload: {
@@ -239,13 +239,13 @@ class Billing extends Component {
         payload: {
           id: query.vid,
         },
-      }).then((response) => {
+      }).then(response => {
         const { invoice } = response
         const { invoiceItems } = invoice
 
         if (invoiceItems && invoiceItems.length > 0) {
           const consumedItems = invoiceItems.filter(
-            (i) => i.isPackage && i.packageConsumeQuantity > 0,
+            i => i.isPackage && i.packageConsumeQuantity > 0,
           )
           if (consumedItems.length > 0) {
             this.setState({
@@ -257,7 +257,7 @@ class Billing extends Component {
     }
   }
 
-  onPrintRef = (ref) => {
+  onPrintRef = ref => {
     this.childOnPrintRef = ref
   }
 
@@ -288,7 +288,7 @@ class Billing extends Component {
       const { prescription = [] } = dispense.entity
       const { invoice, invoicePayment } = values
       this.setState({
-        selectedDrugs: prescription.map((x) => {
+        selectedDrugs: prescription.map(x => {
           return { ...x, no: 1, selected: true }
         }),
       })
@@ -315,11 +315,11 @@ class Billing extends Component {
       ) {
         if (invoicePayment && invoicePayment.length > 0) {
           let payments = invoicePayment.filter(
-            (payment) => !payment.isCancelled && !payment.isDeleted,
+            payment => !payment.isCancelled && !payment.isDeleted,
           )
           if (payments && payments.length > 0) {
             printData = printData.concat(
-              payments.map((payment) => ({
+              payments.map(payment => ({
                 ReportId: 29,
                 DocumentName: 'Receipt',
                 Copies: 1,
@@ -342,7 +342,7 @@ class Billing extends Component {
 
       if (printData && printData.length > 0) {
         const token = localStorage.getItem('token')
-        printData = printData.map((item) => ({
+        printData = printData.map(item => ({
           ...item,
           Token: token,
           BaseUrl: process.env.url,
@@ -379,7 +379,7 @@ class Billing extends Component {
             })
             await this.printAfterComplete(autoPrintReportsOnCompletePayment)
 
-            router.push('/reception/queue')
+            history.push('/reception/queue')
           } else {
             notification.success({
               message: 'Billing Saved',
@@ -388,7 +388,7 @@ class Billing extends Component {
               type: 'patient/query',
               payload: { id: patient.id },
             })
-            this.setState((preState) => ({
+            this.setState(preState => ({
               submitCount: preState.submitCount + 1,
             }))
           }
@@ -443,7 +443,7 @@ class Billing extends Component {
     this.setState({ showAddPaymentModal: !showAddPaymentModal })
   }
 
-  calculateOutstandingBalance = async (invoicePayment) => {
+  calculateOutstandingBalance = async invoicePayment => {
     const { values, setFieldValue } = this.props
 
     const totalPaid = invoicePayment.reduce((totalAmtPaid, payment) => {
@@ -467,7 +467,7 @@ class Billing extends Component {
     }
   }
 
-  handleIsEditing = (editing) => {
+  handleIsEditing = editing => {
     this.setState({ isEditing: editing })
   }
 
@@ -540,7 +540,7 @@ class Billing extends Component {
     // check if invoice is OVERPAID and prompt user for confirmation
     if (
       outstandingBalance < 0 ||
-      invoicePayer.find((ip) => ip.payerOutstanding < 0)
+      invoicePayer.find(ip => ip.payerOutstanding < 0)
     ) {
       return dispatch({
         type: 'global/updateState',
@@ -562,7 +562,7 @@ class Billing extends Component {
     this.checkPackageSignature()
   }
 
-  onPrintReceiptClick = (invoicePaymentID) => {
+  onPrintReceiptClick = invoicePaymentID => {
     const { dispatch } = this.props
     dispatch({
       type: 'report/updateState',
@@ -589,7 +589,7 @@ class Billing extends Component {
   onPrintInvoice = (copayerID, invoicePayerid, index) => {
     const { values, dispatch } = this.props
     const { invoicePayer } = values
-    const modifiedOrNewAddedPayer = invoicePayer.filter((payer) => {
+    const modifiedOrNewAddedPayer = invoicePayer.filter(payer => {
       if (payer.id === undefined && payer.isCancelled) return false
       if (payer.id) return payer.isModified
       return true
@@ -628,11 +628,13 @@ class Billing extends Component {
             }
 
             const callback = () => {
-              this.setState((preState) => ({
+              this.setState(preState => ({
                 submitCount: preState.submitCount + 1,
               }))
               if (currentPrintIndex !== undefined) {
-                const { billing: { entity = {} } } = this.props
+                const {
+                  billing: { entity = {} },
+                } = this.props
                 parametrPaload = {
                   ...parametrPaload,
                   InvoicePayerid: entity.invoicePayer[currentPrintIndex].id,
@@ -663,11 +665,11 @@ class Billing extends Component {
     this.onShowReport(80, parametrPaload)
   }
 
-  handleAddPayment = async (payment) => {
+  handleAddPayment = async payment => {
     const { values, setValues } = this.props
     const { outstandingBalance, ...rest } = payment
     const invoicePayment = [
-      ...values.invoicePayment.filter((item) => item.id),
+      ...values.invoicePayment.filter(item => item.id),
       rest,
     ]
     const _newValues = {
@@ -683,27 +685,24 @@ class Billing extends Component {
     this.upsertBilling()
   }
 
-  handleDeletePayment = async (id) => {
+  handleDeletePayment = async id => {
     const { values, setValues, user } = this.props
     const { invoicePayment } = values
-    let _newInvoicePayment = [
-      ...invoicePayment,
-    ]
+    let _newInvoicePayment = [...invoicePayment]
     if (id === undefined) {
       _newInvoicePayment = invoicePayment.filter(
-        (payment) => payment.id !== undefined,
+        payment => payment.id !== undefined,
       )
     } else {
-      _newInvoicePayment = invoicePayment.map(
-        (payment) =>
-          payment.id === id
-            ? {
-                ...payment,
-                isCancelled: true,
-                cancelDate: new Date(),
-                cancelByUserFK: user.id,
-              }
-            : { ...payment },
+      _newInvoicePayment = invoicePayment.map(payment =>
+        payment.id === id
+          ? {
+              ...payment,
+              isCancelled: true,
+              cancelDate: new Date(),
+              cancelByUserFK: user.id,
+            }
+          : { ...payment },
       )
     }
     const _newValues = {
@@ -723,9 +722,9 @@ class Billing extends Component {
     dispatch({
       type: 'billing/query',
       payload: { id: values.visitId },
-    }).then((response) => {
+    }).then(response => {
       if (response) {
-        this.setState((preState) => ({
+        this.setState(preState => ({
           submitCount: preState.submitCount + 1,
         }))
       }
@@ -737,7 +736,7 @@ class Billing extends Component {
   }
 
   toggleSchemeValidationPrompt = () => {
-    this.setState((preState) => ({
+    this.setState(preState => ({
       showSchemeValidationPrompt: !preState.showSchemeValidationPrompt,
     }))
   }
@@ -748,10 +747,10 @@ class Billing extends Component {
 
     let drugList = []
 
-    prescription.forEach((item) => {
+    prescription.forEach(item => {
       drugList.push(item)
     })
-    packageItem.forEach((item) => {
+    packageItem.forEach(item => {
       if (item.type === 'Medication') {
         drugList.push({
           ...item,
@@ -761,10 +760,10 @@ class Billing extends Component {
       }
     })
 
-    this.setState((prevState) => {
+    this.setState(prevState => {
       return {
         showDrugLabelSelection: !prevState.showDrugLabelSelection,
-        selectedDrugs: drugList.map((x) => {
+        selectedDrugs: drugList.map(x => {
           return { ...x, no: 1, selected: true }
         }),
       }
@@ -772,7 +771,7 @@ class Billing extends Component {
   }
 
   handleDrugLabelSelectionClose = () => {
-    this.setState((prevState) => {
+    this.setState(prevState => {
       return {
         showDrugLabelSelection: !prevState.showDrugLabelSelection,
       }
@@ -780,18 +779,18 @@ class Billing extends Component {
   }
 
   handleDrugLabelSelected = (itemId, selected) => {
-    this.setState((prevState) => ({
-      selectedDrugs: prevState.selectedDrugs.map(
-        (drug) => (drug.id === itemId ? { ...drug, selected } : { ...drug }),
+    this.setState(prevState => ({
+      selectedDrugs: prevState.selectedDrugs.map(drug =>
+        drug.id === itemId ? { ...drug, selected } : { ...drug },
       ),
     }))
     this.props.dispatch({ type: 'global/incrementCommitCount' })
   }
 
   handleDrugLabelNoChanged = (itemId, no) => {
-    this.setState((prevState) => ({
-      selectedDrugs: prevState.selectedDrugs.map(
-        (drug) => (drug.id === itemId ? { ...drug, no } : { ...drug }),
+    this.setState(prevState => ({
+      selectedDrugs: prevState.selectedDrugs.map(drug =>
+        drug.id === itemId ? { ...drug, no } : { ...drug },
       ),
     }))
     this.props.dispatch({ type: 'global/incrementCommitCount' })
@@ -807,7 +806,7 @@ class Billing extends Component {
     })
   }
 
-  handleUpdatedAppliedInvoicePayerInfo = (isUpdatedAppliedInvoicePayerInfo) => {
+  handleUpdatedAppliedInvoicePayerInfo = isUpdatedAppliedInvoicePayerInfo => {
     this.setState({ isUpdatedAppliedInvoicePayerInfo })
   }
 
@@ -826,7 +825,7 @@ class Billing extends Component {
     return showRefreshOrder
   }
 
-  updateSignature = (signature) => {
+  updateSignature = signature => {
     const { dispatch, values, patient } = this.props
     const { thumbnail } = signature
 
@@ -841,7 +840,7 @@ class Billing extends Component {
     })
   }
 
-  render () {
+  render() {
     const {
       showReport,
       reportPayload,
@@ -981,7 +980,9 @@ class Billing extends Component {
                 handlePrintInvoiceClick={this.onPrintInvoiceClick}
                 handlePrintReceiptClick={this.onPrintReceiptClick}
                 {...formikBag}
-                isEnableVisitationInvoiceReport={isEnableVisitationInvoiceReport}
+                isEnableVisitationInvoiceReport={
+                  isEnableVisitationInvoiceReport
+                }
                 handlePrintVisitInvoiceClick={this.onPrintVisitInvoiceClick}
               />
             </GridContainer>
@@ -998,7 +999,7 @@ class Billing extends Component {
             >
               <FastField
                 name='invoice.invoiceRemark'
-                render={(args) => {
+                render={args => {
                   return (
                     <OutlinedTextField
                       label='Invoice Remarks'
@@ -1030,7 +1031,7 @@ class Billing extends Component {
                   </h5>
                   <Field
                     name='autoPrintReportsOnCompletePayment'
-                    render={(args) => {
+                    render={args => {
                       return (
                         <CheckboxGroup
                           disabled={
@@ -1058,8 +1059,7 @@ class Billing extends Component {
           >
             <React.Fragment>
               <div className={classes.paymentButton}>
-                {isEnablePackage &&
-                this.state.isConsumedPackage && (
+                {isEnablePackage && this.state.isConsumedPackage && (
                   <Button
                     color={
                       src !== '' && src !== undefined ? 'success' : 'danger'
@@ -1080,13 +1080,15 @@ class Billing extends Component {
                   disabled={
                     this.state.isEditing ||
                     values.id === undefined ||
-                    values.invoicePayer.find((payer) =>
-                      (payer.invoicePayment || [])
-                        .find((payment) => !payment.isCancelled),
+                    values.invoicePayer.find(payer =>
+                      (payer.invoicePayment || []).find(
+                        payment => !payment.isCancelled,
+                      ),
                     )
                   }
                 >
-                  <ArrowBack />Dispense
+                  <ArrowBack />
+                  Dispense
                 </Button>
                 <Button
                   color='primary'
@@ -1151,7 +1153,9 @@ class Billing extends Component {
         <CommonModal
           open={showReport}
           onClose={this.onCloseReport}
-          title={reportPayload.reportID === 15 ? 'Invoice' : 'Visitation Invoice'}
+          title={
+            reportPayload.reportID === 15 ? 'Invoice' : 'Visitation Invoice'
+          }
           maxWidth='lg'
         >
           <ReportViewer

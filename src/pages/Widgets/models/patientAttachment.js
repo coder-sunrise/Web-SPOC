@@ -1,6 +1,6 @@
 import { createListViewModel } from 'medisys-model'
 import { notification } from '@/components'
-import * as service from '../services'
+import * as service from '../PatientDocument/services'
 
 export default createListViewModel({
   namespace: 'patientAttachment',
@@ -16,7 +16,7 @@ export default createListViewModel({
     //   })
     // },
     effects: {
-      *queryOne ({ payload }, { select, call, put }) {
+      *queryOne({ payload }, { select, call, put }) {
         const response = yield call(service.queryDone, payload)
 
         if (response && response.status === '200') {
@@ -24,7 +24,7 @@ export default createListViewModel({
         }
         return null
       },
-      *removeRow ({ payload }, { call, put }) {
+      *removeRow({ payload }, { call, put }) {
         const result = yield call(service.remove, payload)
         if (result === 204) {
           notification.success({ message: 'Deleted' })
@@ -32,17 +32,14 @@ export default createListViewModel({
       },
     },
     reducers: {
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         const { data } = payload
         return {
           ...st,
-          list: data.data.map((o) => {
+          list: data.data.map(o => {
             return {
               ...o,
-              effectiveDates: [
-                o.effectiveStartDate,
-                o.effectiveEndDate,
-              ],
+              effectiveDates: [o.effectiveStartDate, o.effectiveEndDate],
             }
           }),
         }

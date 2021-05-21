@@ -1,3 +1,5 @@
+import { getDvaApp } from 'umi'
+
 const initialState = {
   loading: {
     global: false,
@@ -6,25 +8,28 @@ const initialState = {
   },
 }
 
-const models = []
-models.push(require('@/models/setting'))
-models.push(require('@/models/menu'))
-models.push(require('@/models/global'))
-models.push(require('@/models/user'))
-models.push(require('@/models/header'))
+if (!window.g_app) {
+  setTimeout(() => {
+    window.g_app = getDvaApp()
+  }, 0)
+}
 
-models.forEach((model) => {
-  initialState[model.default.namespace] = model.default.state
-})
+// const models = []
+// models.push(require('@/models/setting'))
+// models.push(require('@/models/menu'))
+// models.push(require('@/models/global'))
+// models.push(require('@/models/user'))
+// models.push(require('@/models/header'))
+
+// models.forEach((model) => {
+//   initialState[model.default.namespace] = model.default.state
+// })
 
 export const dva = {
   config: {
-    onError (e, ...args) {
+    onError(e, ...args) {
       // e.preventDefault()
-      const [
-        action,
-        { key, effectArgs },
-      ] = args
+      const [action, { key, effectArgs }] = args
       console.group('onError')
       console.log({ e, effectArgs })
       const message = `Error occured in  effects: ${key}, with payload: `
@@ -35,7 +40,7 @@ export const dva = {
       console.log(message, JSON.stringify(payload))
       console.groupEnd('onError')
     },
-    onReducer (reducer) {
+    onReducer(reducer) {
       return (state, action) => {
         const newState =
           action.type === 'RESET_APP_STATE'

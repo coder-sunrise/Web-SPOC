@@ -9,27 +9,27 @@ const bizSessionAPIURL = '/api/bizsession'
 const transferUrl = `${url}/Transfer`
 const bizVoidInvoicePayerDepositURL = '/api/Deposit/CancelInvoicePayerDeposit'
 
-module.exports = {
-  query: (params) => service.query(url, params),
-  addPayment: (params) => {
+const fns = {
+  query: params => service.query(url, params),
+  addPayment: params => {
     return request(invoicePaymentUrl, { method: 'POST', body: params })
   },
-  writeOff: (params) => {
+  writeOff: params => {
     return service.upsert(writeOffUrl, params)
   },
-  upsert: (params) => {
+  upsert: params => {
     return service.upsert(creditNoteUrl, params)
   },
 
-  getBizSession: (params) => service.queryList(bizSessionAPIURL, params),
-  voidWriteOff: (params) => service.upsert(writeOffUrl, params),
-  voidPayment: (params) => service.upsert(invoicePaymentUrl, params),
-  voidCreditNote: (params) => service.upsert(creditNoteUrl, params),
-  voidInvoicePayerDeposit: (params) =>
+  getBizSession: params => service.queryList(bizSessionAPIURL, params),
+  voidWriteOff: params => service.upsert(writeOffUrl, params),
+  voidPayment: params => service.upsert(invoicePaymentUrl, params),
+  voidCreditNote: params => service.upsert(creditNoteUrl, params),
+  voidInvoicePayerDeposit: params =>
     service.upsert(bizVoidInvoicePayerDepositURL, params),
 
-  getTransfer: (params) => service.query(transferUrl, params),
-  postTransfer: async (params) => {
+  getTransfer: params => service.query(transferUrl, params),
+  postTransfer: async params => {
     const r = await request(`${transferUrl}/${params.invoicePayerFK}`, {
       method: 'POST',
       body: {
@@ -39,3 +39,4 @@ module.exports = {
     return r
   },
 }
+export default fns

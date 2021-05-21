@@ -1,19 +1,14 @@
 ﻿import _ from 'lodash'
-import {
-  formatUrlPath,
-  commonDataReaderTransform,
-  decrypt,
-  cleanFieldValue,
-} from 'medisys-util'
+import { formatUrlPath } from '@/utils/utils'
 import BaseCRUDViewModel from './BaseCRUDViewModel'
 
 export default class BaseFormViewModel extends BaseCRUDViewModel {
-  constructor (options) {
+  constructor(options) {
     super(options)
     this.options = options
   }
 
-  create () {
+  create() {
     const _this = this
     // //console.log(this.options)
     const { namespace, param, setting = {} } = this.options
@@ -36,10 +31,10 @@ export default class BaseFormViewModel extends BaseCRUDViewModel {
       },
 
       subscriptions: {
-        setup ({ dispatch, history }) {
+        setup({ dispatch, history }) {
           superSubscription.call(_this, { dispatch, history })
           if (!skipDefaultListen) {
-            history.listen((location) => {
+            history.listen(location => {
               // console.log(state)
               const { urlPatten } = state
               let url = location.pathname + location.search
@@ -88,18 +83,18 @@ export default class BaseFormViewModel extends BaseCRUDViewModel {
       effects: {
         ...super.effects({ queryFnName: 'query' }),
 
-        *create ({ payload, history }, { select, call, put }) {
+        *create({ payload, history }, { select, call, put }) {
           console.log('create', payload)
 
-          const s = yield select((st) => st[namespace])
+          const s = yield select(st => st[namespace])
           const { currentItem, newDetailPath } = s
           let path = detailPath
           if (newDetailPath) {
             path = newDetailPath
           }
-          const newObj = yield select((st) => st[namespace].currentItem)
+          const newObj = yield select(st => st[namespace].currentItem)
           const newEntity = payload || { ...newObj }
-          ignoreFields.forEach((f) => {
+          ignoreFields.forEach(f => {
             delete newEntity[f]
           })
           const response = yield call(service.create, newEntity)
@@ -126,14 +121,14 @@ export default class BaseFormViewModel extends BaseCRUDViewModel {
           }
         },
 
-        *update ({ payload, history }, { select, call, put }) {
+        *update({ payload, history }, { select, call, put }) {
           console.log('update', payload)
 
-          const data = yield select((st) => st[namespace].currentItem)
+          const data = yield select(st => st[namespace].currentItem)
           if (data) {
             const { id } = data
             const newEntity = payload ? { ...payload, id } : { ...data }
-            ignoreFields.forEach((f) => {
+            ignoreFields.forEach(f => {
               delete newEntity[f]
             })
             // console.log(newEntity)
@@ -163,7 +158,7 @@ export default class BaseFormViewModel extends BaseCRUDViewModel {
 
       reducers: {
         ...super.reducers(),
-        querySuccess (st, { payload = {} }) {
+        querySuccess(st, { payload = {} }) {
           // console.log(payload)
           // const { response } = payload
           const { data, version } = payload

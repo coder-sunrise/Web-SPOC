@@ -36,7 +36,7 @@ const widgets = [
     },
     toolbarAddon: (
       <AuthorizedContext>
-        {(r) => {
+        {r => {
           if (r.rights !== 'enable') return null
           return (
             // <Dropdown
@@ -102,9 +102,7 @@ const widgets = [
       loading: Loading,
     }),
     model: 'diagnosis',
-    associatedProps: [
-      'corDiagnosis',
-    ],
+    associatedProps: ['corDiagnosis'],
     layoutConfig: {
       minW: 12,
       minH: 10,
@@ -236,9 +234,7 @@ const widgets = [
       loading: Loading,
     }),
     model: 'patientVitalSign',
-    associatedProps: [
-      'corPatientNoteVitalSign',
-    ],
+    associatedProps: ['corPatientNoteVitalSign'],
     layoutConfig: {
       minW: 12,
       minH: 10,
@@ -295,9 +291,7 @@ const widgets = [
       loading: Loading,
     }),
     model: 'attachment',
-    associatedProps: [
-      'corAttachment',
-    ],
+    associatedProps: ['corAttachment'],
     layoutConfig: {
       minW: 12,
       minH: 10,
@@ -346,9 +340,7 @@ const widgets = [
       },
       loading: Loading,
     }),
-    associatedProps: [
-      'corEyeVisualAcuityTest',
-    ],
+    associatedProps: ['corEyeVisualAcuityTest'],
     layoutConfig: {
       minW: 12,
       minH: 10,
@@ -369,9 +361,7 @@ const widgets = [
       },
       loading: Loading,
     }),
-    associatedProps: [
-      'corEyeRefractionForm',
-    ],
+    associatedProps: ['corEyeRefractionForm'],
     // model: 'refractionForm',
     layoutConfig: {},
   },
@@ -387,9 +377,7 @@ const widgets = [
       },
       loading: Loading,
     }),
-    associatedProps: [
-      'corEyeExaminationForm',
-    ],
+    associatedProps: ['corEyeExaminationForm'],
     // model: 'refractionForm',
     layoutConfig: {},
   },
@@ -411,8 +399,4 @@ const widgets = [
     },
   },
 ]
-
-module.exports = {
-  widgets,
-  ...module.exports,
-}
+export { widgets }

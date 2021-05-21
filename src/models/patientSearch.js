@@ -1,7 +1,5 @@
 import { createListViewModel } from 'medisys-model'
-import * as service from '@/services/patient'
-// import { convertToQuery } from '@/utils/cdrss'
-import { convertToQuery } from '@/utils/utils'
+import service from '@/services/patient'
 
 export default createListViewModel({
   namespace: 'patientSearch',

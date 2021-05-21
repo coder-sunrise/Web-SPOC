@@ -1,19 +1,6 @@
 import { createFormViewModel } from 'medisys-model'
-import moment from 'moment'
-import * as service from '../services/invoicePayment'
 import { notification } from '@/components'
-
-const paymentMode = [
-  { type: 'Cash', objName: 'depositPayment', paymentModeFK: 1 },
-  { type: 'NETS', objName: 'netsPayment', paymentModeFK: 2 },
-  {
-    type: 'Credit Card',
-    objName: 'creditCardPayment',
-    paymentModeFK: 3,
-  },
-  { type: 'Cheque', objName: 'chequePayment', paymentModeFK: 4 },
-  { type: 'Giro', objName: 'giroPayment', paymentModeFK: 5 },
-]
+import service from '../services/invoicePayment'
 
 const InitialSessionInfo = {
   isClinicSessionClosed: true,
@@ -58,7 +45,7 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *getCurrentBizSession (_, { put, call }) {
+      *getCurrentBizSession(_, { put, call }) {
         const bizSessionPayload = {
           IsClinicSessionClosed: false,
         }
@@ -80,7 +67,7 @@ export default createFormViewModel({
           })
         }
       },
-      *submitWriteOff ({ payload }, { call, put }) {
+      *submitWriteOff({ payload }, { call, put }) {
         const response = yield call(service.writeOff, payload)
         const { status } = response
         if (status === '200') {
@@ -91,10 +78,10 @@ export default createFormViewModel({
         }
         return false
       },
-      *submitAddPayment ({ payload }, { call, put, select }) {
-        const userState = yield select((state) => state.user.data)
+      *submitAddPayment({ payload }, { call, put, select }) {
+        const userState = yield select(state => state.user.data)
         const bizSessionState = yield select(
-          (state) => state.invoicePayment.currentBizSessionInfo,
+          state => state.invoicePayment.currentBizSessionInfo,
         )
         console.log({ payload, bizSessionState })
         const { invoicePaymentList, invoicePayerFK } = payload
@@ -148,7 +135,7 @@ export default createFormViewModel({
 
         return false
       },
-      *submitVoidPayment ({ payload }, { call }) {
+      *submitVoidPayment({ payload }, { call }) {
         const response = yield call(service.voidPayment, payload)
         const { status } = response
 
@@ -161,7 +148,7 @@ export default createFormViewModel({
 
         return false
       },
-      *submitVoidWriteOff ({ payload }, { call }) {
+      *submitVoidWriteOff({ payload }, { call }) {
         const response = yield call(service.voidWriteOff, payload)
         const { status } = response
         if (status === '200') {
@@ -173,7 +160,7 @@ export default createFormViewModel({
 
         return false
       },
-      *submitVoidCreditNote ({ payload }, { call }) {
+      *submitVoidCreditNote({ payload }, { call }) {
         const response = yield call(service.voidCreditNote, payload)
         const { status } = response
 
@@ -187,7 +174,7 @@ export default createFormViewModel({
         return false
       },
 
-      *getTransferData ({ payload }, { put, call }) {
+      *getTransferData({ payload }, { put, call }) {
         const { id } = payload
         const response = yield call(service.getTransfer, id)
 
@@ -202,7 +189,7 @@ export default createFormViewModel({
         return false
       },
 
-      *submitTransfer ({ payload }, { call }) {
+      *submitTransfer({ payload }, { call }) {
         const response = yield call(service.postTransfer, payload)
 
         if (response) {
@@ -214,7 +201,7 @@ export default createFormViewModel({
         return false
       },
 
-      *submitVoidInvoicePayerDeposit ({ payload }, { call }) {
+      *submitVoidInvoicePayerDeposit({ payload }, { call }) {
         const response = yield call(service.voidInvoicePayerDeposit, payload)
         const { status } = response
 
@@ -229,14 +216,14 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      reset () {
+      reset() {
         return { ...initialState }
       },
-      queryDone (state, { payload }) {
+      queryDone(state, { payload }) {
         const { data } = payload
         let paymentResult
         if (data) {
-          paymentResult = data.map((payment) => {
+          paymentResult = data.map(payment => {
             let paymentTxnList = []
             const {
               invoicePayment,
@@ -248,7 +235,7 @@ export default createFormViewModel({
 
             // Payment
             paymentTxnList = (paymentTxnList || []).concat(
-              (invoicePayment || []).map((z) => {
+              (invoicePayment || []).map(z => {
                 return {
                   ...z,
                   // id: z.id,
@@ -263,7 +250,7 @@ export default createFormViewModel({
 
             // Write-Off
             paymentTxnList = (paymentTxnList || []).concat(
-              (invoicePayerWriteOff || []).map((z) => {
+              (invoicePayerWriteOff || []).map(z => {
                 return {
                   ...z,
                   // id: z.id,
@@ -279,7 +266,7 @@ export default createFormViewModel({
 
             // Credit Note
             paymentTxnList = (paymentTxnList || []).concat(
-              (creditNote || []).map((z) => {
+              (creditNote || []).map(z => {
                 return {
                   ...z,
                   // id: z.id,
@@ -295,7 +282,7 @@ export default createFormViewModel({
 
             // Invoice PayerDepposit
             paymentTxnList = (paymentTxnList || []).concat(
-              (patientDepositTransaction || []).map((z) => {
+              (patientDepositTransaction || []).map(z => {
                 return {
                   ...z,
                   type: 'Deposit',
@@ -309,8 +296,8 @@ export default createFormViewModel({
             // Statement Corporate Charges
             paymentTxnList = (paymentTxnList || []).concat(
               (statementInvoice || [])
-                .filter((x) => x.adminCharge > 0)
-                .map((z) => {
+                .filter(x => x.adminCharge > 0)
+                .map(z => {
                   return {
                     ...z,
                     // id: z.id,
@@ -327,10 +314,8 @@ export default createFormViewModel({
             // Statement Adjustment
             paymentTxnList = (paymentTxnList || []).concat(
               (statementInvoice || [])
-                .filter(
-                  (x) => x.statementAdjustment && x.statementAdjustment > 0,
-                )
-                .map((z) => {
+                .filter(x => x.statementAdjustment && x.statementAdjustment > 0)
+                .map(z => {
                   return {
                     ...z,
                     // id: z.id,
@@ -349,9 +334,7 @@ export default createFormViewModel({
 
           return {
             ...state,
-            entity: [
-              ...paymentResult,
-            ],
+            entity: [...paymentResult],
             currentId: paymentResult[0].invoiceFK,
           }
         }
@@ -361,7 +344,7 @@ export default createFormViewModel({
         }
       },
 
-      setCurrentBizSession (state, { payload }) {
+      setCurrentBizSession(state, { payload }) {
         return {
           ...state,
           currentBizSessionInfo: {
@@ -370,7 +353,7 @@ export default createFormViewModel({
         }
       },
 
-      setTransferData (state, { payload }) {
+      setTransferData(state, { payload }) {
         return {
           ...state,
           transfer: {

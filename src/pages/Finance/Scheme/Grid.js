@@ -8,9 +8,7 @@ import { Button, CommonTableGrid, Tooltip, notification } from '@/components'
 const viewSchemDetailAuthority = 'scheme.schemedetails'
 
 const Grid = ({ history, height }) => {
-  const [
-    tableParas,
-  ] = useState({
+  const [tableParas] = useState({
     columns: [
       { name: 'coPayerType', title: 'Co-Payer Type' },
       { name: 'code', title: 'Scheme Code' },
@@ -57,7 +55,7 @@ const Grid = ({ history, height }) => {
     {
       columnName: 'action',
       align: 'center',
-      render: (row) => (
+      render: row => (
         <Authorized authority={viewSchemDetailAuthority}>
           <Tooltip title='Edit' placement='bottom'>
             <Button

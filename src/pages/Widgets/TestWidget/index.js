@@ -29,11 +29,11 @@ import { withStyles, Divider, Paper } from '@material-ui/core'
 
 import DeleteIcon from '@material-ui/icons/Delete'
 import Grid from './Grid'
-import model from './models'
+// import model from './models'
 
-window.g_app.replaceModel(model)
+// window.g_app.replaceModel(model)
 
-const styles = (theme) => ({})
+const styles = theme => ({})
 
 @connect(({ testWidget }) => ({
   testWidget,
@@ -63,7 +63,7 @@ const styles = (theme) => ({})
   displayName: 'TestWidget',
 })
 class TestWidget extends Component {
-  render () {
+  render() {
     const { state, props } = this
     const { theme } = props
     return (
@@ -72,7 +72,7 @@ class TestWidget extends Component {
           <GridItem xs={6}>
             <FastField
               name='type'
-              render={(args) => {
+              render={args => {
                 return (
                   <CodeSelect
                     label='Type'
@@ -86,7 +86,7 @@ class TestWidget extends Component {
           <GridItem xs={6}>
             <FastField
               name='name'
-              render={(args) => {
+              render={args => {
                 return (
                   <CodeSelect
                     label='Name'
@@ -100,7 +100,7 @@ class TestWidget extends Component {
           <GridItem xs={6}>
             <FastField
               name='description'
-              render={(args) => {
+              render={args => {
                 return <DatePicker label='Order Date' {...args} />
               }}
             />
@@ -108,7 +108,7 @@ class TestWidget extends Component {
           <GridItem xs={6}>
             <FastField
               name='precaution'
-              render={(args) => {
+              render={args => {
                 return (
                   <CodeSelect
                     label='Precaution'
@@ -122,7 +122,7 @@ class TestWidget extends Component {
           <GridItem xs={11}>
             <FastField
               name='remarks'
-              render={(args) => {
+              render={args => {
                 return (
                   <TextField label='Remarks' multiline rowsMax={6} {...args} />
                 )
