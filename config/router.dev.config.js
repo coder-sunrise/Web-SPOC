@@ -1,5 +1,4 @@
 const devRoutes = {
-  hideInMenu: process.env.NODE_ENV === 'production',
   path: '/development',
   name: 'Development',
   routes: [
@@ -49,7 +48,7 @@ const devRoutes = {
       path: '/development/masonry',
       name: 'Masonry',
       mini: 'M',
-      component: './Development/Masonry',
+      component: './Development/Masonry/index.tsx',
     },
   ],
 }

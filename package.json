@@ -42,8 +42,9 @@
     "@material-ui/icons": "4.9.1",
     "@material-ui/lab": "5.0.0-alpha.3",
     "@material-ui/styles": "4.10.0",
+    "@medisys/component": "^0.1.151",
     "@microsoft/signalr": "^3.1.0",
-    "antd": "3.25.1",
+    "antd": "^4.15.6",
     "axios": "^0.19.0",
     "card-validator": "^6.2.0",
     "classnames": "2.2.6",
@@ -135,13 +136,16 @@
     "slick-carousel": "1.8.1",
     "styled-jss": "^2.2.3",
     "universal-cookie": "^4.0.2",
-    "yup": "0.26.10"
+    "yup": "0.26.10",
+    "umi": "^3.4.0",
+    "umi-request": "^1.0.8"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.3.4",
     "@babel/preset-react": "^7.0.0",
     "@types/react": "^16.7.17",
     "@types/react-dom": "^16.0.10",
+    "@umijs/preset-react": "^1.8.8",
     "antd-pro-merge-less": "^0.2.0",
     "antd-scss-theme-plugin": "^1.0.7",
     "antd-theme-webpack-plugin": "^1.2.0",
@@ -179,8 +183,6 @@
     "tslint-config-prettier": "^1.10.0",
     "tslint-react": "^3.6.0",
     "typescript": "^3.3.3333",
-    "umi": "2.11.3",
-    "umi-plugin-react": "1.13.3",
     "webpack": "^4.41.2"
   },
   "optionalDependencies": {

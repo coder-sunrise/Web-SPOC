@@ -221,7 +221,9 @@ const sharedOverrides = {
     root: {
       // textDecoration: 'underline',
       '&$selected': {
-        backgroundColor: color(hoverColor).lighten(0.05).hex(),
+        backgroundColor: color(hoverColor)
+          .lighten(0.05)
+          .hex(),
       },
       '&$selected:hover': {
         backgroundColor: hoverColor,

@@ -51,7 +51,7 @@ class AntdSwitch extends React.PureComponent {
     onOffMode: true,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     const { form, field, checkedValue } = props
     this.state = {
@@ -62,7 +62,7 @@ class AntdSwitch extends React.PureComponent {
     }
   }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { field, value, checkedValue, unCheckedValue } = nextProps
     // console.log(checkedValue, field.value)
     if (field) {
@@ -76,7 +76,7 @@ class AntdSwitch extends React.PureComponent {
     }
   }
 
-  handleValueChange = (checked) => {
+  handleValueChange = checked => {
     const { form, field, onChange, checkedValue, unCheckedValue } = this.props
     // console.log(checkedValue, field.value)
 
@@ -109,19 +109,9 @@ class AntdSwitch extends React.PureComponent {
     }
 
     const getSwtichCheckedClass = () => {
-      if (
-        [
-          '$',
-          '%',
-        ].includes(restProps.unCheckedChildren)
-      )
+      if (['$', '%'].includes(restProps.unCheckedChildren))
         return classes.switchUnchecked
-      if (
-        [
-          '+',
-          '-',
-        ].includes(restProps.unCheckedChildren)
-      ) {
+      if (['+', '-'].includes(restProps.unCheckedChildren)) {
         if (this.state.value) return classes.minusChecked
         return classes.plusChecked
       }
@@ -147,7 +137,7 @@ class AntdSwitch extends React.PureComponent {
     )
   }
 
-  render () {
+  render() {
     const { props } = this
     const { classes, mode, onChange, ...restProps } = props
     const labelProps = {
