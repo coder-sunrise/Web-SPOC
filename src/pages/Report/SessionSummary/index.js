@@ -1,7 +1,8 @@
 import React from 'react'
 import * as Yup from 'yup'
 import moment from 'moment'
-import { router } from 'umi'
+import { history } from 'umi'
+
 // formik
 import { withFormik } from 'formik'
 // material ui
@@ -24,7 +25,7 @@ const SessionColumns = [
 ]
 
 class SessionSummary extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       ...this.state,

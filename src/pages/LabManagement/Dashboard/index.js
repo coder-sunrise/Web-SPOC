@@ -1,6 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { connect } from 'dva'
-import router, { formatMessage, FormattedMessage } from 'umi'
+import { history } from 'umi'
 
 import { withStyles } from '@material-ui/core'
 
@@ -56,7 +55,7 @@ const styles = () => ({
 })
 class Dashboard extends Component {
   render() {
-    const { history, classes } = this.props
+    const { classes } = this.props
     const card = ({ number1, number2, number3, type }) => {
       return (
         <Card className={classes.card}>

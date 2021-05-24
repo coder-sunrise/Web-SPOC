@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import { connect } from 'dva'
-import router from 'umi'
+import { history } from 'umi'
 // material ui
 import { Popover } from '@material-ui/core'
 // medisys component

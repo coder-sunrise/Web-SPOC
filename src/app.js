@@ -1,4 +1,4 @@
-import { getDvaApp } from 'umi'
+import * as umi from 'umi'
 
 const initialState = {
   loading: {
@@ -10,7 +10,7 @@ const initialState = {
 
 if (!window.g_app) {
   setTimeout(() => {
-    window.g_app = getDvaApp()
+    window.g_app = umi.getDvaApp()
   }, 0)
 }
 

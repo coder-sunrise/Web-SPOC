@@ -1,5 +1,4 @@
 import { createListViewModel } from 'medisys-model'
-import router from 'umi'
 import _ from 'lodash'
 import { sleep, removeFields } from '@/utils/utils'
 import service from '../services/cestemplate'

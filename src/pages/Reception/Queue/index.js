@@ -2,8 +2,7 @@ import React from 'react'
 // dva
 import { connect } from 'dva'
 // umi locale
-import { FormattedMessage, formatMessage } from 'umi'
-import router from 'umi'
+import { history, FormattedMessage, formatMessage } from 'umi'
 // class names
 import classNames from 'classnames'
 // material ui

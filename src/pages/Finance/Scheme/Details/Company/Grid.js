@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
-import router from 'umi'
+import { history } from 'umi'
+
 import moment from 'moment'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 
@@ -36,14 +37,8 @@ class Grid extends PureComponent {
     },
   }
 
-  componentDidMount() {
-    // this.props.dispatch({
-    //   type: 'schemeCompany/query',
-    // })
-  }
-
   showDetail = (row, vmode) => () => {
-    this.props.history.push(`/finance/schemeCompany/${row.Id}?vmode=${vmode}`)
+    history.push(`/finance/schemeCompany/${row.Id}?vmode=${vmode}`)
   }
 
   Cell = ({ column, row, dispatch, classes, ...props }) => {

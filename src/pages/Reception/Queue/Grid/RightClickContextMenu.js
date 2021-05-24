@@ -1,9 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import { connect } from 'dva'
-import { compose } from 'redux'
 import ClickAwayListener from '@material-ui/core/ClickAwayListener'
 
-import router from 'umi'
 // material ui
 import { Popover, Paper } from '@material-ui/core'
 import { notification } from '@/components'

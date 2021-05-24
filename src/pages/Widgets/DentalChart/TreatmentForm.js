@@ -1,32 +1,10 @@
 import React, { PureComponent } from 'react'
-import router from 'umi'
+
 import { Paper, Divider, Chip } from '@material-ui/core'
 
-import { isNumber } from 'util'
-import * as Yup from 'yup'
-
-import _ from 'lodash'
 import { orderTypes } from '@/pages/Consultation/utils'
 import Form from '@/pages/Widgets/Orders/Detail'
-import { currencySymbol } from '@/utils/config'
 
-// common component
-import {
-  GridContainer,
-  GridItem,
-  notification,
-  withFormikExtend,
-  FastField,
-  Field,
-  OutlinedTextField,
-  TextField,
-  NumberInput,
-  Button,
-  ProgressButton,
-  Select,
-  Switch,
-  CodeSelect,
-} from '@/components'
 // utils
 import { calculateAdjustAmount } from '@/utils/utils'
 

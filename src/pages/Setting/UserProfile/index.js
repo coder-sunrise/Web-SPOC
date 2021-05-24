@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'dva'
 import $ from 'jquery'
-import router, { FormattedMessage } from 'umi'
+import { history, FormattedMessage } from 'umi'
 
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'

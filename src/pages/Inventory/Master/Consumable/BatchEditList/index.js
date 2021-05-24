@@ -1,10 +1,5 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import router from 'umi'
-import moment from 'moment'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-
-import { withStyles } from '@material-ui/core'
 import { compare } from '@/layouts'
 // import tooltipsStyle from 'assets/jss/material-kit-pro-react/tooltipsStyle.jsx'
 import { sleep, getAppendUrl } from '@/utils/utils'

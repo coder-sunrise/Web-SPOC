@@ -55,7 +55,7 @@ const { Link } = Anchor
 // }))
 @control()
 class Layout extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.container = React.createRef()
     this.layoutContainer = React.createRef()
@@ -106,23 +106,23 @@ class Layout extends PureComponent {
     this.widgetMenu = (
       <Menu>
         {widgets
-          .map((widget) => {
+          .map(widget => {
             const widgetAccessRight = Authorized.check(widget.accessRight)
             const { rights } = widgetAccessRight || { rights: undefined }
             return { ...widget, rights }
           })
-          .filter((widget) => {
+          .filter(widget => {
             if (!widget.rights) return false
             return widget.rights !== 'hidden'
           })
-          .map((o) => {
-            const cfg = defaultLayout.lg.find((m) => m.i === o.id) || {}
+          .map(o => {
+            const cfg = defaultLayout.lg.find(m => m.i === o.id) || {}
             // const disableByAccessRight = o.rights === 'disable'
             return (
               <Menu.Item
                 key={o.id}
                 disabled={cfg.static}
-                onClick={(e) => {
+                onClick={e => {
                   // console.log(this.state.currentLayout)
                   // console.log(e.domEvent.target)
                   // console.log(this.state.replaceWidget)
@@ -131,11 +131,9 @@ class Layout extends PureComponent {
                   for (let index = 0; index < sizes.length; index++) {
                     const breakpoint = sizes[index]
                     if (layout[breakpoint]) {
-                      const target = layout[breakpoint].find(
-                        (m) => m.i === e.key,
-                      )
+                      const target = layout[breakpoint].find(m => m.i === e.key)
                       let starter = layout[breakpoint].find(
-                        (m) => m.i === this.state.replaceWidget,
+                        m => m.i === this.state.replaceWidget,
                       )
                       if (target) {
                         target.i = this.state.replaceWidget
@@ -144,15 +142,15 @@ class Layout extends PureComponent {
                         starter.i = e.key
                         if (
                           layout.widgets.find(
-                            (m) => m === this.state.replaceWidget,
+                            m => m === this.state.replaceWidget,
                           )
                         )
                           layout.widgets = _.reject(
                             layout.widgets,
-                            (m) => m === this.state.replaceWidget,
+                            m => m === this.state.replaceWidget,
                           )
 
-                        if (!layout.widgets.find((m) => m === e.key)) {
+                        if (!layout.widgets.find(m => m === e.key)) {
                           layout.widgets.push(e.key)
                         }
                         // layout[breakpoint]=_.reject(layout[breakpoint])
@@ -187,24 +185,24 @@ class Layout extends PureComponent {
 
   // componentDidMount () {}
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.removeEventListener('resize', this.delayedResize)
     $(window.mainPanel).css('overflow', 'auto')
 
-    this.state.currentLayout.widgets.map((id) => {
-      const w = widgets.find((o) => o.id === id)
+    this.state.currentLayout.widgets.map(id => {
+      const w = widgets.find(o => o.id === id)
       if (w && w.onUnmount) w.onUnmount()
     })
   }
 
-  resize = (e) => {
+  resize = e => {
     // console.log(e)
     this.setState({
       rowHeight: this.getLayoutRowHeight(),
     })
   }
 
-  showWidgetManagePanel = (event) => {
+  showWidgetManagePanel = event => {
     this.setState({
       anchorEl: event.currentTarget,
       menuOpen: true,
@@ -218,12 +216,12 @@ class Layout extends PureComponent {
     })
   }
 
-  removeWidget = (widgetId) => {
+  removeWidget = widgetId => {
     const { setFieldValue, values } = this.props
-    const wg = widgets.find((o) => o.id === widgetId)
+    const wg = widgets.find(o => o.id === widgetId)
     // console.log(wg)
     const { associatedProps = [], onRemove, model } = wg
-    associatedProps.forEach((ap) => {
+    associatedProps.forEach(ap => {
       const v = values[ap]
       // console.log(ap, v)
       if (v) {
@@ -237,7 +235,7 @@ class Layout extends PureComponent {
           // )
           setFieldValue(
             ap,
-            v.map((o) => ({
+            v.map(o => ({
               ...o,
               isDeleted: true,
             })),
@@ -254,24 +252,24 @@ class Layout extends PureComponent {
     const { currentLayout } = this.state
 
     const layout = {
-      widgets: _.reject(currentLayout.widgets, (w) => w === widgetId),
+      widgets: _.reject(currentLayout.widgets, w => w === widgetId),
     }
-    sizes.forEach((s) => {
+    sizes.forEach(s => {
       layout[s] = currentLayout[s]
       if (layout[s]) {
-        layout[s] = layout[s].filter((o) => o.i !== widgetId)
+        layout[s] = layout[s].filter(o => o.i !== widgetId)
       }
     })
     this.changeLayout(layout)
   }
 
-  addWidget = (widgetId) => {
+  addWidget = widgetId => {
     const { currentLayout } = this.state
     const layout = _.cloneDeep(currentLayout)
     layout.widgets.push(widgetId)
     // console.log(currentLayout)
-    sizes.forEach((s) => {
-      const widget = this.pageDefaultWidgets.find((o) => o.id === widgetId) || {
+    sizes.forEach(s => {
+      const widget = this.pageDefaultWidgets.find(o => o.id === widgetId) || {
         config: {},
       }
       if (layout[s]) {
@@ -292,7 +290,7 @@ class Layout extends PureComponent {
     this.changeLayout(layout)
   }
 
-  promptRemoveWidgetConfirmation = (key) => {
+  promptRemoveWidgetConfirmation = key => {
     this.props.dispatch({
       type: 'global/updateState',
       payload: {
@@ -316,7 +314,7 @@ class Layout extends PureComponent {
     }
   }
 
-  changeLayout = (layout) => {
+  changeLayout = layout => {
     this.setState(
       {
         currentLayout: layout,
@@ -327,8 +325,8 @@ class Layout extends PureComponent {
     )
   }
 
-  fitlerItemWithAccessRight = (itemId) => {
-    const w = widgets.find((m) => m.id === itemId)
+  fitlerItemWithAccessRight = itemId => {
+    const w = widgets.find(m => m.id === itemId)
     if (!w) return false
     const widgetAccessRight = Authorized.check(w.accessRight)
 
@@ -342,11 +340,11 @@ class Layout extends PureComponent {
 
     const r = {
       widgets: defaultWidgets
-        .filter((w) => this.fitlerItemWithAccessRight(w.id))
-        .map((o) => o.id),
+        .filter(w => this.fitlerItemWithAccessRight(w.id))
+        .map(o => o.id),
     }
-    sizes.forEach((s) => {
-      r[s] = defaultWidgets.map((o) => ({
+    sizes.forEach(s => {
+      r[s] = defaultWidgets.map(o => ({
         ...o.config[s],
         i: o.id,
       }))
@@ -354,7 +352,7 @@ class Layout extends PureComponent {
     return r
   }
 
-  generateConfig = (id) => {
+  generateConfig = id => {
     const { classes, ...resetProps } = this.props
     const { elevation } = this.state
     return {
@@ -375,13 +373,13 @@ class Layout extends PureComponent {
   }
 
   toggleMode = () => {
-    this.setState((prevState) => ({
+    this.setState(prevState => ({
       mode: prevState.mode === 'default' ? 'edit' : 'default',
     }))
   }
 
-  toggleDrawer = (event) => {
-    this.setState((prevState) => ({ openDraw: !prevState.openDraw }))
+  toggleDrawer = event => {
+    this.setState(prevState => ({ openDraw: !prevState.openDraw }))
     const { cestemplate, dispatch } = this.props
     if (cestemplate && !cestemplate.list) {
       dispatch({
@@ -391,13 +389,13 @@ class Layout extends PureComponent {
   }
 
   togglePatientHistoryDrawer = () => {
-    this.setState((prevState) => ({
+    this.setState(prevState => ({
       openPatientHistoryDrawer: !prevState.openPatientHistoryDrawer,
     }))
   }
 
   toggleLabTrackingDrawer = () => {
-    this.setState((prevState) => ({
+    this.setState(prevState => ({
       openLabTrackingDrawer: !prevState.openLabTrackingDrawer,
     }))
   }
@@ -414,7 +412,7 @@ class Layout extends PureComponent {
     return true
   }
 
-  onMouseEnter = (e) => {
+  onMouseEnter = e => {
     // console.log(e.target)
     // console.log(cfg, e.target)
     // console.log($(e.target).parent('.widget-container')[0])
@@ -435,7 +433,7 @@ class Layout extends PureComponent {
     }
   }
 
-  onFullScreenClick = (id) => () => {
+  onFullScreenClick = id => () => {
     sessionStorage.setItem(
       'tempLayout',
       JSON.stringify(this.state.currentLayout),
@@ -482,7 +480,7 @@ class Layout extends PureComponent {
     return ((this.props.height || window.innerHeight) - topHeight) / 6
   }
 
-  onAnchorClick = (id) => {
+  onAnchorClick = id => {
     const parentElement = document.getElementById('mainPanel-root')
     const element = document.getElementById(id)
     try {
@@ -503,7 +501,7 @@ class Layout extends PureComponent {
     }
   }
 
-  render () {
+  render() {
     const { state, props } = this
     const { currentLayout } = state
     const { classes, ...restProps } = props
@@ -512,7 +510,7 @@ class Layout extends PureComponent {
       height,
       rights,
       clinicInfo,
-      onSaveLayout = (f) => f,
+      onSaveLayout = f => f,
     } = restProps
     const widgetProps = {
       status: 'consultation',
@@ -532,10 +530,7 @@ class Layout extends PureComponent {
       cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 },
       useCSSTransforms: false,
       preventCollision: !!this.state.fullScreenWidget,
-      margin: [
-        2,
-        2,
-      ],
+      margin: [2, 2],
       isDraggable: !this.state.fullScreenWidget,
       draggableCancel: '.non-dragable',
       draggableHandle: '.dragable',
@@ -569,7 +564,7 @@ class Layout extends PureComponent {
         //   containerPadding,
         // )
       },
-      onResizeStart: (e) => {
+      onResizeStart: e => {
         // $(this.layoutContainer.current).addClass(classes.layoutOnDrag)
         // console.log(e, window, $(window.mainPanel))
         // $(window.mainPanel).scrollTop($(window.mainPanel).scrollTop() + 5)
@@ -590,7 +585,7 @@ class Layout extends PureComponent {
           )
         }
       },
-      onResizeStop: (e) => {
+      onResizeStop: e => {
         // $(this.layoutContainer.current).removeClass(classes.layoutOnDrag)
         // console.log(e)
         $(this.layoutContainer.current).removeClass(
@@ -619,8 +614,8 @@ class Layout extends PureComponent {
           >
             <GridContainer justify='space-between'>
               <GridItem md={9}>
-                {state.currentLayout.widgets.map((id) => {
-                  const w = widgets.find((o) => o.id === id)
+                {state.currentLayout.widgets.map(id => {
+                  const w = widgets.find(o => o.id === id)
                   if (!w) return null
 
                   const onClick = () => this.onAnchorClick(w.id)
@@ -677,15 +672,15 @@ class Layout extends PureComponent {
             // onScroll={this.delayedMainDivScroll}
           >
             <ResponsiveGridLayout {...layoutCfg}>
-              {state.currentLayout.widgets.map((id) => {
-                const w = widgets.find((o) => o.id === id)
+              {state.currentLayout.widgets.map(id => {
+                const w = widgets.find(o => o.id === id)
                 if (!w) return <div />
                 const cfgs = state.currentLayout[state.breakpoint]
-                const cfg = cfgs.find((o) => o.i === id)
+                const cfg = cfgs.find(o => o.i === id)
 
                 if (!cfg) return <div key={id} />
                 const LoadableComponent = w.component
-
+                console.log(w.component)
                 return (
                   <div
                     className={classnames({
@@ -730,12 +725,10 @@ class Layout extends PureComponent {
 
                                   <Dropdown
                                     overlay={this.widgetMenu}
-                                    trigger={[
-                                      'click',
-                                    ]}
+                                    trigger={['click']}
                                     currentWidgetId={id}
                                     disabled={cfg.static}
-                                    onVisibleChange={(visible) => {
+                                    onVisibleChange={visible => {
                                       if (visible)
                                         this.setState({
                                           replaceWidget: id,
@@ -901,7 +894,7 @@ class Layout extends PureComponent {
                     value={currentLayout.widgets}
                     valueField='id'
                     textField='name'
-                    options={widgets.filter((widget) => {
+                    options={widgets.filter(widget => {
                       const widgetAccessRight = Authorized.check(
                         widget.accessRight,
                       )
@@ -994,11 +987,9 @@ class Layout extends PureComponent {
               <LabTrackingDrawer
                 {...widgetProps}
                 patientId={
-                  this.props.visitRegistration.entity ? (
-                    this.props.visitRegistration.entity.visit.patientProfileFK
-                  ) : (
-                    undefined
-                  )
+                  this.props.visitRegistration.entity
+                    ? this.props.visitRegistration.entity.visit.patientProfileFK
+                    : undefined
                 }
                 onClose={this.toggleLabTrackingDrawer}
               />

@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import _ from 'lodash'
-import router from 'umi'
+import { history } from 'umi'
+
 import { connect } from 'dva'
 import withStyles from '@material-ui/core/styles/withStyles'
 // common component
@@ -139,7 +140,7 @@ class EditOrder extends Component {
   }
 
   editOrder = () => {
-    const { dispatch, dispense, history } = this.props
+    const { dispatch, dispense } = this.props
     const { location } = history
     const { query } = location
     dispatch({

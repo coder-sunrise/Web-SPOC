@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import router from 'umi'
+import { history } from 'umi'
 // dva
 import { connect } from 'dva'
 // custom components

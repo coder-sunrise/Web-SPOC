@@ -32,7 +32,7 @@ export default createFormViewModel({
         invoicePayment: [],
       },
     },
-    subscriptions: ({ dispatch, history }) => {
+    subscriptions: ({ dispatch }) => {
       history.listen(async location => {
         const { query, pathname } = location
         const { vid, v, pid, qid } = query

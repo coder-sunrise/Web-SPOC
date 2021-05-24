@@ -1,6 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { connect } from 'dva'
-import router, { formatMessage, FormattedMessage } from 'umi'
+import { history } from 'umi'
 
 import { withStyles } from '@material-ui/core'
 
@@ -9,7 +8,6 @@ import CardActions from '@material-ui/core/CardActions'
 import CardContent from '@material-ui/core/CardContent'
 import Typography from '@material-ui/core/Typography'
 import Hotel from '@material-ui/icons/Hotel'
-import LinkOff from '@material-ui/icons/LinkOff'
 
 import {
   CardContainer,

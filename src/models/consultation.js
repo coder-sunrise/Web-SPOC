@@ -310,8 +310,7 @@ export default createFormViewModel({
         const response = yield call(service.completeOrder, payload)
         return response
       },
-      *closeModal({ payload = { history: {} } }, { call, put, take }) {
-        const { history = {} } = payload
+      *closeModal({}, { call, put, take }) {
         yield put({
           type: 'global/updateAppState',
           payload: {

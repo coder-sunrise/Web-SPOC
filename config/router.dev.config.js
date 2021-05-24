@@ -48,7 +48,7 @@ const devRoutes = {
       path: '/development/masonry',
       name: 'Masonry',
       mini: 'M',
-      component: './Development/Masonry/index.tsx',
+      component: './Development/Masonry',
     },
   ],
 }

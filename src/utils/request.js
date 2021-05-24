@@ -1,8 +1,6 @@
-import fetch from 'dva/fetch'
 import axios from 'axios'
-import router from 'umi'
+
 import hash from 'hash.js'
-import queryString from 'query-string'
 import $ from 'jquery'
 import { notification } from '@/components'
 import { checkIsCodetableAPI, refreshCodetable } from '@/utils/codetable'

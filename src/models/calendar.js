@@ -3,6 +3,7 @@ import BigCalendar from 'react-big-calendar'
 // moment
 import moment from 'moment'
 // medisys model
+import { history } from 'umi'
 import { createListViewModel } from 'medisys-model'
 // common components
 import { notification } from '@/components'
@@ -83,7 +84,7 @@ export default createListViewModel({
       isEditedAsSingleAppointment: false,
       mode: 'single',
     },
-    subscriptions: ({ dispatch, history }) => {
+    subscriptions: ({ dispatch }) => {
       history.listen(location => {
         const { pathname } = location
         const allowedPaths = ['/reception/appointment']
