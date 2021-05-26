@@ -338,10 +338,9 @@ const saveDraftDoctorNote = ({ dispatch, values, visitRegistration }) => {
   const { corDoctorNote = [] } = values
   const { entity: visit = {} } = visitRegistration
   const { id } = visit
-  console.log('corDoctorNote', corDoctorNote)
   dispatch({
     type: 'consultation/saveDraftDoctorNote',
-    payload: { ...(corDoctorNote.length ? corDoctorNote[ 0 ] : {}), visitFK: id }
+    payload: { ...(corDoctorNote.length ? corDoctorNote[ 0 ] : {}), visitFK: id, clinicalObjectRecordFK: values.id }
   })
 }
 
@@ -524,10 +523,13 @@ class Main extends React.Component {
     setTimeout(() => {
       this.props.setFieldValue('fakeField', 'setdirty')
     }, 500)
-    const { consultation, dispatch, clinicSettings: { autoSaveClinicNoteInterval = 60 } } = this.props
-    this.interval = setInterval(() => {
-      saveDraftDoctorNote(this.props)
-    }, autoSaveClinicNoteInterval * 1000)
+
+    const { consultation, dispatch, clinicSettings: { autoSaveClinicNoteInterval = 60, isEnableAutoSaveClinicNote = false } } = this.props
+    if (isEnableAutoSaveClinicNote) {
+      this.interval = setInterval(() => {
+        saveDraftDoctorNote(this.props)
+      }, autoSaveClinicNoteInterval * 1000)
+    }
 
     const { pendingPackage } = consultation.entity
 
@@ -577,7 +579,9 @@ class Main extends React.Component {
       },
     })
 
-    clearInterval(this.interval);
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
   }
 
   shouldComponentUpdate = (nextProps) => {
