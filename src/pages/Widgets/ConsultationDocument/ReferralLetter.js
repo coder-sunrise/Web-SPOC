@@ -31,7 +31,7 @@ import { getClinicianProfile } from './utils'
     const clinicianProfile = getClinicianProfile(codetable, visitEntity)
     const values = {
       ...(consultationDocument.entity ||
-        consultationDocument.defaultReferralLetter),
+        consultationDocument.defaultReferralLetter()),
       referredByUserFK: clinicianProfile.userProfileFK,
     }
 
@@ -70,7 +70,7 @@ class ReferralLetter extends PureComponent {
     // this.editorReferece = ref
   }
 
-  render () {
+  render() {
     const {
       currentType,
       footer,
