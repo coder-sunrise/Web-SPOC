@@ -28,7 +28,7 @@ const isSameOrAfterTime = (startTime, endTime) =>
     if (consultationDocument.entity === undefined) {
       return {
         ...(consultationDocument.entity ||
-          consultationDocument.defaultCertOfAttendance),
+          consultationDocument.defaultCertOfAttendance()),
         attendanceStartTime: visitEntity.visit
           ? moment(visitEntity.visit.visitDate).format('HH:mm')
           : moment().format('HH:mm'),
@@ -98,7 +98,7 @@ const isSameOrAfterTime = (startTime, endTime) =>
   displayName: 'AddConsultationDocument',
 })
 class CertificateAttendance extends PureComponent {
-  componentDidMount () {
+  componentDidMount() {
     const { setFieldValue, values } = this.props
     // console.log({ values })
     if (values.referenceNo === '-')
@@ -113,7 +113,7 @@ class CertificateAttendance extends PureComponent {
       })
   }
 
-  render () {
+  render() {
     const { footer, handleSubmit, classes, values } = this.props
     // console.log({ values })
     return (
