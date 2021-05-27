@@ -53,7 +53,7 @@ class MovementList extends PureComponent {
       {
         columnName: 'costPrice', type: 'currency', currency: true, sortingEnabled: false, width: 100,
         render: (row) => {
-          return row.costPrice ? <NumberInput text currency value={row.costPrice} /> : ''
+          return (row.costPrice || row.costPrice === 0) ? <NumberInput text currency value={row.costPrice} /> : ''
         }
       },
     ]
