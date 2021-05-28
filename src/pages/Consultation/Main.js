@@ -530,32 +530,6 @@ class Main extends React.Component {
         saveDraftDoctorNote(this.props)
       }, autoSaveClinicNoteInterval * 1000)
     }
-
-    const { pendingPackage } = consultation.entity
-
-    if (pendingPackage) {
-      const packages = pendingPackage.reduce(
-        (distinct, data) =>
-          distinct.includes(data.patientPackageFK)
-            ? [
-              ...distinct,
-            ]
-            : [
-              ...distinct,
-              data.patientPackageFK,
-            ],
-        [],
-      )
-
-      if (packages && packages.length > 1) {
-        dispatch({
-          type: 'consultation/updateState',
-          payload: {
-            haveMultiplePendingPackages: true,
-          },
-        })
-      }
-    }
   }
 
   componentWillUnmount() {
@@ -1226,6 +1200,7 @@ class Main extends React.Component {
           onClose={this.closePackageSelectModal}
           onConfirm={this.closePackageSelectModal}
           open={consultation.haveMultiplePendingPackages || false}
+          overrideLoading
         >
           <ConsumePackage {...this.props} />
         </CommonModal>
