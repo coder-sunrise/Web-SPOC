@@ -46,6 +46,7 @@ import {
   ReportsOnSignOffOption,
 } from '@/utils/codes'
 import ConsumePackage from '@/pages/Widgets/Orders/Detail/ConsumePackage'
+import * as service from '@/services/consultation'
 import AutoPrintSelection from './autoPrintSelection'
 
 // import PatientSearch from '@/pages/PatientDatabase/Search'
@@ -334,14 +335,12 @@ const pauseConsultation = ({
   })
 }
 
-const saveDraftDoctorNote = ({ dispatch, values, visitRegistration }) => {
+const saveDraftDoctorNote = ({ values, visitRegistration }) => {
   const { corDoctorNote = [] } = values
   const { entity: visit = {} } = visitRegistration
   const { id } = visit
-  dispatch({
-    type: 'consultation/saveDraftDoctorNote',
-    payload: { ...(corDoctorNote.length ? corDoctorNote[ 0 ] : {}), visitFK: id, clinicalObjectRecordFK: values.id }
-  })
+  const payload = { ...(corDoctorNote.length ? corDoctorNote[ 0 ] : {}), visitFK: id, clinicalObjectRecordFK: values.id }
+  service.saveDraftDoctorNote(payload)
 }
 
 // @skeleton()

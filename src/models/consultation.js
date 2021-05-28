@@ -489,10 +489,6 @@ export default createFormViewModel({
         data.corEyeExaminationForm = corEyeExaminationForm
         return payload
       },
-      *saveDraftDoctorNote({ payload }, { call, put, select }) {
-        const response = yield call(service.saveDraftDoctorNote, payload)
-        return response
-      },
     },
     reducers: {
       showSignOffModal(state, { payload }) {
