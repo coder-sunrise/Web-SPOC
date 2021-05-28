@@ -38,7 +38,7 @@ const _toMoment = (value, isLocal, i, showTime) => {
   return m
 }
 
-const STYLES = (theme) => ({
+const STYLES = theme => ({
   dropdownMenu: {
     zIndex: 1305,
   },
@@ -46,7 +46,10 @@ const STYLES = (theme) => ({
     width: '100% !important',
     boxSizing: 'content-box',
     lineHeight: '1rem',
+    backgroundColor: 'transparent',
     color: 'currentColor',
+    padding: 0,
+    border: '0px solid #ccc !important',
     '& .ant-calendar-picker-icon': {
       marginTop: -7,
       right: 10,
@@ -67,16 +70,31 @@ const STYLES = (theme) => ({
     '& .ant-calendar-range-picker-separator': {
       marginRight: 10,
     },
+    '&.ant-picker-focused': {
+      boxShadow: 'none !important',
+    },
+    '& .ant-picker-active-bar': {
+      marginLeft: 0,
+      bottom: -2,
+    },
+    '& .ant-picker-range-separator': {
+      padding: '0 4',
+    },
+    '& .ant-picker-clear': {
+      right: 0,
+    },
   },
 })
-const keydown = (e) => {
+const keydown = e => {
   if (e.shiftKey) return
   // console.log(e.target)
   if (e.which === 9) {
     // Tab
     return false
   }
-  $(e.target).find('input').trigger('click')
+  $(e.target)
+    .find('input')
+    .trigger('click')
 }
 const debounceKeydown = _.debounce(keydown, 1000, {
   leading: true,
@@ -88,7 +106,7 @@ class AntdDateRangePicker extends PureComponent {
     local: true,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     const {
       field = {},
@@ -122,10 +140,10 @@ class AntdDateRangePicker extends PureComponent {
                       .set({ hour: 0, minute: 0, second: 0 })
                       .formatUTC(false)
                 : showTime
-                  ? moment(o).formatUTC()
-                  : moment(o)
-                      .set({ hour: 23, minute: 59, second: 59 })
-                      .formatUTC(false)
+                ? moment(o).formatUTC()
+                : moment(o)
+                    .set({ hour: 23, minute: 59, second: 59 })
+                    .formatUTC(false)
               : o
           }),
         )
@@ -150,7 +168,7 @@ class AntdDateRangePicker extends PureComponent {
   //   return nextDateValue !== currentDateValue
   // }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { field, local, showTime, value } = nextProps
     // console.log(field.value)
 
@@ -184,16 +202,16 @@ class AntdDateRangePicker extends PureComponent {
                     false,
                   )
               : showTime
-                ? moment(o).formatUTC(false)
-                : moment(o.set({ hour: 23, minute: 59, second: 59 })).formatUTC(
-                    false,
-                  )
+              ? moment(o).formatUTC(false)
+              : moment(o.set({ hour: 23, minute: 59, second: 59 })).formatUTC(
+                  false,
+                )
             : o
         })
       : []
     this.setState({
       value: v,
-      shrink: dateArray.length > 0,
+      shrink: dateArray?.length > 0,
     })
     if (form && field) {
       // console.log(date.formatUTC())
@@ -208,7 +226,7 @@ class AntdDateRangePicker extends PureComponent {
     }
   }
 
-  handleDatePickerOpenChange = (status) => {
+  handleDatePickerOpenChange = status => {
     this.setState({ shrink: status })
   }
 
@@ -216,7 +234,7 @@ class AntdDateRangePicker extends PureComponent {
     this.setState({ shrink: true })
   }
 
-  handleBlur = (e) => {
+  handleBlur = e => {
     debounceKeydown.cancel()
     if (this.state.value === undefined || this.state.value === '') {
       this.setState({ shrink: false })
@@ -282,11 +300,8 @@ class AntdDateRangePicker extends PureComponent {
       if (!this.state.value[0] && !this.state.value[1]) return <span>-</span>
       return (
         <span>
-          <DatePicker
-            text
-            format={format}
-            value={this.state.value[0]}
-          />&nbsp;~&nbsp;
+          <DatePicker text format={format} value={this.state.value[0]} />
+          &nbsp;~&nbsp;
           <DatePicker text format={format} value={this.state.value[1]} />
         </span>
       )
@@ -299,10 +314,7 @@ class AntdDateRangePicker extends PureComponent {
           className={classnames(classes.datepickerContainer)}
           dropdownClassName={classnames(classes.dropdownMenu)}
           allowClear
-          placeholder={[
-            '',
-            '',
-          ]}
+          placeholder={['', '']}
           // startPlaceholder=''
           // endPlaceholder=''
           onChange={this.handleChange}
@@ -312,15 +324,9 @@ class AntdDateRangePicker extends PureComponent {
             onOpenChange,
             this.handleDatePickerOpenChange,
           )}
-          format={[
-            format,
-            ...additionalShortcutFormats,
-          ]}
-          value={this.state.value.map(
-            (o, i) =>
-              moment.isMoment(o)
-                ? o
-                : _toMoment(o, local, i, restProps.showTime),
+          format={[format, ...additionalShortcutFormats]}
+          value={this.state.value.map((o, i) =>
+            moment.isMoment(o) ? o : _toMoment(o, local, i, restProps.showTime),
           )}
           {...restProps}
         />
@@ -328,7 +334,7 @@ class AntdDateRangePicker extends PureComponent {
     )
   }
 
-  render () {
+  render() {
     const { classes, onChange, theme, ...restProps } = this.props
     // const { value } = restProps
     const labelProps = {

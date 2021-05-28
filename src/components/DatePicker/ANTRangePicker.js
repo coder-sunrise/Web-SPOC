@@ -6,7 +6,7 @@ import withStyles from '@material-ui/core/styles/withStyles'
 // ant design
 import { DatePicker, Form } from 'antd'
 
-const styles = (theme) => ({
+const styles = theme => ({
   dropdownMenu: {
     zIndex: 1310,
   },
@@ -63,6 +63,9 @@ const styles = (theme) => ({
       fontSize: '1rem',
       height: 31,
     },
+  },
+  '& .ant-picker-focused': {
+    boxShadow: 'none',
   },
 })
 
@@ -129,7 +132,7 @@ class ANTRangePicker extends PureComponent {
     this.setState({ shrink: false })
   }
 
-  render () {
+  render() {
     const { shrink } = this.state
     const {
       classes,

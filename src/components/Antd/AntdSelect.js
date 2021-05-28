@@ -70,7 +70,9 @@ const STYLES = () => {
 
       '& .ant-select-selector': {
         float: 'left',
-        height: '25px !important',
+        width: '100%',
+        overflow: 'hidden',
+        // height: '24px !important',
         border: '0px solid #fff !important',
         backgroundColor: 'transparent !important',
         padding: '0px !important',
@@ -78,7 +80,7 @@ const STYLES = () => {
       },
 
       '& .ant-select-selection-item': {
-        lineHeight: '23px !important',
+        // lineHeight: '23px !important',
       },
       '& .ant-select-selection-search': {
         left: '0px !important',
