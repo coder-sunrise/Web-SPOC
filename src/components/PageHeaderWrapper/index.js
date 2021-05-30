@@ -15,32 +15,11 @@ const PageHeaderWrapper = ({
   top,
   ...restProps
 }) => (
-  <div>
+  <>
     {top}
-    {/* <MenuContext.Consumer>
-      {value => (
-        <PageHeader
-          wide={contentWidth === 'Fixed'}
-          home={<FormattedMessage id="menu.home" defaultMessage="Home" />}
-          {...value}
-          key="pageheader"
-          {...restProps}
-          linkElement={Link}
-          itemRender={item => {
-            if (item.locale) {
-              return <FormattedMessage id={item.locale} defaultMessage={item.title} />
-            }
-            return item.title
-          }}
-        />
-      )}
-    </MenuContext.Consumer> */}
-    {children ? (
-      <div>
-        <GridContent>{children}</GridContent>
-      </div>
-    ) : null}
-  </div>
+
+    {children || null}
+  </>
 )
 
 export default connect(({ setting }) => ({

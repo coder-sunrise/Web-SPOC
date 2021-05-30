@@ -4,35 +4,18 @@ import $ from 'jquery'
 import _ from 'lodash'
 import moment from 'moment'
 import { headerHeight } from 'mui-pro-jss'
+import ProLayout, { PageContainer, SettingDrawer } from '@ant-design/pro-layout'
+import { connect, formatMessage, Link, getLocale } from 'umi'
 
-// import { renderWhenReady} from '@sencha/ext-react'
-// import { Panel } from '@sencha/ext-modern'
-import { history } from 'umi'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import DocumentTitle from 'react-document-title'
 import isEqual from 'lodash/isEqual'
 import memoizeOne from 'memoize-one'
-import { connect } from 'dva'
-import { ContainerQuery } from 'react-container-query'
 import cx from 'classnames'
 import pathToRegexp from 'path-to-regexp'
 import Media from 'react-media'
-import { formatMessage } from 'umi'
 import { checkAuthoritys } from '@/utils/utils'
-
-// import { ToastComponent } from '@syncfusion/ej2-react-notifications'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
-// import {
-//   primaryColor,
-//   secondaryColor,
-//   dangerColor,
-//   roseColor,
-//   grayColor,
-//   fontColor,
-//   hoverColor,
-// } from 'mui-pro-jss'
-// import Sidebar from 'mui-pro-components/Sidebar'
-// import logo from '../assets/logo.svg'
 import image from 'assets/img/sidebar-2.jpg'
 // import logo from 'assets/img/logo-white.svg'
 import logo from 'assets/img/logo/logo_blue.png'
@@ -48,15 +31,7 @@ import { initClinicSettings } from '@/utils/config'
 import Authorized, { reloadAuthorized } from '@/utils/Authorized'
 import defaultSettings from '@/defaultSettings'
 
-// import Footer from './Footer'
-// import Header from './Header'
-import { notification } from '@/components'
-import SiderMenu from '@/components/SiderMenu'
-import { getAuthority } from '@/utils/authority'
-import Context from './MenuContext'
 import ErrorBoundary from './ErrorBoundary'
-import Exception403 from '../pages/Exception/403'
-import Exception from '../components/Exception'
 import GlobalModalContainer from './GlobalModalContainer'
 
 initClinicSettings()
@@ -88,32 +63,6 @@ const _theme = createMuiTheme({
     ...defaultTheme.overrides,
   },
 })
-
-// let ps
-const query = {
-  'screen-xs': {
-    maxWidth: 575,
-  },
-  'screen-sm': {
-    minWidth: 576,
-    maxWidth: 767,
-  },
-  'screen-md': {
-    minWidth: 768,
-    maxWidth: 991,
-  },
-  'screen-lg': {
-    minWidth: 992,
-    maxWidth: 1199,
-  },
-  'screen-xl': {
-    minWidth: 1200,
-    maxWidth: 1599,
-  },
-  'screen-xxl': {
-    minWidth: 1600,
-  },
-}
 
 const refreshTokenTimer = 10 * 60 * 1000
 const sessionTimeoutTimer = 30 * 60 * 1000
@@ -488,7 +437,7 @@ class BasicLayout extends React.PureComponent {
 
   render() {
     const { classes, loading, theme, ...props } = this.props
-    // console.log(props.collapsed)
+    console.log(props, getLocale())
     NProgress.start()
     if (!loading.global) {
       NProgress.done()
@@ -517,89 +466,39 @@ class BasicLayout extends React.PureComponent {
         <MuiThemeProvider theme={_theme}>
           <CssBaseline />
           <DocumentTitle title={this.getPageTitle(pathname)}>
-            <ContainerQuery query={query}>
-              {params => (
-                <Context.Provider value={this.getContext()}>
-                  <ErrorBoundary>
-                    <div id='main-page' className={cx(params)}>
-                      {!global.fullscreen && (
-                        <div className={classes.wrapper}>
-                          {isTop && !isMobile ? null : (
-                            <SiderMenu
-                              logo={logo}
-                              logoText={defaultSettings.appTitle}
-                              theme={navTheme}
-                              // onCollapse={this.handleMenuCollapse}
-                              menuData={menuData}
-                              isMobile={isMobile}
-                              image={image}
-                              // handleDrawerToggle={this.handleDrawerToggle}
-                              // open={this.state.mobileOpen}
-                              open={this.state.mobileOpen}
-                              color='blue'
-                              bgColor='black'
-                              handleDrawerToggle={this.handleDrawerToggle}
-                              {...props}
-                            />
-                            // <Sidebar
-                            //   routes={menuData}
-                            //   logoText="Creative Tim"
-                            //   logo={logo}
-                            //   image={image}
-                            //   handleDrawerToggle={this.handleDrawerToggle}
-                            //   open={this.state.mobileOpen}
-                            //   color="blue"
-                            //   bgColor="black"
-                            //   miniActive={collapsed}
-                            //   {...this.props}
-                            // />
-                          )}
-                          <div
-                            id='mainPanel-root'
-                            className={mainPanel}
-                            ref={node => {
-                              // this.mainPanel = node
-                              window.mainPanel = node
-                            }}
-                          >
-                            {/* <Header
-            menuData={menuData}
-            handleMenuCollapse={this.handleMenuCollapse}
-            logo={logo}
-            isMobile={isMobile}
-            {...props}
-          /> */}
-                            {/* <Affix target={() => window.mainPanel}> */}
-                            <Header
-                              sidebarMinimize={this.sidebarMinimize}
-                              miniActive={collapsed}
-                              menuData={menuData}
-                              breadcrumbNameMap={this.breadcrumbNameMap}
-                              // routes={dashboardRoutes}
-                              handleDrawerToggle={this.handleDrawerToggle}
-                              {...props}
-                            />
-                            {/* </Affix> */}
-                            <ErrorBoundary>
-                              <div className={classes.content}>
-                                <div className={classes.container}>
-                                  {this.renderChild()}
-                                </div>
-                              </div>
-                            </ErrorBoundary>
-                            {/* <Footer fluid /> */}
-                          </div>
-                        </div>
-                      )}
-
-                      {this.state.authorized && (
-                        <GlobalModalContainer {...props} />
-                      )}
-                    </div>
-                  </ErrorBoundary>
-                </Context.Provider>
-              )}
-            </ContainerQuery>
+            <div id='main-page' style={{ height: '100vh' }}>
+              <ErrorBoundary>
+                <ProLayout
+                  // {...defaultProps}
+                  {...props}
+                  formatMessage={formatMessage}
+                  menuItemRender={(menuItemProps, defaultDom) => {
+                    console.log(defaultDom)
+                    if (
+                      menuItemProps.isUrl ||
+                      !menuItemProps.path ||
+                      location.pathname === menuItemProps.path
+                    ) {
+                      return defaultDom
+                    }
+                    return <Link to={menuItemProps.path}>{defaultDom}</Link>
+                  }}
+                  breadcrumbRender={(routers = []) => [
+                    {
+                      path: '/',
+                      breadcrumbName: formatMessage({ id: 'menu.home' }),
+                    },
+                    ...routers,
+                  ]}
+                  location={{
+                    pathname,
+                  }}
+                >
+                  <PageContainer title={null} content={children} />
+                </ProLayout>
+              </ErrorBoundary>
+              {this.state.authorized && <GlobalModalContainer {...props} />}
+            </div>
           </DocumentTitle>
           {/* <Suspense fallback={<PageLoading />}>{this.renderSettingDrawer()}</Suspense> */}
         </MuiThemeProvider>
@@ -612,7 +511,7 @@ export default withStyles(appStyle)(
   connect(({ global, setting, menu, loading }) => ({
     collapsed: global.collapsed,
     layout: setting.layout,
-    menuData: menu.menuData,
+    // menuData: menu.menuData,
     ...setting,
     loading,
   }))(props => (

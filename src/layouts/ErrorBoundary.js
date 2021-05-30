@@ -3,17 +3,17 @@ import React from 'react'
 import ErrorPage from '@/pages/500'
 
 class ErrorBoundary extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = { hasError: false, error: null }
   }
 
-  static getDerivedStateFromError (error) {
+  static getDerivedStateFromError(error) {
     // Update state so the next render will show the fallback UI.
     console.group('error boundary')
     console.log({
       type: typeof error,
-      stack: error.stack,
+      stack: error?.stack,
       url: window.location.pathname,
       params: window.location.search,
     })
@@ -51,7 +51,7 @@ class ErrorBoundary extends React.Component {
   //   console.log('ErrorBoundary componentDidMount')
   // }
 
-  render () {
+  render() {
     if (this.state.hasError && window.location.href === this.state.url) {
       // Error path
       if (process.env.NODE_ENV === 'development') {
@@ -62,7 +62,7 @@ class ErrorBoundary extends React.Component {
               {this.state.error && this.state.error.toString()}
               <br />
               <p>Stack trace</p>
-              {this.state.error.stack}
+              {this.state.error?.stack}
             </details>
           </div>
         )

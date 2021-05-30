@@ -21,7 +21,7 @@ if (!window.g_app) {
 // models.push(require('@/models/user'))
 // models.push(require('@/models/header'))
 
-// models.forEach((model) => {
+// models.forEach(model => {
 //   initialState[model.default.namespace] = model.default.state
 // })
 

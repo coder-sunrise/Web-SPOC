@@ -1,8 +1,10 @@
 // https://umijs.org/config/
 import os from 'os'
+
+import { defineConfig } from 'umi'
 import pageRoutes from './router.config'
 import webpackPlugin from './plugin.config'
-import defaultSettings from '../src/defaultSettings'
+import defaultSettings from './defaultSettings'
 // import { primaryColor } from '../src/assets/jss/index'
 
 const plugins = {
@@ -14,6 +16,12 @@ const plugins = {
   targets: {
     ie: 11,
   },
+  // layout: {
+  //   // https://umijs.org/zh-CN/plugins/plugin-layout
+  //   locale: true,
+  //   siderWidth: 208,
+  //   ...defaultSettings,
+  // },
   // https://umijs.org/zh-CN/plugins/plugin-locale
   locale: {
     // default zh-CN
@@ -49,7 +57,7 @@ const plugins = {
     : {}),
 }
 
-export default {
+export default defineConfig({
   // add for transfer to umi
   ...plugins,
   targets: {
@@ -101,4 +109,4 @@ export default {
     basePath: '/',
   },
   chainWebpack: webpackPlugin,
-}
+})

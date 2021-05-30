@@ -1,5 +1,5 @@
 import React, { memo } from 'react'
-import { connect } from 'dva'
+import { connect } from 'umi'
 // umi locale
 import { FormattedMessage, formatMessage } from 'umi'
 // formik
@@ -40,7 +40,6 @@ const Filterbar = props => {
     loading,
   } = props
   const onSwitchClick = () => dispatch({ type: 'queueLog/toggleSelfOnly' })
-
   return (
     <div className='div-reception-header'>
       <GridContainer
@@ -110,7 +109,7 @@ const Filterbar = props => {
               <FormattedMessage id='reception.queue.createPatient' />
             </Button>
           </Authorized>
-          {user.clinicianProfile.userProfile.role.clinicRoleFK === 1 &&
+          {user.clinicianProfile.userProfile.role?.clinicRoleFK === 1 &&
             !hideSelfOnlyFilter && (
               <div className={classes.switch}>
                 <Checkbox

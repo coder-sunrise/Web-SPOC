@@ -369,7 +369,7 @@ export default createListViewModel({
         }
       },
       *getClinicBreakHourList(_, { call, put }) {
-        const result = yield call(cbServices.queryClinicBreakHour, {
+        const result = yield call(cbServices.queryList, {
           isActive: true,
           pagesize: 999,
         })
@@ -384,7 +384,7 @@ export default createListViewModel({
         }
       },
       *getClinicOperationHourList(_, { call, put }) {
-        const result = yield call(cohServices.queryClinicOperationHour, {
+        const result = yield call(cohServices.queryList, {
           isActive: true,
           pagesize: 999,
         })
@@ -397,7 +397,7 @@ export default createListViewModel({
         }
       },
       *getPublicHolidayList({ payload }, { call, put }) {
-        const result = yield call(phServices.queryPublicHolidays, {
+        const result = yield call(phServices.queryList, {
           isActive: true,
           lgteql_startDate: payload.start,
           pagesize: 999,

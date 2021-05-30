@@ -302,7 +302,6 @@ class BaseMenu extends React.Component {
       mode,
       location: { pathname },
     } = this.props
-
     const { handleOpenChange, style, menuData, classes } = this.props
     // console.log(selectedKey)
     return (

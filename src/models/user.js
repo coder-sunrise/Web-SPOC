@@ -6,8 +6,8 @@ import {
   saveUserPreference,
 } from '@/services/user'
 import { fetchUserProfileByID } from '@/pages/Setting/UserProfile/services'
-import * as serviceQueue from '../services/queue'
 import { CLINIC_TYPE } from '@/utils/constants'
+import * as serviceQueue from '../services/queue'
 
 const convertServerRights = ({ accessRight, type, permission }) => {
   // const orgName = accessRight
@@ -92,7 +92,7 @@ const convertServerRights = ({ accessRight, type, permission }) => {
   ]
 }
 
-const parseUserRights = (user) => {
+const parseUserRights = user => {
   const disableList = [
     'reception/appointment',
     'patientdatabase',
@@ -106,7 +106,7 @@ const parseUserRights = (user) => {
   ]
   const result = {
     ...user,
-    accessRights: user.accessRights.map((access) => ({
+    accessRights: user.accessRights.map(access => ({
       ...access,
       rights: disableList.includes(access.name) ? 'disable' : access.rights,
     })),
@@ -132,14 +132,14 @@ export default {
   },
 
   effects: {
-    *fetch (state, { call, put }) {
+    *fetch(state, { call, put }) {
       const response = yield call(queryUsers)
       yield put({
         type: 'save',
         payload: response,
       })
     },
-    *fetchCurrent (state, { select, call, put }) {
+    *fetchCurrent(state, { select, call, put }) {
       let user = JSON.parse(sessionStorage.getItem('user'))
       // const clinicInfo = yield select((state) => state.clinicInfo)
       if (!user) {
@@ -171,7 +171,7 @@ export default {
           // console.log(gridSetting)
           user = {
             data: data.userProfileDetailDto,
-            accessRights: _.orderBy(accessRights, (o) => o.name),
+            accessRights: _.orderBy(accessRights, o => o.name),
             gridSetting: JSON.parse(gridSetting.data || '[]'),
           }
           // for AiOT user only
@@ -196,7 +196,7 @@ export default {
         })
       return user
     },
-    *fetchProfileDetails ({ id }, { call, put }) {
+    *fetchProfileDetails({ id }, { call, put }) {
       const resultSession = yield call(serviceQueue.getBizSession, {
         IsClinicSessionClosed: false,
       })
@@ -218,7 +218,7 @@ export default {
         })
     },
 
-    *saveUserPreference ({ payload }, { call, put }) {
+    *saveUserPreference({ payload }, { call, put }) {
       const response = yield call(saveUserPreference, {
         userPreferenceDetails: JSON.stringify(payload.data),
         itemIdentifier: payload.itemIdentifier,
@@ -228,7 +228,7 @@ export default {
         const userSession = JSON.parse(sessionStorage.getItem('user'))
         const { gridSetting } = userSession
         const existIndex = gridSetting.indexOf(
-          gridSetting.find((o) => o.Identifier === payload.itemIdentifier),
+          gridSetting.find(o => o.Identifier === payload.itemIdentifier),
         )
         if (existIndex >= 0) {
           gridSetting.splice(existIndex, 1, payload.data)
@@ -248,16 +248,16 @@ export default {
   },
 
   reducers: {
-    reset (state) {
+    reset(state) {
       return { ...defaultState }
     },
-    save (state, action) {
+    save(state, action) {
       return {
         ...state,
         list: action.payload,
       }
     },
-    saveCurrentUser (state, { payload }) {
+    saveCurrentUser(state, { payload }) {
       // console.log({ payload })
 
       return {
@@ -265,7 +265,7 @@ export default {
         ...payload,
       }
     },
-    changeNotifyCount (state, action) {
+    changeNotifyCount(state, action) {
       return {
         ...state,
         currentUser: {
@@ -275,7 +275,7 @@ export default {
         },
       }
     },
-    saveProfileDetails (state, { profileDetails }) {
+    saveProfileDetails(state, { profileDetails }) {
       return { ...state, profileDetails }
     },
   },
