@@ -32,4 +32,13 @@ module.exports = {
   requestChasBalance: (params) => service.upsert(chasBalanceUrl, params),
   requestMedisaveBalance: (params) => service.upsert(medisaveBalanceUrl, params),
   queryDeposit: (params) => service.query(`${url}/Deposit`, params),
+  duplicateCheck: async (params) => {
+    const r = await request(`${url}/DuplicateCheck`, {
+      method: 'GET',
+      data: {
+        ...params,
+      },
+    })
+    return r
+  },
 }

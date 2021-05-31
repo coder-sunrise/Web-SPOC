@@ -91,10 +91,7 @@ class Details extends PureComponent {
           <ProgressButton
             color='primary'
             onClick={async () => {
-              const isSaveOk = await onSave((success) => {
-                if (success) this.autoFocuseItem(type)
-              })
-              if (isSaveOk) this.autoFocuseItem(type)
+              const isSaveOk = await onSave((success) => { })
             }}
             icon={null}
           >
@@ -164,7 +161,7 @@ class Details extends PureComponent {
     return nextSequence
   }
 
-  render () {
+  render() {
     const { props } = this
     const { classes, orders, dispatch, fromDispense, singleMode, from, clinicSettings } = props
     const { type } = orders

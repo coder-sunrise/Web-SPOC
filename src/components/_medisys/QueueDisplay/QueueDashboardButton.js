@@ -61,7 +61,8 @@ const QueueDashboardButton = ({
           >
             clear
           </ProgressButton>
-        )}</div>
+        )}
+      </div>
     </Authorized>
   )
 }

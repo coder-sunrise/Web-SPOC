@@ -107,7 +107,7 @@ const styles = (theme) => ({
   }),
 )
 class Queue extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       _sessionInfoID: undefined,
@@ -144,7 +144,7 @@ class Queue extends React.Component {
     }, 900000)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     clearInterval(this._timer)
     this.props.dispatch({
       type: 'calendar/updateState',
@@ -695,7 +695,7 @@ class Queue extends React.Component {
 
     if (totalRecords === 1 && hasSearchQuery)
       return this.showVisitRegistration({
-        patientID: patientSearchResult[0].id,
+        patientID: patientSearchResult[ 0 ].id,
       })
     if (totalRecords >= 1) {
       return this.togglePatientSearch()
@@ -771,7 +771,7 @@ class Queue extends React.Component {
     this.toggleForms()
   }
 
-  render () {
+  render() {
     const {
       classes,
       queueLog,
@@ -790,7 +790,6 @@ class Queue extends React.Component {
     const { sessionInfo, error } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
     const { tracker } = queueCalling
-
     const openQueueDisplayAccessRight = Authorized.check('openqueuedisplay')
     return (
       <PageHeaderWrapper
@@ -804,28 +803,28 @@ class Queue extends React.Component {
                 {`Session No.: ${sessionNo}`}
               </h3>
 
-                {openQueueDisplayAccessRight && openQueueDisplayAccessRight.rights !== 'hidden' && tracker && tracker.qNo ? (
-                  <h4
-                    className={classNames(classes.sessionNo)}
-                    style={{
-                      fontSize: 16,
-                      marginTop: 10,
-                      marginLeft: 10,
-                      fontWeight: 'Bold',
-                    }}
-                  >
-                    <font color='red'>
-                      NOW SERVING:{' '}
-                      {tracker.qNo.includes('.') ? (
-                        tracker.qNo
-                      ) : (
-                        `${tracker.qNo}.0`
-                      )}
-                    </font>
-                  </h4>
-                ) : (
-                  ''
-                )}
+              {openQueueDisplayAccessRight && openQueueDisplayAccessRight.rights !== 'hidden' && tracker && tracker.qNo ? (
+                <h4
+                  className={classNames(classes.sessionNo)}
+                  style={{
+                    fontSize: 16,
+                    marginTop: 10,
+                    marginLeft: 10,
+                    fontWeight: 'Bold',
+                  }}
+                >
+                  <font color='red'>
+                    NOW SERVING:{' '}
+                    {tracker.qNo.includes('.') ? (
+                      tracker.qNo
+                    ) : (
+                      `${tracker.qNo}.0`
+                    )}
+                  </font>
+                </h4>
+              ) : (
+                ''
+              )}
 
               {!isClinicSessionClosed && (
                 <div className={classNames(classes.toolBtns)}>

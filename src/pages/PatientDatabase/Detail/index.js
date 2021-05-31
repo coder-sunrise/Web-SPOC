@@ -40,7 +40,7 @@ import {
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 
-import { queryList } from '@/services/patient'
+import { duplicateCheck } from '@/services/patient'
 import { getBizSession } from '@/services/queue'
 import schema from './schema'
 import { mapEntityToValues, upsertPatient } from './utils'
@@ -101,7 +101,7 @@ class PatientDetail extends PureComponent {
     hasActiveSession: false,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     let schemas = schema(props)
     this.widgets = [
@@ -165,7 +165,7 @@ class PatientDetail extends PureComponent {
       },
       {
         id: '9',
-        name: 'Medical History', 
+        name: 'Medical History',
         component: Loadable({
           loader: () => import('./MedicalHistory'),
           render: (loaded, p) => {
@@ -305,11 +305,11 @@ class PatientDetail extends PureComponent {
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.checkHasActiveSession()
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     const { dispatch } = this.props
     const menuErrors = {}
     dispatch({
@@ -363,28 +363,29 @@ class PatientDetail extends PureComponent {
       return handleSubmit()
     }
 
-    const search = {
-      eql_patientAccountNo: values.patientAccountNo,
-      neql_id: values.id ? `${values.id}` : undefined,
-    }
-
-    const response = await queryList({
-      // ...search,
-      // combineCondition: 'and',
-      apiCriteria: {
-        searchValue: values.patientAccountNo,
-      },
+    const response = await duplicateCheck({
+      id: values.id,
+      patientAccountNo: values.patientAccountNo,
+      name: values.name,
+      dob: values.dob
     })
 
     const { data } = response
 
     let shouldPromptSaveConfirmation = false
+    let content
     if (data) {
-      const { totalRecords, data: patientList } = data
-      shouldPromptSaveConfirmation = totalRecords > 1
+      const { isDuplicateAccountNo = false, isDuplicateNameAndDOB = false } = data
+      shouldPromptSaveConfirmation = isDuplicateAccountNo || isDuplicateNameAndDOB
 
-      if (totalRecords === 1) {
-        shouldPromptSaveConfirmation = patientList[0].id !== values.id
+      if (isDuplicateAccountNo && isDuplicateNameAndDOB) {
+        content = 'Duplicated Account No., Patient Name and DOB found.'
+      }
+      else if (isDuplicateAccountNo) {
+        content = 'Duplicated Account No. found.'
+      }
+      else if (isDuplicateNameAndDOB) {
+        content = 'Duplicated Patient Name and DOB found.'
       }
     }
     if (shouldPromptSaveConfirmation) {
@@ -400,9 +401,9 @@ class PatientDetail extends PureComponent {
           openConfirm: true,
           openConfirmTitle: '',
           openConfirmText: 'OK',
-          openConfirmContent: 'Duplicated Account No. found.',
+          openConfirmContent: () => { return <div style={{ fontSize: '1.4rem', fontWeight: 300 }}>{content}</div> },
           additionalInfo: (
-            <h3 style={{ marginTop: 0 }}>Do you wish to proceed?</h3>
+            <div style={{ marginTop: 0, fontSize: '1.4rem', fontWeight: 300 }}>Do you wish to proceed?</div>
           ),
           onConfirmSave: handleSubmit,
         },
@@ -463,7 +464,7 @@ class PatientDetail extends PureComponent {
     this.setState({ selectedMenu })
   }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { errors, dispatch, patient, values, validateForm } = nextProps
     // validateForm(values).then((o) => {
     //   console.log(o)
@@ -471,7 +472,7 @@ class PatientDetail extends PureComponent {
     const menuErrors = {}
     Object.keys(errors).forEach((k) => {
       this.widgets.forEach((w) => {
-        menuErrors[w.id] = !!(w.schema && w.schema[k])
+        menuErrors[ w.id ] = !!(w.schema && w.schema[ k ])
       })
     })
     if (!_.isEqual(patient.menuErrors, menuErrors)) {
@@ -487,7 +488,7 @@ class PatientDetail extends PureComponent {
     }
   }
 
-  render () {
+  render() {
     const {
       theme,
       classes,
@@ -574,11 +575,11 @@ class PatientDetail extends PureComponent {
                             primary={
                               <span
                                 style={{
-                                  color: menuErrors[o.id] ? 'red' : 'inherit',
+                                  color: menuErrors[ o.id ] ? 'red' : 'inherit',
                                 }}
                               >
                                 {o.name}
-                                {menuErrors[o.id] ? (
+                                {menuErrors[ o.id ] ? (
                                   <Error
                                     style={{
                                       position: 'absolute',
@@ -622,8 +623,8 @@ class PatientDetail extends PureComponent {
                       paddingTop: 20,
                     }
                   ) : (
-                      { padding: 4, paddingTop: 20 }
-                    )
+                    { padding: 4, paddingTop: 20 }
+                  )
                 }
               >
                 <Authorized.Context.Provider

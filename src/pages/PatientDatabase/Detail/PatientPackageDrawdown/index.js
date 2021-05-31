@@ -13,6 +13,7 @@ import {
   dateFormatLong,
   SizeContainer,
   CommonModal,
+  NumberInput,
 } from '@/components'
 import model from './models'
 import TransferPackage from './transferPackage'
@@ -65,6 +66,11 @@ const styles = (theme) => ({
   },
   drawdownGrid: {
     marginTop: theme.spacing(1),
+  },
+  drawdownUnitPriceInfo: {
+    marginLeft: theme.spacing(3),
+    fontWeight: 500,
+    fontSize: smallFontSize,
   },
   acknowledgeInfo: {
     marginLeft: theme.spacing(2),
@@ -175,6 +181,7 @@ class PatientPackageDrawdown extends Component {
       remainingQuantity,
       totalQuantity,
       id,
+      unitPrice,
     } = row
 
     const totalDrawdownQuantity = totalQuantity - remainingQuantity
@@ -225,6 +232,9 @@ class PatientPackageDrawdown extends Component {
           ) : (
             <font color='black'>{label}</font>
           )}
+        </p>
+        <p className={classes.drawdownUnitPriceInfo}>
+          Unit Price: <NumberInput text currency value={unitPrice} />
         </p>
         {!isCompleted && !isExpired && remainingQuantity > 0 && (
           <Button className={classes.transferButton}
@@ -305,6 +315,7 @@ class PatientPackageDrawdown extends Component {
     const {
       packageCode,
       packageName,
+      totalPrice,
       expiryDate,
       purchaseDate,
       isCompleted,
@@ -348,9 +359,12 @@ class PatientPackageDrawdown extends Component {
           <GridItem md={8}>            
             <p className={classes.packageTitle}>
               {isCompleted ? (
-                <font color='black'> {packageCode} - {packageName}</font>
+                <font color='black'> {packageCode} - {packageName} (Total: <NumberInput text currency value={totalPrice} />)</font>
               ) : (
-                <font color='#4255BD'> {packageCode} - {packageName}</font>
+                <span>
+                  <font color='#4255BD'> {packageCode} - {packageName}</font>
+                  <font color='black'> (Total: <NumberInput text currency value={totalPrice} />)</font>
+                </span>
               )}
             </p>
           </GridItem>

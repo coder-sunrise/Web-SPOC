@@ -12,51 +12,63 @@ export default createFormViewModel({
     service: {},
     state: {
       type: '5',
-      defaultMedicalCertificate: {
-        type: '5',
-        mcDays: 1,
-        mcReferenceNo: '-',
-        mcStartEndDate: [
-          moment().formatUTC(),
-          moment(),
-        ],
-        mcIssueDate: moment(),
-        unfitTypeFK: 1,
+      defaultMedicalCertificate: () => {
+        return {
+          type: '5',
+          mcDays: 1,
+          mcReferenceNo: '-',
+          mcStartEndDate: [
+            moment().formatUTC(),
+            moment(),
+          ],
+          mcIssueDate: moment(),
+          unfitTypeFK: 1,
+        }
       },
-      defaultMemo: {
-        type: '2',
-        memoDate: moment(),
+      defaultMemo: () => {
+        return {
+          type: '2',
+          memoDate: moment(),
+        }
       },
-      defaultCertOfAttendance: {
-        type: '6',
-        issueDate: moment(),
-        referenceNo: '-',
-        attendanceEndTime: moment().add(30, 'minutes').format('HH:mm'),
+      defaultCertOfAttendance: () => {
+        return {
+          type: '6',
+          issueDate: moment(),
+          referenceNo: '-',
+          attendanceEndTime: moment().add(30, 'minutes').format('HH:mm'),
+        }
       },
-      defaultReferralLetter: {
-        type: '1',
-        referralDate: moment(),
+      defaultReferralLetter: () => {
+        return {
+          type: '1',
+          referralDate: moment(),
+        }
       },
-      defaultVaccinationCertificate: {
-        type: '3',
-        certificateDate: moment(),
+      defaultVaccinationCertificate: () => {
+        return {
+          type: '3',
+          certificateDate: moment(),
+        }
       },
-      defaultOthers: {
-        type: '4',
-        issueDate: moment(),
+      defaultOthers: () => {
+        return {
+          type: '4',
+          issueDate: moment(),
+        }
       },
       default: {},
       rows: [],
     },
     effects: {
-      *upsertRow ({ payload }, { call, put }) {
+      *upsertRow({ payload }, { call, put }) {
         yield put({
           type: 'upsertRowState',
           payload,
         })
       },
 
-      *deleteRow ({ payload }, { select, put }) {
+      *deleteRow({ payload }, { select, put }) {
         const orders = yield select((st) => st.orders)
         const consultationDocument = yield select(
           (st) => st.consultationDocument,
@@ -113,16 +125,16 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      upsertRowState (state, { payload }) {
+      upsertRowState(state, { payload }) {
         let { rows } = state
         if (payload.uid) {
           rows = rows.map((row) => {
             const n =
               row.uid === payload.uid
                 ? {
-                    ...row,
-                    ...payload,
-                  }
+                  ...row,
+                  ...payload,
+                }
                 : row
             return n
           })

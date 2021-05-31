@@ -11,7 +11,7 @@ import ReportBase from '../ReportBase'
 const reportId = 22
 const fileName = 'Inventory Movement Report'
 class InventoryMovementReport extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       ...this.state,
@@ -37,6 +37,7 @@ const InventoryMovementReportWithFormik = withFormik({
     dateFrom: moment(new Date()).startOf('month').toDate(),
     dateTo: moment(new Date()).endOf('month').toDate(),
     inventoryType: 'MEDICATION',
+    transactionType: 'ALL'
   }),
 })(InventoryMovementReport)
 
