@@ -286,7 +286,6 @@ class BasicLayout extends React.PureComponent {
       children,
       location: { pathname },
     } = this.props
-    console.log(children)
     return (
       <React.Fragment>
         <MuiThemeProvider theme={_theme}>
