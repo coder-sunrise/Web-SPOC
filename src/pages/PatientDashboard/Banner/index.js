@@ -102,7 +102,6 @@ class Banner extends PureComponent {
         showWarning: false,
       })
     }
-    console.log('patientAllergyMetaData', patientAllergyMetaData, ctg6pd)
     let g6PD
     if (patientAllergyMetaData.length > 0) {
       g6PD = ctg6pd.find((o) => o.id === patientAllergyMetaData[ 0 ].g6PDFK)
