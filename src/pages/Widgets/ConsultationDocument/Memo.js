@@ -29,7 +29,7 @@ import { getClinicianProfile } from './utils'
   mapPropsToValues: ({ consultationDocument, codetable, visitEntity }) => {
     const clinicianProfile = getClinicianProfile(codetable, visitEntity)
     const values = {
-      ...(consultationDocument.entity || consultationDocument.defaultMemo),
+      ...(consultationDocument.entity || consultationDocument.defaultMemo()),
       issuedByUserFK: clinicianProfile.userProfileFK,
     }
     return values
@@ -65,7 +65,7 @@ class Memo extends PureComponent {
     // this.editorReferece = ref
   }
 
-  render () {
+  render() {
     const {
       footer,
       handleSubmit,

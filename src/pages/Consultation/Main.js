@@ -46,6 +46,7 @@ import {
   ReportsOnSignOffOption,
 } from '@/utils/codes'
 import ConsumePackage from '@/pages/Widgets/Orders/Detail/ConsumePackage'
+import * as service from '@/services/consultation'
 import AutoPrintSelection from './autoPrintSelection'
 
 // import PatientSearch from '@/pages/PatientDatabase/Search'
@@ -334,6 +335,14 @@ const pauseConsultation = ({
   })
 }
 
+const saveDraftDoctorNote = ({ values, visitRegistration }) => {
+  const { corDoctorNote = [] } = values
+  const { entity: visit = {} } = visitRegistration
+  const { id } = visit
+  const payload = { ...(corDoctorNote.length ? corDoctorNote[ 0 ] : {}), visitFK: id, clinicalObjectRecordFK: values.id }
+  service.saveDraftDoctorNote(payload)
+}
+
 // @skeleton()
 @connect(
   ({
@@ -372,7 +381,7 @@ const pauseConsultation = ({
   mapPropsToValues: ({ consultation = {}, visitRegistration }) => {
     if (
       window.g_app._store.getState().global.isShowSecondConfirmButton ===
-        undefined &&
+      undefined &&
       visitRegistration &&
       visitRegistration.entity
     ) {
@@ -482,15 +491,15 @@ const pauseConsultation = ({
         confirmMessage:
           summary && summary.totalWithGST < 0
             ? () => {
-                return (
-                  <div>
-                    <h3>Total invoice amount is negative.</h3>
-                    <h3 style={{ marginTop: 0 }}>
-                      Confirm sign off current consultation?
+              return (
+                <div>
+                  <h3>Total invoice amount is negative.</h3>
+                  <h3 style={{ marginTop: 0 }}>
+                    Confirm sign off current consultation?
                     </h3>
-                  </div>
-                )
-              }
+                </div>
+              )
+            }
             : 'Confirm sign off current consultation?',
         successMessage: 'Consultation signed',
         action: 'sign',
@@ -507,42 +516,22 @@ class Main extends React.Component {
     recording: true,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     // console.log('Main')
     initRoomAssignment()
     setTimeout(() => {
       this.props.setFieldValue('fakeField', 'setdirty')
     }, 500)
 
-    const { consultation, dispatch } = this.props
-    const { pendingPackage } = consultation.entity
-
-    if (pendingPackage) {
-      const packages = pendingPackage.reduce(
-        (distinct, data) =>
-          distinct.includes(data.patientPackageFK)
-            ? [
-                ...distinct,
-              ]
-            : [
-                ...distinct,
-                data.patientPackageFK,
-              ],
-        [],
-      )
-
-      if (packages && packages.length > 1) {
-        dispatch({
-          type: 'consultation/updateState',
-          payload: {
-            haveMultiplePendingPackages: true,
-          },
-        })
-      }
+    const { consultation, dispatch, clinicSettings: { autoSaveClinicNoteInterval = 60, isEnableAutoSaveClinicNote = false } } = this.props
+    if (isEnableAutoSaveClinicNote) {
+      this.interval = setInterval(() => {
+        saveDraftDoctorNote(this.props)
+      }, autoSaveClinicNoteInterval * 1000)
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.dispatch({
       type: 'consultation/updateState',
       payload: {
@@ -562,6 +551,10 @@ class Main extends React.Component {
         secondConfirmMessage: undefined,
       },
     })
+
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
   }
 
   shouldComponentUpdate = (nextProps) => {
@@ -576,14 +569,14 @@ class Main extends React.Component {
     if (
       nextProps.visitRegistration &&
       nextProps.visitRegistration.version !==
-        this.props.visitRegistration.version
+      this.props.visitRegistration.version
     )
       return true
     if (
       nextProps.visitRegistration &&
       nextProps.visitRegistration.entity &&
       nextProps.visitRegistration.entity.id !==
-        this.props.visitRegistration.entity.id
+      this.props.visitRegistration.entity.id
     )
       return true
     if (
@@ -856,11 +849,11 @@ class Main extends React.Component {
               {({ rights }) => {
                 //
                 return rights === 'enable' &&
-                [
-                  'IN CONS',
-                  'WAITING',
-                ].includes(visit.visitStatus) &&
-                values.id ? (
+                  [
+                    'IN CONS',
+                    'WAITING',
+                  ].includes(visit.visitStatus) &&
+                  values.id ? (
                   <GridItem>
                     <h5 style={{ marginTop: -3, fontWeight: 'bold' }}>
                       <Timer
@@ -984,14 +977,14 @@ class Main extends React.Component {
                     'IN CONS',
                     'WAITING',
                   ].includes(visit.visitStatus) && (
-                    <ProgressButton
-                      onClick={this.pauseConsultation}
-                      color='info'
-                      icon={null}
-                    >
-                      Pause
-                    </ProgressButton>
-                  )}
+                      <ProgressButton
+                        onClick={this.pauseConsultation}
+                        color='info'
+                        icon={null}
+                      >
+                        Pause
+                      </ProgressButton>
+                    )}
                   {visit.visitStatus === 'PAUSED' && (
                     <ProgressButton
                       onClick={this.resumeConsultation}
@@ -1056,9 +1049,9 @@ class Main extends React.Component {
     })
     exist.isGstInclusive = currentValue.isGSTInclusive
     mergeArrayProps.forEach((p) => {
-      exist[p] = [
-        ...currentValue[p],
-        ...v[p],
+      exist[ p ] = [
+        ...currentValue[ p ],
+        ...v[ p ],
       ]
     })
     if (v.corDoctorNote && v.corDoctorNote.length > 0) {
@@ -1067,25 +1060,25 @@ class Main extends React.Component {
           chiefComplaints = '',
           clinicianNote = '',
           plan = '',
-        } = exist.corDoctorNote[0]
+        } = exist.corDoctorNote[ 0 ]
 
         if (chiefComplaints)
-          exist.corDoctorNote[0].chiefComplaints = `${chiefComplaints}<br/>${v
-            .corDoctorNote[0].chiefComplaints}`
+          exist.corDoctorNote[ 0 ].chiefComplaints = `${chiefComplaints}<br/>${v
+            .corDoctorNote[ 0 ].chiefComplaints}`
         else
-          exist.corDoctorNote[0].chiefComplaints =
-            v.corDoctorNote[0].chiefComplaints
+          exist.corDoctorNote[ 0 ].chiefComplaints =
+            v.corDoctorNote[ 0 ].chiefComplaints
 
         if (clinicianNote)
-          exist.corDoctorNote[0].clinicianNote = `${clinicianNote}<br/>${v
-            .corDoctorNote[0].clinicianNote}`
+          exist.corDoctorNote[ 0 ].clinicianNote = `${clinicianNote}<br/>${v
+            .corDoctorNote[ 0 ].clinicianNote}`
         else
-          exist.corDoctorNote[0].clinicianNote =
-            v.corDoctorNote[0].clinicianNote
+          exist.corDoctorNote[ 0 ].clinicianNote =
+            v.corDoctorNote[ 0 ].clinicianNote
 
         if (plan)
-          exist.corDoctorNote[0].plan = `${plan}<br/>${v.corDoctorNote[0].plan}`
-        else exist.corDoctorNote[0].plan = v.corDoctorNote[0].plan
+          exist.corDoctorNote[ 0 ].plan = `${plan}<br/>${v.corDoctorNote[ 0 ].plan}`
+        else exist.corDoctorNote[ 0 ].plan = v.corDoctorNote[ 0 ].plan
       } else {
         exist.corDoctorNote = [
           ...v.corDoctorNote,
@@ -1137,7 +1130,7 @@ class Main extends React.Component {
     })
   }
 
-  render () {
+  render() {
     const { props, state } = this
     const {
       classes,
@@ -1206,6 +1199,7 @@ class Main extends React.Component {
           onClose={this.closePackageSelectModal}
           onConfirm={this.closePackageSelectModal}
           open={consultation.haveMultiplePendingPackages || false}
+          overrideLoading
         >
           <ConsumePackage {...this.props} />
         </CommonModal>

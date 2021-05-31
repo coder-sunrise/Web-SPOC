@@ -84,4 +84,11 @@ module.exports = {
     })
     return r
   },
+  saveDraftDoctorNote: async (params) => {
+    const r = await request(`${url}/SaveDraftDoctorNote/${params.visitFK}`, {
+      method: 'PUT',
+      body: params,
+    })
+    return r
+  },
 }

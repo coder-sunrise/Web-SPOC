@@ -76,7 +76,7 @@ const styles = (theme) => ({
 @connect(({ loading, cannedText }) => {
   return {
     cannedText,
-    loading: loading.effects[`cannedText/query`],
+    loading: loading.effects[ `cannedText/query` ],
   }
 })
 @withFormikExtend({
@@ -84,7 +84,7 @@ const styles = (theme) => ({
     const clinicianProfile = getClinicianProfile(codetable, visitEntity)
     const values = {
       ...(consultationDocument.entity ||
-        consultationDocument.defaultMedicalCertificate),
+        consultationDocument.defaultMedicalCertificate()),
       issuedByUserFK: clinicianProfile.userProfileFK,
     }
 
@@ -98,7 +98,7 @@ const styles = (theme) => ({
     unfitTypeFK: Yup.number().required(),
     remarks: Yup.string().max(2000),
     otherUnfitTypeDescription: Yup.string().when('unfitTypeFK', {
-      is: (val) => val && UNFIT_TYPE[val] === 'Others',
+      is: (val) => val && UNFIT_TYPE[ val ] === 'Others',
       then: Yup.string().required(),
     }),
   }),
@@ -110,8 +110,8 @@ const styles = (theme) => ({
     const data = {
       sequence: nextSequence,
       ...values,
-      mcStartDate: mcStartEndDate[0],
-      mcEndDate: mcStartEndDate[1],
+      mcStartDate: mcStartEndDate[ 0 ],
+      mcEndDate: mcStartEndDate[ 1 ],
     }
     // console.log(mcStartEndDate)
     data.subject = currentType.getSubject(data)
@@ -124,14 +124,14 @@ const styles = (theme) => ({
   displayName: 'AddConsultationDocument',
 })
 class MedicalCertificate extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       showCannedText: false,
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { setFieldValue, values, dispatch } = this.props
     dispatch({
       type: 'cannedText/query',
@@ -153,7 +153,7 @@ class MedicalCertificate extends PureComponent {
   onDaysChange = (e) => {
     const { values, setFieldValue } = this.props
     if (e.target.value) {
-      const startDate = moment(values.mcStartEndDate[0])
+      const startDate = moment(values.mcStartEndDate[ 0 ])
       setFieldValue('mcStartEndDate', [
         startDate,
         startDate.clone().add('days', Math.ceil(e.target.value - 1)),
@@ -166,7 +166,7 @@ class MedicalCertificate extends PureComponent {
 
     setFieldValue(
       'mcDays',
-      Math.ceil(moment.duration(moments[1].diff(moments[0])).asDays()),
+      Math.ceil(moment.duration(moments[ 1 ].diff(moments[ 0 ])).asDays()),
     )
   }
 
@@ -178,7 +178,7 @@ class MedicalCertificate extends PureComponent {
   onSettingClick = () => {
     this.props.dispatch({
       type: 'cannedText/setSelectedNote',
-      payload: { cannedTextTypeFK: CANNED_TEXT_TYPE.MEDICALCERTIFICATE, fieldName: CANNED_TEXT_TYPE_FIELD_NAME[CANNED_TEXT_TYPE.MEDICALCERTIFICATE] },
+      payload: { cannedTextTypeFK: CANNED_TEXT_TYPE.MEDICALCERTIFICATE, fieldName: CANNED_TEXT_TYPE_FIELD_NAME[ CANNED_TEXT_TYPE.MEDICALCERTIFICATE ] },
     })
     this.setState({
       showCannedText: true,
@@ -195,8 +195,8 @@ class MedicalCertificate extends PureComponent {
     })
   }
 
-  render () {
-    const { footer, handleSubmit, classes, values, setFieldValue, cannedText , user } = this.props
+  render() {
+    const { footer, handleSubmit, classes, values, setFieldValue, cannedText, user } = this.props
     // console.log({ values })
     const { unfitTypeFK } = values
 
@@ -210,8 +210,8 @@ class MedicalCertificate extends PureComponent {
         </Tooltip>
       )
     }
-    const fieldName = CANNED_TEXT_TYPE_FIELD_NAME[CANNED_TEXT_TYPE.MEDICALCERTIFICATE]
-    let list = cannedText[fieldName] || []
+    const fieldName = CANNED_TEXT_TYPE_FIELD_NAME[ CANNED_TEXT_TYPE.MEDICALCERTIFICATE ]
+    let list = cannedText[ fieldName ] || []
     list = [
       ..._.orderBy(
         list.filter((o) => o.ownedByUserFK === user.data.id),
@@ -298,7 +298,7 @@ class MedicalCertificate extends PureComponent {
                     code='ctUnfitType'
                     label='Description'
                     onChange={(v) => {
-                      if (!v || UNFIT_TYPE[v] !== 'Others') {
+                      if (!v || UNFIT_TYPE[ v ] !== 'Others') {
                         setFieldValue('otherUnfitTypeDescription', '')
                       }
                     }}
@@ -316,7 +316,7 @@ class MedicalCertificate extends PureComponent {
                   <TextField
                     label='If Others, pls. specify'
                     disabled={
-                      !unfitTypeFK || UNFIT_TYPE[unfitTypeFK] !== 'Others'
+                      !unfitTypeFK || UNFIT_TYPE[ unfitTypeFK ] !== 'Others'
                     }
                     maxLength={200}
                     {...args}

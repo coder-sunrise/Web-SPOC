@@ -19,11 +19,20 @@ const FilterBar = ({ handleSubmit, isSubmitting, values, setFieldValue }) => {
     <SizeContainer size='sm'>
       <React.Fragment>
         <GridContainer alignItems='flex-end'>
-          <ReportDateRangePicker />
+          <ReportDateRangePicker fromDateLabel='Statement From Date' toDateLabel='Statement To Date' />
           <GridItem md={1}>
             <FastField
               name='asAt'
               render={(args) => <Checkbox {...args} label='Till Today' />}
+            />
+          </GridItem>
+          <GridItem md={6} />
+          <ReportDateRangePicker fromDateLabel='Statement Due From Date' toDateLabel='Statement Due End Date' fromDateFieldName='dueDateFrom'
+            toDateFieldName='dueDateTo' />
+          <GridItem md={1}>
+            <FastField
+              name='isAllDueDate'
+              render={(args) => <Checkbox {...args} label='All Date' />}
             />
           </GridItem>
           <GridItem md={6} />

@@ -48,7 +48,7 @@ class Number extends React.PureComponent {
     }
 
     return (
-      <span style={{ color: fontColor, fontWeight: 500 }}>{strValue}</span>
+      <span style={{ color: fontColor, fontWeight: type === 'currency' ? 500 : 0 }}>{strValue}</span>
     )
   }
 }
