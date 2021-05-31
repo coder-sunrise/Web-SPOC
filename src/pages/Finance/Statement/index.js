@@ -171,13 +171,6 @@ class Statement extends PureComponent {
           TableProps={{
             height,
           }}
-          pageSizes={[
-            10,
-            50,
-            100,
-            200,
-            400
-          ]}
           columnExtensions={[
             {
               columnName: 'statementNo',
@@ -291,7 +284,7 @@ class Statement extends PureComponent {
         >
           <BatchPrintStatement
             mainDivHeight={mainDivHeight}
-            rows={statement.list || []}
+            rows={statement.batchPrintData || []}
           />
         </CommonModal>
       </CardContainer>
