@@ -34,9 +34,10 @@ module.exports = {
   queryDeposit: (params) => service.query(`${url}/Deposit`, params),
   duplicateCheck: async (params) => {
     const r = await request(`${url}/DuplicateCheck`, {
-      method: 'POST',
-      body:
-        params,
+      method: 'GET',
+      data: {
+        ...params,
+      },
     })
     return r
   },
