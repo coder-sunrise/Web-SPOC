@@ -93,7 +93,7 @@ class AutoSuggestion extends PureComponent {
         height: 19,
         display: 'block',
         fontSize: '13px',
-        color: 'rgba(0, 0, 0, 0.54)', paddingTop: 1, letterSpacing: '0.00938em',
+        color: 'rgba(0, 0, 0, 0.54)', paddingTop: 1,
         fontFamily: 'Roboto, Helvetica, Arial, sans-serif',
         fontWeight: 'inherit',
       }} >{(isFocused || value) ? label : ''}
