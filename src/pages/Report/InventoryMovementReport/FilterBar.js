@@ -11,7 +11,35 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
       <React.Fragment>
         <GridContainer alignItems="flex-end">
           <ReportDateRangePicker />
-          <GridItem md={8} />
+          <GridItem md={2}>
+            <Field
+              name="transactionType"
+              render={(args) => {
+                const { form: fm } = args
+                return (
+                  <Select
+                    {...args}
+                    label="Transaction"
+                    options={[
+                      { name: 'All', value: 'ALL' },
+                      { name: 'Dispense', value: 'DISPENSE' },
+                      { name: 'Purchasing and Receiving', value: 'PODO' },
+                      { name: 'Receiving Goods', value: 'RG' },
+                      { name: 'Inventory Adjustment', value: 'INVENTORYADJ' },
+                      { name: 'Credit Note', value: 'CREDITNOTE' },
+                    ]}
+                    allowClear={false}
+                    onChange={(e) => {
+                      if (e) {
+                        fm.setFieldValue('items', undefined)
+                      }
+                    }}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem md={6} />
           <GridItem md={2}>
             <Field
               name="inventoryType"
