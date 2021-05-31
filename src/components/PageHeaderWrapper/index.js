@@ -15,11 +15,14 @@ const PageHeaderWrapper = ({
   top,
   ...restProps
 }) => (
-  <>
+  <div
+    className={wrapperClassName}
+    style={{ height: '100%', backgroundColor: '#fff' }}
+  >
     {top}
 
     {children || null}
-  </>
+  </div>
 )
 
 export default connect(({ setting }) => ({

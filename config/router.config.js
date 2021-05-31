@@ -50,9 +50,10 @@ const _routes = [
       // Main Landing Page.
       { path: '/', redirect: '/reception/queue' },
       // Reception
+      { path: '/reception', redirect: '/reception/queue' },
       {
         path: '/reception',
-        icon: 'local_hospital',
+        icon: 'icon-medicinebox-fill',
         name: 'reception',
         moduleName: 'Reception',
         authority: ['reception'],
@@ -129,7 +130,7 @@ const _routes = [
       // Patient Database
       {
         path: '/patientdb',
-        icon: 'group',
+        icon: 'icon-team',
         name: 'patient',
         moduleName: 'PatientDataBase',
         authority: ['patientdatabase'],
@@ -180,7 +181,7 @@ const _routes = [
       // SMS
       {
         path: '/communication',
-        icon: 'sms',
+        icon: 'icon-message',
         name: 'communication',
         moduleName: 'Communication',
         system: 'CMS',
@@ -204,7 +205,7 @@ const _routes = [
       // Inventory
       {
         path: '/inventory',
-        icon: 'kitchen',
+        icon: 'icon-container-fill',
         name: 'inventory',
         moduleName: 'Inventory',
         // component: './inventory',
@@ -330,7 +331,7 @@ const _routes = [
       // Finance
       {
         path: '/finance',
-        icon: 'attach_money',
+        icon: 'icon-Dollar',
         name: 'finance',
         moduleName: 'Finance',
         authority: ['finance'],
@@ -466,7 +467,7 @@ const _routes = [
       // Report
       {
         path: '/report',
-        icon: 'library_books',
+        icon: 'icon-Report',
         name: 'report',
         moduleName: 'Report',
         hideChildrenInMenu: true,
@@ -682,7 +683,7 @@ const _routes = [
       // Claim Submission
       {
         path: '/claim-submission',
-        icon: 'receipt',
+        icon: 'icon-container',
         name: 'claimSubmission',
         moduleName: 'Claim Submission',
         hideChildrenInMenu: true,
@@ -728,7 +729,7 @@ const _routes = [
       // Forms
       {
         path: '/forms',
-        icon: 'description',
+        icon: 'icon-pic-right',
         name: 'forms',
         moduleName: 'Forms',
         component: './FormListing',
@@ -739,7 +740,7 @@ const _routes = [
       // Settings
       {
         path: '/setting',
-        icon: 'settings',
+        icon: 'icon-setting',
         name: 'setting',
         moduleName: 'Settings',
         authority: ['settings'],
@@ -1067,7 +1068,7 @@ const _routes = [
       // Support
       {
         path: '/support',
-        icon: 'local_phone',
+        icon: 'icon-phone',
         name: 'support',
         moduleName: 'Support',
         hideChildrenInMenu: true,
@@ -1115,14 +1116,14 @@ const _routes = [
   //
 ]
 
-const routes =
-  process.env.NODE_ENV === 'production'
-    ? _routes
-    : _routes.map((r, index) => {
-        return {
-          ...r,
-          routes: [devRoutes, ...r.routes],
-        }
-      })
+// const routes =
+//   process.env.NODE_ENV === 'production'
+//     ? _routes
+//     : _routes.map((r, index) => {
+//         return {
+//           ...r,
+//           routes: [devRoutes, ...r.routes],
+//         }
+//       })
 
-export default routes
+export default _routes

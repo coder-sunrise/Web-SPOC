@@ -4,7 +4,7 @@ import os from 'os'
 import { defineConfig } from 'umi'
 import pageRoutes from './router.config'
 import webpackPlugin from './plugin.config'
-import defaultSettings from './defaultSettings'
+import defaultSettings from '../src/defaultSettings'
 // import { primaryColor } from '../src/assets/jss/index'
 
 const plugins = {

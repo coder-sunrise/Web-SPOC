@@ -73,9 +73,7 @@ export AuthorizedContext from './Context/Authorized'
 // export * from '@material-ui/lab'
 
 export { default as ToggleButton } from '@material-ui/lab/ToggleButton'
-export {
-  default as ToggleButtonGroup,
-} from '@material-ui/lab/ToggleButtonGroup'
+export { default as ToggleButtonGroup } from '@material-ui/lab/ToggleButtonGroup'
 export { default as TreeItem } from '@material-ui/lab/TreeItem'
 export { default as TreeView } from '@material-ui/lab/TreeView'
 export { default as useAutocomplete } from '@material-ui/lab/useAutocomplete'
@@ -105,3 +103,6 @@ export Popper from './Popper'
 export BreadcrumbView from './PageHeader/BreadcrumbView'
 export Tree from './Tree'
 export HTMLRender from './HTMLRender'
+
+// new Component after migrate to JGH
+export Icon from './icon'

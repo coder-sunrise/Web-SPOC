@@ -1,6 +1,7 @@
 const devRoutes = {
   path: '/development',
   name: 'Development',
+  icon: 'icon-wrench',
   routes: [
     {
       path: '/development/control',
