@@ -1,57 +1,170 @@
-import { Tag, Space } from 'antd'
-// import { QuestionCircleOutlined } from '@ant-design/icons';
+/* eslint-disable guard-for-in */
 import React from 'react'
-import { useModel } from 'umi'
-import Avatar from './AvatarDropdown'
-// import HeaderSearch from '../HeaderSearch';
+import { connect } from 'dva'
+// antd
+import { Divider } from 'antd'
+import _ from 'lodash'
+
+import MenuItem from '@material-ui/core/MenuItem'
+import MenuList from '@material-ui/core/MenuList'
+import Person from '@material-ui/icons/Person'
+import WifiOff from '@material-ui/icons/WifiOff'
+// common components
+import { Badge, SizeContainer, Popper, Button, Tooltip } from '@/components'
+// subcomponents
+import { Notification } from '@/components/_medisys'
+// utils
+import { updateAPIType } from '@/utils/request'
+import { navigateDirtyCheck } from '@/utils/utils'
 import styles from './index.less'
 
-export type SiderTheme = 'light' | 'dark'
+@connect(({ user, clinicInfo, header }) => ({
+  user,
+  clinicInfo,
+  header,
+}))
+class HeaderLinks extends React.Component {
+  state = {
+    openNotification: false,
+    openAccount: false,
+    openDomain: false,
+    title: 'PROD',
+  }
 
-const ENVTagColor = {
-  dev: 'orange',
-  test: 'green',
-  pre: '#87d068',
+  handleClick = key => () => {
+    this.setState(preState => ({ [`open${key}`]: !preState[`open${key}`] }))
+  }
+
+  handleClose = (key, cb) => () => {
+    this.setState({ [`open${key}`]: false })
+    if (cb) cb()
+  }
+
+  onLogoutClick = event => {
+    this.setState({
+      openAccount: false,
+    })
+
+    navigateDirtyCheck({
+      onProceed: () =>
+        this.props.dispatch({
+          type: 'login/logout',
+        }),
+    })(event)
+  }
+
+  openUserProfileForm = () => {
+    const { dispatch, user } = this.props
+    user.data &&
+      dispatch({
+        type: 'user/fetchProfileDetails',
+        id: user.data.clinicianProfile.id,
+      })
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        showUserProfile: true,
+        accountModalTitle: 'My Account',
+      },
+    })
+  }
+
+  openChangePasswordForm = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        showChangePasswordModal: true,
+      },
+    })
+  }
+
+  updateAPIType(type) {
+    updateAPIType(type)
+  }
+
+  render() {
+    const { rtlActive, user, clinicInfo, header } = this.props
+    const { openAccount } = this.state
+    const { signalRConnected, notifications } = header
+
+    const name =
+      user.data && user.data.clinicianProfile
+        ? user.data.clinicianProfile.name
+        : ''
+    const userTitle =
+      user.data && user.data.clinicianProfile
+        ? user.data.clinicianProfile.title
+        : ''
+
+    const clinicShortCode = clinicInfo ? clinicInfo.clinicShortCode : ''
+
+    return (
+      <div>
+        <div>
+          <SizeContainer size='lg'>
+            <div>
+              <Notification
+                dispatch={this.props.dispatch}
+                notifications={notifications}
+              />
+              {!signalRConnected && (
+                <Tooltip title='Real-time update signal is down. Please refresh manually.'>
+                  <Button justIcon color='transparent'>
+                    <Badge
+                      ripple
+                      color='danger'
+                      overlap='circle'
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                      }}
+                      variant='dot'
+                    >
+                      <WifiOff />
+                    </Badge>
+                  </Button>
+                </Tooltip>
+              )}
+              <Popper
+                overlay={
+                  <MenuList role='menu'>
+                    <MenuItem onClick={this.openUserProfileForm}>
+                      My Account
+                    </MenuItem>
+                    <MenuItem onClick={this.openChangePasswordForm}>
+                      Change Password
+                    </MenuItem>
+                    <MenuItem onClick={this.onLogoutClick}>Logout</MenuItem>
+                  </MenuList>
+                }
+              >
+                <Button
+                  justIcon
+                  color='transparent'
+                  aria-label='Person'
+                  aria-haspopup='true'
+                  aria-owns={openAccount ? 'menu-list' : null}
+                >
+                  <Person />
+                  <span>
+                    {userTitle} {name}
+                  </span>
+                </Button>
+              </Popper>
+              <Divider
+                type='vertical'
+                style={{ background: '#999', height: '1.2rem' }}
+              />
+              <div className={styles.clinicShortCode}>
+                <span>{clinicShortCode}</span>
+              </div>
+            </div>
+          </SizeContainer>
+        </div>
+      </div>
+    )
+  }
 }
 
-const GlobalHeaderRight: React.FC = () => {
-  // @ts-ignore
-  let className = styles.right
-  return (
-    <Space className={className}>
-      {/* <HeaderSearch
-        className={`${styles.action} ${styles.search}`}
-        placeholder="站内搜索"
-        defaultValue="umi ui"
-        options={[
-          { label: <a href="https://umijs.org/zh/guide/umi-ui.html">umi ui</a>, value: 'umi ui' },
-          {
-            label: <a href="next.ant.design">Ant Design</a>,
-            value: 'Ant Design',
-          },
-          {
-            label: <a href="https://protable.ant.design/">Pro Table</a>,
-            value: 'Pro Table',
-          },
-          {
-            label: <a href="https://prolayout.ant.design/">Pro Layout</a>,
-            value: 'Pro Layout',
-          },
-        ]}
-        // onSearch={value => {
-        //   console.log('input', value);
-        // }}
-      /> */}
-      {/* <span
-        className={styles.action}
-        onClick={() => {
-          window.open('https://pro.ant.design/docs/getting-started');
-        }}
-      >
-        <QuestionCircleOutlined />
-      </span> */}
-      <Avatar menu />
-    </Space>
-  )
-}
-export default GlobalHeaderRight
+export default HeaderLinks

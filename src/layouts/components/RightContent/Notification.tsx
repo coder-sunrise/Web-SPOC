@@ -7,6 +7,7 @@ import {
 } from '@ant-design/icons'
 import { Avatar, Menu, Spin } from 'antd'
 import { history, useModel } from 'umi'
+import { Icon } from '@/components'
 import { stringify } from 'querystring'
 import HeaderDropdown from '../HeaderDropdown'
 import styles from './index.less'
@@ -93,15 +94,11 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
     </Menu>
   )
   return (
-    <>
-      <HeaderDropdown overlay={menuHeaderDropdown}>
-        <span className={`${styles.action} ${styles.account}`}>
-          {'Miss CAO LI | CLC1'}
-        </span>
-      </HeaderDropdown>
-      {/* <MyProfile />
-      <ChangePassword /> */}
-    </>
+    <HeaderDropdown overlay={menuHeaderDropdown}>
+      <span className={`${styles.action} ${styles.account}`}>
+        <Icon type='notification' /> Notification
+      </span>
+    </HeaderDropdown>
   )
 }
 

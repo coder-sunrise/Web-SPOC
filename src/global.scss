@@ -373,6 +373,10 @@ html {
 //   pointer-events: none;
 //   border-bottom-color: #2f54eb;
 // }
+.anticon {
+  position: relative;
+  top: -1px;
+}
 .ant-pro-basicLayout-content {
   margin: 8px !important;
   .ant-pro-page-container {
