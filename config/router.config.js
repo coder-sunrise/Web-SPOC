@@ -573,7 +573,7 @@ const _routes = [
             path: '/report/diagnosistrending',
             name: 'diagnosistrending',
             component: './Report/DiagnosisTrending',
-            authority: [ 'report.diagnosistrendingreport' ],
+            authority: [ 'report.other.diagnosistrending' ],
           },
           {
             path: '/report/referralsourcereport',
@@ -1119,13 +1119,13 @@ const routes =
   process.env.NODE_ENV === 'production'
     ? _routes
     : _routes.map((r, index) => {
-        if (index === 1) {
-          return {
-            ...r,
-            routes: [ devRoutes, ...r.routes ],
-          }
+      if (index === 1) {
+        return {
+          ...r,
+          routes: [ devRoutes, ...r.routes ],
         }
-        return r
-      })
+      }
+      return r
+    })
 
 export default routes
