@@ -10,7 +10,7 @@ import ListAlt from '@material-ui/icons/ListAlt'
 import NavigateNext from '@material-ui/icons/NavigateNext'
 // common components
 import { primaryColor } from 'mui-pro-jss'
-import { Button, Popover, Tooltip } from '@/components'
+import { Button, Popover, Tooltip, TextField } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
 import { CANNED_TEXT_TYPE_FIELD_NAME } from './utils'
 
@@ -36,7 +36,7 @@ const styles = (theme) => ({
     },
   },
   popoverContainer: {
-    width: 200,
+    width: 300,
     textAlign: 'left',
   },
   listContainer: {
@@ -83,9 +83,14 @@ const CannedTextButton = ({
     setShowCannedText,
   ] = useState(false)
 
-  const fieldName = CANNED_TEXT_TYPE_FIELD_NAME[cannedTextTypeFK]
+  const [
+    filterCannedText,
+    setFilterCannedText,
+  ] = useState('')
 
-  let list = cannedText[fieldName] || []
+  const fieldName = CANNED_TEXT_TYPE_FIELD_NAME[ cannedTextTypeFK ]
+
+  let list = cannedText[ fieldName ] || []
   list = [
     ..._.orderBy(
       list.filter((o) => o.ownedByUserFK === user.id),
@@ -132,8 +137,6 @@ const CannedTextButton = ({
 
   const onListItemClick = (selectedCannedText) => {
     handleSelectCannedText(selectedCannedText)
-    toggleVisibleChange()
-    toggleCannedTextVisibleChange()
   }
 
   const handleSettingClick = () => {
@@ -148,6 +151,17 @@ const CannedTextButton = ({
     toggleVisibleChange()
     onPrevDoctorNoteClick(cannedTextTypeFK)
   }
+
+  const debouncedAction = _.debounce(
+    (e) => {
+      setFilterCannedText(e.target.value)
+    },
+    100,
+    {
+      leading: true,
+      trailing: false,
+    },
+  )
 
   return (
     <Popover
@@ -173,8 +187,14 @@ const CannedTextButton = ({
               visible={showCannedText}
               content={
                 <div className={classes.popoverContainer}>
+                  <TextField
+                    label='Filter Canned Text'
+                    onChange={(e) => {
+                      debouncedAction(e)
+                    }}
+                  />
                   <div className={classes.listContainer}>
-                    {list.map((item) => {
+                    {list.filter(item => item.title.toUpperCase().indexOf(filterCannedText.toUpperCase()) >= 0).map((item) => {
                       const handleClick = () => onListItemClick(item)
                       return (
                         <ListItem
@@ -204,19 +224,19 @@ const CannedTextButton = ({
               </div>
             </Popover>
           </div>
-        </LoadingWrapper>
+        </LoadingWrapper >
       }
     >
       <Button color='info' onClick={handleMainButtonClick}>
         Load From
       </Button>
-    </Popover>
+    </Popover >
   )
 }
 
 const Connected = connect(({ cannedText, loading, user }) => ({
   cannedText,
-  loading: loading.effects['cannedText/query'],
+  loading: loading.effects[ 'cannedText/query' ],
   user: user.data,
 }))(CannedTextButton)
 
