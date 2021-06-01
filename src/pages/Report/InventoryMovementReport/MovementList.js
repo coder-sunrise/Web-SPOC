@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { ReportDataGrid } from '@/components/_medisys'
 import {
-  NumberInput,
+  Number,
 } from '@/components'
 
 class MovementList extends PureComponent {
@@ -53,7 +53,7 @@ class MovementList extends PureComponent {
       {
         columnName: 'costPrice', type: 'currency', currency: true, sortingEnabled: false, width: 100,
         render: (row) => {
-          return (row.costPrice || row.costPrice === 0) ? <NumberInput text currency value={row.costPrice} /> : ''
+          return <Number value={row.costPrice} />
         }
       },
     ]

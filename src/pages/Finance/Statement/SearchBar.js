@@ -90,7 +90,7 @@ class SearchBar extends PureComponent {
     showReportSelection: false,
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.unmount()
   }
 
@@ -103,7 +103,7 @@ class SearchBar extends PureComponent {
     })
 
   handleOnChange = (name, checked) => (event) => {
-    this.setState({ [name]: !checked })
+    this.setState({ [ name ]: !checked })
     // if AllDate is checked, set datetime to max range
   }
 
@@ -117,7 +117,62 @@ class SearchBar extends PureComponent {
     }))
   }
 
-  render () {
+  batchPrintClick = () => {
+    const {
+      batchPrintStatements,
+      dispatch,
+      values
+    } = this.props
+
+    const {
+      statementNo,
+      copayerFK,
+      isAllDateChecked,
+      isAllDueDateChecked,
+      statementStartDate,
+      statementEndDate,
+      dueStartDate,
+      dueEndDate,
+    } = values
+    let statementDateFrom
+    let statementDateTo
+    let statementDueDateFrom
+    let statementDueDateTo
+
+    if (!isAllDateChecked && statementStartDate && statementEndDate) {
+      statementDateFrom = statementStartDate
+      statementDateTo = statementEndDate
+    }
+
+    if (!isAllDueDateChecked && dueStartDate && dueEndDate) {
+      statementDueDateFrom = dueStartDate
+      statementDueDateTo = dueEndDate
+    }
+
+    dispatch({
+      type: 'statement/queryForBatchPrint',
+      payload: {
+        statementNo,
+        copayerFK: typeof copayerFK === 'number' ? copayerFK : undefined,
+        lgteql_statementDate: statementDateFrom,
+        lsteql_statementDate: statementDateTo,
+        isCancelled: false,
+        apiCriteria: {
+          DueDateFrom: statementDueDateFrom,
+          DueDateTo: statementDueDateTo,
+        },
+        pagesize: 99999
+      },
+    }).then(r => {
+      if (r) {
+        if (batchPrintStatements) {
+          batchPrintStatements()
+        }
+      }
+    })
+  }
+
+  render() {
     const {
       classes,
       history,
@@ -294,6 +349,13 @@ class SearchBar extends PureComponent {
                 </Button>
               </Authorized>
             )}
+            <Button
+              variant='contained'
+              color='primary'
+              onClick={this.batchPrintClick}
+            >
+              Batch Print
+            </Button>
           </GridItem>
         </GridContainer>
       </div>
