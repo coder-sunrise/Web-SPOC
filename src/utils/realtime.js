@@ -48,7 +48,9 @@ const updateSignalRState = () => {
     }
 
     setSignalRConnectedState(isConnected)
-    console.log(`Connection State: ${connection.connectionState}`)
+    if (process.env.NODE_ENV === 'production') {
+      console.log(`Connection State: ${connection.connectionState}`)
+    }
   }
 }
 
@@ -113,14 +115,19 @@ const initStream = () => {
                 return console.log(err)
               }
 
-              setTimeout(() => {
-                console.log(
-                  `Retry attempt: ${retryAttempt}, next retry in: ${interval}ms`,
-                )
-                startConnection()
-              }, interval)
+              if (process.env.NODE_ENV === 'production') {
+                setTimeout(() => {
+                  console.log(
+                    `Retry attempt: ${retryAttempt}, next retry in: ${interval}ms`,
+                  )
+                  startConnection()
+                }, interval)
+              }
             }
-            return console.log(err)
+            if (process.env.NODE_ENV === 'production') {
+              return console.log(err)
+            }
+            return null
           })
       else if (connection.connectionState === CONNECTION_STATE.CONNECTED)
         updateSignalRState()

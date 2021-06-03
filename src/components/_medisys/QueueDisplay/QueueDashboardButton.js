@@ -10,7 +10,7 @@ import {
 } from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
 
-const styles = (theme) => ({
+const styles = theme => ({
   queueDashboardButton: {
     margin: `${theme.spacing(2)}px ${theme.spacing(1)}px ${theme.spacing(
       2,
@@ -31,23 +31,21 @@ const QueueDashboardButton = ({
           icon={<Dashboard />}
           size={size}
           color='info'
-          className={classes.queueDashboardButton}
           onClick={() => window.open('/queuedisplay/dashboard')}
         >
           Open Queue Display
-      </ProgressButton>
+        </ProgressButton>
         {showClear && (
           <ProgressButton
             size={size}
             icon={<ClearAll />}
-            className={classes.queueDashboardButton}
             onClick={() => {
               dispatch({
                 type: 'queueCalling/claearAll',
                 payload: {
                   key: VALUE_KEYS.QUEUECALLING,
                 },
-              }).then((res) => {
+              }).then(res => {
                 if (res) {
                   notification.success({ message: 'Cleared' })
                   sendNotification('QueueClear', {

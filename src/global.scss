@@ -1,5 +1,5 @@
-@import "./assets/scss/material-dashboard-pro-react.scss";
-@import "./assets/scss/react-draft-wysiwyg.scss";
+@import './assets/scss/material-dashboard-pro-react.scss';
+@import './assets/scss/react-draft-wysiwyg.scss';
 
 ::-webkit-scrollbar {
   width: 5px;
@@ -164,7 +164,7 @@ html {
     width: 100px;
     height: 100%;
     box-shadow: 0 0 10px $brand-primary, 0 0 5px $brand-primary;
-    opacity: 1.0;
+    opacity: 1;
     transform: rotate(3deg) translate(0px, -4px);
   }
 
@@ -263,7 +263,7 @@ html {
 }
 
 .react-grid-item > .react-resizable-handle::after {
-  content: "";
+  content: '';
   position: absolute;
   right: 3px;
   bottom: 3px;
@@ -373,10 +373,25 @@ html {
 //   pointer-events: none;
 //   border-bottom-color: #2f54eb;
 // }
-
+.anticon {
+  position: relative;
+  top: -1px;
+}
+.ant-pro-basicLayout-content {
+  margin: 8px !important;
+  .ant-pro-page-container {
+    margin: -8px -8px 0 !important;
+  }
+}
+.ant-page-header {
+  padding: 8px !important;
+}
 .calendar-holiday {
   background-color: #7d7d7d;
   color: white;
+}
+.ant-pro-page-container-children-content {
+  margin: 8px 8px 0 !important;
 }
 // .ant-select-arrow {
 //   right: 3px;
@@ -401,7 +416,7 @@ html {
   height: inherit;
   text-align: initial;
 }
-.public-DraftEditor-content[contenteditable=true] {
+.public-DraftEditor-content[contenteditable='true'] {
   -webkit-user-modify: read-write-plaintext-only;
 }
 .DraftEditor-root {
@@ -409,7 +424,7 @@ html {
 }
 .DraftEditor-editorContainer {
   background-color: rgba(255, 255, 255, 0);
-  border-left: .1px solid transparent;
+  border-left: 0.1px solid transparent;
   position: relative;
   z-index: 1;
 }
@@ -529,23 +544,23 @@ html {
   width: 30px;
 }
 .public-DraftStyleDefault-orderedListItem:before {
-  content: counter(ol0) ". ";
+  content: counter(ol0) '. ';
   counter-increment: ol0;
 }
 .public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-depth1:before {
-  content: counter(ol1) ". ";
+  content: counter(ol1) '. ';
   counter-increment: ol1;
 }
 .public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-depth2:before {
-  content: counter(ol2) ". ";
+  content: counter(ol2) '. ';
   counter-increment: ol2;
 }
 .public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-depth3:before {
-  content: counter(ol3) ". ";
+  content: counter(ol3) '. ';
   counter-increment: ol3;
 }
 .public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-depth4:before {
-  content: counter(ol4) ". ";
+  content: counter(ol4) '. ';
   counter-increment: ol4;
 }
 .public-DraftStyleDefault-depth0.public-DraftStyleDefault-reset {

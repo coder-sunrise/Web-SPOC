@@ -1,8 +1,8 @@
 import React from 'react'
-// dva
-import { connect } from 'umi'
+import ProLayout, { PageContainer, SettingDrawer } from '@ant-design/pro-layout'
+
 // umi locale
-import { history, FormattedMessage, formatMessage } from 'umi'
+import { history, FormattedMessage, formatMessage, connect } from 'umi'
 // class names
 import classNames from 'classnames'
 // material ui
@@ -791,155 +791,157 @@ class Queue extends React.Component {
     const { tracker } = queueCalling
     const openQueueDisplayAccessRight = Authorized.check('openqueuedisplay')
     return (
-      <PageHeaderWrapper
-        title={<FormattedMessage id='app.forms.basic.title' />}
-        content={<FormattedMessage id='app.forms.basic.description' />}
-      >
-        <div className='queueHeader'>
-          <CardHeader icon>
-            <h3 className={classNames(classes.sessionNo)}>
-              {`Session No.: ${sessionNo}`}
-            </h3>
+      <PageContainer
+        header={{
+          title: `Session No.: ${sessionNo}`,
+          extra: [
+            <div className='queueHeader'>
+              {openQueueDisplayAccessRight &&
+              openQueueDisplayAccessRight.rights !== 'hidden' &&
+              tracker &&
+              tracker.qNo ? (
+                <h4
+                  className={classNames(classes.sessionNo)}
+                  style={{
+                    fontSize: 16,
+                    marginTop: 10,
+                    marginLeft: 10,
+                    fontWeight: 'Bold',
+                  }}
+                >
+                  <font color='red'>
+                    NOW SERVING:{' '}
+                    {tracker.qNo.includes('.')
+                      ? tracker.qNo
+                      : `${tracker.qNo}.0`}
+                  </font>
+                </h4>
+              ) : (
+                ''
+              )}
 
-            {openQueueDisplayAccessRight &&
-            openQueueDisplayAccessRight.rights !== 'hidden' &&
-            tracker &&
-            tracker.qNo ? (
-              <h4
-                className={classNames(classes.sessionNo)}
-                style={{
-                  fontSize: 16,
-                  marginTop: 10,
-                  marginLeft: 10,
-                  fontWeight: 'Bold',
-                }}
-              >
-                <font color='red'>
-                  NOW SERVING:{' '}
-                  {tracker.qNo.includes('.') ? tracker.qNo : `${tracker.qNo}.0`}
-                </font>
-              </h4>
-            ) : (
-              ''
-            )}
-
-            {!isClinicSessionClosed && (
-              <div className={classNames(classes.toolBtns)}>
-                <Authorized authority='queue.endsession'>
+              {!isClinicSessionClosed && (
+                <div>
+                  <Authorized authority='queue.endsession'>
+                    <ProgressButton
+                      icon={<EventNote />}
+                      color='info'
+                      size='sm'
+                      onClick={this.onSessionSummaryClick}
+                    >
+                      <FormattedMessage id='reception.queue.sessionSummary' />
+                    </ProgressButton>
+                  </Authorized>
+                  <QueueDashboardButton size='sm' />
                   <ProgressButton
-                    icon={<EventNote />}
                     color='info'
                     size='sm'
-                    onClick={this.onSessionSummaryClick}
+                    onClick={this.onRefreshClick}
+                    submitKey={`${modelKey}refresh`}
+                    icon={<Refresh />}
                   >
-                    <FormattedMessage id='reception.queue.sessionSummary' />
+                    Refresh
                   </ProgressButton>
-                </Authorized>
-                <QueueDashboardButton size='sm' />
-                <ProgressButton
-                  color='info'
-                  size='sm'
-                  onClick={this.onRefreshClick}
-                  submitKey={`${modelKey}refresh`}
-                  icon={<Refresh />}
-                >
-                  Refresh
-                </ProgressButton>
 
-                <Authorized authority='queue.endsession'>
-                  <ProgressButton
-                    icon={<Stop />}
-                    color='danger'
-                    size='sm'
-                    onClick={this.onEndSessionClick}
-                  >
-                    <FormattedMessage id='reception.queue.endSession' />
-                  </ProgressButton>
-                </Authorized>
+                  <Authorized authority='queue.endsession'>
+                    <ProgressButton
+                      icon={<Stop />}
+                      color='danger'
+                      size='sm'
+                      onClick={this.onEndSessionClick}
+                    >
+                      <FormattedMessage id='reception.queue.endSession' />
+                    </ProgressButton>
+                  </Authorized>
+                </div>
+              )}
+            </div>,
+          ],
+        }}
+      >
+        <PageHeaderWrapper
+          title={<FormattedMessage id='app.forms.basic.title' />}
+          content={<FormattedMessage id='app.forms.basic.description' />}
+        >
+          {isClinicSessionClosed ? (
+            <EmptySession
+              handleStartSession={this.onStartSession}
+              handleReopenLastSession={this.onReopenLastSession}
+              sessionInfo={sessionInfo}
+              loading={loading}
+              errorState={error}
+            />
+          ) : (
+            <div>
+              <div className='filterBar'>
+                <DetailsActionBar
+                  // selfOnly={queueLog.selfOnly}
+                  // onSwitchClick={this.toggleFilterSelfOnly}
+                  onRegisterVisitEnterPressed={this.onEnterPressed}
+                  toggleNewPatient={this.toggleRegisterNewPatient}
+                  setSearch={this.setSearch}
+                />
               </div>
-            )}
-          </CardHeader>
-        </div>
-
-        <Divider />
-        {isClinicSessionClosed ? (
-          <EmptySession
-            handleStartSession={this.onStartSession}
-            handleReopenLastSession={this.onReopenLastSession}
-            sessionInfo={sessionInfo}
-            loading={loading}
-            errorState={error}
-          />
-        ) : (
-          <div>
-            <div className='filterBar'>
-              <DetailsActionBar
-                // selfOnly={queueLog.selfOnly}
-                // onSwitchClick={this.toggleFilterSelfOnly}
-                onRegisterVisitEnterPressed={this.onEnterPressed}
-                toggleNewPatient={this.toggleRegisterNewPatient}
-                setSearch={this.setSearch}
+              <DetailsGrid
+                // onViewPatientProfileClick={this.onViewPatientProfileClick}
+                // onViewDispenseClick={this.toggleDispense}
+                // onRegisterPatientClick={this.toggleRegisterNewPatient}
+                // handleEditVisitClick={this.showVisitRegistration}
+                // handleActualizeAppointment={this.handleActualizeAppointment}
+                onMenuItemClick={this.onMenuItemClick}
+                onContextMenu={this.onContextMenu}
+                // handleFormsClick={this.showVisitForms}
+                history={history}
+                searchQuery={search}
+              />
+              <RightClickContextMenu
+                onMenuItemClick={this.onMenuItemClick}
+                onOutsidePopoverRightClick={this.onHideContextMenu}
+                anchorEl={this.state.anchorEl}
+                rightClickedRow={this.state.rightClickedRow}
+                dispatch={dispatch}
               />
             </div>
-            <DetailsGrid
-              // onViewPatientProfileClick={this.onViewPatientProfileClick}
-              // onViewDispenseClick={this.toggleDispense}
-              // onRegisterPatientClick={this.toggleRegisterNewPatient}
-              // handleEditVisitClick={this.showVisitRegistration}
-              // handleActualizeAppointment={this.handleActualizeAppointment}
-              onMenuItemClick={this.onMenuItemClick}
-              onContextMenu={this.onContextMenu}
-              // handleFormsClick={this.showVisitForms}
-              history={history}
-              searchQuery={search}
+          )}
+          <CommonModal
+            open={showPatientSearch}
+            title={formatMessage({ id: 'reception.queue.patientSearch' })}
+            onClose={this.togglePatientSearch}
+            onConfirm={this.togglePatientSearch}
+            maxWidth='md'
+            overrideLoading
+          >
+            <PatientSearchModal
+              search={this.state.search}
+              handleRegisterVisitClick={this.showVisitRegistration}
+              onViewPatientProfileClick={this.onViewPatientProfileClick}
             />
-            <RightClickContextMenu
-              onMenuItemClick={this.onMenuItemClick}
-              onOutsidePopoverRightClick={this.onHideContextMenu}
-              anchorEl={this.state.anchorEl}
-              rightClickedRow={this.state.rightClickedRow}
-              dispatch={dispatch}
-            />
-          </div>
-        )}
-        <CommonModal
-          open={showPatientSearch}
-          title={formatMessage({ id: 'reception.queue.patientSearch' })}
-          onClose={this.togglePatientSearch}
-          onConfirm={this.togglePatientSearch}
-          maxWidth='md'
-          overrideLoading
-        >
-          <PatientSearchModal
-            search={this.state.search}
-            handleRegisterVisitClick={this.showVisitRegistration}
-            onViewPatientProfileClick={this.onViewPatientProfileClick}
-          />
-        </CommonModal>
-        <CommonModal
-          open={showEndSessionSummary}
-          title='Session Summary'
-          onClose={this.onEndSessionSummaryClose}
-          onConfirm={this.onEndSessionSummaryClose}
-          disableBackdropClick
-        >
-          <EndSessionSummary sessionID={_sessionInfoID} />
-        </CommonModal>
-        <CommonModal
-          open={showForms}
-          title={
-            this.state.formCategory === FORM_CATEGORY.VisitForms
-              ? 'Visit Forms'
-              : 'Forms'
-          }
-          onClose={this.toggleForms}
-          onConfirm={this.toggleForms}
-          maxWidth='md'
-          overrideLoading
-        >
-          <VisitForms formCategory={this.state.formCategory} />
-        </CommonModal>
-      </PageHeaderWrapper>
+          </CommonModal>
+          <CommonModal
+            open={showEndSessionSummary}
+            title='Session Summary'
+            onClose={this.onEndSessionSummaryClose}
+            onConfirm={this.onEndSessionSummaryClose}
+            disableBackdropClick
+          >
+            <EndSessionSummary sessionID={_sessionInfoID} />
+          </CommonModal>
+          <CommonModal
+            open={showForms}
+            title={
+              this.state.formCategory === FORM_CATEGORY.VisitForms
+                ? 'Visit Forms'
+                : 'Forms'
+            }
+            onClose={this.toggleForms}
+            onConfirm={this.toggleForms}
+            maxWidth='md'
+            overrideLoading
+          >
+            <VisitForms formCategory={this.state.formCategory} />
+          </CommonModal>
+        </PageHeaderWrapper>
+      </PageContainer>
     )
   }
 }
