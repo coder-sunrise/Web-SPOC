@@ -9,6 +9,15 @@ const medisaveBalanceUrl = '/api/PatientCoPaymentScheme/MedisaveBalance'
 // const { url, subjects, getListWithoutCheckRights } = api
 
 const fns = {
+  queryListV2: params => {
+    return request(url, {
+      method: 'GET',
+      data: {
+        ...params,
+        // pagesize: params.pageSize,
+      },
+    })
+  },
   queryList: params => service.queryList(url, params),
   remove: params => service.remove(url, params),
   query: params => service.query(url, params),

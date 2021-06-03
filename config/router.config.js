@@ -127,6 +127,16 @@ const _routes = [
         ],
       },
       //
+      // Patient New
+      {
+        path: '/patient',
+        icon: 'icon-team',
+        name: 'patient',
+        moduleName: 'PatientDataBase',
+        authority: ['patientdatabase'],
+        specialist: ['GP', 'Dental'],
+        component: './Patient',
+      },
       // Patient Database
       {
         path: '/patientdb',
