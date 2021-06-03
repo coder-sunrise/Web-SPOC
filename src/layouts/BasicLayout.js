@@ -291,39 +291,41 @@ class BasicLayout extends React.PureComponent {
         <MuiThemeProvider theme={_theme}>
           <CssBaseline />
           <div id='main-page' style={{ height: '100vh' }}>
-            <ProLayout
-              // {...defaultProps}
-              {...props.setting}
-              route={props.route}
-              className={styles.root}
-              rightContentRender={() => <RightContent />}
-              fixedHeader
-              fixSiderbar
-              formatMessage={formatMessage}
-              menuItemRender={(menuItemProps, defaultDom) => {
-                if (
-                  menuItemProps.isUrl ||
-                  !menuItemProps.path ||
-                  location.pathname === menuItemProps.path
-                ) {
-                  return defaultDom
-                }
-                return <Link to={menuItemProps.path}>{defaultDom}</Link>
-              }}
-              breadcrumbRender={(routers = []) => [
-                {
-                  path: '/',
-                  breadcrumbName: formatMessage({ id: 'menu.home' }),
-                },
-                ...routers,
-              ]}
-              location={{
-                pathname,
-              }}
-            >
-              {children}
-            </ProLayout>
-            {this.state.authorized && <GlobalModalContainer {...props} />}
+            <ErrorBoundary>
+              <ProLayout
+                // {...defaultProps}
+                {...props.setting}
+                route={props.route}
+                className={styles.root}
+                rightContentRender={() => <RightContent />}
+                fixedHeader
+                fixSiderbar
+                formatMessage={formatMessage}
+                menuItemRender={(menuItemProps, defaultDom) => {
+                  if (
+                    menuItemProps.isUrl ||
+                    !menuItemProps.path ||
+                    location.pathname === menuItemProps.path
+                  ) {
+                    return defaultDom
+                  }
+                  return <Link to={menuItemProps.path}>{defaultDom}</Link>
+                }}
+                breadcrumbRender={(routers = []) => [
+                  {
+                    path: '/',
+                    breadcrumbName: formatMessage({ id: 'menu.home' }),
+                  },
+                  ...routers,
+                ]}
+                location={{
+                  pathname,
+                }}
+              >
+                {children}
+              </ProLayout>
+              {this.state.authorized && <GlobalModalContainer {...props} />}
+            </ErrorBoundary>
           </div>
           {/* <Suspense fallback={<PageLoading />}>{this.renderSettingDrawer()}</Suspense> */}
         </MuiThemeProvider>

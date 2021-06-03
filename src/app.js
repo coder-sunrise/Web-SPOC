@@ -1,4 +1,5 @@
 import * as umi from 'umi'
+import '@/utils/miconfig'
 
 const initialState = {
   loading: {

@@ -1469,6 +1469,12 @@ export const cleanFieldValue = data => {
   }
   return data
 }
+export const removeEmpty = values => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  return Object.fromEntries(
+    Object.entries(values).filter(([_, v]) => v !== '' && v.length !== 0),
+  )
+}
 
 export {
   sleep,
