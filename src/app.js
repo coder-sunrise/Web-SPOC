@@ -1,4 +1,5 @@
 import * as umi from 'umi'
+import '@/utils/prototype'
 import '@/utils/miconfig'
 
 const initialState = {

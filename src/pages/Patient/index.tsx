@@ -18,7 +18,7 @@ const defaultColumns = [
     dataIndex: 'patientReferenceNo',
     sorterBy: 'aa.patientReferenceNo',
     defaultSortOrder: 'ascend',
-    width: '200px',
+    width: 100,
     sorter: true,
     search: false,
   },
@@ -33,10 +33,15 @@ const defaultColumns = [
     dataIndex: 'name',
     sorter: true,
     search: false,
+    width: 200,
   },
   {
     title: 'Last Visit Date',
     dataIndex: 'lastVisitDate',
+    valueType: 'dateTime',
+    render: (_dom: any, entity: any) =>
+      entity.lastVisitDate?.format1('L') || '-',
+    width: 100,
     search: false,
   },
   {
@@ -44,8 +49,22 @@ const defaultColumns = [
     dataIndex: 'status',
     search: false,
   },
-  { dataIndex: 'gender/age', title: 'Gender / Age', search: false },
-  { dataIndex: 'dob', title: 'DOB', search: false },
+  {
+    dataIndex: 'gender/age',
+    title: 'Gender / Age',
+    render: (_dom: any, entity: any) =>
+      `${entity.gender?.substring(0, 1)}/${Math.floor(
+        entity.dob?.toDate()?.duration('year'),
+      )}`,
+    search: false,
+  },
+  {
+    dataIndex: 'dob',
+    title: 'DOB',
+    render: (_dom: any, entity: any) => entity.dob?.format('L') || '-',
+    width: 100,
+    search: false,
+  },
   { dataIndex: 'race', title: 'Race', search: false },
   { dataIndex: 'nationality', title: 'Nationality', search: false },
   { dataIndex: 'mobileNo', title: 'Mobile No.', search: false },
@@ -54,10 +73,11 @@ const defaultColumns = [
   {
     dataIndex: 'outstandingBalance',
     title: 'Total O/S Balance',
+    valueType: 'money',
     search: false,
   },
 
-  { dataIndex: 'action', title: 'Action', search: false },
+  // { dataIndex: 'action', title: 'Action', search: false },
   {
     // title: 'Patient Name, Acc No., Patient Ref. No., Contact No.',
     hideInTable: true,
@@ -107,6 +127,8 @@ const PatientIndex = () => {
         toolBarRender={() => {
           return [<Button />]
         }}
+        defaultColumns={['options']}
+        features={['action']}
         beforeSearchSubmit={values => {
           console.log(values)
           return {
@@ -116,6 +138,7 @@ const PatientIndex = () => {
             },
           }
         }}
+        scroll={{ x: 1100 }}
       />
     </PageContainer>
   )

@@ -49,7 +49,6 @@ const requestWrap = (request: () => Promise<unknown>, params: any) => {
             ]
           : [],
     }
-    console.log(args)
     // @ts-ignore
     // eslint-disable-next-line @typescript-eslint/no-invalid-this
     const r = (await request.apply(this, args)) as any
