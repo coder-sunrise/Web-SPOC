@@ -90,7 +90,10 @@ class Address extends Component {
 
   searchAddress = async (value, type) => {
     const response = await queryList('/api/streetAddress', {
-      [ `like_${type}` ]: value,
+      apiCriteria: {
+        searchValue: value,
+        searchType: type
+      },
       pagesize: 10
     })
     if (response && response.data) {
@@ -222,7 +225,7 @@ class Address extends Component {
                   onOptionSelected={onOptionSelected}
                   renderOption={this.renderOption}
                   valuePath='postalCode'
-                  query={async (value) => { return await this.searchAddress(value, 'postalCode') }}
+                  query={async (value) => { return await this.searchAddress(value, 'PostalCode') }}
                   {...args}
                 />
               }} />
@@ -235,7 +238,7 @@ class Address extends Component {
                   onOptionSelected={onOptionSelected}
                   renderOption={this.renderOption}
                   valuePath='postalCode'
-                  query={async (value) => { return await this.searchAddress(value, 'blkHseNo') }}
+                  query={async (value) => { return await this.searchAddress(value, 'BlkHseNo') }}
                   {...args} />
               }}
             />
@@ -256,7 +259,7 @@ class Address extends Component {
                   onOptionSelected={onOptionSelected}
                   renderOption={this.renderOption}
                   valuePath='postalCode'
-                  query={async (value) => { return await this.searchAddress(value, 'building') }}
+                  query={async (value) => { return await this.searchAddress(value, 'Building') }}
                   {...args}
                 />
               }}
@@ -270,7 +273,7 @@ class Address extends Component {
                   onOptionSelected={onOptionSelected}
                   renderOption={this.renderOption}
                   valuePath='postalCode'
-                  query={async (value) => { return await this.searchAddress(value, 'street') }}
+                  query={async (value) => { return await this.searchAddress(value, 'Street') }}
                   {...args}
                 />
               }}
