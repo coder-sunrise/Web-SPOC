@@ -6,7 +6,7 @@ export async function queryList(url, params, convertExcludeFields) {
   // console.log(params)
   const parsedParams = convertToQuery(
     {
-      pagesize: 10,
+      pagesize: params.pageSize || 10,
       current: 1,
       ...params,
     },

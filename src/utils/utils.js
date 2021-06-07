@@ -427,19 +427,26 @@ const convertToQuery = (query = {}, convertExcludeFields = ['create']) => {
   const {
     current,
     pagesize,
+    pageSize,
     combineCondition,
     includeDeleted,
     includeParentDeleted,
     // queryExcludeFields,
     sorting = [],
     props,
+    sort,
     apiCriteria,
   } = query
+  console.log(query)
   let customQuerys = { ...query }
   delete customQuerys.keepFilter
   delete customQuerys.current
   delete customQuerys.pagesize
+  delete customQuerys.pageSize
+  delete customQuerys.sortby
+  delete customQuerys.order
   delete customQuerys.sorting
+  delete customQuerys.sort
   delete customQuerys.includeDeleted
   delete customQuerys.includeParentDeleted
   // delete customQuerys.queryExcludeFields
@@ -539,10 +546,12 @@ const convertToQuery = (query = {}, convertExcludeFields = ['create']) => {
 
   const returnVal = {
     ...newQuery,
-    sort: sorting.map(o => ({
-      sortby: o.sortBy || o.columnName,
-      order: o.direction,
-    })),
+    sort: sort
+      ? sort
+      : sorting.map(o => ({
+          sortby: o.sortBy || o.columnName,
+          order: o.direction,
+        })),
     current,
     pagesize,
     combineCondition,

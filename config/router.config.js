@@ -221,7 +221,15 @@ const _routes = [
         // component: './inventory',
         authority: ['inventory'],
         specialist: ['GP'],
+
         routes: [
+          { path: '/inventory', redirect: '/inventory/master' },
+          {
+            path: '/inventory/master/v2',
+            name: 'master',
+            component: './Inventory/Master/v2',
+            authority: ['inventory/inventorymaster'],
+          },
           {
             path: '/inventory/master',
             name: 'master',

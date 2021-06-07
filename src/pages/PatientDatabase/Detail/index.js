@@ -36,7 +36,7 @@ import {
   DateRangePicker,
   DatePicker,
   Button,
-  withFormik,
+  ProgressButton,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 
@@ -649,23 +649,32 @@ class PatientDetail extends PureComponent {
             <div
               style={{
                 position: 'relative',
+                display: 'flex',
+                justifyContent: 'center',
+                padding: 8,
               }}
             >
-              {footer({
-                align: 'center',
-                onCancel: () => {
+              <Button
+                color='danger'
+                onClick={() => {
                   dispatch({
                     type: 'patient/closePatientModal',
                     payload: {
                       history: this.props.history,
                     },
                   })
-                },
-                onConfirm: patientIsActiveOrCreating
-                  ? this.validatePatient
-                  : undefined,
-                confirmBtnText: 'Save',
-              })}
+                }}
+              >
+                Close
+              </Button>
+              <ProgressButton
+                color='primary'
+                onClick={
+                  patientIsActiveOrCreating ? this.validatePatient : undefined
+                }
+              >
+                Save
+              </ProgressButton>
             </div>
           </GridItem>
         </GridContainer>

@@ -1,22 +1,10 @@
 import { useModel } from 'umi'
 import { MIConfig } from '@medisys/utils'
 import { removeEmpty } from '@/utils/utils'
+import { getCodes, getAllCodes } from '@/utils/codetable'
 
 const codeLoading = {}
 
-const getCodes = async (
-  request: (config: any) => Promise<any>,
-  params?: Record<string, any>,
-) => {
-  const response = await request({
-    IsActive: true,
-    PageSize: GLOBAL_CONFIG.maxPageSize,
-    ...params,
-  })
-
-  // console.log(response?.data?.data);
-  return response?.data?.data
-}
 const requestWrap = (request: () => Promise<unknown>, params: any) => {
   if (typeof request !== 'function') return null
   const { onSuccess, onError } = params || {}
@@ -51,19 +39,20 @@ const requestWrap = (request: () => Promise<unknown>, params: any) => {
     }
     // @ts-ignore
     // eslint-disable-next-line @typescript-eslint/no-invalid-this
-    const r = (await request.apply(this, args)) as any
+    const { data, ...rest } = (await request.apply(this, args)) as any
     result = {
-      ...r,
       data: {
-        data: (r.data?.data || []).map((o: any) => ({
+        data: (data?.data || []).map((o: any) => ({
           key: o.id,
           ...o,
         })),
-        ...r.data?.pagination,
+        pagesize: data?.pageSize,
+        current: data?.currentPage,
+        total: data?.totalRecords,
       },
-      success: !r.detailsErrorMessage,
+      success: !rest.detailsErrorMessage,
     }
-
+    console.log(result, rest)
     return new Promise((resolve, reject) => {
       if (result.success) {
         resolve(result.data)
@@ -86,52 +75,16 @@ MIConfig.setConfig({
     userAccessRights: '_ar',
     lastActiveTime: '_lat',
   },
-  dataLoader: async ({ code }: { code: string }) => {
+  dataLoader: async ({ code, ...payload }: { code: string }) => {
     if (codeLoading[code]) {
       return []
     }
     codeLoading[code] = true
-    let data = []
-    switch (code) {
-      case 'status':
-        data = [
-          {
-            value: true,
-            label: <span style={{ color: 'green' }}>Active</span>,
-          },
-          {
-            value: false,
-            label: <span style={{ color: 'red' }}>Inactive</span>,
-          },
-        ]
-        break
+    let data = await getCodes({
+      code,
+      ...payload,
+    })
 
-      case 'user':
-        data = [
-          {
-            id: 1,
-            name: '123',
-          },
-        ] as any
-        break
-      case 'role':
-        data = await getCodes(queryRoles)
-        break
-      case 'client':
-        data = await getCodes(queryClients)
-        break
-
-      case 'clientAccessRight':
-        data = await getCodes(queryClientAccessRights, { IsActive: undefined })
-        break
-
-      case 'apiPermission':
-        data = await getCodes(queryPermissions)
-        break
-
-      default:
-        break
-    }
     codeLoading[code] = false
 
     // const data = await dispatch({

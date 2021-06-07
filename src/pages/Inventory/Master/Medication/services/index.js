@@ -6,6 +6,7 @@ const url = '/api/InventoryMedication'
 const medicPrecautionUrl = '/api/ctmedicationprecaution'
 
 const fns = {
+  queryListV2: params => service.queryListV2(url, params),
   queryList: params => service.queryList(url, params),
   remove: params => service.remove(url, params),
   query: params => {

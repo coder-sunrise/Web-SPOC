@@ -5,12 +5,12 @@ import { connect, history } from 'umi'
 import { getAppendUrl } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 
-const { queryList, upsert, query, remove } = patientService
+const { queryListV2, upsert, query, remove } = patientService
 const api = {
   remove,
   create: upsert,
   update: upsert,
-  queryList,
+  queryList: queryListV2,
   query,
 }
 
@@ -43,7 +43,7 @@ const defaultColumns = [
     valueType: 'dateTime',
     render: (_dom: any, entity: any) =>
       entity.lastVisitDate?.format('L') || '-',
-    width: 120,
+    width: 100,
     search: false,
   },
   {
@@ -77,7 +77,6 @@ const defaultColumns = [
     title: 'Total O/S Balance',
     valueType: 'money',
     search: false,
-    align: 'right',
   },
 
   // { dataIndex: 'action', title: 'Action', search: false },
@@ -116,6 +115,7 @@ const defaultColumns = [
   // },
 ]
 const showPatient = row => {
+  console.log(row)
   const viewPatProfileAccessRight = Authorized.check(
     'patientdatabase.patientprofiledetails',
   )
@@ -181,17 +181,19 @@ const PatientIndex = ({ dispatch }) => {
                     showPatient(row)
                   }}
                   type='primary'
+                  shape='circle'
                   icon={<Icon type='user' />}
                 />
               )
             },
           },
         ]}
-        beforeSearchSubmit={({ search, ...values }) => {
+        beforeSearchSubmit={values => {
+          console.log(values)
           return {
             ...values,
             apiCriteria: {
-              searchValue: search,
+              searchValue: values.search,
               includeinactive: true,
             },
           }

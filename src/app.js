@@ -9,7 +9,7 @@ const initialState = {
     effects: {},
   },
 }
-
+console.log(umi.getLocale())
 if (!window.g_app) {
   setTimeout(() => {
     window.g_app = umi.getDvaApp()

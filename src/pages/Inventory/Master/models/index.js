@@ -19,7 +19,6 @@ export default createFormViewModel({
             type: 'inventoryMaster/updateState',
             payload: {
               currentTab: query.t,
-              shit: 'abc',
             },
           })
         }
