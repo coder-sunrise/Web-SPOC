@@ -156,7 +156,14 @@ class Banner extends PureComponent {
                 </Popover>
               )}
 
-              <div style={{ marginTop: 4 }}><span style={{ fontWeight: 500 }}>G6PD: </span>{g6PD ? g6PD.name : ''}</div>
+              <div>
+                <span style={{
+                  color: 'darkblue',
+                  fontWeight: 500,
+                  position: 'relative',
+                  fontSize: '16.1px'
+                }}>G6PD: </span>{g6PD ? g6PD.name : '-'}
+              </div>
             </div>
           )}
         </div>
