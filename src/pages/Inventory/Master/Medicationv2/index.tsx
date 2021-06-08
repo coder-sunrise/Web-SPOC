@@ -1,10 +1,12 @@
-import { PageContainer, Icon } from '@/components'
+import { useState, useRef } from 'react'
+import { PageContainer, Icon, notification } from '@/components'
 import { ProTable, Select, Input, Button } from '@medisys/component'
 import service from '@/pages/Inventory/Master/Medication/services'
 import { connect, history } from 'umi'
-import { getAppendUrl } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import { status } from '@/utils/codes'
+import { downloadFile } from '@/services/file'
+import { convertToBase64 } from '@/utils/utils'
 
 const { queryList, upsert, query, remove } = service
 const api = {
@@ -14,7 +16,17 @@ const api = {
   queryList,
   query,
 }
+const clearValue = e => {
+  e.target.value = null
+}
+const mapToFileDto = async file => {
+  const base64 = await convertToBase64(file)
+  const originalFile = {
+    content: base64,
+  }
 
+  return originalFile
+}
 const defaultColumns = [
   {
     dataIndex: 'code',
@@ -91,48 +103,62 @@ const defaultColumns = [
       <Select dataSource={status} displayField='name' valueField='value' />
     ),
   },
-
-  // {
-  //   dataIndex: 'description',
-  //   hideInForm: true,
-  //   fieldProps: {
-  //     rows: 1,
-  //   },
-  // },
-  // {
-  //   title: 'Status',
-  //   dataIndex: 'isActive',
-  //   valueType: 'text',
-  //   renderFormItem: () => {
-  //     return <Select code='status' />
-  //   },
-  //   render: (dom: React.ReactNode) => {
-  //     return <Select code='status' value={dom as any} readonly />
-  //   },
-  // },
 ]
-const showPatient = row => {
-  console.log(row)
-  const viewPatProfileAccessRight = Authorized.check(
-    'patientdatabase.patientprofiledetails',
-  )
-  const disableRights = ['disable', 'hidden']
-  if (
-    viewPatProfileAccessRight &&
-    disableRights.includes(viewPatProfileAccessRight.rights)
-  )
-    return
+const allowedFiles = '.xlsx'
 
-  history.push(
-    getAppendUrl({
-      md: 'pt',
-      cmt: '1',
-      pid: row.id,
-      v: Date.now(),
-    }),
-  )
+const goDetailPage = row => {
+  history.push(`/inventory/master/medication/${row.id}`)
 }
-const PatientIndex = ({ dispatch }) => {
+const MedicationIndex = ({ dispatch }) => {
+  const [exporting, setExporting] = useState(false)
+  const inputEl = useRef(null)
+  const a = PageContainer.Context.useContainer()
+  console.log(a)
+  const [loadingText, setLoadingText] = useState('')
+
+  const onFileChange = async event => {
+    try {
+      const { files } = event.target
+
+      const selectedFiles = await Promise.all(
+        Object.keys(files).map(key => mapToFileDto(files[key])),
+      )
+
+      if (selectedFiles.length > 0) {
+        setExporting(true)
+        setLoadingText('Importing...')
+
+        dispatch({
+          type: 'medication/import',
+          payload: {
+            ...selectedFiles[0],
+          },
+        }).then(result => {
+          if (result && result.byteLength === 0) {
+            notification.success({
+              message: 'Import success',
+            })
+
+            // onSearchClick()
+          } else if (result && result.byteLength > 0) {
+            notification.warning({
+              message:
+                'File is not valid, please download the validation file and check the issues',
+            })
+            downloadFile(result, 'Validation.xlsx')
+          } else {
+            notification.error({
+              message: 'Import failed',
+            })
+          }
+
+          setExporting(false)
+        })
+      }
+    } catch (error) {
+      console.log({ error })
+    }
+  }
   return (
     <ProTable
       columns={defaultColumns}
@@ -146,8 +172,7 @@ const PatientIndex = ({ dispatch }) => {
         return [
           <Button
             type='primary'
-            icon={<Icon type='adduser' />}
-            color='primary'
+            icon={<Icon type='plus' />}
             onClick={() => {
               dispatch({
                 type: 'patient/updateState',
@@ -161,11 +186,62 @@ const PatientIndex = ({ dispatch }) => {
               })
             }}
           >
-            Register New Patient
+            Add New
+          </Button>,
+
+          <Authorized authority='inventorymaster.newinventoryitem'>
+            <input
+              style={{ display: 'none' }}
+              type='file'
+              accept={allowedFiles}
+              id='importMedicationFile'
+              ref={inputEl}
+              multiple={false}
+              onChange={onFileChange}
+              onClick={clearValue}
+            />
+
+            <Button
+              type='primary'
+              icon={<Icon type='attachment' />}
+              onClick={() => {
+                dispatch({
+                  type: 'patient/updateState',
+                  payload: {
+                    entity: undefined,
+                    version: undefined,
+                  },
+                })
+                dispatch({
+                  type: 'patient/openPatientModal',
+                })
+              }}
+            >
+              Import
+            </Button>
+          </Authorized>,
+          <Button
+            type='primary'
+            icon={<Icon type='file-excel' />}
+            loading={exporting}
+            onClick={async () => {
+              setExporting(true)
+              setLoadingText('Exporting...')
+              dispatch({
+                type: 'medication/export',
+              }).then(result => {
+                if (result) {
+                  downloadFile(result, 'Medication.xlsx')
+                }
+                setExporting(false)
+              })
+            }}
+          >
+            Export
           </Button>,
         ]
       }}
-      onRowDblClick={showPatient}
+      onRowDblClick={goDetailPage}
       defaultColumns={['options']}
       features={[
         {
@@ -174,7 +250,7 @@ const PatientIndex = ({ dispatch }) => {
             return (
               <Button
                 onClick={() => {
-                  showPatient(row)
+                  goDetailPage(row)
                 }}
                 type='primary'
                 icon={<Icon type='edit' />}
@@ -193,4 +269,4 @@ export default connect(({ patient }) => {
   return {
     patient,
   }
-})(PatientIndex)
+})(MedicationIndex)

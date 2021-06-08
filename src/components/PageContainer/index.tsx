@@ -46,7 +46,7 @@ const MIPageContainer = ({
         },
       }}
     >
-      <PageContext.Provider value={values}>
+      <PageContext.Provider>
         <PageContainer {...props}>{children}</PageContainer>
       </PageContext.Provider>
     </ConfigProvider>
