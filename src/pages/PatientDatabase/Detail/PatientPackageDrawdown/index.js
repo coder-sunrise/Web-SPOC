@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'dva'
 import { Collapse } from 'antd'
 import moment from 'moment'
+import Print from '@material-ui/icons/Print'
 import withStyles from '@material-ui/core/styles/withStyles'
 import BusinessCenterIcon from '@material-ui/icons/BusinessCenter'
 import {
@@ -15,12 +16,9 @@ import {
   CommonModal,
   NumberInput,
 } from '@/components'
-import model from './models'
 import TransferPackage from './transferPackage'
 import { ReportViewer } from '@/components/_medisys'
 import customstyles from './PatientPackageDrawdownStyle.less'
-
-window.g_app.replaceModel(model)
 
 const smallFontSize = '0.85rem'
 const styles = (theme) => ({
@@ -38,12 +36,12 @@ const styles = (theme) => ({
     color: 'black',
   },
   noRecordsDiv: {
-    height: 'calc(100vh - 270px)',
+    height: 'calc(100vh - 230px)',
     paddingTop: 5,
     marginLeft: theme.spacing(1),
   },
   contentDiv: {
-    height: 'calc(100vh - 270px)',
+    height: 'calc(100vh - 230px)',
     overflow: 'scroll',
   },
   drawdownQuantity: {
@@ -84,37 +82,12 @@ const styles = (theme) => ({
 
 const parseToOneDecimalString = (value = 0.0) => value.toFixed(1)
 
-@connect(({ patient, patientPackageDrawdown }) => ({
+@connect(({ patient }) => ({
   patient,
-  patientPackageDrawdown,
 }))
-@withFormikExtend({
-  authority: [
-    'patientdatabase.patientprofiledetails',
-  ],
-  enableReinitialize: true,
-  mapPropsToValues: ({ patientPackageDrawdown }) => {    
-    const { list = [] } = patientPackageDrawdown
-    return list
-  },
-  handleSubmit: async (values, { props }) => {
-    const {dispatch, patient} = props
 
-    const uncompletedPackages = values.filter(p => !p.isCompleted && !p.isExpired)
-
-    dispatch({
-      type: 'patientPackageDrawdown/savePatientPackage',
-      payload: {
-        patientId: patient.entity.id,
-        patientPackage: uncompletedPackages,
-      },
-    })
-  },
-  displayName: 'PatientPackageDrawdown',
-})
 class PatientPackageDrawdown extends Component {
   state = {
-    isAllPackageCompleted: false,
     isShowPackageTransferModal: false,
     selectedPackageDrawdown: {},
     isShowReport: false,
@@ -126,28 +99,20 @@ class PatientPackageDrawdown extends Component {
     expandDrawdowns: [],
   }
 
-  componentDidMount () {
-    this.refreshPackageDrawdown()
-  }
-
-  componentWillReceiveProps (nextProps) {
-    const { values } = nextProps
-    const uncompletedPackages = values.filter(p => !p.isCompleted && !p.isExpired)
-    this.setState({
-      isAllPackageCompleted: uncompletedPackages.length <= 0,
-    })
+  componentDidMount() {
+    this.setExpandAll(true)
   }
 
   setExpandAll = (isExpandAll = false) => {
-    const { values } = this.props
+    const { values: { patientPackages = [] } } = this.props
     if (isExpandAll) {
-      if (values && values.length > 0) {
+      if (patientPackages.length > 0) {
         this.setState({
-          expandPackages: values.map(o => o.id),
+          expandPackages: patientPackages.map(o => o.id),
         })
 
         let drawdowns = []
-        values.forEach(p => {
+        patientPackages.forEach(p => {
           const { patientPackageDrawdown } = p
           drawdowns = drawdowns.concat(patientPackageDrawdown.map(o => o.id))
         })
@@ -160,21 +125,7 @@ class PatientPackageDrawdown extends Component {
     }
   }
 
-  refreshPackageDrawdown = (isExpandAll = true) => {
-    const { dispatch, patient } = this.props
-    dispatch({
-      type: 'patientPackageDrawdown/getPatientPackageDrawdown',
-      payload: {
-        patientId: patient.entity.id,
-      },
-    }).then((r) => {
-      if (r && isExpandAll) {
-        this.setExpandAll(true)
-      }
-    })
-  }
-
-  getDrawdownTitle = (row, isCompleted, isExpired) => {
+  getDrawdownTitle = (row, isCompleted, isExpired, packageCode, packageName) => {
     const { classes } = this.props
     const {
       itemName,
@@ -188,7 +139,7 @@ class PatientPackageDrawdown extends Component {
     const label = `${itemName} (drawdown to-date: ${parseToOneDecimalString(totalDrawdownQuantity)} / ${parseToOneDecimalString(totalQuantity)})`
 
     return (
-      <div 
+      <div
         className={classes.titleContainer}
         onClick={() => {
           this.setState((preState) => {
@@ -207,8 +158,8 @@ class PatientPackageDrawdown extends Component {
                 ...preState.expandDrawdowns,
                 id,
               ],
-            }            
-          })          
+            }
+          })
         }}
       >
         <div
@@ -243,10 +194,9 @@ class PatientPackageDrawdown extends Component {
             justIcon
             onClick={(e) => {
               e.stopPropagation()
-
               this.setState({
+                selectedPackageDrawdown: { ...row, packageCode, packageName },
                 isShowPackageTransferModal: true,
-                selectedPackageDrawdown: row,
               })
             }}
           >
@@ -280,7 +230,7 @@ class PatientPackageDrawdown extends Component {
               <GridItem md={1}>
                 <p className={classes.drawdownQuantity}>
                   {transaction.transferFromPatient ? (
-                    <font color='green'>- {parseToOneDecimalString(transaction.transactionQuantity)}</font>
+                    <font color='green'>{parseToOneDecimalString(transaction.transactionQuantity)}</font>
                   ) : (
                     <p>- {parseToOneDecimalString(transaction.transactionQuantity)}</p>
                   )}
@@ -293,8 +243,8 @@ class PatientPackageDrawdown extends Component {
                       {infoLabel}
                     </p>
                     {transaction.transactionQuantity > 0 && transaction.signatureDate && (
-                    <p className={classes.acknowledgeInfo}><font color='red'>(Acknowledged on {moment(transaction.signatureDate).format('DD MMM YYYY')})</font></p>
-                  )}
+                      <p className={classes.acknowledgeInfo}><font color='red'>(Acknowledged on {moment(transaction.signatureDate).format('DD MMM YYYY')})</font></p>
+                    )}
                   </div>
                   {transaction.remarks && (
                     <p className={classes.drawdownRemarks}>
@@ -311,7 +261,7 @@ class PatientPackageDrawdown extends Component {
   }
 
   getPackageTitle = (row) => {
-    const { classes, values } = this.props
+    const { classes, values: { patientPackages = [] }, setFieldValue } = this.props
     const {
       packageCode,
       packageName,
@@ -325,8 +275,8 @@ class PatientPackageDrawdown extends Component {
     } = row
 
     return (
-      <div 
-        className={classes.titleContainer} 
+      <div
+        className={classes.titleContainer}
         onClick={() => {
           this.setState((preState) => {
             const drawdowns = patientPackageDrawdown.filter(d => d.patientPackageFK === id)
@@ -351,12 +301,12 @@ class PatientPackageDrawdown extends Component {
                 id,
               ],
               expandDrawdowns: preState.expandDrawdowns.concat(drawdownIds),
-            }            
-          })          
+            }
+          })
         }}
       >
         <GridContainer>
-          <GridItem md={8}>            
+          <GridItem md={8}>
             <p className={classes.packageTitle}>
               {isCompleted ? (
                 <font color='black'> {packageCode} - {packageName} (Total: <NumberInput text currency value={totalPrice} />)</font>
@@ -371,42 +321,44 @@ class PatientPackageDrawdown extends Component {
           <GridItem md={2}>
             {isCompleted && (
               <p className={classes.titleBlack}>Exp. Date: {expiryDate ? moment(expiryDate).format(dateFormatLong) : 'Nil'}</p>
-              )
+            )
             }
             {!isCompleted && !isExpired && (
               <SizeContainer size='sm'>
-                <div 
+                <div
                   onClick={(e) => {
                     e.stopPropagation()
                   }}
                 >
-                  <DatePicker 
+                  <span className={classes.titleBlack}>Exp. Date: </span>
+                  <DatePicker
                     style={{
-                      width: 120, 
+                      width: 120,
                       marginTop: -2,
                     }}
-                    label='Exp. Date' 
-                    format={dateFormatLong} 
-                    value={expiryDate} 
-                    onChange={
-                      value => {
-                        const changedPacakge = values.find(p => p.id === id)
-                        if (changedPacakge) {
-                          changedPacakge.expiryDate = value || undefined
+                    //label='Exp. Date'
+                    format={dateFormatLong}
+                    value={expiryDate}
+                    onChange={(value) => {
+                      setFieldValue('patientPackages', patientPackages.map(v => {
+                        return {
+                          ...v,
+                          expiryDate: v.id === id ? (value || undefined) : v.expiryDate
                         }
-                      }              
+                      }))
+                    }
                     }
                   />
                 </div>
               </SizeContainer>
-              )
+            )
             }
             {!isCompleted && isExpired && (
-              <p className={classes.titleBlack}>Exp. Date: 
+              <p className={classes.titleBlack}>Exp. Date:
                 <font color='red'> {expiryDate ? moment(expiryDate).format(dateFormatLong) : 'Nil'}</font>
               </p>
             )
-          }
+            }
           </GridItem>
           <GridItem md={2}>
             <p className={classes.titleBlack}>Purchased on: {moment(purchaseDate).format(dateFormatLong)}</p>
@@ -442,7 +394,7 @@ class PatientPackageDrawdown extends Component {
           {patientPackageDrawdown.map((o) => {
             return (
               <Collapse.Panel
-                header={this.getDrawdownTitle(o, row.isCompleted, row.isExpired)}
+                header={this.getDrawdownTitle(o, row.isCompleted, row.isExpired, row.packageCode, row.packageName)}
                 key={o.id}
                 className={customstyles.packageDrawdownPanel}
               >
@@ -465,8 +417,6 @@ class PatientPackageDrawdown extends Component {
     this.setState({
       isShowPackageTransferModal: false,
     })
-
-    this.refreshPackageDrawdown(false)
   }
 
   onCloseReport = () => {
@@ -479,9 +429,9 @@ class PatientPackageDrawdown extends Component {
     })
   }
 
-  onPrintClick = () => {    
+  onPrintClick = () => {
     const { patient } = this.props
-    
+
     this.setState({
       isShowReport: true,
       reportPayload: {
@@ -491,20 +441,47 @@ class PatientPackageDrawdown extends Component {
     })
   }
 
-  render () {
+  onTransfer = (newPackageDrawdown) => {
+    const { patient, setFieldValue, values: { patientPackages = [] } } = this.props
+
+    const newTrasaction = {
+      id: 0,
+      isDeleted: false,
+      packageDrawdownFK: newPackageDrawdown.fromPackageDrawdownFK,
+      transactionDate: moment(),
+      transactionQuantity: newPackageDrawdown.transferQuantity,
+      transferToPatientId: newPackageDrawdown.transferToPatientId,
+      transferToPatient: newPackageDrawdown.transferToPatientName,
+      transactionType: "Transfer"
+    }
+
+    patientPackages.forEach(p => {
+      var selectPackageDrawdown = (p.patientPackageDrawdown || []).find(pd => pd.id === newPackageDrawdown.fromPackageDrawdownFK)
+      if (selectPackageDrawdown) {
+        selectPackageDrawdown.remainingQuantity = selectPackageDrawdown.remainingQuantity - newPackageDrawdown.transferQuantity
+        selectPackageDrawdown.patientPackageDrawdownTransaction = [ ...(selectPackageDrawdown.patientPackageDrawdownTransaction || []), newTrasaction ]
+      }
+    })
+
+    setFieldValue('patientPackages', [ ...patientPackages ])
+  }
+
+  render() {
     const {
-      patientPackageDrawdown: { list = [] },
       patient,
       classes,
+      values: { patientPackages = [] }
     } = this.props
 
-    if(list.length > 0) {      
-      return (      
+    if (patientPackages.length > 0) {
+      return (
         <div>
           <GridContainer>
             <GridItem md={12}>
               <div style={{
                 textAlign: 'right',
+                position: 'relative',
+                marginRight: 104
               }}
               >
                 <span
@@ -549,12 +526,19 @@ class PatientPackageDrawdown extends Component {
                     Collapse All
                   </span>
                 </span>
+                <Button
+                  color='primary'
+                  size='sm'
+                  onClick={this.onPrintClick}
+                  style={{ position: 'absolute', bottom: 4 }}
+                >
+                  <Print /> Print</Button>
               </div>
             </GridItem>
-            <GridItem md={12}>              
+            <GridItem md={12}>
               <div className={classes.contentDiv}>
                 <Collapse activeKey={this.state.expandPackages} expandIconPosition={null}>
-                  {list.map((o) => {
+                  {patientPackages.map((o) => {
                     return (
                       <Collapse.Panel
                         header={this.getPackageTitle(o)}
@@ -568,22 +552,6 @@ class PatientPackageDrawdown extends Component {
                 </Collapse>
               </div>
             </GridItem>
-            <GridItem md={12}>
-              {!this.state.isAllPackageCompleted && patient.entity.isActive && (
-              <Button 
-                color='primary' 
-                onClick={this.props.handleSubmit}
-              >
-                Save
-              </Button>
-            )}
-              <Button 
-                color='primary'
-                onClick={this.onPrintClick}
-              >
-              Print
-              </Button>
-            </GridItem>
           </GridContainer>
 
           <CommonModal
@@ -594,7 +562,10 @@ class PatientPackageDrawdown extends Component {
             onConfirm={this.confirmPackageTransferModal}
             open={this.state.isShowPackageTransferModal}
           >
-            <TransferPackage selectedPackageDrawdown={this.state.selectedPackageDrawdown} {...this.props} />
+            <TransferPackage selectedPackageDrawdown={this.state.selectedPackageDrawdown}
+              patientProfileId={patient.entity.id}
+              onTransfer={this.onTransfer}
+              {...this.props} />
           </CommonModal>
           <CommonModal
             open={this.state.isShowReport}
