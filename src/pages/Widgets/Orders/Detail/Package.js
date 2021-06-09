@@ -56,7 +56,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
   validationSchema: Yup.object().shape({
     packageFK: Yup.number().required(),
   }),
-  handleSubmit: (values, { props, onConfirm, setValues }) => {
+  handleSubmit: (values, { props, onConfirm, setValues, resetForm }) => {
     const {
       dispatch,
       orders,
@@ -304,8 +304,8 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
               issuedByUserFK: clinicianProfile.userProfileFK,
               subject: `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
                 ''}, ${Math.floor(
-                moment.duration(moment().diff(dob)).asYears(),
-              )}`,
+                  moment.duration(moment().diff(dob)).asYears(),
+                )}`,
               content: ReplaceCertificateTeplate(
                 defaultTemplate.templateContent,
                 item,
@@ -445,7 +445,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       const newOrder = getOrderFromPackage(
         selectedPackage.code,
         selectedPackage.displayValue,
-        packageItems[index],
+        packageItems[ index ],
       )
       if (newOrder) {
         const data = {
@@ -453,9 +453,9 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
             user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
           sequence: nextSequence,
           ...newOrder,
-          subject: packageItems[index].name,
+          subject: packageItems[ index ].name,
           isDeleted: false,
-          type: packageItems[index].type,
+          type: packageItems[ index ].type,
         }
         datas.push(data)
         nextSequence += 1
@@ -489,6 +489,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
     }
 
     if (onConfirm) onConfirm()
+    if (resetForm) resetForm()
     setValues({
       ...orders.defaultPackage,
       type: orders.type,
@@ -497,7 +498,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
   displayName: 'PackagePage',
 })
 class Package extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     const calUnitPrice = (e) => {
@@ -690,7 +691,7 @@ class Package extends PureComponent {
         (f) => f.caution && f.caution.trim().length > 0,
       )
       if (hasCautionItems.length > 0) {
-        openCautionAlertPrompt(hasCautionItems, () => {})
+        openCautionAlertPrompt(hasCautionItems, () => { })
       }
     }
 
@@ -725,10 +726,11 @@ class Package extends PureComponent {
       handleSubmit()
       return true
     }
+    handleSubmit()
     return false
   }
 
-  render () {
+  render() {
     const { theme, values, footer, handleSubmit } = this.props
 
     const SummaryRow = (p) => {
