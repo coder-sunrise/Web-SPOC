@@ -92,7 +92,7 @@ const FilterBar = ({
           </GridItem>
           <GridItem md={12} />
           <GridItem md={2}>
-            <FastField
+            <Field
               name='visitPurposeIDS'
               render={(args) => (
                 <CodeSelect
