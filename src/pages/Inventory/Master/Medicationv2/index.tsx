@@ -107,7 +107,9 @@ const defaultColumns = [
 const allowedFiles = '.xlsx'
 
 const goDetailPage = row => {
-  history.push(`/inventory/master/medication/${row.id}`)
+  // history.push(`/inventory/master/medication/${row.id}`)
+
+  history.push(`/inventory/master/editmedication?uid=${row.id}`)
 }
 const MedicationIndex = ({ dispatch }) => {
   const [exporting, setExporting] = useState(false)
@@ -160,14 +162,8 @@ const MedicationIndex = ({ dispatch }) => {
   }
   return (
     <ProTable
-      // actionRef={a.actionRef}
       columns={defaultColumns}
       api={api}
-      // search={{
-      //   optionRender: (searchConfig, formProps, dom) => {
-      //     return [dom, <Button></Button>]
-      //   },
-      // }}
       toolBarRender={() => {
         return [
           <Button
@@ -175,12 +171,15 @@ const MedicationIndex = ({ dispatch }) => {
             icon={<Icon type='plus' />}
             onClick={() => {
               dispatch({
-                type: 'patient/updateState',
+                type: 'medicationDetail/updateState',
                 payload: {
                   entity: undefined,
-                  version: undefined,
+                  currentId: undefined,
+                  sddCode: undefined,
+                  sddDescription: undefined,
                 },
               })
+              history.push('/inventory/master/medication')
               dispatch({
                 type: 'patient/openPatientModal',
               })
@@ -205,7 +204,8 @@ const MedicationIndex = ({ dispatch }) => {
               type='primary'
               icon={<Icon type='attachment' />}
               onClick={() => {
-                console.log(actionRef?.current?.getRecords())
+                // console.log(actionRef?.current?.getRecords())
+                inputEl.current.click()
               }}
             >
               Import
@@ -256,8 +256,8 @@ const MedicationIndex = ({ dispatch }) => {
 }
 
 // @ts-ignore
-export default connect(({ patient }) => {
+export default connect(({ medicationDetail }) => {
   return {
-    patient,
+    medicationDetail,
   }
 })(MedicationIndex)
