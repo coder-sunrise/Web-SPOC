@@ -1,9 +1,6 @@
-import React, { useState, useEffect } from 'react'
-import { PageContainer } from '@ant-design/pro-layout'
-import { ConfigProvider } from 'antd'
+import React, { useState } from 'react'
 // import { useModel } from 'umi'
-
-import { PageContext } from '@medisys/component'
+import { ProLayout, PageContext } from '@medisys/component'
 
 const MIPageContainer = ({
   model = 'list',
@@ -26,30 +23,10 @@ const MIPageContainer = ({
     },
   })
 
-  // // @ts-ignore
-  // const { reset } = useModel(model)
-  // // useWhyDidYouUpdate('PageContainer', { ...props });
-  // // const [uid, setUid] = useState(0);
-  // useEffect(() => {
-  //   // setUid(getUniqueId());
-  //   return () => {
-  //     if (reset) reset()
-  //   }
-  // }, [reset])
   return (
-    <ConfigProvider
-      componentSize='middle'
-      form={{
-        validateMessages: {
-          required: 'This field is required',
-          // ...
-        },
-      }}
-    >
-      <PageContext.Provider>
-        <PageContainer {...props}>{children}</PageContainer>
-      </PageContext.Provider>
-    </ConfigProvider>
+    <PageContext.Provider>
+      <ProLayout.PageContainer {...props}>{children}</ProLayout.PageContainer>
+    </PageContext.Provider>
   )
 }
 

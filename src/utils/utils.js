@@ -437,7 +437,7 @@ const convertToQuery = (query = {}, convertExcludeFields = ['create']) => {
     sort,
     apiCriteria,
   } = query
-  console.log(query)
+  // console.log(query)
   let customQuerys = { ...query }
   delete customQuerys.keepFilter
   delete customQuerys.current

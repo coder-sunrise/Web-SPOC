@@ -112,8 +112,7 @@ const goDetailPage = row => {
 const MedicationIndex = ({ dispatch }) => {
   const [exporting, setExporting] = useState(false)
   const inputEl = useRef(null)
-  const a = PageContainer.Context.useContainer()
-  console.log(a)
+  const { actionRef } = PageContainer.Context.useContainer()
   const [loadingText, setLoadingText] = useState('')
 
   const onFileChange = async event => {
@@ -161,6 +160,7 @@ const MedicationIndex = ({ dispatch }) => {
   }
   return (
     <ProTable
+      // actionRef={a.actionRef}
       columns={defaultColumns}
       api={api}
       // search={{
@@ -205,16 +205,7 @@ const MedicationIndex = ({ dispatch }) => {
               type='primary'
               icon={<Icon type='attachment' />}
               onClick={() => {
-                dispatch({
-                  type: 'patient/updateState',
-                  payload: {
-                    entity: undefined,
-                    version: undefined,
-                  },
-                })
-                dispatch({
-                  type: 'patient/openPatientModal',
-                })
+                console.log(actionRef?.current?.getRecords())
               }}
             >
               Import

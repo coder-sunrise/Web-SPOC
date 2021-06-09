@@ -1,11 +1,6 @@
 import { useState } from 'react'
 import { PageContainer, Icon } from '@/components'
-import { ProTable, Select, Input, Button } from '@medisys/component'
-import patientService from '@/services/patient'
 import { connect, history } from 'umi'
-import { getAppendUrl } from '@/utils/utils'
-import Authorized from '@/utils/Authorized'
-import MedicationList from './Medicationv2'
 import { InventoryMasterOption } from './variables'
 
 const tabs = InventoryMasterOption().map(o => {
@@ -15,16 +10,7 @@ const tabs = InventoryMasterOption().map(o => {
     tab: o.name,
   }
 })
-console.log(tabs)
 
-const { queryListV2, upsert, query, remove } = patientService
-const api = {
-  remove,
-  create: upsert,
-  update: upsert,
-  queryList: queryListV2,
-  query,
-}
 const InventoryMasterIndex = ({ dispatch }) => {
   const [tabKey, setTabKey] = useState('medication')
   const currentTab = tabs.find(o => o.key === tabKey)

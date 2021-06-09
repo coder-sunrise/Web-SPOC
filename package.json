@@ -32,7 +32,6 @@
     "docker:push": "npm run docker-hub:build && npm run docker:tag && docker push chenshuai2144/ant-design-pro"
   },
   "dependencies": {
-    "@ant-design/pro-layout": "^6.19.2",
     "@babel/runtime": "^7.1.5",
     "@devexpress/dx-grid-core": "2.2.1",
     "@devexpress/dx-react-core": "2.2.1",
@@ -43,7 +42,7 @@
     "@material-ui/icons": "4.9.1",
     "@material-ui/lab": "5.0.0-alpha.3",
     "@material-ui/styles": "4.10.0",
-    "@medisys/component": "^0.1.188",
+    "@medisys/component": "^0.1.191",
     "@microsoft/signalr": "^3.1.0",
     "antd": "^4.15.6",
     "axios": "^0.19.0",

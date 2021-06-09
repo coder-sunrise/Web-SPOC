@@ -1,5 +1,5 @@
 import React from 'react'
-import ProLayout, { PageContainer, SettingDrawer } from '@ant-design/pro-layout'
+import { ProLayout } from '@medisys/component'
 
 // umi locale
 import { history, FormattedMessage, formatMessage, connect } from 'umi'
@@ -791,7 +791,7 @@ class Queue extends React.Component {
     const { tracker } = queueCalling
     const openQueueDisplayAccessRight = Authorized.check('openqueuedisplay')
     return (
-      <PageContainer
+      <ProLayout.PageContainer
         header={{
           title: `Session No.: ${sessionNo}`,
           extra: [
@@ -941,7 +941,7 @@ class Queue extends React.Component {
             <VisitForms formCategory={this.state.formCategory} />
           </CommonModal>
         </PageHeaderWrapper>
-      </PageContainer>
+      </ProLayout.PageContainer>
     )
   }
 }

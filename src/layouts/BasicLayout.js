@@ -3,7 +3,7 @@ import NProgress from 'nprogress'
 import $ from 'jquery'
 import _ from 'lodash'
 import { headerHeight } from 'mui-pro-jss'
-import ProLayout, { PageContainer, SettingDrawer } from '@ant-design/pro-layout'
+import { ProLayout } from '@medisys/component'
 import { connect, formatMessage, Link, getLocale } from 'umi'
 
 import CssBaseline from '@material-ui/core/CssBaseline'
