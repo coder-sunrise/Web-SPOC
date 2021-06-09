@@ -508,7 +508,7 @@ class PatientPackageDrawdown extends Component {
                   style={{
                     cursor: 'pointer',
                     marginLeft: 20,
-                    marginRight: 10,
+                    marginRight: 20,
                   }}
                   onClick={() => {
                     this.setExpandAll(false)
