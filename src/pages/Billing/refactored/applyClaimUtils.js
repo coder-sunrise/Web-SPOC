@@ -389,7 +389,7 @@ export const validateInvoicePayerItems = (invoicePayerItem) => {
     let maxAmount
     let type = 'Total Payable'
     if (item.schemeCoverageType.toLowerCase() === 'percentage') {
-      maxAmount = roundTo(item.payableBalance * item.schemeCoverage / 100, 4)
+      maxAmount = roundTo(item.payableBalance * item.schemeCoverage / 100, 2)
       type = 'Coverage Amount'
     } else if (item.schemeCoverageType.toLowerCase() === 'exactamount') {
       maxAmount = item.schemeCoverage
