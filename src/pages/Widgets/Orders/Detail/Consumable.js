@@ -89,7 +89,7 @@ const getVisitDoctorUserId = (props) => {
     let { batchNo } = values
     if (batchNo instanceof Array) {
       if (batchNo && batchNo.length > 0) {
-        batchNo = batchNo[ 0 ]
+        batchNo = batchNo[0]
       }
     }
 
@@ -122,7 +122,7 @@ const getVisitDoctorUserId = (props) => {
   displayName: 'OrderPage',
 })
 class Consumable extends PureComponent {
-  constructor(props) {
+  constructor (props) {
     super(props)
 
     let selectedConsumable = {
@@ -252,7 +252,7 @@ class Consumable extends PureComponent {
     }
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     if (nextProps.orders.type === this.props.type)
       if (
         (!this.props.global.openAdjustment &&
@@ -354,7 +354,7 @@ class Consumable extends PureComponent {
     }, 300)
   }
 
-  render() {
+  render () {
     const {
       theme,
       values,
@@ -494,7 +494,7 @@ class Consumable extends PureComponent {
                       options={this.state.selectedConsumable.consumableStock}
                       onChange={(e, op = {}) => {
                         if (op && op.length > 0) {
-                          const { expiryDate } = op[ 0 ]
+                          const { expiryDate } = op[0]
                           setFieldValue(`expiryDate`, expiryDate)
                         } else {
                           setFieldValue(`expiryDate`, undefined)

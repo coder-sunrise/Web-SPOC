@@ -329,7 +329,7 @@ const { qtyFormat } = config
       orderSetItem,
     ) => {
       const { service } = orderSetItem
-      const serviceCenterService = service.ctServiceCenter_ServiceNavigation[ 0 ]
+      const serviceCenterService = service.ctServiceCenter_ServiceNavigation[0]
       const serviceCenter = serviceCenterService.serviceCenterFKNavigation
       let item
       if (service.isActive === true && serviceCenter.isActive === true) {
@@ -420,16 +420,16 @@ const { qtyFormat } = config
     let datas = []
     let nextSequence = getNextSequence()
     for (let index = 0; index < orderSetItems.length; index++) {
-      const newOrder = getOrderFromOrderSet(orderSetCode, orderSetItems[ index ])
+      const newOrder = getOrderFromOrderSet(orderSetCode, orderSetItems[index])
       if (newOrder) {
         const data = {
           isOrderedByDoctor:
             user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
           sequence: nextSequence,
           ...newOrder,
-          subject: orderSetItems[ index ].name,
+          subject: orderSetItems[index].name,
           isDeleted: false,
-          type: orderSetItems[ index ].type,
+          type: orderSetItems[index].type,
         }
         datas.push(data)
         nextSequence += 1
@@ -455,7 +455,7 @@ const { qtyFormat } = config
   displayName: 'OrderPage',
 })
 class OrderSet extends PureComponent {
-  constructor(props) {
+  constructor (props) {
     super(props)
     const { dispatch } = props
     const codeTableNameArray = [
@@ -585,13 +585,13 @@ class OrderSet extends PureComponent {
               typeName:
                 orderTypes.find((type) => type.value === '3').name +
                 (o.service.isActive &&
-                  o.service.ctServiceCenter_ServiceNavigation[ 0 ]
+                  o.service.ctServiceCenter_ServiceNavigation[0]
                     .serviceCenterFKNavigation.isActive === true
                   ? ''
                   : ' (Inactive)'),
               isActive:
                 o.service.isActive &&
-                o.service.ctServiceCenter_ServiceNavigation[ 0 ]
+                o.service.ctServiceCenter_ServiceNavigation[0]
                   .serviceCenterFKNavigation.isActive,
             }
           }),
@@ -644,11 +644,10 @@ class OrderSet extends PureComponent {
       handleSubmit()
       return true
     }
-    handleSubmit()
     return false
   }
 
-  render() {
+  render () {
     const { theme, values, footer, from } = this.props
     return (
       <Authorized

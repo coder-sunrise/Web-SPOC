@@ -115,7 +115,7 @@ const getVisitDoctorUserId = (props) => {
   displayName: 'OrderPage',
 })
 class Service extends PureComponent {
-  constructor(props) {
+  constructor (props) {
     super(props)
     const { dispatch } = props
 
@@ -171,7 +171,7 @@ class Service extends PureComponent {
     }
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     if (nextProps.orders.type === this.props.type)
       if (
         (!this.props.global.openAdjustment &&
@@ -328,7 +328,7 @@ class Service extends PureComponent {
     return false
   }
 
-  render() {
+  render () {
     const {
       theme,
       classes,

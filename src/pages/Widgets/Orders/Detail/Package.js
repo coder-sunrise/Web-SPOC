@@ -445,7 +445,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       const newOrder = getOrderFromPackage(
         selectedPackage.code,
         selectedPackage.displayValue,
-        packageItems[ index ],
+        packageItems[index],
       )
       if (newOrder) {
         const data = {
@@ -453,9 +453,9 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
             user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
           sequence: nextSequence,
           ...newOrder,
-          subject: packageItems[ index ].name,
+          subject: packageItems[index].name,
           isDeleted: false,
-          type: packageItems[ index ].type,
+          type: packageItems[index].type,
         }
         datas.push(data)
         nextSequence += 1
@@ -498,7 +498,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
   displayName: 'PackagePage',
 })
 class Package extends PureComponent {
-  constructor(props) {
+  constructor (props) {
     super(props)
 
     const calUnitPrice = (e) => {
@@ -726,11 +726,10 @@ class Package extends PureComponent {
       handleSubmit()
       return true
     }
-    handleSubmit()
     return false
   }
 
-  render() {
+  render () {
     const { theme, values, footer, handleSubmit } = this.props
 
     const SummaryRow = (p) => {
