@@ -3,7 +3,7 @@ import { withStyles } from '@material-ui/core'
 // formik
 import { Field } from 'formik'
 // umi
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 // custom components
 import {
   TextField,
@@ -28,7 +28,7 @@ import { roundTo } from '@/utils/utils'
 import numeral from 'numeral'
 import FormField from './formField'
 
-const styles = (theme) => ({
+const styles = theme => ({
   verticalSpacing: {
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
@@ -73,7 +73,7 @@ const VisitInfoCard = ({
   clinicSettings,
   ...restProps
 }) => {
-  const validateQNo = (value) => {
+  const validateQNo = value => {
     const qNo = parseFloat(value).toFixed(1)
     if (existingQNo.includes(qNo))
       return 'Queue No. already existed in current queue list'
@@ -82,13 +82,13 @@ const VisitInfoCard = ({
 
   const getVisitOrderTemplateTotal = (vType, template) => {
     let activeItemTotal = 0
-    visitOrderTemplateItemTypes.forEach((type) => {
+    visitOrderTemplateItemTypes.forEach(type => {
       // type.id === 3 means vaccination
       if (vType === VISIT_TYPE.RETAIL && type.id === 3) return
       const currentTypeItems = template.visitOrderTemplateItemDtos.filter(
-        (itemType) => itemType.inventoryItemTypeFK === type.id,
+        itemType => itemType.inventoryItemTypeFK === type.id,
       )
-      currentTypeItems.map((item) => {
+      currentTypeItems.map(item => {
         if (item[type.dtoName].isActive === true) {
           activeItemTotal += item.total || 0
         }
@@ -97,12 +97,12 @@ const VisitInfoCard = ({
     return activeItemTotal
   }
 
-  const validateTotalCharges = (value) => {
+  const validateTotalCharges = value => {
     const { values } = restProps
     let totalTempCharge = 0
     if ((values.visitOrderTemplateFK || 0) > 0) {
       const template = visitOrderTemplateOptions.find(
-        (i) => i.id === values.visitOrderTemplateFK,
+        i => i.id === values.visitOrderTemplateFK,
       )
       totalTempCharge = getVisitOrderTemplateTotal(visitType, template)
     }
@@ -134,7 +134,7 @@ const VisitInfoCard = ({
   const handleVisitTypeChange = (v, op) => {
     const { values } = restProps
     const template = visitOrderTemplateOptions.find(
-      (i) => i.id === values.visitOrderTemplateFK,
+      i => i.id === values.visitOrderTemplateFK,
     )
     setFieldValue(FormField['visit.visitType'], v)
     if (template) {
@@ -146,7 +146,7 @@ const VisitInfoCard = ({
   let totalTempCharge = 0
   if ((values.visitOrderTemplateFK || 0) > 0) {
     const template = visitOrderTemplateOptions.find(
-      (i) => i.id === values.visitOrderTemplateFK,
+      i => i.id === values.visitOrderTemplateFK,
     )
     totalTempCharge = getVisitOrderTemplateTotal(visitType, template)
   }
@@ -162,7 +162,7 @@ const VisitInfoCard = ({
         <GridItem xs md={4}>
           <Field
             name={FormField['visit.visitType']}
-            render={(args) => (
+            render={args => (
               <CodeSelect
                 // disabled={isReadOnly}
                 label={formatMessage({
@@ -179,20 +179,18 @@ const VisitInfoCard = ({
         <GridItem xs md={4}>
           <Field
             name={FormField['visit.doctorProfileFk']}
-            render={(args) => (
+            render={args => (
               <DoctorProfileSelect
                 // disabled={isReadOnly}
                 onChange={(v, op = {}) => handleDoctorChange(v, op)}
                 label={
-                  visitType === VISIT_TYPE.RETAIL ? (
-                    formatMessage({
-                      id: 'reception.queue.visitRegistration.attendantDoctor',
-                    })
-                  ) : (
-                    formatMessage({
-                      id: 'reception.queue.visitRegistration.doctor',
-                    })
-                  )
+                  visitType === VISIT_TYPE.RETAIL
+                    ? formatMessage({
+                        id: 'reception.queue.visitRegistration.attendantDoctor',
+                      })
+                    : formatMessage({
+                        id: 'reception.queue.visitRegistration.doctor',
+                      })
                 }
                 {...args}
               />
@@ -203,7 +201,7 @@ const VisitInfoCard = ({
           <Field
             name={FormField['visit.queueNo']}
             validate={validateQNo}
-            render={(args) => (
+            render={args => (
               <NumberInput
                 {...args}
                 format='0.0'
@@ -211,7 +209,7 @@ const VisitInfoCard = ({
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.queueNo',
                 })}
-                formatter={(value) => {
+                formatter={value => {
                   const isNaN = Number.isNaN(parseFloat(value))
                   return isNaN ? value : parseFloat(value).toFixed(1)
                 }}
@@ -222,7 +220,7 @@ const VisitInfoCard = ({
         <GridItem xs md={4}>
           <Field
             name={FormField['visit.roomFK']}
-            render={(args) => (
+            render={args => (
               <CodeSelect
                 // disabled={isReadOnly}
                 label={formatMessage({
@@ -237,7 +235,7 @@ const VisitInfoCard = ({
         <GridItem xs md={4}>
           <Field
             name={FormField['visit.visitOrderTemplateFK']}
-            render={(args) => {
+            render={args => {
               return (
                 <Select
                   // disabled={isReadOnly}
@@ -249,7 +247,8 @@ const VisitInfoCard = ({
                   authority='none'
                   disabled={isVisitReadonlyAfterSigned}
                   onChange={(e, opts) =>
-                    handleVisitOrderTemplateChange(visitType, opts)}
+                    handleVisitOrderTemplateChange(visitType, opts)
+                  }
                 />
               )
             }}
@@ -259,7 +258,7 @@ const VisitInfoCard = ({
           <Field
             name={FormField['visit.VisitOrderTemplateTotal']}
             validate={validateTotalCharges}
-            render={(args) => {
+            render={args => {
               const { form: fm } = args
               const readOnly = (fm.values.visitOrderTemplateFK || 0) <= 0
               return (
@@ -280,7 +279,7 @@ const VisitInfoCard = ({
         <GridItem xs md={8}>
           <Field
             name={FormField['visit.visitRemarks']}
-            render={(args) => (
+            render={args => (
               <TextField
                 {...args}
                 // disabled={isReadOnly}
@@ -299,7 +298,7 @@ const VisitInfoCard = ({
           {isEnablePackage && (
             <Field
               name={FormField['visit.salesPersonUserFK']}
-              render={(args) => (
+              render={args => (
                 <ClinicianSelect
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.salesPerson',
@@ -327,7 +326,7 @@ const VisitInfoCard = ({
                 )}{' '}
                 be applied to the total bill:
               </p>
-              {(ctinvoiceadjustment || []).map((t) => {
+              {(ctinvoiceadjustment || []).map(t => {
                 if (t.adjType === 'ExactAmount') {
                   return (
                     <span
@@ -341,7 +340,8 @@ const VisitInfoCard = ({
                         {...amountProps}
                         style={{ display: 'inline-block' }}
                         value={t.adjValue}
-                      />;{' '}
+                      />
+                      ;{' '}
                     </span>
                   )
                 }
@@ -378,17 +378,18 @@ const VisitInfoCard = ({
                       <span>
                         ({numeral(Math.abs(t.adjValue)).format('0.00')}%)
                       </span>
-                    </span>;
+                    </span>
+                    ;
                   </span>
                 )
               })}
-              {(copaymentScheme || [])
-                .filter((t) => t.copayerInvoiceAdjustmentValue !== 0).length >
-              0 ? (
+              {(copaymentScheme || []).filter(
+                t => t.copayerInvoiceAdjustmentValue !== 0,
+              ).length > 0 ? (
                 <p>
                   {(copaymentScheme || [])
-                    .filter((t) => t.copayerInvoiceAdjustmentValue !== 0)
-                    .map((t) => {
+                    .filter(t => t.copayerInvoiceAdjustmentValue !== 0)
+                    .map(t => {
                       if (t.copayerInvoiceAdjustmentType === 'ExactAmount') {
                         return (
                           <span
@@ -399,13 +400,15 @@ const VisitInfoCard = ({
                           >
                             <span style={{ fontWeight: '500' }}>
                               {t.coPayerName}
-                            </span>:{' '}
+                            </span>
+                            :{' '}
                             <NumberInput
                               text
                               {...amountProps}
                               style={{ display: 'inline-block' }}
                               value={t.copayerInvoiceAdjustmentValue}
-                            />;{' '}
+                            />
+                            ;{' '}
                           </span>
                         )
                       }
@@ -423,7 +426,8 @@ const VisitInfoCard = ({
                               <span style={{ color: 'darkblue' }}>
                                 {numeral(
                                   t.copayerInvoiceAdjustmentValue,
-                                ).format('0.00')}%;
+                                ).format('0.00')}
+                                %;
                               </span>
                             </span>
                           </span>
@@ -448,11 +452,14 @@ const VisitInfoCard = ({
                             }}
                           >
                             <span>
-                              ({numeral(
+                              (
+                              {numeral(
                                 Math.abs(t.copayerInvoiceAdjustmentValue),
-                              ).format('0.00')}%)
+                              ).format('0.00')}
+                              %)
                             </span>
-                          </span>;
+                          </span>
+                          ;
                         </span>
                       )
                     })}

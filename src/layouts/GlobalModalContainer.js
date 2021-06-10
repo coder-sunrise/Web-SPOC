@@ -1,5 +1,6 @@
 import React, { PureComponent, Fragment } from 'react'
 import { connect } from 'dva'
+import { Drawer } from 'antd'
 import { withStyles } from '@material-ui/core'
 import {
   ChangePassword,
@@ -34,12 +35,12 @@ class GlobalModalContainer extends PureComponent {
   //   console.log(para)
   // }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this._timer = null
   }
 
-  componentDidUpdate (preProps) {
+  componentDidUpdate(preProps) {
     if (
       !preProps.global.showSessionTimeout &&
       this.props.global.showSessionTimeout === true
@@ -102,7 +103,7 @@ class GlobalModalContainer extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { global, report, dispatch, loggedInUserID, classes } = this.props
     return (
       <div>
@@ -130,12 +131,13 @@ class GlobalModalContainer extends PureComponent {
         >
           <ChangePassword userID={loggedInUserID} />
         </CommonModal>
-
-        <CommonModal
-          open={global.showPatientInfoPanel}
+        <Drawer
+          width='100%'
           title='Patient Profile'
-          observe='PatientDetail'
-          authority='patient'
+          placement='right'
+          headerStyle={{
+            textAlign: 'center',
+          }}
           onClose={() => {
             dispatch({
               type: 'patient/closePatientModal',
@@ -144,21 +146,10 @@ class GlobalModalContainer extends PureComponent {
               },
             })
           }}
-          onConfirm={() => {
-            dispatch({
-              type: 'patient/closePatientModal',
-              payload: {
-                history: this.props.history,
-              },
-            })
-          }}
-          // onConfirm={this.toggleModal}
-          fullScreen
-          className={classes.patientModal}
-          showFooter={false}
+          visible={global.showPatientInfoPanel}
         >
           {global.showPatientInfoPanel && <PatientDetail {...this.props} />}
-        </CommonModal>
+        </Drawer>
 
         <CommonModal
           title={global.accountModalTitle}
@@ -230,8 +221,7 @@ class GlobalModalContainer extends PureComponent {
                   >
                     {global.secondConfirmText || 'Pause'}
                   </Button>
-                ) : null
-                }
+                ) : null}
                 <Button
                   color='primary'
                   onClick={() => {
@@ -247,9 +237,9 @@ class GlobalModalContainer extends PureComponent {
             ) : null,
             onConfirm: global.onConfirmSave
               ? () => {
-                global.onConfirmSave()
-                this.closeConfirmationPrompt()
-              }
+                  global.onConfirmSave()
+                  this.closeConfirmationPrompt()
+                }
               : undefined,
           }}
           onClose={() => {

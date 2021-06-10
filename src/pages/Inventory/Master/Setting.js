@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import { FastField } from 'formik'
 import { compose } from 'redux'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { connect } from 'dva'
 import {
   GridContainer,
@@ -35,7 +35,7 @@ const Setting = ({
     entityData.inventoryMedication_MedicationPrecaution.length > 0
   ) {
     addedItems = entityData.inventoryMedication_MedicationPrecaution.map(
-      (item) => ({
+      item => ({
         medicationPrecautionFK: item.medicationPrecautionFK,
         value: item.medicationPrecaution.name,
       }),
@@ -74,7 +74,7 @@ const Setting = ({
           <GridItem xs={6}>
             <FastField
               name={showTransfer ? 'medicationUsageFK' : 'vaccinationUsageFK'}
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   label={formatMessage({
                     id: 'inventory.master.setting.usage',
@@ -93,7 +93,7 @@ const Setting = ({
           <GridItem xs={3}>
             <FastField
               name='prescribingDosageFK'
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   label={formatMessage({
                     id: 'inventory.master.setting.dosage',
@@ -108,18 +108,16 @@ const Setting = ({
           <GridItem xs={3}>
             <FastField
               name='prescribingUOMFK'
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   label={formatMessage({
                     id: 'inventory.master.setting.uom',
                   })}
                   labelField='name'
                   code={
-                    showTransfer ? (
-                      'ctmedicationunitofmeasurement'
-                    ) : (
-                      'ctvaccinationunitofmeasurement'
-                    )
+                    showTransfer
+                      ? 'ctmedicationunitofmeasurement'
+                      : 'ctvaccinationunitofmeasurement'
                   }
                   {...args}
                 />
@@ -131,13 +129,11 @@ const Setting = ({
           <GridItem xs={3}>
             <FastField
               name={
-                showTransfer ? (
-                  'medicationFrequencyFK'
-                ) : (
-                  'vaccinationFrequencyFK'
-                )
+                showTransfer
+                  ? 'medicationFrequencyFK'
+                  : 'vaccinationFrequencyFK'
               }
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   label={formatMessage({
                     id: 'inventory.master.setting.frequency',
@@ -152,7 +148,7 @@ const Setting = ({
           <GridItem xs={3}>
             <FastField
               name='duration'
-              render={(args) => {
+              render={args => {
                 return (
                   <NumberInput
                     label={formatMessage({
@@ -175,7 +171,7 @@ const Setting = ({
           <GridItem xs={3}>
             <FastField
               name='dispensingQuantity'
-              render={(args) => {
+              render={args => {
                 return (
                   <NumberInput
                     label={formatMessage({
@@ -191,7 +187,7 @@ const Setting = ({
           <GridItem xs={3}>
             <FastField
               name='dispensingUOMFK'
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   label={formatMessage({
                     id: 'inventory.master.setting.uom',
@@ -209,7 +205,7 @@ const Setting = ({
           <GridItem xs={1}>
             <FastField
               name='prescriptionToDispenseConversion'
-              render={(args) => (
+              render={args => (
                 <NumberInput
                   label={formatMessage({
                     id:
@@ -224,7 +220,7 @@ const Setting = ({
           <GridItem>
             <FastField
               name='prescribingUOMFK'
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   style={{ marginTop: 15 }}
                   label=''
@@ -232,11 +228,9 @@ const Setting = ({
                   labelField='name'
                   optionLabelLength={optionLabelLength}
                   code={
-                    showTransfer ? (
-                      'ctmedicationunitofmeasurement'
-                    ) : (
-                      'ctvaccinationunitofmeasurement'
-                    )
+                    showTransfer
+                      ? 'ctmedicationunitofmeasurement'
+                      : 'ctvaccinationunitofmeasurement'
                   }
                   {...args}
                 />
@@ -251,7 +245,7 @@ const Setting = ({
           <GridItem>
             <FastField
               name='dispensingUOMFK'
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   style={{ marginTop: 15 }}
                   optionLabelLength={optionLabelLength}
@@ -283,6 +277,7 @@ const ConnectedSetting = connect(({ global }) => ({
   global,
 }))(Setting)
 
-export default compose(withStyles(styles, { withTheme: true }), React.memo)(
-  ConnectedSetting,
-)
+export default compose(
+  withStyles(styles, { withTheme: true }),
+  React.memo,
+)(ConnectedSetting)

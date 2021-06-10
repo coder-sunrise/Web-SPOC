@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import router from 'umi/router'
+import { history } from 'umi'
 // material ui
 import Pageview from '@material-ui/icons/Pageview'
 // dev grid
@@ -8,7 +8,7 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 // custom component
 import { Button, CommonTableGrid, Tooltip } from '@/components'
 
-const CellBase = (props) => {
+const CellBase = props => {
   const { column, row, dispatch } = props
   if (column.name === 'Action') {
     return (
@@ -28,7 +28,7 @@ const CellBase = (props) => {
                   name: row.company,
                 },
               })
-              router.push(href)
+              history.push(href)
             }}
             justIcon
             round
@@ -74,19 +74,20 @@ class CorporateBillingGrid extends PureComponent {
     ],
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'corporateBilling/query',
     })
   }
 
-  render () {
+  render() {
     const { columns, columnExtensions } = this.state
-    const { corporateBilling: { list }, dispatch } = this.props
-    const TableCell = (p) => Cell({ ...p, dispatch })
-    const defaultSortCol = [
-      { columnName: 'lastPayment', direction: 'desc' },
-    ]
+    const {
+      corporateBilling: { list },
+      dispatch,
+    } = this.props
+    const TableCell = p => Cell({ ...p, dispatch })
+    const defaultSortCol = [{ columnName: 'lastPayment', direction: 'desc' }]
 
     const ActionProps = { TableCellComponent: TableCell }
 

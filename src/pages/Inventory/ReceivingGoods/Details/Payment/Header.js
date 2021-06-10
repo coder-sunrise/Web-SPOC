@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import {
   GridContainer,
   GridItem,
@@ -10,7 +10,7 @@ import {
 import { INVOICE_STATUS } from '@/utils/constants'
 
 class Header extends PureComponent {
-  render () {
+  render() {
     const {
       receivingGoodsDetails: {
         receivingGoods: {
@@ -64,11 +64,9 @@ class Header extends PureComponent {
                 id: 'inventory.rg.detail.payment.outstandingAmount',
               })}
               value={
-                invoiceStatusFK === INVOICE_STATUS.WRITEOFF ? (
-                  0
-                ) : (
-                  totalAftGST - getTotalPaid()
-                )
+                invoiceStatusFK === INVOICE_STATUS.WRITEOFF
+                  ? 0
+                  : totalAftGST - getTotalPaid()
               }
             />
           </GridItem>

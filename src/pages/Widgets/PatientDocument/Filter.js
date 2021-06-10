@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 
 import {
@@ -18,7 +18,7 @@ import {
   displayName: 'DocumentTemplateFilter',
 })
 class Filter extends PureComponent {
-  render () {
+  render() {
     const { classes } = this.props
     return (
       <div className={classes.filterBar}>
@@ -26,7 +26,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={3}>
             <FastField
               name='codeDisplayValue'
-              render={(args) => {
+              render={args => {
                 return <TextField label='Document' {...args} />
               }}
             />
@@ -34,7 +34,7 @@ class Filter extends PureComponent {
           <GridItem xs={7} md={4}>
             <FastField
               name='effectiveDates'
-              render={(args) => {
+              render={args => {
                 return (
                   <DateRangePicker label='Create Date' label2='To' {...args} />
                 )

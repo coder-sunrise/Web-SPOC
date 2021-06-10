@@ -3,17 +3,16 @@ import request from '@/utils/request'
 
 const url = '/api/clinicSettings'
 
-module.exports = {
-  query: (params) => {
+const fns = {
+  query: params => {
     return service.queryList(url, params)
   },
-  upsert: async (params) => {
+  upsert: async params => {
     const r = await request(`${url}`, {
       method: 'PUT',
-      body: [
-        ...params,
-      ],
+      body: [...params],
     })
     return r
   },
 }
+export default fns

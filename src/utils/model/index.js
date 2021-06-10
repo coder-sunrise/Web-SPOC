@@ -3,10 +3,13 @@ import BaseListViewModel from './BaseListViewModel'
 import BaseFormViewModel from './BaseFormViewModel'
 import BaseNaviViewModel from './BaseNaviViewModel'
 
-module.exports = {
-  createBasicModel: (options) => new BaseCRUDViewModel(options).create(),
-  createFormViewModel: (options) => new BaseFormViewModel(options).create(),
-  createListViewModel: (options) => new BaseListViewModel(options).create(),
-  createNaviViewModel: (options) => new BaseNaviViewModel(options).create(),
-  createListOptionModel: (options) => new BaseNaviViewModel(options).create(),
-}
+export const createBasicModel = options =>
+  new BaseCRUDViewModel(options).create()
+export const createFormViewModel = options =>
+  new BaseFormViewModel(options).create()
+export const createListViewModel = options =>
+  new BaseListViewModel(options).create()
+export const createNaviViewModel = options =>
+  new BaseNaviViewModel(options).create()
+export const createListOptionModel = options =>
+  new BaseNaviViewModel(options).create()

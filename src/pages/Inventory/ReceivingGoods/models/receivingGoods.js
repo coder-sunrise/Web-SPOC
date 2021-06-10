@@ -3,7 +3,7 @@ import moment from 'moment'
 import { notification } from '@/components'
 import { rgType } from '@/utils/codes'
 import { getUniqueId } from '@/utils/utils'
-import * as service from '../services'
+import service from '../services'
 import { getReceivingGoodsStatusFK, getInvoiceStatusFK } from '../variables'
 
 export default createFormViewModel({
@@ -50,14 +50,14 @@ export default createFormViewModel({
     },
 
     effects: {
-      *refresh ({ payload }, { put }) {
+      *refresh({ payload }, { put }) {
         yield put({
           type: 'queryReceivingGoods',
           payload: { id: payload.id },
         })
       },
-      *initializeReceivingGoods (_, { put, select }) {
-        const user = yield select((state) => state.user)
+      *initializeReceivingGoods(_, { put, select }) {
+        const user = yield select(state => state.user)
         const receivingGoods = {
           receivingGoodsDate: moment(),
           receivingGoodsStatusFK: 1,
@@ -75,11 +75,11 @@ export default createFormViewModel({
           payload: { receivingGoods },
         })
       },
-      *duplicateReceivingGoods ({ payload }, { call, put, select }) {
+      *duplicateReceivingGoods({ payload }, { call, put, select }) {
         // Call API to query selected Receiving Goods
         const response = yield call(service.queryById, payload.id)
         const { data } = response
-        const user = yield select((state) => state.user)
+        const user = yield select(state => state.user)
         return yield put({
           type: 'setReceivingGoods',
           payload: {
@@ -102,7 +102,7 @@ export default createFormViewModel({
             createDate: moment(),
             createByUser: user.data.clinicianProfile.name,
             receivingGoodsPayment: [],
-            receivingGoodsItem: (data.receivingGoodsItem || []).map((o) => {
+            receivingGoodsItem: (data.receivingGoodsItem || []).map(o => {
               return {
                 ...o,
                 inventoryTransactionItemFK: undefined,
@@ -114,7 +114,7 @@ export default createFormViewModel({
           },
         })
       },
-      *queryReceivingGoods ({ payload }, { call, put }) {
+      *queryReceivingGoods({ payload }, { call, put }) {
         const response = yield call(service.queryById, payload.id)
         const { data } = response
         if (data && data.id) {
@@ -126,7 +126,7 @@ export default createFormViewModel({
 
         return null
       },
-      *unlockReceivingGoods ({ payload }, { call }) {
+      *unlockReceivingGoods({ payload }, { call }) {
         const r = yield call(service.unlockReceivingGoods, payload)
         let message = r ? 'Unlocked' : ''
         if (r) {
@@ -136,7 +136,7 @@ export default createFormViewModel({
         }
         return r
       },
-      *saveRG ({ payload }, { call }) {
+      *saveRG({ payload }, { call }) {
         const r = yield call(service.upsert, payload)
         if (r) {
           return r
@@ -145,7 +145,7 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      setNewReceivingGoods (state, { payload }) {
+      setNewReceivingGoods(state, { payload }) {
         return {
           ...state,
           ...state.default,
@@ -157,10 +157,10 @@ export default createFormViewModel({
         }
       },
 
-      setReceivingGoods (state, { payload }) {
+      setReceivingGoods(state, { payload }) {
         const { receivingGoodsItem, receivingGoodsPayment } = payload
-        const itemRows = receivingGoodsItem.map((x) => {
-          const itemType = rgType.find((y) => y.value === x.inventoryItemTypeFK)
+        const itemRows = receivingGoodsItem.map(x => {
+          const itemType = rgType.find(y => y.value === x.inventoryItemTypeFK)
 
           return {
             ...x,

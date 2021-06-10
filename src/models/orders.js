@@ -1,7 +1,7 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import _ from 'lodash'
-import * as service from '@/pages/Inventory/InventoryAdjustment/services'
+import service from '@/pages/Inventory/InventoryAdjustment/services'
 
 import { getUniqueId, maxReducer, calculateAmount } from '@/utils/utils'
 
@@ -74,31 +74,28 @@ export default createListViewModel({
     state: { ...initialState },
     subscriptions: ({ dispatch, history }) => {},
     effects: {
-      *upsertRow ({ payload }, { select, call, put, delay }) {
+      *upsertRow({ payload }, { select, call, put, delay }) {
         const upsert = yield put({
           type: 'upsertRowState',
           payload,
         })
-        const orders = yield select((st) => st.orders)
-        const consultationDocument = yield select(
-          (st) => st.consultationDocument,
-        )
+        const orders = yield select(st => st.orders)
+        const consultationDocument = yield select(st => st.consultationDocument)
         const { rows } = consultationDocument
-        const { entity: { corVaccinationCert = [] } } = orders
+        const {
+          entity: { corVaccinationCert = [] },
+        } = orders
         const activeCORVaccinationCert = corVaccinationCert.find(
-          (vc) => !vc.isDeleted,
+          vc => !vc.isDeleted,
         )
         if (
           activeCORVaccinationCert &&
-          !rows.find((cd) => cd.uid === activeCORVaccinationCert.uid)
+          !rows.find(cd => cd.uid === activeCORVaccinationCert.uid)
         ) {
           yield put({
             type: 'consultationDocument/updateState',
             payload: {
-              rows: [
-                ...rows,
-                activeCORVaccinationCert,
-              ],
+              rows: [...rows, activeCORVaccinationCert],
             },
           })
         }
@@ -116,14 +113,14 @@ export default createListViewModel({
           })
         }
       },
-      *upsertRows ({ payload }, { select, call, put, delay }) {
-        const orders = yield select((st) => st.orders)
+      *upsertRows({ payload }, { select, call, put, delay }) {
+        const orders = yield select(st => st.orders)
         const { rows } = orders
         let newVaccinationCertificates = []
         const getCertificate = (vaccination, uid) => {
           const corVaccinationCert =
             vaccination.type === '2'
-              ? vaccination.corVaccinationCert.map((vc) => {
+              ? vaccination.corVaccinationCert.map(vc => {
                   return {
                     ...vc,
                     vaccinationUFK: uid,
@@ -138,7 +135,7 @@ export default createListViewModel({
         }
         const newVaccinations = [
           ...rows,
-          ...payload.map((v) => {
+          ...payload.map(v => {
             const uid = getUniqueId()
             return {
               ...v,
@@ -158,16 +155,13 @@ export default createListViewModel({
         // insert generate certificate
         if (newVaccinationCertificates.length > 0) {
           const consultationDocument = yield select(
-            (st) => st.consultationDocument,
+            st => st.consultationDocument,
           )
           const { rows: documentRows } = consultationDocument
           yield put({
             type: 'consultationDocument/updateState',
             payload: {
-              rows: [
-                ...documentRows,
-                ...newVaccinationCertificates,
-              ],
+              rows: [...documentRows, ...newVaccinationCertificates],
             },
           })
         }
@@ -183,7 +177,7 @@ export default createListViewModel({
           },
         })
       },
-      *addFinalAdjustment ({ payload }, { select, call, put, delay }) {
+      *addFinalAdjustment({ payload }, { select, call, put, delay }) {
         yield put({
           type: 'addFinalAdjustmentState',
           payload,
@@ -194,7 +188,7 @@ export default createListViewModel({
         })
       },
 
-      *editFinalAdjustment ({ payload }, { select, call, put, delay }) {
+      *editFinalAdjustment({ payload }, { select, call, put, delay }) {
         yield put({
           type: 'editFinalAdjustmentState',
           payload,
@@ -205,7 +199,7 @@ export default createListViewModel({
         })
       },
 
-      *deleteFinalAdjustment ({ payload }, { select, call, put, delay }) {
+      *deleteFinalAdjustment({ payload }, { select, call, put, delay }) {
         yield put({
           type: 'deleteFinalAdjustmentState',
           payload,
@@ -216,40 +210,36 @@ export default createListViewModel({
         })
       },
 
-      *getStockDetails ({ payload }, { call, put }) {
+      *getStockDetails({ payload }, { call, put }) {
         const result = yield call(service.queryStockDetails, payload)
         return result
       },
 
-      *deleteRow ({ payload }, { put, select }) {
-        const orders = yield select((st) => st.orders)
-        const consultationDocument = yield select(
-          (st) => st.consultationDocument,
-        )
+      *deleteRow({ payload }, { put, select }) {
+        const orders = yield select(st => st.orders)
+        const consultationDocument = yield select(st => st.consultationDocument)
         let { finalAdjustments, rows, isGSTInclusive, gstValue } = orders
         const { rows: documentRows } = consultationDocument
-        let tempRows = [
-          ...rows,
-        ]
+        let tempRows = [...rows]
         if (payload) {
-          const deleteRow = rows.find((o) => o.uid === payload.uid)
+          const deleteRow = rows.find(o => o.uid === payload.uid)
           if (deleteRow) {
             // delete auto generated certificate
             if (deleteRow.type === '2') {
               const activeCertificate = deleteRow.corVaccinationCert.find(
-                (vc) => !vc.isDeleted,
+                vc => !vc.isDeleted,
               )
               if (activeCertificate) {
                 let newDocumentRows
                 if (activeCertificate.id > 0) {
-                  newDocumentRows = documentRows.map((d) => {
+                  newDocumentRows = documentRows.map(d => {
                     if (activeCertificate.uid === d.uid)
                       return { ...d, isDeleted: true }
                     return d
                   })
                 } else {
                   newDocumentRows = documentRows.filter(
-                    (d) => d.uid !== activeCertificate.uid,
+                    d => d.uid !== activeCertificate.uid,
                   )
                 }
                 yield put({
@@ -263,13 +253,13 @@ export default createListViewModel({
 
             // delete order
             if (deleteRow.id > 0) {
-              tempRows = rows.map((o) => {
+              tempRows = rows.map(o => {
                 if (!payload || o.uid === payload.uid) {
                   o.isDeleted = true
                   if (deleteRow.type === '2') {
                     o.corVaccinationCert = o.corVaccinationCert
-                      .filter((vc) => vc.id > 0)
-                      .map((vc) => {
+                      .filter(vc => vc.id > 0)
+                      .map(vc => {
                         return { ...vc, isDeleted: true }
                       })
                   }
@@ -277,15 +267,15 @@ export default createListViewModel({
                 return o
               })
             } else {
-              tempRows = rows.filter((o) => o.uid !== payload.uid)
+              tempRows = rows.filter(o => o.uid !== payload.uid)
             }
           }
         } else {
-          tempRows = tempRows.map((o) => ({
+          tempRows = tempRows.map(o => ({
             ...o,
             isDeleted: true,
           }))
-          finalAdjustments = finalAdjustments.map((o) => ({
+          finalAdjustments = finalAdjustments.map(o => ({
             ...o,
             isDeleted: true,
           }))
@@ -306,14 +296,14 @@ export default createListViewModel({
         })
       },
 
-      *addPackage ({ payload }, { select, call, put, delay }) {
+      *addPackage({ payload }, { select, call, put, delay }) {
         yield put({
           type: 'addPackageState',
           payload,
         })
       },
 
-      *deletePackageItem ({ payload }, { select, call, put, delay }) {
+      *deletePackageItem({ payload }, { select, call, put, delay }) {
         yield put({
           type: 'deletePackageItemState',
           payload,
@@ -322,19 +312,19 @@ export default createListViewModel({
     },
 
     reducers: {
-      reset () {
+      reset() {
         return { ...initialState }
       },
-      upsertRowState (state, { payload }) {
+      upsertRowState(state, { payload }) {
         let newRow
         let { rows, type } = state
         if (payload.type) {
           type = payload.type
         }
-        const getCertificate = (uid) => {
+        const getCertificate = uid => {
           const corVaccinationCert =
             type === '2'
-              ? payload.corVaccinationCert.map((vc) => {
+              ? payload.corVaccinationCert.map(vc => {
                   if (vc.uid) {
                     return { ...vc, vaccinationUFK: uid }
                   }
@@ -348,7 +338,7 @@ export default createListViewModel({
           return corVaccinationCert
         }
         if (payload.uid) {
-          rows = rows.map((row) => {
+          rows = rows.map(row => {
             const n =
               row.uid === payload.uid
                 ? {
@@ -372,12 +362,12 @@ export default createListViewModel({
         return {
           ...state,
           rows,
-          entity: newRow || rows.find((r) => r.uid === payload.uid),
+          entity: newRow || rows.find(r => r.uid === payload.uid),
         }
       },
 
       // used by each order component
-      adjustAmount (state, { payload }) {
+      adjustAmount(state, { payload }) {
         return {
           ...state,
           entity: {
@@ -388,7 +378,7 @@ export default createListViewModel({
         }
       },
 
-      calculateAmount (state, { payload = {} }) {
+      calculateAmount(state, { payload = {} }) {
         let { finalAdjustments, rows, isGSTInclusive, gstValue } = state
         const amount = calculateAmount(rows, finalAdjustments, {
           isGSTInclusive,
@@ -401,10 +391,10 @@ export default createListViewModel({
       },
 
       // used by calc total amount
-      addFinalAdjustmentState (state, { payload }) {
+      addFinalAdjustmentState(state, { payload }) {
         let { finalAdjustments, rows } = state
         if (payload.uid) {
-          finalAdjustments = finalAdjustments.map((row) => {
+          finalAdjustments = finalAdjustments.map(row => {
             const n =
               row.uid === payload.uid
                 ? {
@@ -419,7 +409,7 @@ export default createListViewModel({
             ...payload,
             uid: getUniqueId(),
             sequence:
-              finalAdjustments.map((o) => o.sequence).reduce(maxReducer, 0) + 1,
+              finalAdjustments.map(o => o.sequence).reduce(maxReducer, 0) + 1,
           })
         }
         return {
@@ -429,10 +419,10 @@ export default createListViewModel({
       },
 
       // used by calc total amount
-      editFinalAdjustmentState (state, { payload }) {
+      editFinalAdjustmentState(state, { payload }) {
         let { finalAdjustments, rows } = state
         if (payload.uid) {
-          finalAdjustments = finalAdjustments.map((row) => {
+          finalAdjustments = finalAdjustments.map(row => {
             const n =
               row.uid === payload.uid
                 ? {
@@ -447,7 +437,7 @@ export default createListViewModel({
             ...payload,
             uid: getUniqueId(),
             sequence:
-              finalAdjustments.map((o) => o.sequence).reduce(maxReducer, 0) + 1,
+              finalAdjustments.map(o => o.sequence).reduce(maxReducer, 0) + 1,
           })
         }
         return {
@@ -456,19 +446,19 @@ export default createListViewModel({
         }
       },
 
-      deleteFinalAdjustmentState (state, { payload }) {
+      deleteFinalAdjustmentState(state, { payload }) {
         const { finalAdjustments } = state
 
         return {
           ...state,
-          finalAdjustments: finalAdjustments.map((o) => {
+          finalAdjustments: finalAdjustments.map(o => {
             if (o.uid === payload.uid) o.isDeleted = true
             return o
           }),
         }
       },
 
-      addPackageState (state, { payload }) {
+      addPackageState(state, { payload }) {
         let { corPackage } = state
         corPackage.push({
           ...payload,
@@ -480,20 +470,26 @@ export default createListViewModel({
         }
       },
 
-      deletePackageItemState (state, { payload }) {
+      deletePackageItemState(state, { payload }) {
         let { corPackage, rows } = state
-        
-        const activePackageItems = rows.filter(item => item.packageGlobalId === payload.packageGlobalId && item.isDeleted === false)
-        const toBeUpdatedPackage = corPackage.find(p => p.packageGlobalId === payload.packageGlobalId)
+
+        const activePackageItems = rows.filter(
+          item =>
+            item.packageGlobalId === payload.packageGlobalId &&
+            item.isDeleted === false,
+        )
+        const toBeUpdatedPackage = corPackage.find(
+          p => p.packageGlobalId === payload.packageGlobalId,
+        )
         if (toBeUpdatedPackage) {
-          if (activePackageItems.length === 0) {          
+          if (activePackageItems.length === 0) {
             toBeUpdatedPackage.isDeleted = true
-          }
-          else {
-            toBeUpdatedPackage.totalPrice = _.sumBy(activePackageItems, 'totalAfterItemAdjustment') || 0
+          } else {
+            toBeUpdatedPackage.totalPrice =
+              _.sumBy(activePackageItems, 'totalAfterItemAdjustment') || 0
           }
         }
-        
+
         return {
           ...state,
           corPackage,

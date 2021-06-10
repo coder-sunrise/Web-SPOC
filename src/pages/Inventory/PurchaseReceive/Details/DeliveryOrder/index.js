@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
 import $ from 'jquery'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 import Add from '@material-ui/icons/Add'
@@ -14,7 +14,7 @@ import DOGrid from './DOGrid'
 import DODetails from './DODetails'
 import { isPOStatusFulfilled, getAccessRight } from '../../variables'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
   errorMsgStyle: {
     margin: theme.spacing(2),
@@ -41,7 +41,7 @@ class index extends Component {
     mode: '',
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.refreshDeliveryOrder()
   }
 
@@ -91,7 +91,7 @@ class index extends Component {
     }
   }
 
-  onEditDeliveryOrderClicked = async (row) => {
+  onEditDeliveryOrderClicked = async row => {
     const { dispatch } = this.props
     await this.queryInventoryItem()
     await dispatch({
@@ -104,7 +104,7 @@ class index extends Component {
   closeDODetailsModal = () =>
     this.setState({ showDeliveryOrderDetails: false, mode: '' })
 
-  render () {
+  render() {
     const { purchaseOrderDetails, rights, mainDivHeight = 700 } = this.props
     const { purchaseOrder } = purchaseOrderDetails
     const poStatus = purchaseOrder ? purchaseOrder.purchaseOrderStatusFK : 1

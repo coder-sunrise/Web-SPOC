@@ -17,7 +17,7 @@ import {
 } from '@/components'
 import Yup from '@/utils/yup'
 import { getUniqueId } from '@/utils/utils'
-import config from '@/utils/config'
+import { qtyFormat } from '@/utils/config'
 import {
   openCautionAlertPrompt,
   GetOrderItemAccessRight,
@@ -25,8 +25,6 @@ import {
 } from '@/pages/Widgets/Orders/utils'
 import Authorized from '@/utils/Authorized'
 import { getClinicianProfile } from '../../ConsultationDocument/utils'
-
-const { qtyFormat } = config
 
 @connect(
   ({
@@ -82,8 +80,8 @@ const { qtyFormat } = config
     const { entity } = patient
     const { name, patientAccountNo, genderFK, dob } = entity
     const { ctgender = [] } = codetable
-    const gender = ctgender.find((o) => o.id === genderFK) || {}
-    const allDocs = rows.filter((s) => !s.isDeleted)
+    const gender = ctgender.find(o => o.id === genderFK) || {}
+    const allDocs = rows.filter(s => !s.isDeleted)
     let nextDocumentSequence = 1
     if (allDocs && allDocs.length > 0) {
       const { sequence: documentSequence } = _.maxBy(allDocs, 'sequence')
@@ -92,33 +90,34 @@ const { qtyFormat } = config
     let showNoTemplate
 
     const { doctorProfileFK } = visitRegistration.entity.visit
-    const visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK).clinicianProfile.userProfileFK
+    const visitDoctorUserId = doctorprofile.find(d => d.id === doctorProfileFK)
+      .clinicianProfile.userProfileFK
 
-    const getInstruction = (inventoryMedication) => {
+    const getInstruction = inventoryMedication => {
       let instruction = ''
       const usageMethod = ctmedicationusage.find(
-        (codeTableItem) =>
+        codeTableItem =>
           codeTableItem.id === inventoryMedication.medicationUsageFK,
       )
       instruction += `${usageMethod ? usageMethod.name : ''} `
       const dosage = ctmedicationdosage.find(
-        (codeTableItem) =>
+        codeTableItem =>
           codeTableItem.id === inventoryMedication.prescribingDosageFK,
       )
       instruction += `${dosage ? dosage.displayValue : ''} `
       const prescribe = ctmedicationunitofmeasurement.find(
-        (codeTableItem) =>
+        codeTableItem =>
           codeTableItem.id === inventoryMedication.prescribingUOMFK,
       )
       instruction += `${prescribe ? prescribe.name : ''} `
       const drugFrequency = ctmedicationfrequency.find(
-        (codeTableItem) =>
+        codeTableItem =>
           codeTableItem.id === inventoryMedication.medicationFrequencyFK,
       )
       instruction += `${drugFrequency ? drugFrequency.displayValue : ''} For `
-      instruction += `${inventoryMedication.duration
-        ? inventoryMedication.duration
-        : ''} day(s)`
+      instruction += `${
+        inventoryMedication.duration ? inventoryMedication.duration : ''
+      } day(s)`
       return instruction
     }
 
@@ -128,29 +127,29 @@ const { qtyFormat } = config
       let item
       if (inventoryMedication.isActive === true) {
         const medicationdispensingUOM = ctmedicationunitofmeasurement.find(
-          (uom) => uom.id === inventoryMedication.dispensingUOMFK,
+          uom => uom.id === inventoryMedication.dispensingUOMFK,
         )
         const medicationusage = ctmedicationusage.find(
-          (usage) => usage.id === inventoryMedication.medicationUsageFK,
+          usage => usage.id === inventoryMedication.medicationUsageFK,
         )
         const medicationfrequency = ctmedicationfrequency.find(
-          (frequency) =>
+          frequency =>
             frequency.id === inventoryMedication.medicationFrequencyFK,
         )
         const medicationdosage = ctmedicationdosage.find(
-          (dosage) => dosage.id === inventoryMedication.prescribingDosageFK,
+          dosage => dosage.id === inventoryMedication.prescribingDosageFK,
         )
         const medicationprescribingUOM = ctmedicationunitofmeasurement.find(
-          (uom) => uom.id === inventoryMedication.prescribingUOMFK,
+          uom => uom.id === inventoryMedication.prescribingUOMFK,
         )
         const medicationPrecautions =
           inventoryMedication.inventoryMedication_MedicationPrecaution
         const isDefaultBatchNo = inventoryMedication.medicationStock.find(
-          (o) => o.isDefault === true,
+          o => o.isDefault === true,
         )
         let currentMedicationPrecautions = []
         currentMedicationPrecautions = currentMedicationPrecautions.concat(
-          medicationPrecautions.map((o) => {
+          medicationPrecautions.map(o => {
             return {
               precautionCode: o.medicationPrecaution.code,
               Precaution: o.medicationPrecaution.name,
@@ -238,16 +237,16 @@ const { qtyFormat } = config
       let item
       if (inventoryVaccination.isActive === true) {
         const vaccinationUOM = ctvaccinationunitofmeasurement.find(
-          (uom) => uom.id === inventoryVaccination.prescribingUOMFK,
+          uom => uom.id === inventoryVaccination.prescribingUOMFK,
         )
         const vaccinationusage = ctvaccinationusage.find(
-          (usage) => usage.id === inventoryVaccination.vaccinationUsageFK,
+          usage => usage.id === inventoryVaccination.vaccinationUsageFK,
         )
         const vaccinationdosage = ctmedicationdosage.find(
-          (dosage) => dosage.id === inventoryVaccination.prescribingDosageFK,
+          dosage => dosage.id === inventoryVaccination.prescribingDosageFK,
         )
         const isDefaultBatchNo = inventoryVaccination.vaccinationStock.find(
-          (o) => o.isDefault === true,
+          o => o.isDefault === true,
         )
 
         item = {
@@ -296,7 +295,7 @@ const { qtyFormat } = config
       if (item.isGenerateCertificate) {
         const { documenttemplate = [] } = codetable
         const defaultTemplate = documenttemplate.find(
-          (dt) =>
+          dt =>
             dt.isDefaultTemplate === true && dt.documentTemplateTypeFK === 3,
         )
         if (defaultTemplate) {
@@ -363,7 +362,7 @@ const { qtyFormat } = config
       const { inventoryConsumable } = orderSetItem
 
       const isDefaultBatchNo = inventoryConsumable.consumableStock.find(
-        (o) => o.isDefault === true,
+        o => o.isDefault === true,
       )
 
       let item
@@ -454,7 +453,7 @@ const { qtyFormat } = config
   displayName: 'OrderPage',
 })
 class OrderSet extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     const { dispatch } = props
     const codeTableNameArray = [
@@ -473,7 +472,7 @@ class OrderSet extends PureComponent {
     })
 
     this.tableProps = {
-      getRowId: (r) => r.uid,
+      getRowId: r => r.uid,
       columns: [
         { name: 'typeName', title: 'Type' },
         { name: 'name', title: 'Name' },
@@ -483,7 +482,7 @@ class OrderSet extends PureComponent {
       columnExtensions: [
         {
           columnName: 'typeName',
-          render: (row) => {
+          render: row => {
             if (row.isActive === true) {
               return <CustomInput text value={row.typeName} />
             }
@@ -492,7 +491,7 @@ class OrderSet extends PureComponent {
         },
         {
           columnName: 'name',
-          render: (row) => {
+          render: row => {
             if (row.isActive === true) {
               return <CustomInput text value={row.name} />
             }
@@ -502,7 +501,7 @@ class OrderSet extends PureComponent {
         {
           columnName: 'quantity',
           align: 'right',
-          render: (row) => {
+          render: row => {
             if (row.isActive === true) {
               return (
                 <CustomInput
@@ -524,7 +523,7 @@ class OrderSet extends PureComponent {
         {
           columnName: 'subTotal',
           align: 'right',
-          render: (row) => {
+          render: row => {
             if (row.isActive === true) {
               return <NumberInput text currency value={row.subTotal} />
             }
@@ -539,14 +538,14 @@ class OrderSet extends PureComponent {
       let rows = []
       if (op && op.medicationOrderSetItem) {
         rows = rows.concat(
-          op.medicationOrderSetItem.map((o) => {
+          op.medicationOrderSetItem.map(o => {
             return {
               ...o,
               name: o.medicationName,
               uid: getUniqueId(),
               type: '1',
               typeName:
-                orderTypes.find((type) => type.value === '1').name +
+                orderTypes.find(type => type.value === '1').name +
                 (o.inventoryMedication.isActive === true ? '' : ' (Inactive)'),
               isActive: o.inventoryMedication.isActive === true,
               caution: o.inventoryMedication.caution,
@@ -557,14 +556,14 @@ class OrderSet extends PureComponent {
       }
       if (op && op.vaccinationOrderSetItem) {
         rows = rows.concat(
-          op.vaccinationOrderSetItem.map((o) => {
+          op.vaccinationOrderSetItem.map(o => {
             return {
               ...o,
               name: o.vaccinationName,
               uid: getUniqueId(),
               type: '2',
               typeName:
-                orderTypes.find((type) => type.value === '2').name +
+                orderTypes.find(type => type.value === '2').name +
                 (o.inventoryVaccination.isActive === true ? '' : ' (Inactive)'),
               isActive: o.inventoryVaccination.isActive === true,
               caution: o.inventoryVaccination.caution,
@@ -575,14 +574,14 @@ class OrderSet extends PureComponent {
       }
       if (op && op.serviceOrderSetItem) {
         rows = rows.concat(
-          op.serviceOrderSetItem.map((o) => {
+          op.serviceOrderSetItem.map(o => {
             return {
               ...o,
               name: o.serviceName,
               uid: getUniqueId(),
               type: '3',
               typeName:
-                orderTypes.find((type) => type.value === '3').name +
+                orderTypes.find(type => type.value === '3').name +
                 (o.service.isActive &&
                 o.service.ctServiceCenter_ServiceNavigation[0]
                   .serviceCenterFKNavigation.isActive === true
@@ -598,14 +597,14 @@ class OrderSet extends PureComponent {
       }
       if (op && op.consumableOrderSetItem) {
         rows = rows.concat(
-          op.consumableOrderSetItem.map((o) => {
+          op.consumableOrderSetItem.map(o => {
             return {
               ...o,
               name: o.consumableName,
               uid: getUniqueId(),
               type: '4',
               typeName:
-                orderTypes.find((type) => type.value === '4').name +
+                orderTypes.find(type => type.value === '4').name +
                 (o.inventoryConsumable.isActive === true ? '' : ' (Inactive)'),
               isActive: o.inventoryConsumable.isActive === true,
             }
@@ -619,7 +618,7 @@ class OrderSet extends PureComponent {
       })
 
       const hasCautionItems = rows.filter(
-        (f) => f.caution && f.caution.trim().length > 0,
+        f => f.caution && f.caution.trim().length > 0,
       )
       if (hasCautionItems.length > 0) {
         openCautionAlertPrompt(hasCautionItems, () => {})
@@ -646,7 +645,7 @@ class OrderSet extends PureComponent {
     return false
   }
 
-  render () {
+  render() {
     const { theme, values, footer, from } = this.props
     return (
       <Authorized
@@ -660,7 +659,7 @@ class OrderSet extends PureComponent {
             <GridItem xs={6}>
               <Field
                 name='inventoryOrderSetFK'
-                render={(args) => {
+                render={args => {
                   return (
                     <div id={`autofocus_${values.type}`}>
                       <CodeSelect

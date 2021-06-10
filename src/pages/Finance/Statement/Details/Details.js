@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 import Print from '@material-ui/icons/Print'
 import Refresh from '@material-ui/icons/Refresh'
 import { withStyles } from '@material-ui/core'
@@ -20,7 +20,7 @@ import CollectPaymentConfirm from './CollectPaymentConfirm'
 import ExtractAsSingle from './ExtractAsSingle'
 import PrintStatementReport from '../PrintStatementReport'
 
-const styles = (theme) => ({
+const styles = theme => ({
   gridContainer: {
     marginBottom: '10px',
   },
@@ -84,9 +84,9 @@ class Details extends PureComponent {
     })
   }
 
-  gridGetRowID = (row) => row.invoicePayerFK
+  gridGetRowID = row => row.invoicePayerFK
 
-  handleSelectionChange = (selection) => {
+  handleSelectionChange = selection => {
     this.setState({ selectedRows: selection })
   }
 
@@ -94,9 +94,9 @@ class Details extends PureComponent {
     const { statement } = this.props
     let rows = []
     let selectedInvoiceNos = []
-    this.state.selectedRows.forEach((o) => {
+    this.state.selectedRows.forEach(o => {
       const invoice = statement.entity.statementInvoice.find(
-        (r) => r.invoicePayerFK === o,
+        r => r.invoicePayerFK === o,
       )
       if (!invoice) {
         return
@@ -108,12 +108,12 @@ class Details extends PureComponent {
       extractRows: rows,
       selectedRows: selectedInvoiceNos,
     })
-    this.setState((prevState) => {
+    this.setState(prevState => {
       return { showModal: !prevState.showModal }
     })
   }
 
-  printInvoice = (row) => {
+  printInvoice = row => {
     window.g_app._store.dispatch({
       type: 'report/updateState',
       payload: {
@@ -128,7 +128,7 @@ class Details extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const {
       columns,
       showCollectPayment,
@@ -240,7 +240,7 @@ class Details extends PureComponent {
               columnName: 'action',
               align: 'center',
               width: 80,
-              render: (r) => {
+              render: r => {
                 return (
                   <Tooltip title='Print'>
                     <Button
@@ -265,9 +265,9 @@ class Details extends PureComponent {
             selectable: true,
             selectConfig: {
               showSelectAll: true,
-              rowSelectionEnabled: (row) => {
+              rowSelectionEnabled: row => {
                 return !row.statementInvoicePayment.find(
-                  (o) => o.invoicePayment.isCancelled === false,
+                  o => o.invoicePayment.isCancelled === false,
                 )
               },
             },
@@ -278,11 +278,13 @@ class Details extends PureComponent {
         />
 
         <p style={{ margin: theme.spacing(1) }}>
-          {`Last Refreshed On ${values.lastRefreshTime
-            ? moment(values.lastRefreshTime).format(
-                dateFormatLongWithTimeNoSec12h,
-              )
-            : '-'}`}
+          {`Last Refreshed On ${
+            values.lastRefreshTime
+              ? moment(values.lastRefreshTime).format(
+                  dateFormatLongWithTimeNoSec12h,
+                )
+              : '-'
+          }`}
         </p>
 
         <CommonModal

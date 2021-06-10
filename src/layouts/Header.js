@@ -1,9 +1,9 @@
 import React, { PureComponent } from 'react'
-import { formatMessage } from 'umi/locale'
+import { formatMessage, history } from 'umi'
 import { Layout, message } from 'antd'
 import Animate from 'rc-animate'
 import { connect } from 'dva'
-import router from 'umi/router'
+
 import GlobalHeader from '@/components/GlobalHeader'
 import TopNavHeader from '@/components/TopNavHeader'
 import { toast } from '@/components'
@@ -16,7 +16,7 @@ class HeaderView extends PureComponent {
     visible: true,
   }
 
-  static getDerivedStateFromProps (props, state) {
+  static getDerivedStateFromProps(props, state) {
     if (!props.autoHideHeader && !state.visible) {
       return {
         visible: true,
@@ -25,11 +25,11 @@ class HeaderView extends PureComponent {
     return null
   }
 
-  componentDidMount () {
+  componentDidMount() {
     document.addEventListener('scroll', this.handScroll, { passive: true })
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     document.removeEventListener('scroll', this.handScroll)
   }
 
@@ -42,7 +42,7 @@ class HeaderView extends PureComponent {
     return collapsed ? 'calc(100% - 80px)' : 'calc(100% - 256px)'
   }
 
-  handleNoticeClear = (type) => {
+  handleNoticeClear = type => {
     const { setting } = this.props
     if (setting.ui === 'mui') {
       toast.success(
@@ -72,15 +72,15 @@ class HeaderView extends PureComponent {
   handleMenuClick = ({ key }) => {
     const { dispatch } = this.props
     if (key === 'userCenter') {
-      router.push('/account/center')
+      history.push('/account/center')
       return
     }
     if (key === 'triggerError') {
-      router.push('/exception/trigger')
+      history.push('/exception/trigger')
       return
     }
     if (key === 'userinfo') {
-      router.push('/account/settings/base')
+      history.push('/account/settings/base')
       return
     }
     if (key === 'logout') {
@@ -90,7 +90,7 @@ class HeaderView extends PureComponent {
     }
   }
 
-  handleNoticeVisibleChange = (visible) => {
+  handleNoticeVisibleChange = visible => {
     if (visible) {
       const { dispatch } = this.props
       dispatch({
@@ -131,7 +131,7 @@ class HeaderView extends PureComponent {
     }
   }
 
-  render () {
+  render() {
     const { isMobile, handleMenuCollapse, setting } = this.props
     const { navTheme, layout, fixedHeader } = setting
     const { visible } = this.state

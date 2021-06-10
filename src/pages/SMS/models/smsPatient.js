@@ -1,5 +1,5 @@
 import { createListViewModel } from 'medisys-model'
-import * as service from '../services'
+import service from '../services'
 
 export default createListViewModel({
   namespace: 'smsPatient',

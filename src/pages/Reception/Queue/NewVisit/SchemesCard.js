@@ -5,7 +5,7 @@ import { FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // umi
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 // custom components
 import {
   DatePicker,
@@ -16,7 +16,7 @@ import {
   SizeContainer,
 } from '@/components'
 
-const styles = (theme) => ({
+const styles = theme => ({
   container: {
     maxHeight: '40vh',
     overflowY: 'auto',
@@ -41,7 +41,7 @@ const CHASScheme = ({ classes }) => (
         <GridItem xs md={12}>
           <FastField
             name='Validity'
-            render={(args) => (
+            render={args => (
               <DatePicker
                 prefix='Validity: '
                 defaultValue={moment()}
@@ -55,7 +55,7 @@ const CHASScheme = ({ classes }) => (
         <GridItem xs md={12}>
           <FastField
             name='Balance'
-            render={(args) => (
+            render={args => (
               <NumberInput
                 {...args}
                 currency
@@ -80,7 +80,7 @@ const OtherScheme = ({ classes }) => (
         <GridItem xs md={12}>
           <FastField
             name='payer'
-            render={(args) => (
+            render={args => (
               <TextField
                 {...args}
                 disabled
@@ -94,7 +94,7 @@ const OtherScheme = ({ classes }) => (
         <GridItem xs md={12}>
           <FastField
             name='Validity'
-            render={(args) => (
+            render={args => (
               <DatePicker
                 prefix='Validity: '
                 defaultValue={moment()}
@@ -108,7 +108,7 @@ const OtherScheme = ({ classes }) => (
         <GridItem xs md={12}>
           <FastField
             name='Balance'
-            render={(args) => (
+            render={args => (
               <NumberInput
                 {...args}
                 currency
@@ -126,7 +126,7 @@ const OtherScheme = ({ classes }) => (
 )
 
 class SchemesCard extends PureComponent {
-  render () {
+  render() {
     const { classes } = this.props
     return (
       <div className={classes.container}>

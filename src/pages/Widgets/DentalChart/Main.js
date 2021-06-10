@@ -8,13 +8,13 @@ import DiagnosisPanel from './DiagnosisPanel'
 import TreatmentForm from './TreatmentForm'
 import RightPanel from './RightPanel/index.js'
 import Chart from './Chart'
-import model from './models'
-import modelSetup from './models/setup'
+// import model from './models'
+// import modelSetup from './models/setup'
 
-window.g_app.replaceModel(model)
-window.g_app.replaceModel(modelSetup)
+// window.g_app.replaceModel(model)
+// window.g_app.replaceModel(modelSetup)
 
-const styles = (theme) => ({
+const styles = theme => ({
   paper: {
     display: 'flex',
     border: `1px solid ${theme.palette.divider}`,
@@ -78,7 +78,7 @@ const styles = (theme) => ({
   }),
 )
 class DentalChart extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.props.dispatch({
       type: 'codetable/fetchCodes',
@@ -90,7 +90,7 @@ class DentalChart extends React.Component {
     })
   }
 
-  componentWillReceiveProps (np) {
+  componentWillReceiveProps(np) {
     if (
       this.props.dentalChartComponent.data.length === 0 &&
       np.consultation.entity &&
@@ -113,7 +113,7 @@ class DentalChart extends React.Component {
     }
   }
 
-  render () {
+  render() {
     const {
       className,
       canvasDivStyle,

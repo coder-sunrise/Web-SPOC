@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
 import * as Yup from 'yup'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { withStyles, Divider } from '@material-ui/core'
 import { getBizSession } from '@/services/queue'
 import Authorized from '@/utils/Authorized'
@@ -98,10 +98,7 @@ const style = () => ({
       : deposit.default.balance
 
     const amountSchema = Yup.number().when(
-      [
-        'transactionTypeFK',
-        'maxTranseferAmount',
-      ],
+      ['transactionTypeFK', 'maxTranseferAmount'],
       (transactionTypeFK, maxTranseferAmount) => {
         if (transactionTypeFK === 2)
           return Yup.number()
@@ -120,14 +117,14 @@ const style = () => ({
     )
     return Yup.object().shape({
       patientDepositTransaction: Yup.object().when('invoicePayerFK', {
-        is: (val) => !val,
+        is: val => !val,
         then: Yup.object().shape({
           transactionDate: Yup.string().required('Date is required'),
           transactionBizSessionFK: Yup.number().required(),
           transactionModeFK: Yup.number().required('Mode is required'),
           amount: amountSchema,
           creditCardTypeFK: Yup.number().when('transactionModeFK', {
-            is: (val) => val === 1,
+            is: val => val === 1,
             then: Yup.number().required(),
           }),
         }),
@@ -158,10 +155,10 @@ const style = () => ({
     let transactionMode
     let creditCardType
     if (!invoicePayerFK) {
-      transactionMode = ctpaymentmode.find((o) => o.id === transactionModeFK)
+      transactionMode = ctpaymentmode.find(o => o.id === transactionModeFK)
         .displayValue
       if (transactionModeFK === 1) {
-        creditCardType = ctcreditcardtype.find((o) => o.id === creditCardTypeFK)
+        creditCardType = ctcreditcardtype.find(o => o.id === creditCardTypeFK)
           .name
       }
     }
@@ -191,7 +188,7 @@ const style = () => ({
                 : 'Refund from patient deposit account'),
         },
       },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         notification.success({
           message: `${transType} successfully`,
@@ -206,7 +203,7 @@ const style = () => ({
   displayName: 'Deposit',
 })
 class Modal extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       isSessionRequired: false,
@@ -215,7 +212,7 @@ class Modal extends PureComponent {
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch, isDeposit } = this.props
 
     this.fetchLatestBizSessions()
@@ -224,10 +221,10 @@ class Modal extends PureComponent {
       payload: {
         code: 'ctpaymentmode',
       },
-    }).then((v) => {
+    }).then(v => {
       let paymentMode = v
       if (isDeposit) {
-        paymentMode = v.filter((o) => o.code !== 'DEPOSIT')
+        paymentMode = v.filter(o => o.code !== 'DEPOSIT')
       }
       this.setState({ paymentMode })
     })
@@ -237,11 +234,9 @@ class Modal extends PureComponent {
     const { setFieldValue } = this.props
     const payload = {
       pagesize: 1,
-      sorting: [
-        { columnName: 'sessionStartDate', direction: 'desc' },
-      ],
+      sorting: [{ columnName: 'sessionStartDate', direction: 'desc' }],
     }
-    getBizSession(payload).then((response) => {
+    getBizSession(payload).then(response => {
       const { status, data } = response
       if (parseInt(status, 10) === 200 && data.totalRecords > 0) {
         const { data: sessionData } = data
@@ -270,7 +265,7 @@ class Modal extends PureComponent {
     })
   }
 
-  onChangeDate = (event) => {
+  onChangeDate = event => {
     if (event) {
       const { isDeposit } = this.props
       const selectedDate = moment(event).format('YYMMDD')
@@ -284,7 +279,7 @@ class Modal extends PureComponent {
     }
   }
 
-  getBizList = (date) => {
+  getBizList = date => {
     const { dispatch, setFieldValue } = this.props
     const momentDate = moment(date, serverDateFormat)
 
@@ -307,9 +302,7 @@ class Modal extends PureComponent {
             combineCondition: 'or',
           },
         ],
-        sorting: [
-          { columnName: 'sessionStartDate', direction: 'desc' },
-        ],
+        sorting: [{ columnName: 'sessionStartDate', direction: 'desc' }],
       },
     }).then(() => {
       const { bizSessionList } = this.props.deposit
@@ -322,7 +315,7 @@ class Modal extends PureComponent {
     })
   }
 
-  onChangePaymentMode = (event) => {
+  onChangePaymentMode = event => {
     const { setFieldValue } = this.props
     const selectedValue = event || ''
 
@@ -335,7 +328,7 @@ class Modal extends PureComponent {
     }
   }
 
-  calculateBalanceAfter = (event) => {
+  calculateBalanceAfter = event => {
     const { value = 0 } = event.target
     const { isDeposit, errors, initialValues, setFieldValue } = this.props
     const { balance } = this.props.values || 0
@@ -348,7 +341,7 @@ class Modal extends PureComponent {
     setFieldValue('balanceAfter', finalBalance)
   }
 
-  render () {
+  render() {
     const { props } = this
     const { classes, footer, isDeposit, deposit, invoicePayerFK } = props
     const { bizSessionList } = deposit
@@ -369,11 +362,11 @@ class Modal extends PureComponent {
             <GridItem xs={12}>
               <Field
                 name='patientDepositTransaction.transactionDate'
-                render={(args) => (
+                render={args => (
                   <DatePicker
                     timeFomat={false}
                     onChange={this.onChangeDate}
-                    disabledDate={(d) => !d || d.isAfter(moment())}
+                    disabledDate={d => !d || d.isAfter(moment())}
                     label='Date'
                     autoFocus
                     disabled={!allowAddToPastSession}
@@ -385,7 +378,7 @@ class Modal extends PureComponent {
             <GridItem xs={12}>
               <Field
                 name='patientDepositTransaction.transactionBizSessionFK'
-                render={(args) => (
+                render={args => (
                   <Select
                     label='Session'
                     options={bizSessionList}
@@ -400,10 +393,10 @@ class Modal extends PureComponent {
               {!invoicePayerFK && (
                 <Field
                   name='patientDepositTransaction.transactionModeFK'
-                  render={(args) => (
+                  render={args => (
                     <Select
                       label='Mode'
-                      onChange={(e) => this.onChangePaymentMode(e)}
+                      onChange={e => this.onChangePaymentMode(e)}
                       options={paymentMode}
                       labelField='displayValue'
                       valueField='id'
@@ -415,11 +408,10 @@ class Modal extends PureComponent {
             </GridItem>
 
             <GridItem xs={12}>
-              {!invoicePayerFK &&
-              isCardPayment && (
+              {!invoicePayerFK && isCardPayment && (
                 <Field
                   name='patientDepositTransaction.creditCardTypeFK'
-                  render={(args) => (
+                  render={args => (
                     <CodeSelect
                       label='Card Type'
                       code='ctCreditCardType'
@@ -434,7 +426,7 @@ class Modal extends PureComponent {
               {!invoicePayerFK && (
                 <Field
                   name='patientDepositTransaction.modeRemarks'
-                  render={(args) => (
+                  render={args => (
                     <TextField
                       multiline
                       rowsMax='3'
@@ -450,7 +442,7 @@ class Modal extends PureComponent {
             <GridItem xs={12}>
               <Field
                 name='patientDepositTransaction.remarks'
-                render={(args) => (
+                render={args => (
                   <TextField
                     multiline
                     rowsMax='5'
@@ -472,7 +464,7 @@ class Modal extends PureComponent {
               {!invoicePayerFK && (
                 <Field
                   name='balance'
-                  render={(args) => (
+                  render={args => (
                     <NumberInput
                       defaultValue='0.00'
                       disabled
@@ -491,7 +483,7 @@ class Modal extends PureComponent {
             <GridItem md={3}>
               <Field
                 name='patientDepositTransaction.amount'
-                render={(args) => (
+                render={args => (
                   <NumberInput
                     defaultValue='0.00'
                     onChange={this.calculateBalanceAfter}
@@ -511,7 +503,7 @@ class Modal extends PureComponent {
               {!invoicePayerFK && (
                 <Field
                   name='balanceAfter'
-                  render={(args) => (
+                  render={args => (
                     <NumberInput
                       style={{ top: -5 }}
                       {...commonAmountOpts}

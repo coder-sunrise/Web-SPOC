@@ -26,10 +26,10 @@ import { FastField, withFormik } from 'formik'
 //     }
 //   }
 // }
-const compare = (...props) => (Component) => {
+const compare = (...props) => Component => {
   // console.log(props)
   return class BasicComponent extends React.Component {
-    shouldComponentUpdate (nextProps, nextStates) {
+    shouldComponentUpdate(nextProps, nextStates) {
       // console.log(this.props)
       // console.log(nextProps)
 
@@ -59,7 +59,7 @@ const compare = (...props) => (Component) => {
       return false
     }
 
-    render () {
+    render() {
       // console.log(props, Component)
       return <Component {...this.props} />
     }
@@ -175,9 +175,4 @@ const compare = (...props) => (Component) => {
 //     return hoistNonReactStatics_cjs(C, Component)
 //   }
 // }
-
-module.exports = {
-  // withFormikExtend,
-  compare,
-  ...module.exports,
-}
+export { compare }

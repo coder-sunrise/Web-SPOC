@@ -1,6 +1,6 @@
 import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
-import * as service from '@/services/invoicePayment'
+import service from '@/services/invoicePayment'
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
 const InitialCreditNote = {
@@ -35,7 +35,7 @@ export default createFormViewModel({
     },
     effects: {},
     reducers: {
-      mapCreditNote (state, { payload }) {
+      mapCreditNote(state, { payload }) {
         const {
           invoicePayerFK,
           invoiceDetail,
@@ -49,10 +49,10 @@ export default createFormViewModel({
           gstValue,
           invoiceGSTAmt,
         } = invoiceDetail
-        const sum = (a) => a.reduce((x, y) => x + y)
+        const sum = a => a.reduce((x, y) => x + y)
 
         const filterInvPayment = invoicePaymentDetails.find(
-          (x) => x.id === invoicePayerFK,
+          x => x.id === invoicePayerFK,
         )
         const {
           payerTypeFK,
@@ -67,14 +67,11 @@ export default createFormViewModel({
             : outStanding
 
         const filteredCreditNote = creditNote.filter(
-          (x) => x.invoicePayerFK === invoicePayerFK && !x.isCancelled,
+          x => x.invoicePayerFK === invoicePayerFK && !x.isCancelled,
         )
         const pastCreditNoteItems = filteredCreditNote
           .reduce((filtered, item) => {
-            return [
-              ...filtered,
-              ...item.creditNoteItem,
-            ]
+            return [...filtered, ...item.creditNoteItem]
           }, [])
           .reduce(
             (itemSubtotal, item) =>
@@ -88,7 +85,7 @@ export default createFormViewModel({
             {},
           )
 
-        const remainingItems = invoiceItem.map((item) => {
+        const remainingItems = invoiceItem.map(item => {
           // const pastItemQuantity = pastCreditNoteItems[item.itemCode]
           // if (pastItemQuantity) {
           //   const remainingQty = item.quantity - pastItemQuantity
@@ -121,7 +118,7 @@ export default createFormViewModel({
         let totalCreditNote
         totalCreditNote =
           filteredCreditNote.length > 0
-            ? sum(filteredCreditNote.map((x) => Number(x.totalAftGST)))
+            ? sum(filteredCreditNote.map(x => Number(x.totalAftGST)))
             : 0
 
         return {
@@ -132,7 +129,7 @@ export default createFormViewModel({
           invoicePayerFK,
           invoiceTotal: invoiceTotalAftGST,
           creditNoteItem: remainingItems
-            ? remainingItems.filter((x) => x.originRemainingQty > 0)
+            ? remainingItems.filter(x => x.originRemainingQty > 0)
             : [],
           creditNoteBalance: creditNoteBalance - totalCreditNote,
         }

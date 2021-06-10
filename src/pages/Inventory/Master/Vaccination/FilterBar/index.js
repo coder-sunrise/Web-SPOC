@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { FastField, withFormik } from 'formik'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 import { Search, Add, ImportExport, AttachFile } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
@@ -21,7 +21,7 @@ import {
   notification,
 } from '@/components'
 
-const styles = (theme) => ({
+const styles = theme => ({
   filterBar: {
     marginBottom: '10px',
   },
@@ -38,15 +38,9 @@ const styles = (theme) => ({
 const allowedFiles = '.xlsx'
 
 const FilterBar = ({ classes, dispatch, history, values }) => {
-  const [
-    exporting,
-    setExporting,
-  ] = useState(false)
+  const [exporting, setExporting] = useState(false)
 
-  const [
-    loadingText,
-    setLoadingText,
-  ] = useState('')
+  const [loadingText, setLoadingText] = useState('')
 
   const inputEl = useRef(null)
 
@@ -56,7 +50,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
 
     dispatch({
       type: 'vaccination/export',
-    }).then((result) => {
+    }).then(result => {
       if (result) {
         downloadFile(result, 'Vaccination.xlsx')
       }
@@ -80,11 +74,11 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
     })
   }
 
-  const clearValue = (e) => {
+  const clearValue = e => {
     e.target.value = null
   }
 
-  const mapToFileDto = async (file) => {
+  const mapToFileDto = async file => {
     const base64 = await convertToBase64(file)
     const originalFile = {
       content: base64,
@@ -97,12 +91,12 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
     inputEl.current.click()
   }
 
-  const onFileChange = async (event) => {
+  const onFileChange = async event => {
     try {
       const { files } = event.target
 
       const selectedFiles = await Promise.all(
-        Object.keys(files).map((key) => mapToFileDto(files[key])),
+        Object.keys(files).map(key => mapToFileDto(files[key])),
       )
 
       if (selectedFiles.length > 0) {
@@ -114,7 +108,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
           payload: {
             ...selectedFiles[0],
           },
-        }).then((result) => {
+        }).then(result => {
           if (result && result.byteLength === 0) {
             notification.success({
               message: 'Import success',
@@ -147,7 +141,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
         <GridItem xs={6} md={3}>
           <FastField
             name='code'
-            render={(args) => {
+            render={args => {
               return (
                 <TextField
                   label={formatMessage({
@@ -162,7 +156,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
         <GridItem xs={6} md={3}>
           <FastField
             name='displayValue'
-            render={(args) => {
+            render={args => {
               return (
                 <TextField
                   label={formatMessage({
@@ -177,7 +171,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
         <GridItem xs={6} md={3}>
           <FastField
             name='supplier'
-            render={(args) => {
+            render={args => {
               return (
                 <CodeSelect
                   label={formatMessage({
@@ -194,7 +188,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
         <GridItem xs={6} md={3}>
           <FastField
             name='isActive'
-            render={(args) => {
+            render={args => {
               return (
                 <Select
                   label={formatMessage({

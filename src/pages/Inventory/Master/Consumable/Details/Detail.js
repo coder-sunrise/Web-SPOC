@@ -1,5 +1,5 @@
 import React from 'react'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { withStyles } from '@material-ui/core/styles'
 import { FastField } from 'formik'
 import { compose } from 'redux'
@@ -34,7 +34,7 @@ const Detail = ({ consumableDetail, hasActiveSession, theme }) => {
               <GridItem xs={12}>
                 <FastField
                   name='code'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <TextField
                         label={formatMessage({
@@ -49,7 +49,7 @@ const Detail = ({ consumableDetail, hasActiveSession, theme }) => {
               <GridItem xs={12}>
                 <FastField
                   name='displayValue'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <TextField
                         label={formatMessage({
@@ -65,7 +65,7 @@ const Detail = ({ consumableDetail, hasActiveSession, theme }) => {
               <GridItem xs={12}>
                 <FastField
                   name='description'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <TextField
                         label={formatMessage({
@@ -80,7 +80,7 @@ const Detail = ({ consumableDetail, hasActiveSession, theme }) => {
               <GridItem xs={12}>
                 <FastField
                   name='remarks'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <TextField
                         label={formatMessage({
@@ -97,7 +97,7 @@ const Detail = ({ consumableDetail, hasActiveSession, theme }) => {
               <GridItem>
                 <FastField
                   name='chas'
-                  render={(args) => (
+                  render={args => (
                     <CheckboxGroup
                       vertical
                       simple
@@ -135,7 +135,7 @@ const Detail = ({ consumableDetail, hasActiveSession, theme }) => {
               <GridItem xs={12}>
                 <FastField
                   name='favouriteSupplierFK'
-                  render={(args) => (
+                  render={args => (
                     <CodeSelect
                       label={formatMessage({
                         id: 'inventory.master.consumable.supplier',
@@ -151,7 +151,7 @@ const Detail = ({ consumableDetail, hasActiveSession, theme }) => {
               <GridItem xs={12}>
                 <FastField
                   name='uomfk'
-                  render={(args) => (
+                  render={args => (
                     <CodeSelect
                       label={formatMessage({
                         id: 'inventory.master.consumable.baseUOM',
@@ -166,7 +166,7 @@ const Detail = ({ consumableDetail, hasActiveSession, theme }) => {
               <GridItem xs={12}>
                 <FastField
                   name='consumableCategoryFK'
-                  render={(args) => (
+                  render={args => (
                     <CodeSelect
                       label={formatMessage({
                         id: 'inventory.master.consumable.category',
@@ -180,7 +180,7 @@ const Detail = ({ consumableDetail, hasActiveSession, theme }) => {
               <GridItem xs={12}>
                 <FastField
                   name='revenueCategoryFK'
-                  render={(args) => (
+                  render={args => (
                     <CodeSelect
                       label={formatMessage({
                         id: 'inventory.master.medication.revenueCategory',
@@ -194,7 +194,7 @@ const Detail = ({ consumableDetail, hasActiveSession, theme }) => {
               <GridItem xs={12}>
                 <Field
                   name='effectiveDates'
-                  render={(args) => (
+                  render={args => (
                     <DateRangePicker
                       format={dateFormatLong}
                       label='Effective Start Date'
@@ -212,6 +212,7 @@ const Detail = ({ consumableDetail, hasActiveSession, theme }) => {
     </SharedContainer>
   )
 }
-export default compose(withStyles(styles, { withTheme: true }), React.memo)(
-  Detail,
-)
+export default compose(
+  withStyles(styles, { withTheme: true }),
+  React.memo,
+)(Detail)

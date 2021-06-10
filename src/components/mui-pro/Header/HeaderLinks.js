@@ -24,17 +24,14 @@ import { Notification } from '@/components/_medisys'
 // utils
 import { updateAPIType } from '@/utils/request'
 import { navigateDirtyCheck } from '@/utils/utils'
-import {
-  VALUE_KEYS,
-  NOTIFICATION_STATUS,
-  NOTIFICATION_TYPE,
-} from '@/utils/constants'
 
-@connect(({ user, clinicInfo, header }) => ({
-  user,
-  clinicInfo,
-  header,
-}))
+@connect(({ user, clinicInfo, header }) => {
+  return {
+    user,
+    clinicInfo,
+    header,
+  }
+})
 class HeaderLinks extends React.Component {
   state = {
     openNotification: false,
@@ -43,8 +40,8 @@ class HeaderLinks extends React.Component {
     title: 'PROD',
   }
 
-  handleClick = (key) => () => {
-    this.setState((preState) => ({ [`open${key}`]: !preState[`open${key}`] }))
+  handleClick = key => () => {
+    this.setState(preState => ({ [`open${key}`]: !preState[`open${key}`] }))
   }
 
   handleClose = (key, cb) => () => {
@@ -52,7 +49,7 @@ class HeaderLinks extends React.Component {
     if (cb) cb()
   }
 
-  onLogoutClick = (event) => {
+  onLogoutClick = event => {
     this.setState({
       openAccount: false,
     })
@@ -91,11 +88,11 @@ class HeaderLinks extends React.Component {
     })
   }
 
-  updateAPIType (type) {
+  updateAPIType(type) {
     updateAPIType(type)
   }
 
-  render () {
+  render() {
     const { classes, rtlActive, user, clinicInfo, header } = this.props
     const { openAccount } = this.state
     const { signalRConnected, notifications } = header

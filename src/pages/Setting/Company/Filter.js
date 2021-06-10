@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
 import { status } from '@/utils/codes'
@@ -27,13 +27,13 @@ class Filter extends PureComponent {
     isCopayer: undefined,
   }
 
-  checkIsCopayer (name) {
+  checkIsCopayer(name) {
     this.setState({
       isCopayer: name === 'copayer',
     })
   }
 
-  render () {
+  render() {
     const { classes, route, settingCompany } = this.props
     const { name } = route
     const { companyType } = settingCompany
@@ -45,7 +45,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={3}>
             <Field
               name='codeDisplayValue'
-              render={(args) => {
+              render={args => {
                 return (
                   <TextField
                     label={
@@ -61,7 +61,7 @@ class Filter extends PureComponent {
             {isCopayer ? (
               <FastField
                 name='coPayerTypeFK'
-                render={(args) => {
+                render={args => {
                   return (
                     <CodeSelect
                       label='Co-Payer Type'
@@ -78,7 +78,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={3}>
             <FastField
               name='isActive'
-              render={(args) => {
+              render={args => {
                 return <Select label='Status' options={status} {...args} />
               }}
             />

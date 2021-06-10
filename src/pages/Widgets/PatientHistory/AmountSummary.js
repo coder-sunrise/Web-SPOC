@@ -1,6 +1,6 @@
 import React from 'react'
 import { withStyles, Divider } from '@material-ui/core'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import numeral from 'numeral'
 import { GridContainer, GridItem, NumberInput, Tooltip } from '@/components'
 
@@ -13,7 +13,7 @@ const amountProps = {
   fullWidth: true,
 }
 
-const styles = (theme) => ({
+const styles = theme => ({
   cls01: {
     '& .MuiGrid-item': {
       lineHeight: `${theme.spacing(3)}px`,

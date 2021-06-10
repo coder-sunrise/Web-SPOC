@@ -1,9 +1,9 @@
 import React from 'react'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { withStyles } from '@material-ui/core'
 import { Button, GridContainer, GridItem } from '@/components'
 
-const styles = (theme) => ({
+const styles = theme => ({
   reason: {
     marginBottom: theme.spacing(2),
   },
@@ -24,8 +24,7 @@ const DuplicateRG = ({
             {formatMessage({
               id: 'inventory.rg.duplicateRGConfirmation',
             })}
-            <b>{entity.receivingGoodsNo}</b>
-            ?
+            <b>{entity.receivingGoodsNo}</b>?
           </h4>
         </GridItem>
         <Button color='danger' onClick={onClose}>

@@ -6,7 +6,7 @@ import DocumentTitle from 'react-document-title'
 // material ui
 import { withStyles } from '@material-ui/core'
 // umi
-import router from 'umi/router'
+import { history } from 'umi'
 // common component
 import { SizeContainer } from '@/components'
 // medisys
@@ -20,15 +20,15 @@ import defaultSettings from '@/defaultSettings'
 // console.log(moment.locale())
 moment.locale('en') // TODO should be removed in furture, solve deafult display chinese date bug
 // console.log(moment.locale())
-const styles = (theme) => ({
+const styles = theme => ({
   ...authStyle(theme),
 })
 
 class LandingLayout extends React.Component {
-  componentWillMount () {
+  componentWillMount() {
     const token = localStorage.getItem('token')
     if (token !== null) {
-      router.push('/')
+      history.push('/')
     }
   }
 
@@ -36,7 +36,7 @@ class LandingLayout extends React.Component {
     return loginBackground
   }
 
-  render () {
+  render() {
     NProgress.done()
     const { children, classes } = this.props
     return (

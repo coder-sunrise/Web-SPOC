@@ -4,14 +4,15 @@ const url = '/api/Consultation/ScribbleNote'
 
 const templateUrl = '/api/CTScribbleNoteTemplate'
 
-module.exports = {
-  remove: (params) => service.remove(url, params),
-  query: (params) => {
+const fns = {
+  remove: params => service.remove(url, params),
+  query: params => {
     return service.query(url, params)
   },
-  upsert: (params) => {
+  upsert: params => {
     return service.upsert(url, params)
   },
 
-  queryTemplateList: (params) => service.queryList(templateUrl, params),
+  queryTemplateList: params => service.queryList(templateUrl, params),
 }
+export default fns

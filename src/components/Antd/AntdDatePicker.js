@@ -42,13 +42,18 @@ const _toMoment = (value, isLocal, showTime) => {
   // }
 }
 
-const STYLES = (theme) => ({
+const STYLES = theme => ({
   ...inputStyle(theme),
   datepickerContainer: {
     width: '100% !important',
     boxSizing: 'content-box',
     lineHeight: '1em',
     color: 'currentColor',
+    borderWidth: 0,
+    backgroundColor: 'transparent !important',
+    boxShadow: 'none !important',
+    padding: 0,
+
     '& > div > input': {
       border: 'none',
       boxShadow: 'none !important',
@@ -62,7 +67,7 @@ const STYLES = (theme) => ({
   },
 })
 
-const keydown = (e) => {
+const keydown = e => {
   if (e.shiftKey) return
 
   if (e.which === 9) {
@@ -90,7 +95,7 @@ class AntdDatePicker extends PureComponent {
     dateOnly: true,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     const {
       field = {},
@@ -129,7 +134,7 @@ class AntdDatePicker extends PureComponent {
     }
   }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { field, value } = nextProps
     // console.log(value)
     // if (value) console.log(value.target)
@@ -200,7 +205,7 @@ class AntdDatePicker extends PureComponent {
     })
   }
 
-  handleDatePickerOpenChange = (status) => {
+  handleDatePickerOpenChange = status => {
     this.setState({ shrink: status })
   }
 
@@ -208,7 +213,7 @@ class AntdDatePicker extends PureComponent {
     this.setState({ shrink: true })
   }
 
-  handleBlur = (e) => {
+  handleBlur = e => {
     debounceKeydown.cancel()
     if (this.state.value === undefined || this.state.value === '') {
       this.setState({ shrink: false })
@@ -242,7 +247,7 @@ class AntdDatePicker extends PureComponent {
   //   )
   // }
 
-  buildInRestrict = (current) => {
+  buildInRestrict = current => {
     const { dobRestrict, recurrenceRestrict, restrictFromTo } = this.props
     if (dobRestrict) {
       return (
@@ -256,7 +261,10 @@ class AntdDatePicker extends PureComponent {
       return (
         current &&
         (current < moment(recurrenceRestrict).endOf('day') ||
-          current > moment().add(3, 'months').startOf('day'))
+          current >
+            moment()
+              .add(3, 'months')
+              .startOf('day'))
       )
     }
 
@@ -347,7 +355,7 @@ class AntdDatePicker extends PureComponent {
             format,
             ...(restProps.showTime
               ? additionalShortcutFormats.map(
-                  (o) => `${o} ${timeFormat24HourWithSecond}`,
+                  o => `${o} ${timeFormat24HourWithSecond}`,
                 )
               : additionalShortcutFormats),
           ]}
@@ -358,7 +366,7 @@ class AntdDatePicker extends PureComponent {
     )
   }
 
-  render () {
+  render() {
     const { classes, theme, onChange, ...restProps } = this.props
 
     const labelProps = {

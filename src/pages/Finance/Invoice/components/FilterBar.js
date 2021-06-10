@@ -1,7 +1,7 @@
 import React from 'react'
 // formik
 import { FastField, Field, withFormik } from 'formik'
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 // common components
 import {
@@ -46,13 +46,13 @@ const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
           <GridItem xs={6} md={3}>
             <FastField
               name='invoiceNo'
-              render={(args) => <TextField label='Invoice No' {...args} />}
+              render={args => <TextField label='Invoice No' {...args} />}
             />
           </GridItem>
           <GridItem md={3}>
             <Field
               name='invoiceStartDate'
-              render={(args) => (
+              render={args => (
                 <FilterBarDate
                   args={args}
                   label='Invoice Date From'
@@ -67,7 +67,7 @@ const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
           <GridItem md={3}>
             <Field
               name='invoiceEndDate'
-              render={(args) => (
+              render={args => (
                 <FilterBarDate
                   args={args}
                   label='Invoice Date To'
@@ -85,21 +85,19 @@ const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
           <GridItem xs={6} md={3}>
             <FastField
               name='patientAccountNo'
-              render={(args) => (
-                <TextField label='Patient Acc. No.' {...args} />
-              )}
+              render={args => <TextField label='Patient Acc. No.' {...args} />}
             />
           </GridItem>
           <GridItem xs={6} md={3}>
             <FastField
               name='patientName'
-              render={(args) => <TextField label='Patient Name' {...args} />}
+              render={args => <TextField label='Patient Name' {...args} />}
             />
           </GridItem>
           <GridItem xs={6} md={3}>
             <FastField
               name='session'
-              render={(args) => (
+              render={args => (
                 <Select label='Session' options={sessionOptions} {...args} />
               )}
             />
@@ -109,7 +107,7 @@ const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
           <GridItem xs={6} md={3}>
             <FastField
               name='outstandingBalanceStatus'
-              render={(args) => {
+              render={args => {
                 return (
                   <Select
                     label='O/S Balance'

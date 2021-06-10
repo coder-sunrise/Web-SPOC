@@ -1,9 +1,7 @@
 import React, { Component, Fragment } from 'react'
-import { connect } from 'dva'
-import router from 'umi/router'
+import { history } from 'umi'
 
 import { withStyles } from '@material-ui/core'
-import { formatMessage, FormattedMessage } from 'umi/locale'
 
 import Card from '@material-ui/core/Card'
 import CardActions from '@material-ui/core/CardActions'
@@ -56,8 +54,8 @@ const styles = () => ({
   },
 })
 class Dashboard extends Component {
-  render () {
-    const { history, classes } = this.props
+  render() {
+    const { classes } = this.props
     const card = ({ number1, number2, number3, type }) => {
       return (
         <Card className={classes.card}>
@@ -117,7 +115,7 @@ class Dashboard extends Component {
               color='primary'
               style={{ marginBottom: 8 }}
               onClick={() => {
-                router.push('/wardoverview/list')
+                history.push('/wardoverview/list')
               }}
             >
               View

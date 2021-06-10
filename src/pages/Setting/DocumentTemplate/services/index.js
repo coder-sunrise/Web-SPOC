@@ -8,14 +8,15 @@ const getUrl = () => {
   //     ? '/api/smstemplate'
   //     : '/api/CTReferralLetterTemplate'
 
- const url = '/api/DocumentTemplate'
-
+  const url = '/api/DocumentTemplate'
 
   return url
 }
-module.exports = {
+const fns = {
   // remove: (params) => service.remove(url, params),
   // query: (params) => service.query(url, params),
-  queryList: (params) => service.queryList(getUrl(), params),
-  upsert: (params) => service.upsert(getUrl(), params),
+  queryList: params => service.queryList(getUrl(), params),
+  upsert: params => service.upsert(getUrl(), params),
 }
+
+export default fns

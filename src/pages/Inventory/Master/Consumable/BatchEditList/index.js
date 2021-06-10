@@ -1,10 +1,5 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import router from 'umi/router'
-import moment from 'moment'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-
-import { withStyles } from '@material-ui/core'
 import { compare } from '@/layouts'
 // import tooltipsStyle from 'assets/jss/material-kit-pro-react/tooltipsStyle.jsx'
 import { sleep, getAppendUrl } from '@/utils/utils'
@@ -18,11 +13,7 @@ import { Button, CommonModal, EditableTableGrid } from '@/components'
 @compare('consumable')
 class BatchEditList extends PureComponent {
   state = {
-    pageSizes: [
-      5,
-      10,
-      15,
-    ],
+    pageSizes: [5, 10, 15],
     selection: [],
     editingRowIds: [],
   }
@@ -79,9 +70,9 @@ class BatchEditList extends PureComponent {
   //   })
   // }
 
-  changeEditingRowIds = (editingRowIds) => this.setState({ editingRowIds })
+  changeEditingRowIds = editingRowIds => this.setState({ editingRowIds })
 
-  changeRowChanges = (rowChanges) => {
+  changeRowChanges = rowChanges => {
     console.log(rowChanges)
     this.setState({ rowChanges })
   }
@@ -102,17 +93,19 @@ class BatchEditList extends PureComponent {
   }
 
   clickRow = (row, event) => {
-    this.setState((prevState) => ({
-      editingRowIds: prevState.editingRowIds.concat([
-        row.id,
-      ]),
+    this.setState(prevState => ({
+      editingRowIds: prevState.editingRowIds.concat([row.id]),
     }))
   }
 
-  render () {
+  render() {
     const { tableParas, rowChanges, editingRowIds } = this.state
     // console.log(this.props)
-    const { consumable: { list }, dispatch, height } = this.props
+    const {
+      consumable: { list },
+      dispatch,
+      height,
+    } = this.props
     // console.log(height)
     // if (this.state.height <= 0) return null
     return (

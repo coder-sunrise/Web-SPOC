@@ -1,11 +1,9 @@
 import { createFormViewModel } from 'medisys-model'
-import * as service from '../services'
+import service from '../services'
 
 const defaultFilter = {
   searchText: '',
-  actives: [
-    0,
-  ],
+  actives: [0],
 }
 
 export default createFormViewModel({

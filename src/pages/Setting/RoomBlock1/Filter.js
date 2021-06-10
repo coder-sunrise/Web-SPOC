@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
 import {
@@ -35,7 +35,7 @@ const recurrenceTypes = [
   displayName: 'RoomFilter',
 })
 class Filter extends PureComponent {
-  render () {
+  render() {
     const { classes } = this.props
     return (
       <div className={classes.filterBar}>
@@ -43,7 +43,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={3}>
             <FastField
               name='code'
-              render={(args) => {
+              render={args => {
                 return <CodeSelect label='Room' code='ctRoom' {...args} />
               }}
             />
@@ -51,7 +51,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={3}>
             <FastField
               name='dateFrom'
-              render={(args) => {
+              render={args => {
                 return <DatePicker label='Date From' {...args} />
               }}
             />
@@ -59,7 +59,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={3}>
             <FastField
               name='dateTo'
-              render={(args) => {
+              render={args => {
                 return <DatePicker label='Date To' {...args} />
               }}
             />
@@ -67,7 +67,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={2}>
             <FastField
               name='isActive'
-              render={(args) => {
+              render={args => {
                 return (
                   <Select
                     label='Recurrence Type'

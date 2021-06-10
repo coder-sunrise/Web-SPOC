@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { FastField } from 'formik'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 import { withStyles } from '@material-ui/core'
 import Search from '@material-ui/icons/Search'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
@@ -56,11 +56,12 @@ const styles = () => ({
       invoiceRows: returnValue.statementInvoice,
       selectedRows: returnValue.statementInvoice
         .filter(
-          (si) =>
-            !(si.statementInvoicePayment || [])
-              .find((o) => o.invoicePayment.isCancelled === false),
+          si =>
+            !(si.statementInvoicePayment || []).find(
+              o => o.invoicePayment.isCancelled === false,
+            ),
         )
-        .map((o) => o.id),
+        .map(o => o.id),
     }
   },
   validationSchema: Yup.object().shape({
@@ -68,8 +69,10 @@ const styles = () => ({
     statementDate: Yup.date().required(),
     paymentTerm: Yup.number().required(),
     adjustmentRemarks: Yup.string().when('adjustmentValue', {
-      is: (adjValue) => (adjValue || 0) !== 0,
-      then: Yup.string().trim().required(),
+      is: adjValue => (adjValue || 0) !== 0,
+      then: Yup.string()
+        .trim()
+        .required(),
     }),
   }),
 
@@ -85,10 +88,10 @@ const styles = () => ({
 
     // filter out unselected new invoice
     const selectedAndExistingInvoices = invoiceRows.filter(
-      (o) => selectedRows.includes(o.id) || o.statementInvoicePayment,
+      o => selectedRows.includes(o.id) || o.statementInvoicePayment,
     )
 
-    const newStatementInvoice = selectedAndExistingInvoices.map((o) => {
+    const newStatementInvoice = selectedAndExistingInvoices.map(o => {
       const statementInvoiceObj = {
         ...o,
         invoiceFK: o.invoiceFK || o.id,
@@ -103,7 +106,7 @@ const styles = () => ({
       if (
         selectedRows.includes(o.id) ||
         o.statementInvoicePayment.find(
-          (i) => i.invoicePayment.isCancelled === false,
+          i => i.invoicePayment.isCancelled === false,
         )
       ) {
         return {
@@ -122,7 +125,7 @@ const styles = () => ({
         ...restValues,
         statementInvoice: newStatementInvoice,
       },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         resetForm()
         // history.push('/finance/statement')
@@ -191,15 +194,17 @@ class AddNewStatement extends PureComponent {
         sortingEnabled: false,
         width: 100,
       },
-    ], 
-    invoiceRows: [ 
     ],
+    invoiceRows: [],
     selectedRows: [],
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { values, setValues } = this.props
-    const { dispatch, match: { params } } = this.props
+    const {
+      dispatch,
+      match: { params },
+    } = this.props
     if (params.id) {
       dispatch({
         type: 'statement/refreshStatement',
@@ -213,11 +218,11 @@ class AddNewStatement extends PureComponent {
       invoiceRows: values.statementInvoice,
     })
     let defaultIds = []
-    values.statementInvoice.forEach((o) => {
+    values.statementInvoice.forEach(o => {
       if (
         (o.statementInvoicePayment.length === 0 && !o.isDeleted) ||
         o.statementInvoicePayment.find(
-          (i) => i.invoicePayment.isCancelled === true,
+          i => i.invoicePayment.isCancelled === true,
         ) ||
         o.payableAmount === o.outstandingAmount
       ) {
@@ -230,7 +235,7 @@ class AddNewStatement extends PureComponent {
     })
   }
 
-  handleSelectionChange = (rows) => {
+  handleSelectionChange = rows => {
     const { setValues, values } = this.props
     if (rows) {
       setValues({
@@ -241,7 +246,7 @@ class AddNewStatement extends PureComponent {
     this.setState({ selectedRows: rows })
   }
 
-  getInvoiceList = (e) => {
+  getInvoiceList = e => {
     const { dispatch, values, statement, setValues } = this.props
     const { InvoiceNo, effectiveDates, copayerFK } = values
 
@@ -256,16 +261,18 @@ class AddNewStatement extends PureComponent {
     dispatch({
       type: 'statement/queryInvoiceList',
       payload,
-    }).then((invoiceList) => {
+    }).then(invoiceList => {
       if (invoiceList) {
-        const { data } = invoiceList.data 
+        const { data } = invoiceList.data
         let statementInvoices = []
         if (statement.entity) {
           let newData = []
-          data.forEach((p) => {
-            p.invoicePayer.forEach((payer) => {
+          data.forEach(p => {
+            p.invoicePayer.forEach(payer => {
               if (payer.payerTypeFK == 2 || payer.payerTypeFK == 4) {
-                let existsInStatement = values.statementInvoice.find(t => t.invoicePayerFK === payer.id)
+                let existsInStatement = values.statementInvoice.find(
+                  t => t.invoicePayerFK === payer.id,
+                )
                 if (!existsInStatement && payer.companyFK === copayerFK) {
                   newData.push({
                     ...p,
@@ -273,29 +280,29 @@ class AddNewStatement extends PureComponent {
                     id: payer.id,
                     copayerInvoicePayerId: payer.id,
                     payableAmount: payer.payerDistributedAmt,
-                    outstandingAmount: payer.outStanding
+                    outstandingAmount: payer.outStanding,
                   })
                 }
               }
             })
           })
 
-          statementInvoices = [
-            ...values.statementInvoice,
-            ...newData,
-          ]
+          statementInvoices = [...values.statementInvoice, ...newData]
         } else {
           let records = []
-          data.forEach((p) => {
-            p.invoicePayer.forEach((payer) => {
-              if ((payer.payerTypeFK == 2 || payer.payerTypeFK == 4) && payer.companyFK === copayerFK) {
+          data.forEach(p => {
+            p.invoicePayer.forEach(payer => {
+              if (
+                (payer.payerTypeFK == 2 || payer.payerTypeFK == 4) &&
+                payer.companyFK === copayerFK
+              ) {
                 records.push({
                   ...p,
                   invoiceFK: p.id,
                   id: payer.id,
                   copayerInvoicePayerId: payer.id,
                   copayerPayableAmount: payer.payerDistributedAmt,
-                  copayerOutstanding: payer.outStanding
+                  copayerOutstanding: payer.outStanding,
                 })
               }
             })
@@ -335,9 +342,11 @@ class AddNewStatement extends PureComponent {
     setFieldValue('adminChargeValue', adminCharge || 0)
     setFieldValue('adminChargeValueType', adminChargeType || 'Percentage')
     setFieldValue('adjustmentValue', statementAdjustment || 0)
-    setFieldValue('adjustmentValueType', statementAdjustmentType || 'Percentage')
-    if(statementAdjustment)
-    {
+    setFieldValue(
+      'adjustmentValueType',
+      statementAdjustmentType || 'Percentage',
+    )
+    if (statementAdjustment) {
       setFieldValue('adjustmentRemarks', defaultStatementAdjustmentRemarks)
     }
     this.setState(() => {
@@ -348,11 +357,11 @@ class AddNewStatement extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { classes, theme, values, handleSubmit, statement } = this.props
     const { invoiceRows, columns, columnExtensions } = this.state
     const { entity } = statement
-    const mode = entity && entity.id > 0 ? 'Edit' : 'Add' 
+    const mode = entity && entity.id > 0 ? 'Edit' : 'Add'
     return (
       <React.Fragment>
         <CardContainer hideHeader>
@@ -361,13 +370,13 @@ class AddNewStatement extends PureComponent {
               <GridItem md={3}>
                 <FastField
                   name='copayerFK'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <CodeSelect
                         label='Co-Payer'
                         code='ctcopayer'
                         labelField='displayValue'
-                        localFilter={(item) => item.coPayerTypeFK === 1}
+                        localFilter={item => item.coPayerTypeFK === 1}
                         disabled={statement.entity}
                         onChange={this.clearInvoiceList}
                         {...args}
@@ -381,16 +390,14 @@ class AddNewStatement extends PureComponent {
             <GridItem md={3}>
               <FastField
                 name='statementDate'
-                render={(args) => (
-                  <DatePicker label='Statement Date' {...args} />
-                )}
+                render={args => <DatePicker label='Statement Date' {...args} />}
               />
             </GridItem>
             <GridItem md={1} />
             <GridItem md={3}>
               <FastField
                 name='paymentTerm'
-                render={(args) => (
+                render={args => (
                   <NumberInput
                     suffix='Days'
                     qty
@@ -409,7 +416,7 @@ class AddNewStatement extends PureComponent {
               <GridItem md={3}>
                 <Field
                   name='adjustmentValue'
-                  render={(args) => {
+                  render={args => {
                     if (values.adjustmentValueType === 'ExactAmount') {
                       return (
                         <NumberInput
@@ -440,7 +447,7 @@ class AddNewStatement extends PureComponent {
               >
                 <Field
                   name='adjustmentValueType'
-                  render={(args) => (
+                  render={args => (
                     <Switch
                       checkedChildren='$'
                       unCheckedChildren='%'
@@ -455,7 +462,7 @@ class AddNewStatement extends PureComponent {
               <GridItem md={3}>
                 <FastField
                   name='adjustmentRemarks'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <TextField
                         label='Adjustment Remarks'
@@ -472,7 +479,7 @@ class AddNewStatement extends PureComponent {
               <GridItem md={3}>
                 <Field
                   name='adminChargeValue'
-                  render={(args) => {
+                  render={args => {
                     if (values.adminChargeValueType === 'ExactAmount') {
                       return (
                         <NumberInput
@@ -503,7 +510,7 @@ class AddNewStatement extends PureComponent {
               >
                 <Field
                   name='adminChargeValueType'
-                  render={(args) => (
+                  render={args => (
                     <Switch
                       checkedChildren='$'
                       unCheckedChildren='%'
@@ -520,7 +527,7 @@ class AddNewStatement extends PureComponent {
             <GridItem md={7}>
               <FastField
                 name='remark'
-                render={(args) => {
+                render={args => {
                   return <TextField label='Remarks' multiline {...args} />
                 }}
               />
@@ -543,14 +550,14 @@ class AddNewStatement extends PureComponent {
               <GridItem xs md={3}>
                 <FastField
                   name='InvoiceNo'
-                  render={(args) => <TextField label='Invoice No' {...args} />}
+                  render={args => <TextField label='Invoice No' {...args} />}
                 />
               </GridItem>
 
               <GridItem md={3}>
                 <FastField
                   name='effectiveDates'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <DateRangePicker
                         label='Invoice Date From'
@@ -588,7 +595,7 @@ class AddNewStatement extends PureComponent {
                 selectable: true,
                 selectConfig: {
                   showSelectAll: true,
-                  rowSelectionEnabled: (row) => {
+                  rowSelectionEnabled: row => {
                     const {
                       statementInvoicePayment = [],
                       payableAmount,
@@ -596,7 +603,7 @@ class AddNewStatement extends PureComponent {
                       adminCharge,
                     } = row
                     return !statementInvoicePayment.find(
-                      (o) => o.invoicePayment.isCancelled === false,
+                      o => o.invoicePayment.isCancelled === false,
                     )
                   },
                 },
@@ -618,10 +625,9 @@ class AddNewStatement extends PureComponent {
                             if (
                               (values.selectedRows &&
                                 values.selectedRows.includes(cur.id)) ||
-                              (cur.statementInvoicePayment || [])
-                                .find(
-                                  (o) => o.invoicePayment.isCancelled === false,
-                                )
+                              (cur.statementInvoicePayment || []).find(
+                                o => o.invoicePayment.isCancelled === false,
+                              )
                             ) {
                               return pre + getValue(cur) || 0
                             }

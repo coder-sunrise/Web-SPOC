@@ -1,5 +1,5 @@
 import React, { PureComponent, Fragment } from 'react'
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
 import {
@@ -38,12 +38,12 @@ class Filter extends PureComponent {
   }
 
   handleToggle = () => {
-    this.setState((prev) => {
+    this.setState(prev => {
       return { open: !prev.open }
     })
   }
 
-  handleMassAdjustment = async (e) => {
+  handleMassAdjustment = async e => {
     this.handleToggle()
     const { inventoryAdjustment } = this.props
     const result = await this.props.dispatch({
@@ -67,7 +67,7 @@ class Filter extends PureComponent {
     this.props.toggleModal()
   }
 
-  render () {
+  render() {
     const { classes, values } = this.props
     const { open } = this.state
     return (
@@ -76,7 +76,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={2}>
             <FastField
               name='transactionNo'
-              render={(args) => {
+              render={args => {
                 return <TextField label='Transaction No' {...args} />
               }}
             />
@@ -85,7 +85,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={5}>
             <Field
               name='transDates'
-              render={(args) => {
+              render={args => {
                 return (
                   <DateRangePicker
                     label='Transaction From Date'
@@ -101,7 +101,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={2}>
             <Field
               name='allDate'
-              render={(args) => {
+              render={args => {
                 return <Checkbox inputLabel=' ' label='All Date' {...args} />
               }}
             />
@@ -110,7 +110,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={2}>
             <FastField
               name='status'
-              render={(args) => {
+              render={args => {
                 return (
                   <Select
                     label='Status'
@@ -134,10 +134,7 @@ class Filter extends PureComponent {
 
                   if (!allDate) {
                     if (transDates) {
-                      const [
-                        from,
-                        to,
-                      ] = transDates
+                      const [from, to] = transDates
                       fromDate = from
                       toDate = to
                     }
@@ -184,7 +181,7 @@ class Filter extends PureComponent {
                     color='primary'
                     icon={null}
                     onClick={this.handleToggle}
-                    buttonRef={(node) => {
+                    buttonRef={node => {
                       this.anchorElAccount = node
                     }}
                   >

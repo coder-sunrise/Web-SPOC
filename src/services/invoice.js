@@ -3,13 +3,14 @@ import request from '@/utils/request'
 
 const url = '/api/invoice'
 
-module.exports = {
-  queryList: (params) => service.queryList(url, params),
-  query: (params) => service.query(url, params),
-  saveEditInvoice: (payload) => {
+const fns = {
+  queryList: params => service.queryList(url, params),
+  query: params => service.query(url, params),
+  saveEditInvoice: payload => {
     return request(`${url}/saveeditinvoice`, {
       method: 'POST',
       body: payload,
     })
   },
 }
+export default fns

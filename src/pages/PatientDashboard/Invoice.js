@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
 import PerfectScrollbar from 'perfect-scrollbar'
-import Link from 'umi/link'
+import Link from 'umi'
 import DateRange from '@material-ui/icons/DateRange'
 import {
   withStyles,
@@ -30,7 +30,7 @@ import {
   CommonTableGrid,
 } from '@/components'
 
-const Invoice = (props) => {
+const Invoice = props => {
   const invoiceNo = 'INV/123456'
   const invoiceDate = '02 May 2019'
   return (

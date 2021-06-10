@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 // umi
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 // formik
 import { FastField, withFormik } from 'formik'
 // material ui
@@ -13,12 +13,12 @@ import DetailGrid from './DetailGrid'
 
 @withFormik({ mapPropsToValues: () => ({}) })
 class CreditDebitNote extends PureComponent {
-  render () {
+  render() {
     return (
       <CommonHeader Icon={<Book />} titleId='finance.cdNote.title'>
         <FastField
           name='noteType'
-          render={(args) => (
+          render={args => (
             <RadioGroup
               label=' '
               simple

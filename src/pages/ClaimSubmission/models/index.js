@@ -1,7 +1,5 @@
 import { createListViewModel } from 'medisys-model'
-import moment from 'moment'
-import { dateFormatLong, dateFormatLongWithTime } from '@/components'
-import * as service from '../services'
+import service from '../services'
 
 export default createListViewModel({
   namespace: 'claimSubmission',
@@ -18,7 +16,7 @@ export default createListViewModel({
       })
     },
     effects: {
-      *getClaimCount ({ payload }, { put, call }) {
+      *getClaimCount({ payload }, { put, call }) {
         const response = yield call(service.queryBadgeCount, payload)
         const { data } = response
         return yield put({
@@ -26,7 +24,7 @@ export default createListViewModel({
           payload: data || [],
         })
       },
-      *queryById ({ payload }, { call, put }) {
+      *queryById({ payload }, { call, put }) {
         const response = yield call(service.queryById, payload)
         const { data } = response
 
@@ -43,13 +41,13 @@ export default createListViewModel({
       },
     },
     reducers: {
-      setClaimCount (state, { payload }) {
+      setClaimCount(state, { payload }) {
         return {
           ...state,
           invoiceClaimCount: payload,
         }
       },
-      setQueryById (state, { payload }) {
+      setQueryById(state, { payload }) {
         return {
           ...state,
           entity: {

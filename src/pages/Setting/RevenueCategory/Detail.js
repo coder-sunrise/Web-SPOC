@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import _ from 'lodash'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -11,7 +11,7 @@ import {
   DateRangePicker,
 } from '@/components'
 
-const styles = (theme) => ({})
+const styles = theme => ({})
 
 @withFormikExtend({
   mapPropsToValues: ({ settingRevenue }) =>
@@ -19,7 +19,10 @@ const styles = (theme) => ({})
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
-    effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+    effectiveDates: Yup.array()
+      .of(Yup.date())
+      .min(2)
+      .required(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
@@ -31,7 +34,7 @@ const styles = (theme) => ({})
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
       },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         resetForm()
         if (onConfirm) onConfirm()
@@ -46,7 +49,7 @@ const styles = (theme) => ({})
 class Detail extends PureComponent {
   state = {}
 
-  render () {
+  render() {
     const { props } = this
     const { classes, theme, footer, values, settingRevenue } = props
     // console.log('detail', props)
@@ -57,7 +60,7 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='code'
-                render={(args) => (
+                render={args => (
                   <TextField
                     label='Code'
                     autoFocus
@@ -70,13 +73,13 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='displayValue'
-                render={(args) => <TextField label='Display Value' {...args} />}
+                render={args => <TextField label='Display Value' {...args} />}
               />
             </GridItem>
             <GridItem md={6}>
               <FastField
                 name='effectiveDates'
-                render={(args) => {
+                render={args => {
                   return (
                     <DateRangePicker
                       label='Effective Start Date'
@@ -90,7 +93,7 @@ class Detail extends PureComponent {
             <GridItem md={12}>
               <FastField
                 name='description'
-                render={(args) => {
+                render={args => {
                   return (
                     <TextField
                       label='Description'

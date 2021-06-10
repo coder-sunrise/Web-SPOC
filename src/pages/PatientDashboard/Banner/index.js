@@ -1,18 +1,15 @@
 import React, { PureComponent } from 'react'
-import Link from 'umi/link'
+import { Link } from 'umi'
 import { connect } from 'dva'
 import _ from 'lodash'
 import moment from 'moment'
 import { Paper } from '@material-ui/core'
 import { headerHeight } from 'mui-pro-jss'
-import Warining from '@material-ui/icons/Error'
+import Warning from '@material-ui/icons/Error'
 import Edit from '@material-ui/icons/Edit'
 import Refresh from '@material-ui/icons/Sync'
 import { getAppendUrl } from '@/utils/utils'
-import {
-  MoreButton,
-  LoadingWrapper,
-} from '@/components/_medisys'
+import { MoreButton, LoadingWrapper } from '@/components/_medisys'
 import {
   GridContainer,
   GridItem,
@@ -55,26 +52,18 @@ class Banner extends PureComponent {
     currentSchemeType: 0,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.fetchCodeTables()
   }
 
-  getAllergyLink (data) {
+  getAllergyLink(data) {
     const { props } = this
     const { patient } = props
     const { entity } = patient
     const info = entity
     const { patientAllergy = [] } = info
-    const da = _.orderBy(
-      patientAllergy,
-      [
-        'type',
-      ],
-      [
-        'asc',
-      ],
-    )
+    const da = _.orderBy(patientAllergy, ['type'], ['asc'])
     let allergyData = '-'
 
     if (da.length > 0) {
@@ -114,11 +103,9 @@ class Banner extends PureComponent {
             </Link>
           ) : (
             <div>
-              {allergyData.length > 25 ? (
-                `${allergyData.substring(0, 25).trim()}...`
-              ) : (
-                allergyData
-              )}
+              {allergyData.length > 25
+                ? `${allergyData.substring(0, 25).trim()}...`
+                : allergyData}
 
               {da.length > 0 && (
                 <Popover
@@ -199,7 +186,7 @@ class Banner extends PureComponent {
         isSaveToDb,
         patientProfileId: entity.id,
       },
-    }).then((result) => {
+    }).then(result => {
       // console.log('result ==========', result)
       if (result) {
         dispatch({
@@ -262,7 +249,7 @@ class Banner extends PureComponent {
     const { schemePayers } = entity
     const isSaveToDb = true
 
-    if(!schemePayers || schemePayers.length === 0) return
+    if (!schemePayers || schemePayers.length === 0) return
     dispatch({
       type: 'patient/refreshMedisaveBalance',
       payload: {
@@ -271,7 +258,7 @@ class Banner extends PureComponent {
         patientProfileId: entity.id,
         schemePayers,
       },
-    }).then((result) => {
+    }).then(result => {
       if (result) {
         dispatch({
           type: 'patient/query',
@@ -279,7 +266,6 @@ class Banner extends PureComponent {
             id: entity.id,
           },
         })
-
 
         const {
           // balance,
@@ -300,24 +286,23 @@ class Banner extends PureComponent {
               isSuccessful,
             },
           })
-        } else if (payerBalance){
-          
+        } else if (payerBalance) {
           let payerBalanceList = []
           payerBalance.forEach(pb => {
-            if(pb.enquiryType === 'MSVBAL') return
+            if (pb.enquiryType === 'MSVBAL') return
             /* if (oldSchemeTypeFK !== pb.schemeTypeFK) {
               isShowReplacementModal = true
             } */
             const { finalBalance } = pb
             payerBalanceList.push({
-                isShowReplacementModal,
-                // oldSchemeTypeFK,
-                finalBalance,
-                schemeTypeFK: pb.schemeTypeFK,
-                schemePayerFK: pb.schemePayerFK,
-                validFrom,
-                validTo,
-                isSuccessful,
+              isShowReplacementModal,
+              // oldSchemeTypeFK,
+              finalBalance,
+              schemeTypeFK: pb.schemeTypeFK,
+              schemePayerFK: pb.schemePayerFK,
+              validFrom,
+              validTo,
+              isSuccessful,
             })
           })
           this.setState({
@@ -332,7 +317,7 @@ class Banner extends PureComponent {
     })
   }
 
-  isMedisave = (schemeTypeFK) => {
+  isMedisave = schemeTypeFK => {
     /* const { ctschemetype } = this.props.codetable
     const r = ctschemetype.find((o) => o.id === schemeTypeFK)
     if(r)
@@ -343,13 +328,12 @@ class Banner extends PureComponent {
           'MEDIVISIT',
         ].indexOf(r.code) >= 0
       ) */
-    if(schemeTypeFK)
-      return [12,13,14].indexOf(schemeTypeFK) >= 0
+    if (schemeTypeFK) return [12, 13, 14].indexOf(schemeTypeFK) >= 0
 
     return false
   }
 
-  getSchemeDetails = (schemeData) => {
+  getSchemeDetails = schemeData => {
     const { refreshedSchemeData } = this.state
 
     if (
@@ -387,11 +371,9 @@ class Banner extends PureComponent {
 
     const { codetable } = this.props
     const { ctschemetype = [], copaymentscheme = [] } = codetable
-    const schemeType = ctschemetype.find(
-      (o) => o.id === schemeData.schemeTypeFK,
-    )
+    const schemeType = ctschemetype.find(o => o.id === schemeData.schemeTypeFK)
     const copaymentScheme = copaymentscheme.find(
-      (o) => o.id === schemeData.coPaymentSchemeFK,
+      o => o.id === schemeData.coPaymentSchemeFK,
     )
     return {
       balance,
@@ -422,20 +404,26 @@ class Banner extends PureComponent {
     }
   }
 
-  getSchemePayerDetails = (schemePayer) => {
+  getSchemePayerDetails = schemePayer => {
     const { patientScheme } = this.props.patient.entity
-    const schemeData = patientScheme.find((row) => row.schemeTypeFK === schemePayer.schemeFK)
-    const balanceData = schemeData.patientSchemeBalance.find((row) => row.schemePayerFK === schemePayer.id)
+    const schemeData = patientScheme.find(
+      row => row.schemeTypeFK === schemePayer.schemeFK,
+    )
+    const balanceData = schemeData.patientSchemeBalance.find(
+      row => row.schemePayerFK === schemePayer.id,
+    )
 
     if (
-      !_.isEmpty(this.state.refreshedSchemePayerData.payerBalanceList) 
-      && this.state.refreshedSchemePayerData.isSuccessful === true
+      !_.isEmpty(this.state.refreshedSchemePayerData.payerBalanceList) &&
+      this.state.refreshedSchemePayerData.isSuccessful === true
     ) {
       // return { ...this.state.refreshedSchemePayerData }
-      
-      const refreshData = this.state.refreshedSchemePayerData.payerBalanceList.find((row) => row.schemePayerFK === schemePayer.id)
 
-      if(refreshData)
+      const refreshData = this.state.refreshedSchemePayerData.payerBalanceList.find(
+        row => row.schemePayerFK === schemePayer.id,
+      )
+
+      if (refreshData)
         return {
           payerName: schemePayer.payerName,
           payerAccountNo: schemePayer.payerID,
@@ -447,9 +435,7 @@ class Banner extends PureComponent {
           validTo: schemeData.validTo,
           statusDescription: refreshData.statusDescription,
           isSuccessful:
-          refreshData.isSuccessful !== ''
-              ? refreshData.isSuccessful
-              : '',
+            refreshData.isSuccessful !== '' ? refreshData.isSuccessful : '',
           schemeTypeName: '',
           copaymentSchemeName: 'Medisave',
         }
@@ -466,36 +452,32 @@ class Banner extends PureComponent {
       schemeType: schemePayer.schemeType,
       validFrom: schemeData.validFrom,
       validTo: schemeData.validTo,
-      statusDescription: errorData.statusDescription || schemeData.statusDescription,
+      statusDescription:
+        errorData.statusDescription || schemeData.statusDescription,
       isSuccessful: errorData.isSuccessful || schemeData.isSuccessful,
       schemeTypeName: '',
       copaymentSchemeName: 'Medisave',
     }
   }
 
-  displayMedicalProblemData (entity = { patientHistoryDiagnosis: [] }) {
+  displayMedicalProblemData(entity = { patientHistoryDiagnosis: [] }) {
     let medicalProblemData = '-'
     const { patientHistoryDiagnosis = [] } = entity
 
     if (patientHistoryDiagnosis.length > 0) {
       if (patientHistoryDiagnosis.length >= 2) {
-        medicalProblemData = `${patientHistoryDiagnosis[0]
-          .diagnosisDescription}, ${patientHistoryDiagnosis[1]
-          .diagnosisDescription}`
+        medicalProblemData = `${patientHistoryDiagnosis[0].diagnosisDescription}, ${patientHistoryDiagnosis[1].diagnosisDescription}`
       } else {
-        medicalProblemData = `${patientHistoryDiagnosis[0]
-          .diagnosisDescription}`
+        medicalProblemData = `${patientHistoryDiagnosis[0].diagnosisDescription}`
       }
     }
 
     return (
       <div style={{ display: 'inline-block' }}>
         <div style={{ display: 'inline-block' }}>
-          {medicalProblemData.length > 25 ? (
-            `${medicalProblemData.substring(0, 25).trim()}...`
-          ) : (
-            medicalProblemData
-          )}
+          {medicalProblemData.length > 25
+            ? `${medicalProblemData.substring(0, 25).trim()}...`
+            : medicalProblemData}
         </div>
 
         {patientHistoryDiagnosis.length > 0 && (
@@ -518,7 +500,7 @@ class Banner extends PureComponent {
     )
   }
 
-  render () {
+  render() {
     const { props } = this
     const {
       // patientInfo = {},
@@ -547,7 +529,7 @@ class Banner extends PureComponent {
       )
     const { ctsalutation = [] } = codetable
     const info = entity
-    const salt = ctsalutation.find((o) => o.id === info.salutationFK) || {}
+    const salt = ctsalutation.find(o => o.id === info.salutationFK) || {}
     const name = `${salt.name || ''} ${info.name}`
     /* const allergiesStyle = () => {
       return {
@@ -559,19 +541,21 @@ class Banner extends PureComponent {
 
     // get scheme details based on scheme type
     const schemeDataList = []
-    const notMedisaveSchemes = entity.patientScheme && entity.patientScheme.length > 0 ? entity.patientScheme.filter((o) => !this.isMedisave(o.schemeTypeFK) ) : null
-    if(notMedisaveSchemes !== null)
-      notMedisaveSchemes.forEach((row) => {
-        schemeDataList.push(
-              this.getSchemeDetails(row)
-          )
+    const notMedisaveSchemes =
+      entity.patientScheme && entity.patientScheme.length > 0
+        ? entity.patientScheme.filter(o => !this.isMedisave(o.schemeTypeFK))
+        : null
+    if (notMedisaveSchemes !== null)
+      notMedisaveSchemes.forEach(row => {
+        schemeDataList.push(this.getSchemeDetails(row))
       })
-    const medisaveSchemePayers = entity.schemePayer && entity.schemePayer.length > 0 ? entity.schemePayer : null
-    if(medisaveSchemePayers !== null)
-      medisaveSchemePayers.forEach((row) => {
-        schemeDataList.push(
-             this.getSchemePayerDetails(row)
-          )
+    const medisaveSchemePayers =
+      entity.schemePayer && entity.schemePayer.length > 0
+        ? entity.schemePayer
+        : null
+    if (medisaveSchemePayers !== null)
+      medisaveSchemePayers.forEach(row => {
+        schemeDataList.push(this.getSchemePayerDetails(row))
       })
 
     const viewPatientProfileAccess = Authorized.check(
@@ -660,7 +644,7 @@ class Banner extends PureComponent {
                   }}
                 >
                   {this.state.showWarning && (
-                    <Warining style={{ position: 'absolute' }} color='error' />
+                    <Warning style={{ position: 'absolute' }} color='error' />
                   )}
                   <span
                     style={{
@@ -694,113 +678,128 @@ class Banner extends PureComponent {
                     Scheme
                     <span style={{ bottom: -2 }}>
                       {entity.isActive &&
-                      (entity.patientScheme || [])
-                        .filter((o) => o.schemeTypeFK <= 6 || this.isMedisave(o.schemeTypeFK)).length > 0 && (
-                        <IconButton onClick={this.refreshGovtBalance}>
-                          <Refresh />
-                        </IconButton>
-                      )}
+                        (entity.patientScheme || []).filter(
+                          o =>
+                            o.schemeTypeFK <= 6 ||
+                            this.isMedisave(o.schemeTypeFK),
+                        ).length > 0 && (
+                          <IconButton onClick={this.refreshGovtBalance}>
+                            <Refresh />
+                          </IconButton>
+                        )}
                     </span>
                     {schemeDataList.length > 0 && (
                       <Popover
                         icon={null}
-                        content={schemeDataList.sort((a,b) => a.schemeTypeFK - b.schemeTypeFK).map((o) => {
-                          let schemeData = o
-                          return (
-                            <div style={{ marginBottom: 15 }}>
-                              <div>
-                                {schemeData.coPaymentSchemeFK || 
-                                schemeDataList.filter((p) => this.isMedisave(p.schemeTypeFK))[0] === schemeData 
-                                ? (schemeData.copaymentSchemeName) 
-                                : (schemeData.schemeTypeName)
-                                }
-                                <span style={{ bottom: -2 }}>
-                                  {schemeData.schemeTypeFK <= 6 && (
-                                    <IconButton onClick={this.refreshChasBalance}>
-                                      <Refresh />
-                                    </IconButton>
-                                  )}
-                                  {this.isMedisave(schemeData.schemeTypeFK)
-                                    && (schemeDataList.filter((p) => this.isMedisave(p.schemeTypeFK))[0] === schemeData)
-                                    && (
-                                    <IconButton onClick={this.refreshMedisaveBalance}>
-                                      <Refresh />
-                                    </IconButton>
-                                  )}
-                                </span>
+                        content={schemeDataList
+                          .sort((a, b) => a.schemeTypeFK - b.schemeTypeFK)
+                          .map(o => {
+                            let schemeData = o
+                            return (
+                              <div style={{ marginBottom: 15 }}>
+                                <div>
+                                  {schemeData.coPaymentSchemeFK ||
+                                  schemeDataList.filter(p =>
+                                    this.isMedisave(p.schemeTypeFK),
+                                  )[0] === schemeData
+                                    ? schemeData.copaymentSchemeName
+                                    : schemeData.schemeTypeName}
+                                  <span style={{ bottom: -2 }}>
+                                    {schemeData.schemeTypeFK <= 6 && (
+                                      <IconButton
+                                        onClick={this.refreshChasBalance}
+                                      >
+                                        <Refresh />
+                                      </IconButton>
+                                    )}
+                                    {this.isMedisave(schemeData.schemeTypeFK) &&
+                                      schemeDataList.filter(p =>
+                                        this.isMedisave(p.schemeTypeFK),
+                                      )[0] === schemeData && (
+                                        <IconButton
+                                          onClick={this.refreshMedisaveBalance}
+                                        >
+                                          <Refresh />
+                                        </IconButton>
+                                      )}
+                                  </span>
+                                </div>
+                                {schemeData.schemeType && (
+                                  <div style={{ marginTop: 15 }}>
+                                    {schemeData.schemeType}
+                                  </div>
+                                )}
+                                {this.isMedisave(schemeData.schemeTypeFK) && (
+                                  <div>
+                                    Payer: {schemeData.payerName} (
+                                    {schemeData.payerAccountNo})
+                                  </div>
+                                )}
+                                {schemeData.validFrom && (
+                                  <div>
+                                    Validity:{' '}
+                                    {schemeData.validFrom ? (
+                                      <DatePicker
+                                        text
+                                        format={dateFormatLong}
+                                        value={schemeData.validFrom}
+                                      />
+                                    ) : (
+                                      ''
+                                    )}
+                                    &nbsp;-&nbsp;
+                                    {schemeData.validTo ? (
+                                      <DatePicker
+                                        text
+                                        format={dateFormatLong}
+                                        value={schemeData.validTo}
+                                      />
+                                    ) : (
+                                      ''
+                                    )}
+                                  </div>
+                                )}
+                                {schemeData.schemeTypeFK !== 15 ? (
+                                  <div>
+                                    Balance:{' '}
+                                    <NumberInput
+                                      text
+                                      currency
+                                      value={schemeData.balance}
+                                    />
+                                  </div>
+                                ) : (
+                                  ''
+                                )}
+                                {schemeData.schemeTypeFK <= 6 ? (
+                                  <div>
+                                    Patient Acute Visit Balance:{' '}
+                                    <NumberInput
+                                      text
+                                      currency
+                                      value={
+                                        schemeData.acuteVisitPatientBalance
+                                      }
+                                    />
+                                  </div>
+                                ) : (
+                                  ''
+                                )}
+                                {schemeData.schemeTypeFK <= 6 ? (
+                                  <div>
+                                    Patient Acute Clinic Balance:{' '}
+                                    <NumberInput
+                                      text
+                                      currency
+                                      value={schemeData.acuteVisitClinicBalance}
+                                    />
+                                  </div>
+                                ) : (
+                                  ''
+                                )}
                               </div>
-                              {schemeData.schemeType && 
-                                <div style={{ marginTop: 15 }}>
-                                  {schemeData.schemeType}
-                                </div>
-                              }
-                              {this.isMedisave(schemeData.schemeTypeFK) && 
-                                <div>
-                                  Payer: {schemeData.payerName} ({schemeData.payerAccountNo})
-                                </div>
-                              }
-                              {schemeData.validFrom && 
-                              <div>
-                                Validity:{' '}
-                                {schemeData.validFrom ? (
-                                  <DatePicker
-                                    text
-                                    format={dateFormatLong}
-                                    value={schemeData.validFrom}
-                                  />
-                                ) : (
-                                  ''
-                                )}
-                                &nbsp;-&nbsp;
-                                {schemeData.validTo ? (
-                                  <DatePicker
-                                    text
-                                    format={dateFormatLong}
-                                    value={schemeData.validTo}
-                                  />
-                                ) : (
-                                  ''
-                                )}
-                              </div>}
-                              {schemeData.schemeTypeFK !== 15 ? (
-                                <div>
-                                  Balance: {' '}
-                                  <NumberInput
-                                    text
-                                    currency
-                                    value={schemeData.balance}
-                                  />
-                                </div>
-                              ) : (
-                                ''
-                              )}
-                              {schemeData.schemeTypeFK <= 6 ? (
-                                <div>
-                                  Patient Acute Visit Balance: {' '}
-                                  <NumberInput
-                                    text
-                                    currency
-                                    value={schemeData.acuteVisitPatientBalance}
-                                  />
-                                </div>
-                              ) : (
-                                ''
-                              )}
-                              {schemeData.schemeTypeFK <= 6 ? (
-                                <div>
-                                  Patient Acute Clinic Balance: {' '}
-                                  <NumberInput
-                                    text
-                                    currency
-                                    value={schemeData.acuteVisitClinicBalance}
-                                  />
-                                </div>
-                              ) : (
-                                ''
-                              )}
-                            </div>
-                          )
-                        })}
+                            )
+                          })}
                         trigger='click'
                         placement='rightTop'
                       >
@@ -821,64 +820,75 @@ class Banner extends PureComponent {
                     {schemeDataList.length > 0 ? (
                       <div>
                         {schemeDataList
-                        .reduce((_schemeDataList, scheme) => {
-                          if(!this.isMedisave(scheme.schemeTypeFK) || 
-                          _schemeDataList.filter(data => this.isMedisave(data.schemeTypeFK)).length === 0) 
-                            _schemeDataList.push(scheme)
-                          return _schemeDataList
-                        },[])
-                        .sort((a,b) => a.schemeTypeFK - b.schemeTypeFK)
-                        .slice(0, 2).map((o) => {
-                          const schemeData = o
-                          const isMedisave = this.isMedisave(schemeData.schemeTypeFK)
-                          const displayString = 
-                          `
-                          ${schemeData.coPaymentSchemeFK || isMedisave
-                            ? schemeData.copaymentSchemeName || ''
-                            : schemeData.schemeTypeName || ''
+                          .reduce((_schemeDataList, scheme) => {
+                            if (
+                              !this.isMedisave(scheme.schemeTypeFK) ||
+                              _schemeDataList.filter(data =>
+                                this.isMedisave(data.schemeTypeFK),
+                              ).length === 0
+                            )
+                              _schemeDataList.push(scheme)
+                            return _schemeDataList
+                          }, [])
+                          .sort((a, b) => a.schemeTypeFK - b.schemeTypeFK)
+                          .slice(0, 2)
+                          .map(o => {
+                            const schemeData = o
+                            const isMedisave = this.isMedisave(
+                              schemeData.schemeTypeFK,
+                            )
+                            const displayString = `
+                          ${
+                            schemeData.coPaymentSchemeFK || isMedisave
+                              ? schemeData.copaymentSchemeName || ''
+                              : schemeData.schemeTypeName || ''
                           } 
-                          ${!isMedisave ? '(Exp:' : '' } 
-                          ${!isMedisave && schemeData.validTo
-                            ? moment(schemeData.validTo).format('DD MMM YYYY)')
-                            : ''}
-                          ${!isMedisave && !schemeData.validTo
-                          ? '-)'
-                          : ''}
+                          ${!isMedisave ? '(Exp:' : ''} 
+                          ${
+                            !isMedisave && schemeData.validTo
+                              ? moment(schemeData.validTo).format(
+                                  'DD MMM YYYY)',
+                                )
+                              : ''
+                          }
+                          ${!isMedisave && !schemeData.validTo ? '-)' : ''}
                           `
-                          return (
-                            <div style={{ display: 'flex' }}>
-                              {schemeData.statusDescription && (
-                                <div
-                                  style={{
-                                    width: 25,
-                                  }}
-                                >
-                                  <Tooltip title={schemeData.statusDescription}>
-                                    <Warining
-                                      color='error'
-                                      style={{ position: 'absolute' }}
-                                    />
-                                  </Tooltip>
-                                </div>
-                              )}
-                              {
-                                <Tooltip title={displayString}>
+                            return (
+                              <div style={{ display: 'flex' }}>
+                                {schemeData.statusDescription && (
                                   <div
                                     style={{
-                                      whiteSpace: 'nowrap',
-                                      overflow: 'hidden',
-                                      display: 'inline-block',
-                                      textOverflow: 'ellipsis',
-                                      width: '100%',
+                                      width: 25,
                                     }}
                                   >
-                                    {displayString}
+                                    <Tooltip
+                                      title={schemeData.statusDescription}
+                                    >
+                                      <Warning
+                                        color='error'
+                                        style={{ position: 'absolute' }}
+                                      />
+                                    </Tooltip>
                                   </div>
-                                </Tooltip>
-                              }
-                            </div>
-                          )
-                        })}
+                                )}
+                                {
+                                  <Tooltip title={displayString}>
+                                    <div
+                                      style={{
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        display: 'inline-block',
+                                        textOverflow: 'ellipsis',
+                                        width: '100%',
+                                      }}
+                                    >
+                                      {displayString}
+                                    </div>
+                                  </Tooltip>
+                                }
+                              </div>
+                            )
+                          })}
                       </div>
                     ) : (
                       '-'
@@ -894,11 +904,12 @@ class Banner extends PureComponent {
               body={
                 <Tooltip
                   title={
-                    info.outstandingBalance ? (
-                      `${currencySymbol}${_.round(info.outstandingBalance, 2)}`
-                    ) : (
-                      ''
-                    )
+                    info.outstandingBalance
+                      ? `${currencySymbol}${_.round(
+                          info.outstandingBalance,
+                          2,
+                        )}`
+                      : ''
                   }
                 >
                   <div
@@ -907,7 +918,11 @@ class Banner extends PureComponent {
                     }}
                   >
                     {info.outstandingBalance ? (
-                      <NumberInput text currency value={_.round(info.outstandingBalance, 2)} />
+                      <NumberInput
+                        text
+                        currency
+                        value={_.round(info.outstandingBalance, 2)}
+                      />
                     ) : (
                       '-'
                     )}

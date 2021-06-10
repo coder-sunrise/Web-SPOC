@@ -10,10 +10,7 @@ import Grid from '../Grid'
 const styles = () => ({})
 
 const Medication = ({ dispatch, history, medication, values }) => {
-  const [
-    tableParas,
-    setTableParas,
-  ] = useState({
+  const [tableParas, setTableParas] = useState({
     columns: [
       { name: 'code', title: 'Code' },
       { name: 'displayValue', title: 'Name' },
@@ -28,10 +25,7 @@ const Medication = ({ dispatch, history, medication, values }) => {
     leftColumns: [],
   })
 
-  const [
-    colExtensions,
-    setColExtensions,
-  ] = useState([
+  const [colExtensions, setColExtensions] = useState([
     { columnName: 'code', width: 130 },
     { columnName: 'action', width: 80, align: 'center' },
     {

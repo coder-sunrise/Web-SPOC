@@ -15,12 +15,11 @@ import { navigateDirtyCheck } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import CannedText from './CannedText'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
-import model from './models'
-import cannedTextModel from './models/cannedText'
+// import cannedTextModel from './models/cannedText'
 import { getDefaultActivePanel, getConfig, getContent } from './utils'
 import NoteDetails from './noteDetails'
 
-const styles = (theme) => ({
+const styles = theme => ({
   editor: {
     width: '100%',
     marginTop: theme.spacing(1),
@@ -55,8 +54,8 @@ const styles = (theme) => ({
   },
 })
 
-window.g_app.replaceModel(model)
-window.g_app.replaceModel(cannedTextModel)
+// window.g_app.replaceModel(model)
+// window.g_app.replaceModel(cannedTextModel)
 
 @connect(
   ({
@@ -80,7 +79,7 @@ class ClinicalNotes extends Component {
     prefix: 'corDoctorNote',
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     const config = getConfig()
     const contents = getContent(config)
@@ -97,7 +96,7 @@ class ClinicalNotes extends Component {
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { config } = this.state
     const { fields } = config
     const payload = {
@@ -149,9 +148,7 @@ class ClinicalNotes extends Component {
     let previousData = this.form.values.corScribbleNotes
 
     if (scriblenotes.editEnable) {
-      const newArrayItems = [
-        ...scriblenotes[category][arrayName],
-      ]
+      const newArrayItems = [...scriblenotes[category][arrayName]]
       newArrayItems[scriblenotes.selectedIndex].subject = subject
       newArrayItems[scriblenotes.selectedIndex].scribbleNoteLayers = temp
       newArrayItems[scriblenotes.selectedIndex].thumbnail = thumbnail
@@ -167,10 +164,7 @@ class ClinicalNotes extends Component {
       })
       scribbleNoteData[category] = newArrayItems
       previousData = Object.keys(scribbleNoteData).reduce((result, key) => {
-        return [
-          ...result,
-          ...scribbleNoteData[key],
-        ]
+        return [...result, ...scribbleNoteData[key]]
       }, [])
     } else {
       const newData = {
@@ -185,10 +179,7 @@ class ClinicalNotes extends Component {
         payload: {
           ...scriblenotes,
           [category]: {
-            [arrayName]: [
-              ...scriblenotes[category][arrayName],
-              newData,
-            ],
+            [arrayName]: [...scriblenotes[category][arrayName], newData],
           },
         },
       })
@@ -211,9 +202,7 @@ class ClinicalNotes extends Component {
       }),
       {},
     )
-    const tempArrayItems = [
-      ...scriblenotes[category][arrayName],
-    ]
+    const tempArrayItems = [...scriblenotes[category][arrayName]]
     const deleteItem = tempArrayItems[scriblenotes.selectedIndex]
     const updatedCategoryScribbleArray = currentScribbleNoteData[
       category
@@ -279,16 +268,14 @@ class ClinicalNotes extends Component {
     })
   }
 
-  updateAttachments = (args) => ({ added, deleted }) => {
+  updateAttachments = args => ({ added, deleted }) => {
     const { form, field } = args
 
-    let updated = [
-      ...(field.value || []),
-    ]
+    let updated = [...(field.value || [])]
     if (added)
       updated = [
         ...updated,
-        ...added.map((o) => {
+        ...added.map(o => {
           const { id, ...resetProps } = o
           return {
             ...resetProps,
@@ -303,27 +290,19 @@ class ClinicalNotes extends Component {
           (item.fileIndexFK !== undefined && item.fileIndexFK === deleted) ||
           (item.fileIndexFK === undefined && item.id === deleted)
         )
-          return [
-            ...attachments,
-            { ...item, isDeleted: true },
-          ]
+          return [...attachments, { ...item, isDeleted: true }]
 
-        return [
-          ...attachments,
-          { ...item },
-        ]
+        return [...attachments, { ...item }]
       }, [])
 
     form.setFieldValue('corAttachment', updated)
   }
 
-  onEditorChange = (type) => (v) => {
+  onEditorChange = type => v => {
     const { consultation, prefix } = this.props
     const { entity } = consultation
 
-    entity[prefix] = [
-      { ...entity[prefix][0], [type]: v },
-    ]
+    entity[prefix] = [{ ...entity[prefix][0], [type]: v }]
 
     this.props.dispatch({
       type: 'consultation/updateState',
@@ -344,7 +323,7 @@ class ClinicalNotes extends Component {
     })
   }
 
-  openCannedText = (note) => {
+  openCannedText = note => {
     this.props.dispatch({
       type: 'cannedText/setSelectedNote',
       payload: note,
@@ -355,7 +334,7 @@ class ClinicalNotes extends Component {
     })
   }
 
-  insertPrevDoctorNotes = async (cannedTextTypeFK) => {
+  insertPrevDoctorNotes = async cannedTextTypeFK => {
     const { visitRegistration } = this.props
     let previousDoctorNote = await this.props.dispatch({
       type: 'cannedText/queryPrevDoctorNotes',
@@ -390,7 +369,7 @@ class ClinicalNotes extends Component {
     })
   }
 
-  handleAddCannedText = (cannedText) => {
+  handleAddCannedText = cannedText => {
     const { cannedTextRow } = this.state
     const { authority } = cannedTextRow
     const accessRight = Authorized.check(authority)
@@ -412,7 +391,7 @@ class ClinicalNotes extends Component {
     this.form.setFieldValue(name, value)
   }
 
-  insertIntoClinicalNote = (dataUrl) => {
+  insertIntoClinicalNote = dataUrl => {
     const { selectedData, config } = this.state
     const { fields = [] } = config
     const { consultation, prefix } = this.props
@@ -422,7 +401,7 @@ class ClinicalNotes extends Component {
 
     const note = entity[prefix] || []
     const scribbleNoteField = fields.find(
-      (field) => field.scribbleNoteTypeFK === selectedData.scribbleNoteTypeFK,
+      field => field.scribbleNoteTypeFK === selectedData.scribbleNoteTypeFK,
     )
 
     const prevData = note.length > 0 ? note[0][scribbleNoteField.fieldName] : ''
@@ -434,13 +413,13 @@ class ClinicalNotes extends Component {
     this.form.setFieldValue(`${prefix}[0]${scribbleNoteField.fieldName}`, value)
   }
 
-  handleCannedTextButtonClick = (note) => {
+  handleCannedTextButtonClick = note => {
     this.setState({
       cannedTextRow: note,
     })
   }
 
-  render () {
+  render() {
     const {
       prefix,
       classes,
@@ -460,7 +439,7 @@ class ClinicalNotes extends Component {
     } = this.state
     const { entity = {} } = consultation
     const { fields } = config
-    const panels = contents.filter((item) => {
+    const panels = contents.filter(item => {
       const accessRight = Authorized.check(item.authority)
       if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
         return false
@@ -479,7 +458,7 @@ class ClinicalNotes extends Component {
       <div>
         <FieldArray
           name='corScribbleNotes'
-          render={(arrayHelpers) => {
+          render={arrayHelpers => {
             const { form } = arrayHelpers
             this.form = form
             const { values } = form
@@ -491,7 +470,7 @@ class ClinicalNotes extends Component {
               selectedIndex: '',
               ...fields.reduce((_result, field) => {
                 const scribbles = values.corScribbleNotes.filter(
-                  (o) => o.scribbleNoteTypeFK === field.scribbleNoteTypeFK,
+                  o => o.scribbleNoteTypeFK === field.scribbleNoteTypeFK,
                 )
 
                 return {
@@ -533,7 +512,7 @@ class ClinicalNotes extends Component {
                 <div className={classes.editor}>
                   <Field
                     name={`${prefix}[0]${item.fieldName}`}
-                    render={(args) => {
+                    render={args => {
                       return (
                         <Authorized authority={item.authority}>
                           <NoteDetails
@@ -601,7 +580,8 @@ class ClinicalNotes extends Component {
           onClose={() =>
             navigateDirtyCheck({
               onProceed: this.toggleScribbleModal(),
-            })}
+            })
+          }
         >
           <ScribbleNote
             {...this.props}

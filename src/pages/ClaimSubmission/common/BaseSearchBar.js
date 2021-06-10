@@ -3,7 +3,7 @@ import React from 'react'
 import { FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
-import { formatMessage,FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 
 // common components
@@ -16,7 +16,7 @@ import {
   ProgressButton,
 } from '@/components'
 
-const styles = (theme) => ({
+const styles = theme => ({
   searchButton: {
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(2),
@@ -31,11 +31,11 @@ const BaseSearchBar = ({
   dispatch,
   values,
 }) => {
-  const hasHrn = modelsName.includes('medisave') && (
-    modelsName.includes('Submitted') ||
-    modelsName.includes('Approved') ||
-    modelsName.includes('Rejected')
-  )
+  const hasHrn =
+    modelsName.includes('medisave') &&
+    (modelsName.includes('Submitted') ||
+      modelsName.includes('Approved') ||
+      modelsName.includes('Rejected'))
   return (
     <React.Fragment>
       <GridContainer>
@@ -43,47 +43,48 @@ const BaseSearchBar = ({
           <GridItem md={4}>
             <FastField
               name='patientName'
-              render={(args) => <TextField {...args} label='Patient Name' />}
+              render={args => <TextField {...args} label='Patient Name' />}
             />
           </GridItem>
           <GridItem md={4}>
             <FastField
               name='patientAccountNo'
-              render={(args) => <TextField {...args} label='Ref. No/Acc. No' />}
+              render={args => <TextField {...args} label='Ref. No/Acc. No' />}
             />
           </GridItem>
-          
+
           <GridItem md={4}>
             {hasHrn && (
-            <FastField
-              name='hrnNo'
-              render={(args) => <TextField {...args} label='HRN No.' />}
-            />
+              <FastField
+                name='hrnNo'
+                render={args => <TextField {...args} label='HRN No.' />}
+              />
             )}
-          </GridItem>          
+          </GridItem>
           <GridItem md={4}>
             <FastField
               name='invoiceNo'
-              render={(args) => <TextField {...args} label='Invoice No.' />}
+              render={args => <TextField {...args} label='Invoice No.' />}
             />
           </GridItem>
           <GridItem md={4}>
             {!hideInvoiceDate && (
               <FastField
                 name='invoiceDates'
-                render={(args) => {
+                render={args => {
                   return (
                     <DateRangePicker
                       label={formatMessage({
-                        id:'claimsubmission.invoiceClaim.filter.invoicedatedfrom',
+                        id:
+                          'claimsubmission.invoiceClaim.filter.invoicedatedfrom',
                       })}
                       label2={formatMessage({
-                        id:'claimsubmission.invoiceClaim.filter.invoicedateto',
+                        id: 'claimsubmission.invoiceClaim.filter.invoicedateto',
                       })}
                       {...args}
-                    />)
-                }
-                  }
+                    />
+                  )
+                }}
               />
             )}
           </GridItem>
@@ -95,18 +96,17 @@ const BaseSearchBar = ({
               color='primary'
               icon={<Search />}
               onClick={() => {
-                const { 
+                const {
                   patientName,
                   patientAccountNo,
                   invoiceNo,
                   invoiceDates,
                   chasClaimStatusCode,
                   hrnNo,
-                 } = values
+                } = values
 
-                const fromToDates = (index) => {
-                  if (invoiceDates)
-                    return invoiceDates[index]
+                const fromToDates = index => {
+                  if (invoiceDates) return invoiceDates[index]
                   return undefined
                 }
 

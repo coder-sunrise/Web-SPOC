@@ -19,7 +19,7 @@ import {
   RichEditor,
 } from '@/components'
 import { withStyles, TextField } from '@material-ui/core'
-import model from './models'
+// import model from './models'
 import PatientNurseNotesContent from './content'
 
 const styles = () => ({
@@ -31,7 +31,7 @@ const styles = () => ({
   },
 })
 
-window.g_app.replaceModel(model)
+// window.g_app.replaceModel(model)
 
 @connect(({ patient, user, patientNurseNotes }) => ({
   patient,
@@ -39,9 +39,7 @@ window.g_app.replaceModel(model)
   user,
 }))
 @withFormikExtend({
-  authority: [
-    'patientdatabase.patientprofiledetails',
-  ],
+  authority: ['patientdatabase.patientprofiledetails'],
   enableReinitialize: true,
   mapPropsToValues: ({ patient, patientNurseNotes }) => {
     // console.log('mapPropsToValues', patientNurseNotes)
@@ -69,16 +67,14 @@ window.g_app.replaceModel(model)
       payload: {
         PatientProfileFK: patient.entity.id,
         pagesize: 999,
-        sorting: [
-          { columnName: 'createDate', direction: 'desc' },
-        ],
+        sorting: [{ columnName: 'createDate', direction: 'desc' }],
       },
     })
 
     if (refreshResult && refreshResult.data) {
       const { data = [] } = refreshResult
       const editingId = isEdit ? id : response.id
-      const editEntity = data.find((f) => f.id === editingId)
+      const editEntity = data.find(f => f.id === editingId)
       dispatch({
         type: 'patientNurseNotes/updateState',
         payload: { entity: editEntity },
@@ -88,13 +84,13 @@ window.g_app.replaceModel(model)
   displayName: 'PatientNurseNotes',
 })
 class PatientNurseNotes extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.divElement = React.createRef()
     this.hisoryElement = React.createRef()
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.refreshNurseNotes()
     window.addEventListener('resize', this.resize.bind(this))
     // this.resize()
@@ -104,7 +100,7 @@ class PatientNurseNotes extends PureComponent {
     }, 10)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.removeEventListener('resize', this.resize.bind(this))
     const { dispatch } = this.props
     dispatch({
@@ -122,16 +118,14 @@ class PatientNurseNotes extends PureComponent {
       payload: {
         PatientProfileFK: patient.entity.id,
         pagesize: 999,
-        sorting: [
-          { columnName: 'createDate', direction: 'desc' },
-        ],
+        sorting: [{ columnName: 'createDate', direction: 'desc' }],
       },
     })
     return refreshResult
   }
 
   // eslint-disable-next-line react/sort-comp
-  resize () {
+  resize() {
     if (
       this.divElement &&
       this.divElement.current &&
@@ -146,7 +140,7 @@ class PatientNurseNotes extends PureComponent {
     }
   }
 
-  handleEdit = (entity) => {
+  handleEdit = entity => {
     const { dispatch, setFieldValue } = this.props
 
     dispatch({
@@ -161,12 +155,12 @@ class PatientNurseNotes extends PureComponent {
     if (currentBox) currentBox.click()
   }
 
-  onEditorChange = (v) => {
+  onEditorChange = v => {
     const { dispatch, setFieldValue } = this.props
     setFieldValue('notes', v || '')
   }
 
-  render () {
+  render() {
     const {
       dispatch,
       patientNurseNotes: { entity, list = [] },
@@ -195,12 +189,13 @@ class PatientNurseNotes extends PureComponent {
                       overflow: 'scroll',
                     }}
                   >
-                    {list.map((i) => {
+                    {list.map(i => {
                       const { createDate, createByUserFK } = i
                       const canEdit =
                         clinicianProfile.userProfileFK === createByUserFK &&
-                        moment(createDate).utc().formatUTC(true) ===
-                          moment().formatUTC(true)
+                        moment(createDate)
+                          .utc()
+                          .formatUTC(true) === moment().formatUTC(true)
                       return (
                         <PatientNurseNotesContent
                           entity={i}
@@ -232,7 +227,7 @@ class PatientNurseNotes extends PureComponent {
                 <GridItem md={12}>
                   <Field
                     name='notes'
-                    render={(args) => {
+                    render={args => {
                       return (
                         <div ref={this.divElement}>
                           <RichEditor

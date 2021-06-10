@@ -1,6 +1,6 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
-import * as service from '../services'
+import service from '../services'
 
 export default createListViewModel({
   namespace: 'receivingGoodsList',
@@ -14,20 +14,24 @@ export default createListViewModel({
       filterSearch: {
         isAllDateChecked: false,
         transactionDates: [
-          moment().startOf('month').formatUTC(),
-          moment().endOf('day').formatUTC(false),
+          moment()
+            .startOf('month')
+            .formatUTC(),
+          moment()
+            .endOf('day')
+            .formatUTC(false),
         ],
       },
     },
     subscriptions: ({ dispatch, history }) => {},
     effects: {
-      *batchWriteOff ({ payload }, { call }) {
+      *batchWriteOff({ payload }, { call }) {
         const r = yield call(service.writeOffReceivingGoods, payload)
         return r
       },
     },
     reducers: {
-      queryDone (state, { payload }) {
+      queryDone(state, { payload }) {
         const { data } = payload
         return {
           ...state,

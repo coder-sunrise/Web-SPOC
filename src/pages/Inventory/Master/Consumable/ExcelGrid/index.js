@@ -1,16 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { compare } from '@/layouts'
-import router from 'umi/router'
-import moment from 'moment'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-
-import { Tooltip, withStyles } from '@material-ui/core'
-// import tooltipsStyle from 'assets/jss/material-kit-pro-react/tooltipsStyle.jsx'
-import { sleep, getAppendUrl } from '@/utils/utils'
 import { status, suppliers, dispUOMs, yesNo } from '@/utils/codes'
-
-import { Button, CommonModal, EditableTableGrid } from '@/components'
 import ReactDataSheet from 'react-datasheet'
 
 @connect(({ consumable }) => ({
@@ -19,11 +10,7 @@ import ReactDataSheet from 'react-datasheet'
 @compare('consumable')
 class ExcelGrid extends PureComponent {
   state = {
-    pageSizes: [
-      5,
-      10,
-      15,
-    ],
+    pageSizes: [5, 10, 15],
     selection: [],
     editingRowIds: [],
   }
@@ -112,14 +99,14 @@ class ExcelGrid extends PureComponent {
   //   })
   // }
 
-  getComponent = (cell) => {
+  getComponent = cell => {
     // console.log(cell)
     return null
   }
 
-  changeEditingRowIds = (editingRowIds) => this.setState({ editingRowIds })
+  changeEditingRowIds = editingRowIds => this.setState({ editingRowIds })
 
-  changeRowChanges = (rowChanges) => {
+  changeRowChanges = rowChanges => {
     this.setState({ rowChanges })
   }
 
@@ -138,18 +125,20 @@ class ExcelGrid extends PureComponent {
   }
 
   clickRow = (row, event) => {
-    this.setState((prevState) => ({
-      editingRowIds: prevState.editingRowIds.concat([
-        row.id,
-      ]),
+    this.setState(prevState => ({
+      editingRowIds: prevState.editingRowIds.concat([row.id]),
     }))
   }
 
-  render () {
+  render() {
     const { tableParas, rowChanges, editingRowIds, data } = this.state
     if (!data) return null
     // console.log(this.props)
-    const { consumable: { list }, dispatch, height } = this.props
+    const {
+      consumable: { list },
+      dispatch,
+      height,
+    } = this.props
     // console.log(height)
     // if (this.state.height <= 0) return null
 
@@ -171,7 +160,7 @@ class ExcelGrid extends PureComponent {
       // />
       <ReactDataSheet
         data={this.state.data}
-        valueRenderer={(cell) => cell.value}
+        valueRenderer={cell => cell.value}
         // sheetRenderer={(props) => (
         //   <table className={props.className + ' my-awesome-extra-class'}>
         //     <thead>
@@ -183,10 +172,8 @@ class ExcelGrid extends PureComponent {
         //     <tbody>{props.children}</tbody>
         //   </table>
         // )}
-        onCellsChanged={(changes) => {
-          const data = this.state.data.map((row) => [
-            ...row,
-          ])
+        onCellsChanged={changes => {
+          const data = this.state.data.map(row => [...row])
           changes.forEach(({ cell, row, col, value }) => {
             data[row][col] = { ...data[row][col], value }
           })

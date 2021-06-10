@@ -8,7 +8,7 @@ const originalLayouts = getFromLS('layouts') || {}
  * This layout demonstrates how to sync multiple responsive layouts to localstorage.
  */
 class ResponsiveLocalStorageLayout extends React.PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
@@ -16,7 +16,7 @@ class ResponsiveLocalStorageLayout extends React.PureComponent {
     }
   }
 
-  static get defaultProps () {
+  static get defaultProps() {
     return {
       className: 'layout',
       cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 },
@@ -24,16 +24,16 @@ class ResponsiveLocalStorageLayout extends React.PureComponent {
     }
   }
 
-  resetLayout () {
+  resetLayout() {
     this.setState({ layouts: {} })
   }
 
-  onLayoutChange (layout, layouts) {
+  onLayoutChange(layout, layouts) {
     saveToLS('layouts', layouts)
     this.setState({ layouts })
   }
 
-  render () {
+  render() {
     return (
       <div>
         <button onClick={() => this.resetLayout()}>Reset Layout</button>
@@ -43,7 +43,8 @@ class ResponsiveLocalStorageLayout extends React.PureComponent {
           rowHeight={30}
           layouts={this.state.layouts}
           onLayoutChange={(layout, layouts) =>
-            this.onLayoutChange(layout, layouts)}
+            this.onLayoutChange(layout, layouts)
+          }
         >
           <div key='1' data-grid={{ w: 2, h: 3, x: 0, y: 0, minW: 2, minH: 3 }}>
             <span className='text'>1</span>
@@ -66,21 +67,21 @@ class ResponsiveLocalStorageLayout extends React.PureComponent {
   }
 }
 
-module.exports = ResponsiveLocalStorageLayout
+export default ResponsiveLocalStorageLayout
 
-function getFromLS (key) {
+function getFromLS(key) {
   let ls = {}
   if (global.localStorage) {
     try {
       ls = JSON.parse(global.localStorage.getItem('rgl-8')) || {}
     } catch (e) {
-      /*Ignore */
+      /* Ignore */
     }
   }
   return ls[key]
 }
 
-function saveToLS (key, value) {
+function saveToLS(key, value) {
   if (global.localStorage) {
     global.localStorage.setItem(
       'rgl-8',

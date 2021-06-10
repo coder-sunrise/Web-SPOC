@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import PersonAdd from '@material-ui/icons/PersonAdd'
 
@@ -15,7 +15,7 @@ import {
   ProgressButton,
 } from '@/components'
 
-const styles = (theme) => ({
+const styles = theme => ({
   filterBar: {
     marginBottom: '10px',
   },
@@ -42,7 +42,7 @@ const styles = (theme) => ({
   },
 })
 class FilterBar extends PureComponent {
-  render () {
+  render() {
     const { classes, dispatch, disableAdd, simple } = this.props
 
     return (
@@ -52,7 +52,7 @@ class FilterBar extends PureComponent {
             <GridItem md={12} lg={5} style={{ position: 'relative' }}>
               <FastField
                 name='search'
-                render={(args) => {
+                render={args => {
                   return (
                     <TextField
                       autoFocus={!simple}

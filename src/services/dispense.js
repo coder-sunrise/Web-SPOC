@@ -4,19 +4,19 @@ import * as service from '@/services/common'
 
 const url = '/api/dispense'
 
-module.exports = {
-  remove: (params) => service.remove(url, params),
-  query: (params) => {
+const fns = {
+  remove: params => service.remove(url, params),
+  query: params => {
     // console.log(url, params)
     return service.query(url, params)
   },
-  create: async (visitFK) => {
+  create: async visitFK => {
     const r = await request(`${url}/${visitFK}`, {
       method: 'POST',
     })
     return r
   },
-  save: async (params) => {
+  save: async params => {
     // console.log(params)
     const r = await request(`${url}/save/${params.id}`, {
       method: 'PUT',
@@ -24,32 +24,32 @@ module.exports = {
     })
     return r
   },
-  finalize: async (params) => {
+  finalize: async params => {
     const r = await request(`${url}/finalize/${params.id}`, {
       method: 'PUT',
       body: params.values,
     })
     return r
   },
-  unlock: async (params) => {
+  unlock: async params => {
     const r = await request(`${url}/unlock/${params.id}`, {
       method: 'PUT',
     })
     return r
   },
-  refresh: async (id) => {
+  refresh: async id => {
     const r = await request(`${url}/refresh/${id}`, {
       method: 'PUT',
     })
     return r
   },
-  edit: async (id) => {
+  edit: async id => {
     const r = await request(`${url}/edit/${id}`, {
       method: 'PUT',
     })
     return r
   },
-  sign: async (params) => {
+  sign: async params => {
     const r = await request(`${url}/sign/${params.id}`, {
       method: 'PUT',
       body: params,
@@ -57,7 +57,7 @@ module.exports = {
     return r
   },
 
-  queryDrugLabelDetails: async (visitInvoiceDrugId) => {
+  queryDrugLabelDetails: async visitInvoiceDrugId => {
     const r = await request(`${url}/DrugLabel/${visitInvoiceDrugId}`, {
       method: 'GET',
       keepNull: true,
@@ -65,7 +65,7 @@ module.exports = {
     return r
   },
 
-  queryDrugLabelsDetails: async (visitId) => {
+  queryDrugLabelsDetails: async visitId => {
     const r = await request(`${url}/DrugLabelByVisitID/${visitId}`, {
       method: 'GET',
       keepNull: true,
@@ -83,15 +83,15 @@ module.exports = {
     )
     return r
   },
-  saveAddOrderDetails: async (params) => {
+  saveAddOrderDetails: async params => {
     const r = await request(`${url}/retailOrder/${params.id}`, {
       method: 'PUT',
       body: params,
     })
     return r
   },
-  removeAddOrderDetails: (params) =>
-    service.remove(`${url}/retailOrder`, params),
-  removeBillFirstVisit: (params) =>
+  removeAddOrderDetails: params => service.remove(`${url}/retailOrder`, params),
+  removeBillFirstVisit: params =>
     service.remove(`${url}/billFirstOrder`, params),
 }
+export default fns

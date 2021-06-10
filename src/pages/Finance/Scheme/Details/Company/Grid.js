@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
-import router from 'umi/router'
+import { history } from 'umi'
+
 import moment from 'moment'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 
@@ -36,14 +37,8 @@ class Grid extends PureComponent {
     },
   }
 
-  componentDidMount () {
-    // this.props.dispatch({
-    //   type: 'schemeCompany/query',
-    // })
-  }
-
   showDetail = (row, vmode) => () => {
-    this.props.history.push(`/finance/schemeCompany/${row.Id}?vmode=${vmode}`)
+    history.push(`/finance/schemeCompany/${row.Id}?vmode=${vmode}`)
   }
 
   Cell = ({ column, row, dispatch, classes, ...props }) => {
@@ -81,11 +76,14 @@ class Grid extends PureComponent {
     return <Table.Cell {...props} />
   }
 
-  render () {
+  render() {
     const { tableParas } = this.state
     // console.log(this.props)
-    const { schemeCompany: { list = [] }, dispatch } = this.props
-    const TableCell = (p) => this.Cell({ ...p, dispatch })
+    const {
+      schemeCompany: { list = [] },
+      dispatch,
+    } = this.props
+    const TableCell = p => this.Cell({ ...p, dispatch })
     const colExtenstions = [
       { columnName: 'Action', width: 110, align: 'center' },
       {

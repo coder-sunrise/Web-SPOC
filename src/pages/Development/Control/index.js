@@ -66,10 +66,8 @@ import {
 import { widgets } from '@/utils/widgets'
 import Yup from '@/utils/yup'
 import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
-import { deepDiffMapper } from '@/utils/cdrss'
 import Loading from '@/components/PageLoading/index'
 
-console.log(deepDiffMapper)
 // import PatientSearch from '@/pages/PatientDatabase/Search'
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
 const doctors = [
@@ -91,7 +89,7 @@ const ResponsiveGridLayout = WidthProvider(Responsive)
 //     { i: 'c', x: 6, y: 0, w: 6, h: 2 },
 //   ],
 // }
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
   container: {
     width: '100%',
@@ -123,9 +121,7 @@ const initValues = {
   doctorRemarks: 'Testing multiple lines of input',
   timing2: '08:30',
   numberField: 123,
-  doctor: [
-    'bao',
-  ],
+  doctor: ['bao'],
 }
 @withFormik({
   mapPropsToValues: () => initValues,
@@ -135,10 +131,15 @@ const initValues = {
     patientAccountNo: Yup.string().required(),
     genderFK: Yup.string().required(),
     doctorRemarks: Yup.string().required(),
-    doctor: Yup.array().of(Yup.string().required()).required(),
+    doctor: Yup.array()
+      .of(Yup.string().required())
+      .required(),
     doctorRadio: Yup.string().required(),
     isPersist: Yup.boolean().required(),
-    fromto: Yup.array().of(Yup.date()).required().min(2),
+    fromto: Yup.array()
+      .of(Yup.date())
+      .required()
+      .min(2),
     numberField: Yup.number().required(),
     contact: Yup.object().shape({
       contactAddress: Yup.array().of(
@@ -150,13 +151,13 @@ const initValues = {
       ),
     }),
   }),
-  submitForm: (v) => {
+  submitForm: v => {
     console.log(v)
   },
   displayName: 'ControlTest',
 })
 class ControlTest extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.container = React.createRef()
 
@@ -207,21 +208,21 @@ class ControlTest extends PureComponent {
   //   console.log(deepDiffMapper.map(this.props, prevProps, true))
   // }
 
-  componentDidMount () {
+  componentDidMount() {
     // create an instance
   }
 
-  generateConfig = (cfg) => {
+  generateConfig = cfg => {
     const { classes, ...resetProps } = this.props
     const { elevation } = this.state
     return {
       elevation: 0,
       className: classes.paper,
-      onMouseOver: (e) => {
+      onMouseOver: e => {
         elevation[cfg.id] = 3
         this.setState({ elevation })
       },
-      onMouseOut: (e) => {
+      onMouseOut: e => {
         elevation[cfg.id] = 0
         this.setState({ elevation })
       },
@@ -232,37 +233,37 @@ class ControlTest extends PureComponent {
   //   console.log(nextProps, this.props)
   // }
 
-  render () {
+  render() {
     const { props, state } = this
     const { classes, theme, ...resetProps } = this.props
     console.log(Notification, Notification.permission)
     const testConfig = {
-      onFocus: (e) => {
+      onFocus: e => {
         console.log(1)
         console.log(e)
       },
-      onChange: (e) => {
+      onChange: e => {
         console.log(2)
 
         console.log(e)
       },
-      onBlur: (e) => {
+      onBlur: e => {
         console.log(3)
 
         console.log(e)
       },
       inputProps: {
-        onChange: (e) => {
+        onChange: e => {
           console.log(4)
 
           console.log(e)
         },
-        onBlur: (e) => {
+        onBlur: e => {
           console.log(5)
 
           console.log(e)
         },
-        onFocus: (e) => {
+        onFocus: e => {
           console.log(6)
 
           console.log(e)
@@ -286,7 +287,7 @@ class ControlTest extends PureComponent {
 
             <FastField
               name='coPaymentSchemeName'
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   {...args}
                   label='Copayment Scheme name'
@@ -309,7 +310,7 @@ class ControlTest extends PureComponent {
 
             <FastField
               name='name'
-              render={(args) => (
+              render={args => (
                 <TextField prefix={<Search />} label='Name' {...args} />
               )}
             />
@@ -317,7 +318,7 @@ class ControlTest extends PureComponent {
           <GridItem sm={6}>
             <FastField
               name='name'
-              render={(args) => {
+              render={args => {
                 return (
                   <TextField
                     prefix={<Search />}
@@ -333,7 +334,7 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='genderFK'
-              render={(args) => (
+              render={args => (
                 <CodeSelect label='Salutation' code='ctSalutation' {...args} />
               )}
             />
@@ -341,13 +342,13 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='dob'
-              render={(args) => <DatePicker label='DOB' {...args} />}
+              render={args => <DatePicker label='DOB' {...args} />}
             />
           </GridItem>
           <GridItem sm={6}>
             <FastField
               name='fromto'
-              render={(args) => (
+              render={args => (
                 <DateRangePicker label='From' label2='To' {...args} />
               )}
             />
@@ -355,13 +356,13 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='time'
-              render={(args) => <TimePicker label='Time' {...args} />}
+              render={args => <TimePicker label='Time' {...args} />}
             />
           </GridItem>
           <GridItem sm={3}>
             <FastField
               name='name'
-              render={(args) => (
+              render={args => (
                 <TextField
                   prefix={<Search />}
                   label='sdf'
@@ -374,7 +375,7 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='isPersist'
-              render={(args) => {
+              render={args => {
                 return (
                   <Checkbox
                     label='Persist'
@@ -391,7 +392,7 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='doctor'
-              render={(args) => (
+              render={args => (
                 <CheckboxGroup
                   label='Filter by Doctor'
                   // vertical
@@ -401,7 +402,7 @@ class ControlTest extends PureComponent {
                   textField='name'
                   options={doctors}
                   noUnderline
-                  onChange={(e) => {
+                  onChange={e => {
                     // console.log(e)
                     // dispatch({
                     //   type: 'consultation/updateState',
@@ -419,7 +420,7 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='doctorRadio'
-              render={(args) => (
+              render={args => (
                 <RadioGroup
                   label='Filter by Doctor'
                   // vertical
@@ -428,7 +429,7 @@ class ControlTest extends PureComponent {
                   // value={{ tan1: true }}
                   textField='name'
                   options={doctors}
-                  onChange={(e) => {
+                  onChange={e => {
                     // console.log(e)
                     // dispatch({
                     //   type: 'consultation/updateState',
@@ -446,7 +447,7 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='numberField'
-              render={(args) => (
+              render={args => (
                 <TextField
                   prefix='External Prescription'
                   label='Text Input'
@@ -458,7 +459,7 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='doctor'
-              render={(args) => (
+              render={args => (
                 <Select
                   label='Filter by Doctor (Multiple)'
                   mode='multiple'
@@ -471,12 +472,12 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='doctor'
-              render={(args) => (
+              render={args => (
                 <Select
                   mode='tags'
                   maxSelected={1}
                   label='Filter by Doctor (Tags)'
-                  onChange={(v) => {
+                  onChange={v => {
                     console.log(v)
                   }}
                   options={doctors}
@@ -488,7 +489,7 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='doctorsingle'
-              render={(args) => (
+              render={args => (
                 <Select
                   label='Filter by Doctor (Single)'
                   prefix='Filter by Doctor (Single)'
@@ -502,7 +503,7 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='numberField'
-              render={(args) => (
+              render={args => (
                 <NumberInput
                   prefix='External Prescription'
                   label='Number Input'
@@ -516,7 +517,7 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='numberField'
-              render={(args) => (
+              render={args => (
                 <TextField
                   prefix='External Prescription'
                   label='Text Input'
@@ -528,7 +529,7 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='switch'
-              render={(args) => {
+              render={args => {
                 return <Switch label='Switch' {...args} />
               }}
             />
@@ -536,7 +537,7 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='numberField'
-              render={(args) => {
+              render={args => {
                 return <NumberInput format='0,0' label='Number' {...args} />
               }}
             />
@@ -544,7 +545,7 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='diagnosis'
-              render={(args) => {
+              render={args => {
                 return (
                   <CodeSelect
                     label='Diagnosis'
@@ -555,7 +556,7 @@ class ControlTest extends PureComponent {
                     }}
                     labelField='displayvalue'
                     autoComplete
-                    renderDropdown={(option) => {
+                    renderDropdown={option => {
                       return (
                         <span>
                           <AttachMoney
@@ -579,7 +580,7 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='name'
-              render={(args) => {
+              render={args => {
                 return (
                   <OutlinedTextField
                     label='Text Input'
@@ -587,10 +588,10 @@ class ControlTest extends PureComponent {
                     rowsMax={3}
                     rows={3}
                     maxLength={20}
-                    onChange={(v) => {
+                    onChange={v => {
                       console.log(v)
                     }}
-                    onBlur={(v) => {
+                    onBlur={v => {
                       console.log('blur', v)
                     }}
                     {...args}
@@ -604,7 +605,7 @@ class ControlTest extends PureComponent {
           <GridItem>
             <FastField
               name='doctor'
-              render={(args) => {
+              render={args => {
                 return (
                   <ButtonSelect
                     options={doctors}

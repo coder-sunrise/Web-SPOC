@@ -2,38 +2,15 @@ import React, { Component } from 'react'
 import { Editor } from 'react-draft-wysiwyg'
 import { connect } from 'dva'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
-import Yup from '@/utils/yup'
 import Iframe from 'react-iframe'
 
-import {
-  Button,
-  CommonHeader,
-  CommonModal,
-  NavPills,
-  PictureUpload,
-  GridContainer,
-  GridItem,
-  Card,
-  CardAvatar,
-  CardBody,
-  TextField,
-  notification,
-  Select,
-  CodeSelect,
-  DatePicker,
-  RadioGroup,
-  ProgressButton,
-  CardContainer,
-  confirm,
-} from '@/components'
 import { withStyles, Divider, Paper } from '@material-ui/core'
 
-import DeleteIcon from '@material-ui/icons/Delete'
-import model from './models'
+// import model from './models'
 
-window.g_app.replaceModel(model)
+// window.g_app.replaceModel(model)
 
-const styles = (theme) => ({})
+const styles = theme => ({})
 
 @connect(({ dentalChartDemo }) => ({
   dentalChartDemo,
@@ -48,7 +25,7 @@ const styles = (theme) => ({})
   displayName: 'DentalChartDemo',
 })
 class DentalChartDemo extends Component {
-  render () {
+  render() {
     const { state, props } = this
     const { theme } = props
     return (

@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import PersonAdd from '@material-ui/icons/PersonAdd'
 
@@ -18,7 +18,7 @@ import {
   DateRangePicker,
 } from '@/components'
 
-const styles = (theme) => ({
+const styles = theme => ({
   filterBar: {
     marginBottom: '10px',
   },
@@ -45,7 +45,7 @@ const styles = (theme) => ({
   },
 })
 class FilterBar extends PureComponent {
-  render () {
+  render() {
     const { classes, dispatch, disableAdd, simple } = this.props
 
     return (
@@ -54,7 +54,7 @@ class FilterBar extends PureComponent {
           <GridItem md={4}>
             <FastField
               name='search6'
-              render={(args) => {
+              render={args => {
                 return <DateRangePicker label='Date of Request' {...args} />
               }}
             />
@@ -62,7 +62,7 @@ class FilterBar extends PureComponent {
           <GridItem md={4}>
             <FastField
               name='search7'
-              render={(args) => {
+              render={args => {
                 return <TextField label='Patient Acct No.' {...args} />
               }}
             />
@@ -71,7 +71,7 @@ class FilterBar extends PureComponent {
           <GridItem md={4}>
             <FastField
               name='search8'
-              render={(args) => {
+              render={args => {
                 return <DateRangePicker label='Date of Report' {...args} />
               }}
             />
@@ -79,7 +79,7 @@ class FilterBar extends PureComponent {
           <GridItem md={4}>
             <FastField
               name='search9'
-              render={(args) => {
+              render={args => {
                 return <TextField label='Patient Name' {...args} />
               }}
             />

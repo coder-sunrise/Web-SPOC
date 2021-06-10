@@ -16,19 +16,17 @@ import { Tooltip } from '@/components'
 const _config = {
   formControlPropsArray: {
     key: 'formControlProps',
-    value: [
-      'fullWidth',
-    ],
+    value: ['fullWidth'],
   },
 }
 
-function CustomInputWrapper ({ classes, theme, ...props }) {
+function CustomInputWrapper({ classes, theme, ...props }) {
   // console.log(props)
   // formControlProps.fullWidth =fullWidth || formControlProps.fullWidth
   for (const key in _config) {
     if (Object.prototype.hasOwnProperty.call(_config, key)) {
       const element = _config[key]
-      element.value.forEach((o) => {
+      element.value.forEach(o => {
         if (props[o]) {
           if (!props[element.key]) props[element.key] = {}
           props[element.key][o] = props[o]
@@ -137,7 +135,7 @@ function CustomInputWrapper ({ classes, theme, ...props }) {
             title={label2}
             className={labelClasses}
             {...labelProps}
-            style={{ left: '44%', marginLeft: 20 }}
+            style={{ left: '50%', marginLeft: 4 }}
           >
             {label2}
           </InputLabel>

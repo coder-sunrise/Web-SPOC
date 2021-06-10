@@ -1,10 +1,15 @@
 import React from 'react'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { withStyles } from '@material-ui/core'
 import { Button, GridContainer, GridItem } from '@/components'
 import styles from './styles'
 
-const DuplicatePO = ({ classes, onClose, purchaseReceiveList, actions: { handleNavigate } }) => {
+const DuplicatePO = ({
+  classes,
+  onClose,
+  purchaseReceiveList,
+  actions: { handleNavigate },
+}) => {
   const { entity } = purchaseReceiveList
   return (
     <div>
@@ -18,10 +23,7 @@ const DuplicatePO = ({ classes, onClose, purchaseReceiveList, actions: { handleN
             {'?'}
           </h4>
         </GridItem>
-        <Button
-          color='danger'
-          onClick={onClose}
-        >
+        <Button color='danger' onClick={onClose}>
           Close
         </Button>
         <GridItem>
@@ -38,4 +40,3 @@ const DuplicatePO = ({ classes, onClose, purchaseReceiveList, actions: { handleN
 }
 
 export default withStyles(styles, { name: 'DuplicatePO' })(DuplicatePO)
-

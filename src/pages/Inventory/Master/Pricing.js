@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import { FastField } from 'formik'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { GridContainer, GridItem, NumberInput, Field } from '@/components'
 import SharedContainer from './SharedContainer'
 
@@ -15,14 +15,8 @@ const Pricing = ({
   consumableDetail,
   theme,
 }) => {
-  const [
-    acp,
-    setAcp,
-  ] = useState(values.averageCostPrice || 0.0)
-  const [
-    markupMargin,
-    setMarkupMargin,
-  ] = useState(values.markupMargin || 0.0)
+  const [acp, setAcp] = useState(values.averageCostPrice || 0.0)
+  const [markupMargin, setMarkupMargin] = useState(values.markupMargin || 0.0)
 
   const calculateSuggestSellingPrice = () => {
     const suggestedSellingPrice =
@@ -44,17 +38,11 @@ const Pricing = ({
 
     return false
   }
-  useEffect(
-    () => {
-      calculateSuggestSellingPrice()
-      setFieldValue('averageCostPrice', acp)
-      setFieldValue('markupMargin', markupMargin)
-    },
-    [
-      acp,
-      markupMargin,
-    ],
-  )
+  useEffect(() => {
+    calculateSuggestSellingPrice()
+    setFieldValue('averageCostPrice', acp)
+    setFieldValue('markupMargin', markupMargin)
+  }, [acp, markupMargin])
   return (
     <SharedContainer>
       <div
@@ -74,7 +62,7 @@ const Pricing = ({
               <GridItem xs={12}>
                 <Field
                   name='lastCostPriceBefBonus'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <NumberInput
                         currency
@@ -91,7 +79,7 @@ const Pricing = ({
               <GridItem xs={12}>
                 <Field
                   name='lastCostPriceAftBonus'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <NumberInput
                         currency
@@ -108,13 +96,13 @@ const Pricing = ({
               <GridItem xs={12}>
                 <FastField
                   name='averageCostPrice'
-                  render={(args) => (
+                  render={args => (
                     <NumberInput
                       format='$0,0.0000'
                       label={formatMessage({
                         id: 'inventory.master.pricing.averageCostPrice',
                       })}
-                      onChange={(e) => {
+                      onChange={e => {
                         const inputValue = e.target.value || 0
                         setAcp(inputValue)
                       }}
@@ -134,12 +122,12 @@ const Pricing = ({
               <GridItem xs={12}>
                 <FastField
                   name='markupMargin'
-                  render={(args) => (
+                  render={args => (
                     <NumberInput
                       label={formatMessage({
                         id: 'inventory.master.pricing.profitMarginPercentage',
                       })}
-                      onChange={(e) => {
+                      onChange={e => {
                         const inputValue = e.target.value || 0
                         setMarkupMargin(inputValue)
                       }}
@@ -153,7 +141,7 @@ const Pricing = ({
               <GridItem xs={12}>
                 <FastField
                   name='suggestSellingPrice'
-                  render={(args) => (
+                  render={args => (
                     <NumberInput
                       currency
                       label={formatMessage({
@@ -169,7 +157,7 @@ const Pricing = ({
               <GridItem xs={12}>
                 <FastField
                   name='sellingPrice'
-                  render={(args) => (
+                  render={args => (
                     <NumberInput
                       currency
                       label={formatMessage({
@@ -183,7 +171,7 @@ const Pricing = ({
               <GridItem xs={12}>
                 <FastField
                   name='maxDiscount'
-                  render={(args) => (
+                  render={args => (
                     <NumberInput
                       label={formatMessage({
                         id: 'inventory.master.pricing.maxDiscount',

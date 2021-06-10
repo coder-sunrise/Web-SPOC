@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import { FormattedMessage, formatMessage } from 'umi/locale'
+import { FormattedMessage, formatMessage } from 'umi'
 import { withStyles } from '@material-ui/core/styles'
 import { Paper, Divider } from '@material-ui/core'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
@@ -31,7 +31,7 @@ import {
 import Grid from './Grid'
 
 const submitKey = 'schemeCompany/submitDetail'
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 @connect(({ schemeCompany }) => ({
@@ -60,7 +60,7 @@ const styles = (theme) => ({
         type: submitKey,
         payload: values,
       })
-      .then((r) => {
+      .then(r => {
         if (r.message === 'Ok') {
           // toast.success('test')
           notification.success({
@@ -80,7 +80,7 @@ class Company extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     // console.log(this)
     const { props } = this
     const { classes, theme, ...restProps } = props
@@ -97,7 +97,7 @@ class Company extends PureComponent {
             <GridItem xs={9}>
               <FastField
                 name='Supplier'
-                render={(args) => (
+                render={args => (
                   <Select label='Company' options={suppliers} {...args} />
                 )}
               />
@@ -121,7 +121,7 @@ class Company extends PureComponent {
             <GridItem xs={12} md={9}>
               <FastField
                 name='companyType'
-                render={(args) => (
+                render={args => (
                   <RadioGroup
                     label=' '
                     simple

@@ -17,7 +17,7 @@ import Rejected from './Rejected'
   global,
 }))
 class Medisave extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     const { dispatch } = props
     /* dispatch({
@@ -61,10 +61,10 @@ class Medisave extends React.Component {
     allowEdit: false,
   }
 
-  openClaimDetails = (allowEdit) =>
+  openClaimDetails = allowEdit =>
     this.setState({ showClaimDetails: true, allowEdit })
 
-  openSubmitClaimStatus = (count) =>
+  openSubmitClaimStatus = count =>
     this.setState({ showSubmitClaimStatus: true, failedCount: count })
 
   closeClaimDetailsModal = () => {
@@ -86,7 +86,7 @@ class Medisave extends React.Component {
     dispatch({
       type: 'medisaveClaimSubmissionNew/upsert',
       payload: { ...entity },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         this.closeClaimDetailsModal()
       }
@@ -97,7 +97,7 @@ class Medisave extends React.Component {
   closeSubmitClaimStatus = () =>
     this.setState({ showSubmitClaimStatus: false, failedCount: 0 })
 
-  navigateToInvoiceDetails = (row) => {
+  navigateToInvoiceDetails = row => {
     const { history } = this.props
     const { invoiceFK } = row
     history.push(`/claim-submission/medisave/invoice/details?id=${invoiceFK}`)
@@ -112,7 +112,7 @@ class Medisave extends React.Component {
           payload: {
             id: row.id,
           },
-        }).then((r) => {
+        }).then(r => {
           if (r) {
             const { patientDetail = {} } = r
             this.openClaimDetails(allowEdit && !!patientDetail.isActive)
@@ -126,7 +126,7 @@ class Medisave extends React.Component {
           payload: {
             id: row.id,
           },
-        }).then((r) => {
+        }).then(r => {
           if (r) this.navigateToInvoiceDetails(r)
         })
         break
@@ -135,11 +135,11 @@ class Medisave extends React.Component {
     }
   }
 
-  onChangeTab = (e) => {
+  onChangeTab = e => {
     this.setState({ activeTab: e })
   }
 
-  render () {
+  render() {
     const {
       showClaimDetails,
       showSubmitClaimStatus,

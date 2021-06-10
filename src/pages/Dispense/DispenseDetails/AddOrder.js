@@ -3,8 +3,6 @@ import { withStyles } from '@material-ui/core/styles'
 import _ from 'lodash'
 import { connect } from 'dva'
 import { compose } from 'redux'
-import { withRouter } from 'react-router-dom'
-import { sendNotification } from '@/utils/realtime'
 import { SizeContainer, withFormikExtend } from '@/components'
 import { convertToConsultation } from '@/pages/Consultation/utils'
 import {
@@ -54,7 +52,7 @@ const AddOrder = ({
     if (r) {
       const { retailInvoiceAdjustment, retailInvoiceItem } = r
 
-      const mapRetailItemPropertyToOrderProperty = (o) => {
+      const mapRetailItemPropertyToOrderProperty = o => {
         let obj
         switch (o.invoiceItemTypeFK) {
           case INVOICE_ITEM_TYPE_BY_NAME.MEDICATION: {
@@ -67,7 +65,7 @@ const AddOrder = ({
             let medicationItem
             if (o.retailVisitInvoiceDrug.inventoryMedicationFK) {
               medicationItem = inventorymedication.find(
-                (medication) =>
+                medication =>
                   medication.id ===
                     o.retailVisitInvoiceDrug.inventoryMedicationFK &&
                   medication.isActive,
@@ -89,7 +87,7 @@ const AddOrder = ({
                 o.retailVisitInvoiceDrug.concurrencyToken,
               ...restValues,
               corPrescriptionItemInstruction: o.retailVisitInvoiceDrug.retailPrescriptionItem.retailPrescriptionItemInstruction.map(
-                (instruction) => {
+                instruction => {
                   return {
                     ...instruction,
                     stepdose: instruction.stepdose || 'AND',
@@ -112,13 +110,13 @@ const AddOrder = ({
 
           case INVOICE_ITEM_TYPE_BY_NAME.SERVICE: {
             const { serviceId, serviceCenterId } = servicesList.find(
-              (s) =>
+              s =>
                 s.serviceCenter_ServiceId ===
                   o.retailVisitInvoiceService.serviceCenterServiceFK &&
                 s.isActive,
             )
             const serviceItem = ctservice.find(
-              (service) =>
+              service =>
                 service.serviceCenter_ServiceId ===
                 o.retailVisitInvoiceService.serviceCenterServiceFK,
             )
@@ -138,7 +136,7 @@ const AddOrder = ({
 
           case INVOICE_ITEM_TYPE_BY_NAME.CONSUMABLE: {
             const consumableItem = inventoryconsumable.find(
-              (consumable) =>
+              consumable =>
                 consumable.id ===
                   o.retailVisitInvoiceConsumable.inventoryConsumableFK &&
                 consumable.isActive,
@@ -156,7 +154,7 @@ const AddOrder = ({
           }
           case INVOICE_ITEM_TYPE_BY_NAME.VACCINATION: {
             const vaccinationItem = inventoryvaccination.find(
-              (v) => v.displayValue === o.itemName && v.isActive,
+              v => v.displayValue === o.itemName && v.isActive,
             )
             obj = {
               _itemId: vaccinationItem.id,
@@ -180,7 +178,7 @@ const AddOrder = ({
         }
       }
 
-      const assignRetailAdjustmentIdToOrderAdjustmentUid = (o) => {
+      const assignRetailAdjustmentIdToOrderAdjustmentUid = o => {
         return {
           ...o,
           uid: getUniqueId(),
@@ -197,19 +195,15 @@ const AddOrder = ({
 
       const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
       const isVaccinationExist =
-        clinicTypeFK === CLINIC_TYPE.GP
-          ? newRows.filter((row) => !row.type)
-          : []
+        clinicTypeFK === CLINIC_TYPE.GP ? newRows.filter(row => !row.type) : []
 
       const cuationItems = []
       if (isFirstLoad) {
         newRows
-          .filter(
-            (f) => f._itemId && f._caution && f._caution.trim().length > 0,
-          )
-          .map((m) => {
+          .filter(f => f._itemId && f._caution && f._caution.trim().length > 0)
+          .map(m => {
             const existItem = cuationItems.find(
-              (c) => c.id === m._itemId && c.type === m._itemType,
+              c => c.id === m._itemId && c.type === m._itemType,
             )
             if (!existItem) {
               cuationItems.push({
@@ -239,8 +233,8 @@ const AddOrder = ({
       }
 
       const rowsWithoutVaccination = newRows
-        .filter((row) => row.type)
-        .map((row) => {
+        .filter(row => row.type)
+        .map(row => {
           return {
             ...row,
             uid: getUniqueId(),
@@ -295,7 +289,6 @@ const AddOrder = ({
   )
 }
 export default compose(
-  withRouter,
   withStyles(styles, { withTheme: true }),
   connect(
     ({ dispense, orders, codetable, consultation, clinicInfo, forms }) => ({
@@ -324,9 +317,7 @@ export default compose(
       const { rows, summary, finalAdjustments } = orders
       const { addOrderDetails } = dispense
       if (visitType === VISIT_TYPE.RETAIL) {
-        const removeIdAndConcurrencyTokenForNewPrecautionsOrInstructions = (
-          existingIDArray,
-        ) => (instructionOrPrecaution) => {
+        const removeIdAndConcurrencyTokenForNewPrecautionsOrInstructions = existingIDArray => instructionOrPrecaution => {
           if (existingIDArray.includes(instructionOrPrecaution.id)) {
             return {
               ...instructionOrPrecaution,
@@ -367,7 +358,7 @@ export default compose(
           )
 
           const precautionsIDArray = retailPrescriptionItemPrecaution.map(
-            (precaution) => precaution.id,
+            precaution => precaution.id,
           )
 
           const formatNewAddedPrecautions = newAddedPrecautions.map(
@@ -379,7 +370,7 @@ export default compose(
           const returnedPrecautionsArray = [
             ...combinedOldNewPrecautions,
             ...formatNewAddedPrecautions,
-          ].map((o) => setIsDeletedIfWholeItemIsDeleted(o, itemIsDeleted))
+          ].map(o => setIsDeletedIfWholeItemIsDeleted(o, itemIsDeleted))
 
           return returnedPrecautionsArray
         }
@@ -402,7 +393,7 @@ export default compose(
           )
 
           const instructionIDArray = retailPrescriptionItemInstruction.map(
-            (instruction) => instruction.id,
+            instruction => instruction.id,
           )
 
           const formatNewAddedInstructions = newAddedInstructions.map(
@@ -414,7 +405,7 @@ export default compose(
           const returnedInstructionsArray = [
             ...combinedOldNewInstructions,
             ...formatNewAddedInstructions,
-          ].map((o) => setIsDeletedIfWholeItemIsDeleted(o, itemIsDeleted))
+          ].map(o => setIsDeletedIfWholeItemIsDeleted(o, itemIsDeleted))
 
           return returnedInstructionsArray
         }
@@ -437,7 +428,7 @@ export default compose(
           )
 
           const drugMixturesIDArray = retailPrescriptionItemDrugMixture.map(
-            (drugMixture) => drugMixture.id,
+            drugMixture => drugMixture.id,
           )
 
           const formatNewAddedDrugMixtures = newAddedDrugMixtures.map(
@@ -449,17 +440,15 @@ export default compose(
           const returnedDrugMixturesArray = [
             ...combinedOldNewDrugMixtures,
             ...formatNewAddedDrugMixtures,
-          ].map((o) => setIsDeletedIfWholeItemIsDeleted(o, itemIsDeleted))
+          ].map(o => setIsDeletedIfWholeItemIsDeleted(o, itemIsDeleted))
 
           return returnedDrugMixturesArray
         }
 
-        const getDrugMixtureRevenueCategory = (
-          corPrescriptionItemDrugMixture,
-        ) => {
+        const getDrugMixtureRevenueCategory = corPrescriptionItemDrugMixture => {
           let revenueCategoryId = REVENUE_CATEGORY.OTHER
           const activeDrugMixtureItems = corPrescriptionItemDrugMixture.filter(
-            (item) => !item.isDeleted,
+            item => !item.isDeleted,
           )
 
           if (activeDrugMixtureItems.length > 0)
@@ -468,14 +457,14 @@ export default compose(
           return revenueCategoryId
         }
 
-        const mapRetailItemPropertyToApi = (o) => {
+        const mapRetailItemPropertyToApi = o => {
           let obj
           switch (o.type) {
             case ORDER_TYPE_TAB.MEDICATION:
             case ORDER_TYPE_TAB.OPENPRESCRIPTION: {
               let revenueCategory
               const medication = inventorymedication.find(
-                (c) => c.id === o.inventoryMedicationFK,
+                c => c.id === o.inventoryMedicationFK,
               )
               revenueCategory = medication
                 ? medication.revenueCategory
@@ -504,7 +493,7 @@ export default compose(
                 itemName: o.drugName,
                 invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.MEDICATION,
                 unitPrice: o.isDrugMixture
-                  ? (_.round((o.totalPrice || 0) / (o.quantity || 1), 2)) || 0
+                  ? _.round((o.totalPrice || 0) / (o.quantity || 1), 2) || 0
                   : actualUnitPrice,
                 quantity: o.quantity,
                 subTotal: roundTo(o.totalPrice),
@@ -554,7 +543,7 @@ export default compose(
             case ORDER_TYPE_TAB.SERVICE: {
               const { retailService, ...restValues } = o
               const { revenueCategoryFK } = ctservice.find(
-                (c) => c.serviceCenter_ServiceId === o.serviceCenterServiceFK,
+                c => c.serviceCenter_ServiceId === o.serviceCenterServiceFK,
               )
               obj = {
                 adjType: o.adjType,
@@ -583,7 +572,7 @@ export default compose(
             }
             case ORDER_TYPE_TAB.CONSUMABLE: {
               const { uom, revenueCategory } = inventoryconsumable.find(
-                (c) => c.id === o.inventoryConsumableFK,
+                c => c.id === o.inventoryConsumableFK,
               )
               const { retailConsumable, ...restValues } = o
               let actualUnitPrice = o.unitPrice || 0
@@ -652,7 +641,7 @@ export default compose(
         dispatch({
           type: 'dispense/saveAddOrderDetails',
           payload,
-        }).then((r) => {
+        }).then(r => {
           if (r) {
             if (onConfirm) onConfirm()
             history.push({
@@ -678,7 +667,7 @@ export default compose(
             ...billFirstPayload,
             id: consultation.entity.id,
           },
-        }).then((response) => {
+        }).then(response => {
           if (response) {
             dispatch({
               type: `dispense/refresh`,

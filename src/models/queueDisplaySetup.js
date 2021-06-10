@@ -1,7 +1,7 @@
 import { createFormViewModel } from 'medisys-model'
-import * as service from '../services/queueDisplaySetup'
 import { notification } from '@/components'
 import { VALUE_KEYS } from '@/utils/constants'
+import service from '../services/queueDisplaySetup'
 
 export default createFormViewModel({
   namespace: 'queueDisplaySetup',
@@ -22,7 +22,7 @@ export default createFormViewModel({
     subscriptions: ({ dispatch, history, searchField }) => {},
 
     effects: {
-      *upsertQueueDisplaySetup ({ payload }, { call, put }) {
+      *upsertQueueDisplaySetup({ payload }, { call, put }) {
         const r = yield call(service.upsert, payload)
 
         if (r) {
@@ -33,10 +33,10 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         const { data } = payload
         const queueDisplaySetup =
-          data.find((o) => o.key === VALUE_KEYS.QUEUEDISPLAYSETUP) || {}
+          data.find(o => o.key === VALUE_KEYS.QUEUEDISPLAYSETUP) || {}
 
         if (queueDisplaySetup) {
           const { value = '{}' } = queueDisplaySetup

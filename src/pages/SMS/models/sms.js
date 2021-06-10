@@ -1,6 +1,6 @@
 import { createListViewModel } from 'medisys-model'
-import * as service from '../services'
 import { notification } from '@/components'
+import service from '../services'
 
 export default createListViewModel({
   namespace: 'sms',
@@ -16,7 +16,7 @@ export default createListViewModel({
     //   })
     // },
     effects: {
-      *querySMSHistory ({ payload, smsType }, { call, put }) {
+      *querySMSHistory({ payload, smsType }, { call, put }) {
         const response = yield call(service.querySMSHistory, payload, smsType)
         if (response) {
           yield put({
@@ -28,7 +28,7 @@ export default createListViewModel({
         return false
       },
 
-      *sendSms ({ payload }, { call, put }) {
+      *sendSms({ payload }, { call, put }) {
         const response = yield call(service.upsert, payload)
         if (response === 204) {
           notification.success({ message: 'SMS Sent' })
@@ -38,11 +38,11 @@ export default createListViewModel({
       },
     },
     reducers: {
-      getSMSHistory (st, { payload }) {
+      getSMSHistory(st, { payload }) {
         const { data } = payload
         return {
           ...st,
-          smsHistory: data.map((o) => {
+          smsHistory: data.map(o => {
             return {
               ...o,
             }

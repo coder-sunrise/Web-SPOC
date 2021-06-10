@@ -3,8 +3,8 @@ import request from '@/utils/request'
 
 const url = '/api/clinic'
 
-module.exports = {
-  query: (params) => {
+const fns = {
+  query: params => {
     const { clinicCode } = params
     return request(`${url}?clinicCode=${clinicCode}`, {
       method: 'GET',
@@ -12,7 +12,7 @@ module.exports = {
   },
 
   // upsert: (params) => service.upsert(url, params),
-  upsert: async (params) => {
+  upsert: async params => {
     const r = await request(`${url}`, {
       method: 'PUT',
       body: {
@@ -22,3 +22,5 @@ module.exports = {
     return r
   },
 }
+
+export default fns

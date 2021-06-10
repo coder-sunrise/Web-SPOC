@@ -20,10 +20,11 @@ import {
   CheckboxGroup,
 } from '@/components'
 import { getUniqueNumericId } from '@/utils/utils'
-import { queryList } from '@/services/patient'
+import service from '@/services/patient'
 import { MobileNumberInput } from '@/components/_medisys'
 import Address from './Address'
 
+const { queryList } = service
 const styles = () => ({
   contactIcon: {
     width: 15,
@@ -41,7 +42,6 @@ const styles = () => ({
   streetAddress,
   clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
- 
 class Demographic extends PureComponent {
   state = {}
 
@@ -55,11 +55,11 @@ class Demographic extends PureComponent {
     })
   }
 
-  selectReferralPerson = (args) => {
+  selectReferralPerson = args => {
     const { values, classes } = this.props
     return (
       <Select
-        query={(v) => {
+        query={v => {
           return queryList({
             apiCriteria: {
               searchValue: v,
@@ -70,7 +70,7 @@ class Demographic extends PureComponent {
         handleFilter={() => true}
         valueField='id'
         label='Patient Name/Account No./Mobile No.'
-        renderDropdown={(p) => {
+        renderDropdown={p => {
           // console.log(p)
           return (
             <div>
@@ -87,7 +87,7 @@ class Demographic extends PureComponent {
             </div>
           )
         }}
-        onChange={(v) => {
+        onChange={v => {
           if (v === values.id) {
             notification.error({
               message: 'Can not use this patient as referral person',
@@ -101,7 +101,7 @@ class Demographic extends PureComponent {
     )
   }
 
-  onReferredByChange = (event) => {
+  onReferredByChange = event => {
     const { setFieldValue } = this.props
     const { target } = event
     const { value } = target
@@ -110,7 +110,7 @@ class Demographic extends PureComponent {
     }
   }
 
-  render () {
+  render() {
     const { props } = this
     const { values, theme, setFieldValue, classes, dispatch } = props
     const { isPatientNameAutoUpperCase } = props.clinicSettings
@@ -123,7 +123,7 @@ class Demographic extends PureComponent {
               <GridItem xs={6} md={8}>
                 <FastField
                   name='patientAccountNoTypeFK'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <CodeSelect
                         // hideIfNoEditRights
@@ -139,7 +139,7 @@ class Demographic extends PureComponent {
               <GridItem xs={6} md={4}>
                 <FastField
                   name='patientAccountNo'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <TextField
                         label='Account No.'
@@ -155,7 +155,7 @@ class Demographic extends PureComponent {
               <GridItem xs={6} md={4}>
                 <FastField
                   name='salutationFK'
-                  render={(args) => (
+                  render={args => (
                     <CodeSelect
                       // authority='none'
                       label='Title'
@@ -168,17 +168,19 @@ class Demographic extends PureComponent {
               <GridItem xs={6} md={8}>
                 <FastField
                   name='name'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <TextField
                         label='Full Name'
                         uppercase={isPatientNameAutoUpperCase}
                         maxLength='100'
-                        onChange={(e) => {
+                        onChange={e => {
                           if (isPatientNameAutoUpperCase) {
-                            setFieldValue('callingName', (e.target.value || '').toUpperCase())
-                          }
-                          else {
+                            setFieldValue(
+                              'callingName',
+                              (e.target.value || '').toUpperCase(),
+                            )
+                          } else {
                             setFieldValue('callingName', e.target.value)
                           }
                         }}
@@ -191,7 +193,7 @@ class Demographic extends PureComponent {
               <GridItem xs={12}>
                 <FastField
                   name='callingName'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <TextField
                         uppercase={isPatientNameAutoUpperCase}
@@ -206,7 +208,7 @@ class Demographic extends PureComponent {
               <GridItem xs={6}>
                 <FastField
                   name='dob'
-                  render={(args) => (
+                  render={args => (
                     <DatePicker
                       label='Date of Birth'
                       // showTime
@@ -219,7 +221,7 @@ class Demographic extends PureComponent {
               <GridItem xs={6}>
                 <FastField
                   name='genderFK'
-                  render={(args) => {
+                  render={args => {
                     // console.log('args', args)
                     return (
                       <CodeSelect
@@ -236,7 +238,7 @@ class Demographic extends PureComponent {
               <GridItem xs={6}>
                 <FastField
                   name='maritalStatusFK'
-                  render={(args) => (
+                  render={args => (
                     <CodeSelect
                       label='Maritial Status'
                       code='ctMaritalStatus'
@@ -248,7 +250,7 @@ class Demographic extends PureComponent {
               <GridItem xs={6}>
                 <FastField
                   name='nationalityFK'
-                  render={(args) => (
+                  render={args => (
                     <CodeSelect
                       label='Nationality'
                       code='ctNationality'
@@ -261,7 +263,7 @@ class Demographic extends PureComponent {
               <GridItem xs={6}>
                 <FastField
                   name='raceFK'
-                  render={(args) => (
+                  render={args => (
                     <CodeSelect label='Race' code='ctRace' {...args} />
                   )}
                 />
@@ -269,7 +271,7 @@ class Demographic extends PureComponent {
               <GridItem xs={6}>
                 <FastField
                   name='religionFK'
-                  render={(args) => (
+                  render={args => (
                     <CodeSelect label='Religion' code='ctReligion' {...args} />
                   )}
                 />
@@ -277,7 +279,7 @@ class Demographic extends PureComponent {
               <GridItem xs={6}>
                 <FastField
                   name='languageFK'
-                  render={(args) => (
+                  render={args => (
                     <CodeSelect label='Language' code='ctLanguage' {...args} />
                   )}
                 />
@@ -285,13 +287,13 @@ class Demographic extends PureComponent {
               <GridItem xs={6}>
                 <FastField
                   name='dialect'
-                  render={(args) => <TextField label='Dialect' {...args} />}
+                  render={args => <TextField label='Dialect' {...args} />}
                 />
               </GridItem>
               <GridItem xs={12}>
                 <FastField
                   name='occupationFK'
-                  render={(args) => (
+                  render={args => (
                     <CodeSelect
                       label='Occupation'
                       code='ctoccupation'
@@ -305,7 +307,7 @@ class Demographic extends PureComponent {
               <GridItem xs={12}>
                 <FastField
                   name='patientRemarks'
-                  render={(args) => (
+                  render={args => (
                     <TextField
                       label='Remarks'
                       multiline
@@ -325,7 +327,7 @@ class Demographic extends PureComponent {
               <GridItem xs={3}>
                 <FastField
                   name='contact.mobileContactNumber.countryCodeFK'
-                  render={(args) => (
+                  render={args => (
                     <CodeSelect
                       allowClear={false}
                       label='Country Code'
@@ -338,22 +340,20 @@ class Demographic extends PureComponent {
               <GridItem xs={3}>
                 <FastField
                   name='contact.mobileContactNumber.number'
-                  render={(args) => <MobileNumberInput {...args} />}
-                // render={(args) => <NumberInput label='Mobile' {...args} />}
+                  render={args => <MobileNumberInput {...args} />}
+                  // render={(args) => <NumberInput label='Mobile' {...args} />}
                 />
               </GridItem>
               <GridItem xs={3}>
                 <FastField
                   name='contact.homeContactNumber.number'
-                  render={(args) => (
-                    <MobileNumberInput label='Home' {...args} />
-                  )}
+                  render={args => <MobileNumberInput label='Home' {...args} />}
                 />
               </GridItem>
               <GridItem xs={3}>
                 <FastField
                   name='contact.officeContactNumber.number'
-                  render={(args) => (
+                  render={args => (
                     <MobileNumberInput label='Office' {...args} />
                   )}
                 />
@@ -361,19 +361,19 @@ class Demographic extends PureComponent {
               <GridItem xs={6}>
                 <FastField
                   name='contact.faxContactNumber.number'
-                  render={(args) => <MobileNumberInput label='Fax' {...args} />}
+                  render={args => <MobileNumberInput label='Fax' {...args} />}
                 />
               </GridItem>
               <GridItem xs={6}>
                 <FastField
                   name='contact.contactEmailAddress.emailAddress'
-                  render={(args) => <TextField label='Email' {...args} />}
+                  render={args => <TextField label='Email' {...args} />}
                 />
               </GridItem>
               <GridItem xs={12}>
                 <FastField
                   name='preferredContactMode'
-                  render={(args) => (
+                  render={args => (
                     <CodeSelect
                       label='Preferred Contact Mode'
                       code='ctContactMode'
@@ -385,7 +385,7 @@ class Demographic extends PureComponent {
               <GridItem xs={12}>
                 <FastField
                   name='pdpaConsent'
-                  render={(args) => (
+                  render={args => (
                     <CheckboxGroup
                       // prefix='PDPA Consent: '
                       label='PDPA Consent - Agree to receive marketing material via:'
@@ -419,7 +419,7 @@ class Demographic extends PureComponent {
                         const { value } = e.target
                         const { patientPdpaConsent } = values
                         let _patientPdpaConsent = []
-                        const _intValue = value.map((v) => parseInt(v, 10))
+                        const _intValue = value.map(v => parseInt(v, 10))
 
                         if (patientPdpaConsent.length < 3) {
                           _patientPdpaConsent = [
@@ -471,7 +471,7 @@ class Demographic extends PureComponent {
               <GridItem xs={12}>
                 <Field
                   name='translationLinkFK'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <CodeSelect
                         label='Translation'
@@ -494,7 +494,7 @@ class Demographic extends PureComponent {
             <GridItem xs={12}>
               <FieldArray
                 name='contact.contactAddress'
-                render={(arrayHelpers) => {
+                render={arrayHelpers => {
                   this.arrayHelpers = arrayHelpers
                   if (
                     !values ||

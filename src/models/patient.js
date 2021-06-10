@@ -1,7 +1,7 @@
-import router from 'umi/router'
+import { history } from 'umi'
 import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
-import * as service from '@/services/patient'
+import service from '@/services/patient'
 import {
   getRemovedUrl,
   getAppendUrl,
@@ -87,7 +87,7 @@ export default createFormViewModel({
       default: defaultPatientEntity,
     },
     subscriptions: ({ dispatch, history }) => {
-      history.listen(async (loct) => {
+      history.listen(async loct => {
         const { query = {} } = loct
 
         setTimeout(() => {
@@ -112,14 +112,14 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *initState ({ payload }, { put, select, take }) {
+      *initState({ payload }, { put, select, take }) {
         yield put({ type: 'initSchemeCodetable' })
         let { currentId, version, md, newPatient } = payload
         if (newPatient) {
           yield put({ type: 'updateState', payload: { entity: null } })
         }
 
-        const patient = yield select((state) => state.patient)
+        const patient = yield select(state => state.patient)
         if (
           !newPatient &&
           Number(currentId) &&
@@ -144,7 +144,7 @@ export default createFormViewModel({
             },
           })
       },
-      *initSchemeCodetable (_, { put }) {
+      *initSchemeCodetable(_, { put }) {
         yield put({
           type: 'codetable/fetchCodes',
           payload: {
@@ -166,13 +166,12 @@ export default createFormViewModel({
           },
         })
       },
-      *waitLoadComplete (_, { take }) {
+      *waitLoadComplete(_, { take }) {
         yield take('patient/query/@@end')
         return ''
       },
-      *closePatientModal ({ payload }, { all, put, select }) {
-        const patientState = yield select((st) => st.patient)
-        const { history } = payload || { history: undefined }
+      *closePatientModal({ payload }, { all, put, select }) {
+        const patientState = yield select(st => st.patient)
 
         if (patientState.shouldQueryOnClose) {
           yield put({
@@ -207,22 +206,11 @@ export default createFormViewModel({
             false,
           )
 
-        let shouldRemoveQueries = [
-          'md',
-          'cmt',
-          'pid',
-          'new',
-          'qid',
-          'v',
-        ]
+        let shouldRemoveQueries = ['md', 'cmt', 'pid', 'new', 'qid', 'v']
         if (matchesExceptionalPath) {
-          shouldRemoveQueries = [
-            'md',
-            'cmt',
-            'new',
-          ]
+          shouldRemoveQueries = ['md', 'cmt', 'new']
         }
-        router.push(getRemovedUrl(shouldRemoveQueries))
+        history.push(getRemovedUrl(shouldRemoveQueries))
 
         return yield all([
           yield put({
@@ -245,14 +233,14 @@ export default createFormViewModel({
           }),
         ])
       },
-      *openPatientModal ({ payload = { callback: undefined } }, { put }) {
+      *openPatientModal({ payload = { callback: undefined } }, { put }) {
         if (payload.callback) {
           yield put({
             type: 'updateState',
             payload: { callback: payload.callback },
           })
         }
-        router.push(
+        history.push(
           getAppendUrl({
             md: 'pt',
             cmt: '1',
@@ -260,7 +248,7 @@ export default createFormViewModel({
           }),
         )
       },
-      *refreshChasBalance ({ payload }, { call }) {
+      *refreshChasBalance({ payload }, { call }) {
         const {
           patientAccountNo,
           patientCoPaymentSchemeFK,
@@ -287,7 +275,7 @@ export default createFormViewModel({
 
         return result
       },
-      *refreshMedisaveBalance ({ payload }, { call }) {
+      *refreshMedisaveBalance({ payload }, { call }) {
         const {
           patientAccountNo,
           isSaveToDb = false,
@@ -308,25 +296,24 @@ export default createFormViewModel({
           const status = getRefreshMedisaveBalanceStatus(data)
           return { ...data, ...status }
         }
-        
+
         return data
       },
-      *queryDone ({ payload }, { put }) {
+      *queryDone({ payload }, { put }) {
         const { data } = payload
         // console.log(payload)
-        data.patientScheme.forEach((ps) => {
+        data.patientScheme.forEach(ps => {
           if (ps.validFrom && ps.validTo)
-            ps.validRange = [
-              ps.validFrom,
-              ps.validTo,
-            ]
+            ps.validRange = [ps.validFrom, ps.validTo]
           if (ps.coPaymentSchemeFK === null) {
             ps.coPaymentSchemeFK = undefined
           }
 
           ps.preSchemeTypeFK = ps.schemeTypeFK
-        }) 
-        data.patientMedicalHistory = data.patientMedicalHistory || defaultPatientEntity.patientMedicalHistory
+        })
+        data.patientMedicalHistory =
+          data.patientMedicalHistory ||
+          defaultPatientEntity.patientMedicalHistory
         yield put({
           type: 'updateState',
           payload: {
@@ -334,16 +321,16 @@ export default createFormViewModel({
           },
         })
       },
-      *queryDeposit ({ payload }, { select, call, put }) {
+      *queryDeposit({ payload }, { select, call, put }) {
         const response = yield call(service.queryDeposit, payload)
         if (response && response.status === '200') {
           const { data = {} } = response
-          const codetable = yield select((state) => state.codetable)
+          const codetable = yield select(state => state.codetable)
           const { ltdeposittransactiontype: codetbs = [] } = codetable
 
-          const newTransaction = (data.patientDepositTransaction || [])
-            .reduce((pre, cur) => {
-              const ltType = codetbs.find((f) => f.id === cur.transactionTypeFK)
+          const newTransaction = (data.patientDepositTransaction || []).reduce(
+            (pre, cur) => {
+              const ltType = codetbs.find(f => f.id === cur.transactionTypeFK)
               return [
                 ...pre,
                 {
@@ -351,7 +338,9 @@ export default createFormViewModel({
                   transactionTypeName: ltType ? ltType.name || '' : '',
                 },
               ]
-            }, [])
+            },
+            [],
+          )
           data.patientDepositTransaction = newTransaction
 
           yield put({
@@ -364,7 +353,7 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      updateDefaultEntity (state, { payload }) {
+      updateDefaultEntity(state, { payload }) {
         const { patientName } = payload
         return {
           ...state,

@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import moment from 'moment'
 import { queueProcessorType, queueItemStatus } from '@/utils/codes'
@@ -16,12 +16,12 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: () => { },
-  handleSubmit: () => { },
+  mapPropsToValues: () => {},
+  handleSubmit: () => {},
   displayName: 'QueueProcessorFilter',
 })
 class Filter extends PureComponent {
-  render () {
+  render() {
     const { classes } = this.props
     return (
       <div className={classes.filterBar}>
@@ -29,7 +29,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={4}>
             <FastField
               name='queueProcessTypeFK'
-              render={(args) => {
+              render={args => {
                 return (
                   <CodeSelect
                     label='Process Type'
@@ -52,34 +52,38 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={4}>
             <FastField
               name='requestDate'
-              render={(args) => {
+              render={args => {
                 return (
                   <DateRangePicker
                     label='Request Date From'
                     label2='Request Date To'
                     {...args}
-                  />)
-              }
-              }
+                  />
+                )
+              }}
             />
           </GridItem>
           <GridItem xs={6} md={4}>
             <FastField
               name='createByUserFK'
-              render={(args) => {
-                return <ClinicianSelect
-                  noDefaultValue
-                  label='Requested By'
-                  {...args}
-                />
+              render={args => {
+                return (
+                  <ClinicianSelect
+                    noDefaultValue
+                    label='Requested By'
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>
           <GridItem xs={6} md={4}>
             <FastField
               name='queueProcessStatusFK'
-              render={(args) => {
-                return <Select label='Status' options={queueItemStatus} {...args} />
+              render={args => {
+                return (
+                  <Select label='Status' options={queueItemStatus} {...args} />
+                )
               }}
             />
           </GridItem>
@@ -92,15 +96,26 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={<Search />}
                 onClick={() => {
-                  const { queueProcessStatusFK, createByUserFK, queueProcessTypeFK, requestDate } = this.props.values
+                  const {
+                    queueProcessStatusFK,
+                    createByUserFK,
+                    queueProcessTypeFK,
+                    requestDate,
+                  } = this.props.values
                   this.props.dispatch({
                     type: 'queueProcessor/query',
                     payload: {
                       queueProcessStatusFK,
                       queueProcessTypeFK,
                       createByUserFK,
-                      lgteql_createDate: requestDate?.length ? moment(requestDate[0]).formatUTC() : undefined,
-                      lsteql_createDate: requestDate?.length ? moment(requestDate[1]).endOf('day').formatUTC(false) : undefined,
+                      lgteql_createDate: requestDate?.length
+                        ? moment(requestDate[0]).formatUTC()
+                        : undefined,
+                      lsteql_createDate: requestDate?.length
+                        ? moment(requestDate[1])
+                            .endOf('day')
+                            .formatUTC(false)
+                        : undefined,
                     },
                   })
                 }}

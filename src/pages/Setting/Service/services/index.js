@@ -3,22 +3,22 @@ import request from '@/utils/request'
 
 const url = '/api/ctservice'
 
-module.exports = {
+const fns = {
   // remove: (params) => service.remove(url, params),
-  query: (params) => {
+  query: params => {
     return service.query(url, params)
   },
   // upsert: (params) => {
   //   return service.upsert(url, params)
   // },
-  queryOne: async (serviceId) => {
+  queryOne: async serviceId => {
     const response = await request(`${url}/${serviceId}`, {
       method: 'GET',
     })
     return response
   },
-  queryList: (params) => service.queryList(url, params),
-  upsert: (params) => service.upsert(url, params),
+  queryList: params => service.queryList(url, params),
+  upsert: params => service.upsert(url, params),
 
   export: () => {
     return request(`${url}/export`, {
@@ -29,7 +29,7 @@ module.exports = {
     })
   },
 
-  import: (params) => {
+  import: params => {
     return request(`${url}/import`, {
       method: 'POST',
       body: params,
@@ -39,3 +39,4 @@ module.exports = {
     })
   },
 }
+export default fns

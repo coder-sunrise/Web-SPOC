@@ -1,6 +1,6 @@
 import { createListViewModel } from 'medisys-model'
 import { notification } from '@/components'
-import * as service from '../services'
+import service from '../services'
 
 export default createListViewModel({
   namespace: 'queueProcessor',
@@ -8,26 +8,26 @@ export default createListViewModel({
     service,
     state: {
       default: {
-        isUserMaintainable: true, 
+        isUserMaintainable: true,
         description: '',
       },
     },
     effects: {
-      *cancelQueue ({ payload }, { call, put }) {
+      *cancelQueue({ payload }, { call, put }) {
         const result = yield call(service.remove, payload)
         if (result === 204) {
           notification.success({ message: 'Queue item has been canceled.' })
         }
       },
     },
-    reducers: { 
-      queryDone (queuelisting, { payload }) {
-        const { data } = payload  
+    reducers: {
+      queryDone(queuelisting, { payload }) {
+        const { data } = payload
         return {
           ...queuelisting,
-          list: data.data.map((o) => {
+          list: data.data.map(o => {
             return {
-              ...o, 
+              ...o,
             }
           }),
         }

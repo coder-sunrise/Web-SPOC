@@ -1,5 +1,5 @@
 import { createListViewModel } from 'medisys-model'
-import * as service from '../services'
+import service from '../services'
 
 export default createListViewModel({
   namespace: 'medisaveClaimSubmissionRejected',
@@ -19,7 +19,7 @@ export default createListViewModel({
       })
     },
     effects: {
-      *resubmitMedisaveClaim ({ payload }, { put, call }) {
+      *resubmitMedisaveClaim({ payload }, { put, call }) {
         const response = yield call(service.submitMedisaveClaim, payload)
         const { data, status } = response
         if (status === '200') {
@@ -27,7 +27,7 @@ export default createListViewModel({
         }
         return false
       },
-      *refreshPatientDetails ({payload},{put,call}){
+      *refreshPatientDetails({ payload }, { put, call }) {
         const response = yield call(service.refreshPatientDetails, payload)
         const { data, status } = response
         if (status === '200') {
@@ -37,7 +37,7 @@ export default createListViewModel({
       },
     },
     reducers: {
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         const { data } = payload
 
         return {

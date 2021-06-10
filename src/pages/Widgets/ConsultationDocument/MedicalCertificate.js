@@ -17,7 +17,8 @@ import {
   Field,
   ClinicianSelect,
   Button,
-  Popover, Tooltip,
+  Popover,
+  Tooltip,
 } from '@/components'
 import * as service from '@/services/common'
 import { UNFIT_TYPE, CANNED_TEXT_TYPE } from '@/utils/constants'
@@ -28,14 +29,14 @@ import NavigateNext from '@material-ui/icons/NavigateNext'
 import ListAlt from '@material-ui/icons/ListAlt'
 import { CANNED_TEXT_TYPE_FIELD_NAME } from '@/pages/Widgets/ClinicalNotes/CannedText/utils'
 import { connect } from 'dva'
-import cannedTextModel from '@/pages/Widgets/ClinicalNotes/models/cannedText'
+// import cannedTextModel from '@/pages/Widgets/ClinicalNotes/models/cannedText'
 import CannedText from '@/pages/Widgets/ClinicalNotes/CannedText'
 import { primaryColor } from 'mui-pro-jss'
 import { getClinicianProfile } from './utils'
 
-window.g_app.replaceModel(cannedTextModel)
+// window.g_app.replaceModel(cannedTextModel)
 
-const styles = (theme) => ({
+const styles = theme => ({
   item: {
     marginBottom: theme.spacing(1),
     padding: theme.spacing(1),
@@ -45,7 +46,9 @@ const styles = (theme) => ({
     cursor: 'pointer',
 
     '&:hover': {
-      background: color(primaryColor).lighten(0.9).hex(),
+      background: color(primaryColor)
+        .lighten(0.9)
+        .hex(),
     },
     '& > svg': {
       marginRight: theme.spacing(1),
@@ -94,11 +97,14 @@ const styles = (theme) => ({
     mcIssueDate: Yup.date().required(),
     issuedByUserFK: Yup.number().required(),
     mcDays: Yup.number().required(),
-    mcStartEndDate: Yup.array().of(Yup.date()).min(2).required(),
+    mcStartEndDate: Yup.array()
+      .of(Yup.date())
+      .min(2)
+      .required(),
     unfitTypeFK: Yup.number().required(),
     remarks: Yup.string().max(2000),
     otherUnfitTypeDescription: Yup.string().when('unfitTypeFK', {
-      is: (val) => val && UNFIT_TYPE[val] === 'Others',
+      is: val => val && UNFIT_TYPE[val] === 'Others',
       then: Yup.string().required(),
     }),
   }),
@@ -124,14 +130,14 @@ const styles = (theme) => ({
   displayName: 'AddConsultationDocument',
 })
 class MedicalCertificate extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       showCannedText: false,
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { setFieldValue, values, dispatch } = this.props
     dispatch({
       type: 'cannedText/query',
@@ -139,7 +145,7 @@ class MedicalCertificate extends PureComponent {
     })
 
     if (values.mcReferenceNo === '-')
-      service.runningNumber('mc').then((o) => {
+      service.runningNumber('mc').then(o => {
         if (o && o.data) {
           setFieldValue('mcReferenceNo', o.data)
         } else {
@@ -150,7 +156,7 @@ class MedicalCertificate extends PureComponent {
       })
   }
 
-  onDaysChange = (e) => {
+  onDaysChange = e => {
     const { values, setFieldValue } = this.props
     if (e.target.value) {
       const startDate = moment(values.mcStartEndDate[0])
@@ -170,15 +176,24 @@ class MedicalCertificate extends PureComponent {
     )
   }
 
-  onListItemClick = (selectedCannedText) => {
+  onListItemClick = selectedCannedText => {
     const { values, setFieldValue } = this.props
-    setFieldValue('remarks', `${values.remarks || ''}${(values.remarks || '').length > 0 ? '\n' : ''}${selectedCannedText.text}`)
+    setFieldValue(
+      'remarks',
+      `${values.remarks || ''}${(values.remarks || '').length > 0 ? '\n' : ''}${
+        selectedCannedText.text
+      }`,
+    )
   }
 
   onSettingClick = () => {
     this.props.dispatch({
       type: 'cannedText/setSelectedNote',
-      payload: { cannedTextTypeFK: CANNED_TEXT_TYPE.MEDICALCERTIFICATE, fieldName: CANNED_TEXT_TYPE_FIELD_NAME[CANNED_TEXT_TYPE.MEDICALCERTIFICATE] },
+      payload: {
+        cannedTextTypeFK: CANNED_TEXT_TYPE.MEDICALCERTIFICATE,
+        fieldName:
+          CANNED_TEXT_TYPE_FIELD_NAME[CANNED_TEXT_TYPE.MEDICALCERTIFICATE],
+      },
     })
     this.setState({
       showCannedText: true,
@@ -195,8 +210,16 @@ class MedicalCertificate extends PureComponent {
     })
   }
 
-  render () {
-    const { footer, handleSubmit, classes, values, setFieldValue, cannedText , user } = this.props
+  render() {
+    const {
+      footer,
+      handleSubmit,
+      classes,
+      values,
+      setFieldValue,
+      cannedText,
+      user,
+    } = this.props
     // console.log({ values })
     const { unfitTypeFK } = values
 
@@ -210,18 +233,14 @@ class MedicalCertificate extends PureComponent {
         </Tooltip>
       )
     }
-    const fieldName = CANNED_TEXT_TYPE_FIELD_NAME[CANNED_TEXT_TYPE.MEDICALCERTIFICATE]
+    const fieldName =
+      CANNED_TEXT_TYPE_FIELD_NAME[CANNED_TEXT_TYPE.MEDICALCERTIFICATE]
     let list = cannedText[fieldName] || []
     list = [
       ..._.orderBy(
-        list.filter((o) => o.ownedByUserFK === user.data.id),
-        [
-          'sortOrder',
-          'title',
-        ],
-        [
-          'asc',
-        ],
+        list.filter(o => o.ownedByUserFK === user.data.id),
+        ['sortOrder', 'title'],
+        ['asc'],
       ),
     ]
 
@@ -232,7 +251,7 @@ class MedicalCertificate extends PureComponent {
             <GridItem xs={6}>
               <FastField
                 name='mcReferenceNo'
-                render={(args) => {
+                render={args => {
                   return <TextField disabled label='Reference No' {...args} />
                 }}
               />
@@ -243,7 +262,7 @@ class MedicalCertificate extends PureComponent {
           <GridItem xs={6}>
             <FastField
               name='mcIssueDate'
-              render={(args) => {
+              render={args => {
                 return <DatePicker label='Issue Date' autoFocus {...args} />
               }}
             />
@@ -251,7 +270,7 @@ class MedicalCertificate extends PureComponent {
           <GridItem xs={6}>
             <Field
               name='issuedByUserFK'
-              render={(args) => {
+              render={args => {
                 return <ClinicianSelect label='Issue By' disabled {...args} />
               }}
             />
@@ -259,7 +278,7 @@ class MedicalCertificate extends PureComponent {
           <GridItem xs={6}>
             <FastField
               name='mcDays'
-              render={(args) => {
+              render={args => {
                 return (
                   <NumberInput
                     step={0.5}
@@ -277,7 +296,7 @@ class MedicalCertificate extends PureComponent {
           <GridItem xs={6}>
             <FastField
               name='mcStartEndDate'
-              render={(args) => {
+              render={args => {
                 return (
                   <DateRangePicker
                     label='From'
@@ -292,12 +311,12 @@ class MedicalCertificate extends PureComponent {
           <GridItem xs={6}>
             <FastField
               name='unfitTypeFK'
-              render={(args) => {
+              render={args => {
                 return (
                   <CodeSelect
                     code='ctUnfitType'
                     label='Description'
-                    onChange={(v) => {
+                    onChange={v => {
                       if (!v || UNFIT_TYPE[v] !== 'Others') {
                         setFieldValue('otherUnfitTypeDescription', '')
                       }
@@ -311,7 +330,7 @@ class MedicalCertificate extends PureComponent {
           <GridItem xs={6}>
             <FastField
               name='otherUnfitTypeDescription'
-              render={(args) => {
+              render={args => {
                 return (
                   <TextField
                     label='If Others, pls. specify'
@@ -328,9 +347,15 @@ class MedicalCertificate extends PureComponent {
           <GridItem xs={12} className={classes.editor}>
             <FastField
               name='remarks'
-              render={(args) => {
+              render={args => {
                 return (
-                  <TextField label='Remarks' maxLength={2000} multiline rowsMax='4' {...args} />
+                  <TextField
+                    label='Remarks'
+                    maxLength={2000}
+                    multiline
+                    rowsMax='4'
+                    {...args}
+                  />
                 )
               }}
             />
@@ -343,7 +368,7 @@ class MedicalCertificate extends PureComponent {
               content={
                 <div className={classes.popoverContainer}>
                   <div className={classes.listContainer}>
-                    {list.map((item) => {
+                    {list.map(item => {
                       const handleClick = () => this.onListItemClick(item)
                       return (
                         <ListItem
@@ -356,14 +381,19 @@ class MedicalCertificate extends PureComponent {
                     })}
                   </div>
                   <Divider className={classes.divider} />
-                  <div className={classes.item} onClick={() => { this.onSettingClick() }}>
+                  <div
+                    className={classes.item}
+                    onClick={() => {
+                      this.onSettingClick()
+                    }}
+                  >
                     <Settings />
                     <span>Settings</span>
                   </div>
                 </div>
               }
             >
-              <Button color='transparent' style={{ margin: "8px 0 " }}>
+              <Button color='transparent' style={{ margin: '8px 0 ' }}>
                 <ListAlt />
                 <span>Canned Text</span>
                 <NavigateNext className={classes.arrowRight} />
@@ -385,9 +415,10 @@ class MedicalCertificate extends PureComponent {
           <CannedText />
         </CommonModal>
       </div>
-
     )
   }
 }
 
-export default withStyles(styles, { name: 'MedicalCertificate' })(MedicalCertificate)
+export default withStyles(styles, { name: 'MedicalCertificate' })(
+  MedicalCertificate,
+)

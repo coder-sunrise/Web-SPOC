@@ -3,17 +3,16 @@ import request from '@/utils/request'
 
 const url = '/api/roomassignment'
 
-module.exports = {
+const fns = {
   // remove: (params) => service.remove(url, params),
-  query: (params) => service.query(url, params),
-  queryList: (params) => service.queryList(url, params),
-  upsert: (params) => {
+  query: params => service.query(url, params),
+  queryList: params => service.queryList(url, params),
+  upsert: params => {
     const r = request(`${url}`, {
       method: 'POST',
-      body: [
-        ...params,
-      ],
+      body: [...params],
     })
     return r
   },
 }
+export default fns

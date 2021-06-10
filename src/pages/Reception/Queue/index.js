@@ -1,9 +1,8 @@
 import React from 'react'
-// dva
-import { connect } from 'dva'
+import { PageContainer } from '@/components'
+
 // umi locale
-import { FormattedMessage, formatMessage } from 'umi/locale'
-import router from 'umi/router'
+import { history, FormattedMessage, formatMessage, connect } from 'umi'
 // class names
 import classNames from 'classnames'
 // material ui
@@ -53,7 +52,7 @@ import RightClickContextMenu from './Grid/RightClickContextMenu'
 
 const drawerWidth = 400
 
-const styles = (theme) => ({
+const styles = theme => ({
   hide: {
     display: 'none',
   },
@@ -122,7 +121,9 @@ class Queue extends React.Component {
 
   componentWillMount = () => {
     const { dispatch, queueLog, history } = this.props
-    const { location: { query } } = history
+    const {
+      location: { query },
+    } = history
     const { sessionInfo } = queueLog
     dispatch({
       type: `${modelKey}initState`,
@@ -214,7 +215,7 @@ class Queue extends React.Component {
         id: row.id,
         patientProfileFK,
       },
-    }).then((response) => {
+    }).then(response => {
       if (response) {
         dispatch({
           type: 'queueLog/refresh',
@@ -244,7 +245,7 @@ class Queue extends React.Component {
     this.props.dispatch({
       type: 'patient/openPatientModal',
       payload: {
-        callback: (patientProfileFK) => {
+        callback: patientProfileFK => {
           this.props.dispatch({
             type: 'patient/closePatientModal',
           })
@@ -255,7 +256,7 @@ class Queue extends React.Component {
     })
   }
 
-  togglePatientSearch = (override) => {
+  togglePatientSearch = override => {
     const { showPatientSearch } = this.state
     const target = !showPatientSearch
     this.setState({
@@ -280,11 +281,7 @@ class Queue extends React.Component {
         },
       })
     }
-    this.props.history.push(
-      getRemovedUrl([
-        'v',
-      ]),
-    )
+    this.props.history.push(getRemovedUrl(['v']))
   }
 
   resetPatientSearchResult = () => {
@@ -345,7 +342,7 @@ class Queue extends React.Component {
     dispatch({
       type: `queueLog/endSession`,
       sessionID: queueLog.sessionInfo.id,
-    }).then(async (response) => {
+    }).then(async response => {
       if (response) {
         this.clearQueueCall()
         this.setState({
@@ -363,7 +360,7 @@ class Queue extends React.Component {
           key: VALUE_KEYS.QUEUECALLING,
         },
       })
-      .then((res) => {
+      .then(res => {
         if (res) {
           sendNotification('QueueClear', {
             type: NOTIFICATION_TYPE.QUEUECALL,
@@ -378,7 +375,7 @@ class Queue extends React.Component {
     this.setState({ showEndSessionSummary: false })
   }
 
-  onEnterPressed = async (searchQuery) => {
+  onEnterPressed = async searchQuery => {
     const { dispatch } = this.props
     const prefix = 'like_'
     await dispatch({
@@ -404,7 +401,7 @@ class Queue extends React.Component {
     })
   }
 
-  onHideContextMenu = (e) => {
+  onHideContextMenu = e => {
     if (
       e &&
       e.target &&
@@ -417,7 +414,7 @@ class Queue extends React.Component {
     })
   }
 
-  deleteQueueConfirmation = (row) => {
+  deleteQueueConfirmation = row => {
     const { queueNo, id } = row
     const { dispatch } = this.props
     dispatch({
@@ -440,10 +437,15 @@ class Queue extends React.Component {
     })
   }
 
-  isAssignedDoctor = (row) => {
+  isAssignedDoctor = row => {
     if (!row.doctor) return false
-    const { doctor: { id }, visitStatus } = row
-    const { clinicianProfile: { doctorProfile } } = this.props.user
+    const {
+      doctor: { id },
+      visitStatus,
+    } = row
+    const {
+      clinicianProfile: { doctorProfile },
+    } = this.props.user
 
     if (!doctorProfile) {
       notification.error({
@@ -463,12 +465,9 @@ class Queue extends React.Component {
     return true
   }
 
-  canAccess = (id) => {
-    const apptsActionID = [
-      '8',
-      '9',
-    ]
-    const findMatch = (item) => item.id === parseFloat(id, 10)
+  canAccess = id => {
+    const apptsActionID = ['8', '9']
+    const findMatch = item => item.id === parseFloat(id, 10)
 
     let menuOpt = ContextMenuOptions.find(findMatch)
 
@@ -526,9 +525,9 @@ class Queue extends React.Component {
             qid: row.id,
             queueNo: row.queueNo,
           },
-        }).then((o) => {
+        }).then(o => {
           if (o)
-            router.push(
+            history.push(
               `/reception/queue/dispense?isInitialLoading=${isInitialLoading}&qid=${row.id}&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
             )
         })
@@ -544,7 +543,7 @@ class Queue extends React.Component {
           qid: row.id,
           v: version,
         }
-        router.push(getAppendUrl(parameters, '/reception/queue/billing'))
+        history.push(getAppendUrl(parameters, '/reception/queue/billing'))
         break
       }
       case '2': // delete visit
@@ -554,7 +553,7 @@ class Queue extends React.Component {
         this.onViewPatientProfileClick(row.patientProfileFK, row.id)
         break
       case '4': // patient dashboard
-        router.push(
+        history.push(
           `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}`,
         )
         break
@@ -572,9 +571,9 @@ class Queue extends React.Component {
               qid: row.id,
               queueNo: row.queueNo,
             },
-          }).then((o) => {
+          }).then(o => {
             if (o) {
-              router.push(
+              history.push(
                 `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
               )
               openCautionAlertOnStartConsultation(o)
@@ -596,14 +595,14 @@ class Queue extends React.Component {
                 id: row.visitFK,
                 version,
               },
-            }).then((o) => {
+            }).then(o => {
               if (o)
-                router.push(
+                history.push(
                   `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
                 )
             })
           } else {
-            router.push(
+            history.push(
               `/reception/queue/consultation?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&pid=${row.patientProfileFK}&v=${version}`,
             )
           }
@@ -620,12 +619,12 @@ class Queue extends React.Component {
             id: row.visitFK,
             version,
           },
-        }).then((o) => {
+        }).then(o => {
           if (o)
             if (o.updateByUserFK !== this.props.user.id) {
               const { clinicianprofile = [] } = this.props.codetable
               const editingUser = clinicianprofile.find(
-                (m) => m.userProfileFK === o.updateByUserFK,
+                m => m.userProfileFK === o.updateByUserFK,
               ) || {
                 name: 'Someone',
               }
@@ -641,8 +640,8 @@ class Queue extends React.Component {
                         id: row.visitFK,
                         version,
                       },
-                    }).then((c) => {
-                      router.push(
+                    }).then(c => {
+                      history.push(
                         `/reception/queue/consultation?qid=${row.id}&cid=${c.id}&pid=${row.patientProfileFK}&v=${version}`,
                       )
                     })
@@ -650,7 +649,7 @@ class Queue extends React.Component {
                 },
               })
             } else {
-              router.push(
+              history.push(
                 `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
               )
             }
@@ -660,7 +659,7 @@ class Queue extends React.Component {
       case '8': {
         const { clinicianprofile = [] } = this.props.codetable
         const doctorProfile = clinicianprofile.find(
-          (item) => item.id === row.clinicianProfileFk,
+          item => item.id === row.clinicianProfileFk,
         )
         this.handleActualizeAppointment({
           patientID: row.patientProfileFk,
@@ -695,7 +694,7 @@ class Queue extends React.Component {
 
     if (totalRecords === 1 && hasSearchQuery)
       return this.showVisitRegistration({
-        patientID: patientSearchResult[ 0 ].id,
+        patientID: patientSearchResult[0].id,
       })
     if (totalRecords >= 1) {
       return this.togglePatientSearch()
@@ -722,7 +721,7 @@ class Queue extends React.Component {
     )
   }
 
-  setSearch = (v) => {
+  setSearch = v => {
     this.setState({
       search: v,
     })
@@ -749,7 +748,7 @@ class Queue extends React.Component {
     })
   }
 
-  showVisitForms = async (row) => {
+  showVisitForms = async row => {
     const { id, visitStatus, doctor, patientAccountNo, patientName } = row
     await this.props.dispatch({
       type: 'formListing/updateState',
@@ -792,18 +791,15 @@ class Queue extends React.Component {
     const { tracker } = queueCalling
     const openQueueDisplayAccessRight = Authorized.check('openqueuedisplay')
     return (
-      <PageHeaderWrapper
-        title={<FormattedMessage id='app.forms.basic.title' />}
-        content={<FormattedMessage id='app.forms.basic.description' />}
-      >
-        <Card>
-          <div className='queueHeader'>
-            <CardHeader icon>
-              <h3 className={classNames(classes.sessionNo)}>
-                {`Session No.: ${sessionNo}`}
-              </h3>
-
-              {openQueueDisplayAccessRight && openQueueDisplayAccessRight.rights !== 'hidden' && tracker && tracker.qNo ? (
+      <PageContainer
+        header={{
+          title: `Session No.: ${sessionNo}`,
+          extra: [
+            <div className='queueHeader'>
+              {openQueueDisplayAccessRight &&
+              openQueueDisplayAccessRight.rights !== 'hidden' &&
+              tracker &&
+              tracker.qNo ? (
                 <h4
                   className={classNames(classes.sessionNo)}
                   style={{
@@ -815,11 +811,9 @@ class Queue extends React.Component {
                 >
                   <font color='red'>
                     NOW SERVING:{' '}
-                    {tracker.qNo.includes('.') ? (
-                      tracker.qNo
-                    ) : (
-                      `${tracker.qNo}.0`
-                    )}
+                    {tracker.qNo.includes('.')
+                      ? tracker.qNo
+                      : `${tracker.qNo}.0`}
                   </font>
                 </h4>
               ) : (
@@ -827,7 +821,7 @@ class Queue extends React.Component {
               )}
 
               {!isClinicSessionClosed && (
-                <div className={classNames(classes.toolBtns)}>
+                <div>
                   <Authorized authority='queue.endsession'>
                     <ProgressButton
                       icon={<EventNote />}
@@ -861,93 +855,93 @@ class Queue extends React.Component {
                   </Authorized>
                 </div>
               )}
-            </CardHeader>
-          </div>
-
-          <Divider />
-          <CardBody>
-            {isClinicSessionClosed ? (
-              <EmptySession
-                handleStartSession={this.onStartSession}
-                handleReopenLastSession={this.onReopenLastSession}
-                sessionInfo={sessionInfo}
-                loading={loading}
-                errorState={error}
-              />
-            ) : (
-              <div>
-                <div className='filterBar'>
-                  <DetailsActionBar
-                    // selfOnly={queueLog.selfOnly}
-                    // onSwitchClick={this.toggleFilterSelfOnly}
-                    onRegisterVisitEnterPressed={this.onEnterPressed}
-                    toggleNewPatient={this.toggleRegisterNewPatient}
-                    setSearch={this.setSearch}
-                  />
-                </div>
-                <DetailsGrid
-                  // onViewPatientProfileClick={this.onViewPatientProfileClick}
-                  // onViewDispenseClick={this.toggleDispense}
-                  // onRegisterPatientClick={this.toggleRegisterNewPatient}
-                  // handleEditVisitClick={this.showVisitRegistration}
-                  // handleActualizeAppointment={this.handleActualizeAppointment}
-                  onMenuItemClick={this.onMenuItemClick}
-                  onContextMenu={this.onContextMenu}
-                  // handleFormsClick={this.showVisitForms}
-                  history={history}
-                  searchQuery={search}
-                />
-                <RightClickContextMenu
-                  onMenuItemClick={this.onMenuItemClick}
-                  onOutsidePopoverRightClick={this.onHideContextMenu}
-                  anchorEl={this.state.anchorEl}
-                  rightClickedRow={this.state.rightClickedRow}
-                  dispatch={dispatch}
+            </div>,
+          ],
+        }}
+      >
+        <PageHeaderWrapper
+          title={<FormattedMessage id='app.forms.basic.title' />}
+          content={<FormattedMessage id='app.forms.basic.description' />}
+        >
+          {isClinicSessionClosed ? (
+            <EmptySession
+              handleStartSession={this.onStartSession}
+              handleReopenLastSession={this.onReopenLastSession}
+              sessionInfo={sessionInfo}
+              loading={loading}
+              errorState={error}
+            />
+          ) : (
+            <div>
+              <div className='filterBar'>
+                <DetailsActionBar
+                  // selfOnly={queueLog.selfOnly}
+                  // onSwitchClick={this.toggleFilterSelfOnly}
+                  onRegisterVisitEnterPressed={this.onEnterPressed}
+                  toggleNewPatient={this.toggleRegisterNewPatient}
+                  setSearch={this.setSearch}
                 />
               </div>
-            )}
-            <CommonModal
-              open={showPatientSearch}
-              title={formatMessage({ id: 'reception.queue.patientSearch' })}
-              onClose={this.togglePatientSearch}
-              onConfirm={this.togglePatientSearch}
-              maxWidth='md'
-              overrideLoading
-            >
-              <PatientSearchModal
-                search={this.state.search}
-                handleRegisterVisitClick={this.showVisitRegistration}
-                onViewPatientProfileClick={this.onViewPatientProfileClick}
+              <DetailsGrid
+                // onViewPatientProfileClick={this.onViewPatientProfileClick}
+                // onViewDispenseClick={this.toggleDispense}
+                // onRegisterPatientClick={this.toggleRegisterNewPatient}
+                // handleEditVisitClick={this.showVisitRegistration}
+                // handleActualizeAppointment={this.handleActualizeAppointment}
+                onMenuItemClick={this.onMenuItemClick}
+                onContextMenu={this.onContextMenu}
+                // handleFormsClick={this.showVisitForms}
+                history={history}
+                searchQuery={search}
               />
-            </CommonModal>
-            <CommonModal
-              open={showEndSessionSummary}
-              title='Session Summary'
-              onClose={this.onEndSessionSummaryClose}
-              onConfirm={this.onEndSessionSummaryClose}
-              disableBackdropClick
-            >
-              <EndSessionSummary sessionID={_sessionInfoID} />
-            </CommonModal>
-            <CommonModal
-              open={showForms}
-              title={
-                this.state.formCategory === FORM_CATEGORY.VisitForms ? (
-                  'Visit Forms'
-                ) : (
-                  'Forms'
-                )
-              }
-              onClose={this.toggleForms}
-              onConfirm={this.toggleForms}
-              maxWidth='md'
-              overrideLoading
-            >
-              <VisitForms formCategory={this.state.formCategory} />
-            </CommonModal>
-          </CardBody>
-        </Card>
-      </PageHeaderWrapper>
+              <RightClickContextMenu
+                onMenuItemClick={this.onMenuItemClick}
+                onOutsidePopoverRightClick={this.onHideContextMenu}
+                anchorEl={this.state.anchorEl}
+                rightClickedRow={this.state.rightClickedRow}
+                dispatch={dispatch}
+              />
+            </div>
+          )}
+          <CommonModal
+            open={showPatientSearch}
+            title={formatMessage({ id: 'reception.queue.patientSearch' })}
+            onClose={this.togglePatientSearch}
+            onConfirm={this.togglePatientSearch}
+            maxWidth='md'
+            overrideLoading
+          >
+            <PatientSearchModal
+              search={this.state.search}
+              handleRegisterVisitClick={this.showVisitRegistration}
+              onViewPatientProfileClick={this.onViewPatientProfileClick}
+            />
+          </CommonModal>
+          <CommonModal
+            open={showEndSessionSummary}
+            title='Session Summary'
+            onClose={this.onEndSessionSummaryClose}
+            onConfirm={this.onEndSessionSummaryClose}
+            disableBackdropClick
+          >
+            <EndSessionSummary sessionID={_sessionInfoID} />
+          </CommonModal>
+          <CommonModal
+            open={showForms}
+            title={
+              this.state.formCategory === FORM_CATEGORY.VisitForms
+                ? 'Visit Forms'
+                : 'Forms'
+            }
+            onClose={this.toggleForms}
+            onConfirm={this.toggleForms}
+            maxWidth='md'
+            overrideLoading
+          >
+            <VisitForms formCategory={this.state.formCategory} />
+          </CommonModal>
+        </PageHeaderWrapper>
+      </PageContainer>
     )
   }
 }

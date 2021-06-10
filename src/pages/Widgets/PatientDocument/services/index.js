@@ -2,17 +2,11 @@ import * as service from '@/services/common'
 
 const url = '/api/PatientAttachment'
 
-module.exports = {
-  // remove: (params) => service.remove(url, params),
-  // query: (params) => service.query(url, params),
-  queryList: (params) =>
-    service.queryList(url, {
-      ...params,
-      sorting: [
-        { columnName: 'sortOrder', direction: 'asc' },
-      ],
-    }),
-  queryDone: (params) => service.query(url, params),
-  upsert: (params) => service.upsert(url, params),
-  remove: (params) => service.remove(url, params),
-}
+export const queryList = params =>
+  service.queryList(url, {
+    ...params,
+    sorting: [{ columnName: 'sortOrder', direction: 'asc' }],
+  })
+export const queryDone = params => service.query(url, params)
+export const upsert = params => service.upsert(url, params)
+export const remove = params => service.remove(url, params)

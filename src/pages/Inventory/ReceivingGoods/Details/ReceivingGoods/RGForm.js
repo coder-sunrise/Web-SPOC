@@ -1,6 +1,6 @@
 import React from 'react'
 import moment from 'moment'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { Divider } from '@material-ui/core'
 import {
   GridContainer,
@@ -20,7 +20,7 @@ import { LTReceivingGoodsStatus } from '../../variables'
 const prefix = 'receivingGoods'
 
 const RGForm = ({ setFieldValue, isReadOnly = false }) => {
-  const setSupplierDetails = (opts) => {
+  const setSupplierDetails = opts => {
     let conPerson
     let faxNo
     let contactNo
@@ -58,7 +58,7 @@ const RGForm = ({ setFieldValue, isReadOnly = false }) => {
             <GridItem xs={12}>
               <FastField
                 name={`${prefix}.receivingGoodsNo`}
-                render={(args) => {
+                render={args => {
                   return (
                     <TextField
                       label={formatMessage({
@@ -74,7 +74,7 @@ const RGForm = ({ setFieldValue, isReadOnly = false }) => {
             <GridItem xs={12}>
               <Field
                 name={`${prefix}.documentNo`}
-                render={(args) => {
+                render={args => {
                   return (
                     <TextField
                       label={formatMessage({
@@ -89,7 +89,7 @@ const RGForm = ({ setFieldValue, isReadOnly = false }) => {
             <GridItem xs={12}>
               <FastField
                 name={`${prefix}.receivingGoodsStatusFK`}
-                render={(args) => {
+                render={args => {
                   return (
                     <CodeSelect
                       label={formatMessage({
@@ -114,14 +114,14 @@ const RGForm = ({ setFieldValue, isReadOnly = false }) => {
             <GridItem xs={12}>
               <Field
                 name={`${prefix}.receivingGoodsDate`}
-                render={(args) => {
+                render={args => {
                   return (
                     <DatePicker
                       label={formatMessage({
                         id: 'inventory.rg.detail.rgd.rgDate',
                       })}
                       allowClear={false}
-                      onChange={(e) => {
+                      onChange={e => {
                         if (e === '') {
                           setFieldValue(
                             'receivingGoods.receivingGoodsDate',
@@ -139,7 +139,7 @@ const RGForm = ({ setFieldValue, isReadOnly = false }) => {
             <GridItem xs={12}>
               <Field
                 name={`${prefix}.invoiceDate`}
-                render={(args) => {
+                render={args => {
                   return (
                     <DatePicker
                       label={formatMessage({
@@ -155,7 +155,7 @@ const RGForm = ({ setFieldValue, isReadOnly = false }) => {
               <div style={{ position: 'relative' }}>
                 <Field
                   name={`${prefix}.remark`}
-                  render={(args) => {
+                  render={args => {
                     return (
                       <TextField
                         label={formatMessage({
@@ -171,7 +171,7 @@ const RGForm = ({ setFieldValue, isReadOnly = false }) => {
                 />
                 <Field
                   name={`${prefix}.isShowRemarkInPrintout`}
-                  render={(args) => {
+                  render={args => {
                     return (
                       <Checkbox
                         style={{ position: 'absolute', bottom: 2 }}
@@ -206,7 +206,7 @@ const RGForm = ({ setFieldValue, isReadOnly = false }) => {
               <GridItem xs={12}>
                 <FastField
                   name={`${prefix}.supplierFK`}
-                  render={(args) => {
+                  render={args => {
                     return (
                       <CodeSelect
                         label={formatMessage({
@@ -226,7 +226,7 @@ const RGForm = ({ setFieldValue, isReadOnly = false }) => {
               <GridItem xs={12}>
                 <FastField
                   name={`${prefix}.contactPerson`}
-                  render={(args) => {
+                  render={args => {
                     return (
                       <TextField
                         label={formatMessage({
@@ -241,7 +241,7 @@ const RGForm = ({ setFieldValue, isReadOnly = false }) => {
               <GridItem xs={12}>
                 <FastField
                   name={`${prefix}.supplierAddress`}
-                  render={(args) => {
+                  render={args => {
                     return (
                       <OutlinedTextField
                         label={formatMessage({
@@ -266,7 +266,7 @@ const RGForm = ({ setFieldValue, isReadOnly = false }) => {
               <GridItem xs={12}>
                 <FastField
                   name={`${prefix}.contactNo`}
-                  render={(args) => (
+                  render={args => (
                     <MobileNumberInput
                       {...args}
                       label={formatMessage({
@@ -279,7 +279,7 @@ const RGForm = ({ setFieldValue, isReadOnly = false }) => {
               <GridItem xs={12}>
                 <FastField
                   name={`${prefix}.faxNo`}
-                  render={(args) => (
+                  render={args => (
                     <MobileNumberInput
                       {...args}
                       label={formatMessage({

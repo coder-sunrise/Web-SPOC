@@ -1,11 +1,12 @@
-import router from 'umi/router'
+import { history } from 'umi'
 import { createFormViewModel } from 'medisys-model'
 import { subscribeNotification } from '@/utils/realtime'
 import { getAppendUrl } from '@/utils/utils'
 import * as service from '@/pages/Billing/services'
-import { unlock } from '@/services/dispense'
+import dispenseService from '@/services/dispense'
 import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 
+const { unlock } = dispenseService
 export default createFormViewModel({
   namespace: 'billing',
   config: {
@@ -31,8 +32,8 @@ export default createFormViewModel({
         invoicePayment: [],
       },
     },
-    subscriptions: ({ dispatch, history }) => {
-      history.listen(async (location) => {
+    subscriptions: ({ dispatch }) => {
+      history.listen(async location => {
         const { query, pathname } = location
         const { vid, v, pid, qid } = query
 
@@ -45,7 +46,7 @@ export default createFormViewModel({
       })
 
       subscribeNotification('EditedConsultation', {
-        callback: (response) => {
+        callback: response => {
           const { visitID, senderId } = response
           dispatch({
             type: 'updateShouldRefreshOrder',
@@ -65,8 +66,8 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *initState ({ payload }, { select, put, take }) {
-        const queueLogState = yield select((st) => st.queueLog)
+      *initState({ payload }, { select, put, take }) {
+        const queueLogState = yield select(st => st.queueLog)
         if (payload.pid) {
           yield put({
             type: 'patient/query',
@@ -100,8 +101,8 @@ export default createFormViewModel({
           },
         })
       },
-      *showDispenseDetails ({ payload }, { select, put }) {
-        const routing = yield select((st) => st.routing)
+      *showDispenseDetails({ payload }, { select, put }) {
+        const routing = yield select(st => st.routing)
 
         return yield put({
           type: 'dispense/query',
@@ -111,18 +112,16 @@ export default createFormViewModel({
           },
         })
       },
-      *submit ({ payload }, { call, put }) {
+      *submit({ payload }, { call, put }) {
         const { mode, ...restPayload } = payload
         return yield put({
           type: `${mode}`,
           payload: restPayload,
         })
       },
-      *save ({ payload }, { call, put, take, select }) {
+      *save({ payload }, { call, put, take, select }) {
         const response = yield call(service.save, payload)
-        const visitRegistration = yield select(
-          (state) => state.visitRegistration,
-        )
+        const visitRegistration = yield select(state => state.visitRegistration)
         const { entity } = visitRegistration
         const { visitStatus } = payload
         if (response) {
@@ -150,17 +149,15 @@ export default createFormViewModel({
         return false
       },
 
-      *refresh ({ payload }, { put }) {
+      *refresh({ payload }, { put }) {
         yield put({
           type: 'query',
           payload: { id: payload.visitID },
         })
       },
-      *backToDispense ({ payload }, { call, put, select, take }) {
-        const billingState = yield select((state) => state.billing)
-        const visitRegistration = yield select(
-          (state) => state.visitRegistration,
-        )
+      *backToDispense({ payload }, { call, put, select, take }) {
+        const billingState = yield select(state => state.billing)
+        const visitRegistration = yield select(state => state.visitRegistration)
         const { entity } = visitRegistration
 
         const parameters = {
@@ -189,12 +186,12 @@ export default createFormViewModel({
             message: 'Invoice unlocked. Ready for dispensing.',
             queueNo: entity.queueNo,
           })
-          router.push(destinationUrl)
+          history.push(destinationUrl)
         }
       },
-      *updateShouldRefreshOrder ({ payload }, { put, select }) {
-        const user = yield select((state) => state.user)
-        const billing = yield select((state) => state.billing)
+      *updateShouldRefreshOrder({ payload }, { put, select }) {
+        const user = yield select(state => state.user)
+        const billing = yield select(state => state.billing)
         const { visitID, senderId } = payload
         const { entity } = billing || {}
         if (entity && entity.id === visitID && senderId !== user.data.id)
@@ -205,7 +202,7 @@ export default createFormViewModel({
             },
           })
       },
-      *savePackageAcknowledge ({ payload }, { call, put, take }) {
+      *savePackageAcknowledge({ payload }, { call, put, take }) {
         const response = yield call(service.savePackageAcknowledge, payload)
         if (response) {
           yield put({
@@ -222,13 +219,10 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      addItems (state, { payload }) {
+      addItems(state, { payload }) {
         return {
           ...state,
-          invoiceItems: [
-            ...state.invoiceItems,
-            payload,
-          ],
+          invoiceItems: [...state.invoiceItems, payload],
         }
       },
     },

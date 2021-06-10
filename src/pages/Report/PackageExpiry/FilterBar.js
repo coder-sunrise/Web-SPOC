@@ -2,7 +2,7 @@ import React from 'react'
 // formik
 import { FastField } from 'formik'
 import { withStyles } from '@material-ui/core'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 // common components
 import {
   Button,
@@ -16,7 +16,7 @@ import {
 } from '@/components'
 import ReportDateRangePicker from '../ReportDateRangePicker'
 
-const styles = (theme) => ({
+const styles = theme => ({
   generateBtn: {
     marginBottom: theme.spacing(1),
   },
@@ -30,7 +30,7 @@ const FilterBar = ({ classes, handleSubmit, isSubmitting, values }) => {
           <GridItem md={4}>
             <FastField
               name='packageIDs'
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   temp
                   label='Package'
@@ -46,7 +46,7 @@ const FilterBar = ({ classes, handleSubmit, isSubmitting, values }) => {
           <GridItem md={3}>
             <FastField
               name='patientCriteria'
-              render={(args) => (
+              render={args => (
                 <TextField
                   {...args}
                   label={formatMessage({
@@ -58,7 +58,7 @@ const FilterBar = ({ classes, handleSubmit, isSubmitting, values }) => {
           </GridItem>
           <GridItem md={4} />
 
-          <ReportDateRangePicker 
+          <ReportDateRangePicker
             fromDateLabel='Purchase Date From'
             toDateLabel='Purchase Date To'
             disabled={values.isAllDate}
@@ -67,13 +67,15 @@ const FilterBar = ({ classes, handleSubmit, isSubmitting, values }) => {
           <GridItem md={1}>
             <FastField
               name='isAllDate'
-              render={(args) => <Checkbox {...args} label='All Date' defaultValue />}
+              render={args => (
+                <Checkbox {...args} label='All Date' defaultValue />
+              )}
             />
           </GridItem>
           <GridItem md={1}>
             <FastField
               name='expiredAfterDate'
-              render={(args) => <DatePicker {...args} label='Expired After' />}
+              render={args => <DatePicker {...args} label='Expired After' />}
             />
           </GridItem>
           <GridItem md={2} className={classes.generateBtn}>

@@ -2,9 +2,9 @@ import { createListViewModel } from 'medisys-model'
 import { VISIT_TYPE } from '@/utils/constants'
 import { formTypes } from '@/utils/codes'
 import { getUserPreference, saveUserPreference } from '@/services/user'
-import * as service from '../services/patientHistory'
+import service from '../services/patientHistory'
 
-const ParseEyeFormData = (response) => {
+const ParseEyeFormData = response => {
   const { corEyeRefractionForm = {}, corEyeExaminationForm = {} } = response
   let refractionFormData = {}
   let examinationFormData = {}
@@ -43,7 +43,7 @@ export default createListViewModel({
         list: [],
       },
       patientReferralHistory: {
-        entity: {data: [] },
+        entity: { data: [] },
       },
     },
     subscriptions: ({ dispatch, history }) => {
@@ -66,7 +66,7 @@ export default createListViewModel({
       })
     },
     effects: {
-      *initState ({ payload }, { call, put, select, take }) {
+      *initState({ payload }, { call, put, select, take }) {
         let { queueID, version, patientID, mode } = payload
         if (!patientID) {
           yield put({
@@ -74,7 +74,7 @@ export default createListViewModel({
             payload: { id: queueID, version },
           })
           yield take('visitRegistration/query/@@end')
-          const visitRegistration = yield select((st) => st.visitRegistration)
+          const visitRegistration = yield select(st => st.visitRegistration)
           const { visit } = visitRegistration.entity
           if (!visit) return
           patientID = visit.patientProfileFK
@@ -91,7 +91,7 @@ export default createListViewModel({
         })
       },
 
-      *queryPatientHistoy ({ payload }, { call, put }) {
+      *queryPatientHistoy({ payload }, { call, put }) {
         const { patientID, version } = payload
         yield put({
           type: 'query',
@@ -109,21 +109,21 @@ export default createListViewModel({
         })
       },
 
-      *queryVisitHistory ({ payload }, { call }) {
+      *queryVisitHistory({ payload }, { call }) {
         const response = yield call(service.queryVisitHistory, payload)
         if (response.status === '200') {
           return {
-            list: (response.data.data || []).map((item) => {
+            list: (response.data.data || []).map(item => {
               if (item.visitPurposeFK === VISIT_TYPE.RETAIL || item.isNurseNote)
                 return item
               let newEntity = ParseEyeFormData(item.patientHistoryDetail)
               newEntity = {
                 ...newEntity,
-                forms: newEntity.forms.map((o) => {
+                forms: newEntity.forms.map(o => {
                   return {
                     ...o,
                     typeName: formTypes.find(
-                      (type) => parseInt(type.value, 10) === o.type,
+                      type => parseInt(type.value, 10) === o.type,
                     ).name,
                   }
                 }),
@@ -138,7 +138,7 @@ export default createListViewModel({
         }
         return false
       },
-      *queryDispenseHistory ({ payload }, { call, put }) {
+      *queryDispenseHistory({ payload }, { call, put }) {
         const response = yield call(service.queryDispenseHistory, payload)
         if (response.status === '200') {
           yield put({
@@ -151,7 +151,7 @@ export default createListViewModel({
         }
         return false
       },
-      *queryRetailHistory ({ payload }, { call, put }) {
+      *queryRetailHistory({ payload }, { call, put }) {
         const response = yield call(service.queryRetailHistory, payload)
 
         if (response.status === '200') {
@@ -164,7 +164,7 @@ export default createListViewModel({
         return false
       },
 
-      *queryInvoiceHistory ({ payload }, { call, put }) {
+      *queryInvoiceHistory({ payload }, { call, put }) {
         const response = yield call(service.queryInvoiceHistory, payload)
 
         if (response.status === '200') {
@@ -176,7 +176,7 @@ export default createListViewModel({
         }
         return false
       },
-      *saveUserPreference ({ payload }, { call, put, select }) {
+      *saveUserPreference({ payload }, { call, put, select }) {
         const r = yield call(saveUserPreference, {
           userPreferenceDetails: JSON.stringify(payload.userPreferenceDetails),
           itemIdentifier: payload.itemIdentifier,
@@ -187,7 +187,7 @@ export default createListViewModel({
 
         return false
       },
-      *getUserPreference ({ payload }, { call, put }) {
+      *getUserPreference({ payload }, { call, put }) {
         const r = yield call(getUserPreference, 5)
         const { status, data } = r
 
@@ -198,11 +198,11 @@ export default createListViewModel({
               yield put({
                 type: 'updateState',
                 payload: parsedPatientHistory.find(
-                  (o) => o.Identifier === 'SelectCategories',
+                  o => o.Identifier === 'SelectCategories',
                 ),
               })
               return parsedPatientHistory.find(
-                (o) => o.Identifier === 'SelectCategories',
+                o => o.Identifier === 'SelectCategories',
               )
             }
           }
@@ -210,43 +210,42 @@ export default createListViewModel({
         return null
       },
 
-      *queryReferralHistory ({payload},{call,put}){
-        const response = yield call(service.queryReferralHistory,payload)
-        if (response.status==='200') {
-          yield put ({
+      *queryReferralHistory({ payload }, { call, put }) {
+        const response = yield call(service.queryReferralHistory, payload)
+        if (response.status === '200') {
+          yield put({
             type: 'getReferalHistory',
-            payload:response,
+            payload: response,
           })
           return response
         }
         return false
       },
 
-      *saveReferralHistory ({payload},{call,put,select}){
-        const r = yield call(service.saveReferralHistory,payload)
+      *saveReferralHistory({ payload }, { call, put, select }) {
+        const r = yield call(service.saveReferralHistory, payload)
         if (r === 204) return true
 
         return false
       },
-
     },
     reducers: {
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         // const { data } = payload
-        st.list = st.list.map((item) => {
+        st.list = st.list.map(item => {
           if (
             item.visitPurposeFK === VISIT_TYPE.RETAIL ||
-            (!item.coHistory || item.coHistory.length === 0)
+            !item.coHistory || item.coHistory.length === 0
           )
             return item
           let newEntity = ParseEyeFormData(item.patientHistoryDetail)
           newEntity = {
             ...newEntity,
-            forms: newEntity.forms.map((o) => {
+            forms: newEntity.forms.map(o => {
               return {
                 ...o,
                 typeName: formTypes.find(
-                  (type) => parseInt(type.value, 10) === o.type,
+                  type => parseInt(type.value, 10) === o.type,
                 ).name,
               }
             }),
@@ -260,18 +259,18 @@ export default createListViewModel({
           ...st,
         }
       },
-      queryOneDone (st, { payload }) {
+      queryOneDone(st, { payload }) {
         // const { data } = payload
         const { entity } = st
         st.entity = ParseEyeFormData(entity)
 
         st.entity = {
           ...st.entity,
-          forms: st.entity.forms.map((o) => {
+          forms: st.entity.forms.map(o => {
             return {
               ...o,
               typeName: formTypes.find(
-                (type) => parseInt(type.value, 10) === o.type,
+                type => parseInt(type.value, 10) === o.type,
               ).name,
             }
           }),
@@ -281,14 +280,14 @@ export default createListViewModel({
           ...st,
         }
       },
-      getRetailHistory (st, { payload }) {
+      getRetailHistory(st, { payload }) {
         const { data } = payload
         return {
           ...st,
           entity: data,
         }
       },
-      getReferalHistory (st, { payload }) {
+      getReferalHistory(st, { payload }) {
         const { data } = payload
         return {
           ...st,
@@ -297,16 +296,16 @@ export default createListViewModel({
           },
         }
       },
-      getInvoiceHistory (st, { payload }) {
+      getInvoiceHistory(st, { payload }) {
         const { data } = payload
         return {
           ...st,
           invoiceHistory: {
             entity: data,
-            list: data.data.map((o) => {
+            list: data.data.map(o => {
               return {
                 ...o,
-                invoicePayer: o.invoicePayer.map((ip) => {
+                invoicePayer: o.invoicePayer.map(ip => {
                   let paymentTxnList = []
                   const {
                     invoicePayment,
@@ -318,7 +317,7 @@ export default createListViewModel({
 
                   // Payment
                   paymentTxnList = (paymentTxnList || []).concat(
-                    (invoicePayment || []).map((z) => {
+                    (invoicePayment || []).map(z => {
                       return {
                         ...z,
                         // id: z.id,
@@ -333,7 +332,7 @@ export default createListViewModel({
 
                   // Write-Off
                   paymentTxnList = (paymentTxnList || []).concat(
-                    (invoicePayerWriteOff || []).map((z) => {
+                    (invoicePayerWriteOff || []).map(z => {
                       return {
                         ...z,
                         // id: z.id,
@@ -349,7 +348,7 @@ export default createListViewModel({
 
                   // Credit Note
                   paymentTxnList = (paymentTxnList || []).concat(
-                    (creditNote || []).map((z) => {
+                    (creditNote || []).map(z => {
                       return {
                         ...z,
                         // id: z.id,
@@ -365,7 +364,7 @@ export default createListViewModel({
 
                   // Invoice PayerDepposit
                   paymentTxnList = (paymentTxnList || []).concat(
-                    (patientDepositTransaction || []).map((z) => {
+                    (patientDepositTransaction || []).map(z => {
                       return {
                         ...z,
                         type: 'Deposit',
@@ -379,8 +378,8 @@ export default createListViewModel({
                   // Statement Corporate Charges
                   paymentTxnList = (paymentTxnList || []).concat(
                     (statementInvoice || [])
-                      .filter((x) => x.adminCharge > 0)
-                      .map((z) => {
+                      .filter(x => x.adminCharge > 0)
+                      .map(z => {
                         return {
                           ...z,
                           // id: z.id,
@@ -398,10 +397,9 @@ export default createListViewModel({
                   paymentTxnList = (paymentTxnList || []).concat(
                     (statementInvoice || [])
                       .filter(
-                        (x) =>
-                          x.statementAdjustment && x.statementAdjustment > 0,
+                        x => x.statementAdjustment && x.statementAdjustment > 0,
                       )
-                      .map((z) => {
+                      .map(z => {
                         return {
                           ...z,
                           // id: z.id,

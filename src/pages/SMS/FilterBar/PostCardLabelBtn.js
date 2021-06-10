@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'dva'
 // umi
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 // material ui
 import Print from '@material-ui/icons/Print'
 // common components
@@ -27,10 +27,8 @@ const PostCardLabelBtn = ({
     if (labelPrinterSize === '8.9cmx3.6cm') {
       reportID = REPORT_ID.POST_CARD_LABEL_89MM_36MM
     }
-    const selectedPatients = list.filter((item) =>
-      selectedRows.includes(item.id),
-    )
-    selectedPatients.forEach(async (patient) => {
+    const selectedPatients = list.filter(item => selectedRows.includes(item.id))
+    selectedPatients.forEach(async patient => {
       const data = await getRawData(reportID, { patientId: patient.id })
       const payload = [
         {

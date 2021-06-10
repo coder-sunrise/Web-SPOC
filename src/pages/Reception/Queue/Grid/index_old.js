@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import { connect } from 'dva'
-import router from 'umi/router'
+import { history } from 'umi'
 // material ui
 import { Popover } from '@material-ui/core'
 // medisys component
@@ -8,16 +8,18 @@ import { VisitStatusTag, LoadingWrapper } from '@/components/_medisys'
 import { CommonTableGrid, notification } from '@/components'
 // medisys component
 // sub component
-import ActionButton from './ActionButton'
-import ContextMenu from './ContextMenu'
-// utils
 import { getAppendUrl } from '@/utils/utils'
-import { filterData } from '../utils'
 import {
   VISIT_STATUS,
   ContextMenuOptions,
   AppointmentContextMenu,
 } from '@/pages/Reception/Queue/variables'
+import Authorized from '@/utils/Authorized'
+import { VISIT_TYPE, VALUE_KEYS } from '@/utils/constants'
+import ActionButton from './ActionButton'
+import ContextMenu from './ContextMenu'
+// utils
+import { filterData } from '../utils'
 import { StatusIndicator } from '../variables'
 import {
   FuncConfig,
@@ -26,8 +28,6 @@ import {
   AppointmentTableConfig,
   ApptColumnExtensions,
 } from './variables'
-import Authorized from '@/utils/Authorized'
-import { VISIT_TYPE, VALUE_KEYS } from '@/utils/constants'
 
 const Grid = ({
   dispatch,
@@ -48,17 +48,11 @@ const Grid = ({
   statusTagClicked,
   mainDivHeight = 700,
 }) => {
-  const [
-    anchorEl,
-    setAnchorEl,
-  ] = useState(null)
+  const [anchorEl, setAnchorEl] = useState(null)
 
-  const [
-    rightClickedRow,
-    setRightClickedRow,
-  ] = useState(undefined)
+  const [rightClickedRow, setRightClickedRow] = useState(undefined)
 
-  const handlePopoverOpen = (event) => setAnchorEl(event.target)
+  const handlePopoverOpen = event => setAnchorEl(event.target)
 
   const handlePopoverClose = () => {
     setAnchorEl(null)
@@ -68,10 +62,15 @@ const Grid = ({
   const openContextMenu = Boolean(anchorEl)
 
   const isAssignedDoctor = useCallback(
-    (row) => {
+    row => {
       if (!row.doctor) return false
-      const { doctor: { id }, visitStatus } = row
-      const { clinicianProfile: { doctorProfile } } = user.data
+      const {
+        doctor: { id },
+        visitStatus,
+      } = row
+      const {
+        clinicianProfile: { doctorProfile },
+      } = user.data
 
       if (!doctorProfile) {
         notification.error({
@@ -90,9 +89,7 @@ const Grid = ({
       }
       return true
     },
-    [
-      user,
-    ],
+    [user],
   )
 
   const deleteQueue = (id, queueNo) => {
@@ -123,16 +120,18 @@ const Grid = ({
 
   const computeQueueListingData = () => {
     if (filter === StatusIndicator.APPOINTMENT) return calendarEvents
-    let data = [
-      ...queueList,
-    ]
+    let data = [...queueList]
 
-    const { clinicianProfile: { doctorProfile } } = user.data
+    const {
+      clinicianProfile: { doctorProfile },
+    } = user.data
 
     if (selfOnly)
-      data = data.filter((item) => {
+      data = data.filter(item => {
         if (!item.doctor) return false
-        const { doctor: { id } } = item
+        const {
+          doctor: { id },
+        } = item
         return doctorProfile ? id === doctorProfile.id : false
       })
 
@@ -148,7 +147,7 @@ const Grid = ({
     searchQuery,
   ])
 
-  const deleteQueueConfirmation = (row) => {
+  const deleteQueueConfirmation = row => {
     const { queueNo, id } = row
 
     dispatch({
@@ -163,12 +162,9 @@ const Grid = ({
     })
   }
 
-  const canAccess = (id) => {
-    const apptsActionID = [
-      '8',
-      '9',
-    ]
-    const findMatch = (item) => item.id === parseFloat(id, 10)
+  const canAccess = id => {
+    const apptsActionID = ['8', '9']
+    const findMatch = item => item.id === parseFloat(id, 10)
 
     let menuOpt = ContextMenuOptions.find(findMatch)
 
@@ -225,9 +221,9 @@ const Grid = ({
               qid: row.id,
               queueNo: row.queueNo,
             },
-          }).then((o) => {
+          }).then(o => {
             if (o)
-              router.push(
+              history.push(
                 `/reception/queue/dispense?isInitialLoading=${isInitialLoading}&qid=${row.id}&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
               )
           })
@@ -243,7 +239,7 @@ const Grid = ({
             qid: row.id,
             v: version,
           }
-          router.push(getAppendUrl(parameters, '/reception/queue/billing'))
+          history.push(getAppendUrl(parameters, '/reception/queue/billing'))
           break
         }
         case '2': // delete visit
@@ -253,7 +249,7 @@ const Grid = ({
           onViewPatientProfileClick(row.patientProfileFK, row.id)
           break
         case '4': // patient dashboard
-          router.push(
+          history.push(
             `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}`,
           )
           break
@@ -271,9 +267,9 @@ const Grid = ({
                 qid: row.id,
                 queueNo: row.queueNo,
               },
-            }).then((o) => {
+            }).then(o => {
               if (o)
-                router.push(
+                history.push(
                   `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
                 )
             })
@@ -293,14 +289,14 @@ const Grid = ({
                   id: row.visitFK,
                   version,
                 },
-              }).then((o) => {
+              }).then(o => {
                 if (o)
-                  router.push(
+                  history.push(
                     `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
                   )
               })
             } else {
-              router.push(
+              history.push(
                 `/reception/queue/consultation?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}`,
               )
             }
@@ -320,12 +316,12 @@ const Grid = ({
                 id: row.visitFK,
                 version,
               },
-            }).then((o) => {
+            }).then(o => {
               if (o)
                 if (o.updateByUserFK !== user.data.id) {
                   const { clinicianprofile = [] } = codetable
                   const editingUser = clinicianprofile.find(
-                    (m) => m.userProfileFK === o.updateByUserFK,
+                    m => m.userProfileFK === o.updateByUserFK,
                   ) || {
                     name: 'Someone',
                   }
@@ -341,8 +337,8 @@ const Grid = ({
                             id: row.visitFK,
                             version,
                           },
-                        }).then((c) => {
-                          router.push(
+                        }).then(c => {
+                          history.push(
                             `/reception/queue/consultation?qid=${row.id}&cid=${c.id}&v=${version}`,
                           )
                         })
@@ -350,7 +346,7 @@ const Grid = ({
                     },
                   })
                 } else {
-                  router.push(
+                  history.push(
                     `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
                   )
                 }
@@ -361,7 +357,7 @@ const Grid = ({
         case '8': {
           const { clinicianprofile = [] } = codetable
           const doctorProfile = clinicianprofile.find(
-            (item) => item.id === row.clinicianProfileFk,
+            item => item.id === row.clinicianProfileFk,
           )
           handleActualizeAppointment({
             patientID: row.patientProfileFk,
@@ -386,57 +382,47 @@ const Grid = ({
         })
       }, 3000)
     },
-    [
-      codetable.clinicianprofile,
-    ],
+    [codetable.clinicianprofile],
   )
 
   const onRowDoubleClick = useCallback(
-    (row) => {
+    row => {
       const { visitStatus, visitPurposeFK = VISIT_TYPE.CONS } = row
       const isWaiting = visitStatus === VISIT_STATUS.WAITING
-      const { clinicianProfile: { doctorProfile } } = user.data
-      const retailVisits = [
-        VISIT_TYPE.RETAIL,
-        VISIT_TYPE.BILL_FIRST,
-      ]
+      const {
+        clinicianProfile: { doctorProfile },
+      } = user.data
+      const retailVisits = [VISIT_TYPE.RETAIL, VISIT_TYPE.BILL_FIRST]
       if (!doctorProfile || retailVisits.includes(visitPurposeFK)) return false
 
       if (isWaiting) onClick(row, '5') // start consultation context menu id = 5
 
       return true
     },
-    [
-      user,
-    ],
+    [user],
   )
 
   const renderActionButton = useCallback(
-    (row) => {
+    row => {
       return <ActionButton row={row} onClick={onClick} />
     },
-    [
-      codetable,
-      onClick,
-    ],
+    [codetable, onClick],
   )
 
   const handleContextMenuClick = useCallback(
-    (menuItem) => {
+    menuItem => {
       handlePopoverClose()
       onClick(rightClickedRow, menuItem.key)
     },
-    [
-      rightClickedRow,
-    ],
+    [rightClickedRow],
   )
 
-  const onOutsidePopoverRightClick = (event) => {
+  const onOutsidePopoverRightClick = event => {
     event.preventDefault()
     handlePopoverClose()
   }
 
-  const handleStatusTagClick = (row) => {
+  const handleStatusTagClick = row => {
     let id = '5' // default as Start Consultation
     const { visitStatus, visitPurposeFK, patientProfileFk } = row
     if (visitStatus === VISIT_STATUS.UPCOMING_APPT) {
@@ -500,7 +486,7 @@ const Grid = ({
               {
                 columnName: 'visitStatus',
                 width: 200,
-                render: (row) => (
+                render: row => (
                   <VisitStatusTag row={row} onClick={handleStatusTagClick} />
                 ),
               },
@@ -532,7 +518,7 @@ const Grid = ({
               {
                 columnName: 'visitStatus',
                 width: 200,
-                render: (row) => (
+                render: row => (
                   <VisitStatusTag
                     row={row}
                     onClick={handleStatusTagClick}

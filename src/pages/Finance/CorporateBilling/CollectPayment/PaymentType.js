@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { withFormik, Field, FastField } from 'formik'
 import { withStyles } from '@material-ui/core'
 import { paymentMethods } from '@/utils/codes'
@@ -51,7 +51,7 @@ const PaymentComponentBase = ({
         <GridItem xs sm={12} md={12}>
           <FastField
             name='CreditCardType'
-            render={(args) => (
+            render={args => (
               <Select
                 label={formatMessage({
                   id: 'finance.collectPayment.cardType',
@@ -88,7 +88,7 @@ const PaymentComponentBase = ({
         <GridItem xs sm={12} md={12}>
           <FastField
             name='CardNo'
-            render={(args) => (
+            render={args => (
               <TextField
                 label={formatMessage({
                   id: 'finance.collectPayment.cardNo',
@@ -104,7 +104,7 @@ const PaymentComponentBase = ({
         <GridItem xs sm={12} md={12}>
           <FastField
             name='ReferenceNo'
-            render={(args) => (
+            render={args => (
               <TextField
                 label={formatMessage({
                   id: 'finance.collectPayment.referenceNo',
@@ -119,7 +119,7 @@ const PaymentComponentBase = ({
         <GridItem xs sm={12} md={12}>
           <FastField
             name='ChequeNo'
-            render={(args) => (
+            render={args => (
               <TextField
                 label={formatMessage({
                   id: 'finance.collectPayment.chequeNo',
@@ -135,7 +135,7 @@ const PaymentComponentBase = ({
         <GridItem xs sm={12} md={12}>
           <FastField
             name='Remark'
-            render={(args) => (
+            render={args => (
               <TextField
                 label={formatMessage({
                   id: 'finance.collectPayment.remarks',
@@ -168,7 +168,7 @@ const PaymentComponent = ({ paymentMode = '' }) => {
 }
 
 @withFormik({
-  mapPropsToValues: (props) => {
+  mapPropsToValues: props => {
     const { totalAmount } = props
     return {
       PaymentMode: undefined,
@@ -177,7 +177,7 @@ const PaymentComponent = ({ paymentMode = '' }) => {
   },
 })
 class PaymentType extends PureComponent {
-  render () {
+  render() {
     const { totalAmount, values, classes } = this.props
     return (
       <div
@@ -208,7 +208,7 @@ class PaymentType extends PureComponent {
               <GridItem xs sm={12} md={6}>
                 <FastField
                   name='StartDate'
-                  render={(args) => (
+                  render={args => (
                     <DatePicker
                       label={formatMessage({
                         id: 'form.date.placeholder',
@@ -222,7 +222,7 @@ class PaymentType extends PureComponent {
               <GridItem xs sm={12} md={6}>
                 <FastField
                   name='PaymentMode'
-                  render={(args) => (
+                  render={args => (
                     <div className='select-up'>
                       <Select
                         label={formatMessage({

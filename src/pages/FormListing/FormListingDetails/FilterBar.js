@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import moment from 'moment'
 import { FastField, withFormik, Field } from 'formik'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
@@ -16,7 +16,7 @@ import {
 } from '@/components'
 import { FilterBarDate } from '@/components/_medisys'
 
-const styles = (theme) => ({
+const styles = theme => ({
   filterBar: {
     marginBottom: '10px',
   },
@@ -36,7 +36,7 @@ const styles = (theme) => ({
   }),
 })
 class FilterBar extends PureComponent {
-  render () {
+  render() {
     const { classes, dispatch, simple, values } = this.props
     const {
       formSearchStartDate,
@@ -53,7 +53,7 @@ class FilterBar extends PureComponent {
             <GridItem sm={12} md={4} style={{ position: 'relative' }}>
               <FastField
                 name='patientSearchValue'
-                render={(args) => {
+                render={args => {
                   return (
                     <TextField
                       autoFocus={!simple}
@@ -70,11 +70,11 @@ class FilterBar extends PureComponent {
           <GridItem xs={6} md={2}>
             <FastField
               name='status'
-              render={(args) => {
+              render={args => {
                 return (
                   <CodeSelect
                     label='Status'
-                    options={formStatus.filter((o) => o.value !== 1)}
+                    options={formStatus.filter(o => o.value !== 1)}
                     {...args}
                     mode='multiple'
                     valueField='value'
@@ -96,7 +96,7 @@ class FilterBar extends PureComponent {
           <GridItem xs={6} md={2}>
             <FastField
               name='formType'
-              render={(args) => {
+              render={args => {
                 return (
                   <CodeSelect
                     label='Form Type'
@@ -123,7 +123,7 @@ class FilterBar extends PureComponent {
           <GridItem md={2}>
             <Field
               name='formSearchStartDate'
-              render={(args) => (
+              render={args => (
                 <FilterBarDate
                   args={args}
                   label='Visit Date From'
@@ -138,7 +138,7 @@ class FilterBar extends PureComponent {
           <GridItem md={2}>
             <Field
               name='formSearchEndDate'
-              render={(args) => (
+              render={args => (
                 <FilterBarDate
                   isEndDate
                   args={args}

@@ -1,5 +1,5 @@
 import React from 'react'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import {
   Field,
   FastField,
@@ -11,7 +11,7 @@ import {
 } from '@/components'
 
 const CoPayment = ({ values, theme, classes, setFieldValue }) => {
-  const CPNumber = (label, type, radType) => (args) => {
+  const CPNumber = (label, type, radType) => args => {
     return (
       <NumberInput
         label={label}
@@ -27,7 +27,7 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
     )
   }
 
-  const CPSwitch = (type) => (args) => {
+  const CPSwitch = type => args => {
     if (!args.field.value) {
       args.field.value = 'ExactAmount'
     }
@@ -44,7 +44,7 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
     )
   }
 
-  const onRadioButtonChange = (event) => {
+  const onRadioButtonChange = event => {
     const { target } = event
 
     if (target.value === 'sub') {
@@ -101,7 +101,7 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
       <GridItem xs={1}>
         <FastField
           name='itemGroupValueDtoRdoValue'
-          render={(args) => (
+          render={args => (
             <RadioGroup
               label=''
               inputClass={classes.rdoInput}
@@ -139,7 +139,7 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
               id: 'finance.scheme.setting.consumables',
             }),
             values.itemGroupValueDto &&
-            values.itemGroupValueDto.consumableGroupValue
+              values.itemGroupValueDto.consumableGroupValue
               ? values.itemGroupValueDto.consumableGroupValue.groupValueType
               : 'ExactAmount',
             'sub',
@@ -153,7 +153,7 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
               id: 'finance.scheme.setting.medications',
             }),
             values.itemGroupValueDto &&
-            values.itemGroupValueDto.medicationGroupValue
+              values.itemGroupValueDto.medicationGroupValue
               ? values.itemGroupValueDto.medicationGroupValue.groupValueType
               : 'ExactAmount',
             'sub',
@@ -166,7 +166,7 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
               id: 'finance.scheme.setting.vaccines',
             }),
             values.itemGroupValueDto &&
-            values.itemGroupValueDto.vaccinationGroupValue
+              values.itemGroupValueDto.vaccinationGroupValue
               ? values.itemGroupValueDto.vaccinationGroupValue.groupValueType
               : 'ExactAmount',
             'sub',
@@ -179,7 +179,7 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
               id: 'finance.scheme.setting.services',
             }),
             values.itemGroupValueDto &&
-            values.itemGroupValueDto.serviceGroupValue
+              values.itemGroupValueDto.serviceGroupValue
               ? values.itemGroupValueDto.serviceGroupValue.groupValueType
               : 'ExactAmount',
             'sub',

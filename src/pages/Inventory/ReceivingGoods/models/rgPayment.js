@@ -1,7 +1,7 @@
 import { createFormViewModel } from 'medisys-model'
 import { INVOICE_STATUS } from '@/utils/constants'
 import { notification } from '@/components'
-import * as service from '../services/rgPayment'
+import service from '../services/rgPayment'
 
 export default createFormViewModel({
   namespace: 'rgPayment',
@@ -32,7 +32,7 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *getCurrentBizSession (_, { put, call }) {
+      *getCurrentBizSession(_, { put, call }) {
         const bizSessionPayload = {
           IsClinicSessionClosed: false,
         }
@@ -55,7 +55,7 @@ export default createFormViewModel({
         })
         return false
       },
-      *queryRGPayment ({ payload }, { put }) {
+      *queryRGPayment({ payload }, { put }) {
         const newPOValue = payload.payload
         let returnValue = payload
         if (newPOValue) returnValue = newPOValue
@@ -66,7 +66,7 @@ export default createFormViewModel({
           },
         })
       },
-      *upsertRGPayment ({ payload }, { call }) {
+      *upsertRGPayment({ payload }, { call }) {
         const r = yield call(service.updateRGPayment, payload)
         if (r === 204) {
           notification.success({ message: 'Saved' })
@@ -76,7 +76,7 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      setRGPayment (state, { payload }) {
+      setRGPayment(state, { payload }) {
         const { receivingGoods } = payload
         const type = receivingGoods || payload
         const {
@@ -96,7 +96,7 @@ export default createFormViewModel({
         let newReceivingGoodsPayment
         if (receivingGoodsPayment.length >= 1) {
           let tempId = 9999 // temp id for paymentModeFK to match with the paymentMode list
-          newReceivingGoodsPayment = receivingGoodsPayment.map((x) => {
+          newReceivingGoodsPayment = receivingGoodsPayment.map(x => {
             x.cpId = x.clinicPaymentDto.id
             x.cpConcurrencyToken = x.clinicPaymentDto.concurrencyToken
             x.isCancelled = x.clinicPaymentDto.isCancelled
@@ -135,7 +135,7 @@ export default createFormViewModel({
           receivingGoodsPayment: newReceivingGoodsPayment || [],
         }
       },
-      setCurrentBizSession (state, { payload }) {
+      setCurrentBizSession(state, { payload }) {
         return {
           ...state,
           currentBizSessionInfo: {

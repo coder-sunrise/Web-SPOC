@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { withStyles, Divider } from '@material-ui/core'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import Add from '@material-ui/icons/Add'
 
 import { connect } from 'dva'
@@ -30,7 +30,7 @@ const amountProps = {
   fullWidth: true,
 }
 
-const styles = (theme) => ({
+const styles = theme => ({
   cls01: {
     '& .MuiGrid-item': {
       lineHeight: `${theme.spacing(3)}px`,
@@ -43,7 +43,7 @@ const styles = (theme) => ({
   global,
 }))
 class AmountSummary extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     const { rows = [], adjustments = [], config, onValueChanged } = this.props
     // console.log(rows, adjustments)
@@ -57,14 +57,14 @@ class AmountSummary extends PureComponent {
     }
   }
 
-  componentDidMount () {}
+  componentDidMount() {}
 
   // eslint-disable-next-line camelcase
   // eslint-disable-next-line react/sort-comp
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { rows = [], adjustments = [], config, onValueChanged } = nextProps
 
-    this.setState((prevState) => {
+    this.setState(prevState => {
       const newState = calculateAmount(rows, adjustments, config)
 
       if (prevState.summary.totalWithGST !== newState.summary.totalWithGST) {
@@ -93,7 +93,7 @@ class AmountSummary extends PureComponent {
 
     let lastAdjustmentAmount = 0
     const filterDeletedAdjustments = [
-      ...adjustments.filter((item) => !item.isDeleted),
+      ...adjustments.filter(item => !item.isDeleted),
     ]
     if (filterDeletedAdjustments.length > 0) {
       const lastAdjustment = {
@@ -109,7 +109,7 @@ class AmountSummary extends PureComponent {
       payload: {
         openAdjustment: true,
         openAdjustmentConfig: {
-          callbackMethod: (v) => {
+          callbackMethod: v => {
             adjustments.push({
               index: adjustments.length,
               ...v,
@@ -135,10 +135,10 @@ class AmountSummary extends PureComponent {
     })
   }
 
-  deleteAdjustment = (index) => {
+  deleteAdjustment = index => {
     const { adjustments, rows } = this.state
     const { config, onValueChanged } = this.props
-    const newAdjustments = adjustments.map((o) => {
+    const newAdjustments = adjustments.map(o => {
       if (o.index === index) o.isDeleted = true
       return o
     })
@@ -146,13 +146,13 @@ class AmountSummary extends PureComponent {
       {
         ...calculateAmount(rows, newAdjustments, config),
       },
-      (v) => {
+      v => {
         onValueChanged(this.state)
       },
     )
   }
 
-  editAdjustment = (index) => {
+  editAdjustment = index => {
     const { adjustments, rows, summary } = this.state
     const { config, onValueChanged } = this.props
     const { total } = summary
@@ -162,7 +162,7 @@ class AmountSummary extends PureComponent {
       payload: {
         openAdjustment: true,
         openAdjustmentConfig: {
-          callbackMethod: (v) => {
+          callbackMethod: v => {
             adjustments.splice(index, 1, v)
             this.setState(
               {
@@ -188,7 +188,7 @@ class AmountSummary extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const {
       theme,
       showAddAdjustment = true,
@@ -313,7 +313,7 @@ class AmountSummary extends PureComponent {
                   label={`Inclusive GST (${numeral(gstValue).format('0.00')}%)`}
                   simple
                   checked={isGSTInclusive}
-                  onChange={(e) => {
+                  onChange={e => {
                     this.onChangeGstToggle(e.target.value)
                   }}
                 />

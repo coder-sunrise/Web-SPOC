@@ -1,5 +1,5 @@
 import { createFormViewModel } from 'medisys-model'
-import * as service from '@/services/invoice'
+import service from '@/services/invoice'
 import { INVOICE_VIEW_MODE } from '@/utils/constants'
 
 const initialState = {
@@ -33,7 +33,7 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *queryDone ({ payload }, { call, put }) {
+      *queryDone({ payload }, { call, put }) {
         const { data } = payload
         if (data && data.patientProfileFK) {
           yield put({
@@ -44,7 +44,7 @@ export default createFormViewModel({
           })
         }
       },
-      *saveEditInvoice ({ payload }, { call, put, take }) {
+      *saveEditInvoice({ payload }, { call, put, take }) {
         const response = yield call(service.saveEditInvoice, payload)
         if (response) {
           const { id } = response
@@ -81,7 +81,7 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      reset () {
+      reset() {
         return { ...initialState }
       },
     },

@@ -9,27 +9,27 @@ import {
   GridItem,
   RadioGroup,
   SizeContainer,
-  Select
+  Select,
 } from '@/components'
 // medisys components
 import { DoctorProfileSelect } from '@/components/_medisys'
-import { queryList, query } from '@/services/patient'
+import service from '@/services/patient'
 import Call from '@material-ui/icons/Call'
 import ReportDateRangePicker from '../ReportDateRangePicker'
 
+const { queryList, query } = service
 const FilterBar = ({
   handleSubmit,
   isSubmitting,
   visitOrderTemplateOptions = [],
   classes,
 }) => {
-
-  const selectPatientProfile = (args) => {
+  const selectPatientProfile = args => {
     const { disabled } = args
     return (
       <Select
         disabled={disabled}
-        query={(v) => {
+        query={v => {
           if (typeof v === 'number') {
             return query({ id: v })
           }
@@ -41,11 +41,15 @@ const FilterBar = ({
           })
         }}
         handleFilter={() => true}
-        valueField="id"
-        label="Patient Name/Account No./Mobile No./Ref. No."
-        renderDropdown={(p) => {
+        valueField='id'
+        label='Patient Name/Account No./Mobile No./Ref. No.'
+        renderDropdown={p => {
           const { contact = {} } = p
-          const { mobileContactNumber = {}, officeContactNumber = {}, homeContactNumber = {} } = contact
+          const {
+            mobileContactNumber = {},
+            officeContactNumber = {},
+            homeContactNumber = {},
+          } = contact
           p.mobileNo = mobileContactNumber.number || p.mobileNo
           p.officeNo = officeContactNumber.number || p.officeNo
           p.homeNo = homeContactNumber.number || p.homeNo
@@ -73,7 +77,7 @@ const FilterBar = ({
     <SizeContainer size='sm'>
       <GridContainer>
         <GridContainer alignItems='center'>
-          <GridItem xs md={4} >
+          <GridItem xs md={4}>
             <Field
               disabled
               name='patientProfileID'
@@ -94,7 +98,7 @@ const FilterBar = ({
           <GridItem md={2}>
             <FastField
               name='visitPurposeIDS'
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   {...args}
                   options={visitOrderTemplateOptions}
@@ -108,7 +112,7 @@ const FilterBar = ({
           <GridItem md={2}>
             <FastField
               name='doctorIDs'
-              render={(args) => (
+              render={args => (
                 <DoctorProfileSelect
                   mode='multiple'
                   {...args}
@@ -127,7 +131,7 @@ const FilterBar = ({
           <GridItem>
             <FastField
               name='groupBy'
-              render={(args) => (
+              render={args => (
                 <RadioGroup
                   {...args}
                   label='Group By'

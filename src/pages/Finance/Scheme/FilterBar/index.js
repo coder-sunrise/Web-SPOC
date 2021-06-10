@@ -1,6 +1,6 @@
 import React from 'react'
 import { FastField, withFormik } from 'formik'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
 import { withStyles } from '@material-ui/core'
@@ -18,7 +18,7 @@ import {
 import { status } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
 
-const styles = (theme) => ({
+const styles = theme => ({
   filterBar: {
     marginBottom: '10px',
   },
@@ -37,7 +37,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
         <GridItem xs={6} md={4}>
           <FastField
             name='name'
-            render={(args) => {
+            render={args => {
               return (
                 <TextField
                   label={formatMessage({
@@ -52,7 +52,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
         <GridItem xs={6} md={4}>
           <FastField
             name='schemeTypeFK'
-            render={(args) => {
+            render={args => {
               return (
                 <CodeSelect
                   label={formatMessage({
@@ -68,7 +68,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
         <GridItem xs={6} md={4}>
           <FastField
             name='coPayerFK'
-            render={(args) => {
+            render={args => {
               return (
                 <CodeSelect
                   label={formatMessage({
@@ -85,7 +85,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
         <GridItem xs={6} md={4}>
           <FastField
             name='copayerTypeFK'
-            render={(args) => {
+            render={args => {
               return (
                 <CodeSelect
                   label={formatMessage({
@@ -101,7 +101,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
         <GridItem xs={6} md={4}>
           <FastField
             name='isActive'
-            render={(args) => {
+            render={args => {
               return <Select label='Status' {...args} options={status} />
             }}
           />

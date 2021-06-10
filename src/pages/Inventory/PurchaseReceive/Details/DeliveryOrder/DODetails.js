@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import Yup from '@/utils/yup'
 import {
   GridContainer,
@@ -26,10 +26,10 @@ const receivingDetailsSchema = Yup.object().shape({
   expiryDate: Yup.string().nullable(),
   currentReceivingQty: Yup.number()
     .min(0, 'Current Receiving Quantity must be greater than or equal to 0')
-    .max(Yup.ref('maxCurrentReceivingQty'), (e) => {
-      return `Current Receiving Quantity must be less than or equal to ${e.max
-        ? e.max.toFixed(1)
-        : e.max}`
+    .max(Yup.ref('maxCurrentReceivingQty'), e => {
+      return `Current Receiving Quantity must be less than or equal to ${
+        e.max ? e.max.toFixed(1) : e.max
+      }`
     })
     .required(),
 })
@@ -58,7 +58,7 @@ const receivingDetailsSchema = Yup.object().shape({
     } = props
     const { list, purchaseOrderDetails } = deliveryOrderDetails
     const { purchaseOrderItem } = purchaseOrderDetails
-    const getPurchaseOrderItemFK = (v) => {
+    const getPurchaseOrderItemFK = v => {
       if (!v.id || v.id <= 0) {
         let itemFKName = ''
         switch (v.type) {
@@ -79,7 +79,7 @@ const receivingDetailsSchema = Yup.object().shape({
           }
         }
         const { id } = purchaseOrderItem.find(
-          (o) => o[itemFKName] === v[itemFKName],
+          o => o[itemFKName] === v[itemFKName],
         )
         return id
       }
@@ -91,7 +91,7 @@ const receivingDetailsSchema = Yup.object().shape({
     }
 
     let deliveryOrderItem = rows
-      .filter((row) => !(row.isNew && row.isDeleted))
+      .filter(row => !(row.isNew && row.isDeleted))
       .map((x, index) => {
         // const itemType = podoOrderType.find((y) => y.value === x.type)
         const {
@@ -125,7 +125,7 @@ const receivingDetailsSchema = Yup.object().shape({
         deliveryOrderStatusFK: 1, // Temporary hard code, will remove once Soe fix the API
         deliveryOrderItem,
       },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         if (onConfirm) onConfirm()
         dispatch({
@@ -173,15 +173,15 @@ class DODetails extends PureComponent {
       purchaseOrderDetails: { purchaseOrderOutstandingItem },
     } = deliveryOrderDetails
 
-    const osItemType = podoOrderType.filter((type) =>
-      purchaseOrderOutstandingItem.some((osItem) =>
+    const osItemType = podoOrderType.filter(type =>
+      purchaseOrderOutstandingItem.some(osItem =>
         Object.prototype.hasOwnProperty.call(osItem, type.prop),
       ),
     )
 
     this.setState({ itemType: osItemType })
 
-    podoOrderType.forEach((x) => {
+    podoOrderType.forEach(x => {
       this.setState({
         [x.stateName]: deliveryOrderDetails[x.stateName],
       })
@@ -199,7 +199,7 @@ class DODetails extends PureComponent {
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.dispatch({
       type: 'global/updateState',
       payload: {
@@ -223,7 +223,7 @@ class DODetails extends PureComponent {
     })
   }
 
-  handleOnOrderTypeChanged = async (e) => {
+  handleOnOrderTypeChanged = async e => {
     const { values, deliveryOrderDetails } = this.props
     const { purchaseOrderDetails } = deliveryOrderDetails
     const { purchaseOrderItem } = purchaseOrderDetails
@@ -277,12 +277,12 @@ class DODetails extends PureComponent {
     const { purchaseOrderDetails } = deliveryOrderDetails
     const { purchaseOrderItem } = purchaseOrderDetails
     const osItem = purchaseOrderItem.find(
-      (x) => x.code === value && x.inventoryItemTypeFK === row.type,
+      x => x.code === value && x.inventoryItemTypeFK === row.type,
     )
 
     if (osItem) {
       const defaultBatch = this.getBatchStock(row).find(
-        (batch) => batch.isDefault,
+        batch => batch.isDefault,
       )
       if (defaultBatch) {
         row.batchNo = defaultBatch.batchNo
@@ -305,7 +305,7 @@ class DODetails extends PureComponent {
     return { ...row }
   }
 
-  handleSelectedBatch = (e) => {
+  handleSelectedBatch = e => {
     const { option, row, val } = e
 
     if (option.length > 0) {
@@ -347,12 +347,12 @@ class DODetails extends PureComponent {
   getItemOptions = (row, filteredStateName, stateName) => {
     const { code, name, isNew } = row
     if (code && name) {
-      return this.state[stateName].filter((o) => o.value === code)
+      return this.state[stateName].filter(o => o.value === code)
     }
     return isNew ? this.state[filteredStateName] : this.state[stateName]
   }
 
-  rowOptions = (row) => {
+  rowOptions = row => {
     if (row.type === INVENTORY_TYPE.MEDICATION) {
       return this.getItemOptions(
         row,
@@ -380,10 +380,10 @@ class DODetails extends PureComponent {
   getOptions = (stateItemList, storeItemList, row) => {
     const stateArray = stateItemList
     const selectedArray = stateArray.length <= 0 ? storeItemList : stateArray
-    return selectedArray.find((o) => o.itemFK === row.code).stock
+    return selectedArray.find(o => o.itemFK === row.code).stock
   }
 
-  getBatchStock = (row) => {
+  getBatchStock = row => {
     const {
       MedicationItemList = [],
       ConsumableItemList = [],
@@ -417,7 +417,7 @@ class DODetails extends PureComponent {
     return []
   }
 
-  render () {
+  render() {
     const { props } = this
     const {
       footer,
@@ -453,15 +453,15 @@ class DODetails extends PureComponent {
           columnName: 'type',
           type: 'select',
           options: () => this.state.itemType,
-          onChange: (e) => {
+          onChange: e => {
             if (e.option) {
               this.handleOnOrderTypeChanged(e)
             }
           },
-          isDisabled: (row) => row.id >= 0,
-          render: (row) => {
+          isDisabled: row => row.id >= 0,
+          render: row => {
             if (row.type) {
-              return podoOrderType.find((type) => type.value === row.type).name
+              return podoOrderType.find(type => type.value === row.type).name
             }
             return null
           },
@@ -470,36 +470,36 @@ class DODetails extends PureComponent {
           columnName: 'code',
           type: 'select',
           labelField: 'code',
-          options: (row) => {
+          options: row => {
             return this.rowOptions(row)
           },
-          onChange: (e) => {
+          onChange: e => {
             if (e.option) {
               this.handleItemOnChange(e, 'code')
             }
           },
-          isDisabled: (row) => row.id >= 0,
+          isDisabled: row => row.id >= 0,
         },
         {
           columnName: 'name',
           type: 'select',
           labelField: 'name',
-          options: (row) => {
+          options: row => {
             return this.rowOptions(row)
           },
-          onChange: (e) => {
+          onChange: e => {
             if (e.option) {
               this.handleItemOnChange(e, 'name')
             }
           },
-          isDisabled: (row) => row.id >= 0,
+          isDisabled: row => row.id >= 0,
         },
         {
           columnName: 'uom',
           type: 'select',
           labelField: 'uom',
           disabled: true,
-          options: (row) => {
+          options: row => {
             if (row.type === INVENTORY_TYPE.MEDICATION) {
               return this.state.MedicationItemList
             }
@@ -511,7 +511,7 @@ class DODetails extends PureComponent {
             }
             return []
           },
-          isDisabled: (row) => row.id >= 0,
+          isDisabled: row => row.id >= 0,
         },
         {
           columnName: 'orderQuantity',
@@ -519,7 +519,7 @@ class DODetails extends PureComponent {
           format: '0.0',
           disabled: true,
           width: 90,
-          isDisabled: (row) => row.id >= 0,
+          isDisabled: row => row.id >= 0,
         },
         {
           columnName: 'bonusQuantity',
@@ -527,7 +527,7 @@ class DODetails extends PureComponent {
           format: '0.0',
           disabled: true,
           width: 90,
-          isDisabled: (row) => row.id >= 0,
+          isDisabled: row => row.id >= 0,
         },
         {
           columnName: 'quantityReceived',
@@ -535,7 +535,7 @@ class DODetails extends PureComponent {
           format: '0.0',
           disabled: true,
           width: 120,
-          isDisabled: (row) => row.id >= 0,
+          isDisabled: row => row.id >= 0,
         },
         {
           columnName: 'totalBonusReceived',
@@ -543,21 +543,21 @@ class DODetails extends PureComponent {
           format: '0.0',
           disabled: true,
           width: 150,
-          isDisabled: (row) => row.id >= 0,
+          isDisabled: row => row.id >= 0,
         },
         {
           columnName: 'currentReceivingQty',
           type: 'number',
           format: '0.0',
           width: 150,
-          isDisabled: (row) => row.id >= 0,
+          isDisabled: row => row.id >= 0,
         },
         {
           columnName: 'currentReceivingBonusQty',
           type: 'number',
           format: '0.0',
           width: 200,
-          isDisabled: (row) => row.id >= 0,
+          isDisabled: row => row.id >= 0,
         },
         {
           columnName: 'batchNo',
@@ -568,18 +568,18 @@ class DODetails extends PureComponent {
           valueField: 'batchNo',
           disableAll: true,
           options: this.getBatchStock,
-          onChange: (e) => {
+          onChange: e => {
             this.handleSelectedBatch(e)
           },
-          render: (row) => {
+          render: row => {
             return <TextField text value={row.batchNo} />
           },
-          isDisabled: (row) => row.id >= 0,
+          isDisabled: row => row.id >= 0,
         },
         {
           columnName: 'expiryDate',
           type: 'date',
-          isDisabled: (row) => row.id >= 0 || row.batchNoId,
+          isDisabled: row => row.id >= 0 || row.batchNoId,
         },
       ],
       onRowDoubleClick: undefined,
@@ -599,7 +599,7 @@ class DODetails extends PureComponent {
               <GridItem xs={12}>
                 <FastField
                   name='deliveryOrderNo'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <TextField
                         autoFocus
@@ -616,7 +616,7 @@ class DODetails extends PureComponent {
               <GridItem xs={12}>
                 <Field
                   name='deliveryOrderDate'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <DatePicker
                         disabled={values.id}
@@ -639,7 +639,7 @@ class DODetails extends PureComponent {
               <GridItem xs={12}>
                 <FastField
                   name='remark'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <OutlinedTextField
                         label={formatMessage({
@@ -671,7 +671,7 @@ class DODetails extends PureComponent {
             <p className={classes.errorMsgStyle}>{errors.rows}</p>
           )}
           <EditableTableGrid
-            getRowId={(r) => r.uid}
+            getRowId={r => r.uid}
             rows={rows}
             schema={receivingDetailsSchema}
             FuncProps={{

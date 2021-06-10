@@ -1,7 +1,6 @@
 import React, { PureComponent, Fragment } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
-import router from 'umi/router'
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 import { findGetParameter } from '@/utils/utils'
 import { ProgressButton } from '@/components'
@@ -14,7 +13,7 @@ import { initRoomAssignment } from '@/utils/codes'
 import { openCautionAlertOnStartConsultation } from '@/pages/Widgets/Orders/utils'
 import Banner from './Banner'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...inputStyle(theme),
   root: {},
   hide: {
@@ -59,7 +58,7 @@ const styles = (theme) => ({
 }))
 @Authorized.Secured('patientdashboard')
 class PatientDashboard extends PureComponent {
-  componentDidMount () {
+  componentDidMount() {
     if (this.props.patientDashboard.currentId) {
       this.props.dispatch({
         type: 'patientDashboard/query',
@@ -71,7 +70,7 @@ class PatientDashboard extends PureComponent {
     initRoomAssignment()
   }
 
-  componentWillUnmount () {}
+  componentWillUnmount() {}
 
   handleListItemClick = (e, i) => {
     this.setState({ selectedIndex: i })
@@ -116,27 +115,27 @@ class PatientDashboard extends PureComponent {
           version,
         },
       })
-      .then((o) => {
+      .then(o => {
         if (o) {
           const patientID = this.props.visitRegistration.entity.visit
             .patientProfileFK
-          router.push(
-            `/reception/queue/consultation?qid=${findGetParameter(
-              'qid',
-            )}&cid=${o.id}&pid=${patientID}&v=${version}`,
+          history.push(
+            `/reception/queue/consultation?qid=${findGetParameter('qid')}&cid=${
+              o.id
+            }&pid=${patientID}&v=${version}`,
           )
           openCautionAlertOnStartConsultation(o)
         }
       })
   }
 
-  render () {
+  render() {
     const {
       theme,
       classes,
       height,
       linkProps = {},
-      onMenuClick = (p) => p,
+      onMenuClick = p => p,
       ...resetProps
     } = this.props
     const {
@@ -165,34 +164,34 @@ class PatientDashboard extends PureComponent {
                 }}
               >
                 {patientProfile &&
-                patientProfile.isActive &&
-                visit.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
-                  <Authorized authority='openqueuedisplay'>
-                    <CallingQueueButton
-                      qId={queueNo}
-                      roomNo={roomFK}
-                      doctor={doctorProfileFK}
-                    />
-                  </Authorized>
-                )}
+                  patientProfile.isActive &&
+                  visit.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
+                    <Authorized authority='openqueuedisplay'>
+                      <CallingQueueButton
+                        qId={queueNo}
+                        roomNo={roomFK}
+                        doctor={doctorProfileFK}
+                      />
+                    </Authorized>
+                  )}
                 {visit.visitStatus === VISIT_STATUS.WAITING &&
-                patientProfile &&
-                patientProfile.isActive && (
-                  <Authorized authority='patientdashboard.startresumeconsultation'>
-                    <div style={{ padding: '30px 0' }}>
-                      <ProgressButton
-                        color='primary'
-                        onClick={this.startConsultation}
-                        disabled={
-                          visitPurposeFK === VISIT_TYPE.RETAIL ||
-                          visitPurposeFK === VISIT_TYPE.BILL_FIRST
-                        }
-                      >
-                        Start Consultation
-                      </ProgressButton>
-                    </div>
-                  </Authorized>
-                )}
+                  patientProfile &&
+                  patientProfile.isActive && (
+                    <Authorized authority='patientdashboard.startresumeconsultation'>
+                      <div style={{ padding: '30px 0' }}>
+                        <ProgressButton
+                          color='primary'
+                          onClick={this.startConsultation}
+                          disabled={
+                            visitPurposeFK === VISIT_TYPE.RETAIL ||
+                            visitPurposeFK === VISIT_TYPE.BILL_FIRST
+                          }
+                        >
+                          Start Consultation
+                        </ProgressButton>
+                      </div>
+                    </Authorized>
+                  )}
               </div>
             )
           }

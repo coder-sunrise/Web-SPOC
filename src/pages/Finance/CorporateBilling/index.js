@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { FormattedMessage, formatMessage } from 'umi/locale'
+import { FormattedMessage, formatMessage } from 'umi'
 import { withStyles } from '@material-ui/core/styles'
 import Authorized from '@/utils/Authorized'
 
@@ -21,7 +21,7 @@ const styles = () => ({
 })
 
 class CorporateBilling extends PureComponent {
-  render () {
+  render() {
     const { classes } = this.props
     return (
       <PageHeaderWrapper

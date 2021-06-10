@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import _ from 'lodash'
 import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
@@ -59,7 +59,7 @@ export default ({
         editingEnabled: isEditable,
         sortingEnabled: false,
         disabled: !isEditable,
-        onChange: (e) => {
+        onChange: e => {
           if (e.row) {
             e.row.EyeRefractionTestType = e.option ? e.option.name : undefined
           }

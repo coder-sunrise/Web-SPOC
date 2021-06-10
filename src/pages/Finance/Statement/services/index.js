@@ -12,24 +12,23 @@ const invoicePaymentUrl = '/api/InvoicePayment'
 const copayerRecentStatementNoUrl = '/api/Statement/Recent'
 const autoGenerateStatementUrl = '/api/Statement/autogenerate'
 
-
 // const runningNoUrl = '/api/InventoryAdjustment/GenerateRunningNo'
 // const stockUrl = '/api/InventoryAdjustment/StockDetails'
 
-module.exports = {
-  queryList: (params) => service.queryList(url, params),
-  query: (params) => {
+const fns = {
+  queryList: params => service.queryList(url, params),
+  query: params => {
     return service.query(url, params)
   },
-  upsert: (params) => service.upsert(url, params),
+  upsert: params => service.upsert(url, params),
 
-  queryInvoiceList: (params) => service.queryList(invoiceUrl, params),
+  queryInvoiceList: params => service.queryList(invoiceUrl, params),
   // queryStockDetails: (params) => service.query(stockUrl, params),
 
-  queryPaymentHistory: async (params) => {
+  queryPaymentHistory: async params => {
     return service.query(statementPaymentHistoryUrl, params)
   },
-  queryStatementPaymentById: (statmentPaymentId) => {
+  queryStatementPaymentById: statmentPaymentId => {
     return service.query(statementPaymentUrl, { id: statmentPaymentId })
   },
   cancelPayment: async (id, params) => {
@@ -44,7 +43,7 @@ module.exports = {
       body: params,
     })
   },
-  refresh: async (params) => {
+  refresh: async params => {
     let r
     if (params.id) {
       r = await request(`${refreshUrl}/${params.id}`, {
@@ -55,7 +54,7 @@ module.exports = {
     return r
   },
 
-  extract: async (params) => {
+  extract: async params => {
     let r
     if (params.id) {
       r = await request(`${extractUrl}/${params.id}`, {
@@ -66,25 +65,27 @@ module.exports = {
     return r
   },
 
-  queryBizSession: (params) => service.queryList(bizSessionUrl, params),
-  remove: (params) => {
+  queryBizSession: params => service.queryList(bizSessionUrl, params),
+  remove: params => {
     return request(`${url}/${params.id}`, {
       method: 'DELETE',
       body: 'Statement cancelled',
     })
   },
 
-  getLastStatementNo: async (params) => {
+  getLastStatementNo: async params => {
     return request(`${copayerRecentStatementNoUrl}`, {
       method: 'GET',
       body: params,
     })
   },
 
-  autoGenerateStatement: async (params) => {
+  autoGenerateStatement: async params => {
     return request(`${autoGenerateStatementUrl}`, {
       method: 'POST',
       body: params,
     })
   },
 }
+
+export default fns

@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import moment from 'moment'
-import router from 'umi/router'
+import { history, formatMessage } from 'umi'
 import _ from 'lodash'
 import { withStyles } from '@material-ui/core'
-import { formatMessage } from 'umi/locale'
+
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -28,7 +28,7 @@ import {
 import RGGrid from './RGGrid'
 import RGForm from './RGForm'
 
-const styles = (theme) => ({
+const styles = theme => ({
   errorMsgStyle: {
     margin: theme.spacing(2),
     color: '#cf1322',
@@ -51,7 +51,7 @@ const styles = (theme) => ({
   mapPropsToValues: ({ receivingGoodsDetails }) => {
     return {
       ...receivingGoodsDetails,
-      rows: (receivingGoodsDetails.rows || []).map((o) => {
+      rows: (receivingGoodsDetails.rows || []).map(o => {
         return {
           ...o,
           isClosed: receivingGoodsDetails.receivingGoods.isClosed,
@@ -64,7 +64,7 @@ const styles = (theme) => ({
       supplierFK: Yup.string().required(),
     }),
     rows: Yup.array()
-      .compact((x) => x.isDeleted)
+      .compact(x => x.isDeleted)
       .required('At least one item is required.'),
   }),
   handleSubmit: () => {},
@@ -74,11 +74,11 @@ class Index extends Component {
     showReport: false,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.getrgata()
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.dispatch({
       type: 'receivingGoodsDetails/updateState',
       payload: {
@@ -88,14 +88,16 @@ class Index extends Component {
     })
   }
 
-  getrgata = (createdId) => {
+  getrgata = createdId => {
     const { receivingGoodsDetails } = this.props
     const { id, type } = receivingGoodsDetails
     switch (type) {
       // Duplicate order
       case 'dup':
         if (createdId) {
-          router.push(`/inventory/rg/rgdetails?id=${createdId}&&type=${'edit'}`)
+          history.push(
+            `/inventory/rg/rgdetails?id=${createdId}&&type=${'edit'}`,
+          )
           this.props.dispatch({
             type: 'receivingGoodsDetails/queryReceivingGoods',
             payload: { id: createdId, type: 'edit' },
@@ -117,7 +119,9 @@ class Index extends Component {
       // Create new order
       default:
         if (createdId && type === 'new') {
-          router.push(`/inventory/rg/rgdetails?id=${createdId}&&type=${'edit'}`)
+          history.push(
+            `/inventory/rg/rgdetails?id=${createdId}&&type=${'edit'}`,
+          )
           this.props.dispatch({
             type: 'receivingGoodsDetails/queryReceivingGoods',
             payload: { id: createdId, type: 'edit' },
@@ -132,7 +136,7 @@ class Index extends Component {
     }
   }
 
-  onSubmitButtonClicked = async (action) => {
+  onSubmitButtonClicked = async action => {
     const { dispatch, validateForm, history, values } = this.props
     await dispatch({
       type: 'receivingGoodsDetails/updateState',
@@ -154,7 +158,7 @@ class Index extends Component {
           payload: {
             ...processedPayload,
           },
-        }).then((r) => {
+        }).then(r => {
           if (r) {
             if (
               action === rgSubmitAction.SAVE ||
@@ -173,7 +177,7 @@ class Index extends Component {
               const { id } = r
               this.getrgata(id)
             } else {
-              router.push('/inventory/rg')
+              history.push('/inventory/rg')
             }
           }
         })
@@ -244,7 +248,7 @@ class Index extends Component {
     return validation
   }
 
-  processSubmitPayload = (receivingGoodsStatusFK) => {
+  processSubmitPayload = receivingGoodsStatusFK => {
     const { receivingGoodsDetails, values } = this.props
     const { type } = receivingGoodsDetails
     const { receivingGoods, rows } = values
@@ -257,30 +261,32 @@ class Index extends Component {
       } else {
         newReceivingGoodsStatusFK = RECEIVING_GOODS_STATUS.DRAFT
       }
-      receivingGoodsItem = rows.filter((item) => !item.isDeleted).map((x) => {
-        const itemType = rgType.find((y) => y.value === x.type)
-        return {
-          isDeleted: x.isDeleted || false,
-          inventoryItemTypeFK: itemType.value,
-          orderQuantity: x.orderQuantity,
-          bonusReceived: x.bonusReceived,
-          quantityReceived: x.quantityReceived,
-          totalReceived: x.totalReceived,
-          totalPrice: x.totalPrice,
-          totalAfterGST: roundTo(x.totalAfterGST),
-          unitPrice: x.unitPrice,
-          sortOrder: x.sortOrder,
-          IsACPUpdated: false,
-          unitOfMeasurement: x.unitOfMeasurement,
-          batchNo: x.batchNo,
-          expiryDate: x.expiryDate,
-          [itemType.prop]: {
-            [itemType.itemFKName]: x.code,
-            [itemType.itemCode]: x.codeString,
-            [itemType.itemName]: x.nameString,
-          },
-        }
-      })
+      receivingGoodsItem = rows
+        .filter(item => !item.isDeleted)
+        .map(x => {
+          const itemType = rgType.find(y => y.value === x.type)
+          return {
+            isDeleted: x.isDeleted || false,
+            inventoryItemTypeFK: itemType.value,
+            orderQuantity: x.orderQuantity,
+            bonusReceived: x.bonusReceived,
+            quantityReceived: x.quantityReceived,
+            totalReceived: x.totalReceived,
+            totalPrice: x.totalPrice,
+            totalAfterGST: roundTo(x.totalAfterGST),
+            unitPrice: x.unitPrice,
+            sortOrder: x.sortOrder,
+            IsACPUpdated: false,
+            unitOfMeasurement: x.unitOfMeasurement,
+            batchNo: x.batchNo,
+            expiryDate: x.expiryDate,
+            [itemType.prop]: {
+              [itemType.itemFKName]: x.code,
+              [itemType.itemCode]: x.codeString,
+              [itemType.itemName]: x.nameString,
+            },
+          }
+        })
     } else if (type === 'dup') {
       if (receivingGoodsStatusFK === RECEIVING_GOODS_STATUS.COMPLETED) {
         newReceivingGoodsStatusFK = receivingGoodsStatusFK
@@ -290,35 +296,37 @@ class Index extends Component {
       delete receivingGoods.id
       delete receivingGoods.concurrencyToken
 
-      receivingGoodsItem = rows.filter((item) => !item.isDeleted).map((x) => {
-        const itemType = rgType.find((y) => y.value === x.type)
-        return {
-          inventoryItemTypeFK: itemType.value,
-          orderQuantity: x.orderQuantity,
-          bonusReceived: x.bonusReceived,
-          quantityReceived: x.quantityReceived,
-          totalReceived: x.totalReceived,
-          totalPrice: x.totalPrice,
-          unitPrice: x.unitPrice,
-          totalAfterGST: roundTo(x.totalAfterGST),
-          sortOrder: x.sortOrder,
-          IsACPUpdated: false,
-          unitOfMeasurement: x.unitOfMeasurement,
-          batchNo: x.batchNo,
-          expiryDate: x.expiryDate,
-          [itemType.prop]: {
-            [itemType.itemFKName]: x[itemType.itemFKName],
-            [itemType.itemCode]: x.codeString,
-            [itemType.itemName]: x.nameString,
-          },
-        }
-      })
+      receivingGoodsItem = rows
+        .filter(item => !item.isDeleted)
+        .map(x => {
+          const itemType = rgType.find(y => y.value === x.type)
+          return {
+            inventoryItemTypeFK: itemType.value,
+            orderQuantity: x.orderQuantity,
+            bonusReceived: x.bonusReceived,
+            quantityReceived: x.quantityReceived,
+            totalReceived: x.totalReceived,
+            totalPrice: x.totalPrice,
+            unitPrice: x.unitPrice,
+            totalAfterGST: roundTo(x.totalAfterGST),
+            sortOrder: x.sortOrder,
+            IsACPUpdated: false,
+            unitOfMeasurement: x.unitOfMeasurement,
+            batchNo: x.batchNo,
+            expiryDate: x.expiryDate,
+            [itemType.prop]: {
+              [itemType.itemFKName]: x[itemType.itemFKName],
+              [itemType.itemCode]: x.codeString,
+              [itemType.itemName]: x.nameString,
+            },
+          }
+        })
     } else {
       newReceivingGoodsStatusFK = receivingGoodsStatusFK
       receivingGoodsItem = rows
-        .filter((item) => !item.isNew || !item.isDeleted)
-        .map((x) => {
-          const itemType = rgType.find((y) => y.value === x.type)
+        .filter(item => !item.isNew || !item.isDeleted)
+        .map(x => {
+          const itemType = rgType.find(y => y.value === x.type)
           let result = {}
 
           if (x.isNew && !x.isDeleted) {
@@ -372,7 +380,7 @@ class Index extends Component {
   }
 
   toggleReport = () => {
-    this.setState((preState) => ({
+    this.setState(preState => ({
       showReport: !preState.showReport,
     }))
   }
@@ -401,7 +409,7 @@ class Index extends Component {
     return 'enable'
   }
 
-  render () {
+  render() {
     const { values, setFieldValue, errors, classes, setValues } = this.props
     const { receivingGoods: rg, type } = values
     const rgStatus = rg ? rg.receivingGoodsStatusFK : 0
@@ -417,8 +425,7 @@ class Index extends Component {
       createDate,
       cancellationDate,
       updateByUser,
-    } =
-      receivingGoods || {}
+    } = receivingGoods || {}
     const isWriteOff = rg
       ? rg.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
@@ -470,7 +477,7 @@ class Index extends Component {
                     gstField: 'totalAfterGST',
                     gstValue: currentGSTValue,
                   }}
-                  onValueChanged={(v) => {
+                  onValueChanged={v => {
                     const newReceivingGoods = {
                       ...values.receivingGoods,
                       totalAmount: v.summary.total,
@@ -526,28 +533,29 @@ class Index extends Component {
           >
             <div>
               {rgStatus === RECEIVING_GOODS_STATUS.DRAFT &&
-              !rg.isClosed &&
-              type === 'edit' && (
-                <ProgressButton
-                  color='danger'
-                  icon={null}
-                  authority='none'
-                  onClick={() =>
-                    this.onSubmitButtonClicked(rgSubmitAction.CANCEL)}
-                >
-                  {formatMessage({
-                    id: 'inventory.rg.detail.rgd.cancelrg',
-                  })}
-                </ProgressButton>
-              )}
+                !rg.isClosed &&
+                type === 'edit' && (
+                  <ProgressButton
+                    color='danger'
+                    icon={null}
+                    authority='none'
+                    onClick={() =>
+                      this.onSubmitButtonClicked(rgSubmitAction.CANCEL)
+                    }
+                  >
+                    {formatMessage({
+                      id: 'inventory.rg.detail.rgd.cancelrg',
+                    })}
+                  </ProgressButton>
+                )}
 
-              {rgStatus === RECEIVING_GOODS_STATUS.DRAFT &&
-              !rg.isClosed && (
+              {rgStatus === RECEIVING_GOODS_STATUS.DRAFT && !rg.isClosed && (
                 <ProgressButton
                   color='primary'
                   icon={null}
                   onClick={() =>
-                    this.onSubmitButtonClicked(rgSubmitAction.SAVE)}
+                    this.onSubmitButtonClicked(rgSubmitAction.SAVE)
+                  }
                 >
                   {formatMessage({
                     id: 'inventory.rg.detail.rgd.save',
@@ -559,10 +567,11 @@ class Index extends Component {
                   color='success'
                   icon={null}
                   disabled={rows.find(
-                    (item) => !item.isDeleted && item.totalReceived <= 0,
+                    item => !item.isDeleted && item.totalReceived <= 0,
                   )}
                   onClick={() =>
-                    this.onSubmitButtonClicked(rgSubmitAction.COMPLETE)}
+                    this.onSubmitButtonClicked(rgSubmitAction.COMPLETE)
+                  }
                 >
                   {formatMessage({
                     id: 'inventory.rg.detail.rgd.complete',
@@ -578,11 +587,12 @@ class Index extends Component {
                     disabled={
                       isWriteOff ||
                       receivingGoodsPayment.find(
-                        (rgp) => !rgp.clinicPaymentDto.isCancelled,
+                        rgp => !rgp.clinicPaymentDto.isCancelled,
                       )
                     }
                     onClick={() =>
-                      this.onSubmitButtonClicked(rgSubmitAction.UNLOCK)}
+                      this.onSubmitButtonClicked(rgSubmitAction.UNLOCK)
+                    }
                   >
                     {formatMessage({
                       id: 'inventory.rg.detail.rgd.unlock',

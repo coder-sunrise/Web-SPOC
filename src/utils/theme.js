@@ -221,7 +221,9 @@ const sharedOverrides = {
     root: {
       // textDecoration: 'underline',
       '&$selected': {
-        backgroundColor: color(hoverColor).lighten(0.05).hex(),
+        backgroundColor: color(hoverColor)
+          .lighten(0.05)
+          .hex(),
       },
       '&$selected:hover': {
         backgroundColor: hoverColor,
@@ -385,6 +387,12 @@ export const defaultTheme = createMuiTheme({
         '& .checkbox-container': {
           position: 'relative',
           top: 1,
+        },
+        '& .ant-select-selector': {
+          height: '24px !important',
+        },
+        '& .ant-select-selection-item': {
+          lineHeight: '22px !important',
         },
       },
 
@@ -608,6 +616,12 @@ export const smallTheme = createMuiTheme({
           fontSize: 'smaller',
           padding: '0 18px 0 5px',
         },
+        '& .ant-select-selector': {
+          height: '18px !important',
+        },
+        '& .ant-select-selection-item': {
+          lineHeight: '18px !important',
+        },
       },
       input: {
         padding: '3px 0 0px',
@@ -806,6 +820,12 @@ export const largeTheme = createMuiTheme({
         // },
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
           top: -1,
+        },
+        '& .ant-select-selector': {
+          height: '24px !important',
+        },
+        '& .ant-select-selection-item': {
+          lineHeight: '22px !important',
         },
       },
       input: {

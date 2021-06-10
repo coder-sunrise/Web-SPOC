@@ -2,7 +2,7 @@ import React from 'react'
 // material ui
 import { Divider, withStyles } from '@material-ui/core'
 // common component
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import {
   GridContainer,
   GridItem,
@@ -48,7 +48,7 @@ const Summary = ({ classes, values }) => {
           <GridItem md={4} xs={4}>
             <FastField
               name='invoiceTotal'
-              render={(args) => {
+              render={args => {
                 return <NumberInput {...amountProps} {...args} />
               }}
             />
@@ -75,7 +75,7 @@ const Summary = ({ classes, values }) => {
           </GridItem>
 
           <GridContainer md={12} xs={12}>
-            {invoiceAdjustment.map((v) => {
+            {invoiceAdjustment.map(v => {
               return (
                 <GridContainer md={12} xs={12}>
                   <GridItem xs={8}>
@@ -120,7 +120,7 @@ const Summary = ({ classes, values }) => {
             {values.gstValue >= 0 && (
               <FastField
                 name='invoiceGSTAmt'
-                render={(args) => {
+                render={args => {
                   return <NumberInput {...amountProps} {...args} />
                 }}
               />
@@ -143,7 +143,7 @@ const Summary = ({ classes, values }) => {
           <GridItem md={4} xs={4}>
             <FastField
               name='invoiceTotalAftGST'
-              render={(args) => {
+              render={args => {
                 return (
                   <NumberInput
                     value={values.invoiceTotalAftGST}

@@ -6,20 +6,25 @@ import {
   GridItem,
   FastField,
   TextField,
+  withFormikExtend,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 
-const styles = (theme) => ({
-})
+const styles = theme => ({})
 
 const { Secured } = Authorized
 @Secured('queue.consultation.widgets.medicalhistory')
 @connect(({ patient }) => ({
   patient,
 }))
-
+@withFormikExtend({
+  mapPropsToValues: ({ patient }) => {
+    console.log(patient)
+    return {}
+  },
+})
 class MedicalHistory extends PureComponent {
-  componentDidMount () {
+  componentDidMount() {
     // const { dispatch } = this.props
     // dispatch({
     //   type: 'codetable/fetchCodes',
@@ -29,27 +34,27 @@ class MedicalHistory extends PureComponent {
     // })
   }
 
-  componentWillReceiveProps () {
-  }
+  componentWillReceiveProps() {}
 
-  render () {
-    const accessRight = Authorized.check('patientdatabase.patientprofiledetails.medicalhistory')
+  render() {
+    const accessRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.medicalhistory',
+    )
     let disabledByAccessRight = true
     if (accessRight) {
       disabledByAccessRight = accessRight.rights === 'disable'
     }
-
     return (
       <div>
         <GridContainer alignItems='flex-start'>
           <GridItem xs={12} md={12}>
             <FastField
               name='patientMedicalHistory.medicalHistory'
-              render={(args) => {
+              render={args => {
                 return (
                   <TextField
                     label='Medical History'
-                    multiline 
+                    multiline
                     maxLength={9999999}
                     disabled={disabledByAccessRight}
                     {...args}
@@ -61,7 +66,7 @@ class MedicalHistory extends PureComponent {
           <GridItem xs={12} md={12}>
             <FastField
               name='patientMedicalHistory.familyHistory'
-              render={(args) => {
+              render={args => {
                 return (
                   <TextField
                     label='Family History'
@@ -77,7 +82,7 @@ class MedicalHistory extends PureComponent {
           <GridItem xs={12} md={12}>
             <FastField
               name='patientMedicalHistory.socialHistory'
-              render={(args) => {
+              render={args => {
                 return (
                   <TextField
                     label='Social History'

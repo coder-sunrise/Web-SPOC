@@ -1,6 +1,6 @@
-import router from 'umi/router'
+import { history } from 'umi'
 import { createFormViewModel } from 'medisys-model'
-import { query as queryPatient } from '@/services/patient'
+import pServices from '@/services/patient'
 import { getRemovedUrl } from '@/utils/utils'
 import * as service from '../services/visit'
 
@@ -37,7 +37,7 @@ export default createFormViewModel({
       errorState: {},
     },
     subscriptions: ({ dispatch, history }) => {
-      history.listen(async (location) => {
+      history.listen(async location => {
         const { query } = location
         if (query.md === 'visreg') {
           query.vis
@@ -67,8 +67,8 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *closeModal (_, { put }) {
-        router.push(
+      *closeModal(_, { put }) {
+        history.push(
           getRemovedUrl([
             'md',
             'cmt',
@@ -103,7 +103,7 @@ export default createFormViewModel({
         })
         return yield put(closeModal)
       },
-      *fetchVisitInfo ({ payload }, { call, put, take }) {
+      *fetchVisitInfo({ payload }, { call, put, take }) {
         yield put({
           type: 'updateErrorState',
           errorKey: 'visitInfo',
@@ -112,7 +112,9 @@ export default createFormViewModel({
         try {
           const response = yield call(service.query, payload)
           const { data = {} } = response
-          const { visit: { patientProfileFK, visitEyeRefractionForm } } = data
+          const {
+            visit: { patientProfileFK, visitEyeRefractionForm },
+          } = data
 
           if (patientProfileFK) {
             // const { patientProfileFK } = visit
@@ -149,9 +151,7 @@ export default createFormViewModel({
                     formData: refractionFormData,
                   },
                 },
-                attachmentOriList: [
-                  ...data.visit.visitAttachment,
-                ],
+                attachmentOriList: [...data.visit.visitAttachment],
                 expandRefractionForm: !!visitEyeRefractionForm,
               },
             })
@@ -166,11 +166,11 @@ export default createFormViewModel({
           })
         }
       },
-      *fetchPatientInfoByPatientID ({ payload }, { call, put }) {
+      *fetchPatientInfoByPatientID({ payload }, { call, put }) {
         try {
-          const response = yield call(queryPatient, payload)
+          const response = yield call(pServices.queryPatient, payload)
           const { data } = response
-          
+
           yield put({
             type: 'updateState',
             payload: {
@@ -186,7 +186,7 @@ export default createFormViewModel({
           })
         }
       },
-      *getVisitOrderTemplateList ({ payload }, { call, put }) {
+      *getVisitOrderTemplateList({ payload }, { call, put }) {
         try {
           const response = yield call(service.queryVisitOrderTemplate, payload)
           const { data } = response
@@ -200,8 +200,8 @@ export default createFormViewModel({
           })
           return false
         }
-      }, 
-      *getBizSession ({ payload }, { call, put }) {
+      },
+      *getBizSession({ payload }, { call, put }) {
         const response = yield call(service.getBizSession, payload)
         const { data } = response
         return data
@@ -211,7 +211,7 @@ export default createFormViewModel({
       // resetState (state, { payload }) {
       //   return { ...state, ...payload }
       // },
-      updateErrorState (state, { payload }) {
+      updateErrorState(state, { payload }) {
         return {
           ...state,
           errorState: { ...state.errorState, ...payload },

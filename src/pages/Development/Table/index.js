@@ -67,32 +67,8 @@ import {
 import { widgets } from '@/utils/widgets'
 import Yup from '@/utils/yup'
 import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
-import { deepDiffMapper } from '@/utils/cdrss'
-import Loading from '@/components/PageLoading/index'
 
-console.log(deepDiffMapper)
-// import PatientSearch from '@/pages/PatientDatabase/Search'
-// import PatientDetail from '@/pages/PatientDatabase/Detail'
-const doctors = [
-  { value: 'bao', name: 'Bao' },
-  { value: 'cheah', name: 'Cheah' },
-  // { value: 'tan', name: 'Tan' },
-  // { value: 'tan1', name: 'Tan1' },
-  // { value: 'tan2', name: 'Tan2' },
-  // { value: 'tan3', name: 'Tan3' },
-  // { value: 'tan4', name: 'Tan4' },
-  // { value: 'tan5', name: 'Tan5' },
-]
-
-const ResponsiveGridLayout = WidthProvider(Responsive)
-// let layout = {
-//   lg: [
-//     { i: 'a', x: 0, y: 0, w: 12, h: 6, static: true }, // static: true
-//     { i: 'b', x: 0, y: 0, w: 6, h: 2 }, // minW: 2, maxW: 4
-//     { i: 'c', x: 6, y: 0, w: 6, h: 2 },
-//   ],
-// }
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
   container: {
     width: '100%',
@@ -133,9 +109,7 @@ const initValues = {
   doctorRemarks: 'Testing multiple lines of input',
   timing2: '08:30',
   numberField: 123,
-  doctor: [
-    'bao',
-  ],
+  doctor: ['bao'],
 }
 @withFormik({
   mapPropsToValues: () => initValues,
@@ -145,10 +119,15 @@ const initValues = {
     patientAccountNo: Yup.string().required(),
     genderFK: Yup.string().required(),
     doctorRemarks: Yup.string().required(),
-    doctor: Yup.array().of(Yup.string().required()).required(),
+    doctor: Yup.array()
+      .of(Yup.string().required())
+      .required(),
     doctorRadio: Yup.string().required(),
     isPersist: Yup.boolean().required(),
-    fromto: Yup.array().of(Yup.date()).required().min(2),
+    fromto: Yup.array()
+      .of(Yup.date())
+      .required()
+      .min(2),
     numberField: Yup.number().required(),
     contact: Yup.object().shape({
       contactAddress: Yup.array().of(
@@ -160,13 +139,13 @@ const initValues = {
       ),
     }),
   }),
-  submitForm: (v) => {
+  submitForm: v => {
     console.log(v)
   },
   displayName: 'ControlTest',
 })
 class ControlTest extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.container = React.createRef()
 
@@ -217,21 +196,21 @@ class ControlTest extends PureComponent {
   //   console.log(deepDiffMapper.map(this.props, prevProps, true))
   // }
 
-  componentDidMount () {
+  componentDidMount() {
     // create an instance
   }
 
-  generateConfig = (cfg) => {
+  generateConfig = cfg => {
     const { classes, ...resetProps } = this.props
     const { elevation } = this.state
     return {
       elevation: 0,
       className: classes.paper,
-      onMouseOver: (e) => {
+      onMouseOver: e => {
         elevation[cfg.id] = 3
         this.setState({ elevation })
       },
-      onMouseOut: (e) => {
+      onMouseOut: e => {
         elevation[cfg.id] = 0
         this.setState({ elevation })
       },
@@ -242,37 +221,37 @@ class ControlTest extends PureComponent {
   //   console.log(nextProps, this.props)
   // }
 
-  render () {
+  render() {
     const { props, state } = this
     const { classes, theme, ...resetProps } = this.props
     console.log(Notification, Notification.permission)
     const testConfig = {
-      onFocus: (e) => {
+      onFocus: e => {
         console.log(1)
         console.log(e)
       },
-      onChange: (e) => {
+      onChange: e => {
         console.log(2)
 
         console.log(e)
       },
-      onBlur: (e) => {
+      onBlur: e => {
         console.log(3)
 
         console.log(e)
       },
       inputProps: {
-        onChange: (e) => {
+        onChange: e => {
           console.log(4)
 
           console.log(e)
         },
-        onBlur: (e) => {
+        onBlur: e => {
           console.log(5)
 
           console.log(e)
         },
-        onFocus: (e) => {
+        onFocus: e => {
           console.log(6)
 
           console.log(e)
@@ -287,26 +266,26 @@ class ControlTest extends PureComponent {
             height: 300,
           }}
           columns={[
-            { name: 'id', title: 'Id', getCellValue: (row) => row.id },
+            { name: 'id', title: 'Id', getCellValue: row => row.id },
             {
               name: 'ProductCategoryName',
               title: 'Category',
-              getCellValue: (row) => row.ProductCategoryName,
+              getCellValue: row => row.ProductCategoryName,
             },
             {
               name: 'StoreName',
               title: 'Store',
-              getCellValue: (row) => row.StoreName,
+              getCellValue: row => row.StoreName,
             },
             {
               name: 'ProductName',
               title: 'Product',
-              getCellValue: (row) => row.ProductName,
+              getCellValue: row => row.ProductName,
             },
             {
               name: 'SalesAmount',
               title: 'Amount',
-              getCellValue: (row) => row.SalesAmount,
+              getCellValue: row => row.SalesAmount,
             },
           ]}
         />

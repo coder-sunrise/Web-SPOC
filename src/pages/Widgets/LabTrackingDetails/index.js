@@ -11,11 +11,11 @@ import Detail from './Detail'
 import FilterBar from './FilterBar'
 import OverallGrid from './OverallGrid'
 import PatientGrid from './PatientGrid'
-import model from './models'
+// import model from './models'
 
-window.g_app.replaceModel(model)
+// window.g_app.replaceModel(model)
 
-const styles = (theme) => ({
+const styles = theme => ({
   gridRow: {
     marginTop: theme.spacing(1),
   },
@@ -33,7 +33,7 @@ const styles = (theme) => ({
   mainDivHeight: global.mainDivHeight,
 }))
 class LabTrackingDetails extends PureComponent {
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch } = this.props
 
     dispatch({
@@ -60,7 +60,7 @@ class LabTrackingDetails extends PureComponent {
     })
   }
 
-  handlePrintClick = async (row) => {
+  handlePrintClick = async row => {
     const { clinicSettings, handlePrint } = this.props
     const { labelPrinterSize } = clinicSettings
 
@@ -84,7 +84,7 @@ class LabTrackingDetails extends PureComponent {
     handlePrint(JSON.stringify(payload))
   }
 
-  render () {
+  render() {
     const {
       resultType,
       dispatch,

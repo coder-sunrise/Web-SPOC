@@ -13,7 +13,7 @@ const updateGlobalState = ({ gridId }) => {
   const { global } = window.g_app._store.getState()
   // console.log(Object.values(window.$tempGridRow[gridId]))
   const errorRows = Object.values(window.$tempGridRow[gridId]).filter(
-    (o) => !o.isDeleted && (o._errors && o._errors.length),
+    o => !o.isDeleted && o._errors && o._errors.length,
   )
   if (
     window.$tempGridRow[gridId] &&
@@ -41,7 +41,7 @@ const updateGlobalState = ({ gridId }) => {
   }
 }
 
-function onComponentDidMount () {
+function onComponentDidMount() {
   const {
     columnExtensions,
     value,
@@ -77,7 +77,7 @@ function onComponentDidMount () {
     columnName,
   }
 }
-function onComponentChange (args, config) {
+function onComponentChange(args, config) {
   // if (!config) {
   // }
   const {
@@ -110,7 +110,7 @@ function onComponentChange (args, config) {
     : row
   latestRow._errors = errors
   const errorObj = errors.find(
-    (o) =>
+    o =>
       o.path === cfg.columnName || o.path.indexOf(`${cfg.columnName}[`) === 0,
   )
   const error = errorObj ? errorObj.message : ''
@@ -137,7 +137,7 @@ function onComponentChange (args, config) {
   // })
 }
 
-function getCommonConfig () {
+function getCommonConfig() {
   const {
     columnExtensions,
     column: { name: columnName },
@@ -163,11 +163,10 @@ function getCommonConfig () {
     window.$tempGridRow[gridId] && gridId.indexOf('edit') === 0
       ? window.$tempGridRow[gridId][getRowId(row)] || row
       : row || {}
-  const errorObj = (latestRow._errors || [])
-    .find(
-      (o) =>
-        o.path === cfg.columnName || o.path.indexOf(`${cfg.columnName}[`) === 0,
-    )
+  const errorObj = (latestRow._errors || []).find(
+    o =>
+      o.path === cfg.columnName || o.path.indexOf(`${cfg.columnName}[`) === 0,
+  )
   const disabled = isDisabled(latestRow)
   const error = errorObj ? errorObj.message : ''
   // console.log(columnName, latestRow[columnName], this.props.value)
@@ -181,7 +180,7 @@ function getCommonConfig () {
     disabled,
     row: latestRow,
     text: text || !editMode,
-    validSchema: (_row) => {
+    validSchema: _row => {
       if (validationSchema && getRowId(_row)) {
         try {
           validationSchema.validateSync(_row, {
@@ -200,7 +199,7 @@ function getCommonConfig () {
   return commonCfg
 }
 
-function getCommonRender (cb) {
+function getCommonRender(cb) {
   const { value, editMode } = this.props
   const cfg = getCommonConfig.call(this)
   const { render, error, row, isReactComponent } = cfg
@@ -221,8 +220,7 @@ function getCommonRender (cb) {
   return cb(cfg)
 }
 
-module.exports = {
-  ...module.exports,
+export {
   onComponentDidMount,
   onComponentChange,
   getCommonConfig,

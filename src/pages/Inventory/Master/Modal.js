@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import { Field, withFormik } from 'formik'
 import moment from 'moment'
 import * as Yup from 'yup'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { withStyles, Grid, Divider } from '@material-ui/core'
 import { paymentMethods } from '@/utils/codes'
 
@@ -51,7 +51,7 @@ const style = () => ({
         type: 'inventoryMaster/submit',
         payload: values,
       })
-      .then((r) => {
+      .then(r => {
         if (r.message === 'Ok') {
           // toast.success('test')
           notification.success({
@@ -73,7 +73,7 @@ class Modal extends PureComponent {
   //   return totalAmount
   // }
 
-  render () {
+  render() {
     const { state, props } = this
     const { theme, classes, footer, onConfirm, values } = props
 
@@ -101,7 +101,7 @@ class Modal extends PureComponent {
             <GridItem xs={12}>
               <Field
                 name='Date'
-                render={(args) => (
+                render={args => (
                   <DatePicker timeFomat={false} label='Date' {...args} />
                 )}
               />
@@ -109,7 +109,7 @@ class Modal extends PureComponent {
             <GridItem xs={12}>
               <Field
                 name='Mode'
-                render={(args) => (
+                render={args => (
                   <Select label='Mode' options={paymentMethods} {...args} />
                 )}
               />
@@ -117,7 +117,7 @@ class Modal extends PureComponent {
             <GridItem xs={12}>
               <Field
                 name='Remark'
-                render={(args) => (
+                render={args => (
                   <TextField multiline rowsMax='5' label='Remark' {...args} />
                 )}
               />
@@ -125,7 +125,7 @@ class Modal extends PureComponent {
             <GridItem xs={12}>
               <Field
                 name='Balance'
-                render={(args) => (
+                render={args => (
                   <NumberInput
                     {...commonAmountOpts}
                     style={{
@@ -142,7 +142,7 @@ class Modal extends PureComponent {
             <GridItem xs={12}>
               <Field
                 name='ODBalance'
-                render={(args) => (
+                render={args => (
                   <NumberInput
                     {...commonAmountOpts}
                     prefixProps={{
@@ -160,7 +160,7 @@ class Modal extends PureComponent {
             <GridItem xs={12}>
               <Field
                 name='Amount'
-                render={(args) => (
+                render={args => (
                   <NumberInput
                     {...commonAmountOpts}
                     prefix='Amount'
@@ -172,7 +172,7 @@ class Modal extends PureComponent {
             <GridItem xs={12}>
               <Field
                 name='NewBalance'
-                render={(args) => (
+                render={args => (
                   <NumberInput
                     {...commonAmountOpts}
                     disabled

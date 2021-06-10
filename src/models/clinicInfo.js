@@ -1,7 +1,7 @@
 import { createFormViewModel } from 'medisys-model'
-import * as service from '../services/clinicInfo'
 import { subscribeNotification } from '@/utils/realtime'
 import { notification } from '@/components'
+import service from '../services/clinicInfo'
 
 export default createFormViewModel({
   namespace: 'clinicInfo',
@@ -23,13 +23,13 @@ export default createFormViewModel({
         },
       })
 
-      history.listen((loct) => {
+      history.listen(loct => {
         const { pathname } = loct
       })
     },
 
     effects: {
-      *upsertClinicInfo ({ payload }, { call, put }) {
+      *upsertClinicInfo({ payload }, { call, put }) {
         const r = yield call(service.upsert, payload)
 
         if (r) {
@@ -40,7 +40,7 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         const { data } = payload
         const contact = {
           contactAddress: [

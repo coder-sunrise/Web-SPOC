@@ -1,5 +1,5 @@
 import React from 'react'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 // formik
 import { FastField, Field } from 'formik'
 // material ui
@@ -17,7 +17,7 @@ import { AppointmentTypeLabel, DoctorLabel } from '@/components/_medisys'
 import { smsStatus, messageStatus, appointmentStatus } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
 
-const styles = (theme) => ({
+const styles = theme => ({
   checkbox: {
     paddingTop: `${theme.spacing(2)}px !important`,
   },
@@ -31,12 +31,12 @@ const FilterByAppointment = ({ classes, values, setFieldValue }) => {
       <GridItem md={4}>
         <Field
           name='upcomingAppointmentDate'
-          render={(args) => (
+          render={args => (
             <DateRangePicker
               {...args}
               label='Upcoming Appointment From'
               label2='To'
-              onChange={(e) => {
+              onChange={e => {
                 if (e.length === 0)
                   setFieldValue('upcomingAppointmentDate', undefined)
               }}
@@ -47,7 +47,7 @@ const FilterByAppointment = ({ classes, values, setFieldValue }) => {
       <GridItem xs={4}>
         <Field
           name='appointmentType'
-          render={(args) => {
+          render={args => {
             return (
               <CodeSelect
                 {...args}
@@ -56,7 +56,7 @@ const FilterByAppointment = ({ classes, values, setFieldValue }) => {
                 label='Filter by Appointment Type'
                 code='ctappointmenttype'
                 labelField='displayValue'
-                renderDropdown={(option) => (
+                renderDropdown={option => (
                   <AppointmentTypeLabel
                     color={option.tagColorHex}
                     label={option.displayValue}
@@ -83,7 +83,7 @@ const FilterByAppointment = ({ classes, values, setFieldValue }) => {
       <GridItem xs={4}>
         <FastField
           name='doctor'
-          render={(args) => {
+          render={args => {
             return (
               <Authorized authority='appointment.viewotherappointment'>
                 <CodeSelect
@@ -103,7 +103,7 @@ const FilterByAppointment = ({ classes, values, setFieldValue }) => {
                   valueField='clinicianProfile.id'
                   maxTagCount={maxDoctorTagCount}
                   maxTagPlaceholder='doctors'
-                  renderDropdown={(option) => <DoctorLabel doctor={option} />}
+                  renderDropdown={option => <DoctorLabel doctor={option} />}
                   {...args}
                 />
               </Authorized>
@@ -114,7 +114,7 @@ const FilterByAppointment = ({ classes, values, setFieldValue }) => {
       <GridItem xs={2}>
         <FastField
           name='appointmentStatus'
-          render={(args) => {
+          render={args => {
             return (
               <Select
                 label={formatMessage({
@@ -131,7 +131,7 @@ const FilterByAppointment = ({ classes, values, setFieldValue }) => {
       <GridItem xs={4} className={classes.checkbox}>
         <FastField
           name='isExcludeReminderSent'
-          render={(args) => (
+          render={args => (
             <Checkbox
               simple
               label={formatMessage({
@@ -146,7 +146,7 @@ const FilterByAppointment = ({ classes, values, setFieldValue }) => {
       <GridItem xs={2}>
         <FastField
           name='lastSMSSendStatus'
-          render={(args) => {
+          render={args => {
             return (
               <Select
                 label={formatMessage({

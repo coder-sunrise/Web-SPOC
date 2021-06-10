@@ -1,7 +1,7 @@
 import React from 'react'
 // formik
 import { FastField } from 'formik'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 // common components
 import {
   Button,
@@ -28,7 +28,7 @@ const FilterBar = ({ handleSubmit, values, isSubmitting }) => {
           <GridItem md={4}>
             <FastField
               name='patientCriteria'
-              render={(args) => (
+              render={args => (
                 <TextField
                   {...args}
                   label={formatMessage({
@@ -42,7 +42,7 @@ const FilterBar = ({ handleSubmit, values, isSubmitting }) => {
           <GridItem md={1}>
             <FastField
               name='ageFrom'
-              render={(args) => (
+              render={args => (
                 <NumberInput
                   {...args}
                   label='Age From'
@@ -55,7 +55,7 @@ const FilterBar = ({ handleSubmit, values, isSubmitting }) => {
           <GridItem md={1}>
             <FastField
               name='ageTo'
-              render={(args) => (
+              render={args => (
                 <NumberInput {...args} label='Age To' max={200} precision={0} />
               )}
             />
@@ -70,21 +70,21 @@ const FilterBar = ({ handleSubmit, values, isSubmitting }) => {
           <GridItem md={1}>
             <FastField
               name='isAllDate'
-              render={(args) => <Checkbox {...args} label='All Date' />}
+              render={args => <Checkbox {...args} label='All Date' />}
             />
           </GridItem>
 
           <GridItem md={2}>
             <FastField
               name='noVisitDateFrom'
-              render={(args) => <DatePicker {...args} label='No Visit Since' />}
+              render={args => <DatePicker {...args} label='No Visit Since' />}
             />
           </GridItem>
           <GridItem md={4} />
           <GridItem md={2}>
             <FastField
               name='patientStatus'
-              render={(args) => (
+              render={args => (
                 <Select
                   {...args}
                   label='Status'
@@ -112,7 +112,7 @@ const FilterBar = ({ handleSubmit, values, isSubmitting }) => {
           <GridItem md={2}>
             <FastField
               name='doctorIDs'
-              render={(args) => (
+              render={args => (
                 <DoctorProfileSelect
                   mode='multiple'
                   {...args}
@@ -131,7 +131,7 @@ const FilterBar = ({ handleSubmit, values, isSubmitting }) => {
           <GridItem md={1}>
             <FastField
               name='isGroupByDoctor'
-              render={(args) => <Checkbox {...args} label='Group By Doctor' />}
+              render={args => <Checkbox {...args} label='Group By Doctor' />}
             />
           </GridItem>
           <GridItem md={2}>

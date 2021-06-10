@@ -2,11 +2,9 @@ import moment from 'moment'
 import React from 'react'
 import numeral from 'numeral'
 
-import config from './config'
+import { currencyFormat, qtyFormat, currencySymbol } from './config'
 
-const { currencyFormat, qtyFormat, currencySymbol } = config
-
-function NumberFormatter (p) {
+function NumberFormatter(p) {
   const { column } = p
   let cfg
   if (this) {
@@ -83,7 +81,7 @@ const DateFormatter = ({ value, full = false, format }) => {
   //   : moment(value).isValid() ? moment(value).format(format) : value
 }
 
-module.exports = {
+export {
   NumberFormatter,
   DateFormatter,
   currencyFormat,
@@ -106,5 +104,4 @@ module.exports = {
   timeFormat24HourWithSecond,
   timeFormat24Hour,
   additionalShortcutFormats,
-  ...module.exports,
 }

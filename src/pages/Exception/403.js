@@ -1,12 +1,12 @@
 import React, { PureComponent } from 'react'
-import { formatMessage } from 'umi/locale'
-import Link from 'umi/link'
+import { formatMessage, Link } from 'umi'
+
 import Exception from '@/components/Exception'
 import { Button } from '@/components'
 import { connect } from 'dva'
 
 class Exception403 extends PureComponent {
-  render () {
+  render() {
     return (
       <Exception
         type='403'

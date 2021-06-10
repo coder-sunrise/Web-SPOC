@@ -1,12 +1,12 @@
 import request from '@/utils/request'
 import { getUniqueGUID, convertToQuery } from '@/utils/utils'
 
-export async function queryList (url, params, convertExcludeFields) {
+export async function queryList(url, params, convertExcludeFields) {
   // //console.log('querylist')
   // console.log(params)
   const parsedParams = convertToQuery(
     {
-      pagesize: 10,
+      pagesize: params.pageSize || 10,
       current: 1,
       ...params,
     },
@@ -19,7 +19,7 @@ export async function queryList (url, params, convertExcludeFields) {
   })
 }
 
-export async function queryListTemp (url, params, convertExcludeFields) {
+export async function queryListTemp(url, params, convertExcludeFields) {
   // //console.log('querylist')
   // console.log(params)
   const parsedParams = convertToQuery(
@@ -36,7 +36,7 @@ export async function queryListTemp (url, params, convertExcludeFields) {
   })
 }
 
-export async function remove (url, params) {
+export async function remove(url, params) {
   if (params.id) {
     return request(`${url}/${params.id}`, {
       method: 'DELETE',
@@ -53,7 +53,7 @@ export async function remove (url, params) {
   })
 }
 
-export async function query (url, params) {
+export async function query(url, params) {
   if (params.id) {
     return request(`${url}/${params.id}`, {
       method: 'GET',
@@ -72,7 +72,7 @@ export async function query (url, params) {
   })
 }
 
-export async function upsert (url, params) {
+export async function upsert(url, params) {
   // console.log(url, params)
 
   let r
@@ -123,7 +123,7 @@ export async function upsert (url, params) {
 //   })
 // }
 
-export async function lock (url, params, options) {
+export async function lock(url, params, options) {
   return request({
     url: `${url}/lock/true`,
     method: 'patch',
@@ -132,7 +132,7 @@ export async function lock (url, params, options) {
   })
 }
 
-export async function unlock (url, params, options) {
+export async function unlock(url, params, options) {
   return request({
     url: `${url}/lock/false`,
     method: 'patch',
@@ -141,20 +141,18 @@ export async function unlock (url, params, options) {
   })
 }
 
-export async function runningNumber (code) {
+export async function runningNumber(code) {
   return request(`/api/RunningNumber/${code}`)
 }
 
-export async function queryAll (url, params) {
+export async function queryAll(url, params) {
   try {
     let mergeList = []
     const _firstResult = await queryList(url, params)
     const { status, data } = _firstResult
     if (parseInt(status, 10) === 200) {
       const { data: _list, pageSize, totalRecords } = data
-      mergeList = [
-        ..._list,
-      ]
+      mergeList = [..._list]
 
       const totalPage = Math.ceil(totalRecords / pageSize)
       const serviceCalls = []
@@ -169,16 +167,10 @@ export async function queryAll (url, params) {
       const allResult = await Promise.all(serviceCalls)
       if (allResult) {
         const _flatten = allResult.reduce(
-          (_all, result) => [
-            ..._all,
-            ...result.data.data,
-          ],
+          (_all, result) => [..._all, ...result.data.data],
           [],
         )
-        mergeList = [
-          ...mergeList,
-          ..._flatten,
-        ]
+        mergeList = [...mergeList, ..._flatten]
       }
       return {
         ..._firstResult,

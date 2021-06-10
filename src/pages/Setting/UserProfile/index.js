@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'dva'
 import $ from 'jquery'
-import router from 'umi/router'
-import { FormattedMessage } from 'umi/locale'
+import { history, FormattedMessage } from 'umi'
+
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
 // formik
@@ -25,7 +25,7 @@ import {
 } from '@/components'
 import { UserProfileTableConfig } from './const'
 
-const styles = (theme) => ({
+const styles = theme => ({
   verticalSpacing: {
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(2),
@@ -52,7 +52,7 @@ class UserProfile extends React.Component {
           columnName: 'action',
           width: 90,
           align: 'center',
-          render: (row) => this.Cell(row),
+          render: row => this.Cell(row),
         },
       ],
     },
@@ -73,7 +73,7 @@ class UserProfile extends React.Component {
     })
   }
 
-  handleActionButtonClick = async (event) => {
+  handleActionButtonClick = async event => {
     const { currentTarget } = event
     const { dispatch } = this.props
 
@@ -92,7 +92,7 @@ class UserProfile extends React.Component {
     }
   }
 
-  Cell = (row) => {
+  Cell = row => {
     return (
       <Tooltip title='Edit User Profile' placement='bottom'>
         <Button
@@ -126,7 +126,7 @@ class UserProfile extends React.Component {
   }
 
   onAddNewClick = () => {
-    router.push('/setting/userprofile/new')
+    history.push('/setting/userprofile/new')
   }
 
   openModal = () => {
@@ -139,11 +139,11 @@ class UserProfile extends React.Component {
     })
   }
 
-  handleDoubleClick = (row) => {
+  handleDoubleClick = row => {
     this.handleActionButtonClick({ currentTarget: { id: row.id } })
   }
 
-  render () {
+  render() {
     const { classes, mainDivHeight = 700 } = this.props
     let height = mainDivHeight - 100 - ($('.filterBar').height() || 0)
     if (height < 300) height = 300
@@ -154,7 +154,7 @@ class UserProfile extends React.Component {
             <GridItem md={4}>
               <FastField
                 name='searchQuery'
-                render={(args) => (
+                render={args => (
                   <TextField
                     {...args}
                     label='Login Account / Name'
@@ -166,7 +166,7 @@ class UserProfile extends React.Component {
             <GridItem md={2}>
               <FastField
                 name='status'
-                render={(args) => (
+                render={args => (
                   <Select
                     {...args}
                     label='Status'

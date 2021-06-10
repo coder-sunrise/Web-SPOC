@@ -1,9 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import { connect } from 'dva'
-import { compose } from 'redux'
 import ClickAwayListener from '@material-ui/core/ClickAwayListener'
 
-import router from 'umi/router'
 // material ui
 import { Popover, Paper } from '@material-ui/core'
 import { notification } from '@/components'
@@ -22,7 +20,7 @@ import ContextMenu from './ContextMenu'
   clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
 class RightClickContextMenu extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.myRef = React.createRef()
 
@@ -40,21 +38,26 @@ class RightClickContextMenu extends React.Component {
   //   return false
   // }
 
-  handlePopoverOpen = (event) =>
+  handlePopoverOpen = event =>
     this.setState({
       anchorEl: event.target,
     })
 
-  handlePopoverClose = (event) =>
+  handlePopoverClose = event =>
     this.setState({
       anchorEl: null,
       rightClickedRow: undefined,
     })
 
-  isAssignedDoctor = (row) => {
+  isAssignedDoctor = row => {
     if (!row.doctor) return false
-    const { doctor: { id }, visitStatus } = row
-    const { clinicianProfile: { doctorProfile } } = this.props.user.data
+    const {
+      doctor: { id },
+      visitStatus,
+    } = row
+    const {
+      clinicianProfile: { doctorProfile },
+    } = this.props.user.data
 
     if (!doctorProfile) {
       notification.error({
@@ -74,20 +77,14 @@ class RightClickContextMenu extends React.Component {
     return true
   }
 
-  handleContextMenuClick = (menuItem) => {
+  handleContextMenuClick = menuItem => {
     this.props.onOutsidePopoverRightClick()
   }
 
-  canAccess = (id) => {
-    const apptsActionID = [
-      '8',
-      '9',
-      '10',
-      '11',
-      '12',
-    ]
+  canAccess = id => {
+    const apptsActionID = ['8', '9', '10', '11', '12']
 
-    const findMatch = (item) => item.id === parseFloat(id, 10)
+    const findMatch = item => item.id === parseFloat(id, 10)
 
     let menuOpt = ContextMenuOptions.find(findMatch)
     // console.log(menuOpt)
@@ -112,7 +109,7 @@ class RightClickContextMenu extends React.Component {
     this.props.dispatch({})
   }
 
-  render () {
+  render() {
     const { anchorEl, rightClickedRow, ...restProps } = this.props
     if (!anchorEl) return null
 

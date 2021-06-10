@@ -1,7 +1,7 @@
 const devRoutes = {
-  hideInMenu: process.env.NODE_ENV === 'production',
   path: '/development',
   name: 'Development',
+  icon: 'icon-wrench',
   routes: [
     {
       path: '/development/control',

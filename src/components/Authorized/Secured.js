@@ -1,7 +1,7 @@
 import React from 'react'
+import Authorized from '@/utils/Authorized'
 import Exception from '../Exception'
 import CheckPermissions from './CheckPermissions'
-import Authorized from '@/utils/Authorized'
 
 /**
  * 默认不能访问任何页面
@@ -9,7 +9,7 @@ import Authorized from '@/utils/Authorized'
  */
 const Exception403 = () => <Exception type='403' />
 
-export const isComponentClass = (component) => {
+export const isComponentClass = component => {
   if (!component) return false
   const proto = Object.getPrototypeOf(component)
   if (proto === React.Component || proto === Function.prototype) return true
@@ -26,7 +26,7 @@ const checkIsInstantiation = (matches, target, error) => {
   if (matches.rights === 'hidden') return error
   if (isComponentClass(target)) {
     const Target = target
-    return (props) => (
+    return props => (
       <Authorized.Context.Provider value={matches}>
         <Target
           disabled={matches.rights === 'disable'}
@@ -38,7 +38,7 @@ const checkIsInstantiation = (matches, target, error) => {
   }
 
   if (React.isValidElement(target)) {
-    return (props) => (
+    return props => (
       <Authorized.Context.Provider value={matches}>
         {React.cloneElement(target, {
           disabled: matches.rights === 'disable',
@@ -48,8 +48,9 @@ const checkIsInstantiation = (matches, target, error) => {
       </Authorized.Context.Provider>
     )
   }
+  return target
 
-  return () => target
+  // return () => target
 }
 
 // // Determine whether the incoming component has been instantiated
@@ -123,11 +124,12 @@ const authorize = (authority, error) => {
     throw new Error('authority is required')
   }
   // console.log('authority', authority)
-  return function decideAuthority (target) {
+  return function decideAuthority(target) {
     const error = classError || Exception403
     // console.log(error, target)
 
     const rights = CheckPermissions(authority, target, error, 'decorator')
+
     // console.log(rights, target)
     return checkIsInstantiation(rights, target, error)
   }

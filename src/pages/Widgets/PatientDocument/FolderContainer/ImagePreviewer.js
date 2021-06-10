@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 // material ui
 import { withStyles, Chip } from '@material-ui/core'
 import { Print, Save, Delete } from '@material-ui/icons'
@@ -29,7 +29,7 @@ import SetFolderWithPopover from './SetFolderWithPopover'
 import './style.css'
 
 const base64Prefix = 'data:image/png;base64,'
-const styles = (theme) => ({
+const styles = theme => ({
   previous: {
     paddingLeft: 10,
     width: 25,
@@ -62,7 +62,7 @@ const styles = (theme) => ({
   folder,
 }))
 class ImagePreviewer extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.carouselRef = React.createRef()
     this.state = {
@@ -70,7 +70,7 @@ class ImagePreviewer extends Component {
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { defaultFileFK, files } = this.props
 
     // console.log('componentDidMount', { defaultFileFK, files })
@@ -78,19 +78,19 @@ class ImagePreviewer extends Component {
     window.addEventListener('resize', this.resize.bind(this))
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.removeEventListener('resize', this.resize)
   }
 
   // eslint-disable-next-line react/sort-comp
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { files: nextFiles = [] } = nextProps
     const { imageList } = this.state
 
     // handle on removed selected image
     if (nextFiles.length > 0) {
       if (imageList.length !== nextFiles.length) {
-        const preSelectedIndex = imageList.findIndex((f) => f.isSelected)
+        const preSelectedIndex = imageList.findIndex(f => f.isSelected)
         const nextSelectedIndex =
           preSelectedIndex <= 0 ? 0 : preSelectedIndex - 1
         const selectedFileIndexFK = nextFiles[nextSelectedIndex].fileIndexFK
@@ -105,7 +105,7 @@ class ImagePreviewer extends Component {
   cacheImageList = (files, fileIndexFK) => {
     const imageList = files.map((m, i) => {
       const stateFile =
-        (this.state.imageList || []).find((x) => x.id === m.id) || {}
+        (this.state.imageList || []).find(x => x.id === m.id) || {}
       return {
         ...m,
         slideNumber: i,
@@ -118,7 +118,7 @@ class ImagePreviewer extends Component {
 
     const imageWH = this.getImageContainerWH()
     this.setState({ ...imageWH, imageList }, () => {
-      const currentImg = imageList.find((s) => s.fileIndexFK === fileIndexFK)
+      const currentImg = imageList.find(s => s.fileIndexFK === fileIndexFK)
       if (!currentImg || !currentImg.image)
         this.fetchImage(imageList, fileIndexFK)
       else {
@@ -142,15 +142,17 @@ class ImagePreviewer extends Component {
       imageContainerWidth,
     } = this.getImageContainerWH()
 
-    imageList.filter((s) => s.image && s.image.src).map((img) => {
-      let scaleWH = scaleImage(
-        img.image,
-        imageContainerWidth,
-        imageContainerHeight,
-      )
-      img.width = scaleWH.width
-      img.height = scaleWH.height
-    })
+    imageList
+      .filter(s => s.image && s.image.src)
+      .map(img => {
+        let scaleWH = scaleImage(
+          img.image,
+          imageContainerWidth,
+          imageContainerHeight,
+        )
+        img.width = scaleWH.width
+        img.height = scaleWH.height
+      })
 
     this.setState({ imageContainerHeight, imageContainerWidth, imageList })
   }
@@ -161,11 +163,11 @@ class ImagePreviewer extends Component {
       imageContainerHeight: height,
     } = this.state
 
-    const loadImage = (contentInBase64) => {
+    const loadImage = contentInBase64 => {
       if (contentInBase64) {
-        this.processImage(contentInBase64, width, height).then((content) => {
+        this.processImage(contentInBase64, width, height).then(content => {
           let selectedImg
-          imageList.map((i) => {
+          imageList.map(i => {
             if (i.fileIndexFK === fileIndexFK) {
               i.isSelected = true
               selectedImg = i
@@ -188,12 +190,12 @@ class ImagePreviewer extends Component {
       }
     }
 
-    const currentFile = imageList.find((i) => i.fileIndexFK === fileIndexFK)
+    const currentFile = imageList.find(i => i.fileIndexFK === fileIndexFK)
     if (currentFile && currentFile.imageData) {
       loadImage(currentFile.imageData)
     } else {
       this.setState({ loading: true })
-      getFileByFileID(fileIndexFK).then((response) => {
+      getFileByFileID(fileIndexFK).then(response => {
         this.setState({ loading: false })
         const { data } = response
         const contentInBase64 = base64Prefix + arrayBufferToBase64(data)
@@ -224,25 +226,25 @@ class ImagePreviewer extends Component {
     }
   }
 
-  previous = (current) => {
+  previous = current => {
     this.checkFileChanged(current, () => {
       this.carouselRef.prev()
     })
   }
 
-  next = (current) => {
+  next = current => {
     this.checkFileChanged(current, () => {
       this.carouselRef.next()
     })
   }
 
-  afterChangeImage = (current) => {
+  afterChangeImage = current => {
     const { imageList } = this.state
-    imageList.map((m) => {
+    imageList.map(m => {
       m.isSelected = false
     })
 
-    const currentImg = imageList.find((s) => s.slideNumber === current)
+    const currentImg = imageList.find(s => s.slideNumber === current)
     if (currentImg) {
       currentImg.isSelected = true
       if (currentImg.image) {
@@ -253,7 +255,7 @@ class ImagePreviewer extends Component {
     }
   }
 
-  deleteImage = (file) => {
+  deleteImage = file => {
     this.props
       .dispatch({
         type: 'patientAttachment/removeRow',
@@ -262,7 +264,7 @@ class ImagePreviewer extends Component {
         },
       })
       .then(() => {
-        if (this.state.imageList.filter((f) => f.id !== file.id).length === 0)
+        if (this.state.imageList.filter(f => f.id !== file.id).length === 0)
           this.props.onClose()
 
         this.props.dispatch({
@@ -272,7 +274,7 @@ class ImagePreviewer extends Component {
   }
 
   checkFileChanged = (file, onConfirm) => {
-    const origFile = this.props.files.find((f) => f.id === file.id)
+    const origFile = this.props.files.find(f => f.id === file.id)
     if (origFile) {
       const { fileName, folderFKs } = origFile
       if (
@@ -290,7 +292,7 @@ class ImagePreviewer extends Component {
             onConfirmSave: () => {
               // restore file to state
               const { imageList } = this.state
-              const changedFile = imageList.find((f) => f.id === file.id)
+              const changedFile = imageList.find(f => f.id === file.id)
               changedFile.fileName = fileName
               changedFile.folderFKs = _.sortedUniq(folderFKs)
               this.setState({ imageList })
@@ -304,7 +306,7 @@ class ImagePreviewer extends Component {
     }
   }
 
-  render () {
+  render() {
     const {
       imageList = [],
       loading = false,
@@ -318,12 +320,12 @@ class ImagePreviewer extends Component {
       onFileUpdated,
       onAddNewFolders,
     } = this.props
-    const selectedImage = this.state.imageList.find((s) => s.isSelected) || {}
+    const selectedImage = this.state.imageList.find(s => s.isSelected) || {}
 
     return (
       <div
         style={{ display: 'table', height: '100%' }}
-        ref={(ref) => {
+        ref={ref => {
           this.main = ref
         }}
       >
@@ -347,13 +349,13 @@ class ImagePreviewer extends Component {
             }}
           >
             <Carousel
-              ref={(el) => {
+              ref={el => {
                 this.carouselRef = el
               }}
               effect='fade'
               afterChange={this.afterChangeImage}
             >
-              {this.state.imageList.map((img) => {
+              {this.state.imageList.map(img => {
                 const { image, width, height, fileIndexFK, isSelected } = img
                 return (
                   <div>
@@ -363,8 +365,7 @@ class ImagePreviewer extends Component {
                         height: imageContainerHeight,
                       }}
                     >
-                      {image &&
-                      isSelected && (
+                      {image && isSelected && (
                         <ZImage
                           key={fileIndexFK}
                           src={image.src}
@@ -411,7 +412,7 @@ class ImagePreviewer extends Component {
                 label='File Name'
                 value={selectedImage.fileName}
                 maxLength={50}
-                onChange={(e) => {
+                onChange={e => {
                   selectedImage.fileName = e.target.value
                   this.setState({ imageList })
                 }}
@@ -427,7 +428,7 @@ class ImagePreviewer extends Component {
                     key={selectedImage.id}
                     folderList={folderList}
                     selectedFolderFKs={selectedImage.folderFKs || []}
-                    onClose={(selectedFolder) => {
+                    onClose={selectedFolder => {
                       const originalFolders = _.sortedUniq(
                         selectedImage.folderFKs || [],
                       )
@@ -446,8 +447,7 @@ class ImagePreviewer extends Component {
                 )}
               </div>
             </GridItem>
-            {selectedImage.folderFKs &&
-            Array.isArray(selectedImage.folderFKs) && (
+            {selectedImage.folderFKs && Array.isArray(selectedImage.folderFKs) && (
               <GridItem
                 md={12}
                 style={{
@@ -457,8 +457,8 @@ class ImagePreviewer extends Component {
                   overflow: 'scroll',
                 }}
               >
-                {_.uniq(selectedImage.folderFKs).map((item) => {
-                  const folderEntity = folderList.find((f) => f.id === item)
+                {_.uniq(selectedImage.folderFKs).map(item => {
+                  const folderEntity = folderList.find(f => f.id === item)
                   return (
                     <Chip
                       style={{ margin: 8 }}
@@ -469,7 +469,7 @@ class ImagePreviewer extends Component {
                       color='primary'
                       onDelete={() => {
                         selectedImage.folderFKs = selectedImage.folderFKs.filter(
-                          (i) => i !== item,
+                          i => i !== item,
                         )
                         this.setState({ imageList })
                       }}

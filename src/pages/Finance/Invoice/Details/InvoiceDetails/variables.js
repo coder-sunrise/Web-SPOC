@@ -1,5 +1,5 @@
 import numeral from 'numeral'
-import config from '@/utils/config'
+import { qtyFormat } from '@/utils/config'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import PackageDrawdownInfo from '@/pages/Widgets/Orders/Detail/PackageDrawdownInfo'
 
@@ -8,9 +8,7 @@ const wrapCellTextStyle = {
   whiteSpace: 'pre-wrap',
 }
 
-const { qtyFormat } = config
-
-const drugMixtureIndicator = (row) => {
+const drugMixtureIndicator = row => {
   if (row.itemType !== 'Medication' || !row.isDrugMixture) return null
 
   return (
@@ -20,7 +18,7 @@ const drugMixtureIndicator = (row) => {
   )
 }
 
-const packageDrawdownIndicator = (row) => {
+const packageDrawdownIndicator = row => {
   if (!row.isPackage) return null
 
   return (
@@ -37,7 +35,7 @@ export const DataGridColExtensions = [
   {
     columnName: 'itemType',
     width: 300,
-    render: (row) => {
+    render: row => {
       return (
         <div style={{ position: 'relative' }}>
           <div style={wrapCellTextStyle}>
@@ -50,11 +48,12 @@ export const DataGridColExtensions = [
   },
   {
     columnName: 'itemName',
-    render: (row) => {
+    render: row => {
       return (
         <div style={wrapCellTextStyle}>
           {packageDrawdownIndicator(row)}
-          <div style={{
+          <div
+            style={{
               position: 'relative',
               left: row.isPackage ? 22 : 0,
             }}
@@ -70,7 +69,7 @@ export const DataGridColExtensions = [
     type: 'number',
     currency: false,
     width: 180,
-    render: (row) => {
+    render: row => {
       const { quantity, dispenseUOMDisplayValue = '' } = row
       return `${numeral(quantity).format(qtyFormat)} ${dispenseUOMDisplayValue}`
     },
@@ -83,4 +82,3 @@ export const DataGridColExtensions = [
     width: 200,
   },
 ]
-

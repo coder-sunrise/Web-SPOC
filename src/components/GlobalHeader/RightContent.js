@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { FormattedMessage, formatMessage } from 'umi/locale'
+import { FormattedMessage, formatMessage } from 'umi'
 import { Spin, Tag, Menu, Icon, Dropdown, Avatar, Tooltip } from 'antd'
 import moment from 'moment'
 import groupBy from 'lodash/groupBy'
@@ -9,12 +9,12 @@ import SelectLang from '../SelectLang'
 import styles from './index.less'
 
 export default class GlobalHeaderRight extends PureComponent {
-  getNoticeData () {
+  getNoticeData() {
     const { notices = [] } = this.props
     if (notices.length === 0) {
       return {}
     }
-    const newNotices = notices.map((notice) => {
+    const newNotices = notices.map(notice => {
       const newNotice = { ...notice }
       if (newNotice.datetime) {
         newNotice.datetime = moment(notice.datetime).fromNow()
@@ -40,21 +40,20 @@ export default class GlobalHeaderRight extends PureComponent {
     return groupBy(newNotices, 'type')
   }
 
-  getUnreadData = (noticeData) => {
+  getUnreadData = noticeData => {
     const unreadMsg = {}
-    Object.entries(noticeData).forEach(([ key, value
-    ]) => {
+    Object.entries(noticeData).forEach(([key, value]) => {
       if (!unreadMsg[key]) {
         unreadMsg[key] = 0
       }
       if (Array.isArray(value)) {
-        unreadMsg[key] = value.filter((item) => !item.read).length
+        unreadMsg[key] = value.filter(item => !item.read).length
       }
     })
     return unreadMsg
   }
 
-  changeReadState = (clickedItem) => {
+  changeReadState = clickedItem => {
     const { id } = clickedItem
     const { dispatch } = this.props
     dispatch({
@@ -63,7 +62,7 @@ export default class GlobalHeaderRight extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const {
       currentUser,
       fetchingNotices,
@@ -118,10 +117,10 @@ export default class GlobalHeaderRight extends PureComponent {
             formatMessage({ id: 'component.globalHeader.search.example2' }),
             formatMessage({ id: 'component.globalHeader.search.example3' }),
           ]}
-          onSearch={(value) => {
+          onSearch={value => {
             // console.log('input', value); // eslint-disable-line
           }}
-          onPressEnter={(value) => {
+          onPressEnter={value => {
             // console.log('enter', value); // eslint-disable-line
           }}
         />
@@ -150,10 +149,7 @@ export default class GlobalHeaderRight extends PureComponent {
           onPopupVisibleChange={onNoticeVisibleChange}
           loading={fetchingNotices}
           popupAlign={{
-            offset: [
-              20,
-              -16,
-            ],
+            offset: [20, -16],
           }}
           clearClose
         >

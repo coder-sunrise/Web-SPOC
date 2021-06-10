@@ -1,20 +1,18 @@
 import React from 'react'
-import router from 'umi/router'
+import { history } from 'umi'
 // common component
 import { notification } from '@/components'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 // utils
 import { consultationDocumentTypes } from '@/utils/codes'
 import { getReportContext, getRawData } from '@/services/report'
-import {
-  queryDrugLabelDetails,
-  queryDrugLabelsDetails,
-} from '@/services/dispense'
+import service from '@/services/dispense'
 import { REPORT_ID } from '@/utils/constants'
 import { getAppendUrl } from '@/utils/utils'
 import CONSTANTS from './constants'
 import DispenseDetails from './index'
 
+const { queryDrugLabelDetails, queryDrugLabelsDetails } = service
 const WebSocketWrapper = ({
   handlePrint,
   selectedDrugs,
@@ -53,13 +51,13 @@ const WebSocketWrapper = ({
     }
   }
 
-  const generateDrugLablePrintSource = async (row) => {
+  const generateDrugLablePrintSource = async row => {
     const drugLabelDetails1 = await queryDrugLabelDetails(row.id)
     const { data } = drugLabelDetails1
     if (data && data.length > 0) {
       let drugLabelDetail = []
       drugLabelDetail = drugLabelDetail.concat(
-        data.map((o) => {
+        data.map(o => {
           return getDrugLabelDetails(o, row)
         }),
       )
@@ -83,18 +81,17 @@ const WebSocketWrapper = ({
     if (data && data.length > 0) {
       let drugLabelDetail = []
       const newdata = data.filter(
-        (x) =>
+        x =>
           selectedDrugs.findIndex(
-            (value) =>
-              value.id === x.id && (printAllDrugLabel || value.selected),
+            value => value.id === x.id && (printAllDrugLabel || value.selected),
           ) > -1,
       )
-      newdata.map((o) => {
-        let copy = selectedDrugs.find((x) => x.id === o.id).no
+      newdata.map(o => {
+        let copy = selectedDrugs.find(x => x.id === o.id).no
         for (let no = 0; no < copy; no++) {
-          let prescriptionItem = prescriptions.find((p) => p.id === o.id)
-          if (prescriptionItem === undefined) 
-            prescriptionItem = packageItem.find((p) => p.id === o.id)
+          let prescriptionItem = prescriptions.find(p => p.id === o.id)
+          if (prescriptionItem === undefined)
+            prescriptionItem = packageItem.find(p => p.id === o.id)
           drugLabelDetail.push(getDrugLabelDetails(o, prescriptionItem))
         }
       })
@@ -131,12 +128,10 @@ const WebSocketWrapper = ({
           printAllDrugLabel,
         )
         if (drugLabelList) {
-          const payload = drugLabelList.map((drugLabel) => ({
+          const payload = drugLabelList.map(drugLabel => ({
             ReportId: drugLabelReportID,
             ReportData: JSON.stringify({
-              DrugLabelDetails: [
-                { ...drugLabel },
-              ],
+              DrugLabelDetails: [{ ...drugLabel }],
               ReportContext: reportContext,
             }),
           }))
@@ -148,13 +143,11 @@ const WebSocketWrapper = ({
         const reportContext = await getReportContext(drugLabelReportID)
         const drugLabel = await generateDrugLablePrintSource(row)
         if (drugLabel) {
-          const payload = drugLabel.map((details) => {
+          const payload = drugLabel.map(details => {
             return {
               ReportId: drugLabelReportID,
               ReportData: JSON.stringify({
-                DrugLabelDetails: [
-                  { ...details },
-                ],
+                DrugLabelDetails: [{ ...details }],
                 ReportContext: reportContext,
               }),
             }
@@ -194,7 +187,7 @@ const WebSocketWrapper = ({
       await handlePrint(JSON.stringify(printResult))
     } else {
       const documentType = consultationDocumentTypes.find(
-        (o) =>
+        o =>
           o.name.toLowerCase() === row.type.toLowerCase() ||
           (o.name === 'Others' && row.type === 'Other Documents'),
       )
@@ -238,7 +231,7 @@ const WebSocketWrapper = ({
           version: Date.now(),
         },
       })
-      router.push(getAppendUrl({}, '/reception/queue/billing'))
+      history.push(getAppendUrl({}, '/reception/queue/billing'))
     }
   }
 

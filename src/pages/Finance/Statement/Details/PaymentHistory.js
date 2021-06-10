@@ -22,12 +22,12 @@ import {
   Danger,
   Accordion,
 } from '@/components'
-import * as service from '../services/index'
+import service from '../services/index'
 // material ui
 // common components
 // sub components
 
-const styles = (theme) => ({
+const styles = theme => ({
   errorContainer: {
     textAlign: 'left',
     lineHeight: '1em',
@@ -49,8 +49,10 @@ class PaymentHistory extends PureComponent {
     cancelReason: '',
   }
 
-  componentDidMount () {
-    const { match: { params } } = this.props
+  componentDidMount() {
+    const {
+      match: { params },
+    } = this.props
     this.props.dispatch({
       type: 'statement/queryPaymentHistory',
       payload: {
@@ -59,7 +61,7 @@ class PaymentHistory extends PureComponent {
     })
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.dispatch({
       type: 'statement/queryPaymentHistoryDone',
       payload: {
@@ -69,7 +71,7 @@ class PaymentHistory extends PureComponent {
     })
   }
 
-  onCancelReasonChange = (event) => {
+  onCancelReasonChange = event => {
     if (event.target.value !== '' || event.target.value !== undefined)
       this.setState({
         showError: false,
@@ -155,7 +157,7 @@ class PaymentHistory extends PureComponent {
     history.push(`/finance/statement/statementpayment/${row.id}`)
   }
 
-  onPrintReceiptClick = (paymentId) => {
+  onPrintReceiptClick = paymentId => {
     this.setState({
       reportId: 56,
       reportParameters: {
@@ -166,7 +168,7 @@ class PaymentHistory extends PureComponent {
     })
   }
 
-  onPrintInvoicePaymentReceiptClick = (paymentId) => {
+  onPrintInvoicePaymentReceiptClick = paymentId => {
     this.setState({
       reportId: 29,
       reportParameters: {
@@ -183,7 +185,7 @@ class PaymentHistory extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const {
       classes,
       statement: { statementPaymentList, invoicePaymentList },
@@ -242,10 +244,7 @@ class PaymentHistory extends PureComponent {
         <Accordion
           // active={this.state.activePanel}
           // onChange={this.handleActivePanelChange}
-          defaultActive={[
-            0,
-            1,
-          ]}
+          defaultActive={[0, 1]}
           mode='multiple'
           leftIcon
           expandIcon={<SolidExpandMore fontSize='large' />}
@@ -264,7 +263,7 @@ class PaymentHistory extends PureComponent {
                       sortingEnabled: false,
                       align: 'center',
                       width: 150,
-                      render: (item) => {
+                      render: item => {
                         return (
                           <div>
                             <Tooltip title='Show Details'>
@@ -289,7 +288,7 @@ class PaymentHistory extends PureComponent {
                                   <div className={classes.errorContainer}>
                                     <FastField
                                       name='cancelReason'
-                                      render={(args) => (
+                                      render={args => (
                                         <TextField
                                           label='Void Reason'
                                           autoFocus
@@ -349,7 +348,7 @@ class PaymentHistory extends PureComponent {
                       sortingEnabled: false,
                       align: 'center',
                       width: 150,
-                      render: (item) => {
+                      render: item => {
                         return (
                           <div>
                             <DeleteWithPopover
@@ -362,7 +361,7 @@ class PaymentHistory extends PureComponent {
                                   <div className={classes.errorContainer}>
                                     <FastField
                                       name='cancelReason'
-                                      render={(args) => (
+                                      render={args => (
                                         <TextField
                                           label='Void Reason'
                                           autoFocus

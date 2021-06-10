@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 import { FastField, Field, withFormik } from 'formik'
 import { withStyles } from '@material-ui/core'
 import Search from '@material-ui/icons/Search'
@@ -38,10 +38,16 @@ const styles = () => ({
 @withFormik({
   mapPropsToValues: () => ({
     copayerFK: 'All Company',
-    statementStartDate: moment().subtract(1, 'months').startOf('month'),
+    statementStartDate: moment()
+      .subtract(1, 'months')
+      .startOf('month'),
     statementEndDate: moment().endOf('month'),
-    dueStartDate: moment().subtract(1, 'months').startOf('month'),
-    dueEndDate: moment().add(3, 'months').endOf('month'),
+    dueStartDate: moment()
+      .subtract(1, 'months')
+      .startOf('month'),
+    dueEndDate: moment()
+      .add(3, 'months')
+      .endOf('month'),
   }),
   handleSubmit: (values, { props }) => {
     const {
@@ -90,7 +96,7 @@ class SearchBar extends PureComponent {
     showReportSelection: false,
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.unmount()
   }
 
@@ -102,22 +108,22 @@ class SearchBar extends PureComponent {
       },
     })
 
-  handleOnChange = (name, checked) => (event) => {
+  handleOnChange = (name, checked) => event => {
     this.setState({ [name]: !checked })
     // if AllDate is checked, set datetime to max range
   }
 
-  toggleReport = (v) => {
-    this.setState((preState) => ({ showReport: !preState.showReport }))
+  toggleReport = v => {
+    this.setState(preState => ({ showReport: !preState.showReport }))
   }
 
   toggleReportSelection = () => {
-    this.setState((preState) => ({
+    this.setState(preState => ({
       showReportSelection: !preState.showReportSelection,
     }))
   }
 
-  render () {
+  render() {
     const {
       classes,
       history,
@@ -143,13 +149,13 @@ class SearchBar extends PureComponent {
             <GridItem md={3}>
               <FastField
                 name='statementNo'
-                render={(args) => <TextField label='Statement No.' {...args} />}
+                render={args => <TextField label='Statement No.' {...args} />}
               />
             </GridItem>
             <GridItem md={3}>
               <Field
                 name='statementStartDate'
-                render={(args) => (
+                render={args => (
                   <FilterBarDate
                     noTodayLimit
                     args={args}
@@ -166,7 +172,7 @@ class SearchBar extends PureComponent {
             <GridItem md={3}>
               <Field
                 name='statementEndDate'
-                render={(args) => (
+                render={args => (
                   <FilterBarDate
                     isEndDate
                     noTodayLimit
@@ -185,7 +191,7 @@ class SearchBar extends PureComponent {
             <GridItem xs sm={3} md={3} style={{ marginTop: 13 }}>
               <FastField
                 name='isAllDateChecked'
-                render={(args) => {
+                render={args => {
                   return <Checkbox label='All Date' {...args} />
                 }}
               />
@@ -197,14 +203,14 @@ class SearchBar extends PureComponent {
             <GridItem xs sm={3} md={3} style={{ position: 'relative' }}>
               <FastField
                 name='copayerFK'
-                render={(args) => {
+                render={args => {
                   return (
                     <CodeSelect
                       {...args}
                       label='Company'
                       code='ctCopayer'
                       labelField='displayValue'
-                      localFilter={(item) => item.coPayerTypeFK === 1}
+                      localFilter={item => item.coPayerTypeFK === 1}
                     />
                   )
                 }}
@@ -213,7 +219,7 @@ class SearchBar extends PureComponent {
             <GridItem md={3}>
               <Field
                 name='dueStartDate'
-                render={(args) => (
+                render={args => (
                   <FilterBarDate
                     noTodayLimit
                     args={args}
@@ -230,7 +236,7 @@ class SearchBar extends PureComponent {
             <GridItem md={3}>
               <Field
                 name='dueEndDate'
-                render={(args) => (
+                render={args => (
                   <FilterBarDate
                     label='Statement Due End Date'
                     isEndDate
@@ -249,7 +255,7 @@ class SearchBar extends PureComponent {
             <GridItem xs sm={3} md={3} style={{ marginTop: 13 }}>
               <FastField
                 name='isAllDueDateChecked'
-                render={(args) => {
+                render={args => {
                   return <Checkbox label='All Date' {...args} />
                 }}
               />

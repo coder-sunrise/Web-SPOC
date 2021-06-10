@@ -8,7 +8,7 @@ import { Button, GridContainer, GridItem } from '@/components'
 import Authorized from '@/utils/Authorized'
 import { authorityConfig } from './config'
 
-const styles = (theme) => ({
+const styles = theme => ({
   container: {
     marginTop: theme.spacing(2),
   },
@@ -23,20 +23,22 @@ const styles = (theme) => ({
   clinicSettings,
 }))
 class ClaimSubmission extends PureComponent {
-  componentDidMount () {
+  componentDidMount() {
     const { clinicSettings } = this.props
     const isMedisaveEnable = clinicSettings.settings.isEnableMedisave // global medisave
     this.props.dispatch({
       type: 'claimSubmission/getClaimCount',
-      payload: isMedisaveEnable ? {
-        'ClaimCountListDto[0].SchemeType': 'CHAS',
-        'ClaimCountListDto[0].Status': 'New',
-        'ClaimCountListDto[1].SchemeType': 'Medisave',
-        'ClaimCountListDto[1].Status': 'New',
-      } : {
-        'ClaimCountListDto[0].SchemeType': 'CHAS',
-        'ClaimCountListDto[0].Status': 'New',
-      },
+      payload: isMedisaveEnable
+        ? {
+            'ClaimCountListDto[0].SchemeType': 'CHAS',
+            'ClaimCountListDto[0].Status': 'New',
+            'ClaimCountListDto[1].SchemeType': 'Medisave',
+            'ClaimCountListDto[1].Status': 'New',
+          }
+        : {
+            'ClaimCountListDto[0].SchemeType': 'CHAS',
+            'ClaimCountListDto[0].Status': 'New',
+          },
     })
   }
 
@@ -46,7 +48,7 @@ class ClaimSubmission extends PureComponent {
     history.push(`${location.pathname}/${currentTarget.id}`)
   }
 
-  render () {
+  render() {
     const { classes, claimSubmission } = this.props
     const { invoiceClaimCount } = claimSubmission
 
@@ -55,9 +57,9 @@ class ClaimSubmission extends PureComponent {
         <GridItem md={12} container>
           <Authorized authority='claimsubmission'>
             <Fragment>
-              {invoiceClaimCount.map((scheme) => {
+              {invoiceClaimCount.map(scheme => {
                 const authority = authorityConfig.find(
-                  (item) => item.type === scheme.schemeType,
+                  item => item.type === scheme.schemeType,
                 )
 
                 return (

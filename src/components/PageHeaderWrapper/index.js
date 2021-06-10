@@ -1,12 +1,12 @@
 import React from 'react'
-import { FormattedMessage } from 'umi/locale'
-import Link from 'umi/link'
+import Link, { FormattedMessage } from 'umi'
+
 import { connect } from 'dva'
 import Paper from '@material-ui/core/Paper'
 import PageHeader from '@/components/PageHeader'
+import MenuContext from '@/layouts/MenuContext'
 import GridContent from './GridContent'
 import styles from './index.less'
-import MenuContext from '@/layouts/MenuContext'
 
 const PageHeaderWrapper = ({
   children,
@@ -15,31 +15,13 @@ const PageHeaderWrapper = ({
   top,
   ...restProps
 }) => (
-  <div>
+  <div
+    className={wrapperClassName}
+    style={{ height: '100%', backgroundColor: '#fff' }}
+  >
     {top}
-    {/* <MenuContext.Consumer>
-      {value => (
-        <PageHeader
-          wide={contentWidth === 'Fixed'}
-          home={<FormattedMessage id="menu.home" defaultMessage="Home" />}
-          {...value}
-          key="pageheader"
-          {...restProps}
-          linkElement={Link}
-          itemRender={item => {
-            if (item.locale) {
-              return <FormattedMessage id={item.locale} defaultMessage={item.title} />
-            }
-            return item.title
-          }}
-        />
-      )}
-    </MenuContext.Consumer> */}
-    {children ? (
-      <div>
-        <GridContent>{children}</GridContent>
-      </div>
-    ) : null}
+
+    {children || null}
   </div>
 )
 

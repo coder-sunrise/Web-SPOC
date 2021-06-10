@@ -1,8 +1,5 @@
-import update from 'immutability-helper'
 import { createListViewModel } from 'medisys-model'
-import { getUniqueId } from '@/utils/utils'
-import { fakeSubmitForm } from '@/services/api'
-import * as service from '../Consumable/services'
+import service from '../Consumable/services'
 
 const namespace = 'consumable'
 export default createListViewModel({
@@ -42,12 +39,12 @@ export default createListViewModel({
       //     payload: response,
       //   })
       // },
-      *export (_, { call }) {
+      *export(_, { call }) {
         const result = yield call(service.export)
         return result
       },
 
-      *import ({ payload }, { call }) {
+      *import({ payload }, { call }) {
         const result = yield call(service.import, { content: payload.content })
         if (result === false) return false
         return result
@@ -73,17 +70,14 @@ export default createListViewModel({
       //     }),
       //   }
       // },
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         const { data } = payload
         return {
           ...st,
-          list: data.data.map((o) => {
+          list: data.data.map(o => {
             return {
               ...o,
-              effectiveDates: [
-                o.effectiveStartDate,
-                o.effectiveEndDate,
-              ],
+              effectiveDates: [o.effectiveStartDate, o.effectiveEndDate],
               uom: o.uom ? o.uom.id : null,
               favouriteSupplier: o.favouriteSupplier
                 ? o.favouriteSupplier.id

@@ -2,7 +2,7 @@ import { createFormViewModel } from 'medisys-model'
 import _ from 'lodash'
 import { subscribeNotification } from '@/utils/realtime'
 import { VALUE_KEYS } from '@/utils/constants'
-import * as service from '../services/queueDisplaySetup'
+import service from '../services/queueDisplaySetup'
 
 export default createFormViewModel({
   namespace: 'queueCalling',
@@ -18,7 +18,7 @@ export default createFormViewModel({
     },
     subscriptions: ({ dispatch, history, searchField, ...restValues }) => {
       subscribeNotification('QueueCalled', {
-        callback: (response) => {
+        callback: response => {
           const { qNo, roomNo } = response
           const newCalledQueue = { qNo, roomNo }
 
@@ -44,7 +44,7 @@ export default createFormViewModel({
     },
 
     effects: {
-      *getExistingQueueCallList ({ payload }, { call, put }) {
+      *getExistingQueueCallList({ payload }, { call, put }) {
         const r = yield call(service.query, payload)
         const { status, data } = r
         if (status === '200') {
@@ -60,7 +60,7 @@ export default createFormViewModel({
         }
         return false
       },
-      *getStatus ({ payload }, { call, put }) {
+      *getStatus({ payload }, { call, put }) {
         const r = yield call(service.getStatus, payload)
         const { status, data } = r
         if (status === '200') {
@@ -70,7 +70,7 @@ export default createFormViewModel({
         }
         return false
       },
-      *upsertQueueCallList ({ payload }, { call, put }) {
+      *upsertQueueCallList({ payload }, { call, put }) {
         const r = yield call(service.upsert, payload)
 
         if (r.length > 0) {
@@ -84,7 +84,7 @@ export default createFormViewModel({
         }
         return r
       },
-      *syncUp ({ payload }, { call, put }) {
+      *syncUp({ payload }, { call, put }) {
         const r = yield call(service.query, payload)
         const { status, data } = r
 
@@ -102,7 +102,7 @@ export default createFormViewModel({
         }
         return false
       },
-      *claearAll ({ payload }, { call, put }) {
+      *claearAll({ payload }, { call, put }) {
         const { key } = payload
         const r = yield call(service.query, { keys: key })
         const { status, data } = r
@@ -124,16 +124,16 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      setExistingQueueCallList (st, { payload }) {
+      setExistingQueueCallList(st, { payload }) {
         const { value, ...restValues } = payload.data
         const existingQCall = JSON.parse(value)
         // filter same queueNo and roomNo
         const uniqueQCall = _.uniqBy(existingQCall, 'qNo')
         let uniqueRoomCall = []
-        uniqueQCall.forEach((element) => {
+        uniqueQCall.forEach(element => {
           if (
             element.roomNo === '' ||
-            !uniqueRoomCall.find((o) => o.roomNo === element.roomNo)
+            !uniqueRoomCall.find(o => o.roomNo === element.roomNo)
           ) {
             uniqueRoomCall.push({ ...element })
           }
@@ -146,17 +146,14 @@ export default createFormViewModel({
           ...restValues,
         }
       },
-      refreshQueueCallList (st, { payload }) {
+      refreshQueueCallList(st, { payload }) {
         const { callingQueue } = payload
         const { pendingQCall, isSync } = st
 
         if (isSync) {
           let pendingCalls = []
 
-          pendingCalls = [
-            ...pendingQCall,
-            callingQueue,
-          ]
+          pendingCalls = [...pendingQCall, callingQueue]
 
           return {
             ...st,
@@ -170,21 +167,18 @@ export default createFormViewModel({
           tracker: callingQueue,
         }
       },
-      displayCallQueue (st, { payload }) {
+      displayCallQueue(st, { payload }) {
         const { qCallList, pendingQCall } = st
 
         let qArray = []
         // filter same queueNo and roomNo
-        let otherQCalls = qCallList.filter((q) => q.qNo !== pendingQCall[0].qNo)
+        let otherQCalls = qCallList.filter(q => q.qNo !== pendingQCall[0].qNo)
 
         otherQCalls = otherQCalls.filter(
-          (q) => q.roomNo === '' || q.roomNo !== pendingQCall[0].roomNo,
+          q => q.roomNo === '' || q.roomNo !== pendingQCall[0].roomNo,
         )
 
-        qArray = [
-          pendingQCall[0],
-          ...otherQCalls,
-        ]
+        qArray = [pendingQCall[0], ...otherQCalls]
 
         const remainingPendingQCall = pendingQCall.filter((q, idx) => idx !== 0)
         return {
@@ -197,25 +191,23 @@ export default createFormViewModel({
           pendingQCall: remainingPendingQCall,
         }
       },
-      clearCurrentQCall (st, { payload }) {
+      clearCurrentQCall(st, { payload }) {
         return {
           ...st,
           currentQCall: null,
         }
       },
-      claearAllDone (st, { payload }) {
+      claearAllDone(st, { payload }) {
         return {}
       },
-      getLatestQCall (st, { payload }) {
+      getLatestQCall(st, { payload }) {
         const { oriQCallList, pendingQCall } = st
         const { data, isSync } = payload
         const { value, ...restValues } = data
         const existingQCall = JSON.parse(value)
 
         const totalNewQCalled = existingQCall.length - oriQCallList.length
-        const newExistingQCall = [
-          ...existingQCall,
-        ].splice(0, totalNewQCalled)
+        const newExistingQCall = [...existingQCall].splice(0, totalNewQCalled)
 
         const newPendingQCall = [
           ...pendingQCall,
@@ -230,7 +222,7 @@ export default createFormViewModel({
           ...restValues,
         }
       },
-      updateisSyncStatus (st, { payload }) {
+      updateisSyncStatus(st, { payload }) {
         const { isSync } = payload
         return {
           ...st,

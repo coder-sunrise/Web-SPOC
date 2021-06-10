@@ -2,65 +2,34 @@ import React, { Suspense } from 'react'
 import NProgress from 'nprogress'
 import $ from 'jquery'
 import _ from 'lodash'
-import moment from 'moment'
 import { headerHeight } from 'mui-pro-jss'
+import { ProLayout } from '@medisys/component'
+import { connect, formatMessage, Link, getLocale } from 'umi'
 
-// import { renderWhenReady} from '@sencha/ext-react'
-// import { Panel } from '@sencha/ext-modern'
-import router from 'umi/router'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import DocumentTitle from 'react-document-title'
 import isEqual from 'lodash/isEqual'
 import memoizeOne from 'memoize-one'
-import { connect } from 'dva'
-import { ContainerQuery } from 'react-container-query'
 import cx from 'classnames'
 import pathToRegexp from 'path-to-regexp'
 import Media from 'react-media'
-import { formatMessage } from 'umi/locale'
 import { checkAuthoritys } from '@/utils/utils'
-
-// import { ToastComponent } from '@syncfusion/ej2-react-notifications'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
-// import {
-//   primaryColor,
-//   secondaryColor,
-//   dangerColor,
-//   roseColor,
-//   grayColor,
-//   fontColor,
-//   hoverColor,
-// } from 'mui-pro-jss'
-// import Sidebar from 'mui-pro-components/Sidebar'
-// import logo from '../assets/logo.svg'
-import image from 'assets/img/sidebar-2.jpg'
-// import logo from 'assets/img/logo-white.svg'
-import logo from 'assets/img/logo/logo_blue.png'
-// import logo from 'assets/img/logo/nscmh-logo-2.png'
 import withStyles from '@material-ui/core/styles/withStyles'
 import appStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/dashboardStyle.jsx'
-import Header from 'mui-pro-components/Header'
-import Footer from 'mui-pro-components/Footer'
 import Loading from '@/components/PageLoading/index'
 import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import { initStream } from '@/utils/realtime'
 import { initClinicSettings } from '@/utils/config'
 import Authorized, { reloadAuthorized } from '@/utils/Authorized'
 import defaultSettings from '@/defaultSettings'
+import styles from './BasicLayout.less'
+import RightContent from './components/RightContent'
 
-// import Footer from './Footer'
-// import Header from './Header'
-import { notification } from '@/components'
-import SiderMenu from '@/components/SiderMenu'
-import { getAuthority } from '@/utils/authority'
-import Context from './MenuContext'
 import ErrorBoundary from './ErrorBoundary'
-import Exception403 from '../pages/Exception/403'
-import Exception from '../components/Exception'
 import GlobalModalContainer from './GlobalModalContainer'
 
 initClinicSettings()
-
 // setInterval(() => {
 //   console.log(document.activeElement)
 //   // $(document.activeElement).trigger($.Event('keyup', { which: 49 }))
@@ -89,38 +58,12 @@ const _theme = createMuiTheme({
   },
 })
 
-// let ps
-const query = {
-  'screen-xs': {
-    maxWidth: 575,
-  },
-  'screen-sm': {
-    minWidth: 576,
-    maxWidth: 767,
-  },
-  'screen-md': {
-    minWidth: 768,
-    maxWidth: 991,
-  },
-  'screen-lg': {
-    minWidth: 992,
-    maxWidth: 1199,
-  },
-  'screen-xl': {
-    minWidth: 1200,
-    maxWidth: 1599,
-  },
-  'screen-xxl': {
-    minWidth: 1600,
-  },
-}
-
 const refreshTokenTimer = 10 * 60 * 1000
 const sessionTimeoutTimer = 30 * 60 * 1000
 // const sessionTimeoutTimer = 2500
 
 class BasicLayout extends React.PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       mobileOpen: false,
@@ -140,7 +83,7 @@ class BasicLayout extends React.PureComponent {
     let sessionTimeOutInterval = null
     this.refreshTokenInterval = null
 
-    const resetSessionTimeOut = (e) => {
+    const resetSessionTimeOut = e => {
       // console.log(e)
       clearTimeout(sessionTimeOutInterval)
       const now = Date.now()
@@ -175,12 +118,12 @@ class BasicLayout extends React.PureComponent {
     this.refreshToken()
   }
 
-  componentDidMount () {
+  componentDidMount() {
     window.addEventListener('resize', this.resize)
     this.resize()
   }
 
-  componentDidUpdate (e) {
+  componentDidUpdate(e) {
     if (e.history.location.pathname !== e.location.pathname) {
       if (window.mainPanel) window.mainPanel.scrollTop = 0
       if (this.state.mobileOpen) {
@@ -189,37 +132,9 @@ class BasicLayout extends React.PureComponent {
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.removeEventListener('resize', this.resize)
     clearInterval(this.refreshTokenInterval)
-  }
-
-  getContext () {
-    const { location } = this.props
-    return {
-      location,
-      breadcrumbNameMap: this.breadcrumbNameMap,
-    }
-  }
-
-  /**
-   * 获取面包屑映射
-   * @param {Object} menuData 菜单配置
-   */
-  getBreadcrumbNameMap (menus) {
-    // console.log('getBreadcrumbNameMap')
-    const routerMap = {}
-    const flattenMenuData = (data) => {
-      data.forEach((menuItem) => {
-        if (menuItem.children) {
-          flattenMenuData(menuItem.children)
-        }
-        // Reduce memory usage
-        routerMap[menuItem.path] = menuItem
-      })
-    }
-    flattenMenuData(menus)
-    return routerMap
   }
 
   refreshToken = () => {
@@ -246,10 +161,10 @@ class BasicLayout extends React.PureComponent {
 
       const currentUIVersion = currentSystemVersion['semr2-frontend']
         .split('.')
-        .map((item) => parseInt(item, 10))
+        .map(item => parseInt(item, 10))
       const latestUIVersion = latestSystemVersion['semr2-frontend']
         .split('.')
-        .map((item) => parseInt(item, 10))
+        .map(item => parseInt(item, 10))
 
       const shouldRefresh = latestUIVersion.reduce(
         (refresh, version, index) => {
@@ -264,45 +179,6 @@ class BasicLayout extends React.PureComponent {
       console.log({ error })
       return true
     }
-  }
-
-  redirectToAccessable = () => {
-    const { location } = this.props.history
-    const { pathname } = location
-    const _cloned = _.cloneDeep(this.menus)
-    const isAccessible = _cloned.reduce((canAccess, _menu) => {
-      const { children, path } = _menu
-      if (Array.isArray(children) && children.length > 0) {
-        const valid = children.find((child) => {
-          return pathToRegexp(child.path).test(pathname)
-        })
-
-        return canAccess || !!valid
-      }
-      return canAccess || pathToRegexp(path).test(pathname)
-    }, false)
-
-    if (isAccessible) return true
-    const [
-      firstMenu,
-    ] = _cloned
-
-    // check if menu has any sub menu
-    // redirect to first accessible sub menu
-    if (firstMenu.children && Array.isArray(firstMenu.children)) {
-      const [
-        firstChildren,
-      ] = firstMenu.children
-      if (firstChildren && typeof firstChildren.path === 'string') {
-        return this.props.history.push(firstChildren.path)
-      }
-    }
-
-    if (firstMenu && typeof firstMenu.path === 'string') {
-      return this.props.history.push(firstMenu.path)
-    }
-
-    return this.props.history.push('/not-found')
   }
 
   initNecessaryCodetable = () => {
@@ -361,19 +237,6 @@ class BasicLayout extends React.PureComponent {
       type: 'codetable/fetchAllCachedCodetable',
     })
 
-    const menus = await dispatch({
-      type: 'menu/getMenuData',
-      payload: { routes, authority },
-    })
-    this.getBreadcrumbNameMap = memoizeOne(this.getBreadcrumbNameMap, isEqual)
-    this.breadcrumbNameMap = this.getBreadcrumbNameMap(menus)
-    // console.log(this.breadcrumbNameMap)
-
-    this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual)
-    this.getPageTitle = memoizeOne(this.getPageTitle)
-    this.menus = menus
-    this.redirectToAccessable()
-
     this.setState({
       authorized: true,
     })
@@ -381,58 +244,6 @@ class BasicLayout extends React.PureComponent {
     const { pathname } = location
     checkAuthoritys(pathname, history)
   }
-
-  matchParamsPath = (pathname) => {
-    if (!this.breadcrumbNameMap) return null
-    // console.log('matchParamsPath', pathname, this.breadcrumbNameMap)
-    const pathKey = Object.keys(this.breadcrumbNameMap).find((key) =>
-      pathToRegexp(key).test(pathname),
-    )
-    return this.breadcrumbNameMap[pathKey]
-  }
-
-  getPageTitle = (pathname) => {
-    const currRouterData = this.matchParamsPath(pathname)
-    if (!currRouterData) {
-      return defaultSettings.appTitle
-    }
-    const pageName = formatMessage({
-      id: currRouterData.locale || currRouterData.name,
-      defaultMessage: currRouterData.name,
-    })
-    return `${pageName} - ${defaultSettings.appTitle}`
-  }
-
-  getLayoutStyle = () => {
-    const { fixSiderbar, isMobile, collapsed, layout } = this.props
-    if (fixSiderbar && layout !== 'topmenu' && !isMobile) {
-      return {
-        paddingLeft: collapsed ? '80px' : '256px',
-      }
-    }
-    return null
-  }
-
-  getContentStyle = () => {
-    const { fixedHeader } = this.props
-    return {
-      margin: '24px 24px 0',
-      paddingTop: fixedHeader ? 64 : 0,
-    }
-  }
-
-  // handleMenuCollapse = (collapsed) => {
-  //   const { dispatch } = this.props
-  //   dispatch({
-  //     type: 'global/changeLayoutCollapsed',
-  //     payload: collapsed,
-  //   })
-  //   console.log('handleMenuCollapse')
-  //   // $(window).trigger('resize')
-  //   setTimeout(() => {
-  //     this.triggerResizeEvent()
-  //   }, 5000)
-  // }
 
   resize = () => {
     if (window.innerWidth >= 960) {
@@ -448,24 +259,7 @@ class BasicLayout extends React.PureComponent {
     }
   }
 
-  sidebarMinimize = () => {
-    const { dispatch } = this.props
-    dispatch({
-      type: 'global/changeLayoutCollapsed',
-      payload: !this.props.collapsed,
-    }).then(() => {
-      // console.log('resize')
-      setTimeout(this.triggerResizeEvent, 500)
-    })
-  }
-
-  handleDrawerToggle = () => {
-    this.setState((preState) => ({
-      mobileOpen: !preState.mobileOpen,
-    }))
-  }
-
-  triggerResizeEvent () {
+  triggerResizeEvent() {
     // eslint-disable-line
     const event = document.createEvent('HTMLEvents')
     event.initEvent('resize', true, false)
@@ -482,129 +276,57 @@ class BasicLayout extends React.PureComponent {
   //   return <SettingDrawer />
   // };
 
-  renderChild = () => {
-    const { children } = this.props
-    const { authorized } = this.state
-    if (!authorized) return <Loading />
-
-    return children
-  }
-
-  render () {
+  render() {
     const { classes, loading, theme, ...props } = this.props
-    // console.log(props.collapsed)
     NProgress.start()
     if (!loading.global) {
       NProgress.done()
     }
     const {
-      navTheme,
-      layout: PropsLayout,
       children,
       location: { pathname },
-      isMobile,
-      menuData,
-      collapsed,
     } = this.props
-    // console.log(this.props)
-    const isTop = PropsLayout === 'topmenu'
-    // const routerConfig = this.matchParamsPath(pathname)
-    // console.log('routerConfig', routerConfig)
-    const mainPanel = `${classes.mainPanel} ${cx({
-      [classes.mainPanelSidebarMini]: collapsed,
-    })}`
-    // console.log(this.props)
-    // console.log(this)
-    // console.log(this.state.mainDivHeight, window.mainPanel)
     return (
       <React.Fragment>
         <MuiThemeProvider theme={_theme}>
           <CssBaseline />
-          <DocumentTitle title={this.getPageTitle(pathname)}>
-            <ContainerQuery query={query}>
-              {(params) => (
-                <Context.Provider value={this.getContext()}>
-                  <ErrorBoundary>
-                    <div id='main-page' className={cx(params)}>
-                      {!global.fullscreen && (
-                        <div className={classes.wrapper}>
-                          {isTop && !isMobile ? null : (
-                            <SiderMenu
-                              logo={logo}
-                              logoText={defaultSettings.appTitle}
-                              theme={navTheme}
-                              // onCollapse={this.handleMenuCollapse}
-                              menuData={menuData}
-                              isMobile={isMobile}
-                              image={image}
-                              // handleDrawerToggle={this.handleDrawerToggle}
-                              // open={this.state.mobileOpen}
-                              open={this.state.mobileOpen}
-                              color='blue'
-                              bgColor='black'
-                              handleDrawerToggle={this.handleDrawerToggle}
-                              {...props}
-                            />
-                            // <Sidebar
-                            //   routes={menuData}
-                            //   logoText="Creative Tim"
-                            //   logo={logo}
-                            //   image={image}
-                            //   handleDrawerToggle={this.handleDrawerToggle}
-                            //   open={this.state.mobileOpen}
-                            //   color="blue"
-                            //   bgColor="black"
-                            //   miniActive={collapsed}
-                            //   {...this.props}
-                            // />
-                          )}
-                          <div
-                            id='mainPanel-root'
-                            className={mainPanel}
-                            ref={(node) => {
-                              // this.mainPanel = node
-                              window.mainPanel = node
-                            }}
-                          >
-                            {/* <Header
-            menuData={menuData}
-            handleMenuCollapse={this.handleMenuCollapse}
-            logo={logo}
-            isMobile={isMobile}
-            {...props}
-          /> */}
-                            {/* <Affix target={() => window.mainPanel}> */}
-                            <Header
-                              sidebarMinimize={this.sidebarMinimize}
-                              miniActive={collapsed}
-                              menuData={menuData}
-                              breadcrumbNameMap={this.breadcrumbNameMap}
-                              // routes={dashboardRoutes}
-                              handleDrawerToggle={this.handleDrawerToggle}
-                              {...props}
-                            />
-                            {/* </Affix> */}
-                            <ErrorBoundary>
-                              <div className={classes.content}>
-                                <div className={classes.container}>
-                                  {this.renderChild()}
-                                </div>
-                              </div>
-                            </ErrorBoundary>
-                            {/* <Footer fluid /> */}
-                          </div>
-                        </div>
-                      )}
-
-                      {this.state.authorized && (
-                        <GlobalModalContainer {...props} />
-                      )}
-                    </div>
-                  </ErrorBoundary>
-                </Context.Provider>
-              )}
-            </ContainerQuery>
-          </DocumentTitle>
+          <div id='main-page' style={{ height: '100vh' }}>
+            <ErrorBoundary>
+              <ProLayout
+                // {...defaultProps}
+                {...props.setting}
+                route={props.route}
+                className={styles.root}
+                rightContentRender={() => <RightContent />}
+                fixedHeader
+                fixSiderbar
+                formatMessage={formatMessage}
+                menuItemRender={(menuItemProps, defaultDom) => {
+                  if (
+                    menuItemProps.isUrl ||
+                    !menuItemProps.path ||
+                    location.pathname === menuItemProps.path
+                  ) {
+                    return defaultDom
+                  }
+                  return <Link to={menuItemProps.path}>{defaultDom}</Link>
+                }}
+                breadcrumbRender={(routers = []) => [
+                  {
+                    path: '/',
+                    breadcrumbName: formatMessage({ id: 'menu.home' }),
+                  },
+                  ...routers,
+                ]}
+                location={{
+                  pathname,
+                }}
+              >
+                {children}
+              </ProLayout>
+              {this.state.authorized && <GlobalModalContainer {...props} />}
+            </ErrorBoundary>
+          </div>
           {/* <Suspense fallback={<PageLoading />}>{this.renderSettingDrawer()}</Suspense> */}
         </MuiThemeProvider>
       </React.Fragment>
@@ -613,15 +335,9 @@ class BasicLayout extends React.PureComponent {
 }
 
 export default withStyles(appStyle)(
-  connect(({ global, setting, menu, loading }) => ({
-    collapsed: global.collapsed,
-    layout: setting.layout,
-    menuData: menu.menuData,
-    ...setting,
+  connect(({ loading, setting }) => ({
+    // menuData: menu.menuData,
+    setting,
     loading,
-  }))((props) => (
-    <Media query='(max-width: 599px)'>
-      {(isMobile) => <BasicLayout {...props} isMobile={isMobile} />}
-    </Media>
-  )),
+  }))(BasicLayout),
 )

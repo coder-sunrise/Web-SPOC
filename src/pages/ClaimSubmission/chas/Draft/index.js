@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import $ from 'jquery'
 // formik
 import { withFormik } from 'formik'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components1
@@ -21,7 +21,7 @@ import TableGrid from '../TableGrid'
 // variables
 import { DraftCHASColumnExtensions, DraftCHASColumns } from './variables'
 
-const styles = (theme) => ({
+const styles = theme => ({
   cardContainer: {
     margin: 1,
   },
@@ -43,7 +43,7 @@ class DraftCHAS extends React.Component {
     selectedRows: [],
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.refreshDataGrid()
   }
 
@@ -53,7 +53,7 @@ class DraftCHAS extends React.Component {
     })
   }
 
-  handleSelectionChange = (selection) =>
+  handleSelectionChange = selection =>
     this.setState({ selectedRows: selection })
 
   onRefreshClicked = () => {
@@ -63,14 +63,14 @@ class DraftCHAS extends React.Component {
         type: 'chasClaimSubmissionDraft/refreshPatientDetails',
         payload: { claimIds: selectedRows },
       })
-      .then((r) => {
+      .then(r => {
         if (!r) {
           this.refreshDataGrid()
         }
       })
   }
 
-  render () {
+  render() {
     const overrideContextMenuOptions = [
       {
         id: 0,
@@ -121,7 +121,7 @@ class DraftCHAS extends React.Component {
                 selectable: true,
                 selectConfig: {
                   showSelectAll: true,
-                  rowSelectionEnabled: (row) => row.patientIsActive,
+                  rowSelectionEnabled: row => row.patientIsActive,
                 },
               }}
               selection={this.state.selectedRows}

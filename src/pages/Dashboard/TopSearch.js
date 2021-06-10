@@ -1,6 +1,6 @@
 import React, { memo } from 'react'
 import { Row, Col, Table, Tooltip, Card, Icon } from 'antd'
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 import Trend from '@/components/Trend'
 import numeral from 'numeral'
 import styles from './Analysis.less'
@@ -24,7 +24,7 @@ const columns = [
     ),
     dataIndex: 'keyword',
     key: 'keyword',
-    render: (text) => <a href='/'>{text}</a>,
+    render: text => <a href='/'>{text}</a>,
   },
   {
     title: (
@@ -124,7 +124,7 @@ const TopSearch = memo(({ loading, visitData2, searchData, dropdownGroup }) => (
       </Col>
     </Row>
     <Table
-      rowKey={(record) => record.index}
+      rowKey={record => record.index}
       size='small'
       columns={columns}
       dataSource={searchData}

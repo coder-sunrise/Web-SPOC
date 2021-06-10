@@ -1,11 +1,10 @@
 import React, { PureComponent } from 'react'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { GridContainer, CardContainer, GridItem, Button } from '@/components'
 import { downloadPrintingTool } from '../download'
 
-
 class PrintingTool extends PureComponent {
-  render () {
+  render() {
     return (
       <CardContainer hideHeader>
         <GridContainer>

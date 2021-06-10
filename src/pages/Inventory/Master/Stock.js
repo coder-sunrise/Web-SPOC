@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import { FastField } from 'formik'
 import _ from 'lodash'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import moment from 'moment'
 import { Radio } from 'antd'
 import Delete from '@material-ui/icons/Delete'
@@ -20,7 +20,7 @@ import {
 import Authorized from '@/utils/Authorized'
 import SharedContainer from './SharedContainer'
 
-const styles = (theme) => ({
+const styles = theme => ({
   infoPanl: {
     marginBottom: theme.spacing.unit * 2,
   },
@@ -55,13 +55,12 @@ const Stock = ({
     return ''
   }
 
-  const [
-    stock,
-    setStock,
-  ] = useState(_.sortBy(values[objectType().stockProp], 'id'))
+  const [stock, setStock] = useState(
+    _.sortBy(values[objectType().stockProp], 'id'),
+  )
 
-  const changeIsDefault = async (row) => {
-    const updatedStock = stock.map((batch) => {
+  const changeIsDefault = async row => {
+    const updatedStock = stock.map(batch => {
       if (batch.id === row.id) {
         return {
           ...batch,
@@ -86,20 +85,17 @@ const Stock = ({
     })
   }
 
-  const [
-    stockQty,
-    setStockQty,
-  ] = useState(0)
+  const [stockQty, setStockQty] = useState(0)
 
   useEffect(() => {
     let totalQty = 0
-    values[objectType().stockProp].forEach((o) => {
+    values[objectType().stockProp].forEach(o => {
       totalQty += o.stock
     })
     setStockQty(totalQty)
   }, [])
 
-  const handleDeleteStock = async (row) => {
+  const handleDeleteStock = async row => {
     const { stock: remainingQty, isDefault } = row
     if (hasActiveSession) {
       notification.warning({
@@ -122,7 +118,7 @@ const Stock = ({
       return
     }
 
-    const deletedStock = stock.find((batch) => batch.id === row.id)
+    const deletedStock = stock.find(batch => batch.id === row.id)
     deletedStock.isDeleted = true
     setStock(stock)
     await setFieldValue(objectType().stockProp, stock)
@@ -135,7 +131,7 @@ const Stock = ({
       },
     })
   }
-  const renderStockQty = (stockQuantity) => {
+  const renderStockQty = stockQuantity => {
     if (Number.isInteger(stockQuantity)) {
       return stockQuantity.toFixed(1)
     }
@@ -149,9 +145,7 @@ const Stock = ({
     return false
   }
 
-  const [
-    tableParas,
-  ] = useState({
+  const [tableParas] = useState({
     columns: [
       { name: 'batchNo', title: 'Batch No.' },
       { name: 'expiryDate', title: 'Expiry Date' },
@@ -165,14 +159,14 @@ const Stock = ({
     columnExtensions: [
       {
         columnName: 'batchNo',
-        render: (row) => (
+        render: row => (
           <p className={row.isDeleted && classes.isDeleted}>{row.batchNo}</p>
         ),
       },
       {
         columnName: 'stock',
         align: 'center',
-        render: (row) => (
+        render: row => (
           <p
             style={{ color: row.stock < 0 ? 'red' : 'black' }}
             className={row.isDeleted && classes.isDeleted}
@@ -184,20 +178,18 @@ const Stock = ({
       {
         columnName: 'expiryDate',
         align: 'center',
-        render: (row) => (
+        render: row => (
           <p className={row.isDeleted && classes.isDeleted}>
-            {row.expiryDate ? (
-              moment(row.expiryDate).format(dateFormatLong)
-            ) : (
-              '-'
-            )}
+            {row.expiryDate
+              ? moment(row.expiryDate).format(dateFormatLong)
+              : '-'}
           </p>
         ),
       },
       {
         columnName: 'isDefault',
         align: 'center',
-        render: (row) => {
+        render: row => {
           return (
             <Radio
               checked={row.isDefault}
@@ -211,7 +203,7 @@ const Stock = ({
         columnName: 'action',
         sortingEnabled: false,
         align: 'center',
-        render: (row) => {
+        render: row => {
           return (
             <Tooltip
               title={`Delete ${objectType().name} batch`}
@@ -249,7 +241,7 @@ const Stock = ({
           <GridItem xs={12} md={4}>
             <Field
               name={`${objectType().stockProp}`}
-              render={(args) => {
+              render={args => {
                 return (
                   <NumberInput
                     label={formatMessage({
@@ -267,7 +259,7 @@ const Stock = ({
           <GridItem xs={12} md={4}>
             <FastField
               name='reOrderThreshold'
-              render={(args) => {
+              render={args => {
                 return (
                   <NumberInput
                     label={formatMessage({
@@ -282,7 +274,7 @@ const Stock = ({
           <GridItem xs={12} md={4}>
             <FastField
               name='criticalThreshold'
-              render={(args) => {
+              render={args => {
                 return (
                   <NumberInput
                     label={formatMessage({

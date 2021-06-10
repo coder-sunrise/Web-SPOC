@@ -8,7 +8,7 @@ export default createBasicModel({
     // service,
     state: {},
     setting: {},
-    subscriptions: ({ dispatch, history }) => {},
+    subscriptions: ({ dispatch }) => {},
     effects: {},
     reducers: {},
   },

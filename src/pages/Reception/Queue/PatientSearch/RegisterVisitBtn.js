@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 // material ui
 import Add from '@material-ui/icons/Add'
 // custom component
@@ -15,7 +15,7 @@ class ViewDetailsBtn extends PureComponent {
     onClick(row.id)
   }
 
-  render () {
+  render() {
     // return (
     //   <Tooltip title='Register Visit'>
     //     <Button

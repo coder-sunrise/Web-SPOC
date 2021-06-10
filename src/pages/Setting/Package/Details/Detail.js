@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { FastField, Field } from 'formik'
 import { compose } from 'redux'
 
@@ -23,7 +23,7 @@ const Detail = () => {
       <GridItem xs={5} md={5}>
         <FastField
           name='code'
-          render={(args) => {
+          render={args => {
             return <TextField label='Package Code' maxLength={10} {...args} />
           }}
         />
@@ -32,7 +32,7 @@ const Detail = () => {
       <GridItem xs={5} md={5}>
         <FastField
           name='effectiveDates'
-          render={(args) => (
+          render={args => (
             <DateRangePicker
               format={dateFormatLong}
               label='Effective Start Date'
@@ -45,7 +45,7 @@ const Detail = () => {
       <GridItem xs={5} md={5}>
         <FastField
           name='displayValue'
-          render={(args) => {
+          render={args => {
             return <TextField label='Package Name' maxLength={255} {...args} />
           }}
         />
@@ -56,7 +56,7 @@ const Detail = () => {
           <GridItem xs={5} md={5}>
             <Field
               name='validDuration'
-              render={(args) => {
+              render={args => {
                 return (
                   <NumberInput
                     label='Valid Duration'
@@ -74,7 +74,7 @@ const Detail = () => {
           <GridItem xs={6} md={6}>
             <FastField
               name='durationUnitFK'
-              render={(args) => {
+              render={args => {
                 return (
                   <CodeSelect
                     label='Duration Unit'
@@ -90,7 +90,7 @@ const Detail = () => {
       <GridItem xs={5} md={5}>
         <FastField
           name='description'
-          render={(args) => {
+          render={args => {
             return <TextField label='Description' maxLength={500} {...args} />
           }}
         />
@@ -99,7 +99,7 @@ const Detail = () => {
       <GridItem xs={5} md={5}>
         <FastField
           name='remarks'
-          render={(args) => {
+          render={args => {
             return (
               <TextField
                 label='Remarks'

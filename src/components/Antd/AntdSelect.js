@@ -21,10 +21,11 @@ const STYLES = () => {
     // },
     selectContainer: {
       width: '100%',
+      overflow: 'hidden',
       boxSizing: 'content-box',
       // lineHeight: '1rem',
       color: 'currentColor',
-
+      position: 'absolute !important',
       '& > div': {
         // erase all border, and boxShadow
         // height: 31,
@@ -66,6 +67,24 @@ const STYLES = () => {
         // fontWeight: 400,
         // paddingTop: 3,
       },
+
+      '& .ant-select-selector': {
+        float: 'left',
+        width: '100%',
+        overflow: 'hidden',
+        // height: '24px !important',
+        border: '0px solid #fff !important',
+        backgroundColor: 'transparent !important',
+        padding: '0px !important',
+        transition: 'none !important',
+      },
+
+      '& .ant-select-selection-item': {
+        // lineHeight: '23px !important',
+      },
+      '& .ant-select-selection-search': {
+        left: '0px !important',
+      },
     },
   }
 }
@@ -106,7 +125,7 @@ class AntdSelect extends React.PureComponent {
     maxSelected: 0,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     const {
       form,
@@ -124,58 +143,31 @@ class AntdSelect extends React.PureComponent {
 
     let v = form && field ? field.value : props.value || props.defaultValue
     if (field) {
-      v = [
-        'multiple',
-        'tags',
-      ].includes(mode)
-        ? field.value || []
-        : field.value
-      if (
-        [
-          'multiple',
-          'tags',
-        ].includes(mode)
-      ) {
+      v = ['multiple', 'tags'].includes(mode) ? field.value || [] : field.value
+      if (['multiple', 'tags'].includes(mode)) {
         if (v.indexOf(allValue) >= 0 && options.length > 1 && v.length === 1) {
-          v = [
-            ...options.map((o) => o[valueField]),
-          ]
+          v = [...options.map(o => o[valueField])]
           if (disableAll === false) v.unshift(allValue)
           form.setFieldValue(field.name, v)
         }
       }
     } else if (value !== undefined) {
-      v = [
-        'multiple',
-        'tags',
-      ].includes(mode)
-        ? value || []
-        : value
-      if (
-        [
-          'multiple',
-          'tags',
-        ].includes(mode)
-      ) {
+      v = ['multiple', 'tags'].includes(mode) ? value || [] : value
+      if (['multiple', 'tags'].includes(mode)) {
         if (
           Array.isArray(v) &&
           v.indexOf(allValue) >= 0 &&
           options.length > 1 &&
           v.length === 1
         ) {
-          v = [
-            ...options.map((o) => o[valueField]),
-          ]
+          v = [...options.map(o => o[valueField])]
 
           if (disableAll === false) v.unshift(allValue)
         }
       }
     }
 
-    const shrink = [
-      'multiple',
-      'tags',
-    ].includes(mode)
+    const shrink = ['multiple', 'tags'].includes(mode)
       ? v && v.length > 0
       : v !== undefined
     this.state = {
@@ -183,7 +175,7 @@ class AntdSelect extends React.PureComponent {
       value: v,
       data:
         autoComplete && options && options.length > max
-          ? _.filter(options, (o) => o[valueField] === v)
+          ? _.filter(options, o => o[valueField] === v)
           : options,
       fetching: false,
       fetchId: 0,
@@ -192,8 +184,11 @@ class AntdSelect extends React.PureComponent {
     this.lastFetchId = 0
     this.fetchData = _.debounce(props.onFetchData || this.fetchData, 800)
 
-    const focus = (el) => {
-      if (!this.mouseover) $(el).find('.ant-select').trigger('click')
+    const focus = el => {
+      if (!this.mouseover)
+        $(el)
+          .find('.ant-select')
+          .trigger('click')
     }
     this.debounceFocus = _.debounce(focus, 100, {
       leading: true,
@@ -201,7 +196,7 @@ class AntdSelect extends React.PureComponent {
     })
   }
 
-  componentDidMount () {
+  componentDidMount() {
     if (
       this.state.value &&
       ((Array.isArray(this.state.value) && this.state.value.length > 0) ||
@@ -216,7 +211,7 @@ class AntdSelect extends React.PureComponent {
 
   // eslint-disable-next-line camelcase
   // eslint-disable-next-line react/sort-comp
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const {
       field,
       form,
@@ -232,23 +227,10 @@ class AntdSelect extends React.PureComponent {
     let v = this.state.value
     // console.log(v)
     if (field) {
-      v = [
-        'multiple',
-        'tags',
-      ].includes(mode)
-        ? field.value || []
-        : field.value
-      if (
-        [
-          'multiple',
-          'tags',
-        ].includes(mode)
-      ) {
+      v = ['multiple', 'tags'].includes(mode) ? field.value || [] : field.value
+      if (['multiple', 'tags'].includes(mode)) {
         if (v.indexOf(allValue) >= 0 && options.length > 1 && v.length === 1) {
-          v = [
-            allValue,
-            ...options.map((o) => Object.byString(o, valueField)),
-          ]
+          v = [allValue, ...options.map(o => Object.byString(o, valueField))]
 
           if (maxSelected) {
             v = v.slice(Math.max(v.length - maxSelected, 1))
@@ -267,7 +249,7 @@ class AntdSelect extends React.PureComponent {
       }
 
       if (mode === 'multiple' && disableAll === true && Array.isArray(v)) {
-        v = _.reject(v, (o) => o === allValue)
+        v = _.reject(v, o => o === allValue)
       }
 
       if (!_.isEqual(v, this.state.value)) {
@@ -277,23 +259,14 @@ class AntdSelect extends React.PureComponent {
         })
       }
     } else if (value !== undefined) {
-      v = [
-        'multiple',
-        'tags',
-      ].includes(mode)
+      v = ['multiple', 'tags'].includes(mode)
         ? value || []
-        : value === null ? undefined : value
-      if (
-        [
-          'multiple',
-          'tags',
-        ].includes(mode)
-      ) {
+        : value === null
+        ? undefined
+        : value
+      if (['multiple', 'tags'].includes(mode)) {
         if (v.indexOf(allValue) >= 0 && options.length > 1 && v.length === 1) {
-          v = [
-            allValue,
-            ...options.map((o) => Object.byString(o, valueField)),
-          ]
+          v = [allValue, ...options.map(o => Object.byString(o, valueField))]
         }
         if (
           mode === 'multiple' &&
@@ -305,7 +278,7 @@ class AntdSelect extends React.PureComponent {
         }
       }
       if (mode === 'multiple' && disableAll === true && Array.isArray(v)) {
-        v = _.reject(v, (o) => o === allValue)
+        v = _.reject(v, o => o === allValue)
       }
       if (!_.isEqual(v, this.state.value)) {
         this.setState({
@@ -315,12 +288,7 @@ class AntdSelect extends React.PureComponent {
       }
     } else if (!this.state.value || this.state.value.length) {
       this.setState({
-        value: [
-          'multiple',
-          'tags',
-        ].includes(mode)
-          ? []
-          : undefined,
+        value: ['multiple', 'tags'].includes(mode) ? [] : undefined,
         shrink: false,
       })
     }
@@ -330,7 +298,7 @@ class AntdSelect extends React.PureComponent {
       // && this.state.data.length === 0
     ) {
       this.setState({
-        data: _.filter(options, (o) => o[valueField] === v),
+        data: _.filter(options, o => o[valueField] === v),
       })
     }
   }
@@ -361,7 +329,7 @@ class AntdSelect extends React.PureComponent {
     return match
   }
 
-  handleFocus = (e) => {
+  handleFocus = e => {
     this.setState({ shrink: true, focus: true })
     this.debounceFocus(this.myRef.current)
     this.resizeChoiceContents()
@@ -398,7 +366,7 @@ class AntdSelect extends React.PureComponent {
     this.setState({ focus: false })
   }
 
-  handleValueChange = (val) => {
+  handleValueChange = val => {
     const {
       form,
       field,
@@ -414,28 +382,23 @@ class AntdSelect extends React.PureComponent {
       disableAll,
     } = this.props
     let newVal = val
-    if (
-      [
-        'multiple',
-        'tags',
-      ].includes(mode)
-    ) {
+    if (['multiple', 'tags'].includes(mode)) {
       // let _allValue = Object.byString(allValueOption, allValueOption)
       // console.log({ _allValue })
       if (val.indexOf(allValue) >= 0) {
         if (this.state.value.indexOf(allValue) >= 0) {
-          newVal = _.reject(newVal, (v) => v === allValue)
+          newVal = _.reject(newVal, v => v === allValue)
         } else {
           newVal = [
             allValue,
-            ...options.map((o) => Object.byString(o, valueField)),
+            ...options.map(o => Object.byString(o, valueField)),
           ]
         }
       } else if (this.state.value.indexOf(allValue) >= 0) {
         newVal = []
       }
       if (maxSelected && newVal.length > maxSelected) {
-        newVal = _.reject(newVal, (v) => v === allValue)
+        newVal = _.reject(newVal, v => v === allValue)
         newVal = newVal.slice(-maxSelected)
       }
       this.resizeChoiceContents()
@@ -445,25 +408,26 @@ class AntdSelect extends React.PureComponent {
     if (onChange) {
       if (!mode || mode === 'default') {
         const option = (autoComplete || query ? this.state.data : options).find(
-          (o) => o[valueField] === newVal,
+          o => o[valueField] === newVal,
         )
         proceed = onChange(newVal, option) !== false
       } else if (mode === 'multiple') {
         const opts = (autoComplete || query
           ? this.state.data
-          : options).filter((o) =>
-          newVal.find(
-            (m) =>
-              valueField === 'id'
-                ? parseInt(m, 10) === o[valueField]
-                : m === o[valueField],
+          : options
+        ).filter(o =>
+          newVal.find(m =>
+            valueField === 'id'
+              ? parseInt(m, 10) === o[valueField]
+              : m === o[valueField],
           ),
         )
         proceed = onChange(newVal, opts) !== false
       } else if (mode === 'tags') {
         const opts = (autoComplete || query
           ? this.state.data
-          : options).filter((o) => newVal.find((m) => m === o[valueField]))
+          : options
+        ).filter(o => newVal.find(m => m === o[valueField]))
         newVal = newVal.length === 0 ? '' : newVal
         proceed = onChange(newVal, opts) !== false
       }
@@ -477,12 +441,9 @@ class AntdSelect extends React.PureComponent {
           },
         })
       }
-      this.setState((ps) => {
+      this.setState(ps => {
         return {
-          shrink: [
-            'multiple',
-            'tags',
-          ].includes(mode)
+          shrink: ['multiple', 'tags'].includes(mode)
             ? newVal && newVal.length > 0
             : newVal !== undefined || ps.focus,
           value: newVal,
@@ -491,8 +452,8 @@ class AntdSelect extends React.PureComponent {
     }
   }
 
-  fetchData = async (value) => {
-    this.setState((prevState) => {
+  fetchData = async value => {
+    this.setState(prevState => {
       return { data: [], fetching: true, fetchId: ++prevState.fetchId }
     })
     if (this.props.query) {
@@ -509,7 +470,7 @@ class AntdSelect extends React.PureComponent {
       }
       this.setState({
         fetching: false,
-        data: data.map((o) => {
+        data: data.map(o => {
           return {
             ...o,
             name: o[labelField],
@@ -535,9 +496,10 @@ class AntdSelect extends React.PureComponent {
         data: _.filter(
           options,
           // (o) => o[labelField].toLowerCase().indexOf(search) >= 0,
-          (o) =>
-            Object.byString(o, labelField).toLowerCase().indexOf(search) >= 0 &&
-            localFilter(o),
+          o =>
+            Object.byString(o, labelField)
+              .toLowerCase()
+              .indexOf(search) >= 0 && localFilter(o),
         ).splice(0, max),
         fetching: false,
       })
@@ -548,7 +510,7 @@ class AntdSelect extends React.PureComponent {
     const { valueField, labelField, optionLabelLength = 0, mode } = this.props
 
     return source
-      .map((s) => {
+      .map(s => {
         // console.log({ label: Object.byString(s, labelField) })
         return {
           ...s,
@@ -567,22 +529,18 @@ class AntdSelect extends React.PureComponent {
             data={option}
             title={option.label}
             label={
-              optionLabelLength ? (
-                option.label.substring(0, optionLabelLength)
-              ) : (
-                option.label
-              )
+              optionLabelLength
+                ? option.label.substring(0, optionLabelLength)
+                : option.label
             }
             key={`select-${option.value}`}
             value={mode === 'tags' ? `${option.value}` : option.value}
             // key={option.id ? `${option.id}` : option.value}
             disabled={!!option.disabled || !isActive}
           >
-            {typeof renderDropdown === 'function' ? (
-              renderDropdown(option)
-            ) : (
-              option.label
-            )}
+            {typeof renderDropdown === 'function'
+              ? renderDropdown(option)
+              : option.label}
           </Select.Option>
         )
       })
@@ -621,10 +579,7 @@ class AntdSelect extends React.PureComponent {
       autoComplete || query
         ? this.state.data
         : [
-            ...([
-              'multiple',
-              'tags',
-            ].includes(restProps.mode) && !disableAll
+            ...(['multiple', 'tags'].includes(restProps.mode) && !disableAll
               ? [
                   allValueOption || {
                     [valueField]: allValue,
@@ -642,7 +597,7 @@ class AntdSelect extends React.PureComponent {
     if (source[0] && source[0][groupField]) {
       const groups = _.groupBy(source, groupField)
       const group = Object.values(groups)
-      opts = group.map((g) => {
+      opts = group.map(g => {
         return (
           <Select.OptGroup key={g[0].title} label={g[0].title}>
             {this.getSelectOptions(g, renderDropdown)}
@@ -655,7 +610,7 @@ class AntdSelect extends React.PureComponent {
     // console.log(opts)
     if (this.props.text) {
       const match = source.find(
-        (o) => Object.byString(o, this.props.valueField) === this.state.value,
+        o => Object.byString(o, this.props.valueField) === this.state.value,
       )
       let text = ''
       if (match) {
@@ -698,18 +653,15 @@ class AntdSelect extends React.PureComponent {
         // onMouseLeave={onMouseLeave}
       >
         <Select
-          className={classnames([
-            classes.selectContainer,
-            className,
-          ])}
+          className={classnames([classes.selectContainer, className])}
           dropdownClassName={classnames(classes.dropdownMenu)}
           showSearch
           // defaultOpen
           onChange={this.handleValueChange}
-          onMouseEnter={(e) => {
+          onMouseEnter={e => {
             this.mouseover = true
           }}
-          onMouseLeave={(e) => {
+          onMouseLeave={e => {
             this.mouseover = false
           }}
           onFocus={extendFunc(onFocus, this.handleFocus)}
@@ -720,18 +672,19 @@ class AntdSelect extends React.PureComponent {
           // optionFilterProp={labelField}
           allowClear={allowClear}
           dropdownMatchSelectWidth={dropdownMatchSelectWidth}
-          maxTagPlaceholder={(vv) => {
-            const selectItem = vv.filter((o) => o !== allValue)
+          maxTagPlaceholder={vv => {
+            const selectItem = vv.filter(o => o !== allValue)
             if (selectItem.length < 1) return null
             if (selectItem.length === 1) {
               const selectOption = opts.find(
-                (opt) => opt.props.value === selectItem[0],
+                opt => opt.props.value === selectItem[0],
               )
               if (selectOption) return selectOption.props.label
               return null
             }
-            return `${vv.filter((o) => o !== allValue)
-              .length} ${customTagPlaceholder} selected`
+            return `${
+              vv.filter(o => o !== allValue).length
+            } ${customTagPlaceholder} selected`
           }}
           optionLabelProp='label'
           notFoundContent={
@@ -739,11 +692,9 @@ class AntdSelect extends React.PureComponent {
               <Spin size='small' />
             ) : (
               <p>
-                {this.state.fetchId === 0 && (autoComplete || query) ? (
-                  'Input Search Text'
-                ) : (
-                  'Not Found'
-                )}
+                {this.state.fetchId === 0 && (autoComplete || query)
+                  ? 'Input Search Text'
+                  : 'Not Found'}
               </p>
             )
           }
@@ -756,7 +707,7 @@ class AntdSelect extends React.PureComponent {
     )
   }
 
-  render () {
+  render() {
     const { props } = this
     const { classes, mode, onChange, isLoading, ...restProps } = props
     const { value } = this.state

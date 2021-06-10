@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'dva'
 import $ from 'jquery'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 // formik
 import { withFormik } from 'formik'
 // material ui
@@ -26,7 +26,7 @@ import {
   RejectedMedisaveColumns,
 } from './variables'
 
-const styles = (theme) => ({
+const styles = theme => ({
   cardContainer: {
     margin: 1,
   },
@@ -49,7 +49,7 @@ class RejectedMedisave extends React.Component {
     isLoading: false,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.refreshDataGrid()
   }
 
@@ -60,7 +60,7 @@ class RejectedMedisave extends React.Component {
         type: 'medisaveClaimSubmissionRejected/refreshPatientDetails',
         payload: { claimIds: selectedRows },
       })
-      .then((r) => {
+      .then(r => {
         if (!r) {
           this.refreshDataGrid()
           notification.success({
@@ -76,7 +76,7 @@ class RejectedMedisave extends React.Component {
     })
   }
 
-  handleSelectionChange = (selection) =>
+  handleSelectionChange = selection =>
     this.setState({ selectedRows: selection })
 
   handleLoadingVisibility = (visibility = false) =>
@@ -91,10 +91,10 @@ class RejectedMedisave extends React.Component {
           type: 'medisaveClaimSubmissionRejected/resubmitMedisaveClaim',
           payload: { claimIds: selectedRows },
         })
-        .then((r) => {
+        .then(r => {
           this.handleLoadingVisibility(false)
           if (r) {
-            const failedCount = r.filter((t) => t.status !== 'SUCCESS').length
+            const failedCount = r.filter(t => t.status !== 'SUCCESS').length
             if (failedCount === 0) {
               notification.success({
                 message: 'Claim Re-Submission Success.',
@@ -109,7 +109,7 @@ class RejectedMedisave extends React.Component {
     }
   }
 
-  render () {
+  render() {
     const {
       classes,
       medisaveClaimSubmissionRejected,
@@ -155,13 +155,14 @@ class RejectedMedisave extends React.Component {
                   selectable: true,
                   selectConfig: {
                     showSelectAll: true,
-                    rowSelectionEnabled: (row) => row.patientIsActive,
+                    rowSelectionEnabled: row => row.patientIsActive,
                   },
                 }}
                 selection={this.state.selectedRows}
                 onSelectionChange={this.handleSelectionChange}
                 onContextMenuItemClick={(row, id) =>
-                  handleContextMenuItemClick(row, id, true)}
+                  handleContextMenuItemClick(row, id, true)
+                }
                 type='rejected'
                 height={height}
               />

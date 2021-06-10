@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { Divider } from '@material-ui/core'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import Add from '@material-ui/icons/Add'
 
 import { amountProps } from './variables'
@@ -28,7 +28,7 @@ class InvoiceSummary extends PureComponent {
     settingGSTPercentage: 0,
   }
 
-  static getDerivedStateFromProps (props, state) {
+  static getDerivedStateFromProps(props, state) {
     const { clinicSettings } = props
     const { settings } = clinicSettings
 
@@ -60,7 +60,7 @@ class InvoiceSummary extends PureComponent {
     setTimeout(() => handleCalcInvoiceSummary(), 1)
   }
 
-  render () {
+  render() {
     const { settingGSTEnable, settingGSTPercentage } = this.state
     const {
       toggleInvoiceAdjustment,
@@ -98,7 +98,7 @@ class InvoiceSummary extends PureComponent {
 
         <FieldArray
           name='adjustmentList'
-          render={(arrayHelpers) => {
+          render={arrayHelpers => {
             this.arrayHelpers = arrayHelpers
             if (!adjustmentList) return null
             return adjustmentList.map((v, i) => {
@@ -133,7 +133,7 @@ class InvoiceSummary extends PureComponent {
 
               <Field
                 name={`${prefix}IsGSTEnabled`}
-                render={(args) => (
+                render={args => (
                   <Switch
                     style={{
                       position: 'relative',
@@ -155,7 +155,7 @@ class InvoiceSummary extends PureComponent {
             >
               <FastField
                 name={`${prefix}gstAmount`}
-                render={(args) => {
+                render={args => {
                   return <NumberInput {...amountProps} {...args} />
                 }}
               />
@@ -165,7 +165,7 @@ class InvoiceSummary extends PureComponent {
               <GridItem xs={10} md={3} style={{ paddingLeft: 28 }}>
                 <FastField
                   name={`${prefix}IsGSTInclusive`}
-                  render={(args) => {
+                  render={args => {
                     return (
                       <Tooltip
                         title={formatMessage({
@@ -177,7 +177,7 @@ class InvoiceSummary extends PureComponent {
                           label={formatMessage({
                             id: 'app.general.inclusiveGST',
                           })}
-                          onChange={(e) => this.onChangeGstToggle(true, e)}
+                          onChange={e => this.onChangeGstToggle(true, e)}
                           {...args}
                         />
                       </Tooltip>
@@ -202,7 +202,7 @@ class InvoiceSummary extends PureComponent {
           <GridItem xs={10} md={3}>
             <FastField
               name={`${prefix}totalAmount`}
-              render={(args) => {
+              render={args => {
                 return (
                   <NumberInput
                     prefix={formatMessage({

@@ -71,13 +71,8 @@ import {
   NumberInput,
   Switch,
 } from '@/components'
-import { widgets } from '@/utils/widgets'
-import Yup from '@/utils/yup'
-import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
-import { deepDiffMapper } from '@/utils/cdrss'
-import Loading from '@/components/PageLoading'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
   container: {
     width: '100%',
@@ -106,7 +101,7 @@ const styles = (theme) => ({
 })
 
 class ControlTest extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.editorRef = React.createRef()
   }
@@ -119,7 +114,7 @@ class ControlTest extends PureComponent {
   //   console.log(deepDiffMapper.map(this.props, prevProps, true))
   // }
 
-  componentDidMount () {
+  componentDidMount() {
     const myTheme = {
       'common.bi.image':
         'https://uicdn.toast.com/toastui/img/tui-image-editor-bi.png',
@@ -238,7 +233,7 @@ class ControlTest extends PureComponent {
       //   'lena',
       // )
       .loadImageFromURL(imgTest, 'test')
-      .then((result) => {
+      .then(result => {
         // console.log({ result })
         console.log(this.editorInstance.getCanvasSize())
 
@@ -268,7 +263,7 @@ class ControlTest extends PureComponent {
         // this.redrawCanvas(editorInstance)
         // console.log(editorInstance.getCanvasSize())
       })
-      .catch((error) => {
+      .catch(error => {
         console.log({ error })
       })
   }
@@ -303,7 +298,7 @@ class ControlTest extends PureComponent {
   //   container[0].style['margin-right'] = 'auto'
   // }
 
-  render () {
+  render() {
     const { props, state } = this
     const { classes, theme, ...resetProps } = this.props
     console.log(this.props)

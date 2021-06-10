@@ -2,14 +2,14 @@ import React, { PureComponent } from 'react'
 // formik
 import { Field } from 'formik'
 // umi
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi'
 // common components
 import { NumberInput, CommonCard, GridContainer, GridItem } from '@/components'
-import FormField from './formField'
 import Authorized from '@/utils/Authorized'
+import FormField from './formField'
 
 class VitalSignCard extends PureComponent {
-  render () {
+  render() {
     const accessRight = Authorized.check('queue.registervisit.vitalsign')
 
     if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
@@ -26,7 +26,7 @@ class VitalSignCard extends PureComponent {
           <GridItem xs={12} sm={4} md={3}>
             <Field
               name={FormField['vitalsign.temperatureC']}
-              render={(args) => (
+              render={args => (
                 <NumberInput
                   {...args}
                   format='0.0'
@@ -46,7 +46,7 @@ class VitalSignCard extends PureComponent {
           <GridItem xs={12} sm={4} md={3}>
             <Field
               name={FormField['vitalsign.bpSysMMHG']}
-              render={(args) => (
+              render={args => (
                 <NumberInput
                   {...args}
                   // disabled={isReadOnly}
@@ -63,7 +63,7 @@ class VitalSignCard extends PureComponent {
           <GridItem xs={12} sm={4} md={3}>
             <Field
               name={FormField['vitalsign.bpDiaMMHG']}
-              render={(args) => (
+              render={args => (
                 <NumberInput
                   {...args}
                   // disabled={isReadOnly}
@@ -80,7 +80,7 @@ class VitalSignCard extends PureComponent {
           <GridItem xs={12} sm={4} md={3}>
             <Field
               name={FormField['vitalsign.pulseRateBPM']}
-              render={(args) => (
+              render={args => (
                 <NumberInput
                   {...args}
                   // disabled={isReadOnly}
@@ -99,7 +99,7 @@ class VitalSignCard extends PureComponent {
           <GridItem xs={12} sm={4} md={3}>
             <Field
               name={FormField['vitalsign.weightKG']}
-              render={(args) => (
+              render={args => (
                 <NumberInput
                   {...args}
                   // disabled={isReadOnly}
@@ -124,7 +124,7 @@ class VitalSignCard extends PureComponent {
           <GridItem xs={12} sm={4} md={3}>
             <Field
               name={FormField['vitalsign.heightCM']}
-              render={(args) => (
+              render={args => (
                 <NumberInput
                   {...args}
                   precision={0}
@@ -150,7 +150,7 @@ class VitalSignCard extends PureComponent {
           <GridItem xs={12} sm={4} md={3}>
             <Field
               name={FormField['vitalsign.bmi']}
-              render={(args) => (
+              render={args => (
                 <NumberInput
                   {...args}
                   label={formatMessage({

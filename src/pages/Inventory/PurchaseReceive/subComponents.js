@@ -1,9 +1,9 @@
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import PurchaseOrder from './Details/PurchaseOrder'
 import DeliveryOrder from './Details/DeliveryOrder'
 import Payment from './Details/Payment'
 
-export const tabbedPaneAvailability = (status) => {
+export const tabbedPaneAvailability = status => {
   const allowedStatus = [
     // 'Draft',
     1,

@@ -1,7 +1,7 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import { notification } from '@/components'
-import * as service from '@/services/deposit'
+import service from '@/services/deposit'
 
 export default createListViewModel({
   namespace: 'deposit',
@@ -26,7 +26,7 @@ export default createListViewModel({
       })
     },
     effects: {
-      *bizSessionList ({ payload }, { call, put }) {
+      *bizSessionList({ payload }, { call, put }) {
         const response = yield call(service.queryBizSession, payload)
         yield put({
           type: 'updateBizSessionList',
@@ -34,11 +34,11 @@ export default createListViewModel({
         })
       },
 
-      *updateDeposit ({ payload }, { call, put }) {
+      *updateDeposit({ payload }, { call, put }) {
         const response = yield call(service.upsertDeposit, payload)
         return response
       },
-      *deleteTransaction ({ payload }, { call, put }) {
+      *deleteTransaction({ payload }, { call, put }) {
         const result = yield call(service.deleteTransaction, payload)
         if (result === 204) {
           notification.success({ message: 'Deleted' })
@@ -46,12 +46,12 @@ export default createListViewModel({
       },
     },
     reducers: {
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         const { data } = payload
 
         return {
           ...st,
-          list: data.data.map((o) => {
+          list: data.data.map(o => {
             return {
               ...o,
             }
@@ -59,7 +59,7 @@ export default createListViewModel({
         }
       },
 
-      queryOneDone (st, { payload }) {
+      queryOneDone(st, { payload }) {
         const { data } = payload
         return {
           ...st,
@@ -67,11 +67,11 @@ export default createListViewModel({
         }
       },
 
-      updateBizSessionList (state, { payload }) {
+      updateBizSessionList(state, { payload }) {
         const { data } = payload
         return {
           ...state,
-          bizSessionList: data.map((x) => {
+          bizSessionList: data.map(x => {
             return {
               value: x.id,
               name: x.sessionNo,

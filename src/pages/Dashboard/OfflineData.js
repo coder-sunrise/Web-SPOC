@@ -1,9 +1,9 @@
-import React, { memo } from 'react';
-import { Card, Tabs, Row, Col } from 'antd';
-import { formatMessage, FormattedMessage } from 'umi/locale';
-import styles from './Analysis.less';
-import { TimelineChart, Pie } from '@/components/Charts';
-import NumberInfo from '@/components/NumberInfo';
+import React, { memo } from 'react'
+import { Card, Tabs, Row, Col } from 'antd'
+import { formatMessage, FormattedMessage } from 'umi'
+import { TimelineChart, Pie } from '@/components/Charts'
+import NumberInfo from '@/components/NumberInfo'
+import styles from './Analysis.less'
 
 const CustomTab = ({ data, currentTabKey: currentKey }) => (
   <Row gutter={8} style={{ width: 138, margin: '8px 0' }}>
@@ -11,7 +11,10 @@ const CustomTab = ({ data, currentTabKey: currentKey }) => (
       <NumberInfo
         title={data.name}
         subTitle={
-          <FormattedMessage id="app.analysis.conversion-rate" defaultMessage="Conversion Rate" />
+          <FormattedMessage
+            id='app.analysis.conversion-rate'
+            defaultMessage='Conversion Rate'
+          />
         }
         gap={2}
         total={`${data.cvr * 100}%`}
@@ -30,9 +33,9 @@ const CustomTab = ({ data, currentTabKey: currentKey }) => (
       />
     </Col>
   </Row>
-);
+)
 
-const { TabPane } = Tabs;
+const { TabPane } = Tabs
 
 const OfflineData = memo(
   ({ activeKey, loading, offlineData, offlineChartData, handleTabChange }) => (
@@ -44,7 +47,10 @@ const OfflineData = memo(
     >
       <Tabs activeKey={activeKey} onChange={handleTabChange}>
         {offlineData.map(shop => (
-          <TabPane tab={<CustomTab data={shop} currentTabKey={activeKey} />} key={shop.name}>
+          <TabPane
+            tab={<CustomTab data={shop} currentTabKey={activeKey} />}
+            key={shop.name}
+          >
             <div style={{ padding: '0 24px' }}>
               <TimelineChart
                 height={400}
@@ -59,7 +65,7 @@ const OfflineData = memo(
         ))}
       </Tabs>
     </Card>
-  )
-);
+  ),
+)
 
-export default OfflineData;
+export default OfflineData

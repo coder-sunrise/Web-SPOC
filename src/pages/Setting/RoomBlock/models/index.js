@@ -1,7 +1,7 @@
 import moment from 'moment'
 import { createListViewModel } from 'medisys-model'
 import { notification } from '@/components'
-import * as service from '../services'
+import service from '../services'
 
 export default createListViewModel({
   namespace: 'roomBlock',
@@ -17,11 +17,14 @@ export default createListViewModel({
       currentViewRoomBlock: {},
     },
     subscriptions: ({ dispatch, history }) => {
-      history.listen(async (location) => {
+      history.listen(async location => {
         const { pathname } = location
         if (pathname === '/setting/roomblock') {
           const dateFrom = moment().formatUTC()
-          const dateTo = moment().add(6, 'months').endOf('day').formatUTC(false)
+          const dateTo = moment()
+            .add(6, 'months')
+            .endOf('day')
+            .formatUTC(false)
           dispatch({
             type: 'query',
             payload: {
@@ -34,16 +37,14 @@ export default createListViewModel({
       })
     },
     effects: {
-      *queryAll ({ payload }, { all, call, put }) {
+      *queryAll({ payload }, { all, call, put }) {
         let mergeResult = []
         const response = yield call(service.getList, payload)
 
         const { status, data } = response
         if (parseInt(status, 10) === 200) {
           const { data: list, totalRecords, pageSize, currentPage } = data
-          mergeResult = [
-            ...list,
-          ]
+          mergeResult = [...list]
           const totalPage = Math.ceil(totalRecords / 10)
           if (totalPage > 1) {
             const serviceCalls = []
@@ -59,16 +60,10 @@ export default createListViewModel({
 
             if (allResult) {
               const _flatten = allResult.reduce(
-                (_all, result) => [
-                  ..._all,
-                  ...result.data.data,
-                ],
+                (_all, result) => [..._all, ...result.data.data],
                 [],
               )
-              mergeResult = [
-                ...list,
-                ..._flatten,
-              ]
+              mergeResult = [...list, ..._flatten]
             }
           }
 
@@ -80,7 +75,7 @@ export default createListViewModel({
           })
         }
       },
-      *refresh (_, { call, put }) {
+      *refresh(_, { call, put }) {
         yield put({
           type: 'queryAll',
           payload: {
@@ -88,7 +83,7 @@ export default createListViewModel({
           },
         })
       },
-      *update ({ payload }, { call }) {
+      *update({ payload }, { call }) {
         const result = yield call(service.save, payload)
         if (result) {
           notification.success({ message: 'Room Block(s) updated' })
@@ -98,7 +93,7 @@ export default createListViewModel({
       },
     },
     reducers: {
-      queryOneDone (state, { payload }) {
+      queryOneDone(state, { payload }) {
         return { ...state, currentViewRoomBlock: payload.data }
       },
     },

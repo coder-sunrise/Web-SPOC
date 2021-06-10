@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import router from 'umi/router'
+import { history } from 'umi'
 // dva
 import { connect } from 'dva'
 // custom components
@@ -37,9 +37,7 @@ const FuncConfig = {
   pager: false,
   sort: true,
   sortConfig: {
-    defaultSorting: [
-      { columnName: 'queueNo', direction: 'asc' },
-    ],
+    defaultSorting: [{ columnName: 'queueNo', direction: 'asc' }],
   },
 }
 const TableConfig = {
@@ -65,10 +63,7 @@ const TableConfig = {
     { name: 'patientMobile', title: 'Phone' },
     { name: 'action', title: 'Action' },
   ],
-  leftColumns: [
-    'visitStatus',
-    'queueNo',
-  ],
+  leftColumns: ['visitStatus', 'queueNo'],
 }
 
 @connect(({ queueLog, calendar, global, loading }) => ({
@@ -101,14 +96,14 @@ class DetailsGrid extends PureComponent {
       { columnName: 'timeOut', width: 160, type: 'time' },
       {
         columnName: 'gender/age',
-        render: (row) =>
+        render: row =>
           row.gender && row.age ? `${row.gender}/${row.age}` : '',
         sortBy: 'genderFK',
       },
       {
         columnName: 'appointmentTime',
         width: 160,
-        render: (row) => {
+        render: row => {
           if (row.appointmentTime) {
             return DateFormatter({ value: row.appointmentTime, full: true })
           }
@@ -118,23 +113,23 @@ class DetailsGrid extends PureComponent {
       },
       {
         columnName: 'doctor',
-        render: (row) => <DoctorLabel doctor={row.doctor} />,
+        render: row => <DoctorLabel doctor={row.doctor} />,
       },
       {
         columnName: 'action',
         align: 'center',
-        render: (row) => this.Cell(row),
+        render: row => this.Cell(row),
       },
     ],
   }
 
-  onRowDoubleClick = (row) => {
+  onRowDoubleClick = row => {
     this.props.handleEditVisitClick({
       visitID: row.id,
     })
   }
 
-  onViewDispenseClick = (queue) => {
+  onViewDispenseClick = queue => {
     const { dispatch, location } = this.props
     const href = `${location.pathname}/dispense/${queue.visitRefNo}`
 
@@ -145,15 +140,15 @@ class DetailsGrid extends PureComponent {
         name: queue.visitRefNo,
       },
     })
-    router.push(href)
+    history.push(href)
   }
 
-  onViewPatientProfileClick = (row) => {
+  onViewPatientProfileClick = row => {
     const { patientProfileFK } = row
     this.props.onViewPatientProfileClick(patientProfileFK)
   }
 
-  deleteQueueConfirmation = (row) => {
+  deleteQueueConfirmation = row => {
     const { queueNo, id } = row
     const { dispatch } = this.props
 
@@ -167,7 +162,7 @@ class DetailsGrid extends PureComponent {
     })
   }
 
-  deleteQueue = (id) => {
+  deleteQueue = id => {
     const { dispatch } = this.props
     dispatch({
       type: 'queueLog/deleteQueueByQueueID',
@@ -186,10 +181,12 @@ class DetailsGrid extends PureComponent {
         })
         break
       case '1':
-        router.push(`/reception/queue/dispense/${row.visitReferenceNo}`)
+        history.push(`/reception/queue/dispense/${row.visitReferenceNo}`)
         break
       case '1.1':
-        router.push(`/reception/queue/dispense/${row.visitReferenceNo}/billing`)
+        history.push(
+          `/reception/queue/dispense/${row.visitReferenceNo}/billing`,
+        )
         break
       case '2':
         this.deleteQueueConfirmation(row)
@@ -198,17 +195,21 @@ class DetailsGrid extends PureComponent {
         this.onViewPatientProfileClick(row)
         break
       case '4':
-        router.push(`/reception/queue/patientdashboard?qid=${row.id}`)
+        history.push(`/reception/queue/patientdashboard?qid=${row.id}`)
         break
       case '5':
-        router.push(
-          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md=cons`,
+        history.push(
+          `/reception/queue/patientdashboard?qid=${
+            row.id
+          }&v=${Date.now()}&md=cons`,
         )
 
         break
       case '6':
-        router.push(
-          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md=cons&action=resume`,
+        history.push(
+          `/reception/queue/patientdashboard?qid=${
+            row.id
+          }&v=${Date.now()}&md=cons&action=resume`,
         )
 
         break
@@ -220,7 +221,7 @@ class DetailsGrid extends PureComponent {
     }
   }
 
-  Cell = (row) => {
+  Cell = row => {
     const { visitStatus } = row
     if (visitStatus === VISIT_STATUS.UPCOMING_APPT) {
       return (
@@ -247,7 +248,7 @@ class DetailsGrid extends PureComponent {
     )
 
     const enableDispense = dispensedStatuses.includes(row.visitStatus)
-    const newContextMenuOptions = ContextMenuOptions.map((opt) => {
+    const newContextMenuOptions = ContextMenuOptions.map(opt => {
       switch (opt.id) {
         case 0: // view visit
           return { ...opt, hidden: !isStatusWaiting }
@@ -292,7 +293,7 @@ class DetailsGrid extends PureComponent {
     )
   }
 
-  render () {
+  render() {
     const {
       calendar = { calendarEvents: [] },
       queueLog,

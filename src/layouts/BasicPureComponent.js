@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { FormattedMessage, formatMessage } from 'umi/locale'
+import { FormattedMessage, formatMessage } from 'umi'
 import { withStyles } from '@material-ui/core/styles'
 
 import {
@@ -11,7 +11,7 @@ import {
 } from '@/components'
 
 class BasicPureComponent extends PureComponent {
-  shouldComponentUpdate (nextProps, nextStates) {
+  shouldComponentUpdate(nextProps, nextStates) {
     console.log(this.props)
     console.log(nextProps)
 
@@ -25,7 +25,7 @@ class BasicPureComponent extends PureComponent {
     return true
   }
 
-  render () {
+  render() {
     // console.log(this)
     const { children } = this.props
     return <React.Fragment>{children}</React.Fragment>

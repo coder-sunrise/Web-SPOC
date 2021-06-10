@@ -1,7 +1,7 @@
 import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 import { withStyles } from '@material-ui/core'
 
 // import Custom components
@@ -43,10 +43,7 @@ const CommonHeader = ({
 CommonHeader.propTypes = {
   // Icon: PropTypes.object,
   // titleId: PropTypes.string.isRequired,
-  children: PropTypes.oneOfType([
-    PropTypes.object,
-    PropTypes.array,
-  ]).isRequired,
+  children: PropTypes.oneOfType([PropTypes.object, PropTypes.array]).isRequired,
 }
 
 export default withStyles(styles)(CommonHeader)

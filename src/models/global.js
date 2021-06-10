@@ -1,9 +1,7 @@
 import { createFormViewModel } from 'medisys-model'
 import { queryNotices } from '@/services/api'
 import { getSystemVersion } from '@/services/system'
-import { notification } from '@/components'
 
-import config from '@/utils/config'
 // console.log(
 //   localStorage.getItem('menuCollapsed') !== undefined,
 //   Boolean(localStorage.getItem('menuCollapsed')),
@@ -74,14 +72,14 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *fetchNotices (_, { call, put, select }) {
+      *fetchNotices(_, { call, put, select }) {
         const data = yield call(queryNotices)
         yield put({
           type: 'saveNotices',
           payload: data,
         })
         const unreadCount = yield select(
-          (state) => state.global.notices.filter((item) => !item.read).length,
+          state => state.global.notices.filter(item => !item.read).length,
         )
         yield put({
           type: 'user/changeNotifyCount',
@@ -91,14 +89,14 @@ export default createFormViewModel({
           },
         })
       },
-      *clearNotices ({ payload }, { put, select }) {
+      *clearNotices({ payload }, { put, select }) {
         yield put({
           type: 'saveClearedNotices',
           payload,
         })
-        const count = yield select((state) => state.global.notices.length)
+        const count = yield select(state => state.global.notices.length)
         const unreadCount = yield select(
-          (state) => state.global.notices.filter((item) => !item.read).length,
+          state => state.global.notices.filter(item => !item.read).length,
         )
         yield put({
           type: 'user/changeNotifyCount',
@@ -108,9 +106,9 @@ export default createFormViewModel({
           },
         })
       },
-      *changeNoticeReadState ({ payload }, { put, select }) {
-        const notices = yield select((state) =>
-          state.global.notices.map((item) => {
+      *changeNoticeReadState({ payload }, { put, select }) {
+        const notices = yield select(state =>
+          state.global.notices.map(item => {
             const notice = { ...item }
             if (notice.id === payload) {
               notice.read = true
@@ -126,11 +124,11 @@ export default createFormViewModel({
           type: 'user/changeNotifyCount',
           payload: {
             totalCount: notices.length,
-            unreadCount: notices.filter((item) => !item.read).length,
+            unreadCount: notices.filter(item => !item.read).length,
           },
         })
       },
-      *changeLayoutCollapsed ({ payload }, { put, select }) {
+      *changeLayoutCollapsed({ payload }, { put, select }) {
         // console.log(payload, 'menuCollapsed')
         localStorage.setItem('menuCollapsed', payload ? 1 : 0)
 
@@ -141,7 +139,7 @@ export default createFormViewModel({
           },
         })
       },
-      *getUserSettings ({ payload }, { put, select }) {
+      *getUserSettings({ payload }, { put, select }) {
         // localStorage.setItem('menuCollapsed', payload ? 1 : 0)
         // const mockUserConfig = {
         //   currencySymbol: '$',
@@ -156,7 +154,7 @@ export default createFormViewModel({
         //   },
         // })
       },
-      *getSystemVersion (_, { call, put }) {
+      *getSystemVersion(_, { call, put }) {
         const response = yield call(getSystemVersion)
         if (response && response.data) {
           const { data } = response
@@ -173,24 +171,24 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      saveVersion (state, { payload }) {
+      saveVersion(state, { payload }) {
         localStorage.setItem('systemVersion', JSON.stringify(payload))
         return { ...state, systemVersion: { ...payload } }
       },
-      saveNotices (state, { payload }) {
+      saveNotices(state, { payload }) {
         return {
           ...state,
           notices: payload,
         }
       },
-      incrementCommitCount (state) {
+      incrementCommitCount(state) {
         const _commitCount = state.commitCount ? state.commitCount + 1 : 1
         return { ...state, commitCount: _commitCount }
       },
-      saveClearedNotices (state, { payload }) {
+      saveClearedNotices(state, { payload }) {
         return {
           ...state,
-          notices: state.notices.filter((item) => item.type !== payload),
+          notices: state.notices.filter(item => item.type !== payload),
         }
       },
     },

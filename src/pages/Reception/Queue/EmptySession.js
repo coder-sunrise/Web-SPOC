@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 // umi
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 // material ui
 import { LinearProgress, withStyles } from '@material-ui/core'
 import PlayCircleOutline from '@material-ui/icons/PlayCircleOutline'
@@ -29,7 +29,7 @@ class EmptySession extends PureComponent {
     isLastSessionClosed: false,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.checkLastSession()
   }
 
@@ -37,9 +37,7 @@ class EmptySession extends PureComponent {
     try {
       const bizSessionPayload = {
         pagesize: 1,
-        sorting: [
-          { columnName: 'sessionStartDate', direction: 'desc' },
-        ],
+        sorting: [{ columnName: 'sessionStartDate', direction: 'desc' }],
       }
       const result = await getBizSession(bizSessionPayload)
       const { data } = result.data
@@ -64,7 +62,7 @@ class EmptySession extends PureComponent {
     handleReopenLastSession()
   }
 
-  render () {
+  render() {
     const { classes, loading, sessionInfo } = this.props
     const { id } = sessionInfo
     const showLoading = loading.effects['queueLog/getSessionInfo']
@@ -82,20 +80,27 @@ class EmptySession extends PureComponent {
               <LinearProgress />
             </React.Fragment>
           )}
-          {!showLoading &&
-          showStartSession && (
+          {!showLoading && showStartSession && (
             <React.Fragment>
               <h3>
                 <FormattedMessage id='reception.queue.emptyState' />
               </h3>
               <Authorized authority='queue.startsession'>
-                <ProgressButton color='primary' onClick={this.onStartClick} icon={<PlayCircleOutline />}>
+                <ProgressButton
+                  color='primary'
+                  onClick={this.onStartClick}
+                  icon={<PlayCircleOutline />}
+                >
                   <FormattedMessage id='reception.queue.startSession' />
                 </ProgressButton>
               </Authorized>
               {isLastSessionClosed && (
                 <Authorized authority='queue.reopenlastsession'>
-                  <ProgressButton color='primary' onClick={this.onReopenClick} icon={<Replay />}>
+                  <ProgressButton
+                    color='primary'
+                    onClick={this.onReopenClick}
+                    icon={<Replay />}
+                  >
                     <FormattedMessage id='reception.queue.reopenLastSession' />
                   </ProgressButton>
                 </Authorized>

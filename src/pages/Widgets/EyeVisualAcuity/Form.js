@@ -35,11 +35,11 @@ import {
   FieldArray,
   FastField,
 } from '@/components'
-import model from './models'
+// import model from './models'
 
-window.g_app.replaceModel(model)
+// window.g_app.replaceModel(model)
 
-const styles = (theme) => ({
+const styles = theme => ({
   table: {
     '& th': {
       textAlign: 'center',
@@ -83,19 +83,16 @@ const styles = (theme) => ({
 //   visualAcuity,
 // }))
 class Form extends React.PureComponent {
-  componentDidMount () {}
+  componentDidMount() {}
 
   handleUpdateAttachments = ({ added, deleted }) => {
-    const { values: { visitAttachment = [] }, setFieldValue } = this.props
-    let updated = [
-      ...visitAttachment,
-    ]
+    const {
+      values: { visitAttachment = [] },
+      setFieldValue,
+    } = this.props
+    let updated = [...visitAttachment]
 
-    if (added)
-      updated = [
-        ...updated,
-        ...added,
-      ]
+    if (added) updated = [...updated, ...added]
 
     if (deleted)
       updated = updated.reduce((attachments, item) => {
@@ -103,15 +100,9 @@ class Form extends React.PureComponent {
           (item.fileIndexFK !== undefined && item.fileIndexFK === deleted) ||
           (item.fileIndexFK === undefined && item.id === deleted)
         )
-          return [
-            ...attachments,
-            { ...item, isDeleted: true },
-          ]
+          return [...attachments, { ...item, isDeleted: true }]
 
-        return [
-          ...attachments,
-          { ...item },
-        ]
+        return [...attachments, { ...item }]
       }, [])
     setFieldValue('visitAttachment', updated)
   }
@@ -122,7 +113,7 @@ class Form extends React.PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { state, props } = this
     const {
       theme,
@@ -143,7 +134,7 @@ class Form extends React.PureComponent {
       <div style={{ minWidth: 700 }}>
         <FieldArray
           name={prefix}
-          render={(arrayHelpers) => {
+          render={arrayHelpers => {
             const { form } = arrayHelpers
             const { values } = form
             const ary = Object.byString(values, prefix)
@@ -201,7 +192,7 @@ class Form extends React.PureComponent {
                               >
                                 <FastField
                                   name={`${_prefix}isAided`}
-                                  render={(args) => {
+                                  render={args => {
                                     return (
                                       <Switch
                                         onOffMode={false}
@@ -215,7 +206,7 @@ class Form extends React.PureComponent {
                                 />
                                 <FastField
                                   name={`${_prefix}isOwnSpecs`}
-                                  render={(args) => {
+                                  render={args => {
                                     return (
                                       <Checkbox label='Own Specs' {...args} />
                                     )
@@ -228,11 +219,11 @@ class Form extends React.PureComponent {
                                 >
                                   <FastField
                                     name={`${_prefix}isRefractionOn`}
-                                    render={(args) => {
+                                    render={args => {
                                       return (
                                         <Checkbox
                                           label='Refraction On'
-                                          onChange={(e) => {
+                                          onChange={e => {
                                             if (e.target.value === false) {
                                               args.form.setFieldValue(
                                                 `${_prefix}refractionOnRemarks`,
@@ -247,7 +238,7 @@ class Form extends React.PureComponent {
                                   />
                                   <Field
                                     name={`${_prefix}refractionOnRemarks`}
-                                    render={(args) => {
+                                    render={args => {
                                       return (
                                         <TextField
                                           disabled={
@@ -280,7 +271,7 @@ class Form extends React.PureComponent {
                                   <span style={{ marginTop: 5 }}>D</span>
                                   <FastField
                                     name={`${_prefix}nearVADOD`}
-                                    render={(args) => {
+                                    render={args => {
                                       return <TextField {...cfg} {...args} />
                                     }}
                                   />
@@ -291,7 +282,7 @@ class Form extends React.PureComponent {
                                   <span style={{ marginTop: 5 }}>PH</span>
                                   <FastField
                                     name={`${_prefix}nearVAPHOD`}
-                                    render={(args) => {
+                                    render={args => {
                                       return <TextField {...cfg} {...args} />
                                     }}
                                   />
@@ -303,7 +294,7 @@ class Form extends React.PureComponent {
                                   <span style={{ marginTop: 5 }}>N</span>
                                   <FastField
                                     name={`${_prefix}nearVANOD`}
-                                    render={(args) => {
+                                    render={args => {
                                       return (
                                         <TextField
                                           suffix='@'
@@ -319,7 +310,7 @@ class Form extends React.PureComponent {
                               <GridItem xs={3}>
                                 <FastField
                                   name={`${_prefix}nearVAcmOD`}
-                                  render={(args) => {
+                                  render={args => {
                                     return (
                                       <TextField
                                         suffix='cm'
@@ -341,7 +332,7 @@ class Form extends React.PureComponent {
                                   <span style={{ marginTop: 5 }}>D</span>
                                   <FastField
                                     name={`${_prefix}nearVADOS`}
-                                    render={(args) => {
+                                    render={args => {
                                       return <TextField {...cfg} {...args} />
                                     }}
                                   />
@@ -352,7 +343,7 @@ class Form extends React.PureComponent {
                                   <span style={{ marginTop: 5 }}>PH</span>
                                   <FastField
                                     name={`${_prefix}nearVAPHOS`}
-                                    render={(args) => {
+                                    render={args => {
                                       return <TextField {...cfg} {...args} />
                                     }}
                                   />
@@ -364,7 +355,7 @@ class Form extends React.PureComponent {
                                   <span style={{ marginTop: 5 }}>N</span>
                                   <FastField
                                     name={`${_prefix}nearVANOS`}
-                                    render={(args) => {
+                                    render={args => {
                                       return (
                                         <TextField
                                           suffix='@'
@@ -380,7 +371,7 @@ class Form extends React.PureComponent {
                               <GridItem xs={3}>
                                 <FastField
                                   name={`${_prefix}nearVAcmOS`}
-                                  render={(args) => {
+                                  render={args => {
                                     return (
                                       <TextField
                                         suffix='cm'
@@ -408,11 +399,11 @@ class Form extends React.PureComponent {
                               >
                                 <FastField
                                   name={`${_prefix}isNoSpec`}
-                                  render={(args) => {
+                                  render={args => {
                                     return (
                                       <Checkbox
                                         label='No Specs'
-                                        onChange={(e) => {
+                                        onChange={e => {
                                           if (e.target.value === true) {
                                             args.form.setFieldValue(
                                               `${_prefix}specsAge`,
@@ -460,7 +451,7 @@ class Form extends React.PureComponent {
                                 <TextField value='Specs Rx' text />
                                 <Field
                                   name={`${_prefix}specsAge`}
-                                  render={(args) => {
+                                  render={args => {
                                     return (
                                       <TextField
                                         extraClasses={{
@@ -483,7 +474,7 @@ class Form extends React.PureComponent {
                               <GridItem xs={3}>
                                 <Field
                                   name={`${_prefix}specSphereOD`}
-                                  render={(args) => {
+                                  render={args => {
                                     return (
                                       <TextField
                                         suffix='/'
@@ -498,7 +489,7 @@ class Form extends React.PureComponent {
                               <GridItem xs={3}>
                                 <Field
                                   name={`${_prefix}specCylinderOD`}
-                                  render={(args) => {
+                                  render={args => {
                                     return (
                                       <TextField
                                         suffix='X'
@@ -513,7 +504,7 @@ class Form extends React.PureComponent {
                               <GridItem xs={3}>
                                 <Field
                                   name={`${_prefix}specAxisOD`}
-                                  render={(args) => {
+                                  render={args => {
                                     return (
                                       <TextField
                                         suffix='('
@@ -528,7 +519,7 @@ class Form extends React.PureComponent {
                               <GridItem xs={3}>
                                 <Field
                                   name={`${_prefix}specVaOD`}
-                                  render={(args) => {
+                                  render={args => {
                                     return (
                                       <TextField
                                         suffix=')'
@@ -547,7 +538,7 @@ class Form extends React.PureComponent {
                               <GridItem xs={3}>
                                 <Field
                                   name={`${_prefix}specSphereOS`}
-                                  render={(args) => {
+                                  render={args => {
                                     return (
                                       <TextField
                                         suffix='/'
@@ -562,7 +553,7 @@ class Form extends React.PureComponent {
                               <GridItem xs={3}>
                                 <Field
                                   name={`${_prefix}specCylinderOS`}
-                                  render={(args) => {
+                                  render={args => {
                                     return (
                                       <TextField
                                         suffix='X'
@@ -577,7 +568,7 @@ class Form extends React.PureComponent {
                               <GridItem xs={3}>
                                 <Field
                                   name={`${_prefix}specAxisOS`}
-                                  render={(args) => {
+                                  render={args => {
                                     return (
                                       <TextField
                                         suffix='('
@@ -592,7 +583,7 @@ class Form extends React.PureComponent {
                               <GridItem xs={3}>
                                 <Field
                                   name={`${_prefix}specVaOS`}
-                                  render={(args) => {
+                                  render={args => {
                                     return (
                                       <TextField
                                         suffix=')'
@@ -615,7 +606,7 @@ class Form extends React.PureComponent {
                         <GridItem xs={12}>
                           <FastField
                             name={`${_prefix}remark`}
-                            render={(args) => {
+                            render={args => {
                               return (
                                 <OutlinedTextField
                                   label='Remarks'

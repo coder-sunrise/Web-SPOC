@@ -1,9 +1,8 @@
 import React, { Component, Fragment } from 'react'
 // import { connect } from 'dva'
-import router from 'umi/router'
+import { history, formatMessage } from 'umi'
 import _ from 'lodash'
 import { withStyles } from '@material-ui/core'
-import { formatMessage } from 'umi/locale'
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -19,6 +18,7 @@ import { podoOrderType } from '@/utils/codes'
 import { INVOICE_STATUS, PURCHASE_ORDER_STATUS } from '@/utils/constants'
 import AuthorizedContext from '@/components/Context/Authorized'
 import AmountSummary from '@/pages/Shared/AmountSummary'
+import Warining from '@material-ui/icons/Error'
 import {
   isPOStatusDraft,
   poSubmitAction,
@@ -30,9 +30,8 @@ import {
 } from '../../variables'
 import POGrid from './POGrid'
 import POForm from './POForm'
-import Warining from '@material-ui/icons/Error'
 
-const styles = (theme) => ({
+const styles = theme => ({
   errorMsgStyle: {
     margin: theme.spacing(2),
     color: '#cf1322',
@@ -63,34 +62,34 @@ const styles = (theme) => ({
       purchaseOrderDate: Yup.date().required(),
     }),
     rows: Yup.array()
-      .compact((x) => x.isDeleted)
+      .compact(x => x.isDeleted)
       .required('At least one item is required.'),
   }),
-  handleSubmit: () => { },
+  handleSubmit: () => {},
 })
 class Index extends Component {
   state = {
     showReport: false,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.getPOdata()
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.dispatch({
       type: 'purchaseOrderDetails/initializePurchaseOrder',
     })
   }
 
-  getPOdata = (createdId) => {
+  getPOdata = createdId => {
     const { purchaseOrderDetails } = this.props
     const { id, type } = purchaseOrderDetails
     switch (type) {
       // Duplicate order
       case 'dup':
         if (createdId) {
-          router.push(
+          history.push(
             `/inventory/pr/pdodetails?id=${createdId}&&type=${'edit'}`,
           )
           this.props.dispatch({
@@ -114,7 +113,7 @@ class Index extends Component {
       // Create new order
       default:
         if (createdId && type === 'new') {
-          router.push(
+          history.push(
             `/inventory/pr/pdodetails?id=${createdId}&&type=${'edit'}`,
           )
           this.props.dispatch({
@@ -153,7 +152,7 @@ class Index extends Component {
     })
   }
 
-  onSubmitButtonClicked = async (action) => {
+  onSubmitButtonClicked = async action => {
     const { dispatch, validateForm, history } = this.props
     let dispatchType = 'purchaseOrderDetails/savePO'
     let processedPayload = {}
@@ -164,7 +163,10 @@ class Index extends Component {
       this.props.handleSubmit()
     } else {
       const submit = () => {
-        if (action === poSubmitAction.FINALIZE && processedPayload.totalAfterAdj < 0) {
+        if (
+          action === poSubmitAction.FINALIZE &&
+          processedPayload.totalAfterAdj < 0
+        ) {
           window.g_app._store.dispatch({
             type: 'global/updateAppState',
             payload: {
@@ -172,23 +174,34 @@ class Index extends Component {
               isInformType: true,
               customWidth: 'md',
               openConfirmContent: () => {
-                return <div>
-                  <Warining style={{ width: '1.3rem', height: '1.3rem', marginLeft: '10px', color: 'red' }} />
-                  <h3 style={{ marginLeft: '10px', display: 'inline-block' }}>Unable to save, total amount cannot be <span style={{ fontWeight: 400 }}>negative</span>.</h3>
-                </div>
+                return (
+                  <div>
+                    <Warining
+                      style={{
+                        width: '1.3rem',
+                        height: '1.3rem',
+                        marginLeft: '10px',
+                        color: 'red',
+                      }}
+                    />
+                    <h3 style={{ marginLeft: '10px', display: 'inline-block' }}>
+                      Unable to save, total amount cannot be{' '}
+                      <span style={{ fontWeight: 400 }}>negative</span>.
+                    </h3>
+                  </div>
+                )
               },
               openConfirmText: 'OK',
               onConfirmClose: () => {
                 window.g_app._store.dispatch({
                   type: 'global/updateAppState',
                   payload: {
-                    customWidth: undefined
-                  }
+                    customWidth: undefined,
+                  },
                 })
               },
             },
           })
-          return
           return
         }
         dispatch({
@@ -196,7 +209,7 @@ class Index extends Component {
           payload: {
             ...processedPayload,
           },
-        }).then((r) => {
+        }).then(r => {
           if (r) {
             if (
               action === poSubmitAction.SAVE ||
@@ -215,7 +228,7 @@ class Index extends Component {
               const { id } = r
               this.getPOdata(id)
             } else {
-              router.push('/inventory/pr')
+              history.push('/inventory/pr')
             }
           }
         })
@@ -290,8 +303,8 @@ class Index extends Component {
     let newPurchaseOrderStatusFK = purchaseOrderStatusFK
     if (type === 'new') {
       newPurchaseOrderStatusFK = PURCHASE_ORDER_STATUS.DRAFT
-      purchaseOrderItem = rows.map((x) => {
-        const itemType = podoOrderType.find((y) => y.value === x.type)
+      purchaseOrderItem = rows.map(x => {
+        const itemType = podoOrderType.find(y => y.value === x.type)
         return {
           isDeleted: x.isDeleted || false,
           inventoryItemTypeFK: itemType.value,
@@ -317,15 +330,15 @@ class Index extends Component {
       newPurchaseOrderStatusFK = PURCHASE_ORDER_STATUS.DRAFT
       delete purchaseOrder.id
       delete purchaseOrder.concurrencyToken
-      newPoAdjustment = poAdjustment.map((adj) => {
+      newPoAdjustment = poAdjustment.map(adj => {
         delete adj.id
         delete adj.concurrencyToken
         delete adj.purchaseOrderFK
         return adj
       })
 
-      purchaseOrderItem = rows.map((x) => {
-        const itemType = podoOrderType.find((y) => y.value === x.type)
+      purchaseOrderItem = rows.map(x => {
+        const itemType = podoOrderType.find(y => y.value === x.type)
         return {
           inventoryItemTypeFK: itemType.value,
           orderQuantity: x.orderQuantity,
@@ -355,8 +368,8 @@ class Index extends Component {
         newPurchaseOrderStatusFK = purchaseOrder.purchaseOrderStatusFK
       }
 
-      purchaseOrderItem = rows.map((x) => {
-        const itemType = podoOrderType.find((y) => y.value === x.type)
+      purchaseOrderItem = rows.map(x => {
+        const itemType = podoOrderType.find(y => y.value === x.type)
         let result = {}
 
         if (x.isNew && !x.isDeleted) {
@@ -393,7 +406,7 @@ class Index extends Component {
 
     let purchaseOrderTotalAfterGst = 0
     let purchaseOrderTotalAfterAdj = 0
-    purchaseOrderItem.map((x) => {
+    purchaseOrderItem.map(x => {
       purchaseOrderTotalAfterGst += x.totalAfterGst
       purchaseOrderTotalAfterAdj += x.totalAfterAdjustments
       return x
@@ -410,7 +423,7 @@ class Index extends Component {
       invoiceStatusFK: 3, // Soe will double confirm whether this will be done at server side
       purchaseOrderItem,
       purchaseOrderAdjustment: newPoAdjustment || [
-        ...poAdjustment.map((adj) => {
+        ...poAdjustment.map(adj => {
           if (adj.isNew) {
             delete adj.id
           }
@@ -430,12 +443,12 @@ class Index extends Component {
     let totalAdjustmentAmount = 0
 
     const filteredPurchaseOrderAdjustment = purchaseOrderAdjustment.filter(
-      (x) => !x.isDeleted,
+      x => !x.isDeleted,
     )
-    const filteredPurchaseOrderItem = rows.filter((x) => !x.isDeleted)
+    const filteredPurchaseOrderItem = rows.filter(x => !x.isDeleted)
 
     // Calculate all unitPrice
-    filteredPurchaseOrderItem.map((row) => {
+    filteredPurchaseOrderItem.map(row => {
       tempInvoiceTotal += row.totalPrice
       row.tempSubTotal = row.totalPrice
       return null
@@ -454,7 +467,7 @@ class Index extends Component {
             adj.adjDisplayAmount = 0
           }
 
-          filteredPurchaseOrderItem.map((item) => {
+          filteredPurchaseOrderItem.map(item => {
             const itemLevelAmount = calculateItemLevelAdjustment(
               adj.adjType,
               adj.adjValue,
@@ -498,7 +511,7 @@ class Index extends Component {
         return null
       })
     } else {
-      filteredPurchaseOrderItem.map((item) => {
+      filteredPurchaseOrderItem.map(item => {
         if (!isGSTEnabled) {
           item.itemLevelGST = 0
         } else if (isGstInclusive) {
@@ -525,13 +538,13 @@ class Index extends Component {
     }, 1)
   }
 
-  handleDeleteInvoiceAdjustment = (adjustmentList) => {
+  handleDeleteInvoiceAdjustment = adjustmentList => {
     const { setFieldValue } = this.props
     setFieldValue('purchaseOrderAdjustment', adjustmentList)
   }
 
   toggleReport = () => {
-    this.setState((preState) => ({
+    this.setState(preState => ({
       showReport: !preState.showReport,
     }))
   }
@@ -560,7 +573,7 @@ class Index extends Component {
     return 'enable'
   }
 
-  render () {
+  render() {
     const {
       purchaseOrderDetails,
       values,
@@ -577,8 +590,7 @@ class Index extends Component {
       gstValue,
       deliveryOrder = [],
       purchaseOrderPayment = [],
-    } =
-      purchaseOrder || false
+    } = purchaseOrder || false
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
@@ -632,7 +644,7 @@ class Index extends Component {
                     gstAmtField: 'itemLevelGST',
                     gstValue: currentGstValue,
                   }}
-                  onValueChanged={(v) => {
+                  onValueChanged={v => {
                     setFieldValue('purchaseOrder.totalAmount', v.summary.total)
                     setFieldValue(
                       'purchaseOrder.totalAfterAdj',
@@ -649,7 +661,7 @@ class Index extends Component {
 
                     setFieldValue(
                       'purchaseOrderAdjustment',
-                      v.adjustments.map((a) => {
+                      v.adjustments.map(a => {
                         return {
                           sequence: a.index + 1,
                           ...a,
@@ -686,7 +698,8 @@ class Index extends Component {
                     icon={null}
                     authority='none'
                     onClick={() =>
-                      this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
+                      this.onSubmitButtonClicked(poSubmitAction.CANCEL)
+                    }
                   >
                     {formatMessage({
                       id: 'inventory.pr.detail.pod.cancelpo',
@@ -710,7 +723,8 @@ class Index extends Component {
                   icon={null}
                   authority='none'
                   onClick={() =>
-                    this.onSubmitButtonClicked(poSubmitAction.COMPLETE)}
+                    this.onSubmitButtonClicked(poSubmitAction.COMPLETE)
+                  }
                   disabled={!isPOStatusFulfilled(poStatus)}
                 >
                   {formatMessage({
@@ -718,20 +732,19 @@ class Index extends Component {
                   })}
                 </ProgressButton>
               )}
-              {isPOStatusDraft(poStatus) &&
-                type !== 'new' &&
-                type !== 'dup' && (
-                  <ProgressButton
-                    color='success'
-                    icon={null}
-                    onClick={() =>
-                      this.onSubmitButtonClicked(poSubmitAction.FINALIZE)}
-                  >
-                    {formatMessage({
-                      id: 'inventory.pr.detail.pod.finalize',
-                    })}
-                  </ProgressButton>
-                )}
+              {isPOStatusDraft(poStatus) && type !== 'new' && type !== 'dup' && (
+                <ProgressButton
+                  color='success'
+                  icon={null}
+                  onClick={() =>
+                    this.onSubmitButtonClicked(poSubmitAction.FINALIZE)
+                  }
+                >
+                  {formatMessage({
+                    id: 'inventory.pr.detail.pod.finalize',
+                  })}
+                </ProgressButton>
+              )}
             </div>
           )}
 

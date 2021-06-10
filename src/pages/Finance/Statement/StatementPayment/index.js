@@ -8,10 +8,8 @@ import {
   CardContainer,
   Button,
 } from '@/components'
-import {
-  navigateDirtyCheck,
-} from '@/utils/utils'
-import * as service from '../services/index'
+import { navigateDirtyCheck } from '@/utils/utils'
+import service from '../services/index'
 // sub components
 
 const styles = () => ({
@@ -38,22 +36,25 @@ class StatementPayment extends PureComponent {
     ],
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.queryPaymentList()
   }
 
   queryPaymentList = async () => {
     console.log(this.props)
-    const response = await service.queryStatementPaymentById(this.props.match.params.id)
+    const response = await service.queryStatementPaymentById(
+      this.props.match.params.id,
+    )
     this.setState({
-      rows: response.data.statementInvoicePayment.map((item, index) => ({
-        ...item,
-        id: index,
-      })) || [],
+      rows:
+        response.data.statementInvoicePayment.map((item, index) => ({
+          ...item,
+          id: index,
+        })) || [],
     })
   }
 
-  render () {
+  render() {
     const { rows, columns } = this.state
     const { classes } = this.props
     return (
@@ -129,9 +130,7 @@ class StatementPayment extends PureComponent {
               Close
             </Button>
           </div>
-
         </div>
-
       </CardContainer>
     )
   }

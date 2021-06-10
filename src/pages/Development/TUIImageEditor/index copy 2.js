@@ -2,7 +2,6 @@ import React, { PureComponent, Suspense } from 'react'
 import GridLayout, { Responsive, WidthProvider } from 'react-grid-layout'
 import Loadable from 'react-loadable'
 import Loading from '@/components/PageLoading'
-import { deepDiffMapper } from '@/utils/cdrss'
 import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import Yup from '@/utils/yup'
@@ -77,7 +76,7 @@ import image from 'assets/img/sidebar-2.jpg'
 import { widgets } from '@/utils/widgets'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
   container: {
     width: '100%',
@@ -106,7 +105,7 @@ const styles = (theme) => ({
 })
 
 class ControlTest extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.editorRef = React.createRef()
   }
@@ -119,7 +118,7 @@ class ControlTest extends PureComponent {
   //   console.log(deepDiffMapper.map(this.props, prevProps, true))
   // }
 
-  componentDidMount () {
+  componentDidMount() {
     return
     const myTheme = {
       'common.bi.image':
@@ -239,7 +238,7 @@ class ControlTest extends PureComponent {
       //   'lena',
       // )
       .loadImageFromURL(imgTest, 'test')
-      .then((result) => {
+      .then(result => {
         console.log({ result })
         console.log(this.editorInstance.getCanvasSize())
 
@@ -269,7 +268,7 @@ class ControlTest extends PureComponent {
         // this.redrawCanvas(editorInstance)
         // console.log(editorInstance.getCanvasSize())
       })
-      .catch((error) => {
+      .catch(error => {
         console.log({ error })
       })
   }
@@ -304,7 +303,7 @@ class ControlTest extends PureComponent {
   //   container[0].style['margin-right'] = 'auto'
   // }
 
-  render () {
+  render() {
     const { props, state } = this
     const { classes, theme, ...resetProps } = this.props
     console.log(this.props)
@@ -337,7 +336,8 @@ class ControlTest extends PureComponent {
             </li>
             <li className='menu-item'>
               <label className='menu-item no-pointer'>
-                Brush width<input
+                Brush width
+                <input
                   id='input-brush-width-range'
                   type='range'
                   min='5'

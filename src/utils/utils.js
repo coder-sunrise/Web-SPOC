@@ -1,29 +1,20 @@
 import moment from 'moment'
 import React from 'react'
 import _ from 'lodash'
-import { isNumber } from 'util'
+import { camelizeKeys, pascalizeKeys } from 'humps'
 
 import nzh from 'nzh/cn'
-import router from 'umi/router'
-import { formatMessage, setLocale, getLocale } from 'umi/locale'
+import { formatMessage, setLocale, getLocale, history } from 'umi'
+
 import { parse, stringify } from 'qs'
-import $ from 'jquery'
 import numeral from 'numeral'
-import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import Authorized from '@/utils/Authorized'
 
-import * as cdrssUtil from 'medisys-util'
-import {
-  NumberInput,
-  CustomInput,
-  serverDateTimeFormatFull,
-  serverDateFormat,
-  notification,
-} from '@/components'
-import config from './config'
+import { serverDateTimeFormatFull, serverDateFormat } from '@/components'
+import * as config from './config'
 import RouterConfig from '../../config/router.config'
 
-window.addEventListener('unhandledrejection', (event) => {
+window.addEventListener('unhandledrejection', event => {
   console.log(event)
   event.preventDefault()
 })
@@ -32,7 +23,7 @@ document.addEventListener('click', () => {
   window.alreadyFocused = false
 })
 
-Object.byString = function (o, s) {
+Object.byString = function(o, s) {
   if (o === undefined || o === null) return ''
   // console.log(o, s)
   s = s.replace(/\[(\w+)\]/g, '.$1') // convert indexes to properties
@@ -56,18 +47,18 @@ Object.byString = function (o, s) {
   return o
 }
 
-String.prototype.replaceAll = function (search, replacement) {
+String.prototype.replaceAll = function(search, replacement) {
   let target = this
   return target.replace(new RegExp(search, 'g'), replacement)
 }
 
-Number.prototype.currencyString = function () {
+Number.prototype.currencyString = function() {
   if (this === undefined || this === null) return '-'
   return `${config.currencySymbol}${numeral(Math.abs(this)).format(
     config.currencyFormat,
   )}`
 }
-Number.prototype.formatString = function () {
+Number.prototype.formatString = function() {
   if (this === undefined || this === null) return '-'
   return `${numeral(Math.abs(this)).format(config.numberFormat)}`
 }
@@ -80,13 +71,13 @@ Number.prototype.formatString = function () {
 //   return moment(m.formatUTC()).add(-8, 'hours')
 // }
 
-moment.prototype.formatUTC = function (dateOnly = true) {
+moment.prototype.formatUTC = function(dateOnly = true) {
   return this.format(
     dateOnly ? `${serverDateFormat}T00:00:00` : serverDateTimeFormatFull,
   )
 }
 
-String.prototype.format = function () {
+String.prototype.format = function() {
   if (arguments.length === 0) return this
   for (var s = this, i = 0; i < arguments.length; i++)
     s = s.replace(new RegExp(`\\{${i}\\}`, 'g'), arguments[i])
@@ -109,11 +100,11 @@ export const roundUp = (num, decimal = 2) => {
 }
 /* eslint-disable */
 
-export function fixedZero (val) {
+export function fixedZero(val) {
   return val * 1 < 10 ? `0${val}` : val
 }
 
-export function getTimeDistance (type) {
+export function getTimeDistance(type) {
   const now = new Date()
   const oneDay = 1000 * 60 * 60 * 24
 
@@ -121,10 +112,7 @@ export function getTimeDistance (type) {
     now.setHours(0)
     now.setMinutes(0)
     now.setSeconds(0)
-    return [
-      moment(now),
-      moment(now.getTime() + (oneDay - 1000)),
-    ]
+    return [moment(now), moment(now.getTime() + (oneDay - 1000))]
   }
 
   if (type === 'week') {
@@ -141,10 +129,7 @@ export function getTimeDistance (type) {
 
     const beginTime = now.getTime() - day * oneDay
 
-    return [
-      moment(beginTime),
-      moment(beginTime + (7 * oneDay - 1000)),
-    ]
+    return [moment(beginTime), moment(beginTime + (7 * oneDay - 1000))]
   }
 
   if (type === 'month') {
@@ -165,15 +150,12 @@ export function getTimeDistance (type) {
   }
 
   const year = now.getFullYear()
-  return [
-    moment(`${year}-01-01 00:00:00`),
-    moment(`${year}-12-31 23:59:59`),
-  ]
+  return [moment(`${year}-01-01 00:00:00`), moment(`${year}-12-31 23:59:59`)]
 }
 
-export function getPlainNode (nodeList, parentPath = '') {
+export function getPlainNode(nodeList, parentPath = '') {
   const arr = []
-  nodeList.forEach((node) => {
+  nodeList.forEach(node => {
     const item = node
     item.path = `${parentPath}/${item.path || ''}`.replace(/\/+/g, '/')
     item.exact = true
@@ -189,11 +171,11 @@ export function getPlainNode (nodeList, parentPath = '') {
   return arr
 }
 
-export function digitUppercase (n) {
+export function digitUppercase(n) {
   return nzh.toMoney(n)
 }
 
-function getRelation (str1, str2) {
+function getRelation(str1, str2) {
   if (str1 === str2) {
     console.warn('Two path are equal!') // eslint-disable-line
   }
@@ -208,14 +190,14 @@ function getRelation (str1, str2) {
   return 3
 }
 
-function getRenderArr (routes) {
+function getRenderArr(routes) {
   let renderArr = []
   renderArr.push(routes[0])
   for (let i = 1; i < routes.length; i += 1) {
     // 去重
-    renderArr = renderArr.filter((item) => getRelation(item, routes[i]) !== 1)
+    renderArr = renderArr.filter(item => getRelation(item, routes[i]) !== 1)
     // 是否包含
-    const isAdd = renderArr.every((item) => getRelation(item, routes[i]) === 3)
+    const isAdd = renderArr.every(item => getRelation(item, routes[i]) === 3)
     if (isAdd) {
       renderArr.push(routes[i])
     }
@@ -229,18 +211,18 @@ function getRenderArr (routes) {
  * @param {string} path
  * @param {routerData} routerData
  */
-export function getRoutes (path, routerData) {
+export function getRoutes(path, routerData) {
   let routes = Object.keys(routerData).filter(
-    (routePath) => routePath.indexOf(path) === 0 && routePath !== path,
+    routePath => routePath.indexOf(path) === 0 && routePath !== path,
   )
   // Replace path to '' eg. path='user' /user/name => name
-  routes = routes.map((item) => item.replace(path, ''))
+  routes = routes.map(item => item.replace(path, ''))
   // Get the route to be rendered to remove the deep rendering
   const renderArr = getRenderArr(routes)
   // Conversion and stitching parameters
-  const renderRoutes = renderArr.map((item) => {
+  const renderRoutes = renderArr.map(item => {
     const exact = !routes.some(
-      (route) => route !== item && getRelation(route, item) === 1,
+      route => route !== item && getRelation(route, item) === 1,
     )
     return {
       exact,
@@ -252,11 +234,11 @@ export function getRoutes (path, routerData) {
   return renderRoutes
 }
 
-export function getPageQuery (url) {
+export function getPageQuery(url) {
   return parse((url || window.location.href).split('?')[1])
 }
 
-export function getQueryPath (path = '', query = {}) {
+export function getQueryPath(path = '', query = {}) {
   const search = stringify(query)
   if (search.length) {
     return `${path}?${search}`
@@ -267,11 +249,11 @@ export function getQueryPath (path = '', query = {}) {
 /* eslint no-useless-escape:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/
 
-export function isUrl (path) {
+export function isUrl(path) {
   return reg.test(path)
 }
 
-export function formatWan (val) {
+export function formatWan(val) {
   const v = val * 1
   if (!v || Number.isNaN(v)) return ''
 
@@ -300,12 +282,12 @@ export function formatWan (val) {
 }
 
 // 给官方演示站点用，用于关闭真实开发环境不需要使用的特性
-export function isAntdPro () {
+export function isAntdPro() {
   return window.location.hostname === 'preview.pro.ant.design'
 }
 
-export function extendFunc (...args) {
-  const funcNew = function () {
+export function extendFunc(...args) {
+  const funcNew = function() {
     for (let i = 0; i < args.length; i++) {
       if (args[i]) {
         const r = args[i].apply(this, arguments)
@@ -316,7 +298,7 @@ export function extendFunc (...args) {
   return funcNew
 }
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 const sumReducer = (p, n) => {
   return p + n
 }
@@ -324,8 +306,8 @@ const maxReducer = (p, n) => {
   return p >= n ? p : n
 }
 
-export function difference (object, base) {
-  function changes (o, b = {}) {
+export function difference(object, base) {
+  function changes(o, b = {}) {
     const v = lodash.transform(o, (result, value, key) => {
       // console.log(value, b, key, result, o, React.isValidElement(o))
       if (_.isFunction(value) || React.isValidElement(value)) {
@@ -371,7 +353,7 @@ const getAppendUrl = (param, targetUrl) => {
       ...(searchToObject() || {}),
       ...param,
     }
-    Object.keys(n).forEach((k) => {
+    Object.keys(n).forEach(k => {
       newPs += `&${k}=${n[k]}`
     })
   } else if (typeof param === 'string') {
@@ -390,7 +372,7 @@ const getRemovedUrl = (ary = [], targetUrl) => {
   // let existP = {}
   // console.debug(p)
   if (Array.isArray(ary)) {
-    ary.forEach((a) => {
+    ary.forEach(a => {
       delete p[a]
     })
     // const n = {
@@ -407,40 +389,64 @@ const getRemovedUrl = (ary = [], targetUrl) => {
   return getQueryPath(window.location.pathname, p)
 }
 
-const findGetParameter = (parameterName) => {
+const findGetParameter = parameterName => {
   let result = null
   let tmp = []
   // eslint-disable-next-line no-restricted-globals
-  location.search.substr(1).split('&').forEach((item) => {
-    tmp = item.split('=')
-    if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1])
-  })
+  location.search
+    .substr(1)
+    .split('&')
+    .forEach(item => {
+      tmp = item.split('=')
+      if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1])
+    })
   return result
 }
 
-const convertToQuery = (
-  query = {},
-  convertExcludeFields = [
-    'create',
-  ],
-) => {
+let runningId = 0
+export const getUniqueId = (prefix = 'sys-gen-') => {
+  runningId -= 1
+  return `${prefix}${runningId}`
+}
+export const getUniqueGUID = () => {
+  let d = new Date().getTime()
+  let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    let r = (d + Math.random() * 16) % 16 | 0
+    d = Math.floor(d / 16)
+    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16)
+  })
+  return uuid
+}
+export const getUniqueNumericId = () => {
+  runningId -= 1
+  return runningId
+}
+
+const convertToQuery = (query = {}, convertExcludeFields = ['create']) => {
   // //console.log(query)
   const {
     current,
     pagesize,
+    pageSize,
     combineCondition,
     includeDeleted,
     includeParentDeleted,
     // queryExcludeFields,
     sorting = [],
     props,
+    sort,
     apiCriteria,
   } = query
+  // console.log(query)
   let customQuerys = { ...query }
   delete customQuerys.keepFilter
   delete customQuerys.current
   delete customQuerys.pagesize
+  delete customQuerys.pageSize
+  delete customQuerys.sortby
+  delete customQuerys.order
   delete customQuerys.sorting
+  delete customQuerys.sort
   delete customQuerys.includeDeleted
   delete customQuerys.includeParentDeleted
   // delete customQuerys.queryExcludeFields
@@ -513,10 +519,7 @@ const convertToQuery = (
               prop: `${p}.${Object.keys(val)[0]}`,
               val: v,
               opr:
-                [
-                  'boolean',
-                  'number',
-                ].indexOf(typeof v) >= 0
+                ['boolean', 'number'].indexOf(typeof v) >= 0
                   ? filterType.eql
                   : filterType.like,
             })
@@ -531,10 +534,7 @@ const convertToQuery = (
               val,
               // valueType: valType,
               opr:
-                [
-                  'boolean',
-                  'number',
-                ].indexOf(typeof val) >= 0
+                ['boolean', 'number'].indexOf(typeof val) >= 0
                   ? filterType.eql
                   : filterType.like,
             })
@@ -546,10 +546,12 @@ const convertToQuery = (
 
   const returnVal = {
     ...newQuery,
-    sort: sorting.map((o) => ({
-      sortby: o.sortBy || o.columnName,
-      order: o.direction,
-    })),
+    sort: sort
+      ? sort
+      : sorting.map(o => ({
+          sortby: o.sortBy || o.columnName,
+          order: o.direction,
+        })),
     current,
     pagesize,
     combineCondition,
@@ -560,7 +562,7 @@ const convertToQuery = (
 
     // queryExcludeFields,
   }
-  convertExcludeFields.forEach((p) => {
+  convertExcludeFields.forEach(p => {
     if (customQuerys[p] !== undefined) returnVal[p] = customQuerys[p]
   })
   // if (returnVal.columnCriteria && returnVal.columnCriteria.length > 0) {
@@ -577,7 +579,7 @@ export const updateGlobalVariable = (key, value) => {
   window.medisys[key] = value
 }
 
-export const getGlobalVariable = (key) => {
+export const getGlobalVariable = key => {
   if (!window.medisys) {
     window.medisys = {}
   }
@@ -588,7 +590,7 @@ export const updateLoadingState = (type = '@@DVA_LOADING/HIDE') => {
   const { dispatch, getState } = window.g_app._store
   const { loading } = getState()
   if (loading) {
-    Object.keys(loading.effects).forEach((o) => {
+    Object.keys(loading.effects).forEach(o => {
       if (loading.effects[o]) {
         dispatch({
           type,
@@ -685,7 +687,7 @@ export const updateCellValue = (
 }
 
 const observers = {}
-export const watchForElementChange = (e) => {
+export const watchForElementChange = e => {
   let t = e.selector
 
   let n = e.ongoing
@@ -703,8 +705,8 @@ export const watchForElementChange = (e) => {
           attributes: true,
         }
       : i
-  ;(observers[t] = new MutationObserver((e1) => {
-    e1.forEach((e2) => {
+  ;(observers[t] = new MutationObserver(e1 => {
+    e1.forEach(e2 => {
       a(e2)
     }),
       n || observers[t].disconnect()
@@ -712,7 +714,7 @@ export const watchForElementChange = (e) => {
     observers[t].observe(e.container || document, r)
 }
 
-const confirmBeforeReload = (e) => {
+const confirmBeforeReload = e => {
   e.preventDefault()
   // Chrome requires returnValue to be set
   e.returnValue = ''
@@ -723,7 +725,7 @@ const _checkCb = ({ redirectUrl, onProceed }, e) => {
     onProceed(e)
   }
   if (redirectUrl) {
-    router.push(redirectUrl)
+    history.push(redirectUrl)
   }
 }
 
@@ -735,7 +737,7 @@ const navigateDirtyCheck = ({
   confirmText,
   onSecondConfirm,
   ...restProps
-}) => (e) => {
+}) => e => {
   if (window.beforeReloadHandlerAdded) {
     let f = {}
 
@@ -797,7 +799,7 @@ const navigateDirtyCheck = ({
             if (f.onDirtyDiscard) f.onDirtyDiscard()
             delete window.dirtyForms[displayName]
           } else {
-            Object.values(window.dirtyForms).forEach((f) => {
+            Object.values(window.dirtyForms).forEach(f => {
               window.g_app._store.dispatch({
                 type: 'formik/updateState',
                 payload: {
@@ -846,7 +848,7 @@ const calculateAdjustAmount = (
   }
 }
 
-const errMsgForOutOfRange = (field) => `${field} must between 0 and 999,999.99`
+const errMsgForOutOfRange = field => `${field} must between 0 and 999,999.99`
 const calculateItemLevelAdjustment = (
   adjType = 'ExactAmount',
   adjValue = 0,
@@ -882,7 +884,7 @@ const calculateItemLevelAdjustment = (
   }
 }
 
-const htmlEncode = (html) => {
+const htmlEncode = html => {
   // 1.首先动态创建一个容器标签元素，如DIV
   let temp = document.createElement('div')
   // 2.然后将要转换的字符串设置为这个元素的innerText(ie支持)或者textContent(火狐，google支持)
@@ -894,7 +896,7 @@ const htmlEncode = (html) => {
   temp = null
   return output
 }
-const htmlDecode = (text) => {
+const htmlDecode = text => {
   // 1.首先动态创建一个容器标签元素，如DIV
   let temp = document.createElement('div')
   // 2.然后将要转换的字符串设置为这个元素的innerHTML(ie，火狐，google都支持)
@@ -995,13 +997,13 @@ const calculateGSTAdj = ({
   gstValue = 0,
   gstAmtField = 'gstAmount',
 }) => {
-  let gst = roundTo(totalAfterAdj * gstValue / 100)
+  let gst = roundTo((totalAfterAdj * gstValue) / 100)
   if (isGSTInclusive) {
     gst = roundTo(totalAfterAdj - totalAfterAdj / (1 + gstValue / 100))
   }
 
   const totalItemizedGST = roundTo(
-    activeRows.map((i) => i[gstAmtField]).reduce(sumReducer, 0),
+    activeRows.map(i => i[gstAmtField]).reduce(sumReducer, 0),
   )
   const diff = roundTo(gst - totalItemizedGST)
 
@@ -1038,14 +1040,14 @@ const calculateAmount = (
   } = {},
 ) => {
   let gst = 0
-  const activeRows = rows.filter((o) => !o.isDeleted)
-  const activeAdjustments = adjustments.filter((o) => !o.isDeleted)
+  const activeRows = rows.filter(o => !o.isDeleted)
+  const activeAdjustments = adjustments.filter(o => !o.isDeleted)
 
   const total = roundTo(
-    activeRows.map((o) => o[totalField]).reduce(sumReducer, 0),
+    activeRows.map(o => o[totalField]).reduce(sumReducer, 0),
   )
 
-  activeRows.forEach((r) => {
+  activeRows.forEach(r => {
     r.weightage = r[totalField] / total || 0
     // console.log(r[totalField], total, r.weightage)
 
@@ -1056,48 +1058,50 @@ const calculateAmount = (
   if (total === 0 && activeRows[0]) {
     activeRows[0].weightage = 1
   }
-  activeAdjustments.filter((o) => !o.isDeleted).forEach((fa, i) => {
-    activeRows.forEach((o) => {
-      o.subAdjustment = 0
-    })
-    let adjAmount = 0
-    let otherItemsAdjAmount = 0
-    activeRows.forEach((r, j) => {
-      // console.log(r.weightage * fa.adjAmount, r)
-      let adj = 0
-      let initalRowToal = r[totalField]
-      for (let idx = 0; idx < i; idx++) {
-        initalRowToal += r[`adjustmen${idx}`]
-      }
-      if (fa.adjType === 'ExactAmount') {
-        // --- If is last item, should use [totalAdjAmount] - [sum of other items adj amt] ---//
-        if (activeRows.length - 1 === j) {
-          adj = roundTo(fa.adjValue - otherItemsAdjAmount)
-        } else {
-          adj = roundTo(Math.abs(r.weightage) * Math.abs(fa.adjValue), 2)
+  activeAdjustments
+    .filter(o => !o.isDeleted)
+    .forEach((fa, i) => {
+      activeRows.forEach(o => {
+        o.subAdjustment = 0
+      })
+      let adjAmount = 0
+      let otherItemsAdjAmount = 0
+      activeRows.forEach((r, j) => {
+        // console.log(r.weightage * fa.adjAmount, r)
+        let adj = 0
+        let initalRowToal = r[totalField]
+        for (let idx = 0; idx < i; idx++) {
+          initalRowToal += r[`adjustmen${idx}`]
+        }
+        if (fa.adjType === 'ExactAmount') {
+          // --- If is last item, should use [totalAdjAmount] - [sum of other items adj amt] ---//
+          if (activeRows.length - 1 === j) {
+            adj = roundTo(fa.adjValue - otherItemsAdjAmount)
+          } else {
+            adj = roundTo(Math.abs(r.weightage) * Math.abs(fa.adjValue), 2)
+
+            if (fa.adjValue < 0) adj = -adj
+          }
+        } else if (fa.adjType === 'Percentage') {
+          adj = roundTo((Math.abs(fa.adjValue) / 100) * Math.abs(initalRowToal))
 
           if (fa.adjValue < 0) adj = -adj
         }
-      } else if (fa.adjType === 'Percentage') {
-        adj = roundTo(Math.abs(fa.adjValue) / 100 * Math.abs(initalRowToal))
-
-        if (fa.adjValue < 0) adj = -adj
-      }
-      // console.log(r.subAdjustment + adj, r.subAdjustment, adj)
-      adjAmount += adj
-      // r[adjustedField] = roundTo(r[adjustedField] + adj)
-      // r.subAdjustment += adj
-      r[`adjustmen${i}`] = adj
-      r[adjustedField] = roundTo(initalRowToal + adj)
-      otherItemsAdjAmount += roundTo(adj)
+        // console.log(r.subAdjustment + adj, r.subAdjustment, adj)
+        adjAmount += adj
+        // r[adjustedField] = roundTo(r[adjustedField] + adj)
+        // r.subAdjustment += adj
+        r[`adjustmen${i}`] = adj
+        r[adjustedField] = roundTo(initalRowToal + adj)
+        otherItemsAdjAmount += roundTo(adj)
+      })
+      if (fa.adjType === 'Percentage') fa.adjAmount = roundTo(adjAmount)
     })
-    if (fa.adjType === 'Percentage') fa.adjAmount = roundTo(adjAmount)
-  })
   // activeRows.forEach((r) => {
   //   r[adjustedField] = roundTo(r[adjustedField])
   // })
   const totalAfterAdj = roundTo(
-    activeRows.map((o) => o[adjustedField]).reduce(sumReducer, 0),
+    activeRows.map(o => o[adjustedField]).reduce(sumReducer, 0),
   )
 
   const { clinicSettings } = window.g_app._store.getState()
@@ -1110,38 +1114,38 @@ const calculateAmount = (
 
   if (gstValue) {
     if (isGSTInclusive) {
-      activeRows.forEach((r) => {
+      activeRows.forEach(r => {
         gst += roundTo(
           r[adjustedField] - r[adjustedField] / (1 + gstValue / 100),
         )
       })
     } else {
-      gst = roundTo(totalAfterAdj * gstValue / 100)
+      gst = roundTo((totalAfterAdj * gstValue) / 100)
     }
-    activeRows.forEach((r) => {
+    activeRows.forEach(r => {
       if (isGSTInclusive) {
         r[gstField] = r[adjustedField]
         r[gstAmtField] = roundTo(
           r[adjustedField] - r[adjustedField] / (1 + gstValue / 100),
         )
       } else {
-        r[gstAmtField] = roundTo(r[adjustedField] * gstValue / 100)
+        r[gstAmtField] = roundTo((r[adjustedField] * gstValue) / 100)
         r[gstField] = roundTo(r[adjustedField] * (1 + gstValue / 100))
       }
       // console.log(r[gstField], r[gstAmtField])
     })
   } else {
-    activeRows.forEach((r) => {
+    activeRows.forEach(r => {
       r[gstAmtField] = 0
       r[gstField] = r[adjustedField]
     })
   }
   // console.log({ activeRows, adjustments })
-  const mapInvoiceItemAdjustment = (adjustment, index) => (invoiceItem) => {
+  const mapInvoiceItemAdjustment = (adjustment, index) => invoiceItem => {
     let itemAdj
     if (adjustment.invoiceItemAdjustment)
       itemAdj = adjustment.invoiceItemAdjustment.find(
-        (ss) => ss.invoiceItemFK === invoiceItem.id,
+        ss => ss.invoiceItemFK === invoiceItem.id,
       )
     return {
       [itemFkField]: invoiceItem.id,
@@ -1174,7 +1178,7 @@ const calculateAmount = (
       .sort(sortAdjustment),
     summary: {
       subTotal: roundTo(
-        activeRows.map((row) => row[totalField]).reduce(sumReducer, 0),
+        activeRows.map(row => row[totalField]).reduce(sumReducer, 0),
       ),
       gst: absoluteGST,
       gstAdj: gstAdjustment,
@@ -1194,7 +1198,7 @@ const calculateAmount = (
 
 const removeFields = (obj, fields = []) => {
   if (Array.isArray(obj)) {
-    obj.forEach((v) => {
+    obj.forEach(v => {
       removeFields(v, fields)
     })
   } else if (typeof obj === 'object') {
@@ -1206,13 +1210,13 @@ const removeFields = (obj, fields = []) => {
         removeFields(value, fields)
       }
     }
-    fields.forEach((o) => {
+    fields.forEach(o => {
       delete obj[o]
     })
   }
 }
 
-export const currencyFormatter = (value) =>
+export const currencyFormatter = value =>
   numeral(value).format(`$${config.currencyFormat}`)
 
 const regDate = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/s
@@ -1225,7 +1229,7 @@ const commonDataReaderTransform = (data, fieldName, keepNull = false) => {
   if (typeof data === 'object') {
     if (Array.isArray(data)) {
       if (fieldName) data = data.sort((a, b) => a[fieldName] - b[fieldName])
-      data.forEach((element) => {
+      data.forEach(element => {
         commonDataReaderTransform(element, fieldName, keepNull)
       })
     } else {
@@ -1238,9 +1242,7 @@ const commonDataReaderTransform = (data, fieldName, keepNull = false) => {
           }
           if (Array.isArray(v)) {
             if (fieldName)
-              data[field] = lodash.sortBy(data[field], [
-                (o) => o[fieldName],
-              ])
+              data[field] = lodash.sortBy(data[field], [o => o[fieldName]])
             for (let subfield in v) {
               if (Object.prototype.hasOwnProperty.call(v, subfield)) {
                 commonDataReaderTransform(
@@ -1270,12 +1272,12 @@ const commonDataReaderTransform = (data, fieldName, keepNull = false) => {
   return data
 }
 
-const commonDataWriterTransform = (data) => {
+const commonDataWriterTransform = data => {
   const { getClinic } = config
   const { systemTimeZoneInt = 8 } = getClinic() || {}
   if (typeof data === 'object') {
     if (Array.isArray(data)) {
-      data.forEach((element) => {
+      data.forEach(element => {
         commonDataWriterTransform(element)
       })
     } else {
@@ -1321,12 +1323,12 @@ const locationQueryParameters = () => {
   return params
 }
 
-export const convertToBase64 = (file) =>
+export const convertToBase64 = file =>
   new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)
     reader.onload = () => resolve(reader.result.split(',')[1])
-    reader.onerror = (error) => reject(error)
+    reader.onerror = error => reject(error)
   })
 
 const enableTableForceRender = (duration = 1000) => {
@@ -1336,12 +1338,12 @@ const enableTableForceRender = (duration = 1000) => {
   }, duration)
 }
 
-const generateHashCode = (s) =>
+const generateHashCode = s =>
   `${s
     .split('')
     .reduce((a, b) => Math.abs((a << 5) - a + b.charCodeAt(0)) | 0, 0)}`
 
-const stringToBytesFaster = (str) => {
+const stringToBytesFaster = str => {
   // http://stackoverflow.com/questions/1240408/reading-bytes-from-a-javascript-string
   let ch
   let st
@@ -1384,7 +1386,7 @@ const checkAuthoritys = (pathname, history) => {
     }
     let authoritys = getAuthoritys(RouterConfig)
     if (authoritys) {
-      authoritys.forEach((authority) => {
+      authoritys.forEach(authority => {
         const accessRight = Authorized.check(authority)
         if (!accessRight || accessRight.rights === 'hidden') {
           history.push('/forbidden')
@@ -1394,29 +1396,102 @@ const checkAuthoritys = (pathname, history) => {
   }
 }
 
-const getModuleSequence = (moduleName) => {
+const getModuleSequence = moduleName => {
   const sequence = RouterConfig[2].routes
-    .filter((r) => r.moduleName)
-    .map((r) => r.moduleName.toUpperCase())
+    .filter(r => r.moduleName)
+    .map(r => r.moduleName.toUpperCase())
     .indexOf(moduleName.toUpperCase())
   if (sequence >= 0) return sequence
   else return 1000
 }
 
-module.exports = {
-  ...cdrssUtil,
-  ...module.exports,
+export const formatUrlPath = (url, data) => {
+  const newData = camelizeKeys({
+    ...data,
+  })
+  let newUrl = url
+  try {
+    let domin = ''
+    if (newUrl.match(/[a-zA-z]+:\/\/[^/]*/)) {
+      domin = newUrl.match(/[a-zA-z]+:\/\/[^/]*/)[0]
+      newUrl = newUrl.slice(domin.length)
+    }
+    const match = pathToRegexp.parse(newUrl)
+    if (match.length > 1) {
+      for (let index = 1; index < match.length; index++) {
+        let element = match[index]
+        if (!newData[element.name]) {
+          newUrl = newUrl.replace(`:${element.name}`, '')
+        }
+      }
+      newUrl = pathToRegexp.compile(newUrl)(newData)
+      const index = newUrl.indexOf('?')
+      if (index >= 0) {
+        const subUrl = newUrl.substring(index + 1)
+        const para = queryString.parse(subUrl)
+        newUrl = `${newUrl.substring(0, index + 1)}${encrypt(para)}`
+      }
+      // for (let item of match) {
+      //   if (item instanceof Object && item.name in newData) {
+      //     delete data[item.name]
+      //   }
+      // }
+    }
+
+    return domin + newUrl
+  } catch (e) {
+    message.error(e.message)
+    return url
+  }
+}
+
+export const cleanFieldValue = data => {
+  // console.log(data, fieldName)
+  if (data === undefined || data === null) return data
+  if (typeof data === 'object') {
+    if (Array.isArray(data)) {
+      data.forEach(element => {
+        cleanFieldValue(element)
+      })
+    } else {
+      if (data.isNew) {
+        delete data.id
+      }
+      for (let field in data) {
+        if (Object.prototype.hasOwnProperty.call(data, field)) {
+          if (Array.isArray(data[field])) {
+            // data[field] = lodash.sortBy(data[field], [
+            //   (o) => o[fieldName],
+            // ])
+            for (let subfield in data[field]) {
+              if (Object.prototype.hasOwnProperty.call(data[field], subfield)) {
+                cleanFieldValue(data[field][subfield])
+              }
+            }
+          }
+          if (typeof data[field] === 'object') {
+            cleanFieldValue(data[field])
+          }
+        }
+      }
+    }
+  }
+  return data
+}
+export const removeEmpty = values => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  return Object.fromEntries(
+    Object.entries(values).filter(([_, v]) => v !== '' && v.length !== 0),
+  )
+}
+
+export {
   sleep,
   sumReducer,
   maxReducer,
   getAppendUrl,
   getRemovedUrl,
   convertToQuery,
-  updateLoadingState,
-  updateGlobalVariable,
-  getGlobalVariable,
-  updateCellValue,
-  watchForElementChange,
   confirmBeforeReload,
   navigateDirtyCheck,
   calculateAdjustAmount,
@@ -1436,8 +1511,6 @@ module.exports = {
   locationQueryParameters,
   enableTableForceRender,
   generateHashCode,
-  roundTo,
-  roundUp,
   stringToBytesFaster,
   checkAuthoritys,
   getModuleSequence,

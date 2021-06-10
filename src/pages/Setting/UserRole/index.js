@@ -12,7 +12,7 @@ import {
   MenuItem,
 } from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
 // common component
@@ -37,7 +37,7 @@ import Authorized from '@/utils/Authorized'
 import UserRoleForm from './UserRoleForm'
 import { dummyData, UserRoleTableConfig } from './const'
 
-const styles = (theme) => ({
+const styles = theme => ({
   verticalSpacing: {
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(2),
@@ -65,7 +65,7 @@ class UserRole extends React.Component {
           columnName: 'action',
           width: 90,
           align: 'center',
-          render: (row) => {
+          render: row => {
             return (
               <Authorized authority='settings.role.editrole'>
                 <Tooltip title='Edit Role & Access Right' placement='bottom'>
@@ -104,7 +104,7 @@ class UserRole extends React.Component {
     })
   }
 
-  editRow = (row) => {
+  editRow = row => {
     const accessRight = Authorized.check('settings.role.editrole')
     if (accessRight.rights && accessRight.rights !== 'enable') {
       notification.error({
@@ -115,7 +115,7 @@ class UserRole extends React.Component {
     this.props.history.push(`/setting/userrole/${row.id}`)
   }
 
-  handleDoubleClick = (row) => {
+  handleDoubleClick = row => {
     this.editRow(row)
   }
 
@@ -144,7 +144,7 @@ class UserRole extends React.Component {
     this.setState({ openPopper: true })
   }
 
-  handleClickPopper = (i) => {
+  handleClickPopper = i => {
     switch (i) {
       case 1:
       default:
@@ -166,7 +166,7 @@ class UserRole extends React.Component {
     this.setState({ showUserProfileForm: !showUserProfileForm })
   }
 
-  render () {
+  render() {
     const { classes, mainDivHeight = 700 } = this.props
     const { showUserProfileForm, openPopper } = this.state
     let height = mainDivHeight - 100 - ($('.filterBar').height() || 0)
@@ -178,7 +178,7 @@ class UserRole extends React.Component {
             <GridItem md={4}>
               <FastField
                 name='codeDisplayValue'
-                render={(args) => {
+                render={args => {
                   return <TextField label='Code / Name' {...args} />
                 }}
               />
@@ -186,7 +186,7 @@ class UserRole extends React.Component {
             <GridItem md={2}>
               <Field
                 name='clinicalRole'
-                render={(args) => (
+                render={args => (
                   <CodeSelect
                     {...args}
                     label='Clinical Role'
@@ -198,7 +198,7 @@ class UserRole extends React.Component {
             <GridItem md={2}>
               <FastField
                 name='status'
-                render={(args) => (
+                render={args => (
                   <Select
                     {...args}
                     label='Status'

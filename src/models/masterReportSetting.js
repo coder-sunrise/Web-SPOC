@@ -1,5 +1,5 @@
 import { createFormViewModel } from 'medisys-model'
-import * as service from '../services/masterPrintoutSetting'
+import service from '../services/masterPrintoutSetting'
 
 export default createFormViewModel({
   namespace: 'masterPrintoutSetting',
@@ -9,12 +9,10 @@ export default createFormViewModel({
   param: {
     service,
     state: {
-      default: { 
-
-      },
+      default: {},
     },
     subscriptions: ({ dispatch, history, searchField }) => {
-      history.listen((loct) => {
+      history.listen(loct => {
         const { pathname } = loct
         // if (pathname === '/setting') {
         //   dispatch({

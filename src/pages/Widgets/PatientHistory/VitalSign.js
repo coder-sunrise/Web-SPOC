@@ -1,6 +1,6 @@
 import React from 'react'
 import { Table } from 'antd'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import numeral from 'numeral'
 import tablestyles from './PatientHistoryStyle.less'
 
@@ -18,9 +18,11 @@ export default ({ current }) => {
             title: 'Temperature',
             render: (text, row) => (
               <span>
-                {`${row.temperatureC
-                  ? numeral(row.temperatureC).format('0.0')
-                  : '-'} ${formatMessage({
+                {`${
+                  row.temperatureC
+                    ? numeral(row.temperatureC).format('0.0')
+                    : '-'
+                } ${formatMessage({
                   id: 'reception.queue.visitRegistration.temperature.suffix',
                 })}`}
               </span>
@@ -31,9 +33,9 @@ export default ({ current }) => {
             title: 'Blood Presure SYS',
             render: (text, row) => (
               <span>
-                {`${row.bpSysMMHG
-                  ? numeral(row.bpSysMMHG).format('0.0')
-                  : '-'} ${formatMessage({
+                {`${
+                  row.bpSysMMHG ? numeral(row.bpSysMMHG).format('0.0') : '-'
+                } ${formatMessage({
                   id: 'reception.queue.visitRegistration.mmhg',
                 })}`}
               </span>
@@ -45,9 +47,9 @@ export default ({ current }) => {
             title: 'Blood Presure DIA',
             render: (text, row) => (
               <span>
-                {`${row.bpDiaMMHG
-                  ? numeral(row.bpDiaMMHG).format('0.0')
-                  : '-'} ${formatMessage({
+                {`${
+                  row.bpDiaMMHG ? numeral(row.bpDiaMMHG).format('0.0') : '-'
+                } ${formatMessage({
                   id: 'reception.queue.visitRegistration.mmhg',
                 })}`}
               </span>
@@ -58,9 +60,11 @@ export default ({ current }) => {
             title: 'Heart Rate',
             render: (text, row) => (
               <span>
-                {`${row.pulseRateBPM
-                  ? numeral(row.pulseRateBPM).format('0.0')
-                  : '-'} ${formatMessage({
+                {`${
+                  row.pulseRateBPM
+                    ? numeral(row.pulseRateBPM).format('0.0')
+                    : '-'
+                } ${formatMessage({
                   id: 'reception.queue.visitRegistration.heartRate.suffix',
                 })}`}
               </span>
@@ -71,9 +75,9 @@ export default ({ current }) => {
             title: 'Weight',
             render: (text, row) => (
               <span>
-                {`${row.weightKG
-                  ? numeral(row.weightKG).format('0.0')
-                  : '-'} ${formatMessage({
+                {`${
+                  row.weightKG ? numeral(row.weightKG).format('0.0') : '-'
+                } ${formatMessage({
                   id: 'reception.queue.visitRegistration.weight.suffix',
                 })}`}
               </span>
@@ -84,9 +88,9 @@ export default ({ current }) => {
             title: 'Height',
             render: (text, row) => (
               <span>
-                {`${row.heightCM
-                  ? numeral(row.heightCM).format('0.0')
-                  : '-'} ${formatMessage({
+                {`${
+                  row.heightCM ? numeral(row.heightCM).format('0.0') : '-'
+                } ${formatMessage({
                   id: 'reception.queue.visitRegistration.height.suffix',
                 })}`}
               </span>
@@ -97,9 +101,9 @@ export default ({ current }) => {
             title: 'Body Mass Index (BMI)',
             render: (text, row) => (
               <span>
-                {`${row.bmi
-                  ? numeral(row.bmi).format('0.0')
-                  : '0.0'} ${formatMessage({
+                {`${
+                  row.bmi ? numeral(row.bmi).format('0.0') : '0.0'
+                } ${formatMessage({
                   id: 'reception.queue.visitRegistration.bmi.suffix',
                 })}`}
               </span>

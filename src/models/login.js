@@ -1,6 +1,6 @@
 import moment from 'moment'
 import { createFormViewModel } from 'medisys-model'
-import router from 'umi/router'
+import { history } from 'umi'
 // services
 import * as service from '@/services/login'
 // utils
@@ -21,14 +21,14 @@ export default createFormViewModel({
     },
     subscriptions: {},
     effects: {
-      *getToken ({ credentialPayload }, { call, put }) {
+      *getToken({ credentialPayload }, { call, put }) {
         const response = yield call(login, credentialPayload)
         return yield put({
           type: 'updateLoginStatus',
           payload: { ...response },
         })
       },
-      *refreshToken (_, { call, put }) {
+      *refreshToken(_, { call, put }) {
         const response = yield call(refresh)
         if (response) {
           yield put({
@@ -37,7 +37,7 @@ export default createFormViewModel({
           })
         }
       },
-      *logout (_, { put }) {
+      *logout(_, { put }) {
         yield put({
           type: 'global/reset',
         })
@@ -46,14 +46,14 @@ export default createFormViewModel({
         reloadAuthorized()
 
         // yield put({ type: 'RESET_APP_STATE' })
-        router.push('/user/login')
+        history.push('/user/login')
         window.location.reload(true)
 
         return true
       },
     },
     reducers: {
-      updateLoginStatus (state, { payload }) {
+      updateLoginStatus(state, { payload }) {
         const isInvalidLogin = payload.access_token === undefined
         if (!isInvalidLogin) {
           const {

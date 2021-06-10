@@ -1,5 +1,5 @@
 ﻿import numeral from 'numeral'
-import { formatMessage, setLocale, getLocale } from 'umi/locale'
+import { formatMessage, setLocale, getLocale } from 'umi'
 // import my from 'moment/locale/my'
 import moment from 'moment'
 import 'moment/locale/ms-my'
@@ -16,11 +16,17 @@ const defaultNumberalConfig = {
     billion: 'b',
     trillion: 't',
   },
-  ordinal (number) {
+  ordinal(number) {
     let b = number % 10
     return ~~((number % 100) / 10) === 1
       ? 'th'
-      : b === 1 ? 'st' : b === 2 ? 'nd' : b === 3 ? 'rd' : 'th'
+      : b === 1
+      ? 'st'
+      : b === 2
+      ? 'nd'
+      : b === 3
+      ? 'rd'
+      : 'th'
   },
   currency: {
     symbol: '$',
@@ -82,10 +88,10 @@ const countrySettings = [
 // console.log(moment.locale(), getLocale())
 let countrySetting
 let clinicSettings
-const initClinicSettings = () => {
+export const initClinicSettings = () => {
   clinicSettings = JSON.parse(localStorage.getItem('clinicSettings')) || {}
   countrySetting =
-    countrySettings.find((o) => o.value === clinicSettings.locale) || {}
+    countrySettings.find(o => o.value === clinicSettings.locale) || {}
   // console.log(countrySettings, clinicSettings.applicationLocale)
   if (countrySetting.code) {
     if (countrySetting.numberal) {
@@ -108,81 +114,79 @@ const initClinicSettings = () => {
     // console.log(3, moment.locale(), getLocale())
   }
 }
-module.exports = {
-  filterType: {
-    eql: 'eql', // 'Equals',
-    neql: 'neql', // 'Not Equals',
-    lgt: 'lgt', // 'Larger than',
-    lst: 'lst', // 'Lesser than',
-    lgteql: 'lgteql', // 'Lager tan and euquals to',
-    lsteql: 'lsteql', // 'Lesser than and equals to',
-    like: 'like', // 'Equivalent to like ‘%{criteria}%',
-    in: 'in', // 'Equivalent to in ({criteria list}), criteria list shall be separate by | as delimiter',
-  },
 
-  valueType: {
-    i: 'Int32',
-    b: 'Boolean',
-    g: 'Object',
-  },
+export const filterType = {
+  eql: 'eql', // 'Equals',
+  neql: 'neql', // 'Not Equals',
+  lgt: 'lgt', // 'Larger than',
+  lst: 'lst', // 'Lesser than',
+  lgteql: 'lgteql', // 'Lager tan and euquals to',
+  lsteql: 'lsteql', // 'Lesser than and equals to',
+  like: 'like', // 'Equivalent to like ‘%{criteria}%',
+  in: 'in', // 'Equivalent to in ({criteria list}), criteria list shall be separate by | as delimiter',
+}
 
-  regex: {
-    date: /^\d{4}[.-]\d{2}[.-]\d{2}.?\d{0,2}.?\d{0,2}.?\d{0,2}.?\d{0,3}.?$/,
-  },
+export const valueType = {
+  i: 'Int32',
+  b: 'Boolean',
+  g: 'Object',
+}
 
-  format: {
-    datetime: 'DD-MMM-YYYY HH:mm',
-    datepicker: 'DD/MM/YYYY',
-    datepickerWithTime: 'DD/MM/YYYY HH:mm:ss',
-    standardDatetime: 'YYYY-MM-DD HH:mm:ss.SSS Z',
-    standardDate: 'YYYY-MM-DD',
-  },
+export const regex = {
+  date: /^\d{4}[.-]\d{2}[.-]\d{2}.?\d{0,2}.?\d{0,2}.?\d{0,2}.?\d{0,3}.?$/,
+}
 
-  modal: {},
-  style: {
-    gutter: 10,
-  },
-  form: {
-    itemLayout: {
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 8 },
-      },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 16 },
-      },
+export const format = {
+  datetime: 'DD-MMM-YYYY HH:mm',
+  datepicker: 'DD/MM/YYYY',
+  datepickerWithTime: 'DD/MM/YYYY HH:mm:ss',
+  standardDatetime: 'YYYY-MM-DD HH:mm:ss.SSS Z',
+  standardDate: 'YYYY-MM-DD',
+}
+
+export const modal = {}
+export const style = {
+  gutter: 10,
+}
+export const form = {
+  itemLayout: {
+    labelCol: {
+      xs: { span: 24 },
+      sm: { span: 8 },
     },
-    gutter: 10,
-  },
-  grid: {
-    colProps: {
-      style: {
-        marginBottom: 10,
-      },
+    wrapperCol: {
+      xs: { span: 24 },
+      sm: { span: 16 },
     },
   },
-  validation: {
-    required: {
-      required: true,
-      message: 'This field is required',
-    },
-    email: {
-      pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-      message: 'This is not a valid email',
+  gutter: 10,
+}
+export const grid = {
+  colProps: {
+    style: {
+      marginBottom: 10,
     },
   },
-  currencyFormat: '0,0.00',
-  percentageFormat: '0.00%',
-  currencySymbol: '$',
-  qtyFormat: '0.0',
-  numberFormat: '0,0',
-  conuntry: countrySetting,
-  initClinicSettings,
-  getClinic: () => {
-    if (!clinicSettings) {
-      initClinicSettings()
-    }
-    return clinicSettings
+}
+export const validation = {
+  required: {
+    required: true,
+    message: 'This field is required',
   },
+  email: {
+    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    message: 'This is not a valid email',
+  },
+}
+export const currencyFormat = '0,0.00'
+export const percentageFormat = '0.00%'
+export const currencySymbol = '$'
+export const qtyFormat = '0.0'
+export const numberFormat = '0,0'
+export const conuntry = countrySetting
+export const getClinic = () => {
+  if (!clinicSettings) {
+    initClinicSettings()
+  }
+  return clinicSettings
 }

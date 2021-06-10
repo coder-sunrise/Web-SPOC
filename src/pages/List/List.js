@@ -1,34 +1,34 @@
 import React, { Component } from 'react'
-import router from 'umi/router'
+import { history } from 'umi'
 import { connect } from 'dva'
 import { Input } from 'antd'
 import PageHeaderWrapper from '@/components/PageHeaderWrapper'
 
 @connect()
 class SearchList extends Component {
-  handleTabChange = (key) => {
+  handleTabChange = key => {
     const { match } = this.props
     switch (key) {
       case 'articles':
-        router.push(`${match.url}/articles`)
+        history.push(`${match.url}/articles`)
         break
       case 'applications':
-        router.push(`${match.url}/applications`)
+        history.push(`${match.url}/applications`)
         break
       case 'projects':
-        router.push(`${match.url}/projects`)
+        history.push(`${match.url}/projects`)
         break
       default:
         break
     }
   }
 
-  handleFormSubmit = (value) => {
+  handleFormSubmit = value => {
     // eslint-disable-next-line
     // console.log(value);
   }
 
-  render () {
+  render() {
     const tabList = [
       {
         key: 'articles',

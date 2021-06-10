@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { Field, withFormik } from 'formik'
-import { formatMessage } from 'umi/locale'
+import { formatMessage } from 'umi'
 import { withStyles, Grid, Divider } from '@material-ui/core'
 
 import { GridContainer, GridItem, NumberInput } from '@/components'
@@ -32,7 +32,9 @@ class CollectPayment extends PureComponent {
   }
 
   getTotalPayAmount = () => {
-    const { corporateBilling: { collectPaymentList } } = this.props
+    const {
+      corporateBilling: { collectPaymentList },
+    } = this.props
 
     const getSum = (sum, payment) => sum + payment.payAmount
     const totalAmount = collectPaymentList.reduce(getSum, 0)
@@ -40,11 +42,11 @@ class CollectPayment extends PureComponent {
     return totalAmount
   }
 
-  handleTotalAmountChanges = (totalAmount) => {
+  handleTotalAmountChanges = totalAmount => {
     this.setState({ totalAmount })
   }
 
-  render () {
+  render() {
     const { totalAmount } = this.state
     const { theme, classes, footer, onConfirm } = this.props
 

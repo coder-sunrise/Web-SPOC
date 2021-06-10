@@ -1,17 +1,17 @@
 import React, { PureComponent } from 'react'
 import { Icon } from 'antd'
-import Link from 'umi/link'
+import Link from 'umi'
 import Debounce from 'lodash-decorators/debounce'
 import styles from './index.less'
 import RightContent from './RightContent'
 
 export default class GlobalHeader extends PureComponent {
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.triggerResizeEvent.cancel()
   }
   /* eslint-disable*/
   @Debounce(600)
-  triggerResizeEvent () {
+  triggerResizeEvent() {
     // eslint-disable-line
     const event = document.createEvent('HTMLEvents')
     event.initEvent('resize', true, false)
@@ -22,7 +22,7 @@ export default class GlobalHeader extends PureComponent {
     onCollapse(!collapsed)
     this.triggerResizeEvent()
   }
-  render () {
+  render() {
     const { collapsed, isMobile, logo } = this.props
     return (
       <div className={styles.header}>

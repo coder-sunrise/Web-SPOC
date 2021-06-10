@@ -1,7 +1,7 @@
 import { createFormViewModel } from 'medisys-model'
 import { INVOICE_STATUS } from '@/utils/constants'
 import { notification } from '@/components'
-import * as service from '../services/podoPayment'
+import service from '../services/podoPayment'
 
 export default createFormViewModel({
   namespace: 'podoPayment',
@@ -32,7 +32,7 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *getCurrentBizSession (_, { put, call }) {
+      *getCurrentBizSession(_, { put, call }) {
         const bizSessionPayload = {
           IsClinicSessionClosed: false,
         }
@@ -56,7 +56,7 @@ export default createFormViewModel({
         })
         return false
       },
-      *queryPodoPayment ({ payload }, { call, put }) {
+      *queryPodoPayment({ payload }, { call, put }) {
         const newPOValue = payload.payload
         let returnValue = payload
         if (newPOValue) returnValue = newPOValue
@@ -67,7 +67,7 @@ export default createFormViewModel({
           },
         })
       },
-      *upsertPodoPayment ({ payload }, { call }) {
+      *upsertPodoPayment({ payload }, { call }) {
         const r = yield call(service.updatePodoPayment, payload)
         if (r === 204) {
           notification.success({ message: 'Saved' })
@@ -77,7 +77,7 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      setPodoPayment (state, { payload }) {
+      setPodoPayment(state, { payload }) {
         const { purchaseOrder } = payload
         const type = purchaseOrder || payload
         const {
@@ -98,8 +98,8 @@ export default createFormViewModel({
         if (purchaseOrderPayment.length >= 1) {
           let tempId = 9999 // temp id for paymentModeFK to match with the paymentMode list
           newPurchaseOrderPayment = purchaseOrderPayment
-            .filter((x) => x.clinicPaymentDto.isCancelled === false)
-            .map((x) => {
+            .filter(x => x.clinicPaymentDto.isCancelled === false)
+            .map(x => {
               x.cpId = x.clinicPaymentDto.id
               x.cpConcurrencyToken = x.clinicPaymentDto.concurrencyToken
               totalPaidAmount += x.clinicPaymentDto.paymentAmount
@@ -134,7 +134,7 @@ export default createFormViewModel({
           purchaseOrderPayment: newPurchaseOrderPayment || [],
         }
       },
-      setCurrentBizSession (state, { payload }) {
+      setCurrentBizSession(state, { payload }) {
         return {
           ...state,
           currentBizSessionInfo: {

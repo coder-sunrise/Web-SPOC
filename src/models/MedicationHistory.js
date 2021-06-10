@@ -1,5 +1,5 @@
 import { createListViewModel } from 'medisys-model'
-import * as service from '@/services/patientHistory'
+import service from '@/services/patientHistory'
 
 export default createListViewModel({
   namespace: 'medicationHistory',
@@ -9,7 +9,7 @@ export default createListViewModel({
     state: {},
     subscriptions: ({ dispatch, history }) => {},
     effects: {
-      *queryMedicationHistory ({ payload }, { call, put }) {
+      *queryMedicationHistory({ payload }, { call, put }) {
         const response = yield call(service.queryMedicationHistory, payload)
         if (response.status === '200') {
           return {
