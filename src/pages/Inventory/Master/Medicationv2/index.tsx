@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { PageContainer, Icon, notification } from '@/components'
-import { ProTable, Select, Input, Button } from '@medisys/component'
+import { ProTable, Select, Button } from '@medisys/component'
 import service from '@/pages/Inventory/Master/Medication/services'
 import { connect, history } from 'umi'
 import Authorized from '@/utils/Authorized'
@@ -79,6 +79,7 @@ const defaultColumns = [
     dataIndex: 'averageCostPrice',
     title: 'Avg Cost Price',
     valueType: 'money',
+
     search: false,
   },
   {
@@ -114,8 +115,7 @@ const goDetailPage = row => {
 const MedicationIndex = ({ dispatch }) => {
   const [exporting, setExporting] = useState(false)
   const inputEl = useRef(null)
-  const { actionRef } = PageContainer.Context.useContainer()
-  const [loadingText, setLoadingText] = useState('')
+  // const { actionRef } = PageContainer.Context.useContainer()
 
   const onFileChange = async event => {
     try {
@@ -160,6 +160,7 @@ const MedicationIndex = ({ dispatch }) => {
       console.log({ error })
     }
   }
+
   return (
     <ProTable
       columns={defaultColumns}

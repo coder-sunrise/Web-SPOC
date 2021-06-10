@@ -89,31 +89,11 @@ const defaultColumns = [
       if (type === 'form') {
         return null
       }
-      const stateType = form.getFieldValue('state')
       return (
         <Input placeholder='Patient Name, Acc No., Patient Ref. No., Contact No.' />
       )
     },
   },
-
-  // {
-  //   dataIndex: 'description',
-  //   hideInForm: true,
-  //   fieldProps: {
-  //     rows: 1,
-  //   },
-  // },
-  // {
-  //   title: 'Status',
-  //   dataIndex: 'isActive',
-  //   valueType: 'text',
-  //   renderFormItem: () => {
-  //     return <Select code='status' />
-  //   },
-  //   render: (dom: React.ReactNode) => {
-  //     return <Select code='status' value={dom as any} readonly />
-  //   },
-  // },
 ]
 const showPatient = row => {
   const viewPatProfileAccessRight = Authorized.check(

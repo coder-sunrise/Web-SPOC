@@ -52,7 +52,7 @@ const requestWrap = (request: () => Promise<unknown>, params: any) => {
       },
       success: !rest.detailsErrorMessage,
     }
-    console.log(result, rest)
+    // console.log(result, rest)
     return new Promise((resolve, reject) => {
       if (result.success) {
         resolve(result.data)
