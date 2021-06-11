@@ -136,7 +136,8 @@
     "umi": "^3.4.0",
     "umi-request": "^1.0.8",
     "universal-cookie": "^4.0.2",
-    "yup": "0.26.10"
+    "yup": "0.26.10",
+    "@umijs/preset-react": "^1"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.3.4",
