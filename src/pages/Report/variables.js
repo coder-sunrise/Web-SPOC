@@ -43,7 +43,7 @@ export const menuData = [
   },
   {
     title: 'Finance',
-    text: 'Sale Summary Report',
+    text: 'Sales Summary Report',
     url: '/report/salesummary',
     authority: 'report.finance.salessummary',
   },
