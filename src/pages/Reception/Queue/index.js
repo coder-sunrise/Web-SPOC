@@ -106,7 +106,7 @@ const styles = theme => ({
   }),
 )
 class Queue extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       _sessionInfoID: undefined,
@@ -145,7 +145,7 @@ class Queue extends React.Component {
     }, 900000)
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     clearInterval(this._timer)
     this.props.dispatch({
       type: 'calendar/updateState',
@@ -770,7 +770,7 @@ class Queue extends React.Component {
     this.toggleForms()
   }
 
-  render() {
+  render () {
     const {
       classes,
       queueLog,
@@ -793,6 +793,7 @@ class Queue extends React.Component {
     return (
       <PageContainer
         header={{
+          breadcrumb: {},
           title: `Session No.: ${sessionNo}`,
           extra: [
             <div className='queueHeader'>

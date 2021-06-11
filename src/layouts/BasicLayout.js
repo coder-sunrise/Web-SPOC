@@ -3,8 +3,11 @@ import NProgress from 'nprogress'
 import $ from 'jquery'
 import _ from 'lodash'
 import { headerHeight } from 'mui-pro-jss'
-import { ProLayout } from '@medisys/component'
+import { ProLayout} from '@medisys/component'
+import { PageContainer } from '@/components'
 import { connect, formatMessage, Link, getLocale } from 'umi'
+import { Breadcrumb, Alert } from 'antd'
+import { RightOutlined} from '@ant-design/icons' 
 
 import CssBaseline from '@material-ui/core/CssBaseline'
 import DocumentTitle from 'react-document-title'
@@ -23,11 +26,12 @@ import { initStream } from '@/utils/realtime'
 import { initClinicSettings } from '@/utils/config'
 import Authorized, { reloadAuthorized } from '@/utils/Authorized'
 import defaultSettings from '@/defaultSettings'
+import { getMenuData } from '@ant-design/pro-layout'
 import styles from './BasicLayout.less'
 import RightContent from './components/RightContent'
-
 import ErrorBoundary from './ErrorBoundary'
 import GlobalModalContainer from './GlobalModalContainer'
+import HeaderBreadcrumb from './components/HeaderBreadcrumb'
 
 initClinicSettings()
 // setInterval(() => {
@@ -63,7 +67,7 @@ const sessionTimeoutTimer = 30 * 60 * 1000
 // const sessionTimeoutTimer = 2500
 
 class BasicLayout extends React.PureComponent {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       mobileOpen: false,
@@ -118,12 +122,12 @@ class BasicLayout extends React.PureComponent {
     this.refreshToken()
   }
 
-  componentDidMount() {
+  componentDidMount () {
     window.addEventListener('resize', this.resize)
     this.resize()
   }
 
-  componentDidUpdate(e) {
+  componentDidUpdate (e) {
     if (e.history.location.pathname !== e.location.pathname) {
       if (window.mainPanel) window.mainPanel.scrollTop = 0
       if (this.state.mobileOpen) {
@@ -132,7 +136,7 @@ class BasicLayout extends React.PureComponent {
     }
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     window.removeEventListener('resize', this.resize)
     clearInterval(this.refreshTokenInterval)
   }
@@ -259,7 +263,7 @@ class BasicLayout extends React.PureComponent {
     }
   }
 
-  triggerResizeEvent() {
+  triggerResizeEvent () {
     // eslint-disable-line
     const event = document.createEvent('HTMLEvents')
     event.initEvent('resize', true, false)
@@ -276,7 +280,7 @@ class BasicLayout extends React.PureComponent {
   //   return <SettingDrawer />
   // };
 
-  render() {
+  render () {
     const { classes, loading, theme, ...props } = this.props
     NProgress.start()
     if (!loading.global) {
@@ -296,7 +300,8 @@ class BasicLayout extends React.PureComponent {
                 // {...defaultProps}
                 {...props.setting}
                 route={props.route}
-                className={styles.root}
+                className={styles.root}                
+                headerContentRender={(p) => <HeaderBreadcrumb breadcrumb={p.breadcrumb} />}
                 rightContentRender={() => <RightContent />}
                 fixedHeader
                 fixSiderbar
@@ -310,7 +315,7 @@ class BasicLayout extends React.PureComponent {
                     return defaultDom
                   }
                   return <Link to={menuItemProps.path}>{defaultDom}</Link>
-                }}
+                }} 
                 breadcrumbRender={(routers = []) => [
                   {
                     path: '/',
@@ -318,9 +323,8 @@ class BasicLayout extends React.PureComponent {
                   },
                   ...routers,
                 ]}
-                location={{
-                  pathname,
-                }}
+                location={{pathname}}                
+                loading={false}
               >
                 {children}
               </ProLayout>

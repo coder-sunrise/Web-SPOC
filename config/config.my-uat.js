@@ -80,6 +80,7 @@ export default {
     'font-size-base': '1rem',
     'font-size-lg': '1.2rem',
     'font-size-sm': '0.9rem',
+    'zindex-popoconfirm':2000,
     'zindex-notification': 2010,
     'zindex-message': 2010,
     'zindex-popover': 2030,
