@@ -97,7 +97,7 @@ const FilterBar = ({
               render={(args) => (
                 <CodeSelect
                   {...args}
-                  options={visitOrderTemplateOptions}
+                  options={[{ id: 0, displayValue: 'None' }, ...visitOrderTemplateOptions]}
                   labelField='displayValue'
                   mode='multiple'
                   label='Visit Purpose'
