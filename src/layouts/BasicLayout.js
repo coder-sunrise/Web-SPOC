@@ -1,11 +1,11 @@
 import React, { Suspense } from 'react'
 import NProgress from 'nprogress'
 import $ from 'jquery'
-import _ from 'lodash'
+import _ from 'lodash' 
 import { headerHeight } from 'mui-pro-jss'
 import { ProLayout} from '@medisys/component'
 import { PageContainer } from '@/components'
-import { connect, formatMessage, Link, getLocale } from 'umi'
+import { connect, formatMessage, Link, getLocale} from 'umi'
 import { Breadcrumb, Alert } from 'antd'
 import { RightOutlined} from '@ant-design/icons' 
 
@@ -305,7 +305,7 @@ class BasicLayout extends React.PureComponent {
                 rightContentRender={() => <RightContent />}
                 fixedHeader
                 fixSiderbar
-                formatMessage={formatMessage}
+                formatMessage={formatMessage} 
                 menuItemRender={(menuItemProps, defaultDom) => {
                   if (
                     menuItemProps.isUrl ||
@@ -323,8 +323,7 @@ class BasicLayout extends React.PureComponent {
                   },
                   ...routers,
                 ]}
-                location={{pathname}}                
-                loading={false}
+                location={{pathname}}
               >
                 {children}
               </ProLayout>

@@ -16,7 +16,6 @@ const HeaderBreadcrumb: React.FC<HeaderBreadcrumbProps> = (props) => {
   const { formatMessage } = useIntl()
 
   if (breadcrumb) {
-    console.log(breadcrumb)
     const pathSnippets = pathname.split('/').filter(i => i)
     const extraBreadcrumbItems = pathSnippets.map((_, index) => {
       const url = `/${pathSnippets.slice(0, index + 1).join('/')}`
