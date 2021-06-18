@@ -1,27 +1,12 @@
 import React from 'react'
 import { connect } from 'dva'
-import router from 'umi/router'
 import $ from 'jquery'
-import { FormattedMessage } from 'umi/locale'
-import Search from '@material-ui/icons/Search'
-import Add from '@material-ui/icons/Add'
-// formik
-import { withFormik, FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
-import Edit from '@material-ui/icons/Edit'
 // common component
 import {
-  Button,
-  CardContainer,
-  CommonTableGrid,
   GridContainer,
   GridItem,
-  ProgressButton,
-  Select,
-  TextField,
-  Tooltip,
-  withSettingBase,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -67,7 +52,7 @@ class SystemMessageDetail extends React.Component {
     const { contents = 'System message has not found.' } = entity
     return (
       <GridContainer>
-        <GridItem >
+        <GridItem>
           <div
             ref={this.container}
             dangerouslySetInnerHTML={{ __html: contents }}
