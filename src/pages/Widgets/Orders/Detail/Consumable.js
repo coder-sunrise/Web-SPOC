@@ -69,7 +69,7 @@ const getVisitDoctorUserId = (props) => {
       }
     }
 
-    return { ...v }
+    return { ...v, type }
   },
   enableReinitialize: true,
   validationSchema: Yup.object().shape({

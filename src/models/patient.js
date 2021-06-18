@@ -72,6 +72,7 @@ const defaultPatientEntity = {
       isConsent: false,
     },
   ],
+  patientPackage: []
 }
 
 export default createFormViewModel({

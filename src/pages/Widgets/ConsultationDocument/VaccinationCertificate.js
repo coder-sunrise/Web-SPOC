@@ -34,7 +34,7 @@ import { getClinicianProfile } from './utils'
     const clinicianProfile = getClinicianProfile(codetable, visitEntity)
     return {
       ...(consultationDocument.entity ||
-        consultationDocument.defaultVaccinationCertificate),
+        consultationDocument.defaultVaccinationCertificate()),
       issuedByUserFK: clinicianProfile.userProfileFK,
     }
   },
@@ -60,7 +60,7 @@ import { getClinicianProfile } from './utils'
   displayName: 'AddConsultationDocument',
 })
 class VaccinationCertificate extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     const { dispatch } = props
 
@@ -81,7 +81,7 @@ class VaccinationCertificate extends PureComponent {
     // this.editorReferece = ref
   }
 
-  render () {
+  render() {
     const {
       footer,
       handleSubmit,
@@ -129,8 +129,8 @@ class VaccinationCertificate extends PureComponent {
                     const gender = ctgender.find((o) => o.id === genderFK) || {}
                     const v = `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
                       ''}, ${Math.floor(
-                      moment.duration(moment().diff(dob)).asYears(),
-                    )}`
+                        moment.duration(moment().diff(dob)).asYears(),
+                      )}`
                     form.setFieldValue(field.name, v)
                   }
                 }

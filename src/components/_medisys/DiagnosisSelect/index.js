@@ -98,7 +98,7 @@ const DiagnosisSelect = ({
       isOrderByFavourite = true
     }
 
-    if (from === 'Report') {
+    if (from === 'report') {
       categoryFilter = diagnosisFilter
     }
 

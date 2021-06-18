@@ -592,7 +592,7 @@ const _routes = [
             path: '/report/diagnosistrending',
             name: 'diagnosistrending',
             component: './Report/DiagnosisTrending',
-            authority: ['report.diagnosistrendingreport'],
+            authority: ['report.other.diagnosistrending'],
           },
           {
             path: '/report/referralsourcereport',

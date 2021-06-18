@@ -55,7 +55,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
   validationSchema: Yup.object().shape({
     inventoryOrderSetFK: Yup.number().required(),
   }),
-  handleSubmit: (values, { props, onConfirm, setValues }) => {
+  handleSubmit: (values, { props, onConfirm, setValues, resetForm }) => {
     const {
       dispatch,
       orders,
@@ -234,7 +234,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
 
     const getOrderVaccinationFromOrderSet = (orderSetCode, orderSetItem) => {
       const { inventoryVaccination } = orderSetItem
-      let item
+      let item = {}
       if (inventoryVaccination.isActive === true) {
         const vaccinationUOM = ctvaccinationunitofmeasurement.find(
           uom => uom.id === inventoryVaccination.prescribingUOMFK,
@@ -306,8 +306,8 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
               issuedByUserFK: clinicianProfile.userProfileFK,
               subject: `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
                 ''}, ${Math.floor(
-                moment.duration(moment().diff(dob)).asYears(),
-              )}`,
+                  moment.duration(moment().diff(dob)).asYears(),
+                )}`,
               content: ReplaceCertificateTeplate(
                 defaultTemplate.templateContent,
                 item,
@@ -445,6 +445,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       payload: datas,
     })
     if (onConfirm) onConfirm()
+    if (resetForm) resetForm()
     setValues({
       ...orders.defaultOrderSet,
       type: orders.type,
@@ -583,8 +584,8 @@ class OrderSet extends PureComponent {
               typeName:
                 orderTypes.find(type => type.value === '3').name +
                 (o.service.isActive &&
-                o.service.ctServiceCenter_ServiceNavigation[0]
-                  .serviceCenterFKNavigation.isActive === true
+                  o.service.ctServiceCenter_ServiceNavigation[0]
+                    .serviceCenterFKNavigation.isActive === true
                   ? ''
                   : ' (Inactive)'),
               isActive:
@@ -621,7 +622,7 @@ class OrderSet extends PureComponent {
         f => f.caution && f.caution.trim().length > 0,
       )
       if (hasCautionItems.length > 0) {
-        openCautionAlertPrompt(hasCautionItems, () => {})
+        openCautionAlertPrompt(hasCautionItems, () => { })
       }
     }
 

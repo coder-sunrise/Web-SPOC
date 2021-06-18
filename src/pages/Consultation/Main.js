@@ -46,6 +46,7 @@ import {
   ReportsOnSignOffOption,
 } from '@/utils/codes'
 import ConsumePackage from '@/pages/Widgets/Orders/Detail/ConsumePackage'
+import * as service from '@/services/consultation'
 import AutoPrintSelection from './autoPrintSelection'
 
 // import PatientSearch from '@/pages/PatientDatabase/Search'
@@ -335,6 +336,14 @@ const pauseConsultation = ({
   })
 }
 
+const saveDraftDoctorNote = ({ values, visitRegistration }) => {
+  const { corDoctorNote = [] } = values
+  const { entity: visit = {} } = visitRegistration
+  const { id } = visit
+  const payload = { ...(corDoctorNote.length ? corDoctorNote[0] : {}), visitFK: id, clinicalObjectRecordFK: values.id }
+  service.saveDraftDoctorNote(payload)
+}
+
 // @skeleton()
 @connect(
   ({
@@ -515,26 +524,11 @@ class Main extends React.Component {
       this.props.setFieldValue('fakeField', 'setdirty')
     }, 500)
 
-    const { consultation, dispatch } = this.props
-    const { pendingPackage } = consultation.entity
-
-    if (pendingPackage) {
-      const packages = pendingPackage.reduce(
-        (distinct, data) =>
-          distinct.includes(data.patientPackageFK)
-            ? [...distinct]
-            : [...distinct, data.patientPackageFK],
-        [],
-      )
-
-      if (packages && packages.length > 1) {
-        dispatch({
-          type: 'consultation/updateState',
-          payload: {
-            haveMultiplePendingPackages: true,
-          },
-        })
-      }
+    const { consultation, dispatch, clinicSettings: { autoSaveClinicNoteInterval = 60, isEnableAutoSaveClinicNote = false } } = this.props
+    if (isEnableAutoSaveClinicNote) {
+      this.interval = setInterval(() => {
+        saveDraftDoctorNote(this.props)
+      }, autoSaveClinicNoteInterval * 1000)
     }
   }
 
@@ -558,6 +552,10 @@ class Main extends React.Component {
         secondConfirmMessage: undefined,
       },
     })
+
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
   }
 
   shouldComponentUpdate = nextProps => {
@@ -1192,6 +1190,7 @@ class Main extends React.Component {
           onClose={this.closePackageSelectModal}
           onConfirm={this.closePackageSelectModal}
           open={consultation.haveMultiplePendingPackages || false}
+          overrideLoading
         >
           <ConsumePackage {...this.props} />
         </CommonModal>

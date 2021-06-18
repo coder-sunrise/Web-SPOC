@@ -57,12 +57,20 @@ class Banner extends PureComponent {
     this.fetchCodeTables()
   }
 
+  componentWillMount () {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'ctg6pd' },
+    })
+  }
+  
   getAllergyLink(data) {
     const { props } = this
-    const { patient } = props
+    const { patient, codetable: { ctg6pd = [] }, } = props
     const { entity } = patient
     const info = entity
-    const { patientAllergy = [] } = info
+    const { patientAllergy = [], patientAllergyMetaData = [] } = info
     const da = _.orderBy(patientAllergy, ['type'], ['asc'])
     let allergyData = '-'
 
@@ -83,7 +91,10 @@ class Banner extends PureComponent {
         showWarning: false,
       })
     }
-
+    let g6PD
+    if (patientAllergyMetaData.length > 0) {
+      g6PD = ctg6pd.find((o) => o.id === patientAllergyMetaData[0].g6PDFK)
+    }
     return (
       entity &&
       entity.isActive && (
@@ -102,7 +113,7 @@ class Banner extends PureComponent {
               </IconButton>
             </Link>
           ) : (
-            <div>
+            <div style={{ marginTop: 5 }}>
               {allergyData.length > 25
                 ? `${allergyData.substring(0, 25).trim()}...`
                 : allergyData}
@@ -131,6 +142,15 @@ class Banner extends PureComponent {
                   </div>
                 </Popover>
               )}
+
+              <div>
+                <span style={{
+                  color: 'darkblue',
+                  fontWeight: 500,
+                  position: 'relative',
+                  fontSize: '16.1px'
+                }}>G6PD: </span>{g6PD ? g6PD.name : '-'}
+              </div>
             </div>
           )}
         </div>
@@ -473,7 +493,7 @@ class Banner extends PureComponent {
     }
 
     return (
-      <div style={{ display: 'inline-block' }}>
+      <div style={{ display: 'inline-block', marginTop: 5 }}>
         <div style={{ display: 'inline-block' }}>
           {medicalProblemData.length > 25
             ? `${medicalProblemData.substring(0, 25).trim()}...`
@@ -816,7 +836,7 @@ class Banner extends PureComponent {
                   </div>
                 }
                 body={
-                  <div>
+                  <div style={{ marginTop: 4 }}>
                     {schemeDataList.length > 0 ? (
                       <div>
                         {schemeDataList
@@ -854,7 +874,7 @@ class Banner extends PureComponent {
                           ${!isMedisave && !schemeData.validTo ? '-)' : ''}
                           `
                             return (
-                              <div style={{ display: 'flex' }}>
+                              <div style={{ display: 'flex', marginTop: 3 }}>
                                 {schemeData.statusDescription && (
                                   <div
                                     style={{
@@ -915,6 +935,7 @@ class Banner extends PureComponent {
                   <div
                     style={{
                       fontWeight: 500,
+                      marginTop: 5
                     }}
                   >
                     {info.outstandingBalance ? (

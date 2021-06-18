@@ -53,16 +53,9 @@ const parseToOneDecimalString = (value = 0.0) => value.toFixed(1)
     transferToPatientId: Yup.number().required(),
   }),
   handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm } = props
-
-    dispatch({
-      type: 'patientPackageDrawdown/transferPatientPackage',
-      payload: {
-        ...values,
-      },
-    }).then(() => {
-      if (onConfirm) onConfirm()
-    })
+    const { dispatch, onConfirm, onTransfer } = props
+    if (onTransfer) onTransfer({ ...values })
+    if (onConfirm) onConfirm()
   },
   displayName: 'TransferPackage',
 })
@@ -101,9 +94,8 @@ class TransferPackage extends Component {
 
   onSelectPatientClick = async (patientProfile, autoPopulate = false) => {
     const { id, name, patientAccountNo } = patientProfile
-    const { values, setValues, patientPackageDrawdown } = this.props
-    const { list } = patientPackageDrawdown
-    const fromPatientId = list[0].patientProfileFK
+    const { values, setValues, patientProfileId } = this.props
+    const fromPatientId = patientProfileId
 
     if (fromPatientId === id) {
       notification.error({
@@ -151,19 +143,9 @@ class TransferPackage extends Component {
     })
   }
 
-  render() {
-    const {
-      footer,
-      selectedPackageDrawdown,
-      patientPackageDrawdown,
-      classes,
-      values,
-    } = this.props
-    const { list } = patientPackageDrawdown
-    const fromPackage = list.find(
-      p => p.id === selectedPackageDrawdown.patientPackageFK,
-    )
-    const fromPackageLabel = `${fromPackage.packageCode} - ${fromPackage.packageName}`
+  render () {
+    const { footer, selectedPackageDrawdown, classes, values } = this.props
+    const fromPackageLabel = `${selectedPackageDrawdown.packageCode} - ${selectedPackageDrawdown.packageName}`
 
     return (
       <CardContainer hideHeader>
