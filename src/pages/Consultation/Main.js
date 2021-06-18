@@ -46,7 +46,7 @@ import {
   ReportsOnSignOffOption,
 } from '@/utils/codes'
 import ConsumePackage from '@/pages/Widgets/Orders/Detail/ConsumePackage'
-import * as service from '@/services/consultation'
+import service from '@/services/consultation'
 import AutoPrintSelection from './autoPrintSelection'
 
 // import PatientSearch from '@/pages/PatientDatabase/Search'
