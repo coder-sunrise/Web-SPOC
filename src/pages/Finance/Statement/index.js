@@ -50,7 +50,7 @@ class Statement extends PureComponent {
     ],
   }
 
-  componentDidMount() {
+  componentDidMount () {
     const fromDate = moment().subtract(1, 'months').startOf('month').formatUTC()
     const toDate = moment().endOf('month').endOf('day').formatUTC(false)
     const dueToDate = moment()
@@ -134,7 +134,7 @@ class Statement extends PureComponent {
     }))
   }
 
-  render() {
+  render () {
     const {
       history,
       dispatch,

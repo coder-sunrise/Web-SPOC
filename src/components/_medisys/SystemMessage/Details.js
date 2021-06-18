@@ -34,7 +34,7 @@ const styles = (theme) => ({
 class SystemMessageDetail extends React.Component {
   state = {}
 
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.container = React.createRef()
   }
@@ -62,7 +62,7 @@ class SystemMessageDetail extends React.Component {
     $(this.container.current).click()
   }
 
-  render() {
+  render () {
     const { footer, classes, systemMessage: { entity = {} } } = this.props
     const { contents = 'System message has not found.' } = entity
     return (

@@ -96,7 +96,7 @@ class SearchBar extends PureComponent {
     showReportSelection: false,
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     this.unmount()
   }
 
@@ -178,7 +178,7 @@ class SearchBar extends PureComponent {
     })
   }
 
-  render() {
+  render () {
     const {
       classes,
       history,

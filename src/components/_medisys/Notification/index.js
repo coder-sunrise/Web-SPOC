@@ -85,8 +85,8 @@ const NotificationComponent = ({
       icon={null}
       trigger='click'
       className={classnames({
-        [ classes.pooperResponsive ]: true,
-        [ classes.pooperNav ]: true,
+        [classes.pooperResponsive]: true,
+        [classes.pooperNav]: true,
       })}
       content={overlay}
       onVisibleChange={toggleVisibleChange}

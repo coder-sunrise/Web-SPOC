@@ -11,15 +11,15 @@ import {
 import { NOTIFICATION_TYPE } from '@/utils/constants'
 
 export const TITLE = {
-  [ NOTIFICATION_TYPE.QUEUE ]: 'Q. No.',
-  [ NOTIFICATION_TYPE.CODETABLE ]: '',
-  [ NOTIFICATION_TYPE.ERROR ]: '',
+  [NOTIFICATION_TYPE.QUEUE]: 'Q. No.',
+  [NOTIFICATION_TYPE.CODETABLE]: '',
+  [NOTIFICATION_TYPE.ERROR]: '',
 }
 
 export const COLOR = {
-  [ NOTIFICATION_TYPE.QUEUE ]: '#f0f8ff',
-  [ NOTIFICATION_TYPE.CODETABLE ]: '#f0f8ff',
-  [ NOTIFICATION_TYPE.ERROR ]: '#ffc7ce',
+  [NOTIFICATION_TYPE.QUEUE]: '#f0f8ff',
+  [NOTIFICATION_TYPE.CODETABLE]: '#f0f8ff',
+  [NOTIFICATION_TYPE.ERROR]: '#ffc7ce',
 }
 
 export const TYPES = [
@@ -42,7 +42,7 @@ export const TYPES = [
 ]
 
 export const ICONS = {
-  [ NOTIFICATION_TYPE.QUEUE ]: <Info style={{ color: infoColor }} />,
-  [ NOTIFICATION_TYPE.CODETABLE ]: <Settings style={{ color: infoColor }} />,
-  [ NOTIFICATION_TYPE.ERROR ]: <Info style={{ color: dangerColor }} />,
+  [NOTIFICATION_TYPE.QUEUE]: <Info style={{ color: infoColor }} />,
+  [NOTIFICATION_TYPE.CODETABLE]: <Settings style={{ color: infoColor }} />,
+  [NOTIFICATION_TYPE.ERROR]: <Info style={{ color: dangerColor }} />,
 }

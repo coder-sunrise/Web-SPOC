@@ -130,14 +130,14 @@ const styles = theme => ({
   displayName: 'AddConsultationDocument',
 })
 class MedicalCertificate extends PureComponent {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       showCannedText: false,
     }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     const { setFieldValue, values, dispatch } = this.props
     dispatch({
       type: 'cannedText/query',
@@ -180,8 +180,7 @@ class MedicalCertificate extends PureComponent {
     const { values, setFieldValue } = this.props
     setFieldValue(
       'remarks',
-      `${values.remarks || ''}${(values.remarks || '').length > 0 ? '\n' : ''}${
-        selectedCannedText.text
+      `${values.remarks || ''}${(values.remarks || '').length > 0 ? '\n' : ''}${selectedCannedText.text
       }`,
     )
   }
@@ -210,7 +209,7 @@ class MedicalCertificate extends PureComponent {
     })
   }
 
-  render() {
+  render () {
     const {
       footer,
       handleSubmit,

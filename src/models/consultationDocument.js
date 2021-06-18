@@ -61,14 +61,14 @@ export default createFormViewModel({
       rows: [],
     },
     effects: {
-      *upsertRow({ payload }, { call, put }) {
+      *upsertRow ({ payload }, { call, put }) {
         yield put({
           type: 'upsertRowState',
           payload,
         })
       },
 
-      *deleteRow({ payload }, { select, put }) {
+      *deleteRow ({ payload }, { select, put }) {
         const orders = yield select((st) => st.orders)
         const consultationDocument = yield select(
           (st) => st.consultationDocument,
@@ -125,7 +125,7 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      upsertRowState(state, { payload }) {
+      upsertRowState (state, { payload }) {
         let { rows } = state
         if (payload.uid) {
           rows = rows.map((row) => {

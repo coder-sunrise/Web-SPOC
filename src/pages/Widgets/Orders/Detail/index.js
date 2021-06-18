@@ -161,7 +161,7 @@ class Details extends PureComponent {
     return nextSequence
   }
 
-  render() {
+  render () {
     const { props } = this
     const { classes, orders, dispatch, fromDispense, singleMode, from, clinicSettings } = props
     const { type } = orders

@@ -12,7 +12,7 @@ const styles = (theme) => ({
   },
 })
 class StatementList extends PureComponent {
-  render() {
+  render () {
     let listData = []
     const { reportDatas } = this.props
     if (!reportDatas) return null
@@ -22,7 +22,7 @@ class StatementList extends PureComponent {
         i >= 0;
         i--
       ) {
-        const item = reportDatas.StatementSummaryDetails[ i ]
+        const item = reportDatas.StatementSummaryDetails[i]
         listData.splice(0, 0, {
           ...item,
           id: `StatementList-${item.invoiceno}-${i}`,
@@ -108,7 +108,7 @@ class StatementList extends PureComponent {
       },
     }
 
-    if (reportDatas.ListingDetails[ 0 ].groupByCompany) {
+    if (reportDatas.ListingDetails[0].groupByCompany) {
       StatementListCols.splice(2, 1)
       StatementListColsExtension.splice(2, 1)
       FuncProps = {

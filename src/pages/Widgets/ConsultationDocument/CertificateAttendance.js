@@ -98,7 +98,7 @@ const isSameOrAfterTime = (startTime, endTime) =>
   displayName: 'AddConsultationDocument',
 })
 class CertificateAttendance extends PureComponent {
-  componentDidMount() {
+  componentDidMount () {
     const { setFieldValue, values } = this.props
     // console.log({ values })
     if (values.referenceNo === '-')
@@ -113,7 +113,7 @@ class CertificateAttendance extends PureComponent {
       })
   }
 
-  render() {
+  render () {
     const { footer, handleSubmit, classes, values } = this.props
     // console.log({ values })
     return (

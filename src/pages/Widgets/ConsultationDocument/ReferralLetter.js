@@ -70,7 +70,7 @@ class ReferralLetter extends PureComponent {
     // this.editorReferece = ref
   }
 
-  render() {
+  render () {
     const {
       currentType,
       footer,

@@ -27,15 +27,15 @@ const ParseEyeFormData = (response) => {
     ...response,
     corEyeRefractionForm: corEyeRefractionForm
       ? {
-          ...corEyeRefractionForm,
-          formData: refractionFormData,
-        }
+        ...corEyeRefractionForm,
+        formData: refractionFormData,
+      }
       : undefined,
     corEyeExaminationForm: corEyeExaminationForm
       ? {
-          ...corEyeExaminationForm,
-          formData: examinationFormData,
-        }
+        ...corEyeExaminationForm,
+        formData: examinationFormData,
+      }
       : undefined,
   }
   return newResponse
@@ -101,7 +101,7 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *initState({ payload }, { call, put, select, take }) {
+      *initState ({ payload }, { call, put, select, take }) {
         const { queueID, patientID, version } = payload
 
         let visit
@@ -137,7 +137,7 @@ export default createFormViewModel({
         })
       },
 
-      *start({ payload }, { call, put, select, take }) {
+      *start ({ payload }, { call, put, select, take }) {
         yield put({
           type: 'updateState',
           payload: {
@@ -174,7 +174,7 @@ export default createFormViewModel({
         }
         return response
       },
-      *pause({ payload }, { call, put, select }) {
+      *pause ({ payload }, { call, put, select }) {
         const visitRegistration = yield select(state => state.visitRegistration)
         const { entity } = visitRegistration
 
@@ -190,7 +190,7 @@ export default createFormViewModel({
         return response
       },
 
-      *resume({ payload }, { call, put, select }) {
+      *resume ({ payload }, { call, put, select }) {
         const visitRegistration = yield select(state => state.visitRegistration)
         const { entity } = visitRegistration
         yield put({
@@ -225,7 +225,7 @@ export default createFormViewModel({
         }
         return response
       },
-      *edit({ payload }, { call, put }) {
+      *edit ({ payload }, { call, put }) {
         const response = yield call(service.edit, payload.id)
         if (response) {
           yield put({
@@ -245,7 +245,7 @@ export default createFormViewModel({
         }
         return response
       },
-      *overwrite({ payload }, { call, put }) {
+      *overwrite ({ payload }, { call, put }) {
         const response = yield call(service.overwrite, payload.id)
         if (response) {
           yield put({
@@ -264,7 +264,7 @@ export default createFormViewModel({
         }
         return response
       },
-      *sign({ payload }, { call, put, select }) {
+      *sign ({ payload }, { call, put, select }) {
         const visitRegistration = yield select(state => state.visitRegistration)
         const { entity } = visitRegistration
 
@@ -277,7 +277,7 @@ export default createFormViewModel({
         }
         return response
       },
-      *discard({ payload }, { call, put, select }) {
+      *discard ({ payload }, { call, put, select }) {
         const visitRegistration = yield select(state => state.visitRegistration)
         const { entity } = visitRegistration
 
@@ -291,7 +291,7 @@ export default createFormViewModel({
         }
         return response
       },
-      *saveLayout({ payload }, { call, put, select }) {
+      *saveLayout ({ payload }, { call, put, select }) {
         const user = yield select(st => st.user)
         const response = yield call(service.saveLayout, user.data.id, {
           userPreferenceDetails: JSON.stringify(payload),
@@ -299,7 +299,7 @@ export default createFormViewModel({
 
         return response
       },
-      *editOrder({ payload }, { call, put, take }) {
+      *editOrder ({ payload }, { call, put, take }) {
         const response = yield call(service.editOrder, payload.id)
         const { queueID } = payload
 
@@ -329,15 +329,15 @@ export default createFormViewModel({
         }
         return response
       },
-      *signOrder({ payload }, { call, put }) {
+      *signOrder ({ payload }, { call, put }) {
         const response = yield call(service.signOrder, payload)
         return response
       },
-      *completeBillFirstOrder({ payload }, { call, put }) {
+      *completeBillFirstOrder ({ payload }, { call, put }) {
         const response = yield call(service.completeOrder, payload)
         return response
       },
-      *closeModal({}, { call, put, take }) {
+      *closeModal ({ }, { call, put, take }) {
         yield put({
           type: 'global/updateAppState',
           payload: {
@@ -350,7 +350,7 @@ export default createFormViewModel({
 
         history.push('/reception/queue')
       },
-      *queryDone({ payload }, { call, put, select, take }) {
+      *queryDone ({ payload }, { call, put, select, take }) {
         const { data, page } = payload
         if (!data) return null
         let cdRows = []
@@ -507,10 +507,10 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      showSignOffModal(state, { payload }) {
+      showSignOffModal (state, { payload }) {
         return { ...state, ...payload }
       },
-      closeSignOffModal(state) {
+      closeSignOffModal (state) {
         return { ...state, showSignOffModal: false, printData: [] }
       },
     },

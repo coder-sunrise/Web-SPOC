@@ -12,7 +12,7 @@ import { currencySymbol } from '@/utils/config'
 
 const styles = (theme) => ({})
 class Number extends React.PureComponent {
-  render() {
+  render () {
     const {
       classes,
       field,

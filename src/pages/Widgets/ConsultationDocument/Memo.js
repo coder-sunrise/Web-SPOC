@@ -65,7 +65,7 @@ class Memo extends PureComponent {
     // this.editorReferece = ref
   }
 
-  render() {
+  render () {
     const {
       footer,
       handleSubmit,

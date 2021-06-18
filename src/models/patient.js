@@ -113,7 +113,7 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *initState({ payload }, { put, select, take }) {
+      *initState ({ payload }, { put, select, take }) {
         yield put({ type: 'initSchemeCodetable' })
         let { currentId, version, md, newPatient } = payload
         if (newPatient) {
@@ -145,7 +145,7 @@ export default createFormViewModel({
             },
           })
       },
-      *initSchemeCodetable(_, { put }) {
+      *initSchemeCodetable (_, { put }) {
         yield put({
           type: 'codetable/fetchCodes',
           payload: {
@@ -167,11 +167,11 @@ export default createFormViewModel({
           },
         })
       },
-      *waitLoadComplete(_, { take }) {
+      *waitLoadComplete (_, { take }) {
         yield take('patient/query/@@end')
         return ''
       },
-      *closePatientModal({ payload }, { all, put, select }) {
+      *closePatientModal ({ payload }, { all, put, select }) {
         const patientState = yield select(st => st.patient)
 
         if (patientState.shouldQueryOnClose) {
@@ -234,7 +234,7 @@ export default createFormViewModel({
           }),
         ])
       },
-      *openPatientModal({ payload = { callback: undefined } }, { put }) {
+      *openPatientModal ({ payload = { callback: undefined } }, { put }) {
         if (payload.callback) {
           yield put({
             type: 'updateState',
@@ -249,7 +249,7 @@ export default createFormViewModel({
           }),
         )
       },
-      *refreshChasBalance({ payload }, { call }) {
+      *refreshChasBalance ({ payload }, { call }) {
         const {
           patientAccountNo,
           patientCoPaymentSchemeFK,
@@ -276,7 +276,7 @@ export default createFormViewModel({
 
         return result
       },
-      *refreshMedisaveBalance({ payload }, { call }) {
+      *refreshMedisaveBalance ({ payload }, { call }) {
         const {
           patientAccountNo,
           isSaveToDb = false,
@@ -300,7 +300,7 @@ export default createFormViewModel({
 
         return data
       },
-      *queryDone({ payload }, { put }) {
+      *queryDone ({ payload }, { put }) {
         const { data } = payload
         // console.log(payload)
         data.patientScheme.forEach(ps => {
@@ -322,7 +322,7 @@ export default createFormViewModel({
           },
         })
       },
-      *queryDeposit({ payload }, { select, call, put }) {
+      *queryDeposit ({ payload }, { select, call, put }) {
         const response = yield call(service.queryDeposit, payload)
         if (response && response.status === '200') {
           const { data = {} } = response
@@ -354,7 +354,7 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      updateDefaultEntity(state, { payload }) {
+      updateDefaultEntity (state, { payload }) {
         const { patientName } = payload
         return {
           ...state,
