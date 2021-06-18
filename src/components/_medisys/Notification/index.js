@@ -24,7 +24,7 @@ const styles = (theme) => ({
 
 const NotificationComponent = ({
   notifications = [],
-  systemMessage,
+  systemMessage = {},
   dispatch,
   classes,
   theme,
