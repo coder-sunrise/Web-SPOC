@@ -24,7 +24,7 @@ const styles = (theme) => ({
 
 const NotificationComponent = ({
   notifications = [],
-  systemMessage,
+  systemMessage={},
   dispatch,
   classes,
   theme,
@@ -59,8 +59,10 @@ const NotificationComponent = ({
             ...o,
             name: `${o.name} ${unReadCounts > 0 ? `(${unReadCounts})` : ''}`,
             content: o.id === 4 ? (
-              <SystemMessageList dispatch={dispatch} type={o.id}
-                setShowNotification={setShowNotification} />
+              <SystemMessageList dispatch={dispatch}
+                type={o.id}
+                setShowNotification={setShowNotification}
+              />
             ) : (
               <NotificationList
                 notifications={list}
@@ -104,9 +106,12 @@ const NotificationComponent = ({
           horizontal: 'left',
         }}
       >
-        <Button justIcon color='transparent' onClick={() => {
+        <Button justIcon
+          color='transparent'
+          onClick={() => {
           setShowNotification(true)
-        }}>
+        }}
+        >
           <Notifications fontSize='large' />
         </Button>
       </Badge>
