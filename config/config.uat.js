@@ -30,7 +30,7 @@ const plugins = {
     baseNavigator: false,
   },
   dynamicImport: {
-    // loadingComponent: './components/PageLoading/index',
+    loading:  '@/components/PageLoading/index',
   },
   sass: {
     // 默认值 Dart Sass，如果要改用 Node Sass，可安装 node-sass 依赖，然后使用该配置项
@@ -48,8 +48,8 @@ const plugins = {
   ...(!process.env.TEST && os.platform() === 'darwin'
     ? {
         dll: {
-          include: [ 'dva', 'dva/router', 'dva/saga', 'dva/fetch' ],
-          exclude: [ '@babel/runtime' ],
+          include: ['dva', 'dva/router', 'dva/saga', 'dva/fetch'],
+          exclude: ['@babel/runtime'],
         },
         hardSource: true,
       }
@@ -84,13 +84,13 @@ export default defineConfig({
     'font-size-base': '1rem',
     'font-size-lg': '1.2rem',
     'font-size-sm': '0.9rem',
-    'zindex-popoconfirm':2000,
-    'zindex-notification': 2010,
-    'zindex-message': 2010,
-    'zindex-popover': 2030,
-    'zindex-picker': 2050,
-    'zindex-dropdown': 2050,
-    'zindex-tooltip': 2060, 
+    'zindex-popoconfirm':'2000',
+    'zindex-notification': '2010',
+    'zindex-message': '2010',
+    'zindex-popover': '2030',
+    'zindex-picker': '2050',
+    'zindex-dropdown': '2050',
+    'zindex-tooltip': '2060', 
   },
   externals: {
     // '@antv/data-set': 'DataSet',
