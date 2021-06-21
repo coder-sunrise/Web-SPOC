@@ -102,7 +102,7 @@ class PatientDetail extends PureComponent {
     hasActiveSession: false,
   }
 
-  constructor(props) {
+  constructor (props) {
     super(props)
     let schemas = schema(props)
     this.widgets = [
@@ -284,6 +284,22 @@ class PatientDetail extends PureComponent {
           loading: Loading,
         }),
       },
+      {
+        id: '11',
+        name: 'Pre-Order List',
+        // access: [
+        //   'patientdatabase.newpatient',
+        //   'patientdatabase.patientprofiledetails',
+        // ],
+        component: Loadable({
+          loader: () => import('./Pre-Order'),
+          render: (loaded, p) => {
+            let Cmpnet = loaded.default
+            return <Cmpnet {...p} />
+          },
+          loading: Loading,
+        }),
+      },
     ]
 
     const accessRight = Authorized.check(
@@ -310,11 +326,11 @@ class PatientDetail extends PureComponent {
     }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     this.checkHasActiveSession()
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     const { dispatch } = this.props
     const menuErrors = {}
     dispatch({
@@ -479,7 +495,7 @@ class PatientDetail extends PureComponent {
     this.setState({ selectedMenu })
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     const { errors, dispatch, patient, values, validateForm } = nextProps
     // validateForm(values).then((o) => {
     //   console.log(o)
@@ -503,7 +519,7 @@ class PatientDetail extends PureComponent {
     }
   }
 
-  render() {
+  render () {
     const {
       theme,
       classes,
