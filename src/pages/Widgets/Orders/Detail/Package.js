@@ -56,7 +56,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
   validationSchema: Yup.object().shape({
     packageFK: Yup.number().required(),
   }),
-  handleSubmit: (values, { props, onConfirm, setValues }) => {
+  handleSubmit: (values, { props, onConfirm, setValues, resetForm }) => {
     const {
       dispatch,
       orders,
@@ -304,8 +304,8 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
               issuedByUserFK: clinicianProfile.userProfileFK,
               subject: `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
                 ''}, ${Math.floor(
-                moment.duration(moment().diff(dob)).asYears(),
-              )}`,
+                  moment.duration(moment().diff(dob)).asYears(),
+                )}`,
               content: ReplaceCertificateTeplate(
                 defaultTemplate.templateContent,
                 item,
@@ -489,6 +489,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
     }
 
     if (onConfirm) onConfirm()
+    if (resetForm) resetForm()
     setValues({
       ...orders.defaultPackage,
       type: orders.type,
@@ -690,7 +691,7 @@ class Package extends PureComponent {
         (f) => f.caution && f.caution.trim().length > 0,
       )
       if (hasCautionItems.length > 0) {
-        openCautionAlertPrompt(hasCautionItems, () => {})
+        openCautionAlertPrompt(hasCautionItems, () => { })
       }
     }
 

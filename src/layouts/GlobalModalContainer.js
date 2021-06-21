@@ -7,6 +7,7 @@ import {
   SessionTimeout,
   CustomConfirm,
   ImageViewer,
+  SystemMessageDetail,
 } from '@/components/_medisys'
 import { CommonModal, Button } from '@/components'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
@@ -24,10 +25,10 @@ const styles = () => ({
   },
 })
 
-@connect(({ global, user, report }) => ({
+@connect(({ global, user, report, systemMessage }) => ({
   global,
   report,
-  loggedInUserID: user.data && user.data.id,
+  loggedInUserID: user.data && user.data.id, systemMessage
 }))
 class GlobalModalContainer extends PureComponent {
   // componentDidMount () {
@@ -35,12 +36,12 @@ class GlobalModalContainer extends PureComponent {
   //   console.log(para)
   // }
 
-  constructor(props) {
+  constructor (props) {
     super(props)
     this._timer = null
   }
 
-  componentDidUpdate(preProps) {
+  componentDidUpdate (preProps) {
     if (
       !preProps.global.showSessionTimeout &&
       this.props.global.showSessionTimeout === true
@@ -69,6 +70,16 @@ class GlobalModalContainer extends PureComponent {
     dispatch({
       type: 'settingUserProfile/updateCurrentSelected',
       userProfile: {},
+    })
+  }
+
+  closeSystemMessage = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        showSystemMessage: false,
+      },
     })
   }
 
@@ -103,8 +114,9 @@ class GlobalModalContainer extends PureComponent {
     })
   }
 
-  render() {
-    const { global, report, dispatch, loggedInUserID, classes } = this.props
+  render () {
+    const { global, report, dispatch, loggedInUserID, classes, systemMessage: { entity = {} } } = this.props
+    const { title = '' } = entity
     return (
       <div>
         <CommonModal
@@ -160,6 +172,16 @@ class GlobalModalContainer extends PureComponent {
           observe='UserProfile'
         >
           <UserProfileForm />
+        </CommonModal>
+
+        <CommonModal
+          title={title}
+          open={global.showSystemMessage}
+          onClose={this.closeSystemMessage}
+          onConfirm={this.closeSystemMessage}
+          observe='SystemMessage'
+        >
+          <SystemMessageDetail {...this.props} />
         </CommonModal>
 
         <CommonModal
@@ -221,7 +243,8 @@ class GlobalModalContainer extends PureComponent {
                   >
                     {global.secondConfirmText || 'Pause'}
                   </Button>
-                ) : null}
+                ) : null
+                }
                 <Button
                   color='primary'
                   onClick={() => {
@@ -237,9 +260,9 @@ class GlobalModalContainer extends PureComponent {
             ) : null,
             onConfirm: global.onConfirmSave
               ? () => {
-                  global.onConfirmSave()
-                  this.closeConfirmationPrompt()
-                }
+                global.onConfirmSave()
+                this.closeConfirmationPrompt()
+              }
               : undefined,
           }}
           onClose={() => {

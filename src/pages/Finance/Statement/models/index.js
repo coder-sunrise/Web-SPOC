@@ -25,6 +25,7 @@ export default createListViewModel({
       activeTab: '0',
       invoicePaymentList: [],
       statementNoList: undefined,
+      batchPrintData: []
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen((loct, method) => {
@@ -122,6 +123,17 @@ export default createListViewModel({
         }
         return false
       },
+      *queryForBatchPrint({ payload }, { call, put }) {
+        const response = yield call(service.queryList, payload)
+        if (response && response.status === '200') {
+          yield put({
+            type: 'queryBatchPrintDone',
+            payload: response,
+          })
+          return response
+        }
+        return false
+      },
     },
     reducers: {
       setActiveTab(st, { payload }) {
@@ -197,6 +209,21 @@ export default createListViewModel({
         return {
           ...state,
           result: data,
+        }
+      },
+      queryBatchPrintDone(st, { payload }) {
+        const { data } = payload
+        return {
+          ...st,
+          batchPrintData: _.orderBy(
+            data.data || [],
+            [
+              'statementNo',
+            ],
+            [
+              'asc',
+            ],
+          )
         }
       },
     },

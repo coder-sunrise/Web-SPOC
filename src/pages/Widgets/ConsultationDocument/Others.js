@@ -32,7 +32,7 @@ import { getClinicianProfile } from './utils'
   mapPropsToValues: ({ consultationDocument, codetable, visitEntity }) => {
     const clinicianProfile = getClinicianProfile(codetable, visitEntity)
     const values = {
-      ...(consultationDocument.entity || consultationDocument.defaultOthers),
+      ...(consultationDocument.entity || consultationDocument.defaultOthers()),
       issuedByUserFK: clinicianProfile.userProfileFK,
     }
     return values
@@ -69,7 +69,7 @@ class Others extends PureComponent {
     // this.editorReferece = ref
   }
 
-  render () {
+  render() {
     const {
       footer,
       handleSubmit,

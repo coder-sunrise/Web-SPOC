@@ -96,12 +96,12 @@ const FilterBar = ({
           </GridItem>
           <GridItem md={12} />
           <GridItem md={2}>
-            <FastField
+            <Field
               name='visitPurposeIDS'
               render={args => (
                 <CodeSelect
                   {...args}
-                  options={visitOrderTemplateOptions}
+                  options={[{ id: 0, displayValue: 'None' }, ...visitOrderTemplateOptions]}
                   labelField='displayValue'
                   mode='multiple'
                   label='Visit Purpose'

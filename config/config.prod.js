@@ -1,6 +1,5 @@
 // https://umijs.org/config/
 import os from 'os'
-
 import { defineConfig } from 'umi'
 import pageRoutes from './router.config'
 import webpackPlugin from './plugin.config'
@@ -67,10 +66,9 @@ export default defineConfig({
   define: {
     APP_TYPE: process.env.APP_TYPE || '',
     'process.env.client_env': 'production',
-    'process.env.client_secret':
-      'TiOserstaKdhu0af4zOzFFhBaLsgh8XsrzmHxnIpIvHjW7adSPELPYDlLJfDfGzA',
-    'process.env.url': 'https://api.semr2.com',
-    'process.env.signalrUrl': 'https://websocket.semr2.com/notificationHub',
+    'process.env.client_secret': '20e392d2ea9bfa76f2a9cb26c31a34d675ad81281a31f89ed5d572de8da0b9e7',
+    'process.env.url': 'https://jghapi-development.azurewebsites.net',
+    'process.env.signalrUrl': 'https://medicloud-uat-websocket-200729.semr2.com/notificationHub',
   },
   // 路由配置
   routes: pageRoutes,
@@ -99,7 +97,7 @@ export default defineConfig({
   },
   proxy: {
     '/api/': {
-      target: 'https://semr2dev2010.emr.com.sg/api/',
+      target: 'https://semr2uat2010.emr.com.sg/api/',
       changeOrigin: true,
     },
   },

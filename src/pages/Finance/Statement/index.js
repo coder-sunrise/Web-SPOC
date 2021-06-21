@@ -24,6 +24,7 @@ import {
 import SearchBar from './SearchBar'
 import PrintStatementReport from './PrintStatementReport'
 import GenerateStatements from './GenerateStatements'
+import BatchPrintStatement from './BatchPrintStatement'
 
 const styles = () => ({})
 
@@ -34,6 +35,7 @@ const styles = () => ({})
 class Statement extends PureComponent {
   state = {
     showGenerateStatement: false,
+    showBatchPrintStatements: false,
     selectedRows: [],
     columns: [
       { name: 'statementNo', title: 'Statement No.' },
@@ -48,7 +50,7 @@ class Statement extends PureComponent {
     ],
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const fromDate = moment().subtract(1, 'months').startOf('month').formatUTC()
     const toDate = moment().endOf('month').endOf('day').formatUTC(false)
     const dueToDate = moment()
@@ -126,9 +128,25 @@ class Statement extends PureComponent {
     }))
   }
 
-  render () {
-    const { history, dispatch, mainDivHeight = 700 } = this.props
-    const { rows, columns, showGenerateStatement } = this.state
+  toggleBatchPrintStatements = () => {
+    this.setState((preState) => ({
+      showBatchPrintStatements: !preState.showBatchPrintStatements,
+    }))
+  }
+
+  render() {
+    const {
+      history,
+      dispatch,
+      mainDivHeight = 700,
+      statement = {},
+    } = this.props
+    const {
+      rows,
+      columns,
+      showGenerateStatement,
+      showBatchPrintStatements,
+    } = this.state
     let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
     if (height < 300) height = 300
     return (
@@ -141,6 +159,7 @@ class Statement extends PureComponent {
             dispatch={dispatch}
             selectedRows={this.state.selectedRows}
             showGenerateStatement={this.toggleGenerateStatement}
+            batchPrintStatements={this.toggleBatchPrintStatements}
           />
         </div>
         <CommonTableGrid
@@ -253,6 +272,20 @@ class Statement extends PureComponent {
           observe='generateStatements'
         >
           <GenerateStatements />
+        </CommonModal>
+
+        <CommonModal
+          title='Batch Print Statements'
+          open={showBatchPrintStatements}
+          maxWidth='lg'
+          bodyNoPadding
+          onClose={this.toggleBatchPrintStatements}
+          onConfirm={this.toggleBatchPrintStatements}
+        >
+          <BatchPrintStatement
+            mainDivHeight={mainDivHeight}
+            rows={statement.batchPrintData || []}
+          />
         </CommonModal>
       </CardContainer>
     )

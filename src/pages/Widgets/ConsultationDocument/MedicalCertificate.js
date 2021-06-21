@@ -87,7 +87,7 @@ const styles = theme => ({
     const clinicianProfile = getClinicianProfile(codetable, visitEntity)
     const values = {
       ...(consultationDocument.entity ||
-        consultationDocument.defaultMedicalCertificate),
+        consultationDocument.defaultMedicalCertificate()),
       issuedByUserFK: clinicianProfile.userProfileFK,
     }
 
