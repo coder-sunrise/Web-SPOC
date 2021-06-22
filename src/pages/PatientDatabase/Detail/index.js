@@ -284,6 +284,22 @@ class PatientDetail extends PureComponent {
           loading: Loading,
         }),
       },
+      {
+        id: '11',
+        name: 'Pre-Order List',
+        // access: [
+        //   'patientdatabase.newpatient',
+        //   'patientdatabase.patientprofiledetails',
+        // ],
+        component: Loadable({
+          loader: () => import('./Pre-Order'),
+          render: (loaded, p) => {
+            let Cmpnet = loaded.default
+            return <Cmpnet {...p} />
+          },
+          loading: Loading,
+        }),
+      },
     ]
 
     const accessRight = Authorized.check(

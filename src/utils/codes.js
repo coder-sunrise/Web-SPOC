@@ -1875,6 +1875,14 @@ export const costPriceTypes = [
   },
 ]
 
+const preOrderItemCategory={
+  Medication:'Medication',
+  Vaccination:'Vaccination',
+  Service:'Service',
+  Lab:'Lab',
+  Radiology:'Radiology',
+} 
+
 export const documentTemplateTypes = [
   {
     value: 1,
@@ -1927,4 +1935,5 @@ export {
   year,
   queueProcessorType,
   queueItemStatus,
+  preOrderItemCategory,
 }

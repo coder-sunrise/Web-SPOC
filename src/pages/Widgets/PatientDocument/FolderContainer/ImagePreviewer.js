@@ -62,7 +62,7 @@ const styles = theme => ({
   folder,
 }))
 class ImagePreviewer extends Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.carouselRef = React.createRef()
     this.state = {
@@ -70,7 +70,7 @@ class ImagePreviewer extends Component {
     }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     const { defaultFileFK, files } = this.props
 
     // console.log('componentDidMount', { defaultFileFK, files })
@@ -78,12 +78,12 @@ class ImagePreviewer extends Component {
     window.addEventListener('resize', this.resize.bind(this))
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     window.removeEventListener('resize', this.resize)
   }
 
   // eslint-disable-next-line react/sort-comp
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     const { files: nextFiles = [] } = nextProps
     const { imageList } = this.state
 
@@ -129,7 +129,7 @@ class ImagePreviewer extends Component {
   }
 
   getImageContainerWH = () => {
-    const imageContainerHeight = window.innerHeight - 80
+    const imageContainerHeight = window.innerHeight - 85
     const containerWidth = window.innerWidth - 50
     const imageContainerWidth = containerWidth - 400
     return { imageContainerHeight, imageContainerWidth }
@@ -306,7 +306,7 @@ class ImagePreviewer extends Component {
     }
   }
 
-  render() {
+  render () {
     const {
       imageList = [],
       loading = false,
@@ -390,45 +390,45 @@ class ImagePreviewer extends Component {
             style={{ transform: 'rotate(180deg)', color: 'white' }}
           />
         </div>
-        <div>
-          <GridContainer>
-            <GridItem xs={12} md={12}>
-              <TextField
-                label='Created By'
-                text
-                value={selectedImage.createByUserName}
-                style={{ width: '100%' }}
-              />
-            </GridItem>
-            <GridItem md={12}>
-              <TextField
-                label='Create Date'
-                value={moment(selectedImage.createDate).format(dateFormatLong)}
-                text
-              />
-            </GridItem>
-            <GridItem md={12}>
-              <TextField
-                label='File Name'
-                value={selectedImage.fileName}
-                maxLength={50}
-                onChange={e => {
+       
+        <GridContainer style={{display:'table-cell', verticalAlign:'top'}}>
+          <GridItem xs={12} md={12}>
+            <TextField
+              label='Created By'
+              text
+              value={selectedImage.createByUserName}
+              style={{ width: '100%' }}
+            />
+          </GridItem>
+          <GridItem md={12}>
+            <TextField
+              label='Create Date'
+              value={moment(selectedImage.createDate).format(dateFormatLong)}
+              text
+            />
+          </GridItem>
+          <GridItem md={12}>
+            <TextField
+              label='File Name'
+              value={selectedImage.fileName}
+              maxLength={50}
+              onChange={e => {
                   selectedImage.fileName = e.target.value
                   this.setState({ imageList })
                 }}
-                text={readOnly}
-                style={{ width: '100%' }}
-              />
-            </GridItem>
-            <GridItem md={12} style={{ marginTop: 10 }}>
-              <div>
-                <span style={{ marginRight: 10 }}>Folder as:</span>
-                {!readOnly && (
-                  <SetFolderWithPopover
-                    key={selectedImage.id}
-                    folderList={folderList}
-                    selectedFolderFKs={selectedImage.folderFKs || []}
-                    onClose={selectedFolder => {
+              text={readOnly}
+              style={{ width: '100%' }}
+            />
+          </GridItem>
+          <GridItem md={12} style={{ marginTop: 10 }}>
+            <div>
+              <span style={{ marginRight: 10 }}>Folder as:</span>
+              {!readOnly && (
+              <SetFolderWithPopover
+                key={selectedImage.id}
+                folderList={folderList}
+                selectedFolderFKs={selectedImage.folderFKs || []}
+                onClose={selectedFolder => {
                       const originalFolders = _.sortedUniq(
                         selectedImage.folderFKs || [],
                       )
@@ -442,22 +442,22 @@ class ImagePreviewer extends Component {
                         this.setState({ imageList })
                       }
                     }}
-                    onAddNewFolders={onAddNewFolders}
-                  />
+                onAddNewFolders={onAddNewFolders}
+              />
                 )}
-              </div>
-            </GridItem>
-            {selectedImage.folderFKs && Array.isArray(selectedImage.folderFKs) && (
-              <GridItem
-                md={12}
-                style={{
+            </div>
+          </GridItem>
+          {selectedImage.folderFKs && Array.isArray(selectedImage.folderFKs) && (
+          <GridItem
+            md={12}
+            style={{
                   padding: 0,
                   minHeight: 50,
                   maxHeight: 200,
                   overflow: 'scroll',
                 }}
-              >
-                {_.uniq(selectedImage.folderFKs).map(item => {
+          >
+            {_.uniq(selectedImage.folderFKs).map(item => {
                   const folderEntity = folderList.find(f => f.id === item)
                   return (
                     <Chip
@@ -476,13 +476,13 @@ class ImagePreviewer extends Component {
                     />
                   )
                 })}
-              </GridItem>
+          </GridItem>
             )}
-            <GridItem md={12}>
-              <div>
-                <Button
-                  color='primary'
-                  onClick={() => {
+          <GridItem md={12}>
+            <div>
+              <Button
+                color='primary'
+                onClick={() => {
                     printJS({
                       printable: selectedImage.image.src,
                       type: 'image',
@@ -490,40 +490,40 @@ class ImagePreviewer extends Component {
                       header: '',
                     })
                   }}
-                >
-                  <Print /> Print
-                </Button>
-                {!readOnly && (
-                  <React.Fragment>
-                    <Button
-                      color='primary'
-                      disabled={
+              >
+                <Print /> Print
+              </Button>
+              {!readOnly && (
+              <React.Fragment>
+                <Button
+                  color='primary'
+                  disabled={
                         selectedImage.fileName === undefined ||
                         selectedImage.fileName.trim() === ''
                       }
-                      onClick={() => {
+                  onClick={() => {
                         onFileUpdated(selectedImage)
                       }}
-                    >
-                      <Save /> Save
-                    </Button>
+                >
+                  <Save /> Save
+                </Button>
 
-                    <Popconfirm
-                      title='Permanently delete this file in all folders?'
-                      onConfirm={() => {
+                <Popconfirm
+                  title='Permanently delete this file in all folders?'
+                  onConfirm={() => {
                         this.deleteImage(selectedImage)
                       }}
-                    >
-                      <Button color='danger'>
-                        <Delete /> Delete
-                      </Button>
-                    </Popconfirm>
-                  </React.Fragment>
+                >
+                  <Button color='danger'>
+                    <Delete /> Delete
+                  </Button>
+                </Popconfirm>
+              </React.Fragment>
                 )}
-              </div>
-            </GridItem>
-          </GridContainer>
-        </div>
+            </div>
+          </GridItem>
+        </GridContainer>
+     
       </div>
     )
   }
