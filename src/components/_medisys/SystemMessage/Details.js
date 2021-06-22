@@ -1,28 +1,11 @@
 import React from 'react'
-import { connect } from 'dva'
-import router from 'umi/router'
-import $ from 'jquery'
-import { FormattedMessage } from 'umi/locale'
-import Search from '@material-ui/icons/Search'
-import Add from '@material-ui/icons/Add'
-// formik
-import { withFormik, FastField } from 'formik'
+import { connect } from 'dva' 
+import $ from 'jquery'  
+// formik 
 // material ui
-import { withStyles } from '@material-ui/core'
-import Edit from '@material-ui/icons/Edit'
+import { withStyles } from '@material-ui/core' 
 // common component
-import {
-  Button,
-  CardContainer,
-  CommonTableGrid,
-  GridContainer,
-  GridItem,
-  ProgressButton,
-  Select,
-  TextField,
-  Tooltip,
-  withSettingBase,
-} from '@/components'
+import {GridContainer,GridItem } from '@/components'
 
 const styles = (theme) => ({
   verticalSpacing: {
@@ -34,7 +17,7 @@ const styles = (theme) => ({
 class SystemMessageDetail extends React.Component {
   state = {}
 
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.container = React.createRef()
   }
@@ -62,12 +45,12 @@ class SystemMessageDetail extends React.Component {
     $(this.container.current).click()
   }
 
-  render() {
+  render () {
     const { footer, classes, systemMessage: { entity = {} } } = this.props
     const { contents = 'System message has not found.' } = entity
     return (
       <GridContainer>
-        <GridItem >
+        <GridItem>
           <div
             ref={this.container}
             dangerouslySetInnerHTML={{ __html: contents }}
