@@ -644,11 +644,11 @@ class PatientDetail extends PureComponent {
                 style={
                   height > 0
                     ? {
-                        height: height - 95 - 20,
-                        overflow: 'auto',
-                        padding: 4,
-                        paddingTop: 20,
-                      }
+                      height: height - 95 - 20,
+                      overflow: 'auto',
+                      padding: 4,
+                      paddingTop: 20,
+                    }
                     : { padding: 4, paddingTop: 20 }
                 }
               >

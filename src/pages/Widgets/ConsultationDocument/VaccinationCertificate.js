@@ -60,7 +60,7 @@ import { getClinicianProfile } from './utils'
   displayName: 'AddConsultationDocument',
 })
 class VaccinationCertificate extends PureComponent {
-  constructor(props) {
+  constructor (props) {
     super(props)
     const { dispatch } = props
 
@@ -81,7 +81,7 @@ class VaccinationCertificate extends PureComponent {
     // this.editorReferece = ref
   }
 
-  render() {
+  render () {
     const {
       footer,
       handleSubmit,

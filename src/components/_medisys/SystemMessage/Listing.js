@@ -44,17 +44,17 @@ const styles = (theme) => ({
 
 @connect(({ systemMessage }) => ({ systemMessage }))
 class SystemMessageList extends React.Component {
-  render() {
+  render () {
     const { dispatch, systemMessage, classes, setShowNotification } = this.props
     const { list = [] } = systemMessage
     const rootClass = classnames({
-      [ classes.root ]: true,
-      [ classes.listRoot ]: list.length > 0,
-      [ classes.emptyRoot ]: list.length === 0,
+      [classes.root]: true,
+      [classes.listRoot]: list.length > 0,
+      [classes.emptyRoot]: list.length === 0,
     })
 
     const handelLoadMore = (msgTypeId) => {
-      const pagination = systemMessage[ `pagination${msgTypeId}` ]
+      const pagination = systemMessage[`pagination${msgTypeId}`]
       const { current = 0, pageSize, totalRecords } = pagination
       dispatch({
         type: 'systemMessage/queryList',
@@ -102,7 +102,7 @@ class SystemMessageList extends React.Component {
             options={systemMessageTypes.map((o) => {
               const msgList = list.filter((m) => m.systemMessageTypeFK === o.id)
               const newMsgCount = msgList.filter((m) => !m.isRead)
-              const pagination = systemMessage[ `pagination${o.id}` ]
+              const pagination = systemMessage[`pagination${o.id}`]
 
               const { current = 1, pageSize = 0, totalRecords = 0 } =
                 pagination || {}

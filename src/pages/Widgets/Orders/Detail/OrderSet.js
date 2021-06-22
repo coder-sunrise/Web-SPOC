@@ -115,9 +115,8 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
           codeTableItem.id === inventoryMedication.medicationFrequencyFK,
       )
       instruction += `${drugFrequency ? drugFrequency.displayValue : ''} For `
-      instruction += `${
-        inventoryMedication.duration ? inventoryMedication.duration : ''
-      } day(s)`
+      instruction += `${inventoryMedication.duration ? inventoryMedication.duration : ''
+        } day(s)`
       return instruction
     }
 
@@ -454,7 +453,7 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
   displayName: 'OrderPage',
 })
 class OrderSet extends PureComponent {
-  constructor(props) {
+  constructor (props) {
     super(props)
     const { dispatch } = props
     const codeTableNameArray = [
@@ -646,7 +645,7 @@ class OrderSet extends PureComponent {
     return false
   }
 
-  render() {
+  render () {
     const { theme, values, footer, from } = this.props
     return (
       <Authorized

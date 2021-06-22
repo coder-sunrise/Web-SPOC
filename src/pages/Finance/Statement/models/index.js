@@ -41,7 +41,7 @@ export default createListViewModel({
       })
     },
     effects: {
-      *queryInvoiceList({ payload }, { call, put }) {
+      *queryInvoiceList ({ payload }, { call, put }) {
         const response = yield call(service.queryInvoiceList, payload)
         return response
         // yield put({
@@ -49,7 +49,7 @@ export default createListViewModel({
         //   payload: response,
         // })
       },
-      *refreshAll({ payload }, { call, put }) {
+      *refreshAll ({ payload }, { call, put }) {
         yield put({
           type: 'refreshStatement',
           payload,
@@ -60,7 +60,7 @@ export default createListViewModel({
         })
       },
 
-      *refreshStatement({ payload }, { call, put }) {
+      *refreshStatement ({ payload }, { call, put }) {
         const response = yield call(service.refresh, payload)
         if (response === 204) {
           const res = yield call(service.query, payload)
@@ -73,7 +73,7 @@ export default createListViewModel({
         return false
       },
 
-      *extractAsSingle({ payload }, { call, put }) {
+      *extractAsSingle ({ payload }, { call, put }) {
         const response = yield call(service.extract, payload)
         if (response === 204) {
           const res = yield call(service.query, payload)
@@ -85,7 +85,7 @@ export default createListViewModel({
         }
         return false
       },
-      *bizSessionList({ payload }, { call, put }) {
+      *bizSessionList ({ payload }, { call, put }) {
         const response = yield call(service.queryBizSession, payload)
         yield put({
           type: 'updateBizSessionList',
@@ -93,13 +93,13 @@ export default createListViewModel({
         })
       },
 
-      *removeRow({ payload }, { call, put }) {
+      *removeRow ({ payload }, { call, put }) {
         const result = yield call(service.remove, payload)
         if (result === 204) {
           notification.success({ message: 'Deleted' })
         }
       },
-      *queryPaymentHistory({ payload }, { call, put }) {
+      *queryPaymentHistory ({ payload }, { call, put }) {
         const response = yield call(service.queryPaymentHistory, payload)
         yield put({
           type: 'queryPaymentHistoryDone',
@@ -109,21 +109,21 @@ export default createListViewModel({
           },
         })
       },
-      *queryRecentStatementNo({ payload }, { call, put }) {
+      *queryRecentStatementNo ({ payload }, { call, put }) {
         const response = yield call(service.getLastStatementNo, payload)
         yield put({
           type: 'getLastStatementNoDone',
           payload: response,
         })
       },
-      *autoGenerateStatement({ payload }, { call, put }) {
+      *autoGenerateStatement ({ payload }, { call, put }) {
         const r = yield call(service.autoGenerateStatement, payload)
         if (r) {
           return r
         }
         return false
       },
-      *queryForBatchPrint({ payload }, { call, put }) {
+      *queryForBatchPrint ({ payload }, { call, put }) {
         const response = yield call(service.queryList, payload)
         if (response && response.status === '200') {
           yield put({
@@ -136,10 +136,10 @@ export default createListViewModel({
       },
     },
     reducers: {
-      setActiveTab(st, { payload }) {
+      setActiveTab (st, { payload }) {
         return { ...st, activeTab: payload.activeTab }
       },
-      queryDone(st, { payload }) {
+      queryDone (st, { payload }) {
         const { data } = payload
         return {
           ...st,
@@ -153,7 +153,7 @@ export default createListViewModel({
         }
       },
 
-      queryOneDone(st, { payload }) {
+      queryOneDone (st, { payload }) {
         const { data } = payload
         return {
           ...st,
@@ -161,7 +161,7 @@ export default createListViewModel({
         }
       },
 
-      queryInvoiceDone(st, { payload }) {
+      queryInvoiceDone (st, { payload }) {
         const { data } = payload
         return {
           ...st,
@@ -172,27 +172,27 @@ export default createListViewModel({
           }),
         }
       },
-      queryPaymentHistoryDone(st, { payload }) {
+      queryPaymentHistoryDone (st, { payload }) {
         return {
           ...st,
           ...payload,
         }
       },
-      refreshDone(st, { payload }) {
+      refreshDone (st, { payload }) {
         const { data } = payload
         return {
           ...st,
           entity: data,
         }
       },
-      getLastStatementNoDone(st, { payload }) {
+      getLastStatementNoDone (st, { payload }) {
         const { data } = payload
         return {
           ...st,
           statementNoList: data,
         }
       },
-      updateBizSessionList(state, { payload }) {
+      updateBizSessionList (state, { payload }) {
         const { data } = payload
         return {
           ...state,
@@ -204,14 +204,14 @@ export default createListViewModel({
           }),
         }
       },
-      autoGenerateStatementDone(state, { payload }) {
+      autoGenerateStatementDone (state, { payload }) {
         const { data } = payload
         return {
           ...state,
           result: data,
         }
       },
-      queryBatchPrintDone(st, { payload }) {
+      queryBatchPrintDone (st, { payload }) {
         const { data } = payload
         return {
           ...st,

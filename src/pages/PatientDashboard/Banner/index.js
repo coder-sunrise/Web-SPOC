@@ -52,7 +52,7 @@ class Banner extends PureComponent {
     currentSchemeType: 0,
   }
 
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.fetchCodeTables()
   }
@@ -64,8 +64,8 @@ class Banner extends PureComponent {
       payload: { code: 'ctg6pd' },
     })
   }
-  
-  getAllergyLink(data) {
+
+  getAllergyLink (data) {
     const { props } = this
     const { patient, codetable: { ctg6pd = [] }, } = props
     const { entity } = patient
@@ -407,12 +407,12 @@ class Banner extends PureComponent {
       statusDescription: refreshedSchemeData.statusDescription,
       acuteBalanceStatusCode:
         !_.isEmpty(refreshedSchemeData) &&
-        refreshedSchemeData.isSuccessful === false
+          refreshedSchemeData.isSuccessful === false
           ? 'ERROR'
           : undefined,
       chronicBalanceStatusCode:
         !_.isEmpty(refreshedSchemeData) &&
-        refreshedSchemeData.isSuccessful === false
+          refreshedSchemeData.isSuccessful === false
           ? 'ERROR'
           : chronicStatus,
       isSuccessful:
@@ -480,7 +480,7 @@ class Banner extends PureComponent {
     }
   }
 
-  displayMedicalProblemData(entity = { patientHistoryDiagnosis: [] }) {
+  displayMedicalProblemData (entity = { patientHistoryDiagnosis: [] }) {
     let medicalProblemData = '-'
     const { patientHistoryDiagnosis = [] } = entity
 
@@ -520,7 +520,7 @@ class Banner extends PureComponent {
     )
   }
 
-  render() {
+  render () {
     const { props } = this
     const {
       // patientInfo = {},
@@ -719,9 +719,9 @@ class Banner extends PureComponent {
                               <div style={{ marginBottom: 15 }}>
                                 <div>
                                   {schemeData.coPaymentSchemeFK ||
-                                  schemeDataList.filter(p =>
-                                    this.isMedisave(p.schemeTypeFK),
-                                  )[0] === schemeData
+                                    schemeDataList.filter(p =>
+                                      this.isMedisave(p.schemeTypeFK),
+                                    )[0] === schemeData
                                     ? schemeData.copaymentSchemeName
                                     : schemeData.schemeTypeName}
                                   <span style={{ bottom: -2 }}>
@@ -858,19 +858,17 @@ class Banner extends PureComponent {
                               schemeData.schemeTypeFK,
                             )
                             const displayString = `
-                          ${
-                            schemeData.coPaymentSchemeFK || isMedisave
-                              ? schemeData.copaymentSchemeName || ''
-                              : schemeData.schemeTypeName || ''
-                          } 
+                          ${schemeData.coPaymentSchemeFK || isMedisave
+                                ? schemeData.copaymentSchemeName || ''
+                                : schemeData.schemeTypeName || ''
+                              }
                           ${!isMedisave ? '(Exp:' : ''} 
-                          ${
-                            !isMedisave && schemeData.validTo
-                              ? moment(schemeData.validTo).format(
+                          ${!isMedisave && schemeData.validTo
+                                ? moment(schemeData.validTo).format(
                                   'DD MMM YYYY)',
                                 )
                               : ''
-                          }
+                              }
                           ${!isMedisave && !schemeData.validTo ? '-)' : ''}
                           `
                             return (
@@ -926,9 +924,9 @@ class Banner extends PureComponent {
                   title={
                     info.outstandingBalance
                       ? `${currencySymbol}${_.round(
-                          info.outstandingBalance,
-                          2,
-                        )}`
+                        info.outstandingBalance,
+                        2,
+                      )}`
                       : ''
                   }
                 >

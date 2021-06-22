@@ -11,7 +11,7 @@ const STYLES = (theme) => {
 
 @control()
 class AutoSuggestion extends PureComponent {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       value: props.field.value || '',
@@ -21,7 +21,7 @@ class AutoSuggestion extends PureComponent {
     }
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     if (this.state.value !== nextProps.field.value) {
       this.setState({ value: nextProps.field.value })
     }
@@ -33,7 +33,7 @@ class AutoSuggestion extends PureComponent {
     const { valuePath = 'value' } = this.props
 
     return inputLength === 0 ? [] : this.state.options.filter(lang =>
-      lang[ valuePath ].toLowerCase().indexOf(inputValue) >= 0
+      lang[valuePath].toLowerCase().indexOf(inputValue) >= 0
     )
   }
 
@@ -61,7 +61,7 @@ class AutoSuggestion extends PureComponent {
     const { valuePath = 'value', onOptionSelected } = this.props
     const { filterOptions = [] } = this.state
 
-    const selectOption = filterOptions.find(s => s[ valuePath ] === value)
+    const selectOption = filterOptions.find(s => s[valuePath] === value)
     if (onOptionSelected) {
       onOptionSelected(value, selectOption)
     }
@@ -72,7 +72,7 @@ class AutoSuggestion extends PureComponent {
   renderDataSource = () => {
     const { renderOption, valuePath = 'value', displayPath = 'text' } = this.props
     const { filterOptions = [] } = this.state
-    return filterOptions.map(s => { return { ...s, value: s[ valuePath ], text: renderOption ? renderOption(s) : s[ displayPath ] } })
+    return filterOptions.map(s => { return { ...s, value: s[valuePath], text: renderOption ? renderOption(s) : s[displayPath] } })
   }
 
   onFocus = () => {
@@ -83,7 +83,7 @@ class AutoSuggestion extends PureComponent {
     this.setState({ isFocused: false })
   }
 
-  render() {
+  render () {
     const { label } = this.props
     const { value, isFocused } = this.state
 

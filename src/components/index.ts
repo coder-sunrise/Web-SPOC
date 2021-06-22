@@ -107,3 +107,6 @@ export HTMLRender from './HTMLRender'
 // new Component after migrate to JGH
 export Icon from './icon'
 export PageContainer from './PageContainer'
+
+export AutoSuggestion from './AutoSuggestion'
+export Number from './Number'

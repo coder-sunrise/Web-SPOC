@@ -1,11 +1,13 @@
 import React from 'react'
-import { connect } from 'dva' 
-import $ from 'jquery'  
-// formik 
+import { connect } from 'dva'
+import $ from 'jquery'
 // material ui
-import { withStyles } from '@material-ui/core' 
+import { withStyles } from '@material-ui/core'
 // common component
-import {GridContainer,GridItem } from '@/components'
+import {
+  GridContainer,
+  GridItem,
+} from '@/components'
 
 const styles = (theme) => ({
   verticalSpacing: {

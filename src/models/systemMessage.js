@@ -19,13 +19,13 @@ export default createListViewModel({
       })
     },
     effects: {
-      *queryList({ payload }, { call, put, select }) {
+      *queryList ({ payload }, { call, put, select }) {
         const { typeId, sorting = [], pagesize = 10, current = 1 } = payload
         const stMessage = yield select((st) => st.systemMessage)
         let filter = {}
         delete payload.typeId
 
-        filter = stMessage[ `filter${typeId}` ]
+        filter = stMessage[`filter${typeId}`]
 
         filter = {
           sorting,
@@ -43,7 +43,7 @@ export default createListViewModel({
             payload: {
               data,
               typeId,
-              [ `filter${typeId}` ]: filter,
+              [`filter${typeId}`]: filter,
             },
           })
           yield put({
@@ -56,7 +56,7 @@ export default createListViewModel({
 
         return data
       },
-      *received({ payload }, { call, put }) {
+      *received ({ payload }, { call, put }) {
         const { id, isDeleted = false } = payload
         const filter = {
           id,
@@ -95,7 +95,7 @@ export default createListViewModel({
         return data
       },
 
-      *read({ payload }, { call, put }) {
+      *read ({ payload }, { call, put }) {
         const response = yield call(service.upsertRead, payload)
         if (response) {
           yield put({ type: 'received', payload })
@@ -108,7 +108,7 @@ export default createListViewModel({
         return null
       },
 
-      *dismiss({ payload }, { call, put }) {
+      *dismiss ({ payload }, { call, put }) {
         const response = yield call(service.upsertDismiss, payload)
         if (response === 200) {
           yield put({ type: 'received', payload })
@@ -124,11 +124,11 @@ export default createListViewModel({
         }
         return false
       },
-      *dismissAll({ payload }, { call, put }) {
+      *dismissAll ({ payload }, { call, put }) {
         const response = yield call(service.upsertDismissAll, payload)
         const { data = [], status } = response
         if (status === '200' && data.length > 0) {
-          yield put({ type: 'received', payload: { id: data[ 0 ] } })
+          yield put({ type: 'received', payload: { id: data[0] } })
           yield put({
             type: 'dismissDone',
             payload: {
@@ -143,12 +143,12 @@ export default createListViewModel({
       },
     },
     reducers: {
-      dismissDone(st, { payload }) {
+      dismissDone (st, { payload }) {
         const { ids } = payload
         const { list } = st
         for (let i in list) {
-          if (ids.includes(list[ i ].id)) {
-            list[ i ].isDismissed = true
+          if (ids.includes(list[i].id)) {
+            list[i].isDismissed = true
           }
         }
         return {
@@ -156,7 +156,7 @@ export default createListViewModel({
           list,
         }
       },
-      queryDone(st, { payload }) {
+      queryDone (st, { payload }) {
         const { data } = payload
         return {
           ...st,
@@ -170,14 +170,14 @@ export default createListViewModel({
         }
       },
 
-      queryOneDone(st, { payload }) {
+      queryOneDone (st, { payload }) {
         const { data } = payload
         return {
           ...st,
           entity: data,
         }
       },
-      receivedDone(st, { payload = {} }) {
+      receivedDone (st, { payload = {} }) {
         const { list, totalUnReadCount } = st
         const { isDeleted = false, id, data } = payload
         let newST = st
@@ -196,11 +196,11 @@ export default createListViewModel({
             ]
           }, [])
 
-          const pagination = st[ `pagination${systemMessageTypeFK}` ]
+          const pagination = st[`pagination${systemMessageTypeFK}`]
           newST = {
             ...st,
             list: newList,
-            [ `pagination${systemMessageTypeFK}` ]: {
+            [`pagination${systemMessageTypeFK}`]: {
               ...pagination,
               totalRecords: pagination.totalRecords - 1,
             },
@@ -215,7 +215,7 @@ export default createListViewModel({
               entity,
             ] = datas
             const { systemMessageTypeFK } = entity
-            const pagination = st[ `pagination${systemMessageTypeFK}` ]
+            const pagination = st[`pagination${systemMessageTypeFK}`]
             if (!list.some((f) => f.id === entity.id)) {
               newST = {
                 ...st,
@@ -223,7 +223,7 @@ export default createListViewModel({
                   entity,
                   ...list,
                 ],
-                [ `pagination${systemMessageTypeFK}` ]: {
+                [`pagination${systemMessageTypeFK}`]: {
                   ...pagination,
                   totalRecords: pagination.totalRecords + 1,
                 },
@@ -253,14 +253,14 @@ export default createListViewModel({
         }
         return newST
       },
-      querySuccess(st, { payload = {} }) {
+      querySuccess (st, { payload = {} }) {
         const { data, typeId, version, keepFilter = true } = payload
         const datas = data.entities ? data.entities : data.data
         const list = [
           ...(st.list || []),
           ...datas,
         ]
-        const filter = payload[ `filter${typeId}` ]
+        const filter = payload[`filter${typeId}`]
         const { sorting } = filter
 
         const cfg = {}
@@ -271,10 +271,10 @@ export default createListViewModel({
           ...st,
           list,
           totalUnReadCount:
-            datas.length > 0 ? datas[ 0 ].totalUnReadCount : st.totalUnReadCount,
-          [ `filter${typeId}` ]: keepFilter ? filter : {},
-          [ `pagination${typeId}` ]: {
-            ...st[ `pagination${typeId}` ],
+            datas.length > 0 ? datas[0].totalUnReadCount : st.totalUnReadCount,
+          [`filter${typeId}`]: keepFilter ? filter : {},
+          [`pagination${typeId}`]: {
+            ...st[`pagination${typeId}`],
             current: data.currentPage || 1,
             pageSize: data.pageSize || 10,
             totalRecords: data.totalRecords,

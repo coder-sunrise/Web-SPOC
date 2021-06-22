@@ -19,7 +19,7 @@ const reportId = 54
 const fileName = 'Statement Summary Report'
 
 class StatementSummaryReport extends ReportBase {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       ...this.state,
@@ -54,7 +54,7 @@ class StatementSummaryReport extends ReportBase {
       },
     ]
 
-    if (reportDatas.ListingDetails[ 0 ].isPrintDetails) {
+    if (reportDatas.ListingDetails[0].isPrintDetails) {
       segments = [
         ...segments,
         {
@@ -64,7 +64,7 @@ class StatementSummaryReport extends ReportBase {
       ]
     }
 
-    if (reportDatas.ListingDetails[ 0 ].asAt) {
+    if (reportDatas.ListingDetails[0].asAt) {
       segments = [
         ...segments,
         {

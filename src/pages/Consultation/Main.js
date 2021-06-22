@@ -46,7 +46,7 @@ import {
   ReportsOnSignOffOption,
 } from '@/utils/codes'
 import ConsumePackage from '@/pages/Widgets/Orders/Detail/ConsumePackage'
-import * as service from '@/services/consultation'
+import service from '@/services/consultation'
 import AutoPrintSelection from './autoPrintSelection'
 
 // import PatientSearch from '@/pages/PatientDatabase/Search'
@@ -382,7 +382,7 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
   mapPropsToValues: ({ consultation = {}, visitRegistration }) => {
     if (
       window.g_app._store.getState().global.isShowSecondConfirmButton ===
-        undefined &&
+      undefined &&
       visitRegistration &&
       visitRegistration.entity
     ) {
@@ -492,15 +492,15 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
         confirmMessage:
           summary && summary.totalWithGST < 0
             ? () => {
-                return (
-                  <div>
-                    <h3>Total invoice amount is negative.</h3>
-                    <h3 style={{ marginTop: 0 }}>
-                      Confirm sign off current consultation?
+              return (
+                <div>
+                  <h3>Total invoice amount is negative.</h3>
+                  <h3 style={{ marginTop: 0 }}>
+                    Confirm sign off current consultation?
                     </h3>
-                  </div>
-                )
-              }
+                </div>
+              )
+            }
             : 'Confirm sign off current consultation?',
         successMessage: 'Consultation signed',
         action: 'sign',
@@ -517,7 +517,7 @@ class Main extends React.Component {
     recording: true,
   }
 
-  componentDidMount() {
+  componentDidMount () {
     // console.log('Main')
     initRoomAssignment()
     setTimeout(() => {
@@ -532,7 +532,7 @@ class Main extends React.Component {
     }
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     this.props.dispatch({
       type: 'consultation/updateState',
       payload: {
@@ -570,14 +570,14 @@ class Main extends React.Component {
     if (
       nextProps.visitRegistration &&
       nextProps.visitRegistration.version !==
-        this.props.visitRegistration.version
+      this.props.visitRegistration.version
     )
       return true
     if (
       nextProps.visitRegistration &&
       nextProps.visitRegistration.entity &&
       nextProps.visitRegistration.entity.id !==
-        this.props.visitRegistration.entity.id
+      this.props.visitRegistration.entity.id
     )
       return true
     if (
@@ -1121,7 +1121,7 @@ class Main extends React.Component {
     })
   }
 
-  render() {
+  render () {
     const { props, state } = this
     const {
       classes,

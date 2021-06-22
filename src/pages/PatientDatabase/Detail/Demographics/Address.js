@@ -102,7 +102,7 @@ class Address extends Component {
     return []
   }
 
-  render() {
+  render () {
     const searchBtnUid = getUniqueId()
     const {
       addressIndex,
@@ -152,7 +152,7 @@ class Address extends Component {
                         disabled={
                           !!addresses.find(
                             (o) => o.isMailing && !o.isDeleted,
-                          ) && !addresses[ addressIndex ].isMailing
+                          ) && !addresses[addressIndex].isMailing
                         }
                         {...args}
                       />
@@ -169,7 +169,7 @@ class Address extends Component {
                         disabled={
                           !!addresses.find(
                             (o) => o.isPrimary && !o.isDeleted,
-                          ) && !addresses[ addressIndex ].isPrimary
+                          ) && !addresses[addressIndex].isPrimary
                         }
                         {...args}
                       />

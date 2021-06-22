@@ -69,7 +69,7 @@ class Others extends PureComponent {
     // this.editorReferece = ref
   }
 
-  render() {
+  render () {
     const {
       footer,
       handleSubmit,
