@@ -284,4 +284,10 @@ export const menuData = [
     text: 'Invoice Adjustment',
     url: '/setting/invoiceadjustment',
   },
+  {
+    authority: 'settings.clinicsetting.medicationingredient',
+    title: 'Clinic Setting',
+    text: 'Medication Ingredient',
+    url: '/setting/medicationingredient',
+  },
 ]

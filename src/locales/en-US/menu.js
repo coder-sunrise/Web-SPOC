@@ -162,6 +162,7 @@ export default {
   'menu.setting.refractiontesttype': 'Refraction Test Type',
   'menu.setting.package': 'Package',
   'menu.setting.invoiceadjustment': 'Invoice Adjustment',
+  'menu.setting.medicationingredient': 'Medication Ingredient',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',

@@ -1063,6 +1063,12 @@ const _routes = [
             component: './Setting/InvoiceAdjustment',
             authority: ['settings.clinicsetting.invoiceadjustment'],
           },
+          {
+            path: '/setting/medicationingredient',
+            name: 'medicationingredient',
+            component: './Setting/MedicationIngredient',
+            authority: ['settings.clinicsetting.medicationingredient'],
+          },
         ],
       },
       // Settings
