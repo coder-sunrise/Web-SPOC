@@ -52,7 +52,12 @@ class Detail extends PureComponent {
               />
             </GridItem>
             <GridItem md={6}>
-              <FastField name="displayValue" render={(args) => <TextField label="Tag Display Value" {...args} />} />
+              <FastField
+                name="displayValue"
+                render={(args) => (
+                  <TextField label="Tag Display Value" {...args} maxLength={25} inputProps={{ maxLength: 25 }} />
+                )}
+              />
             </GridItem>
             <GridItem md={6}>
               <FastField
