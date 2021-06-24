@@ -1063,6 +1063,12 @@ const _routes = [
             component: './Setting/InvoiceAdjustment',
             authority: ['settings.clinicsetting.invoiceadjustment'],
           },
+          {
+            path: '/setting/drugallergyextension',
+            name: 'drugallergyextension',
+            component: './Setting/DrugAllergyExtension',
+            authority: ['settings.clinicsetting.drugallergyextension'],
+          },
         ],
       },
       // Settings
