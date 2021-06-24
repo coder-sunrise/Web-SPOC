@@ -134,13 +134,29 @@ export default ({
     const accessRight = Authorized.check(editAccessRight)
     if (!accessRight || accessRight.rights !== 'enable') return
 
-    dispatch({
-      type: 'orders/updateState',
-      payload: {
-        entity: row,
-        type: row.type,
-      },
-    })
+    if (row.type === '10') {
+      dispatch({
+        type: 'orders/updateState',
+        payload: {
+          entity: {
+            radiologyItems: [{ ...row }],
+            editServiceId: row.serviceFK,
+            selectCategory: 'All',
+            selectTag: 'All',
+          },
+          type: row.type,
+        },
+      })
+    }
+    else {
+      dispatch({
+        type: 'orders/updateState',
+        payload: {
+          entity: row,
+          type: row.type,
+        },
+      })
+    }
     if (row.type === '7') {
       const treatment =
         (codetable.cttreatment || [])
@@ -704,7 +720,7 @@ export default ({
               qty = `${numeral(row.quantity || 0).format(
                 '0,0.0',
               )} ${row.uomDisplayValue}`
-            } else if (row.type === '3' || row.type === '7') {
+            } else if (row.type === '3' || row.type === '7' || row.type === '10') {
               qty = `${numeral(row.quantity || 0).format('0,0.0')}`
             } else if (row.type === '4') {
               qty = `${numeral(row.quantity || 0).format(
