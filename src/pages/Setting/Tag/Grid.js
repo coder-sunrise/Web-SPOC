@@ -28,9 +28,9 @@ class Grid extends PureComponent {
           height,
         }}
         columns={[
-          { name: 'displayValue', title: 'Tag' },
+          { name: 'displayValue', title: 'Display Value' },
+          { name: 'description', title: 'Description' },
           { name: 'category', title: 'Category' },
-          { name: 'description', title: 'Tag Description' },
           { name: 'isActive', title: 'Status' },
           { name: 'action', title: 'Action' },
         ]}

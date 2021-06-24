@@ -55,7 +55,7 @@ class Detail extends PureComponent {
               <FastField
                 name="displayValue"
                 render={(args) => (
-                  <TextField label="Tag Display Value" {...args} maxLength={25} inputProps={{ maxLength: 25 }} />
+                  <TextField label="Display Value" {...args} maxLength={20} inputProps={{ maxLength: 20 }} />
                 )}
               />
             </GridItem>
@@ -71,7 +71,16 @@ class Detail extends PureComponent {
               <FastField
                 name="description"
                 render={(args) => {
-                  return <TextField label="Tag Description" multiline rowsMax={4} {...args} />
+                  return (
+                    <TextField
+                      label="Description"
+                      multiline
+                      rowsMax={4}
+                      {...args}
+                      maxLength={2000}
+                      inputProps={{ maxLength: 2000 }}
+                    />
+                  )
                 }}
               />
             </GridItem>

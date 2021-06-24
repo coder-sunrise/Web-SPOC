@@ -29,7 +29,7 @@ class Filter extends PureComponent {
             <FastField
               name="tagDisplayValue"
               render={(args) => {
-                return <TextField label="Tag" {...args} />
+                return <TextField label="Display Value" {...args} />
               }}
             />
           </GridItem>
