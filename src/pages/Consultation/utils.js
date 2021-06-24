@@ -7,6 +7,7 @@ import Consumable from '@/pages/Widgets/Orders/Detail/Consumable'
 import OrderSet from '@/pages/Widgets/Orders/Detail/OrderSet'
 import Treatment from '@/pages/Widgets/Orders/Detail/Treatment'
 import Package from '@/pages/Widgets/Orders/Detail/Package'
+import Radiology from '@/pages/Widgets/Orders/Detail/Radiology'
 
 const orderTypes = [
   {
@@ -33,6 +34,7 @@ const orderTypes = [
     value: '3',
     prop: 'corService',
     accessRight: 'queue.consultation.order.service',
+    filter: r => !r.isRadiology,
     getSubject: r => r.serviceName,
     component: props => <Service {...props} />,
   },
@@ -72,6 +74,14 @@ const orderTypes = [
     value: '8',
     accessRight: 'queue.consultation.order.package',
     component: props => <Package {...props} />,
+  },
+  {
+    name: 'Radiology',
+    value: '10',
+    prop: 'corService',
+    accessRight: 'queue.consultation.order.service',
+    filter: r => r.isRadiology,
+    component: props => <Radiology {...props} />,
   },
 ]
 
