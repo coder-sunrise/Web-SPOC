@@ -429,7 +429,7 @@ class Radiology extends PureComponent {
                 <div className={classes.groupPanelTitle}>Service</div>
                 <div style={{ maxHeight: 170, overflowY: 'auto', overflowX: 'hidden' }}>
                   {filterServices.map(r => {
-                    return <div style={{ backgroundColor: editServiceId === r.value ? 'lightgreen' : 'white', borderColor: this.isValidate(r) ? 'green' : 'red' }}
+                    return <div style={{ backgroundColor: editServiceId === r.value ? 'lightgreen' : 'white', borderColor: this.isValidate(r) ? '#00ff00' : 'red' }}
                       className={classes.checkServiceItem}
                       onClick={() => {
                         if (radiologyItems.find(item => item.serviceFK === r.value))
