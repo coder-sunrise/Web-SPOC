@@ -15,12 +15,24 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingDrugAllergyExtension }) => settingDrugAllergyExtension.filter || {},
+  mapPropsToValues: ({ settingDrugAllergyExtension }) => {return {...(settingDrugAllergyExtension.filter || {}),type:false}},
   handleSubmit: () => {},
   displayName: 'DrugAllergyExtensionFilter',
 })
 class Filter extends PureComponent {
   render() {
+    const drugAllergyTypes = [
+      {
+        value: false,
+        name: 'Clinic Drug Allergy',
+        render: () => <span>Clinic</span>,
+      },
+      {
+        value: true,
+        name: 'MIMS',
+        render: () => <span>Master</span>,
+      },
+    ]
     const { classes } = this.props
     return (
       <div className={classes.filterBar}>
@@ -41,6 +53,15 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
+          {/* user can see MIMS here
+           <GridItem xs={6} md={2}>
+            <FastField
+              name='type'
+              render={args => {
+                return <Select label='Type' options={drugAllergyTypes} {...args} allowClear={false} />
+              }}
+            />
+          </GridItem> */}
         </GridContainer>
 
         <GridContainer>
@@ -50,10 +71,11 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={<Search />}
                 onClick={() => {
-                  const { codeDisplayValue, isActive } = this.props.values
+                  const { codeDisplayValue, isActive, type } = this.props.values
                   this.props.dispatch({
                     type: 'settingDrugAllergyExtension/query',
                     payload: {
+                      apiCriteria:{Type:type},
                       isActive,
                       group: [
                         {

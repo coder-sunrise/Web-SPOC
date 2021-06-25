@@ -10,10 +10,7 @@ class Grid extends PureComponent {
       { name: 'displayValue', title: 'Display Value' },
       { name: 'description', title: 'Description' },
       { name: 'isActive', title: 'Status' },
-      {
-        name: 'action',
-        title: 'Action',
-      },
+      { name: 'action', title: 'Action' },
     ],
     columnExtensions: [
       { columnName: 'code', width: 200 },
@@ -29,6 +26,8 @@ class Grid extends PureComponent {
         columnName: 'action',
         align: 'center',
         render: (row) => {
+          if(!row.isUserMaintainable)
+            return null
           return (
             <Tooltip title='Edit Drug Allergy Extension'>
               <Button
@@ -51,10 +50,12 @@ class Grid extends PureComponent {
   editRow = (row, e) => {
     const { dispatch, settingDrugAllergyExtension } = this.props
     const { list } = settingDrugAllergyExtension
+    const { isUserMaintainable } = row
+
     dispatch({
       type: 'settingDrugAllergyExtension/updateState',
       payload: {
-        showModal: true,
+        showModal: isUserMaintainable,
         entity: list.find((o) => o.id === row.id),
       },
     })
