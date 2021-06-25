@@ -162,7 +162,7 @@ export default {
   'menu.setting.refractiontesttype': 'Refraction Test Type',
   'menu.setting.package': 'Package',
   'menu.setting.invoiceadjustment': 'Invoice Adjustment',
-  'menu.setting.drugallergyextension': 'Drug Allergy Extension',
+  'menu.setting.clinicdrugallergy': 'Clinic Drug Allergy',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',

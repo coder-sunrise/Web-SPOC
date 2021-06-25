@@ -285,9 +285,9 @@ export const menuData = [
     url: '/setting/invoiceadjustment',
   },
   {
-    authority: 'settings.clinicsetting.drugallergyextension',
+    authority: 'settings.clinicsetting.clinicdrugallergy',
     title: 'Clinic Setting',
-    text: 'Drug Allergy Extension',
-    url: '/setting/drugallergyextension',
+    text: 'Clinic Drug Allergy',
+    url: '/setting/clinicdrugallergy',
   },
 ]

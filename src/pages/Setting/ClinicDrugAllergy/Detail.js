@@ -14,8 +14,8 @@ import {
 const styles = theme => ({})
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingDrugAllergyExtension }) =>
-    settingDrugAllergyExtension.entity || settingDrugAllergyExtension.default,
+  mapPropsToValues: ({ settingClinicDrugAllergy }) =>
+    settingClinicDrugAllergy.entity || settingClinicDrugAllergy.default,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
@@ -29,23 +29,23 @@ const styles = theme => ({})
     const { dispatch, onConfirm } = props
 
     dispatch({
-      type: 'settingDrugAllergyExtension/upsert',
+      type: 'settingClinicDrugAllergy/upsert',
       payload: {
         ...restValues,
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
-        drugallergyextensionStatusFK: 1,
+        clinicdrugallergyStatusFK: 1,
       },
     }).then(r => {
       if (r) {
         if (onConfirm) onConfirm()
         dispatch({
-          type: 'settingDrugAllergyExtension/query',
+          type: 'settingClinicDrugAllergy/query',
         })
       }
     })
   },
-  displayName: 'DrugAllergyExtensionDetail',
+  displayName: 'ClinicDrugAllergyDetail',
 })
 class Detail extends PureComponent {
   render() {

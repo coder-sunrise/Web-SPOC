@@ -14,31 +14,31 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingDrugAllergyExtension, global }) => ({
-  settingDrugAllergyExtension,
+@connect(({ settingClinicDrugAllergy, global }) => ({
+  settingClinicDrugAllergy,
   mainDivHeight: global.mainDivHeight,
 }))
-@withSettingBase({ modelName: 'settingDrugAllergyExtension' })
-class DrugAllergyExtension extends PureComponent {
+@withSettingBase({ modelName: 'settingClinicDrugAllergy' })
+class ClinicDrugAllergy extends PureComponent {
   state = {}
 
   componentDidMount () {
     this.props.dispatch({
-      type: 'settingDrugAllergyExtension/query',
+      type: 'settingClinicDrugAllergy/query',
     })
   }
 
   toggleModal = () => {
     this.props.dispatch({
-      type: 'settingDrugAllergyExtension/updateState',
+      type: 'settingClinicDrugAllergy/updateState',
       payload: {
-        showModal: !this.props.settingDrugAllergyExtension.showModal,
+        showModal: !this.props.settingClinicDrugAllergy.showModal,
       },
     })
   }
 
   render () {
-    const { settingDrugAllergyExtension, mainDivHeight = 700 } = this.props
+    const { settingClinicDrugAllergy, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
@@ -51,9 +51,9 @@ class DrugAllergyExtension extends PureComponent {
         </div>
         <Grid {...this.props} height={height} />
         <CommonModal
-          open={settingDrugAllergyExtension.showModal}
-          observe='DrugAllergyExtensionDetail'
-          title={settingDrugAllergyExtension.entity ? 'Edit Drug Allergy Extension' : 'Add Drug Allergy Extension'}
+          open={settingClinicDrugAllergy.showModal}
+          observe='ClinicDrugAllergyDetail'
+          title={settingClinicDrugAllergy.entity ? 'Edit Clinic Drug Allergy' : 'Add Clinic Drug Allergy'}
           maxWidth='md'
           bodyNoPadding
           onClose={this.toggleModal}
@@ -66,4 +66,4 @@ class DrugAllergyExtension extends PureComponent {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(DrugAllergyExtension)
+export default withStyles(styles, { withTheme: true })(ClinicDrugAllergy)

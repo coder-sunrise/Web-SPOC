@@ -29,7 +29,7 @@ class Grid extends PureComponent {
           if(!row.isUserMaintainable)
             return null
           return (
-            <Tooltip title='Edit Drug Allergy Extension'>
+            <Tooltip title='Edit Clinic Drug Allergy'>
               <Button
                 size='sm'
                 onClick={() => {
@@ -48,12 +48,12 @@ class Grid extends PureComponent {
   }
 
   editRow = (row, e) => {
-    const { dispatch, settingDrugAllergyExtension } = this.props
-    const { list } = settingDrugAllergyExtension
+    const { dispatch, settingClinicDrugAllergy } = this.props
+    const { list } = settingClinicDrugAllergy
     const { isUserMaintainable } = row
 
     dispatch({
-      type: 'settingDrugAllergyExtension/updateState',
+      type: 'settingClinicDrugAllergy/updateState',
       payload: {
         showModal: isUserMaintainable,
         entity: list.find((o) => o.id === row.id),
@@ -66,7 +66,7 @@ class Grid extends PureComponent {
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
-        type='settingDrugAllergyExtension'
+        type='settingClinicDrugAllergy'
         onRowDoubleClick={this.editRow}
         TableProps={{
           height,
