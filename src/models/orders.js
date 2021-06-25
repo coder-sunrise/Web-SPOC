@@ -69,6 +69,7 @@ const initialState = {
     radiologyItems: [],
     selectCategory: 'All',
     selectTag: 'All',
+    filterService: '',
   },
 }
 export default createListViewModel({

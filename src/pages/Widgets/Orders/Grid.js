@@ -143,6 +143,7 @@ export default ({
             editServiceId: row.serviceFK,
             selectCategory: 'All',
             selectTag: 'All',
+            filterService: '',
           },
           type: row.type,
         },

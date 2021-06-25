@@ -424,6 +424,7 @@ const getServices = data => {
         value: o[0].serviceId,
         code: o[0].code,
         name: o[0].displayValue,
+        serviceCategoryFK: o[0].serviceCategoryFK,
         serviceCenters: o.map(m => {
           return {
             value: m.serviceCenterId,
@@ -455,10 +456,22 @@ const getServices = data => {
     ['asc'],
   )
 
+  const serviceCatetorys = _.orderBy(
+    Object.values(_.groupBy(data, 'serviceCategoryFK')).map(o => {
+      return {
+        value: o[0].serviceCategoryFK,
+        name: o[0].serviceCategory,
+      }
+    }),
+    ['name'],
+    ['asc'],
+  )
+
   return {
     serviceCenterServices: data,
     services,
     serviceCenters,
+    serviceCatetorys,
   }
 }
 export {

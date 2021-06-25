@@ -79,13 +79,15 @@ const Editor = ({
           </div>
         </GridItem>
         <GridItem md={12}>
-          {cannedTextTypeFK !== CANNED_TEXT_TYPE.MEDICALCERTIFICATE ?
-            <FastField
+          {cannedTextTypeFK !== CANNED_TEXT_TYPE.MEDICALCERTIFICATE
+            && cannedTextTypeFK !== CANNED_TEXT_TYPE.RADIOLOGYREMARK
+            && cannedTextTypeFK !== CANNED_TEXT_TYPE.RADIOLOGYINSTRUCTION ?
+            (<FastField
               name='text'
               render={(args) => (
                 <RichEditor strongLabel label='Canned Text' {...args} />
               )}
-            />
+            />)
             :
             <FastField
               name='text'

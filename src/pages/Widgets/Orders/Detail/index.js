@@ -177,7 +177,7 @@ class Details extends PureComponent {
     let orderTypeArray = orderTypes
     if (fromDispense) {
       orderTypeArray = orderTypes.filter(
-        (o) => o.value !== '2' && o.value !== '6' && o.value !== '8',
+        (o) => o.value !== '2' && o.value !== '6' && o.value !== '8' && o.value !== '10',
       )
     }
     else {
@@ -185,6 +185,12 @@ class Details extends PureComponent {
       if (!settings.isEnablePackage) {
         orderTypeArray = orderTypes.filter(
           (o) => o.value !== '8',
+        )
+      }
+
+      if (!settings.isEnableRadiology) {
+        orderTypeArray = orderTypes.filter(
+          (o) => o.value !== '10',
         )
       }
     }
