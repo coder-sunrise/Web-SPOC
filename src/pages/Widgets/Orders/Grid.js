@@ -3,6 +3,8 @@ import _ from 'lodash'
 import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
+import CheckCircle from '@material-ui/icons/CheckCircle'
+import Timer from '@material-ui/icons/Timer'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { Divider } from '@material-ui/core'
@@ -68,12 +70,12 @@ export default ({
           (distinct, data) =>
             distinct.includes(data.packageGlobalId)
               ? [
-                  ...distinct,
-                ]
+                ...distinct,
+              ]
               : [
-                  ...distinct,
-                  data.packageGlobalId,
-                ],
+                ...distinct,
+                data.packageGlobalId,
+              ],
           [],
         )
 
@@ -662,10 +664,24 @@ export default ({
             return (
               <div style={wrapCellTextStyle}>
                 {packageDrawdownIndicator(row)}
+                {row.type === '10' &&
+                  <div style={{
+                    position: 'relative',
+                  }}
+                  >
+                    <Timer style={{
+                      position: 'absolute',
+                      top: 2,
+                      color: 'red',
+                      transform: 'scale(1.4,1.4)',
+                    }}
+                    />
+                  </div>
+                }
                 <div
                   style={{
                     position: 'relative',
-                    left: row.isPackage ? 22 : 0,
+                    left: row.isPackage || row.type === '10' ? 22 : 0,
                   }}
                 >
                   {row.subject}

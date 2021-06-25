@@ -22,7 +22,7 @@ import Yup from '@/utils/yup'
 import { getServices } from '@/utils/codetable'
 import { calculateAdjustAmount } from '@/utils/utils'
 import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
-import { CANNED_TEXT_TYPE } from '@/utils/constants'
+import { CANNED_TEXT_TYPE, SERVICE_CENTER_CATEGORY } from '@/utils/constants'
 import CannedTextButton from './CannedTextButton'
 
 const { CheckableTag } = Tag
@@ -146,7 +146,7 @@ const getVisitDoctorUserId = (props) => {
 class Radiology extends PureComponent {
   constructor (props) {
     super(props)
-    const { dispatch, setFieldValue } = props
+    const { dispatch } = props
 
     this.state = {
       services: [],
@@ -164,7 +164,7 @@ class Radiology extends PureComponent {
         filter: {
           'serviceFKNavigation.IsActive': true,
           'serviceCenterFKNavigation.IsActive': true,
-          'serviceCenterFKNavigation.ServiceCenterCategoryFK': 4,
+          'serviceCenterFKNavigation.ServiceCenterCategoryFK': SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
           combineCondition: 'and',
         },
       },
