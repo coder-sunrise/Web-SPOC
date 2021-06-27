@@ -59,6 +59,12 @@ const tenantCodesMap = new Map([
     },
   ],
   [
+    'ctservicecategory',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
     'inventorymedication',
     {
       ...defaultParams,

@@ -1875,13 +1875,13 @@ export const costPriceTypes = [
   },
 ]
 
-const preOrderItemCategory={
-  Medication:'Medication',
-  Vaccination:'Vaccination',
-  Service:'Service',
-  Lab:'Lab',
-  Radiology:'Radiology',
-} 
+const preOrderItemCategory = {
+  Medication: 'Medication',
+  Vaccination: 'Vaccination',
+  Service: 'Service',
+  Lab: 'Lab',
+  Radiology: 'Radiology',
+}
 
 export const documentTemplateTypes = [
   {
@@ -1900,6 +1900,11 @@ export const documentTemplateTypes = [
     value: 4,
     name: 'Others',
   },
+]
+
+const isPanelItemRequired = [
+  { value: false, name: 'No' },
+  { value: true, name: 'Yes' },
 ]
 
 export {
@@ -1936,4 +1941,5 @@ export {
   queueProcessorType,
   queueItemStatus,
   preOrderItemCategory,
+  isPanelItemRequired,
 }

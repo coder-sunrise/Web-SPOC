@@ -110,3 +110,5 @@ export PageContainer from './PageContainer'
 
 export AutoSuggestion from './AutoSuggestion'
 export Number from './Number'
+
+export TagPanel from './TagPanel'
