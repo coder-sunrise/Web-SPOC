@@ -208,6 +208,12 @@ export const menuData = [
     url: '/setting/refractiontesttype',
   },
   {
+    authority: 'settings.clinicsetting.tag',
+    title: 'Clinic Setting',
+    text: 'TAG',
+    url: '/setting/tag',
+  },
+  {
     authority: 'settings.systemuser.systemuser',
     title: 'System User',
     text: 'System User',
