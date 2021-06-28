@@ -3,7 +3,7 @@ import _ from 'lodash'
 import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
-import CheckCircle from '@material-ui/icons/CheckCircle'
+//import CheckCircle from '@material-ui/icons/CheckCircle'
 import Timer from '@material-ui/icons/Timer'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
@@ -669,6 +669,7 @@ export default ({
                     position: 'relative',
                   }}
                   >
+                  <Tooltip title='Draft'>
                     <Timer style={{
                       position: 'absolute',
                       top: 2,
@@ -676,6 +677,7 @@ export default ({
                       transform: 'scale(1.4,1.4)',
                     }}
                     />
+                  </Tooltip>
                   </div>
                 }
                 <div

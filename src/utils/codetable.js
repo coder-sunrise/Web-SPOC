@@ -433,6 +433,12 @@ const getServices = data => {
             isDefault: m.isDefault,
           }
         }),
+        serviceTags: (o[0].serviceTag || []).map(m => {
+          return {
+            value: m.tagFK,
+            name: m.tagDisplayValue,
+          }
+        }),
       }
     }),
     ['name'],
@@ -467,11 +473,32 @@ const getServices = data => {
     ['asc'],
   )
 
+  let serviceTags = []
+  data.forEach(service => {
+    (service.serviceTag || []).forEach(tag => {
+      serviceTags = serviceTags.concat({
+        value: tag.tagFK,
+        name: tag.tagDisplayValue,
+      })
+    })
+  })
+  serviceTags = _.orderBy(
+    Object.values(_.groupBy(serviceTags, 'value')).map(o => {
+      return {
+        value: o[0].value,
+        name: o[0].name,
+      }
+    }),
+    ['name'],
+    ['asc'],
+  )
+
   return {
     serviceCenterServices: data,
     services,
     serviceCenters,
     serviceCatetorys,
+    serviceTags,
   }
 }
 export {

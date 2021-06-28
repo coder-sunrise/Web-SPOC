@@ -15,7 +15,7 @@ import {
   OutlinedTextField,
   NumberInput,
 } from '@/components'
-import { CANNED_TEXT_TYPE } from '@/utils/constants'
+import { CANNED_TEXT_TYPE, CANNED_TEXT_TYPE_BASE_TEXT } from '@/utils/constants'
 
 const defaultEntity = {
   title: undefined,
@@ -79,9 +79,8 @@ const Editor = ({
           </div>
         </GridItem>
         <GridItem md={12}>
-          {cannedTextTypeFK !== CANNED_TEXT_TYPE.MEDICALCERTIFICATE
-            && cannedTextTypeFK !== CANNED_TEXT_TYPE.RADIOLOGYREMARK
-            && cannedTextTypeFK !== CANNED_TEXT_TYPE.RADIOLOGYINSTRUCTION ?
+          {!CANNED_TEXT_TYPE_BASE_TEXT.find(type => type === cannedTextTypeFK)
+            ?
             (<FastField
               name='text'
               render={(args) => (

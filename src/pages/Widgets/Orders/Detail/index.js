@@ -188,7 +188,7 @@ class Details extends PureComponent {
         )
       }
 
-      if (!settings.isEnableRadiology) {
+      if (!settings.isEnableRadiologyModule) {
         orderTypeArray = orderTypes.filter(
           (o) => o.value !== '10',
         )

@@ -152,7 +152,7 @@ class Radiology extends PureComponent {
       services: [],
       serviceCenters: [],
       serviceCenterServices: [],
-      serviceTag: [],
+      serviceTags: [],
       serviceCatetorys: [],
     }
 
@@ -174,6 +174,7 @@ class Radiology extends PureComponent {
         serviceCenters = [],
         serviceCenterServices = [],
         serviceCatetorys = [],
+        serviceTags = [],
       } = getServices(list)
 
       const newServices = services.reduce((p, c) => {
@@ -202,7 +203,7 @@ class Radiology extends PureComponent {
         services: newServices,
         serviceCenters,
         serviceCenterServices,
-        serviceTag: ['All', 'Abdomen'],
+        serviceTags: [{ value: 'All', name: 'All' }, ...serviceTags],
         serviceCatetorys: [{ value: 'All', name: 'All' }, ...serviceCatetorys],
       })
     })
@@ -346,7 +347,7 @@ class Radiology extends PureComponent {
       from,
       setFieldValue,
     } = this.props
-    const { services = [], serviceCenters = [], serviceCatetorys = [], serviceTag = [] } = this.state
+    const { services = [], serviceCenters = [], serviceCatetorys = [], serviceTags = [] } = this.state
     const { radiologyItems = [], isEdit, editServiceId, filterService = '', selectCategory, selectTag, type } = values
     const totalPriceReadonly =
       Authorized.check('queue.consultation.modifyorderitemtotalprice')
@@ -360,7 +361,8 @@ class Radiology extends PureComponent {
     }
     else {
       filterServices = services.filter(s => radiologyItems.find(r => r.serviceFK === s.value)
-        || ((selectCategory === 'All' || s.serviceCategoryFK === selectCategory)
+        || ((selectTag === 'All' || s.serviceTags.find(st => st.value === selectTag))
+          && (selectCategory === 'All' || s.serviceCategoryFK === selectCategory)
           && (s.code.indexOf(filterService) >= 0 || s.name.indexOf(filterService) >= 0)
         )
       )
@@ -378,35 +380,37 @@ class Radiology extends PureComponent {
               <div style={{ marginTop: 10 }}>
                 <span className={classes.subTitle}>Category: </span>
                 {serviceCatetorys.map(category => (
-                  <CheckableTag
-                    key={category.value}
-                    checked={selectCategory === category.value}
-                    style={{ border: '1px solid rgba(0, 0, 0, 0.42)', fontSize: '0.85rem', padding: '3px 10px' }}
-                    onChange={checked => {
-                      if (!isEdit && checked)
-                        setFieldValue('selectCategory', category.value)
-                    }}
-                  >
-                    {category.name}
-                  </CheckableTag>
+                  isEdit ? <Tag className={classes.tag} color={selectCategory === category.value ? "#4255bd" : undefined}>{category.name}</Tag> :
+                    <CheckableTag
+                      key={category.value}
+                      checked={selectCategory === category.value}
+                      style={{ border: '1px solid rgba(0, 0, 0, 0.42)', fontSize: '0.85rem', padding: '3px 10px' }}
+                      onChange={checked => {
+                        if (!isEdit && checked)
+                          setFieldValue('selectCategory', category.value)
+                      }}
+                    >
+                      {category.name}
+                    </CheckableTag>
                 ))}
               </div>
             </GridItem>
             <GridItem xs={12}>
               <div style={{ marginTop: 10 }}>
                 <span className={classes.subTitle}>Tag: </span>
-                {serviceTag.map(tag => (
-                  <CheckableTag
-                    key={tag}
-                    checked={selectTag === tag}
-                    className={classes.tag}
-                    onChange={checked => {
-                      if (!isEdit && checked)
-                        setFieldValue('selectTag', tag)
-                    }}
-                  >
-                    {tag}
-                  </CheckableTag>
+                {serviceTags.map(tag => (
+                  isEdit ? <Tag className={classes.tag} color={selectTag === tag.value ? "#4255bd" : undefined}>{tag.name}</Tag> :
+                    <CheckableTag
+                      key={tag.value}
+                      checked={selectTag === tag.value}
+                      className={classes.tag}
+                      onChange={checked => {
+                        if (!isEdit && checked)
+                          setFieldValue('selectTag', tag.value)
+                      }}
+                    >
+                      {tag.name}
+                    </CheckableTag>
                 ))}
               </div>
             </GridItem>
