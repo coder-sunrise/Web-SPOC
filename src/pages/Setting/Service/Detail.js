@@ -71,6 +71,9 @@ const checkboxOptions = [
   },
 ]
 
+const isRequiredSpecimen = 'isRequiredSpecimen'
+const isRequiredSpecimenPanelItem = 'isRequiredSpecimenPanelItem'
+
 const modalityItemSchema = Yup.object().shape({
   modalityFK: Yup.string().required(),
 })
@@ -541,6 +544,24 @@ class Detail extends PureComponent {
     setFieldValue('ctService_Tag', [...currentTags, ...deletedTags])
   }
 
+  handleCheckOptionChange = async (e, setFieldValue) => {
+    //Only can check isRequiredSpecimenPanelItem option if isRequiredSpecimen not checked
+    const newValues = e.target.value.filter(
+      v =>
+        e.target.value.includes(isRequiredSpecimen) ||
+        v !== isRequiredSpecimenPanelItem,
+    )
+    await setFieldValue('chkOptions', newValues)
+
+    this.setState({
+      checkboxOptions: checkboxOptions.filter(
+        o =>
+          e.target.value.includes('isRequiredSpecimen') ||
+          o.id !== isRequiredSpecimenPanelItem,
+      ),
+    })
+  }
+
   render() {
     const { props } = this
 
@@ -569,7 +590,6 @@ class Detail extends PureComponent {
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(2) }}>
-          {/* <SizeContainer style={{ padding: 20 }}> */}
           <h4 style={{ fontWeight: 400 }}>
             <b>Service Details</b>
           </h4>
@@ -725,26 +745,12 @@ class Detail extends PureComponent {
                           valueField='id'
                           textField='name'
                           defaultValue={this.state.checkboxOptionValues}
-                          onChange={async e => {
-                            const newValues = e.target.value.filter(
-                              v =>
-                                e.target.value.includes('isRequiredSpecimen') ||
-                                v !== 'isRequiredSpecimenPanelItem',
+                          onChange={e =>
+                            this.handleCheckOptionChange(
+                              e,
+                              args.form.setFieldValue,
                             )
-                            await args.form.setFieldValue(
-                              'chkOptions',
-                              newValues,
-                            )
-
-                            this.setState({
-                              checkboxOptions: checkboxOptions.filter(
-                                o =>
-                                  e.target.value.includes(
-                                    'isRequiredSpecimen',
-                                  ) || o.id !== 'isRequiredSpecimenPanelItem',
-                              ),
-                            })
-                          }}
+                          }
                           options={this.state.checkboxOptions}
                           {...args}
                         />

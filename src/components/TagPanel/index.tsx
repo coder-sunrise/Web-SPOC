@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, MutableRefObject } from 'react'
-import { useSelector, useDispatch } from 'dva'
+import React, { useState, useEffect, useRef } from 'react'
+import { useDispatch } from 'dva'
 import moment from 'moment'
 import { Tag, Input, Tooltip, Select, Divider } from 'antd'
 import { SaveFilled, PlusOutlined } from '@ant-design/icons'
@@ -12,6 +12,15 @@ export interface TagPanelProps {
   defaultTagNames: string[]
 }
 
+type Tag = {
+  description: string
+  displayValue: string
+  category: 'Service' | 'Patient'
+  isUserMaintainable: Boolean
+  effectiveStartDate: string
+  effectiveEndDate: string
+}
+
 const TagPanel: React.FC<TagPanelProps> = ({
   tagCategory,
   onChange,
@@ -20,9 +29,9 @@ const TagPanel: React.FC<TagPanelProps> = ({
   const [inputVisible, setInputVisible] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const inputRef = useRef<Input>(null)
-  const [currentTagNames, setCurrentTagNames] = useState([])
-  const [currentCategoryTags, setTagsUnderCategory] = useState([])
-  const [validTagNames, setValidTagNames] = useState([])
+  const [currentTagNames, setCurrentTagNames] = useState<string[]>([])
+  const [currentCategoryTags, setTagsUnderCategory] = useState<Tag[]>([])
+  const [validTagNames, setValidTagNames] = useState<{ value: string }[]>([])
   const [newTagInput, setNewTagInput] = useState([])
   const dispatch = useDispatch()
 
@@ -75,7 +84,7 @@ const TagPanel: React.FC<TagPanelProps> = ({
     setInputVisible(true)
   }
 
-  const handleInputConfirm = val => {
+  const handleInputConfirm = (val: string) => {
     let newTags: string[] = []
     if (val && currentTagNames.indexOf(val) === -1) {
       newTags = [...currentTagNames, val]
@@ -89,7 +98,7 @@ const TagPanel: React.FC<TagPanelProps> = ({
     )
   }
 
-  const handleInputCancel = e => {
+  const handleInputCancel = () => {
     if (!dropdownOpen) {
       setInputVisible(false)
     }

@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import Edit from '@material-ui/icons/Edit'
 import { CommonTableGrid, Button, Tooltip } from '@/components'
-import { status } from '@/utils/codes'
+import { status, isPanelItemRequired } from '@/utils/codes'
 
 class Grid extends PureComponent {
   editRow = (row, e) => {
