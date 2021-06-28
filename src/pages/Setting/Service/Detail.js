@@ -277,7 +277,7 @@ class Detail extends PureComponent {
 
     const {
       serviceCategoryFK,
-      ctService_Tag,
+      ctService_Tag = [],
       isRequiredSpecimen = false,
     } = this.props.values
     const { ctServiceCategory, dispatch } = this.props
@@ -520,7 +520,7 @@ class Detail extends PureComponent {
 
   handleTagPanelChange = (value, tags, setFieldValue) => {
     const {
-      ctService_Tag: originalTags,
+      ctService_Tag: originalTags = [],
       id: serviceId,
     } = this.props.initialValues
 
@@ -758,7 +758,7 @@ class Detail extends PureComponent {
                     render={args => (
                       <TagPanel
                         tagCategory='Service'
-                        defaultTags={this.state.serviceTags}
+                        defaultTagNames={this.state.serviceTags}
                         {...args}
                         onChange={(value, tags) =>
                           this.handleTagPanelChange(
