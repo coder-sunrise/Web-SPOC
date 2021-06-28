@@ -67,7 +67,7 @@ export default defineConfig({
     APP_TYPE: process.env.APP_TYPE || '',
     'process.env.client_env': 'uat',
     'process.env.client_secret': '20e392d2ea9bfa76f2a9cb26c31a34d675ad81281a31f89ed5d572de8da0b9e7',
-    'process.env.url': 'https://jghapi-development.azurewebsites.net',
+    'process.env.url': 'https://medicloud-uat-api-200729.semr2.com',
     'process.env.signalrUrl': 'https://medicloud-uat-websocket-200729.semr2.com/notificationHub',
   },
   // 路由配置

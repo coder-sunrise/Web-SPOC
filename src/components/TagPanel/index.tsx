@@ -1,21 +1,26 @@
 import React, { useState, useEffect, useRef, MutableRefObject } from 'react'
 import { useSelector, useDispatch } from 'dva'
-import * as service from '../../services/tag'
 import moment from 'moment'
 import { Tag, Input, Tooltip, Select, Divider } from 'antd'
 import { SaveFilled, PlusOutlined } from '@ant-design/icons'
+import * as service from '../../services/tag'
 
 export interface TagPanelProps {
-  tagCategory: 'service' | 'patient'
+  tagCategory: 'Service' | 'Patient'
   onChange: (value: string[], tags: object[]) => void
+  defaultTags: string[]
 }
 
-const TagPanel: React.FC<TagPanelProps> = props => {
+const TagPanel: React.FC<TagPanelProps> = ({
+  tagCategory,
+  onChange,
+  defaultTags = [],
+}) => {
   const [inputVisible, setInputVisible] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const inputRef = useRef<Input>(null)
   const [tags, setTags] = useState([])
-  const [tagsUnderCategory, setTagsUnderCategory] = useState([])
+  const [currentCategoryTags, setTagsUnderCategory] = useState([])
   const [availableTags, setAvailableTags] = useState([])
   const [newTagInput, setNewTagInput] = useState([])
   const dispatch = useDispatch()
@@ -27,35 +32,28 @@ const TagPanel: React.FC<TagPanelProps> = props => {
       payload: { code: 'cttag', force: true },
     }).then(result => {
       if (result) {
-        setTagsUnderCategory(
-          result.filter(t => t.category === props.tagCategory),
-        )
-
-        setAvailableTags(
-          result
-            .filter(t => t.category === props.tagCategory)
-            .filter(t => tags.findIndex(v => v === t.displayValue) === -1)
-            .map(t => {
-              return { value: t.displayValue }
-            }),
-        )
+        setTagsUnderCategory(result.filter(t => t.category === tagCategory))
       }
     })
   }
 
   useEffect(() => {
     fetchTags()
-  }, [props.tagCategory])
+  }, [tagCategory])
+
+  useEffect(() => {
+    setTags(defaultTags)
+  }, [defaultTags])
 
   useEffect(() => {
     setAvailableTags(
-      tagsUnderCategory
+      currentCategoryTags
         .filter(t => tags.findIndex(v => v === t.displayValue) === -1)
         .map(t => {
           return { value: t.displayValue }
         }),
     )
-  }, [tags])
+  }, [tags, currentCategoryTags])
 
   useEffect(() => {
     inputRef.current?.focus()
@@ -64,6 +62,10 @@ const TagPanel: React.FC<TagPanelProps> = props => {
   const handleClose = (removedTag: string) => {
     const newTags = tags.filter(tag => tag !== removedTag)
     setTags(newTags)
+    onChange(
+      newTags,
+      currentCategoryTags.filter(t => newTags.includes(t.displayValue)),
+    )
   }
 
   const showInput = () => {
@@ -78,9 +80,9 @@ const TagPanel: React.FC<TagPanelProps> = props => {
     setTags(newTags)
     setInputVisible(false)
 
-    props.onChange(
+    onChange(
       newTags,
-      tagsUnderCategory.filter(t => newTags.includes(t.displayValue)),
+      currentCategoryTags.filter(t => newTags.includes(t.displayValue)),
     )
   }
 
@@ -95,7 +97,7 @@ const TagPanel: React.FC<TagPanelProps> = props => {
     await service.default.upsert({
       description: newTagInput,
       displayValue: newTagInput,
-      category: 'service',
+      category: tagCategory,
       isUserMaintainable: true,
       effectiveStartDate: moment().formatUTC(),
       effectiveEndDate: moment('2099-12-31T23:59:59').formatUTC(false),
@@ -144,7 +146,7 @@ const TagPanel: React.FC<TagPanelProps> = props => {
           dropdownRender={menu => (
             <div>
               {menu}
-              {tagsUnderCategory.findIndex(t =>
+              {currentCategoryTags.findIndex(t =>
                 t.displayValue.includes(newTagInput),
               ) === -1 && (
                 <>

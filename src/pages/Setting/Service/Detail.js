@@ -24,6 +24,7 @@ import {
   TagPanel,
 } from '@/components'
 import codetable from '@/models/codetable'
+import { tagCategory } from '@/utils/codes'
 
 const styles = theme => ({
   sectionHeader: {
@@ -274,9 +275,30 @@ class Detail extends PureComponent {
   componentDidMount() {
     this.checkHasActiveSession()
 
-    const { serviceCategoryFK, isRequiredSpecimen = false } = this.props.values
-    const { ctServiceCategory } = this.props
-    console.log('props', this.props)
+    const {
+      serviceCategoryFK,
+      ctService_Tag,
+      isRequiredSpecimen = false,
+    } = this.props.values
+    const { ctServiceCategory, dispatch } = this.props
+
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'cttag', force: true },
+    }).then(result => {
+      if (result) {
+        this.setState({
+          serviceTags: result
+            .filter(
+              t =>
+                t.category === 'Service' &&
+                ctService_Tag.findIndex(st => st.tagFK === t.id) !== -1,
+            )
+            .map(t => t.displayValue),
+        })
+      }
+    })
+
     const isPanelItemRequired =
       ctServiceCategory.filter(c => c.id === serviceCategoryFK)[0]
         ?.isPanelItemRequired || false
@@ -496,6 +518,29 @@ class Detail extends PureComponent {
     return _rows
   }
 
+  handleTagPanelChange = (value, tags, setFieldValue) => {
+    const {
+      ctService_Tag: originalTags,
+      id: serviceId,
+    } = this.props.initialValues
+
+    const currentTags = tags.map(t => {
+      return {
+        serviceFK: serviceId,
+        tagFK: t.id,
+        isDeleted: false,
+      }
+    })
+
+    const deletedTags = originalTags
+      .filter(t => !value.includes(t.displayValue))
+      .map(t => {
+        return { ...t, isDeleted: true }
+      })
+
+    setFieldValue('ctService_Tag', [...currentTags, ...deletedTags])
+  }
+
   render() {
     const { props } = this
 
@@ -505,9 +550,10 @@ class Detail extends PureComponent {
       footer,
       clinicSettings,
       settingClinicService,
+      ctService_Tag,
       errors,
     } = props
-    const { id: serviceId } = props.values
+
     const {
       serviceSettings,
       ddlMedisaveHealthScreening,
@@ -711,17 +757,14 @@ class Detail extends PureComponent {
                     name='ctService_Tag'
                     render={args => (
                       <TagPanel
-                        tagCategory='service'
+                        tagCategory='Service'
+                        defaultTags={this.state.serviceTags}
                         {...args}
                         onChange={(value, tags) =>
-                          args.form.setFieldValue(
-                            'ctService_Tag',
-                            tags.map(t => {
-                              return {
-                                serviceFK: serviceId,
-                                tagFK: t.id,
-                              }
-                            }),
+                          this.handleTagPanelChange(
+                            value,
+                            tags,
+                            args.form.setFieldValue,
                           )
                         }
                       ></TagPanel>

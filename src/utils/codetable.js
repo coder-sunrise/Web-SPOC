@@ -7,20 +7,17 @@ import db from './indexedDB'
 
 const multiplyCodetable = (data, multiplier) => {
   if (multiplier === 1) return data
-  let result = [...data]
+  let result = [ ...data ]
   const maxLength = data.length
   for (let i = 1; i <= multiplier; i++) {
-    result = [
-      ...result,
-      ...data.map(item => ({ ...item, id: maxLength * i + item.id })),
-    ]
+    result = [ ...result, ...data.map((item) => ({ ...item, id: maxLength * i + item.id })) ]
   }
   return result
 }
 
 const defaultParams = {
   pagesize: 99999,
-  sorting: [{ columnName: 'sortOrder', direction: 'asc' }],
+  sorting: [ { columnName: 'sortOrder', direction: 'asc' } ],
   isActive: true,
   excludeInactiveCodes: true,
 }
@@ -53,9 +50,7 @@ const tenantCodesMap = new Map([
       ...defaultParams,
       isActive: undefined,
       'ServiceFKNavigation.isActive': true,
-      sorting: [
-        { columnName: 'serviceFKNavigation.displayValue', direction: 'asc' },
-      ],
+      sorting: [ { columnName: 'serviceFKNavigation.displayValue', direction: 'asc' } ],
     },
   ],
   [
@@ -68,35 +63,35 @@ const tenantCodesMap = new Map([
     'inventorymedication',
     {
       ...defaultParams,
-      sorting: [{ columnName: 'displayValue', direction: 'asc' }],
+      sorting: [ { columnName: 'displayValue', direction: 'asc' } ],
     },
   ],
   [
     'inventoryconsumable',
     {
       ...defaultParams,
-      sorting: [{ columnName: 'displayValue', direction: 'asc' }],
+      sorting: [ { columnName: 'displayValue', direction: 'asc' } ],
     },
   ],
   [
     'inventoryvaccination',
     {
       ...defaultParams,
-      sorting: [{ columnName: 'displayValue', direction: 'asc' }],
+      sorting: [ { columnName: 'displayValue', direction: 'asc' } ],
     },
   ],
   [
     'inventoryorderset',
     {
       ...defaultParams,
-      sorting: [{ columnName: 'displayValue', direction: 'asc' }],
+      sorting: [ { columnName: 'displayValue', direction: 'asc' } ],
     },
   ],
   [
     'package',
     {
       ...defaultParams,
-      sorting: [{ columnName: 'displayValue', direction: 'asc' }],
+      sorting: [ { columnName: 'displayValue', direction: 'asc' } ],
     },
   ],
   [
@@ -215,9 +210,9 @@ const tenantCodesMap = new Map([
 ])
 
 // always get latest codetable
-const skipCache = ['doctorprofile', 'clinicianprofile']
+const skipCache = [ 'doctorprofile', 'clinicianprofile' ]
 
-const noSortOrderProp = ['doctorprofile', 'clinicianprofile', 'role']
+const noSortOrderProp = [ 'doctorprofile', 'clinicianprofile', 'role', 'cttag' ]
 
 const convertExcludeFields = [
   // 'excludeInactiveCodes',
@@ -225,12 +220,7 @@ const convertExcludeFields = [
   'refresh',
 ]
 
-const fetchAndSaveCodeTable = async (
-  code,
-  params,
-  refresh = false,
-  temp = false,
-) => {
+const fetchAndSaveCodeTable = async (code, params, refresh = false, temp = false) => {
   let useGeneral = params === undefined || Object.keys(params).length === 0
   const baseURL = '/api/CodeTable'
   // const generalCodetableURL = `${baseURL}?excludeInactiveCodes=true&ctnames=`
@@ -252,10 +242,7 @@ const fetchAndSaveCodeTable = async (
   newParams.sorting = noSortOrderProp.includes(code) ? [] : newParams.sorting
   const body = useGeneral
     ? convertToQuery({ ...newParams }, convertExcludeFields)
-    : convertToQuery(
-        { ...criteriaForTenantCodes, ...params },
-        convertExcludeFields,
-      )
+    : convertToQuery({ ...criteriaForTenantCodes, ...params }, convertExcludeFields)
 
   const response = await request(`${url}${code}`, {
     method: 'GET',
@@ -265,7 +252,7 @@ const fetchAndSaveCodeTable = async (
   let { status: statusCode, data } = response
   let newData = []
   if (parseInt(statusCode, 10) === 200) {
-    newData = [...data.data]
+    newData = [ ...data.data ]
   }
 
   if (parseInt(statusCode, 10) === 200) {
@@ -287,11 +274,10 @@ const getAllCodes = async () => {
   const lastLoginDate = localStorage.getItem('_lastLogin')
   const parsedLastLoginDate = moment(lastLoginDate)
   await db.open()
-  const ct = await db.codetable.toArray(code => {
-    const results = code.filter(_i => {
+  const ct = await db.codetable.toArray((code) => {
+    const results = code.filter((_i) => {
       const { updateDate } = _i
-      const parsedUpdateDate =
-        updateDate === null ? moment('2001-01-01') : moment(updateDate)
+      const parsedUpdateDate = updateDate === null ? moment('2001-01-01') : moment(updateDate)
       return parsedUpdateDate.isAfter(parsedLastLoginDate)
     })
     // .map((_i) => ({
@@ -303,7 +289,7 @@ const getAllCodes = async () => {
     const cts = {
       config: {},
     }
-    results.forEach(r => {
+    results.forEach((r) => {
       const { code: c, data, ...others } = r
       cts[c.toLowerCase()] = data
       cts.config[c.toLowerCase()] = others
@@ -313,7 +299,7 @@ const getAllCodes = async () => {
   return ct || []
 }
 
-const getCodes = async payload => {
+const getCodes = async (payload) => {
   let ctcode
   let params
   let multiply = 1
@@ -354,8 +340,7 @@ const getCodes = async payload => {
           else perform network call and update indexedDB
       */
       const { updateDate, data: existedData } = ct
-      const parsedUpdateDate =
-        updateDate === null ? moment('2001-01-01') : moment(updateDate)
+      const parsedUpdateDate = updateDate === null ? moment('2001-01-01') : moment(updateDate)
       // console.log('should update', {
       //   ctcode,
       //   updateDate: parsedUpdateDate.format(),
@@ -371,7 +356,7 @@ const getCodes = async payload => {
   return result
 }
 
-const checkShouldRefresh = async payload => {
+const checkShouldRefresh = async (payload) => {
   try {
     const { code, filter } = payload
 
@@ -390,7 +375,7 @@ const checkShouldRefresh = async payload => {
   return false
 }
 
-const refreshCodetable = async url => {
+const refreshCodetable = async (url) => {
   try {
     const paths = url.split('/')
     const code = paths[2]
@@ -403,13 +388,12 @@ const refreshCodetable = async url => {
   }
 }
 
-const checkIsCodetableAPI = url => {
+const checkIsCodetableAPI = (url) => {
   try {
     const paths = url.split('/')
 
     // paths.length >= 3 ? tenantCodes.includes(paths[2].toLowerCase()) : false
-    const isTenantCodes =
-      paths.length >= 3 ? tenantCodesMap.has(paths[2].toLowerCase()) : false
+    const isTenantCodes = paths.length >= 3 ? tenantCodesMap.has(paths[2].toLowerCase()) : false
 
     const isCodetable = paths.length >= 3 ? paths[2].startsWith('ct') : false
     // console.log({ isTenantCodes, isCodetable })
@@ -420,7 +404,7 @@ const checkIsCodetableAPI = url => {
   return false
 }
 
-const getTenantCodes = async tenantCode => {
+const getTenantCodes = async (tenantCode) => {
   // todo: paging
   const response = await request(`/api/${tenantCode}`, { method: 'GET' })
   const { status: statusCode, data } = response
@@ -430,15 +414,15 @@ const getTenantCodes = async tenantCode => {
   return {}
 }
 
-const getServices = data => {
+const getServices = (data) => {
   // eslint-disable-next-line compat/compat
   const services = _.orderBy(
-    Object.values(_.groupBy(data, 'serviceId')).map(o => {
+    Object.values(_.groupBy(data, 'serviceId')).map((o) => {
       return {
         value: o[0].serviceId,
         code: o[0].code,
         name: o[0].displayValue,
-        serviceCenters: o.map(m => {
+        serviceCenters: o.map((m) => {
           return {
             value: m.serviceCenterId,
             name: m.serviceCenter,
@@ -448,16 +432,16 @@ const getServices = data => {
         }),
       }
     }),
-    ['name'],
-    ['asc'],
+    [ 'name' ],
+    [ 'asc' ]
   )
   // eslint-disable-next-line compat/compat
   const serviceCenters = _.orderBy(
-    Object.values(_.groupBy(data, 'serviceCenterId')).map(o => {
+    Object.values(_.groupBy(data, 'serviceCenterId')).map((o) => {
       return {
         value: o[0].serviceCenterId,
         name: o[0].serviceCenter,
-        services: o.map(m => {
+        services: o.map((m) => {
           return {
             value: m.serviceId,
             name: m.displayValue,
@@ -465,8 +449,8 @@ const getServices = data => {
         }),
       }
     }),
-    ['name'],
-    ['asc'],
+    [ 'name' ],
+    [ 'asc' ]
   )
 
   return {

@@ -1009,6 +1009,19 @@ const year = [
   { value: '1990', name: '1990' },
 ]
 
+const tagCategory = [
+  {
+    value: 'Patient',
+    name: 'Patient',
+    render: () => <span>Patient</span>,
+  },
+  {
+    value: 'Service',
+    name: 'Service',
+    render: () => <span>Service</span>,
+  },
+]
+
 export const getInventoryItem = (
   list,
   value,
@@ -1942,4 +1955,5 @@ export {
   queueItemStatus,
   preOrderItemCategory,
   isPanelItemRequired,
+  tagCategory,
 }
