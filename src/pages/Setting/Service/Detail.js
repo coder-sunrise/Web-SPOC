@@ -116,7 +116,7 @@ const modalityItemSchema = Yup.object().shape({
       .of(modalityItemSchema),
   }),
   handleSubmit: (values, { props, resetForm }) => {
-    const { effectiveDates, chkOptions, ...restValues } = values
+    const { effectiveDates, chkOptions = [], ...restValues } = values
     const { dispatch, onConfirm } = props
     const selectedOptions = {}
 
@@ -276,6 +276,7 @@ class Detail extends PureComponent {
 
     const { serviceCategoryFK, isRequiredSpecimen = false } = this.props.values
     const { ctServiceCategory } = this.props
+    console.log('props', this.props)
     const isPanelItemRequired =
       ctServiceCategory.filter(c => c.id === serviceCategoryFK)[0]
         ?.isPanelItemRequired || false
@@ -506,6 +507,7 @@ class Detail extends PureComponent {
       settingClinicService,
       errors,
     } = props
+    const { id: serviceId } = props.values
     const {
       serviceSettings,
       ddlMedisaveHealthScreening,
@@ -705,7 +707,26 @@ class Detail extends PureComponent {
                   </GridItem>
                 )}
                 <GridItem xs={12}>
-                  <TagPanel></TagPanel>
+                  <Field
+                    name='ctService_Tag'
+                    render={args => (
+                      <TagPanel
+                        tagCategory='service'
+                        {...args}
+                        onChange={(value, tags) =>
+                          args.form.setFieldValue(
+                            'ctService_Tag',
+                            tags.map(t => {
+                              return {
+                                serviceFK: serviceId,
+                                tagFK: t.id,
+                              }
+                            }),
+                          )
+                        }
+                      ></TagPanel>
+                    )}
+                  />
                 </GridItem>
                 <GridItem xs={12}>
                   <GridContainer>

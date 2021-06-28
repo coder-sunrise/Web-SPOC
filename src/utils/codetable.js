@@ -204,6 +204,14 @@ const tenantCodesMap = new Map([
       ...defaultParams,
     },
   ],
+  [
+    'cttag',
+    {
+      ...defaultParams,
+      sorting: [],
+      isActive: true,
+    },
+  ],
 ])
 
 // always get latest codetable
