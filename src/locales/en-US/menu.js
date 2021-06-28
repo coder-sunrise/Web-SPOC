@@ -163,6 +163,7 @@ export default {
   'menu.setting.package': 'Package',
   'menu.setting.invoiceadjustment': 'Invoice Adjustment',
   'menu.setting.tag': 'Tag',
+  'menu.setting.medicationingredient': 'Medication Ingredient',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',
