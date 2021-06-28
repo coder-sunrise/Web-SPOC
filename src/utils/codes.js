@@ -1915,11 +1915,6 @@ export const documentTemplateTypes = [
   },
 ]
 
-const isPanelItemRequired = [
-  { value: false, name: 'No' },
-  { value: true, name: 'Yes' },
-]
-
 export {
   appointmentStatus,
   status,
@@ -1954,6 +1949,5 @@ export {
   queueProcessorType,
   queueItemStatus,
   preOrderItemCategory,
-  isPanelItemRequired,
   tagCategory,
 }

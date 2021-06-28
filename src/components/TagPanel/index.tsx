@@ -21,7 +21,7 @@ const TagPanel: React.FC<TagPanelProps> = ({
   const inputRef = useRef<Input>(null)
   const [tags, setTags] = useState([])
   const [currentCategoryTags, setTagsUnderCategory] = useState([])
-  const [availableTags, setAvailableTags] = useState([])
+  const [validTags, setValidTags] = useState([])
   const [newTagInput, setNewTagInput] = useState([])
   const dispatch = useDispatch()
 
@@ -46,7 +46,7 @@ const TagPanel: React.FC<TagPanelProps> = ({
   }, [defaultTags])
 
   useEffect(() => {
-    setAvailableTags(
+    setValidTags(
       currentCategoryTags
         .filter(t => tags.findIndex(v => v === t.displayValue) === -1)
         .map(t => {
@@ -59,7 +59,7 @@ const TagPanel: React.FC<TagPanelProps> = ({
     inputRef.current?.focus()
   }, [inputVisible])
 
-  const handleClose = (removedTag: string) => {
+  const handleRemoveTag = (removedTag: string) => {
     const newTags = tags.filter(tag => tag !== removedTag)
     setTags(newTags)
     onChange(
@@ -87,13 +87,12 @@ const TagPanel: React.FC<TagPanelProps> = ({
   }
 
   const handleInputCancel = e => {
-    console.log('drop down opened', dropdownOpen)
     if (!dropdownOpen) {
       setInputVisible(false)
     }
   }
 
-  const addNewTag = async () => {
+  const saveAsNewTag = async () => {
     await service.default.upsert({
       description: newTagInput,
       displayValue: newTagInput,
@@ -111,16 +110,14 @@ const TagPanel: React.FC<TagPanelProps> = ({
 
       {tags.map((tag, index) => {
         {
-          const isLongTag = tag.length > 20
-
           const tagElem = (
             <Tag
               key={tag}
               style={{ margin: '3px' }}
               closable={true}
-              onClose={() => handleClose(tag)}
+              onClose={() => handleRemoveTag(tag)}
             >
-              <span>{isLongTag ? `${tag.slice(0, 20)}...` : tag}</span>
+              <span>{tag}</span>
             </Tag>
           )
           return (
@@ -161,7 +158,7 @@ const TagPanel: React.FC<TagPanelProps> = ({
                         display: 'block',
                         cursor: 'pointer',
                       }}
-                      onClick={addNewTag}
+                      onClick={saveAsNewTag}
                     >
                       Save As New Tag <SaveFilled />
                     </a>
@@ -171,7 +168,7 @@ const TagPanel: React.FC<TagPanelProps> = ({
             </div>
           )}
         >
-          {availableTags.map(item => (
+          {validTags.map(item => (
             <Option key={item.value}>{item.value}</Option>
           ))}
         </Select>
