@@ -15,6 +15,7 @@ import {
   Checkbox,
   RadioGroup,
   FastField,
+  Field,
 } from '@/components'
 import { currencySymbol } from '@/utils/config'
 import Authorized from '@/utils/Authorized'
@@ -110,7 +111,28 @@ const getVisitDoctorUserId = (props) => {
     }
   },
   enableReinitialize: true,
-  validationSchema: Yup.object().shape({}),
+  validationSchema:
+    Yup.object().shape({
+      serviceCenterFK: Yup.number().when('editServiceId', {
+        is: (val) => val,
+        then: Yup.number().required(),
+      }),
+      quantity: Yup.number().when('editServiceId', {
+        is: (val) => val,
+        then: Yup.number().required(),
+      }),
+      total: Yup.number().when('editServiceId', {
+        is: (val) => val,
+        then: Yup.number().required(),
+      }),
+      totalAfterItemAdjustment: Yup.number().when('editServiceId', {
+        is: (val) => val,
+        then: Yup.number().min(
+          0.0,
+          'The amount should be more than 0.00',
+        ),
+      }),
+    }),
 
   handleSubmit: (values, { props, onConfirm, setValues }) => {
     const { dispatch, orders, getNextSequence, user } = props
@@ -436,8 +458,14 @@ class Radiology extends PureComponent {
                     return <div style={{ backgroundColor: editServiceId === r.value ? 'lightgreen' : 'white', borderColor: this.isValidate(r) ? '#00ff00' : 'red' }}
                       className={classes.checkServiceItem}
                       onClick={() => {
-                        if (radiologyItems.find(item => item.serviceFK === r.value))
-                          setFieldValue('editServiceId', r.value)
+                        const selectRadiology = radiologyItems.find(item => item.serviceFK === r.value)
+                        if (selectRadiology) {
+                          setFieldValue('editServiceId', selectRadiology.serviceFK)
+                          setFieldValue('serviceCenterFK', selectRadiology.serviceCenterFK)
+                          setFieldValue('quantity', selectRadiology.quantity)
+                          setFieldValue('total', selectRadiology.total)
+                          setFieldValue('totalAfterItemAdjustment', selectRadiology.totalAfterItemAdjustment)
+                        }
                       }}
                     >
                       <span className={classes.checkServiceLabel} title={r.combinDisplayValue}>{r.name}</span>
@@ -452,11 +480,20 @@ class Radiology extends PureComponent {
                               let newService = { serviceFK: r.value, serviceName: r.name, serviceCode: r.code, priority: 'Normal', type, packageGlobalId: '', performingUserFK: getVisitDoctorUserId(this.props) }
                               this.getServiceCenterService(newService)
                               setFieldValue('radiologyItems', [...radiologyItems, newService])
+                              setFieldValue('editServiceId', newService.serviceFK)
+                              setFieldValue('serviceCenterFK', newService.serviceCenterFK)
+                              setFieldValue('quantity', newService.quantity)
+                              setFieldValue('total', newService.total)
+                              setFieldValue('totalAfterItemAdjustment', newService.totalAfterItemAdjustment)
                             }
                             else {
                               setFieldValue('radiologyItems', [...radiologyItems.filter(item => item.serviceFK !== r.value)])
+                              setFieldValue('editServiceId', undefined)
+                              setFieldValue('serviceCenterFK', undefined)
+                              setFieldValue('quantity', undefined)
+                              setFieldValue('total', undefined)
+                              setFieldValue('totalAfterItemAdjustment', undefined)
                             }
-                            setFieldValue('editServiceId', e.target.value ? r.value : undefined)
                           }}
                         />
                       </div>
@@ -474,43 +511,60 @@ class Radiology extends PureComponent {
               <TextField disabled label='Service Name' value={editService.serviceName} />
             </GridItem>
             <GridItem xs={4}>
-              <Select
-                disabled={!editServiceId}
-                allowClear={false}
-                label='Service Center Name'
-                value={editService.serviceCenterFK || null}
-                options={serviceCenters.filter(
-                  (o) => o.services.find((m) => m.value === editServiceId),
-                )}
-                onChange={(value) => {
-                  editService.serviceCenterFK = value
-                  if (value) {
-                    this.getServiceCenterService(editService)
-                  }
-                  setFieldValue('radiologyItems', [...radiologyItems])
-                }
-                }
+              <Field
+                name='serviceCenterFK'
+                render={(args) => {
+                  return (
+                    <Select
+                      disabled={!editServiceId}
+                      allowClear={false}
+                      label='Service Center Name'
+                      options={serviceCenters.filter(
+                        (o) => o.services.find((m) => m.value === editServiceId),
+                      )}
+                      onChange={(value) => {
+                        editService.serviceCenterFK = value
+                        if (value) {
+                          this.getServiceCenterService(editService)
+                          setFieldValue('quantity', editService.quantity)
+                          setFieldValue('total', editService.total)
+                          setFieldValue('totalAfterItemAdjustment', editService.totalAfterItemAdjustment)
+                        }
+                        setFieldValue('radiologyItems', [...radiologyItems])
+                      }}
+                      {...args}
+                    />)
+                }}
               />
             </GridItem>
             <GridItem xs={3}>
-              <NumberInput
-                value={editService.quantity}
-                disabled={!editServiceId}
-                label='Quantity'
-                style={{
-                  marginLeft: theme.spacing(7),
-                  paddingRight: theme.spacing(6),
-                }}
-                step={1}
-                min={0}
-                onChange={(e) => {
-                  editService.quantity = e.target.value
-                  if (editService.unitPrice) {
-                    const total = e.target.value * editService.unitPrice
-                    editService.total = total
-                    this.updateTotalPrice(total, editService)
-                  }
-                  setFieldValue('radiologyItems', [...radiologyItems])
+              <Field
+                name='quantity'
+                render={(args) => {
+                  return (
+                    <NumberInput
+                      disabled={!editServiceId}
+                      label='Quantity'
+                      style={{
+                        marginLeft: theme.spacing(7),
+                        paddingRight: theme.spacing(6),
+                      }}
+                      step={1}
+                      min={0}
+                      onChange={(e) => {
+                        editService.quantity = e.target.value
+                        if (editService.unitPrice) {
+                          const total = e.target.value * editService.unitPrice
+                          editService.total = total
+                          this.updateTotalPrice(total, editService)
+                          setFieldValue('total', editService.total)
+                          setFieldValue('totalAfterItemAdjustment', editService.totalAfterItemAdjustment)
+                        }
+                        setFieldValue('radiologyItems', [...radiologyItems])
+                      }}
+                      {...args}
+                    />
+                  )
                 }}
               />
             </GridItem>
@@ -543,21 +597,29 @@ class Radiology extends PureComponent {
               </div>
             </GridItem>
             <GridItem xs={3}>
-              <NumberInput
-                label='Total'
-                value={editService.total}
-                style={{
-                  marginLeft: theme.spacing(7),
-                  paddingRight: theme.spacing(6),
+              <Field
+                name='total'
+                render={(args) => {
+                  return (
+                    <NumberInput
+                      label='Total'
+                      style={{
+                        marginLeft: theme.spacing(7),
+                        paddingRight: theme.spacing(6),
+                      }}
+                      min={0}
+                      currency
+                      onChange={(e) => {
+                        editService.total = e.target.value
+                        this.updateTotalPrice(e.target.value, editService)
+                        setFieldValue('radiologyItems', [...radiologyItems])
+                        setFieldValue('totalAfterItemAdjustment', editService.totalAfterItemAdjustment)
+                      }}
+                      disabled={totalPriceReadonly || !editServiceId}
+                      {...args}
+                    />
+                  )
                 }}
-                min={0}
-                currency
-                onChange={(e) => {
-                  editService.total = e.target.value
-                  this.updateTotalPrice(e.target.value, editService)
-                  setFieldValue('radiologyItems', [...radiologyItems])
-                }}
-                disabled={totalPriceReadonly || !editServiceId}
               />
             </GridItem>
           </GridContainer>
@@ -601,6 +663,7 @@ class Radiology extends PureComponent {
                       editService.isMinus = value
                       this.onAdjustmentConditionChange(editService)
                       setFieldValue('radiologyItems', [...radiologyItems])
+                      setFieldValue('totalAfterItemAdjustment', editService.totalAfterItemAdjustment)
                     }}
                     disabled={totalPriceReadonly || !editServiceId}
                   />
@@ -620,6 +683,7 @@ class Radiology extends PureComponent {
                       editService.adjValue = e.target.value
                       this.onAdjustmentConditionChange(editService)
                       setFieldValue('radiologyItems', [...radiologyItems])
+                      setFieldValue('totalAfterItemAdjustment', editService.totalAfterItemAdjustment)
                     }}
                     disabled={totalPriceReadonly || !editServiceId}
                   />
@@ -639,6 +703,7 @@ class Radiology extends PureComponent {
                         editService.adjValue = e.target.value
                         this.onAdjustmentConditionChange(editService)
                         setFieldValue('radiologyItems', [...radiologyItems])
+                        setFieldValue('totalAfterItemAdjustment', editService.totalAfterItemAdjustment)
                       }}
                       disabled={totalPriceReadonly || !editServiceId}
                     />)
@@ -656,6 +721,7 @@ class Radiology extends PureComponent {
                     editService.isExactAmount = value
                     this.onAdjustmentConditionChange(editService)
                     setFieldValue('radiologyItems', [...radiologyItems])
+                    setFieldValue('totalAfterItemAdjustment', editService.totalAfterItemAdjustment)
                   }}
                   disabled={totalPriceReadonly || !editServiceId}
                 />
@@ -719,15 +785,22 @@ class Radiology extends PureComponent {
               </div>
             </GridItem>
             <GridItem xs={3} className={classes.editor}>
-              <NumberInput
-                value={editService.totalAfterItemAdjustment}
-                label='Total After Adj'
-                style={{
-                  marginLeft: theme.spacing(7),
-                  paddingRight: theme.spacing(6),
+              <Field
+                name='totalAfterItemAdjustment'
+                render={(args) => {
+                  return (
+                    <NumberInput
+                      label='Total After Adj'
+                      style={{
+                        marginLeft: theme.spacing(7),
+                        paddingRight: theme.spacing(6),
+                      }}
+                      currency
+                      disabled
+                      {...args}
+                    />
+                  )
                 }}
-                currency
-                disabled
               />
             </GridItem>
           </GridContainer>
