@@ -13,9 +13,9 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingMedicationPrecautions, clinicSettings, codetable }) => {
-    let settings = settingMedicationPrecautions.entity || settingMedicationPrecautions.default
-    if (_.isEmpty(settingMedicationPrecautions.entity)) {
+  mapPropsToValues: ({ settingMedicationContraIndication, clinicSettings, codetable }) => {
+    let settings = settingMedicationContraIndication.entity || settingMedicationContraIndication.default
+    if (_.isEmpty(settingMedicationContraIndication.entity)) {
       const { secondaryPrintOutLanguage = 'JP' } = clinicSettings
       const { ctlanguage = [] } = codetable
       const language = ctlanguage.find(l => l.code === secondaryPrintOutLanguage)
@@ -79,7 +79,7 @@ import {
       }
     }
     dispatch({
-      type: 'settingMedicationPrecautions/upsert',
+      type: 'settingMedicationContraIndication/upsert',
       payload: {
         ...restValues,
         effectiveStartDate: effectiveDates[0],
@@ -90,19 +90,19 @@ import {
         resetForm()
         if (onConfirm) onConfirm()
         dispatch({
-          type: 'settingMedicationPrecautions/query',
+          type: 'settingMedicationContraIndication/query',
         })
       }
     })
   },
-  displayName: 'MedicationPrecautionsDetail',
+  displayName: 'MedicationContraIndicationDetail',
 })
 class Detail extends PureComponent {
   state = {}
 
   render () {
     const { props } = this
-    const { theme, footer, settingMedicationPrecautions, setFieldValue, clinicSettings, codetable } = props
+    const { theme, footer, settingMedicationContraIndication, setFieldValue, clinicSettings, codetable } = props
     const { primaryPrintoutLanguage = 'EN', secondaryPrintOutLanguage = 'JP' } = clinicSettings
     const { ctlanguage = [] } = codetable
     const languages = ctlanguage.filter(l => l.code === secondaryPrintOutLanguage)
@@ -118,7 +118,7 @@ class Detail extends PureComponent {
                     label='Code'
                     autoFocus
                     {...args}
-                    disabled={!!settingMedicationPrecautions.entity}
+                    disabled={!!settingMedicationContraIndication.entity}
                   />
                 )}
               />

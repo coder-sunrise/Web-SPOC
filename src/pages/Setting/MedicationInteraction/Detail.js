@@ -13,9 +13,9 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingMedicationPrecautions, clinicSettings, codetable }) => {
-    let settings = settingMedicationPrecautions.entity || settingMedicationPrecautions.default
-    if (_.isEmpty(settingMedicationPrecautions.entity)) {
+  mapPropsToValues: ({ settingMedicationInteraction, clinicSettings, codetable }) => {
+    let settings = settingMedicationInteraction.entity || settingMedicationInteraction.default
+    if (_.isEmpty(settingMedicationInteraction.entity)) {
       const { secondaryPrintOutLanguage = 'JP' } = clinicSettings
       const { ctlanguage = [] } = codetable
       const language = ctlanguage.find(l => l.code === secondaryPrintOutLanguage)
@@ -79,7 +79,7 @@ import {
       }
     }
     dispatch({
-      type: 'settingMedicationPrecautions/upsert',
+      type: 'settingMedicationInteraction/upsert',
       payload: {
         ...restValues,
         effectiveStartDate: effectiveDates[0],
@@ -90,19 +90,19 @@ import {
         resetForm()
         if (onConfirm) onConfirm()
         dispatch({
-          type: 'settingMedicationPrecautions/query',
+          type: 'settingMedicationInteraction/query',
         })
       }
     })
   },
-  displayName: 'MedicationPrecautionsDetail',
+  displayName: 'MedicationInteractionDetail',
 })
 class Detail extends PureComponent {
   state = {}
 
   render () {
     const { props } = this
-    const { theme, footer, settingMedicationPrecautions, setFieldValue, clinicSettings, codetable } = props
+    const { theme, footer, settingMedicationInteraction, setFieldValue, clinicSettings, codetable } = props
     const { primaryPrintoutLanguage = 'EN', secondaryPrintOutLanguage = 'JP' } = clinicSettings
     const { ctlanguage = [] } = codetable
     const languages = ctlanguage.filter(l => l.code === secondaryPrintOutLanguage)
@@ -118,7 +118,7 @@ class Detail extends PureComponent {
                     label='Code'
                     autoFocus
                     {...args}
-                    disabled={!!settingMedicationPrecautions.entity}
+                    disabled={!!settingMedicationInteraction.entity}
                   />
                 )}
               />

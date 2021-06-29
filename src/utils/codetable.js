@@ -201,6 +201,24 @@ const tenantCodesMap = new Map([
       isActive: true,
     },
   ],
+  [
+    'ctmedicationcontraindication',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctmedicationinteraction',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctmedicationsideeffect',
+    {
+      ...defaultParams,
+    },
+  ],
 ])
 
 // always get latest codetable

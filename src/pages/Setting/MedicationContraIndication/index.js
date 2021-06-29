@@ -14,19 +14,19 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingMedicationPrecautions, global, codetable, clinicSettings }) => ({
-  settingMedicationPrecautions,
+@connect(({ settingMedicationContraIndication, global, codetable, clinicSettings }) => ({
+  settingMedicationContraIndication,
   mainDivHeight: global.mainDivHeight,
   codetable,
   clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
-@withSettingBase({ modelName: 'settingMedicationPrecautions' })
+@withSettingBase({ modelName: 'settingMedicationContraIndication' })
 class ServiceCenter extends PureComponent {
   state = {}
 
   componentDidMount () {
     this.props.dispatch({
-      type: 'settingMedicationPrecautions/query',
+      type: 'settingMedicationContraIndication/query',
     })
 
     this.props.dispatch({
@@ -37,15 +37,15 @@ class ServiceCenter extends PureComponent {
 
   toggleModal = () => {
     this.props.dispatch({
-      type: 'settingMedicationPrecautions/updateState',
+      type: 'settingMedicationContraIndication/updateState',
       payload: {
-        showModal: !this.props.settingMedicationPrecautions.showModal,
+        showModal: !this.props.settingMedicationContraIndication.showModal,
       },
     })
   }
 
   render () {
-    const { settingMedicationPrecautions, mainDivHeight = 700 } = this.props
+    const { settingMedicationContraIndication, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
@@ -58,13 +58,13 @@ class ServiceCenter extends PureComponent {
         </div>
         <Grid {...cfg} {...this.props} height={height} />
         <CommonModal
-          open={settingMedicationPrecautions.showModal}
-          observe='MedicationPrecautionsDetail'
+          open={settingMedicationContraIndication.showModal}
+          observe='MedicationContraIndicationDetail'
           title={
-            settingMedicationPrecautions.entity ? (
-              'Edit Medication Precaution'
+            settingMedicationContraIndication.entity ? (
+              'Edit Medication Contra-Indication'
             ) : (
-              'Add Medication Precaution'
+              'Add Medication Contra-Indication'
             )
           }
           maxWidth='md'

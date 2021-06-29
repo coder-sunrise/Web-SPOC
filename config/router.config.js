@@ -1075,6 +1075,24 @@ const _routes = [
             component: './Setting/MedicationIngredient',
             authority: ['settings.clinicsetting.medicationingredient'],
           },
+          {
+            path: '/setting/medicationcontraindication',
+            name: 'medicationcontraindication',
+            component: './Setting/MedicationContraIndication',
+            authority: ['settings.clinicsetting.medicationcontraindication'],
+          },
+          {
+            path: '/setting/medicationinteraction',
+            name: 'medicationinteraction',
+            component: './Setting/MedicationInteraction',
+            authority: ['settings.clinicsetting.medicationinteraction'],
+          },
+          {
+            path: '/setting/medicationsideeffect',
+            name: 'medicationsideeffect',
+            component: './Setting/MedicationSideEffect',
+            authority: ['settings.clinicsetting.medicationsideeffect'],
+          },
         ],
       },
       // Settings

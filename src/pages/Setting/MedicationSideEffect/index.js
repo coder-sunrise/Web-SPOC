@@ -14,19 +14,19 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingMedicationPrecautions, global, codetable, clinicSettings }) => ({
-  settingMedicationPrecautions,
+@connect(({ settingMedicationSideEffect, global, codetable, clinicSettings }) => ({
+  settingMedicationSideEffect,
   mainDivHeight: global.mainDivHeight,
   codetable,
   clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
-@withSettingBase({ modelName: 'settingMedicationPrecautions' })
+@withSettingBase({ modelName: 'settingMedicationSideEffect' })
 class ServiceCenter extends PureComponent {
   state = {}
 
   componentDidMount () {
     this.props.dispatch({
-      type: 'settingMedicationPrecautions/query',
+      type: 'settingMedicationSideEffect/query',
     })
 
     this.props.dispatch({
@@ -37,15 +37,15 @@ class ServiceCenter extends PureComponent {
 
   toggleModal = () => {
     this.props.dispatch({
-      type: 'settingMedicationPrecautions/updateState',
+      type: 'settingMedicationSideEffect/updateState',
       payload: {
-        showModal: !this.props.settingMedicationPrecautions.showModal,
+        showModal: !this.props.settingMedicationSideEffect.showModal,
       },
     })
   }
 
   render () {
-    const { settingMedicationPrecautions, mainDivHeight = 700 } = this.props
+    const { settingMedicationSideEffect, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
@@ -58,13 +58,13 @@ class ServiceCenter extends PureComponent {
         </div>
         <Grid {...cfg} {...this.props} height={height} />
         <CommonModal
-          open={settingMedicationPrecautions.showModal}
-          observe='MedicationPrecautionsDetail'
+          open={settingMedicationSideEffect.showModal}
+          observe='MedicationSideEffectDetail'
           title={
-            settingMedicationPrecautions.entity ? (
-              'Edit Medication Precaution'
+            settingMedicationSideEffect.entity ? (
+              'Edit Medication Side Effect'
             ) : (
-              'Add Medication Precaution'
+              'Add Medication Side Effect'
             )
           }
           maxWidth='md'

@@ -14,19 +14,19 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingMedicationPrecautions, global, codetable, clinicSettings }) => ({
-  settingMedicationPrecautions,
+@connect(({ settingMedicationInteraction, global, codetable, clinicSettings }) => ({
+  settingMedicationInteraction,
   mainDivHeight: global.mainDivHeight,
   codetable,
   clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
-@withSettingBase({ modelName: 'settingMedicationPrecautions' })
+@withSettingBase({ modelName: 'settingMedicationInteraction' })
 class ServiceCenter extends PureComponent {
   state = {}
 
   componentDidMount () {
     this.props.dispatch({
-      type: 'settingMedicationPrecautions/query',
+      type: 'settingMedicationInteraction/query',
     })
 
     this.props.dispatch({
@@ -37,15 +37,15 @@ class ServiceCenter extends PureComponent {
 
   toggleModal = () => {
     this.props.dispatch({
-      type: 'settingMedicationPrecautions/updateState',
+      type: 'settingMedicationInteraction/updateState',
       payload: {
-        showModal: !this.props.settingMedicationPrecautions.showModal,
+        showModal: !this.props.settingMedicationInteraction.showModal,
       },
     })
   }
 
   render () {
-    const { settingMedicationPrecautions, mainDivHeight = 700 } = this.props
+    const { settingMedicationInteraction, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
@@ -58,13 +58,13 @@ class ServiceCenter extends PureComponent {
         </div>
         <Grid {...cfg} {...this.props} height={height} />
         <CommonModal
-          open={settingMedicationPrecautions.showModal}
-          observe='MedicationPrecautionsDetail'
+          open={settingMedicationInteraction.showModal}
+          observe='MedicationInteractionDetail'
           title={
-            settingMedicationPrecautions.entity ? (
-              'Edit Medication Precaution'
+            settingMedicationInteraction.entity ? (
+              'Edit Medication Interaction'
             ) : (
-              'Add Medication Precaution'
+              'Add Medication Interaction'
             )
           }
           maxWidth='md'
