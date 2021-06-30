@@ -1,6 +1,6 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
-import service from '../services'
+import service from '../services/tag'
 
 export default createListViewModel({
   namespace: 'settingTag',
@@ -10,7 +10,10 @@ export default createListViewModel({
     state: {
       default: {
         isUserMaintainable: true,
-        effectiveDates: [ moment().formatUTC(), moment('2099-12-31T23:59:59').formatUTC(false) ],
+        effectiveDates: [
+          moment().formatUTC(),
+          moment('2099-12-31T23:59:59').formatUTC(false),
+        ],
         description: '',
       },
     },
@@ -21,14 +24,14 @@ export default createListViewModel({
     },
     effects: {},
     reducers: {
-      queryDone (st, { payload }) {
+      queryDone(st, { payload }) {
         const { data } = payload
         return {
           ...st,
-          list: data.data.map((o) => {
+          list: data.data.map(o => {
             return {
               ...o,
-              effectiveDates: [ o.effectiveStartDate, o.effectiveEndDate ],
+              effectiveDates: [o.effectiveStartDate, o.effectiveEndDate],
             }
           }),
         }

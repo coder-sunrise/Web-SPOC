@@ -9,6 +9,7 @@ import {
   GridItem,
   TextField,
   DateRangePicker,
+  Switch,
 } from '@/components'
 
 const styles = theme => ({})
@@ -84,6 +85,22 @@ class Detail extends PureComponent {
                     <DateRangePicker
                       label='Effective Start Date'
                       label2='End Date'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={6}>
+              <FastField
+                name='isPanelItemRequired'
+                render={args => {
+                  return (
+                    <Switch
+                      checkedChildren='Yes'
+                      unCheckedChildren='No'
+                      label='Panel Item Required'
+                      defaultChecked
                       {...args}
                     />
                   )
