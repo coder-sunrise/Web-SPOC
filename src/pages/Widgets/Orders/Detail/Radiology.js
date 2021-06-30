@@ -570,31 +570,17 @@ class Radiology extends PureComponent {
             </GridItem>
           </GridContainer>
           <GridContainer>
-            <GridItem xs={8} style={{ paddingRight: 35 }}>
-              <div style={{ position: 'relative' }}>
-                <TextField
-                  value={editService.remark}
-                  disabled={!editServiceId}
-                  rowsMax='5'
-                  label='Remarks'
-                  onChange={(e) => {
-                    editService.remark = e.target.value
-                    setFieldValue('radiologyItems', [...radiologyItems])
-                  }}
-                />
-                <CannedTextButton
-                  disabled={!editServiceId}
-                  cannedTextTypeFK={CANNED_TEXT_TYPE.RADIOLOGYREMARK}
-                  style={{
-                    position: 'absolute', bottom: 0,
-                    right: -35,
-                  }}
-                  handleSelectCannedText={(cannedText) => {
-                    editService.remark = `${editService.remark} ${cannedText.text || ''}`.substring(0, 2000)
-                    setFieldValue('radiologyItems', [...radiologyItems])
-                  }}
-                />
-              </div>
+            <GridItem xs={8}>
+              <TextField
+                value={editService.remark}
+                disabled={!editServiceId}
+                rowsMax='5'
+                label='Remarks'
+                onChange={(e) => {
+                  editService.remark = e.target.value
+                  setFieldValue('radiologyItems', [...radiologyItems])
+                }}
+              />
             </GridItem>
             <GridItem xs={3}>
               <Field
