@@ -14,9 +14,11 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingMedicationConsumptionMethod, global }) => ({
+@connect(({ settingMedicationConsumptionMethod, global, codetable, clinicSettings }) => ({
   settingMedicationConsumptionMethod,
   mainDivHeight: global.mainDivHeight,
+  codetable,
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
 @withSettingBase({ modelName: 'settingMedicationConsumptionMethod' })
 class ServiceCenter extends PureComponent {
@@ -25,6 +27,11 @@ class ServiceCenter extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingMedicationConsumptionMethod/query',
+    })
+
+    this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'ctlanguage' },
     })
   }
 

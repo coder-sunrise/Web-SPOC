@@ -19,7 +19,25 @@ class Grid extends PureComponent {
   }
 
   render () {
-    const { height } = this.props
+    const { height, clinicSettings } = this.props
+    const { primaryPrintoutLanguage = 'EN', secondaryPrintOutLanguage = '' } = clinicSettings
+    const isUseSecondLanguage = secondaryPrintOutLanguage !== ''
+    let columns = [
+      { name: 'code', title: 'Code' },
+      { name: 'displayValue', title: `Display Value${isUseSecondLanguage ? ` (${primaryPrintoutLanguage})` : ''}` },
+      { name: 'translatedDisplayValue', title: `Display Value (${secondaryPrintOutLanguage})` },
+      { name: 'description', title: 'Description' },
+      { name: 'sortOrder', title: 'Sort Order' },
+      { name: 'isActive', title: 'Status' },
+      {
+        name: 'action',
+        title: 'Action',
+      },
+    ]
+
+    if (!isUseSecondLanguage) {
+      columns = columns.filter(c => c.name !== 'translatedDisplayValue')
+    }
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
@@ -28,24 +46,17 @@ class Grid extends PureComponent {
         TableProps={{
           height,
         }}
-        columns={[
-          { name: 'code', title: 'Code' },
-          { name: 'displayValue', title: 'Display Value' },
-          { name: 'description', title: 'Description' },
-          { name: 'multiplier', title: 'Multiplier' },
-          { name: 'sortOrder', title: 'Sort Order' },
-          { name: 'isActive', title: 'Status' },
-          {
-            name: 'action',
-            title: 'Action',
-          },
-        ]}
+        columns={columns}
         columnExtensions={[
           {
             columnName: 'isActive',
             sortingEnabled: false,
             type: 'select',
             options: status,
+          },
+          {
+            columnName: 'translatedDisplayValue',
+            sortingEnabled: false,
           },
           {
             columnName: 'action',

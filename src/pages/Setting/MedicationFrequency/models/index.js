@@ -29,7 +29,7 @@ export default createListViewModel({
     },
     effects: {},
     reducers: {
-      queryDone(st, { payload }) {
+      queryDone (st, { payload }) {
         const { data } = payload
 
         return {
@@ -38,6 +38,9 @@ export default createListViewModel({
             return {
               ...o,
               effectiveDates: [o.effectiveStartDate, o.effectiveEndDate],
+              translatedDisplayValue: o.translationLink
+                ? o.translationLink.translationMasters[0].displayValue
+                : undefined,
             }
           }),
         }

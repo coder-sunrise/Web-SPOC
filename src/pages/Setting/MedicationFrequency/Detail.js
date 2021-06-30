@@ -9,18 +9,18 @@ import {
   DateRangePicker,
   NumberInput,
   dateFormatLong,
-  CodeSelect,
 } from '@/components'
 
-const styles = (theme) => ({})
-
 @withFormikExtend({
-  mapPropsToValues: ({ settingMedicationFrequency }) => {
+  mapPropsToValues: ({ settingMedicationFrequency, clinicSettings, codetable }) => {
     let settings = settingMedicationFrequency.entity || settingMedicationFrequency.default
-    if (settings && settings.translationLink && settings.translationLink.translationMasters) {
-      settings.translationLink.translationMasters = settings.translationLink.translationMasters.map((o) => {
-        return { ...o, tempLanguageFK: o.languageFK, originalLanguageFK: o.languageFK, originalDisplayValue: o.displayValue }
-      })
+    if (!settings.translationLink || !(settings.translationLink.translationMasters || []).length) {
+      const { secondaryPrintOutLanguage = '' } = clinicSettings
+      const { ctlanguage = [] } = codetable
+      const language = ctlanguage.find(l => l.code === secondaryPrintOutLanguage)
+      if (language) {
+        settings.translationLink = { translationMasters: [{ languageFK: language.id }] }
+      }
     }
     return settings
   }, 
@@ -47,13 +47,9 @@ const styles = (theme) => ({})
     translationLink: Yup.object().shape({
       translationMasters: Yup.array().of(
         Yup.object().shape({
-          displayValue: Yup.string().when('tempLanguageFK', {
+          displayValue: Yup.string().when('languageFK', {
             is: (v) => v !== undefined,
             then: Yup.string().required(),
-          }),
-          languageFK: Yup.number().when('displayValue', {
-            is: (v) => v !== undefined && v !== null && v.trim() !== '',
-            then: Yup.number().required(),
           }),
         }),
       ),
@@ -62,21 +58,6 @@ const styles = (theme) => ({})
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
-    const { translationLink } = restValues
-    // if translate language has been removed, then just update the IsDeleted to True
-    if (translationLink && translationLink.translationMasters && translationLink.translationMasters.length > 0) {
-      if (!translationLink.translationMasters[0].languageFK) {
-        if (translationLink.id) {
-          translationLink.translationMasters[0].isDeleted = true
-          translationLink.translationMasters[0].languageFK = translationLink.translationMasters[0].originalLanguageFK
-          translationLink.translationMasters[0].displayValue = translationLink.translationMasters[0].originalDisplayValue
-          translationLink.isDeleted = true
-        }
-        else {
-          restValues.translationLink = undefined
-        }
-      }
-    }
     dispatch({
       type: 'settingMedicationFrequency/upsert',
       payload: {
@@ -101,13 +82,14 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { theme, footer, settingMedicationFrequency, setFieldValue } = props
-    // console.log('detail', props)
+    const { theme, footer, settingMedicationFrequency, clinicSettings } = props
+    const { primaryPrintoutLanguage = 'EN', secondaryPrintOutLanguage = '' } = clinicSettings
+    const isUseSecondLanguage = secondaryPrintOutLanguage !== ''
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
           <GridContainer>
-            <GridItem md={6}>
+            <GridItem md={4}>
               <FastField
                 name='code'
                 render={(args) => (
@@ -120,14 +102,28 @@ class Detail extends PureComponent {
                 )}
               />
             </GridItem>
-            <GridItem md={6}>
+            <GridItem md={8}>
               <FastField
                 name='displayValue'
-                render={(args) => <TextField label='Display Value' {...args} />}
+                render={(args) => <TextField label={`Display Value${isUseSecondLanguage ? ` (${primaryPrintoutLanguage})` : ''}`} {...args} maxLength={200} />}
               />
             </GridItem>
-
-            <GridItem md={6}>
+            <GridItem md={4}>
+              <FastField
+                name='sortOrder'
+                render={(args) => <NumberInput label='Sort Order' {...args} />}
+              />
+            </GridItem>
+            {isUseSecondLanguage && (
+              <GridItem md={8}>
+                <FastField
+                  name='translationLink.translationMasters[0].displayValue'
+                  render={(args) => {
+                    return (<TextField label={`Display Value (${secondaryPrintOutLanguage})`} {...args} maxLength={200} />)
+                  }}
+                />
+              </GridItem>)}
+            <GridItem md={isUseSecondLanguage ? 12 : 8}>
               <FastField
                 name='effectiveDates'
                 render={(args) => {
@@ -140,15 +136,6 @@ class Detail extends PureComponent {
                     />
                   )
                 }}
-              />
-            </GridItem>
-
-            <GridItem md={6}>
-              <FastField
-                name='sortOrder'
-                render={(args) => (
-                  <NumberInput label='Sort Order' autoFocus {...args} />
-                )}
               />
             </GridItem>
             <GridItem md={12}>
@@ -176,36 +163,6 @@ class Detail extends PureComponent {
                       rowsMax={4}
                       {...args}
                     />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem md={4}>
-              <FastField
-                name='translationLink.translationMasters[0].languageFK'
-                render={(args) => {
-                  return (
-                    <CodeSelect
-                      label='Translation Language'
-                      code='ctLanguage'
-                      onChange={(value) => {
-                        setFieldValue(
-                          `translationLink.translationMasters[0].tempLanguageFK`,
-                          value,
-                        )
-                      }}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem md={8}>
-              <FastField
-                name='translationLink.translationMasters[0].displayValue'
-                render={(args) => {
-                  return (
-                    <TextField label='Translated Display Value' {...args} />
                   )
                 }}
               />

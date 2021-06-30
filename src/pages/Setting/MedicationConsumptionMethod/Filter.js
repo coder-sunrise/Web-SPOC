@@ -17,11 +17,11 @@ import {
 @withFormikExtend({
   mapPropsToValues: ({ settingMedicationConsumptionMethod }) =>
     settingMedicationConsumptionMethod.filter || {},
-  handleSubmit: () => {},
+  handleSubmit: () => { },
   displayName: 'MedicationConsumptionMethodFilter',
 })
 class Filter extends PureComponent {
-  render() {
+  render () {
     const { classes } = this.props
     return (
       <div className={classes.filterBar}>
@@ -56,13 +56,9 @@ class Filter extends PureComponent {
                     type: 'settingMedicationConsumptionMethod/query',
                     payload: {
                       isActive,
-                      group: [
-                        {
-                          code: codeDisplayValue,
-                          displayValue: codeDisplayValue,
-                          combineCondition: 'or',
-                        },
-                      ],
+                      apiCriteria: {
+                        SearchValue: codeDisplayValue,
+                      },
                     },
                   })
                 }}

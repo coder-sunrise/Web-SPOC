@@ -57,13 +57,9 @@ class Filter extends PureComponent {
                     type: 'settingMedicationContraIndication/query',
                     payload: {
                       isActive,
-                      group: [
-                        {
-                          code: codeDisplayValue,
-                          displayValue: codeDisplayValue,
-                          combineCondition: 'or',
-                        },
-                      ],
+                      apiCriteria: {
+                        SearchValue: codeDisplayValue,
+                      },
                     },
                   })
                 }}

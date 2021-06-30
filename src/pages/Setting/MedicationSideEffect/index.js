@@ -31,7 +31,7 @@ class ServiceCenter extends PureComponent {
 
     this.props.dispatch({
       type: 'codetable/fetchCodes',
-      payload: { code: 'ctLanguage' },
+      payload: { code: 'ctlanguage' },
     })
   }
 
