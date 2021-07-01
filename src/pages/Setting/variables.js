@@ -296,4 +296,10 @@ export const menuData = [
     text: 'Medication Ingredient',
     url: '/setting/medicationingredient',
   },
+  {
+    authority: 'settings.clinicsetting.clinicdrugallergy',
+    title: 'Clinic Setting',
+    text: 'Clinic Drug Allergy',
+    url: '/setting/clinicdrugallergy',
+  },
 ]

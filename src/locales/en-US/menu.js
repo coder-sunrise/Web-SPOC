@@ -164,6 +164,7 @@ export default {
   'menu.setting.invoiceadjustment': 'Invoice Adjustment',
   'menu.setting.tag': 'Tag',
   'menu.setting.medicationingredient': 'Medication Ingredient',
+  'menu.setting.clinicdrugallergy': 'Clinic Drug Allergy',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',
