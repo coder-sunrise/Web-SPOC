@@ -38,9 +38,7 @@ export default createListViewModel({
             return {
               ...o,
               effectiveDates: [o.effectiveStartDate, o.effectiveEndDate],
-              translatedDisplayValue: o.translationLink
-                ? o.translationLink.translationMasters[0].displayValue
-                : undefined,
+              translatedDisplayValue: o.translationData.length ? o.translationData[0].value : '',
             }
           }),
         }

@@ -14,10 +14,9 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingMedicationContraIndication, global, codetable, clinicSettings }) => ({
+@connect(({ settingMedicationContraIndication, global, clinicSettings }) => ({
   settingMedicationContraIndication,
   mainDivHeight: global.mainDivHeight,
-  codetable,
   clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
 @withSettingBase({ modelName: 'settingMedicationContraIndication' })
@@ -27,11 +26,6 @@ class ServiceCenter extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingMedicationContraIndication/query',
-    })
-
-    this.props.dispatch({
-      type: 'codetable/fetchCodes',
-      payload: { code: 'ctlanguage' },
     })
   }
 

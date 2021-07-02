@@ -14,10 +14,9 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingMedicationSideEffect, global, codetable, clinicSettings }) => ({
+@connect(({ settingMedicationSideEffect, global, clinicSettings }) => ({
   settingMedicationSideEffect,
   mainDivHeight: global.mainDivHeight,
-  codetable,
   clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
 @withSettingBase({ modelName: 'settingMedicationSideEffect' })
@@ -27,11 +26,6 @@ class ServiceCenter extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingMedicationSideEffect/query',
-    })
-
-    this.props.dispatch({
-      type: 'codetable/fetchCodes',
-      payload: { code: 'ctlanguage' },
     })
   }
 

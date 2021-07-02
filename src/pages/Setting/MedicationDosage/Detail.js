@@ -12,14 +12,12 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingMedicationDosage, clinicSettings, codetable }) => {
+  mapPropsToValues: ({ settingMedicationDosage, clinicSettings }) => {
     let settings = settingMedicationDosage.entity || settingMedicationDosage.default
-    if (!settings.translationLink || !(settings.translationLink.translationMasters || []).length) {
+    if (!(settings.translationData || []).length) {
       const { secondaryPrintOutLanguage = '' } = clinicSettings
-      const { ctlanguage = [] } = codetable
-      const language = ctlanguage.find(l => l.code === secondaryPrintOutLanguage)
-      if (language) {
-        settings.translationLink = { translationMasters: [{ languageFK: language.id }] }
+      if (secondaryPrintOutLanguage !== '') {
+        settings.translationData = [{ language: secondaryPrintOutLanguage, type: 'DisplayValue' }]
       }
     }
     return settings
@@ -42,16 +40,14 @@ import {
         'The number should between -2,147,483,648 and 2,147,483,647',
       )
       .nullable(),
-    translationLink: Yup.object().shape({
-      translationMasters: Yup.array().of(
-        Yup.object().shape({
-          displayValue: Yup.string().when('languageFK', {
-            is: (v) => v !== undefined,
-            then: Yup.string().required(),
-          }),
+    translationData: Yup.array().of(
+      Yup.object().shape({
+        value: Yup.string().when('language', {
+          is: (v) => v !== undefined,
+          then: Yup.string().required(),
         }),
-      ),
-    }),
+      }),
+    ),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
@@ -115,7 +111,7 @@ class Detail extends PureComponent {
             {isUseSecondLanguage && (
               <GridItem md={8}>
                 <FastField
-                  name='translationLink.translationMasters[0].displayValue'
+                  name='translationData[0].value'
                   render={(args) => {
                     return (<TextField label={`Display Value (${secondaryPrintOutLanguage})`} {...args} maxLength={200} />)
                   }}

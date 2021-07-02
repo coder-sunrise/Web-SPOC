@@ -14,10 +14,9 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingMedicationUOM, global, codetable, clinicSettings }) => ({
+@connect(({ settingMedicationUOM, global, clinicSettings }) => ({
   settingMedicationUOM,
   mainDivHeight: global.mainDivHeight,
-  codetable,
   clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
 @withSettingBase({
@@ -29,11 +28,6 @@ class MedicationUOM extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingMedicationUOM/query',
-    })
-
-    this.props.dispatch({
-      type: 'codetable/fetchCodes',
-      payload: { code: 'ctlanguage' },
     })
   }
 

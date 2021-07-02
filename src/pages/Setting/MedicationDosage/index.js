@@ -14,10 +14,9 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingMedicationDosage, global, codetable, clinicSettings }) => ({
+@connect(({ settingMedicationDosage, global, clinicSettings }) => ({
   settingMedicationDosage,
   mainDivHeight: global.mainDivHeight,
-  codetable,
   clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
 @withSettingBase({ modelName: 'settingMedicationDosage' })
@@ -27,11 +26,6 @@ class MedicationDosage extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingMedicationDosage/query',
-    })
-
-    this.props.dispatch({
-      type: 'codetable/fetchCodes',
-      payload: { code: 'ctlanguage' },
     })
   }
 

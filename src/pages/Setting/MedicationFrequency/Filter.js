@@ -52,12 +52,15 @@ class Filter extends PureComponent {
                 icon={<Search />}
                 onClick={() => {
                   const { codeDisplayValue, isActive } = this.props.values
-
+                  const { clinicSettings } = this.props
+                  const { secondaryPrintOutLanguage = '' } = clinicSettings
                   this.props.dispatch({
                     type: 'settingMedicationFrequency/query',
                     payload: {
                       isActive,
                       apiCriteria: {
+                        Language: secondaryPrintOutLanguage,
+                        Type: "DisplayValue",
                         SearchValue: codeDisplayValue,
                       },
                     },
