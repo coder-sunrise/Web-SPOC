@@ -14,11 +14,17 @@ import {
 @withFormikExtend({
   mapPropsToValues: ({ settingMedicationConsumptionMethod, clinicSettings }) => {
     let settings = settingMedicationConsumptionMethod.entity || settingMedicationConsumptionMethod.default
-    if (!(settings.translationData || []).length) {
-      const { secondaryPrintOutLanguage = '' } = clinicSettings
-      if (secondaryPrintOutLanguage !== '') {
-        settings.translationData = [{ language: secondaryPrintOutLanguage, type: 'DisplayValue' }]
+    const { secondaryPrintOutLanguage = '' } = clinicSettings
+    const translationData = (settings.translationData || []).find(t => t.language === secondaryPrintOutLanguage)
+    if (translationData) {
+      const displayValueItem = (translationData.list || []).find(l => l.key === "displayValue")
+      if (displayValueItem) {
+        settings.secondDisplayValue = displayValueItem.value
       }
+    }
+
+    if (secondaryPrintOutLanguage !== '') {
+      settings.secondLanguage = secondaryPrintOutLanguage
     }
     return settings
   },
@@ -37,24 +43,40 @@ import {
       )
       .nullable(),
 
-    translationData: Yup.array().of(
-      Yup.object().shape({
-        value: Yup.string().when('language', {
-          is: (v) => v !== undefined,
-          then: Yup.string().required(),
-        }),
-      }),
-    ),
+    secondDisplayValue: Yup.string().when('secondLanguage', {
+      is: (v) => v !== undefined,
+      then: Yup.string().required(),
+    }),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
-    const { dispatch, onConfirm } = props
+    const { dispatch, onConfirm, clinicSettings } = props
+    const { primaryPrintoutLanguage = 'EN', secondaryPrintOutLanguage = '' } = clinicSettings
+
+    let translationData = [{
+      language: primaryPrintoutLanguage,
+      list: [{
+        key: 'displayValue',
+        value: values.displayValue
+      }]
+    }]
+
+    if (secondaryPrintOutLanguage !== '') {
+      translationData = [...translationData, {
+        language: secondaryPrintOutLanguage,
+        list: [{
+          key: 'displayValue',
+          value: values.secondDisplayValue
+        }]
+      }]
+    }
     dispatch({
       type: 'settingMedicationConsumptionMethod/upsert',
       payload: {
         ...restValues,
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
+        translationData
       },
     }).then((r) => {
       if (r) {
@@ -113,7 +135,7 @@ class Detail extends PureComponent {
             {isUseSecondLanguage && (
               <GridItem md={8}>
                 <FastField
-                  name='translationData[0].value'
+                  name='secondDisplayValue'
                   render={(args) => {
                     return (<TextField label={`Display Value (${secondaryPrintOutLanguage})`} {...args} maxLength={200} />)
                   }}

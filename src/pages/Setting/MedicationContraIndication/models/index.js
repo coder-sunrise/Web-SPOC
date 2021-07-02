@@ -27,18 +27,42 @@ export default createListViewModel({
         const { pathname, search, query = {} } = loct
       })
     },
-    effects: {},
+    effects: {
+      *query ({ payload }, { put, select, call }) {
+
+        const clinicSetting = yield select(st => st.clinicSettings)
+        const result = yield call(service.queryList, payload)
+
+        if (result.status === '200') {
+          yield put({
+            type: 'queryDone',
+            payload: {
+              clinicSetting,
+              data: result.data,
+            },
+          })
+        }
+      }
+    },
     reducers: {
       queryDone (st, { payload }) {
-        const { data } = payload
+        const { data, clinicSetting: { settings: { secondaryPrintOutLanguage = '' } } } = payload
 
         return {
           ...st,
           list: data.data.map(o => {
+            let secondDisplayValue = ''
+            const translationData = o.translationData.find(t => t.language === secondaryPrintOutLanguage)
+            if (translationData) {
+              const displayValueItem = (translationData.list || []).find(l => l.key === "displayValue")
+              if (displayValueItem) {
+                secondDisplayValue = displayValueItem.value
+              }
+            }
             return {
               ...o,
               effectiveDates: [o.effectiveStartDate, o.effectiveEndDate],
-              translatedDisplayValue: o.translationData.length ? o.translationData[0].value : '',
+              translatedDisplayValue: secondDisplayValue,
             }
           }),
         }
