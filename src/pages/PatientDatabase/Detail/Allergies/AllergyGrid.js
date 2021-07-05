@@ -15,15 +15,30 @@ class AllergyGrid extends PureComponent {
   constructor (props) {
     super(props)
 
-    const { type } = props
+    const { type, codetable } = props
+    const allergyList = [
+      ...codetable.ctdrugallergy, 
+      ...codetable.ctclinicdrugallergy
+      .map((ct, index) => {
+        return {
+          ...ct, 
+          id: codetable.ctdrugallergy.length + ct.id,
+        }
+      })
+    ]
+    // console.log('allergyList',allergyList)
 
     // const compareDate = (a, b) =>
     //   a.toLocaleString().localeCompare(b.toLocaleString())
+    let colName = 'allergyName'
+    if(type === 'Allergy') colName = 'allergyFK'
+    if(type === 'Ingredient') colName = 'ingredientFK'
+    // console.log('type',type)
 
     this.tableParas = {
       columns: [
         {
-          name: type === 'Allergy' ? 'allergyFK' : 'allergyName',
+          name: colName,
           title: 'Allergy Name',
         },
         { name: 'allergyReactionFK', title: 'Allergic Reaction' },
@@ -37,9 +52,9 @@ class AllergyGrid extends PureComponent {
           // compare: compareDate,
         },
         {
-          columnName: 'allergyFK',
+          columnName: 'ingredientFK',
           type: 'codeSelect',
-          code: 'ctdrugallergy',
+          code: 'ctmedicationingredient',
           label: 'Allergy Name',
           autoComplete: true,
           onChange: ({ val, option, row }) => {
@@ -54,7 +69,32 @@ class AllergyGrid extends PureComponent {
                   message: 'The Allergy record already exists.',
                 })
               }
-              row.allergyCode = option.code || option.name
+              // row.allergyCode = option.code || option.name
+              row.allergyName = option.name
+            }
+          },
+        },
+        {
+          columnName: 'allergyFK',
+          type: 'select',
+          valueField: 'id',
+          labelField: 'name',
+          label: 'Allergy Name',
+          options: allergyList,
+          autoComplete: true,
+          onChange: ({ val, option, row }) => {
+            if (option) {
+              let { rows } = this.props
+              if (
+                rows.filter(
+                  (o) => !o.isDeleted && o.allergyFK === val && o.id !== row.id,
+                ).length > 0
+              ) {
+                notification.error({
+                  message: 'The Allergy record already exists.',
+                })
+              }
+              // row.allergyCode = option.code || option.name
               row.allergyName = option.name
             }
           },
@@ -63,8 +103,8 @@ class AllergyGrid extends PureComponent {
           columnName: 'allergyName',
           maxLength: 100,
           onChange: ({ val, row }) => {
-            row.allergyCode = val
-            row.allergyFK = 1
+            // row.allergyCode = val
+            // row.allergyFK = 1
           },
         },
         {
