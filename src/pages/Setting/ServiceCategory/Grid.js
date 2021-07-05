@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import Edit from '@material-ui/icons/Edit'
 import { CommonTableGrid, Button, Tooltip } from '@/components'
-import { status } from '@/utils/codes'
+import { status, isPanelItemRequired } from '@/utils/codes'
 
 class Grid extends PureComponent {
   editRow = (row, e) => {
@@ -13,13 +13,13 @@ class Grid extends PureComponent {
         type: 'settingServiceCategory/updateState',
         payload: {
           showModal: true,
-          entity: list.find((o) => o.id === row.id),
+          entity: list.find(o => o.id === row.id),
         },
       })
     }
   }
 
-  render () {
+  render() {
     const { height } = this.props
     return (
       <CommonTableGrid
@@ -33,6 +33,7 @@ class Grid extends PureComponent {
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },
           { name: 'description', title: 'Description' },
+          { name: 'isPanelItemRequired', title: 'Panel Item Required' },
           { name: 'isActive', title: 'Status' },
           {
             name: 'action',
@@ -40,6 +41,14 @@ class Grid extends PureComponent {
           },
         ]}
         columnExtensions={[
+          {
+            columnName: 'isPanelItemRequired',
+            align: 'center',
+            width: 150,
+            type: 'select',
+            options: isPanelItemRequired,
+            sortBy: 'serviceFKNavigation.isAutoOrder',
+          },
           {
             columnName: 'isActive',
             sortingEnabled: false,
@@ -52,7 +61,7 @@ class Grid extends PureComponent {
             columnName: 'action',
             sortingEnabled: false,
             align: 'center',
-            render: (row) => {
+            render: row => {
               return (
                 <Tooltip title='Edit Service Category'>
                   <Button

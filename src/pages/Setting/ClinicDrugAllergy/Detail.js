@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import _ from 'lodash'
-import { FormattedMessage } from 'umi'
+import { formatMessage, FormattedMessage } from 'umi'
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -9,14 +9,13 @@ import {
   GridItem,
   TextField,
   DateRangePicker,
-  Switch,
 } from '@/components'
 
 const styles = theme => ({})
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingServiceCategory }) =>
-    settingServiceCategory.entity || settingServiceCategory.default,
+  mapPropsToValues: ({ settingClinicDrugAllergy }) =>
+    settingClinicDrugAllergy.entity || settingClinicDrugAllergy.default,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
@@ -28,31 +27,30 @@ const styles = theme => ({})
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
+
     dispatch({
-      type: 'settingServiceCategory/upsert',
+      type: 'settingClinicDrugAllergy/upsert',
       payload: {
         ...restValues,
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
+        clinicdrugallergyStatusFK: 1,
       },
     }).then(r => {
       if (r) {
-        resetForm()
         if (onConfirm) onConfirm()
         dispatch({
-          type: 'settingServiceCategory/query',
+          type: 'settingClinicDrugAllergy/query',
         })
       }
     })
   },
-  displayName: 'ServiceCategoryDetail',
+  displayName: 'ClinicDrugAllergyDetail',
 })
 class Detail extends PureComponent {
-  state = {}
-
   render() {
     const { props } = this
-    const { theme, footer, settingServiceCategory } = props
+    let { classes, theme, footer, values } = props
     // console.log('detail', props)
     return (
       <React.Fragment>
@@ -61,30 +59,12 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='code'
-                render={args => (
-                  <TextField
-                    label='Code'
-                    autoFocus
-                    {...args}
-                    disabled={!!settingServiceCategory.entity}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem md={6}>
-              <FastField
-                name='displayValue'
-                render={args => <TextField label='Display Value' {...args} />}
-              />
-            </GridItem>
-            <GridItem md={6}>
-              <FastField
-                name='effectiveDates'
                 render={args => {
                   return (
-                    <DateRangePicker
-                      label='Effective Start Date'
-                      label2='End Date'
+                    <TextField
+                      label='Code'
+                      autoFocus
+                      disabled={!!values.id}
                       {...args}
                     />
                   )
@@ -93,14 +73,21 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='isPanelItemRequired'
+                name='displayValue'
+                render={args => {
+                  return <TextField label='Display Value' {...args} />
+                }}
+              />
+            </GridItem>
+            <GridItem md={6}>
+              <FastField
+                name='effectiveDates'
                 render={args => {
                   return (
-                    <Switch
-                      checkedChildren='Yes'
-                      unCheckedChildren='No'
-                      label='Panel Item Required'
-                      defaultChecked
+                    <DateRangePicker
+                      // showTime
+                      label='Effective Start Date'
+                      label2='End Date'
                       {...args}
                     />
                   )

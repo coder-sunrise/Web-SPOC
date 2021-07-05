@@ -1069,6 +1069,18 @@ const _routes = [
             component: './Setting/tag',
             authority: [ 'settings.clinicsetting.tag' ],
           },
+          {
+            path: '/setting/medicationingredient',
+            name: 'medicationingredient',
+            component: './Setting/MedicationIngredient',
+            authority: ['settings.clinicsetting.medicationingredient'],
+          },
+          {
+            path: '/setting/clinicdrugallergy',
+            name: 'clinicdrugallergy',
+            component: './Setting/ClinicDrugAllergy',
+            authority: ['settings.clinicsetting.clinicdrugallergy'],
+          },
         ],
       },
       // Settings

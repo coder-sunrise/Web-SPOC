@@ -20,7 +20,16 @@ const STYLES = () => {
       height: '100%',
       color: 'currentColor',
       borderRadius: 3,
+      '& .ant-switch-handle': {
+        width: 20,
+        height: 20,
+        '&::before': {
+          borderRadius: 3,
+          right: 2,
+        },
+      },
     },
+
     switchUnchecked: {
       backgroundColor: `${primaryColor} !important`,
     },
@@ -126,6 +135,7 @@ class AntdSwitch extends React.PureComponent {
           className={classnames(
             classes.switchContainer,
             onOffMode && getSwtichCheckedClass(),
+            classes.switchHandle,
           )}
           onChange={this.handleValueChange}
           checkedChildren='Yes'
