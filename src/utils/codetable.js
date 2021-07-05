@@ -437,6 +437,7 @@ const getServices = (data) => {
             name: m.tagDisplayValue,
           }
         }),
+        isDisplayValueChangable: o[0].isDisplayValueChangable
       }
     }),
     ['name'],

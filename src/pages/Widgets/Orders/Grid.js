@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import _ from 'lodash'
+import { Tag } from 'antd'
 import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
@@ -406,6 +407,16 @@ export default ({
     )
   }
 
+  const getDisplayName = (row) => {
+    if (row.type === '10') {
+      if (row.newServiceName && row.newServiceName.trim() !== "") {
+        return row.newServiceName
+      }
+      row.subject
+    }
+    return row.subject
+  }
+
   return (
     <CommonTableGrid
       size='sm'
@@ -657,6 +668,7 @@ export default ({
                 <div style={wrapCellTextStyle}>
                   {texts}
                   {drugMixtureIndicator(row)}
+                  {row.isPreOrder && <Tag color="#4255bd" style={{ position: 'relative', marginLeft: 6, top: 2, borderRadius: 10 }}>Pre</Tag>}
                 </div>
               </Tooltip>
             )
@@ -690,7 +702,7 @@ export default ({
                     left: row.isPackage || row.type === '10' ? 22 : 0,
                   }}
                 >
-                  {row.subject}
+                  {getDisplayName(row)}
                 </div>
               </div>
             )

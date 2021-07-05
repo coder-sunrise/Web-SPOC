@@ -23,14 +23,6 @@ const orderTypes = [
     component: props => <Medication {...props} />,
   },
   {
-    name: 'Vaccination',
-    value: '2',
-    prop: 'corVaccinationItem',
-    accessRight: 'queue.consultation.order.vaccination',
-    getSubject: r => r.vaccinationName,
-    component: props => <Vaccination {...props} />,
-  },
-  {
     name: 'Service',
     value: '3',
     prop: 'corService',
@@ -38,6 +30,23 @@ const orderTypes = [
     filter: r => r.serviceCenterCategoryFK !== SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
     getSubject: r => r.serviceName,
     component: props => <Service {...props} />,
+  },
+  {
+    name: 'Radiology',
+    value: '10',
+    prop: 'corService',
+    accessRight: 'queue.consultation.order.radiology',
+    getSubject: r => r.serviceName,
+    filter: r => r.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
+    component: props => <Radiology {...props} />,
+  },
+  {
+    name: 'Vaccination',
+    value: '2',
+    prop: 'corVaccinationItem',
+    accessRight: 'queue.consultation.order.vaccination',
+    getSubject: r => r.vaccinationName,
+    component: props => <Vaccination {...props} />,
   },
   {
     name: 'Consumable',
@@ -75,15 +84,6 @@ const orderTypes = [
     value: '8',
     accessRight: 'queue.consultation.order.package',
     component: props => <Package {...props} />,
-  },
-  {
-    name: 'Radiology',
-    value: '10',
-    prop: 'corService',
-    accessRight: 'queue.consultation.order.radiology',
-    getSubject: r => r.serviceName,
-    filter: r => r.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
-    component: props => <Radiology {...props} />,
   },
 ]
 
