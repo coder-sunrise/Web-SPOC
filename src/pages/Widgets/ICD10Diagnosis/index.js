@@ -7,7 +7,7 @@ import { withStyles } from '@material-ui/core'
 import Add from '@material-ui/icons/Add'
 import { AuthorizedContext, Button } from '@/components'
 import Authorized from '@/utils/Authorized'
-import Item from './Item'
+import ICD10DiagnosisItem from './item'
 
 const styles = (theme) => ({
   diagnosisRow: {
@@ -15,6 +15,7 @@ const styles = (theme) => ({
     padding: theme.spacing(0.5),
   },
 })
+
 const { Secured } = Authorized
 @Secured('queue.consultation.widgets.diagnosis')
 @connect(({ diagnosis, codetable, consultation }) => ({
@@ -22,20 +23,13 @@ const { Secured } = Authorized
   codetable,
   consultation,
 }))
-class Diagnosis extends PureComponent {
+class ICD10Diagnosis extends PureComponent {
   componentDidMount () {
     const { dispatch } = this.props
     dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctComplication',
-      },
-    })
-
-    dispatch({
       type: 'diagnosis/getUserPreference',
       payload: {
-        type: '6',
+        type: '7',
       },
     })
     dispatch({
@@ -52,6 +46,7 @@ class Diagnosis extends PureComponent {
             favouriteDiagnosisLanguage: favouriteLanguage,
           },
         })
+        console.log('IdDiagnosisRun', favouriteLanguage)
       }
     })
   }
@@ -75,90 +70,51 @@ class Diagnosis extends PureComponent {
   }
 
   addDiagnosis = (index) => {
-    const { diagnosis } = this.props
-    let currentSelectCategory = diagnosis.favouriteDiagnosisCategory || []
-    if (currentSelectCategory.length === 4) {
-      currentSelectCategory = [ 'all', ...currentSelectCategory ]
-    }
     this.arrayHelpers.push({
-      onsetDate: moment(),
+      // onsetDate: moment(),
       uid: getUniqueGUID(),
       sequence: index,
       isNew: true,
-      currentSelectCategory,
     })
   }
 
   handleAddDiagnosisClick = () => {
     let index = 0
-    if (this.diagnosises.length === 0) {
+    if (this.diagnosis.length === 0) {
       index = 1
     } else {
-      index = this.diagnosises[this.diagnosises.length - 1].sequence
+      index = this.diagnosis[this.diagnosis.length - 1].sequence
     }
     this.addDiagnosis(index + 1)
   }
 
-  clearFavouriteDiagnosisMessage = (uid) => {
-    const { form } = this.arrayHelpers
-    const { values, setFieldValue } = form
-    setFieldValue(
-      'corDiagnosis',
-      (values.corDiagnosis || []).map((d) => {
-        if (d.uid === uid) {
-          return {
-            ...d,
-            favouriteDiagnosisMessage: undefined,
-          }
-        }
-        return d
-      })
-    )
-  }
-
-  clearFavouriteDiagnosisCategoryMessage = (uid) => {
-    const { form } = this.arrayHelpers
-    const { values, setFieldValue } = form
-    setFieldValue(
-      'corDiagnosis',
-      (values.corDiagnosis || []).map((d) => {
-        if (d.uid === uid) {
-          return {
-            ...d,
-            favouriteDiagnosisCategoryMessage: undefined,
-          }
-        }
-        return d
-      })
-    )
-  }
-
-  saveDiagnosisAsFavourite = (dignosisCode, uid) => {
+  saveDiagnosisAsFavourite = (icD10DiagnosisCode, uid) => {
     const { dispatch, diagnosis } = this.props
     let newFavouriteDiagnosis
     let addNewFavorite
-    if ((diagnosis.favouriteDiagnosis || []).find((d) => d === dignosisCode)) {
-      newFavouriteDiagnosis = (diagnosis.favouriteDiagnosis || []).filter((d) => d !== dignosisCode)
+    if ((diagnosis.favouriteDiagnosis || []).find((d) => d === icD10DiagnosisCode)) {
+      newFavouriteDiagnosis = (diagnosis.favouriteDiagnosis || []).filter((d) => d !== icD10DiagnosisCode)
     } else {
       addNewFavorite = true
-      newFavouriteDiagnosis = [ ...(diagnosis.favouriteDiagnosis || []), dignosisCode ]
+      newFavouriteDiagnosis = [ ...(diagnosis.favouriteDiagnosis || []), icD10DiagnosisCode ]
     }
     dispatch({
       type: 'diagnosis/saveUserPreference',
       payload: {
         userPreferenceDetails: {
           value: newFavouriteDiagnosis,
-          Identifier: 'FavouriteDiagnosis',
+          Identifier: 'FavouriteICD10Diagnosis',
         },
-        itemIdentifier: 'FavouriteDiagnosis',
-        type: '6',
+        itemIdentifier: 'FavouriteICD10Diagnosis',
+        type: '7',
       },
     }).then((r) => {
+      console.log('getResultDiagnosis', r)
       if (r) {
         dispatch({
           type: 'diagnosis/getUserPreference',
           payload: {
-            type: '6',
+            type: '7',
           },
         }).then((response) => {
           if (response) {
@@ -188,48 +144,21 @@ class Diagnosis extends PureComponent {
     })
   }
 
-  saveCategoryAsFavourite = (favouriteCategory, uid) => {
-    const { dispatch } = this.props
-    dispatch({
-      type: 'diagnosis/saveUserPreference',
-      payload: {
-        userPreferenceDetails: {
-          value: favouriteCategory,
-          Identifier: 'FavouriteDiagnosisCategory',
-        },
-        itemIdentifier: 'FavouriteDiagnosisCategory',
-      },
-    }).then((r) => {
-      if (r) {
-        dispatch({
-          type: 'diagnosis/getUserPreference',
-          payload: {
-            type: '6',
-          },
-        }).then((response) => {
-          if (response) {
-            const { form } = this.arrayHelpers
-            const { values, setFieldValue } = form
-            setFieldValue(
-              'corDiagnosis',
-              (values.corDiagnosis || []).map((d) => {
-                if (d.uid === uid) {
-                  return {
-                    ...d,
-                    favouriteDiagnosisCategoryMessage: 'Saved successfully',
-                  }
-                }
-                return d
-              })
-            )
-
-            setTimeout(() => {
-              this.clearFavouriteDiagnosisCategoryMessage(uid)
-            }, 3000)
+  clearFavouriteDiagnosisMessage = (uid) => {
+    const { form } = this.arrayHelpers
+    const { values, setFieldValue } = form
+    setFieldValue(
+      'corDiagnosis',
+      (values.corDiagnosis || []).map((d) => {
+        if (d.uid === uid) {
+          return {
+            ...d,
+            favouriteDiagnosisMessage: undefined,
           }
-        })
-      }
-    })
+        }
+        return d
+      })
+    )
   }
 
   render () {
@@ -242,35 +171,28 @@ class Diagnosis extends PureComponent {
           render={(arrayHelpers) => {
             const { form } = arrayHelpers
             const { values } = form
-            this.diagnosises = values.corDiagnosis || []
-
+            this.diagnosis = values.corDiagnosis || []
             this.arrayHelpers = arrayHelpers
-            if (this.diagnosises.length === 0) {
+            if (this.diagnosis.length === 0) {
               if (rights === 'enable') {
                 this.addDiagnosis(1)
                 return null
               }
             }
-
-            return this.diagnosises.map((v, i) => {
+            return this.diagnosis.map((v, i) => {
               if (v.isDeleted === true) return null
               return (
                 <div key={v.uid}>
-                  <Item
+                  <ICD10DiagnosisItem
                     {...this.props}
-                    ctCompilation={this.props.codetable}
                     index={i}
                     arrayHelpers={arrayHelpers}
-                    diagnosises={this.diagnosises}
-                    saveCategoryAsFavourite={this.saveCategoryAsFavourite}
+                    diagnosis={this.diagnosis}
                     saveDiagnosisAsFavourite={this.saveDiagnosisAsFavourite}
                     uid={v.uid}
-                    diagnosisCode={v.diagnosisCode}
+                    icD10DiagnosisCode={v.icD10DiagnosisCode}
                     favouriteDiagnosisMessage={v.favouriteDiagnosisMessage}
-                    favouriteDiagnosisCategoryMessage={v.favouriteDiagnosisCategoryMessage}
                     favouriteDiagnosis={diagnosis.favouriteDiagnosis || []}
-                    favouriteDiagnosisCategory={diagnosis.favouriteDiagnosisCategory || []}
-                    currentSelectCategory={v.currentSelectCategory || []}
                   />
                 </div>
               )
@@ -284,7 +206,7 @@ class Diagnosis extends PureComponent {
             return (
               <div>
                 <Button size="sm" color="primary" onClick={this.handleAddDiagnosisClick}>
-                  <Add />Add Diagnosis
+                  <Add /> Add Diagnosis
                 </Button>
               </div>
             )
@@ -295,4 +217,4 @@ class Diagnosis extends PureComponent {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(Diagnosis)
+export default withStyles(styles, { withTheme: true })(ICD10Diagnosis)

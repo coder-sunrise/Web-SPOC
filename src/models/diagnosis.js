@@ -10,9 +10,7 @@ export default createFormViewModel({
     service: {},
     state: {
       default: {
-        corDiagnosis: [
-          {},
-        ],
+        corDiagnosis: [ {} ],
       },
     },
     subscriptions: ({ dispatch, history }) => {
@@ -33,7 +31,7 @@ export default createFormViewModel({
         const r = yield call(saveUserPreference, {
           userPreferenceDetails: JSON.stringify(payload.userPreferenceDetails),
           itemIdentifier: payload.itemIdentifier,
-          type: 6,
+          type: payload.type,
         })
 
         if (r === 204) return true
@@ -41,26 +39,32 @@ export default createFormViewModel({
         return false
       },
       *getUserPreference ({ payload }, { call, put }) {
-        const r = yield call(getUserPreference, 6)
+        const r = yield call(getUserPreference, payload.type)
         const { status, data } = r
 
         if (status === '200') {
           if (data) {
             const parsedFavouriteDiagnosisSetting = JSON.parse(data)
+            let favouriteDiagnosis
+            let favouriteDiagnosisCategory
+            let favouriteDiagnosisLanguage
+            if (payload.type === '6') {
+              favouriteDiagnosis = parsedFavouriteDiagnosisSetting.find((o) => o.Identifier === 'FavouriteDiagnosis')
+              parsedFavouriteDiagnosisSetting.find((o) => o.Identifier === 'FavouriteDiagnosisCategory')
+            } else if (payload.type === '7') {
+              favouriteDiagnosis = parsedFavouriteDiagnosisSetting.find(
+                (o) => o.Identifier === 'FavouriteICD10Diagnosis'
+              )
+            } else if (payload.type === '8') {
+              favouriteDiagnosisLanguage = parsedFavouriteDiagnosisSetting.find(
+                (o) => o.Identifier === 'FavouriteDiagnosisLanguage'
+              )
+            }
             if (parsedFavouriteDiagnosisSetting.length > 0) {
-              const favouriteDiagnosis = parsedFavouriteDiagnosisSetting.find(
-                (o) => o.Identifier === 'FavouriteDiagnosis',
-              )
-              const favouriteDiagnosisCategory = parsedFavouriteDiagnosisSetting.find(
-                (o) => o.Identifier === 'FavouriteDiagnosisCategory',
-              )
               const resultFavouriteDiagnosis = {
-                favouriteDiagnosis: favouriteDiagnosis
-                  ? favouriteDiagnosis.value
-                  : [],
-                favouriteDiagnosisCategory: favouriteDiagnosisCategory
-                  ? favouriteDiagnosisCategory.value
-                  : [],
+                favouriteDiagnosis: favouriteDiagnosis ? favouriteDiagnosis.value : [],
+                favouriteDiagnosisCategory: favouriteDiagnosisCategory ? favouriteDiagnosisCategory.value : [],
+                favouriteDiagnosisLanguage: favouriteDiagnosisLanguage ? favouriteDiagnosisLanguage.value : [],
               }
               yield put({
                 type: 'updateState',

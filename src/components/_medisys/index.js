@@ -28,14 +28,11 @@ export { default as Notification } from './Notification'
 export { default as FilterBarDate } from './FilterBarDate'
 export { default as InventoryItemList } from './InventoryItemList'
 export { default as ImageViewer } from './ImageViewer'
-export {
-  default as QueueDashboardButton,
-} from './QueueDisplay/QueueDashboardButton'
-export {
-  default as CallingQueueButton,
-} from './QueueDisplay/CallingQueueButton'
+export { default as QueueDashboardButton } from './QueueDisplay/QueueDashboardButton'
+export { default as CallingQueueButton } from './QueueDisplay/CallingQueueButton'
 export { default as AuthorizationWrapper } from './AuthorizationWrapper'
 export { default as ICD10AMSelect } from './ICD10AMSelect'
 export { default as ZImage } from './ZImage'
 export { default as SystemMessageList } from './SystemMessage/Listing'
 export { default as SystemMessageDetail } from './SystemMessage/Details'
+export { default as ICD10DiagnosisSelect } from './ICD10DiagnosisSelect'
