@@ -149,7 +149,6 @@ class Allergies extends PureComponent {
   render () {
     const { classes, dispatch, values, schema, ...restProps } = this.props
     const allergyDisabled = this.isDisableAllergy()
-    console.log('this.props.values',this.props.values)
     
     return (
       <div>
