@@ -60,7 +60,7 @@ class Filter extends PureComponent {
                       isActive,
                       apiCriteria: {
                         Language: secondaryPrintOutLanguage,
-                        Type: "DisplayValue",
+                        Key: "displayValue",
                         SearchValue: codeDisplayValue,
                       },
                     },

@@ -3,7 +3,7 @@ import _ from "lodash";
 
 function useTranslation (valuesPara = [], defaultLang) {
   const [value, setVal] = useState({});
-  const [values, setValues] = useState([]);
+  const [values, setValues] = useState(valuesPara);
   const [currentLanguage, setCurrentLanguage] = useState(defaultLang);
   const getValue = (lang) => {
     const displayLanguage = lang ?? currentLanguage;

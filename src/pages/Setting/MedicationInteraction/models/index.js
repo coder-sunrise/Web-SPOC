@@ -1,6 +1,7 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import service from '../services'
+import { getTranslationValue } from '@/utils/utils'
 
 export default createListViewModel({
   namespace: 'settingMedicationInteraction',
@@ -51,20 +52,18 @@ export default createListViewModel({
         return {
           ...st,
           list: data.data.map(o => {
-            let secondDisplayValue = ''
-            const translationData = o.translationData.find(t => t.language === secondaryPrintOutLanguage)
-            if (translationData) {
-              const displayValueItem = (translationData.list || []).find(l => l.key === "displayValue")
-              if (displayValueItem) {
-                secondDisplayValue = displayValueItem.value
-              }
-            }
             return {
               ...o,
               effectiveDates: [o.effectiveStartDate, o.effectiveEndDate],
-              translatedDisplayValue: secondDisplayValue,
+              translatedDisplayValue: getTranslationValue(o.translationData, secondaryPrintOutLanguage, "displayValue"),
             }
           }),
+          pagination: {
+            ...st.pagination,
+            current: data.currentPage || 1,
+            pagesize: data.pageSize || 10,
+            totalRecords: data.totalRecords,
+          },
         }
       },
     },
