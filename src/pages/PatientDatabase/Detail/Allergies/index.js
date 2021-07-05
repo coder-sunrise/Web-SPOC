@@ -119,43 +119,14 @@ class Allergies extends PureComponent {
 
   getRows = (type) => {
     const { codetable } = this.props
-    // console.log('codetable',codetable)
-    if(type === 'Allergy')
-      return this.props.values.patientAllergy.filter((o) => o.type === 'Allergy').map((o) => {
-        if(o.patientAllergyDrug && o.patientAllergyDrug.filter(d => !d.isDeleted).length > 0) {
-          return {
-            ...o,
-            allergyFK: o.patientAllergyDrug[0].allergyFK,
-          }
+    return this.props.values.patientAllergy.filter((o) => o.type === type).map((o) => {
+      if(o.patientAllergyClinicDrug && o.patientAllergyClinicDrug.filter(d => !d.isDeleted).length > 0) {
+        return {
+          ...o,
+          allergyFK: (codetable.ctdrugallergy.length + o.patientAllergyClinicDrug[0].allergyFK),
         }
-        if(o.patientAllergyClinicDrug && o.patientAllergyClinicDrug.filter(d => !d.isDeleted).length > 0) {
-          return {
-            ...o,
-            allergyFK: (codetable.ctdrugallergy.length + o.patientAllergyClinicDrug[0].allergyFK),
-          }
-        }
-        return o
-      })
-    if(type === 'Ingredient')
-      return this.props.values.patientAllergy.filter((o) => o.type === type).map((o) => {
-        if(o.patientAllergyIngredient && o.patientAllergyIngredient.filter(d => !d.isDeleted).length > 0)
-          return {
-            ...o,
-            ingredientFK: o.patientAllergyIngredient[0].ingredientFK,
-            patientAllergyIngredient: [{
-              ...o.patientAllergyIngredient[0],
-              ingredientFK: o.patientAllergyIngredient[0].ingredientFK,
-              isDeleted: o.isDeleted,
-            }]
-          }
-        return o
-      })
-
-    return this.props.values.patientAllergy.filter((o) => o.type === 'NonAllergy').map((o) => {
-      return {
-        ...o,
-        type: 'NonAllergy',
       }
+      return o
     })
   }
 
@@ -178,6 +149,7 @@ class Allergies extends PureComponent {
   render () {
     const { classes, dispatch, values, schema, ...restProps } = this.props
     const allergyDisabled = this.isDisableAllergy()
+    console.log('this.props.values',this.props.values)
     
     return (
       <div>

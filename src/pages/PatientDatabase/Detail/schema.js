@@ -156,9 +156,6 @@ const schemaAllergies = {
       allergyFK: Yup.number().when('type', {
         is: 'Allergy',
         then: Yup.number().required(),
-      }).when('type', {
-        is: 'ClinicAllergy',
-        then: Yup.number().required(),
       }),
       ingredientFK: Yup.number().when('type', {
         is: 'Ingredient',
