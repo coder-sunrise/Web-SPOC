@@ -3,18 +3,39 @@ import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
 import {
+  Radio,
+  Card,
+  Anchor,
+  Select,
+  Menu,
+  PageHeader,
+  Button as AntBtn,
+} from 'antd'
+import { UserOutlined, DownOutlined, LinkOutlined } from '@ant-design/icons'
+import {
   errMsgForOutOfRange as errMsg,
   navigateDirtyCheck,
   roundTo,
 } from '@/utils/utils'
-import { ProgressButton, Button, withFormikExtend, Tabs } from '@/components'
+import {
+  ProgressButton,
+  Button,
+  withFormikExtend,
+  Tabs,
+  Switch,
+  CardContainer,
+} from '@/components'
 import Yup from '@/utils/yup'
+import { headerHeight } from 'mui-pro-jss'
 import { getBizSession } from '@/services/queue'
 import { AuthorizationWrapper } from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
 import { MedicationDetailOption } from './variables'
-
 const { Secured } = Authorized
+import DetailPanel from './Detail'
+import Pricing from '../../Pricing'
+import Stock from '../../Stock'
+import Setting from '../../Setting'
 
 const styles = () => ({
   actionDiv: {
@@ -26,6 +47,15 @@ const styles = () => ({
     paddingBottom: 10,
   },
 })
+
+const currentScrollStyle = {
+  color: '#40a9ff',
+  backgroundColor: '#fff',
+  borderColor: '#40a9ff',
+}
+
+const sections = ['General', 'Setting', 'Pricing', 'Stock']
+
 const Detail = ({
   classes,
   dispatch,
@@ -38,12 +68,24 @@ const Detail = ({
   theme,
   ...props
 }) => {
+  useEffect(() => window.addEventListener('resize', resizeHandler))
+  const [windowHeight, setWindowHeith] = useState(window.innerHeight)
+  const [currentScrollPosition, setCurrentScrollPosition] = useState('general')
+
+  const { clinicSettings } = props
+  const { primaryPrintoutLanguage, secondaryPrintoutLanguage } = clinicSettings
+  const [currentLanguage, setCurrentLanguage] = useState(
+    primaryPrintoutLanguage ?? 'EN',
+  )
+
+  const isMultiLanguage = primaryPrintoutLanguage && secondaryPrintoutLanguage
+  const resizeHandler = () => {
+    setWindowHeith(window.innerHeight)
+  }
+
   const { currentTab } = medication
 
-  const [
-    hasActiveSession,
-    setHasActiveSession,
-  ] = useState(true)
+  const [hasActiveSession, setHasActiveSession] = useState(true)
 
   const detailProps = {
     medicationDetail,
@@ -85,7 +127,7 @@ const Detail = ({
         payload: {
           id: medicationDetail.currentId,
         },
-      }).then(async (med) => {
+      }).then(async med => {
         const { sddfk } = med
         if (sddfk) {
           await dispatch({
@@ -93,7 +135,7 @@ const Detail = ({
             payload: {
               id: sddfk,
             },
-          }).then((sdd) => {
+          }).then(sdd => {
             const { data } = sdd
             const { code, name } = data[0]
             tempCode = code
@@ -111,56 +153,145 @@ const Detail = ({
     }
   }, [])
 
+  const onAnchorClick = id => {
+    const parentElement = document.getElementById('card-holder')
+    const element = document.getElementById(id)
+    try {
+      if (parentElement && element) {
+        const screenPosition = element.getBoundingClientRect()
+        const { scrollTop } = parentElement
+        const { top, left } = screenPosition
+
+        parentElement.scrollTo({
+          // scrolled top position + element top position - Nav header height
+          top: scrollTop + top - 110,
+          left,
+          behavior: 'smooth',
+        })
+        setCurrentScrollPosition(id)
+      }
+    } catch (error) {
+      console.error({ error })
+    }
+  }
+
   return (
     <React.Fragment>
-      {/* <NavPills
-        color='primary'
-        onChange={(event, active) => {
-          history.push(
-            getAppendUrl({
-              t: active,
+      <div>
+        <PageHeader
+          style={{ backgroundColor: 'white' }}
+          title={
+            <>
+              <span>Eye-001</span>
+              <span
+                style={{ fontSize: '0.9rem', fontWeight: 400, marginLeft: 5 }}
+              >
+                Allergan Refresh Plus Lubricant Eye Drops
+              </span>
+            </>
+          }
+          ghost={false}
+          extra={[
+            ...sections.map(s => {
+              const currentStyle =
+                currentScrollPosition === s.toLocaleLowerCase()
+                  ? currentScrollStyle
+                  : {}
+              return (
+                <AntBtn
+                  id={`btn-${s.toLowerCase()}`}
+                  style={{ marginLeft: 3, ...currentStyle }}
+                  size='sm'
+                  type='link'
+                  color='primary'
+                  onClick={() => onAnchorClick(s.toLowerCase())}
+                >
+                  {s} <LinkOutlined />
+                </AntBtn>
+              )
             }),
-          )
-        }}
-        contentStyle={{ margin: '0 -5px' }}
-        tabs={[
-          {
-            tabButton: 'General',
-            tabContent: <DetailPanel {...detailProps} />,
-          },
-          {
-            tabButton: 'Setting',
-            tabContent: <Setting {...detailProps} />,
-          },
-          {
-            tabButton: 'Pricing',
-            tabContent: <Pricing {...detailProps} />,
-          },
-          {
-            tabButton: 'Stock',
-            tabContent: (
-              <Stock
-                medicationDetail={medicationDetail}
-                values={values}
-                setFieldValue={setFieldValue}
+
+            isMultiLanguage && (
+              <Select
+                defaultValue={currentLanguage}
+                options={[
+                  { label: 'JP', value: 'JP' },
+                  { label: 'EN', value: 'EN' },
+                ]}
               />
             ),
-          },
-        ]}
-      /> */}
-      {/* <CardContainer
-        hideHeader
-        style={{
-          margin: theme.spacing(2),
-        }}
+          ]}
+        ></PageHeader>
+        <div
+          id='card-holder'
+          style={{
+            marginTop: 10,
+            height: windowHeight - 200,
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            position: 'sticky',
+          }}
+        >
+          <Card
+            onMouseEnter={e => {
+              setCurrentScrollPosition(e.currentTarget.id)
+            }}
+            title='General'
+            id='general'
+          >
+            <DetailPanel {...detailProps} />
+          </Card>
+          <Card
+            onMouseEnter={e => {
+              setCurrentScrollPosition(e.currentTarget.id)
+            }}
+            title='Setting'
+            id='setting'
+            style={{ marginTop: 16 }}
+          >
+            <Setting {...detailProps} />
+          </Card>
+          <Card
+            onMouseEnter={e => {
+              setCurrentScrollPosition(e.currentTarget.id)
+            }}
+            title='Pricing'
+            id='pricing'
+            style={{ marginTop: 16 }}
+          >
+            <Pricing {...detailProps} />
+          </Card>
+          <Card
+            onMouseEnter={e => {
+              setCurrentScrollPosition(e.currentTarget.id)
+            }}
+            title='Stock'
+            id='stock'
+            style={{ marginTop: 16 }}
+          >
+            <Stock {...detailProps} />
+          </Card>
+          <div
+            onMouseEnter={e => {
+              setCurrentScrollPosition('stock')
+            }}
+            id='scroll-placeholder'
+            style={{ height: 500 }}
+          ></div>
+        </div>
+      </div>
+      {/*
+          <Panel header='Setting' key='1'>
+            <Setting {...detailProps} />
+          </Panel>
+          <Panel header='Pricing' key='1'>
+            <Pricing {...detailProps} />
+          </Panel>
+          <Panel header='Stock' key='1'>
+            <Stock {...detailProps} />
+          </Panel>
+         */}
 
-        
-      > */}
-      <Tabs
-        style={{ marginTop: 20 }}
-        defaultActiveKey='0'
-        options={MedicationDetailOption(detailProps, stockProps)}
-      />
       {/* </CardContainer> */}
       <div className={classes.actionDiv}>
         <Button
@@ -195,7 +326,11 @@ export default compose(
         : medicationDetail.default
 
       let chas = []
-      const { isChasAcuteClaimable, isChasChronicClaimable, isMedisaveClaimable } = returnValue
+      const {
+        isChasAcuteClaimable,
+        isChasChronicClaimable,
+        isMedisaveClaimable,
+      } = returnValue
       if (isChasAcuteClaimable) {
         chas.push('isChasAcuteClaimable')
       }
@@ -205,23 +340,6 @@ export default compose(
       if (isMedisaveClaimable) {
         chas.push('isMedisaveClaimable')
       }
-      // const { sddfk } = returnValue
-      // if (sddfk) {
-      //   console.log('sddfk', sddfk)
-      //   // console.log('sddfk', this.props)
-      //   this.props
-      //     .dispatch({
-      //       type: 'sddDetail/queryOne',
-      //       payload: {
-      //         id: sddfk,
-      //       },
-      //     })
-      //     .then((sdd) => {
-      //       const { data } = sdd
-      //       const { code, name } = data[0]
-      //       console.log('data', data)
-      //     })
-      // }
 
       return {
         ...returnValue,
@@ -232,12 +350,17 @@ export default compose(
     },
     validationSchema: Yup.object().shape({
       code: Yup.string().when('id', {
-        is: (id) => !!id,
-        then: Yup.string().trim().required(),
+        is: id => !!id,
+        then: Yup.string()
+          .trim()
+          .required(),
       }),
       displayValue: Yup.string().required(),
       revenueCategoryFK: Yup.number().required(),
-      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+      effectiveDates: Yup.array()
+        .of(Yup.date())
+        .min(2)
+        .required(),
       prescribingUOMFK: Yup.number().required(),
       prescriptionToDispenseConversion: Yup.number().required(),
       dispensingUOMFK: Yup.number().required(),
@@ -249,7 +372,8 @@ export default compose(
         .min(0, 'Markup Margin must between 0 and 999,999.9')
         .max(999999.9, 'Markup Margin must between 0 and 999,999.9'),
 
-      sellingPrice: Yup.number().required()
+      sellingPrice: Yup.number()
+        .required()
         .min(0, errMsg('Selling Price'))
         .max(999999.99, errMsg('Selling Price')),
 
@@ -287,7 +411,7 @@ export default compose(
         isChasChronicClaimable: false,
         isMedisaveClaimable: false,
       }
-      values.chas.forEach((o) => {
+      values.chas.forEach(o => {
         if (o === 'isChasAcuteClaimable') {
           chas[o] = true
         } else if (o === 'isChasChronicClaimable') {
@@ -309,7 +433,7 @@ export default compose(
       dispatch({
         type: 'medicationDetail/upsert',
         payload,
-      }).then((r) => {
+      }).then(r => {
         if (r) {
           // if (onConfirm) onConfirm()
           // dispatch({

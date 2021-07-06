@@ -225,71 +225,67 @@ const Stock = ({
     ],
   })
   return (
-    <SharedContainer>
-      <div
-        hideHeader
-        style={{
-          margin: theme.spacing(1),
-          minHeight: 670,
-          maxHeight: 670,
-        }}
-      >
-        <h4 style={{ fontWeight: 400 }}>
-          <b>Stock</b>
-        </h4>
-        <GridContainer className={classes.infoPanl}>
-          <GridItem xs={12} md={4}>
-            <Field
-              name={`${objectType().stockProp}`}
-              render={args => {
-                return (
-                  <NumberInput
-                    label={formatMessage({
-                      id: 'inventory.master.stock.currentStock',
-                    })}
-                    value={stockQty}
-                    disabled
-                    format='0.0'
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs={12} md={4}>
-            <FastField
-              name='reOrderThreshold'
-              render={args => {
-                return (
-                  <NumberInput
-                    label={formatMessage({
-                      id: 'inventory.master.stock.reorderThreshold',
-                    })}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs={12} md={4}>
-            <FastField
-              name='criticalThreshold'
-              render={args => {
-                return (
-                  <NumberInput
-                    label={formatMessage({
-                      id: 'inventory.master.stock.criticalThreshold',
-                    })}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-        </GridContainer>
-        <CommonTableGrid rows={stock} showIsDeleted {...tableParas} />
-      </div>
-    </SharedContainer>
+    <div
+      hideHeader
+      style={{
+        margin: theme.spacing(1),
+      }}
+    >
+      <h4 style={{ fontWeight: 400 }}>
+        <b>Stock</b>
+      </h4>
+      <GridContainer className={classes.infoPanl}>
+        <GridItem xs={12} md={4}>
+          <Field
+            name={`${objectType().stockProp}`}
+            render={args => {
+              return (
+                <NumberInput
+                  label={formatMessage({
+                    id: 'inventory.master.stock.currentStock',
+                  })}
+                  value={stockQty}
+                  disabled
+                  format='0.0'
+                  {...args}
+                />
+              )
+            }}
+          />
+        </GridItem>
+        <GridItem xs={12} md={4}>
+          <FastField
+            name='reOrderThreshold'
+            render={args => {
+              return (
+                <NumberInput
+                  label={formatMessage({
+                    id: 'inventory.master.stock.reorderThreshold',
+                  })}
+                  {...args}
+                />
+              )
+            }}
+          />
+        </GridItem>
+        <GridItem xs={12} md={4}>
+          <FastField
+            name='criticalThreshold'
+            render={args => {
+              return (
+                <NumberInput
+                  label={formatMessage({
+                    id: 'inventory.master.stock.criticalThreshold',
+                  })}
+                  {...args}
+                />
+              )
+            }}
+          />
+        </GridItem>
+      </GridContainer>
+      <CommonTableGrid rows={stock} showIsDeleted {...tableParas} />
+    </div>
   )
 }
 export default withStyles(styles, { withTheme: true })(Stock)
