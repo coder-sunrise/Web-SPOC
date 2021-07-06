@@ -571,3 +571,8 @@ export const PACKAGE_SIGNATURE_CHECK_OPTION = {
   OPTIONAL: 'Optional',
   IGNORE: 'Ignore',
 }
+
+export const DIAGNOSIS_TYPE = {
+  ICD10DIANOGSIS: 'ICD10',
+  SNOMEDDIAGNOSIS: 'Snomed',
+}
