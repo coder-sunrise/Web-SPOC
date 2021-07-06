@@ -165,7 +165,7 @@ const schemaAllergies = {
       allergyReactionFK: Yup.number().required(),
       patientAllergyStatusFK: Yup.number().required(),
       // adverseReaction: Yup.string(),
-      onsetDate: Yup.date(),
+      // onsetDate: Yup.date(),
     }),
   ),
 }

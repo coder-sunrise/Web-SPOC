@@ -42,7 +42,7 @@ class AllergyGrid extends PureComponent {
           title: 'Allergy Name',
         },
         { name: 'allergyReactionFK', title: 'Allergic Reaction' },
-        { name: 'onsetDate', title: 'Date' },
+        { name: 'onsetDate', title: 'Onset Date' },
         { name: 'patientAllergyStatusFK', title: 'Status' },
       ],
       columnExtensions: [
