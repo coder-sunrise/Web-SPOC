@@ -7,6 +7,7 @@ import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import { orderTypes } from '@/pages/Consultation/utils'
 import { getUserPreference, saveUserPreference } from '@/services/user'
 import service from '../services/consultation'
+import { USER_PREFERENCE_TYPE } from '@/utils/constants'
 
 const getSequence = (sequence, maxSeq) => {
   if (sequence === 0) return sequence
@@ -310,7 +311,7 @@ export default createFormViewModel({
           if (data) {
             const parsedFavouriteDiagnosisLanguage = JSON.parse(data)
             let favouriteDiagnosisLanguage
-            if (payload.type === '8') {
+            if (payload.type === USER_PREFERENCE_TYPE['FAVOURITEDIAGNOSISLANGUAGESETTING']) {
               favouriteDiagnosisLanguage = parsedFavouriteDiagnosisLanguage.find(
                 (o) => o.Identifier === 'FavouriteDiagnosisLanguage'
               )
