@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { FormattedMessage } from 'umi'
+import { connect } from 'dva'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
 import { status, tagCategory } from '@/utils/codes'
@@ -14,6 +15,9 @@ import {
   ProgressButton,
 } from '@/components'
 
+@connect(({ clinicSettings }) => ({
+  clinicSettings,
+}))
 @withFormikExtend({
   mapPropsToValues: ({ settingTag }) => settingTag.filter || {},
   handleSubmit: () => {},
@@ -21,7 +25,15 @@ import {
 })
 class Filter extends PureComponent {
   render () {
-    const { classes } = this.props
+    const { classes, clinicSettings } = this.props
+
+    let TagOptions
+    if (clinicSettings.settings.isEnableLabModule || clinicSettings.settings.isEnableRadiologyModule) {
+      TagOptions = tagCategory
+    } else {
+      TagOptions = [ tagCategory[0] ]
+    }
+
     return (
       <div className={classes.filterBar}>
         <GridContainer>
@@ -37,7 +49,7 @@ class Filter extends PureComponent {
             <FastField
               name="category"
               render={(args) => {
-                return <Select label="Category" options={tagCategory} {...args} />
+                return <Select label="Category" options={TagOptions} {...args} />
               }}
             />
           </GridItem>
@@ -63,7 +75,10 @@ class Filter extends PureComponent {
                     type: 'settingTag/query',
                     payload: {
                       isActive,
-                      category,
+                      category:
+                        clinicSettings.settings.isEnableLabModule || clinicSettings.settings.isEnableRadiologyModule
+                          ? undefined
+                          : 'Patient',
                       displayValue: tagDisplayValue,
                     },
                   })

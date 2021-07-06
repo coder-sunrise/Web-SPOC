@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
 import { CardContainer, CommonModal, withSettingBase } from '@/components'
-
+import { status } from '@/utils/codes'
 import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
@@ -13,6 +13,8 @@ import Detail from './Detail'
 const styles = (theme) => ({
   ...basicStyle(theme),
 })
+
+const settings = JSON.parse(localStorage.getItem('clinicSettings'))
 
 @connect(({ settingTag, global }) => ({
   settingTag,
@@ -22,10 +24,12 @@ const styles = (theme) => ({
 @withSettingBase({ modelName: 'settingTag' })
 class Tag extends PureComponent {
   state = {}
-
   componentDidMount () {
     this.props.dispatch({
       type: 'settingTag/query',
+      payload: {
+        category: settings.isEnableLabModule || settings.isEnableRadiologyModule ? undefined : 'Patient',
+      },
     })
   }
 
