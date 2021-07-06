@@ -17,8 +17,8 @@ import {
 const Detail = ({
   theme, footer, settingMedicationFrequency, clinicSettings, handleSubmit, values, setFieldValue
 }) => {
-  const { primaryPrintoutLanguage = 'EN', secondaryPrintOutLanguage = '' } = clinicSettings
-  const isUseSecondLanguage = secondaryPrintOutLanguage !== ''
+  const { primaryPrintoutLanguage = 'EN', secondaryPrintoutLanguage = '' } = clinicSettings
+  const isUseSecondLanguage = secondaryPrintoutLanguage !== ''
   const [
     translation,
     getValue,
@@ -70,10 +70,10 @@ const Detail = ({
               <FastField
                 name='secondDisplayValue'
                 render={(args) => {
-                  return (<TextField label={`Display Value (${secondaryPrintOutLanguage})`} {...args} maxLength={200}
+                  return (<TextField label={`Display Value (${secondaryPrintoutLanguage})`} {...args} maxLength={200}
                     onChange={(e) => {
-                      if (getValue(secondaryPrintOutLanguage).displayValue !== e.target.value) {
-                        setValue("displayValue", e.target.value, secondaryPrintOutLanguage)
+                      if (getValue(secondaryPrintoutLanguage).displayValue !== e.target.value) {
+                        setValue("displayValue", e.target.value, secondaryPrintoutLanguage)
                       }
                     }} />)
                 }}
@@ -142,10 +142,10 @@ export default compose(
     enableReinitialize: true,
     mapPropsToValues: ({ settingMedicationFrequency, clinicSettings }) => {
       let settings = settingMedicationFrequency.entity || settingMedicationFrequency.default
-      const { secondaryPrintOutLanguage = '' } = clinicSettings
-      settings.secondDisplayValue = getTranslationValue(settings.translationData, secondaryPrintOutLanguage, "displayValue")
-      if (secondaryPrintOutLanguage !== '') {
-        settings.secondLanguage = secondaryPrintOutLanguage
+      const { secondaryPrintoutLanguage = '' } = clinicSettings
+      settings.secondDisplayValue = getTranslationValue(settings.translationData, secondaryPrintoutLanguage, "displayValue")
+      if (secondaryPrintoutLanguage !== '') {
+        settings.secondLanguage = secondaryPrintoutLanguage
       }
       return settings
     },
@@ -177,7 +177,7 @@ export default compose(
     handleSubmit: (values, { props, resetForm }) => {
       const { effectiveDates, ...restValues } = values
       const { dispatch, onConfirm, clinicSettings } = props
-      const { primaryPrintoutLanguage = 'EN', secondaryPrintOutLanguage = '' } = clinicSettings
+      const { primaryPrintoutLanguage = 'EN', secondaryPrintoutLanguage = '' } = clinicSettings
 
       let translationData = [{
         language: primaryPrintoutLanguage,
@@ -187,9 +187,9 @@ export default compose(
         }]
       }]
 
-      if (secondaryPrintOutLanguage !== '') {
+      if (secondaryPrintoutLanguage !== '') {
         translationData = [...translationData, {
-          language: secondaryPrintOutLanguage,
+          language: secondaryPrintoutLanguage,
           list: [{
             key: 'displayValue',
             value: values.secondDisplayValue

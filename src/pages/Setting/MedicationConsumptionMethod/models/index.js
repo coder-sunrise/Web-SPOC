@@ -47,14 +47,14 @@ export default createListViewModel({
     },
     reducers: {
       queryDone (st, { payload }) {
-        const { data, clinicSetting: { settings: { secondaryPrintOutLanguage = '' } } } = payload
+        const { data, clinicSetting: { settings: { secondaryPrintoutLanguage = '' } } } = payload
         return {
           ...st,
           list: data.data.map(o => {
             return {
               ...o,
               effectiveDates: [o.effectiveStartDate, o.effectiveEndDate],
-              translatedDisplayValue: getTranslationValue(o.translationData, secondaryPrintOutLanguage, "displayValue"),
+              translatedDisplayValue: getTranslationValue(o.translationData, secondaryPrintoutLanguage, "displayValue"),
             }
           }),
           pagination: {

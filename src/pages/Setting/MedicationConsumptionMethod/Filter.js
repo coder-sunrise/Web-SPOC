@@ -53,13 +53,13 @@ class Filter extends PureComponent {
                 onClick={() => {
                   const { codeDisplayValue, isActive } = this.props.values
                   const { clinicSettings } = this.props
-                  const { secondaryPrintOutLanguage = '' } = clinicSettings
+                  const { secondaryPrintoutLanguage = '' } = clinicSettings
                   this.props.dispatch({
                     type: 'settingMedicationConsumptionMethod/query',
                     payload: {
                       isActive,
                       apiCriteria: {
-                        Language: secondaryPrintOutLanguage,
+                        Language: secondaryPrintoutLanguage,
                         Key: "displayValue",
                         SearchValue: codeDisplayValue,
                       },

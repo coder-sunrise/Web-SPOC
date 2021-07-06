@@ -20,12 +20,12 @@ class Grid extends PureComponent {
 
   render () {
     const { height, clinicSettings } = this.props
-    const { primaryPrintoutLanguage = 'EN', secondaryPrintOutLanguage = '' } = clinicSettings
-    const isUseSecondLanguage = secondaryPrintOutLanguage !== ''
+    const { primaryPrintoutLanguage = 'EN', secondaryPrintoutLanguage = '' } = clinicSettings
+    const isUseSecondLanguage = secondaryPrintoutLanguage !== ''
     let columns = [
       { name: 'code', title: 'Code' },
       { name: 'displayValue', title: `Display Value${isUseSecondLanguage ? ` (${primaryPrintoutLanguage})` : ''}` },
-      { name: 'translatedDisplayValue', title: `Display Value (${secondaryPrintOutLanguage})` },
+      { name: 'translatedDisplayValue', title: `Display Value (${secondaryPrintoutLanguage})` },
       { name: 'description', title: 'Description' },
       { name: 'sortOrder', title: 'Sort Order' },
       { name: 'isActive', title: 'Status' },
