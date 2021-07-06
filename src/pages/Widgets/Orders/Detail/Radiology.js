@@ -17,6 +17,7 @@ import {
   RadioGroup,
   FastField,
   Field,
+  Tooltip,
 } from '@/components'
 import { currencySymbol } from '@/utils/config'
 import Authorized from '@/utils/Authorized'
@@ -220,9 +221,7 @@ class Radiology extends PureComponent {
 
         const opt = {
           ...c,
-          combinDisplayValue: `${name} (${currencySymbol}${unitPrice.toFixed(
-            2,
-          )})`,
+          unitPrice,
         }
         return [
           ...p,
@@ -311,6 +310,7 @@ class Radiology extends PureComponent {
     setValues({
       ...orders.defaultRadiology,
       type: orders.type,
+      isEdit: false,
     })
   }
 
@@ -422,11 +422,12 @@ class Radiology extends PureComponent {
               <div style={{ marginTop: 10 }}>
                 <span className={classes.subTitle}>Category: </span>
                 {serviceCatetorys.map(category => (
-                  isEdit ? <Tag className={classes.tag} color={selectCategory === category.value ? "#4255bd" : undefined}>{category.name}</Tag> :
+                  isEdit ? <Tag className={classes.tag} style={{ border: selectCategory === category.value ? '1px solid rgba(0, 0, 0, 0)' : '1px solid rgba(0, 0, 0, 0.42)' }} color={selectCategory === category.value ? "#4255bd" : undefined}>{category.name}</Tag> :
                     <CheckableTag
                       key={category.value}
                       checked={selectCategory === category.value}
-                      style={{ border: '1px solid rgba(0, 0, 0, 0.42)', fontSize: '0.85rem', padding: '3px 10px' }}
+                      className={classes.tag}
+                      style={{ border: selectCategory === category.value ? '1px solid rgba(0, 0, 0, 0)' : '1px solid rgba(0, 0, 0, 0.42)' }}
                       onChange={checked => {
                         if (!isEdit && checked)
                           setFieldValue('selectCategory', category.value)
@@ -441,11 +442,12 @@ class Radiology extends PureComponent {
               <div style={{ marginTop: 10 }}>
                 <span className={classes.subTitle}>Tag: </span>
                 {serviceTags.map(tag => (
-                  isEdit ? <Tag className={classes.tag} color={selectTag === tag.value ? "#4255bd" : undefined}>{tag.name}</Tag> :
+                  isEdit ? <Tag className={classes.tag} style={{ border: selectTag === tag.value ? '1px solid rgba(0, 0, 0, 0)' : '1px solid rgba(0, 0, 0, 0.42)' }} color={selectTag === tag.value ? "#4255bd" : undefined}>{tag.name}</Tag> :
                     <CheckableTag
                       key={tag.value}
                       checked={selectTag === tag.value}
                       className={classes.tag}
+                      style={{ border: selectTag === tag.value ? '1px solid rgba(0, 0, 0, 0)' : '1px solid rgba(0, 0, 0, 0.42)' }}
                       onChange={checked => {
                         if (!isEdit && checked)
                           setFieldValue('selectTag', tag.value)
@@ -457,7 +459,7 @@ class Radiology extends PureComponent {
               </div>
             </GridItem>
             <GridItem xs={12}>
-              <FastField
+              <Field
                 name='filterService'
                 render={(args) => {
                   return <TextField label='Filter by service code, name'
@@ -484,7 +486,13 @@ class Radiology extends PureComponent {
                         }
                       }}
                     >
-                      <span className={classes.checkServiceLabel} title={r.combinDisplayValue}>{r.name}</span>
+                      <Tooltip title={<div>
+                        <div>Service Code: <span>{r.code}</span></div>
+                        <div>Service Name: <span>{r.name}</span></div>
+                        <div>Unit Price: <span>{`${currencySymbol}${r.unitPrice.toFixed(2)}`}</span></div>
+                      </div>}>
+                        <span className={classes.checkServiceLabel}>{r.name}</span>
+                      </Tooltip>
                       <div className={classes.checkServiceCheckBox}>
                         <Checkbox
                           disabled={isEdit}
@@ -530,12 +538,15 @@ class Radiology extends PureComponent {
             </GridItem>
             <GridItem xs={12}>
               <div>
-                <div style={{ marginTop: 5, display: 'inline-block', fontSize: '0.85rem', fontWeight: 500 }}>To be added:</div>
+                <div style={{ marginTop: 5, display: 'inline-block', fontSize: '0.85rem', fontWeight: 500 }}>Selected:</div>
                 {radiologyItems.map(ri => {
-                  return <div style={{ display: 'inline-block', marginLeft: 10 }}><Link onClick={(e) => {
-                    e.preventDefault()
-                    this.setSelectRadilogy(ri)
-                  }}>{ri.serviceName}</Link></div>
+                  return <div style={{ display: 'inline-block', marginLeft: 10 }}>
+                    <Link onClick={(e) => {
+                      e.preventDefault()
+                      this.setSelectRadilogy(ri)
+                    }}><span style={{ textDecoration: 'underline' }}>{ri.serviceName}</span>
+                    </Link>
+                  </div>
                 })}
               </div>
             </GridItem>

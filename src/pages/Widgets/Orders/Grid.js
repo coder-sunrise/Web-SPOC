@@ -664,13 +664,11 @@ export default ({
             }
 
             return (
-              <Tooltip title={texts}>
-                <div style={wrapCellTextStyle}>
-                  {texts}
-                  {drugMixtureIndicator(row)}
-                  {row.isPreOrder && <Tag color="#4255bd" style={{ position: 'relative', marginLeft: 6, top: 2, borderRadius: 10 }}>Pre</Tag>}
-                </div>
-              </Tooltip>
+              <div style={wrapCellTextStyle}>
+                <Tooltip title={texts}><span>{texts}</span></Tooltip>
+                {drugMixtureIndicator(row)}
+                {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'relative', marginLeft: 6, top: 2, borderRadius: 10 }}>Pre</Tag></Tooltip>}
+              </div>
             )
           },
         },
