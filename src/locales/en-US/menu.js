@@ -168,6 +168,7 @@ export default {
   'menu.setting.medicationcontraindication': 'Medication Contra-Indication',
   'menu.setting.medicationinteraction': 'Medication Interaction',
   'menu.setting.medicationsideeffect': 'Medication Side Effect',
+  'menu.setting.genericmedication': 'Generic Medication',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',

@@ -1099,6 +1099,12 @@ const _routes = [
             component: './Setting/MedicationSideEffect',
             authority: ['settings.clinicsetting.medicationsideeffect'],
           },
+          {
+            path: '/setting/genericmedication',
+            name: 'genericmedication',
+            component: './Setting/GenericMedication',
+            authority: ['settings.clinicsetting.genericmedication'],
+          },
         ],
       },
       // Settings

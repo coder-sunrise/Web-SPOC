@@ -320,4 +320,10 @@ export const menuData = [
     text: 'MEDICATION SIDE EFFECT',
     url: '/setting/medicationsideeffect',
   },
+  {
+    authority: 'settings.clinicsetting.genericmedication',
+    title: 'Clinic Setting',
+    text: 'GENERIC MEDICATION',
+    url: '/setting/genericmedication',
+  },
 ]
