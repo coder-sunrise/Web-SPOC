@@ -293,13 +293,37 @@ export const menuData = [
   {
     authority: 'settings.clinicsetting.medicationingredient',
     title: 'Clinic Setting',
-    text: 'Medication Ingredient',
+    text: 'Drug Ingredient',
     url: '/setting/medicationingredient',
   },
   {
     authority: 'settings.clinicsetting.clinicdrugallergy',
     title: 'Clinic Setting',
-    text: 'Clinic Drug Allergy',
+    text: 'Drug Allergy',
     url: '/setting/clinicdrugallergy',
+  },
+  {
+    authority: 'settings.clinicsetting.medicationcontraindication',
+    title: 'Clinic Setting',
+    text: 'MEDICATION CONTRA-INDICATION',
+    url: '/setting/medicationcontraindication',
+  },
+  {
+    authority: 'settings.clinicsetting.medicationinteraction',
+    title: 'Clinic Setting',
+    text: 'MEDICATION INTERACTION',
+    url: '/setting/medicationinteraction',
+  },
+  {
+    authority: 'settings.clinicsetting.medicationsideeffect',
+    title: 'Clinic Setting',
+    text: 'MEDICATION SIDE EFFECT',
+    url: '/setting/medicationsideeffect',
+  },
+  {
+    authority: 'settings.clinicsetting.genericmedication',
+    title: 'Clinic Setting',
+    text: 'GENERIC MEDICATION',
+    url: '/setting/genericmedication',
   },
 ]

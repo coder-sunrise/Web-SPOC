@@ -11,6 +11,7 @@ export const CANNED_TEXT_TYPE_FIELD_NAME = {
   [CANNED_TEXT_TYPE.PLAN]: 'plan',
   [CANNED_TEXT_TYPE.HISTORY]: 'history',
   [CANNED_TEXT_TYPE.MEDICALCERTIFICATE]: 'medicalcertificate',
+  [CANNED_TEXT_TYPE.RADIOLOGYINSTRUCTION]: 'radiologyinstruction',
 }
 
 export const columns = [

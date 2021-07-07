@@ -17,11 +17,11 @@ import {
 @withFormikExtend({
   mapPropsToValues: ({ settingMedicationFrequency }) =>
     settingMedicationFrequency.filter || {},
-  handleSubmit: () => {},
+  handleSubmit: () => { },
   displayName: 'MedicationFrequencyFilter',
 })
 class Filter extends PureComponent {
-  render() {
+  render () {
     const { classes } = this.props
     return (
       <div className={classes.filterBar}>
@@ -52,18 +52,17 @@ class Filter extends PureComponent {
                 icon={<Search />}
                 onClick={() => {
                   const { codeDisplayValue, isActive } = this.props.values
-
+                  const { clinicSettings } = this.props
+                  const { secondaryPrintoutLanguage = '' } = clinicSettings
                   this.props.dispatch({
                     type: 'settingMedicationFrequency/query',
                     payload: {
                       isActive,
-                      group: [
-                        {
-                          code: codeDisplayValue,
-                          displayValue: codeDisplayValue,
-                          combineCondition: 'or',
-                        },
-                      ],
+                      apiCriteria: {
+                        Language: secondaryPrintoutLanguage,
+                        Key: "displayValue",
+                        SearchValue: codeDisplayValue,
+                      },
                     },
                   })
                 }}

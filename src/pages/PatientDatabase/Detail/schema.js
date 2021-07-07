@@ -140,6 +140,13 @@ const schemaEmergencyContact = {
   patientEmergencyContact: Yup.array()
     .compact((v) => v.isDeleted)
     .of(pecValidationSchema),
+  patientFamilyMember: Yup.array()
+  .compact((v)=> v.isDeleted)
+  .of(
+    Yup.object().shape({
+      relationshipFK:Yup.number().required(),
+    }),
+  ),
 }
 
 const schemaAllergies = {
@@ -153,12 +160,19 @@ const schemaAllergies = {
   patientAllergy: Yup.array().compact((v) => v.isDeleted).of(
     Yup.object().shape({
       type: Yup.string().required(),
-      allergyFK: Yup.number().required(),
+      allergyFK: Yup.number().when('type', {
+        is: 'Allergy',
+        then: Yup.number().required(),
+      }),
+      ingredientFK: Yup.number().when('type', {
+        is: 'Ingredient',
+        then: Yup.number().required(),
+      }),
       allergyName: Yup.string().required(),
       allergyReactionFK: Yup.number().required(),
       patientAllergyStatusFK: Yup.number().required(),
       // adverseReaction: Yup.string(),
-      onsetDate: Yup.date(),
+      // onsetDate: Yup.date(),
     }),
   ),
 }

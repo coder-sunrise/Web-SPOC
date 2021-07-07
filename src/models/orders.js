@@ -63,6 +63,14 @@ const initialState = {
   defaultPackage: {
     packageItems: [],
   },
+  defaultRadiology: {
+    editServiceId: undefined,
+    isEdit: false,
+    radiologyItems: [],
+    selectCategory: 'All',
+    selectTag: 'All',
+    filterService: '',
+  },
 }
 export default createListViewModel({
   namespace: 'orders',

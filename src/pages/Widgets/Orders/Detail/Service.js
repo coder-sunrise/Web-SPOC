@@ -123,6 +123,7 @@ class Service extends PureComponent {
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctservice',
+        force: true,
         filter: {
           'serviceFKNavigation.IsActive': true,
           'serviceCenterFKNavigation.IsActive': true,

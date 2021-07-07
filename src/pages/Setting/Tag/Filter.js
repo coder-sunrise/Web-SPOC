@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { FormattedMessage } from 'umi'
+import { connect } from 'dva'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
 import { status, tagCategory } from '@/utils/codes'
@@ -21,7 +22,7 @@ import {
 })
 class Filter extends PureComponent {
   render () {
-    const { classes } = this.props
+    const { classes, tagCategoryOptions } = this.props
     return (
       <div className={classes.filterBar}>
         <GridContainer>
@@ -37,7 +38,7 @@ class Filter extends PureComponent {
             <FastField
               name="category"
               render={(args) => {
-                return <Select label="Category" options={tagCategory} {...args} />
+                return <Select label="Category" options={tagCategoryOptions} {...args} />
               }}
             />
           </GridItem>
