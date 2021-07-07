@@ -422,7 +422,8 @@ const getServices = (data) => {
         value: o[0].serviceId,
         code: o[0].code,
         name: o[0].displayValue,
-        serviceCenters: o.map((m) => {
+        serviceCategoryFK: o[0].serviceCategoryFK,
+        serviceCenters: o.map(m => {
           return {
             value: m.serviceCenterId,
             name: m.serviceCenter,
@@ -430,10 +431,17 @@ const getServices = (data) => {
             isDefault: m.isDefault,
           }
         }),
+        serviceTags: (o[0].serviceTag || []).map(m => {
+          return {
+            value: m.tagFK,
+            name: m.tagDisplayValue,
+          }
+        }),
+        isDisplayValueChangable: o[0].isDisplayValueChangable
       }
     }),
-    [ 'name' ],
-    [ 'asc' ]
+    ['name'],
+    ['asc'],
   )
   // eslint-disable-next-line compat/compat
   const serviceCenters = _.orderBy(
@@ -449,6 +457,37 @@ const getServices = (data) => {
         }),
       }
     }),
+    ['name'],
+    ['asc'],
+  )
+
+  const serviceCatetorys = _.orderBy(
+    Object.values(_.groupBy(data, 'serviceCategoryFK')).map(o => {
+      return {
+        value: o[0].serviceCategoryFK,
+        name: o[0].serviceCategory,
+      }
+    }),
+    ['name'],
+    ['asc'],
+  )
+
+  let serviceTags = []
+  data.forEach(service => {
+    (service.serviceTag || []).forEach(tag => {
+      serviceTags = serviceTags.concat({
+        value: tag.tagFK,
+        name: tag.tagDisplayValue,
+      })
+    })
+  })
+  serviceTags = _.orderBy(
+    Object.values(_.groupBy(serviceTags, 'value')).map(o => {
+      return {
+        value: o[0].value,
+        name: o[0].name,
+      }
+    }),
     [ 'name' ],
     [ 'asc' ]
   )
@@ -457,6 +496,8 @@ const getServices = (data) => {
     serviceCenterServices: data,
     services,
     serviceCenters,
+    serviceCatetorys,
+    serviceTags,
   }
 }
 export {
