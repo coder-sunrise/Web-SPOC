@@ -34,15 +34,8 @@ const plugins = [
       ...(!process.env.TEST && os.platform() === 'darwin'
         ? {
             dll: {
-              include: [
-                'dva',
-                'dva/router',
-                'dva/saga',
-                'dva/fetch',
-              ],
-              exclude: [
-                '@babel/runtime',
-              ],
+              include: ['dva', 'dva/router', 'dva/saga', 'dva/fetch'],
+              exclude: ['@babel/runtime'],
             },
             hardSource: true,
           }
@@ -77,10 +70,8 @@ export default {
     'border-radius-base': '3px',
     'border-radius-sm': '2px',
     'component-background': 'white',
-    'font-size-base': '1rem',
-    'font-size-lg': '1.2rem',
-    'font-size-sm': '0.9rem',
-    'zindex-popoconfirm':2000,
+
+    'zindex-popoconfirm': 2000,
     'zindex-notification': 2010,
     'zindex-message': 2010,
     'zindex-popover': 2030,
@@ -118,8 +109,8 @@ export default {
         const antdProPath = match[1].replace('.less', '').replace('.scss', '')
         const arr = antdProPath
           .split('/')
-          .map((a) => a.replace(/([A-Z])/g, '-$1'))
-          .map((a) => a.toLowerCase())
+          .map(a => a.replace(/([A-Z])/g, '-$1'))
+          .map(a => a.toLowerCase())
         return `antd-pro${arr.join('-')}-${localName}`.replace(/--/g, '-')
       }
       return localName

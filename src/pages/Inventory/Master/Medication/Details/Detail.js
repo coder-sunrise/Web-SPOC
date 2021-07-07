@@ -30,6 +30,7 @@ const Detail = ({
   theme,
   hasActiveSession,
   clinicSettings,
+  languageLabel,
   ...props
 }) => {
   const [toggle, setToggle] = useState(false)
@@ -161,7 +162,7 @@ const Detail = ({
                       label={
                         formatMessage({
                           id: 'inventory.master.medication.indication',
-                        }) + ' (EN)'
+                        }) + languageLabel
                       }
                       multiline
                       rowsMax='5'

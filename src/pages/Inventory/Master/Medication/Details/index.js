@@ -68,6 +68,16 @@ const Detail = ({
   theme,
   ...props
 }) => {
+  const detailProps = {
+    medicationDetail,
+    dispatch,
+    setFieldValue,
+    showTransfer: true,
+    values,
+    hasActiveSession,
+    ...props,
+  }
+
   useEffect(() => window.addEventListener('resize', resizeHandler))
   const [windowHeight, setWindowHeith] = useState(window.innerHeight)
   const [currentScrollPosition, setCurrentScrollPosition] = useState('general')
@@ -79,6 +89,9 @@ const Detail = ({
   )
 
   const isMultiLanguage = primaryPrintoutLanguage && secondaryPrintoutLanguage
+  const languageLabel = isMultiLanguage ? `(${primaryPrintoutLanguage})` : ''
+  detailProps = { ...detailProps, languageLabel }
+
   const resizeHandler = () => {
     setWindowHeith(window.innerHeight)
   }
@@ -86,16 +99,6 @@ const Detail = ({
   const { currentTab } = medication
 
   const [hasActiveSession, setHasActiveSession] = useState(true)
-
-  const detailProps = {
-    medicationDetail,
-    dispatch,
-    setFieldValue,
-    showTransfer: true,
-    values,
-    hasActiveSession,
-    ...props,
-  }
 
   const stockProps = {
     medicationDetail,
