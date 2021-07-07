@@ -53,7 +53,7 @@ class ClinicDrugAllergy extends PureComponent {
         <CommonModal
           open={settingClinicDrugAllergy.showModal}
           observe='ClinicDrugAllergyDetail'
-          title={settingClinicDrugAllergy.entity ? 'Edit Clinic Drug Allergy' : 'Add Clinic Drug Allergy'}
+          title={settingClinicDrugAllergy.entity ? 'Edit Drug Allergy' : 'Add Drug Allergy'}
           maxWidth='md'
           bodyNoPadding
           onClose={this.toggleModal}

@@ -53,7 +53,7 @@ class MedicationIngredient extends PureComponent {
         <CommonModal
           open={settingMedicationIngredient.showModal}
           observe='MedicationIngredientDetail'
-          title={settingMedicationIngredient.entity ? 'Edit Medication Ingredient' : 'Add Medication Ingredient'}
+          title={settingMedicationIngredient.entity ? 'Edit Drug Ingredient' : 'Add Drug Ingredient'}
           maxWidth='md'
           bodyNoPadding
           onClose={this.toggleModal}

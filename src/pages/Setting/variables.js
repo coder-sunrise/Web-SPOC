@@ -293,13 +293,13 @@ export const menuData = [
   {
     authority: 'settings.clinicsetting.medicationingredient',
     title: 'Clinic Setting',
-    text: 'Medication Ingredient',
+    text: 'Drug Ingredient',
     url: '/setting/medicationingredient',
   },
   {
     authority: 'settings.clinicsetting.clinicdrugallergy',
     title: 'Clinic Setting',
-    text: 'Clinic Drug Allergy',
+    text: 'Drug Allergy',
     url: '/setting/clinicdrugallergy',
   },
   {
