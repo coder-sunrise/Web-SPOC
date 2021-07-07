@@ -159,7 +159,7 @@ class FamilyMemberGrid extends PureComponent {
     if (o.familyGroupFK)
     {
       notification.warn({
-        message: 'This patient belongs other family group',
+        message: 'This patient belongs to other family group',
       })
       return
     }    
