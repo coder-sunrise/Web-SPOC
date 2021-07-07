@@ -14,9 +14,10 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingMedicationFrequency, global }) => ({
+@connect(({ settingMedicationFrequency, global, clinicSettings }) => ({
   settingMedicationFrequency,
   mainDivHeight: global.mainDivHeight,
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
 @withSettingBase({ modelName: 'settingMedicationFrequency' })
 class ServiceCenter extends PureComponent {

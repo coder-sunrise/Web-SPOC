@@ -14,9 +14,10 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingMedicationUOM, global }) => ({
+@connect(({ settingMedicationUOM, global, clinicSettings }) => ({
   settingMedicationUOM,
   mainDivHeight: global.mainDivHeight,
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
 @withSettingBase({
   modelName: 'settingMedicationUOM',
