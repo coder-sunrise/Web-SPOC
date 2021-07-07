@@ -15,8 +15,8 @@ import {
 import Loading from '@/components/PageLoading/index'
 import service from '@/services/patient'
 import { getUniqueId } from '@/utils/utils'
-import EmergencyContactGrid from './EmergencyContactGrid'
-import FamilyMemberGrid from './FamilyMemberGrid'
+import EmergencyContactGrid from './Grid/EmergencyContactGrid'
+import FamilyMemberGrid from './Grid/FamilyMemberGrid'
 
 const { query } = service
 class EmergencyContact extends PureComponent {
