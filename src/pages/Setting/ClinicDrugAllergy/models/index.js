@@ -6,7 +6,7 @@ export default createListViewModel({
   namespace: 'settingClinicDrugAllergy',
   config: {
     codetable: {
-      message: 'ClinicDrugAllergy updated',
+      message: 'DrugAllergy updated',
       code: 'ctclinicdrugallergy',
     },
   },

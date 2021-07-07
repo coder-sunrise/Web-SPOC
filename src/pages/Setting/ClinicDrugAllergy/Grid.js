@@ -29,7 +29,7 @@ class Grid extends PureComponent {
           if(!row.isUserMaintainable)
             return null
           return (
-            <Tooltip title='Edit Clinic Drug Allergy'>
+            <Tooltip title='Edit Drug Allergy'>
               <Button
                 size='sm'
                 onClick={() => {

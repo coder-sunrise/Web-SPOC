@@ -24,7 +24,7 @@ class Filter extends PureComponent {
     const drugAllergyTypes = [
       {
         value: false,
-        name: 'Clinic Drug Allergy',
+        name: 'Drug Allergy',
         render: () => <span>Clinic</span>,
       },
       {
