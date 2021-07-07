@@ -25,11 +25,11 @@ const Detail = ({
     getValue,
     setValue,
     setLanguage,
-    something
+    translationData
   ] = useTranslation(values.translationData || [], primaryPrintoutLanguage);
 
   const onSaveClick = async () => {
-    await setFieldValue("translationData", [...something])
+    await setFieldValue("translationData", [...translationData])
     handleSubmit()
   }
   return (

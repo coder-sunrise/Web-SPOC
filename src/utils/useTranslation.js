@@ -48,15 +48,12 @@ function useTranslation (valuesPara = [], defaultLang) {
     item[0].value = value;
 
     setValues(newValues);
-    console.log("newval", newValues);
     return newValues;
   };
 
   const changeLang = (lang) => {
     setCurrentLanguage(lang);
   };
-
-  //const getValue = (fieldName, value, lang) => {};
 
   return [value, getValue, setValue, changeLang, values];
 }
