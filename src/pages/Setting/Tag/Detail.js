@@ -42,14 +42,7 @@ class Detail extends PureComponent {
   state = {}
 
   render () {
-    const { theme, footer, settingTag, clinicSettings } = this.props
-
-    let TagOptions
-    if (clinicSettings.settings.isEnableLabModule || clinicSettings.settings.isEnableRadiologyModule) {
-      TagOptions = tagCategory
-    } else {
-      TagOptions = [ tagCategory[0] ]
-    }
+    const { theme, footer, settingTag, tagCategoryOptions } = this.props
 
     return (
       <React.Fragment>
@@ -59,7 +52,7 @@ class Detail extends PureComponent {
               <FastField
                 name="category"
                 render={(args) => (
-                  <Select label="Category" options={TagOptions} disabled={!!settingTag.entity} {...args} />
+                  <Select label="Category" options={tagCategoryOptions} disabled={!!settingTag.entity} {...args} />
                 )}
               />
             </GridItem>

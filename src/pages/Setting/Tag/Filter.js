@@ -15,9 +15,6 @@ import {
   ProgressButton,
 } from '@/components'
 
-@connect(({ clinicSettings }) => ({
-  clinicSettings,
-}))
 @withFormikExtend({
   mapPropsToValues: ({ settingTag }) => settingTag.filter || {},
   handleSubmit: () => {},
@@ -25,15 +22,7 @@ import {
 })
 class Filter extends PureComponent {
   render () {
-    const { classes, clinicSettings } = this.props
-
-    let TagOptions
-    if (clinicSettings.settings.isEnableLabModule || clinicSettings.settings.isEnableRadiologyModule) {
-      TagOptions = tagCategory
-    } else {
-      TagOptions = [ tagCategory[0] ]
-    }
-
+    const { classes, tagCategoryOptions } = this.props
     return (
       <div className={classes.filterBar}>
         <GridContainer>
@@ -49,7 +38,7 @@ class Filter extends PureComponent {
             <FastField
               name="category"
               render={(args) => {
-                return <Select label="Category" options={TagOptions} {...args} />
+                return <Select label="Category" options={tagCategoryOptions} {...args} />
               }}
             />
           </GridItem>
@@ -75,10 +64,7 @@ class Filter extends PureComponent {
                     type: 'settingTag/query',
                     payload: {
                       isActive,
-                      category:
-                        clinicSettings.settings.isEnableLabModule || clinicSettings.settings.isEnableRadiologyModule
-                          ? undefined
-                          : 'Patient',
+                      category,
                       displayValue: tagDisplayValue,
                     },
                   })
