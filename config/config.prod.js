@@ -30,7 +30,7 @@ const plugins = {
     baseNavigator: false,
   },
   dynamicImport: {
-    loading:  '@/components/PageLoading/index',
+    loading: '@/components/PageLoading/index',
   },
   sass: {
     // 默认值 Dart Sass，如果要改用 Node Sass，可安装 node-sass 依赖，然后使用该配置项
@@ -66,9 +66,11 @@ export default defineConfig({
   define: {
     APP_TYPE: process.env.APP_TYPE || '',
     'process.env.client_env': 'production',
-    'process.env.client_secret': '20e392d2ea9bfa76f2a9cb26c31a34d675ad81281a31f89ed5d572de8da0b9e7',
+    'process.env.client_secret':
+      '20e392d2ea9bfa76f2a9cb26c31a34d675ad81281a31f89ed5d572de8da0b9e7',
     'process.env.url': 'https://jghapi-development.azurewebsites.net',
-    'process.env.signalrUrl': 'https://medicloud-uat-websocket-200729.semr2.com/notificationHub',
+    'process.env.signalrUrl':
+      'https://medicloud-uat-websocket-200729.semr2.com/notificationHub',
   },
   // 路由配置
   routes: pageRoutes,
@@ -81,16 +83,13 @@ export default defineConfig({
     'border-radius-base': '3px',
     'border-radius-sm': '2px',
     'component-background': 'white',
-    'font-size-base': '1rem',
-    'font-size-lg': '1.2rem',
-    'font-size-sm': '0.9rem',
-    'zindex-popoconfirm':'2000',
+    'zindex-popoconfirm': '2000',
     'zindex-notification': '2010',
     'zindex-message': '2010',
     'zindex-popover': '2030',
     'zindex-picker': '2050',
     'zindex-dropdown': '2050',
-    'zindex-tooltip': '2060', 
+    'zindex-tooltip': '2060',
   },
   externals: {
     // '@antv/data-set': 'DataSet',
