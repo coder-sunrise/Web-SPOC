@@ -3,7 +3,11 @@ import _ from 'lodash'
 import Yup from '@/utils/yup'
 import { withFormikExtend, FastField, Select, GridContainer, GridItem, TextField, DateRangePicker } from '@/components'
 import { tagCategory } from '@/utils/codes'
+import { connect } from 'dva'
 
+@connect(({ clinicSettings }) => ({
+  clinicSettings,
+}))
 @withFormikExtend({
   mapPropsToValues: ({ settingTag }) => settingTag.entity || settingTag.default,
   // Add validation
@@ -38,7 +42,8 @@ class Detail extends PureComponent {
   state = {}
 
   render () {
-    const { theme, footer, settingTag } = this.props
+    const { theme, footer, settingTag, tagCategoryOptions } = this.props
+
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
@@ -47,7 +52,7 @@ class Detail extends PureComponent {
               <FastField
                 name="category"
                 render={(args) => (
-                  <Select label="Category" options={tagCategory} disabled={!!settingTag.entity} {...args} />
+                  <Select label="Category" options={tagCategoryOptions} disabled={!!settingTag.entity} {...args} />
                 )}
               />
             </GridItem>
