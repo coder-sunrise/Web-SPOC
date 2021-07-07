@@ -138,7 +138,7 @@ class PatientDetail extends PureComponent {
             return (
               <Cmpnet
                 schema={
-                  schemas.emergencyContact.patientEmergencyContact._subType
+                  schemas.emergencyContact
                 }
                 {...p}
               />

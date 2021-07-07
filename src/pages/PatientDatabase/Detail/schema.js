@@ -140,6 +140,13 @@ const schemaEmergencyContact = {
   patientEmergencyContact: Yup.array()
     .compact((v) => v.isDeleted)
     .of(pecValidationSchema),
+  patientFamilyMember: Yup.array()
+  .compact((v)=> v.isDeleted)
+  .of(
+    Yup.object().shape({
+      relationshipFK:Yup.number().required(),
+    }),
+  ),
 }
 
 const schemaAllergies = {
