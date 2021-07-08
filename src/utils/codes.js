@@ -935,12 +935,12 @@ const tagCategory = [
 
 const languageCategory = [
   {
-    value: 'Japanese',
+    value: 'JP',
     name: 'Japanese',
     render: () => <span>Japanese</span>,
   },
   {
-    value: 'English',
+    value: 'EN',
     name: 'English',
     render: () => <span>English</span>,
   },

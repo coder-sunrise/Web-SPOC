@@ -37,7 +37,7 @@ const ICD10DiagnosisSelect = ({
   useEffect(
     () => {
       setcurrentDiagnosisLanguage(diagnosis.favouriteDiagnosisLanguage)
-      setLabelValue(diagnosis.favouriteDiagnosisLanguage === 'English' ? 'displayvalue' : 'JpnDisplayValue')
+      setLabelValue(diagnosis.favouriteDiagnosisLanguage === 'EN' ? 'displayvalue' : 'JpnDisplayValue')
     },
     [ diagnosis ]
   )
@@ -77,10 +77,10 @@ const ICD10DiagnosisSelect = ({
 
   const onLanguageChange = (e) => {
     setcurrentDiagnosisLanguage(e.target.value)
-    e.target.value === 'English' ? setLabelValue('displayvalue') : setLabelValue('JpnDisplayValue')
+    e.target.value === 'EN' ? setLabelValue('displayvalue') : setLabelValue('JpnDisplayValue')
   }
 
-  const languageOptions = [ { label: ' EN ', value: 'English' }, { label: ' JP ', value: 'Japanese' } ]
+  const languageOptions = [ { label: ' EN ', value: 'EN' }, { label: ' JP ', value: 'JP' } ]
 
   return (
     <div style={{ position: 'relative' }}>
@@ -102,7 +102,7 @@ const ICD10DiagnosisSelect = ({
                   overflow: 'hidden',
                 }}
               >
-                {currentDiagnosisLanguage === 'English' ? (
+                {currentDiagnosisLanguage === 'EN' ? (
                   <div>{option.displayvalue}</div>
                 ) : (
                   <div>{option.JpnDisplayValue}</div>
