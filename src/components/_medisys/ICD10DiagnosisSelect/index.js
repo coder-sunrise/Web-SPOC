@@ -155,17 +155,13 @@ const ICD10DiagnosisSelect = ({
                   color: '#FFCC00',
                   width: 28,
                   height: 28,
-                  cursor: 'hand',
                 }}
                 onClick={handelSaveDiagnosisAsFavourite}
               />
             </Tooltip>
           ) : (
             <Tooltip title="Click to add to favourite">
-              <StarBorder
-                style={{ color: 'gray', width: 28, height: 28, cursor: 'hand' }}
-                onClick={handelSaveDiagnosisAsFavourite}
-              />
+              <StarBorder style={{ color: 'gray', width: 28, height: 28 }} onClick={handelSaveDiagnosisAsFavourite} />
             </Tooltip>
           )}
         </div>
