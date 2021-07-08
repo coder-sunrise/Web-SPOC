@@ -70,7 +70,6 @@ export default {
     'border-radius-base': '3px',
     'border-radius-sm': '2px',
     'component-background': 'white',
-
     'zindex-popoconfirm': 2000,
     'zindex-notification': 2010,
     'zindex-message': 2010,

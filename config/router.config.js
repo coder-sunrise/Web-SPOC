@@ -1070,6 +1070,42 @@ const _routes = [
             component: './Setting/tag',
             authority: ['settings.clinicsetting.tag'],
           },
+          {
+            path: '/setting/medicationingredient',
+            name: 'medicationingredient',
+            component: './Setting/MedicationIngredient',
+            authority: ['settings.clinicsetting.medicationingredient'],
+          },
+          {
+            path: '/setting/clinicdrugallergy',
+            name: 'clinicdrugallergy',
+            component: './Setting/ClinicDrugAllergy',
+            authority: ['settings.clinicsetting.clinicdrugallergy'],
+          },
+          {
+            path: '/setting/medicationcontraindication',
+            name: 'medicationcontraindication',
+            component: './Setting/MedicationContraIndication',
+            authority: ['settings.clinicsetting.medicationcontraindication'],
+          },
+          {
+            path: '/setting/medicationinteraction',
+            name: 'medicationinteraction',
+            component: './Setting/MedicationInteraction',
+            authority: ['settings.clinicsetting.medicationinteraction'],
+          },
+          {
+            path: '/setting/medicationsideeffect',
+            name: 'medicationsideeffect',
+            component: './Setting/MedicationSideEffect',
+            authority: ['settings.clinicsetting.medicationsideeffect'],
+          },
+          {
+            path: '/setting/genericmedication',
+            name: 'genericmedication',
+            component: './Setting/GenericMedication',
+            authority: ['settings.clinicsetting.genericmedication'],
+          },
         ],
       },
       // Settings

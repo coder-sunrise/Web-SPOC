@@ -14,9 +14,10 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingMedicationDosage, global }) => ({
+@connect(({ settingMedicationDosage, global, clinicSettings }) => ({
   settingMedicationDosage,
   mainDivHeight: global.mainDivHeight,
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
 @withSettingBase({ modelName: 'settingMedicationDosage' })
 class MedicationDosage extends PureComponent {
