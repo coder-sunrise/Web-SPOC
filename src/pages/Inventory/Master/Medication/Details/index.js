@@ -88,10 +88,9 @@ const Detail = ({
     primaryPrintoutLanguage ?? 'EN',
   )
 
-  const isMultiLanguage = primaryPrintoutLanguage && secondaryPrintoutLanguage
-  const languageLabel = isMultiLanguage ? `(${primaryPrintoutLanguage})` : ''
-  detailProps = { ...detailProps, languageLabel }
-
+  const isMultiLanguage =
+    primaryPrintoutLanguage && secondaryPrintoutLanguage ? true : false
+  detailProps.isMultiLanguage = isMultiLanguage
   const resizeHandler = () => {
     setWindowHeith(window.innerHeight)
   }
@@ -217,6 +216,9 @@ const Detail = ({
             isMultiLanguage && (
               <Select
                 defaultValue={currentLanguage}
+                onChange={value => {
+                  setCurrentLanguage(value)
+                }}
                 options={[
                   { label: 'JP', value: 'JP' },
                   { label: 'EN', value: 'EN' },
@@ -242,7 +244,7 @@ const Detail = ({
             title='General'
             id='general'
           >
-            <DetailPanel {...detailProps} />
+            <DetailPanel {...detailProps} language={currentLanguage} />
           </Card>
           <Card
             onMouseEnter={e => {
@@ -252,7 +254,7 @@ const Detail = ({
             id='setting'
             style={{ marginTop: 16 }}
           >
-            <Setting {...detailProps} />
+            <Setting {...detailProps} language={currentLanguage} />
           </Card>
           <Card
             onMouseEnter={e => {

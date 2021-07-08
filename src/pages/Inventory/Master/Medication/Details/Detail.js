@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { formatMessage } from 'umi'
 import { withStyles } from '@material-ui/core/styles'
 import { FastField } from 'formik'
@@ -30,11 +30,16 @@ const Detail = ({
   theme,
   hasActiveSession,
   clinicSettings,
-  languageLabel,
+  language,
+  isMultiLanguage,
   ...props
 }) => {
   const [toggle, setToggle] = useState(false)
+  const [languageLabel, setLanguageLabel] = useState('')
   const [attachments, setAttachments] = useState([])
+  useEffect(() => {
+    setLanguageLabel(isMultiLanguage ? `(${language})` : '')
+  }, [language])
   const toggleModal = () => {
     setToggle(!toggle)
   }
@@ -154,7 +159,7 @@ const Detail = ({
         <GridItem xs={12} md={4}>
           <GridContainer>
             <GridItem md={12} style={{ padding: 0 }}>
-              <FastField
+              <Field
                 name='indication'
                 render={args => {
                   return (
