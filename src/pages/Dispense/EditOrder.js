@@ -288,7 +288,7 @@ class EditOrder extends Component {
     const Forms = formsWidget.component
     const formAccessRight = Authorized.check(formsWidget.accessRight)
     return (
-      <div className={classes.content}>
+      <div className={classes.content} style={{ backgroundColor: 'white' }}>
         <GridContainer>
           <GridItem xs={12} md={6}>
             <h5>Orders</h5>

@@ -1485,6 +1485,18 @@ export const removeEmpty = values => {
   )
 }
 
+const getTranslationValue = (translationDatas = [], language, key) => {
+  let displayValue = ''
+  const translationData = translationDatas.find(t => t.language === language)
+  if (translationData) {
+    const displayValueItem = (translationData.list || []).find(l => l.key === key)
+    if (displayValueItem) {
+      displayValue = displayValueItem.value
+    }
+  }
+  return displayValue
+}
+
 export {
   sleep,
   sumReducer,
@@ -1514,6 +1526,7 @@ export {
   stringToBytesFaster,
   checkAuthoritys,
   getModuleSequence,
+  getTranslationValue,
   // toUTC,
   // toLocal,
 }

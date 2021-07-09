@@ -6,7 +6,7 @@ export default createListViewModel({
   namespace: 'settingMedicationIngredient',
   config: {
     codetable: {
-      message: 'MedicationIngredient updated',
+      message: 'DrugIngredient updated',
       code: 'ctmedicationingredient',
     },
   },

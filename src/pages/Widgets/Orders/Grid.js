@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import _ from 'lodash'
+import { Tag } from 'antd'
 import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
+//import CheckCircle from '@material-ui/icons/CheckCircle'
+import Timer from '@material-ui/icons/Timer'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { Divider } from '@material-ui/core'
@@ -68,12 +71,12 @@ export default ({
           (distinct, data) =>
             distinct.includes(data.packageGlobalId)
               ? [
-                  ...distinct,
-                ]
+                ...distinct,
+              ]
               : [
-                  ...distinct,
-                  data.packageGlobalId,
-                ],
+                ...distinct,
+                data.packageGlobalId,
+              ],
           [],
         )
 
@@ -134,13 +137,34 @@ export default ({
     const accessRight = Authorized.check(editAccessRight)
     if (!accessRight || accessRight.rights !== 'enable') return
 
-    dispatch({
-      type: 'orders/updateState',
-      payload: {
-        entity: row,
-        type: row.type,
-      },
-    })
+    if (row.type === '10') {
+      dispatch({
+        type: 'orders/updateState',
+        payload: {
+          entity: {
+            radiologyItems: [{ ...row }],
+            editServiceId: row.serviceFK,
+            selectCategory: 'All',
+            selectTag: 'All',
+            filterService: '',
+            serviceCenterFK: row.serviceCenterFK,
+            quantity: row.quantity,
+            total: row.total,
+            totalAfterItemAdjustment: row.totalAfterItemAdjustment,
+          },
+          type: row.type,
+        },
+      })
+    }
+    else {
+      dispatch({
+        type: 'orders/updateState',
+        payload: {
+          entity: row,
+          type: row.type,
+        },
+      })
+    }
     if (row.type === '7') {
       const treatment =
         (codetable.cttreatment || [])
@@ -381,6 +405,16 @@ export default ({
         </strong>
       </span>
     )
+  }
+
+  const getDisplayName = (row) => {
+    if (row.type === '10') {
+      if (row.newServiceName && row.newServiceName.trim() !== "") {
+        return row.newServiceName
+      }
+      row.subject
+    }
+    return row.subject
   }
 
   return (
@@ -630,12 +664,11 @@ export default ({
             }
 
             return (
-              <Tooltip title={texts}>
-                <div style={wrapCellTextStyle}>
-                  {texts}
-                  {drugMixtureIndicator(row)}
-                </div>
-              </Tooltip>
+              <div style={wrapCellTextStyle}>
+                <Tooltip title={texts}><span>{texts}</span></Tooltip>
+                {drugMixtureIndicator(row)}
+                {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'relative', marginLeft: 6, top: 2, borderRadius: 10 }}>Pre</Tag></Tooltip>}
+              </div>
             )
           },
         },
@@ -645,13 +678,29 @@ export default ({
             return (
               <div style={wrapCellTextStyle}>
                 {packageDrawdownIndicator(row)}
+                {row.type === '10' &&
+                  <div style={{
+                    position: 'relative',
+                  }}
+                  >
+                  <Tooltip title='Draft'>
+                    <Timer style={{
+                      position: 'absolute',
+                      top: 2,
+                      color: 'red',
+                      transform: 'scale(1.4,1.4)',
+                    }}
+                    />
+                  </Tooltip>
+                  </div>
+                }
                 <div
                   style={{
                     position: 'relative',
-                    left: row.isPackage ? 22 : 0,
+                    left: row.isPackage || row.type === '10' ? 22 : 0,
                   }}
                 >
-                  {row.subject}
+                  {getDisplayName(row)}
                 </div>
               </div>
             )
@@ -704,7 +753,7 @@ export default ({
               qty = `${numeral(row.quantity || 0).format(
                 '0,0.0',
               )} ${row.uomDisplayValue}`
-            } else if (row.type === '3' || row.type === '7') {
+            } else if (row.type === '3' || row.type === '7' || row.type === '10') {
               qty = `${numeral(row.quantity || 0).format('0,0.0')}`
             } else if (row.type === '4') {
               qty = `${numeral(row.quantity || 0).format(

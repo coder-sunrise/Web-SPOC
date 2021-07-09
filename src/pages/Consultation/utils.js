@@ -7,6 +7,8 @@ import Consumable from '@/pages/Widgets/Orders/Detail/Consumable'
 import OrderSet from '@/pages/Widgets/Orders/Detail/OrderSet'
 import Treatment from '@/pages/Widgets/Orders/Detail/Treatment'
 import Package from '@/pages/Widgets/Orders/Detail/Package'
+import Radiology from '@/pages/Widgets/Orders/Detail/Radiology'
+import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
 
 const orderTypes = [
   {
@@ -21,20 +23,30 @@ const orderTypes = [
     component: props => <Medication {...props} />,
   },
   {
+    name: 'Service',
+    value: '3',
+    prop: 'corService',
+    accessRight: 'queue.consultation.order.service',
+    filter: r => r.serviceCenterCategoryFK !== SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
+    getSubject: r => r.serviceName,
+    component: props => <Service {...props} />,
+  },
+  {
+    name: 'Radiology',
+    value: '10',
+    prop: 'corService',
+    accessRight: 'queue.consultation.order.radiology',
+    getSubject: r => r.serviceName,
+    filter: r => r.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
+    component: props => <Radiology {...props} />,
+  },
+  {
     name: 'Vaccination',
     value: '2',
     prop: 'corVaccinationItem',
     accessRight: 'queue.consultation.order.vaccination',
     getSubject: r => r.vaccinationName,
     component: props => <Vaccination {...props} />,
-  },
-  {
-    name: 'Service',
-    value: '3',
-    prop: 'corService',
-    accessRight: 'queue.consultation.order.service',
-    getSubject: r => r.serviceName,
-    component: props => <Service {...props} />,
   },
   {
     name: 'Consumable',

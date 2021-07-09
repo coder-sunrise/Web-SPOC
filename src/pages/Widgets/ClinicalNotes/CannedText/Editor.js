@@ -15,7 +15,7 @@ import {
   OutlinedTextField,
   NumberInput,
 } from '@/components'
-import { CANNED_TEXT_TYPE } from '@/utils/constants'
+import { CANNED_TEXT_TYPE, CANNED_TEXT_TYPE_BASE_TEXT } from '@/utils/constants'
 
 const defaultEntity = {
   title: undefined,
@@ -79,13 +79,14 @@ const Editor = ({
           </div>
         </GridItem>
         <GridItem md={12}>
-          {cannedTextTypeFK !== CANNED_TEXT_TYPE.MEDICALCERTIFICATE ?
-            <FastField
+          {!CANNED_TEXT_TYPE_BASE_TEXT.find(type => type === cannedTextTypeFK)
+            ?
+            (<FastField
               name='text'
               render={(args) => (
                 <RichEditor strongLabel label='Canned Text' {...args} />
               )}
-            />
+            />)
             :
             <FastField
               name='text'

@@ -1,5 +1,8 @@
 import React, { PureComponent } from 'react'
 import Yup from '@/utils/yup'
+import useTranslation from "@/utils/useTranslation"
+import { compose } from 'redux'
+import { getTranslationValue } from '@/utils/utils'
 import {
   withFormikExtend,
   FastField,
@@ -8,199 +11,191 @@ import {
   TextField,
   DateRangePicker,
   NumberInput,
-  CodeSelect,
 } from '@/components'
 
-const styles = (theme) => ({})
+const Detail = ({
+  theme, footer, settingMedicationUOM, clinicSettings, handleSubmit, values, setFieldValue
+}) => {
+  const { primaryPrintoutLanguage = 'EN', secondaryPrintoutLanguage = '' } = clinicSettings
+  const isUseSecondLanguage = secondaryPrintoutLanguage !== ''
 
-@withFormikExtend({
-  mapPropsToValues: ({ settingMedicationUOM }) => {
-    let settings = settingMedicationUOM.entity || settingMedicationUOM.default
-    if (settings && settings.translationLink && settings.translationLink.translationMasters) {
-      settings.translationLink.translationMasters = settings.translationLink.translationMasters.map((o) => {
-        return { ...o, tempLanguageFK: o.languageFK, originalLanguageFK: o.languageFK, originalDisplayValue: o.displayValue }
-      })
-    }
-    return settings
-  },
-  validationSchema: Yup.object().shape({
-    code: Yup.string().required(),
-    displayValue: Yup.string().required(),
-    effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
-    sortOrder: Yup.number()
-      .min(
-        -2147483648,
-        'The number should between -2,147,483,648 and 2,147,483,647',
-      )
-      .max(
-        2147483647,
-        'The number should between -2,147,483,648 and 2,147,483,647',
-      )
-      .nullable(),
-    translationLink: Yup.object().shape({
-      translationMasters: Yup.array().of(
-        Yup.object().shape({
-          displayValue: Yup.string().when('tempLanguageFK', {
-            is: (v) => v !== undefined,
-            then: Yup.string().required(),
-          }),
-          languageFK: Yup.number().when('displayValue', {
-            is: (v) => v !== undefined && v !== null && v.trim() !== '',
-            then: Yup.number().required(),
-          }),
-        }),
-      ),
-    }),
-  }),
-  handleSubmit: (values, { props, resetForm }) => {
-    const { effectiveDates, ...restValues } = values
-    const { dispatch, onConfirm } = props
-    const { translationLink } = restValues
-    // if translate language has been removed, then just update the IsDeleted to True
-    if (translationLink && translationLink.translationMasters && translationLink.translationMasters.length > 0) {
-      if (!translationLink.translationMasters[0].languageFK) {
-        if (translationLink.id) {
-          translationLink.translationMasters[0].isDeleted = true
-          translationLink.translationMasters[0].languageFK = translationLink.translationMasters[0].originalLanguageFK
-          translationLink.translationMasters[0].displayValue = translationLink.translationMasters[0].originalDisplayValue
-          translationLink.isDeleted = true
-        }
-        else {
-          restValues.translationLink = undefined
-        }
-      }
-    }
-    dispatch({
-      type: 'settingMedicationUOM/upsert',
-      payload: {
-        ...restValues,
-        effectiveStartDate: effectiveDates[0],
-        effectiveEndDate: effectiveDates[1],
-      },
-    }).then((r) => {
-      if (r) {
-        resetForm()
-        if (onConfirm) onConfirm()
-        dispatch({
-          type: 'settingMedicationUOM/query',
-        })
-      }
-    })
-  },
-  displayName: 'MedicationUOMDetail',
-})
-class Detail extends PureComponent {
-  state = {}
+  const [
+    translation,
+    getValue,
+    setValue,
+    setLanguage,
+    translationData
+  ] = useTranslation(values.translationData || [], primaryPrintoutLanguage);
 
-  render () {
-    const { props } = this
-    const { theme, footer, settingMedicationUOM, setFieldValue } = props
-    // console.log('detail', props)
-    return (
-      <React.Fragment>
-        <div style={{ margin: theme.spacing(1) }}>
-          <GridContainer>
-            <GridItem md={6}>
-              <FastField
-                name='code'
-                render={(args) => (
-                  <TextField
-                    label='Code'
-                    autoFocus
-                    {...args}
-                    disabled={!!settingMedicationUOM.entity}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem md={6}>
-              <FastField
-                name='displayValue'
-                render={(args) => <TextField label='Display Value' {...args} />}
-              />
-            </GridItem>
-            <GridItem md={6}>
-              <FastField
-                name='effectiveDates'
-                render={(args) => {
-                  return (
-                    <DateRangePicker
-                      label='Effective Start Date'
-                      label2='End Date'
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem md={6}>
-              <FastField
-                name='sortOrder'
-                render={(args) => {
-                  return (
-                    <NumberInput label='Sort Order' rowsMax={4} {...args} />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem md={12}>
-              <FastField
-                name='description'
-                render={(args) => {
-                  return (
-                    <TextField
-                      label='Description'
-                      multiline
-                      rowsMax={4}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem md={4}>
-              <FastField
-                name='translationLink.translationMasters[0].languageFK'
-                render={(args) => {
-                  return (
-                    <CodeSelect
-                      label='Translation Language'
-                      code='ctLanguage'
-                      onChange={(value) => {
-                        setFieldValue(
-                          `translationLink.translationMasters[0].tempLanguageFK`,
-                          value,
-                        )
-                      }}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
+  const onSaveClick = async () => {
+    await setFieldValue("translationData", [...translationData])
+    handleSubmit()
+  }
+
+  return (
+    <React.Fragment>
+      <div style={{ margin: theme.spacing(1) }}>
+        <GridContainer>
+          <GridItem md={4}>
+            <FastField
+              name='code'
+              render={(args) => (
+                <TextField
+                  label='Code'
+                  autoFocus
+                  {...args}
+                  disabled={!!settingMedicationUOM.entity}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem md={8}>
+            <FastField
+              name='displayValue'
+              render={(args) => <TextField label={`Display Value${isUseSecondLanguage ? ` (${primaryPrintoutLanguage})` : ''}`} {...args} maxLength={200}
+                onChange={(e) => {
+                  if (getValue(primaryPrintoutLanguage).displayValue !== e.target.value) {
+                    setValue("displayValue", e.target.value, primaryPrintoutLanguage)
+                  }
+                }} />}
+            />
+          </GridItem>
+          <GridItem md={4}>
+            <FastField
+              name='sortOrder'
+              render={(args) => <NumberInput label='Sort Order' {...args} />}
+            />
+          </GridItem>
+          {isUseSecondLanguage && (
             <GridItem md={8}>
               <FastField
-                name='translationLink.translationMasters[0].displayValue'
+                name='secondDisplayValue'
                 render={(args) => {
-                  return (
-                    <TextField label='Translated Display Value' {...args} />
-                  )
+                  return (<TextField label={`Display Value (${secondaryPrintoutLanguage})`} {...args} maxLength={200}
+                    onChange={(e) => {
+                      if (getValue(secondaryPrintoutLanguage).displayValue !== e.target.value) {
+                        setValue("displayValue", e.target.value, secondaryPrintoutLanguage)
+                      }
+                    }} />)
                 }}
               />
-            </GridItem>
-          </GridContainer>
-        </div>
-        {footer &&
-          footer({
-            onConfirm: props.handleSubmit,
-            confirmBtnText: 'Save',
-            confirmProps: {
-              disabled: false,
-            },
-          })}
-      </React.Fragment>
-    )
-  }
+            </GridItem>)}
+          <GridItem md={isUseSecondLanguage ? 12 : 8}>
+            <FastField
+              name='effectiveDates'
+              render={(args) => {
+                return (
+                  <DateRangePicker
+                    label='Effective Start Date'
+                    label2='End Date'
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem md={12}>
+            <FastField
+              name='description'
+              render={(args) => {
+                return (
+                  <TextField
+                    label='Description'
+                    multiline
+                    rowsMax={4}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+        </GridContainer>
+      </div>
+      {footer &&
+        footer({
+          onConfirm: onSaveClick,
+          confirmBtnText: 'Save',
+          confirmProps: {
+            disabled: false,
+          },
+        })}
+    </React.Fragment>
+  )
 }
 
-export default Detail
+export default compose(
+  withFormikExtend({
+    enableReinitialize: true,
+    mapPropsToValues: ({ settingMedicationUOM, clinicSettings }) => {
+      let settings = settingMedicationUOM.entity || settingMedicationUOM.default
+      const { secondaryPrintoutLanguage = '' } = clinicSettings
+      settings.secondDisplayValue = getTranslationValue(settings.translationData, secondaryPrintoutLanguage, "displayValue")
+      if (secondaryPrintoutLanguage !== '') {
+        settings.secondLanguage = secondaryPrintoutLanguage
+      }
+
+      return settings
+    },
+    validationSchema: Yup.object().shape({
+      code: Yup.string().required(),
+      displayValue: Yup.string().required(),
+      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+      sortOrder: Yup.number()
+        .min(
+          -2147483648,
+          'The number should between -2,147,483,648 and 2,147,483,647',
+        )
+        .max(
+          2147483647,
+          'The number should between -2,147,483,648 and 2,147,483,647',
+        )
+        .nullable(),
+      secondDisplayValue: Yup.string().when('secondLanguage', {
+        is: (v) => v !== undefined,
+        then: Yup.string().required(),
+      }),
+    }),
+    handleSubmit: (values, { props, resetForm }) => {
+      const { effectiveDates, ...restValues } = values
+      const { dispatch, onConfirm, clinicSettings } = props
+      const { primaryPrintoutLanguage = 'EN', secondaryPrintoutLanguage = '' } = clinicSettings
+
+      let translationData = [{
+        language: primaryPrintoutLanguage,
+        list: [{
+          key: 'displayValue',
+          value: values.displayValue
+        }]
+      }]
+
+      if (secondaryPrintoutLanguage !== '') {
+        translationData = [...translationData, {
+          language: secondaryPrintoutLanguage,
+          list: [{
+            key: 'displayValue',
+            value: values.secondDisplayValue
+          }]
+        }]
+      }
+
+      dispatch({
+        type: 'settingMedicationUOM/upsert',
+        payload: {
+          ...restValues,
+          effectiveStartDate: effectiveDates[0],
+          effectiveEndDate: effectiveDates[1],
+          translationData,
+        },
+      }).then((r) => {
+        if (r) {
+          resetForm()
+          if (onConfirm) onConfirm()
+          dispatch({
+            type: 'settingMedicationUOM/query',
+          })
+        }
+      })
+    },
+    displayName: 'MedicationUOMDetail',
+  }),
+)(Detail)
