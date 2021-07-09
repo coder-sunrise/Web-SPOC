@@ -3,6 +3,7 @@ import * as Yup from 'yup'
 import { connect } from 'dva'
 import moment from 'moment'
 import classnames from 'classnames'
+import { Link } from 'umi'
 // formik
 import { Field } from 'formik'
 // material ui
@@ -16,6 +17,7 @@ import {
   SizeContainer,
   OutlinedTextField,
   withFormikExtend,
+  Button
 } from '@/components'
 // medisys components
 import { LoadingWrapper, Recurrence } from '@/components/_medisys'
@@ -25,6 +27,7 @@ import { getAppendUrl } from '@/utils/utils'
 import { APPOINTMENT_STATUS, APPOINTMENT_CANCELLEDBY } from '@/utils/constants'
 import { getBizSession } from '@/services/queue'
 import Authorized from '@/utils/Authorized'
+import PatientBanner from '@/pages/PatientDashboard/Banner'
 import AppointmentHistory from './AppointmentHistory'
 import PatientSearchModal from '../../PatientSearch'
 import DeleteConfirmation from './DeleteConfirmation'
@@ -35,6 +38,8 @@ import AppointmentDateInput from './AppointmentDate'
 import FormFooter from './FormFooter'
 import SeriesUpdateConfirmation from '../../SeriesUpdateConfirmation'
 import RescheduleForm from './RescheduleForm'
+import PreOrder from './PreOrder'
+import SelectPreOrder from './SelectPreOrder'
 // utils
 import {
   ValidationSchema,
@@ -52,6 +57,13 @@ const gridValidationSchema = Yup.object().shape({
   clinicianFK: Yup.string().required(),
 })
 
+const activePreOrderItem = [{ id: 1, category: 'Service', itemName: "service 1", quantity: 1.2, dispenseUOM: 'bottle', orderBy: 'doctor 1', orderDate: moment().formatUTC(), remarks: 'eeee', amount: 9999, hasPaid: true },
+{ id: 2, category: 'Service', itemName: "service 2", quantity: 1.2, dispenseUOM: 'bottle', orderBy: 'doctor 1', orderDate: moment().formatUTC(), remarks: 'eeee', amount: 9999, hasPaid: true },
+{ id: 3, category: 'Service', itemName: "service 3", quantity: 1.2, dispenseUOM: 'bottle', orderBy: 'doctor 1', orderDate: moment().formatUTC(), remarks: 'eeee', amount: 9999, hasPaid: true },
+{ id: 4, category: 'Service', itemName: "service 4", quantity: 1.2, dispenseUOM: 'bottle', orderBy: 'doctor 1', orderDate: moment().formatUTC(), remarks: 'eeee', amount: 9999, hasPaid: true },
+{ id: 5, category: 'Service', itemName: "service 5", quantity: 1.2, dispenseUOM: 'bottle', orderBy: 'doctor 1', orderDate: moment().formatUTC(), remarks: 'eeee', amount: 9999, hasPaid: true },
+{ id: 6, category: 'Service', itemName: "service 6", quantity: 1.2, dispenseUOM: 'bottle', orderBy: 'doctor 1', orderDate: moment().formatUTC(), remarks: 'eeee', amount: 9999, hasPaid: true },]
+
 @connect(
   ({
     loginSEMR,
@@ -62,6 +74,7 @@ const gridValidationSchema = Yup.object().shape({
     patient,
     patientSearch,
     global,
+    visitRegistration
   }) => ({
     loginSEMR,
     loading,
@@ -78,6 +91,7 @@ const gridValidationSchema = Yup.object().shape({
     appointmentStatuses: codetable.ltappointmentstatus,
     clinicianProfiles: codetable.clinicianprofile,
     patientSearchResult: patientSearch.list,
+    visitRegistration
   }),
 )
 @withFormikExtend({
@@ -103,10 +117,37 @@ class Form extends React.PureComponent {
     isDataGridValid: this.props.values.id !== undefined,
     editingRows: [],
     hasActiveSession: false,
+    showSelectPreOrder: false,
   }
 
-  componentDidMount () {
+  componentDidMount = async () => {
     const { values, dispatch } = this.props
+    const response = await dispatch({
+      type: 'visitRegistration/getVisitOrderTemplateList',
+      payload: {
+        pagesize: 9999,
+      },
+    })
+    if (response) {
+      const { data } = response
+      const templateOptions = data
+        .filter((template) => template.isActive)
+        .map((template) => {
+          return {
+            ...template,
+            value: template.id,
+            name: template.displayValue,
+          }
+        })
+
+      dispatch({
+        type: 'visitRegistration/updateState',
+        payload: {
+          visitOrderTemplateOptions: templateOptions,
+        },
+      })
+    }
+
     this.checkHasActiveSession()
     Promise.all([
       dispatch({
@@ -589,7 +630,7 @@ class Form extends React.PureComponent {
     }
   }
 
-  onDeleteClick = () => {}
+  onDeleteClick = () => { }
 
   onValidateClick = () => {
     const appointmentStatus = this.props.appointmentStatuses.find(
@@ -976,6 +1017,32 @@ class Form extends React.PureComponent {
     )
   }
 
+  openSelectPreOrder = () => {
+    this.setState({ showSelectPreOrder: true })
+  }
+
+  onSelectPreOrder = (selectPreOrder = []) => {
+    const { values, setFieldValue } = this.props
+    const { currentAppointment = {} } = values
+    let { appointmentPreOrderItem = [] } = currentAppointment
+    selectPreOrder.forEach(po => {
+      let currentPreOrder = appointmentPreOrderItem.find(apo => apo.actualizedPreOrderItemFK === po.id)
+      if (currentPreOrder) {
+        currentPreOrder.isDeleted = false
+      }
+      else {
+        const { id, ...resetPreOrderItem } = po
+        appointmentPreOrderItem = [...appointmentPreOrderItem, { ...resetPreOrderItem, actualizedPreOrderItemFK: id }]
+      }
+    })
+    setFieldValue("currentAppointment", { ...currentAppointment, appointmentPreOrderItem: [...appointmentPreOrderItem] })
+    this.setState({ showSelectPreOrder: false })
+  }
+
+  closeSelectPreOrder = () => {
+    this.setState({ showSelectPreOrder: false })
+  }
+
   render () {
     const {
       classes,
@@ -999,6 +1066,7 @@ class Form extends React.PureComponent {
       showRescheduleForm,
       datagrid,
       editingRows,
+      showSelectPreOrder,
     } = this.state
 
     const patientIsActive =
@@ -1007,6 +1075,7 @@ class Form extends React.PureComponent {
         : true
 
     const { currentAppointment = {} } = values
+    const { appointmentPreOrderItem = [] } = currentAppointment
     const disablePatientInfo = this.shouldDisablePatientInfo()
     const disableFooterButton = this.shouldDisableButtonAction()
     const disableCheckAvailabilityFooterButton = this.shouldDisableCheckAvailabilityButtonAction()
@@ -1015,22 +1084,46 @@ class Form extends React.PureComponent {
     const _datagrid =
       conflicts.length > 0
         ? datagrid
-            .filter((item) => !item.isDeleted)
-            .sort(sortDataGrid)
-            .map((item, index) => ({ ...item, sortOrder: index }))
+          .filter((item) => !item.isDeleted)
+          .sort(sortDataGrid)
+          .map((item, index) => ({ ...item, sortOrder: index }))
         : [
-            ...datagrid,
-          ]
+          ...datagrid,
+        ]
 
     const show =
       loading.effects['patientSearch/query'] || loading.models.calendar
     const _disableAppointmentDate =
       this.shouldDisableAppointmentDate() || !patientIsActive
 
+    const { visitRegistration: { visitOrderTemplateOptions = [] } } = this.props
+
+    const draftPreOrderItem = [...activePreOrderItem.filter(po => !appointmentPreOrderItem.find(apo => !apo.isDeleted && apo.actualizedPreOrderItemFK === po.id)),
+    ...appointmentPreOrderItem.filter(apo => apo.isDeleted).map(apo => {
+      const { isDeleted, ...resetPreOrderItem } = apo
+      return { ...resetPreOrderItem, id: resetPreOrderItem.actualizedPreOrderItemFK }
+    })]
+
+    console.log('draftPreOrderItem', draftPreOrderItem, appointmentPreOrderItem)
     return (
       <LoadingWrapper loading={show} text='Loading...'>
         <SizeContainer size='sm'>
           <React.Fragment>
+            {values.patientProfileFK && <div style={{ marginTop: -20 }}>
+              <PatientBanner extraCmt={<div style={{
+                display: 'flex',
+                alignItems: 'flex-end',
+                justifyContent: 'flex-end',
+                height: '100%',
+                paddingBottom: 10,
+              }}>
+                <Link ><span style={{ textDecoration: 'underline' }} onClick={(e) => {
+                  e.preventDefault()
+                  if (draftPreOrderItem.length)
+                    this.openSelectPreOrder()
+                }}>{`Pre-Order(${draftPreOrderItem.length})`}</span></Link>
+              </div>} />
+            </div>}
             <GridContainer
               className={classnames(classes.formContent)}
               alignItems='flex-start'
@@ -1061,7 +1154,7 @@ class Form extends React.PureComponent {
                     values={values}
                     hasActiveSession={this.state.hasActiveSession}
                   />
-                  <AppointmentDateInput disabled={_disableAppointmentDate} />
+                  <AppointmentDateInput disabled={_disableAppointmentDate} visitOrderTemplateOptions={visitOrderTemplateOptions} />
                   <GridItem xs md={12} className={classes.verticalSpacing}>
                     <AppointmentDataGrid
                       validationSchema={gridValidationSchema}
@@ -1081,7 +1174,7 @@ class Form extends React.PureComponent {
                         <OutlinedTextField
                           {...args}
                           disabled={disableDataGrid}
-                          rows='10'
+                          rows='2'
                           multiline
                           maxLength={2000}
                           label='Appointment Remarks'
@@ -1099,6 +1192,9 @@ class Form extends React.PureComponent {
                         this.onRecurrencePatternChange
                       }
                     />
+                  </GridItem>
+                  <GridItem xs md={12}>
+                    <PreOrder {...this.props}></PreOrder>
                   </GridItem>
                 </GridItem>
 
@@ -1189,6 +1285,14 @@ class Form extends React.PureComponent {
               maxWidth='sm'
             >
               <RescheduleForm onConfirmReschedule={this.onConfirmReschedule} />
+            </CommonModal>
+            <CommonModal
+              open={showSelectPreOrder}
+              title='Select Pre-Order'
+              onClose={this.closeSelectPreOrder}
+              maxWidth='lg'
+            >
+              <SelectPreOrder onSelectPreOrder={this.onSelectPreOrder} activePreOrderItem={draftPreOrderItem} />
             </CommonModal>
           </React.Fragment>
         </SizeContainer>
