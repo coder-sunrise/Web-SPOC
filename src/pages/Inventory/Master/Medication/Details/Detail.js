@@ -3,6 +3,7 @@ import { formatMessage } from 'umi'
 import { withStyles } from '@material-ui/core/styles'
 import { FastField } from 'formik'
 import { compose } from 'redux'
+import { useSelector } from 'react-redux'
 import { Radio } from 'antd'
 import {
   CodeSelect,
@@ -17,6 +18,7 @@ import {
   CheckboxGroup,
 } from '@/components'
 import { AttachmentWithThumbnail } from '@/components/_medisys'
+import { MultiLangCodeSelect } from '../Components'
 import SharedContainer from '../../SharedContainer'
 import Sdd from '../../Sdd'
 
@@ -35,6 +37,7 @@ const Detail = ({
   ...props
 }) => {
   const [toggle, setToggle] = useState(false)
+  const { primaryPrintoutLanguage, secondaryPrintoutLanguage } = clinicSettings
   const [languageLabel, setLanguageLabel] = useState('')
   const [attachments, setAttachments] = useState([])
   useEffect(() => {
@@ -156,26 +159,47 @@ const Detail = ({
             )}
           />
         </GridItem>
+
         <GridItem xs={12} md={4}>
           <GridContainer>
             <GridItem md={12} style={{ padding: 0 }}>
-              <Field
-                name='indication'
-                render={args => {
-                  return (
-                    <TextField
-                      label={
-                        formatMessage({
-                          id: 'inventory.master.medication.indication',
-                        }) + languageLabel
-                      }
-                      multiline
-                      rowsMax='5'
-                      {...args}
-                    />
-                  )
-                }}
-              />
+              {primaryPrintoutLanguage === language ? (
+                <Field
+                  name='indication'
+                  render={args => {
+                    return (
+                      <TextField
+                        label={
+                          formatMessage({
+                            id: 'inventory.master.medication.indication',
+                          }) + languageLabel
+                        }
+                        multiline
+                        rowsMax='5'
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              ) : (
+                <Field
+                  name='indicationSecondary'
+                  render={args => {
+                    return (
+                      <TextField
+                        label={
+                          formatMessage({
+                            id: 'inventory.master.medication.indication',
+                          }) + languageLabel
+                        }
+                        multiline
+                        rowsMax='5'
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              )}
             </GridItem>
             <GridItem md={12} style={{ padding: 0 }}>
               <div style={{ fontWeight: 100, fontSize: '0.8rem' }}>
@@ -209,12 +233,59 @@ const Detail = ({
                 label={formatMessage({
                   id: 'inventory.master.medication.genericMedication',
                 })}
-                code='ctRevenueCategory' //TODO:: replace with actual codeset
+                code='ctGenericMedication'
+                labelField='displayValue'
                 {...args}
               />
             )}
           />
         </GridItem>
+
+        <GridItem xs={12} md={4}>
+          <Field
+            name='routeOfAdministrationFK'
+            render={args => (
+              <MultiLangCodeSelect
+                label={
+                  formatMessage({
+                    id: 'inventory.master.medication.routeOfAdministration',
+                  }) + languageLabel
+                }
+                code='ctMedicationGroup'
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
+        <GridItem xs={12} md={4}>
+          <FastField
+            name='drugAllergyFK'
+            render={args => (
+              <CodeSelect
+                label={formatMessage({
+                  id: 'inventory.master.medication.drugAllergy',
+                })}
+                code='ctclinicdrugallergy'
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
+        <GridItem xs={12} md={4}>
+          <FastField
+            name='medicationIngredientFK'
+            render={args => (
+              <CodeSelect
+                label={formatMessage({
+                  id: 'inventory.master.medication.medicationIngredient',
+                })}
+                code='ctMedicationIngredient'
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
+
         <GridItem xs={12} md={4}>
           <FastField
             name='revenueCategoryFK'
@@ -228,6 +299,49 @@ const Detail = ({
               />
             )}
           />
+        </GridItem>
+        <GridItem md={12} style={{ padding: '0px 8px' }}>
+          <GridContainer>
+            <GridItem md={4}>
+              <Field
+                name='sddCode'
+                render={args => {
+                  return (
+                    <TextField
+                      label={formatMessage({
+                        id: 'inventory.master.medication.sddID',
+                      })}
+                      disabled
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+
+            <GridItem md={7} style={{ paddingRight: 0 }}>
+              <Field
+                name='sddDescription'
+                render={args => {
+                  return (
+                    <TextField
+                      multiline
+                      label={formatMessage({
+                        id: 'inventory.master.medication.sddDescription',
+                      })}
+                      disabled
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={1} style={{ textAlign: 'right', margin: 'auto' }}>
+              <Button variant='contained' color='primary' onClick={toggleModal}>
+                Search
+              </Button>
+            </GridItem>
+          </GridContainer>
         </GridItem>
         <GridItem xs={12} md={4}>
           <Field
@@ -260,15 +374,6 @@ const Detail = ({
             }}
           />
         </GridItem>
-        <GridItem md={12}>
-          <div style={{ padding: '5px 0px' }}>
-            <span>Type: </span>
-            <Radio.Group onChange={() => {}} value={1}>
-              <Radio value={1}>Oral</Radio>
-              <Radio value={2}>External</Radio>
-            </Radio.Group>
-          </div>
-        </GridItem>
       </GridContainer>
 
       <GridContainer>
@@ -297,6 +402,13 @@ const Detail = ({
                         {
                           id: 'isChasChronicClaimable',
                           name: 'CHAS Chronic Claimable',
+                          layoutConfig: {
+                            style: {},
+                          },
+                        },
+                        {
+                          id: 'isOnlyClinicInternalUsage',
+                          name: 'Only Internal Usage',
                           layoutConfig: {
                             style: {},
                           },
@@ -346,6 +458,13 @@ const Detail = ({
                           },
                         },
                         {
+                          id: 'isOnlyClinicInternalUsage',
+                          name: 'Only Internal Usage',
+                          layoutConfig: {
+                            style: {},
+                          },
+                        },
+                        {
                           id: 'isDisplayedInleaflet',
                           name: 'Display in Leaflet',
                           layoutConfig: {
@@ -367,70 +486,22 @@ const Detail = ({
             )}
           />
         </GridItem>
-
         <GridItem md={12}>
-          <GridContainer>
-            <GridItem md={4}>
-              <Field
-                name='attachment'
-                render={args => (
-                  <AttachmentWithThumbnail
-                    extenstions='.png, .jpg, .jpeg'
-                    fieldName='attachment'
-                    label='Images'
-                    local
-                    isReadOnly={false}
-                    allowedMultiple={true}
-                    disableScanner
-                    handleUpdateAttachments={updateAttachments}
-                    attachments={attachments}
-                  />
-                )}
+          <Field
+            name='attachment'
+            render={args => (
+              <AttachmentWithThumbnail
+                extenstions='.png, .jpg, .jpeg'
+                fieldName='attachment'
+                label='Images'
+                isReadOnly={false}
+                allowedMultiple={false}
+                disableScanner
+                handleUpdateAttachments={updateAttachments}
+                attachments={attachments}
+                simple
               />
-            </GridItem>
-          </GridContainer>
-        </GridItem>
-      </GridContainer>
-
-      <h4 style={{ marginLeft: 10, marginTop: 20, fontWeight: 300 }}>
-        <b>SDD</b>
-      </h4>
-      <GridContainer>
-        <GridItem xs={5}>
-          <Field
-            name='sddCode'
-            render={args => {
-              return (
-                <TextField
-                  label={formatMessage({
-                    id: 'inventory.master.medication.sddID',
-                  })}
-                  disabled
-                  {...args}
-                />
-              )
-            }}
-          />
-        </GridItem>
-        <GridItem xs={5} style={{ marginTop: 10 }}>
-          <Button variant='contained' color='primary' onClick={toggleModal}>
-            Search
-          </Button>
-        </GridItem>
-        <GridItem xs={5}>
-          <Field
-            name='sddDescription'
-            render={args => {
-              return (
-                <TextField
-                  label={formatMessage({
-                    id: 'inventory.master.medication.sddDescription',
-                  })}
-                  disabled
-                  {...args}
-                />
-              )
-            }}
+            )}
           />
         </GridItem>
       </GridContainer>

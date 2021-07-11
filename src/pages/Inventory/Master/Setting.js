@@ -11,7 +11,6 @@ import {
   CodeSelect,
   NumberInput,
 } from '@/components'
-import SharedContainer from './SharedContainer'
 
 const styles = () => ({})
 const Setting = ({

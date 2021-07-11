@@ -30,12 +30,11 @@ import { headerHeight } from 'mui-pro-jss'
 import { getBizSession } from '@/services/queue'
 import { AuthorizationWrapper } from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
-import { MedicationDetailOption } from './variables'
 const { Secured } = Authorized
 import DetailPanel from './Detail'
 import Pricing from '../../Pricing'
 import Stock from '../../Stock'
-import Setting from '../../Setting'
+import Setting from './Setting'
 
 const styles = () => ({
   actionDiv: {
@@ -55,6 +54,20 @@ const currentScrollStyle = {
 }
 
 const sections = ['General', 'Setting', 'Pricing', 'Stock']
+
+const CardTitle = ({ children }) => (
+  <div style={{ fontWeight: 500, fontSize: '1.2rem' }}> {children}</div>
+)
+
+function validateIndication(item) {
+  const context = this.parent
+  return (
+    (!context.isMultiLanguage && indication) ||
+    (context.isMultiLanguage &&
+      context.indication &&
+      context.indicationSecondary)
+  )
+}
 
 const Detail = ({
   classes,
@@ -166,7 +179,7 @@ const Detail = ({
 
         parentElement.scrollTo({
           // scrolled top position + element top position - Nav header height
-          top: scrollTop + top - 110,
+          top: scrollTop + top - 120,
           left,
           behavior: 'smooth',
         })
@@ -241,7 +254,7 @@ const Detail = ({
             onMouseEnter={e => {
               setCurrentScrollPosition(e.currentTarget.id)
             }}
-            title='General'
+            title={<CardTitle>General</CardTitle>}
             id='general'
           >
             <DetailPanel {...detailProps} language={currentLanguage} />
@@ -250,7 +263,7 @@ const Detail = ({
             onMouseEnter={e => {
               setCurrentScrollPosition(e.currentTarget.id)
             }}
-            title='Setting'
+            title={<CardTitle>Setting</CardTitle>}
             id='setting'
             style={{ marginTop: 16 }}
           >
@@ -260,7 +273,7 @@ const Detail = ({
             onMouseEnter={e => {
               setCurrentScrollPosition(e.currentTarget.id)
             }}
-            title='Pricing'
+            title={<CardTitle>Pricing</CardTitle>}
             id='pricing'
             style={{ marginTop: 16 }}
           >
@@ -270,7 +283,7 @@ const Detail = ({
             onMouseEnter={e => {
               setCurrentScrollPosition(e.currentTarget.id)
             }}
-            title='Stock'
+            title={<CardTitle>Stock</CardTitle>}
             id='stock'
             style={{ marginTop: 16 }}
           >
@@ -285,19 +298,6 @@ const Detail = ({
           ></div>
         </div>
       </div>
-      {/*
-          <Panel header='Setting' key='1'>
-            <Setting {...detailProps} />
-          </Panel>
-          <Panel header='Pricing' key='1'>
-            <Pricing {...detailProps} />
-          </Panel>
-          <Panel header='Stock' key='1'>
-            <Stock {...detailProps} />
-          </Panel>
-         */}
-
-      {/* </CardContainer> */}
       <div className={classes.actionDiv}>
         <Button
           authority='none'
@@ -325,11 +325,16 @@ export default compose(
   })),
   withFormikExtend({
     enableReinitialize: true,
-    mapPropsToValues: ({ medicationDetail }) => {
+    mapPropsToValues: ({ medicationDetail, clinicSettings }) => {
       const returnValue = medicationDetail.entity
         ? medicationDetail.entity
         : medicationDetail.default
-
+      const {
+        primaryPrintoutLanguage,
+        secondaryPrintoutLanguage,
+      } = clinicSettings
+      const isMultiLanguage =
+        primaryPrintoutLanguage && secondaryPrintoutLanguage ? true : false
       let chas = []
       const {
         isChasAcuteClaimable,
@@ -348,6 +353,7 @@ export default compose(
 
       return {
         ...returnValue,
+        isMultiLanguage,
         chas,
         sddCode: medicationDetail.sddCode,
         sddDescription: medicationDetail.sddDescription,
@@ -362,6 +368,17 @@ export default compose(
       }),
       displayValue: Yup.string().required(),
       revenueCategoryFK: Yup.number().required(),
+      indication: Yup.string().test(
+        'oneOfRequired',
+        'Please enter indication in both languages',
+        validateIndication,
+      ),
+      indicationSecondary: Yup.string().test(
+        'oneOfRequired',
+        'Please enter indication in both languages',
+        validateIndication,
+      ),
+      isMultiLanguage: Yup.boolean(),
       effectiveDates: Yup.array()
         .of(Yup.date())
         .min(2)
@@ -425,6 +442,7 @@ export default compose(
           chas[o] = true
         }
       })
+
       const payload = {
         ...restValues,
         ...chas,
