@@ -892,8 +892,8 @@ const _routes = [
             authority: [ 'settings.clinicsetting.consumableuom' ],
           },
           {
-            path: '/setting/medicationUOM',
-            name: 'medicationUOM',
+            path: '/setting/medicationuom',
+            name: 'medicationuom',
             component: './Setting/MedicationUOM',
             authority: [ 'settings.clinicsetting.medicationuom' ],
           },
