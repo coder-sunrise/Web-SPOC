@@ -109,7 +109,7 @@ const Consumable = ({
       },
     })
 
-    setActiveTab('1')
+    //setActiveTab('1')
     // dispatch({
     //   type: 'inventoryMaster/updateState',
     //   payload: {

@@ -14,7 +14,6 @@ const Vaccination = ({
   history,
   vaccination,
   values,
-  setActiveTab,
 }) => {
   const [
     tableParas,
@@ -102,14 +101,6 @@ const Vaccination = ({
           { columnName: 'effectiveEndDate', direction: 'desc' },
           { columnName: 'displayValue', direction: 'asc' },
         ],
-      },
-    })
-
-    setActiveTab('2')
-    dispatch({
-      type: 'inventoryMaster/updateState',
-      payload: {
-        currentTab: '2',
       },
     })
   }, [])
