@@ -128,6 +128,7 @@ export default ({
   }
 
   const editRow = (row) => {
+    if (row.preOrderServiceItemFK) return
     if (!row.isActive && row.type !== '5' && !row.isDrugMixture) return
 
     if (row.type === '7' && from !== 'EditOrder') return
@@ -794,6 +795,7 @@ export default ({
                         (!row.isActive &&
                           row.type !== '5' &&
                           !row.isDrugMixture)
+                        || row.preOrderServiceItemFK
                       }
                     >
                       <Edit />
@@ -804,7 +806,7 @@ export default ({
                       size='sm'
                       color='danger'
                       justIcon
-                      disabled={isEditingEntity}
+                      disabled={isEditingEntity || row.preOrderServiceItemFK}
                     >
                       <Delete
                         onClick={() => {
