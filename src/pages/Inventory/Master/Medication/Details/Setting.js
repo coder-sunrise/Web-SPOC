@@ -82,6 +82,8 @@ const Setting = ({
               <SelectList
                 header={'Precaution' + languageLabel}
                 codeset='ctMedicationPrecaution'
+                language={language}
+                isMultiLanguage={isMultiLanguage}
                 note='* ONLY THE TOP 3 PRECAUTIONS WILL BE DISPLAYED IN DRUG LABEL'
                 label={formatMessage({
                   id: 'inventory.master.medication.precaution',
@@ -98,6 +100,8 @@ const Setting = ({
               <SelectList
                 header={'Side Effect' + languageLabel}
                 codeset='ctMedicationSideEffect'
+                language={language}
+                isMultiLanguage={isMultiLanguage}
                 label={formatMessage({
                   id: 'inventory.master.medication.sideEffect',
                 })}
@@ -114,6 +118,7 @@ const Setting = ({
                 header={'Contraindication' + languageLabel}
                 codeset='ctMedicationContraIndication'
                 language={language}
+                isMultiLanguage={isMultiLanguage}
                 label={formatMessage({
                   id: 'inventory.master.medication.contraindication',
                 })}
@@ -129,6 +134,8 @@ const Setting = ({
               <SelectList
                 header={'Interaction' + languageLabel}
                 codeset='ctMedicationInteraction'
+                language={language}
+                isMultiLanguage={isMultiLanguage}
                 label={formatMessage({
                   id: 'inventory.master.medication.interaction',
                 })}

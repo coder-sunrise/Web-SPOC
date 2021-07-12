@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { List, Radio } from 'antd'
 import { GridContainer, GridItem, CodeSelect, NumberInput } from '@/components'
 import SectionHeader from './SectionHeader'
+import EditableTable from './DosageRule'
 
 const AutoCalculateDosage = () => {
   return (
@@ -16,6 +17,7 @@ const AutoCalculateDosage = () => {
           <Radio value={3}>by Weight</Radio>
         </Radio.Group>
       </GridItem>
+      <GridItem md={12}></GridItem>
     </GridContainer>
   )
 }

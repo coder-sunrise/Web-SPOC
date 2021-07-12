@@ -62,7 +62,7 @@ const CardTitle = ({ children }) => (
 function validateIndication(item) {
   const context = this.parent
   return (
-    (!context.isMultiLanguage && indication) ||
+    (!context.isMultiLanguage && context.indication) ||
     (context.isMultiLanguage &&
       context.indication &&
       context.indicationSecondary)

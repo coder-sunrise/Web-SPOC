@@ -18,7 +18,14 @@ import {
 import SectionHeader from './SectionHeader'
 import MultiLangCodeSelect from './MultiLangCodeSelect'
 
-const SelectList = ({ language = '', label, codeset, header, note = '' }) => {
+const SelectList = ({
+  language,
+  label,
+  codeset,
+  header,
+  note = '',
+  isMultiLanguage,
+}) => {
   const dispatch = useDispatch()
   const [formattedCodes, setFormattedCodes] = useState([])
   const [currentSelected, setCurrentSelected] = useState(null)
@@ -48,7 +55,7 @@ const SelectList = ({ language = '', label, codeset, header, note = '' }) => {
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: 10 }}>
         <MultiLangCodeSelect
           code={codeset}
-          language={language}
+          language={isMultiLanguage ? language : ''}
           max={10}
           valueField='id'
           onChange={(value, opt) => {
@@ -72,6 +79,9 @@ const SelectList = ({ language = '', label, codeset, header, note = '' }) => {
       <List
         bordered
         split={false}
+        locale={{
+          emptyText: <span></span>,
+        }}
         style={{ height: 200, overflow: 'auto' }}
         dataSource={codeList}
         renderItem={(item, i) => (
