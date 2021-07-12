@@ -11,7 +11,7 @@ import {
 } from '@/components'
 import Loading from '@/components/PageLoading/index'
 import service from '@/services/patient'
-import { getUniqueId,getAppendUrl } from '@/utils/utils'
+import { getUniqueId,getAppendUrl,navigateDirtyCheck ,onComponentDidMount} from '@/utils/utils'
 import { Link } from 'umi'
 
 const { query } = service
@@ -35,14 +35,47 @@ class FamilyMemberGrid extends PureComponent {
         columnName: 'name',
         isDisabled: row => true,
         render: (row) => {
+         const targetUrl = getAppendUrl({
+            md: 'pt',
+            cmt: 1,
+            pid: row.familyMemberFK,
+          },'/patientdb')
+          let closeThenReload=()=>{
+            setTimeout(() => {
+              this.props.dispatch({
+                type: 'patient/closePatientModal',
+                payload: {
+                  history: this.props.history,
+                },
+              })
+              this.props.history.push(targetUrl)
+            }, 1000)
+          }
           return(
             <div>
               <Link
-                to={getAppendUrl({
-                  md: 'pt',
-                  cmt: 1,
-                  pid: row.familyMemberFK,
-                },'/patientdb')}
+                to={targetUrl}
+                onClick={e => {
+                  navigateDirtyCheck({
+                    showOpenConfirmButton: false,
+                    displayName: 'PatientDetail',
+                    openConfirmContent:`You have unsaved changes, continue and save changes?`,
+                    onConfirm: () =>{
+                      this.props.patient.submitCallback = closeThenReload.bind(this)
+                      this.props.handleSubmit()
+                    },
+                    onProceed: () =>{
+                    e.preventDefault()
+                    this.props.dispatch({
+                      type: 'global/updateAppState',
+                      payload: {
+                        openConfirm: true,
+                        openConfirmContent: `Are you sure to switch to patient ${row.name}'s profile?`,
+                        onConfirmSave: closeThenReload.bind(this),
+                      },
+                    })},
+                  })(e)
+                }}
                 >
                 <span
                   style={{
@@ -146,13 +179,13 @@ class FamilyMemberGrid extends PureComponent {
       )
     ) {
       notification.warn({
-        message: 'This contact person already existed',
+        message: 'This family member already existed.',
       })
       return
     }
     if (o.id === values.id) {
       notification.warn({
-        message: 'Can not add this patient himself as contact person',
+        message: 'Can not add patient self as family member.',
       })
       return
     }
@@ -214,7 +247,7 @@ class FamilyMemberGrid extends PureComponent {
 
     return (
       <div>
-          <h4><span style={{color:'#cccccc'}}>Family members to</span> <strong>{values.patientFamilyGroup.name}</strong></h4>
+          <h5><span style={{color:'#999999',fontStyle:'italic'}}>You are currently viewing the family group of</span><span style={{fontWeight:500}}>&nbsp;&nbsp;{values.patientFamilyGroup.name}</span></h5>
         <FastEditableTableGrid
           rows={values.patientFamilyGroup.patientFamilyMember}
           schema={schema.patientFamilyMember._subType}

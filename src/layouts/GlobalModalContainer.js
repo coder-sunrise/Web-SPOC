@@ -245,17 +245,21 @@ class GlobalModalContainer extends PureComponent {
                   </Button>
                 ) : null
                 }
-                <Button
-                  color='primary'
-                  onClick={() => {
-                    if (global.onConfirmDiscard) {
-                      global.onConfirmDiscard()
-                    }
-                    this.closeConfirmationPrompt()
-                  }}
-                >
-                  {global.openConfirmText || 'Confirm'}
-                </Button>
+                {!global.onConfirmSave ? (
+                  // Will be confusing if onConfirmSave is not null, this button should be hidden
+                  <Button
+                    color='primary'
+                    onClick={() => {
+                      if (global.onConfirmDiscard) {
+                        global.onConfirmDiscard()
+                      }
+                      this.closeConfirmationPrompt()
+                    }}
+                  >
+                    {global.openConfirmText || 'Confirm'}
+                  </Button>
+                  ) : null
+                }
               </Fragment>
             ) : null,
             onConfirm: global.onConfirmSave
