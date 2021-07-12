@@ -33,6 +33,7 @@ class Grid extends PureComponent {
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },
           { name: 'description', title: 'Description' },
+          { name: 'sortOrder', title: 'Sort Order' },
           { name: 'isActive', title: 'Status' },
           {
             name: 'action',
@@ -47,6 +48,13 @@ class Grid extends PureComponent {
             options: status,
             align: 'center',
             width: 100,
+          },
+          {
+            columnName: 'sortOrder',
+            width: 120,
+            render: (row) => {
+              return <p>{!row.sortOrder ? '-' : row.sortOrder}</p>
+            },
           },
           {
             columnName: 'action',
