@@ -106,7 +106,7 @@ class Detail extends PureComponent {
                 name='sortOrder'
                 render={(args) => {
                   return (
-                    <NumberInput label='Sort Order' max={99999} precision={0} {...args} />
+                    <NumberInput label='Sort Order' precision={0} {...args} />
                   )
                 }}
               />
