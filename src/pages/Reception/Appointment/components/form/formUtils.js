@@ -239,8 +239,6 @@ export const mapPropsToValues = ({
           ),
           appointmentDate: moment(appointment.appointmentDate).formatUTC(),
           // appointmentDate,
-          appointmentPreOrderItem: [{ actualizedPreOrderItemFK: 7, category: 'Service', itemName: "service 7", quantity: 1.2, dispenseUOM: 'bottle', orderBy: 'doctor 1', orderDate: moment().formatUTC(), remarks: 'eeee', amount: 9999, hasPaid: true },
-          { actualizedPreOrderItemFK: 8, category: 'Service', itemName: "service 8", quantity: 1.2, dispenseUOM: 'bottle', orderBy: 'doctor 1', orderDate: moment().formatUTC(), remarks: 'eeee', amount: 9999, hasPaid: true },],
         },
         appointmentStatusFk: appointment.appointmentStatusFk,
         appointments: viewingAppointment.appointments.map((item) => ({

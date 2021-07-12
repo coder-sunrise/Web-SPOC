@@ -9,22 +9,25 @@ import { queryList as queryAppointments } from '@/services/calendar'
 import Authorized from '@/utils/Authorized'
 import { LoadingWrapper } from '@/components/_medisys'
 import { APPOINTMENT_STATUSOPTIONS } from '@/utils/constants'
+import { InventoryTypes } from '@/utils/codes'
 import { futureApptTableParams, previousApptTableParams } from './variables'
 import { Delete } from '@material-ui/icons'
 
-const PreOrder = ({ setFieldValue, values }) => {
+const PreOrder = ({ values, deletePreOrderItem }) => {
   const { currentAppointment: { appointmentPreOrderItem = [] } } = values
   return <div>
     <div style={{ margin: '6px 0px' }}>Pre-Order Actualization</div>
     <CommonTableGrid
+      forceRender
       size='sm'
       rows={appointmentPreOrderItem.filter(x => !x.isDeleted)}
       FuncProps={{ pager: false }}
+      getRowId={(row) => row.actualizedPreOrderItemFK}
       columns={[
-        { name: 'category', title: 'Category' },
+        { name: 'preOrderItemType', title: 'Category' },
         { name: 'itemName', title: 'Name' },
         { name: 'quantity', title: 'Quantity' },
-        { name: 'orderBy', title: 'Order By' },
+        { name: 'orderByUser', title: 'Order By' },
         { name: 'orderDate', title: 'Order Date & Time' },
         { name: 'remarks', title: 'Remarks' },
         { name: 'amount', title: 'Amount' },
@@ -32,7 +35,9 @@ const PreOrder = ({ setFieldValue, values }) => {
         { name: 'action', title: 'Action' },
       ]}
       columnExtensions={[
-        { columnName: 'category', sortingEnabled: false, width: 120 },
+        {
+          columnName: 'preOrderItemType', sortingEnabled: false, width: 120
+        },
         { columnName: 'itemName', sortingEnabled: false },
         {
           columnName: 'quantity', sortingEnabled: false, width: 120, render: row => {
@@ -42,28 +47,25 @@ const PreOrder = ({ setFieldValue, values }) => {
             )} ${dispenseUOM}`
           },
         },
-        { columnName: 'orderBy', sortingEnabled: false },
+        { columnName: 'orderByUser', sortingEnabled: false },
         { columnName: 'orderDate', sortingEnabled: false, type: 'date', showTime: true, width: 180 },
         { columnName: 'remarks', sortingEnabled: false },
         { columnName: 'amount', sortingEnabled: false, type: 'currency', width: 90 },
         { columnName: 'hasPaid', sortingEnabled: false, width: 50, render: (row) => row.hasPaid ? 'Yes' : 'No' },
         {
           columnName: 'action', width: 60, render: (row) => {
-            return <Button size='sm'
+            return <Authorized authority='appointment.actualizepreorder'>
+              <Button size='sm'
               justIcon
               color='danger'
               onClick={() => {
-                var item = appointmentPreOrderItem.find(po => po.actualizedPreOrderItemFK === row.actualizedPreOrderItemFK)
-                if (item) {
-                  if (item.id) {
-                    item.isDeleted = true
-                  }
-                  else { appointmentPreOrderItem = [...appointmentPreOrderItem.filter(po.actualizedPreOrderItemFK !== row.actualizedPreOrderItemFK)] }
+                if (deletePreOrderItem) {
+                  deletePreOrderItem(row.actualizedPreOrderItemFK)
                 }
-                setFieldValue("currentAppointment.appointmentPreOrderItem", [...appointmentPreOrderItem])
               }}>
               <Delete />
             </Button>
+            </Authorized>
           }
         },
       ]}

@@ -3,9 +3,9 @@ import numeral from 'numeral'
 import { qtyFormat } from '@/utils/config'
 import { CommonTableGrid, Button, CardContainer } from '@/components'
 import { queryList as queryAppointments } from '@/services/calendar'
+import { InventoryTypes } from '@/utils/codes'
 
 const SelectPreOrder = ({ activePreOrderItem = [], onSelectPreOrder, footer, mainDivHeight }) => {
-  console.log('activePreOrderItem', activePreOrderItem)
   const [
     selectedPreOrders,
     setSelectedPreOrders,
@@ -44,17 +44,19 @@ const SelectPreOrder = ({ activePreOrderItem = [], onSelectPreOrder, footer, mai
       onSelectionChange={handleSelectionChange}
       getRowId={(row) => row.id}
       columns={[
-        { name: 'category', title: 'Category' },
+        { name: 'preOrderItemType', title: 'Category' },
         { name: 'itemName', title: 'Name' },
         { name: 'quantity', title: 'Quantity' },
-        { name: 'orderBy', title: 'Order By' },
+        { name: 'orderByUser', title: 'Order By' },
         { name: 'orderDate', title: 'Order Date & Time' },
         { name: 'remarks', title: 'Remarks' },
         { name: 'amount', title: 'Amount' },
         { name: 'hasPaid', title: 'Paid' },
       ]}
       columnExtensions={[
-        { columnName: 'category', sortingEnabled: false, width: 120 },
+        {
+          columnName: 'preOrderItemType', sortingEnabled: false, width: 120,
+        },
         { columnName: 'itemName', sortingEnabled: false },
         {
           columnName: 'quantity', sortingEnabled: false, width: 120, render: row => {
@@ -64,7 +66,7 @@ const SelectPreOrder = ({ activePreOrderItem = [], onSelectPreOrder, footer, mai
             )} ${dispenseUOM}`
           },
         },
-        { columnName: 'orderBy', sortingEnabled: false },
+        { columnName: 'orderByUser', sortingEnabled: false },
         { columnName: 'orderDate', sortingEnabled: false, type: 'date', showTime: true, width: 180 },
         { columnName: 'remarks', sortingEnabled: false },
         { columnName: 'amount', sortingEnabled: false, type: 'currency', width: 90 },

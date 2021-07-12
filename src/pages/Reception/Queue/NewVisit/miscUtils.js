@@ -213,7 +213,7 @@ export const formikMapPropsToValues = ({
         }
         defaultVistPreOrderItem = appointment.appointments[0].appointmentPreOrderItem.map(po => {
           const { actualizedPreOrderItemFK,
-            inventoryType,
+            preorderItemType,
             itemName,
             quantity,
             orderByUser,
@@ -224,7 +224,7 @@ export const formikMapPropsToValues = ({
           } = po
           return {
             actualizedPreOrderItemFK,
-            inventoryType,
+            preorderItemType,
             itemName,
             quantity,
             orderByUser,

@@ -57,13 +57,6 @@ const gridValidationSchema = Yup.object().shape({
   clinicianFK: Yup.string().required(),
 })
 
-const activePreOrderItem = [{ id: 1, category: 'Service', itemName: "service 1", quantity: 1.2, dispenseUOM: 'bottle', orderBy: 'doctor 1', orderDate: moment().formatUTC(), remarks: 'eeee', amount: 9999, hasPaid: true },
-{ id: 2, category: 'Service', itemName: "service 2", quantity: 1.2, dispenseUOM: 'bottle', orderBy: 'doctor 1', orderDate: moment().formatUTC(), remarks: 'eeee', amount: 9999, hasPaid: true },
-{ id: 3, category: 'Service', itemName: "service 3", quantity: 1.2, dispenseUOM: 'bottle', orderBy: 'doctor 1', orderDate: moment().formatUTC(), remarks: 'eeee', amount: 9999, hasPaid: true },
-{ id: 4, category: 'Service', itemName: "service 4", quantity: 1.2, dispenseUOM: 'bottle', orderBy: 'doctor 1', orderDate: moment().formatUTC(), remarks: 'eeee', amount: 9999, hasPaid: true },
-{ id: 5, category: 'Service', itemName: "service 5", quantity: 1.2, dispenseUOM: 'bottle', orderBy: 'doctor 1', orderDate: moment().formatUTC(), remarks: 'eeee', amount: 9999, hasPaid: true },
-{ id: 6, category: 'Service', itemName: "service 6", quantity: 1.2, dispenseUOM: 'bottle', orderBy: 'doctor 1', orderDate: moment().formatUTC(), remarks: 'eeee', amount: 9999, hasPaid: true },]
-
 @connect(
   ({
     loginSEMR,
@@ -181,7 +174,6 @@ class Form extends React.PureComponent {
         }
       })
     } catch (error) {
-      console.log({ error })
     }
   }
 
@@ -570,7 +562,6 @@ class Form extends React.PureComponent {
         const formError = await validateForm(values)
 
         if (Object.keys(formError).length > 0) {
-          console.log({ formError })
           setSubmitting(false)
           return
         }
@@ -626,7 +617,6 @@ class Form extends React.PureComponent {
         }
       })
     } catch (error) {
-      console.log({ error })
     }
   }
 
@@ -705,7 +695,6 @@ class Form extends React.PureComponent {
         (t) => t.id === values.currentAppointment.id,
       )
 
-      console.log(originalAppointment)
       let newResource = Array.from(datagrid, (resource) => {
         let startTime = `${resource.startTime}:00`
         let endTime = `${resource.endTime}:00`
@@ -749,7 +738,6 @@ class Form extends React.PureComponent {
         originalResource = Array.from(
           originalAppointment.appointments_Resources,
           (resource) => {
-            console.log(resource)
             const {
               appointmentFK,
               clinicianFK,
@@ -842,7 +830,6 @@ class Form extends React.PureComponent {
         },
       )
     } catch (error) {
-      console.log({ error })
     }
   }
 
@@ -1035,12 +1022,61 @@ class Form extends React.PureComponent {
         appointmentPreOrderItem = [...appointmentPreOrderItem, { ...resetPreOrderItem, actualizedPreOrderItemFK: id }]
       }
     })
-    setFieldValue("currentAppointment", { ...currentAppointment, appointmentPreOrderItem: [...appointmentPreOrderItem] })
+    setFieldValue("currentAppointment.appointmentPreOrderItem", [...appointmentPreOrderItem])
     this.setState({ showSelectPreOrder: false })
   }
 
   closeSelectPreOrder = () => {
     this.setState({ showSelectPreOrder: false })
+  }
+
+  checkedRecurrence = () => {
+    const { dispatch, values, setFieldValue } = this.props
+    const { currentAppointment = {} } = values
+    if ((currentAppointment.appointmentPreOrderItem || []).length) {
+      dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          openConfirmText: 'ok',
+          openConfirmContent: `Check Recurrence will remove all Pre-Order.`,
+          onConfirmSave: () => {
+            setFieldValue("currentAppointment.appointmentPreOrderItem", [])
+          },
+          onConfirmClose: () => {
+            setFieldValue('isEnableRecurrence', false)
+          }
+        },
+      })
+    }
+  }
+
+  showPreOrder = () => {
+    const { values, mode } = this.props
+    const { isEnableRecurrence, patientProfileFK } = values
+    const actualizePreOrderAccessRight = Authorized.check('appointment.actualizepreorder') || { rights: 'hidden' }
+    if (actualizePreOrderAccessRight.rights === 'hidden') return false
+    if (values.id) {
+      return mode !== 'series'
+    }
+    return patientProfileFK && !isEnableRecurrence
+  }
+
+  deletePreOrderItem = (actualizedPreOrderItemFK) => {
+    const { values, setFieldValue } = this.props
+    const { currentAppointment = {} } = values
+    let { appointmentPreOrderItem = [] } = currentAppointment
+
+    var item = appointmentPreOrderItem.find(poi => poi.actualizedPreOrderItemFK === actualizedPreOrderItemFK)
+    if (item) {
+      if (item.id) {
+        item.isDeleted = true
+        setFieldValue("currentAppointment.appointmentPreOrderItem", [...appointmentPreOrderItem])
+      }
+      else {
+        setFieldValue("currentAppointment.appointmentPreOrderItem", [...appointmentPreOrderItem.filter(poi => poi.actualizedPreOrderItemFK !== actualizedPreOrderItemFK)])
+      }
+    }
   }
 
   render () {
@@ -1056,6 +1092,8 @@ class Form extends React.PureComponent {
       height,
       onHistoryRowSelected,
       patientProfile,
+      visitRegistration: { visitOrderTemplateOptions = [] },
+      dispatch,
     } = this.props
 
     const {
@@ -1074,7 +1112,7 @@ class Form extends React.PureComponent {
         ? patientProfile && patientProfile.isActive
         : true
 
-    const { currentAppointment = {} } = values
+    const { currentAppointment = {}, isEnableRecurrence } = values
     const { appointmentPreOrderItem = [] } = currentAppointment
     const disablePatientInfo = this.shouldDisablePatientInfo()
     const disableFooterButton = this.shouldDisableButtonAction()
@@ -1096,33 +1134,64 @@ class Form extends React.PureComponent {
     const _disableAppointmentDate =
       this.shouldDisableAppointmentDate() || !patientIsActive
 
-    const { visitRegistration: { visitOrderTemplateOptions = [] } } = this.props
-
-    const draftPreOrderItem = [...activePreOrderItem.filter(po => !appointmentPreOrderItem.find(apo => !apo.isDeleted && apo.actualizedPreOrderItemFK === po.id)),
+    const { newPreOrderItem = [] } = patientProfile || {}
+    const draftPreOrderItem = [...newPreOrderItem.filter(po => !appointmentPreOrderItem.find(apo => !apo.isDeleted && apo.actualizedPreOrderItemFK === po.id)),
     ...appointmentPreOrderItem.filter(apo => apo.isDeleted).map(apo => {
       const { isDeleted, ...resetPreOrderItem } = apo
       return { ...resetPreOrderItem, id: resetPreOrderItem.actualizedPreOrderItemFK }
     })]
 
-    console.log('draftPreOrderItem', draftPreOrderItem, appointmentPreOrderItem)
+    const actualizePreOrderAccessRight = Authorized.check('appointment.actualizepreorder') || { rights: 'hidden' }
+
     return (
       <LoadingWrapper loading={show} text='Loading...'>
         <SizeContainer size='sm'>
           <React.Fragment>
             {values.patientProfileFK && <div style={{ marginTop: -20 }}>
-              <PatientBanner extraCmt={<div style={{
+              <PatientBanner extraCmt={
+                <div style={{
                 display: 'flex',
                 alignItems: 'flex-end',
                 justifyContent: 'flex-end',
                 height: '100%',
                 paddingBottom: 10,
               }}>
-                <Link ><span style={{ textDecoration: 'underline' }} onClick={(e) => {
-                  e.preventDefault()
-                  if (draftPreOrderItem.length)
-                    this.openSelectPreOrder()
-                }}>{`Pre-Order(${draftPreOrderItem.length})`}</span></Link>
-              </div>} />
+                  {actualizePreOrderAccessRight.rights !== 'hidden' && <Link disabled={actualizePreOrderAccessRight.rights === 'disable'} >
+                    <span style={{ textDecoration: 'underline' }} onClick={(e) => {
+                      e.preventDefault()
+                      if (actualizePreOrderAccessRight.rights === 'disable') return
+                      if (draftPreOrderItem.length)
+                      {
+                        if (values.id && mode === 'series') {
+                          dispatch({
+                            type: 'global/updateAppState',
+                            payload: {
+                              openConfirm: true,
+                              isInformType: true,
+                              openConfirmText: 'ok',
+                              openConfirmContent: `Pre-Order is not allowed for entire series appointment.`,
+                            },
+                          })
+                          return
+                        }
+                        if (!values.id && isEnableRecurrence) {
+                          dispatch({
+                            type: 'global/updateAppState',
+                            payload: {
+                              openConfirm: true,
+                              isInformType: true,
+                              openConfirmText: 'ok',
+                              openConfirmContent: `Pre-Order is not allowed for recurring appointment.`,
+                            },
+                          })
+                          return
+                        }
+                        this.openSelectPreOrder()
+                      }
+                    }}>{`Pre-Order(${draftPreOrderItem.length})`}</span>
+                  </Link>
+                  }
+                </div>} />
             </div>}
             <GridContainer
               className={classnames(classes.formContent)}
@@ -1191,10 +1260,11 @@ class Form extends React.PureComponent {
                       handleRecurrencePatternChange={
                         this.onRecurrencePatternChange
                       }
+                      checkedRecurrence={this.checkedRecurrence}
                     />
                   </GridItem>
                   <GridItem xs md={12}>
-                    <PreOrder {...this.props}></PreOrder>
+                    {this.showPreOrder() && <PreOrder {...this.props} deletePreOrderItem={this.deletePreOrderItem}></PreOrder>}
                   </GridItem>
                 </GridItem>
 
