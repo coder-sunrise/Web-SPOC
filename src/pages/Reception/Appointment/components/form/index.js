@@ -1008,6 +1008,16 @@ class Form extends React.PureComponent {
     this.setState({ showSelectPreOrder: true })
   }
 
+  updatePreOrderSequence = (appointmentPreOrderItem = []) => {
+    let sequence = 0;
+    appointmentPreOrderItem.forEach(po => {
+      if (!po.isDeleted) {
+        po.sequence = sequence
+        sequence = sequence + 1
+      }
+    })
+  }
+
   onSelectPreOrder = (selectPreOrder = []) => {
     const { values, setFieldValue } = this.props
     const { currentAppointment = {} } = values
@@ -1022,6 +1032,7 @@ class Form extends React.PureComponent {
         appointmentPreOrderItem = [...appointmentPreOrderItem, { ...resetPreOrderItem, actualizedPreOrderItemFK: id }]
       }
     })
+    this.updatePreOrderSequence(appointmentPreOrderItem)
     setFieldValue("currentAppointment.appointmentPreOrderItem", [...appointmentPreOrderItem])
     this.setState({ showSelectPreOrder: false })
   }
@@ -1071,12 +1082,13 @@ class Form extends React.PureComponent {
     if (item) {
       if (item.id) {
         item.isDeleted = true
-        setFieldValue("currentAppointment.appointmentPreOrderItem", [...appointmentPreOrderItem])
       }
       else {
-        setFieldValue("currentAppointment.appointmentPreOrderItem", [...appointmentPreOrderItem.filter(poi => poi.actualizedPreOrderItemFK !== actualizedPreOrderItemFK)])
+        appointmentPreOrderItem = [...appointmentPreOrderItem.filter(poi => poi.actualizedPreOrderItemFK !== actualizedPreOrderItemFK)]
       }
     }
+    this.updatePreOrderSequence(appointmentPreOrderItem)
+    setFieldValue("currentAppointment.appointmentPreOrderItem", [...appointmentPreOrderItem])
   }
 
   render () {
