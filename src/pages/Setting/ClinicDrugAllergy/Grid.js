@@ -9,11 +9,19 @@ class Grid extends PureComponent {
       { name: 'code', title: 'Code' },
       { name: 'displayValue', title: 'Display Value' },
       { name: 'description', title: 'Description' },
+      { name: 'sortOrder', title: 'Sort Order' },
       { name: 'isActive', title: 'Status' },
       { name: 'action', title: 'Action' },
     ],
     columnExtensions: [
       { columnName: 'code', width: 200 },
+      {
+        columnName: 'sortOrder',
+        width: 120,
+        render: (row) => {
+          return <p>{row.sortOrder === null ? '-' : row.sortOrder}</p>
+        },
+      },
       {
         columnName: 'isActive',
         sortingEnabled: false,
