@@ -20,10 +20,10 @@ const InventoryMasterIndex = ({ dispatch }) => {
     <PageContainer
       tabList={tabs}
       onTabChange={key => {
-        // console.log(
-        //   key,
-        //   tabs.find(o => o.key === key),
-        // )
+        console.log(
+          key,
+          tabs.find(o => o.key === key),
+        )
         setTabKey(key)
       }}
     >
