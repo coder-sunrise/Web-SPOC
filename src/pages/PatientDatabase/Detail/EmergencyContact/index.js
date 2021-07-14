@@ -35,8 +35,8 @@ class EmergencyContact extends PureComponent {
         <GridItem>
           <EmergencyContactGrid {...this.props} />
         </GridItem>
-        <GridItem style={{marginTop:20}}>
-         <h4><strong>Family Members</strong></h4>
+        <GridItem style={{marginTop:50}}>
+         <h4 style={{fontWeight:500}}>Family Members</h4>
         </GridItem>
         <GridItem>
           <FamilyMemberGrid {...this.props} />
