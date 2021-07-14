@@ -95,7 +95,6 @@ const VisitInfoCard = ({
   const [visitGroupMessage, setVisitGroupMessage] = useState()
 
   const disableConsReady = Authorized.check('queue.modifyconsultationready')
-  const disableCreateVisitGroup = Authorized.check('queue.createnewvisitgroup')
 
   const validateQNo = value => {
     const qNo = parseFloat(value).toFixed(1)
