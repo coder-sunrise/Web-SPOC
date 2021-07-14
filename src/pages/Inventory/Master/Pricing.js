@@ -50,136 +50,125 @@ const Pricing = ({
         margin: theme.spacing(1),
       }}
     >
-      <h4 style={{ fontWeight: 400 }}>
-        <b>Pricing</b>
-      </h4>
-      <GridContainer gutter={0}>
-        <GridItem xs={12} md={5}>
-          <GridContainer>
-            <GridItem xs={12}>
-              <Field
-                name='lastCostPriceBefBonus'
-                render={args => {
-                  return (
-                    <NumberInput
-                      currency
-                      label={formatMessage({
-                        id: 'inventory.master.pricing.lastCostPriceBefBonus',
-                      })}
-                      disabled={isEditMode()}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <Field
-                name='lastCostPriceAftBonus'
-                render={args => {
-                  return (
-                    <NumberInput
-                      currency
-                      label={formatMessage({
-                        id: 'inventory.master.pricing.lastCostPriceAftBonus',
-                      })}
-                      disabled={isEditMode()}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='averageCostPrice'
-                render={args => (
-                  <NumberInput
-                    format='$0,0.0000'
-                    label={formatMessage({
-                      id: 'inventory.master.pricing.averageCostPrice',
-                    })}
-                    onChange={e => {
-                      const inputValue = e.target.value || 0
-                      setAcp(inputValue)
-                    }}
-                    currency
-                    precision={4}
-                    maxLength={11}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-          </GridContainer>
+      <GridContainer gutter={15}>
+        <GridItem xs={12} md={4}>
+          <Field
+            name='lastCostPriceBefBonus'
+            render={args => {
+              return (
+                <NumberInput
+                  currency
+                  label={formatMessage({
+                    id: 'inventory.master.pricing.lastCostPriceBefBonus',
+                  })}
+                  disabled={isEditMode()}
+                  {...args}
+                />
+              )
+            }}
+          />
         </GridItem>
-        <GridItem xs={12} md={2} />
-        <GridItem xs={12} md={5}>
-          <GridContainer>
-            <GridItem xs={12}>
-              <FastField
-                name='markupMargin'
-                render={args => (
-                  <NumberInput
-                    label={formatMessage({
-                      id: 'inventory.master.pricing.profitMarginPercentage',
-                    })}
-                    onChange={e => {
-                      const inputValue = e.target.value || 0
-                      setMarkupMargin(inputValue)
-                    }}
-                    defaultValue='0.0'
-                    format='0.0'
-                    {...args}
-                  />
-                )}
+        <GridItem xs={12} md={4}>
+          <Field
+            name='lastCostPriceAftBonus'
+            render={args => {
+              return (
+                <NumberInput
+                  currency
+                  label={formatMessage({
+                    id: 'inventory.master.pricing.lastCostPriceAftBonus',
+                  })}
+                  disabled={isEditMode()}
+                  {...args}
+                />
+              )
+            }}
+          />
+        </GridItem>
+        <GridItem xs={12} md={4}>
+          <FastField
+            name='averageCostPrice'
+            render={args => (
+              <NumberInput
+                format='$0,0.0000'
+                label={formatMessage({
+                  id: 'inventory.master.pricing.averageCostPrice',
+                })}
+                onChange={e => {
+                  const inputValue = e.target.value || 0
+                  setAcp(inputValue)
+                }}
+                currency
+                precision={4}
+                maxLength={11}
+                {...args}
               />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='suggestSellingPrice'
-                render={args => (
-                  <NumberInput
-                    currency
-                    label={formatMessage({
-                      id: 'inventory.master.pricing.suggestedSellingPrice',
-                    })}
-                    disabled={isEditMode()}
-                    precision={2}
-                    {...args}
-                  />
-                )}
+            )}
+          />
+        </GridItem>
+
+        <GridItem xs={12} md={4}>
+          <FastField
+            name='markupMargin'
+            render={args => (
+              <NumberInput
+                label={formatMessage({
+                  id: 'inventory.master.pricing.profitMarginPercentage',
+                })}
+                onChange={e => {
+                  const inputValue = e.target.value || 0
+                  setMarkupMargin(inputValue)
+                }}
+                defaultValue='0.0'
+                format='0.0'
+                {...args}
               />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='sellingPrice'
-                render={args => (
-                  <NumberInput
-                    currency
-                    label={formatMessage({
-                      id: 'inventory.master.pricing.sellingPrice',
-                    })}
-                    {...args}
-                  />
-                )}
+            )}
+          />
+        </GridItem>
+        <GridItem xs={12} md={4}>
+          <FastField
+            name='suggestSellingPrice'
+            render={args => (
+              <NumberInput
+                currency
+                label={formatMessage({
+                  id: 'inventory.master.pricing.suggestedSellingPrice',
+                })}
+                disabled={isEditMode()}
+                precision={2}
+                {...args}
               />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='maxDiscount'
-                render={args => (
-                  <NumberInput
-                    label={formatMessage({
-                      id: 'inventory.master.pricing.maxDiscount',
-                    })}
-                    format='0.0'
-                    {...args}
-                  />
-                )}
+            )}
+          />
+        </GridItem>
+        <GridItem xs={12} md={4}>
+          <FastField
+            name='sellingPrice'
+            render={args => (
+              <NumberInput
+                currency
+                label={formatMessage({
+                  id: 'inventory.master.pricing.sellingPrice',
+                })}
+                {...args}
               />
-            </GridItem>
-          </GridContainer>
+            )}
+          />
+        </GridItem>
+        <GridItem xs={12} md={4}>
+          <FastField
+            name='maxDiscount'
+            render={args => (
+              <NumberInput
+                label={formatMessage({
+                  id: 'inventory.master.pricing.maxDiscount',
+                })}
+                format='0.0'
+                {...args}
+              />
+            )}
+          />
         </GridItem>
       </GridContainer>
     </div>

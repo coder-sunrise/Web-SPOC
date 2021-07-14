@@ -73,7 +73,7 @@ const Setting = ({
         margin: theme.spacing(1),
       }}
     >
-      <AutoCalculateDosage></AutoCalculateDosage>
+      <AutoCalculateDosage languageLabel={languageLabel}></AutoCalculateDosage>
       <GridContainer>
         <GridItem md={6}>
           <Field

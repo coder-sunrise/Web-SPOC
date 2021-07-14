@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { connect } from 'dva'
+import { FastField } from 'formik'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
 import {
@@ -197,12 +198,24 @@ const Detail = ({
           style={{ backgroundColor: 'white' }}
           title={
             <>
-              <span>Eye-001</span>
-              <span
-                style={{ fontSize: '0.9rem', fontWeight: 400, marginLeft: 5 }}
-              >
-                Allergan Refresh Plus Lubricant Eye Drops
-              </span>
+              <FastField
+                name='code'
+                render={args => <span>{args.field.value}</span>}
+              ></FastField>
+              <FastField
+                name='displayValue'
+                render={args => (
+                  <span
+                    style={{
+                      fontSize: '0.9rem',
+                      fontWeight: 400,
+                      marginLeft: 5,
+                    }}
+                  >
+                    {args.field.value}
+                  </span>
+                )}
+              ></FastField>
             </>
           }
           ghost={false}
