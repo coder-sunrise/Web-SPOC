@@ -166,10 +166,10 @@ const VisitInfoCard = ({
   }
 
   const handleVisitGroupChange = (v, op) => {
-    setFieldValue(FormField['visit.visitGroup'], op.data.visitGroup)
+    setFieldValue(FormField['visit.visitGroup'], op ? op.data.visitGroup : null)
     setFieldValue(FormField['visit.consReady'], false)
-    setFieldValue(FormField['visit.visitGroupRef'], op.data.visitGroup === '<New Visit Group>' ? op.data.order : null)
-    setVisitGroupMessage(op.data.visitGroup === '<New Visit Group>' ? 'New visit group will be created with\n' + op.data.patientName : null)
+    setFieldValue(FormField['visit.visitGroupRef'], op && op.data.visitGroup === op.data.order ? op.data.order : null)
+    setVisitGroupMessage(op && op.data.visitGroup === op.data.order ? 'New visit group will be created with\n' + op.data.patientName : null)
   }
   
   const { values } = restProps
@@ -328,51 +328,52 @@ const VisitInfoCard = ({
         <GridItem xs md={3}>
           <Authorized authority='queue.visitgroup'>
             <React.Fragment>
-              <Field
-                name={FormField['visit.visitGroup']}
-                render={args => (
-                  <Select
-                    {...args}
-                    valueField='patientName'
-                    labelField='patientName'
-                    disabled={isVisitReadonlyAfterSigned}
-                    options={[...queueLog.list.filter(q => patientInfo && q.patientName !== patientInfo.name).map(l => {                      
-                        return {
-                          visitGroup: l.visitGroup || '<New Visit Group>',
-                          patientName: l.patientName,
-                          order: l.id,
-                        }
-                      })]
-                    }
-                    handleFilter={(input, option) => {
-                      return option.data.visitGroup.toString().toLowerCase().indexOf(input.toString().toLowerCase()) >= 0 ||
-                      option.data.patientName.toString().toLowerCase().indexOf(input.toString().toLowerCase()) >= 0 ||          
-                      option.data.patientName === ''
-                    }
-                    }
-                    label={formatMessage({
-                      id: 'reception.queue.visitRegistration.visitGroup',
-                    })}
-                    dropdownStyle={{ minWidth: "20%", maxHeight: "200px", overflowY: 'auto' }}
-                    onSelect={handleVisitGroupChange}
-                    renderDropdown={(option) => {
-                      return <div><b>{option.visitGroup === '<New Visit Group>' ? '' : option.visitGroup}</b> {option.patientName}</div>
-                    }}
-                  />
-                )}
-              />
+              <Select
+              valueField='visitGroup'
+              labelField='displayValue'
+              value={values.visitGroup}
+              disabled={isVisitReadonlyAfterSigned}
+              options={[...queueLog.list.filter(q => patientInfo).map(l => {                      
+                  return {
+                    visitGroup: l.visitGroup || l.id,
+                    displayValue: l.visitGroup || '<New Visit Group>',
+                    patientName: l.patientName,
+                    order: l.id,
+                  }
+                })]
+              }
+              handleFilter={(input, option) => {
+                return option.data.visitGroup.toString().toLowerCase().indexOf(input.toString().toLowerCase()) >= 0 ||
+                option.data.patientName.toString().toLowerCase().indexOf(input.toString().toLowerCase()) >= 0 ||          
+                option.data.patientName === ''
+              }
+              }
+              label={formatMessage({
+                id: 'reception.queue.visitRegistration.visitGroup',
+              })}
+              dropdownStyle={{ minWidth: "20%", maxHeight: "200px", overflowY: 'auto' }}
+              onClear={handleVisitGroupChange}
+              onSelect={handleVisitGroupChange}
+              renderDropdown={(option) => {
+                return <div>
+                  <span style={{ position: 'absolute'}}><b>{option.visitGroup === option.order ? '' : option.visitGroup}</b></span>
+                  <span style={{ paddingLeft: 40}}>{option.patientName}</span>
+                </div>
+              }}
+            />
               {visitGroupMessage && <div style={{ position: 'relative'}}>
-              <Alert
-                message={visitGroupMessage}
-                type='warning'
-                showIcon={false}
-                style={{
-                  position: 'absolute',
-                  width: '100%',
-                  padding: '0 3px',
-                  fontSize: '0.85rem',
-                }}
-              /></div>}
+                <Alert
+                  message={visitGroupMessage}
+                  type='warning'
+                  showIcon={false}
+                  style={{
+                    position: 'absolute',
+                    width: '100%',
+                    padding: '0 3px',
+                    fontSize: '0.85rem',
+                  }}
+                />
+              </div>}
             </React.Fragment>
           </Authorized>
         </GridItem>
