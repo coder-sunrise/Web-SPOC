@@ -56,6 +56,7 @@ const Recurrence = ({
   formValues,
   recurrenceDto = RecurrenceDTO,
   handleRecurrencePatternChange = (f) => f,
+  checkedRecurrence,
 }) => {
   const { isEnableRecurrence, currentAppointment, eventDate } = formValues
   const { recurrencePatternFK, recurrenceRange } = recurrenceDto
@@ -76,6 +77,11 @@ const Recurrence = ({
               disabled={disabled}
               simple
               label='Enable Recurrence'
+              onChange={(e) => {
+                if (e.target.value && checkedRecurrence) {
+                  checkedRecurrence()
+                }
+              }}
             />
           )
         }}

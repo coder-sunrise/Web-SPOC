@@ -10,7 +10,7 @@ import {
   CodeSelect,
 } from '@/components'
 
-const AppointmentDate = ({ disabled }) => (
+const AppointmentDate = ({ disabled, visitOrderTemplateOptions }) => (
   <React.Fragment>
     <GridItem xs md={3} />
     <GridItem xs md={3}>
@@ -46,6 +46,19 @@ const AppointmentDate = ({ disabled }) => (
       <FastField
         name='bookedByUser'
         render={(args) => <TextField label='Booked By' disabled {...args} />}
+      />
+    </GridItem>
+
+    <GridItem xs md={3}>
+      <Field
+        name='currentAppointment.visitOrderTemplateFK'
+        render={(args) =>
+          <CodeSelect
+            {...args}
+            label="Visit Purpose"
+            options={visitOrderTemplateOptions}
+            disabled={disabled}
+          />}
       />
     </GridItem>
   </React.Fragment>
