@@ -347,10 +347,15 @@ export const formikHandleSubmit = (
         dispatch({
           type: 'calendar/refresh',
         })
-      else
+      else{
+        dispatch({
+          type: 'queueLog/initState',
+        })
         dispatch({
           type: 'queueLog/refresh',
         })
+
+      }
       // reset form can not after onConfirm function.
       // bcz in NewVisit component have function 'componentWillUnmount'
       // there will use this.props.values when close registration visit page

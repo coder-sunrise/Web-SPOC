@@ -148,8 +148,11 @@ export const QueueTableConfig = {
   columns: [
     { name: 'visitStatus', title: 'Status' },
     { name: 'queueNo', title: 'Q. No.' },
+    { name: 'visitGroup', title: 'Group No.' },
+    { name: 'consReady', title: 'Cons. Ready' },
     { name: 'patientReferenceNo', title: 'Ref. No.' },
     { name: 'patientName', title: 'Patient Name' },
+    { name: 'orderCreateTime', title: 'Order Created Time' },
     { name: 'patientAccountNo', title: 'Acc. No.' },
     { name: 'gender/age', title: 'Gender / Age' },
     { name: 'doctor', title: 'Doctor' },
@@ -217,8 +220,14 @@ export const QueueColumnExtensions = [
     },
   },
   { columnName: 'patientAccountNo', compare: compareString, width: 120 },
-
-  { columnName: 'invoiceNo', width: 120 },
+  {
+    columnName: 'visitGroup',
+    align: 'center',
+  },
+  { 
+    columnName: 'invoiceNo',
+    width: 120,
+  },
   {
     columnName: 'roomNo',
     width: 120,
@@ -248,6 +257,12 @@ export const QueueColumnExtensions = [
     columnName: 'patientName',
     width: 250,
     compare: compareString,
+  },
+  {
+    columnName: 'orderCreateTime',
+    width: 180,
+    type: 'date',
+    showTime: true,
   },
   { columnName: 'referralCompany', width: 150 },
   { columnName: 'referralPerson', width: 150 },

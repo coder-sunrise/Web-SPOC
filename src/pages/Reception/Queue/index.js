@@ -83,6 +83,20 @@ const styles = theme => ({
   cardIconTitle: {
     color: 'black',
   },
+  switchContainer: {
+    lineHeight: '1em',
+    height: '100%',
+    color: 'currentColor',
+    borderRadius: 0,
+    '& .ant-switch-handle': {
+      width: 20,
+      height: 16,
+      '&::before': {
+        borderRadius: 3,
+        right: 2,
+      },
+    },
+  },
 })
 
 @connect(
@@ -688,6 +702,22 @@ class Queue extends React.Component {
     }, 3000)
   }
 
+  onQueueListing = (row) => {
+    const { dispatch } = this.props
+    const visitId = row.id
+    dispatch({
+      type: `${modelKey}updateQueueListing`,
+      payload: row,
+    }).then(r => {
+      if (r) {
+        dispatch({
+          type: `${modelKey}updateState`,
+          payload: this.state,
+        })
+      }
+    })
+  }
+  
   showSearchResult = (hasSearchQuery = false) => {
     const { patientSearchResult = [] } = this.props
     const totalRecords = patientSearchResult.length
@@ -891,6 +921,7 @@ class Queue extends React.Component {
                 // handleActualizeAppointment={this.handleActualizeAppointment}
                 onMenuItemClick={this.onMenuItemClick}
                 onContextMenu={this.onContextMenu}
+                onQueueListing={this.onQueueListing}
                 // handleFormsClick={this.showVisitForms}
                 history={history}
                 searchQuery={search}
