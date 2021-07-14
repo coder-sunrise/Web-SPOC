@@ -53,7 +53,7 @@ class Grid extends PureComponent {
             columnName: 'sortOrder',
             width: 120,
             render: (row) => {
-              return <p>{!row.sortOrder ? '-' : row.sortOrder}</p>
+              return <p>{row.sortOrder === undefined ? '-' : row.sortOrder}</p>
             },
           },
           {
