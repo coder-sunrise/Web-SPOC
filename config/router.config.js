@@ -225,10 +225,17 @@ const _routes = [
         routes: [
           { path: '/inventory', redirect: '/inventory/master' },
           {
-            path: '/inventory/master',
+            path: '/inventory/master/v2',
             name: 'master',
             component: './Inventory/Master/v2',
             authority: [ 'inventory/inventorymaster' ],
+          },
+          {
+            path: '/inventory/master',
+            name: 'master',
+            component: './Inventory/Master',
+            authority: [ 'inventory/inventorymaster' ],
+            mini: 'IM',
           },
           {
             path: '/inventory/master/consumable',
