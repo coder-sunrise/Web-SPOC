@@ -9,6 +9,7 @@ import {
   GridItem,
   TextField,
   DateRangePicker,
+  NumberInput
 } from '@/components'
 
 const styles = theme => ({})
@@ -23,6 +24,16 @@ const styles = theme => ({})
       .of(Yup.date())
       .min(2)
       .required(),
+    sortOrder: Yup.number()
+      .min(
+        -2147483648,
+        'The number should between -2,147,483,648 and 2,147,483,647',
+      )
+      .max(
+        2147483647,
+        'The number should between -2,147,483,648 and 2,147,483,647',
+      )
+      .nullable(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
@@ -86,6 +97,16 @@ class Detail extends PureComponent {
                       label2='End Date'
                       {...args}
                     />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={6}>
+              <FastField
+                name='sortOrder'
+                render={(args) => {
+                  return (
+                    <NumberInput label='Sort Order' precision={0} {...args} />
                   )
                 }}
               />
