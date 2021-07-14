@@ -536,6 +536,7 @@ class Banner extends PureComponent {
         paddingRight: 16,
         // maxHeight: 100,
         backgroundColor: '#f0f8ff',
+        marginTop:'-8px',
       },
       refreshingChasBalance,
     } = props
