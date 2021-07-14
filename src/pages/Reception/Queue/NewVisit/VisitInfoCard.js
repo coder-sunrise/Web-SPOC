@@ -188,8 +188,6 @@ const VisitInfoCard = ({
 
   const { isEnablePackage = false } = clinicSettings.settings
 
-  if(values.consReady === undefined)
-    setFieldValue(FormField['visit.consReady'], true)
 
   return (
     <CommonCard title='Visit Information'>

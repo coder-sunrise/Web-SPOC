@@ -121,6 +121,7 @@ export const formikMapPropsToValues = ({
     let doctorProfileFK
     let visitPurposeFK
     let roomAssignmentFK
+    let consReady
     if (clinicInfo) {
       // doctorProfile = doctorProfiles.find(
       //   (item) => item.doctorMCRNo === clinicInfo.primaryMCRNO,
@@ -213,9 +214,13 @@ export const formikMapPropsToValues = ({
       referralType = 'Company'
     }
 
+    if(visitRegistration.consReady === undefined)
+      consReady = true
+
     return {
       queueNo: qNo,
       visitPurposeFK,
+      consReady,
       roomFK: roomAssignmentFK || roomFK,
       visitStatus: VISIT_STATUS.WAITING,
       // doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,

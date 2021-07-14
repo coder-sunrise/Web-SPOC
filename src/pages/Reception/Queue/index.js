@@ -711,8 +711,7 @@ class Queue extends React.Component {
     }).then(r => {
       if (r) {
         dispatch({
-          type: `${modelKey}updateState`,
-          payload: this.state,
+          type: `${modelKey}refresh`,
         })
       }
     })
