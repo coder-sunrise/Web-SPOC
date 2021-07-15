@@ -231,6 +231,12 @@ const tenantCodesMap = new Map([
       ...defaultParams,
     },
   ],
+  [
+    'ctadministrationroute',
+    {
+      ...defaultParams,
+    },
+  ],
 ])
 
 // always get latest codetable
