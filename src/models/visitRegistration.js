@@ -42,17 +42,30 @@ export default createFormViewModel({
         if (query.md === 'visreg') {
           query.vis
             ? dispatch({
-                type: 'fetchVisitInfo',
-                payload: { id: query.vis },
-              })
+              type: 'fetchVisitInfo',
+              payload: { id: query.vis },
+            })
             : dispatch({
-                type: 'patient/query',
-                payload: { id: query.pid },
-              })
+              type: 'patient/query',
+              payload: { id: query.pid },
+            })
           if (query.apptid) {
             dispatch({
               type: 'updateState',
               payload: { appointmentFK: query.apptid },
+            })
+
+            dispatch({
+              type: 'calendar/getAppointmentDetails',
+              payload: {
+                id: query.apptid,
+                mode: 'single',
+              },
+            }).then(r => {
+              dispatch({
+                type: 'updateState',
+                payload: { appointment: { ...r } },
+              })
             })
           }
           if (query.pdroomid) {
@@ -67,7 +80,7 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *closeModal(_, { put }) {
+      * closeModal (_, { put }) {
         history.push(
           getRemovedUrl([
             'md',
@@ -93,6 +106,7 @@ export default createFormViewModel({
             appointmentFK: undefined,
             expandRefractionForm: undefined,
             expandExaminationForm: undefined,
+            appointment: undefined,
           },
         })
         yield put({
@@ -103,7 +117,7 @@ export default createFormViewModel({
         })
         return yield put(closeModal)
       },
-      *fetchVisitInfo({ payload }, { call, put, take }) {
+      * fetchVisitInfo ({ payload }, { call, put, take }) {
         yield put({
           type: 'updateErrorState',
           errorKey: 'visitInfo',
@@ -166,7 +180,7 @@ export default createFormViewModel({
           })
         }
       },
-      *fetchPatientInfoByPatientID({ payload }, { call, put }) {
+      * fetchPatientInfoByPatientID ({ payload }, { call, put }) {
         try {
           const response = yield call(pServices.queryPatient, payload)
           const { data } = response
@@ -186,7 +200,7 @@ export default createFormViewModel({
           })
         }
       },
-      *getVisitOrderTemplateList({ payload }, { call, put }) {
+      * getVisitOrderTemplateList ({ payload }, { call, put }) {
         try {
           const response = yield call(service.queryVisitOrderTemplate, payload)
           const { data } = response
@@ -201,7 +215,7 @@ export default createFormViewModel({
           return false
         }
       },
-      *getBizSession({ payload }, { call, put }) {
+      * getBizSession ({ payload }, { call, put }) {
         const response = yield call(service.getBizSession, payload)
         const { data } = response
         return data
@@ -211,7 +225,7 @@ export default createFormViewModel({
       // resetState (state, { payload }) {
       //   return { ...state, ...payload }
       // },
-      updateErrorState(state, { payload }) {
+      updateErrorState (state, { payload }) {
         return {
           ...state,
           errorState: { ...state.errorState, ...payload },

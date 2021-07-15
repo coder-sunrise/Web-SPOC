@@ -2,6 +2,8 @@ import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import { bool } from 'prop-types'
 import _ from 'lodash'
 import { cleanFields } from '@/pages/Consultation/utils'
+import { VISIT_TYPE } from '@/utils/constants'
+import { visitOrderTemplateItemTypes } from '@/utils/codes'
 import { VISIT_STATUS } from '../variables'
 
 const filterDeletedFiles = (item) => {
@@ -25,27 +27,27 @@ const mapAttachmentToUploadInput = (
 ) =>
   !fileIndexFK
     ? {
-        // file status === uploaded, only 4 info needed for API
-        fileIndexFK: rest.id,
-        thumbnailIndexFK: thumbnail ? thumbnail.id : undefined,
-        sortOrder: index,
-        fileName,
-        attachmentType,
-        attachmentTypeFK,
-        isDeleted,
-        remarks: rest.remarks,
-      }
+      // file status === uploaded, only 4 info needed for API
+      fileIndexFK: rest.id,
+      thumbnailIndexFK: thumbnail ? thumbnail.id : undefined,
+      sortOrder: index,
+      fileName,
+      attachmentType,
+      attachmentTypeFK,
+      isDeleted,
+      remarks: rest.remarks,
+    }
     : {
-        // file status === confirmed, need to provide full object for API
-        ...rest,
-        fileIndexFK,
-        thumbnailIndexFK: thumbnail ? thumbnail.id : undefined,
-        fileName,
-        attachmentType,
-        attachmentTypeFK,
-        isDeleted,
-        sortOrder: index,
-      }
+      // file status === confirmed, need to provide full object for API
+      ...rest,
+      fileIndexFK,
+      thumbnailIndexFK: thumbnail ? thumbnail.id : undefined,
+      fileName,
+      attachmentType,
+      attachmentTypeFK,
+      isDeleted,
+      sortOrder: index,
+    }
 
 const convertEyeForms = (values) => {
   let { visitEyeRefractionForm = {}, visitEyeVisualAcuityTest } = values
@@ -106,6 +108,22 @@ const convertEyeForms = (values) => {
   return values
 }
 
+const getVisitOrderTemplateTotal = (vType, template) => {
+  let activeItemTotal = 0
+  visitOrderTemplateItemTypes.forEach(type => {
+    if (vType === VISIT_TYPE.RETAIL && type.id === 3) return
+    const currentTypeItems = template.visitOrderTemplateItemDtos.filter(
+      itemType => itemType.inventoryItemTypeFK === type.id,
+    )
+    currentTypeItems.map(item => {
+      if (item[type.dtoName].isActive === true) {
+        activeItemTotal += item.total || 0
+      }
+    })
+  })
+  return activeItemTotal
+}
+
 export const formikMapPropsToValues = ({
   clinicInfo,
   queueLog,
@@ -122,6 +140,9 @@ export const formikMapPropsToValues = ({
     let visitPurposeFK
     let roomAssignmentFK
     let consReady
+    let currentVisitOrderTemplateFK
+    let defaultVistPreOrderItem = []
+    let totalTempCharge
     if (clinicInfo) {
       // doctorProfile = doctorProfiles.find(
       //   (item) => item.doctorMCRNo === clinicInfo.primaryMCRNO,
@@ -139,7 +160,7 @@ export const formikMapPropsToValues = ({
       qNo = parseFloat(largestQNo + 1).toFixed(1)
     }
 
-    const { visitInfo, roomFK } = visitRegistration
+    const { visitInfo, roomFK, appointment } = visitRegistration
 
     if (Object.keys(visitInfo).length > 0) {
       qNo = visitInfo.queueNo
@@ -168,10 +189,6 @@ export const formikMapPropsToValues = ({
     }
 
     const { visitOrderTemplateFK, visitEyeRefractionForm } = visitEntries
-    const isVisitOrderTemplateActive = (visitRegistration.visitOrderTemplateOptions ||
-      [])
-      .map((option) => option.id)
-      .includes(visitEntries.visitOrderTemplateFK)
 
     if (!visitEntries.id) {
       if (doctorProfile) {
@@ -188,7 +205,45 @@ export const formikMapPropsToValues = ({
             defaultDoctor.clinicianProfile.roomAssignment.roomFK
         }
       }
+      if (appointment && appointment.appointments.length) {
+        currentVisitOrderTemplateFK = appointment.appointments[0].visitOrderTemplateFK
+        const visitOrderTemplate = (visitRegistration.visitOrderTemplateOptions ||
+          []).find(vi => vi.id === currentVisitOrderTemplateFK)
+        if (visitOrderTemplate) {
+          totalTempCharge = getVisitOrderTemplateTotal(currentVisitOrderTemplateFK, visitOrderTemplate)
+        }
+        defaultVistPreOrderItem = appointment.appointments[0].appointmentPreOrderItem.map(po => {
+          const { actualizedPreOrderItemFK,
+            preorderItemType,
+            itemName,
+            quantity,
+            orderByUser,
+            orderDate,
+            remarks,
+            amount,
+            hasPaid
+          } = po
+          return {
+            actualizedPreOrderItemFK,
+            preorderItemType,
+            itemName,
+            quantity,
+            orderByUser,
+            orderDate,
+            remarks,
+            amount,
+            hasPaid
+          }
+        })
+      }
     }
+    else {
+      currentVisitOrderTemplateFK = visitOrderTemplateFK
+    }
+    const isVisitOrderTemplateActive = (visitRegistration.visitOrderTemplateOptions ||
+      [])
+      .map((option) => option.id)
+      .includes(currentVisitOrderTemplateFK)
 
     let newFormData
     if (visitEyeRefractionForm && visitEyeRefractionForm.formData) {
@@ -227,8 +282,10 @@ export const formikMapPropsToValues = ({
       doctorProfileFK,
       ...visitEntries,
       visitOrderTemplateFK: isVisitOrderTemplateActive
-        ? visitOrderTemplateFK
+        ? currentVisitOrderTemplateFK
         : undefined,
+      vistPreOrderItem: !visitEntries.id ? defaultVistPreOrderItem : visitEntries.vistPreOrderItem,
+      visitOrderTemplateTotal: !visitEntries.id ? totalTempCharge : visitEntries.visitOrderTemplateTotal,
       visitEyeRefractionForm: {
         ...visitEyeRefractionForm,
         formData: newFormData,
