@@ -169,7 +169,7 @@ const VisitInfoCard = ({
     setFieldValue(FormField['visit.visitGroup'], op ? op.data.visitGroup : null)
     setFieldValue(FormField['visit.consReady'], false)
     setFieldValue(FormField['visit.visitGroupRef'], op && op.data.visitGroup === op.data.order ? op.data.order : null)
-    setVisitGroupMessage(op && op.data.visitGroup === op.data.order ? 'New visit group will be created with\n' + op.data.patientName : null)
+    setVisitGroupMessage(op && op.data.visitGroup === op.data.order ? 'New group create with ' + op.data.patientName : null)
   }
   
   const { values } = restProps
@@ -187,7 +187,7 @@ const VisitInfoCard = ({
 
   const { isEnablePackage = false } = clinicSettings.settings
 
-
+console.log(queueLog.list)
   return (
     <CommonCard title='Visit Information'>
       <GridContainer alignItems='center'>
@@ -250,21 +250,22 @@ const VisitInfoCard = ({
           />
         </GridItem>
         <GridItem xs md={3}>
-          <Authorized authority='queue.modifyconsultationready'>
-            <Field 
-                name={FormField['visit.consReady']}
-                render={args => (
-                  <Switch
-                    className={classes.switchContainer}
-                    label={formatMessage({
-                      id: 'reception.queue.visitRegistration.consReady',
-                    })}
-                    disabled={(disableConsReady && disableConsReady.rights === 'Disable') || isVisitReadonlyAfterSigned}
-                    {...args}
-                  />
-                )}
-              />
-          </Authorized>
+          {isEnablePackage && (
+            <Field
+              name={FormField['visit.salesPersonUserFK']}
+              render={args => (
+                <ClinicianSelect
+                  label={formatMessage({
+                    id: 'reception.queue.visitRegistration.salesPerson',
+                  })}
+                  disabled={isVisitReadonlyAfterSigned}
+                  authority='none'
+                  noDefaultValue
+                  {...args}
+                />
+              )}
+            />
+          )}
         </GridItem>
         <GridItem xs md={3}>
           <Field
@@ -326,6 +327,41 @@ const VisitInfoCard = ({
           />
         </GridItem>
         <GridItem xs md={3}>
+          <Authorized authority='queue.modifyconsultationready'>
+            <Field 
+                name={FormField['visit.consReady']}
+                render={args => (
+                  <Switch
+                    className={classes.switchContainer}
+                    label={formatMessage({
+                      id: 'reception.queue.visitRegistration.consReady',
+                    })}
+                    disabled={(disableConsReady && disableConsReady.rights === 'Disable') || isVisitReadonlyAfterSigned}
+                    {...args}
+                  />
+                )}
+              />
+          </Authorized>
+        </GridItem>
+        <GridItem xs md={6}>
+          <Field
+            name={FormField['visit.visitRemarks']}
+            render={args => (
+              <TextField
+                {...args}
+                // disabled={isReadOnly}
+                multiline
+                rowsMax={3}
+                authority='none'
+                disabled={isVisitReadonlyAfterSigned}
+                label={formatMessage({
+                  id: 'reception.queue.visitRegistration.visitRemarks',
+                })}
+              />
+            )}
+          />
+        </GridItem>
+        <GridItem xs md={3}>
           <Authorized authority='queue.visitgroup'>
             <React.Fragment>
               <Select
@@ -333,10 +369,10 @@ const VisitInfoCard = ({
               labelField='displayValue'
               value={values.visitGroup}
               disabled={isVisitReadonlyAfterSigned}
-              options={[...queueLog.list.filter(q => patientInfo).map(l => {                      
+              options={[...queueLog.list.filter(q => patientInfo && patientInfo.name !== q.patientName).map(l => {                      
                   return {
                     visitGroup: l.visitGroup || l.id,
-                    displayValue: l.visitGroup || '<New Visit Group>',
+                    displayValue: l.visitGroup || 'New Group Number',
                     patientName: l.patientName,
                     order: l.id,
                   }
@@ -368,7 +404,9 @@ const VisitInfoCard = ({
                   showIcon={false}
                   style={{
                     position: 'absolute',
-                    width: '100%',
+                    maxWidth: '440px',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
                     padding: '0 3px',
                     fontSize: '0.85rem',
                   }}
@@ -376,42 +414,6 @@ const VisitInfoCard = ({
               </div>}
             </React.Fragment>
           </Authorized>
-        </GridItem>
-        <GridItem xs md={6}>
-          <Field
-            name={FormField['visit.visitRemarks']}
-            render={args => (
-              <TextField
-                {...args}
-                // disabled={isReadOnly}
-                multiline
-                rowsMax={3}
-                authority='none'
-                disabled={isVisitReadonlyAfterSigned}
-                label={formatMessage({
-                  id: 'reception.queue.visitRegistration.visitRemarks',
-                })}
-              />
-            )}
-          />
-        </GridItem>
-        <GridItem xs md={3}>
-          {isEnablePackage && (
-            <Field
-              name={FormField['visit.salesPersonUserFK']}
-              render={args => (
-                <ClinicianSelect
-                  label={formatMessage({
-                    id: 'reception.queue.visitRegistration.salesPerson',
-                  })}
-                  disabled={isVisitReadonlyAfterSigned}
-                  authority='none'
-                  noDefaultValue
-                  {...args}
-                />
-              )}
-            />
-          )}
         </GridItem>
         <GridItem xs md={3} />
         {showAdjusment &&
