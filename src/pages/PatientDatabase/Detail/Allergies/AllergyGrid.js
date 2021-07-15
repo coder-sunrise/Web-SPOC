@@ -70,7 +70,7 @@ class AllergyGrid extends PureComponent {
           autoComplete: true,
           filterOption: (val, option) => {
             let { rows } = this.props
-            return rows.map((o) => o.ingredientFK).indexOf(option.value) < 0
+            return rows.filter((r) => !r.isDeleted).map((o) => o.ingredientFK).indexOf(option.value) < 0
           },
           onChange: ({ val, option, row }) => {
             if (option) {
@@ -99,7 +99,7 @@ class AllergyGrid extends PureComponent {
           autoComplete: true,
           filterOption: (val, option) => {
             let { rows } = this.props
-            return rows.map((o) => o.allergyFK).indexOf(option.value) < 0
+            return rows.filter((r) => !r.isDeleted).map((o) => o.allergyFK).indexOf(option.value) < 0
           },
           onChange: ({ val, option, row }) => {
             if (option) {
