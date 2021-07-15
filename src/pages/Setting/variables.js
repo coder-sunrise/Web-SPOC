@@ -326,4 +326,10 @@ export const menuData = [
     text: 'GENERIC MEDICATION',
     url: '/setting/genericmedication',
   },
+  {
+    authority: 'settings.clinicsetting.administrationroute',
+    title: 'Clinic Setting',
+    text: 'ROUTE OF ADMINISTRATION',
+    url: '/setting/administrationroute',
+  },
 ]
