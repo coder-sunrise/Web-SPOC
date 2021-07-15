@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'dva'
+import { withStyles } from '@material-ui/core'
 import MoreVert from '@material-ui/icons/MoreVert'
 import $ from 'jquery'
 // material ui
@@ -7,7 +8,7 @@ import CallIcon from '@material-ui/icons/Call'
 // medisys component
 import Tooltip from '@material-ui/core/Tooltip'
 import { VisitStatusTag, LoadingWrapper } from '@/components/_medisys'
-import { CommonTableGrid, Button, Skeleton } from '@/components'
+import { CommonTableGrid, Button, Skeleton, Switch } from '@/components'
 // medisys component
 // sub component
 // utils
@@ -23,6 +24,25 @@ import {
 } from './variables'
 import { filterData } from '../utils'
 import { StatusIndicator } from '../variables'
+import { compose } from 'redux'
+import Authorized from '@/utils/Authorized'
+
+const styles = theme => ({
+  switchContainer: {
+    lineHeight: '1em',
+    height: '100%',
+    color: 'currentColor',
+    borderRadius: 0,
+    '& .ant-switch-handle': {
+      width: 20,
+      height: 16,
+      '&::before': {
+        borderRadius: 3,
+        right: 2,
+      },
+    },
+  },
+})
 
 class Grid extends React.Component {
   constructor (props) {
@@ -175,6 +195,7 @@ class Grid extends React.Component {
 
   render () {
     const {
+      classes,
       codetable,
       filter = StatusIndicator.ALL,
       loading = false,
@@ -185,6 +206,21 @@ class Grid extends React.Component {
     } = this.props
 
     const queueListingData = this.computeQueueListingData()
+
+    const showConsReady = Authorized.check('queue.modifyconsultationready')
+    const showVisitGroup = Authorized.check('queue.visitgroup')
+
+    const queueConfig = {
+      ...QueueTableConfig,
+      columns: QueueTableConfig.columns.reduce((cols, column) => {
+        if(['consReady','visitGroup'].indexOf(column.name) < 0 || (
+          (showConsReady && showConsReady.rights !== 'hidden' && column.name === 'consReady') || 
+          (showVisitGroup && showVisitGroup.rights !== 'hidden' && column.name === 'visitGroup')
+        ))
+          cols.push(column)
+        return cols
+      }, []),
+    }
 
     const isLoading = showingVisitRegistration ? false : loading
     let loadingText = 'Refreshing queue...'
@@ -223,6 +259,24 @@ class Grid extends React.Component {
                   ),
                 },
                 {
+                  columnName: 'consReady',
+                  align: 'center',
+                  render: (row) => {
+                    return <Switch
+                      className={classes.switchContainer}
+                      value={row.consReady}
+                      onChange={(checked, event) => {
+                        this.props.onQueueListing({
+                          ...row,
+                          consReady: checked,
+                        })
+                      }}
+                      {...this.props}
+                    />
+                  },
+                  sortingEnabled: false,
+                },
+                {
                   columnName: 'action',
                   align: 'center',
                   render: this.getActionButton,
@@ -246,7 +300,7 @@ class Grid extends React.Component {
               FuncProps={FuncConfig}
               onRowDoubleClick={this.onRowDoubleClick}
               onContextMenu={this.props.onContextMenu}
-              {...QueueTableConfig}
+              {...queueConfig}
             />
           )}
           {filter === StatusIndicator.APPOINTMENT && (
@@ -302,22 +356,26 @@ class Grid extends React.Component {
   }
 }
 
-export default connect(({ queueLog, global, loading, user, codetable }) => ({
-  user,
-  codetable,
-  mainDivHeight: global.mainDivHeight,
-  filter: queueLog.currentFilter,
-  selfOnly: queueLog.selfOnly,
-  queueList: queueLog.list || [],
-  statusTagClicked: queueLog.statusTagClicked,
-  calendarEvents: queueLog.appointmentList || [],
-  eQueueEvents: queueLog.equeueList || [],
-  showingVisitRegistration: global.showVisitRegistration,
-  queueLog,
-  loading:
-    loading.effects['queueLog/refresh'] ||
-    loading.effects['queueLog/getSessionInfo'] ||
-    loading.effects['queueLog/query'] ||
-    loading.effects['calendar/getCalendarList'],
-  queryingFormData: loading.effects['dispense/initState'],
-}))(Grid)
+export default compose(
+  connect(({ queueLog, global, loading, user, codetable, dispatch }) => ({
+    user,
+    codetable,
+    dispatch,
+    mainDivHeight: global.mainDivHeight,
+    filter: queueLog.currentFilter,
+    selfOnly: queueLog.selfOnly,
+    queueList: queueLog.list || [],
+    statusTagClicked: queueLog.statusTagClicked,
+    calendarEvents: queueLog.appointmentList || [],
+    eQueueEvents: queueLog.equeueList || [],
+    showingVisitRegistration: global.showVisitRegistration,
+    queueLog,
+    loading:
+      loading.effects['queueLog/refresh'] ||
+      loading.effects['queueLog/getSessionInfo'] ||
+      loading.effects['queueLog/query'] ||
+      loading.effects['calendar/getCalendarList'],
+    queryingFormData: loading.effects['dispense/initState'],
+  })),
+  withStyles(styles),
+)(Grid)
