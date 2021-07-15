@@ -187,7 +187,6 @@ const VisitInfoCard = ({
 
   const { isEnablePackage = false } = clinicSettings.settings
 
-console.log(queueLog.list)
   return (
     <CommonCard title='Visit Information'>
       <GridContainer alignItems='center'>

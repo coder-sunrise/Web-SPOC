@@ -260,9 +260,9 @@ export const formikMapPropsToValues = ({
       } else if (visitEntries.referralPatientProfileFK) {
         referralType = 'Patient'
       }
-    } else if (
+    } else if (patientInfo && (
       patientInfo.referredBy === 'Company' ||
-      patientInfo.referredBy === 'Patient'
+      patientInfo.referredBy === 'Patient')
     ) {
       referralType = patientInfo.referredBy
     } else if (clinicSettings.settings.isVisitReferralSourceMandatory) {
