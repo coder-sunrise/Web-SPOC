@@ -222,6 +222,18 @@ export default createListViewModel({
 
         return false
       },
+
+      *queryPersistentDiagnosis({ payload }, { call, put }) {
+        const response = yield call(service.queryPersistentDiagnosis, payload)
+        if (response.status === '200') {
+          // yield put({
+          //   type: 'getReferalHistory',
+          //   payload: response,
+          // })
+          return response
+        }
+        return false
+      },
     },
     reducers: {
       queryDone (st, { payload }) {

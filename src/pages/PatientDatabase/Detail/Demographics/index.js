@@ -18,6 +18,7 @@ import {
   CodeSelect,
   DatePicker,
   CheckboxGroup,
+  TagPanel,
 } from '@/components'
 import { getUniqueNumericId } from '@/utils/utils'
 import service from '@/services/patient'
@@ -43,7 +44,36 @@ const styles = () => ({
   clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
 class Demographic extends PureComponent {
-  state = {}
+  state = {
+    patientTags: [],
+  }
+
+  constructor (props) {
+    super(props)
+    this.fetchCodeTables()
+  }
+
+  fetchCodeTables = () => {
+    const { dispatch, values } = this.props
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'cttag',
+      },
+    }).then(result => {
+      if (result) {
+        this.setState({
+          patientTags: result
+            .filter(
+              t =>
+                t.category === 'Patient' 
+                && values.patientTag.findIndex(st => st.tagFK === t.id) !== -1,
+            )
+            .map(t => t.displayValue),
+        })
+      }
+    })
+  }
 
   addAddress = () => {
     this.arrayHelpers.unshift({
@@ -108,6 +138,29 @@ class Demographic extends PureComponent {
     if (value === '') {
       setFieldValue('referredByPatientFK', undefined)
     }
+  }
+
+  handleTagPanelChange = (value, tags, setFieldValue) => {
+    const {
+      patientTag: originalTags = [],
+      id: patientId,
+    } = this.props.initialValues
+
+    const currentTags = tags.map(t => {
+      return {
+        patientProfileFK: patientId,
+        tagFK: t.id,
+        isDeleted: false,
+      }
+    })
+
+    const deletedTags = originalTags
+      .filter(t => !value.includes(t.displayValue))
+      .map(t => {
+        return { ...t, isDeleted: true }
+      })
+
+    setFieldValue('patientTag', [...currentTags, ...deletedTags])
   }
 
   render() {
@@ -321,8 +374,8 @@ class Demographic extends PureComponent {
               </GridItem>
             </GridContainer>
           </GridItem>
-          <GridItem xs={12} md={2} />
-          <GridItem xs={12} md={5}>
+          <GridItem xs={12} md={1} />
+          <GridItem xs={12} md={6}>
             <GridContainer className={classes.autoHeight}>
               <GridItem xs={3}>
                 <FastField
@@ -337,40 +390,42 @@ class Demographic extends PureComponent {
                   )}
                 />
               </GridItem>
-              <GridItem xs={3}>
-                <FastField
-                  name='contact.mobileContactNumber.number'
-                  render={args => <MobileNumberInput {...args} />}
-                  // render={(args) => <NumberInput label='Mobile' {...args} />}
-                />
-              </GridItem>
-              <GridItem xs={3}>
-                <FastField
-                  name='contact.homeContactNumber.number'
-                  render={args => <MobileNumberInput label='Home' {...args} />}
-                />
-              </GridItem>
-              <GridItem xs={3}>
-                <FastField
-                  name='contact.officeContactNumber.number'
-                  render={args => (
-                    <MobileNumberInput label='Office' {...args} />
-                  )}
-                />
-              </GridItem>
-              <GridItem xs={6}>
-                <FastField
-                  name='contact.faxContactNumber.number'
-                  render={args => <MobileNumberInput label='Fax' {...args} />}
-                />
-              </GridItem>
+              <GridContainer xs={9}>
+                <GridItem xs={3}>
+                  <FastField
+                    name='contact.mobileContactNumber.number'
+                    render={args => <MobileNumberInput {...args} />}
+                    // render={(args) => <NumberInput label='Mobile' {...args} />}
+                  />
+                </GridItem>
+                <GridItem xs={3}>
+                  <FastField
+                    name='contact.homeContactNumber.number'
+                    render={args => <MobileNumberInput label='Home' {...args} />}
+                  />
+                </GridItem>
+                <GridItem xs={3}>
+                  <FastField
+                    name='contact.officeContactNumber.number'
+                    render={args => (
+                      <MobileNumberInput label='Office' {...args} />
+                    )}
+                  />
+                </GridItem>
+                <GridItem xs={3}>
+                  <FastField
+                    name='contact.faxContactNumber.number'
+                    render={args => <MobileNumberInput label='Fax' {...args} />}
+                  />
+                </GridItem>
+              </GridContainer>
               <GridItem xs={6}>
                 <FastField
                   name='contact.contactEmailAddress.emailAddress'
                   render={args => <TextField label='Email' {...args} />}
                 />
               </GridItem>
-              <GridItem xs={12}>
+              <GridItem xs={6}>
                 <FastField
                   name='preferredContactMode'
                   render={args => (
@@ -459,13 +514,31 @@ class Demographic extends PureComponent {
                     />
                   )}
                 />
+              </GridItem>            
+              <GridItem xs={12} style={{ paddingTop: 3 }}>
+                <Field
+                    name='patientTag'
+                    render={args => (
+                      <TagPanel
+                        label='Patient Tags:'
+                        tagCategory='Patient'
+                        defaultTagNames={this.state.patientTags}
+                        {...args}
+                        onChange={(value, tags) =>
+                          this.handleTagPanelChange(
+                            value,
+                            tags,
+                            args.form.setFieldValue,
+                          )
+                        }
+                      ></TagPanel>
+                    )}
+                  />
               </GridItem>
               <GridItem xs={12}>
-                <ReferralCard
-                  dispatch={dispatch}
-                  values={values}
-                  mode='patientprofile'
-                  setFieldValue={setFieldValue}
+                <FastField
+                  name='patientRequest'
+                  render={args => <TextField label='Patient Request' {...args} />}
                 />
               </GridItem>
               <GridItem xs={12}>
@@ -474,12 +547,20 @@ class Demographic extends PureComponent {
                   render={args => {
                     return (
                       <CodeSelect
-                        label='Translation'
+                        label='Preferred Printout Language'
                         code='ctlanguage'
                         {...args}
                       />
                     )
                   }}
+                />
+              </GridItem>
+              <GridItem xs={12}>
+                <ReferralCard
+                  dispatch={dispatch}
+                  values={values}
+                  mode='patientprofile'
+                  setFieldValue={setFieldValue}
                 />
               </GridItem>
             </GridContainer>
