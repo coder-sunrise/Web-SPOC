@@ -1,60 +1,42 @@
 
-import { Breadcrumb } from 'antd'
 import React, { useState, useRef, useEffect } from 'react'
 import { useIntl, Link } from 'umi'
-import { Theme } from '@material-ui/core/styles/createMuiTheme'
-import { withStyles } from '@material-ui/styles'
 import { connect } from 'dva'
 import moment from 'moment'
 import { currencySymbol } from '@/utils/config'
 import _ from 'lodash'
-import Loadable from 'react-loadable'
-import Add from '@material-ui/icons/Add'
+import Authorized from '@/utils/Authorized'
 import {
   FastEditableTableGrid,
-  Button,
-  CommonModal,
-  notification,
-  Tooltip,
 } from '@/components'
 import Loading from '@/components/PageLoading/index'
 import service from '@/services/patient'
 import { getUniqueId } from '@/utils/utils'
 import { preOrderItemCategory } from '@/utils/codes'
 import { VISIT_TYPE_NAME } from '@/utils/constants'
-
-
+import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
 // interface IPendingPreOrderProps {
 // }
 
-// const styles = (theme: Theme) => ({
-//   breadcrumbtext: {
-//     fontSize: '18px',
-//     color: 'black',
-//   },
-//   breadcrumblink: {
-//     fontSize: '18px',
-//     color: 'black',
-//     '&:hover': {
-//       color: '#4255bd',
-//     },
-//   },
-// })
-
-
 const PendingPreOrder: React.FC = (props: any) => {
   const { values, schema, user: { data: { clinicianProfile } } } = props
-  const { formatMessage } = useIntl()
   const [medications, setMedications] = useState()
+  const [consumables, setConsumables] = useState()
   const [vaccinations, setVaccinations] = useState()
+  const [services, setServices] = useState()
+  const [labs, setLabs] = useState()
+  const [radiology, setRadiology] = useState()
+
+  const modifyPreOrderAccessRight = Authorized.check('patientdatabase.modifypreorder') ||  {rights: 'hidden'}
+
+  const isEditable = modifyPreOrderAccessRight.rights === 'enable' ? true : false;
 
   const commitChanges = ({ rows }) => {
     const { setFieldValue, values } = props
-    // console.log(rows)
-    setFieldValue('preOrderList', rows)
+    setFieldValue('pendingPreOrderItem', rows)
   }
 
-  const fetchCodeTable = async (ctname: 'ctservice' | 'inventoryvaccination' | 'inventorymedication') => {
+  const fetchCodeTable = async (ctname: 'ctservice' | 'inventoryvaccination' | 'inventorymedication' | 'inventoryconsumable') => {
     return props.dispatch({
       type: 'codetable/fetchCodes',
       payload: {
@@ -100,32 +82,94 @@ const PendingPreOrder: React.FC = (props: any) => {
         })
       }
     }
-  }
-
-  const generateItemDataSource = (row: any) => {
-    const { sourceCategory } = row
-    if (sourceCategory) {
-      if (sourceCategory === preOrderItemCategory.Medication) {
-        return medications
+    if(!consumables) {
+      const {codetable: {inventoryconsumable}} = props
+      if(inventoryconsumable && inventoryconsumable.length >= 0) {
+        const retResponse = inventoryconsumable.reduce(itemWrapper,[])
+        setConsumables(retResponse)
+      }else{
+        fetchCodeTable('inventoryconsumable').then((response) => {
+          const retResponse = response.reduce(itemWrapper, [])
+          setConsumables(retResponse)
+        })
       }
-      if (sourceCategory === preOrderItemCategory.Vaccination) {
-        return vaccinations
+    }
+    if (!services) {
+      const {codetable: {ctservice}} = props
+      if(ctservice && ctservice.length >= 0) {
+        const retSerResponse = ctservice.filter(c => c.serviceCenterCategoryFK !== SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER  && c.serviceCenterCategoryFK !== SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER).reduce(itemWrapper,[])
+        setServices(retSerResponse)
+        const retLabResponse = ctservice.filter(c => c.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER ).reduce(itemWrapper,[])
+        setLabs(retLabResponse)
+        const retRadiologyResponse = ctservice.filter(c => c.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER).reduce(itemWrapper,[])
+        setRadiology(retRadiologyResponse)
+      }else{
+        fetchCodeTable('ctservice').then((response) => {
+          const retSerResponse = response.filter(c => c.serviceCenterCategoryFK !== SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER  && c.serviceCenterCategoryFK !== SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER).reduce(itemWrapper,[])
+          setServices(retSerResponse)
+          const retLabResponse = response.filter(c => c.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER ).reduce(itemWrapper,[])
+          setLabs(retLabResponse)
+          const retRadiologyResponse = response.filter(c => c.serviceCenterCategoryFK === SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER).reduce(itemWrapper,[])
+          setRadiology(retRadiologyResponse)})
       }
     }
   }
 
+  const generateItemDataSource = (row: any) => {
+    const { preOrderItemType } = row
+    if (preOrderItemType) {
+      if (preOrderItemType === preOrderItemCategory[0].value) {
+        return medications
+      }
+      if (preOrderItemType === preOrderItemCategory[1].value) {
+        return consumables
+      }
+      if (preOrderItemType === preOrderItemCategory[2].value) {
+        return vaccinations
+      }
+      if (preOrderItemType === preOrderItemCategory[3].value) {
+        return services
+      }
+      if (preOrderItemType === preOrderItemCategory[4].value) {
+        return labs
+      }
+      if (preOrderItemType === preOrderItemCategory[5].value) {
+        return radiology
+      }
+    }
+  }
+
+  const getFilteredRows = (rows : any) =>{
+    const result = rows.filter((c: { preOrderItemStatus: string }) => c.preOrderItemStatus !=='Actualized')
+    return result
+  }
   const handleCategoryChanged = (e: any) => {
-    // console.log('handleCategoryChanged', e)
     if (!e.option) {
       return
     }
 
     const { option, row } = e
-    row.quantity = undefined
-    row.amount = undefined
+    row.quantity = undefined,
+    row.amount = undefined,
+    row.sourceRecordFK =undefined,
+    row.itemName = undefined,
+    row.preOrderVaccinationItem = undefined,
+    row.preOrderServiceItem = undefined,
+    row.preOrderMedicationItem =undefined,
+    row.preOrderConsumableItem = undefined
+
   }
   const handleItemChanged = (e: any) => {
-    const { row, value } = e
+    const { row,option } = e
+    row.itemName = option?.combinDisplayValue 
+    if(row.preOrderItemType === preOrderItemCategory[0].value)
+      row.preOrderMedicationItem = {InventoryMedicationFK : row.sourceRecordFK}
+      else if (row.preOrderItemType === preOrderItemCategory[1].value)
+      row.preOrderConsumableItem = {InventoryConsumableFK : row.sourceRecordFK}
+      else if (row.preOrderItemType === preOrderItemCategory[2].value)
+      row.preOrderVaccinationItem = {InventoryVaccinationFK : row.sourceRecordFK}
+      else if (row.preOrderItemType === preOrderItemCategory[3].value || row.preOrderItemType == preOrderItemCategory[4].value ||row.preOrderItemType == preOrderItemCategory[5].value)
+      row.preOrderServiceItem = {ServiceCenterServiceFK : row.sourceRecordFK}
     row.quantity = undefined
     row.amount = undefined
     row.remarks = undefined
@@ -138,7 +182,7 @@ const PendingPreOrder: React.FC = (props: any) => {
       return
     }
 
-    if (medications && sourceCategory === preOrderItemCategory.Medication) {
+    if (medications && sourceCategory === preOrderItemCategory[0].value) {
       const item = medications.find((m) => m.id === row.sourceRecordFK)
       if (item) {
         const { sellingPrice } = item
@@ -153,32 +197,38 @@ const PendingPreOrder: React.FC = (props: any) => {
 
   const tableParas = {
     columns: [
-      { name: 'sourceCategory', title: 'Category' },
+      { name: 'preOrderItemType', title: 'Category' },
       { name: 'sourceRecordFK', title: 'Name' },
       { name: 'quantity', title: 'Quantity' },
       { name: 'visitPurposeFK', title: 'Visit Type' },
-      { name: 'orderedByUserName', title: 'Order By' },
-      { name: 'orderedDateTime', title: 'Order Time' },
+      { name: 'orderByUserFK', title: 'Order By' },
+      { name: 'orderDate', title: 'Order Date' },
       { name: 'remarks', title: 'Remarks' },
       { name: 'amount', title: 'Amount' },
+      { name: 'preOrderItemStatus', title: 'Status'},
     ],
     columnExtensions: [
       {
-        columnName: 'sourceCategory',
+        columnName: 'preOrderItemType',
         type: 'select',
         labelField: 'name',
-        valueField: 'name',
+        valueField: 'value',
         width: 180,
-        options: () => Object.keys(preOrderItemCategory).map((k) => ({ name: preOrderItemCategory[k] })),
+        options: () => preOrderItemCategory,
         onChange: handleCategoryChanged,
+        isDisabled :(row) =>  isEditable === true && row.id < 0 ? false : true 
       },
       {
         columnName: 'sourceRecordFK',
         type: 'select',
         labelField: 'combinDisplayValue',
-        valueField: 'id',
+        valueField: 'id' , 
         options: generateItemDataSource,
         onChange: handleItemChanged,
+        render: (row,option)=>{
+          return <div>{row.itemName }</div>
+        },
+        isDisabled :() =>  isEditable ? false : true,
       },
       {
         columnName: 'quantity',
@@ -186,24 +236,29 @@ const PendingPreOrder: React.FC = (props: any) => {
         precision: 2,
         width: 100,
         onChange: handelQuantityChanged,
+        isDisabled :() =>  isEditable ? false : true,
       },
       {
         columnName: 'visitPurposeFK',
         type: 'select',
-        width: 120,
+        width: 150,
         labelField: 'displayName',
         valueField: 'visitPurposeFK',
         options: () => VISIT_TYPE_NAME,
-        isDisabled: () => true,
         sortingEnabled: false,
+        isDisabled :() =>  isEditable ? false : true,
       },
       {
-        columnName: 'orderedByUserName',
+        columnName: 'orderByUserFK',
         width: 150,
+        type: 'text',
+        render:(row)=>{
+          return row.orderByUser
+        },
         isDisabled: () => true,
       },
       {
-        columnName: 'orderedDateTime',
+        columnName: 'orderDate',
         type: 'date',
         width: 100,
         isDisabled: () => true,
@@ -212,15 +267,21 @@ const PendingPreOrder: React.FC = (props: any) => {
         columnName: 'remarks',
         maxLength: 100,
         sortingEnabled: false,
+        isDisabled :() =>  isEditable ? false : true,
       },
       {
         columnName: 'amount',
         width: 100,
         type: 'currency',
+        isDisabled :() =>  isEditable ? false : true,
+      },
+      {
+        columnName: 'preOrderItemStatus',
+        width: 100,
+        isDisabled: () => true,
       },
     ],
   }
-
 
   if (!medications || !vaccinations) {
     return <Loading />
@@ -228,16 +289,28 @@ const PendingPreOrder: React.FC = (props: any) => {
 
   return <>
     <FastEditableTableGrid
-      rows={values.preOrderList}
+      rows={getFilteredRows(values.pendingPreOrderItem)}
       schema={schema}
+      FuncProps={{
+          pager:false,
+      }}
       EditingProps={{
-        showAddCommand: true,
+        showAddCommand: isEditable,
+        isDeletable: (row) => {
+          return isEditable && row.preOrderItemStatus ==='New' ? true : false;
+        },
         onCommitChanges: commitChanges,
         onAddedRowsChange: (rows: any) => {
           return rows.map(o => {
             return {
-              orderedDateTime: moment(),
-              orderedByUserName: clinicianProfile?.name,
+              orderDate: moment(),
+              orderByUserFK: clinicianProfile?.userProfileFK,
+              orderByUser: clinicianProfile?.userProfile.userName,
+              preOrderItemStatus: 'New',
+              preOrderVaccinationItem : undefined,
+              preOrderServiceItem : undefined,
+              preOrderMedicationItem : undefined,
+              preOrderConsumableItem : undefined,
               ...o,
             }
           })
@@ -249,4 +322,3 @@ const PendingPreOrder: React.FC = (props: any) => {
 }
 
 export default connect(({ codetable, user }) => ({ codetable, user }))(PendingPreOrder)
-// export default withStyles(styles)(PreOrder)
