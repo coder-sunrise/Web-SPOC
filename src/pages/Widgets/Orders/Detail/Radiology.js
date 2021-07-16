@@ -18,6 +18,7 @@ import {
   FastField,
   Field,
   Tooltip,
+  FieldSet
 } from '@/components'
 import { currencySymbol } from '@/utils/config'
 import Authorized from '@/utils/Authorized'
@@ -58,10 +59,7 @@ const styles = (theme) => ({
     border: '1px solid rgba(0, 0, 0, 0.42)', fontSize: '0.85rem', padding: '3px 10px',
   },
   groupPanel: {
-    border: '1px solid rgba(0, 0, 0, 0.42)', position: 'relative', padding: 10, marginTop: 10, borderRadius: 5,
-  },
-  groupPanelTitle: {
-    fontSize: '0.85rem', position: 'absolute', top: '-10px', left: '10px', backgroundColor: 'white', padding: '0px 5px',
+    margin: '0px 5px', maxHeight: 170, overflowY: 'auto', overflowX: 'hidden'
   },
   checkServiceItem: {
     display: 'inline-block',
@@ -83,6 +81,13 @@ const styles = (theme) => ({
   },
   checkServiceCheckBox: {
     display: 'inline-block', marginRight: '-16px', position: 'absolute', top: '-3px', right: 0,
+  },
+  legend: {
+    width: 'fit-content',
+    fontSize: '0.85rem',
+    margin: `${theme.spacing(1)}px ${theme.spacing(1)}px 0px`,
+    padding: `0px ${theme.spacing(1)}px`,
+    fontWeight: 500
   },
 })
 
@@ -473,9 +478,8 @@ class Radiology extends PureComponent {
               />
             </GridItem>
             <GridItem xs={12}>
-              <div className={classes.groupPanel}>
-                <div className={classes.groupPanelTitle}>Service</div>
-                <div style={{ maxHeight: 170, overflowY: 'auto', overflowX: 'hidden' }}>
+              <FieldSet classes={this.props.classes} size='sm' title='Service' style={{ fontSize: '0.85rem' }}>
+                <div className={classes.groupPanel} >
                   {filterServices.map(r => {
                     return <div style={{ backgroundColor: editServiceId === r.value ? 'lightgreen' : 'white', borderColor: this.isValidate(r) ? '#99CC99' : 'red' }}
                       className={classes.checkServiceItem}
@@ -534,7 +538,7 @@ class Radiology extends PureComponent {
                     </div>
                   })}
                 </div>
-              </div>
+              </FieldSet>
             </GridItem>
             <GridItem xs={12}>
               <div>

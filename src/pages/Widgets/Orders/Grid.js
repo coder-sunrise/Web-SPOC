@@ -423,7 +423,12 @@ export default ({
       size='sm'
       style={{ margin: 0 }}
       forceRender
-      rows={rows}
+      rows={(rows || []).map(r => {
+        return {
+          ...r,
+          totalAfterItemAdjustment: (r.isPreOrder && !r.isChargeToday) ? 0 : r.totalAfterItemAdjustment
+        }
+      })}
       onRowDoubleClick={editRow}
       getRowId={(r) => r.uid}
       columns={[
@@ -467,7 +472,6 @@ export default ({
           },
           integrated: {
             calculator: (type, r, getValue) => {
-              console.log(type, r, getValue, subTotal)
               if (type === 'subTotal') {
                 return (
                   <span style={{ float: 'right', paddingRight: 70 }}>
@@ -742,7 +746,6 @@ export default ({
           columnName: 'totalAfterItemAdjustment',
           type: 'currency',
           width: 100,
-          render: (row) => <NumberInput value={(row.isPreOrder && !row.isChargeToday) ? 0 : row.totalAfterItemAdjustment} text currency />
         },
         {
           columnName: 'quantity',
