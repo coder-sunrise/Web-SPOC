@@ -139,6 +139,7 @@ export const formikMapPropsToValues = ({
     let doctorProfileFK
     let visitPurposeFK
     let roomAssignmentFK
+    let consReady
     let currentVisitOrderTemplateFK
     let defaultVistPreOrderItem = []
     let totalTempCharge
@@ -259,18 +260,22 @@ export const formikMapPropsToValues = ({
       } else if (visitEntries.referralPatientProfileFK) {
         referralType = 'Patient'
       }
-    } else if (
+    } else if (patientInfo && (
       patientInfo.referredBy === 'Company' ||
-      patientInfo.referredBy === 'Patient'
+      patientInfo.referredBy === 'Patient')
     ) {
       referralType = patientInfo.referredBy
     } else if (clinicSettings.settings.isVisitReferralSourceMandatory) {
       referralType = 'Company'
     }
 
+    if(visitRegistration.consReady === undefined)
+      consReady = true
+
     return {
       queueNo: qNo,
       visitPurposeFK,
+      consReady,
       roomFK: roomAssignmentFK || roomFK,
       visitStatus: VISIT_STATUS.WAITING,
       // doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
@@ -404,10 +409,15 @@ export const formikHandleSubmit = (
         dispatch({
           type: 'calendar/refresh',
         })
-      else
+      else{
+        dispatch({
+          type: 'queueLog/initState',
+        })
         dispatch({
           type: 'queueLog/refresh',
         })
+
+      }
       // reset form can not after onConfirm function.
       // bcz in NewVisit component have function 'componentWillUnmount'
       // there will use this.props.values when close registration visit page
