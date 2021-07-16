@@ -169,8 +169,7 @@ class PatientNurseNotes extends PureComponent {
       user,
     } = this.props
     const { clinicianProfile } = user.data
-
-    const modifyNotesAccessRight = Authorized.check('patientdatabase.patientprofiledetails.patienthistory.notes') || {rights: 'hidden'}
+    const modifyNotesAccessRight = Authorized.check('patientdatabase.patientprofiledetails.patienthistory.nursenotes') || {rights: 'hidden'}
     const isEditableNotes = modifyNotesAccessRight.rights === 'enable' ? true : false
 
     return (

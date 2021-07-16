@@ -15,7 +15,7 @@ const PatientNurseNotesContent = ({ canEdit, entity, handleEdit,isEditableNotes 
     createByUserRole = '',
   } = entity
 
-  const formateDate = moment(createDate).format('hh:mm A, DD MMM YYYY ')  //('DD MMM YYYY HH:mm')
+  const formateDate = moment(createDate).format('DD MMM YYYY HH:mm') 
   const createByUserFullName = `${createByUserTitle} ${createByUserName}`
   const html = htmlDecodeByRegExp(notes)
   return (
