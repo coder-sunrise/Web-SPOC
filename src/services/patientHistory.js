@@ -43,5 +43,9 @@ const fns = {
   saveReferralHistory: params => {
     return service.upsert(`${queueUrl}/ReferralHistory`, params)
   },
+
+  queryPersistentDiagnosis: params => {
+    return service.query(`${url}/PersistentDiagnosis`, params)
+  },
 }
 export default fns
