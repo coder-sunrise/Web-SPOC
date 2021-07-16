@@ -42,6 +42,7 @@ import LabTrackingDrawer from './LabTrackingDrawer'
 import Templates from './Templates'
 // utils
 import gpLayoutCfg, { dentalLayoutCfg } from './layoutConfigs'
+import { DIAGNOSIS_TYPE } from '@/utils/constants'
 
 // console.log(JSON.stringify(dentalLayoutCfg))
 const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
@@ -74,8 +75,9 @@ class Layout extends PureComponent {
 
     const { userDefaultLayout, clinicInfo, clinicSettings, consultation } = props
 
-    const { isEnableJapaneseICD10Diagnosis } = clinicSettings
+    const { isEnableJapaneseICD10Diagnosis, diagnosisDataSource } = clinicSettings
     this.isEnableJapaneseICD10Diagnosis = isEnableJapaneseICD10Diagnosis
+    this.diagnosisDataSource = diagnosisDataSource
 
     const { favouriteDiagnosisLanguage } = consultation
     this.favouriteDiagnosisLanguage = favouriteDiagnosisLanguage
@@ -932,7 +934,7 @@ class Layout extends PureComponent {
                         marginBottom: theme.spacing(1),
                       }}
                     >
-                      {this.isEnableJapaneseICD10Diagnosis === true && (
+                      {this.isEnableJapaneseICD10Diagnosis === true && this.diagnosisDataSource === DIAGNOSIS_TYPE['ICD10DIANOGSIS'] && (
                         <GridContainer>
                           <GridItem xs={12}>
                             <h5 style={{ fontWeight: 500, lineHeight: 1.3 }}>Favourite Diagnosis Language </h5>
