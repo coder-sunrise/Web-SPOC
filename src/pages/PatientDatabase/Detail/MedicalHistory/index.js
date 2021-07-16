@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import moment from 'moment'
 import Authorized from '@/utils/Authorized'
 import {
   GridContainer,
@@ -82,9 +83,18 @@ class MedicalHistory extends PureComponent {
                 style={{ margin: 0 }}
                 rows={this.state.persistentDiagnosis}
                 columns={[
-                  { name: 'icD10DiagnosisDescription', title: 'Diagnosis' },
-                  { name: 'icD10JpnDiagnosisDescription', title: 'Diagnosis(JP)' },
+                  { name: 'diagnosisDescription', title: 'Diagnosis' },
+                  { name: 'jpnDiagnosisDescription', title: 'Diagnosis(JP)' },
                   { name: 'onsetDate', title: 'Onset Date' },
+                ]}
+                columnExtensions={[
+                  {
+                    columnName: 'onsetDate',
+                    type: 'date',
+                    render: (text, row) => (
+                      <span>{moment(row.onsetDate).format('DD MMM YYYY HH:mm')}</span>
+                    ),
+                  }
                 ]}
                 FuncProps={{ pager: false }}
               />
