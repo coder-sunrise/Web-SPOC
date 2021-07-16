@@ -14,20 +14,7 @@ class AllergyGrid extends PureComponent {
 
   constructor (props) {
     super(props)
-    const { dispatch, type, codetable } = this.props
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctdrugallergy',
-      },
-    })
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctclinicdrugallergy',
-      },
-    })
-
+    const { type, codetable } = this.props
     const allergyList = [
       ...codetable.ctdrugallergy, 
       ...codetable.ctclinicdrugallergy
@@ -158,6 +145,7 @@ class AllergyGrid extends PureComponent {
     const { isEditable, rows, schema } = this.props
     return (
       <EditableTableGrid
+        forceRender
         rows={rows}
         schema={schema}
         FuncProps={{
