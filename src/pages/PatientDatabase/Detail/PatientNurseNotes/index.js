@@ -21,6 +21,8 @@ import {
 import { withStyles, TextField } from '@material-ui/core'
 // import model from './models'
 import PatientNurseNotesContent from './content'
+import { Timeline } from 'antd'
+import Authorized from '@/utils/Authorized'
 
 const styles = () => ({
   container: {
@@ -167,6 +169,8 @@ class PatientNurseNotes extends PureComponent {
       user,
     } = this.props
     const { clinicianProfile } = user.data
+    const modifyNotesAccessRight = Authorized.check('patientdatabase.patientprofiledetails.patienthistory.nursenotes') || {rights: 'hidden'}
+    const isEditableNotes = modifyNotesAccessRight.rights === 'enable' ? true : false
 
     return (
       <GridContainer>
@@ -182,10 +186,12 @@ class PatientNurseNotes extends PureComponent {
                     height: 'calc(100vh - 305px)',
                   }}
                 >
+                <Timeline style={{ marginLeft: 10, marginTop: 10 }}>
                   <div
                     style={{
-                      height: 'calc(100vh - 330px)',
-                      marginTop: '15px',
+                      height: 'calc(100vh - 350px)',
+                      marginTop: '25px',
+                      marginLeft: '20px',
                       overflow: 'scroll',
                     }}
                   >
@@ -197,15 +203,19 @@ class PatientNurseNotes extends PureComponent {
                           .utc()
                           .formatUTC(true) === moment().formatUTC(true)
                       return (
+                        <Timeline.Item style={{marginTop: 2 }}>
                         <PatientNurseNotesContent
                           entity={i}
                           dispatch={dispatch}
                           canEdit={canEdit}
                           handleEdit={this.handleEdit}
+                          isEditableNotes = {isEditableNotes}
                         />
+                        </Timeline.Item>
                       )
                     })}
                   </div>
+                  </Timeline>
                 </CardContainer>
               </div>
             </GridItem>
@@ -231,6 +241,7 @@ class PatientNurseNotes extends PureComponent {
                       return (
                         <div ref={this.divElement}>
                           <RichEditor
+                            disabled={!isEditableNotes}
                             strongLabel
                             autoFocus
                             onBlur={this.onEditorChange}
@@ -245,7 +256,7 @@ class PatientNurseNotes extends PureComponent {
             </GridItem>
 
             <GridItem md={12} style={{ textAlign: 'end' }}>
-              <Button color='primary' onClick={this.props.handleSubmit}>
+              <Button color='primary' onClick={this.props.handleSubmit} disabled={!isEditableNotes}>
                 Save
               </Button>
             </GridItem>

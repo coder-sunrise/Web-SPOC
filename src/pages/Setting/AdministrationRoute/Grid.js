@@ -5,12 +5,12 @@ import { CommonTableGrid, Button, Tooltip } from '@/components'
 
 class Grid extends PureComponent {
   editRow = (row, e) => {
-    const { dispatch, settingMedicationInteraction } = this.props
+    const { dispatch, settingAdministrationRoute } = this.props
 
-    const { list } = settingMedicationInteraction
+    const { list } = settingAdministrationRoute
 
     dispatch({
-      type: 'settingMedicationInteraction/updateState',
+      type: 'settingAdministrationRoute/updateState',
       payload: {
         showModal: true,
         entity: list.find((o) => o.id === row.id),
@@ -41,7 +41,7 @@ class Grid extends PureComponent {
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
-        type='settingMedicationInteraction'
+        type='settingAdministrationRoute'
         onRowDoubleClick={this.editRow}
         TableProps={{
           height,
@@ -74,7 +74,7 @@ class Grid extends PureComponent {
             width: 100,
             render: (row) => {
               return (
-                <Tooltip title='Edit Medication Interaction' placement='bottom'>
+                <Tooltip title='Edit Medication Contra-Indication' placement='bottom'>
                   <Button
                     size='sm'
                     onClick={() => {

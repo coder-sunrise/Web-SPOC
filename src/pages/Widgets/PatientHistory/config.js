@@ -175,7 +175,7 @@ export const categoryTypes = [
   },
   {
     value: WIDGETS_ID.NURSENOTES,
-    name: 'Nurse Notes',
+    name: 'Notes',
     authority:
       'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
   },

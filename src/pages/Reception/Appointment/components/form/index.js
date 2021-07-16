@@ -3,6 +3,7 @@ import * as Yup from 'yup'
 import { connect } from 'dva'
 import moment from 'moment'
 import classnames from 'classnames'
+import { Link } from 'umi'
 // formik
 import { Field } from 'formik'
 // material ui
@@ -16,6 +17,7 @@ import {
   SizeContainer,
   OutlinedTextField,
   withFormikExtend,
+  Button
 } from '@/components'
 // medisys components
 import { LoadingWrapper, Recurrence } from '@/components/_medisys'
@@ -25,6 +27,7 @@ import { getAppendUrl } from '@/utils/utils'
 import { APPOINTMENT_STATUS, APPOINTMENT_CANCELLEDBY } from '@/utils/constants'
 import { getBizSession } from '@/services/queue'
 import Authorized from '@/utils/Authorized'
+import PatientBanner from '@/pages/PatientDashboard/Banner'
 import AppointmentHistory from './AppointmentHistory'
 import PatientSearchModal from '../../PatientSearch'
 import DeleteConfirmation from './DeleteConfirmation'
@@ -35,6 +38,8 @@ import AppointmentDateInput from './AppointmentDate'
 import FormFooter from './FormFooter'
 import SeriesUpdateConfirmation from '../../SeriesUpdateConfirmation'
 import RescheduleForm from './RescheduleForm'
+import PreOrder from './PreOrder'
+import SelectPreOrder from './SelectPreOrder'
 // utils
 import {
   ValidationSchema,
@@ -62,6 +67,7 @@ const gridValidationSchema = Yup.object().shape({
     patient,
     patientSearch,
     global,
+    visitRegistration
   }) => ({
     loginSEMR,
     loading,
@@ -78,6 +84,7 @@ const gridValidationSchema = Yup.object().shape({
     appointmentStatuses: codetable.ltappointmentstatus,
     clinicianProfiles: codetable.clinicianprofile,
     patientSearchResult: patientSearch.list,
+    visitRegistration
   }),
 )
 @withFormikExtend({
@@ -103,10 +110,37 @@ class Form extends React.PureComponent {
     isDataGridValid: this.props.values.id !== undefined,
     editingRows: [],
     hasActiveSession: false,
+    showSelectPreOrder: false,
   }
 
-  componentDidMount () {
+  componentDidMount = async () => {
     const { values, dispatch } = this.props
+    const response = await dispatch({
+      type: 'visitRegistration/getVisitOrderTemplateList',
+      payload: {
+        pagesize: 9999,
+      },
+    })
+    if (response) {
+      const { data } = response
+      const templateOptions = data
+        .filter((template) => template.isActive)
+        .map((template) => {
+          return {
+            ...template,
+            value: template.id,
+            name: template.displayValue,
+          }
+        })
+
+      dispatch({
+        type: 'visitRegistration/updateState',
+        payload: {
+          visitOrderTemplateOptions: templateOptions,
+        },
+      })
+    }
+
     this.checkHasActiveSession()
     Promise.all([
       dispatch({
@@ -140,7 +174,6 @@ class Form extends React.PureComponent {
         }
       })
     } catch (error) {
-      console.log({ error })
     }
   }
 
@@ -529,7 +562,6 @@ class Form extends React.PureComponent {
         const formError = await validateForm(values)
 
         if (Object.keys(formError).length > 0) {
-          console.log({ formError })
           setSubmitting(false)
           return
         }
@@ -585,11 +617,10 @@ class Form extends React.PureComponent {
         }
       })
     } catch (error) {
-      console.log({ error })
     }
   }
 
-  onDeleteClick = () => {}
+  onDeleteClick = () => { }
 
   onValidateClick = () => {
     const appointmentStatus = this.props.appointmentStatuses.find(
@@ -664,7 +695,6 @@ class Form extends React.PureComponent {
         (t) => t.id === values.currentAppointment.id,
       )
 
-      console.log(originalAppointment)
       let newResource = Array.from(datagrid, (resource) => {
         let startTime = `${resource.startTime}:00`
         let endTime = `${resource.endTime}:00`
@@ -708,7 +738,6 @@ class Form extends React.PureComponent {
         originalResource = Array.from(
           originalAppointment.appointments_Resources,
           (resource) => {
-            console.log(resource)
             const {
               appointmentFK,
               clinicianFK,
@@ -801,7 +830,6 @@ class Form extends React.PureComponent {
         },
       )
     } catch (error) {
-      console.log({ error })
     }
   }
 
@@ -976,6 +1004,93 @@ class Form extends React.PureComponent {
     )
   }
 
+  openSelectPreOrder = () => {
+    this.setState({ showSelectPreOrder: true })
+  }
+
+  updatePreOrderSequence = (appointmentPreOrderItem = []) => {
+    let sequence = 0;
+    appointmentPreOrderItem.forEach(po => {
+      if (!po.isDeleted) {
+        po.sequence = sequence
+        sequence = sequence + 1
+      }
+    })
+  }
+
+  onSelectPreOrder = (selectPreOrder = []) => {
+    const { values, setFieldValue } = this.props
+    const { currentAppointment = {} } = values
+    let { appointmentPreOrderItem = [] } = currentAppointment
+    selectPreOrder.forEach(po => {
+      let currentPreOrder = appointmentPreOrderItem.find(apo => apo.actualizedPreOrderItemFK === po.id)
+      if (currentPreOrder) {
+        currentPreOrder.isDeleted = false
+      }
+      else {
+        const { id, ...resetPreOrderItem } = po
+        appointmentPreOrderItem = [...appointmentPreOrderItem, { ...resetPreOrderItem, actualizedPreOrderItemFK: id }]
+      }
+    })
+    this.updatePreOrderSequence(appointmentPreOrderItem)
+    setFieldValue("currentAppointment.appointmentPreOrderItem", [...appointmentPreOrderItem])
+    this.setState({ showSelectPreOrder: false })
+  }
+
+  closeSelectPreOrder = () => {
+    this.setState({ showSelectPreOrder: false })
+  }
+
+  checkedRecurrence = () => {
+    const { dispatch, values, setFieldValue } = this.props
+    const { currentAppointment = {} } = values
+    if ((currentAppointment.appointmentPreOrderItem || []).length) {
+      dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          openConfirmText: 'ok',
+          openConfirmContent: `Check Recurrence will remove all Pre-Order.`,
+          onConfirmSave: () => {
+            setFieldValue("currentAppointment.appointmentPreOrderItem", [])
+          },
+          onConfirmClose: () => {
+            setFieldValue('isEnableRecurrence', false)
+          }
+        },
+      })
+    }
+  }
+
+  showPreOrder = () => {
+    const { values, mode } = this.props
+    const { isEnableRecurrence, patientProfileFK } = values
+    const actualizePreOrderAccessRight = Authorized.check('appointment.actualizepreorder') || { rights: 'hidden' }
+    if (actualizePreOrderAccessRight.rights === 'hidden') return false
+    if (values.id) {
+      return mode !== 'series'
+    }
+    return patientProfileFK && !isEnableRecurrence
+  }
+
+  deletePreOrderItem = (actualizedPreOrderItemFK) => {
+    const { values, setFieldValue } = this.props
+    const { currentAppointment = {} } = values
+    let { appointmentPreOrderItem = [] } = currentAppointment
+
+    var item = appointmentPreOrderItem.find(poi => poi.actualizedPreOrderItemFK === actualizedPreOrderItemFK)
+    if (item) {
+      if (item.id) {
+        item.isDeleted = true
+      }
+      else {
+        appointmentPreOrderItem = [...appointmentPreOrderItem.filter(poi => poi.actualizedPreOrderItemFK !== actualizedPreOrderItemFK)]
+      }
+    }
+    this.updatePreOrderSequence(appointmentPreOrderItem)
+    setFieldValue("currentAppointment.appointmentPreOrderItem", [...appointmentPreOrderItem])
+  }
+
   render () {
     const {
       classes,
@@ -989,6 +1104,8 @@ class Form extends React.PureComponent {
       height,
       onHistoryRowSelected,
       patientProfile,
+      visitRegistration: { visitOrderTemplateOptions = [] },
+      dispatch,
     } = this.props
 
     const {
@@ -999,6 +1116,7 @@ class Form extends React.PureComponent {
       showRescheduleForm,
       datagrid,
       editingRows,
+      showSelectPreOrder,
     } = this.state
 
     const patientIsActive =
@@ -1006,7 +1124,8 @@ class Form extends React.PureComponent {
         ? patientProfile && patientProfile.isActive
         : true
 
-    const { currentAppointment = {} } = values
+    const { currentAppointment = {}, isEnableRecurrence } = values
+    const { appointmentPreOrderItem = [] } = currentAppointment
     const disablePatientInfo = this.shouldDisablePatientInfo()
     const disableFooterButton = this.shouldDisableButtonAction()
     const disableCheckAvailabilityFooterButton = this.shouldDisableCheckAvailabilityButtonAction()
@@ -1015,22 +1134,77 @@ class Form extends React.PureComponent {
     const _datagrid =
       conflicts.length > 0
         ? datagrid
-            .filter((item) => !item.isDeleted)
-            .sort(sortDataGrid)
-            .map((item, index) => ({ ...item, sortOrder: index }))
+          .filter((item) => !item.isDeleted)
+          .sort(sortDataGrid)
+          .map((item, index) => ({ ...item, sortOrder: index }))
         : [
-            ...datagrid,
-          ]
+          ...datagrid,
+        ]
 
     const show =
       loading.effects['patientSearch/query'] || loading.models.calendar
     const _disableAppointmentDate =
       this.shouldDisableAppointmentDate() || !patientIsActive
 
+    const { newPreOrderItem = [] } = patientProfile || {}
+    const draftPreOrderItem = [...newPreOrderItem.filter(po => !appointmentPreOrderItem.find(apo => !apo.isDeleted && apo.actualizedPreOrderItemFK === po.id)),
+    ...appointmentPreOrderItem.filter(apo => apo.isDeleted).map(apo => {
+      const { isDeleted, ...resetPreOrderItem } = apo
+      return { ...resetPreOrderItem, id: resetPreOrderItem.actualizedPreOrderItemFK }
+    })]
+
+    const actualizePreOrderAccessRight = Authorized.check('appointment.actualizepreorder') || { rights: 'hidden' }
+
     return (
       <LoadingWrapper loading={show} text='Loading...'>
         <SizeContainer size='sm'>
           <React.Fragment>
+            {values.patientProfileFK && <div style={{ marginTop: -20 }}>
+              <PatientBanner extraCmt={
+                <div style={{
+                display: 'flex',
+                alignItems: 'flex-end',
+                justifyContent: 'flex-end',
+                height: '100%',
+                paddingBottom: 10,
+              }}>
+                  {actualizePreOrderAccessRight.rights !== 'hidden' && <Link disabled={actualizePreOrderAccessRight.rights === 'disable'} >
+                    <span style={{ textDecoration: 'underline' }} onClick={(e) => {
+                      e.preventDefault()
+                      if (actualizePreOrderAccessRight.rights === 'disable') return
+                      if (draftPreOrderItem.length)
+                      {
+                        if (values.id && mode === 'series') {
+                          dispatch({
+                            type: 'global/updateAppState',
+                            payload: {
+                              openConfirm: true,
+                              isInformType: true,
+                              openConfirmText: 'ok',
+                              openConfirmContent: `Pre-Order is not allowed for entire series appointment.`,
+                            },
+                          })
+                          return
+                        }
+                        if (!values.id && isEnableRecurrence) {
+                          dispatch({
+                            type: 'global/updateAppState',
+                            payload: {
+                              openConfirm: true,
+                              isInformType: true,
+                              openConfirmText: 'ok',
+                              openConfirmContent: `Pre-Order is not allowed for recurring appointment.`,
+                            },
+                          })
+                          return
+                        }
+                        this.openSelectPreOrder()
+                      }
+                    }}>{`Pre-Order(${draftPreOrderItem.length})`}</span>
+                  </Link>
+                  }
+                </div>} />
+            </div>}
             <GridContainer
               className={classnames(classes.formContent)}
               alignItems='flex-start'
@@ -1061,7 +1235,7 @@ class Form extends React.PureComponent {
                     values={values}
                     hasActiveSession={this.state.hasActiveSession}
                   />
-                  <AppointmentDateInput disabled={_disableAppointmentDate} />
+                  <AppointmentDateInput disabled={_disableAppointmentDate} visitOrderTemplateOptions={visitOrderTemplateOptions} />
                   <GridItem xs md={12} className={classes.verticalSpacing}>
                     <AppointmentDataGrid
                       validationSchema={gridValidationSchema}
@@ -1081,7 +1255,7 @@ class Form extends React.PureComponent {
                         <OutlinedTextField
                           {...args}
                           disabled={disableDataGrid}
-                          rows='10'
+                          rows='2'
                           multiline
                           maxLength={2000}
                           label='Appointment Remarks'
@@ -1098,7 +1272,11 @@ class Form extends React.PureComponent {
                       handleRecurrencePatternChange={
                         this.onRecurrencePatternChange
                       }
+                      checkedRecurrence={this.checkedRecurrence}
                     />
+                  </GridItem>
+                  <GridItem xs md={12}>
+                    {this.showPreOrder() && <PreOrder {...this.props} deletePreOrderItem={this.deletePreOrderItem}></PreOrder>}
                   </GridItem>
                 </GridItem>
 
@@ -1189,6 +1367,14 @@ class Form extends React.PureComponent {
               maxWidth='sm'
             >
               <RescheduleForm onConfirmReschedule={this.onConfirmReschedule} />
+            </CommonModal>
+            <CommonModal
+              open={showSelectPreOrder}
+              title='Select Pre-Order'
+              onClose={this.closeSelectPreOrder}
+              maxWidth='lg'
+            >
+              <SelectPreOrder onSelectPreOrder={this.onSelectPreOrder} activePreOrderItem={draftPreOrderItem} />
             </CommonModal>
           </React.Fragment>
         </SizeContainer>

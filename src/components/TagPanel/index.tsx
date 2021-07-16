@@ -10,6 +10,7 @@ export interface TagPanelProps {
   tagCategory: 'Service' | 'Patient'
   onChange: (value: string[], tags: object[]) => void
   defaultTagNames: string[]
+  label: string
 }
 
 type Tag = {
@@ -25,6 +26,7 @@ const TagPanel: React.FC<TagPanelProps> = ({
   tagCategory,
   onChange,
   defaultTagNames = [],
+  label,
 }) => {
   const [inputVisible, setInputVisible] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -118,7 +120,7 @@ const TagPanel: React.FC<TagPanelProps> = ({
 
   return (
     <div>
-      <label>Tags: </label>
+      <label>{label} </label>
 
       {currentTagNames.map((tag, index) => {
         {

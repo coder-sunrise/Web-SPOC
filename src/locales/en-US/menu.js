@@ -169,6 +169,7 @@ export default {
   'menu.setting.genericmedication': 'Generic Medication',
   'menu.setting.medicationingredient': 'Drug Ingredient',
   'menu.setting.clinicdrugallergy': 'Drug Allergy',
+  'menu.setting.administrationroute': 'Route of Administration',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',
