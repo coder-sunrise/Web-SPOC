@@ -1104,13 +1104,6 @@ const calculateAmount = (
     activeRows.map(o => o[adjustedField]).reduce(sumReducer, 0),
   )
 
-  const { clinicSettings } = window.g_app._store.getState()
-  if (!clinicSettings || !clinicSettings.settings) {
-    // notification.error({
-    //   message: 'Could not load GST Setting',
-    // })
-    return
-  }
 
   if (gstValue) {
     if (isGSTInclusive) {
