@@ -7,6 +7,9 @@ export default {
   'visit.visitOrderTemplateFK': 'visitOrderTemplateFK',
   'visit.VisitOrderTemplateTotal': 'visitOrderTemplateTotal',
   'visit.salesPersonUserFK': 'salesPersonUserFK',
+  'visit.consReady': 'consReady',
+  'visit.visitGroup': 'visitGroup',
+  'visit.visitGroupRef': 'visitGroupRef',
 
   'vitalsign.temperatureC': 'temperatureC',
   'vitalsign.bpSysMMHG': 'bpSysMMHG',

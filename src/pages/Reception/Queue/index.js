@@ -83,6 +83,20 @@ const styles = theme => ({
   cardIconTitle: {
     color: 'black',
   },
+  switchContainer: {
+    lineHeight: '1em',
+    height: '100%',
+    color: 'currentColor',
+    borderRadius: 0,
+    '& .ant-switch-handle': {
+      width: 20,
+      height: 16,
+      '&::before': {
+        borderRadius: 3,
+        right: 2,
+      },
+    },
+  },
 })
 
 @connect(
@@ -315,12 +329,17 @@ class Queue extends React.Component {
     const { dispatch, queueLog } = this.props
     const { sessionInfo } = queueLog
     const { sessionNo } = sessionInfo
+    const hasWaitingVisitGroup = queueLog.list.find(q => q.visitGroup && q.visitStatus === VISIT_STATUS.WAITING)
+    
     dispatch({
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
         openConfirmTitle: '',
-        openConfirmContent: `End current session (${sessionNo})?`,
+        customWidth: hasWaitingVisitGroup ? 'md' : '',
+        openConfirmContent: hasWaitingVisitGroup 
+        ? [`Confirm to remove waiting patients' visit group and`,<br/>,`end current session (${sessionNo})?`] 
+        : `End current session (${sessionNo})?`,
         onConfirmSave: this.onConfirmEndSession,
       },
     })
@@ -688,6 +707,21 @@ class Queue extends React.Component {
     }, 3000)
   }
 
+  onQueueListing = (row) => {
+    const { dispatch } = this.props
+    const visitId = row.id
+    dispatch({
+      type: `${modelKey}updateQueueListing`,
+      payload: row,
+    }).then(r => {
+      if (r) {
+        dispatch({
+          type: `${modelKey}refresh`,
+        })
+      }
+    })
+  }
+  
   showSearchResult = (hasSearchQuery = false) => {
     const { patientSearchResult = [] } = this.props
     const totalRecords = patientSearchResult.length
@@ -891,6 +925,7 @@ class Queue extends React.Component {
                 // handleActualizeAppointment={this.handleActualizeAppointment}
                 onMenuItemClick={this.onMenuItemClick}
                 onContextMenu={this.onContextMenu}
+                onQueueListing={this.onQueueListing}
                 // handleFormsClick={this.showVisitForms}
                 history={history}
                 searchQuery={search}

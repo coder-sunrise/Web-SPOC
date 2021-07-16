@@ -14,8 +14,7 @@ class AllergyGrid extends PureComponent {
 
   constructor (props) {
     super(props)
-
-    const { type, codetable } = props
+    const { type, codetable } = this.props
     const allergyList = [
       ...codetable.ctdrugallergy, 
       ...codetable.ctclinicdrugallergy
@@ -26,7 +25,6 @@ class AllergyGrid extends PureComponent {
         }
       })
     ]
-    // console.log('allergyList',allergyList)
 
     // const compareDate = (a, b) =>
     //   a.toLocaleString().localeCompare(b.toLocaleString())
@@ -57,12 +55,16 @@ class AllergyGrid extends PureComponent {
           code: 'ctmedicationingredient',
           label: 'Allergy Name',
           autoComplete: true,
+          filterOption: (val, option) => {
+            let { rows } = this.props
+            return rows.filter((r) => !r.isDeleted).map((o) => o.ingredientFK).indexOf(option.value) < 0
+          },
           onChange: ({ val, option, row }) => {
             if (option) {
               let { rows } = this.props
               if (
                 rows.filter(
-                  (o) => !o.isDeleted && o.allergyFK === val && o.id !== row.id,
+                  (o) => !o.isDeleted && o.ingredientFK === val && o.id !== row.id,
                 ).length > 0
               ) {
                 notification.error({
@@ -82,6 +84,10 @@ class AllergyGrid extends PureComponent {
           label: 'Allergy Name',
           options: allergyList,
           autoComplete: true,
+          filterOption: (val, option) => {
+            let { rows } = this.props
+            return rows.filter((r) => !r.isDeleted).map((o) => o.allergyFK).indexOf(option.value) < 0
+          },
           onChange: ({ val, option, row }) => {
             if (option) {
               let { rows } = this.props
@@ -139,6 +145,7 @@ class AllergyGrid extends PureComponent {
     const { isEditable, rows, schema } = this.props
     return (
       <EditableTableGrid
+        forceRender
         rows={rows}
         schema={schema}
         FuncProps={{

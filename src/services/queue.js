@@ -41,3 +41,11 @@ export const queryAppointmentListing = (params) =>
     isCancelled: false,
     pagesize: 999,
   })
+
+export const updateQueueListing = async (params) => {
+  const response = await request(`${queueAPIUrl}/QueueListing`, {
+    method: 'PUT',
+    body: params,
+  })
+  return response
+}
