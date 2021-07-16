@@ -763,6 +763,7 @@ class Detail extends PureComponent {
                     name='ctService_Tag'
                     render={args => (
                       <TagPanel
+                        label='Tags:'
                         tagCategory='Service'
                         defaultTagNames={this.state.serviceTags}
                         {...args}
