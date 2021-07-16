@@ -127,7 +127,7 @@ const ApplyClaims = ({
     updatedInvoiceItems,
     setUpdatedInvoiceItems,
   ] = useState([
-    ...invoice.invoiceItems,
+    ...invoice.invoiceItems.filter(item => !item.isPreOrder || item.isChargeToday),
   ])
 
   const medisaveCopayer =
@@ -487,7 +487,7 @@ const ApplyClaims = ({
     }, 0)
     const newOutstandingBalance = roundTo(finalPayable - totalPaid)
     const newInvoiceItemsCopy = updateOriginalInvoiceItemList(
-      invoice.invoiceItems,
+      invoice.invoiceItems.filter(item => !item.isPreOrder || item.isChargeToday),
       temp,
     )
     updateInvoiceItems(newInvoiceItemsCopy)
@@ -523,7 +523,7 @@ const ApplyClaims = ({
     }, 0)
     const newOutstandingBalance = roundTo(finalPayable - totalPaid)
     const newInvoiceItemsCopy = updateOriginalInvoiceItemList(
-      invoice.invoiceItems,
+      invoice.invoiceItems.filter(item => !item.isPreOrder || item.isChargeToday),
       temp,
     )
 

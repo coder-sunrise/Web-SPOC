@@ -128,7 +128,7 @@ export default ({
   }
 
   const editRow = (row) => {
-    if (row.preOrderServiceItemFK) return
+    if (row.isPreOrderActualize) return
     if (!row.isActive && row.type !== '5' && !row.isDrugMixture) return
 
     if (row.type === '7' && from !== 'EditOrder') return
@@ -467,6 +467,7 @@ export default ({
           },
           integrated: {
             calculator: (type, r, getValue) => {
+              console.log(type, r, getValue, subTotal)
               if (type === 'subTotal') {
                 return (
                   <span style={{ float: 'right', paddingRight: 70 }}>
@@ -665,10 +666,12 @@ export default ({
             }
 
             return (
+              <div style={{ position: 'relative' }}>
               <div style={wrapCellTextStyle}>
                 <Tooltip title={texts}><span>{texts}</span></Tooltip>
                 {drugMixtureIndicator(row)}
-                {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'relative', marginLeft: 6, top: 2, borderRadius: 10 }}>Pre</Tag></Tooltip>}
+                  {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: -10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
+                </div>
               </div>
             )
           },
@@ -739,6 +742,7 @@ export default ({
           columnName: 'totalAfterItemAdjustment',
           type: 'currency',
           width: 100,
+          render: (row) => <NumberInput value={(row.isPreOrder && !row.isChargeToday) ? 0 : row.totalAfterItemAdjustment} text currency />
         },
         {
           columnName: 'quantity',
@@ -795,7 +799,7 @@ export default ({
                         (!row.isActive &&
                           row.type !== '5' &&
                           !row.isDrugMixture)
-                        || row.preOrderServiceItemFK
+                        || row.isPreOrderActualize
                       }
                     >
                       <Edit />
@@ -806,7 +810,8 @@ export default ({
                       size='sm'
                       color='danger'
                       justIcon
-                      disabled={isEditingEntity || row.preOrderServiceItemFK}
+                      disabled={isEditingEntity
+                        || row.isPreOrderActualize}
                     >
                       <Delete
                         onClick={() => {

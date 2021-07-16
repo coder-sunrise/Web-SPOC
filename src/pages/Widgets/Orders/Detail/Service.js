@@ -129,6 +129,7 @@ class Service extends PureComponent {
           'serviceFKNavigation.IsActive': true,
           'serviceCenterFKNavigation.IsActive': true,
           combineCondition: 'and',
+          apiCriteria: { NormalServiceCenter: true }
         },
       },
     }).then((list) => {
