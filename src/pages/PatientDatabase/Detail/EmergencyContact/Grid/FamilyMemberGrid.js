@@ -60,6 +60,7 @@ class FamilyMemberGrid extends PureComponent {
                     showOpenConfirmButton: false,
                     displayName: 'PatientDetail',
                     openConfirmContent:`You have unsaved changes, continue and save changes?`,
+                    confirmText:'Save',
                     onConfirm: () =>{
                       this.props.patient.submitCallback = closeThenReload.bind(this)
                       this.props.handleSubmit()
