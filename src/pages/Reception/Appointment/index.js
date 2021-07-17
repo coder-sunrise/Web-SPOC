@@ -610,6 +610,7 @@ class Appointment extends React.PureComponent {
       filter,
       selectedAppointmentFK,
       showSearchAppointmentModal,
+      eventType,
     } = this.state
 
     const { currentViewAppointment, mode, calendarView } = CalendarModel
@@ -695,7 +696,7 @@ class Appointment extends React.PureComponent {
           onClose={this.closeSeriesConfirmation}
           maxWidth='sm'
         >
-          <SeriesConfirmation onConfirmClick={this.editSeriesConfirmation} />
+          <SeriesConfirmation eventType={eventType} onConfirmClick={this.editSeriesConfirmation} />
         </CommonModal>
 
         <CommonModal
