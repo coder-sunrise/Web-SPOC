@@ -35,6 +35,7 @@ const isMatchRole = (clinicRoleFK, clinicRoleBitValue) => {
 const styles = (theme) => ({
   container: {
     marginBottom: theme.spacing(2),
+    height: 'auto !important' ,
   },
   verticalSpacing: {
     marginTop: theme.spacing(2),
