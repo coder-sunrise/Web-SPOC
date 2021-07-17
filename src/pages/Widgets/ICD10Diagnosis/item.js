@@ -43,7 +43,6 @@ const ICD10DiagnosisItem = ({
   const onDiagnosisChange = (v, op) => {
     const { values: vals, setValues } = form
     const { entity } = consultation
-
     if (op) {
       vals.corDiagnosis[index].icD10DiagnosisDescription = op.displayvalue
       vals.corDiagnosis[index].icD10DiagnosisCode = op.code
@@ -60,7 +59,6 @@ const ICD10DiagnosisItem = ({
       },
     })
   }
-
   const handelSaveDiagnosisAsFavourite = () => {
     saveDiagnosisAsFavourite(icD10DiagnosisCode, uid)
   }
@@ -291,7 +289,14 @@ const ICD10DiagnosisItem = ({
           <FastField
             name={`corDiagnosis[${index}].validityDays`}
             render={(args) => {
-              return <TextField label="Validity (Days)" {...args} />
+              return (
+              <TextField
+              label="Validity (Days)" 
+              onChange={({target})=> {
+                  form.setFieldValue(`corDiagnosis[${index}].validityDays`,(target.value || null))
+                }}
+              {...args} 
+              />)
             }}
           />
         </GridItem>
@@ -307,12 +312,5 @@ const ICD10DiagnosisItem = ({
     </Paper>
   )
 }
-
-// export default withFormik({
-//   validationSchema:Yup.object().shape({
-//   validityDays : Yup.string().required('Test1')
-//   }),
-//   mapPropsToValues:()=>({}),
-// })(ICD10DiagnosisItem)
 
 export default ICD10DiagnosisItem

@@ -45,6 +45,11 @@ const schema = Yup.object().shape({
         .max(999, VitalSignMessage.heightCM),
     }),
   ),
+  corDiagnosis: Yup.array().of(
+    Yup.object().shape({
+      validityDays :  Yup.number().min(1,'Number must be greater than 1').nullable(true),
+      })
+    ),
 
   // corDiagnosis: Yup.array().of(
   //   Yup.object().shape({
