@@ -29,49 +29,44 @@ const EditableCell = ({
   children,
   ...restProps
 }) => {
-  console.log('record', record)
-  console.log('dataIndex', dataIndex)
-  if (!record)
-    return (
-      <td {...restProps}>
-        <div>{children}</div>
-      </td>
-    )
-
-  if (dataIndex === 'operation' || dataIndex === 'range')
-    return (
-      <td {...restProps}>
-        <div>{children}</div>
-      </td>
-    )
-
-  return editing ? (
+  return (
     <td {...restProps}>
       <div>{children}</div>
-    </td>
-  ) : (
-    <td {...restProps}>
-      <div>{record[dataIndex]}</div>
     </td>
   )
 }
 
-const EditableTable = ({ initialData = [] }) => {
+const EditableTable = ({
+  initialData = [],
+  rule,
+  medicationUsageFK,
+  dispenseUomFK,
+  prescribeUomFK,
+}) => {
   const [form] = Form.useForm()
   const [data, setData] = useState(initialData)
   const [editingKey, setEditingKey] = useState('')
   const codetable = useSelector(s => s.codetable)
-  console.log('codetable', codetable)
-  console.log('codetable.ctmedicationdosage', codetable.ctmedicationdosage)
+
   const isEditing = record => record.key === editingKey
   const dispatch = useDispatch()
+
+  const getDisplayValue = (code, id) => {
+    if (id) {
+      const item = codetable[code].filter(c => c.id === id)[0]
+      if (item) {
+        return 'displayValue' in item ? item.displayValue : item.name
+      }
+    }
+
+    return ''
+  }
 
   useEffect(() => {
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctmedicationdosage',
-        force: true,
       },
     })
 
@@ -79,10 +74,26 @@ const EditableTable = ({ initialData = [] }) => {
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctmedicationfrequency',
-        force: true,
+      },
+    })
+
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctmedicationusage',
+      },
+    })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctmedicationunitofmeasurement',
       },
     })
   }, [])
+
+  useEffect(() => {
+    console.log('rule', rule)
+  }, [rule])
 
   const edit = record => {
     form.setFieldsValue({
@@ -116,18 +127,26 @@ const EditableTable = ({ initialData = [] }) => {
     }
   }
 
+  const ruleLabel = {
+    age: 'By Age (Years)',
+    weight: 'By Weight (KG)',
+    default: 'Default',
+  }
   const columns = [
     {
-      title: 'By Weight (KG)',
+      title: ruleLabel[rule ?? 'default'],
       dataIndex: 'range',
       align: 'center',
       width: '18%',
       editable: true,
       render: (item = {}, record) => {
-        const editInProgess = isEditing(record)
+        const editing = isEditing(record)
+
+        if (rule === 'default') return <></>
+
         return (
           <>
-            {editInProgess ? (
+            {editing ? (
               <GridContainer gutter={4}>
                 <GridItem md={3}>
                   <Form.Item
@@ -146,7 +165,7 @@ const EditableTable = ({ initialData = [] }) => {
                       margin: 0,
                     }}
                   >
-                    <Select style={{ width: 100 }}>
+                    <Select style={{ width: 110 }}>
                       <Option value='less than'>less than</Option>
                       <Option value='to'>to</Option>
                       <Option value='more than'>more than</Option>
@@ -166,9 +185,7 @@ const EditableTable = ({ initialData = [] }) => {
               </GridContainer>
             ) : (
               <span>
-                {record.From}
-                {' less than '}
-                {record.to}
+                {`${record.range.from} ${record.range.operator} ${record.range.to}`}
               </span>
             )}
           </>
@@ -176,13 +193,15 @@ const EditableTable = ({ initialData = [] }) => {
       },
     },
     {
-      title: 'Consumption Method',
-      dataIndex: 'consumptionMethod',
+      title: 'Usage',
+      dataIndex: 'usage',
       align: 'center',
       editable: true,
       width: 180,
-      render: (item = {}, record) => {
-        return <span>Take</span>
+      render: () => {
+        return (
+          <span>{getDisplayValue('ctmedicationusage', medicationUsageFK)}</span>
+        )
       },
     },
     {
@@ -190,31 +209,52 @@ const EditableTable = ({ initialData = [] }) => {
       dataIndex: 'dosage',
       align: 'center',
       editable: true,
-      width: 150,
+      width: 120,
       render: (item = {}, record) => {
+        const editing = isEditing(record)
         return (
           <>
-            <Form.Item
-              name={['dosage']}
-              style={{
-                margin: 0,
-              }}
-              rules={[
-                {
-                  required: true,
-                  message: `*Required.`,
-                },
-              ]}
-            >
-              <Select
-                options={codetable.ctmedicationdosage?.map(item => {
-                  return { label: item.displayValue, value: item.id }
-                })}
-                maxLength={10}
-                placeholder='Dosage'
-              />
-            </Form.Item>
+            {editing ? (
+              <Form.Item
+                name={['dosage']}
+                style={{
+                  margin: 0,
+                }}
+                rules={[
+                  {
+                    required: true,
+                    message: `*Required.`,
+                  },
+                ]}
+              >
+                <Select
+                  options={codetable.ctmedicationdosage?.map(item => {
+                    return { label: item.displayValue, value: item.id }
+                  })}
+                  maxLength={10}
+                  placeholder='Dosage'
+                />
+              </Form.Item>
+            ) : (
+              <span>
+                {getDisplayValue('ctmedicationdosage', record.dosage)}
+              </span>
+            )}
           </>
+        )
+      },
+    },
+    {
+      title: 'Prescribe UOM',
+      dataIndex: 'prescribeUom',
+      align: 'center',
+      editable: true,
+      width: 180,
+      render: () => {
+        return (
+          <span>
+            {getDisplayValue('ctmedicationunitofmeasurement', prescribeUomFK)}
+          </span>
         )
       },
     },
@@ -223,23 +263,32 @@ const EditableTable = ({ initialData = [] }) => {
       dataIndex: 'frequency',
       align: 'center',
       editable: true,
-      width: 150,
+      width: 200,
       render: (item = {}, record) => {
+        const editing = isEditing(record)
         return (
-          <Form.Item
-            name={['frequency']}
-            style={{
-              margin: 0,
-            }}
-          >
-            <Select
-              options={codetable.ctmedicationfrequency?.map(item => {
-                return { label: item.displayValue, value: item.id }
-              })}
-              maxLength={10}
-              placeholder='Frequency'
-            />
-          </Form.Item>
+          <>
+            {editing ? (
+              <Form.Item
+                name={['frequency']}
+                style={{
+                  margin: 0,
+                }}
+              >
+                <Select
+                  options={codetable.ctmedicationfrequency?.map(item => {
+                    return { label: item.displayValue, value: item.id }
+                  })}
+                  maxLength={10}
+                  placeholder='Frequency'
+                />
+              </Form.Item>
+            ) : (
+              <span>
+                {getDisplayValue('ctmedicationfrequency', record.frequency)}
+              </span>
+            )}
+          </>
         )
       },
     },
@@ -248,20 +297,83 @@ const EditableTable = ({ initialData = [] }) => {
       dataIndex: 'duration',
       align: 'center',
       editable: true,
-      width: 100,
+      align: 'center',
+      width: 120,
       render: (item = {}, record) => {
-        return <Input type='number'></Input>
+        const editing = isEditing(record)
+        return (
+          <div style={{ display: 'flex' }}>
+            {editing ? (
+              <Form.Item
+                name={['duration']}
+                style={{
+                  margin: 0,
+                }}
+              >
+                <InputNumber
+                  style={{ width: 60, marginRight: 3 }}
+                  min={0}
+                  max={999}
+                ></InputNumber>
+              </Form.Item>
+            ) : (
+              <span>{record.duration}</span>
+            )}
+            <span
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              {record.duration == 1 ? 'day' : 'days'}{' '}
+            </span>
+          </div>
+        )
       },
     },
     {
       title: 'Dispense Qty',
-      dataIndex: 'dosage',
+      dataIndex: 'dispenseQty',
       align: 'center',
+      width: 110,
+      render: (item = {}, record) => {
+        const editing = isEditing(record)
+        return (
+          <>
+            {editing ? (
+              <Form.Item
+                name={['dispenseQty']}
+                style={{
+                  margin: 0,
+                }}
+              >
+                <InputNumber
+                  style={{ width: 60, marginRight: 3 }}
+                  min={0}
+                  max={999}
+                ></InputNumber>
+              </Form.Item>
+            ) : (
+              <span>{record.dispenseQty}</span>
+            )}
+          </>
+        )
+      },
     },
     {
       title: 'Dispense UOM',
-      dataIndex: 'dosage',
+      dataIndex: 'dispenseUom',
       align: 'center',
+      editable: true,
+      width: 180,
+      render: () => {
+        return (
+          <span>
+            {getDisplayValue('ctmedicationunitofmeasurement', dispenseUomFK)}
+          </span>
+        )
+      },
     },
     {
       title: 'Action',
@@ -336,20 +448,22 @@ const EditableTable = ({ initialData = [] }) => {
         rowClassName='editable-row'
         pagination={false}
       />
-      <Button
-        disabled={editingKey !== ''}
-        onClick={() => {
-          const newRecord = { key: -1 }
-          setData([...data, newRecord])
-          edit(newRecord)
-        }}
-        type='link'
-        style={{
-          marginBottom: 16,
-        }}
-      >
-        + NEW
-      </Button>
+      {(rule !== 'default' || data.length === 0) && (
+        <Button
+          disabled={editingKey !== ''}
+          onClick={() => {
+            const newRecord = { key: -1 }
+            setData([...data, newRecord])
+            edit(newRecord)
+          }}
+          type='link'
+          style={{
+            marginBottom: 16,
+          }}
+        >
+          + NEW
+        </Button>
+      )}
     </Form>
   )
 }

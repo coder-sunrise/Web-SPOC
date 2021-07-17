@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { List } from 'antd'
 import Select from '@/components/Antd/AntdSelect'
-import { useDispatch } from 'dva'
 import { formatMessage } from 'umi'
 import { PlusOutlined } from '@ant-design/icons'
 import Delete from '@material-ui/icons/Delete'
@@ -17,25 +15,34 @@ import {
 } from '@/components'
 import SectionHeader from './SectionHeader'
 import MultiLangCodeSelect from './MultiLangCodeSelect'
+import MultiLangCodeList from './MultiLangCodeList'
 
-const SelectList = ({
-  language,
-  label,
-  codeset,
-  header,
-  note = '',
-  isMultiLanguage,
-}) => {
-  const dispatch = useDispatch()
-  const [formattedCodes, setFormattedCodes] = useState([])
+const SelectList = props => {
+  const {
+    language,
+    label,
+    codeset,
+    header,
+    note = '',
+    isMultiLanguage,
+    onChange,
+    initialValue,
+    ...restPros
+  } = props
   const [currentSelected, setCurrentSelected] = useState(null)
-  const [codeList, setCodeLlist] = useState([])
+  const [listItems, setListItems] = useState([])
+
+  useEffect(() => {
+    if (initialValue) setListItems(initialValue)
+  }, [initialValue])
 
   const addItemToList = () => {
+    const newListItems = [...listItems]
+
     if (!currentSelected) return
 
     const isDuplicate =
-      codeList.findIndex(item => item.id === currentSelected.id) >= 0
+      listItems.findIndex(item => item === currentSelected.id) >= 0
 
     if (isDuplicate) {
       notification.error({
@@ -44,9 +51,10 @@ const SelectList = ({
       return
     }
 
-    if (currentSelected) {
-      setCodeLlist([...codeList, currentSelected])
-    }
+    newListItems.push(currentSelected.id)
+
+    setListItems(newListItems)
+    if (onChange) onChange(newListItems)
   }
 
   return (
@@ -76,40 +84,8 @@ const SelectList = ({
         </Button>
       </div>
 
-      <List
-        bordered
-        split={false}
-        locale={{
-          emptyText: <span></span>,
-        }}
-        style={{ height: 200, overflow: 'auto' }}
-        dataSource={codeList}
-        renderItem={(item, i) => (
-          <div style={{ padding: 10, display: 'flex' }}>
-            <span style={{ marginRight: 15, fontWeight: 200 }}>
-              {label} {i + 1}
-            </span>
-            <span style={{ flexGrow: 1 }}>
-              {item['displayValue' + language]}
-            </span>
-            <span>
-              <Tooltip title={`Remove ${label.toLowerCase()}`}>
-                <Button
-                  className='noPadding'
-                  color='danger'
-                  size='sm'
-                  id={item.id}
-                  justIcon
-                  rounded
-                  onClick={() => {}}
-                >
-                  <Delete />
-                </Button>
-              </Tooltip>
-            </span>
-          </div>
-        )}
-      ></List>
+      <MultiLangCodeList data={listItems} {...props} />
+
       <span
         style={{ fontStyle: 'italic', fontSize: '0.8rem', fontWeight: 400 }}
       >

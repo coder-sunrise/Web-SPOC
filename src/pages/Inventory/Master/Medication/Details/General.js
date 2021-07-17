@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { formatMessage } from 'umi'
 import { withStyles } from '@material-ui/core/styles'
 import { FastField } from 'formik'
@@ -20,11 +20,13 @@ import {
 import { AttachmentWithThumbnail } from '@/components/_medisys'
 import { MultiLangCodeSelect } from '../Components'
 import SharedContainer from '../../SharedContainer'
+import useTranslation from '@/utils/hooks/useTranslation'
 import Sdd from '../../Sdd'
+import DetailsContext from './DetailsContext'
 
 const styles = () => ({})
 
-const Detail = ({
+const General = ({
   medicationDetail,
   dispatch,
   setFieldValue,
@@ -32,20 +34,48 @@ const Detail = ({
   theme,
   hasActiveSession,
   clinicSettings,
-  language,
-  isMultiLanguage,
+  values,
+  attachment,
   ...props
 }) => {
   const [toggle, setToggle] = useState(false)
-  const { primaryPrintoutLanguage, secondaryPrintoutLanguage } = clinicSettings
-  const [languageLabel, setLanguageLabel] = useState('')
+  const {
+    primaryPrintoutLanguage,
+    isMultiLanguage,
+    currentLanguage,
+    languageLabel,
+  } = useContext(DetailsContext)
+  const [
+    translation,
+    getValue,
+    setTranslationValue,
+    setLanguage,
+    translationData,
+  ] = useTranslation(values.translationData || [], currentLanguage)
+
+  const entity = medicationDetail.entity
+
   const [attachments, setAttachments] = useState([])
+
   useEffect(() => {
-    setLanguageLabel(isMultiLanguage ? `(${language})` : '')
-  }, [language])
+    if (entity && entity.fileIndexFK) {
+      const attach = [
+        {
+          thumbnailIndexFK: entity.thumbnailIndexFK,
+          fileIndexFK: entity.fileIndexFK,
+          id: entity.fileIndexFK,
+        },
+      ]
+      setAttachments(attach)
+      setFieldValue(attach)
+      return
+    }
+  }, [entity])
+
   const toggleModal = () => {
     setToggle(!toggle)
   }
+
   const handleSelectSdd = row => {
     const { id, code, name } = row
     setToggle(!toggle)
@@ -59,7 +89,6 @@ const Detail = ({
     let updated = [...attachments]
 
     if (added) updated = [...updated, ...added]
-
     if (deleted)
       updated = updated.reduce((items, item) => {
         if (
@@ -92,7 +121,7 @@ const Detail = ({
                     id: 'inventory.master.medication.code',
                   })}
                   {...args}
-                  disabled={!props.values.isActive}
+                  disabled={!values.isActive}
                 />
               )
             }}
@@ -163,7 +192,7 @@ const Detail = ({
         <GridItem xs={12} md={4}>
           <GridContainer>
             <GridItem md={12} style={{ padding: 0 }}>
-              {primaryPrintoutLanguage === language ? (
+              {primaryPrintoutLanguage === currentLanguage ? (
                 <Field
                   name='indication'
                   render={args => {
@@ -177,6 +206,16 @@ const Detail = ({
                         multiline
                         rowsMax='5'
                         {...args}
+                        onChange={e =>
+                          args.form.setFieldValue(
+                            'translationData',
+                            setTranslationValue(
+                              'indication',
+                              e.target.value,
+                              currentLanguage,
+                            ),
+                          )
+                        }
                       />
                     )
                   }}
@@ -194,6 +233,16 @@ const Detail = ({
                         }
                         multiline
                         rowsMax='5'
+                        onChange={e =>
+                          args.form.setFieldValue(
+                            'translationData',
+                            setTranslationValue(
+                              'indication',
+                              e.target.value,
+                              currentLanguage,
+                            ),
+                          )
+                        }
                         {...args}
                       />
                     )
@@ -201,14 +250,26 @@ const Detail = ({
                 />
               )}
             </GridItem>
-            <GridItem md={12} style={{ padding: 0 }}>
-              <div style={{ fontWeight: 100, fontSize: '0.8rem' }}>
-                <span style={{ color: 'blue', fontStyle: 'italic' }}>
-                  Hint:
-                </span>
-                <span>パラセタモールは神のためのものです</span>
-              </div>
-            </GridItem>
+            {isMultiLanguage && (
+              <GridItem md={12} style={{ padding: 0 }}>
+                <div style={{ fontWeight: 100, fontSize: '0.8rem' }}>
+                  <span style={{ color: 'blue', fontStyle: 'italic' }}>
+                    Hint:
+                  </span>
+                  {currentLanguage === primaryPrintoutLanguage ? (
+                    <FastField
+                      name='indicationSecondary'
+                      render={args => <span>{args.field.value}</span>}
+                    ></FastField>
+                  ) : (
+                    <FastField
+                      name='indication'
+                      render={args => <span>{args.field.value}</span>}
+                    ></FastField>
+                  )}
+                </div>
+              </GridItem>
+            )}
           </GridContainer>
         </GridItem>
         <GridItem xs={12} md={4}>
@@ -273,13 +334,15 @@ const Detail = ({
         </GridItem>
         <GridItem xs={12} md={4}>
           <FastField
-            name='medicationIngredientFK'
+            name='medicationIngredients'
             render={args => (
               <CodeSelect
                 label={formatMessage({
                   id: 'inventory.master.medication.medicationIngredient',
                 })}
                 code='ctMedicationIngredient'
+                mode='multiple'
+                disableAll
                 {...args}
               />
             )}
@@ -380,7 +443,7 @@ const Detail = ({
         <GridItem xs={12} />
         <GridItem md={12}>
           <FastField
-            name='chas'
+            name='checkboxGroup'
             render={args => (
               <CheckboxGroup
                 style={{
@@ -414,7 +477,7 @@ const Detail = ({
                           },
                         },
                         {
-                          id: 'isDisplayedInleaflet',
+                          id: 'isDisplayInLeaflet',
                           name: 'Display in Leaflet',
                           layoutConfig: {
                             style: {},
@@ -465,7 +528,7 @@ const Detail = ({
                           },
                         },
                         {
-                          id: 'isDisplayedInleaflet',
+                          id: 'isDisplayInLeaflet',
                           name: 'Display in Leaflet',
                           layoutConfig: {
                             style: {},
@@ -528,4 +591,4 @@ const Detail = ({
 export default compose(
   withStyles(styles, { withTheme: true }),
   React.memo,
-)(Detail)
+)(General)

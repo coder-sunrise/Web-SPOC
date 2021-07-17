@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import { FastField, Field } from 'formik'
 import { compose } from 'redux'
@@ -13,6 +13,7 @@ import {
   CodeSelect,
   NumberInput,
 } from '@/components'
+import DetailsContext from './DetailsContext'
 import { SectionHeader, SelectList, AutoCalculateDosage } from '../Components'
 
 const styles = () => ({})
@@ -21,50 +22,22 @@ const Setting = ({
   classes,
   setFieldValue,
   showTransfer,
-  language,
-  isMultiLanguage,
   dispatch,
   global,
   ...props
 }) => {
-  const { medicationDetail, vaccinationDetail, theme } = props
-  const optionLabelLength = 40
-  const [languageLabel, setLanguageLabel] = useState('')
-  useEffect(() => {
-    setLanguageLabel(isMultiLanguage ? `(${language})` : '')
-    console.log('languageLabel', language)
-    console.log('mulitilang', isMultiLanguage)
-  }, [language])
+  const { medicationDetail, theme, values } = props
+  const {
+    medicationSideEffects,
+    medicationPrecautions,
+    medicationContraindications,
+    medicationInteractions,
+  } = values
 
-  const { ctmedicationprecaution, entity, config = {} } =
-    medicationDetail || vaccinationDetail
-  const entityData = entity || []
-  let addedItems = []
-  if (
-    entityData &&
-    entityData.inventoryMedication_MedicationPrecaution &&
-    entityData.inventoryMedication_MedicationPrecaution.length > 0
-  ) {
-    addedItems = entityData.inventoryMedication_MedicationPrecaution.map(
-      item => ({
-        medicationPrecautionFK: item.medicationPrecautionFK,
-        value: item.medicationPrecaution.name,
-      }),
-    )
-  }
-  const settingProps = {
-    items: ctmedicationprecaution || [],
-    addedItems,
-    classes,
-    label: 'Precaution',
-    limitTitle: formatMessage({
-      id: 'inventory.master.setting.precaution',
-    }),
-    limit: 3,
-    setFieldValue,
-    fieldName: 'inventoryMedication_MedicationPrecaution',
-    searchLabel: 'Precaution Name',
-  }
+  const optionLabelLength = 40
+  const { isMultiLanguage, languageLabel, currentLanguage } = useContext(
+    DetailsContext,
+  )
 
   return (
     <div
@@ -73,21 +46,31 @@ const Setting = ({
         margin: theme.spacing(1),
       }}
     >
-      <AutoCalculateDosage languageLabel={languageLabel}></AutoCalculateDosage>
+      <AutoCalculateDosage
+        languageLabel={languageLabel}
+        {...props}
+      ></AutoCalculateDosage>
       <GridContainer>
         <GridItem md={6}>
           <Field
-            name='precautionFK'
+            name='medicationPrecautions'
             render={args => (
               <SelectList
                 header={'Precaution' + languageLabel}
                 codeset='ctMedicationPrecaution'
-                language={language}
+                language={currentLanguage}
                 isMultiLanguage={isMultiLanguage}
+                initialValue={medicationPrecautions}
                 note='* ONLY THE TOP 3 PRECAUTIONS WILL BE DISPLAYED IN DRUG LABEL'
                 label={formatMessage({
                   id: 'inventory.master.medication.precaution',
                 })}
+                onChange={value =>
+                  setFieldValue(
+                    'medicationPrecautions',
+                    value.map(v => v),
+                  )
+                }
                 {...args}
               />
             )}
@@ -95,16 +78,23 @@ const Setting = ({
         </GridItem>
         <GridItem md={6}>
           <Field
-            name='sideEffectFK'
+            name='medicationSideEffects'
             render={args => (
               <SelectList
                 header={'Side Effect' + languageLabel}
                 codeset='ctMedicationSideEffect'
-                language={language}
+                language={currentLanguage}
                 isMultiLanguage={isMultiLanguage}
                 label={formatMessage({
                   id: 'inventory.master.medication.sideEffect',
                 })}
+                initialValue={medicationSideEffects}
+                onChange={value =>
+                  setFieldValue(
+                    'medicationSideEffects',
+                    value.map(v => v),
+                  )
+                }
                 {...args}
               />
             )}
@@ -112,16 +102,23 @@ const Setting = ({
         </GridItem>
         <GridItem md={6} style={{ marginTop: 20 }}>
           <Field
-            name='sideEffectFK'
+            name='medicationContraindications'
             render={args => (
               <SelectList
                 header={'Contraindication' + languageLabel}
                 codeset='ctMedicationContraIndication'
-                language={language}
+                language={currentLanguage}
                 isMultiLanguage={isMultiLanguage}
                 label={formatMessage({
                   id: 'inventory.master.medication.contraindication',
                 })}
+                initialValue={medicationContraindications}
+                onChange={value =>
+                  setFieldValue(
+                    'medicationContraindications',
+                    value.map(v => v),
+                  )
+                }
                 {...args}
               />
             )}
@@ -129,16 +126,23 @@ const Setting = ({
         </GridItem>
         <GridItem md={6} style={{ marginTop: 20 }}>
           <Field
-            name='medicationInteractionFK'
+            name='medicationInteractions'
             render={args => (
               <SelectList
                 header={'Interaction' + languageLabel}
                 codeset='ctMedicationInteraction'
-                language={language}
+                language={currentLanguage}
                 isMultiLanguage={isMultiLanguage}
                 label={formatMessage({
                   id: 'inventory.master.medication.interaction',
                 })}
+                initialValue={medicationInteractions}
+                onChange={value =>
+                  setFieldValue(
+                    'medicationInteractions',
+                    value.map(v => v),
+                  )
+                }
                 {...args}
               />
             )}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { connect } from 'dva'
 import { FastField } from 'formik'
 import { withStyles } from '@material-ui/core/styles'
@@ -15,6 +15,7 @@ import {
 import { UserOutlined, DownOutlined, LinkOutlined } from '@ant-design/icons'
 import {
   errMsgForOutOfRange as errMsg,
+  getTranslationValue,
   navigateDirtyCheck,
   roundTo,
 } from '@/utils/utils'
@@ -32,10 +33,11 @@ import { getBizSession } from '@/services/queue'
 import { AuthorizationWrapper } from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
 const { Secured } = Authorized
-import DetailPanel from './Detail'
+import General from './General'
 import Pricing from '../../Pricing'
 import Stock from '../../Stock'
 import Setting from './Setting'
+import DetailsContext, { DetailsContextProvider } from './DetailsContext'
 
 const styles = () => ({
   actionDiv: {
@@ -61,12 +63,10 @@ const CardTitle = ({ children }) => (
 )
 
 function validateIndication(item) {
-  const context = this.parent
+  const parent = this.parent
   return (
-    (!context.isMultiLanguage && context.indication) ||
-    (context.isMultiLanguage &&
-      context.indication &&
-      context.indicationSecondary)
+    (!parent.isMultiLanguage && parent.indication) ||
+    (parent.isMultiLanguage && parent.indication && parent.indicationSecondary)
   )
 }
 
@@ -92,19 +92,16 @@ const Detail = ({
     ...props,
   }
 
+  const { isMultiLanguage, setCurrentLanguage, currentLanguage } = useContext(
+    DetailsContext,
+  )
+
   useEffect(() => window.addEventListener('resize', resizeHandler))
   const [windowHeight, setWindowHeith] = useState(window.innerHeight)
   const [currentScrollPosition, setCurrentScrollPosition] = useState('general')
 
   const { clinicSettings } = props
-  const { primaryPrintoutLanguage, secondaryPrintoutLanguage } = clinicSettings
-  const [currentLanguage, setCurrentLanguage] = useState(
-    primaryPrintoutLanguage ?? 'EN',
-  )
 
-  const isMultiLanguage =
-    primaryPrintoutLanguage && secondaryPrintoutLanguage ? true : false
-  detailProps.isMultiLanguage = isMultiLanguage
   const resizeHandler = () => {
     setWindowHeith(window.innerHeight)
   }
@@ -270,7 +267,7 @@ const Detail = ({
             title={<CardTitle>General</CardTitle>}
             id='general'
           >
-            <DetailPanel {...detailProps} language={currentLanguage} />
+            <General {...detailProps} />
           </Card>
           <Card
             onMouseEnter={e => {
@@ -280,7 +277,7 @@ const Detail = ({
             id='setting'
             style={{ marginTop: 16 }}
           >
-            <Setting {...detailProps} language={currentLanguage} />
+            <Setting {...detailProps} />
           </Card>
           <Card
             onMouseEnter={e => {
@@ -329,6 +326,12 @@ const Detail = ({
     </React.Fragment>
   )
 }
+
+const DetailsWithProvider = props => (
+  <DetailsContextProvider>
+    <Detail {...props}></Detail>
+  </DetailsContextProvider>
+)
 export default compose(
   withStyles(styles, { withTheme: true }),
   connect(({ medication, medicationDetail, clinicSettings }) => ({
@@ -339,7 +342,7 @@ export default compose(
   withFormikExtend({
     enableReinitialize: true,
     mapPropsToValues: ({ medicationDetail, clinicSettings }) => {
-      const returnValue = medicationDetail.entity
+      const medicationDetails = medicationDetail.entity
         ? medicationDetail.entity
         : medicationDetail.default
       const {
@@ -348,26 +351,77 @@ export default compose(
       } = clinicSettings
       const isMultiLanguage =
         primaryPrintoutLanguage && secondaryPrintoutLanguage ? true : false
-      let chas = []
+      let checkboxGroup = []
       const {
         isChasAcuteClaimable,
         isChasChronicClaimable,
         isMedisaveClaimable,
-      } = returnValue
+        isExclusive,
+        isDisplayInLeaflet,
+        isOnlyClinicInternalUsage,
+        inventoryMedication_MedicationIngredient,
+        inventoryMedication_MedicationSideEffect,
+        inventoryMedication_MedicationPrecaution,
+        inventoryMedication_MedicationContraIndication,
+        inventoryMedication_MedicationInteraction,
+      } = medicationDetails
       if (isChasAcuteClaimable) {
-        chas.push('isChasAcuteClaimable')
+        checkboxGroup.push('isChasAcuteClaimable')
       }
       if (isChasChronicClaimable) {
-        chas.push('isChasChronicClaimable')
+        checkboxGroup.push('isChasChronicClaimable')
       }
       if (isMedisaveClaimable) {
-        chas.push('isMedisaveClaimable')
+        checkboxGroup.push('isMedisaveClaimable')
+      }
+      if (isExclusive) {
+        checkboxGroup.push('isExclusive')
+      }
+      if (isDisplayInLeaflet) {
+        checkboxGroup.push('isDisplayInLeaflet')
+      }
+      if (isOnlyClinicInternalUsage) {
+        checkboxGroup.push('isOnlyClinicInternalUsage')
       }
 
+      let indicationSecondary
+      if (isMultiLanguage)
+        indicationSecondary = getTranslationValue(
+          medicationDetails.translationData,
+          secondaryPrintoutLanguage,
+          'indication',
+        )
+
+      let medicationIngredients = inventoryMedication_MedicationIngredient?.map(
+        item => item.medicationIngredientFK,
+      )
+
+      let medicationSideEffects = inventoryMedication_MedicationSideEffect
+        ?.sort(item => item.sequence)
+        .map(item => item.medicationSideEffectFK)
+
+      let medicationPrecautions = inventoryMedication_MedicationPrecaution
+        ?.sort(item => item.sequence)
+        .map(item => item.medicationPrecautionFK)
+
+      let medicationContraindications = inventoryMedication_MedicationContraIndication
+        ?.sort(item => item.sequence)
+        .map(item => item.medicationContraIndicationFK)
+
+      let medicationInteractions = inventoryMedication_MedicationInteraction
+        ?.sort(item => item.sequence)
+        .map(item => item.medicationInteractionFK)
+
       return {
-        ...returnValue,
+        ...medicationDetails,
+        medicationIngredients,
+        medicationSideEffects,
+        medicationPrecautions,
+        medicationContraindications,
+        medicationInteractions,
         isMultiLanguage,
-        chas,
+        indicationSecondary,
+        checkboxGroup,
         sddCode: medicationDetail.sddCode,
         sddDescription: medicationDetail.sddDescription,
       }
@@ -426,7 +480,18 @@ export default compose(
     }),
 
     handleSubmit: (values, { props, resetForm }) => {
-      const { id, medicationStock, effectiveDates, ...restValues } = values
+      const {
+        id,
+        medicationStock,
+        effectiveDates,
+        attachment,
+        medicationIngredients = [],
+        medicationSideEffects = [],
+        medicationPrecautions = [],
+        medicationInteractions = [],
+        medicationContraindications = [],
+        ...restValues
+      } = values
       const { dispatch, history, onConfirm, medicationDetail } = props
 
       let defaultMedicationStock = medicationStock
@@ -441,29 +506,98 @@ export default compose(
         ]
       }
 
-      let chas = {
+      let checkboxGroup = {
         isChasAcuteClaimable: false,
         isChasChronicClaimable: false,
         isMedisaveClaimable: false,
+        isExclusive: false,
+        isDisplayInLeaflet: false,
+        isOnlyClinicInternalUsage: false,
       }
-      values.chas.forEach(o => {
-        if (o === 'isChasAcuteClaimable') {
-          chas[o] = true
-        } else if (o === 'isChasChronicClaimable') {
-          chas[o] = true
-        } else if (o === 'isMedisaveClaimable') {
-          chas[o] = true
-        }
+      values.checkboxGroup.forEach(o => {
+        checkboxGroup[o] = true
       })
+
+      const fileInfo = {}
+      if (attachment) {
+        const newAttach = attachment.filter(
+          a => !a.isDeleted && a.fileIndexFK === undefined,
+        )[0]
+        fileInfo.fileIndexFK = newAttach?.id
+        fileInfo.fileName = newAttach?.fileName
+      }
+
+      let medicationIngredientList = undefined
+      const allOptionId = -99
+
+      if (medicationIngredients) {
+        medicationIngredientList = medicationIngredients
+          .filter(m => m !== allOptionId)
+          .map(m => {
+            return { medicationIngredientFK: m, inventoryMedicationFK: id }
+          })
+      }
+
+      let sideEffectList = undefined
+      if (medicationSideEffects) {
+        sideEffectList = medicationSideEffects.map((item, index) => {
+          return {
+            medicationSideEffectFK: item,
+            sequence: index,
+            inventoryMedicationFK: id,
+          }
+        })
+      }
+
+      let precautionList = undefined
+      if (medicationPrecautions) {
+        precautionList = medicationPrecautions.map((item, index) => {
+          return {
+            medicationPrecautionFK: item,
+            sequence: index,
+            inventoryMedicationFK: id,
+          }
+        })
+      }
+
+      let contraIndicationList = undefined
+      if (medicationContraindications) {
+        contraIndicationList = medicationContraindications.map(
+          (item, index) => {
+            return {
+              medicationContraIndicationFK: item,
+              sequence: index,
+              inventoryMedicationFK: id,
+            }
+          },
+        )
+      }
+
+      let interactionList = undefined
+      if (medicationInteractions) {
+        interactionList = medicationInteractions.map((item, index) => {
+          return {
+            medicationInteractionFK: item,
+            sequence: index,
+            inventoryMedicationFK: id,
+          }
+        })
+      }
 
       const payload = {
         ...restValues,
-        ...chas,
+        ...checkboxGroup,
+        ...fileInfo,
         id,
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
         medicationStock: defaultMedicationStock,
         suggestSellingPrice: roundTo(restValues.suggestSellingPrice),
+        inventoryMedication_MedicationIngredient: medicationIngredientList,
+        inventoryMedication_MedicationSideEffect: sideEffectList,
+        inventoryMedication_MedicationPrecaution: precautionList,
+        inventoryMedication_MedicationContraIndication: contraIndicationList,
+        inventoryMedication_MedicationInteraction: interactionList,
       }
 
       dispatch({
@@ -483,4 +617,4 @@ export default compose(
 
     displayName: 'InventoryMedicationDetail',
   }),
-)(Secured('inventorymaster.medication')(Detail))
+)(Secured('inventorymaster.medication')(DetailsWithProvider))

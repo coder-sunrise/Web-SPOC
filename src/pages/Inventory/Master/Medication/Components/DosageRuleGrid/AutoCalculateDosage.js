@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react'
-import { List, Radio } from 'antd'
+import { List, Radio, InputNumber } from 'antd'
 import { formatMessage } from 'umi'
-import { FastField } from 'formik'
+import { FastField, Field, withFormik } from 'formik'
 import { GridContainer, GridItem, CodeSelect, NumberInput } from '@/components'
 import SectionHeader from '../SectionHeader'
 import EditableTable from './DosageRule'
 
-const AutoCalculateDosage = ({ languageLabel }) => {
+const AutoCalculateDosage = ({ languageLabel, values }) => {
+  const { ruleType } = values
+
+  useEffect(() => {
+    console.log('values', values)
+  }, [values.ruleType])
+
   const optionLabelLength = 40
   return (
     <GridContainer>
@@ -37,7 +43,7 @@ const AutoCalculateDosage = ({ languageLabel }) => {
       </GridItem>
       <GridItem md={3}>
         <FastField
-          name='prescribingUOMFK'
+          name='prescribeUomFK'
           render={args => (
             <CodeSelect
               label={formatMessage({
@@ -52,7 +58,7 @@ const AutoCalculateDosage = ({ languageLabel }) => {
       </GridItem>
       <GridItem md={3}>
         <FastField
-          name='dispensingUOMFK'
+          name='dispenseUomFK'
           render={args => (
             <CodeSelect
               label={formatMessage({
@@ -84,7 +90,7 @@ const AutoCalculateDosage = ({ languageLabel }) => {
           </GridItem>
           <GridItem>
             <FastField
-              name='prescribingUOMFK'
+              name='prescribeUomFK'
               render={args => (
                 <CodeSelect
                   style={{ marginTop: 15 }}
@@ -104,7 +110,7 @@ const AutoCalculateDosage = ({ languageLabel }) => {
           </GridItem>
           <GridItem>
             <FastField
-              name='dispensingUOMFK'
+              name='dispenseUomFK'
               render={args => (
                 <CodeSelect
                   style={{ marginTop: 15 }}
@@ -124,14 +130,33 @@ const AutoCalculateDosage = ({ languageLabel }) => {
         <SectionHeader style={{ display: 'inline-flex', marginRight: 20 }}>
           Instruction Setting
         </SectionHeader>
-        <Radio.Group onChange={() => {}} value={1}>
-          <Radio value={1}>Default</Radio>
-          <Radio value={2}>by Age</Radio>
-          <Radio value={3}>by Weight</Radio>
-        </Radio.Group>
+        <FastField
+          name='ruleType'
+          render={args => (
+            <Radio.Group
+              onChange={e =>
+                args.form.setFieldValue('ruleType', e.target.value)
+              }
+            >
+              <Radio value='default'>Default</Radio>
+              <Radio value='age'>by Age</Radio>
+              <Radio value='weight'>by Weight</Radio>
+            </Radio.Group>
+          )}
+        />
       </GridItem>
       <GridItem md={12}>
-        <EditableTable />
+        <Field
+          name='dosageRules'
+          render={args => (
+            <EditableTable
+              rule={ruleType}
+              medicationUsageFK={values.medicationUsageFK}
+              dispenseUomFK={values.dispenseUomFK}
+              prescribeUomFK={values.prescribeUomFK}
+            />
+          )}
+        />
       </GridItem>
     </GridContainer>
   )
