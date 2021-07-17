@@ -81,7 +81,6 @@ class Diagnosis extends PureComponent {
       currentSelectCategory = [ 'all', ...currentSelectCategory ]
     }
     this.arrayHelpers.push({
-      onsetDate: moment(),
       uid: getUniqueGUID(),
       sequence: index,
       isNew: true,
