@@ -5,6 +5,7 @@ import { Paper } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete'
 import moment from 'moment'
 import * as Yup from 'yup'
+import { Alert } from 'antd'
 import {
   Button,
   GridContainer,
@@ -34,6 +35,8 @@ const ICD10DiagnosisItem = ({
   const [ show, setShow ] = useState(false)
 
   const [ showPersistMsg, setShowPersistMsg ] = useState(false)
+
+  const [ persistMsg, setPersitMsg ] = useState('')
 
   const { form } = arrayHelpers
 
@@ -67,26 +70,7 @@ const ICD10DiagnosisItem = ({
   return (
     <Paper className={classes.diagnosisRow}>
       <GridContainer>
-        <GridItem xs={6}>
-          <span style={{ color: 'green', bottom: 0 }}> {favouriteDiagnosisMessage}</span>
-        </GridItem>
-        <GridItem xs={6}>
-          {showPersistMsg === true ? (
-            <div
-              style={{
-                fontSize: '0.9em',
-                bottom: 2,
-                left: 50,
-              }}
-            >
-              Diagnosis will be removed from patient's medical problem
-            </div>
-          ) : (
-            ''
-          )}
-        </GridItem>
-
-        <GridItem xs={6} style={{ paddingRight: 35 }}>
+        <GridItem xs={5}>
           <Field
             name={`corDiagnosis[${index}].icD10DiagnosisFK`}
             render={(args) => (
@@ -106,31 +90,38 @@ const ICD10DiagnosisItem = ({
             )}
           />
         </GridItem>
-
-        <GridItem xs={5} style={{ paddingLeft: 120 }}>
-          <div>
-            <FastField
-              name={`corDiagnosis[${index}].isPersist`}
-              render={(args) => {
-                return (
-                  <Checkbox
-                    inputLabel="Persist"
-                    {...args}
-                    onChange={({ target }) => {
-                      if (target.value === false && !form.values.corDiagnosis[index].isNew) {
-                        setShowPersistMsg(true)
-                      } else {
-                        setShowPersistMsg(false)
-                      }
-                    }}
-                  />
-                )
-              }}
-            />
-          </div>
+        <GridItem xs={5} style={{ right: 50, bottom: 100 }} >
+        {favouriteDiagnosisMessage && (
+          <Alert
+            message={favouriteDiagnosisMessage}
+            type="warning"
+            style={{
+              whiteSpace: 'nowrap',
+              textOverflow: 'ellipsis',
+              display: 'inline-block',
+              overflow: 'hidden',
+              lineHeight: '25px',
+              fontSize: '0.85rem',
+            }}
+          />
+        )}
+        {showPersistMsg && (
+          <Alert
+            message={persistMsg}
+            type="warning"
+            style={{
+              position: 'relative',
+              whiteSpace: 'nowrap',
+              textOverflow: 'ellipsis',
+              display: 'inline-block',
+              overflow: 'hidden',
+              lineHeight: '20px',
+              fontSize: '0.85rem',
+            }}
+          />
+        )}
         </GridItem>
-
-        <GridItem xs={1} style={{ position: 'relative' }}>
+        <GridItem xs={1} style={{ position: 'relative', right: -50 }}>
           <Popover
             content={
               <div
@@ -231,22 +222,48 @@ const ICD10DiagnosisItem = ({
               return (
                 <DatePicker
                   label="Onset Date"
-                  allowClear={false}
                   {...args}
-                  // onChange={(value) => {
-                  //   const { setFieldValue } = form
-                  //   // if (value === '') setFieldValue(`corDiagnosis[${index}].onsetDate`, moment())
-                  // }}
                 />
               )
             }}
           />
         </GridItem>
-        <GridItem xs={5} style={{ paddingLeft: 20, marginTop: 20 }}>
+        <GridItem xs={1} >
+          <div>
+            <FastField
+              name={`corDiagnosis[${index}].isPersist`}
+              render={(args) => {
+                return (
+                  <Checkbox
+                    inputLabel="Persist"
+                    {...args}
+                    onChange={({ target }) => {
+                      if (target.value) {
+                        setShowPersistMsg(true)
+                        setPersitMsg('Diagnosis added from patient’s persistent diagnosis')
+                        setTimeout(() => {
+                          setShowPersistMsg(false)
+                        }, 3000)
+                      } else {
+                        setPersitMsg('Diagnosis removed to patient’s persistent diagnosis')
+                        setShowPersistMsg(true)
+                        setTimeout(() => {
+                          setShowPersistMsg(false)
+                        }, 3000)
+                      }
+                    }}
+                  />
+                )
+              }}
+            />
+          </div>
+        </GridItem>
+        <GridItem xs={5} >
           <Field
             name={`corDiagnosis[${index}].diagnosisType`}
             render={(args) => (
               <RadioGroup
+                label= 'Type'
                 options={diagnosisTypeOptions}
                 onChange={({ target }) => {
                   form.setFieldValue(`corDiagnosis[${index}].diagnosisType`, target.value)
@@ -256,7 +273,6 @@ const ICD10DiagnosisItem = ({
             )}
           />
         </GridItem>
-
         <GridItem xs={5}>
           <FastField
             name={`corDiagnosis[${index}].firstVisitDate`}
@@ -264,19 +280,14 @@ const ICD10DiagnosisItem = ({
               return (
                 <DatePicker
                   label="First Visit Date"
-                  allowClear={false}
                   {...args}
-                  onChange={(value) => {
-                    const { setFieldValue } = form
-                    if (value === '') setFieldValue(`corDiagnosis[${index}].firstVisitDate`, moment())
-                  }}
                 />
               )
             }}
           />
         </GridItem>
-
-        <GridItem xs={5} style={{ paddingLeft: 20 }}>
+        <GridItem xs={1}/>
+        <GridItem xs={5} >
           <FastField
             name={`corDiagnosis[${index}].validityDays`}
             render={(args) => {
@@ -296,5 +307,12 @@ const ICD10DiagnosisItem = ({
     </Paper>
   )
 }
+
+// export default withFormik({
+//   validationSchema:Yup.object().shape({
+//   validityDays : Yup.string().required('Test1')
+//   }),
+//   mapPropsToValues:()=>({}),
+// })(ICD10DiagnosisItem)
 
 export default ICD10DiagnosisItem

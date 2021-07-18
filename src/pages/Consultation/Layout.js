@@ -42,6 +42,7 @@ import LabTrackingDrawer from './LabTrackingDrawer'
 import Templates from './Templates'
 // utils
 import gpLayoutCfg, { dentalLayoutCfg } from './layoutConfigs'
+import { DIAGNOSIS_TYPE } from '@/utils/constants'
 
 // console.log(JSON.stringify(dentalLayoutCfg))
 const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
@@ -72,10 +73,8 @@ class Layout extends PureComponent {
     // console.log(localStorage.getItem('consultationLayout'))
     // console.log(JSON.parse(localStorage.getItem('consultationLayout') || '{}'))
 
-    const { userDefaultLayout, clinicInfo, clinicSettings, consultation } = props
+    const { userDefaultLayout, clinicInfo, consultation } = props
 
-    const { isEnableJapaneseICD10Diagnosis } = clinicSettings
-    this.isEnableJapaneseICD10Diagnosis = isEnableJapaneseICD10Diagnosis
 
     const { favouriteDiagnosisLanguage } = consultation
     this.favouriteDiagnosisLanguage = favouriteDiagnosisLanguage
@@ -503,7 +502,7 @@ class Layout extends PureComponent {
   render () {
     const { state, props } = this
     const { currentLayout } = state
-    const { classes, diagnosis, ...restProps } = props
+    const { classes, diagnosis,clinicSettings, ...restProps } = props
     const {
       theme,
       height,
@@ -516,6 +515,8 @@ class Layout extends PureComponent {
       status: 'consultation',
       rights,
     }
+
+    const { isEnableJapaneseICD10Diagnosis, diagnosisDataSource } = clinicSettings
 
     this.favouriteDiagnosisLanguage = diagnosis.favouriteDiagnosisLanguage
 
@@ -932,7 +933,7 @@ class Layout extends PureComponent {
                         marginBottom: theme.spacing(1),
                       }}
                     >
-                      {this.isEnableJapaneseICD10Diagnosis === true && (
+                      {isEnableJapaneseICD10Diagnosis === true && diagnosisDataSource === DIAGNOSIS_TYPE['ICD10DIANOGSIS'] && (
                         <GridContainer>
                           <GridItem xs={12}>
                             <h5 style={{ fontWeight: 500, lineHeight: 1.3 }}>Favourite Diagnosis Language </h5>
