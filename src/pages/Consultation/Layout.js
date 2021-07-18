@@ -30,6 +30,7 @@ import {
   GridContainer,
   GridItem,
   Select,
+  FastField,
 } from '@/components'
 // sub components
 import { control } from '@/components/Decorator'
@@ -76,8 +77,6 @@ class Layout extends PureComponent {
     const { userDefaultLayout, clinicInfo, consultation } = props
 
 
-    const { favouriteDiagnosisLanguage } = consultation
-    this.favouriteDiagnosisLanguage = favouriteDiagnosisLanguage
 
     let { defaultConsultationTemplate = '[]' } = clinicInfo
     // console.log(defaultConsultationTemplate)
@@ -490,11 +489,10 @@ class Layout extends PureComponent {
   }
 
   setLanguageVersion = (v) => {
-    this.favouriteDiagnosisLanguage = v
     this.props.dispatch({
       type: 'consultation/updateState',
       payload: {
-        favouriteDiagnosisLanguage: this.favouriteDiagnosisLanguage,
+        favouriteDiagnosisLanguage: v,
       },
     })
   }
@@ -517,8 +515,7 @@ class Layout extends PureComponent {
     }
 
     const { isEnableJapaneseICD10Diagnosis, diagnosisDataSource } = clinicSettings
-
-    this.favouriteDiagnosisLanguage = diagnosis.favouriteDiagnosisLanguage
+    const {favouriteDiagnosisLanguage} = diagnosis
 
     const layoutCfg = {
       className: classnames({
@@ -940,21 +937,23 @@ class Layout extends PureComponent {
                           </GridItem>
                           <GridItem xs={8}>
                             <Select
-                              label="Language"
-                              strongLabel
-                              value={this.favouriteDiagnosisLanguage}
-                              options={languageCategory}
-                              dropdownMatchSelectWidth={false}
-                              onChange={(v) => {
-                                this.setLanguageVersion(v)
-                              }}
-                            />
+                            label="Language"
+                            strongLabel
+                            labelField='name'
+                            value={favouriteDiagnosisLanguage}
+                            options={languageCategory}
+                            dropdownMatchSelectWidth={false}
+                            onChange={(v) => {
+                              this.setLanguageVersion(v)
+                            }}
+                            {...restProps}
+                          />
                           </GridItem>
                           <GridItem xs={3} style={{ marginTop: 15, marginLeft: 20 }}>
                             <ProgressButton
                               disabled={false}
                               onClick={() => {
-                                onSaveFavouriteDiagnosisLanguage(this.favouriteDiagnosisLanguage)
+                                onSaveFavouriteDiagnosisLanguage(favouriteDiagnosisLanguage)
                               }}
                             >
                               Save{' '}

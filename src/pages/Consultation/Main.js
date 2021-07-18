@@ -852,31 +852,17 @@ class Main extends React.Component {
       })
       .then((o) => {
         if (o) {
-          this.props
-            .dispatch({
-              type: 'consultation/getUserPreference',
-              payload: {
-                type: '8',
-              },
-            })
-            .then(
-              (response) => {
-                if (response) {
-                  const { favouriteDiagnosisLanguage: favouriteLanguage } = response
-                  this.props.dispatch({
-                    type: 'diagnosis/updateState',
-                    payload: {
-                      favouriteDiagnosisLanguage: favouriteLanguage,
-                    },
-                  })
-                }
-              },
-              notification.success({
-                message: 'My Favourite diagnosis language saved',
-              })
-            )
-        }
+          this.props.dispatch({
+            type: 'diagnosis/updateState',
+            payload: {
+            favouriteDiagnosisLanguage: consultation.favouriteDiagnosisLanguage,
+          },
+        })
+      }},
+      notification.success({
+        message: 'My Favourite diagnosis language saved',
       })
+      )
   }
 
   loadTemplate = (v) => {
