@@ -14,17 +14,13 @@ import AllergyGrid from './AllergyGrid'
 class Allergies extends PureComponent {
   state = {}
 
-  constructor (props) {
-    super(props)
-    this.fetchCodeTables()
-  }
 
   isDisableAllergy = () => {
     return (
       this.props.global.disableSave === true ||
       this.props.values.patientAllergy.filter(
         (o) =>
-          !o.isDeleted && (o.type === 'Allergy' || o.type === 'NonAllergy'),
+          !o.isDeleted && (o.type === 'Allergy' ||o.type === 'Ingredient' || o.type === 'NonAllergy'),
       ).length > 0
     )
   }
@@ -130,21 +126,6 @@ class Allergies extends PureComponent {
     })
   }
 
-  fetchCodeTables = () => {
-    const { dispatch } = this.props
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctdrugallergy',
-      },
-    })
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctclinicdrugallergy',
-      },
-    })
-  }
 
   render () {
     const { classes, dispatch, values, schema, ...restProps } = this.props

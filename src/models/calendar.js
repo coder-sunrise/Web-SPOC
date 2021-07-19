@@ -347,7 +347,7 @@ export default createListViewModel({
             type: 'cachePayload',
             payload,
           })
-          return true
+          return data
         }
         return false
       },

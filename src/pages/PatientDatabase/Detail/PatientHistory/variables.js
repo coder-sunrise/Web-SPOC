@@ -81,7 +81,7 @@ export const PatientHistoryTabOption = (props) => {
     },
     {
       id: PATIENT_HISTORY_TABS.NURSENOTES,
-      name: 'Nurse Notes',
+      name: 'Notes',
       content: addContent(PATIENT_HISTORY_TABS.NURSENOTES, props),
       authority: [
         'patientdatabase.patientprofiledetails.patienthistory.nursenotes',

@@ -38,7 +38,8 @@ const STYLES = (theme) => ({
   },
   timePickerContainer: {
     width: '100%',
-    '& > input': {
+    backgroundColor: 'transparent',
+      '& > input': {
       // erase all border, and box-shadow
       border: 'none',
       boxShadow: 'none !important',
@@ -148,7 +149,7 @@ class AntdTimePicker extends PureComponent {
 
   handleFocus = (e) => {
     const { onFocus, onOpenChange } = this.props
-
+    this.setState({ shrink: true })
     if (onFocus) onFocus(e)
     // setTimeout(() => {
     //   $(this.myRef.current).find('.ant-time-picker').trigger('click')
@@ -156,7 +157,9 @@ class AntdTimePicker extends PureComponent {
   }
 
   handleBlur = (e) => {
-    debounceKeydown.cancel()
+    const { field } = this.props
+    this.setState({ shrink : field.value !== undefined && field.value !== '' })
+    // debounceKeydown.cancel()
   }
 
   getComponent = ({ inputRef, ...props }) => {
@@ -190,6 +193,7 @@ class AntdTimePicker extends PureComponent {
         <TimePicker
           {...restProps}
           onFocus={this.handleFocus}
+          onBlur={this.handleBlur}
           className={classnames(classes.timePickerContainer)}
           // dropdownClassName={classnames(classes.dropdownMenu)}
           popupStyle={{ zIndex: 1400 }}

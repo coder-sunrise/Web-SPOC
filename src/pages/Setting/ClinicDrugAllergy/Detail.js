@@ -8,6 +8,7 @@ import {
   GridContainer,
   GridItem,
   TextField,
+  NumberInput,
   DateRangePicker,
 } from '@/components'
 
@@ -27,6 +28,7 @@ const styles = theme => ({})
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
+
 
     dispatch({
       type: 'settingClinicDrugAllergy/upsert',
@@ -90,6 +92,16 @@ class Detail extends PureComponent {
                       label2='End Date'
                       {...args}
                     />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={6}>
+              <FastField
+                name='sortOrder'
+                render={(args) => {
+                  return (
+                    <NumberInput label='Sort Order' precision={0} rowsMax={4} {...args} />
                   )
                 }}
               />

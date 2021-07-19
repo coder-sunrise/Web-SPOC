@@ -137,17 +137,9 @@ const ICD10DiagnosisSelect = ({
         }}
         {...selectProps}
       />
-      {clinicSettings.isEnableJapaneseICD10Diagnosis === true && (
-        <RadioGroup
-          style={{ ...filterStyle, top: 20, left: 380 }}
-          options={languageOptions}
-          onChange={onLanguageChange}
-          value={currentDiagnosisLanguage}
-        />
-      )}
       {from === 'Consultaion' &&
       selectDiagnosisCode && (
-        <div style={{ ...filterStyle, height: 28, top: 20, bottom: 0, right: -140 }}>
+        <div style={{ ...filterStyle, height: 28, top: 20, bottom: 0, right: -40 }}>
           {favouriteDiagnosis.find((d) => d === selectDiagnosisCode) ? (
             <Tooltip title="Click to remove favourite">
               <Star
@@ -169,6 +161,15 @@ const ICD10DiagnosisSelect = ({
             </Tooltip>
           )}
         </div>
+      )}
+      {clinicSettings.isEnableJapaneseICD10Diagnosis === true && (
+        <RadioGroup
+          label='Diagnosis Language'
+          style={{ ...filterStyle, left: 410 }}
+          options={languageOptions}
+          onChange={onLanguageChange}
+          value={currentDiagnosisLanguage}
+        />
       )}
     </div>
   )
