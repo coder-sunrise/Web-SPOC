@@ -2,6 +2,8 @@ import { history } from 'umi'
 import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
 import service from '@/services/patient'
+import { getUserPreference, saveUserPreference } from '@/services/user'
+import { USER_PREFERENCE_TYPE } from '@/utils/constants'
 import {
   getRemovedUrl,
   getAppendUrl,
@@ -89,9 +91,26 @@ export default createFormViewModel({
       default: defaultPatientEntity,
     },
     subscriptions: ({ dispatch, history }) => {
-      history.listen(async (loct) => {
-        const { query = {} } = loct
-
+      history.listen(async loct => {
+        const { query = {}, pathname } = loct
+        if(pathname === '/patient'){
+          dispatch({
+            type: 'getUserPreference',
+            payload: {
+              type: '4',
+            },
+          }).then((response)=>{
+            if(response){
+              const { favPatDBColumnSetting } = response
+              dispatch({
+                type: 'updateState',
+                payload: {
+                  favPatDBColumnSetting: favPatDBColumnSetting,
+                },
+              })
+            }
+          })
+        }
         setTimeout(() => {
           if (query.md === 'pt' && query.cmt) {
             dispatch({
@@ -351,6 +370,38 @@ export default createFormViewModel({
             },
           })
         }
+      },
+      *saveUserPreference ({ payload }, { call, put, select }) {
+        const r = yield call(saveUserPreference, {
+          userPreferenceDetails: JSON.stringify(payload.userPreferenceDetails),
+          itemIdentifier: payload.itemIdentifier,
+          type: payload.type,
+        })
+        if (r === 204) return true
+
+        return false
+      },
+      *getUserPreference ({ payload }, { call, put }) {
+        const r = yield call(getUserPreference, payload.type)
+        const { status, data } = r
+        if (status === '200') {
+          if (data) {
+            const parsedFavPatDBColumnSetting = JSON.parse(data)
+            let favPatDBColumnSetting
+            if (payload.type === '4') {
+              favPatDBColumnSetting = parsedFavPatDBColumnSetting.find(
+                (o) => o.Identifier === 'PatientDatabaseColumnSetting'
+              )
+            }
+        if (parsedFavPatDBColumnSetting.length > 0) {
+              const resultFavPatDBColumnSetting = {
+                favPatDBColumnSetting: favPatDBColumnSetting ? favPatDBColumnSetting.value : [],
+              }
+              return resultFavPatDBColumnSetting
+            }
+          }
+        }
+        return null
       },
     },
     reducers: {
