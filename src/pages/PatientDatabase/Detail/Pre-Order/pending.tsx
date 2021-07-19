@@ -1,6 +1,5 @@
 
 import React, { useState, useRef, useEffect } from 'react'
-import { useIntl, Link } from 'umi'
 import { connect } from 'dva'
 import moment from 'moment'
 import { currencySymbol } from '@/utils/config'
@@ -10,10 +9,7 @@ import {
   FastEditableTableGrid,
 } from '@/components'
 import Loading from '@/components/PageLoading/index'
-import service from '@/services/patient'
-import { getUniqueId } from '@/utils/utils'
 import { preOrderItemCategory } from '@/utils/codes'
-import { VISIT_TYPE_NAME } from '@/utils/constants'
 import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
 // interface IPendingPreOrderProps {
 // }
@@ -29,7 +25,9 @@ const PendingPreOrder: React.FC = (props: any) => {
 
   const modifyPreOrderAccessRight = Authorized.check('patientdatabase.modifypreorder') ||  {rights: 'hidden'}
 
-  const isEditable = modifyPreOrderAccessRight.rights === 'enable' ? true : false;
+  const isEditable = (row) => {
+    return modifyPreOrderAccessRight.rights === 'enable' && row.hasPaid === false ? true : false;
+  } 
 
   const commitChanges = ({ rows }) => {
     const { setFieldValue, values } = props
@@ -47,13 +45,15 @@ const PendingPreOrder: React.FC = (props: any) => {
 
   const initMedicationVaccintionsOptions = () => {
     const itemWrapper = (p: any, c: any) => {
-      const { code, displayValue, sellingPrice = 0, dispensingUOM = {} } = c
-      const { name: uomName = '' } = dispensingUOM
+      const { code, displayValue, sellingPrice = 0, dispensingUOM = {}, uom = {},unitPrice = 0 } = c
+      const { name : medAndVacUOM='' } = dispensingUOM
+      const { name : consumableUOM=''} = uom
+      let uomName = medAndVacUOM || consumableUOM || ''
+      let pricing = sellingPrice === 0 ? unitPrice === 0 ?  0 : unitPrice : sellingPrice
       let opt = {
         ...c,
-        combinDisplayValue: `${displayValue} - ${code} (${currencySymbol}${sellingPrice.toFixed(
-          2,
-        )} / ${uomName})`,
+        combinDisplayValue: `${displayValue} - ${code} (${currencySymbol}${pricing.toFixed(
+          2,)} / ${uomName})`,
       }
       return [...p, opt]
     }
@@ -177,13 +177,53 @@ const PendingPreOrder: React.FC = (props: any) => {
 
   const handelQuantityChanged = (e) => {
     const { row, value } = e
-    const { sourceCategory } = row
-    if (!sourceCategory) {
+    const { preOrderItemType } = row
+    if (!preOrderItemType) {
       return
     }
 
-    if (medications && sourceCategory === preOrderItemCategory[0].value) {
+    if (medications && preOrderItemType === preOrderItemCategory[0].value) {
       const item = medications.find((m) => m.id === row.sourceRecordFK)
+      if (item) {
+        const { sellingPrice } = item
+        row.amount = sellingPrice * value
+      }
+    }
+
+    if (consumables && preOrderItemType === preOrderItemCategory[1].value) {
+      const item = consumables.find((m) => m.id === row.sourceRecordFK)
+      if (item) {
+        const { sellingPrice } = item
+        row.amount = sellingPrice * value
+      }
+    }
+
+    if (vaccinations && preOrderItemType === preOrderItemCategory[2].value) {
+      const item = vaccinations.find((m) => m.id === row.sourceRecordFK)
+      if (item) {
+        const { sellingPrice } = item
+        row.amount = sellingPrice * value
+      }
+    }
+
+    if (services && preOrderItemType === preOrderItemCategory[3].value) {
+      const item = services.find((m) => m.id === row.sourceRecordFK)
+      if (item) {
+        const { sellingPrice } = item
+        row.amount = sellingPrice * value
+      }
+    }
+
+    if (labs && preOrderItemType === preOrderItemCategory[4].value) {
+      const item = labs.find((m) => m.id === row.sourceRecordFK)
+      if (item) {
+        const { sellingPrice } = item
+        row.amount = sellingPrice * value
+      }
+    }
+
+    if (radiology && preOrderItemType === preOrderItemCategory[5].value) {
+      const item = radiology.find((m) => m.id === row.sourceRecordFK)
       if (item) {
         const { sellingPrice } = item
         row.amount = sellingPrice * value
@@ -197,14 +237,14 @@ const PendingPreOrder: React.FC = (props: any) => {
 
   const tableParas = {
     columns: [
-      { name: 'preOrderItemType', title: 'Category' },
+      { name: 'preOrderItemType', title: 'Type' },
       { name: 'sourceRecordFK', title: 'Name' },
       { name: 'quantity', title: 'Quantity' },
-      { name: 'visitPurposeFK', title: 'Visit Type' },
       { name: 'orderByUserFK', title: 'Order By' },
       { name: 'orderDate', title: 'Order Date' },
       { name: 'remarks', title: 'Remarks' },
       { name: 'amount', title: 'Amount' },
+      { name: 'hasPaid', title: 'Paid'},
       { name: 'preOrderItemStatus', title: 'Status'},
     ],
     columnExtensions: [
@@ -216,7 +256,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         width: 180,
         options: () => preOrderItemCategory,
         onChange: handleCategoryChanged,
-        isDisabled :(row) =>  isEditable === true && row.id < 0 ? false : true 
+        isDisabled :(row) =>  isEditable(row) === true && row.id < 0 ? false : true 
       },
       {
         columnName: 'sourceRecordFK',
@@ -228,7 +268,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         render: (row,option)=>{
           return <div>{row.itemName }</div>
         },
-        isDisabled :() =>  isEditable ? false : true,
+        isDisabled :(row) =>  isEditable(row) ? false : true,
       },
       {
         columnName: 'quantity',
@@ -236,17 +276,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         precision: 2,
         width: 100,
         onChange: handelQuantityChanged,
-        isDisabled :() =>  isEditable ? false : true,
-      },
-      {
-        columnName: 'visitPurposeFK',
-        type: 'select',
-        width: 150,
-        labelField: 'displayName',
-        valueField: 'visitPurposeFK',
-        options: () => VISIT_TYPE_NAME,
-        sortingEnabled: false,
-        isDisabled :() =>  isEditable ? false : true,
+        isDisabled :(row) =>  isEditable(row) ? false : true,
       },
       {
         columnName: 'orderByUserFK',
@@ -267,13 +297,21 @@ const PendingPreOrder: React.FC = (props: any) => {
         columnName: 'remarks',
         maxLength: 100,
         sortingEnabled: false,
-        isDisabled :() =>  isEditable ? false : true,
+        isDisabled :() =>  modifyPreOrderAccessRight.rights === 'enable' ? false : true,
       },
       {
         columnName: 'amount',
         width: 100,
         type: 'currency',
-        isDisabled :() =>  isEditable ? false : true,
+        isDisabled :(row) =>  isEditable(row) ? false : true,
+      },
+      {
+        columnName: 'hasPaid',
+        width: 100,
+        isDisabled: () => true,
+        render:(row) => {
+          return row.hasPaid ? 'Yes' : 'No'
+        }
       },
       {
         columnName: 'preOrderItemStatus',
@@ -307,6 +345,7 @@ const PendingPreOrder: React.FC = (props: any) => {
               orderByUserFK: clinicianProfile?.userProfileFK,
               orderByUser: clinicianProfile?.userProfile.userName,
               preOrderItemStatus: 'New',
+              hasPaid: false,
               preOrderVaccinationItem : undefined,
               preOrderServiceItem : undefined,
               preOrderMedicationItem : undefined,

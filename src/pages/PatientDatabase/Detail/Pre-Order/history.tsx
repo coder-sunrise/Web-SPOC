@@ -13,19 +13,18 @@ interface IHistoryPreOrderProps {
 }
 
 const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props :any) => {
-  const {values,schema } = props
+  const {schema,patientPreOrderItem } = props
+  const {list} = patientPreOrderItem
 
   const getFilteredRows = (rows : any) => {
-    console.log('HistoryRow',rows.filter((c: { preOrderItemStatus: string }) => c.preOrderItemStatus === 'Actualized'))
     return rows.filter((c: { preOrderItemStatus: string }) => c.preOrderItemStatus === 'Actualized')
   }
 
   const tableParas = {
     columns: [
-      { name: 'preOrderItemType', title: 'Category' },
+      { name: 'preOrderItemType', title: 'Type' },
       { name: 'itemName', title: 'Name' },
       { name: 'quantity', title: 'Quantity' },
-      { name: 'visitPurposeFK', title: 'Visit Type' },
       { name: 'orderByUser', title: 'Order By' },
       { name: 'orderDate', title: 'Order Time' },
       { name: 'remarks', title: 'Remarks' },
@@ -52,16 +51,6 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props :any) => {
         type: 'number',
         precision: 2,
         width: 100,
-        isDisabled: () => true,
-      },
-      {
-        columnName: 'visitPurposeFK',
-        type: 'select',
-        width: 150,
-        labelField: 'displayName',
-        valueField: 'visitPurposeFK',
-        options: () => VISIT_TYPE_NAME,
-        sortingEnabled: false,
         isDisabled: () => true,
       },
       {
@@ -92,6 +81,9 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props :any) => {
         columnName: 'actualizedByUser',
         type: 'text',
         isDisabled: () => true,
+        render: (row) => {
+          return row.actualizedByUser ? row.actualizedByUser : '-'
+        },
       },
       {
         columnName: 'actualizedDate',
@@ -103,7 +95,7 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props :any) => {
 
   return <>
   <FastEditableTableGrid
-    rows={getFilteredRows(values.pendingPreOrderItem)}
+    rows={getFilteredRows(list)}
     schema={schema}
     EditingProps={{
       showCommandColumn: false,
