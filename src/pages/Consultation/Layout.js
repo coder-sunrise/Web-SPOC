@@ -30,7 +30,9 @@ import {
   GridContainer,
   GridItem,
   Select,
+  Field,
   FastField,
+  CodeSelect,
 } from '@/components'
 // sub components
 import { control } from '@/components/Decorator'
@@ -876,50 +878,50 @@ class Layout extends PureComponent {
                   </div>
                   <Divider light />
                   <div className={classes.fabDiv}>
-                    <Templates {...restProps} />
-                  </div>
+                  <h5
+                    style={{
+                      fontWeight: 500,
+                      lineHeight: 1.3,
+                      position: 'absolute',
+                    }}
+                  >
+                    Manage Layout
+                  </h5>
+                  <CustomInputWrapper
+                    label=""
+                    style={{ paddingTop: 25 }}
+                    strongLabel
+                    labelProps={{
+                      shrink: true,
+                    }}
+                  >
+                    <ProgressButton
+                      style={{ margin: theme.spacing(1, 0) }}
+                      onClick={() => {
+                        onSaveLayout(this.state.currentLayout)
+                      }}
+                    >
+                      Save Layout as My Favourite
+                    </ProgressButton>
+                    <ul
+                      style={{
+                        listStyle: 'square',
+                        paddingLeft: 16,
+                        fontSize: 'smaller',
+                      }}
+                    >
+                      <li>
+                        <p>Save current consultation layout as my favourite.</p>
+                      </li>
+                      <li>
+                        <p>System will use favourite layout for new consultation.</p>
+                      </li>
+                    </ul>
+                  </CustomInputWrapper>
+                </div>
                   <Divider light />
                   <div className={classes.fabDiv}>
-                    <h5
-                      style={{
-                        fontWeight: 500,
-                        lineHeight: 1.3,
-                        position: 'absolute',
-                      }}
-                    >
-                      Manage Layout
-                    </h5>
-                    <CustomInputWrapper
-                      label=""
-                      style={{ paddingTop: 25 }}
-                      strongLabel
-                      labelProps={{
-                        shrink: true,
-                      }}
-                    >
-                      <ProgressButton
-                        style={{ margin: theme.spacing(1, 0) }}
-                        onClick={() => {
-                          onSaveLayout(this.state.currentLayout)
-                        }}
-                      >
-                        Save as My Favourite
-                      </ProgressButton>
-                      <ul
-                        style={{
-                          listStyle: 'square',
-                          paddingLeft: 16,
-                          fontSize: 'smaller',
-                        }}
-                      >
-                        <li>
-                          <p>Save current consultation layout as my favourite.</p>
-                        </li>
-                        <li>
-                          <p>System will use favourite layout for new consultation.</p>
-                        </li>
-                      </ul>
-                    </CustomInputWrapper>
+                    <Templates {...restProps} />
                   </div>
                   <Divider light />
                   <div className={classes.fabDiv}>
@@ -936,10 +938,12 @@ class Layout extends PureComponent {
                             <h5 style={{ fontWeight: 500, lineHeight: 1.3 }}>Favourite Diagnosis Language </h5>
                           </GridItem>
                           <GridItem xs={8}>
-                            <Select
-                            label="Language"
-                            strongLabel
+                          <Field
+                          render={() => (
+                            <CodeSelect
+                            label="Diagnosis Language"
                             labelField='name'
+                            valueField='value'
                             value={favouriteDiagnosisLanguage}
                             options={languageCategory}
                             dropdownMatchSelectWidth={false}
@@ -947,6 +951,8 @@ class Layout extends PureComponent {
                               this.setLanguageVersion(v)
                             }}
                             {...restProps}
+                          />
+                          )}
                           />
                           </GridItem>
                           <GridItem xs={3} style={{ marginTop: 15, marginLeft: 20 }}>
