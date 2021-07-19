@@ -490,6 +490,7 @@ export default compose(
         medicationPrecautions = [],
         medicationInteractions = [],
         medicationContraindications = [],
+        medicationInstructionRule = [],
         ...restValues
       } = values
       const { dispatch, history, onConfirm, medicationDetail } = props
@@ -584,6 +585,33 @@ export default compose(
         })
       }
 
+      let finalMedicationInstructionRule = [...medicationInstructionRule]
+      let deletedItems = []
+      const originalValues = medicationDetail.entity.medicationInstructionRule
+
+      if (originalValues) {
+        if (medicationInstructionRule.length === 0)
+          deletedItems = originalValues.map(item => ({
+            ...item,
+            isDeleted: true,
+          }))
+        else
+          deletedItems = originalValues
+            .filter(
+              orig =>
+                !medicationInstructionRule.findIndex(d => d.id === orig.id),
+            )
+            .map(item => ({ ...item, isDeleted: true }))
+
+        if (deletedItems)
+          finalMedicationInstructionRule = [
+            ...finalMedicationInstructionRule,
+            ...deletedItems,
+          ]
+      }
+
+      debugger
+
       const payload = {
         ...restValues,
         ...checkboxGroup,
@@ -598,6 +626,7 @@ export default compose(
         inventoryMedication_MedicationPrecaution: precautionList,
         inventoryMedication_MedicationContraIndication: contraIndicationList,
         inventoryMedication_MedicationInteraction: interactionList,
+        medicationInstructionRule: finalMedicationInstructionRule,
       }
 
       dispatch({

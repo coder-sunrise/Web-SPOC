@@ -2,16 +2,54 @@ import React, { useState, useEffect } from 'react'
 import { List, Radio, InputNumber } from 'antd'
 import { formatMessage } from 'umi'
 import { FastField, Field, withFormik } from 'formik'
-import { GridContainer, GridItem, CodeSelect, NumberInput } from '@/components'
+import {
+  GridContainer,
+  GridItem,
+  CodeSelect,
+  NumberInput,
+  Popconfirm,
+} from '@/components'
 import SectionHeader from '../SectionHeader'
-import EditableTable from './DosageRule'
+import DosageRuleTable from './DosageRule'
 
-const AutoCalculateDosage = ({ languageLabel, values }) => {
-  const { ruleType } = values
+const AutoCalculateDosage = ({
+  languageLabel,
+  setFieldValue,
+  values,
+  ...restProps
+}) => {
+  const [ruleType, setRuleType] = useState('default')
+  const [isChangeRuleType, setIsChangeRuleType] = useState(false)
+
+  useEffect(() => {
+    if (
+      values.medicationInstructionRule &&
+      values.medicationInstructionRule.length > 0
+    ) {
+      setRuleType(values.medicationInstructionRule[0].ruleType)
+    }
+  }, [values.medicationInstructionRule])
 
   useEffect(() => {
     console.log('values', values)
   }, [values.ruleType])
+
+  let switchingRuleType = ''
+  const handleRuleTypeClick = e => {
+    const clickedItem = e.currentTarget.dataset.ruletype
+
+    if (clickedItem === ruleType) {
+      e.stopPropagation()
+      e.preventDefault()
+    }
+
+    switchingRuleType = clickedItem
+  }
+
+  const handleRuleTypeChange = () => {
+    setFieldValue('medicationInstructionRule', [])
+    setRuleType(switchingRuleType)
+  }
 
   const optionLabelLength = 40
   return (
@@ -43,7 +81,7 @@ const AutoCalculateDosage = ({ languageLabel, values }) => {
       </GridItem>
       <GridItem md={3}>
         <FastField
-          name='prescribeUomFK'
+          name='prescribingUOMFK'
           render={args => (
             <CodeSelect
               label={formatMessage({
@@ -58,7 +96,7 @@ const AutoCalculateDosage = ({ languageLabel, values }) => {
       </GridItem>
       <GridItem md={3}>
         <FastField
-          name='dispenseUomFK'
+          name='dispensingUOMFK'
           render={args => (
             <CodeSelect
               label={formatMessage({
@@ -90,7 +128,7 @@ const AutoCalculateDosage = ({ languageLabel, values }) => {
           </GridItem>
           <GridItem>
             <FastField
-              name='prescribeUomFK'
+              name='prescribingUOMFK'
               render={args => (
                 <CodeSelect
                   style={{ marginTop: 15 }}
@@ -110,7 +148,7 @@ const AutoCalculateDosage = ({ languageLabel, values }) => {
           </GridItem>
           <GridItem>
             <FastField
-              name='dispenseUomFK'
+              name='dispensingUOMFK'
               render={args => (
                 <CodeSelect
                   style={{ marginTop: 15 }}
@@ -130,30 +168,54 @@ const AutoCalculateDosage = ({ languageLabel, values }) => {
         <SectionHeader style={{ display: 'inline-flex', marginRight: 20 }}>
           Instruction Setting
         </SectionHeader>
-        <FastField
+        <Field
           name='ruleType'
           render={args => (
-            <Radio.Group
-              onChange={e =>
-                args.form.setFieldValue('ruleType', e.target.value)
-              }
+            <Popconfirm
+              title='Confirm to remove all instructions by changing setting?'
+              onConfirm={handleRuleTypeChange}
             >
-              <Radio value='default'>Default</Radio>
-              <Radio value='age'>by Age</Radio>
-              <Radio value='weight'>by Weight</Radio>
-            </Radio.Group>
+              <span data-ruletype='default' onClick={handleRuleTypeClick}>
+                <Radio
+                  value='default'
+                  checked={ruleType === 'default'}
+                  data-ruletype='default'
+                >
+                  Default
+                </Radio>
+              </span>
+              <span data-ruletype='age' onClick={handleRuleTypeClick}>
+                <Radio value='age' checked={ruleType === 'age'}>
+                  by Age
+                </Radio>
+              </span>
+              <span data-ruletype='weight' onClick={handleRuleTypeClick}>
+                <Radio value='weight' checked={ruleType === 'weight'}>
+                  by Weight
+                </Radio>
+              </span>
+            </Popconfirm>
           )}
         />
       </GridItem>
       <GridItem md={12}>
         <Field
-          name='dosageRules'
+          name='medicationInstructionRule'
           render={args => (
-            <EditableTable
+            <DosageRuleTable
               rule={ruleType}
               medicationUsageFK={values.medicationUsageFK}
-              dispenseUomFK={values.dispenseUomFK}
-              prescribeUomFK={values.prescribeUomFK}
+              dispenseUomFK={values.dispensingUOMFK}
+              prescribeUomFK={values.prescribingUOMFK}
+              initialData={values.medicationInstructionRule}
+              onChange={data => {
+                args.form.setFieldValue(
+                  'medicationInstructionRule',
+                  data.map(item => {
+                    return { ...item, ruleType }
+                  }),
+                )
+              }}
             />
           )}
         />

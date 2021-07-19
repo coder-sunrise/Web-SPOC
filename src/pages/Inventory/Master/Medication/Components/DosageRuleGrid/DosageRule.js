@@ -36,29 +36,37 @@ const EditableCell = ({
   )
 }
 
-const EditableTable = ({
-  initialData = [],
+const DosageRuleTable = ({
+  initialData,
   rule,
   medicationUsageFK,
   dispenseUomFK,
   prescribeUomFK,
+  onChange,
 }) => {
   const [form] = Form.useForm()
-  const [data, setData] = useState(initialData)
+  const [data, setData] = useState([])
+  const [rangeValidation, setRangeValidation] = useState('')
   const [editingKey, setEditingKey] = useState('')
   const codetable = useSelector(s => s.codetable)
+
+  useEffect(() => {
+    if (initialData)
+      setData(initialData.map((item, index) => ({ ...item, key: index + 1 })))
+    console.log('initialData', initialData)
+  }, [initialData])
 
   const isEditing = record => record.key === editingKey
   const dispatch = useDispatch()
 
   const getDisplayValue = (code, id) => {
     if (id) {
-      const item = codetable[code].filter(c => c.id === id)[0]
+      console.log('code', code)
+      const item = codetable[code]?.filter(c => c.id === id)[0]
       if (item) {
         return 'displayValue' in item ? item.displayValue : item.name
       }
     }
-
     return ''
   }
 
@@ -108,8 +116,22 @@ const EditableTable = ({
     setEditingKey('')
   }
 
+  const validateRange = fieldValues => {
+    const fields = fieldValues(true)
+
+    const regex = /^(([0-9]+)|(0.5))+$/
+    const from = fields?.rangeStart
+    if (!regex.test(form)) {
+      setRangeValidation('Invalid age range.')
+      return
+    }
+
+    setRangeValidation('')
+  }
+
   const save = async key => {
     try {
+      validateRange(form.getFieldsValue)
       const row = await form.validateFields()
 
       const newData = [...data]
@@ -119,12 +141,22 @@ const EditableTable = ({
       if (item.key === -1) {
         item.key = data.length
       }
+
       newData.splice(index, 1, { ...item, ...row })
       setData(newData)
       setEditingKey('')
+
+      if (onChange) onChange(newData)
     } catch (errInfo) {
       console.log('Validate Failed:', errInfo)
     }
+  }
+
+  const deleteData = async key => {
+    const newData = data.filter(d => d.key !== key)
+    setData(newData)
+
+    if (onChange) onChange(newData)
   }
 
   const ruleLabel = {
@@ -150,17 +182,22 @@ const EditableTable = ({
               <GridContainer gutter={4}>
                 <GridItem md={3}>
                   <Form.Item
-                    name={['range', 'from']}
+                    name={['rangeStart']}
                     style={{
                       margin: 0,
                     }}
                   >
-                    <Input placeholder='From' />
+                    <InputNumber
+                      style={{ width: 60, marginRight: 3 }}
+                      min={0}
+                      max={999}
+                      placeholder='From'
+                    ></InputNumber>
                   </Form.Item>
                 </GridItem>
                 <GridItem md={6}>
                   <Form.Item
-                    name={['range', 'operator']}
+                    name={['operator']}
                     style={{
                       margin: 0,
                     }}
@@ -174,19 +211,29 @@ const EditableTable = ({
                 </GridItem>
                 <GridItem md={3}>
                   <Form.Item
-                    name={['range', 'to']}
+                    name={['rangeEnd']}
                     style={{
                       margin: 0,
                     }}
                   >
-                    <Input placeholder='To' />
+                    <InputNumber
+                      style={{ width: 60, marginRight: 3 }}
+                      min={0}
+                      max={999}
+                      placeholder='To'
+                    ></InputNumber>
                   </Form.Item>
                 </GridItem>
+                {rangeValidation.length > 0 && (
+                  <GridItem md={12}>
+                    <Typography.Text type='danger'>
+                      {rangeValidation}
+                    </Typography.Text>
+                  </GridItem>
+                )}
               </GridContainer>
             ) : (
-              <span>
-                {`${record.range.from} ${record.range.operator} ${record.range.to}`}
-              </span>
+              <span>{`${record.rangeStart} ${record.operator} ${record.rangeEnd}`}</span>
             )}
           </>
         )
@@ -206,7 +253,7 @@ const EditableTable = ({
     },
     {
       title: 'Dosage',
-      dataIndex: 'dosage',
+      dataIndex: 'prescribingDosageFK',
       align: 'center',
       editable: true,
       width: 120,
@@ -216,7 +263,7 @@ const EditableTable = ({
           <>
             {editing ? (
               <Form.Item
-                name={['dosage']}
+                name={['prescribingDosageFK']}
                 style={{
                   margin: 0,
                 }}
@@ -237,7 +284,10 @@ const EditableTable = ({
               </Form.Item>
             ) : (
               <span>
-                {getDisplayValue('ctmedicationdosage', record.dosage)}
+                {getDisplayValue(
+                  'ctmedicationdosage',
+                  record.prescribingDosageFK,
+                )}
               </span>
             )}
           </>
@@ -260,7 +310,7 @@ const EditableTable = ({
     },
     {
       title: 'Frequency',
-      dataIndex: 'frequency',
+      dataIndex: 'medicationFrequencyFK',
       align: 'center',
       editable: true,
       width: 200,
@@ -270,7 +320,7 @@ const EditableTable = ({
           <>
             {editing ? (
               <Form.Item
-                name={['frequency']}
+                name={['medicationFrequencyFK']}
                 style={{
                   margin: 0,
                 }}
@@ -285,7 +335,10 @@ const EditableTable = ({
               </Form.Item>
             ) : (
               <span>
-                {getDisplayValue('ctmedicationfrequency', record.frequency)}
+                {getDisplayValue(
+                  'ctmedicationfrequency',
+                  record.medicationFrequencyFK,
+                )}
               </span>
             )}
           </>
@@ -334,16 +387,16 @@ const EditableTable = ({
     },
     {
       title: 'Dispense Qty',
-      dataIndex: 'dispenseQty',
+      dataIndex: 'dispensingQuantity',
       align: 'center',
-      width: 110,
+      width: 120,
       render: (item = {}, record) => {
         const editing = isEditing(record)
         return (
           <>
             {editing ? (
               <Form.Item
-                name={['dispenseQty']}
+                name={['dispensingQuantity']}
                 style={{
                   margin: 0,
                 }}
@@ -355,7 +408,7 @@ const EditableTable = ({
                 ></InputNumber>
               </Form.Item>
             ) : (
-              <span>{record.dispenseQty}</span>
+              <span>{record.dispensingQuantity}</span>
             )}
           </>
         )
@@ -382,23 +435,19 @@ const EditableTable = ({
       render: (_, record) => {
         const editable = isEditing(record)
         return editable ? (
-          <span>
-            <a
-              href='javascript:;'
-              onClick={() => save(record.key)}
-              style={{
-                marginRight: 8,
-              }}
-            >
+          <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+            <Typography.Link onClick={() => save(record.key)}>
               Save
-            </a>
-            <Popconfirm
-              title='Sure to cancel?'
-              onConfirm={() => cancel(record.key)}
-            >
-              <a>Cancel</a>
-            </Popconfirm>
-          </span>
+            </Typography.Link>
+            <Typography.Link>
+              <Popconfirm
+                title='Sure to cancel?'
+                onConfirm={() => cancel(record.key)}
+              >
+                <a>Cancel</a>
+              </Popconfirm>
+            </Typography.Link>
+          </div>
         ) : (
           <div style={{ display: 'flex', justifyContent: 'space-around' }}>
             <Typography.Link
@@ -409,7 +458,7 @@ const EditableTable = ({
             </Typography.Link>
             <Typography.Link
               disabled={editingKey !== ''}
-              onClick={() => edit(record)}
+              onClick={() => deleteData(record.key)}
             >
               Delete
             </Typography.Link>
@@ -468,4 +517,4 @@ const EditableTable = ({
   )
 }
 
-export default EditableTable
+export default DosageRuleTable

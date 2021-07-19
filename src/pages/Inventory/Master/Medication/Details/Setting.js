@@ -18,15 +18,8 @@ import { SectionHeader, SelectList, AutoCalculateDosage } from '../Components'
 
 const styles = () => ({})
 
-const Setting = ({
-  classes,
-  setFieldValue,
-  showTransfer,
-  dispatch,
-  global,
-  ...props
-}) => {
-  const { medicationDetail, theme, values } = props
+const Setting = ({ classes, showTransfer, dispatch, global, ...props }) => {
+  const { medicationDetail, theme, values, setFieldValue } = props
   const {
     medicationSideEffects,
     medicationPrecautions,

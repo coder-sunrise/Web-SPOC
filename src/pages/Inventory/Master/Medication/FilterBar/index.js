@@ -60,13 +60,22 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
   }
 
   const onSearchClick = () => {
-    const { code, displayValue, favouriteSupplierFK, isActive } = values
+    const {
+      code,
+      displayValue,
+      favouriteSupplierFK,
+      isActive,
+      medicationGroupFK,
+      genericMedicationFK,
+    } = values
     dispatch({
       type: 'medication/query',
       payload: {
         code,
         displayValue,
         favouriteSupplierFK,
+        medicationGroupFK,
+        genericMedicationFK,
         isActive,
       },
     })
@@ -160,6 +169,39 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                   label={formatMessage({
                     id: 'inventory.master.medication.name',
                   })}
+                  {...args}
+                />
+              )
+            }}
+          />
+        </GridItem>
+        <GridItem xs={6} md={3}>
+          <FastField
+            name='genericMedicationFK'
+            render={args => {
+              return (
+                <CodeSelect
+                  label={formatMessage({
+                    id: 'inventory.master.medication.genericMedication',
+                  })}
+                  labelField='displayValue'
+                  code='ctgenericmedication'
+                  {...args}
+                />
+              )
+            }}
+          />
+        </GridItem>
+        <GridItem xs={6} md={3}>
+          <FastField
+            name='medicationGroupFK'
+            render={args => {
+              return (
+                <CodeSelect
+                  label={formatMessage({
+                    id: 'inventory.master.medication.medicationGroup',
+                  })}
+                  code='ctmedicationgroup'
                   {...args}
                 />
               )
