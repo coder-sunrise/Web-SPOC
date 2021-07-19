@@ -182,19 +182,21 @@ class ICD10Diagnosis extends PureComponent {
             return this.diagnosis.map((v, i) => {
               if (v.isDeleted === true) return null
               return (
+                <Authorized authority={"queue.consultation.widgets.diagnosis"}>
                 <div key={v.uid}>
-                  <ICD10DiagnosisItem
-                    {...this.props}
-                    index={i}
-                    arrayHelpers={arrayHelpers}
-                    diagnosis={this.diagnosis}
-                    saveDiagnosisAsFavourite={this.saveDiagnosisAsFavourite}
-                    uid={v.uid}
-                    icD10DiagnosisCode={v.icD10DiagnosisCode}
-                    favouriteDiagnosisMessage={v.favouriteDiagnosisMessage}
-                    favouriteDiagnosis={diagnosis.favouriteDiagnosis || []}
-                  />
-                </div>
+                <ICD10DiagnosisItem
+                  {...this.props}
+                  index={i}
+                  arrayHelpers={arrayHelpers}
+                  diagnosis={this.diagnosis}
+                  saveDiagnosisAsFavourite={this.saveDiagnosisAsFavourite}
+                  uid={v.uid}
+                  icD10DiagnosisCode={v.icD10DiagnosisCode}
+                  favouriteDiagnosisMessage={v.favouriteDiagnosisMessage}
+                  favouriteDiagnosis={diagnosis.favouriteDiagnosis || []}
+                />
+              </div>
+              </Authorized>
               )
             })
           }}

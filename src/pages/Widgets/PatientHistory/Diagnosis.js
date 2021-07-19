@@ -28,33 +28,39 @@ export default ({ current, classes, theme, codetable, clinicSettings }) => {
   let columns = [
     {
       dataIndex: 'diagnosisDescription',
-      title: 'Diagnosis (EN)',
+      title: settings.isEnableJapaneseICD10Diagnosis === true ?'Diagnosis (EN)' : 'Diagnosis',
+      width: 200,
       render: (text) => <div style={wrapCellTextStyle}>{text}</div>,
     },
     {
       dataIndex: 'jpnDiagnosisDescription',
       title: 'Diagnosis (JP)',
+      width: 200,
       render: (text) => <div style={wrapCellTextStyle}>{text}</div>,
     },
     {
       dataIndex: 'diagnosisType',
       title: 'Type',
+      width: 80,
       render: (text) => <div style={wrapCellTextStyle}>{text}</div>,
     },
     {
       dataIndex: 'onsetDate',
       title: 'Onset Date',
+      width: 100,
       format: dateFormatLong,
       render: (text) => <div style={wrapCellTextStyle}>{moment(text).format('DD MMM YYYY')}</div>,
     },
     {
       dataIndex: 'firstVisitDate',
       title: 'First Visit Date',
+      width: 120,
       render: (text) => <div style={wrapCellTextStyle}>{moment(text).format('DD MMM YYYY')}</div>,
     },
     {
       dataIndex: 'validityDays',
       title: 'Validity (Days)',
+      width: 120,
       render: (text) => <div style={wrapCellTextStyle}>{text}</div>,
     },
     {
