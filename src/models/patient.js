@@ -91,25 +91,25 @@ export default createFormViewModel({
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async loct => {
-        const { query = {} } = loct
-
-        dispatch({
-          type: 'getUserPreference',
-          payload: {
-            type: '4',
-          },
-        }).then((response)=>{
-          if(response){
-            const { favPatDBColumnSetting } = response
-            dispatch({
-              type: 'updateState',
-              payload: {
-                favPatDBColumnSetting: favPatDBColumnSetting,
-              },
-            })
-          }
-        })
-
+        const { query = {}, pathname } = loct
+        if(pathname === '/patient'){
+          dispatch({
+            type: 'getUserPreference',
+            payload: {
+              type: '4',
+            },
+          }).then((response)=>{
+            if(response){
+              const { favPatDBColumnSetting } = response
+              dispatch({
+                type: 'updateState',
+                payload: {
+                  favPatDBColumnSetting: favPatDBColumnSetting,
+                },
+              })
+            }
+          })
+        }
         setTimeout(() => {
           if (query.md === 'pt' && query.cmt) {
             dispatch({
