@@ -14,7 +14,7 @@ import Fullscreen from '@material-ui/icons/Fullscreen'
 import FullscreenExit from '@material-ui/icons/FullscreenExit'
 import CompareArrows from '@material-ui/icons/CompareArrows'
 import Accessibility from '@material-ui/icons/Accessibility'
-
+import { connect } from 'dva'
 import { headerHeight } from 'mui-pro-jss'
 // common components
 import {
@@ -29,17 +29,20 @@ import {
   notification,
   GridContainer,
   GridItem,
+  Select,
 } from '@/components'
 // sub components
 import { control } from '@/components/Decorator'
 import Authorized from '@/utils/Authorized'
 import { widgets } from '@/utils/widgets'
 import { CLINIC_TYPE } from '@/utils/constants'
+import { languageCategory } from '@/utils/codes'
 import PatientHistoryDrawer from './PatientHistoryDrawer'
 import LabTrackingDrawer from './LabTrackingDrawer'
 import Templates from './Templates'
 // utils
 import gpLayoutCfg, { dentalLayoutCfg } from './layoutConfigs'
+import { DIAGNOSIS_TYPE } from '@/utils/constants'
 
 // console.log(JSON.stringify(dentalLayoutCfg))
 const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
@@ -50,12 +53,12 @@ const ResponsiveGridLayout = WidthProvider(Responsive)
 let lastActivedWidget = null
 
 const { Link } = Anchor
-// @connect(({ cestemplate }) => ({
-//   cestemplate,
-// }))
+@connect(({ diagnosis }) => ({
+  diagnosis,
+}))
 @control()
 class Layout extends PureComponent {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.container = React.createRef()
     this.layoutContainer = React.createRef()
@@ -70,7 +73,11 @@ class Layout extends PureComponent {
     // console.log(localStorage.getItem('consultationLayout'))
     // console.log(JSON.parse(localStorage.getItem('consultationLayout') || '{}'))
 
-    const { userDefaultLayout, clinicInfo } = props
+    const { userDefaultLayout, clinicInfo, consultation } = props
+
+
+    const { favouriteDiagnosisLanguage } = consultation
+    this.favouriteDiagnosisLanguage = favouriteDiagnosisLanguage
 
     let { defaultConsultationTemplate = '[]' } = clinicInfo
     // console.log(defaultConsultationTemplate)
@@ -102,27 +109,26 @@ class Layout extends PureComponent {
     if (!defaultLayout.widgets) {
       defaultLayout = this.getDefaultLayout()
     }
-    // console.log(defaultLayout)
     this.widgetMenu = (
       <Menu>
         {widgets
-          .map(widget => {
+          .map((widget) => {
             const widgetAccessRight = Authorized.check(widget.accessRight)
             const { rights } = widgetAccessRight || { rights: undefined }
             return { ...widget, rights }
           })
-          .filter(widget => {
+          .filter((widget) => {
             if (!widget.rights) return false
             return widget.rights !== 'hidden'
           })
-          .map(o => {
-            const cfg = defaultLayout.lg.find(m => m.i === o.id) || {}
+          .map((o) => {
+            const cfg = defaultLayout.lg.find((m) => m.i === o.id) || {}
             // const disableByAccessRight = o.rights === 'disable'
             return (
               <Menu.Item
                 key={o.id}
                 disabled={cfg.static}
-                onClick={e => {
+                onClick={(e) => {
                   // console.log(this.state.currentLayout)
                   // console.log(e.domEvent.target)
                   // console.log(this.state.replaceWidget)
@@ -131,26 +137,17 @@ class Layout extends PureComponent {
                   for (let index = 0; index < sizes.length; index++) {
                     const breakpoint = sizes[index]
                     if (layout[breakpoint]) {
-                      const target = layout[breakpoint].find(m => m.i === e.key)
-                      let starter = layout[breakpoint].find(
-                        m => m.i === this.state.replaceWidget,
-                      )
+                      const target = layout[breakpoint].find((m) => m.i === e.key)
+                      let starter = layout[breakpoint].find((m) => m.i === this.state.replaceWidget)
                       if (target) {
                         target.i = this.state.replaceWidget
                         starter.i = e.key
                       } else {
                         starter.i = e.key
-                        if (
-                          layout.widgets.find(
-                            m => m === this.state.replaceWidget,
-                          )
-                        )
-                          layout.widgets = _.reject(
-                            layout.widgets,
-                            m => m === this.state.replaceWidget,
-                          )
+                        if (layout.widgets.find((m) => m === this.state.replaceWidget))
+                          layout.widgets = _.reject(layout.widgets, (m) => m === this.state.replaceWidget)
 
-                        if (!layout.widgets.find(m => m === e.key)) {
+                        if (!layout.widgets.find((m) => m === e.key)) {
                           layout.widgets.push(e.key)
                         }
                         // layout[breakpoint]=_.reject(layout[breakpoint])
@@ -183,26 +180,24 @@ class Layout extends PureComponent {
     localStorage.setItem('consultationLayout', JSON.stringify(defaultLayout))
   }
 
-  // componentDidMount () {}
-
-  componentWillUnmount() {
+  componentWillUnmount () {
     window.removeEventListener('resize', this.delayedResize)
     $(window.mainPanel).css('overflow', 'auto')
 
-    this.state.currentLayout.widgets.map(id => {
-      const w = widgets.find(o => o.id === id)
+    this.state.currentLayout.widgets.map((id) => {
+      const w = widgets.find((o) => o.id === id)
       if (w && w.onUnmount) w.onUnmount()
     })
   }
 
-  resize = e => {
+  resize = (e) => {
     // console.log(e)
     this.setState({
       rowHeight: this.getLayoutRowHeight(),
     })
   }
 
-  showWidgetManagePanel = event => {
+  showWidgetManagePanel = (event) => {
     this.setState({
       anchorEl: event.currentTarget,
       menuOpen: true,
@@ -216,12 +211,12 @@ class Layout extends PureComponent {
     })
   }
 
-  removeWidget = widgetId => {
+  removeWidget = (widgetId) => {
     const { setFieldValue, values } = this.props
-    const wg = widgets.find(o => o.id === widgetId)
+    const wg = widgets.find((o) => o.id === widgetId)
     // console.log(wg)
     const { associatedProps = [], onRemove, model } = wg
-    associatedProps.forEach(ap => {
+    associatedProps.forEach((ap) => {
       const v = values[ap]
       // console.log(ap, v)
       if (v) {
@@ -235,10 +230,10 @@ class Layout extends PureComponent {
           // )
           setFieldValue(
             ap,
-            v.map(o => ({
+            v.map((o) => ({
               ...o,
               isDeleted: true,
-            })),
+            }))
           )
         }
       }
@@ -252,24 +247,24 @@ class Layout extends PureComponent {
     const { currentLayout } = this.state
 
     const layout = {
-      widgets: _.reject(currentLayout.widgets, w => w === widgetId),
+      widgets: _.reject(currentLayout.widgets, (w) => w === widgetId),
     }
-    sizes.forEach(s => {
+    sizes.forEach((s) => {
       layout[s] = currentLayout[s]
       if (layout[s]) {
-        layout[s] = layout[s].filter(o => o.i !== widgetId)
+        layout[s] = layout[s].filter((o) => o.i !== widgetId)
       }
     })
     this.changeLayout(layout)
   }
 
-  addWidget = widgetId => {
+  addWidget = (widgetId) => {
     const { currentLayout } = this.state
     const layout = _.cloneDeep(currentLayout)
     layout.widgets.push(widgetId)
     // console.log(currentLayout)
-    sizes.forEach(s => {
-      const widget = this.pageDefaultWidgets.find(o => o.id === widgetId) || {
+    sizes.forEach((s) => {
+      const widget = this.pageDefaultWidgets.find((o) => o.id === widgetId) || {
         config: {},
       }
       if (layout[s]) {
@@ -290,7 +285,7 @@ class Layout extends PureComponent {
     this.changeLayout(layout)
   }
 
-  promptRemoveWidgetConfirmation = key => {
+  promptRemoveWidgetConfirmation = (key) => {
     this.props.dispatch({
       type: 'global/updateState',
       payload: {
@@ -314,19 +309,19 @@ class Layout extends PureComponent {
     }
   }
 
-  changeLayout = layout => {
+  changeLayout = (layout) => {
     this.setState(
       {
         currentLayout: layout,
       },
       () => {
         localStorage.setItem('consultationLayout', JSON.stringify(layout))
-      },
+      }
     )
   }
 
-  fitlerItemWithAccessRight = itemId => {
-    const w = widgets.find(m => m.id === itemId)
+  fitlerItemWithAccessRight = (itemId) => {
+    const w = widgets.find((m) => m.id === itemId)
     if (!w) return false
     const widgetAccessRight = Authorized.check(w.accessRight)
 
@@ -339,12 +334,10 @@ class Layout extends PureComponent {
     const defaultWidgets = _.cloneDeep(this.pageDefaultWidgets)
 
     const r = {
-      widgets: defaultWidgets
-        .filter(w => this.fitlerItemWithAccessRight(w.id))
-        .map(o => o.id),
+      widgets: defaultWidgets.filter((w) => this.fitlerItemWithAccessRight(w.id)).map((o) => o.id),
     }
-    sizes.forEach(s => {
-      r[s] = defaultWidgets.map(o => ({
+    sizes.forEach((s) => {
+      r[s] = defaultWidgets.map((o) => ({
         ...o.config[s],
         i: o.id,
       }))
@@ -352,7 +345,7 @@ class Layout extends PureComponent {
     return r
   }
 
-  generateConfig = id => {
+  generateConfig = (id) => {
     const { classes, ...resetProps } = this.props
     const { elevation } = this.state
     return {
@@ -373,13 +366,13 @@ class Layout extends PureComponent {
   }
 
   toggleMode = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       mode: prevState.mode === 'default' ? 'edit' : 'default',
     }))
   }
 
-  toggleDrawer = event => {
-    this.setState(prevState => ({ openDraw: !prevState.openDraw }))
+  toggleDrawer = (event) => {
+    this.setState((prevState) => ({ openDraw: !prevState.openDraw }))
     const { cestemplate, dispatch } = this.props
     if (cestemplate && !cestemplate.list) {
       dispatch({
@@ -389,13 +382,13 @@ class Layout extends PureComponent {
   }
 
   togglePatientHistoryDrawer = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       openPatientHistoryDrawer: !prevState.openPatientHistoryDrawer,
     }))
   }
 
   toggleLabTrackingDrawer = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       openLabTrackingDrawer: !prevState.openLabTrackingDrawer,
     }))
   }
@@ -412,7 +405,7 @@ class Layout extends PureComponent {
     return true
   }
 
-  onMouseEnter = e => {
+  onMouseEnter = (e) => {
     // console.log(e.target)
     // console.log(cfg, e.target)
     // console.log($(e.target).parent('.widget-container')[0])
@@ -424,27 +417,22 @@ class Layout extends PureComponent {
       lastActivedWidget.css('overflowX', 'hidden')
     }
     const t = $(e.target)
-    lastActivedWidget = t.hasClass('widget-container')
-      ? t
-      : $(t.parents('.widget-container')[0])
+    lastActivedWidget = t.hasClass('widget-container') ? t : $(t.parents('.widget-container')[0])
     if (lastActivedWidget.length > 0) {
       lastActivedWidget.css('overflowY', 'auto')
       lastActivedWidget.css('overflowX', 'hidden')
     }
   }
 
-  onFullScreenClick = id => () => {
-    sessionStorage.setItem(
-      'tempLayout',
-      JSON.stringify(this.state.currentLayout),
-    )
+  onFullScreenClick = (id) => () => {
+    sessionStorage.setItem('tempLayout', JSON.stringify(this.state.currentLayout))
     this.setState(
       {
         fullScreenWidget: id,
       },
       () => {
         // $(window.mainPanel).css('overflow', 'hidden').scrollTop(0)
-      },
+      }
     )
   }
 
@@ -480,7 +468,7 @@ class Layout extends PureComponent {
     return ((this.props.height || window.innerHeight) - topHeight) / 6
   }
 
-  onAnchorClick = id => {
+  onAnchorClick = (id) => {
     const parentElement = document.getElementById('mainPanel-root')
     const element = document.getElementById(id)
     try {
@@ -501,23 +489,36 @@ class Layout extends PureComponent {
     }
   }
 
-  render() {
+  setLanguageVersion = (v) => {
+    this.favouriteDiagnosisLanguage = v
+    this.props.dispatch({
+      type: 'consultation/updateState',
+      payload: {
+        favouriteDiagnosisLanguage: this.favouriteDiagnosisLanguage,
+      },
+    })
+  }
+
+  render () {
     const { state, props } = this
     const { currentLayout } = state
-    const { classes, ...restProps } = props
+    const { classes, diagnosis,clinicSettings, ...restProps } = props
     const {
       theme,
       height,
       rights,
       clinicInfo,
-      onSaveLayout = f => f,
+      onSaveLayout = (f) => f,
+      onSaveFavouriteDiagnosisLanguage = (s) => s,
     } = restProps
     const widgetProps = {
       status: 'consultation',
-      // parentProps: props,
       rights,
     }
-    // console.log(state.currentLayout)
+
+    const { isEnableJapaneseICD10Diagnosis, diagnosisDataSource } = clinicSettings
+
+    this.favouriteDiagnosisLanguage = diagnosis.favouriteDiagnosisLanguage
 
     const layoutCfg = {
       className: classnames({
@@ -530,7 +531,7 @@ class Layout extends PureComponent {
       cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 },
       useCSSTransforms: false,
       preventCollision: !!this.state.fullScreenWidget,
-      margin: [2, 2],
+      margin: [ 2, 2 ],
       isDraggable: !this.state.fullScreenWidget,
       draggableCancel: '.non-dragable',
       draggableHandle: '.dragable',
@@ -548,7 +549,7 @@ class Layout extends PureComponent {
           !_.isEqualWith(
             allLayouts[this.state.breakpoint],
             this.state.currentLayout[this.state.breakpoint],
-            this.compareNodeLayoutChange,
+            this.compareNodeLayoutChange
           )
         ) {
           // console.log('onLayoutChange')
@@ -564,33 +565,22 @@ class Layout extends PureComponent {
         //   containerPadding,
         // )
       },
-      onResizeStart: e => {
+      onResizeStart: (e) => {
         // $(this.layoutContainer.current).addClass(classes.layoutOnDrag)
         // console.log(e, window, $(window.mainPanel))
         // $(window.mainPanel).scrollTop($(window.mainPanel).scrollTop() + 5)
         // console.log($(this.layoutContainer.current), classes.layoutOnDrag)
-        const {
-          scrollTop,
-          scrollHeight,
-          offsetHeight,
-        } = this.layoutContainer.current
+        const { scrollTop, scrollHeight, offsetHeight } = this.layoutContainer.current
         // console.log(scrollTop + offsetHeight, scrollHeight)
         if (scrollTop + offsetHeight >= scrollHeight - 10) {
-          $(this.layoutContainer.current).addClass(
-            this.props.classes.layoutOnDrag,
-          )
-          this.layoutContainer.current.scrollTo(
-            0,
-            this.layoutContainer.current.scrollHeight,
-          )
+          $(this.layoutContainer.current).addClass(this.props.classes.layoutOnDrag)
+          this.layoutContainer.current.scrollTo(0, this.layoutContainer.current.scrollHeight)
         }
       },
-      onResizeStop: e => {
+      onResizeStop: (e) => {
         // $(this.layoutContainer.current).removeClass(classes.layoutOnDrag)
         // console.log(e)
-        $(this.layoutContainer.current).removeClass(
-          this.props.classes.layoutOnDrag,
-        )
+        $(this.layoutContainer.current).removeClass(this.props.classes.layoutOnDrag)
       },
     }
 
@@ -612,42 +602,34 @@ class Layout extends PureComponent {
               // backgroundColor: '#f0f8ff',
             }}
           >
-            <GridContainer justify='space-between'>
+            <GridContainer justify="space-between">
               <GridItem md={9}>
-                {state.currentLayout.widgets.map(id => {
-                  const w = widgets.find(o => o.id === id)
+                {state.currentLayout.widgets.map((id) => {
+                  const w = widgets.find((o) => o.id === id)
                   if (!w) return null
 
                   const onClick = () => this.onAnchorClick(w.id)
                   return (
-                    <Button size='sm' color='primary' onClick={onClick}>
+                    <Button size="sm" color="primary" onClick={onClick}>
                       {w.name}
                     </Button>
                   )
                 })}
               </GridItem>
               <GridItem md={3} style={{ textAlign: 'right' }}>
-                <Button
-                  size='sm'
-                  color='info'
-                  onClick={this.toggleLabTrackingDrawer}
-                >
+                <Button size="sm" color="info" onClick={this.toggleLabTrackingDrawer}>
                   <Accessibility />
                   Results
                 </Button>
-                <Button size='sm' color='info' onClick={this.toggleDrawer}>
+                <Button size="sm" color="info" onClick={this.toggleDrawer}>
                   <Settings />
                   Widgets
                 </Button>
-                <Authorized authority='queue.consultation.widgets.patienthistory'>
+                <Authorized authority="queue.consultation.widgets.patienthistory">
                   {({ rights: patientHistoryAccessRight }) => {
                     if (patientHistoryAccessRight === 'hidden') return null
                     return (
-                      <Button
-                        size='sm'
-                        color='info'
-                        onClick={this.togglePatientHistoryDrawer}
-                      >
+                      <Button size="sm" color="info" onClick={this.togglePatientHistoryDrawer}>
                         <Accessibility />
                         History
                       </Button>
@@ -672,24 +654,22 @@ class Layout extends PureComponent {
             // onScroll={this.delayedMainDivScroll}
           >
             <ResponsiveGridLayout {...layoutCfg}>
-              {state.currentLayout.widgets.map(id => {
-                const w = widgets.find(o => o.id === id)
+              {state.currentLayout.widgets.map((id) => {
+                const w = widgets.find((o) => o.id === id)
                 if (!w) return <div />
                 const cfgs = state.currentLayout[state.breakpoint]
-                const cfg = cfgs.find(o => o.i === id)
+                const cfg = cfgs.find((o) => o.i === id)
 
                 if (!cfg) return <div key={id} />
                 const LoadableComponent = w.component
-                console.log(w.component)
+                // console.log(w.component)
                 return (
                   <div
                     className={classnames({
                       [classes.block]: true,
                       [classes.fullscreen]: state.fullScreenWidget === id,
                       [classes.hide]: state.fullScreenWidget !== id,
-                      [classes.show]:
-                        !state.fullScreenWidget ||
-                        state.fullScreenWidget === id,
+                      [classes.show]: !state.fullScreenWidget || state.fullScreenWidget === id,
                     })}
                     key={id}
                     id={w.id}
@@ -704,19 +684,17 @@ class Layout extends PureComponent {
                     >
                       {this.state.mode === 'edit' && (
                         <div className={`${classes.blockHeader} dragable`}>
-                          <div
-                            style={{ height: 25, backgroundColor: '#e6e6e6' }}
-                          >
+                          <div style={{ height: 25, backgroundColor: '#e6e6e6' }}>
                             <span className={classes.blockName}>{w.name}</span>
 
                             <React.Fragment>
                               {w.toolbarAddon}
                               {!state.fullScreenWidget && (
                                 <React.Fragment>
-                                  <Tooltip title='Full-screen'>
+                                  <Tooltip title="Full-screen">
                                     <IconButton
-                                      aria-label='Full-screen'
-                                      size='small'
+                                      aria-label="Full-screen"
+                                      size="small"
                                       onClick={this.onFullScreenClick(id)}
                                     >
                                       <Fullscreen />
@@ -725,21 +703,18 @@ class Layout extends PureComponent {
 
                                   <Dropdown
                                     overlay={this.widgetMenu}
-                                    trigger={['click']}
+                                    trigger={[ 'click' ]}
                                     currentWidgetId={id}
                                     disabled={cfg.static}
-                                    onVisibleChange={visible => {
+                                    onVisibleChange={(visible) => {
                                       if (visible)
                                         this.setState({
                                           replaceWidget: id,
                                         })
                                     }}
                                   >
-                                    <Tooltip title='Switch widget'>
-                                      <IconButton
-                                        aria-label='Replace'
-                                        size='small'
-                                      >
+                                    <Tooltip title="Switch widget">
+                                      <IconButton aria-label="Replace" size="small">
                                         <CompareArrows />
                                       </IconButton>
                                     </Tooltip>
@@ -747,25 +722,21 @@ class Layout extends PureComponent {
 
                                   {!w.disableDeleteWarning ? (
                                     <Popconfirm
-                                      title='Removing widget will remove all underlying data. Remove this widget?'
+                                      title="Removing widget will remove all underlying data. Remove this widget?"
                                       onConfirm={() => this.removeWidget(id)}
                                     >
-                                      <Tooltip title='Delete'>
-                                        <IconButton
-                                          aria-label='Delete'
-                                          size='small'
-                                          disabled={w.persist}
-                                        >
+                                      <Tooltip title="Delete">
+                                        <IconButton aria-label="Delete" size="small" disabled={w.persist}>
                                           <Clear />
                                         </IconButton>
                                       </Tooltip>
                                     </Popconfirm>
                                   ) : (
-                                    <Tooltip title='Delete'>
+                                    <Tooltip title="Delete">
                                       <IconButton
                                         onClick={() => this.removeWidget(id)}
-                                        aria-label='Delete'
-                                        size='small'
+                                        aria-label="Delete"
+                                        size="small"
                                         disabled={w.persist}
                                       >
                                         <Clear />
@@ -775,10 +746,10 @@ class Layout extends PureComponent {
                                 </React.Fragment>
                               )}
                               {state.fullScreenWidget === id && (
-                                <Tooltip title='Exit full-screen'>
+                                <Tooltip title="Exit full-screen">
                                   <IconButton
-                                    aria-label='Exit full-screen'
-                                    size='small'
+                                    aria-label="Exit full-screen"
+                                    size="small"
                                     onClick={this.onExitFullScreenClick}
                                   >
                                     <FullscreenExit />
@@ -790,11 +761,8 @@ class Layout extends PureComponent {
                           <Divider light />
                         </div>
                       )}
-                      <div
-                        className='non-dragable'
-                        style={w.layoutConfig ? w.layoutConfig.style : {}}
-                      >
-                        <SizeContainer size='sm'>
+                      <div className="non-dragable" style={w.layoutConfig ? w.layoutConfig.style : {}}>
+                        <SizeContainer size="sm">
                           <LoadableComponent
                             {...widgetProps}
                             {...w.restProps}
@@ -851,15 +819,8 @@ class Layout extends PureComponent {
                 </Slide>
               )}
             </div> */}
-            <Drawer
-              anchor='right'
-              open={this.state.openPatientHistoryDrawer}
-              onClose={this.togglePatientHistoryDrawer}
-            >
-              <PatientHistoryDrawer
-                {...widgetProps}
-                onClose={this.togglePatientHistoryDrawer}
-              />
+            <Drawer anchor="right" open={this.state.openPatientHistoryDrawer} onClose={this.togglePatientHistoryDrawer}>
+              <PatientHistoryDrawer {...widgetProps} onClose={this.togglePatientHistoryDrawer} />
               {/* <div style={{ width: '67vw', padding: theme.spacing(2) }}>
                 <h4>Patient History</h4>
                 <Button />
@@ -868,11 +829,7 @@ class Layout extends PureComponent {
                 </SizeContainer>
               </div> */}
             </Drawer>
-            <Drawer
-              anchor='right'
-              open={this.state.openDraw}
-              onClose={this.toggleDrawer}
-            >
+            <Drawer anchor="right" open={this.state.openDraw} onClose={this.toggleDrawer}>
               <div style={{ width: 360, position: 'relative' }}>
                 <h5
                   style={{
@@ -885,23 +842,19 @@ class Layout extends PureComponent {
                 >
                   Manage Widgets
                 </h5>
-                <SizeContainer size='sm'>
+                <SizeContainer size="sm">
                   <CheckboxGroup
                     className={classes.fabDiv}
-                    label=''
+                    label=""
                     vertical
                     strongLabel
                     value={currentLayout.widgets}
-                    valueField='id'
-                    textField='name'
-                    options={widgets.filter(widget => {
-                      const widgetAccessRight = Authorized.check(
-                        widget.accessRight,
-                      )
+                    valueField="id"
+                    textField="name"
+                    options={widgets.filter((widget) => {
+                      const widgetAccessRight = Authorized.check(widget.accessRight)
                       if (!widgetAccessRight) return false
-                      const shouldShow =
-                        widgetAccessRight &&
-                        widgetAccessRight.rights !== 'hidden'
+                      const shouldShow = widgetAccessRight && widgetAccessRight.rights !== 'hidden'
 
                       return shouldShow
                     })}
@@ -919,7 +872,7 @@ class Layout extends PureComponent {
                       onClick={() => {
                         this.changeLayout(this.getDefaultLayout())
                       }}
-                      color='danger'
+                      color="danger"
                     >
                       Reset
                     </Button>
@@ -940,7 +893,7 @@ class Layout extends PureComponent {
                       Manage Layout
                     </h5>
                     <CustomInputWrapper
-                      label=''
+                      label=""
                       style={{ paddingTop: 25 }}
                       strongLabel
                       labelProps={{
@@ -963,33 +916,66 @@ class Layout extends PureComponent {
                         }}
                       >
                         <li>
-                          <p>
-                            Save current consultation layout as my favourite.
-                          </p>
+                          <p>Save current consultation layout as my favourite.</p>
                         </li>
                         <li>
-                          <p>
-                            System will use favourite layout for new
-                            consultation.
-                          </p>
+                          <p>System will use favourite layout for new consultation.</p>
                         </li>
                       </ul>
                     </CustomInputWrapper>
                   </div>
+                  <Divider light />
+                  <div className={classes.fabDiv}>
+                    <GridContainer
+                      gutter={0}
+                      style={{
+                        marginTop: theme.spacing(2),
+                        marginBottom: theme.spacing(1),
+                      }}
+                    >
+                      {isEnableJapaneseICD10Diagnosis === true && diagnosisDataSource === DIAGNOSIS_TYPE['ICD10DIANOGSIS'] && (
+                        <GridContainer>
+                          <GridItem xs={12}>
+                            <h5 style={{ fontWeight: 500, lineHeight: 1.3 }}>Favourite Diagnosis Language </h5>
+                          </GridItem>
+                          <GridItem xs={8}>
+                            <Select
+                              label="Language"
+                              strongLabel
+                              value={this.favouriteDiagnosisLanguage}
+                              options={languageCategory}
+                              dropdownMatchSelectWidth={false}
+                              onChange={(v) => {
+                                this.setLanguageVersion(v)
+                              }}
+                            />
+                          </GridItem>
+                          <GridItem xs={3} style={{ marginTop: 15, marginLeft: 20 }}>
+                            <ProgressButton
+                              disabled={false}
+                              onClick={() => {
+                                onSaveFavouriteDiagnosisLanguage(this.favouriteDiagnosisLanguage)
+                              }}
+                            >
+                              Save{' '}
+                            </ProgressButton>
+                          </GridItem>
+                        </GridContainer>
+                      )}
+                    </GridContainer>
+                  </div>
                 </SizeContainer>
               </div>
             </Drawer>
-            <Drawer
-              anchor='right'
-              open={this.state.openLabTrackingDrawer}
-              onClose={this.toggleLabTrackingDrawer}
-            >
+            <Drawer anchor="right" open={this.state.openLabTrackingDrawer} onClose={this.toggleLabTrackingDrawer}>
               <LabTrackingDrawer
                 {...widgetProps}
                 patientId={
-                  this.props.visitRegistration.entity
-                    ? this.props.visitRegistration.entity.visit.patientProfileFK
-                    : undefined
+                  this.props.visitRegistration.entity ? (
+                    this.props.visitRegistration.entity.visit.patientProfileFK
+                  ) : (
+                    undefined
+                  )
                 }
                 onClose={this.toggleLabTrackingDrawer}
               />

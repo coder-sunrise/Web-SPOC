@@ -1106,6 +1106,12 @@ const _routes = [
             component: './Setting/GenericMedication',
             authority: ['settings.clinicsetting.genericmedication'],
           },
+          {
+            path: '/setting/administrationroute',
+            name: 'administrationroute',
+            component: './Setting/AdministrationRoute',
+            authority: ['settings.clinicsetting.administrationroute'],
+          },
         ],
       },
       // Settings

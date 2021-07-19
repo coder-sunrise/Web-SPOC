@@ -350,6 +350,11 @@ export default createListViewModel({
 
         return true
       },
+      *updateQueueListing ({ payload }, { call, put }) {
+        const response = yield call(service.updateQueueListing, payload)
+
+        return true
+      },
     },
     reducers: {
       toggleSelfOnly (state) {

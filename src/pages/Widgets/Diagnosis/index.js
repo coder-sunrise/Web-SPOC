@@ -34,15 +34,30 @@ class Diagnosis extends PureComponent {
 
     dispatch({
       type: 'diagnosis/getUserPreference',
-      payload: {},
+      payload: {
+        type: '6',
+      },
+    })
+    dispatch({
+      type: 'diagnosis/getUserPreference',
+      payload: {
+        type: '8',
+      },
+    }).then((response) => {
+      if (response) {
+        const { favouriteDiagnosisLanguage: favouriteLanguage } = response
+        this.props.dispatch({
+          type: 'diagnosis/updateState',
+          payload: {
+            favouriteDiagnosisLanguage: favouriteLanguage,
+          },
+        })
+      }
     })
   }
 
   componentWillReceiveProps (nextProps) {
-    if (
-      !this.props.diagnosis.shouldAddNew &&
-      nextProps.diagnosis.shouldAddNew
-    ) {
+    if (!this.props.diagnosis.shouldAddNew && nextProps.diagnosis.shouldAddNew) {
       let index = 0
       if (this.diagnosises.length === 0) {
         index = 1
@@ -63,13 +78,9 @@ class Diagnosis extends PureComponent {
     const { diagnosis } = this.props
     let currentSelectCategory = diagnosis.favouriteDiagnosisCategory || []
     if (currentSelectCategory.length === 4) {
-      currentSelectCategory = [
-        'all',
-        ...currentSelectCategory,
-      ]
+      currentSelectCategory = [ 'all', ...currentSelectCategory ]
     }
     this.arrayHelpers.push({
-      onsetDate: moment(),
       uid: getUniqueGUID(),
       sequence: index,
       isNew: true,
@@ -100,7 +111,7 @@ class Diagnosis extends PureComponent {
           }
         }
         return d
-      }),
+      })
     )
   }
 
@@ -117,7 +128,7 @@ class Diagnosis extends PureComponent {
           }
         }
         return d
-      }),
+      })
     )
   }
 
@@ -126,14 +137,10 @@ class Diagnosis extends PureComponent {
     let newFavouriteDiagnosis
     let addNewFavorite
     if ((diagnosis.favouriteDiagnosis || []).find((d) => d === dignosisCode)) {
-      newFavouriteDiagnosis = (diagnosis.favouriteDiagnosis || [])
-        .filter((d) => d !== dignosisCode)
+      newFavouriteDiagnosis = (diagnosis.favouriteDiagnosis || []).filter((d) => d !== dignosisCode)
     } else {
       addNewFavorite = true
-      newFavouriteDiagnosis = [
-        ...(diagnosis.favouriteDiagnosis || []),
-        dignosisCode,
-      ]
+      newFavouriteDiagnosis = [ ...(diagnosis.favouriteDiagnosis || []), dignosisCode ]
     }
     dispatch({
       type: 'diagnosis/saveUserPreference',
@@ -143,12 +150,15 @@ class Diagnosis extends PureComponent {
           Identifier: 'FavouriteDiagnosis',
         },
         itemIdentifier: 'FavouriteDiagnosis',
+        type: '6',
       },
     }).then((r) => {
       if (r) {
         dispatch({
           type: 'diagnosis/getUserPreference',
-          payload: {},
+          payload: {
+            type: '6',
+          },
         }).then((response) => {
           if (response) {
             const { form } = this.arrayHelpers
@@ -165,7 +175,7 @@ class Diagnosis extends PureComponent {
                   }
                 }
                 return d
-              }),
+              })
             )
 
             setTimeout(() => {
@@ -192,7 +202,9 @@ class Diagnosis extends PureComponent {
       if (r) {
         dispatch({
           type: 'diagnosis/getUserPreference',
-          payload: {},
+          payload: {
+            type: '6',
+          },
         }).then((response) => {
           if (response) {
             const { form } = this.arrayHelpers
@@ -207,7 +219,7 @@ class Diagnosis extends PureComponent {
                   }
                 }
                 return d
-              }),
+              })
             )
 
             setTimeout(() => {
@@ -225,7 +237,7 @@ class Diagnosis extends PureComponent {
     return (
       <div>
         <FieldArray
-          name='corDiagnosis'
+          name="corDiagnosis"
           render={(arrayHelpers) => {
             const { form } = arrayHelpers
             const { values } = form
@@ -254,13 +266,9 @@ class Diagnosis extends PureComponent {
                     uid={v.uid}
                     diagnosisCode={v.diagnosisCode}
                     favouriteDiagnosisMessage={v.favouriteDiagnosisMessage}
-                    favouriteDiagnosisCategoryMessage={
-                      v.favouriteDiagnosisCategoryMessage
-                    }
+                    favouriteDiagnosisCategoryMessage={v.favouriteDiagnosisCategoryMessage}
                     favouriteDiagnosis={diagnosis.favouriteDiagnosis || []}
-                    favouriteDiagnosisCategory={
-                      diagnosis.favouriteDiagnosisCategory || []
-                    }
+                    favouriteDiagnosisCategory={diagnosis.favouriteDiagnosisCategory || []}
                     currentSelectCategory={v.currentSelectCategory || []}
                   />
                 </div>
@@ -274,11 +282,7 @@ class Diagnosis extends PureComponent {
             if (r.rights !== 'enable') return null
             return (
               <div>
-                <Button
-                  size='sm'
-                  color='primary'
-                  onClick={this.handleAddDiagnosisClick}
-                >
+                <Button size="sm" color="primary" onClick={this.handleAddDiagnosisClick}>
                   <Add />Add Diagnosis
                 </Button>
               </div>

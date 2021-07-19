@@ -124,6 +124,8 @@ export default {
   'reception.queue.visitRegistration.visitInformation': 'Visit Information',
   'reception.queue.visitRegistration.visitType': 'Visit Type',
   'reception.queue.visitRegistration.queueNo': 'Queue Number',
+  'reception.queue.visitRegistration.visitGroup': 'Visit Group Number',
+  'reception.queue.visitRegistration.consReady': 'Cons. Ready',
   'reception.queue.visitRegistration.doctor': 'Doctor',
   'reception.queue.visitRegistration.attendantDoctor': 'Attendant Doctor',
   'reception.queue.visitRegistration.visitRemarks': 'Visit Remarks',

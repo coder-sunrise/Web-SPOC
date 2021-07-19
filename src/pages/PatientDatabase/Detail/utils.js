@@ -93,7 +93,10 @@ const upsertPatient = async ({
         )
       }
     }
-
+    // form submit then call back refresh data
+    if(patient.submitCallback){
+      patient.submitCallback()
+    }
     const newPatient = await dispatch({
       type: 'patient/query',
       payload: {

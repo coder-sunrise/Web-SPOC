@@ -455,7 +455,7 @@ class PatientHistory extends Component {
               <div style={{ fontWeight: 500 }}>
                 {`${moment(visitDate).format(
                   'DD MMM YYYY HH:MM',
-                )} - Nurse Notes${docotrName ? ` - ${docotrName}` : ''}`}
+                )} - Notes${docotrName ? ` - ${docotrName}` : ''}`}
               </div>
             </div>
           )}
@@ -614,7 +614,7 @@ class PatientHistory extends Component {
               fontSize: '0.85rem',
             }}
           >
-            Nurse Notes
+            Notes
           </span>
           <div
             style={{ fontSize: '0.85rem' }}
