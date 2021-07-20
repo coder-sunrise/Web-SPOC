@@ -410,7 +410,7 @@ class Radiology extends PureComponent {
       filterServices = services.filter(s => radiologyItems.find(r => r.serviceFK === s.value)
         || ((selectTag === 'All' || s.serviceTags.find(st => st.value === selectTag))
           && (selectCategory === 'All' || s.serviceCategoryFK === selectCategory)
-          && (s.code.indexOf(filterService) >= 0 || s.name.indexOf(filterService) >= 0)
+        && (s.code.toUpperCase().indexOf(filterService.toUpperCase()) >= 0 || s.name.toUpperCase().indexOf(filterService.toUpperCase()) >= 0)
         )
       )
     }
@@ -637,7 +637,7 @@ class Radiology extends PureComponent {
                     right: -35,
                   }}
                   handleSelectCannedText={(cannedText) => {
-                    editService.instruction = `${editService.instruction} ${cannedText.text || ''}`.substring(0, 2000)
+                    editService.instruction = `${editService.instruction ? (editService.instruction + ' ') : ''}${cannedText.text || ''}`.substring(0, 2000)
                     setFieldValue('radiologyItems', [...radiologyItems])
                   }}
                 />
@@ -766,7 +766,7 @@ class Radiology extends PureComponent {
               <TextField
                 value={editService.newServiceName}
                 disabled={!editServiceId}
-                label='New Service Name'
+                label='New Service Display Name'
                 maxLength={255}
                 onChange={(e) => {
                   editService.newServiceName = e.target.value
