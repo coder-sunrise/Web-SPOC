@@ -7,7 +7,7 @@ import Grid from './Grid'
 
 const AppointmentSearch = ({
   dispatch,
-  handleSelectEvent,
+  handleDoubleClick,
   handleAddAppointmentClick,
   appointment,
   currentUser,
@@ -90,8 +90,8 @@ const AppointmentSearch = ({
         />
       </div>
       <Grid
-        handleSelectEvent={(data) => {
-          handleSelectEvent({ ...data, isHistory: true })
+      handleDoubleClick={(data) => {
+        handleDoubleClick({ ...data, isHistory: true })
         }}
         height={height}
       />

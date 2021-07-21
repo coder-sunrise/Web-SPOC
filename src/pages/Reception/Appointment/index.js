@@ -292,11 +292,14 @@ class Appointment extends React.PureComponent {
     })
   }
 
-  onSelectSlot = (props) => {
-    const { start, end, resourceId } = props || {}
+  onSelectSlot = (props) => { 
+    const { start, end, resourceId,action } = props || {}
     const createApptAccessRight = Authorized.check('appointment.newappointment')
 
     if (createApptAccessRight && createApptAccessRight.rights !== 'enable')
+      return
+
+    if(action === 'select' || action ==='click')
       return
 
     const selectedSlot = {
@@ -305,7 +308,6 @@ class Appointment extends React.PureComponent {
       end,
       resourceId,
     }
-
     this.setState({
       selectedSlot,
       isDragging: false,
@@ -313,7 +315,8 @@ class Appointment extends React.PureComponent {
     })
   }
 
-  onSelectEvent = (selectedEvent) => {
+
+  onDoubleClickEvent = (doubleClickEvent) => {
     const {
       id,
       appointmentFK,
@@ -323,12 +326,14 @@ class Appointment extends React.PureComponent {
       appointmentStatusFk,
       isHistory,
       isDoctorBlock,
-    } = selectedEvent
+    } = doubleClickEvent
+
     if (
       isHistory &&
-      ![
-        APPOINTMENT_STATUS.DRAFT,
-        APPOINTMENT_STATUS.CONFIRMED,
+      [
+        // APPOINTMENT_STATUS.DRAFT,
+        // APPOINTMENT_STATUS.CONFIRMED,
+        APPOINTMENT_STATUS.RESCHEDULED
       ].includes(appointmentStatusFk)
     )
       return
@@ -643,7 +648,7 @@ class Appointment extends React.PureComponent {
               resources={resources}
               filter={filter}
               handleSelectSlot={this.onSelectSlot}
-              handleSelectEvent={this.onSelectEvent}
+              handleDoubleClick={this.onDoubleClickEvent}
               handleMoveEvent={this.moveEvent}
               handleEventMouseOver={this.onEventMouseOver}
               handleOnDragStart={this.handleOnDragStart}
@@ -673,7 +678,7 @@ class Appointment extends React.PureComponent {
                     ? selectedSlot.resourceId
                     : filter.filterBySingleDoctor,
               }}
-              onHistoryRowSelected={this.onSelectEvent}
+              onHistoryRowSelected={this.onDoubleClickEvent}
             />
           )}
         </CommonModal>
@@ -706,7 +711,7 @@ class Appointment extends React.PureComponent {
           maxWidth='xl'
         >
           <AppointmentSearch
-            handleSelectEvent={this.onSelectEvent}
+            handleDoubleClick={this.onDoubleClickEvent}
             handleAddAppointmentClick={this.handleAddAppointmentClick}
             currentUser={user.data.clinicianProfile.id}
             doctorprofile={doctorprofile}
