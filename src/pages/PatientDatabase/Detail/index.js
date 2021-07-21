@@ -316,7 +316,7 @@ class PatientDetail extends PureComponent {
       }
     }
 
-    const preOrderListAccessRight = Authorized.check('patientdatabase.preorder')
+    const preOrderListAccessRight = Authorized.check('patientdatabase.modifypreorder')
     if(preOrderListAccessRight){
       const hiddenPreOrderListAccessRight = preOrderListAccessRight.rights === 'hidden'
       if(hiddenPreOrderListAccessRight){

@@ -1,5 +1,6 @@
 
 import React, { useState, useRef } from 'react'
+import moment from 'moment'
 import { useIntl, Link } from 'umi'
 import { Tabs } from '@/components'
 import { VISIT_TYPE_NAME } from '@/utils/constants'
@@ -24,13 +25,15 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props :any) => {
     columns: [
       { name: 'preOrderItemType', title: 'Type' },
       { name: 'itemName', title: 'Name' },
-      { name: 'quantity', title: 'Quantity' },
       { name: 'orderByUser', title: 'Order By' },
-      { name: 'orderDate', title: 'Order Time' },
+      { name: 'orderDate', title: 'Order Date' },
+      { name: 'quantity', title: 'Order Qty.' },
       { name: 'remarks', title: 'Remarks' },
       { name: 'amount', title: 'Amount' },
       { name: 'actualizedByUser', title: 'Actualized By'},
       { name: 'actualizedDate', title: 'Actualized Date'},
+      { name: 'actualizedQuantity', title: 'Actualized Qty.' },
+
     ],
     columnExtensions: [
       {
@@ -49,8 +52,11 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props :any) => {
       {
         columnName: 'quantity',
         type: 'number',
-        precision: 2,
+        precision: 1,
         width: 100,
+        render: (row) => {
+          return <span>{row.quantity} {row.dispenseUOM}</span>
+        },
         isDisabled: () => true,
       },
       {
@@ -62,7 +68,10 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props :any) => {
       {
         columnName: 'orderDate',
         type: 'date',
-        width: 100,
+        width: 150,
+        render: (row) => {
+          return <span>{moment(row.orderDate).format('DD MMM YYYY HH:mm')}</span>
+        },
         isDisabled: () => true,
       },
       {
@@ -78,6 +87,16 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props :any) => {
         isDisabled: () => true,
       },
       {
+        columnName: 'actualizedQuantity',
+        type: 'number',
+        precision: 2,
+        width: 120,
+        render: (row) => {
+          return <span>{row.actualizedQuantity} {row.dispenseUOM}</span>
+        },
+        isDisabled: () => true,
+      },
+      {
         columnName: 'actualizedByUser',
         type: 'text',
         isDisabled: () => true,
@@ -88,6 +107,9 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props :any) => {
       {
         columnName: 'actualizedDate',
         type: 'date',
+        render: (row) => {
+          return <span>{moment(row.orderDate).format('DD MMM YYYY HH:mm')}</span>
+        },
         isDisabled: () => true,
       },
     ],

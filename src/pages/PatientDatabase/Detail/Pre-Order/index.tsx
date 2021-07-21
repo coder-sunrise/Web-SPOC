@@ -1,6 +1,5 @@
 
-import React, { useState, useRef, useEffect } from 'react'
-import { useIntl, Link } from 'umi'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'dva'
 import { Tabs } from '@/components'
 import PendingPreOrder from './pending'
@@ -30,7 +29,6 @@ const PreOrder: React.FC<IPreOrderProps> = (props) => {
       },
     ]
     return tabs
-    // return tabs.filter((f) => checkAccessRight(f.authority))
   }
   useEffect(() => {
 

@@ -23,10 +23,11 @@ const PendingPreOrder: React.FC = (props: any) => {
   const [labs, setLabs] = useState()
   const [radiology, setRadiology] = useState()
 
-  const modifyPreOrderAccessRight = Authorized.check('patientdatabase.modifypreorder') ||  {rights: 'hidden'}
+  const addPreOrderAccessRight = Authorized.check('patientdatabase.modifypreorder.addpreorder') ||  {rights: 'hidden'}
+  const deletePreOrderAccessRight = Authorized.check('patientdatabase.modifypreorder.deletepreorder') ||  {rights: 'hidden'}
 
   const isEditable = (row) => {
-    return modifyPreOrderAccessRight.rights === 'enable' && row.hasPaid === false ? true : false;
+    return row.id < 0 ? true : false 
   } 
 
   const commitChanges = ({ rows }) => {
@@ -239,9 +240,9 @@ const PendingPreOrder: React.FC = (props: any) => {
     columns: [
       { name: 'preOrderItemType', title: 'Type' },
       { name: 'sourceRecordFK', title: 'Name' },
-      { name: 'quantity', title: 'Quantity' },
       { name: 'orderByUserFK', title: 'Order By' },
       { name: 'orderDate', title: 'Order Date' },
+      { name: 'quantity', title: 'Order Qty.' },
       { name: 'remarks', title: 'Remarks' },
       { name: 'amount', title: 'Amount' },
       { name: 'hasPaid', title: 'Paid'},
@@ -256,7 +257,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         width: 180,
         options: () => preOrderItemCategory,
         onChange: handleCategoryChanged,
-        isDisabled :(row) =>  isEditable(row) === true && row.id < 0 ? false : true 
+        isDisabled :(row) =>  !isEditable(row),
       },
       {
         columnName: 'sourceRecordFK',
@@ -268,15 +269,18 @@ const PendingPreOrder: React.FC = (props: any) => {
         render: (row,option)=>{
           return <div>{row.itemName }</div>
         },
-        isDisabled :(row) =>  isEditable(row) ? false : true,
+        isDisabled :(row) => !isEditable(row),
       },
       {
         columnName: 'quantity',
         type: 'number',
-        precision: 2,
+        precision: 1,
         width: 100,
         onChange: handelQuantityChanged,
-        isDisabled :(row) =>  isEditable(row) ? false : true,
+        render: (row) => {
+          return <span>{row.quantity} {row.dispenseUOM}</span>
+        },
+        isDisabled :(row) => !isEditable(row),
       },
       {
         columnName: 'orderByUserFK',
@@ -290,20 +294,23 @@ const PendingPreOrder: React.FC = (props: any) => {
       {
         columnName: 'orderDate',
         type: 'date',
-        width: 100,
+        width: 150,
         isDisabled: () => true,
+        render: (row) => {
+          return <span>{moment(row.orderDate).format('DD MMM YYYY HH:mm')}</span>
+        },
       },
       {
         columnName: 'remarks',
         maxLength: 100,
         sortingEnabled: false,
-        isDisabled :() =>  modifyPreOrderAccessRight.rights === 'enable' ? false : true,
+        isDisabled :(row) => !isEditable(row),
       },
       {
         columnName: 'amount',
         width: 100,
         type: 'currency',
-        isDisabled :(row) =>  isEditable(row) ? false : true,
+        isDisabled :(row) => !isEditable(row),
       },
       {
         columnName: 'hasPaid',
@@ -311,7 +318,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         isDisabled: () => true,
         render:(row) => {
           return row.hasPaid ? 'Yes' : 'No'
-        }
+        },
       },
       {
         columnName: 'preOrderItemStatus',
@@ -333,10 +340,11 @@ const PendingPreOrder: React.FC = (props: any) => {
           pager:false,
       }}
       EditingProps={{
-        showAddCommand: isEditable,
+        showAddCommand: addPreOrderAccessRight.rights === 'enable' ? true : false,
         isDeletable: (row) => {
-          return isEditable && row.preOrderItemStatus ==='New' ? true : false;
+          return deletePreOrderAccessRight.rights === 'enable' ?  true : false  // && row.preOrderItemStatus ==='New' ? true : false;
         },
+        showCommandColumn : deletePreOrderAccessRight.rights === 'hidden' ? false : true,
         onCommitChanges: commitChanges,
         onAddedRowsChange: (rows: any) => {
           return rows.map(o => {
