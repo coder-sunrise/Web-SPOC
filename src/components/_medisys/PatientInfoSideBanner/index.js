@@ -335,6 +335,7 @@ class PatientInfoSideBanner extends PureComponent {
 
     const medisaveAccessRight = Authorized.check('patientdatabase.checkmedisavebalance')
     const isMedisaveEnable = clinicSettings.isEnableMedisave && medisaveAccessRight.rights !== 'hidden'
+    const isCHASEnable = clinicSettings.isEnableCHAS
     // console.log('isMedisaveEnable',clinicSettings, medisaveAccessRight)
 
     return entity && entity.id ? (
@@ -415,6 +416,7 @@ class PatientInfoSideBanner extends PureComponent {
         </div>
         <Divider light />
         <LoadingWrapper loading={loading} text='Retrieving balance...'>
+         {isCHASEnable && (
           <div
             className={classes.schemeContainer}
             style={{ maxHeight: height - 455 - 20 }}
@@ -500,9 +502,9 @@ class PatientInfoSideBanner extends PureComponent {
                 )
               })}
           </div>
-          {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6).length > 0 && (
-            <Divider light />
-          )}
+        ) && (entity.patientScheme.filter((o) => o.schemeTypeFK <= 6).length > 0 && (
+          <Divider light />
+        ))}
           {isMedisaveEnable && entity.schemePayer.length > 0 && (
             // == MEDISAVE == //
             <div
