@@ -224,7 +224,7 @@ const Stock = ({
               return (
                 <NumberInput
                   label={formatMessage({
-                    id: 'inventory.master.stock.excessThreshold',
+                    id: 'inventory.master.stock.currentStock',
                   })}
                   value={stockQty}
                   disabled
