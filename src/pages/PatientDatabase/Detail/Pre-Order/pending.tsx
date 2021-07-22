@@ -44,7 +44,7 @@ const PendingPreOrder: React.FC = (props: any) => {
     })
   }
 
-  const initMedicationVaccintionsOptions = () => {
+  const initAllTypeOptions = () => {
     const itemWrapper = (p: any, c: any) => {
       const { code, displayValue, sellingPrice = 0, dispensingUOM = {}, uom = {},unitPrice = 0 } = c
       const { name : medAndVacUOM='' } = dispensingUOM
@@ -233,7 +233,7 @@ const PendingPreOrder: React.FC = (props: any) => {
   }
 
   useEffect(() => {
-    initMedicationVaccintionsOptions()
+    initAllTypeOptions()
   }, [])
 
   const tableParas = {

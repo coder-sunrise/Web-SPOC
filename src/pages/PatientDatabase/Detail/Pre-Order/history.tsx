@@ -5,8 +5,8 @@ import { useIntl, Link } from 'umi'
 import { Tabs } from '@/components'
 import { VISIT_TYPE_NAME } from '@/utils/constants'
 import {
-  FastEditableTableGrid,
   Tooltip,
+  CommonTableGrid, 
 } from '@/components'
 import { preOrderItemCategory } from '@/utils/codes'
 interface IHistoryPreOrderProps {
@@ -116,7 +116,7 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props :any) => {
   }
 
   return <>
-  <FastEditableTableGrid
+  <CommonTableGrid
     rows={getFilteredRows(list)}
     schema={schema}
     EditingProps={{
