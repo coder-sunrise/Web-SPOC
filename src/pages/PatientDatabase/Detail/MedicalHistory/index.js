@@ -12,25 +12,27 @@ import {
 class MedicalHistory extends PureComponent {
 
   constructor(props) {
-    super(props);
+    super(props)
     this.state = { 
       persistentDiagnosis: [],
-    };
+    }
   }
 
   componentWillMount () {
     const patientId = this.props.values.id
-
-    this.props.dispatch({
-      type: 'patientHistory/queryPersistentDiagnosis',
-      payload: { id: patientId },
-    }).then((r) => {
-      if (r) {
-        this.setState({
-          persistentDiagnosis: r.data.data,
-        })
-      }
-    })
+    const diagnosis = Authorized.check('patientdatabase.patientprofiledetails.medicalhistory.persistentdiagnosis')
+    if (diagnosis && diagnosis.rights !== 'hidden') {
+      this.props.dispatch({
+        type: 'patientHistory/queryPersistentDiagnosis',
+        payload: { id: patientId },
+      }).then((r) => {
+        if (r) {
+          this.setState({
+            persistentDiagnosis: r.data.data,
+          })
+        }
+      })
+    }
   }
   
   shouldComponentUpdate(nextProps, nextState) {
@@ -49,6 +51,7 @@ class MedicalHistory extends PureComponent {
     if (diagnosis) showPersistentDiagnosis = diagnosis.rights !== 'hidden'
     if (highRisk) showHighRiskPatient = highRisk.rights !== 'hidden'
     if (highRisk) disableEditHighRiskPatient = highRisk.rights !== 'enable'
+    const { clinicSettings } = this.props
 
     return (
       <div>
@@ -82,18 +85,18 @@ class MedicalHistory extends PureComponent {
                 size='sm'
                 style={{ margin: 0 }}
                 rows={this.state.persistentDiagnosis}
-                columns={[
+                columns={clinicSettings.isEnableJapaneseICD10Diagnosis ? [
                   { name: 'diagnosisDescription', title: 'Diagnosis' },
                   { name: 'jpnDiagnosisDescription', title: 'Diagnosis(JP)' },
+                  { name: 'onsetDate', title: 'Onset Date' },
+                ] : [
+                  { name: 'diagnosisDescription', title: 'Diagnosis' },
                   { name: 'onsetDate', title: 'Onset Date' },
                 ]}
                 columnExtensions={[
                   {
                     columnName: 'onsetDate',
                     type: 'date',
-                    render: (text, row) => (
-                      <span>{moment(row.onsetDate).format('DD MMM YYYY HH:mm')}</span>
-                    ),
                   }
                 ]}
                 FuncProps={{ pager: false }}
