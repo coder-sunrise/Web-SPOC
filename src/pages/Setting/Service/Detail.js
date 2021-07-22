@@ -646,18 +646,23 @@ class Detail extends PureComponent {
                           code='CTServiceCategory'
                           labelField='displayValue'
                           onChange={async (values, opts) => {
-                            if (opts) {
+                            if (opts === undefined || opts === null) {
+                              this.setState({
+                                isPanelItemRequired: false,
+                              })
+                            } else {
                               this.setState({
                                 isPanelItemRequired: opts.isPanelItemRequired,
                               })
-                              await args.form.setFieldValue('chkOptions', [])
-
-                              this.setState({
-                                checkboxOptions: checkboxOptions.filter(
-                                  o => o.id !== 'isRequiredSpecimenPanelItem',
-                                ),
-                              })
                             }
+
+                            await args.form.setFieldValue('chkOptions', [])
+
+                            this.setState({
+                              checkboxOptions: checkboxOptions.filter(
+                                o => o.id !== 'isRequiredSpecimenPanelItem',
+                              ),
+                            })
                           }}
                           {...args}
                         />
