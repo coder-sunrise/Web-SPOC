@@ -3,6 +3,7 @@ import numeral from 'numeral'
 import { qtyFormat } from '@/utils/config'
 // dva
 import { connect } from 'dva'
+import { Tag } from 'antd'
 import Yup from '@/utils/yup'
 // material ui
 import { withStyles } from '@material-ui/core'
@@ -20,6 +21,7 @@ import {
   NumberInput,
   Switch,
   ProgressButton,
+  Tooltip
 } from '@/components'
 // utils
 import { INVOICE_VIEW_MODE } from '@/utils/constants'
@@ -296,6 +298,7 @@ class EditInvoice extends Component {
                       <div className={classes.wrapCellTextStyle}>
                         {row.itemType}
                         {this.drugMixtureIndicator(row)}
+                        {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: -10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
                       </div>
                     </div>
                   )
@@ -314,6 +317,7 @@ class EditInvoice extends Component {
                 onChange: e => {
                   this.updateUnitPrice(e.row)
                 },
+                isDisabled: (row) => row.isPreOrder && !row.isChargeToday,
               },
               {
                 columnName: 'quantity',
@@ -361,6 +365,7 @@ class EditInvoice extends Component {
                                 }
                               },
                             }}
+                            disabled={row.isPreOrder && !row.isChargeToday}
                           />
                         )}
                       />
@@ -397,6 +402,7 @@ class EditInvoice extends Component {
                                     }
                                   },
                                 }}
+                                disabled={row.isPreOrder && !row.isChargeToday}
                               />
                             )}
                           />
@@ -428,6 +434,7 @@ class EditInvoice extends Component {
                                     }
                                   },
                                 }}
+                                disabled={row.isPreOrder && !row.isChargeToday}
                               />
                             )}
                           />
@@ -459,6 +466,7 @@ class EditInvoice extends Component {
                                 }
                               },
                             }}
+                            disabled={row.isPreOrder && !row.isChargeToday}
                           />
                         )}
                       />
@@ -475,6 +483,8 @@ class EditInvoice extends Component {
                 onChange: e => {
                   this.updateTotal(e.row)
                 },
+                isDisabled: (row) => row.isPreOrder && !row.isChargeToday,
+                render: (row) => <NumberInput value={(row.isPreOrder && !row.isChargeToday) ? 0 : row.totalAfterItemAdjustment} text currency />
               },
             ]}
             schema={itemSchema}

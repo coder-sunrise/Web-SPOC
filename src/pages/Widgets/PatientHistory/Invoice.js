@@ -2,8 +2,9 @@ import React from 'react'
 import { Table } from 'antd'
 import moment from 'moment'
 import numeral from 'numeral'
+import { Tag } from 'antd'
 import { currencySymbol } from '@/utils/config'
-import { GridContainer, GridItem, TextField } from '@/components'
+import { GridContainer, GridItem, TextField, Tooltip } from '@/components'
 import { VISIT_TYPE } from '@/utils/constants'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import AmountSummary from './AmountSummary'
@@ -59,6 +60,7 @@ const baseColumns = [
           <div style={wrapCellTextStyle}>
             {row.isDrugMixture ? 'Drug Mixture' : row.itemType}
             {drugMixtureIndicator(row)}
+            {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: -10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
           </div>
         </div>
       )
@@ -93,7 +95,7 @@ const baseColumns = [
     title: 'Total',
     width: 100,
     align: 'right',
-    render: (text, row) => showCurrency(row.totalAfterItemAdjustment),
+    render: (text, row) => showCurrency((row.isPreOrder && !row.isChargeToday) ? 0 : row.totalAfterItemAdjustment),
   },
 ]
 
