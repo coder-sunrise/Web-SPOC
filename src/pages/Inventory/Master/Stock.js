@@ -56,7 +56,7 @@ const Stock = ({
   }
 
   const [stock, setStock] = useState(
-    _.sortBy(values[objectType().stockProp], 'id'),
+    _.sortBy(values[objectType().stockProp], 'expiryDate'),
   )
 
   const changeIsDefault = async row => {
@@ -150,7 +150,6 @@ const Stock = ({
       { name: 'batchNo', title: 'Batch No.' },
       { name: 'expiryDate', title: 'Expiry Date' },
       { name: 'stock', title: 'Quantity' },
-      { name: 'isDefault', title: 'Default' },
       {
         name: 'action',
         title: 'Action',
@@ -187,19 +186,6 @@ const Stock = ({
         ),
       },
       {
-        columnName: 'isDefault',
-        align: 'center',
-        render: row => {
-          return (
-            <Radio
-              checked={row.isDefault}
-              onChange={() => changeIsDefault(row)}
-              disabled={row.isDeleted || checkIsReadOnly()}
-            />
-          )
-        },
-      },
-      {
         columnName: 'action',
         sortingEnabled: false,
         align: 'center',
@@ -232,14 +218,14 @@ const Stock = ({
       }}
     >
       <GridContainer className={classes.infoPanl}>
-        <GridItem xs={12} md={4}>
+        <GridItem xs={12} md={3}>
           <Field
             name={`${objectType().stockProp}`}
             render={args => {
               return (
                 <NumberInput
                   label={formatMessage({
-                    id: 'inventory.master.stock.currentStock',
+                    id: 'inventory.master.stock.excessThreshold',
                   })}
                   value={stockQty}
                   disabled
@@ -250,7 +236,7 @@ const Stock = ({
             }}
           />
         </GridItem>
-        <GridItem xs={12} md={4}>
+        <GridItem xs={12} md={3}>
           <FastField
             name='reOrderThreshold'
             render={args => {
@@ -265,7 +251,7 @@ const Stock = ({
             }}
           />
         </GridItem>
-        <GridItem xs={12} md={4}>
+        <GridItem xs={12} md={3}>
           <FastField
             name='criticalThreshold'
             render={args => {
@@ -273,6 +259,21 @@ const Stock = ({
                 <NumberInput
                   label={formatMessage({
                     id: 'inventory.master.stock.criticalThreshold',
+                  })}
+                  {...args}
+                />
+              )
+            }}
+          />
+        </GridItem>
+        <GridItem xs={12} md={3}>
+          <FastField
+            name='excessThreshold'
+            render={args => {
+              return (
+                <NumberInput
+                  label={formatMessage({
+                    id: 'inventory.master.stock.excessThreshold',
                   })}
                   {...args}
                 />
