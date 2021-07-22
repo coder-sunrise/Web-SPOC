@@ -16,6 +16,7 @@ const api = {
 
 const defaultColumns = [
   {
+    key: 'patientReferenceNo',
     title: 'Ref. No.',
     dataIndex: 'patientReferenceNo',
     sorterBy: 'aa.patientReferenceNo',
@@ -25,12 +26,14 @@ const defaultColumns = [
     search: false,
   },
   {
+    key: 'patientAccountNo',
     title: 'Acc. No.',
     dataIndex: 'patientAccountNo',
     sorter: true,
     search: false,
   },
   {
+    key: 'name',
     title: 'Patient Name',
     dataIndex: 'name',
     sorter: true,
@@ -38,6 +41,7 @@ const defaultColumns = [
     width: 200,
   },
   {
+    key: 'lastVisitDate',
     title: 'Last Visit Date',
     dataIndex: 'lastVisitDate',
     valueType: 'dateTime',
@@ -47,11 +51,13 @@ const defaultColumns = [
     search: false,
   },
   {
+    key: 'status',
     title: 'Status',
     dataIndex: 'status',
     search: false,
   },
   {
+    key: 'gender/age',
     dataIndex: 'gender/age',
     title: 'Gender / Age',
     render: (_dom: any, entity: any) =>
@@ -61,18 +67,20 @@ const defaultColumns = [
     search: false,
   },
   {
+    key:'dob',
     dataIndex: 'dob',
     title: 'DOB',
     render: (_dom: any, entity: any) => entity.dob?.format('L') || '-',
     width: 100,
     search: false,
   },
-  { dataIndex: 'race', title: 'Race', search: false },
-  { dataIndex: 'nationality', title: 'Nationality', search: false },
-  { dataIndex: 'mobileNo', title: 'Mobile No.', search: false },
-  { dataIndex: 'homeNo', title: 'Home No.', search: false },
-  { dataIndex: 'officeNo', title: 'Office No.', search: false },
+  { key:'race', dataIndex: 'race', title: 'Race', search: false },
+  { key: 'nationality', dataIndex: 'nationality', title: 'Nationality', search: false },
+  { key: 'mobileNo', dataIndex: 'mobileNo', title: 'Mobile No.', search: false },
+  { key: 'homeNo', dataIndex: 'homeNo', title: 'Home No.', search: false },
+  { key: 'officeNo', dataIndex: 'officeNo', title: 'Office No.', search: false },
   {
+    key: 'outstandingBalance',
     dataIndex: 'outstandingBalance',
     title: 'Total O/S Balance',
     valueType: 'money',
@@ -115,17 +123,43 @@ const showPatient = row => {
     }),
   )
 }
-const PatientIndex = ({ dispatch }) => {
+const saveColumnsSetting = (dispatch, columnsSetting) => {
+   dispatch({
+      type: 'patient/saveUserPreference',
+      payload: {
+        userPreferenceDetails: {
+          value: columnsSetting,
+          Identifier: 'PatientDatabaseColumnSetting',
+        },
+        itemIdentifier: 'PatientDatabaseColumnSetting',
+        type: '4',
+      },
+    }).then((result)=>{
+      dispatch({
+        type: 'patient/updateState',
+        payload: {
+          favPatDBColumnSetting: columnsSetting,
+        },
+      })
+    })
+}
+
+const PatientIndex = ({ dispatch, patient:{ favPatDBColumnSetting={} }}) => {
   return (
-    <PageContainer>
+    <PageContainer pageHeaderRender={false}>
       <ProTable
+        rowSelection={false}
         columns={defaultColumns}
         api={api}
         // search={{
         //   optionRender: (searchConfig, formProps, dom) => {
-        //     return [dom, <Button></Button>]
+        //     console.log(dom)
+        //     return [dom, <Button>HELLO TEST</Button>]
         //   },
         // }}
+        columnsStateMap={favPatDBColumnSetting}
+        onColumnsStateChange={(map)=> saveColumnsSetting(dispatch,map)}
+        options={{ density:false, reload:false, }}
         toolBarRender={() => {
           return [
             <Button

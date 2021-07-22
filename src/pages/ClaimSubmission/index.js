@@ -25,20 +25,25 @@ const styles = theme => ({
 class ClaimSubmission extends PureComponent {
   componentDidMount() {
     const { clinicSettings } = this.props
+    const isCHASEnable = clinicSettings.settings.isEnableCHAS
     const isMedisaveEnable = clinicSettings.settings.isEnableMedisave // global medisave
     this.props.dispatch({
       type: 'claimSubmission/getClaimCount',
-      payload: isMedisaveEnable
-        ? {
-            'ClaimCountListDto[0].SchemeType': 'CHAS',
-            'ClaimCountListDto[0].Status': 'New',
-            'ClaimCountListDto[1].SchemeType': 'Medisave',
-            'ClaimCountListDto[1].Status': 'New',
-          }
-        : {
-            'ClaimCountListDto[0].SchemeType': 'CHAS',
-            'ClaimCountListDto[0].Status': 'New',
-          },
+      payload: (()=>{
+        var list = {}
+        var index = 0
+        if(isCHASEnable){
+          list[`ClaimCountListDto[${index}].SchemeType`] = 'CHAS'
+          list[`ClaimCountListDto[${index}].Status`] = 'New'
+          index++
+        }
+        if(isMedisaveEnable){
+          list[`ClaimCountListDto[${index}].SchemeType`] = 'Medisave'
+          list[`ClaimCountListDto[${index}].Status`] = 'New'
+          index++
+        }
+        return list
+      })(),
     })
   }
 
