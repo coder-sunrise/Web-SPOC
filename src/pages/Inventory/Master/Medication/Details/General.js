@@ -26,6 +26,64 @@ import DetailsContext from './DetailsContext'
 
 const styles = () => ({})
 
+const chasOptions = [
+  {
+    id: 'isChasAcuteClaimable',
+    name: 'CHAS Acute Claimable',
+    layoutConfig: {
+      style: {},
+    },
+  },
+  {
+    id: 'isChasChronicClaimable',
+    name: 'CHAS Chronic Claimable',
+    layoutConfig: {
+      style: {},
+    },
+  },
+]
+
+const medisaveOptions = [
+  {
+    id: 'isMedisaveClaimable',
+    name: 'CDMP Claimable',
+    layoutConfig: {
+      style: {},
+    },
+  },
+  {
+    id: 'isMedisaveClaimable',
+    name: 'CDMP Claimable',
+    layoutConfig: {
+      style: {},
+    },
+  },
+]
+
+const generalOptions = [
+  {
+    id: 'isOnlyClinicInternalUsage',
+    name: 'Only Internal Usage',
+    layoutConfig: {
+      style: {},
+    },
+  },
+  {
+    id: 'isDisplayInLeaflet',
+    name: 'Display in Leaflet',
+    layoutConfig: {
+      style: {},
+    },
+  },
+  {
+    id: 'isExclusive',
+    name: 'Exclusive',
+    layoutConfig: {
+      style: {},
+    },
+  },
+]
+
 const General = ({
   medicationDetail,
   dispatch,
@@ -54,7 +112,6 @@ const General = ({
   ] = useTranslation(values.translationData || [], currentLanguage)
 
   const entity = medicationDetail.entity
-
   const [attachments, setAttachments] = useState([])
 
   useEffect(() => {
@@ -83,6 +140,20 @@ const General = ({
     setFieldValue('sddfk', id)
     setFieldValue('sddCode', code)
     setFieldValue('sddDescription', name)
+  }
+
+  const getCheckboxOptions = () => {
+    let checkboxOptions = []
+    if (clinicSettings.isEnableCHAS) {
+      checkboxOptions.push(...chasOptions)
+    }
+
+    if (clinicSettings.isEnableMedisave) {
+      checkboxOptions.push(...medisaveOptions)
+    }
+
+    checkboxOptions.push(...generalOptions)
+    return checkboxOptions
   }
 
   const updateAttachments = ({ added, deleted }) => {
@@ -443,7 +514,7 @@ const General = ({
       <GridContainer>
         <GridItem xs={12} />
         <GridItem md={12}>
-          <FastField
+          <Field
             name='checkboxGroup'
             render={args => (
               <CheckboxGroup
@@ -453,97 +524,7 @@ const General = ({
                 simple
                 valueField='id'
                 textField='name'
-                options={
-                  clinicSettings.isEnableMedisave
-                    ? [
-                        {
-                          id: 'isChasAcuteClaimable',
-                          name: 'CHAS Acute Claimable',
-                          layoutConfig: {
-                            style: {},
-                          },
-                        },
-                        {
-                          id: 'isChasChronicClaimable',
-                          name: 'CHAS Chronic Claimable',
-                          layoutConfig: {
-                            style: {},
-                          },
-                        },
-                        {
-                          id: 'isOnlyClinicInternalUsage',
-                          name: 'Only Internal Usage',
-                          layoutConfig: {
-                            style: {},
-                          },
-                        },
-                        {
-                          id: 'isDisplayInLeaflet',
-                          name: 'Display in Leaflet',
-                          layoutConfig: {
-                            style: {},
-                          },
-                        },
-                        {
-                          id: 'isExclusive',
-                          name: 'Exclusive',
-                          layoutConfig: {
-                            style: {},
-                          },
-                        },
-                        {
-                          id: 'isMedisaveClaimable',
-                          name: 'CDMP Claimable',
-                          layoutConfig: {
-                            style: {},
-                          },
-                        },
-                        {
-                          id: 'isMedisaveClaimable',
-                          name: 'CDMP Claimable',
-                          layoutConfig: {
-                            style: {},
-                          },
-                        },
-                      ]
-                    : [
-                        {
-                          id: 'isChasAcuteClaimable',
-                          name: 'CHAS Acute Claimable',
-                          layoutConfig: {
-                            style: {},
-                          },
-                        },
-                        {
-                          id: 'isChasChronicClaimable',
-                          name: 'CHAS Chronic Claimable',
-                          layoutConfig: {
-                            style: {},
-                          },
-                        },
-                        {
-                          id: 'isOnlyClinicInternalUsage',
-                          name: 'Only Internal Usage',
-                          layoutConfig: {
-                            style: {},
-                          },
-                        },
-                        {
-                          id: 'isDisplayInLeaflet',
-                          name: 'Display in Leaflet',
-                          layoutConfig: {
-                            style: {},
-                          },
-                        },
-                        {
-                          id: 'isExclusive',
-                          name: 'Exclusive',
-                          layoutConfig: {
-                            style: {},
-                          },
-                        },
-                      ]
-                }
+                options={getCheckboxOptions()}
                 onChange={(e, s) => {}}
                 {...args}
               />
