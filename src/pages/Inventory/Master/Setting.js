@@ -103,7 +103,7 @@ const Setting = ({
             render={args => (
               <CodeSelect
                 label={formatMessage({
-                  id: 'inventory.master.setting.uom',
+                  id: 'inventory.master.setting.prescribeUOM',
                 })}
                 labelField='name'
                 code={
@@ -180,7 +180,7 @@ const Setting = ({
             render={args => (
               <CodeSelect
                 label={formatMessage({
-                  id: 'inventory.master.setting.uom',
+                  id: 'inventory.master.setting.dispenseUOM',
                 })}
                 // Fix work item ID: 10993
                 labelField='name'

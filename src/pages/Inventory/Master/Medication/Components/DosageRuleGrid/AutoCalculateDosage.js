@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { List, Radio, InputNumber } from 'antd'
 import { formatMessage } from 'umi'
 import { FastField, Field, withFormik } from 'formik'
@@ -9,6 +9,7 @@ import {
   NumberInput,
   Popconfirm,
 } from '@/components'
+import DetailsContext from '../../Details/DetailsContext'
 import SectionHeader from '../SectionHeader'
 import DosageRuleTable from './DosageRule'
 
@@ -19,8 +20,8 @@ const AutoCalculateDosage = ({
   ...restProps
 }) => {
   const [ruleType, setRuleType] = useState('default')
-  const [isChangeRuleType, setIsChangeRuleType] = useState(false)
-
+  const { isEditingDosageRule } = useContext(DetailsContext)
+  console.log(ruleType, values)
   useEffect(() => {
     if (
       values.medicationInstructionRule &&
@@ -30,20 +31,23 @@ const AutoCalculateDosage = ({
     }
   }, [values.medicationInstructionRule])
 
-  useEffect(() => {
-    console.log('values', values)
-  }, [values.ruleType])
-
   let switchingRuleType = ''
   const handleRuleTypeClick = e => {
     const clickedItem = e.currentTarget.dataset.ruletype
 
-    if (clickedItem === ruleType) {
+    if (isEditingDosageRule || clickedItem === ruleType) {
       e.stopPropagation()
       e.preventDefault()
     }
 
     switchingRuleType = clickedItem
+
+    //Currently the list is empty, not require to show the prompt.
+    if (values.medicationInstructionRule?.length == 0) {
+      e.stopPropagation()
+      e.preventDefault()
+      handleRuleTypeChange()
+    }
   }
 
   const handleRuleTypeChange = () => {
@@ -85,7 +89,7 @@ const AutoCalculateDosage = ({
           render={args => (
             <CodeSelect
               label={formatMessage({
-                id: 'inventory.master.setting.uom',
+                id: 'inventory.master.setting.prescribeUOM',
               })}
               labelField='name'
               code='ctmedicationunitofmeasurement'
@@ -100,7 +104,7 @@ const AutoCalculateDosage = ({
           render={args => (
             <CodeSelect
               label={formatMessage({
-                id: 'inventory.master.setting.uom',
+                id: 'inventory.master.setting.dispenseUOM',
               })}
               labelField='name'
               code='ctmedicationunitofmeasurement'
@@ -174,23 +178,33 @@ const AutoCalculateDosage = ({
             <Popconfirm
               title='Confirm to remove all instructions by changing setting?'
               onConfirm={handleRuleTypeChange}
+              disabled={isEditingDosageRule}
             >
               <span data-ruletype='default' onClick={handleRuleTypeClick}>
                 <Radio
                   value='default'
                   checked={ruleType === 'default'}
                   data-ruletype='default'
+                  disabled={isEditingDosageRule}
                 >
                   Default
                 </Radio>
               </span>
               <span data-ruletype='age' onClick={handleRuleTypeClick}>
-                <Radio value='age' checked={ruleType === 'age'}>
+                <Radio
+                  value='age'
+                  checked={ruleType === 'age'}
+                  disabled={isEditingDosageRule}
+                >
                   by Age
                 </Radio>
               </span>
               <span data-ruletype='weight' onClick={handleRuleTypeClick}>
-                <Radio value='weight' checked={ruleType === 'weight'}>
+                <Radio
+                  value='weight'
+                  checked={ruleType === 'weight'}
+                  disabled={isEditingDosageRule}
+                >
                   by Weight
                 </Radio>
               </span>

@@ -304,15 +304,16 @@ const General = ({
 
         <GridItem xs={12} md={4}>
           <Field
-            name='routeOfAdministrationFK'
+            name='administrationRouteFK'
             render={args => (
               <MultiLangCodeSelect
                 label={
                   formatMessage({
-                    id: 'inventory.master.medication.routeOfAdministration',
+                    id: 'inventory.master.medication.administrationRoute',
                   }) + languageLabel
                 }
-                code='ctMedicationGroup'
+                code='ctadministrationroute'
+                language={currentLanguage}
                 {...args}
               />
             )}

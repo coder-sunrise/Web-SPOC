@@ -231,9 +231,6 @@ const Stock = ({
         margin: theme.spacing(1),
       }}
     >
-      <h4 style={{ fontWeight: 400 }}>
-        <b>Stock</b>
-      </h4>
       <GridContainer className={classes.infoPanl}>
         <GridItem xs={12} md={4}>
           <Field

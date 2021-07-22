@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { useSelector, useDispatch } from 'dva'
 import _ from 'lodash'
 import ReactDOM from 'react-dom'
@@ -13,7 +13,8 @@ import {
   Typography,
   Select,
 } from 'antd'
-import { GridContainer, GridItem, CodeSelect } from '@/components'
+import { GridContainer, GridItem, CodeSelect, Popover } from '@/components'
+import DetailsContext from '../../Details/DetailsContext'
 
 const EditableRow = ({ index, ...props }) => {
   return <tr {...props} style={{ verticalAlign: 'top' }} />
@@ -36,6 +37,12 @@ const EditableCell = ({
   )
 }
 
+const validOperators = {
+  to: 'to',
+  lessThan: 'less than',
+  moreThan: 'more than',
+}
+
 const DosageRuleTable = ({
   initialData,
   rule,
@@ -46,14 +53,28 @@ const DosageRuleTable = ({
 }) => {
   const [form] = Form.useForm()
   const [data, setData] = useState([])
-  const [rangeValidation, setRangeValidation] = useState('')
+  const [selectedOperator, setSelectedOperator] = useState('')
+  const [rangeValidation, setRangeValidation] = useState({
+    message: '',
+  })
   const [editingKey, setEditingKey] = useState('')
   const codetable = useSelector(s => s.codetable)
+  const maxInput = 999
+
+  const { isEditingDosageRule, setIsEditingDosageRule } = useContext(
+    DetailsContext,
+  )
 
   useEffect(() => {
-    if (initialData)
+    setIsEditingDosageRule(editingKey !== '')
+    if (data.length === 0) form.resetFields()
+  }, [editingKey])
+
+  useEffect(() => {
+    if (initialData) {
+      setEditingKey('')
       setData(initialData.map((item, index) => ({ ...item, key: index + 1 })))
-    console.log('initialData', initialData)
+    }
   }, [initialData])
 
   const isEditing = record => record.key === editingKey
@@ -61,7 +82,6 @@ const DosageRuleTable = ({
 
   const getDisplayValue = (code, id) => {
     if (id) {
-      console.log('code', code)
       const item = codetable[code]?.filter(c => c.id === id)[0]
       if (item) {
         return 'displayValue' in item ? item.displayValue : item.name
@@ -99,10 +119,6 @@ const DosageRuleTable = ({
     })
   }, [])
 
-  useEffect(() => {
-    console.log('rule', rule)
-  }, [rule])
-
   const edit = record => {
     form.setFieldsValue({
       ...record,
@@ -113,48 +129,178 @@ const DosageRuleTable = ({
   const cancel = key => {
     console.log('key', key)
     if (key === -1) setData(data.filter(r => r.key !== key))
+
+    form.resetFields()
+    setRangeValidation({
+      message: '',
+    })
     setEditingKey('')
   }
 
-  const validateRange = fieldValues => {
-    const fields = fieldValues(true)
+  const validate = async () => {
+    const fields = form.getFieldsValue(true)
+    let rangeValidationErrorMessage = ''
+    let rangeValidationErrorDetails = null
+    let validationSuccess = true
+    const operator = fields?.operator
+    const leftOperand = fields?.leftOperand
+    const rightOperand = fields?.rightOperand
 
-    const regex = /^(([0-9]+)|(0.5))+$/
-    const from = fields?.rangeStart
-    if (!regex.test(form)) {
-      setRangeValidation('Invalid age range.')
-      return
+    try {
+      await form.validateFields()
+    } catch {
+      validationSuccess = false
     }
 
-    setRangeValidation('')
+    const regex = /^(([0-9]+)|(0.5))+$/
+
+    if (rule === 'age') {
+      if (
+        (leftOperand && !regex.test(leftOperand)) ||
+        (rightOperand && !regex.test(rightOperand))
+      ) {
+        rangeValidationErrorMessage =
+          'Invalid age range. 0.5 (6 months) or full year only.'
+        validationSuccess = false
+      }
+    }
+
+    if (rule === 'age' || rule === 'weight') {
+      if (!operator) {
+        rangeValidationErrorMessage = `Required.`
+        validationSuccess = false
+      } else if (operator === validOperators.to) {
+        if (
+          leftOperand === undefined ||
+          leftOperand === null ||
+          rightOperand === undefined ||
+          rightOperand === null
+        ) {
+          rangeValidationErrorMessage = 'Both from and to are required.'
+          validationSuccess = false
+        }
+
+        if (leftOperand > rightOperand) {
+          rangeValidationErrorMessage = `${rule} from must be larger than ${rule} to.`
+          validationSuccess = false
+        }
+      } else {
+        if (rightOperand === undefined || rightOperand === null) {
+          rangeValidationErrorMessage = `Required.`
+          validationSuccess = false
+        }
+      }
+
+      //To ensure that mandatory fields have the value before checking conflict with other rules.
+      if (rangeValidationErrorMessage.length === 0) {
+        const conflictValidationResult = validateRangeConflicts({
+          operator,
+          leftOperand,
+          rightOperand,
+        })
+
+        if (!conflictValidationResult.validationSuccess) {
+          ;({
+            rangeValidationErrorMessage,
+            rangeValidationErrorDetails,
+            validationSuccess,
+          } = conflictValidationResult)
+        }
+      }
+    }
+
+    setRangeValidation({
+      message: rangeValidationErrorMessage,
+      details: rangeValidationErrorDetails,
+    })
+    if (validationSuccess) return validationSuccess ? fields : undefined
+  }
+
+  const validateRangeConflicts = ({ operator, leftOperand, rightOperand }) => {
+    let rangeValidationErrorMessage = ''
+    let rangeValidationErrorDetails = null
+    let validationSuccess = true
+
+    // checking lenght as 1 because there is a temporary record added in state duing adding new row.
+    if (!data || data.length === 1) {
+      return {
+        validationSuccess,
+        rangeValidationErrorMessage,
+      }
+    }
+
+    const getMinMax = ({ operator, leftOperand, rightOperand }) => {
+      if (operator === validOperators.to)
+        return { min: leftOperand, max: rightOperand }
+      if (operator === validOperators.lessThan)
+        return { min: 0, max: rightOperand }
+      if (operator === validOperators.moreThan)
+        return { min: rightOperand, max: maxInput }
+    }
+
+    const ranges = data
+      .filter(d => d.key !== -1)
+      .map(d => {
+        const minMax = getMinMax({ ...d })
+        return { ...d, ...minMax }
+      })
+
+    const currentRange = getMinMax({ operator, leftOperand, rightOperand })
+
+    const conflict = ranges.filter(
+      item =>
+        (currentRange.min >= item.min && currentRange.min <= item.max) ||
+        (currentRange.max >= item.min && currentRange.max <= item.max),
+    )
+
+    console.group('range conflict validation')
+    console.log('ranges', ranges)
+    console.log('currentRange', currentRange)
+    console.log('conflict', conflict)
+    console.groupEnd()
+
+    if (conflict.length > 0) {
+      rangeValidationErrorMessage = 'Range conflicting with other rules.'
+      rangeValidationErrorDetails = conflict.map(item => (
+        <div>{`${item.leftOperand ?? ''} ${item.operator} ${
+          item.rightOperand
+        }`}</div>
+      ))
+      validationSuccess = false
+    }
+
+    return {
+      validationSuccess,
+      rangeValidationErrorMessage,
+      rangeValidationErrorDetails,
+    }
   }
 
   const save = async key => {
-    try {
-      validateRange(form.getFieldsValue)
-      const row = await form.validateFields()
+    const row = await validate()
 
-      const newData = [...data]
-      const index = newData.findIndex(item => key === item.key)
+    if (!row) return
 
-      const item = newData[index]
-      if (item.key === -1) {
-        item.key = data.length
-      }
+    const newData = [...data]
+    const index = newData.findIndex(item => key === item.key)
 
-      newData.splice(index, 1, { ...item, ...row })
-      setData(newData)
-      setEditingKey('')
-
-      if (onChange) onChange(newData)
-    } catch (errInfo) {
-      console.log('Validate Failed:', errInfo)
+    const item = newData[index]
+    if (item.key === -1) {
+      item.key = data.length
     }
+
+    newData.splice(index, 1, { ...item, ...row })
+    setData(newData)
+    setEditingKey('')
+    form.resetFields()
+
+    if (onChange) onChange(newData)
   }
 
   const deleteData = async key => {
     const newData = data.filter(d => d.key !== key)
     setData(newData)
+    form.resetFields()
 
     if (onChange) onChange(newData)
   }
@@ -169,32 +315,33 @@ const DosageRuleTable = ({
       title: ruleLabel[rule ?? 'default'],
       dataIndex: 'range',
       align: 'center',
-      width: '18%',
+      width: '20%',
       editable: true,
       render: (item = {}, record) => {
-        const editing = isEditing(record)
-
         if (rule === 'default') return <></>
-
+        const editing = isEditing(record)
         return (
           <>
             {editing ? (
               <GridContainer gutter={4}>
                 <GridItem md={3}>
-                  <Form.Item
-                    name={['rangeStart']}
-                    style={{
-                      margin: 0,
-                    }}
-                  >
-                    <InputNumber
-                      style={{ width: 60, marginRight: 3 }}
-                      min={0}
-                      max={999}
-                      placeholder='From'
-                    ></InputNumber>
-                  </Form.Item>
+                  {selectedOperator === validOperators.to && (
+                    <Form.Item
+                      name={['leftOperand']}
+                      style={{
+                        margin: 0,
+                      }}
+                    >
+                      <InputNumber
+                        style={{ width: 75, marginRight: 3 }}
+                        min={0}
+                        max={maxInput}
+                        placeholder={rule}
+                      ></InputNumber>
+                    </Form.Item>
+                  )}
                 </GridItem>
+
                 <GridItem md={6}>
                   <Form.Item
                     name={['operator']}
@@ -202,38 +349,68 @@ const DosageRuleTable = ({
                       margin: 0,
                     }}
                   >
-                    <Select style={{ width: 110 }}>
-                      <Option value='less than'>less than</Option>
-                      <Option value='to'>to</Option>
-                      <Option value='more than'>more than</Option>
+                    <Select
+                      style={{ width: 110 }}
+                      onChange={val => {
+                        setSelectedOperator(val)
+                        if (val !== validOperators.to)
+                          form.setFieldsValue({ ['leftOperand']: null })
+                      }}
+                    >
+                      <Option value={validOperators.lessThan}>
+                        {validOperators.lessThan}
+                      </Option>
+                      <Option value={validOperators.to}>
+                        {validOperators.to}
+                      </Option>
+                      <Option value={validOperators.moreThan}>
+                        {validOperators.moreThan}
+                      </Option>
                     </Select>
                   </Form.Item>
                 </GridItem>
                 <GridItem md={3}>
                   <Form.Item
-                    name={['rangeEnd']}
+                    name={['rightOperand']}
                     style={{
                       margin: 0,
                     }}
                   >
                     <InputNumber
-                      style={{ width: 60, marginRight: 3 }}
+                      style={{ width: 75, marginRight: 3 }}
                       min={0}
-                      max={999}
-                      placeholder='To'
+                      max={maxInput}
+                      placeholder={rule}
                     ></InputNumber>
                   </Form.Item>
                 </GridItem>
-                {rangeValidation.length > 0 && (
+                {rangeValidation.message.length > 0 && (
                   <GridItem md={12}>
-                    <Typography.Text type='danger'>
-                      {rangeValidation}
-                    </Typography.Text>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                      <Typography.Text type='danger'>
+                        {rangeValidation.message}
+                      </Typography.Text>
+                      {rangeValidation.details !== null &&
+                        rangeValidation.details !== undefined && (
+                          <Popover
+                            icon={null}
+                            title='Conflict Rule(s)'
+                            content={rangeValidation.details}
+                            trigger='click'
+                          >
+                            <Typography.Link> view </Typography.Link>
+                          </Popover>
+                        )}
+                    </div>
                   </GridItem>
                 )}
               </GridContainer>
             ) : (
-              <span>{`${record.rangeStart} ${record.operator} ${record.rangeEnd}`}</span>
+              <span>
+                {`${record.leftOperand ?? ''} ${record.operator} ${
+                  record.rightOperand
+                }`}
+              </span>
             )}
           </>
         )
@@ -245,7 +422,7 @@ const DosageRuleTable = ({
       align: 'center',
       editable: true,
       width: 180,
-      render: () => {
+      render: (item = {}, record) => {
         return (
           <span>{getDisplayValue('ctmedicationusage', medicationUsageFK)}</span>
         )
@@ -270,7 +447,7 @@ const DosageRuleTable = ({
                 rules={[
                   {
                     required: true,
-                    message: `*Required.`,
+                    message: `Required.`,
                   },
                 ]}
               >
@@ -300,7 +477,7 @@ const DosageRuleTable = ({
       align: 'center',
       editable: true,
       width: 180,
-      render: () => {
+      render: (item = {}, record) => {
         return (
           <span>
             {getDisplayValue('ctmedicationunitofmeasurement', prescribeUomFK)}
@@ -324,6 +501,12 @@ const DosageRuleTable = ({
                 style={{
                   margin: 0,
                 }}
+                rules={[
+                  {
+                    required: true,
+                    message: `Required.`,
+                  },
+                ]}
               >
                 <Select
                   options={codetable.ctmedicationfrequency?.map(item => {
@@ -346,7 +529,7 @@ const DosageRuleTable = ({
       },
     },
     {
-      title: 'Duration(days)',
+      title: 'Duration(Days)',
       dataIndex: 'duration',
       align: 'center',
       editable: true,
@@ -355,32 +538,36 @@ const DosageRuleTable = ({
       render: (item = {}, record) => {
         const editing = isEditing(record)
         return (
-          <div style={{ display: 'flex' }}>
+          <div>
             {editing ? (
               <Form.Item
                 name={['duration']}
                 style={{
                   margin: 0,
                 }}
+                rules={[
+                  {
+                    required: true,
+                    message: `Required.`,
+                  },
+                ]}
               >
                 <InputNumber
-                  style={{ width: 60, marginRight: 3 }}
-                  min={0}
-                  max={999}
+                  style={{ width: 60 }}
+                  min={1}
+                  max={maxInput}
                 ></InputNumber>
               </Form.Item>
             ) : (
-              <span>{record.duration}</span>
+              <>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <span>{record.duration}</span>
+                  <span style={{ marginLeft: 3 }}>
+                    {record.duration == 1 ? 'day' : 'days'}{' '}
+                  </span>
+                </div>
+              </>
             )}
-            <span
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              {record.duration == 1 ? 'day' : 'days'}{' '}
-            </span>
           </div>
         )
       },
@@ -400,11 +587,17 @@ const DosageRuleTable = ({
                 style={{
                   margin: 0,
                 }}
+                rules={[
+                  {
+                    required: true,
+                    message: `Required.`,
+                  },
+                ]}
               >
                 <InputNumber
                   style={{ width: 60, marginRight: 3 }}
                   min={0}
-                  max={999}
+                  max={maxInput}
                 ></InputNumber>
               </Form.Item>
             ) : (
@@ -420,7 +613,7 @@ const DosageRuleTable = ({
       align: 'center',
       editable: true,
       width: 180,
-      render: () => {
+      render: (item = {}, record) => {
         return (
           <span>
             {getDisplayValue('ctmedicationunitofmeasurement', dispenseUomFK)}
@@ -432,9 +625,9 @@ const DosageRuleTable = ({
       title: 'Action',
       dataIndex: 'operation',
       align: 'center',
-      render: (_, record) => {
-        const editable = isEditing(record)
-        return editable ? (
+      render: (item = {}, record) => {
+        const editing = isEditing(record)
+        return editing ? (
           <div style={{ display: 'flex', justifyContent: 'space-around' }}>
             <Typography.Link onClick={() => save(record.key)}>
               Save
@@ -503,6 +696,7 @@ const DosageRuleTable = ({
           onClick={() => {
             const newRecord = { key: -1 }
             setData([...data, newRecord])
+            setSelectedOperator(validOperators.to)
             edit(newRecord)
           }}
           type='link'

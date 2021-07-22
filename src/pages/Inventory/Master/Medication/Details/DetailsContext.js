@@ -11,6 +11,7 @@ export const DetailsContextProvider = props => {
   const [isMultiLanguage = false, setIsMultiLanguage] = useState()
   const [primaryPrintoutLanguage, setPrimaryPrintoutLanguage] = useState()
   const [secondaryPrintoutLanguage, setSecondaryPrintoutLanguage] = useState()
+  const [isEditingDosageRule, setIsEditingDosageRule] = useState(false)
 
   useEffect(() => {
     const internalIsMultiLang =
@@ -36,6 +37,8 @@ export const DetailsContextProvider = props => {
         isMultiLanguage,
         primaryPrintoutLanguage,
         secondaryPrintoutLanguage,
+        isEditingDosageRule,
+        setIsEditingDosageRule,
         currentLanguage,
         setCurrentLanguage,
         languageLabel,

@@ -64,10 +64,14 @@ const CardTitle = ({ children }) => (
 
 function validateIndication(item) {
   const parent = this.parent
-  return (
-    (!parent.isMultiLanguage && parent.indication) ||
-    (parent.isMultiLanguage && parent.indication && parent.indicationSecondary)
-  )
+
+  if (!parent.isMultiLanguage) return true
+
+  if (parent.isMultiLanguage)
+    return (
+      (parent.indication && parent.indicationSecondary) ||
+      (!parent.indication && !parent.indicationSecondary)
+    )
 }
 
 const Detail = ({
@@ -92,18 +96,23 @@ const Detail = ({
     ...props,
   }
 
-  const { isMultiLanguage, setCurrentLanguage, currentLanguage } = useContext(
-    DetailsContext,
-  )
+  const {
+    isMultiLanguage,
+    setCurrentLanguage,
+    currentLanguage,
+    isEditingDosageRule,
+  } = useContext(DetailsContext)
 
   useEffect(() => window.addEventListener('resize', resizeHandler))
   const [windowHeight, setWindowHeith] = useState(window.innerHeight)
   const [currentScrollPosition, setCurrentScrollPosition] = useState('general')
+  const [placeHolderHeight, setPlaceHolderHeight] = useState(0)
 
   const { clinicSettings } = props
 
   const resizeHandler = () => {
     setWindowHeith(window.innerHeight)
+    setPlaceHolderHeight(calculatePlaceHolderHeight())
   }
 
   const { currentTab } = medication
@@ -129,6 +138,10 @@ const Detail = ({
 
     setHasActiveSession(data.length > 0)
   }
+
+  useEffect(() => {
+    setPlaceHolderHeight(calculatePlaceHolderHeight())
+  }, [])
 
   useEffect(() => {
     if (medicationDetail.currentId) {
@@ -182,6 +195,21 @@ const Detail = ({
           behavior: 'smooth',
         })
         setCurrentScrollPosition(id)
+      }
+    } catch (error) {
+      console.error({ error })
+    }
+  }
+
+  const calculatePlaceHolderHeight = () => {
+    try {
+      const parentElement = document.getElementById('card-holder')
+      const stockElement = document.getElementById('stock')
+
+      if (parentElement && stockElement) {
+        const placeHolderHeight =
+          parentElement.offsetHeight - stockElement.offsetHeight
+        return placeHolderHeight
       }
     } catch (error) {
       console.error({ error })
@@ -304,7 +332,7 @@ const Detail = ({
               setCurrentScrollPosition('stock')
             }}
             id='scroll-placeholder'
-            style={{ height: 500 }}
+            style={{ height: placeHolderHeight }}
           ></div>
         </div>
       </div>
@@ -321,6 +349,7 @@ const Detail = ({
         <ProgressButton
           submitKey='medicationDetail/submit'
           onClick={handleSubmit}
+          disabled={isEditingDosageRule}
         />
       </div>
     </React.Fragment>
@@ -609,9 +638,6 @@ export default compose(
             ...deletedItems,
           ]
       }
-
-      debugger
-
       const payload = {
         ...restValues,
         ...checkboxGroup,
@@ -635,9 +661,9 @@ export default compose(
       }).then(r => {
         if (r) {
           // if (onConfirm) onConfirm()
-          // dispatch({
-          //   type: 'medicationDetail/query',
-          // })
+          dispatch({
+            type: 'medicationDetail/reset',
+          })
           resetForm()
           history.push('/inventory/master')
         }

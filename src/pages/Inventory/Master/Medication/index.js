@@ -38,21 +38,20 @@ const Medication = ({ dispatch, history, medication, values }) => {
       code: 'ctSupplier',
       sortBy: 'FavouriteSupplierFkNavigation.displayValue',
       labelField: 'displayValue',
-      width: 300,
+      width: 250,
     },
     {
       columnName: 'dispensingUOM',
       type: 'codeSelect',
       code: 'ctmedicationunitofmeasurement',
       sortBy: 'DispensingUOMFkNavigation.DisplayValue',
-      width: 300,
     },
     {
       columnName: 'medicationGroup',
       type: 'codeSelect',
       code: 'ctmedicationgroup',
       sortBy: 'MedicationGroupFkNavigation.displayValue',
-      width: 300,
+      width: 150,
     },
     {
       columnName: 'genericMedication',
@@ -60,7 +59,7 @@ const Medication = ({ dispatch, history, medication, values }) => {
       code: 'ctgenericmedication',
       sortBy: 'GenericMedicationFkNavigation.displayValue',
       labelField: 'displayValue',
-      width: 300,
+      width: 150,
     },
     {
       columnName: 'stock',
