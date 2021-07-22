@@ -55,9 +55,11 @@ const Stock = ({
     return ''
   }
 
-  const [stock, setStock] = useState(
-    _.sortBy(values[objectType().stockProp], 'expiryDate'),
-  )
+  const [stock, setStock] = useState([])
+
+  useEffect(() => {
+    setStock(_.sortBy(values[objectType().stockProp], 'expiryDate').reverse())
+  }, [values.vaccinationStock, values.medicationStock, values.consumableStock])
 
   const changeIsDefault = async row => {
     const updatedStock = stock.map(batch => {
@@ -93,7 +95,7 @@ const Stock = ({
       totalQty += o.stock
     })
     setStockQty(totalQty)
-  }, [])
+  }, [values.vac])
 
   const handleDeleteStock = async row => {
     const { stock: remainingQty, isDefault } = row

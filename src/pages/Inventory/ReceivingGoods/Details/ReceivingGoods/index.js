@@ -434,7 +434,7 @@ class Index extends Component {
     const currentGSTValue = isGSTEnabled ? gstValue : undefined
 
     return (
-      <GridContainer>
+      <div>
         <AuthorizedContext.Provider
           value={{
             rights: this.isEditable(rgStatus, isClosed, isWriteOff)
@@ -523,8 +523,8 @@ class Index extends Component {
           </GridContainer>
 
           <GridContainer
-            xs={8}
-            md={8}
+            xs={12}
+            md={12}
             style={{
               marginTop: 20,
               display: 'flex',
@@ -628,7 +628,7 @@ class Index extends Component {
             }}
           />
         </CommonModal>
-      </GridContainer>
+      </div>
     )
   }
 }
