@@ -591,7 +591,7 @@ class PatientInfoSideBanner extends PureComponent {
 }
 const ConnectedPatientInfoSideBanner = connect(
   ({ loading, clinicSettings }) => ({
-    loading: loading.models.patient,
+    loading: loading.effects['patient/refreshChasBalance'] || loading.effects['patient/refreshMedisaveBalance'],
     clinicSettings: clinicSettings.settings,
   }),
 )(PatientInfoSideBanner)
