@@ -409,11 +409,10 @@ export default ({
   }
 
   const getDisplayName = (row) => {
-    if (row.type === '10') {
+    if (row.type === '10' || row.type === '3') {
       if (row.newServiceName && row.newServiceName.trim() !== "") {
         return row.newServiceName
       }
-      row.subject
     }
     return row.subject
   }
