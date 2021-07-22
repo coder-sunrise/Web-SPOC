@@ -92,7 +92,7 @@ class MedicalHistory extends PureComponent {
                     columnName: 'onsetDate',
                     type: 'date',
                     render: (text, row) => (
-                      <span>{moment(row.onsetDate).format('DD MMM YYYY HH:mm')}</span>
+                      <span>{moment(row.onsetDate).format('DD MMM YYYY')}</span>
                     ),
                   }
                 ]}
