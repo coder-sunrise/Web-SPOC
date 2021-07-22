@@ -22,6 +22,8 @@ import {
   TextField,
   Popconfirm,
   notification,
+  CodeSelect,
+  Field,
 } from '@/components'
 // utils
 
@@ -127,18 +129,22 @@ const Templates = ({
           <h5 style={{ fontWeight: 500, lineHeight: 1.3 }}>Manage Template</h5>
         </GridItem>
         <GridItem xs={8}>
-          <Select
-            label='My Template'
-            strongLabel
-            value={currentId}
-            options={list}
-            valueField='cesId'
-            dropdownMatchSelectWidth={false}
-            onChange={(v) => {
-              setCurrentId(v)
-              setTemplateName('')
-            }}
-          />
+        <Field
+        render= {() => (
+          <CodeSelect
+          label='My Template'
+          value={currentId}
+          options={list}
+          valueField='cesId'
+          labelField='name'
+          dropdownMatchSelectWidth={false}
+          onChange={(v) => {
+            setCurrentId(v)
+            setTemplateName('')
+          }}
+        />
+        )}
+        />
         </GridItem>
         <GridItem xs={4} alignItems='flex-end' justify='flex-end' container>
           <ProgressButton
