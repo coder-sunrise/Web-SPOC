@@ -287,10 +287,6 @@ class PatientDetail extends PureComponent {
       {
         id: '11',
         name: 'Pre-Order List',
-        // access: [
-        //   'patientdatabase.newpatient',
-        //   'patientdatabase.patientprofiledetails',
-        // ],
         component: Loadable({
           loader: () => import('./Pre-Order'),
           render: (loaded, p) => {
@@ -317,6 +313,14 @@ class PatientDetail extends PureComponent {
       const hiddenSchemeByAccessRight = SchemeAccessRight.rights === 'hidden'
       if (hiddenSchemeByAccessRight) {
         this.widgets = this.widgets.filter(t => t.id !== '4')
+      }
+    }
+
+    const preOrderListAccessRight = Authorized.check('patientdatabase.modifypreorder')
+    if(preOrderListAccessRight){
+      const hiddenPreOrderListAccessRight = preOrderListAccessRight.rights === 'hidden'
+      if(hiddenPreOrderListAccessRight){
+        this.widgets = this.widgets.filter(t => t.id !== '11')
       }
     }
 

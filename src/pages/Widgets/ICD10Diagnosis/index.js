@@ -46,7 +46,6 @@ class ICD10Diagnosis extends PureComponent {
             favouriteDiagnosisLanguage: favouriteLanguage,
           },
         })
-        console.log('IdDiagnosisRun', favouriteLanguage)
       }
     })
   }
@@ -109,7 +108,6 @@ class ICD10Diagnosis extends PureComponent {
         type: '7',
       },
     }).then((r) => {
-      console.log('getResultDiagnosis', r)
       if (r) {
         dispatch({
           type: 'diagnosis/getUserPreference',
