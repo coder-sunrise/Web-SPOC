@@ -331,8 +331,6 @@ class Appointment extends React.PureComponent {
     if (
       isHistory &&
       [
-        // APPOINTMENT_STATUS.DRAFT,
-        // APPOINTMENT_STATUS.CONFIRMED,
         APPOINTMENT_STATUS.RESCHEDULED
       ].includes(appointmentStatusFk)
     )
