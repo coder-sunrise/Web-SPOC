@@ -13,15 +13,9 @@ import { InventoryMasterOption } from './variables'
 const styles = () => ({})
 
 const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
-  const [
-    activeTab,
-    setActiveTab,
-  ] = useState('-1')
+  const [activeTab, setActiveTab] = useState('-1')
 
-  const [
-    mounted,
-    setMounted,
-  ] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   const componentProps = {
     dispatch,
@@ -37,6 +31,18 @@ const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
         type: 'codetable/fetchCodes',
         payload: {
           code: 'ctSupplier',
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctmedicationgroup',
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctgenericmedication',
         },
       }),
       dispatch({
@@ -69,7 +75,7 @@ const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
       style={{ marginTop: 20 }}
       activeKey={mounted ? activeTab : '-1'}
       // defaultActivekey='0'
-      onChange={(e) => setActiveTab(e)}
+      onChange={e => setActiveTab(e)}
       options={itemTabs}
     />
   )

@@ -1653,7 +1653,8 @@ class Medication extends PureComponent {
                                   return (
                                     <CodeSelect
                                       label={formatMessage({
-                                        id: 'inventory.master.setting.uom',
+                                        id:
+                                          'inventory.master.setting.prescribeUOM',
                                       })}
                                       allowClear={false}
                                       code='ctMedicationUnitOfMeasurement'
