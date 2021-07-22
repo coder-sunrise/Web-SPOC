@@ -219,46 +219,35 @@ const Detail = ({
                   valueField='id'
                   textField='name'
                   options={
-                    clinicSettings.isEnableMedisave
-                      ? [
-                          {
-                            id: 'isChasAcuteClaimable',
-                            name: 'CHAS Acute Claimable',
-                            layoutConfig: {
-                              style: {},
-                            },
+                    (()=>{
+                      var arr = []
+                      if(clinicSettings.isEnableCHAS){
+                        arr.push(...[{
+                          id: 'isChasAcuteClaimable',
+                          name: 'CHAS Acute Claimable',
+                          layoutConfig: {
+                            style: {},
                           },
-                          {
-                            id: 'isChasChronicClaimable',
-                            name: 'CHAS Chronic Claimable',
-                            layoutConfig: {
-                              style: {},
-                            },
+                        },
+                        {
+                          id: 'isChasChronicClaimable',
+                          name: 'CHAS Chronic Claimable',
+                          layoutConfig: {
+                            style: {},
                           },
-                          {
-                            id: 'isMedisaveClaimable',
-                            name: 'CDMP Claimable',
-                            layoutConfig: {
-                              style: {},
-                            },
+                        }])
+                      }
+                      if(clinicSettings.isEnableMedisave){
+                        arr.push({
+                          id: 'isMedisaveClaimable',
+                          name: 'CDMP Claimable',
+                          layoutConfig: {
+                            style: {},
                           },
-                        ]
-                      : [
-                          {
-                            id: 'isChasAcuteClaimable',
-                            name: 'CHAS Acute Claimable',
-                            layoutConfig: {
-                              style: {},
-                            },
-                          },
-                          {
-                            id: 'isChasChronicClaimable',
-                            name: 'CHAS Chronic Claimable',
-                            layoutConfig: {
-                              style: {},
-                            },
-                          },
-                        ]
+                        })
+                      }
+                      return arr
+                    })()
                   }
                   onChange={(e, s) => {}}
                   {...args}

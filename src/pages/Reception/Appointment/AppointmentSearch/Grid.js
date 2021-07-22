@@ -28,7 +28,7 @@ const styles = (theme) => ({
 }))
 class Grid extends PureComponent {
   appointmentRow = (p) => {
-    const { classes, handleSelectEvent } = this.props
+    const { classes, handleDoubleClick } = this.props
     const { row, children, tableRow } = p
     let newchildren = []
     const middleColumns = children.slice(3, 9)
@@ -70,7 +70,7 @@ class Grid extends PureComponent {
       if (!accessRight || (accessRight && accessRight.rights !== 'enable'))
         return
 
-      handleSelectEvent(selectedData)
+      handleDoubleClick(selectedData)
     }
 
     if (row.countNumber === 1) {

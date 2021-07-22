@@ -573,7 +573,7 @@ class Index extends Component {
     return 'enable'
   }
 
-  render() {
+  render () {
     const {
       purchaseOrderDetails,
       values,
@@ -599,7 +599,7 @@ class Index extends Component {
     const currentGstValue = isGSTEnabled ? gstValue : undefined
 
     return (
-      <GridContainer>
+      <div>
         <POForm
           isReadOnly={this.getRights(type, poStatus, isWriteOff) === 'disable'}
           isFinalize={isPOStatusFinalizedFulFilledPartialReceived(poStatus)}
@@ -773,7 +773,7 @@ class Index extends Component {
             }}
           />
         </CommonModal>
-      </GridContainer>
+      </div>
     )
   }
 }

@@ -1,8 +1,12 @@
 import { Table } from 'antd'
 import numeral from 'numeral'
+import { Tag } from 'antd'
 import { currencySymbol } from '@/utils/config'
 import tablestyles from './PatientHistoryStyle.less'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
+import {
+  Tooltip,
+} from '@/components'
 
 const wrapCellTextStyle = {
   wordWrap: 'break-word',
@@ -37,6 +41,7 @@ export default ({ current }) => {
                   <div style={wrapCellTextStyle}>
                     {row.isDrugMixture ? 'Drug Mixture' : row.type}
                     {drugMixtureIndicator(row)}
+                    {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: -10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
                   </div>
                 </div>
               )
@@ -102,7 +107,7 @@ export default ({ current }) => {
                 }}
               >
                 {`${currencySymbol}${numeral(
-                  row.totalAfterItemAdjustment || 0,
+                  (row.isPreOrder && !row.isChargeToday) ? 0 : (row.totalAfterItemAdjustment || 0),
                 ).format('0,0.00')}`}
               </div>
             ),

@@ -6,48 +6,17 @@
 trigger: none
 
 pool:
-  vmImage: 'windows-latest'
+  name: 'Medicloud'
 
 variables:
   #override the npm_config_cache environment variable to the custom path
   npm_config_cache: $(Build.SourcesDirectory)/node_modules 
 
 steps:
-- task: Cache@2
-  inputs:
-    key: 'version5 | npm | "$(Agent.OS)" | package.json'
-    restoreKeys: |
-      version5 | npm | "$(Agent.OS)"
-    path: $(npm_config_cache)
-    cacheHitVar: CACHE_RESTORED
-  displayName: Cache npm    
-        
+
 - script: npm install
-  condition: ne(variables.CACHE_RESTORED, 'true')
   displayName: 'npm install'
 - script: 
     #export NODE_OPTIONS="--no-warnings --max-old-space-size=2048" && npm run build
     set NODE_OPTIONS=--max_old_space_size=8192 & npm run build
   displayName: 'npm build'
-  
-### Prepare for UAT Environment ###
-
-- script: copy "config\config.uat.js" "config\config.js" /Y
-  displayName: 'update config to uat settings'
-
-- script: 
-    #export NODE_OPTIONS="--no-warnings --max-old-space-size=2048" && npm run build
-    set NODE_OPTIONS=--max_old_space_size=8192 & npm run build
-  displayName: 'npm build(UAT)'
-- task: CopyFiles@2
-  displayName: 'Copy UAT artifacts to staging directory'
-  inputs:
-    SourceFolder: '.\dist'
-    Contents: '**'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)/UAT'
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish UAT artifacts'
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/UAT'
-    ArtifactName: 'drop-uat'
-    publishLocation: 'Container'

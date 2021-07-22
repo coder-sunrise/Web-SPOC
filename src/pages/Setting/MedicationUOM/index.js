@@ -20,7 +20,7 @@ const styles = (theme) => ({
   clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
 @withSettingBase({
-  modelName: 'settingMedicationUOM',
+  modelName: 'settingMedicationUOM'
 })
 class MedicationUOM extends PureComponent {
   state = {}

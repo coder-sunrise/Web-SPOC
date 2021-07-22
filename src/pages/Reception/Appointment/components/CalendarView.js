@@ -241,7 +241,6 @@ class CalendarView extends React.PureComponent {
     const {
       // --- event handlers ---
       handleSelectSlot,
-      handleSelectEvent,
       handleDoubleClick,
       handleOnDragStart,
       // --- variables ---
@@ -364,7 +363,6 @@ class CalendarView extends React.PureComponent {
           eventPropGetter={this._eventColors}
           dayPropGetter={this._customDayPropGetter}
           onSelectSlot={handleSelectSlot}
-          onSelectEvent={handleSelectEvent}
           onDoubleClickEvent={handleDoubleClick}
           onDragStart={handleOnDragStart}
           // --- event handlers ---
