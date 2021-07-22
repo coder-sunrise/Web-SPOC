@@ -87,6 +87,7 @@ export default {
   'inventory.master.stock.currentStock': 'Current Stock',
   'inventory.master.stock.reorderThreshold': 'Re-Order Threshold',
   'inventory.master.stock.criticalThreshold': 'Critical Threshold',
+  'inventory.master.stock.excessThreshold': 'Excess Threshold',
 
   // Purchasing & Receiving
   'inventory.pr.reason': 'Reason',
