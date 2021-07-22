@@ -60,7 +60,7 @@ class HistoryDisplayForConsultation extends PureComponent {
       },
       {
         id: PATIENT_HISTORY_TABS.NURSENOTES,
-        name: 'Nurse Notes',
+        name: 'Notes',
         authority: [
           'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
         ],

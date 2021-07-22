@@ -193,7 +193,6 @@ const CalendarView = ({
   dispatch,
   // --- event handlers ---
   handleSelectSlot,
-  handleSelectEvent,
   handleDoubleClick,
   handleOnDragStart,
   handleEventMouseOver,
@@ -495,7 +494,6 @@ const CalendarView = ({
         dayPropGetter={_customDayPropGetter}
         // slotPropGetter={TimeSlotComponent}
         onSelectSlot={handleSelectSlot}
-        onSelectEvent={handleSelectEvent}
         onDoubleClickEvent={handleDoubleClick}
         onDragStart={handleOnDragStart}
         // #endregion --- event handlers ---

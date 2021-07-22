@@ -9,6 +9,7 @@ import Warning from '@material-ui/icons/Error'
 import Edit from '@material-ui/icons/Edit'
 import Refresh from '@material-ui/icons/Sync'
 import { getAppendUrl } from '@/utils/utils'
+import PatientNurseNotes from '@/pages/PatientDatabase/Detail/PatientNurseNotes'
 import { MoreButton, LoadingWrapper } from '@/components/_medisys'
 import {
   GridContainer,
@@ -21,6 +22,7 @@ import {
   IconButton,
   Popover,
   NumberInput,
+  CommonModal,
 } from '@/components'
 
 import Authorized from '@/utils/Authorized'
@@ -50,6 +52,7 @@ class Banner extends PureComponent {
     refreshedSchemePayerData: {},
     currPatientCoPaymentSchemeFK: 0,
     currentSchemeType: 0,
+    showNotesModal: false,
   }
 
   constructor (props) {
@@ -261,6 +264,14 @@ class Banner extends PureComponent {
         }
       }
     })
+  }
+
+  openNotes = () => {
+    this.setState({showNotesModal:true})
+  }
+
+  closeNotes = () => {
+    this.setState({showNotesModal:false})
   }
 
   refreshMedisaveBalance = () => {
@@ -951,10 +962,33 @@ class Banner extends PureComponent {
               }
             />
           </GridItem>
-          <GridItem xs={12} md={3}>
+          <GridItem xs={6} md={2}>
+          <Block
+          body={
+            <div
+              style={{
+              fontWeight: 500,
+              marginTop: 5
+              }}>
+              <Link>
+                <span style={{textDecoration:'underline'}} onClick={(e) => {this.openNotes()}}>
+                Notes
+                </span>
+              </Link>
+            </div>
+          }/>
+          </GridItem>
+          <GridItem xs={1} md={1}>
             {extraCmt}
           </GridItem>
         </GridContainer>
+        <CommonModal
+          open={this.state.showNotesModal}
+          title='Notes'
+          onClose={this.closeNotes}
+          maxWidth='lg'>
+          <PatientNurseNotes {...this.props}  />
+        </CommonModal>
       </Paper>
       // </Affix>
     )
