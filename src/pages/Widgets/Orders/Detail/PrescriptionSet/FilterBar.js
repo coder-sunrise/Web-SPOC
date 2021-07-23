@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core'
 import { Field } from 'formik'
 import { Link } from 'umi'
 import Search from '@material-ui/icons/Search'
+import Authorized from '@/utils/Authorized'
 // custom component
 import {
   GridContainer,
@@ -29,13 +30,12 @@ const styles = () => ({
 })
 
 const FilterBar = (props) => {
-  const { handelSearch, type, selectItemCount, values } = props
-  const { visitFromDate, visitToDate, isAllDate } = values
-
+  const { handelSearch, type, selectItemCount, handelNewPrescriptionSet } = props
+  const prescriptionSetAccessRight = Authorized.check('queue.consultation.order.prescriptionset') || {}
   return (
     <Fragment>
       <GridContainer>
-        <GridItem md={7} style={{ paddingRight: 140 }}>
+        <GridItem md={6} style={{ paddingRight: 140 }}>
           <div style={{ position: 'relative' }}>
             <Field
               name='searchName'
@@ -58,14 +58,19 @@ const FilterBar = (props) => {
         </GridItem>
 
         <GridItem
-          md={5}
+          md={6}
           justify='flex-end'
           alignItems='center'
           container
           style={{ paddingRight: 150 }}
         >
           <div style={{ position: 'relative' }}>
-            <Link ><span style={{ textDecoration: 'underline' }}>Add New Prescription Set</span></Link>
+            {prescriptionSetAccessRight.rights === 'enable' &&
+              <Link onClick={(e) => {
+                e.preventDefault()
+                handelNewPrescriptionSet()
+              }}><span style={{ textDecoration: 'underline' }}>Add New Prescription Set</span></Link>
+            }
             <div style={{ position: 'absolute', right: -150, top: 0 }}>
               <span >
                 <span style={{ color: 'red' }}>{selectItemCount || 0}</span>{' '}

@@ -1266,6 +1266,8 @@ class Medication extends PureComponent {
       Authorized.check('queue.consultation.modifyorderitemtotalprice')
         .rights !== 'enable'
     const accessRight = authorityCfg[values.type]
+
+    const prescriptionSetAccessRight = Authorized.check('queue.consultation.order.prescriptionset') || { rights: 'hidden' }
     return (
       <Authorized authority={GetOrderItemAccessRight(from, accessRight)}>
         <div>
@@ -1417,15 +1419,16 @@ class Medication extends PureComponent {
                         History
                       </ProgressButton>
                     </Tooltip>
-                    <Tooltip title='Add From Prescription Set'>
+                    {prescriptionSetAccessRight.rights !== 'hidden' && <Tooltip title='Add From Prescription Set'>
                       <ProgressButton
                         color='primary'
                         icon={<Add />}
                         onClick={this.onSearchPrescriptionSet}
                       >
-                        Prescription Set
+                        Pres. Set
                       </ProgressButton>
                     </Tooltip>
+                    }
                   </div>
                 )}
               </div>

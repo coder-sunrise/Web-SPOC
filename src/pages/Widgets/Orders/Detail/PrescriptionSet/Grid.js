@@ -5,6 +5,7 @@ import _ from 'lodash'
 import { withStyles, Divider } from '@material-ui/core'
 import { Collapse } from 'antd'
 import { Edit, Delete } from '@material-ui/icons'
+import Authorized from '@/utils/Authorized'
 // common components
 import {
   GridItem,
@@ -15,7 +16,8 @@ import {
   Button
 } from '@/components'
 // utils
-import { primaryColor } from '@/assets/jss'
+import { primaryColor, dangerColor, grayColor } from '@/assets/jss'
+import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import CustomStyle from '../AddMedicationFromPast/CustomStyle.less'
 
 const styles = () => ({
@@ -24,14 +26,14 @@ const styles = () => ({
     overflow: 'hidden',
     display: 'inline-block',
     textOverflow: 'ellipsis',
-    width: 340,
+    width: 300,
     paddingLeft: 8,
     float: 'left',
     marginTop: 6,
   },
   instructionColumn: {
     display: 'inline-block',
-    width: 400,
+    width: 440,
     paddingLeft: 8,
     float: 'left',
     marginTop: 6,
@@ -50,18 +52,36 @@ const styles = () => ({
     cursor: 'pointer',
     color: primaryColor,
   },
+  removeIcon: {
+    cursor: 'pointer',
+    color: dangerColor,
+  },
 })
 class Grid extends PureComponent {
-  Visits = () => {
+  PrescriptionSets = () => {
     const {
       classes,
       onSelectItems,
-      addedItems,
+      addedPrescriptionSets,
       loadPrescriptionSets,
       isRetail,
       clickCollapseHeader,
       activeKey,
+      handelDelete,
+      handelEdit,
+      user,
     } = this.props
+
+    const drugMixtureIndicator = (row) => {
+      if (!row.isDrugMixture) return null
+
+      return (
+        <div style={{ position: 'relative', top: 3 }}>
+          <DrugMixtureInfo values={row.prescriptionSetDrugMixture || []} />
+        </div>
+      )
+    }
+
     return loadPrescriptionSets.map((o) => {
       const items = _.orderBy(
         (o.prescriptionSetItem || []).filter((drug) => {
@@ -75,52 +95,73 @@ class Grid extends PureComponent {
         ],
       )
 
+      const isSelect = addedPrescriptionSets.indexOf(o.id) >= 0
+      const selectEnable = items.filter(item => (item.isDrugMixture || (item.isActive && item.inventoryDispenseUOMFK === item.dispenseUOMFK))).length > 0
       return {
         header: (
           <div
             onClick={() => {
               clickCollapseHeader(o.id)
             }}
-            style={{ display: 'flex', }}
+            style={{ display: 'flex', padding: '3px 0px 8px 0px' }}
           >
-            <div style={{ marginLeft: 5, marginTop: 10, width: 200 }}>
-              <span>
-                {o.prescriptionSetName}
-              </span>
+            <div style={{
+              marginLeft: 5, marginTop: 14,
+              width: 250,
+            }}>
+              <Tooltip title={o.prescriptionSetName}>
+                <span>
+                  {o.prescriptionSetName}
+                </span>
+              </Tooltip>
             </div>
-            <div style={{ alignItems: 'center', marginLeft: 8 }}>
-              <span
+            <div style={{ alignItems: 'center', marginLeft: 8, position: 'relative' }}>
+              {!isSelect ? <span
                 className={classes.addIcon}
-                onClick={(event) => {
+                style={{ color: selectEnable ? primaryColor : grayColor }}
+                onClick={selectEnable ? (event) => {
                   event.stopPropagation()
-                  onSelectItems(
-                    items.filter(
-                      (item) =>
-                        item.isActive &&
-                        item.inventoryDispenseUOMFK === item.dispenseUOMFK,
-                    ),
-                  )
-                }}
+                  onSelectItems(o.id)
+                } : undefined}
               >
                 <span
                   className='material-icons'
-                  style={{ marginTop: -2 }}
                 >
                   add_circle_outline
                 </span>
-                <span
-                  className='material-icons'
-                  style={{ marginTop: -2 }}
-                >
-                  remove_circle_outline
-                </span>
               </span>
-              <Button justIcon color='primary' onClick={(event) => {
-                event.stopPropagation()
-              }}> <Edit /></Button>
-              <Button justIcon color='danger' onClick={(event) => {
-                event.stopPropagation()
-              }}> <Delete /></Button>
+                : <span
+                  className={classes.removeIcon}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    onSelectItems(o.id)
+                  }}
+                >
+                  <span
+                    className='material-icons'
+                  >
+                    remove_circle_outline
+                  </span>
+                </span>
+              }
+              {user.data.id === o.ownedByUserFK &&
+                <Authorized authority='queue.consultation.order.prescriptionset'>
+                  <Button justIcon color='primary' style={{ position: 'absolute', top: 0, marginLeft: 6 }} onClick={(event) => {
+                    event.stopPropagation()
+                    handelEdit(o)
+                  }}> <Edit />
+                  </Button>
+                </Authorized>
+              }
+              {user.data.id === o.ownedByUserFK &&
+                <Authorized authority='queue.consultation.order.prescriptionset'>
+                  <Button justIcon color='danger' style={{ position: 'absolute', top: 0, left: 60 }} onClick={(event) => {
+                    event.stopPropagation()
+                    handelDelete(o.id)
+                  }}> <Delete />
+                  </Button>
+                </Authorized>
+              }
             </div>
             <div
               style={{
@@ -144,11 +185,10 @@ class Grid extends PureComponent {
         content: (
           <div>
             {items.map((item) => {
-              let addedItem = addedItems.find((added) => added.id === item.id)
               let warningLabel
-              if (!item.isActive) {
+              if (!item.isActive && !item.isDrugMixture) {
                 warningLabel = '#1'
-              } else if (item.inventoryDispenseUOMFK !== item.dispenseUOMFK) {
+              } else if (!item.isDrugMixture && item.inventoryDispenseUOMFK !== item.dispenseUOMFK) {
                 warningLabel = '#2'
               } else if (item.isExternalPrescription) {
                 warningLabel = '#3'
@@ -156,7 +196,7 @@ class Grid extends PureComponent {
               return (
                 <div
                   style={{
-                    background: addedItem ? 'lightGray' : 'white',
+                    background: isSelect ? 'lightGray' : 'white',
                     width: '100%',
                     fontSize: 14,
                   }}
@@ -168,9 +208,10 @@ class Grid extends PureComponent {
                           <sup>{warningLabel}&nbsp;</sup>
                         </span>
                       )}
-                      <Tooltip title={item.drugName || item.vaccinationName}>
-                        <span>{item.drugName || item.vaccinationName}</span>
+                      <Tooltip title={item.drugName}>
+                        <span>{item.drugName}</span>
                       </Tooltip>
+                      {drugMixtureIndicator(item)}
                     </div>
                     <div className={classes.instructionColumn}>
                       <Tooltip
@@ -210,37 +251,37 @@ class Grid extends PureComponent {
       isRetail,
       activeKey,
     } = this.props
-    let visits = _.orderBy(
-      this.Visits().filter((visit) => {
-        return visit.itemCount > 0
+    let prescriptionSets = _.orderBy(
+      this.PrescriptionSets().filter((ps) => {
+        return ps.itemCount > 0
       }),
       [
-        'visitDate',
+        'prescriptionSetName',
       ],
       [
         'desc',
       ],
     )
     const ContentHeight = height - 300
-    const visitContentHeight = ContentHeight - 30
-    if (visits.length >= 0) {
+    const psContentHeight = ContentHeight - 30
+    if (prescriptionSets.length >= 0) {
       return (
         <div>
           <div
             style={{
               overflow: 'auto',
-              height: visitContentHeight,
+              height: psContentHeight,
             }}
           >
             <Collapse activeKey={activeKey} expandIconPosition={null}>
-              {visits.map((visit) => {
+              {prescriptionSets.map((ps) => {
                 return (
                   <Collapse.Panel
-                    header={visit.header}
+                    header={ps.header}
                     className={CustomStyle.customPanel}
-                    key={visit.key}
+                    key={ps.key}
                   >
-                    {visit.content}
+                    {ps.content}
                   </Collapse.Panel>
                 )
               })}
