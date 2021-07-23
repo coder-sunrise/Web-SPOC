@@ -29,8 +29,6 @@ import Authorized from '@/utils/Authorized'
 
 const styles = theme => ({
   switchContainer: {
-    // lineHeight: '1em',
-    // height: '100%',
     color: 'currentColor',
     borderRadius: 0,
     '& .ant-switch-handle': {
