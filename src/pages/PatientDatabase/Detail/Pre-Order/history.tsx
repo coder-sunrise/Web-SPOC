@@ -53,7 +53,7 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props: any) => {
         render: row => {
           return (
             <span>
-              {row.quantity} {row.dispenseUOM}
+              {row.quantity.toFixed(1)} {row.dispenseUOM}
             </span>
           )
         },
@@ -91,12 +91,12 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props: any) => {
       {
         columnName: 'actualizedQuantity',
         type: 'number',
-        precision: 2,
+        precision: 1,
         width: 120,
         render: row => {
           return (
             <span>
-              {row.actualizedQuantity} {row.dispenseUOM}
+              {row.actualizedQuantity.toFixed(1)} {row.dispenseUOM}
             </span>
           )
         },
