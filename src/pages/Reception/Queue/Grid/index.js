@@ -29,8 +29,8 @@ import Authorized from '@/utils/Authorized'
 
 const styles = theme => ({
   switchContainer: {
-    lineHeight: '1em',
-    height: '100%',
+    // lineHeight: '1em',
+    // height: '100%',
     color: 'currentColor',
     borderRadius: 0,
     '& .ant-switch-handle': {
@@ -212,14 +212,9 @@ class Grid extends React.Component {
 
     const queueConfig = {
       ...QueueTableConfig,
-      columns: QueueTableConfig.columns.reduce((cols, column) => {
-        if(['consReady','visitGroup'].indexOf(column.name) < 0 || (
-          (showConsReady && showConsReady.rights !== 'hidden' && column.name === 'consReady') || 
-          (showVisitGroup && showVisitGroup.rights !== 'hidden' && column.name === 'visitGroup')
-        ))
-          cols.push(column)
-        return cols
-      }, []),
+      columns: QueueTableConfig.columns
+      .filter(col => showConsReady && showConsReady.rights === 'hidden' ? col.name !== 'consReady' : true)
+      .filter(col => showVisitGroup && showVisitGroup.rights === 'hidden' ? col.name !== 'visitGroup' : true)
     }
 
     const isLoading = showingVisitRegistration ? false : loading
@@ -265,12 +260,13 @@ class Grid extends React.Component {
                     return <Switch
                       className={classes.switchContainer}
                       value={row.consReady}
-                      onChange={(checked, event) => {
+                      onClick={(checked, event) => {
                         this.props.onQueueListing({
                           ...row,
                           consReady: checked,
                         })
                       }}
+                      disabled={showConsReady && showConsReady.rights !== 'enable'}
                       {...this.props}
                     />
                   },
