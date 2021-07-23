@@ -1,9 +1,6 @@
 
-import { Breadcrumb } from 'antd'
-import React, { useState, useRef, useEffect } from 'react'
-import { useIntl, Link } from 'umi'
-import { Theme } from '@material-ui/core/styles/createMuiTheme'
-import { withStyles } from '@material-ui/styles'
+import React, { useState, useEffect } from 'react'
+import { connect } from 'dva'
 import { Tabs } from '@/components'
 import PendingPreOrder from './pending'
 import HistoryPreOrder from './history'
@@ -12,25 +9,9 @@ interface IPreOrderProps {
   patient: any
 }
 
-// const styles = (theme: Theme) => ({
-//   breadcrumbtext: {
-//     fontSize: '18px',
-//     color: 'black',
-//   },
-//   breadcrumblink: {
-//     fontSize: '18px',
-//     color: 'black',
-//     '&:hover': {
-//       color: '#4255bd',
-//     },
-//   },
-// })
-
 const PreOrder: React.FC<IPreOrderProps> = (props) => {
-  const { patient } = props
-  const { pathname } = window.location
-  const { formatMessage } = useIntl()
-
+  const { patient,dispatch } = props
+  const { entity} = patient
 
   const [activeTab, setActiveTab] = useState<string>('1')
 
@@ -48,14 +29,20 @@ const PreOrder: React.FC<IPreOrderProps> = (props) => {
       },
     ]
     return tabs
-    // return tabs.filter((f) => checkAccessRight(f.authority))
   }
-
   useEffect(() => {
 
-    // console.log(patient)
-
   }, [patient.entity])
+
+  useEffect(() => {
+    dispatch({
+        type: 'patientPreOrderItem/query',
+        payload: {
+          patientProfileFK: entity.id,
+          pagesize: 9999,
+        },
+      })
+  }, [])
 
   return <Tabs
     activeKey={activeTab}
@@ -64,5 +51,6 @@ const PreOrder: React.FC<IPreOrderProps> = (props) => {
   />
 }
 
-export default PreOrder
-// export default withStyles(styles)(PreOrder)
+export default connect(({patientPreOrderItem}) => {
+  return {patientPreOrderItem,}
+})(PreOrder)

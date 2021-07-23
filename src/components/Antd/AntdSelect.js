@@ -401,6 +401,7 @@ class AntdSelect extends React.PureComponent {
         newVal = _.reject(newVal, v => v === allValue)
         newVal = newVal.slice(-maxSelected)
       }
+
       this.resizeChoiceContents()
     }
     let proceed = true

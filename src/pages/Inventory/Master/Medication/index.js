@@ -10,11 +10,14 @@ import Grid from '../Grid'
 const styles = () => ({})
 
 const Medication = ({ dispatch, history, medication, values }) => {
+  console.log('medication', medication)
   const [tableParas, setTableParas] = useState({
     columns: [
       { name: 'code', title: 'Code' },
       { name: 'displayValue', title: 'Name' },
       { name: 'favouriteSupplier', title: 'Supplier' },
+      { name: 'genericMedication', title: 'Generic Drug' },
+      { name: 'medicationGroup', title: 'Drug Group' },
       { name: 'dispensingUOM', title: 'Disp. UOM' },
       { name: 'stock', title: 'Stock' },
       { name: 'averageCostPrice', title: 'Avg Cost Price' },
@@ -27,6 +30,7 @@ const Medication = ({ dispatch, history, medication, values }) => {
 
   const [colExtensions, setColExtensions] = useState([
     { columnName: 'code', width: 130 },
+    { columnName: 'displayValue', width: 300 },
     { columnName: 'action', width: 80, align: 'center' },
     {
       columnName: 'favouriteSupplier',
@@ -34,13 +38,28 @@ const Medication = ({ dispatch, history, medication, values }) => {
       code: 'ctSupplier',
       sortBy: 'FavouriteSupplierFkNavigation.displayValue',
       labelField: 'displayValue',
+      width: 250,
     },
     {
       columnName: 'dispensingUOM',
       type: 'codeSelect',
       code: 'ctmedicationunitofmeasurement',
       sortBy: 'DispensingUOMFkNavigation.DisplayValue',
-      width: 110,
+    },
+    {
+      columnName: 'medicationGroup',
+      type: 'codeSelect',
+      code: 'ctmedicationgroup',
+      sortBy: 'MedicationGroupFkNavigation.displayValue',
+      width: 150,
+    },
+    {
+      columnName: 'genericMedication',
+      type: 'codeSelect',
+      code: 'ctgenericmedication',
+      sortBy: 'GenericMedicationFkNavigation.displayValue',
+      labelField: 'displayValue',
+      width: 150,
     },
     {
       columnName: 'stock',

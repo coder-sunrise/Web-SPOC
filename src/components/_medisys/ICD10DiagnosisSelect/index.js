@@ -39,7 +39,7 @@ const ICD10DiagnosisSelect = ({
       setcurrentDiagnosisLanguage(diagnosis.favouriteDiagnosisLanguage)
       setLabelValue(diagnosis.favouriteDiagnosisLanguage === 'EN' ? 'displayvalue' : 'JpnDisplayValue')
     },
-    [ diagnosis ]
+    [ diagnosis.favouriteDiagnosisLanguage ]
   )
 
   const onICD10DiagnosisSearch = async (v) => {

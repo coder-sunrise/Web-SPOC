@@ -42,37 +42,36 @@ export default createFormViewModel({
       *getUserPreference ({ payload }, { call, put }) {
         const r = yield call(getUserPreference, payload.type)
         const { status, data } = r
-
         if (status === '200') {
           if (data) {
             const parsedFavouriteDiagnosisSetting = JSON.parse(data)
             let favouriteDiagnosis
             let favouriteDiagnosisCategory
             let favouriteDiagnosisLanguage
+            let resultFavouriteDiagnosis
             if (payload.type === USER_PREFERENCE_TYPE['FAVOURITEDIAGNOSISSETTING']) {
               favouriteDiagnosis = parsedFavouriteDiagnosisSetting.find((o) => o.Identifier === 'FavouriteDiagnosis')
               parsedFavouriteDiagnosisSetting.find((o) => o.Identifier === 'FavouriteDiagnosisCategory')
+
+              resultFavouriteDiagnosis = {
+                favouriteDiagnosis: favouriteDiagnosis ? favouriteDiagnosis.value : [],
+                favouriteDiagnosisCategory: favouriteDiagnosisCategory ? favouriteDiagnosisCategory.value : [],}
             } else if (payload.type === USER_PREFERENCE_TYPE['FAVOURITEICD10DIAGNOSISSETTING']) {
               favouriteDiagnosis = parsedFavouriteDiagnosisSetting.find(
                 (o) => o.Identifier === 'FavouriteICD10Diagnosis'
               )
+              resultFavouriteDiagnosis = {favouriteDiagnosis: favouriteDiagnosis ? favouriteDiagnosis.value : [],}
             } else if (payload.type === USER_PREFERENCE_TYPE['FAVOURITEDIAGNOSISLANGUAGESETTING']) {
               favouriteDiagnosisLanguage = parsedFavouriteDiagnosisSetting.find(
                 (o) => o.Identifier === 'FavouriteDiagnosisLanguage'
               )
+              resultFavouriteDiagnosis = {favouriteDiagnosisLanguage: favouriteDiagnosisLanguage ? favouriteDiagnosisLanguage.value : [],}
             }
-            if (parsedFavouriteDiagnosisSetting.length > 0) {
-              const resultFavouriteDiagnosis = {
-                favouriteDiagnosis: favouriteDiagnosis ? favouriteDiagnosis.value : [],
-                favouriteDiagnosisCategory: favouriteDiagnosisCategory ? favouriteDiagnosisCategory.value : [],
-                favouriteDiagnosisLanguage: favouriteDiagnosisLanguage ? favouriteDiagnosisLanguage.value : [],
-              }
-              yield put({
-                type: 'updateState',
-                payload: resultFavouriteDiagnosis,
-              })
-              return resultFavouriteDiagnosis
-            }
+            yield put({
+              type: 'updateState',
+              payload: resultFavouriteDiagnosis,
+            })
+            return resultFavouriteDiagnosis
           }
         }
         return null
