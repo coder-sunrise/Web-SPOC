@@ -77,7 +77,7 @@ class Grid extends PureComponent {
 
       return (
         <div style={{ position: 'relative', top: 3 }}>
-          <DrugMixtureInfo values={row.prescriptionSetDrugMixture || []} />
+          <DrugMixtureInfo values={row.prescriptionSetItemDrugMixture || []} />
         </div>
       )
     }

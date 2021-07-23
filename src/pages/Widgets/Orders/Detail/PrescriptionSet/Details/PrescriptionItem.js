@@ -303,6 +303,42 @@ class Detail extends PureComponent {
     return match
   }
 
+  filterMedicationOptions = (input = '', option) => {
+    let match = false
+    try {
+      const lowerCaseInput = input.toLowerCase()
+
+      const { props } = option
+      const { combinDisplayValue = '', medicationGroup = {} } = props.data
+      match = combinDisplayValue.toLowerCase().indexOf(lowerCaseInput) >= 0
+        || (medicationGroup.name || '').toLowerCase().indexOf(lowerCaseInput) >= 0
+    } catch (error) {
+      match = false
+    }
+    return match
+  }
+
+  renderMedication = (option) => {
+    const { combinDisplayValue = '', medicationGroup = {} } = option
+    return <div style={{ marginTop: 5, }} >
+      <div style={{
+        width: 340, display: 'inline-block',
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
+        overflow: 'hidden',
+        height: '100%',
+      }} title={combinDisplayValue}>{combinDisplayValue}</div>
+      <div style={{
+        width: 120, display: 'inline-block',
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
+        overflow: 'hidden',
+        marginLeft: 6,
+        height: '100%',
+      }} title={medicationGroup.name || ''} > {medicationGroup.name || ''}</div>
+    </div >
+  }
+
   changeMedication = (
     v,
     op = {},
@@ -801,6 +837,16 @@ class Detail extends PureComponent {
           type: 'codeSelect',
           labelField: 'combinDisplayValue',
           options: this.getMedicationOptions,
+          handleFilter: (input, option) => {
+            return this.filterMedicationOptions(input, option)
+          },
+          dropdownMatchSelectWidth: false,
+          dropdownStyle: {
+            width: 500,
+          },
+          renderDropdown: (option) => {
+            return this.renderMedication(option)
+          },
           sortingEnabled: false,
           onChange: e => {
             const { values, setFieldValue } = this.props
@@ -860,7 +906,7 @@ class Detail extends PureComponent {
         },
         {
           columnName: 'uomfk',
-          width: 150,
+          width: 250,
           type: 'codeSelect',
           code: 'ctMedicationUnitOfMeasurement',
           labelField: 'name',
@@ -942,6 +988,12 @@ class Detail extends PureComponent {
                         labelField='combinDisplayValue'
                         onChange={this.changeMedication}
                         options={this.getMedicationOptions()}
+                        handleFilter={this.filterMedicationOptions}
+                        dropdownMatchSelectWidth={false}
+                        dropdownStyle={{
+                          width: 500,
+                        }}
+                        renderDropdown={this.renderMedication}
                         {...args}
                         style={{ paddingRight: 20 }}
                       />
@@ -1261,7 +1313,7 @@ class Detail extends PureComponent {
                                   return (
                                     <CodeSelect
                                       label={formatMessage({
-                                        id: 'inventory.master.setting.uom',
+                                        id: 'inventory.master.setting.prescribeUOM',
                                       })}
                                       allowClear={false}
                                       code='ctMedicationUnitOfMeasurement'
