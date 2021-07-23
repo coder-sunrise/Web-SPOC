@@ -403,6 +403,8 @@ const CalendarView = ({
           bookedByUser,
           createDate,
           isEditedAsSingleAppointment,
+          stageColorHex: appointment.stageColorHex,
+          stage: appointment.stage,
           start: moment(
             `${appointmentDate} ${item.startTime}`,
             `${serverDateFormat} HH:mm`,
