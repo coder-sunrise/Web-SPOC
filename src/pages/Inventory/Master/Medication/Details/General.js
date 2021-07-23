@@ -328,15 +328,15 @@ const General = ({
                     Hint:
                   </span>
                   {currentLanguage === primaryPrintoutLanguage ? (
-                    <FastField
+                    <Field
                       name='indicationSecondary'
                       render={args => <span>{args.field.value}</span>}
-                    ></FastField>
+                    ></Field>
                   ) : (
-                    <FastField
+                    <Field
                       name='indication'
                       render={args => <span>{args.field.value}</span>}
-                    ></FastField>
+                    ></Field>
                   )}
                 </div>
               </GridItem>
