@@ -130,6 +130,7 @@ export default ({
   }
 
   const editRow = (row) => {
+    if (row.isPreOrderActualize) return
     if (!row.isActive && row.type !== '5' && !row.isDrugMixture) return
 
     if (row.type === '7' && from !== 'EditOrder') return
@@ -410,11 +411,10 @@ export default ({
   }
 
   const getDisplayName = (row) => {
-    if (row.type === '10') {
+    if (row.type === '10' || row.type === '3') {
       if (row.newServiceName && row.newServiceName.trim() !== "") {
         return row.newServiceName
       }
-      row.subject
     }
     return row.subject
   }
@@ -435,7 +435,12 @@ export default ({
       size='sm'
       style={{ margin: 0 }}
       forceRender
-      rows={rows}
+      rows={(rows || []).map(r => {
+        return {
+          ...r,
+          totalAfterItemAdjustment: (r.isPreOrder && !r.isChargeToday) ? 0 : r.totalAfterItemAdjustment
+        }
+      })}
       onRowDoubleClick={editRow}
       getRowId={(r) => r.uid}
       columns={[
@@ -681,10 +686,12 @@ export default ({
             }
 
             return (
+              <div style={{ position: 'relative' }}>
               <div style={wrapCellTextStyle}>
                 <Tooltip title={texts}><span>{texts}</span></Tooltip>
                 {drugMixtureIndicator(row)}
-                {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'relative', marginLeft: 6, top: 2, borderRadius: 10 }}>Pre</Tag></Tooltip>}
+                  {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: -10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
+                </div>
               </div>
             )
           },
@@ -811,6 +818,7 @@ export default ({
                         (!row.isActive &&
                           row.type !== '5' &&
                           !row.isDrugMixture)
+                        || row.isPreOrderActualize
                       }
                     >
                       <Edit />
@@ -821,7 +829,8 @@ export default ({
                       size='sm'
                       color='danger'
                       justIcon
-                      disabled={isEditingEntity}
+                      disabled={isEditingEntity
+                        || row.isPreOrderActualize}
                     >
                       <Delete
                         onClick={() => {

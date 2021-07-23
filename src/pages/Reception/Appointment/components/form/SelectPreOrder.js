@@ -10,7 +10,6 @@ const SelectPreOrder = ({ activePreOrderItem = [], onSelectPreOrder, footer, mai
     selectedPreOrders,
     setSelectedPreOrders,
   ] = useState([])
-
   let height = mainDivHeight - 200
   if (height < 300) height = 300
 
@@ -27,7 +26,7 @@ const SelectPreOrder = ({ activePreOrderItem = [], onSelectPreOrder, footer, mai
   return <div>
     <CommonTableGrid
       size='sm'
-      rows={activePreOrderItem}
+      rows={activePreOrderItem.filter(x => x.preOrderItemStatus === 'New')}
       forceRender
       FuncProps={{
         pager: false,

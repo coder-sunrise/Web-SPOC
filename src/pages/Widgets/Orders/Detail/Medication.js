@@ -1678,7 +1678,8 @@ class Medication extends PureComponent {
                                   return (
                                     <CodeSelect
                                       label={formatMessage({
-                                        id: 'inventory.master.setting.uom',
+                                        id:
+                                          'inventory.master.setting.prescribeUOM',
                                       })}
                                       allowClear={false}
                                       code='ctMedicationUnitOfMeasurement'
@@ -2076,50 +2077,87 @@ class Medication extends PureComponent {
               {values.visitPurposeFK !== VISIT_TYPE.RETAIL &&
                 !values.isDrugMixture &&
                 !values.isPackage ? (
-                <FastField
-                  name='isExternalPrescription'
-                  render={args => {
-                    if (args.field.value) {
-                      setDisable(true)
-                    } else {
-                      setDisable(false)
-                    }
-                    return (
-                      <Checkbox
-                        label='External Prescription'
-                        {...args}
-                        onChange={e => {
-                          if (e.target.value) {
-                            this.props.setFieldValue('adjAmount', 0)
-                            this.props.setFieldValue(
-                              'totalAfterItemAdjustment',
-                              0,
-                            )
-                            this.props.setFieldValue('totalPrice', 0)
-                            this.props.setFieldValue('expiryDate', undefined)
-                            this.props.setFieldValue('batchNo', undefined)
-                            this.props.setFieldValue('isMinus', true)
-                            this.props.setFieldValue('isExactAmount', true)
-                            this.props.setFieldValue('adjValue', 0)
+                  <div>
+                    <div style={{ display: 'inline-block' }}>
+                      <FastField
+                        name='isExternalPrescription'
+                        render={args => {
+                          if (args.field.value) {
+                            setDisable(true)
                           } else {
-                            this.props.setFieldValue(
-                              'expiryDate',
-                              this.state.expiryDate,
-                            )
-                            this.props.setFieldValue(
-                              'batchNo',
-                              this.state.batchNo,
-                            )
-                            setTimeout(() => {
-                              this.calculateQuantity()
-                            }, 1)
+                            setDisable(false)
                           }
-                          setDisable(e.target.value)
+                          return (
+                            <Checkbox
+                              label='External Prescription'
+                              {...args}
+                              onChange={e => {
+                                if (e.target.value) {
+                                  this.props.setFieldValue('adjAmount', 0)
+                                  this.props.setFieldValue(
+                                    'totalAfterItemAdjustment',
+                                    0,
+                                  )
+                                  this.props.setFieldValue('totalPrice', 0)
+                                  this.props.setFieldValue('expiryDate', undefined)
+                                  this.props.setFieldValue('batchNo', undefined)
+                                  this.props.setFieldValue('isMinus', true)
+                                  this.props.setFieldValue('isExactAmount', true)
+                                  this.props.setFieldValue('adjValue', 0)
+                                } else {
+                                  this.props.setFieldValue(
+                                    'expiryDate',
+                                    this.state.expiryDate,
+                                  )
+                                  this.props.setFieldValue(
+                                    'batchNo',
+                                    this.state.batchNo,
+                                  )
+                                  setTimeout(() => {
+                                    this.calculateQuantity()
+                                  }, 1)
+                                }
+                                setDisable(e.target.value)
+                              }}
+                            />
+                          )
                         }}
                       />
-                    )
-                  }}
-                />
+                    </div>
+                    {values.type === '1' && <div style={{ display: 'inline-block' }}>
+                      <FastField
+                        name='isPreOrder'
+                        render={args => {
+                          return (
+                            <Checkbox
+                              label='Pre-Order'
+                              {...args}
+                              onChange={e => {
+                                if (!e.target.value) {
+                                  setFieldValue('isChargeToday', false)
+                                }
+                              }}
+                            />
+                          )
+                        }}
+                      />
+                    </div>
+                    }
+                    {values.isPreOrder && <div style={{ display: 'inline-block' }}>
+                      <FastField
+                        name='isChargeToday'
+                        render={args => {
+                          return (
+                            <Checkbox
+                              label='Charge Today'
+                              {...args}
+                            />
+                          )
+                        }}
+                      />
+                    </div>
+                    }
+                  </div>
               ) : (
                 ''
               )}

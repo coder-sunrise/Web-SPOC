@@ -221,7 +221,7 @@ const convertToConsultation = (
   values.corOrderAdjustment = finalAdjustments
   orderTypes.forEach((p, i) => {
     if (p.prop) {
-      if (p.value === '5') {
+      if (p.value === '5' || p.value === '10') {
         values[p.prop] = (values[p.prop] || []).concat(
           orderRows.filter(o => o.type === p.value),
         )
@@ -238,7 +238,8 @@ const convertToConsultation = (
               }),
             }
           })
-      } else {
+      }
+      else {
         values[p.prop] = orderRows.filter(o => o.type === p.value)
       }
     }

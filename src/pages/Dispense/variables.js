@@ -2,6 +2,7 @@ import moment from 'moment'
 import Print from '@material-ui/icons/Print'
 import { FormattedMessage } from 'umi'
 import numeral from 'numeral'
+import { Tag } from 'antd'
 import { currencySymbol, currencyFormat } from '@/utils/config'
 import {
   NumberInput,
@@ -131,6 +132,7 @@ export const PrescriptionColumnExtensions = (
             }}
           >
             {row.name}
+            {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: 10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
             {lowStockIndicator(row, 'inventoryMedicationFK')}
           </div>
         </div>
@@ -161,6 +163,7 @@ export const PrescriptionColumnExtensions = (
     columnName: 'totalAfterItemAdjustment',
     width: 110,
     type: 'currency',
+    render: (row) => <NumberInput value={(row.isPreOrder && !row.isChargeToday) ? 0 : row.totalAfterItemAdjustment} text currency />
   },
   {
     columnName: 'adjAmt',
@@ -340,6 +343,7 @@ export const VaccinationColumnExtensions = (
             }}
           >
             {row.name}
+            {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: 10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
             {lowStockIndicator(row, 'inventoryVaccinationFK')}
           </div>
         </div>
@@ -370,6 +374,7 @@ export const VaccinationColumnExtensions = (
     columnName: 'totalAfterItemAdjustment',
     width: 110,
     type: 'currency',
+    render: (row) => <NumberInput value={(row.isPreOrder && !row.isChargeToday) ? 0 : row.totalAfterItemAdjustment} text currency />
   },
   {
     columnName: 'adjAmt',
@@ -495,6 +500,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     width: 160,
     render: row => {
       return (
+        <div style={{ position: 'relative' }}>
         <div
           style={{
             wordWrap: 'break-word',
@@ -502,6 +508,8 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
           }}
         >
           {row.type}
+            {row.isPreOrder && <Tooltip title='Pre-Order'><Tag color="#4255bd" style={{ position: 'absolute', top: 0, right: -10, borderRadius: 10 }}>Pre</Tag></Tooltip>}
+          </div>
         </div>
       )
     },
@@ -589,7 +597,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
           text
           currency
           showZero
-          value={row.totalAfterItemAdjustment}
+          value={(row.isPreOrder && !row.isChargeToday) ? 0 : row.totalAfterItemAdjustment}
         />
       )
     },

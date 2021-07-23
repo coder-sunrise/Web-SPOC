@@ -55,9 +55,18 @@ const Stock = ({
     return ''
   }
 
-  const [stock, setStock] = useState(
-    _.sortBy(values[objectType().stockProp], 'id'),
-  )
+  const [stock, setStock] = useState([])
+  const [stockQty, setStockQty] = useState(0)
+
+  useEffect(() => {
+    setStock(_.sortBy(values[objectType().stockProp], 'expiryDate').reverse())
+
+    let totalQty = 0
+    values[objectType().stockProp].forEach(o => {
+      totalQty += o.stock
+    })
+    setStockQty(totalQty)
+  }, [values.vaccinationStock, values.medicationStock, values.consumableStock])
 
   const changeIsDefault = async row => {
     const updatedStock = stock.map(batch => {
@@ -84,16 +93,6 @@ const Stock = ({
       },
     })
   }
-
-  const [stockQty, setStockQty] = useState(0)
-
-  useEffect(() => {
-    let totalQty = 0
-    values[objectType().stockProp].forEach(o => {
-      totalQty += o.stock
-    })
-    setStockQty(totalQty)
-  }, [])
 
   const handleDeleteStock = async row => {
     const { stock: remainingQty, isDefault } = row
@@ -150,7 +149,6 @@ const Stock = ({
       { name: 'batchNo', title: 'Batch No.' },
       { name: 'expiryDate', title: 'Expiry Date' },
       { name: 'stock', title: 'Quantity' },
-      { name: 'isDefault', title: 'Default' },
       {
         name: 'action',
         title: 'Action',
@@ -187,19 +185,6 @@ const Stock = ({
         ),
       },
       {
-        columnName: 'isDefault',
-        align: 'center',
-        render: row => {
-          return (
-            <Radio
-              checked={row.isDefault}
-              onChange={() => changeIsDefault(row)}
-              disabled={row.isDeleted || checkIsReadOnly()}
-            />
-          )
-        },
-      },
-      {
         columnName: 'action',
         sortingEnabled: false,
         align: 'center',
@@ -225,71 +210,79 @@ const Stock = ({
     ],
   })
   return (
-    <SharedContainer>
-      <div
-        hideHeader
-        style={{
-          margin: theme.spacing(1),
-          minHeight: 670,
-          maxHeight: 670,
-        }}
-      >
-        <h4 style={{ fontWeight: 400 }}>
-          <b>Stock</b>
-        </h4>
-        <GridContainer className={classes.infoPanl}>
-          <GridItem xs={12} md={4}>
-            <Field
-              name={`${objectType().stockProp}`}
-              render={args => {
-                return (
-                  <NumberInput
-                    label={formatMessage({
-                      id: 'inventory.master.stock.currentStock',
-                    })}
-                    value={stockQty}
-                    disabled
-                    format='0.0'
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs={12} md={4}>
-            <FastField
-              name='reOrderThreshold'
-              render={args => {
-                return (
-                  <NumberInput
-                    label={formatMessage({
-                      id: 'inventory.master.stock.reorderThreshold',
-                    })}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs={12} md={4}>
-            <FastField
-              name='criticalThreshold'
-              render={args => {
-                return (
-                  <NumberInput
-                    label={formatMessage({
-                      id: 'inventory.master.stock.criticalThreshold',
-                    })}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-        </GridContainer>
-        <CommonTableGrid rows={stock} showIsDeleted {...tableParas} />
-      </div>
-    </SharedContainer>
+    <div
+      hideHeader
+      style={{
+        margin: theme.spacing(1),
+      }}
+    >
+      <GridContainer className={classes.infoPanl}>
+        <GridItem xs={12} md={3}>
+          <Field
+            name={`${objectType().stockProp}`}
+            render={args => {
+              return (
+                <NumberInput
+                  label={formatMessage({
+                    id: 'inventory.master.stock.currentStock',
+                  })}
+                  value={stockQty}
+                  disabled
+                  format='0.0'
+                  {...args}
+                />
+              )
+            }}
+          />
+        </GridItem>
+        <GridItem xs={12} md={3}>
+          <FastField
+            name='reOrderThreshold'
+            render={args => {
+              return (
+                <NumberInput
+                  label={formatMessage({
+                    id: 'inventory.master.stock.reorderThreshold',
+                  })}
+                  {...args}
+                />
+              )
+            }}
+          />
+        </GridItem>
+        <GridItem xs={12} md={3}>
+          <FastField
+            name='criticalThreshold'
+            render={args => {
+              return (
+                <NumberInput
+                  label={formatMessage({
+                    id: 'inventory.master.stock.criticalThreshold',
+                  })}
+                  {...args}
+                />
+              )
+            }}
+          />
+        </GridItem>
+        <GridItem xs={12} md={3}>
+          <FastField
+            name='excessThreshold'
+            render={args => {
+              return (
+                <NumberInput
+                  label={formatMessage({
+                    id: 'inventory.master.stock.excessThreshold',
+                  })}
+                  {...args}
+                />
+              )
+            }}
+          />
+        </GridItem>
+      </GridContainer>
+      <CommonTableGrid rows={stock} showIsDeleted {...tableParas} />
+    </div>
   )
 }
 export default withStyles(styles, { withTheme: true })(Stock)
