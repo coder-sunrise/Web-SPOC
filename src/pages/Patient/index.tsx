@@ -46,7 +46,7 @@ const defaultColumns = [
     dataIndex: 'lastVisitDate',
     valueType: 'dateTime',
     render: (_dom: any, entity: any) =>
-      entity.lastVisitDate?.format('L') || '-',
+      entity.lastVisitDate?.format('DD MMM yyyy') || '-',
     width: 120,
     search: false,
   },
@@ -70,7 +70,7 @@ const defaultColumns = [
     key:'dob',
     dataIndex: 'dob',
     title: 'DOB',
-    render: (_dom: any, entity: any) => entity.dob?.format('L') || '-',
+    render: (_dom: any, entity: any) => entity.dob?.format('DD MMM yyyy') || '-',
     width: 100,
     search: false,
   },
@@ -148,6 +148,7 @@ const PatientIndex = ({ dispatch, patient:{ favPatDBColumnSetting={} }}) => {
   return (
     <PageContainer pageHeaderRender={false}>
       <ProTable
+        search={{span:8}}
         rowSelection={false}
         columns={defaultColumns}
         api={api}
