@@ -53,7 +53,9 @@ class FamilyMemberGrid extends PureComponent {
           }
           return(
             <div>
-              <Link
+              {this.props.patient.entity.id === row.familyMemberFK
+              ?row.name
+              :<Link
                 to={targetUrl}
                 onClick={e => {
                   navigateDirtyCheck({
@@ -90,7 +92,7 @@ class FamilyMemberGrid extends PureComponent {
                   >
                 {row.name}
               </span>
-              </Link>
+              </Link>}
             </div>
           )
         },

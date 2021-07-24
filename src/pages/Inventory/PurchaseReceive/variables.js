@@ -69,7 +69,7 @@ const LTInvoiceStatus = [
   },
 ]
 
-const isDuplicatePOAllowed = (status) => {
+const isDuplicatePOAllowed = status => {
   const allowedStatus = [
     'Partially Received',
     'Finalized',
@@ -79,7 +79,7 @@ const isDuplicatePOAllowed = (status) => {
   return !(allowedStatus.indexOf(status) > -1)
 }
 
-export const isPOStatusDraft = (status) => {
+export const isPOStatusDraft = status => {
   const allowedStatus = [
     // 'Draft',
     1,
@@ -87,7 +87,7 @@ export const isPOStatusDraft = (status) => {
   return allowedStatus.indexOf(status) > -1
 }
 
-export const enableSaveButton = (status) => {
+export const enableSaveButton = status => {
   const allowedStatus = [
     // 'Draft',
     1,
@@ -97,7 +97,7 @@ export const enableSaveButton = (status) => {
   return allowedStatus.indexOf(status) > -1
 }
 
-export const isInvoiceReadOnly = (status) => {
+export const isInvoiceReadOnly = status => {
   const allowedStatus = [
     // 'Draft',
     // 'Cancelled',
@@ -107,7 +107,7 @@ export const isInvoiceReadOnly = (status) => {
   return allowedStatus.indexOf(status) > -1
 }
 
-export const isPOStatusFinalizedFulFilledPartialReceived = (status) => {
+export const isPOStatusFinalizedFulFilledPartialReceived = status => {
   const allowedStatus = [
     2, // Finalized
     3, // Partial Received
@@ -116,29 +116,27 @@ export const isPOStatusFinalizedFulFilledPartialReceived = (status) => {
   return allowedStatus.indexOf(status) > -1
 }
 
-export const isPOStatusFulfilled = (status) => {
-  const allowedStatus = [
-    5,
-  ]
+export const isPOStatusFulfilled = status => {
+  const allowedStatus = [5]
   return allowedStatus.indexOf(status) > -1
 }
 
-export const getPurchaseOrderStatusFK = (status) => {
+export const getPurchaseOrderStatusFK = status => {
   let purchaseOrderStatusFK = {}
   if (typeof status === 'number') {
-    purchaseOrderStatusFK = LTPurchaseOrderStatus.find((x) => x.id === status)
+    purchaseOrderStatusFK = LTPurchaseOrderStatus.find(x => x.id === status)
   } else {
     purchaseOrderStatusFK = LTPurchaseOrderStatus.find(
-      (x) => x.name.toLowerCase() === status.toLowerCase(),
+      x => x.name.toLowerCase() === status.toLowerCase(),
     )
   }
 
   return purchaseOrderStatusFK
 }
 
-export const getInvoiceStatusFK = (status) => {
+export const getInvoiceStatusFK = status => {
   const invoiceStatusFK = LTInvoiceStatus.find(
-    (x) => x.name.toLowerCase() === status.toLowerCase(),
+    x => x.name.toLowerCase() === status.toLowerCase(),
   )
   return invoiceStatusFK
 }
@@ -156,7 +154,7 @@ export const PurchaseReceiveGridCol = [
   { name: 'action', title: 'Action' },
 ]
 
-export const ContextMenuOptions = (row) => {
+export const ContextMenuOptions = row => {
   const createAuthority = Authorized.check(
     'purchasingandreceiving.newpurchasingandreceiving',
   )
@@ -194,13 +192,13 @@ export const ContextMenuOptions = (row) => {
     !createAuthority ||
     (createAuthority && createAuthority.rights === 'hidden')
   )
-    menuOptions = menuOptions.filter((option) => option.id !== 1)
+    menuOptions = menuOptions.filter(option => option.id !== 1)
 
   if (
     !viewEditAuthority ||
     (viewEditAuthority && viewEditAuthority.rights === 'hidden')
   )
-    menuOptions = menuOptions.filter((option) => option.id !== 0)
+    menuOptions = menuOptions.filter(option => option.id !== 0)
 
   return menuOptions
 }
