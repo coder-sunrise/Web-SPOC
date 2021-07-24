@@ -13,6 +13,7 @@ import {
   Button,
   TextField,
   ProgressButton,
+  DatePicker,
 } from '@/components'
 
 const styles = theme => ({
@@ -35,9 +36,11 @@ const styles = theme => ({
 })
 
 @withFormik({
-  mapPropsToValues: ({ search }) => {
+  mapPropsToValues: ({ search, dobfrom, dobto }) => {
     return {
       search,
+      dobfrom,
+      dobto,
     }
   },
 })
@@ -65,6 +68,18 @@ class FilterBar extends PureComponent {
                 }}
               />
             </GridItem>
+            <GridItem md={3}>
+              <FastField
+                name='dobfrom'
+                render={args => <DatePicker {...args} label='DOB From' />}
+              />
+            </GridItem>
+            <GridItem md={3}>
+              <FastField
+                name='dobto'
+                render={args => <DatePicker {...args} label='DOB To' />}
+              />
+            </GridItem>
           </Authorized>
           <GridItem md={12} lg={7}>
             <div className={classes.filterBtn}>
@@ -79,7 +94,7 @@ class FilterBar extends PureComponent {
                     //   type: 'patientSearch/updateFilter',
                     //   payload: this.props.values,
                     // })
-                    const { search } = this.props.values
+                    const { search, dobfrom, dobto } = this.props.values
                     const prefix = this.props.values.isExactSearch
                       ? 'eql_'
                       : 'like_'
@@ -98,6 +113,8 @@ class FilterBar extends PureComponent {
                         // ],
                         apiCriteria: {
                           searchValue: search,
+                          dobfrom: dobfrom,
+                          dobto: dobto,
                           includeinactive: window.location.pathname.includes(
                             'patientdb',
                           ),

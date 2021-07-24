@@ -41,6 +41,8 @@ const createPayload = (values, viewOtherApptAccessRight, isActiveDoctor) => {
     searchValue,
     apptDate,
     isPrint,
+    dobfrom,
+    dobto,
   } = values
 
   const commonPayload = {
@@ -93,6 +95,8 @@ const createPayload = (values, viewOtherApptAccessRight, isActiveDoctor) => {
     appStatus: filterByAppointmentStatus.join() || undefined,
     isIncludeRescheduledByClinic: true,
     isIncludeHistory: true,
+    dobfrom: dobfrom || '1900-01-01',
+    dobto: dobto || '9999-12-31',
   }
 }
 
@@ -143,7 +147,19 @@ const FilterBar = ({
             )}
           />
         </GridItem>
-        <GridItem md={6}>
+        <GridItem md={2}>
+          <FastField
+            name='dobfrom'
+            render={args => <DatePicker {...args} label='DOB From' />}
+          />
+        </GridItem>
+        <GridItem md={2}>
+          <FastField
+            name='dobto'
+            render={args => <DatePicker {...args} label='DOB To' />}
+          />
+        </GridItem>
+        <GridItem md={2}>
           <Field
             name='filterByDoctor'
             render={args => (
