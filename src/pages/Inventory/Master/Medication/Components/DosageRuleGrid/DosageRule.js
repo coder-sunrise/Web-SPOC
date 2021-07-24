@@ -274,7 +274,8 @@ const DosageRuleTable = ({
     const conflict = ranges.filter(
       item =>
         (currentRange.min >= item.min && currentRange.min <= item.max) ||
-        (currentRange.max >= item.min && currentRange.max <= item.max),
+        (currentRange.max >= item.min && currentRange.max <= item.max) ||
+        (currentRange.min <= item.min && currentRange.max >= item.max),
     )
 
     console.group('range conflict validation')
