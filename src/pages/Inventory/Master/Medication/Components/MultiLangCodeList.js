@@ -81,8 +81,10 @@ const MultiLangCodeList = ({
       renderItem={(item, i) => {
         return (
           <div style={{ padding: 10, display: 'flex' }}>
-            <span style={{ marginRight: 15, fontWeight: 200 }}>
-              {label} {i + 1}
+            <span
+              style={{ marginRight: 15, fontWeight: 200, flex: '0 0 auto' }}
+            >
+              {`${label} ${i + 1}`}
             </span>
             <span style={{ flexGrow: 1 }}>
               {item['displayValue' + language]}

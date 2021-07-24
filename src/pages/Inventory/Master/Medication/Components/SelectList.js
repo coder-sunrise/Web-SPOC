@@ -54,6 +54,7 @@ const SelectList = props => {
     newListItems.push(currentSelected.id)
 
     setListItems(newListItems)
+    setCurrentSelected(null)
     if (onChange) onChange(newListItems)
   }
 
@@ -64,7 +65,11 @@ const SelectList = props => {
         <MultiLangCodeSelect
           code={codeset}
           language={isMultiLanguage ? language : ''}
+          localFilter={item => {
+            return listItems.findIndex(i => i === item.id) === -1
+          }}
           max={10}
+          value={currentSelected ? currentSelected.id : null}
           valueField='id'
           onChange={(value, opt) => {
             if (value && opt) setCurrentSelected(opt)

@@ -15,6 +15,7 @@ import {
 } from 'antd'
 import { GridContainer, GridItem, CodeSelect, Popover } from '@/components'
 import DetailsContext from '../../Details/DetailsContext'
+import { DOSAGE_RULE, DOSAGE_RULE_OPERATOR } from '@/utils/constants'
 
 const EditableRow = ({ index, ...props }) => {
   return <tr {...props} style={{ verticalAlign: 'top' }} />
@@ -37,10 +38,19 @@ const EditableCell = ({
   )
 }
 
-const validOperators = {
-  to: 'to',
-  lessThan: 'less than',
-  moreThan: 'more than',
+const SingleDecimalInput = ({ onChange, ...props }) => {
+  const [currentValue, setCurrentValue] = useState(null)
+
+  function handlChange(val) {
+    let singleDecimalRegex = /^(([0-9]+)|([0-9]+.[0-9]?))$/
+
+    if (!singleDecimalRegex.test(val)) return
+
+    if (singleDecimalRegex.test(val)) setCurrentValue(val)
+    if (onChange) onChange(val)
+  }
+
+  return <InputNumber value={currentValue} onChange={handlChange} {...props} />
 }
 
 const DosageRuleTable = ({
@@ -53,7 +63,7 @@ const DosageRuleTable = ({
 }) => {
   const [form] = Form.useForm()
   const [data, setData] = useState([])
-  const [selectedOperator, setSelectedOperator] = useState('')
+  const [selectedOperator, setSelectedOperator] = useState(null)
   const [rangeValidation, setRangeValidation] = useState({
     message: '',
   })
@@ -73,9 +83,17 @@ const DosageRuleTable = ({
   useEffect(() => {
     if (initialData) {
       setEditingKey('')
-      setData(initialData.map((item, index) => ({ ...item, key: index + 1 })))
+
+      const sortedInitialData =
+        rule !== DOSAGE_RULE.default
+          ? _.sortBy(initialData, s => getRangeMinMax(s).max)
+          : initialData
+
+      setData(
+        sortedInitialData.map((item, index) => ({ ...item, key: index + 1 })),
+      )
     }
-  }, [initialData])
+  }, [rule, initialData])
 
   const isEditing = record => record.key === editingKey
   const dispatch = useDispatch()
@@ -124,10 +142,10 @@ const DosageRuleTable = ({
       ...record,
     })
     setEditingKey(record.key)
+    setSelectedOperator(record.operator ?? DOSAGE_RULE_OPERATOR.to)
   }
 
   const cancel = key => {
-    console.log('key', key)
     if (key === -1) setData(data.filter(r => r.key !== key))
 
     form.resetFields()
@@ -135,6 +153,15 @@ const DosageRuleTable = ({
       message: '',
     })
     setEditingKey('')
+  }
+
+  const getRangeMinMax = ({ operator, leftOperand, rightOperand }) => {
+    if (operator === DOSAGE_RULE_OPERATOR.to)
+      return { min: leftOperand, max: rightOperand }
+    if (operator === DOSAGE_RULE_OPERATOR.lessThan)
+      return { min: 0, max: rightOperand - 0.1 }
+    if (operator === DOSAGE_RULE_OPERATOR.moreThan)
+      return { min: rightOperand + 0.1, max: maxInput }
   }
 
   const validate = async () => {
@@ -152,12 +179,12 @@ const DosageRuleTable = ({
       validationSuccess = false
     }
 
-    const regex = /^(([0-9]+)|(0.5))+$/
+    const validAgeExpressioin = /^(([0-9]+)|(0.5))+$/
 
-    if (rule === 'age') {
+    if (rule === DOSAGE_RULE.age) {
       if (
-        (leftOperand && !regex.test(leftOperand)) ||
-        (rightOperand && !regex.test(rightOperand))
+        (leftOperand && !validAgeExpressioin.test(leftOperand)) ||
+        (rightOperand && !validAgeExpressioin.test(rightOperand))
       ) {
         rangeValidationErrorMessage =
           'Invalid age range. 0.5 (6 months) or full year only.'
@@ -165,11 +192,11 @@ const DosageRuleTable = ({
       }
     }
 
-    if (rule === 'age' || rule === 'weight') {
+    if (rule === DOSAGE_RULE.age || rule === DOSAGE_RULE.weight) {
       if (!operator) {
         rangeValidationErrorMessage = `Required.`
         validationSuccess = false
-      } else if (operator === validOperators.to) {
+      } else if (operator === DOSAGE_RULE_OPERATOR.to) {
         if (
           leftOperand === undefined ||
           leftOperand === null ||
@@ -187,6 +214,12 @@ const DosageRuleTable = ({
       } else {
         if (rightOperand === undefined || rightOperand === null) {
           rangeValidationErrorMessage = `Required.`
+          validationSuccess = false
+        } else if (
+          operator === DOSAGE_RULE_OPERATOR.lessThan &&
+          rightOperand === 0
+        ) {
+          rangeValidationErrorMessage = `Invalid ${rule} range.`
           validationSuccess = false
         }
       }
@@ -229,23 +262,14 @@ const DosageRuleTable = ({
       }
     }
 
-    const getMinMax = ({ operator, leftOperand, rightOperand }) => {
-      if (operator === validOperators.to)
-        return { min: leftOperand, max: rightOperand }
-      if (operator === validOperators.lessThan)
-        return { min: 0, max: rightOperand }
-      if (operator === validOperators.moreThan)
-        return { min: rightOperand, max: maxInput }
-    }
-
     const ranges = data
-      .filter(d => d.key !== -1)
+      .filter(d => d.key !== -1 && d.key !== editingKey)
       .map(d => {
-        const minMax = getMinMax({ ...d })
+        const minMax = getRangeMinMax({ ...d })
         return { ...d, ...minMax }
       })
 
-    const currentRange = getMinMax({ operator, leftOperand, rightOperand })
+    const currentRange = getRangeMinMax({ operator, leftOperand, rightOperand })
 
     const conflict = ranges.filter(
       item =>
@@ -312,32 +336,32 @@ const DosageRuleTable = ({
   }
   const columns = [
     {
-      title: ruleLabel[rule ?? 'default'],
+      title: ruleLabel[rule ?? DOSAGE_RULE.default],
       dataIndex: 'range',
       align: 'center',
       width: '20%',
       editable: true,
       render: (item = {}, record) => {
-        if (rule === 'default') return <></>
+        if (rule === DOSAGE_RULE.default) return <></>
         const editing = isEditing(record)
         return (
           <>
             {editing ? (
               <GridContainer gutter={4}>
                 <GridItem md={3}>
-                  {selectedOperator === validOperators.to && (
+                  {selectedOperator === DOSAGE_RULE_OPERATOR.to && (
                     <Form.Item
                       name={['leftOperand']}
                       style={{
                         margin: 0,
                       }}
                     >
-                      <InputNumber
+                      <SingleDecimalInput
                         style={{ width: 75, marginRight: 3 }}
                         min={0}
                         max={maxInput}
                         placeholder={rule}
-                      ></InputNumber>
+                      ></SingleDecimalInput>
                     </Form.Item>
                   )}
                 </GridItem>
@@ -350,21 +374,22 @@ const DosageRuleTable = ({
                     }}
                   >
                     <Select
+                      value={selectedOperator}
                       style={{ width: 110 }}
                       onChange={val => {
                         setSelectedOperator(val)
-                        if (val !== validOperators.to)
+                        if (val !== DOSAGE_RULE_OPERATOR.to)
                           form.setFieldsValue({ ['leftOperand']: null })
                       }}
                     >
-                      <Option value={validOperators.lessThan}>
-                        {validOperators.lessThan}
+                      <Option value={DOSAGE_RULE_OPERATOR.lessThan}>
+                        {DOSAGE_RULE_OPERATOR.lessThan}
                       </Option>
-                      <Option value={validOperators.to}>
-                        {validOperators.to}
+                      <Option value={DOSAGE_RULE_OPERATOR.to}>
+                        {DOSAGE_RULE_OPERATOR.to}
                       </Option>
-                      <Option value={validOperators.moreThan}>
-                        {validOperators.moreThan}
+                      <Option value={DOSAGE_RULE_OPERATOR.moreThan}>
+                        {DOSAGE_RULE_OPERATOR.moreThan}
                       </Option>
                     </Select>
                   </Form.Item>
@@ -376,12 +401,12 @@ const DosageRuleTable = ({
                       margin: 0,
                     }}
                   >
-                    <InputNumber
+                    <SingleDecimalInput
                       style={{ width: 75, marginRight: 3 }}
                       min={0}
                       max={maxInput}
                       placeholder={rule}
-                    ></InputNumber>
+                    ></SingleDecimalInput>
                   </Form.Item>
                 </GridItem>
                 {rangeValidation.message.length > 0 && (
@@ -393,6 +418,7 @@ const DosageRuleTable = ({
                       {rangeValidation.details !== null &&
                         rangeValidation.details !== undefined && (
                           <Popover
+                            placement='bottom'
                             icon={null}
                             title='Conflict Rule(s)'
                             content={rangeValidation.details}
@@ -552,11 +578,11 @@ const DosageRuleTable = ({
                   },
                 ]}
               >
-                <InputNumber
+                <SingleDecimalInput
                   style={{ width: 60 }}
                   min={1}
                   max={maxInput}
-                ></InputNumber>
+                ></SingleDecimalInput>
               </Form.Item>
             ) : (
               <>
@@ -594,11 +620,11 @@ const DosageRuleTable = ({
                   },
                 ]}
               >
-                <InputNumber
+                <SingleDecimalInput
                   style={{ width: 60, marginRight: 3 }}
                   min={0}
                   max={maxInput}
-                ></InputNumber>
+                ></SingleDecimalInput>
               </Form.Item>
             ) : (
               <span>{record.dispensingQuantity}</span>
@@ -635,6 +661,8 @@ const DosageRuleTable = ({
             <Typography.Link>
               <Popconfirm
                 title='Sure to cancel?'
+                cancelText='No'
+                okText='Yes'
                 onConfirm={() => cancel(record.key)}
               >
                 <a>Cancel</a>
@@ -690,13 +718,12 @@ const DosageRuleTable = ({
         rowClassName='editable-row'
         pagination={false}
       />
-      {(rule !== 'default' || data.length === 0) && (
+      {(rule !== DOSAGE_RULE.default || data.length === 0) && (
         <Button
           disabled={editingKey !== ''}
           onClick={() => {
             const newRecord = { key: -1 }
             setData([...data, newRecord])
-            setSelectedOperator(validOperators.to)
             edit(newRecord)
           }}
           type='link'
