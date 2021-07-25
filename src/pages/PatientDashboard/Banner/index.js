@@ -55,12 +55,12 @@ class Banner extends PureComponent {
     showNotesModal: false,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.fetchCodeTables()
   }
 
-  componentWillMount () {
+  componentWillMount() {
     const { dispatch } = this.props
     dispatch({
       type: 'codetable/fetchCodes',
@@ -68,9 +68,12 @@ class Banner extends PureComponent {
     })
   }
 
-  getAllergyLink (data) {
+  getAllergyLink(data) {
     const { props } = this
-    const { patient, codetable: { ctg6pd = [] }, } = props
+    const {
+      patient,
+      codetable: { ctg6pd = [] },
+    } = props
     const { entity } = patient
     const info = entity
     const { patientAllergy = [], patientAllergyMetaData = [] } = info
@@ -96,7 +99,7 @@ class Banner extends PureComponent {
     }
     let g6PD
     if (patientAllergyMetaData.length > 0) {
-      g6PD = ctg6pd.find((o) => o.id === patientAllergyMetaData[0].g6PDFK)
+      g6PD = ctg6pd.find(o => o.id === patientAllergyMetaData[0].g6PDFK)
     }
     return (
       entity &&
@@ -147,12 +150,17 @@ class Banner extends PureComponent {
               )}
 
               <div>
-                <span style={{
-                  color: 'darkblue',
-                  fontWeight: 500,
-                  position: 'relative',
-                  fontSize: '16.1px'
-                }}>G6PD: </span>{g6PD ? g6PD.name : '-'}
+                <span
+                  style={{
+                    color: 'darkblue',
+                    fontWeight: 500,
+                    position: 'relative',
+                    fontSize: '16.1px',
+                  }}
+                >
+                  G6PD:{' '}
+                </span>
+                {g6PD ? g6PD.name : '-'}
               </div>
             </div>
           )}
@@ -267,11 +275,11 @@ class Banner extends PureComponent {
   }
 
   openNotes = () => {
-    this.setState({showNotesModal:true})
+    this.setState({ showNotesModal: true })
   }
 
   closeNotes = () => {
-    this.setState({showNotesModal:false})
+    this.setState({ showNotesModal: false })
   }
 
   refreshMedisaveBalance = () => {
@@ -418,12 +426,12 @@ class Banner extends PureComponent {
       statusDescription: refreshedSchemeData.statusDescription,
       acuteBalanceStatusCode:
         !_.isEmpty(refreshedSchemeData) &&
-          refreshedSchemeData.isSuccessful === false
+        refreshedSchemeData.isSuccessful === false
           ? 'ERROR'
           : undefined,
       chronicBalanceStatusCode:
         !_.isEmpty(refreshedSchemeData) &&
-          refreshedSchemeData.isSuccessful === false
+        refreshedSchemeData.isSuccessful === false
           ? 'ERROR'
           : chronicStatus,
       isSuccessful:
@@ -491,7 +499,7 @@ class Banner extends PureComponent {
     }
   }
 
-  displayMedicalProblemData (entity = { patientHistoryDiagnosis: [] }) {
+  displayMedicalProblemData(entity = { patientHistoryDiagnosis: [] }) {
     let medicalProblemData = '-'
     const { patientHistoryDiagnosis = [] } = entity
 
@@ -531,7 +539,7 @@ class Banner extends PureComponent {
     )
   }
 
-  render () {
+  render() {
     const { props } = this
     const {
       // patientInfo = {},
@@ -547,7 +555,7 @@ class Banner extends PureComponent {
         paddingRight: 16,
         // maxHeight: 100,
         backgroundColor: '#f0f8ff',
-        marginTop:'-8px',
+        marginTop: '-8px',
       },
       refreshingChasBalance,
     } = props
@@ -731,9 +739,9 @@ class Banner extends PureComponent {
                               <div style={{ marginBottom: 15 }}>
                                 <div>
                                   {schemeData.coPaymentSchemeFK ||
-                                    schemeDataList.filter(p =>
-                                      this.isMedisave(p.schemeTypeFK),
-                                    )[0] === schemeData
+                                  schemeDataList.filter(p =>
+                                    this.isMedisave(p.schemeTypeFK),
+                                  )[0] === schemeData
                                     ? schemeData.copaymentSchemeName
                                     : schemeData.schemeTypeName}
                                   <span style={{ bottom: -2 }}>
@@ -870,17 +878,19 @@ class Banner extends PureComponent {
                               schemeData.schemeTypeFK,
                             )
                             const displayString = `
-                          ${schemeData.coPaymentSchemeFK || isMedisave
-                                ? schemeData.copaymentSchemeName || ''
-                                : schemeData.schemeTypeName || ''
-                              }
+                          ${
+                            schemeData.coPaymentSchemeFK || isMedisave
+                              ? schemeData.copaymentSchemeName || ''
+                              : schemeData.schemeTypeName || ''
+                          }
                           ${!isMedisave ? '(Exp:' : ''} 
-                          ${!isMedisave && schemeData.validTo
-                                ? moment(schemeData.validTo).format(
+                          ${
+                            !isMedisave && schemeData.validTo
+                              ? moment(schemeData.validTo).format(
                                   'DD MMM YYYY)',
                                 )
                               : ''
-                              }
+                          }
                           ${!isMedisave && !schemeData.validTo ? '-)' : ''}
                           `
                             return (
@@ -936,16 +946,16 @@ class Banner extends PureComponent {
                   title={
                     info.outstandingBalance
                       ? `${currencySymbol}${_.round(
-                        info.outstandingBalance,
-                        2,
-                      )}`
+                          info.outstandingBalance,
+                          2,
+                        )}`
                       : ''
                   }
                 >
                   <div
                     style={{
                       fontWeight: 500,
-                      marginTop: 5
+                      marginTop: 5,
                     }}
                   >
                     {info.outstandingBalance ? (
@@ -963,20 +973,29 @@ class Banner extends PureComponent {
             />
           </GridItem>
           <GridItem xs={6} md={2}>
-          <Block
-          body={
-            <div
-              style={{
-              fontWeight: 500,
-              marginTop: 5
-              }}>
-              <Link>
-                <span style={{textDecoration:'underline'}} onClick={(e) => {this.openNotes()}}>
-                Notes
-                </span>
-              </Link>
-            </div>
-          }/>
+            <Block
+              body={
+                <Authorized authority={'patientdatabase.patientprofiledetails.patienthistory.nursenotes'}>
+                  <div
+                    style={{
+                      fontWeight: 500,
+                      marginTop: 5,
+                    }}
+                  >
+                    <Link>
+                      <span
+                        style={{ textDecoration: 'underline' }}
+                        onClick={e => {
+                          this.openNotes()
+                        }}
+                      >
+                        Notes
+                      </span>
+                    </Link>
+                  </div>
+                </Authorized>
+              }
+            />
           </GridItem>
           <GridItem xs={1} md={1}>
             {extraCmt}
@@ -986,8 +1005,9 @@ class Banner extends PureComponent {
           open={this.state.showNotesModal}
           title='Notes'
           onClose={this.closeNotes}
-          maxWidth='lg'>
-          <PatientNurseNotes {...this.props}  />
+          maxWidth='lg'
+        >
+          <PatientNurseNotes {...this.props} />
         </CommonModal>
       </Paper>
       // </Affix>
