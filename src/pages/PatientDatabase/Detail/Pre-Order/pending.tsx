@@ -359,7 +359,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         render: row => {
           return (
             <span>
-              {row.quantity.toFixed(1)} {row.dispenseUOM}
+              {row.id < 0 ? row.quantity : row.quantity.toFixed(1)} {row.dispenseUOM}
             </span>
           )
         },
