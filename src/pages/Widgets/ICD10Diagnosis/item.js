@@ -238,12 +238,12 @@ const ICD10DiagnosisItem = ({
                     onChange={({ target }) => {
                       if (target.value) {
                         setShowPersistMsg(true)
-                        setPersitMsg('Diagnosis added from patient’s persistent diagnosis')
+                        setPersitMsg('Diagnosis added to patient’s persistent diagnosis')
                         setTimeout(() => {
                           setShowPersistMsg(false)
                         }, 3000)
                       } else {
-                        setPersitMsg('Diagnosis removed to patient’s persistent diagnosis')
+                        setPersitMsg('Diagnosis removed from patient’s persistent diagnosis')
                         setShowPersistMsg(true)
                         setTimeout(() => {
                           setShowPersistMsg(false)
