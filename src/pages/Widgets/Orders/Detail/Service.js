@@ -624,6 +624,10 @@ class Service extends PureComponent {
                   }}
                 />
               )}
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem xs={8} className={classes.editor}>
               {values.isPackage ? (
                 <Field
                   name='performingUserFK'
