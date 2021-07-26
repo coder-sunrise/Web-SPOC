@@ -14,6 +14,7 @@ import classnames from 'classnames'
 import { withStyles } from '@material-ui/core/styles'
 import PatientNurseNotes from '@/pages/PatientDatabase/Detail/PatientNurseNotes'
 import SelectPreOrder from '@/pages/Reception/Appointment/components/form/SelectPreOrder'
+import PatientDetail from '@/pages/PatientDatabase/Detail'
 import { MoreButton, LoadingWrapper } from '@/components/_medisys'
 import {
   GridContainer,
@@ -118,7 +119,7 @@ class Banner extends PureComponent {
     const {
       patient,
       codetable: { ctg6pd = [] },
-	  patientUrl,
+      from,
     } = props
     const { entity } = patient
     const info = entity
@@ -157,7 +158,7 @@ class Banner extends PureComponent {
                 md: 'pt',
                 cmt: 3,
                 pid: info.id,
-              }, patientUrl)}
+              })}
               tabIndex='-1'
             >
               <IconButton>
@@ -249,24 +250,45 @@ class Banner extends PureComponent {
   closePreOrders = () => this.setState({ showPreOrderModal: false })
   openScheme = () => this.setState({ showSchemeModal: true })
   closeScheme = () => this.setState({ showSchemeModal: false })
+  openPatientProfile = () => {
+    if(this.props.from !== 'Appointment') return
+    const { dispatch, patient } = this.props
+    const { entity } = patient 
+    this.setState({ showPatientProfile: true })
+  }
+  closePatientProfile = () => {
+    const { dispatch, patient } = this.props
+    const { entity } = patient
+    dispatch({
+      type: 'patient/query',
+      payload: {
+        id: entity.id,
+      },
+    })
+    this.setState({ showPatientProfile: false })
+  }
 
   getSchemeList = schemeDataList => {
     return schemeDataList.map(s => (
-      <Link>
-        <span
-          style={{
-            color: 'black',
-            textDecoration: 'underline',
-            whiteSpace: 'nowrap',
-          }}
-          onClick={e => {
-            this.openScheme()
-          }}
-        >
-          {s.copaymentSchemeName || s.schemeTypeName}{' '}
-          {s.validTo ? `(Exp: ${moment(s.validTo).format('DD/MM/YYYY')})` : ' '}
-        </span>{' '}
-      </Link>
+      <span
+        style={{ paddingRight: 5 }}
+      >
+        <Link>
+          <span
+            style={{
+              color: 'black',
+              textDecoration: 'underline',
+              whiteSpace: 'nowrap',
+            }}
+            onClick={e => {
+              this.openScheme()
+            }}
+          >
+            {s.copaymentSchemeName || s.schemeTypeName}
+            {s.validTo ? ` (Exp: ${moment(s.validTo).format('DD/MM/YYYY')})` : ''}
+          </span>
+        </Link>
+      </span>
     ))
   }
 
@@ -606,23 +628,10 @@ class Banner extends PureComponent {
 
   onViewPatientProfile = (event) => {
 	event.preventDefault()
-    const { patient, history, patientUrl, from, dispatch } = this.props
+    const { patient, history, from, dispatch } = this.props
     const { entity } = patient
     const info = entity
 
-	if(from === 'Appointment') {
-		
-	}
-
-    // history.push(
-    //   getAppendUrl({
-    //     md: 'pt',
-    //     cmt: '1',
-    //     pid: info.id,
-    //     v: Date.now(),
-    //   }, patientUrl),
-    // )
-	
 	this.props.dispatch({
 		type: 'global/updateState',
 		payload: {
@@ -647,9 +656,8 @@ class Banner extends PureComponent {
       // patientInfo = {},
       extraCmt,
 	  preOrderCmt,
-      from,
+      from = '',
       patient,
-	  patientUrl = '/patient',
       codetable,
       classes,
 	  activePreOrderItem,
@@ -662,8 +670,8 @@ class Banner extends PureComponent {
         overflowY: 'auto',
         top: headerHeight,
         zIndex: 998,
-        paddingLeft: 16,
-        paddingRight: 16,
+        // paddingLeft: 16,
+        // paddingRight: 16,
         // maxHeight: 100,
         backgroundColor: '#f0f8ff',
         marginTop: '-8px',
@@ -728,7 +736,7 @@ class Banner extends PureComponent {
         : null
 
     // console.log('banner-render', schemeDataList)
-	console.log('info',info)
+	// console.log('info',info)
     return (
       <Paper id='patientBanner' style={style}>
         {/* Please do not change the height below (By default is 100) */}
@@ -759,15 +767,16 @@ class Banner extends PureComponent {
                   <Tooltip title={name} placement='bottom-start'>
                     <span
                       style={{
-                        whiteSpace: 'nowrap',
+                        // whiteSpace: 'nowrap',
                         textOverflow: 'ellipsis',
                         textDecoration: 'underline',
                         display: 'inline-block',
                         width: '100%',
                         overflow: 'hidden',
-						fontWeight: 500,
+						            fontWeight: 500,
+                        fontSize: '1.1rem',
+                        color: 'rgb(75, 172, 198)',
                       }}
-					//   onClick={this.onViewPatientProfile}
                     >
                       {name}
                     </span>
@@ -983,7 +992,7 @@ class Banner extends PureComponent {
               </GridItem>
               <GridItem xs={6} md={4} className={classes.cell}>
                 <span className={classes.header}>Scheme: </span>
-                <span>{this.getSchemeList(schemeDataList)}</span>
+                {this.getSchemeList(schemeDataList)}
               </GridItem>
               <GridItem xs={6} md={3} className={classes.cell}>
                 <span className={classes.header}>Non-Claimable Info: </span>
@@ -1005,7 +1014,7 @@ class Banner extends PureComponent {
                     md: 'pt',
                     cmt: 1,
                     pid: info.id,
-                  }, patientUrl)}
+                  })}
                   // disabled={}
                   tabIndex='-1'
                 >
@@ -1018,6 +1027,24 @@ class Banner extends PureComponent {
             {extraCmt}
           </GridItem>
         </GridContainer>
+        <CommonModal
+          open={this.state.showPatientProfile}
+          onClose={this.closePatientProfile}
+          title='Patient Profile'
+          observe='PatientDetail'
+          authority='patient'
+          fullScreen
+          overrideLoading
+          showFooter={false}
+        >
+          <PatientDetail 
+            history={this.props.history}
+            linkProps={{
+              to: '#',
+            }}
+            onClose={this.closePatientProfile}
+          />
+        </CommonModal>
         <CommonModal
           open={this.state.showNotesModal}
           title='Notes'

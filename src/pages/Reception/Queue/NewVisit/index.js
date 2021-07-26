@@ -15,6 +15,7 @@ import {
 // medisys-components
 import { ErrorWrapper, LoadingWrapper } from '@/components/_medisys'
 // Sub-components
+import PatientBanner from '@/pages/PatientDashboard/Banner'
 import { deleteFileByFileID } from '@/services/file'
 import { VISIT_TYPE } from '@/utils/constants'
 import { locationQueryParameters } from '@/utils/utils'
@@ -141,6 +142,8 @@ class NewVisit extends PureComponent {
           visitOrderTemplateOptions: templateOptions,
         },
       })
+      
+      this.setBannerHeight()
     }
 
     const bizSession = await dispatch({
@@ -315,11 +318,22 @@ class NewVisit extends PureComponent {
       return result
     }, [])
   }
+  
+  setBannerHeight = () => {
+    const banner = document.getElementById('patientBanner')
+    const bannerHeight = banner ? banner.offsetHeight : 0
+    this.setState({
+      bannerHeight: bannerHeight,
+    })
+    if(bannerHeight === 0)
+        setTimeout(this.setBannerHeight, 1000)
+  }
 
   render () {
     const {
       classes,
       footer,
+      theme,
       queueLog: { list = [] } = { list: [] },
       loading,
       visitRegistration: {
@@ -335,7 +349,7 @@ class NewVisit extends PureComponent {
       patientInfo,
       ctinvoiceadjustment,
       codetable,
-    } = this.props 
+    } = this.props
     if (expandRefractionForm) {
       let div = $(this.myRef.current).find('div[aria-expanded]:eq(1)')
       if (div.attr('aria-expanded') === 'false') div.click()
@@ -402,19 +416,25 @@ class NewVisit extends PureComponent {
           text={!fetchingInfoText ? loadingText : fetchingInfoText}
         >
           {/* <Chip label='Read Only' className={classes.readOnlyChip} /> */}
-          <GridContainer className={classes.gridContainer}>
-            <GridItem xs sm={12} md={3}>
-              <PatientInfoCard
+          <GridContainer 
+            className={classes.gridContainer}
+          >
+          <GridItem xs sm={12} md={12}>
+            <div
+              style={{ padding: 8, marginTop: -20 }}
+            >
+              <PatientBanner
+                from='VisitReg'
                 {...this.props}
-                autoRefreshChas={autoRefreshChas}
               />
-            </GridItem>
+            </div> 
+          </GridItem>
             <GridItem
               container
               xs
-              md={9}
+              md={12}    
               style={{
-                height,
+                height: height - (this.state.bannerHeight || 0) - 50,
                 overflow: 'auto',
               }}
             >
@@ -485,12 +505,11 @@ class NewVisit extends PureComponent {
                             />
                           </CommonCard>
                         </GridItem>
-                        {preOrderActualizationAccessRight.rights !== 'hidden' && (<GridItem xs={12} className={classes.row}>
+                        {preOrderActualizationAccessRight && preOrderActualizationAccessRight.rights !== 'hidden' && (<GridItem xs={12} className={classes.row}>
                           <CommonCard title='Pre-Order Actualization'>
                           <PreOrderCard {...this.props} values={values} visitPreOrderItem= {values.visitPreOrderItem} dispatch={dispatch}/>
                           </CommonCard>
                          </GridItem>)}
-                        
                         <GridItem xs={12} className={classes.row}>
                           <div ref={this.myRef}>
                             <Accordion
@@ -540,4 +559,4 @@ class NewVisit extends PureComponent {
   }
 }
 
-export default withStyles(styles, { name: 'NewVisitModal' })(NewVisit)
+export default withStyles(styles, { name: 'NewVisitModal', withTheme: true })(NewVisit)
