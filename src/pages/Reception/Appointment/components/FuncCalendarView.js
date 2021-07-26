@@ -349,76 +349,15 @@ const CalendarView = ({
         // TODO: need to fix sortOrder calculation, should exclude deleted appointments when calculating sortOrder
         const firstApptRes = apptResources.find(item => item.isPrimaryClinician)
 
-          if (!firstApptRes) return events
+        if (!firstApptRes) return events
 
-          const firstClinicianFK =
-            firstApptRes !== undefined ? firstApptRes.clinicianFK : undefined
+        const firstClinicianFK =
+          firstApptRes !== undefined ? firstApptRes.clinicianFK : undefined
 
-          const firstAppointmentTypeFK =
-            firstApptRes !== undefined
-              ? firstApptRes.appointmentTypeFK
-              : undefined
-
-          return [
-            ...events,
-            {
-              ...appointment,
-              appointmentTypeFK: firstAppointmentTypeFK,
-              clinicianFK: firstClinicianFK,
-              resourceId: firstClinicianFK,
-              clinicianName: !firstApptRes
-                ? undefined
-                : firstApptRes.clinicianName,
-              start: moment(
-                `${appointment.appointmentDate} ${firstApptRes.startTime}`,
-                `${serverDateFormat} HH:mm`,
-              ).toDate(),
-              end: moment(
-                `${appointment.appointmentDate} ${firstApptRes.endTime}`,
-                `${serverDateFormat} HH:mm`,
-              ).toDate(),
-            },
-          ]
-        }, [])
-      return calendarEvents.reduce((events, appointment) => {
-        const {
-          appointmentDate,
-          patientProfile,
-          patientName,
-          patientContactNo,
-          isEnableRecurrence,
-          appointment_Resources: apptResources,
-          appointmentRemarks,
-          appointmentStatusFk,
-          bookedByUser,
-          createDate,
-          isEditedAsSingleAppointment,
-        } = appointment
-
-        const apptEvents = apptResources.map((item) => ({
-          ...item,
-          resourceId: item.clinicianFK,
-          clinicianFK: item.clinicianFK,
-          patientProfile,
-          patientName,
-          patientContactNo,
-          isEnableRecurrence,
-          appointmentRemarks,
-          appointmentStatusFk,
-          bookedByUser,
-          createDate,
-          isEditedAsSingleAppointment,
-          stageColorHex: appointment.stageColorHex,
-          stage: appointment.stage,
-          start: moment(
-            `${appointmentDate} ${item.startTime}`,
-            `${serverDateFormat} HH:mm`,
-          ).toDate(),
-          end: moment(
-            `${appointmentDate} ${item.endTime}`,
-            `${serverDateFormat} HH:mm`,
-          ).toDate(),
-        }))
+        const firstAppointmentTypeFK =
+          firstApptRes !== undefined
+            ? firstApptRes.appointmentTypeFK
+            : undefined
 
         return [
           ...events,
@@ -469,6 +408,8 @@ const CalendarView = ({
         bookedByUser,
         createDate,
         isEditedAsSingleAppointment,
+        stageColorHex: appointment.stageColorHex,
+        stage: appointment.stage,
         start: moment(
           `${appointmentDate} ${item.startTime}`,
           `${serverDateFormat} HH:mm`,
@@ -478,7 +419,6 @@ const CalendarView = ({
           `${serverDateFormat} HH:mm`,
         ).toDate(),
       }))
-
       return [...events, ...apptEvents]
     }, [])
   }, [calendarView, calendarEvents])
